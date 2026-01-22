@@ -335,6 +335,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(kernel_macros_file) $(no_repo_acl) $(prep
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
+		--kernel-macros-file="$(kernel_macros_file)" \
 		--build-attempts="$$(($(PACKAGE_BUILD_RETRIES)+1))" \
 		--check-attempts="$$(($(CHECK_BUILD_RETRIES)+1))" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \

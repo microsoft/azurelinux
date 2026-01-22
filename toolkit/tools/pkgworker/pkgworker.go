@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -52,6 +53,7 @@ var (
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
 	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
+	kernelMacrosFile     = app.Flag("kernel-macros-file", "File containing kernel macros to use while building.").ExistingFile()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
 	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
@@ -117,7 +119,7 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *kernelMacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
@@ -154,7 +156,7 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, kernelMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -217,6 +219,31 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return
+	}
+
+	if kernelMacrosFile != "" {
+		macroDir, macroErr := rpm.GetMacroDir()
+		if macroErr != nil {
+			err = fmt.Errorf("failed to get RPM macros directory: %w", macroErr)
+			return
+		}
+
+		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
+		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(kernelMacrosFile))
+
+		macroErr = directory.EnsureDirExists(macrosDestDir)
+		if macroErr != nil {
+			err = fmt.Errorf("failed to create macros directory in chroot: %w", macroErr)
+			return
+		}
+
+		macroErr = file.Copy(kernelMacrosFile, macrosDestFile)
+		if macroErr != nil {
+			err = fmt.Errorf("failed to copy kernel macros file into chroot: %w", macroErr)
+			return
+		}
+
+		logger.Log.Infof("Copied kernel macros file into pkgworker chroot (%s -> %s)", kernelMacrosFile, macrosDestFile)
 	}
 	defer chroot.Close(noCleanup)
 
