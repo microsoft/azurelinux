@@ -9,6 +9,22 @@ Group:          System/Management
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# We can use the generate-source-tarball.sh script in the given folder along with the package version to build the tarball automatically.
+# In case we need to re-build this file manually:
+#   1. wget https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. Apply golang-version-upgrade.patch
+#   5. go mod vendor
+#   6. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-upgrade.patch
 Patch1:         remove-caBundle-placeholder.patch
 Patch2:         patch-datavolume-based-on-kubernetes-version.patch
@@ -31,11 +47,13 @@ allowing for true Kubevirt hybrid deployments of Kubernetes.
 
 %prep
 %autosetup -N
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
 %autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
-export GOPROXY=https://proxy.golang.org
+export GOFLAGS="-mod=vendor"
 make manager
 
 %install
