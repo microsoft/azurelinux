@@ -33,6 +33,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
 specs_file               = $(PKGBUILD_DIR)/specs.json
+kernel_macros_file       = $(PKGBUILD_DIR)/macros.kernel
 graph_file               = $(PKGBUILD_DIR)/graph.dot
 cached_file              = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file        = $(PKGBUILD_DIR)/preprocessed_graph.dot
@@ -92,7 +93,25 @@ analyze-built-graph: $(go-graphanalytics)
 # Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
 # We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
 # We only parse the spec files we will actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
+$(kernel_macros_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-kernelverprocessor) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
+	$(go-kernelverprocessor) \
+		--dir $(SPECS_DIR) \
+		--dist-tag $(DIST_TAG) \
+		$(logging_command) \
+		--cpu-prof-file=$(PROFILE_DIR)/kernelverprocessor.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/kernelverprocessor.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/kernelverprocessor.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/kernelverprocessor.jsonl \
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+		--output $@
+
+# Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
+# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
+# We only parse the spec files we will actually pack.
+$(specs_file): $(kernel_macros_file) $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
 		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
@@ -103,6 +122,7 @@ $(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
+		--kernel-macros-file $(kernel_macros_file) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--cpu-prof-file=$(PROFILE_DIR)/specreader.cpu.pprof \
@@ -120,32 +140,6 @@ ifeq ($(RESOLVE_CYCLES_FROM_UPSTREAM),y)
       $(error RESOLVE_CYCLES_FROM_UPSTREAM requires upstream repos to be enabled. Please set DISABLE_UPSTREAM_REPOS=n)
    endif
 endif
-
-# Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
-# We only parse the spec files we will actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-kernelverprocessor) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
-	$(go-kernelverprocessor) \
-		--dir $(SPECS_DIR) \
-		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
-		--build-dir $(parse_working_dir) \
-		--srpm-dir $(BUILD_SRPMS_DIR) \
-		--rpm-dir $(RPMS_DIR) \
-		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
-		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
-		--dist-tag $(DIST_TAG) \
-		--worker-tar $(chroot_worker) \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		$(logging_command) \
-		--cpu-prof-file=$(PROFILE_DIR)/kernelverprocessor.cpu.pprof \
-		--mem-prof-file=$(PROFILE_DIR)/kernelverprocessor.mem.pprof \
-		--trace-file=$(PROFILE_DIR)/kernelverprocessor.trace \
-		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
-		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
-		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
-		--timestamp-file=$(TIMESTAMP_DIR)/kernelverprocessor.jsonl \
-		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
-		--output $@
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
@@ -323,7 +317,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(kernel_macros_file) $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \

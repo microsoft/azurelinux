@@ -29,6 +29,7 @@ var (
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
 	specList                = app.Flag("spec-list", "List of SPECs to parse. If empty will parse all SPECs.").Default("").String()
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
+	kernelMacrosFile        = app.Flag("kernel-macros-file", "File containing kernel macros to use while parsing.").ExistingFile()
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
 	srpmsDir                = app.Flag("srpm-dir", "Directory containing SRPMs.").Required().ExistingDir()
@@ -74,6 +75,6 @@ func main() {
 	specsAbsDir, err := filepath.Abs(*specsDir)
 	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
 
-	err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
+	err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, *kernelMacrosFile, *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
