@@ -15,7 +15,7 @@ License:        Apache-2.0
 URL:            https://crates.io/crates/%{crate}
 Source0:        https://github.com/coreos/%{crate}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # not used on Fedora
-Source1:        https://github.com/coreos/%{crate}/releases/download/v%{version}/%{crate}-%{version}-vendor.tar.gz
+Source1:        %{crate}-%{version}-azlcustomvendor.tar.gz
 Patch0:         0001-Revert-remove-cl-legacy-feature.patch
 Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
 Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
