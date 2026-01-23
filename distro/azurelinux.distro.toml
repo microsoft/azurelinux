@@ -1,0 +1,18 @@
+[distros.azurelinux]
+description = "Azure Linux"
+default-version = "4.0"
+
+[distros.azurelinux.versions.'4.0']
+description = "Azure Linux 4.0"
+release-ver = "4.0"
+mock-config-x86_64 = "mock/azurelinux-4.0-x86_64.cfg"
+mock-config-aarch64 = "mock/azurelinux-4.0-aarch64.cfg"
+
+[distros.azurelinux.versions.'4.0'.default-component-config]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" } }
+
+[distros.azurelinux.versions.'4.0'.default-component-config.build.defines]
+dist = ".azl4"
+vendor = "Microsoft Corporation"
+distribution = "Azure Linux"
+rhel = "10"

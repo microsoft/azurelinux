@@ -1,0 +1,12 @@
+#
+# Base project
+#
+
+includes = ["comps/components.toml", "images/images.toml"]
+
+[project]
+description = 'azurelinux-base'
+log-dir = 'build/logs'
+work-dir = 'build/work'
+output-dir = 'out'
+default-distro = { name = "azurelinux", version = "4.0" }

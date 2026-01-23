@@ -1,0 +1,28 @@
+<!-- When changing this file, bump up the @tagVersion value. -->
+<?xml version="1.0" encoding="utf-8"?>
+<SoftwareIdentity
+  xmlns="http://standards.iso.org/iso/19770/-2/2015/schema.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://standards.iso.org/iso/19770/-2/2015/schema.xsd http://standards.iso.org/iso/19770/-2/2015-current/schema.xsd"
+  xml:lang="en-US"
+  tagId="com.microsoft.AzureLinux-$version"
+  tagVersion="1"
+  name="AzureLinux"
+  version="$version"
+  versionScheme="unknown"
+  media="(OS:linux)">
+  <Entity
+    name="Microsoft Corporation"
+    regid="microsoft.com"
+    role="tagCreator softwareCreator aggregator distributor licensor" />
+  <Link
+    rel="license"
+    href="https://aka.ms/azurelinux" />
+  <Meta
+    product="Azure Linux"
+    colloquialVersion="$version"
+    summary="Azure Linux distribution"
+    entitlementDataRequired="false"
+    unspscCode="43233004"
+    unspscVersion="20.0601" />
+</SoftwareIdentity>

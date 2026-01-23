@@ -1,0 +1,7 @@
+# Top-level configuration file.
+#
+# In the future, the contents of `distro/` and `base/` will be in separate
+# git branches. For now, we stitch them together into a coherent configuration
+# namespace by including them both in this file.
+
+includes = ["distro/distro.toml", "base/project.toml"]

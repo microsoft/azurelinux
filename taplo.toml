@@ -1,0 +1,8 @@
+include = ["**/*.toml"]
+exclude = ["base/out/**/*.toml", "base/build/**/*.toml"]
+
+[[rule]]
+include = ["azldev.toml", "distro/**/*.toml", "base/**/*.toml"]
+
+[rule.schema]
+path = "./external/schemas/azldev.schema.json"

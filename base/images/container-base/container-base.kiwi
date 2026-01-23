@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-container-base">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>user@example.com</contact>
+        <specification>Azure Linux Container Image Example</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <type image="docker">
+            <containerconfig
+                name="microsoft/azurelinux/base/core"
+                tag="4.0"
+                additionalnames=":latest"
+                user="root"
+                workingdir="/">
+                <subcommand execute="/bin/bash"/>
+            </containerconfig>
+        </type>
+    </preferences>
+
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+    </repository>
+
+    <packages type="image">
+        <!-- Core group -->
+        <package name="basesystem" />
+        <package name="bash" />
+        <package name="system-release" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="basesystem" />
+        <package name="filesystem" />
+        <package name="system-release" />
+    </packages>
+</image>

@@ -1,0 +1,374 @@
+# TODO(azl): review this file
+
+# We deviate from some upstream defaults
+disable systemd-timesyncd.service
+# We want to update systemd-boot from packaging scriptlets after updates.
+disable systemd-boot-update.service
+
+enable systemd-resolved.service
+
+enable systemd-oomd.service
+
+# System stuff
+enable dbus.socket
+enable dbus-broker.service
+enable sshd.service
+
+# Locally-running services
+enable atd.*
+enable crond.*
+
+enable chronyd.service
+
+# Enable systemd's network daemon
+enable systemd-networkd.service
+enable systemd-networkd-wait-online.service
+
+enable auditd.service
+
+enable audit-rules.service
+
+# Locally-running service
+enable restorecond.service
+
+enable bluetooth.*
+
+enable avahi-daemon.*
+
+# Default configuration is locally-running only
+# CUPS is now socket-activatable for local use-cases, so don't enable cups.service
+enable cups.socket
+enable cups.path
+
+# The various syslog implementations
+enable rsyslog.*
+enable syslog-ng.*
+enable sysklogd.*
+
+# Network facing
+enable firewalld.service
+
+# Virtualization driver specific daemons. Start by default at boot for VM
+# autostart, but shutdown after 2 mins and socket activated thereafter
+enable virtqemud.service
+enable virtxend.service
+enable virtlxcd.service
+enable virtvboxd.service
+
+# Sockets for the services listed above, to support socket activation
+# after the initial timeout
+enable virtqemud.socket
+enable virtqemud-ro.socket
+enable virtqemud-admin.socket
+enable virtxend.socket
+enable virtxend-ro.socket
+enable virtxend-admin.socket
+enable virtlxcd.socket
+enable virtlxcd-ro.socket
+enable virtlxcd-admin.socket
+enable virtvboxd.socket
+enable virtvboxd-ro.socket
+enable virtvboxd-admin.socket
+
+# Compatibility with libvirtd sockets for old clients (socket activated
+# only when required). Note that the -tcp and -tls sockets are kept disabled
+# by default, as they require additional configuration before they can work
+enable virtproxyd.socket
+enable virtproxyd-ro.socket
+enable virtproxyd-admin.socket
+
+# Secondary drivers providing supporting functionality to main virtualization
+# drivers (socket activated only when required)
+enable virtinterfaced.socket
+enable virtinterfaced-ro.socket
+enable virtinterfaced-admin.socket
+enable virtnetworkd.socket
+enable virtnetworkd-ro.socket
+enable virtnetworkd-admin.socket
+enable virtnodedevd.socket
+enable virtnodedevd-ro.socket
+enable virtnodedevd-admin.socket
+enable virtnwfilterd.socket
+enable virtnwfilterd-ro.socket
+enable virtnwfilterd-admin.socket
+enable virtsecretd.socket
+enable virtsecretd-ro.socket
+enable virtsecretd-admin.socket
+enable virtstoraged.socket
+enable virtstoraged-ro.socket
+enable virtstoraged-admin.socket
+
+# Non-driver support services (socket activated only when required, no
+# read-only socket)
+enable virtlogd.socket
+enable virtlogd-admin.socket
+enable virtlockd.socket
+enable virtlockd-admin.socket
+
+# Intel SGX
+enable aesmd.service
+enable mpa_registration.service
+enable qgs.service
+
+enable xinetd.service
+
+# Storage
+enable multipathd.service
+
+enable libstoragemgmt.service
+
+enable iscsid.socket
+enable iscsiuio.socket
+
+enable iscsi-starter.service
+
+# iSCSI support for early-boot
+enable iscsi-onboot.service
+
+# Locally-running services
+enable lvm2-monitor.*
+enable lvm2-lvmetad.*
+enable dm-event.*
+enable dmraid-activation.service
+
+enable mdmonitor.service
+enable mdmonitor-takeover.service
+
+enable raid-check.timer
+
+enable spice-vdagentd.service
+
+enable qemu-guest-agent.service
+
+enable dnf-makecache.timer
+
+enable rpm-ostree-countme.timer
+
+# Hyper-V guest support daemons
+enable vmtoolsd.service
+enable vgauthd.service
+
+enable dkms.service
+
+enable ipmi.service
+enable ipmievd.service
+
+enable x509watch.timer
+
+enable dnssec-triggerd.service
+
+enable uuidd.socket
+
+# Hardware
+# Locally-running service
+enable gpm.*
+
+enable gpsd.socket
+
+enable x2gocleansessions.service
+
+enable unbound-anchor.timer
+
+enable lvm2-lvmpolld.*
+
+enable dbxtool.service
+
+# Locally-running services
+enable irqbalance.service
+enable lm_sensors.service
+enable mcelog.*
+enable smartd.service
+enable pcscd.socket
+enable rngd.service
+
+# Other stuff
+# Note: abrt-ccpp.service is excluded in favor of systemd-coredump.
+enable abrtd.service
+enable abrt-journal-core.service
+enable abrt-oops.service
+enable abrt-xorg.service
+enable abrt-vmcore.service
+
+# Locally-running services
+enable ksm.service
+enable ksmtuned.service
+enable rootfs-resize.service
+enable sysstat.service
+enable sysstat-collect.timer
+enable sysstat-summary.timer
+enable uuidd.service
+enable xendomains.service
+enable xenstored.service
+enable xenconsoled.service
+
+# Desktop stuff
+# Locally-running services
+enable accounts-daemon.service
+enable rtkit-daemon.service
+enable upower.service
+enable udisks2.service
+enable polkit.service
+
+enable plasma-setup.service
+
+enable timedatex.service
+
+enable mlocate-updatedb.timer
+
+enable plocate-updatedb.timer
+
+enable sa-update.timer
+
+# mcelog is a utility that collects and decodes Machine Check Exception data
+# on x86-32 and x86-64 systems.
+enable mcelog.service
+
+# OPAL-prd is a utility specific to ppc64le systems
+# It is the "OPAL Processor Recovery Diagnostics Daemon"
+enable opal-prd.service
+
+# lircd is the Linux Infrared Control daemon
+# Starting with version 0.9.4, it requires no manual configuration
+enable lircd.socket
+
+# IPSec management
+enable pluto.socket
+
+# Automatically refresh installed snaps
+enable snapd.refresh.timer
+# Socket activated daemon to manage snaps
+enable snapd.socket
+
+# Support for dual-GPU systems
+enable switcheroo-control.service
+
+# Support for the DRBD link-cleaning service
+enable drbdlinksclean.service
+
+# Enable the System Security Services Daemon
+enable sssd.service
+
+# Enable ostree-remount on ostree-based systems
+# (Does nothing on non-ostree systems)
+enable ostree-remount.service
+
+# Enable Performance Co-Pilot services
+enable pmcd.service
+enable pmlogger.service
+enable pmie.service
+
+# Enable SSSD Kerberos Credential Cache Server
+enable sssd-kcm.socket
+
+# A mechanism to transfer state between the initramfs and the real
+# system. Obsolete since /run was introduced, but still used by some
+# services.
+enable import-state.service
+
+# An initscripts mechanism for readonly root
+enable readonly-root.service
+
+# Ensure that any installed kmods are built for the currently-running
+# kernel at boot
+enable akmods.service
+
+# virtualbox-guest-additions service, yet another virtual-machine guest
+# integration agent, this is a locally-running service, Note this has a
+# "ConditionVirtualization=|oracle" so it will only run under VirtualBox
+enable vboxservice.service
+
+# Mark the system for SELinux autorelabel when appropriate
+enable selinux-autorelabel-mark.service
+
+enable cpi.service
+
+# Initialize persistent devices on s390x
+enable device_cio_free.service
+
+# Enable the stratis daemon for managing stratis storage
+enable stratisd.service
+
+# Enable a service to finalize staged OSTree changes at shutdown
+enable ostree-finalize-staged.path
+
+# Enable the Docker daemon socket
+enable docker.socket
+
+# Run fstrim weekly on filesystems listed in fstab
+enable fstrim.timer
+
+# oneshot to generate kata VM appliance at host bootup
+# for the booted kernel
+enable kata-osbuilder-generate.service
+
+# Enable rotation of system log files
+enable logrotate.timer
+
+# Enable regular update of SpamAssassin data files
+enable sa-update.timer
+
+# Enable service to automatically rebuild the RPM database
+# on startup when /var/lib/rpm/.rebuilddb exists
+enable rpmdb-rebuild.service
+
+# Enable service to automatically migrate the RPM database to /usr
+# on startup when /var/lib/rpm/.migratedb exists
+enable rpmdb-migrate.service
+
+# Support service for Azure
+enable waagent.service
+
+# Certbot (Let's Encrypt)
+enable certbot-renew.timer
+
+# enable thermald by default for desktops
+enable thermald.service
+
+# enable uresourced by default for desktops
+enable uresourced.service
+
+# enable power-profiles-daemon
+enable power-profiles-daemon.service
+
+# enable tuned and tuned-ppd
+enable tuned.service
+enable tuned-ppd.service
+
+# Enable clevis-luks-askpass.path
+enable clevis-luks-askpass.path
+
+# Enable livesys services for live media
+enable livesys.service
+enable livesys-late.service
+
+# Enable Waydroid
+enable waydroid-container.service
+
+# Enable nmstate to apply network configuration from /etc/nmstate/*.yml
+enable nmstate.service
+
+# Enable nfs-client.target
+enable nfs-client.target
+
+# Enable cloud-init services
+enable cloud-config.service
+enable cloud-final.service
+enable cloud-init-main.service
+enable cloud-init-local.service
+
+# Enable  kernel-bootcfg-boot-successful.service
+enable kernel-bootcfg-boot-successful.service
+
+# Enable lvm-devices-import
+enable /usr/lib/systemd/system/lvm-devices-import.path
+enable /usr/lib/systemd/system/lvm-devices-import.service
+
+# Enable fips-crypto-policy-overlay
+enable fips-crypto-policy-overlay.service
+
+# Enable gpio-manager.service
+enable gpio-manager.service
+
+# Enable authselect-apply-changes.service
+enable authselect-apply-changes.service
+

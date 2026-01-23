@@ -1,0 +1,2 @@
+[components.azurelinux-release]
+spec = { type = "local", path = "azurelinux-release.spec" }

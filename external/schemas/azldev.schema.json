@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gim-home/azldev-preview/internal/projectconfig/config-file",
+  "$ref": "#/$defs/ConfigFile",
+  "$defs": {
+    "ComponentBuildConfig": {
+      "properties": {
+        "with": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "With options",
+          "description": "'with' options to pass to the builder."
+        },
+        "without": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Without options",
+          "description": "'without' options to pass to the builder."
+        },
+        "defines": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "title": "Macro definitions",
+          "description": "Macro definitions to pass to the builder."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentConfig": {
+      "properties": {
+        "spec": {
+          "$ref": "#/$defs/SpecSource",
+          "title": "Spec",
+          "description": "Identifies where to find the spec for this component"
+        },
+        "overlays": {
+          "items": {
+            "$ref": "#/$defs/ComponentOverlay"
+          },
+          "type": "array",
+          "title": "Overlays",
+          "description": "Overlays to apply to this component's spec and/or sources"
+        },
+        "build": {
+          "$ref": "#/$defs/ComponentBuildConfig",
+          "title": "Build configuration",
+          "description": "Configuration for building the component"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentGroupConfig": {
+      "properties": {
+        "specs": {
+          "items": {
+            "type": "string",
+            "examples": [
+              "SPECS/**/.spec"
+            ]
+          },
+          "type": "array",
+          "title": "Spec path patterns",
+          "description": "List of glob patterns identifying local specs for components in this group"
+        },
+        "excluded-paths": {
+          "items": {
+            "type": "string",
+            "examples": [
+              "build/**"
+            ]
+          },
+          "type": "array",
+          "title": "Excluded path patterns",
+          "description": "List of glob patterns identifying local paths to exclude from spec selection"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentOverlay": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "spec-add-tag",
+            "spec-set-tag",
+            "spec-update-tag",
+            "spec-remove-tag",
+            "spec-prepend-lines",
+            "spec-append-lines",
+            "spec-search-replace",
+            "file-prepend-lines",
+            "file-search-replace",
+            "file-add",
+            "file-remove",
+            "file-rename"
+          ],
+          "title": "Overlay type",
+          "description": "The type of overlay to apply"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human readable description of overlay"
+        },
+        "file": {
+          "type": "string",
+          "title": "Filename",
+          "description": "The name of the non-spec file to which this overlay applies"
+        },
+        "section": {
+          "type": "string",
+          "title": "Section name",
+          "description": "The name of the section to which this overlay applies"
+        },
+        "package": {
+          "type": "string",
+          "title": "Package name",
+          "description": "The name of the sub-package to which this overlay applies"
+        },
+        "tag": {
+          "type": "string",
+          "title": "Tag",
+          "description": "For overlays that apply to spec tags"
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "An exact string value to match in the spec"
+        },
+        "regex": {
+          "type": "string",
+          "title": "Regular expression",
+          "description": "The regular expression to match in the spec"
+        },
+        "replacement": {
+          "type": "string",
+          "title": "Replacement text",
+          "description": "The replacement text to use in the spec"
+        },
+        "lines": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Lines",
+          "description": "The lines of text to use"
+        },
+        "source": {
+          "type": "string",
+          "title": "Source",
+          "description": "For overlays that require a source file as input"
+        },
+        "allow-no-match": {
+          "type": "boolean",
+          "title": "Allow no match",
+          "description": "For search-and-replace overlays (spec-search-replace"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "type"
+      ]
+    },
+    "ConfigFile": {
+      "properties": {
+        "$schema": {
+          "type": "string"
+        },
+        "project": {
+          "$ref": "#/$defs/ProjectInfo",
+          "title": "Project info",
+          "description": "Basic properties for this project"
+        },
+        "includes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Includes",
+          "description": "List of glob patterns specifying additional config files to load"
+        },
+        "distros": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DistroDefinition"
+          },
+          "type": "object",
+          "title": "Distros",
+          "description": "Definitions of distros to build for or consume from"
+        },
+        "component-groups": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ComponentGroupConfig"
+          },
+          "type": "object",
+          "title": "Component groups",
+          "description": "Definitions of component groups for this project"
+        },
+        "components": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ComponentConfig"
+          },
+          "type": "object",
+          "title": "Components",
+          "description": "Definitions of components for this project"
+        },
+        "tools": {
+          "$ref": "#/$defs/ToolsConfig",
+          "title": "Tools configuration",
+          "description": "Configuration for tools used by azldev"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DistroDefinition": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human readable description"
+        },
+        "default-version": {
+          "type": "string",
+          "title": "Default version",
+          "description": "Default version for this distro"
+        },
+        "dist-git-base-uri": {
+          "type": "string",
+          "format": "uri",
+          "title": "Dist-git base URI",
+          "description": "Base URI for the dist-git repository for this distro"
+        },
+        "lookaside-base-uri": {
+          "type": "string",
+          "format": "uri",
+          "title": "Lookaside base URI",
+          "description": "Base URI for lookaside cache for this distro"
+        },
+        "repos": {
+          "items": {
+            "$ref": "#/$defs/PackageRepository"
+          },
+          "type": "array",
+          "title": "Package Repositories",
+          "description": "List of package repository definitions"
+        },
+        "versions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DistroVersionDefinition"
+          },
+          "type": "object",
+          "title": "Versions",
+          "description": "Mapping of distro version definitions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DistroReference": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Name of the referenced distro"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "Version of the referenced distro"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "DistroVersionDefinition": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human readable description of the distro version"
+        },
+        "release-ver": {
+          "type": "string",
+          "title": "Release version",
+          "description": "Formal releasever string"
+        },
+        "dist-git-branch": {
+          "type": "string",
+          "title": "Dist-git branch",
+          "description": "Branch in the dist-git repository for this version"
+        },
+        "default-component-config": {
+          "$ref": "#/$defs/ComponentConfig",
+          "title": "Default component config",
+          "description": "Default component config inherited by all components built for this distro"
+        },
+        "mock-config": {
+          "type": "string",
+          "title": "Mock config file",
+          "description": "Path to the mock config file for this version"
+        },
+        "mock-config-x86_64": {
+          "type": "string",
+          "title": "Mock config file",
+          "description": "Path to the x86_64 mock config file for this version"
+        },
+        "mock-config-aarch64": {
+          "type": "string",
+          "title": "Mock config file",
+          "description": "Path to the aarch64 mock config file for this version"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "release-ver"
+      ]
+    },
+    "ImageCustomizerConfig": {
+      "properties": {
+        "containerTag": {
+          "type": "string",
+          "title": "Container tag",
+          "description": "Container tag of the Image Customizer container"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PackageRepository": {
+      "properties": {
+        "base-uri": {
+          "type": "string",
+          "title": "Base URI",
+          "description": "Base URI for the repository"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "base-uri"
+      ]
+    },
+    "ProjectInfo": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "classic-toolkit",
+            ""
+          ],
+          "title": "Project Type",
+          "description": "Type of the project"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human readable project description"
+        },
+        "log-dir": {
+          "type": "string",
+          "title": "Log Directory",
+          "description": "Path to the log directory",
+          "examples": [
+            "logs"
+          ]
+        },
+        "work-dir": {
+          "type": "string",
+          "title": "Work Directory",
+          "description": "Path to temporary working directory",
+          "examples": [
+            "work"
+          ]
+        },
+        "output-dir": {
+          "type": "string",
+          "title": "Output Directory",
+          "description": "Path to the output directory",
+          "examples": [
+            "out"
+          ]
+        },
+        "default-distro": {
+          "$ref": "#/$defs/DistroReference",
+          "title": "Default Distro",
+          "description": "Default selected distro reference"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SpecSource": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "local",
+            "upstream",
+            ""
+          ],
+          "title": "Source Type",
+          "description": "The type of the spec source"
+        },
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Path to the spec (if available locally)",
+          "examples": [
+            "specs/mycomponent.spec"
+          ]
+        },
+        "upstream-distro": {
+          "$ref": "#/$defs/DistroReference",
+          "title": "Upstream distro",
+          "description": "Reference to the upstream distro providing the spec"
+        },
+        "upstream-name": {
+          "type": "string",
+          "title": "Upstream component name",
+          "description": "Name of the component in the upstream distro",
+          "examples": [
+            "different-name"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "type"
+      ]
+    },
+    "ToolsConfig": {
+      "properties": {
+        "imageCustomizer": {
+          "$ref": "#/$defs/ImageCustomizerConfig",
+          "title": "Image Customizer tool configuration",
+          "description": "Configuration for the Image Customizer tool"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "$comment": "This schema was auto-generated by: azldev config generate-schema"
+}

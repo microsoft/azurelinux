@@ -1,0 +1,36 @@
+[distros.fedora]
+description = "Fedora Linux"
+default-version = "43"
+dist-git-base-uri = "https://src.fedoraproject.org/rpms/$pkg.git"
+lookaside-base-uri = "https://src.fedoraproject.org/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
+repos = [
+    # NOTE: These are source repositories; we will want to tag them as such in the future.
+    {"base-uri" = "https://na.edge.kernel.org/fedora/releases/$releasever/Everything/source/tree" },
+    {"base-uri" = "https://na.edge.kernel.org/fedora/updates/$releasever/Everything/source/tree" },
+    {"base-uri" = "https://na.edge.kernel.org/fedora/development/$releasever/Everything/source/tree" },
+]
+
+[distros.fedora.versions.41]
+description = "Fedora Linux 41"
+release-ver = "41"
+dist-git-branch = "f41"
+
+[distros.fedora.versions.42]
+description = "Fedora Linux 42"
+release-ver = "42"
+dist-git-branch = "f42"
+
+[distros.fedora.versions.43]
+description = "Fedora Linux 43"
+release-ver = "43"
+dist-git-branch = "f43"
+
+[distros.fedora.versions.44]
+description = "Fedora Linux 44"
+release-ver = "43"
+dist-git-branch = "f44"
+
+[distros.fedora.versions.rawhide]
+description = "Fedora Linux Rawhide"
+release-ver = "rawhide"
+dist-git-branch = "rawhide"
