@@ -1,0 +1,99 @@
+From e8f8acb4f03f72803843547319b550c0bd559fa8 Mon Sep 17 00:00:00 2001
+From: dj_palli <v-dpalli@microsoft.com>
+Date: Mon, 4 Aug 2025 01:59:20 +0000
+Subject: [PATCH] 
+ llhttp_settings_t_Parser_structure_callBack_ptrs_in_src_node_http_parser_cc_to_map_with_llhttp_h_except_AddBindingData_BindingData.patch
+
+---
+ src/node_http_parser.cc | 66 +++++++++++++++++++++++++++--------------
+ 1 file changed, 44 insertions(+), 22 deletions(-)
+
+diff --git a/src/node_http_parser.cc b/src/node_http_parser.cc
+index d1942c25..a5365898 100644
+--- a/src/node_http_parser.cc
++++ b/src/node_http_parser.cc
+@@ -524,7 +524,7 @@ class Parser : public AsyncWrap, public StreamListener {
+ 
+     if (chunk_extensions_nread_ > kMaxChunkExtensionsSize) {
+       llhttp_set_error_reason(&parser_,
+-        "HPE_CHUNK_EXTENSIONS_OVERFLOW:Chunk extensions overflow");
++      "HPE_CHUNK_EXTENSIONS_OVERFLOW:Chunk extensions overflow");
+       return HPE_USER;
+     }
+ 
+@@ -1168,29 +1168,51 @@ void ConnectionsList::Expired(const FunctionCallbackInfo<Value>& args) {
+ }
+ 
+ const llhttp_settings_t Parser::settings = {
+-  Proxy<Call, &Parser::on_message_begin>::Raw,
+-  Proxy<DataCall, &Parser::on_url>::Raw,
+-  Proxy<DataCall, &Parser::on_status>::Raw,
+-  Proxy<DataCall, &Parser::on_header_field>::Raw,
+-  Proxy<DataCall, &Parser::on_header_value>::Raw,
+-  Proxy<Call, &Parser::on_headers_complete>::Raw,
+-  Proxy<DataCall, &Parser::on_chunk_extension>::Raw,
+-  Proxy<DataCall, &Parser::on_body>::Raw,
+-  Proxy<Call, &Parser::on_message_complete>::Raw,
+-  Proxy<Call, &Parser::on_chunk_header>::Raw,
+-  Proxy<Call, &Parser::on_chunk_complete>::Raw,
+-
+-  // on_url_complete
+-  nullptr,
+-  // on_status_complete
+-  nullptr,
+-  // on_header_field_complete
+-  nullptr,
+-  // on_header_value_complete
+-  nullptr,
++    Proxy<Call, &Parser::on_message_begin>::Raw,
++    Proxy<DataCall, &Parser::on_url>::Raw,
++    Proxy<DataCall, &Parser::on_status>::Raw,
++
++    // on_method
++    nullptr,
++    // on_version
++    nullptr,
++
++    Proxy<DataCall, &Parser::on_header_field>::Raw,
++    Proxy<DataCall, &Parser::on_header_value>::Raw,
++
++    // on_chunk_extension_name
++    Proxy<DataCall, &Parser::on_chunk_extension>::Raw,
++    // on_chunk_extension_value
++    Proxy<DataCall, &Parser::on_chunk_extension>::Raw,
++
++    Proxy<Call, &Parser::on_headers_complete>::Raw,
++    Proxy<DataCall, &Parser::on_body>::Raw,
++    Proxy<Call, &Parser::on_message_complete>::Raw,
++
++    // on_url_complete
++    nullptr,
++    // on_status_complete
++    nullptr,
++    // on_method_complete
++    nullptr,
++    // on_version_complete
++    nullptr,
++    // on_header_field_complete
++    nullptr,
++    // on_header_value_complete
++    nullptr,
++    // on_chunk_extension_name_complete
++    nullptr,
++    // on_chunk_extension_value_complete
++    nullptr,
++
++    Proxy<Call, &Parser::on_chunk_header>::Raw,
++    Proxy<Call, &Parser::on_chunk_complete>::Raw,
++
++    // on_reset,
++    nullptr,
+ };
+ 
+-
+ void InitializeHttpParser(Local<Object> target,
+                           Local<Value> unused,
+                           Local<Context> context,
+-- 
+2.45.4
+
