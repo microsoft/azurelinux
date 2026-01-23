@@ -63,41 +63,6 @@ License:        Apache-2.0 AND 0BSD AND BSD-3-Clause AND MIT AND (Apache-2.0 OR 
 
 %description -n %{crate} %{_description}
 
-%files       -n %{crate}
-%license COPYRIGHT
-%license LICENSE
-%license NOTICE
-
-%if 0%{?rhel}
-%license cargo-vendor.txt
-%endif
-%doc README.md
-%doc code-of-conduct.md
-%{_bindir}/afterburn
-%{_unitdir}/afterburn.service
-%{_unitdir}/afterburn-checkin.service
-%{_unitdir}/afterburn-firstboot-checkin.service
-%{_unitdir}/afterburn-sshkeys@.service
-%{_unitdir}/afterburn-sshkeys.target
-
-%post        -n %{crate}
-%systemd_post afterburn.service
-%systemd_post afterburn-checkin.service
-%systemd_post afterburn-firstboot-checkin.service
-%systemd_post afterburn-sshkeys@.service
-
-%preun       -n %{crate}
-%systemd_preun afterburn.service
-%systemd_preun afterburn-checkin.service
-%systemd_preun afterburn-firstboot-checkin.service
-%systemd_preun afterburn-sshkeys@.service
-
-%postun      -n %{crate}
-%systemd_postun afterburn.service
-%systemd_postun afterburn-checkin.service
-%systemd_postun afterburn-firstboot-checkin.service
-%systemd_postun afterburn-sshkeys@.service
-
 %package     -n %{crate}-dracut
 Summary:        Dracut modules for afterburn
 BuildRequires:  pkgconfig(dracut)
@@ -107,9 +72,6 @@ Requires:       dracut
 %description -n %{crate}-dracut
 Dracut module that enables afterburn and corresponding services
 to run in the initramfs on boot.
-
-%files       -n %{crate}-dracut
-%{dracutmodulesdir}/30afterburn/
 
 %prep
 %autosetup -n %{crate}-%{version} -p1
@@ -141,10 +103,48 @@ cargo build --release --offline
 mkdir -p %{buildroot}%{dracutmodulesdir}
 cp -a dracut/* %{buildroot}%{dracutmodulesdir}
 
+%post        -n %{crate}
+%systemd_post afterburn.service
+%systemd_post afterburn-checkin.service
+%systemd_post afterburn-firstboot-checkin.service
+%systemd_post afterburn-sshkeys@.service
+
+%preun       -n %{crate}
+%systemd_preun afterburn.service
+%systemd_preun afterburn-checkin.service
+%systemd_preun afterburn-firstboot-checkin.service
+%systemd_preun afterburn-sshkeys@.service
+
+%postun      -n %{crate}
+%systemd_postun afterburn.service
+%systemd_postun afterburn-checkin.service
+%systemd_postun afterburn-firstboot-checkin.service
+%systemd_postun afterburn-sshkeys@.service
+
 %if %{with check}
 %check
 make test
 %endif
+
+%files       -n %{crate}
+%license COPYRIGHT
+%license LICENSE
+%license NOTICE
+
+%if 0%{?rhel}
+%license cargo-vendor.txt
+%endif
+%doc README.md
+%doc code-of-conduct.md
+%{_bindir}/afterburn
+%{_unitdir}/afterburn.service
+%{_unitdir}/afterburn-checkin.service
+%{_unitdir}/afterburn-firstboot-checkin.service
+%{_unitdir}/afterburn-sshkeys@.service
+%{_unitdir}/afterburn-sshkeys.target
+
+%files       -n %{crate}-dracut
+%{dracutmodulesdir}/30afterburn/
 
 %changelog
 * Thu Jan 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.10.0-3
