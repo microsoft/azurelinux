@@ -72,7 +72,7 @@ popd
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-16
 - Bump release for consistency with hvloader spec.
 
-* Wed Nov 20 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.0.1-15
+* Thu Nov 20 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.0.1-15
 - Bump release for consistency with hvloader spec.
 
 * Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-14
