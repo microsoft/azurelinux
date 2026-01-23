@@ -5,18 +5,20 @@
 
 %global crate afterburn
 
-Name:           rust-afterburn
+Name:           rust-%{crate}
 Version:        5.10.0
 Release:        3%{?dist}
 Summary:        Simple cloud provider agent
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        Apache-2.0
-URL:            https://crates.io/crates/afterburn
-Source0:        https://github.com/coreos/afterburn/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://crates.io/crates/%{crate}
+Source0:        https://github.com/coreos/%{crate}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # not used on Fedora
 Source1:        https://github.com/coreos/%{crate}/releases/download/v%{version}/%{crate}-%{version}-vendor.tar.gz
-
+Patch0:         0001-Revert-remove-cl-legacy-feature.patch
+Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
+Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
 # build(deps): bump mailparse from 0.15.0 to 0.16.1
 # (Only the Cargo.toml portion, not the Cargo.lock portion)
 
