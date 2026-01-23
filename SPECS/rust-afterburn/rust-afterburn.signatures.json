@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "afterburn-5.10.0-vendor.tar.gz": "4e0ec8de768cca45f71ee87e853cb71915050b1e167835f0ae520c0a4c8e4590",
+  "afterburn-5.10.0-azlcustomvendor.tar.gz": "78013a7b55bd4b67f64b037a82970ae33cb2fdef2b1bd4fee8dc9932cbc1f527",
   "rust-afterburn-5.10.0.tar.gz": "2001883c4b3072fbd3a536a2d831106d570ee4fde0d9b6788639625ecc423579"
  }
 }
