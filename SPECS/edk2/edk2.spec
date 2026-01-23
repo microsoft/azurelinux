@@ -721,7 +721,7 @@ $tests_ok
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-45
 - Patch for CVE-2025-2295
 
-* Tue Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20230301gitf80f052277c8-44
+* Wed Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20230301gitf80f052277c8-44
 - Patch for CVE-2025-2296
 
 * Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-43
