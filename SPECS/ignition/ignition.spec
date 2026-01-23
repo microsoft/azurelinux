@@ -16,7 +16,7 @@
 # https://github.com/coreos/ignition
 %global goipath         github.com/coreos/ignition
 %global gomodulesmode   GO111MODULE=on
-Version:                2.25.1
+Version:                2.24.0
 
 %global golicenses      LICENSE
 %global godocs          README.md docs/
@@ -31,13 +31,31 @@ Summary:        First boot installer and configuration tool
 # Upstream license specification: Apache-2.0
 License:        Apache-2.0
 URL:            %{gourl}
-Source0:        https://github.com/coreos/ignition/archive/refs/tags/v2.25.1.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0:        https://github.com/coreos/ignition/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-sed-s-coreos-flatcar.patch
+Patch1:         0002-config-add-ignition-translation.patch
+Patch2:         0003-mod-add-flatcar-ignition-0.36.2.patch
+Patch3:         0004-config-v3_6-convert-ignition-2.x-to-3.x.patch
+Patch4:         0005-vendor-go-mod-vendor.patch
+Patch5:         0006-internal-prv-cmdline-backport-flatcar-patch.patch
+Patch6:         0007-provider-qemu-apply-fw_cfg-patch.patch
+Patch7:         0008-config-3_6-test-add-ignition-2.x-test-cases.patch
+Patch8:         0009-internal-disk-fs-ignore-fs-format-mismatches-for-the.patch
+Patch9:         0010-VMware-Fix-guestinfo.-.config.data-and-.config.url-v.patch
+Patch10:        0011-config-version-handle-configuration-version-1.patch
+Patch11:        0012-config-util-add-cloud-init-detection-to-initial-pars.patch
+Patch12:        0013-Revert-drop-OEM-URI-support.patch
+Patch13:        0014-internal-resource-url-support-btrfs-as-OEM-partition.patch
+Patch14:        0015-translation-support-OEM-and-oem.patch
+Patch15:        0016-revert-internal-oem-drop-noop-OEMs.patch
+Patch16:        0017-docs-Add-re-added-platforms-to-docs-to-pass-tests.patch
+Patch17:        0018-usr-share-oem-oem.patch
+Patch18:        0019-internal-exec-stages-mount-Mount-oem.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
 BuildRequires: go-rpm-macros
-BuildRequires: golang >= 1.16.6
+BuildRequires: golang
 
 ExcludeArch: %{ix86}
 
