@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.52",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.52.tar.xz"
+          "version": "1.6.54",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
         }
       }
     },
@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.24.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
         }
       }
     },
@@ -13793,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.44",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
+          "version": "8.0.45",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
         }
       }
     },
