@@ -10741,8 +10741,8 @@
         "type": "other",
         "other": {
           "name": "libpaper",
-          "version": "1.1.28",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/libp/libpaper/libpaper_1.1.28.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/rrthomas/libpaper/archive/v%2.1.1/libpaper-2.1.1.tar.gz"
         }
       }
     },
