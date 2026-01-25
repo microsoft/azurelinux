@@ -1,47 +1,64 @@
-Summary:        Python utilities for manipulating kickstart files.
-Name:           pykickstart
-Version:        3.36
-Release:        2%{?dist}
-License:        GPLv2 AND MIT
+# Enable tests by default. To disable them use:
+#     rpmbuild -ba --without runtests pykickstart.spec
+%bcond_without runtests
+%bcond_with signed
+
+Name:      pykickstart
+Version:   3.58
+Release:   1%{?dist}
+License:   GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://fedoraproject.org/wiki/pykickstart
-Source0:        https://github.com/pykickstart/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  gettext
-BuildRequires:  make
-BuildRequires:  python3-devel
-BuildRequires:  python3-requests
-BuildRequires:  python3-setuptools
-Requires:       python3-kickstart = %{version}-%{release}
-BuildArch:      noarch
-# Only required when building with RUN_CHECK=y
-%if 0%{?with_check}
-BuildRequires:  python3-coverage
-BuildRequires:  python3-sphinx
+Summary:   Python utilities for manipulating kickstart files.
+Url:       http://fedoraproject.org/wiki/pykickstart
+Source0:   https://github.com/pykickstart/%{name}/releases/download/r%{version}/%{name}-%{version}.tar.gz
+%if %{with signed}
+Source1:   https://github.com/pykickstart/%{name}/releases/download/r%{version}/%{name}-%{version}.tar.gz.asc
 %endif
+
+# Fix for python 3.12.7 and 3.13
+Patch0001: 0001-options-adjust-to-behavior-change-in-upstream-_parse.patch
+Patch0002: 0001-Fix-the-fix-for-_parse_optional-changing.patch
+
+BuildArch: noarch
+
+BuildRequires: gettext
+BuildRequires: python3-devel
+BuildRequires: python3-requests
+BuildRequires: python3-setuptools
+BuildRequires: make
+
+# Only required when building with runtests
+%if %{with runtests}
+BuildRequires: python3-sphinx
+%endif
+
+Requires: python3-kickstart = %{version}-%{release}
 
 %description
 Python utilities for manipulating kickstart files.
 
 %package -n python3-kickstart
-Summary:        Python 3 library for manipulating kickstart files.
-Requires:       python3-requests
+Summary:  Python 3 library for manipulating kickstart files.
+Requires: python3-requests
 
 %description -n python3-kickstart
 Python 3 library for manipulating kickstart files.  The binaries are found in
 the pykickstart package.
 
 %prep
-%autosetup -n %{name}-r%{version}
+%autosetup -p1
 
 %build
-make PYTHON=python3
+make PYTHON=%{__python3}
 
 %install
-make PYTHON=python3 DESTDIR=%{buildroot} install
+make PYTHON=%{__python3} DESTDIR=%{buildroot} install
 
 %check
-make PYTHON=python3 test
+%if %{with runtests}
+LC_ALL=C make PYTHON=%{__python3} test-no-coverage
+%endif
 
 %files
 %license COPYING
@@ -59,14 +76,216 @@ make PYTHON=python3 test
 %files -n python3-kickstart
 %doc docs/2to3
 %doc docs/programmers-guide
-%doc docs/kickstart-docs.rst
+%doc docs/kickstart-docs.txt
 %{python3_sitelib}/pykickstart
 %{python3_sitelib}/pykickstart*.egg-info
 
 %changelog
-* Wed Nov 02 2022 Suresh Thelkar <sthelkar@microsoft.com> - 3.36-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT)
-- License verified
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.58-1
+- Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Wed Oct 02 2024 Adam Williamson <awilliam@redhat.com> - 3.58-3
+- Fix the fix for _parse_optional changing (awilliam)
+
+* Wed Oct 02 2024 Brian C. Lane <bcl@redhat.com> - 3.58-2
+- options: adjust to behavior change in upstream _parse_optional (awilliam)
+
+* Mon Aug 19 2024 Brian C. Lane <bcl@redhat.com> - 3.58-1
+- DeprecatedCommand: Return empty list for dataList (bcl)
+
+* Mon Aug 19 2024 Brian C. Lane <bcl@redhat.com> - 3.57-1
+- Add "hw-passphrase" option for autopart and part commands (vtrefny)
+- Enhance %onerror section with recommendation (jkonecny)
+  Resolves: RHEL-47142
+- commands: Add missing DeprecatedCommand class to F41_Module (kkoukiou)
+
+* Mon Aug 05 2024 Brian C. Lane <bcl@redhat.com> - 3.56-1
+- doc/versionremoved: Update VersionChange import for Sphinx 8.0.0 (bcl)
+- Mark the vnc command as deprecated on RHEL 10 (mkolman)
+  Resolves: RHEL-41219
+- pykickstart is supported on python 3.6+ (sgallagh)
+- timezone: Remove the --isUtc, --nontp, and --ntpserver arguments (bcl)
+  Related: RHEL-34009
+- packages: Remove the old camel case arguments on RHEL10 (bcl)
+  Resolves: RHEL-34009
+- nvdimm: Remove support for the nvdimm command on RHEL10 (bcl)
+  Related: RHEL-34009
+- Drop the MIT license (bcl)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.55-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.55-2
+- Rebuilt for Python 3.13
+
+* Mon May 13 2024 Brian C. Lane <bcl@redhat.com> - 3.55-1
+- Deprecate modularity on Fedora 41 (marusak.matej)
+- btrfs: Remove support for the btrfs command on RHEL10 (bcl)
+  Resolves: RHEL-34009
+- Deprecate modularity on RHEL 10 (marusak.matej)
+  Resolves: RHEL-34829
+
+* Thu Apr 25 2024 Brian C. Lane <bcl@redhat.com> - 3.54-1
+- Add a DEFAULT_VERSION variable to version.py (bcl)
+- Deprecate network team options on RHEL 10 (rvykydal)
+
+* Wed Apr 03 2024 Brian C. Lane <bcl@redhat.com> - 3.53-1
+- Update sources to github release urls
+- rhel10: autopart on RHEL does not support --type=btrfs (bcl)
+- rhel10: Add test for btrfs command deprecation (bcl)
+- rhel10: Add missing rhsm and syspurpose commands (bcl)
+- Break out %pre example to kickstart-examples (tasleson)
+- Update kickstart-docs.rst (tasleson)
+- Add Fedora 41 support (bcl)
+- Update RHEL 9 handler (bcl)
+- Update RHEL 10 handler classes (bcl)
+- Add RHEL 10 handler (bcl)
+- workflow: Use python 3.12.2 for tests (bcl)
+- workflow: Bump checkout and setup-python actions to new versions (bcl)
+
+* Thu Feb 01 2024 Brian C. Lane <bcl@redhat.com> - 3.52-1
+- Deprecate %%packages --instLangs and --excludeWeakdeps kickstart options (vponcova)
+- Deprecate timezone --isUtc, --ntpservers and --nontp kickstart options (vponcova)
+- Fix the assert_removed check in the unit tests (vponcova)
+- Remove the repo --ignoregroups kickstart option in Fedora 40 (vponcova)
+- Remove the logging --level kickstart option in Fedora 40 (vponcova)
+- Remove the method kickstart command in Fedora 40 (vponcova)
+- Remove the autostep kickstart command in Fedora 40 (vponcova)
+- requirements: Add setuptools (bcl)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.51-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.51-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 28 2023 Brian C. Lane <bcl@redhat.com> - 3.51-1
+- Deprecate the nvdimm kickstart command (vponcova)
+
+* Fri Nov 10 2023 Brian C. Lane <bcl@redhat.com> - 3.50-1
+- Add Fedora 40 support (bcl)
+- remove control characters from license (cmdr)
+- scripts: Fix wording in documentation (bcl)
+- workflow: Fix test for python 3.12.0 version (bcl)
+
+* Wed Oct 25 2023 Brian C. Lane <bcl@redhat.com> - 3.49-1
+- tox: Only run unit tests for python 3.6 (bcl)
+- workflow: Update to py3.12.0 (bcl)
+- pykickstart: Set timeout to 120s on requests.get (bcl)
+- translation-canary: Update the subtree with current master (bcl)
+- Squashed 'translation-canary/' changes from 840c2d64..5bb81253 (bcl)
+- tests: Add python 3.12 support (bcl)
+- tests: Update unicode test to remove deprecated resetlocale (bcl)
+- rtd: formats is separate, not part of sphinx (bcl)
+- rtd: Add the .readthedocs.yaml config file (bcl)
+- spec: Update spec with changes from Fedora (bcl)
+- Makefile: Update pypi upload command (bcl)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.48-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 3.48-2
+- Rebuilt for Python 3.12
+
+* Thu Jun 08 2023 Brian C. Lane <bcl@redhat.com> - 3.48-1
+- Makefile: Add a test-no-coverage target (bcl)
+- realm: switch from pipes.quote() to shlex.quote() (ptoscano)
+- workflow: Update actions to newest versions (bcl)
+- Fix issues how to generate encrypted passwords (woiling)
+
+* Fri Mar 17 2023 Brian C. Lane <bcl@redhat.com> - 3.47-1
+- network: Move new options to Fedora 39 (bcl)
+  Related: rhbz#1656662
+- displaymode: Update description to describe behavior (bcl)
+
+* Tue Mar 14 2023 Brian C. Lane <bcl@redhat.com> - 3.46-1
+- Add conflict test between ostree sources (#2125655) (jkonecny)
+  Related: rhbz#2125655
+- Fix missing seen check for output generation (#2125655) (jkonecny)
+  Related: rhbz#2125655
+- Add new ostreecontainer command (#2125655) (jkonecny)
+  Related: rhbz#2125655
+  Resolves: rhbz#2125655
+  Related: rhbz#2125655
+- Check the conflicting commands automatically (vponcova)
+- Fix tests for conflicting commands (vponcova)
+- Add conflicting commands support (bcl)
+- Fix handling of package section arguments in older versions (bcl)
+
+* Tue Mar 14 2023 Brian C. Lane <bcl@redhat.com> - 3.45-1
+- workflow: Update to use released python 3.11 version (bcl)
+- Don't allow to use --sdboot and --extlinux together (vponcova)
+- tests: add bootloader sdboot option (jeremy.linton)
+- bootloader: Add systemd-boot support with --sdboot (jeremy.linton)
+- Add %%changelog section to pykickstart.spec.in (jkonecny)
+- Do not request sign for rc-release Makefile target (jkonecny)
+- Do not require SPECFILE for rc-release (jkonecny)
+- Add missing docs copy to scratch Makefile (jkonecny)
+- Add support for Fedora 39 (vslavik)
+
+* Wed Feb 15 2023 Brian C. Lane <bcl@redhat.com> - 3.44-1
+- Add DNS handling options to the network command (vslavik)
+  Related: rhbz#1656662
+- Fix the coverage report (vponcova)
+- whitelist_externals has changed to allowlist_externals (bcl)
+- Update %post example for DNS problems (bcl)
+- deps: Move dependencies into requirements.txt (bcl)
+- Fix syntax of a code sample (ewoud)
+
+* Mon Jan 30 2023 Brian C. Lane <bcl@redhat.com> - 3.43-3
+- SPDX migration
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.43-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Aug 29 2022 Brian C. Lane <bcl@redhat.com> - 3.43-1
+- pyproject.toml: Add dependencies (bcl)
+- sshkey: Escapes quotes in the ssh key (bcl)
+  Resolves: rhbz#2117734
+- test: Add Python 3.11 to test matrix (bcl)
+- Add --hibernation option to AutoPart (ozobal)
+- Makefile: Include pyproject.toml in new release commit (bcl)
+
+* Tue Aug 16 2022 Brian C. Lane <bcl@redhat.com> - 3.42-1
+- Use RHEL9 for RHEL command documentation (bcl)
+- setup.py: use setuptools not distutils (bcl)
+- Add pyproject.toml and update setup.py (bcl)
+- Add Fedora 38 support (bcl)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.41-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jun 16 2022 Python Maint <python-maint@redhat.com> - 3.41-2
+- Rebuilt for Python 3.11
+
+* Thu Jun 16 2022 Brian C. Lane <bcl@redhat.com> - 3.41-1
+- Write commands in alphabetical order (bcl)
+  Resolves: rhbz#2096871
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 3.40-2
+- Rebuilt for Python 3.11
+
+* Mon Jun 13 2022 Brian C. Lane <bcl@redhat.com> - 3.40-1
+- Add support for automatic LUN Scan (vponcova)
+  Related: rhbz#1432883
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.39-2
+- Rebuilt for Python 3.11
+
+* Thu Jun 02 2022 Brian C. Lane <bcl@redhat.com> - 3.39-1
+- tests: Fix unused out variable warnings (bcl)
+- rootpw: Add an --allow-ssh argument (bcl)
+  Resolves: rhbz#2083269
+- github: Fix workflow to only send coverage for python 3.9 (bcl)
+
+* Thu Apr 07 2022 Brian C. Lane <bcl@redhat.com> - 3.38-1
+- Add test for missing closing quote (bcl)
+- i18n: Pass gettext domain on every translation call (bcl)
+
+* Mon Feb 28 2022 Brian C. Lane <bcl@redhat.com> - 3.37-1
+- Remove the --ignorebroken option from RHEL handlers (vponcova)
+- Add the isRHEL function (vponcova)
 
 * Tue Feb 15 2022 Brian C. Lane <bcl@redhat.com> - 3.36-1
 - github: Add rhel9-branch to the list of branches (bcl)
