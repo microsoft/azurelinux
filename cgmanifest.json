@@ -7651,8 +7651,8 @@
         "type": "other",
         "other": {
           "name": "iso-codes",
-          "version": "4.4",
-          "downloadUrl": "https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/iso-codes-4.4/iso-codes-iso-codes-4.4.tar.gz"
+          "version": "4.17.0",
+          "downloadUrl": "https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/v4.17.0/iso-codes-v4.17.0.tar.gz"
         }
       }
     },
