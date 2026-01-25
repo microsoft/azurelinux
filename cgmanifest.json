@@ -12931,8 +12931,8 @@
         "type": "other",
         "other": {
           "name": "man-pages-ja",
-          "version": "20190815",
-          "downloadUrl": "http://linuxjm.osdn.jp/man-pages-ja-20190815.tar.gz"
+          "version": "20230915",
+          "downloadUrl": "https://linuxjm.osdn.jp/man-pages-ja-20230915.tar.gz"
         }
       }
     },
