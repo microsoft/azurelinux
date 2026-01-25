@@ -12,19 +12,19 @@ import (
 
 type Partition struct {
 	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
-	ID string `yaml:"ID"`
+	ID string `yaml:"id"`
 	// FsType is the type of file system to use on the partition.
-	FsType FileSystemType `yaml:"FsType"`
+	FsType FileSystemType `yaml:"fsType"`
 	// Name is the label to assign to the partition.
-	Name string `yaml:"Name"`
+	Name string `yaml:"name"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"Start"`
+	Start uint64 `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"End"`
+	End *uint64 `yaml:"end"`
 	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"Size"`
+	Size *uint64 `yaml:"size"`
 	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"Flags"`
+	Flags []PartitionFlag `yaml:"flags"`
 }
 
 func (p *Partition) IsValid() error {
