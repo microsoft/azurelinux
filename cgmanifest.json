@@ -2978,8 +2978,8 @@
         "type": "other",
         "other": {
           "name": "dovecot",
-          "version": "2.3.20",
-          "downloadUrl": "https://www.dovecot.org/releases/2.3/dovecot-2.3.20.tar.gz"
+          "version": "2.3.21.1",
+          "downloadUrl": "https://www.dovecot.org/releases/2.3/dovecot-2.3.21.1.tar.gz"
         }
       }
     },
