@@ -12971,8 +12971,8 @@
         "type": "other",
         "other": {
           "name": "man-pages-zh-CN",
-          "version": "1.6.2.1",
-          "downloadUrl": "https://github.com/man-pages-zh/manpages-zh/archive/v1.6.2.1.tar.gz"
+          "version": "1.6.3.6",
+          "downloadUrl": "https://github.com/man-pages-zh/manpages-zh/archive/v1.6.3.6.tar.gz"
         }
       }
     },
