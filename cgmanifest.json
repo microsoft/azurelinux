@@ -10581,8 +10581,8 @@
         "type": "other",
         "other": {
           "name": "libnumbertext",
-          "version": "1.0.5",
-          "downloadUrl": "https://github.com/Numbertext/libnumbertext/releases/download/1.0.5/libnumbertext-1.0.5.tar.xz"
+          "version": "1.0.11",
+          "downloadUrl": "https://github.com/Numbertext/libnumbertext/releases/download/1.0.11/libnumbertext-1.0.11.tar.xz"
         }
       }
     },
