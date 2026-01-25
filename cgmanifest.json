@@ -5170,8 +5170,8 @@
         "type": "other",
         "other": {
           "name": "gupnp-igd",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.2.0.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/GNOME/gupnp-igd/archive/refs/tags/1.6.0.tar.gz"
         }
       }
     },
