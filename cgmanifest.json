@@ -5690,8 +5690,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-eu",
-          "version": "0.20080507",
-          "downloadUrl": "http://www.euskara.euskadi.net/r59-20660/eu/contenidos/informacion/euskarazko_softwarea/eu_9567/adjuntos/eu-ES-hunspell.tar.gz"
+          "version": "5.1",
+          "downloadUrl": "http://xuxen.eus/static/hunspell/xuxen_5.1_hunspell.zip"
         }
       }
     },
