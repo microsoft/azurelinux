@@ -11381,8 +11381,8 @@
         "type": "other",
         "other": {
           "name": "libtevent",
-          "version": "0.14.1",
-          "downloadUrl": "https://samba.org/ftp/tevent/tevent-0.14.1.tar.gz"
+          "version": "0.16.1",
+          "downloadUrl": "https://samba.org/ftp/tevent/tevent-0.16.1.tar.gz"
         }
       }
     },
