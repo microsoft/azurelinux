@@ -9721,8 +9721,8 @@
         "type": "other",
         "other": {
           "name": "libgsf",
-          "version": "1.14.47",
-          "downloadUrl": "ftp://ftp.gnome.org/pub/GNOME/sources/libgsf/1.14/libgsf-1.14.47.tar.xz"
+          "version": "1.14.53",
+          "downloadUrl": "https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.53.tar.xz"
         }
       }
     },
