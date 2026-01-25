@@ -5030,8 +5030,8 @@
         "type": "other",
         "other": {
           "name": "gstreamer1",
-          "version": "1.20.0",
-          "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.0.tar.xz"
+          "version": "1.24.8",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.24.8.tar.xz"
         }
       }
     },
@@ -5040,8 +5040,8 @@
         "type": "other",
         "other": {
           "name": "gstreamer1-plugins-base",
-          "version": "1.20.0",
-          "downloadUrl": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.20.0.tar.xz"
+          "version": "1.24.8",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.24.8.tar.xz"
         }
       }
     },
