@@ -6260,8 +6260,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-ro",
-          "version": "3.3.7",
-          "downloadUrl": "http://downloads.sourceforge.net/rospell/ro_RO.3.3.7.zip"
+          "version": "3.3.10",
+          "downloadUrl": "http://downloads.sourceforge.net/rospell/ro_RO.3.3.10.zip"
         }
       }
     },
