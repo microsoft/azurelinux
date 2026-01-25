@@ -9951,8 +9951,8 @@
         "type": "other",
         "other": {
           "name": "libiodbc",
-          "version": "3.52.13",
-          "downloadUrl": "https://github.com/openlink/iODBC/archive/v3.52.13/libiodbc-3.52.13.tar.gz"
+          "version": "3.52.16",
+          "downloadUrl": "https://github.com/openlink/iODBC/archive/v3.52.16/libiodbc-3.52.16.tar.gz"
         }
       }
     },
