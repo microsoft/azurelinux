@@ -9641,8 +9641,8 @@
         "type": "other",
         "other": {
           "name": "libgexiv2",
-          "version": "0.14.2",
-          "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.14/gexiv2-0.14.2.tar.xz"
+          "version": "0.14.3",
+          "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.14/gexiv2-0.14.3.tar.xz"
         }
       }
     },
