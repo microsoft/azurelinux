@@ -13562,8 +13562,8 @@
         "type": "other",
         "other": {
           "name": "mod_auth_gssapi",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/modauthgssapi/mod_auth_gssapi/releases/download/v1.6.1/mod_auth_gssapi-1.6.1.tar.gz"
+          "version": "1.6.5",
+          "downloadUrl": "https://github.com/gssapi/mod_auth_gssapi/releases/download/v1.6.5/mod_auth_gssapi-1.6.5.tar.gz"
         }
       }
     },
