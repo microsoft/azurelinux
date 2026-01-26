@@ -12641,8 +12641,8 @@
         "type": "other",
         "other": {
           "name": "lua-term",
-          "version": "0.07",
-          "downloadUrl": "https://github.com/hoelzro/lua-term/archive/0.07.tar.gz"
+          "version": "0.08",
+          "downloadUrl": "https://github.com/hoelzro/lua-term/archive/0.08.tar.gz"
         }
       }
     },
