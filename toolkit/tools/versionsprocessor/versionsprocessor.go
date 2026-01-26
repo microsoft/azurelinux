@@ -129,7 +129,7 @@ func main() {
 
 			version := releaseVerSplit[0]
 			release := releaseVerSplit[1]
-			releaseClean := strings.SplitN(release, ".", 2)[0] // Includes distribution tag suffixes
+			releaseClean := strings.Replace(release, ".azl3", "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
 
 			// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
 			specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)

@@ -30,7 +30,7 @@
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version %azl_kernel_hwe_version
 %global target_kernel_release %azl_kernel_hwe_release
-%global target_mlnx_ofa_kernel %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
 %global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -42,7 +42,7 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel}-1_%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -68,7 +68,7 @@
 Summary:	 %{_name}-hwe Driver
 Name:		 isert-hwe
 Version:	 25.07
-Release:	 6%{release_suffix}%{?dist}
+Release:	 10%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
