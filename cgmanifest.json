@@ -12731,8 +12731,8 @@
         "type": "other",
         "other": {
           "name": "lzip",
-          "version": "1.21",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/lzip/lzip-1.21.tar.gz"
+          "version": "1.25",
+          "downloadUrl": "https://download-mirror.savannah.gnu.org/releases/lzip/lzip-1.25.tar.gz"
         }
       }
     },
