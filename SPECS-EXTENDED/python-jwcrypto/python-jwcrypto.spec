@@ -1,132 +1,144 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-# Enable python3 build by default
-%bcond_without python3
-
-# Disable python2 build by default
-%bcond_with python2
 
 %global srcname jwcrypto
 
 Name:           python-%{srcname}
-Version:        0.6.0
-Release:        9%{?dist}
+Version:        1.4.2
+Release:        12%{?dist}
 Summary:        Implements JWK, JWS, JWE specifications using python-cryptography
 
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 URL:            https://github.com/latchset/%{srcname}
-Source0:        https://github.com/latchset/%{srcname}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/latchset/%{srcname}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
-%if 0%{?with_python2}
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-cryptography >= 1.5
-BuildRequires:  python2-pytest
-%endif
-
-%if 0%{?with_python3}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-cryptography >= 1.5
+BuildRequires:  python%{python3_pkgversion}-cryptography >= 2.3
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-deprecated
+BuildRequires:  python3-wrapt
 %if 0%{?with_check}
 BuildRequires:  python3-pip
-%endif
 %endif
 
 %description
 Implements JWK, JWS, JWE specifications using python-cryptography
 
 
-%if 0%{?with_python2}
-%package -n python2-%{srcname}
-Summary:        Implements JWK,JWS,JWE specifications using python-cryptography
-Requires:       python2-cryptography >= 1.5
-%{?python_provide:%python_provide python2-%{srcname}}
-
-%description -n python2-%{srcname}
-Implements JWK, JWS, JWE specifications using python-cryptography
-%endif
-
-
-%if 0%{?with_python3}
 %package -n python%{python3_pkgversion}-%{srcname}
 Summary:        Implements JWK, JWS, JWE specifications using python-cryptography
-Requires:       python%{python3_pkgversion}-cryptography >= 1.5
+Requires:       python%{python3_pkgversion}-cryptography >= 2.3
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
 %description -n python%{python3_pkgversion}-%{srcname}
 Implements JWK, JWS, JWE specifications using python-cryptography
-%endif
 
 
 %prep
 %setup -q -n %{srcname}-%{version}
+%if %{defined rhel}
+# avoid python-deprecated dependency
+sed -i -e '/deprecated/d' setup.py %{srcname}.egg-info/requires.txt
+sed -i -e '/^from deprecated/d' -e '/@deprecated/d' %{srcname}/*.py
+%endif
 
 
 %build
-%if 0%{?with_python2}
-%py2_build
-%endif
-%if 0%{?with_python3}
 %py3_build
-%endif
 
 
 %check
-%if 0%{?with_python2}
-%{__python2} -bb -m pytest %{srcname}/test*.py
-%endif
-%if 0%{?with_python3}
-pip3 install pytest
 %{__python3} -bb -m pytest %{srcname}/test*.py
-%endif
 
 
 %install
-%if 0%{?with_python2}
-%py2_install
-%endif
-%if 0%{?with_python3}
 %py3_install
-%endif
 
 rm -rf %{buildroot}%{_docdir}/%{srcname}
-%if 0%{?with_python2}
-rm -rf %{buildroot}%{python2_sitelib}/%{srcname}/tests{,-cookbook}.py*
-%endif
-%if 0%{?with_python3}
 rm -rf %{buildroot}%{python3_sitelib}/%{srcname}/tests{,-cookbook}.py*
 rm -rf %{buildroot}%{python3_sitelib}/%{srcname}/__pycache__/tests{,-cookbook}.*.py*
-%endif
 
 
-%if 0%{?with_python2}
-%files -n python2-%{srcname}
-%doc README.md
-%license LICENSE
-%{python2_sitelib}/%{srcname}
-%{python2_sitelib}/%{srcname}-%{version}-py%{python2_version}.egg-info
-%endif
-
-%if 0%{?with_python3}
 %files -n python%{python3_pkgversion}-%{srcname}
 %doc README.md
 %license LICENSE
 %{python3_sitelib}/%{srcname}
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info
-%endif
 
 
 %changelog
-* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.0-9
-- Add a BR on pip to enable ptest
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.4.2-12
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Thu Mar 02 2021 Henry Li <lihl@microsoft.com> - 0.6.0-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Enable python3 and disable python2 build
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.4.2-10
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jul 24 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.4.2-7
+- Avoid python-deprecated dependency in RHEL builds
+
+* Mon Jul 24 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.4.2-6
+- Remove obsolete python2 packaging
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.4.2-4
+- Rebuilt for Python 3.12
+
+* Tue Apr 04 2023 Christian Heimes <cheimes@redhat.com> - 1.4.2-3
+- Use SPDX license tags
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Sep 15 2022 Simo Sorce <simo@redhat.com> - 1.4.2-1
+- Version 1.4.2
+
+* Wed Sep 14 2022 Simo Sorce <simo@redhat.com> - 1.4.1-1
+- Version 1.4.1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 0.9.1-4
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 10 2021 Simo Sorce <simo@redhat.com> - 0.9.1-1
+- Sync with upstream release 0.9.1
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.8-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 01 2020 Simo Sorce <simo@redhat.com> - 0.8-1
+- Sync with upstream release 0.8
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.6.0-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
