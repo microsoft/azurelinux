@@ -68,7 +68,7 @@
 Summary:	 %{_name}-hwe Driver
 Name:		 isert-hwe
 Version:	 25.07
-Release:	 10%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -252,6 +252,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Mon Jan 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2_6.12.57.1.1
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
 - Upgrade version to 25.07.
 - Enable build on x86_64 kernel hwe.
