@@ -8691,8 +8691,8 @@
         "type": "other",
         "other": {
           "name": "lcov",
-          "version": "1.14",
-          "downloadUrl": "https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz"
         }
       }
     },
