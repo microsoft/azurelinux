@@ -24,7 +24,7 @@ toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
 rpms_snapshot_dir_name = rpms_snapshots
 rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
 rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.log
-rpms_macros_file        = $(PKGBUILD_DIR)/macros.releaseversions
+rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 valid_arch_spec_names_build_dir = $(BUILD_DIR)/valid_arch_spec_names
@@ -73,6 +73,7 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	cp $(toolkit_archive) $(toolkit_archive_versioned) && \
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	cp $(rpms_snapshot) $(toolkit_rpms_snapshot_file) && \
+	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
@@ -94,7 +95,7 @@ rpms-snapshot: $(rpms_snapshot)
 
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
-	cp $(rpms_macros_file) $(rpm_snapshot)
+	cp $(rel_versions_macro_file) $(rpms_snapshot)
 
 $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
 	@mkdir -p "$(rpms_snapshot_build_dir)"
