@@ -12771,8 +12771,8 @@
         "type": "other",
         "other": {
           "name": "m17n-lib",
-          "version": "1.8.0",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/m17n/m17n-lib-1.8.0.tar.gz"
+          "version": "1.8.5",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/m17n/m17n-lib-1.8.5.tar.gz"
         }
       }
     },
