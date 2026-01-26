@@ -96,6 +96,8 @@ $(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build
 		--dir $(SPECS_DIR) \
 		--dist-tag $(DIST_TAG) \
 		$(logging_command) \
+		--build-dir $(parse_working_dir) \
+		--worker-tar $(chroot_worker) \
 		--cpu-prof-file=$(PROFILE_DIR)/versionsprocessor.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/versionsprocessor.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/versionsprocessor.trace \
