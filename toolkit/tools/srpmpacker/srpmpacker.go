@@ -222,14 +222,14 @@ func main() {
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-// kernelMacrosFile, if non-empty, is made available inside the chroot so rpmbuild can use it while packing SRPMs.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar, kernelMacrosFile string, workers, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+// releaseVersionMacrosFile, if non-empty, is made available inside the chroot so rpmbuild can use it while packing SRPMs.
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar, releaseVersionMacrosFile string, workers, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
 		useAzureCliAuth := templateSrcConfig.sourceAuthMode == sourceAuthModeAzureCli
-		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir, kernelMacrosFile, useAzureCliAuth)
+		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFile, useAzureCliAuth)
 		if err != nil {
 			return
 		}
@@ -319,8 +319,8 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-// If kernelMacrosFile is non-empty, it will be copied into the default RPM macros directory inside the chroot.
-func createChroot(workerTar, buildDir, outDir, specsDir, kernelMacrosFile string, useAzureCliAuth bool) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
+// If releaseVersionMacrosFile is non-empty, it will be copied into the default RPM macros directory inside the chroot.
+func createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFile string, useAzureCliAuth bool) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false
@@ -388,9 +388,9 @@ func createChroot(workerTar, buildDir, outDir, specsDir, kernelMacrosFile string
 		}
 	}
 
-	// If a kernel macros file is provided, copy it into the default RPM macros directory
+	// If a release version macros file is provided, copy it into the default RPM macros directory
 	// inside the chroot so rpmbuild picks it up automatically when packing SRPMs.
-	if kernelMacrosFile != "" {
+	if releaseVersionMacrosFile != "" {
 		macroDir, macroErr := rpm.GetMacroDir()
 		if macroErr != nil {
 			logger.Log.Errorf("Failed to get RPM macro directory: %s", macroErr)
@@ -398,7 +398,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir, kernelMacrosFile string
 		}
 
 		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
-		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(kernelMacrosFile))
+		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(releaseVersionMacrosFile))
 
 		mkdirErr := directory.EnsureDirExists(macrosDestDir)
 		if mkdirErr != nil {
@@ -406,13 +406,13 @@ func createChroot(workerTar, buildDir, outDir, specsDir, kernelMacrosFile string
 			return
 		}
 
-		copyErr := file.Copy(kernelMacrosFile, macrosDestFile)
+		copyErr := file.Copy(releaseVersionMacrosFile, macrosDestFile)
 		if copyErr != nil {
-			logger.Log.Errorf("Failed to copy kernel macros file into chroot (%s -> %s): %s", kernelMacrosFile, macrosDestFile, copyErr)
+			logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", releaseVersionMacrosFile, macrosDestFile, copyErr)
 			return
 		}
 
-		logger.Log.Infof("Copied kernel macros file into SRPM chroot (%s -> %s)", kernelMacrosFile, macrosDestFile)
+		logger.Log.Infof("Copied release version macros file into SRPM chroot (%s -> %s)", releaseVersionMacrosFile, macrosDestFile)
 	}
 
 	// Networking support is needed to download sources.

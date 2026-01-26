@@ -58,8 +58,8 @@ type parseResult struct {
 
 // ParseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-// kernelMacrosFile, if non-empty, is made available inside the chroot at the same path as on the host.
-func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar, kernelMacrosFile, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+// releaseVersionMacrosFile, if non-empty, is made available inside the chroot at the same path as on the host.
+func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar, releaseVersionMacrosFile, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -67,7 +67,7 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir, kernelMacrosFile)
+		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
 		if err != nil {
 			return
 		}
@@ -127,8 +127,8 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 }
 
 // createChroot creates a chroot to parse SPECs inside of.
-// If kernelMacrosFile is non-empty, its parent directory is also made available inside the chroot.
-func createChroot(workerTar, buildDir, specsDir, srpmsDir, kernelMacrosFile string) (chroot *safechroot.Chroot, err error) {
+// If releaseVersionMacrosFile is non-empty, its parent directory is also made available inside the chroot.
+func createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
 	const (
 		chrootName       = "specparser_chroot"
 		existingDir      = false
@@ -169,9 +169,9 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir, kernelMacrosFile stri
 		}
 	}
 
-	// If a kernel macros file is provided, copy it into the default RPM macros directory
+	// If a release version macros file is provided, copy it into the default RPM macros directory
 	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if kernelMacrosFile != "" {
+	if releaseVersionMacrosFile != "" {
 		macroDir, macroErr := rpm.GetMacroDir()
 		if macroErr != nil {
 			logger.Log.Errorf("Failed to get RPM macro directory: %s", macroErr)
@@ -180,7 +180,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir, kernelMacrosFile stri
 
 		// Destination path inside the chroot (same path as on the host).
 		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
-		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(kernelMacrosFile))
+		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(releaseVersionMacrosFile))
 
 		// Ensure destination directory exists and copy the file.
 		mkdirErr := directory.EnsureDirExists(macrosDestDir)
@@ -189,13 +189,13 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir, kernelMacrosFile stri
 			return
 		}
 
-		copyErr := file.Copy(kernelMacrosFile, macrosDestFile)
+		copyErr := file.Copy(releaseVersionMacrosFile, macrosDestFile)
 		if copyErr != nil {
-			logger.Log.Errorf("Failed to copy kernel macros file into chroot (%s -> %s): %s", kernelMacrosFile, macrosDestFile, copyErr)
+			logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", releaseVersionMacrosFile, macrosDestFile, copyErr)
 			return
 		}
 
-		logger.Log.Infof("Copied kernel macros file into chroot (%s -> %s)", kernelMacrosFile, macrosDestFile)
+		logger.Log.Infof("Copied release version macros file into chroot (%s -> %s)", releaseVersionMacrosFile, macrosDestFile)
 	}
 
 	return

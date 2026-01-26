@@ -156,7 +156,7 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, kernelMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, releaseVersionMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -221,7 +221,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
-	if kernelMacrosFile != "" {
+	if releaseVersionMacrosFile != "" {
 		macroDir, macroErr := rpm.GetMacroDir()
 		if macroErr != nil {
 			err = fmt.Errorf("failed to get RPM macros directory: %w", macroErr)
@@ -229,7 +229,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		}
 
 		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
-		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(kernelMacrosFile))
+		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(releaseVersionMacrosFile))
 
 		macroErr = directory.EnsureDirExists(macrosDestDir)
 		if macroErr != nil {
@@ -237,13 +237,13 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 			return
 		}
 
-		macroErr = file.Copy(kernelMacrosFile, macrosDestFile)
+		macroErr = file.Copy(releaseVersionMacrosFile, macrosDestFile)
 		if macroErr != nil {
-			err = fmt.Errorf("failed to copy kernel macros file into chroot: %w", macroErr)
+			err = fmt.Errorf("failed to copy release version macros file into chroot: %w", macroErr)
 			return
 		}
 
-		logger.Log.Infof("Copied kernel macros file into pkgworker chroot (%s -> %s)", kernelMacrosFile, macrosDestFile)
+		logger.Log.Infof("Copied release version macros file into pkgworker chroot (%s -> %s)", releaseVersionMacrosFile, macrosDestFile)
 	}
 	defer chroot.Close(noCleanup)
 

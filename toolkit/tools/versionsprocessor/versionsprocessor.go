@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	app           = kingpin.New("kernelverprocessor", "A tool to determine dynamic kernel version")
+	app           = kingpin.New("versionsprocessor", "A tool to generate a macro file of all specs version and release")
 	specsDir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
 	output        = exe.OutputFlag(app, "Output file to export the JSON")
 	workers       = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
@@ -57,7 +57,7 @@ func main() {
 	}
 	defer prof.StopProfiler()
 
-	timestamp.BeginTiming("kernelverprocessor", *timestampFile)
+	timestamp.BeginTiming("versionsprocessor", *timestampFile)
 	defer timestamp.CompleteTiming()
 
 	if *workers <= 0 {
@@ -86,10 +86,10 @@ func main() {
 
 	macros_output := []byte{}
 
-	// Process each kernel flavour/type
+	// Process all specs files
 	for _, specFile := range allSpecFiles {
 
-		// Get kernel version-release from spec file
+		// Get spec file version-release
 
 		specFileName := filepath.Base(specFile)
 
