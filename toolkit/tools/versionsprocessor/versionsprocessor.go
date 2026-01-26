@@ -23,15 +23,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const (
-	defaultWorkerCount = "100"
-)
-
 var (
 	app           = kingpin.New("versionsprocessor", "A tool to generate a macro file of all specs version and release")
 	specsDir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
 	output        = exe.OutputFlag(app, "Output file to export the JSON")
-	workers       = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	distTag       = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	targetArch    = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
 	logFlags      = exe.SetupLogFlags(app)
@@ -59,10 +54,6 @@ func main() {
 
 	timestamp.BeginTiming("versionsprocessor", *timestampFile)
 	defer timestamp.CompleteTiming()
-
-	if *workers <= 0 {
-		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
-	}
 
 	logger.PanicOnError(err)
 
