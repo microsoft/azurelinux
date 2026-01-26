@@ -90,9 +90,7 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
-# Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
-# We only parse the spec files we will actually pack.
+# Parse all SPECS in $(SPECS_DIR) and generate a release versions macros file containing macros of spec file versions and release.
 $(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-versionsprocessor) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-versionsprocessor) \
 		--dir $(SPECS_DIR) \
