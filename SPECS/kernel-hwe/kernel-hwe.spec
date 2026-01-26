@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.50.2
-Release:        1%{?dist}
+Version:        6.12.57.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -423,6 +423,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
+- Enable aarch64 kernel configs for performance improvements.
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.57.1-1
+- Kernel upgrade
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Update kernel
 - Changes to SPEC file to support x86_64 build

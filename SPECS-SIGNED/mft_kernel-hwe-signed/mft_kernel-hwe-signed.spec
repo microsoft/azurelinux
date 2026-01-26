@@ -4,8 +4,8 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
-%global target_kernel_release 1
+%global target_azl_build_kernel_version 6.12.57.1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -14,8 +14,8 @@
 
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
-Version:         4.30.0
-Release:	     23%{release_suffix}%{?dist}
+Version:         4.33.0
+Release:         2%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -29,9 +29,13 @@ Group:           System Environment/Kernel
 Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
+%ifarch aarch64
+Source3:        bf3_livefish.ko
+%endif
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-ExclusiveArch:  aarch64
+
 Conflicts:      mft_kernel
 Conflicts:      kernel-mft
 
@@ -61,6 +65,9 @@ pushd rpm_contents
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/mst_pci.ko
 cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/mst_pciconf.ko
+%ifarch aarch64
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/bf3_livefish.ko
+%endif
 
 popd
 
@@ -84,6 +91,16 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-2_6.12.57.1.2
+- Bump to match kernel-hwe.
+
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1_6.12.57.1.1
+- Upgrade version to 4.33.0.
+- Enable build on x86_64 kernel hwe.
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-23_6.12.50.2-1
 - Bump release to rebuild for new release
 

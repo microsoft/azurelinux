@@ -8,10 +8,17 @@
 %define config_source %{SOURCE1}
 %endif
 
+%ifarch aarch64
+%global __provides_exclude_from %{_libdir}/debug/.build-id/
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE5}
+%endif
+
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.6.100.mshv1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -21,7 +28,7 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-ExclusiveArch:  x86_64
+Source5:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -81,7 +88,7 @@ This package contains the 'perf' performance analysis tools for MSHV kernel.
 %prep
 %autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-%{version}
 make mrproper
-cp %{SOURCE1} .config
+cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE2} certs/mariner.pem
@@ -148,6 +155,10 @@ mkdir -p %{buildroot}/boot/efi
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
 %endif
 
+%ifarch aarch64
+install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
+%endif
+
 # Restrict the permission on System.map-X file
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
 install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
@@ -177,6 +188,10 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
+
+%ifarch aarch64
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
+%endif
 
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
@@ -216,7 +231,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+%ifarch x86_64
 /boot/efi/vmlinuz-%{uname_r}
+%endif
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 %config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
@@ -236,7 +253,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
+%ifarch x86_64
 %{_lib64dir}/libperf-jvmti.so
+%endif
+%ifarch aarch64
+%{_libdir}/libperf-jvmti.so
+%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
@@ -245,6 +267,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Jan 06 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-3
+- Enable ftrace syscalls tracing support in kernel config
+
+* Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-2
+- Enable build on aarch64
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
 - Upgrade to 6.6.100.mshv1
 

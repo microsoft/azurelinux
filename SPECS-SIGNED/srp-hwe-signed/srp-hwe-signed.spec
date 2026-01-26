@@ -32,8 +32,8 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
-%global target_kernel_release 1
+%global target_azl_build_kernel_version 6.12.57.1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -43,12 +43,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name srp-hwe
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-2%{release_suffix}%{?dist}}
 
 Summary:	 srp driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 23%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -66,7 +66,6 @@ Source2:         scsi_transport_srp.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 %description
 srp kernel modules
@@ -112,6 +111,16 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
+- Bump to match kernel-hwe.
+
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 

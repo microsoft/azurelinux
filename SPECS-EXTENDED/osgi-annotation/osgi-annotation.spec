@@ -1,9 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 #
 # spec file for package osgi-annotation
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,12 +20,12 @@ Distribution:   Azure Linux
 
 
 Name:           osgi-annotation
-Version:        7.0.0
-Release:        2%{?dist}
+Version:        8.1.0
+Release:        1%{?dist}
 Summary:        Annotations for use in compiling OSGi bundles
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://www.osgi.org/
+URL:            https://www.osgi.org/
 # Upstream project is behind an account registration system with no anonymous
 # read access, so we download the source from maven central instead
 Source0:        https://repo1.maven.org/maven2/org/osgi/osgi.annotation/%{version}/osgi.annotation-%{version}-sources.jar
@@ -33,7 +34,7 @@ Source2:        http://www.apache.org/licenses/LICENSE-2.0
 Source3:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-local-bootstrap >= 6
 BuildRequires:  unzip
 BuildArch:      noarch
 
@@ -88,25 +89,37 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.annotation.pom
 %add_maven_depmap %{name}/osgi.annotation.pom %{name}/osgi.annotation.jar -a org.osgi:org.osgi.annotation
 # javadoc
 install -dm 0744 %{buildroot}%{_javadocdir}/%{name}
+install -dm 0755 %{buildroot}%{_docdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}
+
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 
 %files -f .mfiles
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 
 %files javadoc
-%license LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.0-2
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Tue May 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.1.0-1
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
+- Fixed duplicate LICENSE warning
+- Marked extra legal files as documentation.
+- License verified
 
-* Mon Nov 16 2020 Ruying Chen <v-ruyche@microsoft.com> - 7.0.0-1.4
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
-
+* Wed Oct  2 2024 Fridrich Strba <fstrba@suse.com>
+- Spec file cleanup
+* Sat Sep  2 2023 Fridrich Strba <fstrba@suse.com>
+- Upgrade to the upstream version 8.1.0
+  * no upstream changes
+* Sun Mar 20 2022 Fridrich Strba <fstrba@suse.com>
+- Build with source and target levels 8
 * Wed Apr  1 2020 Fridrich Strba <fstrba@suse.com>
 - Upgrade to the upstream version 7.0.0
+  * no upstream changes
 * Mon Feb 11 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of osgi-annotations 6.0.0

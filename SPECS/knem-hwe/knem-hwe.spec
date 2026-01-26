@@ -28,8 +28,8 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
-%global target_kernel_release 1
+%global target_azl_build_kernel_version 6.12.57.1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_release: %global _release OFED.23.10.0.2.1.1}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -55,14 +55,17 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
 Version:	 1.1.4.90mlnx3
-Release:	 23%{release_suffix}%{?dist}
+Release:	 26%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
 
 BuildRequires:  gcc
@@ -117,7 +120,6 @@ Group: System Environment/Libraries
 Requires: kernel-hwe = %{target_kernel_version_full}
 Requires: kmod
 Conflicts: knem-modules
-ExclusiveArch: aarch64
 
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
@@ -239,6 +241,17 @@ fi
 %endif
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-26_6.12.57.1.2
+- Bump to match kernel-hwe.
+
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-25_6.12.57.1.1
+- Build with OFED 25.07.0.9.7.1.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 

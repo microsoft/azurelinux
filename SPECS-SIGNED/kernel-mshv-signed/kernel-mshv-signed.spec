@@ -3,11 +3,14 @@
 %ifarch x86_64
 %global buildarch x86_64
 %endif
+%ifarch aarch64
+%global buildarch aarch64
+%endif
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.6.100.mshv1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,7 +82,6 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 %{?grub2_configuration_requires}
-ExclusiveArch:  x86_64
 
 %description -n kernel-mshv
 The kernel package contains the signed MSHV-enabled Linux kernel.
@@ -128,7 +130,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+%ifarch x86_64
 /boot/efi/vmlinuz-%{uname_r}
+%endif
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 %config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
@@ -136,6 +140,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Mon Jan 06 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-3
+- Enable ftrace syscalls tracing support in kernel config
+
+* Wed Oct 22 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-2
+- Enable build on aarch64
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
 - Upgrade to 6.6.100.mshv1
 

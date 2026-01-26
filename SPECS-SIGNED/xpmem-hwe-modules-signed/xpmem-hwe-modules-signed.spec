@@ -5,15 +5,15 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
-%global target_kernel_release 1
+%global target_azl_build_kernel_version 6.12.57.1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-hwe-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-2%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -21,14 +21,13 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 23%{release_suffix}%{?dist}
+Release:	 26%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
-ExclusiveArch:   aarch64
 
 #
 # To populate these sources:
@@ -94,6 +93,16 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-26_6.12.57.1.2
+- Bump to match kernel-hwe.
+
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1.1
+- Build with OFED 25.07.0.9.7.1.
+- Enable build on x86_64 kernel hwe.
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 - Align %%post* scripts with other kmod packages.
