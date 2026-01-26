@@ -18,9 +18,13 @@ Key Features:
 
 import json
 import re
+import os
+from datetime import datetime
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 from AntiPatternDetector import AntiPattern, Severity
+from datetime import datetime
+from HtmlReportGenerator import HtmlReportGenerator
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -36,16 +40,16 @@ class ResultAnalyzer:
     - Determining whether to fail the pipeline based on severity
     """
     
-    def __init__(self, anti_patterns: List[AntiPattern], ai_analysis: str):
+    def __init__(self, anti_patterns: List[AntiPattern] = None, ai_analysis: str = None):
         """
         Initialize with detection results and AI analysis.
         
         Args:
-            anti_patterns: List of detected anti-patterns
-            ai_analysis: Analysis string from Azure OpenAI
+            anti_patterns: List of detected anti-patterns (optional)
+            ai_analysis: Analysis string from Azure OpenAI (optional)
         """
-        self.anti_patterns = anti_patterns
-        self.ai_analysis = ai_analysis
+        self.anti_patterns = anti_patterns or []
+        self.ai_analysis = ai_analysis or ""
         
         # Group anti-patterns by severity
         self.grouped_patterns = self._group_by_severity()
@@ -468,3 +472,386 @@ class ResultAnalyzer:
         content_parts.append("📋 **For detailed analysis and recommendations, check the Azure DevOps pipeline logs.**")
         
         return "\n".join(content_parts)
+    
+    def _get_severity_emoji(self, severity: Severity) -> str:
+        """Get emoji for severity level."""
+        emoji_map = {
+            Severity.INFO: "✅",
+            Severity.WARNING: "⚠️",
+            Severity.ERROR: "🔴",
+            Severity.CRITICAL: "🔥"
+        }
+        return emoji_map.get(severity, "ℹ️")
+    
+    def generate_html_report(self, analysis_result: 'MultiSpecAnalysisResult', pr_metadata: Optional[dict] = None) -> str:
+        """
+        Generate an interactive HTML report with dark theme and expandable sections.
+        Delegates to HtmlReportGenerator for modularity.
+        Args:
+            analysis_result: MultiSpecAnalysisResult with all spec data
+            pr_metadata: Optional dict with PR metadata (pr_number, pr_title, pr_author, etc.)
+        Returns:
+            HTML string with embedded CSS and JavaScript for interactivity
+        """
+        html_generator = HtmlReportGenerator(
+            severity_color_fn=self._get_severity_color,
+            severity_emoji_fn=self._get_severity_emoji
+        )
+        return html_generator.generate_report_body(analysis_result, pr_metadata)
+    
+    def _get_severity_color(self, severity: Severity) -> str:
+        """Get color code for severity level (cool tone palette: blue/purple/green)."""
+        color_map = {
+            Severity.INFO: "#3fb950",      # Green (keep - already cool)
+            Severity.WARNING: "#a371f7",   # Purple (was yellow/orange)
+            Severity.ERROR: "#58a6ff",     # Blue (was red)
+            Severity.CRITICAL: "#bc8cff"   # Bright purple (was bright red)
+        }
+        return color_map.get(severity, "#8b949e")
+    
+    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, 
+                                   github_client = None, blob_storage_client = None, pr_number: int = None,
+                                   pr_metadata: dict = None, categorized_issues: dict = None) -> str:
+        """
+        Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult with all spec data
+            include_html: Whether to include interactive HTML report at the top
+            github_client: Optional GitHubClient instance for creating Gist with HTML report (fallback)
+            blob_storage_client: Optional BlobStorageClient for uploading to Azure Blob Storage (preferred)
+            pr_number: PR number for blob storage upload (required if blob_storage_client provided)
+            pr_metadata: Optional dict with PR metadata (title, author, branches, sha, timestamp)
+            categorized_issues: Optional dict with categorized issues from AnalyticsManager
+            
+        Returns:
+            Formatted GitHub markdown report with optional HTML section
+        """
+        report_lines = []
+        
+        # Use provided metadata or create default
+        if not pr_metadata:
+            pr_metadata = {
+                "pr_number": pr_number or 0,
+                "pr_title": f"PR #{pr_number}" if pr_number else "Unknown PR",
+                "pr_author": "Unknown",
+                "source_branch": os.environ.get("SYSTEM_PULLREQUEST_SOURCEBRANCH", "unknown"),
+                "target_branch": os.environ.get("SYSTEM_PULLREQUEST_TARGETBRANCH", "main"),
+                "source_commit_sha": os.environ.get("SYSTEM_PULLREQUEST_SOURCECOMMITID", "")[:8],
+                "analysis_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+            }
+        
+        # Add HTML report - try blob storage first, fall back to Gist
+        # Note: Blob storage preferred for production, Gist as fallback
+        if include_html and (blob_storage_client or github_client):
+            # Create HTML generator instance with severity helper methods
+            html_generator = HtmlReportGenerator(
+                severity_color_fn=self._get_severity_color,
+                severity_emoji_fn=self._get_severity_emoji
+            )
+            
+            # Generate the report body with categorized issues for challenge persistence
+            html_report = html_generator.generate_report_body(
+                analysis_result, 
+                pr_metadata=pr_metadata,
+                categorized_issues=categorized_issues
+            )
+            
+            # Generate the complete HTML page with CSS and JavaScript
+            html_page = html_generator.generate_complete_page(html_report, pr_number or 0)
+            
+            html_url = None
+            
+            # Try blob storage first (preferred for production with UMI)
+            if blob_storage_client and pr_number:
+                try:
+                    logger.info("Attempting to upload HTML report to Azure Blob Storage...")
+                    html_url = blob_storage_client.upload_html(
+                        pr_number=pr_number,
+                        html_content=html_page
+                    )
+                    if html_url:
+                        logger.info(f"✅ HTML report uploaded to blob storage: {html_url}")
+                except Exception as e:
+                    logger.warning(f"Blob storage upload failed, will try Gist fallback: {e}")
+                    html_url = None
+            
+            # Fall back to Gist if blob storage failed or not available
+            if not html_url and github_client:
+                logger.info("Using Gist for HTML report (blob storage not available or failed)")
+                html_url = github_client.create_gist(
+                    filename="cve-spec-check-report.html",
+                    content=html_page,
+                    description=f"CVE Spec File Check Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                )
+                if html_url:
+                    logger.info(f"✅ HTML report uploaded to Gist: {html_url}")
+            
+            if html_url:
+                # Add prominent HTML report link section
+                report_lines.append("")
+                report_lines.append("---")
+                report_lines.append("")
+                report_lines.append("## 📊 RADAR Code Review Report")
+                report_lines.append("")
+                report_lines.append(f"### 🔗 <a href=\"{html_url}\" target=\"_blank\" rel=\"noopener noreferrer\">CLICK HERE to open the RADAR Code Review Report to review and challenge findings</a>")
+                report_lines.append("")
+                report_lines.append("**The report will open in a new tab automatically**")
+                report_lines.append("")
+                report_lines.append("**Features:**")
+                report_lines.append("- 🎯 Realtime anti-pattern detection with AI reasoning")
+                report_lines.append("- 🔐 GitHub OAuth sign-in for authenticated challenges")
+                report_lines.append("- 💬 Submit feedback and challenges directly from the report")
+                report_lines.append("- 📊 Comprehensive analysis with severity indicators")
+                report_lines.append("")
+                report_lines.append("---")
+                report_lines.append("")
+                logger.info(f"Added HTML report link to comment: {html_url}")
+            else:
+                logger.warning("Both blob storage and Gist failed - skipping HTML report section")
+                # No HTML report section added if both methods fail
+        
+        # Get severity emoji
+        severity_emoji = self._get_severity_emoji(analysis_result.overall_severity)
+        severity_name = analysis_result.overall_severity.name
+        
+        # Header with emoji and severity
+        if analysis_result.overall_severity >= Severity.ERROR:
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **FAILED**")
+        elif analysis_result.overall_severity == Severity.WARNING:
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **PASSED WITH WARNINGS**")
+        else:
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **PASSED**")
+        
+        report_lines.append("")
+        report_lines.append(f"**Overall Severity:** {severity_emoji} **{severity_name}**")
+        report_lines.append(f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*")
+        report_lines.append("")
+        report_lines.append("---")
+        report_lines.append("")
+        
+        # Executive Summary
+        report_lines.append("## 📋 Executive Summary")
+        report_lines.append("")
+        stats = analysis_result.summary_statistics
+        report_lines.append(f"| Metric | Count |")
+        report_lines.append(f"|--------|-------|")
+        report_lines.append(f"| **Total Spec Files Analyzed** | {stats['total_specs']} |")
+        report_lines.append(f"| **Specs with Errors** | 🔴 {stats['specs_with_errors']} |")
+        report_lines.append(f"| **Specs with Warnings** | ⚠️ {stats['specs_with_warnings']} |")
+        report_lines.append(f"| **Total Issues Found** | {analysis_result.total_issues} |")
+        report_lines.append("")
+        
+        # Add categorized issues breakdown if available
+        if categorized_issues:
+            report_lines.append("## 🏷️ Issue Status Tracking")
+            report_lines.append("")
+            report_lines.append("This commit's issues have been categorized based on challenge history:")
+            report_lines.append("")
+            
+            new_count = len(categorized_issues['new_issues'])
+            recurring_count = len(categorized_issues['recurring_unchallenged'])
+            challenged_count = len(categorized_issues['challenged_issues'])
+            resolved_count = len(categorized_issues['resolved_issues'])
+            
+            report_lines.append(f"| Status | Count | Description |")
+            report_lines.append(f"|--------|-------|-------------|")
+            report_lines.append(f"| 🆕 **New Issues** | {new_count} | First time detected in this PR |")
+            report_lines.append(f"| 🔄 **Recurring Unchallenged** | {recurring_count} | Previously detected but not yet challenged |")
+            report_lines.append(f"| ✅ **Previously Challenged** | {challenged_count} | Issues already acknowledged by reviewers |")
+            report_lines.append(f"| ✔️ **Resolved** | {resolved_count} | Issues fixed since last commit |")
+            report_lines.append("")
+            
+            # Show actionable issues requiring attention
+            unchallenged_total = new_count + recurring_count
+            if unchallenged_total > 0:
+                report_lines.append(f"⚠️ **{unchallenged_total} issue(s)** require attention (new or recurring unchallenged)")
+                report_lines.append("")
+            elif challenged_count > 0:
+                report_lines.append(f"✅ All {challenged_count} issue(s) have been acknowledged by reviewers")
+                report_lines.append("")
+            else:
+                report_lines.append("🎉 No issues detected in this commit!")
+                report_lines.append("")
+            
+            # Add helpful note
+            if challenged_count > 0:
+                report_lines.append("> **Note:** Previously challenged issues are not re-flagged. They remain visible for tracking purposes.")
+                report_lines.append("")
+        
+        # Package-by-package breakdown
+        report_lines.append("## 📦 Package Analysis Details")
+        report_lines.append("")
+        
+        sorted_specs = sorted(analysis_result.spec_results, key=lambda x: x.package_name)
+        for idx, spec_result in enumerate(sorted_specs):
+            pkg_emoji = self._get_severity_emoji(spec_result.severity)
+            
+            # Wrap entire spec section in collapsible details (open by default)
+            report_lines.append("<details open>")
+            report_lines.append(f"<summary><h3>{pkg_emoji} <b>{spec_result.package_name}</b> - {spec_result.severity.name}</h3></summary>")
+            report_lines.append("")
+            
+            # Spec metadata
+            report_lines.append(f"- **Spec File:** `{spec_result.spec_path}`")
+            report_lines.append(f"- **Status:** {pkg_emoji} **{spec_result.severity.name}**")
+            report_lines.append(f"- **Issues:** {spec_result.summary}")
+            report_lines.append("")
+            
+            # Finer delimiter before anti-patterns
+            if spec_result.anti_patterns or spec_result.ai_analysis or spec_result.severity >= Severity.ERROR:
+                report_lines.append("***")
+                report_lines.append("")
+            
+            # Anti-patterns section
+            if spec_result.anti_patterns:
+                report_lines.append("<details open>")
+                report_lines.append("<summary>🐛 <b>Anti-Patterns Detected</b> (Click to collapse)</summary>")
+                report_lines.append("")
+                
+                # Group by type
+                issues_by_type = spec_result.get_issues_by_type()
+                for issue_type, patterns in issues_by_type.items():
+                    # Get severity from first pattern of this type (they should all be same severity)
+                    pattern_severity = patterns[0].severity if patterns else Severity.INFO
+                    severity_emoji_local = self._get_severity_emoji(pattern_severity)
+                    severity_name = pattern_severity.name
+                    
+                    report_lines.append(f"#### {severity_emoji_local} `{issue_type}` **({severity_name})** - {len(patterns)} occurrence(s)")
+                    report_lines.append("")
+                    for i, pattern in enumerate(patterns, 1):
+                        # Truncate long descriptions
+                        desc = pattern.description if len(pattern.description) <= 100 else pattern.description[:97] + "..."
+                        report_lines.append(f"{i}. {desc}")
+                    report_lines.append("")
+                
+                report_lines.append("</details>")
+                report_lines.append("")
+                
+                # Delimiter after anti-patterns if more content follows
+                if spec_result.ai_analysis or spec_result.severity >= Severity.ERROR:
+                    report_lines.append("***")
+                    report_lines.append("")
+            
+            # AI Analysis section
+            if spec_result.ai_analysis:
+                report_lines.append("<details open>")
+                report_lines.append("<summary>🤖 <b>AI Analysis Summary</b> (Click to collapse)</summary>")
+                report_lines.append("")
+                # Take first 5 lines of AI analysis
+                ai_lines = spec_result.ai_analysis.split('\n')[:5]
+                for line in ai_lines:
+                    if line.strip():
+                        report_lines.append(line)
+                report_lines.append("")
+                report_lines.append("</details>")
+                report_lines.append("")
+                
+                # Delimiter after AI analysis if recommended actions follow
+                if spec_result.severity >= Severity.ERROR:
+                    report_lines.append("***")
+                    report_lines.append("")
+            
+            # Per-spec Recommended Actions
+            if spec_result.severity >= Severity.ERROR:
+                report_lines.append("<details open>")
+                report_lines.append(f"<summary>✅ <b>Recommended Actions for {spec_result.package_name}</b> (Click to collapse)</summary>")
+                report_lines.append("")
+                
+                # Get unique recommendations
+                recommendations = set()
+                for pattern in spec_result.anti_patterns:
+                    if pattern.severity >= Severity.ERROR:
+                        recommendations.add(pattern.recommendation)
+                
+                if recommendations:
+                    for rec in sorted(recommendations):
+                        report_lines.append(f"- [ ] {rec}")
+                    report_lines.append("")
+                
+                report_lines.append("</details>")
+                report_lines.append("")
+            
+            # Close spec-level details
+            report_lines.append("</details>")
+            report_lines.append("")
+            
+            # Add subtle delimiter between specs (but not after the last one)
+            if idx < len(sorted_specs) - 1:
+                report_lines.append("---")
+                report_lines.append("")
+        
+        # Overall Recommendations (keep at bottom)
+        if analysis_result.get_failed_specs():
+            report_lines.append("---")
+            report_lines.append("")
+            report_lines.append("## ✅ All Recommended Actions")
+            report_lines.append("")
+            report_lines.append("*Complete checklist of all actions needed across all packages*")
+            report_lines.append("")
+            
+            for spec_result in analysis_result.get_failed_specs():
+                report_lines.append(f"### **{spec_result.package_name}**")
+                report_lines.append("")
+                
+                # Get unique recommendations
+                recommendations = set()
+                for pattern in spec_result.anti_patterns:
+                    if pattern.severity >= Severity.ERROR:
+                        recommendations.add(pattern.recommendation)
+                
+                for rec in sorted(recommendations):
+                    report_lines.append(f"- [ ] {rec}")
+                report_lines.append("")
+        
+        # Footer
+        report_lines.append("---")
+        report_lines.append("*🤖 RADAR Code Review PR Check*")
+        
+        return '\n'.join(report_lines)
+
+    def save_json_results(self, analysis_result: 'MultiSpecAnalysisResult', filepath: str):
+        """
+        Save analysis results in structured JSON format.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult to save
+            filepath: Path to save JSON file
+        """
+        import json
+        from dataclasses import asdict
+        
+        # Convert to JSON-serializable format
+        json_data = {
+            'timestamp': datetime.now().isoformat(),
+            'overall_severity': analysis_result.overall_severity.name,
+            'total_issues': analysis_result.total_issues,
+            'summary_statistics': analysis_result.summary_statistics,
+            'spec_results': []
+        }
+        
+        for spec_result in analysis_result.spec_results:
+            spec_data = {
+                'spec_path': spec_result.spec_path,
+                'package_name': spec_result.package_name,
+                'severity': spec_result.severity.name,
+                'summary': spec_result.summary,
+                'anti_patterns': [
+                    {
+                        'id': p.id,
+                        'name': p.name,
+                        'description': p.description,
+                        'severity': p.severity.name,
+                        'line_number': p.line_number,
+                        'recommendation': p.recommendation
+                    }
+                    for p in spec_result.anti_patterns
+                ],
+                'ai_analysis': spec_result.ai_analysis
+            }
+            json_data['spec_results'].append(spec_data)
+        
+        with open(filepath, 'w') as f:
+            json.dump(json_data, f, indent=2)
+        
+        logger.info(f"Saved JSON results to {filepath}")

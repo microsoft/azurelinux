@@ -14,13 +14,63 @@ import requests
 import logging
 import json
 import re
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
 
+# Azure Key Vault imports
+try:
+    from azure.identity import DefaultAzureCredential
+    from azure.keyvault.secrets import SecretClient
+    KEY_VAULT_AVAILABLE = True
+except ImportError:
+    KEY_VAULT_AVAILABLE = False
+    logging.warning("Azure Key Vault SDK not available - will use environment variables only")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("github-client")
+
+def fetch_github_token_from_keyvault() -> Optional[str]:
+    """
+    Fetch GitHub PAT from Azure Key Vault using Managed Identity.
+    
+    Returns:
+        str: GitHub PAT token from Key Vault, or None if unavailable
+    """
+    if not KEY_VAULT_AVAILABLE:
+        logger.warning("⚠️ Azure Key Vault SDK not available - skipping Key Vault token fetch")
+        return None
+    
+    try:
+        # Configuration from security-config-dev.json
+        vault_name = "mariner-pipelines-kv"
+        secret_name = "cblmarghGithubPRPat"
+        vault_url = f"https://{vault_name}.vault.azure.net"
+        
+        logger.info(f"🔐 Fetching GitHub PAT from Key Vault: {vault_name}/{secret_name}")
+        
+        # Use DefaultAzureCredential (will use Managed Identity in pipeline)
+        credential = DefaultAzureCredential()
+        secret_client = SecretClient(vault_url=vault_url, credential=credential)
+        
+        # Fetch the secret
+        secret = secret_client.get_secret(secret_name)
+        token = secret.value
+        
+        if token and token.strip():
+            token_prefix = token[:10] if len(token) >= 10 else token
+            logger.info(f"✅ Successfully fetched GitHub PAT from Key Vault (prefix: {token_prefix}...)")
+            return token
+        else:
+            logger.warning("⚠️ Key Vault secret is empty")
+            return None
+            
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to fetch token from Key Vault: {e}")
+        logger.warning("   Will fall back to environment variables")
+        return None
 
 class CheckStatus(Enum):
     """GitHub Check API status values"""
@@ -36,21 +86,38 @@ class GitHubClient:
     """Client for interacting with GitHub API for PR checks and comments"""
     
     def __init__(self):
-        """Initialize the GitHub client using environment variables for auth"""
-        # Try multiple token environment variables in order of preference
-        token_vars = [
-            "GITHUB_TOKEN",  # Prioritize CBL-Mariner bot PAT from key vault
-            "SYSTEM_ACCESSTOKEN",  # Fall back to Azure DevOps OAuth token
-            "GITHUB_ACCESS_TOKEN",
-            "AZDO_GITHUB_TOKEN"
-        ]
-        
+        """Initialize the GitHub client using Key Vault or environment variables for auth"""
         self.token = None
-        for var in token_vars:
-            if os.environ.get(var):
-                self.token = os.environ.get(var)
-                logger.info(f"Using {var} for GitHub authentication")
-                break
+        
+        # FIRST: Try to fetch token from Azure Key Vault (single source of truth)
+        logger.info("🔐 Attempting to fetch GitHub PAT from Key Vault...")
+        kv_token = fetch_github_token_from_keyvault()
+        if kv_token:
+            self.token = kv_token
+            logger.info("✅ Using GitHub PAT from Key Vault")
+        else:
+            # FALLBACK: Try environment variables (for local testing or when Key Vault unavailable)
+            logger.info("⚠️ Key Vault token not available, trying environment variables...")
+            token_vars = [
+                "GITHUB_TOKEN",  # Explicit GitHub token
+                "SYSTEM_ACCESSTOKEN",  # Azure DevOps OAuth token
+                "GITHUB_ACCESS_TOKEN",
+                "AZDO_GITHUB_TOKEN"
+            ]
+            
+            for var in token_vars:
+                token_value = os.environ.get(var, "")
+                # Only use non-empty tokens
+                if token_value and token_value.strip():
+                    self.token = token_value
+                    token_prefix = token_value[:10] if len(token_value) >= 10 else token_value
+                    logger.info(f"✅ Using {var} for GitHub authentication (prefix: {token_prefix}...)")
+                    break
+                elif var in os.environ:
+                    logger.warning(f"⚠️ {var} is set but empty - skipping")
+        
+        if not self.token:
+            logger.error("❌ No valid GitHub token found in Key Vault or environment variables")
                 
         # Get repository details from environment variables
         self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo
@@ -182,10 +249,11 @@ class GitHubClient:
             Response from GitHub API
         """
         if not self.token or not self.repo_name or not self.pr_number:
-            logger.warning("Required GitHub params not available, skipping comment posting")
+            logger.error(f"Missing required params - token: {'✓' if self.token else '✗'}, repo: {self.repo_name}, pr: {self.pr_number}")
             return {}
             
         url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/comments"
+        logger.info(f"Posting comment to: {url}")
         
         payload = {
             "body": body
@@ -193,11 +261,51 @@ class GitHubClient:
         
         try:
             response = requests.post(url, headers=self.headers, json=payload)
+            logger.info(f"Response status: {response.status_code}")
             response.raise_for_status()
+            logger.info("✅ Successfully posted comment")
             return response.json()
         except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to post PR comment: {str(e)}")
+            logger.error(f"❌ Failed to post PR comment: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
             return {}
+    
+    def get_pr_metadata(self) -> Optional[Dict[str, Any]]:
+        """
+        Fetch PR metadata from GitHub API including author, title, branches, etc.
+        
+        Returns:
+            Dictionary with PR metadata or None if fetch fails
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.warning("Required GitHub params not available, cannot fetch PR metadata")
+            return None
+        
+        url = f"{self.api_base_url}/repos/{self.repo_name}/pulls/{self.pr_number}"
+        
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            pr_data = response.json()
+            
+            metadata = {
+                "pr_number": self.pr_number,
+                "pr_title": pr_data.get("title", f"PR #{self.pr_number}"),
+                "pr_author": pr_data.get("user", {}).get("login", "Unknown"),
+                "source_branch": pr_data.get("head", {}).get("ref", "unknown"),
+                "target_branch": pr_data.get("base", {}).get("ref", "main"),
+                "source_commit_sha": pr_data.get("head", {}).get("sha", "")[:8],
+                "analysis_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+            }
+            
+            logger.info(f"✅ Fetched PR metadata: author={metadata['pr_author']}, title={metadata['pr_title']}")
+            return metadata
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to fetch PR metadata: {str(e)}")
+            return None
     
     def get_pr_comments(self) -> List[Dict[str, Any]]:
         """
@@ -248,6 +356,75 @@ class GitHubClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to update PR comment: {str(e)}")
             return {}
+    
+    def add_label(self, label: str) -> Dict[str, Any]:
+        """
+        Add a label to the PR.
+        
+        Args:
+            label: The label name to add
+            
+        Returns:
+            Response from GitHub API
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.error(f"Missing required params - token: {'✓' if self.token else '✗'}, repo: {self.repo_name}, pr: {self.pr_number}")
+            return {}
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/labels"
+        logger.info(f"Adding label '{label}' to PR #{self.pr_number}")
+        
+        payload = {
+            "labels": [label]
+        }
+        
+        try:
+            response = requests.post(url, headers=self.headers, json=payload)
+            logger.info(f"Response status: {response.status_code}")
+            response.raise_for_status()
+            logger.info(f"✅ Successfully added label '{label}'")
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to add label '{label}': {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
+            return {}
+    
+    def remove_label(self, label: str) -> bool:
+        """
+        Remove a label from the PR.
+        
+        Args:
+            label: The label name to remove
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.error(f"Missing required params - token: {'✓' if self.token else '✗'}, repo: {self.repo_name}, pr: {self.pr_number}")
+            return False
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/labels/{label}"
+        logger.info(f"Removing label '{label}' from PR #{self.pr_number}")
+        
+        try:
+            response = requests.delete(url, headers=self.headers)
+            logger.info(f"Response status: {response.status_code}")
+            
+            # 200 = successfully removed, 404 = label wasn't there (still success from our perspective)
+            if response.status_code in [200, 404]:
+                logger.info(f"✅ Successfully removed label '{label}' (or it wasn't present)")
+                return True
+            
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to remove label '{label}': {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
+            return False
     
     def post_or_update_comment(self, body: str, marker: str) -> Dict[str, Any]:
         """
@@ -302,6 +479,50 @@ class GitHubClient:
         # Didn't find a comment with our marker, create a new one
         logger.info("No existing comment found with marker, creating new comment")
         return self.post_pr_comment(marked_body)
+    
+    def create_gist(self, filename: str, content: str, description: str = "") -> Optional[str]:
+        """
+        Create a secret GitHub Gist and return its URL.
+        
+        Args:
+            filename: Name of the file in the gist
+            content: Content of the file
+            description: Description of the gist
+            
+        Returns:
+            URL of the created gist, or None if failed
+        """
+        if not self.token:
+            logger.warning("GitHub token not available, skipping gist creation")
+            return None
+            
+        url = f"{self.api_base_url}/gists"
+        
+        payload = {
+            "description": description,
+            "public": False,  # Create secret gist
+            "files": {
+                filename: {
+                    "content": content
+                }
+            }
+        }
+        
+        try:
+            logger.info(f"Creating secret gist: {filename}")
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            gist_data = response.json()
+            gist_url = gist_data.get("html_url")
+            logger.info(f"✅ Created gist: {gist_url}")
+            return gist_url
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to create gist: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
+            return None
+
     
     def create_severity_status(self, severity: Severity, commit_sha: str) -> Dict[str, Any]:
         """

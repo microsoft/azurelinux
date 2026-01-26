@@ -1,0 +1,18 @@
+# Testing requirements for CveSpecFilePRCheck
+
+# Core testing frameworks
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-timeout>=2.1.0
+
+# For mocking and test utilities
+mock>=4.0.3
+faker>=18.0.0  # For generating test data
+
+# Code quality tools for tests
+pytest-flake8>=1.1.1
+pytest-pylint>=0.19.0
+
+# Parent package requirements
+-r ../requirements.txt

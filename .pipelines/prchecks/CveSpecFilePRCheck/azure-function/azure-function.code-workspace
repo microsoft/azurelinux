@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "azureFunctions.deploySubpath": ".",
+    "azureFunctions.projectRuntime": "~4",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.pythonVenv": ".venv"
+  }
+}
