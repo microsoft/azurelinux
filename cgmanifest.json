@@ -8631,8 +8631,8 @@
         "type": "other",
         "other": {
           "name": "langtable",
-          "version": "0.0.53",
-          "downloadUrl": "https://github.com/mike-fabian/langtable/releases/download/0.0.53/langtable-0.0.53.tar.gz"
+          "version": "0.0.68",
+          "downloadUrl": "https://github.com/mike-fabian/langtable/archive/refs/tags/0.0.68.tar.gz"
         }
       }
     },
