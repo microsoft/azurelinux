@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.119.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -440,6 +440,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jan 26 20:19:05 UTC 2026 Jiri Appl <jiria@microsoft.com> - 6.6.119.3-5
+- enable CONFIG_FW_CFG_SYSFS
+
 * Mon Jan 26 18:58:05 UTC 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-4
 - enable CONFIG_SQUASHFS_ZSTD
 
