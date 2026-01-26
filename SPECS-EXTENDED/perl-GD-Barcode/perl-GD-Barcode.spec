@@ -1,19 +1,48 @@
+# Perform optional tests
+%bcond_without perl_GD_Barcode_enables_optional_test
+
+# Break a build cycle perl-Business-ISBN → perl-GD-Barcode
+%if %{with perl_GD_Barcode_enables_optional_test} && !%{defined perl_bootstrap}
+%define optional_test 1
+%else
+%define optional_test 0
+%endif
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-GD-Barcode
-Version:        1.15
-Release:        34%{?dist}
+Version:        2.00
+Release:        6%{?dist}
 Summary:        Create barcode image with GD
 # see Barcode.pm
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/GD-Barcode
-Source0:        https://cpan.metacpan.org/authors/id/K/KW/KWITKNR/GD-Barcode-%{version}.tar.gz#/perl-GD-Barcode-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-Barcode-%{version}.tar.gz#/perl-GD-Barcode-%{version}.tar.gz
 BuildArch:      noarch
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-BuildRequires:  perl-generators
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
+buildrequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+# Run-time
+BuildRequires:  perl(constant)
 BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker) 
 BuildRequires:  perl(GD)
+BuildRequires:  perl(parent)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+%if 0%{?with_check}
+BuildRequires:  perl(ok)
+BuildRequires:  perl(Test2::V0)
+%if %{optional_test}
+# Optional tests
+BuildRequires:  perl(Business::ISBN) >= 3.007
+BuildRequires:  perl(Test2::Require::Module)
+%endif
+%endif
 # definitely not picked up automagically.
 Requires:       perl(GD)
 
@@ -21,31 +50,114 @@ Requires:       perl(GD)
 GD::Barcode is a subclass of GD and allows you to create barcode images 
 with GD. 
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+%if %{optional_test}
+Requires:       perl(Business::ISBN) >= 3.007
+%endif
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n GD-Barcode-%{version}
-find sample/ -type f -exec sed -i 's/\r//' {} +
+%if !%{optional_test}
+rm t/business-isbn-png-barcode.t
+perl -i -ne 'print $_ unless m{^t/business-isbn-png-barcode\.t\b}' MANIFEST
+%endif
+for i in `find sample/ -type f`; do
+    perl -pi -e 's/\r//' $i
+done
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -exec rm -f {} \;
-find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
+%{make_install}
 %{_fixperms} %{buildroot}/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
-%doc Changes README sample/ test.pl
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%doc Changes README sample
+%{perl_vendorlib}/GD*
+%{_mandir}/man3/GD::Barcode*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-34
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Mar 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.00-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.00-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.00-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.00-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Oct 11 2023 Petr Pisar <ppisar@redhat.com> - 2.00-2
+- Break a build cycle with perl-Business-ISBN on Perl bootstrap
+
+* Mon Sep 18 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.00-1
+- 2.00 bump (rhbz#2238862)
+- Package tests
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-44
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-43
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-42
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.15-41
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-40
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-39
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.15-38
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-37
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.15-35
+- Perl 5.32 rebuild
+
+* Mon Feb 24 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.15-34
+- Modernize spec
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
