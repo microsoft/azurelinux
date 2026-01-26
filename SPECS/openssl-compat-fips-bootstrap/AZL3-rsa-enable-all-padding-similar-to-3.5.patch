@@ -1,0 +1,26 @@
+From 73c0f7acfec19af70a751a28c84ebd9b5f7156d8 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 23 Jul 2025 16:29:47 +0000
+Subject: [PATCH] AZL3 -- enable all padding, similar to 3.5
+
+---
+ providers/implementations/asymciphers/rsa_enc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/providers/implementations/asymciphers/rsa_enc.c b/providers/implementations/asymciphers/rsa_enc.c
+index b2c239c..d2e75cb 100644
+--- a/providers/implementations/asymciphers/rsa_enc.c
++++ b/providers/implementations/asymciphers/rsa_enc.c
+@@ -144,8 +144,7 @@ static int rsa_decrypt_init(void *vprsactx, void *vrsa,
+ # ifdef FIPS_MODULE
+ static int fips_padding_allowed(const PROV_RSA_CTX *prsactx)
+ {
+-    if (prsactx->pad_mode == RSA_PKCS1_PADDING || prsactx->pad_mode == RSA_NO_PADDING
+-        || prsactx->pad_mode == RSA_PKCS1_WITH_TLS_PADDING)
++    if (prsactx->pad_mode == RSA_NO_PADDING)
+         return 0;
+ 
+     return 1;
+-- 
+2.45.4
+
