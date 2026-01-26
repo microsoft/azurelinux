@@ -4,12 +4,13 @@
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.43.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+Patch0:         CVE-2026-24049.patch
 %global pypi_name wheel
 %global python_wheel_name %{pypi_name}-%{version}-py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
@@ -115,6 +116,9 @@ pip3 install iniconfig
 %endif
 
 %changelog
+* Mon Jan 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.43.0-2
+- Patch for CVE-2026-24049
+
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
 
