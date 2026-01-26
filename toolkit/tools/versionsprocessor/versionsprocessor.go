@@ -37,7 +37,7 @@ var (
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	extraFiles    = app.Flag("extra-macros-file", "Additional files whose contents will be appended to the output; may be specified multiple times.").ExistingFiles()
+	extraFiles    = app.Flag("extra-macros-files", "Additional files whose contents will be appended to the output; may be specified multiple times.").ExistingFiles()
 )
 
 func main() {
@@ -150,6 +150,7 @@ func main() {
 		}
 
 		macros_output = append(macros_output, []byte(contents)...)
+		logger.Log.Infof("Appended contents %s of extra macros file (%s)", contents, extraPath)
 	}
 
 	err = file.Write(string(macros_output), *output)
