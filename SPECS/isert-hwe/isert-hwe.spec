@@ -42,7 +42,7 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel}-%{target_mlnx_ofa_kernel_release}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel}-1_%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
