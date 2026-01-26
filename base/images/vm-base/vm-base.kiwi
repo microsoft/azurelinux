@@ -31,7 +31,7 @@
             </initrd>
         </type>
     </preferences>
-       
+
     <repository type="rpm-md" alias="fedora-43-everything">
         <source
             path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
@@ -55,6 +55,8 @@
         <package name="dnf-plugins-core" />
         <package name="dnf" />
         <package name="dracut-config-generic" />
+        <package name="dracut-kiwi-oem-repart"/>
+        <package name="glibc-langpack-en" />
         <package name="glibc-locale-source" />
         <package name="glibc-minimal-langpack" />
         <package name="glibc" />
