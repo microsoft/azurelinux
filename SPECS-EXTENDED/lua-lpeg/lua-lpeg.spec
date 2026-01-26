@@ -12,19 +12,18 @@ Distribution:   Azure Linux
 %global lua_compat_builddir %{_builddir}/lua%{lua_compat_version}-%{lua_pkg_name}-%{version}-%{release}
 
 Name:           lua-%{lua_pkg_name}
-Version:        1.0.2
-Release:        4%{?dist}
+Version:        1.1.0
+Release:        2%{?dist}
 Summary:        Parsing Expression Grammars for Lua
 
 License:        MIT
-URL:            http://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/
-Source0:        http://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/%{lua_pkg_name}-%{version}.tar.gz
+URL:            https://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/
+Source0:        https://github.com/neovim/deps/raw/refs/heads/master/opt/%{lua_pkg_name}-%{version}.tar.gz
 Patch1:         0001-inject-ldflags.patch
 
 BuildRequires:  gcc
 BuildRequires:  lua-devel >= %{lua_version}
 Requires:       lua(abi) = %{lua_version}
-
 
 %description
 LPeg is a new pattern-matching library for Lua, based on Parsing Expression
@@ -34,6 +33,7 @@ Grammars (PEGs).
 Summary:        Parsing Expression Grammars for Lua %{lua_compat_version}
 Provides:       compat-%{name}
 BuildRequires:  compat-lua-devel >= %{lua_compat_version}
+BuildRequires: make
 Requires:       lua(abi) = %{lua_compat_version}
 
 %description -n lua%{lua_compat_version}-%{lua_pkg_name}
@@ -46,25 +46,23 @@ rm -rf %{lua_compat_builddir}
 cp -a . %{lua_compat_builddir}
 
 %build
-make %{?_smp_mflags} COPT="%{optflags}" LDFLAGS="%{build_ldflags}"
+%make_build COPT="%{optflags}" LDFLAGS="%{build_ldflags}"
 
 pushd %{lua_compat_builddir}
-make %{?_smp_mflags} COPT="-I%{_includedir}/lua-%{lua_compat_version} %{optflags}" LDFLAGS="-L%{lua_compat_libdir} %{build_ldflags}"
+%make_build COPT="-I%{_includedir}/lua-%{lua_compat_version} %{optflags}" LDFLAGS="-L%{lua_compat_libdir} %{build_ldflags}"
 popd
 
 %install
-%{__rm} -rf %{buildroot}
-
-%{__mkdir_p} %{buildroot}%{lua_libdir}
-%{__mkdir_p} %{buildroot}%{lua_pkgdir}
-%{__install} -p lpeg.so %{buildroot}%{lua_libdir}/lpeg.so.%{version}
+%{__install} -d -m 0755 %{buildroot}%{lua_libdir}
+%{__install} -d -m 0755 %{buildroot}%{lua_pkgdir}
+%{__install} -p -m 0755 lpeg.so %{buildroot}%{lua_libdir}/lpeg.so.%{version}
 %{__ln_s} lpeg.so.%{version} %{buildroot}%{lua_libdir}/lpeg.so
 %{__install} -p -m 0644 re.lua %{buildroot}%{lua_pkgdir}
 
 pushd %{lua_compat_builddir}
-%{__mkdir_p} %{buildroot}%{lua_compat_libdir}
-%{__mkdir_p} %{buildroot}%{lua_compat_pkgdir}
-%{__install} -p lpeg.so %{buildroot}%{lua_compat_libdir}/lpeg.so.%{version}
+%{__install} -d -m 0755 %{buildroot}%{lua_compat_libdir}
+%{__install} -d -m 0755 %{buildroot}%{lua_compat_pkgdir}
+%{__install} -p -m 0755 lpeg.so %{buildroot}%{lua_compat_libdir}/lpeg.so.%{version}
 %{__ln_s} lpeg.so.%{version} %{buildroot}%{lua_compat_libdir}/lpeg.so
 %{__install} -p -m 0644 re.lua %{buildroot}%{lua_compat_pkgdir}
 popd
@@ -86,13 +84,49 @@ lua test.lua
 
 
 %changelog
-* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-4
-- Fixing run-time dependencies.
+* Thu Feb 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.1.0-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified.
 
-* Fri Jan 08 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.2-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove Fedora/RHEL version checks
+* Wed Jul 24 2024 Andreas Schneider <asn@cryptomilk.org> - 1.1.0-1
+- Update to version 1.1.0
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 1.0.2-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Mon Jun 29 2020 Tom Callaway <spot@fedoraproject.org> - 1.0.2-3
+- rebuild for lua 5.4
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
