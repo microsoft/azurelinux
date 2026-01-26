@@ -12591,8 +12591,8 @@
         "type": "other",
         "other": {
           "name": "lua-expat",
-          "version": "1.3.0",
-          "downloadUrl": "https://matthewwild.co.uk/projects/luaexpat/luaexpat-1.3.0.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/lunarmodules/luaexpat/archive/1.5.2/luaexpat-1.5.2.tar.gz"
         }
       }
     },
