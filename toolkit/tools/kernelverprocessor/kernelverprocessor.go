@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	packagelist "github.com/microsoft/azurelinux/toolkit/tools/internal/packlist"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
@@ -25,29 +24,26 @@ import (
 )
 
 const (
-	defaultWorkerCount    = "100"
-	kernelHWESpecName     = "kernel-hwe"
-	kernelHWEVerMacroName = "KERNEL_HWE_VERSION"
-	kernelHWERelMacroName = "KERNEL_HWE_REL"
+	defaultWorkerCount = "100"
 )
 
 var (
-	app                        = kingpin.New("kernelverprocessor", "A tool to determine dynamic kernel version")
-	specsDir                   = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	output                     = exe.OutputFlag(app, "Output file to export the JSON")
-	workers                    = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
-	distTag                    = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	targetArch                 = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
-	logFlags                   = exe.SetupLogFlags(app)
-	profFlags                  = exe.SetupProfileFlags(app)
-	timestampFile              = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	extraKernelVersionsToParse = []string{kernelHWESpecName}
+	app           = kingpin.New("kernelverprocessor", "A tool to determine dynamic kernel version")
+	specsDir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	output        = exe.OutputFlag(app, "Output file to export the JSON")
+	workers       = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
+	distTag       = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	targetArch    = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
+	logFlags      = exe.SetupLogFlags(app)
+	profFlags     = exe.SetupProfileFlags(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
 	const (
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
+		prefix                = "azl"
 	)
 
 	app.Version(exe.ToolkitVersion)
@@ -69,13 +65,6 @@ func main() {
 
 	logger.PanicOnError(err)
 
-	// A parse list may be provided, if so only parse this subset.
-	// If none is provided, parse all specs.
-	kernelSpecListSet, err := packagelist.ParsePackageList(strings.Join(extraKernelVersionsToParse, " "))
-	logger.PanicOnError(err)
-
-	//err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, "", *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
-
 	var buildArch string = *targetArch
 
 	if *targetArch == "" {
@@ -85,18 +74,19 @@ func main() {
 		}
 	}
 
-	kernelSpecFiles, err := specreaderutils.FindSpecFiles(*specsDir, kernelSpecListSet)
+	// Find all spec files
+	allSpecFiles, err := specreaderutils.FindSpecFiles(*specsDir, nil)
 	if err != nil {
 		logger.Log.Panicf("Error finding spec files: %s", err)
 		return
 	}
 
-	logger.Log.Infof("Processing kernel HWE spec files: %v", kernelSpecFiles)
+	logger.Log.Infof("Processing version and release for %d spec files into %s", len(allSpecFiles), *output)
 
 	macros_output := []byte{}
 
 	// Process each kernel flavour/type
-	for _, specFile := range kernelSpecFiles {
+	for _, specFile := range allSpecFiles {
 
 		// Get kernel version-release from spec file
 
@@ -105,40 +95,42 @@ func main() {
 		sourceDir := filepath.Dir(specFile)
 		noCheckDefines := rpm.DefaultDistroDefines(false, *distTag)
 
-		logger.Log.Infof("Processing kernel HWE spec files: %v %v", specFileName, sourceDir)
-
 		versionRelease, err := rpm.QuerySPEC(specFile, sourceDir, `%{VERSION}-%{RELEASE}`, buildArch, noCheckDefines, rpm.QueryHeaderArgument)
 		if err != nil {
-			logger.Log.Errorf("Failed to query kernel-hwe spec file (%s). Error: %s", specFileName, err)
+			logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
 			continue
 		}
 
-		logger.Log.Infof("kernel-hwe version-release: %s", versionRelease)
 		logger.PanicOnError(err)
 
 		if len(versionRelease) == 0 {
-			logger.Log.Errorf("Invalid version-release retrieved from kernel-hwe spec file (%s): %s", specFileName, versionRelease)
+			logger.Log.Errorf("Invalid version-release retrieved from spec file (%s): %s", specFileName, versionRelease)
 			continue
 		}
 
 		releaseVerSplit := strings.Split(versionRelease[0], "-")
 
 		if len(releaseVerSplit) < 2 {
-			logger.Log.Errorf("Invalid version-release format retrieved from kernel-hwe spec file (%s): %s", specFileName, versionRelease[0])
+			logger.Log.Errorf("Invalid version-release format retrieved from spec file (%s): %s", specFileName, versionRelease[0])
 			continue
-
 		}
 
 		version := releaseVerSplit[0]
 		release := releaseVerSplit[1]
 		releaseClean := strings.SplitN(release, ".", 2)[0] // Includes distribution tag suffixes
 
-		logger.Log.Infof("Processed kernel-hwe version-release: %s %s", version, release)
+		// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
+		specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
+		specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
+		specFileNameMacroFormat = strings.ToLower(specFileNameMacroFormat)
+
+		versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
+		releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
 
 		// Generate RPM macro definitions instead of modifying spec files directly.
 		macros := fmt.Sprintf("%%%s %s\n%%%s %s\n",
-			kernelHWEVerMacroName, version,
-			kernelHWERelMacroName, releaseClean,
+			versionMacroString, version,
+			releaseMacroString, releaseClean,
 		)
 
 		macros_output = append(macros_output, []byte(macros)...)
