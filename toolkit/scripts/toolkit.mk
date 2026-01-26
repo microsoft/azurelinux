@@ -74,6 +74,7 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	cp $(rpms_snapshot) $(toolkit_rpms_snapshot_file) && \
 	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
+	cp $(rpms_macros_file) $(toolkit_prep_dir) && \
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
@@ -86,7 +87,6 @@ $(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_componen
 	cp $(mariner_repos_files) $(toolkit_repos_dir) && \
 	cp $(toolkit_component_extra_files) $(toolkit_prep_dir) && \
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
-	cp $(rpms_macros_file) $(toolkit_prep_dir) && \
 	rm -rf $(toolkit_prep_dir)/out && \
 	tar -cvp -f $(toolkit_archive) -C $(dir $(toolkit_prep_dir)) $(notdir $(toolkit_prep_dir))
 
@@ -95,7 +95,6 @@ rpms-snapshot: $(rpms_snapshot)
 
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
-	cp $(rel_versions_macro_file) $(rpms_snapshot)
 
 $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
 	@mkdir -p "$(rpms_snapshot_build_dir)"
