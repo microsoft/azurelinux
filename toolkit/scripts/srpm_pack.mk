@@ -13,9 +13,9 @@
 # update  - Check signatures and updating any mismatches in the signatures file
 SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 
-SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
-SRPM_BUILD_LOGS_DIR   = $(LOGS_DIR)/pkggen/srpms
-kernel_macros_file    = $(PKGBUILD_DIR)/macros.kernel
+SRPM_BUILD_CHROOT_DIR   = $(BUILD_DIR)/SRPM_packaging
+SRPM_BUILD_LOGS_DIR     = $(LOGS_DIR)/pkggen/srpms
+rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 
 
 # Configure the list of packages we want to process into SRPMs
@@ -79,7 +79,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(kernel_macros_file) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(depend_SRPM_PACK_LIST) $(local_spec_sources)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(rel_versions_macro_file) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(depend_SRPM_PACK_LIST) $(local_spec_sources)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -90,7 +90,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(kernel_macros_file) $(chroot_worker) $(l
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
-		--kernel-macros-file=$(kernel_macros_file) \
+		--versions-macro-file=$(rel_versions_macro_file) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
@@ -118,7 +118,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(kernel_macros_file) $(toolchai
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
-		--kernel-macros-file=$(kernel_macros_file) \
+		--versions-macro-file=$(kernel_macros_file) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list="$(toolchain_spec_list)" \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
