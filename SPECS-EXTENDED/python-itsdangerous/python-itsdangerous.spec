@@ -1,64 +1,131 @@
+%global srcname itsdangerous
+
+Name:           python-%{srcname}
+Version:        2.1.2
+Release:        10%{?dist}
+Summary:        Library for passing trusted data to untrusted environments
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global upstream_name itsdangerous
-
-
-Name:           python-%{upstream_name}
-Version:        0.24
-Release:        21%{?dist}
-Summary:        Python library for passing trusted data to untrusted environments
-License:        BSD
-URL:            http://pythonhosted.org/itsdangerous/
-Source0:        http://pypi.python.org/packages/source/i/%{upstream_name}/%{upstream_name}-%{version}.tar.gz
+URL:            https://itsdangerous.palletsprojects.com
+Source0:        %{pypi_source}#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%description
-Itsdangerous is a Python library for passing data through untrusted 
-environments (for example, HTTP cookies) while ensuring the data is not 
+%global _description %{expand:
+Itsdangerous is a Python library for passing data through untrusted
+environments (for example, HTTP cookies) while ensuring the data is not
 tampered with.
 
-Internally itsdangerous uses HMAC and SHA1 for signing by default and bases the 
-implementation on the Django signing module. It also however supports JSON Web 
-Signatures (JWS).
+Internally itsdangerous uses HMAC and SHA1 for signing by default and bases the
+implementation on the Django signing module. It also however supports JSON Web
+Signatures (JWS).}
 
-%package -n python3-%{upstream_name}
-Summary:        Python 3 library for passing trusted data to untrusted environments
-%{?python_provide:%python_provide python3-%{upstream_name}}
+%description %{_description}
+
+%package -n python3-%{srcname}
+Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+# for tests
+BuildRequires:  python3dist(pytest)
+#BuildRequires:  python3dist(freezegun)
 
-%description -n python3-%{upstream_name}
-Itsdangerous is a Python 3 library for passing data through untrusted 
-environments (for example, HTTP cookies) while ensuring the data is not 
-tampered with.
+%description -n python3-%{srcname} %{_description}
 
-Internally itsdangerous uses HMAC and SHA1 for signing by default and bases the 
-implementation on the Django signing module. It also however supports JSON Web 
-Signatures (JWS).
 
 %prep
-%setup -q -n %{upstream_name}-%{version}
-rm -r *.egg-info
+%autosetup -n %{srcname}-%{version}
+
+
+%generate_buildrequires
+%pyproject_buildrequires
+
 
 %build
-%py3_build
+%pyproject_wheel
+
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files itsdangerous
+
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} tests.py
+%pytest -Wdefault \
+  --ignore=tests/test_itsdangerous/test_timed.py \
+  --ignore=tests/test_itsdangerous/test_url_safe.py
 
-%files -n python3-%{upstream_name}
-%license LICENSE
-%doc CHANGES README
-%{python3_sitelib}/%{upstream_name}.py
-%{python3_sitelib}/%{upstream_name}*.egg-info
-%{python3_sitelib}/__pycache__/%{upstream_name}*
+
+%files -n python3-%{srcname} -f %{pyproject_files}
+%license LICENSE.rst
+%doc CHANGES.rst README.rst
+
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24-21
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Sep 08 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.1.2-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Drop BR on `python3-freezegun` for tests
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.1.2-8
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.1.2-4
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Sep 01 2022 Jonathan Wright <jonathan@almalinux.org> - 2.1.2-2
+- modernize spec file
+
+* Thu Sep 01 2022 Jonathan Wright <jonathan@almalinux.org> - 2.1.2-1
+- update to 2.1.2
+- rhbz#2055967
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.0.1-4
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 22 2021 Lumír Balhar <lbalhar@redhat.com> - 2.0.1-1
+- Update to 2.0.1
+Resolves: rhbz#1841259
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 1.1.0-5
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri May 22 2020 Miro Hrončok <mhroncok@redhat.com> - 1.1.0-2
+- Rebuilt for Python 3.9
+
+* Thu Apr 16 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 1.1.0-1
+- Update to 1.1.0
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.24-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
