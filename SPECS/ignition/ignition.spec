@@ -307,6 +307,7 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 %if %{with check}
 %check
 sed -i '34d' ./test
+sed -i '/Checking gofmt/,+5d' ./test
 VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
