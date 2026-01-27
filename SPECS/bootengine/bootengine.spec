@@ -57,7 +57,6 @@ find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec
 %license LICENSE
 %doc README.md
 %{dracutlibdir}/modules.d/*
-
 %{_sbindir}/update-bootengine
 
 %changelog
