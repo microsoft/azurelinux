@@ -1,12 +1,12 @@
 %global nginx_user nginx
-%global njs_version 0.8.3
+%global njs_version 0.9.4
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.25.4
-Release:        6%{?dist}
+Version:        1.28.1
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,9 +20,11 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 Source3:        nginx-tests.tgz
 %endif
 
-Patch0:         CVE-2024-7347.patch
-Patch1:         CVE-2025-23419.patch
-Patch2:         CVE-2025-53859.patch
+Patch1:         0001-remove-Werror-in-upstream-build-scripts.patch
+Patch2:         0002-fix-PIDFile-handling.patch
+Patch3:         0003-Add-SSL-passphrase-dialog.patch
+Patch4:         0004-Disable-ENGINE-support.patch
+Patch5:         0005-Compile-perl-module-with-O2.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -165,6 +167,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Thu Oct 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.28.0-1
+- Upgrade to 1.28.0 Upstream Stable Version
+
 * Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
 - Enable stream ssl preread module
 
