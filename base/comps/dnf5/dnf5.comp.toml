@@ -5,5 +5,3 @@
 without = [
     "plugin_rhsm"
 ]
-
-[components.dnf5-plugins]
