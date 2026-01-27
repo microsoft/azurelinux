@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -66,6 +66,15 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # algorithms that are used in the speed tests. This patch skips those tests.
 # If SymCrypt adds support, we should change and eventually remove this patch.
 Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
+Patch100: 0001-Correct-handling-of-AEAD-encrypted-CMS-with-inadmiss.patch
+Patch101: 0002-Some-comments-to-clarify-functions-usage.patch
+Patch102: 0003-Test-for-handling-of-AEAD-encrypted-CMS-with-inadmis.patch
+Patch103: 0001-ossl_quic_get_cipher_by_char-Add-a-NULL-guard-before.patch
+Patch104: 0001-Check-the-received-uncompressed-certificate-length-t.patch
+Patch105: 0001-Fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
+Patch106: 0001-Fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencr.patch
+Patch107: 0001-Verify-ASN1-object-s-types-before-attempting-to-acce.patch
+Patch108: 0001-Add-NULL-check-to-PKCS12_item_decrypt_d2i_ex.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -143,7 +152,7 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -S git -p1 -n %{name}-%{version}
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -362,6 +371,10 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
+- Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160, 
+  CVE-2025-69418, CVE-2025-69420, and CVE-2025-69421
+
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
 - Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
 
