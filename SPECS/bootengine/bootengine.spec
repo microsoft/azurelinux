@@ -1,5 +1,5 @@
 Name:           bootengine
-Version:        0.0.38-r38
+Version:        0.0.38
 Release:        1%{?dist}
 Summary:        Flatcar bootengine dracut modules and helper utilities
 
@@ -56,6 +56,6 @@ find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec
 %{_sbindir}/update-bootengine
 
 %changelog
-* Tue Jan 27 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.38-r38-1
+* Tue Jan 27 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.38-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
