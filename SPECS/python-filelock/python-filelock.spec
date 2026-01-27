@@ -1,7 +1,7 @@
 %global srcname filelock
 Summary:        A platform independent file lock
 Name:           python-filelock
-Version:        3.20.1
+Version:        3.20.3
 Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
@@ -70,6 +70,9 @@ pip3 install pytest-asyncio
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Tue Jan 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.20.3-1
+- Auto-upgrade to 3.20.3 - for CVE-2026-22701
+
 * Tue Dec 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.20.1-1
 - Auto-upgrade to 3.20.1 - for CVE-2025-68146
 
