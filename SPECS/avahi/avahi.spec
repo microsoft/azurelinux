@@ -186,6 +186,16 @@ rm -fv docs/INSTALL
 %build
 # Use autogen to kill rpaths
 rm -fv missing
+
+# AZL: avahi-daemon hangs in libssp's fail() routine when built with libssp support enabled.
+# This support is dynamically set when avahi's configure scans the current build environment
+# for the presence of the standalone libssp built by gcc.
+# This standalone implementation of libssp is generally obsoleted in most modern systems,
+# and instead the libc's implementation of SSP is used.
+# So we will remove the libssp files from here if we find they are present. Avahi's configure
+# will instead use glibc's ssp implementation which does not hang and is proper.
+rm -fv /usr/lib64/libssp.*
+
 NOCONFIGURE=1 ./autogen.sh
 
 # Note that "--with-distro=none" is necessary to prevent initscripts from being installed
@@ -215,6 +225,9 @@ NOCONFIGURE=1 ./autogen.sh
         --disable-gtk \
         --disable-gtk3 \
         --disable-mono \
+%if 0%{?with_check}
+        --enable-tests \
+%endif
 ;
 
 # workaround parallel build issues (aarch64 only so far, bug #1564553)
@@ -259,6 +272,7 @@ rm -fv  %{buildroot}%{_datadir}/avahi/interfaces/avahi-discover.ui
 
 
 %check
+%make_build -k V=1 check || make check V=1
 
 %pre
 getent group avahi >/dev/null || groupadd -f -g 70 -r avahi
@@ -419,7 +433,7 @@ exit 0
 * Tue Jan 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.8-5
 - Patch for CVE-2026-24401, CVE-2025-68471, CVE-2025-68468, CVE-2025-68276
 
-* Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
+* Thu Feb 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
 - Fix CVE-2024-52616 with an upstream patch
 
 * Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-3
