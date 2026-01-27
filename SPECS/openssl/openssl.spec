@@ -8,7 +8,7 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.5
+Version: 3.3.6
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -362,6 +362,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Jan 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.6-1
+- Auto-upgrade to 3.3.6 - security updates
+
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
 - Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
 
