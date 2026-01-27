@@ -1,27 +1,30 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           python-systemd
-Version:        234
-Release:        13%{?dist}
-Summary:        Python module wrapping systemd functionality
+Version:        235
+Release:        12%{?dist}
+Summary:        Python module wrapping libsystemd functionality
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/systemd/python-systemd
 Source0:        https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Patch to fix test failures
+Patch:          https://github.com/systemd/python-systemd/pull/119.patch
 
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:  systemd-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-sphinx
 BuildRequires:  web-assets-devel
 BuildRequires:  python3-pytest
 
-%global _description \
-Python module for native access to the systemd facilities.\
-Functionality includes sending of structured messages to the journal\
-and reading journal files, querying machine and boot identifiers and a\
-lists of message identifiers provided by systemd. Other functionality\
-provided by libsystemd is also wrapped.
+%global _description %{expand:
+Python module for native access to the libsystemd facilities. Functionality
+includes sending of structured messages to the journal and reading journal
+files, querying machine and boot identifiers and a lists of message identifiers
+provided by systemd. Other functionality provided the library is also wrapped.}
 
 %description %_description
 
@@ -32,7 +35,6 @@ Summary:        %{summary}
 Provides:       systemd-python3 = %{version}-%{release}
 Provides:       systemd-python3%{?_isa} = %{version}-%{release}
 Obsoletes:      systemd-python3 < 230
-Recommends:	%{name}-doc
 
 %description -n python3-systemd %_description
 
@@ -76,8 +78,72 @@ make PYTHON=%{__python3} check
 %doc %{_pkgdocdir}/html
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 234-13
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Mar 14 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 235-12
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 235-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 235-10
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 235-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 235-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug 22 2023 Jens Petersen <petersen@redhat.com> - 235-7
+- Don't recommend python-systemd-doc which pulls in 3 packages
+
+* Mon Aug 07 2023 Lukáš Zaoral <lzaoral@redhat.com> - 235-6
+- migrate to SPDX license format
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 235-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 235-4
+- Rebuilt for Python 3.12
+
+* Tue Feb 28 2023 Miro Hrončok <miro@hroncok.cz> - 235-3
+- BuildRequire python3-setuptools explicitly
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 235-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Aug 16 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 235-1
+- Version 235 (rhbz#2113777)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 234-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 234-21
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 234-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 16 2021 Paul Wouters <paul.wouters@aiven.io> - 234-19
+- Pull in namespace support of upstream PR#87
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 234-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 234-17
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 234-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 12 2020 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 234-15
+- Fix build with new mock (#1793022) and python 3.10 (#1891786)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 234-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 234-13
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 234-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -146,3 +212,4 @@ make PYTHON=%{__python3} check
 
 * Mon Jul  6 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@laptop> - 230-1
 - Initial packaging
+
