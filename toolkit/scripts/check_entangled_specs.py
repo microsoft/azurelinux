@@ -192,7 +192,16 @@ def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
                 line = line.strip()
                 if not line or line.startswith("#"):
                     continue
+                if not line.startswith("%"):
+                    continue
+
                 if not line.startswith("%global"):
+                    # Transform lines like "%foo 1" into "%global foo 1"
+                    parts = line.split(maxsplit=1)
+                    if len(parts) == 2 and parts[0].startswith("%"):
+                        name = parts[0][1:]
+                        value = parts[1]
+                        line = f"%global {name} {value}"
                     continue
 
                 parts = line.split(maxsplit=2)
