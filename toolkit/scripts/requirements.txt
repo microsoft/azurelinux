@@ -6,6 +6,7 @@
 #
 decorator==5.1.1
     # via validators
+pyrpm==0.4
     # via -r requirements.in
 python-rpm-spec==0.14.1
     # via -r requirements.in

@@ -2,13 +2,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-from collections import defaultdict
-from os import path
-from typing import FrozenSet, List, Set
+from os import path, listdir
+from typing import FrozenSet, List
 import argparse
-import subprocess
-import shlex
 import sys
+
+from pyrpm.spec import replace_macros, Spec
 
 # Control output verbosity, keeping this module global since we do not
 # have a containing top-level scope
@@ -174,45 +173,93 @@ def print_verbose(message: str):
         print(message)
 
 
-def _formatted_rpmspec_command(spec_path: str) -> str:
-    """Return a base rpmspec command string with common macro definitions.
+def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
+    """Load simple %global macro definitions from a macros file into a Spec.
 
-    We rely on rpmspec (and thus rpm) to load macros from macros.d (such as
-    macros.releaseversions) so that all tags are fully macro-expanded.
+    This is a minimal loader that understands lines of the form::
+
+        %global name value
+
+    It is primarily used to inject values from files like
+    macros.releaseversions so that pyrpm can fully expand spec tags.
     """
 
-    # Match the defines used elsewhere in the toolkit when querying specs so
-    # that parsing is stable and deterministic.
-    source_dir = path.dirname(spec_path)
-    return (
-        "rpmspec "
-        "-D 'forgemeta %{{nil}}' "
-        "-D 'py3_dist X' "
-        "-D 'with_check 0' "
-        "-D 'dist .azl3' "
-        "-D '__python3 python3' "
-        f"-D '_sourcedir {source_dir}' "
-        "-D 'fillup_prereq fillup'"
+    try:
+        with open(macros_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if not line.startswith("%global"):
+                    continue
+
+                parts = line.split(maxsplit=2)
+                if len(parts) < 3:
+                    continue
+
+                _, name, value = parts
+                # pyrpm stores macros on the Spec instance; update in place.
+                # getattr/hasattr used for compatibility with library versions.
+                macros = getattr(spec, "macros", None)
+                if isinstance(macros, dict):
+                    macros[name] = value
+    except FileNotFoundError:
+        # Best-effort: if the macros file is missing we just skip it.
+        return
+
+
+def _hydrate_spec_with_macros(spec_path: str) -> "Spec":
+    """Create a Spec object and preload it with macros from macros.d.
+
+    This wires in macros from known locations (notably macros.releaseversions)
+    so that calls to replace_macros() see fully defined values.
+    """
+
+    spec = Spec.from_file(spec_path)
+
+    # Primary locations used in CI and builds.
+    rpm_macro_dirs = [
+        "/usr/lib/rpm/macros.d",
+        "/usr/lib/rpm",
+        "/etc/rpm/macros.d",
+        "/etc/rpm",
+    ]
+    for macro_dir in rpm_macro_dirs:
+        if not path.isdir(macro_dir):
+            continue
+        for entry in listdir(macro_dir):
+            macros_path = path.join(macro_dir, entry)
+            if path.isfile(macros_path):
+                _load_macros_from_file(spec, macros_path)
+
+    # Fallback: when running locally from a tree where the macros files live
+    # under build/pkg_artifacts, try to use that directory if present.
+    tree_local_macros_dir = path.join(
+        path.dirname(path.dirname(path.abspath(__file__))),
+        "build",
+        "pkg_artifacts",
     )
+    if path.isdir(tree_local_macros_dir):
+        for entry in listdir(tree_local_macros_dir):
+            macros_path = path.join(tree_local_macros_dir, entry)
+            if path.isfile(macros_path):
+                _load_macros_from_file(spec, macros_path)
+
+    return spec
 
 
 def read_spec_tag(spec_path: str, tag: str) -> str:
-    """Read a spec header tag using rpmspec with all macros expanded.
+    """Read a spec header tag via pyrpm with macros.d preloaded.
 
-    This relies on rpm's own macro machinery (including macros.d) so that
-    tags like version, release, sdkver, and mstflintver are fully resolved
-    before comparison.
+    The returned value has %macros expanded using pyrpm's replace_macros
+    after injecting macros from macros.releaseversions.
     """
 
-    # rpmspec is case-insensitive for tag names, but normalize for clarity.
-    tag_name = tag.strip()
-    command = _formatted_rpmspec_command(spec_path)
-    rpmspec_cmd = f"{command} --srpm --qf '%{{{tag_name}}}' -q {spec_path}"
-
-    raw_output = subprocess.check_output(
-        shlex.split(rpmspec_cmd), stderr=subprocess.DEVNULL
-    )
-    return raw_output.decode("utf-8", errors="strict")
+    spec = _hydrate_spec_with_macros(spec_path)
+    value = getattr(spec, tag)
+    if value:
+        value = replace_macros(value, spec)
+    return value
 
 def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool:
     """Check if spec set violates matching rules for any of given tags. Return True/False accordingly."""
