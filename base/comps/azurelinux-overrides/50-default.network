@@ -1,0 +1,6 @@
+# We want sytemd to manage all interfaces
+[Match]
+Name=*
+
+[Network]
+DHCP=yes
