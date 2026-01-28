@@ -440,11 +440,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Jan 26 20:19:05 UTC 2026 Jiri Appl <jiria@microsoft.com> - 6.6.119.3-5
-- enable CONFIG_FW_CFG_SYSFS
-
-* Mon Jan 26 18:58:05 UTC 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-4
-- enable CONFIG_SQUASHFS_ZSTD
+* Tue Jan 28 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-5
+- Enable CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
 
 * Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
 - Enable XFRM_INTERFACE

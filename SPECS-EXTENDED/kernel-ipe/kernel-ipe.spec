@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.119.3
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,6 +460,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jan 28 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-5
+- Enable CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
 * Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
 - Enable XFRM_INTERFACE
 
