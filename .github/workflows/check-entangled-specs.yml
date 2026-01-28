@@ -35,5 +35,11 @@ jobs:
       - name: Unit test for spec entanglement check
         run: PYTHONPATH=toolkit/scripts python3 toolkit/scripts/tests/test_check_entangled_specs.py
 
+      - name: Generate the macros file with version/release info
+        run: |
+          sudo make -C toolkit -j$(nproc) generate-versions-macros-file REBUILD_TOOLS=y DAILY_BUILD_ID=lkg
+
+          sudo cp -v ./build/pkg_artifacts/macros.releaseversions /usr/lib/rpm/macros.d/macros.releaseversions
+
       - name: Run spec entanglement checking script
         run: python3 toolkit/scripts/check_entangled_specs.py .
