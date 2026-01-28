@@ -6,10 +6,9 @@ from collections import defaultdict
 from os import path
 from typing import FrozenSet, List, Set
 import argparse
-import pprint
+import subprocess
+import shlex
 import sys
-
-from pyrpm.spec import replace_macros, Spec
 
 # Control output verbosity, keeping this module global since we do not
 # have a containing top-level scope
@@ -174,6 +173,47 @@ def print_verbose(message: str):
     if verbose:
         print(message)
 
+
+def _formatted_rpmspec_command(spec_path: str) -> str:
+    """Return a base rpmspec command string with common macro definitions.
+
+    We rely on rpmspec (and thus rpm) to load macros from macros.d (such as
+    macros.releaseversions) so that all tags are fully macro-expanded.
+    """
+
+    # Match the defines used elsewhere in the toolkit when querying specs so
+    # that parsing is stable and deterministic.
+    source_dir = path.dirname(spec_path)
+    return (
+        "rpmspec --parse "
+        "-D 'forgemeta %{{nil}}' "
+        "-D 'py3_dist X' "
+        "-D 'with_check 0' "
+        "-D 'dist .azl3' "
+        "-D '__python3 python3' "
+        f"-D '_sourcedir {source_dir}' "
+        "-D 'fillup_prereq fillup'"
+    )
+
+
+def read_spec_tag(spec_path: str, tag: str) -> str:
+    """Read a spec header tag using rpmspec with all macros expanded.
+
+    This relies on rpm's own macro machinery (including macros.d) so that
+    tags like version, release, sdkver, and mstflintver are fully resolved
+    before comparison.
+    """
+
+    # rpmspec is case-insensitive for tag names, but normalize for clarity.
+    tag_name = tag.strip()
+    command = _formatted_rpmspec_command(spec_path)
+    rpmspec_cmd = f"{command} --srpm --qf '%{{{tag_name}}}' -q {spec_path}"
+
+    raw_output = subprocess.check_output(
+        shlex.split(rpmspec_cmd), stderr=subprocess.DEVNULL
+    )
+    return raw_output.decode("utf-8", errors="strict")
+
 def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool:
     """Check if spec set violates matching rules for any of given tags. Return True/False accordingly."""
     has_error = False
@@ -181,11 +221,11 @@ def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool
         print_verbose(f"Processing group: {group}")
         spec_tag_map = {tag: {} for tag in tags}
         for spec_filename in group:
-            parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
+            spec_path = path.join(base_path, spec_filename)
             print_verbose(f"\t{spec_filename}")
 
             for tag, tag_current in tags.items():
-                tag_value = get_tag_value(parsed_spec, tag)
+                tag_value = read_spec_tag(spec_path, tag)
                 spec_tag_map[tag][spec_filename] = tag_value
                 tag_want = f" (want: {tag_current})" if tag_current else ""
                 print_verbose(f"\t\ttag({tag}) value: {tag_value}{tag_want}")
@@ -203,9 +243,9 @@ def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool
     return has_error
 
 def check_matches(base_path: str):
-    kernel_headers_spec = Spec.from_file(path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec"))
-    kernel_headers_version = get_tag_value(kernel_headers_spec, 'version')
-    kernel_headers_release = get_tag_value(kernel_headers_spec, 'release')
+    kernel_headers_spec_path = path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec")
+    kernel_headers_version = read_spec_tag(kernel_headers_spec_path, 'version')
+    kernel_headers_release = read_spec_tag(kernel_headers_spec_path, 'release')
     kernel_version_release = f"{kernel_headers_version}-{kernel_headers_release}"
     
     groups_to_check = [({'mstflintver':{}}, mstflintver_matching_groups),
@@ -221,12 +261,6 @@ def check_matches(base_path: str):
         print('The current repository state violates one or more spec entanglement rule!')
         sys.exit(1)
     print('Repository state is consistent with spec entanglement rules.')
-
-def get_tag_value(spec: "Spec", tag: str) -> str:
-    value = getattr(spec, tag)
-    if value:
-        value = replace_macros(value, spec)
-    return value
 
 def main():
     global verbose
