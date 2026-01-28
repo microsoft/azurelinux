@@ -1,6 +1,6 @@
 [distros.fedora]
 description = "Fedora Linux"
-default-version = "43"
+default-version = "42"
 dist-git-base-uri = "https://src.fedoraproject.org/rpms/$pkg.git"
 lookaside-base-uri = "https://src.fedoraproject.org/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
 repos = [
