@@ -185,7 +185,9 @@ def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
     """
 
     try:
-        with open(macros_path, encoding="utf-8") as f:
+        # Some system macro files may not be valid UTF-8; ignore undecodable
+        # bytes so that we still parse simple %global lines when possible.
+        with open(macros_path, encoding="utf-8", errors="ignore") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):
