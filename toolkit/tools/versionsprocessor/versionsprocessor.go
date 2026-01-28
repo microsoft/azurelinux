@@ -170,7 +170,7 @@ func main() {
 		}
 
 		macros_output = append(macros_output, []byte(contents)...)
-		logger.Log.Infof("Appended contents %s of extra macros file (%s)", contents, extraPath)
+		logger.Log.Infof("Appended contents of provided extra macros file (%s) to %s", extraPath, *output)
 	}
 
 	err = file.Write(string(macros_output), *output)
