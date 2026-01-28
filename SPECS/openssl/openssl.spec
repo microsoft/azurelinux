@@ -152,7 +152,7 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-%autosetup -S git -p1 -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
