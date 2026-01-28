@@ -1,10 +1,10 @@
-# [images.vm-base]
-# description = "VM Base Image"
-# definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
+[images.vm-base]
+description = "VM Base Image"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
-# [images.container-base]
-# description = "Container Base Image"
-# definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
+[images.container-base]
+description = "Container Base Image"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
 
 # NOTE:
 # sudo dnf install -y kiwi-cli

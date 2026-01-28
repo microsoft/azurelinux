@@ -158,11 +158,6 @@
           "type": "string",
           "title": "Source",
           "description": "For overlays that require a source file as input"
-        },
-        "allow-no-match": {
-          "type": "boolean",
-          "title": "Allow no match",
-          "description": "For search-and-replace overlays (spec-search-replace"
         }
       },
       "additionalProperties": false,
@@ -212,6 +207,14 @@
           "type": "object",
           "title": "Components",
           "description": "Definitions of components for this project"
+        },
+        "images": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ImageConfig"
+          },
+          "type": "object",
+          "title": "Images",
+          "description": "Definitions of images for this project"
         },
         "tools": {
           "$ref": "#/$defs/ToolsConfig",
@@ -277,6 +280,12 @@
           "type": "string",
           "title": "Version",
           "description": "Version of the referenced distro"
+        },
+        "snapshot": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Snapshot",
+          "description": "If specified use source code as it existed at this date/time"
         }
       },
       "additionalProperties": false,
@@ -329,12 +338,44 @@
         "release-ver"
       ]
     },
+    "ImageConfig": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of the image"
+        },
+        "definition": {
+          "$ref": "#/$defs/ImageDefinition",
+          "title": "Definition",
+          "description": "Identifies where to find the definition for this image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ImageCustomizerConfig": {
       "properties": {
         "containerTag": {
           "type": "string",
           "title": "Container tag",
           "description": "Container tag of the Image Customizer container"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageDefinition": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "Type of image definition"
+        },
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Path to the image definition file"
         }
       },
       "additionalProperties": false,
