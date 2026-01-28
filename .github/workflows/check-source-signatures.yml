@@ -91,7 +91,7 @@ jobs:
           fi
 
           set -x
-          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }} EXTRA_MACROS_FILES="build/pkg_artifacts/macros.releaseversions"; then
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }} EXTRA_MACROS_FILES="./build/pkg_artifacts/macros.releaseversions"; then
             set +x
             printf "\n\n******************************\n"
             echo "Failed to check the signatures of the modified packages."
