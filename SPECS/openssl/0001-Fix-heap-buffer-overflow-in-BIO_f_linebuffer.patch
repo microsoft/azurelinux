@@ -1,4 +1,4 @@
-From 701aa270db8ad424cece68702b9bb2e05290af9b Mon Sep 17 00:00:00 2001
+From fb41a020b838f8145d07586275053568469a999c Mon Sep 17 00:00:00 2001
 From: Neil Horman <nhorman@openssl.org>
 Date: Wed, 7 Jan 2026 11:52:09 -0500
 Subject: [PATCH] Fix heap buffer overflow in BIO_f_linebuffer
@@ -18,11 +18,10 @@ Fixes CVE-2025-68160
  1 file changed, 26 insertions(+), 6 deletions(-)
 
 diff --git a/crypto/bio/bf_lbuf.c b/crypto/bio/bf_lbuf.c
-index 1dfcac8f2e..e4af2a8c4f 100644
+index eed3dc4..ce71231 100644
 --- a/crypto/bio/bf_lbuf.c
 +++ b/crypto/bio/bf_lbuf.c
-@@ -187,14 +187,34 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
-     }
+@@ -186,14 +186,34 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
      while (foundnl && inl > 0);
      /*
       * We've written as much as we can.  The rest of the input buffer, if
@@ -64,5 +63,5 @@ index 1dfcac8f2e..e4af2a8c4f 100644
  }
  
 -- 
-2.52.0
+2.45.4
 

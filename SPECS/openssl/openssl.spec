@@ -372,7 +372,7 @@ install -m644 %{SOURCE9} \
 
 %changelog
 * Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
-- Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160, 
+- Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160,
   CVE-2025-69418, CVE-2025-69420, and CVE-2025-69421
 
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
