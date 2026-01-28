@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.52",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.52.tar.xz"
+          "version": "1.6.54",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
         }
       }
     },
@@ -10972,7 +10972,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.18-FINAL.tar.gz"
         }
       }
     },
@@ -12881,8 +12881,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.21",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.21.tar.gz"
+          "version": "10.6.24",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
         }
       }
     },
@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.24.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
         }
       }
     },
@@ -13793,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.44",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
+          "version": "8.0.45",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
         }
       }
     },
@@ -14133,8 +14133,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.9.4",
-          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.4/net-snmp-5.9.4.tar.gz"
+          "version": "5.9.5.2",
+          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.5.2/net-snmp-5.9.5.2.tar.gz"
         }
       }
     },
@@ -21054,8 +21054,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.24.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.24.1/pgbouncer-1.24.1.tar.gz"
+          "version": "1.25.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
         }
       }
     },
@@ -21074,8 +21074,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.33",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.33.tar.xz"
+          "version": "8.1.34",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.34.tar.xz"
         }
       }
     },
