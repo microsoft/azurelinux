@@ -39,6 +39,8 @@ Patch15:        CVE-2025-4138.patch
 Patch16:        CVE-2025-8194.patch
 Patch17:        CVE-2025-8291.patch
 Patch18:        CVE-2025-6075.patch
+Patch19:        CVE-2026-0672.patch
+Patch20:        CVE-2026-1299.patch
 
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
@@ -50,8 +52,6 @@ Patch1004:      CVE-2024-37891.patch
 Patch1005:      CVE-2025-50181.patch
 Patch1006:      CVE-2023-5752.patch
 Patch1007:      CVE-2023-45803.patch
-Patch1008:      CVE-2026-0672.patch
-Patch1009:      CVE-2026-1299.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -206,6 +206,8 @@ The test package contains all regression tests for Python as well as the modules
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+%patch19 -p1
+%patch20 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
