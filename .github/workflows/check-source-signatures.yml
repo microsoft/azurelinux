@@ -90,8 +90,16 @@ jobs:
             exit 0
           fi
 
+          MACROS_RELEASEVERSIONS_PATH=$(find . -type f -path "*/build/pkg_artifacts/macros.releaseversions" -print -quit)
+          if [ -z "$MACROS_RELEASEVERSIONS_PATH" ]; then
+          echo "build/pkg_artifacts/macros.releaseversions not found."
+          exit 1
+          fi
+          MACROS_RELEASEVERSIONS_PATH=$(realpath "$MACROS_RELEASEVERSIONS_PATH")
+          echo "Using macros.releaseversions at: $MACROS_RELEASEVERSIONS_PATH"
+
           set -x
-          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }} EXTRA_MACROS_FILES="./build/pkg_artifacts/macros.releaseversions"; then
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }} EXTRA_MACROS_FILES="$MACROS_RELEASEVERSIONS_PATH"; then
             set +x
             printf "\n\n******************************\n"
             echo "Failed to check the signatures of the modified packages."
