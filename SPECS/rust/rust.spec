@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-02-20
-%define stage0_version 1.85.0
+%define release_date 2025-08-07
+%define stage0_version 1.89.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.86.0
-Release:        10%{?dist}
+Version:        1.90.0
+Release:        3%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,7 +41,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:		CVE-2025-4574.patch
+Patch0:         CVE-2025-4574.patch
 Patch1:         CVE-2025-53605.patch
 Patch2:         CVE-2024-11738.patch
 BuildRequires:  binutils
@@ -61,7 +61,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-16%{?dist}
+BuildRequires:  glibc-static >= 2.38-18%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -181,6 +181,15 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-3
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-2
+- Bump to rebuild with updated glibc
+
+* Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
+- Upgrade to 1.90.0
+
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
 - Bump to rebuild with updated glibc
 

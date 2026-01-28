@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-compress",
-          "version": "1.26.1",
-          "downloadUrl": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.26.1-src.tar.gz"
+          "version": "1.19",
+          "downloadUrl": "http://archive.apache.org/dist/commons/compress/source/commons-compress-1.19-src.tar.gz"
         }
       }
     },
@@ -1107,8 +1107,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.15",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.15/bind-9.20.15.tar.xz"
+          "version": "9.20.18",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.18/bind-9.20.18.tar.xz"
         }
       }
     },
@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "41.0.139",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.139.tar.gz"
+          "version": "48.0.246",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v48.0.246.tar.gz"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.24.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
+          "version": "1.25.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.6-1/go1.25.6-20260116.7.src.tar.gz"
         }
       }
     },
@@ -8651,8 +8651,8 @@
         "type": "other",
         "other": {
           "name": "lasso",
-          "version": "2.8.0",
-          "downloadUrl": "http://dev.entrouvert.org/lasso/lasso-2.8.0.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "https://git.entrouvert.org/entrouvert/lasso/archive/v2.9.0.tar.gz"
         }
       }
     },
@@ -10831,8 +10831,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.52",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.52.tar.xz"
+          "version": "1.6.54",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
         }
       }
     },
@@ -11001,8 +11001,8 @@
         "type": "other",
         "other": {
           "name": "libreport",
-          "version": "2.13.1",
-          "downloadUrl": "https://github.com/abrt/libreport/archive/2.13.1/libreport-2.13.1.tar.gz"
+          "version": "2.17.15",
+          "downloadUrl": "https://github.com/abrt/libreport/archive/2.17.15/libreport-2.17.15.tar.gz"
         }
       }
     },
@@ -11232,7 +11232,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.19",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.19-FINAL.tar.gz"
         }
       }
     },
@@ -13882,8 +13882,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.44",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
+          "version": "8.0.45",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
         }
       }
     },
@@ -22643,8 +22643,8 @@
         "type": "other",
         "other": {
           "name": "python-debtcollector",
-          "version": "1.22.0",
-          "downloadUrl": "https://tarballs.openstack.org/debtcollector/debtcollector-1.22.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://tarballs.openstack.org/debtcollector/debtcollector-3.0.0.tar.gz"
         }
       }
     },
@@ -22873,8 +22873,8 @@
         "type": "other",
         "other": {
           "name": "python-filelock",
-          "version": "3.20.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.20.1.tar.gz"
+          "version": "3.20.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.20.3.tar.gz"
         }
       }
     },
@@ -23953,8 +23953,8 @@
         "type": "other",
         "other": {
           "name": "python-oslo-i18n",
-          "version": "5.1.0",
-          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-5.1.0.tar.gz"
+          "version": "6.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/o/oslo_i18n/oslo_i18n-6.7.1.tar.gz"
         }
       }
     },
@@ -27534,8 +27534,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.86.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.86.0-src.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
         }
       }
     },
@@ -28686,8 +28686,8 @@
         "type": "other",
         "other": {
           "name": "suitesparse",
-          "version": "5.4.0",
-          "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
+          "version": "7.11.0",
+          "downloadUrl": "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v7.11.0/suitesparse-7.11.0.tar.gz"
         }
       }
     },
@@ -31199,8 +31199,8 @@
         "type": "other",
         "other": {
           "name": "xz-java",
-          "version": "1.10",
-          "downloadUrl": "https://tukaani.org/xz/xz-java-1.10.zip"
+          "version": "1.8",
+          "downloadUrl": "http://tukaani.org/xz/xz-java-1.8.zip"
         }
       }
     },
