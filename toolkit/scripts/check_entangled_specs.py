@@ -185,7 +185,7 @@ def _formatted_rpmspec_command(spec_path: str) -> str:
     # that parsing is stable and deterministic.
     source_dir = path.dirname(spec_path)
     return (
-        "rpmspec --parse "
+        "rpmspec "
         "-D 'forgemeta %{{nil}}' "
         "-D 'py3_dist X' "
         "-D 'with_check 0' "
