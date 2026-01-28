@@ -124,6 +124,10 @@ prepare_chroot_environment() {
     sudo cp -v "$macro_file" "$chroot_rpm_macros_dir_path"
   done
 
+  make -sC generate-versions-macros-file
+  echo "Copying the version/release macros file to the chroot."
+  sudo cp -v "build/pkg_artifacts/macros.releaseversions" "$chroot_rpm_macros_dir_path"
+
   echo
 }
 

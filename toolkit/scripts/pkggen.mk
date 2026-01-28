@@ -51,6 +51,8 @@ $(call create_folder,$(rpmbuilding_logs_dir))
 parse-specs: $(specs_file)
 ##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
+##help:target:generate-versions-macros-file=Generate a macros file containing version and release macros for all specs.
+generate-versions-macros-file: $(rel_versions_macro_file)
 ##help:target:graph=Create the initial package build graph.
 workplan graph: $(graph_file)
 graph-preprocessed: $(preprocessed_file)
