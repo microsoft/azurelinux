@@ -92,9 +92,10 @@ jobs:
 
           MACROS_RELEASEVERSIONS_PATH=$(find . -type f -path "*/build/pkg_artifacts/macros.releaseversions" -print -quit)
           if [ -z "$MACROS_RELEASEVERSIONS_PATH" ]; then
-          echo "build/pkg_artifacts/macros.releaseversions not found."
-          exit 1
+            echo "build/pkg_artifacts/macros.releaseversions not found."
+            exit 1
           fi
+
           MACROS_RELEASEVERSIONS_PATH=$(realpath "$MACROS_RELEASEVERSIONS_PATH")
           echo "Using macros.releaseversions at: $MACROS_RELEASEVERSIONS_PATH"
 
