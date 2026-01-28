@@ -14472,8 +14472,8 @@
         "type": "other",
         "other": {
           "name": "nodejs24",
-          "version": "24.12.0",
-          "downloadUrl": "https://nodejs.org/download/release/v24.12.0/node-v24.12.0.tar.xz"
+          "version": "24.13.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.13.0/node-v24.13.0.tar.xz"
         }
       }
     },
