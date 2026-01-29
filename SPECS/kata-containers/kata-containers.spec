@@ -10,7 +10,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
+<<<<<<< HEAD
 Patch0:         rust-1.90-fixes.patch
+=======
+Patch0:         CVE-2026-24054.patch
+>>>>>>> d1eb55142 ([AUTO-PR] azure-core/azurelinux:sprt/CVE-2026-24054-kata-containerd (#15606))
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
@@ -114,9 +118,14 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+<<<<<<< HEAD
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-3
 - Bump release to rebuild with rust
 - Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
+=======
+* Thu Jan 22 2026 Aurelien Bombo <abombo@microsoft.com> - 3.19.1.kata2-3
+- Patch CVE-2026-24054
+>>>>>>> d1eb55142 ([AUTO-PR] azure-core/azurelinux:sprt/CVE-2026-24054-kata-containerd (#15606))
 
 * Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> - 3.19.1.kata2-2
 - Enable build on aarch64
