@@ -158,7 +158,7 @@ intltool-0.51.0-7.azl3.noarch.rpm
 itstool-2.0.7-1.azl3.noarch.rpm
 kbd-2.2.0-2.azl3.aarch64.rpm
 kbd-debuginfo-2.2.0-2.azl3.aarch64.rpm
-kernel-headers-6.6.119.3-3.azl3.noarch.rpm
+kernel-headers-6.6.119.3-4.azl3.noarch.rpm
 kmod-30-1.azl3.aarch64.rpm
 kmod-debuginfo-30-1.azl3.aarch64.rpm
 kmod-devel-30-1.azl3.aarch64.rpm
