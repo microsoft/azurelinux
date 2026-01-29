@@ -167,7 +167,29 @@ export HASHBANGPERL=/usr/bin/perl
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # NEW_RPM_OPT_FLAGS, so we can skip specifiying them here.
-Release: 2%{?dist}
+./Configure \
+    --prefix=%{_prefix} \
+    --openssldir=%{_sysconfdir}/pki/tls \
+    --libdir=lib \
+    shared \
+    no-aria \
+    enable-bf \
+    no-blake2 \
+    enable-camellia \
+    no-capieng \
+    enable-cast \
+    no-chacha \
+    enable-cms \
+    no-comp \
+    enable-ct \
+    enable-deprecated \
+    enable-des \
+    enable-dh \
+    enable-dsa \
+    no-dtls1 \
+    no-ec2m \
+    enable-ec_nistp_64_gcc_128 \
+    enable-ecdh \
     enable-ecdsa \
     no-gost \
     no-idea \
