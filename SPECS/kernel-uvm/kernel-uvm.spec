@@ -166,7 +166,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %changelog
 * Tue Jan 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.96.mshv1-3
-- Enable xattr and other feature modules for CIFS
+- Enable xattr and other feature modules for CIFS and NFS
 
 * Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
 - Enable build on aarch64
