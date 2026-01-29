@@ -1,0 +1,16 @@
+[Unit]
+Description=Flatcar Metadata Agent (SSH Keys)
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+Environment=COREOS_METADATA_OPT_PROVIDER=--cmdline
+ExecStart=/usr/bin/coreos-metadata ${COREOS_METADATA_OPT_PROVIDER} --ssh-keys=%i
+ExecStartPost=/usr/bin/update-ssh-keys -u %i
+
+[Install]
+DefaultInstance=core
+RequiredBy=multi-user.target
+Alias=afterburn-sshkeys@.service
