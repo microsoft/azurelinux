@@ -1,9 +1,10 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
+%global pypi_name wheel
 %bcond main_python 1
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
-Version:        0.43.0
+Version:        0.46.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -57,6 +58,10 @@ A Python wheel of wheel to use with virtualenv.
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
+sed -i -E '/Requires-Dist/ s/[[:space:]]*@+[[:space:]]*/@/g' tests/test_metadata.py
+
+# flit_core expects [project].license to be a table/dict, not a string
+sed -i 's/^license = "MIT"$/license = { text = "MIT" }/' pyproject.toml
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -115,6 +120,9 @@ pip3 install iniconfig
 %endif
 
 %changelog
+* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.46.2-1
+- Updated to 0.46.2 to fix CVE-2026-24049
+
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
 
