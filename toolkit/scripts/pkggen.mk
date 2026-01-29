@@ -93,7 +93,7 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse all SPECS in $(SPECS_DIR) and generate a release versions macros file containing macros of spec file versions and release.
-$(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-versionsprocessor) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
+$(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(go-versionsprocessor) $(depend_SPECS_DIR)
 	$(go-versionsprocessor) \
 		--dir $(SPECS_DIR) \
 		--dist-tag $(DIST_TAG) \
