@@ -106,11 +106,11 @@ gdbm-lang-1.21-1.cm2.x86_64.rpm
 gettext-0.21-3.cm2.x86_64.rpm
 gettext-debuginfo-0.21-3.cm2.x86_64.rpm
 gfortran-11.2.0-9.cm2.x86_64.rpm
-glib-2.71.0-9.cm2.x86_64.rpm
-glib-debuginfo-2.71.0-9.cm2.x86_64.rpm
-glib-devel-2.71.0-9.cm2.x86_64.rpm
-glib-doc-2.71.0-9.cm2.noarch.rpm
-glib-schemas-2.71.0-9.cm2.x86_64.rpm
+glib-2.71.0-10.cm2.x86_64.rpm
+glib-debuginfo-2.71.0-10.cm2.x86_64.rpm
+glib-devel-2.71.0-10.cm2.x86_64.rpm
+glib-doc-2.71.0-10.cm2.noarch.rpm
+glib-schemas-2.71.0-10.cm2.x86_64.rpm
 glibc-2.35-8.cm2.x86_64.rpm
 glibc-debuginfo-2.35-8.cm2.x86_64.rpm
 glibc-devel-2.35-8.cm2.x86_64.rpm
