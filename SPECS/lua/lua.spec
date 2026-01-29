@@ -103,6 +103,7 @@ mv src/luaconf.h src/luaconf.h.template.in
 sed -i 's|5.3.0|%{version}|g' configure.ac
 %patch21 -p1
 %patch23 -p1
+%patch24 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
@@ -113,7 +114,6 @@ mv src/luaconf.h src/luaconf.h.template.in
 %patch3 -p1 -z .configure-linux
 %patch4 -p1 -z .configure-compat-all
 %patch6 -p1 -b .luac-shared-link-fix
-%patch 24 -p1
 %patch18 -p1 -b .CVE-2020-24370
 autoreconf -i
 cd ..
