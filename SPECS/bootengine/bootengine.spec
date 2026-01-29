@@ -9,7 +9,7 @@ License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/flatcar/bootengine
-Source0:        https://github.com/flatcar/bootengine/archive/%{commit_hash}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/flatcar/bootengine/archive/%{commit_hash}.tar.gz#/%{name}-%{version}-master.tar.gz
 Patch0:         0001-modify-tests.patch
 BuildArch:      noarch
 BuildRequires:  dracut
