@@ -16,6 +16,8 @@ URL:            https://crates.io/crates/%{crate}
 Source0:        https://github.com/coreos/%{crate}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # not used on Fedora
 Source1:        %{crate}-%{version}-azlcustomvendor.tar.gz
+Source2:        coreos-metadata-sshkeys.service
+Source3:        coreos-metadata.service
 Patch0:         0001-Revert-remove-cl-legacy-feature.patch
 Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
 Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
@@ -102,24 +104,35 @@ cargo build --release --offline
 %make_install
 mkdir -p %{buildroot}%{dracutmodulesdir}
 cp -a dracut/* %{buildroot}%{dracutmodulesdir}
+cp %{buildroot}%{_bindir}/afterburn %{buildroot}%{_bindir}/coreos-metadata
+ls -al
+install -D -m 0644 %{SOURCE3} %{buildroot}/usr/lib/systemd/system/
+install -D -m 0644 %{SOURCE2} %{buildroot}/usr/lib/systemd/system/coreos-metadata-sshkeys@.service
+
 
 %post        -n %{crate}
 %systemd_post afterburn.service
 %systemd_post afterburn-checkin.service
 %systemd_post afterburn-firstboot-checkin.service
 %systemd_post afterburn-sshkeys@.service
+%systemd_post coreos-metadata.service
+%systemd_post coreos-metadata-sshkeys@.service
 
 %preun       -n %{crate}
 %systemd_preun afterburn.service
 %systemd_preun afterburn-checkin.service
 %systemd_preun afterburn-firstboot-checkin.service
 %systemd_preun afterburn-sshkeys@.service
+%systemd_preun coreos-metadata.service
+%systemd_preun coreos-metadata-sshkeys@.service
 
 %postun      -n %{crate}
 %systemd_postun afterburn.service
 %systemd_postun afterburn-checkin.service
 %systemd_postun afterburn-firstboot-checkin.service
 %systemd_postun afterburn-sshkeys@.service
+%systemd_postun coreos-metadata.service
+%systemd_postun coreos-metadata-sshkeys@.service
 
 %if %{with check}
 %check
@@ -137,11 +150,14 @@ make test
 %doc README.md
 %doc code-of-conduct.md
 %{_bindir}/afterburn
+%{_bindir}/coreos-metadata
 %{_unitdir}/afterburn.service
 %{_unitdir}/afterburn-checkin.service
 %{_unitdir}/afterburn-firstboot-checkin.service
 %{_unitdir}/afterburn-sshkeys@.service
 %{_unitdir}/afterburn-sshkeys.target
+%{_unitdir}/coreos-metadata.service
+%{_unitdir}/coreos-metadata-sshkeys@.service
 
 %files       -n %{crate}-dracut
 %{dracutmodulesdir}/30afterburn/
