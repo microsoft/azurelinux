@@ -14471,6 +14471,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nodejs24",
+          "version": "24.13.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.13.0/node-v24.13.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
