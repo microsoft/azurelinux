@@ -7701,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "iwd",
-          "version": "1.22",
-          "downloadUrl": "https://www.kernel.org/pub/linux/network/wireless/iwd-1.22.tar.xz"
+          "version": "3.3",
+          "downloadUrl": "https://www.kernel.org/pub/linux/network/wireless/iwd-3.3.tar.xz"
         }
       }
     },
