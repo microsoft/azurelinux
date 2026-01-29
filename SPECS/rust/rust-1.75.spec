@@ -181,7 +181,7 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Mon Feb 01 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.75.0-25
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.75.0-25
 - Add patch for CVE-2026-24116
 
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-24
