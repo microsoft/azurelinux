@@ -244,7 +244,7 @@ This package contains the grub2 config which is compatable with bootupd.
 %forgeautosetup -p1
 
 %build
-export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=true "
+export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=false "
 %if 0%{?rhel} && 0%{?rhel} <= 8
 # Disable writing ssh keys fragments on RHEL/CentOS <= 8
 LDFLAGS+=' -X github.com/coreos/ignition/v2/internal/distro.writeAuthorizedKeysFragment=false '
@@ -294,6 +294,7 @@ install -p -m 0644 grub2/05_ignition.cfg  %{buildroot}%{_prefix}/lib/bootupd/gru
 # ignition
 install -d -p %{buildroot}%{_bindir}
 install -p -m 0755 ./ignition-validate %{buildroot}%{_bindir}
+ln -sf ../%{_libexecdir}/ignition-rmcfg %{buildroot}%{_bindir}/ignition
 
 %if 0%{?with_cross}
 install -d -p %{buildroot}%{_datadir}/ignition
@@ -318,6 +319,7 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %{_unitdir}/ignition-delete-config.service
 %{_libexecdir}/ignition-apply
 %{_libexecdir}/ignition-rmcfg
+%{_bindir}/ignition
 
 %files validate
 %doc README.md
