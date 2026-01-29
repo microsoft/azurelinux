@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,7 @@ Patch6:         %{name}-5.3.5-luac-shared-link-fix.patch
 %endif
 # https://www.lua.org/bugs.html
 Patch18:        %{name}-5.3.5-CVE-2020-24370.patch
+Patch19:        CVE-2026-24827.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -86,6 +87,7 @@ This package contains the static version of liblua for %{name}.
 %prep
 %if 0%{?bootstrap}
 %setup -q -a 2 -a 3
+%patch 19 -p1
 %else
 %setup -q -a 3
 %endif
@@ -212,6 +214,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Thu Jan 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.4.6-2
+- Patch for CVE-2026-24827
+
 * Tue Feb 27 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.6-1
 - Upgrade to version 5.4.6
 - Disable bootstrap
