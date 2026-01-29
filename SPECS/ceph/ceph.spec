@@ -28,8 +28,8 @@ Patch13:        CVE-2020-10724.patch
 Patch14:        CVE-2025-1744.patch
 Patch15:        CVE-2021-28361.patch
 Patch16:        CVE-2020-14378.patch
-Patch17:        CVE-2025-52555.patch
-Patch18:        CVE-2024-48916.patch
+#Patch17:        CVE-2025-52555.patch
+#Patch18:        CVE-2024-48916.patch
 Patch19:        CVE-2025-9648.patch
 Patch20:        CVE-2024-47866.patch
 #
