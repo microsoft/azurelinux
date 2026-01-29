@@ -200,7 +200,7 @@ def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
                 if len(parts) < 2:
                     continue
 
-                _, name, value = parts
+                name, value = parts
                 # pyrpm stores macros on the Spec instance; update in place.
                 # getattr/hasattr used for compatibility with library versions.
                 macros = getattr(spec, "macros", None)
