@@ -1,4 +1,4 @@
-%define commit_hash daf43bf9c1ca45bf1a43566c3a6f96ec0cb44a36
+%define commit_hash 7d9895ce55617b18a78294975197975ac17b5bc3
 
 Name:           bootengine
 Version:        0.0.38
@@ -10,9 +10,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/flatcar/bootengine
 Source0:        https://github.com/flatcar/bootengine/archive/%{commit_hash}.tar.gz#/%{name}-%{version}.tar.gz
-
+Patch0:         0001-modify-tests.patch
 BuildArch:      noarch
 BuildRequires:  dracut
+Requires:       util-linux
 
 # Keep this local so the spec works even if a global dracut macro isn't defined.
 %global dracutlibdir %{_prefix}/lib/dracut
@@ -23,7 +24,7 @@ This package installs the bootengine dracut module directory (modules.d)
 and any included helper utilities/scripts from the Flatcar bootengine source.
 
 %prep
-%autosetup -n %{name}-%{commit_hash}
+%autosetup -p1 -n %{name}-%{commit_hash}
 
 %build
 # no build step (content is scripts/modules)
@@ -51,7 +52,9 @@ find %{buildroot}%{dracutlibdir}/modules.d -type f -name "*.sh" -exec chmod 0755
 find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec chmod 0755 {} \; 2>/dev/null || :
 
 %check
-./test
+set -e
+
+./dracut/51usr-generator/testsuite.sh
 
 %files
 %license LICENSE
