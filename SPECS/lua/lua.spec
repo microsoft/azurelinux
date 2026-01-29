@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ Patch6:         %{name}-5.3.5-luac-shared-link-fix.patch
 Patch18:        %{name}-5.3.5-CVE-2020-24370.patch
 Patch21:        CVE-2022-28805.patch
 Patch23:        CVE-2022-33099.patch
+Patch24:        CVE-2026-24827.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -112,6 +113,7 @@ mv src/luaconf.h src/luaconf.h.template.in
 %patch3 -p1 -z .configure-linux
 %patch4 -p1 -z .configure-compat-all
 %patch6 -p1 -b .luac-shared-link-fix
+%patch 24 -p1
 %patch18 -p1 -b .CVE-2020-24370
 autoreconf -i
 cd ..
@@ -216,6 +218,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Thu Jan 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.4.4-2
+- Patch for CVE-2026-24827
+
 * Tue May 09 2023 Bala <balakumaran.kannan@microsoft.com> - 5.4.4-1
 - Upgrade to version 5.4.4 to fix CVE-2021-44964
 - Removed patches that are already part of new version
