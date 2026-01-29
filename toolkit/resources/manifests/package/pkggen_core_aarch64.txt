@@ -170,6 +170,7 @@ gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
+<<<<<<< HEAD
 openssl-3.3.5-1.azl3.aarch64.rpm
 openssl-devel-3.3.5-1.azl3.aarch64.rpm
 openssl-libs-3.3.5-1.azl3.aarch64.rpm
@@ -177,6 +178,15 @@ openssl-perl-3.3.5-1.azl3.aarch64.rpm
 openssl-static-3.3.5-1.azl3.aarch64.rpm
 libcap-2.69-12.azl3.aarch64.rpm
 libcap-devel-2.69-12.azl3.aarch64.rpm
+=======
+openssl-3.3.5-2.azl3.aarch64.rpm
+openssl-devel-3.3.5-2.azl3.aarch64.rpm
+openssl-libs-3.3.5-2.azl3.aarch64.rpm
+openssl-perl-3.3.5-2.azl3.aarch64.rpm
+openssl-static-3.3.5-2.azl3.aarch64.rpm
+libcap-2.69-10.azl3.aarch64.rpm
+libcap-devel-2.69-10.azl3.aarch64.rpm
+>>>>>>> bfb613e0e (Patch openssl for CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160, CVE-2025-69418, CVE-2025-69420, CVE-2025-69421 (#15592))
 debugedit-5.0-2.azl3.aarch64.rpm
 libarchive-3.7.7-4.azl3.aarch64.rpm
 libarchive-devel-3.7.7-4.azl3.aarch64.rpm
