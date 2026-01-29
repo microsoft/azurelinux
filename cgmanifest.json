@@ -10701,8 +10701,8 @@
         "type": "other",
         "other": {
           "name": "libosinfo",
-          "version": "1.10.0",
-          "downloadUrl": "https://releases.pagure.org/libosinfo/libosinfo-1.10.0.tar.xz"
+          "version": "1.11.0",
+          "downloadUrl": "https://releases.pagure.org/libosinfo/libosinfo-1.11.0.tar.xz"
         }
       }
     },
