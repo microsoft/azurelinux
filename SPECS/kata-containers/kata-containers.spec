@@ -115,14 +115,15 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Thu Jan 22 2026 Aurelien Bombo <abombo@microsoft.com> - 3.19.1.kata2-3
-- Patch CVE-2026-24054
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
+* Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
 - Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
+
+* Thu Jan 22 2026 Aurelien Bombo <abombo@microsoft.com> - 3.19.1.kata2-3
+- Patch CVE-2026-24054
+
 * Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> - 3.19.1.kata2-2
 - Enable build on aarch64
-* Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
 
 * Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
 - Auto-upgrade to 3.19.1.kata2
