@@ -174,11 +174,11 @@ def print_verbose(message: str):
 
 
 def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
-    """Load simple %global macro definitions from a macros file into a Spec.
+    """Load simple %name macro definitions from a macros file into a Spec.
 
     This is a minimal loader that understands lines of the form::
 
-        %global name value
+        %name value
 
     It is primarily used to inject values from files like
     macros.releaseversions so that pyrpm can fully expand spec tags.
@@ -188,6 +188,7 @@ def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
         # Some system macro files may not be valid UTF-8; ignore undecodable
         # bytes so that we still parse simple %global lines when possible.
         with open(macros_path, encoding="utf-8", errors="ignore") as f:
+            print_verbose(f"Loading macros from: {macros_path}")
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):
@@ -195,17 +196,8 @@ def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
                 if not line.startswith("%"):
                     continue
 
-                if not line.startswith("%global"):
-                    # Transform lines like "%foo 1" into "%global foo 1"
-                    parts = line.split(maxsplit=1)
-                    if len(parts) == 2 and parts[0].startswith("%"):
-                        name = parts[0][1:]
-                        value = parts[1]
-                        line = f"%global {name} {value}"
-                    continue
-
-                parts = line.split(maxsplit=2)
-                if len(parts) < 3:
+                parts = line.split(maxsplit=1)
+                if len(parts) < 2:
                     continue
 
                 _, name, value = parts
