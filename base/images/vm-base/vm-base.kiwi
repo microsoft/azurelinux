@@ -87,9 +87,7 @@
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
-        <package name="systemd-resolved" />
         <package name="systemd" />
-	<package name="azurelinux-overrides" />
         <package name="tar" />
         <package name="util-linux" />
         <package name="vim-minimal" />
@@ -117,6 +115,6 @@
 
     <users>
           <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
-	  <user name="azureuser" password="$6$LTUZg7I3kpIkQhkr$4P2pvOdWEocGfUZP17AVtKpKDPIKsvmYoRSBFwaf5rfoS2/QEVj5HMvU0vPvNJ/5GfvBDpVibT5I8s4OBS8j3/" home="/home/azureuser" groups="root,wheel" />
+	  <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
     </users>
 </image>

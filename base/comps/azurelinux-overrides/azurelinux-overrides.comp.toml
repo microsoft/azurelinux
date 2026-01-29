@@ -1,2 +1,0 @@
-[components.azurelinux-overrides]
-spec = { type = "local", path = "azurelinux-overrides.spec" }
