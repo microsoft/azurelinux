@@ -74,7 +74,6 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	cp $(rpms_snapshot) $(toolkit_rpms_snapshot_file) && \
 	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
-	cp $(rpms_macros_file) $(toolkit_prep_dir) && \
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
