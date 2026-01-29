@@ -107,7 +107,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(rel_versions_macro_file) $(chroot_worker
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
 	touch $@
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(rel_versions_macro_file) $(toolchain_files) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_files) $(go-srpmpacker)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -118,7 +118,6 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(rel_versions_macro_file) $(too
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
-		--versions-macro-file=$(rel_versions_macro_file) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list="$(toolchain_spec_list)" \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
