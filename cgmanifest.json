@@ -15453,8 +15453,8 @@
         "type": "other",
         "other": {
           "name": "opendnssec",
-          "version": "2.1.7",
-          "downloadUrl": "http://www.opendnssec.org/files/source/opendnssec-2.1.7.tar.gz"
+          "version": "2.1.14",
+          "downloadUrl": "https://dist.opendnssec.org/source/opendnssec-2.1.14.tar.gz"
         }
       }
     },
