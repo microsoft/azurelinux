@@ -284,7 +284,6 @@ install -d -p %{buildroot}/%{dracutlibdir}/modules.d
 cp -r dracut/* %{buildroot}/%{dracutlibdir}/modules.d/
 install -m 0644 -D -t %{buildroot}/%{_unitdir} systemd/ignition-delete-config.service
 install -m 0755 -d %{buildroot}/%{_libexecdir}
-ln -sf ../lib/dracut/modules.d/30ignition/ignition %{buildroot}/%{_libexecdir}/ignition-apply
 ln -sf ../lib/dracut/modules.d/30ignition/ignition %{buildroot}/%{_libexecdir}/ignition-rmcfg
 
 # grub
@@ -317,7 +316,6 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %doc %{godocs}
 %{dracutlibdir}/modules.d/30ignition/*
 %{_unitdir}/ignition-delete-config.service
-%{_libexecdir}/ignition-apply
 %{_libexecdir}/ignition-rmcfg
 %{_bindir}/ignition
 
