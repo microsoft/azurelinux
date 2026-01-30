@@ -16463,8 +16463,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-C3",
-          "version": "0.34",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Class-C3-0.34.tar.gz"
+          "version": "0.35",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Class/Class-C3-0.35.tar.gz"
         }
       }
     },
