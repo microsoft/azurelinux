@@ -23673,8 +23673,8 @@
         "type": "other",
         "other": {
           "name": "python-mimeparse",
-          "version": "1.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-mimeparse/python-mimeparse-1.6.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python_mimeparse/python_mimeparse-2.0.0.tar.gz"
         }
       }
     },
