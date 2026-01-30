@@ -177,10 +177,6 @@ install -d -p %{buildroot}%{_datadir}/ignition
 install -p -m 0644 ./ignition-validate-* %{buildroot}%{_datadir}/ignition
 %endif
 
-# The ignition binary is only for dracut, and is dangerous to run from
-# the command line.  Install directly into the dracut module dir.
-install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
-
 %if %{with check}
 %check
 sed -i '34d' ./test
