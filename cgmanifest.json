@@ -19513,8 +19513,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Eventual",
-          "version": "0.094001",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094001.tar.gz"
+          "version": "0.094003",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094003.tar.gz"
         }
       }
     },
