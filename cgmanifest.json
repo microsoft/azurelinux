@@ -17803,8 +17803,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-ShareDir",
-          "version": "1.116",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-ShareDir-1.116.tar.gz"
+          "version": "1.118",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-ShareDir-1.118.tar.gz"
         }
       }
     },
