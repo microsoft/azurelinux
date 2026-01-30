@@ -24863,8 +24863,8 @@
         "type": "other",
         "other": {
           "name": "python-simpleline",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/rhinstaller/python-simpleline/archive/simpleline-1.6.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/rhinstaller/python-simpleline/releases/download/1.9.0/simpleline-1.9.0.tar.gz"
         }
       }
     },
