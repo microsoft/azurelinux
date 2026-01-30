@@ -45,6 +45,25 @@
             "IgnoredFilesRegexList": [
                 "^/usr/share/man/man3/.*NOTICE.*\\.3ossl\\.gz$"
             ]
+        },
+        {
+            "PackageName": "rust",
+            "IgnoredFilesRegexList": [
+                "^/usr/lib/rustlib/.*?/license-files/.*"
+            ]
+        },
+        {
+            "_comment1": "Rust documentation contains font license files that are embedded in the documentation.",
+            "_comment2": "These are license files for fonts used in the web documentation, not the main package licenses.",
+            "PackageName": "rust-doc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/docs/html/.*/fonts/.*\\.txt$",
+                "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.txt$",
+                "^/usr/share/doc/docs/html/static\\.files/.*COPYRIGHT.*\\.txt$",
+                "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.md$",
+                "^/usr/share/doc/docs/html/core/.*/fn\\.*absd.*\\.html$",
+                "^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [
