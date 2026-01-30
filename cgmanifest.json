@@ -19573,8 +19573,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Spell",
-          "version": "1.20",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Spell-1.20.tar.gz"
+          "version": "1.27",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Spell-1.27.tar.gz"
         }
       }
     },
