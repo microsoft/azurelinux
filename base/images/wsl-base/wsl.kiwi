@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<image schemaversion="7.4" name="Azure-Linux">
+	<description type="system">
+	    <author>Azure Linux</author>
+        <contact>user@example.com</contact>
+		<specification>Azure Linux</specification>
+	</description>
+	<preferences>
+		<version>43</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>UTC</timezone>
+		<release-version>43</release-version>
+	</preferences>
+
+	<profiles>
+		<profile name="WSL-Base" description="Windows Subsystem for Linux Base"/>
+	</profiles>
+	<preferences profiles="WSL-Base">
+		<type image="wsl"/>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>false</rpm-locale-filtering>
+		<rpm-excludedocs>false</rpm-excludedocs>
+	</preferences>
+	<packages type="bootstrap" profiles="WSL-Base">
+		<package name="bash"/>
+		<package name="coreutils"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="fedora-release-wsl"/>
+		<package name="rpm"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="WSL-Base">
+		<package name="attr"/>
+		<package name="acl"/>
+		<package name="bash-color-prompt"/>
+		<package name="bash-completion"/>
+		<package name="bind-utils"/>
+		<package name="bzip2"/>
+		<package name="curl"/>
+		<package name="dbus"/>
+		<package name="default-editor"/>
+		<package name="file"/>
+		<package name="glibc-langpack-en"/>
+		<package name="gnupg2"/>
+		<package name="iproute"/>
+		<package name="iputils"/>
+		<package name="less"/>
+		<package name="lsof"/>
+		<package name="man-db"/>
+		<package name="man-pages"/>
+		<package name="NetworkManager"/>
+		<package name="nmap-ncat"/>
+		<package name="openssh-clients"/>
+		<package name="passwd"/>
+		<package name="pciutils"/>
+		<package name="procps-ng"/>
+		<package name="rsync"/>
+		<package name="shadow-utils"/>
+		<package name="sudo"/>
+		<package name="symlinks"/>
+		<package name="systemd-udev"/>
+		<package name="systemd-resolved"/>
+		<package name="tar"/>
+		<package name="tcpdump"/>
+		<package name="time"/>
+		<package name="traceroute"/>
+		<package name="tree"/>
+		<package name="unzip"/>
+		<package name="usbutils"/>
+		<package name="util-linux"/>
+		<package name="vim-minimal"/>
+		<package name="wget"/>
+		<package name="which"/>
+		<package name="whois"/>
+		<package name="wsl-setup"/>
+		<package name="zip"/>
+		<package name="zram-generator-defaults"/>
+	</packages>
+</image>

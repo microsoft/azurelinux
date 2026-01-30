@@ -1,0 +1,41 @@
+# Inspired by the config used for lorax-built live media
+ 
+set default="1"
+ 
+function load_video {
+	insmod efi_gop
+	insmod efi_uga
+	insmod video_bochs
+	insmod video_cirrus
+	insmod all_video
+}
+set basicgfx="nomodeset"
+ 
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+ 
+terminal_input console
+terminal_output ${terminal_output}
+ 
+set timeout=${boot_timeout}
+set timeout_style=${boot_timeout_style}
+ 
+search ${search_params}
+ 
+menuentry "Start ${title}" --class fedora --class gnu-linux --class gnu --class os {
+	linux ($$root)${bootpath}/${kernel_file} ${boot_options}
+	initrd ($$root)${bootpath}/${initrd_file}
+}
+menuentry "Test this media & start ${title}" --class fedora --class gnu-linux --class gnu --class os {
+	linux ($$root)${bootpath}/${kernel_file} ${boot_options} rd.live.check
+	initrd ($$root)${bootpath}/${initrd_file}
+}
+submenu "Troubleshooting -->" {
+	menuentry "Start ${title} in basic graphics mode" --class fedora --class gnu-linux --class gnu --class os {
+		linux ($$root)${bootpath}/${kernel_file} ${boot_options} $${basicgfx}
+		initrd ($$root)${bootpath}/${initrd_file}
+	}
+}

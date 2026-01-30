@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+<image schemaversion="7.4" name="Azure-Linux">
+	<description type="system">
+		<author>Azure Linux Contributors</author>
+		<specification>Azure Linux</specification>
+	</description>
+	<repository type="rpm-md" alias="fedora43-everything" priority="99">
+		<source path="https://download.fedoraproject.org/pub/fedora/linux/releases/43/Everything/x86_64/os/"/>
+	</repository>
+	<repository type="rpm-md" alias="fedora43-updates" priority="98">
+		<source path="https://download.fedoraproject.org/pub/fedora/linux/updates/43/Everything/x86_64/"/>
+	</repository>
+	<preferences>
+		<version>43</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>UTC</timezone>
+		<release-version>43</release-version>
+	</preferences>
+	<profiles>
+		<profile name="BaseCommon" description="Base system packages">
+		</profile>
+		<profile name="BootCore" description="Boot and core packages">
+		</profile>
+		<profile name="LiveInstall" description="Live Install ISO">
+			<requires profile="BaseCommon"/>
+			<requires profile="BootCore"/>
+		</profile>
+	</profiles>
+	<preferences profiles="LiveInstall" arch="x86_64">
+		<type image="iso"
+			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
+			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
+			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="console=ttyS0,115200 console=tty0 inst.text inst.cmdline inst.nomodeset"
+			fscreateoptions="-Efragments -C 1048576"
+            >
+			<bootloader name="grub2" grub_template="grub-x86.cfg.iso-template" console="console" timeout="10"/>
+		</type>
+	</preferences>
+
+    <preferences profiles="LiveInstall" arch="aarch64">
+		<type image="iso"
+			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
+			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
+			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="quiet rhgb"
+			fscreateoptions="-Efragments -C 1048576"
+			>
+			<bootloader name="grub2" grub_template="grub-arm.cfg.iso-template" console="console" timeout="10"/>
+		</type>
+	</preferences>
+
+    <packages type="bootstrap">
+		<package name="filesystem"/>
+	</packages>
+    <packages type="bootstrap" patternType="plusRecommended" profiles="BootCore">
+		<package name="grubby"/>
+	</packages>
+    <packages type="image" patternType="plusRecommended" profiles="BaseCommon">
+        <package name="abrt-cli"/>
+        <package name="acl"/>
+        <package name="amd-ucode-firmware"/>
+        <package name="at"/>
+        <package name="attr"/>
+        <package name="bash-color-prompt"/>
+        <package name="bash-completion"/>
+        <package name="bc"/>
+        <package name="bind-utils"/>
+        <package name="btrfs-progs"/>
+        <package name="bzip2"/>
+        <package name="cifs-utils"/>
+        <package name="compsize"/>
+        <package name="cpio"/>
+        <package name="crontabs"/>
+        <package name="cryptsetup"/>
+        <package name="cyrus-sasl-plain"/>
+        <package name="dbus"/>
+        <package name="default-editor"/>
+        <package name="deltarpm"/>
+        <package name="dos2unix"/>
+        <package name="dosfstools"/>
+        <package name="ed"/>
+        <package name="ethtool"/>
+        <package name="exfatprogs"/>
+        <package name="file"/>
+        <package name="fpaste"/>
+        <package name="fprintd-pam"/>
+        <package name="gnupg2"/>
+        <package name="hunspell"/>
+        <package name="iptstate"/>
+        <package name="irqbalance"/>
+        <package name="logrotate"/>
+        <package name="lsof"/>
+        <package name="mailcap"/>
+        <package name="man-pages"/>
+        <package name="mcelog" arch="x86_64"/>
+        <package name="mdadm"/>
+        <package name="microcode_ctl" arch="x86_64"/>
+        <package name="mtr"/>
+        <package name="net-tools"/>
+        <package name="nfs-utils"/>
+        <package name="nmap-ncat"/>
+        <package name="ntfs-3g"/>
+        <package name="ntfsprogs"/>
+        <package name="opensc"/>
+        <package name="passwdqc"/>
+        <package name="pciutils"/>
+        <package name="pinfo"/>
+        <package name="plocate"/>
+        <package name="psacct"/>
+        <package name="quota"/>
+        <package name="realmd"/>
+        <package name="rsync"/>
+        <package name="rsyslog"/>
+        <package name="smartmontools"/>
+        <package name="sos"/>
+        <package name="sssd-proxy"/>
+        <package name="sudo"/>
+        <package name="symlinks"/>
+        <package name="systemd-udev"/>
+        <package name="tar"/>
+        <package name="tcpdump"/>
+        <package name="time"/>
+        <package name="traceroute"/>
+        <package name="tree"/>
+        <package name="unzip"/>
+        <package name="usbutils"/>
+        <package name="wget2-wget"/>
+        <package name="which"/>
+        <package name="whois"/>
+        <package name="words"/>
+        <package name="zip"/>
+		<package name="systemd"/>
+		<package name="glibc"/>
+		<package name="bash"/>
+		<ignore name="qemu-user-static"/> <!-- Saves ~100MB -->
+	</packages>
+ 
+    <packages type="iso" patternType="plusRecommended" profiles="BootCore">
+		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
+		<package name="grub2-efi-ia32-cdboot" arch="x86_64"/>
+		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
+	</packages>
+    <packages type="image" patternType="plusRecommended" profiles="BootCore">
+		<package name="grub2-efi-aa64" arch="aarch64"/>
+		<package name="grub2-efi-aa64-modules" arch="aarch64"/>
+		<package name="grub2-efi-x64" arch="x86_64"/>
+		<package name="grub2-efi-x64-modules" arch="x86_64"/>
+		<package name="grub2-pc" arch="x86_64"/>
+		<package name="grub2-pc-modules" arch="x86_64"/>
+		<package name="shim-signed-aa64" arch="aarch64"/>
+		<package name="shim-signed-x64" arch="x86_64"/>
+		<package name="kernel-core"/>
+		<package name="systemd-resolved"/>
+	</packages>
+
+	<packages type="iso" patternType="plusRecommended" profiles="LiveInstall">
+		<!-- Filter out unwanted EFI files from the embedded ESP, see rhbz#2358785 -->
+		<file name="iso-esp-excludes.yaml" target="image/exclude_files_efifatimage.yaml"/>
+		<!-- The point of a live image is to install -->
+		<package name="anaconda"/>
+		<package name="anaconda-core"/>
+		<package name="anaconda-gui"/>
+		<package name="anaconda-tui"/>
+
+        <package name="anaconda-install-env-deps"/>
+		<package name="anaconda-live"/>
+		<!-- Need this for SVG release note images -->
+		<package name="aajohan-comfortaa-fonts"/>
+		<package name="dracut-live"/>
+		<package name="dracut-network"/>
+		<package name="dracut-config-generic"/>
+		<package name="glibc-all-langpacks"/>
+		<package name="isomd5sum"/>
+		<package name="kernel"/>
+		<package name="kernel-modules"/>
+		<package name="kernel-modules-extra"/>
+		<package name="livesys-scripts"/>
+		<package name="btrfs-progs"/>
+		<package name="udisks2-btrfs"/>
+		<ignore name="device-mapper-multipath"/>
+		<ignore name="fcoe-utils"/>
+		<ignore name="gfs2-utils"/>
+	</packages>
+</image>
