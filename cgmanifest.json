@@ -28436,8 +28436,8 @@
         "type": "other",
         "other": {
           "name": "spice-protocol",
-          "version": "0.14.3",
-          "downloadUrl": "https://www.spice-space.org/download/releases/spice-protocol-0.14.3.tar.xz"
+          "version": "0.14.4",
+          "downloadUrl": "https://www.spice-space.org/download/releases/spice-protocol-0.14.4.tar.xz"
         }
       }
     },
