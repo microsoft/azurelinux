@@ -45,11 +45,11 @@ if [ -f update-bootengine ]; then
   install -d -p %{buildroot}%{_sbindir}
   install -p -m 0755 update-bootengine %{buildroot}%{_sbindir}/update-bootengine
 fi
-
+install -p -m 0755 minimal-init %{buildroot}%{_sbindir}/minimal-init
 # Ensure dracut module files are readable/executable where appropriate
 # (Avoid chmod -R 0755; be conservative)
-find %{buildroot}%{dracutlibdir}/modules.d -type f -name "*.sh" -exec chmod 0755 {} \; 2>/dev/null || :
-find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec chmod 0755 {} \; 2>/dev/null || :
+find %{buildroot}%{dracutlibdir}/modules.d -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || :
+find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec chmod +x {} \; 2>/dev/null || :
 
 %check
 set -e
@@ -61,6 +61,7 @@ set -e
 %doc README.md
 %{dracutlibdir}/modules.d/*
 %{_sbindir}/update-bootengine
+%{_sbindir}/minimal-init
 
 %changelog
 * Tue Jan 27 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.38-1
