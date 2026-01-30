@@ -16913,8 +16913,8 @@
         "type": "other",
         "other": {
           "name": "perl-Crypt-PasswdMD5",
-          "version": "1.4.0",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-1.40.tgz"
+          "version": "1.4.2",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSAVAGE/Crypt-PasswdMD5-1.42.tgz"
         }
       }
     },
