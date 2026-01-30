@@ -1,11 +1,14 @@
 # '$schema' = 'https://github.com/define/the/schema.json'
+
+includes = ["distros/**/*.distro.toml"]
+
 [project]
 description = 'azl-core'
 
 log-dir = 'build/logs'
 work-dir = 'build/work'
 output-dir = 'out'
-#default-distro = { name = "azurelinux", otherconfig="?" }
+default-distro = { name = "azurelinux", version = "3.0" }
 
 [components.PyYAML]
 [components.attr]
