@@ -11,7 +11,7 @@ diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tm
 index 4c24cae..68a7bbe 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -652,7 +652,7 @@ install_sw: install_dev install_engines install_modules install_runtime ## Insta
+@@ -663,7 +663,7 @@ install_sw: install_dev install_engines install_modules install_runtime ## Insta
  
  uninstall_sw: uninstall_runtime uninstall_modules uninstall_engines uninstall_dev ## Uninstall the software and libraries
  
