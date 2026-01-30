@@ -168,7 +168,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n isert-%{target_mlnx_ofa_kernel}
+%setup -n isert-%{target_mlnx_ofa_kernel_version}
 set -- *
 mkdir source
 mv "$@" source/
