@@ -373,7 +373,7 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> -3.3.5-3
+* Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-3
 - Patch CVE-2025-69419, CVE-2026-22795, and CVE-2026-22796
 
 * Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
