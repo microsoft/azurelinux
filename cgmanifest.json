@@ -22403,8 +22403,8 @@
         "type": "other",
         "other": {
           "name": "python-cmd2",
-          "version": "0.9.16",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ef/77/7a13dbfc91018ad4d7ad07345c636e374a7655a17ac5b3c8c1248c4e722c/cmd2-0.9.16.tar.gz"
+          "version": "2.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/39/a0/830934f19f07e77c7d332fd5b41358611afc8d33d8cea78259b9a5d7f8ef/cmd2-2.4.2.tar.gz"
         }
       }
     },
