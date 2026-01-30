@@ -18083,8 +18083,8 @@
         "type": "other",
         "other": {
           "name": "perl-Image-Info",
-          "version": "1.42",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-1.42.tar.gz"
+          "version": "1.44",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-1.44.tar.gz"
         }
       }
     },
