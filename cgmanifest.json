@@ -17493,8 +17493,8 @@
         "type": "other",
         "other": {
           "name": "perl-EV",
-          "version": "4.33",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-4.33.tar.gz"
+          "version": "4.34",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-4.34.tar.gz"
         }
       }
     },

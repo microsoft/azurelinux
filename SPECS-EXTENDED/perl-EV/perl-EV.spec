@@ -1,11 +1,11 @@
 Summary:        Wrapper for the libev high-performance event loop library
 Name:           perl-EV
-Version:        4.33
-Release:        8%{?dist}
+Version:        4.34
+Release:        1%{?dist}
 # Note: The source archive includes a libev/ folder which contents are licensed
 #       as "BSD or GPLv2+". However, those are removed at build-time and
 #       perl-EV is instead built against the system-provided libev.
-License:        GPL+ OR Artistic
+License:        GPL-1.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/EV
@@ -13,18 +13,22 @@ Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-%{version}
 Patch0:         perl-EV-4.03-Don-t-ask-questions-at-build-time.patch
 Patch1:         perl-EV-4.30-Don-t-check-bundled-libev.patch
 
-BuildRequires:  gcc
-BuildRequires:  gdbm-devel
-BuildRequires:  libev-source >= 4.33
 BuildRequires:  make
+BuildRequires:  gcc
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
-BuildRequires:  perl(AnyEvent) >= 2.6
-BuildRequires:  perl(Canary::Stability)
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(common::sense)
+BuildRequires:  gdbm-devel
+BuildRequires:  libev-source >= 4.33
+BuildRequires:  perl(AnyEvent) => 2.6
+BuildRequires:  perl(Canary::Stability)
 
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{_bindir}/perl -V:version`"; echo $version))
+# We remove the upstream bundled libev, but still build against statically
+# linked files from the libev-source package.
+Provides:       bundled(libev)
+
 %{?perl_default_filter}
 
 %description
@@ -39,18 +43,18 @@ much more detailed information.
 %prep
 %setup -q -n EV-%{version}
 
-%patch 0 -p1
-%patch 1
+%patch -P0 -p1
+%patch -P1 -p0
 
 # remove all traces of the bundled libev
 rm -fr ./libev
 
 # use the sources from the system libev
 mkdir -p ./libev
-cp -r %{_datadir}/libev-source/* ./libev/
+cp -r /usr/share/libev-source/* ./libev/
 
 %build
-PERL_CANARY_STABILITY_NOPROMPT=1 %{_bindir}/perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
+PERL_CANARY_STABILITY_NOPROMPT=1 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
 %make_build
 
 %install
@@ -63,12 +67,15 @@ PERL_CANARY_STABILITY_NOPROMPT=1 %{_bindir}/perl Makefile.PL INSTALLDIRS=vendor 
 %files
 %license COPYING
 %doc Changes README
-%{perl_vendorarch}/auto/*
-%{perl_vendorarch}/EV.pm
-%{perl_vendorarch}/EV
-%{_mandir}/man3/*.3*
+%{perl_vendorarch}/*
+%exclude %dir %{perl_vendorarch}/auto/
+%{_mandir}/man3/EV*.3pm*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 4.34-1
+- Update to version 4.34
+- License verified
+
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.33-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
