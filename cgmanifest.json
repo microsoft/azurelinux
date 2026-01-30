@@ -20143,8 +20143,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Differences",
-          "version": "0.6700",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-0.67.tar.gz"
+          "version": "0.7100",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-0.71.tar.gz"
         }
       }
     },
