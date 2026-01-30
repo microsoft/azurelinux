@@ -8,16 +8,16 @@ Status: Draft
 
 ## Overview
 
-This PRD defines the foundation for AI agent support in the Azure Linux repository. The goal is to enable agents to effectively assist with package management workflows using the `azldev` tool, while maintaining code quality and repository hygiene standards.
+This PRD defines the foundation for AI agent support in the Azure Linux repository. The goal is to enable agents to effectively assist with component management workflows using the `azldev` tool, while maintaining code quality and repository hygiene standards.
 
 **Related ideas:** None (greenfield)
 
 ## Problem Statement
 
-Azure Linux package maintainers will benefit from AI agent assistance for common workflows:
+Azure Linux component maintainers will benefit from AI agent assistance for common workflows:
 
-- Adding new packages to the distro
-- Updating existing packages (version bumps, dependency changes)
+- Adding new components to the distro
+- Updating existing components (version bumps, dependency changes)
 - Writing and debugging overlays (spec modifications)
 - Maintaining repository hygiene (file organization, consistent patterns)
 
@@ -27,7 +27,7 @@ Without proper instructions, agents lack context about:
 - The overlay system for modifying upstream specs
 - The `azldev` tool commands and workflows
 - Repository conventions and hygiene requirements
-- Package specific workflows
+- Component specific workflows
 
 ## Target Users
 
@@ -55,17 +55,17 @@ Without proper instructions, agents lack context about:
    - `distro/` - Distro configuration
 
 4. **Copilot Skills** (`.github/skills/`)
-   - `add-package.md` - Adding a new package to the distro
-   - `update-package.md` - Updating an existing package
+   - `add-component.md` - Adding a new component to the distro
+   - `update-component.md` - Updating an existing component
    - `fix-overlay.md` - Diagnosing and fixing overlay issues
-   - `build-package.md` - How to build and test packages
+   - `build-component.md` - How to build and test components
 
 5. **Experimental custom agents** (`.github/agents/`, 1-2 maximum)
-   - Consider: Package reviewer agent, Overlay specialist agent
+   - Consider: Component reviewer agent, Overlay specialist agent
 
 6. **Prompt templates** (`.github/prompts/*.prompt.md`)
-   - `add-package.prompt.md` - Guided workflow for adding a new package
-   - `update-package.prompt.md` - Guided workflow for updating an existing package
+   - `add-component.prompt.md` - Guided workflow for adding a new component
+   - `update-component.prompt.md` - Guided workflow for updating an existing component
    - `review-component.prompt.md` - Review a component for hygiene and best practices
    - `debug-overlay.prompt.md` - Diagnose and fix overlay issues
    - `migrate-component.prompt.md` - Migrate inline component to dedicated file
@@ -89,8 +89,8 @@ azurelinux/
 │   ├── instructions/*.instructions.md  # File-type specific instructions
 │   ├── prompts/*.prompt.md             # Prompt templates
 │   └── skills/
-│       ├── azl-add-package.md
-│       ├── azl-update-package.md
+│       ├── azl-add-component.md
+│       ├── azl-update-component.md
 │       └── azl-fix-overlay.md
 ├── .vscode/
 │   ├── mcp.json                         # MCP tool configuration
@@ -141,7 +141,7 @@ The main instructions file should cover:
    - Overlays modify upstream specs without forking
 
 2. **Key Concepts**
-   - Components vs packages
+   - Components vs RPM packages (output artifacts)
    - Upstream distros (Fedora) and how specs are sourced
    - The overlay system and when to use it
 
@@ -184,11 +184,15 @@ The main instructions file should cover:
 - How to trace back to source component
 - Useful for debugging overlay results
 
+#### `*.kiwi` Instructions
+
+- Purpose: defining image builds
+
 ### Skills Design
 
-#### `azl-add-package.md`
+#### `azl-add-component.md`
 
-**Trigger:** User wants to add a new package
+**Trigger:** User wants to add a new component
 
 **Concepts to cover:**
 
@@ -204,9 +208,9 @@ The main instructions file should cover:
 - Simple import (no changes) → Add to `components.toml`
 - Needs overlays or customizations → Create `<name>/<name>.comp.toml`
 
-#### `azl-update-package.md`
+#### `azl-update-component.md`
 
-**Trigger:** User wants to update a package version or configuration
+**Trigger:** User wants to update a component version or configuration
 
 **Concepts to cover:**
 
@@ -218,7 +222,7 @@ The main instructions file should cover:
 
 **Versioning and Compatibility Considerations:**
 
-When updating packages, agents MUST be cautious about version changes:
+When updating components, agents MUST be cautious about version changes:
 
 - **Major version bumps** (e.g., 1.x → 2.x): High risk. May break API/ABI compatibility. Require explicit user approval and should note potential downstream impact.
 - **Minor version bumps** (e.g., 1.2 → 1.3): Medium risk. Generally safe but may introduce new dependencies or deprecations.
@@ -232,6 +236,7 @@ Agents should:
 3. **Note new dependencies** - Version updates may pull in new BuildRequires or Requires
 4. **Examine existing overlays** - Ensure overlays still apply cleanly to new version. If an overlay fails, treat as a breaking change. If an overlay is no longer needed, recommend its removal.
 5. **Warn about feature removal** - Upstream may remove features that Azure Linux depends on
+6. **Summarize risks/changes** - Provide a summary of potential impacts of the version update
 
 When in doubt, recommend the user review the upstream changelog before proceeding, with references if available.
 
@@ -266,15 +271,15 @@ When in doubt, recommend the user review the upstream changelog before proceedin
 
 **Key debugging locations:**
 
-- `~/rpmbuild/BUILD/` - Extracted sources and build artifacts
-- `~/rpmbuild/BUILDROOT/` - Installed files
+- Where to find the prepared sources with overlays applied
+- RPM build output directories
 - Build logs in mock output
 
 ### Experimental Agents
 
 Consider creating 1-2 specialized agents:
 
-1. **Package Hygiene Agent**
+1. **Component Hygiene Agent**
    - Reviews component definitions for hygiene violations
    - Suggests file organization improvements
    - Validates overlay descriptions exist
@@ -295,13 +300,13 @@ Prompts are reusable, parameterized workflows that users can invoke directly.
 
 Both may cover similar topics but serve different purposes. Skills answer "how does this work?" while prompts answer "help me do this now."
 
-#### `add-package.prompt.md`
+#### `add-component.prompt.md`
 
-**Purpose:** Guided workflow for adding a new package to Azure Linux
+**Purpose:** Guided workflow for adding a new component to Azure Linux
 
 **Parameters:**
 
-- `package_name` (required) - Name of the package to add
+- `component_name` (required) - Name of the component to add
 - `source_distro` (optional, default: fedora) - Upstream distro to source from
 - `project` (optional, default: base) - Target project (base, extras, etc.)
 
@@ -314,13 +319,13 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 - Add overlays with meaningful descriptions
 - Validate and optionally test build
 
-#### `update-package.prompt.md`
+#### `update-component.prompt.md`
 
-**Purpose:** Guided workflow for updating an existing package
+**Purpose:** Guided workflow for updating an existing component
 
 **Parameters:**
 
-- `package_name` (required) - Name of the package to update
+- `component_name` (required) - Name of the component to update
 - `new_version` (optional) - Target version (if version bump)
 - `update_type` (optional) - Type: version, dependency, overlay, or config
 
@@ -339,7 +344,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 **Parameters:**
 
-- `package_name` (required) - Name of the component to review
+- `component_name` (required) - Name of the component to review
 
 **Review areas:**
 
@@ -357,7 +362,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 **Parameters:**
 
-- `package_name` (required) - Name of the failing component
+- `component_name` (required) - Name of the failing component
 - `error_message` (optional) - Error message from build/validation
 
 **Diagnostic concepts:**
@@ -379,7 +384,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 **Parameters:**
 
-- `package_name` (required) - Name of the component to migrate
+- `component_name` (required) - Name of the component to migrate
 
 **When to use:**
 
@@ -404,8 +409,8 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 ### Phase 2: Skills
 
-- [ ] Create `.github/skills/azl-add-package.md`
-- [ ] Create `.github/skills/azl-update-package.md`
+- [ ] Create `.github/skills/azl-add-component.md`
+- [ ] Create `.github/skills/azl-update-component.md`
 - [ ] Create `.github/skills/azl-fix-overlay.md`
 - [ ] Create `.github/skills/azl-debug-build.md`
 
@@ -417,8 +422,8 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 ### Phase 4: Prompts
 
-- [ ] Create `.github/prompts/add-package.prompt.md`
-- [ ] Create `.github/prompts/update-package.prompt.md`
+- [ ] Create `.github/prompts/add-component.prompt.md`
+- [ ] Create `.github/prompts/update-component.prompt.md`
 - [ ] Create `.github/prompts/review-component.prompt.md`
 - [ ] Create `.github/prompts/debug-overlay.prompt.md`
 - [ ] Create `.github/prompts/debug-build.prompt.md` - Debug build failures using mock shell
@@ -426,7 +431,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 ### Phase 5: Experimental Agents
 
-- [ ] Evaluate need for Package Hygiene agent
+- [ ] Evaluate need for Component Hygiene agent
 - [ ] Evaluate need for Overlay Specialist agent
 - [ ] Implement 0-2 agents based on evaluation
 
@@ -434,77 +439,6 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 
 - [ ] Create `.vscode/mcp.json` configuration for azldev MCP tools
 - [ ] Document MCP tool usage in instructions once end-to-end flow is complete
-
-## MCP Integration Roadmap
-
-Partial MCP support exists in azldev but is not yet complete for end-to-end agent workflows. This section tracks what's needed for full integration.
-
-### Current State
-
-- `azldev_component_query` exists as an MCP tool
-- Additional commands need MCP exposure for complete workflows
-
-### VS Code Configuration
-
-Create `.vscode/mcp.json` to configure MCP tools for the workspace. This enables VS Code agents to use azldev commands directly instead of shell execution.
-
-### Priority MCP Tools for Agent Workflows
-
-The following commands should be prioritized for MCP exposure (in order of importance for agent workflows):
-
-1. **`component query`** - Essential for understanding component state (partially implemented)
-2. **`component list`** - Discovery of available components
-3. **`component build`** - Testing changes
-4. **`component prepare-sources`** - Debugging overlay application
-5. **`component add`** - Adding new packages
-6. **`component mock-shell`** - Interactive debugging (may need special handling for terminal access)
-
-### MCP Integration Success Criteria
-
-- Agents can complete add-package workflow entirely via MCP (no shell commands)
-- Agents can diagnose overlay failures using MCP tool output
-- Error messages from MCP tools are structured and machine-parseable
-
-## azldev Enhancements for Agent Support
-
-This section documents azldev improvements that would significantly enhance agent workflows. These are suggestions for the azldev team, not requirements for this PRD.
-
-### Structured Error Output
-
-**Problem:** Output is meant for humans, making it hard for agents to parse errors.
-
-**Enhancement:** Ensure that `azldev` commands can emit structured output (e.g., JSON). Allow it to write to a file for easier parsing.
-
-### Component Validation Without Build
-
-**Problem:** Agents will need to validate component definitions and overlays without performing a full build.
-
-**Enhancement:** Add `azldev component validate <name>` command that:
-
-- Validates TOML syntax and schema compliance
-- Checks overlay patterns against upstream spec (without building)
-- Verifies referenced files exist
-- Reports hygiene violations
-
-### Overlay Dry-Run
-
-**Problem:** Agents can't preview overlay results without running `prepare-sources`.
-
-**Enhancement:** Add `azldev component overlay-preview <name>` that shows:
-
-- Before/after diff for each overlay
-- Which overlays would fail and why
-- Warnings for patterns that match but may be fragile
-
-### Mock Shell Improvements
-
-**Problem:** `mock-shell` is powerful but not well-documented for debugging workflows.
-
-**Enhancement:** Improve discoverability:
-
-- Document common debugging paths (logs in `BUILD/*/`, `rpmbuild` directory structure)
-- Add `--preserve-buildenv` documentation for keeping failed build state
-- Consider `azldev component logs <name>` for quick access to build logs
 
 ## Areas to Revisit Regularly
 
@@ -526,13 +460,13 @@ These aspects of the PRD should be reviewed and updated as the project evolves:
 
 ### Quantitative
 
-- Agents can add a simple package with ≤2 human corrections
+- Agents can add a simple component with ≤2 human corrections
 - Agents can diagnose common overlay errors and suggest fixes
 - 95% of component definitions pass hygiene checks
 
 ### Qualitative
 
-- Team members report agents are "helpful" for package workflows
+- Team members report agents are "helpful" for component workflows
 - Reduced time spent explaining basic concepts to new contributors
 - Overlay debugging is faster with agent assistance
 
@@ -547,7 +481,7 @@ These aspects of the PRD should be reviewed and updated as the project evolves:
 
 4. **Agent scope:** Should experimental agents be repo-specific or potentially shared across Azure Linux repos? Should azldev have a command to install the resources into other repos?
 
-5. **Prompts vs Skills overlap:** Some workflows exist as both skills and prompts (e.g., add-package). Should we consolidate, or keep both for different use cases (reference vs interactive)?
+5. **Prompts vs Skills overlap:** Some workflows exist as both skills and prompts (e.g., add-component). Should we consolidate, or keep both for different use cases (reference vs interactive)?
    - **Resolution:** Keep both. Skills are reference documentation (passive); prompts are interactive workflows (active). They serve different purposes even when covering similar topics. The prompt may refer to the skill for deeper understanding.
 
 ## Appendix: Key azldev Capabilities
@@ -570,7 +504,7 @@ These aspects of the PRD should be reviewed and updated as the project evolves:
 
 ## Appendix: Overlay Quick Reference
 
-Overlays modify upstream specs without forking. Below are illustrative examples; see `external/schemas/azldev.schema.json` for the complete overlay type definitions and required fields.
+Overlays modify upstream specs without forking. Below are illustrative examples; see `external/schemas/azldev.schema.json` for the complete overlay type definitions and required fields. Also reference `overlays.toml` from `azldev` for up-to-date patterns.
 
 ### Example 1: Add a build dependency
 
