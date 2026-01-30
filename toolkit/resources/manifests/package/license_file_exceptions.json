@@ -55,7 +55,7 @@
                 "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.txt$",
                 "^/usr/share/doc/docs/html/static\\.files/.*COPYRIGHT.*\\.txt$",
                 "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.md$",
-                "^/usr/share/doc/docs/html/core/.*/fn\\.*absd.*\\.html$",
+                "^/usr/share/doc/docs/html/core/.*/fn\\..*absd.*\\.html$",
                 "^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$"
             ]
         }
