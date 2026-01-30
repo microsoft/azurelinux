@@ -327,7 +327,6 @@ pushd "downstream/assertj-core"
 %patch -P 1 -p1
 popd
 
-
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"
