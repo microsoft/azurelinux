@@ -19263,8 +19263,8 @@
         "type": "other",
         "other": {
           "name": "perl-Package-Stash-XS",
-          "version": "0.29",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-XS-0.29.tar.gz"
+          "version": "0.30",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-XS-0.30.tar.gz"
         }
       }
     },
