@@ -24,6 +24,7 @@ toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
 rpms_snapshot_dir_name = rpms_snapshots
 rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
 rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.log
+rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 valid_arch_spec_names_build_dir = $(BUILD_DIR)/valid_arch_spec_names
@@ -72,6 +73,7 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	cp $(toolkit_archive) $(toolkit_archive_versioned) && \
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	cp $(rpms_snapshot) $(toolkit_rpms_snapshot_file) && \
+	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
