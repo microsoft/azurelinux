@@ -749,7 +749,7 @@ index 4d572fb..965801b 100644
      { NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
  #if defined(ECP_NISTZ256_ASM)
          EC_GFp_nistz256_method,
-@@ -2777,25 +2082,7 @@ static const ec_list_element curve_list[] = {
+@@ -2777,25 +2082,6 @@ static const ec_list_element curve_list[] = {
  static const ec_list_element curve_list[] = {
      /* prime field curves */
      /* secg curves */
@@ -767,7 +767,7 @@ index 4d572fb..965801b 100644
 -        "SECG curve over a 160 bit prime field" },
 -    { NID_secp160r2, &_EC_SECG_PRIME_160R2.h, 0,
 -        "SECG/WTLS curve over a 160 bit prime field" },
-     /* SECG secp192r1 is the same as X9.62 prime192v1 and hence omitted */
+-    /* SECG secp192r1 is the same as X9.62 prime192v1 and hence omitted */
 -    { NID_secp192k1, &_EC_SECG_PRIME_192K1.h, 0,
 -        "SECG curve over a 192 bit prime field" },
 -    { NID_secp224k1, &_EC_SECG_PRIME_224K1.h, 0,

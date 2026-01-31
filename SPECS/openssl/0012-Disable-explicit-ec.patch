@@ -1,15 +1,21 @@
-From 5d9ad80a35095d5d10c7ac7a3cc6ed8a4b98d515 Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Thu, 18 Apr 2024 00:22:09 +0000
-Subject: [PATCH] Disable explicit ec
+From 91bdd9b816b22bc1464ec323f3272b866b24114d Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 12/35] 0012-Disable-explicit-ec.patch
 
+Patch-name: 0012-Disable-explicit-ec.patch
+Patch-id: 12
+Patch-status: |
+    # Disable explicit EC curves
+    # https://bugzilla.redhat.com/show_bug.cgi?id=2066412
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
 ---
- crypto/ec/ec_asn1.c                           |  2 ++
- crypto/ec/ec_lib.c                            |  2 ++
- test/ectest.c                                 | 12 ++++++------
- test/endecode_test.c                          |  4 ++--
- test/recipes/30-test_evp_data/evppkey_ecdsa.txt  |  8 ++++----
- 5 files changed, 16 insertions(+), 12 deletions(-)
+ crypto/ec/ec_asn1.c                           | 11 ++++++++++
+ crypto/ec/ec_lib.c                            |  6 +++++
+ test/ectest.c                                 | 22 ++++++++++---------
+ test/endecode_test.c                          | 20 ++++++++---------
+ .../30-test_evp_data/evppkey_ecdsa.txt        | 12 ----------
+ 5 files changed, 39 insertions(+), 32 deletions(-)
 
 diff --git a/crypto/ec/ec_asn1.c b/crypto/ec/ec_asn1.c
 index bfd0242..bb46212 100644
@@ -107,7 +113,7 @@ index 6563006..e4bc89a 100644
      if (!TEST_ptr(pctx2 = EVP_PKEY_CTX_new(pkey2, NULL))
 -        || !TEST_int_eq(EVP_PKEY_derive_init(pctx2), 1)
 -        || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx2, pkey1), 1)
-+        || !TEST_int_le(EVP_PKEY_derive_init(pctx2), 0)
++        || !TEST_int_le(EVP_PKEY_derive_init(pctx2), 1)
 +/*      || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx2, pkey1), 1)
          || !TEST_int_eq(EVP_PKEY_derive(pctx2, NULL, &t), 1)
          || !TEST_int_gt(bsize, t)
@@ -225,3 +231,5 @@ index 1f9ce93..5d49148 100644
  PrivateKey = B-163
  -----BEGIN PRIVATE KEY-----
  MGMCAQAwEAYHKoZIzj0CAQYFK4EEAA8ETDBKAgEBBBUDnQW0mLiHVha/jqFznX/K
+-- 
+2.41.0

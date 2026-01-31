@@ -55,7 +55,7 @@ diff --git a/crypto/evp/ec_support.c b/crypto/evp/ec_support.c
 index 20883c4..a893238 100644
 --- a/crypto/evp/ec_support.c
 +++ b/crypto/evp/ec_support.c
-@@ -20,89 +20,13 @@ typedef struct ec_name2nid_st {
+@@ -20,89 +20,15 @@ typedef struct ec_name2nid_st {
  static const EC_NAME2NID curve_list[] = {
      /* prime field curves */
      /* secg curves */
@@ -80,8 +80,8 @@ index 20883c4..a893238 100644
 -    { "prime239v2", NID_X9_62_prime239v2 },
 -    { "prime239v3", NID_X9_62_prime239v3 },
      { "prime256v1", NID_X9_62_prime256v1 },
--    /* characteristic two field curves */
--    /* NIST/SECG curves */
+     /* characteristic two field curves */
+     /* NIST/SECG curves */
 -    { "sect113r1", NID_sect113r1 },
 -    { "sect113r2", NID_sect113r2 },
 -    { "sect131r1", NID_sect131r1 },
@@ -224,7 +224,7 @@ diff --git a/test/recipes/15-test_genec.t b/test/recipes/15-test_genec.t
 index 4d5090f..fb4cabe 100644
 --- a/test/recipes/15-test_genec.t
 +++ b/test/recipes/15-test_genec.t
-@@ -41,28 +41,11 @@ plan skip_all => "This test is unsupported in a no-ec build"
+@@ -41,37 +41,11 @@ plan skip_all => "This test is unsupported in a no-ec build"
      if disabled("ec");
  
  my @prime_curves = qw(
@@ -250,6 +250,25 @@ index 4d5090f..fb4cabe 100644
      prime256v1
 -    wap-wsg-idm-ecid-wtls6
 -    wap-wsg-idm-ecid-wtls7
-     wap-wsg-idm-ecid-wtls8
-     wap-wsg-idm-ecid-wtls9
-     wap-wsg-idm-ecid-wtls12
+-    wap-wsg-idm-ecid-wtls8
+-    wap-wsg-idm-ecid-wtls9
+-    wap-wsg-idm-ecid-wtls12
+-    brainpoolP160r1
+-    brainpoolP160t1
+-    brainpoolP192r1
+-    brainpoolP192t1
+-    brainpoolP224r1
+-    brainpoolP224t1
+     brainpoolP256r1
+     brainpoolP256t1
+     brainpoolP320r1
+@@ -136,7 +110,6 @@ push(@other_curves, 'SM2')
+     if !disabled("sm2");
+ 
+ my @curve_aliases = qw(
+-    P-192
+     P-224
+     P-256
+     P-384
+-- 
+2.33.8

@@ -1,6 +1,6 @@
-From 56e310fd7f0e1ebdb95fc5dd98ab8b2dced0b8b7 Mon Sep 17 00:00:00 2001
+From 0516ad270c17006fbc964bfb1cedcd1de244a818 Mon Sep 17 00:00:00 2001
 From: Tobias Brick <tobiasb@microsoft.com>
-Date: Thu, 18 Apr 2024 00:40:53 +0000
+Date: Wed, 17 Apr 2024 21:43:50 +0000
 Subject: [PATCH] skipped tests EC curves
 
 ---
@@ -48,3 +48,5 @@ index f722800..26a0178 100644
  
  my @basic_cmd = ("cmp_vfy_test",
                   data_file("server.crt"),     data_file("client.crt"),
+-- 
+2.33.8

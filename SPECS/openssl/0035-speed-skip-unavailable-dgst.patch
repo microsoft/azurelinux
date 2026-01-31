@@ -1,11 +1,16 @@
-From 14e9d11f16db6ad9a3a7e1d3a5a2e4e0ed8b5add Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Mon, 22 Apr 2024 17:44:10 +0000
-Subject: [PATCH] speed skip unavailable dgst
+From 213f38dc580d39f2cb46592b5e6db585fc6a650f Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 19/35] 0035-speed-skip-unavailable-dgst.patch
 
+Patch-name: 0035-speed-skip-unavailable-dgst.patch
+Patch-id: 35
+Patch-status: |
+    # Skip unavailable algorithms running `openssl speed`
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
 ---
- apps/speed.c | 2 ++
- 1 file changed, 2 insertions(+)
+ apps/speed.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/apps/speed.c b/apps/speed.c
 index 3f8dcca..9d504f2 100644
@@ -21,3 +26,5 @@ index 3f8dcca..9d504f2 100644
          if (!EVP_MAC_init(mctx, NULL, 0, NULL)
              || !EVP_MAC_update(mctx, buf, lengths[testnum])
              || !EVP_MAC_final(mctx, mac, &outl, sizeof(mac)))
+-- 
+2.41.0

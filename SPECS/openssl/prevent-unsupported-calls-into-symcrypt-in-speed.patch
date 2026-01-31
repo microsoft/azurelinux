@@ -1,12 +1,11 @@
-From be7e5be92243e42eeb783b70acd3da7083d324a4 Mon Sep 17 00:00:00 2001
-From: corvus-callidus <lyrydber@microsoft.com>
-Date: Fri, 30 Jan 2026 00:47:26 +0000
-Subject: [PATCH] Apply prevent-unsupported-calls-into-symcrypt-in-speed.patch
- (manually rebased)
+From 4576a24fbe145ea200b9f9eb7e1854c61932e8b6 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Tue, 25 Feb 2025 21:52:41 +0000
+Subject: [PATCH] prevent unsupported calls into symcrypt in speed
 
 ---
- apps/speed.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ apps/speed.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
 diff --git a/apps/speed.c b/apps/speed.c
 index 9d504f2..1c2be26 100644
@@ -158,5 +157,5 @@ index 9d504f2..1c2be26 100644
                  sigs_algname[sigs_algs_len++] = OPENSSL_strdup(rsa_choices[i].name);
              }
 -- 
-2.52.0
+2.45.3
 

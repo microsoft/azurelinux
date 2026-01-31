@@ -85,10 +85,16 @@ index b1eedc0..e4a1e5f 100644
  #include "internal/sslconf.h"
  #include "internal/nelem.h"
  #include "internal/sizes.h"
-@@ -1986,6 +1987,17 @@ int tls12_check_peer_sigalg(SSL_CONNECTION *s, uint16_t sig, EVP_PKEY *pkey)
+@@ -1986,12 +1987,28 @@ int tls12_check_peer_sigalg(SSL_CONNECTION *s, uint16_t sig, EVP_PKEY *pkey)
       * Make sure security callback allows algorithm. For historical
       * reasons we have to pass the sigalg as a two byte char array.
       */
+-    sigalgstr[0] = (sig >> 8) & 0xff;
+-    sigalgstr[1] = sig & 0xff;
+-    secbits = sigalg_security_bits(SSL_CONNECTION_GET_CTX(s), lu);
+-    if (secbits == 0 || !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits, md != NULL ? EVP_MD_get_type(md) : NID_undef, (void *)sigalgstr)) {
+-        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
+-        return 0;
 +
 +    if ((lu->hash == NID_sha1 || lu->hash == NID_md5_sha1)
 +            && ossl_ctx_legacy_digest_signatures_allowed(SSL_CONNECTION_GET_CTX(s)->libctx, 0)
@@ -96,22 +102,24 @@ index b1eedc0..e4a1e5f 100644
 +        /* When rh-allow-sha1-signatures = yes and security level <= 1,
 +         * explicitly allow SHA1 for backwards compatibility. Also allow
 +         * MD5-SHA1 because TLS 1.0 is still supported, which uses it. */
-+        goto store_sigalg;
-+    }
-+
-+    /* Security callback check */
-     sigalgstr[0] = (sig >> 8) & 0xff;
-     sigalgstr[1] = sig & 0xff;
-     secbits = sigalg_security_bits(SSL_CONNECTION_GET_CTX(s), lu);
-@@ -1993,6 +2005,8 @@ int tls12_check_peer_sigalg(SSL_CONNECTION *s, uint16_t sig, EVP_PKEY *pkey)
-         SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
-         return 0;
++    } else {
++        /*
++         * Make sure security callback allows algorithm. For historical
++         * reasons we have to pass the sigalg as a two byte char array.
++         */
++        sigalgstr[0] = (sig >> 8) & 0xff;
++        sigalgstr[1] = sig & 0xff;
++        secbits = sigalg_security_bits(SSL_CONNECTION_GET_CTX(s), lu);
++        if (secbits == 0 ||
++            !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits,
++                          md != NULL ? EVP_MD_get_type(md) : NID_undef,
++                          (void *)sigalgstr)) {
++            SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
++            return 0;
++        }
      }
-+
-+store_sigalg:
      /* Store the sigalg the peer uses */
      s->s3.tmp.peer_sigalg = lu;
-     return 1;
 @@ -2566,6 +2580,15 @@ static int tls12_sigalg_allowed(const SSL_CONNECTION *s, int op,
          }
      }
@@ -178,3 +186,5 @@ index e60046b..90bc684 100644
  
  ok(verify("ee-pss-sha256-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "2"),
      "PSS signature using SHA256 and auth level 2");
+-- 
+2.33.8
