@@ -273,7 +273,7 @@ index 64851fd..aa8ed67 100644
  #define OSSL_LIB_CTX_DECODER_CACHE_INDEX 20
 -#define OSSL_LIB_CTX_MAX_INDEXES 20
 +#define OSSL_LIB_CTX_LEGACY_DIGEST_SIGNATURES_INDEX 21
-+#define OSSL_LIB_CTX_MAX_INDEXES 21
++#define OSSL_LIB_CTX_MAX_INDEXES 22
  
  OSSL_LIB_CTX *ossl_lib_ctx_get_concrete(OSSL_LIB_CTX *ctx);
  int ossl_lib_ctx_is_default(OSSL_LIB_CTX *ctx);
