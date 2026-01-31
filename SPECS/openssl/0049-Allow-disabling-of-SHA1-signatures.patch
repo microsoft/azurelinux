@@ -25,16 +25,16 @@ diff --git a/crypto/context.c b/crypto/context.c
 index a9694e7..f561242 100644
 --- a/crypto/context.c
 +++ b/crypto/context.c
-@@ -83,6 +83,8 @@ struct ossl_lib_ctx_st {
+@@ -84,6 +84,8 @@ struct ossl_lib_ctx_st {
      void *fips_prov;
  #endif
  
 +    void *legacy_digest_signatures;
 +
-     unsigned int ischild:1;
+     unsigned int ischild : 1;
  };
  
-@@ -223,6 +225,10 @@ static int context_init(OSSL_LIB_CTX *ctx)
+@@ -233,6 +235,10 @@ static int context_init(OSSL_LIB_CTX *ctx)
          goto err;
  #endif
  
@@ -45,7 +45,7 @@ index a9694e7..f561242 100644
      /* Low priority. */
  #ifndef FIPS_MODULE
      ctx->child_provider = ossl_child_prov_ctx_new(ctx);
-@@ -366,6 +372,11 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
+@@ -376,6 +382,11 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
      }
  #endif
  
@@ -57,7 +57,7 @@ index a9694e7..f561242 100644
      /* Low priority. */
  #ifndef FIPS_MODULE
      if (ctx->child_provider != NULL) {
-@@ -663,6 +674,9 @@ void *ossl_lib_ctx_get_data(OSSL_LIB_CTX *ctx, int index)
+@@ -674,6 +685,9 @@ void *ossl_lib_ctx_get_data(OSSL_LIB_CTX *ctx, int index)
          return ctx->fips_prov;
  #endif
  
@@ -97,14 +97,14 @@ index 0e7fe64..b9d3b6d 100644
 +            }
          } else {
              ERR_raise_data(ERR_LIB_EVP, EVP_R_UNKNOWN_OPTION,
-                            "name=%s, value=%s", oval->name, oval->value);
+                 "name=%s, value=%s", oval->name, oval->value);
 diff --git a/crypto/evp/m_sigver.c b/crypto/evp/m_sigver.c
 index 3a979f4..01e6828 100644
 --- a/crypto/evp/m_sigver.c
 +++ b/crypto/evp/m_sigver.c
 @@ -15,6 +15,73 @@
  #include "internal/provider.h"
- #include "internal/numbers.h"   /* includes SIZE_MAX */
+ #include "internal/numbers.h" /* includes SIZE_MAX */
  #include "evp_local.h"
 +#include "crypto/context.h"
 +
@@ -176,7 +176,7 @@ index 3a979f4..01e6828 100644
  
  #ifndef FIPS_MODULE
  
-@@ -253,6 +320,18 @@ static int do_sigver_init(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx,
+@@ -251,6 +318,18 @@ static int do_sigver_init(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx,
          }
      }
  
@@ -207,7 +207,7 @@ index c4b9615..57eda1f 100644
  #include "evp_local.h"
  
  #ifndef FIPS_MODULE
-@@ -933,6 +934,20 @@ static int evp_pkey_ctx_set_md(EVP_PKEY_CTX *ctx, const EVP_MD *md,
+@@ -934,6 +935,20 @@ static int evp_pkey_ctx_set_md(EVP_PKEY_CTX *ctx, const EVP_MD *md,
          return -2;
      }
  
@@ -267,13 +267,13 @@ diff --git a/include/internal/cryptlib.h b/include/internal/cryptlib.h
 index 64851fd..aa8ed67 100644
 --- a/include/internal/cryptlib.h
 +++ b/include/internal/cryptlib.h
-@@ -117,7 +117,8 @@ typedef struct ossl_ex_data_global_st {
- # define OSSL_LIB_CTX_CHILD_PROVIDER_INDEX          18
- # define OSSL_LIB_CTX_THREAD_INDEX                  19
- # define OSSL_LIB_CTX_DECODER_CACHE_INDEX           20
--# define OSSL_LIB_CTX_MAX_INDEXES                   20
-+# define OSSL_LIB_CTX_LEGACY_DIGEST_SIGNATURES_INDEX 21
-+# define OSSL_LIB_CTX_MAX_INDEXES                   22
+@@ -114,7 +114,8 @@ typedef struct ossl_ex_data_global_st {
+ #define OSSL_LIB_CTX_CHILD_PROVIDER_INDEX 18
+ #define OSSL_LIB_CTX_THREAD_INDEX 19
+ #define OSSL_LIB_CTX_DECODER_CACHE_INDEX 20
+-#define OSSL_LIB_CTX_MAX_INDEXES 20
++#define OSSL_LIB_CTX_LEGACY_DIGEST_SIGNATURES_INDEX 21
++#define OSSL_LIB_CTX_MAX_INDEXES 21
  
  OSSL_LIB_CTX *ossl_lib_ctx_get_concrete(OSSL_LIB_CTX *ctx);
  int ossl_lib_ctx_is_default(OSSL_LIB_CTX *ctx);
@@ -283,7 +283,7 @@ index fd7f7e3..05464b0 100644
 +++ b/include/internal/sslconf.h
 @@ -18,4 +18,8 @@ int conf_ssl_name_find(const char *name, size_t *idx);
  void conf_ssl_get_cmd(const SSL_CONF_CMD *cmd, size_t idx, char **cmdstr,
-                       char **arg);
+     char **arg);
  
 +/* Methods to support disabling all signatures with legacy digests */
 +int ossl_ctx_legacy_digest_signatures_allowed(OSSL_LIB_CTX *libctx, int loadconfig);
@@ -302,10 +302,13 @@ index 0d3acdb..fe694c4 100644
  
  /*
   * FIPS requires a minimum security strength of 112 bits (for encryption or
-@@ -243,6 +244,15 @@ int ossl_digest_get_approved_nid_with_sha1(OSSL_LIB_CTX *ctx, const EVP_MD *md,
+@@ -241,17 +242,36 @@ int ossl_digest_get_approved_nid_with_sha1(OSSL_LIB_CTX *ctx, const EVP_MD *md,
+ #if !defined(OPENSSL_NO_FIPS_SECURITYCHECKS)
+     if (ossl_securitycheck_enabled(ctx)) {
+         if (mdnid == NID_undef || (mdnid == NID_sha1 && !sha1_allowed))
              mdnid = -1; /* disallowed by security checks */
      }
- # endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
+ #endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
 +
 +#ifndef FIPS_MODULE
 +    if (!ossl_ctx_legacy_digest_signatures_allowed(ctx, 0))
@@ -318,10 +321,12 @@ index 0d3acdb..fe694c4 100644
      return mdnid;
  }
  
-@@ -252,5 +262,15 @@ int ossl_digest_is_allowed(OSSL_LIB_CTX *ctx, const EVP_MD *md)
+ int ossl_digest_is_allowed(OSSL_LIB_CTX *ctx, const EVP_MD *md)
+ {
+ #if !defined(OPENSSL_NO_FIPS_SECURITYCHECKS)
      if (ossl_securitycheck_enabled(ctx))
          return ossl_digest_get_approved_nid(md) != NID_undef;
- # endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
+ #endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
 +
 +#ifndef FIPS_MODULE
 +    {
@@ -350,14 +355,14 @@ index 2463234..2ca7a59 100644
  }
  
  int ossl_digest_rsa_sign_get_md_nid(OSSL_LIB_CTX *ctx, const EVP_MD *md,
--                                    ossl_unused int sha1_allowed)
-+                                    int sha1_allowed)
+-    ossl_unused int sha1_allowed)
++    int sha1_allowed)
  {
      int mdnid;
 +    int ldsigs_allowed;
  
      static const OSSL_ITEM name_to_nid[] = {
-         { NID_md5,       OSSL_DIGEST_NAME_MD5       },
+         { NID_md5, OSSL_DIGEST_NAME_MD5 },
 @@ -42,8 +44,11 @@ int ossl_digest_rsa_sign_get_md_nid(OSSL_LIB_CTX *ctx, const EVP_MD *md,
          { NID_ripemd160, OSSL_DIGEST_NAME_RIPEMD160 },
      };
@@ -375,7 +380,7 @@ diff --git a/providers/implementations/signature/dsa_sig.c b/providers/implement
 index b89a0f6..e0c26a1 100644
 --- a/providers/implementations/signature/dsa_sig.c
 +++ b/providers/implementations/signature/dsa_sig.c
-@@ -125,12 +125,17 @@ static int dsa_setup_md(PROV_DSA_CTX *ctx,
+@@ -124,12 +124,17 @@ static int dsa_setup_md(PROV_DSA_CTX *ctx,
          mdprops = ctx->propq;
  
      if (mdname != NULL) {
@@ -383,7 +388,7 @@ index b89a0f6..e0c26a1 100644
          WPACKET pkt;
          EVP_MD *md = EVP_MD_fetch(ctx->libctx, mdname, mdprops);
 -        int md_nid = ossl_digest_get_approved_nid_with_sha1(ctx->libctx, md,
--                                                            sha1_allowed);
+-            sha1_allowed);
 +        int md_nid;
          size_t mdname_len = strlen(mdname);
 +#ifdef FIPS_MODULE
@@ -392,7 +397,7 @@ index b89a0f6..e0c26a1 100644
 +        int sha1_allowed = 0;
 +#endif
 +        md_nid = ossl_digest_get_approved_nid_with_sha1(ctx->libctx, md,
-+                                                            sha1_allowed);
++            sha1_allowed);
  
          if (md == NULL || md_nid < 0) {
              if (md == NULL)
@@ -400,8 +405,8 @@ diff --git a/providers/implementations/signature/ecdsa_sig.c b/providers/impleme
 index fe65ed8..191580b 100644
 --- a/providers/implementations/signature/ecdsa_sig.c
 +++ b/providers/implementations/signature/ecdsa_sig.c
-@@ -247,7 +247,11 @@ static int ecdsa_setup_md(PROV_ECDSA_CTX *ctx, const char *mdname,
-                        "%s could not be fetched", mdname);
+@@ -251,7 +251,11 @@ static int ecdsa_setup_md(PROV_ECDSA_CTX *ctx, const char *mdname,
+             "%s could not be fetched", mdname);
          return 0;
      }
 +#ifdef FIPS_MODULE
@@ -410,7 +415,7 @@ index fe65ed8..191580b 100644
 +    sha1_allowed = 0;
 +#endif
      md_nid = ossl_digest_get_approved_nid_with_sha1(ctx->libctx, md,
-                                                     sha1_allowed);
+         sha1_allowed);
      if (md_nid < 0) {
 diff --git a/providers/implementations/signature/rsa_sig.c b/providers/implementations/signature/rsa_sig.c
 index 76db37d..2391909 100644
@@ -432,7 +437,7 @@ index 76db37d..2391909 100644
  
  static OSSL_FUNC_signature_newctx_fn rsa_newctx;
  static OSSL_FUNC_signature_sign_init_fn rsa_sign_init;
-@@ -301,10 +303,15 @@ static int rsa_setup_md(PROV_RSA_CTX *ctx, const char *mdname,
+@@ -317,10 +319,15 @@ static int rsa_setup_md(PROV_RSA_CTX *ctx, const char *mdname,
  
      if (mdname != NULL) {
          EVP_MD *md = EVP_MD_fetch(ctx->libctx, mdname, mdprops);
@@ -445,12 +450,12 @@ index 76db37d..2391909 100644
 +        int sha1_allowed = 0;
 +#endif
 +        md_nid = ossl_digest_rsa_sign_get_md_nid(ctx->libctx, md,
-                                                      sha1_allowed);
+             sha1_allowed);
 -        size_t mdname_len = strlen(mdname);
  
          if (md == NULL
              || md_nid <= 0
-@@ -1366,8 +1373,15 @@ static int rsa_set_ctx_params(void *vprsactx, const OSSL_PARAM params[])
+@@ -1371,8 +1378,15 @@ static int rsa_set_ctx_params(void *vprsactx, const OSSL_PARAM params[])
      prsactx->pad_mode = pad_mode;
  
      if (prsactx->md == NULL && pmdname == NULL
@@ -479,7 +484,7 @@ index e9aa078..b4969f5 100644
  #include "internal/nelem.h"
  #include "internal/sizes.h"
  #include "internal/tlsgroups.h"
-@@ -1514,6 +1515,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
+@@ -1513,6 +1514,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
      uint16_t *tls12_sigalgs_list = NULL;
      EVP_PKEY *tmpkey = EVP_PKEY_new();
      int ret = 0;
@@ -487,15 +492,15 @@ index e9aa078..b4969f5 100644
  
      if (ctx == NULL)
          goto err;
-@@ -1529,6 +1531,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
+@@ -1528,6 +1530,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
          goto err;
  
      ERR_set_mark();
 +    ldsigs_allowed = ossl_ctx_legacy_digest_signatures_allowed(ctx->libctx, 0);
      /* First fill cache and tls12_sigalgs list from legacy algorithm list */
      for (i = 0, lu = sigalg_lookup_tbl;
-          i < OSSL_NELEM(sigalg_lookup_tbl); lu++, i++) {
-@@ -1550,6 +1553,11 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
+         i < OSSL_NELEM(sigalg_lookup_tbl); lu++, i++) {
+@@ -1549,6 +1552,11 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
              cache[i].enabled = 0;
              continue;
          }

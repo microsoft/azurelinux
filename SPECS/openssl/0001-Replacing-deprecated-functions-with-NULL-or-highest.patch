@@ -25,11 +25,11 @@ more supported methods for the SSL protocol.
  1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/ssl/methods.c b/ssl/methods.c
-index c846143277..a7ae074bfd 100644
+index 0709883..7364b82 100644
 --- a/ssl/methods.c
 +++ b/ssl/methods.c
-@@ -215,17 +215,29 @@ const SSL_METHOD *TLSv1_client_method(void)
- # ifndef OPENSSL_NO_SSL3_METHOD
+@@ -228,17 +228,29 @@ const SSL_METHOD *TLSv1_client_method(void)
+ #ifndef OPENSSL_NO_SSL3_METHOD
  const SSL_METHOD *SSLv3_method(void)
  {
 +#  ifdef OPENSSL_NO_SSL3
@@ -56,10 +56,10 @@ index c846143277..a7ae074bfd 100644
      return sslv3_client_method();
 +#  endif
  }
- # endif
+ #endif
  
-@@ -249,17 +261,17 @@ const SSL_METHOD *DTLSv1_2_client_method(void)
- # ifndef OPENSSL_NO_DTLS1_METHOD
+@@ -262,17 +274,17 @@ const SSL_METHOD *DTLSv1_2_client_method(void)
+ #ifndef OPENSSL_NO_DTLS1_METHOD
  const SSL_METHOD *DTLSv1_method(void)
  {
 -    return dtlsv1_method();
@@ -77,8 +77,5 @@ index c846143277..a7ae074bfd 100644
 -    return dtlsv1_client_method();
 +    return DTLS_client_method();
  }
- # endif
+ #endif
  
--- 
-2.25.1
-
