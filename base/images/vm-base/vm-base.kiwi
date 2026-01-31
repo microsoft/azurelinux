@@ -86,6 +86,7 @@
         <package name="sudo" />
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
+	<package name="azurelinux-config-systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="systemd" />
         <package name="tar" />

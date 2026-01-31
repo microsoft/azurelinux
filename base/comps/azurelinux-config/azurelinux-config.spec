@@ -17,8 +17,12 @@ Provides AZL specifc configuration overrides via sub-packages. These sub-package
 Summary:        Azure Linux specific configuration for systemd-networkd.
 Requires:       systemd-networkd
 
+# This is a reverse dependency to make systemd-networkd pull-in this package.
+# It is still experimental. Consider this as a placeholder.
+Supplements:    systemd-networkd
+
 %description systemd-networkd
-Provides systemd-networkd configuration installed to /etc/systemd/network. These ask systemd to manage all interfaces on the system.
+Provides systemd-networkd configuration installed at /etc/systemd/network which asks systemd to manage all interfaces on the system.
 
 %install
 install -d %{buildroot}%{_sysconfdir}/systemd/network
