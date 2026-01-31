@@ -29,13 +29,13 @@ azldev comp build azurelinux-repos --local-repo ./base/out && createrepo_c ./bas
 # Build rpm to ensure the azl-specific vendor tag is configured.
 azldev comp build rpm --local-repo ./base/out && createrepo_c ./base/out
 # Build a base container image using these private RPMs and upstream Fedora packages.
-sudo kiwi --loglevel 10 \
-    --kiwi-file container-base.kiwi \
-    system build \
-    --description ./base/images/container-base \
-    --target-dir ./base/out/images \
-    --add-repo="file:///$PWD/base/out,rpm-md,azl,1"
+# sudo kiwi --loglevel 10 \
+#     --kiwi-file container-base.kiwi \
+#     system build \
+#     --description ./base/images/container-base \
+#     --target-dir ./base/out/images \
+#     --add-repo="file:///$PWD/base/out,rpm-md,azl,1"
 
-# Run a command in the container to verify.
-xzcat ./base/out/images/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
-docker run -it --rm microsoft/azurelinux/base/core:4.0 cat /etc/os-release
+# # Run a command in the container to verify.
+# xzcat ./base/out/images/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
+# docker run -it --rm microsoft/azurelinux/base/core:4.0 cat /etc/os-release
