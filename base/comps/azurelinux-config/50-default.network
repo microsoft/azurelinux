@@ -1,4 +1,4 @@
-# We want sytemd to manage all interfaces
+# We want systemd to manage all interfaces
 [Match]
 Name=*
 

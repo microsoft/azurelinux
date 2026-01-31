@@ -1,3 +1,5 @@
+%define is_development 1
+
 Summary:        Azure Linux configuration override meta-package
 Name:           azurelinux-config
 Version:        4.0

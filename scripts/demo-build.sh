@@ -8,7 +8,7 @@ echo -e "\e[0;33mbash trace, -x output is in ./demo-build.trc\e[0m"
 
 #
 # NOTE: This script is a throwaway script. Please think ~~twice~~ thrice before you
-# consider adding anything to it. Push all dev-tooling demands into azldev.
+# consider adding anything to it. Let us push all dev-tooling into azldev.
 #
 
 # Confirm working dir.
