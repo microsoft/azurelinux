@@ -18,14 +18,14 @@
             format="vhdx"
             initrd_system="dracut"
             filesystem="ext4"
-            kernelcmdline="console=ttyS0 rd.shell=0 systemd.getty_auto=false"
+            kernelcmdline="console=ttyS0 rd.shell=0"
             firmware="uefi"
             overlayroot="false"
             eficsm="false"
             bootpartition="false"
             efipartsize="200">
             <bootloader name="systemd_boot" timeout="0" />
-            <size unit="G">2</size>
+            <size unit="G">4</size>
             <initrd action="setup">
                 <dracut uefi="true"/>
             </initrd>
@@ -86,7 +86,7 @@
         <package name="sudo" />
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
-        <package name="systemd-resolved" />
+	<package name="azurelinux-config-systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="systemd" />
         <package name="tar" />
@@ -114,9 +114,8 @@
         <package name="system-release" />
     </packages>
 
-    <!--
     <users>
-        <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
+          <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
+	  <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
     </users>
-    -->
 </image>

@@ -1,0 +1,6 @@
+# We want systemd to manage all interfaces
+[Match]
+Name=*
+
+[Network]
+DHCP=yes
