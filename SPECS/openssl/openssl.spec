@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -75,6 +75,8 @@ Patch105: 0001-Fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
 Patch106: 0001-Fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencr.patch
 Patch107: 0001-Verify-ASN1-object-s-types-before-attempting-to-acce.patch
 Patch108: 0001-Add-NULL-check-to-PKCS12_item_decrypt_d2i_ex.patch
+Patch109: CVE-2025-69419.patch
+Patch110: CVE-2026-22796.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -371,6 +373,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-3
+- Patch CVE-2025-69419, CVE-2026-22795, and CVE-2026-22796
+
 * Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
 - Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160,
   CVE-2025-69418, CVE-2025-69420, and CVE-2025-69421
