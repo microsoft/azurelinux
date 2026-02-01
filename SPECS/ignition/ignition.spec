@@ -170,7 +170,8 @@ install -p -m 0755 ./ignition %{buildroot}%{_bindir}
 install -p -m 0755 ./ignition-validate %{buildroot}%{_bindir}
 %endif
 
-ln -sf %{buildroot}%{_libexecdir}/ignition-rmcfg %{buildroot}%{_bindir}/ignition
+
+ln -rsf %{buildroot}%{_bindir}/ignition %{buildroot}%{_libexecdir}/ignition-rmcfg
 
 %if 0%{?with_cross}
 install -d -p %{buildroot}%{_datadir}/ignition
