@@ -8611,8 +8611,8 @@
         "type": "other",
         "other": {
           "name": "ladspa",
-          "version": "1.13",
-          "downloadUrl": "http://www.ladspa.org/download/ladspa_sdk_1.13.tgz"
+          "version": "1.17",
+          "downloadUrl": "https://www.ladspa.org/download/ladspa_sdk_1.17.tgz"
         }
       }
     },
