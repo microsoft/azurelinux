@@ -11,7 +11,7 @@ Subject: [PATCH] Allow SHA1 in seclevel 1 if rh allow sha1 signatures
  4 files changed, 81 insertions(+), 12 deletions(-)
 
 diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
-index 1794c14..1dfbe58 100644
+index c52da4f..4a09285 100644
 --- a/crypto/x509/x509_vfy.c
 +++ b/crypto/x509/x509_vfy.c
 @@ -25,6 +25,7 @@
@@ -22,7 +22,7 @@ index 1794c14..1dfbe58 100644
  #include "crypto/x509.h"
  #include "x509_local.h"
  
-@@ -3668,14 +3669,31 @@ static int check_sig_level(X509_STORE_CTX *ctx, X509 *cert)
+@@ -3659,14 +3660,31 @@ static int check_sig_level(X509_STORE_CTX *ctx, X509 *cert)
  {
      int secbits = -1;
      int level = ctx->param->auth_level;
@@ -56,7 +56,7 @@ index 1794c14..1dfbe58 100644
      return secbits >= minbits_table[level - 1];
  }
 diff --git a/doc/man5/config.pod b/doc/man5/config.pod
-index 4d9254f..d1c4ad1 100644
+index fe2f9f8..44ae801 100644
 --- a/doc/man5/config.pod
 +++ b/doc/man5/config.pod
 @@ -320,6 +320,13 @@ this option is set to B<no>.  Because TLS 1.1 or lower use MD5-SHA1 as
@@ -74,7 +74,7 @@ index 4d9254f..d1c4ad1 100644
  
  The value is a boolean that can be B<yes> or B<no>.  If the value is
 diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
-index b4969f5..4560dc5 100644
+index b1eedc0..e4a1e5f 100644
 --- a/ssl/t1_lib.c
 +++ b/ssl/t1_lib.c
 @@ -20,6 +20,7 @@
@@ -85,17 +85,14 @@ index b4969f5..4560dc5 100644
  #include "internal/sslconf.h"
  #include "internal/nelem.h"
  #include "internal/sizes.h"
-@@ -1989,15 +1990,28 @@ int tls12_check_peer_sigalg(SSL_CONNECTION *s, uint16_t sig, EVP_PKEY *pkey)
+@@ -1986,12 +1987,28 @@ int tls12_check_peer_sigalg(SSL_CONNECTION *s, uint16_t sig, EVP_PKEY *pkey)
       * Make sure security callback allows algorithm. For historical
       * reasons we have to pass the sigalg as a two byte char array.
       */
 -    sigalgstr[0] = (sig >> 8) & 0xff;
 -    sigalgstr[1] = sig & 0xff;
 -    secbits = sigalg_security_bits(SSL_CONNECTION_GET_CTX(s), lu);
--    if (secbits == 0 ||
--        !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits,
--                      md != NULL ? EVP_MD_get_type(md) : NID_undef,
--                      (void *)sigalgstr)) {
+-    if (secbits == 0 || !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits, md != NULL ? EVP_MD_get_type(md) : NID_undef, (void *)sigalgstr)) {
 -        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
 -        return 0;
 +
@@ -123,7 +120,7 @@ index b4969f5..4560dc5 100644
      }
      /* Store the sigalg the peer uses */
      s->s3.tmp.peer_sigalg = lu;
-@@ -2568,6 +2582,15 @@ static int tls12_sigalg_allowed(const SSL_CONNECTION *s, int op,
+@@ -2566,6 +2580,15 @@ static int tls12_sigalg_allowed(const SSL_CONNECTION *s, int op,
          }
      }
  
@@ -139,7 +136,7 @@ index b4969f5..4560dc5 100644
      /* Finally see if security callback allows it */
      secbits = sigalg_security_bits(SSL_CONNECTION_GET_CTX(s), lu);
      sigalgstr[0] = (lu->sigalg >> 8) & 0xff;
-@@ -3511,6 +3534,7 @@ static int ssl_security_cert_sig(SSL_CONNECTION *s, SSL_CTX *ctx, X509 *x,
+@@ -3505,6 +3528,7 @@ static int ssl_security_cert_sig(SSL_CONNECTION *s, SSL_CTX *ctx, X509 *x,
  {
      /* Lookup signature algorithm digest */
      int secbits, nid, pknid;
@@ -147,7 +144,7 @@ index b4969f5..4560dc5 100644
  
      /* Don't check signature if self signed */
      if ((X509_get_extension_flags(x) & EXFLAG_SS) != 0)
-@@ -3520,6 +3544,26 @@ static int ssl_security_cert_sig(SSL_CONNECTION *s, SSL_CTX *ctx, X509 *x,
+@@ -3514,6 +3538,26 @@ static int ssl_security_cert_sig(SSL_CONNECTION *s, SSL_CTX *ctx, X509 *x,
      /* If digest NID not defined use signature NID */
      if (nid == NID_undef)
          nid = pknid;
@@ -175,10 +172,10 @@ index b4969f5..4560dc5 100644
          return ssl_security(s, op, secbits, nid, x);
      else
 diff --git a/test/recipes/25-test_verify.t b/test/recipes/25-test_verify.t
-index 1c8fce8..a584629 100644
+index e60046b..90bc684 100644
 --- a/test/recipes/25-test_verify.t
 +++ b/test/recipes/25-test_verify.t
-@@ -481,8 +481,8 @@ ok(verify("ee-pss-sha1-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "0"
+@@ -482,8 +482,8 @@ ok(verify("ee-pss-sha1-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "0"
  ok(verify("ee-pss-sha256-cert", "", ["root-cert"], ["ca-cert"], ),
      "CA with PSS signature using SHA256");
  
@@ -191,4 +188,3 @@ index 1c8fce8..a584629 100644
      "PSS signature using SHA256 and auth level 2");
 -- 
 2.33.8
-

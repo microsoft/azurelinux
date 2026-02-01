@@ -54,7 +54,7 @@ index 33d52a9..a9694e7 100644
  struct ossl_lib_ctx_st {
      CRYPTO_RWLOCK *lock, *rand_crngt_lock;
      OSSL_EX_DATA_GLOBAL global;
-@@ -368,6 +403,7 @@ static int default_context_inited = 0;
+@@ -379,6 +415,7 @@ static int default_context_inited = 0;
  
  DEFINE_RUN_ONCE_STATIC(default_context_do_init)
  {
@@ -67,15 +67,15 @@ index ab41d64..efb12ae 100644
 --- a/include/internal/provider.h
 +++ b/include/internal/provider.h
 @@ -112,6 +112,9 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
-                                 const OSSL_DISPATCH *in);
+     const OSSL_DISPATCH *in);
  void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx);
  
 +/* FIPS flag access */
 +int ossl_get_kernel_fips_flag(void);
 +
- # ifdef __cplusplus
+ #ifdef __cplusplus
  }
- # endif
+ #endif
 -- 
 2.33.8
 

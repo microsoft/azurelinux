@@ -15,7 +15,7 @@ diff --git a/apps/openssl.cnf b/apps/openssl.cnf
 index 97567a67be..eb25a0ac48 100644
 --- a/apps/openssl.cnf
 +++ b/apps/openssl.cnf
-@@ -104,7 +104,7 @@ cert_opt 	= ca_default		# Certificate field options
+@@ -111,7 +111,7 @@ cert_opt 	= ca_default		# Certificate field options
  
  default_days	= 365			# how long to certify for
  default_crl_days= 30			# how long before next CRL
@@ -24,7 +24,7 @@ index 97567a67be..eb25a0ac48 100644
  preserve	= no			# keep passed DN ordering
  
  # A few difference way of specifying how similar the request should look
-@@ -136,6 +136,7 @@ emailAddress		= optional
+@@ -143,6 +143,7 @@ emailAddress		= optional
  ####################################################################
  [ req ]
  default_bits		= 2048
@@ -32,7 +32,7 @@ index 97567a67be..eb25a0ac48 100644
  default_keyfile 	= privkey.pem
  distinguished_name	= req_distinguished_name
  attributes		= req_attributes
-@@ -158,17 +159,18 @@ string_mask = utf8only
+@@ -165,17 +166,18 @@ string_mask = utf8only
  
  [ req_distinguished_name ]
  countryName			= Country Name (2 letter code)
@@ -54,7 +54,7 @@ index 97567a67be..eb25a0ac48 100644
  
  # we can do this but it is not needed normally :-)
  #1.organizationName		= Second Organization Name (eg, company)
-@@ -177,7 +179,7 @@ localityName			= Locality Name (eg, city)
+@@ -184,7 +186,7 @@ localityName			= Locality Name (eg, city)
  organizationalUnitName		= Organizational Unit Name (eg, section)
  #organizationalUnitName_default	=
  
