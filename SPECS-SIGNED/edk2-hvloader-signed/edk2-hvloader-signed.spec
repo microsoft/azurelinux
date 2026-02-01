@@ -74,7 +74,11 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
+<<<<<<< HEAD
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-12
+=======
+* Fri Jan 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-12
+>>>>>>> 8e8e355ab ([AutoPR- Security] Patch edk2 for CVE-2025-15467 [CRITICAL] (#15644))
 - Bump release for consistency with edk2 spec.
 
 * Thu Dec 18 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20240524git3e722403cd16-11

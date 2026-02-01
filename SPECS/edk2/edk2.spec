@@ -141,7 +141,11 @@ Patch1004: CVE-2024-2511.patch
 Patch1005: CVE-2024-4603.patch
 Patch1006: CVE-2025-3770.patch
 Patch1007: CVE-2025-9230.patch
+<<<<<<< HEAD
 Patch1008: CVE-2025-2295.patch
+=======
+Patch1008: CVE-2025-15467.patch
+>>>>>>> 8e8e355ab ([AutoPR- Security] Patch edk2 for CVE-2025-15467 [CRITICAL] (#15644))
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -803,8 +807,13 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+<<<<<<< HEAD
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-12
 - Patch for CVE-2025-2295
+=======
+* Fri Jan 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-12
+- Patch for CVE-2025-15467
+>>>>>>> 8e8e355ab ([AutoPR- Security] Patch edk2 for CVE-2025-15467 [CRITICAL] (#15644))
 
 * Thu Dec 18 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20240524git3e722403cd16-11
 - Patch for CVE-2025-2296
