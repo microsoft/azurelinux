@@ -11,9 +11,10 @@ Group:          System Environment/Base
 BuildArch:      noarch
 
 %global commit 8bd8a82fb22bc46ea2cf7da94d58655e102ca26d
+%global shortcommit %(echo %{commit} | cut -c1-7)
 
 # tarball matches the ebuild SRC_URI pattern:
-Source0:        https://github.com/flatcar/init/archive/%{commit}/init-%{commit}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/flatcar/init/archive/%{commit}/init-%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
 
 # optional tests, analogous to IUSE=test
 %bcond_without tests

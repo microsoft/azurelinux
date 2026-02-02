@@ -3,6 +3,7 @@ Name:           coreos-cloudinit
 Version:        1.14.0
 
 %global commit  1c1d7f4ae6b933350d7fd36e882dda170123cccc
+%global shortcommit %(echo %{commit} | cut -c1-7)
 
 Release:        1%{?dist}
 License:        Apache-2.0
@@ -11,7 +12,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/flatcar/coreos-cloudinit
 
-Source0:        https://github.com/flatcar/coreos-cloudinit/archive/%{commit}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/flatcar/coreos-cloudinit/archive/%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
