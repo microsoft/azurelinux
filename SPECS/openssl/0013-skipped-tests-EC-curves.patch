@@ -4,16 +4,16 @@ Date: Wed, 17 Apr 2024 21:43:50 +0000
 Subject: [PATCH] skipped tests EC curves
 
 ---
- test/recipes/15-test_ec.t          | 2 +-
+ test/recipes/15-test_ec.t         | 2 +-
  test/recipes/65-test_cmp_protect.t | 2 +-
  test/recipes/65-test_cmp_vfy.t     | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/test/recipes/15-test_ec.t b/test/recipes/15-test_ec.t
-index c953fad..906769a 100644
+index 9bf946e..d652187 100644
 --- a/test/recipes/15-test_ec.t
 +++ b/test/recipes/15-test_ec.t
-@@ -94,7 +94,7 @@ SKIP: {
+@@ -104,7 +104,7 @@ SKIP: {
  
  subtest 'Check loading of fips and non-fips keys' => sub {
      plan skip_all => "FIPS is disabled"
@@ -50,4 +50,3 @@ index f722800..26a0178 100644
                   data_file("server.crt"),     data_file("client.crt"),
 -- 
 2.33.8
-

@@ -8,7 +8,7 @@ Subject: [PATCH] prevent unsupported calls into symcrypt in speed
  1 file changed, 44 insertions(+), 2 deletions(-)
 
 diff --git a/apps/speed.c b/apps/speed.c
-index 8c3342e..b4e966d 100644
+index 9d504f2..1c2be26 100644
 --- a/apps/speed.c
 +++ b/apps/speed.c
 @@ -27,6 +27,9 @@
@@ -21,102 +21,100 @@ index 8c3342e..b4e966d 100644
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-@@ -383,15 +386,24 @@ static double rsa_results[RSA_NUM][4];  /* 4 ops: sign, verify, encrypt, decrypt
- 
- #ifndef OPENSSL_NO_DH
- enum ff_params_t {
--    R_FFDH_2048, R_FFDH_3072, R_FFDH_4096, R_FFDH_6144, R_FFDH_8192, FFDH_NUM
-+    R_FFDH_2048,
-+    R_FFDH_3072,
-+    R_FFDH_4096,
+@@ -434,8 +437,10 @@ enum ff_params_t {
+     R_FFDH_2048,
+     R_FFDH_3072,
+     R_FFDH_4096,
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-+    R_FFDH_6144,
-+    R_FFDH_8192,
+     R_FFDH_6144,
+     R_FFDH_8192,
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
-+    FFDH_NUM,
+     FFDH_NUM
  };
  
- static const OPT_PAIR ffdh_choices[FFDH_NUM] = {
-     {"ffdh2048", R_FFDH_2048},
-     {"ffdh3072", R_FFDH_3072},
-     {"ffdh4096", R_FFDH_4096},
+@@ -443,8 +448,10 @@ static const OPT_PAIR ffdh_choices[FFDH_NUM] = {
+     { "ffdh2048", R_FFDH_2048 },
+     { "ffdh3072", R_FFDH_3072 },
+     { "ffdh4096", R_FFDH_4096 },
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-     {"ffdh6144", R_FFDH_6144},
-     {"ffdh8192", R_FFDH_8192},
+     { "ffdh6144", R_FFDH_6144 },
+     { "ffdh8192", R_FFDH_8192 },
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
  };
  
- static double ffdh_results[FFDH_NUM][1];  /* 1 op: derivation */
-@@ -403,8 +415,11 @@ enum ec_curves_t {
-     R_EC_K163, R_EC_K233, R_EC_K283, R_EC_K409, R_EC_K571,
-     R_EC_B163, R_EC_B233, R_EC_B283, R_EC_B409, R_EC_B571,
+ static double ffdh_results[FFDH_NUM][1]; /* 1 op: derivation */
+@@ -467,12 +474,14 @@ enum ec_curves_t {
+     R_EC_B409,
+     R_EC_B571,
  #endif
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-     R_EC_BRP256R1, R_EC_BRP256T1, R_EC_BRP384R1, R_EC_BRP384T1,
--    R_EC_BRP512R1, R_EC_BRP512T1, ECDSA_NUM
-+    R_EC_BRP512R1, R_EC_BRP512T1,
+     R_EC_BRP256R1,
+     R_EC_BRP256T1,
+     R_EC_BRP384R1,
+     R_EC_BRP384T1,
+     R_EC_BRP512R1,
+     R_EC_BRP512T1,
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
-+    ECDSA_NUM
+     ECDSA_NUM
  };
  /* list of ecdsa curves */
- static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
-@@ -424,12 +439,14 @@ static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
-     {"ecdsab409", R_EC_B409},
-     {"ecdsab571", R_EC_B571},
+@@ -493,12 +502,14 @@ static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
+     { "ecdsab409", R_EC_B409 },
+     { "ecdsab571", R_EC_B571 },
  #endif
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-     {"ecdsabrp256r1", R_EC_BRP256R1},
-     {"ecdsabrp256t1", R_EC_BRP256T1},
-     {"ecdsabrp384r1", R_EC_BRP384R1},
-     {"ecdsabrp384t1", R_EC_BRP384T1},
-     {"ecdsabrp512r1", R_EC_BRP512R1},
-     {"ecdsabrp512t1", R_EC_BRP512T1}
+     { "ecdsabrp256r1", R_EC_BRP256R1 },
+     { "ecdsabrp256t1", R_EC_BRP256T1 },
+     { "ecdsabrp384r1", R_EC_BRP384R1 },
+     { "ecdsabrp384t1", R_EC_BRP384T1 },
+     { "ecdsabrp512r1", R_EC_BRP512R1 },
+     { "ecdsabrp512t1", R_EC_BRP512T1 }
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
  };
  enum {
  #ifndef OPENSSL_NO_ECX
-@@ -456,12 +473,14 @@ static const OPT_PAIR ecdh_choices[EC_NUM] = {
-     {"ecdhb409", R_EC_B409},
-     {"ecdhb571", R_EC_B571},
+@@ -527,12 +538,14 @@ static const OPT_PAIR ecdh_choices[EC_NUM] = {
+     { "ecdhb409", R_EC_B409 },
+     { "ecdhb571", R_EC_B571 },
  #endif
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-     {"ecdhbrp256r1", R_EC_BRP256R1},
-     {"ecdhbrp256t1", R_EC_BRP256T1},
-     {"ecdhbrp384r1", R_EC_BRP384R1},
-     {"ecdhbrp384t1", R_EC_BRP384T1},
-     {"ecdhbrp512r1", R_EC_BRP512R1},
-     {"ecdhbrp512t1", R_EC_BRP512T1},
+     { "ecdhbrp256r1", R_EC_BRP256R1 },
+     { "ecdhbrp256t1", R_EC_BRP256T1 },
+     { "ecdhbrp384r1", R_EC_BRP384R1 },
+     { "ecdhbrp384t1", R_EC_BRP384T1 },
+     { "ecdhbrp512r1", R_EC_BRP512R1 },
+     { "ecdhbrp512t1", R_EC_BRP512T1 },
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
  #ifndef OPENSSL_NO_ECX
-     {"ecdhx25519", R_EC_X25519},
-     {"ecdhx448", R_EC_X448}
-@@ -1806,8 +1825,10 @@ int speed_main(int argc, char **argv)
-         {"ffdh2048", NID_ffdhe2048, 2048},
-         {"ffdh3072", NID_ffdhe3072, 3072},
-         {"ffdh4096", NID_ffdhe4096, 4096},
+     { "ecdhx25519", R_EC_X25519 },
+     { "ecdhx448", R_EC_X448 }
+@@ -1983,8 +1996,10 @@ int speed_main(int argc, char **argv)
+         { "ffdh2048", NID_ffdhe2048, 2048 },
+         { "ffdh3072", NID_ffdhe3072, 3072 },
+         { "ffdh4096", NID_ffdhe4096, 4096 },
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-         {"ffdh6144", NID_ffdhe6144, 6144},
-         {"ffdh8192", NID_ffdhe8192, 8192}
+         { "ffdh6144", NID_ffdhe6144, 6144 },
+         { "ffdh8192", NID_ffdhe8192, 8192 }
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
      };
      uint8_t ffdh_doit[FFDH_NUM] = { 0 };
  
-@@ -1839,12 +1860,14 @@ int speed_main(int argc, char **argv)
-         {"nistb409", NID_sect409r1, 409},
-         {"nistb571", NID_sect571r1, 571},
+@@ -2016,12 +2031,14 @@ int speed_main(int argc, char **argv)
+         { "nistb409", NID_sect409r1, 409 },
+         { "nistb571", NID_sect571r1, 571 },
  #endif
 +#ifndef AZL3_SYMCRYPT_PROVIDER
-         {"brainpoolP256r1", NID_brainpoolP256r1, 256},
-         {"brainpoolP256t1", NID_brainpoolP256t1, 256},
-         {"brainpoolP384r1", NID_brainpoolP384r1, 384},
-         {"brainpoolP384t1", NID_brainpoolP384t1, 384},
-         {"brainpoolP512r1", NID_brainpoolP512r1, 512},
-         {"brainpoolP512t1", NID_brainpoolP512t1, 512},
+         { "brainpoolP256r1", NID_brainpoolP256r1, 256 },
+         { "brainpoolP256t1", NID_brainpoolP256t1, 256 },
+         { "brainpoolP384r1", NID_brainpoolP384r1, 384 },
+         { "brainpoolP384t1", NID_brainpoolP384t1, 384 },
+         { "brainpoolP512r1", NID_brainpoolP512r1, 512 },
+         { "brainpoolP512t1", NID_brainpoolP512t1, 512 },
 +#endif /* AZL3_SYMCRYPT_PROVIDER */
  #ifndef OPENSSL_NO_ECX
          /* Other and ECDH only ones */
-         {"X25519", NID_X25519, 253},
-@@ -1885,8 +1908,13 @@ int speed_main(int argc, char **argv)
+         { "X25519", NID_X25519, 253 },
+@@ -2062,8 +2079,13 @@ int speed_main(int argc, char **argv)
      OPENSSL_assert(ec_curves[EC_NUM - 1].nid == NID_X448);
      OPENSSL_assert(strcmp(ecdh_choices[EC_NUM - 1].name, "ecdhx448") == 0);
  
@@ -130,7 +128,7 @@ index 8c3342e..b4e966d 100644
  #endif /* OPENSSL_NO_ECX */
  
  #ifndef OPENSSL_NO_SM2
-@@ -2066,6 +2094,13 @@ int speed_main(int argc, char **argv)
+@@ -2243,6 +2265,13 @@ int speed_main(int argc, char **argv)
                  goto end;
              }
              for (i = 0; i < OSSL_NELEM(rsa_choices); i++) {
@@ -144,7 +142,7 @@ index 8c3342e..b4e966d 100644
                  kems_doit[kems_algs_len] = 1;
                  kems_algname[kems_algs_len++] = OPENSSL_strdup(rsa_choices[i].name);
              }
-@@ -2111,6 +2146,13 @@ int speed_main(int argc, char **argv)
+@@ -2288,6 +2317,13 @@ int speed_main(int argc, char **argv)
                  goto end;
              }
              for (i = 0; i < OSSL_NELEM(rsa_choices); i++) {

@@ -13,10 +13,10 @@ From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
  1 file changed, 3 insertions(+)
 
 diff --git a/apps/speed.c b/apps/speed.c
-index d527f12f18..2ff3eb53bd 100644
+index 3f8dcca..9d504f2 100644
 --- a/apps/speed.c
 +++ b/apps/speed.c
-@@ -610,6 +610,9 @@ static int EVP_MAC_loop(int algindex, void *args)
+@@ -777,6 +777,9 @@ static int EVP_MAC_loop(ossl_unused int algindex, void *args)
      for (count = 0; COND(c[algindex][testnum]); count++) {
          size_t outl;
  
@@ -28,4 +28,3 @@ index d527f12f18..2ff3eb53bd 100644
              || !EVP_MAC_final(mctx, mac, &outl, sizeof(mac)))
 -- 
 2.41.0
-
