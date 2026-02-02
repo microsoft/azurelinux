@@ -1,4 +1,4 @@
-%define commit_hash 7d9895ce55617b18a78294975197975ac17b5bc3
+%define commit_hash daf43bf9c1ca45bf1a43566c3a6f96ec0cb44a36
 
 Name:           bootengine
 Version:        0.0.38
@@ -45,23 +45,30 @@ if [ -f update-bootengine ]; then
   install -d -p %{buildroot}%{_sbindir}
   install -p -m 0755 update-bootengine %{buildroot}%{_sbindir}/update-bootengine
 fi
-install -p -m 0755 minimal-init %{buildroot}%{_sbindir}/minimal-init
-# Ensure dracut module files are readable/executable where appropriate
-# (Avoid chmod -R 0755; be conservative)
-find %{buildroot}%{dracutlibdir}/modules.d -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || :
-find %{buildroot}%{dracutlibdir}/modules.d -type f -name "module-setup.sh" -exec chmod +x {} \; 2>/dev/null || :
+
+chmod +x \
+  %{buildroot}%{dracutlibdir}/modules.d/10*-generator/*-generator \
+  %{buildroot}%{dracutlibdir}/modules.d/10diskless-generator/diskless-btrfs \
+  %{buildroot}%{dracutlibdir}/modules.d/10networkd-dependency-generator/*-generator \
+  %{buildroot}%{dracutlibdir}/modules.d/03flatcar-network/parse-ip-for-networkd.sh \
+  %{buildroot}%{dracutlibdir}/modules.d/30disk-uuid/disk-uuid.sh \
+  %{buildroot}%{dracutlibdir}/modules.d/30ignition/ignition-generator \
+  %{buildroot}%{dracutlibdir}/modules.d/30ignition/ignition-setup.sh \
+  %{buildroot}%{dracutlibdir}/modules.d/30ignition/ignition-setup-pre.sh \
+  %{buildroot}%{dracutlibdir}/modules.d/30ignition/ignition-kargs-helper \
+  %{buildroot}%{dracutlibdir}/modules.d/30ignition/retry-umount.sh \
+  %{buildroot}%{dracutlibdir}/modules.d/99setup-root/initrd-setup-root \
+  %{buildroot}%{dracutlibdir}/modules.d/99setup-root/initrd-setup-root-after-ignition \
+  %{buildroot}%{dracutlibdir}/modules.d/99setup-root/gpg-agent-wrapper
 
 %check
-set -e
-
-./dracut/51usr-generator/testsuite.sh
+./test
 
 %files
 %license LICENSE
 %doc README.md
 %{dracutlibdir}/modules.d/*
 %{_sbindir}/update-bootengine
-%{_sbindir}/minimal-init
 
 %changelog
 * Tue Jan 27 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.38-1
