@@ -7241,8 +7241,8 @@
         "type": "other",
         "other": {
           "name": "ignition",
-          "version": "2.24.0",
-          "downloadUrl": "https://github.com/coreos/ignition/archive/refs/tags/v2.24.0.tar.gz"
+          "version": "2.22.0",
+          "downloadUrl": "https://github.com/coreos/ignition/archive/refs/tags/v2.22.0.tar.gz"
         }
       }
     },
