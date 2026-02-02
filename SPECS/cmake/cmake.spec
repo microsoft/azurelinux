@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,7 @@ Patch12:	CVE-2025-5917.patch
 Patch13:	CVE-2025-5918.patch
 Patch14:	CVE-2025-9301.patch
 Patch15:	CVE-2025-10148.patch
+Patch16:	CVE-2025-14017.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -112,6 +113,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-11
+- Patch for CVE-2025-14017
+
 * Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-10
 - Patch for CVE-2025-10148
 

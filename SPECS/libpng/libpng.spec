@@ -1,6 +1,6 @@
 Summary:        contains libraries for reading and writing PNG files.
 Name:           libpng
-Version:        1.6.52
+Version:        1.6.54
 Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
@@ -57,6 +57,9 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jan 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.54-1
+- Auto-upgrade to 1.6.54 - for CVE-2026-22695, CVE-2026-22801
+
 * Thu Dec 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.52-1
 - Auto-upgrade to 1.6.52 - for CVE-2025-66293
 

@@ -766,7 +766,9 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		return
 	}
 
-	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
+	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation.
+	// Note: --nogpgcheck is used here because GPG signature validation is performed earlier during package fetching (imagepkgfetcher)
+	// when VALIDATE_IMAGE_GPG=y is set. Packages in the local repo have already been verified.
 	err = shell.NewExecBuilder("tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck",
 		"--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/", releaseverCliArg).
 		StdoutCallback(onStdout).
@@ -830,7 +832,9 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 			stderr string
 		)
 
-		// Issue an install request but stop right before actually performing the install (assumeno)
+		// Issue an install request but stop right before actually performing the install (assumeno).
+		// Note: --nogpgcheck is safe here because this is a dry-run (--assumeno) and packages are validated
+		// during fetching when VALIDATE_IMAGE_GPG=y is set.
 		stdout, stderr, err = shell.Execute("tdnf", "install", releaseverCliArg, "--assumeno", "--nogpgcheck", pkg, "--installroot", installRoot)
 		if err != nil {
 			// tdnf aborts the process when it detects an install with --assumeno.
