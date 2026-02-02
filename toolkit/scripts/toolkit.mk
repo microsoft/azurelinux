@@ -78,7 +78,7 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
-$(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_component_extra_files) $(toolkit_root_files) $(rel_versions_macro_file)
+$(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_component_extra_files) $(toolkit_root_files)
 	rm -rf $(toolkit_prep_dir) && \
 	mkdir -p $(toolkit_prep_dir) && \
 	mkdir -p $(toolkit_repos_dir) && \
