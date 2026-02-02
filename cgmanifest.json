@@ -25153,8 +25153,8 @@
         "type": "other",
         "other": {
           "name": "python-systemd",
-          "version": "234",
-          "downloadUrl": "https://github.com/systemd/python-systemd/archive/v234.tar.gz"
+          "version": "235",
+          "downloadUrl": "https://github.com/systemd/python-systemd/archive/v235.tar.gz"
         }
       }
     },
