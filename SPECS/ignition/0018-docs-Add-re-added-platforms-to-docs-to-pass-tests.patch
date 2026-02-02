@@ -1,7 +1,7 @@
-From 9840bd7740f5667f8b2d6e3d87da226dab14bf83 Mon Sep 17 00:00:00 2001
+From 1e45cd2bea29d19cdce12c6708ae93b53a63e42f Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Mon, 4 Mar 2024 15:05:14 +0100
-Subject: [PATCH 17/19] docs: Add re-added platforms to docs to pass tests
+Subject: [PATCH 18/20] docs: Add re-added platforms to docs to pass tests
 
 Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Co-Authored-By: Krzesimir Nowak <knowak@microsoft.com
@@ -10,7 +10,7 @@ Co-Authored-By: Krzesimir Nowak <knowak@microsoft.com
  1 file changed, 4 insertions(+)
 
 diff --git a/docs/supported-platforms.md b/docs/supported-platforms.md
-index f8e1d3ae..0a30664c 100644
+index b81beee0..75cf5501 100644
 --- a/docs/supported-platforms.md
 +++ b/docs/supported-platforms.md
 @@ -15,6 +15,7 @@ Ignition is currently supported for the following platforms:
@@ -29,8 +29,8 @@ index f8e1d3ae..0a30664c 100644
 +* `rackspace-onmetal` - Ignition will read its configuration from the instance userdata. Cloud SSH keys are handled separately.
 +* `vagrant` - Ignition will read its configuration from the instance userdata. Cloud SSH keys are handled separately.
  * [Scaleway] (`scaleway`) - Ignition will read its configuration from the instance userdata. Cloud SSH keys are handled separately.
- * [UpCloud] (`upcloud`) - Ignition will read its configuration from the instance userdata fetched from the metadata service (which is NOT enabled by default, make sure you enable it if you use custom images). Cloud SSH keys are handled separately.
  * [VirtualBox] (`virtualbox`) - Use the VirtualBox guest property `/Ignition/Config` to provide the config to the virtual machine.
+ * [VMware] (`vmware`) - Use the VMware Guestinfo variables `ignition.config.data` and `ignition.config.data.encoding` to provide the config and its encoding to the virtual machine. Valid encodings are "", "base64", and "gzip+base64". Guestinfo variables can be provided directly or via an OVF environment, with priority given to variables specified directly.
 -- 
-2.51.0
+2.49.1
 
