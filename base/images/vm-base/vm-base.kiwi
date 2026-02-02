@@ -118,6 +118,5 @@
 
     <users>
           <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
-          <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
     </users>
 </image>

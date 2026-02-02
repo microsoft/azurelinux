@@ -8,14 +8,13 @@ License:        MIT
 URL:            https://aka.ms/azurelinux
 
 Source1:        50-default.network
-Source2:        10-azurelinux-firewalld.preset
-Source3:        azurelinux-firewalld-zone.xml
-Source4:        firewalld-azurelinux.conf
+Source2:        azurelinux-firewalld-zone.xml
+Source3:        firewalld-azurelinux.conf
 
 BuildArch:      noarch
 
 %description
-Provides AZL specifc configuration overrides via sub-packages. These sub-packages will be pulled in by the relevant owning packages via reverse dependencies.
+Provides AZL specific configuration overrides via sub-packages. These sub-packages will be pulled in by the relevant owning packages via reverse dependencies.
 
 
 %package systemd-networkd
@@ -38,13 +37,12 @@ Provides Azure Linux specific policies and zones for firewalld.
 
 %install
 install -d %{buildroot}%{_sysconfdir}/systemd/network
-install -m 644 %{_sourcedir}/50-default.network %{buildroot}%{_sysconfdir}/systemd/network/50-default.network
-install -d %{buildroot}%{_sysconfdir}/systemd/system-preset
-install -m 644 %{_sourcedir}/10-azurelinux-firewalld.preset %{buildroot}%{_sysconfdir}/systemd/system-preset/10-azurelinux-firewalld.preset
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/systemd/network/50-default.network
 install -d %{buildroot}%{_sysconfdir}/firewalld/zones
-install -m 644 %{_sourcedir}/azurelinux-firewalld-zone.xml %{buildroot}%{_sysconfdir}/firewalld/zones/azurelinux.xml
-install -m 644 %{_sourcedir}/firewalld-azurelinux.conf %{buildroot}%{_sysconfdir}/firewalld/firewalld-azurelinux.conf
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/firewalld/zones/azurelinux.xml
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/firewalld/firewalld-azurelinux.conf
 
+# We need the post/postun symlink to avoid littering /etc/firewalld with rpm save files.
 %post firewalld
 ln -sf %{_sysconfdir}/firewalld/firewalld-azurelinux.conf %{_sysconfdir}/firewalld/firewalld.conf
 
@@ -55,7 +53,6 @@ ln -sf %{_sysconfdir}/firewalld/firewalld-standard.conf %{_sysconfdir}/firewalld
 %config(noreplace) /etc/systemd/network/50-default.network
 
 %files firewalld
-%config(noreplace) /etc/systemd/system-preset/10-azurelinux-firewalld.preset
 %config(noreplace) /etc/firewalld/zones/azurelinux.xml
 %config(noreplace) /etc/firewalld/firewalld-azurelinux.conf
 
