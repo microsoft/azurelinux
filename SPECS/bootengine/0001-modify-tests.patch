@@ -4,13 +4,13 @@ Date: Thu, 29 Jan 2026 13:40:55 +0530
 Subject: [PATCH] modify tests
 
 ---
- dracut/51usr-generator/testsuite.sh | 4 ++--
+ dracut/10usr-generator/testsuite.sh | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/dracut/51usr-generator/testsuite.sh b/dracut/51usr-generator/testsuite.sh
+diff --git a/dracut/10usr-generator/testsuite.sh b/dracut/10usr-generator/testsuite.sh
 index b2b0c7c..d22e50b 100755
---- a/dracut/51usr-generator/testsuite.sh
-+++ b/dracut/51usr-generator/testsuite.sh
+--- a/dracut/10usr-generator/testsuite.sh
++++ b/dracut/10usr-generator/testsuite.sh
 @@ -50,7 +50,7 @@ After=remount-sysroot.service
  What=/foo
  Where=/sysroot/usr
