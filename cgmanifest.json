@@ -1107,8 +1107,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.15",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.15/bind-9.20.15.tar.xz"
+          "version": "9.20.18",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.18/bind-9.20.18.tar.xz"
         }
       }
     },
@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "41.0.139",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.139.tar.gz"
+          "version": "48.0.246",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v48.0.246.tar.gz"
         }
       }
     },
@@ -14382,8 +14382,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.25.4",
-          "downloadUrl": "https://nginx.org/download/nginx-1.25.4.tar.gz"
+          "version": "1.28.1",
+          "downloadUrl": "https://nginx.org/download/nginx-1.28.1.tar.gz"
         }
       }
     },
@@ -14464,6 +14464,16 @@
           "name": "nodejs",
           "version": "20.14.0",
           "downloadUrl": "https://nodejs.org/download/release/v20.14.0/node-v20.14.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nodejs24",
+          "version": "24.13.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.13.0/node-v24.13.0.tar.xz"
         }
       }
     },
