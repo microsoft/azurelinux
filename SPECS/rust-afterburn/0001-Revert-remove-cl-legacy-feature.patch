@@ -8,20 +8,22 @@ This reverts commit 3e4b623b390ab756a6be963eec7198b3e7f44e20.
 (dpark: Re-add hostname crate and its dependencies, as they are not
  included by default in 5.5.)
 
+Modified by - Sandeep Karambelkar <skarambelkar@microsoft.com>
+
 Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Signed-off-by: Dongsu Park <dpark@linux.microsoft.com>
 ---
- Cargo.lock                              | 33 ++++++++++-
+ Cargo.lock                              | 31 ++++++++++
  Cargo.toml                              |  4 ++
- src/metadata.rs                         |  8 +++
+ src/metadata.rs                         |  6 ++
  src/providers/mod.rs                    |  2 +
  src/providers/vagrant_virtualbox/mod.rs | 79 +++++++++++++++++++++++++
  src/util/cmdline.rs                     |  4 ++
- 6 files changed, 129 insertions(+), 1 deletion(-)
+ 6 files changed, 126 insertions(+)
  create mode 100644 src/providers/vagrant_virtualbox/mod.rs
 
 diff --git a/Cargo.lock b/Cargo.lock
-index a4b7224..c2e3cc9 100644
+index 0cfbbeb..d9e9171 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -31,6 +31,7 @@ dependencies = [
@@ -32,49 +34,58 @@ index a4b7224..c2e3cc9 100644
   "ipnetwork",
   "libflate",
   "libsystemd",
-@@ -812,6 +813,17 @@ dependencies = [
+@@ -830,6 +831,17 @@ dependencies = [
   "digest",
  ]
- 
+
 +[[package]]
 +name = "hostname"
-+version = "0.4.2"
++version = "0.4.0"
 +source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "617aaa3557aef3810a6369d0a99fac8a080891b68bd9f9812a1eeda0c0730cbd"
++checksum = "f9c7c7c8ac16c798734b8a24560c1362120597c40d5e1459f09498f8f6c8f2ba"
 +dependencies = [
 + "cfg-if",
 + "libc",
-+ "windows-link 0.2.0",
++ "windows",
 +]
 +
  [[package]]
  name = "http"
  version = "1.3.1"
-@@ -2478,6 +2490,16 @@ version = "0.4.0"
+@@ -2626,6 +2638,25 @@ version = "0.4.0"
  source = "registry+https://github.com/rust-lang/crates.io-index"
- checksum = "45e46c0661abb7180e7b9c281db115305d49ca1709ab8242adf09666d2173c65"
- 
+ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
 +[[package]]
 +name = "windows"
-+version = "0.62.0"
++version = "0.52.0"
 +source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "9579d0e6970fd5250aa29aba5994052385ff55cf7b28a059e484bb79ea842e42"
++checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
 +dependencies = [
 + "windows-core",
 + "windows-targets 0.52.6",
 +]
 +
++[[package]]
++name = "windows-core"
++version = "0.52.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
++dependencies = [
++ "windows-targets 0.52.6",
++]
++
  [[package]]
- name = "windows-registry"
- version = "0.5.3"
+ name = "windows-link"
+ version = "0.1.1"
 diff --git a/Cargo.toml b/Cargo.toml
-index 0929be8..7cd4b91 100644
+index e11445f..a529f40 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -33,11 +33,15 @@ path = "src/main.rs"
  # We assume we're being delivered via e.g. RPM which supports split debuginfo
  debug = true
- 
+
 +[features]
 +cl-legacy = []
 +
@@ -88,19 +99,10 @@ index 0929be8..7cd4b91 100644
  libflate = "2.1"
  libsystemd = ">= 0.2.1, < 0.8.0"
 diff --git a/src/metadata.rs b/src/metadata.rs
-index 94f9238..2ad1c8e 100644
+index bd311f7..59b765d 100644
 --- a/src/metadata.rs
 +++ b/src/metadata.rs
-@@ -35,6 +35,8 @@ use crate::providers::packet::PacketProvider;
- use crate::providers::powervs::PowerVSProvider;
- use crate::providers::proxmoxve;
- use crate::providers::scaleway::ScalewayProvider;
-+#[cfg(feature = "cl-legacy")]
-+use crate::providers::vagrant_virtualbox::VagrantVirtualboxProvider;
- use crate::providers::upcloud::UpCloudProvider;
- use crate::providers::vmware::VmwareProvider;
- use crate::providers::vultr::VultrProvider;
-@@ -60,6 +62,10 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
+@@ -60,6 +60,10 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
          "cloudstack-configdrive" => box_result!(ConfigDrive::try_new()?),
          "digitalocean" => box_result!(DigitalOceanProvider::try_new()?),
          "exoscale" => box_result!(ExoscaleProvider::try_new()?),
@@ -111,29 +113,28 @@ index 94f9238..2ad1c8e 100644
          "gcp" => box_result!(GcpProvider::try_new()?),
          "hetzner" => box_result!(HetznerProvider::try_new()?),
          // IBM Cloud - VPC Generation 2.
-@@ -73,6 +79,8 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
+@@ -73,6 +77,8 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
          "powervs" => box_result!(PowerVSProvider::try_new()?),
          "proxmoxve" => proxmoxve::try_config_drive_else_leave(),
          "scaleway" => box_result!(ScalewayProvider::try_new()?),
-+        #[cfg(feature = "cl-legacy")]
++       #[cfg(feature = "cl-legacy")]
 +        "vagrant-virtualbox" => box_result!(VagrantVirtualboxProvider::new()),
-         "upcloud" => box_result!(UpCloudProvider::try_new()?),
          "vmware" => box_result!(VmwareProvider::try_new()?),
          "vultr" => box_result!(VultrProvider::try_new()?),
+         _ => bail!("unknown provider '{}'", provider),
 diff --git a/src/providers/mod.rs b/src/providers/mod.rs
-index e17d551..6fe44b6 100644
+index dab07e1..0d69c4f 100644
 --- a/src/providers/mod.rs
 +++ b/src/providers/mod.rs
-@@ -40,6 +40,8 @@ pub mod packet;
+@@ -41,6 +41,8 @@ pub mod packet;
  pub mod powervs;
  pub mod proxmoxve;
  pub mod scaleway;
 +#[cfg(feature = "cl-legacy")]
 +pub mod vagrant_virtualbox;
- pub mod upcloud;
  pub mod vmware;
  pub mod vultr;
- 
+
 diff --git a/src/providers/vagrant_virtualbox/mod.rs b/src/providers/vagrant_virtualbox/mod.rs
 new file mode 100644
 index 0000000..d7a9e0e
@@ -225,16 +226,15 @@ index d07cfeb..2e96ce4 100644
 +++ b/src/util/cmdline.rs
 @@ -23,7 +23,11 @@ use anyhow::{bail, Context, Result};
  use slog_scope::trace;
- 
+
  /// Platform key.
 +#[cfg(not(feature = "cl-legacy"))]
  const CMDLINE_PLATFORM_FLAG: &str = "ignition.platform.id";
 +/// Platform key (CL and RHCOS legacy name: "OEM").
 +#[cfg(feature = "cl-legacy")]
 +const CMDLINE_PLATFORM_FLAG: &str = "coreos.oem.id";
- 
+
  /// Get platform value from cmdline file.
  pub fn get_platform(fpath: &str) -> Result<String> {
--- 
-2.44.2
-
+--
+2.45.4
