@@ -17913,8 +17913,8 @@
         "type": "other",
         "other": {
           "name": "perl-GD-Barcode",
-          "version": "1.15",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KW/KWITKNR/GD-Barcode-1.15.tar.gz"
+          "version": "2.00",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/GD/GD-Barcode-2.00.tar.gz"
         }
       }
     },
