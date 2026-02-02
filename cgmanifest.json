@@ -1228,7 +1228,7 @@
         "other": {
           "name": "bootengine",
           "version": "0.0.38",
-          "downloadUrl": "https://github.com/flatcar/bootengine/archive/7d9895ce55617b18a78294975197975ac17b5bc3.tar.gz"
+          "downloadUrl": "https://github.com/flatcar/bootengine/archive/daf43bf9c1ca45bf1a43566c3a6f96ec0cb44a36.tar.gz"
         }
       }
     },
