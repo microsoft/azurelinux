@@ -6,8 +6,8 @@
 %global crate afterburn
 
 Name:           rust-%{crate}
-Version:        5.10.0
-Release:        3%{?dist}
+Version:        5.8.2
+Release:        1%{?dist}
 Summary:        Simple cloud provider agent
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -146,7 +146,7 @@ make test
 %{dracutmodulesdir}/30afterburn/
 
 %changelog
-* Thu Jan 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.10.0-3
+* Thu Jan 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.8.2-1
 - Initial Azure Linux import from Fedora 43 (license: MIT)
 - License verified
 
