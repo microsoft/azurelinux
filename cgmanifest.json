@@ -27534,8 +27534,8 @@
         "type": "other",
         "other": {
           "name": "rust-afterburn",
-          "version": "5.10.0",
-          "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.10.0.tar.gz"
+          "version": "5.8.2",
+          "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
         }
       }
     },
