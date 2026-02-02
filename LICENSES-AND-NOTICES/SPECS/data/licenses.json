@@ -3166,6 +3166,8 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
+                "coreos-cloudinit",
+                "coreos-init",
                 "python-nocaselist"
             ]
         },
