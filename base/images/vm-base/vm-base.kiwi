@@ -56,6 +56,8 @@
         <package name="dnf" />
         <package name="dracut-config-generic" />
         <package name="dracut-kiwi-oem-repart"/>
+        <package name="firewalld"/>
+        <package name="azurelinux-config-firewalld"/>
         <package name="glibc-langpack-en" />
         <package name="glibc-locale-source" />
         <package name="glibc-minimal-langpack" />
@@ -86,7 +88,7 @@
         <package name="sudo" />
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
-	<package name="azurelinux-config-systemd-networkd" />
+        <package name="azurelinux-config-systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="systemd" />
         <package name="tar" />
@@ -116,6 +118,6 @@
 
     <users>
           <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
-	  <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
+          <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
     </users>
 </image>

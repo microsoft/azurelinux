@@ -57,6 +57,7 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.file]
 [components.filesystem]
 [components.findutils]
+[components.firewalld]
 [components.fonts-rpm-macros]
 [components.fstrm]
 [components.fuse]

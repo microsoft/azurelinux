@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>azurelinux</short>
+  <description>For use in azure cloud vms with zero trust policy. Only ssh is allowed by default. If we need dynamic IPv6 addressing dhcpv6-client will have to be enabled.</description>
+  <service name="ssh"/>
+  <!--
+  <service name="dhcpv6-client"/>
+  -->
+  <forward/>
+</zone>
