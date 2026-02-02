@@ -19,12 +19,14 @@ specs_dir_name = $(notdir $(SPECS_DIR))
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar*
 toolkit_root_files = $(wildcard $(toolkit_root)/*)
 toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
+rel_versions_macro_file_name = macros.releaseversions
+rel_versions_macro_file = $(PKGBUILD_DIR)/$(rel_versions_macro_file_name)
+rel_versions_macro_file_dest = $(toolkit_prep_dir)/$(rel_versions_macro_file_name)
 
 # Build files
 rpms_snapshot_dir_name = rpms_snapshots
 rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
 rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.log
-rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 valid_arch_spec_names_build_dir = $(BUILD_DIR)/valid_arch_spec_names
@@ -73,11 +75,10 @@ $(toolkit_archive_versioned_compressed): $(toolkit_archive) $(rpms_snapshot) $(d
 	cp $(toolkit_archive) $(toolkit_archive_versioned) && \
 	echo "$(toolkit_version)" > $(toolkit_release_file) && \
 	cp $(rpms_snapshot) $(toolkit_rpms_snapshot_file) && \
-	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
 	tar --update -f $(toolkit_archive_versioned) -C $(toolkit_build_dir) $(toolkit_release_file_relative_path) $(toolkit_rpms_snapshot_file_relative_path) && \
 	$(ARCHIVE_TOOL) --best -c $(toolkit_archive_versioned) > $(toolkit_archive_versioned_compressed)
 
-$(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_component_extra_files) $(toolkit_root_files)
+$(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_component_extra_files) $(toolkit_root_files) $(rel_versions_macro_file)
 	rm -rf $(toolkit_prep_dir) && \
 	mkdir -p $(toolkit_prep_dir) && \
 	mkdir -p $(toolkit_repos_dir) && \
@@ -85,6 +86,7 @@ $(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_componen
 	cp -r $(toolkit_root_files) $(toolkit_prep_dir) && \
 	cp $(mariner_repos_files) $(toolkit_repos_dir) && \
 	cp $(toolkit_component_extra_files) $(toolkit_prep_dir) && \
+	cp $(rel_versions_macro_file) $(rel_versions_macro_file_dest) && \
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
 	rm -rf $(toolkit_prep_dir)/out && \
 	tar -cvp -f $(toolkit_archive) -C $(dir $(toolkit_prep_dir)) $(notdir $(toolkit_prep_dir))
