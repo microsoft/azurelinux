@@ -29,7 +29,7 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 2
+%global target_kernel_release 3
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -41,7 +41,7 @@
 
 %{!?_name: %define _name isert-hwe}
 %{!?_version: %define _version 25.07}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-2%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-3%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -67,7 +67,7 @@
 Summary:	 %{_name}-hwe Driver
 Name:		 isert-hwe
 Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Release:	 3%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -251,6 +251,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Mon Feb 02 2026 Sean Dougherty <sdougherty@microsoft.com> - 25.07-3_6.12.57.1.3
+- Bump release to match kernel-hwe
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
 - Bump to match kernel-hwe.
 

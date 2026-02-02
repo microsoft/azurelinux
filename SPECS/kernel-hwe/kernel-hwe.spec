@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.57.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -423,6 +423,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Feb 02 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.12.57.1-3
+- Enable CONFIG_SQUASHFS_ZSTD and CONFIG_FW_CFG_SYSFS
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
 - Enable aarch64 kernel configs for performance improvements.
 
