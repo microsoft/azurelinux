@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.57.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -423,9 +423,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Jan 05 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
 - Enable Aquantia AQtion ethernet driver configs in HWE kernel
 - Enable CONFIG_DMABUF_MOVE_NOTIFY and CONFIG_HSA_AMD_P2P configs in HWE kernel
+
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
+- Enable aarch64 kernel configs for performance improvements.
 
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.57.1-1
 - Kernel upgrade

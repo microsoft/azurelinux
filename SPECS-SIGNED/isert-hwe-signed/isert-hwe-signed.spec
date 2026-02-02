@@ -32,19 +32,19 @@
 
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 2
+%global target_kernel_release 3
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-2%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-3%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Release:	 3%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -110,8 +110,11 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-isert-*.conf
 
 %changelog
-* Mon Jan 05 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
-- Bump to match kernel-hwe
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-3_6.12.57.1.3
+- Bump to match kernel-hwe.
+
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
+- Bump to match kernel-hwe.
 
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
 - Upgrade version to 25.07.
