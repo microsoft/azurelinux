@@ -96,7 +96,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %endif
 
 %changelog
-* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 0.24.3-7
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 0.24.3-8
 - Bump release to rebuild with rust
 
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.24.3-7
