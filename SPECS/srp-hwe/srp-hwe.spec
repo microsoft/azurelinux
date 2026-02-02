@@ -27,7 +27,7 @@
 #
 
 %if 0%{azl}
-# hard code versions due to ADO bug:58993948
+
 %global target_azl_build_kernel_version %azl_kernel_hwe_version
 %global target_kernel_release %azl_kernel_hwe_release
 %global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
