@@ -408,6 +408,6 @@
     </packages>
 
     <users>
-        <user name="root" password="123" pwdformat="plain" home="/root" groups="root"/>
+        <user name="root" password=" pwdformat="plain" home="/root" groups="root"/>
     </users>
 </image>
