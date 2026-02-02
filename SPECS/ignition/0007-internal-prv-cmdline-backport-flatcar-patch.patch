@@ -1,7 +1,7 @@
-From aafc9c756610faffad5bf28eb2c4661e6df5b4b9 Mon Sep 17 00:00:00 2001
+From f84e3ffe1e864515a4552c457268db801277380d Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Mon, 19 Feb 2024 18:12:22 +0100
-Subject: [PATCH 06/19] internal/prv/cmdline: backport flatcar patch
+Subject: [PATCH 07/20] internal/prv/cmdline: backport flatcar patch
 
 this patch provides backward compatibility for various config
 key
@@ -36,5 +36,5 @@ index 30203bff..86a5cb79 100644
  		}
  
 -- 
-2.51.0
+2.49.1
 

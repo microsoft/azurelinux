@@ -1,7 +1,7 @@
-From f1d4bbdd0ae6e123301837e9de77dffd199c3ec5 Mon Sep 17 00:00:00 2001
+From d4896d39233152d8fb772fa509a7d02134980fe8 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Tue, 20 Feb 2024 10:12:02 +0100
-Subject: [PATCH 10/19] VMware: Fix guestinfo.*.config.data and *.config.url
+Subject: [PATCH 11/20] VMware: Fix guestinfo.*.config.data and *.config.url
  variables
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -164,5 +164,5 @@ index 597c33fd..3680a4cd 100644
  
  func delConfig(f *resource.Fetcher) error {
 -- 
-2.51.0
+2.49.1
 

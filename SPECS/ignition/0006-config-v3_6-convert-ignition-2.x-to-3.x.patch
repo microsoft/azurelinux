@@ -1,7 +1,7 @@
-From 60e42b49e60202310a0fd38c468191eaba9fca28 Mon Sep 17 00:00:00 2001
+From 1c451c17c202fa1a27888bfe76d192e077d13ab8 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Thu, 24 Oct 2024 10:20:45 +0200
-Subject: [PATCH 04/19] config/v3_6: convert ignition 2.x to 3.x
+Subject: [PATCH 06/20] config/v3_6: convert ignition 2.x to 3.x
 
 if the version of ignition is 2.x we convert it to 3.x using
 ign-converter.
@@ -72,5 +72,5 @@ index 3be26cae..ea367663 100644
  		return Parse(raw)
  	}
 -- 
-2.51.0
+2.49.1
 

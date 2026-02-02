@@ -1,7 +1,7 @@
-From 74b323eea057235dd0aa755f115fbb44a9ae7a8a Mon Sep 17 00:00:00 2001
+From d4cbad99a8dfce27c34d6373b49c50b3a2942bb3 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Wed, 22 Sep 2021 14:53:49 +0200
-Subject: [PATCH 09/19] internal/disk/fs: ignore fs format mismatches for the
+Subject: [PATCH 10/20] internal/disk/fs: ignore fs format mismatches for the
  OEM partition
 
 As soon as the OEM partition's filesystem format changes, all users
@@ -22,7 +22,7 @@ Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/internal/exec/stages/disks/filesystems.go b/internal/exec/stages/disks/filesystems.go
-index a12c59d7..360267ff 100644
+index c575ced4..fefd1fff 100644
 --- a/internal/exec/stages/disks/filesystems.go
 +++ b/internal/exec/stages/disks/filesystems.go
 @@ -126,7 +126,7 @@ func (s stage) createFilesystem(fs types.Filesystem) error {
@@ -33,7 +33,7 @@ index a12c59d7..360267ff 100644
 +		if (info.Type == fileSystemFormat || info.Label == "OEM") &&
  			(fs.Label == nil || info.Label == *fs.Label) &&
  			(fs.UUID == nil || canonicalizeFilesystemUUID(info.Type, info.UUID) == canonicalizeFilesystemUUID(fileSystemFormat, *fs.UUID)) {
- 			s.Info("filesystem at %q is already correctly formatted. Skipping mkfs...", fs.Device)
+ 			s.Logger.Info("filesystem at %q is already correctly formatted. Skipping mkfs...", fs.Device)
 -- 
-2.51.0
+2.49.1
 

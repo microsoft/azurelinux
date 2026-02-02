@@ -1,7 +1,7 @@
-From b617624e830507f68268db881fdb1576ed25fb41 Mon Sep 17 00:00:00 2001
+From 70d0e48e5339081461a4a6815a07ee80e0d39310 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Wed, 25 May 2022 10:38:16 +0200
-Subject: [PATCH 13/19] Revert "*: drop OEM URI support"
+Subject: [PATCH 14/20] Revert "*: drop OEM URI support"
 
 This reverts commit 0c088d6de77aa1b1f47b9252a07f51cb1e249df3.
 ---
@@ -68,7 +68,7 @@ index bf1f3a5e..63297beb 100644
  	case "s3":
  		if v, ok := u.Query()["versionId"]; ok {
 diff --git a/config/v3_4/types/url.go b/config/v3_4/types/url.go
-index b1f96337..752044ce 100644
+index 9b2b4405..5258c3c6 100644
 --- a/config/v3_4/types/url.go
 +++ b/config/v3_4/types/url.go
 @@ -32,7 +32,7 @@ func validateURL(s string) error {
@@ -81,7 +81,7 @@ index b1f96337..752044ce 100644
  	case "s3":
  		if v, ok := u.Query()["versionId"]; ok {
 diff --git a/docs/supported-platforms.md b/docs/supported-platforms.md
-index afd49437..f8e1d3ae 100644
+index 5f508761..b81beee0 100644
 --- a/docs/supported-platforms.md
 +++ b/docs/supported-platforms.md
 @@ -12,6 +12,7 @@ Ignition is currently supported for the following platforms:
@@ -93,7 +93,7 @@ index afd49437..f8e1d3ae 100644
  * [CloudStack] (`cloudstack`) - Ignition will read its configuration from the instance userdata via either metadata service or config drive. Cloud SSH keys are handled separately.
  * [DigitalOcean] (`digitalocean`) - Ignition will read its configuration from the droplet userdata. Cloud SSH keys and network configuration are handled separately.
 diff --git a/internal/distro/distro.go b/internal/distro/distro.go
-index 9d9351e7..f3c32aaf 100644
+index eb4c3179..2726d705 100644
 --- a/internal/distro/distro.go
 +++ b/internal/distro/distro.go
 @@ -23,13 +23,17 @@ import (
@@ -132,7 +132,7 @@ index 9d9351e7..f3c32aaf 100644
  func GroupaddCmd() string  { return groupaddCmd }
  func GroupdelCmd() string  { return groupdelCmd }
 diff --git a/internal/resource/url.go b/internal/resource/url.go
-index 5f08f059..a9f7f7ba 100644
+index 354385fa..f7b855d8 100644
 --- a/internal/resource/url.go
 +++ b/internal/resource/url.go
 @@ -23,10 +23,12 @@ import (
@@ -158,7 +158,7 @@ index 5f08f059..a9f7f7ba 100644
  	"github.com/flatcar/ignition/v2/internal/util"
  	"golang.org/x/oauth2/google"
  	"google.golang.org/api/option"
-@@ -165,6 +169,8 @@ func (f *Fetcher) FetchToBuffer(u url.URL, opts FetchOptions) ([]byte, error) {
+@@ -170,6 +174,8 @@ func (f *Fetcher) FetchToBuffer(u url.URL, opts FetchOptions) ([]byte, error) {
  		err = f.fetchFromTFTP(u, dest, opts)
  	case "data":
  		err = f.fetchFromDataURL(u, dest, opts)
@@ -166,8 +166,8 @@ index 5f08f059..a9f7f7ba 100644
 +		err = f.fetchFromOEM(u, dest, opts)
  	case "s3", "arn":
  		buf := &s3buf{
- 			WriteAtBuffer: manager.NewWriteAtBuffer([]byte{}),
-@@ -237,6 +243,8 @@ func (f *Fetcher) Fetch(u url.URL, dest *os.File, opts FetchOptions) error {
+ 			WriteAtBuffer: aws.NewWriteAtBuffer([]byte{}),
+@@ -242,6 +248,8 @@ func (f *Fetcher) Fetch(u url.URL, dest *os.File, opts FetchOptions) error {
  		return f.fetchFromTFTP(u, dest, opts)
  	case "data":
  		return f.fetchFromDataURL(u, dest, opts)
@@ -176,7 +176,7 @@ index 5f08f059..a9f7f7ba 100644
  	case "s3", "arn":
  		return f.fetchFromS3(u, dest, opts)
  	case "gs":
-@@ -447,6 +455,53 @@ type s3target interface {
+@@ -450,6 +458,53 @@ type s3target interface {
  	io.ReadSeeker
  }
  
@@ -230,7 +230,7 @@ index 5f08f059..a9f7f7ba 100644
  // FetchFromS3 gets data from an S3 bucket as described by u and writes it into
  // dest, returning an error if one is encountered. It will attempt to acquire
  // IAM credentials from the EC2 metadata service, and if this fails will attempt
-@@ -735,3 +790,39 @@ func (f *Fetcher) parseARN(arnURL string) (string, string, string, string, error
+@@ -725,3 +780,39 @@ func (f *Fetcher) parseARN(arnURL string) (string, string, string, string, error
  	key := strings.Join(urlSplit[1:], "/")
  	return bucket, key, "", regionHint, nil
  }
@@ -271,5 +271,5 @@ index 5f08f059..a9f7f7ba 100644
 +	)
 +}
 -- 
-2.51.0
+2.49.1
 

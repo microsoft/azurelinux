@@ -1,7 +1,7 @@
-From 719b3ca13660a9d53afef3c4f0a4ac1824af5615 Mon Sep 17 00:00:00 2001
+From 158a17fe6da1c9e30f8d177e375a7424e19954b4 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mathieu@kinvolk.io>
 Date: Thu, 2 Sep 2021 11:03:17 +0200
-Subject: [PATCH 08/19] config/3_6/test: add ignition 2.x test cases
+Subject: [PATCH 09/20] config/3_6/test: add ignition 2.x test cases
 
 Signed-off-by: Mathieu Tortuyaux <mathieu@kinvolk.io>
 ---
@@ -40,5 +40,5 @@ index 54cbd91c..99f2e3dd 100644
  			in:  in{config: []byte(`{"ignition": {"version": "3.0.0"}}`)},
  			out: out{config: types.Config{Ignition: types.Ignition{Version: types.MaxVersion.String()}}},
 -- 
-2.51.0
+2.49.1
 
