@@ -1,7 +1,7 @@
-From 60a6c5a81e06fbaed6939ac925937ca941f0732e Mon Sep 17 00:00:00 2001
+From 198f62a4845d171bbdc73893715da2fb6b4df382 Mon Sep 17 00:00:00 2001
 From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
 Date: Tue, 20 Feb 2024 10:25:24 +0100
-Subject: [PATCH 16/19] revert: internal/oem: drop noop OEMs
+Subject: [PATCH 17/20] revert: internal/oem: drop noop OEMs
 
 This reverts: https://github.com/flatcar/ignition/commit/26828f92e00060aa8ebf2197545ad602af237132
 
@@ -42,5 +42,5 @@ index 27c923d4..ae259f8f 100644
  
  func fetchConfig(f *resource.Fetcher) (types.Config, report.Report, error) {
 -- 
-2.51.0
+2.49.1
 
