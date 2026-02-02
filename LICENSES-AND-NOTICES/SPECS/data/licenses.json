@@ -3171,6 +3171,8 @@
             "license": "Same as the source project.",
             "specs": [
                 "azure-vm-utils",
+                "coreos-cloudinit",
+                "coreos-init",
                 "python-nocaselist"
             ]
         },
