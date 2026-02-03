@@ -2,6 +2,7 @@ From c35c77748f7ed54c0deee7dcf874a7acb4856008 Mon Sep 17 00:00:00 2001
 From: Archana Shettigar <v-shettigara@microsoft.com>
 Date: Tue, 3 Feb 2026 12:59:16 +0530
 Subject: [PATCH] Use vendored packaging to canonicalize requirements
+Upstream Reference Patch: https://github.com/pypa/wheel/commit/4ec2ae368bb30b0a92617824f833ae615aca18cf
 
 ---
  tests/test_metadata.py | 6 +++---
