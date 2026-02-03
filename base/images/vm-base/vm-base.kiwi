@@ -18,7 +18,7 @@
             format="vhdx"
             initrd_system="dracut"
             filesystem="ext4"
-            kernelcmdline="console=ttyS0 rd.shell=0 systemd.getty_auto=false"
+            kernelcmdline="console=ttyS0 rd.shell=0"
             firmware="uefi"
             overlayroot="false"
             eficsm="false"
