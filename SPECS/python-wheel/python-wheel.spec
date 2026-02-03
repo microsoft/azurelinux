@@ -3,7 +3,7 @@
 %bcond main_python 1
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
-Version:        0.43.0
+Version:        0.46.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -115,6 +115,9 @@ pip3 install iniconfig
 %endif
 
 %changelog
+* Tue Feb 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.46.3-1
+- Auto-upgrade to 0.46.3 - for CVE-2026-24049
+
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
 
