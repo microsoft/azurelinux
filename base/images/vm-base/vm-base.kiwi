@@ -25,7 +25,7 @@
             bootpartition="false"
             efipartsize="200">
             <bootloader name="systemd_boot" timeout="0" />
-            <size unit="G">2</size>
+            <size unit="G">4</size>
             <initrd action="setup">
                 <dracut uefi="true"/>
             </initrd>
