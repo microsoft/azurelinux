@@ -121,7 +121,7 @@ pip3 install iniconfig
 
 %changelog
 * Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.46.3-1
-- Updated to 0.46.2 to fix CVE-2026-24049
+- Updated to 0.46.3 to fix CVE-2026-24049
 
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
