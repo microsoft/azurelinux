@@ -328,13 +328,13 @@ dracut-hostonly
 dracut-vrf
 grub2-configuration
 grub2-efi-binary
-wget-libs                 
+wget-libs
 ca-certificates-base
 ca-certificates-tools
-ca-certificates-shared    
-expat-libs              
+ca-certificates-shared
+expat-libs
 sgx-backwards-compatibility
-initramfs                 
+initramfs
 gptfdisk
 iana-etc
 util-linux-libs
