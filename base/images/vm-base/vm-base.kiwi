@@ -41,12 +41,10 @@
         <!-- Azure Linux Only packages-->
         <package name = "azurelinux-repos" />
         <!-- Core System -->
-        <package name="basesystem" />
         <package name="bash" />
         <package name="bash-completion" />
         <package name="coreutils" />
         <package name="cpio" />
-        <package name="filesystem" />
         <package name="findutils" />
         <package name="glibc" />
         <package name="glibc-langpack-en" />
@@ -58,7 +56,6 @@
         <package name="sed" />
         <package name="shadow-utils" />
         <package name="shadow-utils-subid" />
-        <package name="system-release" />
         <package name="systemd" />
         <package name="systemd-libs" />
         <package name="util-linux" />
@@ -271,7 +268,6 @@
         <package name="acl"/>
         <package name="attr"/>
         <package name="cyrus-sasl"/>
-        <package name="shim"/>
         <package name="kernel-devel"/>
         <package name="kernel-headers"/>
         <package name="kernel-tools"/>
@@ -367,9 +363,6 @@
         <package name="cronie"/>
         <package name="cronie-anacron"/>
         <package name="tini"/>
-        <package name="containerd"/>
-        <package name="docker-cli"/>
-        <package name="runc"/>
         <package name="postgresql-libs"/>
         <package name="bc"/>
         <package name="chkconfig"/>
@@ -381,7 +374,6 @@
         <package name="glib"/>
         <package name="irqbalance"/>
         <package name="iw"/>
-        <package name="moby-engine"/>
         <package name="ncurses-term"/>
         <package name="newt"/>
         <package name="nghttp2"/>
@@ -408,6 +400,6 @@
     </packages>
 
     <users>
-        <user name="root" password=" pwdformat="plain" home="/root" groups="root"/>
+        <user name="root" password="123" pwdformat="plain" home="/root" groups="root"/>
     </users>
 </image>
