@@ -86,7 +86,7 @@
         <package name="sudo" />
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
-	<package name="azurelinux-config-systemd-networkd" />
+        <package name="azurelinux-config-systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="systemd" />
         <package name="tar" />
@@ -114,8 +114,9 @@
         <package name="system-release" />
     </packages>
 
+    <!-- No users added by default, let cloud-init take care of it.
     <users>
-          <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
-	  <user name="azureuser" password="INSERT-PASSWORD-HERE" home="/home/azureuser" groups="root,wheel" />
+    <user name="root" password="" groups="root" />
     </users>
+    -->
 </image>

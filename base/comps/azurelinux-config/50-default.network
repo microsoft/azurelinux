@@ -2,5 +2,6 @@
 [Match]
 Name=*
 
+# We will not enable DHCP. Let cloud-init do it for us.
 [Network]
-DHCP=yes
+# DHCP=yes

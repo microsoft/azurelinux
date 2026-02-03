@@ -81,8 +81,6 @@ function boot_vm() {
 if [[ "$image_type" == "container" ]] ; then
     build_container_image
 elif [[ "$image_type" == "vm" || "$image_type" == "vm-boot" ]] ; then
-    # You may need this cleanup until azldev is fixed:
-    # sudo rm -rf $(git rev-parse --show-toplevel)/base/out/images
     build_vm_image
     if [[ "$image_type" == "vm-boot" ]] ; then
 	boot_vm "$(mktemp -u XXXXXX)"
