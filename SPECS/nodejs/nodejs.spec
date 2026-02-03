@@ -148,14 +148,18 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Tue Feb 03 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-13
-- Add nodejs provides to manage co existence with nodejs24
-* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-12
+* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-13
 - Patch for CVE-2025-55130
+
+* Thu Jan 29 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-12
+- Add nodejs provides to manage co existence with nodejs24
+
 * Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-11
 - Patch for CVE-2026-21637, CVE-2025-59466, CVE-2025-59465, CVE-2025-55132, CVE-2025-55131
+
 * Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-10
 - Patch for CVE-2025-5222
+
 * Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
 - Patch CVE-2025-23165, CVE-2025-23166
 
