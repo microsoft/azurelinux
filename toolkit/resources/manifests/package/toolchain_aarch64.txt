@@ -122,11 +122,11 @@ gdbm-lang-1.23-1.azl3.aarch64.rpm
 gettext-0.22-1.azl3.aarch64.rpm
 gettext-debuginfo-0.22-1.azl3.aarch64.rpm
 gfortran-13.2.0-7.azl3.aarch64.rpm
-glib-2.78.6-6.azl3.aarch64.rpm
-glib-debuginfo-2.78.6-6.azl3.aarch64.rpm
-glib-devel-2.78.6-6.azl3.aarch64.rpm
-glib-doc-2.78.6-6.azl3.noarch.rpm
-glib-schemas-2.78.6-6.azl3.aarch64.rpm
+glib-2.78.6-7.azl3.aarch64.rpm
+glib-debuginfo-2.78.6-7.azl3.aarch64.rpm
+glib-devel-2.78.6-7.azl3.aarch64.rpm
+glib-doc-2.78.6-7.azl3.noarch.rpm
+glib-schemas-2.78.6-7.azl3.aarch64.rpm
 glibc-2.38-18.azl3.aarch64.rpm
 glibc-debuginfo-2.38-18.azl3.aarch64.rpm
 glibc-devel-2.38-18.azl3.aarch64.rpm
