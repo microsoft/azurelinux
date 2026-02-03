@@ -78,13 +78,7 @@ This package contains the yaml file requried to download and run the
 kured container in a kubernetes cluster.
 
 %prep
-%setup -q
-%patch 2 -p1
-%patch 0 -p1
-
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-%patch 1 -p1
+%autosetup -p1 -a1
 
 %build
 
