@@ -136,7 +136,8 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 
 
 %files
-%doc LICENSE NEWS ChangeLog README
+%doc NEWS ChangeLog README
+%license LICENSE
 %{_bindir}/gltpd
 %{_bindir}/ogdi_*
 %{_libdir}/libogdi.so.*
@@ -162,7 +163,7 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 %changelog
 * Mon Feb 02 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.1.1-4
 - Rebuilt with updated tcl version dependency for ogdi-tcl subpackage
-- to resolve installation failure.
+- to resolve installation failure and license issue.
 
 * Wed Dec 11 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.1.1-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
