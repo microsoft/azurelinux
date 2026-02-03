@@ -87,7 +87,6 @@
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
-        <package name="systemd-resolved" />
         <package name="systemd" />
         <package name="tar" />
         <package name="util-linux" />
