@@ -163,12 +163,6 @@ make cctest
 * Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
 - Patch CVE-2025-23165, CVE-2025-23166
 
-* Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-10
-- Patch for CVE-2025-5222
-
-* Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
-- Patch CVE-2025-23165, CVE-2025-23166
-
 * Wed May 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-8
 - Patch CVE-2025-47279
 
