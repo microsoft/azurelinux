@@ -20,22 +20,12 @@ for prereq in azldev kiwi createrepo_c docker; do
     fi
 done
 
-# Build azurelinux-rpm-config to generate system macros, etc.
-azldev comp build azurelinux-rpm-config && createrepo_c ./base/out
-# Build azurelinux-release and azurelinux-repos to provide repo files and release info.
-# They require the rpm-config package to be built first.
-azldev comp build azurelinux-release --local-repo ./base/out && createrepo_c ./base/out
-azldev comp build azurelinux-repos --local-repo ./base/out && createrepo_c ./base/out
-# Build rpm to ensure the azl-specific vendor tag is configured.
-azldev comp build rpm --local-repo ./base/out && createrepo_c ./base/out
+# Build necessary components in specified order, adding to repo along the way:
+azldev comp build --local-repo-with-publish ./base/out azurelinux-rpm-config azurelinux-release azurelinux-repos rpm
+
 # Build a base container image using these private RPMs and upstream Fedora packages.
-sudo kiwi --loglevel 10 \
-    --kiwi-file container-base.kiwi \
-    system build \
-    --description ./base/images/container-base \
-    --target-dir ./base/out/images \
-    --add-repo="file:///$PWD/base/out,rpm-md,azl,1"
+azldev image build --local-repo ./base/out container-base
 
 # Run a command in the container to verify.
-xzcat ./base/out/images/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
+xzcat ./base/out/images/container-base/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
 docker run -it --rm microsoft/azurelinux/base/core:4.0 cat /etc/os-release
