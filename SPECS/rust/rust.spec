@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,6 +142,10 @@ userdel -r test
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
+# Move third-party licenses from docdir to licensedir to avoid duplicate classification
+mkdir -p %{buildroot}%{_licensedir}/rust-doc
+mv %{buildroot}%{_docdir}/rustc/licenses/* %{buildroot}%{_licensedir}/rust-doc/
+rmdir %{buildroot}%{_docdir}/rustc/licenses
 rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
@@ -169,7 +173,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_docdir}/rustc/licenses/*
+%license %{_licensedir}/rust-doc/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
