@@ -68,7 +68,9 @@ ln -sf ../lib/coreos  %{buildroot}%{_prefix}/lib64/coreos
 
 # Generate file manifest automatically (avoids missing files when upstream changes)
 # This will list all files installed under %{buildroot} as absolute paths.
-find %{buildroot} -mindepth 1 -printf "/%%P\n" | sort > %{_builddir}/%{name}.files
+find %{buildroot} -type f -o -type l \
+  | sed "s|^%{buildroot}||" \
+  | sort -u > %{name}.files
 
 %check
 %if %{with tests}
@@ -90,9 +92,9 @@ find %{buildroot} -mindepth 1 -printf "/%%P\n" | sort > %{_builddir}/%{name}.fil
 %systemd_postun rpcbind.target
 %systemd_postun rpcbind.service
 
-%files -f %{_builddir}/%{name}.files
-%license LICENSE
-%doc README.md NOTICE
+%files -f %{name}.files
+%license LICENSE NOTICE
+%doc README.md
 
 %changelog
 * Mon Feb 02 2026 Sumit Jena (HCL Technologies Ltd) - 0.0.1-1
