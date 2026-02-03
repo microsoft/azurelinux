@@ -28,7 +28,7 @@ Provides systemd-networkd configuration installed at /etc/systemd/network which 
 
 %install
 install -d %{buildroot}%{_sysconfdir}/systemd/network
-install -m 644 %{_sourcedir}/50-default.network %{buildroot}%{_sysconfdir}/systemd/network/50-default.network
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/systemd/network/50-default.network
 
 %files systemd-networkd
 %config(noreplace) /etc/systemd/network/50-default.network
