@@ -47,6 +47,7 @@ Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2025-4574_1.75.patch
 Patch4:         CVE-2025-53605_1.75.patch
 Patch5:         CVE-2026-24116_1.75.patch
+Patch6:         CVE-2025-58160_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -182,7 +183,7 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.75.0-25
-- Add patch for CVE-2026-24116
+- Add patch for CVE-2026-24116 & CVE-2025-58160
 
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-24
 - Bump to rebuild with updated glibc

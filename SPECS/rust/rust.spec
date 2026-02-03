@@ -50,6 +50,7 @@ Patch5:         CVE-2025-68114.patch
 Patch6:         CVE-2025-4207.patch
 Patch7:         CVE-2025-12818.patch
 Patch8:         CVE-2026-24116.patch
+Patch9:         CVE-2025-58160.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -189,7 +190,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %changelog
 * Fri Jan 30 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.90.0-4
 - Patch for CVE-2025-68114, CVE-2025-4207, CVE-2025-55159, CVE-2025-12818,
-  CVE-2025-67873 and CVE-2026-24116
+  CVE-2025-67873, CVE-2026-24116 and CVE-2025-58160
 
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-3
 - Bump to rebuild with updated glibc
