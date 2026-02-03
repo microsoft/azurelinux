@@ -7,7 +7,7 @@
 Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.05.0
-BuildRequires:  ocaml-cmdliner-devel >= 0.9.8
+BuildRequires:  ocaml-cmdliner-devel >= 1.3.0 
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamlbuild
 BuildRequires:  ocaml-ocamldoc
@@ -42,6 +42,9 @@ developing applications that use %{name}.
 
 %prep
 %autosetup -n %{srcname}-%{version} -p1
+ 
+# Skip the styled_perf_bug test, which runs until stopped by an external signal
+sed -i '/styled_perf_bug/d' pkg/pkg.ml _tags
 
 # Topkg does watermark replacements only if run inside a git checkout.  Github
 # tarballs do not come with a .git directory.  Therefore, we do the watermark
@@ -101,6 +104,11 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Fri Nov 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.9.0-2
+- Updated ocaml-cmdliner-devel dependency to 1.3.0
+- License Verified
+- Skip the styled_perf_bug test, which runs until stopped by an external signal
+
 * Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 
