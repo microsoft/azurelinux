@@ -123,9 +123,9 @@ glibc-tools-2.35-7.cm2.x86_64.rpm
 gmp-6.2.1-4.cm2.x86_64.rpm
 gmp-debuginfo-6.2.1-4.cm2.x86_64.rpm
 gmp-devel-6.2.1-4.cm2.x86_64.rpm
-gnupg2-2.4.0-2.cm2.x86_64.rpm
-gnupg2-debuginfo-2.4.0-2.cm2.x86_64.rpm
-gnupg2-lang-2.4.0-2.cm2.x86_64.rpm
+gnupg2-2.4.0-3.cm2.x86_64.rpm
+gnupg2-debuginfo-2.4.0-3.cm2.x86_64.rpm
+gnupg2-lang-2.4.0-3.cm2.x86_64.rpm
 gperf-3.1-5.cm2.x86_64.rpm
 gperf-debuginfo-3.1-5.cm2.x86_64.rpm
 gpgme-1.16.0-2.cm2.x86_64.rpm
