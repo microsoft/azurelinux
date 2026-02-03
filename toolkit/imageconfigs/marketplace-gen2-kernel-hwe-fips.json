@@ -5,7 +5,7 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "cblmariner-arm64-gen2-fips-kernel-hwe",
+                    "Name": "cblmariner-gen2-kernel-hwe-fips",
                     "Type": "vhd"
                 }
             ],
@@ -57,7 +57,7 @@
             ],
             "PackageLists": [
                 "packagelists/fips-packages.json",
-                "packagelists/core-packages-image-aarch64.json",
+                "packagelists/core-packages-image.json",
                 "packagelists/marketplace-tools-packages.json",
                 "packagelists/azurevm-packages.json",
                 "packagelists/hyperv-packages.json"
@@ -78,7 +78,7 @@
             },
             "KernelCommandLine": {
                 "EnableFIPS": true,
-                "ExtraCommandLine": "console=tty1 console=ttyAMA0 earlycon=pl011,0xeffec000 initcall_blacklist=arm_pmu_acpi_init"
+                "ExtraCommandLine": "console=ttyS0"
             },
             "Hostname": "azurelinux"
         }

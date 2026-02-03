@@ -5,29 +5,31 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "cblmariner-gen1-fips-kernel-hwe",
+                    "Name": "cblmariner-arm64-gen2-kernel-hwe-fips",
                     "Type": "vhd"
                 }
             ],
             "Partitions": [
                 {
-                    "ID": "reserved",
+                    "ID": "efi",
                     "Flags": [
-                        "grub"
+                        "esp",
+                        "boot"
                     ],
                     "Start": 1,
-                    "End": 9,
+                    "End": 65,
                     "FsType": "fat32"
                 },
                 {
                     "ID": "boot",
-                    "Start": 9,
-                    "End": 509,
+                    "Start": 65,
+                    "End": 565,
                     "FsType": "ext4"
                 },
                 {
                     "ID": "rootfs",
-                    "Start": 509,
+                    "Name": "rootfs",
+                    "Start": 565,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -37,11 +39,12 @@
     "SystemConfigs": [
         {
             "Name": "Standard",
-            "BootType": "legacy",
+            "BootType": "efi",
             "PartitionSettings": [
                 {
-                    "ID": "reserved",
-                    "MountPoint": ""
+                    "ID": "efi",
+                    "MountPoint": "/boot/efi",
+                    "MountOptions" : "umask=0077"
                 },
                 {
                     "ID": "boot",
@@ -54,7 +57,7 @@
             ],
             "PackageLists": [
                 "packagelists/fips-packages.json",
-                "packagelists/core-packages-image.json",
+                "packagelists/core-packages-image-aarch64.json",
                 "packagelists/marketplace-tools-packages.json",
                 "packagelists/azurevm-packages.json",
                 "packagelists/hyperv-packages.json"
@@ -75,7 +78,7 @@
             },
             "KernelCommandLine": {
                 "EnableFIPS": true,
-                "ExtraCommandLine": "console=ttyS0"
+                "ExtraCommandLine": "console=tty1 console=ttyAMA0 earlycon=pl011,0xeffec000 initcall_blacklist=arm_pmu_acpi_init"
             },
             "Hostname": "azurelinux"
         }

@@ -5,31 +5,29 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "cblmariner-gen2-fips-kernel-hwe",
+                    "Name": "cblmariner-gen1-kernel-hwe-fips",
                     "Type": "vhd"
                 }
             ],
             "Partitions": [
                 {
-                    "ID": "efi",
+                    "ID": "reserved",
                     "Flags": [
-                        "esp",
-                        "boot"
+                        "grub"
                     ],
                     "Start": 1,
-                    "End": 65,
+                    "End": 9,
                     "FsType": "fat32"
                 },
                 {
                     "ID": "boot",
-                    "Start": 65,
-                    "End": 565,
+                    "Start": 9,
+                    "End": 509,
                     "FsType": "ext4"
                 },
                 {
                     "ID": "rootfs",
-                    "Name": "rootfs",
-                    "Start": 565,
+                    "Start": 509,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -39,12 +37,11 @@
     "SystemConfigs": [
         {
             "Name": "Standard",
-            "BootType": "efi",
+            "BootType": "legacy",
             "PartitionSettings": [
                 {
-                    "ID": "efi",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
+                    "ID": "reserved",
+                    "MountPoint": ""
                 },
                 {
                     "ID": "boot",
