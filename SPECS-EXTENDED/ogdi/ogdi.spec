@@ -1,8 +1,9 @@
 %global		gittag	4_1_1
+%global         __requires_exclude ^libtcl.so.*$
 Summary:        Open Geographic Datastore Interface
 Name:		ogdi
 Version:	4.1.1
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,8 +47,8 @@ OGDI header files and developer's documentation.
 
 %package tcl
 Summary:	TCL wrapper for OGDI
+Requires:       tcl >= 8.6
 Requires:	%{name} = %{version}-%{release}
-
 %description tcl
 TCL wrapper for OGDI.
 
@@ -159,6 +160,10 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 
 
 %changelog
+* Mon Feb 02 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.1.1-4
+- Rebuilt with updated tcl version dependency for ogdi-tcl subpackage
+- to resolve installation failure.
+
 * Wed Dec 11 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.1.1-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
