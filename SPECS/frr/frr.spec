@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,9 @@ Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2024-44070.patch
 Patch6:         CVE-2024-55553.patch
 Patch7:         0001-Fix-frr-c90-complaint-error.patch
-
+# Following CVE fixes CVE-2025-61100, CVE-2025-61101, CVE-2025-61102, CVE-2025-61103,
+# CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
+Patch8:         CVE-2025-61099.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -201,6 +203,10 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Jan 21 2026 Archana Shettigar <v-shettigara@microsoft.com> - 8.5.5-5
+- Patch CVE-2025-61099, CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
+  CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107
+
 * Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 8.5.5-4
 - Rebuilt for net-snmp version up with c90 fix
 
