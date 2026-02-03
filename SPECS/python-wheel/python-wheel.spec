@@ -4,13 +4,14 @@
 %bcond main_python 1
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
-Version:        0.46.2
+Version:        0.46.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+Patch0:         Use-vendored-packaging-to-canonicalize-requirements.patch
 %global pypi_name wheel
 %global python_wheel_name %{pypi_name}-%{version}-py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
@@ -58,7 +59,6 @@ A Python wheel of wheel to use with virtualenv.
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
-sed -i -E '/Requires-Dist/ s/[[:space:]]*@+[[:space:]]*/@/g' tests/test_metadata.py
 
 # flit_core expects [project].license to be a table/dict, not a string
 sed -i 's/^license = "MIT"$/license = { text = "MIT" }/' pyproject.toml
@@ -120,7 +120,7 @@ pip3 install iniconfig
 %endif
 
 %changelog
-* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.46.2-1
+* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.46.3-1
 - Updated to 0.46.2 to fix CVE-2026-24049
 
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
