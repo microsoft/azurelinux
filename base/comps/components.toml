@@ -96,7 +96,6 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.jq]
 [components.json-c]
 [components.kbd]
-[components.kernel]
 [components.kernel-srpm-macros]
 [components.keyutils]
 [components.kmod]
