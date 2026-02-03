@@ -167,51 +167,8 @@ export HASHBANGPERL=/usr/bin/perl
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # NEW_RPM_OPT_FLAGS, so we can skip specifiying them here.
 ./Configure \
-    --prefix=%{_prefix} \
-    --openssldir=%{_sysconfdir}/pki/tls \
-    --libdir=lib \
-    shared \
-    no-aria \
-    enable-bf \
-    no-blake2 \
-    enable-camellia \
-    no-capieng \
-    enable-cast \
-    no-chacha \
-    enable-cms \
-    no-comp \
-    enable-ct \
-    enable-deprecated \
-    enable-des \
-    enable-dh \
-    enable-dsa \
-    no-dtls1 \
-    no-ec2m \
-    enable-ec_nistp_64_gcc_128 \
-    enable-ecdh \
-    enable-ecdsa \
-    no-gost \
-    no-idea \
-    no-mdc2 \
-    no-md2 \
-    enable-md4 \
-    no-poly1305 \
-    enable-rc2 \
-    enable-rc4 \
-    enable-rc5 \
-    no-rfc3779 \
-    enable-rmd160 \
-    no-sctp \
-    no-seed \
-    no-siphash \
-    no-sm2 \
-    no-sm3 \
-    no-sm4 \
-    no-ssl \
-    no-ssl3 \
-    no-weak-ssl-ciphers \
-    no-whirlpool \
-    no-zlib \
+Patch109: CVE-2025-69419.patch
+Patch110: CVE-2026-22796.patch
     no-zlib-dynamic \
     enable-ktls \
     enable-buildtest-c++ \
