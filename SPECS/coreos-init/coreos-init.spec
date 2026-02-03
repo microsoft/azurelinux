@@ -64,8 +64,9 @@ ln -sf %{_unitdir}/rpcbind.service %{buildroot}%{_sysconfdir}/systemd/system/rpc
 install -d %{buildroot}%{_prefix}/lib64
 ln -sf ../lib/modules %{buildroot}%{_prefix}/lib64/modules
 ln -sf ../lib/flatcar %{buildroot}%{_prefix}/lib64/flatcar
-ln -sf ../lib/coreos  %{buildroot}%{_prefix}/lib64/coreos
-
+rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
+rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
+rm -rf  %{buildroot}/etc/issue
 # Generate file manifest automatically (avoids missing files when upstream changes)
 # This will list all files installed under %{buildroot} as absolute paths.
 find %{buildroot} -type f -o -type l \
