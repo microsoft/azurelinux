@@ -29,8 +29,7 @@ Obsoletes:      moby-cli < %{version}-%{release}
 %{summary}
 
 %prep
-%autosetup -p1 -n cli-%{version}
-%setup -q -n cli-%{version} -T -D -a 1
+%autosetup -n cli-%{version} -a 1 -p1
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_builddir}/cli-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
