@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -233,13 +233,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-<<<<<<< azure-autosec/kubevirt/2.0/1042208
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-36
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-37
 - Patch for CVE-2025-11065
-=======
+
 * Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.59.0-36
 - Bump to rebuild with updated glibc
->>>>>>> main
 
 * Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.59.0-35
 - Bump to rebuild with updated glibc
