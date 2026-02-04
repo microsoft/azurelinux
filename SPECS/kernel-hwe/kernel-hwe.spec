@@ -426,7 +426,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
 - Retain kernel config options similar to 6.6 in 6.12 for CONFIG_NET_VENDOR_AQUANTIA
 - CONFIG_AQTION, CONFIG_BLK_WBT, CONFIG_BLK_WBT_MQ, CONFIG_DM_CACHE,CONFIG_INET_DIAG_DESTROY
-- CONFIG_ XFRM_INTERFACE CONFIG_HSA_AMD_P2P and CONFIG_DMABUF_MOVE_NOTIFY
+- CONFIG_ XFRM_INTERFACE CONFIG_HSA_AMD_P2P, CONFIG_DMABUF_MOVE_NOTIFY
+- CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
 
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
 - Enable aarch64 kernel configs for performance improvements.

@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-	"config":"c740c6ec10ceca054ad278cc13fb88191cec41f93356a48b85ce122da11f03dc",
+	"config":"2a3c1876b4abdfde92a65ce43205b4b8a931e517dcb6411f5fc3cb3a0caae8ce",
     "config_aarch64": "c7081c42e9a9e6831df39fe4f95c2e7c5d35d40dcd45a423ada586a3434efe3a",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
