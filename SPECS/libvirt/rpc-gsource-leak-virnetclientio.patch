@@ -1,0 +1,48 @@
+From 98f1cf88fa7e0f992d93f376418fbfb3996a9690 Mon Sep 17 00:00:00 2001
+From: Daniel P. Berrangé <berrange@redhat.com>
+Date: Fri, 17 May 2024 14:55:24 +0100
+Subject: [PATCH] rpc: avoid leak of GSource in use for interrupting main loop
+
+Upstream Patch Reference: https://gitlab.com/libvirt/libvirt/-/commit/98f1cf88fa7e0f992d93f376418fbfb3996a9690
+
+We never release the reference on the GSource created for
+interrupting the main loop, nor do we remove it from the
+main context if our thread is woken up prior to the wakeup
+callback firing.
+
+This can result in a leak of GSource objects, along with an
+ever growing list of GSources attached to the main context,
+which will gradually slow down execution of the loop, as
+several operations are O(N) for the number of attached
+GSource objects.
+
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/rpc/virnetclient.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/rpc/virnetclient.c b/src/rpc/virnetclient.c
+index 147b0d6..6d424eb 100644
+--- a/src/rpc/virnetclient.c
++++ b/src/rpc/virnetclient.c
+@@ -1934,7 +1934,7 @@ static int virNetClientIO(virNetClient *client,
+     /* Check to see if another thread is dispatching */
+     if (client->haveTheBuck) {
+         /* Force other thread to wakeup from poll */
+-        GSource *wakeup = g_idle_source_new();
++        g_autoptr(GSource) wakeup = g_idle_source_new();
+         g_source_set_callback(wakeup, virNetClientIOWakeup, client->eventLoop, NULL);
+         g_source_attach(wakeup, client->eventCtx);
+
+@@ -1956,6 +1956,7 @@ static int virNetClientIO(virNetClient *client,
+             return -1;
+         }
+
++        g_source_destroy(wakeup);
+         VIR_DEBUG("Woken up from sleep head=%p call=%p",
+                   client->waitDispatch, thiscall);
+         /* Three reasons we can be woken up
+--
+2.34.1
+

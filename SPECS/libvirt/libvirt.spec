@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -201,6 +201,7 @@ Patch2:         CVE-2024-2494.patch
 Patch3:         CVE-2024-4418.patch
 Patch4:         CVE-2025-13193.patch
 Patch5:         CVE-2025-12748.patch
+Patch6:         rpc-gsource-leak-virnetclientio.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2191,6 +2192,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Feb 04 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 10.0.0-8
+- Backport fix for GSource memory leak in RPC client (upstream commit 98f1cf88)
+
 * Thu Jan 15 2026 Akhila Guruju <v-guakhila@microsoft.com> - 10.0.0-7
 - Patch CVE-2025-12748
 
