@@ -1,0 +1,6 @@
+# CODEOWNERS file for automatic review assignment
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# All TOML files require review from these owners
+*.toml @ddstreetmicrosoft @reubeno @christopherco
+**/*.toml @ddstreetmicrosoft @reubeno @christopherco
