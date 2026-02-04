@@ -55,7 +55,7 @@ Then, with a single command, you create and start all the services from your
 configuration.
 
 %prep
-%autosetup -n compose-%{version} -T -D -a 1 -p1
+%autosetup -n compose-%{version} -a 1 -p1
 
 %build
 go build \
