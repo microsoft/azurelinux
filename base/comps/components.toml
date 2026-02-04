@@ -270,8 +270,6 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.rpcbind]
 [components.rsync]
 
-[components.rust]
-# build = { known-failure = "Needs investigation" }
 
 [components.sbsigntools]
 [components.screen]

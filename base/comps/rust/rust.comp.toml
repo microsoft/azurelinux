@@ -1,0 +1,8 @@
+[components.rust]
+
+# Remove RHEL-specific rust-toolset BuildRequires (use Fedora's cargo-rpm-macros instead)
+[[components.rust.overlays]]
+description = "Remove rust-toolset BuildRequires"
+type = "spec-search-replace"
+regex = "%\\{\\?rhel:BuildRequires: rust-toolset\\}"
+replacement = ""
