@@ -5,6 +5,9 @@
 # No reporting by default
 reporting-disable: true
 
+#Enable token hashing
+use-hashed-tokens: true
+
 # Avoid OOM, adjust according to your HW specs
 # By default it can easily exhaust RAM, so play it safe by default
 
