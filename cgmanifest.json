@@ -29405,6 +29405,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tzdata",
+          "version": "2025c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzcode2025c.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "uchardet",
           "version": "0.0.8",
           "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.8.tar.xz"
