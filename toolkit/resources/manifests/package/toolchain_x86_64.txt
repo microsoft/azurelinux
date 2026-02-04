@@ -147,9 +147,9 @@ glibc-tools-2.38-16.azl3.x86_64.rpm
 gmp-6.3.0-1.azl3.x86_64.rpm
 gmp-debuginfo-6.3.0-1.azl3.x86_64.rpm
 gmp-devel-6.3.0-1.azl3.x86_64.rpm
-gnupg2-2.4.9-1.azl3.x86_64.rpm
-gnupg2-debuginfo-2.4.9-1.azl3.x86_64.rpm
-gnupg2-lang-2.4.9-1.azl3.x86_64.rpm
+gnupg2-2.4.9-2.azl3.x86_64.rpm
+gnupg2-debuginfo-2.4.9-2.azl3.x86_64.rpm
+gnupg2-lang-2.4.9-2.azl3.x86_64.rpm
 gperf-3.1-5.azl3.x86_64.rpm
 gperf-debuginfo-3.1-5.azl3.x86_64.rpm
 gpgme-1.23.2-2.azl3.x86_64.rpm
