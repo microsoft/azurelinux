@@ -63,7 +63,6 @@ ln -sf %{_unitdir}/rpcbind.service %{buildroot}%{_sysconfdir}/systemd/system/rpc
 # ebuild: compatibility symlinks for /usr/lib64 -> ../lib/...
 install -d %{buildroot}%{_prefix}/lib64
 ln -sf ../lib/modules %{buildroot}%{_prefix}/lib64/modules
-ln -sf ../lib/flatcar %{buildroot}%{_prefix}/lib64/flatcar
 rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
 rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
 rm -rf  %{buildroot}/etc/issue
