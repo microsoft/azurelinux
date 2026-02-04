@@ -428,7 +428,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 27%{?dist}
+Release: 28%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -452,6 +452,12 @@ Patch13:  CVE-2024-26328.patch
 Patch14:  CVE-2024-7409.patch
 Patch15:  CVE-2025-11234.patch
 Patch16:  CVE-2025-12464.patch
+# Backport memory leak fixes from QEMU 9.1.0 for kubevirt workloads
+# - virtio-net queue pair leak on realize (8c49756825)
+# - virtio-blk zone report leak (bbdf902366)
+# Note: APIC/ISA/PC BIOS leak fixes not applicable to 8.2.0 (code differs)
+Patch17:  backport-virtio-net-queue-leak.patch
+Patch18:  backport-virtio-blk-zone-leak.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3435,6 +3441,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Wed Feb 04 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 8.2.0-28
+- Backport 2 memory leak fixes from QEMU 9.1.0 for kubevirt workloads
+- Add backport-virtio-net-queue-leak.patch (upstream 8c49756825)
+- Add backport-virtio-blk-zone-leak.patch (upstream bbdf902366)
+
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-27
 - Bump to rebuild with updated glibc
 

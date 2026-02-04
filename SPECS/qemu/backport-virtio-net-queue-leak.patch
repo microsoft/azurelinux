@@ -1,0 +1,34 @@
+From 8c49756825dab430b17648637735c2736d23f778 Mon Sep 17 00:00:00 2001
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Date: Sun, 28 Apr 2024 16:00:51 +0900
+Subject: [PATCH] virtio-net: Add only one queue pair when realizing
+
+Multiqueue usage is not negotiated yet when realizing. If more than
+one queue is added and the guest never requests to enable multiqueue,
+the extra queues will not be deleted when unrealizing and leak.
+
+Fixes: f9d6dbf0bf6e ("virtio-net: remove virtio queues if the guest doesn't support multiqueue")
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/virtio-net.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 3cee2ef3ac..a8db8bfd9c 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -3743,9 +3743,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     n->net_conf.tx_queue_size = MIN(virtio_net_max_tx_queue_size(n),
+                                     n->net_conf.tx_queue_size);
+ 
+-    for (i = 0; i < n->max_queue_pairs; i++) {
+-        virtio_net_add_queue(n, i);
+-    }
++    virtio_net_add_queue(n, 0);
+ 
+     n->ctrl_vq = virtio_add_queue(vdev, 64, virtio_net_handle_ctrl);
+     qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+-- 
+GitLab
+

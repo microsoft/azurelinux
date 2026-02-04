@@ -1,0 +1,46 @@
+From bbdf9023665f409113cb07b463732861af63fb47 Mon Sep 17 00:00:00 2001
+From: Zheyu Ma <zheyuma97@gmail.com>
+Date: Thu, 4 Apr 2024 14:00:40 +0200
+Subject: [PATCH] block/virtio-blk: Fix memory leak from virtio_blk_zone_report
+
+This modification ensures that in scenarios where the buffer size is
+insufficient for a zone report, the function will now properly set an
+error status and proceed to a cleanup label, instead of merely
+returning.
+
+The following ASAN log reveals it:
+
+==1767400==ERROR: LeakSanitizer: detected memory leaks
+Direct leak of 312 byte(s) in 1 object(s) allocated from:
+    #0 0x64ac7b3280cd in malloc llvm/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x735b02fb9738 in g_malloc (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x5e738)
+    #2 0x64ac7d23be96 in virtqueue_split_pop hw/virtio/virtio.c:1612:12
+    #3 0x64ac7d23728a in virtqueue_pop hw/virtio/virtio.c:1783:16
+    #4 0x64ac7cfcaacd in virtio_blk_get_request hw/block/virtio-blk.c:228:27
+    #5 0x64ac7cfca7c7 in virtio_blk_handle_vq hw/block/virtio-blk.c:1123:23
+    #6 0x64ac7cfecb95 in virtio_blk_handle_output hw/block/virtio-blk.c:1157:5
+
+Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
+Message-id: 20240404120040.1951466-1-zheyuma97@gmail.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/block/virtio-blk.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 92de315f17..bb86e65f65 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -768,7 +768,8 @@ static void virtio_blk_handle_zone_report(VirtIOBlockReq *req,
+             sizeof(struct virtio_blk_zone_report) +
+             sizeof(struct virtio_blk_zone_descriptor)) {
+         virtio_error(vdev, "in buffer too small for zone report");
+-        return;
++        err_status = VIRTIO_BLK_S_ZONE_INVALID_CMD;
++        goto out;
+     }
+ 
+     /* start byte offset of the zone report */
+-- 
+GitLab
+
