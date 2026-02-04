@@ -85,10 +85,7 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-# We need setup instead of autosetup because we have two sources and need the patch applied
-# after both sources have been extracted.
-%setup -q -a 1
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 go build -o bin/acmesolver cmd/acmesolver/main.go
