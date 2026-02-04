@@ -56,7 +56,7 @@ Patch23:        CVE-2025-11065.patch
 
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-9%{?dist}
+BuildRequires:  glibc-static >= 2.35-10%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -233,8 +233,13 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< azure-autosec/kubevirt/2.0/1042208
 * Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-36
 - Patch for CVE-2025-11065
+=======
+* Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.59.0-36
+- Bump to rebuild with updated glibc
+>>>>>>> main
 
 * Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.59.0-35
 - Bump to rebuild with updated glibc
