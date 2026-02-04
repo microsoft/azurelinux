@@ -55,10 +55,7 @@ Then, with a single command, you create and start all the services from your
 configuration.
 
 %prep
-%autosetup -N -n compose-%{version}
-# Apply vendor before patching
-%setup -q -n compose-%{version} -T -D -a 1
-%autopatch -p1
+%autosetup -n compose-%{version} -T -D -a 1 -p1
 
 %build
 go build \
