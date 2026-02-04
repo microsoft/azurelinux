@@ -9331,8 +9331,8 @@
         "type": "other",
         "other": {
           "name": "libeasyfc",
-          "version": "0.14.0",
-          "downloadUrl": "https://bitbucket.org/tagoh/libeasyfc/downloads/libeasyfc-0.14.0.tar.bz2"
+          "version": "0.14.1",
+          "downloadUrl": "https://bitbucket.org/tagoh/libeasyfc/downloads/libeasyfc-0.14.1.tar.bz2"
         }
       }
     },
