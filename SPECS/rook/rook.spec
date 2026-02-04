@@ -133,10 +133,7 @@ This package contains Helm Charts for Rook.
 %define _buildshell /bin/bash
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -p1 a1
 
 %build
 # remove symbols unsupported by k8s (+) from version
