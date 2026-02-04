@@ -48,10 +48,7 @@ KEDA is a Kubernetes-based Event Driven Autoscaling component.
 It provides event driven scale for any container running in Kubernetes
 
 %prep
-%autosetup -N
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
