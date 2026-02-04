@@ -62,7 +62,6 @@ bzip2
 lz4
 unzip
 zlib
-emacs-filesystem
 python3-asn1crypto
 python3-blinker
 python3-certifi
