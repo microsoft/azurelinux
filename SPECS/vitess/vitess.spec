@@ -45,10 +45,7 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -a1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
