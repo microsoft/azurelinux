@@ -233,7 +233,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-37
+* Wed Feb 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-37
 - Patch for CVE-2025-11065
 
 * Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.59.0-36
