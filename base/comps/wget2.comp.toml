@@ -1,0 +1,5 @@
+[components.wget2]
+
+[components.wget2.build]
+# Supply the wget compatibility package.
+with = ["as_wget"]
