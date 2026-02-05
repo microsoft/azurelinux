@@ -1186,6 +1186,8 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %dir %{_libdir}/ceph
 %dir %{_libdir}/ceph/erasure-code
 %{_libdir}/ceph/erasure-code/libec_*.so*
+%dir %{_libdir}/ceph/extblkdev
+%{_libdir}/ceph/extblkdev/libceph_*.so*
 %dir %{_libdir}/ceph/compressor
 %{_libdir}/ceph/compressor/libceph_*.so*
 %{_unitdir}/ceph-crash.service
