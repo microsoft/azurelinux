@@ -2,6 +2,14 @@
 # Kernel-headers using Fedora spec with overlays for Azure Linux 6.18.
 # Fedora's spec expects a pre-built headers tarball. These overlays adapt it to
 # use Azure Linux kernel source and generate headers during build.
+## TODO ##
+# This component uses type = "local" because the overlays change Source0 from
+# Fedora's pre-built headers tarball to the full Azure Linux kernel source.
+# With type = "upstream", azldev fetches sources before applying overlays, so
+# the renamed tarball would not be available. Once azldev supports fetching
+# overlay-modified sources, this can switch to type = "upstream".
+# To get a copy of the source use
+# curl -sL -o kernel-6.18.5.1.tar.gz https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz
 spec = { type = "local", path = "kernel-headers.spec" }
 overlays = [
     # Build deps (Fedora's spec has none since it uses pre-built headers).
