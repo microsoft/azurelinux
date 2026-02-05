@@ -39,28 +39,42 @@
 
     <packages type="image">
         <!-- Core group -->
-        <package name="basesystem" />
+        <package name="azurelinux-release" />
+        <package name="azurelinux-rpm-config" />
+        <package name="azurelinux-repos" />
         <package name="bash" />
         <package name="ca-certificates" />
         <package name="coreutils" />
-        <package name="system-release" />
 
         <!-- Minimal group -->
+        <package name="acl" />
+        <package name="attr" />
         <package name="audit" />
+        <package name="bash-completion" />
+        <package name="bc" />
         <package name="binutils" />
+        <package name="bind-utils" />
+        <package name="brotli" />
+        <package name="bzip2" />
+        <package name="chkconfig" />
         <package name="chrony" />
         <package name="cloud-init" />
         <package name="cloud-utils-growpart" />
+        <package name="cracklib-dicts" />
+        <package name="cronie" />
         <package name="cryptsetup" />
-        <package name="dnf-plugins-core" />
-        <package name="dnf" />
-        <package name="dracut-config-generic" />
-        <package name="dracut-kiwi-oem-repart"/>
-        <package name="firewalld"/>
-        <package name="glibc-langpack-en" />
-        <package name="glibc-locale-source" />
-        <package name="glibc-minimal-langpack" />
+        <package name="cyrus-sasl" />
+        <package name="device-mapper-event" />
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+        <package name="dracut-kiwi-oem-repart" />
+        <package name="elfutils" />
+        <package name="elfutils-default-yama-scope" />
+        <package name="file" />
+        <package name="firewalld" />
         <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="grub2" />
         <package name="grubby" />
         <package name="gzip" />
         <package name="hostname" />
@@ -68,34 +82,37 @@
         <package name="iputils" />
         <package name="irqbalance" />
         <package name="kernel" />
-        <package name="less" />
+        <package name="kernel-tools" />
+        <package name="lvm2" />
+        <package name="lz4" />
         <package name="man-db" />
-        <package name="ncurses" />
+        <package name="nano" />
+        <package name="ncurses-term" />
+        <package name="net-tools" />
+        <package name="nftables" />
         <package name="openssh-clients" />
         <package name="openssh-server" />
-        <package name="passwd" />
-        <package name="pciutils" />
-        <package name="policycoreutils" />
-        <package name="procps-ng" />
-        <package name="psmisc" />
-        <package name="rng-tools" />
-        <package name="rpm-plugin-systemd-inhibit" />
-        <package name="rpm" />
+        <package name="rsync" />
+        <package name="rsyslog" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
+        <package name="shadow-utils-subid" />
         <package name="sudo" />
+        <package name="systemd" />
         <package name="systemd-boot" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
-        <package name="systemd" />
+        <package name="systemd-rpm-macros" />
         <package name="tar" />
+        <package name="tpm2-tss" />
+        <package name="unzip" />
         <package name="util-linux" />
         <package name="vim-minimal" />
-        <package name="xfsprogs" />
-        <package name="zram-generator-defaults" />
-        <package name="zram-generator" />
-        <package name="zstd" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="zchunk" />
+        <package name="zlib" />
 
         <!-- Azure-specific packages -->
         <package name="WALinuxAgent" />
@@ -111,7 +128,6 @@
         <package name="grub2-efi-x64-modules" />
         <package name="grub2-efi-x64" />
         <package name="shim" arch="x86_64" />
-        <package name="system-release" />
     </packages>
 
     <!--
