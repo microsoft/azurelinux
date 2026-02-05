@@ -62,7 +62,7 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.fstrm]
 [components.fuse]
 [components.gawk]
-[components.gcc14]
+[components.gcc]
 [components.gdbm]
 [components.gdisk]
 [components.gettext]
