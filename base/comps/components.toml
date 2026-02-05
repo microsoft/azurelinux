@@ -1,7 +1,7 @@
 includes = ["**/*.comp.toml"]
 
 #
-# Components imported from Fedora
+# Components imported from Fedora with no per-component modifications.
 #
 
 [components.acl]
@@ -10,11 +10,6 @@ includes = ["**/*.comp.toml"]
 [components.attr]
 [components.audit]
 [components.babel]
-
-[components.bash]
-# Need build fixes in rawhide
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
-
 [components.bash-completion]
 [components.bc]
 [components.bind]
@@ -36,10 +31,7 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.cryptsetup]
 [components.cyrus-sasl]
 [components.dbus]
-
 [components.dbus-broker]
-# build = { known-failure = "Needs investigation" }
-
 [components.dbus-python]
 [components.diffutils]
 [components.ding-libs]
@@ -131,11 +123,6 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.libpwquality]
 [components.librepo]
 [components.libreport]
-
-[components.libseccomp]
-# Need build fixes in rawhide
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
-
 [components.libselinux]
 [components.libsemanage]
 [components.libsepol]
@@ -269,10 +256,7 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.rootfiles]
 [components.rpcbind]
 [components.rsync]
-
 [components.rust]
-# build = { known-failure = "Needs investigation" }
-
 [components.sbsigntools]
 [components.screen]
 [components.sed]
