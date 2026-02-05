@@ -56,6 +56,7 @@
         <package name="dnf" />
         <package name="dracut-config-generic" />
         <package name="dracut-kiwi-oem-repart"/>
+        <package name="firewalld"/>
         <package name="glibc-langpack-en" />
         <package name="glibc-locale-source" />
         <package name="glibc-minimal-langpack" />
