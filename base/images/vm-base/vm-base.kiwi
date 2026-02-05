@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-vm-base">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>user@example.com</contact>
+        <specification>Azure Linux VM Image Example</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhdx"
+            initrd_system="dracut"
+            filesystem="ext4"
+            kernelcmdline="console=ttyS0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200">
+            <bootloader name="grub2" timeout="0" />
+            <size unit="G">4</size>
+            <initrd action="setup">
+                <dracut uefi="false"/>
+            </initrd>
+        </type>
+    </preferences>
+
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+    </repository>
+
+    <packages type="image">
+        <!-- Azure Linux Only packages-->
+        <package name = "azurelinux-repos" />
+        <!-- Core System -->
+        <package name="bash" />
+        <package name="bash-completion" />
+        <package name="coreutils" />
+        <package name="cpio" />
+        <package name="findutils" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="ncurses" />
+        <package name="ncurses-base" />
+        <package name="ncurses-libs" />
+        <package name="pam" />
+        <package name="readline" />
+        <package name="sed" />
+        <package name="shadow-utils" />
+        <package name="shadow-utils-subid" />
+        <package name="systemd" />
+        <package name="systemd-libs" />
+        <package name="util-linux" />
+        <package name="which" />
+
+        <!-- Crypto/Security -->
+        <package name="audit" />
+        <package name="audit-libs" />
+        <package name="cyrus-sasl-lib" />
+        <package name="gnutls" />
+        <package name="gpgme" />
+        <package name="libacl" />
+        <package name="libattr" />
+        <package name="libgcrypt" />
+        <package name="libgpg-error" />
+        <package name="libselinux" />
+        <package name="openssh" />
+        <package name="openssh-clients" />
+        <package name="openssh-server" />
+        <package name="openssl" />
+        <package name="openssl-libs" />
+        <package name="policycoreutils" />
+        <package name="selinux-policy-targeted" />
+        <package name="sudo" />
+
+        <!-- Azure/Cloud -->
+        <package name="WALinuxAgent" />
+        <package name="azure-vm-utils" />
+        <package name="cloud-init" />
+        <package name="cloud-utils-growpart" />
+        <package name="hyperv-daemons" />
+        <package name="hyperv-daemons-license" />
+        <package name="hypervfcopyd" />
+        <package name="hypervkvpd" />
+        <package name="hypervvssd" />
+
+        <!-- Boot/Kernel -->
+        <package name="dracut" />
+        <package name="dracut-kiwi-oem-repart" />
+        <package name="grub2-tools-minimal" />
+        <package name="grubby" />
+        <package name="kernel" />
+        <package name="kernel-modules" />
+        <package name="kmod" />
+        <package name="grub2" />
+
+        <!-- Package Management -->
+        <package name="dnf" />
+        <package name="dnf-data" />
+        <package name="dnf-plugins-core" />
+        <package name="libdnf" />
+        <package name="rpm" />
+        <package name="rpm-build-libs" />
+        <package name="rpm-libs" />
+
+        <!-- Networking -->
+        <package name="curl" />
+        <package name="dhcpcd" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="systemd-networkd" />
+        <package name="iptables" />
+
+        <!-- Compression -->
+        <package name="bzip2-libs" />
+        <package name="gzip" />
+        <package name="tar" />
+        <package name="xz" />
+        <package name="xz-libs" />
+        <package name="zstd" />
+
+        <!-- Filesystem -->
+        <package name="e2fsprogs" />
+        <package name="e2fsprogs-libs" />
+        <package name="lvm2" />
+        <package name="parted" />
+        <package name="xfsprogs" />
+
+        <!-- Device/System -->
+        <package name="cryptsetup" />
+        <package name="dbus" />
+        <package name="device-mapper" />
+        <package name="device-mapper-event" />
+        <package name="device-mapper-event-libs" />
+        <package name="device-mapper-libs" />
+        <package name="pciutils-libs" />
+        <package name="systemd-udev" />
+
+
+        <!-- Python -->
+        <package name="python3" />
+        <package name="python3-charset-normalizer" />
+        <package name="python3-configobj" />
+        <package name="python3-dbus" />
+        <package name="python3-distro" />
+        <package name="python3-dnf" />
+        <package name="python3-hawkey" />
+        <package name="python3-idna" />
+        <package name="python3-jinja2" />
+        <package name="python3-jsonpatch" />
+        <package name="python3-jsonpointer" />
+        <package name="python3-jsonschema" />
+        <package name="python3-libcomps" />
+        <package name="python3-libdnf" />
+        <package name="python3-libs" />
+        <package name="python3-markupsafe" />
+        <package name="python3-oauthlib" />
+        <package name="python3-requests" />
+        <package name="python3-rpm" />
+        <package name="python3-setuptools" />
+        <package name="python3-six" />
+        <package name="python3-urllib3" />
+
+        <!-- Libraries -->
+        <package name="libaio" />
+        <package name="libarchive" />
+        <package name="libassuan" />
+        <package name="libbpf" />
+        <package name="libcap" />
+        <package name="libcap-ng" />
+        <package name="libcomps" />
+        <package name="libedit" />
+        <package name="libevent" />
+        <package name="libffi" />
+        <package name="libgomp" />
+        <package name="libidn2" />
+        <package name="libksba" />
+        <package name="libmnl" />
+        <package name="libmodulemd" />
+        <package name="libnftnl" />
+        <package name="libnl3" />
+        <package name="libpkgconf" />
+        <package name="libpwquality" />
+        <package name="librepo" />
+        <package name="libseccomp" />
+        <package name="libsemanage" />
+        <package name="libsepol" />
+        <package name="libsolv" />
+        <package name="libstdc++" />
+        <package name="libtasn1" />
+        <package name="libunistring" />
+        <package name="libxcrypt" />
+        <package name="libxkbcommon" />
+        <package name="libxml2" />
+        <package name="libyaml" />
+
+        <!-- Utilities -->
+        <package name="diffutils" />
+        <package name="libgcc" />
+        <package name="gawk" />
+        <package name="grep" />
+        <package name="less" />
+        <package name="nano" />
+
+        <!-- Time/Certificates -->
+        <package name="chrony" />
+        <package name="tzdata" />
+        <package name="ca-certificates" />
+        <package name="p11-kit" />
+        <package name="p11-kit-trust" />
+
+        <!-- Logging/Monitoring -->
+        <package name="logrotate" />
+        <package name="procps-ng" />
+        <package name="psmisc" />
+
+        <!-- Misc System -->
+        <package name="expat" />
+
+        <!-- Database -->
+        <package name="sqlite-libs" />
+
+        <!-- Additional Tools -->
+        <package name="man-db" />
+        <package name="cracklib" />
+        <package name="cracklib-dicts" />
+        <package name="cryptsetup-libs" />
+        <package name="elfutils-default-yama-scope" />
+        <package name="elfutils-libelf" />
+        <package name="file" />
+        <package name="file-libs" />
+        <package name="gdbm" />
+        <package name="gmp" />
+        <package name="gnupg2" />
+        <package name="groff-base" />
+        <package name="hostname" />
+        <package name="json-c" />
+        <package name="kbd" />
+        <package name="lmdb-libs" />
+        <package name="lua-libs" />
+        <package name="mpfr" />
+        <package name="nettle" />
+        <package name="npth" />
+        <package name="openldap" />
+        <package name="pcre2" />
+        <package name="pinentry" />
+        <package name="pkgconf" />
+        <package name="pkgconf-m4" />
+        <package name="pkgconf-pkg-config" />
+        <package name="popt" />
+        <package name="rsync" />
+        <package name="systemd-pam" />
+        <package name="systemd-resolved" />
+        <package name="tpm2-tss" />
+        <package name="userspace-rcu" />
+        <package name="xkeyboard-config" />
+        <package name="zchunk-libs" />
+        
+        <!-- Additional requested packages (not already in image section above) -->
+        <package name="acl"/>
+        <package name="attr"/>
+        <package name="cyrus-sasl"/>
+        <package name="kernel-devel"/>
+        <package name="kernel-headers"/>
+        <package name="kernel-tools"/>
+        <package name="rpm-devel"/>
+        <package name="systemd-rpm-macros"/>
+        <package name="bind-libs"/>
+        <package name="bind-license"/>
+        <package name="bind-utils"/>
+        <package name="net-tools"/>
+        <package name="wget"/>
+        <package name="brotli"/>
+        <package name="bzip2"/>
+        <package name="lz4"/>
+        <package name="unzip"/>
+        <package name="zlib"/>
+        <package name="emacs-filesystem"/>
+        <package name="python3-pyyaml"/>
+        <package name="python3-asn1crypto"/>
+        <package name="python3-blinker"/>
+        <package name="python3-certifi"/>
+        <package name="python3-cffi"/>
+        <package name="python3-cryptography"/>
+        <package name="python3-gpg"/>
+        <package name="python3-jwt"/>
+        <package name="python3-netifaces"/>
+        <package name="python3-packaging"/>
+        <package name="python3-prettytable"/>
+        <package name="python3-pyOpenSSL"/>
+        <package name="python3-pyasn1"/>
+        <package name="python3-pycparser"/>
+        <package name="python3-pyparsing"/>
+        <package name="python3-wcwidth"/>
+        <package name="perl-Carp"/>
+        <package name="perl-Class-Struct"/>
+        <package name="perl-DynaLoader"/>
+        <package name="perl-Encode"/>
+        <package name="perl-Errno"/>
+        <package name="perl-Exporter"/>
+        <package name="perl-Fcntl"/>
+        <package name="perl-File-Basename"/>
+        <package name="perl-File-Path"/>
+        <package name="perl-File-Temp"/>
+        <package name="perl-Getopt-Long"/>
+        <package name="perl-Getopt-Std"/>
+        <package name="perl-HTTP-Tiny"/>
+        <package name="perl-IO"/>
+        <package name="perl-IPC-Open3"/>
+        <package name="perl-MIME-Base64"/>
+        <package name="perl-NDBM_File"/>
+        <package name="perl-POSIX"/>
+        <package name="perl-PathTools"/>
+        <package name="perl-Pod-Escapes"/>
+        <package name="perl-Pod-Perldoc"/>
+        <package name="perl-Pod-Simple"/>
+        <package name="perl-Pod-Usage"/>
+        <package name="perl-Scalar-List-Utils"/>
+        <package name="perl-SelectSaver"/>
+        <package name="perl-Socket"/>
+        <package name="perl-Storable"/>
+        <package name="perl-Symbol"/>
+        <package name="perl-Term-ANSIColor"/>
+        <package name="perl-Term-Cap"/>
+        <package name="perl-Text-ParseWords"/>
+        <package name="perl-Text-Tabs+Wrap"/>
+        <package name="perl-Time-Local"/>
+        <package name="perl-constant"/>
+        <package name="perl-if"/>
+        <package name="perl-interpreter"/>
+        <package name="perl-libs"/>
+        <package name="perl-locale"/>
+        <package name="perl-macros"/>
+        <package name="perl-mro"/>
+        <package name="perl-overload"/>
+        <package name="perl-overloading"/>
+        <package name="perl-parent"/>
+        <package name="perl-podlators"/>
+        <package name="perl-vars"/>
+        <package name="libcgroup"/>
+        <package name="libdb"/>
+        <package name="libestr"/>
+        <package name="libfastjson"/>
+        <package name="liblognorm"/>
+        <package name="librdkafka"/>
+        <package name="librelp"/>
+        <package name="libssh2"/>
+        <package name="libtraceevent"/>
+        <package name="libuv"/>
+        <package name="autogen-libopts"/>
+        <package name="libtool"/>
+        <package name="make"/>
+        <package name="vim"/>
+        <package name="rsyslog"/>
+        <package name="cronie"/>
+        <package name="cronie-anacron"/>
+        <package name="tini"/>
+        <package name="postgresql-libs"/>
+        <package name="bc"/>
+        <package name="chkconfig"/>
+        <package name="elfutils"/>
+        <package name="emacs"/>
+        <package name="libgc"/>
+        <package name="gdb"/>
+        <package name="gdbm-devel"/>
+        <package name="glib"/>
+        <package name="irqbalance"/>
+        <package name="iw"/>
+        <package name="ncurses-term"/>
+        <package name="newt"/>
+        <package name="nghttp2"/>
+        <package name="pcre2-tools"/>
+        <package name="popt-devel"/>
+        <package name="slang"/>
+        <package name="strace"/>
+        <package name="tmux"/>
+        <package name="wireless-regdb"/>
+        <package name="zchunk"/>
+        <package name="libzstd"/>
+        <package name="libcurl"/>
+        <package name="krb5-libs"/>
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="basesystem" />
+        <package name="dracut-network" />
+        <package name="filesystem" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="grub2-efi-x64" />
+        <package name="shim" arch="x86_64" />
+        <package name="system-release" />
+    </packages>
+
+    <users>
+        <user name="root" password="" pwdformat="plain" home="/root" groups="root"/>
+    </users>
+</image>
