@@ -1,7 +1,8 @@
 {
  "Signatures": {
   "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
-  "containerd.toml": "5b3821236f09b4c858e0e098bbe1400f4dbbb47d360e39d21c61858b088c2896",
-  "containerd-2.0.0.tar.gz": "346d644e1b96e1f4a39bfe9d1eb0eb01ca676f806c12d95e5dbe35325bbc1780"
+  "containerd.toml": "0d118eac5e02fac4256c944ffde7c8734e9a553ad1235c62c3a3ce44139c3797",
+  "containerd-2.1.6.tar.gz": "9b13537e5d61b9cf301295a807751447cc7c86fd79bb37ac5630455013d353a5",
+  "fix-credential-leak-in-grpc-errors.patch": "cc4e6a41619dd159bde664355691cf074540f2aa37f958b0c31876c9be811450"
  }
 }

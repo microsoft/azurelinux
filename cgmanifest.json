@@ -2047,8 +2047,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.0.0.tar.gz"
+          "version": "2.1.6",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.1.6.tar.gz"
         }
       }
     },
