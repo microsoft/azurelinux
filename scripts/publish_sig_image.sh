@@ -1,11 +1,14 @@
 #!/bin/bash
 # https://basevmimage.blob.core.windows.net/vhds/azl4-vm-base.x86_64-0.1.vhd
+# Find the absolute path of the directory containing this script
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+. "$SCRIPTS_DIR/common.sh"
+
 storage_account_url="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net"
 storage_account_resource_id="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
 replicationMode="Shallow"
-image_version=0.0.1
-storage_blob_name="azl4-vm-base.x86_64-0.1.vhd"
+image_version=$VERSION
 storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$storage_blob_name"
 
 az account set --subscription "$SUBSCRIPTION_ID"
@@ -42,8 +45,8 @@ if [[ $containerExists != "true" ]]; then
         --auth-mode login
 fi
 
-# # Upload the image artifact to Steamboat Storage Account
-# azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint"
+# Upload the image artifact to Steamboat Storage Account
+azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint"
 
 # Ensure STEAMBOAT_GALLERY_NAME exists
 if ! az sig show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME"; then
@@ -84,7 +87,7 @@ REGIONS_JSON=$(echo "$LOCATION" | awk -F, '{
 az deployment group create \
   --name "$GALLERY_IMAGE_DEFINITION-$image_version" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --template-file "./azure-gallery-image-base.bicep" \
+  --template-file "$SCRIPTS_DIR/azure-gallery-image-base.bicep" \
   --parameters galleryName="$GALLERY_NAME" \
                imageDefinitionName="$GALLERY_IMAGE_DEFINITION" \
                versionName="$image_version" \
