@@ -300,7 +300,6 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.userspace-rcu]
 [components.util-linux]
 [components.vim]
-[components.wget2]
 [components.which]
 [components.words]
 [components.xfsdump]
