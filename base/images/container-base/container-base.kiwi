@@ -1,41 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
 <image schemaversion="8.3" name="azl4-container-base">
+    <profiles>
+        <profile name="Container-Base" description="Base Container Image" />
+        <profile name="Container-Build" description="Build Container Image" />
+    </profiles>
+
     <description type="system">
         <author>Azure Linux</author>
         <contact>user@example.com</contact>
         <specification>Azure Linux Container Image Example</specification>
     </description>
+
+    <!-- Preferences applicable to all container image profiles -->
     <preferences>
-        <version>0.1</version>
+        <version>4.0</version>
         <packagemanager>dnf5</packagemanager>
-        <type image="docker">
+        <timezone>Etc/UTC</timezone>
+        <locale>en_US</locale>
+        <rpm-locale-filtering>true</rpm-locale-filtering>
+        <rpm-excludedocs>true</rpm-excludedocs>
+    </preferences>
+
+    <!-- Profile-specific preferences -->
+    <preferences profiles="Container-Base">
+        <type image="oci">
             <containerconfig
-                name="microsoft/azurelinux/base/core"
+                name="microsoft/azurelinux"
                 tag="4.0"
-                additionalnames=":latest"
                 user="root"
                 workingdir="/">
-                <subcommand execute="/bin/bash"/>
+                <subcommand execute="/bin/bash" />
+                <labels>
+                    <label name="org.opencontainers.image.vendor" value="Microsoft Corporation" />
+                    <label name="org.opencontainers.image.url"
+                        value="https://github.com/microsoft/azurelinux/" />
+                    <label name="org.opencontainers.image.licenses" value="MIT" />
+                    <label name="org.opencontainers.image.title" value="azurelinux" />
+                    <label name="org.opencontainers.image.version" value="4.0" />
+                </labels>
+            </containerconfig>
+        </type>
+    </preferences>
+    <preferences profiles="Container-Build">
+        <type image="oci">
+            <containerconfig
+                name="microsoft/azurelinux/build"
+                tag="4.0"
+                user="root"
+                workingdir="/">
+                <subcommand execute="/bin/bash" />
+                <labels>
+                    <label name="org.opencontainers.image.vendor" value="Microsoft Corporation" />
+                    <label name="org.opencontainers.image.url"
+                        value="https://github.com/microsoft/azurelinux/" />
+                    <label name="org.opencontainers.image.licenses" value="MIT" />
+                    <label name="org.opencontainers.image.title" value="azurelinux-build" />
+                    <label name="org.opencontainers.image.version" value="4.0" />
+                </labels>
             </containerconfig>
         </type>
     </preferences>
 
+    <!-- Upstream repo info -->
     <repository type="rpm-md" alias="fedora-43-everything">
         <source
             path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
     </repository>
 
-    <packages type="image">
-        <!-- Core group -->
+    <!-- Include in all profiles a small set of required packages (without weak dependencies). -->
+    <packages type="bootstrap" patternType="onlyRequired" profiles="Container-Base,Container-Build">
+        <package name="azurelinux-release" />
         <package name="basesystem" />
         <package name="bash" />
-        <package name="system-release" />
+        <package name="dnf5" />
+        <package name="glibc-minimal-langpack" />
     </packages>
 
-    <packages type="bootstrap">
-        <package name="basesystem" />
-        <package name="filesystem" />
-        <package name="system-release" />
+    <!-- Add core standard development tools to build container. -->
+    <packages type="bootstrap" patternType="onlyRequired" profiles="Container-Build">
+        <package name="azure-cli" />
+        <package name="cmake" />
+        <package name="curl" />
+        <package name="g++" />
+        <package name="gcc" />
+        <package name="git-lfs" />
+        <package name="git" />
+        <package name="jq" />
+        <package name="make" />
+        <package name="nano" />
+        <package name="nodejs24" />
+        <package name="python3" />
+        <package name="rpm-build" />
+        <package name="sed" />
+        <package name="sudo" />
+        <package name="tar" />
+        <package name="unzip" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="zip" />
     </packages>
 </image>

@@ -1,16 +1,11 @@
 [images.vm-base]
-description = "VM Base Image"
+description = "Base VM"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
 [images.container-base]
-description = "Container Base Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
+description = "Base Container"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "Container-Base" }
 
-# NOTE:
-# sudo dnf install -y kiwi-cli
-# sudo kiwi --loglevel 10 \
-#     --kiwi-file container-base.kiwi \
-#     system build \
-#     --description ./container-base \
-#     --target-dir <output_dir> \
-#     --add-repo='file:///home/username/some/dir/with/private/rpms,rpm-md,azl,1
+[images.container-build]
+description = "Build Container"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "Container-Build" }
