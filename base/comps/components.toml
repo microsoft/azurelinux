@@ -259,7 +259,7 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 [components.python-systemd]
 [components.python-urllib3]
 [components.python-wcwidth]
-[components.'python3.9']
+[components.'python3.14']
 [components.pytz]
 [components.PyYAML]
 [components.quota]
