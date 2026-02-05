@@ -35,6 +35,7 @@ elfutils-default-yama-scope
 file
 firewalld
 glib
+glibc
 glibc-langpack-en
 grub2
 grub2-efi-x64
@@ -45,6 +46,7 @@ irqbalance
 kernel
 kernel-headers
 kernel-tools
+kernel-modules
 lvm2
 lz4
 man-db
@@ -70,6 +72,7 @@ systemd-boot
 systemd-networkd
 systemd-resolved
 systemd-rpm-macros
+tar
 tpm2-tss
 unzip
 util-linux
