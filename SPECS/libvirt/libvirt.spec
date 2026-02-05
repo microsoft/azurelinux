@@ -184,8 +184,8 @@
 
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
-Version:        10.0.0
-Release:        7%{?dist}
+Version:        10.10.0
+Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
