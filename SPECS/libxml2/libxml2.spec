@@ -96,7 +96,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Feb 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.10.4-11
-- Patch for CVE-2025-8732.patch
+- Patch for CVE-2025-8732
 
 * Tue Jan 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.10.4-10
 - Patch for CVE-2026-0992, CVE-2026-0990, CVE-2025-7425
