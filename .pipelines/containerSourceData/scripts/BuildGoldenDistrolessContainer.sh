@@ -6,8 +6,8 @@ set -e
 
 function docker_cleanup {
     echo "+++ Cleaning up Docker resources to free disk space"
-    docker system prune -f --volumes 2>/dev/null || true
-    docker builder prune -f 2>/dev/null || true
+    docker system prune -f --volumes || true
+    docker builder prune -f || true
     echo "+++ Docker cleanup completed"
     df -h / || true
 }
@@ -49,6 +49,9 @@ function DockerBuild {
         --build-arg RPMS="$rpmsDir" \
         --build-arg LOCAL_REPO_FILE="$marinaraSrcDir/local.repo" \
         --no-cache
+
+    # Cleanup after build to free disk space
+    docker_cleanup
 }
 
 function create_distroless_container {
@@ -96,9 +99,6 @@ function create_distroless_container {
         false \
         "$rpmsPath"
 
-    # Cleanup before next build
-    docker_cleanup
-
     # Create debug container
     DockerBuild \
         "$debugContainerName" \
@@ -109,9 +109,6 @@ function create_distroless_container {
         false \
         "$rpmsPath"
 
-    # Cleanup before next build
-    docker_cleanup
-
     # Create nonroot container
     DockerBuild \
         "$nonrootContainerName" \
@@ -121,9 +118,6 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         true \
         "$rpmsPath"
-
-    # Cleanup before next build
-    docker_cleanup
 
     # Create debug nonroot container
     DockerBuild \
