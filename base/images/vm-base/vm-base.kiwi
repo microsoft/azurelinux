@@ -92,7 +92,6 @@
         <package name="nftables" />
         <package name="openssh-clients" />
         <package name="openssh-server" />
-        <package name="pcre2-tools" />
         <package name="rsync" />
         <package name="rsyslog" />
         <package name="selinux-policy-targeted" />
