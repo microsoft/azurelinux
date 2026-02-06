@@ -17,8 +17,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.100.mshv1
-Release:        3%{?dist}
+Version:        6.6.100.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
