@@ -1,0 +1,122 @@
+From ddb86e4a9f315575eab153c805c5edd9368bb6c4 Mon Sep 17 00:00:00 2001
+From: Saul Paredes <saulparedes@microsoft.com>
+Date: Fri, 6 Feb 2026 14:14:09 -0800
+Subject: [PATCH] deferred MSHV pages minimal patch. This: - adding
+ https://microsoft.visualstudio.com/LSG/_git/linux-dom0/commit/690142a5166105f564e0b520bd817f130205a7dd?refName=refs/heads/user/skinsburskii/always-invalidate&path=/drivers/hv/mshv_root_main.c
+ - reverting
+ https://msazure.visualstudio.com/LSG-linux/_git/LSG-linux-rolling/commit/983f21a6dcdf70dd5ec76374cb2dd747bb4b891d?refName=refs/heads/feature/dom0/6.6&path=/drivers/hv/mshv_root_main.c
+
+Signed-off-by: Saul Paredes <saulparedes@microsoft.com>
+---
+ drivers/hv/mshv_root_main.c | 52 ++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 8bdd42145..43cd2daa5 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -43,6 +43,8 @@
+ 
+ #define MSHV_MAP_FAULT_IN_PAGES			HPAGE_PMD_NR
+ 
++#define VALUE_PMD_ALIGNED(c)			(!((c) & (PTRS_PER_PMD - 1)))
++
+ MODULE_AUTHOR("Microsoft");
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Microsoft Hyper-V root partition VMM interface /dev/mshv");
+@@ -1765,7 +1767,9 @@ mshv_region_remap_pages(struct mshv_mem_region *region, u32 map_flags,
+ 	if (page_offset + page_count > region->nr_pages)
+ 		return -EINVAL;
+ 
+-	if (region->flags.large_pages)
++	if (region->flags.large_pages &&
++	    VALUE_PMD_ALIGNED(page_offset) &&
++	    VALUE_PMD_ALIGNED(page_count))
+ 		map_flags |= HV_MAP_GPA_LARGE_PAGE;
+ 
+ 	/* ask the hypervisor to map guest ram */
+@@ -1902,6 +1906,10 @@ static void mshv_region_movable_fini(struct mshv_mem_region *region)
+  * is blockable, it uses a blocking lock; otherwise, it attempts a non-blocking
+  * lock and returns false if unsuccessful.
+  *
++ * NOTE: Failure to invalidate a region is a serious error, as the pages will
++ * be considered freed while they are still mapped by the hypervisor.
++ * Any attempt to access such pages will likely crash the system.
++ *
+  * Return: true if the region was successfully invalidated, false otherwise.
+  */
+ static bool mshv_region_invalidate(struct mmu_interval_notifier *mni,
+@@ -1915,15 +1923,10 @@ static bool mshv_region_invalidate(struct mmu_interval_notifier *mni,
+ 	unsigned long mstart, mend;
+ 	int ret;
+ 
+-	if (!mmget_not_zero(mni->mm))
+-		return true;
+-
+-	if (mmu_notifier_range_blockable(range)) {
++	if (mmu_notifier_range_blockable(range))
+ 		mutex_lock(&region->memreg_mutex);
+-	} else if (!mutex_trylock(&region->memreg_mutex)) {
+-		mmput(mni->mm);
+-		return false;
+-	}
++	else if (!mutex_trylock(&region->memreg_mutex))
++		goto out_fail;
+ 
+ 	mmu_interval_set_seq(mni, cur_seq);
+ 
+@@ -1937,20 +1940,26 @@ static bool mshv_region_invalidate(struct mmu_interval_notifier *mni,
+ 	ret = mshv_region_remap_pages(region, HV_MAP_GPA_NO_ACCESS,
+ 				      page_offset, page_count);
+ 
+-	WARN_ONCE(ret,
+-		  "Failed to invalidate region %#llx-%#llx (range %#lx-%#lx, event: %u, pages %#llx-%#llx, mm: %#llx): %d\n",
+-		  region->start_uaddr,
+-		  region->start_uaddr + (region->nr_pages << HV_HYP_PAGE_SHIFT),
+-		  range->start, range->end, range->event,
+-		  page_offset, page_offset + page_count - 1, (u64)range->mm, ret);
++	if (ret) {
++		mutex_unlock(&region->memreg_mutex);
++		goto out_fail;
++	}
+ 
+ 	memset(region->pages + page_offset, 0,
+ 	       page_count * sizeof(struct page *));
+ 
+ 	mutex_unlock(&region->memreg_mutex);
+-	mmput(mni->mm);
+ 
+ 	return true;
++
++out_fail:
++	WARN_ONCE(ret,
++		  "Failed to invalidate region %#llx-%#llx (range %#lx-%#lx, event: %u, pages %#llx-%#llx, mm: %#llx): %d\n",
++		  region->start_uaddr,
++		  region->start_uaddr + (region->nr_pages << HV_HYP_PAGE_SHIFT),
++		  range->start, range->end, range->event,
++		  page_offset, page_offset + page_count - 1, (u64)range->mm, ret);
++	return false;
+ }
+ 
+ static const struct mmu_interval_notifier_ops mshv_region_mni_ops = {
+@@ -1961,17 +1970,6 @@ static bool mshv_region_movable_init(struct mshv_mem_region *region)
+ {
+ 	int ret;
+ 
+-	/*
+-	 * FIXME:
+-	 *
+-	 * Disable movable pages since it causes crashes sometimes. Need to
+-	 * investigate further.
+-	 *
+-	 * Returning false here causes the region to be always pinned. This is
+-	 * the old behavior before movable pages support was implemented.
+-	 */
+-	return false;
+-
+ 	ret = mmu_interval_notifier_insert(&region->memreg_mni, current->mm,
+ 					   region->start_uaddr,
+ 					   region->nr_pages << HV_HYP_PAGE_SHIFT,
+-- 
+2.34.1
+
