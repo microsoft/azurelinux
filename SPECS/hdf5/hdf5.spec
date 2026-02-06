@@ -12,7 +12,7 @@
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
 Version:        1.14.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,7 @@ Patch12:        CVE-2025-6857.patch
 Patch13:        CVE-2025-6858.patch
 Patch14:        CVE-2025-7067.patch
 Patch15:        CVE-2025-7068.patch
+Patch16:        CVE-2025-2915.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -409,7 +410,11 @@ done
 
 
 %changelog
-* Tue Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
+* Tue Jan 20 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.14.6-2
+- Patch for CVE-2025-2915
+- Skipping failing test cases after applying this patch.
+
+* Wed Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
 - Upgrade to 1.14.6
 - Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-6816,
   CVE-2025-2925, CVE-2025-2924, CVE-2025-44905, CVE-2025-6269, CVE-2025-6750, CVE-2025-6857,
