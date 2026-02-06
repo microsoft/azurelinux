@@ -11,22 +11,83 @@
 # To get a copy of the source use
 # curl -sL -o kernel-6.18.5.1.tar.gz https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz
 spec = { type = "local", path = "kernel-headers.spec" }
-overlays = [
-    # Build deps (Fedora's spec has none since it uses pre-built headers).
-    { type = "spec-search-replace", regex = "%global debug_package %{nil}", replacement = "%global debug_package %{nil}\n\nBuildRequires: make\nBuildRequires: gcc\nBuildRequires: perl\nBuildRequires: rsync" },
 
-    # Version updates: Fedora 6.19 -> Azure Linux 6.18.5.1
-    { type = "spec-search-replace", regex = "%global released_kernel 0", replacement = "%global released_kernel 0\n\n%define mariner_version 3" },
-    { type = "spec-search-replace", regex = "%define specversion 6.19.0", replacement = "%define specversion 6.18.5.1" },
-    { type = "spec-search-replace", regex = "%define tarfile_release 6.19-rc8", replacement = "%define tarfile_release 6.18.5.1" },
-    { type = "spec-search-replace", regex = "%define specrelease 0.rc8.54", replacement = "%define specrelease 1" },
+# Build deps (Fedora's spec has none since it uses pre-built headers).
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%global debug_package %{nil}"
+replacement = "%global debug_package %{nil}\n\nBuildRequires: make\nBuildRequires: gcc\nBuildRequires: perl\nBuildRequires: rsync"
 
-    # Source: use full Azure Linux kernel tarball instead of pre-built headers.
-    { type = "spec-update-tag", tag = "Source0", value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz" },
+# Version updates: Fedora 6.19 -> Azure Linux 6.18.5.1
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%global released_kernel 0"
+replacement = "%global released_kernel 0\n\n%define mariner_version 3"
 
-    # Prep: extract Azure Linux tarball.
-    { type = "spec-search-replace", regex = "%setup -q -c", replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{specversion}" },
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specversion 6.19.0"
+replacement = "%define specversion 6.18.5.1"
 
-    # Build + install: generate headers from source and replace Fedora's copy logic.
-    { type = "spec-search-replace", regex = "# List of architectures we support and want to copy their headers", replacement = "# Generate headers from Azure Linux kernel source\nmake mrproper\nmake headers\n\nfor cross_arch in arm64; do\n    make ARCH=$cross_arch O=usr/include-$cross_arch headers\ndone\n\nfind usr/include* \\( -name \".*\" -o -name \"Makefile\" \\) -delete\n\nmkdir -p $RPM_BUILD_ROOT%{_includedir}\ncp -rv usr/include/* $RPM_BUILD_ROOT%{_includedir}\n\nfor cross_arch in arm64; do\n    cross_arch_includedir=$RPM_BUILD_ROOT%{_prefix}/${cross_arch}-linux-gnu/include\n    mkdir -p $cross_arch_includedir\n    cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir\ndone\n\nexit 0\n\n# Original Fedora logic (skipped):\n# List of architectures we support and want to copy their headers" },
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define tarfile_release 6.19-rc8"
+replacement = "%define tarfile_release 6.18.5.1"
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specrelease 0.rc8.54"
+replacement = "%define specrelease 1"
+
+# Source: use full Azure Linux kernel tarball instead of pre-built headers.
+[[components.kernel-headers.overlays]]
+type = "spec-update-tag"
+tag = "Source0"
+value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz"
+
+# Prep: extract Azure Linux tarball.
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%setup -q -c"
+replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{specversion}"
+
+# Build: generate native + cross headers from Azure Linux kernel source.
+# Detects native arch and cross-compiles for the other (x86_64 <-> arm64).
+[[components.kernel-headers.overlays]]
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "make mrproper",
+    "make headers",
+    "",
+    "# Determine native kernel arch and cross-compile for the other",
+    "native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')",
+    "for cross_arch in arm64 x86; do",
+    "    [ \"$cross_arch\" = \"$native_karch\" ] && continue",
+    "    make ARCH=$cross_arch O=usr/include-$cross_arch headers",
+    "done",
+    "",
+    "find usr/include* \\( -name \".*\" -o -name \"Makefile\" \\) -delete",
 ]
+
+# Install: copy built headers into RPM buildroot, replacing Fedora's copy logic.
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "# List of architectures we support and want to copy their headers"
+replacement = """
+native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
+
+mkdir -p $RPM_BUILD_ROOT%{_includedir}
+cp -rv usr/include/* $RPM_BUILD_ROOT%{_includedir}
+
+for cross_arch in arm64 x86; do
+    [ "$cross_arch" = "$native_karch" ] && continue
+    cross_arch_includedir=$RPM_BUILD_ROOT%{_prefix}/${cross_arch}-linux-gnu/include
+    mkdir -p $cross_arch_includedir
+    cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir
+done
+
+exit 0
+
+# Original Fedora logic (skipped):
+# List of architectures we support and want to copy their headers"""
