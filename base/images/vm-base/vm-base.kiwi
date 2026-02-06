@@ -122,7 +122,6 @@
     </packages>
 
     <packages type="bootstrap">
-        <package name="basesystem" />
         <package name="dracut-network" />
         <package name="filesystem" />
         <package name="grub2-efi-x64-modules" />
