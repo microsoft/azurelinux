@@ -1,8 +1,6 @@
 #!/bin/bash
 # Script to find missing components from VM image packages and add them to components.toml
 
-set -e
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPONENTS_TOML="$REPO_ROOT/base/comps/components.toml"
