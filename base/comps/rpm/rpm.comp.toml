@@ -1,9 +1,11 @@
 [components.rpm]
-
-# Update vendor macro.
-[[components.rpm.overlays]]
-description = "Customize RPM vendor"
-type = "spec-search-replace"
-regex = "RPM_VENDOR=redhat"
-replacement = "RPM_VENDOR=azurelinux"
-
+overlays = [
+    # Update vendor macro.
+    { type = "spec-search-replace", regex = "RPM_VENDOR=redhat", replacement = "RPM_VENDOR=azurelinux" },
+    # Remove __pycache__ from python3-rpm files section - it's not generated during build with Python 3.14
+    { type = "spec-search-replace", regex = "%artifact %\\{python3_sitearch\\}/rpm/__pycache__/", replacement = "" },
+    # Remove doc line that copies from BUILD dir - cmake already installs to BUILDROOT
+    { type = "spec-search-replace", regex = "%doc CREDITS docs/manual/\\[a-z\\]\\*", replacement = "" },
+    # Add wildcard to capture all cmake-installed docs
+    { type = "spec-search-replace", regex = "%doc %\\{_defaultdocdir\\}/rpm/README", replacement = "%doc %{_defaultdocdir}/rpm/*" },
+]
