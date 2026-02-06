@@ -101,6 +101,10 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		serializedArgs = append(serializedArgs, fmt.Sprintf("--rpmmacros-file=%s", config.RpmmacrosFile))
 	}
 
+	if config.VersionsMacroFile != "" {
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--versions-macro-file=%s", config.VersionsMacroFile))
+	}
+
 	if config.NoCleanup {
 		serializedArgs = append(serializedArgs, "--no-cleanup")
 	}
