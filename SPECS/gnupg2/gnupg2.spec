@@ -1,6 +1,6 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.0
+Version:        2.4.5
 Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -16,6 +16,7 @@ BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
 BuildRequires:  libgpg-error-devel >= 1.46
+BuildRequires:  gnutls-devel
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
 Requires:       libgpg-error >= 1.46
