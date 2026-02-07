@@ -11681,8 +11681,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.0.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.0.0.tar.xz"
+          "version": "10.10.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
         }
       }
     },
@@ -25843,8 +25843,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "8.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-8.2.0.tar.xz"
+          "version": "9.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
         }
       }
     },

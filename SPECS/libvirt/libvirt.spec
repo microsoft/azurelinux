@@ -2203,9 +2203,6 @@ exit 0
   (field was renamed in upstream commit bd6d7ebf6 included in libvirt v10.9.0)
 - Switch from yajl to json-c (required since libvirt 10.8.0)
 
-* Wed Feb 04 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 10.0.0-8
-- Backport fix for GSource memory leak in RPC client (upstream commit 98f1cf88)
-
 * Thu Jan 15 2026 Akhila Guruju <v-guakhila@microsoft.com> - 10.0.0-7
 - Patch CVE-2025-12748
 
