@@ -41,14 +41,14 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
 | Mechanism | Discovery | Supported Surfaces |
 | --------- | --------- | ------------------ |
 | `.github/copilot-instructions.md` | Auto | VS Code, Visual Studio, GitHub.com, Copilot CLI |
-| `AGENTS.md` (root and subdirectories) | Auto | VS Code, Copilot CLI (Codex) |
+| `AGENTS.md` (root and subdirectories) | Auto | VS Code, Copilot CLI |
 | Agent Skills (`.github/skills/*/SKILL.md`) | On-demand (description match) | VS Code, Copilot CLI, Copilot coding agent ([open standard](https://agentskills.io/)) |
-| `.github/instructions/*.instructions.md` | Auto (via `applyTo` globs) | VS Code only |
-| `.github/prompts/*.prompt.md` | User-invoked | VS Code only |
-| `.github/agents/*.agent.md` | User-selected | VS Code only |
+| `.github/instructions/*.instructions.md` | Auto (via `applyTo` globs) | VS Code, Copilot CLI |
+| `.github/agents/*.agent.md` | User-selected / inferred | VS Code, Copilot CLI |
+| `.github/prompts/*.prompt.md` | User-invoked (`/command`) | VS Code only |
 | `.vscode/mcp.json` | Auto | VS Code only |
 
-**Guiding principle:** Put the most important content in cross-platform files (`copilot-instructions.md`, `AGENTS.md`). Use VS Code-specific files (`.instructions.md`, prompts) as optional enhancements for richer IDE integration.
+**Guiding principle:** Most instruction file types are now cross-platform (Copilot CLI supports `copilot-instructions.md`, `AGENTS.md`, `.instructions.md`, agents, and skills). The main exception is `.prompt.md` files, which are VS Code only. Encode domain knowledge in skills (cross-platform); prompts should be thin wrappers that reference skills for the actual guidance.
 
 ## Scope
 
@@ -60,7 +60,7 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
    - Common workflows at a high level
    - Links to detailed guidance
 
-2. **File-type specific instructions** (`.instructions.md` with `applyTo` globs) — *VS Code enhancement*
+2. **File-type specific instructions** (`.instructions.md` with `applyTo` globs) — *cross-platform (VS Code, Copilot CLI)*
    - `*.comp.toml` - Component definition files
    - `*.distro.toml` - Distro configuration files
    - `*.spec` - RPM spec files (hand-coded)
@@ -77,10 +77,11 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
    - `azl-build-component/SKILL.md` - How to build and test components
    - Each skill is a directory containing a `SKILL.md` (with required `name` and `description` YAML frontmatter) plus optional scripts, examples, and resources. Skills are discovered on-demand based on description matching — no `AGENTS.md` link required for discovery, but `AGENTS.md` files may still reference skills for supplementary orientation.
 
-5. **Experimental custom agents** (`.github/agents/*.agent.md`, 1-2 maximum) — *VS Code only*
+5. **Experimental custom agents** (`.github/agents/*.agent.md`, 1-2 maximum) — *cross-platform (VS Code, Copilot CLI)*
    - Consider: Component reviewer agent, Overlay specialist agent
    - Agents use `.agent.md` files with optional YAML frontmatter (`description`, `tools`, `model`, `handoffs`)
    - Consider handoffs between agents for multi-step workflows (e.g., review → fix)
+   - Copilot CLI discovers agents from `.github/agents/`, `~/.copilot/agents/`, and org-level locations
 
 6. **Prompt templates** (`.github/prompts/*.prompt.md`) — *VS Code only*
    - `add-component.prompt.md` - Guided workflow for adding a new component
@@ -88,6 +89,7 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
    - `review-component.prompt.md` - Review a component for hygiene and best practices
    - `debug-overlay.prompt.md` - Diagnose and fix overlay issues
    - `migrate-component.prompt.md` - Migrate inline component to dedicated file
+   - **Design principle:** Prompts are thin wrappers — they collect user input and orchestrate the workflow, but reference the corresponding skill for domain knowledge. This ensures Copilot CLI users (who lack `/prompt` support) still get the same guidance via skills.
 
 ### Out of Scope (v1)
 
@@ -105,13 +107,13 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
 azurelinux/
 ├── .github/
 │   ├── copilot-instructions.md         # Repository-wide instructions (cross-platform)
-│   ├── instructions/                    # File-type specific instructions (VS Code)
+│   ├── instructions/                    # File-type specific instructions (cross-platform)
 │   │   ├── comp-toml.instructions.md
 │   │   └── spec.instructions.md
-│   ├── prompts/                         # Prompt templates (VS Code)
+│   ├── prompts/                         # Prompt templates (VS Code only)
 │   │   ├── add-component.prompt.md
 │   │   └── ...
-│   ├── agents/                          # Custom agents (VS Code)
+│   ├── agents/                          # Custom agents (cross-platform)
 │   │   └── *.agent.md
 │   └── skills/                          # Agent Skills (cross-platform, open standard)
 │       ├── azl-add-component/
@@ -343,27 +345,39 @@ Consider creating 1-2 specialized agents:
 
 ### Prompts Design
 
-Prompts are reusable, parameterized workflows that users can invoke directly via `/` in chat. They are `.prompt.md` files stored in `.github/prompts/`.
+Prompts are reusable, parameterized workflows that users can invoke directly via `/` in chat. They are `.prompt.md` files stored in `.github/prompts/`. **Prompts are VS Code only** — Copilot CLI does not currently support `/prompt` invocation.
 
 **Key prompt file features:**
 
 - **YAML frontmatter** — optional `description`, `agent`, `tools`, `model` fields
 - **Input variables** — use `${input:variableName}` or `${input:variableName:placeholder}` for user-provided parameters
 - **Built-in variables** — `${file}`, `${selection}`, `${workspaceFolder}`, etc.
-- **Markdown links** — reference instructions files and workspace files using relative paths (avoids duplicating guidance)
+- **Markdown links** — reference skill and instruction files using relative paths
 - **Tool references** — use `#tool:<tool-name>` syntax to reference specific tools
 - **Agent selection** — `agent:` frontmatter can route the prompt through a custom agent
 
+**Critical design principle — prompts are thin wrappers around skills:**
+
+Since prompts are VS Code only, all domain knowledge must live in skills (which are cross-platform). Each prompt should:
+
+1. **Collect user input** via `${input:...}` variables
+2. **Reference the corresponding skill** via a Markdown link (e.g., `[skill](../.github/skills/azl-add-component/SKILL.md)`), so the skill's instructions are loaded into context
+3. **Orchestrate the workflow** — define the step-by-step sequence, but delegate the "how" to the skill
+4. **Add VS Code-specific affordances** — use `agent:`, `tools:`, and built-in variables that only make sense in VS Code
+
+This ensures Copilot CLI users get the same guidance via automatic skill discovery, even without `/prompt` support. If Copilot CLI adds prompt support in the future, the thin-wrapper design means prompts will work there too with minimal changes.
+
 **Skills vs Prompts distinction:**
 
-- **Skills** are **on-demand capabilities** loaded automatically when Copilot detects relevance. They provide comprehensive information and can include scripts/resources.
-- **Prompts** are **user-invoked workflows** triggered explicitly via `/command`. They are streamlined action guides.
+- **Skills** are **on-demand capabilities** loaded automatically when Copilot detects relevance. They provide comprehensive domain knowledge and can include scripts/resources. *Cross-platform.*
+- **Prompts** are **user-invoked workflows** triggered explicitly via `/command`. They are streamlined action orchestrators. *VS Code only.*
 
-Both may cover similar topics but serve different purposes. Skills answer "how does this work?" while prompts answer "help me do this now." Prompts should link to relevant instructions files via Markdown links rather than duplicating their content.
+Both cover similar topics but serve different purposes. Skills answer "how does this work?" while prompts answer "help me do this now."
 
 #### `add-component.prompt.md`
 
 **Purpose:** Guided workflow for adding a new component to Azure Linux
+**References:** `azl-add-component/SKILL.md` (linked via Markdown, provides domain knowledge)
 
 **Input variables** (via `${input:...}` syntax):
 
@@ -371,7 +385,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 - `${input:source_distro:fedora}` (optional) - Upstream distro to source from
 - `${input:project:base}` (optional) - Target project (base, extras, etc.)
 
-**Workflow concepts:**
+**Workflow orchestration** (detailed guidance lives in the skill):
 
 - Check for existing component
 - Gather upstream spec information
@@ -383,6 +397,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 #### `update-component.prompt.md`
 
 **Purpose:** Guided workflow for updating an existing component
+**References:** `azl-update-component/SKILL.md` (linked via Markdown, provides domain knowledge)
 
 **Input variables:**
 
@@ -390,7 +405,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 - `${input:new_version:target version}` (optional) - Target version (if version bump)
 - `${input:update_type:version|dependency|overlay|config}` (optional) - Type of update
 
-**Workflow concepts:**
+**Workflow orchestration** (detailed guidance lives in the skill):
 
 - Query current state before changes
 - Identify scope of update
@@ -402,6 +417,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 #### `review-component.prompt.md`
 
 **Purpose:** Review a component definition for hygiene and best practices
+**References:** Hygiene rules from `copilot-instructions.md` and `base/comps/AGENTS.md` (linked via Markdown)
 
 **Input variables:**
 
@@ -420,6 +436,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 #### `debug-overlay.prompt.md`
 
 **Purpose:** Diagnose and fix overlay application failures
+**References:** `azl-fix-overlay/SKILL.md` (linked via Markdown, provides diagnostic knowledge)
 
 **Input variables:**
 
@@ -442,6 +459,7 @@ Both may cover similar topics but serve different purposes. Skills answer "how d
 #### `migrate-component.prompt.md`
 
 **Purpose:** Migrate an inline component definition to a dedicated file
+**References:** Migration guidance from `azl-update-component/SKILL.md` and `base/comps/AGENTS.md` (linked via Markdown)
 
 **Input variables:**
 
@@ -480,9 +498,9 @@ Each skill is a directory with a `SKILL.md` file following the [Agent Skills sta
 - [ ] Write clear `description` fields so Copilot can match skills to user requests
 - [ ] Optionally link skills from `AGENTS.md` files for supplementary orientation
 
-### Phase 3: File-Type Instructions (VS Code enhancement)
+### Phase 3: File-Type Instructions (cross-platform)
 
-These `.instructions.md` files use `applyTo` globs for automatic context injection in VS Code. The core guidance they contain should already be covered by the cross-platform `AGENTS.md` and `copilot-instructions.md` files from Phase 1; these provide a richer experience for VS Code users.
+These `.instructions.md` files use `applyTo` globs for automatic context injection. Both VS Code and Copilot CLI support them. They complement the broader `AGENTS.md` and `copilot-instructions.md` files from Phase 1 with file-type-specific guidance.
 
 - [ ] Create `.github/instructions/comp-toml.instructions.md` (`applyTo: "**/*.comp.toml"`)
 - [ ] Create `.github/instructions/spec-handcoded.instructions.md` (`applyTo: "**/*.spec"`)
@@ -491,7 +509,7 @@ These `.instructions.md` files use `applyTo` globs for automatic context injecti
 
 ### Phase 4: Prompts (VS Code only)
 
-Prompts use `${input:variableName:placeholder}` for parameters, Markdown links to reference instructions files (avoid duplicating), and optional `agent:`/`tools:` frontmatter.
+Prompts are thin wrappers: they collect user input via `${input:...}` variables and reference the corresponding skill via Markdown links for domain knowledge. This ensures the same guidance is available to Copilot CLI users via automatic skill discovery. Use optional `agent:`/`tools:` frontmatter for VS Code-specific affordances.
 
 - [ ] Create `.github/prompts/add-component.prompt.md`
 - [ ] Create `.github/prompts/update-component.prompt.md`
@@ -500,9 +518,9 @@ Prompts use `${input:variableName:placeholder}` for parameters, Markdown links t
 - [ ] Create `.github/prompts/debug-build.prompt.md` - Debug build failures using mock shell
 - [ ] Create `.github/prompts/migrate-component.prompt.md`
 
-### Phase 5: Experimental Agents (VS Code only)
+### Phase 5: Experimental Agents (cross-platform)
 
-Agents are `.agent.md` files in `.github/agents/`. Use YAML frontmatter to restrict tools, set models, and define handoffs.
+Agents are `.agent.md` files in `.github/agents/`. Both VS Code and Copilot CLI discover them. Use YAML frontmatter to restrict tools, set models, and define handoffs.
 
 - [ ] Evaluate need for Component Hygiene agent (`hygiene-review.agent.md`)
 - [ ] Evaluate need for Overlay Specialist agent (`overlay-specialist.agent.md`)
@@ -558,7 +576,7 @@ These aspects of the PRD should be reviewed and updated as the project evolves:
 4. **Agent scope:** Should experimental agents be repo-specific or potentially shared across Azure Linux repos? Should azldev have a command to install the resources into other repos?
 
 5. **Prompts vs Skills overlap:** Some workflows exist as both skills and prompts (e.g., add-component). Should we consolidate, or keep both for different use cases (reference vs interactive)?
-   - **Resolution:** Keep both. Skills are reference documentation (passive); prompts are interactive workflows (active). They serve different purposes even when covering similar topics. The prompt may refer to the skill for deeper understanding.
+   - **Resolution:** Keep both, but with a clear layering: skills hold the domain knowledge (cross-platform), prompts are thin wrappers that reference skills and add VS Code-specific affordances (input variables, agent routing, tool selection). This avoids knowledge duplication and ensures Copilot CLI users get the same guidance via automatic skill discovery.
 
 ## Appendix: Key azldev Capabilities
 
