@@ -66,7 +66,7 @@ def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -
     commands = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
         level = _SEVERITY_MAP[category][0]
-        line = finding.get("line", 1)
+        line = finding.get("line") or 1
         msg = _format_message(finding, escape_fn=escape_workflow_command)
         escaped_file = escape_workflow_command(spec_file)
         commands.append(f"::{level} file={escaped_file},line={line}::{msg}")
@@ -78,7 +78,7 @@ def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -
     annotations = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
         _, api_level, title = _SEVERITY_MAP[category]
-        line = finding.get("line", 1)
+        line = finding.get("line") or 1
         msg = _format_message(finding)
         annotations.append({
             "path": spec_file,

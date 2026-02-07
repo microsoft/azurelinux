@@ -36,7 +36,7 @@ class Finding(BaseModel):
 class SpecReview(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    spec_file: str
+    spec_file: str = Field(..., min_length=1)
     errors: list[Finding] = Field(default_factory=list)
     warnings: list[Finding] = Field(default_factory=list)
     suggestions: list[Finding] = Field(default_factory=list)

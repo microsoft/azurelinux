@@ -247,7 +247,7 @@ jobs:
           retention-days: 30
 
       - name: Fail if errors found
-        if: steps.changed-specs.outputs.skip != 'true' && (steps.validate.outputs.error_count || '0') > 0
+        if: steps.changed-specs.outputs.skip != 'true' && fromJSON(steps.validate.outputs.error_count || '0') > 0
         run: |
           echo "Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
           echo ""
