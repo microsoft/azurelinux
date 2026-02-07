@@ -208,7 +208,7 @@ libxml2-devel-2.11.5-8.azl3.aarch64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-14.azl3.noarch.rpm
 libsepol-3.6-2.azl3.aarch64.rpm
-glib-2.78.6-7.azl3.aarch64.rpm
+glib-2.78.6-8.azl3.aarch64.rpm
 libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
