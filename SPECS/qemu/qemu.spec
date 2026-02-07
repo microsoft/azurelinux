@@ -427,8 +427,8 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
-Version: 8.2.0
-Release: 27%{?dist}
+Version: 9.1.0
+Release: 1%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -438,20 +438,9 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 # Fix pvh.img ld build failure on fedora rawhide
 Patch1:   0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
 Patch2:   0002-Disable-failing-tests-on-azl.patch
-Patch3:   CVE-2023-6683.patch
-Patch4:   CVE-2023-6693.patch
-Patch5:   CVE-2021-20255.patch
-Patch6:   CVE-2024-3447.patch
-Patch7:   CVE-2024-4467.patch
-Patch8:   CVE-2024-6505.patch
-Patch9:   CVE-2024-4693.patch
-Patch10:  CVE-2024-7730.patch
-Patch11:  CVE-2024-3567.patch
-Patch12:  CVE-2024-26327.patch
-Patch13:  CVE-2024-26328.patch
-Patch14:  CVE-2024-7409.patch
-Patch15:  CVE-2025-11234.patch
-Patch16:  CVE-2025-12464.patch
+Patch3:   CVE-2021-20255.patch
+Patch4:   CVE-2025-11234.patch
+Patch5:   CVE-2025-12464.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -1644,7 +1633,6 @@ mkdir -p %{static_builddir}
   --disable-attr                   \\\
   --disable-auth-pam               \\\
   --disable-avx2                   \\\
-  --disable-avx512f                \\\
   --disable-avx512bw               \\\
   --disable-blkio                  \\\
   --disable-block-drv-whitelist-in-tools \\\
@@ -1841,7 +1829,6 @@ run_configure \
   --enable-attr \
 %ifarch %{ix86} x86_64
   --enable-avx2 \
-  --enable-avx512f \
   --enable-avx512bw \
 %endif
 %if %{have_libblkio}
@@ -3435,6 +3422,14 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.1.0-1
+- Upgrade to QEMU 9.1.0
+- Remove CVE patches merged upstream: CVE-2023-6683, CVE-2023-6693,
+  CVE-2024-3447, CVE-2024-4467, CVE-2024-6505, CVE-2024-4693,
+  CVE-2024-7730, CVE-2024-3567, CVE-2024-26327, CVE-2024-26328,
+  CVE-2024-7409
+- Rebase 0002-Disable-failing-tests-on-azl.patch for 9.1.0
+
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-27
 - Bump to rebuild with updated glibc
 
