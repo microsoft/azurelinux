@@ -159,7 +159,7 @@ jobs:
             --label-a "Reviewer A (claude-opus-4.6)" \
             --label-b "Reviewer B (gpt-5.2-codex)" \
             --label-final "Synthesized (gpt-5.2-codex)" \
-          || echo "⚠️ Compare failed (missing reports?)"
+          || echo "Compare failed (missing reports?)"
 
       - name: Validate report and check for errors
         if: steps.changed-specs.outputs.skip != 'true'
@@ -249,7 +249,7 @@ jobs:
       - name: Fail if errors found
         if: steps.changed-specs.outputs.skip != 'true' && (steps.validate.outputs.error_count || '0') > 0
         run: |
-          echo "❌ Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
+          echo "Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
           echo ""
           # Print all findings so "View details" shows everything
           python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --all

@@ -73,7 +73,7 @@ class SpecReviewReport(BaseModel):
         return self.total_errors > 0
 
     def print_summary(self):
-        status = "❌ ERRORS FOUND" if self.has_errors else "✅ No errors"
+        status = "ERRORS FOUND" if self.has_errors else "No errors"
         print(f"{status}")
         print(f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}")
 
@@ -82,7 +82,7 @@ class SpecReviewReport(BaseModel):
             if review.errors:
                 print(f"\n{review.spec_name}:")
                 for e in review.errors:
-                    print(f"  ❌ {e.description}")
+                    print(f"  [error] {e.description}")
                     if e.citation:
                         print(f"     {e.citation}")
 
@@ -91,7 +91,7 @@ class SpecReviewReport(BaseModel):
             if review.warnings:
                 print(f"\n{review.spec_name}:")
                 for w in review.warnings:
-                    print(f"  ⚠️  {w.description}")
+                    print(f"  [warning] {w.description}")
                     if w.citation:
                         print(f"     {w.citation}")
 
@@ -100,7 +100,7 @@ class SpecReviewReport(BaseModel):
             if review.suggestions:
                 print(f"\n{review.spec_name}:")
                 for s in review.suggestions:
-                    print(f"  💡 {s.description}")
+                    print(f"  [suggestion] {s.description}")
                     if s.citation:
                         print(f"     {s.citation}")
 
@@ -138,7 +138,7 @@ def compare_reports(
 ) -> None:
     """Print a human-readable comparison of two reviewer reports and the synthesis."""
     severities = ["errors", "warnings", "suggestions"]
-    icons = {"errors": "❌", "warnings": "⚠️ ", "suggestions": "💡"}
+    icons = {"errors": "ERROR", "warnings": "WARNING", "suggestions": "SUGGESTION"}
 
     # --- Per-model summary table ---
     col_w = max(len(label_a), len(label_b), len(label_final), 5) + 2
@@ -174,7 +174,7 @@ def compare_reports(
                     sources.append("A")
                 if (spec, desc) in set_b:
                     sources.append("B")
-                print(f"    ✓ [{'+'.join(sources)}] {spec}: {desc}")
+                print(f"    + [{'+'.join(sources)}] {spec}: {desc}")
 
         if dropped:
             print(f"  Dropped ({len(dropped)}):")
@@ -184,7 +184,7 @@ def compare_reports(
                     sources.append("A")
                 if (spec, desc) in set_b:
                     sources.append("B")
-                print(f"    ✗ [{'+'.join(sources)}] {spec}: {desc}")
+                print(f"    - [{'+'.join(sources)}] {spec}: {desc}")
 
         if added:
             print(f"  Added by synthesizer ({len(added)}):")
@@ -214,13 +214,13 @@ def main() -> int:
             rb = _load_report(args.report_b)
             rf = _load_report(args.report_final)
         except FileNotFoundError as e:
-            print(f"❌ File not found: {e}", file=sys.stderr)
+            print(f"File not found: {e}", file=sys.stderr)
             return 2
         except json.JSONDecodeError as e:
-            print(f"❌ Invalid JSON: {e}", file=sys.stderr)
+            print(f"Invalid JSON: {e}", file=sys.stderr)
             return 2
         except Exception as e:
-            print(f"❌ Validation failed: {e}", file=sys.stderr)
+            print(f"Validation failed: {e}", file=sys.stderr)
             return 2
 
         compare_reports(ra, rb, rf, args.label_a, args.label_b, args.label_final)
@@ -245,13 +245,13 @@ def main() -> int:
     try:
         report = SpecReviewReport.from_file(args.file)
     except FileNotFoundError:
-        print(f"❌ File not found: {args.file}", file=sys.stderr)
+        print(f"File not found: {args.file}", file=sys.stderr)
         return 2
     except json.JSONDecodeError as e:
-        print(f"❌ Invalid JSON: {e}", file=sys.stderr)
+        print(f"Invalid JSON: {e}", file=sys.stderr)
         return 2
     except Exception as e:
-        print(f"❌ Validation failed: {e}", file=sys.stderr)
+        print(f"Validation failed: {e}", file=sys.stderr)
         return 2
 
     if args.json:
