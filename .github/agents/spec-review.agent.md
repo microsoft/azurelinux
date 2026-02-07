@@ -120,7 +120,7 @@ The triage manifest is consumed by Step 3 (KB generation) to decide which guidel
 - This is critical for getting complete guideline content — unresolved includes mean missing examples and rules
 
 **Use the triage manifest from Step 2** to focus KB generation on relevant guideline topics. For example:
-- If triage found golang specs → read `Golang.adoc` and `Golang_advanced.adoc`
+- If triage found golang specs → read `Golang.adoc` and `Golang_advanced.adoc` (assuming the packaging-committee sources are available as a git repo that was passed to you).
 - If triage found systemd services → read `Systemd.adoc`
 - If triage found release/meta packages → focus on naming, versioning, and file ownership rules
 - Always include core guidelines (naming, versioning, licensing, source URLs) regardless of spec types
