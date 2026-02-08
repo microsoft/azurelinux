@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "afterburn-5.8.2-azlcustomvendor.tar.gz": "167a8d2acbb17ba982f7fe1bcb02d974ba57d8e938b676d5f6ec417b86a62ccb",
+  "coreos-metadata-sshkeys.service": "fc4d58504e03cf72bd1d943d9982db99d3331153c27960420f677de75011a29a",
+  "coreos-metadata.service": "05d61c59cfa81eb9965963b65bcedcc6e6c9749ce060097f377eaa4abadf0bac",
+  "rust-afterburn-5.8.2.tar.gz": "67bdee0ac3596778e615a3f3d2bc2542944a8f6316902867e7c354d1612c9089"
+ }
+}

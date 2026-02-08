@@ -1,0 +1,240 @@
+From c3aab3785e37c362131c0738178e0320435dca68 Mon Sep 17 00:00:00 2001
+From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+Date: Thu, 19 Sep 2024 09:53:18 +0200
+Subject: [PATCH 1/3] Revert "*: remove cl-legacy feature"
+
+This reverts commit 3e4b623b390ab756a6be963eec7198b3e7f44e20.
+
+(dpark: Re-add hostname crate and its dependencies, as they are not
+ included by default in 5.5.)
+
+Modified by - Sandeep Karambelkar <skarambelkar@microsoft.com>
+
+Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+Signed-off-by: Dongsu Park <dpark@linux.microsoft.com>
+---
+ Cargo.lock                              | 31 ++++++++++
+ Cargo.toml                              |  4 ++
+ src/metadata.rs                         |  6 ++
+ src/providers/mod.rs                    |  2 +
+ src/providers/vagrant_virtualbox/mod.rs | 79 +++++++++++++++++++++++++
+ src/util/cmdline.rs                     |  4 ++
+ 6 files changed, 126 insertions(+)
+ create mode 100644 src/providers/vagrant_virtualbox/mod.rs
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 0cfbbeb..d9e9171 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -31,6 +31,7 @@ dependencies = [
+  "base64 0.22.1",
+  "cfg-if",
+  "clap",
++ "hostname",
+  "ipnetwork",
+  "libflate",
+  "libsystemd",
+@@ -830,6 +831,17 @@ dependencies = [
+  "digest",
+ ]
+
++[[package]]
++name = "hostname"
++version = "0.4.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f9c7c7c8ac16c798734b8a24560c1362120597c40d5e1459f09498f8f6c8f2ba"
++dependencies = [
++ "cfg-if",
++ "libc",
++ "windows",
++]
++
+ [[package]]
+ name = "http"
+ version = "1.3.1"
+@@ -2626,6 +2638,25 @@ version = "0.4.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
++[[package]]
++name = "windows"
++version = "0.52.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
++dependencies = [
++ "windows-core",
++ "windows-targets 0.52.6",
++]
++
++[[package]]
++name = "windows-core"
++version = "0.52.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
++dependencies = [
++ "windows-targets 0.52.6",
++]
++
+ [[package]]
+ name = "windows-link"
+ version = "0.1.1"
+diff --git a/Cargo.toml b/Cargo.toml
+index e11445f..a529f40 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -33,11 +33,15 @@ path = "src/main.rs"
+ # We assume we're being delivered via e.g. RPM which supports split debuginfo
+ debug = true
+
++[features]
++cl-legacy = []
++
+ [dependencies]
+ anyhow = "1.0"
+ base64 = "0.22"
+ cfg-if = "1.0"
+ clap = { version = "4", "default-features" = false, "features" = ["std", "cargo", "derive", "error-context", "help", "suggestions", "usage", "wrap_help"] }
++hostname = "0.4.0"
+ ipnetwork = ">= 0.17, < 0.22"
+ libflate = "2.1"
+ libsystemd = ">= 0.2.1, < 0.8.0"
+diff --git a/src/metadata.rs b/src/metadata.rs
+index bd311f7..59b765d 100644
+--- a/src/metadata.rs
++++ b/src/metadata.rs
+@@ -60,6 +60,10 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
+         "cloudstack-configdrive" => box_result!(ConfigDrive::try_new()?),
+         "digitalocean" => box_result!(DigitalOceanProvider::try_new()?),
+         "exoscale" => box_result!(ExoscaleProvider::try_new()?),
++        #[cfg(feature = "cl-legacy")]
++        "ec2" => box_result!(AwsProvider::try_new()?),
++        #[cfg(feature = "cl-legacy")]
++        "gce" => box_result!(GcpProvider::try_new()?),
+         "gcp" => box_result!(GcpProvider::try_new()?),
+         "hetzner" => box_result!(HetznerProvider::try_new()?),
+         // IBM Cloud - VPC Generation 2.
+@@ -73,6 +77,8 @@ pub fn fetch_metadata(provider: &str) -> Result<Box<dyn providers::MetadataProvi
+         "powervs" => box_result!(PowerVSProvider::try_new()?),
+         "proxmoxve" => proxmoxve::try_config_drive_else_leave(),
+         "scaleway" => box_result!(ScalewayProvider::try_new()?),
++       #[cfg(feature = "cl-legacy")]
++        "vagrant-virtualbox" => box_result!(VagrantVirtualboxProvider::new()),
+         "vmware" => box_result!(VmwareProvider::try_new()?),
+         "vultr" => box_result!(VultrProvider::try_new()?),
+         _ => bail!("unknown provider '{}'", provider),
+diff --git a/src/providers/mod.rs b/src/providers/mod.rs
+index dab07e1..0d69c4f 100644
+--- a/src/providers/mod.rs
++++ b/src/providers/mod.rs
+@@ -41,6 +41,8 @@ pub mod packet;
+ pub mod powervs;
+ pub mod proxmoxve;
+ pub mod scaleway;
++#[cfg(feature = "cl-legacy")]
++pub mod vagrant_virtualbox;
+ pub mod vmware;
+ pub mod vultr;
+
+diff --git a/src/providers/vagrant_virtualbox/mod.rs b/src/providers/vagrant_virtualbox/mod.rs
+new file mode 100644
+index 0000000..d7a9e0e
+--- /dev/null
++++ b/src/providers/vagrant_virtualbox/mod.rs
+@@ -0,0 +1,79 @@
++// Copyright 2017 CoreOS, Inc.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++//! vagrant/virtualbox metadata fetcher
++
++use std::collections::HashMap;
++use std::net::IpAddr;
++use std::thread;
++use std::time::Duration;
++
++use anyhow::{anyhow,Context,Result};
++use slog_scope::info;
++
++use crate::providers::MetadataProvider;
++
++#[derive(Clone, Copy, Debug)]
++pub struct VagrantVirtualboxProvider;
++
++impl VagrantVirtualboxProvider {
++    pub fn new() -> Self {
++        Self
++    }
++
++    fn get_ip() -> Result<String> {
++        let max_attempts = 30;
++        for _ in 0..max_attempts {
++            if let Some(iface) = Self::find_eth1() {
++                for a in iface.ips {
++                    if let IpAddr::V4(a) = a.ip() {
++                        return Ok(format!("{}", a));
++                    }
++                }
++            }
++            info!("eth1 not found or is lacking an ipv4 address; waiting 2 seconds");
++            thread::sleep(Duration::from_secs(2));
++        }
++        Err(anyhow!("eth1 was not found!"))
++    }
++
++    fn find_eth1() -> Option<pnet_datalink::NetworkInterface> {
++        pnet_datalink::interfaces()
++            .into_iter()
++            .find(|i| i.name == "eth1")
++    }
++
++    /// Get the hostname from local system settings.
++    fn system_hostname() -> Result<String> {
++        let hostname = hostname::get()
++            .context("unable to get hostname")?
++            .to_string_lossy()
++            .into_owned();
++        Ok(hostname)
++    }
++}
++
++impl MetadataProvider for VagrantVirtualboxProvider {
++    fn attributes(&self) -> Result<HashMap<String, String>> {
++        let hostname = Self::system_hostname()?;
++        let ip = Self::get_ip()?;
++
++        let attributes = maplit::hashmap! {
++            "VAGRANT_VIRTUALBOX_HOSTNAME".to_string() => hostname,
++            "VAGRANT_VIRTUALBOX_PRIVATE_IPV4".to_string() => ip,
++        };
++
++        Ok(attributes)
++    }
++}
+diff --git a/src/util/cmdline.rs b/src/util/cmdline.rs
+index d07cfeb..2e96ce4 100644
+--- a/src/util/cmdline.rs
++++ b/src/util/cmdline.rs
+@@ -23,7 +23,11 @@ use anyhow::{bail, Context, Result};
+ use slog_scope::trace;
+
+ /// Platform key.
++#[cfg(not(feature = "cl-legacy"))]
+ const CMDLINE_PLATFORM_FLAG: &str = "ignition.platform.id";
++/// Platform key (CL and RHCOS legacy name: "OEM").
++#[cfg(feature = "cl-legacy")]
++const CMDLINE_PLATFORM_FLAG: &str = "coreos.oem.id";
+
+ /// Get platform value from cmdline file.
+ pub fn get_platform(fpath: &str) -> Result<String> {
+--
+2.45.4

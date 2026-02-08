@@ -27543,6 +27543,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rust-afterburn",
+          "version": "5.8.2",
+          "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rust-cbindgen",
           "version": "0.24.3",
           "downloadUrl": "https://github.com/mozilla/cbindgen/archive/refs/tags/v0.24.3.tar.gz"
