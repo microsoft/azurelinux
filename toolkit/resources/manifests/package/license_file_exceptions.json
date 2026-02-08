@@ -45,6 +45,13 @@
             "IgnoredFilesRegexList": [
                 "^/usr/share/man/man3/.*NOTICE.*\\.3ossl\\.gz$"
             ]
+        },
+        {
+            "_comment": "LICENSE.rst in fonts directory is for third-party fonts used in HTML documentation, not the main libvirt license.",
+            "PackageName": "libvirt-docs",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/libvirt-docs/html/fonts/LICENSE\\.rst$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [
