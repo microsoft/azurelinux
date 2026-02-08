@@ -8911,8 +8911,8 @@
         "type": "other",
         "other": {
           "name": "libblockdev",
-          "version": "3.2.0",
-          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/3.2.0/libblockdev-3.2.0.tar.gz"
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/3.4.0/libblockdev-3.4.0.tar.gz"
         }
       }
     },
@@ -29496,8 +29496,8 @@
         "type": "other",
         "other": {
           "name": "udisks2",
-          "version": "2.9.4",
-          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
+          "version": "2.11.0",
+          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.11.0/udisks-2.11.0.tar.bz2"
         }
       }
     },
