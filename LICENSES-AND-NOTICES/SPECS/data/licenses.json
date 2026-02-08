@@ -2834,6 +2834,7 @@
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
+                "kernel6.18",
                 "keyutils",
                 "kmod",
                 "krb5",
