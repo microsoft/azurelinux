@@ -3167,6 +3167,7 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
+                "bootengine",
                 "python-nocaselist"
             ]
         },
