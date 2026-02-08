@@ -1,0 +1,58 @@
+From 9ede2b1e13f72db37718853faff74b4429084d59 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 13/35] 0013-skipped-tests-EC-curves.patch
+
+Patch-name: 0013-skipped-tests-EC-curves.patch
+Patch-id: 13
+Patch-status: |
+    # Skipped tests from former 0011-Remove-EC-curves.patch
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
+---
+ test/recipes/15-test_ec.t          | 2 +-
+ test/recipes/65-test_cmp_protect.t | 2 +-
+ test/recipes/65-test_cmp_vfy.t     | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test/recipes/15-test_ec.t b/test/recipes/15-test_ec.t
+index 0638d626e7..c0efd77649 100644
+--- a/test/recipes/15-test_ec.t
++++ b/test/recipes/15-test_ec.t
+@@ -90,7 +90,7 @@ subtest 'Ed448 conversions -- public key' => sub {
+ 
+ subtest 'Check loading of fips and non-fips keys' => sub {
+     plan skip_all => "FIPS is disabled"
+-        if $no_fips;
++        if 1; #Red Hat specific, original value is $no_fips;
+ 
+     plan tests => 2;
+ 
+diff --git a/test/recipes/65-test_cmp_protect.t b/test/recipes/65-test_cmp_protect.t
+index 631603df7c..4cb2ffebbc 100644
+--- a/test/recipes/65-test_cmp_protect.t
++++ b/test/recipes/65-test_cmp_protect.t
+@@ -27,7 +27,7 @@ plan skip_all => "This test is not supported in a no-cmp build"
+ plan skip_all => "This test is not supported in a shared library build on Windows"
+     if $^O eq 'MSWin32' && !disabled("shared");
+ 
+-plan tests => 2 + ($no_fips ? 0 : 1); #fips test
++plan skip_all => 2 + ($no_fips ? 0 : 1); #fips test
+ 
+ my @basic_cmd = ("cmp_protect_test",
+                  data_file("server.pem"),
+diff --git a/test/recipes/65-test_cmp_vfy.t b/test/recipes/65-test_cmp_vfy.t
+index f722800e27..26a01786bb 100644
+--- a/test/recipes/65-test_cmp_vfy.t
++++ b/test/recipes/65-test_cmp_vfy.t
+@@ -27,7 +27,7 @@ plan skip_all => "This test is not supported in a no-cmp build"
+ plan skip_all => "This test is not supported in a no-ec build"
+     if disabled("ec");
+ 
+-plan tests => 2 + ($no_fips ? 0 : 1); #fips test
++plan skip_all => 2 + ($no_fips ? 0 : 1); #fips test
+ 
+ my @basic_cmd = ("cmp_vfy_test",
+                  data_file("server.crt"),     data_file("client.crt"),
+-- 
+2.41.0
+
