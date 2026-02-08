@@ -31,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.57.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -431,6 +431,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-4
+- Retain kernel config options similar to 6.6 in 6.12 for CONFIG_NET_VENDOR_AQUANTIA
+- CONFIG_AQTION, CONFIG_BLK_WBT, CONFIG_BLK_WBT_MQ, CONFIG_DM_CACHE,CONFIG_INET_DIAG_DESTROY
+- CONFIG_ XFRM_INTERFACE CONFIG_HSA_AMD_P2P, CONFIG_DMABUF_MOVE_NOTIFY
+- CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
 * Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
 - HMAC calc the kernel HWE for FIPS.
 

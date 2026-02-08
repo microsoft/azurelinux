@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
 Version:        6.12.57.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -108,6 +108,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-4
+- Bump to match kernel-hwe.
+
 * Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
 - HMAC calc the kernel HWE for FIPS.
 
