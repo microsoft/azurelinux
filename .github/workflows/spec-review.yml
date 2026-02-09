@@ -1,0 +1,256 @@
+name: Spec Review
+
+on:
+  pull_request:
+    paths:
+      - '**/*.spec'
+  workflow_dispatch:
+
+# Cancel in-progress runs when new commits are pushed
+concurrency:
+  group: spec-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Auth flow:
+# Since copilot currently requires user auth, but we want to avoid using personal tokens,
+# we use a dedicated COPILOT_TOKEN secret which is derived from a GitHub App and can be rotated
+# and managed more easily.
+# The GITHUB_TOKEN is used for standard GitHub API operations (comments, annotations, etc.) and
+# is automatically provided by GitHub Actions.
+jobs:
+  spec-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0  # Need full history for diff
+          persist-credentials: false
+
+      - name: Test gh auth
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+        run: |
+          gh auth status
+
+      - name: Get changed spec files
+        id: changed-specs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            # Get list of changed .spec files in the PR
+            CHANGED_SPECS=$(gh pr diff "$PR_NUMBER" --name-only | grep '\.spec$' || true)
+          else
+            # For workflow_dispatch, review all specs
+            CHANGED_SPECS=$(find . -type f -name "*.spec" | sed 's|^\./||')
+          fi
+
+          if [[ -z "$CHANGED_SPECS" ]]; then
+            echo "No .spec files changed"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Changed spec files:"
+          echo "$CHANGED_SPECS"
+
+          # Write validated spec paths to a file (avoids unquoted word-splitting)
+          SPEC_ARGS_FILE=$(mktemp)
+          while IFS= read -r spec; do
+            # Reject paths with shell metacharacters or glob/space chars
+            if [[ "$spec" =~ [\$\`\"\'\'\;\|\&\>\<\(\)\{\}\*\?\[\]\ ] ]]; then
+              echo "::warning::Skipping suspicious spec path: $spec"
+              continue
+            fi
+            echo "$spec" >> "$SPEC_ARGS_FILE"
+          done <<< "$CHANGED_SPECS"
+
+          # Build SPEC_ARGS from the validated file
+          SPEC_ARGS=""
+          while IFS= read -r spec; do
+            SPEC_ARGS="$SPEC_ARGS --spec $spec"
+          done < "$SPEC_ARGS_FILE"
+          rm -f "$SPEC_ARGS_FILE"
+
+          echo "spec_args=$SPEC_ARGS" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        if: steps.changed-specs.outputs.skip != 'true'
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        if: steps.changed-specs.outputs.skip != 'true'
+        run: pip install -r .github/workflows/scripts/requirements.txt
+
+      - name: Install Copilot CLI
+        if: steps.changed-specs.outputs.skip != 'true'
+        run: |
+          npm i -g @github/copilot
+          copilot --version
+
+      # Local developer guide: .github/workflows/scripts/README.md
+      - name: Run Copilot spec review (multi-model)
+        if: steps.changed-specs.outputs.skip != 'true'
+        run: |
+          chmod +x .github/workflows/scripts/spec_review_multi.sh
+          # shellcheck disable=SC2086
+          # SPEC_ARGS is built from validated file paths (grep \.spec$ only)
+          .github/workflows/scripts/spec_review_multi.sh $SPEC_ARGS \
+            --work-dir .spec_review/workdir
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
+
+      - name: Print knowledge bases
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          echo "=== Knowledge Base A ==="
+          cat .spec_review/workdir/kb_a.md || echo "No KB A file found"
+          echo ""
+          echo "=== Knowledge Base B ==="
+          cat .spec_review/workdir/kb_b.md || echo "No KB B file found"
+          echo ""
+          echo "=== Synthesis Notes ==="
+          cat .spec_review/workdir/kb_synth.md || echo "No synthesis KB file found"
+
+      - name: Print session logs
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          echo "=== Copilot Session Log A ==="
+          cat .spec_review/workdir/log_a.md || echo "No log A file found"
+          echo ""
+          echo "=== Copilot Session Log B ==="
+          cat .spec_review/workdir/log_b.md || echo "No log B file found"
+          echo ""
+          echo "=== Synthesis Log ==="
+          cat .spec_review/workdir/log_synth.md || echo "No synthesis log found"
+
+      - name: Print reports
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          echo "=== Report A ==="
+          cat .spec_review/workdir/report_a.json || echo "No report A file found"
+          echo ""
+          echo "=== Report B ==="
+          cat .spec_review/workdir/report_b.json || echo "No report B file found"
+          echo ""
+          echo "=== Final Report ==="
+          cat .spec_review/report.json || echo "No final report file found"
+
+      - name: Compare model findings
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          # NOTE: Label model names must match defaults in spec_review_multi.sh
+          # (DEFAULT_MODEL1, DEFAULT_MODEL2, DEFAULT_SYNTH_MODEL)
+          python .github/workflows/scripts/spec_review_schema.py compare \
+            .spec_review/workdir/report_a.json \
+            .spec_review/workdir/report_b.json \
+            .spec_review/report.json \
+            --label-a "Reviewer A (claude-opus-4.6)" \
+            --label-b "Reviewer B (gpt-5.2-codex)" \
+            --label-final "Synthesized (gpt-5.2-codex)" \
+          || echo "Compare failed (missing reports?)"
+
+      - name: Validate report and check for errors
+        if: steps.changed-specs.outputs.skip != 'true'
+        id: validate
+        run: |
+          # Validate JSON structure
+          python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --json
+
+          # Count errors and warnings
+          ERROR_COUNT=$(jq '[.spec_reviews[].errors | length] | add // 0' .spec_review/report.json)
+          WARNING_COUNT=$(jq '[.spec_reviews[].warnings | length] | add // 0' .spec_review/report.json)
+          SUGGESTION_COUNT=$(jq '[.spec_reviews[].suggestions | length] | add // 0' .spec_review/report.json)
+
+          echo "error_count=$ERROR_COUNT" >> "$GITHUB_OUTPUT"
+          echo "warning_count=$WARNING_COUNT" >> "$GITHUB_OUTPUT"
+          echo "suggestion_count=$SUGGESTION_COUNT" >> "$GITHUB_OUTPUT"
+
+          echo "Total errors: $ERROR_COUNT"
+          echo "Total warnings: $WARNING_COUNT"
+          echo "Total suggestions: $SUGGESTION_COUNT"
+
+      - name: Create inline annotations
+        if: steps.changed-specs.outputs.skip != 'true'
+        run: |
+          # Generate workflow commands that create inline annotations
+          python .github/workflows/scripts/create_check_annotations.py .spec_review/report.json \
+            --repo-root "$GITHUB_WORKSPACE" --workflow-commands
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && steps.changed-specs.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Generate formatted comment to a temp file (avoids ARG_MAX issues with large comments)
+          COMMENT_FILE=$(mktemp)
+          python .github/workflows/scripts/format_pr_comment.py \
+            .spec_review/report.json \
+            --repo "$REPO" \
+            --sha "$HEAD_SHA" \
+            --repo-root "$GITHUB_WORKSPACE" > "$COMMENT_FILE"
+
+          # Find existing bot comment by marker (--paginate handles PRs with >30 comments)
+          EXISTING_COMMENT_ID=$(gh api \
+            --paginate \
+            "/repos/${REPO}/issues/${PR_NUMBER}/comments" \
+            --jq '.[] | select(.body | contains("<!-- SPEC_REVIEW_BOT -->")) | .id' \
+            | head -n1)
+
+          if [[ -n "$EXISTING_COMMENT_ID" ]]; then
+            echo "Updating existing comment $EXISTING_COMMENT_ID"
+            gh api \
+              --method PATCH \
+              "/repos/${REPO}/issues/comments/$EXISTING_COMMENT_ID" \
+              -F body=@"$COMMENT_FILE"
+          else
+            echo "Creating new comment"
+            gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
+          fi
+          rm -f "$COMMENT_FILE"
+
+      - name: Write job summary
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        env:
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python .github/workflows/scripts/format_pr_comment.py \
+            .spec_review/report.json \
+            --repo "$REPO" \
+            --sha "$HEAD_SHA" \
+            --repo-root "$GITHUB_WORKSPACE" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: spec-review-results
+          path: |
+            .spec_review/report.json
+            .spec_review/workdir/
+          retention-days: 30
+
+      - name: Fail if errors found
+        if: steps.changed-specs.outputs.skip != 'true' && fromJSON(steps.validate.outputs.error_count || '0') > 0
+        run: |
+          echo "Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
+          echo ""
+          # Print all findings so "View details" shows everything
+          python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --all
+          exit 1
