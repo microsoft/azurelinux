@@ -94,7 +94,7 @@ index 70c9729..5b39131 100644
 +
 +    // Config file paths
 +#  define SYMCRYPT_PROV_CONF           OPENSSLDIR "/symcrypt_prov.cnf"
-+    // TODO: Upstream uses fips_local.cnf, which is actually a link to a crypto policy file. Review this name.
++    // Upstream uses fips_local.cnf, we use fips_prov.cnf since we don't use crypto policies.
 +#  define FIPS_PROV_CONF              OPENSSLDIR "/fips_prov.cnf"
 +
 +    // Context and configuration variables.
