@@ -17,6 +17,8 @@ BuildRequires:  make
 Requires:       SymCrypt >= 103.8.0
 Requires:       openssl
 
+Conflicts: openssl-fips-provider
+
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 
@@ -79,8 +81,8 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 # These permissions are a result of a security review to mitigate potential risks:
 # - Group and others are denied read access to prevent user-level code from inferring
 #   details about other running applications and their certsinuse usage.
-# - All users have write and execute permissions to create new log files and to 
-#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+# - All users have write and execute permissions to create new log files and to
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or
 #   replaced by a symlink).
 # - The sticky bit is set to prevent malicious users from deleting the log files
 #   and interfering with certsinuse alerting mechanisms.
