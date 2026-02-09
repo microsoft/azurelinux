@@ -1,0 +1,11 @@
+[components.firewalld]
+
+[[components.firewalld.overlays]]
+type = "spec-remove-tag"
+description = "Remove Fedora patch that opens mdns port in public (default) zone"
+tag = "Patch0"
+
+[[components.firewalld.overlays]]
+type = "file-remove"
+description = "Remove Fedora patch that opens mdns port in public (default) zone"
+file = "fedora-only-MDNS-default.patch"
