@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.1616
+Version:        9.1.2132
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -221,6 +221,9 @@ fi
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Mon Feb 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.2132-1
+- Auto-upgrade to 9.1.2132 - for CVE-2026-25749
+
 * Tue Aug 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1616-1
 - Auto-upgrade to 9.1.1616 - for CVE-2025-9390
 
