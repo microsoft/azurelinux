@@ -1,4 +1,4 @@
-# Stub workflow — A copy of this workflow must live on the default branch (3.0) so that the pull_request_target event
+# Stub workflow — A copy of this workflow must live on the default branch (3.0) so that the pull_request_target
 # event can trigger it with access to secrets. It then delegates all real work to the reusable template on
 # tomls/base/main, which has the scripts, prompts, and agent definitions.
 #

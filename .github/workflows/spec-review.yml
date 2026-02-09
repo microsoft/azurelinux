@@ -81,7 +81,7 @@ jobs:
           # Copy all spec files from sparse checkout into the main tree.
           # The sparse checkout already filtered to *.spec only.
           cd pr-head
-          find . -name '*.spec' -print0 | while IFS= read -r -d '' spec; do
+          find . -name '*.spec' -type f -print0 | while IFS= read -r -d '' spec; do
             echo "Copying '$(realpath "$spec")' to '$(realpath -m "../$spec")'"
             mkdir -p "../$(dirname "$spec")"
             cp "$spec" "../$spec"
@@ -120,8 +120,12 @@ jobs:
           echo "Changed spec files:"
           echo "$CHANGED_SPECS"
 
-          # Build --spec args (paths are from gh/git, safe by construction)
-          SPEC_ARGS=$(printf -- '--spec %s ' $CHANGED_SPECS)
+          # Build --spec args from line-delimited paths
+          SPEC_ARGS=""
+          while IFS= read -r spec; do
+            [[ -z "$spec" ]] && continue
+            SPEC_ARGS+="--spec ${spec} "
+          done <<< "$CHANGED_SPECS"
 
           echo "spec_args=$SPEC_ARGS" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
@@ -264,7 +268,7 @@ jobs:
               -F body=@"$COMMENT_FILE"
           else
             echo "Creating new comment"
-            gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file "$COMMENT_FILE"
           fi
           rm -f "$COMMENT_FILE"
 
