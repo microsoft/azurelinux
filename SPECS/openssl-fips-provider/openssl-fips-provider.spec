@@ -76,6 +76,7 @@ BuildRequires: %{_bindir}/rename
 BuildRequires: coreutils
 BuildRequires: g++
 BuildRequires: gcc
+BuildRequires: git-core
 BuildRequires: make
 BuildRequires: perl-core
 BuildRequires: perl(Digest::SHA)
@@ -101,7 +102,6 @@ libraries which provide various cryptographic algorithms and
 protocols. This package provides the OpenSSL FIPS Provider module.
 
 %prep
-# TODO: TOBIASB: Move back to not using git
 %autosetup -S git -n openssl-%{version}
 
 %build
