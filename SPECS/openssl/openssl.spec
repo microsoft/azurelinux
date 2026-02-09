@@ -371,7 +371,7 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Tue Feb 3 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
+* Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
 - Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
 - Patch OpenSSL speed to skip algorithms not supported by the selected FIPS provider.
 
