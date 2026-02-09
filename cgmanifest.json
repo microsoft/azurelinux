@@ -15612,7 +15612,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openssl",
+          "name": "openssl-fips-provider",
           "version": "3.1.2",
           "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.1.2/openssl-3.1.2.tar.gz"
         }
