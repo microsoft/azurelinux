@@ -41,12 +41,19 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: spec-review-run-${{ inputs.pr-number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {} # Override any inherited defaults; job-level permissions are set below
+
 jobs:
   spec-review:
+    name: Spec Review
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Post review comments and inline annotations on PRs
 
     steps:
       # Stage 1: Checkout the scripts branch for tooling (prompts, scripts, agents).
@@ -297,8 +304,10 @@ jobs:
 
       - name: Fail if errors found
         if: steps.changed-specs.outputs.skip != 'true' && fromJSON(steps.validate.outputs.error_count || '0') > 0
+        env:
+          ERROR_COUNT: ${{ steps.validate.outputs.error_count }}
         run: |
-          echo "Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
+          echo "Found ${ERROR_COUNT} error(s) in spec review"
           echo ""
           # Print all findings so "View details" shows everything
           python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --all

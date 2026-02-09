@@ -12,7 +12,11 @@
 # the base is used, while still allowing the PR head to provide the .spec files as data input.
 name: Spec Review
 
-on:
+# pull_request_target is required here: we need secret access (COPILOT_TOKEN) to run the
+# spec review agent on fork PRs. The stub itself runs NO code from the PR — it only
+# delegates to a trusted reusable workflow pinned to tomls/base/main, which sparse-checks
+# out only .spec data files (never executable code) from the PR head.
+on: # zizmor: ignore[dangerous-triggers]
   pull_request_target:
     # Only trigger on PRs targeting the toml base branch which modify .spec files. We do
     # not want to affect PRs targeting other branches.
@@ -22,13 +26,19 @@ on:
     paths:
       - '**/*.spec'
 
+permissions: {} # All permissions are declared by the reusable workflow's job
+
 concurrency:
   group: spec-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   review:
-    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@tomls/base/main
+    # Prevent forks from running a stale/vulnerable copy of this stub with Actions enabled
+    if: github.repository == 'microsoft/azurelinux'
+    # Intentionally branch-pinned to our own repo so the
+    # reusable workflow picks up prompt/script/agent updates automatically.
+    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@tomls/base/main # zizmor: ignore[unpinned-uses]
     with:
       pr-head-sha: ${{ github.event.pull_request.head.sha }}
       pr-head-repo: ${{ github.event.pull_request.head.repo.full_name }}
