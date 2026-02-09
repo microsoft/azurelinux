@@ -162,6 +162,7 @@ fi
 %lang(da) %{_datarootdir}/vim/vim*/lang/da/LC_MESSAGES/vim.mo
 %lang(lv) %{_datarootdir}/vim/vim*/lang/lv/LC_MESSAGES/vim.mo
 %lang(sr) %{_datarootdir}/vim/vim*/lang/sr/LC_MESSAGES/vim.mo
+%lang(ta) %{_datarootdir}/vim/vim*/lang/ta/LC_MESSAGES/vim.mo
 %lang(tr) %{_datarootdir}/vim/vim*/lang/tr/LC_MESSAGES/vim.mo
 %lang(vi) %{_datarootdir}/vim/vim*/lang/vi/LC_MESSAGES/vim.mo
 %lang(zh_CN.UTF-8) %{_datarootdir}/vim/vim*/lang/zh_CN.UTF-8/LC_MESSAGES/vim.mo
