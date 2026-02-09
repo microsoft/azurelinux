@@ -84,11 +84,11 @@ tar xf %{SOURCE1}
 pushd vendor/libz-sys/src/zlib
 %patch0 -p1
 %patch4 -p1
+%patch6 -p1
 popd
 %patch1 -p1
 %patch2 -p1	
 %patch3 -p1
-%patch 6 -p1
 %patch5 -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
