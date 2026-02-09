@@ -14,9 +14,28 @@ spec = { type = "local", path = "kernel-headers.spec" }
 
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 [[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "%global debug_package %{nil}"
-replacement = "%global debug_package %{nil}\n\nBuildRequires: make\nBuildRequires: gcc\nBuildRequires: perl\nBuildRequires: rsync"
+type = "spec-add-tag"
+description = "Add make as a build dependency for generating headers from source"
+tag = "BuildRequires"
+value = "make"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add gcc as a build dependency for generating headers from source"
+tag = "BuildRequires"
+value = "gcc"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add perl as a build dependency for kernel header sanitization scripts"
+tag = "BuildRequires"
+value = "perl"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add rsync as a build dependency for kernel headers_install"
+tag = "BuildRequires"
+value = "rsync"
 
 # Version updates: Fedora 6.19 -> Azure Linux 6.18.5.1
 [[components.kernel-headers.overlays]]
