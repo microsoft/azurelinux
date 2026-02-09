@@ -52,25 +52,24 @@ regex = "%setup -q -c"
 replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{specversion}"
 
 # Build: generate native + cross headers from Azure Linux kernel source.
+# Uses make headers_install which produces properly sanitized userspace headers.
 # Detects native arch and cross-compiles for the other (x86_64 <-> arm64).
 [[components.kernel-headers.overlays]]
 type = "spec-append-lines"
 section = "%build"
 lines = [
     "make mrproper",
-    "make headers",
+    "make headers_install INSTALL_HDR_PATH=headers-native",
     "",
     "# Determine native kernel arch and cross-compile for the other",
     "native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')",
     "for cross_arch in arm64 x86; do",
     "    [ \"$cross_arch\" = \"$native_karch\" ] && continue",
-    "    make ARCH=$cross_arch O=usr/include-$cross_arch headers",
+    "    make ARCH=$cross_arch headers_install INSTALL_HDR_PATH=headers-$cross_arch",
     "done",
-    "",
-    "find usr/include* \\( -name \".*\" -o -name \"Makefile\" \\) -delete",
 ]
 
-# Install: copy built headers into RPM buildroot, replacing Fedora's copy logic.
+# Install: copy headers_install output into RPM buildroot, replacing Fedora's copy logic.
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 regex = "# List of architectures we support and want to copy their headers"
@@ -78,13 +77,13 @@ replacement = """
 native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
 
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
-cp -rv usr/include/* $RPM_BUILD_ROOT%{_includedir}
+cp -rv headers-native/include/* $RPM_BUILD_ROOT%{_includedir}
 
 for cross_arch in arm64 x86; do
     [ "$cross_arch" = "$native_karch" ] && continue
     cross_arch_includedir=$RPM_BUILD_ROOT%{_prefix}/${cross_arch}-linux-gnu/include
     mkdir -p $cross_arch_includedir
-    cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir
+    cp -rv headers-$cross_arch/include/* $cross_arch_includedir
 done
 
 exit 0
