@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.5
-Release: 3%{?dist}
+Release: 1001%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -49,9 +49,9 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
-# # Load the SymCrypt provider by default if present in non-FIPS mode,
-# # and always load it implicitly in FIPS mode
-Patch32:  0032-Force-fips.patch
+# # Load SymCrypt provider by default if present in non-FIPS mode,
+# # and always load it or the openssl fips provider in FIPS mode.
+Patch32: 0032-Force-fips-symcrypt-or-fips-3.3.5-AZL3.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -151,7 +151,8 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+# TODO: TOBIASB: Switch away from git
+%autosetup -S git -n %{name}-%{version}
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
