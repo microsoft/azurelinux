@@ -92,57 +92,15 @@ BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
 %endif
 
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-
 %description
+# TODO: TOBIASB: Wording review
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
 libraries which provide various cryptographic algorithms and
-protocols.
-
-%package libs
-Summary: A general purpose cryptography library with TLS implementation
-Recommends: SymCrypt
-Recommends: SymCrypt-OpenSSL
-
-%description libs
-OpenSSL is a toolkit for supporting cryptography. The openssl-libs
-package contains the libraries that are used by various applications which
-support cryptographic algorithms and protocols.
-
-%package devel
-Summary: Files for development of applications which will use OpenSSL
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
-
-%description devel
-OpenSSL is a toolkit for supporting cryptography. The openssl-devel
-package contains include files needed to develop applications which
-support various cryptographic algorithms and protocols.
-
-%package static
-Summary:        Libraries for static linking of applications which will use OpenSSL
-# Group:          Development/Libraries
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-
-%description static
-OpenSSL is a toolkit for supporting cryptography. The openssl-static
-package contains static libraries needed for static linking of
-applications which support various cryptographic algorithms and
-protocols.
-
-%package perl
-Summary: Perl scripts provided with OpenSSL
-Requires: perl-interpreter
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description perl
-OpenSSL is a toolkit for supporting cryptography. The openssl-perl
-package provides Perl scripts for converting certificates and keys
-from other formats to the formats used by the OpenSSL toolkit.
+protocols. This package provides the OpenSSL FIPS Provider module.
 
 %prep
-# TOBIASB: Move back to not using git
+# TODO: TOBIASB: Move back to not using git
 %autosetup -S git -n openssl-%{version}
 
 %build
@@ -332,55 +290,15 @@ install -m644 %{SOURCE9} \
 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 %endif
 
+# TODO: TOBIASB: REVIEW
+# Delete everything but fips.so, since that's all we ship.
+# To do this, we delete all files and links that aren't fips.so, and then clean up empty directories.
+find $RPM_BUILD_ROOT -type f ! -name fips.so -delete
+find $RPM_BUILD_ROOT -type l ! -name fips.so -delete
+find $RPM_BUILD_ROOT -type d -empty -delete
+
 %files
-%{!?_licensedir:%global license %%doc}
-%license LICENSE.txt
-%doc NEWS.md README.md
-%{_bindir}/openssl
-%{_mandir}/man1/*
-%{_mandir}/man5/*
-%{_mandir}/man7/*
-%{_pkgdocdir}/Makefile.certificate
-%exclude %{_mandir}/man1/*.pl*
-%exclude %{_mandir}/man1/tsget*
-
-%files libs
-%{!?_licensedir:%global license %%doc}
-%license LICENSE.txt
-%dir %{_sysconfdir}/pki/tls
-%dir %{_sysconfdir}/pki/tls/certs
-%dir %{_sysconfdir}/pki/tls/misc
-%dir %{_sysconfdir}/pki/tls/private
-%config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
-%config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
-%attr(0755,root,root) %{_libdir}/libcrypto.so.%{version}
-%{_libdir}/libcrypto.so.%{soversion}
-%attr(0755,root,root) %{_libdir}/libssl.so.%{version}
-%{_libdir}/libssl.so.%{soversion}
-%attr(0755,root,root) %{_libdir}/engines-%{soversion}
 %attr(0755,root,root) %{_libdir}/ossl-modules
-
-%files devel
-%doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
-%{_prefix}/include/openssl
-%{_libdir}/*.so
-%{_mandir}/man3/*
-%{_libdir}/pkgconfig/*.pc
-
-%files static
-%{_libdir}/*.a
-
-%files perl
-%{_bindir}/c_rehash
-%{_bindir}/*.pl
-%{_bindir}/tsget
-%{_mandir}/man1/*.pl*
-%{_mandir}/man1/tsget*
-%dir %{_sysconfdir}/pki/CA
-%dir %{_sysconfdir}/pki/CA/private
-%dir %{_sysconfdir}/pki/CA/certs
-%dir %{_sysconfdir}/pki/CA/crl
-%dir %{_sysconfdir}/pki/CA/newcerts
 
 %ldconfig_scriptlets libs
 
