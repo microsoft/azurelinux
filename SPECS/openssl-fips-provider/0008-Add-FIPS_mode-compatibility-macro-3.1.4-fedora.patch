@@ -1,7 +1,7 @@
-From f803c320433fb1663a818a5ce97f39c3cd46fdd9 Mon Sep 17 00:00:00 2001
+From 8e29a10b39a649d751870eb1fd1b8c388e66acc3 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Mon, 31 Jul 2023 09:41:27 +0200
-Subject: [PATCH] 0008-Add-FIPS_mode-compatibility-macro.patch
+Subject: [PATCH 08/35] 0008-Add-FIPS_mode-compatibility-macro.patch
 
 Patch-name: 0008-Add-FIPS_mode-compatibility-macro.patch
 Patch-id: 8
@@ -16,7 +16,7 @@ From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
 
 diff --git a/include/openssl/fips.h b/include/openssl/fips.h
 new file mode 100644
-index 0000000..4162cbf
+index 0000000000..4162cbf88e
 --- /dev/null
 +++ b/include/openssl/fips.h
 @@ -0,0 +1,26 @@
@@ -47,10 +47,10 @@ index 0000000..4162cbf
 +# endif
 +#endif
 diff --git a/test/property_test.c b/test/property_test.c
-index e62ff24..37489e4 100644
+index 45b1db3e85..8894c1c1cb 100644
 --- a/test/property_test.c
 +++ b/test/property_test.c
-@@ -703,6 +703,19 @@ static int test_property_list_to_string_bounds(void)
+@@ -677,6 +677,19 @@ static int test_property_list_to_string(int i)
      return ret;
  }
  
@@ -70,14 +70,14 @@ index e62ff24..37489e4 100644
  int setup_tests(void)
  {
      ADD_TEST(test_property_string);
-@@ -716,6 +729,7 @@ int setup_tests(void)
+@@ -690,6 +703,7 @@ int setup_tests(void)
      ADD_TEST(test_property);
      ADD_TEST(test_query_cache_stochastic);
      ADD_TEST(test_fips_mode);
 +    ADD_TEST(test_downstream_FIPS_mode);
      ADD_ALL_TESTS(test_property_list_to_string, OSSL_NELEM(to_string_tests));
-     ADD_TEST(test_property_list_to_string_bounds);
      return 1;
+ }
 -- 
-2.45.4
+2.41.0
 
