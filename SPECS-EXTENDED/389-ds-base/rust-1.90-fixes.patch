@@ -1,0 +1,25 @@
+From 3a0d6ff3272c4a3d5f2d552a436e4f0fe0756a0a Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Wed, 29 Oct 2025 06:38:08 +0000
+Subject: [PATCH] Add explicit lifetime for ValueArrayRef iterator for Rust 1.90
+
+---
+ src/slapi_r_plugin/src/value.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/slapi_r_plugin/src/value.rs b/src/slapi_r_plugin/src/value.rs
+index 2fd35c8..fec74ac 100644
+--- a/src/slapi_r_plugin/src/value.rs
++++ b/src/slapi_r_plugin/src/value.rs
+@@ -61,7 +61,7 @@ impl ValueArrayRef {
+         ValueArrayRef { raw_slapi_val }
+     }
+ 
+-    pub fn iter(&self) -> ValueArrayRefIter {
++    pub fn iter(&self) -> ValueArrayRefIter<'_> {
+         ValueArrayRefIter {
+             idx: 0,
+             va_ref: &self,
+-- 
+2.45.4
+

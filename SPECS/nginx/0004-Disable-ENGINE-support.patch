@@ -1,0 +1,99 @@
+From 0b9485b645b487d08ed3ab38e94d433112553d67 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Tue, 2 Jul 2024 18:29:18 +0200
+Subject: [PATCH 4/5] Disable ENGINE support
+ 
+---
+ auto/options                        | 3 +++
+ configure                           | 4 ++++
+ src/event/ngx_event_openssl.c       | 4 ++--
+ src/event/ngx_event_openssl.h       | 2 +-
+ src/event/ngx_event_openssl_cache.c | 2 +-
+ 5 files changed, 11 insertions(+), 4 deletions(-)
+ 
+diff --git a/auto/options b/auto/options
+index 6a6e990a0f6b..3cc983dc68a2 100644
+--- a/auto/options
++++ b/auto/options
+@@ -45,6 +45,8 @@ USE_THREADS=NO
+ 
+ NGX_FILE_AIO=NO
+ 
++NGX_SSL_NO_ENGINE=NO
++
+ QUIC_BPF=NO
+ 
+ HTTP=YES
+@@ -373,6 +375,7 @@ use the \"--with-mail_ssl_module\" option instead"
+ 
+         --with-openssl=*)                OPENSSL="$value"           ;;
+         --with-openssl-opt=*)            OPENSSL_OPT="$value"       ;;
++        --without-engine)                NGX_SSL_NO_ENGINE=YES      ;;
+ 
+         --with-md5=*)
+             NGX_POST_CONF_MSG="$NGX_POST_CONF_MSG
+diff --git a/configure b/configure
+index 5b88ebb4cbe8..3a2129e499fc 100755
+--- a/configure
++++ b/configure
+@@ -104,6 +104,10 @@ have=NGX_HTTP_UWSGI_TEMP_PATH value="\"$NGX_HTTP_UWSGI_TEMP_PATH\""
+ have=NGX_HTTP_SCGI_TEMP_PATH value="\"$NGX_HTTP_SCGI_TEMP_PATH\""
+ . auto/define
+ 
++if [ $NGX_SSL_NO_ENGINE = YES ]; then
++    have=NGX_SSL_NO_ENGINE . auto/have
++fi
++
+ . auto/make
+ . auto/lib/make
+ . auto/install
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index fb6a5e950504..0b58d1383457 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -5981,7 +5981,7 @@ ngx_openssl_create_conf(ngx_cycle_t *cycle)
+ static char *
+ ngx_openssl_engine(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ {
+-#ifndef OPENSSL_NO_ENGINE
++#if !defined(OPENSSL_NO_ENGINE) && !defined(NGX_SSL_NO_ENGINE)
+ 
+     ngx_openssl_conf_t *oscf = conf;
+ 
+@@ -6032,7 +6032,7 @@ ngx_openssl_exit(ngx_cycle_t *cycle)
+ #if OPENSSL_VERSION_NUMBER < 0x10100003L
+ 
+     EVP_cleanup();
+-#ifndef OPENSSL_NO_ENGINE
++#if !defined(OPENSSL_NO_ENGINE) && !defined(NGX_SSL_NO_ENGINE)
+     ENGINE_cleanup();
+ #endif
+ 
+diff --git a/src/event/ngx_event_openssl.h b/src/event/ngx_event_openssl.h
+index 43bddc7be736..7ea2ad751e2b 100644
+--- a/src/event/ngx_event_openssl.h
++++ b/src/event/ngx_event_openssl.h
+@@ -22,7 +22,7 @@
+ #ifndef OPENSSL_NO_DH
+ #include <openssl/dh.h>
+ #endif
+-#ifndef OPENSSL_NO_ENGINE
++#if !defined(OPENSSL_NO_ENGINE) && !defined(NGX_SSL_NO_ENGINE)
+ #include <openssl/engine.h>
+ #endif
+ #include <openssl/evp.h>
+diff --git a/src/event/ngx_event_openssl_cache.c b/src/event/ngx_event_openssl_cache.c
+index 83ddbbaeb97e..b2df0941f5c1 100644
+--- a/src/event/ngx_event_openssl_cache.c
++++ b/src/event/ngx_event_openssl_cache.c
+@@ -694,7 +694,7 @@ ngx_ssl_cache_pkey_create(ngx_ssl_cache_key_t *id, char **err, void *data)
+ 
+     if (id->type == NGX_SSL_CACHE_ENGINE) {
+ 
+-#ifndef OPENSSL_NO_ENGINE
++#if !defined(OPENSSL_NO_ENGINE) && !defined(NGX_SSL_NO_ENGINE)
+ 
+         u_char  *p, *last;
+         ENGINE  *engine;
+-- 
+2.52.0

@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.14.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,7 @@ Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
+Provides:       nodejs
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -147,8 +148,11 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-12
+* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-13
 - Patch for CVE-2025-55130
+
+* Thu Jan 29 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-12
+- Add nodejs provides to manage co existence with nodejs24
 
 * Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-11
 - Patch for CVE-2026-21637, CVE-2025-59466, CVE-2025-59465, CVE-2025-55132, CVE-2025-55131

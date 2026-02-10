@@ -96,13 +96,10 @@ BuildRequires: perl(lib)
 BuildRequires: perl(Pod::Html)
 BuildRequires: perl(Text::Template)
 BuildRequires: sed
-
-%if 0%{?with_check}
 BuildRequires: perl(Math::BigInt)
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
-%endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 

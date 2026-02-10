@@ -1,0 +1,42 @@
+From 9185793e75435d890f18d391eaaeab0ade6f1415 Mon Sep 17 00:00:00 2001
+Message-ID: <9185793e75435d890f18d391eaaeab0ade6f1415.1716386938.git.tredaelli@redhat.com>
+From: Frode Nordahl <fnordahl@ubuntu.com>
+Date: Mon, 8 Apr 2024 23:24:14 +0200
+Subject: [PATCH] tests: Fix compatibility issue with Python 3.13 in vlog.at.
+
+The vlog - Python3 test makes use of output from Python
+Tracebacks in its test assertion.
+
+In Python 3.13 a line with tophat (``^``) markers is added below
+Tracebacks from calls to assert [0], which makes the test fail.
+This change of behavior is also backported to the Python 3.12 and
+3.11 stable branches [1].
+
+Strip lines containing one or more occurrence of the ``^``
+character from the output before performing the test assertions.
+
+0: https://github.com/python/cpython/pull/105935
+1: https://github.com/python/cpython/issues/116034
+
+Reported-at: https://launchpad.net/bugs/2060434
+Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+ tests/vlog.at | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/vlog.at b/tests/vlog.at
+index 785014956..efe91479a 100644
+--- a/tests/vlog.at
++++ b/tests/vlog.at
+@@ -8,6 +8,7 @@ AT_CHECK([$PYTHON3 $srcdir/test-vlog.py --log-file log_file \
+ 
+ AT_CHECK([sed -e 's/.*-.*-.*T..:..:..Z |//' \
+ -e 's/File ".*", line [[0-9]][[0-9]]*,/File <name>, line <number>,/' \
++-e '/\^\+/d' \
+ stderr_log], [0], [dnl
+   0  | module_0 | EMER | emergency
+   1  | module_0 | ERR | error
+-- 
+2.45.0
+
