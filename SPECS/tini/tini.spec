@@ -1,7 +1,7 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,7 @@ BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-8%{?dist}
+BuildRequires:  glibc-static >= 2.35-10%{?dist}
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -66,6 +66,12 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
+* Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.19.0-15
+- Bump to rebuild with updated glibc
+
+* Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-14
+- Bump to rebuild with updated glibc
+
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-13
 - Bump to rebuild with updated glibc
 
