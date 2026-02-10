@@ -41,7 +41,7 @@ value = "rsync"
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 regex = "%global released_kernel 0"
-replacement = "%global released_kernel 0\n\n%define mariner_version 3"
+replacement = "%global released_kernel 0\n\n%define azurelinux_version 3"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
@@ -62,13 +62,13 @@ replacement = "%define specrelease 1"
 [[components.kernel-headers.overlays]]
 type = "spec-update-tag"
 tag = "Source0"
-value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz"
+value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz"
 
 # Prep: extract Azure Linux tarball.
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 regex = "%setup -q -c"
-replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{specversion}"
+replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specversion}"
 
 # Build: generate native + cross headers from Azure Linux kernel source.
 # Uses make headers_install which produces properly sanitized userspace headers.
