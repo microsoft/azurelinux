@@ -33,7 +33,7 @@ tar -xzf %{SOURCE0}
 
 %build
 # Build using your actual build process
-cd manticore/src
+cd azihsm-linux-driver-main/src
 export KERNEL_SRC=/lib/modules/%{target_kernel_version_full}/build
 make
 
