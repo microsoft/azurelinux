@@ -8,7 +8,7 @@
 Name:           perl-BSD-Resource
 Version:        1.291.100
 %global module_version 1.2911
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        BSD process resource limit and priority functions
 # No matter what the pm and xs headers say, this is stated in the POD and,
 # according to upstream changelog for 1.2905, is correct.
@@ -64,12 +64,17 @@ find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 make test
 
 %files
-%doc ChangeLog README
+%doc README
 %{perl_vendorarch}/BSD/
 %{perl_vendorarch}/auto/BSD/
 %{_mandir}/man3/*
+%exclude %{_mandir}/man3/BSD::Resource.3pm.gz
 
 %changelog
+* Tue Dec 30 2025 Aninda Pradhan <v-anindap@microsoft.com> - 1.291.100-13
+- Fixed license warning by excluding changelog from doc and BSD::Resource.3pm.gz from man directory
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.291.100-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
