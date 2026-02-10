@@ -30,7 +30,7 @@ Manticore out-of-tree kernel driver
 %prep
 # Extract the tarball
 mkdir manticore
-tar -xzf %{SOURCE0}
+tar -xzf %{SOURCE0} --strip-components=1 -C manticore
 
 %build
 # Build using your actual build process
