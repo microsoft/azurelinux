@@ -14,6 +14,6 @@
     "named.rwtab": "6a4c84b6709211d09f2d71491d4c66d1d4c0115a9db247a5ed2a9db10e575735",
     "named.sysconfig": "8f8eff846667b7811358e289e9fe594de17d0e47f2b8cebf7840ad8db7f34816",
     "setup-named-chroot.sh": "786fbc88c7929fadf217cf2286f2eb03b6fba14843e5da40ad43c0022dd71c3a",
-    "bind-9.20.15.tar.xz": "d62b38fae48ba83fca6181112d0c71018d8b0f2ce285dc79dc6a0367722ccabb"
+    "bind-9.20.18.tar.xz": "dfc546c990ac4515529cd45c4dd995862b18ae8a2d0cb29208e8896a5d325331"
   }
 }

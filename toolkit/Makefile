@@ -164,8 +164,13 @@ else
 VALIDATE_TOOLCHAIN_GPG ?= y
 endif
 endif
+##help:var:VALIDATE_IMAGE_GPG:{y,n}=Enable RPM GPG signature verification during package fetching and image builds. When enabled, all packages must be signed - this validates that packages have completed the signing process. Default is 'n' for local development with unsigned packages. Production builds use a multi-step workflow (build packages -> sign packages -> build images) and should set 'y' for the final image build step to enforce that all packages are signed. Keys used for validation can be modified with the IMAGE_GPG_VALIDATION_KEYS variable.
+VALIDATE_IMAGE_GPG ?= n
 
-TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+# Default GPG keys for package GPG validation, used with VALIDATE_TOOLCHAIN_GPG and VALIDATE_IMAGE_GPG
+default_gpg_keys := $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
+IMAGE_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
 
 ######## COMMON MAKEFILE UTILITIES ########
 

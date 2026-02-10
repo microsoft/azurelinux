@@ -29,7 +29,7 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -41,7 +41,7 @@
 
 %{!?_name: %define _name srp-hwe}
 %{!?_version: %define _version 25.07}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-1%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-2%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -67,7 +67,7 @@
 Summary:	 srp driver
 Name:		 srp-hwe
 Version:	 25.07
-Release:	 1%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -257,6 +257,9 @@ fi
 %endif
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
+- Bump to match kernel-hwe.
+
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
 - Upgrade version to 25.07.
 - Enable build on x86_64 kernel hwe.

@@ -3,7 +3,7 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-2%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -43,7 +43,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 25%{release_suffix}%{?dist}
+Release:	 26%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -206,6 +206,9 @@ fi
 %endif
 
 %changelog
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-26_6.12.57.1.2
+- Bump to match kernel-hwe.
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1.1
 - Build with OFED 25.07.0.9.7.1.
 - Enable build on x86_64 kernel hwe.
