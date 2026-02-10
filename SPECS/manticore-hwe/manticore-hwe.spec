@@ -29,11 +29,12 @@ Manticore out-of-tree kernel driver
 
 %prep
 # Extract the tarball
+mkdir manticore
 tar -xzf %{SOURCE0}
 
 %build
 # Build using your actual build process
-cd azihsm-linux-driver-main/src
+cd manticore/src
 export KERNEL_SRC=/lib/modules/%{target_kernel_version_full}/build
 make
 
