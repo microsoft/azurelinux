@@ -19,9 +19,6 @@ specs_dir_name = $(notdir $(SPECS_DIR))
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar*
 toolkit_root_files = $(wildcard $(toolkit_root)/*)
 toolkit_version   = $(RELEASE_VERSION)-$(build_arch)
-rel_versions_macro_file_name = macros.releaseversions
-rel_versions_macro_file = $(PKGBUILD_DIR)/$(rel_versions_macro_file_name)
-rel_versions_macro_file_dest = $(toolkit_prep_dir)/$(rel_versions_macro_file_name)
 
 # Build files
 rpms_snapshot_dir_name = rpms_snapshots
@@ -86,7 +83,6 @@ $(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_componen
 	cp -r $(toolkit_root_files) $(toolkit_prep_dir) && \
 	cp $(mariner_repos_files) $(toolkit_repos_dir) && \
 	cp $(toolkit_component_extra_files) $(toolkit_prep_dir) && \
-	cp $(rel_versions_macro_file) $(rel_versions_macro_file_dest) && \
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
 	rm -rf $(toolkit_prep_dir)/out && \
 	tar -cvp -f $(toolkit_archive) -C $(dir $(toolkit_prep_dir)) $(notdir $(toolkit_prep_dir))
