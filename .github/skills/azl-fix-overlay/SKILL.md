@@ -3,8 +3,7 @@ name: azl-fix-overlay
 description: |
   Diagnose and fix overlay issues in Azure Linux components. Use when overlays
   fail to apply, produce unexpected results, or need debugging. Triggers:
-  "overlay error", "fix overlay", "overlay not applying", "spec-search-replace
-  failed", "overlay debug".
+  "overlay error", "fix overlay", "overlay not applying", "spec-search-replace failed", "overlay debug".
 ---
 
 # Fix an Overlay
