@@ -411,6 +411,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %ifarch x86_64
 %{_sbindir}/cpufreq-bench
 %{_lib64dir}/libperf-jvmti.so
+%{_libdir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
