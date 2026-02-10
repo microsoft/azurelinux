@@ -2,9 +2,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-from os import path, listdir
-from typing import FrozenSet, List
+from collections import defaultdict
+from os import path
+from typing import FrozenSet, List, Set
 import argparse
+import pprint
 import sys
 
 from pyrpm.spec import replace_macros, Spec
@@ -172,98 +174,6 @@ def print_verbose(message: str):
     if verbose:
         print(message)
 
-
-def _load_macros_from_file(spec: "Spec", macros_path: str) -> None:
-    """Load simple %name macro definitions from a macros file into a Spec.
-
-    This is a minimal loader that understands lines of the form::
-
-        %name value
-
-    It is primarily used to inject values from files like
-    macros.releaseversions so that pyrpm can fully expand spec tags.
-    """
-
-    try:
-        # Some system macro files may not be valid UTF-8; ignore undecodable
-        # bytes so that we still parse simple %global lines when possible.
-        with open(macros_path, encoding="utf-8", errors="ignore") as f:
-            print_verbose(f"Loading macros from: {macros_path}")
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                if not line.startswith("%"):
-                    continue
-
-                parts = line.split(maxsplit=1)
-                if len(parts) < 2:
-                    continue
-
-                name, value = parts
-                # pyrpm stores macros on the Spec instance; update in place.
-                # getattr/hasattr used for compatibility with library versions.
-                macros = getattr(spec, "macros", None)
-                if isinstance(macros, dict):
-                    macros[name] = value
-    except FileNotFoundError:
-        # Best-effort: if the macros file is missing we just skip it.
-        return
-
-
-def _hydrate_spec_with_macros(spec_path: str) -> "Spec":
-    """Create a Spec object and preload it with macros from macros.d.
-
-    This wires in macros from known locations (notably macros.releaseversions)
-    so that calls to replace_macros() see fully defined values.
-    """
-
-    spec = Spec.from_file(spec_path)
-
-    # Primary locations used in CI and builds.
-    rpm_macro_dirs = [
-        "/usr/lib/rpm/macros.d",
-        "/usr/lib/rpm",
-        "/etc/rpm/macros.d",
-        "/etc/rpm",
-    ]
-    for macro_dir in rpm_macro_dirs:
-        if not path.isdir(macro_dir):
-            continue
-        for entry in listdir(macro_dir):
-            macros_path = path.join(macro_dir, entry)
-            if path.isfile(macros_path):
-                _load_macros_from_file(spec, macros_path)
-
-    # Fallback: when running locally from a tree where the macros files live
-    # under build/pkg_artifacts, try to use that directory if present.
-    tree_local_macros_dir = path.join(
-        path.dirname(path.dirname(path.abspath(__file__))),
-        "build",
-        "pkg_artifacts",
-    )
-    if path.isdir(tree_local_macros_dir):
-        for entry in listdir(tree_local_macros_dir):
-            macros_path = path.join(tree_local_macros_dir, entry)
-            if path.isfile(macros_path):
-                _load_macros_from_file(spec, macros_path)
-
-    return spec
-
-
-def read_spec_tag(spec_path: str, tag: str) -> str:
-    """Read a spec header tag via pyrpm with macros.d preloaded.
-
-    The returned value has %macros expanded using pyrpm's replace_macros
-    after injecting macros from macros.releaseversions.
-    """
-
-    spec = _hydrate_spec_with_macros(spec_path)
-    value = getattr(spec, tag)
-    if value:
-        value = replace_macros(value, spec)
-    return value
-
 def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool:
     """Check if spec set violates matching rules for any of given tags. Return True/False accordingly."""
     has_error = False
@@ -271,11 +181,11 @@ def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool
         print_verbose(f"Processing group: {group}")
         spec_tag_map = {tag: {} for tag in tags}
         for spec_filename in group:
-            spec_path = path.join(base_path, spec_filename)
+            parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
             print_verbose(f"\t{spec_filename}")
 
             for tag, tag_current in tags.items():
-                tag_value = read_spec_tag(spec_path, tag)
+                tag_value = get_tag_value(parsed_spec, tag)
                 spec_tag_map[tag][spec_filename] = tag_value
                 tag_want = f" (want: {tag_current})" if tag_current else ""
                 print_verbose(f"\t\ttag({tag}) value: {tag_value}{tag_want}")
@@ -293,9 +203,9 @@ def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool
     return has_error
 
 def check_matches(base_path: str):
-    kernel_headers_spec_path = path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec")
-    kernel_headers_version = read_spec_tag(kernel_headers_spec_path, 'version')
-    kernel_headers_release = read_spec_tag(kernel_headers_spec_path, 'release')
+    kernel_headers_spec = Spec.from_file(path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec"))
+    kernel_headers_version = get_tag_value(kernel_headers_spec, 'version')
+    kernel_headers_release = get_tag_value(kernel_headers_spec, 'release')
     kernel_version_release = f"{kernel_headers_version}-{kernel_headers_release}"
     
     groups_to_check = [({'mstflintver':{}}, mstflintver_matching_groups),
@@ -311,6 +221,12 @@ def check_matches(base_path: str):
         print('The current repository state violates one or more spec entanglement rule!')
         sys.exit(1)
     print('Repository state is consistent with spec entanglement rules.')
+
+def get_tag_value(spec: "Spec", tag: str) -> str:
+    value = getattr(spec, tag)
+    if value:
+        value = replace_macros(value, spec)
+    return value
 
 def main():
     global verbose
