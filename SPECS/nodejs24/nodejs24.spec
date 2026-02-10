@@ -82,13 +82,14 @@ Requires: %{name} = %{version}-%{release}
 Optional data files to provide full-icu support for Node.js. Remove this
 package to save space if non-English locales are not needed.
 
-%package        npm
+%package        npm24
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Provides:       npm = %{npm_version}.%{version}-%{release}
+Provides:       npm24 = %{npm_version}.%{version}-%{release}
+Conflicts:      npm
 
-%description npm
+%description npm24
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
