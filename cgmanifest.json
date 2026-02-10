@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
+          "version": "1.24.13",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.6-1/go1.25.6-20260116.7.src.tar.gz"
+          "version": "1.25.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.7-1/go1.25.7-20260204.4.src.tar.gz"
         }
       }
     },
@@ -6600,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8311,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -25573,8 +25573,8 @@
         "type": "other",
         "other": {
           "name": "python-wheel",
-          "version": "0.43.0",
-          "downloadUrl": "https://github.com/pypa/wheel/archive/0.43.0/wheel-0.43.0.tar.gz"
+          "version": "0.46.3",
+          "downloadUrl": "https://github.com/pypa/wheel/archive/0.46.3/wheel-0.46.3.tar.gz"
         }
       }
     },
@@ -29886,8 +29886,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1616",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
+          "version": "9.1.2132",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2132.tar.gz"
         }
       }
     },
