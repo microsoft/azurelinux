@@ -413,6 +413,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_lib64dir}/libperf-jvmti.so
 %{_libdir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
+%{_sysconfdir}/cpupower-service.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
 %{_includedir}/powercap.h
