@@ -27,9 +27,11 @@
 #
 
 %if 0%{azl}
-# hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 2
+
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -41,8 +43,7 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name mlnx-nfsrdma-hwe}
-%{!?_version: %define _version 25.07}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-2%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -68,14 +69,14 @@
 Summary:	 %{_name} Driver
 Name:		 mlnx-nfsrdma-hwe
 Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Release:	 3%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
-Source0:         %{_distro_sources_url}/mlnx-nfsrdma-%{_version}.tgz
+Source0:         %{_distro_sources_url}/mlnx-nfsrdma-%{target_mlnx_ofa_kernel_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -167,7 +168,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n mlnx-nfsrdma-%{_version}
+%setup -n mlnx-nfsrdma-%{target_mlnx_ofa_kernel_version}
 set -- *
 mkdir source
 mv "$@" source/
@@ -252,6 +253,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 02 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-3_6.12.57.1.2
+- Tweak specs to use dynamic versioning for kernel
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
 - Bump to match kernel-hwe.
 
