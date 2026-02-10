@@ -96,7 +96,8 @@ sh configure \
     --with-ipv6 \
     --with-pcre \
     --with-stream \
-    --with-compat
+    --with-compat \
+    --with-stream_ssl_preread_module
 
 %make_build
 
@@ -151,6 +152,7 @@ exit 0
 %changelog
 * Tue Feb 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.1-15
 - Patch for CVE-2026-1642
+- Enable stream ssl preread module
 
 * Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.1-14
 - Patch for CVE-2025-53859
