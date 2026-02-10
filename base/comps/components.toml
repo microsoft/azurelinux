@@ -1,4 +1,4 @@
-includes = ["**/*.comp.toml"]
+#includes = ["**/*.comp.toml"]
 
 #
 # Components imported from Fedora
