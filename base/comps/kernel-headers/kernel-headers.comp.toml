@@ -12,6 +12,25 @@
 # curl -sL -o kernel-6.18.5.1.tar.gz https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz
 spec = { type = "local", path = "kernel-headers.spec" }
 
+# Version updates: Fedora -> Azure Linux 6.18.5.1
+[components.kernel-headers.build]
+defines = { "azurelinux_version" = "3" }
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specversion .+"
+replacement = "%define specversion 6.18.5.1"
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define tarfile_release .+"
+replacement = "%define tarfile_release 6.18.5.1"
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specrelease .+"
+replacement = "%define specrelease 1%{?dist}"
+
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 [[components.kernel-headers.overlays]]
 type = "spec-add-tag"
@@ -36,27 +55,6 @@ type = "spec-add-tag"
 description = "Add rsync as a build dependency for kernel headers_install"
 tag = "BuildRequires"
 value = "rsync"
-
-# Version updates: Fedora 6.19 -> Azure Linux 6.18.5.1
-[[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "%global released_kernel 0"
-replacement = "%global released_kernel 0\n\n%define azurelinux_version 3"
-
-[[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "%define specversion 6.19.0"
-replacement = "%define specversion 6.18.5.1"
-
-[[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "%define tarfile_release 6.19-rc8"
-replacement = "%define tarfile_release 6.18.5.1"
-
-[[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "%define specrelease 0.rc8.54"
-replacement = "%define specrelease 1"
 
 # Source: use full Azure Linux kernel tarball instead of pre-built headers.
 [[components.kernel-headers.overlays]]
