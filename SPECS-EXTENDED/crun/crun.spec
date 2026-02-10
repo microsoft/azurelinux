@@ -12,7 +12,7 @@
 Summary:       OCI runtime written in C
 Name:          crun
 Version:       1.24
-Release:       1%{?dist}
+Release:       3%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 URL:           https://github.com/containers/%{name}
@@ -48,7 +48,7 @@ BuildRequires: wasmedge-devel
 %endif
 
 BuildRequires: python
-BuildRequires: glibc-static >= 2.38-16%{?dist}
+BuildRequires: glibc-static >= 2.38-18%{?dist}
 Provides:      oci-runtime
 
 %description
@@ -114,6 +114,12 @@ rm -rf %{buildroot}%{_prefix}/lib*
 %endif
 
 %changelog
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.24-3
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.24-2
+- Bump to rebuild with updated glibc
+
 * Fri Nov 07 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.24-1
 - Initial Azure Linux import from Fedora 42 (license: MIT).
 - Modified for building in azurelinux
