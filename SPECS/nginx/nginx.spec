@@ -5,7 +5,7 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.28.1
+Version:        1.28.2
 Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
@@ -167,6 +167,10 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+
+* Tue Feb 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.28.2-1
+- Upgrade to version 1.28.2 (fixes CVE-2026-1642) .
+
 * Thu Oct 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.28.0-1
 - Upgrade to 1.28.0 Upstream Stable Version
 
