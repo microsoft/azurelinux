@@ -3,6 +3,22 @@
   "$id": "https://github.com/gim-home/azldev-preview/internal/projectconfig/config-file",
   "$ref": "#/$defs/ConfigFile",
   "$defs": {
+    "CheckConfig": {
+      "properties": {
+        "skip": {
+          "type": "boolean",
+          "title": "Skip check",
+          "description": "Disables the %check section by prepending 'exit 0' when set to true"
+        },
+        "skip_reason": {
+          "type": "string",
+          "title": "Skip reason",
+          "description": "Required justification for skipping the %check section"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ComponentBuildConfig": {
       "properties": {
         "with": {
@@ -28,6 +44,11 @@
           "type": "object",
           "title": "Macro definitions",
           "description": "Macro definitions to pass to the builder."
+        },
+        "check": {
+          "$ref": "#/$defs/CheckConfig",
+          "title": "Check configuration",
+          "description": "Configuration for the %check section"
         }
       },
       "additionalProperties": false,
@@ -376,6 +397,11 @@
           "type": "string",
           "title": "Path",
           "description": "Path to the image definition file"
+        },
+        "profile": {
+          "type": "string",
+          "title": "Profile",
+          "description": "Optional field that specifies the profile to use when building the image"
         }
       },
       "additionalProperties": false,
