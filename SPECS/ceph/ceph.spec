@@ -1431,7 +1431,8 @@ fi
 %{_datadir}/ceph/mgr/progress
 %{_datadir}/ceph/mgr/prometheus
 %{_datadir}/ceph/mgr/rbd_support
-%{_datadir}/ceph/mgr/restful
+# a dependent module of restful is not available and 
+# hence not enabling it at this moment
 %{_datadir}/ceph/mgr/selftest
 %{_datadir}/ceph/mgr/snap_schedule
 %{_datadir}/ceph/mgr/stats
