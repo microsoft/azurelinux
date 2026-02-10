@@ -23,7 +23,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 27%{release_suffix}%{?dist}
+Release:	 29%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -95,8 +95,14 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
-* Mon Feb 02 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-27_6.12.57.1.2
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-29_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
+
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-28_6.12.57.1.4
+- Bump to match kernel-hwe.
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-27_6.12.57.1.3
+- Bump to match kernel-hwe.
 
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-26_6.12.57.1.2
 - Bump to match kernel-hwe.

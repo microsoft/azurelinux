@@ -15,7 +15,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.33.0
-Release:         3%{release_suffix}%{?dist}
+Release:         5%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -91,8 +91,14 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
-* Mon Feb 02 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-3_6.12.57.1.2
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-5_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel
+
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-4_6.12.57.1.4
+- Bump to match kernel-hwe.
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-3_6.12.57.1.3
+- Bump to match kernel-hwe.
 
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-2_6.12.57.1.2
 - Bump to match kernel-hwe.

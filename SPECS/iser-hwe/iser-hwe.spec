@@ -68,7 +68,7 @@
 Summary:	 %{_name} Driver
 Name:		 iser-hwe
 Version:	 25.07
-Release:	 3%{release_suffix}%{?dist}
+Release:	 5%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -252,8 +252,14 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Mon Feb 02 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-3_6.12.57.1.2
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.1
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4
+- Bump to match kernel-hwe.
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-3_6.12.57.1.3
+- Bump to match kernel-hwe.
 
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
 - Bump to match kernel-hwe.
