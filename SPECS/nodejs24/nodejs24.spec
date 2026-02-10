@@ -170,7 +170,7 @@ make cctest
 %dir %{icudatadir}
 %{icudatadir}/icudt%{icu_major}*.dat
 
-%files npm
+%files npm24
 %defattr(-,root,root)
 %{_bindir}/npm
 %{_bindir}/npx
