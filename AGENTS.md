@@ -13,7 +13,7 @@ For project context and architecture, see [`.github/copilot-instructions.md`](.g
 Detailed workflows live in skills (loaded on-demand when relevant):
 
 | Task | Skill |
-|------|-------|
+| ---- | ----- |
 | Build a component, debug build failures | [`azl-build-component`](.github/skills/azl-build-component/SKILL.md) |
 | Add a new component to the distro | [`azl-add-component`](.github/skills/azl-add-component/SKILL.md) |
 | Diagnose and fix overlay issues | [`azl-fix-overlay`](.github/skills/azl-fix-overlay/SKILL.md) |
