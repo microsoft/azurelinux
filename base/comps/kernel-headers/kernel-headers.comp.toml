@@ -74,23 +74,23 @@ replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azure
 [[components.kernel-headers.overlays]]
 type = "spec-append-lines"
 section = "%build"
-lines = [
-    "make mrproper",
-    "make headers_install INSTALL_HDR_PATH=headers-native",
-    "",
-    "# Determine native kernel arch and cross-compile for the other",
-    "native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')",
-    "for cross_arch in arm64 x86; do",
-    "    [ \"$cross_arch\" = \"$native_karch\" ] && continue",
-    "    make ARCH=$cross_arch headers_install INSTALL_HDR_PATH=headers-$cross_arch",
-    "done",
-]
+lines = ["""
+make mrproper
+make headers_install INSTALL_HDR_PATH=headers-native
+
+# Determine native kernel arch and cross-compile for the other
+native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
+for cross_arch in arm64 x86; do
+    [ "$cross_arch" = "$native_karch" ] && continue
+    make ARCH=$cross_arch headers_install INSTALL_HDR_PATH=headers-$cross_arch
+done"""]
 
 # Install: copy headers_install output into RPM buildroot, replacing Fedora's copy logic.
+# The exit 0 at the end short-circuits the original Fedora install logic.
 [[components.kernel-headers.overlays]]
-type = "spec-search-replace"
-regex = "# List of architectures we support and want to copy their headers"
-replacement = """
+type = "spec-prepend-lines"
+section = "%install"
+lines = ["""
 native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
 
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
@@ -103,7 +103,4 @@ for cross_arch in arm64 x86; do
     cp -rv headers-$cross_arch/include/* $cross_arch_includedir
 done
 
-exit 0
-
-# Original Fedora logic (skipped):
-# List of architectures we support and want to copy their headers"""
+exit 0"""]
