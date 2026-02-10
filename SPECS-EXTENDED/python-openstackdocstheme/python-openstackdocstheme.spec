@@ -70,6 +70,7 @@ export PYTHONPATH=.
 sphinx-build -b html doc/source doc/build/html
 # remove the sphinx-build leftovers
 rm -rf html/.{doctrees,buildinfo}
+rm -f doc/build/html/_static/images/docs/license.png
 
 %install
 %pyproject_install

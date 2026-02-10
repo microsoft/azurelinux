@@ -94,6 +94,20 @@ fetch-external-image-packages: $(image_external_package_cache_summary)
 # Validate the selected config file if any changes occur in the image config base directory.
 # Changes to files located outside the base directory will not be detected.
 validate-image-config: $(validate-config)
+
+# Validate that all config dependencies exist before Make tries to process them as prerequisites
+# If we don't do this, Make will error out with a less-than-helpful message about having no rule to make
+# the validation flag (since its a pattern match and if a dependency is missing, it can't match the pattern)
+# Skip this check for printvar targets so users can still debug with the suggested command
+ifneq ($(CONFIG_FILE),)
+  ifeq ($(filter printvar-%,$(MAKECMDGOALS)),)
+    config_missing_files = $(filter-out $(wildcard $(config_other_files)),$(config_other_files))
+    ifneq ($(config_missing_files),)
+      $(error $(newline)$(newline)ERROR: Image configuration '$(CONFIG_FILE)' missing files:$(newline)$(newline)$(foreach file,$(config_missing_files),  - $(file)$(newline))$(newline)Run this command to see all expected files:$(newline)  make printvar-config_other_files CONFIG_FILE=$(CONFIG_FILE) --quiet$(newline))
+    endif
+  endif
+endif
+
 $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imageconfigvalidator) \
@@ -126,7 +140,12 @@ ifneq ($(REPO_SNAPSHOT_TIME),)
 imagepkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
+ifeq ($(VALIDATE_IMAGE_GPG),y)
+imagepkgfetcher_extra_flags += --enable-gpg-check
+imagepkgfetcher_extra_flags += $(foreach key,$(IMAGE_GPG_VALIDATION_KEYS),--gpg-key=$(key))
+endif
+
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(depend_VALIDATE_IMAGE_GPG) $(depend_IMAGE_GPG_VALIDATION_KEYS) $(IMAGE_GPG_VALIDATION_KEYS) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \

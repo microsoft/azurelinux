@@ -1,5 +1,5 @@
 %global nginx_user nginx
-%global njs_version 0.8.3
+%global njs_version 0.9.4
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
@@ -163,7 +163,10 @@ rm -rf nginx-tests
 
 %changelog
 * Tue Feb 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.28.2-1
-- Upgrade to version 1.28.2 (fixes CVE-2026-1642) .
+- Upgrade to version 1.28.2 (fixes CVE-2026-1642).
+
+* Thu Oct 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.28.0-1
+- Upgrade to 1.28.0 Upstream Stable Version
 
 * Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
 - Enable stream ssl preread module
