@@ -123,7 +123,7 @@ python3 configure.py \
   --openssl-use-def-ca-store \
   --shared-cares
 
-JOBS=4 make %{?_smp_mflags} V=0
+JOBS=%{_smp_build_ncpus} make %{?_smp_mflags} V=0
 
 %install
 
