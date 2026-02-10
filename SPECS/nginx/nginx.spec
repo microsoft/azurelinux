@@ -163,7 +163,7 @@ rm -rf nginx-tests
 
 %changelog
 * Tue Feb 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.28.2-1
-- Add patch for CVE-2026-1642
+- Upgrade to version 1.28.2 (fixes CVE-2026-1642) .
 
 * Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
 - Enable stream ssl preread module
