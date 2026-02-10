@@ -131,11 +131,11 @@ LDFLAGS+=' -compressdwarf=false '
 export GOFLAGS="-mod=vendor"
 
 echo "Building ignition..."
-GOEXPERIMENT=strictfipsruntime %gobuild -ldflags "${LDFLAGS:-} -o ./ignition internal/main.go
+go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -o ./ignition internal/main.go
 
 %if 0%{?with_validate}
 echo "Building ignition-validate..."
-%gobuild -ldflags "${LDFLAGS:-} -o ./ignition-validate validate/main.go
+go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -o ./ignition-validate validate/main.go
 
 %global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -a -v -x
 %endif
