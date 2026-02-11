@@ -8,7 +8,7 @@
 Summary:        An SVG library based on cairo
 Name:           librsvg2
 Version:        2.58.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,7 @@ Source0:        https://download.gnome.org/sources/librsvg/2.58/librsvg-%{versio
 #   3. tar Jcvf [path to your vendor tarball]/librsvg-[version]-vendor.tar.xz vendor
 #      e.g. tar Jcvf ../librsvg-2.58.1-vendor.tar.xz vendor
 Source1:        librsvg-2.58.1-vendor.tar.xz
+Patch0:         CVE-2026-25727.patch
 BuildRequires:  cairo-devel >= %{cairo_version}
 BuildRequires:  cairo-gobject-devel >= %{cairo_version}
 BuildRequires:  chrpath
@@ -125,6 +126,9 @@ rm -vrf %{buildroot}%{_docdir}
 %{_bindir}/rsvg-convert
 
 %changelog
+* Tue Feb 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.58.1-6
+- Patch for CVE-2026-25727
+
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 2.58.1-5
 - Bump release to rebuild with rust
 
