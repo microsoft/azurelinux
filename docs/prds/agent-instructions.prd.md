@@ -496,11 +496,11 @@ Both cover similar topics but serve different purposes. Skills answer "how does 
 
 **Output:** Structured report with findings and recommendations, grouped by severity
 
-#### `azl-debug-component.prompt.md` — Tier 1 (skill-backed, multi-skill)
+#### `azl-debug-component.prompt.md` — Tier 2 (multi-skill composition)
 
 **Purpose:** Diagnose and fix component build failures, including overlay application errors
 **References:** `azl-fix-overlay/SKILL.md` (overlay diagnosis), `azl-build-component/SKILL.md` (build debugging/inner loop), `azl-mock/SKILL.md` (chroot inspection) — all linked via Markdown
-**Tier rationale:** This is a Tier 1 prompt backed by multiple skills. It triages the error type and routes to the appropriate skill's workflow.
+**Tier rationale:** This is a Tier 2 prompt that composes multiple skills. It triages the error type and routes to the appropriate skill's workflow.
 
 **Input variables:**
 
@@ -589,14 +589,13 @@ These `.instructions.md` files use `applyTo` globs for automatic context injecti
 
 ### Phase 4: Prompts (VS Code only)
 
-Prompts are thin wrappers: they collect user input via `${input:...}` variables and reference the corresponding skill via Markdown links for domain knowledge. This ensures the same guidance is available to Copilot CLI users via automatic skill discovery. Use optional `agent:`/`tools:` frontmatter for VS Code-specific affordances.
+Prompts follow a two-tier model: **Tier 1** prompts are thin wrappers around existing skills, while **Tier 2** prompts encode their own workflow logic and compose multiple existing skills/instructions. Both tiers collect user input via `${input:...}` variables and use Markdown links to pull in domain knowledge. Use optional `agent:`/`tools:` frontmatter for VS Code-specific affordances. See the [VS Code prompt files documentation](https://code.visualstudio.com/docs/copilot/customization/prompt-files) for syntax reference.
 
-- [ ] Create `.github/prompts/add-component.prompt.md`
-- [ ] Create `.github/prompts/update-component.prompt.md`
-- [ ] Create `.github/prompts/review-component.prompt.md`
-- [ ] Create `.github/prompts/debug-overlay.prompt.md`
-- [ ] Create `.github/prompts/debug-build.prompt.md` - Debug build failures using mock shell
-- [ ] Create `.github/prompts/migrate-component.prompt.md`
+- [x] Create `.github/prompts/azl-add-component.prompt.md` — Tier 1 (wraps `azl-add-component`)
+- [x] Create `.github/prompts/azl-update-component.prompt.md` — Tier 2 (composes `comp-toml.instructions.md` + `azl-fix-overlay` + `azl-build-component`)
+- [x] Create `.github/prompts/azl-review-component.prompt.md` — Tier 1 (wraps `azl-review-component`)
+- [x] Create `.github/prompts/azl-debug-component.prompt.md` — Tier 2 (triages between `azl-fix-overlay` + `azl-build-component` + `azl-mock`)
+- [x] Create `.github/prompts/azl-migrate-component.prompt.md` — Tier 2 (composes `comp-toml.instructions.md` + `base/comps/AGENTS.md`)
 
 ### Phase 5: Experimental Agents (cross-platform)
 
@@ -656,7 +655,7 @@ These aspects of the PRD should be reviewed and updated as the project evolves:
 4. **Agent scope:** Should experimental agents be repo-specific or potentially shared across Azure Linux repos? Should azldev have a command to install the resources into other repos?
 
 5. **Prompts vs Skills overlap:** Some workflows exist as both skills and prompts (e.g., add-component). Should we consolidate, or keep both for different use cases (reference vs interactive)?
-   - **Resolution:** Keep both, but with a clear layering: skills hold task workflow knowledge (cross-platform), prompts are thin wrappers that reference skills and add VS Code-specific affordances (input variables, agent routing, tool selection). This avoids knowledge duplication and ensures Copilot CLI users get the same guidance via automatic skill discovery.
+   - **Resolution:** Keep both, using a two-tier model. **Tier 1** prompts are thin wrappers around an existing skill (e.g., `add-component` → `azl-add-component`). **Tier 2** prompts encode their own workflow logic when no dedicated skill exists, composing multiple existing skills and instruction files (e.g., `update-component` composes `comp-toml.instructions.md` + `azl-fix-overlay` + `azl-build-component`). This avoids both knowledge duplication and creating skills just to satisfy a pattern (YAGNI). Copilot CLI users get equivalent guidance: Tier 1 skills are directly discoverable, and Tier 2 prompts compose independently discoverable skills.
 
 6. **Passive vs active context balance:** Research shows passive context (AGENTS.md) dramatically outperforms skills for domain knowledge. But passive context is a per-interaction token tax. Our current split: lean AGENTS.md (guardrails) + `.instructions.md` (domain knowledge, scoped by file type) + skills (task workflows). This may need tuning based on real usage — if agents still miss domain knowledge when `.instructions.md` doesn't fire (e.g., asking about components without a `.comp.toml` open), we may need to move some content back to always-on AGENTS.md.
 
