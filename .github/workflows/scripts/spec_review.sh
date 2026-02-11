@@ -4,7 +4,7 @@
 #
 # Args: --spec <spec_file1> --spec <spec_file2> ... --url <guideline_url1> --url <guideline_url2> --output <output_file> --log <log_file> --knowledge-base <knowledge_base_file>
 
-set -euo pipefail
+set -euxo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
