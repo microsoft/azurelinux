@@ -3,7 +3,7 @@
 Title: PRD: Agent Instructions and Skills for Azure Linux
 Author: Daniel McIlvaney
 Created: 2026-01-29
-Updated: 2026-02-09
+Updated: 2026-02-11
 Status: Draft
 
 ## Overview
@@ -80,6 +80,8 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
    - `azl-add-component/SKILL.md` - Adding a new component to the distro
    - `azl-fix-overlay/SKILL.md` - Diagnosing and fixing overlay issues
    - `azl-build-component/SKILL.md` - Building, testing, and debugging components
+   - `azl-mock/SKILL.md` - Testing and inspecting packages in mock chroots
+   - `azl-review-component/SKILL.md` - Reviewing component definitions for hygiene and best practices
    - Each skill is a directory containing a `SKILL.md` (with required `name` and `description` YAML frontmatter) plus optional scripts, examples, and resources. Skills are discovered on-demand based on description matching.
    - **Design principle:** Skills are for explicit, multi-step task workflows — not general domain knowledge. Domain knowledge belongs in passive context (`.instructions.md`, `AGENTS.md`) where it's available without the agent needing to decide to load it. AGENTS.md files link to skills for discoverability, but links are not required for skill triggering.
 
@@ -90,12 +92,13 @@ Instruction files should work across GitHub Copilot surfaces where possible: VS 
    - Copilot CLI discovers agents from `.github/agents/`, `~/.copilot/agents/`, and org-level locations
 
 6. **Prompt templates** (`.github/prompts/*.prompt.md`) — *VS Code only*
-   - `add-component.prompt.md` - Guided workflow for adding a new component
-   - `update-component.prompt.md` - Guided workflow for updating an existing component
-   - `review-component.prompt.md` - Review a component for hygiene and best practices
-   - `debug-overlay.prompt.md` - Diagnose and fix overlay issues
-   - `migrate-component.prompt.md` - Migrate inline component to dedicated file
-   - **Design principle:** Prompts are thin wrappers — they collect user input and orchestrate the workflow, but reference the corresponding skill for domain knowledge. This ensures Copilot CLI users (who lack `/prompt` support) still get the same guidance via skills.
+   - `azl-add-component.prompt.md` - Guided workflow for adding a new component
+   - `azl-update-component.prompt.md` - Guided workflow for updating an existing component
+   - `azl-review-component.prompt.md` - Review a component for hygiene and best practices
+   - `azl-debug-component.prompt.md` - Diagnose and fix overlay failures and build errors
+   - `azl-migrate-component.prompt.md` - Migrate inline component to dedicated file
+   - **Design principle:** Prompts follow a two-tier model. **Tier 1** (skill-backed): when a dedicated skill exists, the prompt is a thin wrapper that collects input and references the skill. **Tier 2** (orchestrator): when no dedicated skill exists, the prompt encodes its own workflow logic and references *multiple* existing skills and instruction files. This avoids creating skills just to back a prompt (YAGNI). Both tiers ensure Copilot CLI users get equivalent guidance via automatic skill discovery.
+   - See the [VS Code prompt files documentation](https://code.visualstudio.com/docs/copilot/customization/prompt-files) for prompt file syntax and features.
 
 ### Out of Scope (v1)
 
@@ -117,7 +120,7 @@ azurelinux/
 │   │   ├── comp-toml.instructions.md
 │   │   └── spec.instructions.md
 │   ├── prompts/                         # Prompt templates (VS Code only)
-│   │   ├── add-component.prompt.md
+│   │   ├── azl-add-component.prompt.md
 │   │   └── ...
 │   ├── agents/                          # Custom agents (cross-platform)
 │   │   └── *.agent.md
@@ -126,7 +129,9 @@ azurelinux/
 │       │   └── SKILL.md
 │       ├── azl-fix-overlay/
 │       │   └── SKILL.md
-│       └── azl-build-component/
+│       ├── azl-build-component/
+│       │   └── SKILL.md
+│       └── azl-mock/
 │           └── SKILL.md
 ├── .vscode/
 │   └── mcp.json                         # MCP tool configuration (VS Code)
@@ -263,16 +268,18 @@ The `description` field is critical: write it to clearly describe both what the 
 **Concepts to cover:**
 
 - How to check if a component already exists
-- Determining the appropriate source distro (usually Fedora)
+- "Inspect upstream spec first" workflow — add a bare inline entry, use `prep-sources --skip-overlays` to pull the spec (Fedora dist-git blocks direct web fetches), plan overlays, then create a dedicated file if needed
+- Determining the appropriate source distro (usually Fedora) and upstream source options (default, pinned version, different `upstream-name`, local spec)
 - When to use inline definition vs dedicated `.comp.toml` file
-- Adding overlays when customizations are needed
-- Validating the component definition
-- Testing with a build
+- Adding overlays when customizations are needed — tips: test incrementally, avoid renaming `Name:`, no `$schema` in TOML, no multi-line regex, prefer targeted overlay types over regex
+- **Overlays vs forked spec**: overlays are vastly preferable; forked specs are a last resort, require explicit user sign-off, and commit to indefinite maintenance
+- Validating the component definition (`prep-sources` pre/post diff → `comp build` → smoke test via `azl-mock`)
 
 **Decision tree:**
 
 - Simple import (no changes) → Add to `components.toml`
 - Needs overlays or customizations → Create `<name>/<name>.comp.toml`
+- Needs extensive changes that overlays can't handle → Forked local spec (last resort, requires user sign-off)
 
 #### `azl-update-component/SKILL.md` — Not planned
 
@@ -303,17 +310,23 @@ When in doubt, recommend the user review the upstream changelog before proceedin
 
 **Concepts to cover:**
 
+- Diagnosis workflow: reproduce with `prep-sources` pre/post diff (using a temp dir), inspect the pre-overlay output to see what the overlay is trying to modify
+- Note that `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/`)
 - Reading and interpreting overlay error messages
 - Understanding overlay type requirements and constraints
 - Diagnosing `spec-*` overlay failures (section/tag existence)
-- Diagnosing regex overlay failures (pattern matching)
-- Diagnosing `file-*` overlay failures (file existence)
+- Diagnosing regex overlay failures (pattern matching, TOML literal strings, no multi-line regex)
+- Diagnosing `file-*` overlay failures (file existence, glob support for `file-search-replace`)
+- Overlay type quick reference table (all 12 types with key fields)
+- Tips: test incrementally, minimize overlays, verify in chroot via `azl-mock`, follow inner loop from `azl-build-component`
 
 **Common failure patterns:**
 
-- Pattern doesn't match upstream (upstream changed)
-- Tag already exists (use set instead of add)
-- Section not found (case sensitivity, renamed sections)
+- `spec-add-tag`: "tag already exists" → use `spec-set-tag` or `spec-update-tag`
+- `spec-search-replace`: no match → upstream changed, regex escaping, use TOML literal strings
+- `spec-*-lines`: section not found → case sensitivity, renamed sections
+- `file-*`: file not found → check pre-overlay dir listing
+- Overlay applies but build still fails → compare post-overlay spec against expectations (regex matched wrong lines, replacement introduced syntax errors, missing dependency)
 
 #### `azl-build-component/SKILL.md`
 
@@ -321,20 +334,44 @@ When in doubt, recommend the user review the upstream changelog before proceedin
 
 **Concepts to cover:**
 
-- Basic build sequence (build → createrepo → build dependents)
-- How to preserve build state on failure for inspection
-- Entering the mock shell environment for interactive debugging
-- Key locations where build artifacts and logs are stored
-- Iterative workflow: inspect → hypothesize → fix → retry
-- Per-component build overrides via `build.defines`
-- Source inspection: comparing pre/post overlay sources
+- "Never install built RPMs on the host" — they target Azure Linux, not the dev machine. Use `azl-mock` instead.
+- **Build Output Directories** table mapping `project.toml` keys (`output-dir`, `log-dir`, `work-dir`) → resolved paths (`base/out/`, `base/build/logs/`, `base/build/work/`). Note that `prep-sources -o <dir>` output is separate from these.
+- Build sequence: single build, chained builds with `--local-repo-with-publish`, rebuild against local repo
+- **Dev Inner Loop** as a formal table: investigate → compare → modify → verify → build → inspect
+  - Use a temp dir for prep-sources output dirs — clean with `rm -rf` before each run (no `--force` flag)
+- How to preserve build state on failure for inspection (`--preserve-buildenv`)
+- Entering the mock shell environment for interactive debugging (cross-ref to `azl-mock`)
+- Warning about `-p` flag meaning in `mock shell` vs `comp build` (different semantics)
+- Per-component build overrides via `build.defines` (macros) and `build.without` (disable conditionals)
+- Source inspection: comparing pre/post overlay sources with `prep-sources` + `diff -r`
 
 **Key debugging locations:**
 
-- Where to find the prepared sources with overlays applied
-- RPM build output directories (`base/out/`)
-- Build logs (`base/build/logs/`)
-- Mock chroot (when preserved)
+- RPM build output: `base/out/` (configured by `output-dir` in `project.toml`)
+- Build logs: `base/build/logs/` (configured by `log-dir`)
+- Per-component work dirs: `base/build/work/<name>/` (configured by `work-dir`)
+- Mock chroot (when preserved with `--preserve-buildenv`)
+- `prep-sources` output (user-specified dir, NOT in `base/out/`)
+
+#### `azl-mock/SKILL.md`
+
+**Trigger:** Testing built RPMs, inspecting dependencies, debugging runtime issues, verifying package contents
+
+**Concepts to cover:**
+
+- Resetting mock chroot (`mock --scrub=chroot` or `--scrub=all`) — `azldev` has no built-in reset
+- Non-interactive chroot (preferred for agents): heredoc pattern with `azldev adv mock shell`
+- Examine RPM contents on host: `rpm2cpio` extraction to `my/build/dir`
+- Interactive chroot: step-by-step agent workflow (establish shared shell → user runs mock → agent sends commands in same terminal)
+- Key flags: `-p`/`--add-package` (installs package), `--enable-network`
+- Warning that `-p` means `--add-package` (not component name) — different from `comp build -p`
+
+**Gotchas:**
+
+- Don't mix `-p <name>` with `--add-package /path/to/rpm` for the same package (installs two conflicting builds)
+- Mock chroot state is persistent between sessions — use `mock --scrub=chroot` to reset
+- One mock session per terminal — run `exit` before starting another
+- `advanced` (`adv`) is hidden from `azldev --help`
 
 ### Experimental Agents
 
@@ -373,25 +410,24 @@ Prompts are reusable, parameterized workflows that users can invoke directly via
 - **Tool references** — use `#tool:<tool-name>` syntax to reference specific tools
 - **Agent selection** — `agent:` frontmatter can route the prompt through a custom agent
 
-**Critical design principle — prompts are thin wrappers around skills:**
+**Critical design principle — two-tier prompt model:**
 
-Since prompts are VS Code only, all domain knowledge must live in skills (which are cross-platform). Each prompt should:
+Prompts follow one of two tiers depending on whether a dedicated skill exists:
 
-1. **Collect user input** via `${input:...}` variables
-2. **Reference the corresponding skill** via a Markdown link (e.g., `[skill](../.github/skills/azl-add-component/SKILL.md)`), so the skill's instructions are loaded into context
-3. **Orchestrate the workflow** — define the step-by-step sequence, but delegate the "how" to the skill
-4. **Add VS Code-specific affordances** — use `agent:`, `tools:`, and built-in variables that only make sense in VS Code
+- **Tier 1 (skill-backed):** When a dedicated skill covers the workflow, the prompt is a thin wrapper. It collects user input via `${input:...}` variables, references the skill via a Markdown link (so the skill's instructions load into context), and adds VS Code-specific affordances (`agent:`, `tools:`, built-in variables). The prompt orchestrates the step-by-step sequence but delegates the "how" to the skill. Example: `azl-add-component.prompt.md` → `azl-add-component/SKILL.md`.
 
-This ensures Copilot CLI users get the same guidance via automatic skill discovery, even without `/prompt` support. If Copilot CLI adds prompt support in the future, the thin-wrapper design means prompts will work there too with minimal changes.
+- **Tier 2 (orchestrator):** When no dedicated skill exists — because the workflow is a composition of existing skills, instruction files, and AGENTS.md content — the prompt encodes the workflow logic directly. It references *multiple* existing resources via Markdown links (e.g., `comp-toml.instructions.md` + `azl-fix-overlay/SKILL.md` + `azl-build-component/SKILL.md`). Creating a skill just to back a prompt violates YAGNI when the workflow is a straightforward composition. Example: `azl-update-component.prompt.md` combines structural knowledge from `comp-toml.instructions.md` with overlay repair from `azl-fix-overlay` and testing from `azl-build-component`.
+
+Both tiers ensure Copilot CLI users get equivalent guidance: Tier 1 prompts have a directly matching skill, and Tier 2 prompts compose skills that are independently discoverable. See the [VS Code prompt files documentation](https://code.visualstudio.com/docs/copilot/customization/prompt-files) for prompt file syntax and features.
 
 **Skills vs Prompts distinction:**
 
-- **Skills** are **on-demand capabilities** loaded automatically when Copilot detects relevance. They provide comprehensive domain knowledge and can include scripts/resources. *Cross-platform.*
-- **Prompts** are **user-invoked workflows** triggered explicitly via `/command`. They are streamlined action orchestrators. *VS Code only.*
+- **Skills** are **on-demand capabilities** loaded automatically when Copilot detects relevance. They provide comprehensive task workflow knowledge and can include scripts/resources. *Cross-platform.*
+- **Prompts** are **user-invoked workflows** triggered explicitly via `/command`. They are streamlined action orchestrators that either wrap a single skill (Tier 1) or compose multiple existing resources (Tier 2). *VS Code only.*
 
 Both cover similar topics but serve different purposes. Skills answer "how does this work?" while prompts answer "help me do this now."
 
-#### `add-component.prompt.md`
+#### `azl-add-component.prompt.md`
 
 **Purpose:** Guided workflow for adding a new component to Azure Linux
 **References:** `azl-add-component/SKILL.md` (linked via Markdown, provides domain knowledge)
@@ -411,10 +447,11 @@ Both cover similar topics but serve different purposes. Skills answer "how does 
 - Add overlays with meaningful descriptions
 - Validate and optionally test build
 
-#### `update-component.prompt.md`
+#### `azl-update-component.prompt.md` — Tier 2 (orchestrator)
 
 **Purpose:** Guided workflow for updating an existing component
-**References:** `azl-update-component/SKILL.md` (linked via Markdown, provides domain knowledge)
+**References:** `comp-toml.instructions.md` (structural knowledge), `azl-fix-overlay/SKILL.md` (if overlays break), `azl-build-component/SKILL.md` (to test) — all linked via Markdown
+**Tier rationale:** No dedicated update skill exists (see `azl-update-component — Not planned` above). The update workflow is a composition of structural editing (from `comp-toml.instructions.md`), overlay repair (from `azl-fix-overlay`), and build testing (from `azl-build-component`). The prompt encodes the meta-workflow that ties these together, including versioning risk assessment (update policy will be encoded in the components TOML if non-standard).
 
 **Input variables:**
 
@@ -422,61 +459,72 @@ Both cover similar topics but serve different purposes. Skills answer "how does 
 - `${input:new_version:target version}` (optional) - Target version (if version bump)
 - `${input:update_type:version|dependency|overlay|config}` (optional) - Type of update
 
-**Workflow orchestration** (detailed guidance lives in the skill):
+**Workflow logic** (encoded directly in the prompt):
 
-- Query current state before changes
-- Identify scope of update
-- Review upstream changes for version bumps
-- Update component definition appropriately
-- Migrate to dedicated file if needed
-- Validate and test
+1. Query current state: `azldev comp query -p <name>`
+2. Identify scope of update (version bump, dependency change, overlay edit, config tweak)
+3. For version bumps: assess versioning risk (major/minor/patch), flag soname changes, note new dependencies, recommend upstream changelog review
+4. Apply changes to `.comp.toml` (structural knowledge from `comp-toml.instructions.md`)
+5. Verify overlays still apply: `prep-sources` pre/post diff (if overlays break, follow `azl-fix-overlay`)
+6. Migrate to dedicated file if needed (see `migrate-component` prompt)
+7. Build and test: follow `azl-build-component` inner loop
 
-#### `review-component.prompt.md`
+**Versioning risk assessment** (encoded in prompt body, sourced from the Versioning and Compatibility Considerations section of this PRD):
+
+- **Major bumps** (1.x → 2.x): High risk — require explicit user approval
+- **Minor bumps** (1.2 → 1.3): Medium risk — check for new dependencies/deprecations
+- **Patch bumps** (1.2.3 → 1.2.4): Low risk — usually safe
+- Always: check upstream release notes, flag soname changes, examine overlay compatibility, warn about feature removal, summarize risks
+
+#### `azl-review-component.prompt.md` — Tier 1 (skill-backed)
 
 **Purpose:** Review a component definition for hygiene and best practices
-**References:** Hygiene rules from `copilot-instructions.md` and `base/comps/AGENTS.md` (linked via Markdown)
+**References:** `azl-review-component/SKILL.md` (review checklist and workflow), plus `copilot-instructions.md` (hygiene rules), `base/comps/AGENTS.md` (file organization), `comp-toml.instructions.md` (overlay patterns) — all linked via Markdown
+**Tier rationale:** Backed by the `azl-review-component` skill, which owns the canonical review checklist.
 
 **Input variables:**
 
 - `${input:component_name:package name}` (required) - Name of the component to review
 
-**Review areas:**
+**Review checklist** (encoded in prompt body):
 
-- File organization and structure
-- Overlay quality (descriptions, patterns)
-- Naming conventions
-- Dependency correctness
-- Source accessibility
+- **File organization:** Is the component in the right location? Should an inline definition be a dedicated file? Does naming match upstream?
+- **Overlay quality:** Do all overlays have `description` fields? Are targeted overlay types used over regex where possible? Are there unnecessary overlays? No multi-line regex?
+- **Naming conventions:** Does the component name match the upstream package name? Is `upstream-name` used when they differ?
+- **Build configuration:** Are `build.defines` and `build.without` used appropriately? Any missing or unnecessary build overrides?
+- **Source configuration:** Is the spec source type appropriate (upstream default vs pinned vs local)?
 
-**Output:** Structured report with findings and recommendations
+**Output:** Structured report with findings and recommendations, grouped by severity
 
-#### `debug-overlay.prompt.md`
+#### `azl-debug-component.prompt.md` — Tier 1 (skill-backed, multi-skill)
 
-**Purpose:** Diagnose and fix overlay application failures
-**References:** `azl-fix-overlay/SKILL.md` (linked via Markdown, provides diagnostic knowledge)
+**Purpose:** Diagnose and fix component build failures, including overlay application errors
+**References:** `azl-fix-overlay/SKILL.md` (overlay diagnosis), `azl-build-component/SKILL.md` (build debugging/inner loop), `azl-mock/SKILL.md` (chroot inspection) — all linked via Markdown
+**Tier rationale:** This is a Tier 1 prompt backed by multiple skills. It triages the error type and routes to the appropriate skill's workflow.
 
 **Input variables:**
 
 - `${input:component_name:package name}` (required) - Name of the failing component
-- `${input:error_message:paste error here}` (optional) - Error message from build/validation
+- `${input:error_context:paste error or describe issue}` (optional) - Error message or description from build/validation
 
-**Diagnostic concepts:**
+**Triage logic** (encoded in prompt body):
 
-- Interpreting overlay error messages
-- Comparing overlay expectations vs upstream spec content
-- Identifying root causes (upstream drift, pattern issues, type mismatches)
-- Suggesting appropriate fixes
+1. If the error is an overlay application failure (overlay errors during `prep-sources` or early in build): follow `azl-fix-overlay` skill workflow — diff pre/post overlay output, diagnose pattern failures, suggest fixes
+2. If the error is a build failure (compilation errors, missing dependencies, test failures): follow `azl-build-component` inner loop — check logs, preserve buildenv, inspect mock chroot
+3. If the error is a runtime/packaging issue (wrong file permissions, missing files, dependency conflicts): follow `azl-mock` skill workflow — install in chroot, verify contents, check dependencies
+4. When in doubt, start with `prep-sources` pre/post diff to determine if the issue is overlay-related or build-related
 
 **Common diagnoses:**
 
-- Upstream spec changed, breaking pattern match
-- Section or tag renamed/removed
-- Wrong overlay type for the situation
+- Overlay: upstream spec changed breaking pattern match, section renamed/removed, wrong overlay type
+- Build: missing BuildRequires, incompatible compiler flags, test failures in mock
+- Runtime: missing Requires, wrong file paths, permission issues
 
-#### `migrate-component.prompt.md`
+#### `azl-migrate-component.prompt.md` — Tier 2 (orchestrator)
 
 **Purpose:** Migrate an inline component definition to a dedicated file
-**References:** Migration guidance from `azl-update-component/SKILL.md` and `base/comps/AGENTS.md` (linked via Markdown)
+**References:** `comp-toml.instructions.md` (file organization patterns, inline vs dedicated), `base/comps/AGENTS.md` (file organization rules) — linked via Markdown
+**Tier rationale:** No dedicated migration skill exists. The workflow is simple enough to encode directly — it's a mechanical file operation guided by existing structural knowledge.
 
 **Input variables:**
 
@@ -488,12 +536,14 @@ Both cover similar topics but serve different purposes. Skills answer "how does 
 - Component definition is getting complex
 - Adding overlays to an inline component
 
-**Workflow concepts:**
+**Workflow logic** (encoded in prompt body):
 
-- Extract current inline definition
-- Create dedicated `<name>/<name>.comp.toml` file
-- Update includes if needed
-- Validate component resolution unchanged
+1. Query the current inline definition: `azldev comp query -p <name>`
+2. Extract the component's entry from `components.toml` (or whichever file contains the inline definition)
+3. Create `<name>/<name>.comp.toml` with the extracted definition (follow patterns from `comp-toml.instructions.md`)
+4. Replace the inline definition with an include directive or remove it (the dedicated file is auto-discovered via `**/*.comp.toml` glob in `components.toml`)
+5. Validate: `azldev comp query -p <name>` — output should be identical to before migration
+6. Optionally: add overlays or customizations that triggered the migration
 
 ## Implementation Plan
 
@@ -503,7 +553,7 @@ Both cover similar topics but serve different purposes. Skills answer "how does 
 - [x] Create `AGENTS.md` (root) — lean: conventions, skill table, directory pointers
 - [x] Create `base/comps/AGENTS.md` — lean: file organization rules, skill pointers
 - [x] Create `distro/AGENTS.md` — build defaults, structure overview, shared config warning
-- [x] Create skill stubs (`.github/skills/azl-{add-component,fix-overlay,build-component}/SKILL.md`)
+- [x] Create skill stubs (`.github/skills/azl-{add-component,fix-overlay,build-component,mock,review-component}/SKILL.md`)
 
 ### Phase 2: Agent Skills (cross-platform, open standard)
 
@@ -512,9 +562,11 @@ Each skill is a directory with a `SKILL.md` file following the [Agent Skills sta
 Skills are for explicit task workflows only — domain knowledge goes in passive context (Phase 1 + Phase 3).
 
 - [x] Create `.github/skills/azl-build-component/SKILL.md` (full content)
-- [ ] Flesh out `.github/skills/azl-add-component/SKILL.md` (currently a stub)
-- [ ] Flesh out `.github/skills/azl-fix-overlay/SKILL.md` (currently a stub)
-- [ ] Write clear `description` fields with trigger phrases so Copilot can match skills to user requests
+- [x] Flesh out `.github/skills/azl-add-component/SKILL.md`
+- [x] Flesh out `.github/skills/azl-fix-overlay/SKILL.md`
+- [x] Create `.github/skills/azl-mock/SKILL.md` (mock chroot testing and inspection)
+- [ ] Flesh out `.github/skills/azl-review-component/SKILL.md` (component hygiene review)
+- [x] Write clear `description` fields with trigger phrases so Copilot can match skills to user requests
 - [x] Link skills from `AGENTS.md` files for discoverability
 
 ### Phase 3: File-Type Instructions (cross-platform)
@@ -652,7 +704,7 @@ replacement = "VENDOR=azurelinux"
 description = "Add Azure Linux specific install step"
 type = "spec-append-lines"
 section = "%install"
-lines = "install -D -m 644 azl-config %{buildroot}/etc/mypackage/azl.conf"
+lines = ["install -D -m 644 azl-config %{buildroot}/etc/mypackage/azl.conf"]
 ```
 
 **Common overlay categories:**

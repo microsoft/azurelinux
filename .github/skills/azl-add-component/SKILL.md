@@ -1,18 +1,125 @@
 ---
 name: azl-add-component
-description: |
-  Add a new component to Azure Linux. Use when importing packages from Fedora,
-  creating comp.toml files, choosing inline vs dedicated definitions, or setting
-  up a new component with overlays. Triggers: "add component", "new package",
-  "import from fedora", "create my-comp.toml", etc.
+description: "Add a new component to Azure Linux. Use when importing packages from Fedora, creating comp.toml files, choosing inline vs dedicated definitions, or setting up a new component with overlays. Triggers: add component, new package, import from fedora, create comp.toml."
 ---
 
 # Add a Component
 
-> **TODO:** This skill is a placeholder. Full instructions will cover:
->
-> - Checking if a component already exists (`azldev comp query -p <name>`)
-> - Choosing inline (in `components.toml`) vs dedicated (`<name>/<name>.comp.toml`)
-> - Sourcing specs from upstream Fedora
-> - Adding overlays when customizations are needed
-> - Validating with `azldev comp prep-sources` and test builds
+## Before You Start
+
+```bash
+# Check if it already exists
+azldev comp list -p <name> -q -O json
+```
+
+### Inspect the upstream spec first
+
+The fastest way to see what you're working with:
+
+1. Add a bare inline entry in `components.toml`: `[components.<name>]`
+2. Pull the spec: `rm -rf my/build/dir/<name> && azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name> -q`
+3. Read the spec, plan your overlays
+4. Decide if overlays are required, if so: Remove the inline entry, create a dedicated `<name>/<name>.comp.toml`
+
+Fedora dist-git is behind bot detection — direct web fetches often fail. Use `prep-sources` to pull specs reliably.
+
+> Note: `prep-sources -o` writes to the directory you specify — this is ad-hoc output, separate from the project's configured build output dirs in `base/project.toml`.
+
+## Decision: Inline vs Dedicated File
+
+**Inline** (in `components.toml`) — simple upstream import, no modifications:
+
+```toml
+[components.jq]
+```
+
+**Dedicated file** (`<name>/<name>.comp.toml`) — needs overlays, build config, or local spec:
+
+```toml
+# <name>/<name>.comp.toml
+[components.<name>]
+
+[[components.<name>.overlays]]
+description = "Why this change is needed"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "some-dependency"
+```
+
+Rule of thumb: if it's more than `[components.<name>]`, give it a dedicated file. The `includes = ["**/*.comp.toml"]` in `components.toml` picks it up automatically.
+
+## Upstream Source Options
+
+```toml
+# Default: inherit project's Fedora version (currently Fedora 43)
+[components.curl]
+
+# Pin a specific Fedora version
+[components.curl]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+
+# Different upstream name
+[components.azurelinux-rpm-config]
+spec = { type = "upstream", upstream-name = "redhat-rpm-config" }
+
+# Local spec (Azure Linux-originating package)
+[components.azurelinux-release]
+spec = { type = "local", path = "azurelinux-release.spec" }
+```
+
+## Adding Overlays
+
+Every overlay MUST have a `description` explaining *why*:
+
+```toml
+[[components.<name>.overlays]]
+description = "Add missing build dependency for Azure Linux"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "golang >= 1.21"
+
+[[components.<name>.overlays]]
+description = "Customize vendor string for Azure Linux"
+type = "spec-search-replace"
+regex = "VENDOR=upstream"
+replacement = "VENDOR=azurelinux"
+```
+
+See the [schema](../../../external/schemas/azldev.schema.json) for all overlay types.
+
+### Overlay tips
+
+- **Test incrementally.** Apply one or a small batch at a time, verify with `prep-sources` before adding more.
+- **Avoid renaming `Name:`.** Changing the spec `Name:` tag causes cascading breakage (`%{name}` in Source0, `%setup`, paths, `%files`). Try to avoid it unless absolutely necessary.
+- **No `$schema` in TOML.** `$` is invalid at the start of a bare TOML key — don't try to add schema references to `.comp.toml` files.
+- **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements instead.
+- **Avoid regex when possible.** Targeted overlay types (`spec-add-tag`, `spec-prepend-lines`, etc.) are more robust to upstream changes than regex.
+  - Regex replace should be considerd a **last resort** when more targeted overlay types won't work. They are brittle and prone to breakage when upstream changes.
+
+### Overlays vs. Dedicated spec
+
+Overlays are vastly preferable to maintaining a forked spec, they get automatic updates from upstream and are more resilient to changes. Only fork the spec as a **last resort** when the required changes are so extensive that overlays become unmanageable. Even then, try to minimize the delta from upstream as much as possible to reduce maintenance burden:
+  - Clearly document the rationale for each change.
+  - Add comments to the spec itself for EVERY change (so future maintainers can differentiate local changes vs. upstream drift when version bumps happen).
+  - Recommend to the user contributing necessary changes upstream to reduce divergence over time, where possible.
+
+**Using a forked spec is a commitment to maintain it indefinitely, coordinate with the user to decide if it's truly necessary. Get explicit sign-off from the user before proceeding with a forked spec.**
+
+## Validate
+
+> Use a temp dir for `prep-sources` output. Clean before each run with `rm -rf` since `prep-sources` fails on non-empty dirs (no `--force` flag).
+
+`prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
+
+```bash
+# Clean scratch dirs before each run (prep-sources fails on non-empty dirs)
+rm -rf my/build/dir/<name>-pre my/build/dir/<name>-post
+azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name>-pre -q
+azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
+diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
+
+# Test build (RPMs land in base/out/ per project.toml output-dir)
+azldev comp build -p <name> -q
+```
+
+For testing the built RPMs, see the [`azl-mock`](../azl-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → verify → build → test → inspect), see [`azl-build-component`](../azl-build-component/SKILL.md).
