@@ -108,7 +108,8 @@ jobs:
           .github/workflows/scripts/spec_review_multi.sh $SPEC_ARGS \
             --work-dir .spec_review/workdir
         env:
-          GH_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
           SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
 
       - name: Print knowledge bases
