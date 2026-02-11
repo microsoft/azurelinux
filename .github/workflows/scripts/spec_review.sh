@@ -291,8 +291,17 @@ trap 'rm -rf "$temp_sources_dir"' EXIT SIGHUP SIGINT SIGTERM
 
 git_folders=()
 for GIT_SOURCE in "${GIT_SOURCES[@]}"; do
-    git clone --depth 1 --single-branch "$GIT_SOURCE" "$temp_sources_dir/$(basename "$GIT_SOURCE" .git)"
-    git_folders+=("$temp_sources_dir/$(basename "$GIT_SOURCE" .git)")
+    dest="$temp_sources_dir/$(basename "$GIT_SOURCE" .git)"
+    echo "Cloning $GIT_SOURCE -> $dest"
+    # Capture verbose output but only print on failure to avoid log noise
+    clone_log="$(mktemp)"
+    if ! GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 --single-branch "$GIT_SOURCE" "$dest" 2>"$clone_log"; then
+        echo "Error: Failed to clone $GIT_SOURCE" >&2
+        cat "$clone_log" >&2
+        exit 1
+    fi
+    rm -f "$clone_log"
+    git_folders+=("$dest")
 done
 # Add git source folders to allow list
 for folder in "${git_folders[@]}"; do
@@ -382,6 +391,10 @@ Tools that are pre-approved: ${tool_hint}
 "
 
 # Run the copilot agent — 4 total attempts (1 initial + 3 retries) if output validation fails
+# The copilot CLI reads GH_TOKEN for auth. In CI, GH_TOKEN is the GITHUB_TOKEN (for gh/git ops)
+# and COPILOT_TOKEN is the dedicated Copilot credential. We override GH_TOKEN inline so only the
+# copilot process sees it; the rest of the script keeps using GITHUB_TOKEN. Falls back to GH_TOKEN
+# for local runs where COPILOT_TOKEN isn't set.
 for run in {1..4}; do
     if [[ $run -gt 1 ]]; then
         echo "Retrying copilot review (attempt $run)..."
@@ -393,7 +406,7 @@ for run in {1..4}; do
             printf -v retry_prompt "The output file %s failed validation:\n%s\n\nPlease fix the issues and re-validate." "$OUTPUT" "$validation_output"
         fi
 
-        copilot --agent "spec-review" \
+        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
             --model "$MODEL" \
             --continue \
             "${TOOLS[@]}" \
@@ -402,7 +415,7 @@ for run in {1..4}; do
             "${allow_url_args[@]}" \
             -p "$retry_prompt"
     else
-        copilot --agent "spec-review" \
+        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
             --model "$MODEL" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
