@@ -179,7 +179,8 @@ make cctest
 
 %changelog
 * Tue Feb 10 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-2
-- Add conflicts for npm
+- Add conflicts for legacy npm package
+- Rename npm subpackage to npm24 and update provided capability from npm to npm24
 
 * Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-1
 - Upgrade to 24.13.0
