@@ -393,6 +393,10 @@ Tools that are pre-approved: ${tool_hint}
 # Auth: The copilot CLI checks COPILOT_GITHUB_TOKEN before GH_TOKEN/GITHUB_TOKEN.
 # In CI, COPILOT_GITHUB_TOKEN is the dedicated Copilot credential and GH_TOKEN is GITHUB_TOKEN
 # (for gh/git ops). Locally, set COPILOT_GITHUB_TOKEN or GH_TOKEN to your Copilot-capable token.
+COPILOT_LOG_DIR="${WORK_DIR:-$(dirname "$OUTPUT")}/copilot_logs"
+mkdir -p "$COPILOT_LOG_DIR"
+copilot_debug_args=("--log-level" "debug" "--log-dir" "$COPILOT_LOG_DIR")
+
 for run in {1..4}; do
     if [[ $run -gt 1 ]]; then
         echo "Retrying copilot review (attempt $run)..."
@@ -404,22 +408,34 @@ for run in {1..4}; do
             printf -v retry_prompt "The output file %s failed validation:\n%s\n\nPlease fix the issues and re-validate." "$OUTPUT" "$validation_output"
         fi
 
+        copilot_exit=0
         copilot --agent "spec-review" \
             --model "$MODEL" \
             --continue \
+            "${copilot_debug_args[@]}" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
             --share "$LOG" \
             "${allow_url_args[@]}" \
-            -p "$retry_prompt"
+            -p "$retry_prompt" || copilot_exit=$?
     else
+        copilot_exit=0
         copilot --agent "spec-review" \
             --model "$MODEL" \
+            "${copilot_debug_args[@]}" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
             --share "$LOG" \
             "${allow_url_args[@]}" \
-            -p "$prompt"
+            -p "$prompt" || copilot_exit=$?
+    fi
+
+    if [[ $copilot_exit -ne 0 ]]; then
+        echo "::warning::Copilot CLI exited with code $copilot_exit (attempt $run)"
+        echo "=== Copilot debug logs ==="
+        find "$COPILOT_LOG_DIR" -type f -name '*.log' -exec echo "--- {} ---" \; -exec cat {} \; 2>/dev/null || echo "No log files found"
+        echo "=== End copilot debug logs ==="
+        # Don't exit yet — fall through to validation which will trigger retry
     fi
 
     # Validate the output report
