@@ -104,19 +104,7 @@ Inside the chroot: `rpmbuild`, `find`, `dnf5` — standard RPM tooling. `BUILDRO
 
 ## Per-Component Build Overrides
 
-Use `build.defines` to change macros for a single component:
-
-```toml
-[components.wget2.build]
-defines = { rhel = "11" }
-```
-
-Use `build.without` to disable build conditionals:
-
-```toml
-[components.dnf5.build]
-without = ["plugin_rhsm"]
-```
+Use `build.defines` (macros) and `build.without` (disable conditionals) in the component's `.comp.toml`. See [`comp-toml.instructions.md`](../../instructions/comp-toml.instructions.md#build-configuration) for syntax and examples.
 
 Verify with `prep-sources` before doing a full build.
 

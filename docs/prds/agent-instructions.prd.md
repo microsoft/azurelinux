@@ -573,14 +573,19 @@ Skills are for explicit task workflows only — domain knowledge goes in passive
 
 These `.instructions.md` files use `applyTo` globs for automatic context injection. Both VS Code and Copilot CLI support them. **This is the primary home for domain knowledge** — structural patterns, TOML syntax, valid overlay shapes, component definition examples. This content was deliberately removed from AGENTS.md to reduce always-on context tax, and placed here where it fires only when the agent is actually working with the relevant file type.
 
-- [ ] Create `.github/instructions/comp-toml.instructions.md` (`applyTo: "**/*.comp.toml"`)
+- [x] Create `.github/instructions/comp-toml.instructions.md` (`applyTo: "**/*.comp.toml"`)
   - Component definition patterns (inline vs dedicated, examples)
   - Overlay syntax and common patterns
   - Schema overview and required fields
   - When to use inline vs file-based definitions
-- [ ] Create `.github/instructions/spec-handcoded.instructions.md` (`applyTo: "**/*.spec"`)
+- [x] Create `.github/instructions/spec.instructions.md` (`applyTo: "**/*.spec"`)
+  - When hand-coded specs are appropriate (Azure Linux-originating packages only)
+  - Relationship to `.comp.toml` and overlays (prefer overlays over forking)
+  - Azure Linux conventions (dist tag, vendor, `%autorelease`, SPDX licenses)
+  - How to inspect/debug specs via `prep-sources`
+  - Note that specs in `prep-sources` output are generated — don't edit directly
 - [ ] Create `.github/instructions/spec-generated.instructions.md` - pending directory structure
-- [ ] Create `.github/instructions/kiwi.instructions.md` (`applyTo: "**/*.kiwi"`) - image build definitions
+- [x] Create `.github/instructions/kiwi.instructions.md` (`applyTo: "**/*.kiwi"`) - image build definitions
 
 ### Phase 4: Prompts (VS Code only)
 
