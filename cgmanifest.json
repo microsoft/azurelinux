@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.52",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.52.tar.xz"
+          "version": "1.6.54",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
         }
       }
     },
@@ -10972,7 +10972,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.18-FINAL.tar.gz"
         }
       }
     },
@@ -13793,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.44",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
+          "version": "8.0.45",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
         }
       }
     },
