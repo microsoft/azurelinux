@@ -298,7 +298,6 @@ for GIT_SOURCE in "${GIT_SOURCES[@]}"; do
     if ! GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 --single-branch "$GIT_SOURCE" "$dest" 2>"$clone_log"; then
         echo "Error: Failed to clone $GIT_SOURCE" >&2
         cat "$clone_log" >&2
-        rm -f "$clone_log"
         exit 1
     fi
     rm -f "$clone_log"
