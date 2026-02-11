@@ -14,9 +14,9 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
-# Tasks that run less than this many seconds are considered timeout/cascade
-# failures rather than genuine build failures.
-TIMEOUT_THRESHOLD_SECS = 30.0
+# Default: tasks that run less than this many seconds are considered
+# timeout/cascade failures rather than genuine build failures.
+DEFAULT_TIMEOUT_THRESHOLD_SECS = 120.0
 
 # Minimum gap in createTime (seconds) between consecutive tasks (sorted by
 # createTime) to consider them part of different sets.
@@ -71,10 +71,13 @@ def split_task_sets(tasks: list[dict]) -> list[tuple[str, list[dict]]]:
     return [(f"Set {i + 1}", s) for i, s in enumerate(sets)]
 
 
-def classify_task(task: dict) -> str:
+def classify_task(
+    task: dict,
+    threshold: float = DEFAULT_TIMEOUT_THRESHOLD_SECS,
+) -> str:
     """Classify a task as Completed, Failed (real), or Failed (timeout).
 
-    A failed task whose duration is below TIMEOUT_THRESHOLD_SECS is considered
+    A failed task whose duration is below *threshold* seconds is considered
     a timeout/cascade failure.
     """
     status = task.get("status", "Unknown")
@@ -82,7 +85,7 @@ def classify_task(task: dict) -> str:
         return status
 
     duration = _task_duration_secs(task)
-    if duration is not None and duration < TIMEOUT_THRESHOLD_SECS:
+    if duration is not None and duration < threshold:
         return "Failed (timeout)"
     return "Failed (real)"
 
@@ -98,7 +101,9 @@ def cmd_summary(args: argparse.Namespace) -> None:
     task_sets = split_task_sets(tasks)
 
     for label, set_tasks in task_sets:
-        classifications = Counter(classify_task(t) for t in set_tasks)
+        classifications = Counter(
+            classify_task(t, args.timeout_threshold) for t in set_tasks
+        )
         total = len(set_tasks)
 
         first_create = min(_parse_time(t["createTime"]) for t in set_tasks)
@@ -157,25 +162,34 @@ def cmd_failed(args: argparse.Namespace) -> None:
 
         if args.real_only:
             failed_tasks = [
-                t for t in failed_tasks if classify_task(t) == "Failed (real)"
+                t
+                for t in failed_tasks
+                if classify_task(t, args.timeout_threshold) == "Failed (real)"
             ]
         elif args.timeout_only:
             failed_tasks = [
                 t
                 for t in failed_tasks
-                if classify_task(t) == "Failed (timeout)"
+                if classify_task(t, args.timeout_threshold)
+                == "Failed (timeout)"
             ]
 
         if not failed_tasks:
             continue
 
         found_any = True
+
+        if args.names_only:
+            for task in failed_tasks:
+                print(task.get("taskName", "Unknown"))
+            continue
+
         if len(task_sets) > 1 or args.set is None:
             print(f"--- {label} ---")
 
         for task in failed_tasks:
             name = task.get("taskName", "Unknown")
-            classification = classify_task(task)
+            classification = classify_task(task, args.timeout_threshold)
             tag = "real" if classification == "Failed (real)" else "timeout"
             duration = _task_duration_secs(task)
             dur_str = f"{duration:.0f}s" if duration is not None else "?"
@@ -192,6 +206,16 @@ def main() -> None:
     # summary subcommand
     p_summary = subparsers.add_parser("summary", help="Show task status summary")
     p_summary.add_argument("file", help="Path to job status JSON file")
+    p_summary.add_argument(
+        "--timeout-threshold",
+        type=float,
+        default=DEFAULT_TIMEOUT_THRESHOLD_SECS,
+        metavar="SECS",
+        help=(
+            "Duration threshold in seconds for classifying failures "
+            f"(default: {DEFAULT_TIMEOUT_THRESHOLD_SECS})"
+        ),
+    )
     p_summary.set_defaults(func=cmd_summary)
 
     # failed subcommand
@@ -203,16 +227,31 @@ def main() -> None:
         default=None,
         help="Only show failures from this set number (1-based)",
     )
+    p_failed.add_argument(
+        "--timeout-threshold",
+        type=float,
+        default=DEFAULT_TIMEOUT_THRESHOLD_SECS,
+        metavar="SECS",
+        help=(
+            "Duration threshold in seconds for classifying failures "
+            f"(default: {DEFAULT_TIMEOUT_THRESHOLD_SECS})"
+        ),
+    )
     filter_group = p_failed.add_mutually_exclusive_group()
     filter_group.add_argument(
         "--real-only",
         action="store_true",
-        help="Only show real build failures (duration >= 30s)",
+        help="Only show real build failures (duration >= threshold)",
     )
     filter_group.add_argument(
         "--timeout-only",
         action="store_true",
-        help="Only show timeout/cascade failures (duration < 30s)",
+        help="Only show timeout/cascade failures (duration < threshold)",
+    )
+    p_failed.add_argument(
+        "--names-only",
+        action="store_true",
+        help="Output a flat list of task names only (no type or duration)",
     )
     p_failed.set_defaults(func=cmd_failed)
 
