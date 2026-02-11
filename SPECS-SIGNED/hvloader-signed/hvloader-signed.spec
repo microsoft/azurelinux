@@ -6,7 +6,7 @@
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           hvloader-signed-%{buildarch}
 Version:        1.0.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,7 +69,10 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Wed Nov 20 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.0.1-15
+* Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-16
+- Bump release for consistency with hvloader spec.
+
+* Thu Nov 20 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.0.1-15
 - Bump release for consistency with hvloader spec.
 
 * Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-14

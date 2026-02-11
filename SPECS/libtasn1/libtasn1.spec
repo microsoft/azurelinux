@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.19.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-12133.patch
+Patch1:         CVE-2025-13151.patch
 Provides:       libtasn1-tools = %{version}-%{release}
 
 %description
@@ -58,6 +59,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jan 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.19.0-3
+- Patch for CVE-2025-13151
+
 * Fri Feb 21 2025 Ankita Pareek <ankitapareek@microsoft.com> - 4.19.0-2
 - Address CVE-2024-12133
 

@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.60
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
@@ -11,7 +11,7 @@ Distribution:   Mariner
 Patch0:         CVE-2023-2602.patch
 Patch1:         CVE-2023-2603.patch
 Patch2:         CVE-2025-1390.patch
-BuildRequires: glibc-static >= 2.35-7%{?dist}
+BuildRequires: glibc-static >= 2.35-9%{?dist}
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
@@ -64,6 +64,12 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.60-6
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.60-5
+- Bump to rebuild with updated glibc
+
 * Wed Feb 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.60-4
 - Modify check section to fix ptest
 

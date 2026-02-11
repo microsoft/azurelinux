@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    44%{?dist}
+Release:    45%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -134,6 +134,7 @@ Patch1004: improve-safety-of-DH.patch
 Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 Patch1006: CVE-2022-4304.patch
 Patch1007: CVE-2025-3770.patch
+Patch1008: CVE-2025-2295.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -717,7 +718,10 @@ $tests_ok
 
 
 %changelog
-* Tue Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20230301gitf80f052277c8-44
+* Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-45
+- Patch for CVE-2025-2295
+
+* Wed Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20230301gitf80f052277c8-44
 - Patch for CVE-2025-2296
 
 * Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-43
