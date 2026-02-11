@@ -292,15 +292,14 @@ trap 'rm -rf "$temp_sources_dir"' EXIT SIGHUP SIGINT SIGTERM
 git_folders=()
 for GIT_SOURCE in "${GIT_SOURCES[@]}"; do
     dest="$temp_sources_dir/$(basename "$GIT_SOURCE" .git)"
-    echo "Cloning $GIT_SOURCE -> $dest"
-    # Capture verbose output but only print on failure to avoid log noise
-    clone_log="$(mktemp)"
-    if ! GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 --single-branch "$GIT_SOURCE" "$dest" 2>"$clone_log"; then
-        echo "Error: Failed to clone $GIT_SOURCE" >&2
-        cat "$clone_log" >&2
+    echo "Cloning $GIT_SOURCE -> $dest with debug output..."
+    # Print verbose clone output for debugging credential/network issues
+    clone_exit=0
+    GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 --single-branch "$GIT_SOURCE" "$dest" || clone_exit=$?
+    if [[ $clone_exit -ne 0 ]]; then
+        echo "Error: Failed to clone $GIT_SOURCE (exit code $clone_exit)" >&2
         exit 1
     fi
-    rm -f "$clone_log"
     git_folders+=("$dest")
 done
 # Add git source folders to allow list
