@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.8.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch2:         CVE-2024-11053.patch
 Patch3:         CVE-2024-9681.patch
 Patch4:         CVE-2025-0167.patch
 Patch5:         CVE-2025-10148.patch
+Patch6:         CVE-2025-14017.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
@@ -91,6 +92,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.8.0-8
+- Patch for CVE-2025-14017
+
 * Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.8.0-7
 - Patch for CVE-2025-10148
 

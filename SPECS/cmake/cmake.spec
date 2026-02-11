@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch25:        CVE-2025-9301.patch
 Patch26:        CVE-2025-5916.patch
 Patch27:        CVE-2025-5917.patch
 Patch28:        CVE-2025-5918.patch
+Patch29:        CVE-2025-14017.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -106,6 +107,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.21.4-21
+- Patch for CVE-2025-14017
+
 * Wed Sep 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.21.4-20
 - Patch CVE-2025-5916, CVE-2025-5917 & CVE-2025-5918
 - Fix FILE skip regression in CVE-2025-5918 patch.
