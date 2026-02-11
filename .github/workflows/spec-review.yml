@@ -109,7 +109,7 @@ jobs:
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
           SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
 
       - name: Print knowledge bases

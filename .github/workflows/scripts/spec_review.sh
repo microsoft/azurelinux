@@ -390,10 +390,9 @@ Tools that are pre-approved: ${tool_hint}
 "
 
 # Run the copilot agent — 4 total attempts (1 initial + 3 retries) if output validation fails
-# The copilot CLI reads GH_TOKEN for auth. In CI, GH_TOKEN is the GITHUB_TOKEN (for gh/git ops)
-# and COPILOT_TOKEN is the dedicated Copilot credential. We override GH_TOKEN inline so only the
-# copilot process sees it; the rest of the script keeps using GITHUB_TOKEN. Falls back to GH_TOKEN
-# for local runs where COPILOT_TOKEN isn't set.
+# Auth: The copilot CLI checks COPILOT_GITHUB_TOKEN before GH_TOKEN/GITHUB_TOKEN.
+# In CI, COPILOT_GITHUB_TOKEN is the dedicated Copilot credential and GH_TOKEN is GITHUB_TOKEN
+# (for gh/git ops). Locally, set COPILOT_GITHUB_TOKEN or GH_TOKEN to your Copilot-capable token.
 for run in {1..4}; do
     if [[ $run -gt 1 ]]; then
         echo "Retrying copilot review (attempt $run)..."
@@ -405,7 +404,7 @@ for run in {1..4}; do
             printf -v retry_prompt "The output file %s failed validation:\n%s\n\nPlease fix the issues and re-validate." "$OUTPUT" "$validation_output"
         fi
 
-        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
+        copilot --agent "spec-review" \
             --model "$MODEL" \
             --continue \
             "${TOOLS[@]}" \
@@ -414,7 +413,7 @@ for run in {1..4}; do
             "${allow_url_args[@]}" \
             -p "$retry_prompt"
     else
-        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
+        copilot --agent "spec-review" \
             --model "$MODEL" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
