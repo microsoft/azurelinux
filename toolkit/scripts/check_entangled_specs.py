@@ -127,8 +127,11 @@ version_release_matching_groups = [
     frozenset([
         "SPECS-SIGNED/xpmem-hwe-modules-signed/xpmem-hwe-modules-signed.spec",
         "SPECS/xpmem-hwe/xpmem-hwe.spec"
-    ])
-
+    ]),
+    frozenset([
+        "SPECS/openssl/openssl.spec",
+        "SPECS/openssl-compat/openssl-compat.spec",
+    ]),
 ]
 
 version_matching_groups = [
