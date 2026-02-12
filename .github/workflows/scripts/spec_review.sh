@@ -363,6 +363,7 @@ Instructions:
 5. Re-validate *EVERY* finding against the cited sources to ensure accuracy, fix any mistakes. Check the web sources again to confirm accuracy.
 6. Write the merged report to ${OUTPUT}.
 7. Store synthesis notes in ${KNOWLEDGE_BASE} for diagnostics.
+
 8. Validate the final report by running: '${VALIDATOR} ${OUTPUT}' (Call verbatim, other commands will be blocked).
 
 Model: ${MODEL}
@@ -372,6 +373,7 @@ else
     prompt="
 Review: ${SPEC_FILES[*]} against packaging guidelines from: ${URLS[*]} and ${git_prompt[*]}, place results in ${OUTPUT}.
 Knowledge base: ${KNOWLEDGE_BASE}
+  NOTE: The output directories should be created for you already!
 Model: ${MODEL}
 After writing the JSON report, validate it by running: '${VALIDATOR} ${OUTPUT}' (Call verbatim, other commands will be blocked).
 "
