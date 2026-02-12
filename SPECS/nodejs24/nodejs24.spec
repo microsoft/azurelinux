@@ -86,7 +86,7 @@ package to save space if non-English locales are not needed.
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Provides:       nodejs24-npm
+Provides:       nodejs24-npm = %{version}-%{release}
 Obsoletes:      nodejs24-npm < %{version}-%{release}
 Conflicts:      npm
 
