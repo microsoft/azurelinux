@@ -23,10 +23,12 @@ overlays = [
     # Note that we don't do the reverse to avoid conflicts with upstream Fedora
     # redhat-rpm-config during bootstrapping (replacing a dir with a symlink is
     # problematic in RPM land).
+    # TODO: remove symlinks after bootstrap
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
 
     # Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
+    # TODO: remove symlinks after bootstrap
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/bin", "for arch in x86_64 aarch64; do", "  ln -sf ${arch}-redhat-linux-gnu-pkg-config %{buildroot}/usr/bin/${arch}-azurelinux-linux-gnu-pkg-config", "done"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/bin/*-azurelinux-linux-gnu-pkg-config"] },
 
