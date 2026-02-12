@@ -69,7 +69,11 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
+<<<<<<< HEAD
 * Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-17
+=======
+* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-17
+>>>>>>> 4f89bd840 ([AutoPR- Security] Patch hvloader for CVE-2026-22795, CVE-2025-69421, CVE-2025-69420, CVE-2025-69419 [HIGH] (#15767))
 - Bump release for consistency with hvloader spec.
 
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-16
