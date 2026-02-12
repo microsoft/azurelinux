@@ -26,9 +26,7 @@ on: # zizmor: ignore[dangerous-triggers]
     paths:
       - '**/*.spec'
 
-permissions:
-  contents: read
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: spec-review-${{ github.event.pull_request.number }}
@@ -41,6 +39,9 @@ jobs:
     # Intentionally branch-pinned to our own repo so the
     # reusable workflow picks up prompt/script/agent updates automatically.
     uses: microsoft/azurelinux/.github/workflows/spec-review.yml@tomls/base/main # zizmor: ignore[unpinned-uses]
+    permissions:
+      contents: read
+      pull-requests: write # Post review comments and inline annotations on PRs
     with:
       pr-head-sha: ${{ github.event.pull_request.head.sha }}
       pr-head-repo: ${{ github.event.pull_request.head.repo.full_name }}
