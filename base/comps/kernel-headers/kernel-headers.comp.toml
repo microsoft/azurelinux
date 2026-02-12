@@ -58,7 +58,7 @@ value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-l
 filename = "kernel-6.18.5.1.tar.gz"
 hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
 hash-type = "SHA512"
-url = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
 
 # Prep: extract Azure Linux tarball.
 [[components.kernel-headers.overlays]]
