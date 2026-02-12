@@ -171,7 +171,7 @@ make cctest
 %dir %{icudatadir}
 %{icudatadir}/icudt%{icu_major}*.dat
 
-%files npm24
+%files npm
 %defattr(-,root,root)
 %{_bindir}/npm
 %{_bindir}/npx
@@ -181,7 +181,7 @@ make cctest
 %changelog
 * Tue Feb 10 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-2
 - Add conflicts for legacy npm package
-- Rename npm subpackage to npm24 and update provided capability from npm to npm24
+- Update provided capability from npm to nodejs24-npm
 
 * Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-1
 - Upgrade to 24.13.0
