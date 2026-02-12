@@ -26,7 +26,9 @@ on: # zizmor: ignore[dangerous-triggers]
     paths:
       - '**/*.spec'
 
-permissions: {} # All permissions are declared by the reusable workflow's job
+permissions:
+  contents: read
+  pull-requests: write
 
 concurrency:
   group: spec-review-${{ github.event.pull_request.number }}
