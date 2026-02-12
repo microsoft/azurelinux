@@ -363,7 +363,7 @@ Instructions:
 5. Re-validate *EVERY* finding against the cited sources to ensure accuracy, fix any mistakes. Check the web sources again to confirm accuracy.
 6. Write the merged report to ${OUTPUT}.
 7. Store synthesis notes in ${KNOWLEDGE_BASE} for diagnostics.
-
+  NOTE: The output directories should be created for you already!
 8. Validate the final report by running: '${VALIDATOR} ${OUTPUT}' (Call verbatim, other commands will be blocked).
 
 Model: ${MODEL}
@@ -393,10 +393,13 @@ Tools that are pre-approved: ${tool_hint}
 "
 
 # Run the copilot agent — 4 total attempts (1 initial + 3 retries) if output validation fails
-# The copilot CLI reads GH_TOKEN for auth. In CI, GH_TOKEN is the GITHUB_TOKEN (for gh/git ops)
-# and COPILOT_TOKEN is the dedicated Copilot credential. We override GH_TOKEN inline so only the
-# copilot process sees it; the rest of the script keeps using GITHUB_TOKEN. Falls back to GH_TOKEN
-# for local runs where COPILOT_TOKEN isn't set.
+# Auth: The copilot CLI checks COPILOT_GITHUB_TOKEN before GH_TOKEN/GITHUB_TOKEN.
+# In CI, COPILOT_GITHUB_TOKEN is the dedicated Copilot credential and GH_TOKEN is GITHUB_TOKEN
+# (for gh/git ops). Locally, set COPILOT_GITHUB_TOKEN or GH_TOKEN to your Copilot-capable token.
+COPILOT_LOG_DIR="${WORK_DIR:-$(dirname "$OUTPUT")}/copilot_logs"
+mkdir -p "$COPILOT_LOG_DIR"
+copilot_debug_args=("--log-level" "debug" "--log-dir" "$COPILOT_LOG_DIR")
+
 for run in {1..4}; do
     if [[ $run -gt 1 ]]; then
         echo "Retrying copilot review (attempt $run)..."
@@ -408,22 +411,34 @@ for run in {1..4}; do
             printf -v retry_prompt "The output file %s failed validation:\n%s\n\nPlease fix the issues and re-validate." "$OUTPUT" "$validation_output"
         fi
 
-        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
+        copilot_exit=0
+        copilot --agent "spec-review" \
             --model "$MODEL" \
             --continue \
+            "${copilot_debug_args[@]}" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
             --share "$LOG" \
             "${allow_url_args[@]}" \
-            -p "$retry_prompt"
+            -p "$retry_prompt" || copilot_exit=$?
+
+        if [[ $copilot_exit -ne 0 ]]; then
+            echo "::warning::Copilot CLI exited with code $copilot_exit (attempt $run)"
+        fi
     else
-        GH_TOKEN="${COPILOT_TOKEN:-$GH_TOKEN}" copilot --agent "spec-review" \
+        copilot_exit=0
+        copilot --agent "spec-review" \
             --model "$MODEL" \
+            "${copilot_debug_args[@]}" \
             "${TOOLS[@]}" \
             "${allow_folders[@]}" \
             --share "$LOG" \
             "${allow_url_args[@]}" \
-            -p "$prompt"
+            -p "$prompt" || copilot_exit=$?
+
+        if [[ $copilot_exit -ne 0 ]]; then
+            echo "::warning::Copilot CLI exited with code $copilot_exit (attempt $run)"
+        fi
     fi
 
     # Validate the output report

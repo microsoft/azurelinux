@@ -164,8 +164,14 @@ jobs:
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
           SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
+
+      - name: Print copilot debug logs
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          echo "=== Copilot Debug Logs ==="
+          find .spec_review/workdir -path '*/copilot_logs/*.log' -exec echo "--- {} ---" \; -exec cat {} \; 2>/dev/null || echo "No copilot debug logs found"
 
       - name: Print knowledge bases
         if: always() && steps.changed-specs.outputs.skip != 'true'
