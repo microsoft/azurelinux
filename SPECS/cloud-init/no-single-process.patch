@@ -5,8 +5,8 @@ Author: Brett Holman <brett.holman@canonical.com>
 Last-Update: 2024-08-02
 
 diff -ruN a/cloudinit/cmd/status.py b/cloudinit/cmd/status.py
---- a/cloudinit/cmd/status.py	2024-08-30 14:19:57.000000000 -0700
-+++ b/cloudinit/cmd/status.py	2024-09-30 16:12:15.632570075 -0700
+--- a/cloudinit/cmd/status.py	2026-02-12 21:33:39.035227272 +0000
++++ b/cloudinit/cmd/status.py	2026-02-12 21:34:46.978947389 +0000
 @@ -318,9 +318,8 @@
      for service in [
          "cloud-final.service",
@@ -19,8 +19,8 @@ diff -ruN a/cloudinit/cmd/status.py b/cloudinit/cmd/status.py
          try:
              stdout = query_systemctl(
 diff -ruN a/cloudinit/config/cc_mounts.py b/cloudinit/config/cc_mounts.py
---- a/cloudinit/config/cc_mounts.py	2024-08-30 14:19:57.000000000 -0700
-+++ b/cloudinit/config/cc_mounts.py	2024-09-30 16:12:50.281703594 -0700
+--- a/cloudinit/config/cc_mounts.py	2026-02-12 21:33:39.035227272 +0000
++++ b/cloudinit/config/cc_mounts.py	2026-02-12 21:34:51.298929670 +0000
 @@ -525,7 +525,7 @@
      # fs_spec, fs_file, fs_vfstype, fs_mntops, fs-freq, fs_passno
      uses_systemd = cloud.distro.uses_systemd()
@@ -31,8 +31,8 @@ diff -ruN a/cloudinit/config/cc_mounts.py b/cloudinit/config/cc_mounts.py
          else "defaults,nobootwait"
      )
 diff -ruN a/cloudinit/config/schemas/schema-cloud-config-v1.json b/cloudinit/config/schemas/schema-cloud-config-v1.json
---- a/cloudinit/config/schemas/schema-cloud-config-v1.json	2024-08-30 14:19:57.000000000 -0700
-+++ b/cloudinit/config/schemas/schema-cloud-config-v1.json	2024-09-30 16:13:48.717358398 -0700
+--- a/cloudinit/config/schemas/schema-cloud-config-v1.json	2026-02-12 21:33:39.039227255 +0000
++++ b/cloudinit/config/schemas/schema-cloud-config-v1.json	2026-02-12 21:34:51.302929653 +0000
 @@ -2022,12 +2022,12 @@
          },
          "mount_default_fields": {
@@ -49,8 +49,8 @@ diff -ruN a/cloudinit/config/schemas/schema-cloud-config-v1.json b/cloudinit/con
              "2"
            ],
 diff -ruN a/systemd/cloud-config.service.tmpl b/systemd/cloud-config.service.tmpl
---- a/systemd/cloud-config.service.tmpl	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-config.service.tmpl	2024-09-30 16:04:45.242125447 -0700
+--- a/systemd/cloud-config.service.tmpl	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-config.service.tmpl	2026-02-12 21:34:55.438912689 +0000
 @@ -10,14 +10,7 @@
  
  [Service]
@@ -68,8 +68,8 @@ diff -ruN a/systemd/cloud-config.service.tmpl b/systemd/cloud-config.service.tmp
  TimeoutSec=0
  
 diff -ruN a/systemd/cloud-config.target b/systemd/cloud-config.target
---- a/systemd/cloud-config.target	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-config.target	2024-09-30 16:14:21.895676757 -0700
+--- a/systemd/cloud-config.target	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-config.target	2026-02-12 21:34:58.966898218 +0000
 @@ -14,5 +14,5 @@
  
  [Unit]
@@ -77,10 +77,10 @@ diff -ruN a/systemd/cloud-config.target b/systemd/cloud-config.target
 -Wants=cloud-init-local.service cloud-init-network.service
 -After=cloud-init-local.service cloud-init-network.service
 +Wants=cloud-init-local.service cloud-init.service
-+After=cloud-init-local.service cloud-init.servic
++After=cloud-init-local.service cloud-init.service
 diff -ruN a/systemd/cloud-final.service.tmpl b/systemd/cloud-final.service.tmpl
---- a/systemd/cloud-final.service.tmpl	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-final.service.tmpl	2024-09-30 16:06:04.764625254 -0700
+--- a/systemd/cloud-final.service.tmpl	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-final.service.tmpl	2026-02-12 21:36:57.798410809 +0000
 @@ -15,16 +15,10 @@
  
  [Service]
@@ -101,8 +101,8 @@ diff -ruN a/systemd/cloud-final.service.tmpl b/systemd/cloud-final.service.tmpl
  # Restart NetworkManager if it is present and running.
  ExecStartPost=/bin/sh -c 'u=NetworkManager.service; \
 diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
---- a/systemd/cloud-init-local.service.tmpl	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-init-local.service.tmpl	2024-09-30 16:07:21.911075080 -0700
+--- a/systemd/cloud-init-local.service.tmpl	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-init-local.service.tmpl	2026-02-12 21:36:57.798410809 +0000
 @@ -7,6 +7,7 @@
  {% endif %}
  Wants=network-pre.target
@@ -128,8 +128,8 @@ diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.ser
  TimeoutSec=0
  
 diff -ruN a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.service.tmpl
---- a/systemd/cloud-init-main.service.tmpl	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-init-main.service.tmpl	1969-12-31 16:00:00.000000000 -0800
+--- a/systemd/cloud-init-main.service.tmpl	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-init-main.service.tmpl	1970-01-01 00:00:00.000000000 +0000
 @@ -1,52 +0,0 @@
 -## template:jinja
 -# systemd ordering resources
@@ -184,8 +184,8 @@ diff -ruN a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.servi
 -[Install]
 -WantedBy=cloud-init.target
 diff -ruN a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
---- a/systemd/cloud-init-network.service.tmpl	2024-08-30 14:19:57.000000000 -0700
-+++ b/systemd/cloud-init-network.service.tmpl	1969-12-31 16:00:00.000000000 -0800
+--- a/systemd/cloud-init-network.service.tmpl	2026-02-12 21:33:39.063227156 +0000
++++ b/systemd/cloud-init-network.service.tmpl	1970-01-01 00:00:00.000000000 +0000
 @@ -1,64 +0,0 @@
 -## template:jinja
 -[Unit]
@@ -252,8 +252,8 @@ diff -ruN a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network
 -[Install]
 -WantedBy=cloud-init.target
 diff -ruN a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
---- a/systemd/cloud-init.service.tmpl	1969-12-31 16:00:00.000000000 -0800
-+++ b/systemd/cloud-init.service.tmpl	2024-09-30 16:10:27.305042289 -0700
+--- a/systemd/cloud-init.service.tmpl	1970-01-01 00:00:00.000000000 +0000
++++ b/systemd/cloud-init.service.tmpl	2026-02-12 21:36:09.202610133 +0000
 @@ -0,0 +1,57 @@
 +## template:jinja
 +[Unit]
@@ -308,14 +308,13 @@ diff -ruN a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
 +TimeoutSec=0
 +
 +# Output needs to appear in instance console output
-+StandardOutput=journalconsole
++StandardOutput=journal+console
 +
 +[Install]
 +WantedBy=cloud-init.target
-\ No newline at end of file
 diff -ruN a/tests/unittests/config/test_cc_mounts.py b/tests/unittests/config/test_cc_mounts.py
---- a/tests/unittests/config/test_cc_mounts.py	2024-08-30 14:19:57.000000000 -0700
-+++ b/tests/unittests/config/test_cc_mounts.py	2024-09-30 16:15:11.357454290 -0700
+--- a/tests/unittests/config/test_cc_mounts.py	2026-02-12 21:33:39.075227106 +0000
++++ b/tests/unittests/config/test_cc_mounts.py	2026-02-12 21:35:39.638731395 +0000
 @@ -566,9 +566,9 @@
              LABEL=keepme	none	ext4	defaults	0	0
              LABEL=UEFI
@@ -328,4 +327,3 @@ diff -ruN a/tests/unittests/config/test_cc_mounts.py b/tests/unittests/config/te
              /dev/sdb1	none	swap	sw,comment=cloudconfig	0	0
              """  # noqa: E501
              ).strip()
-
