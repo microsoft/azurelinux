@@ -82,11 +82,12 @@ Requires: %{name} = %{version}-%{release}
 Optional data files to provide full-icu support for Node.js. Remove this
 package to save space if non-English locales are not needed.
 
-%package        npm24
+%package        npm
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Provides:       npm24 = %{npm_version}.%{version}-%{release}
+Provides:       nodejs24-npm = %{version}-%{release}
+Obsoletes:      nodejs24-npm < %{version}-%{release}
 Conflicts:      npm
 
 %description npm24
