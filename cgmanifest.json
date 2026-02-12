@@ -10831,8 +10831,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.54",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
+          "version": "1.6.55",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.55.tar.xz"
         }
       }
     },
@@ -14382,8 +14382,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.28.1",
-          "downloadUrl": "https://nginx.org/download/nginx-1.28.1.tar.gz"
+          "version": "1.28.2",
+          "downloadUrl": "https://nginx.org/download/nginx-1.28.2.tar.gz"
         }
       }
     },
