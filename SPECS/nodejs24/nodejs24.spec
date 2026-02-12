@@ -90,7 +90,7 @@ Provides:       nodejs24-npm = %{version}-%{release}
 Obsoletes:      nodejs24-npm < %{version}-%{release}
 Conflicts:      npm
 
-%description npm24
+%description npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
