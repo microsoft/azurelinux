@@ -2784,6 +2784,7 @@
                 "golang",
                 "golang-1.23",
                 "golang-1.24",
+                "golang-1.25",
                 "gperf",
                 "gperftools",
                 "gpgme",
