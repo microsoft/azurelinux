@@ -363,7 +363,7 @@ Instructions:
 5. Re-validate *EVERY* finding against the cited sources to ensure accuracy, fix any mistakes. Check the web sources again to confirm accuracy.
 6. Write the merged report to ${OUTPUT}.
 7. Store synthesis notes in ${KNOWLEDGE_BASE} for diagnostics.
-  NOTE: The output directories should be created for you already!
+   - NOTE: The output directories should be created for you already!
 8. Validate the final report by running: '${VALIDATOR} ${OUTPUT}' (Call verbatim, other commands will be blocked).
 
 Model: ${MODEL}
@@ -373,7 +373,7 @@ else
     prompt="
 Review: ${SPEC_FILES[*]} against packaging guidelines from: ${URLS[*]} and ${git_prompt[*]}, place results in ${OUTPUT}.
 Knowledge base: ${KNOWLEDGE_BASE}
-  NOTE: The output directories should be created for you already!
+  - NOTE: The output directories should be created for you already!
 Model: ${MODEL}
 After writing the JSON report, validate it by running: '${VALIDATOR} ${OUTPUT}' (Call verbatim, other commands will be blocked).
 "
@@ -396,7 +396,7 @@ Tools that are pre-approved: ${tool_hint}
 # Auth: The copilot CLI checks COPILOT_GITHUB_TOKEN before GH_TOKEN/GITHUB_TOKEN.
 # In CI, COPILOT_GITHUB_TOKEN is the dedicated Copilot credential and GH_TOKEN is GITHUB_TOKEN
 # (for gh/git ops). Locally, set COPILOT_GITHUB_TOKEN or GH_TOKEN to your Copilot-capable token.
-COPILOT_LOG_DIR="${WORK_DIR:-$(dirname "$OUTPUT")}/copilot_logs"
+COPILOT_LOG_DIR="$(dirname "$OUTPUT")/copilot_logs"
 mkdir -p "$COPILOT_LOG_DIR"
 copilot_debug_args=("--log-level" "debug" "--log-dir" "$COPILOT_LOG_DIR")
 
@@ -424,6 +424,8 @@ for run in {1..4}; do
 
         if [[ $copilot_exit -ne 0 ]]; then
             echo "::warning::Copilot CLI exited with code $copilot_exit (attempt $run)"
+            [[ -f "$OUTPUT" ]] && echo "  Output file exists, will attempt validation." \
+                               || echo "  No output file produced."
         fi
     else
         copilot_exit=0
@@ -438,6 +440,8 @@ for run in {1..4}; do
 
         if [[ $copilot_exit -ne 0 ]]; then
             echo "::warning::Copilot CLI exited with code $copilot_exit (attempt $run)"
+            [[ -f "$OUTPUT" ]] && echo "  Output file exists, will attempt validation." \
+                               || echo "  No output file produced."
         fi
     fi
 

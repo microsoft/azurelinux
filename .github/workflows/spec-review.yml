@@ -18,7 +18,7 @@ on:
       pr-number:
         description: 'Pull request number'
         required: true
-        type: string
+        type: number
       repo:
         description: 'Full name of the base repo (e.g. microsoft/azurelinux)'
         required: true
@@ -127,14 +127,15 @@ jobs:
           echo "Changed spec files:"
           echo "$CHANGED_SPECS"
 
-          # Build --spec args from line-delimited paths
-          SPEC_ARGS=""
+          # Write one spec path per line to a file for safe consumption downstream.
+          # Prefix relative paths with ./ to prevent flag injection from '--'-prefixed names.
+          SPEC_LIST_FILE=".spec_review_paths.txt"
           while IFS= read -r spec; do
             [[ -z "$spec" ]] && continue
-            SPEC_ARGS+="--spec ${spec} "
-          done <<< "$CHANGED_SPECS"
+            [[ "$spec" != /* ]] && spec="./$spec"
+            echo "$spec"
+          done <<< "$CHANGED_SPECS" > "$SPEC_LIST_FILE"
 
-          echo "spec_args=$SPEC_ARGS" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
@@ -158,14 +159,17 @@ jobs:
         if: steps.changed-specs.outputs.skip != 'true'
         run: |
           chmod +x .github/workflows/scripts/spec_review_multi.sh
-          # shellcheck disable=SC2086
-          # SPEC_ARGS is built from validated file paths (grep \.spec$ only)
-          .github/workflows/scripts/spec_review_multi.sh $SPEC_ARGS \
+          # Build a properly-quoted array from the line-delimited spec list file
+          SPEC_ARGS=()
+          while IFS= read -r spec; do
+            [[ -z "$spec" ]] && continue
+            SPEC_ARGS+=("--spec" "$spec")
+          done < .spec_review_paths.txt
+          .github/workflows/scripts/spec_review_multi.sh "${SPEC_ARGS[@]}" \
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
-          SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
 
       - name: Print copilot debug logs
         if: always() && steps.changed-specs.outputs.skip != 'true'
