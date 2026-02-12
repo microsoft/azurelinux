@@ -60,9 +60,6 @@ rm -rf %{buildroot}
 install -d %{buildroot}%{_sysconfdir}/systemd/system/rpcbind.target.wants
 ln -sf %{_unitdir}/rpcbind.service %{buildroot}%{_sysconfdir}/systemd/system/rpcbind.target.wants/rpcbind.service
 
-# ebuild: compatibility symlinks for /usr/lib64 -> ../lib/...
-install -d %{buildroot}%{_prefix}/lib64
-ln -sf ../lib/modules %{buildroot}%{_prefix}/lib64/modules
 rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
 rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
 rm -rf  %{buildroot}/etc/issue
