@@ -10,8 +10,8 @@ URL:            https://www.tcpdump.org/
 #Source0:       https://github.com/the-tcpdump-group/%{name}/archive/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-8006.patch
-Patch1:		CVE-2023-7256.patch
-Patch2:		CVE-2025-11961.patch
+Patch1:	        CVE-2023-7256.patch
+Patch2:	        CVE-2025-11961.patch
 
 %description
 Libpcap provides a portable framework for low-level network
