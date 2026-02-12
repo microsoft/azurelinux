@@ -25,8 +25,8 @@ overlays = [
     # problematic in RPM land).
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
-   
-    #Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
+
+    # Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/bin", "for arch in x86_64 aarch64; do", "  ln -sf ${arch}-redhat-linux-gnu-pkg-config %{buildroot}/usr/bin/${arch}-azurelinux-linux-gnu-pkg-config", "done"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/bin/*-azurelinux-linux-gnu-pkg-config"] },
 
