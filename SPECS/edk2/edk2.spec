@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    46%{?dist}
+Release:    47%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -135,19 +135,13 @@ Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-
 Patch1006: CVE-2022-4304.patch
 Patch1007: CVE-2025-3770.patch
 Patch1008: CVE-2025-2295.patch
-<<<<<<< HEAD
-Patch1009: CVE-2025-68160.patch
-Patch1010: CVE-2025-69418.patch
-Patch1011: CVE-2026-22796.patch
-=======
 Patch1009: CVE-2025-69419.patch
 Patch1010: CVE-2025-69420.patch
 Patch1011: CVE-2025-69421.patch
 Patch1012: CVE-2026-22795.patch
->>>>>>> f9c0b4eee ([AutoPR- Security] Patch edk2 for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420 [HIGH] (#15763))
-
-# python3-devel and libuuid-devel are required for building tools.
-# python3-devel is also needed for varstore template generation and
+Patch1013: CVE-2025-68160.patch
+Patch1014: CVE-2025-69418.patch
+Patch1015: CVE-2026-22796.patch
 # verification with "ovmf-vars-generator".
 BuildRequires:  python3-devel
 BuildRequires:  libuuid-devel
@@ -725,17 +719,11 @@ $tests_ok
 %{_bindir}/UPT
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
-
-
 %changelog
-<<<<<<< HEAD
-* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
-- Patch for CVE-2026-22796, CVE-2025-69418, CVE-2025-68160
-=======
 * Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
 - Patch for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420
->>>>>>> f9c0b4eee ([AutoPR- Security] Patch edk2 for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420 [HIGH] (#15763))
-
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-47
+- Patch for CVE-2026-22796, CVE-2025-69418, CVE-2025-68160
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-45
 - Patch for CVE-2025-2295
 
