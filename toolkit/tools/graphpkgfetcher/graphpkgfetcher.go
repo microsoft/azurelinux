@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -518,13 +519,17 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 }
 
 func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []string) (err error) {
-	rpmPaths := []string{}
-	for _, resolvedPackage := range resolvedPackages {
-		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
-	}
+	// Keep canonical package filenames in graph nodes for downstream consumers that
+	// parse package names from basenames (for example pkgworker's tdnf install args).
+	chosenRPMPath := rpmPackageToRPMPath(resolvedPackages[0], outDir)
+	if len(resolvedPackages) > 1 {
+		rpmPaths := []string{}
+		for _, resolvedPackage := range resolvedPackages {
+			// For conflict resolution only, use the actual on-disk file path which may
+			// include a tdnf-added filename prefix.
+			rpmPaths = append(rpmPaths, findResolvedRPMPath(resolvedPackage, outDir))
+		}
 
-	chosenRPMPath := rpmPaths[0]
-	if len(rpmPaths) > 1 {
 		var resolvedRPMs []string
 		logger.Log.Debugf("Found %d candidates. Resolving", len(rpmPaths))
 
@@ -557,6 +562,28 @@ func rpmPackageToRPMPath(rpmPackage, outDir string) string {
 	rpmPackage = rpm.StripEpochFromPackageFullQualifiedName(rpmPackage)
 	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
 	return filepath.Join(outDir, rpmName)
+}
+
+// findResolvedRPMPath returns the on-disk path for a package in the RPM cache.
+// Newer tdnf builds may prefix downloaded RPM files (for example "<hash>-name-ver-rel.arch.rpm").
+// Keep using the canonical filename when present, and otherwise fall back to the prefixed variant.
+func findResolvedRPMPath(rpmPackage, outDir string) string {
+	canonicalPath := rpmPackageToRPMPath(rpmPackage, outDir)
+
+	exists, err := file.PathExists(canonicalPath)
+	if err == nil && exists {
+		return canonicalPath
+	}
+
+	canonicalBase := filepath.Base(canonicalPath)
+	pattern := filepath.Join(outDir, fmt.Sprintf("*-%s", canonicalBase))
+	matches, err := filepath.Glob(pattern)
+	if err != nil || len(matches) == 0 {
+		return canonicalPath
+	}
+
+	sort.Strings(matches)
+	return matches[0]
 }
 
 func isToolchainPackage(rpmPath string, toolchainRPMs []string) bool {
