@@ -1,35 +1,100 @@
-name: Spec Review
+# Reusable spec review workflow — called by the stub on the default branch.
+# Lives on tomls/base/main so it picks up prompt/agent/script updates automatically.
+#
+# See also: .github/workflows/spec-review-stub.yml (the pull_request_target stub)
+name: Spec Review (reusable)
 
 on:
-  pull_request:
-    paths:
-      - '**/*.spec'
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      pr-head-sha:
+        description: 'PR head commit SHA'
+        required: true
+        type: string
+      pr-head-repo:
+        description: 'Full name of the PR head repo (e.g. fork-owner/azurelinux)'
+        required: true
+        type: string
+      pr-number:
+        description: 'Pull request number'
+        required: true
+        type: number
+      repo:
+        description: 'Full name of the base repo (e.g. microsoft/azurelinux)'
+        required: true
+        type: string
+      scripts-ref:
+        description: 'Git ref to checkout for scripts/prompts/agents (default: tomls/base/main)'
+        required: false
+        type: string
+        default: tomls/base/main
+    secrets:
+      COPILOT_TOKEN:
+        description: 'GitHub App token for Copilot CLI authentication'
+        required: true
 
-# Cancel in-progress runs when new commits are pushed
+  # Keep workflow_dispatch for standalone testing (no stub needed)
+  workflow_dispatch:
+    inputs:
+      spec-files:
+        description: 'Space-separated list of spec files to review (default: all *.spec in repo), relative to repo root.'
+        required: false
+        type: string
+
 concurrency:
-  group: spec-review-${{ github.event.pull_request.number || github.ref }}
+  group: spec-review-run-${{ inputs.pr-number || github.ref }}
   cancel-in-progress: true
 
-# Auth flow:
-# Since copilot currently requires user auth, but we want to avoid using personal tokens,
-# we use a dedicated COPILOT_TOKEN secret which is derived from a GitHub App and can be rotated
-# and managed more easily.
-# The GITHUB_TOKEN is used for standard GitHub API operations (comments, annotations, etc.) and
-# is automatically provided by GitHub Actions.
+permissions: {} # Override any inherited defaults; job-level permissions are set below
+
 jobs:
   spec-review:
+    name: Spec Review
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Post review comments and inline annotations on PRs
 
     steps:
-      - name: Checkout repository
+      # Stage 1: Checkout the scripts branch for tooling (prompts, scripts, agents).
+      # actions/checkout in a reusable workflow checks out the *caller's* ref by default,
+      # so we must explicitly specify the repo and ref where the scripts live.
+      - name: Checkout scripts (base ref)
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 0  # Need full history for diff
+          repository: ${{ inputs.repo || github.repository }}
+          ref: ${{ inputs.scripts-ref || github.ref }}
           persist-credentials: false
+
+      # Stage 2: Sparse-checkout only *.spec files from the PR head, then overlay
+      # them into the main working tree so all paths stay repo-relative.
+      # For non-PR runs (workflow_dispatch), skip — we already have everything.
+      - name: Checkout PR specs (sparse)
+        if: inputs.pr-head-sha != ''
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: ${{ inputs.pr-head-repo }}
+          ref: ${{ inputs.pr-head-sha }}
+          path: pr-head
+          sparse-checkout: |
+            **/*.spec
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Overlay spec files from PR head
+        if: inputs.pr-head-sha != ''
+        run: |
+          # Copy all spec files from sparse checkout into the main tree.
+          # The sparse checkout already filtered to *.spec only.
+          cd pr-head
+          find . -name '*.spec' -type f -print0 | while IFS= read -r -d '' spec; do
+            echo "Copying '$(realpath "$spec")' to '$(realpath -m "../$spec")'"
+            mkdir -p "../$(dirname "$spec")"
+            cp "$spec" "../$spec"
+          done
+          cd ..
+          rm -rf pr-head
 
       - name: Test gh auth
         env:
@@ -41,14 +106,15 @@ jobs:
         id: changed-specs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_NAME: ${{ github.event_name }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          SPEC_FILES: ${{ github.event.inputs.spec-files }}
         run: |
-          if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            # Get list of changed .spec files in the PR
+          if [[ -n "$SPEC_FILES" ]]; then
+            # Manual dispatch with explicit spec list
+            CHANGED_SPECS="$SPEC_FILES"
+          elif [[ -n "$PR_NUMBER" ]]; then
             CHANGED_SPECS=$(gh pr diff "$PR_NUMBER" --name-only | grep '\.spec$' || true)
           else
-            # For workflow_dispatch, review all specs
             CHANGED_SPECS=$(find . -type f -name "*.spec" | sed 's|^\./||')
           fi
 
@@ -61,25 +127,15 @@ jobs:
           echo "Changed spec files:"
           echo "$CHANGED_SPECS"
 
-          # Write validated spec paths to a file (avoids unquoted word-splitting)
-          SPEC_ARGS_FILE=$(mktemp)
+          # Write one spec path per line to a file for safe consumption downstream.
+          # Prefix relative paths with ./ to prevent flag injection from '--'-prefixed names.
+          SPEC_LIST_FILE=".spec_review_paths.txt"
           while IFS= read -r spec; do
-            # Reject paths with shell metacharacters or glob/space chars
-            if [[ "$spec" =~ [\$\`\"\'\'\;\|\&\>\<\(\)\{\}\*\?\[\]\ ] ]]; then
-              echo "::warning::Skipping suspicious spec path: $spec"
-              continue
-            fi
-            echo "$spec" >> "$SPEC_ARGS_FILE"
-          done <<< "$CHANGED_SPECS"
+            [[ -z "$spec" ]] && continue
+            [[ "$spec" != /* ]] && spec="./$spec"
+            echo "$spec"
+          done <<< "$CHANGED_SPECS" > "$SPEC_LIST_FILE"
 
-          # Build SPEC_ARGS from the validated file
-          SPEC_ARGS=""
-          while IFS= read -r spec; do
-            SPEC_ARGS="$SPEC_ARGS --spec $spec"
-          done < "$SPEC_ARGS_FILE"
-          rm -f "$SPEC_ARGS_FILE"
-
-          echo "spec_args=$SPEC_ARGS" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
@@ -103,14 +159,23 @@ jobs:
         if: steps.changed-specs.outputs.skip != 'true'
         run: |
           chmod +x .github/workflows/scripts/spec_review_multi.sh
-          # shellcheck disable=SC2086
-          # SPEC_ARGS is built from validated file paths (grep \.spec$ only)
-          .github/workflows/scripts/spec_review_multi.sh $SPEC_ARGS \
+          # Build a properly-quoted array from the line-delimited spec list file
+          SPEC_ARGS=()
+          while IFS= read -r spec; do
+            [[ -z "$spec" ]] && continue
+            SPEC_ARGS+=("--spec" "$spec")
+          done < .spec_review_paths.txt
+          .github/workflows/scripts/spec_review_multi.sh "${SPEC_ARGS[@]}" \
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}
-          SPEC_ARGS: ${{ steps.changed-specs.outputs.spec_args }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+
+      - name: Print copilot debug logs
+        if: always() && steps.changed-specs.outputs.skip != 'true'
+        run: |
+          echo "=== Copilot Debug Logs ==="
+          find .spec_review/workdir -path '*/copilot_logs/*.log' -exec echo "--- {} ---" \; -exec cat {} \; 2>/dev/null || echo "No copilot debug logs found"
 
       - name: Print knowledge bases
         if: always() && steps.changed-specs.outputs.skip != 'true'
@@ -190,12 +255,12 @@ jobs:
             --repo-root "$GITHUB_WORKSPACE" --workflow-commands
 
       - name: Post PR comment
-        if: github.event_name == 'pull_request' && steps.changed-specs.outputs.skip != 'true'
+        if: inputs.pr-number != '' && steps.changed-specs.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ inputs.repo }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          HEAD_SHA: ${{ inputs.pr-head-sha }}
         run: |
           # Generate formatted comment to a temp file (avoids ARG_MAX issues with large comments)
           COMMENT_FILE=$(mktemp)
@@ -220,15 +285,15 @@ jobs:
               -F body=@"$COMMENT_FILE"
           else
             echo "Creating new comment"
-            gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file "$COMMENT_FILE"
           fi
           rm -f "$COMMENT_FILE"
 
       - name: Write job summary
         if: always() && steps.changed-specs.outputs.skip != 'true'
         env:
-          REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          REPO: ${{ inputs.repo || github.repository }}
+          HEAD_SHA: ${{ inputs.pr-head-sha || github.sha }}
         run: |
           python .github/workflows/scripts/format_pr_comment.py \
             .spec_review/report.json \
@@ -249,8 +314,10 @@ jobs:
 
       - name: Fail if errors found
         if: steps.changed-specs.outputs.skip != 'true' && fromJSON(steps.validate.outputs.error_count || '0') > 0
+        env:
+          ERROR_COUNT: ${{ steps.validate.outputs.error_count }}
         run: |
-          echo "Found ${{ steps.validate.outputs.error_count }} error(s) in spec review"
+          echo "Found ${ERROR_COUNT} error(s) in spec review"
           echo ""
           # Print all findings so "View details" shows everything
           python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --all
