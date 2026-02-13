@@ -81,6 +81,14 @@
           "$ref": "#/$defs/ComponentBuildConfig",
           "title": "Build configuration",
           "description": "Configuration for building the component"
+        },
+        "source-files": {
+          "items": {
+            "$ref": "#/$defs/SourceFileReference"
+          },
+          "type": "array",
+          "title": "Source files",
+          "description": "Source files to download for this component"
         }
       },
       "additionalProperties": false,
@@ -417,6 +425,31 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Origin": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "download"
+          ],
+          "title": "Origin type",
+          "description": "Type of origin for this source file"
+        },
+        "uri": {
+          "type": "string",
+          "title": "URI",
+          "description": "URI to download the source file from if origin type is 'download'",
+          "examples": [
+            "https://example.com/source.tar.gz"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "type"
+      ]
+    },
     "PackageRepository": {
       "properties": {
         "base-uri": {
@@ -479,6 +512,28 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "SourceFileReference": {
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "hash-type": {
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/Origin"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "filename",
+        "origin"
+      ]
     },
     "SpecSource": {
       "properties": {
