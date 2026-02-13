@@ -3,6 +3,22 @@
   "$id": "https://github.com/gim-home/azldev-preview/internal/projectconfig/config-file",
   "$ref": "#/$defs/ConfigFile",
   "$defs": {
+    "CheckConfig": {
+      "properties": {
+        "skip": {
+          "type": "boolean",
+          "title": "Skip check",
+          "description": "Disables the %check section by prepending 'exit 0' when set to true"
+        },
+        "skip_reason": {
+          "type": "string",
+          "title": "Skip reason",
+          "description": "Required justification for skipping the %check section"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ComponentBuildConfig": {
       "properties": {
         "with": {
@@ -28,6 +44,19 @@
           "type": "object",
           "title": "Macro definitions",
           "description": "Macro definitions to pass to the builder."
+        },
+        "undefines": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Undefined macros",
+          "description": "Macro names to undefine when passing to the builder."
+        },
+        "check": {
+          "$ref": "#/$defs/CheckConfig",
+          "title": "Check configuration",
+          "description": "Configuration for the %check section"
         }
       },
       "additionalProperties": false,
@@ -52,6 +81,14 @@
           "$ref": "#/$defs/ComponentBuildConfig",
           "title": "Build configuration",
           "description": "Configuration for building the component"
+        },
+        "source-files": {
+          "items": {
+            "$ref": "#/$defs/SourceFileReference"
+          },
+          "type": "array",
+          "title": "Source files",
+          "description": "Source files to download for this component"
         }
       },
       "additionalProperties": false,
@@ -97,6 +134,8 @@
             "spec-prepend-lines",
             "spec-append-lines",
             "spec-search-replace",
+            "patch-add",
+            "patch-remove",
             "file-prepend-lines",
             "file-search-replace",
             "file-add",
@@ -376,10 +415,40 @@
           "type": "string",
           "title": "Path",
           "description": "Path to the image definition file"
+        },
+        "profile": {
+          "type": "string",
+          "title": "Profile",
+          "description": "Optional field that specifies the profile to use when building the image"
         }
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "Origin": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "download"
+          ],
+          "title": "Origin type",
+          "description": "Type of origin for this source file"
+        },
+        "uri": {
+          "type": "string",
+          "title": "URI",
+          "description": "URI to download the source file from if origin type is 'download'",
+          "examples": [
+            "https://example.com/source.tar.gz"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "type"
+      ]
     },
     "PackageRepository": {
       "properties": {
@@ -443,6 +512,28 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "SourceFileReference": {
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "hash-type": {
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/Origin"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "filename",
+        "origin"
+      ]
     },
     "SpecSource": {
       "properties": {
