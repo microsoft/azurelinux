@@ -1,0 +1,104 @@
+[components.kernel-headers]
+# Kernel-headers using Fedora spec with overlays for Azure Linux 6.18.
+# Fedora's spec expects a pre-built headers tarball. These overlays adapt it to
+# use Azure Linux kernel source and generate headers during build.
+spec = { type = "upstream" }
+
+# Version updates: Fedora -> Azure Linux 6.18.5.1
+[components.kernel-headers.build]
+defines = { "azurelinux_version" = "3" }
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specversion .+"
+replacement = "%define specversion 6.18.5.1"
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define tarfile_release .+"
+replacement = "%define tarfile_release 6.18.5.1"
+
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%define specrelease .+"
+replacement = "%define specrelease 1%{?dist}"
+
+# Build deps (Fedora's spec has none since it uses pre-built headers).
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add make as a build dependency for generating headers from source"
+tag = "BuildRequires"
+value = "make"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add gcc as a build dependency for generating headers from source"
+tag = "BuildRequires"
+value = "gcc"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add perl as a build dependency for kernel header sanitization scripts"
+tag = "BuildRequires"
+value = "perl"
+
+[[components.kernel-headers.overlays]]
+type = "spec-add-tag"
+description = "Add rsync as a build dependency for kernel headers_install"
+tag = "BuildRequires"
+value = "rsync"
+
+# Source: use full Azure Linux kernel tarball instead of pre-built headers.
+[[components.kernel-headers.overlays]]
+type = "spec-update-tag"
+tag = "Source0"
+value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz"
+
+[[components.kernel-headers.source-files]]
+filename = "kernel-6.18.5.1.tar.gz"
+hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+
+# Prep: extract Azure Linux tarball.
+[[components.kernel-headers.overlays]]
+type = "spec-search-replace"
+regex = "%setup -q -c"
+replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specversion}"
+
+# Build: generate native + cross headers from Azure Linux kernel source.
+# Uses make headers_install which produces properly sanitized userspace headers.
+# Detects native arch and cross-compiles for the other (x86_64 <-> arm64).
+[[components.kernel-headers.overlays]]
+type = "spec-append-lines"
+section = "%build"
+lines = ["""
+make mrproper
+make headers_install INSTALL_HDR_PATH=headers-native
+
+# Determine native kernel arch and cross-compile for the other
+native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
+for cross_arch in arm64 x86; do
+    [ "$cross_arch" = "$native_karch" ] && continue
+    make ARCH=$cross_arch headers_install INSTALL_HDR_PATH=headers-$cross_arch
+done"""]
+
+# Install: copy headers_install output into RPM buildroot, replacing Fedora's copy logic.
+# The exit 0 at the end short-circuits the original Fedora install logic.
+[[components.kernel-headers.overlays]]
+type = "spec-prepend-lines"
+section = "%install"
+lines = ["""
+native_karch=$(uname -m | sed 's/x86_64/x86/;s/aarch64/arm64/')
+
+mkdir -p $RPM_BUILD_ROOT%{_includedir}
+cp -rv headers-native/include/* $RPM_BUILD_ROOT%{_includedir}
+
+for cross_arch in arm64 x86; do
+    [ "$cross_arch" = "$native_karch" ] && continue
+    cross_arch_includedir=$RPM_BUILD_ROOT%{_prefix}/${cross_arch}-linux-gnu/include
+    mkdir -p $cross_arch_includedir
+    cp -rv headers-$cross_arch/include/* $cross_arch_includedir
+done
+
+exit 0"""]

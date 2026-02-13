@@ -1,2 +1,5 @@
 [components.azurelinux-repos]
 spec = { type = "local", path = "azurelinux-repos.spec" }
+
+[components.azurelinux-repos.build]
+check = { skip = true, skip_reason = "Tests fail due to evergreen repos and any repo from this package is currently unavailable anyway." }
