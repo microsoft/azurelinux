@@ -33,6 +33,8 @@ TEST_RUN_LIST           ?=
 TEST_RERUN_LIST         ?=
 ##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
+##help:var:EXTRA_MACROS_FILES:<file1> <file2>=Space separated list of additional files whose contents will be appended to the versions macro file used during package builds. Example: EXTRA_MACROS_FILES="file1 file2".
+EXTRA_MACROS_FILES ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
