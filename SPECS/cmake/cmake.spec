@@ -35,8 +35,6 @@ Patch15:	CVE-2025-10148.patch
 Patch16:	CVE-2025-14017.patch
 Patch17:	CVE-2025-10966.patch
 Patch18:	CVE-2025-14524.patch
-Patch19:	CVE-2025-15079.patch
-Patch20:	CVE-2025-15224.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -118,7 +116,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %changelog
 * Wed Jan 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-12
-- Patch for CVE-2025-15224, CVE-2025-15079, CVE-2025-10966, CVE-2025-14524
+- Patch for CVE-2025-10966 & CVE-2025-14524
 
 * Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-11
 - Patch for CVE-2025-14017
