@@ -10111,8 +10111,8 @@
         "type": "other",
         "other": {
           "name": "liblangtag",
-          "version": "0.6.3",
-          "downloadUrl": "https://bitbucket.org/tagoh/liblangtag/downloads/liblangtag-0.6.3.tar.bz2"
+          "version": "0.6.7",
+          "downloadUrl": "https://bitbucket.org/tagoh/liblangtag/downloads/liblangtag-0.6.7.tar.bz2"
         }
       }
     },
