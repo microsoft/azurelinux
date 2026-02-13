@@ -94,7 +94,7 @@ See the [schema](../../../external/schemas/azldev.schema.json) for all overlay t
 - **No `$schema` in TOML.** `$` is invalid at the start of a bare TOML key — don't try to add schema references to `.comp.toml` files.
 - **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements instead.
 - **Avoid regex when possible.** Targeted overlay types (`spec-add-tag`, `spec-prepend-lines`, etc.) are more robust to upstream changes than regex.
-  - Regex replace should be considerd a **last resort** when more targeted overlay types won't work. They are brittle and prone to breakage when upstream changes.
+  - Regex replace should be considered a **last resort** when more targeted overlay types won't work. They are brittle and prone to breakage when upstream changes.
 
 ### Overlays vs. Dedicated spec
 

@@ -21,7 +21,7 @@ azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
 diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
 ```
 
-If `prep-sources` fails, the error message will identify which overlay failed and why. See [Package Sources](../../../workshop/tools/azldev-workshop/package-sources.md) for a full walkthrough of this diffing workflow.
+If `prep-sources` fails, the error message will identify which overlay failed and why.
 
 ### 2. Inspect the upstream spec/sources
 
