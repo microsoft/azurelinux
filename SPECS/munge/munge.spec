@@ -1,7 +1,7 @@
 Summary:        Enables uid & gid authentication across a host cluster
 Name:           munge
-Version:        0.5.13
-Release:        9%{?dist}
+Version:        0.5.18
+Release:        1%{?dist}
 # The libs and devel package is GPLv3+ and LGPLv3+ where as the main package is GPLv3 only.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -53,7 +53,6 @@ cp -p %{SOURCE2} munge.logrotate
 
 %build
 %configure  --disable-static --with-crypto-lib=openssl
-echo "d /run/munge 0755 munge munge -" > src/etc/munge.tmpfiles.conf.in
 # Get rid of some rpaths for /usr/sbin
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -123,7 +122,6 @@ exit 0
 %attr(0755,munge,munge) %dir /run/munge/
 %attr(0644,munge,munge) %ghost /run/munge/munged.pid
 
-%config(noreplace) %{_tmpfilesdir}/munge.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/munge
 
 %license COPYING COPYING.LESSER
@@ -156,6 +154,9 @@ exit 0
 %{_mandir}/man3/munge_strerror.3.gz
 
 %changelog
+* Fri Feb 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.18-1
+- Auto-upgrade to 0.5.18 - for CVE-2026-25506
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.13-9
 - Move from Extended to Core.
 - License verified.
