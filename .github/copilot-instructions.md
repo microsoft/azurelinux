@@ -2,7 +2,7 @@
 
 Azure Linux is a TOML-defined Linux distribution that imports RPM specs from upstream distros (primarily Fedora) and customizes them via an **overlay system** — no spec forking required. The `azldev` CLI tool drives all component and image workflows.
 
-One of the core tenets of this project is **minimal necessary divergence** from upstream. Overlays should be surgical and only change what's needed to meet Azure Linux requirements. Upstream packages should be prefered over bespoke components, and local specs should be a last resort. This keeps maintenance overhead low and makes it easier to pull in new versions and security updates from upstream.
+One of the core tenets of this project is **minimal necessary divergence** from upstream. Overlays should be surgical and only change what's needed to meet Azure Linux requirements. Upstream packages should be preferred over bespoke components, and local specs should be a last resort. This keeps maintenance overhead low and makes it easier to pull in new versions and security updates from upstream.
 
 ## Repository Layout
 
