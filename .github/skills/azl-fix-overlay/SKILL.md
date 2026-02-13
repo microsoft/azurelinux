@@ -56,24 +56,7 @@ The overlay applied cleanly but the *result* is wrong. Compare `<post-dir>/<name
 - Replacement introduced syntax errors in the spec
 - Missing dependency that the overlay was supposed to add
 
-## Overlay Type Quick Reference
-
-| Type | Does | Key fields |
-|------|------|------------|
-| `spec-add-tag` | Add a new tag to spec | `tag`, `value` |
-| `spec-set-tag` | Replace existing tag value | `tag`, `value` |
-| `spec-update-tag` | Append to existing tag | `tag`, `value` |
-| `spec-remove-tag` | Remove a tag | `tag` |
-| `spec-prepend-lines` | Insert lines before a section | `section`, `lines` |
-| `spec-append-lines` | Insert lines after a section header | `section`, `lines` |
-| `spec-search-replace` | Regex replace in spec | `regex`, `replacement` |
-| `file-add` | Add a file to sources | `file`, `source` |
-| `file-remove` | Remove a file from sources | `file` |
-| `file-rename` | Rename a source file | `file`, `replacement` |
-| `file-prepend-lines` | Prepend lines to a file | `file`, `lines` |
-| `file-search-replace` | Regex replace in source files | `file`, `regex`, `replacement` |
-
-Full schema: [`azldev.schema.json`](../../../external/schemas/azldev.schema.json) (or `azldev config generate-schema > /tmp/schema.json` for latest changes).
+For overlay type reference (all 12 types with key fields), see [`comp-toml.instructions.md`](../../instructions/comp-toml.instructions.md#overlay-types). Full schema: [`azldev.schema.json`](../../../external/schemas/azldev.schema.json).
 
 ## Tips
 

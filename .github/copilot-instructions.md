@@ -29,12 +29,9 @@ azldev.toml                          # Root config — includes distro/ and base
 
 ## Key Concepts
 
-**Components** = unit of packaging (→ one or more RPMs). Spec sources:
-- Upstream (default): `[components.curl]` — pulls from Fedora dist-git
-- Local: `spec = { type = "local", path = "mypackage.spec" }`
-- Pinned upstream: `spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }`
+**Components** = unit of packaging (→ one or more RPMs). Spec sources: upstream (default, from Fedora dist-git), local, or pinned upstream. See [`comp-toml.instructions.md`](instructions/comp-toml.instructions.md#spec-source-types) for syntax.
 
-**Overlays** modify upstream specs/sources without forking. Types: `spec-add-tag`, `spec-set-tag`, `spec-update-tag`, `spec-remove-tag`, `spec-prepend-lines`, `spec-append-lines`, `spec-search-replace`, `file-add`, `file-remove`, `file-rename`, `file-prepend-lines`, `file-search-replace`. Schema: [`azldev.schema.json`](../external/schemas/azldev.schema.json).
+**Overlays** modify upstream specs/sources without forking. See [`comp-toml.instructions.md`](instructions/comp-toml.instructions.md#overlays) for types, syntax, and pitfalls. Schema: [`azldev.schema.json`](../external/schemas/azldev.schema.json).
 
 **TOML include hierarchy**: `azldev.toml` → `distro/distro.toml` + `base/project.toml` → `base/comps/components.toml` → `**/*.comp.toml` (stitched into single namespace).
 
@@ -42,20 +39,24 @@ azldev.toml                          # Root config — includes distro/ and base
 
 Run all commands from the repo root (where `azldev.toml` lives). If the terminal's cwd has drifted, use `azldev -C /path/to/repo <command>`. Use `azldev --help` and `azldev <command> --help` for current syntax — the tool is under active development.
 
+**Agent-friendly flags:** Use `-q` (quiet) to reduce noise and `-O json` for machine-parseable output. These are global flags and work on all commands.
+
 | Task | Command |
 |------|---------|
-| List all components | `azldev comp list -a` |
-| Query a component | `azldev comp query -p <name>` |
+| List all components | `azldev comp list -a -q -O json` |
+| List a specific component | `azldev comp list -p <name> -q -O json` |
+| List with wildcard | `azldev comp list -p "azurelinux*" -q -O json` |
+| Query a component (parsed spec, slow) | `azldev comp query -p <name> -q -O json` |
 | Add a component | `azldev comp add` |
-| Build a component | `azldev comp build -p <name>` |
-| Build chain (auto-publish to local repo) | `azldev comp build --local-repo-with-publish ./base/out -p <a> -p <b>` |
-| Prepare sources (apply overlays) | `azldev comp prep-sources -p <name> -o <dir>` |
-| Prepare sources (skip overlays) | `azldev comp prep-sources -p <name> --skip-overlays -o <dir>` |
-| Build, keep env on failure | `azldev comp build -p <name> --preserve-buildenv on-failure` |
+| Build a component | `azldev comp build -p <name> -q` |
+| Build chain (auto-publish to local repo) | `azldev comp build --local-repo-with-publish ./base/out -p <a> -p <b> -q` |
+| Prepare sources (apply overlays) | `azldev comp prep-sources -p <name> -o <dir> -q` |
+| Prepare sources (skip overlays) | `azldev comp prep-sources -p <name> --skip-overlays -o <dir> -q` |
+| Build, keep env on failure | `azldev comp build -p <name> --preserve-buildenv on-failure -q` |
 | List images | `azldev image list` |
 | Build an image | `azldev image build` |
 | Boot an image in QEMU | `azldev image boot` |
-| Dump resolved config | `azldev config dump` |
+| Dump resolved config | `azldev config dump -q -O json` |
 | Advanced commands (like mock shell) | `azldev adv --help` (hidden from normal help) |
 
 ## Repository Hygiene Rules
@@ -64,3 +65,4 @@ Run all commands from the repo root (where `azldev.toml` lives). If the terminal
 2. **Naming**: Component names should match the upstream package name. Use `upstream-name` when the upstream name differs (e.g., `upstream-name = "redhat-rpm-config"` for `azurelinux-rpm-config`).
 3. **Schema validation**: The authoritative schema is `external/schemas/azldev.schema.json`. Do NOT add `$schema` keys to TOML files — `$` is invalid at the start of a bare TOML key.
 4. **Don't edit generated output**: Build artifacts in `base/out/` and `base/build/` are generated (configured by `output-dir`, `log-dir`, `work-dir` in `base/project.toml`) — never edit them directly. Note: `prep-sources -o <dir>` writes to a user-specified directory, separate from these project output dirs.
+5. **Mandatory testing**: Any change that affects a component's output (overlays, build config, spec edits, version bumps, new components) MUST be validated by building AND testing the resulting RPMs. A successful build alone is not sufficient — smoke-test in a mock chroot. Pure organizational changes (moving definitions between files, editing descriptions/comments) do not require rebuild. See `AGENTS.md` for the full testing protocol.

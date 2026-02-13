@@ -48,53 +48,14 @@ value = "some-dependency"
 
 Rule of thumb: if it's more than `[components.<name>]`, give it a dedicated file. The `includes = ["**/*.comp.toml"]` in `components.toml` picks it up automatically.
 
-## Upstream Source Options
+## Spec Sources & Overlays
 
-```toml
-# Default: inherit project's Fedora version (currently Fedora 43)
-[components.curl]
+For spec source types, overlay syntax, overlay types, and pitfalls, see [`comp-toml.instructions.md`](../../instructions/comp-toml.instructions.md).
 
-# Pin a specific Fedora version
-[components.curl]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
-
-# Different upstream name
-[components.azurelinux-rpm-config]
-spec = { type = "upstream", upstream-name = "redhat-rpm-config" }
-
-# Local spec (Azure Linux-originating package)
-[components.azurelinux-release]
-spec = { type = "local", path = "azurelinux-release.spec" }
-```
-
-## Adding Overlays
-
-Every overlay MUST have a `description` explaining *why*:
-
-```toml
-[[components.<name>.overlays]]
-description = "Add missing build dependency for Azure Linux"
-type = "spec-add-tag"
-tag = "BuildRequires"
-value = "golang >= 1.21"
-
-[[components.<name>.overlays]]
-description = "Customize vendor string for Azure Linux"
-type = "spec-search-replace"
-regex = "VENDOR=upstream"
-replacement = "VENDOR=azurelinux"
-```
-
-See the [schema](../../../external/schemas/azldev.schema.json) for all overlay types.
-
-### Overlay tips
-
-- **Test incrementally.** Apply one or a small batch at a time, verify with `prep-sources` before adding more.
-- **Avoid renaming `Name:`.** Changing the spec `Name:` tag causes cascading breakage (`%{name}` in Source0, `%setup`, paths, `%files`). Try to avoid it unless absolutely necessary.
-- **No `$schema` in TOML.** `$` is invalid at the start of a bare TOML key — don't try to add schema references to `.comp.toml` files.
-- **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements instead.
-- **Avoid regex when possible.** Targeted overlay types (`spec-add-tag`, `spec-prepend-lines`, etc.) are more robust to upstream changes than regex.
-  - Regex replace should be considered a **last resort** when more targeted overlay types won't work. They are brittle and prone to breakage when upstream changes.
+Key points for adding components:
+- Every overlay MUST have a `description` explaining *why*
+- Test incrementally — apply one overlay at a time, verify with `prep-sources`
+- Prefer targeted overlay types (`spec-add-tag`, `spec-set-tag`) over regex (`spec-search-replace`)
 
 ### Overlays vs. Dedicated spec
 
