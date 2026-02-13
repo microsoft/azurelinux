@@ -25293,8 +25293,8 @@
         "type": "other",
         "other": {
           "name": "python-toolz",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/pytoolz/toolz/archive/refs/tags/0.12.0.tar.gz"
+          "version": "0.12.1",
+          "downloadUrl": "https://github.com/pytoolz/toolz/archive/refs/tags/0.12.1.tar.gz"
         }
       }
     },
