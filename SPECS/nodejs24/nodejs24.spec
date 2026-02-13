@@ -180,11 +180,13 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.13.0-3
+- Patch for CVE-2025-69418
+
 * Tue Feb 10 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-2
 - Add conflicts for legacy npm package
 - Update provided capability from npm to nodejs24-npm
-* Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.13.0-3
-- Patch for CVE-2025-69418
+
 * Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-1
 - Upgrade to 24.13.0
 - Add support for passing runtime internationalization data
