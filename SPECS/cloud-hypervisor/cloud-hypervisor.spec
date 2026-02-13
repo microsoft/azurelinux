@@ -5,7 +5,7 @@
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
 Version:        32.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Patch2:         CVE-2023-50711-vhost.patch
 Patch3:         CVE-2023-50711-versionize.patch
 Patch4:         CVE-2025-1744.patch
 Patch5:         CVE-2024-43806.patch
+Patch6:         CVE-2026-24799.patch
 %endif
 
 Conflicts: cloud-hypervisor-cvm
@@ -83,6 +84,7 @@ tar xf %{SOURCE1}
 pushd vendor/libz-sys/src/zlib
 %patch0 -p1
 %patch4 -p1
+%patch6 -p1
 popd
 %patch1 -p1
 %patch2 -p1	
@@ -168,6 +170,9 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Fri Feb 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 32.0-8
+- Patch for CVE-2026-24799
+
 * Thu May 22 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 32.0-7
 - Patch CVE-2024-43806
 
