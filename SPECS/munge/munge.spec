@@ -53,7 +53,6 @@ cp -p %{SOURCE2} munge.logrotate
 
 %build
 %configure  --disable-static --with-crypto-lib=openssl
-echo "d /run/munge 0755 munge munge -" > src/etc/munge.tmpfiles.conf.in
 # Get rid of some rpaths for /usr/sbin
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -123,7 +122,6 @@ exit 0
 %attr(0755,munge,munge) %dir /run/munge/
 %attr(0644,munge,munge) %ghost /run/munge/munged.pid
 
-%config(noreplace) %{_tmpfilesdir}/munge.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/munge
 
 %license COPYING COPYING.LESSER
