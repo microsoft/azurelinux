@@ -9,12 +9,12 @@ overlays = [
     { type = "spec-set-tag", tag = "URL", value = "https://aka.ms/azurelinux" },
     # Set our version.
     { type = "spec-update-tag", tag = "Version", value = "1004" },
+    # Global search-and-replace in spec file: {fedora,redhat}->azurelinux
+    { type = "spec-search-replace", regex = "(fedora|redhat)", replacement = "azurelinux" },
     # Provide compatibility with Fedora's upstream version.
     { type = "spec-add-tag", tag = "Provides", value = "redhat-rpm-config = %{version}-%{release}" },
     # Make sure this package takes precedence over any Fedora variant.
     { type = "spec-add-tag", tag = "Obsoletes", value = "redhat-rpm-config < 1000" },
-    # Global search-and-replace in spec file: {fedora,redhat}->azurelinux
-    { type = "spec-search-replace", regex = "(fedora|redhat)", replacement = "azurelinux" },
     # Remove symlink; replace it with a dynamically constructed one in the spec.
     # We need to change how we generate a symlink and the tag referencing the checked-in one.
     { type = "spec-search-replace", regex = '^.*:\s*azurelinux-annobin-cc1\s*$', replacement = "" },
