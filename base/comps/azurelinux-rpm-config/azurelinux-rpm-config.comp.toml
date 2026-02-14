@@ -5,64 +5,49 @@ overlays = [
     # Overlays for spec.
     #
 
+    # Set the component's name.
+    { type = "spec-set-tag", tag = "Name", value = "azurelinux-rpm-config" },
     # Set this distro's URL.
     { type = "spec-set-tag", tag = "URL", value = "https://aka.ms/azurelinux" },
     # Set our version.
     { type = "spec-update-tag", tag = "Version", value = "1004" },
     # Provide compatibility with Fedora's upstream version.
     { type = "spec-add-tag", tag = "Provides", value = "redhat-rpm-config = %{version}-%{release}" },
-    # Make sure this package takes precedence over any Fedora variant.
+    # Make sure this package takes precedence over (and would replace) any Fedora variant.
+    # Note that Fedora's version of redhat-rpm-config has a version equal to 300 + the release number
+    # (e.g., 343 for Fedora 43).
     { type = "spec-add-tag", tag = "Obsoletes", value = "redhat-rpm-config < 1000" },
-    # Global search-and-replace in spec file: {fedora,redhat}->azurelinux
-    { type = "spec-search-replace", regex = "(fedora|redhat)", replacement = "azurelinux" },
-    # Remove symlink; replace it with a dynamically constructed one in the spec.
-    # We need to change how we generate a symlink and the tag referencing the checked-in one.
-    { type = "spec-search-replace", regex = '^.*:\s*azurelinux-annobin-cc1\s*$', replacement = "" },
-    { type = "spec-append-lines", section = "%prep", lines = ["ln -sfr azurelinux-annobin-select-annobin-built-plugin azurelinux-annobin-cc1"] },
+    { type = "spec-add-tag", tag = "Conflicts", value = "redhat-rpm-config < 1000" },
+
+    # Create symlink for our own name: /usr/lib/rpm/azurelinux -> /usr/lib/rpm/redhat
+    # Note that we don't do the reverse to avoid conflicts with upstream Fedora
+    # redhat-rpm-config during bootstrapping (replacing a dir with a symlink is
+    # problematic in RPM land).
+    # TODO: remove symlinks after bootstrap
+    { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
+    { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
+
+    # Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
+    # TODO: remove symlinks after bootstrap
+    { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/bin", "for arch in x86_64 aarch64; do", "  ln -sf ${arch}-redhat-linux-gnu-pkg-config %{buildroot}/usr/bin/${arch}-azurelinux-linux-gnu-pkg-config", "done"] },
+    { type = "spec-prepend-lines", section = "%files", lines = ["/usr/bin/*-azurelinux-linux-gnu-pkg-config"] },
 
     #
     # Overlays for non-spec files.
     #
 
-    # Remove the symlink that we can't easily fix up (the spec changes above avoid using it).
-    { type = "file-remove", file = "redhat-annobin-cc1" },
-
-    # Apply file renames *first*: fedora/redhat -> azurelinux
-    { type = "file-rename", file = "macros.fedora-misc-srpm", replacement = "macros.azurelinux-misc-srpm" },
-    { type = "file-rename", file = "macros.fedora-misc", replacement = "macros.azurelinux-misc" },
-    { type = "file-rename", file = "redhat-annobin-plugin-select.sh", replacement = "azurelinux-annobin-plugin-select.sh" },
-    { type = "file-rename", file = "redhat-annobin-select-annobin-built-plugin", replacement = "azurelinux-annobin-select-annobin-built-plugin" },
-    { type = "file-rename", file = "redhat-annobin-select-gcc-built-plugin", replacement = "azurelinux-annobin-select-gcc-built-plugin" },
-    { type = "file-rename", file = "redhat-hardened-cc1", replacement = "azurelinux-hardened-cc1" },
-    { type = "file-rename", file = "redhat-hardened-clang-ld.cfg", replacement = "azurelinux-hardened-clang-ld.cfg" },
-    { type = "file-rename", file = "redhat-hardened-clang.cfg", replacement = "azurelinux-hardened-clang.cfg" },
-    { type = "file-rename", file = "redhat-hardened-ld-errors", replacement = "azurelinux-hardened-ld-errors" },
-    { type = "file-rename", file = "redhat-hardened-ld", replacement = "azurelinux-hardened-ld" },
-    { type = "file-rename", file = "STAGE2-redhat-rpm-config", replacement = "STAGE2-azurelinux-rpm-config" },
-
     # Update all references to the Fedora version of this package to the Azure Linux one.
     { type = "file-search-replace", file = "**/*", regex = "redhat-rpm-config", replacement = "azurelinux-rpm-config" },
-    # Update all references to the vendor-specific dir under /usr/lib/rpm.
-    { type = "file-search-replace", file = "**/*", regex = "/usr/lib/rpm/redhat", replacement = "/usr/lib/rpm/azurelinux" },
 
-    # Update vendor macro + textual references in macros files.
+    # Update vendor macro.
     { type = "file-search-replace", file = "macros", regex = "%_vendor.*", replacement = "%_vendor azurelinux" },
-    { type = "file-search-replace", file = "macros", regex = "redhat", replacement = "azurelinux" },
 
     # Remove dist.sh file; we'll replace it wholesale with our own version.
     { type = "file-remove", file = "dist.sh" },
     # Add our own version of dist.sh customized for Azure Linux.
     { type = "file-add", file = "dist.sh", source = "dist.sh" },
 
-    # Additional replacements of the distro name in macros files.
-    { type = "file-search-replace", file = "rpmrc", regex = "fedora", replacement = "azurelinux" },
-    { type = "file-search-replace", file = "macros.azurelinux-misc", regex = "fedora", replacement = "azurelinux" },
-    { type = "file-search-replace", file = "macros.azurelinux-misc-srpm", regex = "/lib/swidtag/fedoraproject.org", replacement = "/lib/swidtag/microsoft.com" },
-    { type = "file-search-replace", file = "macros.azurelinux-misc-srpm", regex = "[Ff]edora", replacement = "azurelinux" },
-    # Update annobin references.
-    { type = "file-search-replace", file = "azurelinux-annobin-plugin-select.sh", regex = "redhat-annobin", replacement = "azurelinux-annobin" },
-    { type = "file-search-replace", file = "buildflags.md", regex = "redhat-annobin", replacement = "azurelinux-annobin" },
-    # Update redhat-hardened references.
-    { type = "file-search-replace", file = "STAGE2-azurelinux-rpm-config", regex = "redhat-hardened", replacement = "azurelinux-hardened" },
-    { type = "file-search-replace", file = "buildflags.md", regex = "redhat-hardened", replacement = "azurelinux-hardened" },
+    # Targeted adjustments in some macros files.
+    { type = "file-search-replace", file = "macros.fedora-misc-srpm", regex = "/lib/swidtag/fedoraproject.org", replacement = "/lib/swidtag/microsoft.com" },
+    { type = "file-search-replace", file = "macros.fedora-misc-srpm", regex = "[Ff]edora", replacement = "azurelinux" },
 ]
