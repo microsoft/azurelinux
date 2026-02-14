@@ -11,7 +11,7 @@
 
 Name:          netavark
 Version:       1.10.3
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -225,6 +225,9 @@ popd
 %{_unitdir}/%{name}-firewalld-reload.service
 
 %changelog
+* Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.10.3-6
+- Bump release to rebuild with rust
+
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.10.3-5
 - Bump release to rebuild with rust
 
