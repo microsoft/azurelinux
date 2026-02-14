@@ -1,0 +1,5 @@
+[components.rust]
+
+# Undefine RHEL macro to avoid build requirement issues.
+[components.rust.build]
+undefines = ["rhel"]
