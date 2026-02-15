@@ -6,7 +6,7 @@
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           hvloader-signed-%{buildarch}
 Version:        1.0.1
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
