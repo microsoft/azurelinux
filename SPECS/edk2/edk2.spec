@@ -720,10 +720,12 @@ $tests_ok
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
 %changelog
-* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
-- Patch for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-47
 - Patch for CVE-2026-22796, CVE-2025-69418, CVE-2025-68160
+
+* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
+- Patch for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420
+
 * Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-45
 - Patch for CVE-2025-2295
 
