@@ -530,7 +530,7 @@ procps-ng-lang-4.0.4-1.azl3.aarch64.rpm
 pyproject-rpm-macros-1.12.0-2.azl3.noarch.rpm
 pyproject-srpm-macros-1.12.0-2.azl3.noarch.rpm
 python-markupsafe-debuginfo-2.1.3-1.azl3.aarch64.rpm
-python-wheel-wheel-0.46.3-1.azl3.noarch.rpm
+python-wheel-wheel-0.43.0-1.azl3.noarch.rpm
 python3-3.12.9-8.azl3.aarch64.rpm
 python3-audit-3.1.2-1.azl3.aarch64.rpm
 python3-cracklib-2.9.11-1.azl3.aarch64.rpm
@@ -557,7 +557,7 @@ python3-rpm-generators-14-11.azl3.noarch.rpm
 python3-setuptools-69.0.3-5.azl3.noarch.rpm
 python3-test-3.12.9-8.azl3.aarch64.rpm
 python3-tools-3.12.9-8.azl3.aarch64.rpm
-python3-wheel-0.46.3-1.azl3.noarch.rpm
+python3-wheel-0.43.0-1.azl3.noarch.rpm
 readline-8.2-2.azl3.aarch64.rpm
 readline-debuginfo-8.2-2.azl3.aarch64.rpm
 readline-devel-8.2-2.azl3.aarch64.rpm
