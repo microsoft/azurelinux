@@ -184,8 +184,8 @@
 
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
-Version:        10.0.0
-Release:        7%{?dist}
+Version:        10.10.0
+Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -196,11 +196,8 @@ URL:            https://libvirt.org/
 %endif
 Source:         https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
 Patch0:         libvirt-conf.patch
-Patch1:         CVE-2024-1441.patch
-Patch2:         CVE-2024-2494.patch
-Patch3:         CVE-2024-4418.patch
-Patch4:         CVE-2025-13193.patch
-Patch5:         CVE-2025-12748.patch
+Patch1:         CVE-2025-13193.patch
+Patch2:         CVE-2025-12748.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -266,7 +263,7 @@ BuildRequires: libblkid-devel >= 2.17
 BuildRequires: augeas
 BuildRequires: systemd-devel >= 185
 BuildRequires: libpciaccess-devel >= 0.10.9
-BuildRequires: yajl-devel
+BuildRequires: json-c-devel
     %if %{with_sanlock}
 BuildRequires: sanlock-devel >= 2.4
     %endif
@@ -1185,7 +1182,6 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
            -Dapparmor_profiles=disabled \
            -Dsecdriver_apparmor=disabled \
            -Dudev=enabled \
-           -Dyajl=enabled \
            %{?arg_sanlock} \
            -Dlibpcap=enabled \
            %{?arg_nbdkit} \
@@ -1755,6 +1751,9 @@ exit 0
 %dir %attr(0700, root, root) %{_localstatedir}/log/libvirt/
 %attr(0755, root, root) %{_libexecdir}/libvirt_iohelper
 %attr(0755, root, root) %{_bindir}/virt-ssh-helper
+%attr(0755, root, root) %{_libexecdir}/libvirt-ssh-proxy
+%dir %{_sysconfdir}/ssh/ssh_config.d
+%config(noreplace) %{_sysconfdir}/ssh/ssh_config.d/30-libvirt-ssh-proxy.conf
 %attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
 %{_mandir}/man1/virt-admin.1*
 %{_mandir}/man1/virt-host-validate.1*
@@ -1831,8 +1830,11 @@ exit 0
 
 %files daemon-driver-network
 %config(noreplace) %{_sysconfdir}/libvirt/virtnetworkd.conf
+%config(noreplace) %{_sysconfdir}/libvirt/network.conf
 %{_datadir}/augeas/lenses/virtnetworkd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnetworkd.aug
+%{_datadir}/augeas/lenses/libvirtd_network.aug
+%{_datadir}/augeas/lenses/tests/test_libvirtd_network.aug
 %{_unitdir}/virtnetworkd.service
 %{_unitdir}/virtnetworkd.socket
 %{_unitdir}/virtnetworkd-ro.socket
@@ -1960,6 +1962,7 @@ exit 0
 %config(noreplace) %{_prefix}/lib/sysctl.d/60-qemu-postcopy-migration.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
+%{_prefix}/lib/sysusers.d/libvirt-qemu.conf
 %{_unitdir}/virtqemud.service
 %{_unitdir}/virtqemud.socket
 %{_unitdir}/virtqemud-ro.socket
@@ -2191,6 +2194,15 @@ exit 0
 %endif
 
 %changelog
+* Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 10.10.0-1
+- Upgrade to 10.10.0
+- Add new files introduced in 10.10.0: network.conf, libvirtd_network.aug,
+  libvirt-qemu.conf sysusers, libvirt-ssh-proxy and ssh config
+- Remove CVE-2024-1441, CVE-2024-2494, CVE-2024-4418 patches (fixed upstream)
+- Fix CVE-2025-12748.patch to use 'format' instead of 'compressed' field name
+  (field was renamed in upstream commit bd6d7ebf6 included in libvirt v10.9.0)
+- Switch from yajl to json-c (required since libvirt 10.8.0)
+
 * Thu Jan 15 2026 Akhila Guruju <v-guakhila@microsoft.com> - 10.0.0-7
 - Patch CVE-2025-12748
 
