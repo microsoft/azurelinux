@@ -46,6 +46,8 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         0001-net-mana-Implement-get_ringparam-set_ringparam-for-m.patch
+Patch2:         0002-net-mana-Increase-the-DEF_RX_BUFFERS_PER_QUEUE-to-10.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
