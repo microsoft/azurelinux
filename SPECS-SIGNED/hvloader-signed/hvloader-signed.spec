@@ -69,7 +69,7 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Mon Feb 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-18
+* Sun Feb 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-18
 - Bump release for consistency with hvloader spec.
 
 * Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-17
