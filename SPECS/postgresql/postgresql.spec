@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        14.20
+Version:        14.21
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Fri Feb 13 2026 Kanishk Bansal <kanbansal@microsoft.com> - 14.21-1
+- Upgrade for CVE-2026-2003, CVE-2026-2004, CVE-2026-2005, CVE-2026-2006, CVE-2026-2007
+
 * Fri Nov 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.20-1
 - Auto-upgrade to 14.20 - for CVE-2025-12817, CVE-2025-12818
 
