@@ -9,7 +9,7 @@
 Summary:        Library to extract data from within an Excel spreadsheet
 Name:           freexl
 Version:        2.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # The entire source is triply-licensed as (MPL-1.1 OR GPL-2.0-or-later OR
 # LGPL-2.1-or-later), except for some build-system files that do not contribute
 # to the license of the binary RPMs:
@@ -29,7 +29,7 @@ Source0:        https://www.gaia-gis.it/gaia-sins/freexl-sources/%{name}-%{versi
 
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  minizip-devel
+BuildRequires:  minizip-compat-devel
 
 %if %{with autoreconf}
 BuildRequires:  autoconf
@@ -133,6 +133,9 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 %endif
 
 %changelog
+* Wed Jan 14 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.0.0-2
+- Updated dependency package name to minizip-compat-devel.
+
 * Mon Oct 28 2024 Jyoti kanase <v-jykanase@microsoft.com> - 2.0.0-1
 - Upgrade to version 2.0.0
 - License verified
