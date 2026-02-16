@@ -2,7 +2,7 @@
 %global gem_name faraday
 Summary:        HTTP/REST API client library
 Name:           rubygem-faraday
-Version:        2.5.2
+Version:        2.14.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -36,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Feb 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.14.1-1
+- Auto-upgrade to 2.14.1 - for CVE-2026-25765
+
 * Wed Sep 07 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.2-1
 - Update to v2.5.2.
 
