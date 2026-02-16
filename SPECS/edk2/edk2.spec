@@ -141,7 +141,8 @@ Patch1011: CVE-2025-69421.patch
 Patch1012: CVE-2026-22795.patch
 Patch1013: CVE-2025-68160.patch
 Patch1014: CVE-2025-69418.patch
-Patch1015: CVE-2026-22796.patch
+Patch1015: CVE-2026-22796.nopatch
+
 # verification with "ovmf-vars-generator".
 BuildRequires:  python3-devel
 BuildRequires:  libuuid-devel
@@ -721,7 +722,8 @@ $tests_ok
 %{_datadir}/%{name}/Python
 %changelog
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-47
-- Patch for CVE-2026-22796, CVE-2025-69418, CVE-2025-68160
+- Patch for CVE-2025-69418, CVE-2025-68160
+- Add nopatch for CVE-2026-22796 (fixed with CVE-2026-22795)
 
 * Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
 - Patch for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420
