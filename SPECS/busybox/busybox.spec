@@ -91,6 +91,12 @@ mkdir -p %{buildroot}/%{_mandir}/man1
 install -m 644 docs/busybox.static.1 %{buildroot}/%{_mandir}/man1/busybox.1
 install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.petitboot.1
 
+%check
+cd testsuite
+# CVE-2026-26157: hardened tar extraction blocks symlink + hardlink write attacks
+# These tests validate insecure legacy behavior and are expected to fail
+./runtest --skip "tar-symlink-attack,tar-symlink-hardlink-coexist"
+
 %files
 %license LICENSE
 %doc README
