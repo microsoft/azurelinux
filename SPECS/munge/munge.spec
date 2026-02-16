@@ -71,9 +71,6 @@ install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/mun
 # Not installed by make
 install -p -D -m 0644 src/etc/munge.tmpfiles.conf  %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
-# rm unneeded files.
-rm %{buildroot}/%{_sysconfdir}/sysconfig/munge
-
 # Exclude .la files
 rm %{buildroot}/%{_libdir}/libmunge.la
 
