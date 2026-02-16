@@ -1,6 +1,6 @@
 Summary:        libgpg-error
 Name:           libgpg-error
-Version:        1.46
+Version:        1.48
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
@@ -29,7 +29,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of libgpg-error.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure
@@ -69,11 +69,15 @@ make %{?_smp_mflags} check
 %{_datadir}/aclocal/*
 %{_datadir}/common-lisp/source/gpg-error
 %{_libdir}/pkgconfig/*.pc
+%{_mandir}/man1/gpgrt-config.1.gz
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 05 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.48-1
+- Upgrade to version 1.48 to support gnupg2
+
 * Fri Mar 03 2023 Bala <balakumaran.kannan@microsoft.com> - 1.46-1
 - Upgrade to version 1.46 to support gnupg2
 
