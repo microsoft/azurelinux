@@ -38,9 +38,9 @@ Patch19:         CVE-2025-4969.patch
 Patch20:         CVE-2025-11021.patch
 Patch21:         CVE-2025-32049.patch
 Patch22:         CVE-2026-1536.patch
-Patch21:         CVE-2026-1467.patch
-Patch22:         CVE-2026-1761.patch
-Patch23:         CVE-2026-1801.patch
+Patch23:         CVE-2026-1467.patch
+Patch24:         CVE-2026-1761.patch
+Patch25:         CVE-2026-1801.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
