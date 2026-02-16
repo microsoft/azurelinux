@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.54",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
+          "version": "1.6.55",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.55.tar.xz"
         }
       }
     },
@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
+          "version": "1.24.13",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz"
         }
       }
     },
@@ -21434,8 +21434,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.20",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.20/postgresql-14.20.tar.bz2"
+          "version": "14.21",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.21/postgresql-14.21.tar.bz2"
         }
       }
     },
