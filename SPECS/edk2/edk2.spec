@@ -143,6 +143,8 @@ Patch1013: CVE-2025-68160.patch
 Patch1014: CVE-2025-69418.patch
 Patch1015: CVE-2026-22796.nopatch
 
+# python3-devel and libuuid-devel are required for building tools.
+# python3-devel is also needed for varstore template generation and
 # verification with "ovmf-vars-generator".
 BuildRequires:  python3-devel
 BuildRequires:  libuuid-devel
@@ -720,6 +722,8 @@ $tests_ok
 %{_bindir}/UPT
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
+
+
 %changelog
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-47
 - Patch for CVE-2025-69418, CVE-2025-68160
