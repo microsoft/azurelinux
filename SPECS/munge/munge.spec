@@ -53,7 +53,6 @@ cp -p %{SOURCE2} munge.logrotate
 
 %build
 %configure  --disable-static --with-crypto-lib=openssl
-echo "d /run/munge 0755 munge munge -" > src/etc/munge.tmpfiles.conf.in
 # Get rid of some rpaths for /usr/sbin
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -67,9 +66,6 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 # Install extra files.
 install -p -m 755 create-munge-key %{buildroot}/%{_sbindir}/create-munge-key
 install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/munge
-
-# Not installed by make
-install -p -D -m 0644 src/etc/munge.tmpfiles.conf  %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 # Exclude .la files
 rm %{buildroot}/%{_libdir}/libmunge.la
@@ -124,9 +120,9 @@ exit 0
 %attr(0700,munge,munge) %dir %{_sysconfdir}/munge
 %attr(0755,munge,munge) %dir /run/munge/
 %attr(0644,munge,munge) %ghost /run/munge/munged.pid
-
-%config(noreplace) %{_tmpfilesdir}/munge.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/munge
 %config(noreplace) %{_sysconfdir}/logrotate.d/munge
+%{_sysusersdir}/munge.conf
 
 %license COPYING COPYING.LESSER
 %doc AUTHORS
@@ -135,7 +131,7 @@ exit 0
 
 %files libs
 %{_libdir}/libmunge.so.2
-%{_libdir}/libmunge.so.2.0.0
+%{_libdir}/libmunge.so.2.0.1
 
 %files devel
 %{_includedir}/munge.h
