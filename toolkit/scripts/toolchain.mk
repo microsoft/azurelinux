@@ -165,6 +165,7 @@ $(raw_toolchain): $(toolchain_files)
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
 			$(SOURCE_URL) \
+			$(NO_TOOLCHAIN_CONTAINER) \
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(ARCHIVE_TOOL) \
 			$(toolchain_raw_logs_dir) 2>&1 | tee $(toolchain_raw_logs_dir)/create_toolchain_in_container_full.log; \

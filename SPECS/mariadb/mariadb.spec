@@ -280,7 +280,7 @@ BuildRequires:    perl(warnings)
 # for running some openssl tests rhbz#1189180
 BuildRequires:    openssl openssl-devel
  
-%{!?with_bundled_fmt:BuildRequires: fmt-devel >= 10.2.1-4}
+%{!?with_bundled_fmt:BuildRequires: fmt-devel >= 10.2.1-2}
  
 Requires:         bash coreutils grep
 BuildRequires:    perl(Test::Harness)
