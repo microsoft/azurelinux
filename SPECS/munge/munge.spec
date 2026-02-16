@@ -67,10 +67,6 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 install -p -m 755 create-munge-key %{buildroot}/%{_sbindir}/create-munge-key
 install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/munge
 
-# rm unneeded files.
-rm %{buildroot}/%{_sysconfdir}/sysconfig/munge
-rm %{buildroot}/%{_initddir}/munge
-
 # Exclude .la files
 rm %{buildroot}/%{_libdir}/libmunge.la
 
