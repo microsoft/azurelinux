@@ -64,8 +64,8 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE README.md
+%license LICENSE NOTICE
+%doc README.md
 %{_bindir}/cf
 
 %changelog
