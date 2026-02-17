@@ -47,11 +47,14 @@ install -m 755 manticore/src/azihsm.ko %{buildroot}/lib/modules/%{target_kernel_
 
 %post
 /sbin/depmod %{target_kernel_version_full}
-/sbin/modprobe azihsm
+if [ "$(uname -r)" = "%{target_kernel_version_full}" ]; then
+    /sbin/modprobe azihsm || :
+fi
 
 %preun
-/sbin/modprobe -r azihsm
-# TODO: Delete modules files
+if [ $1 -eq 0 ] && [ "$(uname -r)" = "%{target_kernel_version_full}" ]; then
+    /sbin/modprobe -r azihsm || :
+fi
 
 %postun
 if [ $1 -eq 0 ]; then

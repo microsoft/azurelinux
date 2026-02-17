@@ -61,14 +61,14 @@ mkdir -p %{buildroot}/lib/modules/%{target_kernel_version_full}/extra
 install -D -m 644 %{SOURCE1} %{buildroot}/lib/modules/%{target_kernel_version_full}/extra/azihsm.ko
 
 %post -n %{_name}
-if [ $1 -ge 1 ]; then
-    /sbin/depmod %{target_kernel_version_full}
-    /sbin/modprobe azihsm
+/sbin/depmod %{target_kernel_version_full}
+if [ "$(uname -r)" = "%{target_kernel_version_full}" ]; then
+    /sbin/modprobe azihsm || :
 fi
 
 %preun -n %{_name}
-if [ $1 -eq 0 ]; then
-    /sbin/modprobe -r azihsm
+if [ $1 -eq 0 ] && [ "$(uname -r)" = "%{target_kernel_version_full}" ]; then
+    /sbin/modprobe -r azihsm || :
 fi
 
 %postun -n %{_name}
