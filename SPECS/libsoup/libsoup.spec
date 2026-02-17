@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,8 @@ Patch19:         CVE-2025-4969.patch
 Patch20:         CVE-2025-11021.patch
 Patch21:         CVE-2025-32049.patch
 Patch22:         CVE-2026-1536.patch
-Patch23:         CVE-2026-1760.patch
+Patch23:         CVE-2026-0716.patch
+Patch24:         CVE-2026-1760.patch
 
 
 BuildRequires:  meson
@@ -151,8 +152,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-12
+* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-13
 - Patch for CVE-2026-1760
+
+* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-12
+- Patch for CVE-2026-0716
 
 * Thu Feb 12 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.0.4-11
 - Patch for CVE-2025-32049, CVE-2025-1536
