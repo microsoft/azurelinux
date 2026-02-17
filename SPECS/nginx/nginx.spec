@@ -96,8 +96,7 @@ sh configure \
     --with-ipv6 \
     --with-pcre \
     --with-stream \
-    --with-compat \
-    --with-stream_ssl_preread_module
+    --with-compat
 
 %make_build
 
