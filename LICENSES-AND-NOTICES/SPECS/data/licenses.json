@@ -2243,6 +2243,7 @@
                 "azl-otel-collector",
                 "azure-iot-sdk-c",
                 "azure-nvme-utils",
+                "azure-vm-utils",
                 "azure-storage-cpp",
                 "azurelinux-image-tools",
                 "azurelinux-release",
