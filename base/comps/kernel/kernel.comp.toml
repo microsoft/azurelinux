@@ -1,6 +1,114 @@
-[components.kernel]
+###############################################################################
+# AUTO-GENERATED — do not edit manually.
+# Source: kernel-matrix.toml    variant: kernel6.18
+# Regenerate: python3 scripts/generate-kernels.py
+###############################################################################
 
-# Set rhel to 0 to avoid deps on non-existent cert packages
-# (rhel=10 would engage RHEL-specific BuildRequires)
-[components.kernel.build]
-defines = { rhel = "0" }
+# Standard Azure Linux kernel
+
+[components."kernel6.18"]
+spec = { type = "upstream", upstream-name = "kernel" }
+
+[components."kernel6.18".build]
+defines = { rhel = "0", debugbuildsenabled = "0" }
+with = ["baseonly"]
+without = ["debug", "configchecks"]
+
+[[components."kernel6.18".source-files]]
+filename = "kernel-6.18.5.1.tar.gz"
+hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+
+[[components.kernel.overlays]]
+description = "Add Azure Linux x86_64 config file"
+type = "file-add"
+file = "6.18-x86_64-azl.config"
+source = "configs/6.18-x86_64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Add Azure Linux aarch64 config file"
+type = "file-add"
+file = "6.18-aarch64-azl.config"
+source = "configs/6.18-aarch64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Declare Azure Linux x86_64 config source"
+type = "spec-add-tag"
+tag = "Source10000"
+value = "6.18-x86_64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Declare Azure Linux aarch64 config source"
+type = "spec-add-tag"
+tag = "Source10001"
+value = "6.18-aarch64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Install Azure Linux configs and extra sources during %prep"
+type = "spec-search-replace"
+regex = "find . -name .gitignore -delete >/dev/null"
+replacement = """find . -name .gitignore -delete >/dev/null
+
+# Use Azure Linux x86_64 config
+%{log_msg "Replacing x86_64 config with Azure Linux config"}
+cp %{SOURCE10000} kernel-%{specrpmversion}-x86_64.config
+
+# Use Azure Linux aarch64 config
+%{log_msg "Replacing aarch64 config with Azure Linux config"}
+cp %{SOURCE10001} kernel-%{specrpmversion}-aarch64.config"""
+
+[[components.kernel.overlays]]
+description = "Set specrpmversion to 6.18.5.1"
+type = "spec-search-replace"
+regex = "%define specrpmversion .+"
+replacement = """%define azurelinux_version 3
+%define specrpmversion 6.18.5.1"""
+
+[[components.kernel.overlays]]
+description = "Derive specversion from specrpmversion"
+type = "spec-search-replace"
+regex = "%define specversion .+"
+replacement = "%define specversion %{specrpmversion}"
+
+[[components.kernel.overlays]]
+description = "Derive tarfile_release from specrpmversion"
+type = "spec-search-replace"
+regex = "%define tarfile_release .+"
+replacement = "%define tarfile_release %{specrpmversion}"
+
+[[components.kernel.overlays]]
+description = "Set pkgrelease to rachel.fun.release"
+type = "spec-search-replace"
+regex = "%define pkgrelease .+"
+replacement = "%define pkgrelease rachel.fun.release"
+
+[[components.kernel.overlays]]
+description = "Set specrelease to rachel.fun.release"
+type = "spec-search-replace"
+regex = "%define specrelease .+"
+replacement = "%define specrelease rachel.fun.release%{?buildid}%{?dist}"
+
+[[components.kernel.overlays]]
+description = "Use CBL-Mariner kernel source URL"
+type = "spec-update-tag"
+tag = "Source0"
+value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specrpmversion}.tar.gz#/kernel-%{specrpmversion}.tar.gz"
+
+[[components.kernel.overlays]]
+description = "Fix tarball extraction path for CBL-Mariner"
+type = "spec-search-replace"
+regex = "linux-%{tarfile_release}"
+replacement = "CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specrpmversion}"
+
+[[components.kernel.overlays]]
+description = "Disable redhat patch declaration"
+type = "spec-search-replace"
+regex = "Patch1: patch-%{patchversion}-redhat.patch"
+replacement = "# Patch1: patch-%{patchversion}-redhat.patch (disabled for CBL-Mariner)"
+
+[[components.kernel.overlays]]
+description = "Disable redhat patch application"
+type = "spec-search-replace"
+regex = "ApplyOptionalPatch patch-%{patchversion}-redhat.patch"
+replacement = "# ApplyOptionalPatch patch-%{patchversion}-redhat.patch (disabled for CBL-Mariner)"
