@@ -5,7 +5,7 @@ storage:
   bootType: efi
   disks:
   - partitionTableType: gpt
-    maxSize: 40G
+    maxSize: 30G
     partitions:
     - id: esp
       type: esp

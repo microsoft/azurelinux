@@ -96,10 +96,6 @@ Distribution:   Azure Linux
 %endif
 
 %global have_virgl 1
-# 2.0 has this set, disabled till dep is available in 3.0
-%if 0%{?azl}
-%global have_virgl 0
-%endif
 
 %global have_pmem 0
 %ifarch x86_64 %{power64}
@@ -279,7 +275,12 @@ Distribution:   Azure Linux
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
+# virtio-vga-gl requires virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
+%else
+%define requires_device_display_virtio_vga_gl %{nil}
+%endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
@@ -288,12 +289,18 @@ Distribution:   Azure Linux
 %define requires_package_virtiofsd Requires: virtiofsd
 %endif
 
-%if %{have_virgl}
+# vhost-user-gpu and -gl packages require both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %define requires_device_display_vhost_user_gpu Requires: %{name}-device-display-vhost-user-gpu = %{evr}
+%else
+%define requires_device_display_vhost_user_gpu %{nil}
+%endif
+
+# -gl packages require both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %define requires_device_display_virtio_gpu_gl Requires: %{name}-device-display-virtio-gpu-gl = %{evr}
 %define requires_device_display_virtio_gpu_pci_gl Requires: %{name}-device-display-virtio-gpu-pci-gl = %{evr}
 %else
-%define requires_device_display_vhost_user_gpu %{nil}
 %define requires_device_display_virtio_gpu_gl %{nil}
 %define requires_device_display_virtio_gpu_pci_gl %{nil}
 %endif
@@ -427,8 +434,8 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
-Version: 8.2.0
-Release: 25%{?dist}
+Version: 9.1.0
+Release: 1%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -438,20 +445,9 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 # Fix pvh.img ld build failure on fedora rawhide
 Patch1:   0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
 Patch2:   0002-Disable-failing-tests-on-azl.patch
-Patch3:   CVE-2023-6683.patch
-Patch4:   CVE-2023-6693.patch
-Patch5:   CVE-2021-20255.patch
-Patch6:   CVE-2024-3447.patch
-Patch7:   CVE-2024-4467.patch
-Patch8:   CVE-2024-6505.patch
-Patch9:   CVE-2024-4693.patch
-Patch10:  CVE-2024-7730.patch
-Patch11:  CVE-2024-3567.patch
-Patch12:  CVE-2024-26327.patch
-Patch13:  CVE-2024-26328.patch
-Patch14:  CVE-2024-7409.patch
-Patch15:  CVE-2025-11234.patch
-Patch16:  CVE-2025-12464.patch
+Patch3:   CVE-2021-20255.patch
+Patch4:   CVE-2025-11234.patch
+Patch5:   CVE-2025-12464.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -654,7 +650,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-16%{?dist}
+BuildRequires: glibc-static >= 2.38-18%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -670,7 +666,6 @@ Requires: %{name}-system-loongarch64 = %{version}-%{release}
 Requires: %{name}-system-m68k = %{version}-%{release}
 Requires: %{name}-system-microblaze = %{version}-%{release}
 Requires: %{name}-system-mips = %{version}-%{release}
-Requires: %{name}-system-nios2 = %{version}-%{release}
 Requires: %{name}-system-or1k = %{version}-%{release}
 %if %{with ppc_support}
 Requires: %{name}-system-ppc = %{version}-%{release}
@@ -977,7 +972,8 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu
 This package provides the virtio-gpu display device for QEMU.
 
-%if %{have_virgl}
+# virtio-gpu-gl requires both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %package device-display-virtio-gpu-gl
 Summary: QEMU virtio-gpu-gl display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -999,7 +995,8 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu-pci
 This package provides the virtio-gpu-pci display device for QEMU.
 
-%if %{have_virgl}
+# virtio-gpu-pci-gl requires both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %package device-display-virtio-gpu-pci-gl
 Summary: QEMU virtio-gpu-pci-gl display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -1027,11 +1024,19 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-vga
 This package provides the virtio-vga display device for QEMU.
 
+# The virtio-vga-gl module requires both virglrenderer AND opengl support.
+# Starting with QEMU 9.1.0 (commit 8a161d08 "build: do not build virtio-vga-gl
+# if virgl/opengl not available"), the hw-display-virtio-vga-gl.so module is
+# only built when both virglrenderer AND opengl are enabled. In QEMU 8.2.0 and
+# earlier, the module was always built (as a stub) even without these, which is
+# why this conditional was not needed before.
+%if %{have_virgl} && %{have_opengl}
 %package device-display-virtio-vga-gl
 Summary: QEMU virtio-vga-gl display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-vga-gl
 This package provides the virtio-vga-gl display device for QEMU.
+%endif
 
 %if %{have_rutabaga_gfx}
 %package device-display-virtio-vga-rutabaga
@@ -1062,7 +1067,8 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the USB smartcard device for QEMU.
 %endif
 
-%if %{have_virgl}
+# vhost-user-gpu binary requires both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %package device-display-vhost-user-gpu
 Summary: QEMU QXL display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -1178,7 +1184,6 @@ Requires: qemu-user-static-loongarch64
 Requires: qemu-user-static-m68k
 Requires: qemu-user-static-microblaze
 Requires: qemu-user-static-mips
-Requires: qemu-user-static-nios2
 Requires: qemu-user-static-or1k
 Requires: qemu-user-static-ppc
 Requires: qemu-user-static-riscv
@@ -1250,12 +1255,6 @@ static binaries
 Summary: QEMU user mode emulation of mips qemu targets static build
 %description user-static-mips
 This package provides the mips user mode emulation of qemu targets built as
-static binaries
-
-%package user-static-nios2
-Summary: QEMU user mode emulation of nios2 qemu targets static build
-%description user-static-nios2
-This package provides the nios2 user mode emulation of qemu targets built as
 static binaries
 
 %package user-static-or1k
@@ -1456,20 +1455,6 @@ Requires: %{name}-common = %{version}-%{release}
 This package provides the QEMU system emulator for MIPS systems.
 
 
-%package system-nios2
-Summary: QEMU system emulator for nios2
-Requires: %{name}-system-nios2-core = %{version}-%{release}
-%{requires_all_modules}
-%description system-nios2
-This package provides the QEMU system emulator for NIOS2.
-
-%package system-nios2-core
-Summary: QEMU system emulator for nios2
-Requires: %{name}-common = %{version}-%{release}
-%description system-nios2-core
-This package provides the QEMU system emulator for NIOS2.
-
-
 %package system-or1k
 Summary: QEMU system emulator for OpenRisc32
 Requires: %{name}-system-or1k-core = %{version}-%{release}
@@ -1644,7 +1629,6 @@ mkdir -p %{static_builddir}
   --disable-attr                   \\\
   --disable-auth-pam               \\\
   --disable-avx2                   \\\
-  --disable-avx512f                \\\
   --disable-avx512bw               \\\
   --disable-blkio                  \\\
   --disable-block-drv-whitelist-in-tools \\\
@@ -1704,7 +1688,6 @@ mkdir -p %{static_builddir}
   --disable-linux-aio              \\\
   --disable-linux-io-uring         \\\
   --disable-linux-user             \\\
-  --disable-live-block-migration   \\\
   --disable-lto                    \\\
   --disable-lzfse                  \\\
   --disable-lzo                    \\\
@@ -1726,7 +1709,6 @@ mkdir -p %{static_builddir}
   --disable-pipewire               \\\
   --disable-pixman                 \\\
   --disable-plugins                \\\
-  --disable-pvrdma                 \\\
   --disable-qcow1                  \\\
   --disable-qed                    \\\
   --disable-qom-cast-debug         \\\
@@ -1841,7 +1823,6 @@ run_configure \
   --enable-attr \
 %ifarch %{ix86} x86_64
   --enable-avx2 \
-  --enable-avx512f \
   --enable-avx512bw \
 %endif
 %if %{have_libblkio}
@@ -1969,12 +1950,8 @@ run_configure \
   --enable-linux-io-uring \
 %endif
   --enable-linux-user \
-  --enable-live-block-migration \
   --enable-multiprocess \
   --enable-parallels \
-%if %{have_librdma}
-  --enable-pvrdma \
-%endif
   --enable-qcow1 \
   --enable-qed \
   --enable-qom-cast-debug \
@@ -2432,11 +2409,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %postun user-static-mips
 /bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
 
-%post user-static-nios2
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
-%postun user-static-nios2
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
-
 %post user-static-or1k
 /bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
 %postun user-static-or1k
@@ -2488,6 +2460,18 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_bindir}/qemu-io
 %{_bindir}/qemu-nbd
 %{_bindir}/qemu-storage-daemon
+%{_datadir}/systemtap/tapset/qemu-img.stp
+%{_datadir}/systemtap/tapset/qemu-img-log.stp
+%{_datadir}/systemtap/tapset/qemu-img-simpletrace.stp
+%{_datadir}/systemtap/tapset/qemu-io.stp
+%{_datadir}/systemtap/tapset/qemu-io-log.stp
+%{_datadir}/systemtap/tapset/qemu-io-simpletrace.stp
+%{_datadir}/systemtap/tapset/qemu-nbd.stp
+%{_datadir}/systemtap/tapset/qemu-nbd-log.stp
+%{_datadir}/systemtap/tapset/qemu-nbd-simpletrace.stp
+%{_datadir}/systemtap/tapset/qemu-storage-daemon.stp
+%{_datadir}/systemtap/tapset/qemu-storage-daemon-log.stp
+%{_datadir}/systemtap/tapset/qemu-storage-daemon-simpletrace.stp
 %if ! %{azl}
 %{_mandir}/man1/qemu-img.1*
 %{_mandir}/man8/qemu-nbd.8*
@@ -2526,6 +2510,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files tools
 %{_bindir}/qemu-keymap
 %{_bindir}/qemu-edid
+%ifarch x86_64
+%{_bindir}/qemu-vmsr-helper
+%endif
 %{_bindir}/qemu-trace-stap
 %{_datadir}/%{name}/simpletrace.py*
 %{_datadir}/%{name}/tracetool/*.py*
@@ -2662,7 +2649,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/chardev-baum.so
 %endif
 
-%if %{have_virgl}
+%if %{have_virgl} && %{have_opengl}
 %files device-display-virtio-gpu-gl
 %{_libdir}/%{name}/hw-display-virtio-gpu-gl.so
 %endif
@@ -2670,7 +2657,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files device-display-virtio-gpu-rutabaga
 %{_libdir}/%{name}/hw-display-virtio-gpu-rutabaga.so
 %endif
-%if %{have_virgl}
+%if %{have_virgl} && %{have_opengl}
 %files device-display-virtio-gpu-pci-gl
 %{_libdir}/%{name}/hw-display-virtio-gpu-pci-gl.so
 %endif
@@ -2687,8 +2674,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
 %files device-display-virtio-vga
 %{_libdir}/%{name}/hw-display-virtio-vga.so
+# virtio-vga-gl module only built when virglrenderer AND opengl enabled (QEMU >= 9.1.0)
+%if %{have_virgl} && %{have_opengl}
 %files device-display-virtio-vga-gl
 %{_libdir}/%{name}/hw-display-virtio-vga-gl.so
+%endif
 
 %if %{have_rutabaga_gfx}
 %files device-display-virtio-vga-rutabaga
@@ -2704,7 +2694,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 
-%if %{have_virgl}
+# vhost-user-gpu binary requires both virglrenderer AND opengl (QEMU 9.1.0+)
+%if %{have_virgl} && %{have_opengl}
 %files device-display-vhost-user-gpu
 %{_datadir}/%{name}/vhost-user/50-qemu-gpu.json
 %{_libexecdir}/vhost-user-gpu
@@ -2754,7 +2745,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_bindir}/qemu-mips64el
 %{_bindir}/qemu-mipsn32
 %{_bindir}/qemu-mipsn32el
-%{_bindir}/qemu-nios2
 %{_bindir}/qemu-or1k
 %if %{with ppc_support}
 %{_bindir}/qemu-ppc
@@ -2831,9 +2821,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-mipsn32el.stp
 %{_datadir}/systemtap/tapset/qemu-mipsn32el-log.stp
 %{_datadir}/systemtap/tapset/qemu-mipsn32el-simpletrace.stp
-%{_datadir}/systemtap/tapset/qemu-nios2.stp
-%{_datadir}/systemtap/tapset/qemu-nios2-log.stp
-%{_datadir}/systemtap/tapset/qemu-nios2-simpletrace.stp
 %{_datadir}/systemtap/tapset/qemu-or1k.stp
 %{_datadir}/systemtap/tapset/qemu-or1k-log.stp
 %{_datadir}/systemtap/tapset/qemu-or1k-simpletrace.stp
@@ -3004,12 +2991,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_exec_prefix}/lib/binfmt.d/qemu-mipsel-static.conf
 %{_exec_prefix}/lib/binfmt.d/qemu-mipsn32-static.conf
 %{_exec_prefix}/lib/binfmt.d/qemu-mipsn32el-static.conf
-
-%files user-static-nios2
-%{_bindir}/qemu-nios2-static
-%{_datadir}/systemtap/tapset/qemu-nios2-log-static.stp
-%{_datadir}/systemtap/tapset/qemu-nios2-simpletrace-static.stp
-%{_datadir}/systemtap/tapset/qemu-nios2-static.stp
 
 %files user-static-or1k
 %{_bindir}/qemu-or1k-static
@@ -3186,6 +3167,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_mandir}/man1/qemu-system-hppa.1*
 %endif
 %{_datadir}/%{name}/hppa-firmware.img
+%{_datadir}/%{name}/hppa-firmware64.img
 
 
 %files system-loongarch64
@@ -3252,16 +3234,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_mandir}/man1/qemu-system-mips64.1*
 %endif
 
-
-%files system-nios2
-%files system-nios2-core
-%{_bindir}/qemu-system-nios2
-%{_datadir}/systemtap/tapset/qemu-system-nios2.stp
-%{_datadir}/systemtap/tapset/qemu-system-nios2-log.stp
-%{_datadir}/systemtap/tapset/qemu-system-nios2-simpletrace.stp
-%if ! %{azl}
-%{_mandir}/man1/qemu-system-nios2.1*
-%endif
 
 %files system-or1k
 %files system-or1k-core
@@ -3435,6 +3407,33 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.1.0-1
+- Upgrade to QEMU 9.1.0
+- Remove CVE patches merged upstream: CVE-2023-6683, CVE-2023-6693,
+  CVE-2024-3447, CVE-2024-4467, CVE-2024-6505, CVE-2024-4693,
+  CVE-2024-7730, CVE-2024-3567, CVE-2024-26327, CVE-2024-26328,
+  CVE-2024-7409
+- Rebase 0002-Disable-failing-tests-on-azl.patch for 9.1.0
+- Remove pvrdma configure options (removed upstream in commit 1dfd42c4)
+- Remove live-block-migration configure options (removed upstream in
+  commit eef0bae3a75f "migration: Remove block migration")
+- Remove avx512f configure option (removed upstream in commit 5765bca5)
+- Remove nios2 architecture support (removed upstream in commit
+  6c3014858c4c "target/nios2: Remove the deprecated Nios II target")
+- Enable virglrenderer support (now available in Azure Linux 3.0)
+- Fix -gl and vhost-user-gpu subpackage conditionals to require both
+  virgl AND opengl (QEMU 9.1.0 no longer builds these without opengl)
+- Add qemu-vmsr-helper, hppa-firmware64.img, and systemtap tapset files
+  for qemu-img, qemu-io, qemu-nbd, qemu-storage-daemon to packaging
+- Guard qemu-vmsr-helper in %%files tools with %%ifarch x86_64 since it
+  is x86-only (reads Intel RAPL MSRs) and not built on aarch64
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-27
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-26
+- Bump to rebuild with updated glibc
+
 * Wed Nov 19 2025 Aditya Singh <v-aditysing@microsoft.com> - 8.2.0-25
 - Added Patch for CVE-2025-12464
 

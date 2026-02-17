@@ -1,9 +1,7 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 #
 # spec file for package xz-java
 #
-# Copyright (c) 2025 SUSE LLC
+# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
 # Copyright (c) 2013 Peter Conrad
 #
 # All modifications and additions to the file contributed by third parties
@@ -18,23 +16,25 @@ Distribution:   Azure Linux
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-Name:           xz-java
-Version:        1.10
-Release:        3%{?dist}
 Summary:        Pure Java implementation of XZ compression
-License:        0BSD
+Name:           xz-java
+Version:        1.8
+Release:        5%{?dist}
+License:        Public Domain
 Group:          Development/Libraries/Java
-URL:            https://tukaani.org/xz/java.html
-Source0:        https://tukaani.org/xz/xz-java-%{version}.zip
-Patch0:         xz-java-module-info.patch
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            http://tukaani.org/xz/java.html
+Source:         http://tukaani.org/xz/xz-java-%{version}.zip
+Patch0:         xz-java-source-version.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap >= 6
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-Provides:       java-xz = %{version}-%{release}
-Obsoletes:      java-xz < 1.8-5
 BuildArch:      noarch
+Provides:       java-xz
+Obsoletes:      java-xz
 
 %description
 This is an implementation of XZ data compression in pure Java.
@@ -49,10 +49,12 @@ Group:          Documentation/HTML
 This package contains the API documentation of xz-java.
 
 %prep
-%autosetup -p1 -n %{name} -c
+%setup -q -c -n %{name}
+%patch 0 -p1
 
 %build
-ant -Dant.build.javac.{source,target}=8 clean jar doc maven
+sed -i 's/linkoffline="[^"]*"//;/extdoc_/d' build.xml
+ant  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 clean jar doc maven
 
 %install
 # jar
@@ -64,28 +66,19 @@ install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 build/maven/xz-%{version}.pom %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar
 # javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
-# Remove LICENSE from javadoc directory to avoid duplicate license warning
-mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
-mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
-
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license COPYING
-%license ADDITIONAL_LICENSE_INFO
-%doc {NEWS,README,THANKS}.md
+%doc NEWS README THANKS
 %{_javadir}/xz.jar
 
 %files javadoc
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Nov 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-3
-- Upgrade from openSUSE Tumbleweed.
-- License verified
-
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-5
 - Move to SPECS
 - License verified

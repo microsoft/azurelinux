@@ -29,7 +29,7 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 1
+%global target_kernel_release 4
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -102,7 +102,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 25.07
-Release:	 1%{release_suffix}%{?dist}
+Release:	 4%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -449,6 +449,15 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4
+- Bump to match kernel-hwe.
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-3_6.12.57.1.3
+- Bump to match kernel-hwe.
+
+* Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-2_6.12.57.1.2
+- Bump to match kernel-hwe.
+
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
 - Upgrade version to 25.07.
 - Enable build on x86_64 kernel hwe.

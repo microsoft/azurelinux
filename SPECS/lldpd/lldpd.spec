@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:     lldpd
 Version:  1.0.17
-Release:  1%{?dist}
+Release:  2%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -162,6 +162,9 @@ fi
 
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.17-2
+- Bumping release to rebuild with new 'net-snmp' libs.
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.17-1
 - Auto-upgrade to 1.0.17 - Azure Linux 3.0 - package upgrades
 

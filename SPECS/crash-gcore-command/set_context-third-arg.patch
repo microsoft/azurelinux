@@ -1,0 +1,44 @@
+From 62b8d5005eaa9014467db85cfe268e65c6679f4c Mon Sep 17 00:00:00 2001
+From: Tao Liu <ltao@redhat.com>
+Date: Mon, 4 Nov 2024 17:11:19 +1300
+Subject: [PATCH] gcore: update set_context with upstream counterpart
+
+With the introduction of upstream commit "Preparing for gdb stack unwind
+support" [1], the function set_context() is added by a 3rd parameter. Without
+this patch, the compiliation of gcore will fail.
+
+The 3rd parameter of set_context() is used to sync the context of crash and
+gdb, so gdb can hold the the value of registers of current crash's task
+context, and gdb can output the stack unwinding for current task.
+
+This have nothing to do with gcore, so simply set the 3rd parameter as FALSE.
+
+[1]: https://github.com/lian-bo/crash/commit/d75d15d31b92f8882ccb15c960665e2c8a8d1c28
+
+Signed-off-by: Tao Liu <ltao@redhat.com>
+---
+ src/gcore.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/gcore.c b/src/gcore.c
+index 47a9c0d..a79f69b 100644
+--- a/src/gcore.c
++++ b/src/gcore.c
+@@ -306,7 +306,7 @@ static void do_gcore(char *arg)
+ 
+ 		if (tc != CURRENT_CONTEXT()) {
+ 			gcore->orig_task = CURRENT_TASK();
+-			(void) set_context(tc->task, NO_PID);
++			(void) set_context(tc->task, NO_PID, FALSE);
+ 		}
+ 
+ 		snprintf(gcore->corename, CORENAME_MAX_SIZE + 1, "core.%lu.%s",
+@@ -340,7 +340,7 @@ static void do_gcore(char *arg)
+ 	}
+ 
+ 	if (gcore->orig_task)
+-		(void)set_context(gcore->orig_task, NO_PID);
++		(void)set_context(gcore->orig_task, NO_PID, FALSE);
+ 
+ }
+ 

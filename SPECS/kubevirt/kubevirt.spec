@@ -19,26 +19,20 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.5.3
-Release:        4%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# The containers_meta packages and associated files are not required for the Mariner build
-# Nexus team needs these to-be-upstreamed patches for the operator Edge to work
-# correctly.
-Patch0:         CVE-2025-47913.patch
-Patch1:         CVE-2025-64324.patch
-Patch2:         CVE-2025-64435.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-16%{?dist}
-BuildRequires:  golang >= 1.21
+BuildRequires:  glibc-static >= 2.38-18%{?dist}
+BuildRequires:  golang >= 1.24
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -270,6 +264,22 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Feb 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.7.0-1
+- Upgrade to 1.7.0
+- Remove CVE-2025-47913.patch - vulnerable ssh/agent package no longer vendored in 1.7.0
+- Remove CVE-2025-64435.patch - fixed upstream via PR#15680 (controller_ref.go removed)
+- Bump golang BuildRequires to >= 1.24 per upstream PR#15784
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.3-3
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.3-2
+- Bump to rebuild with updated glibc
+
+* Tue Dec 30 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.6.3-1
+- Upgrade to 1.6.3
+- Remove CVE-2025-64324.patch
+
 * Wed Dec 17 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.3-4
 - Added patch for CVE-2025-64435
 

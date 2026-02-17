@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
@@ -49,6 +50,9 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
+	enableGpgCheck = app.Flag("enable-gpg-check", "Enable RPM GPG signature verification for all repositories during package fetching.").Bool()
+	gpgKeyPaths    = app.Flag("gpg-key", "Path to a GPG key file for signature validation. May be specified multiple times. Required if enable-gpg-check is set.").ExistingFiles()
+
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
@@ -71,6 +75,10 @@ func main() {
 
 	if *externalOnly && strings.TrimSpace(*inputGraph) == "" {
 		logger.Log.Fatal("input-graph must be provided if external-only is set.")
+	}
+
+	if *enableGpgCheck && len(*gpgKeyPaths) == 0 {
+		logger.Log.Fatal("--enable-gpg-check requires at least one --gpg-key path")
 	}
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
@@ -108,6 +116,14 @@ func main() {
 
 	if err != nil {
 		logger.Log.Panicf("Failed to clone RPM repo. Error: %s", err)
+	}
+
+	// Validate GPG signatures of downloaded packages if enabled
+	if *enableGpgCheck {
+		err = rpm.ValidateDirectoryRPMSignatures(cloner.CloneDirectory(), *gpgKeyPaths)
+		if err != nil {
+			logger.Log.Panicf("Failed to validate RPM signatures. Error: %s", err)
+		}
 	}
 
 	timestamp.StartEvent("finalize cloned packages", nil)
