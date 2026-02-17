@@ -8490,6 +8490,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "koji",
+          "version": "1.35.3",
+          "downloadUrl": "https://releases.pagure.org/koji/koji-1.35.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kpatch",
           "version": "0.9.8",
           "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
