@@ -2,5 +2,14 @@
 
 # Set rhel to 0 to avoid deps on non-existent cert packages
 # (rhel=10 would engage RHEL-specific BuildRequires)
-[components.kernel.build]
-defines = { rhel = "0" }
+# Set debugbuildsenabled to 0 to avoid deps on debuginfo packages
+# Build with the following settings:
+# - baseonly: builds the base kernel without additional features or modules
+# Build without the following:
+# - debug: builds the debug kernel variant
+# - configchecks: builds the kernel with configuration checks enabled
+# - efiuki: builds kernel-uki
+[components."kernel".build]
+defines = { rhel = "0", debugbuildsenabled = "0" }
+with = ["baseonly"]
+without = ["debug", "configchecks", "efiuki"]
