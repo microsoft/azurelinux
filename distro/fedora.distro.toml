@@ -1,7 +1,7 @@
 [distros.fedora]
 description = "Fedora Linux"
 default-version = "43"
-dist-git-base-uri = "https://src.fedoraproject.org/rpms/$pkg.git"
+dist-git-base-uri = "git://azl.src.kojiaks.internal/rpms/$pkg.git"
 lookaside-base-uri = "https://src.fedoraproject.org/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
 repos = [
     # NOTE: These are source repositories; we will want to tag them as such in the future.
