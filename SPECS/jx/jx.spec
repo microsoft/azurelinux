@@ -84,7 +84,7 @@ make test && \
 * Tue Sep 02 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.236-22
 - Bump release to rebuild with golang
 
-* Thur Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.236-21
+* Thu Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.236-21
 - Fix CVE-2024-51744
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-20
