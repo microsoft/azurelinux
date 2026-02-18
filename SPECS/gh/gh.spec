@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ Patch1:         CVE-2021-43565.patch
 Patch2:         CVE-2022-32149.patch
 Patch3:         CVE-2024-54132.patch
 Patch4:         CVE-2024-45338.patch
+Patch5:         CVE-2025-47911.patch
 
 BuildRequires:  golang
 BuildRequires:  git
@@ -77,6 +78,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.0-26
+- Patch for CVE-2025-47911
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.13.0-25
 - Bump release to rebuild with golang
 
