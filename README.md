@@ -31,6 +31,25 @@ In VSCode, there are specialized prompts for common tasks. They can be accessed 
 | `azl-review-component` | Audit a component for hygiene and best practices. |
 | `azl-migrate-component` | Move an inline entry to a dedicated `.comp.toml` file. |
 
+### Agents
+
+In addition to prompts, the repo includes **chat agents** that can be selected from the chat participant dropdown (the model/agent next to the Copilot Chat panel). Select the agent, then type your query:
+
+| Agent | What it does |
+|-------|--------------|
+| `koji-query` | Triage Koji build failures — fetch task info/logs, identify root cause, and suggest next steps. Give it a task ID, URL, or package name. |
+| `spec-review` | Review spec files against packaging best practices and produce a structured findings report. |
+
+Example: select **koji-query** from the dropdown, then type:
+
+```markdown
+> what is the status of the lolcat package
+```
+
+```markdown
+> https://koji.example.com/koji/taskinfo?taskID=1234
+```
+
 ### Copilot CLI
 
 The skills and instructions are also compatible with the [GitHub Copilot CLI](https://github.com/features/copilot/cli/) which can be used directly from the terminal without opening VSCode.
@@ -46,3 +65,11 @@ copilot --add-dir . -i "Upgrade vim to the next stable release"
 ```
 
 Note: `copilot` supports fully autonomous operation (no interactive mode) with `-p <prompt>` however, until azldev supports a full MCP mode the tool approvals are very difficult. `--yolo` (same as `--allow-all-tools --allow-all-paths --allow-all-urls`) is an option, but use with extreme caution since it grants the agent unrestricted access to your filesystem and network. For now, it's recommended to use `-i` to at least have visibility into the agent's thought process and tool usage.
+
+### CLI Agents
+
+Copilot CLI also supports agents, use `/agent` to select one, or start the CLI with a specific agent:
+
+```bash
+copilot --add-dir . --agent koji-query
+```
