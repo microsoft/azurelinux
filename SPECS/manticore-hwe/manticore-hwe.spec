@@ -17,7 +17,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch:  x86_64 
 
-Source0:        manticore-3.2.0.tar.gz
+Source0:        %{_distro_sources_url}/manticore-%{manticore_driver_version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
