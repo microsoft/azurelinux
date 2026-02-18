@@ -3,7 +3,7 @@
 Summary:        The open-source application container engine client.
 Name:           moby-cli
 Version:        24.0.9
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Patch0:         disable_manpage_vendor.patch
 Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2024-36623.patch
 Patch3:         CVE-2024-24786.patch
+Patch4:         CVE-2025-11065.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
 BuildRequires:  golang
@@ -27,8 +28,7 @@ Requires:       xz
 %{summary}
 
 %prep
-%autosetup -p1 -n cli-%{version}
-%setup -q -n cli-%{version} -T -D -a 1
+%autosetup -p1 -a1 -n cli-%{version}
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_builddir}/cli-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
@@ -80,6 +80,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.0.9-8
+- Patch for CVE-2025-11065
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 24.0.9-7
 - Bump release to rebuild with golang
 
