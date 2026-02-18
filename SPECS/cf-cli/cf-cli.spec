@@ -48,10 +48,7 @@ BuildRequires:  golang
 The official command line client for Cloud Foundry.
 
 %prep
-%autosetup -N -n cli-%{version}
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
@@ -68,8 +65,8 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE README.md
+%license LICENSE NOTICE
+%doc README.md
 %{_bindir}/cf
 
 %changelog
