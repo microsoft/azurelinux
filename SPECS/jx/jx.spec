@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.2.236
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ Patch2:         CVE-2023-45288.patch
 Patch3:         CVE-2024-51744.patch
 Patch4:         CVE-2025-58058.patch
 Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2025-30204.patch
 BuildRequires:  golang
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -71,16 +72,19 @@ make test && \
 %{_bindir}/jx
 
 %changelog
+* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.2.236-25
+- Patch for CVE-2025-30204
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.2.236-24
 - Patch for CVE-2025-65637
 
 * Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.2.236-23
 - Patch for CVE-2025-58058
 
-* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.236-22
+* Tue Sep 02 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.236-22
 - Bump release to rebuild with golang
 
-* Thur Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.236-21
+* Thu Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.236-21
 - Fix CVE-2024-51744
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-20
