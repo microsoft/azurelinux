@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.2
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -29,16 +29,14 @@ Patch4:         CVE-2025-27144.patch
 Patch5:         CVE-2022-3162.patch
 Patch6:         CVE-2024-51744.patch
 Patch7:         CVE-2025-65637.patch
+Patch8:         CVE-2025-11065.patch
 BuildRequires: golang
 
 %description
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups.
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar -xvf %{SOURCE1}
-%autopatch -p1
+%autosetup -a 1 -p1
 
 %build
 go build -mod=vendor
@@ -54,6 +52,9 @@ go test -mod=vendor ./...
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Wed Feb 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.2-25
+- Patch for CVE-2025-11065
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.2-24
 - Patch for CVE-2025-65637
 
