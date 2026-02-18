@@ -45,9 +45,7 @@ Requires:       git
 GitHub official command line tool.
 
 %prep
-%setup -q -n cli-%{version}
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
