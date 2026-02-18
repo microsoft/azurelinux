@@ -298,10 +298,10 @@ p11-kit-debuginfo-0.25.0-1.azl3.aarch64.rpm
 p11-kit-devel-0.25.0-1.azl3.aarch64.rpm
 p11-kit-server-0.25.0-1.azl3.aarch64.rpm
 p11-kit-trust-0.25.0-1.azl3.aarch64.rpm
-pam-1.5.3-5.azl3.aarch64.rpm
-pam-debuginfo-1.5.3-5.azl3.aarch64.rpm
-pam-devel-1.5.3-5.azl3.aarch64.rpm
-pam-lang-1.5.3-5.azl3.aarch64.rpm
+pam-1.5.3-6.azl3.aarch64.rpm
+pam-debuginfo-1.5.3-6.azl3.aarch64.rpm
+pam-devel-1.5.3-6.azl3.aarch64.rpm
+pam-lang-1.5.3-6.azl3.aarch64.rpm
 patch-2.7.6-9.azl3.aarch64.rpm
 patch-debuginfo-2.7.6-9.azl3.aarch64.rpm
 pcre2-10.42-3.azl3.aarch64.rpm
