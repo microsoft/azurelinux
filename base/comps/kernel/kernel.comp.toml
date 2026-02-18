@@ -13,3 +13,9 @@
 defines = { rhel = "0", debugbuildsenabled = "0" }
 with = ["baseonly"]
 without = ["debug", "configchecks", "efiuki"]
+
+[[components.kernel.overlays]]
+type = "spec-search-replace"
+description = "Fix RPM 6.x parametric macro getopt issue with dashes in log_msg argument"
+regex = '%\{log_msg "Cannot build --with baseonly, up build is disabled"\}'
+replacement = '%{log_msg -- "Cannot build --with baseonly, up build is disabled"}'
