@@ -17,6 +17,7 @@ Name:		    %{_name}-signed
 Version:        %{manticore_driver_version}
 Release:        1%{release_suffix}%{?dist}
 License:        GPL-2.0
+Vendor:         Microsoft Corporation
 ExclusiveArch:  x86_64
 
 # Unsigned RPM built from SPECS-MSFT/manticore
@@ -82,5 +83,6 @@ fi
 
 %changelog
 * Thu Feb 10 2026 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 3.2.0-1
-- Initial build
+- Original version for Azure Linux
+- License verified
 
