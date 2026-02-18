@@ -81,7 +81,7 @@ make test && \
 * Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.2.236-23
 - Patch for CVE-2025-58058
 
-* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.236-22
+* Tue Sep 02 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.236-22
 - Bump release to rebuild with golang
 
 * Thur Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.236-21
