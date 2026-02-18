@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,8 @@ Patch2:         CVE-2021-44716.patch
 Patch3:         CVE-2022-32149.patch
 Patch4:         CVE-2024-45338.patch
 Patch5:         CVE-2024-51744.patch
+Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2025-47911.patch
 
 BuildRequires:  golang
 %if %{with_check}
@@ -70,6 +72,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-27
+- Patch for CVE-2025-30204, CVE-2025-47911
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.4.0-26
 - Bump release to rebuild with golang
 
