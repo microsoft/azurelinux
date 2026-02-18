@@ -33,7 +33,7 @@ In VSCode, there are specialized prompts for common tasks. They can be accessed 
 
 ### Agents
 
-In addition to prompts, the repo includes **chat agents** that can be selected from the chat participant dropdown (the model/agent picker at the top of the Copilot Chat panel). Select the agent, then type your query:
+In addition to prompts, the repo includes **chat agents** that can be selected from the chat participant dropdown (the model/agent next to the Copilot Chat panel). Select the agent, then type your query:
 
 | Agent | What it does |
 |-------|--------------|
