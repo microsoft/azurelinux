@@ -31,14 +31,16 @@ Paths are relative to the project root (`base/`). Don't edit anything in these d
 
 ```bash
 # Build a single component
-azldev comp build -p <name> -q
+azldev comp build -p <name>
 
 # Build multiple components, auto-publishing RPMs to local repo for chained deps
-azldev comp build --local-repo-with-publish ./base/out -p <dep1> -p <dep2> -q
+azldev comp build --local-repo-with-publish ./base/out -p <dep1> -p <dep2>
 
 # Rebuild a single component against an already-populated local repo
-azldev comp build -p <name> --local-repo ./base/out -q
+azldev comp build -p <name> --local-repo ./base/out
 ```
+
+**NOTE:** `-q` (silent) can be used with all commands for cleaner logs, but will limit visibility into build progress. Only use `-q` for inner-loop builds when you know the build will run to completion without infrastructure issues.
 
 Build foundational packages first (e.g., `azurelinux-rpm-config`), then dependents. See [`scripts/demo-build.sh`](../../../scripts/demo-build.sh) for a working example.
 
