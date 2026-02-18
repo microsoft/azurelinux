@@ -1,0 +1,4 @@
+[components.rubygem-em-http-request]
+
+[components.rubygem-em-http-request.build]
+check = { skip = true, skip_reason = "Tests fail due to lacking network access, and get stuck until they hit mock's 24 hour timeout." }
