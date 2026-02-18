@@ -50,9 +50,9 @@ Source2:        build.sh
 Source3:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-38561.patch
 Patch1:         CVE-2022-32149.patch
-Patch2:		CVE-2024-45338.patch
-Patch3:		CVE-2022-29526.patch
-Patch4:		CVE-2025-47911.patch
+Patch2:         CVE-2024-45338.patch
+Patch3:         CVE-2022-29526.patch
+Patch4:         CVE-2025-47911.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -245,7 +245,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Update cnitool documentation for spec v0.4.0
     + Add cni-route-override to CNI plugin list
   * Build and test changes:
-    + Release: 5%{?dist}
+    + Release: 4%{?dist}
 
 * Fri May 17 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.0:
