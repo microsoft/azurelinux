@@ -134,7 +134,7 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-8
 - Bump release to rebuild with go 1.19.5
 
-* Tues Jan 24 2023 Adit Jha <aditjha@microsoft.com> - 1.4.0-7
+* Tue Jan 24 2023 Adit Jha <aditjha@microsoft.com> - 1.4.0-7
 - Bump release to rebuild vendor repoistory which contain patch fix for CVE-2021-4235, CVE-2022-3064
 
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-6
