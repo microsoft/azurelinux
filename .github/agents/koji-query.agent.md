@@ -10,12 +10,14 @@ user-invokable: true
 
 - **Base URL**: {GET FROM USER, or ENV: `KOJI_BASE_URL`}
   - If the env variable is not set, prompt the user to input the base URL of the Koji Web UI (e.g., `https://koji.example.com`), or tell them to set the `KOJI_BASE_URL` environment variable for future use.
-- **MCP tools (preferred)**: Use the `koji` MCP server tools (`set_koji_url`, `koji_fetch`) to fetch pages and logs. These handle TLS verification automatically and write output to temp files under `base/build/work/scratch/koji/` to avoid bloating context. Use `read_file` and `grep_search` on the resulting files to inspect content.
+- **MCP tools (preferred)**: Use the `koji` MCP server tools (`set_koji_url`, `koji_fetch`) to fetch pages and logs. These write output to temp files under `base/build/work/scratch/koji/` to avoid bloating context. Use `read_file` and `grep_search` on the resulting files to inspect content.
   1. Call `set_koji_url` with the base URL first.
   2. Call `koji_fetch` with the path (e.g., `/koji/taskinfo?taskID=3307`). It returns the file path where content was saved.
+     - If the fetch fails with an SSL certificate error (e.g., self-signed cert), ask the user if they want to skip SSL verification, then call `koji_allow_insecure` to proceed. Do **NOT** proceed without explicit user approval for the **specific** URL.
   3. Use `read_file` or `grep_search` on the saved file to extract the information you need.
   4. Call `koji_cleanup` when done to remove fetched temp files and reclaim disk space (NOTE: This will clean up ALL scratch files, so only call it when you're completely done with the current files).
 - **CLI fallback**: If MCP tools are unavailable, use `curl -sk` to skip TLS verification.
+- **Network issues**: Koji is typically only accessible via VPN or corporate network. If you encounter connection errors or timeouts, assume it is a network permissions issue — ask the user to confirm they are connected to the appropriate network before retrying. Do NOT keep retrying on your own.
 
 ## Discovery: Finding Builds by Package Name
 

@@ -14,11 +14,12 @@ bothering the user again.
 """
 
 import os
-import re
 import ssl
 import tempfile
+import urllib.error
 import urllib.request
-from urllib.parse import parse_qs, urlparse
+from typing import Optional
+from urllib.parse import urlparse
 
 try:
     from mcp.server.fastmcp import FastMCP
@@ -32,37 +33,59 @@ except ImportError:
 
 mcp = FastMCP("koji")
 
-_base_url: str | None = None
+_base_url: Optional[str] = None
+_allow_insecure: bool = False
+_ssl_error_seen_for: Optional[str] = None
 _output_dir: str = os.path.join(
     os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "koji"
 )
 
 
-def _derive_filename(path: str) -> str:
-    """Turn a Koji URL path into a human-readable filename.
-
-    /koji/taskinfo?taskID=3307         -> task_3307_info.html
-    /koji/getfile?taskID=6059&name=build.log&offset=-4000  -> task_6059_build.log
-    """
-    parsed = urlparse(path)
-    params = parse_qs(parsed.query)
-    task_id = params.get("taskID", ["unknown"])[0]
-
-    if "getfile" in parsed.path:
-        name = params.get("name", ["output.txt"])[0]
-        return f"task_{task_id}_{name}"
-    else:
-        page = parsed.path.rstrip("/").rsplit("/", 1)[-1] or "page"
-        return f"task_{task_id}_{page}.html"
-
-
 @mcp.tool()
 def set_koji_url(base_url: str) -> str:
     """Set the Koji Web UI base URL (e.g. https://koji.example.com).
-    Must be called before using koji_fetch."""
-    global _base_url
-    _base_url = base_url.rstrip("/")
+    Must be called before using koji_fetch.
+
+    SSL certificate verification is enabled by default. If the Koji server
+    uses self-signed certificates, use the separate koji_allow_insecure tool
+    to disable verification after confirming with the user."""
+    global _base_url, _allow_insecure, _ssl_error_seen_for
+    normalized = base_url.rstrip("/")
+
+    # Reset insecure flag if the URL changed
+    if normalized != _base_url:
+        _allow_insecure = False
+        _ssl_error_seen_for = None
+
+    _base_url = normalized
     return f"Koji base URL set to {_base_url}"
+
+
+@mcp.tool()
+def koji_allow_insecure() -> str:
+    """Disable SSL certificate verification for the configured Koji URL.
+
+    This is a SEPARATE tool so the user explicitly approves skipping SSL
+    verification. It can only be called after:
+      1. A Koji base URL has been set via set_koji_url.
+      2. A prior koji_fetch call has failed with an SSL certificate error.
+
+    DO NOT call this tool without first confirming with the user that they
+    want to allow insecure connections."""
+    global _allow_insecure
+
+    if not _base_url:
+        return "ERROR: No Koji URL set. Call set_koji_url first."
+
+    if _ssl_error_seen_for != _base_url:
+        return (
+            "ERROR: Cannot enable insecure mode — no SSL error has been "
+            "observed for the current URL yet. Call koji_fetch first; if it "
+            "fails with a certificate error, then call this tool."
+        )
+
+    _allow_insecure = True
+    return f"SSL verification DISABLED for {_base_url}"
 
 
 @mcp.tool()
@@ -76,28 +99,71 @@ def koji_fetch(path: str) -> str:
     `offset` is optional. The tool can easily handle large files and write them to disk, and agents can then use
     read_file or grep_search, shell(tail), shell(head), shell(grep) etc. to inspect specific parts.
     """
+    global _ssl_error_seen_for
+
     if not _base_url:
         return "ERROR: Koji base URL not set. Call set_koji_url first."
 
     url = _base_url + path
 
-    # Guard against SSRF via URL authority tricks (e.g. path="@evil.com/...")
+    # Guard against SSRF via URL authority tricks (e.g. path="@evil.com/..." or ":8080/...")
     parsed_base = urlparse(_base_url)
     parsed_url = urlparse(url)
-    if parsed_url.hostname != parsed_base.hostname:
+
+    def _effective_port(parsed):
+        """Return the effective port for a parsed URL (explicit or scheme default)."""
+        if parsed.port is not None:
+            return parsed.port
+        if parsed.scheme == "http":
+            return 80
+        if parsed.scheme == "https":
+            return 443
+        return None
+
+    base_port = _effective_port(parsed_base)
+    url_port = _effective_port(parsed_url)
+
+    if (
+        parsed_url.hostname != parsed_base.hostname
+        or parsed_url.scheme != parsed_base.scheme
+        or url_port != base_port
+    ):
         return (
-            f"ERROR: Constructed URL points to a different host "
-            f"({parsed_url.hostname!r} != {parsed_base.hostname!r}). Aborting."
+            "ERROR: Constructed URL does not match the configured Koji endpoint "
+            f"(scheme/host/port mismatch: {parsed_url.scheme!r}://{parsed_url.hostname!r}:{url_port!r} "
+            f"!= {parsed_base.scheme!r}://{parsed_base.hostname!r}:{base_port!r}). Aborting."
         )
 
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    # SSL: verify certs by default, only disable if the user explicitly opted in
+    ssl_ctx = None
+    if parsed_url.scheme == "https" and _allow_insecure:
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
 
     req = urllib.request.Request(url, headers={"User-Agent": "koji-mcp/1.0"})
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
+        with urllib.request.urlopen(req, context=ssl_ctx, timeout=10) as resp:
             data = resp.read()
+    except urllib.error.URLError as e:
+        # urllib wraps SSL errors inside URLError.reason
+        if isinstance(e.reason, (ssl.SSLCertVerificationError, ssl.SSLError)):
+            _ssl_error_seen_for = _base_url
+            return (
+                f"ERROR: SSL certificate verification failed for {url}: {e.reason}\n\n"
+                "The server **may** be using a self-signed certificate (don't assume — it could be a misconfiguration or an attack). "
+                "You **MUST** inform the user about the security implications of allowing insecure connections, then"
+                "offer the user a selecton of two options: proceed or abort (use 'ask_questions' tool if available, with 'no' as the default answer). "
+                "If the user chooses to proceed, call the koji_allow_insecure tool. "
+                "DO NOT proceed without explicit user approval for the SPECIFIC URL."
+            )
+        return (
+            f"ERROR fetching {url}: {e}\n\n"
+            "NOTE: Koji is typically only accessible via a secure connection "
+            "(e.g., VPN or corporate network). If you are seeing connection "
+            "errors or timeouts, please verify that you are connected to the "
+            "appropriate network before retrying."
+        )
     except Exception as e:
         return (
             f"ERROR fetching {url}: {e}\n\n"
@@ -114,13 +180,7 @@ def koji_fetch(path: str) -> str:
 
     # Always write to a temp file to keep context small
     os.makedirs(_output_dir, exist_ok=True)
-    base_name = _derive_filename(path)
-    # Use mkstemp so parallel fetches never collide
-    fd, out_path = tempfile.mkstemp(
-        prefix=re.sub(r"[^\w.-]", "_", base_name) + ".",
-        suffix="",
-        dir=_output_dir,
-    )
+    fd, out_path = tempfile.mkstemp(prefix="koji_", dir=_output_dir)
     with os.fdopen(fd, "w") as f:
         f.write(text)
 
