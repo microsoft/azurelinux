@@ -77,16 +77,16 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1:1.9.5-17
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-17
 - Patch for CVE-2025-11065
 
-* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1:1.9.5-16
+* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-16
 - Patch for CVE-2025-47913
 
 * Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-15
 - Patch for CVE-2025-58058
 
-* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.9.5-14
+* Tue Sep 02 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.9.5-14
 - Bump release to rebuild with golang
 
 * Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.9.5-13
