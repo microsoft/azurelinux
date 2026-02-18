@@ -246,7 +246,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Update cnitool documentation for spec v0.4.0
     + Add cni-route-override to CNI plugin list
   * Build and test changes:
-    + Release: 21%{?dist}
+    + Release: 4%{?dist}
 
 * Fri May 17 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.0:
