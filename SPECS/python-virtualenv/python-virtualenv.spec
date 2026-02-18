@@ -51,7 +51,7 @@ virtualenv is a tool to create isolated Python environment.
 # For the poolmanager.py under tests, it is archived inside a .whl file, which in turn is archived inside another .whl file,
 # so, we need to unpack the outer .whl, then unpack the inner .whl, apply the patch, and then re-zip both levels.
 
-echo "Manually Patching virtualenv-20.26.6/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
 mkdir -p unpacked_pip-25.0.1-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl -d unpacked_pip-25.0.1-py3-none-any
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1000}
@@ -63,7 +63,7 @@ zip -r ../src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl *
 popd
 rm -rf unpacked_pip-25.0.1-py3-none-any
 
-echo "Manually Patching virtualenv-20.26.6/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
 mkdir -p unpacked_pip-25.3-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip-25.3-py3-none-any
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1000}
