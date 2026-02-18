@@ -1,3 +1,0 @@
-[components.bash]
-# Need build fixes in rawhide
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }

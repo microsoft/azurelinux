@@ -1,7 +1,0 @@
-[components.dnf5]
-
-[components.dnf5.build]
-# Disable RedHat subscription manager plugin
-without = [
-    "plugin_rhsm"
-]

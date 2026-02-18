@@ -1,9 +1,0 @@
-[components.rpm]
-
-# Update vendor macro.
-[[components.rpm.overlays]]
-description = "Customize RPM vendor"
-type = "spec-search-replace"
-regex = "RPM_VENDOR=redhat"
-replacement = "RPM_VENDOR=azurelinux"
-
