@@ -11,7 +11,6 @@ spec = { type = "upstream", upstream-name = "kernel" }
 
 [components."kernel6.18".build]
 defines = { rhel = "0", debugbuildsenabled = "0" }
-with = ["baseonly"]
 without = ["debug", "configchecks"]
 
 [[components."kernel6.18".source-files]]
