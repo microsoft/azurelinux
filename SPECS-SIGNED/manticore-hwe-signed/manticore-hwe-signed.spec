@@ -18,6 +18,7 @@ Version:        %{manticore_driver_version}
 Release:        1%{release_suffix}%{?dist}
 License:        GPL-2.0
 Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 ExclusiveArch:  x86_64
 
 # Unsigned RPM built from SPECS-MSFT/manticore

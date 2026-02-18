@@ -14,6 +14,7 @@ Release:        1%{release_suffix}%{?dist}
 Summary:        Manticore OOT kernel driver
 License:        GPL-2.0
 Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 ExclusiveArch:  x86_64 
 
 Source0:        manticore-3.2.0.tar.gz

@@ -12992,7 +12992,7 @@
         "other": {
           "name": "manticore-hwe",
           "version": "3.2.0",
-          "downloadUrl": "https://github.com/Azure/azihsm-linux-driver/archive/refs/tags/v3.2.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/manticore-3.2.0.tar.gz"
         }
       }
     },
