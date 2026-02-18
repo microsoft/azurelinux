@@ -125,6 +125,31 @@ with = ["feature_x"]
 without = ["plugin_rhsm"]
 ```
 
+## Adding Description Comments
+
+When adding or modifying fields in a `.comp.toml` file, check the schema (`external/schemas/azldev.schema.json`) for a `description` on that field. If the schema field **does not** have a `description` key (or equivalent, i.e. `skip_reason` for check skip), add a TOML comment above the field explaining what it does and why it's set to that value. This helps future readers (human and agent) understand fields that aren't self-documenting via the schema.
+
+**BUT**... don't add pointless noise - if the change is self-explanatory and requires no additional context, a comment may not be necessary. Use your judgement, but when in doubt, add a comment.
+
+DO:
+
+```toml
+# Pin to Fedora rawhide since we need feature 'x' that is not in stable releases yet.
+# Re-align to a stable release once the feature is backported or a new release is available.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+```
+
+Offers important context about *why* the component is pinned to rawhide, which is not obvious from the TOML field alone. Future readers will understand the rationale and know to check for backports or new releases to remove the rawhide pin.
+
+DO NOT:
+
+```toml
+# Need new stuff.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+```
+
+This offers no real information beyond what the TOML field already says, and doesn't explain *why* the new stuff is needed, or what that new stuff is. It's just noise.
+
 ## Validation
 
 Verify overlays apply cleanly with `azldev comp prep-sources` before committing. See skills `azl-build-component` and `azl-fix-overlay` for step-by-step workflows.

@@ -52,6 +52,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Diagnose and fix overlay issues | [`azl-fix-overlay`](.github/skills/azl-fix-overlay/SKILL.md) |
 | Test and inspect packages in mock chroot | [`azl-mock`](.github/skills/azl-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`azl-review-component`](.github/skills/azl-review-component/SKILL.md) |
+| Triage Koji build failures | [`azl-koji-triage`](.github/skills/azl-koji-triage/SKILL.md) |
 
 ## Directory Guidance
 

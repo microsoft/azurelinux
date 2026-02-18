@@ -52,6 +52,13 @@ def set_koji_url(base_url: str) -> str:
     global _base_url, _allow_insecure, _ssl_error_seen_for
     normalized = base_url.rstrip("/")
 
+    # Only allow http/https — reject file://, ftp://, etc.
+    parsed = urlparse(normalized)
+    if parsed.scheme not in ("http", "https"):
+        return f"ERROR: Only http/https URLs are supported (got {parsed.scheme!r})"
+    if parsed.username or parsed.password:
+        return "ERROR: URLs with embedded credentials are not supported"
+
     # Reset insecure flag if the URL changed
     if normalized != _base_url:
         _allow_insecure = False
@@ -104,6 +111,9 @@ def koji_fetch(path: str) -> str:
     if not _base_url:
         return "ERROR: Koji base URL not set. Call set_koji_url first."
 
+    if not path.startswith("/"):
+        return "ERROR: path must start with '/'"
+
     url = _base_url + path
 
     # Guard against SSRF via URL authority tricks (e.g. path="@evil.com/..." or ":8080/...")
@@ -152,8 +162,8 @@ def koji_fetch(path: str) -> str:
             return (
                 f"ERROR: SSL certificate verification failed for {url}: {e.reason}\n\n"
                 "The server **may** be using a self-signed certificate (don't assume — it could be a misconfiguration or an attack). "
-                "You **MUST** inform the user about the security implications of allowing insecure connections, then"
-                "offer the user a selecton of two options: proceed or abort (use 'ask_questions' tool if available, with 'no' as the default answer). "
+                "You **MUST** inform the user about the security implications of allowing insecure connections, then "
+                "offer the user a selection of two options: proceed or abort (use 'ask_questions/ask_user' tools if available, with 'no' as the default/first option). "
                 "If the user chooses to proceed, call the koji_allow_insecure tool. "
                 "DO NOT proceed without explicit user approval for the SPECIFIC URL."
             )
