@@ -7901,8 +7901,8 @@
         "type": "other",
         "other": {
           "name": "jdom2",
-          "version": "2.0.6",
-          "downloadUrl": "https://github.com/hunterhacker/jdom/archive/JDOM-2.0.6.tar.gz"
+          "version": "2.0.6.1",
+          "downloadUrl": "https://github.com/hunterhacker/jdom/archive/JDOM-2.0.6.1.tar.gz#/jdom2-2.0.6.1.tar.gz"
         }
       }
     },
