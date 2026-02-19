@@ -1,0 +1,42 @@
+From 0dc08f4751e70db6ad8ca28f37eba52218077d24 Mon Sep 17 00:00:00 2001
+From: Krzesimir Nowak <knowak@microsoft.com>
+Date: Tue, 4 Apr 2023 12:12:42 +0200
+Subject: [PATCH 19/20] /usr/share/oem -> /oem
+
+---
+ config/util/translate.go  | 2 +-
+ internal/distro/distro.go | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/config/util/translate.go b/config/util/translate.go
+index 347d148c..d4c057b2 100644
+--- a/config/util/translate.go
++++ b/config/util/translate.go
+@@ -154,7 +154,7 @@ func FSGeneration(name string, fsMap map[string]string) (string, error) {
+ 	if _, ok := fsMap[name]; !ok {
+ 		addedSuffixCounter += 1
+ 		if name == "oem" {
+-			fsMap[name] = "/usr/share/oem"
++			fsMap[name] = "/oem"
+ 		} else {
+ 			// generate a new path
+ 			fsMap[name] = "/tmp/" + name + "-ign" + strconv.FormatUint(addedSuffixCounter, 10)
+diff --git a/internal/distro/distro.go b/internal/distro/distro.go
+index 2726d705..c335eeee 100644
+--- a/internal/distro/distro.go
++++ b/internal/distro/distro.go
+@@ -32,7 +32,10 @@ var (
+ 	bootIDPath        = "/proc/sys/kernel/random/boot_id"
+ 	// initramfs directory containing distro-provided base config
+ 	systemConfigDir = "/usr/lib/ignition"
+-	// initramfs directory to check before retrieving file from OEM partition
++	// initramfs directory to check before retrieving file from
++	// OEM partition; note that OEM partition is mounted on /oem
++	// on the host, but initrds still use /usr/share/oem for
++	// backwards compatilibity
+ 	oemLookasideDir = "/usr/share/oem"
+ 
+ 	// Helper programs
+-- 
+2.49.1
+

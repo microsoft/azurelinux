@@ -1,0 +1,32 @@
+From a00ce4cd775722e87f97a529d4ff802f0d7f37c9 Mon Sep 17 00:00:00 2001
+From: Krzesimir Nowak <knowak@microsoft.com>
+Date: Tue, 16 May 2023 17:43:43 +0200
+Subject: [PATCH 20/20] internal/exec/stages/mount: Mount /oem
+
+When asking to mount the OEM partition to /usr/share/oem, actually
+mount it in /oem. The /usr/share/oem is a symlink pointing to /oem, so
+the ignition config (or container linux config) trying to put stuff
+into /usr/share/oem, should end up having things in /oem.
+---
+ internal/exec/stages/mount/mount.go | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/internal/exec/stages/mount/mount.go b/internal/exec/stages/mount/mount.go
+index bace4bbd..bc6767d2 100644
+--- a/internal/exec/stages/mount/mount.go
++++ b/internal/exec/stages/mount/mount.go
+@@ -118,6 +118,11 @@ func (s stage) mountFs(fs types.Filesystem) error {
+ 	// mount paths shouldn't include symlinks or other non-directories so we can use filepath.Join()
+ 	// instead of s.JoinPath(). Check that the resulting path is composed of only directories.
+ 	relpath := *fs.Path
++	// /usr/share/oem is now a symlink to /oem, so make sure we
++	// rather actually try to mount /oem
++	if relpath == "/usr/share/oem" && fs.Device == "/dev/disk/by-label/OEM" {
++		relpath = "/oem"
++	}
+ 	path := filepath.Join(s.DestDir, relpath)
+ 	if err := checkForNonDirectories(path); err != nil {
+ 		return err
+-- 
+2.49.1
+
