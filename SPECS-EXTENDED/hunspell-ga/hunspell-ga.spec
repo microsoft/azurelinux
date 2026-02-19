@@ -1,47 +1,88 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} >= 36 || 0%{?rhel} > 9
+%global dict_dirname hunspell
+%else
+%global dict_dirname myspell
+%endif
+
 Name: hunspell-ga
 Summary: Irish hunspell dictionaries
-Version: 5.0
-Release: 7%{?dist}
-Source0: https://github.com/kscanne/gaelspell/releases/download/v%{version}/ispell-gaeilge-%{version}.tar.gz
-Source1: myspell-header
-Source2: hunspell-header
-URL: https://github.com/kscanne/gaelspell
-License: GPLv2+
+Version: 5.1
+Release: 8%{?dist}
+Source: https://github.com/kscanne/gaelspell/releases/download/v%{version}/hunspell-ga-%{version}.zip
+URL: https://cadhan.com/gaelspell/
+License: GPL-2.0-or-later
 BuildArch: noarch
+BuildRequires: make
 BuildRequires: hunspell-devel
-Patch1: ispell-gaeilge-5.0-buildhunspell.patch
 
-Requires: hunspell
+Requires: hunspell-filesystem
 Supplements: (hunspell and langpacks-ga)
 
 %description
 Irish hunspell dictionaries.
 
 %prep
-%autosetup -n ispell-gaeilge-%{version}
+%autosetup -c
 
 %build
-make
-cat %{SOURCE1} %{SOURCE2} > header
-export LANG=C.UTF-8
-iconv -f utf-8 -t iso-8859-1 < gaeilge.aff > gaeilge.aff.iso-8859-1
-ispellaff2myspell gaeilge.aff.iso-8859-1 --myheader header | sed -e "s/\"\"/0/g" | sed -e "s/\"//g" > ga_IE.aff
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p ga_IE.dic ga_IE.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p ga_IE.dic ga_IE.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
 
 %files
-%doc README ChangeLog
-%license COPYING
-%{_datadir}/myspell/*
+%doc README_ga_IE.txt
+%{_datadir}/%{dict_dirname}/*
+
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 5.1-8
+- AzureLinux import from Fedora 41 .
+- License verified
+
+* Sun Aug 04 2024 Parag Nemade <pnemade AT redhat DOT com> - 5.1-7
+- Add conditional for RHEL for using hunspell directory
+- Add tmt CI tests
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 16 2022 Caolán McNamara <caolanm@redhat.com> - 5.1-1
+- latest release
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 5.0-11
+- Add conditional for new hunspell dir path and update to Requires:
+  hunspell-filesystem
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
