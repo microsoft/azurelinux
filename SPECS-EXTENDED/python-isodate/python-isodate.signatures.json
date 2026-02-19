@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "isodate-0.6.0.tar.gz": "2e364a3d5759479cdb2d37cce6b9376ea504db2ff90252a2e5b7cc89cc9ff2d8",
-  "python-isodate-LICENSE.txt": "1c4315a9e6fdd36b09e726d2d2fe6e89394cd39c1678ace9de8f1d5f4cf583c5"
- }
+  "Signatures": {
+    "python-isodate-LICENSE.txt": "1c4315a9e6fdd36b09e726d2d2fe6e89394cd39c1678ace9de8f1d5f4cf583c5",
+    "isodate-0.6.1.tar.gz": "48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"
+  }
 }
