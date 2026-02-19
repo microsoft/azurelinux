@@ -4,16 +4,17 @@ Distribution:   Azure Linux
 %global gtk3_version 3.20
 
 Name:           gspell
-Version:        1.8.4
-Release:        2%{?dist}
+Version:        1.14.0
+Release:        1%{?dist}
 Summary:        Spell-checking library for GTK+
 
-License:        LGPLv2+
-URL:            https://wiki.gnome.org/Projects/gspell
-Source0:        https://download.gnome.org/sources/%{name}/1.8/%{name}-%{version}.tar.xz
+License:        LGPLv2.1+
+URL:            https://gitlab.gnome.org/GNOME/gspell
+Source0:        https://gitlab.gnome.org/GNOME/gspell/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gettext
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  meson
 BuildRequires:  pkgconfig(enchant-2)
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gtk+-3.0) >= %{gtk3_version}
@@ -52,12 +53,12 @@ This package contains the full API documentation for %{name}.
 
 
 %build
-%configure --disable-static
-make %{?_smp_mflags}
+%meson
+%meson_build
 
 
 %install
-%make_install
+%meson_install
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
 %find_lang gspell-1
@@ -67,9 +68,9 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 
 
 %files -f gspell-1.lang
-%license COPYING
+%license LICENSES/*
 %{_libdir}/girepository-1.0/
-%{_libdir}/libgspell-1.so.2*
+%{_libdir}/libgspell-1.so.3*
 
 %files devel
 %{_bindir}/gspell-app1
@@ -78,12 +79,21 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{_libdir}/pkgconfig/gspell-1.pc
 %{_datadir}/gir-1.0/
 %{_datadir}/vala/
+%exclude %dir %{_datadir}/installed-tests/%{name}-1/
+%exclude %{_datadir}/installed-tests/%{name}-1/*
+%exclude %dir %{_libexecdir}/installed-tests/%{name}-1/
+%exclude %{_libexecdir}/installed-tests/%{name}-1/*
 
 %files doc
 %{_datadir}/gtk-doc/
 
 
 %changelog
+* Tue Oct 15 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.14.0-1
+- Upgrade to latest upstream
+- Change to meson build system
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.4-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

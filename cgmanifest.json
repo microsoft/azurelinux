@@ -5000,8 +5000,8 @@
         "type": "other",
         "other": {
           "name": "gspell",
-          "version": "1.8.4",
-          "downloadUrl": "https://download.gnome.org/sources/gspell/1.8/gspell-1.8.4.tar.xz"
+          "version": "1.14.0",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/gspell/-/archive/1.14.0/gspell-1.14.0.tar.gz"
         }
       }
     },
