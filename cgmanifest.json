@@ -14252,8 +14252,8 @@
         "type": "other",
         "other": {
           "name": "netcdf",
-          "version": "4.9.0",
-          "downloadUrl": "https://github.com/Unidata/netcdf-c/archive/v4.9.0/netcdf-4.9.0.tar.gz"
+          "version": "4.9.2",
+          "downloadUrl": "https://github.com/Unidata/netcdf-c/archive/v4.9.2/netcdf-4.9.2.tar.gz"
         }
       }
     },

@@ -1,0 +1,37 @@
+From d73830f682c243e25a5bcfb34ecaff4b66bda536 Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Fri, 16 Dec 2022 20:53:48 -0700
+Subject: [PATCH] Avoid soname versions for plugins
+
+---
+ plugins/Makefile.am | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 762da932d9..f2a034db66 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -4,22 +4,7 @@
+ # Put Together AM_CPPFLAGS and AM_LDFLAGS
+ include $(top_srcdir)/lib_flags.am
+ 
+-# This linker flag specifies libtool version info.
+-# See http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
+-# for information regarding incrementing `-version-info`.
+-plugin_version_info = -version-info 0:0:0
+-
+-AM_LDFLAGS += -module -shared -export-dynamic $(NOUNDEFINED)
+-
+-if ISMINGW
+-  AM_LDFLAGS += -avoid-version
+-else !ISMINGW
+-if ISCYGWIN
+-AM_LDFLAGS += -avoid-version
+-else !ISCYGWIN
+-AM_LDFLAGS += $(plugin_version_info)
+-endif !ISCYGWIN
+-endif !ISMINGW
++AM_LDFLAGS += -module -avoid-version -shared -export-dynamic $(NOUNDEFINED)
+ 
+ # Create an alternate directory if not installing or for noinst installs.
+ ALTPLUGINDIR = ${abs_top_builddir}/plugins/plugindir
