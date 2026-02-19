@@ -12601,8 +12601,8 @@
         "type": "other",
         "other": {
           "name": "lua-filesystem",
-          "version": "1.6.3",
-          "downloadUrl": "https://github.com/keplerproject/luafilesystem/archive/8014725009e195ffb502bcd65ca4e93b60a1b21c/luafilesystem-1.6.3.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/keplerproject/luafilesystem/archive/v1_8_0/luafilesystem-1.8.0.tar.gz"
         }
       }
     },
