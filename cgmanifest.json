@@ -3018,8 +3018,8 @@
         "type": "other",
         "other": {
           "name": "driverctl",
-          "version": "0.111",
-          "downloadUrl": "https://gitlab.com/driverctl/driverctl/repository/archive.tar.gz?ref=0.111"
+          "version": "0.115",
+          "downloadUrl": "https://gitlab.com/driverctl/driverctl/repository/archive.tar.gz?ref=0.115"
         }
       }
     },
