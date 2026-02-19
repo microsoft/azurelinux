@@ -1,0 +1,25 @@
+[components.apache-sshd]
+
+[[components.apache-sshd.overlays]]
+description = "Remove maven-remote-resources-plugin (Xpp3Dom classloading clash with plexus-xml/maven4)"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%pom_remove_plugin :maven-remote-resources-plugin"]
+
+[[components.apache-sshd.overlays]]
+description = "Add patch for maven.compiler.release POM property (xmvn javadoc fix)"
+type = "patch-add"
+file = "add-maven-compiler-release.patch"
+source = "add-maven-compiler-release.patch"
+
+[[components.apache-sshd.overlays]]
+description = "Use %autosetup to auto-apply all patches"
+type = "spec-search-replace"
+regex = '%setup -q'
+replacement = '%autosetup -p1'
+
+[[components.apache-sshd.overlays]]
+description = "Remove explicit %patch call now handled by %autosetup"
+type = "spec-search-replace"
+regex = '%patch -P0 -p1'
+replacement = ''

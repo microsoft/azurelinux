@@ -1,0 +1,21 @@
+From: Nan Liu <liunan@microsoft.com>
+Subject: Add maven.compiler.release property for xmvn javadoc compatibility
+
+POM defines <release> only in maven-compiler-plugin config, not as a
+Maven property. xmvn-mojo's JavadocMojo reads ${maven.compiler.release}
+(null) and falls back to ${maven.compiler.source} = 1.8, passing
+"--release 1.8" to javadoc, which JDK 21+ rejects.
+
+Adding <maven.compiler.release> as a POM property so xmvn-mojo can
+read it directly.
+
+--- a/pom.xml
++++ b/pom.xml
+@@ -103,6 +103,7 @@
+         <maven.compiler.target>${javac.target}</maven.compiler.target>
+         <ant.build.javac.target>${javac.target}</ant.build.javac.target>
+ 
++        <maven.compiler.release>${java.sdk.version}</maven.compiler.release>
+         <min.required.maven.version>3.5.0</min.required.maven.version>
+         <groovy.version>3.0.11</groovy.version>
+         <bouncycastle.version>1.76</bouncycastle.version>

@@ -316,7 +316,6 @@
 [components.apache-ivy]
 [components.apache-parent]
 [components.apache-resource-bundles]
-[components.apache-sshd]
 [components.apiguardian]
 [components.appstream]
 [components.apr-util]
