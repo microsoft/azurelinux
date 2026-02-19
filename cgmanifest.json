@@ -17513,8 +17513,8 @@
         "type": "other",
         "other": {
           "name": "perl-Event",
-          "version": "1.27",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETJ/Event-1.27.tar.gz"
+          "version": "1.28",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETJ/Event-1.28.tar.gz"
         }
       }
     },
