@@ -24143,8 +24143,8 @@
         "type": "other",
         "other": {
           "name": "python-productmd",
-          "version": "1.30",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/productmd/productmd-1.30.tar.gz"
+          "version": "1.41",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/productmd/productmd-1.41.tar.gz"
         }
       }
     },
