@@ -10,7 +10,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://aka.ms/azurelinux
+URL:            https://github.com/microsoft/azurelinux/
+SupportUrl:     https://github.com/microsoft/azurelinux/issues
 
 Source1:        90-default.preset
 Source2:        90-default-user.preset
@@ -57,8 +58,8 @@ VERSION_ID="%{version}"
 PRETTY_NAME="Microsoft %{distribution} %{version}"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
-BUG_REPORT_URL="%{url}"
-SUPPORT_URL="%{url}"
+BUG_REPORT_URL="%{SupportUrl}"
+SUPPORT_URL="%{SupportUrl}"
 EOF
 ln -sv ..%{_libdir}/os-release %{buildroot}%{_sysconfdir}/os-release
 
