@@ -20923,8 +20923,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Generator",
-          "version": "1.04",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BH/BHOLZMAN/XML-Generator-1.04.tar.gz"
+          "version": "1.13",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TIMLEGGE/XML-Generator-1.13.tar.gz"
         }
       }
     },
