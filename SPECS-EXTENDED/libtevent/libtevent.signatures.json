@@ -1,8 +1,7 @@
 {
  "Signatures": {
-  "libtevent-LICENSE.txt": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
-  "tevent-0.14.1.tar.asc": "4e6b80f531b75d3db3f1fe8da52d0bdbcf6cae76f901709bee8da9aabe2a3ef7",
-  "tevent-0.14.1.tar.gz": "ef85fcaa80ffd2351036ba4b347630fef2a1ac3da964a7f1820466bad03cd00d",
+  "tevent-0.16.1.tar.asc": "8eb98d2d9714304ce7f24ddb0a6aab9e2285248ac644b6c17567a161b38e6a53",
+  "tevent-0.16.1.tar.gz": "362971e0f32dc1905f6fe4736319c4b8348c22dc85aa6c3f690a28efe548029e",
   "tevent.keyring": "11197db7d14c377d77cc931c089246da99800ba4b2e87884449f60ceb5dfe4ea"
  }
 }

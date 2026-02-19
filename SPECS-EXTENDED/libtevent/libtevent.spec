@@ -1,34 +1,31 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global with_python3 1
-
-%global talloc_version 2.3.4
+%global talloc_version 2.4.2
 
 Name: libtevent
-Version: 0.14.1
-Release: 1%{?dist}
+Version: 0.16.1
+Release: 5%{?dist}
 Summary: The tevent library
-License: LGPLv3+
+License: LGPL-3.0-or-later
 URL: https://tevent.samba.org/
 Source0: https://samba.org/ftp/tevent/tevent-%{version}.tar.gz
 Source1: https://samba.org/ftp/tevent/tevent-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tevent.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
 Source2: tevent.keyring
-Source3: %{name}-LICENSE.txt
 
+# Patches
+
+BuildRequires: docbook-style-xsl
+BuildRequires: doxygen
 BuildRequires: gcc
+BuildRequires: gnupg2
 BuildRequires: libcmocka-devel >= 1.1.3
 BuildRequires: libtalloc-devel >= %{talloc_version}
-BuildRequires: doxygen
-BuildRequires: docbook-style-xsl
 BuildRequires: libxslt
-BuildRequires: gnupg2
-BuildRequires: which
-%if 0%{?with_python3}
+BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-talloc-devel >= %{talloc_version}
-%endif
 
 Provides: bundled(libreplace)
 Obsoletes: python2-tevent < 0.10.0-1
@@ -49,7 +46,6 @@ Requires: libtalloc-devel%{?_isa} >= %{talloc_version}
 Header files needed to develop programs that link against the Tevent library.
 
 
-%if 0%{?with_python3}
 %package -n python3-tevent
 Summary: Python 3 bindings for the Tevent library
 Requires: libtevent%{?_isa} = %{version}-%{release}
@@ -58,35 +54,32 @@ Requires: libtevent%{?_isa} = %{version}-%{release}
 
 %description -n python3-tevent
 Python 3 bindings for libtevent
-%endif
 
 %prep
+zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n tevent-%{version} -p1
-cp %{SOURCE3} ./LICENSE.txt
 
 %build
-zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %configure --disable-rpath \
            --bundled-libraries=NONE \
            --builtin-libraries=replace
 
-make %{?_smp_mflags} V=1
+%make_build
 
 doxygen doxy.config
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # Install API docs
 rm -f doc/man/man3/todo*
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}
-cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
+install -d -m0755 %{buildroot}%{_mandir}
+cp -a doc/man/man3 %{buildroot}%{_mandir}
 
 %files
-%license LICENSE.txt
 %{_libdir}/libtevent.so.*
 
 %files devel
@@ -95,26 +88,104 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/pkgconfig/tevent.pc
 %{_mandir}/man3/tevent*.gz
 
-%if 0%{?with_python3}
 %files -n python3-tevent
 %{python3_sitearch}/tevent.py
 %{python3_sitearch}/__pycache__/tevent.*
 %{python3_sitearch}/_tevent.cpython*.so
-%endif
 
 %ldconfig_scriptlets
 
 %changelog
-* Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 0.14.1-1
-- Update to 0.14.1 to build with Python 3.12
-
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.2-4
+* Thu Nov 21 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.16.1-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 0.10.2-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove distro condition check
-- Add which as BuildRequires
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.16.1-3
+- Rebuilt for Python 3.13
+
+* Wed Apr 24 2024 Pavel Filipenský <pfilipen@redhat.com> - 0.16.1-2
+- Cleanup spec file
+
+* Mon Jan 29 2024 Guenther Deschner <gdeschner@redhat.com> - 0.16.1-1
+- rhbz#2260956 - libtevent-0.16.1 is available
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Oct 27 2023 Andreas Schneider <asn@redhat.com> - 0.16.0-1
+- Update to version 0.16.0
+- resolves: rhbz#2244376
+
+* Mon Aug 07 2023 Guenther Deschner <gdeschner@redhat.com> - 0.15.0-1
+- rhbz#2224332 - libtevent-0.15.0 is available
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.14.1-2
+- Rebuilt for Python 3.12
+
+* Thu Feb 23 2023 Pavel Filipenský <pfilipen@redhat.com> -0.14.1-1
+- SPDX migration
+
+* Thu Feb 16 2023 Guenther Deschner <gdeschner@redhat.com> - 0.14.1-1
+- rhbz#2166867 - libtevent-0.14.1 is available
+
+* Fri Jan 20 2023 Andreas Schneider <asn@redhat.com> - 0.14.0-1
+- Update to version 0.14.0
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Aug 08 2022 Guenther Deschner <gdeschner@redhat.com> - 0.13.0-1
+- rhbz#2114634 - libtevent-0.13.0 is available
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.12.1-2
+- Rebuilt for Python 3.11
+
+* Fri Jun 10 2022 Andreas Schneider <asn@redhat.com> - 0.12.1-1
+- Update to version 0.12.1
+- resolves: rhbz#2095120
+
+* Mon May 02 2022 Pavel Filipenský <pfilipen@redhat.com> - 0.12.0-0
+- Update to version 0.12.0
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.0-1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jul 09 2021 Andreas Schneider <asn@redhat.com> - 0.11.0-0
+- Update to version 0.11.0
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.10.2-8
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Oct 22 2020 Andreas Schneider <asn@redhat.com> - 0.10.2-6
+- Spec file cleanup and improvements
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 0.10.2-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.10.2-3
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
