@@ -1,8 +1,8 @@
 Name:           perl-File-BOM
-Version:        0.16
-Release:        5%{?dist}
+Version:        0.18
+Release:        15%{?dist}
 Summary:        Utilities for handling Byte Order Marks
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-BOM
@@ -26,6 +26,8 @@ BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(Readonly) >= 0.06
 BuildRequires:  perl(Symbol)
 # Tests only
+# Required to process t/testrules.yml
+BuildRequires:  perl(CPAN::Meta::YAML)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(POSIX)
@@ -33,7 +35,6 @@ BuildRequires:  perl(Test::Exception) >= 0.20
 BuildRequires:  perl(Test::More) >= 0.10
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(utf8)
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Encode) >= 1.99
 Requires:       perl(Readonly) >= 0.06
 
@@ -46,8 +47,6 @@ are to be found at the beginning of some files and streams.
 
 %prep
 %setup -q -n File-BOM-%{version}
-# Normalize EOLs
-sed -i -e 's/\r//' README
 
 %build
 perl Build.PL installdirs=vendor
@@ -66,8 +65,51 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 12 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.18-15
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.18-8
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.18-5
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.18-2
+- Perl 5.32 rebuild
+
+* Mon May 04 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.18-1
+- 0.18 bump
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -189,3 +231,4 @@ Rebuild for new perl
 
 * Sat Jun 18 2005 Michael A. Peters <mpeters@mac.com> 0.09-1
 - initial Fedora Extras CVS Checkin
+

@@ -17643,8 +17643,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-BOM",
-          "version": "0.16",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MATTLAW/File-BOM-0.16.tar.gz"
+          "version": "0.18",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MATTLAW/File-BOM-0.18.tar.gz"
         }
       }
     },
