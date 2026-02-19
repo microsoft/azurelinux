@@ -4,14 +4,14 @@
 %global soversion_gobject 0
 
 Name: liblangtag
-Version: 0.6.3
-Release: 3%{?dist}
+Version: 0.6.7
+Release: 1%{?dist}
 Summary: An interface library to access tags for identifying languages
 
 License: LGPLv3+ or MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://tagoh.bitbucket.org/liblangtag/
+URL: https://bitbucket.org/tagoh/liblangtag
 Source0: https://bitbucket.org/tagoh/%{name}/downloads/%{name}-%{version}.tar.bz2
 
 Requires: %{name}-data = %{version}-%{release}
@@ -127,6 +127,10 @@ make %{?_smp_mflags} check
 %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Tue Nov 19 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.6.7-1
+- Update to 0.6.7
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
