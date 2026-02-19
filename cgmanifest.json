@@ -13572,8 +13572,8 @@
         "type": "other",
         "other": {
           "name": "mod_auth_mellon",
-          "version": "0.16.0",
-          "downloadUrl": "https://github.com/latchset/mod_auth_mellon/releases/download/v0_16_0/mod_auth_mellon-0.16.0.tar.gz"
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/latchset/mod_auth_mellon/releases/download/v0_16_0/mod_auth_mellon-0.19.0.tar.gz"
         }
       }
     },
