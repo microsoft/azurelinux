@@ -21293,8 +21293,8 @@
         "type": "other",
         "other": {
           "name": "pinfo",
-          "version": "0.6.10",
-          "downloadUrl": "https://github.com/baszoetekouw/pinfo/archive/refs/tags/pinfo-0.6.10.tar.bz2"
+          "version": "0.6.13",
+          "downloadUrl": "https://github.com/baszoetekouw/pinfo/archive/refs/tags/v0.6.13.tar.gz"
         }
       }
     },

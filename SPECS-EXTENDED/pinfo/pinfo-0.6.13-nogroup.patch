@@ -1,0 +1,22 @@
+--- pinfo-0.6.9/src/utils.c.nogroup	2006-03-16 15:14:30.000000000 +0100
++++ pinfo-0.6.9/src/utils.c	2007-01-19 13:45:53.000000000 +0100
+@@ -32,7 +32,7 @@
+ #endif
+ 
+ char *safe_user = "nobody";
+-char *safe_group = "nogroup";
++char *safe_group = "nobody";
+ 
+ #ifndef HAVE_DECL_CURS_SET
+ void
+--- pinfo-0.6.9/src/pinforc.in.nogroup	2007-01-19 13:42:14.000000000 +0100
++++ pinfo-0.6.9/src/pinforc.in	2007-01-19 13:45:35.000000000 +0100
+@@ -91,7 +91,7 @@
+ PRINTUTILITY=lpr
+ MANLINKS=1:8:2:3:4:5:6:7:9:n:p:o:3X11:3Xt:3x:3X
+ SAFE-USER=nobody
+-SAFE-GROUP=nogroup
++SAFE-GROUP=nobody
+ #
+ # Remember, HIGHLIGHTREGEXP may be slow (thus it's commented by default)
+ #

@@ -1,0 +1,22 @@
+From 16dba5978146b6d3a540ac7c8f415eda49280847 Mon Sep 17 00:00:00 2001
+From: Bas Zoetekouw <bas.zoetekouw@surfnet.nl>
+Date: Thu, 23 Jul 2020 20:11:24 +0200
+Subject: [PATCH] fix use of global variabel
+
+---
+ src/parse_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/parse_config.h b/src/parse_config.h
+index 2dffa4f..4e68bb4 100644
+--- a/src/parse_config.h
++++ b/src/parse_config.h
+@@ -85,7 +85,7 @@ typedef struct colours
+ colours;
+ #endif /* HAVE_CURSES_COLOR */
+ 
+-int use_manual;
++extern int use_manual;
+ 
+ int parse_config (void);
+ int parse_line (char *line);

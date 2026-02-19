@@ -1,24 +1,30 @@
+Name:    pinfo
+Version: 0.6.13
+Release: 8%{?dist}
 Summary: An info file viewer
-Name: pinfo
-Version: 0.6.10
-Release: 26%{?dist}
-License: GPLv2
+License: GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: https://github.com/baszoetekouw/pinfo
-# Source: https://github.com/baszoetekouw/pinfo/archive/refs/tags/v0.6.10.tar.gz
-Source: https://github.com/baszoetekouw/pinfo/archive/refs/tags/pinfo-0.6.10.tar.bz2
-Patch1: pinfo-0.6.9-xdg.patch
-Patch2: pinfo-0.6.9-infosuff.patch
-Patch3: pinfo-0.6.9-nogroup.patch
-Patch4: pinfo-0.6.9-mansection.patch
-Patch5: pinfo-0.6.9-infopath.patch
-Patch6: pinfo-0.6.10-man.patch
-Patch7: pinfo-0.6.9-as-needed.patch
-Patch8: pinfo-0.6.10-gcc10.patch
+URL:    https://github.com/baszoetekouw/pinfo
+Source: %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+Patch1: pinfo-0.6.9-infopath.patch
+Patch2: pinfo-0.6.9-xdg.patch
+Patch3: pinfo-0.6.10-man.patch
+Patch4: pinfo-0.6.13-fnocommon.patch
+Patch5: pinfo-0.6.13-gccwarn.patch
+Patch6: pinfo-0.6.13-nogroup.patch
+Patch7: pinfo-0.6.13-stringop-overflow.patch
+Patch8: pinfo-configure-c99.patch
+
+BuildRequires: automake
+BuildRequires: gcc
+BuildRequires: gettext-devel
+BuildRequires: libtool
+BuildRequires: make
 BuildRequires: ncurses-devel
-BuildRequires: automake gettext-devel libtool texinfo
+BuildRequires: texinfo
+
 Requires: xdg-utils
 
 %description
@@ -36,9 +42,6 @@ using regular expressions, and is based on the ncurses library.
 
 %install
 %make_install
-# These symbolic links conflict with actual binaries in perl-pmtools (bz 437612)
-# ln -sf pinfo $RPM_BUILD_ROOT%{_bindir}/pman
-# ln -sf pinfo.1 $RPM_BUILD_ROOT%{_mandir}/man1/pman.1
 
 # This file should not be packaged
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
@@ -46,17 +49,57 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %find_lang %{name}
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING ChangeLog* NEWS README TECHSTUFF
+%license COPYING
+%doc AUTHORS NEWS README.md TECHSTUFF
 %config(noreplace) %{_sysconfdir}/pinforc
 %{_bindir}/pinfo
-# %{_bindir}/pman
 %{_infodir}/pinfo.info*
 %{_mandir}/man1/pinfo.1*
-# %{_mandir}/man1/pman.1*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.10-26
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.6.13-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.13-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.13-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.13-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.13-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 27 2023 Florian Weimer <fweimer@redhat.com> - 0.6.13-3
+- Port configure script to C99
+
+* Tue Mar 14 2023 Lukáš Zaoral <lzaoral@redhat.com> - 0.6.13-2
+- migrated to SPDX license
+- cleaned-up the specfile
+
+* Thu Jan 26 2023 Lukáš Zaoral <lzaoral@redhat.com> - 0.6.13-1
+- Update to v0.6.13
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.10-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Feb 24 2020 Than Ngo <than@redhat.com> - 0.6.10-25
 - Fixed FTBFS
