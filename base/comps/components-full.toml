@@ -799,7 +799,6 @@
 [components.git]
 [components.gjs]
 [components.gl2ps]
-[components.glade]
 [components.glew]
 [components.glib-networking]
 [components.'glibmm2.4']
