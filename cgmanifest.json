@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "botan2",
-          "version": "2.14.0",
-          "downloadUrl": "https://botan.randombit.net/releases/Botan-2.14.0.tar.xz"
+          "version": "2.19.5",
+          "downloadUrl": "https://botan.randombit.net/releases/Botan-2.19.5.tar.xz"
         }
       }
     },

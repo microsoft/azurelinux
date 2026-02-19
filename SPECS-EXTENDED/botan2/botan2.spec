@@ -3,22 +3,23 @@ Distribution:   Azure Linux
 %global major_version 2
 
 Name:           botan2
-Version:        2.14.0
-Release:        2%{?dist}
+Version:        2.19.5
+Release:        1%{?dist}
 Summary:        Crypto and TLS for C++11
 
-License:        BSD
+License:        BSD-2-Clause
 URL:            https://botan.randombit.net/
 Source0:        https://botan.randombit.net/releases/Botan-%{version}.tar.xz
 
 BuildRequires:  gcc-c++
 BuildRequires:  python3
 BuildRequires:  python3-devel
-BuildRequires:  %{_bindir}/sphinx-build
-BuildRequires:  %{_bindir}/rst2man
+BuildRequires:  python3-docutils
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-sphinx
 BuildRequires:  bzip2-devel
 BuildRequires:  zlib-devel
-BuildRequires:  openssl-devel
+BuildRequires:  make
 
 %description
 Botan is a BSD-licensed crypto library written in C++. It provides a
@@ -51,6 +52,8 @@ This package contains HTML documentation for %{name}.
 
 %package -n python3-%{name}
 Summary:        Python3 bindings for %{name}
+BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
 
 %description -n python3-%{name}
@@ -60,14 +63,14 @@ This package contains the Python3 binding for %{name}.
 
 
 %prep
-%autosetup -n Botan-%{version}
+%autosetup -n Botan-%{version} -p1
 
 
 %build
 export CXXFLAGS="${CXXFLAGS:-%{optflags}}"
 
 # we have the necessary prerequisites, so enable optional modules
-%global enable_modules bzip2,zlib,openssl
+%global enable_modules bzip2,zlib
 
 %{__python3} ./configure.py \
         --prefix=%{_prefix} \
@@ -91,6 +94,10 @@ export CXXFLAGS="${CXXFLAGS:-%{optflags}}"
 make install PYTHON_EXE=%{__python3} DESTDIR=%{buildroot}
 
 sed -e '1{/^#!/d}' -i %{buildroot}%{python3_sitearch}/botan2.py
+%if "%{python3_sitelib}" != "%{python3_sitearch}"
+mkdir -p %{buildroot}%{python3_sitelib}
+mv %{buildroot}%{python3_sitearch}/botan2.py %{buildroot}%{python3_sitelib}/botan2.py
+%endif
 
 # doc installation fixups
 mv %{buildroot}%{_docdir}/botan-%{version} %{buildroot}%{_pkgdocdir}
@@ -104,9 +111,9 @@ rm -r %{buildroot}%{_pkgdocdir}/handbook/{.doctrees,.buildinfo}
 %license license.txt
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/*.txt
-%{_libdir}/libbotan-%{major_version}.so.13*
+%{_libdir}/libbotan-%{major_version}.so.19*
 %{_bindir}/botan
-%{_mandir}/man1/botan.1.gz
+%{_mandir}/man1/botan.1*
 
 
 %files devel
@@ -124,8 +131,7 @@ rm -r %{buildroot}%{_pkgdocdir}/handbook/{.doctrees,.buildinfo}
 
 %files -n python3-%{name}
 %license license.txt
-%{python3_sitearch}/%{name}.py
-%{python3_sitearch}/__pycache__/*
+%pycached %{python3_sitelib}/%{name}.py
 
 
 %check
@@ -133,6 +139,10 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./botan-test
 
 
 %changelog
+* wed nov 5 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.19.5-1
+- Upgrade to version 2.19.5
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.14.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
