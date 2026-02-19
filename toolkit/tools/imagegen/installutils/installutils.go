@@ -55,6 +55,9 @@ const (
 	// CmdlineSELinuxEnforcingArg is the arg required for forcing SELinux to be in enforcing mode.
 	CmdlineSELinuxEnforcingArg = "enforcing=1"
 
+	// CmdlineSELinuxPermissiveArg is the arg for SELinux to be in force-permissive mode.
+	CmdlineSELinuxPermissiveArg = "enforcing=0"
+
 	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
 	CmdlineSELinuxSettings = CmdlineSELinuxSecurityArg + " " + CmdlineSELinuxEnabledArg
 

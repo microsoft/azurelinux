@@ -14,12 +14,8 @@ import (
 
 var grubArgs = []string{
 	"rd.overlayfs",
-	"roothash",
 	"root",
-	"rd.systemd.verity",
-	"systemd.verity_root_data",
-	"systemd.verity_root_hash",
-	"systemd.verity_root_options",
+	"roothash",
 	"selinux",
 	"enforcing",
 }
@@ -92,6 +88,5 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]stri
 			}
 		}
 	}
-
 	return values, rootDevice, nil
 }
