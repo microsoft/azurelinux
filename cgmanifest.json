@@ -18383,8 +18383,8 @@
         "type": "other",
         "other": {
           "name": "perl-libnet",
-          "version": "3.11",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perl-libnet_repackaged-3.11.tar.gz"
+          "version": "3.15",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHAY/libnet-3.15.tar.gz"
         }
       }
     },
