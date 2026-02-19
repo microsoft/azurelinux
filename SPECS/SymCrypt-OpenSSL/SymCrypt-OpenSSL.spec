@@ -1,7 +1,7 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
 Version:        1.9.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ BuildRequires:  make
 
 Requires:       SymCrypt >= 103.8.0
 Requires:       openssl
+
+Conflicts: openssl-fips-provider
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
@@ -79,14 +81,17 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 # These permissions are a result of a security review to mitigate potential risks:
 # - Group and others are denied read access to prevent user-level code from inferring
 #   details about other running applications and their certsinuse usage.
-# - All users have write and execute permissions to create new log files and to 
-#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+# - All users have write and execute permissions to create new log files and to
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or
 #   replaced by a symlink).
 # - The sticky bit is set to prevent malicious users from deleting the log files
 #   and interfering with certsinuse alerting mechanisms.
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
+* Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.4-2
+- Add conflicts with openssl-fips-provider
+
 * Tue Oct 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
 - Auto-upgrade to 1.9.4 - bug fixes
 

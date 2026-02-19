@@ -1076,6 +1076,7 @@
                 "opensm",
                 "opensp",
                 "openssl",
+                "openssl-fips-provider",
                 "openssl-ibmpkcs11",
                 "openssl-pkcs11",
                 "openwsman",
