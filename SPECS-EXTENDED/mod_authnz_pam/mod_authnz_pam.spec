@@ -9,11 +9,11 @@ Distribution:   Azure Linux
 
 Summary: PAM authorization checker and PAM Basic Authentication provider
 Name: mod_authnz_pam
-Version: 1.2.1
-Release: 2%{?dist}
+Version: 1.2.3
+Release: 9%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_authnz_pam/
-Source0: http://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_authnz_pam/
+Source0: https://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pam-devel
@@ -57,7 +57,8 @@ install -Dp -m 0644 authnz_pam.module $RPM_BUILD_ROOT%{_httpd_modconfdir}/55-aut
 install -Dp -m 0644 authnz_pam.confx $RPM_BUILD_ROOT%{_httpd_confdir}/authnz_pam.conf
 
 %files
-%doc README LICENSE
+%license LICENSE
+%doc README
 %if "%{_httpd_modconfdir}" != "%{_httpd_confdir}"
 %config(noreplace) %{_httpd_modconfdir}/55-authnz_pam.conf
 %endif
@@ -65,8 +66,45 @@ install -Dp -m 0644 authnz_pam.confx $RPM_BUILD_ROOT%{_httpd_confdir}/authnz_pam
 %{_httpd_moddir}/*.so
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 31 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.3-9
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jan 31 2022 Jan Pazdziora <jpazdziora@redhat.com> - 1.2.3-1
+- 2048511 - rebase to upstream version 1.2.3.
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 30 2021 Jan Pazdziora <jpazdziora@redhat.com> - 1.2.2-1
+- 1944553 - rebase to upstream version 1.2.2.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jul 15 2020 Jan Pazdziora <jpazdziora@redhat.com> - 1.2.1-1
 - 1855338 - rebase to upstream version 1.2.1.

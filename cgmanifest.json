@@ -13592,8 +13592,8 @@
         "type": "other",
         "other": {
           "name": "mod_authnz_pam",
-          "version": "1.2.1",
-          "downloadUrl": "http://www.adelton.com/apache/mod_authnz_pam/mod_authnz_pam-1.2.1.tar.gz"
+          "version": "1.2.3",
+          "downloadUrl": "https://www.adelton.com/apache/mod_authnz_pam/mod_authnz_pam-1.2.3.tar.gz"
         }
       }
     },
