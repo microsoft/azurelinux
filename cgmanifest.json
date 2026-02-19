@@ -23743,8 +23743,8 @@
         "type": "other",
         "other": {
           "name": "python-msal",
-          "version": "1.18.0~b1",
-          "downloadUrl": "https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/1.18.0b1/microsoft-authentication-library-for-python-1.18.0b1.tar.gz"
+          "version": "1.31.1",
+          "downloadUrl": "https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/1.31.1/microsoft-authentication-library-for-python-1.31.1.tar.gz"
         }
       }
     },
