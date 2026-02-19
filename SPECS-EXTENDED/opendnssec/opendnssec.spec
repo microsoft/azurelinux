@@ -5,11 +5,11 @@ Distribution:   Azure Linux
 
 Summary: DNSSEC key and zone management software
 Name: opendnssec
-Version: 2.1.7
-Release: 5%{?dist}
+Version: 2.1.14
+Release: 1%{?dist}
 License: BSD
-Url: http://www.opendnssec.org/
-Source0: http://www.opendnssec.org/files/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz
+Url: https://www.opendnssec.org/
+Source0: https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
 Source1: ods-enforcerd.service
 Source2: ods-signerd.service
 Source3: ods.sysconfig
@@ -179,6 +179,10 @@ ods-enforcer update all >/dev/null 2>/dev/null ||:
 %systemd_postun_with_restart ods-signerd.service
 
 %changelog
+* Fri Feb 21 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.1.14-1
+- Update to 2.1.14
+- License verified
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-5
 - Updating naming for 3.0 version of Azure Linux.
 - License verified.
