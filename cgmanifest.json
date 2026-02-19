@@ -19613,8 +19613,8 @@
         "type": "other",
         "other": {
           "name": "perl-PPIx-Regexp",
-          "version": "0.069",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/W/WY/WYANT/PPIx-Regexp-0.069.tar.gz"
+          "version": "0.088",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/W/WY/WYANT/PPIx-Regexp-0.088.tar.gz"
         }
       }
     },
