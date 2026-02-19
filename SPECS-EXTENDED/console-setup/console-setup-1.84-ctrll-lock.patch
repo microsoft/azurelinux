@@ -1,7 +1,7 @@
-diff -up console-setup-1.185/Keyboard/ckbcomp.orig console-setup-1.185/Keyboard/ckbcomp
---- console-setup-1.185/Keyboard/ckbcomp.orig	2018-08-27 10:45:20.753504386 +0200
-+++ console-setup-1.185/Keyboard/ckbcomp	2018-08-27 10:45:20.758504393 +0200
-@@ -196,10 +196,6 @@ my %acmtable; # Unicode -> legacy code (
+diff -up console-setup/Keyboard/ckbcomp.orig console-setup/Keyboard/ckbcomp
+--- console-setup/Keyboard/ckbcomp.orig	2023-01-05 09:43:41.059205282 +0100
++++ console-setup/Keyboard/ckbcomp	2023-01-05 09:44:49.789082563 +0100
+@@ -204,10 +204,6 @@ my %acmtable; # Unicode -> legacy code (
  
  my $KEYMAP = ''; # This variable contains the generated keymap
  
@@ -12,17 +12,17 @@ diff -up console-setup-1.185/Keyboard/ckbcomp.orig console-setup-1.185/Keyboard/
  my %keycodes_table; # x keysym -> x key code
  my %aliases;        # x keysym -> x keysym
  
-@@ -4378,9 +4374,6 @@ sub print_vector {
+@@ -4400,9 +4396,6 @@ sub print_vector {
  		my $u = ord (uc (pack ("U", $v)));
  		my $c = ($v == $l ? $u : $l);
  		$capsvector[$mask] = $1 ."U+". sprintf ("%04x", $c);
--		if ($v != $c && $v gt 0x7f) {
+-		if ($v != $c && $v > 0x7f) {
 -		    $broken_caps = 1;
 -		}
  	    }
  	}
  	if ($no_NoSymbol) {
-@@ -4778,10 +4771,6 @@ keycode 127 =
+@@ -4800,10 +4793,6 @@ keycode 127 =
      die "$0: Unsupported keyboard type $arch\n";
  }
  
@@ -32,4 +32,4 @@ diff -up console-setup-1.185/Keyboard/ckbcomp.orig console-setup-1.185/Keyboard/
 -
  print $KEYMAP;
  
- if ($freebsd) {
+ if (!$compose_charmap && $charmap) {
