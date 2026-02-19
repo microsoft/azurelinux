@@ -1,19 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global modname flask
-%global srcname Flask
-
+%global srcname flask
 Name:           python-%{modname}
-Version:        1.1.1
-Release:        4%{?dist}
+Version:        3.1.0
+Release:        1%{?dist}
+Epoch:          1
 Summary:        A micro-framework for Python based on Werkzeug, Jinja 2 and good intentions
+License:        BSD-3-Clause
+URL:            https://flask.palletsprojects.com/en/stable/
 
-License:        BSD
-URL:            http://flask.pocoo.org/
-Source0:        %{pypi_source}
 
+Source0:        https://files.pythonhosted.org/packages/89/50/dff6380f1c7f84135484e176e0cac8690af72fa90e932ad2a0a60e28c69b/flask-3.1.0.tar.gz
 BuildArch:      noarch
-
+ 
 %global _description \
 Flask is called a “micro-framework” because the idea to keep the core\
 simple but extensible. There is no database abstraction layer, no form\
@@ -23,67 +23,71 @@ that can add this functionality into your application as if it was\
 implemented in Flask itself. There are currently extensions for object\
 relational mappers, form validation, upload handling, various open\
 authentication technologies and more.
-
 %description %{_description}
-
-%package -n python%{python3_pkgversion}-%{modname}
+%package -n python3-%{modname}
 Summary:        %{summary}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-jinja2
-BuildRequires:  python%{python3_pkgversion}-werkzeug
-BuildRequires:  python%{python3_pkgversion}-itsdangerous
-BuildRequires:  python%{python3_pkgversion}-click
-Requires:       python%{python3_pkgversion}-jinja2
-Requires:       python%{python3_pkgversion}-werkzeug >= 0.15
-Requires:       python%{python3_pkgversion}-itsdangerous
-Requires:       python%{python3_pkgversion}-click
-Obsoletes:      python2-%{modname} < 1:1.0.2-9
-
-%description -n python%{python3_pkgversion}-%{modname} %{_description}
-
+BuildRequires:      make
+BuildRequires:      python3-devel
+BuildRequires:      python3-pip
+BuildRequires:      python3-wheel
+BuildRequires:      python3-flit-core
+BuildRequires:      python3-pytest
+BuildRequires:      python3-werkzeug
+BuildRequires:      python3-markupsafe
+BuildRequires:      python3-click
+BuildRequires:      python3-blinker
+BuildRequires:      python3-jinja2
+BuildRequires:      python3-itsdangerous
+%description -n python3-%{modname} %{_description}
 Python 3 version.
-
+%if %{with doc}
 %package doc
 Summary:        Documentation for %{name}
-Obsoletes:      python%{python3_pkgversion}-%{modname}-doc < 1:0.11.1-3
-
 %description doc
 Documentation and examples for %{name}.
-
+%endif
+%pyproject_extras_subpkg -n python3-%{modname} async
+%generate_buildrequires
+# -t picks test.txt by default which contains too tight pins
+%pyproject_buildrequires -x async requirements/tests.in %{?with_doc:requirements/docs.in}
 %prep
 %autosetup -n %{srcname}-%{version}
 rm -rf examples/flaskr/
 rm -rf examples/minitwit/
-
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{modname}
 mv %{buildroot}%{_bindir}/%{modname}{,-%{python3_version}}
 ln -s %{modname}-%{python3_version} %{buildroot}%{_bindir}/%{modname}-3
 ln -sf %{modname}-3 %{buildroot}%{_bindir}/%{modname}
-
+%if %{with doc}
+pushd docs
+# PYTHONPATH to prevent "'Flask' must be installed to build the documentation."
+make PYTHONPATH=%{buildroot}/%{python3_sitelib} SPHINXBUILD=sphinx-build-3 html
+rm -v _build/html/.buildinfo
+popd
+%endif
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-3 -v -k "not test_send_from_directory_bad_request"
-
-%files -n python%{python3_pkgversion}-%{modname}
-%license LICENSE.rst
-%doc CHANGES.rst README.rst
+%pytest -Wdefault
+%files -n python3-%{modname} -f %{pyproject_files}
+%license LICENSE.txt
+%doc CHANGES.rst README.md
 %{_bindir}/%{modname}
 %{_bindir}/%{modname}-3
 %{_bindir}/%{modname}-%{python3_version}
-%{python3_sitelib}/%{srcname}-*.egg-info/
-%{python3_sitelib}/%{modname}/
-
+%if %{with doc}
 %files doc
-%license LICENSE.rst
-%doc examples
+%license LICENSE.txt
+%doc docs/_build/html examples
+%endif
 
 %changelog
+* Tue Apr 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.1.0-1
+- Update to version 3.1.0
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.1.1-4
 - Remove epoch
 
