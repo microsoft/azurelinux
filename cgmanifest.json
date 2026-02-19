@@ -25883,8 +25883,8 @@
         "type": "other",
         "other": {
           "name": "qr-code-generator",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/nayuki/QR-Code-generator/archive/67c62461d380352500fc39557fd9f046b7fe1d18/qr-code-generator-67c6246.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/nayuki/QR-Code-generator/archive/refs/tags/v1.8.0.tar.gz"
         }
       }
     },
