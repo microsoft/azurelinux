@@ -1,19 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:          gupnp-av
-Version:       0.12.11
-Release:       4%{?dist}
+Version:       0.14.1
+Release:       1%{?dist}
 Summary:       A collection of helpers for building UPnP AV applications
 
-License:       LGPLv2+
-URL:           http://www.gupnp.org/
-Source0:       http://download.gnome.org/sources/gupnp-av/0.12/%{name}-%{version}.tar.xz
+License:       LGPLv2.1+
+URL:           https://www.gupnp.org/
+Source0:       https://download.gnome.org/sources/gupnp-av/0.14/%{name}-%{version}.tar.xz
+Patch0:        fix-xmlRecoverMemory-deprecation.patch
 
 BuildRequires: glib2-devel
 BuildRequires: gtk-doc
 BuildRequires: gobject-introspection-devel >= 1.36.0
 BuildRequires: libxml2-devel
 BuildRequires: libsoup-devel
+BuildRequires: meson
 BuildRequires: vala
 
 %description
@@ -40,27 +42,28 @@ BuildArch: noarch
 This package contains developer documentation for %{name}.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%configure --disable-static
-make %{?_smp_mflags} V=1
+%meson -Dgtk_doc=true
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 #Remove libtool archives.
 find %{buildroot} -name '*.la' -delete
 
 %check
-make check %{?_smp_mflags} V=1
+%meson_test
+#make check %{?_smp_mflags} V=1
 
 %ldconfig_scriptlets
 
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc AUTHORS README
+%doc AUTHORS README.md
 %{_libdir}/libgupnp-av-1.0.so.*
 %{_libdir}/girepository-1.0/GUPnPAV-1.0.typelib
 %{_datadir}/%{name}
@@ -76,6 +79,10 @@ make check %{?_smp_mflags} V=1
 %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Thu Oct 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.14.1-1
+- Update to 0.14.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.11-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
