@@ -1,22 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           webrtc-audio-processing
-Version:        0.3.1
-Release:        5%{?dist}
+Version:        1.3
+Release:        4%{?dist}
 Summary:        Library for echo cancellation
 
-License:        BSD and MIT
+License:        BSD-3-Clause
 URL:            http://www.freedesktop.org/software/pulseaudio/webrtc-audio-processing/
 Source0:        http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/%{name}-%{version}.tar.xz
 
-## upstream patches
+Patch0:         arches.patch
+Patch1:         65f002e.patch
 
-Patch100:         webrtc-fix-typedefs-on-other-arches.patch
-# bz#1336466, https://bugs.freedesktop.org/show_bug.cgi?id=95738
-Patch104:         webrtc-audio-processing-0.2-big-endian.patch
-
-BuildRequires: autoconf automake libtool
+BuildRequires: meson
 BuildRequires: gcc gcc-c++
+BuildRequires: abseil-cpp-devel
+#BuildRequires: neon-devel
 
 %description
 %{name} is a library derived from Google WebRTC project that 
@@ -35,24 +34,15 @@ files for developing applications that use %{name}.
 %autosetup -p1
 
 %build
-# for patch1
-autoreconf -vif
-
-%configure \
-%ifarch %{arm} aarch64
-  --enable-neon=no \
-%endif
-  --disable-silent-rules \
-  --disable-static
-
-%make_build
+%meson
+%meson_build \
+#%%ifarch %%{arm} aarch64
+#  -Dneon=no \
+#%endif
 
 
 %install
-%make_install
-
-# remove libtool archives
-find %{buildroot} -type f -name "*.la" -delete
+%meson_install
 
 
 %ldconfig_scriptlets
@@ -60,17 +50,54 @@ find %{buildroot} -type f -name "*.la" -delete
 %files
 %doc NEWS AUTHORS README.md
 %license COPYING
-%{_libdir}/libwebrtc_audio_processing.so.1*
+%{_libdir}/libwebrtc-audio-coding-1.so.3*
+%{_libdir}/libwebrtc-audio-processing-1.so.3*
 
 %files devel
-%{_libdir}/libwebrtc_audio_processing.so
-%{_libdir}/pkgconfig/webrtc-audio-processing.pc
-%{_includedir}/webrtc_audio_processing/
+%{_libdir}/libwebrtc-audio-coding-1.so
+%{_libdir}/libwebrtc-audio-processing-1.so
+%{_libdir}/pkgconfig/webrtc-audio-coding-1.pc
+%{_libdir}/pkgconfig/webrtc-audio-processing-1.pc
+%{_includedir}/webrtc-audio-processing-1/
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.3-4
+- AzureLinux import from Fedora 41 .
+- License verified
+
+* Sun Aug 25 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 1.3-3
+- Rebuilt for abseil-cpp-20240722.0
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Feb 09 2024 Gwyn Ciesla <gwync@protonmail.com> - 1.3-1
+- 1.3
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
