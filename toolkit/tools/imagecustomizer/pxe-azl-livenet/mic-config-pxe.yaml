@@ -1,0 +1,26 @@
+os:
+  packages:
+    install:
+    - squashfs-tools
+    - tar
+    - device-mapper
+    - curl
+  additionalFiles:
+    artifacts/90azl-livenet/liveos-artifacts-download.service:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.service
+        permissions: "644"
+    artifacts/90azl-livenet/liveos-artifacts-download.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.sh
+        permissions: "755"
+    artifacts/90azl-livenet/schedule-liveos-artifacts-download.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/schedule-liveos-artifacts-download.sh
+        permissions: "755"
+    artifacts/90azl-livenet/azl-livenet-genrules.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/azl-livenet-genrules.sh
+        permissions: "755"
+    artifacts/90azl-livenet/module-setup.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/module-setup.sh
+        permissions: "755"
+    artifacts/liveos-dracut-pxe.conf:
+      - path: /etc/dracut.conf.d/10-liveos-dracut-pxe.conf
+        permissions: "644"
