@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "test-unit-ruby-core-1.0.6-additional.tar.gz": "d06193be2aded064cc131c3885ee0eae56eef28cdc22b8d06748b3508b4dfa98",
+  "test-unit-ruby-core-1.0.6.gem": "0408898eced6ece9f858542000c985cbda8c5204f3f430b28d8ae237626560ae",
+  "test-unit-ruby-core-create-missing-files.sh": "eebafbfd07aad12fd3afc416641492be9ee82ff99051b96cdcb2150f93d38397"
+ }
+}

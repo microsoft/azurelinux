@@ -27403,6 +27403,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-test-unit-ruby-core",
+          "version": "1.0.6",
+          "downloadUrl": "https://rubygems.org/gems/test-unit-ruby-core-1.0.6.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-thor",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/rails/thor/archive/refs/tags/v1.2.1.tar.gz"
