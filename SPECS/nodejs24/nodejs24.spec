@@ -16,7 +16,7 @@ Name:           nodejs24
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        24.13.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,7 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
+Patch6:         CVE-2025-69418.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -86,7 +87,9 @@ package to save space if non-English locales are not needed.
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Provides:       npm = %{npm_version}.%{version}-%{release}
+Provides:       nodejs24-npm = %{version}-%{release}
+Obsoletes:      nodejs24-npm < %{version}-%{release}
+Conflicts:      npm
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
@@ -122,7 +125,7 @@ python3 configure.py \
   --openssl-use-def-ca-store \
   --shared-cares
 
-JOBS=4 make %{?_smp_mflags} V=0
+JOBS=%{_smp_build_ncpus} make %{?_smp_mflags} V=0
 
 %install
 
@@ -177,6 +180,13 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.13.0-3
+- Patch for CVE-2025-69418
+
+* Tue Feb 10 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-2
+- Add conflicts for legacy npm package
+- Update provided capability from npm to nodejs24-npm
+
 * Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-1
 - Upgrade to 24.13.0
 - Add support for passing runtime internationalization data

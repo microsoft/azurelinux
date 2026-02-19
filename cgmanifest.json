@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.12-1/go1.24.12-20260116.10.src.tar.gz"
+          "version": "1.24.13",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.6-1/go1.25.6-20260116.7.src.tar.gz"
+          "version": "1.25.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.7-1/go1.25.7-20260204.4.src.tar.gz"
         }
       }
     },
@@ -6600,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8311,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "version": "6.6.121.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
         }
       }
     },
@@ -8571,8 +8571,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.6.3",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.6.3.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.0.tar.gz"
         }
       }
     },
@@ -10831,8 +10831,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.54",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.54.tar.xz"
+          "version": "1.6.55",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.55.tar.xz"
         }
       }
     },
@@ -11681,8 +11681,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.0.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.0.0.tar.xz"
+          "version": "10.10.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
         }
       }
     },
@@ -14382,8 +14382,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.28.1",
-          "downloadUrl": "https://nginx.org/download/nginx-1.28.1.tar.gz"
+          "version": "1.28.2",
+          "downloadUrl": "https://nginx.org/download/nginx-1.28.2.tar.gz"
         }
       }
     },
@@ -21593,8 +21593,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.11",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.11/postgresql-16.11.tar.bz2"
+          "version": "16.12",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.12/postgresql-16.12.tar.bz2"
         }
       }
     },
@@ -25483,8 +25483,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.25.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/94/d7/adb787076e65dc99ef057e0118e25becf80dd05233ef4c86f07aa35f6492/virtualenv-20.25.0.tar.gz"
+          "version": "20.36.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz"
         }
       }
     },
@@ -25843,8 +25843,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "8.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-8.2.0.tar.xz"
+          "version": "9.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
         }
       }
     },
@@ -29886,8 +29886,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1616",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
+          "version": "9.1.2148",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
         }
       }
     },

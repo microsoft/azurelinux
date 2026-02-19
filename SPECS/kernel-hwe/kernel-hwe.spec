@@ -1,4 +1,5 @@
 %global security_hardening none
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 %define short_name hwe
 
@@ -30,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.57.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +43,7 @@ Source2:        config_aarch64
 Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
+Source6:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -260,6 +262,10 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
+# hmac sign the kernel for FIPS
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
+
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
 
@@ -349,8 +355,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+/boot/.vmlinuz-%{uname_r}.hmac
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
+/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accel
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
@@ -423,6 +431,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-4
+- Retain kernel config options similar to 6.6 in 6.12 for CONFIG_NET_VENDOR_AQUANTIA
+- CONFIG_AQTION, CONFIG_BLK_WBT, CONFIG_BLK_WBT_MQ, CONFIG_DM_CACHE,CONFIG_INET_DIAG_DESTROY
+- CONFIG_ XFRM_INTERFACE CONFIG_HSA_AMD_P2P, CONFIG_DMABUF_MOVE_NOTIFY
+- CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
+- HMAC calc the kernel HWE for FIPS.
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
 - Enable aarch64 kernel configs for performance improvements.
 
