@@ -1,26 +1,16 @@
-diff -pruN man-pages-ja-20120715.orig/script/pkgs.list man-pages-ja-20120715/script/pkgs.list
---- man-pages-ja-20120715.orig/script/pkgs.list	2012-06-12 02:45:41.000000000 +0900
-+++ man-pages-ja-20120715/script/pkgs.list	2012-07-25 20:18:11.000000000 +0900
-@@ -8,7 +8,6 @@
- #
- shadow		Y
- GNU_coreutils	Y
--gnumaniak	Y
- GNU_bash	Y
+diff -pruN man-pages-ja-20230915.orig/script/pkgs.list man-pages-ja-20230915/script/pkgs.list
+--- man-pages-ja-20230915.orig/script/pkgs.list	2022-11-12 12:33:09.000000000 +0900
++++ man-pages-ja-20230915/script/pkgs.list	2023-10-12 22:29:05.801946807 +0900
+@@ -12,7 +12,7 @@ GNU_bash	Y
  GNU_bc		Y
  GNU_binutils	Y
-@@ -37,6 +36,7 @@ GNU_texinfo	Y
- GNU_textutils	N
- GNU_uucp	Y
- LDP_man-pages	Y
-+gnumaniak	Y
- SysVinit	Y
- acl		Y
- apmd		Y
-diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/script/pkgs.list
---- man-pages-ja-20180715.orig/script/pkgs.list	2018-07-27 16:46:12.082186441 +0900
-+++ man-pages-ja-20180715/script/pkgs.list	2018-07-28 20:28:31.653878451 +0900
-@@ -43,60 +43,60 @@ apmd		Y
+ GNU_cpio	Y
+-GNU_dejagnu	Y
++GNU_dejagnu	N
+ GNU_autoconf	Y
+ GNU_automake	Y
+ GNU_bison	Y
+@@ -52,65 +52,65 @@ apmd		Y
  at		Y
  autofs		Y
  bind		Y
@@ -33,12 +23,12 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
  byacc		Y
  bzip2		Y
  cdparanoia	Y
--cdrecord	Y
-+cdrecord	N
+ cdrecord	Y
  cron		Y
  cups		Y
 -cvsup		Y
 +cvsup		N
+ dblatex		Y
  dhcp		Y
  dhcp2		Y
  dhcpcd		Y
@@ -51,7 +41,7 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
  eject		Y
  expect		Y
 -fdutils		Y
-+#fdutils		Y
++fdutils		N
  fetchmail	Y
  file		Y
  flex		Y
@@ -66,6 +56,8 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
 +ipchains-scripts	N
 +ipfwadm		N
  iptables	Y
+ itstool		Y
+ kmod		Y
  ld.so		Y
 -lids		Y
 -lilo		Y
@@ -82,11 +74,11 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
 +majordomo	N
 +man		N
 +man-db		Y
+ meson		Y
  microcode_ctl	Y
 -mirrordir	Y
--module-init-tools	Y
 +mirrordir	N
-+module-init-tools	N
+ module-init-tools	N
  modutils	N
  mpg123		Y
  ncftp		Y
@@ -99,14 +91,15 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
 +netkit		N
 +nfs-server	N
  nfs-utils	Y
+ nginx		Y
  pciutils	Y
 -pcmcia-cs	Y
 +pcmcia-cs	N
  ppp		Y
  procinfo	Y
  procmail	Y
-@@ -104,7 +104,7 @@ procps		Y
- psmisc		Y
+@@ -119,7 +119,7 @@ psmisc		Y
+ qpdf		Y
  quota		Y
  rdate		Y
 -reiserfsprogs	Y
@@ -114,9 +107,9 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
  rp-pppoe	Y
  rpm		Y
  rssh		Y
-@@ -113,18 +113,18 @@ sendmail	Y
- setserial	Y
+@@ -129,20 +129,20 @@ setserial	Y
  smartmontools	Y
+ subversion	Y
  sudo		Y
 -sysklogd	Y
 +sysklogd	N
@@ -125,12 +118,14 @@ diff -pruN man-pages-ja-20180715.orig/script/pkgs.list man-pages-ja-20180715/scr
  tcsh		Y
 -ucd-snmp	Y
 +ucd-snmp	N
+ upower		Y
  util-linux	Y
  uudeview	Y
  vsftpd		Y
 -wu-ftpd		Y
 +wu-ftpd		N
  xinetd		Y
+ xz		Y
  yp-tools	Y
  ypbind		N
  ypbind-mt	Y

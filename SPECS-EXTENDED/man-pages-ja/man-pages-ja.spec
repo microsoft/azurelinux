@@ -1,40 +1,41 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: man-pages-ja
-Version: 20190815
-Release: 3%{?dist}
-# BSD - shadow, bsd-games, byacc, bzip2, dhcpcd, dump, file, hdparm, rssh, tcp_wrappers, tcsh
-# GFDL - GNU_*, cron, glibc-linuxthreads
-# GPL+/GPLv2+/BSD/MIT/Copyright only/IEEE - LDP_manpages, gnumaniak, ld.so
-# GPLv2+ - SysVinit, acl, apmd, at, autofs, ebtables, eject, e2fsprogs, iptables, logrotate, man-db, net-tools, pciutils, psmisc, rdate, rp-pppoe, rpm, smartmontools, uudeview
+Version: 20230915
+Release: 5%{?dist}
+# BSD-3-Clause - shadow, bsd-games, byacc, bzip2, dhcpcd, dump, file, hdparm, rssh, tcp_wrappers, tcsh
+# GFDL-1.3-or-later - GNU_*, cron, glibc-linuxthreads
+# BSD-4-Clause-UC/Linux-man-pages-copyleft/GPL-2.0-or-later/BSD-4.3TAHOE/Linux-man-pages-1-para/GPL-1.0-or-later/BSD-3-Clause/MIT/Spencer-94/LicenseRef-LDPL/BSD-2-Clause/LicenseRef-Fedora-UltraPermissive/LicenseRef-Fedora-Public-Domain - LDP_manpages, gnumaniak, ld.so
+# GPL-2.0-or-later - SysVinit, acl, apmd, at, autofs, ebtables, eject, e2fsprogs, iptables, logrotate, man-db, net-tools, pciutils, psmisc, rdate, rp-pppoe, rpm, smartmontools, uudeview
 # ISC - bind, dhcp, dhcp2, sudo
-# GPLv2 and LGPLv2 - cdparanoia
-# GPLv2+ and LGPLv2+ with exceptions and AML - cups
+# GPL-2.0-or-later and LGPL-2.1-or-later - cdparanoia
+# Apache-2.0 WITH LLVM-exception AND BSD-3-Clause AND Zlib AND BSD-2-Clause - cups
 # ??? - microcode_ctl, procps
-# Public Domain - expect
-# GPL+ and Public Domain - fetchmail
-# BSD and LGPLv2+ - flex
-# LGPLv2+ - mpg123
-# Artistic clarified - ncftp
+# LicenseRef-Fedora-Public-Domain - expect
+# GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain - fetchmail
+# BSD-3-Clause AND LGPL-2.0-or-later - flex
+# GPL-2.0-or-later - mpg123
+# BSD-3-Clause - ncftp
 # MIT - ncurses
-# MIT and GPLv2 and GPLv2+ and BSD - nfs-utils
-# BSD and LGPLv2+ and GPLv2+ and Public Domain - ppp
+# MIT and GPL-2.0-only and GPL-2.0-or-later and BSD-3-Clause - nfs-utils
+# BSD-4.3TAHOE and LGPLv2+ and GPLv2+ and Public Domain - ppp
 # GPL+ - procinfo, setserial
-# GPLv2+ or Artistic - procmail
+# GPL-2.0-or-later or Artistic-1.0-Perl - procmail
 # BSD and GPLv2 and GPLv2+ - quota
-# GPLv3+ - rsync
+# GPL-3.0-or-later - rsync
 # Sendmail - sendmail
-# BSD with advertising - tcpdump
+# BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND BSD-4-Clause-UC AND ISC AND NTP - tcpdump
 # GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain - util-linux
-# GPLv2 with exceptions - vsftpd
+# GPL-2.0-only WITH vsftpd-openssl-exception - vsftpd
 # xinetd - xinetd
 # GPLv2 - yp-tools, ypbind-mt, ypserv
-License: BSD and GFDL and GPL+ and GPLv2+ and MIT and Copyright only and IEEE and ISC and GPLv2 and LGPLv2 and LGPLv2+ with exceptions and AML and Public Domain and LGPLv2+ and Artistic clarified and (GPLv2+ or Artistic) and GPLv3+ and Sendmail and BSD with advertising and GPLv2 with exceptions and xinetd
+License: BSD-3-Clause AND GFDL-1.3-or-later AND BSD-4-Clause-UC AND Linux-man-pages-copyleft AND GPL-2.0-or-later AND BSD-4.3TAHOE AND Linux-man-pages-1-para AND GPL-1.0-or-later AND MIT AND Spencer-94 AND LicenseRef-LDPL AND BSD-2-Clause AND ISC AND LGPL-2.1-or-later AND Apache-2.0 WITH LLVM-exception AND Zlib AND LicenseRef-Fedora-Public-Domain AND LicenseRef-Fedora-UltraPermissive AND GPL-2.0-only AND LGPL-2.0-or-later AND (GPL-2.0-or-later OR Artistic-1.0-Perl) AND GPL-3.0-or-later AND Sendmail AND BSD-4-Clause AND NTP AND GPL-2.0-only WITH vsftpd-openssl-exception AND xinetd
 BuildArch: noarch
+BuildRequires: make
 BuildRequires: perl(Env), perl(Encode)
-URL: http://linuxjm.osdn.jp/
+URL: https://linuxjm.osdn.jp/
 
-Source: http://linuxjm.osdn.jp/%{name}-%{version}.tar.gz
+Source: https://linuxjm.osdn.jp/%{name}-%{version}.tar.gz
 Source1: %{name}-rpm.pl
 Source2: %{name}-tail.1
 Source3: %{name}-echo.1
@@ -42,7 +43,6 @@ Source4: %{name}-tar.1
 Source5: %{name}-snmptrapd.8
 Patch0: %{name}-fix-configure.perl.patch
 Patch1: %{name}-fix-pkgs-list.patch
-Patch2: %{name}-fix-ebtables.patch
 Patch15: %{name}-358081-sysctl-warn.patch
 Patch18: %{name}-433692-printf.1.patch
 Patch21: %{name}-456263-top.1.patch
@@ -159,8 +159,55 @@ done
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190815-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 03 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20230915-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230915-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230915-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230915-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Oct 12 2023 Akira TAGOH <tagoh@redhat.com> - 20230915-1
+- Updates to 20230915.
+- Convert License tag to SPDX.
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20220415-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20220415-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220415-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Apr 28 2022 Akira TAGOH <tagoh@redhat.com> - 20220415-1
+- Updates to 20220415.
+
+* Tue Feb 22 2022 Akira TAGOH <tagoh@redhat.com> - 20220215-1
+- Updates to 20220215.
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20200315-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200315-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200315-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200315-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Mar 25 2020 Akira TAGOH <tagoh@redhat.com> - 20200315-1
+- Updates to 20200315.
+
+* Fri Mar  6 2020 Akira TAGOH <tagoh@redhat.com> - 20200215-1
+- Updates to 20200215.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20190815-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
