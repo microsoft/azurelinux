@@ -2,33 +2,23 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:       m17n-db
 Summary:    Multilingualization datafiles for m17n-lib
-Version:    1.8.0
-Release:    10%{?dist}
-License:    LGPLv2+
+Version:    1.8.9
+Release:    2%{?dist}
+License:    LGPL-2.1-or-later
 URL:        http://www.nongnu.org/m17n
 
 Source0:    http://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
-## Till the Inscript2 gets upstreamed in m17n-db, use this source
-Source1:    http://releases.pagure.org/inscript2/inscript2-20160423.tar.gz
 # Following is awaiting for upstream commit
-Source2:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
-Source3:    https://github.com/mike-fabian/m17n-db-sayura/archive/1.0.0.tar.gz#/m17n-db-sayura-1.0.0.tar.gz
+Source1:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
 
 BuildArch:  noarch
+BuildRequires: make
 BuildRequires: gettext
 BuildRequires: glibc-locale-source
 BuildRequires: gcc
 
 Obsoletes:  m17n-contrib < 1.1.14-4.fc20
 Provides:   m17n-contrib = 1.1.14-4.fc20
-
-# Fedora speicifc patches
-Patch0:     %{name}-1.6.5-bn-itrans-bug182227.patch
-Patch1:     %{name}-1.6.5-kn-itrans_key-summary_bug228806.patch
-Patch2:     %{name}-1.6.5-kn-inscript-ZWNJ-bug440007.patch
-Patch3:     %{name}-1.6.5-number_pad_itrans-222634.patch
-Patch4:     %{name}-1.7.0-fix-e-o-mappings.patch
-Patch5:     %{name}-1.8.0-inscript2-mni-sat.patch
 
 %description
 This package contains multilingualization (m17n) datafiles for m17n-lib
@@ -52,44 +42,23 @@ Requires: %{name} = %{version}-%{release}
 %description devel
 m17n-db development files
 
-
 %prep
 %autosetup -N
 
-##extract inscript2 maps
-tar xzf %{SOURCE1}
-##extract m17n-db-sayura
-tar xzf %{SOURCE3}
-
 %autopatch -p0
-
-# Following fixes https://bugzilla.redhat.com/show_bug.cgi?id=1487512
-sed -i 's/ ("ld" "སྡ")/ ("ld" "ལྡ")/g' MIM/bo-ewts.mim
 
 %build
 %configure
-make %{?_smp_mflags}
+%{make_build}
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
-
-# don't ship unijoy map for now
-rm %{buildroot}%{_datadir}/m17n/bn-unijoy.mim
-rm %{buildroot}%{_datadir}/m17n/icons/bn-unijoy.png
+%{make_install}
 
 #removing ispell.mim for rh#587927
 rm %{buildroot}%{_datadir}/m17n/ispell.mim
 
-#install inscript2 keymaps
-cp -p inscript2/IM/* %{buildroot}%{_datadir}/m17n/
-cp -p inscript2/icons/* %{buildroot}%{_datadir}/m17n/icons
-
 # install minglish keymap
-cp -p %{SOURCE2} %{buildroot}%{_datadir}/m17n
-
-# install si-sayura
-cp -p m17n-db-sayura-1.0.0/si-sayura.mim %{buildroot}%{_datadir}/m17n
-cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icons
+/usr/bin/install -m 644 %{SOURCE1} %{buildroot}%{_datadir}/m17n
 
 # For installing the translation files
 %find_lang %name
@@ -125,6 +94,7 @@ cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icon
 %{_datadir}/m17n/v*.mim
 %{_datadir}/m17n/y*.mim
 # icons for keymaps
+%dir %{_datadir}/m17n/icons
 %{_datadir}/m17n/icons/*.png
 %exclude %{_datadir}/m17n/zh-*.mim
 %exclude %{_datadir}/m17n/icons/zh*.png
@@ -147,8 +117,229 @@ cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icon
 %{_datadir}/pkgconfig/m17n-db.pc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.0-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.8.9-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
+
+* Thu Nov 14 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.9-1
+- Update to 1.8.9
+- mr-gamabhana.mim: Update by Shantanu Oak <shantanu.oak@gmail.com>
+- ar-translit.mim: Use Shift+t (T) in ar-translit.mim to input the Arabic
+  tatweel (by Benjamin Westphal <benjamin.westphal@riseup.net>)
+
+* Thu Sep 19 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.8-1
+- Update to 1.8.8
+- bn-probhat.mim: Sync with the "in(ben_probhat)" layout in xkeyboard-
+  config
+- sa-vedic-itrans.mim: Improvements by विश्वासो वासुकिजः (Vishvas Vasuki)
+  <vishvas.vasuki@gmail.com>
+- sa-itrans.mim: Improvements by विश्वासो वासुकिजः (Vishvas Vasuki)
+  <vishvas.vasuki@gmail.com>
+- hi-itrans.mim: Improvements by विश्वासो वासुकिजः (Vishvas Vasuki)
+  <vishvas.vasuki@gmail.com>
+- hu-rovas-post.mim: Sync with the improvements in hu-old-hungarian-
+  rovas.txt in ibus-table-others. Also make it possible to use non-ASCII
+  accented characters like ü as input.
+
+* Tue Jul 30 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.7-1
+- Updated to 1.8.7
+- mr-gamabhana.mim: Update by Shantanu Oak <shantanu.oak@gmail.com>
+- sa-vedic-itrans.mim: Additions by विश्वासो वासुकिजः (Vishvas Vasuki)
+  <vishvas.vasuki@gmail.com>
+
+* Fri Jul 19 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.6-1
+- Update to 1.8.6
+- si-wijesekera.mim: Many updates by Harshula Jayasuriya
+  <harshula@hj.id.au>
+- si-wijesekera.mim renamed to MIM/si-wijesekara.mim
+- configure.ac: Add support for zstd-compressed charmaps (by Thomas
+  Staudinger <staudi.kaos@gmail.com>)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 17 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.5-5
+- Convert CI test to tmt
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 07 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.5-1
+- Update to 1.8.5
+- new-newa-traditional-extended: New input method by Swornim Nakarmi <svarnim.nakahmi1.618@gmail.com>
+- ml-pn-c: New input method for Malayalam by Ajith R <ajithramayyan at yahoo dot co dot in>
+- en-pn-eqf: This is a slightly modified version of the QWERTY English layout to be used along with the ml-pn-c input method
+
+* Mon Sep 25 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.4-1
+- Update to 1.8.4
+- New input methods from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)"
+  sa-vedic-itrans, dra-iso-15919-itrans, hi-brahmi-itrans, ks-sharada-itrans,
+  mr-modi-itrans, sa-brahmi-itrans, sa-grantha-itrans, sa-iso-15919-itrans,
+  sa-sharada-itrans, sa-inscript, sa-iast-vedic
+- hi-itrans: Updates from "विश्वासो वासुकिजः (Vishvas Vasuki)" <vishvas.vasuki@gmail.com>
+- ne-trad-ttf: Update from author,  Santosh Pradhan <sapradhan8@gmail.com>
+- ja-trycode: Add icon.
+- ks-inscript: Add icon.
+- mai-inscript: Add icon.
+- ml-enhanced-inscript: Add icon.
+- mr-itrans: Add icon.
+- hi-remington: Add icon.
+- mr-typewriter: Add icon.
+- mr-phonetic: Add icon.
+- ne-rom-translit: Add icon.
+- zh-pinyin-yi: Add icon.
+- unicode: Add icon.
+- da-post: Add icon.
+- bo-ewts: Add icon.
+- bo-tcrc: Add icon.
+- kn-typewriter: Add icon.
+- grc-mizuochi: Add icon.
+- fr-azerty: Add icon.
+- hi-optitransv2: Updates from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)"
+- kn-optitransv2: Updates from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)"
+- sa-itrans: Updates from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)"
+- kn-itrans: Updates from "विश्वासो वासुकिजः (Vishvas Vasuki)" <vishvas.vasuki@gmail.com> and some extra bug fixes.
+- lsymbol: Some additions from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)" and
+  some more improvements: Use emoji presentation when possible, better grouping in groups of 6, better description
+- math-latex: Updates from https://github.com/indic-transliteration/m17n-db-indic "विश्वासो वासुकिजः (Vishvas Vasuki)"
+  New option "with-backslash-prefix".
+- ks-kbd: Fix typo in description, add icon.
+- ug-kbd: Add icon.
+- tai-sonla-kbd.png: Add icon.
+- mni-inscript2-mtei.png: Add icon.
+- sat-inscript2-olck.png: Add icon.
+- or-phonetic.png: Add icon.
+- sa-harvard-kyoto.png: Add icon.
+- pa-anmollipi.png: Add icon.
+- pa-remington.png: Add icon.
+- si-singlish.png: Add icon.
+- ta-lk-renganathan.png: Add icon.
+- te-rts.png: Add icon.
+- vi-han.png: Add icon.
+- vi-nomvni: Make existing icon work.
+- vi-nomtelex: Make existing icon work.
+- lsymbol: Add icon.
+- ssymbol: Add icon.
+
+* Mon Jul 24 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.3-1
+- Update to 1.8.3
+- kok-inscript2-deva, mr-inscript, mr-inscript2: Fix digit 0
+- ta-vutam: Change the header comment to a description
+- mr-gamabhana: icon resized to 48x48
+- latn1-pre: add icon
+- ar-translit: add icon
+- ath-phonetic: add icon
+- bla-phonetic: add icon
+- cr-western: add icon
+- iu-phonetic: add icon
+- nsk-phonetic: add icon
+- oj-phonetic: add icon
+- uk-kbd: add icon
+- eo-vi-sistemo: add icon
+- Rename the .mim files of some eo input methods to improve search for the icons
+- Workarounds for doxygen
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon May 08 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.2-1
+- Update to 1.8.2
+- Remove bn-national-jatiya input method (included upstream)
+- Remove si-sayura input method (included upstream)
+- Remove mr-gamabhana input method (included upstream)
+- Update German translations (100%)
+- Remove m17n-db-1.8.0-inscript2-mni-sat.patch (included upstream)
+- Remove m17n-db-1.6.5-number_pad_itrans-222634.patch
+  This patch is not needed, numbers are typed in language representation
+  when using the number pad with numlock on even without this patch.
+  (I.e. the problem reported in https://bugzilla.redhat.com/show_bug.cgi?id=222634
+   is still fixed)
+- Add icon for hu-rovas-post input method
+- Remove m17n-db-1.6.5-kn-itrans_key-summary_bug228806.patch
+  (See: https://git.savannah.nongnu.org/cgit/m17n/m17n-db.git/commit/?id=f10cfe21d49afbef40bdc681ff70563b6154eac0
+  after these upstream changes to kn-itrans, the summary added by the patch is wrong)
+- Remove m17n-db-1.6.5-bn-itrans-bug182227.patch
+  (This patch removed mappings which are "not in ITRANS Bengali table", nevertheless
+   these mappings might be useful to some users, better keep them for the time being)
+- Remove m17n-db-1.6.5-kn-inscript-ZWNJ-bug440007.patch (included upstream)
+- Remove m17n-db-1.7.0-fix-e-o-mappings.patch (included upstream)
+- Remvove fix for ld mapping in MIM/bo-ewts.mim (include upstream)
+  (See: https://bugzilla.redhat.com/show_bug.cgi?id=1487512)
+- MIM/bo-ewts.mim: remove whitespace in rn and brn mapping
+
+* Wed May 03 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.1-1
+- Update to 1.8.1
+- Remove inscript2-20210820.tar.gz because it is now included upstream
+- Remove m17n-db-1.8.0-ml-mozhi-savannah-bug-59681.patch because it is included upstream
+- Remove unicode.mim because the improvement is included upstream
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 30 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-28
+- Migrate license tag to SPDX
+
+* Fri Aug 19 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-27
+- Add bn-national-jatiya.{mim,png}
+- Add improved unicode.mim
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 12 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-25
+- Add mr-gamabhana.png icon for mr-gamabhana.mim input method
+
+* Mon Jul 11 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-24
+- Ship the bn-unijoy.mim as well, it seems to work, maybe there
+  was some problem in the past. But at the moment I see no reason
+  to omit it.
+
+* Fri Feb 25 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-23
+- Add mr-gamabhana.mim input method
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Aug 20 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-21
+- Update inscript2 keymaps to new upstream release 20210820
+
+* Thu Aug 12 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-20
+- Update inscript2 keymaps to new upstream release 20210812
+
+* Mon Aug 09 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-19
+- Update inscript2 keymaps to new upstream release 20210809
+
+* Tue Aug 03 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-18
+- Update inscript2 keymaps to new upstream release 20210803
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-16
+- Re-upload minglish.mim source to fix its permissions to 644
+
+* Wed May 19 2021 Mike FABIAN <mfabian@redhat.com> - 1.8.0-15
+- rename patch m17n-db-1.8.0-ml-mozhi-bug-59681.patch to
+  m17n-db-1.8.0-ml-mozhi-savannah-bug-59681.patch and add
+  a comment with a link to the bug.
+
+* Tue May 18 2021 Mike FABIAN <mfabian@redhat.com> - 1.8.0-14
+- Add back autopatch to apply the patches again
+
+* Sun Apr 04 2021 Rajeesh KV <rajeeshknambiar@fedoraproject.org> - 1.8.0-13
+- Malayalam Mozhi input scheme bug fix
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Mar 18 2020 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-10
+- Use make_build and make_install macros
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

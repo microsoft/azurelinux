@@ -1,8 +1,6 @@
 {
  "Signatures": {
-  "inscript2-20160423.tar.gz": "5814e72fc37ed84b38c775c0b6f0a5d37f87a2439d097c51b20e0521e7da3e7f",
-  "m17n-db-1.8.0.tar.gz": "657f23835b6655e7a63a362bac66260454ee356da4855eadb9366911d33fdc6d",
-  "m17n-db-sayura-1.0.0.tar.gz": "cd1a0b3d55d68dda335fffa069d9c31fecf786d3a6e5ccd00cde68f0b8c87375",
+  "m17n-db-1.8.9.tar.gz": "481254a380aa9c66d7f4ec3aa372a7e1d2fe47fc39df6e76044bd44017c424a4",
   "minglish.mim": "350b47b993f5d57deedc2e5c85a1cec02ea0be3b8d78c3ec1f2539002aabbdc0"
  }
 }

@@ -12761,8 +12761,8 @@
         "type": "other",
         "other": {
           "name": "m17n-db",
-          "version": "1.8.0",
-          "downloadUrl": "http://download-mirror.savannah.gnu.org/releases/m17n/m17n-db-1.8.0.tar.gz"
+          "version": "1.8.9",
+          "downloadUrl": "http://download-mirror.savannah.gnu.org/releases/m17n/m17n-db-1.8.9.tar.gz"
         }
       }
     },
