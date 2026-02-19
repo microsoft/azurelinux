@@ -1,0 +1,9 @@
+[components.gnutls]
+
+[components.gnutls.build]
+# The upstream spec enables bundled_gmp when rhel >= 9 && fips is on.
+# Azure Linux defines rhel=10 and fips is on by default, which triggers this.
+# However, the bundled gmp source (gmp-6.2.1.tar.xz) only exists in the RHEL
+# lookaside — not in Fedora's — so the download fails. Since Azure Linux ships
+# gmp as a standalone package, disable bundling and use the system copy instead.
+without = ["bundled_gmp"]
