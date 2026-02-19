@@ -2578,8 +2578,8 @@
         "type": "other",
         "other": {
           "name": "delve",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/go-delve/delve/archive/v1.5.0.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://github.com/go-delve/delve/archive/v1.23.0.tar.gz"
         }
       }
     },
