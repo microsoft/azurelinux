@@ -4,30 +4,37 @@ Distribution:   Azure Linux
 %bcond_with anthy
 
 Name:           m17n-lib
-Version:        1.8.0
-Release:        8%{?dist}
+Version:        1.8.5
+Release:        2%{?dist}
 Summary:        Multilingual text library
 
-License:        LGPLv2+
-URL:            http://www.nongnu.org/m17n/
-Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+License:        LGPL-2.1-or-later
+URL:            https://www.nongnu.org/m17n/
+Source0:        https://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 Patch0:         %{name}-1.8.0-multilib.patch
-Patch1:         Fix-segmentation-fault-when-using-ibus-m17n-with-vi-telex-in-gedit-in-wayland.patch
 
-BuildRequires:  m17n-db-devel libthai-devel
-BuildRequires:  libxml2-devel
-BuildRequires:  fontconfig-devel freetype-devel
-BuildRequires:  fribidi-devel gd-devel
-BuildRequires:  libotf-devel
-BuildRequires:  autoconf gettext-devel
-BuildRequires:  automake libtool
+BuildRequires: make
+BuildRequires: m17n-db-devel
+BuildRequires: libthai-devel
+BuildRequires: libxml2-devel
+BuildRequires: libXft-devel
+BuildRequires: fontconfig-devel
+BuildRequires: freetype-devel
+BuildRequires: fribidi-devel
+BuildRequires: gd-devel
+BuildRequires: libXaw-devel
+BuildRequires: libotf-devel
+BuildRequires: autoconf
+BuildRequires: gettext-devel
+BuildRequires: automake
+BuildRequires: libtool
 
 # The upstream source contains part of gnulib
 # library which includes directories intl and m4
 Provides: bundled(gnulib)
 
 %if %{with anthy}
-BuildRequires:  anthy-devel
+BuildRequires:  anthy-unicode-devel
 %endif
 
 Requires:       m17n-db
@@ -38,13 +45,14 @@ the input of many languages with the input table maps from m17n-db.
 
 The package provides the core and input method backend libraries.
 
+%if %{with anthy}
 %package  anthy
 Summary:  Anthy module for m17n
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description anthy
 Anthy module for %{name} allows ja-anthy.mim to support input conversion.
-
+%endif
 
 %package  devel
 Summary:  Development files for %{name}
@@ -53,7 +61,6 @@ Requires: %{name}-tools = %{version}-%{release}
 %description devel
 Development files for %{name}.
 
-
 %package  tools
 Summary:  The m17n GUI Library tools
 Requires: m17n-db-extras
@@ -61,7 +68,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 Tools to test M17n GUI widget library.
-
 
 %prep
 %autosetup -p1
@@ -72,14 +78,17 @@ Tools to test M17n GUI widget library.
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-# parallel make usage with make command fails build on koji
-make
+%{make_build}
 
 %install
 make install DESTDIR=%{buildroot} INSTALL="install -p"
 
 # fix bug rh#680363
 rm %{buildroot}%{_libdir}/m17n/1.0/libmimx-ispell.so
+
+%if %{without anthy}
+rm %{buildroot}%{_libdir}/m17n/1.0/libmimx-anthy.so
+%endif
 
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
@@ -99,8 +108,10 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libm17n-flt.so.*
 
 #Anthy module
+%if %{with anthy}
 %files anthy
 %{_libdir}/m17n/1.0/libmimx-anthy.so
+%endif
 
 %files devel
 %{_includedir}/*
@@ -117,10 +128,85 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libm17n-gui.so.*
 
 %changelog
-* Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 1.8.0-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove x11-related depdendencies
-- Disable depending on anthy, which wil cause build cycle 
+* Mon Apr 07 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.8.5-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Wed Feb 12 2025 Mike FABIAN <mfabian@redhat.com> - 1.8.5-1
+- Update to 1.8.5
+- Use UTF-8 instead of EUC-JP in example/mimx-anthy.c This fixes encoding
+  problems when ja-anthy is used by ibus-m17n (m17n:ja:anthy - ja-anthy
+  (m17n)) or by ibus-typing-booster.
+- Enable anthy-unicode (thanks to Takao Fujiwara <tfujiwar@redhat.com>)
+- Use BuildRequires:  anthy-unicode-devel
+- Fix build on Fedora rawhide (Fedora 42)
+- configure.ac: fix incorrect bashism (thanks to Eli Schwartz
+  <eschwartz93@gmail.com>)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 18 2024 Mike FABIAN <mfabian@redhat.com> - 1.8.4-5
+- Convert CI test to tmt
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 23 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.4-1
+- Update to 1.8.4
+- Fixes “typedef in m17n-core.h causing error when compiling with C++ code”
+  (Resolves: https://savannah.nongnu.org/bugs/index.php?64566)
+
+* Wed Jul 26 2023 Björn Esser <besser82@fedoraproject.org> - 1.8.3-2
+- Rebuild(libotf)
+
+* Tue Jul 25 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.3-1
+- Update to 1.8.3
+- Fixes to be able to create m17n-docs-1.8.3: Fix doxygen tags, change all EUC-JP files to UTF-8
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May 09 2023 Mike FABIAN <mfabian@redhat.com> - 1.8.2-1
+- Update to 1.8.2
+- Fix parallel builds by switching from absolute to relative paths
+  (Resolves: https://savannah.nongnu.org/bugs/index.php?61377)
+- enable parallel builds in the spec file
+
+- Update to 1.8.1
+- Remove m17n-lib-c99.patch (included upstream)
+- Remove Fix-segmentation-fault-when-using-ibus-m17n-with-vi-telex-in-gedit-in-wayland.patch
+  (included upstream)
+
+* Tue Apr 25 2023 Florian Weimer <fweimer@redhat.com> - 1.8.0-16
+- Fix C99 compatibility issue in example code
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 30 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.0-14
+- Migrate license tag to SPDX
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Parag Nemade <pnemade AT redhat DOT com> - 1.8.0-10
+- Add conditional for anthy module subpackage
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -343,3 +429,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 * Sat Jan 15 2005 UTUMI Hirosi <utuhiro78@yahoo.co.jp>
 - modify spec for fedora
+
