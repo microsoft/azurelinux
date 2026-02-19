@@ -22243,8 +22243,8 @@
         "type": "other",
         "other": {
           "name": "python-blivet",
-          "version": "3.2.2",
-          "downloadUrl": "http://github.com/storaged-project/blivet/archive/blivet-3.2.2.tar.gz"
+          "version": "3.11.0",
+          "downloadUrl": "http://github.com/storaged-project/blivet/archive/blivet-3.11.0.tar.gz"
         }
       }
     },

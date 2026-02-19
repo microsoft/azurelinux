@@ -1,0 +1,77 @@
+From dabec2a372742416829b1cdb589d1b9d91846476 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 3 Oct 2024 11:13:21 -0700
+Subject: [PATCH] free_space_estimate: adjust for compression on btrfs
+
+We have a problem with Fedora aarch64 KDE disk images ATM. We
+want to make them 16 power-of-ten gigabytes big, so they will fit
+on "16GB" SD cards / USB sticks. When we set them to this size,
+compose fails because the anaconda free space check fails, saying
+"An additional 436 MiB is needed". That check is ultimately backed
+by this estimate.
+
+In these images, the main system partition is a btrfs volume,
+with compression enabled. If you examine the last successful
+image (which was built at size 18 power-of-two GB), thanks to
+compression, only ~5GB of space is actually occupied on that
+volume. The contents would easily fit if it were slightly smaller.
+
+With this change we adjust the free space estimate by a
+compression factor, as well as a metadata factor, if the class
+defines one. For the btrfs class we set it to 1.4 when the
+compression flag is set. That's a pretty conservative estimate,
+we will usually achieve a much better compression ratio with
+a typical OS payload (as the numbers above show). AFAICT this
+codepath is only actually used by the anaconda size check, so
+the change should be fairly safe.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ blivet/formats/fs.py | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/blivet/formats/fs.py b/blivet/formats/fs.py
+index 9f0525f1e..ac21e730c 100644
+--- a/blivet/formats/fs.py
++++ b/blivet/formats/fs.py
+@@ -192,6 +192,14 @@ def dict(self):
+                   "mountable": self.mountable})
+         return d
+ 
++    @classmethod
++    def _compression_size_factor(cls):
++        """ Adjust free space estimate for transparent compression.
++        Classes for filesystems that implement transparent compression
++        can override this.
++        """
++        return 1
++
+     @classmethod
+     def free_space_estimate(cls, device_size):
+         """ Get estimated free space when format will be done on device
+@@ -207,7 +215,7 @@ def free_space_estimate(cls, device_size):
+             :return: estimated free size after format
+             :rtype: :class:`~.size.Size`
+         """
+-        return device_size * cls._metadata_size_factor
++        return device_size * cls._metadata_size_factor * cls._compression_size_factor()
+ 
+     @classmethod
+     def get_required_size(cls, free_space):
+@@ -1108,6 +1116,16 @@ def _pre_process_subvolnames(subvols):
+                 return False
+             return True
+ 
++    @classmethod
++    def _compression_size_factor(cls):
++        """ Adjust free space estimate for transparent compression.
++        We estimate 40% 'additional space' if it's enabled (this is
++        pretty conservative).
++        """
++        if flags.btrfs_compression:
++            return 1.40
++        return 1
++
+ 
+ register_device_format(BTRFS)
+ 
