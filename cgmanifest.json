@@ -19443,8 +19443,8 @@
         "type": "other",
         "other": {
           "name": "perl-Perl4-CoreLibs",
-          "version": "0.004",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.004.tar.gz"
+          "version": "0.005",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.005.tar.gz"
         }
       }
     },
