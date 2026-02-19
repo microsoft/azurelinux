@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cldr-emoji-annotation",
-          "version": "37.0_13.0_0_1",
-          "downloadUrl": "https://github.com/fujiwarat/cldr-emoji-annotation/releases/download/37.0_13.0_0_1/cldr-emoji-annotation-37.0_13.0_0_1.tar.gz"
+          "version": "46.1~beta2",
+          "downloadUrl": "https://github.com/unicode-org/cldr/releases/download/release-46-1-beta2/cldr-core-46.1~beta2.zip"
         }
       }
     },
