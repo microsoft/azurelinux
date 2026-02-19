@@ -6950,8 +6950,8 @@
         "type": "other",
         "other": {
           "name": "hyphen-ru",
-          "version": "0.20020727",
-          "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/hyph_ru_RU.zip"
+          "version": "0.20200325",
+          "downloadUrl": "https://ctan.org/tex-archive/language/hyph-utf8/tex/patterns/tex/hyph-ru.tex"
         }
       }
     },
