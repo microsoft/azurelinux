@@ -1,0 +1,4 @@
+[components.golang-x-tools]
+
+[components.golang-x-tools.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

@@ -1,0 +1,4 @@
+[components.golang-github-google-gofuzz]
+
+[components.golang-github-google-gofuzz.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

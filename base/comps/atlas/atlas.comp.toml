@@ -1,0 +1,13 @@
+[components.atlas]
+
+# Fedora's lapack-static 3.12.0-10 dropped the separate liblapack_pic.a file
+# (it was redundant since static libs are now built with -fPIC by default).
+# The spec references the old name in %prep when building a pruned LAPACK archive.
+# Fixed upstream in atlas-3.10.3-33 (rawhide):
+#   https://src.fedoraproject.org/rpms/atlas/c/f253f3a2d6c1 (rhbz#2433875)
+# This overlay can be removed once we import from a Fedora version that includes the fix.
+[[components.atlas.overlays]]
+description = "Fix liblapack_pic.a reference — renamed to liblapack.a in lapack-static 3.12.0-10"
+type = "spec-search-replace"
+regex = 'liblapack_pic\.a'
+replacement = "liblapack.a"

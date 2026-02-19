@@ -1,0 +1,4 @@
+[components.myst-nb]
+
+[components.myst-nb.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

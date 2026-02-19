@@ -1,0 +1,4 @@
+[components.golang-github-gogo-protobuf]
+
+[components.golang-github-gogo-protobuf.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

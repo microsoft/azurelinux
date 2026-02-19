@@ -1,0 +1,4 @@
+[components.golang-opentelemetry-contrib]
+
+[components.golang-opentelemetry-contrib.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

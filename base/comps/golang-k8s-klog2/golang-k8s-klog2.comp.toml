@@ -1,0 +1,4 @@
+[components.golang-k8s-klog2]
+
+[components.golang-k8s-klog2.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

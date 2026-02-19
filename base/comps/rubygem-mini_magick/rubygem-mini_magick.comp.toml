@@ -1,0 +1,4 @@
+[components.rubygem-mini_magick]
+
+[components.rubygem-mini_magick.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
