@@ -1,6 +1,6 @@
 Name:		perl-ExtUtils-Helpers
-Version:	0.026
-Release:	14%{?dist}
+Version:	0.028
+Release:	1%{?dist}
 Summary:	Various portability utilities for module builders
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -66,6 +66,10 @@ make test
 %{_mandir}/man3/ExtUtils::Helpers::Unix.3*
 
 %changelog
+* Fri Dec 20 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.028-1
+- Update to version 0.028
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.026-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
