@@ -23,10 +23,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 Source0:        https://github.com/flatcar/update-ssh-keys/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        https://github.com/flatcar/update-ssh-keys/releases/download/v%{version}/%{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.60
+
+Requires: coreos-init
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
@@ -76,5 +77,5 @@ cargo test --offline
 
 %changelog
 * Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.35.3-10
-- Initial CBL-Mariner import (reference:flatcar).
+- Initial Azure Linux import from the source project reference:flatcar (license: same as "License" tag).
 - License verified
