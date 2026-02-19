@@ -134,7 +134,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 - Upgrade to 1.12.15 - to fix CVE-2024-12401
 - Remove CVE-2024-45337.patch as it is fixed in 1.12.15
 
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.13-3
+* Sat Jan 18 2025 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.13-3
 - Add patch for CVE-2024-45338
 
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
