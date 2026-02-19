@@ -23,6 +23,7 @@ type OS struct {
 	Services            Services            `yaml:"services"`
 	Modules             []Module            `yaml:"modules"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
+	Uki                 bool                `yaml:"uki"`
 }
 
 func (s *OS) IsValid() error {
