@@ -1,0 +1,161 @@
+From e03851847226e52f6a5eb2224fe9b32b2f4ca592 Mon Sep 17 00:00:00 2001
+From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+Date: Thu, 10 Nov 2022 11:58:49 +0100
+Subject: [PATCH 16/20] translation: support OEM and oem
+
+Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+---
+ config/v24tov31/v24tov31.go      |   6 +-
+ config/v24tov31/v24tov31_test.go | 109 +++++++++++++++++++++++++++++++
+ 2 files changed, 112 insertions(+), 3 deletions(-)
+
+diff --git a/config/v24tov31/v24tov31.go b/config/v24tov31/v24tov31.go
+index 46749385..68da4014 100644
+--- a/config/v24tov31/v24tov31.go
++++ b/config/v24tov31/v24tov31.go
+@@ -21,14 +21,14 @@ import (
+ 	"path"
+ 	"path/filepath"
+ 	"reflect"
++	"strings"
+ 
+ 	old "github.com/flatcar/ignition/config/v2_4/types"
+ 	oldValidate "github.com/flatcar/ignition/config/validate"
+ 	"github.com/flatcar/ignition/v2/config/merge"
++	"github.com/flatcar/ignition/v2/config/util"
+ 	"github.com/flatcar/ignition/v2/config/v3_1/types"
+ 	"github.com/flatcar/ignition/v2/config/validate"
+-	"github.com/flatcar/ignition/v2/config/util"
+-
+ )
+ 
+ // Check2_4 returns if the config is translatable but does not do any translation.
+@@ -474,7 +474,7 @@ func translateFilesystems(fss []old.Filesystem, m map[string]string) (ret []type
+ 		}
+ 
+ 		format := f.Mount.Format
+-		if f.Name == "oem" && (wipe == nil || !*wipe) {
++		if strings.ToLower(f.Name) == "oem" && (wipe == nil || !*wipe) {
+ 			format = "btrfs"
+ 		}
+ 
+diff --git a/config/v24tov31/v24tov31_test.go b/config/v24tov31/v24tov31_test.go
+index e81f6bed..68c07109 100644
+--- a/config/v24tov31/v24tov31_test.go
++++ b/config/v24tov31/v24tov31_test.go
+@@ -1690,3 +1690,112 @@ func TestDuplicateUnits(t *testing.T) {
+ 		assert.Equal(t, test.ign3, res)
+ 	}
+ }
++
++func TestOEMPartition(t *testing.T) {
++	tests := []struct {
++		ign      types2_4.Config
++		fsFormat string
++	}{
++		{
++			ign: types2_4.Config{
++				Ignition: types2_4.Ignition{
++					Version:  "2.4.0",
++					Config:   types2_4.IgnitionConfig{},
++					Timeouts: types2_4.Timeouts{},
++					Security: types2_4.Security{},
++					Proxy:    types2_4.Proxy{},
++				},
++				Storage: types2_4.Storage{
++					Filesystems: []types2_4.Filesystem{
++						{
++							Name: "OEM",
++							Mount: &types2_4.Mount{
++								Device: "/dev/disk/by-label/OEM",
++								Format: "ext4",
++							},
++						},
++					},
++				},
++			},
++			fsFormat: "btrfs",
++		},
++		{
++			ign: types2_4.Config{
++				Ignition: types2_4.Ignition{
++					Version:  "2.4.0",
++					Config:   types2_4.IgnitionConfig{},
++					Timeouts: types2_4.Timeouts{},
++					Security: types2_4.Security{},
++					Proxy:    types2_4.Proxy{},
++				},
++				Storage: types2_4.Storage{
++					Filesystems: []types2_4.Filesystem{
++						{
++							Name: "oem",
++							Mount: &types2_4.Mount{
++								Device: "/dev/disk/by-label/OEM",
++								Format: "ext4",
++							},
++						},
++					},
++				},
++			},
++			fsFormat: "btrfs",
++		},
++		{
++			ign: types2_4.Config{
++				Ignition: types2_4.Ignition{
++					Version:  "2.4.0",
++					Config:   types2_4.IgnitionConfig{},
++					Timeouts: types2_4.Timeouts{},
++					Security: types2_4.Security{},
++					Proxy:    types2_4.Proxy{},
++				},
++				Storage: types2_4.Storage{
++					Filesystems: []types2_4.Filesystem{
++						{
++							Name: "OEM",
++							Mount: &types2_4.Mount{
++								Device:         "/dev/disk/by-label/OEM",
++								Format:         "ext4",
++								WipeFilesystem: true,
++							},
++						},
++					},
++				},
++			},
++			fsFormat: "ext4",
++		},
++		{
++			ign: types2_4.Config{
++				Ignition: types2_4.Ignition{
++					Version:  "2.4.0",
++					Config:   types2_4.IgnitionConfig{},
++					Timeouts: types2_4.Timeouts{},
++					Security: types2_4.Security{},
++					Proxy:    types2_4.Proxy{},
++				},
++				Storage: types2_4.Storage{
++					Filesystems: []types2_4.Filesystem{
++						{
++							Name: "oem",
++							Mount: &types2_4.Mount{
++								Device:         "/dev/disk/by-label/OEM",
++								Format:         "ext4",
++								WipeFilesystem: true,
++							},
++						},
++					},
++				},
++			},
++			fsFormat: "ext4",
++		},
++	}
++
++	for _, test := range tests {
++		res, err := v24tov31.Translate(test.ign, nil)
++
++		assert.Nil(t, err)
++		assert.Equal(t, test.fsFormat, *res.Storage.Filesystems[0].Format)
++	}
++}
+-- 
+2.49.1
+
