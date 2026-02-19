@@ -1,44 +1,44 @@
 Summary:        Image meta information extraction module for Perl
 Name:           perl-Image-Info
-Version:        1.42
-Release:        4%{?dist}
-License:        GPL+ OR Artistic
+Version:        1.44
+Release:        1%{?dist}
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Image-Info
-Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-%{version}.tar.gz
+BuildArch:      noarch
 BuildRequires:  coreutils
+BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl-generators
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Compress::Zlib)
 BuildRequires:  perl(Config)
+BuildRequires:  perl(constant)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(IO::Scalar)
-BuildRequires:  perl(IO::String)
 BuildRequires:  perl(Image::Xbm)
 BuildRequires:  perl(Image::Xpm)
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Test::Pod)
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
-BuildRequires:  perl(XML::LibXML::Reader)
-BuildRequires:  perl(XML::Simple)
-BuildRequires:  perl(constant)
+BuildRequires:  perl(IO::Scalar)
+BuildRequires:  perl(IO::String)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(strict)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod)
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 BuildRequires:  perl(vars)
+BuildRequires:  perl(XML::LibXML::Reader)
+BuildRequires:  perl(XML::Simple)
 Requires:       rgb
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Compress::Zlib)
 Requires:       perl(IO::Scalar)
-BuildArch:      noarch
 
 %description
 This Perl extension allows you to extract meta information from
@@ -61,13 +61,16 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%license README
-%doc CHANGES CREDITS TODO exifdump imgdump
+%doc CHANGES CREDITS README TODO exifdump imgdump
 %{perl_vendorlib}/Bundle/
 %{perl_vendorlib}/Image/
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.44-1
+- Update to version 1.44
+- License verified
+
 * Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 1.42-4
 - License verified
 
