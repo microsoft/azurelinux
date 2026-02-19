@@ -22783,8 +22783,8 @@
         "type": "other",
         "other": {
           "name": "python-entrypoints",
-          "version": "0.3",
-          "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.3/entrypoints-0.3.tar.gz"
+          "version": "0.4",
+          "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.4/entrypoints-0.4.tar.gz"
         }
       }
     },
