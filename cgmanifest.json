@@ -21963,8 +21963,8 @@
         "type": "other",
         "other": {
           "name": "pykickstart",
-          "version": "3.36",
-          "downloadUrl": "https://github.com/pykickstart/pykickstart/archive/refs/tags/r3.36.tar.gz"
+          "version": "3.58",
+          "downloadUrl": "https://github.com/pykickstart/pykickstart/releases/download/r3.58/pykickstart-3.58.tar.gz"
         }
       }
     },

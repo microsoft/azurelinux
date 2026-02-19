@@ -1,0 +1,28 @@
+From faf6a88a1be4558ebd26f5d52c0990f5dd3ca592 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 2 Oct 2024 17:54:33 -0700
+Subject: [PATCH] Fix the fix for _parse_optional changing
+
+Whoops. Don't know how this slipped through testing.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ pykickstart/options.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pykickstart/options.py b/pykickstart/options.py
+index ca0e18af..f0803039 100644
+--- a/pykickstart/options.py
++++ b/pykickstart/options.py
+@@ -185,7 +185,7 @@ class KSOptionParser(ArgumentParser):
+         # deprecated. we can only safely do this if there's exactly
+         # one matching action
+         if isinstance(option_tuple_or_tuples, list):
+-            if len(option_tuple_or_tuples == 1):
++            if len(option_tuple_or_tuples) == 1:
+                 option_tuple = option_tuple_or_tuples[0]
+             else:
+                 return option_tuple_or_tuples
+-- 
+2.46.2
+
