@@ -4,8 +4,6 @@ Distribution:   Azure Linux
 %global srcname python-mimeparse
 # what it's imported as
 %global libname mimeparse
-# name of egg info directory
-%global eggname python_mimeparse
 # package name fragment
 %global pkgname mimeparse
 
@@ -14,32 +12,22 @@ This module provides basic functions for parsing mime-type names
 and matching them against a list of media-ranges.}
 
 
-
-
-
 Name:           python-%{pkgname}
-Version:        1.6.0
-Release:        13%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 Summary:        Python module for parsing mime-type names
 License:        MIT
 URL:            https://github.com/dbtsai/python-mimeparse
-Source0:        %pypi_source
+Source0:        %{pypi_source python_mimeparse}
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools_scm
 
 
 %description %{common_description}
-
-
-%if %{with python2}
-%package -n python2-%{pkgname}
-Summary:        %{summary}
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-%{?python_provide:%python_provide python2-%{pkgname}}
-
-
-%description -n python2-%{pkgname} %{common_description}
-%endif
 
 
 %package -n python%{python3_pkgversion}-%{pkgname}
@@ -53,49 +41,35 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 
 
 %prep
-%setup -q -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+%autosetup -n python_mimeparse-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%if %{with python2}
-%py2_build
-%endif
-%py3_build
+%pyproject_wheel
 
 
 %install
-%if %{with python2}
-%py2_install
-%endif
-%py3_install
+%pyproject_install
+%pyproject_save_files %{libname}
 
 
 %check
-%if %{with python2}
-%{__python2} -m unittest -v mimeparse_test
-%endif
-%{__python3} -m unittest -v mimeparse_test
+%pytest
 
 
-%if %{with python2}
-%files -n python2-%{pkgname}
+%files -n python%{python3_pkgversion}-%{pkgname} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-%{python2_sitelib}/%{libname}.py*
-%{python2_sitelib}/%{eggname}-%{version}-py%{python2_version}.egg-info
-%endif
-
-
-%files -n python%{python3_pkgversion}-%{pkgname}
-%license LICENSE
-%doc README.rst
-%{python3_sitelib}/%{libname}.py
-%{python3_sitelib}/__pycache__/%{libname}.cpython-%{python3_version_nodots}*.py*
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 
 %changelog
+* Mon Mar 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.0.0-1
+- Update to 2.0.0
+- Remove unneeded python2 conditionals
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.0-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
