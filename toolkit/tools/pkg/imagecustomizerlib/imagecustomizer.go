@@ -200,25 +200,25 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.Syst
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err)
+			return fmt.Errorf("invalid additionalFiles source file (%s):\n%w", sourceFile, err)
 		}
 
 		if !isFile {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile)
+			return fmt.Errorf("invalid additionalFiles source file (%s): not a file", sourceFile)
 		}
 	}
 
 	for i, script := range config.PostInstallScripts {
 		err = validateScript(baseConfigPath, &script)
 		if err != nil {
-			return fmt.Errorf("invalid PostInstallScripts item at index %d: %w", i, err)
+			return fmt.Errorf("invalid postInstallScripts item at index %d: %w", i, err)
 		}
 	}
 
 	for i, script := range config.FinalizeImageScripts {
 		err = validateScript(baseConfigPath, &script)
 		if err != nil {
-			return fmt.Errorf("invalid FinalizeImageScripts item at index %d: %w", i, err)
+			return fmt.Errorf("invalid finalizeImageScripts item at index %d: %w", i, err)
 		}
 	}
 

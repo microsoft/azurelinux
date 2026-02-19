@@ -19,7 +19,7 @@ func bootTypeToImager(bootType imagecustomizerapi.BootType) (string, error) {
 		return "legacy", nil
 
 	default:
-		return "", fmt.Errorf("invalid BootType value (%s)", bootType)
+		return "", fmt.Errorf("invalid bootType value (%s)", bootType)
 	}
 }
 

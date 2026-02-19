@@ -97,7 +97,7 @@ func TestDiskIsValidInvalidTableType(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "PartitionTableType")
+	assert.ErrorContains(t, err, "partitionTableType")
 }
 
 func TestDiskIsValidInvalidPartition(t *testing.T) {

@@ -13,13 +13,13 @@ import (
 
 type Disk struct {
 	// The type of partition table to use (e.g. mbr, gpt)
-	PartitionTableType PartitionTableType `yaml:"PartitionTableType"`
+	PartitionTableType PartitionTableType `yaml:"partitionTableType"`
 
 	// The virtual size of the disk.
-	MaxSize uint64 `yaml:"MaxSize"`
+	MaxSize uint64 `yaml:"maxSize"`
 
 	// The partitions to allocate on the disk.
-	Partitions []Partition `yaml:"Partitions"`
+	Partitions []Partition `yaml:"partitions"`
 }
 
 func (d *Disk) IsValid() error {
