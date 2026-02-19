@@ -1,19 +1,15 @@
 # PPI::XSAccessor is experimental
-%if 0%{?rhel:1}
-%bcond_with XSAccessor
-%else
 %bcond_without XSAccessor
-%endif
 
 Name:           perl-PPI
-Version:        1.270
-Release:        4%{?dist}
+Version:        1.279
+Release:        1%{?dist}
 Summary:        Parse, Analyze and Manipulate Perl
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PPI
-Source0:        https://cpan.metacpan.org/modules/by-module/PPI/PPI-%{version}.tar.gz#/perl-PPI-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/PPI/PPI-%{version}.tar.gz
 BuildArch:      noarch
 # =============== Module Build ======================
 BuildRequires:  coreutils
@@ -32,7 +28,7 @@ BuildRequires:  perl(Digest::MD5) >= 2.35
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(IO::String) >= 1.07
+BuildRequires:  perl(if)
 BuildRequires:  perl(List::Util) >= 1.33
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Params::Util) >= 1.00
@@ -46,23 +42,17 @@ BuildRequires:  perl(CPAN::Meta) >= 2.120900
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(File::Spec::Unix)
 BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(if)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(Test::Deep)
-BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(parent)
+BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(Test::NoWarnings)
 BuildRequires:  perl(Test::Object) >= 0.07
 BuildRequires:  perl(Test::SubCalls) >= 1.07
 BuildRequires:  perl(Test::Warnings)
 BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(utf8)
-# =============== Module Runtime ====================
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-%if %{with XSAccessor}
-BuildRequires:  perl(Class::XSAccessor)
-%endif
+# =============== Dependencies ======================
 # Run-require Task::Weaken, see Changes for more details.
 Requires:       perl(Task::Weaken)
 
@@ -74,6 +64,9 @@ Parse, analyze and manipulate Perl (without perl).
 
 %prep
 %setup -q -n PPI-%{version}
+
+# Fix bogus exec permissions
+chmod -c -x Changes LICENSE README
 
 %if %{without XSAccessor}
 rm lib/PPI/XSAccessor.pm
@@ -99,6 +92,10 @@ make test
 %{_mandir}/man3/PPI*.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.279-1
+- Update to version 1.279
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.270-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

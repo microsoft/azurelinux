@@ -19583,8 +19583,8 @@
         "type": "other",
         "other": {
           "name": "perl-PPI",
-          "version": "1.270",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/PPI/PPI-1.270.tar.gz"
+          "version": "1.279",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/PPI/PPI-1.279.tar.gz"
         }
       }
     },
