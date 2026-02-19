@@ -25343,8 +25343,8 @@
         "type": "other",
         "other": {
           "name": "python-trio",
-          "version": "0.16.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trio/trio-0.16.0.tar.gz"
+          "version": "0.23.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trio/trio-0.23.1.tar.gz"
         }
       }
     },
