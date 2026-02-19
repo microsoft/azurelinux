@@ -22843,8 +22843,8 @@
         "type": "other",
         "other": {
           "name": "python-fasteners",
-          "version": "0.18",
-          "downloadUrl": "https://github.com/harlowja/fasteners/archive/0.18/fasteners-0.18.tar.gz"
+          "version": "0.19",
+          "downloadUrl": "https://github.com/harlowja/fasteners/archive/0.19/fasteners-0.19.tar.gz"
         }
       }
     },
