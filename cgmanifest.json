@@ -16844,7 +16844,7 @@
         "other": {
           "name": "perl-Crypt-CBC",
           "version": "2.33",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-CBC-2.33.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LD/LDS/Crypt-CBC-3.04.tar.gz"
         }
       }
     },
