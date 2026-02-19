@@ -1,18 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:      libnumbertext
-Version:   1.0.5
-Release:   5%{?dist}
+Version:   1.0.11
+Release:   1%{?dist}
 Summary:   Number to number name and money text conversion library
 
 #The entire source code is dual license LGPLv3+ or BSD, except for
 #the data files hr.sor, sr.sor and sh.sor which are tri license
 #CC-BY-SA or LGPLv3+ or BSD
-License:   (LGPLv3+ or BSD) and (LGPLv3+ or BSD or CC-BY-SA)
+License:   ( LGPL-3.0-or-later OR BSD 3-Clause ) AND ( LGPL-3.0-or-later OR CC-BY-SA-3.0 )
 URL:       https://github.com/Numbertext/libnumbertext
 Source:    https://github.com/Numbertext/libnumbertext/releases/download/%{version}/libnumbertext-%{version}.tar.xz
 
 BuildRequires: autoconf, automake, libtool, gcc-c++
+BuildRequires: make
 
 %description
 Language-neutral NUMBERTEXT and MONEYTEXT functions for LibreOffice Calc
@@ -30,14 +31,14 @@ Includes and definitions for developing with libnumbertext
 %build
 autoreconf -v --install --force
 %configure --disable-silent-rules --disable-static --disable-werror --with-pic
-make %{?_smp_mflags}
+%make_build
 
 %check
 make check
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 
 %ldconfig_scriptlets
@@ -55,6 +56,10 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 %{_libdir}/*.so
 
 %changelog
+* Wed Nov 20 2024 Akarsh Chaudhary  <v-akarshc@microsoft.com> -1.0.11-1
+- Upgrade to version 1.0.11
+-License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
