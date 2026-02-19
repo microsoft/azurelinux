@@ -2259,6 +2259,7 @@
                 "clamav",
                 "cloud-hypervisor",
                 "cloud-provider-kubevirt",
+                "cluster-api-provider-kubevirt",
                 "cmake-fedora",
                 "containerd2",
                 "coredns",

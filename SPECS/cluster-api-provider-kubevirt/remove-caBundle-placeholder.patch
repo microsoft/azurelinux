@@ -1,0 +1,45 @@
+From 42085d27e0e948371398b8a39b5619244b4e8c4e Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Tue, 12 Aug 2025 11:11:33 -0700
+Subject: [PATCH] Remove kubevirt webhook clientconfig caBundle placeholder
+
+Removes the kubevirt webhook clientconfig caBundle placeholder as this
+is no longer works with Kubernetes v1.31 [0]
+
+[0] https://github.com/kubernetes/kubernetes/issues/125569#issuecomment-2261245120 
+
+---
+ config/crd/patches/webhook_in_kubevirtclusters.yaml | 3 ---
+ config/crd/patches/webhook_in_kubevirtmachines.yaml | 3 ---
+ 2 files changed, 6 deletions(-)
+
+diff --git a/config/crd/patches/webhook_in_kubevirtclusters.yaml b/config/crd/patches/webhook_in_kubevirtclusters.yaml
+index 0da5af4..57765a3 100644
+--- a/config/crd/patches/webhook_in_kubevirtclusters.yaml
++++ b/config/crd/patches/webhook_in_kubevirtclusters.yaml
+@@ -10,9 +10,6 @@ spec:
+     webhook:
+       conversionReviewVersions: ["v1", "v1beta1"]
+       clientConfig:
+-        # this is "\n" used as a placeholder, otherwise it will be rejected by the apiserver for being blank,
+-        # but we're going to set it later using the cert-manager (or potentially a patch if not using cert-manager)
+-        caBundle: Cg==
+         service:
+           namespace: system
+           name: webhook-service
+diff --git a/config/crd/patches/webhook_in_kubevirtmachines.yaml b/config/crd/patches/webhook_in_kubevirtmachines.yaml
+index 12efbba..26e3fe8 100644
+--- a/config/crd/patches/webhook_in_kubevirtmachines.yaml
++++ b/config/crd/patches/webhook_in_kubevirtmachines.yaml
+@@ -10,9 +10,6 @@ spec:
+     webhook:
+       conversionReviewVersions: ["v1", "v1beta1"]
+       clientConfig:
+-        # this is "\n" used as a placeholder, otherwise it will be rejected by the apiserver for being blank,
+-        # but we're going to set it later using the cert-manager (or potentially a patch if not using cert-manager)
+-        caBundle: Cg==
+         service:
+           namespace: system
+           name: webhook-service
+-- 
+2.49.0
