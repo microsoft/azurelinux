@@ -5930,8 +5930,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-it",
-          "version": "2.4",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/linguistico/italiano_2_4_2007_09_01.zip"
+          "version": "5.1.1",
+          "downloadUrl": "https://pagure.io/dizionario_italiano/archive/5.1.1/dizionario_italiano-5.1.1.tar.gz"
         }
       }
     },
