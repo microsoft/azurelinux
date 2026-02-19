@@ -22533,8 +22533,8 @@
         "type": "other",
         "other": {
           "name": "python-cups",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/OpenPrinting/pycups/releases/download/v2.0.1/pycups-2.0.1.tar.gz"
+          "version": "2.0.4",
+          "downloadUrl": "https://github.com/OpenPrinting/pycups/releases/download/v2.0.4/pycups-2.0.4.tar.gz"
         }
       }
     },
