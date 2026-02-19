@@ -2,11 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        C library for portable packet creation and injection
 Name:           libnet
-Version:        1.2
-Release:        2%{?dist}
-License:        BSD
+Version:        1.3
+Release:        1%{?dist}
+License:        BSD-2-Clause AND BSD-3-Clause
 URL:            https://github.com/libnet/libnet
 Source0:        https://github.com/libnet/libnet/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         libnet-config.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  %{_bindir}/pod2man
@@ -46,6 +47,7 @@ developing applications that use libnet.
 
 %prep
 %setup -q
+%patch -P 0 -p1
 # Avoid library soname bump (https://github.com/libnet/libnet/issues/115)
 sed -e 's/-version-info 9:0:0/-version-info 9:0:8/' -i src/Makefile.{am,in}
 
@@ -87,6 +89,7 @@ done
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}.h
 %{_includedir}/%{name}/
+%{_mandir}/man1/%{name}*.1*
 %{_mandir}/man3/%{name}*.3*
 
 %if 0%{!?_without_doc:1}
@@ -95,6 +98,10 @@ done
 %endif
 
 %changelog
+* Mon Nov 18 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.3-1
+- upgrade to version 1.3
+-License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
