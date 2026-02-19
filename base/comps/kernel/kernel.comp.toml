@@ -2,6 +2,7 @@
 
 # Set rhel to 0 to avoid deps on non-existent cert packages
 # (rhel=10 would engage RHEL-specific BuildRequires)
+# Add without = ["debug"] to skip debug kernel variant and reduce build time
 [components.kernel.build]
 defines = { rhel = "0" }
 without = ["debug"]
