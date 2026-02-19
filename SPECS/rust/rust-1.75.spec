@@ -50,6 +50,7 @@ Patch5:         CVE-2026-24116_1.75.patch
 Patch6:         CVE-2025-58160_1.75.patch
 Patch7:         CVE-2026-25541_1.75.patch
 Patch8:         CVE-2026-25727_1.75.patch
+Patch9:         CVE-2023-48795_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
