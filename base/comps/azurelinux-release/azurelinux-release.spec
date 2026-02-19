@@ -5,7 +5,7 @@
 # or 0 for RC and stable releases
 %define is_development 1
 
-# TODO(azl): review
+# TODO(azl): review -- set to a future date for now, fix before release
 %define eol_date 1900-01-01
 
 %define dist_version_major 4
