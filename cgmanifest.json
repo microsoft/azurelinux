@@ -18433,8 +18433,8 @@
         "type": "other",
         "other": {
           "name": "perl-List-MoreUtils-XS",
-          "version": "0.428",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-XS-0.428.tar.gz"
+          "version": "0.430",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/List/List-MoreUtils-XS-0.430.tar.gz"
         }
       }
     },
