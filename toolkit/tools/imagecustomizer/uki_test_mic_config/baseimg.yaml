@@ -1,0 +1,87 @@
+storage:
+  bootType: efi
+  disks:
+  - partitionTableType: gpt
+    maxSize: 6144M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 1025M
+
+    - id: boot
+      start: 1025M
+      end: 2048M
+
+    - id: root
+      start: 2048M
+      end: 4096M
+
+    - id: roothash
+      start: 4096M
+      end: 4224M
+
+    - id: var
+      start: 4224M
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: root
+    type: ext4
+    mountPoint:
+      path: /
+
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+
+os:
+  resetBootLoaderType: hard-reset
+  selinux:
+    mode: enforcing
+
+  kernelCommandLine:
+    extraCommandLine: "console=tty0 console=ttyS0 rd.debug"
+
+  packages:
+    remove:
+    - grub2-efi-binary
+    install:
+    - systemd-ukify
+    - systemd-boot
+    - efibootmgr
+    - vim
+    - lvm2
+    - veritysetup
+    - selinux-policy
+    - selinux-policy-modules
+
+  users:
+  - name: test
+    password:
+      type: plain-text
+      value: password
+    secondaryGroups:
+    - sudo
+
+  verity:
+    corruptionOption: panic
+    dataPartition:
+      idType: id
+      id: root
+    hashPartition:
+      idType: id
+      id: roothash
+
+  uki: true
