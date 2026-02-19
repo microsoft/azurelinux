@@ -5,18 +5,20 @@ Distribution:   Azure Linux
 %global ucddir %{unicodedir}/ucd
 
 Name:           unicode-ucd
-Version:        13.0.0
+Version:        16.0.0
 Release:        2%{?dist}
 Summary:        Unicode Character Database
 
-# https://fedoraproject.org/wiki/Licensing/MIT#Modern_Style_without_sublicense_.28Unicode.29
-License:        MIT
-URL:            http://www.unicode.org/ucd/
-Source0:        http://www.unicode.org/Public/zipped/%{version}/UCD.zip
-# http://www.unicode.org/terms_of_use.html referenced in ReadMe.txt redirects to:
-# curl http://www.unicode.org/copyright.html | dos2unix > copyright.html
-Source1:        http://www.unicode.org/copyright.html
-Source2:        http://www.unicode.org/Public/zipped/%{version}/Unihan.zip
+# http://www.unicode.org/terms_of_use.html in ReadMe.txt redirects to:
+# http://www.unicode.org/copyright.html
+# which links to https://www.unicode.org/license.txt
+# https://github.com/spdx/license-list-XML/issues/2105
+License:        Unicode-3.0
+URL:            https://www.unicode.org/ucd/
+# update with fbrnch update-version -f
+Source0:        https://www.unicode.org/Public/zipped/%{version}/UCD.zip
+Source1:        https://www.unicode.org/Public/zipped/%{version}/Unihan.zip
+Source2:        https://www.unicode.org/license.txt
 BuildArch:      noarch
 
 %description
@@ -48,13 +50,12 @@ grep -q "%{version}" ReadMe.txt || (echo "zip file seems not %{version}" ; exit 
 %install
 mkdir -p %{buildroot}%{ucddir}
 cp -ar . %{buildroot}%{ucddir}
-cp -p %{SOURCE2} %{buildroot}%{ucddir}
-
-cp -p %{SOURCE1} .
+cp -p %{SOURCE1} %{buildroot}%{ucddir}
+cp %{SOURCE2} .
 
 
 %files
-%doc copyright.html
+%license license.txt
 %dir %{unicodedir}
 %{ucddir}
 %exclude %{ucddir}/Unihan.zip
@@ -64,8 +65,65 @@ cp -p %{SOURCE1} .
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 16 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 16.0.0-2
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- change the URL and Source0 from http to https
+- License verified
+
+* Thu Sep 19 2024 Jens Petersen <petersen@redhat.com> - 16.0.0-1
+- update for https://unicode.org/versions/Unicode16.0.0/
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 15.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jul 15 2024 Parag Nemade <pnemade AT redhat DOT com> - 15.1.0-3
+- Update the license tag to Unicode-3.0
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 15.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Sep 16 2023 Jens Petersen <petersen@redhat.com> - 15.1.0-1
+- Unicode 15.1 released
+
+* Thu Aug 31 2023 Jens Petersen <petersen@redhat.com> - 15.1.0-0.2
+- add license.txt
+
+* Thu Aug 31 2023 Jens Petersen <petersen@redhat.com> - 15.1.0-0.1
+- update to draft 15.1.0: https://unicode.org/versions/Unicode15.1.0/
+- do not add copyright.html file from website
+- add missing Unicode-TOU license tag
+
+* Mon Aug 21 2023 Parag Nemade <pnemade AT fedoraproject DOT org> - 15.0.0-4
+- Migrate to SPDX license expression
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 15.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 15.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Sep 14 2022 Jens Petersen <petersen@redhat.com> - 15.0.0-1
+- https://www.unicode.org/versions/Unicode15.0.0/ (#2126234)
+- http://blog.unicode.org/2022/09/announcing-unicode-standard-version-150.html
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 14.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 14.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Sep 20 2021 Jens Petersen <petersen@redhat.com> - 14.0.0-1
+- update to Unicode 14
+- https://www.unicode.org/versions/Unicode14.0.0/
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 13.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 13.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 13.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Mar 11 2020 Jens Petersen <petersen@redhat.com> - 13.0.0-1
 - update to Unicode 13

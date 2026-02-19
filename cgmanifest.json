@@ -29566,8 +29566,8 @@
         "type": "other",
         "other": {
           "name": "unicode-ucd",
-          "version": "13.0.0",
-          "downloadUrl": "http://www.unicode.org/Public/zipped/13.0.0/UCD.zip"
+          "version": "16.0.0",
+          "downloadUrl": "https://www.unicode.org/Public/zipped/16.0.0/UCD.zip"
         }
       }
     },
