@@ -26043,8 +26043,8 @@
         "type": "other",
         "other": {
           "name": "rarian",
-          "version": "0.8.1",
-          "downloadUrl": "http://download.gnome.org/sources/rarian/0.8/rarian-0.8.1.tar.bz2"
+          "version": "0.8.6",
+          "downloadUrl": "https://gitlab.freedesktop.org/rarian/rarian/-/releases/0.8.6/downloads/assets/rarian-0.8.6.tar.bz2"
         }
       }
     },
