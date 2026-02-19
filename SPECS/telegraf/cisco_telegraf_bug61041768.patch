@@ -1,18 +1,19 @@
-From 3fe3d313aea92822999c714a0718290b5b40805d Mon Sep 17 00:00:00 2001
-From: asbhat10 <abhishekbhat10@gmail.com>
-Date: Fri, 23 Jan 2026 09:39:31 -0800
-Subject: [PATCH 1/4] Handle DME events for cisco NXOS telemetry data
+From 279c3f7c7bde9ef7871fdc70799b03bc5cc9fc88 Mon Sep 17 00:00:00 2001
+From: Sindhu Karri <lakarri@microsoft.com>
+Date: Thu, 19 Feb 2026 16:35:01 +0000
+Subject: [PATCH] Handle DME events for cisco NXOS telemetry data
+Upstream Reference Link: https://github.com/influxdata/telegraf/pull/18254
 
 ---
- .../cisco_telemetry_mdt.go                    |  12 +-
- .../cisco_telemetry_mdt_test.go               | 145 ++++++++++++++++++
- 2 files changed, 155 insertions(+), 2 deletions(-)
+ .../cisco_telemetry_mdt.go                    |   8 +-
+ .../cisco_telemetry_mdt_test.go               | 162 ++++++++++++++++++
+ 2 files changed, 168 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
-index f2ffc29d7375e..90c996a8df70c 100644
+index f52533fcb..660b1e2fc 100644
 --- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
 +++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
-@@ -722,8 +722,12 @@ func (c *CiscoTelemetryMDT) parseContentField(
+@@ -695,8 +695,12 @@ func (c *CiscoTelemetryMDT) parseContentField(grouper *metric.SeriesGrouper, fie
  				nxChildren = subfield
  			} else {
  				sub := subfield.Fields
@@ -26,36 +27,12 @@ index f2ffc29d7375e..90c996a8df70c 100644
 +					}
  				}
  			}
- 			// if nxAttributes == NULL then class based query.
-@@ -767,12 +771,14 @@ func (c *CiscoTelemetryMDT) parseContentField(
- 	// DME structure: https://developer.cisco.com/site/nxapi-dme-model-reference-api/
- 	rn := ""
- 	dn := false
-+	dnstr := ""
- 
- 	for _, subfield := range nxAttributes.Fields {
- 		if subfield.Name == "rn" {
- 			rn = decodeTag(subfield)
- 		} else if subfield.Name == "dn" {
- 			dn = true
-+			dnstr = decodeTag(subfield)
- 		}
- 	}
- 
-@@ -781,6 +787,8 @@ func (c *CiscoTelemetryMDT) parseContentField(
- 	} else if !dn { // Check for distinguished name being present
- 		c.acc.AddError(errors.New("failed while decoding NX-OS: missing 'dn' field"))
- 		return
-+	} else if dn {
-+		tags["dn"] = dnstr
- 	}
- 
- 	for _, subfield := range nxAttributes.Fields {
+ 			//if nxAttributes == NULL then class based query.
 diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-index 3e81eb60ce005..c2d24452e1627 100644
+index 841172f18..dc6db69e9 100644
 --- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
 +++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-@@ -1379,3 +1379,148 @@ func TestSourceFieldRewrite(t *testing.T) {
+@@ -1240,3 +1240,165 @@ func TestSourceFieldRewrite(t *testing.T) {
  	fields := map[string]interface{}{"bool": false}
  	acc.AssertContainsTaggedFields(t, "alias", fields, tags)
  }
@@ -114,40 +91,58 @@ index 3e81eb60ce005..c2d24452e1627 100644
 +																							{
 +																								Fields: []*telemetry.TelemetryField{
 +																									{
-+																										Name:        "childAction",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: ""},
++																										Name: "childAction",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "",
++																										},
 +																									},
 +																									{
-+																										Name:        "dn",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "sys/intf/phys-[eth1/11]/phys"},
++																										Name: "dn",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "sys/intf/phys-[eth1/11]/phys",
++																										},
 +																									},
 +																									{
-+																										Name:        "lastLinkStChg",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "2026-01-22T14:15:46.199-08:00"},
++																										Name: "lastLinkStChg",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "2026-01-22T14:15:46.199-08:00",
++																										},
 +																									},
 +																									{
-+																										Name:        "operBitset",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "3-4"},
++																										Name: "operBitset",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "3-4",
++																										},
 +																									},
 +																									{
-+																										Name:        "operSt",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "up"},
++																										Name: "operSt",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "up",
++																										},
 +																									},
 +																									{
-+																										Name:        "operStQual",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "none"},
++																										Name: "operStQual",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "none",
++																										},
 +																									},
 +																									{
-+																										Name:        "resetCtr",
-+																										ValueByType: &telemetry.TelemetryField_Sint64Value{Sint64Value: 2},
++																										Name: "resetCtr",
++																										ValueByType: &telemetry.TelemetryField_Sint64Value{
++																											Sint64Value: 2,
++																										},
 +																									},
 +																									{
-+																										Name:        "rn",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: ""},
++																										Name: "rn",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "",
++																										},
 +																									},
 +																									{
-+																										Name:        "status",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "modified"},
++																										Name: "status",
++																										ValueByType: &telemetry.TelemetryField_StringValue{
++																											StringValue: "modified",
++																										},
 +																									},
 +																								},
 +																							},
@@ -189,7 +184,6 @@ index 3e81eb60ce005..c2d24452e1627 100644
 +	tags := map[string]string{
 +		"path":         "EVENT-LIST",
 +		"EVENT_LIST":   "EVENT-LIST",
-+		"dn":           "sys/intf/phys-[eth1/11]/phys",
 +		"source":       "NX-PGBL-GX2",
 +		"subscription": "1",
 +	}
@@ -204,235 +198,6 @@ index 3e81eb60ce005..c2d24452e1627 100644
 +	}
 +	acc.AssertContainsTaggedFields(t, "EVENT-LIST", fields, tags)
 +}
+-- 
+2.45.4
 
-From df079326472a1652ee2a62b52aa3504d27d51e08 Mon Sep 17 00:00:00 2001
-From: asbhat10 <abhishekbhat10@gmail.com>
-Date: Fri, 23 Jan 2026 11:08:49 -0800
-Subject: [PATCH 2/4] Fix lint errors
-
----
- .../cisco_telemetry_mdt_test.go               | 54 ++++++++++++-------
- 1 file changed, 36 insertions(+), 18 deletions(-)
-
-diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-index c2d24452e1627..e83c7ba0e9c8d 100644
---- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-+++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-@@ -1434,40 +1434,58 @@ func TestHandleNXDMEEventListWithDn(t *testing.T) {
- 																							{
- 																								Fields: []*telemetry.TelemetryField{
- 																									{
--																										Name:        "childAction",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: ""},
-+																										Name: "childAction",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "",
-+																									},
- 																									},
- 																									{
--																										Name:        "dn",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "sys/intf/phys-[eth1/11]/phys"},
-+																										Name: "dn",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "sys/intf/phys-[eth1/11]/phys",
-+																									},
- 																									},
- 																									{
--																										Name:        "lastLinkStChg",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "2026-01-22T14:15:46.199-08:00"},
-+																										Name: "lastLinkStChg",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "2026-01-22T14:15:46.199-08:00",
-+																									},
- 																									},
- 																									{
--																										Name:        "operBitset",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "3-4"},
-+																										Name: "operBitset",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "3-4",
-+																									},
- 																									},
- 																									{
--																										Name:        "operSt",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "up"},
-+																										Name: "operSt",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "up",
-+																									},
- 																									},
- 																									{
--																										Name:        "operStQual",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "none"},
-+																										Name: "operStQual",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "none",
-+																									},
- 																									},
- 																									{
--																										Name:        "resetCtr",
--																										ValueByType: &telemetry.TelemetryField_Sint64Value{Sint64Value: 2},
-+																										Name: "resetCtr",
-+																										ValueByType: &telemetry.TelemetryField_Sint64Value{
-+																										Sint64Value: 2,
-+																									},
- 																									},
- 																									{
--																										Name:        "rn",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: ""},
-+																										Name: "rn",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "",
-+																									},
- 																									},
- 																									{
--																										Name:        "status",
--																										ValueByType: &telemetry.TelemetryField_StringValue{StringValue: "modified"},
-+																										Name: "status",
-+																										ValueByType: &telemetry.TelemetryField_StringValue{
-+																										StringValue: "modified",
-+																									},
- 																									},
- 																								},
- 																							},
-
-From c12af36db8b5945805a228eb7f06145363045688 Mon Sep 17 00:00:00 2001
-From: asbhat10 <abhishekbhat10@gmail.com>
-Date: Fri, 23 Jan 2026 11:12:43 -0800
-Subject: [PATCH 3/4] Fix fmt errors
-
----
- .../cisco_telemetry_mdt_test.go               | 36 +++++++++----------
- 1 file changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-index e83c7ba0e9c8d..c7dbfe83d3c4a 100644
---- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-+++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-@@ -1436,56 +1436,56 @@ func TestHandleNXDMEEventListWithDn(t *testing.T) {
- 																									{
- 																										Name: "childAction",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "",
--																									},
-+																											StringValue: "",
-+																										},
- 																									},
- 																									{
- 																										Name: "dn",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "sys/intf/phys-[eth1/11]/phys",
--																									},
-+																											StringValue: "sys/intf/phys-[eth1/11]/phys",
-+																										},
- 																									},
- 																									{
- 																										Name: "lastLinkStChg",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "2026-01-22T14:15:46.199-08:00",
--																									},
-+																											StringValue: "2026-01-22T14:15:46.199-08:00",
-+																										},
- 																									},
- 																									{
- 																										Name: "operBitset",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "3-4",
--																									},
-+																											StringValue: "3-4",
-+																										},
- 																									},
- 																									{
- 																										Name: "operSt",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "up",
--																									},
-+																											StringValue: "up",
-+																										},
- 																									},
- 																									{
- 																										Name: "operStQual",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "none",
--																									},
-+																											StringValue: "none",
-+																										},
- 																									},
- 																									{
- 																										Name: "resetCtr",
- 																										ValueByType: &telemetry.TelemetryField_Sint64Value{
--																										Sint64Value: 2,
--																									},
-+																											Sint64Value: 2,
-+																										},
- 																									},
- 																									{
- 																										Name: "rn",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "",
--																									},
-+																											StringValue: "",
-+																										},
- 																									},
- 																									{
- 																										Name: "status",
- 																										ValueByType: &telemetry.TelemetryField_StringValue{
--																										StringValue: "modified",
--																									},
-+																											StringValue: "modified",
-+																										},
- 																									},
- 																								},
- 																							},
-
-From c3c1d417bbc6cbe0658b8be439c04249d048f5d1 Mon Sep 17 00:00:00 2001
-From: asbhat10 <abhishekbhat10@gmail.com>
-Date: Wed, 28 Jan 2026 10:22:34 -0800
-Subject: [PATCH 4/4] Address review comments. Removed the addition of dn as
- tag in code
-
----
- plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go     | 4 ----
- .../inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go    | 1 -
- 2 files changed, 5 deletions(-)
-
-diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
-index 90c996a8df70c..13a05b19d59e6 100644
---- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
-+++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt.go
-@@ -771,14 +771,12 @@ func (c *CiscoTelemetryMDT) parseContentField(
- 	// DME structure: https://developer.cisco.com/site/nxapi-dme-model-reference-api/
- 	rn := ""
- 	dn := false
--	dnstr := ""
- 
- 	for _, subfield := range nxAttributes.Fields {
- 		if subfield.Name == "rn" {
- 			rn = decodeTag(subfield)
- 		} else if subfield.Name == "dn" {
- 			dn = true
--			dnstr = decodeTag(subfield)
- 		}
- 	}
- 
-@@ -787,8 +785,6 @@ func (c *CiscoTelemetryMDT) parseContentField(
- 	} else if !dn { // Check for distinguished name being present
- 		c.acc.AddError(errors.New("failed while decoding NX-OS: missing 'dn' field"))
- 		return
--	} else if dn {
--		tags["dn"] = dnstr
- 	}
- 
- 	for _, subfield := range nxAttributes.Fields {
-diff --git a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-index c7dbfe83d3c4a..4051b2dbdc00d 100644
---- a/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-+++ b/plugins/inputs/cisco_telemetry_mdt/cisco_telemetry_mdt_test.go
-@@ -1527,7 +1527,6 @@ func TestHandleNXDMEEventListWithDn(t *testing.T) {
- 	tags := map[string]string{
- 		"path":         "EVENT-LIST",
- 		"EVENT_LIST":   "EVENT-LIST",
--		"dn":           "sys/intf/phys-[eth1/11]/phys",
- 		"source":       "NX-PGBL-GX2",
- 		"subscription": "1",
- 	}
