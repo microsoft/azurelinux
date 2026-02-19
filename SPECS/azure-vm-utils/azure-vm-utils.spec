@@ -4,7 +4,8 @@ Name:           azure-vm-utils
 Version:        0.7.0
 Release:        1%{?dist}
 Summary:        Utilities and udev rules for Linux on Azure
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 License:        MIT
 URL:            https://github.com/Azure/%{name}
 Source0:        https://github.com/Azure/azure-vm-utils/archive/refs/tags/v0.7.0.tar.gz#/%{name}-%{version}.tar.gz
