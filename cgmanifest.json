@@ -2117,8 +2117,8 @@
         "type": "other",
         "other": {
           "name": "corosync-qdevice",
-          "version": "3.0.1",
-          "downloadUrl": "https://github.com/corosync/corosync-qdevice/releases/download/v3.0.1/corosync-qdevice-3.0.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/corosync/corosync-qdevice/releases/download/v3.0.3/corosync-qdevice-3.0.3.tar.gz"
         }
       }
     },
