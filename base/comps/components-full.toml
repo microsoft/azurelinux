@@ -819,7 +819,6 @@
 [components.gnulib]
 [components.gnuplot]
 [components.gnustep-base]
-[components.gnustep-make]
 [components.gobject-introspection]
 [components.golang-bitbucket-ww-goautoneg]
 [components.golang-cloud-google-auth]
