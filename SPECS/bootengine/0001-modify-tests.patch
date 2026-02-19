@@ -1,0 +1,34 @@
+From aa3edfbf9fa3bfe59d945901a2a55d637e677bd9 Mon Sep 17 00:00:00 2001
+From: SumitJenaHCL <v-sumitjena@microsoft.com>
+Date: Thu, 29 Jan 2026 13:40:55 +0530
+Subject: [PATCH] modify tests
+
+---
+ dracut/10usr-generator/testsuite.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dracut/10usr-generator/testsuite.sh b/dracut/10usr-generator/testsuite.sh
+index b2b0c7c..d22e50b 100755
+--- a/dracut/10usr-generator/testsuite.sh
++++ b/dracut/10usr-generator/testsuite.sh
+@@ -50,7 +50,7 @@ After=remount-sysroot.service
+ What=/foo
+ Where=/sysroot/usr
+ Type=auto
+-Options=ro
++Options=ro,rescue=nologreplay
+ EOF
+     return $?
+ }
+@@ -70,7 +70,7 @@ After=remount-sysroot.service
+ What=/two
+ Where=/sysroot/usr
+ Type=auto
+-Options=ro
++Options=ro,rescue=nologreplay
+ EOF
+     return $?
+ }
+-- 
+2.45.4
+
