@@ -2317,6 +2317,8 @@
                 "lsb-release",
                 "ltp",
                 "lttng-consume",
+                "manticore-hwe",
+                "manticore-hwe-signed",
                 "mm-common",
                 "moby-containerd-cc",
                 "moby-engine",

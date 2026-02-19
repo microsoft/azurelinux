@@ -12990,6 +12990,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "manticore-hwe",
+          "version": "3.2.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/manticore-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mariadb",
           "version": "10.11.15",
           "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.15/source/mariadb-10.11.15.tar.gz"
