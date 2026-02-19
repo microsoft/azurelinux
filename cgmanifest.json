@@ -19493,8 +19493,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Coverage-TrustPod",
-          "version": "0.100005",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Coverage-TrustPod-0.100005.tar.gz"
+          "version": "0.100006",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Coverage-TrustPod-0.100006.tar.gz"
         }
       }
     },
