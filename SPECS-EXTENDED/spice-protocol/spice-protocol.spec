@@ -1,11 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           spice-protocol
-Version:        0.14.3
-Release:        2%{?dist}
+Version:        0.14.4
+Release:        7%{?dist}
 Summary:        Spice protocol header files
 # Main headers are BSD, controller / foreign menu are LGPL
-License:        BSD and LGPLv2+
+License:        BSD-3-Clause AND LGPL-2.1-or-later
 URL:            https://www.spice-space.org/
 Source0:        https://www.spice-space.org/download/releases/%{name}-%{version}.tar.xz
 Source1:        https://www.spice-space.org/download/releases/%{name}-%{version}.tar.xz.sig
@@ -39,11 +39,42 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.3-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.14.4-7
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Feb 10 2022 Victor Toso <victortoso@redhat.com> - 0.14.4-1
+- Update to 0.14.4 release
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sun Nov 29 2020 Victor Toso <victortoso@redhat.com> - 0.14.3-1
 - Update to 0.14.3 release
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri May 15 2020 Victor Toso <victortoso@redhat.com> - 0.14.2-1
 - Update to 0.14.2 release (now using meson only)
