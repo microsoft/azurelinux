@@ -20503,8 +20503,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-TrailingSpace",
-          "version": "0.0302",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-TrailingSpace-0.0302.tar.gz"
+          "version": "0.0601",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-TrailingSpace-0.0601.tar.gz"
         }
       }
     },
