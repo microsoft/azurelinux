@@ -1,15 +1,19 @@
+	
+# Enable optional dependencies
+%bcond_without perl_File_ShareDir_enables_optional_deps
+ 
 Name:           perl-File-ShareDir
-Version:        1.116
-Release:        8%{?dist}
+Version:        1.118
+Release:        1%{?dist}
 Summary:        Locate per-dist and per-module shared files
 # other files:              GPL+ or Artistic
 ## not in binary packages
 # inc/latest/private.pm:    ASL 2.0
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-ShareDir
-Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-ShareDir-%{version}.tar.gz#/perl-File-ShareDir-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-ShareDir-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -31,20 +35,24 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(Class::Inspector) >= 1.12
 BuildRequires:  perl(constant)
 # Optional run-time
+%if %{with perl_File_ShareDir_enables_optional_deps}
 BuildRequires:  perl(List::MoreUtils) >= 0.428
 BuildRequires:  perl(Params::Util) >= 1.07
+%endif
 # Tests
-BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Test::More) >= 0.47
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Optional tests
+BuildRequires:  perl(CPAN::Meta)
 Requires:       perl(Class::Inspector) >= 1.12
+%if %{with perl_File_ShareDir_enables_optional_deps}
 Recommends:     perl(List::MoreUtils) >= 0.428
 Recommends:     perl(Params::Util) >= 1.07
+%endif
 
 %{?perl_default_filter}
 %global __requires_exclude %{?__requires_exclude}|perl\\(Class::Inspector\\)$
@@ -59,11 +67,11 @@ available to the larger Perl community.
 %setup -q -n File-ShareDir-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} %{buildroot}/*
 chmod 644 share/sample.txt
 chmod 644 share/subdir/sample.txt
@@ -80,6 +88,10 @@ make test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.118-1
+- Update to version 1.118
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.116-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
