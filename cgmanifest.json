@@ -21683,8 +21683,8 @@
         "type": "other",
         "other": {
           "name": "proj",
-          "version": "9.2.1",
-          "downloadUrl": "https://download.osgeo.org/proj/proj-9.2.1.tar.gz"
+          "version": "9.4.1",
+          "downloadUrl": "https://download.osgeo.org/proj/proj-9.4.1.tar.gz"
         }
       }
     },
