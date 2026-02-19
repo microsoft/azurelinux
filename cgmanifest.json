@@ -24753,8 +24753,8 @@
         "type": "other",
         "other": {
           "name": "python-rtslib",
-          "version": "2.1.fb69",
-          "downloadUrl": "https://github.com/open-iscsi/rtslib-fb/archive/v2.1.fb69/rtslib-fb-2.1.fb69.tar.gz"
+          "version": "2.1.76",
+          "downloadUrl": "https://github.com/open-iscsi/rtslib-fb/archive/v2.1.76/rtslib-fb-2.1.76.tar.gz"
         }
       }
     },
