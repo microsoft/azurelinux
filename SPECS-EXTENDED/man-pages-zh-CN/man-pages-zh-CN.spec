@@ -1,20 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %global origname manpages-zh
 
 Summary: Chinese Man Pages from Chinese Man Pages Project
-Name: man-pages-zh-CN
-Version: 1.6.2.1
-Release: 9%{?dist}
-License: GFDL
-#Vendor: From CMPP (Chinese Man Pages Project)
-URL: https://github.com/man-pages-zh/
-Source0: https://github.com/man-pages-zh/%{origname}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Name:       man-pages-zh-CN
+Version:    1.6.3.6
+Release:    11%{?dist}
+License:    GFDL-1.2-no-invariants-or-later
+#Vendor:    From CMPP (Chinese Man Pages Project)
+URL:        https://github.com/man-pages-zh/
+Source0:    https://github.com/man-pages-zh/%{origname}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 Summary(zh_CN): 中文 man pages
 
 Provides: man-pages-zh_CN = %{version}-%{release}
 
+BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: gnome-common
@@ -52,19 +54,64 @@ make %{?_smp_mflags}
 %install
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/zh_CN
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+# Include the COPYRIGHT file in %doc macro
+rm $RPM_BUILD_ROOT%{_datadir}/doc/manpages-zh/COPYRIGHT
 # Remove file conflict
 %global manDest $RPM_BUILD_ROOT%{_mandir}/zh_CN
 rm -f %{manDest}/man1/newgrp.1
 
 
 %files
-%doc README NEWS
+%doc README NEWS COPYRIGHT
 %license COPYING
 %{_mandir}/zh_CN/man*/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.2.1-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.6.3.6-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon May 22 2023 Peng Wu <pwu@redhat.com> - 1.6.3.6-6
+- Rebuild the package
+
+* Mon May 22 2023 Peng Wu <pwu@redhat.com> - 1.6.3.6-5
+- Migrate to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 27 2021 Peng Wu <pwu@redhat.com> - 1.6.3.6-1
+- Update to 1.6.3.6
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Feb  1 2021 Peng Wu <pwu@redhat.com> - 1.6.3.4-1
+- Update to 1.6.3.4
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
