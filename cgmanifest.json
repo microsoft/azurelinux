@@ -27274,8 +27274,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rspec-support",
-          "version": "3.12.0",
-          "downloadUrl": "https://github.com/rspec/rspec-support/archive/refs/tags/v3.12.0.tar.gz"
+          "version": "3.13.1",
+          "downloadUrl": "https://github.com/rspec/rspec-support/archive/refs/tags/v3.13.1.tar.gz"
         }
       }
     },
