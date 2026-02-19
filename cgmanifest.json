@@ -17413,8 +17413,8 @@
         "type": "other",
         "other": {
           "name": "perl-Email-Address",
-          "version": "1.912",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Email/Email-Address-1.912.tar.gz"
+          "version": "1.913",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Email/Email-Address-1.913.tar.gz"
         }
       }
     },
