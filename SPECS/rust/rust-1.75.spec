@@ -50,6 +50,7 @@ Patch5:         CVE-2026-24116_1.75.patch
 Patch6:         CVE-2025-58160_1.75.patch
 Patch7:         CVE-2026-25541_1.75.patch
 Patch8:         CVE-2026-25727_1.75.patch
+Patch9:         CVE-2023-48795_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -185,7 +186,7 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Tue Feb 10 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-26
-- Add patch for CVE-2026-25541 & CVE-2026-25727
+- Add patch for CVE-2026-25541, CVE-2026-25727 & CVE-2023-48795
 
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.75.0-25
 - Add patch for CVE-2026-24116 & CVE-2025-58160
