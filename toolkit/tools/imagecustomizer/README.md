@@ -86,6 +86,9 @@ Disadvantages:
    For a description of all the command line options, see:
    [Azure Linux Image Customizer command line](./docs/cli.md)
 
+   For more information about creating ISO images,
+   see [Mariner Image Customizer ISO Support](./docs/iso.md)
+
 5. Use the customized image.
 
    The customized image is placed in the file that you specified with the
