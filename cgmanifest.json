@@ -18333,8 +18333,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-Color",
-          "version": "0.133",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.133.tar.gz"
+          "version": "0.134",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.134.tar.gz"
         }
       }
     },
