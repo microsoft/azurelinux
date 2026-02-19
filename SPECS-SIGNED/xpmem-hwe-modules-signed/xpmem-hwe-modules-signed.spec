@@ -95,7 +95,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
-* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-29_6.12.57.1.2
+* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-29_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-28_6.12.57.1.4

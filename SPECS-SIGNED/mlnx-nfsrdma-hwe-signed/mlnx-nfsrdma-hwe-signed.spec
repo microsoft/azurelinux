@@ -119,7 +119,7 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-mlnx-nfsrdma-*.conf
 
 %changelog
-* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.2
+* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4

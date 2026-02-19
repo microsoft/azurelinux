@@ -113,7 +113,7 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
-* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.2
+* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel and MOFED
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4

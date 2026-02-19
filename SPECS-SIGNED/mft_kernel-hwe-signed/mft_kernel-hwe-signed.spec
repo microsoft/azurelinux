@@ -91,7 +91,7 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
-* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-5_6.12.57.1.2
+* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-5_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-4_6.12.57.1.4
