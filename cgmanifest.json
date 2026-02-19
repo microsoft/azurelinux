@@ -6240,8 +6240,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-pt",
-          "version": "0.20130125",
-          "downloadUrl": "http://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20130125.tar.gz"
+          "version": "0.20131030",
+          "downloadUrl": "http://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20131030.tar.gz"
         }
       }
     },
