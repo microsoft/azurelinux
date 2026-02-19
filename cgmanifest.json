@@ -17523,8 +17523,8 @@
         "type": "other",
         "other": {
           "name": "perl-Exception-Class",
-          "version": "1.44",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Exception-Class-1.44.tar.gz"
+          "version": "1.45",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Exception-Class-1.45.tar.gz"
         }
       }
     },
