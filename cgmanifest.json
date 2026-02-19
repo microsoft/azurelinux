@@ -17903,8 +17903,8 @@
         "type": "other",
         "other": {
           "name": "perl-GD",
-          "version": "2.71",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/GD/GD-2.71.tar.gz"
+          "version": "2.83",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/GD/GD-2.83.tar.gz"
         }
       }
     },
