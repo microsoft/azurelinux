@@ -18643,8 +18643,8 @@
         "type": "other",
         "other": {
           "name": "perl-Mixin-Linewise",
-          "version": "0.108",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Mixin-Linewise-0.108.tar.gz"
+          "version": "0.111",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Mixin-Linewise-0.111.tar.gz"
         }
       }
     },
