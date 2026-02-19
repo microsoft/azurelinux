@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ Patch8:         CVE-2025-2953.patch
 Patch9:         CVE-2025-55552.patch
 Patch10:        CVE-2025-55560.patch
 Patch11:        CVE-2025-3001.patch
+Patch12:        CVE-2026-24747.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -95,6 +96,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Thu Jan 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-13
+- Patch for CVE-2026-24747
+
 * Thu Dec 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-12
 - Patch for CVE-2025-3001
 
