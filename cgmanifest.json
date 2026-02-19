@@ -30522,8 +30522,8 @@
         "type": "other",
         "other": {
           "name": "xfconf",
-          "version": "4.18.3",
-          "downloadUrl": "https://archive.xfce.org/src/xfce/xfconf/4.18/xfconf-4.18.3.tar.bz2"
+          "version": "4.20.0",
+          "downloadUrl": "https://archive.xfce.org/src/xfce/xfconf/4.20/xfconf-4.20.0.tar.bz2"
         }
       }
     },
