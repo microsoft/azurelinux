@@ -30146,8 +30146,8 @@
         "type": "other",
         "other": {
           "name": "whois",
-          "version": "5.5.15",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/w/whois/whois_5.5.15.tar.xz"
+          "version": "5.5.20",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/w/whois/whois_5.5.20.tar.xz"
         }
       }
     },
