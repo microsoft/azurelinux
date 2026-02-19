@@ -1,16 +1,20 @@
+%global tarball_version %%(echo %{version} | tr '~' '.')
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:          yelp-tools
-Version:       3.32.2
-Release:       5%{?dist}
+Version:       42.1
+Release:       7%{?dist}
 Summary:       Create, manage, and publish documentation for Yelp
 
-License:       GPLv2+
+License:       GPL-2.0-or-later
 URL:           https://wiki.gnome.org/Apps/Yelp/Tools
-Source0:       https://download.gnome.org/sources/%{name}/3.32/%{name}-%{version}.tar.xz
+Source0:       https://download.gnome.org/sources/%{name}/42/%{name}-%{tarball_version}.tar.xz
 BuildArch:     noarch
 
+BuildRequires: meson
 BuildRequires: pkgconfig(yelp-xsl)
+BuildRequires: python3-lxml
 BuildRequires: itstool
 BuildRequires: libxslt
 
@@ -18,6 +22,7 @@ Requires: /usr/bin/itstool
 Requires: /usr/bin/xmllint
 Requires: /usr/bin/xsltproc
 Requires: mallard-rng
+Requires: python3-lxml
 Requires: yelp-xsl
 
 %description
@@ -27,17 +32,17 @@ lifting is done by packages like yelp-xsl and itstool. This package just
 wraps things up in a developer-friendly way.
 
 %prep
-%setup -q
+%autosetup -p1 -n %{name}-%{tarball_version}
 
 %build
-%configure
-make %{?_smp_mflags}
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %files
-%doc AUTHORS README
+%doc AUTHORS README.md NEWS
 %license COPYING COPYING.GPL
 %{_bindir}/yelp-build
 %{_bindir}/yelp-check
@@ -46,8 +51,73 @@ make %{?_smp_mflags}
 %{_datadir}/aclocal/yelp.m4
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.32.2-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 42.1-7
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Feb 12 2024 Tomas Popela <tpopela@redhat.com> - 42.1-5
+- Build for the SPDX license format change
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 31 2022 David King <amigadave@amigadave.com> - 42.1-1
+- Update to 42.1
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 42.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Mar 19 2022 David King <amigadave@amigadave.com> - 42.0-1
+- Update to 42.0
+
+* Mon Feb 14 2022 David King <amigadave@amigadave.com> - 42~beta-1
+- Update to 42.beta
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 41.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Sep 18 2021 Kalev Lember <klember@redhat.com> - 41.0-1
+- Update to 41.0
+
+* Thu Aug 19 2021 Kalev Lember <klember@redhat.com> - 41~beta-1
+- Update to 41.beta
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 40.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar 22 2021 Kalev Lember <klember@redhat.com> - 40.0-1
+- Update to 40.0
+
+* Mon Mar 15 2021 Kalev Lember <klember@redhat.com> - 40~rc-1
+- Update to 40.rc
+
+* Tue Feb 23 2021 David King <amigadave@amigadave.com> - 40~beta-2
+- Add Requires on python3-lxml (#1932011)
+
+* Thu Feb 18 2021 Kalev Lember <klember@redhat.com> - 40~beta-1
+- Update to 40.beta
+- Switch to meson build system
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.38.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Sep 12 2020 Kalev Lember <klember@redhat.com> - 3.38.0-1
+- Update to 3.38.0
+
+* Mon Aug 17 2020 Kalev Lember <klember@redhat.com> - 3.37.90-1
+- Update to 3.37.90
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

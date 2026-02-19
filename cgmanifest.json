@@ -31239,8 +31239,8 @@
         "type": "other",
         "other": {
           "name": "yelp-tools",
-          "version": "3.32.2",
-          "downloadUrl": "https://download.gnome.org/sources/yelp-tools/3.32/yelp-tools-3.32.2.tar.xz"
+          "version": "42.1",
+          "downloadUrl": "https://download.gnome.org/sources/yelp-tools/42/yelp-tools-42.1.tar.xz"
         }
       }
     },
