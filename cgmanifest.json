@@ -16433,8 +16433,8 @@
         "type": "other",
         "other": {
           "name": "perl-CBOR-XS",
-          "version": "1.86",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-1.86.tar.gz"
+          "version": "1.87",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-1.87.tar.gz"
         }
       }
     },
