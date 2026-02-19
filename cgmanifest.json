@@ -13011,8 +13011,8 @@
         "type": "other",
         "other": {
           "name": "mariadb-connector-odbc",
-          "version": "3.1.11",
-          "downloadUrl": "https://downloads.mariadb.org/f/connector-odbc-3.1.11/mariadb-connector-odbc-3.1.11-ga-src.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://archive.mariadb.org/connector-odbc-3.2.2/mariadb-connector-odbc-3.2.2-src.tar.gz"
         }
       }
     },
