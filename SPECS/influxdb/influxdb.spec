@@ -201,7 +201,7 @@ go test ./...
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.5-1
 - Auto-upgrade to 2.7.5 - Upgrade influxdb to fix CVE-2023-44487
 
-* Wed Jan 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.3-9
+* Mon Jan 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.3-9
 - Fix CVE-2024-28180
 
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.7.3-8
