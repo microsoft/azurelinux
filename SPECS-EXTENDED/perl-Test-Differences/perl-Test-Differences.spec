@@ -1,16 +1,14 @@
-# RPM version needs 4 digits after the decimal to preserve upgrade path
-%global module_version 0.67
-%global RPM_version %{module_version}00
-
+# TODO: BR: optional test dependency Unknown::Values if it becomes available
+%global cpan_version 0.71
 Name:           perl-Test-Differences
-Version:        %{RPM_version}
-Release:        5%{?dist}
+Version:        %(LANG=C printf "%.4f" %{cpan_version})
+Release:        1%{?dist}
 Summary:        Test strings and data structures and show differences if not OK
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Differences
-Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-%{module_version}.tar.gz#/perl-Test-Differences-%{module_version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-%{cpan_version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -36,8 +34,7 @@ BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(Pod::Coverage) >= 0.18
 BuildRequires:  perl(Test::Pod) >= 1.22
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.08
-# Explicit Requirements
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Explicit Dependencies
 Requires:       perl(B::Deparse)
 Requires:       perl(Text::Diff) >= 1.43
 
@@ -47,7 +44,7 @@ structures and they're just plain wrong, an equivalent to the Unix
 diff utility may be just what's needed.
 
 %prep
-%setup -q -n Test-Differences-%{module_version}
+%setup -q -n Test-Differences-%{cpan_version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -67,6 +64,10 @@ make test
 %{_mandir}/man3/Test::Differences.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.7100-1
+- Update to version 0.7100
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6700-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
