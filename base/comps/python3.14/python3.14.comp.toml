@@ -1,0 +1,10 @@
+[components.'python3.14']
+
+# Override the wheel package prefix to use the Fedora-style unversioned name.
+# Azure Linux sets %rhel, which causes python-rpm-macros to expand
+# %python_wheel_pkg_prefix to "python3" (RHEL-style), requiring packages like
+# python3-pip-wheel / python3-setuptools-wheel. Fedora repos only provide the
+# unversioned python-pip-wheel / python-setuptools-wheel. This define forces
+# the Fedora convention so wheel dependencies resolve correctly.
+[components.'python3.14'.build]
+defines = { python_wheel_pkg_prefix = "python" }
