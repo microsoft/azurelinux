@@ -1,131 +1,116 @@
 Summary:        Library for manipulating FITS data files
 Name:           cfitsio
-Version:        4.0.0
-Release:        5%{?dist}
-License:        MIT
+Version:        4.5.0
+Release:        1%{?dist}
+License:        CFITSIO
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://heasarc.gsfc.nasa.gov/fitsio/
-Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
-# Remove soname version check
-Patch1:         cfitsio-noversioncheck.patch
-# Some rearrangements in pkg-config file
-Patch2:         cfitsio-pkgconfig.patch
-# Use builder linker flags
-Patch3:         cfitsio-ldflags.patch
-# Remove rpath
-Patch4:         cfitsio-remove-rpath.patch
-BuildRequires:  bzip2-devel
-BuildRequires:  curl-devel
-BuildRequires:  gcc-gfortran
-BuildRequires:  make
-BuildRequires:  zlib-devel
-##BuildRequires: pkgconfig(curl)
-
+Source0:        https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
+Patch:          cfitsio-noversioncheck.patch
+ 
+BuildRequires: gcc-gfortran
+BuildRequires: make
+BuildRequires: zlib-devel
+BuildRequires: bzip2-devel
+BuildRequires: curl-devel
+ 
 %description
-CFITSIO is a library of C and FORTRAN subroutines for reading and writing
-data files in FITS (Flexible Image Transport System) data format. CFITSIO
-simplifies the task of writing software that deals with FITS files by
-providing an easy to use set of high-level routines that insulate the
-programmer from the internal complexities of the FITS file format. At the
-same time, CFITSIO provides many advanced features that have made it the
-most widely used FITS file programming interface in the astronomical
+CFITSIO is a library of C and FORTRAN subroutines for reading and writing 
+data files in FITS (Flexible Image Transport System) data format. CFITSIO 
+simplifies the task of writing software that deals with FITS files by 
+providing an easy to use set of high-level routines that insulate the 
+programmer from the internal complexities of the FITS file format. At the 
+same time, CFITSIO provides many advanced features that have made it the 
+most widely used FITS file programming interface in the astronomical 
 community.
-
+ 
 %package devel
-Summary:        Headers required when building programs against cfitsio
-Requires:       %{name} = %{version}-%{release}
-Requires:       pkgconfig
-
+Summary: Headers required when building programs against cfitsio
+Requires: %{name} = %{version}-%{release}
+Requires: pkgconfig
+ 
 %description devel
 Headers required when building a program against the cfitsio library.
-
+ 
 %package static
-Summary:        Static cfitsio library
-
+Summary: Static cfitsio library
+ 
 %description static
 Static cfitsio library; avoid use if possible.
-
+ 
 %package docs
-Summary:        Documentation for cfitsio
-BuildArch:      noarch
-
+Summary: Documentation for cfitsio
+BuildArch:  noarch
+ 
 %description docs
 Stand-alone documentation for cfitsio.
-
-%package -n fpack
-Summary:        FITS image compression and decompression utilities
-Requires:       %{name} = %{version}-%{release}
-
-%description -n fpack
-fpack optimally compresses FITS format images and funpack restores them
-to the original state.
-
-* Integer format images are losslessly compressed using the Rice
-compression algorithm.
-    * typically 30% better compression than GZIP
-    * about 3 times faster compression speed than GZIP
-    * about the same uncompression speed as GUNZIP
-
-* Floating-point format images are compressed with a lossy algorithm
-    * truncates the image pixel noise by a user-specified amount to
-      produce much higher compression than by lossless techniques
-    * the precision of scientific measurements in the compressed image
-      (relative to those in the original image) depends on the selected
-       amount of compression
-
+ 
+%package utils
+Summary: CFITSIO based utilities
+Requires: %{name} = %{version}-%{release}
+Provides: fpack{?_isa} = %{version}-%{release}
+Obsoletes: fpack <= 4.5.0-1  
+Provides: fitsverify{?_isa} = 4.22-5
+Obsoletes: fitsverify <= 4.22-4
+ 
+%description utils
+This package contains utility programas provided by CFITSIO
+ 
 %prep
-%autosetup
-
+%autosetup -p1
+ 
 %build
-%configure --enable-reentrant -with-bzip2
-make shared
-make fpack funpack
-
+%configure --enable-reentrant -with-bzip2 --includedir=%{_includedir}/%{name}
+make %{?_smp_mflags}
+ 
 %check
 make testprog
 LD_LIBRARY_PATH=. ./testprog > testprog.lis
 cmp -s testprog.lis testprog.out
 cmp -s testprog.fit testprog.std
-
+ 
 %install
-%make_install LIBDIR=%{_libdir} INCLUDEDIR=%{_includedir}/%{name} \
- CFITSIO_LIB=%{buildroot}%{_libdir} \
- CFITSIO_INCLUDE=%{buildroot}%{_includedir}/%{name}
-cp -p f{,un}pack %{buildroot}%{_bindir}
-
-chmod 755 %{buildroot}%{_libdir}/libcfitsio.so.*
-chmod 755 %{buildroot}%{_bindir}/f{,un}pack
-
-
+make DESTDIR=%{buildroot} install
+#
+rm %{buildroot}/%{_bindir}/cookbook
+rm %{buildroot}/%{_bindir}/smem
+rm %{buildroot}/%{_bindir}/speed
+ 
 %ldconfig_scriptlets
-
 %files
-%license License.txt
-%doc README docs/changes.txt
-%{_libdir}/libcfitsio.so.9*
-
+%doc README.md ChangeLog
+%license licenses/License.txt
+%{_libdir}/libcfitsio.so.10*
+ %{_libdir}/libcfitsio.la
+ 
 %files devel
-%doc cookbook.*
+%doc utilities/cookbook.*
 %{_includedir}/%{name}
 %{_libdir}/libcfitsio.so
 %{_libdir}/pkgconfig/cfitsio.pc
-
+ 
 %files static
-%license License.txt
+%license licenses/License.txt
 %{_libdir}/libcfitsio.a
-
+ 
 %files docs
-%license License.txt
-%doc docs/fitsio.doc docs/fitsio.pdf docs/cfitsio.pdf
-
-%files -n fpack
-%license License.txt
+%doc docs/fitsio.pdf docs/cfitsio.pdf
+%license licenses/License.txt
+ 
+%files utils
 %doc docs/fpackguide.pdf
+%license licenses/License.txt
+%{_bindir}/fitsverify
+%{_bindir}/fitscopy
 %{_bindir}/fpack
 %{_bindir}/funpack
+%{_bindir}/imcopy
 
 %changelog
+* Thu Nov 28 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.5.0-1
+- Upgrade to version 4.5.0
+
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.0.0-5
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified
