@@ -1,5 +1,6 @@
 [components.'python3.14']
 
+
 # Override the wheel package prefix to use the Fedora-style unversioned name.
 # Azure Linux sets %rhel, which causes python-rpm-macros to expand
 # %python_wheel_pkg_prefix to "python3" (RHEL-style), requiring packages like
@@ -8,3 +9,8 @@
 # the Fedora convention so wheel dependencies resolve correctly.
 [components.'python3.14'.build]
 defines = { python_wheel_pkg_prefix = "python" }
+# Disable experimental JIT (PEP 744, deferred). The Fedora spec gates stencil
+# generation on %fedora >= 41, which evaluates true in our bootstrap chroot and
+# requires clang/llvm 19 — unavailable in Azure Linux. JIT is off-by-default
+# at runtime anyway (requires PYTHON_JIT=1).
+without = ["jit"]
