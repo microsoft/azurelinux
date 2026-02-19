@@ -18813,8 +18813,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-Load-Util",
-          "version": "0.006",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-0.006.tar.gz"
+          "version": "0.012",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-0.012.tar.gz"
         }
       }
     },
