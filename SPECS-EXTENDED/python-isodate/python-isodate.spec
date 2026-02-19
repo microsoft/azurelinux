@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global srcname isodate
 
 Name:           python-%{srcname}
-Version:        0.6.0
-Release:        6%{?dist}
+Version:        0.7.2
+Release:        1%{?dist}
 Summary:        An ISO 8601 date/time/duration parser and formatter
 License:        BSD
 URL:            https://pypi.org/project/isodate/
@@ -13,8 +13,9 @@ Source1:        %{name}-LICENSE.txt
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
+BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-pytest
 
 
 %global _description This module implements ISO 8601 date, time and duration \
@@ -52,25 +53,32 @@ Summary: %summary
 mv %{SOURCE1} ./LICENSE.txt
 
 
+%generate_buildrequires
+%pyproject_buildrequires
+
+
 %build
-%py3_build
+%pyproject_wheel
+
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 
 %check
-%{__python3} setup.py test
+%pytest
 
 
-%files -n python3-%{srcname}
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENSE.txt
 %doc CHANGES.txt README.rst TODO.txt
-%{python3_sitelib}/%{srcname}-*.egg-info/
-%{python3_sitelib}/%{srcname}/
 
 
 %changelog
+* Thu Aug 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 0.7.2-1
+- Update to 0.7.2
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
 - License verified
 

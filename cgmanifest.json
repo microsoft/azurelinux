@@ -23283,8 +23283,8 @@
         "type": "other",
         "other": {
           "name": "python-isodate",
-          "version": "0.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/isodate/isodate-0.6.0.tar.gz"
+          "version": "0.7.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/isodate/isodate-0.7.2.tar.gz"
         }
       }
     },
