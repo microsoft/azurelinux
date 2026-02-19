@@ -1,0 +1,2 @@
+# See arpwatch(8) for more information on available options.
+OPTIONS=-C

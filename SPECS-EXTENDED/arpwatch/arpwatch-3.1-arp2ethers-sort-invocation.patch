@@ -1,0 +1,15 @@
+Fix nonstandard sort flags (obsolete + notation for keys, available in some
+BSDs for compatibility but non-POSIX and not supported by GNU sort).
+
+diff -Naur arpwatch-3.1-original/arp2ethers arpwatch-3.1/arp2ethers
+--- arpwatch-3.1-original/arp2ethers	2013-02-16 03:10:28.000000000 -0500
++++ arpwatch-3.1/arp2ethers	2020-11-07 11:22:04.762234105 -0500
+@@ -13,7 +13,7 @@
+ #	- sort
+ #
+ 
+-sort +2rn arp.dat |
++sort -k 2 -rn arp.dat |
+     awk 'NF == 4 { print }' |
+     awk -f p.awk |
+     egrep -v '\.[0-9][0-9]*$' |
