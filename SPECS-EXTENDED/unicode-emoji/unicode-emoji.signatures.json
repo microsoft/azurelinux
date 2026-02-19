@@ -1,11 +1,12 @@
 {
  "Signatures": {
-  "ReadMe.txt": "c6a3f97d9423857b4dc79110b528a73188e6829b5117a4d80b22d4886446b179",
-  "copyright.html": "e64365d338b707f1bac79d9391c7579eb6db270c49b711bc1665ae8e7e36173d",
-  "emoji-data.txt": "d2686f400a638c80775d7c662556fb8fa8dd3bbe4aa548d9d31624264c6e1bb1",
-  "emoji-sequences.txt": "5a864aab19aa703d019647f01a5b6fe127b7dbedff3a9569242224b4a4e9341a",
-  "emoji-test.txt": "dbd8a566962e1d8b67f2c531ea0241b2ea791c736850a9fdb61fc8a0c62ae0ba",
-  "emoji-variation-sequences.txt": "2efb7e9461e19c5f8e8fdb3b9a8122fb8148f50a901f0c2d4c8ba42209b5b55a",
-  "emoji-zwj-sequences.txt": "1d8f06c1dca8ebecb0ca7b753bc52efacdf44c60a921f2ab04f02b42ce1389bf"
+  "ReadMe.txt": "d5cd31db8caf71a1bc2bb25a9eefbc154bd5df9528d8cb9481585e068c45257d",
+  "copyright.html": "9f83fb0a046180c87d22c2678e79300475125611ac8dfc2da303db6c6b347251",
+  "emoji-data.txt": "f1365a5173eee18e1f98b240cdc492e84a25f1ce7e0c9d1094eb29c41a22696a",
+  "emoji-sequences.txt": "3fe3c77e72e8f26df302dc7d99b106c5d08fd808ef7246fb5d4502d659fe659c",
+  "emoji-test.txt": "24f0c534e86cf142e2496953e8f0e46a3e702392911eddcd29c6cced85139697",
+  "emoji-variation-sequences.txt": "71d93ec015011371a027ba2bc0a63155d381c6e0b94a586c1a88a49400cd6864",
+  "emoji-zwj-sequences.txt": "9423ec235474356f970a696506737e2d5d65453a67f45df66b8bbe920c3fab83",
+  "license.txt": "f7830d126f59d83842565d3dddedc79db4ca978ed52aee0ebcc040ea76a85519"
  }
 }

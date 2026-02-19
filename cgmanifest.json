@@ -29556,8 +29556,8 @@
         "type": "other",
         "other": {
           "name": "unicode-emoji",
-          "version": "13.0",
-          "downloadUrl": "http://www.unicode.org/copyright.html"
+          "version": "16.0",
+          "downloadUrl": "https://www.unicode.org/copyright.html"
         }
       }
     },
