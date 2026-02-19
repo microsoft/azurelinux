@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "capstone-4.0.2.tar.gz": "7c81d798022f81e7507f1a60d6817f63aa76e489aa4e7055255f21a22f5e526a"
+  "capstone-5.0.1.tar.gz": "2b9c66915923fdc42e0e32e2a9d7d83d3534a45bb235e163a70047951890c01a",
+  "cstool.1": "654b4c5a83b415a4fb993f8177a225d1a596f95da7fbc91d37613dc31050f00c"
  }
 }

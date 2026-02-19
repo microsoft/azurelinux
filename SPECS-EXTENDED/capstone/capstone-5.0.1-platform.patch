@@ -1,0 +1,22 @@
+diff -uNr capstone-5.0.orig/bindings/python/setup.py capstone-5.0/bindings/python/setup.py
+--- capstone-5.0.orig/bindings/python/setup.py	2023-08-07 16:55:34.314825530 -0500
++++ capstone-5.0/bindings/python/setup.py	2023-08-07 21:06:59.182376477 -0500
+@@ -201,15 +201,9 @@
+     idx = sys.argv.index('bdist_wheel') + 1
+     sys.argv.insert(idx, '--plat-name')
+     name = get_platform()
+-    if 'linux' in name:
+-        # linux_* platform tags are disallowed because the python ecosystem is fubar
+-        # linux builds should be built in the centos 5 vm for maximum compatibility
+-        # see https://github.com/pypa/manylinux
+-        # see also https://github.com/angr/angr-dev/blob/master/bdist.sh
+-        sys.argv.insert(idx + 1, 'manylinux1_' + platform.machine())
+-    else:
+-        # https://www.python.org/dev/peps/pep-0425/
+-        sys.argv.insert(idx + 1, name.replace('.', '_').replace('-', '_'))
++    pyversion = platform.python_version()
++    major_version, minor_version = map(int, pyversion.split('.')[:2])
++    sys.argv.insert(idx + 1, name.replace('.', '_').replace('-', '_') + "_" + str(major_version) + str(minor_version))
+ 
+ setup(
+     provides=['capstone'],
