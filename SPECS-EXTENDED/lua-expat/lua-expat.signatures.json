@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "gpgkey-32A9EDDE3609931EB98CEAC315907E8E7BDD6BFE.gpg": "e521c199fd3beb54db5d4d906ffe8b71cd95844bc83d9f9e324286807867a3d2",
-  "luaexpat-1.3.0.tar.gz": "d060397960d87b2c89cf490f330508b7def1a0677bdc120531c571609fc57dc3",
-  "luaexpat-1.3.0.tar.gz.asc": "f8423769d324385aa9bf93ed704113f98e2791f7f78acf0bb37418d634a9ef98"
+  "luaexpat-1.5.2.tar.gz": "89d83f2141edec31be576425637216928221918fe95dc3854d1b7fd4c627213f"
  }
 }
