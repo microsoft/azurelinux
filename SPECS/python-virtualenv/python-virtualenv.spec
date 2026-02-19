@@ -1,15 +1,14 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
-Version:        20.25.0
-Release:        3%{?dist}
+Version:        20.36.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
-Source0:        https://files.pythonhosted.org/packages/94/d7/adb787076e65dc99ef057e0118e25becf80dd05233ef4c86f07aa35f6492/virtualenv-20.25.0.tar.gz
+Source0:        https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz
 Patch0:         0001-replace-to-flit.patch
-Patch1:         CVE-2024-53899.patch
 BuildArch:      noarch
 
 %description
@@ -61,6 +60,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Jan 14 2026 Archana Shettigar <v-shettigara@microsoft.com> - 20.36.1-1
+- Upgrade to 20.36.1 for CVE-2026-22702
+
 * Wed Dec 11 2024 Sudipta Pandit <sudpandit@microsoft.com> - 20.25.0-3
 - Backport fix for CVE-2024-53899
 
