@@ -53,6 +53,7 @@ cat <<-"EOF" > %{buildroot}%{_libdir}/os-release
 NAME="Microsoft %{distribution}"
 VERSION="%{distro_release_version_no_time}"
 ID=azurelinux
+ID_LIKE=fedora
 VERSION_ID="%{version}"
 PRETTY_NAME="Microsoft %{distribution} %{version}"
 ANSI_COLOR="1;34"
