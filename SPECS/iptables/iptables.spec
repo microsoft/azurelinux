@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Requires(postun): %{_sbindir}/update-alternatives
 # Our build tooling cannot handle this
 #Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
+Requires:       %{name}-core = %{version}-%{release}
 
 %description
 The next part of this chapter deals with firewalls. The principal
@@ -37,6 +38,12 @@ Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 It contains the libraries and header files to create applications.
+
+%package        core
+Summary:        Core files for iptables which do not require bash
+
+%description    core
+Core iptables files that can be used in a container without requiring bash.
 
 %prep
 %autosetup
@@ -111,18 +118,28 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%{_sbindir}/ip{,6}tables-apply
 %config(noreplace) %{_sysconfdir}/systemd/scripts/iptables
 %config(noreplace) %{_sysconfdir}/systemd/scripts/iptables.stop
+
+%files core
+%defattr(-,root,root)
+%license COPYING
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip4save
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip6save
 %config(noreplace) %{_sysconfdir}/ethertypes
 %{_unitdir}/iptables.service
-%{_sbindir}/*
+%{_sbindir}/ip{,6}tables-legacy*
+%{_sbindir}/xtables-legacy-multi
+%{_sbindir}/ip{,6}tables-nft*
+%{_sbindir}/ip{,6}tables{,-restore}-translate
+%{_sbindir}/{eb,arp}tables-nft*
+%{_sbindir}/xtables-nft-multi
+%{_sbindir}/xtables-monitor
+%{_sbindir}/ebtables-translate
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_libdir}/iptables/*
-%{_bindir}/iptables-xml
 %{_mandir}/man1/*
 %{_mandir}/man8/*
 /usr/share/xtables/iptables.xslt
@@ -137,6 +154,9 @@ fi
 %{_mandir}/man3/*
 
 %changelog
+* Thu Mar 27 2025 Andrew Phelps <anphel@microsoft.com> - 1.8.10-5
+- Create core subpackage which does not depend on bash
+
 * Thu Jan 16 2025 Dallas Delaney <dadelan@microsoft.com> - 1.8.10-4
 - Add back kernel modules that were removed by enabling nftables
 
