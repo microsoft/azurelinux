@@ -305,8 +305,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-codec",
-          "version": "1.15",
-          "downloadUrl": "http://archive.apache.org/dist/commons/codec/source/commons-codec-1.15-src.tar.gz"
+          "version": "1.18.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/codec/source/commons-codec-1.18.0-src.tar.gz"
         }
       }
     },
