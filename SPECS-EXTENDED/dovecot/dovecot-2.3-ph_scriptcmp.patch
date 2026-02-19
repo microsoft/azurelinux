@@ -1,0 +1,12 @@
+diff -up dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/storage/file/sieve-file-script.c.testfix4 dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/storage/file/sieve-file-script.c
+--- dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/storage/file/sieve-file-script.c.testfix4	2024-06-03 13:35:24.408858593 +0200
++++ dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/storage/file/sieve-file-script.c	2024-06-03 13:35:24.434858849 +0200
+@@ -800,7 +800,7 @@ static bool sieve_file_script_equals
+ 		(struct sieve_file_script *)other;
+ 
+ 	return ( CMP_DEV_T(fscript->st.st_dev, fother->st.st_dev) &&
+-		fscript->st.st_ino == fother->st.st_ino );
++		fscript->st.st_ino == fother->st.st_ino && (fscript->st.st_ino != 0 || script->location != NULL && other->location != NULL && strcmp(script->location, other->location) == 0));
+ }
+ 
+ /*
