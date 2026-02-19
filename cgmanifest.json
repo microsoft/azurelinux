@@ -5580,8 +5580,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-csb",
-          "version": "0.20050311",
-          "downloadUrl": "http://ftp.gnu.org/gnu/aspell/dict/csb/aspell6-csb-0.02-0.tar.bz2"
+          "version": "0.20190319",
+          "downloadUrl": "https://addons.thunderbird.net/firefox/downloads/latest/kashubian-spell-checker-poland/addon-222511-latest.xpi"
         }
       }
     },
