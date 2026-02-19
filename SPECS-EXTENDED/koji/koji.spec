@@ -236,7 +236,8 @@ install -m0644 -D koji.sysusers.conf %{buildroot}%{_sysusersdir}/koji.conf
 %{_datadir}/koji
 %config(noreplace) /etc/koji.conf
 %dir /etc/koji.conf.d
-%doc docs Authors COPYING LGPL
+%doc docs Authors
+%license COPYING LGPL
  
 %files -n python%{python3_pkgversion}-koji
 %{python3_sitelib}/%{name}
