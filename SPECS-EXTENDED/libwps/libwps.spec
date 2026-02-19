@@ -1,15 +1,15 @@
 %global apiversion 0.4
 
 Name:		libwps
-Version:	0.4.11
-Release:	2%{?dist}
+Version:	0.4.14
+Release:	5%{?dist}
 Summary:	A library for import of Microsoft Works documents
 
-License:	LGPLv2+ or MPLv2.0
+License:	LGPL-2.1-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://libwps.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+URL:		https://libwps.sourceforge.net/
+Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:	doxygen
 BuildRequires:	gcc-c++
@@ -17,6 +17,7 @@ BuildRequires:	help2man
 BuildRequires:	pkgconfig(librevenge-0.0)
 BuildRequires:	pkgconfig(librevenge-generators-0.0)
 BuildRequires:	pkgconfig(librevenge-stream-0.0)
+BuildRequires:	make
 
 %description
 %{name} is a library for import of Microsoft Works text documents,
@@ -100,8 +101,54 @@ install -m 0644 wks2*.1 wps2*.1 %{buildroot}/%{_mandir}/man1
 %doc docs/doxygen/html
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.11-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 02 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.4.14-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jan 11 2024 David Tardon <dtardon@redhat.com> - 0.4.14-1
+- Update to new upstream release 0.4.14
+
+* Thu Jan 11 2024 David Tardon <dtardon@redhat.com> - 0.4.13-4
+- Fix alignment
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.13-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 01 2022 David Tardon <dtardon@redhat.com> - 0.4.13-1
+- New upstream release
+
+* Mon Nov 21 2022 David Tardon <dtardon@redhat.com> - 0.4.12-6
+- Convert license to SPDX
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Sep 06 2020 David Tardon <dtardon@redhat.com> - 0.4.12-1
+- new upstream release
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sun Apr 05 2020 David Tardon <dtardon@redhat.com> - 0.4.11-1
 - new upstream release
@@ -295,3 +342,4 @@ install -m 0644 wks2*.1 wps2*.1 %{buildroot}/%{_mandir}/man1
 
 * Tue Feb 10 2009 Simon Wesp <cassmodiah@fedoraproject.org> - 0.1.2-1
 - Initial Package build 
+
