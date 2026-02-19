@@ -17423,8 +17423,8 @@
         "type": "other",
         "other": {
           "name": "perl-Email-Date-Format",
-          "version": "1.005",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Email-Date-Format-1.005.tar.gz"
+          "version": "1.008",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Email-Date-Format-1.008.tar.gz"
         }
       }
     },
