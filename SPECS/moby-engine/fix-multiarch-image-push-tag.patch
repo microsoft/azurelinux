@@ -1,0 +1,42 @@
+From a7ef4a208d96a71162ed3b0f04ec90112ead44fd Mon Sep 17 00:00:00 2001
+From: henry118 <henryw@amazon.com>
+Date: Sat, 10 May 2025 00:00:00 +0000
+Subject: [PATCH] Fix multiarch image push tag for containerd snapshotter
+
+When the "containerd-snapshotter" feature is enabled and pushing multiarch
+images, all platform specific image manifests should be pushed by digest,
+but only the top level manifest index should be pushed by tag. In the previous
+implementation in moby, all of them were pushed by tag.
+
+This replicates the similar logic in containerd:
+https://github.com/containerd/containerd/blob/main/client/client.go#L485-L488
+
+Signed-off-by: henry118 <henryw@amazon.com>
+---
+ daemon/containerd/image_push.go | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/daemon/containerd/image_push.go b/daemon/containerd/image_push.go
+index 1234567..abcdefg 100644
+--- a/daemon/containerd/image_push.go
++++ b/daemon/containerd/image_push.go
+@@ -144,7 +144,16 @@ func (i *ImageService) pushRef(ctx context.Context, targetRef reference.Named, p
+ 	wrapped := wrapWithFakeMountableBlobs(store, mountableBlobs)
+ 	store = wrapped
+ 
+-	pusher, err := resolver.Pusher(ctx, targetRef.String())
++	// Annotate ref with digest to push only push tag for single digest
++	ref := targetRef
++	if _, digested := ref.(reference.Digested); !digested {
++		ref, err = reference.WithDigest(ref, target.Digest)
++		if err != nil {
++			return err
++		}
++	}
++
++	pusher, err := resolver.Pusher(ctx, ref.String())
+ 	if err != nil {
+ 		return err
+ 	}
+-- 
+2.39.0
