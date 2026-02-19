@@ -23303,8 +23303,8 @@
         "type": "other",
         "other": {
           "name": "python-itsdangerous",
-          "version": "0.24",
-          "downloadUrl": "http://pypi.python.org/packages/source/i/itsdangerous/itsdangerous-0.24.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/itsdangerous/itsdangerous-2.1.2.tar.gz"
         }
       }
     },
