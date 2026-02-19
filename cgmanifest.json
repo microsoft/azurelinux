@@ -17783,8 +17783,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-ReadBackwards",
-          "version": "1.05",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/U/UR/URI/File-ReadBackwards-1.05.tar.gz"
+          "version": "1.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-ReadBackwards-1.06.tar.gz"
         }
       }
     },
