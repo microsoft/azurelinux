@@ -1,20 +1,27 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global _unitdir /usr/lib/systemd/system
-Summary: A log file analysis program
+Summary: Analyzes and Reports on system logs
 Name: logwatch
-Version: 7.5.3
-Release: 5%{?dist}
+Version: 7.12
+Release: 2%{?dist}
 License: MIT
-URL: http://www.logwatch.org/
-Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Temporary fix for update to DNF 4.4
-Source1: dnf-rpm.conf
+URL: https://sourceforge.net/projects/logwatch/
+Source0: https://sourceforge.net/projects/logwatch/files/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildRequires: perl-generators
-Requires: grep mailx
+Requires: grep
 Requires: perl(Date::Manip)
-Requires: perl(Sys::CPU)
-Requires: perl(Sys::MemInfo)
+Requires: perl(diagnostics)
+Requires: perl(Errno)
+Requires: perl(File::Basename)
+Requires: perl(lib)
+Requires: perl(re)
+Requires: perl(Socket)
+Requires: perl(subs)
+Requires: perl(Time::Local)
+Requires: perl(URI::URL)
+Requires: perl(vars)
+Requires: perl(warnings)
 Requires: cronie
 BuildArchitectures: noarch
 
@@ -25,8 +32,7 @@ that you wish with the detail that you wish.  Easy to use - works right out
 of the package on many systems.
 
 %prep
-%setup -q
-cp -p %{SOURCE1} .
+%autosetup -p1
 
 %build
 
@@ -47,46 +53,47 @@ install -m 0755 -d %{buildroot}%{_datadir}/logwatch/scripts/services
 install -m 0755 -d %{buildroot}%{_datadir}/logwatch/scripts/shared
 install -m 0755 -d %{buildroot}%{_datadir}/logwatch/lib
 install -m 0755 -d %{buildroot}%{_sbindir}
+install -m 0755 -d %{buildroot}%{_mandir}/man1
 install -m 0755 -d %{buildroot}%{_mandir}/man5
 install -m 0755 -d %{buildroot}%{_mandir}/man8
 
-for i in scripts/logfiles/*; do
-    if [ $(ls $i | wc -l) -ne 0 ]; then
-        install -m 0755 -d %{buildroot}%{_datadir}/logwatch/$i
-        install -m 0644 $i/* %{buildroot}%{_datadir}/logwatch/$i
-    fi
+for i in scripts/logfiles/* ; do
+   if [ $(ls $i | wc -l) -ne 0 ] ; then
+      install -m 0755 -d %{buildroot}%{_datadir}/logwatch/$i
+      install -m 0644 $i/* %{buildroot}%{_datadir}/logwatch/$i
+   fi
 done
 
 install -m 0755 scripts/logwatch.pl %{buildroot}%{_datadir}/logwatch/scripts/logwatch.pl
 install -m 0644 scripts/services/* %{buildroot}%{_datadir}/logwatch/scripts/services
 install -m 0644 scripts/shared/* %{buildroot}%{_datadir}/logwatch/scripts/shared
 
-install -m 0644 conf/logwatch.conf %{buildroot}%{_datadir}/logwatch/default.conf/logwatch.conf
+install -m 0644 conf/*.conf %{buildroot}%{_datadir}/logwatch/default.conf
 
 install -m 0644 conf/logfiles/* %{buildroot}%{_datadir}/logwatch/default.conf/logfiles
 install -m 0644 conf/services/* %{buildroot}%{_datadir}/logwatch/default.conf/services
 install -m 0644 conf/html/* %{buildroot}%{_datadir}/logwatch/default.conf/html
 
-install -m 0644 lib/Logwatch.pm %{buildroot}%{_datadir}/logwatch/lib/Logwatch.pm
+install -m 0644 lib/* %{buildroot}%{_datadir}/logwatch/lib
 
-install -m 0644 ignore.conf.5 %{buildroot}%{_mandir}/man5
-install -m 0644 override.conf.5 %{buildroot}%{_mandir}/man5
+install -m 0644 amavis-logwatch.1 %{buildroot}%{_mandir}/man1
+install -m 0644 postfix-logwatch.1 %{buildroot}%{_mandir}/man1
 install -m 0644 logwatch.conf.5 %{buildroot}%{_mandir}/man5
+ln -s logwatch.conf.5 %{buildroot}%{_mandir}/man5/ignore.conf.5
+ln -s logwatch.conf.5 %{buildroot}%{_mandir}/man5/override.conf.5
 install -m 0644 logwatch.8 %{buildroot}%{_mandir}/man8
 
 install -m 0755 scheduler/logwatch.cron %{buildroot}%{_sysconfdir}/cron.daily/0logwatch
 mkdir -p %{buildroot}%{_unitdir}
-install -m 0755 scheduler/logwatch.timer %{buildroot}%{_unitdir}/logwatch.timer
-install -m 0755 scheduler/logwatch.service %{buildroot}%{_unitdir}/logwatch.service
+install -m 0644 scheduler/logwatch.timer %{buildroot}%{_unitdir}/logwatch.timer
+install -m 0644 scheduler/logwatch.service %{buildroot}%{_unitdir}/logwatch.service
+install -m 0644 scheduler/systemd.conf %{buildroot}%{_datadir}/logwatch/default.conf/systemd.conf
 
 ln -s ../../%{_datadir}/logwatch/scripts/logwatch.pl %{buildroot}/%{_sbindir}/logwatch
 
 echo "###### REGULAR EXPRESSIONS IN THIS FILE WILL BE TRIMMED FROM REPORT OUTPUT #####" > %{buildroot}%{_sysconfdir}/logwatch/conf/ignore.conf
 echo "# Local configuration options go here (defaults are in %{_datadir}/logwatch/default.conf/logwatch.conf)" > %{buildroot}%{_sysconfdir}/logwatch/conf/logwatch.conf
 echo "# Configuration overrides for specific logfiles/services may be placed here." > %{buildroot}%{_sysconfdir}/logwatch/conf/override.conf
-
-# Fix for DNF 4.4
-install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 
 %files
 %license LICENSE
@@ -104,8 +111,6 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %dir %{_datadir}/logwatch/dist.conf
 %dir %{_datadir}/logwatch/dist.conf/services
 %dir %{_datadir}/logwatch/dist.conf/logfiles
-# Fix for DNF 4.4
-%{_datadir}/logwatch/dist.conf/logfiles/*.conf
 %{_datadir}/logwatch/scripts/logwatch.pl
 %config(noreplace) %{_datadir}/logwatch/default.conf/*.conf
 %{_sbindir}/logwatch
@@ -114,7 +119,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_datadir}/logwatch/scripts/services
 %{_datadir}/logwatch/scripts/logfiles
 %dir %{_datadir}/logwatch/lib
-%{_datadir}/logwatch/lib/Logwatch.pm
+%{_datadir}/logwatch/lib/*
 %dir %{_datadir}/logwatch/default.conf
 %dir %{_datadir}/logwatch/default.conf/services
 %{_datadir}/logwatch/default.conf/services/*.conf
@@ -127,18 +132,109 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_unitdir}/logwatch.timer
 
 %changelog
-* Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 7.5.3-5
-- Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
+* Thu Apr 18 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.12-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+- Replaced crontabs with cronie
 
-* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
-- Updating source URLs.
-- License verified.
+* Thu Jan 23 2025 Frank Crawford <frank@crawford.emu.id.au> - 7.12-1
+- Update to 7.12
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.11-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Mon Nov 23 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.3-2
-- Handle changes for DNF 4.4 (#1895839)
+* Sat Jan 04 2025 Frank Crawford <frank@crawford.emu.id.au> - 7.11-3
+- Correct update to confs to fix BZ2326879
+
+* Sat Dec 28 2024 Frank Crawford <frank@crawford.emu.id.au> - 7.11-2
+- Update confs to fix BZ2326879
+
+* Mon Aug 05 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.11-1
+- Update to 7.11
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jan 28 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.10-1
+- Update to 7.10
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Jitka Plesnikova <jplesnik@redhat.com> - 7.9-2
+- Remove unused dependencies perl(Sys::CPU), perl(Sys::MemInfo)
+
+* Sun Jul 23 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.9-1
+- Update to 7.9
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri May 19 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-3
+- Add missing dependencies to fix BZ2203367
+- Convert to autosetup macro
+
+* Sun May 07 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-2
+- Add patch to mdadm to fix BZ2192995 for F38
+- Fix reports for named
+
+* Sun Jan 22 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-1
+- Update to 7.8
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 21 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-3
+- SPDX license update - type MIT:Modern Style with sublicense
+
+* Sun Sep 04 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-2
+- Add patches for F36 that missed latest release
+
+* Sun Jul 24 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-1
+- Update to 7.7
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 7.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jan 23 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.6-1
+- Update to 7.6 (note new version convention - major.minor)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Aug 28 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.6-2
+- Match minor change in systemd
+
+* Sat Jul 24 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.6-1
+- Update to 7.5.6
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Apr 06 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.5-2
+- Add patch to remove CMDEND from cron service
+
+* Tue Jan 26 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.5-1
+- Update to 7.5.5
+
+* Mon Dec 14 2020 Orion Poplawski <orion@nwra.com> - 7.5.4-4
+- Systemd unit files are not executable
+
+* Mon Nov 23 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.4-3
+- Handle changes for DNF 4.4
+
+* Mon Nov 09 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.4-2
+- Add requires for perl-diagnostics (#1893671) and perl-lib (#1893503)
+- Add other requires as nothing is now automatically supplied
+
+* Mon Aug 03 2020 Jan Synáček <jsynacek@redhat.com> - 7.5.4-1
+- Update to 7.5.4 (#1862935)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Feb 25 2020 Jan Synáček <jsynacek@redhat.com> - 7.5.3-1
 - Update to 7.5.3 (#1800953)
