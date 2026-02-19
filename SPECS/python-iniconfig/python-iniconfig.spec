@@ -13,8 +13,8 @@ having a unique set of features:
 * iniconfig raises an Error if two sections have the same name.}
 
 Name:           python-%{base_name}
-Version:        1.1.1
-Release:        17%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 Summary:        Brain-dead simple parsing of ini files
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -32,6 +32,8 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-hatchling
 BuildRequires:  python3-wheel
 
 # pytest 6+ needs this and this uses pytest for tests
@@ -64,9 +66,6 @@ Summary:        %{summary}
 
 %prep
 %autosetup -n %{base_name}-%{version}
-# Remove undeclared dependency on python-py
-# Merged upstream https://github.com/pytest-dev/iniconfig/pull/47
-sed -i "s/py\.test/pytest/" testing/test_iniconfig.py
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -88,11 +87,14 @@ sed -i "s/py\.test/pytest/" testing/test_iniconfig.py
 
 
 %files -n python3-%{base_name} -f %{pyproject_files}
-%doc README.txt
-%license LICENSE
+%doc README.rst
+%license %{python3_sitelib}/iniconfig-%{version}.dist-info/licenses/LICENSE
 
 
 %changelog
+* Wed Apr 16 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.1.0-1
+- Upgrade to 2.1.0
+
 * Mon Oct 07 2024 Devin Anderson <danderson@microsoft.com> - 1.1.1-17
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.

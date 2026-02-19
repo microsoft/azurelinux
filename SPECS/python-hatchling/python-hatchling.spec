@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{srcname}
 Version:        1.21.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        The build backend used by Hatch
 
 # SPDX
@@ -46,7 +46,11 @@ This is the extensible, standards compliant build backend used by Hatch.}
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
-
+Requires:       python3-editables
+Requires:       python3-pathspec
+Requires:       python3-pluggy
+Requires:       python3-trove-classifiers
+Requires:       python3-packaging
 %description -n python3-%{srcname} %{common_description}
 
 
@@ -94,6 +98,9 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
 
 
 %changelog
+* Wed Apr 16 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.21.1-5
+- Added missing runtime dependencies
+
 * Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.21.1-4
 - Remove unnecessary build dependency
 - Re-enable tests (after a fashion)
