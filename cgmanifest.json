@@ -17703,8 +17703,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Find-Object-Rule",
-          "version": "0.0312",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-Rule-0.0312.tar.gz"
+          "version": "0.0313",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-Rule-0.0313.tar.gz"
         }
       }
     },

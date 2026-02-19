@@ -1,16 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_File_Find_Object_Rule_enables_optional_test}
 %else
 %{bcond_with perl_File_Find_Object_Rule_enables_optional_test}
 %endif
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           perl-File-Find-Object-Rule
-Version:        0.0312
-Release:        3%{?dist}
+Version:        0.0313
+Release:        10%{?dist}
 Summary:        Alternative interface to File::Find::Object
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Find-Object-Rule
 Source0:        https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-Rule-%{version}.tar.gz#/perl-File-Find-Object-Rule-%{version}.tar.gz
 Patch0:         File-Find-Object-Rule-0.0310-shellbang.patch
@@ -36,14 +36,15 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(File::Spec::Functions)
 # Test Suite
 BuildRequires:  perl(base)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::TreeCreate)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::More)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 %description
 File::Find::Object::Rule is a friendlier interface to File::Find::Object. It 
@@ -53,7 +54,7 @@ allows you to build rules that specify the desired files and directories.
 %setup -qn File-Find-Object-Rule-%{version}
 
 # Avoid use of /usr/bin/env
-%patch 0
+%patch -P 0
 
 %build
 perl Build.PL --installdirs=vendor
@@ -77,12 +78,55 @@ perl Build.PL --installdirs=vendor
 %{_mandir}/man3/File::Find::Object::Rule::Procedural.3*
 
 %changelog
-* Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 0.0312-3
-- Add an explicit BR on `perl(blib)` to enable ptest
+* Wed Apr 09 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.0313-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0312-2
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.0313-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0313-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Aug 27 2021 Paul Howarth <paul@city-fan.org> - 0.0313-1
+- Update to 0.0313
+  - Split File::TreeCreate off to its own distribution
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0312-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.0312-6
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0312-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.0312-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.0312-3
+- Perl 5.32 rebuild
+
+* Tue Mar 10 2020 Paul Howarth <paul@city-fan.org> - 0.0312-2
+- BR: perl(blib) for t/00-compile.t and t/findorule.t
 
 * Tue Jan 28 2020 Paul Howarth <paul@city-fan.org> - 0.0312-1
 - Update to 0.0312
