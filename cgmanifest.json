@@ -13331,8 +13331,8 @@
         "type": "other",
         "other": {
           "name": "microdnf",
-          "version": "3.5.1",
-          "downloadUrl": "https://github.com/rpm-software-management/microdnf/archive/v3.5.1/microdnf-3.5.1.tar.gz"
+          "version": "3.10.1",
+          "downloadUrl": "https://github.com/rpm-software-management/microdnf/archive/3.10.1/microdnf-3.10.1.tar.gz"
         }
       }
     },
