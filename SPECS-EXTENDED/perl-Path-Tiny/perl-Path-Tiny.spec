@@ -1,3 +1,5 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 # Run optional test
 %if ! (0%{?rhel})
 %bcond_without perl_Path_Tiny_enables_optional_test
@@ -6,14 +8,12 @@
 %endif
 
 Name:		perl-Path-Tiny
-Version:	0.112
-Release:	2%{?dist}
+Version:	0.146
+Release:	3%{?dist}
 Summary:	File path utility
-License:	ASL 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	Apache-2.0
 URL:		https://metacpan.org/release/Path-Tiny
-Source0:	https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-%{version}.tar.gz#/perl-Path-Tiny-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -28,11 +28,11 @@ BuildRequires:	perl(Config)
 BuildRequires:	perl(constant)
 BuildRequires:	perl(Cwd)
 BuildRequires:	perl(Digest) >= 1.03
-BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(Digest::SHA) >= 5.45
 BuildRequires:	perl(Encode)
 BuildRequires:	perl(Exporter) >= 5.57
 BuildRequires:	perl(Fcntl)
+BuildRequires:	perl(File::Compare)
 BuildRequires:	perl(File::Copy)
 BuildRequires:	perl(File::Glob)
 BuildRequires:	perl(File::Path) >= 2.07
@@ -46,6 +46,7 @@ BuildRequires:	perl(warnings)
 BuildRequires:	perl(warnings::register)
 # Test Suite
 BuildRequires:	perl(blib)
+BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(File::Basename)
 BuildRequires:	perl(File::Spec::Functions)
 BuildRequires:	perl(File::Spec::Unix)
@@ -58,16 +59,15 @@ BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 BuildRequires:	perl(Test::FailWarnings)
-BuildRequires:	perl(Test::MockRandom)
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Cwd)
 Requires:	perl(Digest) >= 1.03
-Requires:	perl(Digest::MD5)
 Requires:	perl(Digest::SHA) >= 5.45
 Requires:	perl(Encode)
 Requires:	perl(Fcntl)
+Requires:	perl(File::Compare)
 Requires:	perl(File::Copy)
 Requires:	perl(File::Glob)
 Requires:	perl(File::Path) >= 2.07
@@ -124,8 +124,135 @@ make test
 %{_mandir}/man3/Path::Tiny.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.112-2
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+* Fri Dec 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.146-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.146-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri May 10 2024 Paul Howarth <paul@city-fan.org> - 0.146-1
+- Update to 0.146
+  - Improved error message spewing to a file in a non-existent directory
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.144-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.144-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.144-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.144-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec  2 2022 Paul Howarth <paul@city-fan.org> - 0.144-1
+- Update to 0.144
+  - Fixed tilde expansion tests where ~root expands to '/'
+
+* Wed Nov  9 2022 Paul Howarth <paul@city-fan.org> - 0.142-1
+- Update to 0.142
+  Deprecations
+  - Tilde expansion is deprecated due to inconsistent and bug-prone behavior
+  Bug fixes
+  - Prevent expansion of tildes that are not the very first character (e.g.
+    "./~foo")
+  - Prevent unintentional tilde expansion during internal path processing
+  - Escape non-tilde glob characters before tilde expansion
+  - Fixed spew/edit to a long filename approaching the filesystem length limit
+  - Internal calls to 'print' are checked for possible errors
+  - Internal read calls are checked for errors
+  Changes
+  - Path stringification now adds "./" in front of paths starting with literal
+    tilde so they will round-trip; FREEZE updated to use this stringification
+    rule as well
+  - 'move' now uses File::Copy::move internally instead of the built-in
+    'rename', allowing it to work across filesystems; it also returns an object
+    for the moved location, allowing chaining
+  - edit_lines_raw now uses a buffered raw I/O layer
+  - edit_lines_utf8 now prefers PerlIO::utf8_strict, if available
+  - lines_utf8 now consistently uses a buffered I/O layer
+  - open*_utf8 now prefers PerlIO::utf8_strict, if available
+  - slurp_utf8 now consistently uses an unbuffered I/O layer
+  Documented
+  - Changed all raw/UTF-8 layer descriptions in method documentation to match
+    the code
+  - Fixed SYNOPSIS syntax
+  - Documented how to disable TMPDIR when making temp files/dirs
+  Testing
+  - Add additional tilde stringification testing
+  - Fixed tilde expansion tests on Windows
+  - Skip a problematic test case on Cygwin
+
+* Thu Oct 20 2022 Paul Howarth <paul@city-fan.org> - 0.130-1
+- Update to 0.130
+  - The 'mkdir' method no longer fails when applied to an existing directory
+
+* Thu Oct 20 2022 Paul Howarth <paul@city-fan.org> - 0.128-1
+- Update to 0.128
+  - Added 'mkdir' to replace 'mkpath', but returning the path object for
+    chaining
+  - The 'mkpath' method is deprecated in favor of 'mkdir'
+  - Added 'has_same_bytes' to efficiently compare the contents of two files
+  - Edited SYNOPSIS in the POD
+
+* Fri Sep  2 2022 Paul Howarth <paul@city-fan.org> - 0.124-1
+- Update to 0.124
+  - Added link to 'touchpath' in the 'mkpath' docs
+  - Fixed example in `tempfile' docs
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.122-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.122-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.122-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 17 2022 Paul Howarth <paul@city-fan.org> - 0.122-1
+- Update to 0.122
+  - Adds 'size' and 'size_human' methods; the latter gives 'ls -lh' style
+    output, with options to choose base2 or base10 forms
+
+* Mon Oct 25 2021 Paul Howarth <paul@city-fan.org> - 0.120-1
+- Update to 0.120
+  - The 'tempdir' and 'tempfile' methods may be called on a Path::Tiny object
+    representing a directory, in which case the directory will be used as the
+    container for the temporary object (as if the 'DIR' argument were used)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.118-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 23 2021 Michal Josef Spacek <mspacek@redhat.com> - 0.118-3
+- Remove runtime dependency for Digest::MD5
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.118-2
+- Perl 5.34 rebuild
+
+* Fri Feb  5 2021 Paul Howarth <paul@city-fan.org> - 0.118-1
+- Update to 0.118
+  - Skip symlink tests on Windows by actually testing symlinks, as Perl 5.33.5
+    adds notional support but it's not possible without elevated privileges
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.116-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 23 2021 Paul Howarth <paul@city-fan.org> - 0.116-1
+- Update to 0.116
+  - Fix tests on MSYS without symlinks enabled
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.114-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.114-2
+- Perl 5.32 rebuild
+
+* Sun Apr 26 2020 Paul Howarth <paul@city-fan.org> - 0.114-1
+- Update to 0.114
+  - Use \z instead of $ in regular expressions
 
 * Wed Jan 29 2020 Paul Howarth <paul@city-fan.org> - 0.112-1
 - Update to 0.112

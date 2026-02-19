@@ -19393,8 +19393,8 @@
         "type": "other",
         "other": {
           "name": "perl-Path-Tiny",
-          "version": "0.112",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-0.112.tar.gz"
+          "version": "0.146",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-0.146.tar.gz"
         }
       }
     },
