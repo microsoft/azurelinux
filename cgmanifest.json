@@ -26594,8 +26594,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-deep_merge",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/danielsdeleo/deep_merge/archive/refs/tags/1.2.1.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://rubygems.org/gems/deep_merge-1.2.2.gem"
         }
       }
     },
