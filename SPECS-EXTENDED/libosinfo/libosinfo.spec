@@ -1,12 +1,12 @@
 Summary:        A library for managing OS information for virtualization
 Name:           libosinfo
-Version:        1.10.0
+Version:        1.11.0
 Release:        2%{?dist}
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libosinfo.org/
-Source:         https://releases.pagure.org/libosinfo/%{name}-1.10.0.tar.xz
+Source:         https://releases.pagure.org/libosinfo/%{name}-1.11.0.tar.xz
 BuildRequires:  %{_bindir}/pod2man
 BuildRequires:  gcc
 BuildRequires:  gettext-devel
@@ -21,6 +21,7 @@ BuildRequires:  libxslt-devel >= 1.0.0
 BuildRequires:  meson
 BuildRequires:  osinfo-db
 BuildRequires:  vala
+BuildRequires:  perl-podlators
 Requires:       hwdata
 Requires:       osinfo-db
 Requires:       osinfo-db-tools
@@ -54,6 +55,7 @@ Libraries, includes, etc. to compile with the libosinfo library
     -Denable-introspection=enabled \
     -Denable-vala=enabled
 %meson_build
+
 
 %install
 %meson_install
