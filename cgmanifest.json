@@ -22633,8 +22633,8 @@
         "type": "other",
         "other": {
           "name": "python-ddt",
-          "version": "1.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/ddt/ddt-1.4.2.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/ddt/ddt-1.6.0.tar.gz"
         }
       }
     },

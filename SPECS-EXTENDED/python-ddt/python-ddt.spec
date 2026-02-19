@@ -1,73 +1,112 @@
-# what it's called on pypi
 %global srcname ddt
-# what it's imported as
-%global libname %{srcname}
-# name of egg info directory
-%global eggname %{srcname}
-# package name fragment
-%global pkgname %{srcname}
-
 %global common_description %{expand:
 DDT (Data-Driven Tests) allows you to multiply one test case by running it with
-different test data, and make it appear as multiple test cases. It is used in
-combination with other testing frameworks like unittest and nose.}
+different test data, and make it appear as multiple test cases.}
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:           python-%{pkgname}
-Version:        1.4.2
-Release:        6%{?dist}
+%bcond_without  tests
+
+
+Name:           python-%{srcname}
+Version:        1.6.0
+Release:        10%{?dist}
 Summary:        Python library to multiply test cases
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/datadriventests/ddt
-Source0:        %pypi_source
+Source:         %{pypi_source}#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+%if %{with tests}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-PyYAML
+BuildRequires:  python3-six
+%endif
 
 
 %description %{common_description}
 
 
-%package -n python3-%{pkgname}
+%package -n python3-%{srcname}
 Summary:        %{summary}
-BuildRequires:  python3-devel
-BuildRequires:  %{py3_dist setuptools}
-%if 0%{?with_check}
-BuildRequires:  %{py3_dist pytest pyyaml six}
-%endif
-%{?python_provide:%python_provide python3-%{pkgname}}
 
 
-%description -n python3-%{pkgname} %{common_description}
+%description -n python3-%{srcname} %{common_description}
 
 
 %prep
-%autosetup -n %{srcname}-%{version} -p 1
-rm -rf %{eggname}.egg-info
+%autosetup -n %{srcname}-%{version}
+
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 
 %check
-%pytest --verbose
+%if %{with tests}
+%pytest
+%else
+%pyproject_check_import
+%endif
 
 
-%files -n python3-%{pkgname}
-%license LICENSE.md
+%files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.md
-%pycached %{python3_sitelib}/%{libname}.py
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 
 %changelog
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.2-6
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+* Tue May 06 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.6.0-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Added BR on `python-PyYAML` for tests
 - License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.6.0-8
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.6.0-4
+- Rebuilt for Python 3.12
+
+* Wed Jun 07 2023 Jan Friesse <jfriesse@redhat.com> - 1.6.0-3
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Aug 22 2022 Joel Capitao <jcapitao@redhat.com> - 1.6.0-1
+- Latest upstream, resolves: rhbz#2089550
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.4.4-2
+- Rebuilt for Python 3.11
+
+* Thu Apr 21 2022 Carl George <carl@george.computer> - 1.4.4-1
+- Latest upstream, resolves: rhbz#1938360
+- Convert to pyproject macros
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
