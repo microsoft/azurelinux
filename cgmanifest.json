@@ -16703,8 +16703,8 @@
         "type": "other",
         "other": {
           "name": "perl-Config-INI",
-          "version": "0.025",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Config-INI-0.025.tar.gz"
+          "version": "0.029",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Config-INI-0.029.tar.gz"
         }
       }
     },
