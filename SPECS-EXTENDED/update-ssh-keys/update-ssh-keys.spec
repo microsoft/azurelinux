@@ -23,7 +23,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 Source0:        https://github.com/flatcar/update-ssh-keys/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+SOURCE1:        update-ssh-keys-0.7.0-vendor.tar.gz
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.60
 
