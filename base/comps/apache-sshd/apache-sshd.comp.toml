@@ -1,0 +1,10 @@
+[components.apache-sshd]
+overlays = [
+    # Remove maven-remote-resources-plugin to work around API incompatibility between
+    # plugin v3.1.0 and plexus-xml/maven4 jars in Fedora 43 chroot (NoSuchMethodError on Xpp3Dom).
+    { type = "spec-append-lines", section = "%prep", lines = ["%pom_remove_plugin :maven-remote-resources-plugin"] },
+
+    # POM defines <release> only in maven-compiler-plugin config, not as a property.
+    # xmvn-mojo:javadoc reads ${maven.compiler.release} (null) and falls back to ${maven.compiler.source} = 1.8, which JDK 21 javadoc rejects.
+    { type = "spec-append-lines", section = "%prep", lines = ["sed -i '/<maven.compiler.target>/a\\    <maven.compiler.release>8</maven.compiler.release>' pom.xml"] },
+]
