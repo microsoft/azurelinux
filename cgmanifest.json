@@ -23633,8 +23633,8 @@
         "type": "other",
         "other": {
           "name": "python-mccabe",
-          "version": "0.6.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
+          "version": "0.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.7.0.tar.gz"
         }
       }
     },
