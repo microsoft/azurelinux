@@ -14832,8 +14832,148 @@
         "type": "other",
         "other": {
           "name": "ocaml-camlp5",
-          "version": "8.00.02",
-          "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel8.00.02.tar.gz"
+          "version": "8.04.00",
+          "downloadUrl": "https://github.com/camlp5/camlp5/archive/8.04.00/camlp5-8.04.00.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-bos",
+          "version": "0.2.1",
+          "downloadUrl": "https://erratique.ch/software/bos/releases/bos-0.2.1.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-camlp5-buildscripts",
+          "version": "0.06",
+          "downloadUrl": "https://github.com/camlp5/camlp5-buildscripts/archive/0.06/camlp5-buildscripts-0.06.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-rresult",
+          "version": "0.7.0",
+          "downloadUrl": "https://erratique.ch/software/rresult/releases/rresult-0.7.0.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-version",
+          "version": "4.0.3",
+          "downloadUrl": "https://github.com/ocurrent/ocaml-version/archive/v4.0.3/ocaml-version-4.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-pcre2",
+          "version": "8.0.3",
+          "downloadUrl": "https://github.com/camlp5/pcre2-ocaml/archive/8.0.3/pcre2-8.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-ocamlgraph",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/backtracking/ocamlgraph/releases/download/2.2.0/ocamlgraph-2.2.0.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-mtime",
+          "version": "2.1.0",
+          "downloadUrl": "https://erratique.ch/software/mtime/releases/mtime-2.1.0.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-mdx",
+          "version": "2.5.1",
+          "downloadUrl": "https://github.com/realworldocaml/mdx/releases/download/2.5.1/mdx-2.5.1.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-logs",
+          "version": "0.10.0",
+          "downloadUrl": "https://erratique.ch/software/logs/releases/logs-0.10.0.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-lablgtk",
+          "version": "2.18.14",
+          "downloadUrl": "https://github.com/garrigue/lablgtk/archive/2.18.14/lablgtk-2.18.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-graphics",
+          "version": "5.2.0",
+          "downloadUrl": "https://github.com/ocaml/graphics/archive/5.2.0/graphics-5.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "not-ocamlfind",
+          "version": "0.14",
+          "downloadUrl": "https://github.com/chetmurthy/not-ocamlfind/archive/0.14/not-ocamlfind-0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgnomecanvas",
+          "version": "2.30.3",
+          "downloadUrl": "https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gtksourceview2",
+          "version": "2.11.2",
+          "downloadUrl": "https://download.gnome.org/sources/gtksourceview/2.11/gtksourceview-2.11.2.tar.bz2"
         }
       }
     },
@@ -14862,8 +15002,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-cmdliner",
-          "version": "1.0.4",
-          "downloadUrl": "https://github.com/dbuenzli/cmdliner/archive/v1.0.4/ocaml-cmdliner-1.0.4.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/dbuenzli/cmdliner/archive/refs/tags/v1.3.0.tar.gz"
         }
       }
     },

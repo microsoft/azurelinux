@@ -1,0 +1,26 @@
+--- lablgtk-2.18.13/configure.in.orig	2022-10-06 01:55:37.000000000 -0600
++++ lablgtk-2.18.13/configure.in	2023-09-27 12:16:38.789928991 -0600
+@@ -220,8 +220,8 @@ AC_MSG_RESULT(use $THREADS_LIB threads)
+ # Check for dll support
+ HAS_DLL_SUPPORT="no"
+ AC_MSG_CHECKING(for ocaml dll support)
+-if test -r "$OCAMLLIB/stublibs/dllunix.so" ||
+-   test -r "$OCAMLLIB/stublibs/dllunix.dll"
++if test -r "$OCAMLLIB/stublibs/dllunixnat.so" ||
++   test -r "$OCAMLLIB/stublibs/dllunixbyt.so"
+ then HAS_DLL_SUPPORT="yes"
+ fi
+ AC_MSG_RESULT($HAS_DLL_SUPPORT)
+--- lablgtk-2.18.13/configure.orig	2022-10-06 01:55:37.000000000 -0600
++++ lablgtk-2.18.13/configure	2023-09-27 13:31:10.122363877 -0600
+@@ -3172,8 +3172,8 @@ printf "%s\n" "use $THREADS_LIB threads"
+ HAS_DLL_SUPPORT="no"
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for ocaml dll support" >&5
+ printf %s "checking for ocaml dll support... " >&6; }
+-if test -r "$OCAMLLIB/stublibs/dllunix.so" ||
+-   test -r "$OCAMLLIB/stublibs/dllunix.dll"
++if test -r "$OCAMLLIB/stublibs/dllunixnat.so" ||
++   test -r "$OCAMLLIB/stublibs/dllunixbyt.so"
+ then HAS_DLL_SUPPORT="yes"
+ fi
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $HAS_DLL_SUPPORT" >&5

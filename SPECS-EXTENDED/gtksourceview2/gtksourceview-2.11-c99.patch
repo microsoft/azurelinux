@@ -1,0 +1,28 @@
+commit 7af75f026f555134e61a89c613589cd847dd998c
+Author: Ignacio Casal Quinteiro <icq@gnome.org>
+Date:   Wed Dec 22 16:29:09 2010 +0100
+
+    Remove unneeded method.
+
+diff --git a/tests/test-completion.c b/tests/test-completion.c
+index b199584160dfe67c..2bfee669340818ea 100644
+--- a/tests/test-completion.c
++++ b/tests/test-completion.c
+@@ -295,14 +295,13 @@ create_completion(void)
+ int
+ main (int argc, char *argv[])
+ {
+- 	GtkWidget *window;
+-	
+-	gtk_set_locale ();
++	GtkWidget *window;
++
+ 	gtk_init (&argc, &argv);
+ 
+ 	window = create_window ();
+ 	create_completion ();
+-	
++
+ 	gtk_widget_show_all (window);
+ 
+ 	gtk_main ();

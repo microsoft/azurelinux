@@ -1,0 +1,29 @@
+From b25e71c57fc934a7ce36e51826af9fa7c2cf9a80 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9bastien=20Wilmet?= <swilmet@gnome.org>
+Date: Thu, 14 Dec 2017 13:03:15 +0100
+Subject: [PATCH] View: fix assignment from incompatible pointer type
+
+GLib now propagates types with g_object_ref().
+
+At that code path we are sure that buffer is a GtkSourceBuffer since
+there is a condition if (GTK_SOURCE_IS_BUFFER (buffer)).
+---
+ gtksourceview/gtksourceview.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gtksourceview/gtksourceview.c b/gtksourceview/gtksourceview.c
+index 21424be97..e642ce360 100644
+--- a/gtksourceview/gtksourceview.c
++++ b/gtksourceview/gtksourceview.c
+@@ -1845,7 +1845,7 @@ set_source_buffer (GtkSourceView *view,
+ 
+ 	if (buffer && GTK_IS_SOURCE_BUFFER (buffer))
+ 	{
+-		view->priv->source_buffer = g_object_ref (buffer);
++		view->priv->source_buffer = g_object_ref (GTK_SOURCE_BUFFER (buffer));
+ 
+ 		g_signal_connect (buffer,
+ 				  "highlight_updated",
+-- 
+GitLab
+
