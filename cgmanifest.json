@@ -5500,8 +5500,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-az",
-          "version": "0.20040827",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/aspell/dict/az/aspell6-az-0.02-0.tar.bz2"
+          "version": "0.20180807",
+          "downloadUrl": "https://github.com/mozillaz/spellchecker/archive/refs/heads/master.zip#/azerbaijani_spellchecker-0.2.zip"
         }
       }
     },
