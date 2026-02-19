@@ -1,19 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           langtable
-Version:        0.0.53
-Release:        2%{?dist}
+Version:        0.0.68
+Release:        3%{?dist}
 Summary:        Guessing reasonable defaults for locale, keyboard layout, territory, and language.
 # the translations in languages.xml and territories.xml are (mostly)
 # imported from CLDR and are thus under the Unicode license, the
 # short name for this license is "MIT", see:
 # https://fedoraproject.org/wiki/Licensing:MIT?rd=Licensing/MIT#Modern_Style_without_sublicense_.28Unicode.29
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://github.com/mike-fabian/langtable
-Source0:        https://github.com/mike-fabian/langtable/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/mike-fabian/langtable/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-interpreter
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 
 %description
 langtable is used to guess reasonable defaults for locale, keyboard layout,
@@ -24,7 +25,7 @@ already known.
 
 %package -n python3-langtable
 Summary:        Python module to query the langtable-data
-License:        GPLv3+
+License:        GPL-3.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Obsoletes:      %{name}-data < %{version}-%{release}
 Provides:       %{name}-data = %{version}-%{release}
@@ -51,23 +52,23 @@ perl -pi -e "s,_DATADIR = '(.*)',_DATADIR = '%{_datadir}/langtable'," langtable/
 (cd $RPM_BUILD_DIR/%{name}-%{version}; %{__python3} test_cases.py)
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/keyboards.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/keyboards.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/keyboards.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/languages.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/languages.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/languages.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/territories.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/territories.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/territories.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/timezoneidparts.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezoneidparts.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezoneidparts.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/timezones.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezones.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezones.xml
 
 %files
 %license COPYING unicode-license.txt
-%doc README ChangeLog test_cases.py langtable/schemas/*.rng
+%doc README* ChangeLog test_cases.py langtable/schemas/*.rng
 
 %files -n python3-langtable
 %dir %{python3_sitelib}/langtable
@@ -76,8 +77,180 @@ xmllint --noout --relaxng \
 %{python3_sitelib}/langtable-*.egg-info/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.53-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Apr 07 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.0.68-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.68-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 17 2024 Mike FABIAN <mfabian@redhat.com> - 0.0.68-1
+- Update to 0.0.68
+- Reorder ibus/chewing as the default inputmethod for TW or Hant. Resolves:
+  https://github.com/mike-fabian/langtable/pull/22 See:
+  https://fedoraproject.org/wiki/Changes/IBusChewingForZhTW
+- Add ltg_LV.UTF-8
+
+* Tue Jun 11 2024 Python Maint <python-maint@redhat.com> - 0.0.67-2
+- Rebuilt for Python 3.13
+
+* Tue Jun 11 2024 Mike FABIAN <mfabian@redhat.com> - 0.0.67-1
+- Update to 0.0.67
+- Add tool to check which languages, scripts, and territories available in
+  CLDR are missing in langtable
+- Add all missing scripts and languages: yrl, xnr, wbp, vmw, vec, trw, trv,
+  skr, sdh, quc, pis, pcm, myv, mus, moh, mic, mhn, ltg, lmo, lld, kxv,
+  kpe, kgp, ken, kcg, kaj, jbo, gaa, cic, cho, ceb, cch, cad, bss, blt,
+  Tavt blo, bgn, bgc, rhg, Rohg hnj, Hmnp Shaw, Dsrt bew, bal, arn, apc,
+  ann, scn
+- Drop Python < 3 support (using pyupgrade --py3-plus langtable.py)
+- Fix some ruff and pylint warnings
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.0.66-2
+- Rebuilt for Python 3.13
+
+* Tue May 07 2024 Mike FABIAN <mfabian@redhat.com> - 0.0.66-1
+- Update to 0.0.66
+- Fix syntax error in a keyboard layout name for th (Resolves:
+  https://github.com/mike-fabian/langtable/issues/21xs)
+- Add mdf
+- Use “in(eng)” keyboard layout instead of “us” for BD to get AltGr enabled
+- Get translation changes from CLDR
+- Add option to include changed translations as well to the script getting
+  translations from CLDR
+- Add reference to the the PyPI package to the README.md. And add a
+  README.html and README generated from the README.md.
+- Make test outputs somewhat more verbose, even when all tests pass
+  (Resolves: https://github.com/mike-fabian/langtable/pull/20). Thanks to
+  Sebastian <seb128@ubuntu.com> for the pull request.
+- Fix Makefile twine-upload target for new authentification
+
+* Thu Feb 08 2024 Mike FABIAN <mfabian@redhat.com> - 0.0.65-1
+- Update to 0.0.65
+- Add wuu, tok, glk, gbm, ssy
+- Remove aa_ER.UTF-8@saaho
+- Add kv_RU.UTF-8, chr_RU.UTF-8
+- Add EU, EZ
+- Improve README and Makefile (Resolves: https://github.com/mike-
+  fabian/langtable/issues/19)
+- Add more translations from CLDR
+- Get translation changes from CLDR
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.64-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.64-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Sep 19 2023 Mike FABIAN <mfabian@redhat.com> - 0.0.64-1
+- Update to 0.0.64
+- Add new public functions list_all_{languages,locales,keyboards,territories,timezones,scripts,input_methods,console_fonts}
+  (See also the discussion at: https://gitlab.gnome.org/GNOME/gnome-desktop/-/merge_requests/159)
+
+* Mon Aug 28 2023 Mike FABIAN <mfabian@redhat.com> - 0.0.63-1
+- Update to 0.0.63
+- Add more translations from CLDR
+- Get translation changes from CLDR
+- Japanese: prefer anthy over kkc
+  (Thanks to adam Williamson: https://github.com/mike-fabian/langtable/pull/17)
+- Use skipTerritory also in list_keyboards(), list_consolefonts(), and list_timezones()
+  (Resolves: https://github.com/mike-fabian/langtable/issues/18)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.62-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.0.62-2
+- Rebuilt for Python 3.12
+
+* Tue May 02 2023 Mike FABIAN <mfabian@redhat.com> - 0.0.62-1
+- Update to 0.0.62
+- Get translation changes from CLDR
+- Add more translations from CLDR
+- Add Norwegian keyboard layout to keyboards.xml
+  (Resolves: https://github.com/mike-fabian/langtable/issues/16)
+- Add Hang script to Southern Aymara
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.61-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 28 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.61-2
+- Migrate license tag of python3-langtable to SPDX as well
+
+* Thu Nov 24 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.61-1
+- Update to 0.0.61
+- Add mnw_MM.UTF-8 and ckb_IQ.UTF-8
+- Do not run test cases using Python2 anymore
+- Add bih
+- Add more translations from CLDR
+- Migrate license tag to SPDX
+
+* Wed Sep 21 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.60-1
+- Update to 0.0.60
+- Add list_common_locales() function
+  (Resolves: https://github.com/mike-fabian/langtable/issues/15)
+- For ar_IN locale, langtable should give the 'ara' keyboard layout as the first choice
+  (Resolves: Resolves: https://github.com/mike-fabian/langtable/issues/14)
+
+* Tue Sep 06 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.59-1
+- Update to 0.0.59
+- Add ibus/m17n:ar:kbd as input method for Arabic and fix iso639-1 code for Arabic
+- Get translation changes from CLDR
+- Add more translations from CLDR
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.58-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.0.58-2
+- Rebuilt for Python 3.11
+
+* Thu Apr 21 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.58-1
+- Update to 0.0.58
+- Add syr locale
+- Get translation changes from CLDR
+- Add more translations from CLDR
+- Fix names for keyboard layouts which have changed
+- Add ab_GE locale
+- Add rif language
+
+* Tue Jan 25 2022 Mike FABIAN <mfabian@redhat.com> - 0.0.57-1
+- Update to 0.0.57
+- Get translation changes from CLDR
+- Add more translations from CLDR
+- Replace “ibus/cangjie” with “ibus/table:cangjie5”
+- Updates for Sami languages (from Marko Myllynen)
+- Updates for Finnish keyboard layouts (from Marko Myllynen)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.56-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Aug 16 2021 Mike FABIAN <mfabian@redhat.com> - 0.0.56-1
+- Update to 0.0.56
+- Fallback to translations in “xx” from “xx_Zzzz”
+  only if “Zzzz” is the main script of “xx”
+  (Resolves: https://github.com/mike-fabian/langtable/issues/13)
+- Get translation changes for mt from CLDR
+
+* Wed Aug 11 2021 Mike FABIAN <mfabian@redhat.com> - 0.0.55-1
+- Update to 0.0.55
+- Get translation changes from CLDR
+- Add more translations from CLDR
+- Make inscript2 instead of inscript input methods the default
+  (See: https://fedoraproject.org/wiki/Changes/Enhanced_Inscript_as_default_Indic_IM)
+- Make ibus/m17n:vi:telex the default input method for Vietnamese
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.54-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.0.54-3
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.54-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Oct 29 2020 Mike FABIAN <mfabian@redhat.com> - 0.0.54-1
+- Update to 0.0.54
+- add list_common_languages derived from gnome-control-center
+  by Sundeep ANAND <suanand@redhat.com>
 
 * Tue Sep 15 2020 Mike FABIAN <mfabian@redhat.com> - 0.0.53-1
 - Update to 0.0.53
@@ -89,6 +262,12 @@ xmllint --noout --relaxng \
 * Tue Aug 18 2020 Mike FABIAN <mfabian@redhat.com> - 0.0.52-1
 - Update to 0.0.52
 - add list_common_keyboards() to public api by Sundeep ANAND <suanand@redhat.com>
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.51-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.0.51-3
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.51-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -509,6 +688,3 @@ xmllint --noout --relaxng \
 
 * Tue May 07 2013 Mike FABIAN <mfabian@redhat.com> - 0.0.1-1
 - initial package
-
-
-
