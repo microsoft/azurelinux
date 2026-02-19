@@ -94,12 +94,7 @@ jobs:
             fi
           done
           
-          # Additional checks for binary files and large files
           if [[ -f "$file" ]]; then
-            # Check if file is binary (but allow .sh files even if executable)
-            if  file "$file" | grep -q "binary\|archive\|compressed"; then
-              should_be_in_blob_store=true
-            fi
             
             # Check file size (files > 1MB should be in blob store)
             file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo 0)
