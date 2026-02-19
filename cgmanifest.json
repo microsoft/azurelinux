@@ -23403,8 +23403,8 @@
         "type": "other",
         "other": {
           "name": "python-jwcrypto",
-          "version": "0.6.0",
-          "downloadUrl": "https://github.com/latchset/jwcrypto/releases/download/v0.6.0/jwcrypto-0.6.0.tar.gz"
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/latchset/jwcrypto/releases/download/v1.4.2/jwcrypto-1.4.2.tar.gz"
         }
       }
     },
