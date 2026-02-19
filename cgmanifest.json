@@ -24473,8 +24473,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-timeout",
-          "version": "1.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/pytest-timeout-1.4.2.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-timeout/pytest-timeout-2.3.1.tar.gz"
         }
       }
     },

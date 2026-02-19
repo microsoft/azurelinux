@@ -9,8 +9,10 @@
 
 Summary:        py.test plugin to abort hanging tests
 Name:           python-%{pypi_name}
-Version:        1.4.2
-Release:        4%{?dist}
+Version:        2.3.1
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/pytest-dev/pytest-timeout
 Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -56,6 +58,10 @@ pip3 install pytest==7.1.2 pytest-cov==3.0.0
 %{python3_sitelib}/__pycache__/pytest_timeout*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.1-1
+- Auto-upgrade to 2.3.1
+- License verified
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4.2-4
 - Drop BR on pytest and install latest deps to enable ptest
 - License verified
