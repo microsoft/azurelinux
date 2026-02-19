@@ -1,87 +1,199 @@
-Summary:        C++ API for the cairo graphics library
+
+%global so_version 1
+%global apiver 1.0
+
+# “Let mm-common-get copy some files to untracked/”, i.e., replace scripts from
+# the tarball with those from mm-common. This is (potentially) required if
+# building an autotools-generated tarball with meson, or vice versa.
+%bcond maintainer_mode 0
+
+# Doxygen HTML help is not suitable for packaging due to a minified JavaScript
+# bundle inserted by Doxygen itself. See discussion at
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555.
+#
+# We can enable the Doxygen PDF documentation as a substitute.
+#
+# We still generate the HTML documentation, but strip out all the JavaScript
+# that causes policy issues. This degrades it in the browser, but is sufficient
+# to keep the Devhelp documentation working.
+#%bcond doc_pdf 1
+
 Name:           cairomm
-Version:        1.12.0
-Release:        15%{?dist}
-License:        LGPLv2+
-Vendor:         Microsoft Corporation
+Summary:        C++ API for the cairo graphics library
+Version:        1.14.5
+Release:        1%{?dist}
+vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.cairographics.org
-Source:         http://www.cairographics.org/releases/%{name}-%{version}.tar.gz
-%global apiver 1.0
-%global cairo_version 1.10.0
+License:        LGPL-2.0-or-later
+
+%global src_base https://www.cairographics.org/releases
+Source0:        %{src_base}/cairomm-%{version}.tar.xz
+# No keyring with authorized GPG signing keys is published
+# (https://gitlab.freedesktop.org/freedesktop/freedesktop/-/issues/331), but we
+# are able to verify the signature using the key for Kjell Ahlstedt from
+# https://gitlab.freedesktop.org/freedesktop/freedesktop/-/issues/290.
+Source1:        %{src_base}/cairomm-%{version}.tar.xz.asc
+Source2:        https://gitlab.freedesktop.org/freedesktop/freedesktop/uploads/0ac64e9582659f70a719d59fb02cd037/gpg_key.pub
 %global libsigc_version 2.5.1
-BuildRequires:  cairo-devel >= %{cairo_version}
+%global cairo_version 1.10.0
+BuildRequires:  gnupg2
+
 BuildRequires:  gcc-c++
+BuildRequires:  meson
+
+BuildRequires:  pkgconfig(cairo)
 BuildRequires:  libsigc++20-devel >= %{libsigc_version}
-BuildRequires:  perl-interpreter
-BuildRequires:  pkgconfig
-BuildRequires:  perl(Getopt::Long)
 Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       libsigc++20%{?_isa} >= %{libsigc_version}
+BuildRequires:  pkgconfig(fontconfig)
+
+# Everything mentioned in data/cairomm*.pc.in, except the Quartz and Win32
+# libraries that do not apply to this platform:
+BuildRequires:  pkgconfig(cairo-ft)
+BuildRequires:  pkgconfig(cairo-pdf)
+BuildRequires:  pkgconfig(cairo-png)
+BuildRequires:  pkgconfig(cairo-ps)
+BuildRequires:  pkgconfig(cairo-svg)
+BuildRequires:  pkgconfig(cairo-xlib)
+BuildRequires:  pkgconfig(cairo-xlib-xrender)
+
+%if %{with maintainer_mode}
+# mm-common-get
+BuildRequires:  mm-common >= 1.0.4
+%endif
+
+BuildRequires:  doxygen
+# dot
+BuildRequires:  graphviz
+# xsltproc
+BuildRequires:  libxslt
+BuildRequires:  pkgconfig(mm-common-libstdc++)
+
+
+# For tests:
+BuildRequires:  boost-devel
+
+# Based on discussion in
+# https://src.fedoraproject.org/rpms/pangomm/pull-request/2, cairomm will
+# continue to provide API/ABI version 1.0 indefinitely, with the cairomm1.16
+# package providing the new 1.16 API/ABI series. This virtual Provides is
+# therefore no longer required, as dependent packages requiring the 1.0 API/ABI
+# may safely require cairomm and its subpackages.
+Provides:       cairomm%{apiver}%{?_isa} = %{version}-%{release}
 
 %description
-Cairomm is the C++ API for the cairo graphics library. It offers all the power
-of cairo with an interface familiar to C++ developers, including use of the
-Standard Template Library where it makes sense.
+This library provides a C++ interface to cairo.
+
+The API/ABI version series is %{apiver}.
+
 
 %package        devel
-Summary:        Headers for developing programs that will use %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development files for cairomm
+Requires:       cairomm%{?_isa} = %{version}-%{release}
+
+Provides:       cairomm%{apiver}-devel%{?_isa} = %{version}-%{release}
 
 %description    devel
-Cairomm is the C++ API for the cairo graphics library. It offers all the power
-of cairo with an interface familiar to C++ developers, including use of the
-Standard Template Library where it makes sense.
+The cairomm-devel package contains libraries and header files for developing
+applications that use cairomm.
 
-This package contains the libraries and header files needed for
-developing %{name} applications.
+The API/ABI version series is %{apiver}.
 
-%package        doc
-Summary:        Developer's documentation for the cairomm library
-Requires:       %{name} = %{version}-%{release}
-Requires:       libsigc++20-doc
-BuildArch:      noarch
 
-%description      doc
-This package contains developer's documentation for the cairomm
-library. Cairomm is the C++ API for the cairo graphics library.
+#%package        doc
+#Summary:        Documentation for cairomm
 
-The documentation can be viewed either through the devhelp
-documentation browser or through a web browser.
+#BuildArch:      noarch
 
-If using a web browser the documentation is installed in the gtk-doc
-hierarchy and can be found at %{_docdir}/cairomm-1.0
+#Provides:       cairomm%{apiver}-doc = %{version}-%{release}
+
+#%description    doc
+#Documentation for cairomm can be viewed through the devhelp documentation
+#browser.
+
+#The API/ABI version series is %{apiver}.
+
 
 %prep
-%setup -q
+%{gpgverify} \
+    --keyring='%{SOURCE2}' --signature='%{SOURCE1}'  --data='%{SOURCE0}'
+
+%autosetup
+# Fix stray executable bit:
+chmod -v a-x NEWS
+
+# We must remove the jQuery/jQueryUI bundle with precompiled/minified/bundled
+# JavaScript that is in untracked/docs/reference/html/jquery.js, since such
+# sources are banned in Fedora. (Note also that the bundled JavaScript had a
+# different license.) We also remove the tag file, which triggers a rebuild of
+# the documentation. While we are at it, we might as well rebuild the devhelp
+# XML too. Note that we will still install the HTML documentation, since the
+# devhelp XML requires it, but we will strip out the JavaScript, which will
+# degrade the documentation in a web browser.
+rm -rf untracked/docs/reference/html
+rm untracked/docs/reference/cairomm-%{apiver}.tag \
+   untracked/docs/reference/cairomm-%{apiver}.devhelp2
+
+
 
 %build
-%configure --disable-static
-make %{?_smp_mflags}
+%meson \
+  -Dmaintainer-mode=%{?with_maintainer_mode:true}%{?!with_maintainer_mode:false} \
+  -Dbuild-documentation=false \
+  -Dbuild-examples=false \
+  -Dbuild-tests=true \
+  -Dboost-shared=true \
+  -Dwarnings=max
+
+
+%meson_build
+
+
+
+
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+%meson_install
+#install -t %{buildroot}%{_docdir}/cairomm-%{apiver} -m 0644 -p \
+#    ChangeLog NEWS README.md
+#cp -rp examples %{buildroot}%{_docdir}/cairomm-%{apiver}/
 
-%ldconfig_scriptlets
+# Strip out bundled and/or pre-minified JavaScript; this degrades the browser
+# experience, but the HTML is still usable for devhelp.
+#find '%{buildroot}%{_docdir}/cairomm-%{apiver}/reference/html' \
+#  -type f \( -name '*.js' -o -name '*.js.*' \) -print -delete
+
+
+
+%check
+%meson_test
 
 %files
 %license COPYING
-%doc AUTHORS README NEWS
-%{_libdir}/lib*.so.*
+%{_libdir}/libcairomm-%{apiver}.so.%{so_version}{,.*}
+
 
 %files devel
-%doc ChangeLog
-%{_includedir}/%{name}-%{apiver}
-%{_libdir}/*.so
-%{_libdir}/pkgconfig/*
-%{_libdir}/%{name}-%{apiver}
+%{_includedir}/cairomm-%{apiver}/
+%{_libdir}/libcairomm-%{apiver}.so
+%{_libdir}/pkgconfig/cairomm-%{apiver}.pc
+%{_libdir}/pkgconfig/cairomm-*-%{apiver}.pc
+%{_libdir}/cairomm-%{apiver}/
 
-%files doc
-%doc %{_docdir}/%{name}-%{apiver}/
-%doc %{_datadir}/devhelp/
+
+#%files doc
+#%license COPYING
+# Note: JavaScript has been removed from HTML reference manual, degrading the
+# browser experience. It is still needed for Devhelp support.
+#%doc %{_docdir}/cairomm-%{apiver}/
+#%doc %{_datadir}/devhelp/
+
 
 %changelog
+* Thu Nov 2024 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.14.5-1
+- upgrade to version 1.14.5
+
 * Wed Oct 26 2022 Muhammad Falak <mwani@microsoft.com> - 1.12.0-15
 - License verified
 

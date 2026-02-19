@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "cairomm-1.12.0.tar.gz": "50435aec6fdd976934b791e808993160113ad19ca53a5634a9b64ccbe55874cc"
+  "cairomm-1.14.5.tar.xz": "70136203540c884e89ce1c9edfb6369b9953937f6cd596d97c78c9758a5d48db",
+  "cairomm-1.14.5.tar.xz.asc": "bac7d9a09dbf876aaff86da6f49ffa35465e0cbf0082870a8d534ac4a3598b78",
+  "gpg_key.pub": "b1457513a743cff02a2d70908b127b1887dae88c9fe62db6299be3c7ccd55e4f"
  }
 }

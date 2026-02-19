@@ -1407,8 +1407,8 @@
         "type": "other",
         "other": {
           "name": "cairomm",
-          "version": "1.12.0",
-          "downloadUrl": "http://www.cairographics.org/releases/cairomm-1.12.0.tar.gz"
+          "version": "1.14.5",
+          "downloadUrl": "http://www.cairographics.org/releases/cairomm-1.14.5.tar.gz"
         }
       }
     },
