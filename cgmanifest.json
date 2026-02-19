@@ -15292,8 +15292,8 @@
         "type": "other",
         "other": {
           "name": "ocl-icd",
-          "version": "2.2.13",
-          "downloadUrl": "https://github.com/OCL-dev/ocl-icd/archive/v2.2.13/ocl-icd-2.2.13.tar.gz"
+          "version": "2.3.2",
+          "downloadUrl": "https://github.com/OCL-dev/ocl-icd/archive/v2.3.2/ocl-icd-2.3.2.tar.gz"
         }
       }
     },
