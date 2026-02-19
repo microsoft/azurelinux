@@ -1,10 +1,25 @@
 [components.apache-sshd]
-overlays = [
-    # Remove maven-remote-resources-plugin to work around API incompatibility between
-    # plugin v3.1.0 and plexus-xml/maven4 jars in Fedora 43 chroot (NoSuchMethodError on Xpp3Dom).
-    { type = "spec-append-lines", section = "%prep", lines = ["%pom_remove_plugin :maven-remote-resources-plugin"] },
 
-    # POM defines <release> only in maven-compiler-plugin config, not as a property.
-    # xmvn-mojo:javadoc reads ${maven.compiler.release} (null) and falls back to ${maven.compiler.source} = 1.8, which JDK 21 javadoc rejects.
-    { type = "spec-append-lines", section = "%prep", lines = ["sed -i '/<maven.compiler.target>/a\\    <maven.compiler.release>8</maven.compiler.release>' pom.xml"] },
-]
+[[components.apache-sshd.overlays]]
+description = "Remove maven-remote-resources-plugin (Xpp3Dom classloading clash with plexus-xml/maven4)"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%pom_remove_plugin :maven-remote-resources-plugin"]
+
+[[components.apache-sshd.overlays]]
+description = "Add patch for maven.compiler.release POM property (xmvn javadoc fix)"
+type = "patch-add"
+file = "add-maven-compiler-release.patch"
+source = "add-maven-compiler-release.patch"
+
+[[components.apache-sshd.overlays]]
+description = "Use %autosetup to auto-apply all patches"
+type = "spec-search-replace"
+regex = '%setup -q'
+replacement = '%autosetup -p1'
+
+[[components.apache-sshd.overlays]]
+description = "Remove explicit %patch call now handled by %autosetup"
+type = "spec-search-replace"
+regex = '%patch -P0 -p1'
+replacement = ''
