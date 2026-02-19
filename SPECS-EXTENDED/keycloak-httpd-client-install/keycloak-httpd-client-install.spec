@@ -4,33 +4,18 @@ Distribution:   Azure Linux
 %global summary Tools to configure Apache HTTPD as Keycloak client
 
 
-
-
-
-  %bcond_with python2
-  %bcond_without python3
-
-
 Name:           %{srcname}
-Version:        1.1
-Release:        6%{?dist}
+Version:        1.3
+Release:        2%{?dist}
 Summary:        %{summary}
 
-%global git_tag RELEASE_%(r=%{version}; echo $r | tr '.' '_')
-
-License:        GPLv3
-URL:            https://github.com/jdennis/keycloak-httpd-client-install
-Source0:        https://github.com/jdennis/keycloak-httpd-client-install/archive/%{git_tag}.tar.gz
-
+License:        GPL-3.0-or-later
+URL:            https://github.com/latchset/keycloak-httpd-client-install
+Source0:        https://github.com/latchset/keycloak-httpd-client-install/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%if %{with python2}
-BuildRequires:  python2-devel
-%endif # with_python2
-
-%if 0%{?with_python3}
 BuildRequires:  python3-devel
-%endif
+BuildRequires:  (python3-setuptools if python3-devel >= 3.12)
 
 Requires:       %{_bindir}/keycloak-httpd-client-install
 
@@ -42,25 +27,6 @@ libraries and tools which can automate and simplify configuring an
 Apache HTTPD authentication module and registering as a client of a
 Keycloak IdP.
 
-%if %{with python2}
-%package -n python2-%{srcname}
-Summary:        %{summary}
-
-%{?python_provide:%python_provide python2-%{srcname}}
-
-Requires:       %{name} = %{version}-%{release}
-Requires:       python2-requests
-Requires:       python2-requests-oauthlib
-Requires:       python2-jinja2
-Requires:       %{_bindir}/keycloak-httpd-client-install
-
-%description -n python2-%{srcname}
-Keycloak is an authentication server. This package contains libraries and
-programs which can invoke the Keycloak REST API and configure clients
-of a Keycloak server.
-%endif # with_python2
-
-%if 0%{?with_python3}
 %package -n python3-%{srcname}
 Summary:        %{summary}
 
@@ -70,44 +36,21 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       python3-requests
 Requires:       python3-requests-oauthlib
 Requires:       python3-jinja2
+Requires:       python3-lxml
 
 %description -n python3-%{srcname}
 Keycloak is an authentication server. This package contains libraries and
 programs which can invoke the Keycloak REST API and configure clients
 of a Keycloak server.
 
-%endif
-
 %prep
-%autosetup -n %{srcname}-%{git_tag} -p1
+%autosetup -n %{name}-%{version} -p1
 
 %build
-%if %{with python2}
-%py2_build
-%endif # with_python2
-
-%if 0%{?with_python3}
 %py3_build
-%endif
 
 %install
-%if %{with python2}
-# Must do the python2 install first because the scripts in /usr/bin are
-# overwritten with every setup.py install, and in general we want the
-# python3 version to be the default.
-%py2_install
-%endif # with_python2
-
-%if 0%{?with_python3}
-# py3_install won't overwrite files if they have a timestamp greater-than
-# or equal to the py2 installed files. If both the py2 and py3 builds execute
-# quickly the files end up with the same timestamps thus leaving the py2
-# version in the py3 install. Therefore remove any files susceptible to this.
-%if %{with python2}
-rm %{buildroot}%{_bindir}/keycloak-httpd-client-install
-%endif # with_python2
 %py3_install
-%endif
 
 install -d -m 755 %{buildroot}/%{_mandir}/man8
 install -c -m 644 doc/keycloak-httpd-client-install.8 %{buildroot}/%{_mandir}/man8
@@ -117,29 +60,74 @@ install -c -m 644 doc/keycloak-httpd-client-install.8 %{buildroot}/%{_mandir}/ma
 %doc README.md doc/ChangeLog
 %{_datadir}/%{srcname}/
 
-%if %{with python2}
-# Note that there is no %%files section for the unversioned python module if we are building for several python runtimes
-%files -n python2-%{srcname}
-%{python2_sitelib}/*
-
-%if ! 0%{?with_python3}
-%{_bindir}/keycloak-httpd-client-install
-%{_bindir}/keycloak-rest
-%{_mandir}/man8/*
-%endif
-%endif # with_python2
-
-%if 0%{?with_python3}
 %files -n python3-%{srcname}
 %{python3_sitelib}/*
 %{_bindir}/keycloak-httpd-client-install
 %{_bindir}/keycloak-rest
 %{_mandir}/man8/*
-%endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Mar 11 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.3-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Fri Sep 13 2024 Tomas Halman <thalman@redhat.com> - 1.3-1
+- Rebase to version 1.3
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.1-22
+- Rebuilt for Python 3.13
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Oct 4 2023 Tomas Halman <thalman@redhat.com> - 1.1-19
+- Resolves: rhbz#2115262 keycloak-httpd-client-install missing dependency to python-lxml
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.1-17
+- Rebuilt for Python 3.12
+
+* Tue Mar 7 2023 Tomas Halman <thalman@redhat.com> - 1.1-16
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 4 2023 keycloak-httpd-client-install fails to build with Python 3.12 - 1.1.14
+- Resolves: rhbz#2155009 - keycloak-httpd-client-install fails to build with
+  Python 3.12: ModuleNotFoundError: No module named 'distutils'
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.1-12
+- Rebuilt for Python 3.11
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.1-9
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.1-6
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
