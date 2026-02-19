@@ -4,5 +4,5 @@
 # (rhel=10 would engage RHEL-specific BuildRequires)
 # Add without = ["debug"] to skip debug kernel variant and reduce build time
 [components.kernel.build]
-defines = { rhel = "0" }
+# defines = { rhel = "0" }
 without = ["debug"]

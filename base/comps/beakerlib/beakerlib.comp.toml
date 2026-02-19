@@ -1,12 +1,12 @@
 [components.beakerlib]
 
-# Azure Linux defines both %fedora (from the Fedora 43 chroot) and %rhel=10
-# (from distro build defines). The upstream spec applies python3.patch on Fedora
-# and python-platform.patch on RHEL>7, expecting them to be mutually exclusive.
-# Since both conditions are true here, the patches conflict (same shebang lines).
-# Disable python-platform.patch — Azure Linux uses python3, not platform-python.
-[[components.beakerlib.overlays]]
-description = "Skip python-platform.patch (Patch3) which conflicts with python3.patch (Patch2) when both %fedora and %rhel are defined"
-type = "spec-search-replace"
-regex = '%patch -P 3 -p1'
-replacement = '# Disabled for Azure Linux: python-platform.patch conflicts with python3.patch'
+# # Azure Linux defines both %fedora (from the Fedora 43 chroot) and %rhel=10
+# # (from distro build defines). The upstream spec applies python3.patch on Fedora
+# # and python-platform.patch on RHEL>7, expecting them to be mutually exclusive.
+# # Since both conditions are true here, the patches conflict (same shebang lines).
+# # Disable python-platform.patch — Azure Linux uses python3, not platform-python.
+# [[components.beakerlib.overlays]]
+# description = "Skip python-platform.patch (Patch3) which conflicts with python3.patch (Patch2) when both %fedora and %rhel are defined"
+# type = "spec-search-replace"
+# regex = '%patch -P 3 -p1'
+# replacement = '# Disabled for Azure Linux: python-platform.patch conflicts with python3.patch'
