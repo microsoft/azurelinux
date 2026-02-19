@@ -15413,8 +15413,8 @@
         "type": "other",
         "other": {
           "name": "opencc",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/BYVoid/OpenCC/archive/ver.1.1.1.tar.gz"
+          "version": "1.1.7",
+          "downloadUrl": "https://github.com/BYVoid/OpenCC/archive/ver.1.1.7.tar.gz"
         }
       }
     },

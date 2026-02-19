@@ -1,19 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 Name:       opencc
-Version:    1.1.1
+Version:    1.1.7
 Release:    3%{?dist}
 Summary:    Libraries for Simplified-Traditional Chinese Conversion
-License:    ASL 2.0
+License:    Apache-2.0
 URL:        https://github.com/BYVoid/OpenCC
 Source0:    https://github.com/BYVoid/OpenCC/archive/ver.%{version}.tar.gz#/OpenCC-ver.%{version}.tar.gz
-Patch0:     parallel-build-fix.patch
+Patch0:     opencc-fixes-std-initializer-list.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  python3
+BuildRequires:  marisa-devel
+BuildRequires:  rapidjson-devel
 
 %description
 OpenCC is a library for converting characters and phrases between
@@ -46,10 +49,11 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -p1 -n OpenCC-ver.%{version}
+%setup -q -n OpenCC-ver.%{version}
+%patch -P0 -p1 -b .compile
 
 %build
-%cmake -DENABLE_GETTEXT:BOOL=ON -DBUILD_DOCUMENTATION:BOOL=ON
+%cmake -DENABLE_GETTEXT:BOOL=ON -DBUILD_DOCUMENTATION:BOOL=ON -DUSE_SYSTEM_MARISA:BOOL=ON -DUSE_SYSTEM_RAPIDJSON:BOOL=ON
 %cmake_build
 
 %install
@@ -59,8 +63,6 @@ developing applications that use %{name}.
 %ctest
 
 #%find_lang %{name}
-
-%ldconfig_scriptlets
 
 %files
 %doc AUTHORS LICENSE README.md
@@ -78,11 +80,49 @@ developing applications that use %{name}.
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/opencc/OpenCC*.cmake
 
 %changelog
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-3
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- Add patch to fix parallel build issue
+* Tue Apr 29 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.1.7-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Feb  2 2024 Peng Wu <pwu@redhat.com> - 1.1.7-1
+- Update to 1.1.7
+- Resolves: RHBZ#2261417
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 18 2023 Peng Wu <pwu@redhat.com> - 1.1.4-3
+- Migrate to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Oct 21 2022 Peng Wu <pwu@redhat.com> - 1.1.4-1
+- Update to 1.1.4
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Aug  2 2021 Peng Wu <pwu@redhat.com> - 1.1.2-1
+- Update to 1.1.2
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
