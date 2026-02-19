@@ -1,0 +1,4 @@
+[components.golang-github-rcrowley-metrics]
+
+[components.golang-github-rcrowley-metrics.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

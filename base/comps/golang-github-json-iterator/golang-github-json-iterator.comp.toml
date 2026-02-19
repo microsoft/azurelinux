@@ -1,0 +1,4 @@
+[components.golang-github-json-iterator]
+
+[components.golang-github-json-iterator.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

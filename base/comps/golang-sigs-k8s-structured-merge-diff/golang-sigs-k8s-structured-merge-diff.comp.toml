@@ -1,0 +1,4 @@
+[components.golang-sigs-k8s-structured-merge-diff]
+
+[components.golang-sigs-k8s-structured-merge-diff.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

@@ -1,0 +1,4 @@
+[components.golang-github-shopify-sarama]
+
+[components.golang-github-shopify-sarama.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

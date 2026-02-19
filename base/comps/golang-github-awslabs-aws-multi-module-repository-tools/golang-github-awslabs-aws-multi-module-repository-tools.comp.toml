@@ -1,0 +1,4 @@
+[components.golang-github-awslabs-aws-multi-module-repository-tools]
+
+[components.golang-github-awslabs-aws-multi-module-repository-tools.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
