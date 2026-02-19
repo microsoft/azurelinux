@@ -18453,8 +18453,8 @@
         "type": "other",
         "other": {
           "name": "perl-Locale-Codes",
-          "version": "3.66",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Locale-Codes-3.66.tar.gz"
+          "version": "3.81",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Locale-Codes-3.81.tar.gz"
         }
       }
     },
