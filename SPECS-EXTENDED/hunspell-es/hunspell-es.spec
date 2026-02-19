@@ -1,9 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} >= 36 || 0%{?rhel} > 9
+%global dict_dirname hunspell
+%else
+%global dict_dirname myspell
+%endif
+
 Name: hunspell-es
 Summary: Spanish hunspell dictionaries
-Version: 2.3
-Release: 8%{?dist}
+Version: 2.8
+Release: 1%{?dist}
+Epoch: 1
 Source0: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_AR.oxt
 Source1: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_BO.oxt
 Source2: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_CL.oxt
@@ -13,45 +20,47 @@ Source5: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_CU.ox
 Source6: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_DO.oxt
 Source7: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_EC.oxt
 Source8: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_ES.oxt
-Source9: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_GT.oxt
-Source10: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_HN.oxt
-Source11: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_MX.oxt
-Source12: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_NI.oxt
-Source13: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PA.oxt
-Source14: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PE.oxt
-Source15: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PR.oxt
-Source16: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PY.oxt
-Source17: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_SV.oxt
-Source18: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_UY.oxt
-Source19: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_US.oxt
-Source20: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_VE.oxt
+Source9: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_GQ.oxt
+Source10: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_GT.oxt
+Source11: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_HN.oxt
+Source12: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_MX.oxt
+Source13: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_NI.oxt
+Source14: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PA.oxt
+Source16: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PE.oxt
+Source17: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PR.oxt
+Source18: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_PY.oxt
+Source19: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_SV.oxt
+Source20: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_US.oxt
+Source21: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_UY.oxt
+Source22: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_VE.oxt
 
 URL: https://github.com/sbosio/rla-es/
-License: LGPLv3+ or GPLv3+ or MPLv1.1
+License: LGPL-3.0-or-later OR GPL-3.0-or-later OR MPL-1.1
 BuildArch: noarch
 
-Requires: hunspell
-Requires: hunspell-es-AR = %{version}-%{release}
-Requires: hunspell-es-BO = %{version}-%{release}
-Requires: hunspell-es-CL = %{version}-%{release}
-Requires: hunspell-es-CO = %{version}-%{release}
-Requires: hunspell-es-CR = %{version}-%{release}
-Requires: hunspell-es-CU = %{version}-%{release}
-Requires: hunspell-es-DO = %{version}-%{release}
-Requires: hunspell-es-EC = %{version}-%{release}
-Requires: hunspell-es-ES = %{version}-%{release}
-Requires: hunspell-es-GT = %{version}-%{release}
-Requires: hunspell-es-HN = %{version}-%{release}
-Requires: hunspell-es-MX = %{version}-%{release}
-Requires: hunspell-es-NI = %{version}-%{release}
-Requires: hunspell-es-PA = %{version}-%{release}
-Requires: hunspell-es-PE = %{version}-%{release}
-Requires: hunspell-es-PR = %{version}-%{release}
-Requires: hunspell-es-PY = %{version}-%{release}
-Requires: hunspell-es-SV = %{version}-%{release}
-Requires: hunspell-es-UY = %{version}-%{release}
-Requires: hunspell-es-US = %{version}-%{release}
-Requires: hunspell-es-VE = %{version}-%{release}
+Requires: hunspell-filesystem
+Requires: hunspell-es-AR = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-BO = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-CL = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-CO = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-CR = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-CU = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-DO = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-EC = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-ES = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-GT = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-GQ = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-HN = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-MX = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-NI = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-PA = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-PE = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-PR = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-PY = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-SV = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-UY = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-US = %{epoch}:%{version}-%{release}
+Requires: hunspell-es-VE = %{epoch}:%{version}-%{release}
 Supplements: (hunspell and langpacks-es)
 
 %description
@@ -126,6 +135,13 @@ Summary:        Guatemalan Spanish hunspell dictionary
 
 %description    GT
 Guatemalan Spanish hunspell dictionary
+
+%package        GQ
+Requires:       hunspell
+Summary:        Equatorial Guinean Spanish hunspell dictionary
+
+%description    GQ
+Equatorial Guinean Spanish hunspell dictionary
 
 %package        HN
 Requires:       hunspell
@@ -204,7 +220,7 @@ Summary:        Venezuelan Spanish hunspell dictionary
 %description    VE
 Venezuelan Spanish hunspell dictionary
 
-%define es_REGIONS es_ES es_AR es_BO es_CL es_CO es_CR es_CU es_DO es_EC es_GT es_HN es_MX es_NI es_PA es_PE es_PR es_PY es_SV es_US es_UY es_VE
+%define es_REGIONS es_AR es_BO es_CL es_CO es_CR es_CU es_DO es_EC es_ES es_GQ es_GT es_HN es_MX es_NI es_PA es_PE es_PR es_PY es_SV es_US es_UY es_VE
 
 %prep
 %setup -q -c -n hunspell-es
@@ -216,12 +232,12 @@ done
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
 # supported Spanish language regions:
 for REGION in %{es_REGIONS}; do
-    cp -p $REGION.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/
-    cp -p $REGION.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/
+    cp -p $REGION.dic $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
+    cp -p $REGION.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
 done
 
 %files
@@ -229,134 +245,181 @@ done
 %files ES
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_ES.*
+%{_datadir}/%{dict_dirname}/es_ES.*
 
 
 %files AR
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_AR.*
+%{_datadir}/%{dict_dirname}/es_AR.*
 
 
 %files BO
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_BO.*
+%{_datadir}/%{dict_dirname}/es_BO.*
 
 
 %files CL
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_CL.*
+%{_datadir}/%{dict_dirname}/es_CL.*
 
 
 %files CO
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_CO.*
+%{_datadir}/%{dict_dirname}/es_CO.*
 
 
 %files CR
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_CR.*
+%{_datadir}/%{dict_dirname}/es_CR.*
 
 
 %files CU
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_CU.*
+%{_datadir}/%{dict_dirname}/es_CU.*
 
 
 %files DO
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_DO.*
+%{_datadir}/%{dict_dirname}/es_DO.*
 
 
 %files EC
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_EC.*
+%{_datadir}/%{dict_dirname}/es_EC.*
+
+
+%files GQ
+%doc README.txt Changelog.txt
+%license GPLv3.txt MPL-1.1.txt LGPLv3.txt
+%{_datadir}/%{dict_dirname}/es_GQ.*
 
 
 %files GT
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_GT.*
+%{_datadir}/%{dict_dirname}/es_GT.*
 
 
 %files HN
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_HN.*
+%{_datadir}/%{dict_dirname}/es_HN.*
 
 
 %files MX
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_MX.*
+%{_datadir}/%{dict_dirname}/es_MX.*
 
 
 %files NI
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_NI.*
+%{_datadir}/%{dict_dirname}/es_NI.*
 
 
 %files PA
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_PA.*
+%{_datadir}/%{dict_dirname}/es_PA.*
 
 
 %files PE
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_PE.*
+%{_datadir}/%{dict_dirname}/es_PE.*
 
 
 %files PR
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_PR.*
+%{_datadir}/%{dict_dirname}/es_PR.*
 
 
 %files PY
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_PY.*
+%{_datadir}/%{dict_dirname}/es_PY.*
 
 
 %files SV
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_SV.*
+%{_datadir}/%{dict_dirname}/es_SV.*
 
 
 %files US
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_US.*
+%{_datadir}/%{dict_dirname}/es_US.*
 
 
 %files UY
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_UY.*
+%{_datadir}/%{dict_dirname}/es_UY.*
 
 
 %files VE
 %doc README.txt Changelog.txt
 %license GPLv3.txt MPL-1.1.txt LGPLv3.txt
-%{_datadir}/myspell/es_VE.*
+%{_datadir}/%{dict_dirname}/es_VE.*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.3-8
-- Remove epoch
+* Tue Mar 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.8-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.3-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug 22 2023 Ismeel Olea <ismael@olea.org> - 1:2.8-1
+* Update to v2.8. Now includes variants for Equatorial Guinea.
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolán McNamara <caolanm@redhat.com> - 1:2.2-15
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 1:2.3-12
+- Revert typo in previous commit
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 1:2.3-11
+- Add conditional for new hunspell dir path and update to Requires:
+  hunspell-filesystem
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

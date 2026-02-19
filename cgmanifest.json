@@ -5670,8 +5670,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-es",
-          "version": "2.3",
-          "downloadUrl": "https://github.com/sbosio/rla-es/releases/download/v2.3/es_AR.oxt"
+          "version": "2.8",
+          "downloadUrl": "https://github.com/sbosio/rla-es/releases/download/v2.8/es_AR.oxt"
         }
       }
     },
