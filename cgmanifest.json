@@ -15313,8 +15313,8 @@
         "type": "other",
         "other": {
           "name": "oddjob",
-          "version": "0.34.6",
-          "downloadUrl": "https://releases.pagure.org/oddjob/oddjob-0.34.6.tar.gz"
+          "version": "0.34.7",
+          "downloadUrl": "https://releases.pagure.org/oddjob/oddjob-0.34.7.tar.gz"
         }
       }
     },

@@ -2,70 +2,35 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global build_sample_subpackage 0
 
-
 %global dbus_send /usr/bin/dbus-send
 
-
-
-
-
-%global systemd 1
-%global sysvinit 0
-
-
-
-
-
-
-%global separate_usr 0
-
-
-
-
 Name: oddjob
-Version: 0.34.6
-Release: 2%{?dist}
+Version: 0.34.7
+Release: 15%{?dist}
 Source0: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz
-Source1: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz.sig
+Source1: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz.asc
+Patch1: oddjob-override-mask-fix.patch
+# Fix build with libxml2-2.12.0
+# https://pagure.io/oddjob/pull-request/24
+Patch2: oddjob-libxml2.patch
 Summary: A D-Bus service which runs odd jobs on behalf of client applications
-License: BSD
+License: BSD-3-Clause
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: dbus-devel >= 0.22, dbus-x11, libselinux-devel, libxml2-devel
 BuildRequires: pam-devel, pkgconfig
 BuildRequires: cyrus-sasl-devel, krb5-devel, openldap-devel
 BuildRequires: docbook-dtds, xmlto
-%if %{systemd}
 BuildRequires:	systemd-units
-BuildRequires:  systemd-devel
 Requires(post):	systemd-units
 Requires(preun):	systemd-units
 Requires(postun):	systemd-units
 Requires(post):	systemd-sysv
-%else
-Requires(post): /sbin/service
-Requires(postun): /sbin/service
-Requires(post): /sbin/chkconfig
-Requires(pre): /sbin/chkconfig
-%endif
 Requires: dbus
 # for "killall"
 Requires(post): psmisc
 Obsoletes: oddjob-devel < 0.30, oddjob-libs < 0.30, oddjob-python < 0.30
 URL: https://pagure.io/oddjob
-
-%if %{systemd}
-BuildRequires:  systemd-units
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
-Requires(post): systemd-sysv
-%endif
-
-%if %{sysvinit}
-Requires(post): /sbin/chkconfig, /sbin/service
-Requires(preun): /sbin/chkconfig, /sbin/service
-%endif
-
 
 %description
 oddjob is a D-Bus service which performs particular tasks for clients which
@@ -90,6 +55,8 @@ This package contains a trivial sample oddjob service.
 
 %prep
 %setup -q
+%patch -P1 -p1
+%patch -P2 -p1
 
 %build
 sample_flag=
@@ -103,11 +70,7 @@ sample_flag=--enable-sample
 	--with-selinux-labels \
 	--without-python --enable-xml-docs --enable-compat-dtd \
 	--disable-dependency-tracking \
-%if %{systemd}
 	--enable-systemd --disable-sysvinit \
-%else
-	--enable-sysvinit --disable-systemd \
-%endif
 	$sample_flag
 make %{_smp_mflags}
 
@@ -116,12 +79,6 @@ rm -fr "$RPM_BUILD_ROOT"
 make install DESTDIR="$RPM_BUILD_ROOT"
 rm -f "$RPM_BUILD_ROOT"/%{_libdir}/security/*.la
 rm -f "$RPM_BUILD_ROOT"/%{_libdir}/security/*.a
-%if %{separate_usr}
-if ! test -d "$RPM_BUILD_ROOT"/%{_lib}/security ; then
-	mkdir -p "$RPM_BUILD_ROOT"/%{_lib}/security
-	mv "$RPM_BUILD_ROOT"/%{_libdir}/security/*.so "$RPM_BUILD_ROOT"/%{_lib}/security/
-fi
-%endif
 # Recommended, though I disagree.
 rm -f "$RPM_BUILD_ROOT"/%{_libdir}/*.la
 
@@ -141,15 +98,12 @@ touch -r src/oddjobd-mkhomedir.conf.in	$RPM_BUILD_ROOT/%{_sysconfdir}/oddjobd.co
 touch -r src/oddjob-mkhomedir.conf.in	$RPM_BUILD_ROOT/%{_sysconfdir}/dbus-1/system.d/oddjob-mkhomedir.conf
 
 %files
-%doc *.dtd COPYING NEWS QUICKSTART doc/oddjob.html src/reload
+%doc *.dtd NEWS QUICKSTART doc/oddjob.html src/reload
+%license COPYING
 %if ! %{build_sample_subpackage}
 %doc sample-install-root/sample
 %endif
-%if %{systemd}
 %{_unitdir}/oddjobd.service
-%else
-%{_initrddir}/oddjobd
-%endif
 %{_bindir}/*
 %{_sbindir}/*
 %config(noreplace) %{_sysconfdir}/dbus-*/system.d/oddjob.conf
@@ -168,11 +122,7 @@ touch -r src/oddjob-mkhomedir.conf.in	$RPM_BUILD_ROOT/%{_sysconfdir}/dbus-1/syst
 %doc src/mkhomedirfor src/mkmyhomedir
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/mkhomedir
-%if %{separate_usr}
-/%{_lib}/security/pam_oddjob_mkhomedir.so
-%else
 %{_libdir}/security/pam_oddjob_mkhomedir.so
-%endif
 %{_mandir}/*/pam_oddjob_mkhomedir.*
 %{_mandir}/*/oddjob-mkhomedir.*
 %{_mandir}/*/oddjobd-mkhomedir.*
@@ -190,48 +140,15 @@ touch -r src/oddjob-mkhomedir.conf.in	$RPM_BUILD_ROOT/%{_sysconfdir}/dbus-1/syst
 if test $1 -eq 1 ; then
 	killall -HUP dbus-daemon 2>&1 > /dev/null
 fi
-%if %{systemd}
 %systemd_post oddjobd.service
-%endif
-%if %{sysvinit}
-/sbin/chkconfig --add oddjobd
-%endif
 
 %postun
-%if %{systemd}
 %systemd_postun_with_restart oddjobd.service
-%endif
-%if %{sysvinit}
-if [ $1 -gt 0 ] ; then
-	/sbin/service oddjobd condrestart 2>&1 > /dev/null || :
-fi
-%endif
 exit 0
 
 %preun
-%if %{systemd}
 %systemd_preun oddjobd.service
-%endif
-%if %{sysvinit}
-if [ $1 -eq 0 ] ; then
-	/sbin/service oddjobd stop > /dev/null 2>&1
-	/sbin/chkconfig --del oddjobd
-fi
-%endif
 exit 0
-
-%if %{systemd}
-%triggerun -- oddjobd < 0.31.3
-# Save the current service runlevel info, in case the user wants to apply
-# the enabled status manually later, by running
-#   "systemd-sysv-convert --apply oddjobd".
-%{_bindir}/systemd-sysv-convert --save oddjobd >/dev/null 2>&1 ||:
-# Do this because the old package's %%postun doesn't know we need to do it.
-/sbin/chkconfig --del oddjobd >/dev/null 2>&1 || :
-# Do this because the old package's %%postun wouldn't have tried.
-/bin/systemctl try-restart oddjobd.service >/dev/null 2>&1 || :
-exit 0
-%endif
 
 %post mkhomedir
 # Adjust older configuration files that may have been modified so that they
@@ -243,15 +160,66 @@ fi
 if test $1 -eq 1 ; then
 	killall -HUP dbus-daemon 2>&1 > /dev/null
 fi
-if [ -f /var/lock/subsys/oddjobd ] ; then
+systemctl --quiet is-active oddjobd
+isactive=$?
+if test $isactive -eq 0 ; then
 	%{dbus_send} --system --dest=com.redhat.oddjob /com/redhat/oddjob com.redhat.oddjob.reload
 fi
 exit 0
 
 %changelog
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.34.6-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add explicit build dependency on systemd-devel for systemd pkgconfig files
+* Mon Mar 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.34.7-15
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jul 05 2024 Alexander Bokovoy <abokovoy@redhat.com> - 0.34.7-13
+- Clean up spec file from pre-systemd times
+- Use systemd services to initiate oddjobd configuration reload
+- Resolves: rhbz#2248817
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 13 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.34.7-10
+- Fix build with libxml2-2.12.0
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 09 2022 Alexander Bokovoy <abokovoy@redhat.com> - 0.34.7-7
+- Provide a switch to restore pre-CVE-2020-10737 behavior
+- Always set the home directory permissions according to HOME_MODE
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.34.7-3
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 14 22:09:29 EET 2020 Alexander Bokovoy <abokovoy@redhat.com> - 0.34.7-1
+- upstream release 0.34.7
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu May  7 2020 Nalin Dahyabhai <nalin@redhat.com> - 0.34.6-1
 - update license on src/buffer.h
