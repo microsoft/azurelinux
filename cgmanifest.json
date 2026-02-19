@@ -30554,8 +30554,8 @@
         "type": "other",
         "other": {
           "name": "xfsdump",
-          "version": "3.1.12",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsdump/xfsdump-3.1.12.tar.xz"
+          "version": "3.2.0",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsdump/xfsdump-3.2.0.tar.xz"
         }
       }
     },
