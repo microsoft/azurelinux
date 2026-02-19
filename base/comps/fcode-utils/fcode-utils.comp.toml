@@ -1,0 +1,16 @@
+[components.fcode-utils]
+
+# Upstream project is dormant (last release v1.0.3 in 2014). The codebase uses
+# K&R-style function pointer declarations (e.g. void (*funct)()) and redefines
+# bool via typedef, which are incompatible with C23 defaults in GCC 15:
+#   1. bool is a keyword in C23; typedef to bool is a hard error
+#   2. () means zero params in C23; calling through () pointers with args is an error
+#   3. Incompatible pointer type assignments are promoted to errors
+# An upstream fix (partial) exists but is not merged: https://github.com/openbios/fcode-utils/pull/32
+# Fedora has not patched this either as of rawhide (Feb 2026).
+# Force C17 mode to restore pre-C23 semantics until upstream modernizes.
+[[components.fcode-utils.overlays]]
+description = "Fix GCC 15/C23 build failures by forcing C17 mode for K&R-style function pointers and bool typedef"
+type = "spec-search-replace"
+regex = 'CFLAGS=.%\{optflags\}.'
+replacement = 'CFLAGS="%{optflags} -std=gnu17"'
