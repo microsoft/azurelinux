@@ -1,0 +1,13 @@
+[components.gnustep-make]
+
+# AZL defines %rhel=10, which triggers the RHEL-specific CC=gobjc override in the
+# upstream spec's %build section. The gobjc compiler can't create executables with
+# AZL's hardened compiler flags (annobin/redhat-hardened-cc1 specs), causing configure
+# to fail with "C compiler cannot create executables". On Fedora, %rhel is unset so
+# the default CC=gcc is used. Remove the RHEL conditional to follow the Fedora path.
+
+[[components.gnustep-make.overlays]]
+description = "Neutralize RHEL-specific CC=gobjc override — gobjc can't create executables with AZL's hardened compiler flags (annobin/redhat-hardened-cc1 specs), causing configure to fail"
+type = "spec-search-replace"
+regex = 'export CC=gobjc'
+replacement = '# export CC=gobjc  # disabled for AZL — use default CC=gcc'
