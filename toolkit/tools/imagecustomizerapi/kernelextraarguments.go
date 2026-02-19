@@ -6,18 +6,6 @@ import (
 	"strings"
 )
 
-// KernelExtraArguments defines one or more extra kernel arguments.
-type KernelExtraArguments string
-
-func (e KernelExtraArguments) IsValid() error {
-	err := validateKernelArgumentsFormat(string(e))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 /*
 	The following code is based on the 'quoting' section in grub
 	documentation: https://www.gnu.org/software/grub/manual/grub/grub.html#Quoting

@@ -3,16 +3,20 @@
 
 package imagecustomizerapi
 
+import (
+	"fmt"
+)
+
 type KernelCommandLine struct {
 	// Extra kernel command line args.
-	ExtraCommandLine KernelExtraArguments `yaml:"extraCommandLine"`
+	ExtraCommandLine []string `yaml:"extraCommandLine"`
 }
 
-func (s *KernelCommandLine) IsValid() error {
-	err := s.ExtraCommandLine.IsValid()
-	if err != nil {
-		return err
+func (k *KernelCommandLine) IsValid() error {
+	for i, arg := range k.ExtraCommandLine {
+		if arg == "" {
+			return fmt.Errorf("kernel argument cannot be empty at index %d", i)
+		}
 	}
-
 	return nil
 }

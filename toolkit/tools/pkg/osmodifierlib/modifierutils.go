@@ -61,6 +61,11 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		}
 	}
 
+	err = imagecustomizerlib.AddKernelCommandLine(osConfig.KernelCommandLine.ExtraCommandLine, dummyChroot)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+	}
+
 	return nil
 }
 

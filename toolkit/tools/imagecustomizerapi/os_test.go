@@ -215,14 +215,3 @@ func TestOSIsValidOverlayDuplicateWorkDir(t *testing.T) {
 	err := os.IsValid()
 	assert.ErrorContains(t, err, "duplicate workDir (/work_root) found in overlay at index 1")
 }
-
-func TestOSIsValidInvalidKernelCommandLine(t *testing.T) {
-	os := OS{
-		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "\"",
-		},
-	}
-
-	err := os.IsValid()
-	assert.ErrorContains(t, err, "invalid kernelCommandLine")
-}

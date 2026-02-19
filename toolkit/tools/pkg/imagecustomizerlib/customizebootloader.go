@@ -24,7 +24,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 
 	default:
 		// Append the kernel command-line args to the existing grub config.
-		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		err := AddKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
 		if err != nil {
 			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
 		}
@@ -86,12 +86,12 @@ func hardResetBootLoader(baseConfigPath string, config *imagecustomizerapi.Confi
 }
 
 // Inserts new kernel command-line args into the grub config file.
-func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
-	imageChroot *safechroot.Chroot,
+func AddKernelCommandLine(extraCommandLine []string,
+	imageChroot safechroot.ChrootInterface,
 ) error {
 	var err error
 
-	if kernelExtraArguments == "" {
+	if len(extraCommandLine) == 0 {
 		// Nothing to do.
 		return nil
 	}
@@ -103,7 +103,7 @@ func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArg
 		return err
 	}
 
-	err = bootCustomizer.AddKernelCommandLine(string(kernelExtraArguments))
+	err = bootCustomizer.AddKernelCommandLine(extraCommandLine)
 	if err != nil {
 		return err
 	}
