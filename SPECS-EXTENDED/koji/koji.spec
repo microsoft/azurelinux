@@ -23,9 +23,6 @@ Source0: https://releases.pagure.org/koji/koji-%{version}.tar.bz2
 Patch0: 0001-download-build-allow-fallback-to-unsigned-with-key.patch
 Patch1: 0002-Fix-flake8-and-unit-test.patch
  
-# Not upstreamable
-Patch100: fedora-config.patch
- 
 BuildArch: noarch
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
 Requires: python%{python3_pkgversion}-libcomps
