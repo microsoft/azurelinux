@@ -77,5 +77,5 @@ cargo test --offline
 
 %changelog
 * Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.35.3-10
-- Initial Azure Linux import from the source project reference:flatcar (license: same as "License" tag).
+- Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified
