@@ -8,15 +8,15 @@ Distribution:   Azure Linux
 # Avoid accidental so-name bumps.
 # ATTENTION!!!  You need to run a bootstrap build
 # of cmake *BEFORE* bumping the so-name here!
-%global sover 22
+%global sover 25
 
 
 Name:           jsoncpp
-Version:        1.9.2
-Release:        3%{?dist}
+Version:        1.9.5
+Release:        1%{?dist}
 Summary:        JSON library implemented in C++
 
-License:        Public Domain or MIT
+License:        LicenseRef-Fedora-Public-Domain OR MIT
 URL:            https://github.com/open-source-parsers/%{name}
 Source0:        %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -62,17 +62,21 @@ doxygen -s -u doc/doxyfile.in
 sed -i -e 's!^DOT_FONTNAME.*=.*!DOT_FONTNAME =!g' doc/doxyfile.in
 %endif
 
-
 %build
 mkdir -p %{_target_platform}
 pushd %{_target_platform}
-%cmake -DBUILD_STATIC_LIBS=OFF                \
-       -DJSONCPP_WITH_WARNING_AS_ERROR=OFF    \
-       -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON    \
-       -DJSONCPP_WITH_CMAKE_PACKAGE=ON        \
-       -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF \
-       -DPYTHON_EXECUTABLE="%{__python3}"     \
-       ..
+%cmake -DBUILD_STATIC_LIBS:BOOL=OFF                 \
+  -DBUILD_OBJECT_LIBS:BOOL=OFF                 \
+  -DJSONCPP_WITH_CMAKE_PACKAGE:BOOL=ON         \
+  -DJSONCPP_WITH_EXAMPLE:BOOL=OFF              \
+  -DJSONCPP_WITH_PKGCONFIG_SUPPORT:BOOL=ON     \
+  -DJSONCPP_WITH_POST_BUILD_UNITTEST:BOOL=OFF  \
+  -DJSONCPP_WITH_STRICT_ISO:BOOL=ON            \
+  -DJSONCPP_WITH_TESTS:BOOL=ON                 \
+  -DJSONCPP_WITH_WARNING_AS_ERROR:BOOL=OFF     \
+  -DPYTHON_EXECUTABLE:STRING="%{__python3}"      \
+   ..
+
 popd
 %make_build -C %{_target_platform}
 
@@ -82,8 +86,8 @@ cp -p %{_target_platform}/version .
 %{__python3} doxybuild.py --with-dot --doxygen %{_bindir}/doxygen
 rm -f version
 %endif
-
-
+ 
+ 
 %install
 %make_install -C %{_target_platform}
 
@@ -93,12 +97,16 @@ install -pm 0644 README.md %{buildroot}%{_docdir}/%{name}
 %if %{with jsoncpp_enables_doc}
 mkdir -p %{buildroot}%{_docdir}/%{name}/html
 install -pm 0644 dist/doxygen/*/*.{html,png} %{buildroot}%{_docdir}/%{name}/html
+find %{buildroot}%{_docdir} -type d -print0 | xargs -0 chmod -c 0755
+find %{buildroot}%{_docdir} -type f -print0 | xargs -0 chmod -c 0644
 hardlink -cfv %{buildroot}%{_docdir}/%{name}
 %endif
 
 
 %check
-%make_build -C %{_target_platform} jsoncpp_check
+# Run tests single threaded.
+%global _smp_mflags -j1
+%ctest
 
 
 %ldconfig_scriptlets
@@ -130,6 +138,10 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 
 
 %changelog
+* Wed Nov 13 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.9.5-1
+- Upgrade to version 1.9.5
+-License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -303,3 +315,4 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 
 * Tue Nov 27 2012 Sébastien Willmann <sebastien.willmann@gmail.com> 0.6.0-0.1.rc2
 - Creation of the spec file
+
