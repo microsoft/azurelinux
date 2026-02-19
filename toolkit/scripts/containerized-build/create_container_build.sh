@@ -54,6 +54,10 @@ To see help, run 'sudo make containerized-rpmbuild-help'
 }
 
 build_worker_chroot() {
+    if [[ "${no_recursive_make}" == "true" ]]; then
+        echo "-nr set, skipping worker chroot build"
+        return
+    fi
     pushd $toolkit_root
     echo "Building worker chroot..."
     make chroot-tools REBUILD_TOOLS=y > ${STD_OUT_REDIRECT}
@@ -61,13 +65,34 @@ build_worker_chroot() {
 }
 
 build_tools() {
-    pushd $toolkit_root
-    echo "Building required tools..."
-    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > ${STD_OUT_REDIRECT}
-    popd
+    if [[ "${no_recursive_make}" == "true" ]]; then
+        echo "-nr set, skipping tools build"
+    else
+        pushd $toolkit_root
+        echo "Building required tools..."
+        make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > ${STD_OUT_REDIRECT}
+        popd
+    fi
+
+    # Ensure all the tools are built
+    tools=("go-depsearch" "go-downloader" "go-grapher" "go-specreader" "go-srpmpacker")
+    for tool in "${tools[@]}"; do
+        pushd $toolkit_root
+        tool_path=$(make --no-print-directory -s "printvar-${tool}" 2> /dev/null)
+        if [[ ! -f "$tool_path" ]]; then
+            print_error "Tool $tool not found, either build tools manually or set REBUILD_TOOLS=y in make command"
+            exit 1
+        fi
+        popd
+    done
 }
 
 build_graph() {
+    if [[ "${no_recursive_make}" == "true" ]]; then
+        echo "-nr set, skipping graph build"
+        return
+    fi
+
     pushd $toolkit_root
     echo "Building dependency graph..."
     make workplan > ${STD_OUT_REDIRECT}
@@ -97,6 +122,7 @@ while (( "$#")); do
     -r ) enable_local_repo=true; shift ;;
     -k ) keep_container=""; shift ;;
     -q ) STD_OUT_REDIRECT=/dev/null; shift ;;
+    -nr ) no_recursive_make=true; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
@@ -170,7 +196,7 @@ fi
 
 # ============ Populate SRPMS ============
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container (only required in build mode)
-if [[ "${mode}" == "build" ]]; then
+if [[ "${mode}" == "build" ]] && [[ -z "${no_recursive_make}" ]]; then
     pushd $toolkit_root
     echo "Populating Intermediate SRPMs..."
     if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" )  || ( ! -f "$TOOL_BINS_DIR/downloader" ) ]]; then build_tools; fi

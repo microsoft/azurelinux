@@ -46,9 +46,11 @@ ifeq ($(QUIET),y)
 containerized_build_args += -q
 endif
 
+containerized_tool_reqs := go-depsearch go-downloader go-grapher go-specreade go-srpmpacker
+
 ##help:target:containerized-rpmbuild=Launch containerized shell for inner-loop RPM building/testing.
-containerized-rpmbuild: $(no_repo_acl)
-	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
+containerized-rpmbuild: $(no_repo_acl) toolchain input-srpms graph chroot-tools $(containerized_tool_reqs)
+	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args) -nr
 
 containerized-rpmbuild-help:
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh -h
