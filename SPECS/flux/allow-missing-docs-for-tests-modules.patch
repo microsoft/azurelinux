@@ -1,0 +1,33 @@
+From d4568519c9e61ef9836366ed782a54b1b1414826 Mon Sep 17 00:00:00 2001
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Date: Mon, 24 Feb 2025 12:18:42 +0300
+Subject: [PATCH] Allow missing docs for tests modules
+
+---
+ libflux/flux-core/src/ast/mod.rs       | 1 +
+ libflux/flux-core/src/formatter/mod.rs | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libflux/flux-core/src/ast/mod.rs b/libflux/flux-core/src/ast/mod.rs
+index ba4b13d..2ed00e4 100644
+--- a/libflux/flux-core/src/ast/mod.rs
++++ b/libflux/flux-core/src/ast/mod.rs
+@@ -1705,4 +1705,5 @@ where
+ // The tests code exports a few helpers for writing AST related tests.
+ // We make it public so other tests can consume those helpers.
+ #[cfg(test)]
++#[allow(missing_docs)]
+ pub mod tests;
+diff --git a/libflux/flux-core/src/formatter/mod.rs b/libflux/flux-core/src/formatter/mod.rs
+index 54a350f..9ae1d39 100644
+--- a/libflux/flux-core/src/formatter/mod.rs
++++ b/libflux/flux-core/src/formatter/mod.rs
+@@ -2110,4 +2110,5 @@ fn starts_with_comment(n: Node) -> bool {
+ }
+ 
+ #[cfg(test)]
++#[allow(missing_docs)]
+ pub mod tests;
+-- 
+2.45.2
+
