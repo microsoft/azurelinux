@@ -4,3 +4,4 @@
 # (rhel=10 would engage RHEL-specific BuildRequires)
 [components.kernel.build]
 defines = { rhel = "0" }
+without = ["debug"]
