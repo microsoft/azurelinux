@@ -1,0 +1,53 @@
+From b03adce8d8b5cf434b38908fc6a496ef8b860bc6 Mon Sep 17 00:00:00 2001
+From: "Frank Ch. Eigler" <fche@redhat.com>
+Date: Tue, 13 Jul 2021 19:34:50 -0400
+Subject: [PATCH 2/4] runtime: linux 5.14 compat: <linux/panic_notifier.h>
+
+Linux commit f39650de687e3 moved some kernel decls around.
+---
+ buildrun.cxx                       | 3 ++-
+ runtime/linux/autoconf-514-panic.c | 3 +++
+ runtime/transport/transport.c      | 3 +++
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+ create mode 100644 runtime/linux/autoconf-514-panic.c
+
+diff --git a/buildrun.cxx b/buildrun.cxx
+index ba3daa0a0..b050e35b1 100644
+--- a/buildrun.cxx
++++ b/buildrun.cxx
+@@ -383,7 +383,8 @@ compile_pass (systemtap_session& s)
+   output_exportconf(s, o2, "cpu_khz", "STAPCONF_CPU_KHZ");
+   output_exportconf(s, o2, "__module_text_address", "STAPCONF_MODULE_TEXT_ADDRESS");
+   output_exportconf(s, o2, "add_timer_on", "STAPCONF_ADD_TIMER_ON");
+-
++  output_autoconf(s, o, cs, "autoconf-514-panic.c", "STAPCONF_514_PANIC", NULL);
++  
+   output_dual_exportconf(s, o2, "probe_kernel_read", "probe_kernel_write", "STAPCONF_PROBE_KERNEL");
+   output_autoconf(s, o, cs, "autoconf-hw_breakpoint_context.c",
+ 		  "STAPCONF_HW_BREAKPOINT_CONTEXT", NULL);
+diff --git a/runtime/linux/autoconf-514-panic.c b/runtime/linux/autoconf-514-panic.c
+new file mode 100644
+index 000000000..57b1a0026
+--- /dev/null
++++ b/runtime/linux/autoconf-514-panic.c
+@@ -0,0 +1,3 @@
++#include <linux/panic_notifier.h>
++
++void* c = & panic_notifier_list;
+diff --git a/runtime/transport/transport.c b/runtime/transport/transport.c
+index 32ef99da6..9b9d6cbe2 100644
+--- a/runtime/transport/transport.c
++++ b/runtime/transport/transport.c
+@@ -24,6 +24,9 @@
+ #ifdef STAPCONF_LOCKDOWN_DEBUGFS
+ #include <linux/security.h>
+ #endif
++#ifdef STAPCONF_514_PANIC
++#include <linux/panic_notifier.h>
++#endif
+ #include "../uidgid_compatibility.h"
+ 
+ static int _stp_exit_flag = 0;
+-- 
+2.34.1
+

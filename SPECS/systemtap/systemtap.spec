@@ -9,13 +9,20 @@
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
 Version:        4.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/System
 URL:            https://sourceware.org/systemtap/
 Source0:        https://sourceware.org/systemtap/ftp/releases/%{name}-%{version}.tar.gz
+
+# Patches to fix stap build errors
+Patch0:         0001-runtime-adapt-to-Werror-implicit-fallthrough-5.patch
+Patch1:         0002-runtime-linux-5.14-compat-linux-panic_notifier.h.patch
+Patch2:         0003-PR28079-Adapt-to-kernel-5.14-task_struct.__state-cha.patch
+Patch3:         0004-Use-task_state-tapset-function-to-avoid-task_struct-.patch
+
 BuildRequires:  elfutils-devel
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glibc-devel
@@ -45,6 +52,10 @@ BuildRequires:  rpm-devel
 %endif
 Requires:       elfutils
 Requires:       gcc
+%if %{with_check}
+BuildRequires:  kernel-devel
+BuildRequires:  kernel-headers
+%endif
 Requires:       kernel-devel
 Requires:       make
 Requires:       %{name}-runtime = %{version}-%{release}
@@ -107,6 +118,7 @@ SystemTap server is the server component of an instrumentation system for system
 
 %prep
 %setup -q
+%autopatch -p1
 sed -i "s#"kernel"#"linux"#g" stap-prep
 sed -i "s#"devel"#"dev"#g" stap-prep
 
@@ -142,6 +154,7 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 make
 
 %install
+make DESTDIR=$RPM_BUILD_ROOT install
 [ %{buildroot} != / ] && rm -rf ""
 %makeinstall
 
@@ -315,8 +328,10 @@ fi
 %files runtime
 %defattr(-,root,root)
 %attr(4111,root,root) %{_bindir}/staprun
+%dir %{_libexecdir}/systemtap
 %{_libexecdir}/systemtap/stap-env
 %{_libexecdir}/systemtap/stap-authorize-cert
+%{_libexecdir}/systemtap/stapio
 %if %{with_crash}
 %{_libdir}/systemtap/staplog.so*
 %endif
@@ -331,6 +346,7 @@ fi
 %files server
 %defattr(-,root,root)
 %{_bindir}/stap-server
+%dir %{_libexecdir}/systemtap
 %{_libexecdir}/systemtap/stap-serverd
 %{_libexecdir}/systemtap/stap-start-server
 %{_libexecdir}/systemtap/stap-stop-server
@@ -349,6 +365,10 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Mon May 13 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.5-4
+- Ensure that stapio is installed
+- Cherry-pick changes from upstream 4.6 to allow stp files to build
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
