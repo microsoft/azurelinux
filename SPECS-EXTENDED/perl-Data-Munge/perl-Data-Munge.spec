@@ -1,56 +1,59 @@
+%global cpan_version 0.111
 Name:           perl-Data-Munge
-Version:        0.097
-Release:        11%{?dist}
+Version:        0.111
+Release:        1%{?dist}
 Summary:        Utility functions for working with perl data structures and code references
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Munge
 Source0:        https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-%{version}.tar.gz#/perl-Data-Munge-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  findutils
+# build requirements
+BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Spec)
+# Run-time:
+# Scalar::Util not used since perl 5.016
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-# Run-time:
-BuildRequires:  perl(base)
-BuildRequires:  perl(Exporter)
-# Scalar::Util not used since perl 5.016
 # Tests:
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Test::Warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires:  perl(Test2::V0)
+BuildRequires:  perl(Test::Pod)
 
 %description
 This module defines a few generally useful utility functions that process
 perl data structures and code references.
 
 %prep
-%setup -q -n Data-Munge-%{version}
+%setup -q -n Data-Munge-%{cpan_version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
-make test
+%{make_build} test
 
 %files
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/Data*
+%{_mandir}/man3/Data*
 
 %changelog
+* Mon Mar 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.111-1
+- Update to version 0.111
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.097-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

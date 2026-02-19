@@ -16963,8 +16963,8 @@
         "type": "other",
         "other": {
           "name": "perl-Data-Munge",
-          "version": "0.097",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-0.097.tar.gz"
+          "version": "0.111",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-0.111.tar.gz"
         }
       }
     },
