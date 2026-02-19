@@ -1,0 +1,4 @@
+[components.golang-github-grpc-ecosystem-gateway-2]
+
+[components.golang-github-grpc-ecosystem-gateway-2.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

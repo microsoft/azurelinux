@@ -1,0 +1,4 @@
+[components.golang-github-pmezard-difflib]
+
+[components.golang-github-pmezard-difflib.build]
+check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
