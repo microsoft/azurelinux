@@ -18903,8 +18903,8 @@
         "type": "other",
         "other": {
           "name": "perl-Mojolicious",
-          "version": "8.57",
-          "downloadUrl": "http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-8.57.tar.gz"
+          "version": "9.37",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-9.37.tar.gz"
         }
       }
     },
