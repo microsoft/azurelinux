@@ -1,0 +1,24 @@
+The standard iconv function uses char ** even for its input
+argument. With a const char ** argument, ICONV_NONTRANS is incorrectly
+set to 1 if the compiler produces an error for such incompatible
+pointer types.
+
+Submitted upstream: <https://gitlab.com/muttmua/mutt/-/merge_requests/175>
+
+diff --git a/configure.ac b/configure.ac
+index 9fe461df2a5af3a8..443da363081343c5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1322,10 +1322,10 @@ AC_CACHE_CHECK([whether iconv is non-transcribing], mutt_cv_iconv_nontrans,
+ int main()
+ {
+   iconv_t cd;
+-  const char *ib;
++  char *ib;
+   char *ob;
+   size_t ibl, obl;
+-  const char *s = "\304\211";
++  char *s = (char *) "\304\211";
+ changequote(, )dnl
+   char t[3];
+ changequote([, ])dnl

@@ -13872,8 +13872,8 @@
         "type": "other",
         "other": {
           "name": "mutt",
-          "version": "2.2.12",
-          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.2.12.tar.gz"
+          "version": "2.2.13",
+          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.2.13.tar.gz"
         }
       }
     },

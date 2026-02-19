@@ -1,0 +1,9 @@
+/test:
+    summary:
+        Basic set of quick tests for mutt.
+    discover:
+      - name: fedora
+        how: fmf
+        url: "https://src.fedoraproject.org/tests/mutt.git"
+    execute:
+        how: tmt
