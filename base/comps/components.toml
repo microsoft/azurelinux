@@ -23,7 +23,7 @@
 [components.mingw-vulkan-headers]
 [components.mtdev]
 [components.maven-invoker]
-[components.jakarta-inject1.0]
+#[components.jakarta-inject1.0]
 [components.mokutil]
 [components.dav1d]
 [components.chkconfig]
