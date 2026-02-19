@@ -17633,8 +17633,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-BaseDir",
-          "version": "0.08",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KI/KIMRYAN/File-BaseDir-0.08.tar.gz"
+          "version": "0.09",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-BaseDir-0.09.tar.gz"
         }
       }
     },
