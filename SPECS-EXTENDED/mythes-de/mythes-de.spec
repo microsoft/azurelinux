@@ -1,20 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global upstreamid 20201226
+%global upstreamid 20250916
 
 Summary:        German thesaurus
 Name:           mythes-de
 Version:        0.%{upstreamid}
-Release:        2%{?dist}
-License:        LGPLv2+ or CC-BY-SA
+Release:        1%{?dist}
+License:        LGPL-2.1-or-later OR CC-BY-SA-4.0
 URL:            https://www.openthesaurus.de/
-Source0:        https://www.openthesaurus.de/export/Deutscher-Thesaurus.oxt
-Source1:        https://www.openthesaurus.de/export/Schweizer-Thesaurus.oxt
+Source0:        https://www.openthesaurus.de/export/Deutscher-Thesaurus.oxt#/Deutscher-Thesaurus-%{version}.oxt
+Source1:        https://www.openthesaurus.de/export/Schweizer-Thesaurus.oxt#/Schweizer-Thesaurus-%{version}.oxt
 BuildArch:      noarch
 Requires:       mythes
 
 Supplements:    (mythes and langpacks-de)
-
 
 %description
 German thesaurus.
@@ -53,12 +52,70 @@ pushd $RPM_BUILD_ROOT%{_datadir}/mythes/
 popd
 
 %files
-%license README.txt
+%doc README.txt
 %{_datadir}/mythes/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20201226-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Fri Dec 20 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.20250916-1
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20240601-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 02 2024 Robert Scheck <robert@fedoraproject.org> 0.20240601-1
+- Upgrade to latest daily snapshot release
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20230601-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20230601-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20230601-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 02 2023 Robert Scheck <robert@fedoraproject.org> 0.20230601-1
+- Upgrade to latest daily snapshot release
+
+* Thu Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 0.20220716-4
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20220716-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20220716-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jul 17 2022 Robert Scheck <robert@fedoraproject.org> 0.20220716-1
+- Upgrade to latest daily snapshot release
+
+* Mon Apr 18 2022 Robert Scheck <robert@fedoraproject.org> 0.20220417-1
+- Upgrade to latest daily snapshot release
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20220115-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Jan 16 2022 Robert Scheck <robert@fedoraproject.org> 0.20220115-1
+- Upgrade to latest daily snapshot release
+
+* Wed Sep 01 2021 Robert Scheck <robert@fedoraproject.org> 0.20210831-1
+- Upgrade to latest daily snapshot release
+
+* Sat Jul 24 2021 Robert Scheck <robert@fedoraproject.org> 0.20210723-1
+- Upgrade to latest daily snapshot release
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20210302-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Robert Scheck <robert@fedoraproject.org> 0.20210302-1
+- Upgrade to latest daily snapshot release
+
+* Sun Jan 31 2021 Robert Scheck <robert@fedoraproject.org> 0.20210130-1
+- Upgrade to latest daily snapshot release
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20201226-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sun Dec 27 2020 Robert Scheck <robert@fedoraproject.org> 0.20201226-1
 - Upgrade to latest daily snapshot release
