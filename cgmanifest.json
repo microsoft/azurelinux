@@ -19233,8 +19233,8 @@
         "type": "other",
         "other": {
           "name": "perl-Package-DeprecationManager",
-          "version": "0.17",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Package-DeprecationManager-0.17.tar.gz"
+          "version": "0.18",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Package-DeprecationManager-0.18.tar.gz"
         }
       }
     },
