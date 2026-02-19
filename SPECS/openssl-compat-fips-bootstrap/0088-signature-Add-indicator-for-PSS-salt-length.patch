@@ -1,0 +1,107 @@
+From 9134fadd6544be82f96e3d5ce9c1f489de6a1745 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:17 +0100
+Subject: [PATCH 38/49] 0088-signature-Add-indicator-for-PSS-salt-length.patch
+
+Patch-name: 0088-signature-Add-indicator-for-PSS-salt-length.patch
+Patch-id: 88
+Patch-status: |
+    # 0088-signature-Add-indicator-for-PSS-salt-length.patch
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ include/openssl/evp.h                         |  4 ++++
+ providers/implementations/signature/rsa_sig.c | 21 +++++++++++++++++
+ util/perl/OpenSSL/paramnames.pm               | 23 ++++++++++---------
+ 3 files changed, 37 insertions(+), 11 deletions(-)
+
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index 48d5886d1e..e3fa4a8043 100644
+--- a/include/openssl/evp.h
++++ b/include/openssl/evp.h
+@@ -804,6 +804,10 @@ __owur int EVP_CipherFinal(EVP_CIPHER_CTX *ctx, unsigned char *outm,
+ __owur int EVP_CipherFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *outm,
+                               int *outl);
+ 
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
++
+ __owur int EVP_SignFinal(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+                          EVP_PKEY *pkey);
+ __owur int EVP_SignFinal_ex(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+diff --git a/providers/implementations/signature/rsa_sig.c b/providers/implementations/signature/rsa_sig.c
+index b0f32f0b57..1e56d673ee 100644
+--- a/providers/implementations/signature/rsa_sig.c
++++ b/providers/implementations/signature/rsa_sig.c
+@@ -1169,6 +1169,24 @@ static int rsa_get_ctx_params(void *vprsactx, OSSL_PARAM *params)
+         }
+     }
+ 
++#ifdef FIPS_MODULE
++    p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_REDHAT_FIPS_INDICATOR);
++    if (p != NULL) {
++        int fips_indicator = EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_APPROVED;
++        if (prsactx->pad_mode == RSA_PKCS1_PSS_PADDING) {
++            if (prsactx->md == NULL) {
++                fips_indicator = EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_UNDETERMINED;
++            } else if (rsa_pss_compute_saltlen(prsactx) > EVP_MD_get_size(prsactx->md)) {
++                fips_indicator = EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_NOT_APPROVED;
++            }
++        } else if (prsactx->pad_mode == RSA_NO_PADDING) {
++            if (prsactx->md == NULL) /* Should always be the case */
++                fips_indicator = EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_NOT_APPROVED;
++        }
++        return OSSL_PARAM_set_int(p, fips_indicator);
++    }
++#endif
++
+     return 1;
+ }
+ 
+@@ -1178,6 +1196,9 @@ static const OSSL_PARAM known_gettable_ctx_params[] = {
+     OSSL_PARAM_utf8_string(OSSL_SIGNATURE_PARAM_DIGEST, NULL, 0),
+     OSSL_PARAM_utf8_string(OSSL_SIGNATURE_PARAM_MGF1_DIGEST, NULL, 0),
+     OSSL_PARAM_utf8_string(OSSL_SIGNATURE_PARAM_PSS_SALTLEN, NULL, 0),
++#ifdef FIPS_MODULE
++    OSSL_PARAM_int(OSSL_SIGNATURE_PARAM_REDHAT_FIPS_INDICATOR, NULL),
++#endif
+     OSSL_PARAM_END
+ };
+ 
+diff --git a/util/perl/OpenSSL/paramnames.pm b/util/perl/OpenSSL/paramnames.pm
+index 8b2d430f17..a109e44521 100644
+--- a/util/perl/OpenSSL/paramnames.pm
++++ b/util/perl/OpenSSL/paramnames.pm
+@@ -377,17 +377,18 @@ my %params = (
+     'EXCHANGE_PARAM_KDF_UKM' =>               "kdf-ukm",
+ 
+ # Signature parameters
+-    'SIGNATURE_PARAM_ALGORITHM_ID' =>       "algorithm-id",
+-    'SIGNATURE_PARAM_PAD_MODE' =>           '*PKEY_PARAM_PAD_MODE',
+-    'SIGNATURE_PARAM_DIGEST' =>             '*PKEY_PARAM_DIGEST',
+-    'SIGNATURE_PARAM_PROPERTIES' =>         '*PKEY_PARAM_PROPERTIES',
+-    'SIGNATURE_PARAM_PSS_SALTLEN' =>        "saltlen",
+-    'SIGNATURE_PARAM_MGF1_DIGEST' =>        '*PKEY_PARAM_MGF1_DIGEST',
+-    'SIGNATURE_PARAM_MGF1_PROPERTIES' =>    '*PKEY_PARAM_MGF1_PROPERTIES',
+-    'SIGNATURE_PARAM_DIGEST_SIZE' =>        '*PKEY_PARAM_DIGEST_SIZE',
+-    'SIGNATURE_PARAM_NONCE_TYPE' =>         "nonce-type",
+-    'SIGNATURE_PARAM_INSTANCE' =>           "instance",
+-    'SIGNATURE_PARAM_CONTEXT_STRING' =>     "context-string",
++    'SIGNATURE_PARAM_ALGORITHM_ID' =>          "algorithm-id",
++    'SIGNATURE_PARAM_PAD_MODE' =>              '*PKEY_PARAM_PAD_MODE',
++    'SIGNATURE_PARAM_DIGEST' =>                '*PKEY_PARAM_DIGEST',
++    'SIGNATURE_PARAM_PROPERTIES' =>            '*PKEY_PARAM_PROPERTIES',
++    'SIGNATURE_PARAM_PSS_SALTLEN' =>           "saltlen",
++    'SIGNATURE_PARAM_MGF1_DIGEST' =>           '*PKEY_PARAM_MGF1_DIGEST',
++    'SIGNATURE_PARAM_MGF1_PROPERTIES' =>       '*PKEY_PARAM_MGF1_PROPERTIES',
++    'SIGNATURE_PARAM_DIGEST_SIZE' =>           '*PKEY_PARAM_DIGEST_SIZE',
++    'SIGNATURE_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator",
++    'SIGNATURE_PARAM_NONCE_TYPE' =>            "nonce-type",
++    'SIGNATURE_PARAM_INSTANCE' =>              "instance",
++    'SIGNATURE_PARAM_CONTEXT_STRING' =>        "context-string",
+ 
+ # Asym cipher parameters
+     'ASYM_CIPHER_PARAM_DIGEST' =>                   '*PKEY_PARAM_DIGEST',
+-- 
+2.44.0
+

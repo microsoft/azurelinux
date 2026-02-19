@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ $# -ne 2 ] ; then
+    echo "Usage:"
+    echo "   $0 <git-dir> <base-tag>"
+    exit 1
+fi
+
+git_dir="$1"
+base_tag="$2"
+
+target_dir="$(pwd)"
+
+pushd "$git_dir" >/dev/null
+git format-patch -k -o "$target_dir" "$base_tag" >/dev/null
+popd >/dev/null
+
+echo "# Patches exported from source git"
+
+i=1
+for p in *.patch ; do
+    printf "# "
+    sed '/^Subject:/{s/^Subject: //;p};d' "$p"
+    printf "Patch%s: %s\n" $i "$p"
+    i=$(($i + 1))
+done

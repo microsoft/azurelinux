@@ -1,0 +1,13 @@
+{
+ "Signatures": {
+  "0025-for-tests.patch": "0824fb88488a4e38b5abc6231f0b18b06193444340fa534afc05294f7a13cfcd",
+  "Makefile.certificate": "fba3d7313fd8bdf2a585cd76795503584d6f3e1205dcd16a74c817842fda372b",
+  "configuration-prefix.h": "11aba0dcfab381269e7e6ba1fdde1e4e8dfe51e39d8c7a2918f3b28a32cb98fd",
+  "configuration-switch.h": "400439d7e8c551e7d5de8bfc648dcc0ddf6f4a7552750af4813449f68941b928",
+  "genpatches": "9da7f988d4378adf499b1322e79f29e94c889c4bf10cd6e79e6991b673de2463",
+  "make-dummy-cert": "bc9d96d7bcb2c82dc9674e80e6a4146f9eea3cce96c2feae305dafb0561f4365",
+  "openssl-3.3.5.tar.gz": "9d62c00a5a6903740c8703f0e006257f429d565d3b91ac1a9bd4a4c700002e01",
+  "openssl.rpmlintrc": "c470b2da8ef8c177fb2d456fb4fcd850f18cc5771ec8a1175d3247961ad5ded5",
+  "renew-dummy-cert": "58e1c7c2b15bfcb323e4223b8b1280ff12f17fbd88e5f8b817df7bbd0fb97637"
+ }
+}
