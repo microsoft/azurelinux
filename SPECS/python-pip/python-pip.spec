@@ -12,8 +12,8 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://pip.pypa.io/
 Source0:        https://github.com/pypa/pip/archive/%{version}/%{srcname}-%{version}.tar.gz
-Patch0:		CVE-2024-37891.patch
-Patch1:		CVE-2025-8869.patch
+Patch0:         CVE-2024-37891.patch
+Patch1:         CVE-2025-8869.patch
 Patch2:         CVE-2025-50181.patch
 Patch3:         CVE-2026-1703.patch
 
