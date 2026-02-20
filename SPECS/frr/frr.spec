@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        9.1.1
-Release:        5%{?dist}
+Version:        10.5.0
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,12 +16,10 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
-Patch5:         CVE-2024-44070.patch
-Patch6:         CVE-2024-55553.patch
-Patch7:         0001-Fix-frr-c90-complaint-error.patch
+Patch5:         0001-Fix-frr-c90-complaint-error.patch
 # Following CVE-2025-61099 fixes CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
-# CVE-2025-61103, CVE-2025-61104, CVE-2025-61106 and CVE-2025-61107.
-Patch8:         CVE-2025-61099.patch
+# CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
+Patch6:         CVE-2025-61099.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -38,6 +36,7 @@ BuildRequires:  make
 BuildRequires:  ncurses
 BuildRequires:  ncurses-devel
 BuildRequires:  net-snmp-devel
+BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  patch
 BuildRequires:  perl-XML-LibXML
@@ -74,8 +73,6 @@ FRRouting is a fork of Quagga.
 
 %prep
 %autosetup -p1 -n %{name}-%{name}-%{version}
-# C++14 or later needed for abseil-cpp 20230125; string_view needs C++17:
-sed -r -i 's/(AX_CXX_COMPILE_STDCXX\(\[)11(\])/\117\2/' configure.ac
 
 %build
 autoreconf -ivf
@@ -94,8 +91,6 @@ autoreconf -ivf
     --enable-user=frr \
     --enable-group=frr \
     --enable-vty-group=frrvty \
-    --enable-rtadv \
-    --disable-exampledir \
     --enable-systemd=yes \
     --enable-static=no \
     --disable-ldpd \
@@ -143,6 +138,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Upstream does not maintain a stable API, these files from -devel subpackage are no longer needed
 rm %{buildroot}%{_libdir}/frr/*.so
 rm -r %{buildroot}%{_includedir}/frr/
+rm -rf %{buildroot}%{_libdir}/frr/pkgconfig
 
 %pre
 %sysusers_create_package %{name} %{SOURCE2}
@@ -203,6 +199,14 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Feb 17 2026 Sudipta Pandit <sudpandit@microsoft.com> - 10.5.0-1
+- Upgrade to version 10.5.0
+- Remove CVE-2024-44070.patch (fixed upstream in 10.5.0)
+- Remove CVE-2024-55553.patch (fixed upstream in 10.5.0)
+- Rebase patches for 10.5.0 compatibility
+- Remove --enable-rtadv and --disable-exampledir (removed upstream)
+- Remove AX_CXX_COMPILE_STDCXX sed workaround (macro removed upstream)
+
 * Wed Jan 21 2026 Archana Shettigar <v-shettigara@microsoft.com> - 9.1.1-5
 - Patch CVE-2025-61099, CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
   CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107
