@@ -21,6 +21,16 @@ config_opts['package_manager'] = 'dnf5'
 config_opts['update_before_build'] = False
 config_opts['root'] = 'azl-4.0-{{ target_arch }}'
 
+# When rpmautospec is enabled,
+# the %autorelease and %autochangelog macros can be used in spec files
+# to automatically generate release numbers and changelog entries based
+# on the git history, eliminating the need to manually maintain them.
+config_opts['plugin_conf']['rpmautospec_enable'] = True
+config_opts['plugin_conf']['rpmautospec_opts'] = {
+    'requires': ['rpmautospec'],
+    'cmd_base': ['/usr/bin/rpmautospec', 'process-distgit'],
+}
+
 config_opts['dnf.conf'] = """
 [main]
 zchunk=true
