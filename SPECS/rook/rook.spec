@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,7 @@ Patch5:         CVE-2024-28180.patch
 Patch6:         CVE-2022-3162.patch
 Patch7:         CVE-2025-27144.patch
 Patch8:         CVE-2024-51744.patch
+Patch9:         CVE-2025-11065.patch
 # Ceph version is needed to set correct container tag in manifests
 BuildRequires:  ceph
 # Rook requirements
@@ -245,11 +246,9 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 %files k8s-yaml
 %dir %{_datarootdir}/k8s-yaml
 %dir %{_datarootdir}/k8s-yaml/rook
-%dir %{_datarootdir}/k8s-yaml/rook/ceph
 %{_datadir}/k8s-yaml/rook/ceph/
 
 %files ceph-helm-charts
-%doc %{_datadir}/%{name}-ceph-helm-charts/operator/README.md
 %{_datadir}/%{name}-ceph-helm-charts
 
 ################################################################################
@@ -260,6 +259,9 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
+* Tue Feb 03 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.6.2-28
+- Patch CVE-2025-11065
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.6.2-27
 - Bump release to rebuild with golang
 
