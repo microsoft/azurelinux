@@ -11,7 +11,7 @@
 
 Name:          netavark
 Version:       1.10.3
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -19,6 +19,7 @@ Distribution:   Azure Linux
 URL:           https://github.com/containers/%{name}
 Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
+Patch0:        CVE-2026-25541.patch
 BuildRequires: cargo < 1.85.0
 BuildRequires: make
 BuildRequires: protobuf-c
@@ -193,11 +194,11 @@ Its features include:
 * Support for container DNS resolution via aardvark-dns.
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -N -n %{name}-%{built_tag_strip}
 tar fx %{SOURCE1}
 mkdir -p .cargo
 
-cat >.cargo/config << EOF
+cat > .cargo/config.toml << 'EOF'
 [source.crates-io]
 replace-with = "vendored-sources"
 
@@ -205,6 +206,8 @@ replace-with = "vendored-sources"
 directory = "vendor"
 EOF
 
+patch -p1 < %{_sourcedir}/CVE-2026-25541.patch
+``
 %build
 %{__make} build
 
@@ -225,6 +228,9 @@ popd
 %{_unitdir}/%{name}-firewalld-reload.service
 
 %changelog
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.10.3-6
+- Patch for CVE-2026-25541
+
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.10.3-5
 - Bump release to rebuild with rust
 
