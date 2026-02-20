@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -173,40 +174,33 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 
 	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
-	logger.Log.Infof("Building: %s", baseSrpmName)
-	printDiskUsage(fmt.Sprintf("before building %s", baseSrpmName))
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
-	printDiskUsage(fmt.Sprintf("after building %s", baseSrpmName))
-	return
-}
+	printedDirs := []string{"/tmp"}
+	ccacheDir := agent.Config().CCacheDir
+	if ccacheDir != "" {
+		printedDirs = append(printedDirs, ccacheDir)
+	}
+	outDir := path.Join(agent.Config().RpmDir, "..")
+	if outDir != "" {
+		printedDirs = append(printedDirs, outDir)
+	}
+	buildDir := path.Join(agent.Config().LogDir, "..", "..", "..")
+	if buildDir != "" {
+		printedDirs = append(printedDirs, buildDir)
+	}
 
-// printDiskUsage logs the output of "du -h -d1" for a set of directories.
-// It is a best-effort helper: if a directory does not exist or the command fails,
-// a warning is logged and execution continues.
-func printDiskUsage(label string) {
-	// printPWD()
-	dirs := []string{"/tmp", "../build", "../out", "../ccache"}
-	printDirectoryDiskUsage(label, dirs)
+	logger.Log.Infof("Building: %s", baseSrpmName)
+	printDirectoryDiskUsage(fmt.Sprintf("before building %s", baseSrpmName), printedDirs...)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
+	printDirectoryDiskUsage(fmt.Sprintf("after building %s", baseSrpmName), printedDirs...)
+	return
 }
 
 // printDirectoryDiskUsage runs "du -h -d1" on a single directory and logs the output.
 // Errors are logged as warnings without interrupting the build.
-func printDirectoryDiskUsage(label string, dirs []string) {
+func printDirectoryDiskUsage(label string, dirs ...string) {
 	args := append([]string{"-h", "-d1", "--threshold=1M"}, dirs...)
-	stdout, stderr, err := shell.Execute("du", args...)
-	if err != nil {
-		logger.Log.Warnf("Disk usage %s: failed to get size for '%v': %v\nstderr: %s", label, dirs, err, stderr)
-		return
-	}
+	stdout, _, _ := shell.Execute("du", args...)
 	logger.Log.Infof("Disk usage %s for '%v':\n%s", label, dirs, strings.TrimSpace(stdout))
-}
-func printPWD() {
-	wd, err := os.Getwd()
-	if err != nil {
-		logger.Log.Warnf("Failed to get current working directory: %v", err)
-		return
-	}
-	logger.Log.Infof("Current working directory: %s", wd)
 }
 
 // testNode tests a TypeTest node.
