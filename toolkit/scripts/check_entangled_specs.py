@@ -60,7 +60,6 @@ version_release_matching_groups = [
         "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
     ]),
     frozenset([
-        "SPECS/shim/shim.spec",
         "SPECS/shim-unsigned-x64/shim-unsigned-x64.spec",
         "SPECS/shim-unsigned-aarch64/shim-unsigned-aarch64.spec"
     ]),
@@ -189,7 +188,7 @@ def check_spec_tags(base_path: str, tags: dict, groups: List[FrozenSet]) -> bool
                 spec_tag_map[tag][spec_filename] = tag_value
                 tag_want = f" (want: {tag_current})" if tag_current else ""
                 print_verbose(f"\t\ttag({tag}) value: {tag_value}{tag_want}")
-        
+
         for tag, specs_values in spec_tag_map.items():
             # Skip to next tag if tag value is unique and it matches "tag_expected_value" if set
             value_list = list(specs_values.values())
@@ -207,12 +206,12 @@ def check_matches(base_path: str):
     kernel_headers_version = get_tag_value(kernel_headers_spec, 'version')
     kernel_headers_release = get_tag_value(kernel_headers_spec, 'release')
     kernel_version_release = f"{kernel_headers_version}-{kernel_headers_release}"
-    
+
     groups_to_check = [({'mstflintver':{}}, mstflintver_matching_groups),
                        ({'sdkver':{}}, sdkver_matching_groups),
                        ({'epoch':{}, 'version':{}, 'release':{}}, version_release_matching_groups),
                        ({'epoch':{}, 'version':{}}, version_matching_groups)]
-    
+
     check_result = []
     for check_args in groups_to_check:
         print_verbose(f'Calling check_spec_tags with "{check_args}"')
