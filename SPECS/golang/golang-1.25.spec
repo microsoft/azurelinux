@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.0-20260210.6.src.tar.gz
+%global ms_go_filename  go1.25.7-20260204.4.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.0
+Version:        1.25.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -32,8 +32,6 @@ Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
 # bootstrap 03
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
-# bootstrap 04
-Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -57,9 +55,6 @@ mv -v go go-bootstrap-02
 
 tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
-
-tar xf %{SOURCE5} --no-same-owner
-mv -v go go-bootstrap-04
 
 %setup -q -n go
 
@@ -95,7 +90,6 @@ go_bootstrap 00
 go_bootstrap 01
 go_bootstrap 02
 go_bootstrap 03
-go_bootstrap 04
 
 # Build current go version
 export GOHOSTOS=linux
@@ -166,9 +160,6 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Feb 11 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.0-1
-- Bump version to 1.26.0-1
-
 * Thu Feb 05 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.7-1
 - Bump version to 1.25.7-1
 
