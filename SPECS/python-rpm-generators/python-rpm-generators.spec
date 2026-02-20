@@ -1,7 +1,7 @@
 Name:           python-rpm-generators
 Summary:        Dependency generators for Python RPMs
 Version:        14
-Release:        11%{?dist}
+Release:        12%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
@@ -56,6 +56,9 @@ install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} *.py
 %{_rpmconfigdir}/pythonbundles.py
 
 %changelog
+* Thu Mar 14 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 14-12
+- Enabling Python requires generator.
+
 * Mon Mar 04 2024 Andrew Phelps <anphel@microsoft.com> - 14-11
 - Promote from SPECS-EXTENDED to SPECS
 - Refresh from Fedora 40 (license: MIT)
