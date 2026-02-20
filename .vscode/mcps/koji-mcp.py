@@ -21,6 +21,13 @@ import urllib.request
 from typing import Optional
 from urllib.parse import urlparse
 
+from _mcp_utils import (
+    INLINE_THRESHOLD_BYTES,
+    check_ssrf,
+    validate_base_url,
+    write_output,
+)
+
 try:
     from mcp.server.fastmcp import FastMCP
 except ImportError:
@@ -50,14 +57,9 @@ def set_koji_url(base_url: str) -> str:
     uses self-signed certificates, use the separate koji_allow_insecure tool
     to disable verification after confirming with the user."""
     global _base_url, _allow_insecure, _ssl_error_seen_for
-    normalized = base_url.rstrip("/")
-
-    # Only allow http/https — reject file://, ftp://, etc.
-    parsed = urlparse(normalized)
-    if parsed.scheme not in ("http", "https"):
-        return f"ERROR: Only http/https URLs are supported (got {parsed.scheme!r})"
-    if parsed.username or parsed.password:
-        return "ERROR: URLs with embedded credentials are not supported"
+    normalized, err = validate_base_url(base_url)
+    if err:
+        return err
 
     # Reset insecure flag if the URL changed
     if normalized != _base_url:
@@ -117,32 +119,11 @@ def koji_fetch(path: str) -> str:
     url = _base_url + path
 
     # Guard against SSRF via URL authority tricks (e.g. path="@evil.com/..." or ":8080/...")
-    parsed_base = urlparse(_base_url)
+    ssrf_err = check_ssrf(_base_url, url)
+    if ssrf_err:
+        return ssrf_err
+
     parsed_url = urlparse(url)
-
-    def _effective_port(parsed):
-        """Return the effective port for a parsed URL (explicit or scheme default)."""
-        if parsed.port is not None:
-            return parsed.port
-        if parsed.scheme == "http":
-            return 80
-        if parsed.scheme == "https":
-            return 443
-        return None
-
-    base_port = _effective_port(parsed_base)
-    url_port = _effective_port(parsed_url)
-
-    if (
-        parsed_url.hostname != parsed_base.hostname
-        or parsed_url.scheme != parsed_base.scheme
-        or url_port != base_port
-    ):
-        return (
-            "ERROR: Constructed URL does not match the configured Koji endpoint "
-            f"(scheme/host/port mismatch: {parsed_url.scheme!r}://{parsed_url.hostname!r}:{url_port!r} "
-            f"!= {parsed_base.scheme!r}://{parsed_base.hostname!r}:{base_port!r}). Aborting."
-        )
 
     # SSL: verify certs by default, only disable if the user explicitly opted in
     ssl_ctx = None
@@ -188,15 +169,7 @@ def koji_fetch(path: str) -> str:
     except UnicodeDecodeError:
         text = data.decode("latin-1")
 
-    # Always write to a temp file to keep context small
-    os.makedirs(_output_dir, exist_ok=True)
-    fd, out_path = tempfile.mkstemp(prefix="koji_", dir=_output_dir)
-    with os.fdopen(fd, "w") as f:
-        f.write(text)
-
-    size = len(data)
-    lines = text.count("\n")
-    return f"Wrote {size} bytes ({lines} lines) to {out_path}"
+    return write_output(text, output_dir=_output_dir, prefix="koji_")
 
 
 @mcp.tool()

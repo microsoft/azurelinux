@@ -150,6 +150,19 @@ spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawh
 
 This offers no real information beyond what the TOML field already says, and doesn't explain *why* the new stuff is needed, or what that new stuff is. It's just noise.
 
+### References
+
+When making changes based on external information (e.g. a bug report, an upstream commit, a changelog entry, etc.), include a link to the relevant source in a comment (prefer full URL for ease of use). This provides valuable context for future readers to understand the reasoning behind the change and investigate further if needed. It also makes it easier to determine if the change is still relevant or if there have been updates since.
+
+```toml
+# ...
+# Fixed upstream in my-package-1.2.3 (rawhide): https://src.fedoraproject.org/rpms/my-package/c/abcdef123456 (rhbz#1234567)
+[[components.mypackage.overlays]]
+description = "Fix build failure due to missing dependency that was added in my-package-1.2.3"
+...
+```
+
+
 ## Validation
 
 Verify overlays apply cleanly with `azldev comp prep-sources` before committing. See skills `azl-build-component` and `azl-fix-overlay` for step-by-step workflows.

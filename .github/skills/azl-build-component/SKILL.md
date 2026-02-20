@@ -57,22 +57,22 @@ investigate → modify → verify → build → test → inspect
 | **Investigate** | `prep-sources --skip-overlays -o my/build/dir/<name>-pre` | Upstream spec/sources as-is |
 | **Compare** | `prep-sources -o my/build/dir/<name>-post` + `diff -r ...-pre ...-post` | Current overlay effect |
 | **Modify** | Edit `*.comp.toml` (overlays, defines, without) | — |
-| **Verify** | `rm -rf .../<name>-post && prep-sources -o my/build/dir/<name>-post` | Overlay applies cleanly |
+| **Verify** | `prep-sources --force -o my/build/dir/<name>-post` | Overlay applies cleanly |
 | **Build** | `comp build -p <name>` | RPMs appear in `base/out/` |
 | **Test** | `adv mock shell --add-package base/out/<name>*.rpm` | Package installs, binary runs, basic functionality works |
 | **Inspect** | `comp build --preserve-buildenv always` + `adv mock shell` | BUILDROOT contents, file lists |
 
-> Use a temp dir for `prep-sources` output. Clean before each run with `rm -rf` since `prep-sources` fails on non-empty dirs (no `--force` flag).
+> Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
+
+> Package builds are often very long, so adjust command timeouts accordingly when using shell tools to run builds, or use background mode if available.
 
 ## Debugging Build Failures
 
 ### 1. Diff sources pre/post overlay
 
 ```bash
-# Clean scratch dirs before each run (prep-sources fails on non-empty dirs)
-rm -rf my/build/dir/<name>-pre my/build/dir/<name>-post
-azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
+azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
 diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
 ```
 
