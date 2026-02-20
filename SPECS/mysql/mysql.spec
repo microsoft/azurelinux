@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.45
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Patch1:         CVE-2024-2410.patch
 Patch2:         fix-tests-for-unsupported-chacha-ciphers.patch
 Patch3:         CVE-2025-62813.patch
 Patch4:         CVE-2026-0994.patch
+Patch5:         CVE-2025-0838.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -116,6 +117,9 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Mon Feb 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 8.0.45-3
+- Patch for CVE-2025-0838
+
 * Mon Feb 09 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 8.0.45-2
 - Patch for CVE-2026-0994
 
