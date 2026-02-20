@@ -27,9 +27,11 @@
 #
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
@@ -39,8 +41,7 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name srp}
-%{!?_version: %define _version 25.07}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-1%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -66,7 +67,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 25.07
-Release:	 1%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -258,6 +259,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update source path

@@ -1,9 +1,11 @@
 %{!?KMP: %global KMP 0}
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
@@ -12,7 +14,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -42,7 +44,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -274,6 +276,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-23
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-22
 - Build with OFED 25.07.0.9.7.1.
 - Update source path
