@@ -40,6 +40,7 @@ Patch21:         CVE-2025-32049.patch
 Patch22:         CVE-2026-1536.patch
 Patch23:         CVE-2026-0716.patch
 Patch24:         CVE-2026-1760.patch
+Patch25:         CVE-2026-2443.patch
 
 
 BuildRequires:  meson
@@ -153,7 +154,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-13
-- Patch for CVE-2026-1760
+- Patch for CVE-2026-1760, CVE-2026-2443
 
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-12
 - Patch for CVE-2026-0716
