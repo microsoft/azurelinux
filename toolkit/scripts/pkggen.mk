@@ -103,7 +103,7 @@ $(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build
 		--cpu-prof-file=$(PROFILE_DIR)/versionsprocessor.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/versionsprocessor.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/versionsprocessor.trace \
-		$(if $(EXTRA_MACROS_FILES),$(foreach file,$(EXTRA_MACROS_FILES),--extra-macros-files=$(file))) \
+		$(if $(EXTRA_MACROS_FILES),$(foreach file,$(EXTRA_MACROS_FILES),--extra-macros-file=$(file))) \
 		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \

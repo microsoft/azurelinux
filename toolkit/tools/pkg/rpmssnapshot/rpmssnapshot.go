@@ -59,10 +59,10 @@ type SnapshotGenerator struct {
 }
 
 // New creates a new snapshot generator. If the chroot is created successfully, the caller is responsible for calling CleanUp().
-func New(buildDirPath, workerTarPath, specsDirPath string) (newSnapshotGenerator *SnapshotGenerator, err error) {
+func New(buildDirPath, workerTarPath, specsDirPath, releaseVersionMacrosFile string) (newSnapshotGenerator *SnapshotGenerator, err error) {
 	const chrootName = "rpmssnapshot_chroot"
 	newSnapshotGenerator = &SnapshotGenerator{}
-	err = newSnapshotGenerator.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath)
+	err = newSnapshotGenerator.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, releaseVersionMacrosFile)
 
 	return newSnapshotGenerator, err
 }

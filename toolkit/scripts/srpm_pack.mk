@@ -17,7 +17,6 @@ SRPM_BUILD_CHROOT_DIR   = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR     = $(LOGS_DIR)/pkggen/srpms
 rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 
-
 # Configure the list of packages we want to process into SRPMs
 # Strip any whitespace from user input and reasign using override so we can compare it with the empty string
 override SRPM_PACK_LIST := $(strip $(SRPM_PACK_LIST))
