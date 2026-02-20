@@ -1,4 +1,12 @@
 [components.golang-github-clbanning-mxj]
 
-[components.golang-github-clbanning-mxj.build]
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
+# Upstream example_test.go references v1 API identifiers (HandleXmlReader, Map, etc.)
+# that don't exist in v2.5.5. Fedora hasn't updated to a fixed version (v2.7+).
+# Remove the broken test file so %check can run the real tests.
+# Issue: https://github.com/clbanning/mxj/blob/v2.5.5/example_test.go references non-existent identifiers
+# Fixed upstream in v2.7.0: https://github.com/clbanning/mxj/commit/458e5dc01578622621dd1997cf19edbaa7972b00
+[[components.golang-github-clbanning-mxj.overlays]]
+description = "Remove example_test.go which references v1 API identifiers not present in v2"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["# Remove broken example tests that reference v1 API identifiers", "rm -f example_test.go"]
