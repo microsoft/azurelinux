@@ -125,11 +125,11 @@ var (
 	srpmPackList = app.Flag("pack-list", "List of SPECs to pack. If empty will pack all SPECs.").Default("").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
-	workers           = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
-	concurrentNetOps  = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
-	repackAll         = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
-	nestedSourcesDir  = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
-	versionsMacroFile = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while packing SRPMs.").ExistingFile()
+	workers                  = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
+	concurrentNetOps         = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
+	repackAll                = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
+	nestedSourcesDir         = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
+	releaseVersionMacrosFile = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while packing SRPMs.").ExistingFile()
 
 	// Use String() and not ExistingFile() as the Makefile may pass an empty string if the user did not specify any of these options
 	sourceURL     = app.Flag("source-url", "URL to a source server to download SPEC sources from.").String()
@@ -216,7 +216,7 @@ func main() {
 	packList, err := packagelist.ParsePackageList(*srpmPackList)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *versionsMacroFile, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *releaseVersionMacrosFile, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
 }
 

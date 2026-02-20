@@ -76,7 +76,7 @@ var (
 	distroReleaseVersion       = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with.").Required().String()
 	distroBuildNumber          = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
 	rpmmacrosFile              = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
-	versionsMacroFile          = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while building.").ExistingFile()
+	releaseVersionMacrosFile   = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while building.").ExistingFile()
 	buildAttempts              = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	checkAttempts              = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
 	extraLayers                = app.Flag("extra-layers", "Sets the number of additional layers in the graph beyond the goal packages to buid.").Default(defaultExtraLayers).Int()
@@ -195,7 +195,7 @@ func main() {
 		DistroReleaseVersion: *distroReleaseVersion,
 		DistroBuildNumber:    *distroBuildNumber,
 		RPMMacrosFiles:       *rpmmacrosFile,
-		VersionsMacroFile:    *versionsMacroFile,
+		VersionsMacroFile:    *releaseVersionMacrosFile,
 
 		NoCleanup:    *noCleanup,
 		UseCcache:    *useCcache,
