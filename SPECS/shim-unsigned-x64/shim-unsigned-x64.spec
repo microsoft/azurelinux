@@ -1,5 +1,6 @@
 %global pesign_vre 0.106-1
 %global openssl_vre 1.0.2j
+%global shim_commit_id afc49558b34548644c1cd0ad1b6526a9470182ed
 
 # For prereleases, % global prerelease rc2, and downpatch Makefile
 %if %{defined prerelease}
@@ -35,8 +36,8 @@
 %global dbxfile %{nil}
 
 Name:		shim-unsigned-%{efiarch}
-Version:	15.8
-Release:	5%{?dist}
+Version:	16.1
+Release:	1%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	x86_64
 License:	BSD
@@ -125,7 +126,7 @@ mkdir build-%{efialtarch}
 cp %{SOURCE3} data/
 
 %build
-COMMITID=$(cat commit)
+COMMITID=%{shim_commit_id}
 MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
@@ -155,7 +156,7 @@ cd ..
 %endif
 
 %install
-COMMITID=$(cat commit)
+COMMITID=%{shim_commit_id}
 MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
@@ -221,6 +222,9 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Thu Feb 19 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
+- Update to shim 16.1
+
 * Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
 - Bump to match shim release
 

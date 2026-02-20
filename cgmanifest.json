@@ -28116,8 +28116,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },
@@ -28126,8 +28126,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },

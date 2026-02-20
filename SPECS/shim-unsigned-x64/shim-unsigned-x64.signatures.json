@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "azurelinux-ca-20230216.der": "fac39cd3bbb87d6326eb87020eb7ab1f01058d9b94d3c47d4264da05601bc89a",
-  "sbat.azurelinux.csv": "80907b1bea790a87633642e4dacfc211abf359958f663bc236c41a592aab1e2a",
-  "shim-15.8.tar.bz2": "a79f0a9b89f3681ab384865b1a46ab3f79d88b11b4ca59aa040ab03fffae80a9",
+  "sbat.azurelinux.csv": "2048a700f11677450ec8686c7788ca6f01e1e942cfeab19712f84f54c2285325",
+  "shim-16.1.tar.bz2": "46319cd228d8f2c06c744241c0f342412329a7c630436fce7f82cf6936b1d603",
   "shim-find-debuginfo.sh": "1516c1b476abb0a2c7af8d9087d0a6fab93bd83d529ab32f57aa36a1139235a5",
   "shim.patches": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
  }
