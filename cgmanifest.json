@@ -13862,8 +13862,8 @@
         "type": "other",
         "other": {
           "name": "munge",
-          "version": "0.5.15",
-          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.15/munge-0.5.15.tar.xz"
+          "version": "0.5.18",
+          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.18/munge-0.5.18.tar.xz"
         }
       }
     },
@@ -29886,8 +29886,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.2132",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2132.tar.gz"
+          "version": "9.1.2148",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
         }
       }
     },
