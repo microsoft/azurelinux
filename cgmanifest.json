@@ -894,6 +894,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-vm-utils",
+          "version": "0.7.0",
+          "downloadUrl": "https://github.com/Azure/azure-vm-utils/archive/v0.7.0/azure-vm-utils-v0.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-storage-cpp",
           "version": "7.5.0",
           "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"

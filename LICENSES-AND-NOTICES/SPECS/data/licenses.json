@@ -2244,6 +2244,7 @@
                 "azure-iot-sdk-c",
                 "azure-nvme-utils",
                 "azure-storage-cpp",
+                "azure-vm-utils",
                 "azurelinux-image-tools",
                 "azurelinux-release",
                 "azurelinux-repos",
