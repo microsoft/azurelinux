@@ -185,8 +185,11 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 // a warning is logged and execution continues.
 func printDiskUsage(label string) {
 	// printPWD()
-	dirs := []string{"/tmp", "../build", "../out", "../ccache"}
+	dirs := []string{"../build", "../out"}
 	printDirectoryDiskUsage(label, dirs)
+	dirs2 := []string{"../ccache"}
+	printDirectoryDiskUsage(label, dirs2)
+
 }
 
 // printDirectoryDiskUsage runs "du -h -d1" on a single directory and logs the output.
