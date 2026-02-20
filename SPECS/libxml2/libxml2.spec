@@ -24,6 +24,7 @@ Patch12:        CVE-2025-49795.patch
 Patch13:        CVE-2025-7425.patch
 Patch14:        CVE-2026-0990.patch
 Patch15:        CVE-2026-0992.patch
+Patch16:        CVE-2025-8732.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
@@ -96,7 +97,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.11.5-9
-- Patch for CVE-2026-0990, CVE-2026-0992
+- Patch for CVE-2026-0990, CVE-2026-0992, CVE-2025-8732
 
 * Mon Jan 12 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.11.5-8
 - Patch CVE-2025-7525
