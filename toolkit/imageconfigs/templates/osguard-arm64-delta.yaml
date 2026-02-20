@@ -1,0 +1,20 @@
+os:
+  kernelCommandLine:
+    extraCommandLine:
+      # Tells the Linux kernel to use the first ARM PL011 UART device as the primary system console after initialization 
+      - console=ttyAMA0
+      # Enables an early debug console using the ARM PL011 UART at base address `0xeffec000` to output kernel messages from the earliest stages of the boot process
+      - earlycon=pl011,0xeffec000
+      # Stopping ACPI-based ARM PMU initialization
+      - initcall_blacklist=arm_pmu_acpi_init
+      # Disable IPE code integrity enforcement 
+      - ipe.enforce=0
+scripts:
+  postCustomization:
+  # Tag this image variant with its specific variant-id
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - osguard-arm64
+    - --variant
+    - OS Guard Image (ARM64)
