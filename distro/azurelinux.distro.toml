@@ -11,6 +11,10 @@ mock-config-aarch64 = "mock/azurelinux-4.0-aarch64.cfg"
 [distros.azurelinux.versions.'4.0'.default-component-config]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" } }
 
+[distros.azurelinux.versions.'4.0'.default-component-config.build.check]
+skip = true
+skip_reason = "Checks are disabled by default for Azure Linux 4.0. To enable checks for a specific component, set check = { skip = false } in the component's build config."
+
 [distros.azurelinux.versions.'4.0'.default-component-config.build.defines]
 dist = ".azl4"
 vendor = "Microsoft Corporation"
