@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.0
-Release:        2%{?dist}
+Version:        2.4.9
+Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,10 +15,10 @@ BuildRequires:  npth-devel >= 1.2
 BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
-BuildRequires:  libgpg-error-devel >= 1.46
+BuildRequires:  libgpg-error-devel >= 1.48
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
-Requires:       libgpg-error >= 1.46
+Requires:       libgpg-error >= 1.48
 Requires:       npth >= 1.2
 Requires:       libassuan >= 2.5.0
 Requires:       pinentry
@@ -48,7 +48,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -p1 -n gnupg-%{version}
 
 %build
 %configure \
@@ -56,6 +56,9 @@ These are the additional language files of gnupg2
 %make_build
 
 %install
+ln -sf gpg2.1 doc/gpg.1
+ln -sf gpgv2.1 doc/gpgv.1
+
 %make_install
 
 pushd %{buildroot}%{_bindir}
@@ -89,6 +92,10 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.9-1
+- Auto-upgrade to 2.4.9 - for CVE-2025-68973, CVE-2025-30258
+- date libgpg-error dependency to 1.48
+
 * Tue Mar 21 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
 - Add correct version for libgpg-error-devel as a BR
 
