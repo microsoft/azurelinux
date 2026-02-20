@@ -246,11 +246,9 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 %files k8s-yaml
 %dir %{_datarootdir}/k8s-yaml
 %dir %{_datarootdir}/k8s-yaml/rook
-%dir %{_datarootdir}/k8s-yaml/rook/ceph
 %{_datadir}/k8s-yaml/rook/ceph/
 
 %files ceph-helm-charts
-%doc %{_datadir}/%{name}-ceph-helm-charts/operator/README.md
 %{_datadir}/%{name}-ceph-helm-charts
 
 ################################################################################
