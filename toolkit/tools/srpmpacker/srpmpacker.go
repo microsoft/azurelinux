@@ -319,7 +319,6 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-// If releaseVersionMacrosFile is non-empty, it will be copied into the default RPM macros directory inside the chroot.
 func createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFile string, useAzureCliAuth bool) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"

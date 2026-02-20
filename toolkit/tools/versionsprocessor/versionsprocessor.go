@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 
 // versionsprocessor is a tool to generate a macro file of all specs version and release.
+// It iterates ove all of the SPEC files in the provided directory, gets the version and release for each SPEC,
+// and then writes that information to an output file as RPM macros file.\
+// The output file is then provided to other tools and passed into their respective rpm macros folder so that rpmbuild command automatically recognize it.
 
 package main
 
@@ -48,7 +51,7 @@ func main() {
 
 	var (
 		chroot       *safechroot.Chroot
-		macrosOutput []byte
+		macrosOutput []string
 	)
 
 	app.Version(exe.ToolkitVersion)
@@ -85,8 +88,6 @@ func main() {
 	}
 
 	doParse := func() error {
-		var parseError error
-
 		// Find all spec files
 		allSpecFiles, err := specreaderutils.FindSpecFiles(*specsDir, nil)
 		if err != nil {
@@ -136,16 +137,16 @@ func main() {
 				releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
 
 				// Generate RPM macro definitions instead of modifying spec files directly.
-				macros := fmt.Sprintf("%%%s %s\n%%%s %s\n",
+				macros := fmt.Sprintf("%%%s %s\n%%%s %s",
 					versionMacroString, version,
 					releaseMacroString, releaseClean,
 				)
 
-				macrosOutput = append(macrosOutput, []byte(macros)...)
+				macrosOutput = append(macrosOutput, macros)
 			}
 		}
 
-		return parseError
+		return err
 	}
 
 	if chroot != nil {
@@ -166,11 +167,11 @@ func main() {
 			continue
 		}
 
-		macrosOutput = append(macrosOutput, []byte(contents)...)
+		macrosOutput = append(macrosOutput, contents)
 		logger.Log.Infof("Appended contents of provided extra macros file (%s) to %s", extraPath, *output)
 	}
 
-	err = file.Write(string(macrosOutput), *output)
+	err = file.WriteLines(macrosOutput, *output)
 	if err != nil {
 		logger.Log.Errorf("Failed to write file (%s)", *output)
 		return

@@ -127,7 +127,6 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 }
 
 // createChroot creates a chroot to parse SPECs inside of.
-// If releaseVersionMacrosFile is non-empty, its parent directory is also made available inside the chroot.
 func createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
 	const (
 		chrootName       = "specparser_chroot"
