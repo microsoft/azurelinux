@@ -1,4 +1,15 @@
 [components.golang-github-mwitkow-conntrack]
 
-[components.golang-github-mwitkow-conntrack.build]
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
+# Upstream codebase is abandoned (https://github.com/mwitkow/go-conntrack/issues/14)
+# listener_test.go has a race condition in TestMonitoringNormalConns: the test calls
+# conn.Close() and immediately checks the counter, but the counter is incremented
+# asynchronously when the server processes the close. Missing a sleep between close
+# and assertion causes intermittent failures (expected: 2, actual: 1).
+# dialer_test.go extends ListenerTestSuite so must also be removed.
+# This leaves promhelper_test.go and tracehelper_test.go running.
+[[components.golang-github-mwitkow-conntrack.overlays]]
+description = "Remove listener_test.go and dialer_test.go due to race condition in ListenerTestSuite"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["# Remove ListenerTestSuite tests - flaky due to race condition (no sleep after conn.Close())", "rm -f listener_test.go dialer_test.go"]
+
