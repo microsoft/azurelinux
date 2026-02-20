@@ -13773,8 +13773,8 @@
         "type": "other",
         "other": {
           "name": "munge",
-          "version": "0.5.13",
-          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
+          "version": "0.5.18",
+          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.18/munge-0.5.18.tar.xz"
         }
       }
     },
@@ -21434,8 +21434,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.20",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.20/postgresql-14.20.tar.bz2"
+          "version": "14.21",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.21/postgresql-14.21.tar.bz2"
         }
       }
     },
