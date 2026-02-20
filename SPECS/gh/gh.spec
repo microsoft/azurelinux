@@ -98,10 +98,10 @@ make test
 * Fri Feb 21 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.62.0-6
 - Patch CVE-2025-25204
 
-* Wed Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-5
+* Tue Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-5
 - Patch CVE-2024-53859, CVE-2024-53858
 
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
+* Sat Jan 18 2025 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
 - Add patch for CVE-2024-45338
 
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.62.0-3
