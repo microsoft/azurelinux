@@ -1,15 +1,16 @@
 {
-    "Registrations": [
+    "$schema": "https://json.schemastore.org/component-detection-manifest.json",
+    "version": 1,
+    "registrations": [
         {
-            "Component": {
-                "Type": "DockerImage",
-                "DockerImage": {
-                    "Name": "mcr.microsoft.com/cbl-mariner/base/core",
-                    "Digest": "sha256:82314abb594a695fd8817774e8b7f101934902cc1d99b3075e80acbc8b9b23ee",
-                    "Tag": "2.0.20240123"
+            "component": {
+                "type": "other",
+                "other": {
+                    "name": "mcr.microsoft.com/cbl-mariner/base/core",
+                    "version": "2.0.20240123",
+                    "hash": "sha256:82314abb594a695fd8817774e8b7f101934902cc1d99b3075e80acbc8b9b23ee"
                 }
             }
         }
-    ],
-    "Version": 1
+    ]
 }
