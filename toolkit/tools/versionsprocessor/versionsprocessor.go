@@ -41,7 +41,7 @@ var (
 	profFlags     = exe.SetupProfileFlags(app)
 	workerTar     = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	extraFiles    = app.Flag("extra-macros-files", "Additional files whose contents will be appended to the output; may be specified multiple times.").ExistingFiles()
+	extraFiles    = app.Flag("extra-macros-file", "Additional files whose contents will be appended to the output; may be specified multiple times.").ExistingFiles()
 )
 
 func main() {
