@@ -1,0 +1,111 @@
+From 9f375dc2b52d6cec2b0388af197048c048ed53a5 Mon Sep 17 00:00:00 2001
+From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+Date: Tue, 29 Mar 2022 16:01:19 +0200
+Subject: [PATCH 2/3] util/cmdline: Handle the cmdline flags as list of
+ supported names
+
+Flatcar Container Linux uses flatcar.oem.id as kernel parameter and has
+support for coreos.oem.id. Afterburn's ignition.oem.id is not supported
+and even if, it would not be the sole option.
+Handle both flatcar.oem.id and coreos.oem.id. The first name in the
+list takes precedence, any other present names are ignored.
+---
+ src/util/cmdline.rs | 64 +++++++++++++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 28 deletions(-)
+
+diff --git a/src/util/cmdline.rs b/src/util/cmdline.rs
+index 2e96ce4..89e85d4 100644
+--- a/src/util/cmdline.rs
++++ b/src/util/cmdline.rs
+@@ -24,29 +24,36 @@ use slog_scope::trace;
+ 
+ /// Platform key.
+ #[cfg(not(feature = "cl-legacy"))]
+-const CMDLINE_PLATFORM_FLAG: &str = "ignition.platform.id";
+-/// Platform key (CL and RHCOS legacy name: "OEM").
++const CMDLINE_PLATFORM_FLAGS: [&'static str; 1] = ["ignition.platform.id"];
++/// Backwards-compatible platform keys, the first name takes precedence.
+ #[cfg(feature = "cl-legacy")]
+-const CMDLINE_PLATFORM_FLAG: &str = "coreos.oem.id";
++const CMDLINE_PLATFORM_FLAGS: [&'static str; 2] = ["flatcar.oem.id", "coreos.oem.id"];
+ 
+ /// Get platform value from cmdline file.
+ pub fn get_platform(fpath: &str) -> Result<String> {
+     let content = std::fs::read_to_string(fpath)
+         .with_context(|| format!("Failed to read cmdline file ({fpath})"))?;
+ 
+-    match find_flag_value(CMDLINE_PLATFORM_FLAG, &content) {
+-        Some(platform) => {
+-            trace!("found '{}' flag: {}", CMDLINE_PLATFORM_FLAG, platform);
+-            Ok(platform)
++    for flagname in &CMDLINE_PLATFORM_FLAGS {
++        match find_flag_value(flagname, &content) {
++            Some(platform) => {
++                trace!("found '{}' flag: {}", flagname, platform);
++                return Ok(platform);
++            }
++            None => {
++                continue;
++            }
+         }
+-        None => bail!(
+-            "Couldn't find flag '{}' in cmdline file ({})",
+-            CMDLINE_PLATFORM_FLAG,
+-            fpath
+-        ),
+     }
++
++    bail!(
++        "Couldn't find one of the flags '{:?}' in cmdline file ({})",
++        CMDLINE_PLATFORM_FLAGS,
++        fpath
++    )
+ }
+ 
++
+ /// Check whether kernel cmdline file contains flags for network configuration.
+ #[allow(unused)]
+ pub fn has_network_kargs(fpath: &str) -> Result<bool> {
+@@ -99,22 +106,23 @@ mod tests {
+ 
+     #[test]
+     fn test_find_flag() {
+-        let flagname = "coreos.oem.id";
+-        let tests = vec![
+-            ("", None),
+-            ("foo=bar", None),
+-            ("coreos.oem.id", None),
+-            ("coreos.oem.id=", None),
+-            ("coreos.oem.id=\t", None),
+-            ("coreos.oem.id=ec2", Some("ec2".to_string())),
+-            ("coreos.oem.id=\tec2", Some("ec2".to_string())),
+-            ("coreos.oem.id=ec2\n", Some("ec2".to_string())),
+-            ("foo=bar coreos.oem.id=ec2", Some("ec2".to_string())),
+-            ("coreos.oem.id=ec2 foo=bar", Some("ec2".to_string())),
+-        ];
+-        for (tcase, tres) in tests {
+-            let res = find_flag_value(flagname, tcase);
+-            assert_eq!(res, tres, "failed testcase: '{tcase}'");
++        for flagname in &CMDLINE_PLATFORM_FLAGS {
++            let tests = vec![
++                ("".to_string(), None),
++                ("foo=bar".to_string(), None),
++                (format!("{}", flagname), None),
++                (format!("{}=", flagname), None),
++                (format!("{}=\t", flagname), None),
++                (format!("{}=ec2", flagname), Some("ec2".to_string())),
++                (format!("{}=\tec2", flagname), Some("ec2".to_string())),
++                (format!("{}=ec2\n", flagname), Some("ec2".to_string())),
++                (format!("foo=bar {}=ec2", flagname), Some("ec2".to_string())),
++                (format!("{}=ec2 foo=bar", flagname), Some("ec2".to_string())),
++            ];
++            for (tcase, tres) in tests {
++                let res = find_flag_value(flagname, &tcase);
++                assert_eq!(res, tres, "failed testcase: '{}'", &tcase);
++            }
+         }
+     }
+ 
+-- 
+2.44.2
+
