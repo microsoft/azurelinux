@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.121.1 Kernel Configuration
+# Linux/arm64 6.6.126.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -1250,6 +1250,7 @@ CONFIG_TCP_CONG_ILLINOIS=m
 CONFIG_TCP_CONG_DCTCP=m
 CONFIG_TCP_CONG_CDG=m
 CONFIG_TCP_CONG_BBR=m
+# CONFIG_TCP_CONG_BBR3 is not set
 CONFIG_DEFAULT_CUBIC=y
 # CONFIG_DEFAULT_RENO is not set
 CONFIG_DEFAULT_TCP_CONG="cubic"
