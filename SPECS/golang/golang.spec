@@ -58,6 +58,9 @@ mv -v go go-bootstrap-02
 tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
 
+tar xf %{SOURCE5} --no-same-owner
+mv -v go go-bootstrap-04
+
 %setup -q -n go
 
 %build
