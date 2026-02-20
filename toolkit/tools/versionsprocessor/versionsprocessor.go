@@ -16,8 +16,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -80,7 +78,7 @@ func main() {
 
 	if *workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = createChroot(*workerTar, *buildDir, *specsDir)
+		chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
 		if err != nil {
 			return
 		}
@@ -176,48 +174,4 @@ func main() {
 		logger.Log.Errorf("Failed to write file (%s)", *output)
 		return
 	}
-}
-
-// createChroot creates a chroot to parse SPECs inside of.
-func createChroot(workerTar, buildDir, specsDir string) (chroot *safechroot.Chroot, err error) {
-	const (
-		chrootName       = "versionprocessor_chroot"
-		existingDir      = false
-		leaveFilesOnDisk = false
-	)
-
-	// Mount the specs and srpms directories to an identical path inside the chroot.
-	// Since versionsprocessor saves the full paths to specs in its output that grapher will then consume,
-	// the pathing needs to be preserved from the host system.
-	var extraDirectories []string
-
-	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
-	}
-
-	chrootDir := filepath.Join(buildDir, chrootName)
-	chroot = safechroot.NewChroot(chrootDir, existingDir)
-
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true)
-	if err != nil {
-		return
-	}
-
-	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
-	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir}
-		for _, dir := range dirsToCopy {
-			dirInChroot := filepath.Join(chroot.RootDir(), dir)
-			err = directory.CopyContents(dir, dirInChroot)
-			if err != nil {
-				closeErr := chroot.Close(leaveFilesOnDisk)
-				if closeErr != nil {
-					logger.Log.Errorf("Failed to close chroot, err: %s", err)
-				}
-				return
-			}
-		}
-	}
-
-	return
 }

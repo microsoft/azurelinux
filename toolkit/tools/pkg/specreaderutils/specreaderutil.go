@@ -67,7 +67,7 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
+		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
 		if err != nil {
 			return
 		}
@@ -127,9 +127,8 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 }
 
 // createChroot creates a chroot to parse SPECs inside of.
-func createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
+func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
 	const (
-		chrootName       = "specparser_chroot"
 		existingDir      = false
 		leaveFilesOnDisk = false
 	)
@@ -141,7 +140,10 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosF
 
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
-		safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	if srpmsDir != "" {
+		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""))
 	}
 
 	chrootDir := filepath.Join(buildDir, chrootName)
