@@ -97,8 +97,8 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		fmt.Sprintf("--timeout=%s", allowableRuntime),
 	}
 
-	if config.RpmmacrosFile != "" {
-		serializedArgs = append(serializedArgs, fmt.Sprintf("--rpmmacros-file=%s", config.RpmmacrosFile))
+	if config.RPMMacrosFiles != "" {
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--rpmmacros-file=%s", config.RPMMacrosFiles))
 	}
 
 	if config.VersionsMacroFile != "" {

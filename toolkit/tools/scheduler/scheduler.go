@@ -194,7 +194,7 @@ func main() {
 		DistTag:              *distTag,
 		DistroReleaseVersion: *distroReleaseVersion,
 		DistroBuildNumber:    *distroBuildNumber,
-		RpmmacrosFile:        *rpmmacrosFile,
+		RPMMacrosFiles:       *rpmmacrosFile,
 		VersionsMacroFile:    *versionsMacroFile,
 
 		NoCleanup:    *noCleanup,

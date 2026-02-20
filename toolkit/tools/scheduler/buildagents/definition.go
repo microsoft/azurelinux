@@ -25,7 +25,7 @@ type BuildAgentConfig struct {
 	DistTag              string
 	DistroReleaseVersion string
 	DistroBuildNumber    string
-	RpmmacrosFile        string
+	RPMMacrosFiles       string
 	VersionsMacroFile    string
 
 	NoCleanup bool

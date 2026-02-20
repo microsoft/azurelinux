@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -221,29 +220,13 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
+	// If a release version macros file is provided, copy it into the default RPM macros directory
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
 	if releaseVersionMacrosFile != "" {
-		macroDir, macroErr := rpm.GetMacroDir()
-		if macroErr != nil {
-			err = fmt.Errorf("failed to get RPM macros directory: %w", macroErr)
-			return
+		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+		if err != nil {
+			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}
-
-		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
-		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(releaseVersionMacrosFile))
-
-		macroErr = directory.EnsureDirExists(macrosDestDir)
-		if macroErr != nil {
-			err = fmt.Errorf("failed to create macros directory in chroot: %w", macroErr)
-			return
-		}
-
-		macroErr = file.Copy(releaseVersionMacrosFile, macrosDestFile)
-		if macroErr != nil {
-			err = fmt.Errorf("failed to copy release version macros file into chroot: %w", macroErr)
-			return
-		}
-
-		logger.Log.Infof("Copied release version macros file into pkgworker chroot (%s -> %s)", releaseVersionMacrosFile, macrosDestFile)
 	}
 	defer chroot.Close(noCleanup)
 

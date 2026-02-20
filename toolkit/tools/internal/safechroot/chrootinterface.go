@@ -8,4 +8,5 @@ type ChrootInterface interface {
 	Run(toRun func() error) error
 	UnsafeRun(toRun func() error) error
 	AddFiles(filesToCopy ...FileToCopy) error
+	AddRPMMacrosFile(macrosFilePath string) error
 }

@@ -389,30 +389,12 @@ func createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFil
 	}
 
 	// If a release version macros file is provided, copy it into the default RPM macros directory
-	// inside the chroot so rpmbuild picks it up automatically when packing SRPMs.
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
 	if releaseVersionMacrosFile != "" {
-		macroDir, macroErr := rpm.GetMacroDir()
-		if macroErr != nil {
-			logger.Log.Errorf("Failed to get RPM macro directory: %s", macroErr)
-			return
+		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+		if err != nil {
+			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}
-
-		macrosDestDir := filepath.Join(chroot.RootDir(), macroDir)
-		macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(releaseVersionMacrosFile))
-
-		mkdirErr := directory.EnsureDirExists(macrosDestDir)
-		if mkdirErr != nil {
-			logger.Log.Errorf("Failed to create macros directory inside chroot (%s): %s", macrosDestDir, mkdirErr)
-			return
-		}
-
-		copyErr := file.Copy(releaseVersionMacrosFile, macrosDestFile)
-		if copyErr != nil {
-			logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", releaseVersionMacrosFile, macrosDestFile, copyErr)
-			return
-		}
-
-		logger.Log.Infof("Copied release version macros file into SRPM chroot (%s -> %s)", releaseVersionMacrosFile, macrosDestFile)
 	}
 
 	// Networking support is needed to download sources.

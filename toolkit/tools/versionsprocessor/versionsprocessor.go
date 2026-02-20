@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// specreader is a tool to parse spec files into a JSON structure
+// versionsprocessor is a tool to generate a macro file of all specs version and release.
 
 package main
 
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -42,14 +43,12 @@ var (
 
 func main() {
 	const (
-		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
-		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
-		prefix                = "azl"
+		prefix = "azl"
 	)
 
 	var (
-		chroot        *safechroot.Chroot
-		macros_output []byte
+		chroot       *safechroot.Chroot
+		macrosOutput []byte
 	)
 
 	app.Version(exe.ToolkitVersion)
@@ -105,47 +104,45 @@ func main() {
 			specFileName := filepath.Base(specFile)
 
 			sourceDir := filepath.Dir(specFile)
-			noCheckDefines := rpm.DefaultDistroDefines(false, *distTag)
+			defines := rpm.DefaultDistroDefines(false, *distTag)
 
-			versionRelease, err := rpm.QuerySPEC(specFile, sourceDir, `%{VERSION}-%{RELEASE}`, buildArch, noCheckDefines, rpm.QueryHeaderArgument)
+			packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
+
 			if err != nil {
 				logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
 				continue
 			}
 
-			logger.PanicOnError(err)
+			for _, packageVersionString := range packages {
 
-			if len(versionRelease) == 0 {
-				logger.Log.Errorf("Invalid version-release retrieved from spec file (%s): %s", specFileName, versionRelease)
-				continue
+				// the output of the above query is in the format of "packagename: version-release",
+				// so split by ": " to get the version-release portion we want the second part
+				releaseVerSplit := regexp.MustCompile(`^[^:]+: (.+)-(.+)$`).FindStringSubmatch(packageVersionString)[1:]
+
+				if len(releaseVerSplit) != 2 {
+					logger.Log.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
+					continue
+				}
+
+				version := releaseVerSplit[0]
+				release := releaseVerSplit[1]
+				releaseClean := strings.Replace(release, *distTag, "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
+
+				// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
+				specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
+				specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
+
+				versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
+				releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
+
+				// Generate RPM macro definitions instead of modifying spec files directly.
+				macros := fmt.Sprintf("%%%s %s\n%%%s %s\n",
+					versionMacroString, version,
+					releaseMacroString, releaseClean,
+				)
+
+				macrosOutput = append(macrosOutput, []byte(macros)...)
 			}
-
-			releaseVerSplit := strings.Split(versionRelease[0], "-")
-
-			if len(releaseVerSplit) < 2 {
-				logger.Log.Errorf("Invalid version-release format retrieved from spec file (%s): %s", specFileName, versionRelease[0])
-				continue
-			}
-
-			version := releaseVerSplit[0]
-			release := releaseVerSplit[1]
-			releaseClean := strings.Replace(release, ".azl3", "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
-
-			// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
-			specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
-			specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
-			specFileNameMacroFormat = strings.ToLower(specFileNameMacroFormat)
-
-			versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
-			releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
-
-			// Generate RPM macro definitions instead of modifying spec files directly.
-			macros := fmt.Sprintf("%%%s %s\n%%%s %s\n",
-				versionMacroString, version,
-				releaseMacroString, releaseClean,
-			)
-
-			macros_output = append(macros_output, []byte(macros)...)
 		}
 
 		return parseError
@@ -169,11 +166,11 @@ func main() {
 			continue
 		}
 
-		macros_output = append(macros_output, []byte(contents)...)
+		macrosOutput = append(macrosOutput, []byte(contents)...)
 		logger.Log.Infof("Appended contents of provided extra macros file (%s) to %s", extraPath, *output)
 	}
 
-	err = file.Write(string(macros_output), *output)
+	err = file.Write(string(macrosOutput), *output)
 	if err != nil {
 		logger.Log.Errorf("Failed to write file (%s)", *output)
 		return

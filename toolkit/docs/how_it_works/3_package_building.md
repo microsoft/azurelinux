@@ -117,6 +117,10 @@ The files can be ingested into the `graphviz` tools to visualize them, although 
 dot -Tpng -o visualized.png < graph.dot
 ```
 
+### Dynamic versioning
+We have a versionsprocessor tool that iterates over all Specs and writes their release and versions into a macro file in a format of
+`azl_<package_name>_release`, `azl_<package_name>_version`, note that the `<package_name>` needs any `-` are replaced with `_` due to macros not allowing `-`.
+
 ### Stage 1: Grapher
 
 The `grapher` tool reads the `specs.json` file and converts it into an acyclic directed graph. Inter-package dependencies are represented by directed edges in the graph.
