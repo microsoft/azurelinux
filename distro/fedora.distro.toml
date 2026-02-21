@@ -2,7 +2,7 @@
 description = "Fedora Linux"
 default-version = "43"
 dist-git-base-uri = "git://azl.src.kojiaks.internal/rpms/$pkg.git"
-lookaside-base-uri = "https://src.fedoraproject.org/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
+lookaside-base-uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
 repos = [
     # NOTE: These are source repositories; we will want to tag them as such in the future.
     {"base-uri" = "https://na.edge.kernel.org/fedora/releases/$releasever/Everything/source/tree" },
