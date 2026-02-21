@@ -9,15 +9,13 @@ description: "Diagnose and fix overlay issues in Azure Linux components. Use whe
 
 ### 1. Reproduce and inspect
 
-> Use a temp dir for `prep-sources` output. Clean before each run with `rm -rf` since `prep-sources` fails on non-empty dirs (no `--force` flag).
+> Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
 
 ```bash
-# Clean scratch dirs before each run (prep-sources fails on non-empty dirs)
-rm -rf my/build/dir/<name>-pre my/build/dir/<name>-post
-azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
+azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
 diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
 ```
 

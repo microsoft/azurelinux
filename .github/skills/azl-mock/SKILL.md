@@ -88,6 +88,6 @@ Prefer the non-interactive heredoc approach when possible. Use interactive only 
   - `--add-package /path/to/rpm` to install your locally built RPM
   - `-p <name>` to install a package by name from configured repos
 - **Mock chroot is persistent.** State survives between `azldev adv mock shell` sessions — installed packages, created files, etc. all persist. This is useful (install once, re-enter later) but can cause confusion from stale state. Use `mock --scrub=chroot` to reset when needed (see "Resetting the Mock Chroot" above).
-- **Use a temp dir for `prep-sources` output.** Clean before each run with `rm -rf` — `prep-sources` fails on non-empty dirs (no `--force` flag). Note that `prep-sources -o <dir>` writes to a user-specified dir, NOT `base/out/` (that's for `comp build` output).
+- **Use a temp dir for `prep-sources` output.** Use `--force` to overwrite an existing output dir. Note that `prep-sources -o <dir>` writes to a user-specified dir, NOT `base/out/` (that's for `comp build` output).
 - **One mock session per terminal.** If a terminal is already inside mock shell, running `azldev adv mock shell` again will fail. Run `exit` first.
 - **`advanced` is hidden.** `azldev adv` (alias for `advanced`) doesn't appear in `azldev --help` but contains `mock shell`, `mock build-rpms`, `mcp`, and `wget`.
