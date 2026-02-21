@@ -14,9 +14,11 @@ import (
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemdependency"
 
@@ -156,6 +158,48 @@ func NewOverlayMountPoint(chrootDir, source, target, lowerDir, upperDir, workDir
 		flags:  overlayFlags,
 		data:   overlayData,
 	}
+
+	return
+}
+
+func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) (err error) {
+
+	var (
+		macroDir string
+	)
+
+	doParse := func() error {
+		var macroErr error
+
+		macroDir, macroErr = rpm.GetMacroDir()
+		if macroErr != nil {
+			logger.Log.Errorf("Failed to get RPM macro directory: %s", macroErr)
+			return macroErr
+		}
+
+		return macroErr
+	}
+
+	c.Run(doParse)
+
+	// Destination path inside the chroot (same path as on the host).
+	macrosDestDir := filepath.Join(c.rootDir, macroDir)
+	macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(macrosFilePath))
+
+	// Ensure destination directory exists and copy the file.
+	mkdirErr := directory.EnsureDirExists(macrosDestDir)
+	if mkdirErr != nil {
+		logger.Log.Errorf("Failed to create macros directory inside chroot (%s): %s", macrosDestDir, mkdirErr)
+		return mkdirErr
+	}
+
+	copyErr := file.Copy(macrosFilePath, macrosDestFile)
+	if copyErr != nil {
+		logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", macrosFilePath, macrosDestFile, copyErr)
+		return mkdirErr
+	}
+
+	logger.Log.Infof("Copied release version macros file into chroot (%s -> %s)", macrosFilePath, macrosDestFile)
 
 	return
 }

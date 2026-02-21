@@ -30,12 +30,10 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
-
-%global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %global _name mlnx-ofa_kernel-modules}
 
@@ -45,7 +43,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 1%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -143,38 +141,38 @@ pushd rpm_contents
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
 
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/compat/mlx_compat.ko
-cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_cm.ko
-cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_core.ko
-cp -rf %{SOURCE4} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_ucm.ko
-cp -rf %{SOURCE5} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_umad.ko
-cp -rf %{SOURCE6} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_uverbs.ko
-cp -rf %{SOURCE7} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/iw_cm.ko
-cp -rf %{SOURCE8} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_cm.ko
-cp -rf %{SOURCE9} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_ucm.ko
-cp -rf %{SOURCE10} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/bnxt_re/bnxt_re.ko
-cp -rf %{SOURCE11} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/efa/efa.ko
-cp -rf %{SOURCE12} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx4/mlx4_ib.ko
-cp -rf %{SOURCE13} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx5/mlx5_ib.ko
-cp -rf %{SOURCE14} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/rxe/rdma_rxe.ko
-cp -rf %{SOURCE15} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/ipoib/ib_ipoib.ko
-cp -rf %{SOURCE16} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/iser/ib_iser.ko
-cp -rf %{SOURCE17} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
-cp -rf %{SOURCE18} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
-cp -rf %{SOURCE19} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
-cp -rf %{SOURCE20} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
-cp -rf %{SOURCE21} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
-cp -rf %{SOURCE22} ./lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
-cp -rf %{SOURCE23} ./lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
-cp -rf %{SOURCE24} ./lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
-cp -rf %{SOURCE25} ./lib/modules/%{KVERSION}/updates/net/smc/smc.ko
-cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
-cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
-cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
-cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
-cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
-cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
-cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
+cp -rf %{SOURCE1} ./lib/modules/%{target_kernel_version_full}/updates/compat/mlx_compat.ko
+cp -rf %{SOURCE2} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/ib_cm.ko
+cp -rf %{SOURCE3} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/ib_core.ko
+cp -rf %{SOURCE4} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/ib_ucm.ko
+cp -rf %{SOURCE5} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/ib_umad.ko
+cp -rf %{SOURCE6} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/ib_uverbs.ko
+cp -rf %{SOURCE7} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/iw_cm.ko
+cp -rf %{SOURCE8} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/rdma_cm.ko
+cp -rf %{SOURCE9} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/core/rdma_ucm.ko
+cp -rf %{SOURCE10} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/hw/bnxt_re/bnxt_re.ko
+cp -rf %{SOURCE11} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/hw/efa/efa.ko
+cp -rf %{SOURCE12} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/hw/mlx4/mlx4_ib.ko
+cp -rf %{SOURCE13} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/hw/mlx5/mlx5_ib.ko
+cp -rf %{SOURCE14} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/sw/rxe/rdma_rxe.ko
+cp -rf %{SOURCE15} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/ulp/ipoib/ib_ipoib.ko
+cp -rf %{SOURCE16} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/ulp/iser/ib_iser.ko
+cp -rf %{SOURCE17} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
+cp -rf %{SOURCE18} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
+cp -rf %{SOURCE19} ./lib/modules/%{target_kernel_version_full}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
+cp -rf %{SOURCE20} ./lib/modules/%{target_kernel_version_full}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
+cp -rf %{SOURCE21} ./lib/modules/%{target_kernel_version_full}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
+cp -rf %{SOURCE22} ./lib/modules/%{target_kernel_version_full}/updates/drivers/nvme/host/nvme-rdma.ko
+cp -rf %{SOURCE23} ./lib/modules/%{target_kernel_version_full}/updates/drivers/nvme/target/nvmet-rdma.ko
+cp -rf %{SOURCE24} ./lib/modules/%{target_kernel_version_full}/updates/net/mlxdevm/mlxdevm.ko
+cp -rf %{SOURCE25} ./lib/modules/%{target_kernel_version_full}/updates/net/smc/smc.ko
+cp -rf %{SOURCE26} ./lib/modules/%{target_kernel_version_full}/updates/net/smc/smc_diag.ko
+cp -rf %{SOURCE27} ./lib/modules/%{target_kernel_version_full}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
+cp -rf %{SOURCE28} ./lib/modules/%{target_kernel_version_full}/updates/net/sunrpc/xprtrdma/svcrdma.ko
+cp -rf %{SOURCE29} ./lib/modules/%{target_kernel_version_full}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+cp -rf %{SOURCE30} ./lib/modules/%{target_kernel_version_full}/updates/drivers/fwctl/fwctl.ko
+cp -rf %{SOURCE31} ./lib/modules/%{target_kernel_version_full}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
+cp -rf %{SOURCE32} ./lib/modules/%{target_kernel_version_full}/updates/drivers/infiniband/hw/mana/mana_ib.ko
 
 popd
 
@@ -188,18 +186,21 @@ popd
 
 
 %post -n %{_name}
-/sbin/depmod %{KVERSION}
+/sbin/depmod %{target_kernel_version_full}
 
 %postun -n %{_name}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
-	/sbin/depmod %{KVERSION}
+	/sbin/depmod %{target_kernel_version_full}
 fi
 
 %files -n %{_name}
-/lib/modules/%{KVERSION}/updates/
+/lib/modules/%{target_kernel_version_full}/updates/
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+- Tweak specs to use dynamic versioning for kernel versions.
+
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update additional kernel modules fwctl mana and mlx5_dpll included from 25.07

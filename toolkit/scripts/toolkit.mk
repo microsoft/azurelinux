@@ -25,6 +25,7 @@ rpms_snapshot_dir_name = rpms_snapshots
 rpms_snapshot_build_dir = $(BUILD_DIR)/$(rpms_snapshot_dir_name)
 rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.log
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
+rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 
 valid_arch_spec_names_build_dir = $(BUILD_DIR)/valid_arch_spec_names
 valid_arch_spec_names           = $(valid_arch_spec_names_build_dir)/valid_arch_spec_names.txt
@@ -93,12 +94,13 @@ rpms-snapshot: $(rpms_snapshot)
 $(rpms_snapshot): $(rpms_snapshot_per_specs) $(depend_SPECS_DIR)
 	cp $(rpms_snapshot_per_specs) $(rpms_snapshot)
 
-$(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR)
+$(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(rel_versions_macro_file)
 	@mkdir -p "$(rpms_snapshot_build_dir)"
 	$(go-rpmssnapshot) \
 		--input="$(SPECS_DIR)" \
 		--output="$(rpms_snapshot_per_specs)" \
 		--build-dir="$(rpms_snapshot_build_dir)" \
+		--versions-macro-file $(rel_versions_macro_file) \
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \
@@ -114,13 +116,14 @@ run-specarchchecker: $(valid_arch_spec_names)
 	@cat $(valid_arch_spec_names) && echo "" # File doesn't have a newline at the end, so add one via echo.
 	@echo "Valid arch spec names generated under '$(valid_arch_spec_names)'."
 
-$(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST)
+$(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(rel_versions_macro_file)
 	$(go-specarchchecker) \
 		--input="$(SPECS_DIR)" \
 		--output="$@" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--build-dir="$(valid_arch_spec_names_build_dir)" \
+		--versions-macro-file $(rel_versions_macro_file) \
 		$(if $(filter y,$(RUN_CHECK)),--test-only) \
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \

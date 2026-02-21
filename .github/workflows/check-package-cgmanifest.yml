@@ -51,6 +51,10 @@ jobs:
       if: ${{ env.updated-specs != '' }}
       run: sudo make -C toolkit -j$(nproc) chroot-tools REBUILD_TOOLS=y DAILY_BUILD_ID=lkg
 
+    - name: Generate the macros file with version/release info
+      if: ${{ env.updated-specs != '' }}
+      run: sudo make -C toolkit -j$(nproc) generate-versions-macros-file REBUILD_TOOLS=y DAILY_BUILD_ID=lkg
+
     - name: Check each spec
       if: ${{ env.updated-specs != '' }}
       run: .github/workflows/validate-cg-manifest.sh build/worker/worker_chroot.tar.gz ${{ env.updated-specs }}

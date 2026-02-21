@@ -58,7 +58,8 @@ type parseResult struct {
 
 // ParseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+// releaseVersionMacrosFile, if non-empty, is made available inside the chroot at the same path as on the host.
+func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar, releaseVersionMacrosFile, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -66,7 +67,7 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir)
+		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
 		if err != nil {
 			return
 		}
@@ -126,9 +127,8 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 }
 
 // createChroot creates a chroot to parse SPECs inside of.
-func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safechroot.Chroot, err error) {
+func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
 	const (
-		chrootName       = "specparser_chroot"
 		existingDir      = false
 		leaveFilesOnDisk = false
 	)
@@ -140,7 +140,10 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
-		safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	if srpmsDir != "" {
+		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""))
 	}
 
 	chrootDir := filepath.Join(buildDir, chrootName)
@@ -164,6 +167,15 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 				}
 				return
 			}
+		}
+	}
+
+	// If a release version macros file is provided, copy it into the default RPM macros directory
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
+	if releaseVersionMacrosFile != "" {
+		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+		if err != nil {
+			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}
 	}
 

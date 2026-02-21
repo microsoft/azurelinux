@@ -13,8 +13,9 @@
 # update  - Check signatures and updating any mismatches in the signatures file
 SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 
-SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
-SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
+SRPM_BUILD_CHROOT_DIR   = $(BUILD_DIR)/SRPM_packaging
+SRPM_BUILD_LOGS_DIR     = $(LOGS_DIR)/pkggen/srpms
+rel_versions_macro_file = $(PKGBUILD_DIR)/macros.releaseversions
 
 # Configure the list of packages we want to process into SRPMs
 # Strip any whitespace from user input and reasign using override so we can compare it with the empty string
@@ -77,7 +78,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(depend_SRPM_PACK_LIST) $(local_spec_sources)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(rel_versions_macro_file) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(depend_SRPM_PACK_LIST) $(local_spec_sources)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -88,6 +89,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
+		--versions-macro-file=$(rel_versions_macro_file) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \

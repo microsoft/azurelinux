@@ -37,29 +37,30 @@ const (
 )
 
 var (
-	app                  = kingpin.New("pkgworker", "A worker for building packages locally")
-	srpmFile             = exe.InputFlag(app, "Full path to the SRPM to build")
-	workDir              = app.Flag("work-dir", "The directory to create the build folder").Required().String()
-	workerTar            = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	repoFile             = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
-	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
-	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
-	toolchainDirPath     = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain a top level directory for each architecture.").Required().ExistingDir()
-	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Azure Linux Base").Required().ExistingDir()
-	basePackageName      = app.Flag("base-package-name", "The name of the spec file used to build this package without the extension.").Required().String()
-	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
-	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
-	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
-	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
-	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
-	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
-	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
-	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	ccacheRootDir        = app.Flag("ccache-root-dir", "The directory used to store ccache outputs").String()
-	ccachConfig          = app.Flag("ccache-config", "The configuration file for ccache.").String()
-	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
-	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
+	app                      = kingpin.New("pkgworker", "A worker for building packages locally")
+	srpmFile                 = exe.InputFlag(app, "Full path to the SRPM to build")
+	workDir                  = app.Flag("work-dir", "The directory to create the build folder").Required().String()
+	workerTar                = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	repoFile                 = app.Flag("repo-file", "Full path to local.repo").Required().ExistingFile()
+	rpmsDirPath              = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
+	srpmsDirPath             = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
+	toolchainDirPath         = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain a top level directory for each architecture.").Required().ExistingDir()
+	cacheDir                 = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Azure Linux Base").Required().ExistingDir()
+	basePackageName          = app.Flag("base-package-name", "The name of the spec file used to build this package without the extension.").Required().String()
+	noCleanup                = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
+	distTag                  = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	distroReleaseVersion     = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
+	distroBuildNumber        = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
+	rpmmacrosFile            = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
+	releaseVersionMacrosFile = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while building.").ExistingFile()
+	runCheck                 = app.Flag("run-check", "Run the check during package build").Bool()
+	packagesToInstall        = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
+	outArch                  = app.Flag("out-arch", "Architecture of resulting package").String()
+	useCcache                = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
+	ccacheRootDir            = app.Flag("ccache-root-dir", "The directory used to store ccache outputs").String()
+	ccachConfig              = app.Flag("ccache-config", "The configuration file for ccache.").String()
+	maxCPU                   = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	timeout                  = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
 	logFlags = exe.SetupLogFlags(app)
 )
@@ -117,7 +118,7 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *releaseVersionMacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
@@ -154,7 +155,7 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, releaseVersionMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -217,6 +218,15 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return
+	}
+
+	// If a release version macros file is provided, copy it into the default RPM macros directory
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
+	if releaseVersionMacrosFile != "" {
+		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+		if err != nil {
+			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
+		}
 	}
 	defer chroot.Close(noCleanup)
 

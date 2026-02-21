@@ -27,9 +27,12 @@
 #
 
 %if 0%{azl}
-# hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 4
+# the naming convetion is azl_<package_name>_version and azl_<package_name>_release
+# the package name will convert hyphens to underscores
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -40,8 +43,7 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name isert-hwe}
-%{!?_version: %define _version 25.07}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-4%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -67,14 +69,14 @@
 Summary:	 %{_name}-hwe Driver
 Name:		 isert-hwe
 Version:	 25.07
-Release:	 4%{release_suffix}%{?dist}
+Release:	 5%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
-Source0:         %{_distro_sources_url}/isert-%{_version}.tgz
+Source0:         %{_distro_sources_url}/isert-%{target_mlnx_ofa_kernel_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -166,7 +168,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n isert-%{_version}
+%setup -n isert-%{target_mlnx_ofa_kernel_version}
 set -- *
 mkdir source
 mv "$@" source/
@@ -251,6 +253,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.1
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4
 - Bump to match kernel-hwe.
 

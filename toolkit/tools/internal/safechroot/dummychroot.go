@@ -23,3 +23,7 @@ func (d *DummyChroot) UnsafeRun(toRun func() error) (err error) {
 func (d *DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return AddFilesToDestination(d.RootDir(), filesToCopy...)
 }
+
+func (d *DummyChroot) AddRPMMacrosFile(macrosFilePath string) error {
+	return d.AddRPMMacrosFile(macrosFilePath)
+}
