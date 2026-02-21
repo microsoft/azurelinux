@@ -17,8 +17,8 @@ const (
 	defaultFilePermissions = 0o755
 )
 
-func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFileList,
-	imageChroot *safechroot.Chroot,
+func CopyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFileList,
+	imageChroot safechroot.ChrootInterface,
 ) error {
 	for _, additionalFile := range additionalFiles {
 		logger.Log.Infof("Copying: %s", additionalFile.Destination)
