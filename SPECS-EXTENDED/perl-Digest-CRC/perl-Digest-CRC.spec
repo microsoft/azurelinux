@@ -1,6 +1,6 @@
 Name:           perl-Digest-CRC
-Version:        0.22.2
-Release:        12%{?dist}
+Version:        0.24
+Release:        1%{?dist}
 Summary:        Generic CRC functions
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -35,7 +35,7 @@ The Digest::CRC module calculates CRC sums of all sorts. It contains wrapper
 functions with the correct parameters for CRC-CCITT, CRC-16 and CRC-32.
 
 %prep
-%setup -qn Digest-CRC-0.22
+%setup -qn Digest-CRC-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" \
@@ -57,6 +57,10 @@ make test TEST_VERBOSE=1
 %{_mandir}/man3/Digest::CRC.3*
 
 %changelog
+* Tue Dec 17 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.24-1
+- Update to 0.24
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22.2-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

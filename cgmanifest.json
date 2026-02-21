@@ -17363,8 +17363,8 @@
         "type": "other",
         "other": {
           "name": "perl-Digest-CRC",
-          "version": "0.22.2",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OL/OLIMAUL/Digest-CRC-0.22.2.tar.gz"
+          "version": "0.24",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OL/OLIMAUL/Digest-CRC-0.24.tar.gz"
         }
       }
     },
