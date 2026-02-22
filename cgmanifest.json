@@ -17553,8 +17553,8 @@
         "type": "other",
         "other": {
           "name": "perl-ExtUtils-Config",
-          "version": "0.008",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-Config-0.008.tar.gz"
+          "version": "0.010",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-Config-0.010.tar.gz"
         }
       }
     },
