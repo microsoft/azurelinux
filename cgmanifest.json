@@ -31199,8 +31199,8 @@
         "type": "other",
         "other": {
           "name": "xz-java",
-          "version": "1.8",
-          "downloadUrl": "http://tukaani.org/xz/xz-java-1.8.zip"
+          "version": "1.10",
+          "downloadUrl": "https://tukaani.org/xz/xz-java-1.10.zip"
         }
       }
     },
