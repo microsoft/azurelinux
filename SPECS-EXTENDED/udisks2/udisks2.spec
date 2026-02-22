@@ -1,96 +1,121 @@
-%global glib2_version                   2.50
+%global glib2_version                   2.68
 %global gobject_introspection_version   1.30.0
 %global polkit_version                  0.102
 %global systemd_version                 208
 %global libatasmart_version             0.17
 %global dbus_version                    1.4.0
-%global with_gtk_doc                    0
-%global libblockdev_version             2.25
-%define enable_iscsi                    0
-%define with_bcache                     1
+%global with_gtk_doc                    1
+%global libblockdev_version             3.0
+
+%define enable_iscsi                    1
 %define with_btrfs                      1
-%define with_lsm                        0
-%define with_zram                       1
-%define with_lvmcache                   1
-# valid options are 'luks1' or 'luks2'
-%define default_luks_encryption         luks2
-Summary:        Disk Manager
-Name:           udisks2
-Version:        2.9.4
-Release:        6%{?dist}
-License:        GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/storaged-project/udisks
-Source0:        https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
-Patch0:         ignore-apple-boot-part.patch
-Patch1:         udisks-2.10.0-doc_annotations.patch
-BuildRequires:  make
-BuildRequires:  glib2-devel >= %{glib2_version}
-BuildRequires:  gobject-introspection-devel >= %{gobject_introspection_version}
-BuildRequires:  libgudev1-devel >= %{systemd_version}
-BuildRequires:  libatasmart-devel >= %{libatasmart_version}
-BuildRequires:  polkit-devel >= %{polkit_version}
-BuildRequires:  systemd >= %{systemd_version}
-BuildRequires:  systemd-devel >= %{systemd_version}
-BuildRequires:  libacl-devel
-BuildRequires:  chrpath
-BuildRequires:  gtk-doc
-BuildRequires:  gettext-devel
-BuildRequires:  libblockdev-devel        >= %{libblockdev_version}
-BuildRequires:  libblockdev-part-devel   >= %{libblockdev_version}
-BuildRequires:  libblockdev-loop-devel   >= %{libblockdev_version}
-BuildRequires:  libblockdev-swap-devel   >= %{libblockdev_version}
-BuildRequires:  libblockdev-mdraid-devel >= %{libblockdev_version}
-BuildRequires:  libblockdev-fs-devel     >= %{libblockdev_version}
-BuildRequires:  libblockdev-crypto-devel >= %{libblockdev_version}
-BuildRequires:  libmount-devel
-BuildRequires:  libuuid-devel
-Requires:       libblockdev        >= %{libblockdev_version}
-Requires:       libblockdev-part   >= %{libblockdev_version}
-Requires:       libblockdev-loop   >= %{libblockdev_version}
-Requires:       libblockdev-swap   >= %{libblockdev_version}
-Requires:       libblockdev-mdraid >= %{libblockdev_version}
-Requires:       libblockdev-fs     >= %{libblockdev_version}
-Requires:       libblockdev-crypto >= %{libblockdev_version}
-# Needed for the systemd-related macros used in this file
-%{?systemd_requires}
-BuildRequires:  systemd
+%define with_lsm                        1
+
+%define is_git                          %(git show > /dev/null 2>&1 && echo 1 || echo 0)
+%define git_hash                        %(git log -1 --pretty=format:"%h" || true)
+%define build_date                      %(date '+%Y%m%d')
+
+# btrfs is not available on RHEL
+%if 0%{?rhel}
+%define with_btrfs 0
+%endif
+
+Name:          udisks2
+Summary:       Disk Manager
+Version:       2.11.0
+Release:       1%{?dist}
+License:       GPL-2.0-or-later
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+URL:           https://github.com/storaged-project/udisks
+Source0:       https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
+
+
+BuildRequires: make
+BuildRequires: glib2-devel >= %{glib2_version}
+BuildRequires: gobject-introspection-devel >= %{gobject_introspection_version}
+BuildRequires: libgudev1-devel >= %{systemd_version}
+BuildRequires: libatasmart-devel >= %{libatasmart_version}
+BuildRequires: polkit-devel >= %{polkit_version}
+BuildRequires: systemd >= %{systemd_version}
+BuildRequires: systemd-devel >= %{systemd_version}
+BuildRequires: systemd-rpm-macros
+BuildRequires: libacl-devel
+BuildRequires: chrpath
+BuildRequires: gtk-doc
+BuildRequires: gettext-devel
+BuildRequires: redhat-rpm-config
+BuildRequires: libblockdev-devel        >= %{libblockdev_version}
+BuildRequires: libblockdev-part-devel   >= %{libblockdev_version}
+BuildRequires: libblockdev-loop-devel   >= %{libblockdev_version}
+BuildRequires: libblockdev-swap-devel   >= %{libblockdev_version}
+BuildRequires: libblockdev-mdraid-devel >= %{libblockdev_version}
+BuildRequires: libblockdev-fs-devel     >= %{libblockdev_version}
+BuildRequires: libblockdev-crypto-devel >= %{libblockdev_version}
+BuildRequires: libblockdev-nvme-devel   >= %{libblockdev_version}
+BuildRequires: libblockdev-smart-devel  >= %{libblockdev_version}
+
+BuildRequires: libuuid-devel
+
+Requires:      libblockdev        >= %{libblockdev_version}
+Requires:      libblockdev-part   >= %{libblockdev_version}
+Requires:      libblockdev-loop   >= %{libblockdev_version}
+Requires:      libblockdev-swap   >= %{libblockdev_version}
+Requires:      libblockdev-mdraid >= %{libblockdev_version}
+Requires:      libblockdev-fs     >= %{libblockdev_version}
+Requires:      libblockdev-crypto >= %{libblockdev_version}
+Requires:      libblockdev-nvme   >= %{libblockdev_version}
+Requires:      libblockdev-smart  >= %{libblockdev_version}
+
+Requires:      lib%{name}%{?_isa} = %{version}-%{release}
+
 # Needed to pull in the system bus daemon
-Requires:       dbus >= %{dbus_version}
+Requires:      dbus >= %{dbus_version}
 # Needed to pull in the udev daemon
-Requires:       udev >= %{systemd_version}
+Requires:      udev >= %{systemd_version}
 # We need at least this version for bugfixes/features etc.
-Requires:       libatasmart >= %{libatasmart_version}
+Requires:      libatasmart >= %{libatasmart_version}
 # For mount, umount, mkswap
-Requires:       util-linux
+Requires:      util-linux
 # For mkfs.ext3, mkfs.ext3, e2label
-Requires:       e2fsprogs
+Recommends:    e2fsprogs
 # For mkfs.xfs, xfs_admin
-Requires:       xfsprogs
+Recommends:    xfsprogs
 # For mkfs.vfat
-Requires:       dosfstools
-Requires:       gdisk
+Recommends:    dosfstools
+# For exfat
+Recommends:    exfatprogs
+# For UDF
+Recommends:    udftools
 # For ejecting removable disks
-#Requires: eject
-# For utab monitor
-Requires:       util-linux-libs
-Recommends:     polkit
-Requires:       lib%{name}%{?_isa} = %{version}-%{release}
-Requires:       ntfsprogs
-Requires:       ntfs-3g
-Provides:       storaged = %{version}-%{release}
-Obsoletes:      storaged
+Recommends:    eject
+# The actual polkit agent
+Requires:      polkit >= %{polkit_version}
+
+# For mkntfs (not available on rhel or on ppc/ppc64) and f2fs
+Recommends:    nilfs-utils
+%ifnarch ppc ppc64
+Recommends:    ntfsprogs
+%endif
+Recommends:    ntfs-3g
+
+# btrfs
+%if 0%{?with_btrfs}
+Recommends:   btrfs-progs
+%endif
+
+Provides:     storaged = %{version}-%{release}
+Obsoletes:    storaged < %{version}-%{release}
 
 %description
 The Udisks project provides a daemon, tools and libraries to access and
 manipulate disks, storage devices and technologies.
 
 %package -n lib%{name}
-Summary:        Dynamic library to access the udisksd daemon
-License:        LGPLv2+
-Provides:       libstoraged = %{version}-%{release}
-Obsoletes:      libstoraged
+Summary: Dynamic library to access the udisksd daemon
+License: LGPL-2.0-or-later
+Provides:  libstoraged = %{version}-%{release}
+Obsoletes: libstoraged < %{version}-%{release}
 
 %description -n lib%{name}
 This package contains the dynamic library, which provides
@@ -111,53 +136,38 @@ This package contains module for iSCSI configuration.
 %endif
 
 %package -n %{name}-lvm2
-Summary:        Module for LVM2
-License:        LGPLv2+
-BuildRequires:  lvm2-devel
-BuildRequires:  libblockdev-lvm-devel >= %{libblockdev_version}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       lvm2
-Requires:       libblockdev-lvm >= %{libblockdev_version}
-Provides:       storaged-lvm2 = %{version}-%{release}
-Obsoletes:      storaged-lvm2
+Summary: Module for LVM2
+Requires: %{name}%{?_isa} = %{version}-%{release}
+License: LGPL-2.0-or-later
+Requires: lvm2
+Requires: libblockdev-lvm >= %{libblockdev_version}
+BuildRequires: libblockdev-lvm-devel >= %{libblockdev_version}
+Provides:  storaged-lvm2 = %{version}-%{release}
+Obsoletes: storaged-lvm2 < %{version}-%{release}
 
 %description -n %{name}-lvm2
 This package contains module for LVM2 configuration.
 
 %package -n lib%{name}-devel
-Summary:        Development files for lib%{name}
-License:        LGPLv2+
-Requires:       lib%{name}%{?_isa} = %{version}-%{release}
-Provides:       libstoraged-devel = %{version}-%{release}
-Obsoletes:      libstoraged-devel
+Summary: Development files for lib%{name}
+Requires: lib%{name}%{?_isa} = %{version}-%{release}
+License: LGPL-2.0-or-later
+Provides:  libstoraged-devel = %{version}-%{release}
+Obsoletes: libstoraged-devel < %{version}-%{release}
 
 %description -n lib%{name}-devel
-This package contains the development files for the library lib%{name}, a
-dynamic library, which provides access to the udisksd daemon.
-
-%if 0%{?with_bcache}
-%package -n %{name}-bcache
-Summary:        Module for Bcache
-License:        LGPLv2+
-BuildRequires:  libblockdev-kbd-devel >= %{libblockdev_version}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libblockdev-kbd >= %{libblockdev_version}
-Provides:       storaged-bcache = %{version}-%{release}
-Obsoletes:      storaged-bcache
-
-%description -n %{name}-bcache
-This package contains module for Bcache configuration.
-%endif
+This package contains the development files for the library lib%{name},
+a dynamic library, which provides access to the udisksd daemon.
 
 %if 0%{?with_btrfs}
 %package -n %{name}-btrfs
-Summary:        Module for BTRFS
-License:        LGPLv2+
-BuildRequires:  libblockdev-btrfs-devel >= %{libblockdev_version}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libblockdev-btrfs >= %{libblockdev_version}
-Provides:       storaged-btrfs = %{version}-%{release}
-Obsoletes:      storaged-btrfs
+Summary: Module for BTRFS
+Requires: %{name}%{?_isa} = %{version}-%{release}
+License: LGPL-2.0-or-later
+Requires: libblockdev-btrfs >= %{libblockdev_version}
+BuildRequires: libblockdev-btrfs-devel >= %{libblockdev_version}
+Provides:  storaged-btrfs = %{version}-%{release}
+Obsoletes: storaged-btrfs < %{version}-%{release}
 
 %description -n %{name}-btrfs
 This package contains module for BTRFS configuration.
@@ -165,65 +175,40 @@ This package contains module for BTRFS configuration.
 
 %if 0%{?with_lsm}
 %package -n %{name}-lsm
-Summary:        Module for LSM
-License:        LGPLv2+
-BuildRequires:  libstoragemgmt-devel
-BuildRequires:  libconfig-devel
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libstoragemgmt
-Provides:       storaged-lsm = %{version}-%{release}
-Obsoletes:      storaged-lsm
+Summary: Module for LSM
+Requires: %{name}%{?_isa} = %{version}-%{release}
+License: LGPL-2.0-or-later
+Requires: libstoragemgmt
+BuildRequires: libstoragemgmt-devel
+BuildRequires: libconfig-devel
+Provides:  storaged-lsm = %{version}-%{release}
+Obsoletes: storaged-lsm < %{version}-%{release}
 
 %description -n %{name}-lsm
 This package contains module for LSM configuration.
 %endif
 
-%if 0%{?with_zram}
-%package -n %{name}-zram
-Summary:        Module for ZRAM
-License:        LGPLv2+
-BuildRequires:  libblockdev-kbd-devel >= %{libblockdev_version}
-BuildRequires:  libblockdev-swap-devel
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libblockdev-kbd >= %{libblockdev_version}
-Requires:       libblockdev-swap >= %{libblockdev_version}
-Provides:       storaged-zram = %{version}-%{release}
-Obsoletes:      storaged-zram
-
-%description -n %{name}-zram
-This package contains module for ZRAM configuration.
-%endif
-
 %prep
 %autosetup -p1 -n udisks-%{version}
-sed -i udisks/udisks2.conf.in -e "s/encryption=luks1/encryption=%{default_luks_encryption}/"
 rm -f src/tests/dbus-tests/config_h.py
+rm -f src/udisks-daemon-resources.{c,h}
+# default to ntfs-3g (#2182206)
+sed -i data/builtin_mount_options.conf -e 's/ntfs_drivers=ntfs3,ntfs/ntfs_drivers=ntfs,ntfs3/'
 
 %build
-autoreconf -ivf
+# autoreconf -ivf
 # modules need to be explicitly enabled
 %configure            \
 %if %{with_gtk_doc}
     --enable-gtk-doc  \
 %else
     --disable-gtk-doc \
-    --disable-man \
-%endif
-%if 0%{?with_bcache}
-    --enable-bcache   \
 %endif
 %if 0%{?with_btrfs}
     --enable-btrfs    \
 %endif
-    --disable-vdo      \
-%if 0%{?with_zram}
-    --enable-zram     \
-%endif
 %if 0%{?with_lsm}
     --enable-lsm      \
-%endif
-%if 0%{?with_lvmcache}
-    --enable-lvmcache \
 %endif
     --enable-lvm2     \
 %if 0%{?enable_iscsi}
@@ -231,13 +216,16 @@ autoreconf -ivf
 %else
     --disable-iscsi
 %endif
-%make_build
+make %{?_smp_mflags}
 
 %install
-%make_install
+make install DESTDIR=%{buildroot}
 %if %{with_gtk_doc} == 0
 rm -fr %{buildroot}/%{_datadir}/gtk-doc/html/udisks2
 %endif
+
+# not created if lsm is disabled
+mkdir -p %{buildroot}%{_sysconfdir}/udisks2/modules.conf.d
 
 find %{buildroot} -name \*.la -o -name \*.a | xargs rm
 
@@ -264,21 +252,6 @@ fi
 
 %ldconfig_scriptlets -n lib%{name}
 
-%if 0%{?with_zram}
-%post -n %{name}-zram
-%systemd_post udisks2-zram-setup@.service
-if [ -S /run/udev/control ]; then
-    udevadm control --reload
-    udevadm trigger
-fi
-
-%preun -n %{name}-zram
-%systemd_preun udisks2-zram-setup@.service
-
-%postun -n %{name}-zram
-%systemd_postun udisks2-zram-setup@.service
-%endif
-
 %files -f udisks2.lang
 %doc README.md AUTHORS NEWS HACKING
 %license COPYING
@@ -289,6 +262,7 @@ fi
 
 %{_datadir}/dbus-1/system.d/org.freedesktop.UDisks2.conf
 %{_datadir}/bash-completion/completions/udisksctl
+%{_datadir}/zsh/site-functions/_udisks2
 %{_tmpfilesdir}/%{name}.conf
 %{_unitdir}/udisks2.service
 %{_udevrulesdir}/80-udisks2.rules
@@ -300,13 +274,13 @@ fi
 %{_libexecdir}/udisks2/udisksd
 
 %{_bindir}/udisksctl
-%if 0%{?with_gtk_doc}
+
 %{_mandir}/man1/udisksctl.1*
 %{_mandir}/man5/udisks2.conf.5*
 %{_mandir}/man8/udisksd.8*
 %{_mandir}/man8/udisks.8*
 %{_mandir}/man8/umount.udisks2.8*
-%endif
+
 %{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.policy
 %{_datadir}/dbus-1/system-services/org.freedesktop.UDisks2.service
 
@@ -343,23 +317,11 @@ fi
 %if 0%{?enable_iscsi}
 %{_libdir}/pkgconfig/udisks2-iscsi.pc
 %endif
-%if 0%{?with_bcache}
-%{_libdir}/pkgconfig/udisks2-bcache.pc
-%endif
 %if 0%{?with_btrfs}
 %{_libdir}/pkgconfig/udisks2-btrfs.pc
 %endif
 %if 0%{?with_lsm}
 %{_libdir}/pkgconfig/udisks2-lsm.pc
-%endif
-%if 0%{?with_zram}
-%{_libdir}/pkgconfig/udisks2-zram.pc
-%endif
-
-%if 0%{?with_bcache}
-%files -n %{name}-bcache
-%{_libdir}/udisks2/modules/libudisks2_bcache.so
-%{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.bcache.policy
 %endif
 
 %if 0%{?with_btrfs}
@@ -372,25 +334,15 @@ fi
 %files -n %{name}-lsm
 %dir %{_sysconfdir}/udisks2/modules.conf.d
 %{_libdir}/udisks2/modules/libudisks2_lsm.so
-%if 0%{?with_gtk_doc}
 %{_mandir}/man5/udisks2_lsm.conf.*
-%endif
 %{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.lsm.policy
 %attr(0600,root,root) %{_sysconfdir}/udisks2/modules.conf.d/udisks2_lsm.conf
 %endif
 
-%if 0%{?with_zram}
-%files -n %{name}-zram
-%if 0%{?with_lsm}
-%dir %{_sysconfdir}/udisks2/modules.conf.d
-%endif
-%{_libdir}/udisks2/modules/libudisks2_zram.so
-%{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.zram.policy
-%{_unitdir}/udisks2-zram-setup@.service
-%{_udevrulesdir}/90-udisks2-zram.rules
-%endif
-
 %changelog
+* Mon Dec 22 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.11.0-1
+- Upgrade to version 2.11.0
+
 * Fri Feb 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.9.4-6
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Disable sub-packages iSCSI, LSM, docs and manpage
@@ -625,3 +577,5 @@ fi
 
 * Sun Jan 12 2014 Patrick Uiterwijk <puiterwijk@redhat.com> - 0.1.0-1
 - Rename from udisks2-lvm
+
+
