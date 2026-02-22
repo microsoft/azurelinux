@@ -1,5 +1,6 @@
 augeas
 ca-certificates
+edk2-ovmf
 iptables
 kubevirt-container-disk
 kubevirt-virt-launcher
