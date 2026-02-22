@@ -1,4 +1,4 @@
-+[distros.azurelinux]
+[distros.azurelinux]
 description = "Azure Linux"
 default-version = "4.0"
 
