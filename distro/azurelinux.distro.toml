@@ -12,6 +12,6 @@ mock-config-aarch64 = "mock/azurelinux-4.0-aarch64.cfg"
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" } }
 
 [distros.azurelinux.versions.'4.0'.default-component-config.build.defines]
-dist = ".azl4-02212026"
+dist = ".azl402212026"
 vendor = "Microsoft Corporation"
 distribution = "Azure Linux"
