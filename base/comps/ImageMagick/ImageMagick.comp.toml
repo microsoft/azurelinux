@@ -1,0 +1,5 @@
+[components.ImageMagick]
+
+# skip dependency on libuhdr
+[components.ImageMagick.build]
+defines = { "fedora" = "0" }
