@@ -3167,8 +3167,8 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                 "update-ssh-keys",
-                "python-nocaselist"
+                "python-nocaselist",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {
