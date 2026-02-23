@@ -3167,7 +3167,10 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "coreos-cloudinit",
+                "coreos-init",
+                "python-nocaselist",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {
