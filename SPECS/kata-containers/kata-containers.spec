@@ -14,6 +14,7 @@ Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
 Patch2:         CVE-2026-24834.patch
 Patch3:         CVE-2026-25727.patch
+Patch4:         CVE-2026-25541.patch
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
@@ -115,7 +116,7 @@ popd
 
 %changelog
 * Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
-- Patch CVE-2026-24834 and CVE-2026-25727
+- Patch CVE-2026-24834, CVE-2026-25727 and CVE-2026-25541
 
 * Thu Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
