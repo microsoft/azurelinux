@@ -53,7 +53,6 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
-
 * Mon Feb 23 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 3.0.1-2
 - Fix ptest regression on Azure Linux 3.0 by replacing deprecated unittest
   assertEquals() with assertEqual() in python-daemon tests (TASK 16234)
