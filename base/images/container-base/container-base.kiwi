@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
-<image schemaversion="8.3" name="azl4-container-base">
+<image schemaversion="8.3" name="azl4-vm-base">
     <description type="system">
         <author>Azure Linux</author>
         <contact>user@example.com</contact>
-        <specification>Azure Linux Container Image Example</specification>
+        <specification>Azure Linux VM Image Example</specification>
     </description>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
-        <type image="docker">
-            <containerconfig
-                name="microsoft/azurelinux/base/core"
-                tag="4.0"
-                additionalnames=":latest"
-                user="root"
-                workingdir="/">
-                <subcommand execute="/bin/bash"/>
-            </containerconfig>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhdx"
+            initrd_system="dracut"
+            filesystem="ext4"
+            kernelcmdline="console=ttyS0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200">
+            <bootloader name="systemd_boot" timeout="0" />
+            <size unit="G">4</size>
+            <initrd action="setup">
+                <dracut uefi="true"/>
+            </initrd>
         </type>
     </preferences>
 
@@ -28,14 +39,99 @@
 
     <packages type="image">
         <!-- Core group -->
-        <package name="basesystem" />
+        <package name="azurelinux-release" />
+        <package name="azurelinux-rpm-config" />
+        <package name="azurelinux-repos" />
         <package name="bash" />
-        <package name="system-release" />
+        <package name="ca-certificates" />
+        <package name="coreutils" />
+
+        <!-- Minimal group -->
+        <package name="acl" />
+        <package name="attr" />
+        <package name="audit" />
+        <package name="bash-completion" />
+        <package name="bc" />
+        <package name="binutils" />
+        <package name="bind-utils" />
+        <package name="brotli" />
+        <package name="bzip2" />
+        <package name="chkconfig" />
+        <package name="chrony" />
+        <package name="cloud-init" />
+        <package name="cloud-utils-growpart" />
+        <package name="cracklib-dicts" />
+        <package name="cronie" />
+        <package name="cryptsetup" />
+        <package name="cyrus-sasl" />
+        <package name="device-mapper-event" />
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+        <package name="dracut-kiwi-oem-repart" />
+        <package name="elfutils" />
+        <package name="elfutils-default-yama-scope" />
+        <package name="file" />
+        <package name="firewalld" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="grub2" />
+        <package name="grubby" />
+        <package name="gzip" />
+        <package name="hostname" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="kernel" />
+        <package name="kernel-tools" />
+        <package name="lvm2" />
+        <package name="lz4" />
+        <package name="man-db" />
+        <package name="nano" />
+        <package name="ncurses-term" />
+        <package name="net-tools" />
+        <package name="nftables" />
+        <package name="openssh-clients" />
+        <package name="openssh-server" />
+        <package name="rsync" />
+        <package name="rsyslog" />
+        <package name="selinux-policy-targeted" />
+        <package name="setup" />
+        <package name="shadow-utils" />
+        <package name="shadow-utils-subid" />
+        <package name="sudo" />
+        <package name="systemd" />
+        <package name="systemd-boot" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-rpm-macros" />
+        <package name="tar" />
+        <package name="tpm2-tss" />
+        <package name="unzip" />
+        <package name="util-linux" />
+        <package name="vim-minimal" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="zchunk" />
+        <package name="zlib" />
+
+        <!-- Azure-specific packages -->
+        <package name="WALinuxAgent" />
+        <package name="azure-vm-utils" />
+        <package name="hyperv-daemons" />
+        <package name="kernel-modules" />
     </packages>
 
     <packages type="bootstrap">
-        <package name="basesystem" />
+        <package name="dracut-network" />
         <package name="filesystem" />
-        <package name="system-release" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="grub2-efi-x64" />
+        <package name="shim" arch="x86_64" />
     </packages>
+
+    <!--
+    <users>
+        <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
+    </users>
+    -->
 </image>
