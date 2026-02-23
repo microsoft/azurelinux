@@ -68,12 +68,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package provides extra utilities based on the librsvg library.
 
 %prep
-%autosetup -n librsvg-%{version} -p1 -Sgit
+%autosetup -N -n librsvg-%{version} -Sgit
 
 # Do vendor expansion here manually by
 # calling `tar xf` and setting up .cargo/config to use it.
 tar -xf %{SOURCE1} --no-same-owner
 mkdir -p .cargo
+
+patch -p1 < %{_sourcedir}/CVE-2026-25727.patch
 
 cat >.cargo/config << EOF
 [source.crates-io]
