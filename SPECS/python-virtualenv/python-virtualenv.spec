@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz
 Patch0:         0001-replace-to-flit.patch
+Patch1000:      CVE-2025-50181.patch
 BuildArch:      noarch
 
 %description
@@ -20,6 +21,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
+BuildRequires:  zip
 
 %if 0%{?with_check}
 BuildRequires:  python3-pip
@@ -37,7 +39,40 @@ Provides:       %{name}-doc = %{version}-%{release}
 virtualenv is a tool to create isolated Python environment.
 
 %prep
-%autosetup -p1 -n virtualenv-%{version}
+# Adding -N to enable manual patching, needed for CVE-2025-50181
+%autosetup -p1 -n virtualenv-%{version} -N
+%patch0 -p1
+
+# Manual patching for CVE-2025-50181
+# This patch is needed to fix the issue with urllib3 poolmanager.py
+# The poolmanager.py file is located in 4 different places and each is of different version so the same patch cannot be applied to all of them.
+# For the poolmanager.py under src, it is archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
+# For the poolmanager.py under tests, it is archived inside a .whl file, which in turn is archived inside another .whl file,
+# so, we need to unpack the outer .whl, then unpack the inner .whl, apply the patch, and then re-zip both levels.
+
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
+mkdir -p unpacked_pip-25.0.1-py3-none-any
+unzip src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl -d unpacked_pip-25.0.1-py3-none-any
+patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1000}
+# Remove the original file
+rm -f src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl
+# After patching, re-zip the contents back into a .whl
+pushd unpacked_pip-25.0.1-py3-none-any
+zip -r ../src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl *
+popd
+rm -rf unpacked_pip-25.0.1-py3-none-any
+
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
+mkdir -p unpacked_pip-25.3-py3-none-any
+unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip-25.3-py3-none-any
+patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1000}
+# Remove the original file
+rm -f src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl
+# After patching, re-zip the contents back into a .whl
+pushd unpacked_pip-25.3-py3-none-any
+zip -r ../src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl *
+popd
+rm -rf unpacked_pip-25.3-py3-none-any
 
 %generate_buildrequires
 
