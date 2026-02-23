@@ -8362,7 +8362,7 @@
         "other": {
           "name": "kernel-uvm",
           "version": "6.6.96.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.6.96.mshv1.tar.gz"
         }
       }
     },
