@@ -13,6 +13,7 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
 Patch2:         CVE-2026-24834.patch
+Patch3:         CVE-2026-25727.patch
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
@@ -41,10 +42,7 @@ Summary:        Kata Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE1}
-popd
+%autosetup -p1 -n %{name}-%{version} -a 1
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -117,7 +115,7 @@ popd
 
 %changelog
 * Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
-- Patch CVE-2026-24834
+- Patch CVE-2026-24834 and CVE-2026-25727
 
 * Thu Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
