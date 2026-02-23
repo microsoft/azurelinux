@@ -41,7 +41,7 @@ virtualenv is a tool to create isolated Python environment.
 %prep
 # Adding -N to enable manual patching, needed for CVE-2025-50181
 %autosetup -p1 -n virtualenv-%{version} -N
-%patch0 -p1
+%patch -P 0 -p1
 
 # Manual patching for CVE-2025-50181
 # This patch is needed to fix the issue with urllib3 poolmanager.py
