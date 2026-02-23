@@ -107,7 +107,7 @@ These are the additional language files of libsoup.
     -Dntlm=disabled \
     -Ddoc_tests=false \
     -Ddocs=disabled \
-    -Dtests=ture
+    -Dtests=true
 %meson_build
 
 %install
