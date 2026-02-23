@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: libart_lgpl
 Version: 2.3.21
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: Library of graphics routines used by libgnomecanvas
 URL: http://www.gnome.org/
 Source0: http://download.gnome.org/sources/libart_lgpl/2.3/%{name}-%{version}.tar.bz2
@@ -63,8 +63,8 @@ EOF
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS NEWS README
-%license COPYING
+%doc AUTHORS README
+%license COPYING NEWS
 %{_libdir}/lib*.so.*
 
 %files devel
@@ -74,6 +74,10 @@ EOF
 %{_includedir}/*
 
 %changelog
+* Tue Dec 30 2025 Aninda Pradhan <v-anindap@microsoft.com> - 2.3.21-25
+- Fixed license warning by removing NEWS file from doc directory
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.21-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
