@@ -22,6 +22,7 @@ auto-approved.
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import urllib.error
@@ -259,6 +260,8 @@ def distgit_search(
     valid_modes = ("pickaxe", "grep", "log-grep")
     if mode not in valid_modes:
         return f"ERROR: mode must be one of {valid_modes}, got {mode!r}"
+    if not query:
+        return "ERROR: query must not be empty."
     if ref != "--all" and ref.startswith("-"):
         return f"ERROR: ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."
 
@@ -283,7 +286,7 @@ def distgit_search(
             return "ERROR: --all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."
         cmd = [
             "git", "--git-dir", git_dir, "grep",
-            "-n", "-i", query, ref, "--",
+            "-n", "-i", "-e", query, ref, "--",
         ]
     elif mode == "log-grep":
         ref_args = ["--all"] if ref == "--all" else [ref]
@@ -342,6 +345,11 @@ def distgit_show(
         commit: Commit hash (full or abbreviated)
         auto_clean: Auto-evict oldest cached repo if cache is full.
     """
+    # Validate commit is a hex SHA (prevents argument injection when commit
+    # appears before "--" in the arg list)
+    if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
+        return "ERROR: commit must be a hex SHA hash (4-40 chars)."
+
     repo_dir, err = _ensure_repo(package, auto_clean)
     if err:
         return err
@@ -350,7 +358,7 @@ def distgit_show(
 
     try:
         result = subprocess.run(
-            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", "--", commit],
+            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
             capture_output=True, text=True, timeout=30,
         )
     except subprocess.TimeoutExpired:

@@ -35,7 +35,7 @@ The input file (`${input:results_file}`) is a JSON object with this structure:
 
 Key fields:
 - `buildTasks[].taskStatus` — `"Failed"` or `"Completed"`
-  - NOTE: Do not filter on this, individual tasks may have "failed" even when the overall status is "Completed". Use `kojiTaskStatus` for triage.
+  - NOTE: Some builds may have overall status "Completed" while individual tasks failed, or vice versa. Use the OR of both `taskStatus` and `kojiTaskStatus` to catch all failure modes.
 - `buildTasks[].kojiInfo.kojiTaskStatus` — more detailed status. Filter to `"Failed"` for triage.
 - `buildTasks[].kojiInfo.kojiTaskNumber` — the Koji task ID (use with `${input:koji_url}` to construct URLs)
 - `buildTasks[].kojiInfo.componentName` — package name
