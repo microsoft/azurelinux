@@ -13,7 +13,7 @@ This repo includes [GitHub Copilot](https://docs.github.com/en/copilot) prompt f
 
 If the workspace is opened correctly, the agent will automatically gain access to the relevant instructions.
 
-> You may need to ensure [⚙️chat.useAgentSkills](vscode://settings?id:chat.useAgentSkills) is enabled in your VSCode settings for skills to work properly.
+> You may need to ensure [⚙️chat.useAgentSkills](vscode://settings/chat.useAgentSkills) is enabled in your VSCode settings for skills to work properly.
 
 ### Prerequisites
 
