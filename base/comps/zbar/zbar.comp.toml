@@ -1,0 +1,34 @@
+[components.zbar]
+
+# Since GLib 2.80, gobject-introspection tools (g-ir-scanner) were merged into
+# glib2 but the legacy tools still live in a separate package. The zbar configure
+# script autodetects g-ir-scanner and won't generate typelibs without it, but the
+# spec never explicitly BuildRequires it — it only worked by accident through
+# transitive deps. Fedora dropped the GIR file listings in rawhide (release 10).
+# We do the same: remove the typelib/gir entries from %files so the build doesn't
+# fail when g-ir-scanner isn't present.
+# Ref: https://src.fedoraproject.org/rpms/zbar/c/a1e97927fd862a8ca777462155b54c4ee4176923 ("Fix FTBFS")
+
+[[components.zbar.overlays]]
+description = "Remove ZBar typelib directory from zbar-gtk %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+type = "spec-search-replace"
+regex = '%dir %\{_libdir\}/girepository-1\.0'
+replacement = ""
+
+[[components.zbar.overlays]]
+description = "Remove ZBar typelib from zbar-gtk %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+type = "spec-search-replace"
+regex = '%\{_libdir\}/girepository-1\.0/ZBar-1\.0\.typelib'
+replacement = ""
+
+[[components.zbar.overlays]]
+description = "Remove ZBar .gir directory from zbar-gtk-devel %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+type = "spec-search-replace"
+regex = '%dir %\{_datadir\}/gir-1\.0'
+replacement = ""
+
+[[components.zbar.overlays]]
+description = "Remove ZBar .gir file from zbar-gtk-devel %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+type = "spec-search-replace"
+regex = '%\{_datadir\}/gir-1\.0/ZBar-1\.0\.gir'
+replacement = ""
