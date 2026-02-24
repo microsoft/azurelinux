@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,6 +89,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.4.0-3
+- test
+
 * Tue Mar 21 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
 - Add correct version for libgpg-error-devel as a BR
 
