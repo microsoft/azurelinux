@@ -1,6 +1,6 @@
 ---
-name: azl-fix-overlay
-description: "Diagnose and fix overlay issues in Azure Linux components. Use when overlays fail to apply, produce unexpected results, or need debugging. Triggers: overlay error, fix overlay, overlay not applying, spec-search-replace failed, overlay debug."
+name: skill-fix-overlay
+description: "[Skill] Diagnose and fix overlay issues in Azure Linux components. Use when overlays fail to apply, produce unexpected results, or need debugging. Triggers: overlay error, fix overlay, overlay not applying, spec-search-replace failed, overlay debug."
 ---
 
 # Fix an Overlay
@@ -9,15 +9,13 @@ description: "Diagnose and fix overlay issues in Azure Linux components. Use whe
 
 ### 1. Reproduce and inspect
 
-> Use a temp dir for `prep-sources` output. Clean before each run with `rm -rf` since `prep-sources` fails on non-empty dirs (no `--force` flag).
+> Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
 
 ```bash
-# Clean scratch dirs before each run (prep-sources fails on non-empty dirs)
-rm -rf my/build/dir/<name>-pre my/build/dir/<name>-post
-azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
+azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
 diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
 ```
 
@@ -62,6 +60,6 @@ For overlay type reference (all 12 types with key fields), see [`comp-toml.instr
 
 - **Test incrementally.** Apply one overlay at a time and verify with `prep-sources`. Debugging 10 overlays at once is painful.
 - **Minimize overlays.** Each is a potential failure point. Prefer the smallest delta from upstream.
-- **Verify in chroot.** If overlays apply but the build still fails, use [`azl-mock`](../azl-mock/SKILL.md) to inspect the build environment.
-- **Follow the inner loop.** The full cycle is: investigate → modify → verify → build → test → inspect. See [`azl-build-component`](../azl-build-component/SKILL.md) for details.
-- **Smoke-test after fixing overlays.** A clean apply and successful build don't guarantee working RPMs. See [`azl-mock`](../azl-mock/SKILL.md).
+- **Verify in chroot.** If overlays apply but the build still fails, use [`skill-mock`](../skill-mock/SKILL.md) to inspect the build environment.
+- **Follow the inner loop.** The full cycle is: investigate → modify → verify → build → test → inspect. See [`skill-build-component`](../skill-build-component/SKILL.md) for details.
+- **Smoke-test after fixing overlays.** A clean apply and successful build don't guarantee working RPMs. See [`skill-mock`](../skill-mock/SKILL.md).

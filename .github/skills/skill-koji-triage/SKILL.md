@@ -1,6 +1,6 @@
 ---
-name: azl-koji-triage
-description: "Examine Koji builds, fetch task info and logs from the Koji Web UI, identify failures, and provide root cause analysis. Use when triaging Koji build failures, investigating failed tasks, downloading build logs, or searching for broken packages. Triggers: koji failure, koji build failed, koji task, koji log, koji triage, build failure analysis."
+name: skill-koji-triage
+description: "[Skill] Examine Koji builds, fetch task info and logs from the Koji Web UI, identify failures, and provide root cause analysis. Use when triaging Koji build failures, investigating failed tasks, downloading build logs, or searching for broken packages. Triggers: koji failure, koji build failed, koji task, koji log, koji triage, build failure analysis."
 ---
 
 # Koji Build Failure Triage

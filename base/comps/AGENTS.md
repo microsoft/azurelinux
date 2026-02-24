@@ -9,7 +9,7 @@
 
 ## Skills
 
-- Adding a new component → [`azl-add-component`](../../.github/skills/azl-add-component/SKILL.md)
-- Fixing overlay issues → [`azl-fix-overlay`](../../.github/skills/azl-fix-overlay/SKILL.md)
-- Building and debugging → [`azl-build-component`](../../.github/skills/azl-build-component/SKILL.md)
-- Testing in mock chroot → [`azl-mock`](../../.github/skills/azl-mock/SKILL.md)
+- Adding a new component → [`skill-add-component`](../../.github/skills/skill-add-component/SKILL.md)
+- Fixing overlay issues → [`skill-fix-overlay`](../../.github/skills/skill-fix-overlay/SKILL.md)
+- Building and debugging → [`skill-build-component`](../../.github/skills/skill-build-component/SKILL.md)
+- Testing in mock chroot → [`skill-mock`](../../.github/skills/skill-mock/SKILL.md)

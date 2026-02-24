@@ -4,6 +4,8 @@ Azure Linux is a TOML-defined Linux distribution that imports RPM specs from ups
 
 One of the core tenets of this project is **minimal necessary divergence** from upstream. Overlays should be surgical and only change what's needed to meet Azure Linux requirements. Upstream packages should be preferred over bespoke components, and local specs should be a last resort. This keeps maintenance overhead low and makes it easier to pull in new versions and security updates from upstream.
 
+While AZL derives from Fedora, it is also an enterprise focused distro which tries to align with RHEL where it makes sense. At times this can cause conflicts in spec files that normally expect the Fedora and RHEL macros to be mutually exclusive. Use your best judgement when navigating these conflicts, but in general the guiding principle should be to minimize divergence from Fedora while still producing a stable enterprise distro suitable for use in the Azure cloud. If a spec file has complex conditional logic to handle differences between Fedora and RHEL, consult with the user to understand the rationale and determine the best path forward for AZL.
+
 ## Repository Layout
 
 ```

@@ -1,6 +1,6 @@
 ---
-name: azl-add-component
-description: "Add a new component to Azure Linux. Use when importing packages from Fedora, creating comp.toml files, choosing inline vs dedicated definitions, or setting up a new component with overlays. Triggers: add component, new package, import from fedora, create comp.toml."
+name: skill-add-component
+description: "[Skill] Add a new component to Azure Linux. Use when importing packages from Fedora, creating comp.toml files, choosing inline vs dedicated definitions, or setting up a new component with overlays. Triggers: add component, new package, import from fedora, create comp.toml."
 ---
 
 # Add a Component
@@ -17,7 +17,7 @@ azldev comp list -p <name> -q -O json
 The fastest way to see what you're working with:
 
 1. Add a bare inline entry in `components.toml`: `[components.<name>]`
-2. Pull the spec: `rm -rf my/build/dir/<name> && azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name> -q`
+2. Pull the spec: `azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name> -q`
 3. Read the spec, plan your overlays
 4. Decide if overlays are required, if so: Remove the inline entry, create a dedicated `<name>/<name>.comp.toml`
 
@@ -68,19 +68,17 @@ Overlays are vastly preferable to maintaining a forked spec, they get automatic 
 
 ## Validate
 
-> Use a temp dir for `prep-sources` output. Clean before each run with `rm -rf` since `prep-sources` fails on non-empty dirs (no `--force` flag).
+> Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
 
 ```bash
-# Clean scratch dirs before each run (prep-sources fails on non-empty dirs)
-rm -rf my/build/dir/<name>-pre my/build/dir/<name>-post
-azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> -o my/build/dir/<name>-post -q
+azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
 diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
 
 # Test build (RPMs land in base/out/ per project.toml output-dir)
 azldev comp build -p <name> -q
 ```
 
-For testing the built RPMs, see the [`azl-mock`](../azl-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → verify → build → test → inspect), see [`azl-build-component`](../azl-build-component/SKILL.md).
+For testing the built RPMs, see the [`skill-mock`](../skill-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → verify → build → test → inspect), see [`skill-build-component`](../skill-build-component/SKILL.md).

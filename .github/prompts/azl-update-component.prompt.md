@@ -6,7 +6,7 @@ description: "Update an existing Azure Linux component (version bump, dependency
 
 Update **${input:component_name}** — target version: **${input:new_version:target version}**, update type: **${input:update_type:version|dependency|overlay|config}**.
 
-Use structural patterns from [comp-toml.instructions.md](../instructions/comp-toml.instructions.md). If overlays break, follow the [azl-fix-overlay skill](../skills/azl-fix-overlay/SKILL.md). Test changes using the [azl-build-component skill](../skills/azl-build-component/SKILL.md).
+Use structural patterns from [comp-toml.instructions.md](../instructions/comp-toml.instructions.md). If overlays break, follow the [skill-fix-overlay skill](../skills/skill-fix-overlay/SKILL.md). Test changes using the [skill-build-component skill](../skills/skill-build-component/SKILL.md).
 
 ## Workflow
 
@@ -23,7 +23,7 @@ Use structural patterns from [comp-toml.instructions.md](../instructions/comp-to
    post=$(mktemp -d) && azldev comp prep-sources -p ${input:component_name} -o "$post"
    diff -r "$pre" "$post"
    ```
-   If overlays fail, follow the [azl-fix-overlay skill](../skills/azl-fix-overlay/SKILL.md).
+   If overlays fail, follow the [skill-fix-overlay skill](../skills/skill-fix-overlay/SKILL.md).
 5. **Migrate to dedicated file** if the component is still inline and now needs customization (use `/azl-migrate-component`)
 6. **Build and test:** `azldev comp build -p ${input:component_name}`
 7. **Smoke-test** the built RPMs in a mock chroot

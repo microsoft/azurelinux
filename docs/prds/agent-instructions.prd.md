@@ -338,7 +338,7 @@ When in doubt, recommend the user review the upstream changelog before proceedin
 - **Build Output Directories** table mapping `project.toml` keys (`output-dir`, `log-dir`, `work-dir`) → resolved paths (`base/out/`, `base/build/logs/`, `base/build/work/`). Note that `prep-sources -o <dir>` output is separate from these.
 - Build sequence: single build, chained builds with `--local-repo-with-publish`, rebuild against local repo
 - **Dev Inner Loop** as a formal table: investigate → compare → modify → verify → build → inspect
-  - Use a temp dir for prep-sources output dirs — clean with `rm -rf` before each run (no `--force` flag)
+  - Use a temp dir for prep-sources output dirs — use `--force` to overwrite an existing output dir
 - How to preserve build state on failure for inspection (`--preserve-buildenv`)
 - Entering the mock shell environment for interactive debugging (cross-ref to `azl-mock`)
 - Warning about `-p` flag meaning in `mock shell` vs `comp build` (different semantics)

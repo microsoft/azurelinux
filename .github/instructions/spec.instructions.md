@@ -8,7 +8,7 @@ applyTo: "**/*.spec"
 
 Most components import specs from upstream (Fedora) via `*.comp.toml` — hand-coded specs are only for **Azure Linux-originating packages** that don't exist upstream (e.g., `azurelinux-release`, `azurelinux-repos`).
 
-If the package exists upstream, **prefer overlays** over maintaining a forked spec. Overlays get automatic upstream updates and are more resilient to changes. See the `azl-add-component` skill for the decision tree.
+If the package exists upstream, **prefer overlays** over maintaining a forked spec. Overlays get automatic upstream updates and are more resilient to changes. See the `skill-add-component` skill for the decision tree.
 
 ## Relationship to `.comp.toml`
 
@@ -25,7 +25,7 @@ The spec file lives alongside the `.comp.toml` in the component's directory (`ba
 
 Specs in `prep-sources` output directories are **generated output** — they may have overlays applied. Don't edit them directly. To change an upstream spec, modify the overlays in the `.comp.toml` instead.
 
-To see the upstream spec before overlays: `rm -rf my/build/dir/<name> && azldev comp prep-sources -p <name> --skip-overlays -o my/build/dir/<name> -q`
+To see the upstream spec before overlays: `azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name> -q`
 
 ## Azure Linux conventions
 
@@ -37,4 +37,4 @@ To see the upstream spec before overlays: `rm -rf my/build/dir/<name> && azldev 
 
 ## Debugging a spec
 
-If overlays produce an incorrect spec, use `prep-sources` to compare before/after. See skills `azl-fix-overlay` and `azl-build-component` for step-by-step workflows.
+If overlays produce an incorrect spec, use `prep-sources` to compare before/after. See skills `skill-fix-overlay` and `skill-build-component` for step-by-step workflows.

@@ -6,7 +6,7 @@ description: "Add a new component to Azure Linux"
 
 Add the component **${input:component_name}** to the **${input:project:base}** project, sourcing from **${input:source_distro:fedora}**.
 
-Follow the workflow in the [azl-add-component skill](../skills/azl-add-component/SKILL.md) and use the structural patterns from [comp-toml.instructions.md](../instructions/comp-toml.instructions.md).
+Follow the workflow in the [skill-add-component skill](../skills/skill-add-component/SKILL.md) and use the structural patterns from [comp-toml.instructions.md](../instructions/comp-toml.instructions.md).
 
 ## Workflow
 
