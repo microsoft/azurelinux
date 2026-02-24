@@ -14,6 +14,7 @@ config_opts['plugin_conf']['ccache_enable'] = True
 config_opts['cleanup_on_success'] = False
 config_opts['cleanup_on_failure'] = False
 
+config_opts['macros']['%dist'] = '.azl4'
 config_opts['dist'] = 'azl4'
 config_opts['extra_chroot_dirs'] = ['/run/lock']
 config_opts['releasever'] = '43'
