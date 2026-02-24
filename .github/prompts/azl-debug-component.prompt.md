@@ -38,4 +38,4 @@ If `prep-sources` itself fails, the issue is overlay-related (category 1). If it
 
 ## Fix
 
-**IF** a request has been made to fix the issue, attempt a fix. Before declaring success, ensure the fix actually resolves the issue by running tests. Also, queue a sub-agent and tell it use use the `skill-review-component` skill to review the fix and confirm it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeate as needed).
+**IF** a request has been made to fix the issue, attempt a fix. Before declaring success, ensure the fix actually resolves the issue by running tests. Also, queue a sub-agent and tell it to use the `skill-review-component` skill to review the fix and confirm it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeat as needed).

@@ -23,7 +23,6 @@ from typing import Optional
 from urllib.parse import urlparse
 
 from _mcp_utils import (
-    INLINE_THRESHOLD_BYTES,
     FastMCP,
     check_ssrf,
     load_env,

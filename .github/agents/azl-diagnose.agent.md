@@ -8,7 +8,7 @@ disable-model-invocation: false
 handoffs:
   - label: Attempt to diagnose and fix the issue
     agent: azl-diagnose
-    prompt: Follow the directions in [the debug workflow](../prompts/azl-debug-component.prompt.md) to fix the issue. Ensure a review agent runs before declaring the fix ready, to ensure it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeate as needed).
+    prompt: Follow the directions in [the debug workflow](../prompts/azl-debug-component.prompt.md) to fix the issue. Ensure a review agent runs before declaring the fix ready, to ensure it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeat as needed).
     send: true
   - label: Ask follow-up questions
     agent: azl-diagnose

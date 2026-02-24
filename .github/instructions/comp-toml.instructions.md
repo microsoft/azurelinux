@@ -162,7 +162,6 @@ description = "Fix build failure due to missing dependency that was added in my-
 ...
 ```
 
-
 ## Validation
 
 Verify overlays apply cleanly with `azldev comp prep-sources` before committing. See skills `skill-build-component` and `skill-fix-overlay` for step-by-step workflows.

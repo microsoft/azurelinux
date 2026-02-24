@@ -67,13 +67,13 @@ If the failure count is small (≤5), you can skip batching and put everything i
 
 5. Configure the koji MCP tools for the sub-agents (e.g., set base URL, allow insecure if needed) - do this once in the orchestrator before spawning sub-agents, and they will inherit the configuration.
 
-5. For each batch, spawn a sub-agent using `runSubagent`. **Launch sub-agents in parallel if the platform supports it, BUT limit to 10 parallel agents in each batch to avoid rate limiting** (i.e., put multiple `runSubagent` calls in the same tool-call block). Each sub-agent receives:
+6. For each batch, spawn a sub-agent using `runSubagent`. **Launch sub-agents in parallel if the platform supports it, BUT limit to 10 parallel agents in each batch to avoid rate limiting** (i.e., put multiple `runSubagent` calls in the same tool-call block). Each sub-agent receives:
    - The Koji base URL (`${input:koji_url}`)
    - The path to its batch file
    - The output directory path
    - The diagnostic instructions as a .md file (see Phase 1 Sub-Agent Prompt below)
-6. Each sub-agent writes one JSON file per build to the triage directory: `base/build/work/scratch/triage/<taskID>.json`
-7. After all sub-agents complete, verify that a JSON file exists for each failed build. Re-run any missing ones.
+7. Each sub-agent writes one JSON file per build to the triage directory: `base/build/work/scratch/triage/<taskID>.json`
+8. After all sub-agents complete, verify that a JSON file exists for each failed build. Re-run any missing ones.
 
 ### Phase 2 — Bucketize & Summarize (single pass)
 
@@ -154,8 +154,8 @@ Follow the "Investigation Workflow" section from the skill file. Then:
 
 ## Rules
 - Do not call 'koji_cleanup' - There may be multiple sub-agents working in parallel, and they should not delete each other's files. The orchestrator will handle cleanup after all sub-agents complete.
-- If a task has no downloadable logs (e.g., plugin error in Result field only), note that in rootCause.
-- If you can't determine the failure, set failureCategory to "unknown" and explain in rootCause.
+- If a task has no downloadable logs (e.g., plugin error in Result field only), note that in shortSummary.
+- If you can't determine the failure, set failureCategory to "unknown" and explain in shortSummary.
 - Return a brief summary of findings when done (which tasks succeeded/failed diagnosis).
 - Do not edit or modify any files outside of your assigned output JSON file. If you need additional files or configuration, inform the orchestrator.
 ```

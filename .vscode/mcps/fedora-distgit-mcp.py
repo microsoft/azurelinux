@@ -29,15 +29,18 @@ import urllib.request
 from typing import Optional
 
 from _mcp_utils import (
-    INLINE_THRESHOLD_BYTES,
     FastMCP,
     check_ssrf,
+    load_env,
     validate_base_url,
     validate_package_name,
     write_output,
 )
 
 mcp = FastMCP("fedora-distgit")
+
+# Load .env config — may set AZLDEV_WORK_DIR etc.
+load_env()
 
 _DEFAULT_BASE_URL = "https://src.fedoraproject.org"
 _base_url: str = _DEFAULT_BASE_URL
@@ -256,12 +259,14 @@ def distgit_search(
     valid_modes = ("pickaxe", "grep", "log-grep")
     if mode not in valid_modes:
         return f"ERROR: mode must be one of {valid_modes}, got {mode!r}"
+    if ref != "--all" and ref.startswith("-"):
+        return f"ERROR: ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."
 
     repo_dir, err = _ensure_repo(package, auto_clean)
     if err:
         return err
 
-    git_dir = os.path.join(repo_dir, ".git")
+    git_dir = _git_dir(package)
 
     # Build the git command
     if mode == "pickaxe":
@@ -341,11 +346,11 @@ def distgit_show(
     if err:
         return err
 
-    git_dir = os.path.join(repo_dir, ".git")
+    git_dir = _git_dir(package)
 
     try:
         result = subprocess.run(
-            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit],
+            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", "--", commit],
             capture_output=True, text=True, timeout=30,
         )
     except subprocess.TimeoutExpired:

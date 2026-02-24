@@ -42,8 +42,8 @@ def load_env(env_path: str | Path | None = None) -> None:
 
     Searches for the .env file in this order:
       1. Explicit ``env_path`` argument
-      2. ``../../.env`` relative workspace root
-      3. ``../../.env`` workspace root
+      2. ``.env`` in the current working directory
+      3. ``.env`` in the workspace root (two dirs up from this source file)
       4. ``.vscode/mcps/.env`` relative to the working directory
       5. ``.vscode/mcps/.env`` next to this source file
 
