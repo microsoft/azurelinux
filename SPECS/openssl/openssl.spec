@@ -162,51 +162,17 @@ export HASHBANGPERL=%{_bindir}/perl
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
 
 # See https://wiki.openssl.org/index.php/Compilation_and_Installation for configure options
+Patch44:        CVE-2024-5535.patch
+Patch45:        openssl-1.1.1-Fix-timing-side-channel-in-ECDSA-signature-computation.patch
+Patch46:        openssl-1.1.1-fix-incorrect-check-of-unwrapped-key-size.patch
+Patch47:        openssl-1.1.1-ensure-ASN1-types-are-checked-before-use.patch
+Patch48:        openssl-1.1.1-fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
+Patch49:        openssl-1.1.1-fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencrypted.patch
+Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
+Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
 
-# NOTE: the 'no-<prot>-method' switches are not used by design. The changes inside 'Patch2'
-#       make sure that protocols disabled through 'no-<prot>' will still be unaccessible.
-#       This is a workaround until OpenSSL issue #7048 is officially resolved.
-#       Issue link: https://github.com/openssl/openssl/issues/7048.
-#       For more details please read the comment inside the patch.
-./config \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
-    shared \
-    no-aria \
-    enable-bf \
-    no-blake2 \
-    enable-camellia \
-    no-capieng \
-    enable-cast \
-    no-chacha \
-    enable-cms \
-    no-comp \
-    enable-ct \
-    enable-deprecated \
-    enable-des \
-    enable-dh \
-    enable-dsa \
-    no-dtls1 \
-    no-ec2m \
-    enable-ec_nistp_64_gcc_128 \
-    enable-ecdh \
-    enable-ecdsa \
-    no-gost \
-    no-idea \
-    no-mdc2 \
-    no-md2 \
-    enable-md4 \
-    no-poly1305 \
-    enable-rc2 \
-    enable-rc4 \
-    enable-rc5 \
-    no-rfc3779 \
-    enable-rmd160 \
-    no-sctp \
-    no-seed \
-    no-siphash \
-    no-sm2 \
-    no-sm3 \
-    no-sm4 \
+BuildRequires:  perl-Test-Warnings
+BuildRequires:  perl-Text-Template
     no-ssl \
     no-ssl3 \
     no-weak-ssl-ciphers \
