@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,10 @@ URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz
 Patch0:         0001-replace-to-flit.patch
 Patch1000:      CVE-2025-50181.patch
+Patch1001:      CVE-2026-1703v0.patch
+Patch1002:      CVE-2026-1703v1.patch
+Patch1003:      CVE-2026-24049v0.patch
+Patch1004:      CVE-2026-24049v1.patch
 BuildArch:      noarch
 
 %description
@@ -54,6 +58,8 @@ echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-
 mkdir -p unpacked_pip-25.0.1-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl -d unpacked_pip-25.0.1-py3-none-any
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1000}
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/utils/unpacking.py"
+patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1001}
 # Remove the original file
 rm -f src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl
 # After patching, re-zip the contents back into a .whl
@@ -66,13 +72,44 @@ echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-
 mkdir -p unpacked_pip-25.3-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip-25.3-py3-none-any
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1000}
-# Remove the original file
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/utils/unpacking.py"
+patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1002}
 rm -f src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl
-# After patching, re-zip the contents back into a .whl
 pushd unpacked_pip-25.3-py3-none-any
 zip -r ../src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl *
 popd
 rm -rf unpacked_pip-25.3-py3-none-any
+
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl/setuptools/_vendor/wheel/cli/unpack.py"
+mkdir -p unpacked_setuptools-75.3.2-py3-none-any
+unzip src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl -d unpacked_setuptools-75.3.2-py3-none-any
+patch -p1 -d unpacked_setuptools-75.3.2-py3-none-any < %{PATCH1003}
+rm -f src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl
+pushd unpacked_setuptools-75.3.2-py3-none-any
+zip -r ../src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl *
+popd
+rm -rf unpacked_setuptools-75.3.2-py3-none-any
+
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl/setuptools/_vendor/wheel/cli/unpack.py"
+mkdir -p unpacked_setuptools-80.9.0-py3-none-any
+unzip src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl -d unpacked_setuptools-80.9.0-py3-none-any
+patch -p1 -d unpacked_setuptools-80.9.0-py3-none-any < %{PATCH1003}
+rm -f src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl
+pushd unpacked_setuptools-80.9.0-py3-none-any
+zip -r ../src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl *
+popd
+rm -rf unpacked_setuptools-80.9.0-py3-none-any
+
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.whl/wheel/cli/unpack.py"
+mkdir -p unpacked_wheel-0.45.1-py3-none-any
+unzip src/virtualenv/seed/wheels/embed/wheel-0.45.1-py3-none-any.whl -d unpacked_wheel-0.45.1-py3-none-any
+patch -p1 -d unpacked_wheel-0.45.1-py3-none-any < %{PATCH1004}
+rm -f src/virtualenv/seed/wheels/embed/wheel-0.45.1-py3-none-any.whl
+pushd unpacked_wheel-0.45.1-py3-none-any
+zip -r ../src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.whl *
+popd
+rm -rf unpacked_wheel-0.45.1-py3-none-any
+
 
 %generate_buildrequires
 
@@ -95,6 +132,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Feb 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 20.36.1-2
+- Patch for CVE-2025-50181, CVE-2026-24049 and CVE-2026-1703
+
 * Wed Jan 14 2026 Archana Shettigar <v-shettigara@microsoft.com> - 20.36.1-1
 - Upgrade to 20.36.1 for CVE-2026-22702
 
