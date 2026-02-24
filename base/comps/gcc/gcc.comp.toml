@@ -1,0 +1,53 @@
+[components.gcc]
+
+# Our version of GCC will not support many of the language frontends Fedora
+# supports. We also do not want GPU offload either. Dropping support makes the
+# builds faster and leaner. The overlays below express those choices.
+
+[[components.gcc.overlays]]
+description = "Disable Ada language support by setting build_ada to 0 everywhere"
+type = "spec-search-replace"
+regex = '%global build_ada 1'
+replacement = '%global build_ada 0'
+
+[[components.gcc.overlays]]
+description = "Disable Objective-C language support"
+type = "spec-search-replace"
+regex = '%global build_objc 1'
+replacement = '%global build_objc 0'
+
+[[components.gcc.overlays]]
+description = "Disable Go language support"
+type = "spec-search-replace"
+regex = '%global build_go 1'
+replacement = '%global build_go 0'
+
+[[components.gcc.overlays]]
+description = "Disable D language support"
+type = "spec-search-replace"
+regex = '%global build_d 1'
+replacement = '%global build_d 0'
+
+[[components.gcc.overlays]]
+description = "Disable Modula-2 language support"
+type = "spec-search-replace"
+regex = '%global build_m2 1'
+replacement = '%global build_m2 0'
+
+[[components.gcc.overlays]]
+description = "Disable Cobol language support"
+type = "spec-search-replace"
+regex = '%global build_cobol 1'
+replacement = '%global build_cobol 0'
+
+[[components.gcc.overlays]]
+description = "Disable NVPTX offload support"
+type = "spec-search-replace"
+regex = '%global build_offload_nvptx 1'
+replacement = '%global build_offload_nvptx 0'
+
+[[components.gcc.overlays]]
+description = "Disable AMDGCN offload support"
+type = "spec-search-replace"
+regex = '%global build_offload_amdgcn 1'
+replacement = '%global build_offload_amdgcn 0'
