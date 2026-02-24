@@ -160,6 +160,7 @@ trap clean_up EXIT SIGINT SIGTERM
 prepare_chroot_environment "$1" "$2" "$WORK_DIR"
 
 shift # Remove the first argument (the chroot archive) from the list of specs to check.
+shift # Remove the second argument (the macros.releaseversions file) from the list of specs to check.
 echo "Checking $# specs."
 
 i=0
