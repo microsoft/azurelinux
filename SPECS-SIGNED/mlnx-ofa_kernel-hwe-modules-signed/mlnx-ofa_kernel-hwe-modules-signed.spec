@@ -32,7 +32,7 @@
 
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 4
+%global target_kernel_release 5
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -46,7 +46,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 4%{release_suffix}%{?dist}
+Release:	 5%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -237,6 +237,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 25.07-5_6.12.57.1.5
+- Bump release to match kernel-hwe
+
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4
 - Bump to match kernel-hwe.
 

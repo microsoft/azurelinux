@@ -29,7 +29,7 @@
 
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 4
+%global target_kernel_release 5
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -44,7 +44,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 %{_name}-signed
 Version:	 1.1.4.90mlnx3
-Release:	 28%{release_suffix}%{?dist}
+Release:	 29%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -110,6 +110,9 @@ fi
 /lib/modules/
 
 %changelog
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-29_6.12.57.1.5
+- Bump release to match kernel-hwe
+
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-28_6.12.57.1.4
 - Bump to match kernel-hwe.
 
