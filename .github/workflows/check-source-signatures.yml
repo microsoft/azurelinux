@@ -81,6 +81,8 @@ jobs:
 
           sudo make -C toolkit -j$(nproc) chroot-tools REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
 
+          # Generate the macros.releaseversions file that is needed by the signature check.
+          # The file contains versions and releases of all packages under SPECS folder.
           sudo make -C toolkit -j$(nproc) generate-versions-macros-file REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
 
       - name: Check for invalid source signatures
@@ -92,7 +94,7 @@ jobs:
 
           MACROS_RELEASEVERSIONS_PATH=$(find . -type f -path "*/build/pkg_artifacts/macros.releaseversions" -print -quit)
           if [ -z "$MACROS_RELEASEVERSIONS_PATH" ]; then
-            echo "build/pkg_artifacts/macros.releaseversions not found."
+            echo "macros.releaseversions was not found under */build/pkg_artifacts path."
             exit 1
           fi
 
