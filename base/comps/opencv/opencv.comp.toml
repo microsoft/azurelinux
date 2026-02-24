@@ -1,0 +1,18 @@
+[components.opencv]
+
+# CVE-2025-53644 patch targets bundled 3rdparty/openjpeg, which Fedora's spec
+# deletes during %prep (it uses system openjpeg2-devel instead). The patch
+# can't find the file and fails. Remove both the patch declaration and its
+# application. The CVE fix belongs in the system openjpeg package, not here.
+# Upstream Fedora offending commit: https://src.fedoraproject.org/rpms/opencv/c/f7431cf
+
+[[components.opencv.overlays]]
+description = "Remove CVE-2025-53644 patch — targets bundled openjpeg that is deleted in %prep; fix belongs in system openjpeg package"
+type = "patch-remove"
+file = "**/a39db41390de546d18962ee1278bd6dbb715f466.patch"
+
+[[components.opencv.overlays]]
+description = "Remove application of CVE-2025-53644 patch (see above)"
+type = "spec-search-replace"
+regex = '%patch.*cve2025-53644'
+replacement = ""
