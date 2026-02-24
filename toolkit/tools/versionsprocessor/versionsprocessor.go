@@ -76,14 +76,17 @@ func main() {
 		}
 	}
 
-	if *workerTar != "" {
-		const leaveFilesOnDisk = false
-		chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
-		if err != nil {
-			return
-		}
-		defer chroot.Close(leaveFilesOnDisk)
+	if *workerTar == "" {
+		logger.Log.Error("No worker tar provided, parsing specs in host environment. This may cause issues if the host environment is different from the target build environment.")
+		return
 	}
+
+	const leaveFilesOnDisk = false
+	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
+	if err != nil {
+		return
+	}
+	defer chroot.Close(leaveFilesOnDisk)
 
 	doParse := func() error {
 		// Find all spec files
@@ -114,31 +117,11 @@ func main() {
 
 			for _, packageVersionString := range packages {
 
-				// the output of the above query is in the format of "packagename: version-release",
-				// so split by ": " to get the version-release portion we want the second part
-				releaseVerSplit := regexp.MustCompile(`^[^:]+: (.+)-(.+)$`).FindStringSubmatch(packageVersionString)[1:]
-
-				if len(releaseVerSplit) != 2 {
-					logger.Log.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
+				macros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
+				if err != nil {
+					logger.Log.Errorf("Error processing package version string: %s", err)
 					continue
 				}
-
-				version := releaseVerSplit[0]
-				release := releaseVerSplit[1]
-				releaseClean := strings.Replace(release, *distTag, "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
-
-				// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
-				specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
-				specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
-
-				versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
-				releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
-
-				// Generate RPM macro definitions instead of modifying spec files directly.
-				macros := fmt.Sprintf("%%%s %s\n%%%s %s",
-					versionMacroString, version,
-					releaseMacroString, releaseClean,
-				)
 
 				macrosOutput = append(macrosOutput, macros)
 			}
@@ -153,8 +136,44 @@ func main() {
 		err = doParse()
 	}
 
+	writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
+}
+
+func processPackageVersionString(packageVersionString string, specFileName string, prefix string) (macros string, err error) {
+	// the output of the above query is in the format of "packagename: version-release",
+	// so split by ": " to get the version-release portion we want the second part
+	releaseVerSplit := regexp.MustCompile(`^[^:]+: (.+)-(.+)$`).FindStringSubmatch(packageVersionString)[1:]
+
+	if len(releaseVerSplit) != 2 {
+		err = fmt.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
+		logger.Log.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
+
+		return "", err
+	}
+
+	version := releaseVerSplit[0]
+	release := releaseVerSplit[1]
+	releaseClean := strings.Replace(release, *distTag, "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
+
+	// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
+	specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
+	specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
+
+	versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
+	releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
+
+	// Generate RPM macro definitions instead of modifying spec files directly.
+	macros = fmt.Sprintf("%%%s %s\n%%%s %s",
+		versionMacroString, version,
+		releaseMacroString, releaseClean,
+	)
+
+	return macros, nil
+}
+
+func writeExtraFilesToOutput(extraFiles []string, macrosOutput []string, output string) (err error) {
 	// If extra files were provided, append their contents to the output as well.
-	for _, extraPath := range *extraFiles {
+	for _, extraPath := range extraFiles {
 		if strings.TrimSpace(extraPath) == "" {
 			continue
 		}
@@ -166,12 +185,14 @@ func main() {
 		}
 
 		macrosOutput = append(macrosOutput, contents)
-		logger.Log.Infof("Appended contents of provided extra macros file (%s) to %s", extraPath, *output)
+		logger.Log.Infof("Appended contents of provided extra macros file (%s) to %s", extraPath, output)
 	}
 
-	err = file.WriteLines(macrosOutput, *output)
+	err = file.WriteLines(macrosOutput, output)
 	if err != nil {
-		logger.Log.Errorf("Failed to write file (%s)", *output)
-		return
+		logger.Log.Errorf("Failed to write file (%s)", output)
+		return err
 	}
+
+	return nil
 }
