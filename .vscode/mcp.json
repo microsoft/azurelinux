@@ -6,6 +6,13 @@
       "args": [
         ".vscode/mcps/koji-mcp.py"
       ]
+    },
+    "fedora-distgit": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        ".vscode/mcps/fedora-distgit-mcp.py"
+      ]
     }
   }
 }

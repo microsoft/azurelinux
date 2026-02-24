@@ -13,7 +13,18 @@ This repo includes [GitHub Copilot](https://docs.github.com/en/copilot) prompt f
 
 If the workspace is opened correctly, the agent will automatically gain access to the relevant instructions.
 
-> You may need to ensure [⚙️chat.useAgentSkills](vscode://settings?id:chat.useAgentSkills) is enabled in your VSCode settings for skills to work properly.
+> You may need to ensure [⚙️chat.useAgentSkills](vscode://settings/chat.useAgentSkills) is enabled in your VSCode settings for skills to work properly.
+
+### Prerequisites
+
+The `azl-diagnose` agent and Koji-related tools require:
+
+1. **MCP Python packages** — the MCP servers won't start without them:
+   ```bash
+   pip3 install --user -r .vscode/mcps/requirements.txt
+   ```
+2. **Network access to the internal Koji instance** — The internal Koji is only accessible via VPN or the corporate network. If the agent reports connection errors, verify you are connected before retrying.
+3. **(Optional) `.env` configuration** — Create a `.env` file (in the workspace root or `.vscode/mcps/`) to pre-configure MCP server settings like the Koji base URL and pre-approved insecure URLs. This avoids the agent having to set the URL or approve self-signed certificates every session. See [.vscode/mcps/.env.example](.vscode/mcps/.env.example) for available variables.
 
 Ask Copilot about any aspect of the project — it can reference the instructions and skills to provide detailed, actionable answers or perform tasks. For example:
 
@@ -25,6 +36,7 @@ In VSCode, there are specialized prompts for common tasks. They can be accessed 
 
 | Prompt | What it does |
 |--------|--------------|
+| **`azl-diagnose`** | **Diagnose a build failure using a Koji task ID, URL, or package name. Great starting point for any build issue.** |
 | `azl-add-component` | Import a package from Fedora — overlays, build & test. |
 | `azl-update-component` | Version bump, dependency change, or overlay edit. |
 | `azl-debug-component` | Triage build failures, overlay errors, or packaging issues. |
@@ -37,10 +49,10 @@ In addition to prompts, the repo includes **chat agents** that can be selected f
 
 | Agent | What it does |
 |-------|--------------|
-| `koji-query` | Triage Koji build failures — fetch task info/logs, identify root cause, and suggest next steps. Give it a task ID, URL, or package name. |
+| `azl-diagnose` | Diagnose build failures — fetch task info/logs, identify root cause, and suggest fixes. Give it a task ID, URL, or package name. |
 | `spec-review` | Review spec files against packaging best practices and produce a structured findings report. |
 
-Example: select **koji-query** from the dropdown, then type:
+Example: select **azl-diagnose** from the dropdown, then type:
 
 ```markdown
 > what is the status of the lolcat package
@@ -71,5 +83,5 @@ Note: `copilot` supports fully autonomous operation (no interactive mode) with `
 Copilot CLI also supports agents, use `/agent` to select one, or start the CLI with a specific agent:
 
 ```bash
-copilot --add-dir . --agent koji-query
+copilot --add-dir . --agent azl-diagnose
 ```

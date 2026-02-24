@@ -1,6 +1,6 @@
 ---
-name: azl-review-component
-description: "Review an Azure Linux component definition for hygiene and best practices. Use when reviewing comp.toml files, checking overlay quality, validating file organization, or auditing component definitions. Triggers: review component, check hygiene, audit component, validate comp.toml, component review. NOTE: This skill is a work-in-progress — the checklist below covers basics but the full review workflow is still being refined."
+name: skill-review-component
+description: "[Skill] Review an Azure Linux component definition for hygiene and best practices. Use when reviewing comp.toml files, checking overlay quality, validating file organization, or auditing component definitions. Triggers: review component, check hygiene, audit component, validate comp.toml, component review. NOTE: This skill is a work-in-progress — the checklist below covers basics but the full review workflow is still being refined."
 ---
 
 # Review a Component
@@ -29,6 +29,7 @@ azldev comp query -p <name> -q -O json
 
 - Every overlay MUST have a `description` field explaining *why* the change is needed
 - Prefer targeted overlay types (`spec-set-tag`, `spec-add-tag`) over regex (`spec-search-replace`) where possible
+  - Regex overlays should be a last resort and must be carefully reviewed for correctness and potential unintended matches. Almost always prefer more specific overlay types that target the exact change needed, rather than broad regex patterns that could match multiple unintended places in the spec on future updates etc.
 - No multi-line regex patterns (unsupported)
 - Use TOML literal strings (`'...'`) for regex to avoid escaping issues
 - No unnecessary overlays — if upstream already provides what's needed, don't overlay it
@@ -62,3 +63,7 @@ Produce a structured report grouped by severity:
 - **Errors:** Must-fix issues (missing overlay descriptions, broken patterns)
 - **Warnings:** Should-fix issues (suboptimal overlay types, naming mismatches)
 - **Info:** Suggestions and best practices
+
+## Scope of Changes
+
+If the review includes a subset of the file (i.e., git diff), focus on that subset but also consider the overall context to ensure changes fit well with the existing structure and conventions. Offer actionable recommendations for any issues with the changes, but also consider if there are broader improvements that could be made to the component definition as a whole. The goal should be to minimize changes while maximizing maintainability and adherence to best practices. This is a balance - if the proposed change aligns with the existing structure and conventions, it's likely better to keep it as-is even if it's not perfect, rather than suggesting a large refactor that may introduce new issues or require additional testing. However, if the fix would be fairly small and would improve the overall quality and maintainability of the component, it's worth suggesting. Use your judgement to weigh the benefits of the change against the potential risks and effort involved in both making the changes, testing them, and getting final review sign-off from the maintainers (who will likely prefer smaller, incremental improvements over large refactors, especially if the current structure is already reasonably good and the proposed change is more of a "nice to have" than a "must have").

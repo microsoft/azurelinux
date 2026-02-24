@@ -1,6 +1,6 @@
 ---
-name: azl-koji-triage
-description: "Examine Koji builds, fetch task info and logs from the Koji Web UI, identify failures, and provide root cause analysis. Use when triaging Koji build failures, investigating failed tasks, downloading build logs, or searching for broken packages. Triggers: koji failure, koji build failed, koji task, koji log, koji triage, build failure analysis."
+name: skill-koji-triage
+description: "[Skill] Examine Koji builds, fetch task info and logs from the Koji Web UI, identify failures, and provide root cause analysis. Use when triaging Koji build failures, investigating failed tasks, downloading build logs, or searching for broken packages. Triggers: koji failure, koji build failed, koji task, koji log, koji triage, build failure analysis."
 ---
 
 # Koji Build Failure Triage
@@ -117,6 +117,8 @@ koji_fetch(path="/koji/taskinfo?taskID=87474")
 ```
 
 ## Investigation Workflow
+
+> **Branch mismatch warning:** The branch checked out locally may not correspond to the code that Koji built. If the local component definition, spec, or overlays don't seem to match what the build logs show, check which branch/commit Koji used (visible in the task info page or `checkout.log`) and compare with the current local branch (`git branch --show-current` / `git log --oneline -1`). Use non-destructive git commands to inspect the Koji branch without modifying the working tree — e.g., `git show <koji-ref>:<path>` to read files, `git diff HEAD..<koji-ref> -- <path>` to compare. Avoid `git checkout` to switch branches, as the user may have uncommitted work.
 
 ### 1. Get Task Info
 
