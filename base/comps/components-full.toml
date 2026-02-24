@@ -2956,7 +2956,6 @@
 [components.xcb-util-renderutil]
 [components.xcb-util-wm]
 [components.xclip]
-[components.xclock]
 [components.xdg-dbus-proxy]
 [components.xdg-user-dirs]
 [components.xdg-utils]
