@@ -2872,6 +2872,9 @@
 [components.python-cligj]
 [components.python-cloudpickle]
 [components.python-cmd2]
+# Required by python-jaraco-context: coherent.licensed is listed in its
+# pyproject.toml build-system.requires (Koji task 158990).
+[components.python-coherent-licensed]
 [components.python-coincidence]
 [components.python-coloredlogs]
 [components.python-colorlog]
@@ -3016,7 +3019,6 @@
 [components.python-itsdangerous]
 [components.python-jaraco-classes]
 [components.python-jaraco-collections]
-[components.python-jaraco-context]
 [components.python-jaraco-envs]
 [components.python-jaraco-functools]
 [components.python-jaraco-packaging]
