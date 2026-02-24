@@ -1,7 +1,7 @@
 
 %if 0%{azl}
-%global target_azl_build_kernel_version %azl_kernel_hwe_version
-%global target_kernel_release %azl_kernel_hwe_release
+%global target_azl_build_kernel_version %azl_kernel_version
+%global target_kernel_release %azl_kernel_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
