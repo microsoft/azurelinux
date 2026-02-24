@@ -110,13 +110,13 @@ cd testsuite
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
-* Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.35.0-17
-- Patch for CVE-2026-26157
 * Thu Feb 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.35.0-18
 - Bump to rebuild with updated glibc
+
+* Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.35.0-17
+- Patch for CVE-2026-26157
+
 * Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.35.0-16
-- Bump to rebuild with updated glibc
-* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.35.0-15
 - Bump to rebuild with updated glibc
 
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.35.0-15
