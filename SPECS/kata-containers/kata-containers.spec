@@ -16,6 +16,7 @@ Patch2:         CVE-2026-24834.patch
 Patch3:         CVE-2026-25727.patch
 Patch4:         CVE-2026-25541.patch
 Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -116,7 +117,7 @@ popd
 
 %changelog
 * Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
-- Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541 and CVE-2025-65637
+- Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
 
 * Thu Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
