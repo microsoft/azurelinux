@@ -3357,7 +3357,6 @@
 [components.slirp4netns]
 [components.snappy]
 [components.snowball]
-[components.socat]
 [components.socket_wrapper]
 [components.softhsm]
 [components.sombok]
