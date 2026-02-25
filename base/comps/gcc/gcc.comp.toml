@@ -1,11 +1,12 @@
 [components.gcc]
 
-# Our version of GCC will not support many of the language frontends Fedora
-# supports. We also do not want GPU offload either. Dropping support makes the
-# builds faster and leaner. The overlays below express those choices.
+# Our build of GCC does not support many of the language frontends Fedora
+# supports. We also do not want GPU offload to be done by GCC. It is better done
+# via libraries like CUDA. Dropping support for these features make the build
+# faster. The overlays below implement those choices.
 
 [[components.gcc.overlays]]
-description = "Disable Ada language support by setting build_ada to 0 everywhere"
+description = "Disable Ada language support"
 type = "spec-search-replace"
 regex = '%global build_ada 1'
 replacement = '%global build_ada 0'
