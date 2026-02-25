@@ -29796,8 +29796,8 @@
         "type": "other",
         "other": {
           "name": "update-ssh-keys",
-          "version": "0.7.0",
-          "downloadUrl": "https://github.com/flatcar/update-ssh-keys/archive/refs/tags/v0.7.0.tar.gz"
+          "version": "0.3.0",
+          "downloadUrl": "https://github.com/flatcar/update-ssh-keys/archive/be3ce2acc50313a6826c578e9dbb67e17085d60d.tar.gz"
         }
       }
     },
