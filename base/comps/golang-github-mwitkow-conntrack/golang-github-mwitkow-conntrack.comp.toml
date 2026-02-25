@@ -11,5 +11,7 @@
 description = "Remove listener_test.go and dialer_test.go due to race condition in ListenerTestSuite"
 type = "spec-append-lines"
 section = "%prep"
-lines = ["# Remove ListenerTestSuite tests - flaky due to race condition (no sleep after conn.Close())", "rm -f listener_test.go dialer_test.go"]
-
+lines = [
+    "# Remove ListenerTestSuite tests - flaky due to race condition (no sleep after conn.Close())",
+    "rm -f listener_test.go dialer_test.go",
+]
