@@ -101,11 +101,12 @@ patch -p1 < %{PATCH5}
 patch -p1 < %{PATCH7}
 
 pushd python_x86_64-unknown-linux-gnu/lib/python3.12/email/
-%patch 8 -p1
 patch -p1 < %{PATCH6}
 popd
 
 popd
+
+patch -p1 < %{PATCH8}
 
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
