@@ -75,8 +75,8 @@ replacement = "RPM_VENDOR=azurelinux"
 |------|------|------------|
 | `spec-add-tag` | Add a new tag; **fails if already exists** | `tag`, `value` |
 | `spec-insert-tag` | Insert tag after the last tag of the same family (e.g., `Source9999` after last `Source*`); falls back to after last tag of any kind | `tag`, `value` |
-| `spec-set-tag` | Set tag value; replaces if exists, adds if not | `tag`, `value` |
-| `spec-update-tag` | Update existing tag; **fails if tag doesn't exist** | `tag`, `value` |
+| `spec-set-tag` | Set tag value; replaces entire value if exists, adds if not | `tag`, `value` |
+| `spec-update-tag` | Replace value of existing tag; **fails if tag doesn't exist** | `tag`, `value` |
 | `spec-remove-tag` | Remove a tag; **fails if tag doesn't exist** | `tag`, optionally `value` to match |
 | `spec-prepend-lines` | Insert at start of section body | `section`, `lines` |
 | `spec-append-lines` | Insert at end of section body | `section`, `lines` |

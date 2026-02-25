@@ -25,7 +25,7 @@ The spec file lives alongside the `.comp.toml` in the component's directory (`ba
 
 Specs in `prep-sources` output directories are **generated output** — they may have overlays applied. Don't edit them directly. To change an upstream spec, modify the overlays in the `.comp.toml` instead.
 
-To see the upstream spec before overlays: `azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name> -q`
+To see the upstream spec before overlays: `azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name> -q`
 
 ## Azure Linux conventions
 

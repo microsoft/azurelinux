@@ -30,8 +30,8 @@ First, determine the error category:
 **When in doubt**, start with a `prep-sources` pre/post diff to determine if the issue is overlay-related:
 
 ```bash
-azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre
-azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post
+azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre --force
+azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post --force
 diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post
 ```
 

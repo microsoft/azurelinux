@@ -54,10 +54,10 @@ investigate → modify → verify → build → test → inspect
 
 | Step | Command | What to check |
 |------|---------|---------------|
-| **Investigate** | `prep-sources --skip-overlays -o my/build/dir/<name>-pre` | Upstream spec/sources as-is |
-| **Compare** | `prep-sources -o my/build/dir/<name>-post` + `diff -r ...-pre ...-post` | Current overlay effect |
+| **Investigate** | `prep-sources --skip-overlays --force -o base/build/work/scratch/<name>-pre` | Upstream spec/sources as-is |
+| **Compare** | `prep-sources --force -o base/build/work/scratch/<name>-post` + `diff -r ...-pre ...-post` | Current overlay effect |
 | **Modify** | Edit `*.comp.toml` (overlays, defines, without) | — |
-| **Verify** | `prep-sources --force -o my/build/dir/<name>-post` | Overlay applies cleanly |
+| **Verify** | `prep-sources --force -o base/build/work/scratch/<name>-post` | Overlay applies cleanly |
 | **Build** | `comp build -p <name>` | RPMs appear in `base/out/` |
 | **Test** | `adv mock shell --add-package base/out/<name>*.rpm` | Package installs, binary runs, basic functionality works |
 | **Inspect** | `comp build --preserve-buildenv always` + `adv mock shell` | BUILDROOT contents, file lists |
@@ -71,9 +71,9 @@ investigate → modify → verify → build → test → inspect
 ### 1. Diff sources pre/post overlay
 
 ```bash
-azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
-diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
+azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o base/build/work/scratch/<name>-post -q
+diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
 ```
 
 This reveals whether overlays apply as intended or whether upstream changed.
