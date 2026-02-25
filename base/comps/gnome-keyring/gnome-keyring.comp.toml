@@ -1,0 +1,11 @@
+[components.gnome-keyring]
+
+# The rpmautospec fallback macro in redhat-rpm-config expands %autochangelog to raw changelog
+# entry text but does NOT emit the %changelog section header. Without the header, RPM interprets
+# the expanded lines as part of the preceding %files section, causing "File must begin with /"
+# errors. Adding the explicit %changelog header before %autochangelog fixes this.
+[[components.gnome-keyring.overlays]]
+description = "Add explicit %changelog header before %autochangelog — the rpmautospec fallback macro does not emit the section header"
+type = "spec-search-replace"
+regex = '^%autochangelog'
+replacement = "%changelog\n%autochangelog"

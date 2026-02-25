@@ -810,7 +810,6 @@
 [components.gnome-control-center]
 [components.gnome-desktop3]
 [components.gnome-icon-theme]
-[components.gnome-keyring]
 [components.gnome-online-accounts]
 [components.gnome-session]
 [components.gnome-settings-daemon]
