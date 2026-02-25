@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "update-ssh-keys-0.7.0.tar.gz": "d2167cd89a812e83fe9a24034a8bbc7c36f9bcbb21cb5692405fd5e435272fec",
-    "update-ssh-keys-0.7.0-vendor1.tar.gz": "b39186b772b1b55248d7e03a17d8098b9cc234784c9e3d7b42d6d7cba57226c8"
+    "be3ce2acc50313a6826c578e9dbb67e17085d60d.tar.gz": "70a39289dfb4962ff1ede2a12e51f4c7fbeafb36edf7f4ec1182731d2e5844a8",
+    "update-ssh-keys-0.3.0-vendor.tar.gz": "dfeb707b2e0bd52086429d2c3255d498ebcac4124dbc71e58096a9593b5fca60"
   }
 }
