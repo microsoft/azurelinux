@@ -235,10 +235,10 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 * Wed Aug 17 2022 Anatol Belski <anbelski@linux.microsoft.com> - 26.0-1
 - Pull release 26.0 for Mariner from upstream
 
-* Tue May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
+* Mon May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
 - Initial import 23.1 for Mariner from upstream
 
-*   Thu Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
+*   Wed Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
 -   Update to 23.0
 
 *   Thu Mar 03 2022 Rob Bradford <robert.bradford@intel.com> 22.0-0
