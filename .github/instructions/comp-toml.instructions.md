@@ -91,6 +91,8 @@ replacement = "RPM_VENDOR=azurelinux"
 
 Optional fields that apply to multiple types: `section` (target spec section), `package` (target sub-package).
 
+**Up-to-date details can be found from the azldev schema command, or by inspecting [azldev.schema.json](../../external/schemas/azldev.schema.json)**.
+
 ### Choosing the right overlay type (avoiding regex)
 
 `spec-search-replace` is fragile — it breaks when upstream changes the matched text. Before reaching for regex, check if a targeted type can do the job:
