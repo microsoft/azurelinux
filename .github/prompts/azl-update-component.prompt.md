@@ -19,9 +19,9 @@ Use structural patterns from [comp-toml.instructions.md](../instructions/comp-to
 3. **Apply changes** to the `.comp.toml` file
 4. **Verify overlays still apply:**
    ```bash
-   pre=$(mktemp -d) && azldev comp prep-sources -p ${input:component_name} --skip-overlays -o "$pre"
-   post=$(mktemp -d) && azldev comp prep-sources -p ${input:component_name} -o "$post"
-   diff -r "$pre" "$post"
+   azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre --force
+   azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post --force
+   diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post
    ```
    If overlays fail, follow the [skill-fix-overlay skill](../skills/skill-fix-overlay/SKILL.md).
 5. **Migrate to dedicated file** if the component is still inline and now needs customization (use `/azl-migrate-component`)

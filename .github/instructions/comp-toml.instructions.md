@@ -73,13 +73,16 @@ replacement = "RPM_VENDOR=azurelinux"
 
 | Type | Does | Key fields |
 |------|------|------------|
-| `spec-add-tag` | Add a new tag to spec | `tag`, `value` |
-| `spec-set-tag` | Replace existing tag value | `tag`, `value` |
-| `spec-update-tag` | Append to existing tag | `tag`, `value` |
-| `spec-remove-tag` | Remove a tag | `tag` |
+| `spec-add-tag` | Add a new tag; **fails if already exists** | `tag`, `value` |
+| `spec-insert-tag` | Insert tag after the last tag of the same family (e.g., `Source9999` after last `Source*`); falls back to after last tag of any kind | `tag`, `value` |
+| `spec-set-tag` | Set tag value; replaces entire value if exists, adds if not | `tag`, `value` |
+| `spec-update-tag` | Replace value of existing tag; **fails if tag doesn't exist** | `tag`, `value` |
+| `spec-remove-tag` | Remove a tag; **fails if tag doesn't exist** | `tag`, optionally `value` to match |
 | `spec-prepend-lines` | Insert at start of section body | `section`, `lines` |
 | `spec-append-lines` | Insert at end of section body | `section`, `lines` |
-| `spec-search-replace` | Regex replace in spec | `regex`, `replacement` |
+| `spec-search-replace` | Regex replace in spec (**last resort**) | `regex`, `replacement` |
+| `patch-add` | Copy a patch file into sources and register it in the spec (`PatchN` or `%patchlist`) | `source`, optionally `file` |
+| `patch-remove` | Remove patch files and their spec references matching a glob | `file` |
 | `file-add` | Add a file to sources root | `file`, `source` |
 | `file-remove` | Remove a file from sources | `file` |
 | `file-rename` | Rename a source file | `file`, `replacement` |
@@ -88,10 +91,32 @@ replacement = "RPM_VENDOR=azurelinux"
 
 Optional fields that apply to multiple types: `section` (target spec section), `package` (target sub-package).
 
+**Up-to-date details can be found from the azldev schema command, or by inspecting [azldev.schema.json](../../external/schemas/azldev.schema.json)**.
+
+### Choosing the right overlay type (avoiding regex)
+
+`spec-search-replace` is fragile — it breaks when upstream changes the matched text. Before reaching for regex, check if a targeted type can do the job:
+
+| Task | Use this | NOT this |
+|------|----------|----------|
+| Add a `BuildRequires` or `Requires` | `spec-add-tag` | regex to insert a line |
+| Add a `Source` tag alongside existing ones | `spec-insert-tag` (e.g., `tag = "Source9999"`) | regex to find the last Source line |
+| Change `Version`, `Release`, or `Summary` | `spec-set-tag` | regex `s/old/new/` |
+| Remove a specific dependency | `spec-remove-tag` with `tag` + `value` | regex to delete the line |
+| Add commands at end of `%install` | `spec-append-lines` with `section = "%install"` | regex to find and insert after a line |
+| Add entries to `%files` | `spec-append-lines` with `section = "%files"` | regex to append after existing entries |
+| Add env/export at start of `%build` | `spec-prepend-lines` with `section = "%build"` | regex to insert before existing content |
+| Add a patch | `patch-add` (auto-registers `PatchN` or `%patchlist`) | manual `spec-add-tag` for PatchN + `file-add` |
+| Remove a patch | `patch-remove` with glob (e.g., `file = "CVE-*.patch"`) | regex to delete PatchN line + `file-remove` |
+| Target a sub-package's `%files` | `spec-append-lines` with `section = "%files"`, `package = "devel"` | regex scoped to a section |
+
+**When regex IS appropriate:** modifying arbitrary text mid-section (e.g., changing a configure flag, replacing a variable value, removing a conditional block). Even then, always scope with `section` and `package` to limit the blast radius.
+
 ### Overlay pitfalls
 
 - **Do NOT use inline array syntax for overlays.** Write each overlay as a separate `[[components.<name>.overlays]]` block (array-of-tables), not as `overlays = [{ ... }, { ... }]`. The inline form is valid TOML but harder to read and review. Some older components in the repo use the inline style — don't copy it.
 - **No `$schema` in TOML.** `$` is invalid at the start of a bare TOML key.
+- **Scope regex overlays with `section` and `package`.** When using `spec-search-replace`, always set `section` (e.g. `"%files"`, `"%install"`) and `package` (e.g. `"foo"` for a `%files foo` section) to limit where the regex matches if possible. The `package` value is the **short sub-package suffix** as it appears after the section tag in the spec (e.g. `%files foo` → `package = "foo"`, not `package = "mypkg-foo"`). Unscoped regex overlays risk matching unintended lines elsewhere in the spec, especially after upstream updates. If the overlay targets a specific sub-package's `%files` section, both fields should be set.
 - **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements.
 - **No backreferences in `spec-search-replace`.** `${1}` or `$1` in `replacement` is literal text, not a capture group backreference. Repeat the matched text in the replacement instead.
 - **`lines` must be an array of strings.** Use `lines = ["single line"]` or a multi-line array `lines = ["line1", "line2"]`, not a bare string like `lines = "..."`.

@@ -14,9 +14,9 @@ description: "[Skill] Diagnose and fix overlay issues in Azure Linux components.
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
 
 ```bash
-azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
-diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
+azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o base/build/work/scratch/<name>-post -q
+diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
 ```
 
 If `prep-sources` fails, the error message will identify which overlay failed and why.
@@ -29,7 +29,7 @@ Look at the pre-overlay output dir — this is what the overlay is trying to mod
 
 ### `spec-add-tag`: "tag already exists"
 
-The tag is already in the upstream spec. Fix: use `spec-set-tag` (replaces existing) or `spec-update-tag` (appends to existing value) instead.
+The tag is already in the upstream spec. Fix: use `spec-set-tag` (replaces value if exists, adds if not) or `spec-update-tag` (replaces value, but fails if tag doesn't exist — use when you want to guarantee the tag was already present) instead.
 
 ### `spec-search-replace`: no match
 

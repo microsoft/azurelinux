@@ -17,7 +17,7 @@ azldev comp list -p <name> -q -O json
 The fastest way to see what you're working with:
 
 1. Add a bare inline entry in `components.toml`: `[components.<name>]`
-2. Pull the spec: `azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name> -q`
+2. Pull the spec: `azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name> -q`
 3. Read the spec, plan your overlays
 4. Decide if overlays are required, if so: Remove the inline entry, create a dedicated `<name>/<name>.comp.toml`
 
@@ -56,6 +56,7 @@ Key points for adding components:
 - Every overlay MUST have a `description` explaining *why*
 - Test incrementally — apply one overlay at a time, verify with `prep-sources`
 - Prefer targeted overlay types (`spec-add-tag`, `spec-set-tag`) over regex (`spec-search-replace`)
+- **Keep `%check` enabled** — do not disable tests unless there is a documented, unavoidable reason (upstream bug, missing test infra, etc.). If you must disable, provide a clear `skip_reason`.
 
 ### Overlays vs. Dedicated spec
 
@@ -73,9 +74,9 @@ Overlays are vastly preferable to maintaining a forked spec, they get automatic 
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
 
 ```bash
-azldev comp prep-sources -p <name> --skip-overlays --force -o my/build/dir/<name>-pre -q
-azldev comp prep-sources -p <name> --force -o my/build/dir/<name>-post -q
-diff -r my/build/dir/<name>-pre my/build/dir/<name>-post
+azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name>-pre -q
+azldev comp prep-sources -p <name> --force -o base/build/work/scratch/<name>-post -q
+diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
 
 # Test build (RPMs land in base/out/ per project.toml output-dir)
 azldev comp build -p <name> -q

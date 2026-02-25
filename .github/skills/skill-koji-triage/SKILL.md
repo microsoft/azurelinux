@@ -7,10 +7,10 @@ description: "[Skill] Examine Koji builds, fetch task info and logs from the Koj
 
 ## Koji Web UI
 
-- **Base URL**: Get from the user, or from env variable `KOJI_BASE_URL`.
-  - If the env variable is not set, prompt the user to input the base URL of the Koji Web UI (e.g., `https://koji.example.com`), or tell them to set the `KOJI_BASE_URL` environment variable for future use.
+- **Base URL**: Get from the user, or from env variable `KOJI_BASE_URL`, or pre-configured in the MCP server.
+  - If the env variable is not set, and the MCP is not pre-configured, prompt the user to input the base URL of the Koji Web UI (e.g., `https://koji.example.com`).
 - **MCP tools (preferred)**: Use the `koji` MCP server tools (`set_koji_url`, `koji_fetch`) to fetch pages and logs. These write output to temp files under `base/build/work/scratch/koji/` to avoid bloating context. Use `read_file` and `grep_search` on the resulting files to inspect content.
-  1. Call `set_koji_url` with the base URL first.
+  1. Call `set_koji_url` with the base URL first (if not pre-set)
   2. Call `koji_fetch` with the path (e.g., `/koji/taskinfo?taskID=3307`). It returns the file path where content was saved.
      - If the fetch fails with an SSL certificate error (e.g., self-signed cert), ask the user if they want to skip SSL verification, then call `koji_allow_insecure` to proceed. Do **NOT** proceed without explicit user approval for the **specific** URL.
   3. Use `read_file` or `grep_search` on the saved file to extract the information you need.
