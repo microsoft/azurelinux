@@ -10,33 +10,17 @@
 # Ref: https://src.fedoraproject.org/rpms/zbar/c/a1e97927fd862a8ca777462155b54c4ee4176923 ("Fix FTBFS")
 
 [[components.zbar.overlays]]
-description = "Remove ZBar typelib directory from zbar-gtk %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+description = "Remove GIR typelib entries from zbar-gtk %files (g-ir-scanner not available, aligns with Fedora rawhide)"
 type = "spec-search-replace"
 section = "%files"
 package = "gtk"
-regex = '%dir %\{_libdir\}/girepository-1\.0'
+regex = '%.*girepository-1\.0.*'
 replacement = ""
 
 [[components.zbar.overlays]]
-description = "Remove ZBar typelib from zbar-gtk %files (g-ir-scanner not available, aligns with Fedora rawhide)"
-type = "spec-search-replace"
-section = "%files"
-package = "gtk"
-regex = '%\{_libdir\}/girepository-1\.0/ZBar-1\.0\.typelib'
-replacement = ""
-
-[[components.zbar.overlays]]
-description = "Remove ZBar .gir directory from zbar-gtk-devel %files (g-ir-scanner not available, aligns with Fedora rawhide)"
+description = "Remove GIR data entries from zbar-gtk-devel %files (g-ir-scanner not available, aligns with Fedora rawhide)"
 type = "spec-search-replace"
 section = "%files"
 package = "gtk-devel"
-regex = '%dir %\{_datadir\}/gir-1\.0'
-replacement = ""
-
-[[components.zbar.overlays]]
-description = "Remove ZBar .gir file from zbar-gtk-devel %files (g-ir-scanner not available, aligns with Fedora rawhide)"
-type = "spec-search-replace"
-section = "%files"
-package = "gtk-devel"
-regex = '%\{_datadir\}/gir-1\.0/ZBar-1\.0\.gir'
+regex = '%.*gir-1\.0.*'
 replacement = ""
