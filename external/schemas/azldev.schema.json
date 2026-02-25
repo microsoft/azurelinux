@@ -128,6 +128,7 @@
           "type": "string",
           "enum": [
             "spec-add-tag",
+            "spec-insert-tag",
             "spec-set-tag",
             "spec-update-tag",
             "spec-remove-tag",
