@@ -60,7 +60,6 @@
 [components.apache-commons-parent]
 [components.apache-commons-text]
 [components.apache-commons-vfs]
-[components.apache-ivy]
 [components.apache-parent]
 [components.apache-resource-bundles]
 [components.apiguardian]

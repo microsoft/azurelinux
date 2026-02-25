@@ -1,0 +1,5 @@
+[components.apache-ivy]
+overlays = [
+    { type = "file-add", file = "IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch", source = "IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch" },
+    { type = "spec-add-tag", tag = "Source4", value = "IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch" },
+]
