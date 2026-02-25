@@ -5,7 +5,7 @@
 Name:           cloud-hypervisor
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of the KVM hypervisor and the Microsoft Hypervisor (MSHV).
 Version:        48.0.259
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,7 +71,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%setup -q -n cloud-hypervisor-%{version}
+%setup -q -n %{name}-msft-v%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 %endif
@@ -236,7 +236,7 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 * Tue May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
 - Initial import 23.1 for Mariner from upstream
 
-*   Thu Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
+*   Wed Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
 -   Update to 23.0
 
 *   Thu Mar 03 2022 Rob Bradford <robert.bradford@intel.com> 22.0-0
