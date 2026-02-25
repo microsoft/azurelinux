@@ -1,0 +1,8 @@
+[components.socat]
+
+[[components.socat.overlays]]
+description = "Exclude VSOCK_ECHO test (410) — /dev/vsock unavailable in mock chroot"
+type = "spec-search-replace"
+section = "%check"
+regex = '-a \\\\\$N -ne 528'
+replacement = '-a \\$N -ne 410 -a \\$N -ne 528'
