@@ -27,7 +27,14 @@ if [[ ! -f "$RESULTS_FILE" ]]; then
 fi
 RESULTS_BASENAME="$(basename "$RESULTS_FILE")"
 
+REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
+
 # Always build — layer caching makes this fast when nothing changed
+# Copy requirements.txt into the build context (COPY can't reach outside it)
+cp "${REPO_ROOT}/.vscode/mcps/requirements.txt" "${SCRIPT_DIR}/requirements.txt"
+# Trap will not fire for exec, but will cover cleanup if the build step fails
+trap 'rm -f "${SCRIPT_DIR}/requirements.txt"' EXIT
+
 # Use buildx if available, otherwise fall back to legacy builder
 echo "Building triage image..." >&2
 if docker buildx version &>/dev/null; then
@@ -37,14 +44,14 @@ else
     docker build -t "$IMAGE_NAME" "$SCRIPT_DIR" >&2
 fi
 
+# Clean up immediately — only needed for the build step
+rm -f "${SCRIPT_DIR}/requirements.txt"
+
 echo "Running triage agent..." >&2
 DOCKER_ARGS=( --rm )
 
 # Run as the calling user so output files have the right ownership
 DOCKER_ARGS+=( -u "$(id -u):$(id -g)" )
-
-# Mount the repo root read-only, with a writable output dir.
-REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 
 # Require a .env file for MCP server config (Koji URL, auth, etc.)
 ENV_FILE=""
