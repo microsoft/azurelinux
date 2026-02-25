@@ -1,4 +1,0 @@
-[components.golang-github-streadway-handy]
-
-[components.golang-github-streadway-handy.build]
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }

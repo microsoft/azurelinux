@@ -1,0 +1,7 @@
+[components.openexr]
+
+[[components.openexr.overlays]]
+description = "Use portable %{__cmake_builddir} macro instead of hardcoded redhat-linux-build path"
+type = "spec-search-replace"
+regex = 'redhat-linux-build'
+replacement = '%{__cmake_builddir}'

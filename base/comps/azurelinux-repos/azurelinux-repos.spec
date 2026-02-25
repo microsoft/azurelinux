@@ -4,7 +4,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        0.1
+Release:        1%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
