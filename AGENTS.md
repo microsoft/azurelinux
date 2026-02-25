@@ -39,6 +39,8 @@ Do NOT skip testing for changes that affect RPM output. Do NOT tell the user "th
 - `prep-sources -o <dir>` output is ad-hoc (user-chosen dir). `comp build` output goes to project-configured dirs (`base/out/`, `base/build/`). Don't conflate them.
 - For temporary files, ensure they are all placed inside the project's defined work directory (`azldev config dump -q -f json 2>&1 | grep 'workDir'`). Example commands use `my/build/dir`, when starting work on a component **check the actual path** once, and ensure all temp directories are inside it unless there's a specific reason not to be (e.g., truly global temp dir for some reason).
 
+> **Do NOT use `/tmp` or bare `mktemp -d`** — always use `base/build/work/scratch/` (or a subdirectory) for temporary files. This avoids permission issues and keeps all working files inside the project tree.
+
 Example: `workDir="/home/user/azurelinux/base/build/work"`, use "./base/build/work/scratch/" for all temp dirs, or a subdir like "./base/build/work/scratch/thing".
 
 ## Skills

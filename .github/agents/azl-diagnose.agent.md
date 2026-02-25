@@ -8,19 +8,19 @@ disable-model-invocation: false
 handoffs:
   - label: Attempt to diagnose and fix the issue
     agent: azl-diagnose
-    prompt: Follow the directions in [the debug workflow](../prompts/azl-debug-component.prompt.md) to fix the issue. Ensure a review agent runs before declaring the fix ready, to ensure it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeat as needed).
+    prompt: "Follow the directions in [the debug workflow](../prompts/azl-debug-component.prompt.md) to fix the issue. Ensure a review agent runs before declaring the fix ready, to ensure it follows best practices and won't cause future maintenance issues. If the review agent raises concerns, address them, and then re-run the review (repeat as needed)."
     send: true
   - label: Ask follow-up questions
     agent: azl-diagnose
-    prompt: Briefly summarize the findings in one paragraph or less, then help the user with any follow-up questions.
+    prompt: 'Briefly summarize the findings in one paragraph or less, then help the user with any follow-up questions.'
     send: true
   - label: Write a summary to a markdown file
     agent: azl-diagnose
-    prompt: Write a report summarizing the investigation, findings, and next steps into a markdown file in the current directory.
+    prompt: 'Write a report summarizing the investigation, findings, and next steps into a markdown file in the current directory.'
     send: true
   - label: Make a commit with the fix
     agent: azl-diagnose
-    prompt: If the changes are made **AND READY**, commit them with a clear message describing the fix. The commit message should follow the conventional commit format (e.g., `fix(pkg): fix build failure due to missing dependency\n\nDetailed explanation of the fix with references to relevant sources and excerpts from upstream bug reports, changelogs, or commits that informed the fix.\nTested by doing thing.`). Do not reference internal-only koji in the PR message (upstream is fine). Ensure only the changes related to the fix are included in the commit (Do not remove unrelated changes, offer to stash or unstage them instead). Propose a commit message (in markdown code block) to the user, and ask for confirmation before commiting. If no fix has been made yet, respond with "No fix identified yet, so no commit made." If a fix has been made but is not ready, respond with "A fix has been identified but is not ready to be committed yet."
+    prompt: 'If the changes are made AND READY, commit them with a clear message describing the fix. The commit message should follow the conventional commit format (e.g., `fix(pkg): fix build failure due to missing dependency\n\nDetailed explanation of the fix with references to relevant sources and excerpts from upstream bug reports, changelogs, or commits that informed the fix.\nTested by doing thing.`). Do not reference internal-only koji in the PR message (upstream is fine). Ensure only the changes related to the fix are included in the commit (Do not remove unrelated changes, offer to stash or unstage them instead). Propose a commit message (in markdown code block) to the user, then use the `ask_questions` or `ask_user` tool (whichever is available) to confirm before committing. Present two options: "Commit" and "Abort", with "Abort" as the default/first option. If no fix has been made yet, respond with "No fix identified yet, so no commit made." If a fix has been made but is not ready, respond with "A fix has been identified but is not ready to be committed yet."'
     send: true
 ---
 # Build Failure Diagnosis

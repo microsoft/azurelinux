@@ -110,7 +110,14 @@ Use `build.defines` (macros) and `build.without` (disable conditionals) in the c
 
 Verify with `prep-sources` before doing a full build.
 
+### Disabling `%check` (test suites)
+
+Disabling `%check` (via `build.without = ["check"]`) is an **absolute last resort**. Always attempt to fix failing tests first — investigate the root cause, check upstream for patches or known issues, and try targeted fixes. If disabling is truly unavoidable, the component's `skip_reason` field MUST clearly explain:
+- What tests fail and how
+- Why the failures cannot be fixed (e.g., upstream bug with link, environment limitation, missing test infrastructure)
+- Whether this is expected to be temporary (and if so, what would unblock re-enabling)
+
 ## Reference
 - CLI help: `azldev comp build --help`, `azldev advanced mock --help`
 - `azldev advanced` (alias `adv`) is hidden from `azldev --help` but contains `mock shell`, `mock build-rpms`, `mcp`, and `wget`.
-- [schema reference](../../../external/schemas/azldev.schema.json) (or `azldev config generate-schema > /tmp/schema.json` for latest changes)
+- [schema reference](../../../external/schemas/azldev.schema.json) (or `azldev config generate-schema > base/build/work/scratch/schema.json` for latest changes)

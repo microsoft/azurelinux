@@ -21,6 +21,7 @@ First, determine the error category:
 2. **Build failure** — compilation errors, missing dependencies, test failures during `comp build`:
    - Follow the `skill-build-component` inner loop: check build logs in `base/build/logs/`, use `--preserve-buildenv on-failure`, inspect mock chroot
    - Common causes: missing BuildRequires, incompatible compiler flags, test failures
+   - **`%check` failures:** Always attempt to fix failing tests first. Disabling `%check` (via `build.without = ["check"]`) is an **absolute last resort** — only after exhausting other options. If you must disable it, the `skip_reason` must clearly explain why the tests cannot be fixed.
 
 3. **Runtime/packaging issue** — wrong file permissions, missing files, dependency conflicts in built RPMs:
    - Follow the `skill-mock` workflow: install RPMs in a mock chroot, verify contents, check dependencies
@@ -29,9 +30,9 @@ First, determine the error category:
 **When in doubt**, start with a `prep-sources` pre/post diff to determine if the issue is overlay-related:
 
 ```bash
-pre=$(mktemp -d) && azldev comp prep-sources -p ${input:component_name} --skip-overlays -o "$pre"
-post=$(mktemp -d) && azldev comp prep-sources -p ${input:component_name} -o "$post"
-diff -r "$pre" "$post"
+azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre
+azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post
+diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post
 ```
 
 If `prep-sources` itself fails, the issue is overlay-related (category 1). If it succeeds but `comp build` fails, it's a build issue (category 2).

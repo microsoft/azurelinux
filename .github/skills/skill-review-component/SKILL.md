@@ -30,6 +30,7 @@ azldev comp query -p <name> -q -O json
 - Every overlay MUST have a `description` field explaining *why* the change is needed
 - Prefer targeted overlay types (`spec-set-tag`, `spec-add-tag`) over regex (`spec-search-replace`) where possible
   - Regex overlays should be a last resort and must be carefully reviewed for correctness and potential unintended matches. Almost always prefer more specific overlay types that target the exact change needed, rather than broad regex patterns that could match multiple unintended places in the spec on future updates etc.
+- When `spec-search-replace` is unavoidable, **make every effort to always scope it** with `section` and/or `package` fields to limit where the regex can match. For example, a replacement targeting a `%files` entry in a sub-package should set `section = "%files"` and `package = "<suffix>"` (the short sub-package suffix as it appears in the spec header, e.g. `"foo"` for `%files foo`, not `"mypkg-foo"`). Unscoped regex overlays are fragile and may silently match unintended lines after upstream updates.
 - No multi-line regex patterns (unsupported)
 - Use TOML literal strings (`'...'`) for regex to avoid escaping issues
 - No unnecessary overlays — if upstream already provides what's needed, don't overlay it
@@ -44,6 +45,7 @@ azldev comp query -p <name> -q -O json
 - `build.defines` and `build.without` are used appropriately
 - No unnecessary build overrides
 - Conditional builds (`build.without`) match available spec conditionals
+- **`%check` disabled?** If `build.without` includes `"check"`, flag as a **Warning** — disabling tests is an absolute last resort. Verify that a `skip_reason` is present and clearly explains why the tests cannot be fixed. If the justification is missing or weak, recommend re-enabling `%check` and fixing the underlying test failures instead.
 
 ### 6. Source configuration
 

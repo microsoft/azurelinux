@@ -42,6 +42,7 @@ In VSCode, there are specialized prompts for common tasks. They can be accessed 
 | `azl-debug-component` | Triage build failures, overlay errors, or packaging issues. |
 | `azl-review-component` | Audit a component for hygiene and best practices. |
 | `azl-migrate-component` | Move an inline entry to a dedicated `.comp.toml` file. |
+| `azl-mass-triage` | Batch-triage build failures from a JSON results file — diagnose, bucketize, and summarize. |
 
 ### Agents
 

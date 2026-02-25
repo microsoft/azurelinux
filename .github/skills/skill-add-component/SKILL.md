@@ -56,6 +56,7 @@ Key points for adding components:
 - Every overlay MUST have a `description` explaining *why*
 - Test incrementally — apply one overlay at a time, verify with `prep-sources`
 - Prefer targeted overlay types (`spec-add-tag`, `spec-set-tag`) over regex (`spec-search-replace`)
+- **Keep `%check` enabled** — do not disable tests unless there is a documented, unavoidable reason (upstream bug, missing test infra, etc.). If you must disable, provide a clear `skip_reason`.
 
 ### Overlays vs. Dedicated spec
 

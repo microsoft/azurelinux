@@ -44,6 +44,8 @@ Key fields:
 
 ### Phase 1 — Diagnose (parallel sub-agents)
 
+> **IMPORTANT:** Always save diagnostic instructions as a `.md` file in the working directory and reference it by path when spawning sub-agents — do NOT pass full prompt text inline in `runSubagent` calls. This ensures sub-agents can read instructions with file tools, avoids context window bloat in the orchestrator, and persists the instructions for debugging.
+
 1. Read `${input:results_file}` and filter `buildTasks` to only entries with `kojiInfo.kojiTaskStatus` of `"Failed"` or `taskStatus` of `"Failed"` (some failed builds may still have overall status "Completed"). Extract the `kojiTaskNumber` and `componentName` for each failed task.
 2. Configure the koji MCP tool:
   - If the user has provided a Koji base URL as input (`${input:koji_url}`), use that.
@@ -53,6 +55,8 @@ Key fields:
 3. Create the triage output directory: `base/build/work/scratch/triage/`.
   - Ensure there are no existing JSON files in the triage directory from previous runs, to avoid confusion. If there are, prompt the user to confirm deletion before proceeding.
 4. Use cmdline tools (jq, python, etc.) to partition the failed builds into batches of **~6 builds each**, writing a JSON file per batch to the triage directory (e.g., `base/build/work/scratch/triage/batch-1.json`, `batch-2.json`, etc.) with this structure:
+
+> **All temporary and intermediate files** (jq output, working files, batch files, etc.) MUST go in `base/build/work/scratch/triage/` — do NOT use `/tmp` or bare `mktemp -d`.
 
 ```json
 {
@@ -71,7 +75,7 @@ If the failure count is small (≤5), you can skip batching and put everything i
    - The Koji base URL (`${input:koji_url}`)
    - The path to its batch file
    - The output directory path
-   - The diagnostic instructions as a .md file (see Phase 1 Sub-Agent Prompt below)
+   - The path to the `.md` prompt file (do NOT inline the prompt content — reference by file path only)
 7. Each sub-agent writes one JSON file per build to the triage directory: `base/build/work/scratch/triage/<taskID>.json`
 8. After all sub-agents complete, verify that a JSON file exists for each failed build. Re-run any missing ones.
 
