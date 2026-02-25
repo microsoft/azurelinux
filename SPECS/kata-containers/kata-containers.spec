@@ -12,7 +12,11 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
-
+Patch2:         CVE-2026-24834.patch
+Patch3:         CVE-2026-25727.patch
+Patch4:         CVE-2026-25541.patch
+Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -40,10 +44,7 @@ Summary:        Kata Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE1}
-popd
+%autosetup -p1 -n %{name}-%{version} -a 1
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -115,10 +116,17 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+<<<<<<< HEAD
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
 - Bump release to rebuild with rust
 
 * Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
+=======
+* Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
+- Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
+
+* Thu Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
+>>>>>>> 4d5e656ea ([CRITICAL] Patch kata-containers for CVE-2026-24834 , [MEDIUM] CVE-2026-25727, CVE-2025-65637, CVE-2026-25541 and CVE-2025-11065 (#15950))
 - Bump release to rebuild with rust
 - Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
 
