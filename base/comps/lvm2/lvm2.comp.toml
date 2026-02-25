@@ -1,0 +1,7 @@
+[components.lvm2]
+
+[[components.lvm2.overlays]]
+description = "Our azurelinux-release package resets the system_release_version to 4, so we need to update this package's system_release version minimum dependency."
+type = "spec-search-replace"
+regex = "%global system_release_version 23"
+replacement = "%global system_release_version 4"
