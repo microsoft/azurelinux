@@ -89,13 +89,15 @@ DOCKER_ARGS+=( -e "HOME=/home/copilot" )
 PROMPT="Follow the instructions in .github/prompts/azl-mass-triage.prompt.md to triage /triage-input/${RESULTS_BASENAME}.
 The repo is mounted read-only! Write output to /workspace/out/triage/ (final output only). The base/build dirs are a writable tmpfs for intermediate files.
 Place ONLY the final report .md and .json files in the output dir, no other files should be written there. Use the mounted tmpfs for ALL other files.
-Once complete, Write a report summarizing the investigation, findings, and next steps into a markdown file in the output dir."
+Once complete, write a report summarizing the investigation, findings, and next steps into a markdown file in the output dir."
 
 if [[ -n "$EXTRA_PROMPT" ]]; then
     PROMPT+=$'\n\nAdditional instructions from the user:\n'
     PROMPT+="$EXTRA_PROMPT"
 fi
 
+# Security: --allow-all-* is safe here — the repo is mounted read-only, output is
+# restricted to out/triage/, and the container provides process isolation.
 COPILOT_ARGS=(--allow-all-tools --allow-all-paths --allow-all-urls --agent azl-diagnose -p "$PROMPT")
 
-exec docker run "${DOCKER_ARGS[@]}" "$IMAGE_NAME" "${COPILOT_ARGS[@]}"
+exec docker run "${DOCKER_ARGS[@]}" -- "$IMAGE_NAME" "${COPILOT_ARGS[@]}"
