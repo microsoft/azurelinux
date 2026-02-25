@@ -7,4 +7,6 @@ overlays = [
     { type = "spec-add-tag", tag = "Source5", value = "remove-Pack200Packing-java.patch" },
 
     { type = "spec-search-replace", regex = "dos2unix src/java/org/apache/ivy/ant/IvyAntSettings.java", replacement = "dos2unix src/java/org/apache/ivy/ant/IvyAntSettings.java asciidoc/release-notes.adoc ivy.xml optional.patterns src/java/org/apache/ivy/core/pack/PackagingManager.java src/java/org/apache/ivy/core/pack/PackingRegistry.java src/java/org/apache/ivy/core/settings/IvySettings.java src/java/org/apache/ivy/core/pack/ArchivePacking.java src/java/org/apache/ivy/core/pack/OsgiBundlePacking.java src/java/org/apache/ivy/core/pack/Pack200Packing.java src/java/org/apache/ivy/core/pack/StreamPacking.java src/java/org/apache/ivy/core/pack/ZipPacking.java src/java/org/apache/ivy/util/FileUtil.java test/java/org/apache/ivy/core/retrieve/RetrieveTest.java test/java/org/apache/ivy/core/pack/ZipPackingTest.java version.properties" },
+
+    { type = "spec-search-replace", regex = "patch -p1 -l < %{SOURCE3}", replacement = "patch -p1 -l < %{SOURCE3}\npatch -p1 -l < %{SOURCE4}\npatch -p1 -l < %{SOURCE5}" },
 ]
