@@ -1,5 +1,5 @@
 #!/bin/bash
-# https://basevmimage.blob.core.windows.net/vhds/azl4-vm-base.x86_64-0.1.vhd
+
 # Find the absolute path of the directory containing this script
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPTS_DIR/common.sh"
@@ -8,7 +8,6 @@ storage_account_url="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net"
 storage_account_resource_id="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
 replicationMode="Shallow"
-image_version=$VERSION
 storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$storage_blob_name"
 
 az account set --subscription "$SUBSCRIPTION_ID"
@@ -45,10 +44,10 @@ if [[ $containerExists != "true" ]]; then
         --auth-mode login
 fi
 
-# Upload the image artifact to Steamboat Storage Account
+# Upload the image artifact to Storage Account
 azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint"
 
-# Ensure STEAMBOAT_GALLERY_NAME exists
+# Ensure GALLERY_NAME exists
 if ! az sig show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME"; then
     echo "Could not find image gallery \"$GALLERY_NAME\" in resource group \"$RESOURCE_GROUP_NAME\". Creating the gallery."
     az sig create \
@@ -73,6 +72,8 @@ if [[ $imageDefinitionExists -eq 0 ]]; then
         --os-type Linux
 fi
 
+VERSION="$(get-image-version increment)"
+
 # Convert comma-separated regions to JSON array for bicep template
 # Note: Using a single region for now
 REGIONS_JSON=$(echo "$LOCATION" | awk -F, '{
@@ -85,14 +86,14 @@ REGIONS_JSON=$(echo "$LOCATION" | awk -F, '{
 }')
 # Create Image Version from storage account blob
 az deployment group create \
-  --name "$GALLERY_IMAGE_DEFINITION-$image_version" \
+  --name "$GALLERY_IMAGE_DEFINITION-$VERSION" \
   --resource-group "$RESOURCE_GROUP_NAME" \
   --template-file "$SCRIPTS_DIR/azure-gallery-image-base.bicep" \
   --parameters galleryName="$GALLERY_NAME" \
                imageDefinitionName="$GALLERY_IMAGE_DEFINITION" \
-               versionName="$image_version" \
-               location="westus3" \
-               regions='["westus3"]' \
+               versionName="$VERSION" \
+               location="$LOCATION" \
+               regions="$REGIONS_JSON" \
                sourceDiskId="$storage_account_resource_id" \
                sourceDiskUrl="$storage_blob_endpoint" \
                replicationMode="$replicationMode"
