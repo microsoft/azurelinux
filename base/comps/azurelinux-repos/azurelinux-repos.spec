@@ -45,7 +45,7 @@ This package provides the evergreen repo definitions.
 
 %package -n azurelinux-gpg-keys
 Summary:        Azure Linux RPM keys
-Requires:       filesystem >= 3.18-6
+Requires:       filesystem >= 3.18-1
 
 %description -n azurelinux-gpg-keys
 This package provides the RPM signature keys.
