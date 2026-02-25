@@ -30,7 +30,7 @@ Name:		shim-unsigned-aarch64
 # shim-unsigned-%%{_arch}, maybe in the future we'll rename it (also
 # would be good if Fedora would correct the name). Until then, let's
 # just Provide: the proper name.
-Provides:       shim-unsigned-%{efiarch}
+Provides:       shim-unsigned-%{efiarch} = %{version}-%{release}
 
 Version:	16.1
 Release:	1%{?dist}

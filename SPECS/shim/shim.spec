@@ -73,7 +73,18 @@ Provides:       shim-unsigned = %{version}-%{release}
 # This is when grub was updated to be signed with the newer Azure Linux certificate
 Conflicts:      grub2-efi-binary < 2.06-22
 
-BuildRequires:  shim-unsigned-%{efiarch} = %{version}-%{release}
+# Use the actual package name for BuildRequires rather than the virtual
+# Provides name. On aarch64 the package is named shim-unsigned-aarch64
+# but provides shim-unsigned-aa64 (unversioned). Using the virtual name
+# causes the build graph to see a freshness change from a newly built
+# shim-unsigned-aarch64 and force a rebuild of this package even when
+# only shim-unsigned-* was updated.
+%ifarch x86_64
+BuildRequires:  shim-unsigned-x64 = %{version}
+%endif
+%ifarch aarch64
+BuildRequires:  shim-unsigned-aarch64 = %{version}
+%endif
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  efivar
