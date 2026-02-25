@@ -13,7 +13,7 @@
 # in the package's source location (using the format update-ssh-keys-VERSION-vendor.tar.gz)
 
 Name:           update-ssh-keys
-Version:        0.7.0
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Utility for managing OpenSSH authorized public keys
 
@@ -22,11 +22,13 @@ URL:            https://github.com/flatcar/update-ssh-keys
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-Source0:        https://github.com/flatcar/update-ssh-keys/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-SOURCE1:        update-ssh-keys-0.7.0-vendor1.tar.gz
+Source0:        https://github.com/flatcar/update-ssh-keys/archive/be3ce2acc50313a6826c578e9dbb67e17085d60d.tar.gz
+SOURCE1:        update-ssh-keys-0.3.0-vendor.tar.gz
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.60
 
+# make sure we have a new enough coreos-init that we won't conflict with the
+# old bash script
 Requires: coreos-init
 
 %ifarch x86_64
@@ -46,7 +48,7 @@ access in cloud environments. It can integrate with cloud-config and other
 provisioning systems to maintain authorized_keys files.
 
 %prep
-%autosetup -n %{crate}-%{version} -p1
+%autosetup -n update-ssh-keys-be3ce2acc50313a6826c578e9dbb67e17085d60d -a1
 
 # Extract vendored crates
 tar xf %{SOURCE1}
@@ -76,6 +78,6 @@ cargo test --offline
 %{_bindir}/%{crate}
 
 %changelog
-* Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.35.3-10
+* Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.3.0-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified
