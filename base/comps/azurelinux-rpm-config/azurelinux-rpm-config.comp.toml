@@ -11,21 +11,6 @@ overlays = [
     { type = "spec-set-tag", tag = "URL", value = "https://aka.ms/azurelinux" },
     # Set our version.
     { type = "spec-update-tag", tag = "Version", value = "1004" },
-    # Provide compatibility with Fedora's upstream version.
-    { type = "spec-add-tag", tag = "Provides", value = "redhat-rpm-config = %{version}-%{release}" },
-    # Make sure this package takes precedence over (and would replace) any Fedora variant.
-    # Note that Fedora's version of redhat-rpm-config has a version equal to 300 + the release number
-    # (e.g., 343 for Fedora 43).
-    { type = "spec-add-tag", tag = "Obsoletes", value = "redhat-rpm-config < 1000" },
-    { type = "spec-add-tag", tag = "Conflicts", value = "redhat-rpm-config < 1000" },
-
-    # Create symlink for our own name: /usr/lib/rpm/azurelinux -> /usr/lib/rpm/redhat
-    # Note that we don't do the reverse to avoid conflicts with upstream Fedora
-    # redhat-rpm-config during bootstrapping (replacing a dir with a symlink is
-    # problematic in RPM land).
-    # TODO: remove symlinks after bootstrap
-    { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
-    { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
 
     # Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
     # TODO: remove symlinks after bootstrap

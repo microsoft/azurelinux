@@ -48,13 +48,24 @@ Requires: azurelinux-gpg-keys
 %description gpg-keys
 Azure Linux compatibility providing 'fedora-gpg-keys'.
 
+%package rpm-config
+Provides: redhat-rpm-config = 1004
+Requires: azurelinux-rpm-config
+%description rpm-config
+Azure Linux compatibility providing 'redhat-rpm-config'.
+
 %prep
 
 %build
 
 %install
+install -d -m 0755 %{buildroot}/usr/lib/rpm
+ln -s azurelinux %{buildroot}/usr/lib/rpm/redhat
 
 %files
+
+%files rpm-config
+/usr/lib/rpm/redhat
 
 %changelog
 %autochangelog
