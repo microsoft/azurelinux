@@ -1,0 +1,25 @@
+[components.openpace]
+
+[[components.openpace.overlays]]
+description = """
+Fix install-data-local silently dropping one documentation file per build.
+
+The upstream Makefile.am uses 'find -exec sh -c ... {} +' without a dummy $0
+placeholder. Per POSIX, the first argument after 'sh -c script' becomes $0 and
+is excluded from $@, causing the first file returned by find to be silently
+dropped. Different filesystem types return files in different find order, so
+different files are dropped on x86_64 vs aarch64 builders, causing noarch
+rpmdiff failures in Koji.
+
+TODO: push change to upstream
+"""
+type = "patch-add"
+source = "fix-install-data-local-missing-dollar0.patch"
+
+[[components.openpace.overlays]]
+description = "Apply the install-data-local fix patch after existing patches"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch 1 -p1 -b \.unsupported-tests$'
+replacement = """%patch 1 -p1 -b .unsupported-tests
+%patch 2 -p1"""
