@@ -94,7 +94,13 @@ scripts/batch-triage/triage.sh --results /path/to/results.json
 scripts/batch-triage/triage.sh --results /path/to/results.json 'only triage one package'
 ```
 
-Requirements: Docker (buildx recommended), GitHub auth (env var or config), and a `.env` file (see above). Output lands in `out/triage/`, owned by the calling user.
+Requirements:
+
+- Docker (buildx recommended)
+- GitHub auth ([copilot env var](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/authenticate-copilot-cli), `copilot` logged in, or `gh` logged in)
+- a `.env` file (see above).
+
+Output lands in `out/triage/`.
 
 See [scripts/batch-triage/](scripts/batch-triage/) for the Dockerfile and wrapper script.
 
