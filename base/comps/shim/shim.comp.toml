@@ -9,3 +9,26 @@ lines = [
   "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
   "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
 ]
+
+# TEMPORARY DIRTY SOLUTION:
+# The EFI files listed in the 'source-files' sections are produced from the 'shim-unsigned-*' packages.
+# The only reason the currently hard-coded 'uri' values work, is because we separately first built 'shim-unsigned-*' packages,
+# MANUALLY uploaded the resulting EFI files to the lookaside cache, and then MANUALLY updated the 'uri' fields.
+# This does not scale, is not easily automatable, can easily break, and should be replaced by a more robust solution as soon as possible.
+[[components.shim.source-files]]
+filename = "shimx64.efi"
+hash = "7741013d9a24ce554bf6a9df6b776a57b114055e7f80f2bf69c7e1757e2f02f8d2a0b6f3722e33a04ecc81cdd88800ac7b427d4fbde363ac4bf7a49a36f1cc5f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/shim/shimx64.efi/sha512/7741013d9a24ce554bf6a9df6b776a57b114055e7f80f2bf69c7e1757e2f02f8d2a0b6f3722e33a04ecc81cdd88800ac7b427d4fbde363ac4bf7a49a36f1cc5f/shimx64.efi" }
+
+[[components.shim.source-files]]
+filename = "shimia32.efi"
+hash = "0e3d65da04dde786187e85edbee9550c7ed1e10d40820fb37e46a5e23a769808e36d3e3bbd7edec4deee3065de79e8a798c6ad70218eb80f98c6f29c05c87a76"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/shim/shimia32.efi/sha512/0e3d65da04dde786187e85edbee9550c7ed1e10d40820fb37e46a5e23a769808e36d3e3bbd7edec4deee3065de79e8a798c6ad70218eb80f98c6f29c05c87a76/shimia32.efi" }
+
+[[components.shim.source-files]]
+filename = "shimaa64.efi"
+hash = "57aa116d1c91a9ec36ab8b46c9164ae19af192bb15a2307269f69e2e838fa3798e310eb49e1c89e5cdceac5a5634028c62570467727ff6e878d3cdea36e84f2d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/shim/shimaa64.efi/sha512/57aa116d1c91a9ec36ab8b46c9164ae19af192bb15a2307269f69e2e838fa3798e310eb49e1c89e5cdceac5a5634028c62570467727ff6e878d3cdea36e84f2d/shimaa64.efi" }
