@@ -197,6 +197,7 @@
 [components.dlm]
 [components.dnf-plugins-core]
 [components.dnsmasq]
+[components.dns-root-data]
 [components.docbook-dtds]
 [components.docbook-style-dsssl]
 [components.docbook-style-xsl]
