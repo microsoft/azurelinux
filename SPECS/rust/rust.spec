@@ -2,14 +2,14 @@
 %global __requires_exclude ^librustc_driver-
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
-# Look for "date:" and "rustc:".
-%define release_date 2025-08-07
-%define stage0_version 1.89.0
+# Look for "compiler_date:" and "compiler_version".
+%define release_date 2025-10-30
+%define stage0_version 1.91.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.90.0
-Release:        5%{?dist}
+Version:        1.92.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,18 +41,14 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2025-4574.patch
-Patch1:         CVE-2025-53605.patch
-Patch2:         CVE-2024-11738.patch
-Patch3:         CVE-2025-55159.patch
-Patch4:         CVE-2025-67873.patch
-Patch5:         CVE-2025-68114.patch
-Patch6:         CVE-2025-4207.patch
-Patch7:         CVE-2025-12818.patch
-Patch8:         CVE-2026-24116.patch
-Patch9:         CVE-2025-58160.patch
-Patch10:        CVE-2026-25541.patch
-Patch11:        CVE-2026-25727.patch
+#Patch2:         CVE-2024-11738.patch
+#Patch3:         CVE-2025-55159.patch
+#Patch4:         CVE-2025-67873.patch
+#Patch5:         CVE-2025-68114.patch
+#Patch6:         CVE-2025-4207.patch
+#Patch7:         CVE-2025-12818.patch
+#Patch8:         CVE-2026-24116.patch
+#Patch9:         CVE-2025-58160.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -124,7 +120,7 @@ sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
     --enable-profiler \
-    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv,rustdoc" \
     --release-channel="stable" \
     --release-description="Azure Linux %{version}-%{release}"
 
@@ -179,6 +175,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %{_sysconfdir}/bash_completion.d/cargo
+%exclude %{_sysconfdir}/target-spec-json-schema.json
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
