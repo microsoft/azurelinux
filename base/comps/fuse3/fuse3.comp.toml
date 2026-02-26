@@ -1,0 +1,6 @@
+[components.fuse3]
+
+# We are temporarily building the Fedora 42 version of fuse3 to aid with bootstrapping
+# issues; notably, Fedora 43 shipped with the *Fedora 42* version of this package.
+[components.fuse3-42]
+spec = { type = "upstream", upstream-name = "fuse3", upstream-distro = { name = "fedora", version = "42" } }
