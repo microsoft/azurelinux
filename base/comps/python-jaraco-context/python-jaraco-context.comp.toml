@@ -1,7 +1,11 @@
 [components.python-jaraco-context]
-
-[components.python-jaraco-context.build]
-# Tests pass (14/14) but require python-jaraco-test >= 5.6.0 (rawhide),
-# while AZL currently has 5.5.0 (f43). Re-enable once python-jaraco-test
-# is updated or pinned to rawhide.
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
+# TODO: Remove snapshot pin once python-coherent-licensed lands in F43 stable (or F44+ is adopted).
+# Pin snapshot to before the broken 6.0.2/6.1.0 updates were pushed to the f43 branch.
+# These updates added a dynamic BuildRequires on python-coherent-licensed, which was never
+# shipped in F43 stable (the Fedora Koji build was trashcanned and the Bodhi update abandoned).
+# The last good f43 version is 6.0.1-9.fc43.
+# Refs:
+#   https://packages.fedoraproject.org/pkgs/python-jaraco-context/python3-jaraco-context/
+#   https://koji.fedoraproject.org/koji/buildinfo?buildID=2919309 (coherent-licensed trashcanned)
+#   https://src.fedoraproject.org/rpms/python-jaraco-context/tree/f43
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-01-05T00:00:00Z" } }
