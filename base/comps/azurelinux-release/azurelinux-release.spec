@@ -63,7 +63,10 @@ Requires:       azurelinux-release-common = %{version}-%{release}
 Recommends:     azurelinux-release-identity-basic
 
 
-BuildRequires:  azurelinux-rpm-config
+# For now we depend on `system-rpm-config`, which is provided both by
+# redhat-rpm-config (while bootstrapping) and azurelinux-rpm-config
+# (after bootstrapping).
+BuildRequires:  system-rpm-config
 BuildRequires:  systemd-rpm-macros
 
 %description
