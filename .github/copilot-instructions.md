@@ -52,8 +52,8 @@ Run all commands from the repo root (where `azldev.toml` lives). If the terminal
 | Add a component | `azldev comp add` |
 | Build a component | `azldev comp build -p <name> -q` |
 | Build chain (auto-publish to local repo) | `azldev comp build --local-repo-with-publish ./base/out -p <a> -p <b> -q` |
-| Prepare sources (apply overlays) | `azldev comp prep-sources -p <name> -o <dir> -q` |
-| Prepare sources (skip overlays) | `azldev comp prep-sources -p <name> --skip-overlays -o <dir> -q` |
+| Prepare sources (apply overlays) | `azldev comp prep-sources -p <name> --force -o <dir> -q` |
+| Prepare sources (skip overlays) | `azldev comp prep-sources -p <name> --skip-overlays --force -o <dir> -q` |
 | Build, keep env on failure | `azldev comp build -p <name> --preserve-buildenv on-failure -q` |
 | List images | `azldev image list` |
 | Build an image | `azldev image build` |

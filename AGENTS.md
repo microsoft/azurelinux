@@ -33,7 +33,7 @@ Do NOT skip testing for changes that affect RPM output. Do NOT tell the user "th
 
 - Always run `azldev comp list -p <name> -q -O json` before modifying a component.
 - Prefer overlays over forking/local specs when customizing upstream packages.
-- Use `azldev comp prep-sources -p <name> -o <dir> -q` to verify overlays apply cleanly before building.
+- Use `azldev comp prep-sources -p <name> --force -o <dir> -q` to verify overlays apply cleanly before building. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
 - Follow the inner loop cycle: investigate → modify → verify → build → test → inspect. See [`skill-build-component`](.github/skills/skill-build-component/SKILL.md).
   - Note: Use your best judgement, some packages are VERY slow to build (e.g., `kernel`), in those cases you may want to do multiple iterations of investigate → modify → verify with `prep-sources` before doing a full build + test.
 - `prep-sources -o <dir>` output is ad-hoc (user-chosen dir). `comp build` output goes to project-configured dirs (`base/out/`, `base/build/`). Don't conflate them.

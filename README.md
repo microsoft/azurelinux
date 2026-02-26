@@ -79,6 +79,31 @@ copilot --add-dir . -i "Upgrade vim to the next stable release"
 
 Note: `copilot` supports fully autonomous operation (no interactive mode) with `-p <prompt>` however, until azldev supports a full MCP mode the tool approvals are very difficult. `--yolo` (same as `--allow-all-tools --allow-all-paths --allow-all-urls`) is an option, but use with extreme caution since it grants the agent unrestricted access to your filesystem and network. For now, it's recommended to use `-i` to at least have visibility into the agent's thought process and tool usage.
 
+### Dockerized Batch Triage
+
+For batch triage of build failures, a containerized wrapper runs the `azl-diagnose` agent inside an Azure Linux 3.0 container. The repo is mounted read-only, the agent analyzes a results JSON file, and writes triage reports to `out/triage/`.
+
+```bash
+# Default: reads ./results.json
+scripts/batch-triage/triage.sh
+
+# Custom results file
+scripts/batch-triage/triage.sh --results /path/to/results.json
+
+# With extra instructions
+scripts/batch-triage/triage.sh --results /path/to/results.json 'only triage one package'
+```
+
+Requirements:
+
+- Docker (buildx recommended)
+- GitHub auth ([copilot env var](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/authenticate-copilot-cli), `copilot` logged in, or `gh` logged in)
+- a `.env` file (see above).
+
+Output lands in `out/triage/`.
+
+See [scripts/batch-triage/](scripts/batch-triage/) for the Dockerfile and wrapper script.
+
 ### CLI Agents
 
 Copilot CLI also supports agents, use `/agent` to select one, or start the CLI with a specific agent:

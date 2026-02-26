@@ -119,9 +119,22 @@ Optional fields that apply to multiple types: `section` (target spec section), `
 - **Scope regex overlays with `section` and `package`.** When using `spec-search-replace`, always set `section` (e.g. `"%files"`, `"%install"`) and `package` (e.g. `"foo"` for a `%files foo` section) to limit where the regex matches if possible. The `package` value is the **short sub-package suffix** as it appears after the section tag in the spec (e.g. `%files foo` → `package = "foo"`, not `package = "mypkg-foo"`). Unscoped regex overlays risk matching unintended lines elsewhere in the spec, especially after upstream updates. If the overlay targets a specific sub-package's `%files` section, both fields should be set.
 - **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements.
 - **No backreferences in `spec-search-replace`.** `${1}` or `$1` in `replacement` is literal text, not a capture group backreference. Repeat the matched text in the replacement instead.
-- **`lines` must be an array of strings.** Use `lines = ["single line"]` or a multi-line array `lines = ["line1", "line2"]`, not a bare string like `lines = "..."`.
+- **`lines` must be an array of strings.** Use `lines = ["single line"]` for single-element lists, or a multi-line array for multiple elements (not a bare string like `lines = "..."`).
+    ```toml
+    lines = [
+        "line 1",
+        "line 2",
+    ]
+    ```
 - **`file-add` places files at the sources root**, alongside the tarball and other Source files — NOT inside the extracted source tree. To install the added file, also add a `spec-add-tag` for the corresponding `Source` tag and a `spec-append-lines` in `%install` to install it. To modify files inside the extracted tree, use `file-search-replace` or add a `sed` command in `%prep` via `spec-append-lines`.
 - **Use TOML literal strings for regex.** `regex = 'RPM_VENDOR=redhat'` avoids double-escaping backslashes.
+- **Prefer multi-line format for TOML arrays.** When a list field (`lines`, `with`, `without`, etc.) has 2+ elements, split it across multiple lines with a trailing comma for readability:
+    ```toml
+    lines = [
+        "# Comment explaining the change",
+        "rm -f broken_test",
+    ]
+    ```
 - **Prefer targeted types over regex.** `spec-add-tag`, `spec-set-tag`, `spec-prepend-lines`, etc. are more robust to upstream changes. Use `spec-search-replace` as a last resort.
 - **`spec-prepend-lines` and `spec-append-lines` operate *within* a section body.** `spec-prepend-lines` inserts right after the section header (start of body); `spec-append-lines` inserts at the end of the section body (before the next section). Neither inserts outside the section boundary. For example, to add install commands at the end of `%install`, use `spec-append-lines` with `section = "%install"` — do NOT use `spec-prepend-lines` with `section = "%files"` (that would put the lines inside `%files`).
 - **Don't rename `Name:`.** Changing the spec `Name:` tag causes cascading breakage (`%{name}` in Source0, `%setup`, paths, `%files`).
