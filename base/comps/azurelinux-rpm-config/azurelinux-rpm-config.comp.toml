@@ -12,11 +12,6 @@ overlays = [
     # Set our version.
     { type = "spec-update-tag", tag = "Version", value = "1004" },
 
-    # Create a symlink pkg-config: /usr/bin/<arch>-azurelinux-linux-gnu-pkg-config -> /usr/bin/<arch>-redhat-linux-gnu-pkg-config.
-    # TODO: remove symlinks after bootstrap
-    { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/bin", "for arch in x86_64 aarch64; do", "  ln -sf ${arch}-redhat-linux-gnu-pkg-config %{buildroot}/usr/bin/${arch}-azurelinux-linux-gnu-pkg-config", "done"] },
-    { type = "spec-prepend-lines", section = "%files", lines = ["/usr/bin/*-azurelinux-linux-gnu-pkg-config"] },
-
     #
     # Overlays for non-spec files.
     #

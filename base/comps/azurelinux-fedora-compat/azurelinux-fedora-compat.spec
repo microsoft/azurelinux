@@ -62,7 +62,13 @@ Azure Linux compatibility providing 'redhat-rpm-config'.
 install -d -m 0755 %{buildroot}/usr/lib/rpm
 ln -s azurelinux %{buildroot}/usr/lib/rpm/redhat
 
+install -d -m 0755 %{buildroot}/usr/bin
+ln -s aarch64-azurelinux-linux-gnu-pkg-config %{buildroot}/usr/bin/aarch64-redhat-linux-gnu-pkg-config
+ln -s x86_64-azurelinux-linux-gnu-pkg-config %{buildroot}/usr/bin/x86_64-redhat-linux-gnu-pkg-config
+
 %files
+/usr/bin/aarch64-redhat-linux-gnu-pkg-config
+/usr/bin/x86_64-redhat-linux-gnu-pkg-config
 
 %files rpm-config
 /usr/lib/rpm/redhat
