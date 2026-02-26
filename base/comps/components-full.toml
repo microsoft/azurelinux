@@ -275,7 +275,6 @@
 [components.fribidi]
 [components.fsverity-utils]
 [components.fuse-overlayfs]
-[components.fuse3]
 [components.fusesource-pom]
 [components.game-music-emu]
 [components.gavl]
