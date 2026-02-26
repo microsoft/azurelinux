@@ -36,6 +36,18 @@ Requires: azurelinux-release-identity
 %description release-identity
 Azure Linux compatibility providing 'fedora-release-identity'.
 
+%package repos
+Provides: fedora-repos
+Requires: azurelinux-repos
+%description repos
+Azure Linux compatibility providing 'fedora-repos'.
+
+%package gpg-keys
+Provides: fedora-gpg-keys
+Requires: azurelinux-gpg-keys
+%description gpg-keys
+Azure Linux compatibility providing 'fedora-gpg-keys'.
+
 %prep
 
 %build
