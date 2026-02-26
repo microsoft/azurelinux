@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ Patch10:        CVE-2025-11468.patch
 Patch11:        CVE-2026-0672.patch
 Patch12:        CVE-2026-0865.patch
 Patch13:        CVE-2026-1299.patch
+Patch14:        CVE-2026-1703.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -39,6 +40,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  readline-devel
 BuildRequires:  sqlite-devel
+BuildRequires:  perl-WWW-Curl
 BuildRequires:  xz-devel
 Requires:       ncurses
 Requires:       openssl
@@ -140,7 +142,26 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%autosetup -p1 -n Python-%{version}
+%autosetup -p1 -n Python-%{version} -N
+
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+pushd Lib/ensurepip/_bundled
+unzip pip-24.3.1-py3-none-any.whl
+%patch14 -p1
+popd
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -252,6 +273,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Feb 27 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.12.9-10
+- Patch for CVE-2026-1703
+
 * Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-9
 - Patch for CVE-2026-1299
 
