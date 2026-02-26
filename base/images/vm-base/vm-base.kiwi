@@ -15,7 +15,8 @@
         <release-version>4.0</release-version>
         <type
             image="oem"
-            format="vhdx"
+            format="vhd-fixed"
+            formatoptions="force_size"
             initrd_system="dracut"
             filesystem="ext4"
             kernelcmdline="console=ttyS0 rd.shell=0"
@@ -25,7 +26,7 @@
             bootpartition="false"
             efipartsize="200">
             <bootloader name="systemd_boot" timeout="0" />
-            <size unit="G">4</size>
+            <size unit="M">4096</size>
             <initrd action="setup">
                 <dracut uefi="true"/>
             </initrd>
