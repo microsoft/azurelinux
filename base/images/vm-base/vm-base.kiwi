@@ -33,10 +33,11 @@
         </type>
     </preferences>
 
-    <repository type="rpm-md" alias="fedora-43-everything">
-        <source
-            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+    <!-- Priority 1 = highest; AZL packages always preferred -->
+    <repository type="rpm-md" alias="azl4-rpms" priority="1">
+        <source path="http://20.88.251.114/kojifiles/repos-dist/azl4-rpms-tag-20260225/425/x86_64/" />
     </repository>
+
 
     <packages type="image">
         <!-- Core group -->
