@@ -102,28 +102,11 @@ func main() {
 		for _, specFile := range allSpecFiles {
 
 			// Get spec file version-release
-
-			specFileName := filepath.Base(specFile)
-
-			sourceDir := filepath.Dir(specFile)
-			defines := rpm.DefaultDistroDefines(false, *distTag)
-
-			packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
+			macrosOutput, err = processSpecFile(specFile, buildArch, prefix, macrosOutput)
 
 			if err != nil {
-				logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
+				logger.Log.Errorf("Error processing spec file (%s): %s", specFile, err)
 				continue
-			}
-
-			for _, packageVersionString := range packages {
-
-				macros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
-				if err != nil {
-					logger.Log.Errorf("Error processing package version string: %s", err)
-					continue
-				}
-
-				macrosOutput = append(macrosOutput, macros)
 			}
 		}
 
@@ -137,6 +120,35 @@ func main() {
 	}
 
 	writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
+}
+
+func processSpecFile(specFile string, buildArch string, prefix string, macrosOutput []string) (newMacrosOutput []string, err error) {
+	// Get spec file version-release
+
+	specFileName := filepath.Base(specFile)
+
+	sourceDir := filepath.Dir(specFile)
+	defines := rpm.DefaultDistroDefines(false, *distTag)
+
+	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
+
+	if err != nil {
+		logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
+		return nil, err
+	}
+
+	for _, packageVersionString := range packages {
+
+		macros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
+		if err != nil {
+			logger.Log.Errorf("Error processing package version string: %s", err)
+			continue
+		}
+
+		macrosOutput = append(macrosOutput, macros)
+	}
+
+	return macrosOutput, nil
 }
 
 func processPackageVersionString(packageVersionString string, specFileName string, prefix string) (macros string, err error) {
