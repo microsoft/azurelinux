@@ -1,0 +1,7 @@
+[components.libdeflate]
+
+[components.libdeflate.build]
+# Disable MinGW cross-compilation subpackages. AZL has no MinGW support and
+# the mingw debuginfo RPMs cause noarch rpmdiff failures due to non-deterministic
+# find ordering in mingw-find-debuginfo.sh across x86_64 and aarch64 builders.
+without = ["mingw"]
