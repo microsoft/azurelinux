@@ -1,0 +1,2 @@
+[components.azurelinux-fedora-compat]
+spec = { type = "local", path = "azurelinux-fedora-compat.spec" }

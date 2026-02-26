@@ -84,6 +84,9 @@ Requires:   azurelinux-release-identity = %{version}-%{release}
 Provides:       system-release(releasever) = %{releasever}
 %endif
 
+# TEMPORARY remove after repo bootstrap is complete
+Requires:   azurelinux-fedora-compat
+
 %description common
 Release files common to all variants of Azure Linux
 
