@@ -3,8 +3,8 @@ param imageDefinitionName string
 param versionName string
 param location string = resourceGroup().location
 param regions array = [resourceGroup().location]
-param sourceDiskId string
-param sourceDiskUrl string
+param sourceStorageAccountId string
+param sourceVhdUri string
 param defaultReplicaCount int = 1
 param excludedFromLatest bool = false
 param allowDeletionOfReplicatedLocations bool = false
@@ -29,8 +29,8 @@ resource imageVersion 'Microsoft.Compute/galleries/images/versions@2024-03-03' =
       osDiskImage: {
         hostCaching: 'ReadWrite'
         source: {
-          storageAccountId: sourceDiskId
-          uri: sourceDiskUrl
+          storageAccountId: sourceStorageAccountId
+          uri: sourceVhdUri
         }
       }
     }

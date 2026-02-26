@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -euxo pipefail
 # Find the absolute path of the directory containing this script
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPTS_DIR/common.sh"
@@ -8,7 +8,7 @@ storage_account_url="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net"
 storage_account_resource_id="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
 replicationMode="Shallow"
-storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$storage_blob_name"
+storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$STORAGE_BLOB_NAME"
 
 az account set --subscription "$SUBSCRIPTION_ID"
 
@@ -19,7 +19,6 @@ if [ "$(az group exists -n "$RESOURCE_GROUP_NAME")" == "false" ]; then
 fi
 
 # Ensure STORAGE_ACCOUNT_NAME exists and the managed identity has access
-storage_account_resource_id="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 if ! az storage account show --ids "$storage_account_resource_id"; then
     echo "Could not find storage account \"$STORAGE_ACCOUNT_NAME\" in the expected location. Creating the storage account."
 
@@ -72,7 +71,7 @@ if [[ $imageDefinitionExists -eq 0 ]]; then
         --os-type Linux
 fi
 
-VERSION="$(get-image-version increment)"
+image_version="$(increment-version "$(get-image-version)")"
 
 # Convert comma-separated regions to JSON array for bicep template
 # Note: Using a single region for now
@@ -86,14 +85,14 @@ REGIONS_JSON=$(echo "$LOCATION" | awk -F, '{
 }')
 # Create Image Version from storage account blob
 az deployment group create \
-  --name "$GALLERY_IMAGE_DEFINITION-$VERSION" \
+  --name "$GALLERY_IMAGE_DEFINITION-$image_version" \
   --resource-group "$RESOURCE_GROUP_NAME" \
   --template-file "$SCRIPTS_DIR/azure-gallery-image-base.bicep" \
   --parameters galleryName="$GALLERY_NAME" \
                imageDefinitionName="$GALLERY_IMAGE_DEFINITION" \
-               versionName="$VERSION" \
+               versionName="$image_version" \
                location="$LOCATION" \
                regions="$REGIONS_JSON" \
-               sourceDiskId="$storage_account_resource_id" \
-               sourceDiskUrl="$storage_blob_endpoint" \
+               sourceStorageAccountId="$storage_account_resource_id" \
+               sourceVhdUri="$storage_blob_endpoint" \
                replicationMode="$replicationMode"
