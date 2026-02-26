@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 // versionsprocessor is a tool to generate a macro file of all specs version and release.
-// It iterates ove all of the SPEC files in the provided directory, gets the version and release for each SPEC,
-// and then writes that information to an output file as RPM macros file.\
+// It iterates over all of the SPEC files in the provided directory, gets the version and release for each SPEC,
+// and then writes that information to an output file as RPM macros file.
 // The output file is then provided to other tools and passed into their respective rpm macros folder so that rpmbuild command automatically recognize it.
 
 package main
@@ -65,14 +65,15 @@ func main() {
 	timestamp.BeginTiming("versionsprocessor", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	logger.PanicOnError(err)
-
 	var buildArch string = *targetArch
 
 	if *targetArch == "" {
 		buildArch, err = rpm.GetRpmArch(runtime.GOARCH)
 		if err != nil {
-			return
+			logger.PanicOnError(err)
+		}
+		if err != nil {
+			logger.Log.Errorf("Failed to determine RPM architecture for runtime architecture %q: %v", runtime.GOARCH, err)
 		}
 	}
 
@@ -84,7 +85,7 @@ func main() {
 	const leaveFilesOnDisk = false
 	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
 	if err != nil {
-		return
+		logger.PanicOnError("Failed to create chroot")
 	}
 	defer chroot.Close(leaveFilesOnDisk)
 
@@ -119,7 +120,11 @@ func main() {
 		err = doParse()
 	}
 
-	writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
+	err = writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
+	if err != nil {
+		logger.Log.Errorf("Failed to write extra files to output: %s", err)
+		os.Exit(1)
+	}
 }
 
 func processSpecFile(specFile string, buildArch string, prefix string, macrosOutput []string) (newMacrosOutput []string, err error) {
