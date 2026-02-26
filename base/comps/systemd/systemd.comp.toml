@@ -1,0 +1,17 @@
+[components.systemd]
+
+# AZL's setup package is 2.15.0-1, but upstream Fedora 41+ systemd requires >= 2.15.0-3.
+# Lower the version threshold to match what's available in AZL.
+# Ref: https://src.fedoraproject.org/rpms/setup/commits/rawhide (2.15.0-3 added /usr/lib/sysusers.d ownership)
+
+[[components.systemd.overlays]]
+description = "Lower BuildRequires on setup from 2.15.0-3 to 2.15.0-1 to match AZL's available version"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+setup >= 2\.15\.0-3$'
+replacement = "BuildRequires:  setup >= 2.15.0-1"
+
+[[components.systemd.overlays]]
+description = "Lower Conflicts on setup from 2.15.0-3 to 2.15.0-1 to match AZL's available version"
+type = "spec-search-replace"
+regex = '^Conflicts:\s+setup < 2\.15\.0-3$'
+replacement = "Conflicts:      setup < 2.15.0-1"
