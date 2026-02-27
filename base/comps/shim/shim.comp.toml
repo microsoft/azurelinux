@@ -1,13 +1,21 @@
 [components.shim]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-06-01T00:00:00-08:00" } }
 
-[[components.shim.overlays]]
-description = "TEMPORARILY use the unsigned shim binaries from our shim-unsigned-ARCH packages"
-type = "spec-append-lines"
-section = "%prep"
-lines = [
-  "test -e %{shimdirx64}/$(basename %{shimefix64}) && cp -vf %{shimdirx64}/$(basename %{shimefix64}) %{shimefix64} ||:",
-  "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
-  "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
+overlays = [
+  # TEMPORARILY force dist tag to be present in release to avoid NEVR conflicts
+  { type = "spec-search-replace", regex = '%global dist.*', replacement = "" },
+
+  # TEMPORARILY remove release from the dependency on the shim unsigned packages
+  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedx64.*$', replacement = "BuildRequires: %{unsignedx64} = 15.8" },
+  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedia32.*$', replacement = "BuildRequires: %{unsignedia32} = 15.8" },
+  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedaa64.*$', replacement = "BuildRequires: %{unsignedaa64} = 15.8" },
+
+  # TEMPORARILY use the unsigned shim binaries from our shim-unsigned-ARCH packages
+  { type = "spec-append-lines", section = "%prep", lines = [
+    "test -e %{shimdirx64}/$(basename %{shimefix64}) && cp -vf %{shimdirx64}/$(basename %{shimefix64}) %{shimefix64} ||:",
+    "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
+    "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
+  ] },
 ]
 
 # TEMPORARY DIRTY SOLUTION:
