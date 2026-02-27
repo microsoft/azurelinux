@@ -1,11 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
-<<<<<<< HEAD
-Release:        20%{?dist}
-=======
 Release:        19%{?dist}
->>>>>>> 9704c9209 ([AutoPR- Security] Patch telegraf for CVE-2026-27571 [HIGH] (#16032))
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,15 +28,12 @@ Patch14:        CVE-2024-51744.patch
 Patch15:        CVE-2025-30215.patch
 Patch16:        CVE-2025-22872.patch
 Patch17:        CVE-2025-10543.patch
-<<<<<<< HEAD
-Patch18:        CVE-2025-47911.patch
-Patch19:        CVE-2025-58190.patch
-Patch20:        CVE-2026-2303.patch
-Patch21:        CVE-2026-26014.patch
-Patch22:        CVE-2025-11065.patch
-=======
 Patch18:        CVE-2026-27571.patch
->>>>>>> 9704c9209 ([AutoPR- Security] Patch telegraf for CVE-2026-27571 [HIGH] (#16032))
+Patch19:        CVE-2025-47911.patch
+Patch20:        CVE-2025-58190.patch
+Patch21:        CVE-2026-2303.patch
+Patch22:        CVE-2026-26014.patch
+Patch23:        CVE-2025-11065.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -111,16 +104,14 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-<<<<<<< HEAD
 * Tue Feb 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.29.4-20
 - Patch CVE-2025-11065
 
 * Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.29.4-19
 - Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
-=======
+
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.29.4-19
 - Patch for CVE-2026-27571
->>>>>>> 9704c9209 ([AutoPR- Security] Patch telegraf for CVE-2026-27571 [HIGH] (#16032))
 
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.29.4-18
 - Patch for CVE-2025-10543
