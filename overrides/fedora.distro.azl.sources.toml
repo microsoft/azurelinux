@@ -1,0 +1,3 @@
+[distros.fedora]
+dist-git-base-uri = "https://azl.src.kojiaks.internal/rpms/$pkg.git"
+lookaside-base-uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
