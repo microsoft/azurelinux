@@ -107,9 +107,6 @@ fi
 * Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-11
 - Patch for CVE-2025-47913
 
-* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-11
-- Patch for CVE-2025-47913
-
 * Tue Apr 22 2025 Mayank Singh <mayansingh@microsoft.com> - 1.31.0-10
 - Fix CVE-2025-22872 with an upstream patch
 
