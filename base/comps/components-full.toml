@@ -2409,7 +2409,6 @@
 [components.python-stack-data]
 [components.python-starlette]
 [components.python-statsmodels]
-[components.python-stestr]
 [components.python-stevedore]
 [components.python-strict-rfc3339]
 [components.python-sure]

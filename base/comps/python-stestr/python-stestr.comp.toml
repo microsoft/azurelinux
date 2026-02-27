@@ -1,0 +1,11 @@
+[components.python-stestr]
+
+# cliff.sphinxext uses argparse.HelpFormatter._format_actions_usage, a private API
+# removed in Python 3.14. This crashes sphinx-build during %build when generating docs.
+# Disable doc generation while we figure out what to do about this.
+# Fixed in cliff: https://opendev.org/openstack/cliff/commit/391261c849c994ca2d3f42926497e633047ed8c7
+[[components.python-stestr.overlays]]
+description = "Disable doc generation — cliff.sphinxext is incompatible with Python 3.14 (uses removed argparse._format_actions_usage)"
+type = "spec-search-replace"
+regex = '^%global with_doc 1$'
+replacement = '%global with_doc 0'
