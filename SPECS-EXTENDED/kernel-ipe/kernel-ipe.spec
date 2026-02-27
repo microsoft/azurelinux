@@ -461,7 +461,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Fri Feb 27 2026 Andrew Chiang <andrewchiang@microsoft.com> - 6.6.126.1-2
-- Bump release to match kernel
+- Enable CONFIG_TCP_CONG_BBR3=m
 
 * Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
 - Auto-upgrade to 6.6.126.1
