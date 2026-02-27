@@ -1,0 +1,181 @@
+# ---------------------------------------------------------------------------
+# Azure DevOps Pipeline — Sync Fedora Sources to Azure Blob Storage
+# ---------------------------------------------------------------------------
+#
+# Purpose:
+#   Downloads upstream Fedora component sources via azldev, verifies their
+#   integrity, and uploads them to an Azure Blob Storage lookaside cache.
+#   This keeps the lookaside in sync with the component definitions on the
+#   tomls/base/main branch.
+#
+# Trigger:
+#   Runs automatically on every merge to tomls/base/main.  `batch: true`
+#   coalesces concurrent commits so only the latest triggers a run.
+#   Can also be triggered manually via the ADO "Run pipeline" button,
+#   optionally overriding parameters (e.g. to sync a specific component).
+#
+# Prerequisites:
+#   1. An Azure Service Connection with "Storage Blob Data Contributor"
+#      (or equivalent) on the target storage account.  Set its name in
+#      the `serviceConnectionName` variable below.
+#   2. The `azldev` binary published to an Azure DevOps Artifacts
+#      Universal Package feed.  Set the feed coordinates in the
+#      `azldevFeed*` variables below.
+#
+# See scripts/README.md for full documentation.
+# ---------------------------------------------------------------------------
+
+trigger:
+  batch: true                       # coalesce — only latest commit runs
+  branches:
+    include:
+      - tomls/base/main
+
+# Allow manual runs from the ADO UI with parameter overrides.
+pr: none
+
+# ---------------------------------------------------------------------------
+# Parameters — configurable at queue time via "Run pipeline"
+# ---------------------------------------------------------------------------
+parameters:
+  - name: accountUrl
+    displayName: "Azure Storage Account URL"
+    type: string
+    default: "https://azltempstaginglookaside.blob.core.windows.net"
+
+  - name: container
+    displayName: "Blob container name"
+    type: string
+    default: "repo"
+
+  - name: components
+    displayName: "Components to sync (newline-separated; leave empty for all)"
+    type: string
+    default: ""
+
+# ---------------------------------------------------------------------------
+# Variables
+# ---------------------------------------------------------------------------
+variables:
+  # -- Azure Service Connection --
+  # Replace with the name of your ADO Service Connection that has
+  # "Storage Blob Data Contributor" on the storage account specified
+  # in parameters.accountUrl.
+  serviceConnectionName: "<YOUR_AZURE_SERVICE_CONNECTION>"
+
+  # -- azldev ADO Artifacts feed coordinates --
+  # The pipeline downloads the azldev binary from a Universal Package
+  # published to an Azure DevOps Artifacts feed.
+  #
+  # For a project-scoped feed use:
+  #   azldevFeed: "<PROJECT_NAME>/<FEED_NAME>"
+  # For an organization-scoped feed use:
+  #   azldevFeed: "<FEED_NAME>"
+  azldevFeed: "<YOUR_FEED>"
+  azldevPackageName: "azldev"
+  azldevPackageVersion: "*"          # "*" = latest; pin to e.g. "1.2.3" for reproducibility
+
+  # -- Misc --
+  pythonVersion: "3.10"
+
+# ---------------------------------------------------------------------------
+# Job
+# ---------------------------------------------------------------------------
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  # 1. Checkout ----------------------------------------------------------
+  - checkout: self
+    displayName: "Checkout repository"
+
+  # 2. Python setup -------------------------------------------------------
+  - task: UsePythonVersion@0
+    displayName: "Set up Python $(pythonVersion)"
+    inputs:
+      versionSpec: "$(pythonVersion)"
+
+  # 3. Install Python dependencies ----------------------------------------
+  - script: |
+      set -euo pipefail
+      python -m pip install --upgrade pip
+      pip install azure-identity azure-storage-blob
+    displayName: "Install Python dependencies"
+
+  # 4. Fetch azldev from ADO Artifacts feed --------------------------------
+  #
+  # Downloads the azldev Universal Package from the configured ADO feed
+  # into the repo root and makes it executable.
+  #
+  # TODO: Replace the placeholder feed variables above with real values.
+  #       The build service identity for this pipeline must have "Reader"
+  #       access to the feed.  For organization-scoped feeds this is
+  #       granted automatically; for cross-project feeds you may need to
+  #       add the "<Project> Build Service (<Org>)" identity explicitly.
+  - task: UniversalPackages@0
+    displayName: "Download azldev from ADO Artifacts"
+    inputs:
+      command: download
+      vstsFeed: "$(azldevFeed)"
+      vstsFeedPackage: "$(azldevPackageName)"
+      vstsPackageVersion: "$(azldevPackageVersion)"
+      downloadDirectory: "$(Build.SourcesDirectory)"
+
+  - script: chmod +x ./azldev
+    displayName: "Make azldev executable"
+    workingDirectory: "$(Build.SourcesDirectory)"
+
+  # 5. Write components file (conditional) ---------------------------------
+  #
+  # When the `components` parameter is non-empty, write its value into a
+  # file (one component per line) so we can pass it to --components-file.
+  # When empty, the script auto-discovers all components matching the
+  # default filter ("Upstream: fedora").
+  - script: |
+      set -euo pipefail
+      printf '%s\n' '${{ parameters.components }}' > components.pipeline.list
+      echo "Components file written:"
+      cat components.pipeline.list
+    displayName: "Write components list file"
+    workingDirectory: "$(Build.SourcesDirectory)"
+    condition: and(succeeded(), ne('${{ parameters.components }}', ''))
+
+  # 6. Run sync-sources.py ------------------------------------------------
+  #
+  # Uses AzureCLI@2 which performs `az login` automatically using the
+  # Service Connection, satisfying the script's AzureCliCredential auth.
+  - task: AzureCLI@2
+    displayName: "Run sync-sources.py"
+    inputs:
+      azureSubscription: "$(serviceConnectionName)"
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+
+        ARGS=(
+          python scripts/sync-sources.py
+          --account-url "${{ parameters.accountUrl }}"
+          --container "${{ parameters.container }}"
+        )
+
+        # If a components file was written in the previous step, use it.
+        if [[ -f "components.pipeline.list" ]]; then
+          ARGS+=(--components-file components.pipeline.list)
+        fi
+
+        echo "Running: ${ARGS[*]}"
+        "${ARGS[@]}"
+      workingDirectory: "$(Build.SourcesDirectory)"
+
+  # 7. Publish failed-components list as artifact --------------------------
+  #
+  # Always runs (even on partial failure) so operators can inspect which
+  # components failed and re-trigger with that list.
+  - task: PublishPipelineArtifact@1
+    displayName: "Publish failed components list"
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: "$(Build.SourcesDirectory)/components.failed.list"
+      artifactName: "failed-components"
+    continueOnError: true             # no-op if the file doesn't exist (full success)
