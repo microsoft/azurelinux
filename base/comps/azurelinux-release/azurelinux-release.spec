@@ -1,4 +1,4 @@
-%define release_name "Alpha1"
+%define release_name Alpha1
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
