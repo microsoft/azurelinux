@@ -117,11 +117,11 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
+- Bump release to rebuild with rust
+
 * Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
 - Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
-
-* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
-- Bump release to rebuild with rust
 
 * Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
