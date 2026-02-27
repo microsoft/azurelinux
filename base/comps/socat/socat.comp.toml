@@ -1,6 +1,12 @@
 [components.socat]
 
 [[components.socat.overlays]]
+description = "Export SHELL env var — socat SHELL address type requires it but mock chroot does not set it"
+type = "spec-prepend-lines"
+section = "%check"
+lines = ["export SHELL=/bin/bash"]
+
+[[components.socat.overlays]]
 description = "Exclude VSOCK_ECHO test (410) — /dev/vsock unavailable in mock chroot"
 type = "spec-search-replace"
 section = "%check"
