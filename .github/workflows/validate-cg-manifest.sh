@@ -10,8 +10,7 @@
 #   - The URL listed in the cgmanifets is valid (can be downloaded)
 
 # $1 - Path to worker chroot's archive
-# $2 - Path to macros.releaseversions file to copy to the chroot for rpmspec parsing
-# $3+ - Paths to spec files to check
+# $2+ - Paths to spec files to check
 
 set -euo pipefail
 
@@ -91,7 +90,6 @@ chroot_rpmspec() {
 prepare_chroot_environment() {
   local chroot_archive
   local chroot_dir_path
-  local macros_file
   local chroot_rpm_macros_dir_path
   local dist_name
   local dist_number
@@ -99,8 +97,7 @@ prepare_chroot_environment() {
   local rpm_macros_dir_path
 
   chroot_archive="$1"
-  chroot_dir_path="$3"
-  macros_file="$2"
+  chroot_dir_path="$2"
 
   echo "Creating worker chroot under '$chroot_dir_path'."
 
@@ -127,24 +124,16 @@ prepare_chroot_environment() {
     sudo cp -v "$macro_file" "$chroot_rpm_macros_dir_path"
   done
 
-  echo "Copying the version/release macros file to the chroot."
-  sudo cp -v "$macros_file" "$chroot_rpm_macros_dir_path"
-
   echo
 }
 
-if [[ $# -lt 3 ]]; then
+if [[ $# -lt 2 ]]; then
   echo "No specs passed to validate."
   exit 1
 fi
 
 if [[ ! -f "$1" ]]; then
   echo "First argument is not a valid file. Please pass the path to the worker chroot's archive."
-  exit 1
-fi
-
-if [[ ! -f "$2" ]]; then
-  echo "Second argument is not a valid file. Please pass the path to the macros.releaseversions file to copy to the chroot."
   exit 1
 fi
 
@@ -157,10 +146,9 @@ function clean_up {
 }
 trap clean_up EXIT SIGINT SIGTERM
 
-prepare_chroot_environment "$1" "$2" "$WORK_DIR"
+prepare_chroot_environment "$1" "$WORK_DIR"
 
 shift # Remove the first argument (the chroot archive) from the list of specs to check.
-shift # Remove the second argument (the macros.releaseversions file) from the list of specs to check.
 echo "Checking $# specs."
 
 i=0
