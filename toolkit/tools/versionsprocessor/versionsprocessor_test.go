@@ -490,7 +490,7 @@ func TestWriteExtraFilesToOutput_SkipsEmptyPaths(t *testing.T) {
 	// Should only contain the original macros, nothing extra.
 	assert.Contains(t, content, "%azl_pkg_version 1.0")
 	lines := strings.Split(strings.TrimSpace(content), "\n")
-	assert.Equal(t, 1, len(lines))
+	assert.Equal(t, len(lines), 1)
 }
 
 func TestWriteExtraFilesToOutput_NonexistentExtraFile(t *testing.T) {
