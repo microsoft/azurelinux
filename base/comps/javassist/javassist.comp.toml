@@ -1,0 +1,10 @@
+[components.javassist]
+
+# Disable tests during the maven build.
+# They run tests as part of the build, meaning the %build section will fail on flaky tests.
+[[components.javassist.overlays]]
+description = "Disabling checks for initial set of failures"
+type = "spec-search-replace"
+section = "%build"
+regex = '^%mvn_build$'
+replacement = '%mvn_build -f'
