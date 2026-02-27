@@ -1,0 +1,17 @@
+[components.gt]
+
+# The upstream spec sets %build_type_safety_c 0 which adds -fpermissive, but that
+# is insufficient for GCC's treatment of K&R empty-parens declarations (e.g.,
+# `FILE *efopen()`) as zero-argument prototypes. Adding -std=gnu89 restores C89
+# semantics where empty parens mean "unspecified arguments," fixing hard errors
+# like "too many arguments to function 'efopen'; expected 0, have 2" in dim.c.
+#
+# Fixed via a patch that addresses the issue in F44 with
+# https://src.fedoraproject.org/rpms/gt/c/a8aec4724c07e306085f4b6e1a68e2ebde540359
+[[components.gt.overlays]]
+description = "Add -std=gnu89 to CFLAGS to fix K&R C function declarations failing with modern GCC"
+type = "spec-prepend-lines"
+section = "%build"
+lines = [
+    'export CFLAGS="$CFLAGS -std=gnu89"',
+]

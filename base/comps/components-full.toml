@@ -579,7 +579,6 @@
 [components.gstreamer1]
 [components.gstreamer1-plugins-bad-free]
 [components.gstreamer1-plugins-base]
-[components.gt]
 [components.gtest]
 [components.gtk-doc]
 [components.gtk-layer-shell]
