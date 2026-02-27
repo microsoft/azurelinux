@@ -2,8 +2,8 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.1.0
-Release:        2%{?dist}
+Version:        1.2.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -112,8 +112,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
-* Fri Feb 13 2026 Brian Fjeldstad <bfjelds@microsoft.com> 1.1.0-2
-- Add osmodifier
+* Fri Feb 27 2026 Brian Fjeldstad <bfjelds@microsoft.com> 1.2.0-1
+- Add osmodifier subpackage
+- Upgrade to version 1.2.0
 
 * Mon Dec 8 2025 Chris Gunn <chrisgun@microsoft.com> 1.1.0-1
 - Upgrade to version 1.1.0
