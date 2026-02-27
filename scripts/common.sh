@@ -21,7 +21,7 @@ export SSH_PUBLIC_KEY_PATH="<path-to-your-ssh-public-key>"
 export TEST_VM_SIZE="<your-test-vm-size>"
 
 # Set local image path
-export IMAGE_PATH="./base/out/images/vm-base/azl4-vm-base.x86_64-0.1.vhdfixed"
+export IMAGE_PATH="$REPO_ROOT/base/out/images/vm-base/azl4-vm-base.x86_64-0.1.vhdfixed"
 
 # Set gallery configuration
 export GALLERY_NAME="<your-gallery-name>"
