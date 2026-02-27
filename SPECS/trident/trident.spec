@@ -10,7 +10,7 @@ Summary:        Declarative, security-first OS lifecycle agent designed primaril
 Name:           trident
 %if %{undefined rpm_ver}
 # Use hard-coded versions for distro build
-Version:        0.20.0
+Version:        0.21.0
 Release:        1%{?dist}
 %else
 Version:        %{rpm_ver}
@@ -85,6 +85,17 @@ and its dependencies for managing the lifecycle of Azure Linux hosts.
 # For Trident repo build, package osmodifier included via `Source1`
 %{_bindir}/osmodifier
 %endif
+%{_unitdir}/%{name}d.service
+%{_unitdir}/%{name}d.socket
+
+%post
+%systemd_post %{name}d.socket
+
+%preun
+%systemd_preun %{name}d.socket
+
+%postun
+%systemd_postun %{name}d.socket
 
 # ------------------------------------------------------------------------------
 
@@ -115,23 +126,19 @@ Requires:       %{name}
 Conflicts:      %{name}-install-service
 
 %description service
-Trident files for SystemD update and commit services
+Trident files for SystemD commit services
 
 %files service
 %{_unitdir}/%{name}.service
-%{_unitdir}/%{name}-update.service
 
 %post service
 %systemd_post %{name}.service
-%systemd_post %{name}-update.service
 
 %preun service
 %systemd_preun %{name}.service
-%systemd_preun %{name}-update.service
 
 %postun service
 %systemd_postun_with_restart %{name}.service
-%systemd_postun_with_restart %{name}-update.service
 
 # ------------------------------------------------------------------------------
 
@@ -154,28 +161,6 @@ Trident files for SystemD install service
 
 %postun install-service
 %systemd_postun_with_restart %{name}-install.service
-
-# ------------------------------------------------------------------------------
-
-%package update-poll
-Summary:        Trident files for SystemD service
-Requires:       %{name}
-Requires:       %{name}-service
-
-%description update-poll
-SystemD timer for update polling with Harpoon.
-
-%files update-poll
-%{_unitdir}/%{name}-update.timer
-
-%post update-poll
-%systemd_post %{name}-update.timer
-
-%preun update-poll
-%systemd_preun %{name}-update.timer
-
-%postun update-poll
-%systemd_postun_with_restart %{name}-update.timer
 
 # ------------------------------------------------------------------------------
 
@@ -284,9 +269,11 @@ install -D -p -m 0644 selinux/%{name}.if %{buildroot}%{_datadir}/selinux/devel/i
 mkdir -p %{buildroot}%{_unitdir}
 install -D -m 644 packaging/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -D -m 644 packaging/systemd/%{name}-install.service %{buildroot}%{_unitdir}/%{name}-install.service
-install -D -m 644 packaging/systemd/%{name}-update.service %{buildroot}%{_unitdir}/%{name}-update.service
+# Network configuration service for provisioning OS
 install -D -m 644 packaging/systemd/%{name}-network.service %{buildroot}%{_unitdir}/%{name}-network.service
-install -D -m 644 packaging/systemd/%{name}-update.timer %{buildroot}%{_unitdir}/%{name}-update.timer
+# Daemon socket and service
+install -D -m 644 packaging/systemd/%{name}d.socket %{buildroot}%{_unitdir}/%{name}d.socket
+install -D -m 644 packaging/systemd/%{name}d.service %{buildroot}%{_unitdir}/%{name}d.service
 
 mkdir -p %{buildroot}/etc/%{name}
 
@@ -302,6 +289,6 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
-* Mon Jan 5 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.20.0-1
+* Mon Jan 5 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.21.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.
