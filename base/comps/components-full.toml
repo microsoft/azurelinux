@@ -673,7 +673,6 @@
 [components.javacc-maven-plugin]
 [components.javapackages-tools]
 [components.javaparser]
-[components.javassist]
 [components.jaxb-api2]
 [components.jaxen]
 [components.jbig2dec]
