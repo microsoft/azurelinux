@@ -139,10 +139,12 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 48.0.246-3
+- Bump release to rebuild with rust
+
 * Wed Feb 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 48.0.246-2
 - Patch for CVE-2026-27211
-* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 48.0.246-3
-- Bump release to rebuild with rust
+
 * Fri Jan 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 48.0.246-1
 - Auto-upgrade to 48.0.246
 
