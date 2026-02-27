@@ -9,3 +9,16 @@ filename = "kernel-6.18.5.1.tar.gz"
 hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
 hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+
+# Disable redhat patch declaration and application since they are not applicable to AzureLinux
+[[components.kernel.overlays]]
+description = "Disable redhat patch declaration — not applicable to AzureLinux"
+type = "spec-search-replace"
+regex = "Patch1: patch-%{patchversion}-redhat.patch"
+replacement = "# Patch1: patch-%{patchversion}-redhat.patch (disabled for AzureLinux)"
+
+[[components.kernel.overlays]]
+description = "Disable redhat patch application — not applicable to AzureLinux"
+type = "spec-search-replace"
+regex = "ApplyOptionalPatch patch-%{patchversion}-redhat.patch"
+replacement = "# ApplyOptionalPatch patch-%{patchversion}-redhat.patch (disabled for AzureLinux)"
