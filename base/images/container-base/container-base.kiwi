@@ -21,6 +21,11 @@
         </type>
     </preferences>
 
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+    </repository>
+
     <packages type="image">
         <!-- Core group -->
         <package name="basesystem" />
