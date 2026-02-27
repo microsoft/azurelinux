@@ -295,7 +295,4 @@ for a full sync.
 
 | Script | Purpose |
 |---|---|
-| `download-sources.py` | Standalone download-only script (subset of `sync-sources.py`). |
-| `upload-sources.py` | Standalone upload-only script with `--overwrite` support. |
-| `verify-sources.py` | Standalone verify-only script; checks hashes and optionally verifies remote blobs exist. |
 | `update-components-list.py` | Maintains `components.list` — adds missing components from image builds or prunes stale entries. |

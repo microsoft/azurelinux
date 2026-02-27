@@ -518,36 +518,43 @@ def verify_file(
     expected_hex: str,
     *,
     quiet: bool = False,
-) -> bool:
-    """Verify a single file's hash.  Returns True on match."""
+) -> str | None:
+    """Hash a single file and compare against the expected digest.
+
+    Returns the **actual** hex digest of the file on success, or ``None``
+    when the file cannot be hashed (missing file, unsupported algorithm).
+
+    A mismatch between the expected and actual hash is reported as a
+    warning but is **not** treated as a failure — the actual digest is
+    still returned so that callers can use the real hash for uploads.
+    """
     algo = _HASH_TO_ALGO.get(hash_type)
     if algo is None:
         print(
             f"ERROR: unsupported hash type '{hash_type}' for {filename}",
             file=sys.stderr,
         )
-        return False
+        return None
 
     filepath = sources_dir / filename
     if not filepath.exists():
         print(f"ERROR: file not found: {filepath}", file=sys.stderr)
-        return False
+        return None
 
     with open(filepath, "rb") as f:
         actual_hex = hashlib.file_digest(f, algo).hexdigest()
 
     if actual_hex.lower() != expected_hex.lower():
-        print(
-            f"ERROR: hash mismatch for {filepath}\n"
-            f"  expected: {expected_hex.lower()}\n"
-            f"  actual:   {actual_hex}",
+        _lock_print(
+            f"WARNING: hash mismatch for {filepath}\n"
+            f"  from 'sources': {expected_hex.lower()}\n"
+            f"  actual:         {actual_hex}",
             file=sys.stderr,
         )
-        return False
-
-    if not quiet:
+    elif not quiet:
         _lock_print(f"OK: {filepath} ({hash_type})")
-    return True
+
+    return actual_hex
 
 
 # ---------------------------------------------------------------------------
@@ -593,7 +600,7 @@ def _upload_file_if_missing(
 
     if blob_name in existing_blobs:
         if not quiet:
-            _lock_print(f"SKIPPED: {blob_name} (already exists)")
+            _lock_print(f"SKIPPED (already exists): {blob_name}")
         return True
 
     blob_client = blob_service_client.get_blob_client(
@@ -653,9 +660,10 @@ def _process_component_sources(
             continue
         hash_type, filename, expected_hex = parsed
 
-        if not verify_file(
+        actual_hex = verify_file(
             sources_dir, hash_type, filename, expected_hex, quiet=quiet
-        ):
+        )
+        if actual_hex is None:
             all_ok = False
             continue
 
@@ -668,7 +676,7 @@ def _process_component_sources(
                 pkg,
                 hash_type,
                 filename,
-                expected_hex,
+                actual_hex,
                 quiet=quiet,
             ):
                 all_ok = False
