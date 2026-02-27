@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-wsl-base">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>user@example.com</contact>
+        <specification>Azure Linux WSL Image</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+    </preferences>
+
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+    </repository>
+
+    <profiles>
+        <profile name="WSL-Base" description="Windows Subsystem for Linux Base"/>
+    </profiles>
+    <preferences profiles="WSL-Base">
+        <type image="wsl"/>
+        <timezone>Etc/UTC</timezone>
+        <locale>en_US</locale>
+        <rpm-locale-filtering>false</rpm-locale-filtering>
+        <rpm-excludedocs>false</rpm-excludedocs>
+    </preferences>
+    <packages type="bootstrap" profiles="WSL-Base">
+        <package name="bash" />
+        <package name="coreutils" />
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+        <package name="azurelinux-release" />
+        <package name="rpm" />
+    </packages>
+    <packages type="image" patternType="plusRecommended" profiles="WSL-Base">
+        <!-- Azure Linux core -->
+        <package name="azurelinux-release" />
+        <package name="azurelinux-rpm-config" />
+        <package name="azurelinux-repos" />
+
+        <!-- Base utilities -->
+        <package name="attr" />
+        <package name="acl" />
+        <package name="bash-completion" />
+        <package name="bind-utils" />
+        <package name="bzip2" />
+        <package name="curl" />
+        <package name="dbus" />
+        <package name="file" />
+        <package name="glibc-langpack-en" />
+        <package name="gnupg2" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="less" />
+        <package name="lsof" />
+        <package name="man-db" />
+        <package name="man-pages" />
+        <package name="NetworkManager" />
+        <package name="nmap-ncat" />
+        <package name="openssh-clients" />
+        <package name="passwd" />
+        <package name="pciutils" />
+        <package name="procps-ng" />
+        <package name="rsync" />
+        <package name="shadow-utils" />
+        <package name="sudo" />
+        <package name="symlinks" />
+        <package name="systemd-udev" />
+        <package name="systemd-resolved" />
+        <package name="tar" />
+        <package name="tcpdump" />
+        <package name="time" />
+        <package name="traceroute" />
+        <package name="tree" />
+        <package name="unzip" />
+        <package name="usbutils" />
+        <package name="util-linux" />
+        <package name="vim-minimal" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="whois" />
+        <package name="wsl-setup" />
+        <package name="zip" />
+        <package name="zram-generator-defaults" />
+    </packages>
+</image>

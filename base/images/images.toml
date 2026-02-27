@@ -6,6 +6,10 @@ definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
 
+[images.wsl-base]
+description = "WSL Base Image"
+definition = { type = "kiwi", path = "wsl-base/wsl-base.kiwi", profile = "WSL-Base" }
+
 # NOTE:
 # sudo dnf install -y kiwi-cli
 # sudo kiwi --loglevel 10 \
