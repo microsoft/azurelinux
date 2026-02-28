@@ -81,6 +81,7 @@ extends:
           - job: SyncFedoraSources
             displayName: "Sync Fedora sources to Azure Blob Storage"
             pool:
+              name: "Azure Pipelines"
               type: linux
 
             variables:
