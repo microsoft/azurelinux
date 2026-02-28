@@ -70,7 +70,7 @@ variables:
   pythonVersion: "3.12"
 
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
     featureFlags:
       LinuxHostVersion:
@@ -81,8 +81,7 @@ extends:
           - job: SyncFedoraSources
             displayName: "Sync Fedora sources to Azure Blob Storage"
             pool:
-              name: "Azure Pipelines"
-              isCustom: true
+              name: "mariner-core-amd64-1es-mariner3-no-umi"
               type: linux
 
             variables:
