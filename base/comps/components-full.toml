@@ -2099,7 +2099,6 @@
 [components.protobuf]
 [components.protozero]
 [components.prrte]
-[components.psutils]
 [components.pugixml]
 [components.pulseaudio]
 [components.py3c]
