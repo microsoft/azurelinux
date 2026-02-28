@@ -2631,6 +2631,7 @@
 [components.python-roman-numerals-py]
 [components.python-rpds-py]
 [components.python-rpm-generators]
+[components.python-rpmautospec]
 [components.python-rpmautospec-core]
 [components.python-rsa]
 [components.python-rst-linker]
