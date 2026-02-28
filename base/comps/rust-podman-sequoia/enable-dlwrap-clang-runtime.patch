@@ -1,0 +1,10 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -98,6 +98,7 @@
+ 
+ [build-dependencies.dlwrap]
+ version = "0.3.7"
++features = ["clang-runtime"]
+ 
+ [build-dependencies.regex]
+ version = "1"
