@@ -17,8 +17,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.100.mshv1
-Release:        4%{?dist}
+Version:        6.6.121.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -267,6 +267,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Feb 26 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.121.mshv1-1
+- Upgrade to 6.6.121.mshv1. This update adds deferred MSHV paging support
+
 * Thu Feb 19 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-4
 - Enable additional tracing in kernel config
 
