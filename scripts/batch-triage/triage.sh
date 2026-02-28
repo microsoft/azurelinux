@@ -44,7 +44,7 @@ EXTRA_PROMPT="${*:-}"
 RESULTS_FILE="$(realpath -m "$RESULTS_FILE")"
 if [[ ! -f "$RESULTS_FILE" ]]; then
     echo "Error: Results file not found: $RESULTS_FILE" >&2
-    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [extra prompt text]" >&2
+    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [extra prompt text]" >&2
     exit 1
 fi
 RESULTS_BASENAME="$(basename "$RESULTS_FILE")"
