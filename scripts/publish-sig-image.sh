@@ -44,7 +44,7 @@ if [[ $containerExists != "true" ]]; then
 fi
 
 # Upload the image artifact to Storage Account
-azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint"
+azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint" --blob-type=PageBlob
 
 # Ensure GALLERY_NAME exists
 if ! az sig show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME"; then

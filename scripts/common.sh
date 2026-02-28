@@ -18,7 +18,14 @@ export STORAGE_BLOB_NAME="azl4-vm-base.x86_64-${TIME_TAG}.vhdfixed"
 export VM_NAME="${USER}-azl-vm-${TIME_TAG}"
 export SSH_USER="<your-ssh-username>"
 export SSH_PUBLIC_KEY_PATH="<path-to-your-ssh-public-key>"
-export TEST_VM_SIZE="<your-test-vm-size>"
+
+# Set VM size based on architecture
+ARCH="<test-vm-architecture>" # e.g., "x86_64" or "aarch64"
+if [ "$ARCH" = "aarch64" ]; then
+    export TEST_VM_SIZE="Standard_D4ps_v6"
+else
+    export TEST_VM_SIZE="Standard_D4s_v7"
+fi
 
 # Set local image path
 export IMAGE_PATH="$REPO_ROOT/base/out/images/vm-base/azl4-vm-base.x86_64-0.1.vhdfixed"
