@@ -8,7 +8,7 @@ repo_gpgcheck=1
 type=rpm
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
-skip_if_unavailable=False
+skip_if_unavailable=True
 
 [azurelinux-debuginfo]
 name=Azure Linux $releasever - $basearch - Debug
@@ -19,7 +19,7 @@ repo_gpgcheck=1
 type=rpm
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
-skip_if_unavailable=False
+skip_if_unavailable=True
 
 [azurelinux-source]
 name=Azure Linux $releasever - Source
@@ -30,4 +30,4 @@ repo_gpgcheck=1
 type=rpm
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
-skip_if_unavailable=False
+skip_if_unavailable=True
