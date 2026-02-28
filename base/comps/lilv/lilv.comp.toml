@@ -1,0 +1,4 @@
+[components.lilv]
+# Pin to a Fedora 43 snapshot that predates the lilv 0.26.x update, which requires sord >= 0.16.20.
+# The build tag currently has sord 0.16.18. Remove the snapshot once sord is updated to >= 0.16.20.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-06-01T00:00:00-08:00" } }
