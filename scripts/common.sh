@@ -24,7 +24,7 @@ ARCH="<test-vm-architecture>" # e.g., "x86_64" or "aarch64"
 if [ "$ARCH" = "aarch64" ]; then
     export TEST_VM_SIZE="Standard_D4ps_v6"
 else
-    export TEST_VM_SIZE="Standard_D4s_v7"
+    export TEST_VM_SIZE="Standard_D4s_v5"
 fi
 
 # Set local image path
