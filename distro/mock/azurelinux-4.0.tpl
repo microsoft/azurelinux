@@ -1,14 +1,11 @@
 # Disable bootstrap image for now.
 config_opts['use_bootstrap_image'] = False
 
-# General packages required
-config_opts['chroot_setup_cmd'] = 'install @{% if mirrored %}buildsys-{% endif %}build'
+# Setup buildroot and plugins
+config_opts['chroot_setup_cmd'] = 'install @buildsys-build'
 
 # Provide path to system-installed logging.ini file.
 config_opts['log_config_file'] = '/etc/mock/logging.ini'
-
-# Plugin config
-config_opts['plugin_conf']['ccache_enable'] = True
 
 # Failure behavior
 config_opts['cleanup_on_success'] = False
@@ -57,26 +54,35 @@ user_agent={{ user_agent }}
 
 # repos
 
-[local]
+{% if stage1_repourl is defined %}
+
+[stage1]
 name=local
-baseurl=https://kojipkgs.fedoraproject.org/repos/f{{ releasever }}-build/latest/$basearch/
-cost=2000
-enabled={{ not mirrored }}
+baseurl={{ stage1_repourl }}
+cost=1
+enabled=1
 skip_if_unavailable=False
 
-{% if mirrored %}
+{% else %}
+
 [fedora]
 name=fedora
 metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=$basearch
 gpgkey=file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-{{ releasever }}-primary
 gpgcheck=1
 skip_if_unavailable=False
+cost=1000
+enabled=1
 
-[updates]
+[fedora-updates]
 name=updates
 metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&arch=$basearch
 gpgkey=file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-{{ releasever }}-primary
 gpgcheck=1
 skip_if_unavailable=False
+cost=1000
+enabled=0
+
 {% endif %}
+
 """
