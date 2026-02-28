@@ -83,27 +83,26 @@ extends:
               ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
 
             steps:
-              # 1. Checkout ----------------------------------------------------------
               - checkout: self
                 displayName: "Checkout repository"
 
-              # 2. Python setup -------------------------------------------------------
               - task: UsePythonVersion@0
                 displayName: "Set up Python $(pythonVersion)"
                 inputs:
                   versionSpec: "$(pythonVersion)"
+              
+              - task: PipAuthenticate@1
+                displayName: Enable internal pip feed
+                inputs:
+                  onlyAddExtraIndex: false
+                  artifactFeeds: "MarinerFeed"
 
-              # 3. Install Python dependencies ----------------------------------------
               - script: |
                   set -euo pipefail
                   python -m pip install --upgrade pip
                   pip install azure-identity azure-storage-blob
                 displayName: "Install Python dependencies"
 
-              # 4. Fetch azldev from ADO Artifacts feed --------------------------------
-              #
-              # Downloads the azldev Universal Package from the configured ADO feed
-              # into the repo root and makes it executable.
               - task: UniversalPackages@0
                 displayName: "Download azldev from ADO Artifacts"
                 inputs:
@@ -118,27 +117,17 @@ extends:
                 displayName: "Make azldev executable"
                 workingDirectory: "$(Build.SourcesDirectory)"
 
-              # 5. Write components file (conditional) ---------------------------------
-              #
-              # When the `components` parameter is non-empty, write its value into a
-              # file (one component per line) so we can pass it to --components-file.
-              # When empty, the script auto-discovers all components matching the
-              # default filter ("Upstream: fedora").
               - script: |
                   set -euo pipefail
                   printf '%s\n' '${{ parameters.components }}' > components.pipeline.list
                   echo "Components file written:"
                   cat components.pipeline.list
-                displayName: "Write components list file"
+                displayName: "[Optional] Write components list file"
                 workingDirectory: "$(Build.SourcesDirectory)"
                 condition: and(succeeded(), ne('${{ parameters.components }}', ''))
 
-              # 6. Run sync-sources.py ------------------------------------------------
-              #
-              # Uses AzureCLI@2 which performs `az login` automatically using the
-              # Service Connection, satisfying the script's AzureCliCredential auth.
               - task: AzureCLI@2
-                displayName: "Run sync-sources.py"
+                displayName: "Sync lookaside cache"
                 inputs:
                   azureSubscription: "$(serviceConnectionName)"
                   scriptType: bash
@@ -161,7 +150,6 @@ extends:
                     "${ARGS[@]}"
                   workingDirectory: "$(Build.SourcesDirectory)"
 
-              # 7. Publish failed-components list
               - script: |
                   set -euo pipefail
                   if [[ -f "components.failed.list" ]]; then
