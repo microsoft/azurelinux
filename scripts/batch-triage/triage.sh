@@ -6,23 +6,45 @@ set -euo pipefail
 IMAGE_NAME="localhost/azurelinux/batch-triage"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse args: [--results /path/to/file.json] [extra prompt text]
+# Parse args: [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [extra prompt text]
 RESULTS_FILE="./results.json"
-if [[ "${1:-}" == "--results" ]]; then
-    if [[ -z "${2:-}" ]]; then
-        echo "Error: --results requires a file path argument" >&2
-        exit 1
-    fi
-    RESULTS_FILE="$2"
-    shift 2
-fi
+MODEL="claude-opus-4.6"
+DO_DEBUG=false
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --results)
+            if [[ -z "${2:-}" ]]; then
+                echo "Error: --results requires a file path argument" >&2
+                exit 1
+            fi
+            RESULTS_FILE="$2"
+            shift 2
+            ;;
+        --model)
+            if [[ -z "${2:-}" ]]; then
+                echo "Error: --model requires a model name argument" >&2
+                exit 1
+            fi
+            MODEL="$2"
+            shift 2
+            ;;
+        --interactive | --debug)
+            # For debugging, runs 'bash' in the container instead of the agent
+            DO_DEBUG=true
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 EXTRA_PROMPT="${*:-}"
 
 # Resolve to absolute path and validate
 RESULTS_FILE="$(realpath -m "$RESULTS_FILE")"
 if [[ ! -f "$RESULTS_FILE" ]]; then
     echo "Error: Results file not found: $RESULTS_FILE" >&2
-    echo "Usage: $0 [--results /path/to/file.json] [extra prompt text]" >&2
+    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [extra prompt text]" >&2
     exit 1
 fi
 RESULTS_BASENAME="$(basename "$RESULTS_FILE")"
@@ -48,7 +70,7 @@ fi
 rm -f "${SCRIPT_DIR}/requirements.txt"
 
 echo "Running triage agent..." >&2
-DOCKER_ARGS=( --rm )
+DOCKER_ARGS=( --rm --init )
 
 # Run as the calling user so output files have the right ownership
 DOCKER_ARGS+=( -u "$(id -u):$(id -g)" )
@@ -93,7 +115,7 @@ done
 DOCKER_ARGS+=( -e "HOME=/home/copilot" )
 
 # Task prompt:
-PROMPT="Follow the instructions in .github/prompts/azl-mass-triage.prompt.md to triage /triage-input/${RESULTS_BASENAME}.
+PROMPT="Follow the instructions in .github/prompts/azl-mass-triage.prompt.md to orchestrate the triage of /triage-input/${RESULTS_BASENAME}.
 The repo is mounted read-only! Write output to /workspace/out/triage/ (final output only). The base/build dirs are a writable tmpfs for intermediate files.
 Place ONLY the final report .md and .json files in the output dir, no other files should be written there. Use the mounted tmpfs for ALL other files.
 Once complete, write a report summarizing the investigation, findings, and next steps into a markdown file in the output dir."
@@ -105,6 +127,17 @@ fi
 
 # Security: --allow-all-* is safe here — the repo is mounted read-only, output is
 # restricted to out/triage/, and the container provides process isolation.
-COPILOT_ARGS=(--allow-all-tools --allow-all-paths --allow-all-urls --agent azl-diagnose -p "$PROMPT")
+COPILOT_ARGS=(--model "$MODEL" --allow-all-tools --allow-all-paths --allow-all-urls --agent azl-diagnose -p "$PROMPT")
 
+if [[ "$DO_DEBUG" == true ]]; then
+    echo "Running in interactive debug mode. Starting bash in the container instead of the agent..." >&2
+    echo "To run the agent, invoke it with:" >&2
+    echo "     copilot $(printf ' %q' "${COPILOT_ARGS[@]}")" >&2
+    # copilot is set as the entrypoint, so we have to override it to get a shell for debugging
+    DOCKER_ARGS+=( -it --entrypoint "/bin/bash" )
+    # Replace copilot args with some bash args which set a user name and cmdline prompt without needing to create
+    # a user entry in the container. Without this the prompt is "I have no name!" which is confusing.
+    RC_OVERRIDE='PS1="[copilot-triage-debug] \w\$ "'
+    COPILOT_ARGS=(-c "exec bash --rcfile <(echo '$RC_OVERRIDE')")
+fi
 exec docker run "${DOCKER_ARGS[@]}" -- "$IMAGE_NAME" "${COPILOT_ARGS[@]}"
