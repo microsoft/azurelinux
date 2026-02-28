@@ -55,6 +55,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Test and inspect packages in mock chroot | [`skill-mock`](.github/skills/skill-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.github/skills/skill-koji-triage/SKILL.md) |
+| Batch-triage build failures from results file | [`skill-mass-triage`](.github/skills/skill-mass-triage/SKILL.md) |
 
 ## Directory Guidance
 

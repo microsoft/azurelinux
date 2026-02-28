@@ -9,12 +9,16 @@ description: "[Skill] Examine Koji builds, fetch task info and logs from the Koj
 
 - **Base URL**: Get from the user, or from env variable `KOJI_BASE_URL`, or pre-configured in the MCP server.
   - If the env variable is not set, and the MCP is not pre-configured, prompt the user to input the base URL of the Koji Web UI (e.g., `https://koji.example.com`).
-- **MCP tools (preferred)**: Use the `koji` MCP server tools (`set_koji_url`, `koji_fetch`) to fetch pages and logs. These write output to temp files under `base/build/work/scratch/koji/` to avoid bloating context. Use `read_file` and `grep_search` on the resulting files to inspect content.
-  1. Call `set_koji_url` with the base URL first (if not pre-set)
-  2. Call `koji_fetch` with the path (e.g., `/koji/taskinfo?taskID=3307`). It returns the file path where content was saved.
-     - If the fetch fails with an SSL certificate error (e.g., self-signed cert), ask the user if they want to skip SSL verification, then call `koji_allow_insecure` to proceed. Do **NOT** proceed without explicit user approval for the **specific** URL.
-  3. Use `read_file` or `grep_search` on the saved file to extract the information you need.
-  4. Call `koji_cleanup` when done to remove fetched temp files and reclaim disk space (NOTE: This will clean up ALL scratch files, so only call it when you're completely done with the current files).
+- **MCP tools (preferred)**: Use the `koji` MCP server tools to fetch pages and logs. These write output to temp files under `base/build/work/scratch/koji/` to avoid bloating context. Use `read_file` and `grep_search` on the resulting files to inspect content.
+
+  **Available tools:** `koji_status`, `set_koji_url`, `koji_fetch`, `koji_allow_insecure`, `koji_cleanup`. All tools return a dict with the result plus server state (base URL, output dir, etc.).
+
+  1. Call `koji_status` to check if a base URL is already configured (via env or a prior call).
+  2. Either call `set_koji_url` to set a default, or pass `override_base_url` directly to `koji_fetch` per-call. Setting a default is convenient when all requests target the same instance, and `override_base_url` is useful for ad-hoc queries against other instances.
+  3. Call `koji_fetch` with the path (e.g., `/koji/taskinfo?taskID=3307`). It returns the file path where content was saved.
+     - If the fetch fails with an SSL certificate error (e.g., self-signed cert), ask the user if they want to skip SSL verification, then call `koji_allow_insecure` (optionally with `override_base_url`) to proceed. Do **NOT** proceed without explicit user approval for the **specific** URL.
+  4. Use `read_file` or `grep_search` on the saved file to extract the information you need.
+  5. Call `koji_cleanup` when done to remove fetched temp files and reclaim disk space (NOTE: This will clean up ALL scratch files, so only call it when you're completely done with the current files).
 - **MCP is required.** If MCP tools are not working, ask the user to fix their MCP configuration rather than falling back to CLI tools.
 - **Network issues**: Koji is typically only accessible via VPN or corporate network. If you encounter connection errors or timeouts, assume it is a network permissions issue — ask the user to confirm they are connected to the appropriate network before retrying. Do NOT keep retrying on your own.
 
@@ -124,7 +128,11 @@ koji_fetch(path="/koji/taskinfo?taskID=87474")
 
 Fetch the task page and extract key details (state, method, children).
 
-Call `set_koji_url` once, then `koji_fetch` with path `/koji/taskinfo?taskID=<TASK_ID>`. Use `grep_search` on the saved file to extract state, method, and child task IDs.
+If you don't know the status of the koji tool, check its status.
+
+Decide if the base URL should be changed (is this a one-off, or long-term investigation?).
+
+Call `koji_fetch` with path `/koji/taskinfo?taskID=<TASK_ID>`, either using the default base URL or passing an `override_base_url`. Use either built-in tools or cmdline tools on the saved file to extract state, method, and child task IDs.
 
 Parse the HTML to find:
 - **State**: `failed`, `closed` (success), `canceled`, `free`, `open`
@@ -204,15 +212,21 @@ There are four main failure categories. Check them in this order:
 | `mock exited with status 30` | Dependency OR infrastructure | `root.log` or `mock_output.log` |
 | `mock exited with status 1` | Build or test failure | `build.log` |
 
+## Upstream Reference
+
+Upstream Fedora's Koji (https://koji.fedoraproject.org/koji/) and the Fedora dist-git are incredibly useful references for understanding package issues. If a package is failing in Azure Linux, check if it fails in Fedora too. Check for upstream fixes to the issue, or if it's fixed in newer Fedora releases. **NEVER** assume that a package is "just broke", if the same package builds successfully in Fedora, then it's critical to understand WHAT the difference is between the Fedora and Azure Linux build environments that is causing the failure. This can often lead to insights about missing dependencies, unsupported configurations, or other issues in Azure Linux that need to be addressed.
+
+For older upstream logs, you may have to reference (https://kojipkgs.fedoraproject.org), which archives old build logs that are no longer on the main koji server. This server is usually protected by a bot challenge, you can re-purpose the `koji_fetch` tool with `override_base_url` to fetch from this server as well, it will often pass the bot challenge successfully.
+
 ## Example: Full Investigation
 
 ```
-# 1. Set the Koji base URL (once per session)
+# 1. Set the Koji base URL (once per session), or pass override_base_url to each call
 set_koji_url(base_url="https://koji.example.com")
 
 # 2. Fetch parent task info → saved to temp file
 koji_fetch(path="/koji/taskinfo?taskID=3307")
-# → "Wrote 12345 bytes (200 lines) to base/build/work/scratch/koji/task_3307_taskinfo.html.xxxxx"
+# → {"output": "Wrote 12345 bytes (200 lines) to .../koji/koji_abc123", "default_base_url": "...", ...}
 
 # 3. Use grep_search on the saved file to find child task IDs and state
 #    grep for 'taskinfo?taskID=' to find children
@@ -224,15 +238,15 @@ koji_fetch(path="/koji/taskinfo?taskID=6059")
 # 5. Fetch logs in order of priority:
 # 5a. mock_output.log (infrastructure errors)
 koji_fetch(path="/koji/getfile?taskID=6059&volume=DEFAULT&name=mock_output.log&offset=-4000")
-# → grep saved file for: ERROR, Failed to register, could not init
+# → grep the file from the "output" field for: ERROR, Failed to register, could not init
 
 # 5b. root.log (dependency resolution errors)
 koji_fetch(path="/koji/getfile?taskID=6059&volume=DEFAULT&name=root.log")
-# → grep saved file for: No match for, Failed to resolve
+# → grep for: No match for, Failed to resolve
 
 # 5c. build.log (build/test errors)
 koji_fetch(path="/koji/getfile?taskID=6059&volume=DEFAULT&name=build.log")
-# → grep saved file for: FAIL, ERROR, Bad exit status, error:
+# → grep for: FAIL, ERROR, Bad exit status, error:
 
 # 5d. For exceptionally large files, consider using 'fold' on the saved file.
 ```
