@@ -82,6 +82,7 @@ extends:
             displayName: "Sync Fedora sources to Azure Blob Storage"
             pool:
               name: "Azure Pipelines"
+              isCustom: true
               type: linux
 
             variables:
