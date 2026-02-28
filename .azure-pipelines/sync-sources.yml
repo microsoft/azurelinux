@@ -25,14 +25,18 @@
 # See scripts/README.md for full documentation.
 # ---------------------------------------------------------------------------
 
-trigger:
-  batch: true # coalesce — only latest commit runs
-  branches:
-    include:
-      - tomls/base/main
+# Trigger controlled by ADO
+trigger: none
 
 # Allow manual runs from the ADO UI with parameter overrides.
 pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
 
 # ---------------------------------------------------------------------------
 # Parameters — configurable at queue time via "Run pipeline"
