@@ -3226,7 +3226,6 @@
 [components.rust-pin-project-lite]
 [components.rust-pin-utils]
 [components.rust-pkg-config]
-[components.rust-podman-sequoia]
 [components.rust-potential_utf]
 [components.rust-powerfmt]
 [components.rust-powerfmt-macros]
