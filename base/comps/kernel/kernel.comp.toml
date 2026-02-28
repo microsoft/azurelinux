@@ -4,13 +4,72 @@
 [components.kernel.build]
 without = ["debug"]
 
+[components.kernel.build.defines]
+# RPM release number for the Azure Linux kernel package
+azl_pkgrelease = "1"
+# 4th version component appended to EXTRAVERSION so uname -r matches source version (6.18.5.1).
+kextraversion = ".1"
+# CBL-Mariner branch number (used in tarball path)
+azurelinux_version = "3"
+
+# Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
 filename = "kernel-6.18.5.1.tar.gz"
 hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
 hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
 
-# Disable redhat patch declaration and application since they are not applicable to AzureLinux
+# Insert version and release information from the component defines into the spec file, and update the source URL to match the AzureLinux kernel source structure
+[[components.kernel.overlays]]
+description = "Set specrpmversion to 6.18.5.1"
+type = "spec-search-replace"
+regex = "%define specrpmversion .+"
+replacement = "%define specrpmversion 6.18.5.1"
+
+[[components.kernel.overlays]]
+description = "Derive specversion from specrpmversion. This becomes KVERREL which becomes the uname"
+type = "spec-search-replace"
+regex = "%define specversion .+"
+replacement = "%define specversion %{specrpmversion}"
+
+[[components.kernel.overlays]]
+description = "Derive tarfile_release from specrpmversion (include for completeness but later overridden)"
+type = "spec-search-replace"
+regex = "%define tarfile_release .+"
+replacement = "%define tarfile_release %{specrpmversion}"
+
+[[components.kernel.overlays]]
+description = "Set pkgrelease to azl_pkgrelease macro. Looks to only be realted to documentation"
+type = "spec-search-replace"
+regex = "%define pkgrelease .+"
+replacement = "%define pkgrelease %{azl_pkgrelease}"
+
+[[components.kernel.overlays]]
+description = "Set specrelease (used for RPM Release: tag) to azl_pkgrelease macro"
+type = "spec-search-replace"
+regex = "%define specrelease .+"
+replacement = "%define specrelease %{azl_pkgrelease}%{?buildid}%{?dist}"
+
+# Use the AzureLinux kernel source
+[[components.kernel.overlays]]
+description = "Use AzureLinux kernel source URL"
+type = "spec-update-tag"
+tag = "Source0"
+value = "kernel-%{specrpmversion}.tar.gz"
+
+[[components.kernel.overlays]]
+description = "Fix tarball extraction path for AzureLinux"
+type = "spec-search-replace"
+regex = "linux-%{tarfile_release}"
+replacement = "CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specrpmversion}"
+
+# Disable redhat-specific sources and patches since they are not applicable to AzureLinux
+[[components.kernel.overlays]]
+description = "Disable copy of Makefile.rhelver (Source1) — not applicable to AzureLinux"
+type = "spec-search-replace"
+regex = "cp -a %{SOURCE1} ."
+replacement = "# cp -a %{SOURCE1} . (disabled for AzureLinux — Makefile.rhelver is Red Hat-specific)"
+
 [[components.kernel.overlays]]
 description = "Disable redhat patch declaration — not applicable to AzureLinux"
 type = "spec-search-replace"
