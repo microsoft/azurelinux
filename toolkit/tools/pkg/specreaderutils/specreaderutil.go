@@ -56,6 +56,36 @@ type parseResult struct {
 	err      error
 }
 
+// ChrootOption is a functional option for CreateChroot.
+type ChrootOption func(*chrootConfig)
+
+type chrootConfig struct {
+	specsDir                string
+	srpmsDir                string
+	releaseVersionMacrosFile string
+}
+
+// WithSpecsDir adds a bind mount for the given specs directory inside the chroot.
+func WithSpecsDir(specsDir string) ChrootOption {
+	return func(c *chrootConfig) {
+		c.specsDir = specsDir
+	}
+}
+
+// WithSRPMsDir adds a bind mount for the given SRPMs directory inside the chroot.
+func WithSRPMsDir(srpmsDir string) ChrootOption {
+	return func(c *chrootConfig) {
+		c.srpmsDir = srpmsDir
+	}
+}
+
+// WithReleaseVersionMacrosFile copies the given macros file into the chroot's RPM macros directory.
+func WithReleaseVersionMacrosFile(file string) ChrootOption {
+	return func(c *chrootConfig) {
+		c.releaseVersionMacrosFile = file
+	}
+}
+
 // ParseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
 // releaseVersionMacrosFile, if non-empty, is made available inside the chroot at the same path as on the host.
@@ -67,7 +97,10 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
+		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir,
+			WithSpecsDir(specsDir),
+			WithSRPMsDir(srpmsDir),
+			WithReleaseVersionMacrosFile(releaseVersionMacrosFile))
 		if err != nil {
 			return
 		}
@@ -126,24 +159,30 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 	return
 }
 
-// createChroot creates a chroot to parse SPECs inside of.
-func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
+// CreateChroot creates a chroot to parse SPECs inside of.
+func CreateChroot(chrootName, workerTar, buildDir string, opts ...ChrootOption) (chroot *safechroot.Chroot, err error) {
 	const (
 		existingDir      = false
 		leaveFilesOnDisk = false
 	)
+
+	cfg := &chrootConfig{}
+	for _, opt := range opts {
+		opt(cfg)
+	}
 
 	// Mount the specs and srpms directories to an identical path inside the chroot.
 	// Since specreader saves the full paths to specs in its output that grapher will then consume,
 	// the pathing needs to be preserved from the host system.
 	var extraDirectories []string
 
-	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
+	var extraMountPoints []*safechroot.MountPoint
+	if cfg.specsDir != "" {
+		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(cfg.specsDir, cfg.specsDir, "", safechroot.BindMountPointFlags, ""))
 	}
 
-	if srpmsDir != "" {
-		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""))
+	if cfg.srpmsDir != "" {
+		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(cfg.srpmsDir, cfg.srpmsDir, "", safechroot.BindMountPointFlags, ""))
 	}
 
 	chrootDir := filepath.Join(buildDir, chrootName)
@@ -156,7 +195,7 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVe
 
 	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
 	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir, srpmsDir}
+		dirsToCopy := []string{cfg.specsDir, cfg.srpmsDir}
 		for _, dir := range dirsToCopy {
 			dirInChroot := filepath.Join(chroot.RootDir(), dir)
 			err = directory.CopyContents(dir, dirInChroot)
@@ -172,8 +211,8 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVe
 
 	// If a release version macros file is provided, copy it into the default RPM macros directory
 	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if releaseVersionMacrosFile != "" {
-		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+	if cfg.releaseVersionMacrosFile != "" {
+		err = chroot.AddRPMMacrosFile(cfg.releaseVersionMacrosFile)
 		if err != nil {
 			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}

@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -27,6 +28,10 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
+
+// packageVersionRe matches lines of the form "NAME: EPOCHNUM|VERSION-RELEASE"
+// as produced by the rpm query format "%{NAME}: %{EPOCHNUM}|%{VERSION}-%{RELEASE}".
+var packageVersionRe = regexp.MustCompile(`^([^:]+): (\d+)\|(.+)-(.+)$`)
 
 var (
 	app           = kingpin.New("versionsprocessor", "A tool to generate a macro file of all specs version and release")
@@ -83,9 +88,11 @@ func main() {
 	}
 
 	const leaveFilesOnDisk = false
-	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
+	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir,
+		specreaderutils.WithSpecsDir(*specsDir))
 	if err != nil {
-		logger.PanicOnError("Failed to create chroot")
+		logger.Log.Errorf("Failed to create chroot: %s", err)
+		os.Exit(1)
 	}
 	defer chroot.Close(leaveFilesOnDisk)
 
@@ -93,21 +100,17 @@ func main() {
 		// Find all spec files
 		allSpecFiles, err := specreaderutils.FindSpecFiles(*specsDir, nil)
 		if err != nil {
-			logger.Log.Panicf("Error finding spec files: %s", err)
+			logger.Log.Errorf("Error finding spec files: %s", err)
 			return err
 		}
 
 		logger.Log.Infof("Processing version and release for %d spec files into %s", len(allSpecFiles), *output)
 
-		// Process all specs files
+		// Get spec file version-release
 		for _, specFile := range allSpecFiles {
-
-			// Get spec file version-release
 			macrosOutput, err = processSpecFile(specFile, buildArch, prefix, macrosOutput)
-
 			if err != nil {
-				logger.Log.Errorf("Error processing spec file (%s): %s", specFile, err)
-				continue
+				return fmt.Errorf("error processing spec file (%s): %w", specFile, err)
 			}
 		}
 
@@ -120,6 +123,11 @@ func main() {
 		err = doParse()
 	}
 
+	if err != nil {
+		logger.Log.Errorf("Failed to generate versions macros: %s", err)
+		os.Exit(1)
+	}
+
 	err = writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
 	if err != nil {
 		logger.Log.Errorf("Failed to write extra files to output: %s", err)
@@ -128,14 +136,12 @@ func main() {
 }
 
 func processSpecFile(specFile string, buildArch string, prefix string, macrosOutput []string) (newMacrosOutput []string, err error) {
-	// Get spec file version-release
-
 	specFileName := filepath.Base(specFile)
 
 	sourceDir := filepath.Dir(specFile)
 	defines := rpm.DefaultDistroDefines(false, *distTag)
 
-	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
+	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{EPOCHNUM}|%{VERSION}-%{RELEASE}\n`, buildArch, defines, rpm.QueryHeaderArgument)
 
 	if err != nil {
 		logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
@@ -144,46 +150,51 @@ func processSpecFile(specFile string, buildArch string, prefix string, macrosOut
 
 	for _, packageVersionString := range packages {
 
-		macros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
+		packageMacros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
 		if err != nil {
 			logger.Log.Errorf("Error processing package version string: %s", err)
 			continue
 		}
 
-		macrosOutput = append(macrosOutput, macros)
+		macrosOutput = append(macrosOutput, packageMacros...)
 	}
 
 	return macrosOutput, nil
 }
 
-func processPackageVersionString(packageVersionString string, specFileName string, prefix string) (macros string, err error) {
-	// the output of the above query is in the format of "packagename: version-release",
-	// so split by ": " to get the version-release portion we want the second part
-	releaseVerSplit := regexp.MustCompile(`^[^:]+: (.+)-(.+)$`).FindStringSubmatch(packageVersionString)[1:]
+func processPackageVersionString(packageVersionString string, specFileName string, prefix string) (macros []string, err error) {
+	// The output of the rpm query is in the format "NAME: EPOCHNUM|VERSION-RELEASE".
+	match := packageVersionRe.FindStringSubmatch(packageVersionString)
 
-	if len(releaseVerSplit) != 2 {
-		err = fmt.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
-		logger.Log.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
-
-		return "", err
+	if len(match) != 5 {
+		err = fmt.Errorf("unexpected version format retrieved from spec file (%s): %q", specFileName, packageVersionString)
+		logger.Log.Errorf("%s", err)
+		return nil, err
 	}
 
-	version := releaseVerSplit[0]
-	release := releaseVerSplit[1]
-	releaseClean := strings.Replace(release, *distTag, "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
+	packageName := match[1]
+	epochStr := match[2]
+	version := match[3]
+	release := match[4]
 
-	// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
-	specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
-	specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
+	// Remove the dist tag from the release. The release macro does not include the distro suffix
+	// so that it can be compared across different distros.
+	releaseClean := strings.Replace(release, *distTag, "", 1)
 
-	versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
-	releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
+	// Replace '-' with '_' as RPM macros cannot contain '-'.
+	packageNameMacroFormat := strings.ReplaceAll(packageName, "-", "_")
 
-	// Generate RPM macro definitions instead of modifying spec files directly.
-	macros = fmt.Sprintf("%%%s %s\n%%%s %s",
-		versionMacroString, version,
-		releaseMacroString, releaseClean,
-	)
+	versionMacroString := prefix + "_" + packageNameMacroFormat + "_version"
+	releaseMacroString := prefix + "_" + packageNameMacroFormat + "_release"
+
+	epochNum, convErr := strconv.Atoi(epochStr)
+	if convErr == nil && epochNum > 0 {
+		epochMacroString := prefix + "_" + packageNameMacroFormat + "_epoch"
+		macros = append(macros, fmt.Sprintf("%%%s %s", epochMacroString, epochStr))
+	}
+
+	macros = append(macros, fmt.Sprintf("%%%s %s", versionMacroString, version))
+	macros = append(macros, fmt.Sprintf("%%%s %s", releaseMacroString, releaseClean))
 
 	return macros, nil
 }

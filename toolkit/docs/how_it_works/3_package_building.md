@@ -118,8 +118,23 @@ dot -Tpng -o visualized.png < graph.dot
 ```
 
 ### Dynamic versioning
-We have a versionsprocessor tool that iterates over all Specs and writes their release and versions into a macro file in a format of
-`azl_<package_name>_release`, `azl_<package_name>_version`, note that the `<package_name>` needs any `-` are replaced with `_` due to macros not allowing `-`.
+
+The `versionsprocessor` tool scans all spec files in the `SPECS` directory and writes their version and release information into a macro file (by default `macros.releaseversions`). This file is automatically loaded by `rpmbuild` during package builds, enabling specs to reference other packages' versions without hard-coding them.
+
+For each spec file, the tool generates macros in the following format:
+- `%azl_<package_name>_version` — the package's version (e.g., `1.2.3`)
+- `%azl_<package_name>_release` — the package's release number **without** the distro suffix (e.g., `5`, not `5.azl3`)
+- `%azl_<package_name>_epoch` — the package's epoch number; only emitted when epoch is non-zero
+
+The `<package_name>` component uses the RPM `%{NAME}` field (the binary package name), with any `-` characters replaced by `_` because RPM macros cannot contain hyphens.
+
+For example, for a package named `my-cool-pkg` at version `1.2.3` with release `5.azl3`, the tool emits:
+```
+%azl_my_cool_pkg_version 1.2.3
+%azl_my_cool_pkg_release 5
+```
+
+These macros allow out-of-tree kernel module specs (and others) to reference the exact version of the kernel they target, replacing older workarounds that queried `kernel-headers` via `rpm --whatprovides`.
 
 ### Stage 1: Grapher
 
