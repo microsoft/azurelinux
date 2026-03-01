@@ -81,7 +81,7 @@ extends:
           - job: SyncFedoraSources
             displayName: "Sync Fedora sources to Azure Blob Storage"
             pool:
-              name: "mariner-core-amd64-1es-mariner3-no-umi"
+              name: "Azure Pipelines"
               type: linux
 
             variables:
