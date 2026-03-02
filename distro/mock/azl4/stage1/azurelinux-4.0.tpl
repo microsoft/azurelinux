@@ -8,7 +8,7 @@ config_opts['chroot_setup_cmd'] = 'install @{% if mirrored %}buildsys-{% endif %
 config_opts['log_config_file'] = '/etc/mock/logging.ini'
 
 # Plugin config
-config_opts['plugin_conf']['ccache_enable'] = True
+config_opts['plugin_conf']['ccache_enable'] = False
 
 # Failure behavior
 config_opts['cleanup_on_success'] = False
