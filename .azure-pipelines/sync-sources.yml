@@ -75,8 +75,8 @@ extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
     featureFlags:
-      # LinuxHostVersion:
-      #   Network: R1
+      LinuxHostVersion:
+        Network: R1
       EnableCDPxPAT: false
       # runOnHost: true
     stages:
