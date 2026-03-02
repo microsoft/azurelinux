@@ -84,7 +84,9 @@ extends:
             displayName: "Sync Fedora sources to Azure Blob Storage"
             timeoutInMinutes: 180
             pool:
+              name: "Azure Pipelines"
               type: linux
+              vmImage: "ubuntu-latest"
 
             variables:
               ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
@@ -93,11 +95,11 @@ extends:
               - checkout: self
                 displayName: "Checkout repository"
 
-              # - task: UsePythonVersion@0
-              #   displayName: "Set up Python $(pythonVersion)"
-              #   inputs:
-              #     versionSpec: "$(pythonVersion)"
-              
+              - task: UsePythonVersion@0
+                displayName: "Set up Python $(pythonVersion)"
+                inputs:
+                  versionSpec: "$(pythonVersion)"
+
               - task: PipAuthenticate@1
                 displayName: Enable internal pip feed
                 inputs:
