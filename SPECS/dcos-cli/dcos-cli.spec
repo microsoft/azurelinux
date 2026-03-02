@@ -53,6 +53,7 @@ go test -mod=vendor
 %changelog
 * Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-21
 - Patch for CVE-2025-30204
+- Update Patch for CVE-2020-26160
 
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-20
 - Patch for CVE-2025-65637
