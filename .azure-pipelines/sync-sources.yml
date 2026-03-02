@@ -113,7 +113,7 @@ extends:
                   set -euo pipefail
                   tdnf install -y python3-pip
                   python3 -m pip install --upgrade pip
-                  python3 -m pip install azure-identity azure-storage-blob
+                  python3 -m pip install --user azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
