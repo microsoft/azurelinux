@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -77,29 +77,20 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go check -t go/cmd \
-         -d go/mysql \
-         -d go/mysql/endtoend \
-         -d go/sqltypes \
-         -d go/vt/hook \
-         -d go/vt/mysqlctl \
-         -d go/vt/srvtopo \
-         -t go/vt/topo \
-         -d go/vt/vtctld \
-         -d go/vt/vtgate/evalengine \
-         -d go/vt/vtqueryserver \
-         -d go/vt/vttablet/endtoend \
-         -t go/vt/vttablet/tabletmanager \
-         -t go/vt/vttablet/tabletserver \
-         -t go/vt/vttablet/worker \
-         -d go/vt/withddl \
-         -t go/vt/worker \
-         -d go/vt/workflow/reshardingworkflowgen \
-         -d go/vt/wrangler \
-         -d go/vt/wrangler/testlib \
-         -d go/vt/zkctl \
-         -d go/json2 \
-         -t go/test/endtoend
+go test -mod=vendor \
+       ./go/mysql/... \
+       ./go/sqltypes/... \
+       ./go/vt/hook/... \
+       ./go/vt/mysqlctl/... \
+       ./go/vt/srvtopo/... \
+       ./go/vt/topo/... \
+       ./go/vt/vtctld/... \
+       ./go/vt/vtgate/evalengine/... \
+       ./go/vt/vttablet/tabletmanager/... \
+       ./go/vt/vttablet/tabletserver/... \
+       ./go/vt/wrangler/... \
+       ./go/vt/zkctl/... \
+       ./go/json2/...
 
 %files
 %license LICENSE
@@ -108,6 +99,11 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Mon Mar 02 2026 Kanishk Bansal <kanbansal@microsoft.com> - 19.0.4-8
+- Fix %%check section: replace invalid 'go check' with 'go test' and remove
+  directories removed in v19 (vtqueryserver, vttablet/worker, withddl, worker,
+  reshardingworkflowgen)
+
 * Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 19.0.4-7
 - Add patch for CVE-2024-53257
 
