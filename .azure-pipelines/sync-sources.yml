@@ -67,7 +67,7 @@ variables:
   azldevPackageName: "azldev-preview-pkg-x86_64"
   azldevPackageVersion: "*" # "*" = latest;
 
-  pythonVersion: "3.12"
+  pythonVersion: "3.12.12"
 
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
