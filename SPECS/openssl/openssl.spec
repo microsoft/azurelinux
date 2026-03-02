@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,7 @@ Patch48:        openssl-1.1.1-fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
 Patch49:        openssl-1.1.1-fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencrypted.patch
 Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
 Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
+Patch52:        CVE-2025-69421.patch
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
@@ -336,6 +337,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Tue Mar 03 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.1k-39
+- Patch CVE-2025-69421
+
 * Fri Feb 20 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.1.1k-38
 - Ensure ASN1 types are checked before use in s_client, PKCS12, and PKCS7
 - Fix heap buffer overflow in BIO_f_linebuffer on short writes
