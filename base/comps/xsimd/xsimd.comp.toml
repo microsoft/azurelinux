@@ -1,0 +1,11 @@
+# Backport fix for ARM64 SVE static assertion failure from upstream commit 0fd437f.
+# Changes std::is_same to std::is_base_of to handle derived arch types like i8mm<neon64>.
+#
+# Upstream commit: https://github.com/xtensor-stack/xsimd/commit/0fd437f
+[components.xsimd]
+
+[[components.xsimd.overlays]]
+description = "Apply patch to fix ARM64 static check compile failure"
+type = "patch-add"
+file = "xsimd-sve-fix.patch"
+source = "xsimd-sve-fix.patch"
