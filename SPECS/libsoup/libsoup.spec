@@ -74,8 +74,9 @@ Patch24:         CVE-2026-1467.patch
 Patch25:         CVE-2026-1536.patch
 Patch26:         CVE-2026-1761.patch
 Patch27:         CVE-2026-1801.patch
-Patch28:         CVE-2026-0716.patch
-Patch29:         CVE-2026-2443.patch
+Patch28:         fix-ssl-test.patch
+Patch29:         CVE-2026-0716.patch
+Patch30:         CVE-2026-2443.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -107,7 +108,8 @@ These are the additional language files of libsoup.
     -Dntlm=disabled \
     -Ddoc_tests=false \
     -Ddocs=disabled \
-    -Dtests=true
+    -Dgssapi=disabled \
+    -Dpkcs11_tests=disabled
 %meson_build
 
 %install
@@ -145,6 +147,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-13
 - Patch for CVE-2026-0716, CVE-2026-2443
+- enable ptests and fix ssl-test
+- fix patch for CVE-2026-1536
 
 * Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-12
 - Patch for CVE-2026-1801, CVE-2026-1761, CVE-2026-1536, CVE-2025-32049, CVE-2026-1467
