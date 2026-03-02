@@ -67,7 +67,9 @@ variables:
   azldevPackageName: "azldev-preview-pkg-x86_64"
   azldevPackageVersion: "*" # "*" = latest;
 
-  pythonVersion: "3.12.12"
+  LinuxContainerImage: 'mcr.microsoft.com/onebranch/azurelinux/build:3.0'
+  # pythonVersion: "3.12.12"
+
 
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
@@ -76,7 +78,7 @@ extends:
       # LinuxHostVersion:
       #   Network: R1
       EnableCDPxPAT: false
-      runOnHost: true
+      # runOnHost: true
     stages:
       - stage: SyncSources
         jobs:
@@ -84,9 +86,7 @@ extends:
             displayName: "Sync Fedora sources to Azure Blob Storage"
             timeoutInMinutes: 180
             pool:
-              name: "Azure Pipelines"
               type: linux
-              vmImage: "ubuntu-latest"
 
             variables:
               ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
