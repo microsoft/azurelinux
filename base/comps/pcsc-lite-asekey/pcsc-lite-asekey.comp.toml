@@ -1,0 +1,14 @@
+[components.pcsc-lite-asekey]
+
+# The upstream Makefile constructs the compiler name as CC=$(BUILD)-gcc, where
+# BUILD is the GNU triplet from ./configure --build=. For reasons that we still need
+# to investigate, on our Koji builders the triplet vendor is "koji" (e.g. aarch64-koji-linux),
+# for which no gcc symlink exists. This results in calling a symlink that doesn't exist,
+# which fails.
+# We can work around this for now by overriding CC=gcc to call gcc directory.
+[[components.pcsc-lite-asekey.overlays]]
+description = "Use plain gcc instead of triplet-prefixed compiler name to work around build on Koji builders"
+type = "spec-search-replace"
+section = "%build"
+regex = '%\{make_build\}'
+replacement = '%{make_build} CC=gcc'
