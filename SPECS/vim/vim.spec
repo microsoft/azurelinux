@@ -189,6 +189,7 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
+%{_datarootdir}/vim/vim*/xdg.vim
 %{_datarootdir}/vim/vim*/syntax/nosyntax.vim
 %{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_bindir}/ex
@@ -198,8 +199,8 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
-%{_datarootdir}/vim/vim91/LICENSE
-%{_datarootdir}/vim/vim91/README.txt
+%{_datarootdir}/vim/vim*/LICENSE
+%{_datarootdir}/vim/vim*/README.txt
 
 %changelog
 * Sun Mar 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0088-1
