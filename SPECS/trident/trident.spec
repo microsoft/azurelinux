@@ -39,6 +39,8 @@ Source1:        osmodifier
 %endif
 
 BuildRequires:  openssl-devel
+BuildRequires:  protobuf-compiler
+BuildRequires:  protobuf-devel
 BuildRequires:  systemd-units
 BuildRequires:  rust
 
