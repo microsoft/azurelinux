@@ -122,7 +122,14 @@ install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb/config.yaml
 %check
 export GOTRACEBACK=all
 export GO111MODULE=on
-go test ./... -skip='Test_FromFile|TestService'
+
+mkdir -p /dev/shm
+mount -t tmpfs tmpfs /dev/shm
+# Export environment variables if needed
+export TMPDIR=/dev/shm
+
+# Run the Go test suite
+go test ./...
 
 %pre
 %sysusers_create_package %{name} %{SOURCE6}
@@ -152,7 +159,7 @@ go test ./... -skip='Test_FromFile|TestService'
 
 %changelog
 * Fri Jan 02 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.8.0-1
-- Upgrade to 2.8.0 for CVE-CVE-2024-30896
+- Upgrade to 2.8.0 for CVE-2024-30896
 
 * Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-10
 - Patch for CVE-2025-10543
