@@ -32,7 +32,6 @@ config_opts['chroot_setup_cmd'] += ' xz'
 config_opts['log_config_file'] = '/etc/mock/logging.ini'
 
 # Plugin config
-# NOTE: We disable ccache until its dependencies are available for stage2.
 config_opts['plugin_conf']['ccache_enable'] = False
 
 # Failure behavior
