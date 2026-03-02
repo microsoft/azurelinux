@@ -1,0 +1,23 @@
+Subject: Disable doxygen call graphs for reproducible noarch builds
+
+Doxygen's SHORT_NAMES numbering is non-deterministic across different
+filesystems/hosts due to readdir() ordering affecting the global
+first-come-first-served counter in convertNameToFile(). This causes
+call graph filenames (*_cgraph.map/md5/png) to differ between
+architectures, breaking Koji's noarch rpmdiff check.
+
+Disable CALL_GRAPH to remove the non-deterministic output files.
+The HTML pages, class/file indexes, and all textual content are
+unaffected.
+
+--- a/Doxyfile.in
++++ b/Doxyfile.in
+@@ -1122,7 +1122,7 @@
+ # So in most cases it will be better to enable call graphs for selected 
+ # functions only using the \callgraph command.
+ 
+-CALL_GRAPH             = YES
++CALL_GRAPH             = NO
+ 
+ # If the GRAPHICAL_HIERARCHY and HAVE_DOT tags are set to YES then doxygen 
+ # will graphical hierarchy of all classes instead of a textual one.

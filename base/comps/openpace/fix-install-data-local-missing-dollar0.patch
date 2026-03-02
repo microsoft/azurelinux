@@ -1,0 +1,13 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -117,8 +117,8 @@
+ 
+ install-data-local:
+ 	$(INSTALL) -d $(DESTDIR)$(htmldir)
+-	find $(srcdir)/docs -type d -exec sh -c 'for f in $$@; do $(MKDIR_P)            "$(DESTDIR)$(htmldir)/$${f##$(srcdir)/docs/}"; done' {} +
+-	find $(srcdir)/docs -type f -exec sh -c 'for f in $$@; do $(INSTALL_DATA) "$$f" "$(DESTDIR)$(htmldir)/$${f##$(srcdir)/docs/}"; done' {} +
++	find $(srcdir)/docs -type d -exec sh -c 'for f in $$@; do $(MKDIR_P)            "$(DESTDIR)$(htmldir)/$${f##$(srcdir)/docs/}"; done' _ {} +
++	find $(srcdir)/docs -type f -exec sh -c 'for f in $$@; do $(INSTALL_DATA) "$$f" "$(DESTDIR)$(htmldir)/$${f##$(srcdir)/docs/}"; done' _ {} +
+ 
+ uninstall-local:
+ 	rm -rf $(DESTDIR)$(htmldir)

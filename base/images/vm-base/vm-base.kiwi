@@ -33,6 +33,11 @@
         </type>
     </preferences>
 
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/$arch/os/" />
+    </repository>
+
     <packages type="image">
         <!-- Core group -->
         <package name="azurelinux-release" />
@@ -120,9 +125,12 @@
     <packages type="bootstrap">
         <package name="dracut-network" />
         <package name="filesystem" />
-        <package name="grub2-efi-x64-modules" />
-        <package name="grub2-efi-x64" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
         <package name="shim" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
     </packages>
 
     <!--

@@ -1,0 +1,23 @@
+[components.psutils]
+
+# Disable gnulib unbundling to use the bundled gnulib copy (same as RHEL).
+#
+# Fedora's gnulib-devel 0-55 (f43-updates) has a packaging bug where
+# gnulib-tool.py expects .gnulib-tool.py adjacent to itself in /usr/bin/,
+# but the gnulib spec installs it to /usr/share/gnulib/ instead. This
+# causes a build failure in %prep:
+#
+#   python3: can't open file '/usr/bin/.gnulib-tool.py': [Errno 2] No such file or directory
+#
+# Fedora hasn't hit this yet because no package has been rebuilt against
+# gnulib-0-55 (the fc44 mass-rebuild still used gnulib-0-52 from fc42).
+#
+# Using bundled gnulib is safe — upstream psutils already ships a gnulib
+# snapshot in its tarball, and the unbundling only replaces the
+# relocatable-perl module with a system copy.
+#
+# Undo this TEMPORARY WORKAROUND when upstream Fedora gnulib packaging is fixed.
+# We will generally want to follow Fedora's Bundled Libraries Policy, which
+# strongly discourages shipping bundled copies of libraries/code.
+[components.psutils.build]
+without = ["psutils_enables_unbundling_gnulib"]

@@ -1,0 +1,25 @@
+[components.rust-podman-sequoia]
+
+# Fix build failure: clang-sys "runtime" feature unification causes panic
+# in dlwrap's build script because libclang is loaded via dlopen but
+# clang_sys::load() is never called.
+#
+# When bindgen (a transitive build-dep) enables clang-sys/runtime, Cargo
+# feature unification applies it to the shared clang-sys instance used by
+# dlwrap's clang dependency. But without dlwrap's clang-runtime feature,
+# the clang crate doesn't know to call load() first — causing a panic:
+#   "a `libclang` shared library is not loaded on this thread"
+#
+# The clang-runtime feature (added in dlwrap 0.3.9) propagates the runtime
+# feature through clang and clang-sys, ensuring load() is called.
+#
+# Fedora hit the same issue with 0.2.0-4.fc44 mass rebuild and resolved
+# it by bumping to 0.3.2 and adding the equivalent patch to enable building 
+# dlwrap with the clang-runtime feature in the podman-sequoia toml:
+#   https://src.fedoraproject.org/rpms/rust-podman-sequoia/c/7f0694fa51b07b8d1f2cb839f685365731306a1b?branch=f44
+# Upstream podman-sequoia change:
+#   https://github.com/ueno/podman-sequoia/commit/9bedf62e6d538c1c28b7e7fbece0113c5a151d18
+[[components.rust-podman-sequoia.overlays]]
+description = "Enable dlwrap clang-runtime feature to fix libclang loading panic caused by Cargo feature unification with bindgen"
+type = "patch-add"
+source = "enable-dlwrap-clang-runtime.patch"

@@ -1,12 +1,12 @@
-%define release_name Evergreen
-%define is_evergreen 1
+%define release_name Alpha1
+%define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
 # or 0 for RC and stable releases
 %define is_development 1
 
 # TODO(azl): review
-%define eol_date 1900-01-01
+%define eol_date 2026-03-01
 
 %define dist_version_major 4
 %define dist_version_minor 0
@@ -33,9 +33,8 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
-# The numbering is 0.<r> before a given release is released,
-# and then just <r>.
-Release:        %autorelease %[0%{?is_development} ? "-p" : ""]
+# TODO(azl): Review whether we can move back to autorelease (with conditional -p)
+Release:        2%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -273,20 +272,17 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 %global dist_debuginfod_url ima:enforcing https://debuginfod.microsoft.com/ ima:ignore
 # -------------------------------------------------------------------------
 
-# Set the RELEASE_TYPE appropriately
-%define release_type %[0%{?is_development} ? "development" : "stable"]
-
+# TODO(azl): review; dynamically generate RELEASE_TYPE from release_type macro
 cat <<EOF >os-release
 NAME="%{dist_name}"
 VERSION="%{dist_version} (%{release_name}%{?prerelease})"
-RELEASE_TYPE=%{release_type}
+RELEASE_TYPE=development
 ID=azurelinux
 VERSION_ID=%{dist_version}
 VERSION_CODENAME=""
 PRETTY_NAME="Azure Linux %{dist_version} (%{release_name}%{?prerelease})"
 ANSI_COLOR="0;38;2;60;110;180"
 LOGO=azurelinux-logo-icon
-# TODO(azl): review
 CPE_NAME="cpe:/o:azurelinuxproject:azurelinux:%{dist_version}"
 DEFAULT_HOSTNAME="azurelinux"
 HOME_URL="%{dist_home_url}"
@@ -451,4 +447,5 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 
 
 %changelog
-%autochangelog
+* Fri Feb 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
+- Initial version

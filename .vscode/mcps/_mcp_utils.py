@@ -5,12 +5,18 @@ Provides common helpers for URL validation, SSRF guards, output handling,
 and .env file loading so individual MCP servers stay DRY.
 """
 
+from __future__ import annotations
+
 import os
 import re
 import sys
 import tempfile
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
+
+# Return type for all MCP tools — values may be str, int, list, or None.
+StatusDict = dict[str, Any]
 
 _INSTALL_HINT = "Install with:  pip3 install --user -r .vscode/mcps/requirements.txt"
 
@@ -82,9 +88,9 @@ def validate_base_url(base_url: str) -> tuple[str, str | None]:
     parsed = urlparse(normalized)
 
     if parsed.scheme not in ("http", "https"):
-        return "", f"ERROR: Only http/https URLs are supported (got {parsed.scheme!r})"
+        return "", f"Only http/https URLs are supported (got {parsed.scheme!r})"
     if parsed.username or parsed.password:
-        return "", "ERROR: URLs with embedded credentials are not supported"
+        return "", "URLs with embedded credentials are not supported"
 
     return normalized, None
 
@@ -118,7 +124,7 @@ def check_ssrf(base_url: str, constructed_url: str) -> str | None:
         or url_port != base_port
     ):
         return (
-            "ERROR: Constructed URL does not match the configured endpoint "
+            "Constructed URL does not match the configured endpoint "
             f"(scheme/host/port mismatch: {parsed_url.scheme!r}://{parsed_url.hostname!r}:{url_port!r} "
             f"!= {parsed_base.scheme!r}://{parsed_base.hostname!r}:{base_port!r}). Aborting."
         )
@@ -131,10 +137,10 @@ def validate_package_name(name: str) -> str | None:
     Returns an error string if invalid, None if valid.
     """
     if not name:
-        return "ERROR: Package name must not be empty."
+        return "Package name must not be empty."
     if not _VALID_PACKAGE_NAME_RE.match(name):
         return (
-            f"ERROR: Invalid package name {name!r}. "
+            f"Invalid package name {name!r}. "
             "Package names must start with an alphanumeric character and "
             "contain only alphanumerics, '.', '_', '+', or '-'."
         )
@@ -143,7 +149,7 @@ def validate_package_name(name: str) -> str | None:
 
 def write_output(
     text: str,
-    output_dir: str,
+    output_dir: str | Path,
     prefix: str,
     extra_msg: str = "",
 ) -> str:

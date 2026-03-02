@@ -1,0 +1,51 @@
+[components.libspf2]
+
+# Disable doxygen call graphs to fix noarch rpmdiff failure.
+#
+# Root cause: doxygen's SHORT_NAMES numbering (a00001, a00002, ...) is assigned
+# via a global first-come-first-served counter (g_usedNamesCount in util.cpp's
+# convertNameToFile()). The number depends on the order convertNameToFile() is
+# called, which is influenced by:
+#
+#   1. readDir() in doxygen.cpp iterates directories via DirIterator (dir.cpp),
+#      which wraps ghc::filesystem::directory_iterator — i.e. POSIX readdir().
+#      readdir() order is filesystem/host-dependent and not guaranteed by POSIX.
+#
+#   2. Although doxygen sorts the discovered file list (dirResultList and
+#      inputNameLinkedMap) before parsing, the output generation phase calls
+#      convertNameToFile() through multi-threaded pipelines (generateFileSources,
+#      generateFileDocs, generateClassDocs all use ThreadPool) and hash-based
+#      containers (std::unordered_map/set), making call order non-deterministic.
+#
+# AZL's x86_64 and aarch64 builders have different filesystem configurations
+# that produce different readdir() ordering, causing the call graph files
+# (*_cgraph.map/md5/png) in the noarch -apidocs subpackage to have different
+# short-name sequences on each architecture. This triggers Koji's noarch
+# rpmdiff check.
+#
+# The call graphs are not essential to the API documentation — the HTML pages,
+# class/file indexes, and all textual content remain identical. Disabling
+# CALL_GRAPH and CALLER_GRAPH removes the nondeterministic files entirely.
+#
+# This is an upstream doxygen design issue (no known upstream bug filed).
+# A proper fix would require doxygen to derive SHORT_NAMES numbers from a
+# deterministic function of the input name (e.g. hashing) rather than a
+# global counter.
+# 
+# This overlay is a TEMPORARY WORKAROUND until the upstream doxygen issue is
+# addressed and the fix makes it into the distribution's doxygen package.
+
+[[components.libspf2.overlays]]
+type = "patch-add"
+description = "Disable doxygen call graphs to fix noarch rpmdiff failure caused by readdir() nondeterminism in SHORT_NAMES numbering"
+source = "disable-call-graphs.patch"
+
+# The spec uses explicit %patch calls (not %autopatch/%patchlist), so patch-add
+# only registers the Patch tag — we need to apply it ourselves.
+[[components.libspf2.overlays]]
+type = "spec-append-lines"
+section = "%prep"
+description = "Apply the disable-call-graphs patch"
+lines = [
+    "%patch -P4 -p1",
+]
