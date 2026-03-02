@@ -1,7 +1,6 @@
 [components.perl]
 
 [components.perl.build]
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
 # Workaround: disable SystemTap/DTrace during initial distro bringup to avoid a
 # parallel-make race condition where DynaLoader's sub-make references
 # ../../.dtrace-temp.<hash>.h before the top-level Makefile generates it
