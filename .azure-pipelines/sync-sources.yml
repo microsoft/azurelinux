@@ -3,9 +3,9 @@
 # ---------------------------------------------------------------------------
 #
 # Purpose:
-#   Downloads upstream Fedora component sources via azldev, verifies their
-#   integrity, and uploads them to an Azure Blob Storage lookaside cache.
-#   This keeps the lookaside in sync with the component definitions on the
+#   Downloads upstream Fedora component sources via azldev and uploads
+#   them to an Azure Blob Storage lookaside cache.  This keeps the
+#   lookaside in sync with the component definitions on the
 #   tomls/base/main branch.
 #
 # Trigger:
@@ -68,7 +68,7 @@ variables:
   azldevPackageVersion: "*" # "*" = latest;
 
   # LinuxContainerImage: 'mcr.microsoft.com/onebranch/azurelinux/build:3.0'
-  LinuxContainerImage: 'ubuntu:24.04'
+  # LinuxContainerImage: 'ubuntu:24.04'
 
 
 extends:
@@ -78,7 +78,7 @@ extends:
       LinuxHostVersion:
         Network: R1
       EnableCDPxPAT: false
-      # runOnHost: true
+      runOnHost: true
     globalSdl: # https://aka.ms/obpipelines/sdl
       tsa:
         enabled: false
