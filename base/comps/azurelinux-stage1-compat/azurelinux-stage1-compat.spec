@@ -1,7 +1,7 @@
 Summary:        Azure Linux Stage1 Compat
 Name:           azurelinux-stage1-compat
 Version:        0.1
-Release:        %autorelease
+Release:        1%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -23,4 +23,5 @@ done
 /usr/bin/*-azurelinux-linux-gnu-pkg-config
 
 %changelog
-%autochangelog
+* Mon Mar 02 2026 Reuben Olinsky <reubeno@microsoft.com> - 0.1-1
+- Initial version
