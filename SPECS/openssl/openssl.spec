@@ -72,7 +72,7 @@ Patch48:        openssl-1.1.1-fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
 Patch49:        openssl-1.1.1-fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencrypted.patch
 Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
 Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
-Patch52:        CVE-2025-69421.patch
+Patch52:        openssl-1.1.1-check-oct-argument-for-NULL.patch
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
