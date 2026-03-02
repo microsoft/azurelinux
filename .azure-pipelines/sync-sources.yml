@@ -111,9 +111,10 @@ extends:
 
               - script: |
                   set -euo pipefail
-                  tdnf install -y python3-pip
-                  python3 -m pip install --upgrade pip
-                  python3 -m pip install --user azure-storage-blob
+                  tdnf install -y azure-core azure-identity
+                  # python3 -m pip install --upgrade pip
+                  # python3 -m pip install keyring artifacts-keyring
+                  # python3 -m pip install azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
