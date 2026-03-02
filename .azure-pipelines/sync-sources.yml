@@ -93,10 +93,10 @@ extends:
               - checkout: self
                 displayName: "Checkout repository"
 
-              - task: UsePythonVersion@0
-                displayName: "Set up Python $(pythonVersion)"
-                inputs:
-                  versionSpec: "$(pythonVersion)"
+              # - task: UsePythonVersion@0
+              #   displayName: "Set up Python $(pythonVersion)"
+              #   inputs:
+              #     versionSpec: "$(pythonVersion)"
               
               - task: PipAuthenticate@1
                 displayName: Enable internal pip feed
