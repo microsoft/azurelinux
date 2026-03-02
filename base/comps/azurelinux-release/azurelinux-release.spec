@@ -12,6 +12,8 @@
 %define dist_version_minor 0
 %define dist_version %{dist_version_major}.%{dist_version_minor}
 
+%define upstream_fedora_version 43
+
 %if %{is_evergreen}
 %define bug_version evergreen
 %define releasever evergreen
@@ -356,6 +358,7 @@ cat >> %{buildroot}%{_rpmconfigdir}/macros.d/macros.dist << EOF
 %%__bootstrap         ~bootstrap
 %%azurelinux          %{dist_version}
 %%azl4                1
+%%fedora              %{upstream_fedora_version}
 %%distcore            .azl%%{dist_version_major}
 %%dist                %%{!?distprefix0:%%{?distprefix}}%%{expand:%%{lua:for i=0,9999 do print("%%{?distprefix" .. i .."}") end}}%%{distcore}%%{?with_bootstrap:%%{__bootstrap}}%%{?buildrelease:+build%%{buildrelease}}
 %%dist_vendor         %{dist_vendor}
