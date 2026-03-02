@@ -17,7 +17,7 @@ regex = '^%global buildjdkver 24$'
 replacement = '%global buildjdkver 25'
 
 [[components.java-25-openjdk-portable.overlays]]
-description = "We need JDK 25 to build sicne that is our bootstrap version"
+description = "We need JDK 25 to build since that is our bootstrap version"
 type = "spec-add-tag"
 tag = "BuildRequires"
 value = "java-25-openjdk-devel"
