@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -915,6 +915,8 @@ This package provides a Ceph hardware monitoring agent.
 #################################################################################
 %prep
 %autosetup -p1
+rm -rf src/boost/tools/boost_install/test/iostreams/zlib-1.2.11
+rm -rf src/boost/libs/beast/test/extern/zlib-1.2.11
 
 %build
 pwd
@@ -2022,6 +2024,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Mon Mar 02 2026 Kanishk Bansal <kanbansal@microsoft.com> - 18.2.2-13
+- remove zlib
+
 * Thu Nov 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-12
 - Patch for CVE-2024-47866
 
