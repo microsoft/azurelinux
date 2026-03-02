@@ -302,6 +302,6 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
-* Mon Jan 5 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.20.0-1
+* Mon Mar 2 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.21.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.
