@@ -67,8 +67,8 @@ variables:
   azldevPackageName: "azldev-preview-pkg-x86_64"
   azldevPackageVersion: "*" # "*" = latest;
 
-  LinuxContainerImage: 'mcr.microsoft.com/onebranch/azurelinux/build:3.0'
-  # pythonVersion: "3.12.12"
+  # LinuxContainerImage: 'mcr.microsoft.com/onebranch/azurelinux/build:3.0'
+  LinuxContainerImage: 'ubuntu:24.04'
 
 
 extends:
@@ -103,18 +103,19 @@ extends:
               #   inputs:
               #     versionSpec: "$(pythonVersion)"
 
-              - task: PipAuthenticate@1
-                displayName: Enable internal pip feed
-                inputs:
-                  onlyAddExtraIndex: false
-                  artifactFeeds: "MarinerFeed"
+              # - task: PipAuthenticate@1
+              #   displayName: Enable internal pip feed
+              #   inputs:
+              #     onlyAddExtraIndex: false
+              #     artifactFeeds: "MarinerFeed"
 
               - script: |
                   set -euo pipefail
-                  tdnf install -y azure-core azure-identity
-                  # python3 -m pip install --upgrade pip
+                  # tdnf install -y azure-core azure-identity
+                  tdnf install -y ca-certificates
+                  python3 -m pip install --upgrade pip
                   # python3 -m pip install keyring artifacts-keyring
-                  # python3 -m pip install azure-storage-blob
+                  python3 -m pip install azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
