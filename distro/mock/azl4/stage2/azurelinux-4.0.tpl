@@ -4,6 +4,7 @@ config_opts['use_bootstrap_image'] = False
 # General packages required
 # TODO: This will be moved into a comp.xml file.
 config_opts['chroot_setup_cmd'] = 'install'
+config_opts['chroot_setup_cmd'] += ' azurelinux-stage1-compat'
 config_opts['chroot_setup_cmd'] += ' bash'
 config_opts['chroot_setup_cmd'] += ' bzip2'
 config_opts['chroot_setup_cmd'] += ' coreutils'
