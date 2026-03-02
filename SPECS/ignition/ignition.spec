@@ -1,8 +1,5 @@
 %bcond_with check
 
-%global ignedgecommit a2587490b2a9a215ad12cf15866025efbe027552
-%global ignedgeshortcommit %(c=%{ignedgecommit}; echo ${c:0:7})
-
 %global goarch %{_arch}
 %ifarch x86_64
 %global goarch amd64
@@ -98,7 +95,6 @@ the configuration.
 
 This package contains a tool for validating Ignition configurations.
 
-############## validate-redistributable subpackage ##############
 %endif
 
 %if 0%{?with_grub}
@@ -120,14 +116,6 @@ This package contains the grub2 config which is compatable with bootupd.
 
 %build
 export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=false "
-%if 0%{?rhel} && 0%{?rhel} <= 8
-# Disable writing ssh keys fragments on RHEL/CentOS <= 8
-LDFLAGS+=' -X github.com/coreos/ignition/v2/internal/distro.writeAuthorizedKeysFragment=false '
-%endif
-%if 0%{?rhel}
-# Need uncompressed debug symbols for debuginfo extraction
-LDFLAGS+=' -compressdwarf=false '
-%endif
 export GOFLAGS="-mod=vendor"
 
 echo "Building ignition..."
@@ -137,7 +125,7 @@ go build -ldflags "${LDFLAGS:-}" -o ./ignition internal/main.go
 echo "Building ignition-validate..."
 go build -ldflags "${LDFLAGS:-}" -o ./ignition-validate validate/main.go
 
-%global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -a -v -x
+%global gocrossbuild go build -ldflags "${LDFLAGS:-}" -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -a -v -x
 %endif
 
 %if 0%{?with_cross}
