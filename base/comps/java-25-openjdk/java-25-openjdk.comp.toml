@@ -1,0 +1,5 @@
+[components.java-25-openjdk]
+# Pull from Fedora 42 instead of the default (43) because the fc43 spec
+# references a portable source version that doesn't match the available
+# java-25-openjdk-portable-sources RPM.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-30T00:00:00-08:00" } }

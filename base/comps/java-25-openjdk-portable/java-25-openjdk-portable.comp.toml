@@ -1,0 +1,20 @@
+[components.java-25-openjdk-portable]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-22T00:00:00-08:00" } }
+
+[[components.java-25-openjdk-portable.overlays]]
+description = "Override buildjdkver to use Java 21 instead of 24 for bootstrap"
+type = "spec-search-replace"
+regex = '^%global buildjdkver 24$'
+replacement = '%global buildjdkver 25'
+
+[[components.java-25-openjdk-portable.overlays]]
+description = "We need JDK 25 to build sicne that is our bootstrap version"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "java-25-openjdk-devel"
+
+[[components.java-25-openjdk-portable.overlays]]
+description = "Set GCC and CC environment variables to /usr/bin/gcc to avoid ccache symlink that OpenJDK configure rejects"
+type = "spec-prepend-lines"
+section = "%build"
+lines = ["export GCC=/usr/bin/gcc", "export CC=/usr/bin/gcc", "export CXX=/usr/bin/g++"]
