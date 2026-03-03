@@ -1,47 +1,41 @@
 [components.libspf2]
 
-# Disable doxygen call graphs to fix noarch rpmdiff failure.
+# Fix noarch rpmdiff failure in the -apidocs subpackage.
 #
-# Root cause: doxygen's SHORT_NAMES numbering (a00001, a00002, ...) is assigned
-# via a global first-come-first-served counter (g_usedNamesCount in util.cpp's
-# convertNameToFile()). The number depends on the order convertNameToFile() is
-# called, which is influenced by:
+# Root cause: the upstream spec enables doxygen SHORT_NAMES=YES via sed in
+# %build. SHORT_NAMES replaces all output filenames with a global counter
+# (a00001, a00002, ...) assigned by convertNameToFile() in doxygen. The
+# counter order depends on readdir() traversal and multi-threaded output
+# generation (ThreadPool + hash-based containers), making it nondeterministic
+# across hosts/architectures. AZL's x86_64 and aarch64 builders produce
+# different filename sequences, triggering Koji's noarch rpmdiff check.
 #
-#   1. readDir() in doxygen.cpp iterates directories via DirIterator (dir.cpp),
-#      which wraps ghc::filesystem::directory_iterator — i.e. POSIX readdir().
-#      readdir() order is filesystem/host-dependent and not guaranteed by POSIX.
-#
-#   2. Although doxygen sorts the discovered file list (dirResultList and
-#      inputNameLinkedMap) before parsing, the output generation phase calls
-#      convertNameToFile() through multi-threaded pipelines (generateFileSources,
-#      generateFileDocs, generateClassDocs all use ThreadPool) and hash-based
-#      containers (std::unordered_map/set), making call order non-deterministic.
-#
-# AZL's x86_64 and aarch64 builders have different filesystem configurations
-# that produce different readdir() ordering, causing the call graph files
-# (*_cgraph.map/md5/png) in the noarch -apidocs subpackage to have different
-# short-name sequences on each architecture. This triggers Koji's noarch
-# rpmdiff check.
-#
-# The call graphs are not essential to the API documentation — the HTML pages,
-# class/file indexes, and all textual content remain identical. Disabling
-# CALL_GRAPH and CALLER_GRAPH removes the nondeterministic files entirely.
-#
-# This is an upstream doxygen design issue (no known upstream bug filed).
-# A proper fix would require doxygen to derive SHORT_NAMES numbers from a
-# deterministic function of the input name (e.g. hashing) rather than a
-# global counter.
-# 
-# This overlay is a TEMPORARY WORKAROUND until the upstream doxygen issue is
-# addressed and the fix makes it into the distribution's doxygen package.
+# Fix approach (two layers):
+#   1. Remove the sed that enables SHORT_NAMES — doxygen's default (NO) derives
+#      filenames from symbol names, which is fully deterministic.
+#   2. Disable CALL_GRAPH in Doxyfile.in — even with deterministic filenames,
+#      graphviz-generated graph images (SVG/PNG) can have nondeterministic
+#      content due to layout differences across architectures. Removing call
+#      graphs eliminates this second source of divergence. The HTML pages,
+#      class/file indexes, and all textual content are unaffected.
 
+# Layer 1: Neutralize SHORT_NAMES=YES — keep the default (NO) for deterministic filenames
+[[components.libspf2.overlays]]
+type = "spec-search-replace"
+section = "%build"
+description = "Disable SHORT_NAMES override — counter-based naming is nondeterministic across architectures, causing noarch rpmdiff failures"
+regex = 'sed -i -e .+SHORT_NAMES.+Doxyfile'
+replacement = '# SHORT_NAMES left at default (NO) for reproducible noarch builds'
+
+# Layer 2: Disable call graphs to avoid nondeterministic graphviz output
 [[components.libspf2.overlays]]
 type = "patch-add"
-description = "Disable doxygen call graphs to fix noarch rpmdiff failure caused by readdir() nondeterminism in SHORT_NAMES numbering"
+description = "Disable doxygen CALL_GRAPH to remove nondeterministic graphviz-generated images from noarch -apidocs"
 source = "disable-call-graphs.patch"
 
 # The spec uses explicit %patch calls (not %autopatch/%patchlist), so patch-add
 # only registers the Patch tag — we need to apply it ourselves.
+# Patch4 because upstream has Patch1-3; patch-add auto-assigns the next number.
 [[components.libspf2.overlays]]
 type = "spec-append-lines"
 section = "%prep"
