@@ -54,7 +54,7 @@ with an atomic cutover step that takes only a few seconds.
 # to apply to individual file
 for i in $(find . -iname "*.go" -type f); do
   sed -i "s|github.com/coreos/etcd|go.etcd.io/etcd|" $i
-  sed -i "s|gotest.tools|gotest.tools/v3|" $i
+  sed -i "s|gotest\.tools\b\([^/]\)|gotest.tools/v3\1|g" $i
 done
 
 rm -rf go/trace/plugin_datadog.go
@@ -78,24 +78,73 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go test -v ./go/cmd/... \
-           ./go/mysql/... \
-           ./go/mysql/endtoend/... \
-           ./go/sqltypes/... \
-           ./go/vt/hook/... \
-           ./go/vt/mysqlctl/... \
-           ./go/vt/srvtopo/... \
-           ./go/vt/topo/... \
-           ./go/vt/vtctld/... \
-           ./go/vt/vtgate/evalengine/... \
-           ./go/vt/vttablet/endtoend/... \
-           ./go/vt/vttablet/tabletmanager/... \
-           ./go/vt/vttablet/tabletserver/... \
-           ./go/vt/wrangler/... \
-           ./go/vt/wrangler/testlib/... \
-           ./go/vt/zkctl/... \
-           ./go/json2/... \
-           ./go/test/endtoend/...
+# Only run unit tests that do not require external infrastructure
+# (MySQL/mysqld, mysqlctl binary in-tree, consul, etcd, zookeeper, timezone data, /usr/local/vitess).
+# Excluded sub-packages and reasons:
+#   go/cmd/vtclient                        - needs mysqlctl binary (bin/mysqlctl)
+#   go/cmd/vttestserver                    - needs mysqlctl binary (bin/mysqlctl)
+#   go/mysql (root)                        - needs mysqld (VT_MYSQL_ROOT)
+#   go/mysql/collations/integration        - needs mysqlctl binary
+#   go/mysql/datetime                      - needs timezone data (Europe/*)
+#   go/mysql/endtoend                      - needs mysqlctl binary
+#   go/vt/hook                             - needs /usr/local/vitess/vthook
+#   go/vt/mysqlctl (root)                  - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/topo/consultopo                  - needs consul service/binary
+#   go/vt/topo/etcd2topo                   - needs etcd service/binary
+#   go/vt/topo/k8stopo                     - needs k8s test environment
+#   go/vt/topo/zk2topo                     - needs zookeeper + /usr/local/vitess/bin
+#   go/vt/vtctld                           - depends on FQDN/DNS-sensitive test setup
+#   go/vt/vtgate/evalengine/integration    - needs mysqlctl binary
+#   go/vt/vttablet/endtoend                - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager           - depends on MySQL socket / hostname resolution
+#   go/vt/vttablet/tabletmanager/vdiff     - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager/vreplication - needs mysqlctl binary
+#   go/vt/vttablet/tabletserver/vstreamer  - needs mysqlctl binary
+#   go/vt/wrangler                         - depends on FQDN/DNS-sensitive test setup
+#   go/vt/wrangler/testlib                 - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/zkctl                            - needs /usr/local/vitess/bin (zookeeper)
+#   go/test/endtoend/...                   - full integration tests; requires external infra/binaries
+
+go test -mod=vendor \
+       ./go/mysql/binlog/... \
+       ./go/mysql/collations \
+       ./go/mysql/collations/charset/... \
+       ./go/mysql/decimal/... \
+       ./go/mysql/fastparse/... \
+       ./go/mysql/format/... \
+       ./go/mysql/hex/... \
+       ./go/mysql/json/... \
+       ./go/mysql/ldapauthserver/... \
+       ./go/mysql/vault/... \
+       ./go/sqltypes/... \
+       ./go/vt/mysqlctl/backupstats/... \
+       ./go/vt/mysqlctl/filebackupstorage/... \
+       ./go/vt/mysqlctl/mysqlctlproto/... \
+       ./go/vt/mysqlctl/tmutils/... \
+       ./go/vt/srvtopo/... \
+       ./go/vt/topo \
+       ./go/vt/topo/events/... \
+       ./go/vt/topo/helpers/... \
+       ./go/vt/topo/memorytopo/... \
+       ./go/vt/topo/topoproto/... \
+       ./go/vt/topo/topotests/... \
+       ./go/vt/vtgate/evalengine \
+       ./go/vt/vttablet/tabletserver \
+       ./go/vt/vttablet/tabletserver/connpool \
+       ./go/vt/vttablet/tabletserver/gc \
+       ./go/vt/vttablet/tabletserver/messager \
+       ./go/vt/vttablet/tabletserver/planbuilder \
+       ./go/vt/vttablet/tabletserver/repltracker \
+       ./go/vt/vttablet/tabletserver/rules \
+       ./go/vt/vttablet/tabletserver/schema \
+       ./go/vt/vttablet/tabletserver/tabletenv \
+       ./go/vt/vttablet/tabletserver/throttle \
+       ./go/vt/vttablet/tabletserver/throttle/base \
+       ./go/vt/vttablet/tabletserver/throttle/mysql \
+       ./go/vt/vttablet/tabletserver/txlimiter \
+       ./go/vt/vttablet/tabletserver/txserializer \
+       ./go/vt/vttablet/tabletserver/txthrottler \
+       ./go/json2/...
 
 %files
 %license LICENSE
