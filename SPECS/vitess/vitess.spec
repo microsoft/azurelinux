@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -31,6 +31,8 @@ Patch1:         CVE-2024-45339.patch
 Patch2:         CVE-2025-22868.patch
 Patch3:         CVE-2025-22870.patch
 Patch4:         CVE-2024-53257.patch
+Patch5:         CVE-2026-27965.patch
+Patch6:         CVE-2026-27969.patch
 BuildRequires: golang < 1.23
 
 %description
@@ -44,10 +46,7 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -a1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
@@ -77,29 +76,70 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go check -t go/cmd \
-         -d go/mysql \
-         -d go/mysql/endtoend \
-         -d go/sqltypes \
-         -d go/vt/hook \
-         -d go/vt/mysqlctl \
-         -d go/vt/srvtopo \
-         -t go/vt/topo \
-         -d go/vt/vtctld \
-         -d go/vt/vtgate/evalengine \
-         -d go/vt/vtqueryserver \
-         -d go/vt/vttablet/endtoend \
-         -t go/vt/vttablet/tabletmanager \
-         -t go/vt/vttablet/tabletserver \
-         -t go/vt/vttablet/worker \
-         -d go/vt/withddl \
-         -t go/vt/worker \
-         -d go/vt/workflow/reshardingworkflowgen \
-         -d go/vt/wrangler \
-         -d go/vt/wrangler/testlib \
-         -d go/vt/zkctl \
-         -d go/json2 \
-         -t go/test/endtoend
+# Only run unit tests that do not require external infrastructure
+# (MySQL/mysqld, consul, etcd, zookeeper, timezone data, /usr/local/vitess).
+# Excluded sub-packages and reasons:
+#   go/mysql (root)                  - needs mysqld (VT_MYSQL_ROOT)
+#   go/mysql/collations/integration  - needs mysqlctl binary
+#   go/mysql/datetime                - needs timezone data (Europe/*)
+#   go/mysql/endtoend                - needs mysqlctl binary
+#   go/vt/hook                       - needs /usr/local/vitess/vthook
+#   go/vt/mysqlctl (root)            - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/topo/consultopo            - needs consul binary
+#   go/vt/topo/etcd2topo             - needs etcd binary
+#   go/vt/topo/zk2topo               - needs /usr/local/vitess/bin (zookeeper)
+#   go/vt/vtgate/evalengine           - panic: missing timezone Location
+#   go/vt/vtgate/evalengine/integration - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager      - needs MySQL socket
+#   go/vt/vttablet/tabletmanager/vdiff - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager/vreplication - needs mysqlctl binary
+#   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
+#   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
+go test -mod=vendor \
+       ./go/mysql/binlog/... \
+       ./go/mysql/capabilities/... \
+       ./go/mysql/collations \
+       ./go/mysql/collations/colldata/... \
+       ./go/mysql/decimal/... \
+       ./go/mysql/fastparse/... \
+       ./go/mysql/format/... \
+       ./go/mysql/hex/... \
+       ./go/mysql/icuregex/... \
+       ./go/mysql/json/... \
+       ./go/mysql/ldapauthserver/... \
+       ./go/mysql/replication/... \
+       ./go/mysql/sqlerror/... \
+       ./go/mysql/vault/... \
+       ./go/sqltypes/... \
+       ./go/vt/mysqlctl/backupstats/... \
+       ./go/vt/mysqlctl/filebackupstorage/... \
+       ./go/vt/mysqlctl/mysqlctlproto/... \
+       ./go/vt/mysqlctl/s3backupstorage/... \
+       ./go/vt/mysqlctl/tmutils/... \
+       ./go/vt/srvtopo/... \
+       ./go/vt/topo \
+       ./go/vt/topo/events/... \
+       ./go/vt/topo/helpers/... \
+       ./go/vt/topo/memorytopo/... \
+       ./go/vt/topo/topoproto/... \
+       ./go/vt/topo/topotests/... \
+       ./go/vt/vtctld/... \
+       ./go/vt/vttablet/tabletserver \
+       ./go/vt/vttablet/tabletserver/connpool/... \
+       ./go/vt/vttablet/tabletserver/gc/... \
+       ./go/vt/vttablet/tabletserver/messager/... \
+       ./go/vt/vttablet/tabletserver/planbuilder/... \
+       ./go/vt/vttablet/tabletserver/repltracker/... \
+       ./go/vt/vttablet/tabletserver/rules/... \
+       ./go/vt/vttablet/tabletserver/schema/... \
+       ./go/vt/vttablet/tabletserver/tabletenv/... \
+       ./go/vt/vttablet/tabletserver/throttle/... \
+       ./go/vt/vttablet/tabletserver/txlimiter/... \
+       ./go/vt/vttablet/tabletserver/txserializer/... \
+       ./go/vt/vttablet/tabletserver/txthrottler/... \
+       ./go/vt/wrangler \
+       ./go/json2/...
 
 %files
 %license LICENSE
@@ -108,6 +148,12 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Thu Feb 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-8
+- Patch for CVE-2026-27969, CVE-2026-27965
+- Fix %%check section: replace invalid 'go check' with 'go test', remove dirs
+  deleted in v19, and exclude integration tests that require external infra
+  (MySQL, consul, etcd, zookeeper, timezone data) not available in build chroot
+
 * Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 19.0.4-7
 - Add patch for CVE-2024-53257
 
