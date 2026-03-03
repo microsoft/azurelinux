@@ -188,16 +188,17 @@ def cmd_add_missing(args: argparse.Namespace) -> int:
 def cmd_update(args: argparse.Namespace) -> int:
     """Handler for the ``update`` subcommand.
 
-    Workflow:
-    0.  Read the sources list to get the desired set of package names.
-    1.  Optionally compare against ``get_existing_components()`` (informational).
-    2.  Parse top-level ``components.toml`` — packages defined there are left
-        untouched.
-    3.  Scan ``components_root/**/*.comp.toml`` for dedicated component dirs.
-        Keep the directory if the package is in the new list, otherwise remove
-        it.
-    4.  Write any remaining new packages (not already in the top-level
-        components.toml or a dedicated comp.toml) to *output_file*.
+    Default (full-sync) workflow:
+      0.  Read the sources list to get the desired set of package names.
+      1.  Optionally compare against ``get_existing_components()`` (info).
+      2.  Parse top-level ``components.toml`` — left untouched.
+      3.  Scan ``components_root/**/*.comp.toml`` for dedicated component dirs.
+          Keep if the package is in the new list, otherwise remove the dir.
+      4.  Write remaining new packages to *output_file*.
+
+    With ``--add-only``:
+      Skips step 3 (no pruning).  Reads the existing *output_file* (if any),
+      merges the new entries in sorted order, and writes the result back.
     """
     components_root = args.components_root.resolve()
     components_toml = (components_root / "components.toml").resolve()
@@ -209,38 +210,48 @@ def cmd_update(args: argparse.Namespace) -> int:
     if not components_toml.is_file():
         sys.exit(f"Error: components.toml not found: {components_toml}")
 
+    # 0. Read desired source packages
     new_packages = read_sources_list(args.sources_list)
     print(f"Read {len(new_packages)} package(s) from {args.sources_list}")
 
+    # 1. Informational
     existing = get_existing_components()
     print(f"Found {len(existing)} existing component(s) via azldev")
 
+    # 2. Parse inline components (these stay untouched)
     inline_names = parse_inline_components(components_toml)
     print(f"Found {len(inline_names)} inline component(s) in {components_toml.name}")
 
+    # 3. Scan dedicated component dirs
     dedicated = parse_dedicated_components(components_root)
     print(f"Found {len(dedicated)} dedicated component dir(s)")
 
-    kept: list[str] = []
     removed: list[str] = []
-    for name, comp_dir in sorted(dedicated.items()):
-        if name in new_packages:
-            kept.append(name)
-        else:
-            removed.append(name)
-            if not args.dry_run:
-                shutil.rmtree(comp_dir)
+    if args.add_only:
+        # --add-only: skip pruning entirely
+        print("\n--add-only: skipping removal of stale component dirs")
+    else:
+        kept: list[str] = []
+        for name, comp_dir in sorted(dedicated.items()):
+            if name in new_packages:
+                kept.append(name)
+            else:
+                removed.append(name)
+                if not args.dry_run:
+                    shutil.rmtree(comp_dir)
 
-    if kept:
-        print(
-            f"\nKept {len(kept)} dedicated component dir(s) (present in sources list)"
-        )
-    if removed:
-        verb = "Would remove" if args.dry_run else "Removed"
-        print(f"\n{verb} {len(removed)} stale dedicated component dir(s):")
-        for name in removed:
-            print(f"  {name}")
+        if kept:
+            print(
+                f"\nKept {len(kept)} dedicated component dir(s) "
+                f"(present in sources list)"
+            )
+        if removed:
+            verb = "Would remove" if args.dry_run else "Removed"
+            print(f"\n{verb} {len(removed)} stale dedicated component dir(s):")
+            for name in removed:
+                print(f"  {name}")
 
+    # 4. Determine which packages still need to be added
     already_defined = inline_names | set(dedicated.keys())
     already_defined -= set(removed)
     to_add = sorted(new_packages - already_defined)
@@ -257,11 +268,16 @@ def cmd_update(args: argparse.Namespace) -> int:
         print(f"\nDry run — no output written to {args.output_file}.")
         return 0
 
-    # Write new component entries to the output file
     output = args.output_file.resolve()
-    entries = [toml_component_key(c) for c in to_add]
-    output.write_text("\n".join(entries) + "\n")
-    print(f"\nWrote {len(entries)} component entrie(s) to {output}")
+
+    if args.add_only and output.is_file():
+        # Merge into existing output file, preserving header and sorting
+        add_and_sort_components(output, to_add)
+        print(f"\nMerged {len(to_add)} new component(s) into {output}")
+    else:
+        entries = [toml_component_key(c) for c in to_add]
+        output.write_text("\n".join(entries) + "\n")
+        print(f"\nWrote {len(to_add)} component entries to {output}")
     return 0
 
 
@@ -336,6 +352,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         required=True,
         help="Where to write the new component entries",
+    )
+    update.add_argument(
+        "--add-only",
+        action="store_true",
+        help="Only add missing packages to the output file (no pruning of "
+        "stale component dirs). If the output file already exists, new "
+        "entries are merged in sorted order.",
     )
     update.add_argument(
         "--dry-run",
