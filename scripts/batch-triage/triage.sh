@@ -6,15 +6,16 @@ set -euo pipefail
 IMAGE_NAME="localhost/azurelinux/batch-triage"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse args: [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [extra prompt text]
+# Parse args: [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [--help|-h] [extra prompt text]
 
 # Usage/help function
 usage() {
-    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [extra prompt text]" >&2
+    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [--help|-h] [extra prompt text]" >&2
     echo "  --results <file>   Path to the JSON file with results to triage (default: ./results.json)" >&2
     echo "  --model <model>    Language model to use for triage (default: claude-opus-4.6)" >&2
     echo "  --debug, --interactive  Run in interactive debug mode with a bash shell instead of the agent" >&2
     echo "  --no-cache         Rebuild the Docker image without using cache" >&2
+    echo "  --help, -h         Show this help message and exit" >&2
     echo "  extra prompt text  Additional instructions to append to the agent's prompt" >&2
     echo "" >&2
     echo "Example:" >&2
