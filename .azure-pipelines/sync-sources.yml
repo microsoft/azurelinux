@@ -95,9 +95,6 @@ extends:
               ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
 
             steps:
-              - checkout: self
-                displayName: "Checkout repository"
-
               # - task: UsePythonVersion@0
               #   displayName: "Set up Python $(pythonVersion)"
               #   inputs:
@@ -112,8 +109,8 @@ extends:
               - script: |
                   set -euo pipefail
                   # tdnf install -y azure-core azure-identity
-                  tdnf install -y ca-certificates
-                  python3 -m pip install --upgrade pip
+                  # tdnf install -y ca-certificates
+                  # python3 -m pip install --upgrade pip
                   # python3 -m pip install keyring artifacts-keyring
                   python3 -m pip install azure-storage-blob
                 displayName: "Install Python dependencies"
