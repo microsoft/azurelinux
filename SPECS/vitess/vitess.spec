@@ -33,6 +33,7 @@ Patch3:         CVE-2025-22870.patch
 Patch4:         CVE-2024-53257.patch
 Patch5:         CVE-2026-27965.patch
 Patch6:         CVE-2026-27969.patch
+Patch7:         CVE-2025-11065.patch
 BuildRequires: golang < 1.23
 
 %description
@@ -148,13 +149,15 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Thu Feb 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-9
+- Patch for CVE-2025-11065
+
 * Thu Feb 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-8
 - Patch for CVE-2026-27969, CVE-2026-27965
 - Fix %%check section: replace invalid 'go check' with 'go test', remove dirs
   deleted in v19, and exclude integration tests that require external infra
   (MySQL, consul, etcd, zookeeper, timezone data) not available in build chroot
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-9
-- Patch for CVE-2025-11065
+
 * Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 19.0.4-7
 - Add patch for CVE-2024-53257
 
