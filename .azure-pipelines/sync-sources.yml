@@ -112,7 +112,7 @@ extends:
                   # tdnf install -y ca-certificates
                   # python3 -m pip install --upgrade pip
                   # python3 -m pip install keyring artifacts-keyring
-                  python3 -m pip install --user azure-storage-blob
+                  python3 -m pip install --user azure-identity azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
