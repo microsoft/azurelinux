@@ -1,0 +1,5 @@
+[components.java-25-openjdk]
+# Current java-25 build requires java-25-openjdk-portable-sources version 25.0.20.0.10.
+# Fed43 portable rpm delivers 25.0.0.0.32. Fedora43 builds work with Fed42 rpm. To
+# unbock our build, we pull the last Fedora 43 snapshot when version was 25.0.0.0.32. 
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-30T00:00:00-08:00" } }

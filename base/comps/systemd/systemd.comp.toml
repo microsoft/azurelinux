@@ -15,3 +15,15 @@ description = "Lower Conflicts on setup from 2.15.0-3 to 2.15.0-1 to match AZL's
 type = "spec-search-replace"
 regex = '^Conflicts:\s+setup < 2\.15\.0-3$'
 replacement = "Conflicts:      setup < 2.15.0-1"
+
+[[components.systemd.overlays]]
+description = "Remove xen-devel BuildRequires — not available in AZL (AZL targets Hyper-V/Azure, not Xen)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "xen-devel"
+
+[[components.systemd.overlays]]
+description = "Disable Xen in meson — set have_xen to 0 so -Dxenctrl=disabled (no targeted overlay for %global)"
+type = "spec-search-replace"
+regex = '%global have_xen 1'
+replacement = "%global have_xen 0"
