@@ -11,13 +11,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         CVE-2026-24054.patch
-Patch1:         rust-1.90-fixes.patch
-Patch2:         CVE-2026-24834.patch
-Patch3:         CVE-2026-25727.patch
-Patch4:         CVE-2026-25541.patch
-Patch5:         CVE-2025-65637.patch
-Patch6:         CVE-2025-11065.patch
+# Patch0:         CVE-2026-24054.patch
+# Patch0:         rust-1.90-fixes.patch
+# Patch2:         CVE-2026-24834.patch
+# Patch3:         CVE-2026-25727.patch
+# Patch4:         CVE-2026-25541.patch
+# Patch5:         CVE-2025-65637.patch
+# Patch6:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
