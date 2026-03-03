@@ -231,8 +231,8 @@ EOF
 
 %build
 %if %{undefined rpm_ver}
-# Use ${version}-${release} for TRIDENT_VERSION in distro build
-export TRIDENT_VERSION="${version}-${release}"
+# Use %{version}-%{release} for TRIDENT_VERSION in distro build
+export TRIDENT_VERSION="%{version}-%{release}"
 %else
 # Use %{trident_version} for Trident repo build
 export TRIDENT_VERSION="%{trident_version}"
