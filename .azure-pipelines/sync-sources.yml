@@ -139,7 +139,10 @@ extends:
                 condition: and(succeeded(), ne('${{ parameters.components }}', ''))
 
               # Create a non-root user to run azldev, since it doesn't like being run as root.
-              - script: useradd -m azldevuser
+              - script: |
+                  set -euo pipefail
+                  useradd -m azldevuser
+                  chown -R azldevuser:azldevuser "$(Build.SourcesDirectory)"
                 displayName: "Create azldevuser"
 
               - task: AzureCLI@2
