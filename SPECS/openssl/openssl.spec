@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,11 @@ Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failu
 Patch44:        CVE-2024-5535.patch
 Patch45:        openssl-1.1.1-Fix-timing-side-channel-in-ECDSA-signature-computation.patch
 Patch46:        openssl-1.1.1-fix-incorrect-check-of-unwrapped-key-size.patch
+Patch47:        openssl-1.1.1-ensure-ASN1-types-are-checked-before-use.patch
+Patch48:        openssl-1.1.1-fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
+Patch49:        openssl-1.1.1-fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencrypted.patch
+Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
+Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
@@ -157,7 +162,6 @@ export HASHBANGPERL=%{_bindir}/perl
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
 
 # See https://wiki.openssl.org/index.php/Compilation_and_Installation for configure options
-
 # NOTE: the 'no-<prot>-method' switches are not used by design. The changes inside 'Patch2'
 #       make sure that protocols disabled through 'no-<prot>' will still be unaccessible.
 #       This is a workaround until OpenSSL issue #7048 is officially resolved.
@@ -331,6 +335,13 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Fri Feb 20 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.1.1k-38
+- Ensure ASN1 types are checked before use in s_client, PKCS12, and PKCS7
+- Fix heap buffer overflow in BIO_f_linebuffer on short writes
+- Fix OCB AES-NI HW stream path leaving bytes unauthenticated and unencrypted
+- Check return code of UTF8_putc to handle encoding errors
+- Verify ASN1 object types before access in ESS and timestamp verification
+
 * Thu Nov 06 2025 Lynsey Rydberg <lyrydber@microsoft.com> - 1.1.1k-37
 - Fix incorrect check of unwrapped key size
 
