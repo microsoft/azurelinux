@@ -52,7 +52,7 @@ var (
 
 // ChrootConfig holds the configuration for creating a chroot environment.
 type ChrootConfig struct {
-	SrpmsDir                string
+	SrpmsDir                 string
 	ReleaseVersionMacrosFile string
 }
 
