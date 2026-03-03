@@ -1,0 +1,23 @@
+# Java portable package has a bootstrap stage which requires N-1 or N version of
+# JDK. For stage-1 we have an _option_ to pull deps from elsewhere. For stage-2
+# packages are restricted to what we build. We do not build jdk 24 and only 'N' or
+# 25 will work for us.
+#
+# The second workaround is to deliver the appropriate minor version of java portable.
+# Java 25 sdk needs 25.0.0.0.32 version of the -sources as a build requires. We pull
+# from the last snapshot of the spec at that version. 
+
+[components.java-25-openjdk-portable]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-22T00:00:00-08:00" } }
+
+[[components.java-25-openjdk-portable.overlays]]
+description = "Override buildjdkver to use Java 25 instead of 24 for bootstrap"
+type = "spec-search-replace"
+regex = '^%global buildjdkver 24$'
+replacement = '%global buildjdkver 25'
+
+[[components.java-25-openjdk-portable.overlays]]
+description = "We need JDK 25 to build since that is our bootstrap version"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "java-25-openjdk-devel"
