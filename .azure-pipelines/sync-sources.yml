@@ -95,10 +95,12 @@ extends:
               ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
 
             steps:
-              # - task: UsePythonVersion@0
-              #   displayName: "Set up Python $(pythonVersion)"
-              #   inputs:
-              #     versionSpec: "$(pythonVersion)"
+              # Create a non-root user to run azldev, since it doesn't like being run as root.
+              - script: |
+                  set -euo pipefail
+                  useradd -m azldevuser
+                  chown -R azldevuser:azldevuser "$(Build.SourcesDirectory)"
+                displayName: "Create azldevuser"
 
               # - task: PipAuthenticate@1
               #   displayName: Enable internal pip feed
@@ -108,11 +110,11 @@ extends:
 
               - script: |
                   set -euo pipefail
+                  sudo su azldevuser -c "python3 -m pip install --user azure-identity azure-storage-blob"
                   # tdnf install -y azure-core azure-identity
                   # tdnf install -y ca-certificates
                   # python3 -m pip install --upgrade pip
                   # python3 -m pip install keyring artifacts-keyring
-                  python3 -m pip install --user azure-identity azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
@@ -137,13 +139,6 @@ extends:
                 displayName: "[Optional] Write components list file"
                 workingDirectory: "$(Build.SourcesDirectory)"
                 condition: and(succeeded(), ne('${{ parameters.components }}', ''))
-
-              # Create a non-root user to run azldev, since it doesn't like being run as root.
-              - script: |
-                  set -euo pipefail
-                  useradd -m azldevuser
-                  chown -R azldevuser:azldevuser "$(Build.SourcesDirectory)"
-                displayName: "Create azldevuser"
 
               - task: AzureCLI@2
                 displayName: "Sync lookaside cache"
