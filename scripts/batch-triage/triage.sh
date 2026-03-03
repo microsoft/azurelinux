@@ -6,10 +6,25 @@ set -euo pipefail
 IMAGE_NAME="localhost/azurelinux/batch-triage"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse args: [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [extra prompt text]
+# Parse args: [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [extra prompt text]
+
+# Usage/help function
+usage() {
+    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [extra prompt text]" >&2
+    echo "  --results <file>   Path to the JSON file with results to triage (default: ./results.json)" >&2
+    echo "  --model <model>    Language model to use for triage (default: claude-opus-4.6)" >&2
+    echo "  --debug, --interactive  Run in interactive debug mode with a bash shell instead of the agent" >&2
+    echo "  --no-cache         Rebuild the Docker image without using cache" >&2
+    echo "  extra prompt text  Additional instructions to append to the agent's prompt" >&2
+    echo "" >&2
+    echo "Example:" >&2
+    echo "  $0 --results /path/to/failures.json --model claude-sonnet-4.6 Ignore any duplicate package failures" >&2
+}
+
 RESULTS_FILE="./results.json"
 MODEL="claude-opus-4.6"
 DO_DEBUG=false
+DOCKER_COMMON_ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --results)
@@ -33,6 +48,15 @@ while [[ $# -gt 0 ]]; do
             DO_DEBUG=true
             shift
             ;;
+        --no-cache)
+            # Force a full rebuild of the Docker image.
+            DOCKER_COMMON_ARGS+=(--no-cache)
+            shift
+            ;;
+        --help | -h)
+            usage
+            exit 0
+            ;;
         *)
             break
             ;;
@@ -44,7 +68,7 @@ EXTRA_PROMPT="${*:-}"
 RESULTS_FILE="$(realpath -m "$RESULTS_FILE")"
 if [[ ! -f "$RESULTS_FILE" ]]; then
     echo "Error: Results file not found: $RESULTS_FILE" >&2
-    echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [extra prompt text]" >&2
+    usage
     exit 1
 fi
 RESULTS_BASENAME="$(basename "$RESULTS_FILE")"
@@ -59,11 +83,12 @@ trap 'rm -f "${SCRIPT_DIR}/requirements.txt"' EXIT
 
 # Use buildx if available, otherwise fall back to legacy builder
 echo "Building triage image..." >&2
+DOCKER_COMMON_ARGS+=(-q -t "$IMAGE_NAME" "$SCRIPT_DIR")
 if docker buildx version &>/dev/null; then
-    docker buildx build -q -t "$IMAGE_NAME" "$SCRIPT_DIR" >&2
+    docker buildx build "${DOCKER_COMMON_ARGS[@]}" >&2
 else
     echo "Warning: docker-buildx not found, using legacy builder. Install docker-buildx to remove warning." >&2
-    docker build -t "$IMAGE_NAME" "$SCRIPT_DIR" >&2
+    docker build "${DOCKER_COMMON_ARGS[@]}" >&2
 fi
 
 # Clean up immediately — only needed for the build step
@@ -108,11 +133,10 @@ for var in COPILOT_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN; do
     [[ -n "${!var:-}" ]] && DOCKER_ARGS+=( -e "$var=${!var}" )
 done
 
-# Mount any auth config dirs that exist (ro, mapped ${HOME} passed to the container)
-[[ -d "${HOME}/.copilot" ]]    && DOCKER_ARGS+=( -v "${HOME}/.copilot:/home/copilot/.copilot:ro"  )
-[[ -d "${HOME}/.config/gh" ]]  && DOCKER_ARGS+=( -v "${HOME}/.config/gh:/home/copilot/.config/gh:ro" )
-
-DOCKER_ARGS+=( -e "HOME=/home/copilot" )
+# Mount copilot auth config (not the whole dir) so the container's .copilot/pkg/ stays writable for self-updates, but
+# the auth config is available for API access.
+[[ -f "${HOME}/.copilot/config.json" ]] && DOCKER_ARGS+=( -v "${HOME}/.copilot/config.json:/home/copilot/.copilot/config.json:ro" )
+[[ -d "${HOME}/.config/gh" ]]           && DOCKER_ARGS+=( -v "${HOME}/.config/gh:/home/copilot/.config/gh:ro" )
 
 # Task prompt:
 PROMPT="Follow the instructions in .github/prompts/azl-mass-triage.prompt.md to orchestrate the triage of /triage-input/${RESULTS_BASENAME}.

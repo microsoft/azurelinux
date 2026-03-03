@@ -1,4 +1,3 @@
-````skill
 ---
 name: skill-mass-triage
 description: "[Skill] Batch-triage build failures from a JSON results file — diagnose with parallel sub-agents, bucketize by root cause, and produce a consolidated summary. Use when asked to triage a Koji results file. Triggers: batch triage, mass triage, triage results file, bucketize failures."
@@ -186,5 +185,3 @@ Follow the "Investigation Workflow" section from the skill file. Then:
 - Sub-agents handle only Koji fetching / log analysis / JSON writing — they don't need workspace context.
 - If a sub-agent fails or hangs, note the affected task IDs and retry them individually.
 - Clean up triage scratch files with `koji_cleanup` only after the final summary is written.
-
-````
