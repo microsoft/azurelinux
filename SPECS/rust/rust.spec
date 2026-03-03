@@ -50,6 +50,7 @@ Patch5:         CVE-2025-53605.patch
 Patch6:         CVE-2025-58160.patch
 Patch7:         CVE-2026-25541.patch
 Patch8:         CVE-2026-25727.patch
+Patch9:         CVE-2026-27171.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -186,8 +187,8 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Tue Feb 17 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-15
-- Patch for CVE-2025-58160, CVE-2026-25541 and CVE-2026-25727
+* Tue Mar 03 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-15
+- Patch for CVE-2025-58160, CVE-2026-25541, CVE-2026-25727 and CVE-2026-27171
 
 * Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.72.0-14
 - Bump to rebuild with updated glibc
