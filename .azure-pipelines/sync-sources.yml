@@ -67,10 +67,6 @@ variables:
   azldevPackageName: "azldev-preview-pkg-x86_64"
   azldevPackageVersion: "*" # "*" = latest;
 
-  # LinuxContainerImage: 'mcr.microsoft.com/onebranch/azurelinux/build:3.0'
-  # LinuxContainerImage: 'ubuntu:24.04'
-
-
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
@@ -102,19 +98,7 @@ extends:
                   chown -R azldevuser:azldevuser "$(Build.SourcesDirectory)"
                 displayName: "Create azldevuser"
 
-              # - task: PipAuthenticate@1
-              #   displayName: Enable internal pip feed
-              #   inputs:
-              #     onlyAddExtraIndex: false
-              #     artifactFeeds: "MarinerFeed"
-
-              - script: |
-                  set -euo pipefail
-                  sudo su azldevuser -c "python3 -m pip install --user azure-identity azure-storage-blob"
-                  # tdnf install -y azure-core azure-identity
-                  # tdnf install -y ca-certificates
-                  # python3 -m pip install --upgrade pip
-                  # python3 -m pip install keyring artifacts-keyring
+              - script: sudo su azldevuser -c "python3 -m pip install --user azure-identity azure-storage-blob"
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
@@ -161,14 +145,11 @@ extends:
                       ARGS+=(--components-file components.pipeline.list)
                     fi
 
-                    set -x
-
                     AZURE_CONFIG_DIR="/home/azldevuser/.azure"
                     cp -r "$HOME/.azure" "$AZURE_CONFIG_DIR"
                     chown -R azldevuser:azldevuser "$AZURE_CONFIG_DIR"
 
                     echo "Running: '${ARGS[*]}' as azldevuser"
-                    # su azldevuser -c "export AZURE_CONFIG_DIR=${AZURE_CONFIG_DIR} && ${ARGS[*]}"
                     su azldevuser -c "${ARGS[*]}"
                   workingDirectory: "$(Build.SourcesDirectory)"
 
