@@ -34,6 +34,7 @@ Patch4:         CVE-2025-22870.patch
 # CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
 Patch5:         CVE-2025-22872.patch
 Patch6:         CVE-2026-27969.patch
+Patch7:         CVE-2026-27965.patch
 BuildRequires: golang
 
 %description
@@ -104,7 +105,7 @@ go test -v ./go/cmd/... \
 
 %changelog
 * Mon Mar 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 17.0.7-13
-- Patch for CVE-2026-27969
+- Patch for CVE-2026-27969, CVE-2026-27965
 
 * Thu Oct 09 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 17.0.7-12
 - Enable debuginfo subpackage generation
