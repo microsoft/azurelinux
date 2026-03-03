@@ -1300,6 +1300,7 @@
 [components.openbox]
 [components.opencl-headers]
 [components.opencore-amr]
+[components.opencsd]
 [components.opendmarc]
 [components.openexr2]
 [components.openfec]
