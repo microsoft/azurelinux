@@ -25,10 +25,10 @@
             eficsm="false"
             bootpartition="false"
             efipartsize="200">
-            <bootloader name="systemd_boot" timeout="0" />
+            <bootloader name="grub2" timeout="0" />
             <size unit="M">4096</size>
             <initrd action="setup">
-                <dracut uefi="true"/>
+                <dracut uefi="false"/>
             </initrd>
         </type>
     </preferences>
@@ -101,7 +101,6 @@
         <package name="shadow-utils-subid" />
         <package name="sudo" />
         <package name="systemd" />
-        <package name="systemd-boot" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="systemd-rpm-macros" />
