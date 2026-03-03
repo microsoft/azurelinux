@@ -59,7 +59,7 @@ find %{buildroot} -name '*.a' -delete
 
 mkdir -p %{buildroot}%{_datadir}/licenses/freetype
 cp LICENSE.TXT %{buildroot}%{_datadir}/licenses/freetype
-cp -r docs/* %{buildroot}%{_datadir}/licenses/freetype
+cp docs/FTL.TXT docs/GPLv2.TXT %{buildroot}%{_datadir}/licenses/freetype
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -69,9 +69,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files
 %defattr(-,root,root)
-%license docs/LICENSE.TXT
+%license LICENSE.TXT docs/FTL.TXT docs/GPLv2.TXT
 %{_libdir}/*.so*
-%{_datadir}/*
+%{_datadir}/licenses/freetype/
 
 %files devel
 %defattr(-,root,root)
@@ -79,6 +79,8 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_bindir}/freetype-config
+%{_datadir}/aclocal/*
+%{_mandir}/man1/*
 
 %changelog
 * Tue Mar 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.2-2
