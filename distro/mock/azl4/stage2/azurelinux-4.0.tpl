@@ -2,13 +2,37 @@
 config_opts['use_bootstrap_image'] = False
 
 # General packages required
-config_opts['chroot_setup_cmd'] = 'install @{% if mirrored %}buildsys-{% endif %}build'
+# TODO: This will be moved into a comp.xml file.
+config_opts['chroot_setup_cmd'] = 'install'
+config_opts['chroot_setup_cmd'] += ' azurelinux-stage1-compat'
+config_opts['chroot_setup_cmd'] += ' bash'
+config_opts['chroot_setup_cmd'] += ' bzip2'
+config_opts['chroot_setup_cmd'] += ' coreutils'
+config_opts['chroot_setup_cmd'] += ' cpio'
+config_opts['chroot_setup_cmd'] += ' diffutils'
+config_opts['chroot_setup_cmd'] += ' azurelinux-release-common'
+config_opts['chroot_setup_cmd'] += ' findutils'
+config_opts['chroot_setup_cmd'] += ' gawk'
+config_opts['chroot_setup_cmd'] += ' glibc-minimal-langpack'
+config_opts['chroot_setup_cmd'] += ' grep'
+config_opts['chroot_setup_cmd'] += ' gzip'
+config_opts['chroot_setup_cmd'] += ' info'
+config_opts['chroot_setup_cmd'] += ' patch'
+config_opts['chroot_setup_cmd'] += ' azurelinux-rpm-config'
+config_opts['chroot_setup_cmd'] += ' rpm-build'
+config_opts['chroot_setup_cmd'] += ' sed'
+config_opts['chroot_setup_cmd'] += ' shadow-utils'
+config_opts['chroot_setup_cmd'] += ' tar'
+config_opts['chroot_setup_cmd'] += ' unzip'
+config_opts['chroot_setup_cmd'] += ' util-linux'
+config_opts['chroot_setup_cmd'] += ' which'
+config_opts['chroot_setup_cmd'] += ' xz'
 
 # Provide path to system-installed logging.ini file.
 config_opts['log_config_file'] = '/etc/mock/logging.ini'
 
 # Plugin config
-config_opts['plugin_conf']['ccache_enable'] = True
+config_opts['plugin_conf']['ccache_enable'] = False
 
 # Failure behavior
 config_opts['cleanup_on_success'] = False
@@ -19,10 +43,10 @@ config_opts['macros']['%vendor'] = 'Microsoft Corporation'
 config_opts['macros']['%distribution'] = 'Azure Linux'
 config_opts['dist'] = 'azl4'
 config_opts['extra_chroot_dirs'] = ['/run/lock']
-config_opts['releasever'] = '43'
+config_opts['releasever'] = '4.0'
 config_opts['package_manager'] = 'dnf5'
 config_opts['update_before_build'] = False
-config_opts['root'] = 'azl-4.0-{{ target_arch }}'
+config_opts['root'] = 'azl-4.0-stage2-{{ target_arch }}'
 
 # When rpmautospec is enabled,
 # the %autorelease and %autochangelog macros can be used in spec files
@@ -55,28 +79,10 @@ module_platform_id=platform:f{{ releasever }}
 protected_packages=
 user_agent={{ user_agent }}
 
-# repos
-
-[local]
-name=local
-baseurl=https://kojipkgs.fedoraproject.org/repos/f{{ releasever }}-build/latest/$basearch/
-cost=2000
-enabled={{ not mirrored }}
+[koji]
+name=koji
+baseurl=http://20.88.251.114/kojifiles/repos-dist/azl4-bootstrap-rpms-tag-20260226/latest/$basearch/
+cost=1
+enabled=1
 skip_if_unavailable=False
-
-{% if mirrored %}
-[fedora]
-name=fedora
-metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=$basearch
-gpgkey=file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-{{ releasever }}-primary
-gpgcheck=1
-skip_if_unavailable=False
-
-[updates]
-name=updates
-metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&arch=$basearch
-gpgkey=file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-{{ releasever }}-primary
-gpgcheck=1
-skip_if_unavailable=False
-{% endif %}
 """

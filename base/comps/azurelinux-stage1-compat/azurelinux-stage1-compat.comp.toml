@@ -1,0 +1,2 @@
+[components.azurelinux-stage1-compat]
+spec = { type = "local", path = "azurelinux-stage1-compat.spec" }
