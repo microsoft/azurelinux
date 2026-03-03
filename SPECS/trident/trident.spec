@@ -231,11 +231,11 @@ EOF
 
 %build
 %if %{undefined rpm_ver}
-# Use cargo with source and vendor tarballs for distro build
-export TRIDENT_VERSION="%{trident_version}"
-%else
-# Use cargo with source and vendor tarballs for distro build
+# Use ${version}-${release} for TRIDENT_VERSION in distro build
 export TRIDENT_VERSION="${version}-${release}"
+%else
+# Use %{trident_version} for Trident repo build
+export TRIDENT_VERSION="%{trident_version}"
 %endif
 cargo build --release
 
