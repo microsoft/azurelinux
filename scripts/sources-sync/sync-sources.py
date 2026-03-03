@@ -88,7 +88,7 @@ def _setup_logging(*, quiet: bool) -> None:
 # Constants
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(".")
 SOURCES_DIR = REPO_ROOT / "sources"
 DOWNLOADS_DIR = SOURCES_DIR / "downloads"
 LOG_DIR = SOURCES_DIR / "logs"
