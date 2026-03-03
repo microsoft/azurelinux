@@ -1,0 +1,25 @@
+From db1abfc90a1f5429f28d6e1617dc674aa974b12d Mon Sep 17 00:00:00 2001
+From: Durga Jagadeesh Palli <v-dpalli@microsoft.com>
+Date: Tue, 24 Feb 2026 07:41:43 +0000
+Subject: [PATCH] pytest-xdist-3.5.0-fix-pytest9-parser_patch
+
+---
+ testing/test_remote.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testing/test_remote.py b/testing/test_remote.py
+index 2d250c5..3723d66 100644
+--- a/testing/test_remote.py
++++ b/testing/test_remote.py
+@@ -372,7 +372,7 @@ def test_remote_usage_prog(pytester: pytest.Pytester, request) -> None:
+         import sys
+ 
+         def test(get_config_parser, request):
+-            get_config_parser._getparser().error("my_usage_error")
++            get_config_parser.optparser.error("my_usage_error")
+     """
+     )
+ 
+-- 
+2.45.4
+
