@@ -9,6 +9,8 @@ RUN tdnf install -y curl ca-certificates tar gzip git npm python3-pip azurelinux
     npm install -g @github/copilot
 
 # 777 needed because the container runs as an arbitrary UID via -u $(id -u):$(id -g)
-RUN mkdir -p /home/copilot && chmod 777 /home/copilot
+# Ensure the home directory exists and is writable, copilot will want to self-update and needs somewhere to write to.
+RUN mkdir -p /home/copilot/.copilot/pkg && chmod -R 777 /home/copilot
 
+ENV HOME=/home/copilot
 ENTRYPOINT ["copilot"]
