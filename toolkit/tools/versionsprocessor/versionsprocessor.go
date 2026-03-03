@@ -68,12 +68,13 @@ func main() {
 	if *targetArch == "" {
 		buildArch, err = rpm.GetRpmArch(runtime.GOARCH)
 		if err != nil {
-			logger.PanicOnError(err)
+			logger.Log.Errorf("Failed to get RPM architecture for GOARCH %s: %s", runtime.GOARCH, err)
+			return
 		}
 	}
 
 	if *workerTar == "" {
-		logger.Log.Error("No worker tar provided, parsing specs in host environment. This may cause issues if the host environment is different from the target build environment.")
+		logger.Log.Error("No worker tar provided, please provide a worker tar to parse specs in the chroot environment.")
 		return
 	}
 
@@ -99,12 +100,9 @@ func main() {
 			// Get spec file version-release
 			macrosOutput, err = processSpecFile(specFile, buildArch, *distTag, macrosOutput)
 
-			// We must continue processing all spec files even if there's an error with one of them, so just log the error and move on to the next file.
-			// Some spec files have errors or warnings unrelated to our query that cause the processing to fail,
-			// and we don't want that to prevent us from getting version-release information for the other spec files.
 			if err != nil {
 				logger.Log.Errorf("Error processing spec file (%s): %s", specFile, err)
-				continue
+				return err
 			}
 		}
 
