@@ -161,10 +161,11 @@ extends:
                       ARGS+=(--components-file components.pipeline.list)
                     fi
 
-                    chown -R azldevuser:azldevuser "$AZURE_CONFIG_DIR"
+                    # chown -R azldevuser:azldevuser "$AZURE_CONFIG_DIR"
 
                     echo "Running: '${ARGS[*]}' as azldevuser"
-                    su azldevuser -c "export AZURE_CONFIG_DIR=${AZURE_CONFIG_DIR} && ${ARGS[*]}"
+                    # su azldevuser -c "export AZURE_CONFIG_DIR=${AZURE_CONFIG_DIR} && ${ARGS[*]}"
+                    su azldevuser -c "${ARGS[*]}"
                   workingDirectory: "$(Build.SourcesDirectory)"
 
               - script: |
