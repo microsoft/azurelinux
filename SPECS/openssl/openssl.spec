@@ -338,7 +338,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %changelog
 * Tue Mar 03 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.1k-39
-- Patch CVE-2025-69421
+- Patch PKCS12_item_decrypt_d2i_ex(): Check oct argument for NULL
 
 * Fri Feb 20 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.1.1k-38
 - Ensure ASN1 types are checked before use in s_client, PKCS12, and PKCS7
