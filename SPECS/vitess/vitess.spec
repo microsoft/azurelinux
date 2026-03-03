@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        17.0.7
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -76,24 +76,67 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go test -v ./go/cmd/... \
-           ./go/mysql/... \
-           ./go/mysql/endtoend/... \
-           ./go/sqltypes/... \
-           ./go/vt/hook/... \
-           ./go/vt/mysqlctl/... \
-           ./go/vt/srvtopo/... \
-           ./go/vt/topo/... \
-           ./go/vt/vtctld/... \
-           ./go/vt/vtgate/evalengine/... \
-           ./go/vt/vttablet/endtoend/... \
-           ./go/vt/vttablet/tabletmanager/... \
-           ./go/vt/vttablet/tabletserver/... \
-           ./go/vt/wrangler/... \
-           ./go/vt/wrangler/testlib/... \
-           ./go/vt/zkctl/... \
-           ./go/json2/... \
-           ./go/test/endtoend/...
+# Only run unit tests that do not require external infrastructure
+# (MySQL/mysqld, consul, etcd, zookeeper, timezone data, /usr/local/vitess).
+# Excluded sub-packages and reasons:
+#   go/mysql (root)                  - needs mysqld (VT_MYSQL_ROOT)
+#   go/mysql/collations/integration  - needs mysqlctl binary
+#   go/mysql/datetime                - needs timezone data (Europe/*)
+#   go/mysql/endtoend                - needs mysqlctl binary
+#   go/vt/hook                       - needs /usr/local/vitess/vthook
+#   go/vt/mysqlctl (root)            - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/topo/consultopo            - needs consul binary
+#   go/vt/topo/etcd2topo             - needs etcd binary
+#   go/vt/topo/k8stopo               - needs Kubernetes API server
+#   go/vt/topo/zk2topo               - needs /usr/local/vitess/bin (zookeeper)
+#   go/vt/vtgate/evalengine           - panic: missing timezone Location
+#   go/vt/vtgate/evalengine/integration - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager      - needs MySQL socket
+#   go/vt/vttablet/tabletmanager/vdiff - needs mysqlctl binary
+#   go/vt/vttablet/tabletmanager/vreplication - needs mysqlctl binary
+#   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
+#   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
+#   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
+#   go/vt/vttablet/endtoend           - needs MySQL infrastructure
+#   go/test/endtoend                   - needs full Vitess cluster
+#   go/cmd                             - needs MySQL/vttest infrastructure
+go test -mod=vendor \
+       ./go/mysql/binlog/... \
+       ./go/mysql/collations \
+       ./go/mysql/decimal/... \
+       ./go/mysql/fastparse/... \
+       ./go/mysql/json/... \
+       ./go/mysql/ldapauthserver/... \
+       ./go/mysql/vault/... \
+       ./go/sqltypes/... \
+       ./go/vt/mysqlctl/backupstats/... \
+       ./go/vt/mysqlctl/filebackupstorage/... \
+       ./go/vt/mysqlctl/mysqlctlproto/... \
+       ./go/vt/mysqlctl/s3backupstorage/... \
+       ./go/vt/mysqlctl/tmutils/... \
+       ./go/vt/srvtopo/... \
+       ./go/vt/topo \
+       ./go/vt/topo/events/... \
+       ./go/vt/topo/helpers/... \
+       ./go/vt/topo/memorytopo/... \
+       ./go/vt/topo/topoproto/... \
+       ./go/vt/topo/topotests/... \
+       ./go/vt/vtctld/... \
+       ./go/vt/vttablet/tabletserver \
+       ./go/vt/vttablet/tabletserver/connpool/... \
+       ./go/vt/vttablet/tabletserver/gc/... \
+       ./go/vt/vttablet/tabletserver/messager/... \
+       ./go/vt/vttablet/tabletserver/planbuilder/... \
+       ./go/vt/vttablet/tabletserver/repltracker/... \
+       ./go/vt/vttablet/tabletserver/rules/... \
+       ./go/vt/vttablet/tabletserver/schema/... \
+       ./go/vt/vttablet/tabletserver/tabletenv/... \
+       ./go/vt/vttablet/tabletserver/throttle/... \
+       ./go/vt/vttablet/tabletserver/txlimiter/... \
+       ./go/vt/vttablet/tabletserver/txserializer/... \
+       ./go/vt/vttablet/tabletserver/txthrottler/... \
+       ./go/vt/wrangler \
+       ./go/json2/...
 
 %files
 %license LICENSE
@@ -102,6 +145,11 @@ go test -v ./go/cmd/... \
 %{_bindir}/*
 
 %changelog
+* Mon Mar 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 17.0.7-13
+- Fix %%check section: replace invalid 'go test -v' with 'go test -mod=vendor',
+  exclude integration tests requiring external infra (MySQL, consul, etcd,
+  zookeeper, Kubernetes, timezone data) not available in build chroot
+
 * Thu Oct 09 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 17.0.7-12
 - Enable debuginfo subpackage generation
 
