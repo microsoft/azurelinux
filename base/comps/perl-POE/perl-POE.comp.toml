@@ -1,4 +1,0 @@
-[components.perl-POE]
-
-[components.perl-POE.build]
-check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
