@@ -1,0 +1,34 @@
+From 7a88cb6fa33f36662d35eaf5a9f2bdc9263f3081 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Mon, 2 Mar 2026 22:40:06 -0800
+Subject: [PATCH] fix: avoid incorrect CPE parsing on Azure Linux
+
+setup.py inspects release metadata under /etc to detect the
+appropriate path to the system "libexec" dir. When
+/etc/redhat-release is not found, it instead tries to parse
+/etc/system-release-cpe. This logic incorrectly interprets
+the CPE string on some systems, potentially running off the
+end of the string's components and ultimately causing an
+exception. This workaround fix explicitly also consider
+the presence of /etc/azurelinux-release as an indication
+that "libexec" is under /usr/libexec.
+---
+ setup.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index fd9692e56..2ef0bd8d3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -184,6 +184,8 @@ if os.uname()[0] in ["FreeBSD", "DragonFly", "OpenBSD"]:
+     USR_LIB_EXEC = "usr/local/lib"
+ elif os.path.isfile("/etc/redhat-release"):
+     USR_LIB_EXEC = "usr/libexec"
++elif os.path.isfile("/etc/azurelinux-release"):
++    USR_LIB_EXEC = "usr/libexec"
+ elif os.path.isfile("/etc/system-release-cpe"):
+     with open("/etc/system-release-cpe") as f:
+         cpe_data = f.read().rstrip().split(":")
+-- 
+2.53.0
+

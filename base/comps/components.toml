@@ -25,7 +25,6 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.checkpolicy]
 [components.chkconfig]
 [components.chrony]
-[components.cloud-init]
 [components.cloud-utils]
 [components.cpio]
 [components.cracklib]

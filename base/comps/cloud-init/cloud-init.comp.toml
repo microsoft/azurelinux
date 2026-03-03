@@ -1,0 +1,13 @@
+[components.cloud-init]
+
+[[components.cloud-init.overlays]]
+description = "Workaround CPE parsing bug in cloud-init 25.2"
+type = "spec-add-tag"
+tag = "Patch"
+value = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
+
+[[components.cloud-init.overlays]]
+description = "Add the CPE parsing bug fix patch file"
+type = "file-add"
+source = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
+file = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
