@@ -112,7 +112,7 @@ extends:
                   # tdnf install -y ca-certificates
                   # python3 -m pip install --upgrade pip
                   # python3 -m pip install keyring artifacts-keyring
-                  python3 -m pip install azure-storage-blob
+                  python3 -m pip install --user azure-storage-blob
                 displayName: "Install Python dependencies"
 
               - task: UniversalPackages@0
@@ -138,6 +138,10 @@ extends:
                 workingDirectory: "$(Build.SourcesDirectory)"
                 condition: and(succeeded(), ne('${{ parameters.components }}', ''))
 
+              # Create a non-root user to run azldev, since it doesn't like being run as root.
+              - script: useradd -m azldevuser
+                displayName: "Create azldevuser"
+
               - task: AzureCLI@2
                 displayName: "Sync lookaside cache"
                 inputs:
@@ -158,8 +162,8 @@ extends:
                       ARGS+=(--components-file components.pipeline.list)
                     fi
 
-                    echo "Running: ${ARGS[*]}"
-                    "${ARGS[@]}"
+                    echo "Running: ${ARGS[*]} as azldevuser"
+                    su azldevuser -c "${ARGS[*]}"
                   workingDirectory: "$(Build.SourcesDirectory)"
 
               - script: |
