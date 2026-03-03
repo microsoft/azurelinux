@@ -28,6 +28,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+var packageVersionRegexp = regexp.MustCompile(`^[^:]+: (?:(.+):)?(.+)-(.+)$`)
+
 var (
 	app           = kingpin.New("versionsprocessor", "A tool to generate a macro file of all specs version and release")
 	specsDir      = exe.InputDirFlag(app, "Directory to scan for SPECS")
@@ -43,10 +45,6 @@ var (
 )
 
 func main() {
-	const (
-		prefix = "azl"
-	)
-
 	var (
 		chroot       *safechroot.Chroot
 		macrosOutput []string
@@ -72,9 +70,6 @@ func main() {
 		if err != nil {
 			logger.PanicOnError(err)
 		}
-		if err != nil {
-			logger.Log.Errorf("Failed to determine RPM architecture for runtime architecture %q: %v", runtime.GOARCH, err)
-		}
 	}
 
 	if *workerTar == "" {
@@ -83,17 +78,17 @@ func main() {
 	}
 
 	const leaveFilesOnDisk = false
-	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir, "", "")
+	chroot, err = specreaderutils.CreateChroot("versionprocessor_chroot", *workerTar, *buildDir, *specsDir)
 	if err != nil {
 		logger.PanicOnError("Failed to create chroot")
 	}
 	defer chroot.Close(leaveFilesOnDisk)
 
 	doParse := func() error {
-		// Find all spec files
+		// Find all spec files in provided specs dir
 		allSpecFiles, err := specreaderutils.FindSpecFiles(*specsDir, nil)
 		if err != nil {
-			logger.Log.Panicf("Error finding spec files: %s", err)
+			logger.Log.Errorf("Error finding spec files: %s", err)
 			return err
 		}
 
@@ -101,10 +96,12 @@ func main() {
 
 		// Process all specs files
 		for _, specFile := range allSpecFiles {
-
 			// Get spec file version-release
-			macrosOutput, err = processSpecFile(specFile, buildArch, prefix, macrosOutput)
+			macrosOutput, err = processSpecFile(specFile, buildArch, *distTag, macrosOutput)
 
+			// We must continue processing all spec files even if there's an error with one of them, so just log the error and move on to the next file.
+			// Some spec files have errors or warnings unrelated to our query that cause the processing to fail,
+			// and we don't want that to prevent us from getting version-release information for the other spec files.
 			if err != nil {
 				logger.Log.Errorf("Error processing spec file (%s): %s", specFile, err)
 				continue
@@ -114,10 +111,10 @@ func main() {
 		return err
 	}
 
-	if chroot != nil {
-		err = chroot.Run(doParse)
-	} else {
-		err = doParse()
+	err = chroot.Run(doParse)
+
+	if err != nil {
+		logger.Log.Errorf("Error processing spec files: %s", err)
 	}
 
 	err = writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
@@ -127,13 +124,13 @@ func main() {
 	}
 }
 
-func processSpecFile(specFile string, buildArch string, prefix string, macrosOutput []string) (newMacrosOutput []string, err error) {
+func processSpecFile(specFile string, buildArch string, distTag string, macrosOutput []string) (newMacrosOutput []string, err error) {
 	// Get spec file version-release
 
 	specFileName := filepath.Base(specFile)
 
 	sourceDir := filepath.Dir(specFile)
-	defines := rpm.DefaultDistroDefines(false, *distTag)
+	defines := rpm.DefaultDistroDefines(false, distTag)
 
 	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
 
@@ -144,46 +141,53 @@ func processSpecFile(specFile string, buildArch string, prefix string, macrosOut
 
 	for _, packageVersionString := range packages {
 
-		macros, err := processPackageVersionString(packageVersionString, specFileName, prefix)
+		macros, err := processPackageVersionString(packageVersionString, specFileName, distTag)
 		if err != nil {
 			logger.Log.Errorf("Error processing package version string: %s", err)
 			continue
 		}
 
-		macrosOutput = append(macrosOutput, macros)
+		macrosOutput = append(macrosOutput, macros...)
 	}
 
 	return macrosOutput, nil
 }
 
-func processPackageVersionString(packageVersionString string, specFileName string, prefix string) (macros string, err error) {
+func processPackageVersionString(packageVersionString string, specFileName string, distTag string) (macros []string, err error) {
+	const (
+		prefix = "azl"
+	)
 	// the output of the above query is in the format of "packagename: version-release",
 	// so split by ": " to get the version-release portion we want the second part
-	releaseVerSplit := regexp.MustCompile(`^[^:]+: (.+)-(.+)$`).FindStringSubmatch(packageVersionString)[1:]
+	releaseVerSplit := packageVersionRegexp.FindStringSubmatch(packageVersionString)[1:]
 
-	if len(releaseVerSplit) != 2 {
-		err = fmt.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
-		logger.Log.Errorf("Empty version-release format retrieved from spec file (%s)", specFileName)
+	if len(releaseVerSplit) <= 2 {
+		errorString := fmt.Sprintf("Empty version-release format retrieved from spec file (%s)", specFileName)
+		err = fmt.Errorf(errorString)
+		logger.Log.Errorf(errorString)
 
-		return "", err
+		return []string{""}, err
 	}
 
-	version := releaseVerSplit[0]
-	release := releaseVerSplit[1]
-	releaseClean := strings.Replace(release, *distTag, "", 1) // targetting azl3 specifically since this won't go into above 3.0 toolkit
+	epoch := releaseVerSplit[0]
+	version := releaseVerSplit[1]
+	release := releaseVerSplit[2]
+	releaseClean := strings.Replace(release, distTag, "", 1)
 
 	// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
-	specFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
-	specFileNameMacroFormat = strings.ReplaceAll(specFileNameMacroFormat, "-", "_")
+	packageFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
+	packageFileNameMacroFormat = strings.ReplaceAll(packageFileNameMacroFormat, "-", "_")
 
-	versionMacroString := prefix + "_" + specFileNameMacroFormat + "_version"
-	releaseMacroString := prefix + "_" + specFileNameMacroFormat + "_release"
+	epochReleaseString := prefix + "_" + packageFileNameMacroFormat + "_epoch"
+	versionMacroString := prefix + "_" + packageFileNameMacroFormat + "_version"
+	releaseMacroString := prefix + "_" + packageFileNameMacroFormat + "_release"
 
 	// Generate RPM macro definitions instead of modifying spec files directly.
-	macros = fmt.Sprintf("%%%s %s\n%%%s %s",
-		versionMacroString, version,
-		releaseMacroString, releaseClean,
-	)
+	macros = []string{
+		fmt.Sprintf("%%%s %s", epochReleaseString, epoch),
+		fmt.Sprintf("%%%s %s", versionMacroString, version),
+		fmt.Sprintf("%%%s %s", releaseMacroString, releaseClean),
+	}
 
 	return macros, nil
 }

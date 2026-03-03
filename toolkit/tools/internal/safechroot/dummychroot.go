@@ -25,5 +25,5 @@ func (d *DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 }
 
 func (d *DummyChroot) AddRPMMacrosFile(macrosFilePath string) error {
-	return d.AddRPMMacrosFile(macrosFilePath)
+	return AddRPMMacrosFile(d, macrosFilePath)
 }

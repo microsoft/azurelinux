@@ -162,13 +162,14 @@ func NewOverlayMountPoint(chrootDir, source, target, lowerDir, upperDir, workDir
 	return
 }
 
-func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) (err error) {
+func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) error {
+	return AddRPMMacrosFile(c, macrosFilePath)
+}
 
-	var (
-		macroDir string
-	)
+func AddRPMMacrosFile(c ChrootInterface, macrosFilePath string) (err error) {
+	var macroDir string
 
-	doParse := func() error {
+	doGetMacroDir := func() error {
 		var macroErr error
 
 		macroDir, macroErr = rpm.GetMacroDir()
@@ -180,11 +181,22 @@ func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) (err error) {
 		return macroErr
 	}
 
-	c.Run(doParse)
+	c.Run(doGetMacroDir)
 
 	// Destination path inside the chroot (same path as on the host).
-	macrosDestDir := filepath.Join(c.rootDir, macroDir)
+	macrosDestDir := filepath.Join(c.RootDir(), macroDir)
 	macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(macrosFilePath))
+
+	exists, existsErr := file.PathExists(macrosDestFile)
+	if existsErr != nil {
+		logger.Log.Errorf("Failed to check if macros file exists (%s): %s", macrosDestFile, existsErr)
+		return existsErr
+	}
+
+	if exists {
+		logger.Log.Warningf("Macros file (%s) already exists, skipping copy", macrosDestFile)
+		return nil
+	}
 
 	// Ensure destination directory exists and copy the file.
 	mkdirErr := directory.EnsureDirExists(macrosDestDir)
@@ -196,7 +208,7 @@ func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) (err error) {
 	copyErr := file.Copy(macrosFilePath, macrosDestFile)
 	if copyErr != nil {
 		logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", macrosFilePath, macrosDestFile, copyErr)
-		return mkdirErr
+		return copyErr
 	}
 
 	logger.Log.Infof("Copied release version macros file into chroot (%s -> %s)", macrosFilePath, macrosDestFile)

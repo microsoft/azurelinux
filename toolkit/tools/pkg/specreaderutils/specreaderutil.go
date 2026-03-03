@@ -50,6 +50,29 @@ var (
 	}
 )
 
+// ChrootConfig holds the configuration for creating a chroot environment.
+type ChrootConfig struct {
+	SrpmsDir                string
+	ReleaseVersionMacrosFile string
+}
+
+// ChrootOption is a functional option for configuring chroot creation.
+type ChrootOption func(*ChrootConfig)
+
+// WithSrpmsDir sets the SRPM directory to mount inside the chroot.
+func WithSrpmsDir(srpmsDir string) ChrootOption {
+	return func(c *ChrootConfig) {
+		c.SrpmsDir = srpmsDir
+	}
+}
+
+// WithReleaseVersionMacrosFile sets the release version macros file to copy into the chroot.
+func WithReleaseVersionMacrosFile(file string) ChrootOption {
+	return func(c *ChrootConfig) {
+		c.ReleaseVersionMacrosFile = file
+	}
+}
+
 // parseResult holds the worker results from parsing a SPEC file.
 type parseResult struct {
 	packages []*pkgjson.Package
@@ -67,7 +90,7 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile)
+		chroot, err = CreateChroot("specparser_chroot", workerTar, buildDir, specsDir, WithSrpmsDir(srpmsDir), WithReleaseVersionMacrosFile(releaseVersionMacrosFile))
 		if err != nil {
 			return
 		}
@@ -126,12 +149,21 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 	return
 }
 
-// createChroot creates a chroot to parse SPECs inside of.
-func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVersionMacrosFile string) (chroot *safechroot.Chroot, err error) {
+// CreateChroot creates a chroot to parse SPECs inside of.
+// Required parameters are chrootName, workerTar, buildDir, and specsDir.
+// Optional configuration can be provided via ChrootOption functions:
+//   - WithSrpmsDir: sets the SRPM directory to mount inside the chroot.
+//   - WithReleaseVersionMacrosFile: sets the release version macros file to copy into the chroot.
+func CreateChroot(chrootName, workerTar, buildDir, specsDir string, opts ...ChrootOption) (chroot *safechroot.Chroot, err error) {
 	const (
 		existingDir      = false
 		leaveFilesOnDisk = false
 	)
+
+	cfg := &ChrootConfig{}
+	for _, opt := range opts {
+		opt(cfg)
+	}
 
 	// Mount the specs and srpms directories to an identical path inside the chroot.
 	// Since specreader saves the full paths to specs in its output that grapher will then consume,
@@ -142,8 +174,8 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVe
 		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
 	}
 
-	if srpmsDir != "" {
-		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""))
+	if cfg.SrpmsDir != "" {
+		extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(cfg.SrpmsDir, cfg.SrpmsDir, "", safechroot.BindMountPointFlags, ""))
 	}
 
 	chrootDir := filepath.Join(buildDir, chrootName)
@@ -156,7 +188,7 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVe
 
 	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
 	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir, srpmsDir}
+		dirsToCopy := []string{specsDir, cfg.SrpmsDir}
 		for _, dir := range dirsToCopy {
 			dirInChroot := filepath.Join(chroot.RootDir(), dir)
 			err = directory.CopyContents(dir, dirInChroot)
@@ -172,8 +204,8 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir, srpmsDir, releaseVe
 
 	// If a release version macros file is provided, copy it into the default RPM macros directory
 	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if releaseVersionMacrosFile != "" {
-		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
+	if cfg.ReleaseVersionMacrosFile != "" {
+		err = chroot.AddRPMMacrosFile(cfg.ReleaseVersionMacrosFile)
 		if err != nil {
 			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}
