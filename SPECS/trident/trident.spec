@@ -230,7 +230,13 @@ EOF
 %endif
 
 %build
+%if %{undefined rpm_ver}
+# Use cargo with source and vendor tarballs for distro build
 export TRIDENT_VERSION="%{trident_version}"
+%else
+# Use cargo with source and vendor tarballs for distro build
+export TRIDENT_VERSION="${version}-${release}"
+%endif
 cargo build --release
 
 mkdir selinux
