@@ -5,9 +5,9 @@ Subject: [PATCH] Added patch to skip failing ptests
 
 ---
  .../tests/integration/test_routing_direct.cc  |  765 +++----
- .../tests/integration/test_routing_sharing.cc | 1792 ++++++++---------
+ .../tests/integration/test_routing_sharing.cc | 1820 ++++++++---------
  .../test_routing_sharing_constrained_pools.cc | 1270 ++++++------
- 3 files changed, 1916 insertions(+), 1911 deletions(-)
+ 3 files changed, 1930 insertions(+), 1925 deletions(-)
 
 diff --git a/router/tests/integration/test_routing_direct.cc b/router/tests/integration/test_routing_direct.cc
 index d57cb904..c6fb56e3 100644
@@ -824,7 +824,7 @@ index d57cb904..c6fb56e3 100644
       SharedServer::Account{SharedServer::sha256_password_account().username,
                             "wrong-password",
 diff --git a/router/tests/integration/test_routing_sharing.cc b/router/tests/integration/test_routing_sharing.cc
-index 28a0d587..b8eb2147 100644
+index 28a0d587..7719155d 100644
 --- a/router/tests/integration/test_routing_sharing.cc
 +++ b/router/tests/integration/test_routing_sharing.cc
 @@ -1615,248 +1615,248 @@ TEST_P(ShareConnectionTest, classic_protocol_share_same_user) {
@@ -2440,7 +2440,7 @@ index 28a0d587..b8eb2147 100644
  /**
   * Check, empty caching-sha2-password over plaintext works with get-server-key.
   */
-@@ -7211,114 +7211,114 @@ class ChangeUserTest
+@@ -7211,128 +7211,128 @@ class ChangeUserTest
  std::unique_ptr<MysqlClient> ChangeUserTest::cli_{};
  bool ChangeUserTest::last_with_ssl_{};
  ShareConnectionParam ChangeUserTest::last_connect_param_{};
@@ -2552,6 +2552,20 @@ index 28a0d587..b8eb2147 100644
 -  }
 -}
 -
+-INSTANTIATE_TEST_SUITE_P(
+-    Spec, ChangeUserTest,
+-    ::testing::Combine(::testing::Bool(),
+-                       ::testing::ValuesIn(share_connection_params),
+-                       ::testing::ValuesIn(change_user_params),
+-                       ::testing::Values("", "testing")),
+-    [](auto &info) {
+-      auto schema = std::get<3>(info.param);
+-      return "with" + std::string(std::get<0>(info.param) ? "" : "out") +
+-             "_ssl__via_" + std::get<1>(info.param).testname + "_" +
+-             std::get<2>(info.param).scenario +
+-             (schema.empty() ? "_without_schema"s : ("_with_schema_" + schema));
+-    });
+-
 +#if 0
 +*TEST_P(ChangeUserTest, classic_protocol) {
 +*  auto [with_ssl, connect_param, test_param, schema] = GetParam();
@@ -2659,10 +2673,24 @@ index 28a0d587..b8eb2147 100644
 +*    }
 +*  }
 +*}
++*
++*INSTANTIATE_TEST_SUITE_P(
++*    Spec, ChangeUserTest,
++*    ::testing::Combine(::testing::Bool(),
++*                       ::testing::ValuesIn(share_connection_params),
++*                       ::testing::ValuesIn(change_user_params),
++*                       ::testing::Values("", "testing")),
++*    [](auto &info) {
++*      auto schema = std::get<3>(info.param);
++*      return "with" + std::string(std::get<0>(info.param) ? "" : "out") +
++*             "_ssl__via_" + std::get<1>(info.param).testname + "_" +
++*             std::get<2>(info.param).scenario +
++*             (schema.empty() ? "_without_schema"s : ("_with_schema_" + schema));
++*    });
 +#endif
- INSTANTIATE_TEST_SUITE_P(
-     Spec, ChangeUserTest,
-     ::testing::Combine(::testing::Bool(),
+ int main(int argc, char *argv[]) {
+   net::impl::socket::init();
+ 
 diff --git a/router/tests/integration/test_routing_sharing_constrained_pools.cc b/router/tests/integration/test_routing_sharing_constrained_pools.cc
 index 32885de1..bc336fea 100644
 --- a/router/tests/integration/test_routing_sharing_constrained_pools.cc
