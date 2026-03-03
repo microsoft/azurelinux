@@ -96,6 +96,19 @@
     },
     "ComponentGroupConfig": {
       "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of this component group"
+        },
+        "components": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Components",
+          "description": "List of component names that are members of this group"
+        },
         "specs": {
           "items": {
             "type": "string",
@@ -117,6 +130,11 @@
           "type": "array",
           "title": "Excluded path patterns",
           "description": "List of glob patterns identifying local paths to exclude from spec selection"
+        },
+        "default-component-config": {
+          "$ref": "#/$defs/ComponentConfig",
+          "title": "Default component configuration",
+          "description": "Default component config inherited by all members of this component group"
         }
       },
       "additionalProperties": false,
@@ -567,6 +585,17 @@
           "description": "Name of the component in the upstream distro",
           "examples": [
             "different-name"
+          ]
+        },
+        "upstream-commit": {
+          "type": "string",
+          "maxLength": 40,
+          "minLength": 7,
+          "pattern": "^[0-9a-fA-F]+$",
+          "title": "Upstream commit",
+          "description": "Git commit hash to pin the upstream spec to. Takes priority over snapshot.",
+          "examples": [
+            "abc1234def5678"
           ]
         }
       },
