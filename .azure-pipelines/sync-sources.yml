@@ -135,7 +135,7 @@ extends:
                     set -euo pipefail
 
                     ARGS=(
-                      python3 scripts/sync-sources.py
+                      python3 scripts/sources-sync/sync-sources.py
                       --account-url "${{ parameters.accountUrl }}"
                       --container "${{ parameters.container }}"
                     )

@@ -4,8 +4,8 @@ This directory contains scripts for downloading, verifying, and uploading
 component sources to the Azure Blob Storage lookaside cache used by the
 Azure Linux build system.
 
-The primary entry point is **`sync-sources.py`** — a single script that
-combines the download, verify, and upload workflows.  An Azure DevOps (ADO)
+The entry point is **`sync-sources.py`** — a single script that
+combines the download and upload workflows.  An Azure DevOps (ADO)
 pipeline at [`.azure-pipelines/sync-sources.yml`](../.azure-pipelines/sync-sources.yml)
 automates this on every merge to the `tomls/base/main` branch.
 
@@ -290,9 +290,3 @@ under `sources/logs/`.  With ~590 components, expect significant disk usage
 for a full sync.
 
 ---
-
-## Related Scripts
-
-| Script | Purpose |
-|---|---|
-| `update-components-list.py` | Maintains `components.list` — adds missing components from image builds or prunes stale entries. |
