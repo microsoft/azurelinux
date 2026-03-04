@@ -1,3 +1,5 @@
+includes = ["image-tests.toml"]
+
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
