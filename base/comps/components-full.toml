@@ -650,8 +650,6 @@
 [components.jasper]
 [components.java-21-openjdk]
 [components.java-21-openjdk-portable]
-[components.java-latest-openjdk]
-[components.java-latest-openjdk-portable]
 [components.java-rpm-macros]
 [components.java_cup]
 [components.javacc]
