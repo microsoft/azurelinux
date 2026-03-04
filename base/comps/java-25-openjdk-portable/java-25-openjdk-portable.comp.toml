@@ -16,8 +16,11 @@ type = "spec-search-replace"
 regex = '^%global buildjdkver 24$'
 replacement = '%global buildjdkver 25'
 
+# We are working of an older version of the -portable spec which hardcoded BuildRequires
+# to java-latest*. The buildjdkver change above will not remove that dependency. We have
+# to explicitly replace the -latest dependency with -25.
 [[components.java-25-openjdk-portable.overlays]]
-description = "We need JDK 25 to build since that is our bootstrap version"
-type = "spec-add-tag"
-tag = "BuildRequires"
-value = "java-25-openjdk-devel"
+description = "Replace upstream java-latest BuildRequires with java-25 to remove java-latest dependency"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java-latest-openjdk-devel$'
+replacement = 'BuildRequires: java-25-openjdk-devel'
