@@ -1,0 +1,64 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 2048,
+            "Artifacts": [
+                {
+                    "Name": "core",
+                    "Type": "vhd"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "boot",
+                    "Flags": [
+                        "grub"
+                    ],
+                    "Start": 1,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 9,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "BootType": "legacy",
+            "PartitionSettings": [
+                {
+                    "ID": "boot",
+                    "MountPoint": ""
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/hyperv-packages.json",
+                "packagelists/fips-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/core-tools-packages.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/selinux.json",
+                "packagelists/virt-guest-packages.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel-hwe"
+            },
+            "KernelCommandLine": {
+                "ExtraCommandLine": "fips=1",
+                "SELinux": "permissive"
+            },
+            "Hostname": "azurelinux"
+        }
+    ]
+}
