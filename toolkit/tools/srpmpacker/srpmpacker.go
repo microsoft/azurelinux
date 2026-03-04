@@ -356,7 +356,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFil
 	chrootDir := filepath.Join(buildDir, chrootName)
 	chroot = safechroot.NewChroot(chrootDir, existingDir)
 
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true)
+	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true, releaseVersionMacrosFile)
 	if err != nil {
 		return
 	}
@@ -384,15 +384,6 @@ func createChroot(workerTar, buildDir, outDir, specsDir, releaseVersionMacrosFil
 		err = directory.CopyContents(outDir, srpmsInChroot)
 		if err != nil {
 			return
-		}
-	}
-
-	// If a release version macros file is provided, copy it into the default RPM macros directory
-	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if releaseVersionMacrosFile != "" {
-		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
-		if err != nil {
-			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
 		}
 	}
 

@@ -170,7 +170,7 @@ endif
 VALIDATE_IMAGE_GPG ?= n
 
 # Default GPG keys for package GPG validation, used with VALIDATE_TOOLCHAIN_GPG and VALIDATE_IMAGE_GPG
-default_gpg_keys := $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+default_gpg_keys := $(strip $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY))
 TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
 IMAGE_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
 

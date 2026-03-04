@@ -265,7 +265,7 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 // This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
 func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint,
-	includeDefaultMounts bool,
+	includeDefaultMounts bool, releaseVersionMacrosFile ...string,
 ) (err error) {
 	// On failed initialization, cleanup all chroot files
 	const leaveChrootOnDisk = false
@@ -373,6 +373,16 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		// Mark this chroot as initialized, allowing it to be cleaned up on SIGTERM
 		// if requested.
 		activeChroots = append(activeChroots, c)
+	}
+
+	// If a release version macros file is provided, copy it into the default RPM macros directory
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
+	if len(releaseVersionMacrosFile) > 0 && releaseVersionMacrosFile[0] != "" {
+		err = c.AddRPMMacrosFile(releaseVersionMacrosFile[0])
+		if err != nil {
+			err = fmt.Errorf("failed to add release version macros file to chroot:\n%w", err)
+			return
+		}
 	}
 
 	return

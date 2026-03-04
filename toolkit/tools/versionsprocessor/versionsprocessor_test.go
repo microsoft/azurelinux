@@ -193,10 +193,10 @@ func TestProcessSpecFile_SinglePackage(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
-	assert.Contains(t, macros[0], "%azl_testpkg_epoch ")
-	assert.Contains(t, macros[1], "%azl_testpkg_version 1.2.3")
-	assert.Contains(t, macros[2], "%azl_testpkg_release 4")
+	require.Len(t, macros, 2)
+	assert.NotContains(t, macros[0], "%azl_testpkg_epoch ")
+	assert.Contains(t, macros[0], "%azl_testpkg_version 1.2.3")
+	assert.Contains(t, macros[1], "%azl_testpkg_release 4")
 }
 
 func TestProcessSpecFile_VersionOnly(t *testing.T) {
@@ -208,8 +208,8 @@ func TestProcessSpecFile_VersionOnly(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
-	assert.Contains(t, macros[1], "%azl_simplepkg_version 5.0")
+	require.Len(t, macros, 2)
+	assert.Contains(t, macros[0], "%azl_simplepkg_version 5.0")
 }
 
 func TestProcessSpecFile_ReleaseDistTagStripped(t *testing.T) {
@@ -221,10 +221,10 @@ func TestProcessSpecFile_ReleaseDistTagStripped(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
+	require.Len(t, macros, 2)
 	// The dist tag ".azl3" should be stripped from the release.
-	assert.Contains(t, macros[2], "%azl_mypkg_release 7")
-	assert.NotContains(t, macros[2], ".azl3")
+	assert.Contains(t, macros[1], "%azl_mypkg_release 7")
+	assert.NotContains(t, macros[1], ".azl3")
 }
 
 func TestProcessSpecFile_DashInPackageName(t *testing.T) {
@@ -236,11 +236,11 @@ func TestProcessSpecFile_DashInPackageName(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
+	require.Len(t, macros, 2)
 	// The spec file name has dashes, which should become underscores in macro names.
-	assert.Contains(t, macros[0], "%azl_my_cool_pkg_epoch ")
-	assert.Contains(t, macros[1], "%azl_my_cool_pkg_version 3.1.0")
-	assert.Contains(t, macros[2], "%azl_my_cool_pkg_release 2")
+	assert.NotContains(t, macros[0], "%azl_my_cool_pkg_epoch ")
+	assert.Contains(t, macros[0], "%azl_my_cool_pkg_version 3.1.0")
+	assert.Contains(t, macros[1], "%azl_my_cool_pkg_release 2")
 }
 
 func TestProcessSpecFile_WithSubpackages(t *testing.T) {
@@ -287,11 +287,11 @@ Libs.
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
 	// With --srpm, rpmspec returns the source RPM entry (1 result).
-	require.Len(t, macros, 3)
+	require.Len(t, macros, 2)
 
-	assert.Contains(t, macros[0], "%azl_multipkg_epoch ")
-	assert.Contains(t, macros[1], "%azl_multipkg_version 4.0.0")
-	assert.Contains(t, macros[2], "%azl_multipkg_release 3")
+	assert.NotContains(t, macros[0], "%azl_multipkg_epoch ")
+	assert.Contains(t, macros[0], "%azl_multipkg_version 4.0.0")
+	assert.Contains(t, macros[1], "%azl_multipkg_release 3")
 }
 
 func TestProcessSpecFile_NonexistentFile(t *testing.T) {
@@ -331,11 +331,11 @@ func TestProcessSpecFile_ReleaseWithoutDistMacro(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
+	require.Len(t, macros, 2)
 	// Release should remain as-is since there's no dist tag to strip.
-	assert.Contains(t, macros[0], "%azl_nodist_epoch ")
-	assert.Contains(t, macros[1], "%azl_nodist_version 1.0")
-	assert.Contains(t, macros[2], "%azl_nodist_release 5")
+	assert.NotContains(t, macros[0], "%azl_nodist_epoch ")
+	assert.Contains(t, macros[0], "%azl_nodist_version 1.0")
+	assert.Contains(t, macros[1], "%azl_nodist_release 5")
 }
 
 func TestProcessSpecFile_MultiDigitVersion(t *testing.T) {
@@ -347,10 +347,10 @@ func TestProcessSpecFile_MultiDigitVersion(t *testing.T) {
 
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
-	assert.Contains(t, macros[0], "%azl_bigver_epoch ")
-	assert.Contains(t, macros[1], "%azl_bigver_version 10.20.30")
-	assert.Contains(t, macros[2], "%azl_bigver_release 100")
+	require.Len(t, macros, 2)
+	assert.NotContains(t, macros[0], "%azl_bigver_epoch ")
+	assert.Contains(t, macros[0], "%azl_bigver_version 10.20.30")
+	assert.Contains(t, macros[1], "%azl_bigver_release 100")
 }
 
 func TestProcessSpecFile_AccumulatesMacros(t *testing.T) {
@@ -363,14 +363,14 @@ func TestProcessSpecFile_AccumulatesMacros(t *testing.T) {
 	specPath1 := createSpecFile(t, tmpDir, "pkga", "1.0", "1%{?dist}")
 	macros, err := processSpecFile(specPath1, arch, distTag, nil)
 	require.NoError(t, err)
-	require.Len(t, macros, 3)
+	require.Len(t, macros, 2)
 
 	// Process a second spec, passing the existing macros slice.
 	specPath2 := createSpecFile(t, tmpDir, "pkgb", "2.0", "2%{?dist}")
 	macros, err = processSpecFile(specPath2, arch, distTag, macros)
 	require.NoError(t, err)
 	// Should now contain macros from both specs.
-	require.Len(t, macros, 6)
+	require.Len(t, macros, 4)
 	combined := strings.Join(macros, "\n")
 	assert.Contains(t, combined, "%azl_pkga_version 1.0")
 	assert.Contains(t, combined, "%azl_pkgb_version 2.0")

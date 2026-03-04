@@ -214,19 +214,10 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		extraDirs = append(extraDirs, chrootCcacheDir)
 	}
 
-	err = chroot.Initialize(workerTar, extraDirs, mountPoints, true)
+	err = chroot.Initialize(workerTar, extraDirs, mountPoints, true, releaseVersionMacrosFile)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return
-	}
-
-	// If a release version macros file is provided, copy it into the default RPM macros directory
-	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if releaseVersionMacrosFile != "" {
-		err = chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
-		if err != nil {
-			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
-		}
 	}
 	defer chroot.Close(noCleanup)
 

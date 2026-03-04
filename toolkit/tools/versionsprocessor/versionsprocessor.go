@@ -95,15 +95,32 @@ func main() {
 
 		logger.Log.Infof("Processing version and release for %d spec files into %s", len(allSpecFiles), *output)
 
-		// Process all specs files
-		for _, specFile := range allSpecFiles {
-			// Get spec file version-release
-			macrosOutput, err = processSpecFile(specFile, buildArch, *distTag, macrosOutput)
+		type ProcessResult struct {
+			macros []string
+			err    error
+		}
+		resultsChannel := make(chan ProcessResult, len(allSpecFiles))
 
-			if err != nil {
-				logger.Log.Errorf("Error processing spec file (%s): %s", specFile, err)
-				return err
+		for _, specFile := range allSpecFiles {
+			go func(sf string) {
+				macros, processErr := processSpecFile(sf, buildArch, *distTag, nil)
+				if processErr != nil {
+					processErr = fmt.Errorf("error processing spec file (%s): %w", sf, processErr)
+				}
+				resultsChannel <- ProcessResult{
+					macros: macros,
+					err:    processErr,
+				}
+			}(specFile)
+		}
+
+		for i := 0; i < len(allSpecFiles); i++ {
+			result := <-resultsChannel
+			if result.err != nil {
+				logger.Log.Errorf("%s", result.err)
+				return result.err
 			}
+			macrosOutput = append(macrosOutput, result.macros...)
 		}
 
 		return err
@@ -112,7 +129,7 @@ func main() {
 	err = chroot.Run(doParse)
 
 	if err != nil {
-		logger.Log.Errorf("Error processing spec files: %s", err)
+		logger.Log.Fatalf("Error processing spec files: %s", err)
 	}
 
 	err = writeExtraFilesToOutput(*extraFiles, macrosOutput, *output)
@@ -182,9 +199,13 @@ func processPackageVersionString(packageVersionString string, specFileName strin
 
 	// Generate RPM macro definitions instead of modifying spec files directly.
 	macros = []string{
-		fmt.Sprintf("%%%s %s", epochReleaseString, epoch),
 		fmt.Sprintf("%%%s %s", versionMacroString, version),
 		fmt.Sprintf("%%%s %s", releaseMacroString, releaseClean),
+	}
+
+	// Only append (to the front of the list) if we have an epoch
+	if epoch != "" {
+		macros = append([]string{fmt.Sprintf("%%%s %s", epochReleaseString, epoch)}, macros...)
 	}
 
 	return macros, nil

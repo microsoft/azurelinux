@@ -84,6 +84,7 @@ $(toolkit_archive): $(go_tool_targets) $(mariner_repos_files) $(toolkit_componen
 	cp -r $(toolkit_root_files) $(toolkit_prep_dir) && \
 	cp $(mariner_repos_files) $(toolkit_repos_dir) && \
 	cp $(toolkit_component_extra_files) $(toolkit_prep_dir) && \
+	cp $(rel_versions_macro_file) $(toolkit_prep_dir) && \
 	cp $(go_tool_targets) $(toolkit_tools_dir) && \
 	rm -rf $(toolkit_prep_dir)/out && \
 	tar -cvp -f $(toolkit_archive) -C $(dir $(toolkit_prep_dir)) $(notdir $(toolkit_prep_dir))

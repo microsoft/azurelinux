@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -58,19 +57,10 @@ func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath,
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(mountDirPath, chrootMountDirPath, "", safechroot.BindMountPointFlags, ""),
 	}
-	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true)
+	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true, releaseVersionMacrosFile)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot (%s) inside (%s):\n%w", workerTarPath, chrootDirPath, err)
 		return
-	}
-
-	// If a release version macros file is provided, copy it into the default RPM macros directory
-	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
-	if releaseVersionMacrosFile != "" {
-		err = s.chroot.AddRPMMacrosFile(releaseVersionMacrosFile)
-		if err != nil {
-			logger.Log.Errorf("Failed to add release version macros file to chroot: %s", err)
-		}
 	}
 
 	return
