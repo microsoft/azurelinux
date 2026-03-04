@@ -2,14 +2,17 @@ includes = ["image-tests.toml"]
 
 [images.vm-base]
 description = "VM Base Image"
+image-type = "1P"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
 [images.trident-vm-testimage]
 description = "Trident VM Test Image"
+image-type = "test-only"
 definition = { type = "kiwi", path = "trident-vm-testimage/trident-vm-testimage.kiwi" }
 
 [images.container-base]
 description = "Container Base Image"
+image-type = "3P"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
 
 # NOTE:

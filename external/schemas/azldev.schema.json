@@ -403,6 +403,16 @@
           "title": "Description",
           "description": "Description of the image"
         },
+        "image-type": {
+          "type": "string",
+          "enum": [
+            "test-only",
+            "1P",
+            "3P"
+          ],
+          "title": "Image type",
+          "description": "Classification for the image lifecycle and ownership"
+        },
         "definition": {
           "$ref": "#/$defs/ImageDefinition",
           "title": "Definition",
