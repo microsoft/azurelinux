@@ -9,7 +9,7 @@
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
-        <type image="docker">
+        <type image="oci">
             <containerconfig
                 name="microsoft/azurelinux/base/core"
                 tag="4.0"
