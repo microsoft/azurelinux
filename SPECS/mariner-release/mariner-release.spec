@@ -63,7 +63,7 @@ EOF
 
 %changelog
 * Tue Mar 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-85
-- Bump release for Mar 206 Update
+- Bump release for Mar 2026 Update
 
 * Mon Jan 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-84
 - Bump release for Feb 2026 Update
