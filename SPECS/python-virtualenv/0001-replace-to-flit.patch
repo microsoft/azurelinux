@@ -1,14 +1,14 @@
-From 1ca0e076bb669382770c16b6f3c53770cbee5513 Mon Sep 17 00:00:00 2001
-From: Saul Paredes <saulparedes@microsoft.com>
-Date: Mon, 26 Feb 2024 17:00:41 -0800
-Subject: [PATCH] replace to flit
+From a778f8a379f75100d24159c4c3ffdbce4ff36e07 Mon Sep 17 00:00:00 2001
+From: Archana Shettigar <v-shettigara@microsoft.com>
+Date: Wed, 14 Jan 2026 15:30:01 +0530
+Subject: [PATCH] replace-to-flit
 
 ---
- pyproject.toml | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+ pyproject.toml | 23 ++++-------------------
+ 1 file changed, 4 insertions(+), 19 deletions(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index 842a5b5..f4ed041 100644
+index 0a7ca00..03706b2 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -1,9 +1,6 @@
@@ -29,10 +29,10 @@ index 842a5b5..f4ed041 100644
  ]
 -license = "MIT"
 +license = {text = "MIT"}
- maintainers = [{ name = "Bernat Gabor", email = "gaborjbernat@gmail.com" }]
- requires-python = ">=3.7"
- classifiers = [
-@@ -37,9 +34,7 @@ classifiers = [
+ maintainers = [
+   { name = "Bernat Gabor", email = "gaborjbernat@gmail.com" },
+ ]
+@@ -40,9 +37,7 @@ classifiers = [
    "Topic :: Software Development :: Testing",
    "Topic :: Utilities",
  ]
@@ -41,20 +41,25 @@ index 842a5b5..f4ed041 100644
 -]
 +version = "3.10.0"
  dependencies = [
-   "distlib<1,>=0.3.7",
-   "filelock<4,>=3.12.2",
-@@ -96,11 +91,6 @@ builtin = "virtualenv.discovery.builtin:Builtin"
- app-data = "virtualenv.seed.embed.via_app_data.via_app_data:FromAppData"
- pip = "virtualenv.seed.embed.pip_invoke:PipInvoke"
+   "distlib>=0.3.7,<1",
+   "filelock>=3.16.1,<4; python_version<'3.10'",
+@@ -99,16 +94,6 @@ entry-points."virtualenv.discovery".builtin = "virtualenv.discovery.builtin:Buil
+ entry-points."virtualenv.seed".app-data = "virtualenv.seed.embed.via_app_data.via_app_data:FromAppData"
+ entry-points."virtualenv.seed".pip = "virtualenv.seed.embed.pip_invoke:PipInvoke"
  
 -[tool.hatch]
 -build.hooks.vcs.version-file = "src/virtualenv/version.py"
--build.targets.sdist.include = ["/src", "/tests", "/tasks", "/tox.ini"]
+-build.targets.sdist.include = [
+-  "/src",
+-  "/tests",
+-  "/tasks",
+-  "/tox.ini",
+-]
 -version.source = "vcs"
 -
- [tool.black]
+ [tool.ruff]
  line-length = 120
- 
+ format.preview = true
 -- 
-2.25.1
+2.45.4
 
