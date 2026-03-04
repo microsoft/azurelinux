@@ -4,7 +4,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -112,6 +112,17 @@ done
 for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
     sed -i "s/^enabled=AUTO_VALUE$/enabled=${stable_enabled}/" $repo || exit 1
 done
+
+# Update BASE_REPO_URI in azurelinux.repo; compute based on dist tag.
+# Extract the last dot-delimited segment from %%dist (e.g. "20260303" from ".azl4~bootstrap.20260303").
+# If the segment doesn't contain an 8-digit date, fall back to a hard-coded URI.
+date_segment=$(echo '%{dist}' | awk -F. '{print $NF}')
+if echo "$date_segment" | grep -qE '[0-9]{8}'; then
+    base_repo_uri="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/${date_segment}"
+else
+    base_repo_uri='https://packages.microsoft.com/azurelinux/$releasever/prod/base'
+fi
+sed -i "s|BASE_REPO_URI|${base_repo_uri}|" $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
 
 # Adjust Evergreen repo files to include Evergreen+1 GPG key.
 # This is necessary for the period when Evergreen gets bumped to N+1 and packages
@@ -247,198 +258,8 @@ rm -f "$TMPRING"
 
 
 %changelog
-* Mon Aug 11 2025 Samyak Jain <samyak.jn11@gmail.com> - 44-0.1
-- Rawhide is now F44
+* Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
+- Update .repo files.
 
-* Mon Aug 04 2025 Samyak Jain <samyak.jn11@gmail.com> - 43-0.3
-- Add RPM-GPG-KEY-fedora-45-primary
-- Add fedora-45-ima.der for ima signing.
-
-* Thu Mar 13 2025 Kevin Fenzi <kevin@scrye.com> - 43-0.2
-- Add fedora-43-ima.der and fedora-44-ima.der for ima signing.
-
-* Fri Jan 31 2025 Patrik Polakovic <patrik@alphamail.org> - 43-0.1
-- Rawhide is now F43
-
-* Wed Jan 10 2025 Samyak Jain <samyak.jn11@gmail.com> - 42-0.4
-- Add RPM-GPG-KEY-fedora-44-primary
-
-* Tue Oct 22 2024 Stephen Gallagher <sgallagh@redhat.com> - 42-0.3
-- ELN: Drop ResilientStorage
-
-* Wed Sep 18 2024 Stephen Gallagher <sgallagh@redhat.com> - 42-0.2
-- Use mirror links for ELN
-
-* Tue Aug 13 2024 Samyak Jain <samyak.jn11@gmail.com> - 42-0.1
-- Setup for evergreen being F42
-
-* Sat Aug 10 2024 Samyak Jain <samyak.jn11@gmail.com> - 41-0.3
-- Add RPM-GPG-KEY-fedora-43-primary
-
-* Wed May 08 2024 Coiby Xu <coxu@redhat.com> - 41-0.2
-- add/update IMA certs
-
-* Tue Feb 13 2024 Samyak Jain <samyak.jn11@gmail.com> - 41-0.1
-- Setup for evergreen being F41
-
-* Wed Sep 27 2023 Sandro Bonazzola <sbonazzo@redhat.com> - 40-0.2
-- Allow ELN installation without Rawhide repos
-
-* Tue Aug 08 2023 Samyak Jain <samyak.jn11@gmail.com> - 40-0.1
-- Setup for evergreen being F40
-
-* Fri Jul 21 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 39-0.4
-- Update IMA keys location for kernel/dracut
-
-* Mon Jul 10 2023 Miro Hrončok <mhroncok@redhat.com> - 39-0.3
-- Drop fedora-repos-modular and fedora-repos-evergreen-modular packages
-- https://fedoraproject.org/wiki/Changes/RetireModularity
-
-* Sat Feb 18 2023 Kevin Fenzi <kevin@scrye.com> - 39-0.2
-- Include IMA public certs.
-
-* Wed Feb 08 2023 Tomas Hrcka <thrcka@redhat.com> - 39-0.1
-- Setup for evergreen being F39
-
-* Wed Jan 25 2023 Tomas Hrcka <thrcka@redhat.com> - 38-0.4
-- Add RPM-GPG-KEY-fedora-40-primary
-
-* Tue Aug 16 2022 Adam Williamson <awilliam@redhat.com> - 38.0-3
-- Fix RPM-GPG-KEY-fedora-39-primary (dustymabe)
-
-* Tue Aug 09 2022 Tomas Hrcka <thrcka@redhat.com> - 38-0.2
-- Drop armhfp from archmap on f38,f39
-
-* Tue Aug 09 2022 Tomas Hrcka <thrcka@redhat.com> - 38-0.1
-- Setup for evergreen being F38
-- Adding F39 key
-
-* Wed Jun 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 37-0.3
-- ELN: don't enable layered product repos by default
-
-* Wed May 25 2022 Stephen Gallagher <sgallagh@redhat.com> - 37-0.2
-- Rework Fedora ELN repositories
-
-* Tue Feb 08 2022 Tomas Hrcka <thrcka@redhat.com> - 37-0.1
-- Setup for evergreen being F37
-- Adding F38 key
-
-* Tue Aug 17 2021 Tomas Hrcka <thrcka@redhat.com> - 36-0.3
-- Remove spurious space in RPM-GPG-KEY-fedora-37-primary (cgwalters)
-
-* Tue Aug 10 2021 Tomas Hrcka <thrcka@redhat.com> - 36-0.2
-- Setup for evergreen being F36
-
-* Wed Apr 28 2021 Dusty Mabe <dusty@dustymabe.com> - 35-0.4
-- Enable the updates archive repo on non-evergreen.
-
-* Fri Feb 19 2021 Petr Menšík <pemensik@redhat.com> - 35-0.3
-- Check arch key imports during build (#1872248)
-
-* Wed Feb 17 2021 Mohan Boddu <mboddu@bhujji.com> - 35-0.2
-- Support $releasever=evergreen on Rawhide (kparal)
-- Make archmap entries mandatory, except symlinks (kparal)
-- Fixing F36 key
-
-* Tue Feb 09 2021 Tomas Hrcka <thrcka@redhat.com> - 35-0.1
-- Setup for evergreen being F35
-
-* Tue Feb 09 2021 Mohan Boddu <mboddu@bhujji.com> - 34-0.10
-- Fixing archmap for F35
-
-* Thu Feb 04 2021 Mohan Boddu <mboddu@bhujji.com> - 34-0.9
-- Adding F35 key
-
-* Wed Oct 14 2020 Stephen Gallagher <sgallagh@redhat.com> - 34-0.8
-- ELN: Drop dependency on fedora-repos-evergreen-modular
-
-* Tue Oct 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 34-0.7
-- Ensure that the ELN GPG key always points at the Rawhide key
-
-* Tue Oct 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 34-0.6
-- Drop the fedora-eln-modular.repo
-
-* Thu Oct 08 2020 Stephen Gallagher <sgallagh@redhat.com> - 34-0.5
-- Update the ELN repos for the BaseOS and AppStream split
-
-* Mon Oct 05 2020 Dusty Mabe <dusty@dustymabe.com> - 34-0.4
-- Add the fedora-repos-archive subpackage.
-
-* Fri Aug 21 2020 Miro Hrončok <mhroncok@redhat.com> - 34-0.3
-- Fix a copy-paste error in eln repo name
-- Drop fedora-modular from base package since it's in the modular subpackage
-- Fixes: rhbz#1869150
-
-* Wed Aug 19 2020 Stephen Gallagher <sgallagh@redhat.com> - 34-0.2
-- Enable rebuilding of fedora-repos in ELN
-- Drop unused modularity-specific release information
-
-* Mon Aug 10 2020 Tomas Hrcka <thrcka@redhat.com> - 34-0.1
-- Setup for evergreen being F34
-
-* Thu Aug 06 2020 Mohan Boddu <mboddu@bhujji.com> - 33-0.9
-- Adding F34 key
-
-* Tue Jun 30 2020 Stephen Gallagher <sgallagh@redhat.com> - 33-0.8
-- Add optional repositories for ELN
-
-* Mon Jun 29 21:10:15 CEST 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 33-0.7
-- Split modular repos to the separate packages
-
-* Mon Jun 01 2020 Dusty Mabe <dusty@dustymabe.com> - 33-0.6
-- Add fedora compose ostree repo to fedora-repos-ostree
-
-* Mon Apr 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 33-0.5
-- Add the release to the fedora-repos(NN) Provides:
-
-* Thu Apr 09 2020 Kalev Lember <klember@redhat.com> - 33-0.4
-- Switch to metalink for fedora-cisco-openh264 and disable repo gpgcheck
-  (#1768206)
-- Use the same metadata_expire time for fedora-cisco-openh264 and -debuginfo
-- Remove enabled_metadata key for fedora-cisco-openh264
-
-* Sat Feb 22 2020 Neal Gompa <ngompa13@gmail.com> - 33-0.3
-- Enable fedora-cisco-openh264 repo by default
-
-* Wed Feb 19 2020 Adam Williamson <awilliam@redhat.com> - 33-0.2
-- Restore baseurl lines, but with example domain
-
-* Tue Feb 11 2020 Mohan Boddu <mboddu@bhujji.com> - 33-0.1
-- Setup for evergreen being F33
-
-* Tue Feb 11 2020 Mohan Boddu <mboddu@bhujji.com> - 32-0.4
-- Remove baseurl download.fp.o (puiterwijk)
-- Enabling dnf countme
-
-* Tue Jan 28 2020 Mohan Boddu <mboddu@bhujji.com> - 32-0.3
-- Adding F33 key
-
-* Mon Aug 19 2019 Kevin Fenzi <kevin@scrye.com> - 32-0.2
-- Fix f32 key having extra spaces.
-
-* Tue Aug 13 2019 Mohan Boddu <mboddu@bhujji.com> - 32-0.1
-- Adding F32 key
-- Setup for evergreen being f32
-
-* Tue Mar 12 2019 Vít Ondruch <vondruch@redhat.com> - 31-0.3
-- Allow to use newer GPG keys, so Rawhide can be updated after branch.
-
-* Thu Mar 07 2019 Sinny Kumari <skumari@redhat.com> - 31-0.2
-- Create fedora-repos-ostree sub-package
-
-* Tue Feb 19 2019 Tomas Hrcka <thrcka@redhat.com> - 31-0.1
-- Setup for evergreen being f31
-
-* Mon Feb 18 2019 Mohan Boddu <mboddu@bhujji.com> - 30-0.4
-- Adding F31 key
-
-* Sat Jan 05 2019 Kevin Fenzi <kevin@scrye.com> - 30-0.3
-- Add fedora-7-primary to archmap. Fixes bug #1531957
-- Remove failovermethod option in repos (augenauf(Florian H))
-
-* Tue Nov 13 2018 Mohan Boddu <mboddu@bhujji.com> - 30-0.2
-- Adding fedora-iot-2019 key
-- Enable skip_if_unavailable for cisco-openh264 repo
-
-* Tue Aug 14 2018 Mohan Boddu <mboddu@bhujji.com> - 30-0.1
-- Setup for evergreen being f30
+* Fri Jan 23 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-1
+- Initial definition based on fedora-repos spec (forked from upstream 44-0.1).
