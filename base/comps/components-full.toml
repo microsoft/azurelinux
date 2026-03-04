@@ -297,7 +297,8 @@
 [components.gcr]
 [components.gcr3]
 [components.gd]
-[components.gdal]
+# WORKAROUND: Disable gdal to avoid it crashing koji builders.
+# [components.gdal]
 [components.gdb]
 [components.gdcm]
 [components.gdk-pixbuf2]
