@@ -1,0 +1,17 @@
+[components.kernel.tests]
+skus = ["NCv3-series", "Standard_F72s_v2", "PremiumV2_ZRS", "VpnGw4"]
+test-suites = ["component-smoke", "component-network-functional"]
+
+[components.kernel.tests.tests_selectors.component-smoke]
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline"]
+testcase_names = ["verify_kernel_boot"]
+
+[components.kernel.tests.tests_selectors.component-network-functional]
+area = "network"
+category = "functional"
+priority = [0, 1]
+tags = ["sriov"]
+testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]

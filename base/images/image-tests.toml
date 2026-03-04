@@ -1,0 +1,35 @@
+[images.vm-base.tests]
+skus = ["NCv3-series", "PremiumV2_ZRS"]
+test-suites = ["vm-smoke", "vm-network-functional"]
+
+[images.vm-base.tests.tests_selectors.vm-smoke]
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline"]
+testcase_names = ["verify_vm_boot"]
+
+[images.vm-base.tests.tests_selectors.vm-network-functional]
+area = "network"
+category = "functional"
+priority = [0, 1]
+tags = ["sriov"]
+testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+
+[images.container-base.tests]
+skus = ["Standard_F72s_v2", "VpnGw4"]
+test-suites = ["container-smoke", "container-network-functional"]
+
+[images.container-base.tests.tests_selectors.container-smoke]
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline"]
+testcase_names = ["verify_container_start"]
+
+[images.container-base.tests.tests_selectors.container-network-functional]
+area = "network"
+category = "functional"
+priority = [0, 1]
+tags = ["sriov"]
+testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
