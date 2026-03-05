@@ -2,7 +2,7 @@
 name: azl-tenet-reviewer
 description: Answer questions about specific Azure Linux design goals and decisions, and review proposed plans or implementations for alignment with Azure Linux tenets.
 argument-hint: Ask a question about Azure Linux design goals or request a review of a plan/implementation for alignment with Azure Linux tenets.
-agents: ['*']
+agents: ["*"]
 user-invocable: true
 disable-model-invocation: false
 ---

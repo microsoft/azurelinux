@@ -24,7 +24,7 @@ If unsure, request a review — false positives are cheap, missed anti-goal viol
 
 ## How to Request a Review
 
-Delegate the review to a sub-agent to avoid loading the very large tenet documents into your own context. There are two approaches depending on your capabilities.
+Delegate the review to a sub-agent to avoid loading all of the tenet documents into your own context. There are two approaches depending on your capabilities.
 
 ### Path A: Named Agent (preferred)
 
