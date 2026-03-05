@@ -6,7 +6,7 @@ without = ["debug"]
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "1"
+azl_pkgrelease = "2"
 # 4th version component appended to EXTRAVERSION so uname -r matches source version (6.18.5.1).
 kextraversion = ".1"
 # CBL-Mariner branch number (used in tarball path)
@@ -49,6 +49,12 @@ description = "Set specrelease (used for RPM Release: tag) to azl_pkgrelease mac
 type = "spec-search-replace"
 regex = "%define specrelease .+"
 replacement = "%define specrelease %{azl_pkgrelease}%{?buildid}%{?dist}"
+
+[[components.kernel.overlays]]
+description = "Inject kextraversion (.1) into Makefile EXTRAVERSION so uname -r includes the full 4-component version (6.18.5.1) instead of just 3 (6.18.5)"
+type = "spec-search-replace"
+regex = "EXTRAVERSION = -\\$\\{ShortRel\\}"
+replacement = "EXTRAVERSION = %{?kextraversion}-${ShortRel}"
 
 # Use the AzureLinux kernel source
 [[components.kernel.overlays]]
