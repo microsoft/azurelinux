@@ -63,9 +63,7 @@ could include the installation of certain RPMs, updating the SELinux mode, and
 enabling DM-Verity.
 
 %prep
-%autosetup -p1 -n azure-linux-image-tools-%{version}
-tar -xf %{SOURCE1} --no-same-owner
-
+%autosetup -a1 -p1 -n azure-linux-image-tools-%{version}
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
