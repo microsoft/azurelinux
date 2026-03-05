@@ -199,7 +199,7 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
 %changelog
-* Fri Jan 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.22.1-2
+* Fri Jan 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.22.0-1
 - Initial Azure Linux import from Fedora 43 (license: MIT)
 - License verified
 
