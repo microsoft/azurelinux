@@ -3,7 +3,7 @@ name: spec-review
 description: 'Reviews spec files against best practices and summarizes findings in a JSON file.'
 argument-hint: 'What to review (name or path). Optionally: guideline URLs/git repos, KB & report paths.'
 agents: ["*"]
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 ---
 1. **Triage spec files** - Categorize specs by type/ecosystem to guide targeted KB generation

@@ -1,5 +1,6 @@
 ---
 applyTo: "**/*.spec"
+description: Guidelines for RPM spec files (*.spec) — when hand-coded specs are appropriate, relationship to comp.toml, and conventions for Azure Linux-originating packages. **ALWAYS** refer to this file when working on a hand-edited spec file, or before deciding to use a hand-coded spec instead of overlays, to ensure consistency and avoid common pitfalls.
 ---
 
 # RPM Spec Files (`*.spec`)

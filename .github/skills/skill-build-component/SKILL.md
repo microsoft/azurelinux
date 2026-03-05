@@ -1,6 +1,8 @@
 ---
 name: skill-build-component
 description: "[Skill] Build and test Azure Linux components using azldev. Use when building packages, debugging build failures, inspecting mock chroots, preparing sources, or working with the build inner loop. Triggers: build component, build failed, mock shell, prepare sources, debug build, build error."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Build & Debug Components
