@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.126.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -442,6 +442,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Mar 05 2026 Muhammad Falak <mwani@microsoft.com> - 6.6.126.1-2
+- Include mana patches from main-line
+
 * Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
 - Auto-upgrade to 6.6.126.1
 
