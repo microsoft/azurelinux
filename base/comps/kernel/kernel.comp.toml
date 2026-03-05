@@ -135,7 +135,7 @@ type = "spec-append-lines"
 section = "%prep"
 lines = [
     "# AZL: Copy mariner.pem signing CA cert into kernel source tree",
-    "%ifnarch %nobuildarches",
+    "%ifnarch noarch %nobuildarches",
     "cp %{SOURCE5002} linux-%{KVERREL}/certs/mariner.pem",
     "# AZL: Overwrite Fedora-generated configs with complete AZL kernel configs",
     '%{log_msg "AZL: Overwrite configs with AZL kernel configs"}',
