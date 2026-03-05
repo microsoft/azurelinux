@@ -5,11 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.14.0
-<<<<<<< HEAD
-Release:        13%{?dist}
-=======
-Release:        10%{?dist}
->>>>>>> 3c481d3e6 (patch nodejs for CVE-2025-23167)
+Release:        14%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +29,6 @@ Patch10:        CVE-2025-27516.patch
 Patch11:        CVE-2025-47279.patch
 Patch12:        CVE-2025-23165.patch
 Patch13:        CVE-2025-23166.patch
-<<<<<<< HEAD
 Patch14:        CVE-2025-5222.patch
 Patch15:        CVE-2025-55131.patch
 Patch16:        CVE-2025-55132.patch
@@ -41,9 +36,7 @@ Patch17:        CVE-2025-59465.patch
 Patch18:        CVE-2025-59466.patch
 Patch19:        CVE-2026-21637.patch
 Patch20:        CVE-2025-55130.patch
-=======
-Patch14:        CVE-2025-23167.patch
->>>>>>> 3c481d3e6 (patch nodejs for CVE-2025-23167)
+Patch21:        CVE-2025-23167.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -156,7 +149,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-<<<<<<< HEAD
+* Thu Mar 05 2026 Akhila Guruju <v-guakhila@microsoft.com> - 20.14.0-14
+- Patch CVE-2025-23167
+
 * Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-13
 - Patch for CVE-2025-55130
 
@@ -168,10 +163,6 @@ make cctest
 
 * Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-10
 - Patch for CVE-2025-5222
-=======
-* Tue Jul 15 2025 Akhila Guruju <v-guakhila@microsoft.com> - 20.14.0-10
-- Patch CVE-2025-23167
->>>>>>> 3c481d3e6 (patch nodejs for CVE-2025-23167)
 
 * Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
 - Patch CVE-2025-23165, CVE-2025-23166
