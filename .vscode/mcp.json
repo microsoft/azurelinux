@@ -13,6 +13,27 @@
       "args": [
         ".vscode/mcps/fedora-distgit-mcp.py"
       ]
+    },
+    "azure-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure/mcp@latest",
+        "server",
+        "start",
+        "--tool", "monitor_metrics_definitions",
+        "--tool", "monitor_metrics_query",
+        "--tool", "monitor_workspace_log_query",
+        "--tool", "monitor_activitylog_list",
+        "--tool", "monitor_resource_log_query",
+        "--tool", "monitor_table_list",
+        "--tool", "aks_cluster_get",
+        "--tool", "aks_nodepool_get"
+      ],
+      "env": {
+        "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
+      }
     }
   }
 }

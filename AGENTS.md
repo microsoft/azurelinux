@@ -56,6 +56,12 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.github/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.github/skills/skill-mass-triage/SKILL.md) |
+| Inspect Koji AKS cluster health and node pools | [`skill-aks-health`](.github/skills/skill-aks-health/SKILL.md) |
+| Resolve Koji AKS deployment context | [`skill-deployment-context`](.github/skills/skill-deployment-context/SKILL.md) |
+| KQL queries for Koji logs, pods, and events | [`skill-kql-queries`](.github/skills/skill-kql-queries/SKILL.md) |
+| Query Azure Monitor metrics for Koji AKS | [`skill-metrics`](.github/skills/skill-metrics/SKILL.md) |
+
+> **Azure infra workflow ordering:** Before running any KQL log queries, metrics queries, or AKS health checks, **always resolve deployment context first** using [`skill-deployment-context`](.github/skills/skill-deployment-context/SKILL.md). This provides the resource group, cluster name, subscription, and Log Analytics workspace needed by the other Azure skills.
 
 ## Directory Guidance
 
