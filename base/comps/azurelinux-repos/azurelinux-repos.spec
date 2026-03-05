@@ -4,7 +4,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -258,6 +258,9 @@ rm -f "$TMPRING"
 
 
 %changelog
+* Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-3
+- Update .repo files for initial Alpha release.
+
 * Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
 - Update .repo files.
 
