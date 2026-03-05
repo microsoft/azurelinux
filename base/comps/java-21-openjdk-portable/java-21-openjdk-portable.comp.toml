@@ -1,0 +1,13 @@
+[components.java-21-openjdk-portable]
+
+# We build java-21 with portable sources 21.0.8.0.9. The head version of fed43 delivers
+# 21.0.10.0.7. This will cause stage2 builds to fail. As a workaround pull from an older
+# snapshot from before version was upgraded.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-22T00:00:00-08:00" } }
+
+# The build repo has a newer java-21-openjdk (21.0.8+) whose libjava.so references
+# JVM_IsContainerized — a symbol not present in the 21.0.7 libjvm.so. The fresh_libjvm
+# feature rebuilds libjvm.so from source and swaps it into the boot JDK, causing an ABI
+# mismatch. Disable it so the boot JDK uses its own compatible libjvm.so.
+[components.java-21-openjdk-portable.build]
+without = ["fresh_libjvm"]
