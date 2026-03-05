@@ -148,7 +148,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-13
 - Patch for CVE-2026-0716, CVE-2026-2443
 - enable ptests and fix ssl-test
-- fix patch for CVE-2026-1536
+- fix patch for CVE-2025-32907 & CVE-2026-1536
 
 * Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-12
 - Patch for CVE-2026-1801, CVE-2026-1761, CVE-2026-1536, CVE-2025-32049, CVE-2026-1467
