@@ -1,0 +1,83 @@
+From 647d009c240dbeadf586e69b3c9121b6b6cb12d7 Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Fri, 23 May 2025 06:45:40 +0200
+Subject: [PATCH 2/4] path-util: invert PATH_STARTSWITH_ACCEPT_DOT_DOT flag
+
+As requested: https://github.com/systemd/systemd/pull/37572#pullrequestreview-2861928094
+
+(cherry picked from commit ceed11e465f1c8efff1931412a85924d9de7c08d)
+(cherry picked from commit 7ac3220213690e8a8d6d2a6e81e43bd1dce01d69)
+---
+ src/basic/fs-util.c   | 2 +-
+ src/basic/mkdir.c     | 2 +-
+ src/basic/path-util.c | 4 ++--
+ src/basic/path-util.h | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/basic/fs-util.c b/src/basic/fs-util.c
+index cc89f48fb7..f7c91680d8 100644
+--- a/src/basic/fs-util.c
++++ b/src/basic/fs-util.c
+@@ -65,7 +65,7 @@ int rmdir_parents(const char *path, const char *stop) {
+                 assert(*slash == '/');
+                 *slash = '\0';
+ 
+-                if (path_startswith_full(stop, p, /* flags= */ 0))
++                if (path_startswith_full(stop, p, PATH_STARTSWITH_REFUSE_DOT_DOT))
+                         return 0;
+ 
+                 if (rmdir(p) < 0 && errno != ENOENT)
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index 7bc73361a5..8f14c47214 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -155,7 +155,7 @@ int mkdir_parents_internal(const char *prefix, const char *path, mode_t mode, ui
+         assert(_mkdirat != mkdirat);
+ 
+         if (prefix) {
+-                p = path_startswith_full(path, prefix, /* flags= */ 0);
++                p = path_startswith_full(path, prefix, PATH_STARTSWITH_REFUSE_DOT_DOT);
+                 if (!p)
+                         return -ENOTDIR;
+         } else
+diff --git a/src/basic/path-util.c b/src/basic/path-util.c
+index e73f5d708e..a65a5c32f6 100644
+--- a/src/basic/path-util.c
++++ b/src/basic/path-util.c
+@@ -426,11 +426,11 @@ char* path_startswith_full(const char *original_path, const char *prefix, PathSt
+                 const char *p, *q;
+                 int m, n;
+ 
+-                m = path_find_first_component(&path, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &p);
++                m = path_find_first_component(&path, !FLAGS_SET(flags, PATH_STARTSWITH_REFUSE_DOT_DOT), &p);
+                 if (m < 0)
+                         return NULL;
+ 
+-                n = path_find_first_component(&prefix, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &q);
++                n = path_find_first_component(&prefix, !FLAGS_SET(flags, PATH_STARTSWITH_REFUSE_DOT_DOT), &q);
+                 if (n < 0)
+                         return NULL;
+ 
+diff --git a/src/basic/path-util.h b/src/basic/path-util.h
+index e0ec05f4db..11a1078df9 100644
+--- a/src/basic/path-util.h
++++ b/src/basic/path-util.h
+@@ -55,13 +55,13 @@ int path_make_relative(const char *from, const char *to, char **ret);
+ int path_make_relative_parent(const char *from_child, const char *to, char **ret);
+ 
+ typedef enum PathStartWithFlags {
+-        PATH_STARTSWITH_ACCEPT_DOT_DOT       = 1U << 0,
++        PATH_STARTSWITH_REFUSE_DOT_DOT       = 1U << 0,
+         PATH_STARTSWITH_RETURN_LEADING_SLASH = 1U << 1,
+ } PathStartWithFlags;
+ 
+ char* path_startswith_full(const char *path, const char *prefix, PathStartWithFlags flags) _pure_;
+ static inline char* path_startswith(const char *path, const char *prefix) {
+-        return path_startswith_full(path, prefix, PATH_STARTSWITH_ACCEPT_DOT_DOT);
++        return path_startswith_full(path, prefix, 0);
+ }
+ 
+ int path_compare(const char *a, const char *b) _pure_;
+-- 
+2.51.0
+

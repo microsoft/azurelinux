@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.19.1.kata2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -12,8 +12,13 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
-Patch2:         CVE-2025-58160.patch
-Patch3:         CVE-2026-27171.patch
+Patch2:         CVE-2026-24834.patch
+Patch3:         CVE-2026-25727.patch
+Patch4:         CVE-2026-25541.patch
+Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2025-11065.patch
+Patch7:         CVE-2025-58160.patch
+Patch8:         CVE-2026-27171.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -113,8 +118,11 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-7
 - Patch for CVE-2025-58160 and CVE-2026-27171
+
+* Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
+- Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
 
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
 - Bump release to rebuild with rust

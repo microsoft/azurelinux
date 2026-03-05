@@ -905,8 +905,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.1.0.tar.gz"
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.2.0.tar.gz"
         }
       }
     },
@@ -6610,8 +6610,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.121.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
+          "version": "6.6.126.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.121.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
+          "version": "6.6.126.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.121.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
+          "version": "6.6.126.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.121.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
+          "version": "6.6.126.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.121.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.1.tar.gz"
+          "version": "6.6.126.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
         }
       }
     },
@@ -8341,8 +8341,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.100.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.100.mshv1.tar.gz"
+          "version": "6.6.121.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.121.mshv1.tar.gz"
         }
       }
     },
@@ -15615,6 +15615,16 @@
           "name": "openssh",
           "version": "9.8p1",
           "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.8p1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openssl-fips-provider",
+          "version": "3.1.2",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.1.2/openssl-3.1.2.tar.gz"
         }
       }
     },
@@ -25583,8 +25593,8 @@
         "type": "other",
         "other": {
           "name": "python-wheel",
-          "version": "0.46.3",
-          "downloadUrl": "https://github.com/pypa/wheel/archive/0.46.3/wheel-0.46.3.tar.gz"
+          "version": "0.43.0",
+          "downloadUrl": "https://github.com/pypa/wheel/archive/0.43.0/wheel-0.43.0.tar.gz"
         }
       }
     },
@@ -29345,6 +29355,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "trident",
+          "version": "0.21.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.21.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "trilead-ssh2",
           "version": "217.371.vc1d30dc5a_b_32",
           "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/refs/tags/build-217-jenkins-371.vc1d30dc5a_b_32.tar.gz"
@@ -29896,8 +29916,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.2148",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
+          "version": "9.2.0088",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0088.tar.gz"
         }
       }
     },
