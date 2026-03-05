@@ -648,7 +648,6 @@
 [components.jansi-native]
 [components.jansi1]
 [components.jasper]
-[components.java-21-openjdk]
 [components.java-21-openjdk-portable]
 [components.java-rpm-macros]
 [components.java_cup]
