@@ -1,59 +1,73 @@
 [images.vm-base.tests]
 skus = ["NCv3-series", "PremiumV2_ZRS"]
-test-suites = ["vm-smoke", "vm-network-functional"]
+test-frameworks = ["LISA", "bvt"]
 
-[images.vm-base.tests.tests_selectors.vm-smoke]
+[images.vm-base.tests.test_suites_by_framework.LISA]
+test-suites = ["vm-smoke", "vm-network-functional", "vm-trident-crypto-functional"]
+
+[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-smoke]
 area = "core"
 category = "smoke"
 priority = [0]
 tags = ["baseline"]
 testcase_names = ["verify_vm_boot"]
 
-[images.vm-base.tests.tests_selectors.vm-network-functional]
+[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-network-functional]
 area = "network"
 category = "functional"
 priority = [0, 1]
 tags = ["sriov"]
 testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
 
-[images.trident-vm-testimage.tests]
-skus = ["NCv3-series", "PremiumV2_ZRS"]
-test-frameworks = ["LISA", "bvt"]
-
-[images.trident-vm-testimage.tests.test_suites_by_framework.LISA]
-test-suites = ["OpenSSLTestSuite"]
-
-[images.trident-vm-testimage.tests.test_suites_by_framework.LISA.tests_selectors.OpenSSLTestSuite]
+[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional]
 area = "core"
 category = "functional"
 priority = [0]
-tags = ["crypto"]
+tags = ["trident", "crypto"]
 testcase_names = ["verify_openssl_basic", "verify_golang_sys_crypto", "verify_openssl_speed_test"]
 
-[images.trident-vm-testimage.tests.test_suites_by_framework.bvt]
-test-suites = ["OpenSSLBvtSuite"]
+[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional.requirements]
+image = "trident-vm-testimage"
+image-type = "test-only"
+distro = "azurelinux-custom"
 
-[images.trident-vm-testimage.tests.test_suites_by_framework.bvt.tests_selectors.OpenSSLBvtSuite]
+[images.vm-base.tests.test_suites_by_framework.bvt]
+test-suites = ["vm-bvt-smoke"]
+
+[images.vm-base.tests.test_suites_by_framework.bvt.tests_selectors.vm-bvt-smoke]
 area = "core"
 category = "smoke"
 priority = [0]
-tags = ["crypto", "bvt"]
-testcase_names = ["verify_openssl_basic"]
+tags = ["baseline", "bvt"]
+testcase_names = ["verify_vm_boot"]
 
 [images.container-base.tests]
 skus = ["Standard_F72s_v2", "VpnGw4"]
+test-frameworks = ["LISA", "bvt"]
+
+[images.container-base.tests.test_suites_by_framework.LISA]
 test-suites = ["container-smoke", "container-network-functional"]
 
-[images.container-base.tests.tests_selectors.container-smoke]
+[images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-smoke]
 area = "core"
 category = "smoke"
 priority = [0]
 tags = ["baseline"]
 testcase_names = ["verify_container_start"]
 
-[images.container-base.tests.tests_selectors.container-network-functional]
+[images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-network-functional]
 area = "network"
 category = "functional"
 priority = [0, 1]
 tags = ["sriov"]
 testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+
+[images.container-base.tests.test_suites_by_framework.bvt]
+test-suites = ["container-bvt-smoke"]
+
+[images.container-base.tests.test_suites_by_framework.bvt.tests_selectors.container-bvt-smoke]
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline", "bvt"]
+testcase_names = ["verify_container_start"]
