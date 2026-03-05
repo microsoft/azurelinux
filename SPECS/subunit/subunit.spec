@@ -198,8 +198,8 @@ touch -r c++/SubunitTestProgressListener.h \
 
 %check
 %if %{without bootstrap}
-pip3 install "testtools == 2.7.2" "fixtures >= 3.0.0"
-pip3 install iso8601 extras testscenarios
+pip3 install "testtools == 2.7.2"
+pip3 install iso8601 testscenarios fixtures
 # Run the tests for python3
 export LD_LIBRARY_PATH=$PWD/.libs
 export PYTHON=%{python3}
