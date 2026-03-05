@@ -10,7 +10,7 @@ Summary:        Declarative, security-first OS lifecycle agent designed primaril
 Name:           trident
 # Use hard-coded versions for distro build
 Version:        0.21.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Group:          Applications/System
@@ -32,7 +32,8 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 %else
 Source1:        osmodifier
 %endif
-
+Patch0:        CVE-2025-58160.patch
+Patch1:        CVE-2026-25541.patch
 BuildRequires:  openssl-devel
 BuildRequires:  protobuf-compiler
 BuildRequires:  protobuf-devel
@@ -212,12 +213,9 @@ be removed once the fix is merged in AZL 4.0.
 %if %{undefined rpm_ver}
 # Use cargo with source and vendor tarballs for distro build
 %prep
-%autosetup -n %{name}-%{version} -p1
+%autosetup -p1 -n %{name}-%{version} -a 1
 
-# Do vendor expansion here manually by
-# calling `tar x` and setting up
 # .cargo/config to use it.
-tar fx %{SOURCE1}
 mkdir -p .cargo
 
 cat >.cargo/config << EOF
@@ -300,6 +298,9 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Fri Mar 6 2026 Archana Shettigar <v-shettigara@microsoft.com> 0.21.0-2
+- Patch for CVE-2025-58160 & CVE-2026-25541
+
 * Mon Mar 2 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.21.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.
