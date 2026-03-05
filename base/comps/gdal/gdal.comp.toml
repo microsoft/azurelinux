@@ -1,0 +1,6 @@
+[components.gdal]
+
+[components.gdal.build]
+# Azure Linux does not support MinGW cross-compilation.
+without = ["mingw"]
+check = { skip = true, skip_reason = "gcore tests are causing the build POD to be OOM killed." }
