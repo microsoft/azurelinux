@@ -1,0 +1,6 @@
+[components.java-21-openjdk]
+
+# java-21 portable sources delivers 21.0.8.0.9 version of sources but spec wants
+# 21.0.10.0.7. As a workaround we fetch the spec from a snapshot which points at the
+# source version available in fed43 repo.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-30T00:00:00-08:00" } }
