@@ -24,15 +24,23 @@ If unsure, request a review — false positives are cheap, missed anti-goal viol
 
 ## How to Request a Review
 
-Delegate the review to a sub-agent to avoid loading all of the tenet documents into your own context. There are two approaches depending on your capabilities.
+**Always delegate the review to a sub-agent.** This keeps tenet documents out of your context and ensures consistent review quality regardless of review complexity. There are three approaches in order of preference.
 
 ### Path A: Named Agent (preferred)
 
-If you can pass `agentName` to `runSubagent` (requires the user to have enabled custom agent invocation in VS Code settings), use the dedicated tenet reviewer agent. It has built-in review instructions.
+Use the dedicated tenet reviewer agent by passing `agentName` to `runSubagent` (or `agent_type` to the `task` tool if running in Copilot CLI). This requires custom agent invocation to be enabled in VS Code settings — if unsure, try it and fall back to Path B if it fails.
 
-```
+```text
 runSubagent(
   agentName: "azl-tenet-reviewer",
+  description: "Tenet review for <topic>",
+  prompt: "Review the following changes against Azure Linux tenets. Read ALL tenet files in ./docs/tenets/tenets.*.md before reviewing.\n\n## Changes\n<describe changes in detail along with any pertinent background>\n\n## Context\n<why these changes are being made>\n\nReturn your review using the structured output format (Verdict, Anti-Goal Violations, Goal Alignment, Non-Goal Notes, Recommendations)."
+)
+```
+
+```text
+task(
+  agent_type: "azl-tenet-reviewer",
   description: "Tenet review for <topic>",
   prompt: "Review the following changes against Azure Linux tenets. Read ALL tenet files in ./docs/tenets/tenets.*.md before reviewing.\n\n## Changes\n<describe changes in detail along with any pertinent background>\n\n## Context\n<why these changes are being made>\n\nReturn your review using the structured output format (Verdict, Anti-Goal Violations, Goal Alignment, Non-Goal Notes, Recommendations)."
 )
@@ -51,9 +59,9 @@ runSubagent(
 
 The review guide ([REVIEW-GUIDE.md](REVIEW-GUIDE.md)) contains the complete self-contained procedure: which files to read, how to classify findings, and the output format. A vanilla sub-agent reading that file has everything it needs. You do not need to read the guide yourself — just make sure it is included in the prompt for the sub-agent.
 
-### Path C: Inline Review (last resort)
+### Path C: Inline Review (escape hatch)
 
-If `runSubagent` is not available at all (e.g., you are already a sub-agent), you can perform the review inline by reading [REVIEW-GUIDE.md](REVIEW-GUIDE.md) and following its procedure directly. Only do this as a last resort as it will consume a lot of context and may be less efficient than delegating to a dedicated reviewer agent.
+If sub-agent spawning is genuinely unavailable (e.g., you are already a sub-agent in an environment that does not support recursive sub-agents), perform the review inline by reading [REVIEW-GUIDE.md](REVIEW-GUIDE.md) and following its procedure directly. **Only use this path when delegation is impossible** — try to delegate first and fall back to inline only on failure.
 
 ## Interpreting Results
 

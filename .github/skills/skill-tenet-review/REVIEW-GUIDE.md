@@ -4,7 +4,7 @@ This document contains the full procedure for reviewing changes against Azure Li
 
 ## Tenet Documents
 
-Read ALL tenet files before reviewing. They are small (~400 lines total):
+Read ALL tenet files before reviewing - they must all be read in their entirety:
 
 - `./docs/tenets/tenets.*.md`
 
@@ -31,7 +31,7 @@ Every tenet document uses the same classification:
 
 ## Output Format
 
-```
+```markdown
 ## Tenet Review
 
 ### Verdict: PASS | WARN | FAIL

@@ -1234,7 +1234,6 @@
 [components.mockito]
 [components.mod_http2]
 [components.modello]
-[components.ModemManager]
 [components.moditect]
 [components.modulemaker-maven-plugin]
 [components.mojo-executor]
