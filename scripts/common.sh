@@ -15,13 +15,13 @@ export STORAGE_CONTAINER_NAME="images"
 export PUBLISHER="MicrosoftAzureLinux"
 export OFFER="azure-linux-4"
 export TIME_TAG="$(date +%Y%m%d-%H%M%S)"
-export STORAGE_BLOB_NAME="azl4-vm-base.x86_64-${TIME_TAG}.vhdfixed"
+export STORAGE_BLOB_NAME="azl4-vm-base.aarch64-${TIME_TAG}.vhdfixed"
 export VM_NAME="${USER:-${USERNAME:-unknown}}-azl-vm-${TIME_TAG}"
 export SSH_USER="azureuser"
 export SSH_PUBLIC_KEY_PATH="/c/Users/anphel/.ssh/id_rsa_azure.pub"
 
 # Set VM size based on architecture
-ARCH="<test-vm-architecture>" # e.g., "x86_64" or "aarch64"
+ARCH="aarch64" # e.g., "x86_64" or "aarch64"
 if [ "$ARCH" = "aarch64" ]; then
     export TEST_VM_SIZE="Standard_D4ps_v6"
 else
@@ -29,11 +29,11 @@ else
 fi
 
 # Set local image path
-export IMAGE_PATH="$REPO_ROOT/out/azl4-vm-base.x86_64-0.1-1.vhdfixed"
+export IMAGE_PATH="$REPO_ROOT/out/azl4-vm-base.aarch64-0.1-1.vhdfixed"
 
 # Set gallery configuration
 export GALLERY_NAME="azlpubStagingGalleryoxz2o4gw"
-export GALLERY_IMAGE_DEFINITION="AzureLinuxAlpha1-x64"
+export GALLERY_IMAGE_DEFINITION="AzureLinuxAlpha1-arm64"
 export REMOTE_KOJI_REPO_URL="http://20.88.251.114/kojifiles/"
 
 function get-image-version() {
