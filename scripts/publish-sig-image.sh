@@ -69,6 +69,14 @@ fi
 imageDefinitionExists=$(az sig image-definition list -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME" | grep "name" | grep -c "$GALLERY_IMAGE_DEFINITION" || :;) # the "|| :;" prevents grep from halting the script when it finds no matches and exits with exit code 1
 if [[ $imageDefinitionExists -eq 0 ]]; then
     echo "Could not find image-definition \"$GALLERY_IMAGE_DEFINITION\". Creating definition \"$GALLERY_IMAGE_DEFINITION\" in gallery \"$GALLERY_NAME\"..."
+
+    # Map ARCH to Azure architecture name
+    if [ "$ARCH" = "aarch64" ]; then
+        az_arch="Arm64"
+    else
+        az_arch="x64"
+    fi
+
     az sig image-definition create \
         --gallery-image-definition "$GALLERY_IMAGE_DEFINITION" \
         --publisher "$PUBLISHER" \
@@ -77,7 +85,8 @@ if [[ $imageDefinitionExists -eq 0 ]]; then
         --gallery-name "$GALLERY_NAME" \
         --resource-group "$RESOURCE_GROUP_NAME" \
         --location "$LOCATION" \
-        --os-type Linux
+        --os-type Linux \
+        --architecture "$az_arch"
 fi
 
 image_version="0.1.0"
