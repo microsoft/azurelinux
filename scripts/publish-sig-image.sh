@@ -1,5 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
+# Prevent MSYS2/Git Bash from mangling paths like /subscriptions/... into C:/Program Files/Git/subscriptions/...
+export MSYS_NO_PATHCONV=1
 # Find the absolute path of the directory containing this script
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . "$SCRIPTS_DIR/common.sh"
@@ -10,7 +12,7 @@ storage_account_resource_id="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RES
 replicationMode="Shallow"
 storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$STORAGE_BLOB_NAME"
 
-az account set --subscription "$SUBSCRIPTION_ID"
+az account set --subscription "$SUBSCRIPTION_NAME"
 
 if [ "$(az group exists -n "$RESOURCE_GROUP_NAME")" == "false" ]; then
     az group create \
@@ -43,8 +45,15 @@ if [[ $containerExists != "true" ]]; then
         --auth-mode login
 fi
 
-# Upload the image artifact to Storage Account
-azcopy copy "$IMAGE_PATH" "$storage_blob_endpoint" --blob-type=PageBlob
+# Upload the image artifact to Storage Account as a page blob
+az storage blob upload \
+    --account-name "$STORAGE_ACCOUNT_NAME" \
+    --container-name "$STORAGE_CONTAINER_NAME" \
+    --name "$STORAGE_BLOB_NAME" \
+    --file "$(cygpath -w "$IMAGE_PATH")" \
+    --type page \
+    --auth-mode login \
+    --overwrite
 
 # Ensure GALLERY_NAME exists
 if ! az sig show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME"; then
@@ -87,7 +96,7 @@ REGIONS_JSON=$(echo "$LOCATION" | awk -F, '{
 az deployment group create \
   --name "$GALLERY_IMAGE_DEFINITION-$image_version" \
   --resource-group "$RESOURCE_GROUP_NAME" \
-  --template-file "$SCRIPTS_DIR/azure-gallery-image-base.bicep" \
+  --template-file "$(cygpath -w "$SCRIPTS_DIR/azure-gallery-image-base.bicep")" \
   --parameters galleryName="$GALLERY_NAME" \
                imageDefinitionName="$GALLERY_IMAGE_DEFINITION" \
                versionName="$image_version" \

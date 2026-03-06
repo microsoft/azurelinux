@@ -3,21 +3,22 @@ set -euxo pipefail
 
 REPO_ROOT="$( cd "$SCRIPTS_DIR/.." &> /dev/null && pwd )"
 
-# Set your Azure subscription ID
-export SUBSCRIPTION_ID="<your-subscription-id>"
+# Set your Azure subscription ID (name for az commands, GUID for resource IDs)
+export SUBSCRIPTION_NAME="EdgeOS_IoT_CBL-Mariner_DevTest"
+export SUBSCRIPTION_ID="0012ca50-c773-43b2-80e2-f24b6377145c"
 
 # Set resource configuration
-export RESOURCE_GROUP_NAME="<your-resource-group-name>"
+export RESOURCE_GROUP_NAME="anphel-compute-gallery-test1-rg"
 export LOCATION="westus3"
-export STORAGE_ACCOUNT_NAME="<your-storage-account-name>"
-export STORAGE_CONTAINER_NAME="<your-storage-container-name>"
-export PUBLISHER="<your-publisher-name>"
-export OFFER="<your-offer-name>"
+export STORAGE_ACCOUNT_NAME="anphelgallerytest1sa"
+export STORAGE_CONTAINER_NAME="anphel-compute-gallery-test1-container"
+export PUBLISHER="anphel-dummy-publisher"
+export OFFER="compute-gallery-test1-offer"
 export TIME_TAG="$(date +%Y%m%d-%H%M%S)"
 export STORAGE_BLOB_NAME="azl4-vm-base.x86_64-${TIME_TAG}.vhdfixed"
-export VM_NAME="${USER}-azl-vm-${TIME_TAG}"
-export SSH_USER="<your-ssh-username>"
-export SSH_PUBLIC_KEY_PATH="<path-to-your-ssh-public-key>"
+export VM_NAME="${USER:-${USERNAME:-unknown}}-azl-vm-${TIME_TAG}"
+export SSH_USER="azureuser"
+export SSH_PUBLIC_KEY_PATH="/c/Users/anphel/git/azurelinux/.ssh/id_ed25519.pub"
 
 # Set VM size based on architecture
 ARCH="<test-vm-architecture>" # e.g., "x86_64" or "aarch64"
@@ -28,12 +29,12 @@ else
 fi
 
 # Set local image path
-export IMAGE_PATH="$REPO_ROOT/base/out/images/vm-base/azl4-vm-base.x86_64-0.1.vhdfixed"
+export IMAGE_PATH="$REPO_ROOT/out/azl4-vm-base.x86_64-0.1-1.vhdfixed"
 
 # Set gallery configuration
-export GALLERY_NAME="<your-gallery-name>"
-export GALLERY_IMAGE_DEFINITION="<your-image-definition-name>"
-export REMOTE_KOJI_REPO_URL="<your-remote-koji-repo-url>"
+export GALLERY_NAME="anphel_compute_gallery_test1"
+export GALLERY_IMAGE_DEFINITION="anphel-compute-gallery-test1-image-definition"
+export REMOTE_KOJI_REPO_URL="http://20.88.251.114/kojifiles/"
 
 function get-image-version() {
     # If the image definition doesn't exist yet, return the initial version
