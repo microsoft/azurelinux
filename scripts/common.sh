@@ -4,21 +4,21 @@ set -euxo pipefail
 REPO_ROOT="$( cd "$SCRIPTS_DIR/.." &> /dev/null && pwd )"
 
 # Set your Azure subscription ID (name for az commands, GUID for resource IDs)
-export SUBSCRIPTION_NAME="EdgeOS_IoT_CBL-Mariner_DevTest"
-export SUBSCRIPTION_ID="0012ca50-c773-43b2-80e2-f24b6377145c"
+export SUBSCRIPTION_NAME="EdgeOS_AzureLinux_ControlTower_Test"
+export SUBSCRIPTION_ID="e4ab81f8-030f-4593-a8f2-3ea2c7630a19"
 
 # Set resource configuration
-export RESOURCE_GROUP_NAME="anphel-compute-gallery-test1-rg"
+export RESOURCE_GROUP_NAME="azl-preview-publishing"
 export LOCATION="westus3"
-export STORAGE_ACCOUNT_NAME="anphelgallerytest1sa"
-export STORAGE_CONTAINER_NAME="anphel-compute-gallery-test1-container"
-export PUBLISHER="anphel-dummy-publisher"
-export OFFER="compute-gallery-test1-offer"
+export STORAGE_ACCOUNT_NAME="azlpubstagingoxz2o4gw"
+export STORAGE_CONTAINER_NAME="images"
+export PUBLISHER="MicrosoftAzureLinux"
+export OFFER="azure-linux-4"
 export TIME_TAG="$(date +%Y%m%d-%H%M%S)"
 export STORAGE_BLOB_NAME="azl4-vm-base.x86_64-${TIME_TAG}.vhdfixed"
 export VM_NAME="${USER:-${USERNAME:-unknown}}-azl-vm-${TIME_TAG}"
 export SSH_USER="azureuser"
-export SSH_PUBLIC_KEY_PATH="/c/Users/anphel/git/azurelinux/.ssh/id_ed25519.pub"
+export SSH_PUBLIC_KEY_PATH="/c/Users/anphel/.ssh/id_rsa_azure.pub"
 
 # Set VM size based on architecture
 ARCH="<test-vm-architecture>" # e.g., "x86_64" or "aarch64"
@@ -32,8 +32,8 @@ fi
 export IMAGE_PATH="$REPO_ROOT/out/azl4-vm-base.x86_64-0.1-1.vhdfixed"
 
 # Set gallery configuration
-export GALLERY_NAME="anphel_compute_gallery_test1"
-export GALLERY_IMAGE_DEFINITION="anphel-compute-gallery-test1-image-definition"
+export GALLERY_NAME="azlpubStagingGalleryoxz2o4gw"
+export GALLERY_IMAGE_DEFINITION="AzureLinuxAlpha1-x64"
 export REMOTE_KOJI_REPO_URL="http://20.88.251.114/kojifiles/"
 
 function get-image-version() {

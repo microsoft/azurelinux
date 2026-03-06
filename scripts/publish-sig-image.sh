@@ -80,7 +80,7 @@ if [[ $imageDefinitionExists -eq 0 ]]; then
         --os-type Linux
 fi
 
-image_version="$(increment-version "$(get-image-version)")"
+image_version="0.1.0"
 
 # Convert comma-separated regions to JSON array for bicep template
 # Note: Using a single region for now
