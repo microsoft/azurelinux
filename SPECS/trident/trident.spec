@@ -213,9 +213,12 @@ be removed once the fix is merged in AZL 4.0.
 %if %{undefined rpm_ver}
 # Use cargo with source and vendor tarballs for distro build
 %prep
-%autosetup -p1 -n %{name}-%{version} -a 1
+%autosetup -n %{name}-%{version} -N
 
+# Do vendor expansion here manually by
+# calling `tar x` and setting up
 # .cargo/config to use it.
+tar fx %{SOURCE1}
 mkdir -p .cargo
 
 cat >.cargo/config << EOF
@@ -225,6 +228,7 @@ replace-with = "vendored-sources"
 [source.vendored-sources]
 directory = "vendor"
 EOF
+%autopatch -p1
 %endif
 
 %build
