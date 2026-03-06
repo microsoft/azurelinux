@@ -7,7 +7,9 @@ disable-model-invocation: false
 
 # Tenet Review
 
-Use this skill when your changes could affect Azure Linux design decisions. The tenets define what Azure Linux **must do** (goals), **may do** (non-goals), and **must not do** (anti-goals).
+Use this skill when your changes could affect Azure Linux design decisions. The tenets define what Azure Linux **intends to do** (goals), **may do** (non-goals), and **does not intend to do** (anti-goals).
+
+> **Note:** To drive better quality treat every finding conservatively — assume the most restrictive interpretation of tenets and flag any potential issues.
 
 ## When to Request a Tenet Review
 

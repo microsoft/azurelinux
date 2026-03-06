@@ -14,9 +14,19 @@ It is important to read and understand ALL tenets. Even if some seem irrelevant 
 
 Every tenet document uses the same classification:
 
-- **Goal**: Must be included, supported, and maintained in the distro.
+- **Goal**: Intended to be included, supported, and maintained in the distro.
 - **Non-goal**: Not required, but may be included if there is demand.
-- **Anti-goal**: Explicitly excluded from the distro.
+- **Anti-goal**: Not intended for inclusion in the distro.
+
+> **Strict interpretation for reviews:** To drive better quality and engineering best practices, interpret the tenet language conservatively and assume the most restrictive interpretation.
+
+**For the purposes of tenet reviews, treat these as binding design commitments:**
+
+> - "Intended to be included/supported" → treat as **required** — changes that omit or undermine a goal should be flagged.
+> - "Not intended for inclusion" → treat as **excluded** — changes that introduce an anti-goal item should be rejected.
+> - "Should" in tenet docs → treat as **must** unless there is explicit, documented justification for deviation.
+>
+> When in doubt, flag the issue. False positives are cheap; missed violations are not.
 
 **Anti-goal violations are critical.** Any plan that conflicts with an anti-goal must be rejected or require significant revision.
 
