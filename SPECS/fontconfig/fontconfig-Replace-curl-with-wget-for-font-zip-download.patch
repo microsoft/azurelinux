@@ -1,0 +1,25 @@
+From 3cede1ea16e5e3b0cd3c4ee3bf3f5b908a564f48 Mon Sep 17 00:00:00 2001
+From: Archana Shettigar <v-shettigara@microsoft.com>
+Date: Thu, 19 Feb 2026 19:46:16 +0530
+Subject: [PATCH] Replace curl with wget for font zip download
+
+---
+ test/run-test.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/run-test.sh b/test/run-test.sh
+index c3da72a..2d58ee9 100644
+--- a/test/run-test.sh
++++ b/test/run-test.sh
+@@ -432,7 +432,7 @@ fi # if [ "x$EXEEXT" = "x" ]
+ if [ -x "$BUILDTESTDIR"/test-crbug1004254 ]; then
+     dotest "MT-safe global config"
+     prep
+-    curl -s -o "$FONTDIR"/noto.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSans-hinted.zip
++    wget -q -O "$FONTDIR"/noto.zip --user-agent="Mozilla/5.0" --referer="https://www.1001freefonts.com/" https://www.1001freefonts.com/d/5627/noto-sans.zip
+     (cd "$FONTDIR"; unzip noto.zip)
+     if [ -n "${SOURCE_DATE_EPOCH:-}" ] && [ ${#SOURCE_DATE_EPOCH} -gt 0 ]; then
+ 	touch -m -t "$(date -d @"${SOURCE_DATE_EPOCH}" +%y%m%d%H%M.%S)" "$FONTDIR"
+-- 
+2.45.4
+
