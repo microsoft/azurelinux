@@ -47,12 +47,10 @@ virtualenv is a tool to create isolated Python environment.
 %autosetup -p1 -n virtualenv-%{version} -N
 %patch -P 0 -p1
 
-# Manual patching for CVE-2025-50181
-# This patch is needed to fix the issue with urllib3 poolmanager.py
-# The poolmanager.py file is located in 4 different places and each is of different version so the same patch cannot be applied to all of them.
-# For the poolmanager.py under src, it is archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
-# For the poolmanager.py under tests, it is archived inside a .whl file, which in turn is archived inside another .whl file,
-# so, we need to unpack the outer .whl, then unpack the inner .whl, apply the patch, and then re-zip both levels.
+# Manual patching for CVE-2025-50181 and CVE-2026-1703v0
+# For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
+# For CVE-2026-1703, unpacking.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
+# Affected files are under src and archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
 
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
 mkdir -p unpacked_pip-25.0.1-py3-none-any
@@ -68,6 +66,7 @@ zip -r ../src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl *
 popd
 rm -rf unpacked_pip-25.0.1-py3-none-any
 
+# Manual patching for CVE-2025-50181 and CVE-2026-1703v1
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_vendor/urllib3/poolmanager.py"
 mkdir -p unpacked_pip-25.3-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip-25.3-py3-none-any
@@ -80,6 +79,9 @@ zip -r ../src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl *
 popd
 rm -rf unpacked_pip-25.3-py3-none-any
 
+# Manual patching for CVE-2026-24049v0
+# For CVE-2026-24049, unpack.py file is located in 3 different places and each is of different version so the same patch cannot be applied to all of them.
+# Affected files are under src and archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl/setuptools/_vendor/wheel/cli/unpack.py"
 mkdir -p unpacked_setuptools-75.3.2-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl -d unpacked_setuptools-75.3.2-py3-none-any
@@ -90,6 +92,7 @@ zip -r ../src/virtualenv/seed/wheels/embed/setuptools-75.3.2-py3-none-any.whl *
 popd
 rm -rf unpacked_setuptools-75.3.2-py3-none-any
 
+# Manual patching for CVE-2026-24049v0
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl/setuptools/_vendor/wheel/cli/unpack.py"
 mkdir -p unpacked_setuptools-80.9.0-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl -d unpacked_setuptools-80.9.0-py3-none-any
@@ -100,6 +103,7 @@ zip -r ../src/virtualenv/seed/wheels/embed/setuptools-80.9.0-py3-none-any.whl *
 popd
 rm -rf unpacked_setuptools-80.9.0-py3-none-any
 
+# Manual patching for CVE-2026-24049v1
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.whl/wheel/cli/unpack.py"
 mkdir -p unpacked_wheel-0.45.1-py3-none-any
 unzip src/virtualenv/seed/wheels/embed/wheel-0.45.1-py3-none-any.whl -d unpacked_wheel-0.45.1-py3-none-any
