@@ -312,6 +312,7 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.tcsh]
 [components.texinfo]
 [components.time]
+[components.tini]
 [components.tpm2-tss]
 [components.traceroute]
 [components.tree-sitter-srpm-macros]
