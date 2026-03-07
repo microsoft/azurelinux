@@ -115,7 +115,7 @@ This package contains the grub2 config which is compatable with bootupd.
 %forgeautosetup -p1
 
 %build
-export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=false "
+export LDFLAGS="-X github.com/flatcar/ignition/v2/internal/version.Raw=%{version} -X github.com/flatcar/ignition/v2/internal/distro.selinuxRelabel=false "
 export GOFLAGS="-mod=vendor"
 
 echo "Building ignition..."
