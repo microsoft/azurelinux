@@ -31,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.57.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -431,6 +431,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-6
+- Enable FIPS crypto configs CONFIG_CRYPTO_DH_RFC7919_GROUPS, CONFIG_CRYPTO_ECDSA,
+- CONFIG_CRYPTO_ARC4, CONFIG_CRYPTO_DEV_BCM_SPU and their dependencies
+
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.12.57.1-5
 - Enable lwtunnel, lwtunnel-bpf, and sched_core
 
