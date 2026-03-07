@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,13 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:         CVE-2025-4574.patch
 Patch1:         CVE-2025-53605.patch
 Patch2:         CVE-2024-11738.patch
+Patch3:         CVE-2025-55159.patch
+Patch4:         CVE-2025-67873.patch
+Patch5:         CVE-2025-68114.patch
+Patch6:         CVE-2025-4207.patch
+Patch7:         CVE-2025-12818.patch
+Patch8:         CVE-2026-24116.patch
+Patch9:         CVE-2025-58160.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -61,7 +68,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-17%{?dist}
+BuildRequires:  glibc-static >= 2.38-18%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -181,6 +188,13 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Fri Jan 30 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.90.0-4
+- Patch for CVE-2025-68114, CVE-2025-4207, CVE-2025-55159, CVE-2025-12818,
+  CVE-2025-67873, CVE-2026-24116 and CVE-2025-58160
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-3
+- Bump to rebuild with updated glibc
+
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-2
 - Bump to rebuild with updated glibc
 

@@ -31,7 +31,7 @@ Epoch: 0
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 5.6.1
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
 Summary: Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -48,7 +48,7 @@ BuildRequires: btrfs-progs-devel
 BuildRequires: gcc
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
-BuildRequires: glibc-static >= 2.38-17%{?dist}
+BuildRequires: glibc-static >= 2.38-18%{?dist}
 BuildRequires: golang
 BuildRequires: git-core
 
@@ -298,6 +298,9 @@ make localunit
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0:5.6.1-7
+- Bump to rebuild with updated glibc
+
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0:5.6.1-6
 - Bump to rebuild with updated glibc
 

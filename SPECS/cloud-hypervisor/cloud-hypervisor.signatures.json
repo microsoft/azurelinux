@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "cloud-hypervisor-41.0.139-vendor.tar.gz": "44d4f5770968c2482d7da25bb18cd399b8eb9b6a5f1de5aa816083954d1c8241",
-    "cloud-hypervisor-41.0.139.tar.gz": "116191af642c8c57710205cefab0787a5fd903e3a946638b1380cac732a8e381"
+    "cloud-hypervisor-48.0.246.tar.gz": "627775016abe81d478258065e41495d11822dde6a892cab5d234eefc6ffed802",
+    "cloud-hypervisor-48.0.246-vendor.tar.gz": "a314204b25b980f7055f5ac4bcdbb43051e8f7d29c3c05468653475bda3d87fe"
   }
 }
