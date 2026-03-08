@@ -1,6 +1,8 @@
 ---
 name: skill-mock
 description: "[Skill] Test and inspect packages in Azure Linux mock chroots. Use when testing built RPMs, inspecting dependencies, debugging runtime issues, or verifying package contents. Triggers: test package, mock shell, inspect rpm, smoke test, chroot, verify build output."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Test & Inspect in Mock Chroot

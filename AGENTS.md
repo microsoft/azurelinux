@@ -56,6 +56,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.github/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.github/skills/skill-mass-triage/SKILL.md) |
+| Review changes against Azure Linux tenets | [`skill-tenet-review`](.github/skills/skill-tenet-review/SKILL.md) |
 
 ## Directory Guidance
 

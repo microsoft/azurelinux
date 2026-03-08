@@ -1,6 +1,8 @@
 ---
 name: skill-mass-triage
 description: "[Skill] Batch-triage build failures from a JSON results file — diagnose with parallel sub-agents, bucketize by root cause, and produce a consolidated summary. Use when asked to triage a Koji results file. Triggers: batch triage, mass triage, triage results file, bucketize failures."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Batch Build Triage

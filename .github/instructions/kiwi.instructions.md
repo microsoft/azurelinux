@@ -1,5 +1,6 @@
 ---
 applyTo: "**/*.kiwi"
+description: Guidelines for Kiwi image definitions (*.kiwi XML files) - image registration, repository config, package selection, and build conventions for Azure Linux images. **ALWAYS** refer to this file when working with Kiwi image definitions to ensure consistency and avoid common pitfalls.
 ---
 
 # Kiwi Image Definitions (`*.kiwi`)

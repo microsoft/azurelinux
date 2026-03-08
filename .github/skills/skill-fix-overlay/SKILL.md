@@ -1,6 +1,8 @@
 ---
 name: skill-fix-overlay
 description: "[Skill] Diagnose and fix overlay issues in Azure Linux components. Use when overlays fail to apply, produce unexpected results, or need debugging. Triggers: overlay error, fix overlay, overlay not applying, spec-search-replace failed, overlay debug."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Fix an Overlay

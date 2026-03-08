@@ -1,6 +1,8 @@
 ---
 name: skill-review-component
 description: "[Skill] Review an Azure Linux component definition for hygiene and best practices. Use when reviewing comp.toml files, checking overlay quality, validating file organization, or auditing component definitions. Triggers: review component, check hygiene, audit component, validate comp.toml, component review. NOTE: This skill is a work-in-progress — the checklist below covers basics but the full review workflow is still being refined."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Review a Component
@@ -57,6 +59,10 @@ azldev comp query -p <name> -q -O json
 
 - If the change could affect built RPMs, verify they were tested — not just built
 - Pure organizational changes (moving definitions, editing comments) don't need a rebuild
+
+### 8. Tenet alignment
+
+If the component change touches tenet-relevant areas (licensing, kernel config, security policy, packaging scope, image contents, etc.), flag it and recommend a tenet review. Follow the [`skill-tenet-review`](../skill-tenet-review/SKILL.md) skill to determine whether a review is needed and how to request one. Not every component change needs a tenet review — focus on changes that affect *what* Azure Linux ships or *how* it behaves, not routine maintenance.
 
 ## Output
 

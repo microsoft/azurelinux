@@ -1,5 +1,6 @@
 ---
-applyTo: "**/*.comp.toml"
+applyTo: "**/*.comp.toml,**/components.toml"
+description: Guidelines for creating and modifying azldev component definition files (`components.toml` and `*.comp.toml`) in the Azure Linux component repository. **ALWAYS** refer to this file when working with component definitions, spec sources, and overlays to ensure consistency and avoid common pitfalls.
 ---
 
 # Component Definition Files (`*.comp.toml`)

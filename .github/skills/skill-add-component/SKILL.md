@@ -1,6 +1,8 @@
 ---
 name: skill-add-component
 description: "[Skill] Add a new component to Azure Linux. Use when importing packages from Fedora, creating comp.toml files, choosing inline vs dedicated definitions, or setting up a new component with overlays. Triggers: add component, new package, import from fedora, create comp.toml."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Add a Component
@@ -24,6 +26,15 @@ The fastest way to see what you're working with:
 Fedora dist-git is behind bot detection — direct web fetches often fail. Use `prep-sources` to pull specs reliably.
 
 > Note: `prep-sources -o` writes to the directory you specify — this is ad-hoc output, separate from the project's configured build output dirs in `base/project.toml`.
+
+## Tenet Review
+
+Adding a new component is a design decision. Follow [`skill-tenet-review`](../skill-tenet-review/SKILL.md) skill. Most new components should at minimum be checked against the licensing and packaging tenets. **Remember, it's much easier to get a tenet review early than to deal with anti-goal violations later. If in doubt, ask for a review.**
+
+Treat the tenet review verdict as a decision gate:
+- **PASS**: proceed with implementation.
+- **WARN**: adjust the design to address the warning, or if not feasible make it very clear to the user when summarizing the completed work.
+- **FAIL**: stop and reconsider. Either adjust the design to address the violation, or get explicit user confirmation to proceed with the known violation (e.g., if the component is critical and there's no viable alternative, but it violates a tenet, document the rationale and residual risk clearly).
 
 ## Decision: Inline vs Dedicated File
 
@@ -83,3 +94,7 @@ azldev comp build -p <name> -q
 ```
 
 For testing the built RPMs, see the [`skill-mock`](../skill-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → verify → build → test → inspect), see [`skill-build-component`](../skill-build-component/SKILL.md).
+
+## Tenet Re-Review
+
+Did any design decisions change during implementation? If so, follow the [`skill-tenet-review`](../skill-tenet-review/SKILL.md) skill again before finalizing the component.

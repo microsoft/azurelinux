@@ -3,7 +3,7 @@ name: azl-diagnose
 description: Diagnose build failures — fetch Koji task info/logs, investigate upstream sources, identify root cause, and suggest fixes. Accepts task IDs, URLs, package names, or general queries.
 argument-hint: Ask a question about a package (e.g., `kernel`) or give a task ID/URL (e.g., `1234`, `https://koji.example.com/koji/taskinfo?taskID=1234`).
 agents: ["*"]
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 handoffs:
   - label: Attempt to diagnose and fix the issue
@@ -35,4 +35,5 @@ This agent diagnoses build failures — Koji triage, upstream investigation, roo
 4. Identify the root cause using the failure categories in the skill
 5. Investigate upstream sources (Fedora dist-git, bug tracker, mailing list, etc.) for relevant information and potential fixes (the `fedora-distgit` tool may be helpful here, or re-use the koji MCP for pulling from upstream Fedora's public koji instance at "https://koji.fedoraproject.org")
   - Understand how upstream deals with the issue - is it a known issue? Is it fixed in newer releases? Are there workarounds or mitigations? This context is critical for informing the fix strategy in Azure Linux — whether to backport an upstream fix, apply a workaround, or address an underlying difference between Azure Linux and Fedora that's causing the issue.
-6. Present a clear summary: what failed, why, and what to do next
+6. **Tenet check** — Before proposing a fix, consider whether it changes design-level decisions (e.g., adding/removing packages, changing kernel config, altering security policy, modifying image contents). If so, request a tenet review by following the [`skill-tenet-review`](../skills/skill-tenet-review/SKILL.md) skill. Pure build fixes (missing deps, compiler flags, test patches) do not need tenet review. **Remember, it's easy to get a review now, but very costly to have anti-goal violations in production later. Ask early!**
+7. Present a clear summary: what failed, why, and what to do next
