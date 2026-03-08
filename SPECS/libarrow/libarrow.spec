@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -77,6 +77,8 @@ BuildRequires:	gtk-doc
 # Additional pyarrow build requirements; see also %%generate_buildrequires
 BuildRequires:  python3dist(cffi)
  
+Patch0:        CVE-2026-25087.patch
+
 %description
 Apache Arrow defines a language-independent columnar memory
 format for flat and hierarchical data, organized for efficient
@@ -247,6 +249,9 @@ popd
 %{_libdir}/pkgconfig/parquet*.pc
  
 %changelog
+* Mon Mar 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 15.0.0-8
+- Patch to fix CVE-2026-25087.
+
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 15.0.0-7
 - Patch to fix CVE-2024-52338
 
