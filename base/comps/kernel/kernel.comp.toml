@@ -6,7 +6,7 @@ without = ["debug"]
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "2"
+azl_pkgrelease = "3"
 # 4th version component appended to EXTRAVERSION so uname -r matches source version (6.18.5.1).
 kextraversion = ".1"
 # CBL-Mariner branch number (used in tarball path)
