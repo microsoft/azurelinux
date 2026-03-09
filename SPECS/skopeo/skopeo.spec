@@ -65,7 +65,7 @@ make test-unit-local
 * Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.2-13
 - Patch for CVE-2025-58183
 
-* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.2-12
+* Tue Sep 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.2-12
 - Patch for CVE-2025-58058
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.14.2-11
@@ -119,7 +119,7 @@ make test-unit-local
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-2
 - Bump release to rebuild with go 1.19.11
 
-* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-1
+* Thu Jun 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-1
 - Bump skopeo version to 1.12.0 - upgrade to latest
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-5
