@@ -1,6 +1,5 @@
 %global __ocaml_requires_opts -c -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
 %global __ocaml_provides_opts -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
-%global majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        OCaml compiler and programming environment
 Name:           ocaml
 Version:        4.13.1
@@ -9,6 +8,7 @@ License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.ocaml.org
+%global majmin %(echo %{version} | cut -d. -f1-2)
 Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{version}.tar.xz
 Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch
 Patch0002:      0002-configure-Allow-user-defined-C-compiler-flags.patch
