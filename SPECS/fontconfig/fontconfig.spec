@@ -8,7 +8,7 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.freedesktop.org/software/fontconfig/release/%{name}-%{version}.tar.gz
-Patch0:         fontconfig-Replace-curl-with-wget-for-font-zip-download.patch
+Patch0:         fontconfig-fix-ptest.patch
 BuildRequires:  freetype-devel
 BuildRequires:  libxml2
 BuildRequires:  expat-devel
@@ -42,7 +42,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 
 %check
-make -k check
+VERBOSE=1 make -k check
 
 %post
 /sbin/ldconfig
