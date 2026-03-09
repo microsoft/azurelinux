@@ -1,12 +1,12 @@
 [components.kernel]
 
-# Add without = ["debug"] to skip debug kernel variant and reduce build time
+# Skip debug kernel variant to reduce build time
 [components.kernel.build]
 without = ["debug"]
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "2"
+azl_pkgrelease = "3"
 # 4th version component appended to EXTRAVERSION so uname -r matches source version (6.18.5.1).
 kextraversion = ".1"
 # CBL-Mariner branch number (used in tarball path)
@@ -87,3 +87,70 @@ description = "Disable redhat patch application — not applicable to AzureLinux
 type = "spec-search-replace"
 regex = "ApplyOptionalPatch patch-%{patchversion}-redhat.patch"
 replacement = "# ApplyOptionalPatch patch-%{patchversion}-redhat.patch (disabled for AzureLinux)"
+
+# Azure Linux kernel configs — full replacements for the Fedora-generated configs.
+# The Fedora config pipeline runs fully (generate_all_configs.sh, merge.py, etc.),
+# then we overwrite at the end of %prep with our AZL configs and re-run
+# process_configs.sh to validate them (make olddefconfig + listnewconfig).
+
+[[components.kernel.overlays]]
+description = "Add AZL x86_64 kernel config to sources"
+type = "file-add"
+file = "6.18-x86_64-azl.config"
+source = "6.18-x86_64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Add AZL aarch64 kernel config to sources"
+type = "file-add"
+file = "6.18-aarch64-azl.config"
+source = "6.18-aarch64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Add AZL signing CA certificate (embedded as builtin trusted key via CONFIG_SYSTEM_TRUSTED_KEYS)"
+type = "file-add"
+file = "azurelinux-ca-20230216.pem"
+source = "azurelinux-ca-20230216.pem"
+
+[[components.kernel.overlays]]
+description = "Register AZL x86_64 kernel config as Source5000"
+type = "spec-insert-tag"
+tag = "Source5000"
+value = "6.18-x86_64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Register AZL aarch64 kernel config as Source5001"
+type = "spec-insert-tag"
+tag = "Source5001"
+value = "6.18-aarch64-azl.config"
+
+[[components.kernel.overlays]]
+description = "Register AZL signing CA certificate as Source5002"
+type = "spec-insert-tag"
+tag = "Source5002"
+value = "azurelinux-ca-20230216.pem"
+
+[[components.kernel.overlays]]
+description = "Overwrite Fedora-generated configs with AZL configs and re-validate with process_configs.sh at the end of %prep — lets the entire Fedora config pipeline run first, then overwrites with our complete configs. Only copies the config matching the build arch to avoid cross-arch make failures."
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "# AZL: Copy mariner.pem signing CA cert into kernel source tree",
+    "%ifnarch noarch %nobuildarches",
+    "cp %{SOURCE5002} linux-%{KVERREL}/certs/mariner.pem",
+    "# AZL: Overwrite Fedora-generated configs with complete AZL kernel configs",
+    '%{log_msg "AZL: Overwrite configs with AZL kernel configs"}',
+    "cd linux-%{KVERREL}/configs",
+    "# Remove all Fedora-generated configs — we replace with AZL configs for build arch only",
+    "rm -f %{name}-%{specrpmversion}-*.config",
+    "%ifarch x86_64",
+    "cp %{SOURCE5000} %{name}-%{specrpmversion}-x86_64.config",
+    "%endif",
+    "%ifarch aarch64",
+    "cp %{SOURCE5001} %{name}-%{specrpmversion}-aarch64.config",
+    "%endif",
+    "# Re-run process_configs.sh to validate AZL configs (make olddefconfig + listnewconfig)",
+    'OPTS="-w -n -c"',
+    "RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}",
+    "cd ../..",
+    "%endif",
+]
