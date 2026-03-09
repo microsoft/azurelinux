@@ -1,0 +1,59 @@
+From ea5447f2cc45909ff414d865e280337b10ba2808 Mon Sep 17 00:00:00 2001
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Date: Sun, 29 Sep 2024 20:44:35 -0700
+Subject: [PATCH 2/2] net: mana: Increase the DEF_RX_BUFFERS_PER_QUEUE to 1024
+
+Through some experiments, we found out that increasing the default
+RX buffers count from 512 to 1024, gives slightly better throughput
+and significantly reduces the no_wqe_rx errs on the receiver side.
+Along with these, other parameters like cpu usage, retrans seg etc
+also show some improvement with 1024 value.
+
+Following are some snippets from the experiments
+
+ntttcp tests with 512 Rx buffers
+---------------------------------------
+connections|  throughput|  no_wqe errs|
+---------------------------------------
+1          |  40.93Gbps | 123,211     |
+16         | 180.15Gbps | 190,120     |
+128        | 180.20Gbps | 173,508     |
+256        | 180.27Gbps | 189,884     |
+
+ntttcp tests with 1024 Rx buffers
+---------------------------------------
+connections|  throughput|  no_wqe errs|
+---------------------------------------
+1          |  44.22Gbps | 19,864      |
+16         | 180.19Gbps | 4,430       |
+128        | 180.21Gbps | 2,560       |
+256        | 180.29Gbps | 1,529       |
+
+So, increasing the default RX buffers per queue count to 1024
+
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Link: https://patch.msgid.link/1727667875-29908-1-git-send-email-shradhagupta@linux.microsoft.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ include/net/mana/mana.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index d4f106b44a203..76d401d114664 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -43,7 +43,7 @@ enum TRI_STATE {
+  * size beyond this value gets rejected by __alloc_page() call.
+  */
+ #define MAX_RX_BUFFERS_PER_QUEUE 8192
+-#define DEF_RX_BUFFERS_PER_QUEUE 512
++#define DEF_RX_BUFFERS_PER_QUEUE 1024
+ #define MIN_RX_BUFFERS_PER_QUEUE 128
+ 
+ /* This max value for TX buffers is derived as the maximum allocatable
+-- 
+2.53.0
+

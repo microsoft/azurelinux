@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.126.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,8 @@ Source7:        azl-ipe-boot-policy.pol
 Source8:        Makefile
 Source9:        tarfs.c
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         0001-net-mana-Implement-get_ringparam-set_ringparam-for-m.patch
+Patch2:         0002-net-mana-Increase-the-DEF_RX_BUFFERS_PER_QUEUE-to-10.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -460,6 +462,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Mar 05 2026 Muhammad Falak <mwani@microsoft.com> - 6.6.126.1-2
+- Include mana patches from main-line
+
 * Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
 - Auto-upgrade to 6.6.126.1
 
