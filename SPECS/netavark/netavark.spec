@@ -194,11 +194,10 @@ Its features include:
 * Support for container DNS resolution via aardvark-dns.
 
 %prep
-%autosetup -N -n %{name}-%{built_tag_strip}
-tar fx %{SOURCE1}
+%autosetup -p1 -n %{name}-%{built_tag_strip} -a 1
 mkdir -p .cargo
 
-cat > .cargo/config.toml << 'EOF'
+cat >.cargo/config << EOF
 [source.crates-io]
 replace-with = "vendored-sources"
 
@@ -206,8 +205,6 @@ replace-with = "vendored-sources"
 directory = "vendor"
 EOF
 
-patch -p1 < %{_sourcedir}/CVE-2026-25541.patch
-``
 %build
 %{__make} build
 
