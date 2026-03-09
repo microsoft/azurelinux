@@ -1,6 +1,8 @@
 ---
-name: kql-queries
-description: "KQL query templates for Koji container logs, pod errors, restarts, Kubernetes events, build job activity, and node resource usage via Log Analytics."
+name: skill-kql-queries
+description: "[Skill] kql, queries, log analytics, container logs - KQL query templates for Koji container logs, pod errors, restarts, Kubernetes events, build job activity, and node resource usage via Log Analytics."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Koji KQL Log Queries

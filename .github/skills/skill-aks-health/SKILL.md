@@ -1,6 +1,8 @@
 ---
-name: aks-health
-description: "Inspect Koji AKS cluster health, node pool status, autoscaling, VM sizes, activity logs, deployment failures, and Azure control-plane operations."
+name: skill-aks-health
+description: "[Skill] aks, aks health, cluster health, node pool, activity logs - Inspect Koji AKS cluster health, node pool status, autoscaling, activity logs, deployment failures, and Azure control-plane operations."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Koji AKS Cluster Health
@@ -15,16 +17,16 @@ description: "Inspect Koji AKS cluster health, node pool status, autoscaling, VM
 
 ## AKS node pools
 
-The Koji AKS cluster has three node pool types:
+The Koji AKS cluster has four node pool types:
 
-| Pool | Purpose | Typical VM size |
-|------|---------|-----------------|
-| System | Core K8s services (coredns, metrics-server) | `Standard_D4s_v6` |
-| Infra | Koji hub, web, kojira, jobs | Shared with system or dedicated |
-| Builder (x86_64) | x86_64 build workers | `Standard_D4s_v5` |
-| Builder (arm64) | ARM64 build workers | `Standard_D4ps_v5` |
+| Pool | Purpose |
+|------|----------|
+| System | Core K8s services (coredns, metrics-server) |
+| Infra | Koji hub, web, kojira, jobs |
+| Builder (x86_64) | x86_64 build workers |
+| Builder (arm64) | ARM64 build workers |
 
-Builder pools use **autoscaling** (max count configurable via `AKS_BUILDER_NODE_MAX_COUNT`, default 25).
+Use `aks_nodepool_get` to discover current VM sizes and scaling configuration. Builder pools use **autoscaling** with a configurable maximum node count (check your AKS deployment or IaC configuration for the exact value and defaults).
 
 ## Activity logs
 

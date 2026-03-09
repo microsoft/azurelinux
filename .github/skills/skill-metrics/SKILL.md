@@ -1,6 +1,8 @@
 ---
-name: metrics
-description: "Query Azure Monitor metrics for Koji AKS node CPU, memory, disk usage, pod readiness, and PostgreSQL database performance."
+name: skill-metrics
+description: "[Skill] metrics, azure-monitor, aks - Query Azure Monitor metrics for Koji AKS node CPU, memory, disk usage, and pod readiness."
+user-invocable: false
+disable-model-invocation: false
 ---
 
 # Koji Azure Monitor Metrics
