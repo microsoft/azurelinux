@@ -63,7 +63,7 @@ Patch6:         CVE-2022-3162.patch
 Patch7:         CVE-2025-27144.patch
 Patch8:         CVE-2024-51744.patch
 Patch9:         CVE-2025-30204.patch
-Patch10:         CVE-2025-11065.patch
+Patch10:        CVE-2025-11065.patch
 # Ceph version is needed to set correct container tag in manifests
 BuildRequires:  ceph
 # Rook requirements
