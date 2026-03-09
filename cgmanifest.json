@@ -6520,8 +6520,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.200.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.200.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.200.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.200.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.200.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
         }
       }
     },
@@ -12310,16 +12310,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lockdev",
           "version": "1.0.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
@@ -12881,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.24",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
+          "version": "10.6.25",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.25.tar.gz"
         }
       }
     },
@@ -24914,8 +24904,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.36.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz"
+          "version": "20.26.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz"
         }
       }
     },
@@ -29457,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.2148",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
+          "version": "9.2.0088",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0088.tar.gz"
         }
       }
     },

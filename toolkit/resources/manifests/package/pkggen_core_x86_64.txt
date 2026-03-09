@@ -1,5 +1,5 @@
 filesystem-1.1-20.cm2.x86_64.rpm
-kernel-headers-5.15.186.1-1.cm2.noarch.rpm
+kernel-headers-5.15.200.1-1.cm2.noarch.rpm
 glibc-2.35-10.cm2.x86_64.rpm
 glibc-devel-2.35-10.cm2.x86_64.rpm
 glibc-i18n-2.35-10.cm2.x86_64.rpm
@@ -165,11 +165,11 @@ texinfo-6.8-1.cm2.x86_64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-openssl-1.1.1k-37.cm2.x86_64.rpm
-openssl-devel-1.1.1k-37.cm2.x86_64.rpm
-openssl-libs-1.1.1k-37.cm2.x86_64.rpm
-openssl-perl-1.1.1k-37.cm2.x86_64.rpm
-openssl-static-1.1.1k-37.cm2.x86_64.rpm
+openssl-1.1.1k-38.cm2.x86_64.rpm
+openssl-devel-1.1.1k-38.cm2.x86_64.rpm
+openssl-libs-1.1.1k-38.cm2.x86_64.rpm
+openssl-perl-1.1.1k-38.cm2.x86_64.rpm
+openssl-static-1.1.1k-38.cm2.x86_64.rpm
 libcap-2.60-7.cm2.x86_64.rpm
 libcap-devel-2.60-7.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
@@ -221,8 +221,8 @@ libksba-devel-1.6.3-1.cm2.x86_64.rpm
 libxslt-1.1.34-10.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
-gnupg2-2.4.0-2.cm2.x86_64.rpm
-gnupg2-lang-2.4.0-2.cm2.x86_64.rpm
+gnupg2-2.4.0-3.cm2.x86_64.rpm
+gnupg2-lang-2.4.0-3.cm2.x86_64.rpm
 gpgme-1.16.0-2.cm2.x86_64.rpm
 mariner-repos-shared-2.0-9.cm2.noarch.rpm
 mariner-repos-2.0-9.cm2.noarch.rpm
