@@ -111,6 +111,8 @@ Python 3 version.
 %build
 tar -xf %{SOURCE1} -C /root/
 
+rm -rf /root/.cache/bazel/_bazel_root/install/
+
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
@@ -161,7 +163,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-4
 - Remove .bazelversion file.
 
-* Thu Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
+* Mon Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
 - Add tf-nightly subpackage. 
 
 * Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
