@@ -30,7 +30,8 @@ Patch10:        CVE-2025-11468.patch
 Patch11:        CVE-2026-0672.patch
 Patch12:        CVE-2026-0865.patch
 Patch13:        CVE-2026-1299.patch
-Patch14:        CVE-2026-1703.patch
+
+Patch1001:      CVE-2026-1703.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -142,24 +143,11 @@ The test package contains all regression tests for Python as well as the modules
 
 %prep
 %autosetup -p1 -n Python-%{version} -N
+%autopatch -p1 -m 0 -M 1000
 
-%patch -P 0 -p1
-%patch -P 1 -p1
-%patch -P 2 -p1
-%patch -P 3 -p1
-%patch -P 4 -p1
-%patch -P 5 -p1
-%patch -P 6 -p1
-%patch -P 7 -p1
-%patch -P 8 -p1
-%patch -P 9 -p1
-%patch -P 10 -p1
-%patch -P 11 -p1
-%patch -P 12 -p1
-%patch -P 13 -p1
 pushd Lib/ensurepip/_bundled
 unzip pip-24.3.1-py3-none-any.whl
-%patch -P 14 -p1
+%autopatch -p1 -m 1001
 popd
 
 %build
