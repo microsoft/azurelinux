@@ -40,7 +40,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  readline-devel
 BuildRequires:  sqlite-devel
-BuildRequires:  perl-WWW-Curl
 BuildRequires:  xz-devel
 Requires:       ncurses
 Requires:       openssl
@@ -144,23 +143,23 @@ The test package contains all regression tests for Python as well as the modules
 %prep
 %autosetup -p1 -n Python-%{version} -N
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
+%patch 8 -p1
+%patch 9 -p1
+%patch 10 -p1
+%patch 11 -p1
+%patch 12 -p1
+%patch 13 -p1
 pushd Lib/ensurepip/_bundled
 unzip pip-24.3.1-py3-none-any.whl
-%patch14 -p1
+%patch 14 -p1
 popd
 
 %build
@@ -308,7 +307,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Thu Jan 30 2025 Bala <balakumaran.kannan@microsoft.com> - 3.12.3-6
 - Patch CVE-2023-27043
 
-* Mon Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
+* Tue Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
 - Patch CVE-2024-12254
 
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4
