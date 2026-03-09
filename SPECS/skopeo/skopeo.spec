@@ -100,7 +100,7 @@ make test-unit-local
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-2
 - Bump release to rebuild with go 1.19.11
 
-* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-1
+* Thu Jun 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-1
 - Bump skopeo version to 1.12.0 - upgrade to latest
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-5
