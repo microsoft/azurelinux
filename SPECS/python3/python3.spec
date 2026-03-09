@@ -143,23 +143,23 @@ The test package contains all regression tests for Python as well as the modules
 %prep
 %autosetup -p1 -n Python-%{version} -N
 
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
-%patch 8 -p1
-%patch 9 -p1
-%patch 10 -p1
-%patch 11 -p1
-%patch 12 -p1
-%patch 13 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
+%patch -P 7 -p1
+%patch -P 8 -p1
+%patch -P 9 -p1
+%patch -P 10 -p1
+%patch -P 11 -p1
+%patch -P 12 -p1
+%patch -P 13 -p1
 pushd Lib/ensurepip/_bundled
 unzip pip-24.3.1-py3-none-any.whl
-%patch 14 -p1
+%patch -P 14 -p1
 popd
 
 %build
