@@ -162,7 +162,6 @@ export HASHBANGPERL=%{_bindir}/perl
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
 
 # See https://wiki.openssl.org/index.php/Compilation_and_Installation for configure options
-
 # NOTE: the 'no-<prot>-method' switches are not used by design. The changes inside 'Patch2'
 #       make sure that protocols disabled through 'no-<prot>' will still be unaccessible.
 #       This is a workaround until OpenSSL issue #7048 is officially resolved.

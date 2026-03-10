@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.35.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ Patch12:        CVE-2022-48174.patch
 Patch13:        CVE-2023-39810.patch
 Patch14:        CVE-2026-26157.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-static >= 2.35-9%{?dist}
+BuildRequires:  glibc-static >= 2.35-10%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 # libbb/hash_md5_sha.c
@@ -110,6 +110,9 @@ cd testsuite
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Thu Feb 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.35.0-18
+- Bump to rebuild with updated glibc
+
 * Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.35.0-17
 - Patch for CVE-2026-26157
 
