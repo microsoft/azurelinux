@@ -28,6 +28,7 @@ BuildRequires:  python3-numpy
 BuildRequires:  python3-pip
 BuildRequires:  python3-protobuf
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-packaging >= 24
 BuildRequires:  python3-six
 BuildRequires:  python3-virtualenv
 BuildRequires:  python3-wheel

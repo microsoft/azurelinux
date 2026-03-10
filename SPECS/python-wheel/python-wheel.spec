@@ -36,6 +36,7 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-packaging >= 24
 BuildRequires:  python3-pip
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
