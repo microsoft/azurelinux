@@ -8,6 +8,7 @@ arches = ["x86_64", "aarch64"]
 
 # Mock build environment configuration (maps to Koji mock.* extras)
 [distros.azurelinux-staging.rpms-build-tag.mock]
+# parent = azl4-bootstrap-rpms-tag-20260307 (Will have to be injected by Control Tower)
 package-manager = "dnf5"
 new-chroot = false
 isolation = "simple"
@@ -15,7 +16,7 @@ releasever = '43'
 
 # RPM macros injected into the buildroot (maps to Koji rpm.macro.* extras)
 [distros.azurelinux-staging.rpms-build-tag.rpm-macros]
-# dist = '.azl4~bootstrap.20260307'
+# dist = '.azl4~bootstrap.20260307' (Will have to be injected by Control Tower).
 distribution = 'Azure Linux'
 vendor = 'Microsoft Corporation'
 
