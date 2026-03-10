@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ Patch12:        CVE-2024-33601.patch
 Patch13:        CVE-2026-0861.patch
 Patch14:        CVE-2026-0915.patch
 Patch15:        CVE-2025-0395.patch
+Patch16:        CVE-2025-15281.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -330,6 +331,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.35-10
+- Patch for CVE-2025-15281
+
 * Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.35-9
 - Patch for CVE-2025-0395
 
