@@ -1,0 +1,27 @@
+From f5ed6cdd0a9fa3c0ce6d5b862d10da253945e791 Mon Sep 17 00:00:00 2001
+From: Ben Finney <ben+python@benfinney.id.au>
+Date: Oct 12 2023 22:25:06 +0000
+Subject: Migrate TestCase method to current name ‘assertEqual’.
+
+Upstream Patch Reference:
+https://pagure.io/python-daemon/c/f5ed6cdd0a9fa3c0ce6d5b862d10da253945e791.patch
+---
+ test/test_daemon.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_daemon.py b/test/test_daemon.py
+index 16df21e..77a0c08 100644
+--- a/test/test_daemon.py
++++ b/test/test_daemon.py
+@@ -2247,7 +2247,7 @@ class set_signal_handlers_TestCase(scaffold.TestCase):
+                 unittest.mock.call(signal_number, handler)
+                 for (signal_number, handler) in signal_handler_map.items()]
+         daemon.daemon.set_signal_handlers(signal_handler_map)
+-        self.assertEquals(expected_calls, mock_func_signal_signal.mock_calls)
++        self.assertEqual(expected_calls, mock_func_signal_signal.mock_calls)
+ 
+ 
+ @unittest.mock.patch.object(daemon.daemon.atexit, "register")
+-- 
+2.45.4
+
