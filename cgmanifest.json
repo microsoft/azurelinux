@@ -8210,6 +8210,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-containers-preview",
+          "version": "3.27.0-preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0-preview1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
