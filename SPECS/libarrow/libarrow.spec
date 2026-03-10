@@ -200,7 +200,8 @@ popd
 
 %files doc
 %license LICENSE.txt
-%doc README.md NOTICE.txt
+%license NOTICE.txt
+%doc README.md
 %exclude %{_docdir}/arrow/
  
 %files devel
