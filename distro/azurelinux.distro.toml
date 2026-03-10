@@ -1,6 +1,47 @@
 [distros.azurelinux]
 description = "Azure Linux"
 default-version = "4.0-stage1"
+branch = "toml/base/main"
+
+[distros.azurelinux-staging]
+description = "Azure Linux Staging Repo"
+default-version = "4.0-stage1"
+branch = "toml/overrides/azurelinux-staging/main"
+
+[distros.azurelinux-staging.inputs]
+# Upstream package repositories to pull SPECs at buildtime.
+upstream-git-repos = ["azl4-fedora-mirror"]
+# Where we will be retrieving source code for packages at buildtime.
+source-stores = ["main"]
+# Where we will be retrieving package dependencies at buildtime, configured in Koji as tag "external-repositories".
+package-repositories = ["fedora-external", "fedora-external-updates"]
+
+[distros.azurelinux-staging.outputs]
+# Upstream package repositories to pull SPECs at buildtime.
+package-repositories = ["azurelinux-staging-rpms"]
+source-stores = ["main"]
+# Where we will be retrieving source code for packages at buildtime.
+image-repositories = ["azurelinux-staging-images"]
+
+# [[resources.source-stores.main]]
+# type = "fedora-lookaside-cache"
+# uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs/$pkg/$filename/$hashtype/$hash/$filename"
+
+# [[resources.package-repositories.fedora-external]]
+# name = "fedora-external"
+# type = "rpm-repository"
+# uri = "https://dl.fedoraproject.org/pub/fedora/linux/releases/43/Everything/$arch/os/"
+
+# [[resources.package-repositories.fedora-external-updates]]
+# name = "fedora-external-updates"
+# type = "rpm-repository"
+# uri = "https://dl.fedoraproject.org/pub/fedora/linux/updates/43/Everything/$arch/os/"
+
+# [[resources.upstream-git-repos.azl4-fedora-mirror]]
+# name = "azl4-fedora-mirror"
+# uri = "git://azl.src.kojiaks.internal/rpms/$pkg.git"
+
+# NOTE: The above resources are examples of how to define source stores and package repositories.
 
 #
 # Azure Linux 4.0 Stage1
