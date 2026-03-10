@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,8 @@ Patch17:        CVE-2025-8291.patch
 Patch18:        CVE-2025-6075.patch
 Patch19:        CVE-2026-0672.patch
 Patch20:        CVE-2026-1299.patch
+Patch21:        CVE-2025-12084.patch
+Patch22:        CVE-2026-0865.patch
 
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
@@ -208,6 +210,8 @@ The test package contains all regression tests for Python as well as the modules
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
+%patch22 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -383,6 +387,9 @@ make test TESTOPTS="-x test_multiprocessing_spawn -x test_socket -x test_email"
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Jan 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.9.19-19
+- Patch for CVE-2026-0865, CVE-2025-12084
+
 * Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.9.19-18
 - Patch for CVE-2026-1299, CVE-2026-0672
 
