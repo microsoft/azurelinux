@@ -1,0 +1,65 @@
+From 2de688e02fbc5ff96fcf29ad3af962e8035824eb Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Wed, 27 Dec 2023 19:21:06 +0100
+Subject: [PATCH] Support KChart6 for KF6
+
+---
+ src/analyze/CMakeLists.txt     | 14 ++++++++++++--
+ src/analyze/gui/CMakeLists.txt |  2 +-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/src/analyze/CMakeLists.txt b/src/analyze/CMakeLists.txt
+index e57d242e..e71aee9f 100644
+--- a/src/analyze/CMakeLists.txt
++++ b/src/analyze/CMakeLists.txt
+@@ -34,6 +34,12 @@ endif()
+ add_subdirectory(print)
+ 
+ if(HEAPTRACK_BUILD_GUI)
++    if(QT_VERSION_MAJOR EQUAL 6)
++        set(KChartName KChart6)
++    else()
++        set(KChartName KChart)
++    endif()
++
+     find_package(Qt${QT_VERSION_MAJOR} ${QT_MIN_VERSION} ${REQUIRED_IN_APPIMAGE} NO_MODULE OPTIONAL_COMPONENTS Widgets)
+     set_package_properties(Qt${QT_VERSION_MAJOR} PROPERTIES TYPE RECOMMENDED PURPOSE "Required for the heaptrack_gui executable.")
+     find_package(ECM 1.0.0 ${REQUIRED_IN_APPIMAGE} NO_MODULE)
+@@ -41,8 +47,8 @@ if(HEAPTRACK_BUILD_GUI)
+     if(Qt${QT_VERSION_MAJOR}_FOUND AND ECM_FOUND)
+         set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
+             find_package(KF${QT_VERSION_MAJOR} ${REQUIRED_IN_APPIMAGE} COMPONENTS CoreAddons I18n ItemModels ThreadWeaver ConfigWidgets KIO IconThemes)
+-            find_package(KChart ${REQUIRED_IN_APPIMAGE} "2.6.0")
+-            set_package_properties(KChart PROPERTIES TYPE RECOMMENDED PURPOSE "Required for the heaptrack_gui executable. Get it from the kdiagram module.")
++            find_package(${KChartName} ${REQUIRED_IN_APPIMAGE} "2.6.0")
++            set_package_properties(${KChartName} PROPERTIES TYPE RECOMMENDED PURPOSE "Required for the heaptrack_gui executable. Get it from the kdiagram module.")
+         if(KF${QT_VERSION_MAJOR}I18n_FOUND)
+             ki18n_install(../../po)
+         endif()
+@@ -51,6 +57,10 @@ if(HEAPTRACK_BUILD_GUI)
+     endif()
+ endif()
+ 
++if(KChart6_FOUND)
++    set(KChart_FOUND TRUE)
++endif()
++
+ if (KF${QT_VERSION_MAJOR}_FOUND)
+     add_subdirectory(gui)
+ endif()
+diff --git a/src/analyze/gui/CMakeLists.txt b/src/analyze/gui/CMakeLists.txt
+index f5803b67..2124683d 100644
+--- a/src/analyze/gui/CMakeLists.txt
++++ b/src/analyze/gui/CMakeLists.txt
+@@ -92,7 +92,7 @@ if (KChart_FOUND)
+         histogrammodel.cpp
+     )
+     list(APPEND LIBRARIES
+-        KChart
++        ${KChartName}
+         Qt${QT_VERSION_MAJOR}::Svg
+     )
+ endif()
+-- 
+GitLab
+

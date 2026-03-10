@@ -1,0 +1,48 @@
+From c6c45f3455a652c38aefa402aece5dafa492e8ab Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Fri, 15 Dec 2023 22:53:19 +0100
+Subject: [PATCH] cmake: Fix C compatibility of libunwind probes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Future compilers such as GCC 14 are likely to enforce C type
+compatibility rules by default and report errors like this one:
+
+…/TryCompile-aAxUZn/src.c: In function ‘main’:
+…/TryCompile-aAxUZn/src.c:3:43: error: passing argument 1 of ‘unw_backtrace’ from incompatible pointer type
+    3 | int main() { void* buf[10]; unw_backtrace(&buf, 10); return 0; }
+      |                                           ^~~~
+      |                                           |
+      |                                           void * (*)[10]
+In file included from /usr/include/libunwind-x86_64.h:129,
+                 from /usr/include/libunwind.h:23,
+                 from …/TryCompile-aAxUZn/src.c:2:
+/usr/include/libunwind-common.h:318:27: note: expected ‘void **’ but argument is of type ‘void * (*)[10]’
+  318 | extern int unw_backtrace (void **, int);
+      |                           ^~~~~~~
+
+Removing the address operator ensures that the array type decays to
+a pointer, and that the types are compatible.
+---
+ cmake/FindLibunwind.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/FindLibunwind.cmake b/cmake/FindLibunwind.cmake
+index 2dddfad9..d597de9c 100644
+--- a/cmake/FindLibunwind.cmake
++++ b/cmake/FindLibunwind.cmake
+@@ -57,8 +57,8 @@ if (LIBUNWIND_LIBRARY)
+                           LIBUNWIND_HAS_UNW_GETCONTEXT)
+   check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { unw_context_t context; unw_cursor_t cursor; unw_getcontext(&context); unw_init_local(&cursor, &context); return 0; }"
+                           LIBUNWIND_HAS_UNW_INIT_LOCAL)
+-  check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace(&buf, 10); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE)
+-  check_c_source_compiles ("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace_skip(&buf, 10, 2); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE_SKIP)
++  check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace(buf, 10); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE)
++  check_c_source_compiles ("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace_skip(buf, 10, 2); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE_SKIP)
+   check_c_source_compiles ("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { return unw_set_cache_size(unw_local_addr_space, 1024, 0); }" LIBUNWIND_HAS_UNW_SET_CACHE_SIZE)
+   check_c_source_compiles ("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { return unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD); }" LIBUNWIND_HAS_UNW_CACHE_PER_THREAD)
+   set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+-- 
+GitLab
+

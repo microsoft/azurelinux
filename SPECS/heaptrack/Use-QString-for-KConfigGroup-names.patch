@@ -1,0 +1,73 @@
+From 38fd1d7b0ff53a35ed7c4ef241c21c8c06e1efb2 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 2 Jan 2024 15:47:29 +0100
+Subject: [PATCH] Use QString for KConfigGroup names
+
+Required in KF6
+---
+ src/analyze/gui/mainwindow.cpp | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/analyze/gui/mainwindow.cpp b/src/analyze/gui/mainwindow.cpp
+index 1ebd4c9c..c3be2fa7 100644
+--- a/src/analyze/gui/mainwindow.cpp
++++ b/src/analyze/gui/mainwindow.cpp
+@@ -57,8 +57,8 @@ const int MAINWINDOW_VERSION = 1;
+ 
+ namespace Config {
+ namespace Groups {
+-const char MainWindow[] = "MainWindow";
+-const char CodeNavigation[] = "CodeNavigation";
++const QString MainWindow() { return QStringLiteral("MainWindow"); }
++const QString CodeNavigation() { return QStringLiteral("CodeNavigation"); }
+ }
+ namespace Entries {
+ const char State[] = "State";
+@@ -317,7 +317,7 @@ MainWindow::MainWindow(QWidget* parent)
+ {
+     m_ui->setupUi(this);
+ 
+-    auto group = m_config->group(Config::Groups::MainWindow);
++    auto group = m_config->group(Config::Groups::MainWindow());
+     auto state = group.readEntry(Config::Entries::State, QByteArray());
+     restoreState(state, MAINWINDOW_VERSION);
+ 
+@@ -671,7 +671,7 @@ MainWindow::MainWindow(QWidget* parent)
+ MainWindow::~MainWindow()
+ {
+     auto state = saveState(MAINWINDOW_VERSION);
+-    auto group = m_config->group(Config::Groups::MainWindow);
++    auto group = m_config->group(Config::Groups::MainWindow());
+     group.writeEntry(Config::Entries::State, state);
+ }
+ 
+@@ -788,7 +788,7 @@ void MainWindow::setupCodeNavigationMenu()
+     auto group = new QActionGroup(this);
+     group->setExclusive(true);
+ 
+-    const auto settings = m_config->group(Config::Groups::CodeNavigation);
++    const auto settings = m_config->group(Config::Groups::CodeNavigation());
+     const auto currentIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
+ 
+     for (int i = 0; i < LAST_IDE; ++i) {
+@@ -838,7 +838,7 @@ void MainWindow::setupCodeNavigationMenu()
+ 
+ void MainWindow::setCodeNavigationIDE(QAction* action)
+ {
+-    auto settings = m_config->group(Config::Groups::CodeNavigation);
++    auto settings = m_config->group(Config::Groups::CodeNavigation());
+ 
+     if (action->data() == -1) {
+         const auto customCmd =
+@@ -859,7 +859,7 @@ void MainWindow::setCodeNavigationIDE(QAction* action)
+ 
+ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int columnNumber)
+ {
+-    const auto settings = m_config->group(Config::Groups::CodeNavigation);
++    const auto settings = m_config->group(Config::Groups::CodeNavigation());
+     const auto ideIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
+ 
+     QString command;
+-- 
+GitLab
+
