@@ -1,0 +1,25 @@
+From 3a175899a03d7d74ab5b6af0a0c056924afea04c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 17 Apr 2024 20:41:39 +0000
+Subject: [PATCH] Do not install html docs
+
+---
+ Configurations/unix-Makefile.tmpl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index 17e194f..77e8b53 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -611,7 +611,7 @@ install_sw: install_dev install_engines install_modules install_runtime
+ 
+ uninstall_sw: uninstall_runtime uninstall_modules uninstall_engines uninstall_dev
+ 
+-install_docs: install_man_docs install_html_docs
++install_docs: install_man_docs ## Install manpages but not HTML documentation
+ 
+ uninstall_docs: uninstall_man_docs uninstall_html_docs
+ 	$(RM) -r $(DESTDIR)$(DOCDIR)
+-- 
+2.45.4
+

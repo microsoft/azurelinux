@@ -1,0 +1,29 @@
+From 3f9deff30ae6efbfe979043b00cdf649b39793c0 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Thu, 24 Sep 2020 09:51:34 +0200
+Subject: Disable signature verification with totally unsafe hash algorithms
+
+(was openssl-1.1.1-no-weak-verify.patch)
+---
+ crypto/asn1/a_verify.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/crypto/asn1/a_verify.c b/crypto/asn1/a_verify.c
+index b7eed914b0..af62f0ef08 100644
+--- a/crypto/asn1/a_verify.c
++++ b/crypto/asn1/a_verify.c
+@@ -152,6 +152,11 @@ int ASN1_item_verify_ctx(const ASN1_ITEM *it, const X509_ALGOR *alg,
+             ERR_raise(ERR_LIB_ASN1, ERR_R_EVP_LIB);
+         if (ret <= 1)
+             goto err;
++    } else if ((mdnid == NID_md5
++               && ossl_safe_getenv("OPENSSL_ENABLE_MD5_VERIFY") == NULL) ||
++               mdnid == NID_md4 || mdnid == NID_md2 || mdnid == NID_sha) {
++        ERR_raise(ERR_LIB_ASN1, ASN1_R_UNKNOWN_MESSAGE_DIGEST_ALGORITHM);
++        goto err;
+     } else {
+         const EVP_MD *type = NULL;
+ 
+-- 
+2.26.2
+

@@ -5,83 +5,71 @@ Subject: [PATCH] Disable tests that fail during azl rpmbuild check
 
 1. Disable post-copy eventfd based tests as they hang
 2. Disable TLS-PSK test as they fail (curve is unsupported error,
-possibily because psktool doesn't work on azl).
+possibly because psktool doesn't work on azl).
 
 Signed-off-by: Kanika Nema <kanikanema@microsoft.com>
 ---
  tests/qtest/migration-test.c | 28 +++++++++++++++++++++++++++-
  1 file changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-index 0fbaa6a90f..29217922b1 100644
---- a/tests/qtest/migration-test.c
-+++ b/tests/qtest/migration-test.c
-@@ -3306,6 +3306,8 @@ int main(int argc, char **argv)
+--- a/b/tests/qtest/migration-test.c	2026-02-06 23:49:13.929537847 +0000
++++ b/tests/qtest/migration-test.c	2026-02-06 23:49:36.409520951 +0000
+@@ -3808,6 +3808,8 @@
      }
  
      has_uffd = ufd_version_check();
 +    /* Unblock azl qemu tests, eventfd may not be working properly */
 +    has_uffd = 0;
      arch = qtest_get_arch();
+     is_x86 = !strcmp(arch, "i386") || !strcmp(arch, "x86_64");
  
-     /*
-@@ -3393,9 +3395,19 @@ int main(int argc, char **argv)
-     }
+@@ -3896,8 +3898,14 @@
+ #endif
  
  #ifdef CONFIG_GNUTLS
 +/*
 + * TLSPSK doesn't work in azl builds and fails with this error:
 + * "qemu-system-x86_64: TLS handshake failed: The curve is unsupported"
-+ * "qemu-system-x86_64: TLS handshake failed: Error in the pull function."
-+ * "{\"return\": {\"status\": \"failed\", \"error-desc\": \"TLS handshake
-+ * failed: The curve is unsupported\"}}"
-+ * "ERROR:../tests/qtest/migration-helpers.c:181:check_migration_status:
-+ * assertion failed (current_status != \"failed\"): (\"failed\" != \"failed\")" 
 + */
 +#if 0
-     qtest_add_func("/migration/precopy/unix/tls/psk",
-                    test_precopy_unix_tls_psk);
--
+     migration_test_add("/migration/precopy/unix/tls/psk",
+                        test_precopy_unix_tls_psk);
 +#endif
+ 
      if (has_uffd) {
          /*
-          * NOTE: psk test is enough for postcopy, as other types of TLS
-@@ -3424,10 +3436,19 @@ int main(int argc, char **argv)
-                    test_precopy_tcp_switchover_ack);
+@@ -3928,10 +3936,16 @@
+                        test_precopy_tcp_switchover_ack);
  
  #ifdef CONFIG_GNUTLS
 +/*
-+ * TLS PSK tests fail on azl rmpbuilds with error:
++ * TLS PSK tests fail on azl rpmbuilds with error:
 + * "qemu-system-x86_64: TLS handshake failed: The curve is unsupported"
-+ * "qemu-system-x86_64: TLS handshake failed: Error in the pull function."
-+ * "ERROR:../tests/qtest/migration-helpers.c:181:check_migration_status:
-+ * assertion failed (current_status != \"failed\"): (\"failed\" != \"failed\")"
 + */
 +#if 0
-     qtest_add_func("/migration/precopy/tcp/tls/psk/match",
-                    test_precopy_tcp_tls_psk_match);
-     qtest_add_func("/migration/precopy/tcp/tls/psk/mismatch",
-                    test_precopy_tcp_tls_psk_mismatch);
+     migration_test_add("/migration/precopy/tcp/tls/psk/match",
+                        test_precopy_tcp_tls_psk_match);
+     migration_test_add("/migration/precopy/tcp/tls/psk/mismatch",
+                        test_precopy_tcp_tls_psk_mismatch);
 +#endif
  #ifdef CONFIG_TASN1
-     qtest_add_func("/migration/precopy/tcp/tls/x509/default-host",
-                    test_precopy_tcp_tls_x509_default_host);
-@@ -3483,10 +3504,15 @@ int main(int argc, char **argv)
-                    test_multifd_tcp_zstd);
+     migration_test_add("/migration/precopy/tcp/tls/x509/default-host",
+                        test_precopy_tcp_tls_x509_default_host);
+@@ -4005,10 +4019,15 @@
+                        test_multifd_tcp_uadk);
  #endif
  #ifdef CONFIG_GNUTLS
 +/*
-+ * TLS PSK tests fail on azl RPMBUILDS
++ * TLS PSK tests fail on azl rpmbuilds
 + */
 +#if 0
-     qtest_add_func("/migration/multifd/tcp/tls/psk/match",
-                    test_multifd_tcp_tls_psk_match);
-     qtest_add_func("/migration/multifd/tcp/tls/psk/mismatch",
-                    test_multifd_tcp_tls_psk_mismatch);
+     migration_test_add("/migration/multifd/tcp/tls/psk/match",
+                        test_multifd_tcp_tls_psk_match);
+     migration_test_add("/migration/multifd/tcp/tls/psk/mismatch",
+                        test_multifd_tcp_tls_psk_mismatch);
 +#endif
  #ifdef CONFIG_TASN1
-     qtest_add_func("/migration/multifd/tcp/tls/x509/default-host",
-                    test_multifd_tcp_tls_x509_default_host);
+     migration_test_add("/migration/multifd/tcp/tls/x509/default-host",
+                        test_multifd_tcp_tls_x509_default_host);
 -- 
 2.25.1
-

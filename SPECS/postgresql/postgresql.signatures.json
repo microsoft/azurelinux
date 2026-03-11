@@ -1,6 +1,6 @@
 {
   "Signatures": {
     "postgresql.service": "2d209e10523c43e7011b4a85e9e32f5f5911a74a25012cdeaf5fdeb0a5664461",
-    "postgresql-16.11.tar.bz2": "6deb08c23d03d77d8f8bd1c14049eeef64aef8968fd8891df2dfc0b42f178eac"
+    "postgresql-16.12.tar.bz2": "b253ee949303ef5df00e24002600da4fb37e5ccfafa78718c6ea6a936b4d97f1"
   }
 }

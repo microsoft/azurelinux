@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        25.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-4565.patch
+Patch1:         CVE-2026-0994.patch
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  cmake
@@ -123,6 +124,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.3-6
+- Patch for CVE-2026-0994
+
 * Thu Jun 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 25.3-5
 - Patch CVE-2025-4565
 

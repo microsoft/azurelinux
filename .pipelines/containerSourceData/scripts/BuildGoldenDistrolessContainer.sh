@@ -4,6 +4,14 @@
 
 set -e
 
+function docker_cleanup {
+    echo "+++ Cleaning up Docker resources to free disk space"
+    docker system prune -f --volumes || true
+    docker builder prune -f || true
+    echo "+++ Docker cleanup completed"
+    df -h / || true
+}
+
 function DockerBuild {
     local containerName=$1
     local azureLinuxVersion=$2
@@ -41,6 +49,9 @@ function DockerBuild {
         --build-arg RPMS="$rpmsDir" \
         --build-arg LOCAL_REPO_FILE="$marinaraSrcDir/local.repo" \
         --no-cache
+
+    # Cleanup after build to free disk space
+    docker_cleanup
 }
 
 function create_distroless_container {

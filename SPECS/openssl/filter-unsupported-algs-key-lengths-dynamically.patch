@@ -1,0 +1,304 @@
+From ee3d85ad744df521675c146a468219c6e2661764 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 8 Jan 2026 11:04:42 -0800
+Subject: [PATCH] filter unsupported algs key lengths dynamically
+
+---
+ apps/speed.c | 258 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 256 insertions(+), 2 deletions(-)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index f04e0a5..73395ce 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -611,6 +611,176 @@ static int have_cipher(const char *name)
+     return ret;
+ }
+ 
++/* Check if RSA key size is supported by the active provider */
++static int is_rsa_key_supported(unsigned int bits)
++{
++    int ret = 0;
++    EVP_PKEY_CTX *genctx = NULL;
++    EVP_PKEY *pkey = NULL;
++    BIGNUM *bn = NULL;
++
++    ERR_set_mark();
++
++    bn = BN_new();
++    if (bn != NULL && BN_set_word(bn, RSA_F4)) {
++        if (init_gen_str(&genctx, "RSA", NULL, 0, NULL, NULL)) {
++            if (EVP_PKEY_CTX_set_rsa_keygen_bits(genctx, bits) > 0
++                && EVP_PKEY_CTX_set1_rsa_keygen_pubexp(genctx, bn) > 0
++                && EVP_PKEY_CTX_set_rsa_keygen_primes(genctx, RSA_DEFAULT_PRIME_NUM) > 0) {
++                /*
++                 * For small RSA keys (< 2048), actually generate to verify support
++                 * since providers often reject these during keygen, not setup.
++                 * For larger keys, parameter validation is sufficient (keygen is slow).
++                 */
++                if (bits < 2048)
++                    ret = (EVP_PKEY_keygen(genctx, &pkey) > 0);
++                else
++                    ret = 1;
++            }
++            EVP_PKEY_CTX_free(genctx);
++        }
++    }
++    BN_free(bn);
++    EVP_PKEY_free(pkey);
++
++    ERR_pop_to_mark();
++    return ret;
++}
++
++/* Check if DSA key size is supported by the active provider */
++static int is_dsa_key_supported(unsigned int bits)
++{
++    EVP_PKEY *dsa_key = NULL;
++    EVP_PKEY_CTX *sign_ctx = NULL;
++    unsigned char buf[20] = {0};
++    unsigned char sig[256];
++    size_t siglen = sizeof(sig);
++    int ret = 0;
++
++    ERR_set_mark();
++
++    /*
++     * Actually try to create a DSA key and perform a signing operation.
++     * This is the only reliable way to check if the key size is supported,
++     * as FIPS restrictions are enforced during the signing operation.
++     * We suppress errors so this check is silent.
++     */
++    dsa_key = get_dsa(bits);
++    if (dsa_key != NULL) {
++        sign_ctx = EVP_PKEY_CTX_new(dsa_key, NULL);
++        if (sign_ctx != NULL) {
++            if (EVP_PKEY_sign_init(sign_ctx) > 0
++                && EVP_PKEY_sign(sign_ctx, sig, &siglen, buf, sizeof(buf)) > 0) {
++                ret = 1;
++            }
++            EVP_PKEY_CTX_free(sign_ctx);
++        }
++        EVP_PKEY_free(dsa_key);
++    }
++    ERR_pop_to_mark();
++    return ret;
++}
++
++/* Check if EC curve is supported by the active provider */
++static int is_ec_curve_supported(int nid)
++{
++    EVP_PKEY *ec_key = NULL;
++    EVP_PKEY_CTX *kctx = NULL;
++    EVP_PKEY_CTX *pctx = NULL;
++    EVP_PKEY_CTX *sign_ctx = NULL;
++    EVP_PKEY *params = NULL;
++    unsigned char buf[20] = {0};
++    unsigned char sig[512];
++    size_t siglen = sizeof(sig);
++    int ret = 0;
++
++    ERR_set_mark();
++
++    /*
++     * Actually try to create an EC key for this curve and perform a signing
++     * operation. This is the only reliable way to check if the curve is supported,
++     * as FIPS restrictions are enforced during key generation or signing.
++     * We suppress errors so this check is silent.
++     */
++
++    /* Try to create a key context */
++    kctx = EVP_PKEY_CTX_new_id(nid, NULL);
++    if (kctx == NULL) {
++        /* Try the alternative method for curves not supported via new_id */
++        pctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
++        if (pctx != NULL) {
++            if (EVP_PKEY_paramgen_init(pctx) > 0
++                && EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, nid) > 0
++                && EVP_PKEY_paramgen(pctx, &params) > 0) {
++                kctx = EVP_PKEY_CTX_new(params, NULL);
++            }
++            EVP_PKEY_CTX_free(pctx);
++        }
++    }
++
++    /* Try to generate a key and test signing */
++    if (kctx != NULL) {
++        if (EVP_PKEY_keygen_init(kctx) > 0
++            && EVP_PKEY_keygen(kctx, &ec_key) > 0) {
++            sign_ctx = EVP_PKEY_CTX_new(ec_key, NULL);
++            if (sign_ctx != NULL) {
++                if (EVP_PKEY_sign_init(sign_ctx) > 0
++                    && EVP_PKEY_sign(sign_ctx, sig, &siglen, buf, sizeof(buf)) > 0) {
++                    ret = 1;
++                }
++                EVP_PKEY_CTX_free(sign_ctx);
++            }
++        }
++        EVP_PKEY_CTX_free(kctx);
++    }
++
++    EVP_PKEY_free(ec_key);
++    EVP_PKEY_free(params);
++    ERR_pop_to_mark();
++    return ret;
++}
++
++#ifndef OPENSSL_NO_ECX
++/* Check if EdDSA curve is supported by the active provider */
++static int is_eddsa_curve_supported(int nid)
++{
++    int ret = 0;
++    EVP_PKEY_CTX *kctx = NULL;
++
++    ERR_set_mark();
++
++    kctx = EVP_PKEY_CTX_new_id(nid, NULL);
++    if (kctx != NULL) {
++        ret = 1;
++        EVP_PKEY_CTX_free(kctx);
++    }
++
++    ERR_pop_to_mark();
++    return ret;
++}
++#endif /* OPENSSL_NO_ECX */
++
++#ifndef OPENSSL_NO_DH
++/* Check if FFDH group is supported by the active provider */
++static int is_ffdh_group_supported(unsigned int nid)
++{
++    int ret = 0;
++    EVP_PKEY_CTX *genctx = NULL;
++
++    ERR_set_mark();
++
++    if (init_gen_str(&genctx, "DH", NULL, 0, NULL, NULL)) {
++        if (EVP_PKEY_CTX_set_dh_nid(genctx, nid) > 0) {
++            ret = 1;
++        }
++        EVP_PKEY_CTX_free(genctx);
++    }
++
++    ERR_pop_to_mark();
++    return ret;
++}
++#endif /* OPENSSL_NO_DH */
++
+ static int EVP_Digest_loop(const char *mdname, ossl_unused int algindex, void *args)
+ {
+     loopargs_t *tempargs = *(loopargs_t **) args;
+@@ -2549,6 +2719,80 @@ int speed_main(int argc, char **argv)
+         memset(sigs_doit, 1, sizeof(sigs_doit));
+         do_sigs = 1;
+     }
++
++    /*
++     * Filter out unsupported algorithms based on provider capabilities.
++     * This filtering must happen regardless of whether specific algorithms
++     * were requested on the command line, to prevent errors when running
++     * in restricted environments (e.g., FIPS mode).
++     */
++
++    /* Filter out unsupported RSA key sizes based on provider capabilities */
++    for (i = 0; i < RSA_NUM; i++) {
++        if (rsa_doit[i] && !is_rsa_key_supported(rsa_keys[i].bits))
++            rsa_doit[i] = 0;
++    }
++
++#ifndef OPENSSL_NO_DH
++    /* Filter out unsupported FFDH groups based on provider capabilities */
++    for (i = 0; i < FFDH_NUM; i++) {
++        if (ffdh_doit[i] && !is_ffdh_group_supported(ffdh_params[i].nid))
++            ffdh_doit[i] = 0;
++    }
++#endif
++
++    /* Filter out unsupported DSA key sizes based on provider capabilities */
++    for (i = 0; i < DSA_NUM; i++) {
++        if (dsa_doit[i] && !is_dsa_key_supported(dsa_bits[i]))
++            dsa_doit[i] = 0;
++    }
++
++
++
++#ifndef OPENSSL_NO_ECX
++    /* Filter out unsupported ECDSA curves based on provider capabilities */
++    for (i = 0; i < ECDSA_NUM; i++) {
++        if (ecdsa_doit[i] && !is_ec_curve_supported(ec_curves[i].nid))
++            ecdsa_doit[i] = 0;
++    }
++
++    /* Filter out unsupported ECDH curves based on provider capabilities */
++    for (i = 0; i < EC_NUM; i++) {
++        if (ecdh_doit[i] && !is_ec_curve_supported(ec_curves[i].nid))
++            ecdh_doit[i] = 0;
++    }
++
++    /* Filter out unsupported EdDSA curves based on provider capabilities */
++    for (i = 0; i < EdDSA_NUM; i++) {
++        if (eddsa_doit[i] && !is_eddsa_curve_supported(ed_curves[i].nid))
++            eddsa_doit[i] = 0;
++    }
++#endif /* OPENSSL_NO_ECX */
++
++#ifndef OPENSSL_NO_SM2
++    /* Filter out unsupported SM2 curves based on provider capabilities */
++    for (i = 0; i < SM2_NUM; i++) {
++        if (sm2_doit[i] && !is_ec_curve_supported(sm2_curves[i].nid))
++            sm2_doit[i] = 0;
++    }
++#endif
++
++    /* Filter out unsupported KEM algorithms based on provider capabilities */
++    for (i = 0; i < kems_algs_len; i++) {
++        if (kems_doit[i]) {
++            const char *kem_name = kems_algname[i];
++            unsigned int bits;
++            char sfx[MAX_ALGNAME_SUFFIX];
++
++            /* Check if this is an RSA KEM with a specific bit size */
++            if (strlen(kem_name) < MAX_ALGNAME_SUFFIX + 4
++                && sscanf(kem_name, "rsa%u%s", &bits, sfx) == 1) {
++                if (!is_rsa_key_supported(bits))
++                    kems_doit[i] = 0;
++            }
++        }
++    }
++
+     for (i = 0; i < ALGOR_NUM; i++)
+         if (doit[i])
+             pr_header++;
+@@ -4217,17 +4461,27 @@ int speed_main(int argc, char **argv)
+             /* no string after rsa<bitcnt> permitted: */
+             if (strlen(sig_name) < MAX_ALGNAME_SUFFIX + 4 /* rsa+digit */
+                 && sscanf(sig_name, "rsa%u%s", &bits, sfx) == 1) {
++                /* Pre-validate RSA key size support */
++                if (!is_rsa_key_supported(bits)) {
++                    /* Provider doesn't support this key size - skip silently */
++                    goto sig_err_break;
++                }
+                 params[0] = OSSL_PARAM_construct_uint(OSSL_PKEY_PARAM_RSA_BITS,
+                                                       &bits);
+                 use_params = 1;
+             }
+ 
+             if (strncmp(sig_name, "dsa", 3) == 0) {
++                unsigned int dsa_bits = atoi(sig_name + 3);
++                /* Pre-validate DSA key size support */
++                if (!is_dsa_key_supported(dsa_bits)) {
++                    /* Provider doesn't support this key size - skip silently */
++                    goto sig_err_break;
++                }
+                 ctx_params = EVP_PKEY_CTX_new_id(EVP_PKEY_DSA, NULL);
+                 if (ctx_params == NULL
+                     || EVP_PKEY_paramgen_init(ctx_params) <= 0
+-                    || EVP_PKEY_CTX_set_dsa_paramgen_bits(ctx_params,
+-                                                        atoi(sig_name + 3)) <= 0
++                    || EVP_PKEY_CTX_set_dsa_paramgen_bits(ctx_params, dsa_bits) <= 0
+                     || EVP_PKEY_paramgen(ctx_params, &pkey_params) <= 0
+                     || (sig_gen_ctx = EVP_PKEY_CTX_new(pkey_params, NULL)) == NULL
+                     || EVP_PKEY_keygen_init(sig_gen_ctx) <= 0) {
+-- 
+2.43.0
+

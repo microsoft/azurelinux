@@ -5,12 +5,13 @@
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
 Version:        20240116.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-0838.patch
 
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
@@ -94,6 +95,9 @@ Development headers for %{name}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Feb 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240116.0-3
+- Patch for CVE-2025-0838
+
 * Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 20240116.0-2
 - Change the build type back to 'RelWithDebInfo' so that 'abseil' compiles with
   'NDEBUG' defined so that packages that link to 'abseil' with 'NDEBUG' defined
