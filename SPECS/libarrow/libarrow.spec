@@ -24,7 +24,8 @@ Distribution:   Azure Linux
 Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{version}.tar.gz#/libarrow-%{version}.tar.gz
 Patch0001: 0001-python-pyproject.toml.patch
 Patch0002: CVE-2024-52338.patch
- 
+Patch0003: CVE-2026-25087.patch
+
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
 # package, and in turn the only consumer of this and liborc is Ceph, which
@@ -77,8 +78,6 @@ BuildRequires:	gtk-doc
 # Additional pyarrow build requirements; see also %%generate_buildrequires
 BuildRequires:  python3dist(cffi)
  
-Patch0:        CVE-2026-25087.patch
-
 %description
 Apache Arrow defines a language-independent columnar memory
 format for flat and hierarchical data, organized for efficient
