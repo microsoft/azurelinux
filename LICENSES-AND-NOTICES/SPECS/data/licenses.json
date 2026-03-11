@@ -1972,7 +1972,6 @@
                 "rubygem-sys-filesystem",
                 "rubygem-thread_order",
                 "rusers",
-                "rust-afterburn",
                 "rust-cbindgen",
                 "s-nail",
                 "samba",
@@ -3167,7 +3166,8 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "python-nocaselist",
+                "rust-afterburn"
             ]
         },
         "Sysbench source": {
