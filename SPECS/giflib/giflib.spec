@@ -74,7 +74,7 @@ find %{buildroot} -name '*.a' -print -delete
 * Tue Apr 15 2025 Sudipta Pandit <sudpandit@microsoft.com> - 5.2.1-9
 - Patch CVE-2025-31344
 
-* Fri Feb 14 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
+* Wed Feb 14 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
 - Patch CVE-2023-39742
 
 * Fri Oct 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 5.2.1-7
