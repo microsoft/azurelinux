@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,6 +97,10 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Thu Mar 05 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.0.0-15
+- Remove typing_extensions.override usage from CVE-2026-24747 patch to fix
+  ImportError with typing_extensions 4.2.0 (override requires >= 4.4.0)
+
 * Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-14
 - Patch for CVE-2026-0994
 
