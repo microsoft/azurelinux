@@ -505,7 +505,6 @@
                 "icon-naming-utils",
                 "icoutils",
                 "iftop",
-                "ignition",
                 "iio-sensor-proxy",
                 "ilmbase",
                 "im-chooser",
@@ -3171,6 +3170,7 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
+                "ignition",
                 "python-nocaselist"
             ]
         },
