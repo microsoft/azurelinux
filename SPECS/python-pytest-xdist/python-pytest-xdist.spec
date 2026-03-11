@@ -78,11 +78,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/xdist/
 
 %changelog
-* Tue Mar 03 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 5.5.0-2
+* Tue Mar 03 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.0-2
 - Add patch to fix parser ptest error.
 - Skip failing crash-output test incompatible with pytest 9
 
-* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 5.5.0-1
+* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 3.5.0-1
 - Updating to version 3.5.0.
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-1
