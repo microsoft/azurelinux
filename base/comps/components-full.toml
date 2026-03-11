@@ -2959,6 +2959,7 @@
 [components.rest]
 [components.rgb]
 [components.rhash]
+[components.rust-ripgrep]
 [components.rlottie]
 [components.roc-toolkit]
 [components.rocclr]
