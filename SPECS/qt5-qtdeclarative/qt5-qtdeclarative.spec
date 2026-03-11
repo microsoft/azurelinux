@@ -10,8 +10,7 @@ License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
-Patch0:  CVE-2025-12385_p1.patch
-Patch1:  CVE-2025-12385_p2.patch
+Patch0:  CVE-2025-12385.patch
 
 ## upstream patches
 
@@ -50,9 +49,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%setup -q -n qtdeclarative-everywhere-src-%{version}
-%patch0 -p1
-%patch1 -p1
+%autosetup -n qtdeclarative-everywhere-src-%{version} -p1
 
 %build
 
