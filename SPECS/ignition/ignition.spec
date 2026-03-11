@@ -61,10 +61,6 @@ BuildRequires: golang
 
 ExcludeArch: %{ix86}
 
-# Requires for 'disks' stage
-%if 0%{?fedora}
-Recommends: btrfs-progs
-%endif
 Requires: dosfstools
 Requires: gdisk
 Requires: dracut
