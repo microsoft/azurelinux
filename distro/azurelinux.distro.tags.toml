@@ -1,0 +1,84 @@
+# This file defines Koji tags for the Azure Linux distribution.
+# Tags are used to group packages and images for building and release management.
+
+# RPM build tag configuration (maps to Koji tag extras for RPM builds)
+[distros.azurelinux-staging.rpms-build-tag]
+# Architectures this tag builds for
+arches = ["x86_64", "aarch64"]
+
+[distros.azurelinux-staging.rpms-build-tag.bootstrap]
+external-repositories = ["fedora-external", "fedora-external-updates"]
+
+# Mock build environment configuration (maps to Koji mock.* extras)
+[distros.azurelinux-staging.rpms-build-tag.mock]
+# parent = azl4-bootstrap-rpms-tag-20260307 (Will have to be injected by Control Tower)
+package-manager = "dnf5"
+new-chroot = false
+isolation = "simple"
+releasever = '43'
+
+# RPM macros injected into the buildroot (maps to Koji rpm.macro.* extras)
+[distros.azurelinux-staging.rpms-build-tag.rpm-macros]
+# dist = '.azl4~bootstrap.20260307' (Will have to be injected by Control Tower).
+distribution = 'Azure Linux'
+vendor = 'Microsoft Corporation'
+
+# Build groups — packages installed in the mock chroot (maps to Koji tag groups)
+[distros.azurelinux-staging.rpms-build-tag.groups]
+# Packages installed when building RPMs
+build = [
+    "bash",
+    "bzip2",
+    "coreutils",
+    "cpio",
+    "diffutils",
+    "fedora-release",
+    "findutils",
+    "gawk",
+    "gcc",
+    "gcc-c++",
+    "grep",
+    "gzip",
+    "make",
+    "patch",
+    "python",
+    "redhat-rpm-config",
+    "rpm-build",
+    "sed",
+    "shadow-utils",
+    "tar",
+    "unzip",
+    "utils-linux",
+    "which",
+    "xz",
+]
+# Packages installed when generating SRPMs from spec files
+srpm-build = [
+    "bash",
+    "fedora-release",
+    "fedpkg-minimal",
+    "git",
+    "redhat-rpm-config",
+    "rhpkg-simple",
+    "rpm-build",
+    "shadow-utils",
+]
+
+# Generic extra options — catch-all for Koji tag extras with typed-value resolution
+# [distros.azurelinux-staging.rpms-build-tag.extra-options]
+# releasever = { type = "distro-version", distro = "azurelinux" }
+# snapshot = { type = "timestamp", value = "2026-02-24T00:00:00-08:00" }
+# tag2distrepo = { type = "template", template = "azl4-%{releasever}-%{snapshot}" }
+
+[distros.azurelinux-staging.rpms-dest-tag]
+arches = ["x86_64", "aarch64"]
+
+[distros.azurelinux-staging.container-build-tag]
+arches = ["x86_64", "aarch64"]
+
+# Mock build environment configuration (maps to Koji mock.* extras)
+[distros.azurelinux-staging.container-build-tag.mock]
+package-manager = "dnf5"
+new-chroot = false
+isolation = "simple"
+releasever = '43'
