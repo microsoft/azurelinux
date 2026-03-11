@@ -505,7 +505,6 @@
                 "icon-naming-utils",
                 "icoutils",
                 "iftop",
-                "ignition",
                 "iio-sensor-proxy",
                 "ilmbase",
                 "im-chooser",
@@ -3177,6 +3176,7 @@
                 "bootengine",
                 "coreos-cloudinit",
                 "coreos-init",
+                "ignition",
                 "python-nocaselist",
                 "update-ssh-keys"
             ]
