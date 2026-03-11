@@ -433,7 +433,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-6
 - Enable FIPS crypto configs CONFIG_CRYPTO_DH_RFC7919_GROUPS, CONFIG_CRYPTO_ECDSA,
-- CONFIG_CRYPTO_ARC4, CONFIG_CRYPTO_DEV_BCM_SPU and their dependencies
+- CONFIG_CRYPTO_ARC4, CONFIG_CRYPTO_DEV_BCM_SPU and their dependencies for Arm64 arch
 
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.12.57.1-5
 - Enable lwtunnel, lwtunnel-bpf, and sched_core
