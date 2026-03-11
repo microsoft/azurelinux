@@ -1,0 +1,163 @@
+# ---------------------------------------------------------------------------
+# Azure DevOps Pipeline — Sync Fedora Sources to Azure Blob Storage
+# ---------------------------------------------------------------------------
+#
+# Purpose:
+#   Downloads upstream Fedora component sources via azldev and uploads
+#   them to an Azure Blob Storage lookaside cache.  This keeps the
+#   lookaside in sync with the component definitions on the
+#   tomls/base/main branch.
+#
+# Trigger:
+#   Runs automatically on every merge to tomls/base/main.  `batch: true`
+#   coalesces concurrent commits so only the latest triggers a run.
+#   Can also be triggered manually via the ADO "Run pipeline" button,
+#   optionally overriding parameters (e.g. to sync a specific component).
+#
+# Prerequisites:
+#   1. An Azure Service Connection with "Storage Blob Data Contributor"
+#      (or equivalent) on the target storage account.  Set its name in
+#      the `serviceConnectionName` variable below.
+#   2. The `azldev` binary published to an Azure DevOps Artifacts
+#      Universal Package feed.  Set the feed coordinates in the
+#      `azldevFeed*` variables below.
+#
+# See scripts/README.md for full documentation.
+# ---------------------------------------------------------------------------
+
+# Trigger controlled by ADO
+trigger: none
+
+# Allow manual runs from the ADO UI with parameter overrides.
+pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+# ---------------------------------------------------------------------------
+# Parameters — configurable at queue time via "Run pipeline"
+# ---------------------------------------------------------------------------
+parameters:
+  - name: accountUrl
+    displayName: "Azure Storage Account URL"
+    type: string
+    default: "https://azltempstaginglookaside.blob.core.windows.net"
+
+  - name: container
+    displayName: "Blob container name"
+    type: string
+    default: "repo"
+
+  - name: components
+    displayName: "Components to sync (newline-separated; leave empty for all)"
+    type: string
+    default: ""
+
+variables:
+  serviceConnectionName: "Temp lookaside cache uploader CS"
+
+  # -- azldev ADO Artifacts feed coordinates --
+  # The pipeline downloads the azldev binary from a Universal Package
+  # published to an Azure DevOps Artifacts feed.
+  azldevFeed: "mariner/azldev-preview-feed"
+  azldevPackageName: "azldev-preview-pkg-x86_64"
+  azldevPackageVersion: "*" # "*" = latest;
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      LinuxHostVersion:
+        Network: R1
+      EnableCDPxPAT: false
+      runOnHost: true
+    globalSdl: # https://aka.ms/obpipelines/sdl
+      tsa:
+        enabled: false
+    stages:
+      - stage: SyncSources
+        jobs:
+          - job: SyncFedoraSources
+            displayName: "Sync Fedora sources to Azure Blob Storage"
+            timeoutInMinutes: 180
+            pool:
+              type: linux
+
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/sync-sources-output"
+
+            steps:
+              # Create a non-root user to run azldev, since it doesn't like being run as root.
+              - script: |
+                  set -euo pipefail
+                  useradd -m azldevuser
+                  chown -R azldevuser:azldevuser "$(Build.SourcesDirectory)"
+                displayName: "Create azldevuser"
+
+              - script: sudo su azldevuser -c "python3 -m pip install --user azure-identity azure-storage-blob"
+                displayName: "Install Python dependencies"
+
+              - task: UniversalPackages@0
+                displayName: "Download azldev from ADO Artifacts"
+                inputs:
+                  command: download
+                  feedsToUse: "internal"
+                  vstsFeed: "$(azldevFeed)"
+                  vstsFeedPackage: "$(azldevPackageName)"
+                  vstsPackageVersion: "$(azldevPackageVersion)"
+                  downloadDirectory: "$(Build.SourcesDirectory)"
+
+              - script: chmod +x ./azldev
+                displayName: "Make azldev executable"
+                workingDirectory: "$(Build.SourcesDirectory)"
+
+              - script: |
+                  set -euo pipefail
+                  printf '%s\n' '${{ parameters.components }}' > components.pipeline.list
+                  echo "Components file written:"
+                  cat components.pipeline.list
+                displayName: "[Optional] Write components list file"
+                workingDirectory: "$(Build.SourcesDirectory)"
+                condition: and(succeeded(), ne('${{ parameters.components }}', ''))
+
+              - task: AzureCLI@2
+                displayName: "Sync lookaside cache"
+                inputs:
+                  azureSubscription: "$(serviceConnectionName)"
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  useGlobalConfig: true
+                  inlineScript: |
+                    set -euo pipefail
+
+                    ARGS=(
+                      python3 scripts/sources-sync/sync-sources.py
+                      --account-url "${{ parameters.accountUrl }}"
+                      --container "${{ parameters.container }}"
+                    )
+
+                    # If a components file was written in the previous step, use it.
+                    if [[ -f "components.pipeline.list" ]]; then
+                      ARGS+=(--components-file components.pipeline.list)
+                    fi
+
+                    AZURE_CONFIG_DIR="/home/azldevuser/.azure"
+                    cp -r "$HOME/.azure" "$AZURE_CONFIG_DIR"
+                    chown -R azldevuser:azldevuser "$AZURE_CONFIG_DIR"
+
+                    echo "Running: '${ARGS[*]}' as azldevuser"
+                    su azldevuser -c "${ARGS[*]}"
+                  workingDirectory: "$(Build.SourcesDirectory)"
+
+              - script: |
+                  set -euo pipefail
+                  if [[ -f "components.failed.list" ]]; then
+                    mkdir -p "$ob_outputDirectory"
+                    cp components.failed.list "$ob_outputDirectory/"
+                  fi
+                displayName: "Copy failed components list"
+                workingDirectory: "$(Build.SourcesDirectory)"
