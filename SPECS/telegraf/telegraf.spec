@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,6 +26,12 @@ Patch11:        CVE-2025-22872.patch
 Patch12:        CVE-2025-47913.patch
 Patch13:        CVE-2025-10543.patch
 Patch14:        CVE-2026-27571.patch
+Patch15:        CVE-2025-11065.patch
+Patch16:        CVE-2025-47911.patch
+Patch17:        CVE-2025-58190.patch
+Patch18:        CVE-2026-2303.patch
+Patch19:        CVE-2026-26014.patch
+
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -90,6 +96,12 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-15
+- Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
+
+* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-14
+- Patch for CVE-2025-11065
+
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-13
 - Patch for CVE-2026-27571
 
@@ -111,7 +123,7 @@ fi
 * Mon Mar 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-7
 - Patch CVE-2025-30204
 
-* Tue Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
+* Wed Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
 - Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 
 * Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-5
