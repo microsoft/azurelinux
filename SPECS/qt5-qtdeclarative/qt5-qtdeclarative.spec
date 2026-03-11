@@ -10,7 +10,8 @@ License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
-Patch0:  CVE-2025-12385.patch
+Patch0:  CVE-2025-12385_p1.patch
+Patch1:  CVE-2025-12385_p2.patch
 
 ## upstream patches
 
@@ -50,7 +51,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n qtdeclarative-everywhere-src-%{version}
-%patch 0 -p1
+%patch0 -p1
+%patch1 -p1
 
 %build
 
@@ -143,7 +145,7 @@ popd
 
 
 %changelog
-* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.12.5-6
+* Wed Mar 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.12.5-6
 - Patch for CVE-2025-12385
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.5-5
