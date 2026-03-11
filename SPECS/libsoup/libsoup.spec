@@ -1,3 +1,5 @@
+%bcond_with check
+
 %define BaseVersion 3.0
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
@@ -108,8 +110,13 @@ These are the additional language files of libsoup.
     -Dntlm=disabled \
     -Ddoc_tests=false \
     -Ddocs=disabled \
+%if %{with check}
+    -Dtests=true \
     -Dgssapi=disabled \
     -Dpkcs11_tests=disabled
+%else
+    -Dtests=false
+%endif
 %meson_build
 
 %install
@@ -119,7 +126,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}-%{BaseVersion}
 
 %check
+%if %{with check}
 %meson_test
+%endif
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
