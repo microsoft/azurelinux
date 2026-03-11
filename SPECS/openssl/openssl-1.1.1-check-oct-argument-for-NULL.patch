@@ -11,7 +11,6 @@ Reviewed-by: Nikola Pajkovsky <nikolap@openssl.org>
 Reviewed-by: Neil Horman <nhorman@openssl.org>
 (Merged from https://github.com/openssl/premium/pull/12)
 
-Upstream Reference Patch: https://msazure.visualstudio.com/PlatformCrypto/_git/openssl-msft/commit/00a87a8e7bc2a3cc780fcd645c3c4341b7d1bc54?path=/crypto/pkcs12
 ---
  crypto/pkcs12/p12_decr.c | 6 ++++++
  1 file changed, 6 insertions(+)
