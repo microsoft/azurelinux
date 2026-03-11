@@ -6,6 +6,9 @@
 # Architectures this tag builds for
 arches = ["x86_64", "aarch64"]
 
+[distros.azurelinux-staging.rpms-build-tag.bootstrap]
+external-repositories = ["fedora-external", "fedora-external-updates"]
+
 # Mock build environment configuration (maps to Koji mock.* extras)
 [distros.azurelinux-staging.rpms-build-tag.mock]
 # parent = azl4-bootstrap-rpms-tag-20260307 (Will have to be injected by Control Tower)

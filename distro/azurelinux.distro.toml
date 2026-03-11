@@ -8,6 +8,15 @@ description = "Azure Linux Staging Repo"
 default-version = "4.0-stage1"
 branch = "toml/overrides/azurelinux-staging/main"
 
+[[distros.azurelinux-staging.projects]]
+name = "base"
+type = "git"
+uri = "?"
+path = "projects/azurelinux/base"
+branch = "main"
+auth = false
+
+
 [distros.azurelinux-staging.inputs]
 # Upstream package repositories to pull SPECs at buildtime.
 upstream-git-repos = ["azl4-fedora-mirror"]
