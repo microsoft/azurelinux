@@ -1974,7 +1974,6 @@
                 "rubygem-sys-filesystem",
                 "rubygem-thread_order",
                 "rusers",
-                "rust-afterburn",
                 "rust-cbindgen",
                 "s-nail",
                 "samba",
@@ -3179,6 +3178,7 @@
                 "coreos-init",
                 "ignition-flatcar",
                 "python-nocaselist",
+                "rust-afterburn",
                 "update-ssh-keys"
             ]
         },
