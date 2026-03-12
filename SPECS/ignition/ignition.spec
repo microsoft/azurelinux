@@ -56,7 +56,6 @@ Patch19:        0020-internal-exec-stages-mount-Mount-oem.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
-BuildRequires: go-rpm-macros
 BuildRequires: golang
 
 ExcludeArch: %{ix86}
