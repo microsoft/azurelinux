@@ -1,4 +1,4 @@
-[images.trident-vm-testimage]
+[custom-images.trident-vm-testimage]
 description = "Trident VM Test Image"
 image-type = "test-only"
 parent-image = "../../base/images/vm-base"

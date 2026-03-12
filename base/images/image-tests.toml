@@ -6,18 +6,18 @@ test-frameworks = ["LISA", "bvt"]
 test-suites = ["vm-smoke", "vm-network-functional", "vm-trident-crypto-functional"]
 
 [images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-smoke]
-# area = "core"
+area = "core"
 # category = "smoke"
 # priority = [0]
 # tags = ["baseline"]
-testcase_names = ["verify_vm_boot"]
+# testcase_names = ["verify_vm_boot"]
 
 [images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-network-functional]
 # area = "network"
 # category = "functional"
 # priority = [0, 1]
-# tags = ["sriov"]
-testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+tags = ["sriov"]
+# testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
 
 [images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional]
 # area = "core"
@@ -27,7 +27,7 @@ testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
 testcase_names = ["verify_openssl_basic", "verify_golang_sys_crypto", "verify_openssl_speed_test"]
 
 [images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional.requirements]
-image = "trident-vm-testimage"
+image = "custom-images.trident-vm-testimage"
 image-type = "test-only"
 distro = "azurelinux-custom"
 delivery-type = "SharedImageGallery"
@@ -37,10 +37,10 @@ test-suites = ["vm-bvt-smoke"]
 
 [images.vm-base.tests.test_suites_by_framework.bvt.tests_selectors.vm-bvt-smoke]
 # area = "core"
-# category = "smoke"
+category = "smoke"
 # priority = [0]
 # tags = ["baseline", "bvt"]
-testcase_names = ["verify_vm_boot"]
+# testcase_names = ["verify_vm_boot"]
 
 [images.container-base.tests]
 skus = ["Standard_F72s_v2", "VpnGw4"]
@@ -52,16 +52,16 @@ test-suites = ["container-smoke", "container-network-functional"]
 [images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-smoke]
 # area = "core"
 # category = "smoke"
-# priority = [0]
+priority = [0]
 # tags = ["baseline"]
-testcase_names = ["verify_container_start"]
+# testcase_names = ["verify_container_start"]
 
 [images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-network-functional]
-# area = "network"
+area = "network"
 # category = "functional"
 # priority = [0, 1]
 # tags = ["sriov"]
-testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+# testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
 
 [images.container-base.tests.test_suites_by_framework.bvt]
 test-suites = ["container-bvt-smoke"]
@@ -70,5 +70,5 @@ test-suites = ["container-bvt-smoke"]
 # area = "core"
 # category = "smoke"
 # priority = [0]
-# tags = ["baseline", "bvt"]
-testcase_names = ["verify_container_start"]
+tags = ["baseline", "bvt"]
+# testcase_names = ["verify_container_start"]
