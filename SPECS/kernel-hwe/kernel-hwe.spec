@@ -69,9 +69,7 @@ BuildRequires:  sed
 BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 BuildRequires:  python3-lxml
-%ifarch x86_64
 BuildRequires:  pciutils-devel
-%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -210,6 +208,10 @@ make -C tools/perf PYTHON=%{python3} all
 make -C tools turbostat cpupower
 %endif
 
+%ifarch aarch64
+make -C tools cpupower
+%endif
+
 #Compile bpftool
 make -C tools/bpf/bpftool
 
@@ -296,9 +298,14 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
-%ifarch x86_64
+%ifarch x86_64 aarch64
 # Install turbostat cpupower
-make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} cpupower_install
+%endif
+
+%ifarch x86_64 
+# Install turbostat cpupower
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install 
 %endif
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
@@ -390,17 +397,19 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%ifarch x86_64
 %{_sbindir}/cpufreq-bench
-%{_lib64dir}/libperf-jvmti.so
+%config(noreplace) %{_sysconfdir}/cpufreq-bench.conf
+%config(noreplace) %{_sysconfdir}/cpupower-service.conf
+%{_datadir}/bash-completion/completions/cpupower
+%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
+%{_mandir}/man1/cpupower*.1.gz
 %{_libdir}/libcpupower.so*
-%{_sysconfdir}/cpufreq-bench.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
 %{_includedir}/powercap.h
-%{_mandir}/man1/cpupower*.gz
+%ifarch x86_64
+%{_lib64dir}/libperf-jvmti.so
 %{_mandir}/man8/turbostat*.gz
-%{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
