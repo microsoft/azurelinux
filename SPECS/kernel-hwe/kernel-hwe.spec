@@ -410,7 +410,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %ifarch x86_64
 %{_lib64dir}/libperf-jvmti.so
 %{_mandir}/man8/turbostat*.gz
-%{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
 %{_libdir}/libperf-jvmti.so
