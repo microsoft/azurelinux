@@ -5,11 +5,10 @@ description: "[Skill] Batch-triage build failures from a JSON results file — d
 
 # Batch Build Triage
 
-Triage failed builds from a JSON results file. Diagnose each failure using sub-agents, bucketize by root cause, and produce a consolidated summary. This workflow handles any number of failures — from 1 to hundreds — using the same sub-agent dispatch pattern throughout.
+Triage failed builds from a JSON results file or control tower job id guid. Diagnose each failure using sub-agents, bucketize by root cause, and produce a consolidated summary. This workflow handles any number of failures — from 1 to hundreds — using the same sub-agent dispatch pattern throughout.
 
 ## Input Format
-
-The input results file is a JSON object with this structure:
+The input results file -- or the control tower MCP results -- is a JSON object with this structure:
 
 ```json
 {
