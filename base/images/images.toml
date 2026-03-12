@@ -1,9 +1,13 @@
+includes = ["image-tests.toml"]
+
 [images.vm-base]
 description = "VM Base Image"
+image-type = "1P"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
 [images.container-base]
 description = "Container Base Image"
+image-type = "3P"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
 
 # NOTE:
