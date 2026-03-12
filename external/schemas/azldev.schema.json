@@ -89,6 +89,11 @@
           "type": "array",
           "title": "Source files",
           "description": "Source files to download for this component"
+        },
+        "tests": {
+          "$ref": "#/$defs/TestsConfig",
+          "title": "Tests",
+          "description": "Test suites and selector criteria for validating this component"
         }
       },
       "additionalProperties": false,
@@ -417,6 +422,142 @@
           "$ref": "#/$defs/ImageDefinition",
           "title": "Definition",
           "description": "Identifies where to find the definition for this image"
+        },
+        "tests": {
+          "$ref": "#/$defs/TestsConfig",
+          "title": "Tests",
+          "description": "Test suites and selector criteria for validating this image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestsConfig": {
+      "properties": {
+        "skus": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "SKUs",
+          "description": "List of Azure SKUs the test suites should run against"
+        },
+        "test-suites": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test suites",
+          "description": "List of test suite names enabled for this target"
+        },
+        "tests_selectors": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TestSuiteSelector"
+          },
+          "type": "object",
+          "title": "Test selectors",
+          "description": "Selector criteria keyed by test suite name"
+        }
+      },
+      "required": [
+        "test-suites"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteSelector": {
+      "properties": {
+        "area": {
+          "type": "string",
+          "title": "Area",
+          "description": "Functional area that the test suite targets"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "description": "Category of tests such as smoke or functional"
+        },
+        "priority": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Priority",
+          "description": "Priority levels used to filter tests"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Tags",
+          "description": "Tags used to select tests"
+        },
+        "testcase_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test case names",
+          "description": "Explicit list of test case names to run"
+        },
+        "requirements": {
+          "$ref": "#/$defs/TestSuiteRequirements",
+          "title": "Requirements",
+          "description": "Optional environment requirements for this selector"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "area"
+          ]
+        },
+        {
+          "required": [
+            "category"
+          ]
+        },
+        {
+          "required": [
+            "priority"
+          ]
+        },
+        {
+          "required": [
+            "tags"
+          ]
+        },
+        {
+          "required": [
+            "testcase_names"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteRequirements": {
+      "properties": {
+        "image": {
+          "type": "string",
+          "title": "Image",
+          "description": "Specific image identifier required by this test selector"
+        },
+        "image-type": {
+          "type": "string",
+          "title": "Image type",
+          "description": "Image type required by this test selector"
+        },
+        "distro": {
+          "type": "string",
+          "title": "Distro",
+          "description": "Distro required by this test selector"
+        },
+        "delivery-type": {
+          "type": "string",
+          "title": "Delivery type",
+          "description": "Delivery channel required by this test selector"
         }
       },
       "additionalProperties": false,
