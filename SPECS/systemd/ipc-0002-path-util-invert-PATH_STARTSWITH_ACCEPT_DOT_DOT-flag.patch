@@ -1,0 +1,92 @@
+From 0b9afe68a36c751113e5abbc41964adb42009b16 Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Fri, 23 May 2025 06:45:40 +0200
+Subject: [PATCH 2/4] path-util: invert PATH_STARTSWITH_ACCEPT_DOT_DOT flag
+
+As requested: https://github.com/systemd/systemd/pull/37572#pullrequestreview-2861928094
+
+(cherry picked from commit ceed11e465f1c8efff1931412a85924d9de7c08d)
+(cherry picked from commit 7ac3220213690e8a8d6d2a6e81e43bd1dce01d69)
+---
+ src/basic/fs-util.c   | 2 +-
+ src/basic/mkdir.c     | 4 ++--
+ src/basic/path-util.c | 4 ++--
+ src/basic/path-util.h | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/basic/fs-util.c b/src/basic/fs-util.c
+index 8b2f6cc087..5e853a863a 100644
+--- a/src/basic/fs-util.c
++++ b/src/basic/fs-util.c
+@@ -67,7 +67,7 @@ int rmdir_parents(const char *path, const char *stop) {
+                 assert(*slash == '/');
+                 *slash = '\0';
+ 
+-                if (path_startswith_full(stop, p, /* flags= */ 0))
++                if (path_startswith_full(stop, p, PATH_STARTSWITH_REFUSE_DOT_DOT))
+                         return 0;
+ 
+                 if (rmdir(p) < 0 && errno != ENOENT)
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index 454739679c..361c142ebe 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -92,7 +92,7 @@ int mkdir_parents_internal(const char *prefix, const char *path, mode_t mode, ui
+         assert(_mkdirat != mkdirat);
+ 
+         if (prefix) {
+-                p = path_startswith_full(path, prefix, /* flags= */ 0);
++                p = path_startswith_full(path, prefix, PATH_STARTSWITH_REFUSE_DOT_DOT);
+                 if (!p)
+                         return -ENOTDIR;
+         } else
+@@ -137,7 +137,7 @@ int mkdir_parents_internal(const char *prefix, const char *path, mode_t mode, ui
+ 
+                 s[n] = '\0';
+ 
+-                if (!prefix || !path_startswith_full(prefix, path, /* flags= */ 0)) {
++                if (!prefix || !path_startswith_full(prefix, path, PATH_STARTSWITH_REFUSE_DOT_DOT)) {
+                         r = mkdir_safe_internal(path, mode, uid, gid, flags, _mkdirat);
+                         if (r < 0 && r != -EEXIST)
+                                 return r;
+diff --git a/src/basic/path-util.c b/src/basic/path-util.c
+index 9b44d5735c..47266b8206 100644
+--- a/src/basic/path-util.c
++++ b/src/basic/path-util.c
+@@ -447,11 +447,11 @@ char* path_startswith_full(const char *original_path, const char *prefix, PathSt
+                 const char *p, *q;
+                 int m, n;
+ 
+-                m = path_find_first_component(&path, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &p);
++                m = path_find_first_component(&path, !FLAGS_SET(flags, PATH_STARTSWITH_REFUSE_DOT_DOT), &p);
+                 if (m < 0)
+                         return NULL;
+ 
+-                n = path_find_first_component(&prefix, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &q);
++                n = path_find_first_component(&prefix, !FLAGS_SET(flags, PATH_STARTSWITH_REFUSE_DOT_DOT), &q);
+                 if (n < 0)
+                         return NULL;
+ 
+diff --git a/src/basic/path-util.h b/src/basic/path-util.h
+index 763d1fe1a1..c16c525464 100644
+--- a/src/basic/path-util.h
++++ b/src/basic/path-util.h
+@@ -59,13 +59,13 @@ int path_make_absolute_cwd(const char *p, char **ret);
+ int path_make_relative(const char *from, const char *to, char **ret);
+ 
+ typedef enum PathStartWithFlags {
+-        PATH_STARTSWITH_ACCEPT_DOT_DOT       = 1U << 0,
++        PATH_STARTSWITH_REFUSE_DOT_DOT       = 1U << 0,
+         PATH_STARTSWITH_RETURN_LEADING_SLASH = 1U << 1,
+ } PathStartWithFlags;
+ 
+ char* path_startswith_full(const char *path, const char *prefix, PathStartWithFlags flags) _pure_;
+ static inline char* path_startswith(const char *path, const char *prefix) {
+-        return path_startswith_full(path, prefix, PATH_STARTSWITH_ACCEPT_DOT_DOT);
++        return path_startswith_full(path, prefix, 0);
+ }
+ int path_compare(const char *a, const char *b) _pure_;
+ 
+-- 
+2.51.0
+
