@@ -1,6 +1,5 @@
 [images.vm-base]
 description = "VM Base Image"
-name = "Azure Linux 4"
 distro = "azurelinux"
 definition = { type = "kiwi", path = "vm-base.kiwi" }
 

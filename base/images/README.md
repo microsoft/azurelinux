@@ -10,5 +10,3 @@ The schema in `external/schemas/azldev.schema.json` has been extended accordingl
 
 # Notes
 - 'distro` is a required field in the image manifest, but it is not used by azldev at this time. It is intended for use by downstream tooling such as TEE to categorize images by their base distribution.
-
-- Introduced `name` alongside `description` in the image manifest. The `name` field is intended to be a concise identifier for the image, while `description` can provide more detailed information. Thoughts?

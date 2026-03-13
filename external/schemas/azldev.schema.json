@@ -403,11 +403,6 @@
           "title": "Description",
           "description": "Description of the image"
         },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "Human readable image name exposed to downstream consumers"
-        },
         "distro": {
           "type": "string",
           "title": "Distro",
