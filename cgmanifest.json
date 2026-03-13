@@ -28757,7 +28757,7 @@
         "other": {
           "name": "swtpm",
           "version": "0.8.1",
-          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/d2849a9f5ced70438d67036693438344b47b4161/swtpm-d2849a9.tar.gz"
+          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/2ae7b019370760e17f4f2675195a91ca53950eda/swtpm-2ae7b0.tar.gz"
         }
       }
     },
