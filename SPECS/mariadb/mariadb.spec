@@ -1,7 +1,6 @@
 # Plain package name for cases, where %%{name} differs (e.g. for versioned packages)
 %global majorname mariadb
-%define package_version 10.11.15
-%define majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
+%define majorversion 10.11
 
 %define _vpath_builddir .
 
@@ -131,7 +130,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
  
 Name:             %{majorname}
-Version:          %{package_version}
+Version:          10.11.16
 Release:          1%{?dist}
 Epoch:            3
  
@@ -1484,7 +1483,7 @@ fi
 %{_mandir}/man1/galera_recovery.1*
 %config(noreplace) %{_sysconfdir}/my.cnf.d/galera.cnf
 %attr(0640,root,root) %ghost %config(noreplace) %{_sysconfdir}/sysconfig/clustercheck
-#%{_datadir}/selinux/packages/targeted/%{majorname}-server-galera.pp
+#%%{_datadir}/selinux/packages/targeted/%%{majorname}-server-galera.pp
 %endif
  
 %files -n %{pkgname}-server
@@ -1769,6 +1768,9 @@ fi
 %endif
  
 %changelog
+* Sun Mar 08 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3:10.11.16-1
+- Upgrade to 10.11.16 for CVE-2026-3494
+
 * Mon Dec 29 2025 BinduSri Adabala <v-badabala@microsoft.com> - 10.11.15-1
 - Upgrade to 10.11.15 for CVE-2025-13699
 
@@ -1779,9 +1781,6 @@ fi
 
 * Thu Mar 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.11-1
 - Auto-upgrade to 10.11.11 - for CVE-2025-21490
-
-* Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
-- Auto-upgrade to 10.11.10 - to address CVE-2024-21096
 
 * Wed Feb 05 2025 Michal Schorm <mschorm@redhat.com> - 3:10.11.11-1
 - Rebase to 10.11.11
@@ -1797,7 +1796,10 @@ fi
  
 * Sat Nov 16 2024 Michal Schorm <mschorm@redhat.com> - 3:10.11.10-1
 - Rebase to 10.11.10
- 
+
+* Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
+- Auto-upgrade to 10.11.10 - to address CVE-2024-21096
+
 * Tue Aug 13 2024 Michal Schorm <mschorm@redhat.com> - 3:10.11.9-1
 - Rebase to 10.11.9
  
