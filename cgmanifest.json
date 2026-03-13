@@ -2086,6 +2086,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "coreos-cloudinit",
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/flatcar/coreos-cloudinit/archive/1c1d7f4ae6b933350d7fd36e882dda170123cccc.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coreos-init",
+          "version": "0.0.1",
+          "downloadUrl": "https://github.com/flatcar/init/archive/8bd8a82fb22bc46ea2cf7da94d58655e102ca26d/init-8bd8a82fb22bc46ea2cf7da94d58655e102ca26d.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "coredns",
           "version": "1.11.4",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.11.4.tar.gz"
