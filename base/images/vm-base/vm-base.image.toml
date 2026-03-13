@@ -1,0 +1,30 @@
+[images.vm-base]
+description = "VM Base Image"
+name = "Azure Linux 4"
+distro = "azurelinux"
+definition = { type = "kiwi", path = "vm-base.kiwi" }
+
+[images.vm-base.delivery.marketplace]
+publisher = "MicrosoftCBLMariner"
+offer = "azure-linux-4"
+sku_prefix = "azure-linux-4"
+version = "*"
+
+[images.vm-base.delivery.vhd]
+vhd_path = "*"
+
+[images.vm-base.delivery.shared_gallery]
+subscription_id = "*"
+resource_group_name = "*"
+image_gallery = "*"
+image_definition = "*"
+image_version = "*"
+
+[images.vm-base.variants]
+architectures = [
+    "amd64",
+    "arm64",
+]
+hyperv_generations = [
+    "gen2",
+]
