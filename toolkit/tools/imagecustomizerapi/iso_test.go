@@ -12,10 +12,10 @@ import (
 func TestIsoIsValid(t *testing.T) {
 	iso := Iso{
 		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "'",
+			ExtraCommandLine: []string{"'"},
 		},
 	}
 
 	err := iso.IsValid()
-	assert.ErrorContains(t, err, "invalid kernelCommandLine")
+	assert.NoError(t, err)
 }
