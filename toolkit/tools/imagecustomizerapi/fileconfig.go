@@ -18,10 +18,10 @@ type FileConfigList []FileConfig
 // FileConfig specifies options for how a file is copied in the target OS.
 type FileConfig struct {
 	// The file path in the target OS that the file will be copied to.
-	Path string `yaml:"Path"`
+	Path string `yaml:"path"`
 
 	// The file permissions to set on the file.
-	Permissions *FilePermissions `yaml:"Permissions"`
+	Permissions *FilePermissions `yaml:"permissions"`
 }
 
 var (
@@ -70,14 +70,14 @@ func (l *FileConfigList) UnmarshalYAML(value *yaml.Node) error {
 func (f *FileConfig) IsValid() (err error) {
 	// Path
 	if f.Path == "" {
-		return fmt.Errorf("invalid Path value: empty string")
+		return fmt.Errorf("invalid path value: empty string")
 	}
 
 	// Permissions
 	if f.Permissions != nil {
 		err = f.Permissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid Permissions value:\n%w", err)
+			return fmt.Errorf("invalid permissions value:\n%w", err)
 		}
 	}
 
