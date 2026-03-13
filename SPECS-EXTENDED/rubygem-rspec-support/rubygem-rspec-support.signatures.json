@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "rubygem-rspec-support-3.12.0.tar.gz": "0b42df9613ac8033f9ac3b2f529deb2f0bf323528b91afbbbb12360b54fd1fcf"
+  "rspec-related-create-full-tarball.sh": "af6dd6d70935e1f7d897b3671d98df339185810668016aa55a36d03fdad52a01",
+  "rubygem-rspec-support-3.13.1.tar.gz": "3bc8bfa7a41ac4780b2570bd91afe1b4f304330de26d9497f90ba7122d342711"
  }
 }
