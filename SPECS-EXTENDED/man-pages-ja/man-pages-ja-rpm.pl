@@ -21,7 +21,7 @@ for($i=0; $i<=$n; $i++) {
 }
 print "C\n";
 
-for($i=0; $i<=171; $i++) {
+for($i=0; $i<=145; $i++) {
   print "0\n";
 }
 print "C\n";
