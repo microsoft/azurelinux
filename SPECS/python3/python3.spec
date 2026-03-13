@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,8 @@ Patch10:        CVE-2025-11468.patch
 Patch11:        CVE-2026-0672.patch
 Patch12:        CVE-2026-0865.patch
 Patch13:        CVE-2026-1299.patch
+
+Patch1001:      CVE-2026-1703.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -140,7 +142,13 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%autosetup -p1 -n Python-%{version}
+%autosetup -p1 -n Python-%{version} -N
+%autopatch -p1 -m 0 -M 1000
+
+pushd Lib/ensurepip/_bundled
+unzip pip-24.3.1-py3-none-any.whl
+%autopatch -p1 -m 1001
+popd
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -252,6 +260,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Feb 27 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.12.9-10
+- Patch for CVE-2026-1703
+
 * Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-9
 - Patch for CVE-2026-1299
 
@@ -284,7 +295,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Thu Jan 30 2025 Bala <balakumaran.kannan@microsoft.com> - 3.12.3-6
 - Patch CVE-2023-27043
 
-* Mon Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
+* Tue Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
 - Patch CVE-2024-12254
 
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4
