@@ -11,8 +11,8 @@
 
 Summary: TPM Emulator
 Name:           swtpm
-Version:        0.8.0
-Release:        1%{?dist}
+Version:        0.8.1
+Release:        13%{?dist}
 License:        BSD-3-Clause
 URL:            http://github.com/stefanberger/swtpm
 Vendor:         Microsoft Corporation
