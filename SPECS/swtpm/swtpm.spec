@@ -2,7 +2,7 @@
 
 %global gitdate     20221110
 %global gitcommit   2ae7b019370760e17f4f2675195a91ca53950eda
-%global gitshortcommit  %(c=%{gitcommit}; echo ${c:0:7})
+%global gitshortcommit  %(c=%{gitcommit}; echo ${c:0:6})
 
 # Macros needed by SELinux
 %global selinuxtype targeted
