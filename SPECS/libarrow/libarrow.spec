@@ -119,6 +119,20 @@ Requires:	zlib-devel
 %description devel
 Libraries and header files for Apache Arrow C++.
 
+%package acero
+Summary: Runtime libraries for Apache Arrow Acero
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description acero
+Runtime shared library for Apache Arrow Acero execution engine.
+
+%package dataset
+Summary: Runtime libraries for Apache Arrow Dataset
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description dataset
+Runtime shared library for Apache Arrow Dataset component.
+
 #--------------------------------------------------------------------
  
 %package -n parquet-libs
@@ -196,6 +210,13 @@ popd
 
 %files
 %{_libdir}/libarrow.so.*
+%{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
+
+%files acero
+%{_libdir}/libarrow_acero.so.*
+
+%files dataset
+%{_libdir}/libarrow_dataset.so.*
 
 %files doc
 %license LICENSE.txt
@@ -204,36 +225,37 @@ popd
 %exclude %{_docdir}/arrow/
  
 %files devel
+%{_libdir}/libarrow_acero.so
+%{_libdir}/libarrow_dataset.so
 %dir %{_includedir}/arrow/
      %{_includedir}/arrow/*
-%exclude %{_includedir}/arrow/dataset/
-%if %{with use_flight}
-%exclude %{_includedir}/arrow/flight/
-%exclude %{_includedir}/arrow-flight-glib
-%endif
 %exclude %{_libdir}/cmake/Arrow/FindBrotliAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findlz4Alt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindORC.cmake
-%exclude %{_libdir}/cmake/Arrow/FindorcAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/FindSnappyAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindgRPCAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findre2Alt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findutf8proc.cmake
-%exclude %{_libdir}/cmake/Arrow/FindzstdAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindThriftAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/FindOpenSSLAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindProtobufAlt.cmake
 %dir %{_libdir}/cmake/Arrow/
      %{_libdir}/cmake/Arrow/ArrowConfig*.cmake
      %{_libdir}/cmake/Arrow/ArrowOptions.cmake
      %{_libdir}/cmake/Arrow/ArrowTargets*.cmake
      %{_libdir}/cmake/Arrow/arrow-config.cmake
+
+# CMake package config files for component libraries
+%{_libdir}/cmake/ArrowAcero/*.cmake
+%{_libdir}/cmake/ArrowDataset/*.cmake
+
 %{_libdir}/libarrow.so
 %{_libdir}/pkgconfig/arrow-compute.pc
 %{_libdir}/pkgconfig/arrow-csv.pc
 %{_libdir}/pkgconfig/arrow-filesystem.pc
 %{_libdir}/pkgconfig/arrow-json.pc
 %{_libdir}/pkgconfig/arrow.pc
+
+# pkg-config files for component libraries
+%{_libdir}/pkgconfig/arrow-acero.pc
+%{_libdir}/pkgconfig/arrow-dataset.pc
+
 %{_datadir}/arrow/gdb/gdb_arrow.py
 #%%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
 
