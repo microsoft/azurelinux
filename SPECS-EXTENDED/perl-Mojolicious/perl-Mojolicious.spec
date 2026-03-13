@@ -1,13 +1,12 @@
-Name:           perl-Mojolicious
-Version:        8.57
-Release:        3%{?dist}
-Summary:        A next generation web framework for Perl
-License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Mojolicious
+Version:        9.37
+Release:        3%{?dist}
+Summary:        A next generation web framework for Perl
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/Mojolicious
-Source0:        http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz
-
+Source0:        https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -73,12 +72,13 @@ BuildRequires:  perl(Unicode::Normalize)
 BuildRequires:  perl(utf8)
 # Optional run-time:
 BuildRequires:  perl(Role::Tiny) >= 2.000001
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Tests:
 BuildRequires:  perl(base)
 BuildRequires:  perl(IO::Socket::INET)
 BuildRequires:  perl(lib)
 # Test::Future::AsyncAwait::Awaitable not used
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Suggests:       perl(Cpanel::JSON::XS) >= 4.09
 Requires:       perl(experimental)
 Requires:       perl(FindBin)
@@ -101,7 +101,6 @@ Requires:       perl(Time::Local) >= 1.2
 
 %package -n perl-Test-Mojo
 Summary:        Test::Mojo perl Module
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 
 %description -n perl-Test-Mojo
 %{summary}
@@ -144,8 +143,169 @@ mv README.md lib/Mojolicious/
 %{perl_vendorlib}/Test
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.57-3
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Wed Dec 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 9.37-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.37-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun May 19 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 9.37-1
+- Update to 9.37
+
+* Sun Mar 10 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 9.36-1
+- Update to 9.36
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.35-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.35-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Oct 29 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 9.35-1
+- Update to 9.35
+
+* Mon Sep 11 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 9.34-1
+- Update to 9.34
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jun 25 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 9.33-1
+- Update to 9.33
+- Migrate License tag to SPDX
+
+* Sun May 14 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 9.32-1
+- Update to 9.32
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Dec 25 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.31-1
+- Update to 9.31
+
+* Mon Nov 28 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.30-1
+- Update to 9.30
+
+* Sun Nov 13 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.29-1
+- Update to 9.29
+
+* Mon Sep 12 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.27-1
+- Update to 9.27
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.26-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 06 2022 Jitka Plesnikova <jplesnik@redhat.com> - 9.26-2
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Sun Jun 05 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.26-1
+- Update to 9.26
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 9.25-2
+- Perl 5.36 rebuild
+
+* Sun May 01 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.25-1
+- Update to 9.25
+
+* Sun Apr 24 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.24-1
+- Update to 9.24
+
+* Sun Mar 27 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 9.23-1
+- Update to 9.23
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.22-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Oct 24 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.22-1
+- Update to 9.22
+
+* Sun Aug 29 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.21-1
+- Update to 9.21
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 9.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun Jun 06 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.19-1
+- Update to 9.19
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 9.18-2
+- Perl 5.34 re-rebuild updated packages
+
+* Sun May 23 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.18-1
+- Update to 9.18
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 9.17-2
+- Perl 5.34 rebuild
+
+* Sun Apr 18 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.17-1
+- Update to 9.17
+
+* Sat Apr 10 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.16-1
+- Update to 9.16
+
+* Sun Mar 28 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.14-1
+- Update to 9.14
+
+* Sun Mar 21 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.12-1
+- Update to 9.12
+
+* Sun Mar 14 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.09-1
+- Update to 9.09
+
+* Sun Mar 14 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.08-1
+- Update to 9.08
+
+* Sun Mar 07 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.03-1
+- Update to 9.03
+
+* Sun Mar 07 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.02-1
+- Update to 9.02
+
+* Sun Feb 21 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.01-1
+- Update to 9.01
+
+* Sun Feb 14 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 9.0-1
+- Update to 9.0
+
+* Sun Feb 07 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 8.73-1
+- Update to 8.73
+
+* Sun Jan 31 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 8.72-1
+- Update to 8.72
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 8.71-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 17 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 8.71-1
+- Update to 8.71
+
+* Sun Jan 03 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 8.70-1
+- Update to 8.70
+
+* Sun Dec 06 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.67-1
+- Update to 8.67
+
+* Sun Nov 15 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.65-1
+- Update to 8.65
+
+* Sun Nov 08 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.64-1
+- Update to 8.64
+
+* Sun Oct 18 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.63-1
+- Update to 8.63
+
+* Sun Oct 04 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.61-1
+- Update to 8.61
+
+* Sun Sep 27 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.60-1
+- Update to 8.60
+
+* Sun Sep 13 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.59-1
+- Update to 8.59
+
+* Sun Aug 16 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 8.58-1
+- Update to 8.58
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 8.57-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
