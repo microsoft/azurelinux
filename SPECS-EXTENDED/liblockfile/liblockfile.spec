@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           liblockfile
-Version:        1.14
-Release:        6%{?dist}
+Version:        1.17
+Release:        1%{?dist}
 Summary:        This implements a number of functions found in -lmail on SysV systems
 
 # regarding license please see file COPYRIGHT
 License:        GPLv2+ and LGPLv2+
 URL:            http://packages.qa.debian.org/libl/liblockfile.html
-Source0:        http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_%{version}.orig.tar.gz
+Source0:        https://github.com/miquels/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 
@@ -30,7 +30,7 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n %{name}
+%autosetup -n %{name}-%{version}
 
 # remove -g root from install
 sed -i "s/-g root//" Makefile.in
@@ -69,6 +69,10 @@ ldconfig -N -n %{buildroot}/%{_libdir}
 
 
 %changelog
+* Thu Nov 07 2021 Kevin Lockwood <v-klockwood@microsoft.com> - 1.17-1
+- Update to 1.17
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
