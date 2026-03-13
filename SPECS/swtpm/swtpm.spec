@@ -1,7 +1,7 @@
 %bcond_without gnutls
 
-%global gitdate     20230815
-%global gitcommit   d2849a9f5ced70438d67036693438344b47b4161
+%global gitdate     20221110
+%global gitcommit   2ae7b019370760e17f4f2675195a91ca53950eda
 %global gitshortcommit  %(c=%{gitcommit}; echo ${c:0:7})
 
 # Macros needed by SELinux
@@ -11,13 +11,14 @@
 
 Summary: TPM Emulator
 Name:           swtpm
-Version:        0.8.1
-Release:        5%{?dist}
+Version:        0.8.0
+Release:        1%{?dist}
 License:        BSD-3-Clause
 URL:            http://github.com/stefanberger/swtpm
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        %{url}/archive/%{gitcommit}/%{name}-%{gitshortcommit}.tar.gz
+Patch0:         0001-swtpm_setup-fix-Werror-maybe-uninitialized.patch
 
 BuildRequires:  make
 BuildRequires:  git-core

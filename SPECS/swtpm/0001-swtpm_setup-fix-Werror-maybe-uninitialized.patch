@@ -1,0 +1,37 @@
+From 95cd8db3dc822d8f741b90d560e50f44841f9d29 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 22 Nov 2022 11:24:57 +0400
+Subject: [PATCH] swtpm_setup: fix -Werror=maybe-uninitialized
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+/usr/include/glib-2.0/glib/glib-autocleanups.h:30:3: error: ‘argv’ may be used uninitialized [-Werror=maybe-uninitialized]
+   30 |   g_free (*pp);
+      |   ^~~~~~~~~~~~
+swtpm_setup.c: In function ‘get_swtpm_capabilities.constprop.0’:
+swtpm_setup.c:940:24: note: ‘argv’ was declared here
+  940 |     g_autofree gchar **argv;
+      |                        ^~~~
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ src/swtpm_setup/swtpm_setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/swtpm_setup/swtpm_setup.c b/src/swtpm_setup/swtpm_setup.c
+index 1b528c8..3570235 100644
+--- a/src/swtpm_setup/swtpm_setup.c
++++ b/src/swtpm_setup/swtpm_setup.c
+@@ -937,7 +937,7 @@ static int get_swtpm_capabilities(gchar **swtpm_prg_l, gboolean is_tpm2,
+     gchar *my_argv[] = { "--print-capabilities", is_tpm2 ? "--tpm2" : NULL, NULL };
+     g_autofree gchar *logop = NULL;
+     g_autoptr(GError) error = NULL;
+-    g_autofree gchar **argv;
++    g_autofree gchar **argv = NULL;
+     int exit_status = 0;
+     gboolean success;
+     int ret = 1;
+-- 
+2.38.1
+
