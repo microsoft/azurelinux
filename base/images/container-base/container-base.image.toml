@@ -1,0 +1,4 @@
+[images.container-base]
+description = "Container Base Image"
+distro = "azurelinux"
+definition = { type = "kiwi", path = "container-base.kiwi" }

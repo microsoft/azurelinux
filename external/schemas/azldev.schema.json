@@ -403,10 +403,193 @@
           "title": "Description",
           "description": "Description of the image"
         },
+        "distro": {
+          "type": "string",
+          "title": "Distro",
+          "description": "Distribution identifier for the image"
+        },
         "definition": {
           "$ref": "#/$defs/ImageDefinition",
           "title": "Definition",
           "description": "Identifies where to find the definition for this image"
+        },
+        "delivery": {
+          "$ref": "#/$defs/ImageDeliveryConfig",
+          "title": "Delivery configuration",
+          "description": "Delivery mechanisms and publish-time metadata available for this image"
+        },
+        "variants": {
+          "$ref": "#/$defs/ImageVariantsConfig",
+          "title": "Variants",
+          "description": "Allowed variant values for this image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageDeliveryConfig": {
+      "properties": {
+        "marketplace": {
+          "$ref": "#/$defs/ImageMarketplaceDeliveryConfig",
+          "title": "Marketplace delivery",
+          "description": "Azure Marketplace delivery metadata"
+        },
+        "vhd": {
+          "$ref": "#/$defs/ImageVhdDeliveryConfig",
+          "title": "VHD delivery",
+          "description": "VHD delivery metadata"
+        },
+        "shared_gallery": {
+          "$ref": "#/$defs/ImageSharedGalleryDeliveryConfig",
+          "title": "Shared gallery delivery",
+          "description": "Shared Image Gallery delivery metadata"
+        },
+        "community_gallery": {
+          "$ref": "#/$defs/ImageCommunityGalleryDeliveryConfig",
+          "title": "Community gallery delivery",
+          "description": "Community gallery delivery metadata"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageMarketplaceDeliveryConfig": {
+      "properties": {
+        "publisher": {
+          "type": "string",
+          "title": "Publisher",
+          "description": "Azure Marketplace publisher"
+        },
+        "offer": {
+          "type": "string",
+          "title": "Offer",
+          "description": "Azure Marketplace offer"
+        },
+        "sku_prefix": {
+          "type": "string",
+          "title": "SKU prefix",
+          "description": "SKU prefix before architecture or generation suffixes are applied"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "Marketplace version or placeholder to be resolved during fulfillment"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageVhdDeliveryConfig": {
+      "properties": {
+        "vhd_path": {
+          "type": "string",
+          "title": "VHD path",
+          "description": "VHD URL or placeholder to be resolved during fulfillment"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageSharedGalleryCapabilityConfig": {
+      "properties": {
+        "accelerated_networking": {
+          "type": "boolean",
+          "title": "Accelerated networking",
+          "description": "Whether accelerated networking is supported"
+        },
+        "hibernation_support": {
+          "type": "boolean",
+          "title": "Hibernation support",
+          "description": "Whether hibernation is supported"
+        },
+        "high_perf_nvme": {
+          "type": "boolean",
+          "title": "High performance NVMe",
+          "description": "Whether high performance NVMe is supported"
+        },
+        "security_type": {
+          "type": "string",
+          "title": "Security type",
+          "description": "Security type exposed by the published image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageSharedGalleryDeliveryConfig": {
+      "properties": {
+        "subscription_id": {
+          "type": "string",
+          "title": "Subscription ID",
+          "description": "Azure subscription ID or placeholder"
+        },
+        "resource_group_name": {
+          "type": "string",
+          "title": "Resource group name",
+          "description": "Resource group name or placeholder"
+        },
+        "image_gallery": {
+          "type": "string",
+          "title": "Image gallery",
+          "description": "Shared Image Gallery name or placeholder"
+        },
+        "image_definition": {
+          "type": "string",
+          "title": "Image definition",
+          "description": "Shared Image Gallery image definition name or placeholder"
+        },
+        "image_version": {
+          "type": "string",
+          "title": "Image version",
+          "description": "Shared Image Gallery version or placeholder"
+        },
+        "capability": {
+          "$ref": "#/$defs/ImageSharedGalleryCapabilityConfig",
+          "title": "Capabilities",
+          "description": "Capability metadata exposed for the shared gallery image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageCommunityGalleryDeliveryConfig": {
+      "properties": {
+        "image_gallery": {
+          "type": "string",
+          "title": "Image gallery",
+          "description": "Community gallery name or placeholder"
+        },
+        "image_definition": {
+          "type": "string",
+          "title": "Image definition",
+          "description": "Community gallery image definition name or placeholder"
+        },
+        "image_version": {
+          "type": "string",
+          "title": "Image version",
+          "description": "Community gallery image version or placeholder"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageVariantsConfig": {
+      "properties": {
+        "architectures": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Architectures",
+          "description": "Allowed architecture values for this image"
+        },
+        "hyperv_generations": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Hyper-V generations",
+          "description": "Allowed Hyper-V generation values for this image"
         }
       },
       "additionalProperties": false,
