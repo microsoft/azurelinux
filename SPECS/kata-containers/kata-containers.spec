@@ -39,7 +39,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -51,6 +51,7 @@ Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2023-39325.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2023-44487.patch
+Patch4:         CVE-2025-53605.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -91,10 +92,11 @@ Requires:       curl
 This package contains the UVM osbuilder files
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -N -n %{name}-%{version}
 
 cd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
+%autopatch -p1
 
 # Not using gobuild here in order to stick to how upstream builds
 # (This builds multiple binaries)
@@ -219,6 +221,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Fri Sep 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.2.0.azl2-8
+- Add patch for CVE-2025-53605
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.0.azl-7
 - Bump release to rebuild with golang
 
