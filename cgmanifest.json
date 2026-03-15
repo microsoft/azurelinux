@@ -1226,6 +1226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bootengine",
+          "version": "0.0.38",
+          "downloadUrl": "https://github.com/flatcar/bootengine/archive/daf43bf9c1ca45bf1a43566c3a6f96ec0cb44a36.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "booth",
           "version": "1.2",
           "downloadUrl": "https://github.com/ClusterLabs/booth/releases/download/v1.2/booth-1.2.tar.gz"
