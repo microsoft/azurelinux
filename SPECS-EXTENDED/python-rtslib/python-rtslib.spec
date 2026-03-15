@@ -4,29 +4,27 @@
 %bcond_with apidocs
 
 Name:             python-rtslib
-License:          ASL 2.0
+License:          Apache-2.0
+Vendor:           Microsoft Corporation
+Distribution:     Azure Linux
 Summary:          API for Linux kernel LIO SCSI target
-Version:          2.1.fb69
-Release:          9%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Version:          2.1.76
+Release:          10%{?dist}
 URL:              https://github.com/open-iscsi/%{oname}
-Source:           %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
-Source1:          target.service
+Source0:          %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:           0001-disable-xen_pvscsi.patch
+Patch1:           0002-rtslib-explicitely-import-kmod.error-and-kmod.Kmod.patch
 BuildArch:        noarch
 %if %{with apidocs}
 BuildRequires:    epydoc
 %endif
 BuildRequires:    systemd
 
-
 %global _description\
 API for generic Linux SCSI kernel target. Includes the 'target'\
 service and targetctl tool for restoring configuration.
 
 %description %_description
-
 
 %if %{with apidocs}
 %package doc
@@ -57,7 +55,6 @@ Obsoletes:      %{name}-doc < %{version}-%{release}
 %description -n python3-rtslib
 API for generic Linux SCSI kernel target.
 
-
 %package -n target-restore
 Summary:          Systemd service for targetcli/rtslib
 Requires:         python3-rtslib = %{version}-%{release}
@@ -69,11 +66,8 @@ Requires(postun): systemd
 Systemd service to restore the LIO kernel target settings
 on system restart.
 
-
 %prep
-%setup -q -n %{oname}-%{version}
-%patch 0 -p1
-
+%autosetup -p1 -n %{oname}-%{version}
 
 %build
 %py3_build
@@ -93,7 +87,7 @@ mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_sysconfdir}/target/backup
 mkdir -p %{buildroot}%{_localstatedir}/target/pr
 mkdir -p %{buildroot}%{_localstatedir}/target/alua
-install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/target.service
+install -m 644 systemd/target.service %{buildroot}%{_unitdir}/target.service
 install -m 644 doc/targetctl.8 %{buildroot}%{_mandir}/man8/
 install -m 644 doc/saveconfig.json.5 %{buildroot}%{_mandir}/man5/
 
@@ -129,8 +123,81 @@ install -m 644 doc/saveconfig.json.5 %{buildroot}%{_mandir}/man5/
 %endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.fb69-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 2.1.76-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.76-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.1.76-8
+- Rebuilt for Python 3.13
+
+* Mon Feb 12 2024 Maurizio Lombardi <mlombard@redhat.com> - 2.1.76-7
+- Migrated to SPDX license
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.76-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.76-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 02 2023 Maurizio Lombardi <mlombard@redhat.com> - 2.1.76-4
+- Fix kmod import
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.76-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 07 2023 Python Maint <python-maint@redhat.com> - 2.1.76-2
+- Rebuilt for Python 3.12
+
+
+* Tue Jun 06 2023 Maurizio Lombardi <mlombard@redhat.com> - 2.1.76-1
+- Rebase to version 2.1.76
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.75-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.75-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.1.75-2
+- Rebuilt for Python 3.11
+
+* Mon May 16 2022 Maurizio Lombardi <mlombard@redhat.com> - 2.1.75-1
+- Update to new upstream version
+
+* Wed Mar 30 2022 Maurizio Lombardi <mlombard@redhat.com> - 2.1.74-7
+- Add support for cpus_allowed_list attribute
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.74-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.74-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.1.74-4
+- Rebuilt for Python 3.10
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.1.74-3
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.74-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 31 2020 Maurizio Lombardi <mlombard@redhat.com> - 2.1.74-1
+- New upstream version
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.73-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jun 25 2020 Matt Coleman <matt@datto.com> - 2.1.73-1
+- New upstream version
+- Use upstream's systemd service
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.1.fb69-9
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.fb69-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
