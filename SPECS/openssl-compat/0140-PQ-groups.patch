@@ -1,0 +1,12 @@
+diff -up a/ssl/t1_trce.c.fix b/ssl/t1_trce.c
+--- a/ssl/t1_trce.c.fix	2025-07-14 11:32:51.925210715 +0200
++++ b/ssl/t1_trce.c	2025-07-14 11:33:10.846723010 +0200
+@@ -545,6 +545,8 @@ static const ssl_trace_tbl ssl_groups_tb
+     {258, "ffdhe4096"},
+     {259, "ffdhe6144"},
+     {260, "ffdhe8192"},
++    {4587, "SecP256r1MLKEM768"},
++    {4588, "X25519MLKEM768"},
+     {25497, "X25519Kyber768Draft00"},
+     {25498, "SecP256r1Kyber768Draft00"},
+     {0xFF01, "arbitrary_explicit_prime_curves"},
