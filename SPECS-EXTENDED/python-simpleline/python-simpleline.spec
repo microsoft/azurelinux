@@ -1,24 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname simpleline
 
-Name: python-%{srcname}
-Summary: A Python library for creating text UI
-Url: https://github.com/rhinstaller/python-%{srcname}
-Version: 1.6
-Release: 4%{?dist}
+Name: 		python-%{srcname}
+Summary: 	A Python library for creating text UI
+Url: 		https://github.com/rhinstaller/python-%{srcname}
+Version: 	1.9.0
+Release: 	13%{?dist}
 # This tarball was created from upstream git:
 #   git clone https://github.com/rhinstaller/python-simpleline
 #   cd python-simpleline && make archive
-Source0: https://github.com/rhinstaller/python-%{srcname}/archive/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
-
-License: GPLv2+
-BuildArch: noarch
-BuildRequires: python3-devel
-BuildRequires: gettext
-BuildRequires: python3-setuptools
-BuildRequires: intltool
-BuildRequires: python3-gobject-base
+Source0: 	https://github.com/rhinstaller/python-%{srcname}/releases/download/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Adding patch for missing po files, as a tarball without po files has been uploaded to blobstore.
+Patch0:         0001-missing-po-files.patch
+License: 	LGPL-3.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+BuildArch: 	noarch
+BuildRequires: 	make
+BuildRequires: 	python3-devel
+BuildRequires: 	gettext
+BuildRequires: 	python3-setuptools
+BuildRequires: 	intltool
+BuildRequires: 	python3-gobject-base
 
 %description
 Simpleline is a Python library for creating text UI.
@@ -30,7 +32,7 @@ Printed lines are never rewritten!
 
 %package -n python3-%{srcname}
 Summary: A Python3 library for creating text UI
-Requires: python3-rpm
+Requires: 	rpm-python3
 
 %{?python_provide:%python_provide python3-%{srcname}}
 
@@ -42,7 +44,7 @@ is appended to the bottom of the screen.
 Printed lines are never rewritten!
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 %make_build
@@ -54,16 +56,111 @@ make DESTDIR=%{buildroot} install
 %check
 make test
 
-
 %files -n python3-%{srcname} -f python-%{srcname}.lang
-%license COPYING
-%doc ChangeLog README.md
+%license LICENSE.md
+%doc README.md
 %{python3_sitelib}/*
 
 %changelog
-* Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Replacing dependency on 'rpm-python' with 'python3-rpm'.
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1.9.0-13
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.9.0-11
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.9.0-7
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 19 2022 Jiri Konecny <jkonecny@redhat.com> - 1.9.0-5
+- Migrate to SPDX license: https://fedoraproject.org/wiki/Changes/SPDX_Licenses_Phase_1#Detailed_Description
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.9.0-3
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 11 2021 Packit Service <user-cont-team+packit-service@redhat.com> - 1.9.0-1
+- New version - 1.9.0 (Jiri Konecny)
+- Adapt Makefile bumpver target for x.y.z versioning (Jiri Konecny)
+- Add tests for UIScreen wide disabling of concurrency check (Jiri Konecny)
+- Rename helper test classes to have Mock postfix (Jiri Konecny)
+- Call App.initialize() in the setUp phase of GlobalConfiguration test (Jiri Konecny)
+- Abstract registering signal handler in the InputHandler constructor (Jiri Konecny)
+- Allow to disable concurrency check for all UIScreen inputs (Jiri Konecny)
+- Use {} and [] instead of dict() and list() (Jiri Konecny)
+- Specify encoding for open() (Jiri Konecny)
+- Remove 'u' prefix from strings (Jiri Konecny)
+
+* Tue Aug 31 2021 Jiri Konecny <jkonecny@redhat.com> - 1.8.2-1
+- New version - 1.8.2 (Jiri Konecny)
+- Remove changelog from the upstream spec file (Jiri Konecny)
+- Fix spec file archive link (Jiri Konecny)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.8-2
+- Rebuilt for Python 3.10
+
+* Mon Feb 22 2021 Packit Service <user-cont-team+packit-service@redhat.com> - 1.8-1
+- New version - 1.8 (Jiri Konecny)
+- Add missing make command to spec file (Jiri Konecny)
+- Don't translate the prompt keys (Vendula Poncova)
+- Enable daily build for Anaconda-devel COPR repository (Jiri Konecny)
+- Use Fedora container registry instead of Dockerhub (Jiri Konecny)
+- Migrate COPR daily COPR builds to Packit (Jiri Konecny)
+- Test build on Fedora ELN (Jiri Konecny)
+- Remove packit get-current-action (Jiri Konecny)
+- Run tests in GitHub workflow (Martin Pitt)
+- Fix raise-missing-from (W0707) pylint warnings (Martin Pitt)
+- Fix pylint to check test code correctly (Jiri Konecny)
+- Use script to run unit tests (Jiri Konecny)
+- Use relative imports in tests (Jiri Konecny)
+- Change directory structure of unit tests (Jiri Konecny)
+- Fix documentation of _process_screen method (Jiri Konecny)
+- Fix pylint issues (Jiri Konecny)
+- Use pylint instead of pocketlint (Jiri Konecny)
+- Add coverage support (Jiri Konecny)
+- Make link to exmples directory in Readme (Jiri Konecny)
+- Fix homepage of the project in setup.py (Jiri Konecny)
+- Fix classifiers in setup.py (Jiri Konecny)
+- Add pypi-upload to Makefile (Jiri Konecny)
+- Use correct variant of the field (Jiri Konecny)
+- Propose Fedora update only to Fedora in development (Jiri Konecny)
+- Add upstream tag template to packit for releasing (Jiri Konecny)
+- Packit will download archive from Source0 if needed (Jiri Konecny)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jiri Konecny <jkonecny@redhat.com> - 1.7-1
+- new upstream release: 1.7
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 1.6-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
