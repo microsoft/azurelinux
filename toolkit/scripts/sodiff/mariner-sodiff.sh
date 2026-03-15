@@ -37,9 +37,13 @@ sodiff_log_file="${sodiff_out_dir}/sodiff.log"
 # Setup output dir
 mkdir -p "$sodiff_out_dir"
 
-# Prepare mariner/ubuntu compatibility calls
+# Isolate repo file to avoid picking up host system repos
+sodiff_isolated_reposdir="$sodiff_out_dir/isolated_repos"
+mkdir -p "$sodiff_isolated_reposdir"
+cp "$repo_file_path" "$sodiff_isolated_reposdir/"
 
-common_options="-c $repo_file_path --releasever $mariner_version"
+# Prepare mariner/ubuntu compatibility calls
+common_options="--releasever $mariner_version --setopt=reposdir=$sodiff_isolated_reposdir"
 
 dnf_command=dnf
 # Cache RPM metadata
