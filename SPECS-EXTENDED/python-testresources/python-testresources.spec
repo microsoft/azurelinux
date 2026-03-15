@@ -3,67 +3,62 @@ Distribution:   Azure Linux
 %global pypi_name testresources
 
 Name:           python-%{pypi_name}
-Version:        1.0.0
-Release:        16%{?dist}
+Version:        2.0.2
+Release:        1%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
-License:        ASL 2.0 and BSD and GPLv2+
+License:        (Apache-2.0 OR BSD-3-Clause) AND GPL-2.0-or-later
 # file testresources/tests/TestUtil.py is GPLv2+
-URL:            https://launchpad.net/testresources
-Source0:        https://pypi.python.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
+URL:            https://github.com/testing-cabal/%{pypi_name}
+Source:         https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+%define _python_dist_allow_version_zero 1
 
-%description
-testresources: extensions to python unittest to allow declarative use
-of resources by test cases.
-
-%package -n python3-%{pypi_name}
-Summary:        Testresources, a pyunit extension for managing expensive test resources
-%{?python_provide:%python_provide python3-%{pypi_name}}
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
+BuildRequires: python-setuptools_scm
+BuildRequires: python-pip
+BuildRequires: python-pbr
+BuildRequires: python-toml
+BuildRequires: python-wheel
+BuildRequires: python3-pytest
 BuildRequires: python3-testtools
 BuildRequires: python3-fixtures
-BuildRequires: python3-pbr
-Requires: python3-pbr
 
-%description -n python3-%{pypi_name}
+Requires: python-pbr
+
+%global _description %{expand:
 testresources: extensions to python unittest to allow declarative use
-of resources by test cases.
+of resources by test cases.}
 
+%description %{_description}
+
+%package -n python3-%{pypi_name}
+Summary:        %{summary}
+BuildRequires:  python-devel
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%setup -q -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf lib/%{pypi_name}.egg-info
-
+%autosetup -n %{pypi_name}-%{version}
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
 %check
-# tests fail on python3.5
-# testresources/tests/test_optimising_test_suite.py", line 527, in
-# testBasicSortTests
-# testtools.matchers._impl.MismatchError:
-# [test_three, test_one, test_two, test_four] not in
-#   [[test_one, test_two, test_three, test_four],
-#   [test_three, test_two, test_one, test_four]]:
-#      failed with permutation [test_one, test_two, test_three, test_four]
-# %{__python3} setup.py test
+%{python3} -m testtools.run testresources.tests.test_suite
 
-
-%files -n python3-%{pypi_name}
-%doc README NEWS doc
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%files -n python3-%{pypi_name} -f %{pyproject_files}
+%license Apache-2.0 BSD
+%doc README.rst NEWS doc
 
 %changelog
+* Wed Jan 21 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.2-1
+- Upgrade to 2.0.2 (Reference: Fedora 44)
+- License verified
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.0-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add understated dependency on python3-pbr
