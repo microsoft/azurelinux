@@ -21,10 +21,10 @@ type ArchChecker struct {
 }
 
 // New creates an ArchChecker. If the chroot is created successfully, the caller is responsible for calling CleanUp().
-func New(buildDirPath, workerTarPath, specsDirPath string) (newArchChecker *ArchChecker, err error) {
+func New(buildDirPath, workerTarPath, specsDirPath, releaseVersionMacrosFile string) (newArchChecker *ArchChecker, err error) {
 	const chrootName = "specarchchecker_chroot"
 	newArchChecker = &ArchChecker{}
-	err = newArchChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath)
+	err = newArchChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, releaseVersionMacrosFile)
 
 	return newArchChecker, err
 }
