@@ -1557,8 +1557,8 @@
         "type": "other",
         "other": {
           "name": "ceph",
-          "version": "18.2.2",
-          "downloadUrl": "https://download.ceph.com/tarballs/ceph-18.2.2.tar.gz"
+          "version": "18.2.7",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-18.2.7.tar.gz"
         }
       }
     },
