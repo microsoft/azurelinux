@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.11.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
 Patch0:         CVE-2023-33976.patch
+Patch1:         CVE-2026-2492.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -110,6 +111,8 @@ Python 3 version.
 %build
 tar -xf %{SOURCE1} -C /root/
 
+rm -rf /root/.cache/bazel/_bazel_root/install/
+
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
@@ -148,6 +151,9 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
 
 %changelog
+* Tue Feb 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.11.1-3
+- Patch for CVE-2026-2492
+
 * Thu Aug 15 2024 Aadhar Agarwal <aadagarwal@microsoft> - 2.11.1-2
 - Add a patch for CVE-2023-33976
 
@@ -157,7 +163,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-4
 - Remove .bazelversion file.
 
-* Thu Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
+* Mon Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
 - Add tf-nightly subpackage. 
 
 * Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
