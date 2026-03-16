@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,6 +51,7 @@ autoreconf -i
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=yes \
     --enable-selinux=yes \
+    --enable-user-session=yes \
     --runstatedir=/run \
     --with-console-auth-dir=/run/console
 
@@ -78,6 +79,7 @@ make %{?_smp_mflags} check
 %{_libdir}/tmpfiles.d/dbus.conf
 %{_sysconfdir}/dbus-1
 %{_unitdir}/*
+%{_userunitdir}/*
 %exclude %{_libdir}/sysusers.d
 
 #%%{_sharedstatedir}/*
@@ -94,6 +96,9 @@ make %{?_smp_mflags} check
 %dir %{_libdir}/dbus-1.0
 
 %changelog
+* Mon Mar 16 2026 Dan Streetman <ddstreet@ieee.org> - 1.15.8-4
+- Enable user sessions
+
 * Tue Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 1.15.8-3
 - fix attributes on dbus-daemon-launch-helper
 - sort files list
