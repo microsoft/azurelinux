@@ -16,8 +16,11 @@ Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
 Patch2:         CVE-2012-2677.patch
 Patch3:         CVE-2025-62813.patch
 Patch4:         CVE-2025-0838.patch
-# Patch to skip failing ptests.
+# Patch to skip failing ptests on x86 architecture
+%ifarch x86_64
 Patch5:         skip-failing-ptests.patch 
+%endif
+
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
