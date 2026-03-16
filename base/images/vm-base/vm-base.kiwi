@@ -35,7 +35,7 @@
 
     <repository type="rpm-md" alias="fedora-43-everything">
         <source
-            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/$arch/os/" />
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/x86_64/" />
     </repository>
 
     <packages type="image">
