@@ -12,11 +12,11 @@ Distribution:   Azure Linux
 
 Name: quagga
 Version: 1.2.4
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: Routing daemon
 License: GPLv2+
 URL: http://www.quagga.net
-Source0: http://download.savannah.gnu.org/releases/quagga/%{name}-%{version}.tar.gz
+Source0: https://github.com/%{name}/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1: quagga-filter-perl-requires.sh
 Source2: quagga-tmpfs.conf
 BuildRequires: perl-generators pkgconfig
@@ -183,7 +183,8 @@ fi
 %systemd_preun ripngd.service
 
 %files
-%doc AUTHORS COPYING
+%license COPYING COPYING.LIB
+%doc AUTHORS
 %doc zebra/zebra.conf.sample
 %doc isisd/isisd.conf.sample
 %doc ripd/ripd.conf.sample
@@ -213,10 +214,10 @@ fi
 %{_unitdir}/*.service
 
 %files contrib
-%doc AUTHORS COPYING %attr(0644,root,root) tools
+%license COPYING COPYING.LIB
+%doc AUTHORS %attr(0644,root,root) tools
 
 %files devel
-%doc AUTHORS COPYING
 %dir %{_libdir}/quagga/
 %{_libdir}/quagga/*.so
 %dir %{_includedir}/quagga
@@ -225,6 +226,11 @@ fi
 %{_includedir}/quagga/ospfd/*.h
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-16
+- Bumping release to rebuild with new 'net-snmp' libs.
+- Fixed source URL.
+- License verified.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.4-15
 - Conditionalize building of tex-based documentation
 

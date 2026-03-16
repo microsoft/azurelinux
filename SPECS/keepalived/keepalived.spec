@@ -1,7 +1,7 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
 Version:        2.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -110,6 +110,9 @@ fi
 %{_mandir}/man8/keepalived.8*
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.1-2
+- Bumping release to rebuild with new 'net-snmp' libs.
+
 * Thu Sep 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.3.1-1
 - Add patch for CVE-2024-41184.patch.
 - Use autosetup.

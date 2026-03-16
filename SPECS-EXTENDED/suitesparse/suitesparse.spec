@@ -1,38 +1,112 @@
-%global amd_version_major 2
-%global btf_version_major 1
-%global camd_version_major 2
-%global ccolamd_version_major 2
-%global cholmod_version_major 3
-%global colamd_version_major 2
-%global csparse_version_major 3
-%global cxsparse_version_major 3
-%global klu_version_major 1
-%global ldl_version_major 2
-%global rbio_version_major 2
-%global spqr_version_major 2
-%global SuiteSparse_config_major 5
-%global umfpack_version_major 5
+%global amd_version_major 3
+%global btf_version_major 2
+%global camd_version_major 3
+%global ccolamd_version_major 3
+%global cholmod_version_major 5
+%global colamd_version_major 3
+%global csparse_version_major 4
+%global cxsparse_version_major 4
+%global gpuqrengine_version_major 3
+%global graphblas_version_major 10
+%global klu_cholmod_version_major 2
+%global klu_version_major 2
+%global lagraph_version_major 1
+%global lagraphx_version_major 1
+%global ldl_version_major 3
+%global paru_version_major 1
+%global rbio_version_major 4
+%global spex_version_major 3
+%global spqr_version_major 4
+%global SuiteSparse_config_major 7
+%global SuiteSparse_gpuruntime_major 3
+%global SuiteSparse_metis_major 5
+%global umfpack_version_major 6
+
 ### CXSparse is a superset of CSparse, and the two share common header
 ### names, so it does not make sense to build both. CXSparse is built
 ### by default, but CSparse can be built instead by defining
 ### enable_csparse as 1 below.
 %global enable_csparse 0
 
-Summary:        A collection of sparse matrix libraries
+# Whether to build a separate version of libraries linked against an ILP64 BLAS
+%if 0%{?__isa_bits} == 64
+%global build64 1
+%endif
+
+%global suitesparse_builds SuiteSparse %{?build64:SuiteSparse64 SuiteSparse64_}
+
+%global blaslib openblas
+
+# SuiteSparse uses a modified version of metis, so use it
+%bcond_with system_metis
+
+%global commit 6ab1e9eb9e67264218ffbdfc25010650da449a39
+
 Name:           suitesparse
-Version:        5.4.0
-Release:        5%{?dist}
-License:        (LGPLv2+ OR BSD) AND LGPLv2+ AND GPLv2+
+Version:        7.11.0
+Release:        1%{?dist}
+Summary:        A collection of sparse matrix libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
-Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
+
+# See LICENSE.txt for a breakdown of all licenses:
+# Shipped modules licenses:
+# * AMD      - BSD-3-Clause
+# * BTF      - LGPL-2.1-or-later
+# * CAMD     - BSD-3-Clause
+# * COLAMD   - BSD-3-Clause
+# * CCOLAMD  - BSD-3-Clause
+# * CHOLMOD  - LGPL-2.1-or-later AND GPL-2.0-or-later
+# * CSparse  - LGPL-2.1-or-later AND BSD-3-Clause
+# * CXSparse - LGPL-2.1-or-later AND BSD-3-Clause
+# * KLU      - LGPL-2.1-or-later
+# * LDL      - LGPL-2.1-or-later
+# * RBio     - GPL-2.0-or-later
+# * SPQR     - GPL-2.0-or-later
+# * UMFPACK  - GPL-2.0-or-later
+#
+# Not shipped modules licenses:
+# * GPUQREngine            - GPL-2.0-or-later
+# * GraphBLAS              - Apache-2.0 AND GPL-3.0-or-later
+# * SLIP_LU                - LGPL-3.0-or-later OR GPL-2.0-or-later OR (LGPL-3.0-or-later AND GPL-2.0-or-later)
+# * MATLAB_Tools           - BSD-3-Clause AND GPL-2.0-or-later
+# * Mongoose               - GPL-3.0-only
+# * ssget                  - BSD-3-Clause
+# * SuiteSparse_GPURuntime - GPL-2.0-or-later
+
+License:        BSD-3-Clause AND LGPL-2.1-or-later AND GPL-2.0-or-later
+URL:            http://faculty.cse.tamu.edu/davis/suitesparse.html
+Source0:        https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v%{version}/%{name}-%{version}.tar.gz
+
+BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  hardlink
+BuildRequires:  gcc-gfortran
+BuildRequires:  make
+
+BuildRequires:  gmp-devel
+%if %{with system_metis}
 BuildRequires:  metis-devel
+%else
+Provides:       bundled(metis) = 5.1.0
+%endif
+BuildRequires:  %{blaslib}-devel
+BuildRequires:  mpfr-devel
+# openblas is still required for 64-bit suffixed versions
 BuildRequires:  openblas-devel
+BuildRequires:  lapack-devel
+BuildRequires:  mpfr-devel
 BuildRequires:  tbb-devel
+BuildRequires:  hardlink
+
+# Not packaged in Fedora
+Provides:       bundled(cpu_features) = 0.6.0
+# GraphBLAS redefines malloc() so must use bundled versions
+Provides:       bundled(lz4) = 1.9.3
+Provides:       bundled(zstd) = 1.5.5
+
+Obsoletes:      umfpack <= 5.0.1
+Obsoletes:      ufsparse <= 2.1.1
 Provides:       ufsparse = %{version}-%{release}
 
 %description
@@ -54,14 +128,18 @@ matrices.  The package includes the following libraries:
   SuiteSparse_config  configuration file for all the above packages.
   RBio                read/write files in Rutherford/Boeing format
 
+
 %package devel
 Summary:        Development headers for SuiteSparse
 Requires:       %{name} = %{version}-%{release}
+Obsoletes:      umfpack-devel <= 5.0.1
+Obsoletes:      ufsparse-devel <= 2.1.1
 Provides:       ufsparse-devel = %{version}-%{release}
 
 %description devel
 The suitesparse-devel package contains files needed for developing
 applications which use the suitesparse libraries.
+
 
 %package static
 Summary:        Static version of SuiteSparse libraries
@@ -72,11 +150,14 @@ Provides:       ufsparse-static = %{version}-%{release}
 The suitesparse-static package contains the statically linkable
 version of the suitesparse libraries.
 
+
+%if 0%{?build64}
 %package -n %{name}64
 Summary:        A collection of sparse matrix libraries (ILP64 version)
 
 %description -n %{name}64
 The suitesparse collection compiled against an ILP64 BLAS library.
+
 
 %package -n %{name}64-devel
 Summary:        Development headers for SuiteSparse (ILP64 version)
@@ -87,6 +168,7 @@ Requires:       %{name}64 = %{version}-%{release}
 The suitesparse64-devel package contains files needed for developing
 applications which use the suitesparse libraries (ILP64 version).
 
+
 %package -n %{name}64-static
 Summary:        Static version of SuiteSparse libraries (ILP64 version)
 Requires:       %{name}-devel = %{version}-%{release}
@@ -95,11 +177,13 @@ Requires:       %{name}-devel = %{version}-%{release}
 The suitesparse64-static package contains the statically linkable
 version of the suitesparse libraries (ILP64 version).
 
+
 %package -n %{name}64_
 Summary:        A collection of sparse matrix libraries (ILP64 version)
 
 %description -n %{name}64_
 The suitesparse collection compiled against an ILP64 BLAS library.
+
 
 %package -n %{name}64_-devel
 Summary:        Development headers for SuiteSparse (ILP64 version)
@@ -112,6 +196,7 @@ applications which use the suitesparse libraries (ILP64 version) compiled
 against a BLAS library with the "64_" symbol name suffix (see openblas-*64_
 packages).
 
+
 %package -n %{name}64_-static
 Summary:        Static version of SuiteSparse libraries (ILP64 version)
 Requires:       %{name}-devel = %{version}-%{release}
@@ -120,22 +205,34 @@ Requires:       %{name}-devel = %{version}-%{release}
 The suitesparse64_-static package contains the statically linkable
 version of the suitesparse libraries (ILP64 version) compiled against a
 BLAS library with the "64_" symbol name suffix (see openblas-*64_ packages).
+%endif
+
 
 %package doc
 Summary:        Documentation files for SuiteSparse
-Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
 
 %description doc
 This package contains documentation files for %{name}.
 
+
 %prep
-%setup -q -c
-pushd SuiteSparse
+%setup -c -q
+mkdir Doc Licenses
+pushd SuiteSparse-%{version}
+#patch 0 -p1 -b .postfix
+%if !0%{?enable_csparse}
+  sed -i -e /CSparse/d Makefile
+%endif
+  # Build fails
+  sed -i -e /Mongoose/d Makefile
+%if %{with system_metis}
   # Remove bundled metis
-  rm -r metis*
-  # Makefiles look for metis.h specifically
-  ln -s %{_includedir}/metis/*.h include/
+  rm -r SuiteSparse_metis
+  # SuiteSparse looks for SuiteSparse_metis.h specifically
+  ln -s %{_includedir}/metis/metis.h include/SuiteSparse_metis.h
+%endif
 
   # Fix pragma ivdep so gcc understands it.
   for fil in $(grep -Frl 'pragma ivdep' .); do
@@ -144,239 +241,94 @@ pushd SuiteSparse
     rm -f ${fil}.orig
   done
 
-  # drop non-standard -O3 and duplicate -fexceptions from default CFLAGS
-  sed -i -e '/^  CF =/ s/ -O3 -fexceptions//' SuiteSparse_config/SuiteSparse_config.mk
+  # drop non-standard -O3
+  sed -i -e '/OPTS.*-O3/d' CHOLMOD/SuiteSparse_metis/GKlib/GKlibSystem.cmake
 
-  # Allow adding a suffix to the library name
-  sed -i -e '/SO.*=/s/$(LIBRARY).so/$(LIBRARY)$(LIBRARY_SUFFIX).so/' \
-         -e '/AR_TARGET *=/s/$(LIBRARY).a/$(LIBRARY)$(LIBRARY_SUFFIX).a/' SuiteSparse_config/SuiteSparse_config.mk
-  sed -i -e 's/-l\(amd\|btf\|camd\|ccolamd\|cholmod\|colamd\|csparse\|cxsparse\|klu\|ldl\|rbio\|spqr\|suitesparseconfig\|umfpack\)/-l\1$(LIBRARY_SUFFIX)/g' \
-    $(find -name Makefile\* -o -name \*.mk)
+  # collect docs and licenses in one place to ship
+  find -iname lesser.txt -o -iname lesserv3.txt -o -iname license.txt -o \
+    -iname gpl.txt -o -iname GPLv2.txt -o -iname CONTRIBUTOR-LICENSE.txt -o -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf" -o -iname license \
+    -a -not -type d | while read f; do
+        b="${f%%/*}"
+        r="${f#$b}"
+        x="$(echo "$r" | sed 's|/doc/|/|gi')"
+        install -m0644 -D "$f" "../Licenses/$b/$x"
+    done
+
+    # Copy documentation files but EXCLUDE License.txt, gpl.txt, GPLv2.txt, lesserv3.txt
+  find . -type f \( \
+          -iname "*.pdf" -o \
+          -iname "ChangeLog" -o \
+          -iname "README*" -o \
+          -iname "*.txt" \
+      \) \
+      ! -iname "License.txt" \
+      ! -iname "gpl.txt" \
+      ! -iname "GPLv2.txt" \
+      ! -iname "lesserv3.txt" \
+      ! -iname "CONTRIBUTOR-LICENSE.txt" \
+      ! -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf" \
+  | while read f; do
+      b="${f%%/*}"
+      r="${f#$b}"
+      x="$(echo "$r" | sed 's|/doc/|/|gi')"
+      install -m0644 -D "$f" "../Doc/$b/$x"
+  done
 popd
-cp -a SuiteSparse SuiteSparse64
-cp -a SuiteSparse SuiteSparse64_
+%if 0%{?build64}
+cp -al SuiteSparse-%{version} SuiteSparse64-%{version}
+cp -al SuiteSparse-%{version} SuiteSparse64_-%{version}
+%endif
+
+# hardlink duplicate documentation files
+hardlink -cv Licenses/
 
 %build
-export AUTOCC=no
-export CC=gcc
-
-for build in SuiteSparse SuiteSparse64 SuiteSparse64_
+# FindSuiteSparse_config looks for "build"
+%global _vpath_builddir build
+for build in %{suitesparse_builds}
 do
-  pushd $build
-
-  # TODO - Try to use upstream makefile - will build more components
-  mkdir -p Doc/{AMD,BTF,CAMD,CCOLAMD,CHOLMOD,COLAMD,KLU,LDL,UMFPACK,SPQR,RBio} Include
-
-  export CFLAGS="%{optflags} -I%{_includedir}/metis"
-  export LAPACK=""
-  # Set flags for ILP64 build
-  if [ $build = SuiteSparse64 ]
-  then
-     export CFLAGS="$CFLAGS -DBLAS64"
-     export BLAS=-lopenblas64
-     export LIBRARY_SUFFIX=64
-  elif [ $build = SuiteSparse64_ ]
-  then
-     export CFLAGS="$CFLAGS -DBLAS64 -DSUN64"
-     export BLAS=-lopenblas64_
-     export LIBRARY_SUFFIX=64_
-  else
-     export BLAS=-lopenblas
-  fi
-
-  # SuiteSparse_config needs to come first
-  pushd SuiteSparse_config
-    %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    cp -p *.h ../Include
-  popd
-
-  pushd AMD
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/License.txt Doc/lesser.txt Doc/ChangeLog Doc/*.pdf ../Doc/AMD
-  popd
-
-  pushd BTF
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/* ../Doc/BTF
-  popd
-
-  pushd CAMD
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/ChangeLog Doc/License.txt Doc/*.pdf ../Doc/CAMD
-  popd
-
-  pushd CCOLAMD
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/* ../Doc/CCOLAMD
-  popd
-
-  pushd COLAMD
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/* ../Doc/COLAMD
-  popd
-
-  pushd CHOLMOD
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/*.pdf ../Doc/CHOLMOD
-    cp -p Cholesky/lesser.txt ../Doc/CHOLMOD/Cholesky_License.txt
-    cp -p Core/lesser.txt ../Doc/CHOLMOD/Core_License.txt
-    cp -p MatrixOps/gpl.txt ../Doc/CHOLMOD/MatrixOps_License.txt
-    cp -p Partition/lesser.txt ../Doc/CHOLMOD/Partition_License.txt
-    cp -p Supernodal/gpl.txt ../Doc/CHOLMOD/Supernodal_License.txt
-  popd
-
-  %if "%{?enable_csparse}" == "1"
-  pushd CSparse
-    pushd Source
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-      cp -p cs.h ../../Include
-    popd
-    mkdir ../Doc/CSparse/
-    cp -p Doc/* ../Doc/CSparse
-  popd
-
-  %else
-  pushd CXSparse
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/cs.h ../Include
-    mkdir ../Doc/CXSparse/
-    cp -p Doc/* ../Doc/CXSparse
-  popd
-  %endif
-
-  pushd KLU
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/lesser.txt ../Doc/KLU
-  popd
-
-  pushd LDL
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/ChangeLog Doc/lesser.txt Doc/*.pdf ../Doc/LDL
-  popd
-
-  pushd UMFPACK
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/License.txt Doc/ChangeLog Doc/gpl.txt Doc/*.pdf ../Doc/UMFPACK
-  popd
-
-  pushd SPQR
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS -DHAVE_TBB -DNPARTITION" TBB=-ltbb BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h* ../Include
-    cp -p README{,_SPQR}.txt
-    cp -p README_SPQR.txt Doc/* ../Doc/SPQR
-  popd
-
-  pushd RBio
-    pushd Lib
-      %make_build CFLAGS="$CFLAGS" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX"
-    popd
-    cp -p Include/*.h ../Include
-    cp -p README.txt Doc/ChangeLog Doc/License.txt ../Doc/RBio
-  popd
-
+  pushd $build-%{version}
+    %set_build_flags
+    CMAKE_OPTIONS="-DCMAKE_C_FLAGS_RELEASE:STRING=-DNDEBUG -DCMAKE_CXX_FLAGS_RELEASE:STRING=-DNDEBUG -DCMAKE_Fortran_FLAGS_RELEASE:STRING=-DNDEBUG -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_DO_STRIP:BOOL=OFF \
+                   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} -DCMAKE_INSTALL_LIBDIR=%{_libdir} -DCOMPACT=ON"
+%if %{with system_metis}
+    CMAKE_OPTIONS="$CMAKE_OPTIONS -DSUITESPARSE_METIS_FOUND=true -DSUITESPARSE_METIS_INCLUDE_DIR=%{_includedir}/metis -DSUITESPARSE_METIS_LIBRARIES=%{_libdir}/libmetis.so"
+%endif
+    # Set flags for ILP64 build
+    if [ $build = SuiteSparse64 ]
+    then
+       CMAKE_OPTIONS="$CMAKE_OPTIONS -DSUITESPARSE_INCLUDEDIR_POSTFIX=$build -DSUITESPARSE_PKGFILEDIR=%{_libdir}/$build -DCMAKE_RELEASE_POSTFIX=64 -DBLA_VENDOR=OpenBLAS -DALLOW_64BIT_BLAS=yes"
+       export CFLAGS="$CFLAGS -DBLAS_OPENBLAS_64"
+    elif [ $build = SuiteSparse64_ ]
+    then
+       CMAKE_OPTIONS="$CMAKE_OPTIONS -DSUITESPARSE_INCLUDEDIR_POSTFIX=$build -DSUITESPARSE_PKGFILEDIR=%{_libdir}/$build -DCMAKE_RELEASE_POSTFIX=64_ -DBLA_VENDOR=OpenBLAS -DALLOW_64BIT_BLAS=yes -DBLAS_LIBRARIES=%{_libdir}/libopenblas64_.so"
+       export CFLAGS="$CFLAGS -DBLAS_OPENBLAS_64"
+    else
+       CMAKE_OPTIONS="$CMAKE_OPTIONS -DSUITESPARSE_INCLUDEDIR_POSTFIX=suitesparse -DBLA_VENDOR=OpenBLAS"
+    fi   
+    %make_build CMAKE_OPTIONS="$CMAKE_OPTIONS" JOBS=%{_smp_build_ncpus}
   popd
 done
 
 %install
-mkdir -p %{buildroot}%{_libdir}
-mkdir -p %{buildroot}%{_includedir}/%{name}
-cp -a SuiteSparse/Include/*.{h,hpp} %{buildroot}%{_includedir}/%{name}/
-for build in SuiteSparse SuiteSparse64 SuiteSparse64_
+for build in %{suitesparse_builds}
 do
-  pushd $build
-    cp -a */Lib/*.a lib/*.so* %{buildroot}%{_libdir}/
-    chmod 755 %{buildroot}%{_libdir}/*.so.*
-
-    # collect licenses in one place to ship as base package documentation
-    rm -rf Licenses
-    mkdir Licenses
-    find */ -iname lesser.txt -o -iname license.txt -o -iname gpl.txt -o \
-        -iname license | while read f; do
-            b="${f%%/*}"
-            r="${f#$b}"
-            x="$(echo "$r" | sed 's|/doc/|/|gi')"
-            install -m0644 -D "$f" "./Licenses/$b/$x"
-        done
-
-    # hardlink duplicate documentation files
-    hardlink -cv Docs/ Licenses/
+  pushd $build-%{version}
+    %make_install
   popd
 done
-
 
 %check
-check_status=0
-export AUTOCC=no
-export CC=gcc
-TESTDIRS="AMD CAMD CCOLAMD CHOLMOD COLAMD KLU LDL SPQR RBio UMFPACK"
-%if "%{?enable_csparse}" == "1"
-TESTDIRS="$TESTDIRS CSparse"
-%else
-TESTDIRS="$TESTDIRS CXSparse"
-%endif
-for build in SuiteSparse SuiteSparse64 SuiteSparse64_
+# Build demos as a check
+for build in %{suitesparse_builds}
 do
-  pushd $build
-    export CFLAGS="%{optflags} -I%{_includedir}/metis"
-    export LAPACK=""
-    # Set flags for ILP64 build
-    if [ $build = SuiteSparse64 ]
-    then
-       export CFLAGS="$CFLAGS -DBLAS64"
-       export BLAS=-lopenblas64
-       export LIBRARY_SUFFIX=64
-    elif [ $build = SuiteSparse64_ ]
-    then
-       export CFLAGS="$CFLAGS -DBLAS64 -DSUN64"
-       export BLAS=-lopenblas64_
-       export LIBRARY_SUFFIX=64_
-    else
-       export BLAS=-lopenblas
-    fi
-
-    for d in $TESTDIRS ; do
-        %make_build -C $d/Demo CFLAGS="$CFLAGS" LIB="%{?__global_ldflags} -lm -lrt" BLAS="$BLAS" LIBRARY_SUFFIX="$LIBRARY_SUFFIX" SPQR_CONFIG=-DHAVE_TBB TBB=-ltbb
-	if [[ $? -ne 0 ]]; then
-	check_status=1
-	fi
-    done
+  pushd $build-%{version}
+    make install DESTDIR=%{buildroot}
   popd
 done
-[[ $check_status -eq 0 ]]
 
 %files
-%license SuiteSparse/Licenses
+%license Licenses
 %{_libdir}/libamd.so.%{amd_version_major}*
 %{_libdir}/libbtf.so.%{btf_version_major}*
 %{_libdir}/libcamd.so.%{camd_version_major}*
@@ -387,24 +339,75 @@ done
 %{_libdir}/libcsparse.so.%{csparse_version_major}*
 %endif
 %{_libdir}/libcxsparse.so.%{cxsparse_version_major}*
+%{_libdir}/libgraphblas.so.%{graphblas_version_major}*
+%{_libdir}/libklu_cholmod.so.%{klu_cholmod_version_major}*
 %{_libdir}/libklu.so.%{klu_version_major}*
+%{_libdir}/liblagraph.so.%{lagraph_version_major}*
+%{_libdir}/liblagraphx.so.%{lagraphx_version_major}*
 %{_libdir}/libldl.so.%{ldl_version_major}*
+%{_libdir}/libparu.so.%{paru_version_major}*
 %{_libdir}/librbio.so.%{rbio_version_major}*
+%{_libdir}/libspex.so.%{spex_version_major}*
+%{_libdir}/libspexpython.so.%{spex_version_major}*
 %{_libdir}/libspqr.so.%{spqr_version_major}*
 %{_libdir}/libsuitesparseconfig.so.%{SuiteSparse_config_major}*
 %{_libdir}/libumfpack.so.%{umfpack_version_major}*
 
 %files devel
-%{_includedir}/%{name}
+%{_includedir}/%{name}/
+%{_libdir}/cmake/AMD/
+%{_libdir}/cmake/BTF/
+%{_libdir}/cmake/CAMD/
+%{_libdir}/cmake/CCOLAMD/
+%{_libdir}/cmake/CHOLMOD/
+%{_libdir}/cmake/COLAMD/
+%{_libdir}/cmake/CXSparse/
+%{_libdir}/cmake/GraphBLAS/
+%{_libdir}/cmake/KLU/
+%{_libdir}/cmake/KLU_CHOLMOD/
+%{_libdir}/cmake/LAGraph/
+%{_libdir}/cmake/LDL/
+%{_libdir}/cmake/ParU/
+%{_libdir}/cmake/RBio/
+%{_libdir}/cmake/SPEX/
+%{_libdir}/cmake/SPQR/
+%{_libdir}/cmake/SuiteSparse_config/
+%{_libdir}/cmake/SuiteSparse/
+%{_libdir}/cmake/UMFPACK/
+%exclude %{_libdir}/cmake/*/*_static*.cmake
+%{_libdir}/pkgconfig/AMD.pc
+%{_libdir}/pkgconfig/BTF.pc
+%{_libdir}/pkgconfig/CAMD.pc
+%{_libdir}/pkgconfig/CCOLAMD.pc
+%{_libdir}/pkgconfig/CHOLMOD.pc
+%{_libdir}/pkgconfig/COLAMD.pc
+%{_libdir}/pkgconfig/CXSparse.pc
+%{_libdir}/pkgconfig/GraphBLAS.pc
+%{_libdir}/pkgconfig/KLU.pc
+%{_libdir}/pkgconfig/KLU_CHOLMOD.pc
+%{_libdir}/pkgconfig/LAGraph.pc
+%{_libdir}/pkgconfig/LDL.pc
+%{_libdir}/pkgconfig/ParU.pc
+%{_libdir}/pkgconfig/RBio.pc
+%{_libdir}/pkgconfig/SPEX.pc
+%{_libdir}/pkgconfig/SPQR.pc
+%{_libdir}/pkgconfig/SuiteSparse_config.pc
+%{_libdir}/pkgconfig/UMFPACK.pc
 %{_libdir}/lib*.so
+%if 0%{?build64}
 %exclude %{_libdir}/lib*64*.so
+%endif
 
 %files static
+%{_libdir}/cmake/*/*_static*.cmake
 %{_libdir}/lib*.a
+%if 0%{?build64}
 %exclude %{_libdir}/lib*64*.a
+%endif
 
+%if 0%{?build64}
 %files -n %{name}64
-%license SuiteSparse64/Licenses
+%license Licenses
 %{_libdir}/libamd64.so.%{amd_version_major}*
 %{_libdir}/libbtf64.so.%{btf_version_major}*
 %{_libdir}/libcamd64.so.%{camd_version_major}*
@@ -415,21 +418,30 @@ done
 %{_libdir}/libcsparse64.so.%{csparse_version_major}*
 %endif
 %{_libdir}/libcxsparse64.so.%{cxsparse_version_major}*
+%{_libdir}/libgraphblas64.so.%{graphblas_version_major}*
+%{_libdir}/libklu_cholmod64.so.%{klu_cholmod_version_major}*
 %{_libdir}/libklu64.so.%{klu_version_major}*
+%{_libdir}/liblagraph64.so.%{lagraph_version_major}*
+%{_libdir}/liblagraphx64.so.%{lagraphx_version_major}*
 %{_libdir}/libldl64.so.%{ldl_version_major}*
+%{_libdir}/libparu64.so.%{paru_version_major}*
 %{_libdir}/librbio64.so.%{rbio_version_major}*
+%{_libdir}/libspex64.so.%{spex_version_major}*
+%{_libdir}/libspexpython64.so.%{spex_version_major}*
 %{_libdir}/libspqr64.so.%{spqr_version_major}*
 %{_libdir}/libsuitesparseconfig64.so.%{SuiteSparse_config_major}*
 %{_libdir}/libumfpack64.so.%{umfpack_version_major}*
 
 %files -n %{name}64-devel
+%{_includedir}/SuiteSparse64/
 %{_libdir}/lib*64.so
+%{_libdir}/SuiteSparse64
 
 %files -n %{name}64-static
 %{_libdir}/lib*64.a
 
 %files -n %{name}64_
-%license SuiteSparse64_/Licenses
+%license Licenses
 %{_libdir}/libamd64_.so.%{amd_version_major}*
 %{_libdir}/libbtf64_.so.%{btf_version_major}*
 %{_libdir}/libcamd64_.so.%{camd_version_major}*
@@ -440,23 +452,37 @@ done
 %{_libdir}/libcsparse64_.so.%{csparse_version_major}*
 %endif
 %{_libdir}/libcxsparse64_.so.%{cxsparse_version_major}*
+%{_libdir}/libgraphblas64_.so.%{graphblas_version_major}*
+%{_libdir}/libklu_cholmod64_.so.%{klu_cholmod_version_major}*
 %{_libdir}/libklu64_.so.%{klu_version_major}*
+%{_libdir}/liblagraph64_.so.%{lagraph_version_major}*
+%{_libdir}/liblagraphx64_.so.%{lagraphx_version_major}*
 %{_libdir}/libldl64_.so.%{ldl_version_major}*
+%{_libdir}/libparu64_.so.%{paru_version_major}*
 %{_libdir}/librbio64_.so.%{rbio_version_major}*
+%{_libdir}/libspex64_.so.%{spex_version_major}*
+%{_libdir}/libspexpython64_.so.%{spex_version_major}*
 %{_libdir}/libspqr64_.so.%{spqr_version_major}*
 %{_libdir}/libsuitesparseconfig64_.so.%{SuiteSparse_config_major}*
 %{_libdir}/libumfpack64_.so.%{umfpack_version_major}*
 
 %files -n %{name}64_-devel
+%{_includedir}/SuiteSparse64_/
 %{_libdir}/lib*64_.so
+%{_libdir}/SuiteSparse64_
 
 %files -n %{name}64_-static
 %{_libdir}/lib*64_.a
+%endif
 
 %files doc
-%doc SuiteSparse/Doc/*
+%doc Doc/*
 
 %changelog
+* Mon Dec 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 7.11.0-1
+- Upgrade to 7.11.0 (Reference: Fedora 42)
+- License verified
+
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 5.4.0-5
 - License verified
 - Lint spec

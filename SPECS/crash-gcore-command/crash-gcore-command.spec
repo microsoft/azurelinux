@@ -1,6 +1,6 @@
 Name:          crash-gcore-command
 Version:       1.6.1
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -8,10 +8,11 @@ Distribution:   Azure Linux
 URL:           https://github.com/crash-utility/crash-extensions
 Source0:       https://github.com/crash-utility/crash-extensions/raw/master/%{name}-%{version}.tar.gz
 Source1:       gcore_defs.patch
+Patch0:        set_context-third-arg.patch
 License:       GPLv2+
 BuildRequires: zlib-devel
-BuildRequires: crash-devel >= 7.2.5
-Requires:      crash >= 7.2.5
+BuildRequires: crash-devel >= 9.0.0
+Requires:      crash >= 9.0.0
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 ExclusiveArch: x86_64
 
@@ -20,7 +21,11 @@ Command for creating a core dump file of a user-space task that was
 running in a kernel dumpfile.
 
 %prep
-%setup -q -n %{name}-%{version}
+# Note: we use -p2 here since patches come from upstream crash-gcore, but the
+# source tarball comes from official crash-utilities/crash-extensions
+# repository which already removes the top layer of directory nesting from the
+# upstream crash-gcore code tree.
+%autosetup -p2 -n %{name}-%{version}
 
 %build
 %ifarch x86_64
@@ -39,9 +44,11 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/crash/extensions/gcore.so
-%doc COPYING
 
 %changelog
+* Tue Jan 06 2026 Chris Co <chrco@microsoft.com> - 1.6.1-3
+- add patch to fix build break with newer crash v9.0.0
+
 *   Fri Jul 08 2022 Andrew Phelps <anphel@microsoft.com> 1.6.1-2
 -   Add ExclusiveArch: x86_64
 *   Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> 1.6.1-1

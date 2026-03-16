@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 %bcond_with tests
 Name:           apache-%{short_name}
 Version:        2.14.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Utilities to assist with developing IO functionality
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -82,15 +82,10 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
-# Remove LICENSE from javadoc directory to avoid duplicate license warning
-mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
-mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
-
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
-%license ADDITIONAL_LICENSE_INFO
 %doc RELEASE-NOTES.txt
 %{_javadir}/%{name}.jar
 
@@ -98,9 +93,6 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %doc %{_javadocdir}/%{name}
 
 %changelog
-* Fri Nov 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.14.0-2
-- Address build error caused by license warning
-
 * Mon Oct 7 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.14.0-1
 - Upgrade to 2.14.0 to fix the CVE-2024-47554.
 - License verified

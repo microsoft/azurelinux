@@ -1,0 +1,99 @@
+From 39b8a0e8f664dc103a552dbab1cdccdab8ce3062 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 7 Mar 2023 09:16:10 +0100
+Subject: [PATCH] Fix resolving flags for packages with a name different from
+ its identifier
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Alien-Build-2.77 tests revealed a bug in constructing a query for
+pkgconf-1.9 solver: If a package file had file name different from
+a Name value inside the file, the package was able to be found, but
+the flags solver searched for the Name and found nothing.
+
+Studying pre-pkgconf documentation shows that Name value is only
+a human-oriented display name and a base of the package file name
+should be used instead as a package identifier. This base name is
+stored into an id field of the package structure of pkgconf.
+
+This patch fixes it by using the id field instead. It also adds a test
+to prevent from future regressions.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs      |  2 +-
+ MANIFEST           |  1 +
+ corpus/lib4/bar.pc |  4 ++++
+ t/client.t         | 14 +++++++++++++-
+ 4 files changed, 19 insertions(+), 2 deletions(-)
+ create mode 100644 corpus/lib4/bar.pc
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index 63c78fb..57e6892 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -117,7 +117,7 @@ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+ #if LIBPKGCONF_VERSION >= 10900
+   if (sizeof(query_string) <=
+       snprintf(query_string, sizeof(query_string), "%s = %s",
+-      package->realname, package->version))
++      package->id, package->version))
+     false;
+   pkgconf_queue_push(&query, query_string);
+   if (loaded_from_file)
+diff --git a/MANIFEST b/MANIFEST
+index 77378df..1eb4491 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -6,6 +6,7 @@ corpus/lib1/foo1a.pc
+ corpus/lib2/bar.pc
+ corpus/lib2/foo.pc
+ corpus/lib3/foo.pc
++corpus/lib4/bar.pc
+ INSTALL
+ lib/PkgConfig/LibPkgConf.pm
+ lib/PkgConfig/LibPkgConf/Client.pm
+diff --git a/corpus/lib4/bar.pc b/corpus/lib4/bar.pc
+new file mode 100644
+index 0000000..47e52dd
+--- /dev/null
++++ b/corpus/lib4/bar.pc
+@@ -0,0 +1,4 @@
++Name: foo
++Description: A pkg-config file whose identifier does not match its name
++Version: 1.2.3
++Cflags: -fPIC
+diff --git a/t/client.t b/t/client.t
+index 6c80f83..db115fe 100644
+--- a/t/client.t
++++ b/t/client.t
+@@ -206,7 +206,7 @@ subtest 'path attributes' => sub {
+ 
+   mkpath "$root/$_", 0, 0700 for qw(
+     foo bar baz ralph trans formers foo/lib bar/lib trans/lib formers/lib
+-    foo/include bar/include trans/include formers/include
++    /foo/include bar/include trans/include formers/include
+   );
+ 
+   subtest 'search path' => sub {
+@@ -295,4 +295,16 @@ subtest 'global' => sub {
+ 
+ };
+ 
++subtest 'a package with a different name' => sub {
++
++  my $client = PkgConfig::LibPkgConf::Client->new( path => 'corpus/lib4' );
++
++  is( $client->find('foo'), undef, 'A human-readable name foo is ignored');
++
++  my $pkg = $client->find('bar');
++  isnt( $pkg, undef, 'An identifier bar is found' );
++  is( $pkg->cflags, '-fPIC ', 'Cflags are retrieved' );
++
++};
++
+ done_testing;
+-- 
+2.39.2
+

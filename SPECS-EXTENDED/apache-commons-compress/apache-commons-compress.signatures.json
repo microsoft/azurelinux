@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "apache-commons-compress-build.xml": "b08148f1c54080179fdc8c6afc5f4d9c414367fb191a546c4bd3cc24be914abb",
-  "commons-compress-1.26.1-src.tar.gz": "0fd4a84162f5edcca757b4d0048e7abd78272e1b6794f9f0b2b42832ead922ed"
+  "apache-commons-compress-build.xml": "a2b5bf60863391c673afb1ddcfec071d34d460ef4db2b92f4fa31a76951dc67e",
+  "commons-compress-1.19-src.tar.gz": "34217d8e831c7e769d24ade60e41aa48c71200f772f18216205c00b9b2a11d4b",
+  "commons-compress-1.19-src.tar.gz.asc": "119f182d6fe0a74c5923193d509a0a012baca1efcff98a96aa4c54c48c23bfc3"
  }
 }

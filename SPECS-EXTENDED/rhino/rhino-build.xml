@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="rhino" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property name="project.groupId" value="org.mozilla"/>
+  <property name="project.artifactId" value="rhino"/>
+  <property name="project.artifactId.engine" value="rhino-engine"/>
+  <property name="project.artifactId.runtime" value="rhino-runtime"/>
+  <property name="project.version" value="1.7.15.1"/>
+
+  <property name="compiler.source" value="1.8"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src"/>
+  <property name="build.srcDirTool" value="toolsrc"/>
+  <property name="build.srcDirXmlImpl" value="xmlimplsrc"/>
+  <property name="build.resourceDir" value="src"/>
+  <property name="build.resourceDirTool" value="toolsrc"/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}"
+           nowarn="false"
+           debug="true"
+           encoding="utf-8"
+           optimize="false"
+           deprecation="true"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+        <pathelement location="${build.srcDirTool}"/>
+        <pathelement location="${build.srcDirXmlImpl}"/>
+      </src>
+     </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir}">
+         <exclude name="**/*.java"/>
+      </fileset>
+      <fileset dir="${build.resourceDirTool}">
+         <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc packagenames="*"
+             destdir="${reporting.outputDirectory}/apidocs"
+             access="protected"
+             source="${compiler.source}"
+             verbose="false"
+             version="true"
+             use="true"
+             author="true"
+             splitindex="false"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             notree="false"
+             noindex="false"
+             nohelp="false"
+             nonavbar="false"
+             serialwarn="false"
+             encoding="utf-8"
+             linksource="false"
+             breakiterator="false">
+      <sourcepath>
+        <pathelement location="${build.srcDir}"/>
+        <pathelement location="${build.srcDirTool}"/>
+        <pathelement location="${build.srcDirXmlImpl}"/>
+      </sourcepath>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${project.artifactId}-${project.version}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html, org/mozilla/javascript/engine/**, META-INF/services/**">
+      <manifest>
+		<attribute name="Automatic-Module-Name" value="org.mozilla.rhino"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-SymbolicName" value="org.mozilla.rhino"/>
+		<attribute name="Bundle-Version" value="${project.version}"/>
+		<attribute name="Export-Package" value="org.mozilla.javascript,org.mozilla.javascript.annotations,org.mozilla.javascript.ast"/>
+		<attribute name="Implementation-Title" value="Mozilla Rhino"/>
+		<attribute name="Implementation-URL" value="http://www.mozilla.org/rhino"/>
+		<attribute name="Implementation-Vendor" value="Mozilla Foundation"/>
+		<attribute name="Implementation-Version" value="${project.version}"/>
+		<attribute name="Main-Class" value="org.mozilla.javascript.tools.shell.Main"/>
+      </manifest>
+    </jar>
+    <jar jarfile="${build.dir}/${project.artifactId.engine}-${project.version}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         includes="**/package.html, org/mozilla/javascript/engine/**, META-INF/services/**">
+      <manifest>
+        <attribute name="Automatic-Module-Name" value="org.mozilla.rhino.engine"/>
+        <attribute name="Implementation-Title" value="Mozilla Rhino ScriptEngine"/>
+        <attribute name="Implementation-URL" value="http://www.mozilla.org/rhino"/>
+        <attribute name="Implementation-Vendor" value="Mozilla Foundation"/>
+        <attribute name="Implementation-Version" value="${project.version}"/>
+      </manifest>
+    </jar>
+    <jar jarfile="${build.dir}/${project.artifactId.runtime}-${project.version}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html, org/mozilla/javascript/tools/**, org/mozilla/javascript/engine/**, META-INF/services/**">
+      <manifest>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-SymbolicName" value="org.mozilla.rhino-runtime"/>
+        <attribute name="Bundle-Version" value="${project.version}"/>
+        <attribute name="Export-Package" value="org.mozilla.javascript,org.mozilla.javascript.annotations,org.mozilla.javascript.ast"/>
+        <attribute name="Implementation-Title" value="Mozilla Rhino"/>
+        <attribute name="Implementation-URL" value="http://www.mozilla.org/rhino"/>
+        <attribute name="Implementation-Vendor" value="Mozilla Foundation"/>
+        <attribute name="Implementation-Version" value="${project.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

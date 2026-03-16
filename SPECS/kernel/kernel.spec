@@ -31,8 +31,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.117.1
-Release:        1%{?dist}
+Version:        6.6.126.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -440,6 +440,30 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Feb 27 2026 Andrew Chiang <andrewchiang@microsoft.com> - 6.6.126.1-2
+- Enable CONFIG_TCP_CONG_BBR3=m
+
+* Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
+- Auto-upgrade to 6.6.126.1
+
+* Mon Feb 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.121.1-2
+- Enable lwtunnel, lwtunnel-bpf, and sched_core
+
+* Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1
+- Auto-upgrade to 6.6.121.1
+
+* Tue Jan 28 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-4
+- Enable CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
+* Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
+- Enable XFRM_INTERFACE
+
+* Thu Jan 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-2
+- Enable CONFIG_INET_DIAG_DESTROY
+
+* Tue Jan 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.119.3-1
+- Auto-upgrade to 6.6.119.3
+
 * Wed Nov 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.117.1-1
 - Auto-upgrade to 6.6.117.1
 

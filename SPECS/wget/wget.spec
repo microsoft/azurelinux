@@ -3,7 +3,7 @@
 Summary:        An advanced file and recursive website downloader
 Name:           wget
 Version:        2.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND GFDL-1.3-or-later
 URL:            https://gitlab.com/gnuwget/wget2
 Group:          System Environment/NetworkingPrograms
@@ -31,6 +31,8 @@ Patch0006:      0006-Disable-TCP-Fast-Open-by-default.patch
 Patch0007:      fix-ssl-read-and-write-error-check.patch
 # https://github.com/rockdaboot/wget2/issues/344
 Patch0008:      set-debug_skip_body-for-OCSP-requests-in-openssl-tls-provider.patch
+Patch9:      CVE-2025-69194.patch
+Patch10:     CVE-2025-69195.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -163,6 +165,9 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
+* Mon Jan 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.0-7
+- Patch for CVE-2025-69194, CVE-2025-69195
+
 * Mon Feb 24 2025 Sam Meluch <sammeluch@microsoft.com> - 2.1.0-6
 - Add %check section from Fedora upstream.
 

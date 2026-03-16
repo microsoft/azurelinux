@@ -1,0 +1,13 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 7b09dd5..568f3dd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -31,8 +31,6 @@ classifiers = [
+   "Programming Language :: Python :: 3.10",
+   "Programming Language :: Python :: 3.11",
+   "Programming Language :: Python :: 3.12",
+-  "Programming Language :: Python :: 3.13",
+-  "Programming Language :: Python :: 3.14",
+   "Topic :: Internet",
+   "Topic :: Software Development :: Libraries",
+   "Topic :: System",

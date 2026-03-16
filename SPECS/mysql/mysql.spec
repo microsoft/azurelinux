@@ -2,8 +2,8 @@
 
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.44
-Release:        2%{?dist}
+Version:        8.0.45
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -114,6 +114,10 @@ sudo -u test ctest || { cat Testing/Temporary/LastTest.log || echo 'No log found
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Jan 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.45-1
+- Upgrade to 8.0.45 for CVE-2026-21948, CVE-2026-21968, 
+  CVE-2026-21941, CVE-2026-21964, CVE-2026-21936, CVE-2026-21937
+
 * Tue Oct 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.44-2
 - Patch for CVE-2025-62813
 

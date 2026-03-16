@@ -1,17 +1,17 @@
-From d80b7b190c789c33a15f56613a21c44827a63c75 Mon Sep 17 00:00:00 2001
+From bab91e014f73296a8ac9a3aef2aaa324a85e9b96 Mon Sep 17 00:00:00 2001
 From: Michael Simacek <msimacek@redhat.com>
 Date: Mon, 12 Feb 2018 10:59:55 +0100
-Subject: [PATCH 2/3] Remove ZSTD compressor
+Subject: [PATCH 2/2] Remove ZSTD compressor
 
 ---
- .../compressors/CompressorStreamFactory.java  | 22 ++++---------------
- 1 file changed, 4 insertions(+), 18 deletions(-)
+ .../compress/compressors/CompressorStreamFactory.java      | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
-index 2406d5a44..9ed40a3d7 100644
+index ab178a9..3817704 100644
 --- a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
 +++ b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
-@@ -53,9 +53,6 @@
+@@ -54,9 +54,6 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
  import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
  import org.apache.commons.compress.compressors.xz.XZUtils;
  import org.apache.commons.compress.compressors.z.ZCompressorInputStream;
@@ -19,40 +19,20 @@ index 2406d5a44..9ed40a3d7 100644
 -import org.apache.commons.compress.compressors.zstandard.ZstdCompressorOutputStream;
 -import org.apache.commons.compress.compressors.zstandard.ZstdUtils;
  import org.apache.commons.compress.utils.IOUtils;
- import org.apache.commons.compress.utils.Sets;
- 
-@@ -280,10 +277,6 @@ static String detect(final InputStream inputStream, final Set<String> compressor
+ import org.apache.commons.compress.utils.Lists;
+ import org.apache.commons.compress.utils.ServiceLoaderIterator;
+@@ -516,10 +513,6 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
              return LZ4_FRAMED;
          }
  
--        if (compressorNames.contains(ZSTANDARD) && ZstdUtils.matches(signature, signatureLength)) {
+-        if (ZstdUtils.matches(signature, signatureLength)) {
 -            return ZSTANDARD;
 -        }
 -
          throw new CompressorException("No Compressor found for the stream signature.");
      }
- 
-@@ -405,10 +398,6 @@ public static String getZ() {
-         return Z;
-     }
- 
--    public static String getZstandard() {
--        return ZSTANDARD;
--    }
--
-     static void putAll(final Set<String> names, final CompressorStreamProvider provider, final TreeMap<String, CompressorStreamProvider> map) {
-         names.forEach(name -> map.put(toKey(name), provider));
-     }
-@@ -513,7 +502,7 @@ public CompressorInputStream createCompressorInputStream(final InputStream in, f
-      * Creates a compressor input stream from a compressor name and an input stream.
-      *
-      * @param name of the compressor, i.e. {@value #GZIP}, {@value #BZIP2}, {@value #XZ}, {@value #LZMA}, {@value #PACK200}, {@value #SNAPPY_RAW},
--     *             {@value #SNAPPY_FRAMED}, {@value #Z}, {@value #LZ4_BLOCK}, {@value #LZ4_FRAMED}, {@value #ZSTANDARD}, {@value #DEFLATE64} or
-+     *             {@value #SNAPPY_FRAMED}, {@value #Z}, {@value #LZ4_BLOCK}, {@value #LZ4_FRAMED}, {@value #DEFLATE64} or
-      *             {@value #DEFLATE}
-      * @param in   the input stream
-      * @return compressor input stream
-@@ -554,10 +543,7 @@ public CompressorInputStream createCompressorInputStream(final String name, fina
+     /**
+@@ -595,10 +588,7 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
              }
  
              if (ZSTANDARD.equalsIgnoreCase(name)) {
@@ -64,16 +44,7 @@ index 2406d5a44..9ed40a3d7 100644
              }
  
              if (LZMA.equalsIgnoreCase(name)) {
-@@ -614,7 +600,7 @@ public CompressorInputStream createCompressorInputStream(final String name, fina
-      * Creates a compressor output stream from a compressor name and an output stream.
-      *
-      * @param name the compressor name, i.e. {@value #GZIP}, {@value #BZIP2}, {@value #XZ}, {@value #PACK200}, {@value #SNAPPY_FRAMED}, {@value #LZ4_BLOCK},
--     *             {@value #LZ4_FRAMED}, {@value #ZSTANDARD} or {@value #DEFLATE}
-+     *             {@value #LZ4_FRAMED} or {@value #DEFLATE}
-      * @param out  the output stream
-      * @return the compressor output stream
-      * @throws CompressorException      if the archiver name is not known
-@@ -665,7 +651,7 @@ public CompressorOutputStream createCompressorOutputStream(final String name, fi
+@@ -714,7 +704,7 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
              }
  
              if (ZSTANDARD.equalsIgnoreCase(name)) {
@@ -83,5 +54,5 @@ index 2406d5a44..9ed40a3d7 100644
          } catch (final IOException e) {
              throw new CompressorException("Could not create CompressorOutputStream", e);
 -- 
-2.43.0
+2.14.3
 

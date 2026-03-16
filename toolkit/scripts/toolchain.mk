@@ -309,7 +309,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh $(TOOLCHAIN_GPG_VALIDATION_KEYS)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh $(depend_TOOLCHAIN_GPG_VALIDATION_KEYS) $(TOOLCHAIN_GPG_VALIDATION_KEYS)
 	@log_file="$(toolchain_downloads_logs_dir)/$(notdir $@).log" && \
 	rm -f "$$log_file" && \
 	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
