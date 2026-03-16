@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.6.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -22,6 +22,7 @@ Patch9:         CVE-2025-5916.patch
 Patch10:        CVE-2025-5917.patch
 Patch11:        CVE-2025-5918.patch
 Patch12:        CVE-2025-60753.patch
+Patch13:        CVE-2026-4111.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -75,6 +76,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Mar 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.6.1-9
+- Patch for CVE-2026-4111
+
 * Tue Jan 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.6.1-8
 - Patch for CVE-2025-60753
 
