@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libssh
 Version:        0.10.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -19,6 +19,7 @@ Patch3:         CVE-2025-5318.patch
 Patch4:         CVE-2025-4878.patch
 Patch5:         CVE-2025-8277.patch
 Patch6:         CVE-2025-8114.patch
+Patch7:         CVE-2026-3731.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -152,6 +153,9 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Mon Mar 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-6
+- Patch for CVE-2026-3731
+
 * Wed Nov 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-5
 - Patch for CVE-2025-8114
 
