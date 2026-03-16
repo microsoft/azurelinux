@@ -31,20 +31,20 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 5
+%global target_azl_build_kernel_version 6.12.68.1
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-5%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-6%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 5%{release_suffix}%{?dist}
+Release:	 6%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -110,6 +110,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-isert-*.conf
 
 %changelog
+* Mon Mar 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-6_6.12.68.1.1
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 25.07-5_6.12.57.1.5
 - Bump release to match kernel-hwe
 
