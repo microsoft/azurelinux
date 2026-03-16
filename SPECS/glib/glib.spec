@@ -20,6 +20,7 @@ Patch6:         CVE-2025-13601.patch
 Patch7:         CVE-2025-14087.patch
 Patch8:         CVE-2025-14512.patch
 Patch9:         CVE-2026-1489.patch
+Patch10:        CVE-2026-0988.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -134,7 +135,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %changelog
 * Thu Feb 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.71.0-10
-- Patch for CVE-2026-1489
+- Patch for CVE-2026-1489, CVE-2026-0988
 
 * Mon Dec 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.71.0-9
 - Patch for CVE-2025-14512, CVE-2025-14087
