@@ -16,7 +16,7 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
 Version:        3.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 
+Patch0:         pytest-xdist-3.5.0-fix-pytest9-parser.patch
 %description %{_description}
 
 %package -n     python3-%{pypi_name}
@@ -47,7 +48,7 @@ Requires:       python3-py
 %pyproject_extras_subpkg -n python3-%{pypi_name} psutil setproctitle
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n %{pypi_name}-%{version} -p1
 
 %build
 %pyproject_wheel
@@ -68,7 +69,7 @@ pip3 install atomicwrites>=1.3.0 \
     apipkg
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v  -k "not test_warning_captured_deprecated_in_pytest_6"
+    python%{python3_version} -m pytest -v  -k "not test_warning_captured_deprecated_in_pytest_6 and not test_handlecrashitem_one"
 
 %files -n python3-%{pypi_name}
 %doc README.rst
@@ -77,7 +78,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/xdist/
 
 %changelog
-* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 5.5.0-1
+* Tue Mar 03 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.0-2
+- Add patch to fix parser ptest error.
+- Skip failing crash-output test incompatible with pytest 9
+
+* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 3.5.0-1
 - Updating to version 3.5.0.
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-1

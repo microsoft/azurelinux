@@ -1,0 +1,31 @@
+From 302a1ff190f7b04db6c9bf8885cca1cf5dbf051b Mon Sep 17 00:00:00 2001
+From: Durga Jagadeesh Palli <v-dpalli@microsoft.com>
+Date: Thu, 12 Mar 2026 09:50:20 +0000
+Subject: [PATCH] Address ptest-error-conditionally
+
+---
+ testing/test_remote.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/testing/test_remote.py b/testing/test_remote.py
+index 2d250c5..a5fdb8d 100644
+--- a/testing/test_remote.py
++++ b/testing/test_remote.py
+@@ -372,7 +372,13 @@ def test_remote_usage_prog(pytester: pytest.Pytester, request) -> None:
+         import sys
+ 
+         def test(get_config_parser, request):
+-            get_config_parser._getparser().error("my_usage_error")
++            import pytest
++            # pytest 9 changed internal get_config_parser API. Keep compatibility with pytest < 9.
++            # (Upstream handles this with a version check.)
++            if pytest.version_tuple[:2] >= (9, 0):
++                get_config_parser.optparser.error("my_usage_error")
++            else:
++                get_config_parser._getparser().error("my_usage_error")
+     """
+     )
+ 
+-- 
+2.45.4
+
