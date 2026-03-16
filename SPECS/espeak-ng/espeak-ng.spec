@@ -62,8 +62,7 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 
 %check
 # Disable parallel build
-%define _smp_mflags -j1
-%make_build check
+%make_build -j1 check
 
 %ldconfig_scriptlets
 
