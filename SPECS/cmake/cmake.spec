@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,7 @@ operating system and in a compiler-independent manner.
 
 %prep
 %autosetup -p1
+rm -rf Utilities/cmcurl/lib/vssh/
 
 %build
 ./bootstrap \
