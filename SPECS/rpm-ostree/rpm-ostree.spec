@@ -11,6 +11,7 @@ Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
 Patch1:         rpm-ostree-libdnf-build.patch
 Patch2:         CVE-2024-2905.patch
 Patch3:         CVE-2026-25541.patch
+Patch4:         CVE-2025-58160.patch
 
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
@@ -180,7 +181,7 @@ make check
 
 %changelog
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2024.4-8
-- Patch for CVE-2026-25541
+- Patch for CVE-2026-25541 & CVE-2025-58160
 
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2024.4-7
 - Bump release to rebuild with rust
