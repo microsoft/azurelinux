@@ -21560,6 +21560,10 @@ name = "wsdd"
 description = "Web Service Discovery daemon for SMB/CIFS network browsing"
 
 [[items]]
+name = "wsl-setup"
+description = "Critical required for WSL and other packages"
+
+[[items]]
 name = "xalan-j2"
 description = "Java XSLT processor"
 
