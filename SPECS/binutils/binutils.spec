@@ -37,7 +37,7 @@ Patch3:         CVE-2025-1178.patch
 Patch4:         CVE-2025-1181.patch
 Patch5:         CVE-2025-1182.patch
 Patch6:         CVE-2025-0840.patch
-Patch7:		CVE-2025-1744.patch
+Patch7:         CVE-2025-1744.patch
 Patch8:         CVE-2025-5245.patch
 Patch9:         CVE-2025-5244.patch
 Patch10:        CVE-2025-7546.patch
