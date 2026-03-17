@@ -1,0 +1,9 @@
+[components.xorg-x11-drv-nvidia]
+spec = { 
+    type = "upstream", 
+    upstream-distro = { 
+        name = "rpmfusion-nonfree", 
+        version = "43", 
+        snapshot = "2026-02-24T00:00:00-08:00" 
+    } 
+}
