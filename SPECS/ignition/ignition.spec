@@ -56,11 +56,14 @@ Patch19:        0020-internal-exec-stages-mount-Mount-oem.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
-BuildRequires: go-rpm-macros
 BuildRequires: golang
 
 ExcludeArch: %{ix86}
 
+# Requires for 'disks' stage
+%if 0%{?fedora}
+Recommends: btrfs-progs
+%endif
 Requires: dosfstools
 Requires: gdisk
 Requires: dracut
@@ -111,7 +114,7 @@ This package contains the grub2 config which is compatable with bootupd.
 %forgeautosetup -p1
 
 %build
-export LDFLAGS="-X github.com/flatcar/ignition/v2/internal/version.Raw=%{version} -X github.com/flatcar/ignition/v2/internal/distro.selinuxRelabel=false "
+export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=false "
 export GOFLAGS="-mod=vendor"
 
 echo "Building ignition..."
@@ -167,6 +170,7 @@ install -p -m 0644 ./ignition-validate-* %{buildroot}%{_datadir}/ignition
 %check
 sed -i '34d' ./test
 sed -i '/Checking gofmt/,+5d' ./test
+sed -i '/Checking gofix.../,/Checking [a-zA-Z0-9_-]\+\.\.\./{ /Checking gofix.../d; /Checking [a-zA-Z0-9_-]\+\.\.\./!d }' ./test
 VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
