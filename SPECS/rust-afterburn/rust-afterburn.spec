@@ -14,15 +14,12 @@ Distribution:   Azure Linux
 License:        Apache-2.0
 URL:            https://crates.io/crates/%{crate}
 Source0:        https://github.com/coreos/%{crate}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# not used on Fedora
 Source1:        %{crate}-%{version}-azlcustomvendor.tar.gz
 Source2:        coreos-metadata-sshkeys.service
 Source3:        coreos-metadata.service
 Patch0:         0001-Revert-remove-cl-legacy-feature.patch
 Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
 Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
-# build(deps): bump mailparse from 0.15.0 to 0.16.1
-# (Only the Cargo.toml portion, not the Cargo.lock portion)
 
 ExcludeArch:    %{ix86}
 
@@ -91,7 +88,7 @@ replace-with = "vendored-sources"
 directory = "vendor"
 EOF
 # afterburn-sshkeys@.service is by default enabled for the 'core' user in
-# Fedora CoreOS.
+# CoreOS.
 # Based on https://github.com/coreos/afterburn/blob/master/Makefile.
 sed -e 's,@DEFAULT_INSTANCE@,core,' < \
   systemd/afterburn-sshkeys@.service.in > \
