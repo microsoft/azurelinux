@@ -1,0 +1,4 @@
+[components.rust]
+# Fedora repo does not have 1.93 which the spec gets pinned to. Snapshot from a
+# later version to pickup a later version - 1.94, which is available.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-03-10T00:00:00-08:00" } }
