@@ -25,6 +25,8 @@ Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{
 Patch0001: 0001-python-pyproject.toml.patch
 Patch0002: CVE-2024-52338.patch
 Patch0003: CVE-2026-25087.patch
+Patch0004: libarrow-15.0.0-fix-transform-iterator-uninitialized.patch
+
 
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
