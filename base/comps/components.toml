@@ -300,6 +300,7 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.setup]
 [components.shadow-utils]
 [components.slang]
+[components.socat]
 [components.sqlite]
 [components.sssd]
 [components.strace]
