@@ -1447,6 +1447,20 @@
         "justification": "Needed for livepatching - PR: https://github.com/microsoft/azurelinux/pull/3107"
       },
       {
+        "name": "CONFIG_LOCK_DOWN_IN_EFI_SECURE_BOOT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Required for EFI Secure Boot lockdown across all kernels"
+      },
+      {
         "name": "CONFIG_LLC",
         "values": [
           {
