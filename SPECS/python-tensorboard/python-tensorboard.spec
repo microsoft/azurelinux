@@ -28,6 +28,7 @@ BuildRequires:  python3-numpy
 BuildRequires:  python3-pip
 BuildRequires:  python3-protobuf
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-packaging >= 24
 BuildRequires:  python3-six
 BuildRequires:  python3-virtualenv
 BuildRequires:  python3-wheel
@@ -102,10 +103,10 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 - Remove npm directory before building to make sure as no nodejs vulnerability is getting through
 - It is done while fixing CVE-2024-21538
 
-* Thu Sep 26 09 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-5
+* Thu Sep 26 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-5
 - Patch to fix CVE-2024-45590
 
-* Wed Sep 25 09 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-4
+* Wed Sep 25 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-4
 - Patch to fix CVE-2024-43796
 
 * Mon Sep 02 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-3
