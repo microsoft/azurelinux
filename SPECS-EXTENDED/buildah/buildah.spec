@@ -27,10 +27,10 @@ Epoch: 0
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 1.41.4
+Version: 1.43.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 7%{?dist}
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch: aarch64 ppc64le s390x x86_64
@@ -39,9 +39,10 @@ URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0: 0001-Run-selective-tests.patch
+Patch1: 0001-fix-copier-arguments.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
-BuildRequires: golang >= 1.16.6
+BuildRequires: golang >= 1.25.0
 BuildRequires: glib2-devel
 BuildRequires: glibc-static >= 2.38-19%{?dist}
 %if !%{defined gobuild}
@@ -173,8 +174,9 @@ make test-unit
 %{_datadir}/%{name}/test
 
 %changelog
-* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 0:1.41.4-7
-- Bump to rebuild with updated glibc
+* Wed Mar 18 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.43.0-1
+- Upgrade to version 1.43.0
+- fixed ptests failures
 
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0:1.41.4-6
 - Bump to rebuild with updated glibc
