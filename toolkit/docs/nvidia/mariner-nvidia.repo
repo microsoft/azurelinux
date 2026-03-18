@@ -7,3 +7,4 @@ repo_gpgcheck=1
 enabled=1
 skip_if_unavailable=True
 sslverify=1
+priority=1
