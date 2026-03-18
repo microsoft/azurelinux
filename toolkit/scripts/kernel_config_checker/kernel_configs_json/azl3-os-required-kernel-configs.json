@@ -22,10 +22,6 @@
           {
             "architecture": "x86_64",
             "value": "y"
-          },
-          {
-            "architecture": "arm64",
-            "value": "n"
           }
         ],
         "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
@@ -353,6 +349,30 @@
         "justification": "Needed to see early logging in serial console - PR: https://github.com/microsoft/azurelinux/pull/6888"
       },
       {
+        "name": "CONFIG_CRYPTO_ARC4",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable FIPS crypto configs and dependencies for arm64"
+      },
+      {
+        "name": "CONFIG_CRYPTO_DEV_BCM_SPU",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable FIPS crypto configs and dependencies for arm64"
+      },
+      {
         "name": "CONFIG_CRYPTO_DH",
         "values": [
           {
@@ -622,10 +642,6 @@
           {
             "architecture": "x86_64",
             "value": "y"
-          },
-          {
-            "architecture": "arm64",
-            "value": "n"
           }
         ],
         "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
@@ -1450,10 +1466,6 @@
           {
             "architecture": "x86_64",
             "value": "y"
-          },
-          {
-            "architecture": "arm64",
-            "value": "n"
           }
         ],
         "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
@@ -2932,16 +2944,6 @@
           "justification": "needed for 64k page size"
         },
         {
-          "name": "CONFIG_DEVICE_PRIVATE",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "kernel-64k enables DEVICE_PRIVATE on arm64 - PR: https://github.com/microsoft/azurelinux/pull/12178"
-        },
-        {
           "name": "CONFIG_DMI_SYSFS",
           "values": [
             {
@@ -3006,66 +3008,6 @@
     {
       "name": "kernel-hwe",
       "kernel_configs": [
-        {
-          "name": "CONFIG_ANON_VMA_NAME",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "kernel-hwe enables ANON_VMA_NAME on arm64 - PR: https://github.com/microsoft/azurelinux/pull/12178"
-        },
-        {
-          "name": "CONFIG_CRYPTO_DH_RFC7919_GROUPS",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "n"
-            }
-          ],
-          "justification": "kernel-hwe 6.12 does not enable CRYPTO_DH_RFC7919_GROUPS on arm64 - PR: https://github.com/microsoft/azurelinux/pull/11409"
-        },
-        {
-          "name": "CONFIG_CRYPTO_ECC",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "m"
-            }
-          ],
-          "justification": "kernel-hwe 6.12 builds CRYPTO_ECC as module on arm64 - PR: https://github.com/microsoft/azurelinux/pull/366"
-        },
-        {
-          "name": "CONFIG_CRYPTO_ECDSA",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "n"
-            }
-          ],
-          "justification": "kernel-hwe 6.12 does not enable CRYPTO_ECDSA on arm64 - PR: https://github.com/microsoft/azurelinux/pull/1932"
-        },
-        {
-          "name": "CONFIG_CRYPTO_RNG_DEFAULT",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "m"
-            }
-          ],
-          "justification": "kernel-hwe 6.12 builds CRYPTO_RNG_DEFAULT as module on arm64"
-        },
-        {
-          "name": "CONFIG_DEVICE_PRIVATE",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "kernel-hwe enables DEVICE_PRIVATE on arm64 - PR: https://github.com/microsoft/azurelinux/pull/12178"
-        },
         {
           "name": "CONFIG_DMABUF_MOVE_NOTIFY",
           "values": [
@@ -3139,26 +3081,6 @@
             }
           ],
           "justification": "kernel-hwe 6.12 does not enable ICE_SWITCHDEV on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
-        },
-        {
-          "name": "CONFIG_LRU_GEN",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "kernel-hwe enables LRU_GEN on arm64 - PR: https://github.com/microsoft/azurelinux/pull/12178"
-        },
-        {
-          "name": "CONFIG_LRU_GEN_ENABLED",
-          "values": [
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "kernel-hwe enables LRU_GEN_ENABLED on arm64 - PR: https://github.com/microsoft/azurelinux/pull/12178"
         },
         {
           "name": "CONFIG_PLDMFW",
