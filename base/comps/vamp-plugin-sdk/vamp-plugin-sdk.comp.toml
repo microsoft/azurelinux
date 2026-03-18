@@ -1,0 +1,21 @@
+[components.vamp-plugin-sdk]
+
+# The sdkstatic target runs ranlib on the static archives as a recipe
+# command after the archive files are built.  Other targets (host, plugins,
+# rdfgen) depend on the archive files directly, not on sdkstatic.  With
+# parallel make (-jN), the linker can read an archive while ranlib is
+# still rewriting its symbol table.
+# 
+# Fix by moving ranlib into the individual archive target recipes so the
+# archive file is not considered up-to-date until ranlib has finished. 
+[[components.vamp-plugin-sdk.overlays]]
+description = "Re-number existing patch and add new makefile.in patch"
+type = "spec-search-replace"
+regex = "Patch:          %.name.-libdir.diff"
+replacement = "Patch0: %{name}-libdir.diff\nPatch1: 0001-Fix-race-in-Makefile.in.patch"
+
+[[components.vamp-plugin-sdk.overlays]]
+description = "Add Makefile.in patch to fix make race"
+type = "file-add"
+file = "0001-Fix-race-in-Makefile.in.patch"
+source = "0001-Fix-race-in-Makefile.in.patch"
