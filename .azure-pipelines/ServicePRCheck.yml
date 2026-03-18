@@ -1,0 +1,120 @@
+# Microsoft Corporation
+#
+# PR check pipeline — authenticates via Workload Identity Federation (OIDC)
+# and calls an external service API with PR context.
+#
+# Prerequisites (ADO / Azure Portal):
+#   1. Entra ID App Registration with an api:// audience URI.
+#   2. Federated identity credential on the app registration for the ADO
+#      service connection (issuer: https://vstoken.dev.azure.com/<org-id>,
+#      subject: sc://<org>/<project>/<service-connection-name>).
+#   3. ARM service connection in ADO project settings using Workload Identity
+#      Federation (manual), named to match the azureSubscription value below.
+#   4. ADO branch policy or pipeline PR trigger configured to fire on PRs.
+
+# Trigger controlled by ADO branch policy — not YAML triggers.
+trigger: none
+
+pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  parameters:
+    stages:
+      - stage: PRCheck
+        displayName: 'Service PR Check'
+        jobs:
+          - job: CallServiceAPI
+            displayName: 'Authenticate and Call Service'
+            pool:
+              type: linux
+
+            variables:
+              # ── Customise these ──────────────────────────────────────
+              # Name of the ARM service connection (Workload Identity Federation).
+              serviceConnection: 'prcheck-wif-connection'
+              # Entra ID audience URI registered for the target service.
+              apiAudience: 'api://<your-service-client-id>'
+              # Base URL of the external service.
+              apiBaseUrl: 'https://<your-service-endpoint>'
+
+            steps:
+              # ── Step 1: Acquire an Entra ID bearer token ─────────────
+              - task: AzureCLI@2
+                displayName: 'Acquire Entra ID Bearer Token'
+                inputs:
+                  azureSubscription: $(serviceConnection)
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  # Exposes $servicePrincipalId, $idToken, $tenantId in the
+                  # script environment — useful for debugging or manual OIDC
+                  # exchange if needed.
+                  addSpnToEnvironment: true
+                  inlineScript: |
+                    set -euo pipefail
+
+                    echo "Authenticating via Workload Identity Federation..."
+
+                    TOKEN=$(az account get-access-token \
+                      --resource "$(apiAudience)" \
+                      --query accessToken \
+                      -o tsv)
+
+                    if [[ -z "$TOKEN" ]]; then
+                      echo "##vso[task.logissue type=error]Failed to acquire bearer token."
+                      exit 1
+                    fi
+
+                    # Store as a secret pipeline variable for subsequent steps.
+                    echo "##vso[task.setvariable variable=API_TOKEN;issecret=true]$TOKEN"
+                    echo "Bearer token acquired (expires: $(az account get-access-token \
+                      --resource "$(apiAudience)" --query expiresOn -o tsv))"
+
+              # ── Step 2: Call the external service API ─────────────────
+              - script: |
+                  set -euo pipefail
+
+                  # Build the JSON payload from ADO predefined PR variables.
+                  PAYLOAD=$(cat <<'DELIM'
+                  {
+                    "prNumber":     "$(System.PullRequest.PullRequestNumber)",
+                    "headCommit":   "$(System.PullRequest.SourceCommitId)",
+                    "mergeCommit":  "$(Build.SourceVersion)",
+                    "sourceBranch": "$(System.PullRequest.SourceBranch)",
+                    "targetBranch": "$(System.PullRequest.TargetBranch)",
+                    "author":       "$(Build.RequestedFor)",
+                    "authorEmail":  "$(Build.RequestedForEmail)",
+                    "repository":   "$(Build.Repository.Name)",
+                    "buildId":      "$(Build.BuildId)"
+                  }
+                  DELIM
+                  )
+
+                  echo "Calling service API for PR #$(System.PullRequest.PullRequestNumber)..."
+                  echo "Payload:"
+                  echo "$PAYLOAD" | jq .
+
+                  HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+                    -X POST "$(apiBaseUrl)/api/pr-check" \
+                    -H "Authorization: Bearer $(API_TOKEN)" \
+                    -H "Content-Type: application/json" \
+                    -d "$PAYLOAD")
+
+                  echo "HTTP status: $HTTP_CODE"
+
+                  if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 300 ]]; then
+                    echo "##vso[task.logissue type=error]Service returned HTTP $HTTP_CODE"
+                    cat response.json
+                    exit 1
+                  fi
+
+                  echo "Service response:"
+                  cat response.json | jq .
+                displayName: 'Call Service API with PR Context'
