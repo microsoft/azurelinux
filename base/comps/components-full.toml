@@ -557,7 +557,6 @@
 [components.GraphicsMagick]
 [components.graphite2]
 [components.graphviz]
-[components.grpc]
 [components.gsettings-desktop-schemas]
 [components.gsl]
 [components.gsm]

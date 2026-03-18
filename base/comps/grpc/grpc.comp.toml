@@ -1,0 +1,19 @@
+[components.grpc.spec]
+
+# Race condition in FilterStackCall::StartBatch() causes SIGABRT during
+# RoundRobinTest.HealthCheckingHandlesSubchannelFailure in client_lb_end2end_test.
+# The test passes in Fedora Koji (grpc-1.48.4-57.fc44 x86_64) but crashes in AZL's
+# container build environment due to timing differences. This is the same class of
+# issue that causes Fedora to exclude many other gRPC tests (client_ssl, flaky_network, etc.).
+# Fedora Koji successful build: https://koji.fedoraproject.org/koji/buildinfo?buildID=2926315
+[[components.grpc.overlays]]
+description = "Exclude client_lb_end2end_test which crashes with a race condition in CQ assertion under AZL build environment"
+type = "spec-search-replace"
+section = "%check"
+regex = '^client_ssl$'
+replacement = """client_ssl
+
+# Race condition in FilterStackCall::StartBatch() CQ assertion (SIGABRT)
+# in RoundRobinTest.HealthCheckingHandlesSubchannelFailure.
+# Passes in Fedora but crashes under AZL container environment timing.
+client_lb_end2end"""
