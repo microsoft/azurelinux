@@ -1,0 +1,11 @@
+[testsuite]
+name = "LisaSmoke"
+
+[selector]
+testcase_names = ["smoke_test"]
+
+[image]
+definition = "vm-base"
+
+[platform]
+location = "eastus"
