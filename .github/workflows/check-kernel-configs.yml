@@ -1,0 +1,96 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# This action checks that required kernel configs have not been removed or
+# modified to an undesirable value.
+name: Kernel Required Configs Check
+
+on:
+  push:
+    branches: [3.0*, fasttrack/*]
+    paths:
+      - 'SPECS/kernel*/config*'
+  pull_request:
+    branches: [3.0*, fasttrack/*]
+    paths:
+      - 'SPECS/kernel*/config*'
+
+jobs:
+  check:
+    name: Kernel configs check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+      # For consistency, we use the same major/minor version of Python that Azure Linux ships
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Get Python dependencies
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      # Check if kernel configs changed
+      - name: Check if config files changed
+        run: |
+          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+          changed_configs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/kernel.*/config.*$" || test $? = 1; })
+          echo "Files to validate: '${changed_configs}'"
+          echo "updated_configs<<EOF" >> $GITHUB_ENV
+          echo "${changed_configs}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # Run kernel config checker against each changed config file
+      - name: Run kernel config checking script
+        if: ${{ env.updated_configs != '' }}
+        run: |
+          failed=0
+          holder="${{ env.updated_configs }}"
+          for file in $holder; do
+            # Extract kernel name from path (e.g., SPECS/kernel-hwe/config -> kernel-hwe)
+            kernel_name=$(echo "$file" | sed 's|SPECS/\([^/]*\)/.*|\1|')
+
+            # Determine architecture from filename
+            if [[ "$file" == *"aarch64"* ]]; then
+              arch="arm64"
+            else
+              arch="x86_64"
+            fi
+
+            echo "============================================"
+            echo "Checking: ${file} (kernel=${kernel_name}, arch=${arch})"
+            echo "============================================"
+
+            cd toolkit/scripts/kernel_config_checker
+            if ! python3 check_config.py \
+              "../../../${file}" \
+              kernel_configs_json/azl3-os-required-kernel-configs.json \
+              "${kernel_name}" "${arch}"; then
+              failed=1
+            fi
+            cd ../../..
+          done
+
+          if [ "$failed" -eq 1 ]; then
+            echo ""
+            echo "✗ One or more kernel config checks failed"
+            exit 1
+          fi
