@@ -3854,7 +3854,6 @@
 [components.rust-new_debug_unreachable]
 [components.rust-newtype-uuid]
 [components.rust-nibble_vec]
-[components.rust-nix]
 [components.'rust-nix0.24']
 [components.'rust-nix0.26']
 [components.'rust-nix0.27']
