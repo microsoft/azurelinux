@@ -37,9 +37,7 @@ Provides:       perl(XML::Parser::Style::Tree) = %{version}-%{release}
 The XML::Parser module is a Perl extension interface to James Clark's XML parser, expat
 
 %prep
-%setup -q -n XML-Parser-%{version}
-%patch 0 -p1
-%patch 1 -p1
+%autosetup -p1 -n XML-Parser-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor --prefix=%{_prefix}
