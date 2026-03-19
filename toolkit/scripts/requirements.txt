@@ -14,7 +14,7 @@ rpm==0.1.0
     # via -r requirements.in
 validators==0.20.0
     # via -r requirements.in
-pydantic>=2.0.0
+pydantic==2.9.2
     # via kernel_config_checker
 
 # The following packages are considered to be unsafe in a requirements file:
