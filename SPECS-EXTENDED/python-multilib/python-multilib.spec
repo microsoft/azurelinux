@@ -69,5 +69,5 @@ install -D -m 0644 etc/multilib.conf %{buildroot}%{_sysconfdir}/multilib.conf
 
 %changelog
 * Wed Mar 18 2026 GitHub Copilot <copilot@github.com> - 1.3-1
-- Initial Azure Linux import from Fedora rawhide.
+- Initial Azure Linux import from Fedora 44 (license: MIT).
 - License verified.
