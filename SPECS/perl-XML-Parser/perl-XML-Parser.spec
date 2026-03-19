@@ -1,13 +1,15 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
 Version:        2.47
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://metacpan.org/pod/XML::Parser
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{version}.tar.gz
+Patch0:         CVE-2006-10002.patch
+Patch1:         CVE-2006-10003.patch
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -36,6 +38,8 @@ The XML::Parser module is a Perl extension interface to James Clark's XML parser
 
 %prep
 %setup -q -n XML-Parser-%{version}
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor --prefix=%{_prefix}
@@ -55,6 +59,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Mar 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.47-2
+- Patch for CVE-2006-10003, CVE-2006-10002
+
 * Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.47-1
 - Upgrade to 2.47
 
