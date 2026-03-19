@@ -1,6 +1,6 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
-Version:        2.47
+Version:        2.49
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
@@ -55,6 +55,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Mar 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.49-1
+- Auto-upgrade to 2.49 - for CVE-2006-10002, CVE-2006-10003
+
 * Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.47-1
 - Upgrade to 2.47
 

@@ -21003,8 +21003,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Parser",
-          "version": "2.47",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz"
+          "version": "2.49",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.49.tar.gz"
         }
       }
     },
