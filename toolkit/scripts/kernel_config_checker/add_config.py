@@ -48,22 +48,50 @@ def _select_override(data: dict) -> str:
             return choice
 
 
+def _find_existing(configs: list, name: str) -> Optional[int]:
+    """Return the index of an existing config with the given name, or None."""
+    for i, cfg in enumerate(configs):
+        if cfg.get("name") == name:
+            return i
+    return None
+
+
+def _insert_or_replace(configs: list, new_config: dict) -> bool:
+    """Insert config, prompting to replace if a duplicate exists.
+
+    Returns True if the config was added/replaced, False if the user declined.
+    """
+    idx = _find_existing(configs, new_config["name"])
+    if idx is not None:
+        print(f"⚠  {new_config['name']} already exists in this section.")
+        choice = input("Replace existing entry? [y/N]: ").strip().lower()
+        if choice != "y":
+            print("Aborted.")
+            return False
+        configs[idx] = new_config
+    else:
+        configs.append(new_config)
+    return True
+
+
 def _add_config_to_data(
     data: dict, new_config: dict, override_name: Optional[str]
-) -> str:
-    """Add a config entry to the data dict."""
+) -> Optional[str]:
+    """Add a config entry to the data dict. Returns section label or None if aborted."""
     if override_name is None:
         if "default" not in data:
             data["default"] = {
                 "name": "default",
                 "kernel_configs": [],
             }
-        data["default"]["kernel_configs"].append(new_config)
+        if not _insert_or_replace(data["default"]["kernel_configs"], new_config):
+            return None
         return "default section"
 
     for override in data.get("overrides", []):
         if override.get("name") == override_name:
-            override["kernel_configs"].append(new_config)
+            if not _insert_or_replace(override["kernel_configs"], new_config):
+                return None
             return f"'{override_name}' override section"
 
     if "overrides" not in data:
@@ -83,6 +111,11 @@ def add_config_interactive(schema_path: Path) -> None:
     if not config_name.startswith("CONFIG_"):
         config_name = "CONFIG_" + config_name
 
+    if config_name == "CONFIG_" or not config_name[len("CONFIG_"):].replace("_", "").isalnum():
+        print("❌ Error: Invalid config name. Must be a non-empty"
+              " alphanumeric symbol like CONFIG_EXAMPLE")
+        return
+
     print(
         "\nEnter values for each architecture"
         " (y/n/m or specific value, leave blank to skip):"
@@ -91,6 +124,9 @@ def add_config_interactive(schema_path: Path) -> None:
     arm64_value = input("arm64 value: ").strip()
 
     justification = input("\nEnter justification: ").strip()
+    if not justification:
+        print("❌ Error: Justification is required for auditability")
+        return
 
     with open(schema_path, "r") as f:
         data = json.load(f)
@@ -115,6 +151,8 @@ def add_config_interactive(schema_path: Path) -> None:
     }
 
     section_label = _add_config_to_data(data, new_config, override_name)
+    if section_label is None:
+        return
 
     try:
         validated = IntentionalKernelConfigSchema.model_validate(data)

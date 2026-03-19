@@ -184,10 +184,24 @@ def main():
         "kernel_name", nargs="?", help="Name of the kernel to check"
     )
     parser.add_argument(
-        "architecture", nargs="?", help="Architecture (x86_64 or arm64)"
+        "architecture",
+        nargs="?",
+        help="Architecture (x86_64 or arm64; 'aarch64' is accepted as arm64)",
     )
 
     args = parser.parse_args()
+
+    # Normalize and validate architecture early to avoid silent success on typos.
+    if args.architecture:
+        # Normalize common alias to the canonical name used in configs.
+        if args.architecture == "aarch64":
+            args.architecture = "arm64"
+        valid_architectures = {"x86_64", "arm64"}
+        if args.architecture not in valid_architectures:
+            parser.error(
+                f"Invalid architecture '{args.architecture}'. "
+                f"Expected one of: {', '.join(sorted(valid_architectures))}"
+            )
 
     if args.add_config:
         try:
