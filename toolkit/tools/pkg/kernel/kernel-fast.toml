@@ -1,0 +1,19 @@
+# Kernel fast-iteration overrides
+#
+# Builds only the stock (base) kernel with no debuginfo, skipping optional
+# subpackages that slow down the build. NOT for production use.
+#
+# Usage:
+#   azldev --config-file base/comps/kernel/kernel-fast.toml comp build -p kernel -q
+#
+
+[components.kernel.build]
+without = [
+    "debug",       # skip debug kernel variant (already in kernel.comp.toml, repeated here because merge replaces the list)
+    "debuginfo",   # skip debuginfo/debugsource RPMs — biggest time saver
+    "perf",        # skip perf tool subpackages
+    "tools",       # skip kernel-tools subpackages
+    "selftests",   # skip kernel selftests
+    "doc",         # skip kernel-doc
+    "cross_headers", # skip cross-compiled headers
+]
