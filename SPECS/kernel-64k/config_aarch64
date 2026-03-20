@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.126.1 Kernel Configuration
+# Linux/arm64 6.6.129.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -5595,6 +5595,7 @@ CONFIG_MFD_CORE=y
 # CONFIG_MFD_CS42L43_I2C is not set
 # CONFIG_MFD_MADERA is not set
 # CONFIG_MFD_MAX5970 is not set
+# CONFIG_MFD_TN48M_CPLD is not set
 # CONFIG_PMIC_DA903X is not set
 # CONFIG_MFD_DA9052_SPI is not set
 # CONFIG_MFD_DA9052_I2C is not set
@@ -11209,7 +11210,6 @@ CONFIG_LOCK_DEBUGGING_SUPPORT=y
 
 # CONFIG_DEBUG_IRQFLAGS is not set
 CONFIG_STACKTRACE=y
-# CONFIG_WARN_ALL_UNSEEDED_RANDOM is not set
 # CONFIG_DEBUG_KOBJECT is not set
 
 #
