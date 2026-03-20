@@ -3368,8 +3368,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.17",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.17/otp-OTP-26.2.5.17.tar.gz"
+          "version": "26.2.5.18",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.18/otp-OTP-26.2.5.18.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.0",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.0-1/go1.26.0-20260210.6.src.tar.gz"
+          "version": "1.26.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.1-1/go1.26.1-20260306.1.src.tar.gz"
         }
       }
     },
@@ -4700,8 +4700,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.7-1/go1.25.7-20260204.4.src.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.8-1/go1.25.8-20260306.2.src.tar.gz"
         }
       }
     },
@@ -6610,8 +6610,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.129.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.129.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.129.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.129.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.129.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.129.1.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.129.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.129.1.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.129.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.129.1.tar.gz"
         }
       }
     },
@@ -13001,8 +13001,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.15",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.15/source/mariadb-10.11.15.tar.gz"
+          "version": "10.11.16",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.16/source/mariadb-10.11.16.tar.gz"
         }
       }
     },
@@ -29916,8 +29916,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0088",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0088.tar.gz"
+          "version": "9.2.0173",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0173.tar.gz"
         }
       }
     },
