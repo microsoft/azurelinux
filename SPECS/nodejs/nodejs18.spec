@@ -30,7 +30,7 @@ Patch10:        CVE-2025-7656.patch
 Patch11:        CVE-2025-5889.patch
 Patch12:        CVE-2025-5222.patch
 Patch13:        CVE-2025-55131.patch
-Patch14:        CVE-2026-27135_nodejs18.patch
+Patch14:        CVE-2026-27135.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
