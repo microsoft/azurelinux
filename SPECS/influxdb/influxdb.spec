@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -157,6 +157,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 2.6.1-31
+- Bump package to rebuild with rust 1.90.0
+
 * Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.1-30
 - Patch for CVE-2025-47911, CVE-2025-30204
 

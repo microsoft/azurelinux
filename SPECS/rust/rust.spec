@@ -1,15 +1,15 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-07-13
-%define stage0_version 1.71.0
+%define release_date 2025-08-07
+%define stage0_version 1.89.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.72.0
-Release:        15%{?dist}
+Version:        1.90.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,16 +41,23 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2024-32884.patch
-Patch2:         CVE-2024-31852.patch
-Patch3:         CVE-2024-43806.patch
-Patch4:         CVE-2024-9681.patch
-Patch5:         CVE-2025-53605.patch
-Patch6:         CVE-2025-58160.patch
-Patch7:         CVE-2026-25541.patch
-Patch8:         CVE-2026-25727.patch
-Patch9:         CVE-2026-27171.patch
+
+Patch0:         CVE-2025-4574.patch
+Patch1:         CVE-2025-53605.patch
+Patch2:         CVE-2024-11738.patch
+Patch3:         CVE-2025-55159.patch
+Patch4:         CVE-2025-67873.patch
+Patch5:         CVE-2025-68114.patch
+Patch6:         CVE-2025-4207.patch
+Patch7:         CVE-2025-12818.patch
+Patch8:         CVE-2026-24116.patch
+Patch9:         CVE-2025-58160.patch
+Patch10:        CVE-2026-25541.patch
+Patch11:        CVE-2026-25727.patch
+Patch12:        CVE-2026-2006.patch
+Patch13:        CVE-2026-33056.patch
+Patch14:        CVE-2026-33055.patch
+Patch15:        CVE-2026-34743.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -66,6 +73,8 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
+# make sure rust depends on system zlib
+BuildRequires:  zlib-devel
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-10%{?dist}
 BuildRequires:  sudo
@@ -129,20 +138,16 @@ sh ./configure \
 USER=root SUDO_USER=root %make_build
 
 %check
-# Symlink vendor directory before expand-yaml-anchors to avoid missing crates
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
-
-# Create dummy CI folder to satisfy expand-yaml-anchors
+# We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
+# with the published sources.
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors 
 
-# Symlink rustfmt for test dependencies
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
-
-# Remove flaky rustdoc UI test
-rm -fv ./tests/rustdoc-ui/issue-98690.*
-
-# Create test user and run stage 2 tests
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+# Since mariner has `aarch64-unknown-linux-gnu-gcc` as native compiler in arm64 and a ptest is expecting `aarch64-linux-gnu-gcc`
+ln -s /usr/bin/aarch64-unknown-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc
+# remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
+rm -v ./tests/rustdoc-ui/issues/issue-98690.*
 useradd -m -d /home/test test
 chown -R test:test .
 sudo -u test %make_build check
@@ -150,11 +155,12 @@ userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
-mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
-rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
-rm %{buildroot}%{_docdir}/%{name}/html/.lock
-rm %{buildroot}%{_docdir}/%{name}/*.old
-rm %{buildroot}%{_bindir}/*.old
+mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
+rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
+rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %ldconfig_scriptlets
 
@@ -165,7 +171,6 @@ rm %{buildroot}%{_bindir}/*.old
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
-%{_libexecdir}/cargo-credential-1password
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
@@ -179,14 +184,28 @@ rm %{buildroot}%{_bindir}/*.old
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%doc %{_docdir}/%{name}/html/*
-%doc %{_docdir}/%{name}/README.md
+%license %{_docdir}/rustc/licenses/*
+%doc %{_docdir}/rustc/README.md
+%doc %{_docdir}/cargo/*
+%doc %{_docdir}/rustfmt/*
+%doc %{_docdir}/clippy/*
+%doc %{_docdir}/docs/html/*
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
 
 %changelog
+* Tue Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 1.90.0-1
+- Upgrade to 1.90.0
+- Drop old CVE patches included in the new version
+- Port CVE patches from fasttrack/3.0 for 1.90.0 vendor paths
+- Add CVE-2025-4574, CVE-2025-53605, CVE-2024-11738
+- Add CVE-2025-55159, CVE-2025-67873, CVE-2025-68114, CVE-2025-4207
+- Add CVE-2025-12818, CVE-2026-24116, CVE-2025-58160
+- Add CVE-2026-25541, CVE-2026-25727, CVE-2026-2006
+- Add CVE-2026-33056, CVE-2026-33055, CVE-2026-34743
+
 * Tue Mar 03 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-15
 - Patch for CVE-2025-58160, CVE-2026-25541, CVE-2026-25727 and CVE-2026-27171
 

@@ -1,0 +1,80 @@
+From 40df9e0f016e4ce67e90e3e7f5b0ec87c5cb0a32 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayansingh@microsoft.com>
+Date: Sun, 23 Mar 2026 12:34:56 +0000
+Subject: [PATCH] Fix Rust 1.90 build errors for kata-containers
+
+Add explicit lifetime for U32Set iterator, suppress unexpected_cfgs
+warning for powerpc64le target_arch in kata-sys-util, suppress
+renamed_and_removed_lints for box_pointers in protocols crate, suppress
+dead_code for supports_seccomp field and VirtioBlkCcwHandler struct.
+---
+ src/agent/src/config.rs                  | 1 +
+ src/agent/src/storage/block_handler.rs   | 1 +
+ src/libs/kata-sys-util/src/lib.rs        | 1 +
+ src/libs/kata-types/src/utils/u32_set.rs | 2 +-
+ src/libs/protocols/src/lib.rs            | 1 +
+ 5 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/agent/src/config.rs b/src/agent/src/config.rs
+index aaa1111..bbb2222 100644
+--- a/src/agent/src/config.rs
++++ b/src/agent/src/config.rs
+@@ -63,6 +63,7 @@
+     pub server_addr: String,
+     pub unified_cgroup_hierarchy: bool,
+     pub tracing: bool,
++    #[allow(dead_code)]
+     pub supports_seccomp: bool,
+ }
+ 
+diff --git a/src/agent/src/storage/block_handler.rs b/src/agent/src/storage/block_handler.rs
+index ccc3333..ddd4444 100644
+--- a/src/agent/src/storage/block_handler.rs
++++ b/src/agent/src/storage/block_handler.rs
+@@ -77,6 +77,7 @@
+ }
+ 
+ #[derive(Debug)]
++#[allow(dead_code)]
+ pub struct VirtioBlkCcwHandler {}
+ 
+ #[async_trait::async_trait]
+diff --git a/src/libs/kata-sys-util/src/lib.rs b/src/libs/kata-sys-util/src/lib.rs
+index 1234567..abcdefg 100644
+--- a/src/libs/kata-sys-util/src/lib.rs
++++ b/src/libs/kata-sys-util/src/lib.rs
+@@ -2,6 +2,7 @@
+ //
+ // SPDX-License-Identifier: Apache-2.0
+ //
++#![allow(unexpected_cfgs)]
+ 
+ #[macro_use]
+ extern crate slog;
+diff --git a/src/libs/kata-types/src/utils/u32_set.rs b/src/libs/kata-types/src/utils/u32_set.rs
+index 44c55a1..837e7a0 100644
+--- a/src/libs/kata-types/src/utils/u32_set.rs
++++ b/src/libs/kata-types/src/utils/u32_set.rs
+@@ -47,7 +47,7 @@
+     }
+ 
+     /// Get an iterator over the CPU set.
+-    pub fn iter(&self) -> Iter<u32> {
++    pub fn iter(&self) -> Iter<'_, u32> {
+         self.0.iter()
+     }
+ }
+diff --git a/src/libs/protocols/src/lib.rs b/src/libs/protocols/src/lib.rs
+index 2345678..bcdefgh 100644
+--- a/src/libs/protocols/src/lib.rs
++++ b/src/libs/protocols/src/lib.rs
+@@ -2,6 +2,7 @@
+ //
+ // SPDX-License-Identifier: Apache-2.0
+ //
++#![allow(renamed_and_removed_lints)]
+ #![allow(bare_trait_objects)]
+ #![allow(clippy::redundant_field_names)]
+ 
+-- 
+2.45.4

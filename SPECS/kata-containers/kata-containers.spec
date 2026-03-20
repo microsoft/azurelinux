@@ -39,7 +39,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -51,6 +51,7 @@ Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2023-39325.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2023-44487.patch
+Patch4:         rust-1.90-fixes.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -219,6 +220,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Fri Mar 20 2026 Mayank Singh <mayansingh@microsoft.com> - 3.2.0.azl-8
+- Bump package to rebuild with rust 1.90.0
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.0.azl-7
 - Bump release to rebuild with golang
 

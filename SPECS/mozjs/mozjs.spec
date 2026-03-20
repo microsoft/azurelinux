@@ -3,7 +3,7 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -128,6 +128,9 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
+* Wed Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 78.10.0-6
+- Bump package to rebuild with rust 1.90.0
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 78.10.0-5
 - Bump package to rebuild with rust 1.72.0
 

@@ -10,7 +10,7 @@
 
 Name:          netavark
 Version:       1.0.3
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -219,6 +219,9 @@ popd
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 1.0.3-6
+- Bump package to rebuild with rust 1.90.0
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.3-5
 - Bump package to rebuild with rust 1.72.0
 

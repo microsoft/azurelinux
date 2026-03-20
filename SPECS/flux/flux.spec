@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.191.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -141,6 +141,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Wed Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 0.191.0-5
+- Bump package to rebuild with rust 1.90.0
+
 * Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 0.191.0-4
 - Add missing EOF for inline patch call.
 

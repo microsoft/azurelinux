@@ -1,6 +1,6 @@
 Name:           virtiofsd
 Version:        1.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Virtio-fs vhost-user device daemon (Rust version)
 License:        Apache-2.0 AND BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtio
 %{_libexecdir}/virtiofsd-rs
 
 %changelog
+* Wed Apr 22 2026 Mayank Singh <mayansingh@microsoft.com> - 1.8.0-4
+- Bump package to rebuild with rust 1.90.0
+
 * Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 1.8.0-3
 - Patch CVE-2024-43806
 

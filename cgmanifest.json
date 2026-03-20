@@ -1757,8 +1757,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.9.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.5.2.tar.gz"
         }
       }
     },
@@ -27175,8 +27175,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.72.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.72.0-src.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
         }
       }
     },
