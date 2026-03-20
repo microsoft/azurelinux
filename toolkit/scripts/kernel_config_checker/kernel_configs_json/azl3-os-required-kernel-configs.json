@@ -1,0 +1,3112 @@
+{
+  "default": {
+    "name": "default",
+    "kernel_configs": [
+      {
+        "name": "CONFIG_AMD_MEM_ENCRYPT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/50479755/"
+      },
+      {
+        "name": "CONFIG_ANON_VMA_NAME",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_AQTION",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable Aquantia AQtion ethernet driver kernel configs - PR: https://github.com/microsoft/azurelinux/pull/14638"
+      },
+      {
+        "name": "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for kernel upgrade 5.15.125.1 - PR: https://github.com/microsoft/azurelinux/pull/5964"
+      },
+      {
+        "name": "CONFIG_ARM64_ERRATUM_2054223",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for kernel upgrade 5.15.123.1 - PR: https://github.com/microsoft/azurelinux/pull/5916"
+      },
+      {
+        "name": "CONFIG_ARM64_ERRATUM_2067961",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for kernel upgrade 5.15.123.1 - PR: https://github.com/microsoft/azurelinux/pull/5916"
+      },
+      {
+        "name": "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for kernel upgrade 5.15.123.1 - PR: https://github.com/microsoft/azurelinux/pull/5916"
+      },
+      {
+        "name": "CONFIG_ARM_FFA_TRANSPORT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54252120"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for VFIO to work - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "More secure when set - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_LEGACY_DT_BINDINGS",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "No device tree support needed - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_QCOM",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Allow support of QCom SMMU, because why not? - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_QCOM_DEBUG",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Allow support of QCom SMMU, because why not? - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_V3",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for VFIO to work - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_ARM_SMMU_V3_SVA",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for CONFIG_ARM_SMMU_V3 - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_BINFMT_MISC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer and HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3300"
+      },
+      {
+        "name": "CONFIG_BLK_CGROUP_IOLATENCY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable support for latency based cgroup IO protection - PR: https://github.com/microsoft/azurelinux/pull/7794"
+      },
+      {
+        "name": "CONFIG_BLK_DEV_IO_TRACE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5417"
+      },
+      {
+        "name": "CONFIG_BLK_DEV_NBD",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Add nbd module for customer - PR: https://github.com/microsoft/azurelinux/pull/5972"
+      },
+      {
+        "name": "CONFIG_BLK_DEV_SX8",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "The sx8 block driver removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel - PR: https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
+      },
+      {
+        "name": "CONFIG_BLK_DEV_ZONED",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Zoned block device support - PR: https://github.com/microsoft/azurelinux/pull/3465"
+      },
+      {
+        "name": "CONFIG_BLK_WBT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "kernel: Enable support for block device writeback throttling - PR: https://github.com/microsoft/azurelinux/pull/14797"
+      },
+      {
+        "name": "CONFIG_BLK_WBT_MQ",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "kernel: Enable support for block device writeback throttling - PR: https://github.com/microsoft/azurelinux/pull/14797"
+      },
+      {
+        "name": "CONFIG_BPF_LSM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Allow customers to use BPF LSM programs - PR: https://github.com/microsoft/azurelinux/pull/6846"
+      },
+      {
+        "name": "CONFIG_BPF_UNPRIV_DEFAULT_OFF",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for CVE-2021-20194 - PR: https://github.com/microsoft/azurelinux/pull/2352"
+      },
+      {
+        "name": "CONFIG_BRIDGE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_CC_CAN_LINK_STATIC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Remove static linking support from the kernel - PR: https://github.com/microsoft/azurelinux/pull/3748"
+      },
+      {
+        "name": "CONFIG_COMPAT_32BIT_TIME",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Avoid error that 2 bit get_time syscalls aren't available - PR: https://github.com/microsoft/azurelinux/pull/3812"
+      },
+      {
+        "name": "CONFIG_CONSOLE_LOGLEVEL_DEFAULT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "7"
+          },
+          {
+            "architecture": "arm64",
+            "value": "7"
+          }
+        ],
+        "justification": "Needed to see early logging in serial console - PR: https://github.com/microsoft/azurelinux/pull/6888"
+      },
+      {
+        "name": "CONFIG_CRYPTO_ARC4",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable FIPS crypto configs and dependencies for arm64"
+      },
+      {
+        "name": "CONFIG_CRYPTO_DEV_BCM_SPU",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable FIPS crypto configs and dependencies for arm64"
+      },
+      {
+        "name": "CONFIG_CRYPTO_DH",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/55493874"
+      },
+      {
+        "name": "CONFIG_CRYPTO_DH_RFC7919_GROUPS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "kernel: enable CONFIG_CRYPTO_DH in aarch64 - PR: https://github.com/microsoft/azurelinux/pull/11409"
+      },
+      {
+        "name": "CONFIG_CRYPTO_ECC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable arm64 hyperv and SoCs support - PR: https://github.com/microsoft/azurelinux/pull/366"
+      },
+      {
+        "name": "CONFIG_CRYPTO_ECDSA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "kernel: update to 5.15.2.1 - PR: https://github.com/microsoft/azurelinux/pull/1932"
+      },
+      {
+        "name": "CONFIG_CRYPTO_RNG_DEFAULT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Present since initial kernel configuration"
+      },
+      {
+        "name": "CONFIG_CUSE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable CUSE to support Nvidia rshim interface for Azure Linux hosts - PR: https://github.com/microsoft/azurelinux/pull/6853"
+      },
+      {
+        "name": "CONFIG_DEBUG_PREEMPT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/55530233"
+      },
+      {
+        "name": "CONFIG_DECNET",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel - PR: https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+      },
+      {
+        "name": "CONFIG_DECNET_NF_GRABULATOR",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel - PR: https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+      },
+      {
+        "name": "CONFIG_DECNET_ROUTER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel - PR: https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+      },
+      {
+        "name": "CONFIG_DEFAULT_SECURITY_SELINUX",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/47059310"
+      },
+      {
+        "name": "CONFIG_DELL_RBU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_SMBIOS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_SMBIOS_SMM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_SMBIOS_WMI",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_SMO8800",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_WMI",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_DELL_WMI_AIO",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_DELL_WMI_DESCRIPTOR",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_DELL_WMI_LED",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_DELL_WMI_PRIVACY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_DELL_WMI_SYSMAN",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_DEVICE_PRIVATE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_DMABUF_MOVE_NOTIFY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Enable DMA P2P - PR: https://github.com/microsoft/azurelinux/pull/14660"
+      },
+      {
+        "name": "CONFIG_DMI_SYSFS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52293123"
+      },
+      {
+        "name": "CONFIG_DM_CACHE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable dm-cache module - PR: https://github.com/microsoft/azurelinux/pull/14661"
+      },
+      {
+        "name": "CONFIG_DM_CACHE_SMQ",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable dm-cache module - PR: https://github.com/microsoft/azurelinux/pull/14661"
+      },
+      {
+        "name": "CONFIG_DM_MULTIPATH_HST",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/5951"
+      },
+      {
+        "name": "CONFIG_DM_MULTIPATH_IOA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/5951"
+      },
+      {
+        "name": "CONFIG_DM_MULTIPATH_QL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/5951"
+      },
+      {
+        "name": "CONFIG_DM_MULTIPATH_ST",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/5951"
+      },
+      {
+        "name": "CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG_SECONDARY_KEYRING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52293123"
+      },
+      {
+        "name": "CONFIG_DRM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "amdgpu - https://github.com/microsoft/azurelinux/pull/10612"
+      },
+      {
+        "name": "CONFIG_DRM_AMDGPU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5416"
+      },
+      {
+        "name": "CONFIG_DRM_AMDGPU_CIK",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5416"
+      },
+      {
+        "name": "CONFIG_DRM_AMDGPU_SI",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5416"
+      },
+      {
+        "name": "CONFIG_DRM_KMS_HELPER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Present since initial kernel configuration"
+      },
+      {
+        "name": "CONFIG_DRM_VGEM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed to enable media acceleration - PR: https://github.com/microsoft/azurelinux/pull/3227"
+      },
+      {
+        "name": "CONFIG_DWMAC_LOONGSON",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Not available - PR: https://github.com/microsoft/azurelinux/pull/7539"
+      },
+      {
+        "name": "CONFIG_DXGKRNL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/56525306"
+      },
+      {
+        "name": "CONFIG_E1000",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable virtio console by default and build e1000 drivers as modules - PR: https://github.com/microsoft/azurelinux/pull/10604"
+      },
+      {
+        "name": "CONFIG_E1000E",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable virtio console by default and build e1000 drivers as modules - PR: https://github.com/microsoft/azurelinux/pull/10604"
+      },
+      {
+        "name": "CONFIG_EDAC_SKX",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5487"
+      },
+      {
+        "name": "CONFIG_EROFS_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52293123"
+      },
+      {
+        "name": "CONFIG_EVM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/51595441"
+      },
+      {
+        "name": "CONFIG_FPGA_DFL_AFU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needs to be off for CVE-2023-26242 - PR: https://github.com/microsoft/azurelinux/pull/6574"
+      },
+      {
+        "name": "CONFIG_FS_VERITY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52471216"
+      },
+      {
+        "name": "CONFIG_FTRACE_SYSCALLS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed to enable eBPF CO-RE syscalls tracers - PR: https://github.com/microsoft/azurelinux/pull/3210"
+      },
+      {
+        "name": "CONFIG_FW_LOADER_COMPRESS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": " QLogic NIC firmware in linux-firmware is compressed - PR: https://github.com/microsoft/azurelinux/pull/2201"
+      },
+      {
+        "name": "CONFIG_GDS_FORCE_MITIGATION",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for kernel upgrade 5.15.125.1. Off to prevent AVX being disabled - PR: https://github.com/microsoft/azurelinux/pull/5964"
+      },
+      {
+        "name": "CONFIG_GPIO_MLXBF2",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_HIBERNATION",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/4369"
+      },
+      {
+        "name": "CONFIG_HIST_TRIGGERS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for auoms metrics - PR: https://github.com/microsoft/azurelinux/pull/5292"
+      },
+      {
+        "name": "CONFIG_HSA_AMD",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable DRM_AMDGPU module in kernel-drivers-gpu - PR: https://github.com/microsoft/azurelinux/pull/5416"
+      },
+      {
+        "name": "CONFIG_HSA_AMD_P2P",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable DMA P2P - PR: https://github.com/microsoft/azurelinux/pull/14660"
+      },
+      {
+        "name": "CONFIG_HSA_AMD_SVM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable DMA P2P - PR: https://github.com/microsoft/azurelinux/pull/14660"
+      },
+      {
+        "name": "CONFIG_HW_RANDOM_TPM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_I2C_MLXBF",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_ICE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54512964"
+      },
+      {
+        "name": "CONFIG_ICE_SWITCHDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable Intel Ethernet Connection E800 networking driver - PR: https://github.com/microsoft/azurelinux/pull/10960"
+      },
+      {
+        "name": "CONFIG_IGC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/50236901"
+      },
+      {
+        "name": "CONFIG_IMA_ARCH_POLICY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52293123"
+      },
+      {
+        "name": "CONFIG_INET_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_INET_DIAG_DESTROY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "kernel: enable CONFIG_INET_DIAG_DESTROY - PR: https://github.com/microsoft/azurelinux/pull/15465"
+      },
+      {
+        "name": "CONFIG_INET_SCTP_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_INET_TCP_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_INET_UDP_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_INFINIBAND_BNXT_RE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_INIT_ON_FREE_DEFAULT_ON",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Creates increased boot times and errors on large memory systems - PR: https://github.com/microsoft/azurelinux/pull/4829"
+      },
+      {
+        "name": "CONFIG_INTEGRITY_MACHINE_KEYRING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52293123"
+      },
+      {
+        "name": "CONFIG_INTEL_IFS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54251923?src=WorkItemMention&src-action=artifact_link"
+      },
+      {
+        "name": "CONFIG_INTEL_IOMMU_SVM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/84"
+      },
+      {
+        "name": "CONFIG_INTEL_TDX_GUEST",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://dev.azure.com/microsoft/OS/_workitems/edit/46616758"
+      },
+      {
+        "name": "CONFIG_IOMMU_SVA",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for CONFIG_ARM_SMMU_V3_SVA - PR: https://github.com/microsoft/azurelinux/pull/6829"
+      },
+      {
+        "name": "CONFIG_IO_STRICT_DEVMEM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for tboot - PR: https://github.com/microsoft/azurelinux/pull/2357"
+      },
+      {
+        "name": "CONFIG_IO_URING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_IPV6_FOU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_IPV6_FOU_TUNNEL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_IP_VS_DEBUG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_IP_VS_MH",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Add additional mh scheduler for ipvs per suggestion by customer - PR: https://github.com/microsoft/azurelinux/pull/5657"
+      },
+      {
+        "name": "CONFIG_ISO9660_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_KEXEC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52296698"
+      },
+      {
+        "name": "CONFIG_KEXEC_BZIMAGE_VERIFY_SIG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54615562"
+      },
+      {
+        "name": "CONFIG_KEXEC_IMAGE_VERIFY_SIG",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable signature verification of kexec kernel - PR: https://github.com/microsoft/azurelinux/pull/10961"
+      },
+      {
+        "name": "CONFIG_KEXEC_SIG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54615562"
+      },
+      {
+        "name": "CONFIG_LEGACY_TIOCSTI",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52296698"
+      },
+      {
+        "name": "CONFIG_LIVEPATCH",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for livepatching - PR: https://github.com/microsoft/azurelinux/pull/3107"
+      },
+      {
+        "name": "CONFIG_LOCK_DOWN_IN_EFI_SECURE_BOOT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Required for EFI Secure Boot lockdown across all kernels"
+      },
+      {
+        "name": "CONFIG_LLC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_LRU_GEN",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_LRU_GEN_ENABLED",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_LWTUNNEL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "feat(kernel): Enable LWTUNNEL_BPF and SCHED_CORE - PR: https://github.com/microsoft/azurelinux/pull/15607"
+      },
+      {
+        "name": "CONFIG_LWTUNNEL_BPF",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "feat(kernel): Enable LWTUNNEL_BPF and SCHED_CORE - PR: https://github.com/microsoft/azurelinux/pull/15607"
+      },
+      {
+        "name": "CONFIG_MACVLAN",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_MCTP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Do not enable mctp unless fix for CVE-2023-3439 is present - PR: https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
+      },
+      {
+        "name": "CONFIG_MELLANOX_PLATFORM",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLX5_CLS_ACT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54037260"
+      },
+      {
+        "name": "CONFIG_MLXBF_BOOTCTL",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLXBF_GIGE",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLXBF_PMC",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLXBF_TMFIFO",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLXREG_HOTPLUG",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MLXREG_IO",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MMC_DW",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MMC_DW_BLUEFIELD",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MMC_DW_PLTFM",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_MPTCP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/51241174"
+      },
+      {
+        "name": "CONFIG_NETFILTER_NETLINK_GLUE_CT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NETFILTER_XT_MARK",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NETFILTER_XT_MATCH_IPCOMP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NETFILTER_XT_TARGET_AUDIT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NETFILTER_XT_TARGET_NOTRACK",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NETFILTER_XT_TARGET_TRACE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for the iptables TRACE target and HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NETLINK_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NET_CLS_FLOWER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer and HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NET_CLS_RSVP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for update to 5.15.133.1 - PR: https://github.com/microsoft/azurelinux/pull/6286"
+      },
+      {
+        "name": "CONFIG_NET_CLS_RSVP6",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for update to 5.15.133.1 - PR: https://github.com/microsoft/azurelinux/pull/6286"
+      },
+      {
+        "name": "CONFIG_NET_FOU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NET_FOU_IP_TUNNELS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NET_VENDOR_AQUANTIA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable Aquantia AQtion ethernet driver kernel configs - PR: https://github.com/microsoft/azurelinux/pull/14638"
+      },
+      {
+        "name": "CONFIG_NFSD_V4_SECURITY_LABEL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_NFT_CONNLIMIT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NFT_DUP_NETDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NFT_FIB",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NFT_FIB_IPV4",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NFT_FWD_NETDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NFT_REJECT_NETDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NF_CONNTRACK_PROCFS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Perf tuning changes - PR: https://github.com/microsoft/azurelinux/pull/8944"
+      },
+      {
+        "name": "CONFIG_NF_CT_NETLINK_HELPER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NF_DUP_NETDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_NF_LOG_ARP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NF_TABLES_ARP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NF_TABLES_NETDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_NVME_RDMA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5283"
+      },
+      {
+        "name": "CONFIG_NVME_TARGET_TCP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_NVME_TCP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5283"
+      },
+      {
+        "name": "CONFIG_PACKET_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_PARAVIRT_SPINLOCKS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_PATA_LEGACY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_PCI_HYPERV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/55841415"
+      },
+      {
+        "name": "CONFIG_PCI_HYPERV_INTERFACE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "aarch64 config for kernel update to v5.15.32 - PR: https://github.com/microsoft/azurelinux/pull/2735"
+      },
+      {
+        "name": "CONFIG_PCI_P2PDMA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "kernel: Align arm hv,xen,virtio modules with x86 to fix arm boot - PR: https://github.com/microsoft/azurelinux/pull/8579"
+      },
+      {
+        "name": "CONFIG_PERF_EVENTS_INTEL_CSTATE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_PERF_EVENTS_INTEL_RAPL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Performance improvements via Kernel configuration parameters - PR: https://github.com/microsoft/azurelinux/pull/12178"
+      },
+      {
+        "name": "CONFIG_PHY_RTK_RTD_USB2PHY",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Not available - PR: https://github.com/microsoft/azurelinux/pull/7539"
+      },
+      {
+        "name": "CONFIG_PHY_RTK_RTD_USB3PHY",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Not available - PR: https://github.com/microsoft/azurelinux/pull/7539"
+      },
+      {
+        "name": "CONFIG_PLDMFW",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable Intel Ethernet Connection E800 networking driver - PR: https://github.com/microsoft/azurelinux/pull/10960"
+      },
+      {
+        "name": "CONFIG_PTP_1588_CLOCK_KVM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Removes error boot message 'failed to initialize ptp kvm' - PR: https://github.com/microsoft/azurelinux/pull/3122"
+      },
+      {
+        "name": "CONFIG_RAS_CEC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5417"
+      },
+      {
+        "name": "CONFIG_ROSE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://dev.azure.com/microsoft/OS/_workitems/edit/47170615"
+      },
+      {
+        "name": "CONFIG_SCHEDSTATS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_SCHED_CORE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "feat(kernel): Enable LWTUNNEL_BPF and SCHED_CORE - PR: https://github.com/microsoft/azurelinux/pull/15607"
+      },
+      {
+        "name": "CONFIG_SCSI_LOGGING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/3826"
+      },
+      {
+        "name": "CONFIG_SCSI_MPI3MR",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/7794"
+      },
+      {
+        "name": "CONFIG_SECONDARY_TRUSTED_KEYRING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52297228"
+      },
+      {
+        "name": "CONFIG_SECURITY_IPE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52471216"
+      },
+      {
+        "name": "CONFIG_SECURITY_LANDLOCK",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Security - PR: https://github.com/microsoft/azurelinux/pull/3484"
+      },
+      {
+        "name": "CONFIG_SECURITY_SELINUX_BOOTPARAM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/3480"
+      },
+      {
+        "name": "CONFIG_SECURITY_SMACK",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Removed in favor of SELinux - PR: https://github.com/microsoft/azurelinux/pull/3080"
+      },
+      {
+        "name": "CONFIG_SENSORS_DELL_SMM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_SENSORS_MLXREG_FAN",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_SEV_GUEST",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/50479755/"
+      },
+      {
+        "name": "CONFIG_SIGNED_PE_FILE_VERIFICATION",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Present since initial kernel configuration"
+      },
+      {
+        "name": "CONFIG_SMB_SERVER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needs to be off for CVE-2023-38431, CVE-2023-38430, CVE-2023-38427, CVE-2023-32258, CVE-2023-32257, CVE-2023-32254, CVE-2023-32252, CVE-2023-32250, CVE-2023-32247, CVE-2022-47940 - PR: https://github.com/microsoft/azurelinux/pull/6574"
+      },
+      {
+        "name": "CONFIG_STP",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_STX104",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needed for update to 5.15.131.1 - PR: https://github.com/microsoft/azurelinux/pull/6196"
+      },
+      {
+        "name": "CONFIG_TARGET_CORE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/4473"
+      },
+      {
+        "name": "CONFIG_TASKSTATS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_TASK_DELAY_ACCT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_TASK_IO_ACCOUNTING",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_TASK_XACCT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: Initial Azure Linux PR"
+      },
+      {
+        "name": "CONFIG_TCG_TPM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/135"
+      },
+      {
+        "name": "CONFIG_TCP_CONG_BBR",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/4122"
+      },
+      {
+        "name": "CONFIG_TDX_GUEST_DRIVER",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://dev.azure.com/microsoft/OS/_workitems/edit/46616758"
+      },
+      {
+        "name": "CONFIG_THERMAL_HWMON",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5417"
+      },
+      {
+        "name": "CONFIG_TLS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+      },
+      {
+        "name": "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Perf tuning changes - PR: https://github.com/microsoft/azurelinux/pull/8944"
+      },
+      {
+        "name": "CONFIG_TUN",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_UNIX_DIAG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
+      },
+      {
+        "name": "CONFIG_USB_HIDDEV",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_USB_SERIAL_CH341",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_USB_TMC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52967503"
+      },
+      {
+        "name": "CONFIG_USER_EVENTS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable user-based event tracing - PR: https://github.com/microsoft/azurelinux/pull/7044"
+      },
+      {
+        "name": "CONFIG_VCC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Needs to be off for CVE-2023-23039 - PR: https://github.com/microsoft/azurelinux/pull/6574"
+      },
+      {
+        "name": "CONFIG_VFAT_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Make vfat always available - PR: https://github.com/microsoft/azurelinux/pull/3733"
+      },
+      {
+        "name": "CONFIG_VFIO_NOIOMMU",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "VMs may not have access to iommu - PR: https://github.com/microsoft/azurelinux/pull/2385"
+      },
+      {
+        "name": "CONFIG_VIRTIO_CONSOLE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_VIRTIO_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed to see logs in Azure serial console - PR: https://github.com/microsoft/azurelinux/pull/3264"
+      },
+      {
+        "name": "CONFIG_WIREGUARD",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5135"
+      },
+      {
+        "name": "CONFIG_X86_AMD_PLATFORM_DEVICE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54457858?src=WorkItemMention&src-action=artifact_link"
+      },
+      {
+        "name": "CONFIG_X86_CET",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_X86_IOPL_IOPERM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/47911952"
+      },
+      {
+        "name": "CONFIG_X86_KERNEL_IBT",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_X86_PLATFORM_DRIVERS_DELL",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          }
+        ],
+        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/2671"
+      },
+      {
+        "name": "CONFIG_XEN_DEBUG_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "XEN not officially supported - https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+      },
+      {
+        "name": "CONFIG_XFS_SUPPORT_V4",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Deprecated - https://github.com/microsoft/CBL-Mariner-Linux-Kernel/blob/rolling-lts/mariner-3/6.6.22.1/fs/xfs/Kconfig#L25"
+      },
+      {
+        "name": "CONFIG_ZONE_DMA",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          }
+        ],
+        "justification": "results in large memory usage numbers - https://github.com/microsoft/azurelinux/pull/12221"
+      },
+      {
+        "name": "CONFIG_ZRAM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable ZRAM to align ARM and AMD offerings - PR: https://github.com/microsoft/azurelinux/pull/7794"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "name": "kernel",
+      "kernel_configs": [
+        {
+          "name": "CONFIG_DRM_ACCEL_IVPU",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54118255"
+        },
+        {
+          "name": "CONFIG_FW_CFG_SYSFS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "kernel: Enable CONFIG_SQUASHFS_ZSTD and CONFIG_FW_CFG_SYSFS - PR: https://github.com/microsoft/azurelinux/pull/15612"
+        },
+        {
+          "name": "CONFIG_HSA_AMD_SVM",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel does not enable HSA_AMD_SVM on arm64 - PR: https://github.com/microsoft/azurelinux/pull/14660"
+        },
+        {
+          "name": "CONFIG_NUMA_BALANCING",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/55353192"
+        },
+        {
+          "name": "CONFIG_SQUASHFS_ZSTD",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "kernel: Enable CONFIG_SQUASHFS_ZSTD and CONFIG_FW_CFG_SYSFS - PR: https://github.com/microsoft/azurelinux/pull/15612"
+        },
+        {
+          "name": "CONFIG_TCP_CONG_BBR3",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "kernel: Enable CONFIG_TCP_CONG_BBR3 - PR: https://github.com/microsoft/azurelinux/pull/16044"
+        },
+        {
+          "name": "CONFIG_UCLAMP_TASK",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/55353192"
+        },
+        {
+          "name": "CONFIG_XFRM_INTERFACE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "kernel: enable xfrm_interface - PR: https://github.com/microsoft/azurelinux/pull/15463"
+        }
+      ]
+    },
+    {
+      "name": "kernel-64k",
+      "kernel_configs": [
+        {
+          "name": "CONFIG_ARM64_64K_PAGES",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "needed for 64k page size"
+        },
+        {
+          "name": "CONFIG_DMI_SYSFS",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "kernel-64k builds DMI_SYSFS as builtin"
+        },
+        {
+          "name": "CONFIG_DXGKRNL",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "DXGKRNL not available in kernel-64k"
+        },
+        {
+          "name": "CONFIG_ICE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-64k does not enable Intel ICE driver on arm64"
+        },
+        {
+          "name": "CONFIG_ICE_SWITCHDEV",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-64k does not enable ICE_SWITCHDEV on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
+        },
+        {
+          "name": "CONFIG_PLDMFW",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-64k does not enable PLDMFW on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
+        },
+        {
+          "name": "CONFIG_TEGRA_IVC",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/56255416"
+        }
+      ]
+    },
+    {
+      "name": "kernel-hwe",
+      "kernel_configs": [
+        {
+          "name": "CONFIG_DMABUF_MOVE_NOTIFY",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 enables DMABUF_MOVE_NOTIFY on arm64 - PR: https://github.com/microsoft/azurelinux/pull/14660"
+        },
+        {
+          "name": "CONFIG_DRM",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 builds DRM as builtin on arm64"
+        },
+        {
+          "name": "CONFIG_DRM_KMS_HELPER",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 builds DRM_KMS_HELPER as builtin on arm64"
+        },
+        {
+          "name": "CONFIG_DXGKRNL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "n"
+            },
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "DXGKRNL not available in kernel-hwe"
+        },
+        {
+          "name": "CONFIG_GPIO_MLXBF2",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 changes BlueField2 GPIO from builtin to module"
+        },
+        {
+          "name": "CONFIG_ICE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 does not enable Intel ICE driver on arm64"
+        },
+        {
+          "name": "CONFIG_ICE_SWITCHDEV",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 does not enable ICE_SWITCHDEV on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
+        },
+        {
+          "name": "CONFIG_PLDMFW",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "kernel-hwe 6.12 does not enable PLDMFW on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
+        }
+      ]
+    }
+  ]
+}
