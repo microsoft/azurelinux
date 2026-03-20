@@ -9,14 +9,17 @@ Group:          System Environment/Libraries
 URL:            https://www.nasm.us
 Source0:        http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-46456.patch
+
+BuildRequires:  perl
+BuildRequires:  perl(File::Find)
+
 ExclusiveArch:  x86_64
 
 %description
 NASM (Netwide Assembler) is an 80x86 assembler designed for portability and modularity. It includes a disassembler as well.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 %configure
