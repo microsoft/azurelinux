@@ -7,7 +7,7 @@ TensorBoard is a suite of web applications for inspecting and understanding your
 Summary:        TensorBoard is a suite of web applications for inspecting and understanding your TensorFlow runs and graphs
 Name:           python-%{pypi_name}
 Version:        2.16.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -99,6 +99,9 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 %{python3_sitelib}/tensorboard_data_server*
 
 %changelog
+* Fri Mar 20 2026 Archana Shettigar <v-shettigara@microsoft.com> - 2.16.2-7
+- Bump release to build with python-packaging
+
 * Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 2.16.2-6
 - Remove npm directory before building to make sure as no nodejs vulnerability is getting through
 - It is done while fixing CVE-2024-21538
