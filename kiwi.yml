@@ -83,10 +83,10 @@
 #  - max_size: 700m
 
 # Setup process parameters for partition mapping
-#mapper:
+mapper:
 #  # Specify tool to use for creating partition maps
 #  # Possible values are: kpartx and partx
-#  - part_mapper: partx
+  - part_mapper: kpartx
 
 # Setup process parameters to handle runtime checks
 #runtime_checks:
