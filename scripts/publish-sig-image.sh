@@ -12,7 +12,7 @@ storage_blob_endpoint="$storage_account_url/$STORAGE_CONTAINER_NAME/$STORAGE_BLO
 
 az account set --subscription "$SUBSCRIPTION_ID"
 
-if [ "$(az group exists -n "$RESOURCE_GROUP_NAME")" == "false" ]; then
+if [ "$(az_tsv group exists -n "$RESOURCE_GROUP_NAME")" == "false" ]; then
     az group create \
         --name "$RESOURCE_GROUP_NAME" \
         --location "$LOCATION"
@@ -22,7 +22,7 @@ fi
 if ! az storage account show --ids "$storage_account_resource_id"; then
     echo "Could not find storage account \"$STORAGE_ACCOUNT_NAME\" in the expected location. Creating the storage account."
 
-    if [ "$(az storage account check-name --name "$STORAGE_ACCOUNT_NAME" --query nameAvailable)" == "false" ]; then
+    if [ "$(az_tsv storage account check-name --name "$STORAGE_ACCOUNT_NAME" --query nameAvailable)" == "false" ]; then
         echo "Storage account name $STORAGE_ACCOUNT_NAME is not available"
         exit 1
     fi
@@ -34,7 +34,7 @@ if ! az storage account show --ids "$storage_account_resource_id"; then
 fi
 
 # Ensure "build_target" storage container exists
-containerExists=$(az storage container exists --account-name "$STORAGE_ACCOUNT_NAME" --name "$STORAGE_CONTAINER_NAME" --auth-mode login | jq .exists)
+containerExists=$(az_tsv storage container exists --account-name "$STORAGE_ACCOUNT_NAME" --name "$STORAGE_CONTAINER_NAME" --auth-mode login --query "exists")
 if [[ $containerExists != "true" ]]; then
     echo "Could not find container \"$STORAGE_CONTAINER_NAME\". Creating container \"$STORAGE_CONTAINER_NAME\" in storage account \"$STORAGE_ACCOUNT_NAME\"..."
     az storage container create \
@@ -57,8 +57,7 @@ fi
 
 # Ensure the "build_target" image-definition exists
 # Note: We publish only the VHD from the secure-prod the SIG
-imageDefinitionExists=$(az sig image-definition list -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME" | grep "name" | grep -c "$GALLERY_IMAGE_DEFINITION" || :;) # the "|| :;" prevents grep from halting the script when it finds no matches and exits with exit code 1
-if [[ $imageDefinitionExists -eq 0 ]]; then
+if ! az sig image-definition show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME" -n "$GALLERY_IMAGE_DEFINITION"; then
     echo "Could not find image-definition \"$GALLERY_IMAGE_DEFINITION\". Creating definition \"$GALLERY_IMAGE_DEFINITION\" in gallery \"$GALLERY_NAME\"..."
     az sig image-definition create \
         --gallery-image-definition "$GALLERY_IMAGE_DEFINITION" \

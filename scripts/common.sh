@@ -44,10 +44,10 @@ function get-image-version() {
 
     # Get the latest version from the gallery
     local image_version
-    image_version=$(az sig image-version list \
+    image_version=$(az_tsv sig image-version list \
         --resource-group "$RESOURCE_GROUP_NAME" \
         --gallery-name "$GALLERY_NAME" \
-        --gallery-image-name "$GALLERY_IMAGE_DEFINITION" --query '[].name' -o tsv |
+        --gallery-image-name "$GALLERY_IMAGE_DEFINITION" --query '[].name' |
         sort -t "." -k1,1n -k2,2n -k3,3n |
         tail -1)
 
@@ -61,4 +61,11 @@ function get-image-version() {
 function increment-version() {
     local version="${1:?Usage: increment-version <major.minor.patch>}"
     echo "$version" | awk -F. '{print $1"."$2"."$3+1}'
+}
+
+# On WSL, az CLI may return carriage returns in tsv output, which can cause issues in string comparisons.
+# This helper function wraps az CLI calls that expect tsv output and removes any carriage returns.
+# It's safe on non-WSL environments because output won't contain carriage returns.
+function az_tsv() {
+    az "$@" --output tsv | tr -d '\r'
 }
