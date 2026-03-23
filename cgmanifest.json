@@ -12310,16 +12310,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lockdev",
           "version": "1.0.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
@@ -12881,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.24",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
+          "version": "10.6.25",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.25.tar.gz"
         }
       }
     },
@@ -14684,7 +14674,7 @@
         "other": {
           "name": "ocaml",
           "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13/ocaml-4.13.1.tar.xz"
         }
       }
     },
@@ -29457,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.2148",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
+          "version": "9.2.0173",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0173.tar.gz"
         }
       }
     },
