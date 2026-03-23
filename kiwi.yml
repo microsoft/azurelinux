@@ -1,0 +1,168 @@
+# KIWI - Build configuration file
+#
+# Below all configuration parameters available to control
+# KIWI's build process are listed as comments. The values
+# used here provides the default values applied by KIWI if
+# no other information is specified.
+#
+# To make any of the below effective, please uncomment the
+# respective section(s) and adapt the parameters according
+# to your needs
+#
+
+# Setup access to security keys
+#credentials:
+#  # Specify private key(s) used for signing operations
+#  - verification_metadata_signing_key_file: /path/to/private.pem
+
+# Setup access options for the Open BuildService
+#obs:
+#  # Specify the URL of the Open BuildService download server
+#  - download_url: http://download.opensuse.org/repositories
+#  # Specify if the BuildService download server is public or private.
+#  # This information is used to verify if the request to populate
+#  # the repositories via the imageinclude attribute is possible
+#  - public: true
+
+
+# Setup behaviour of the kiwi result bundle command
+#bundle:
+#  # Specify if the bundle tarball should contain compressed results.
+#  # Note: Already compressed result information will not be touched.
+#  # Build results that generate an encrypted filesystem, i.e.
+#  # luks setup, will not be compressed. The intention for result compression
+#  # is to produce a smaller representation of the original. Encrypted data
+#  # generally grows when an attempt is made to compress the data. This is
+#  # due to the nature of compression algorithms. Therefore this setting is
+#  # ignored when encryption is enabled.
+#  - compress: false
+#  # Specify if the image build result and bundle should contain
+#  # a .changes file. The .changes file contains the package changelog
+#  # information from all packages installed into the image.
+#  - has_package_changes: false
+
+
+# Setup behaviour of XZ compressor
+#xz:
+#  # Specify options used in any xz compression call
+#  - options: '--threads=0'
+
+
+# Setup process parameters for container image creation
+#container:
+#  # Specify compression for container images
+#  # Possible values are true, false, xz or none.
+#  - compress: true
+
+
+# Setup process parameters for ISO image creation
+#iso:
+#  # Specify tool category which should be used to build iso images
+#  # Possible values are: xorriso
+#  - tool_category: xorriso
+#  # Specify media tag tool used to implant iso checksums
+#  # Possible values are checkmedia and isomd5sum
+#  - media_tag_tool: isomd5sum
+
+
+# Setup process parameters for OCI toolchain
+#oci:
+#  # Specify OCI archive tool which should be used on creation of
+#  # container archives for OCI compliant images, e.g docker
+#  # Possible values are umoci and buildah
+#  - archive_tool: buildah
+
+
+# Specify build constraints that applies during the image build
+# process. If one or more constraints are violated the build exits
+# with an appropriate error message.
+#build_constraints:
+#  # Maximum result image size. The value can be specified in
+#  # bytes or it can be specified with m=MB or g=GB. The constraint
+#  # is checked prior to the result bundle creation
+#  - max_size: 700m
+
+# Setup process parameters for partition mapping
+#mapper:
+#  # Specify tool to use for creating partition maps
+#  # Possible values are: kpartx and partx
+#  - part_mapper: partx
+
+# Setup process parameters to handle runtime checks
+#runtime_checks:
+#  # Specify list of runtime checks to disable
+#  - disable:
+#      # verify that the host has the required container tools installed
+#      - check_container_tool_chain_installed
+
+#      # verify that there are repositories configured
+#      - check_repositories_configured
+
+#      # verify that the URL for imageinclude repos is accessable
+#      - check_image_include_repos_publicly_resolvable
+
+#      # verify for legacy kiwi boot images that they exist on the host
+#      - check_boot_description_exists
+
+#      # verify if kiwi initrd_system was set if a boot attribute exists
+#      - check_initrd_selection_required
+
+#      # verify for legacy kiwi boot images that the same kernel is used
+#      - check_consistent_kernel_in_boot_and_system_image
+
+#      # check for reserved label names used in LVM setup
+#      - check_volume_setup_defines_reserved_labels
+
+#      # verify only one full size volume is specified for LVM images
+#      - check_volume_setup_defines_multiple_fullsize_volumes
+
+#      # verify no / volume setup is setup but the @root volume is used
+#      - check_volume_setup_has_no_root_definition
+
+#      # verify if volume label is really used with a volume setup
+#      - check_volume_label_used_with_lvm
+
+#      # verify that there is a xen domain setup for xen images
+#      - check_xen_uniquely_setup_as_server_or_guest
+
+#      # verify mediacheck is installed for ISO images that requests it
+#      - check_mediacheck_installed
+
+#      # verify that checkmedia/tagmedia is used with an MBR(msdos) partition table
+#      - check_checkmedia_used_with_msdos_table
+
+#      # verify dracut-kiwi-live is installed for ISO images
+#      - check_dracut_module_for_live_iso_in_package_list
+
+#      # verify dracut-kiwi-overlay is installed for overlay disk images
+#      - check_dracut_module_for_disk_overlay_in_package_list
+
+#      # verify dracut-kiwi-repart is installed for OEM disk images
+#      - check_dracut_module_for_disk_oem_in_package_list
+
+#      # verify dracut-kiwi-oem-dump is installed for OEM install images
+#      - check_dracut_module_for_oem_install_in_package_list
+
+#      # verify configured firmware is compatible with host architecture
+#      - check_architecture_supports_iso_firmware_setup
+
+#      # verify WSL naming conventions
+#      - check_appx_naming_conventions_valid
+
+#      # check kiwi dracut modules compatible with kiwi builder
+#      - check_dracut_module_versions_compatible_to_kiwi
+
+#      # check target_dir and image root on a supported filesystem
+#      - check_target_dir_on_unsupported_filesystem
+
+#      # check for unresolved include statements in the XML description
+#      - check_include_references_unresolvable
+
+#      # validate options passed to cryptsetup via luksformat element
+#      - check_luksformat_options_valid
+
+#      # check devicepersistency compatible with partition table type
+#      - check_partuuid_persistency_type_used_with_mbr
+
+#      # check efifatimagesize does not exceed the max El Torito load size
+#      - check_efi_fat_image_has_correct_size
