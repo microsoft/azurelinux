@@ -1,6 +1,10 @@
-[images.vm-base]
-description = "VM Base Image"
-definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
+[images.vm-base-gen2]
+description = "VM Base Image (Generation 2 / UEFI)"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "gen2" }
+
+[images.vm-base-gen1]
+description = "VM Base Image (Generation 1 / BIOS)"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "gen1" }
 
 [images.container-base]
 description = "Container Base Image"

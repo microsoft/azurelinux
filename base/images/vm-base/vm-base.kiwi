@@ -6,6 +6,10 @@
         <contact>user@example.com</contact>
         <specification>Azure Linux VM Image Example</specification>
     </description>
+    <profiles>
+        <profile name="gen2" description="Generation 2 VM (UEFI)" import="true" />
+        <profile name="gen1" description="Generation 1 VM (BIOS)" />
+    </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
@@ -13,6 +17,8 @@
         <keytable>us</keytable>
         <timezone>UTC</timezone>
         <release-version>4.0</release-version>
+    </preferences>
+    <preferences profiles="gen2">
         <type
             image="oem"
             format="vhd-fixed"
@@ -25,6 +31,24 @@
             eficsm="false"
             bootpartition="false"
             efipartsize="200">
+            <bootloader name="grub2" timeout="0" />
+            <size unit="M">4096</size>
+            <initrd action="setup">
+                <dracut uefi="false"/>
+            </initrd>
+        </type>
+    </preferences>
+    <preferences profiles="gen1">
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            kernelcmdline="console=ttyS0 rd.shell=0"
+            firmware="bios"
+            overlayroot="false"
+            bootpartition="false">
             <bootloader name="grub2" timeout="0" />
             <size unit="M">4096</size>
             <initrd action="setup">
@@ -124,12 +148,17 @@
     <packages type="bootstrap">
         <package name="dracut-network" />
         <package name="filesystem" />
+    </packages>
+    <packages type="bootstrap" profiles="gen2">
         <package name="grub2-efi-x64-modules" arch="x86_64" />
         <package name="grub2-efi-x64" arch="x86_64" />
         <package name="grub2-efi-aa64-modules" arch="aarch64" />
         <package name="grub2-efi-aa64" arch="aarch64" />
         <package name="shim" arch="x86_64" />
         <package name="shim" arch="aarch64" />
+    </packages>
+    <packages type="bootstrap" profiles="gen1">
+        <package name="grub2-pc" arch="x86_64" />
     </packages>
 
     <!--
