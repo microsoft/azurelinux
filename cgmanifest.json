@@ -14083,8 +14083,8 @@
         "type": "other",
         "other": {
           "name": "ncurses",
-          "version": "6.4",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230520.tgz"
+          "version": "6.6",
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.6.tar.gz"
         }
       }
     },
