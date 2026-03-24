@@ -10,7 +10,7 @@ EnvironmentFile=/etc/sysconfig/qemu-ga
 ExecStart=/usr/bin/qemu-ga \
   --method=virtio-serial \
   --path=/dev/virtio-ports/org.qemu.guest_agent.0 \
-  --blacklist=${BLACKLIST_RPC} \
+  --block-rpcs=${BLOCK_RPCS} \
   -F${FSFREEZE_HOOK_PATHNAME}
 Restart=always
 RestartSec=0
