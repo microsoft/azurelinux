@@ -1,16 +1,24 @@
 # Microsoft Corporation
 #
 # PR check pipeline — authenticates via Workload Identity Federation (OIDC)
-# and calls an external service API with PR context.
+# and calls the Control Tower prcheck API with PR context.
 #
 # Prerequisites (ADO / Azure Portal):
-#   1. Entra ID App Registration with an api:// audience URI.
+#   1. Entra ID App Registration with audience URI
+#      "api://<ControlTower-ClientId>" (see variable group below).
 #   2. Federated identity credential on the app registration for the ADO
 #      service connection (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
 #   3. ARM service connection in ADO project settings using Workload Identity
-#      Federation (manual), named to match the azureSubscription value below.
+#      Federation (manual), named to match $(ServiceConnection).
 #   4. ADO branch policy or pipeline PR trigger configured to fire on PRs.
+#
+# Variable Group (ADO Pipelines > Library):
+#   Name: "ControlTower-PRCheck"
+#   Required variables:
+#     - ServiceConnection   : Name of the ARM/WIF service connection
+#     - ApiAudience          : Entra ID audience URI for the Control Tower app
+#     - ApiBaseUrl           : Base URL of the Control Tower service
 
 # Trigger controlled by ADO branch policy — not YAML triggers.
 trigger: none
@@ -31,26 +39,23 @@ extends:
       - stage: PRCheck
         displayName: 'Service PR Check'
         jobs:
-          - job: CallServiceAPI
-            displayName: 'Authenticate and Call Service'
+          - job: CallControlTowerAPI
+            displayName: 'Authenticate and Call Control Tower'
             pool:
               type: linux
 
             variables:
-              # ── Customise these ──────────────────────────────────────
-              # Name of the ARM service connection (Workload Identity Federation).
-              serviceConnection: 'prcheck-wif-connection'
-              # Entra ID audience URI registered for the target service.
-              apiAudience: 'api://<your-service-client-id>'
-              # Base URL of the external service.
-              apiBaseUrl: 'https://<your-service-endpoint>'
+              # All three values come from the "ControlTower-PRCheck" variable
+              # group (ADO Pipelines > Library). Do NOT hardcode secrets or
+              # environment-specific values here.
+              - group: ControlTower-PRCheck
 
             steps:
               # ── Step 1: Acquire an Entra ID bearer token ─────────────
               - task: AzureCLI@2
                 displayName: 'Acquire Entra ID Bearer Token'
                 inputs:
-                  azureSubscription: $(serviceConnection)
+                  azureSubscription: $(ServiceConnection)
                   scriptType: bash
                   scriptLocation: inlineScript
                   # Exposes $servicePrincipalId, $idToken, $tenantId in the
@@ -63,7 +68,7 @@ extends:
                     echo "Authenticating via Workload Identity Federation..."
 
                     TOKEN=$(az account get-access-token \
-                      --resource "$(apiAudience)" \
+                      --resource "$(ApiAudience)" \
                       --query accessToken \
                       -o tsv)
 
@@ -75,34 +80,38 @@ extends:
                     # Store as a secret pipeline variable for subsequent steps.
                     echo "##vso[task.setvariable variable=API_TOKEN;issecret=true]$TOKEN"
                     echo "Bearer token acquired (expires: $(az account get-access-token \
-                      --resource "$(apiAudience)" --query expiresOn -o tsv))"
+                      --resource "$(ApiAudience)" --query expiresOn -o tsv))"
 
-              # ── Step 2: Call the external service API ─────────────────
+              # ── Step 2: Call the Control Tower prcheck API ───────────
               - script: |
                   set -euo pipefail
 
-                  # Build the JSON payload from ADO predefined PR variables.
-                  PAYLOAD=$(cat <<'DELIM'
-                  {
-                    "prNumber":     "$(System.PullRequest.PullRequestNumber)",
-                    "headCommit":   "$(System.PullRequest.SourceCommitId)",
-                    "mergeCommit":  "$(Build.SourceVersion)",
-                    "sourceBranch": "$(System.PullRequest.SourceBranch)",
-                    "targetBranch": "$(System.PullRequest.TargetBranch)",
-                    "author":       "$(Build.RequestedFor)",
-                    "authorEmail":  "$(Build.RequestedForEmail)",
-                    "repository":   "$(Build.Repository.Name)",
-                    "buildId":      "$(Build.BuildId)"
-                  }
-                  DELIM
-                  )
+                  # Construct the repo URI from ADO predefined variables.
+                  REPO_URI="$(System.CollectionUri)$(System.TeamProject)/_git/$(Build.Repository.Name)"
 
-                  echo "Calling service API for PR #$(System.PullRequest.PullRequestNumber)..."
+                  # Build the JSON payload matching the Control Tower schema.
+                  PAYLOAD=$(jq -n \
+                    --arg repoUri        "$REPO_URI" \
+                    --argjson prNumber    "$(System.PullRequest.PullRequestNumber)" \
+                    --arg sourceBranch    "$(System.PullRequest.SourceBranch)" \
+                    --arg sourceCommitSha "$(System.PullRequest.SourceCommitId)" \
+                    --arg targetBranch    "$(System.PullRequest.TargetBranch)" \
+                    --arg targetCommitSha "$(Build.SourceVersion)" \
+                    '{
+                      repoUri:         $repoUri,
+                      prNumber:        $prNumber,
+                      sourceBranch:    $sourceBranch,
+                      sourceCommitSha: $sourceCommitSha,
+                      targetBranch:    $targetBranch,
+                      targetCommitSha: $targetCommitSha
+                    }')
+
+                  echo "Calling Control Tower prcheck for PR #$(System.PullRequest.PullRequestNumber)..."
                   echo "Payload:"
                   echo "$PAYLOAD" | jq .
 
                   HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
-                    -X POST "$(apiBaseUrl)/api/pr-check" \
+                    -X POST "$(ApiBaseUrl)/api/Scenario/prcheck" \
                     -H "Authorization: Bearer $(API_TOKEN)" \
                     -H "Content-Type: application/json" \
                     -d "$PAYLOAD")
@@ -110,11 +119,11 @@ extends:
                   echo "HTTP status: $HTTP_CODE"
 
                   if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 300 ]]; then
-                    echo "##vso[task.logissue type=error]Service returned HTTP $HTTP_CODE"
+                    echo "##vso[task.logissue type=error]Control Tower returned HTTP $HTTP_CODE"
                     cat response.json
                     exit 1
                   fi
 
                   echo "Service response:"
                   cat response.json | jq .
-                displayName: 'Call Service API with PR Context'
+                displayName: 'Call Control Tower prcheck API'
