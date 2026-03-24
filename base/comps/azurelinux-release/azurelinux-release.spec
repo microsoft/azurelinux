@@ -48,6 +48,7 @@ Source13:       99-default-disable.preset
 Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
+Source17:       20-azure.conf
 
 BuildArch:      noarch
 
@@ -327,6 +328,7 @@ echo "VARIANT_ID=cloud" >> %{buildroot}%{_prefix}/lib/os-release.cloud
 sed -i -e "s|(%{release_name}%{?prerelease})|(Cloud Variant%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.cloud
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Cloud/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
 sed -i -e "/^DEFAULT_HOSTNAME=/d" %{buildroot}%{_prefix}/lib/os-release.cloud
+install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 %endif
 
 %if %{with container}
@@ -337,6 +339,7 @@ echo "VARIANT=\"Container Image\"" >> %{buildroot}%{_prefix}/lib/os-release.cont
 echo "VARIANT_ID=container" >> %{buildroot}%{_prefix}/lib/os-release.container
 sed -i -e "s|(%{release_name}%{?prerelease})|(Container Image%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.container
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Container/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
+install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 %endif
 
 %if %{with wsl}
@@ -430,6 +433,7 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
+%{_prefix}/lib/sysctl.d/20-azure.conf
 %endif
 
 
@@ -438,6 +442,7 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 %files identity-container
 %{_prefix}/lib/os-release.container
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
+%{_prefix}/lib/sysctl.d/20-azure.conf
 %endif
 
 
