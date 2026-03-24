@@ -2,8 +2,8 @@
 
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
-Version:        6.4
-Release:        2%{?dist}
+Version:        6.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -234,6 +234,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Tue Mar 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6-1
+- Auto-upgrade to 6.6 - for CVE-2025-69720
+
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 6.4-2
 - Update to version 6.4-20231125
 
