@@ -204,7 +204,6 @@ xz NEWS
 %{!?_licensedir:%global license %%doc}
 %doc README
 %license COPYING
-%{_datadir}/terminfo/l/linux
 %dir %{_sysconfdir}/terminfo
 %{_datadir}/tabset
 %dir %{_datadir}/terminfo
@@ -227,7 +226,6 @@ xz NEWS
 %{_includedir}/ncursesw/*.h
 %{_includedir}/*.h
 %{_mandir}/man1/ncurses*-config*
-%{_mandir}/man1/description.1m.gz
 %{_mandir}/man3/*
 %{_libdir}/lib*.a
 
