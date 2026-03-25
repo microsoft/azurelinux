@@ -1,13 +1,14 @@
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 Name:           python-pyasn1
 Version:        0.4.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/pyasn1
 Source0:        https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-%{version}.tar.gz
+Patch0:         CVE-2026-30922.patch
 BuildArch:      noarch
 
 %description
@@ -41,6 +42,9 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-2
+- Patch for CVE-2026-30922
+
 * Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.8-1
 - Upgrade to latest upstream version
 - Use nicer Source0
