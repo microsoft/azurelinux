@@ -67,11 +67,17 @@ popd
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
+%{kata_bin}/kata-ctl
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-cloud-hypervisor.toml
+%{defaults_kata}/configuration-cloud-hypervisor-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
+%{kata_shim_bin}/containerd-shim-kata-v2-go
+%{kata_shim_bin}/containerd-shim-kata-v2-rs
 
 %license LICENSE
 %doc CONTRIBUTING.md
