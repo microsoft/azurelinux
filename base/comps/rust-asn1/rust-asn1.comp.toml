@@ -1,0 +1,9 @@
+# Workaround: pin to 0.21.3 (pre-0.22.0) because the 0.22.0 spec has a dynamic
+# BuildRequires on crate(asn1_derive) = 0.22.0, which is only provided by a
+# freshly-built rust-asn1_derive — not available in the F43 repos that the Koji
+# builders use for dependency resolution.
+# Fedora handles the 0.22.0 update via a side-tag (f43-build-side-132637) where
+# asn1_derive is built first and available to subsequent builds in the same tag.
+# Remove this pin once Koji builders can see prior completed builds as deps.
+[components.rust-asn1]
+spec = { type = "upstream", upstream-commit = "1fbe217f608fbd46f8f6c73c02dfbb2717e47b22" }

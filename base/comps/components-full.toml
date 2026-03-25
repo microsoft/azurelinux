@@ -3200,8 +3200,6 @@
 [components.rust-as-slice]
 [components.rust-ascii-canvas]
 [components.rust-askalono-cli]
-[components.rust-asn1]
-[components.rust-asn1_derive]
 [components.rust-assert-impl]
 [components.rust-assert-json-diff]
 [components.rust-assert2]

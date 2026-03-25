@@ -1,0 +1,7 @@
+# Workaround: pin to 0.21.3 to stay in sync with rust-asn1 (also pinned).
+# The 0.22.0 version builds fine standalone, but since builders can't see prior
+# builds, pinning both to 0.21.3 keeps the crate pair consistent with the F43
+# repos. Remove this pin together with the rust-asn1 pin once Koji builders can
+# see prior completed builds as deps.
+[components.rust-asn1_derive]
+spec = { type = "upstream", upstream-commit = "81f13496eca74993bf22c2b5f6ae55dc0c6d516d" }
