@@ -1,0 +1,5 @@
+<image>
+	<repository type="rpm-md" alias="evergreen">
+		<source path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/$basearch/" />
+	</repository>
+</image>
