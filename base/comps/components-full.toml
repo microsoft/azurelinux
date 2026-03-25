@@ -3362,7 +3362,6 @@
 [components.rust-chrono-tz]
 [components.rust-chrono-tz-build]
 [components.rust-chumsky]
-[components.rust-cipher]
 [components.'rust-cipher0.4']
 [components.rust-clang]
 [components.rust-clang-sys]

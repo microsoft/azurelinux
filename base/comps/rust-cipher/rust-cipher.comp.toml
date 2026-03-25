@@ -1,0 +1,5 @@
+[components.rust-cipher]
+
+# Pull in snapshot which upgrades package to 5.1. That version is
+# required to fix a dependency on rust-crypto-common-devel
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-02-28T00:00:00Z" } }
