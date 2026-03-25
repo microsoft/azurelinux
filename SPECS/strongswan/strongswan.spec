@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
 Version:        5.9.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         strongswan-fix-make-check.patch
 Patch1:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
 Patch2:         strongswan-5.9.7-5.9.11_charon_tkm_dh_len.patch
 Patch3:         CVE-2025-62291.patch
+Patch4:         CVE-2026-25075.patch
 BuildRequires:  autoconf
 BuildRequires:  gmp-devel
 
@@ -53,6 +54,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+* Wed Mar 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.10-5
+- Patch for CVE-2026-25075
+
 * Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.10-4
 - Patch for CVE-2025-62291
 
