@@ -1,0 +1,312 @@
+<image>
+	<profiles>
+		<profile name="ContainerCore" description="Container core packages">
+		</profile>
+		<profile name="Container-Base-Generic-Minimal" description="Generic Minimal Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+		<profile name="Container-Base-Generic" description="Generic Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+		<profile name="Container-Base-Generic-Init" description="Generic Init Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+		<profile name="Container-Toolbox" description="Toolbox Container Image"/>
+	</profiles>
+	<preferences profiles="Container-Base-Generic">
+		<type image="oci">
+			<containerconfig
+			  name="fedora"
+			  tag="43"
+			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			>
+				<subcommand execute="/bin/bash"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
+					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="fedora"/>
+					<label name="org.opencontainers.image.title" value="fedora"/>
+					<label name="org.opencontainers.image.version" value="43"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Fedora Project"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="fedora"/>
+					<label name="version" value="43"/>
+				</labels>
+				<environment>
+					<env name="container" value="oci"/>
+					<env name="PATH" value="/usr/local/bin:/usr/bin"/>
+				</environment>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+	<preferences profiles="Container-Base-Generic-Minimal">
+		<type image="oci">
+			<containerconfig
+			  name="fedora-minimal"
+			  tag="43"
+			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			>
+				<subcommand execute="/bin/bash"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
+					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="fedora-minimal"/>
+					<label name="org.opencontainers.image.title" value="fedora-minimal"/>
+					<label name="org.opencontainers.image.version" value="43"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Fedora Project"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="fedora-minimal"/>
+					<label name="version" value="43"/>
+				</labels>
+				<environment>
+					<env name="container" value="oci"/>
+					<env name="PATH" value="/usr/local/bin:/usr/bin"/>
+				</environment>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+	<preferences profiles="Container-Base-Generic-Init">
+		<type image="oci">
+			<containerconfig
+			  name="fedora-init"
+			  tag="43"
+			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			>
+				<subcommand execute="/sbin/init"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
+					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="fedora-init"/>
+					<label name="org.opencontainers.image.title" value="fedora-init"/>
+					<label name="org.opencontainers.image.version" value="43"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Fedora Project"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="fedora-init"/>
+					<label name="version" value="43"/>
+				</labels>
+				<stopsignal>SIGRTMIN+3</stopsignal>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+	<preferences profiles="Container-Toolbox">
+		<type image="oci">
+			<containerconfig
+			  name="fedora-toolbox"
+			  tag="43"
+			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			>
+				<subcommand execute="/bin/bash"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
+					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="fedora-toolbox"/>
+					<label name="org.opencontainers.image.title" value="fedora-toolbox"/>
+					<label name="org.opencontainers.image.version" value="43"/>
+					<label name="com.github.containers.toolbox" value="true"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Fedora Project"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="fedora-toolbox"/>
+					<label name="version" value="43"/>
+				</labels>
+				<environment>
+					<env name="container" value="oci"/>
+					<env name="PATH" value="/usr/local/bin:/usr/bin"/>
+				</environment>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>false</rpm-locale-filtering>
+		<rpm-excludedocs>false</rpm-excludedocs>
+	</preferences>
+	<packages type="bootstrap" profiles="ContainerCore">
+		<ignore name="dosfstools"/>
+		<ignore name="e2fsprogs"/>
+		<ignore name="fuse-libs"/>
+		<ignore name="gnupg2-smime"/>
+		<ignore name="libss"/> <!-- used by e2fsprogs -->
+		<ignore name="kernel"/>
+		<ignore name="*-firmware"/>
+		<ignore name="geolite2-city"/>
+		<ignore name="geolite2-country"/>
+		<ignore name="pinentry"/>
+		<ignore name="shared-mime-info"/>
+		<ignore name="pinentry"/>
+		<ignore name="trousers"/>
+		<ignore name="xkeyboard-config"/>
+		<ignore name="grubby"/>
+		<ignore name="langpacks-en_GB"/>
+		<!-- https://bugzilla.redhat.com/show_bug.cgi?id=1951111 -->
+		<ignore name="sssd-client"/>
+		<package name="fedora-release-container"/>
+		<package name="bash"/>
+		<package name="coreutils"/>
+		<package name="rpm"/>
+		<package name="shadow-utils"/>
+		<package name="util-linux-core"/>
+		<package name="gawk"/>
+	</packages>
+	<packages type="bootstrap" profiles="Container-Base-Generic-Minimal">
+		<ignore name="glibc-langpack-en"/>
+		<ignore name="langpacks-en"/>
+		<ignore name="tzdata"/>
+		<package name="dnf5"/>
+		<package name="glibc-minimal-langpack"/>
+		<package name="systemd-standalone-sysusers"/>
+	</packages>
+	<packages type="bootstrap" profiles="Container-Base-Generic">
+		<package name="systemd-standalone-sysusers"/>
+	</packages>
+	<packages type="bootstrap" profiles="Container-Base-Generic,Container-Base-Generic-Init">
+		<ignore name="glibc-langpack-en"/>
+		<ignore name="langpacks-en"/>
+		<package name="bzip2"/>
+		<package name="gzip"/>
+		<package name="sudo"/>
+		<package name="rootfiles"/>
+		<package name="tar"/> <!-- https://bugzilla.redhat.com/show_bug.cgi?id=1409920 -->
+		<package name="vim-minimal"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="glibc-minimal-langpack"/>
+		<package name="tzdata"/>
+		<package name="xz"/>
+		<package name="zstd"/>
+	</packages>
+	<packages type="image" profiles="Container-Base-Generic-Init">
+		<package name="glibc-langpack-en"/>
+		<package name="kbd"/>
+		<package name="systemd"/>
+	</packages>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="Container-Toolbox">
+		<ignore name="dosfstools"/>
+		<ignore name="e2fsprogs"/>
+		<ignore name="*-firmware"/>
+		<ignore name="fuse-libs"/>
+		<ignore name="geolite2-city"/>
+		<ignore name="geolite2-country"/>
+		<ignore name="grubby"/>
+		<ignore name="kernel"/>
+		<ignore name="libss"/> <!-- used by e2fsprogs -->
+		<ignore name="pinentry"/>
+		<ignore name="shared-mime-info"/>
+		<ignore name="sssd-client"/>
+		<!-- This is a weak dep of systemd, we do not want this in the container;
+		     see: https://github.com/containers/toolbox/issues/1410  -->
+		<ignore name="systemd-resolved"/>
+		<ignore name="trousers"/>
+		<ignore name="xkeyboard-config"/>
+		<package name="acl"/>
+		<package name="bash"/>
+		<package name="bash-completion"/>
+		<package name="bc"/>
+		<package name="bzip2"/>
+		<package name="coreutils"/>
+		<package name="coreutils-common"/>
+		<package name="cpio"/>
+		<package name="curl"/>
+		<package name="default-editor"/>
+		<package name="diffutils"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="fedora-release-toolbx"/>
+		<package name="file"/>
+		<package name="findutils"/>
+		<package name="flatpak-spawn"/>
+		<package name="fpaste"/>
+		<package name="gawk"/>
+		<package name="git"/>
+		<package name="glibc-all-langpacks"/>
+		<package name="gnupg2"/>
+		<package name="gnupg2-smime"/>
+		<package name="grep"/>
+		<package name="gvfs-client"/>
+		<package name="gzip"/>
+		<package name="hostname"/>
+		<package name="iproute"/>
+		<package name="iputils"/>
+		<package name="kbd-misc"/>
+		<package name="keyutils"/>
+		<package name="krb5-libs"/>
+		<package name="langpacks-en"/>
+		<package name="less"/>
+		<package name="libcap"/>
+		<package name="lsof"/>
+		<package name="man-db"/>
+		<package name="man-pages"/>
+		<package name="mesa-dri-drivers"/>
+		<package name="mesa-va-drivers" arch="aarch64,ppc64le,x86_64,riscv64"/> <!-- doesn't exist in s390x -->
+		<package name="mesa-vulkan-drivers"/>
+		<package name="mtr"/>
+		<package name="nss-mdns"/>
+		<package name="openssh-clients"/>
+		<package name="openssl"/>
+		<package name="p11-kit-client"/>
+		<package name="pam"/>
+		<package name="pigz"/>
+		<package name="policycoreutils"/>
+		<package name="procps-ng"/>
+		<package name="psmisc"/>
+		<package name="python3"/>
+		<package name="rootfiles"/>
+		<package name="rpm"/>
+		<package name="rsync"/>
+		<package name="sed"/>
+		<package name="shadow-utils"/>
+		<package name="sudo"/>
+		<package name="tar"/> <!-- https://bugzilla.redhat.com/show_bug.cgi?id=1409920 -->
+		<package name="tcpdump"/>
+		<package name="time"/>
+		<package name="traceroute"/>
+		<package name="tree"/>
+		<package name="tzdata"/>
+		<package name="unzip"/>
+		<package name="util-linux"/>
+		<package name="vim-minimal"/>
+		<package name="vte-profile"/>
+		<package name="vulkan-loader"/>
+		<package name="wget"/>
+		<package name="which"/>
+		<package name="whois"/>
+		<package name="words"/>
+		<package name="xorg-x11-xauth"/>
+		<package name="xz"/>
+		<package name="zip"/>
+	</packages>
+	<packages type="uninstall" profiles="Container-Toolbox">
+		<package name="dracut"/>
+		<package name="pinentry"/>
+		<package name="systemd-resolved"/>
+		<package name="xkeyboard-config"/>
+	</packages>
+	<packages type="bootstrap" profiles="Container-Base-Generic-Minimal,Container-Base-Generic,Container-Toolbox">
+		<package name="systemd-standalone-tmpfiles"/>
+	</packages>
+	<packages type="uninstall" profiles="Container-Base-Generic-Minimal,Container-Base-Generic,Container-Toolbox">
+		<package name="systemd-standalone-tmpfiles"/>
+	</packages>
+</image>
