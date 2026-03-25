@@ -15,23 +15,23 @@
 	<preferences profiles="Container-Base-Generic">
 		<type image="oci">
 			<containerconfig
-			  name="fedora"
+			  name="azurelinux"
 			  tag="43"
-			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/bin/bash"/>
 				<labels>
-					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
-					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
 					<label name="org.opencontainers.image.license" value="MIT"/>
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
-					<label name="org.opencontainers.image.name" value="fedora"/>
-					<label name="org.opencontainers.image.title" value="fedora"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
 					<label name="org.opencontainers.image.version" value="43"/>
 					<!-- Legacy attributes for backward compatibility -->
-					<label name="vendor" value="Fedora Project"/>
+					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
-					<label name="name" value="fedora"/>
+					<label name="name" value="azurelinux"/>
 					<label name="version" value="43"/>
 				</labels>
 				<environment>
@@ -48,23 +48,23 @@
 	<preferences profiles="Container-Base-Generic-Minimal">
 		<type image="oci">
 			<containerconfig
-			  name="fedora-minimal"
+			  name="azurelinux-minimal"
 			  tag="43"
-			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/bin/bash"/>
 				<labels>
-					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
-					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
 					<label name="org.opencontainers.image.license" value="MIT"/>
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
-					<label name="org.opencontainers.image.name" value="fedora-minimal"/>
-					<label name="org.opencontainers.image.title" value="fedora-minimal"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
 					<label name="org.opencontainers.image.version" value="43"/>
 					<!-- Legacy attributes for backward compatibility -->
-					<label name="vendor" value="Fedora Project"/>
+					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
-					<label name="name" value="fedora-minimal"/>
+					<label name="name" value="azurelinux-minimal"/>
 					<label name="version" value="43"/>
 				</labels>
 				<environment>
@@ -81,23 +81,23 @@
 	<preferences profiles="Container-Base-Generic-Init">
 		<type image="oci">
 			<containerconfig
-			  name="fedora-init"
+			  name="azurelinux-init"
 			  tag="43"
-			  maintainer="Fedora Project Contributors &lt;devel@lists.fedoraproject.org&gt;"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/sbin/init"/>
 				<labels>
-					<label name="org.opencontainers.image.vendor" value="Fedora Project"/>
-					<label name="org.opencontainers.image.url" value="https://fedoraproject.org/"/>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
 					<label name="org.opencontainers.image.license" value="MIT"/>
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
-					<label name="org.opencontainers.image.name" value="fedora-init"/>
-					<label name="org.opencontainers.image.title" value="fedora-init"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
 					<label name="org.opencontainers.image.version" value="43"/>
 					<!-- Legacy attributes for backward compatibility -->
-					<label name="vendor" value="Fedora Project"/>
+					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
-					<label name="name" value="fedora-init"/>
+					<label name="name" value="azurelinux-init"/>
 					<label name="version" value="43"/>
 				</labels>
 				<stopsignal>SIGRTMIN+3</stopsignal>
@@ -127,7 +127,7 @@
 		<ignore name="langpacks-en_GB"/>
 		<!-- https://bugzilla.redhat.com/show_bug.cgi?id=1951111 -->
 		<ignore name="sssd-client"/>
-		<package name="fedora-release-container"/>
+		<package name="azurelinux-release-container"/>
 		<package name="bash"/>
 		<package name="coreutils"/>
 		<package name="rpm"/>

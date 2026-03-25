@@ -7,7 +7,7 @@
 	</profiles>
 	<preferences profiles="LiveInstall" arch="x86_64">
 		<type image="iso"
-			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
+			publisher="Microsoft" volid="AzureLinux" application_id="AzureLinux"
 			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
 			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="quiet rhgb"
 			fscreateoptions="-Efragments -C 1048576"
@@ -17,7 +17,7 @@
 	</preferences>
 	<preferences profiles="LiveInstall" arch="aarch64">
 		<type image="iso"
-			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
+			publisher="Microsoft" volid="AzureLinux" application_id="AzureLinux"
 			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
 			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="quiet rhgb"
 			fscreateoptions="-Efragments -C 1048576"

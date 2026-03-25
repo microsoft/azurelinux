@@ -5,7 +5,7 @@
 		</profile>
 	</profiles>
 	<packages type="bootstrap" patternType="plusRecommended" profiles="Tiny-Disk">
-		<package name="fedora-release"/>
+		<package name="azurelinux-release"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="Tiny-Disk">
 		<namedCollection name="core"/>

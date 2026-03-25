@@ -13,10 +13,10 @@
 		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
 		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
-			<systemdisk name="fedora">
+			<systemdisk name="azurelinux">
 				<volume name="@root=root"/>
 				<volume name="home" parent="/"/>
 				<volume name="var" parent="/"/>
@@ -31,10 +31,10 @@
 		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
 		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid" force_mbr="true" editbootinstall="editbootinstall_rpilegacy.sh"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" disk_start_sector="34816" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
-			<systemdisk name="fedora">
+			<systemdisk name="azurelinux">
 				<volume name="@root=root"/>
 				<volume name="home" parent="/"/>
 				<volume name="var" parent="/"/>

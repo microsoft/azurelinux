@@ -14,7 +14,7 @@
 		<package name="coreutils"/>
 		<package name="dnf5"/>
 		<package name="dnf5-plugins"/>
-		<package name="fedora-release-wsl"/>
+		<package name="azurelinux-release-wsl"/>
 		<package name="rpm"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="WSL-Base">
