@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<image schemaversion="7.4" name="Fedora">
+<image schemaversion="7.4" name="AzureLinux">
 	<description type="system">
-		<author>Fedora Project Contributors</author>
-		<contact>devel@lists.fedoraproject.org</contact>
-		<specification>Fedora Linux</specification>
+		<author>Microsoft</author>
+		<contact>azurelinux@microsoft.com</contact>
+		<specification>AzureLinux</specification>
 	</description>
 	<preferences>
 		<version>43</version>

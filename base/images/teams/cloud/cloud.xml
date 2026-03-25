@@ -22,7 +22,7 @@
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 earlyprintk=ttyS0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
 			<systemdisk>
@@ -42,7 +42,7 @@
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 earlyprintk=ttyAMA0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" console="serial" timeout="0"/>
 			<systemdisk>
@@ -62,7 +62,7 @@
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
 			<size unit="G">5</size>
@@ -82,7 +82,7 @@
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
 			<size unit="G">5</size>
@@ -103,7 +103,7 @@
 		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="true"
 		      kernelcmdline="systemd.firstboot=off"
 		      devicepersistency="by-uuid"
-		      rootfs_label="fedora"
+		      rootfs_label="azurelinux"
 		      initrd_system="none"
 		      editbootconfig="uki-editbootconfig.sh"
 		      >
@@ -120,7 +120,7 @@
 		</type>
 	</preferences>
 	<packages type="bootstrap" patternType="plusRecommended" profiles="CloudCore,CloudCoreUKI">
-		<package name="fedora-release-cloud"/>
+		<package name="azurelinux-release-cloud"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="CloudCore">
 		<namedCollection name="cloud-server-environment"/>
