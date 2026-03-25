@@ -1,0 +1,5 @@
+<image>
+	<repository type="rpm-md" alias="evergreen">
+		<source path="http://20.88.251.114/kojifiles/repos-dist/azl4-bootstrap-rpms-tag-20260405/latest/$basearch/" />
+	</repository>
+</image>
