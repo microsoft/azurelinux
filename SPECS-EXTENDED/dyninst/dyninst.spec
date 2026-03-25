@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 13%{?dist}
+Release: 15%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://www.dyninst.org
@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.35-8%{?dist}
+BuildRequires: glibc-static >= 2.35-10%{?dist}
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -194,6 +194,12 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 10.1.0-15
+- Bump to rebuild with updated glibc
+
+* Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-14
+- Bump to rebuild with updated glibc
+
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-13
 - Bump to rebuild with updated glibc
 

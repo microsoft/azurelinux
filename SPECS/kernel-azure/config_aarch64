@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.186.1 Kernel Configuration
+# Linux/arm64 5.15.200.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -7834,7 +7834,6 @@ CONFIG_STAGING=y
 # CONFIG_RTL8192U is not set
 # CONFIG_RTLLIB is not set
 # CONFIG_RTL8723BS is not set
-# CONFIG_R8712U is not set
 # CONFIG_R8188EU is not set
 # CONFIG_RTS5208 is not set
 # CONFIG_VT6655 is not set

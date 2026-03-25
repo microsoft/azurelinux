@@ -1,19 +1,20 @@
 %global __ocaml_requires_opts -c -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
 %global __ocaml_provides_opts -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
-%global majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        OCaml compiler and programming environment
 Name:           ocaml
 Version:        4.13.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.ocaml.org
+%global majmin %(echo %{version} | cut -d. -f1-2)
 Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{version}.tar.xz
 Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch
 Patch0002:      0002-configure-Allow-user-defined-C-compiler-flags.patch
 Patch0003:      0003-configure-Remove-incorrect-assumption-about-cross-co.patch
 Patch0004:      0004-remove-unused-var-in-alloc_aync_stubs.patch
+Patch5:      CVE-2026-28364.patch
 BuildRequires:  autoconf
 BuildRequires:  binutils-devel
 BuildRequires:  chrpath
@@ -258,6 +259,9 @@ make -j1 all
 %{_libdir}/ocaml/compiler-libs/*.o
 
 %changelog
+* Sun Mar 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.13.1-3
+- Patch for CVE-2026-28364
+
 * Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
 - Introduce a patch to remove unused vars in test to enable ptest
 
