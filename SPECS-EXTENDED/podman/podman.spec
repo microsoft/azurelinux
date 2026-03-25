@@ -31,7 +31,7 @@ Epoch: 0
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 5.6.1
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
 Summary: Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -298,6 +298,9 @@ make localunit
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 0:5.6.1-8
+- Bump to rebuild with updated glibc
+
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0:5.6.1-7
 - Bump to rebuild with updated glibc
 

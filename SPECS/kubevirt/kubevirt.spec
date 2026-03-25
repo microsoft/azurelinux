@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.7.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -267,6 +267,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.0-4
+- Bump to rebuild with updated glibc
+
 * Fri Feb 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-3
 - Patch for CVE-2025-58190, CVE-2025-47911
 
