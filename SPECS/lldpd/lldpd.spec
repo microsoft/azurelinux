@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:     lldpd
 Version:  1.0.14
-Release:  3%{?dist}
+Release:  4%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -163,6 +163,9 @@ fi
 
 
 %changelog
+* Tue Mar 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.0.14-4
+- Rebuild for net-snmp-libs to version 5.9.5.2-1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.14-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
