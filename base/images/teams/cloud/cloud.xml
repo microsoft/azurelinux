@@ -18,7 +18,7 @@
 	</profiles>
 	<preferences profiles="Cloud-Base-Azure" arch="x86_64">
 		<type image="oem" format="vhd-fixed" formatoptions="force_size"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="compress=zstd:1"
+		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 earlyprintk=ttyS0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
@@ -38,7 +38,7 @@
 	</preferences>
 	<preferences profiles="Cloud-Base-Azure" arch="aarch64">
 		<type image="oem" format="vhd-fixed" formatoptions="force_size"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="compress=zstd:1"
+		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 earlyprintk=ttyAMA0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
@@ -58,7 +58,7 @@
 	</preferences>
 	<preferences profiles="Cloud-Base-Generic" arch="x86_64">
 		<type image="oem" format="qcow2"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="compress=zstd:1"
+		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
@@ -78,7 +78,7 @@
 	</preferences>
 	<preferences profiles="Cloud-Base-Generic" arch="aarch64">
 		<type image="oem" format="qcow2"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="compress=zstd:1"
+		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
@@ -100,7 +100,7 @@
 		<type image="oem" format="qcow2"
 		      firmware="uefi" efipartsize="1000"
 		      bootpartition="false"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="true"
+		      filesystem="ext4"
 		      kernelcmdline="systemd.firstboot=off"
 		      devicepersistency="by-uuid"
 		      rootfs_label="azurelinux"
@@ -132,7 +132,6 @@
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<ignore name="plymouth"/>
-		<package name="btrfs-progs"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
 	</packages>
@@ -146,7 +145,6 @@
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<ignore name="plymouth"/>
-		<package name="btrfs-progs"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
 	</packages>
