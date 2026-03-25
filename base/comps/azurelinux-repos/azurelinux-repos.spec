@@ -4,7 +4,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -118,7 +118,7 @@ done
 # If the segment doesn't contain an 8-digit date, fall back to a hard-coded URI.
 date_segment=$(echo '%{dist}' | awk -F. '{print $NF}')
 if echo "$date_segment" | grep -qE '[0-9]{8}'; then
-    base_repo_uri="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/${date_segment}"
+    base_repo_uri="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-dev/${date_segment}"
 else
     base_repo_uri='https://packages.microsoft.com/azurelinux/$releasever/prod/base'
 fi
@@ -258,6 +258,9 @@ rm -f "$TMPRING"
 
 
 %changelog
+* Wed Mar 25 2026 Sam Meluch <sammeluch@microsoft.com> - 4.0-4
+- Update .repo files for daily repo publishing to dev blob storage.
+
 * Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-3
 - Update .repo files for initial Alpha release.
 
