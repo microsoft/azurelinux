@@ -36,7 +36,6 @@
 		<package name="lsof"/>
 		<package name="man-db"/>
 		<package name="man-pages"/>
-		<package name="NetworkManager"/>
 		<package name="nmap-ncat"/>
 		<package name="openssh-clients"/>
 		<package name="passwd"/>
@@ -46,8 +45,9 @@
 		<package name="shadow-utils"/>
 		<package name="sudo"/>
 		<package name="symlinks"/>
-		<package name="systemd-udev"/>
+		<package name="systemd-networkd"/>
 		<package name="systemd-resolved"/>
+		<package name="systemd-udev"/>
 		<package name="tar"/>
 		<package name="tcpdump"/>
 		<package name="time"/>
