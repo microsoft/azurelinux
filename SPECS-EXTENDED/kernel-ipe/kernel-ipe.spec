@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.129.1
-Release:        2%{?dist}
+Version:        6.6.130.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,6 +460,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.130.1-1
+- Auto-upgrade to 6.6.130.1
+
 * Tue Mar 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.129.1-2
 - Enable lz4, lz4hc, and zstd zram compression
 
