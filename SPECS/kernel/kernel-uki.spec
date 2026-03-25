@@ -13,7 +13,7 @@
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.129.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,6 +70,9 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Tue Mar 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.129.1-2
+- Bump release to match kernel,kernel-ipe
+
 * Thu Mar 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.129.1-1
 - Auto-upgrade to 6.6.129.1
 

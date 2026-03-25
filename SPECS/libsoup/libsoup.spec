@@ -124,7 +124,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}-%{BaseVersion}
 
 %check
-%if 0%{with_check}
+%if 0%{?with_check}
 %meson_test
 %endif
 
