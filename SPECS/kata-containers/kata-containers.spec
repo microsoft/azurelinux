@@ -69,11 +69,17 @@ popd
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
+%{kata_bin}/kata-ctl
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-clh-runtime-rs.toml
+%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
+%{kata_shim_bin}/containerd-shim-kata-v2-go
+%{kata_shim_bin}/containerd-shim-kata-v2-rs
 
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -82,6 +88,7 @@ popd
 %files tools
 %dir %{kata_path}
 %dir %{tools_pkg}
+%{tools_pkg}/VERSION
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
 %{tools_pkg}/tools/osbuilder/Makefile
