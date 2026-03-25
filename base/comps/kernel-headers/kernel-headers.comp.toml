@@ -5,23 +5,27 @@
 spec = { type = "upstream" }
 
 # Version updates: Fedora -> Azure Linux 6.18.5.1
+# Uses 3-part version (6.18.5) + kextraversion (1) scheme matching kernel.
 [components.kernel-headers.build]
-defines = { "azurelinux_version" = "3" }
+defines = { "azurelinux_version" = "3", "kextraversion" = "1" }
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
+description = "Set specversion to 3-part version matching kernel's specrpmversion"
 regex = "%define specversion .+"
-replacement = "%define specversion 6.18.5.1"
+replacement = "%define specversion 6.18.5"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
+description = "Set tarfile_release to 3-part version (tarball name uses specversion.kextraversion)"
 regex = "%define tarfile_release .+"
-replacement = "%define tarfile_release 6.18.5.1"
+replacement = "%define tarfile_release 6.18.5"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
+description = "Set specrelease so kextraversion (4th version component) flows into Release, matching kernel convention"
 regex = "%define specrelease .+"
-replacement = "%define specrelease 1%{?dist}"
+replacement = "%define specrelease %{kextraversion}.2%{?dist}"
 
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 [[components.kernel-headers.overlays]]
@@ -52,7 +56,7 @@ value = "rsync"
 [[components.kernel-headers.overlays]]
 type = "spec-update-tag"
 tag = "Source0"
-value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specversion}.tar.gz#/kernel-%{specversion}.tar.gz"
+value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specversion}.%{kextraversion}.tar.gz#/kernel-%{specversion}.%{kextraversion}.tar.gz"
 
 [[components.kernel-headers.source-files]]
 filename = "kernel-6.18.5.1.tar.gz"
@@ -64,7 +68,7 @@ origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Li
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 regex = "%setup -q -c"
-replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specversion}"
+replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specversion}.%{kextraversion}"
 
 # Build: generate native + cross headers from Azure Linux kernel source.
 # Uses make headers_install which produces properly sanitized userspace headers.
