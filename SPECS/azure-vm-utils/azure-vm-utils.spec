@@ -66,6 +66,6 @@ cp -a initramfs/dracut/modules.d/* %{buildroot}%{dracutmodulesdir}
 %{_mandir}/man8/azure-vm-utils-selftest.8.gz
 
 %changelog
-* Thu Feb 19 2026 Sumit Jena (HCL Technologies Ltd) - 1.14.0-1
+* Thu Feb 19 2026 Sumit Jena (HCL Technologies Ltd) - 0.7.0-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
