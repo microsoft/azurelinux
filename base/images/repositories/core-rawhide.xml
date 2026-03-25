@@ -1,0 +1,7 @@
+<image>
+	<repository type="rpm-md" alias="rawhide" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=rawhide&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-rawhide-primary"/>
+		</source>
+	</repository>
+</image>

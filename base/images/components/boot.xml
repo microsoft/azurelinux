@@ -1,0 +1,138 @@
+<image>
+	<profiles>
+		<profile name="BootCore" description="Boot core packages"/>
+		<profile name="BootCoreUKI" description="Boot core packages for UKI"/>
+		<profile name="BootDiskCore" description="Boot disk core configuration">
+			<requires profile="BaseCommon"/>
+			<requires profile="HardwareCommon"/>
+			<requires profile="BootCore"/>
+		</profile>
+	</profiles>
+	<preferences profiles="BootDiskCore" arch="x86_64,riscv64">
+		<type image="oem"
+		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
+		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
+		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" firmware="uefi"
+		      rootfs_label="fedora"
+		      >
+			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
+			<systemdisk name="fedora">
+				<volume name="@root=root"/>
+				<volume name="home" parent="/"/>
+				<volume name="var" parent="/"/>
+			</systemdisk>
+			<oemconfig>
+				<oem-resize>false</oem-resize>
+			</oemconfig>
+		</type>
+	</preferences>
+	<preferences profiles="BootDiskCore" arch="aarch64">
+		<type image="oem"
+		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
+		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid" force_mbr="true" editbootinstall="editbootinstall_rpilegacy.sh"
+		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" disk_start_sector="34816" firmware="uefi"
+		      rootfs_label="fedora"
+		      >
+			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
+			<systemdisk name="fedora">
+				<volume name="@root=root"/>
+				<volume name="home" parent="/"/>
+				<volume name="var" parent="/"/>
+			</systemdisk>
+			<oemconfig>
+				<oem-resize>false</oem-resize>
+			</oemconfig>
+		</type>
+	</preferences>
+	<preferences profiles="BootDiskCore" arch="ppc64le">
+		<type image="oem"
+		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
+		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
+		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" firmware="ofw"
+		      rootfs_label="fedora"
+		      >
+			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
+			<systemdisk>
+				<volume name="@root=root"/>
+				<volume name="home" parent="/"/>
+				<volume name="var" parent="/"/>
+			</systemdisk>
+			<oemconfig>
+				<oem-resize>false</oem-resize>
+			</oemconfig>
+		</type>
+	</preferences>
+	<preferences profiles="BootDiskCore" arch="s390x">
+		<type image="oem"
+		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8"
+		      devicepersistency="by-uuid"
+		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4"
+		      rootfs_label="fedora"
+		      >
+			<bootloader name="zipl" timeout="1"/>
+			<systemdisk>
+				<volume name="@root=root"/>
+				<volume name="home" parent="/"/>
+				<volume name="var" parent="/"/>
+			</systemdisk>
+			<oemconfig>
+				<oem-resize>false</oem-resize>
+			</oemconfig>
+		</type>
+	</preferences>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="BootCore,BootCoreUKI">
+		<package name="grubby"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="BootCore">
+		<ignore name="kernel-*debug*"/>
+		<package name="grub2-efi-aa64" arch="aarch64"/>
+		<package name="grub2-efi-aa64-modules" arch="aarch64"/>
+		<package name="grub2-efi-riscv64" arch="riscv64"/>
+		<package name="grub2-efi-riscv64-modules" arch="riscv64"/>
+		<package name="grub2-efi-ia32" arch="x86_64"/>
+		<package name="grub2-efi-ia32-modules" arch="x86_64"/>
+		<package name="grub2-efi-x64" arch="x86_64"/>
+		<package name="grub2-efi-x64-modules" arch="x86_64"/>
+		<package name="grub2-pc" arch="x86_64"/>
+		<package name="grub2-pc-modules" arch="x86_64"/>
+		<package name="grub2-ppc64le" arch="ppc64le"/>
+		<package name="s390utils-base" arch="s390x"/>
+		<package name="shim-signed-aa64" arch="aarch64"/>
+		<package name="shim-signed-ia32" arch="x86_64"/>
+		<package name="shim-signed-x64" arch="x86_64"/>
+		<package name="shim-unsigned-riscv64" arch="riscv64"/>
+		<package name="kernel-core"/>
+		<package name="systemd-oomd-defaults"/>
+		<package name="systemd-resolved"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="BootCoreUKI">
+		<package name="shim-signed-aa64" arch="aarch64"/>
+		<package name="shim-signed-ia32" arch="x86_64"/>
+		<package name="shim-signed-x64" arch="x86_64"/>
+		<package name="shim-unsigned-riscv64" arch="riscv64"/>
+		<package name="systemd-oomd-defaults"/>
+		<package name="systemd-resolved"/>
+		<package name="kernel-uki-virt"/>
+		<package name="python3-virt-firmware"/>
+		<package name="uki-direct"/>
+	</packages>
+	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
+		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
+		<package name="grub2-efi-riscv64-cdboot" arch="riscv64"/>
+		<package name="grub2-efi-ia32-cdboot" arch="x86_64"/>
+		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="BootDiskCore">
+		<ignore name="kernel-*debug*"/>
+		<package name="arm-image-installer" arch="aarch64"/>
+		<package name="glibc-all-langpacks"/>
+		<package name="kernel"/>
+		<package name="kernel-modules"/>
+		<package name="kernel-modules-extra"/>
+		<package name="btrfs-progs"/>
+		<package name="udisks2-btrfs"/>
+		<package name="uboot-images-armv8" arch="aarch64"/>
+		<package name="uboot-images-riscv64" arch="riscv64"/>
+	</packages>
+</image>
