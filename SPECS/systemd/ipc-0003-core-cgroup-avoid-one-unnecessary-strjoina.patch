@@ -1,0 +1,101 @@
+From 9f9c7d231d80e68f4d2117a02bb53f8c2949f048 Mon Sep 17 00:00:00 2001
+From: Mike Yuan <me@yhndnzj.com>
+Date: Thu, 26 Feb 2026 11:06:00 +0100
+Subject: [PATCH 3/4] core/cgroup: avoid one unnecessary strjoina()
+
+(cherry picked from commit 42aee39107fbdd7db1ccd402a2151822b2805e9f)
+(cherry picked from commit 80acea4ef80a4bb78560ed970c34952299b890d6)
+(cherry picked from commit b5fd14693057e5f2c9b4a49603be64ec3608ff6c)
+(cherry picked from commit 21167006574d6b83813c7596759b474f56562412)
+---
+ src/core/cgroup.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/src/core/cgroup.c b/src/core/cgroup.c
+index f58de95a49..5b8591ca97 100644
+--- a/src/core/cgroup.c
++++ b/src/core/cgroup.c
+@@ -2221,12 +2221,13 @@ static int unit_update_cgroup(
+         return 0;
+ }
+ 
+-static int unit_attach_pid_to_cgroup_via_bus(Unit *u, pid_t pid, const char *suffix_path) {
++static int unit_attach_pid_to_cgroup_via_bus(Unit *u, const char *cgroup_path, pid_t pid) {
+         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
+-        char *pp;
+         int r;
+ 
+         assert(u);
++        assert(cgroup_path);
++        assert(pid_is_valid(pid));
+ 
+         if (MANAGER_IS_SYSTEM(u->manager))
+                 return -EINVAL;
+@@ -2234,17 +2235,13 @@ static int unit_attach_pid_to_cgroup_via_bus(Unit *u, pid_t pid, const char *suf
+         if (!u->manager->system_bus)
+                 return -EIO;
+ 
+-        if (!u->cgroup_path)
+-                return -EINVAL;
+-
+         /* Determine this unit's cgroup path relative to our cgroup root */
+-        pp = path_startswith(u->cgroup_path, u->manager->cgroup_root);
++        const char *pp = path_startswith_full(cgroup_path,
++                                              u->manager->cgroup_root,
++                                              PATH_STARTSWITH_RETURN_LEADING_SLASH|PATH_STARTSWITH_REFUSE_DOT_DOT);
+         if (!pp)
+                 return -EINVAL;
+ 
+-        pp = strjoina("/", pp, suffix_path);
+-        path_simplify(pp);
+-
+         r = sd_bus_call_method(u->manager->system_bus,
+                                "org.freedesktop.systemd1",
+                                "/org/freedesktop/systemd1",
+@@ -2284,9 +2281,11 @@ int unit_attach_pids_to_cgroup(Unit *u, Set *pids, const char *suffix_path) {
+                 return r;
+ 
+         if (isempty(suffix_path))
+-                p = u->cgroup_path;
+-        else
++                p = empty_to_root(u->cgroup_path);
++        else {
++                assert(path_is_absolute(suffix_path));
+                 p = prefix_roota(u->cgroup_path, suffix_path);
++        }
+ 
+         delegated_mask = unit_get_delegate_mask(u);
+ 
+@@ -2301,7 +2300,7 @@ int unit_attach_pids_to_cgroup(Unit *u, Set *pids, const char *suffix_path) {
+ 
+                         log_unit_full_errno(u, again ? LOG_DEBUG : LOG_INFO,  r,
+                                             "Couldn't move process "PID_FMT" to%s requested cgroup '%s': %m",
+-                                            pid, again ? " directly" : "", empty_to_root(p));
++                                            pid, again ? " directly" : "", p);
+ 
+                         if (again) {
+                                 int z;
+@@ -2311,9 +2310,9 @@ int unit_attach_pids_to_cgroup(Unit *u, Set *pids, const char *suffix_path) {
+                                  * Since it's more privileged it might be able to move the process across the
+                                  * leaves of a subtree whose top node is not owned by us. */
+ 
+-                                z = unit_attach_pid_to_cgroup_via_bus(u, pid, suffix_path);
++                                z = unit_attach_pid_to_cgroup_via_bus(u, p, pid);
+                                 if (z < 0)
+-                                        log_unit_info_errno(u, z, "Couldn't move process "PID_FMT" to requested cgroup '%s' (directly or via the system bus): %m", pid, empty_to_root(p));
++                                        log_unit_info_errno(u, z, "Couldn't move process "PID_FMT" to requested cgroup '%s' (directly or via the system bus): %m", pid, p);
+                                 else {
+                                         if (ret >= 0)
+                                                 ret++; /* Count successful additions */
+@@ -2351,7 +2350,7 @@ int unit_attach_pids_to_cgroup(Unit *u, Set *pids, const char *suffix_path) {
+                                         continue; /* Success! */
+ 
+                                 log_unit_debug_errno(u, r, "Failed to attach PID " PID_FMT " to requested cgroup %s in controller %s, falling back to unit's cgroup: %m",
+-                                                     pid, empty_to_root(p), cgroup_controller_to_string(c));
++                                                     pid, p, cgroup_controller_to_string(c));
+                         }
+ 
+                         /* So this controller is either not delegate or realized, or something else weird happened. In
+-- 
+2.51.0
+

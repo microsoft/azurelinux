@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.2148
+Version:        9.2.0173
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -189,6 +189,7 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
+%{_datarootdir}/vim/vim*/xdg.vim
 %{_datarootdir}/vim/vim*/syntax/nosyntax.vim
 %{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_bindir}/ex
@@ -198,10 +199,16 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
-%{_datarootdir}/vim/vim91/LICENSE
-%{_datarootdir}/vim/vim91/README.txt
+%{_datarootdir}/vim/vim*/LICENSE
+%{_datarootdir}/vim/vim*/README.txt
 
 %changelog
+* Sun Mar 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0173-1
+- Auto-upgrade to 9.2.0173 - for CVE-2026-32249
+
+* Sun Mar 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0088-1
+- Auto-upgrade to 9.2.0088 - for CVE-2026-28417, CVE-2026-28418, CVE-2026-28419, CVE-2026-28420, CVE-2026-28421, CVE-2026-28422
+
 * Mon Feb 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.2148-1
 - Auto-upgrade to 9.1.2148 - for CVE-2026-26269
 

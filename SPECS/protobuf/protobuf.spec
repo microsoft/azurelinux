@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.17.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
 Patch0:         CVE-2022-1941.patch
 Patch1:         CVE-2025-4565.patch
+Patch2:         CVE-2026-0994.patch
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  make
@@ -110,6 +111,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.3-5
+- Patch for CVE-2026-0994
+
 * Tue Jul 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.17.3-4
 - Patch CVE-2025-4565
 
