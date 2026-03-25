@@ -43,7 +43,7 @@ BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.16.6
 BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.38-18%{?dist}
+BuildRequires: glibc-static >= 2.38-19%{?dist}
 %if !%{defined gobuild}
 BuildRequires: go-rpm-macros
 %endif

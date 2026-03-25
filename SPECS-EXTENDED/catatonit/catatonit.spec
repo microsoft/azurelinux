@@ -13,7 +13,7 @@ BuildRequires: automake
 BuildRequires: file
 BuildRequires: gcc
 BuildRequires: git
-BuildRequires: glibc-static >= 2.38-18%{?dist}
+BuildRequires: glibc-static >= 2.38-19%{?dist}
 BuildRequires: libtool
 BuildRequires: make
 

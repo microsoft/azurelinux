@@ -19,7 +19,7 @@ Patch4:         CVE-2024-51744.patch
 Patch5:         CVE-2025-65637.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-18%{?dist}
+BuildRequires:  glibc-static >= 2.38-19%{?dist}
 BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 

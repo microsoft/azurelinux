@@ -48,7 +48,7 @@ BuildRequires: btrfs-progs-devel
 BuildRequires: gcc
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
-BuildRequires: glibc-static >= 2.38-18%{?dist}
+BuildRequires: glibc-static >= 2.38-19%{?dist}
 BuildRequires: golang
 BuildRequires: git-core
 
