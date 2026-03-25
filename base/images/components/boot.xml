@@ -8,7 +8,7 @@
 			<requires profile="BootCore"/>
 		</profile>
 	</profiles>
-	<preferences profiles="BootDiskCore" arch="x86_64,riscv64">
+	<preferences profiles="BootDiskCore" arch="x86_64">
 		<type image="oem"
 		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
 		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
@@ -44,43 +44,6 @@
 			</oemconfig>
 		</type>
 	</preferences>
-	<preferences profiles="BootDiskCore" arch="ppc64le">
-		<type image="oem"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
-		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" firmware="ofw"
-		      rootfs_label="fedora"
-		      >
-			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
-		</type>
-	</preferences>
-	<preferences profiles="BootDiskCore" arch="s390x">
-		<type image="oem"
-		      filesystem="btrfs" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" fsmountoptions="x-systemd.growfs,compress=zstd:1"
-		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8"
-		      devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4"
-		      rootfs_label="fedora"
-		      >
-			<bootloader name="zipl" timeout="1"/>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
-		</type>
-	</preferences>
 	<packages type="bootstrap" patternType="plusRecommended" profiles="BootCore,BootCoreUKI">
 		<package name="grubby"/>
 	</packages>
@@ -88,20 +51,15 @@
 		<ignore name="kernel-*debug*"/>
 		<package name="grub2-efi-aa64" arch="aarch64"/>
 		<package name="grub2-efi-aa64-modules" arch="aarch64"/>
-		<package name="grub2-efi-riscv64" arch="riscv64"/>
-		<package name="grub2-efi-riscv64-modules" arch="riscv64"/>
 		<package name="grub2-efi-ia32" arch="x86_64"/>
 		<package name="grub2-efi-ia32-modules" arch="x86_64"/>
 		<package name="grub2-efi-x64" arch="x86_64"/>
 		<package name="grub2-efi-x64-modules" arch="x86_64"/>
 		<package name="grub2-pc" arch="x86_64"/>
 		<package name="grub2-pc-modules" arch="x86_64"/>
-		<package name="grub2-ppc64le" arch="ppc64le"/>
-		<package name="s390utils-base" arch="s390x"/>
 		<package name="shim-signed-aa64" arch="aarch64"/>
 		<package name="shim-signed-ia32" arch="x86_64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
-		<package name="shim-unsigned-riscv64" arch="riscv64"/>
 		<package name="kernel-core"/>
 		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
@@ -110,7 +68,6 @@
 		<package name="shim-signed-aa64" arch="aarch64"/>
 		<package name="shim-signed-ia32" arch="x86_64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
-		<package name="shim-unsigned-riscv64" arch="riscv64"/>
 		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
 		<package name="kernel-uki-virt"/>
@@ -119,7 +76,6 @@
 	</packages>
 	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
 		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
-		<package name="grub2-efi-riscv64-cdboot" arch="riscv64"/>
 		<package name="grub2-efi-ia32-cdboot" arch="x86_64"/>
 		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
 	</packages>
@@ -133,6 +89,5 @@
 		<package name="btrfs-progs"/>
 		<package name="udisks2-btrfs"/>
 		<package name="uboot-images-armv8" arch="aarch64"/>
-		<package name="uboot-images-riscv64" arch="riscv64"/>
 	</packages>
 </image>

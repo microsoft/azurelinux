@@ -25,26 +25,6 @@
 			<bootloader name="grub2" grub_template="grub-arm.cfg.iso-template" console="console" timeout="10"/>
 		</type>
 	</preferences>
-	<preferences profiles="LiveInstall" arch="riscv64">
-		<type image="iso"
-			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
-			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
-			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="quiet rhgb"
-			fscreateoptions="-Efragments -C 1048576"
-			>
-			<bootloader name="grub2" grub_template="grub-riscv64.cfg.iso-template" console="console" timeout="10"/>
-		</type>
-	</preferences>
-	<preferences profiles="LiveInstall" arch="ppc64le">
-		<type image="iso"
-			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
-			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
-			firmware="ofw" kernelcmdline="quiet rhgb"
-			fscreateoptions="-Efragments -C 1048576"
-			>
-			<bootloader name="grub2" grub_template="grub-ppc.cfg.iso-template" console="console" timeout="10"/>
-		</type>
-	</preferences>
 	<packages type="iso" patternType="plusRecommended" profiles="LiveInstall">
 		<!-- Filter out unwanted EFI files from the embedded ESP, see rhbz#2358785 -->
 		<file name="iso-esp-excludes.yaml" target="image/exclude_files_efifatimage.yaml"/>
