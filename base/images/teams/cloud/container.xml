@@ -16,7 +16,7 @@
 		<type image="oci">
 			<containerconfig
 			  name="azurelinux"
-			  tag="43"
+			  tag="4"
 			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/bin/bash"/>
@@ -27,12 +27,12 @@
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
 					<label name="org.opencontainers.image.name" value="azurelinux"/>
 					<label name="org.opencontainers.image.title" value="azurelinux"/>
-					<label name="org.opencontainers.image.version" value="43"/>
+					<label name="org.opencontainers.image.version" value="4"/>
 					<!-- Legacy attributes for backward compatibility -->
 					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
 					<label name="name" value="azurelinux"/>
-					<label name="version" value="43"/>
+					<label name="version" value="4"/>
 				</labels>
 				<environment>
 					<env name="container" value="oci"/>
@@ -49,7 +49,7 @@
 		<type image="oci">
 			<containerconfig
 			  name="azurelinux-minimal"
-			  tag="43"
+			  tag="4"
 			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/bin/bash"/>
@@ -60,12 +60,12 @@
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
 					<label name="org.opencontainers.image.name" value="azurelinux"/>
 					<label name="org.opencontainers.image.title" value="azurelinux"/>
-					<label name="org.opencontainers.image.version" value="43"/>
+					<label name="org.opencontainers.image.version" value="4"/>
 					<!-- Legacy attributes for backward compatibility -->
 					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
 					<label name="name" value="azurelinux-minimal"/>
-					<label name="version" value="43"/>
+					<label name="version" value="4"/>
 				</labels>
 				<environment>
 					<env name="container" value="oci"/>
@@ -82,7 +82,7 @@
 		<type image="oci">
 			<containerconfig
 			  name="azurelinux-init"
-			  tag="43"
+			  tag="4"
 			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
 			>
 				<subcommand execute="/sbin/init"/>
@@ -93,12 +93,12 @@
 					<label name="org.opencontainers.image.licenses" value="MIT"/>
 					<label name="org.opencontainers.image.name" value="azurelinux"/>
 					<label name="org.opencontainers.image.title" value="azurelinux"/>
-					<label name="org.opencontainers.image.version" value="43"/>
+					<label name="org.opencontainers.image.version" value="4"/>
 					<!-- Legacy attributes for backward compatibility -->
 					<label name="vendor" value="Microsoft"/>
 					<label name="license" value="MIT"/>
 					<label name="name" value="azurelinux-init"/>
-					<label name="version" value="43"/>
+					<label name="version" value="4"/>
 				</labels>
 				<stopsignal>SIGRTMIN+3</stopsignal>
 			</containerconfig>

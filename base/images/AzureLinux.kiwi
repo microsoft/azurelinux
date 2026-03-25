@@ -7,12 +7,12 @@
 		<specification>AzureLinux</specification>
 	</description>
 	<preferences>
-		<version>43</version>
+		<version>4</version>
 		<packagemanager>dnf5</packagemanager>
 		<locale>en_US</locale>
 		<keytable>us</keytable>
 		<timezone>UTC</timezone>
-		<release-version>43</release-version>
+		<release-version>4</release-version>
 	</preferences>
 	<include from="this://./repositories/core.xml"/>
 	<include from="this://./components/common.xml"/>
