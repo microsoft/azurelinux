@@ -41,8 +41,6 @@
 		<package name="kernel-modules"/>
 		<package name="kernel-modules-extra"/>
 		<package name="livesys-scripts"/>
-		<package name="btrfs-progs"/>
-		<package name="udisks2-btrfs"/>
 		<ignore name="device-mapper-multipath"/>
 		<ignore name="fcoe-utils"/>
 	</packages>
