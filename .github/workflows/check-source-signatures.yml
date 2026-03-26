@@ -94,13 +94,7 @@ jobs:
             exit 0
           fi
 
-          MACROS_RELEASEVERSIONS_PATH=$(sudo find . -type f -path "*/build/pkg_artifacts/macros.releaseversions" -print -quit)
-          if [ -z "$MACROS_RELEASEVERSIONS_PATH" ]; then
-            echo "macros.releaseversions was not found under */build/pkg_artifacts path."
-            exit 1
-          fi
-
-          MACROS_RELEASEVERSIONS_PATH=$(realpath "$MACROS_RELEASEVERSIONS_PATH")
+          MACROS_RELEASEVERSIONS_PATH="$(realpath -e build/pkg_artifacts/macros.releaseversions)"
           echo "Using macros.releaseversions at: $MACROS_RELEASEVERSIONS_PATH"
 
           set -x
