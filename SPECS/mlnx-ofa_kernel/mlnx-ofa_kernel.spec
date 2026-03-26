@@ -29,8 +29,6 @@
 %if 0%{azl}
 %global target_azl_build_kernel_version %azl_kernel_version
 %global target_kernel_release %azl_kernel_release
-%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_version
-%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -115,7 +113,7 @@ Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
-Source0:         %{_distro_sources_url}/%{_name}-%{target_mlnx_ofa_kernel_version}.tgz
+Source0:         %{_distro_sources_url}/%{_name}-%{version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -303,7 +301,7 @@ drivers against it.
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n %{_name}-%{target_mlnx_ofa_kernel_version}
+%setup -n %{_name}-%{version}
 set -- *
 mkdir source
 mv "$@" source/
