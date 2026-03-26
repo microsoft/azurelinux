@@ -1235,7 +1235,7 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Wed Mar 26 2026 Lanze Liu <lanzeliu@microsoft.com> - 255-27
+* Thu Mar 26 2026 Lanze Liu <lanzeliu@microsoft.com> - 255-27
 - Fix pcrlock failure on Hyper-V/Azure VMs with vTPM by backporting upstream
   commit e90a255 from systemd v256 (PR #31429).
 
