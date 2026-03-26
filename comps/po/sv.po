@@ -1,0 +1,3202 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# Chester Cheng <ccheng@redhat.com>, 2007
+# Christian Rose <menthos@menthos.com>, 2002-2005
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Göran Uddeborg <goeran@uddeborg.se>, 2011,2014, 2020.
+# Klap Hest <jojje3000@hotmail.com>, 2013
+# Klap Hest <jojje3000@hotmail.com>, 2013
+# fedoratrans <fedoratrans@gmail.com>, 2007-2008
+# Göran Uddeborg <goeran@uddeborg.se>, 2016. #zanata, 2020.
+# Kevin Fenzi <kevin@scrye.com>, 2016. #zanata
+# Allan Nordhøy <epost@anotheragency.no>, 2020.
+# Sebastian Rasmussen <sebras@gmail.com>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-07 13:23-0800\n"
+"PO-Revision-Date: 2021-01-23 01:37+0000\n"
+"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
+"Language-Team: Swedish <https://translate.fedoraproject.org/projects/"
+"fedora-comps/main/sv/>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.4.2\n"
+
+#: ../comps-f32.xml.in.h:1 ../comps-f33.xml.in.h:1 ../comps-f34.xml.in.h:1
+msgid "3D Printing"
+msgstr "3D-utskrifter"
+
+#: ../comps-f32.xml.in.h:2 ../comps-f33.xml.in.h:2 ../comps-f34.xml.in.h:2
+msgid "3D printing software"
+msgstr "Programvara för 3D-utskrifter"
+
+#: ../comps-f32.xml.in.h:3 ../comps-f33.xml.in.h:3 ../comps-f34.xml.in.h:3
+msgid "Administration Tools"
+msgstr "Administrationsverktyg"
+
+#: ../comps-f32.xml.in.h:4 ../comps-f33.xml.in.h:4 ../comps-f34.xml.in.h:4
+msgid ""
+"This group is a collection of graphical administration tools for the system, "
+"such as for managing user accounts and configuring system hardware."
+msgstr ""
+"Denna grupp är en samling grafiska administrationsverktyg för systemet, som "
+"exempelvis hantering av användarkonton och konfiguration av systemhårdvara."
+
+#: ../comps-f32.xml.in.h:5 ../comps-f33.xml.in.h:5 ../comps-f34.xml.in.h:5
+msgid "Anaconda tools"
+msgstr "Anacondaverktyg"
+
+#: ../comps-f32.xml.in.h:6 ../comps-f33.xml.in.h:6 ../comps-f34.xml.in.h:6
+msgid "ARM Tools"
+msgstr "ARM-verktyg"
+
+#: ../comps-f32.xml.in.h:7 ../comps-f33.xml.in.h:7 ../comps-f34.xml.in.h:7
+msgid "Tools for working with arm systems"
+msgstr "Verktyg för att arbeta med arm-system"
+
+#: ../comps-f32.xml.in.h:8 ../comps-f33.xml.in.h:8 ../comps-f34.xml.in.h:8
+msgid "x86 Baremetal Tools"
+msgstr "x86-lågnivåverktyg"
+
+#: ../comps-f32.xml.in.h:9 ../comps-f33.xml.in.h:9 ../comps-f34.xml.in.h:9
+msgid "Tools for working with baremetal x86 systems"
+msgstr "Verktyg för att arbeta med lågnivå-x86-system"
+
+#: ../comps-f32.xml.in.h:10 ../comps-f33.xml.in.h:10 ../comps-f34.xml.in.h:10
+msgid "Audio Production"
+msgstr "Audioproduktion"
+
+#: ../comps-f32.xml.in.h:11 ../comps-f33.xml.in.h:11 ../comps-f34.xml.in.h:11
+msgid "Various tools for audio synthesis and music production."
+msgstr "Diverse verktyg för audiosyntes och musikproduktion."
+
+#: ../comps-f32.xml.in.h:12 ../comps-f33.xml.in.h:12 ../comps-f34.xml.in.h:12
+msgid "Authoring and Publishing"
+msgstr "Författande och publicering"
+
+#: ../comps-f32.xml.in.h:13 ../comps-f33.xml.in.h:13 ../comps-f34.xml.in.h:13
+msgid ""
+"These tools allow you to create documents in the DocBook format and convert "
+"them into HTML, PDF, Postscript, and text."
+msgstr ""
+"Dessa verktyg låter dig skapa dokumentation i DocBook-formatet och "
+"konvertera dem till HTML, PDF, Postscript och text."
+
+#: ../comps-f32.xml.in.h:14 ../comps-f33.xml.in.h:14 ../comps-f34.xml.in.h:14
+msgid "base-x"
+msgstr "bas-x"
+
+#: ../comps-f32.xml.in.h:15 ../comps-f33.xml.in.h:15 ../comps-f34.xml.in.h:15
+msgid "Local X.org display server"
+msgstr "Lokal X.org display-server"
+
+#: ../comps-f32.xml.in.h:16 ../comps-f33.xml.in.h:16 ../comps-f34.xml.in.h:16
+msgid "Basic Desktop"
+msgstr "Grundläggande skrivbord"
+
+#: ../comps-f32.xml.in.h:17 ../comps-f33.xml.in.h:17 ../comps-f34.xml.in.h:17
+msgid "Basic X Window System with a choice of window manager."
+msgstr "Grund i fönstersystemet X med ett urval av fönsterhanterare."
+
+#: ../comps-f32.xml.in.h:18
+msgid "Books and Guides"
+msgstr "Böcker och guider"
+
+#: ../comps-f32.xml.in.h:19
+msgid "Books and Guides for Fedora users and developers"
+msgstr "Böcker och guider för Fedoraanvändare och -utvecklare"
+
+#: ../comps-f32.xml.in.h:20 ../comps-f33.xml.in.h:18 ../comps-f34.xml.in.h:18
+#: ../comps-epel7.xml.in.h:25
+msgid "Buildsystem building group"
+msgstr "Byggsystem byggrupp"
+
+#: ../comps-f32.xml.in.h:21 ../comps-f33.xml.in.h:19 ../comps-f34.xml.in.h:19
+msgid "C Development Tools and Libraries"
+msgstr "C-utvecklingsverktyg och -bibliotek"
+
+#: ../comps-f32.xml.in.h:22 ../comps-f33.xml.in.h:20 ../comps-f34.xml.in.h:20
+msgid ""
+"These tools include core development tools such as automake, gcc and "
+"debuggers."
+msgstr ""
+"Dessa verktyg innehåller grundläggande utvecklingsverktyg såsom automake, "
+"gcc och felsökare."
+
+#: ../comps-f32.xml.in.h:23 ../comps-f33.xml.in.h:21 ../comps-f34.xml.in.h:21
+#: ../comps-epel7.xml.in.h:34
+msgid "Cinnamon"
+msgstr "Cinnamon"
+
+#: ../comps-f32.xml.in.h:24 ../comps-f33.xml.in.h:22 ../comps-f34.xml.in.h:22
+#: ../comps-epel7.xml.in.h:35
+msgid ""
+"Cinnamon provides a desktop with a traditional layout, advanced features, "
+"easy to use, powerful and flexible."
+msgstr ""
+"Cinnamon erbjuder ett skrivbord med en traditionell layout, avancerade "
+"funktioner, lätt att använda, kraftfullt och flexibelt."
+
+#: ../comps-f32.xml.in.h:25 ../comps-f33.xml.in.h:23 ../comps-f34.xml.in.h:23
+msgid "Cloud Infrastructure"
+msgstr "Molninfrastruktur"
+
+#: ../comps-f32.xml.in.h:26 ../comps-f33.xml.in.h:24 ../comps-f34.xml.in.h:24
+msgid "Infrastructure packages for cloud computing."
+msgstr "Infrastrukturpaket för molnberäkningar."
+
+#: ../comps-f32.xml.in.h:27 ../comps-f33.xml.in.h:25 ../comps-f34.xml.in.h:25
+msgid "Cloud Management Tools"
+msgstr "Molnhanteringsverktyg"
+
+#: ../comps-f32.xml.in.h:28 ../comps-f33.xml.in.h:26 ../comps-f34.xml.in.h:26
+msgid ""
+"Software to manage servers and system images that run in \"cloud\" "
+"environments"
+msgstr ""
+"Program för att hantera servrar och systemavbilder som kör i ”molnmiljöer”"
+
+#: ../comps-f32.xml.in.h:29 ../comps-f33.xml.in.h:27 ../comps-f34.xml.in.h:27
+msgid "Cloud Server Tools"
+msgstr "Molnserververktyg"
+
+#: ../comps-f32.xml.in.h:30 ../comps-f33.xml.in.h:28 ../comps-f34.xml.in.h:28
+msgid ""
+"Software for servers and system images that run in \"cloud\" environments"
+msgstr "Program för servrar och systemavbilder som kör i ”molnmiljöer”"
+
+#: ../comps-f32.xml.in.h:31 ../comps-f33.xml.in.h:29 ../comps-f34.xml.in.h:29
+msgid "Compiz"
+msgstr "Compiz"
+
+#: ../comps-f32.xml.in.h:32 ../comps-f33.xml.in.h:30 ../comps-f34.xml.in.h:30
+msgid "This package group adds Compiz and Emerald"
+msgstr "Denna paketgrupp lägger till Compiz och Emerald"
+
+#: ../comps-f32.xml.in.h:33 ../comps-f33.xml.in.h:31 ../comps-f34.xml.in.h:31
+msgid "Container Management"
+msgstr "Behållarhantering"
+
+#: ../comps-f32.xml.in.h:34 ../comps-f33.xml.in.h:32 ../comps-f34.xml.in.h:32
+msgid "Tools for managing Linux containers"
+msgstr "Verktyg för att hantera Linuxbehållare"
+
+#: ../comps-f32.xml.in.h:35 ../comps-f33.xml.in.h:33 ../comps-f34.xml.in.h:33
+#: ../comps-epel7.xml.in.h:41
+msgid "Core"
+msgstr "Grund"
+
+#: ../comps-f32.xml.in.h:36 ../comps-f33.xml.in.h:34 ../comps-f34.xml.in.h:34
+msgid "Smallest possible installation"
+msgstr "Minsta möjliga installation"
+
+#: ../comps-f32.xml.in.h:37 ../comps-f33.xml.in.h:35 ../comps-f34.xml.in.h:35
+msgid "Critical Path (Applications)"
+msgstr "Kritisk linje (program)"
+
+#: ../comps-f32.xml.in.h:38 ../comps-f33.xml.in.h:36 ../comps-f34.xml.in.h:36
+msgid "A set of applications that are considered critical path"
+msgstr "Ett antal program som anses ligga på den kritiska linjen"
+
+#: ../comps-f32.xml.in.h:39 ../comps-f33.xml.in.h:37 ../comps-f34.xml.in.h:37
+msgid "Critical Path (Base)"
+msgstr "Kritisk linje (bas)"
+
+#: ../comps-f32.xml.in.h:40 ../comps-f33.xml.in.h:38 ../comps-f34.xml.in.h:38
+msgid ""
+"A set of packages that provide the shared platform for Critical Path "
+"functionality on all Fedora spins"
+msgstr ""
+"Ett antal paket som utgör den delade plattformen den kritiska linjens "
+"funktionalitet i alla Fedoraspinn"
+
+#: ../comps-f32.xml.in.h:41 ../comps-f33.xml.in.h:39 ../comps-f34.xml.in.h:39
+msgid "Critical Path (Deepin desktop)"
+msgstr "Kritisk linje (Deepin-skrivbord)"
+
+#: ../comps-f32.xml.in.h:42 ../comps-f33.xml.in.h:40 ../comps-f34.xml.in.h:40
+msgid ""
+"A set of packages that provide the Critical Path functionality for the "
+"Deepin desktop"
+msgstr ""
+"Ett antal paket som ger den kritiska linjens funktionalitet för Deepin-"
+"skrivbordet"
+
+#: ../comps-f32.xml.in.h:43 ../comps-f33.xml.in.h:41 ../comps-f34.xml.in.h:41
+msgid "Critical Path (GNOME)"
+msgstr "Kritisk linje (GNOME)"
+
+#: ../comps-f32.xml.in.h:44 ../comps-f33.xml.in.h:42 ../comps-f34.xml.in.h:42
+msgid ""
+"A set of packages that provide the Critical Path functionality for the GNOME "
+"desktop"
+msgstr ""
+"Ett antal paket som ger kritiska linjens funktionalitet för GNOME-skrivbordet"
+
+#: ../comps-f32.xml.in.h:45 ../comps-f33.xml.in.h:43 ../comps-f34.xml.in.h:43
+#: ../comps-epel8.xml.in.h:3
+msgid "Critical Path (KDE)"
+msgstr "Kritisk linje (KDE)"
+
+#: ../comps-f32.xml.in.h:46 ../comps-f33.xml.in.h:44 ../comps-f34.xml.in.h:44
+#: ../comps-epel8.xml.in.h:4
+msgid ""
+"A set of packages that provide the Critical Path functionality for the KDE "
+"desktop"
+msgstr ""
+"Ett antal paket som ger den kritiska linjens funktionalitet för KDE-"
+"skrivbordet"
+
+#: ../comps-f32.xml.in.h:47 ../comps-f33.xml.in.h:45 ../comps-f34.xml.in.h:45
+msgid "Critical Path (LXDE)"
+msgstr "Kritisk linje (LXDE)"
+
+#: ../comps-f32.xml.in.h:48 ../comps-f33.xml.in.h:46 ../comps-f34.xml.in.h:46
+msgid ""
+"A set of packages that provide the Critical Path functionality for the LXDE "
+"desktop"
+msgstr ""
+"Ett antal paket som ger den kritiska linjens funktionalitet för LXDE-"
+"skrivbordet"
+
+#: ../comps-f32.xml.in.h:49 ../comps-f33.xml.in.h:47 ../comps-f34.xml.in.h:47
+msgid "Critical Path (LXQt)"
+msgstr "Kritisk linje (LXQt)"
+
+#: ../comps-f32.xml.in.h:50 ../comps-f33.xml.in.h:48 ../comps-f34.xml.in.h:48
+msgid ""
+"A set of packages that provide the Critical Path functionality for the LXQt "
+"desktop"
+msgstr ""
+"Ett antal paket som ger den kritiska linjens funktionalitet för LXQt-"
+"skrivbordet"
+
+#: ../comps-f32.xml.in.h:51 ../comps-f33.xml.in.h:49 ../comps-f34.xml.in.h:49
+msgid "Critical Path (Xfce)"
+msgstr "Kritisk linje (Xfce)"
+
+#: ../comps-f32.xml.in.h:52 ../comps-f33.xml.in.h:50 ../comps-f34.xml.in.h:50
+msgid ""
+"A set of packages that provide the Critical Path functionality for the Xfce "
+"desktop"
+msgstr ""
+"Ett antal paket som ger den kritiska linjens funktionalitet för Xfce-"
+"skrivbordet"
+
+#: ../comps-f32.xml.in.h:53 ../comps-f33.xml.in.h:51 ../comps-f34.xml.in.h:51
+msgid "D Development Tools and Libraries"
+msgstr "D-utvecklingsverktyg och -bibliotek"
+
+#: ../comps-f32.xml.in.h:54 ../comps-f33.xml.in.h:52 ../comps-f34.xml.in.h:52
+msgid ""
+"These include development tools and libraries such as ldc, and geany-tag."
+msgstr ""
+"Dessa inkluderar utvecklingsverktyg och -bibliotek såsom ldc och geany-tag."
+
+#: ../comps-f32.xml.in.h:55 ../comps-f33.xml.in.h:53 ../comps-f34.xml.in.h:53
+msgid "Deepin Desktop Environment"
+msgstr "Deepin-skrivbordsmiljö"
+
+#: ../comps-f32.xml.in.h:56 ../comps-f33.xml.in.h:54 ../comps-f34.xml.in.h:54
+msgid ""
+"Deepin Desktop is a desktop environment aims at being elegant and easy to "
+"use."
+msgstr ""
+"Deepin-skrivbord är en skrivbordsmiljö som siktar på att vara elegant och "
+"lätt att använda."
+
+#: ../comps-f32.xml.in.h:57 ../comps-f33.xml.in.h:55 ../comps-f34.xml.in.h:55
+msgid "Deepin Desktop Applications"
+msgstr "Deepin-skrivbordsprogram"
+
+#: ../comps-f32.xml.in.h:58 ../comps-f33.xml.in.h:56 ../comps-f34.xml.in.h:56
+msgid "Media packages for Deepin Desktop"
+msgstr "Mediapaket för Deepin-skrivbord"
+
+#: ../comps-f32.xml.in.h:59 ../comps-f33.xml.in.h:57 ../comps-f34.xml.in.h:57
+msgid "Deepin Desktop Office"
+msgstr "Deepin-skrivbord kontor"
+
+#: ../comps-f32.xml.in.h:60 ../comps-f33.xml.in.h:58 ../comps-f34.xml.in.h:58
+msgid "Office suite for Deepin Desktop"
+msgstr "Kontorssvit för Deepin-skrivbord"
+
+#: ../comps-f32.xml.in.h:61 ../comps-f33.xml.in.h:59 ../comps-f34.xml.in.h:59
+msgid "Design Suite"
+msgstr "Designsvit"
+
+#: ../comps-f32.xml.in.h:62 ../comps-f33.xml.in.h:60 ../comps-f34.xml.in.h:60
+msgid ""
+"These packages are targeted towards professional designers, and are related "
+"to graphics, web and animation."
+msgstr ""
+"Dessa paket är riktade till professionella designers, och är relaterade till "
+"grafik, webb och animeringar."
+
+#: ../comps-f32.xml.in.h:63 ../comps-f33.xml.in.h:61 ../comps-f34.xml.in.h:61
+msgid "Development Libraries"
+msgstr "Utvecklingsbibliotek"
+
+#: ../comps-f32.xml.in.h:64 ../comps-f33.xml.in.h:62 ../comps-f34.xml.in.h:62
+msgid ""
+"The packages in this group are core libraries needed to develop applications."
+msgstr ""
+"Paketen i denna grupp är grundläggande bibliotek som behövs för utveckling "
+"av program."
+
+#: ../comps-f32.xml.in.h:65 ../comps-f33.xml.in.h:63 ../comps-f34.xml.in.h:63
+msgid "Development Tools"
+msgstr "Utvecklingsverktyg"
+
+#: ../comps-f32.xml.in.h:66 ../comps-f33.xml.in.h:64 ../comps-f34.xml.in.h:64
+msgid "These tools include general development tools such as git and CVS."
+msgstr ""
+"Dessa verktyg inkluderar allmänna utvecklingsverktyg såsom git och CVS."
+
+#: ../comps-f32.xml.in.h:67 ../comps-f33.xml.in.h:65 ../comps-f34.xml.in.h:65
+#: ../comps-epel7.xml.in.h:56
+msgid "Dial-up Networking Support"
+msgstr "Stöd för uppringt nätverk"
+
+#: ../comps-f32.xml.in.h:68 ../comps-f33.xml.in.h:66 ../comps-f34.xml.in.h:66
+#: ../comps-epel7.xml.in.h:60
+msgid "Directory Server"
+msgstr "Katalogserver"
+
+#: ../comps-f32.xml.in.h:69 ../comps-f33.xml.in.h:67 ../comps-f34.xml.in.h:67
+#: ../comps-epel7.xml.in.h:61
+msgid "Machine and user identity servers."
+msgstr "Maskin- och användaridentitetsservrar."
+
+#: ../comps-f32.xml.in.h:70 ../comps-f33.xml.in.h:68 ../comps-f34.xml.in.h:68
+msgid "DNS Name Server"
+msgstr "DNS-namnserver"
+
+#: ../comps-f32.xml.in.h:71 ../comps-f33.xml.in.h:69 ../comps-f34.xml.in.h:69
+msgid ""
+"This package group allows you to run a DNS name server (BIND) on the system."
+msgstr "Denna paketgrupp låter dig köra en DNS-namnserver (BIND) på systemet."
+
+#: ../comps-f32.xml.in.h:72 ../comps-f33.xml.in.h:70 ../comps-f34.xml.in.h:70
+msgid "Dogtag Certificate System"
+msgstr "Certifikatsystemet Dogtag"
+
+#: ../comps-f32.xml.in.h:73 ../comps-f33.xml.in.h:71 ../comps-f34.xml.in.h:71
+msgid "Enterprise-class open source Certificate Authority"
+msgstr "Certifikatmyndighet i öppen källkod för stora organisationer"
+
+#: ../comps-f32.xml.in.h:74 ../comps-f33.xml.in.h:72 ../comps-f34.xml.in.h:72
+msgid "Domain Membership"
+msgstr "Domänmedlemskap"
+
+#: ../comps-f32.xml.in.h:75 ../comps-f33.xml.in.h:73 ../comps-f34.xml.in.h:73
+msgid "Support for joining a FreeIPA or Active Directory Domain"
+msgstr "Stöd för att gå med i en FreeIPA- eller Active Directory-domän"
+
+#: ../comps-f32.xml.in.h:76 ../comps-f33.xml.in.h:74 ../comps-f34.xml.in.h:74
+msgid "Fedora Eclipse"
+msgstr "Fedora Eclipse"
+
+#: ../comps-f32.xml.in.h:77 ../comps-f33.xml.in.h:75 ../comps-f34.xml.in.h:75
+msgid "Integrated Development Environments based on Eclipse."
+msgstr "Integrerad utvecklingsmiljö baserad på Eclipse."
+
+#: ../comps-f32.xml.in.h:78 ../comps-f33.xml.in.h:76 ../comps-f34.xml.in.h:76
+msgid "Editors"
+msgstr "Textredigerare"
+
+#: ../comps-f32.xml.in.h:79 ../comps-f33.xml.in.h:77 ../comps-f34.xml.in.h:77
+msgid ""
+"Sometimes called text editors, these are programs that allow you to create "
+"and edit text files. This includes Emacs and Vi."
+msgstr ""
+"Med dessa program, ibland kallade textredigerare, kan du skapa och redigera "
+"filer. Dessa inkluderar Emacs och Vi."
+
+#: ../comps-f32.xml.in.h:80 ../comps-f33.xml.in.h:78 ../comps-f34.xml.in.h:78
+#: ../comps-epel7.xml.in.h:65
+msgid "Educational Software"
+msgstr "Utbildningsprogramvara"
+
+#: ../comps-f32.xml.in.h:81 ../comps-f33.xml.in.h:79 ../comps-f34.xml.in.h:79
+msgid "Educational software for learning"
+msgstr "Utbildningsprogramvara för inlärning"
+
+#: ../comps-f32.xml.in.h:82 ../comps-f33.xml.in.h:80 ../comps-f34.xml.in.h:80
+#: ../comps-epel7.xml.in.h:67
+msgid "Electronic Lab"
+msgstr "Elektroniklabb"
+
+#: ../comps-f32.xml.in.h:83 ../comps-f33.xml.in.h:81 ../comps-f34.xml.in.h:81
+msgid "Design and simulation tools for hardware engineers"
+msgstr "Design- och simuleringsverktyg för hårdvaruingenjörer"
+
+#: ../comps-f32.xml.in.h:84 ../comps-f33.xml.in.h:82 ../comps-f34.xml.in.h:82
+msgid "Engineering and Scientific"
+msgstr "Teknik och vetenskap"
+
+#: ../comps-f32.xml.in.h:85 ../comps-f33.xml.in.h:83 ../comps-f34.xml.in.h:83
+msgid ""
+"This group includes packages for performing mathematical and scientific "
+"computations and plotting, as well as unit conversion."
+msgstr ""
+"Denna grupp inkluderar paket för utförande av matematiska och vetenskapliga "
+"beräkningar och diagramritning såväl som enhetskonvertering."
+
+#: ../comps-f32.xml.in.h:86 ../comps-f33.xml.in.h:84 ../comps-f34.xml.in.h:84
+msgid "Enlightenment"
+msgstr "Enlightenment"
+
+#: ../comps-f32.xml.in.h:87 ../comps-f33.xml.in.h:85 ../comps-f34.xml.in.h:85
+msgid ""
+"Enlightenment is a lean, fast, modular and very extensible windowed desktop "
+"environment."
+msgstr ""
+"Enlightenment är en slimmad, snabb, modulär och väldigt utbyggbar "
+"fönsterskrivbordsmiljö."
+
+#: ../comps-f32.xml.in.h:88
+msgid "Epiphany Web Browser"
+msgstr "Epiphany Webbläsare"
+
+#: ../comps-f32.xml.in.h:89
+msgid "Epiphany Web Browser for GNOME"
+msgstr "Webbläsaren Epiphany för GNOME"
+
+#: ../comps-f32.xml.in.h:90 ../comps-f33.xml.in.h:86 ../comps-f34.xml.in.h:86
+#: ../comps-epel7.xml.in.h:75 ../comps-epel8.xml.in.h:1
+msgid "Fedora Packager"
+msgstr "Fedorapaketerare"
+
+#: ../comps-f32.xml.in.h:91 ../comps-f33.xml.in.h:87 ../comps-f34.xml.in.h:87
+msgid "Tools and utilities needed by a Fedora Packager"
+msgstr "Verktyg och tillbehör som en Fedorapaketerare behöver"
+
+#: ../comps-f32.xml.in.h:92 ../comps-f33.xml.in.h:88 ../comps-f34.xml.in.h:88
+msgid "Firefox Web Browser"
+msgstr "Firefox Webbläsare"
+
+#: ../comps-f32.xml.in.h:93 ../comps-f33.xml.in.h:89 ../comps-f34.xml.in.h:89
+msgid "The Firefox web browser"
+msgstr "Webbläsaren Firefox"
+
+#: ../comps-f32.xml.in.h:94 ../comps-f33.xml.in.h:90 ../comps-f34.xml.in.h:90
+msgid "Font design and packaging"
+msgstr "Typsnittsdesign och paketering"
+
+#: ../comps-f32.xml.in.h:95 ../comps-f33.xml.in.h:91 ../comps-f34.xml.in.h:91
+msgid ""
+"This group is a collection of tools used in the design, modification, "
+"manipulation, and packaging of fonts."
+msgstr ""
+"Denna grupp är en samling av verktyg och resurser för att designa, ändra, "
+"redigera och paketera typsnitt."
+
+#: ../comps-f32.xml.in.h:96 ../comps-f33.xml.in.h:92 ../comps-f34.xml.in.h:92
+#: ../comps-epel7.xml.in.h:80
+msgid "Fonts"
+msgstr "Typsnitt"
+
+#: ../comps-f32.xml.in.h:97 ../comps-f33.xml.in.h:93 ../comps-f34.xml.in.h:93
+msgid "Fonts packages for rendering text on the desktop."
+msgstr "Typsnittspaket för att rendera text på skrivbordet."
+
+#: ../comps-f32.xml.in.h:98 ../comps-f33.xml.in.h:94 ../comps-f34.xml.in.h:94
+msgid "FreeIPA Server"
+msgstr "FreeIPA-server"
+
+#: ../comps-f32.xml.in.h:99 ../comps-f33.xml.in.h:95 ../comps-f34.xml.in.h:95
+msgid ""
+"Provides central directory services for identity, policy management and "
+"auditing."
+msgstr ""
+"Ger centrala katalogtjänster för identitet, policyhantering och granskning."
+
+#: ../comps-f32.xml.in.h:100 ../comps-f33.xml.in.h:96 ../comps-f34.xml.in.h:96
+msgid "FTP Server"
+msgstr "FTP-server"
+
+#: ../comps-f32.xml.in.h:101 ../comps-f33.xml.in.h:97 ../comps-f34.xml.in.h:97
+msgid "These tools allow you to run an FTP server on the system."
+msgstr "Dessa verktyg låter dig köra en FTP-server på systemet."
+
+#: ../comps-f32.xml.in.h:102 ../comps-f33.xml.in.h:98 ../comps-f34.xml.in.h:98
+msgid "Games and Entertainment"
+msgstr "Spel och underhållning"
+
+#: ../comps-f32.xml.in.h:103 ../comps-f33.xml.in.h:99 ../comps-f34.xml.in.h:99
+msgid "Various ways to relax and spend your free time."
+msgstr "Diverse sätt att koppla av och fördriva ledig tid."
+
+#: ../comps-f32.xml.in.h:104 ../comps-f33.xml.in.h:100
+#: ../comps-f34.xml.in.h:100
+msgid "GNOME"
+msgstr "GNOME"
+
+#: ../comps-f32.xml.in.h:105 ../comps-f33.xml.in.h:101
+#: ../comps-f34.xml.in.h:101
+msgid "GNOME is a highly intuitive and user friendly desktop environment."
+msgstr "GNOME är en mycket intuitiv och användarvänlig skrivbordsmiljö."
+
+#: ../comps-f32.xml.in.h:106 ../comps-f33.xml.in.h:102
+#: ../comps-f34.xml.in.h:102
+msgid "Extra games for the GNOME Desktop"
+msgstr "Extra spel för GNOME-skrivbordet"
+
+#: ../comps-f32.xml.in.h:107 ../comps-f33.xml.in.h:103
+#: ../comps-f34.xml.in.h:103
+msgid "A variety of games for the GNOME Desktop"
+msgstr "Ett antal olika spel för GNOME-skrivbordet"
+
+#: ../comps-f32.xml.in.h:108 ../comps-f33.xml.in.h:104
+#: ../comps-f34.xml.in.h:104
+msgid "GNOME Software Development"
+msgstr "GNOME-programvaruutveckling"
+
+#: ../comps-f32.xml.in.h:109 ../comps-f33.xml.in.h:105
+#: ../comps-f34.xml.in.h:105
+msgid ""
+"Install these packages in order to develop GTK+ and GNOME graphical "
+"applications."
+msgstr ""
+"Installera dessa paket för att kunna utveckla grafiska program som använder "
+"GTK+ och GNOME."
+
+#: ../comps-f32.xml.in.h:110 ../comps-f33.xml.in.h:106
+#: ../comps-f34.xml.in.h:106
+msgid "Graphical Internet"
+msgstr "Grafiskt Internet"
+
+#: ../comps-f32.xml.in.h:111 ../comps-f33.xml.in.h:107
+#: ../comps-f34.xml.in.h:107
+msgid "This group includes graphical email, web, and chat clients."
+msgstr "Denna grupp inkluderar grafiska klienter för e-post, webb och chatt."
+
+#: ../comps-f32.xml.in.h:112 ../comps-f33.xml.in.h:108
+#: ../comps-f34.xml.in.h:108
+msgid "Graphics"
+msgstr "Grafik"
+
+#: ../comps-f32.xml.in.h:113 ../comps-f33.xml.in.h:109
+#: ../comps-f34.xml.in.h:109
+msgid "This group includes packages to help you manipulate and scan images."
+msgstr ""
+"Denna grupp inkluderar paket som hjälper dig manipulera och läsa in bilder."
+
+#: ../comps-f32.xml.in.h:114 ../comps-f33.xml.in.h:110
+#: ../comps-f34.xml.in.h:110
+msgid "Guest Agents"
+msgstr "Gästagenter"
+
+#: ../comps-f32.xml.in.h:115 ../comps-f33.xml.in.h:111
+#: ../comps-f34.xml.in.h:111
+msgid "Agents used when running under a hypervisor."
+msgstr "Agenter som används när man kör under en hypervisor."
+
+#: ../comps-f32.xml.in.h:116 ../comps-f33.xml.in.h:112
+#: ../comps-f34.xml.in.h:112
+msgid "Guest Desktop Agents"
+msgstr "Gästskrivbordsagenter"
+
+#: ../comps-f32.xml.in.h:117 ../comps-f33.xml.in.h:113
+#: ../comps-f34.xml.in.h:113
+msgid "Agents used when running as a virtualized desktop."
+msgstr "Agenter som används när man kör som ett virtuellt skrivbord."
+
+#: ../comps-f32.xml.in.h:118 ../comps-f33.xml.in.h:114
+#: ../comps-f34.xml.in.h:114
+msgid "High Availability"
+msgstr "Hög tillgänglighet"
+
+#: ../comps-f32.xml.in.h:119 ../comps-f33.xml.in.h:115
+#: ../comps-f34.xml.in.h:115
+msgid "Infrastructure for highly available services and/or shared storage."
+msgstr ""
+"Infrastruktur för tjänster och/eller delad lagring med hög tillgänglighet."
+
+#: ../comps-f32.xml.in.h:120 ../comps-f33.xml.in.h:116
+#: ../comps-f34.xml.in.h:116
+msgid "HAProxy"
+msgstr "HAProxy"
+
+#: ../comps-f32.xml.in.h:121 ../comps-f33.xml.in.h:117
+#: ../comps-f34.xml.in.h:117
+msgid "TCP/HTTP Load Balancer."
+msgstr "Lastbalanserare för TCP/HTTP."
+
+#: ../comps-f32.xml.in.h:122 ../comps-f33.xml.in.h:118
+#: ../comps-f34.xml.in.h:118
+msgid "Hardware Support"
+msgstr "Stöd för maskinvara"
+
+#: ../comps-f32.xml.in.h:123 ../comps-f33.xml.in.h:119
+#: ../comps-f34.xml.in.h:119
+msgid ""
+"This group is a collection of tools for various hardware specific utilities."
+msgstr ""
+"Denna grupp är en samling verktyg för olika maskinvaru-specifika tillbehör."
+
+#: ../comps-f32.xml.in.h:124 ../comps-f33.xml.in.h:120
+#: ../comps-f34.xml.in.h:120 ../comps-epel7.xml.in.h:101
+msgid "Haskell"
+msgstr "Haskell"
+
+#: ../comps-f32.xml.in.h:125 ../comps-f33.xml.in.h:121
+#: ../comps-f34.xml.in.h:121 ../comps-epel7.xml.in.h:102
+msgid "Support for developing programs in the Haskell programming language."
+msgstr "Stöd för utveckling av program i programmeringsspråket Haskell."
+
+#: ../comps-f32.xml.in.h:126 ../comps-f33.xml.in.h:122
+#: ../comps-f34.xml.in.h:122
+msgid "Headless Management"
+msgstr "Hantering utan huvud"
+
+#: ../comps-f32.xml.in.h:127 ../comps-f33.xml.in.h:123
+#: ../comps-f34.xml.in.h:123
+msgid "Tools for managing the system without an attached graphical console."
+msgstr ""
+"Verktyg för att hantera systemet utan att en grafisk konsol är inkopplad."
+
+#: ../comps-f32.xml.in.h:128 ../comps-f33.xml.in.h:124
+#: ../comps-f34.xml.in.h:124 ../comps-epel7.xml.in.h:111
+msgid "Input Methods"
+msgstr "Inmatningsmetoder"
+
+#: ../comps-f32.xml.in.h:129 ../comps-f33.xml.in.h:125
+#: ../comps-f34.xml.in.h:125
+msgid "Input method packages for the input of international text."
+msgstr "Paket med inmatningsmetoder för inmatning av internationell text."
+
+#: ../comps-f32.xml.in.h:130 ../comps-f33.xml.in.h:126
+#: ../comps-f34.xml.in.h:126
+msgid "Java"
+msgstr "Java"
+
+#: ../comps-f32.xml.in.h:131 ../comps-f33.xml.in.h:127
+#: ../comps-f34.xml.in.h:127
+msgid "Support for running programs written in the Java programming language."
+msgstr ""
+"Stöd för körande av program som är skrivna i programmeringsspråket Java."
+
+#: ../comps-f32.xml.in.h:132 ../comps-f33.xml.in.h:128
+#: ../comps-f34.xml.in.h:128
+msgid "Java Development"
+msgstr "Javautveckling"
+
+#: ../comps-f32.xml.in.h:133 ../comps-f33.xml.in.h:129
+#: ../comps-f34.xml.in.h:129
+msgid "Support for developing programs in the Java programming language."
+msgstr "Stöd för utveckling av program i programmeringsspråket Java."
+
+#: ../comps-f32.xml.in.h:134 ../comps-f33.xml.in.h:130
+#: ../comps-f34.xml.in.h:130
+msgid "Java Application Server"
+msgstr "Applikationsserver för Java"
+
+#: ../comps-f32.xml.in.h:135 ../comps-f33.xml.in.h:131
+#: ../comps-f34.xml.in.h:131
+msgid "Java application server."
+msgstr "Applikationsserver för Java."
+
+#: ../comps-f32.xml.in.h:136 ../comps-f33.xml.in.h:132
+#: ../comps-f34.xml.in.h:132 ../comps-epel8.xml.in.h:5
+msgid "KDE Applications"
+msgstr "KDE-program"
+
+#: ../comps-f32.xml.in.h:137 ../comps-f33.xml.in.h:133
+#: ../comps-f34.xml.in.h:133 ../comps-epel8.xml.in.h:6
+msgid "A set of commonly used KDE applications"
+msgstr "Ett antal ofta använda KDE-program"
+
+#: ../comps-f32.xml.in.h:138 ../comps-f33.xml.in.h:134
+#: ../comps-f34.xml.in.h:134 ../comps-epel8.xml.in.h:7
+msgid "KDE"
+msgstr "KDE"
+
+#: ../comps-f32.xml.in.h:139 ../comps-f33.xml.in.h:135
+#: ../comps-f34.xml.in.h:135 ../comps-epel8.xml.in.h:8
+msgid ""
+"The KDE Plasma Workspaces, a highly-configurable graphical user interface "
+"which includes a panel, desktop, system icons and desktop widgets, and many "
+"powerful KDE applications."
+msgstr ""
+"KDE Plasma arbetsytor, ett mycket konfigurerbart grafiskt användargränssnitt "
+"som inkluderar en panel, skrivbord, systemikoner och skrivbordsprogram och "
+"många kraftfulla KDE-program."
+
+#: ../comps-f32.xml.in.h:140 ../comps-f33.xml.in.h:136
+#: ../comps-f34.xml.in.h:136 ../comps-epel8.xml.in.h:9
+msgid "KDE Educational applications"
+msgstr "KDE utbildningsprogram"
+
+#: ../comps-f32.xml.in.h:141 ../comps-f33.xml.in.h:137
+#: ../comps-f34.xml.in.h:137 ../comps-epel8.xml.in.h:10
+msgid "KDE Multimedia support"
+msgstr "KDE multimediastöd"
+
+#: ../comps-f32.xml.in.h:142 ../comps-f33.xml.in.h:138
+#: ../comps-f34.xml.in.h:138 ../comps-epel8.xml.in.h:11
+msgid "Multimedia support for KDE"
+msgstr "Multimediastöd för KDE"
+
+#: ../comps-f32.xml.in.h:143 ../comps-f33.xml.in.h:139
+#: ../comps-f34.xml.in.h:139 ../comps-epel8.xml.in.h:12
+msgid "KDE Office"
+msgstr "KDE kontor"
+
+#: ../comps-f32.xml.in.h:144 ../comps-f33.xml.in.h:140
+#: ../comps-f34.xml.in.h:140 ../comps-epel8.xml.in.h:13
+msgid "KDE Office applications"
+msgstr "KDE kontorsprogram"
+
+#: ../comps-f32.xml.in.h:145 ../comps-f33.xml.in.h:141
+#: ../comps-f34.xml.in.h:141 ../comps-epel8.xml.in.h:14
+msgid "KDE Software Development"
+msgstr "KDE-programvaruutveckling"
+
+#: ../comps-f32.xml.in.h:146 ../comps-f33.xml.in.h:142
+#: ../comps-f34.xml.in.h:142 ../comps-epel8.xml.in.h:15
+msgid "Install these packages to develop Qt and KDE graphical applications."
+msgstr ""
+"Installera dessa paket för att utveckla grafiska program för Qt och KDE."
+
+#: ../comps-f32.xml.in.h:147 ../comps-f33.xml.in.h:143
+#: ../comps-f34.xml.in.h:143
+msgid "KDE Telepathy"
+msgstr "KDE Telepathy"
+
+#: ../comps-f32.xml.in.h:148 ../comps-f33.xml.in.h:144
+#: ../comps-f34.xml.in.h:144
+msgid "KDE Telepathy applications"
+msgstr "KDE Telepathy-program"
+
+#: ../comps-f32.xml.in.h:149 ../comps-f33.xml.in.h:145
+#: ../comps-f34.xml.in.h:145 ../comps-epel8.xml.in.h:16
+msgid "KDE Frameworks 5 Software Development"
+msgstr "KDE Frameworks 5-programutveckling"
+
+#: ../comps-f32.xml.in.h:150 ../comps-f33.xml.in.h:146
+#: ../comps-f34.xml.in.h:146 ../comps-epel8.xml.in.h:17
+msgid ""
+"Install these packages to develop applications using Qt5 and KDE Frameworks "
+"5."
+msgstr ""
+"Installera dessa paket för att utveckla program som använder Qt5 och KDE "
+"Frameworks 5."
+
+#: ../comps-f32.xml.in.h:151 ../comps-f33.xml.in.h:147
+#: ../comps-f34.xml.in.h:147
+msgid "Legacy Fonts"
+msgstr "Äldre typsnitt"
+
+#: ../comps-f32.xml.in.h:152 ../comps-f33.xml.in.h:148
+#: ../comps-f34.xml.in.h:148
+msgid "Older bitmap and vector fonts packages"
+msgstr "Paket med äldre bildpunkts- och vektortypsnitt"
+
+#: ../comps-f32.xml.in.h:153 ../comps-f33.xml.in.h:149
+#: ../comps-f34.xml.in.h:149
+msgid "Legacy Network Server"
+msgstr "Äldre nätverksserver"
+
+#: ../comps-f32.xml.in.h:154 ../comps-f33.xml.in.h:150
+#: ../comps-f34.xml.in.h:150
+msgid ""
+"These packages include servers for old network protocols such as rsh and "
+"telnet."
+msgstr ""
+"Dessa paket inkluderar servrar för gamla nätverksprotokoll som exempelvis "
+"rsh och telnet."
+
+#: ../comps-f32.xml.in.h:155
+msgid "Legacy Software Development"
+msgstr "Utveckling av äldre programvara"
+
+#: ../comps-f32.xml.in.h:156
+msgid "These packages provide compatibility with previous releases."
+msgstr "Dessa paket ger kompatibilitet med tidigare utgåvor."
+
+#: ../comps-f32.xml.in.h:157
+msgid "Legacy Software Support"
+msgstr "Stöd för äldre programvara"
+
+#: ../comps-f32.xml.in.h:158 ../comps-f33.xml.in.h:151
+#: ../comps-f34.xml.in.h:151
+msgid "LibreOffice"
+msgstr "LibreOffice"
+
+#: ../comps-f32.xml.in.h:159 ../comps-f33.xml.in.h:152
+#: ../comps-f34.xml.in.h:152
+msgid "LibreOffice Productivity Suite"
+msgstr "LibreOffice Produktivitetssvit"
+
+#: ../comps-f32.xml.in.h:160 ../comps-f33.xml.in.h:153
+#: ../comps-f34.xml.in.h:153
+msgid "LibreOffice Development"
+msgstr "LibreOffice-utveckling"
+
+#: ../comps-f32.xml.in.h:161 ../comps-f33.xml.in.h:154
+#: ../comps-f34.xml.in.h:154
+msgid ""
+"These packages are helpful when developing LibreOffice extensions or macros."
+msgstr ""
+"Dessa paket hjälper till när man utvecklar utökningar eller makron till "
+"LibreOffice."
+
+#: ../comps-f32.xml.in.h:162 ../comps-f33.xml.in.h:155
+#: ../comps-f34.xml.in.h:155
+msgid "Load Balancer"
+msgstr "Lastbalanserare"
+
+#: ../comps-f32.xml.in.h:163 ../comps-f33.xml.in.h:156
+#: ../comps-f34.xml.in.h:156
+msgid "Load balancing support for network traffic"
+msgstr "Lastbalanseringsstöd för nätverkstrafik"
+
+#: ../comps-f32.xml.in.h:164 ../comps-f33.xml.in.h:157
+#: ../comps-f34.xml.in.h:157
+msgid "Applications for the LXDE Desktop"
+msgstr "Program för skrivbordet LXDE"
+
+#: ../comps-f32.xml.in.h:165 ../comps-f33.xml.in.h:158
+#: ../comps-f34.xml.in.h:158
+msgid "A set of commonly used applications for the LXDE Desktop"
+msgstr "Ett antal ofta använda program för skrivbordet LXDE"
+
+#: ../comps-f32.xml.in.h:166 ../comps-f33.xml.in.h:159
+#: ../comps-f34.xml.in.h:159
+msgid "LXDE"
+msgstr "LXDE"
+
+#: ../comps-f32.xml.in.h:167 ../comps-f33.xml.in.h:160
+#: ../comps-f34.xml.in.h:160
+msgid ""
+"LXDE is a lightweight X11 desktop environment designed for computers with "
+"low hardware specifications like netbooks, mobile devices or older computers."
+msgstr ""
+"LXDE är en lättviktig X11 skrivbordsmiljö gjord för datorer med låga "
+"hårdvaruspecifikationer som nätböcker, mobila enheter eller äldre datorer."
+
+#: ../comps-f32.xml.in.h:168 ../comps-f33.xml.in.h:161
+#: ../comps-f34.xml.in.h:161
+msgid "Multimedia support for LXDE"
+msgstr "Multimediastöd till LXDE"
+
+#: ../comps-f32.xml.in.h:169 ../comps-f33.xml.in.h:162
+#: ../comps-f34.xml.in.h:162
+msgid "LXDE Office"
+msgstr "LXDE Kontor"
+
+#: ../comps-f32.xml.in.h:170 ../comps-f33.xml.in.h:163
+#: ../comps-f34.xml.in.h:163
+msgid "Office suite for LXDE"
+msgstr "Kontorssvit till LXDE"
+
+#: ../comps-f32.xml.in.h:171 ../comps-f33.xml.in.h:164
+#: ../comps-f34.xml.in.h:164
+msgid "Applications for the LXQt Desktop"
+msgstr "Program för skrivbordet LXQt"
+
+#: ../comps-f32.xml.in.h:172 ../comps-f33.xml.in.h:165
+#: ../comps-f34.xml.in.h:165
+msgid "A set of commonly used applications for the LXQt Desktop"
+msgstr "Ett antal ofta använda program för skrivbordet LXQt"
+
+#: ../comps-f32.xml.in.h:173 ../comps-f33.xml.in.h:166
+#: ../comps-f34.xml.in.h:166
+msgid "LXQt"
+msgstr "LXQt"
+
+#: ../comps-f32.xml.in.h:174 ../comps-f33.xml.in.h:167
+#: ../comps-f34.xml.in.h:167 ../comps-epel7.xml.in.h:150
+msgid ""
+"LXQt is a lightweight X11 desktop environment designed for computers with "
+"low hardware specifications like netbooks, mobile devices or older computers."
+msgstr ""
+"LXQt är en lättviktig X11-skrivbordsmiljö gjord för datorer med låga "
+"hårdvaruspecifikationer som nätböcker, mobila enheter eller äldre datorer."
+
+#: ../comps-f32.xml.in.h:175 ../comps-f33.xml.in.h:168
+#: ../comps-f34.xml.in.h:168
+msgid "Translations of LXQt"
+msgstr "Översättningar av LXQt"
+
+#: ../comps-f32.xml.in.h:176 ../comps-f33.xml.in.h:169
+#: ../comps-f34.xml.in.h:169
+msgid "Multimedia support for LXQt"
+msgstr "Multimediastöd till LXQt"
+
+#: ../comps-f32.xml.in.h:177 ../comps-f33.xml.in.h:170
+#: ../comps-f34.xml.in.h:170
+msgid "LXQt Office"
+msgstr "LXQt Kontor"
+
+#: ../comps-f32.xml.in.h:178 ../comps-f33.xml.in.h:171
+#: ../comps-f34.xml.in.h:171
+msgid "Office suite for LXQt"
+msgstr "Kontorssvit till LXQt"
+
+#: ../comps-f32.xml.in.h:179 ../comps-f33.xml.in.h:172
+#: ../comps-f34.xml.in.h:172
+msgid "Mail Server"
+msgstr "E-postserver"
+
+#: ../comps-f32.xml.in.h:180 ../comps-f33.xml.in.h:173
+#: ../comps-f34.xml.in.h:173
+msgid "These packages allow you to configure an IMAP or SMTP mail server."
+msgstr "Dessa paket låter dig konfigurera en IMAP- eller SMTP-e-postserver."
+
+#: ../comps-f32.xml.in.h:181 ../comps-f33.xml.in.h:174
+#: ../comps-f34.xml.in.h:174
+msgid "MATE Applications"
+msgstr "MATE-program"
+
+#: ../comps-f32.xml.in.h:182 ../comps-f33.xml.in.h:175
+#: ../comps-f34.xml.in.h:175
+msgid "Applications for the MATE Desktop."
+msgstr "Program för skrivbordet MATE."
+
+#: ../comps-f32.xml.in.h:183 ../comps-f33.xml.in.h:176
+#: ../comps-f34.xml.in.h:176 ../comps-epel7.xml.in.h:164
+msgid "MATE"
+msgstr "MATE"
+
+#: ../comps-f32.xml.in.h:184 ../comps-f33.xml.in.h:177
+#: ../comps-f34.xml.in.h:177 ../comps-epel7.xml.in.h:165
+msgid ""
+"MATE Desktop is based on GNOME 2 and provides a powerful graphical user "
+"interface for users who seek a simple easy to use traditional desktop "
+"interface."
+msgstr ""
+"Skrivbordet MATE är baserat på GNOME 2 och erbjuder ett kraftfullt grafiskt "
+"användargränssnitt för användare som är ute efter ett enkelt och lättanvänt "
+"traditionellt skrivbordsgränssnitt."
+
+#: ../comps-f32.xml.in.h:185
+msgid "Medical Applications"
+msgstr "Medicinska program"
+
+#: ../comps-f32.xml.in.h:186
+msgid "This is a group of applications related to health care."
+msgstr "Detta är en grupp av program relaterade till hälsovård."
+
+#: ../comps-f32.xml.in.h:187 ../comps-f33.xml.in.h:178
+#: ../comps-f34.xml.in.h:178 ../comps-epel7.xml.in.h:166
+msgid "Milkymist"
+msgstr "Milkymist"
+
+#: ../comps-f32.xml.in.h:188 ../comps-f33.xml.in.h:179
+#: ../comps-f34.xml.in.h:179 ../comps-epel7.xml.in.h:167
+msgid "Toolchain for Milkymist hardware engineers."
+msgstr "Verktygskedja för Milkymist-hårdvaruingenjörer."
+
+#: ../comps-f32.xml.in.h:189 ../comps-f33.xml.in.h:180
+#: ../comps-f34.xml.in.h:180
+msgid "MinGW cross-compiler"
+msgstr "Korskompilatorn MinGW"
+
+#: ../comps-f32.xml.in.h:190 ../comps-f33.xml.in.h:181
+#: ../comps-f34.xml.in.h:181
+msgid ""
+"Support for cross-compiling programs to 32 bit Windows targets, testing "
+"them, and building installers, all from within Fedora."
+msgstr ""
+"Stöd för korskompilering av program till 32-bitars Windowsmål, testning av "
+"dem och byggande av installerare, allt inifrån Fedora."
+
+#: ../comps-f32.xml.in.h:191 ../comps-f33.xml.in.h:182
+#: ../comps-f34.xml.in.h:182
+msgid "MongoDB"
+msgstr "MongoDB"
+
+#: ../comps-f32.xml.in.h:192 ../comps-f33.xml.in.h:183
+#: ../comps-f34.xml.in.h:183
+msgid "Scalable, high-performance NoSQL database."
+msgstr "Skalbar NoSQL-databas med hög prestanda."
+
+#: ../comps-f32.xml.in.h:193 ../comps-f33.xml.in.h:184
+#: ../comps-f34.xml.in.h:184
+msgid "Multimedia"
+msgstr "Multimedia"
+
+#: ../comps-f32.xml.in.h:194 ../comps-f33.xml.in.h:185
+#: ../comps-f34.xml.in.h:185
+msgid "Audio/video framework common to desktops"
+msgstr "Gemensamt ljud-/videoramverk för olika skrivbord"
+
+#: ../comps-f32.xml.in.h:195 ../comps-f33.xml.in.h:186
+#: ../comps-f34.xml.in.h:186
+msgid "MariaDB (MySQL) Database"
+msgstr "Databasen MariaDB (MySQL)"
+
+#: ../comps-f32.xml.in.h:196 ../comps-f33.xml.in.h:187
+#: ../comps-f34.xml.in.h:187
+msgid ""
+"This package group contains packages useful for use with MariaDB (MySQL)."
+msgstr ""
+"Denna paketgrupp innehåller paket som är användbara tillsammans med MariaDB "
+"(MySQL)."
+
+#: ../comps-f32.xml.in.h:197 ../comps-f33.xml.in.h:188
+#: ../comps-f34.xml.in.h:188
+msgid "Network Servers"
+msgstr "Nätverksservrar"
+
+#: ../comps-f32.xml.in.h:198 ../comps-f33.xml.in.h:189
+#: ../comps-f34.xml.in.h:189
+msgid ""
+"These packages include network-based servers such as DHCP, Kerberos and NIS."
+msgstr ""
+"Dessa paket inkluderar nätverksbaserade servrar som exempelvis DHCP, "
+"Kerberos och NIS."
+
+#: ../comps-f32.xml.in.h:199 ../comps-f33.xml.in.h:190
+#: ../comps-f34.xml.in.h:190
+msgid "Common NetworkManager Submodules"
+msgstr "Allmänna NetworkManager-undermoduler"
+
+#: ../comps-f32.xml.in.h:200 ../comps-f33.xml.in.h:191
+#: ../comps-f34.xml.in.h:191
+msgid ""
+"This group contains NetworkManager submodules that are commonly used, but "
+"may not be wanted in some streamlined configurations."
+msgstr ""
+"Denna grupp innehåller undermoduler till NetworkManager som ofta används, "
+"men som kanske inte önskas i några slimmade konfigurationer."
+
+#: ../comps-f32.xml.in.h:201 ../comps-f33.xml.in.h:192
+#: ../comps-f34.xml.in.h:192
+msgid "Neuron Modelling Simulators"
+msgstr "Neuronmodelleringssimulatorer"
+
+#: ../comps-f32.xml.in.h:202 ../comps-f33.xml.in.h:193
+#: ../comps-f34.xml.in.h:193
+msgid ""
+"This group includes simulators used in modelling of neurons and their "
+"networks."
+msgstr ""
+"Denna grupp inkluderar simulatorer som används inom modellering av neuroner "
+"och deras nätverk."
+
+#: ../comps-f32.xml.in.h:203 ../comps-f33.xml.in.h:194
+#: ../comps-f34.xml.in.h:194
+msgid "News Server"
+msgstr "Diskussionsgruppsserver"
+
+#: ../comps-f32.xml.in.h:204 ../comps-f33.xml.in.h:195
+#: ../comps-f34.xml.in.h:195
+msgid "This group allows you to configure the system as a news server."
+msgstr ""
+"Denna grupp låter dig konfigurera systemet som en diskussionsgruppsserver."
+
+#: ../comps-f32.xml.in.h:205 ../comps-f33.xml.in.h:196
+#: ../comps-f34.xml.in.h:196
+msgid "OCaml"
+msgstr "OCaml"
+
+#: ../comps-f32.xml.in.h:206 ../comps-f33.xml.in.h:197
+#: ../comps-f34.xml.in.h:197
+msgid ""
+"Support for developing software using the Objective Caml programming "
+"language and libraries."
+msgstr ""
+"Stöd för utveckling av program i programmeringsspråket Objective Caml och "
+"dess bibliotek."
+
+#: ../comps-f32.xml.in.h:207 ../comps-f33.xml.in.h:198
+#: ../comps-f34.xml.in.h:198
+msgid "Office/Productivity"
+msgstr "Kontorsprogramvara"
+
+#: ../comps-f32.xml.in.h:208 ../comps-f33.xml.in.h:199
+#: ../comps-f34.xml.in.h:199
+msgid "The applications include office suites, PDF viewers, and more."
+msgstr ""
+"Programmen inkluderar sviter med kontorsprogramvara, PDF-visare, med mera."
+
+#: ../comps-f32.xml.in.h:209
+msgid "Online Help and Documentation"
+msgstr "Direkthjälp och -dokumentation"
+
+#: ../comps-f32.xml.in.h:210 ../comps-f33.xml.in.h:200
+#: ../comps-f34.xml.in.h:200
+msgid "Pantheon Desktop"
+msgstr "Pantheon-skrivbord"
+
+#: ../comps-f32.xml.in.h:211 ../comps-f33.xml.in.h:201
+#: ../comps-f34.xml.in.h:201
+msgid "The Pantheon desktop environment is the DE that powers elementaryOS."
+msgstr ""
+"Pantheon-skrivbordsmiljön är skrivbordsmiljön som används i elementaryOS."
+
+#: ../comps-f32.xml.in.h:212 ../comps-f33.xml.in.h:202
+#: ../comps-f34.xml.in.h:202
+msgid "Perl Development"
+msgstr "Perlutveckling"
+
+#: ../comps-f32.xml.in.h:213 ../comps-f33.xml.in.h:203
+#: ../comps-f34.xml.in.h:203
+msgid "Support for developing programs in the Perl programming language."
+msgstr "Stöd för utveckling av program i programmeringsspråket Perl."
+
+#: ../comps-f32.xml.in.h:214 ../comps-f33.xml.in.h:204
+#: ../comps-f34.xml.in.h:204
+msgid "Perl for Web"
+msgstr "Perl för webben"
+
+#: ../comps-f32.xml.in.h:215 ../comps-f33.xml.in.h:205
+#: ../comps-f34.xml.in.h:205
+msgid "Basic Perl web application support."
+msgstr "Grundläggande stöd för Perl i webbprogram."
+
+#: ../comps-f32.xml.in.h:216 ../comps-f33.xml.in.h:208
+#: ../comps-f34.xml.in.h:208
+msgid "PHP"
+msgstr "PHP"
+
+#: ../comps-f32.xml.in.h:217 ../comps-f33.xml.in.h:209
+#: ../comps-f34.xml.in.h:209
+msgid "General-purpose web development scripting language."
+msgstr "Generellt skriptspråk för webbutveckling."
+
+#: ../comps-f32.xml.in.h:218 ../comps-f33.xml.in.h:210
+#: ../comps-f34.xml.in.h:210
+msgid "VMware Platform Support"
+msgstr "Stöd för VMware-plattform"
+
+#: ../comps-f32.xml.in.h:219 ../comps-f33.xml.in.h:211
+#: ../comps-f34.xml.in.h:211
+msgid "Packages to install in VMware virtual machines"
+msgstr "Paket att installera i VMware-virtuella maskiner"
+
+#: ../comps-f32.xml.in.h:220 ../comps-f33.xml.in.h:212
+#: ../comps-f34.xml.in.h:212
+msgid "Printing Support"
+msgstr "Utskriftsstöd"
+
+#: ../comps-f32.xml.in.h:221 ../comps-f33.xml.in.h:213
+#: ../comps-f34.xml.in.h:213
+msgid ""
+"Install these tools to enable the system to print or act as a print server."
+msgstr ""
+"Installera dessa verktyg för att låta systemet skriva ut eller agera "
+"utskriftsserver."
+
+#: ../comps-f32.xml.in.h:222 ../comps-f33.xml.in.h:214
+#: ../comps-f34.xml.in.h:214
+msgid "Python Classroom"
+msgstr "Pythonklassrum"
+
+#: ../comps-f32.xml.in.h:223 ../comps-f33.xml.in.h:215
+#: ../comps-f34.xml.in.h:215
+msgid "Tools used to teach and learn Python."
+msgstr "Verktyg att använda för att lära ut och studera Python."
+
+#: ../comps-f32.xml.in.h:224 ../comps-f33.xml.in.h:216
+#: ../comps-f34.xml.in.h:216
+msgid "Python Science"
+msgstr "Python-vetenskap"
+
+#: ../comps-f32.xml.in.h:225 ../comps-f33.xml.in.h:217
+#: ../comps-f34.xml.in.h:217
+msgid "Tools used to do science in Python."
+msgstr "Verktyg för att arbeta med vetenskap i Python."
+
+#: ../comps-f32.xml.in.h:226 ../comps-f33.xml.in.h:218
+#: ../comps-f34.xml.in.h:218
+msgid "Robotics"
+msgstr "Robotteknik"
+
+#: ../comps-f32.xml.in.h:227 ../comps-f33.xml.in.h:219
+#: ../comps-f34.xml.in.h:219
+msgid "Suite of packages for robotics development"
+msgstr "Svit av paket för robotteknikutveckling"
+
+#: ../comps-f32.xml.in.h:228 ../comps-f33.xml.in.h:220
+#: ../comps-f34.xml.in.h:220
+msgid "RPM Development Tools"
+msgstr "RPM-utvecklingsverktyg"
+
+#: ../comps-f32.xml.in.h:229 ../comps-f33.xml.in.h:221
+#: ../comps-f34.xml.in.h:221
+msgid "These tools include core development tools such rpmbuild."
+msgstr ""
+"Dessa verktyg inkluderar grundläggande utvecklingsverktyg såsom rpmbuild."
+
+#: ../comps-f32.xml.in.h:230 ../comps-f33.xml.in.h:222
+#: ../comps-f34.xml.in.h:222
+msgid "Ruby"
+msgstr "Ruby"
+
+#: ../comps-f32.xml.in.h:231 ../comps-f33.xml.in.h:223
+#: ../comps-f34.xml.in.h:223
+msgid "Basic support for the Ruby programming language."
+msgstr "Grundläggande stöd för programmeringsspråket Ruby."
+
+#: ../comps-f32.xml.in.h:232 ../comps-f33.xml.in.h:224
+#: ../comps-f34.xml.in.h:224
+msgid "Ruby on Rails"
+msgstr "Ruby on Rails"
+
+#: ../comps-f32.xml.in.h:233 ../comps-f33.xml.in.h:225
+#: ../comps-f34.xml.in.h:225
+msgid "Ruby on Rails web application stack."
+msgstr "Webbprogramstacken Ruby on Rails."
+
+#: ../comps-f32.xml.in.h:234 ../comps-f33.xml.in.h:226
+#: ../comps-f34.xml.in.h:226
+msgid "Security Lab"
+msgstr "Säkerhetslabb"
+
+#: ../comps-f32.xml.in.h:235 ../comps-f33.xml.in.h:227
+#: ../comps-f34.xml.in.h:227
+msgid ""
+"Tools for security auditing, forensics, system rescue, and teaching security "
+"testing methodologies."
+msgstr ""
+"Verktyg för säkerhetsrevision, kriminalteknik, systemräddning och att lära "
+"ut metoder för säkerhetstestning."
+
+#: ../comps-f32.xml.in.h:236 ../comps-f33.xml.in.h:228
+#: ../comps-f34.xml.in.h:228
+msgid "Server Configuration Tools"
+msgstr "Serverkonfigurationsverktyg"
+
+#: ../comps-f32.xml.in.h:237 ../comps-f33.xml.in.h:229
+#: ../comps-f34.xml.in.h:229
+msgid "This group contains all of Red Hat's custom server configuration tools."
+msgstr ""
+"Denna grupp innehåller alla Red Hats specialanpassade verktyg för "
+"konfiguration av server."
+
+#: ../comps-f32.xml.in.h:238 ../comps-f33.xml.in.h:230
+#: ../comps-f34.xml.in.h:230
+msgid "Hardware Support for Server Systems"
+msgstr "Hårdvarustöd för serversystem"
+
+#: ../comps-f32.xml.in.h:239 ../comps-f33.xml.in.h:231
+#: ../comps-f34.xml.in.h:231
+msgid ""
+"This group is a limited collection of tools for various uncommon hardware "
+"specific utilities."
+msgstr ""
+"Denna grupp är en begränsad uppsättning verktyg för diverse ovanliga "
+"hårdvaruspecifika verktyg."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:241 ../comps-f33.xml.in.h:233
+#: ../comps-f34.xml.in.h:233
+msgid "Fedora Server product core"
+msgstr "Fedora Server produktkärna"
+
+#: ../comps-f32.xml.in.h:242 ../comps-f33.xml.in.h:234
+#: ../comps-f34.xml.in.h:234
+msgid "Packages mandatory for the server product."
+msgstr "Obligatoriska paket för serverprodukten."
+
+#: ../comps-f32.xml.in.h:243 ../comps-f33.xml.in.h:235
+#: ../comps-f34.xml.in.h:235
+msgid "Windows File Server"
+msgstr "Windows-filserver"
+
+#: ../comps-f32.xml.in.h:244 ../comps-f33.xml.in.h:236
+#: ../comps-f34.xml.in.h:236
+msgid ""
+"This package group allows you to share files between Linux and MS "
+"Windows(tm) systems."
+msgstr ""
+"Denna paketgrupp låter dig dela filer mellan Linux och system med MS "
+"Windows(tm)."
+
+#: ../comps-f32.xml.in.h:245 ../comps-f33.xml.in.h:237
+#: ../comps-f34.xml.in.h:237
+msgid "Sound and Video"
+msgstr "Ljud och video"
+
+#: ../comps-f32.xml.in.h:246 ../comps-f33.xml.in.h:238
+#: ../comps-f34.xml.in.h:238
+msgid ""
+"From CD recording to playing audio CDs and multimedia files, this package "
+"group allows you to work with sound and video on the system."
+msgstr ""
+"Denna paketgrupp låter dig arbeta med ljud och video, vare sig det gäller cd-"
+"inspelning eller att lyssna på musikskivor och multimedia-filer."
+
+#: ../comps-f32.xml.in.h:247 ../comps-f33.xml.in.h:239
+#: ../comps-f34.xml.in.h:239
+msgid "PostgreSQL Database"
+msgstr "PostgreSQL-databas"
+
+#: ../comps-f32.xml.in.h:248 ../comps-f33.xml.in.h:240
+#: ../comps-f34.xml.in.h:240
+msgid "This package group includes packages useful for use with PostgreSQL."
+msgstr ""
+"Denna paketgrupp inkluderar paket som är användbara vid användning med "
+"PostgreSQL."
+
+#: ../comps-f32.xml.in.h:249 ../comps-f33.xml.in.h:241
+#: ../comps-f34.xml.in.h:241
+msgid "Standard"
+msgstr "Standard"
+
+#: ../comps-f32.xml.in.h:250 ../comps-f33.xml.in.h:242
+#: ../comps-f34.xml.in.h:242
+msgid "Common set of utilities that extend the minimal installation."
+msgstr ""
+"Normal uppsättning av verktyg som utvidgar den minimala installationen."
+
+#: ../comps-f32.xml.in.h:251 ../comps-f33.xml.in.h:243
+#: ../comps-f34.xml.in.h:243
+msgid "Additional Sugar Activities"
+msgstr "Ytterligare Sugar-aktiviteter"
+
+#: ../comps-f32.xml.in.h:252 ../comps-f33.xml.in.h:244
+#: ../comps-f34.xml.in.h:244
+msgid "Additional activities for use with the Sugar Environment."
+msgstr "Ytterligare aktiviteter att användas med miljön Sugar."
+
+#: ../comps-f32.xml.in.h:253 ../comps-f33.xml.in.h:245
+#: ../comps-f34.xml.in.h:245
+msgid "Sugar Desktop Environment"
+msgstr "Skrivbordsmiljön Sugar"
+
+#: ../comps-f32.xml.in.h:254 ../comps-f33.xml.in.h:246
+#: ../comps-f34.xml.in.h:246
+msgid "A software playground for learning about learning."
+msgstr "En programlekstuga för att lära om lärande."
+
+#: ../comps-f32.xml.in.h:255 ../comps-f33.xml.in.h:247
+#: ../comps-f34.xml.in.h:247
+msgid "System Tools"
+msgstr "Systemverktyg"
+
+#: ../comps-f32.xml.in.h:256 ../comps-f33.xml.in.h:248
+#: ../comps-f34.xml.in.h:248
+msgid ""
+"This group is a collection of various tools for the system, such as the "
+"client for connecting to SMB shares and tools to monitor network traffic."
+msgstr ""
+"Denna grupp är en samling med diverse verktyg för systemet, som exempelvis "
+"klienten för anslutning till SMB-utdelningar och verktyg för övervakning av "
+"nätverkstrafik."
+
+#: ../comps-f32.xml.in.h:257 ../comps-f33.xml.in.h:249
+#: ../comps-f34.xml.in.h:249
+msgid "Text-based Internet"
+msgstr "Textbaserat Internet"
+
+#: ../comps-f32.xml.in.h:258 ../comps-f33.xml.in.h:250
+#: ../comps-f34.xml.in.h:250
+msgid ""
+"This group includes text-based email, web, and chat clients. These "
+"applications do not require the X Window System."
+msgstr ""
+"Denna grupp inkluderar textbaserade klienter för e-post, webb och chatt. "
+"Dessa program kräver inte fönstersystemet X."
+
+#: ../comps-f32.xml.in.h:259 ../comps-f33.xml.in.h:251
+#: ../comps-f34.xml.in.h:251
+msgid "Tomcat"
+msgstr "Tomcat"
+
+#: ../comps-f32.xml.in.h:260 ../comps-f33.xml.in.h:252
+#: ../comps-f34.xml.in.h:252
+msgid "Tomcat web application server."
+msgstr "Webbprogramservern Tomcat."
+
+#: ../comps-f32.xml.in.h:261 ../comps-f33.xml.in.h:253
+#: ../comps-f34.xml.in.h:253
+msgid "Vagrant with libvirt support"
+msgstr "Vagrant med libvirt-stöd"
+
+#: ../comps-f32.xml.in.h:262 ../comps-f33.xml.in.h:254
+#: ../comps-f34.xml.in.h:254
+msgid "These packages provide Vagrant with libvirt provider support"
+msgstr "Dessa paket ger stöd för Vagrant med libvirt-leverantör"
+
+#: ../comps-f32.xml.in.h:263 ../comps-f33.xml.in.h:255
+#: ../comps-f34.xml.in.h:255 ../comps-epel7.xml.in.h:277
+msgid "Virtualization"
+msgstr "Virtualisering"
+
+#: ../comps-f32.xml.in.h:264 ../comps-f33.xml.in.h:256
+#: ../comps-f34.xml.in.h:256
+msgid "These packages provide a graphical virtualization environment."
+msgstr "Dessa paket ger en grafisk virtualiseringsmiljö."
+
+#: ../comps-f32.xml.in.h:265 ../comps-f33.xml.in.h:257
+#: ../comps-f34.xml.in.h:257
+msgid "Headless Virtualization"
+msgstr "Virtualisering utan huvud"
+
+#: ../comps-f32.xml.in.h:266 ../comps-f33.xml.in.h:258
+#: ../comps-f34.xml.in.h:258
+msgid "These packages provide a headless virtualization environment."
+msgstr "Dessa paket ger en virtualiseringsmiljö utan tillkopplad skärm."
+
+#: ../comps-f32.xml.in.h:267 ../comps-f33.xml.in.h:259
+#: ../comps-f34.xml.in.h:259
+msgid "Basic Web Server"
+msgstr "Enkel webbserver"
+
+#: ../comps-f32.xml.in.h:268 ../comps-f33.xml.in.h:260
+#: ../comps-f34.xml.in.h:260
+msgid "These tools allow you to run a Web server on the system."
+msgstr "Dessa verktyg låter dig köra en webbserver på systemet."
+
+#: ../comps-f32.xml.in.h:269 ../comps-f33.xml.in.h:261
+#: ../comps-f34.xml.in.h:261
+msgid "Window Managers"
+msgstr "Fönsterhanterare"
+
+#: ../comps-f32.xml.in.h:270 ../comps-f33.xml.in.h:262
+#: ../comps-f34.xml.in.h:262
+msgid ""
+"Simple window managers that aren't part of a larger desktop environment."
+msgstr ""
+"Enklare fönsterhanterare som inte är en del av en större skrivbordsmiljö."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:272 ../comps-f33.xml.in.h:264
+#: ../comps-f34.xml.in.h:264
+msgid "Fedora Workstation ostree support"
+msgstr "Fedora Workstation ostree support"
+
+#: ../comps-f32.xml.in.h:273 ../comps-f33.xml.in.h:265
+#: ../comps-f34.xml.in.h:265
+msgid "Packages mandatory for the workstation ostree product."
+msgstr "Obligatoriska paket för ostreeprodukten för arbetsstationer."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:275 ../comps-f33.xml.in.h:267
+#: ../comps-f34.xml.in.h:267
+msgid "Fedora Workstation product core"
+msgstr "Fedora Workstation produktkärna"
+
+#: ../comps-f32.xml.in.h:276 ../comps-f33.xml.in.h:268
+#: ../comps-f34.xml.in.h:268
+msgid "Packages mandatory for the workstation product."
+msgstr "Obligatoriska paket för arbetsstationsprodukten."
+
+#: ../comps-f32.xml.in.h:277 ../comps-f33.xml.in.h:269
+#: ../comps-f34.xml.in.h:269
+msgid "X Software Development"
+msgstr "X-programvaruutveckling"
+
+#: ../comps-f32.xml.in.h:278 ../comps-f33.xml.in.h:270
+#: ../comps-f34.xml.in.h:270
+msgid ""
+"These packages allow you to develop applications for the X Window System."
+msgstr "Dessa paket låter dig utveckla program för fönstersystemet X."
+
+#: ../comps-f32.xml.in.h:279 ../comps-f33.xml.in.h:271
+#: ../comps-f34.xml.in.h:271
+msgid "Applications for the Xfce Desktop"
+msgstr "Program för skrivbordet Xfce"
+
+#: ../comps-f32.xml.in.h:280 ../comps-f33.xml.in.h:272
+#: ../comps-f34.xml.in.h:272
+msgid "A set of commonly used applications for the Xfce Desktop"
+msgstr "Ett antal ofta använda program för skrivbordet Xfce"
+
+#: ../comps-f32.xml.in.h:281 ../comps-f33.xml.in.h:273
+#: ../comps-f34.xml.in.h:273 ../comps-epel7.xml.in.h:295
+#: ../comps-epel8.xml.in.h:18
+msgid "Xfce"
+msgstr "Xfce"
+
+#: ../comps-f32.xml.in.h:282 ../comps-f33.xml.in.h:274
+#: ../comps-f34.xml.in.h:274 ../comps-epel7.xml.in.h:296
+#: ../comps-epel8.xml.in.h:19
+msgid "A lightweight desktop environment that works well on low end machines."
+msgstr ""
+"En lättviktig skrivbordsmiljö som fungerar bra på långsammare maskiner."
+
+#: ../comps-f32.xml.in.h:283 ../comps-f33.xml.in.h:275
+#: ../comps-f34.xml.in.h:275
+msgid "Extra plugins for the Xfce panel"
+msgstr "Extra insticksmoduler för Xfce-panelen"
+
+#: ../comps-f32.xml.in.h:284 ../comps-f33.xml.in.h:276
+#: ../comps-f34.xml.in.h:276
+msgid "Extend the functionality of the Xfce panel"
+msgstr "Utökad funktionalitet i Xfce-panelen"
+
+#: ../comps-f32.xml.in.h:285 ../comps-f33.xml.in.h:277
+#: ../comps-f34.xml.in.h:277
+msgid "Multimedia support for Xfce"
+msgstr "Multimediastöd till Xfce"
+
+#: ../comps-f32.xml.in.h:286 ../comps-f33.xml.in.h:278
+#: ../comps-f34.xml.in.h:278
+msgid "Xfce Office"
+msgstr "Xfce Kontor"
+
+#: ../comps-f32.xml.in.h:287 ../comps-f33.xml.in.h:279
+#: ../comps-f34.xml.in.h:279
+msgid "Office suite for Xfce"
+msgstr "Kontorssvit till Xfce"
+
+#: ../comps-f32.xml.in.h:288 ../comps-f33.xml.in.h:280
+#: ../comps-f34.xml.in.h:280
+msgid "Xfce Software Development"
+msgstr "Xfce-programutveckling"
+
+#: ../comps-f32.xml.in.h:289 ../comps-f33.xml.in.h:281
+#: ../comps-f34.xml.in.h:281
+msgid ""
+"Install these packages in order to develop GTK+ and Xfce graphical "
+"applications."
+msgstr ""
+"Installera dessa paket för att utveckla grafiska GTK+- och Xfce-program."
+
+#: ../comps-f32.xml.in.h:290 ../comps-f33.xml.in.h:282
+#: ../comps-f34.xml.in.h:282
+msgid "XMonad"
+msgstr "XMonad"
+
+#: ../comps-f32.xml.in.h:291 ../comps-f33.xml.in.h:283
+#: ../comps-f34.xml.in.h:283
+msgid "A tiling window manager"
+msgstr "En fönsterhanterare för ej överlappande fönster"
+
+#: ../comps-f32.xml.in.h:292 ../comps-f33.xml.in.h:284
+#: ../comps-f34.xml.in.h:284
+msgid "XMonad for MATE"
+msgstr "XMonad för MATE"
+
+#: ../comps-f32.xml.in.h:293 ../comps-f33.xml.in.h:285
+#: ../comps-f34.xml.in.h:285
+msgid "XMonad window manager with MATE"
+msgstr "Fönsterhanteraren XMonad med MATE"
+
+#: ../comps-f32.xml.in.h:294 ../comps-f33.xml.in.h:286
+#: ../comps-f34.xml.in.h:286
+msgid "Fedora Custom Operating System"
+msgstr "Fedora Custom operativsystem"
+
+#: ../comps-f32.xml.in.h:295 ../comps-f33.xml.in.h:287
+#: ../comps-f34.xml.in.h:287
+msgid "Basic building block for a custom Fedora system."
+msgstr "Grundläggande byggblock för ett anpassat Fedorasystem."
+
+#: ../comps-f32.xml.in.h:296 ../comps-f33.xml.in.h:288
+#: ../comps-f34.xml.in.h:288
+msgid "Minimal Install"
+msgstr "Minimal installation"
+
+#: ../comps-f32.xml.in.h:297 ../comps-f33.xml.in.h:289
+#: ../comps-f34.xml.in.h:289
+msgid "Basic functionality."
+msgstr "Grundläggande funktionalitet."
+
+#: ../comps-f32.xml.in.h:298 ../comps-f33.xml.in.h:290
+#: ../comps-f34.xml.in.h:290 ../comps-epel8.xml.in.h:20
+msgid "KDE Plasma Workspaces"
+msgstr "KDE Plasma arbetsytor"
+
+#: ../comps-f32.xml.in.h:299 ../comps-f33.xml.in.h:291
+#: ../comps-f34.xml.in.h:291
+msgid "Xfce Desktop"
+msgstr "Xfce-skrivbordet"
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:301 ../comps-f33.xml.in.h:293
+#: ../comps-f34.xml.in.h:293
+msgid "Fedora Server Edition"
+msgstr "Fedora Server-utgåvan"
+
+#. Should eventually say “with a web UI accessible right after installation”
+#. or something else to differentiate from
+#. infrastructure-server-environment.
+#: ../comps-f32.xml.in.h:305 ../comps-f33.xml.in.h:297
+#: ../comps-f34.xml.in.h:297
+msgid "An integrated, easier to manage server."
+msgstr "En integrerad, mer lätthanterad server."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:307 ../comps-f33.xml.in.h:299
+#: ../comps-f34.xml.in.h:299
+msgid "Fedora Workstation"
+msgstr "Fedora Workstation"
+
+#: ../comps-f32.xml.in.h:308 ../comps-f33.xml.in.h:300
+#: ../comps-f34.xml.in.h:300
+msgid ""
+"Fedora Workstation is a user friendly desktop system for laptops and PCs."
+msgstr ""
+"Fedora Workstation är ett användarvänligt skrivbordsssytem för bärbara och "
+"stationära datorer."
+
+#: ../comps-f32.xml.in.h:309 ../comps-f33.xml.in.h:301
+#: ../comps-f34.xml.in.h:301
+msgid "LXDE Desktop"
+msgstr "LXDE-skrivbordet"
+
+#: ../comps-f32.xml.in.h:310 ../comps-f33.xml.in.h:302
+#: ../comps-f34.xml.in.h:302 ../comps-epel7.xml.in.h:149
+msgid "LXQt Desktop"
+msgstr "LXQt-skrivbordet"
+
+#: ../comps-f32.xml.in.h:311 ../comps-f33.xml.in.h:303
+#: ../comps-f34.xml.in.h:303 ../comps-epel7.xml.in.h:299
+msgid "Cinnamon Desktop"
+msgstr "Cinnamon-skrivbordet"
+
+#: ../comps-f32.xml.in.h:312 ../comps-f33.xml.in.h:304
+#: ../comps-f34.xml.in.h:304 ../comps-epel7.xml.in.h:300
+msgid "MATE Desktop"
+msgstr "MATE-skrivbordet"
+
+#: ../comps-f32.xml.in.h:313 ../comps-f33.xml.in.h:305
+#: ../comps-f34.xml.in.h:305
+msgid "Deepin Desktop"
+msgstr "Deepin-skrivbord"
+
+#: ../comps-f32.xml.in.h:314 ../comps-f33.xml.in.h:306
+#: ../comps-f34.xml.in.h:306
+msgid ""
+"Deepin desktop is the desktop environment released with deepin. It aims at "
+"being elegant and easy to use."
+msgstr ""
+"Deepin-skrivbord är skrivbordsmiljön som släppts tillsammans med deepin. Den "
+"ämnar vara elegant och enkel att använda."
+
+#: ../comps-f32.xml.in.h:315 ../comps-f33.xml.in.h:307
+#: ../comps-f34.xml.in.h:307
+msgid "Fedora Cloud Server"
+msgstr "Fedora Cloud Server"
+
+#: ../comps-f32.xml.in.h:316 ../comps-f33.xml.in.h:308
+#: ../comps-f34.xml.in.h:308
+msgid "A server install with components needed to run in a cloud environment."
+msgstr ""
+"En serverinstallation med komponenter som behövs för att köra i en molnmiljö."
+
+#: ../comps-f32.xml.in.h:317 ../comps-f33.xml.in.h:309
+#: ../comps-f34.xml.in.h:309
+msgid "Development and Creative Workstation"
+msgstr "Utvecklings- och kreativ arbetsstation"
+
+#: ../comps-f32.xml.in.h:318 ../comps-f33.xml.in.h:310
+#: ../comps-f34.xml.in.h:310
+msgid "Workstation for software, hardware, graphics, or content development."
+msgstr ""
+"Arbetsstation för utveckling av programvara, hårdvara, grafik eller media."
+
+#: ../comps-f32.xml.in.h:319 ../comps-f33.xml.in.h:311
+#: ../comps-f34.xml.in.h:311 ../comps-epel7.xml.in.h:286
+msgid "Web Server"
+msgstr "Webbserver"
+
+#: ../comps-f32.xml.in.h:320 ../comps-f33.xml.in.h:312
+#: ../comps-f34.xml.in.h:312
+msgid "Server for serving static and dynamic internet content."
+msgstr "Server för att serva statiskt eller dynamiskt internetinnehåll."
+
+#: ../comps-f32.xml.in.h:321 ../comps-f33.xml.in.h:313
+#: ../comps-f34.xml.in.h:313
+msgid "Infrastructure Server"
+msgstr "Infrastrukturserver"
+
+#: ../comps-f32.xml.in.h:322 ../comps-f33.xml.in.h:314
+#: ../comps-f34.xml.in.h:314
+msgid "Server for operating network infrastructure services."
+msgstr "Server för att driva tjänster för nätverksinfrastruktur."
+
+#: ../comps-f32.xml.in.h:323 ../comps-f33.xml.in.h:315
+#: ../comps-f34.xml.in.h:315
+msgid "X Window System with a choice of window manager."
+msgstr "Fönstersystemet X med ett urval av fönsterhanterare."
+
+#: ../comps-f32.xml.in.h:324 ../comps-f33.xml.in.h:316
+#: ../comps-f34.xml.in.h:316 ../comps-epel7.xml.in.h:128
+#: ../comps-epel8.xml.in.h:21
+msgid "KDE Desktop"
+msgstr "KDE-skrivbord"
+
+#: ../comps-f32.xml.in.h:325 ../comps-f33.xml.in.h:317
+#: ../comps-f34.xml.in.h:317 ../comps-epel8.xml.in.h:22
+msgid ""
+"The KDE SC includes the KDE Plasma Desktop, a highly-configurable graphical "
+"user interface which includes a panel, desktop, system icons and desktop "
+"widgets, and many powerful KDE applications."
+msgstr ""
+"KDE SC innehåller skrivbordet KDE Plasma, ett mycket konfigurerbart grafiskt "
+"användargränssnitt som innehåller en panel, ett skrivbord, systemikoner och "
+"skrivbordsprogram, och många kraftfulla KDE-program."
+
+#: ../comps-f32.xml.in.h:326 ../comps-f33.xml.in.h:318
+#: ../comps-f34.xml.in.h:318 ../comps-epel7.xml.in.h:303
+msgid "Applications"
+msgstr "Program"
+
+#: ../comps-f32.xml.in.h:327 ../comps-f33.xml.in.h:319
+#: ../comps-f34.xml.in.h:319
+msgid "Applications to perform a variety of tasks"
+msgstr "Applikationer för utföra en mängd arbetsuppgifter"
+
+#: ../comps-f32.xml.in.h:328 ../comps-f33.xml.in.h:320
+#: ../comps-f34.xml.in.h:320
+msgid "GNOME Desktop"
+msgstr "GNOME-skrivbordet"
+
+#: ../comps-f32.xml.in.h:329 ../comps-f33.xml.in.h:321
+#: ../comps-f34.xml.in.h:321 ../comps-epel7.xml.in.h:305
+msgid "Development"
+msgstr "Utveckling"
+
+#: ../comps-f32.xml.in.h:330 ../comps-f33.xml.in.h:322
+#: ../comps-f34.xml.in.h:322
+msgid ""
+"Packages which provide functionality for developing and building "
+"applications."
+msgstr ""
+"Paket som tillhandahåller funktionalitet för att utveckla och skapa program."
+
+#: ../comps-f32.xml.in.h:331 ../comps-f33.xml.in.h:323
+#: ../comps-f34.xml.in.h:323
+msgid "Servers"
+msgstr "Servrar"
+
+#: ../comps-f32.xml.in.h:332 ../comps-f33.xml.in.h:324
+#: ../comps-f34.xml.in.h:324
+msgid "Software used for running network servers"
+msgstr "Programvara som används för att köra nätverksservrar"
+
+#: ../comps-f32.xml.in.h:333 ../comps-f33.xml.in.h:325
+#: ../comps-f34.xml.in.h:325
+msgid "Base System"
+msgstr "Bassystem"
+
+#: ../comps-f32.xml.in.h:334 ../comps-f33.xml.in.h:326
+#: ../comps-f34.xml.in.h:326
+msgid "Various core pieces of the system."
+msgstr "Olika nyckeldelar av systemet."
+
+#: ../comps-f32.xml.in.h:335
+msgid "Content"
+msgstr "Innehåll"
+
+#: ../comps-f32.xml.in.h:336
+msgid "Text and other Free content."
+msgstr "Text och annat fritt innehåll."
+
+#: ../comps-f32.xml.in.h:337 ../comps-f33.xml.in.h:327
+#: ../comps-f34.xml.in.h:327
+msgid "Neuroscience"
+msgstr "Neurovetenskap"
+
+#: ../comps-f32.xml.in.h:338 ../comps-f33.xml.in.h:328
+#: ../comps-f34.xml.in.h:328
+msgid "Tools for Neuroscience."
+msgstr "Verktyg för neurovetenskap."
+
+#: ../comps-f33.xml.in.h:206 ../comps-f34.xml.in.h:206
+msgid "A phone/tablet UX environment"
+msgstr "En användarupplevelsmiljö för mobil/platta"
+
+#: ../comps-f33.xml.in.h:207 ../comps-f34.xml.in.h:207
+msgid "A phone/tablet desktop UX based on GNOME3 technologies."
+msgstr ""
+"Ett användarupplevelsmiljö för mobil/platt-skrivbord baserad på "
+"GNOME3-teknologier."
+
+#: ../comps-epel7.xml.in.h:1
+msgid "Additional Development"
+msgstr "Ytterligare utveckling"
+
+#: ../comps-epel7.xml.in.h:2
+msgid ""
+"Additional development headers and libraries for developing applications"
+msgstr "Ytterligare utvecklingshuvuden och -bibliotek för att utveckla program"
+
+#: ../comps-epel7.xml.in.h:3
+msgid "Afrikaans Support"
+msgstr "Stöd för afrikaans"
+
+#: ../comps-epel7.xml.in.h:4
+msgid "Albanian Support"
+msgstr "Stöd för albanska"
+
+#: ../comps-epel7.xml.in.h:5
+msgid "Amazigh Support"
+msgstr "Stöd för amazigh"
+
+#: ../comps-epel7.xml.in.h:6
+msgid "Arabic Support"
+msgstr "Stöd för arabiska"
+
+#: ../comps-epel7.xml.in.h:7
+msgid "Armenian Support"
+msgstr "Stöd för armeniska"
+
+#: ../comps-epel7.xml.in.h:8
+msgid "Assamese Support"
+msgstr "Stöd för assamesiska"
+
+#: ../comps-epel7.xml.in.h:9
+msgid "Azerbaijani Support"
+msgstr "Stöd för azerbajdzjanska"
+
+#: ../comps-epel7.xml.in.h:10
+msgid "Backup Client"
+msgstr "Klient för säkerhetskopiering"
+
+#: ../comps-epel7.xml.in.h:11
+msgid "Client tools for connecting to a backup server and doing backups."
+msgstr ""
+"Klientverktyg för att ansluta till en server för säkerhetskopiering och göra "
+"säkerhetskopior."
+
+#: ../comps-epel7.xml.in.h:12
+msgid "Backup Server"
+msgstr "Server för säkerhetskopiering"
+
+#: ../comps-epel7.xml.in.h:13
+msgid "Software to centralize your infrastructure's backups."
+msgstr "Program för att centralisera säkerhetskopiorna av din infrastruktur."
+
+#: ../comps-epel7.xml.in.h:14
+msgid "Base"
+msgstr "Bas"
+
+#: ../comps-epel7.xml.in.h:15
+msgid "The basic installation of Enterprise Linux."
+msgstr "Grundinstallationen av Enterprise Linux."
+
+#: ../comps-epel7.xml.in.h:16
+msgid "Desktop"
+msgstr "Skrivbord"
+
+#: ../comps-epel7.xml.in.h:17
+msgid "A minimal desktop that can also be used as a thin client."
+msgstr "Ett minimalt skrivbord som också kan användas som en tunn klient."
+
+#: ../comps-epel7.xml.in.h:18
+msgid "Basque Support"
+msgstr "Stöd för baskiska"
+
+#: ../comps-epel7.xml.in.h:19
+msgid "Belarusian Support"
+msgstr "Stöd för vitryska"
+
+#: ../comps-epel7.xml.in.h:20
+msgid "Bengali Support"
+msgstr "Stöd för bengali"
+
+#: ../comps-epel7.xml.in.h:21
+msgid "Bhutanese Support"
+msgstr "Stöd för bhutanesiska"
+
+#: ../comps-epel7.xml.in.h:22
+msgid "Brazilian Portuguese Support"
+msgstr "Stöd för brasiliansk portugisiska"
+
+#: ../comps-epel7.xml.in.h:23
+msgid "Breton Support"
+msgstr "Stöd för bretonska"
+
+#: ../comps-epel7.xml.in.h:24
+msgid "English (UK) Support"
+msgstr "Stöd för britisk engelska"
+
+#: ../comps-epel7.xml.in.h:26
+msgid "Bulgarian Support"
+msgstr "Stöd för bulgariska"
+
+#: ../comps-epel7.xml.in.h:27
+msgid "Myanmar (Burmese) Support"
+msgstr "Stöd för burmesiska"
+
+#: ../comps-epel7.xml.in.h:28
+msgid "Catalan Support"
+msgstr "Stöd för katalanska"
+
+#: ../comps-epel7.xml.in.h:29
+msgid "Chhattisgarhi Support"
+msgstr "Stöd för chhattisgarhi"
+
+#: ../comps-epel7.xml.in.h:30
+msgid "Chichewa Support"
+msgstr "Stöd för chichewa"
+
+#: ../comps-epel7.xml.in.h:31
+msgid "Chinese Support"
+msgstr "Stöd för kinesiska"
+
+#: ../comps-epel7.xml.in.h:32
+msgid "CIFS file server"
+msgstr "CIFS-filserver"
+
+#: ../comps-epel7.xml.in.h:33
+msgid "Share files between Linux and Microsoft Windows systems."
+msgstr "Dela filer mellan system med Linux och med Microsoft Windows."
+
+#: ../comps-epel7.xml.in.h:36
+msgid "Compatibility libraries"
+msgstr "Kompatibilitetsbibliotek"
+
+#: ../comps-epel7.xml.in.h:37
+msgid ""
+"Compatibility libraries for applications built on previous versions of "
+"Enterprise Linux."
+msgstr ""
+"Kompatibilitetsbibliotek för program byggda på tidigare versioner av "
+"Enterprise Linux."
+
+#: ../comps-epel7.xml.in.h:38
+msgid "Console internet tools"
+msgstr "Konsolverktyg för internet"
+
+#: ../comps-epel7.xml.in.h:39
+msgid "Console internet access tools, often used by administrators."
+msgstr "Konsolverktyg för internetåtkomst, ofta använda av administratörer."
+
+#: ../comps-epel7.xml.in.h:40
+msgid "Coptic Support"
+msgstr "Stöd för koptiska"
+
+#: ../comps-epel7.xml.in.h:42
+msgid "Smallest possible installation."
+msgstr "Minsta möjliga installation."
+
+#: ../comps-epel7.xml.in.h:43
+msgid "Croatian Support"
+msgstr "Stöd för kroatiska"
+
+#: ../comps-epel7.xml.in.h:44
+msgid "Czech Support"
+msgstr "Stöd för tjeckiska"
+
+#: ../comps-epel7.xml.in.h:45
+msgid "Danish Support"
+msgstr "Stöd för danska"
+
+#: ../comps-epel7.xml.in.h:46
+msgid "Debugging Tools"
+msgstr "Felsökningsverktyg"
+
+#: ../comps-epel7.xml.in.h:47
+msgid ""
+"Tools for debugging misbehaving applications and diagnosing performance "
+"problems."
+msgstr ""
+"Verktyg för att felsöka program som gör fel och för att diagnostisera "
+"prestandaproblem."
+
+#: ../comps-epel7.xml.in.h:48
+msgid "Desktop Debugging and Performance Tools"
+msgstr "Felsöknings- och prestandaverktyg för skrivbordet"
+
+#: ../comps-epel7.xml.in.h:49
+msgid "GUI tools for debugging applications and performance."
+msgstr "Grafiska verktyg för felsökning av program och prestanda."
+
+#: ../comps-epel7.xml.in.h:50
+msgid "Desktop Platform"
+msgstr "Skrivbordsplattform"
+
+#: ../comps-epel7.xml.in.h:51
+msgid "Supported libraries for the Enterprise Linux Desktop Platform."
+msgstr "Stödbibliotek för Enterprise Linux skrivbordsplattform."
+
+#: ../comps-epel7.xml.in.h:52
+msgid "Desktop Platform Development"
+msgstr "Utveckling av skrivbordsplattform"
+
+#: ../comps-epel7.xml.in.h:53
+msgid ""
+"Development headers and libraries for developing applications to run on the "
+"Enterprise Linux Desktop Platform."
+msgstr ""
+"Utvecklingshuvuden och -bibliotek för utveckling av program som skall köra "
+"på Enterprise Linux skrivbordsplattform."
+
+#: ../comps-epel7.xml.in.h:54
+msgid "Development tools"
+msgstr "Utvecklingsverktyg"
+
+#: ../comps-epel7.xml.in.h:55
+msgid "A basic development environment."
+msgstr "En grundläggande utvecklingsmiljö."
+
+#: ../comps-epel7.xml.in.h:57
+msgid "Tools for connecting via PPP or ISDN."
+msgstr "Verktyg för att ansluta via PPP eller ISDN."
+
+#: ../comps-epel7.xml.in.h:58
+msgid "Directory Client"
+msgstr "Katalogklient"
+
+#: ../comps-epel7.xml.in.h:59
+msgid "Clients for integration into a network managed by a directory service."
+msgstr "Klienter för integration i ett nätverk hanterat av en katalogtjänst."
+
+#: ../comps-epel7.xml.in.h:62
+msgid "Dutch Support"
+msgstr "Stöd för nederländska"
+
+#: ../comps-epel7.xml.in.h:63
+msgid "Eclipse"
+msgstr "Eclipse"
+
+#: ../comps-epel7.xml.in.h:64
+msgid "Eclipse-based Integrated Development Environment."
+msgstr "Eclipse-baserad integrerad utvecklingsmiljö."
+
+#: ../comps-epel7.xml.in.h:66
+msgid "Educational software for learning."
+msgstr "Undervisningsprogram för lärande."
+
+#: ../comps-epel7.xml.in.h:68
+msgid "Design and Simulation tools for hardware engineers."
+msgstr "Konstruktions- och simuleringsverktyg för maskinvaruingenjörer."
+
+#: ../comps-epel7.xml.in.h:69
+msgid "Emacs"
+msgstr "Emacs"
+
+#: ../comps-epel7.xml.in.h:70
+msgid "The GNU Emacs extensible, customizable, text editor."
+msgstr "Den utökningsbara, anpassningsbara textredigeraren GNU Emacs."
+
+#: ../comps-epel7.xml.in.h:71
+msgid "Esperanto Support"
+msgstr "Stöd för esperanto"
+
+#: ../comps-epel7.xml.in.h:72
+msgid "Estonian Support"
+msgstr "Stöd för estniska"
+
+#: ../comps-epel7.xml.in.h:73
+msgid "Ethiopic Support"
+msgstr "Stöd för etiopiska"
+
+#: ../comps-epel7.xml.in.h:74
+msgid "Faroese Support"
+msgstr "Stöd för färöiska"
+
+#: ../comps-epel7.xml.in.h:76 ../comps-epel8.xml.in.h:2
+msgid "Tools and utilities needed by a Fedora Packager."
+msgstr "Verktyg och tillbehör som en Fedorapaketerare behöver."
+
+#: ../comps-epel7.xml.in.h:77
+msgid "Fijian Support"
+msgstr "Stöd för fijianska"
+
+#: ../comps-epel7.xml.in.h:78
+msgid "Filipino Support"
+msgstr "Stöd för filipino"
+
+#: ../comps-epel7.xml.in.h:79
+msgid "Finnish Support"
+msgstr "Stöd för finska"
+
+#: ../comps-epel7.xml.in.h:81
+msgid "Fonts for rendering text in a variety of languages and scripts."
+msgstr "Typsnitt för rendering av text i olika språk och alfabeten."
+
+#: ../comps-epel7.xml.in.h:82
+msgid "French Support"
+msgstr "Stöd för franska"
+
+#: ../comps-epel7.xml.in.h:83
+msgid "Frisian Support"
+msgstr "Stöd för frisiska"
+
+#: ../comps-epel7.xml.in.h:84
+msgid "Friulian Support"
+msgstr "Stöd för friuliska"
+
+#: ../comps-epel7.xml.in.h:85
+msgid "FTP server"
+msgstr "FTP-server"
+
+#: ../comps-epel7.xml.in.h:86
+msgid "Allows the system to act as an FTP server."
+msgstr "Låter systemet att agera som en FTP-server."
+
+#: ../comps-epel7.xml.in.h:87
+msgid "Gaelic Support"
+msgstr "Stöd för höglandsskotska"
+
+#: ../comps-epel7.xml.in.h:88
+msgid "Galician Support"
+msgstr "Stöd för galiciska"
+
+#: ../comps-epel7.xml.in.h:89
+msgid "General Purpose Desktop"
+msgstr "Skrivbord för allmän användning"
+
+#: ../comps-epel7.xml.in.h:90
+msgid "A general purpose desktop."
+msgstr "Ett skrivbord för allmänna ändamål."
+
+#: ../comps-epel7.xml.in.h:91
+msgid "Georgian Support"
+msgstr "Stöd för georgiska"
+
+#: ../comps-epel7.xml.in.h:92
+msgid "German Support"
+msgstr "Stöd för tyska"
+
+#: ../comps-epel7.xml.in.h:93
+msgid "Graphical Administration Tools"
+msgstr "Grafiska administrationsverktyg"
+
+#: ../comps-epel7.xml.in.h:94
+msgid ""
+"Graphical system administration tools for managing many aspects of a system."
+msgstr ""
+"Verktyg för grafisk systemadministration och hantering av många aspekter av "
+"ett system."
+
+#: ../comps-epel7.xml.in.h:95
+msgid "Graphics Creation Tools"
+msgstr "Verktyg för grafikskapande"
+
+#: ../comps-epel7.xml.in.h:96
+msgid "Software for creation and manipulation of still images."
+msgstr "Program för att skapa och hantera stillbilder."
+
+#: ../comps-epel7.xml.in.h:97
+msgid "Greek Support"
+msgstr "Stöd för grekiska"
+
+#: ../comps-epel7.xml.in.h:98
+msgid "Gujarati Support"
+msgstr "Stöd för gujarati"
+
+#: ../comps-epel7.xml.in.h:99
+msgid "Hardware monitoring utilities"
+msgstr "Verktyg för övervakning av maskiner"
+
+#: ../comps-epel7.xml.in.h:100
+msgid "A set of tools to monitor server hardware"
+msgstr "En uppsättning verktyg för att övervaka servermaskinvara"
+
+#: ../comps-epel7.xml.in.h:103
+msgid "Hebrew Support"
+msgstr "Stöd för hebreiska"
+
+#: ../comps-epel7.xml.in.h:104
+msgid "Hiligaynon Support"
+msgstr "Stöd för hiligaynon"
+
+#: ../comps-epel7.xml.in.h:105
+msgid "Hindi Support"
+msgstr "Stöd för hindi"
+
+#: ../comps-epel7.xml.in.h:106
+msgid "Hungarian Support"
+msgstr "Stöd för ungerska"
+
+#: ../comps-epel7.xml.in.h:107
+msgid "Icelandic Support"
+msgstr "Stöd för isländska"
+
+#: ../comps-epel7.xml.in.h:108
+msgid "Indonesian Support"
+msgstr "Stöd för indonesiska"
+
+#: ../comps-epel7.xml.in.h:109
+msgid "Infiniband Support"
+msgstr "Stöd för Infiniband"
+
+#: ../comps-epel7.xml.in.h:110
+msgid ""
+"Software designed for supporting clustering and grid connectivity using RDMA-"
+"based InfiniBand and iWARP fabrics."
+msgstr ""
+"Program gjorda för att stödja klustring och nätkonnektivitet med RDMA-"
+"baserade InfiniBand- och iWARP-konstruktioner."
+
+#: ../comps-epel7.xml.in.h:112
+msgid "Software for the input of international text."
+msgstr "Program för inmatning av internationell text."
+
+#: ../comps-epel7.xml.in.h:113
+msgid "Interlingua Support"
+msgstr "Stöd för interlingua"
+
+#: ../comps-epel7.xml.in.h:114
+msgid "Internet Applications"
+msgstr "Internetprogram"
+
+#: ../comps-epel7.xml.in.h:115
+msgid "Email, chat, and video conferencing software."
+msgstr "Epost-, chatt- och videokonferensprogram."
+
+#: ../comps-epel7.xml.in.h:116
+msgid "Internet Browser"
+msgstr "Internetläsare"
+
+#: ../comps-epel7.xml.in.h:117
+msgid "Firefox web browser"
+msgstr "Webbläsaren Firefox"
+
+#: ../comps-epel7.xml.in.h:118
+msgid "Inuktitut Support"
+msgstr "Stöd för inuktitut"
+
+#: ../comps-epel7.xml.in.h:119
+msgid "Irish Support"
+msgstr "Stöd för iriska"
+
+#: ../comps-epel7.xml.in.h:120
+msgid "Italian Support"
+msgstr "Stöd för italienska"
+
+#: ../comps-epel7.xml.in.h:121
+msgid "Japanese Support"
+msgstr "Stöd för japanska"
+
+#: ../comps-epel7.xml.in.h:122
+msgid "Java Platform"
+msgstr "Javaplattform"
+
+#: ../comps-epel7.xml.in.h:123
+msgid "Java support for the Enterprise Linux Server and Desktop Platforms."
+msgstr ""
+"Stöd för Java för server- och skrivbordsplattformarna av Enterprise Linux."
+
+#: ../comps-epel7.xml.in.h:124
+msgid "Kannada Support"
+msgstr "Stöd för kannada"
+
+#: ../comps-epel7.xml.in.h:125
+msgid "Kashmiri Support"
+msgstr "Stöd för kashmiri"
+
+#: ../comps-epel7.xml.in.h:126
+msgid "Kashubian Support"
+msgstr "Stöd för kasjubiska"
+
+#: ../comps-epel7.xml.in.h:127
+msgid "Kazakh Support"
+msgstr "Stöd för kazakiska"
+
+#: ../comps-epel7.xml.in.h:129
+msgid "A KDE desktop."
+msgstr "Ett KDE-skrivbord."
+
+#: ../comps-epel7.xml.in.h:130
+msgid "Khmer Support"
+msgstr "Stöd för kambodjanska"
+
+#: ../comps-epel7.xml.in.h:131
+msgid "Kinyarwanda Support"
+msgstr "Stöd för kinyarwanda"
+
+#: ../comps-epel7.xml.in.h:132
+msgid "Konkani Support"
+msgstr "Stöd för konkani"
+
+#: ../comps-epel7.xml.in.h:133
+msgid "Korean Support"
+msgstr "Stöd för koreanska"
+
+#: ../comps-epel7.xml.in.h:134
+msgid "Kurdish Support"
+msgstr "Stöd för kurdiska"
+
+#: ../comps-epel7.xml.in.h:135
+msgid "Lao Support"
+msgstr "Stöd för laotiska"
+
+#: ../comps-epel7.xml.in.h:136
+msgid "Large Systems Performance"
+msgstr "Prestanda hos stora system"
+
+#: ../comps-epel7.xml.in.h:137
+msgid "Performance support tools for large systems"
+msgstr "Prestandastödsverktyg för stora system"
+
+#: ../comps-epel7.xml.in.h:138
+msgid "Latin Support"
+msgstr "Stöd för latin"
+
+#: ../comps-epel7.xml.in.h:139
+msgid "Latvian Support"
+msgstr "Stöd för lettiska"
+
+#: ../comps-epel7.xml.in.h:140
+msgid "Legacy UNIX compatibility"
+msgstr "Kompatibilitet med äldre UNIX"
+
+#: ../comps-epel7.xml.in.h:141
+msgid ""
+"Compatibility programs for migration from or working with legacy UNIX "
+"environments."
+msgstr ""
+"Kompatibilitetsprogram för övergång från att arbeta med äldre UNIX-miljöer."
+
+#: ../comps-epel7.xml.in.h:142
+msgid "Legacy X Window System compatibility"
+msgstr "Kompatibilitet med äldre versioner av fönstersystemet X"
+
+#: ../comps-epel7.xml.in.h:143
+msgid ""
+"Compatibility programs for migration from or working with legacy X Window "
+"System environments."
+msgstr ""
+"Kompatibilitetsprogram för övergång från eller arbete med äldre miljöer av "
+"fönstersystemet X."
+
+#: ../comps-epel7.xml.in.h:144
+msgid "Basic legacy X Window System compatibility"
+msgstr "Grundläggande kompatibilitet med äldre miljöer av fönstersystemet X"
+
+#: ../comps-epel7.xml.in.h:145
+msgid ""
+"Minimal set of compatibility programs for migration from or working with "
+"legacy X Window System environments."
+msgstr ""
+"Minimal uppsättning med kompatibilitetsprogram för migrering från eller "
+"arbete med äldre miljöer av fönstersystemet X."
+
+#: ../comps-epel7.xml.in.h:146
+msgid "Lithuanian Support"
+msgstr "Stöd för litauiska"
+
+#: ../comps-epel7.xml.in.h:147
+msgid "Low Saxon Support"
+msgstr "Stöd för lågtyska"
+
+#: ../comps-epel7.xml.in.h:148
+msgid "Luxembourgish Support"
+msgstr "Stöd för luxemburgiska"
+
+#: ../comps-epel7.xml.in.h:151
+msgid "Macedonian Support"
+msgstr "Stöd för makedonska"
+
+#: ../comps-epel7.xml.in.h:152
+msgid "E-mail server"
+msgstr "Epostserver"
+
+#: ../comps-epel7.xml.in.h:153
+msgid "Allows the system to act as a SMTP and/or IMAP e-mail server."
+msgstr "Låter systemet att agera som en SMTP- och/eller IMAP-e-postserver."
+
+#: ../comps-epel7.xml.in.h:154
+msgid "Mainframe Access"
+msgstr "Åtkomst av stordatorer"
+
+#: ../comps-epel7.xml.in.h:155
+msgid "Tools for accessing mainframe computing resources."
+msgstr "Verktyg för att nå datorresurser i stordatorer."
+
+#: ../comps-epel7.xml.in.h:156
+msgid "Maithili Support"
+msgstr "Stöd för maithili"
+
+#: ../comps-epel7.xml.in.h:157
+msgid "Malagasy Support"
+msgstr "Stöd för malagassiska"
+
+#: ../comps-epel7.xml.in.h:158
+msgid "Malay Support"
+msgstr "Stöd för malajiska"
+
+#: ../comps-epel7.xml.in.h:159
+msgid "Malayalam Support"
+msgstr "Stöd för malajalam"
+
+#: ../comps-epel7.xml.in.h:160
+msgid "Maltese Support"
+msgstr "Stöd för maltesiska"
+
+#: ../comps-epel7.xml.in.h:161
+msgid "Manx Support"
+msgstr "Stöd för manx"
+
+#: ../comps-epel7.xml.in.h:162
+msgid "Maori Support"
+msgstr "Stöd för maori"
+
+#: ../comps-epel7.xml.in.h:163
+msgid "Marathi Support"
+msgstr "Stöd för marathi"
+
+#: ../comps-epel7.xml.in.h:168
+msgid "Mongolian Support"
+msgstr "Stöd för mongoliska"
+
+#: ../comps-epel7.xml.in.h:169
+msgid "MySQL Database server"
+msgstr "MySQL-databasserver"
+
+#: ../comps-epel7.xml.in.h:170
+msgid "The MySQL SQL database server, and associated packages."
+msgstr "SQL-databasservern MySQL, och tillhörande paket."
+
+#: ../comps-epel7.xml.in.h:171
+msgid "MySQL Database client"
+msgstr "MySQL-databasklient"
+
+#: ../comps-epel7.xml.in.h:172
+msgid "The MySQL SQL database client, and associated packages."
+msgstr "SQL-databasklienten MySQL, och tillhörande paket."
+
+#: ../comps-epel7.xml.in.h:173
+msgid "Nepali Support"
+msgstr "Stöd för nepali"
+
+#: ../comps-epel7.xml.in.h:174
+msgid "Network file system client"
+msgstr "Nätverksfilsystemsklient"
+
+#: ../comps-epel7.xml.in.h:175
+msgid "Enables the system to attach to network storage."
+msgstr "Låter systemet ansluta till nätverkslagring."
+
+#: ../comps-epel7.xml.in.h:176
+msgid "Network Infrastructure Server"
+msgstr "Nätverksinfrastrukturserver"
+
+#: ../comps-epel7.xml.in.h:177
+msgid "Servers for core network protocols and services, such as DHCP or DNS."
+msgstr ""
+"Servrar för grundläggande nätverksprotokoll och -tjänster, såsom DHCP eller "
+"DNS."
+
+#: ../comps-epel7.xml.in.h:178
+msgid "Networking Tools"
+msgstr "Nätverksverktyg"
+
+#: ../comps-epel7.xml.in.h:179
+msgid "Tools for configuring and analyzing computer networks."
+msgstr "Verktyg för att konfigurera och analysera datornätverk."
+
+#: ../comps-epel7.xml.in.h:180
+msgid "NFS file server"
+msgstr "NFS-filserver"
+
+#: ../comps-epel7.xml.in.h:181
+msgid "NFS file server."
+msgstr "NFS-filserver."
+
+#: ../comps-epel7.xml.in.h:182
+msgid "Northern Sotho Support"
+msgstr "Stöd för norra sotho"
+
+#: ../comps-epel7.xml.in.h:183
+msgid "Norwegian Support"
+msgstr "Stöd för norska"
+
+#: ../comps-epel7.xml.in.h:184
+msgid "Occitan Support"
+msgstr "Stöd för occitanska"
+
+#: ../comps-epel7.xml.in.h:185
+msgid "Office Suite and Productivity"
+msgstr "Kontorssvit och produktivitet"
+
+#: ../comps-epel7.xml.in.h:186
+msgid "A full-purpose office suite, and other productivity tools."
+msgstr "En kontorssvit för alla ändamål, och andra produktivitetsverktyg."
+
+#: ../comps-epel7.xml.in.h:187
+msgid "Oriya Support"
+msgstr "Stöd för oriya"
+
+#: ../comps-epel7.xml.in.h:188
+msgid "Performance Tools"
+msgstr "Prestandaverktyg"
+
+#: ../comps-epel7.xml.in.h:189
+msgid "Tools for diagnosing system and application-level performance problems."
+msgstr ""
+"Verktyg för att diagnostisera prestandaproblem på system- och programnivå."
+
+#: ../comps-epel7.xml.in.h:190
+msgid "Perl Support"
+msgstr "Stöd för Perl"
+
+#: ../comps-epel7.xml.in.h:191
+msgid "Perl interfaces to common libraries and functionality."
+msgstr "Perlgränssnitt till vanliga bibliotek och vanlig funktionalitet."
+
+#: ../comps-epel7.xml.in.h:192
+msgid "Persian Support"
+msgstr "Stöd för persiska"
+
+#: ../comps-epel7.xml.in.h:193
+msgid "PHP Support"
+msgstr "Stöd för PHP"
+
+#: ../comps-epel7.xml.in.h:194
+msgid "PHP web application framework."
+msgstr "Ramverket PHP för webbprogram."
+
+#: ../comps-epel7.xml.in.h:195
+msgid "Polish Support"
+msgstr "Stöd för polska"
+
+#: ../comps-epel7.xml.in.h:196
+msgid "Portuguese Support"
+msgstr "Stöd för portugisiska"
+
+#: ../comps-epel7.xml.in.h:197
+msgid "PostgreSQL Database server"
+msgstr "PostgreSQL-databasserver"
+
+#: ../comps-epel7.xml.in.h:198
+msgid "The PostgreSQL SQL database server, and associated packages."
+msgstr "SQL-databasservern PostgreSQL, och tillhörande program."
+
+#: ../comps-epel7.xml.in.h:199
+msgid "PostgreSQL Database client"
+msgstr "PostgreSQL-databasklient"
+
+#: ../comps-epel7.xml.in.h:200
+msgid "The PostgreSQL SQL database client, and associated packages."
+msgstr "SQL-databasklienten PostgreSQL, och tillhörande program."
+
+#: ../comps-epel7.xml.in.h:201
+msgid "Printing client"
+msgstr "Skrivarklient"
+
+#: ../comps-epel7.xml.in.h:202
+msgid "Tools for printing to a local printer or a remote print server."
+msgstr "Verktyg för utskrift till en lokal skrivare eller fjärrskrivarserver."
+
+#: ../comps-epel7.xml.in.h:203
+msgid "Print Server"
+msgstr "Skrivarserver"
+
+#: ../comps-epel7.xml.in.h:204
+msgid "Allows the system to act as a print server."
+msgstr "Låter systemet att agera som en skrivarserver."
+
+#: ../comps-epel7.xml.in.h:205
+msgid "Punjabi Support"
+msgstr "Stöd för punjabi"
+
+#: ../comps-epel7.xml.in.h:206
+msgid "Remote Desktop Clients"
+msgstr "Klienter för fjärrskrivbord"
+
+#: ../comps-epel7.xml.in.h:207
+msgid "Romanian Support"
+msgstr "Stöd för rumänska"
+
+#: ../comps-epel7.xml.in.h:208
+msgid "Russian Support"
+msgstr "Stöd för ryska"
+
+#: ../comps-epel7.xml.in.h:209
+msgid "Sanskrit Support"
+msgstr "Stöd för sanskrit"
+
+#: ../comps-epel7.xml.in.h:210
+msgid "Sardinian Support"
+msgstr "Stöd för sardiska"
+
+#: ../comps-epel7.xml.in.h:211
+msgid "Scientific support"
+msgstr "Stöd för vetenskap"
+
+#: ../comps-epel7.xml.in.h:212
+msgid ""
+"Tools for mathematical and scientific computations, and parallel computing."
+msgstr ""
+"Verktyg för matematiska och vetenskapliga beräkningar, och "
+"parallellberäkningar."
+
+#: ../comps-epel7.xml.in.h:213
+msgid "Security Tools"
+msgstr "Säkerhetsverktyg"
+
+#: ../comps-epel7.xml.in.h:214
+msgid "Security tools for integrity and trust verification."
+msgstr "Säkerhetsverktyg för verifikation av integritet och trovärdighet."
+
+#: ../comps-epel7.xml.in.h:215
+msgid "Serbian Support"
+msgstr "Stöd för serbiska"
+
+#: ../comps-epel7.xml.in.h:216
+msgid "Server Platform"
+msgstr "Serverplattform"
+
+#: ../comps-epel7.xml.in.h:217
+msgid "Supported libraries for the Enterprise Linux Server Platform."
+msgstr "Stödbibliotek för Enterprise Linux serverplattform."
+
+#: ../comps-epel7.xml.in.h:218
+msgid "Server Platform Development"
+msgstr "Utveckling av serverplattform"
+
+#: ../comps-epel7.xml.in.h:219
+msgid ""
+"Development headers and libraries for developing applications to run on the "
+"Enterprise Linux Server Platform."
+msgstr ""
+"Utvecklingshuvuden och -bibliotek för utveckling av program som skall köra "
+"på Enterprise Linux serverplattform."
+
+#: ../comps-epel7.xml.in.h:220
+msgid "Server Policy"
+msgstr "Serverpolicy"
+
+#: ../comps-epel7.xml.in.h:221
+msgid "Policy packages for the Server variant."
+msgstr "Policypaket för servervarianten."
+
+#: ../comps-epel7.xml.in.h:222
+msgid "Sindhi Support"
+msgstr "Stöd för sindhi"
+
+#: ../comps-epel7.xml.in.h:223
+msgid "Sinhala Support"
+msgstr "Stöd för singalesiska"
+
+#: ../comps-epel7.xml.in.h:224
+msgid "Slovak Support"
+msgstr "Stöd för slovakiska"
+
+#: ../comps-epel7.xml.in.h:225
+msgid "Slovenian Support"
+msgstr "Stöd för slovenska"
+
+#: ../comps-epel7.xml.in.h:226
+msgid "Smart card support"
+msgstr "Stöd för smarta kort"
+
+#: ../comps-epel7.xml.in.h:227
+msgid "Support for using smart card authentication."
+msgstr "Stöd för att använda smarta kort för autentisering."
+
+#: ../comps-epel7.xml.in.h:228
+msgid "Southern Ndebele Support"
+msgstr "Stöd för södra ndebele"
+
+#: ../comps-epel7.xml.in.h:229
+msgid "Southern Sotho Support"
+msgstr "Stöd för södra sotho"
+
+#: ../comps-epel7.xml.in.h:230
+msgid "Spanish Support"
+msgstr "Stöd för spanska"
+
+#: ../comps-epel7.xml.in.h:231
+msgid "FCoE Storage Client"
+msgstr "FCoE-lagringsklient"
+
+#: ../comps-epel7.xml.in.h:232
+msgid "Fiber Channel over Ethernet support"
+msgstr "Stöd för fiberkanal över Ethernet"
+
+#: ../comps-epel7.xml.in.h:233
+msgid "iSCSI Storage Client"
+msgstr "iSCSI-lagringsklient"
+
+#: ../comps-epel7.xml.in.h:234
+msgid "iSCSI client support"
+msgstr "iSCSI-klientstöd"
+
+#: ../comps-epel7.xml.in.h:235
+msgid "Storage Availability Tools"
+msgstr "Verktyg för lagringstillgänglighet"
+
+#: ../comps-epel7.xml.in.h:236
+msgid "A set of tools to manage SAN path availability"
+msgstr "Ett antal verktyg för att hantera tillgänglighet av SAN-sökvägar"
+
+#: ../comps-epel7.xml.in.h:237
+msgid "Network Storage Server"
+msgstr "Nätverkslagringsserver"
+
+#: ../comps-epel7.xml.in.h:238
+msgid "iSCSI, iSER, and iSNS network storage server."
+msgstr "iSCSI-, iSER- och iSNS-nätverkslagringsserver."
+
+#: ../comps-epel7.xml.in.h:239
+msgid "Swahili Support"
+msgstr "Stöd för swahili"
+
+#: ../comps-epel7.xml.in.h:240
+msgid "Swati Support"
+msgstr "Stöd för siswati"
+
+#: ../comps-epel7.xml.in.h:241
+msgid "Swedish Support"
+msgstr "Stöd för svenska"
+
+#: ../comps-epel7.xml.in.h:242
+msgid "System administration tools"
+msgstr "Systemadministrationsverktyg"
+
+#: ../comps-epel7.xml.in.h:243
+msgid "Utilities useful in system administration."
+msgstr "Verktyg som är användbara för systemadministration."
+
+#: ../comps-epel7.xml.in.h:244
+msgid "System Management"
+msgstr "Systemhantering"
+
+#: ../comps-epel7.xml.in.h:245
+msgid "Various low-level hardware management frameworks."
+msgstr "Diverse lågnivåramverk för maskinvaruhantering."
+
+#: ../comps-epel7.xml.in.h:246
+msgid "Messaging Client Support"
+msgstr "Stöd för meddelandeklient"
+
+#: ../comps-epel7.xml.in.h:247
+msgid "AMQP messaging client for systems management."
+msgstr "Meddelandeklienten AMQP för systemhantering."
+
+#: ../comps-epel7.xml.in.h:248
+msgid "Messaging Server Support"
+msgstr "Stöd för meddelandeserver"
+
+#: ../comps-epel7.xml.in.h:249
+msgid "AMQP messaging broker for systems management."
+msgstr "Meddelandemäklaren AMQP för systemhantering."
+
+#: ../comps-epel7.xml.in.h:250
+msgid "SNMP Support"
+msgstr "Stöd för SNMP"
+
+#: ../comps-epel7.xml.in.h:251
+msgid "SNMP management agent."
+msgstr "Styragent för SNMP."
+
+#: ../comps-epel7.xml.in.h:252
+msgid "Web-Based Enterprise Management"
+msgstr "Webbaserad Enterprise-hantering"
+
+#: ../comps-epel7.xml.in.h:253
+msgid "WBEM interface for Enterprise Linux."
+msgstr "WBEM-gränssnitt för Enterprise Linux."
+
+#: ../comps-epel7.xml.in.h:254
+msgid "Tagalog Support"
+msgstr "Stöd för tagalog"
+
+#: ../comps-epel7.xml.in.h:255
+msgid "Tajik Support"
+msgstr "Stöd för tajik"
+
+#: ../comps-epel7.xml.in.h:256
+msgid "Tamil Support"
+msgstr "Stöd för tamil"
+
+#: ../comps-epel7.xml.in.h:257
+msgid "Technical Writing"
+msgstr "Teknisk dokumentation"
+
+#: ../comps-epel7.xml.in.h:258
+msgid "Tools for writing technical documentation."
+msgstr "Verktyg för att skriva teknisk dokumentation."
+
+#: ../comps-epel7.xml.in.h:259
+msgid "Telugu Support"
+msgstr "Stöd för telugu"
+
+#: ../comps-epel7.xml.in.h:260
+msgid "Tetum Support"
+msgstr "Stöd för tetum"
+
+#: ../comps-epel7.xml.in.h:261
+msgid "TeX support"
+msgstr "Stöd för TeX"
+
+#: ../comps-epel7.xml.in.h:262
+msgid "Support for the TeX document formatting system."
+msgstr "Stöd för dokumentformateringssystemet TeX."
+
+#: ../comps-epel7.xml.in.h:263
+msgid "Thai Support"
+msgstr "Stöd för thailändska"
+
+#: ../comps-epel7.xml.in.h:264
+msgid "Tibetan Support"
+msgstr "Stöd för tibetanska"
+
+#: ../comps-epel7.xml.in.h:265
+msgid "Tsonga Support"
+msgstr "Stöd för tsonga"
+
+#: ../comps-epel7.xml.in.h:266
+msgid "Tswana Support"
+msgstr "Stöd för tswana"
+
+#: ../comps-epel7.xml.in.h:267
+msgid "TurboGears application framework"
+msgstr "TurboGears applikationsramverk"
+
+#: ../comps-epel7.xml.in.h:268
+msgid "TurboGears web application framework."
+msgstr "TurboGears webbapplikationsramverk."
+
+#: ../comps-epel7.xml.in.h:269
+msgid "Turkish Support"
+msgstr "Stöd för turkiska"
+
+#: ../comps-epel7.xml.in.h:270
+msgid "Turkmen Support"
+msgstr "Stöd för turkmeniska"
+
+#: ../comps-epel7.xml.in.h:271
+msgid "Ukrainian Support"
+msgstr "Stöd för ukrainska"
+
+#: ../comps-epel7.xml.in.h:272
+msgid "Upper Sorbian Support"
+msgstr "Stöd för högsorbiska"
+
+#: ../comps-epel7.xml.in.h:273
+msgid "Urdu Support"
+msgstr "Stöd för urdu"
+
+#: ../comps-epel7.xml.in.h:274
+msgid "Uzbek Support"
+msgstr "Stöd för uzbekiska"
+
+#: ../comps-epel7.xml.in.h:275
+msgid "Venda Support"
+msgstr "Stöd för venda"
+
+#: ../comps-epel7.xml.in.h:276
+msgid "Vietnamese Support"
+msgstr "Stöd för vietnamesiska"
+
+#: ../comps-epel7.xml.in.h:278
+msgid "Provides an environment for hosting virtualized guests."
+msgstr "Skapar en miljö för att vara värd åt virtualiserade gäster."
+
+#: ../comps-epel7.xml.in.h:279
+msgid "Virtualization Client"
+msgstr "Virtualiseringsklient"
+
+#: ../comps-epel7.xml.in.h:280
+msgid "Clients for installing and managing virtualization instances."
+msgstr "Klienter för att installera och hantera virtualiseringsinstanser."
+
+#: ../comps-epel7.xml.in.h:281
+msgid "Virtualization Platform"
+msgstr "Virtualiseringsplattform"
+
+#: ../comps-epel7.xml.in.h:282
+msgid ""
+"Provides an interface for accessing and controlling virtualized guests and "
+"containers."
+msgstr ""
+"Skapar ett gränssnitt för att komma åt och styra virtualiserade gäster och "
+"behållare."
+
+#: ../comps-epel7.xml.in.h:283
+msgid "Virtualization Tools"
+msgstr "Virtualiseringsverktyg"
+
+#: ../comps-epel7.xml.in.h:284
+msgid "Tools for offline virtual image management."
+msgstr "Verktyg för hantering av virtuella avbilder frånkopplat."
+
+#: ../comps-epel7.xml.in.h:285
+msgid "Walloon Support"
+msgstr "Stöd för vallonska"
+
+#: ../comps-epel7.xml.in.h:287
+msgid ""
+"Allows the system to act as a web server, and run Perl and Python web "
+"applications."
+msgstr ""
+"Låter systemet att agera som en webbserver, och köra Perl- och "
+"Pythonwebbprogram."
+
+#: ../comps-epel7.xml.in.h:288
+msgid "Web Servlet Engine"
+msgstr "Webb-servlet-motor"
+
+#: ../comps-epel7.xml.in.h:289
+msgid "Allows the system to host Java servlets."
+msgstr "Låter systemet att vara värd för Java servlets."
+
+#: ../comps-epel7.xml.in.h:290
+msgid "Welsh Support"
+msgstr "Stöd för kymriska"
+
+#: ../comps-epel7.xml.in.h:291
+msgid "Workstation Policy"
+msgstr "Arbetsstationspolicy"
+
+#: ../comps-epel7.xml.in.h:292
+msgid "Policy packages for the Workstation variant."
+msgstr "Policypaket för arbetsstationsvarianten."
+
+#: ../comps-epel7.xml.in.h:293
+msgid "X Window System"
+msgstr "Fönstersystemet X"
+
+#: ../comps-epel7.xml.in.h:294
+msgid "X Window System Support."
+msgstr "Stöd för fönstersystemet X."
+
+#: ../comps-epel7.xml.in.h:297
+msgid "Xhosa Support"
+msgstr "Stöd för xhosa"
+
+#: ../comps-epel7.xml.in.h:298
+msgid "Zulu Support"
+msgstr "Stöd för zulu"
+
+#: ../comps-epel7.xml.in.h:301
+msgid "Desktops"
+msgstr "Skrivbord"
+
+#: ../comps-epel7.xml.in.h:302
+msgid "Desktops and thin clients."
+msgstr "Skrivbord och tunna klienter."
+
+#: ../comps-epel7.xml.in.h:304
+msgid "End-user applications."
+msgstr "Slutanvändarprogram."
+
+#: ../comps-epel7.xml.in.h:306
+msgid "Development tools and libraries."
+msgstr "Utvecklingsverktyg och -bibliotek."
+
+#~ msgid "Bodo Support"
+#~ msgstr "Stöd för bodo"
+
+#~ msgid ""
+#~ "These packages are targeted towards professional designers related to "
+#~ "graphics, web and animation."
+#~ msgstr ""
+#~ "Dessa paket är riktade till professionella designer och är relaterade "
+#~ "grafik, webb och animeringar."
+
+#~ msgid "Dogri Support"
+#~ msgstr "Stöd för dogri"
+
+#~ msgid "Lepcha Support"
+#~ msgstr "Lepcha-stöd"
+
+#~ msgid "Manipuri Support"
+#~ msgstr "Stöd för manipuri"
+
+#~ msgid "Odia Support"
+#~ msgstr "Stöd för Oriya"
+
+#~ msgid "Basic Python web application support."
+#~ msgstr "Grundläggande stöd för Python i webbprogram."
+
+#~ msgid "Santali Support"
+#~ msgstr "Stöd för santali"
+
+#~ msgid ""
+#~ "This group is a limited collection of tools for various hardware specific "
+#~ "utilities."
+#~ msgstr ""
+#~ "Denna grupp är en begränsad samling av verktyg för diverse "
+#~ "hårdvaruspecifika verktyg."
+
+#~ msgid "Simplified Chinese Support"
+#~ msgstr "Stöd för förenklad kinesiska"
+
+#~ msgid "Traditional Chinese Support"
+#~ msgstr "Stöd för traditionell kinesiska"
+
+#~ msgid "These packages provide a virtualization environment."
+#~ msgstr "Dessa paket tillhandahåller en virtualiseringsmiljö."
+
+#~ msgid "Yiddish Support"
+#~ msgstr "Stöd för jiddisch"
+
+#~ msgid "Fedora Server"
+#~ msgstr "Fedora Server"
+
+#~ msgid "Ansible node"
+#~ msgstr "Ansible-nod"
+
+#~ msgid ""
+#~ "This group contains packages necessary for the system to be controlled by "
+#~ "Ansible."
+#~ msgstr ""
+#~ "Denna grupp innehåller paket som behövs för att systemet skall kunna "
+#~ "styras av Ansible."
+
+#~ msgid "Critical Path (Hawaii)"
+#~ msgstr "Kritisk väg (Hawaii)"
+
+#~ msgid ""
+#~ "A set of packages that provide the Critical Path functionality for the "
+#~ "Hawaii desktop"
+#~ msgstr ""
+#~ "En uppsättning paket som ger funktionaliteten Kritisk väg för Hawaii-"
+#~ "skrivbordet"
+
+#~ msgid "Applications for the Hawaii Desktop"
+#~ msgstr "Program för Hawaii-skrivbordet"
+
+#~ msgid "A set of commonly used applications for the Hawaii Desktop"
+#~ msgstr "En uppsättning ofta använda program för Hawaii-skrivbordet"
+
+#~ msgid "Hawaii"
+#~ msgstr "Hawaii"
+
+#~ msgid ""
+#~ "Hawaii is a fast, lightweight, intuitive and user friendly Wayland "
+#~ "desktop environment that adapts to desktop and mobile devices."
+#~ msgstr ""
+#~ "Hawaii är en snabb, lättviktig, intuitiv och användarvänlig Wayland-"
+#~ "skrivbordsmiljö som anpassar sig till skrivbordet och mobila enheter."
+
+#~ msgid "Multimedia support for Hawaii"
+#~ msgstr "Multimediastöd för Hawaii"
+
+#~ msgid "Hawaii Office"
+#~ msgstr "Hawaii kontor"
+
+#~ msgid "Office suite for Hawaii"
+#~ msgstr "Kontorssvit för Hawaii"
+
+#~ msgid "LiveCD Tools"
+#~ msgstr "LiveCD-verktyg"
+
+#~ msgid "Tools that need to be installed into a livecd for it to function"
+#~ msgstr ""
+#~ "Verktyg som behöver vara installerade på en livecd för att den skall "
+#~ "fungera"
+
+#~ msgid "Hawaii Desktop"
+#~ msgstr "Hawaii-skrivbordet"
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Arabic environments."
+#~ msgstr ""
+#~ "Denna grupp är en samling av verktyg och resurser för arabiska miljöer."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Armenian "
+#~ "environments."
+#~ msgstr ""
+#~ "Denna grupp är en samling av verktyg och resurser för armenska miljöer."
+
+#~ msgid ""
+#~ "These tools allow you to create documentation in the DocBook format and "
+#~ "convert them to HTML, PDF, Postscript, and text."
+#~ msgstr ""
+#~ "Dessa verktyg låter dig skapa dokumentation i DocBook-formatet och "
+#~ "konvertera dem till HTML, PDF, Postscript och text."
+
+#~ msgid ""
+#~ "Install this group of packages to use the base graphical (X) user "
+#~ "interface."
+#~ msgstr ""
+#~ "Installera denna paketgrupp för att använda det grundläggande grafiska "
+#~ "gränssnittet (X)."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Czech environments."
+#~ msgstr ""
+#~ "Denna grupp är en samling av verktyg och resurser för tjeckiska miljöer."
+
+#~ msgid ""
+#~ "These tools include core development tools such as automake, gcc, perl, "
+#~ "python, and debuggers."
+#~ msgstr ""
+#~ "Dessa verktyg inkluderar grundläggande utvecklingsverktyg som exempelvis "
+#~ "automake, gcc, perl, python och felsökningsverktyg."
+
+#~ msgid "Dialup Networking Support"
+#~ msgstr "Stöd för uppringd uppkoppling"
+
+#~ msgid ""
+#~ "Sometimes called text editors, these are programs that allow you to "
+#~ "create and edit files. These include Emacs and Vi."
+#~ msgstr ""
+#~ "Detta är program som låter dig skapa och redigera filer, och kallas ofta "
+#~ "textredigerare. Dessa inkluderar Emacs och Vi."
+
+#~ msgid "Design and Simulation tools for hardware engineers"
+#~ msgstr "Design- och simuleringsverktyg för hårdvaruingenjörer"
+
+#~ msgid "Tools and Utilities needed by a Fedora Packager"
+#~ msgstr "Verktyg och tillbehör som Fedorapaketeraren behöver"
+
+#~ msgid "GNOME Desktop Environment"
+#~ msgstr "Skrivbordsmiljön GNOME"
+
+#~ msgid ""
+#~ "GNOME is a powerful, graphical user interface which includes a panel, "
+#~ "desktop, system icons, and a graphical file manager."
+#~ msgstr ""
+#~ "GNOME är ett kraftfullt, grafiskt användargränssnitt som innehåller en "
+#~ "panel, ett skrivbord, systemikoner och en grafisk filhanterare."
+
+#~ msgid "This group includes graphical email, Web, and chat clients."
+#~ msgstr ""
+#~ "Denna grupp inkluderar grafiska klienter för e-post, webbsurfande och "
+#~ "chatt."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Hebrew environments."
+#~ msgstr ""
+#~ "Denna grupp är en samling av verktyg och resurser för hebreiska miljöer."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Japanese "
+#~ "environments."
+#~ msgstr ""
+#~ "Denna grupp är en samling av verktyg och resurser för japanska miljöer."
+
+#~ msgid "KDE (K Desktop Environment)"
+#~ msgstr "Skrivbordsmiljön KDE"
+
+#~ msgid ""
+#~ "KDE is a powerful, graphical user interface which includes a panel, "
+#~ "desktop, system icons, and a graphical file manager."
+#~ msgstr ""
+#~ "KDE är ett kraftfullt, grafiskt användargränssnitt som innehåller en "
+#~ "panel, ett skrivbord, systemikoner och en grafisk filhanterare."
+
+#~ msgid "Install these packages to develop QT and KDE graphical applications."
+#~ msgstr ""
+#~ "Installera dessa paket för att utveckla grafiska program för QT och KDE."
+
+#~ msgid "This group is a collection of network servers for specific purposes"
+#~ msgstr "Denna grupp är en samling nätverksservrar för specifika ändamål"
+
+#~ msgid ""
+#~ "This group includes text-based email, Web, and chat clients. These "
+#~ "applications do not require the X Window System."
+#~ msgstr ""
+#~ "Denna grupp inkluderar textbaserade klienter för e-post, webbsurfande och "
+#~ "chatt. Dessa program kräver inte fönstersystemet X."
+
+#~ msgid "Web Development"
+#~ msgstr "Webbutveckling"
+
+#~ msgid ""
+#~ "These packages are helpful when developing web applications or web pages."
+#~ msgstr ""
+#~ "Dessa paket är till hjälp när du utvecklar webbapplikationer eller "
+#~ "webbsidor."
+
+#~ msgid "XEmacs"
+#~ msgstr "XEmacs"
+
+#~ msgid "The XEmacs text editor."
+#~ msgstr "Textredigeraren XEmacs."
+
+#~ msgid "Desktop environments"
+#~ msgstr "Skrivbordsmiljöer"
+
+#~ msgid "Applications for a variety of tasks"
+#~ msgstr "Program för en mängd arbetsuppgifter"

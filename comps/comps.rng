@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Comps file Relax-NG Schema
+
+    © 2006 Nicolas Mailhot <nim at fedoraproject dot org>
+
+    TODO: re-add namespace to this file
+          use that namespace to comps.xml files
+          create grammar for comps.xml.in
+          add more documentation for comps elements
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" 
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" 
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <ref name="comps"/>
+  </start>
+  <define name="comps">
+    <element name="comps">
+      <oneOrMore>
+        <ref name="group"/>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="environment"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="category"/>
+      </zeroOrMore>
+      <interleave><!-- We don't care what order these are in -->
+        <optional>
+          <ref name="whiteout"/>
+        </optional>
+        <optional>
+          <ref name="blacklist"/>
+        </optional>
+        <optional>
+          <ref name="langpacks"/>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+  <define name="group">
+    <element name="group">
+      <!-- Example documentation. Please add more. -->
+      <a:documentation>This defines a package group.</a:documentation>
+      <optional>
+        <ref name="arch"/>
+      </optional>
+      <optional>
+        <ref name="variant"/>
+      </optional>
+      <interleave>
+       <ref name="id"/>
+       <optional>
+         <element name="default" a:defaultValue="true">
+           <a:documentation>Should the group be enabled by default?</a:documentation>
+           <ref name="boolean"/>
+         </element>
+       </optional>
+       <optional>
+         <element name="uservisible" a:defaultValue="true">
+           <a:documentation>Should the group be visible to users?</a:documentation>
+           <ref name="boolean"/>
+         </element>
+       </optional>
+       <optional>
+         <element name="display_order">
+           <ref name="positiveInteger"/>
+         </element>
+       </optional>
+       <optional>
+         <element name="langonly">
+           <ref name="locale"/>
+         </element>
+       </optional>
+       <optional>
+         <ref name="groupreqlist"/>
+       </optional>
+       <ref name="packagelist"/>
+      </interleave>
+    </element>
+  </define>
+  <define name="groupreqlist">
+    <a:documentation>
+      Contains a list of other groups that this group requires.
+      This element has been ignored by yum et. al. since 2005 and should
+      therefore be considered deprecated.
+    </a:documentation>
+    <element name="grouplist">
+      <oneOrMore>
+        <ref name="groupreq"/>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="metapkg"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="groupreq">
+    <element name="groupreq">
+      <ref name="groupname"/>
+    </element>
+  </define>
+  <define name="metapkg">
+    <element name="metapkg">
+      <ref name="packagename"/>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value>mandatory</value>
+            <value>default</value>
+            <value>optional</value>
+          </choice>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="packagelist">
+    <element name="packagelist">
+      <zeroOrMore>
+        <ref name="packagereq"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="packagereq">
+    <element name="packagereq">
+      <choice>
+        <optional>
+          <attribute name="type" a:defaultValue="optional">
+            <choice>
+              <value>mandatory</value>
+              <value>default</value>
+              <value>optional</value>
+            </choice>
+          </attribute>
+        </optional>
+        <group>
+          <attribute name="type" a:defaultValue="conditional">
+            <choice>
+              <value>conditional</value>
+            </choice>
+          </attribute>
+          <attribute name="requires">
+            <ref name="packagename"/>
+          </attribute>
+        </group>
+      </choice>
+      <optional>
+        <attribute name="basearchonly" a:defaultValue="false">
+          <ref name="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <ref name="arch"/>
+      </optional>
+      <optional>
+        <ref name="variant"/>
+      </optional>
+      <ref name="packagename"/>
+    </element>
+  </define>
+  <define name="environment">
+    <element name="environment">
+      <optional>
+        <ref name="arch"/>
+      </optional>
+      <optional>
+        <ref name="variant"/>
+      </optional>
+      <interleave>
+        <ref name="id"/>
+        <optional>
+          <element name="display_order">
+            <ref name="positiveInteger"/>
+          </element>
+        </optional>
+        <ref name="grouplist"/>
+        <optional>
+          <ref name="optionlist"/>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+  <define name="category">
+    <element name="category">
+      <optional>
+        <ref name="arch"/>
+      </optional>
+      <optional>
+        <ref name="variant"/>
+      </optional>
+      <interleave>
+      <ref name="id"/>
+      <optional>
+        <element name="display_order">
+          <ref name="positiveInteger"/>
+        </element>
+      </optional>
+      <ref name="grouplist"/>
+     </interleave>
+    </element>
+  </define>
+  <define name="grouplist">
+    <element name="grouplist">
+      <oneOrMore>
+        <ref name="groupid"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="optionlist">
+    <element name="optionlist">
+      <oneOrMore>
+        <ref name="groupid"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="groupid">
+    <element name="groupid">
+      <ref name="string"/>
+      <optional>
+        <attribute name="default" a:defaultValue="false">
+          <ref name="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <ref name="arch"/>
+      </optional>
+    </element>
+  </define>
+  <define name="id">
+    <element name="id">
+      <ref name="ID"/>
+    </element>
+    <choice>
+      <!-- Either we have one _name and an optional _description (comps.xml.in) -->
+      <group>
+        <element name="_name">
+          <ref name="string"/>
+        </element>
+        <optional>
+          <element name="_description">
+            <ref name="string"/>
+          </element>
+        </optional>
+      </group>
+      <!-- Or we have one name, an optional description, and then zero-or-more
+           localized names and descriptions following that. -->
+      <group>
+        <element name="name">
+          <ref name="string"/>
+        </element>
+        <zeroOrMore>
+          <element name="name">
+            <attribute name="xml:lang">
+              <ref name="locale"/>
+            </attribute>
+            <ref name="string"/>
+          </element>
+        </zeroOrMore>
+        <optional>
+          <element name="description">
+            <ref name="string"/>
+          </element>
+          <zeroOrMore>
+            <element name="description">
+              <attribute name="xml:lang">
+                <ref name="locale"/>
+              </attribute>
+              <ref name="string"/>
+            </element>
+          </zeroOrMore>
+        </optional>
+      </group>
+    </choice>
+  </define>
+  <define name="langpacks">
+    <a:documentation>
+    The "langpacks" item is a list of package-to-langpack mappings used
+    by the yum-langpacks plugin.
+
+    An example is:
+     &lt;match name="foo" install="foo-lang-%s"&gt;
+    When the 'foo' package is installed, the 'foo-lang-(language code)' package
+    will be installed for any configured languages.
+    </a:documentation>
+    <element name="langpacks">
+      <zeroOrMore>
+        <element name="match">
+          <attribute name="name">
+            <ref name="string"/>
+          </attribute>
+          <attribute name="install">
+            <ref name="string"/>
+          </attribute>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="blacklist">
+    <a:documentation>
+    The "blacklist" is a list of packages that will be *removed* if found
+    during an upgrade. Typically this is used to handle tricky upgrade cases
+    that can't be modeled with existing RPM Obsoletes/Conflicts/etc.
+
+    Here's an example: In FC6, hal was a multilib package, but in F7 we split
+    it into (non-multilib) hal and (multilib) hal-libs.
+    So the system starts with hal.x86_64 and hal.i386 (for multilib compat).
+    We want to upgrade to hal.x86_64 and hal-libs.x86_64, with hal-libs.i386
+    for multilib. Upgrading hal.x86_64 will bring in hal-libs.x86_64, and
+    upgrading hal.i386 brings in hal-libs.i386. Adding a blacklist item for
+    'hal.i386' causes anaconda to remove the (now-unneeded) hal.i386, 
+    which gives us the desired outcome.
+    </a:documentation>
+    <element name="blacklist">
+      <zeroOrMore>
+        <element name="package">
+          <attribute name="name">
+            <ref name="string"/>
+          </attribute>
+          <optional>
+            <ref name="arch"/>
+          </optional>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="whiteout">
+    <a:documentation>
+    The RPM "whiteout" list is used to by RPM to break dependency loops. 
+    Each "ignoredep" element has two attributes - "package" and "requires" -
+    which are both package names. While calculating dependencies, RPM will
+    ignore any dependency that results in p requiring r. 
+
+    This is used to keep upgrades from getting stuck on known dependency loops,
+    like with mutually dependent packages (e.g. xinitrc and xorg-x11)
+
+    To feed this info to RPM, each item should be converted to a string of the
+    form 'package>requires', and the RPM macro '_dependency_whiteout' should be
+    filled with a (whitespace-separated) list of these items.
+    </a:documentation>
+    <element name="whiteout">
+      <zeroOrMore>
+        <element name="ignoredep">
+          <attribute name="package">
+            <ref name="string"/>
+          </attribute>
+          <attribute name="requires">
+            <ref name="string"/>
+          </attribute>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="arch">
+    <attribute name="arch">
+      <ref name="string"/>
+      <a:documentation>
+        Arch to blacklist this package from. If unspecified, it will be
+        blocked on all arches.
+        <!-- Technically this should be an enum of known arches:
+             i386 x86_64 ppc ppc64 ia64 sparc alpha ... -->
+      </a:documentation>
+    </attribute>
+  </define>
+  <define name="variant">
+    <attribute name="variant">
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="boolean">
+    <choice>
+      <value>true</value>
+      <value>True</value>
+      <value>false</value>
+      <value>False</value>
+    </choice>
+  </define>
+  <define name="groupname">
+    <data type="string"/>
+  </define>
+  <define name="ID">
+    <data type="string"/>
+  </define>
+<!-- Should be a regexp -->
+  <define name="locale">
+    <data type="string"/>
+  </define>
+  <define name="packagename">
+    <data type="string"/>
+  </define>
+  <define name="positiveInteger">
+    <data type="positiveInteger"/>
+  </define>
+  <define name="string">
+    <data type="string"/>
+  </define>
+</grammar>

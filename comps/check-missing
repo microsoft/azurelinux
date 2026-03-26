@@ -1,0 +1,157 @@
+#!/bin/python3
+
+# This script looks for the comps-fXX.xml.in file for the release version
+# specified, grabs lists of all packages that exist in that release of
+# Fedora, and looks through the comps `pkgreq` lines for ones that specify
+# packages that do not currently exist . It is arch-aware. It expects to
+# be run on a Fedora system with network access, as it will try to query
+# the dnf repos to get lists of currently-existing packages. It relies on
+# the non-Rawhide repo definitions actually working for Rawhide if passed
+# the Rawhide-matching release number, which is a kinda undocumented
+# feature but we rely on it in other places too. You will need
+# fedora-repos and python3-lxml packages installed.
+
+import glob
+import argparse
+import subprocess
+import sys
+import lxml.etree as ET
+from collections import defaultdict
+
+ARCHES = ('aarch64', 'ppc64le', 's390x', 'x86_64')
+
+parser = argparse.ArgumentParser(description='Check Fedora comps files for missing packages and packages missing on architectures')
+parser.add_argument('relver', help='Release version to check')
+parser.add_argument('--update', dest='update', action='store_true', default=False,
+                    help='Update the comps file with the changes')
+args = parser.parse_args()
+
+# gather package lists. this eats lots of RAM. I don't care.
+# FIXME: for this script to work for EPEL and ELN someone would have
+# to figure out the right tweaks to this command line.
+pkgs = {}
+for arch in ARCHES:
+    pkgtext = subprocess.run(('dnf', f'--forcearch={arch}', f'--releasever={args.relver}', '--disablerepo=*', '--enablerepo=fedora', '--enablerepo=updates', '--enablerepo=fedora-cisco-openh264', 'repoquery', '--qf=%{NAME}\n'), capture_output=True, text=True).stdout
+    pkgs[arch] = pkgtext.splitlines()
+
+compsfile = f'comps-f{args.relver}.xml.in'
+
+# find package reqs in comps
+tree = ET.parse(compsfile) #, ET.XMLParser(target=CommentedTreeBuilder()))
+root = tree.getroot()
+pkgreqs = root.findall('.//packagereq')
+
+# Check if each package is in the repository for each architecture
+removedpkgs = defaultdict(list)
+archpkgs = defaultdict(list)
+for pkgreq in pkgreqs:
+    reqtype = pkgreq.get('type', '')
+    # list of arches the package is missing on
+    missing = []
+    present = []
+
+    # arches the package is listed for (if no 'arch' key, it's listed for all)
+    reqarches = pkgreq.get('arch', '')
+    if reqarches:
+        reqarches = reqarches.split(',')
+    else:
+        reqarches = ARCHES
+
+    # do the actual check, append arch to 'missing' if it's not there
+    for arch in reqarches:
+        if arch in pkgs and pkgreq.text not in pkgs[arch]:
+            missing.append(arch)
+        else:
+            present.append(arch)
+
+    grpid = pkgreq.find('./../../id').text
+    pkgname = pkgreq.text
+
+    # print the result
+    if missing and not present:
+        if pkgreq.getparent() is not None:
+            removedpkgs[pkgname].append(grpid)
+            pkgreq.getparent().remove(pkgreq)
+    elif missing and reqtype != 'optional':
+        archpkgs[pkgname] = ','.join(present)
+
+# Find empty groups after packages not in repositories have been removed
+pkglists = root.findall('.//packagelist')
+removedgrps = {}
+for pkglist in pkglists:
+    if not len(pkglist):
+        group = pkglist.getparent()
+        grpid = group.find('./id').text
+        removedgrps[grpid] = []
+        group.getparent().remove(group)
+
+
+# Remove any empty groups from the environment lists
+envlists = root.findall('.//environment//groupid')
+for envgrp in envlists:
+    grpid = envgrp.text
+    if grpid in removedgrps:
+        # The groups are inside a grouplist inside the environment
+        par = envgrp.getparent()
+        envid = par.getparent().find('./id').text
+        removedgrps[grpid].append(envid)
+        par.remove(envgrp)
+
+
+# Remove any empty groups from the category lists
+catlists = root.findall('.//category//groupid')
+for catgrp in catlists:
+    grpid = catgrp.text
+    if grpid in removedgrps:
+        # The groups are inside a grouplist inside the category
+        par = catgrp.getparent()
+        catid = par.getparent().find('./id').text
+        removedgrps[grpid].append(catid)
+        par.remove(catgrp)
+
+
+# Remove any language packs for packages that don't exist anymore
+langpacks = root.find('.//langpacks')
+removedlang = []
+for lang in langpacks.getchildren():
+    pkg = lang.get('name')
+    if pkg in list(removedpkgs):
+        removedlang.append(pkg)
+        lang.getparent().remove(lang)
+
+# Print out a summary
+if archpkgs:
+    print('Packages with incorrect architecture tags:')
+    for pkg in sorted(archpkgs):
+        print('    {} only available on {}'.format(pkg, archpkgs[pkg]))
+    print()
+
+if removedpkgs:
+    print('Removing packages:')
+    for pkg in sorted(removedpkgs):
+        print('    {} in group {}'.format(pkg, ', '.join(removedpkgs[pkg])))
+    print()
+
+if removedgrps:
+    print('Removing empty groups:')
+    for group in sorted(removedgrps):
+        print('    {} in {}'.format(group, ', '.join(removedgrps[group])))
+    print()
+
+if removedlang:
+    print('Removing language packs for:')
+    for lang in removedlang:
+        print('    {}'.format(lang))
+    print()
+
+if not archpkgs and not removedpkgs and not removedgrps and not removedlang:
+    print("No problems found!")
+
+# Write out the updated XML file if desired
+if args.update:
+    tree.write(compsfile, encoding="UTF-8", xml_declaration=True)
+    sys.exit(0)
+
+if archpkgs or removedpkgs or removedgrps or removedlang:
+    sys.exit(1)
+sys.exit(0)

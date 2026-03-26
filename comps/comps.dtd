@@ -1,0 +1,49 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT comps (group+,environment+,category+,langpacks?)>
+<!ATTLIST comps xmlns CDATA #FIXED ''>
+
+<!ELEMENT group (id,name,description,default,uservisible,langonly?, packagelist)>
+<!ATTLIST group xmlns CDATA #FIXED ''>
+
+<!ELEMENT environment (id,name,description,display_order?,grouplist,optionlist)>
+<!ATTLIST environment xmlns CDATA #FIXED ''>
+
+<!ELEMENT category (id,name,description,display_order?,grouplist)>
+<!ATTLIST category xmlns CDATA #FIXED ''>
+
+<!ELEMENT default (#PCDATA)>
+<!ATTLIST default xmlns CDATA #FIXED ''>
+
+<!ELEMENT uservisible (#PCDATA)>
+<!ATTLIST uservisible xmlns CDATA #FIXED ''>
+
+<!ELEMENT langonly (#PCDATA)>
+<!ATTLIST langonly xmlns CDATA #FIXED ''>
+
+<!ELEMENT packagelist (packagereq)+>
+<!ATTLIST packagelist xmlns CDATA #FIXED ''>
+
+<!ELEMENT display_order (#PCDATA)>
+<!ATTLIST display_order xmlns CDATA #FIXED ''>
+
+<!ELEMENT grouplist (groupid)+>
+<!ATTLIST grouplist xmlns CDATA #FIXED ''>
+
+<!ELEMENT packagereq (#PCDATA)>
+<!ATTLIST packagereq xmlns CDATA #FIXED '' requires NMTOKEN #IMPLIED type NMTOKEN #REQUIRED>
+
+<!ELEMENT groupid (#PCDATA)>
+<!ATTLIST groupid xmlns CDATA #FIXED ''>
+
+<!ELEMENT id (#PCDATA)>
+<!ATTLIST id xmlns CDATA #FIXED ''>
+
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST name xmlns CDATA #FIXED ''>
+
+<!ELEMENT description (#PCDATA)>
+<!ATTLIST description xmlns CDATA #FIXED ''>
+
+<!ELEMENT optionlist (groupid)+>
+<!ATTLIST optionlist xmlns CDATA #FIXED ''>

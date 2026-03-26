@@ -1,0 +1,3037 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Rajesh Ranjan <rranjan@redhat.com>, 2007
+# Rajesh Ranjan <rajesh672@gmail.com>, 2009
+# Rajesh Ranjan <rranjan@redhat.com>, 2004, 2005, 2006, 2008, 2009, 2011
+# Kevin Fenzi <kevin@scrye.com>, 2016. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-07 13:23-0800\n"
+"PO-Revision-Date: 2016-03-30 04:11+0000\n"
+"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
+"Language-Team: Hindi (http://www.transifex.com/projects/p/comps/language/"
+"hi/)\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Zanata 4.6.2\n"
+
+#: ../comps-f32.xml.in.h:1 ../comps-f33.xml.in.h:1 ../comps-f34.xml.in.h:1
+msgid "3D Printing"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:2 ../comps-f33.xml.in.h:2 ../comps-f34.xml.in.h:2
+msgid "3D printing software"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:3 ../comps-f33.xml.in.h:3 ../comps-f34.xml.in.h:3
+msgid "Administration Tools"
+msgstr "प्रशासन औज़ार"
+
+#: ../comps-f32.xml.in.h:4 ../comps-f33.xml.in.h:4 ../comps-f34.xml.in.h:4
+msgid ""
+"This group is a collection of graphical administration tools for the system, "
+"such as for managing user accounts and configuring system hardware."
+msgstr ""
+"यह समूह तंत्र के लिए आलेखी प्रशासन औज़ार का संग्रह है, जैसे उपयोक्ता लेखा प्रबंधन के लिए और "
+"तंत्र हार्डवेयर विन्यास के लिये."
+
+#: ../comps-f32.xml.in.h:5 ../comps-f33.xml.in.h:5 ../comps-f34.xml.in.h:5
+msgid "Anaconda tools"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:6 ../comps-f33.xml.in.h:6 ../comps-f34.xml.in.h:6
+msgid "ARM Tools"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:7 ../comps-f33.xml.in.h:7 ../comps-f34.xml.in.h:7
+msgid "Tools for working with arm systems"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:8 ../comps-f33.xml.in.h:8 ../comps-f34.xml.in.h:8
+msgid "x86 Baremetal Tools"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:9 ../comps-f33.xml.in.h:9 ../comps-f34.xml.in.h:9
+msgid "Tools for working with baremetal x86 systems"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:10 ../comps-f33.xml.in.h:10 ../comps-f34.xml.in.h:10
+msgid "Audio Production"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:11 ../comps-f33.xml.in.h:11 ../comps-f34.xml.in.h:11
+#, fuzzy
+msgid "Various tools for audio synthesis and music production."
+msgstr "एकीकरण और भरोसा सत्यापन के लिए सुरक्षा औज़ार."
+
+#: ../comps-f32.xml.in.h:12 ../comps-f33.xml.in.h:12 ../comps-f34.xml.in.h:12
+msgid "Authoring and Publishing"
+msgstr "लेखन और प्रकाशन"
+
+#: ../comps-f32.xml.in.h:13 ../comps-f33.xml.in.h:13 ../comps-f34.xml.in.h:13
+msgid ""
+"These tools allow you to create documents in the DocBook format and convert "
+"them into HTML, PDF, Postscript, and text."
+msgstr ""
+"ये औज़ार आपको DocBook प्रारूप में दस्तावेजन बनाकर और उन्हें HTML, PDF, पोस्टस्क्रिप्ट, और "
+"पाठ्यांश में बदलने की अनुमति देता है."
+
+#: ../comps-f32.xml.in.h:14 ../comps-f33.xml.in.h:14 ../comps-f34.xml.in.h:14
+msgid "base-x"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:15 ../comps-f33.xml.in.h:15 ../comps-f34.xml.in.h:15
+msgid "Local X.org display server"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:16 ../comps-f33.xml.in.h:16 ../comps-f34.xml.in.h:16
+msgid "Basic Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:17 ../comps-f33.xml.in.h:17 ../comps-f34.xml.in.h:17
+msgid "Basic X Window System with a choice of window manager."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:18
+msgid "Books and Guides"
+msgstr "पुस्तक और गाइड"
+
+#: ../comps-f32.xml.in.h:19
+msgid "Books and Guides for Fedora users and developers"
+msgstr "फेडोरा उपयोक्ता और विकासकर्ता के लिए पुस्तक और गाइड"
+
+#: ../comps-f32.xml.in.h:20 ../comps-f33.xml.in.h:18 ../comps-f34.xml.in.h:18
+#: ../comps-epel7.xml.in.h:25
+msgid "Buildsystem building group"
+msgstr "बिल्डतंत्र बिल्डिंग समूह"
+
+#: ../comps-f32.xml.in.h:21 ../comps-f33.xml.in.h:19 ../comps-f34.xml.in.h:19
+msgid "C Development Tools and Libraries"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:22 ../comps-f33.xml.in.h:20 ../comps-f34.xml.in.h:20
+msgid ""
+"These tools include core development tools such as automake, gcc and "
+"debuggers."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:23 ../comps-f33.xml.in.h:21 ../comps-f34.xml.in.h:21
+#: ../comps-epel7.xml.in.h:34
+msgid "Cinnamon"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:24 ../comps-f33.xml.in.h:22 ../comps-f34.xml.in.h:22
+#: ../comps-epel7.xml.in.h:35
+msgid ""
+"Cinnamon provides a desktop with a traditional layout, advanced features, "
+"easy to use, powerful and flexible."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:25 ../comps-f33.xml.in.h:23 ../comps-f34.xml.in.h:23
+msgid "Cloud Infrastructure"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:26 ../comps-f33.xml.in.h:24 ../comps-f34.xml.in.h:24
+msgid "Infrastructure packages for cloud computing."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:27 ../comps-f33.xml.in.h:25 ../comps-f34.xml.in.h:25
+#, fuzzy
+msgid "Cloud Management Tools"
+msgstr "विकासात्मक औज़ार"
+
+#: ../comps-f32.xml.in.h:28 ../comps-f33.xml.in.h:26 ../comps-f34.xml.in.h:26
+msgid ""
+"Software to manage servers and system images that run in \"cloud\" "
+"environments"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:29 ../comps-f33.xml.in.h:27 ../comps-f34.xml.in.h:27
+msgid "Cloud Server Tools"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:30 ../comps-f33.xml.in.h:28 ../comps-f34.xml.in.h:28
+msgid ""
+"Software for servers and system images that run in \"cloud\" environments"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:31 ../comps-f33.xml.in.h:29 ../comps-f34.xml.in.h:29
+msgid "Compiz"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:32 ../comps-f33.xml.in.h:30 ../comps-f34.xml.in.h:30
+msgid "This package group adds Compiz and Emerald"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:33 ../comps-f33.xml.in.h:31 ../comps-f34.xml.in.h:31
+#, fuzzy
+msgid "Container Management"
+msgstr "तंत्र प्रबंधन"
+
+#: ../comps-f32.xml.in.h:34 ../comps-f33.xml.in.h:32 ../comps-f34.xml.in.h:32
+#, fuzzy
+msgid "Tools for managing Linux containers"
+msgstr "मेनफ्रेम कंप्यूटिंग संसाधन की पहुँच के लिए औज़ार."
+
+#: ../comps-f32.xml.in.h:35 ../comps-f33.xml.in.h:33 ../comps-f34.xml.in.h:33
+#: ../comps-epel7.xml.in.h:41
+msgid "Core"
+msgstr "क्रोड़"
+
+#: ../comps-f32.xml.in.h:36 ../comps-f33.xml.in.h:34 ../comps-f34.xml.in.h:34
+msgid "Smallest possible installation"
+msgstr "लघुतम संभावित संस्थापन"
+
+#: ../comps-f32.xml.in.h:37 ../comps-f33.xml.in.h:35 ../comps-f34.xml.in.h:35
+msgid "Critical Path (Applications)"
+msgstr "गंभीर पथ (अनुप्रयोग)"
+
+#: ../comps-f32.xml.in.h:38 ../comps-f33.xml.in.h:36 ../comps-f34.xml.in.h:36
+msgid "A set of applications that are considered critical path"
+msgstr "अनुप्रयोगों का एक सेट जो गंभीर पथ माना जाता हैअनुप्रय़"
+
+#: ../comps-f32.xml.in.h:39 ../comps-f33.xml.in.h:37 ../comps-f34.xml.in.h:37
+msgid "Critical Path (Base)"
+msgstr "गंभीर पथ (Base)"
+
+#: ../comps-f32.xml.in.h:40 ../comps-f33.xml.in.h:38 ../comps-f34.xml.in.h:38
+msgid ""
+"A set of packages that provide the shared platform for Critical Path "
+"functionality on all Fedora spins"
+msgstr ""
+"संकुलों का एक सेट गंभीर पथ प्रकार्यात्मकता सभी फेडोरा स्पिन के लिए साझे प्लेटफॉर्म पर देता है"
+
+#: ../comps-f32.xml.in.h:41 ../comps-f33.xml.in.h:39 ../comps-f34.xml.in.h:39
+#, fuzzy
+#| msgid "Critical Path (KDE)"
+msgid "Critical Path (Deepin desktop)"
+msgstr "गंभीर पथ (केडीई)"
+
+#: ../comps-f32.xml.in.h:42 ../comps-f33.xml.in.h:40 ../comps-f34.xml.in.h:40
+#, fuzzy
+#| msgid ""
+#| "A set of packages that provide the Critical Path functionality for the "
+#| "KDE desktop"
+msgid ""
+"A set of packages that provide the Critical Path functionality for the "
+"Deepin desktop"
+msgstr "संकुलों का सेट जो केडीई डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:43 ../comps-f33.xml.in.h:41 ../comps-f34.xml.in.h:41
+msgid "Critical Path (GNOME)"
+msgstr "गंभीर पथ (GNOME)"
+
+#: ../comps-f32.xml.in.h:44 ../comps-f33.xml.in.h:42 ../comps-f34.xml.in.h:42
+msgid ""
+"A set of packages that provide the Critical Path functionality for the GNOME "
+"desktop"
+msgstr "संकुलों का एक सेट जो गनोम डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:45 ../comps-f33.xml.in.h:43 ../comps-f34.xml.in.h:43
+#: ../comps-epel8.xml.in.h:3
+msgid "Critical Path (KDE)"
+msgstr "गंभीर पथ (केडीई)"
+
+#: ../comps-f32.xml.in.h:46 ../comps-f33.xml.in.h:44 ../comps-f34.xml.in.h:44
+#: ../comps-epel8.xml.in.h:4
+msgid ""
+"A set of packages that provide the Critical Path functionality for the KDE "
+"desktop"
+msgstr "संकुलों का सेट जो केडीई डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:47 ../comps-f33.xml.in.h:45 ../comps-f34.xml.in.h:45
+msgid "Critical Path (LXDE)"
+msgstr "गंभीर पथ (एलएक्सडीई)"
+
+#: ../comps-f32.xml.in.h:48 ../comps-f33.xml.in.h:46 ../comps-f34.xml.in.h:46
+msgid ""
+"A set of packages that provide the Critical Path functionality for the LXDE "
+"desktop"
+msgstr "संकुलों का सेट जो एलएक्सडीई डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:49 ../comps-f33.xml.in.h:47 ../comps-f34.xml.in.h:47
+#, fuzzy
+msgid "Critical Path (LXQt)"
+msgstr "गंभीर पथ (एलएक्सडीई)"
+
+#: ../comps-f32.xml.in.h:50 ../comps-f33.xml.in.h:48 ../comps-f34.xml.in.h:48
+#, fuzzy
+msgid ""
+"A set of packages that provide the Critical Path functionality for the LXQt "
+"desktop"
+msgstr "संकुलों का सेट जो एलएक्सडीई डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:51 ../comps-f33.xml.in.h:49 ../comps-f34.xml.in.h:49
+msgid "Critical Path (Xfce)"
+msgstr "गंभीर पथ (एक्सएफसीई)"
+
+#: ../comps-f32.xml.in.h:52 ../comps-f33.xml.in.h:50 ../comps-f34.xml.in.h:50
+msgid ""
+"A set of packages that provide the Critical Path functionality for the Xfce "
+"desktop"
+msgstr "संकुलों का सेट जो एक्सएफसीई डेस्कटॉप के लिए गंभीर पथ कार्यशीलता देता है"
+
+#: ../comps-f32.xml.in.h:53 ../comps-f33.xml.in.h:51 ../comps-f34.xml.in.h:51
+#, fuzzy
+msgid "D Development Tools and Libraries"
+msgstr "विकास औज़ार और लाइब्रेरी."
+
+#: ../comps-f32.xml.in.h:54 ../comps-f33.xml.in.h:52 ../comps-f34.xml.in.h:52
+#, fuzzy
+msgid ""
+"These include development tools and libraries such as ldc, and geany-tag."
+msgstr "इन औज़ारों में ऑटोमेक, जीसीसी, पर्ल, पाइथन, और डिबगर जैसे केंद्रीय विकास औज़ार हैं."
+
+#: ../comps-f32.xml.in.h:55 ../comps-f33.xml.in.h:53 ../comps-f34.xml.in.h:53
+#, fuzzy
+#| msgid "Desktop Environments"
+msgid "Deepin Desktop Environment"
+msgstr "डेस्कटॉप वातावरण"
+
+#: ../comps-f32.xml.in.h:56 ../comps-f33.xml.in.h:54 ../comps-f34.xml.in.h:54
+msgid ""
+"Deepin Desktop is a desktop environment aims at being elegant and easy to "
+"use."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:57 ../comps-f33.xml.in.h:55 ../comps-f34.xml.in.h:55
+#, fuzzy
+#| msgid "Internet Applications"
+msgid "Deepin Desktop Applications"
+msgstr "इंटरनेट अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:58 ../comps-f33.xml.in.h:56 ../comps-f34.xml.in.h:56
+#, fuzzy
+#| msgid "Fonts packages for rendering text on the desktop."
+msgid "Media packages for Deepin Desktop"
+msgstr "डेस्कटॉप पर पाठ रेंडर करने के लिए फ़ॉन्ट संकुल"
+
+#: ../comps-f32.xml.in.h:59 ../comps-f33.xml.in.h:57 ../comps-f34.xml.in.h:57
+#, fuzzy
+#| msgid "Remote Desktop Clients"
+msgid "Deepin Desktop Office"
+msgstr "दूरस्थ डेस्कटॉप क्लाइंट"
+
+#: ../comps-f32.xml.in.h:60 ../comps-f33.xml.in.h:58 ../comps-f34.xml.in.h:58
+msgid "Office suite for Deepin Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:61 ../comps-f33.xml.in.h:59 ../comps-f34.xml.in.h:59
+msgid "Design Suite"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:62 ../comps-f33.xml.in.h:60 ../comps-f34.xml.in.h:60
+msgid ""
+"These packages are targeted towards professional designers, and are related "
+"to graphics, web and animation."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:63 ../comps-f33.xml.in.h:61 ../comps-f34.xml.in.h:61
+msgid "Development Libraries"
+msgstr "विकासात्मक लाइब्रेरी"
+
+#: ../comps-f32.xml.in.h:64 ../comps-f33.xml.in.h:62 ../comps-f34.xml.in.h:62
+msgid ""
+"The packages in this group are core libraries needed to develop applications."
+msgstr ""
+"इस समूह में समाहित संकुल वो क्रोड़ लाइब्रेरी-समूह हैं जो अनुप्रयोग विकास के लिए आवश्यक है."
+
+#: ../comps-f32.xml.in.h:65 ../comps-f33.xml.in.h:63 ../comps-f34.xml.in.h:63
+msgid "Development Tools"
+msgstr "विकासात्मक औज़ार"
+
+#: ../comps-f32.xml.in.h:66 ../comps-f33.xml.in.h:64 ../comps-f34.xml.in.h:64
+#, fuzzy
+msgid "These tools include general development tools such as git and CVS."
+msgstr "इन औज़ारों में ऑटोमेक, जीसीसी, पर्ल, पाइथन, और डिबगर जैसे केंद्रीय विकास औज़ार हैं."
+
+#: ../comps-f32.xml.in.h:67 ../comps-f33.xml.in.h:65 ../comps-f34.xml.in.h:65
+#: ../comps-epel7.xml.in.h:56
+msgid "Dial-up Networking Support"
+msgstr "डायलअप संजालन समर्थन"
+
+#: ../comps-f32.xml.in.h:68 ../comps-f33.xml.in.h:66 ../comps-f34.xml.in.h:66
+#: ../comps-epel7.xml.in.h:60
+msgid "Directory Server"
+msgstr "निर्देशिका सर्वर"
+
+#: ../comps-f32.xml.in.h:69 ../comps-f33.xml.in.h:67 ../comps-f34.xml.in.h:67
+#: ../comps-epel7.xml.in.h:61
+msgid "Machine and user identity servers."
+msgstr "मशीन और उपयोक्ता पहचान सर्वर."
+
+#: ../comps-f32.xml.in.h:70 ../comps-f33.xml.in.h:68 ../comps-f34.xml.in.h:68
+msgid "DNS Name Server"
+msgstr "DNS नाम सर्वर"
+
+#: ../comps-f32.xml.in.h:71 ../comps-f33.xml.in.h:69 ../comps-f34.xml.in.h:69
+msgid ""
+"This package group allows you to run a DNS name server (BIND) on the system."
+msgstr "इस संकुल समूह से आप तंत्र पर DNS नाम सर्वर (BIND) को चला सकते हैं."
+
+#: ../comps-f32.xml.in.h:72 ../comps-f33.xml.in.h:70 ../comps-f34.xml.in.h:70
+msgid "Dogtag Certificate System"
+msgstr "डॉगटैग प्रमाणपत्र प्रणालीडॉगटैग प्रमाणपत्र प्रमाण"
+
+#: ../comps-f32.xml.in.h:73 ../comps-f33.xml.in.h:71 ../comps-f34.xml.in.h:71
+msgid "Enterprise-class open source Certificate Authority"
+msgstr "एंटरप्राइज स्तरीय मुक्त स्रोत प्रमाणपत्र प्राधिकार"
+
+#: ../comps-f32.xml.in.h:74 ../comps-f33.xml.in.h:72 ../comps-f34.xml.in.h:72
+msgid "Domain Membership"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:75 ../comps-f33.xml.in.h:73 ../comps-f34.xml.in.h:73
+msgid "Support for joining a FreeIPA or Active Directory Domain"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:76 ../comps-f33.xml.in.h:74 ../comps-f34.xml.in.h:74
+msgid "Fedora Eclipse"
+msgstr "फेडोरा ग्रहण"
+
+#: ../comps-f32.xml.in.h:77 ../comps-f33.xml.in.h:75 ../comps-f34.xml.in.h:75
+msgid "Integrated Development Environments based on Eclipse."
+msgstr "एक्लीप्स पर आधारित एकीकृत विकास वातावरण"
+
+#: ../comps-f32.xml.in.h:78 ../comps-f33.xml.in.h:76 ../comps-f34.xml.in.h:76
+msgid "Editors"
+msgstr "संपादक"
+
+#: ../comps-f32.xml.in.h:79 ../comps-f33.xml.in.h:77 ../comps-f34.xml.in.h:77
+msgid ""
+"Sometimes called text editors, these are programs that allow you to create "
+"and edit text files. This includes Emacs and Vi."
+msgstr ""
+"कभी पाठ संपादक के नाम से जाने जाने वाले ये कार्यक्रम आपको फ़ाइल बनाने और संपादित करने की "
+"अनुमति देते हैं. इनमें ईमेक्स और वीआई है."
+
+#: ../comps-f32.xml.in.h:80 ../comps-f33.xml.in.h:78 ../comps-f34.xml.in.h:78
+#: ../comps-epel7.xml.in.h:65
+msgid "Educational Software"
+msgstr "शैक्षणिक सॉफ़्टवेयर"
+
+#: ../comps-f32.xml.in.h:81 ../comps-f33.xml.in.h:79 ../comps-f34.xml.in.h:79
+msgid "Educational software for learning"
+msgstr "प्रशिक्षण के लिये शैक्षणिक सॉफ़्टवेयर"
+
+#: ../comps-f32.xml.in.h:82 ../comps-f33.xml.in.h:80 ../comps-f34.xml.in.h:80
+#: ../comps-epel7.xml.in.h:67
+msgid "Electronic Lab"
+msgstr "इलेक्ट्रॉनिक प्रयोगशाला"
+
+#: ../comps-f32.xml.in.h:83 ../comps-f33.xml.in.h:81 ../comps-f34.xml.in.h:81
+#, fuzzy
+msgid "Design and simulation tools for hardware engineers"
+msgstr "हार्डवेयर इंजीनियर के लिए डिज़ायन व सिमुलेशन औज़ार"
+
+#: ../comps-f32.xml.in.h:84 ../comps-f33.xml.in.h:82 ../comps-f34.xml.in.h:82
+msgid "Engineering and Scientific"
+msgstr "अभियांत्रिक और वैज्ञानिक"
+
+#: ../comps-f32.xml.in.h:85 ../comps-f33.xml.in.h:83 ../comps-f34.xml.in.h:83
+msgid ""
+"This group includes packages for performing mathematical and scientific "
+"computations and plotting, as well as unit conversion."
+msgstr "इस समूह में गणित और वैज्ञानिक अभिकलन, प्लोट और इकाई बदलाव के लिए संकुल हैं."
+
+#: ../comps-f32.xml.in.h:86 ../comps-f33.xml.in.h:84 ../comps-f34.xml.in.h:84
+msgid "Enlightenment"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:87 ../comps-f33.xml.in.h:85 ../comps-f34.xml.in.h:85
+msgid ""
+"Enlightenment is a lean, fast, modular and very extensible windowed desktop "
+"environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:88
+msgid "Epiphany Web Browser"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:89
+msgid "Epiphany Web Browser for GNOME"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:90 ../comps-f33.xml.in.h:86 ../comps-f34.xml.in.h:86
+#: ../comps-epel7.xml.in.h:75 ../comps-epel8.xml.in.h:1
+msgid "Fedora Packager"
+msgstr "फेडोरा संकुलकर्ता"
+
+#: ../comps-f32.xml.in.h:91 ../comps-f33.xml.in.h:87 ../comps-f34.xml.in.h:87
+#, fuzzy
+msgid "Tools and utilities needed by a Fedora Packager"
+msgstr "फेडोरा पैकेजर के द्वारा जरूरी औज़ार और उपयोगिताएँ."
+
+#: ../comps-f32.xml.in.h:92 ../comps-f33.xml.in.h:88 ../comps-f34.xml.in.h:88
+msgid "Firefox Web Browser"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:93 ../comps-f33.xml.in.h:89 ../comps-f34.xml.in.h:89
+msgid "The Firefox web browser"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:94 ../comps-f33.xml.in.h:90 ../comps-f34.xml.in.h:90
+msgid "Font design and packaging"
+msgstr "फ़ॉन्ट डिज़ायन व संकुलन"
+
+#: ../comps-f32.xml.in.h:95 ../comps-f33.xml.in.h:91 ../comps-f34.xml.in.h:91
+msgid ""
+"This group is a collection of tools used in the design, modification, "
+"manipulation, and packaging of fonts."
+msgstr ""
+"यह समूह औज़ारों का संग्रह है जो कि फ़ॉन्ट के डिज़ायन, रूपांतरण, जोड़-तोड़ और संकुलन में प्रयुक्त "
+"होता है."
+
+#: ../comps-f32.xml.in.h:96 ../comps-f33.xml.in.h:92 ../comps-f34.xml.in.h:92
+#: ../comps-epel7.xml.in.h:80
+msgid "Fonts"
+msgstr "फ़ॉन्ट"
+
+#: ../comps-f32.xml.in.h:97 ../comps-f33.xml.in.h:93 ../comps-f34.xml.in.h:93
+msgid "Fonts packages for rendering text on the desktop."
+msgstr "डेस्कटॉप पर पाठ रेंडर करने के लिए फ़ॉन्ट संकुल"
+
+#: ../comps-f32.xml.in.h:98 ../comps-f33.xml.in.h:94 ../comps-f34.xml.in.h:94
+#, fuzzy
+msgid "FreeIPA Server"
+msgstr "FTP सर्वर"
+
+#: ../comps-f32.xml.in.h:99 ../comps-f33.xml.in.h:95 ../comps-f34.xml.in.h:95
+msgid ""
+"Provides central directory services for identity, policy management and "
+"auditing."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:100 ../comps-f33.xml.in.h:96 ../comps-f34.xml.in.h:96
+msgid "FTP Server"
+msgstr "FTP सर्वर"
+
+#: ../comps-f32.xml.in.h:101 ../comps-f33.xml.in.h:97 ../comps-f34.xml.in.h:97
+msgid "These tools allow you to run an FTP server on the system."
+msgstr "इन औज़ारों से तंत्र पर आप FTP सर्वर चला सकते हैं."
+
+#: ../comps-f32.xml.in.h:102 ../comps-f33.xml.in.h:98 ../comps-f34.xml.in.h:98
+msgid "Games and Entertainment"
+msgstr "खेल और मनोरंजन"
+
+#: ../comps-f32.xml.in.h:103 ../comps-f33.xml.in.h:99 ../comps-f34.xml.in.h:99
+msgid "Various ways to relax and spend your free time."
+msgstr "आपके मुफ्त समय बिताने और आराम करने के विविध तरीके."
+
+#: ../comps-f32.xml.in.h:104 ../comps-f33.xml.in.h:100
+#: ../comps-f34.xml.in.h:100
+msgid "GNOME"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:105 ../comps-f33.xml.in.h:101
+#: ../comps-f34.xml.in.h:101
+msgid "GNOME is a highly intuitive and user friendly desktop environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:106 ../comps-f33.xml.in.h:102
+#: ../comps-f34.xml.in.h:102
+msgid "Extra games for the GNOME Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:107 ../comps-f33.xml.in.h:103
+#: ../comps-f34.xml.in.h:103
+msgid "A variety of games for the GNOME Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:108 ../comps-f33.xml.in.h:104
+#: ../comps-f34.xml.in.h:104
+msgid "GNOME Software Development"
+msgstr "GNOME सॉफ़्टवेयर विकास"
+
+#: ../comps-f32.xml.in.h:109 ../comps-f33.xml.in.h:105
+#: ../comps-f34.xml.in.h:105
+msgid ""
+"Install these packages in order to develop GTK+ and GNOME graphical "
+"applications."
+msgstr "GTK+ और GNOME आलेखी अनुप्रयोगों का विकास करने के लिए इन संकुलों का संस्थापन करें."
+
+#: ../comps-f32.xml.in.h:110 ../comps-f33.xml.in.h:106
+#: ../comps-f34.xml.in.h:106
+msgid "Graphical Internet"
+msgstr "आलेखीय इंटरनेट"
+
+#: ../comps-f32.xml.in.h:111 ../comps-f33.xml.in.h:107
+#: ../comps-f34.xml.in.h:107
+#, fuzzy
+msgid "This group includes graphical email, web, and chat clients."
+msgstr "इस समूह में आलेखीय ईमेल, वेब और चैट क्लाइंट हैं."
+
+#: ../comps-f32.xml.in.h:112 ../comps-f33.xml.in.h:108
+#: ../comps-f34.xml.in.h:108
+msgid "Graphics"
+msgstr "चित्रादि"
+
+#: ../comps-f32.xml.in.h:113 ../comps-f33.xml.in.h:109
+#: ../comps-f34.xml.in.h:109
+msgid "This group includes packages to help you manipulate and scan images."
+msgstr "इस समूह में छवि के जोड़-तोड़ और स्कैनिंग करने के लिए संकुल शामिल हैं."
+
+#: ../comps-f32.xml.in.h:114 ../comps-f33.xml.in.h:110
+#: ../comps-f34.xml.in.h:110
+msgid "Guest Agents"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:115 ../comps-f33.xml.in.h:111
+#: ../comps-f34.xml.in.h:111
+msgid "Agents used when running under a hypervisor."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:116 ../comps-f33.xml.in.h:112
+#: ../comps-f34.xml.in.h:112
+msgid "Guest Desktop Agents"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:117 ../comps-f33.xml.in.h:113
+#: ../comps-f34.xml.in.h:113
+msgid "Agents used when running as a virtualized desktop."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:118 ../comps-f33.xml.in.h:114
+#: ../comps-f34.xml.in.h:114
+msgid "High Availability"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:119 ../comps-f33.xml.in.h:115
+#: ../comps-f34.xml.in.h:115
+msgid "Infrastructure for highly available services and/or shared storage."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:120 ../comps-f33.xml.in.h:116
+#: ../comps-f34.xml.in.h:116
+msgid "HAProxy"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:121 ../comps-f33.xml.in.h:117
+#: ../comps-f34.xml.in.h:117
+msgid "TCP/HTTP Load Balancer."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:122 ../comps-f33.xml.in.h:118
+#: ../comps-f34.xml.in.h:118
+msgid "Hardware Support"
+msgstr "हार्डवेयर समर्थन"
+
+#: ../comps-f32.xml.in.h:123 ../comps-f33.xml.in.h:119
+#: ../comps-f34.xml.in.h:119
+msgid ""
+"This group is a collection of tools for various hardware specific utilities."
+msgstr "यह समूह विविध हार्डवेयर विशिष्ट उपयोगिता के लिये औज़ारों का समूह है."
+
+#: ../comps-f32.xml.in.h:124 ../comps-f33.xml.in.h:120
+#: ../comps-f34.xml.in.h:120 ../comps-epel7.xml.in.h:101
+msgid "Haskell"
+msgstr "हास्केल"
+
+#: ../comps-f32.xml.in.h:125 ../comps-f33.xml.in.h:121
+#: ../comps-f34.xml.in.h:121 ../comps-epel7.xml.in.h:102
+msgid "Support for developing programs in the Haskell programming language."
+msgstr "हास्केल प्रोग्रामिंग भाषा में प्रोग्राम बनाने के लिये समर्थन"
+
+#: ../comps-f32.xml.in.h:126 ../comps-f33.xml.in.h:122
+#: ../comps-f34.xml.in.h:122
+#, fuzzy
+msgid "Headless Management"
+msgstr "तंत्र प्रबंधन"
+
+#: ../comps-f32.xml.in.h:127 ../comps-f33.xml.in.h:123
+#: ../comps-f34.xml.in.h:123
+msgid "Tools for managing the system without an attached graphical console."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:128 ../comps-f33.xml.in.h:124
+#: ../comps-f34.xml.in.h:124 ../comps-epel7.xml.in.h:111
+msgid "Input Methods"
+msgstr "इनपुट विधि"
+
+#: ../comps-f32.xml.in.h:129 ../comps-f33.xml.in.h:125
+#: ../comps-f34.xml.in.h:125
+msgid "Input method packages for the input of international text."
+msgstr "अंतरराष्ट्रीय पाठ की इनपुट के लिए इनपुट विधि संकुल."
+
+#: ../comps-f32.xml.in.h:130 ../comps-f33.xml.in.h:126
+#: ../comps-f34.xml.in.h:126
+msgid "Java"
+msgstr "जावा"
+
+#: ../comps-f32.xml.in.h:131 ../comps-f33.xml.in.h:127
+#: ../comps-f34.xml.in.h:127
+msgid "Support for running programs written in the Java programming language."
+msgstr "जावा प्रोग्रामिंग भाषा में लिखे प्रोग्राम को चलाने के लिये समर्थन"
+
+#: ../comps-f32.xml.in.h:132 ../comps-f33.xml.in.h:128
+#: ../comps-f34.xml.in.h:128
+msgid "Java Development"
+msgstr "जावा विकास"
+
+#: ../comps-f32.xml.in.h:133 ../comps-f33.xml.in.h:129
+#: ../comps-f34.xml.in.h:129
+msgid "Support for developing programs in the Java programming language."
+msgstr "जावा प्रोग्रामिंग भाषा में प्रोग्राम बनाने के लिये समर्थन"
+
+#: ../comps-f32.xml.in.h:134 ../comps-f33.xml.in.h:130
+#: ../comps-f34.xml.in.h:130
+#, fuzzy
+msgid "Java Application Server"
+msgstr "अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:135 ../comps-f33.xml.in.h:131
+#: ../comps-f34.xml.in.h:131
+msgid "Java application server."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:136 ../comps-f33.xml.in.h:132
+#: ../comps-f34.xml.in.h:132 ../comps-epel8.xml.in.h:5
+msgid "KDE Applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:137 ../comps-f33.xml.in.h:133
+#: ../comps-f34.xml.in.h:133 ../comps-epel8.xml.in.h:6
+msgid "A set of commonly used KDE applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:138 ../comps-f33.xml.in.h:134
+#: ../comps-f34.xml.in.h:134 ../comps-epel8.xml.in.h:7
+msgid "KDE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:139 ../comps-f33.xml.in.h:135
+#: ../comps-f34.xml.in.h:135 ../comps-epel8.xml.in.h:8
+msgid ""
+"The KDE Plasma Workspaces, a highly-configurable graphical user interface "
+"which includes a panel, desktop, system icons and desktop widgets, and many "
+"powerful KDE applications."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:140 ../comps-f33.xml.in.h:136
+#: ../comps-f34.xml.in.h:136 ../comps-epel8.xml.in.h:9
+msgid "KDE Educational applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:141 ../comps-f33.xml.in.h:137
+#: ../comps-f34.xml.in.h:137 ../comps-epel8.xml.in.h:10
+msgid "KDE Multimedia support"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:142 ../comps-f33.xml.in.h:138
+#: ../comps-f34.xml.in.h:138 ../comps-epel8.xml.in.h:11
+msgid "Multimedia support for KDE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:143 ../comps-f33.xml.in.h:139
+#: ../comps-f34.xml.in.h:139 ../comps-epel8.xml.in.h:12
+msgid "KDE Office"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:144 ../comps-f33.xml.in.h:140
+#: ../comps-f34.xml.in.h:140 ../comps-epel8.xml.in.h:13
+msgid "KDE Office applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:145 ../comps-f33.xml.in.h:141
+#: ../comps-f34.xml.in.h:141 ../comps-epel8.xml.in.h:14
+msgid "KDE Software Development"
+msgstr "KDE सॉफ़्टवेयर विकास"
+
+#: ../comps-f32.xml.in.h:146 ../comps-f33.xml.in.h:142
+#: ../comps-f34.xml.in.h:142 ../comps-epel8.xml.in.h:15
+#, fuzzy
+msgid "Install these packages to develop Qt and KDE graphical applications."
+msgstr "QT और KDE आलेखी अनुप्रयोगों का विकास करने के लिए इन संकुलों का संस्थापन करें."
+
+#: ../comps-f32.xml.in.h:147 ../comps-f33.xml.in.h:143
+#: ../comps-f34.xml.in.h:143
+msgid "KDE Telepathy"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:148 ../comps-f33.xml.in.h:144
+#: ../comps-f34.xml.in.h:144
+msgid "KDE Telepathy applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:149 ../comps-f33.xml.in.h:145
+#: ../comps-f34.xml.in.h:145 ../comps-epel8.xml.in.h:16
+#, fuzzy
+msgid "KDE Frameworks 5 Software Development"
+msgstr "KDE सॉफ़्टवेयर विकास"
+
+#: ../comps-f32.xml.in.h:150 ../comps-f33.xml.in.h:146
+#: ../comps-f34.xml.in.h:146 ../comps-epel8.xml.in.h:17
+#, fuzzy
+msgid ""
+"Install these packages to develop applications using Qt5 and KDE Frameworks "
+"5."
+msgstr "QT और KDE आलेखी अनुप्रयोगों का विकास करने के लिए इन संकुलों का संस्थापन करें."
+
+#: ../comps-f32.xml.in.h:151 ../comps-f33.xml.in.h:147
+#: ../comps-f34.xml.in.h:147
+msgid "Legacy Fonts"
+msgstr "पुराना फ़ॉन्ट"
+
+#: ../comps-f32.xml.in.h:152 ../comps-f33.xml.in.h:148
+#: ../comps-f34.xml.in.h:148
+msgid "Older bitmap and vector fonts packages"
+msgstr "पुराना बिटमैप और सदिश फ़ॉन्ट संकुल"
+
+#: ../comps-f32.xml.in.h:153 ../comps-f33.xml.in.h:149
+#: ../comps-f34.xml.in.h:149
+msgid "Legacy Network Server"
+msgstr "पुरातन संजाल सर्वर"
+
+#: ../comps-f32.xml.in.h:154 ../comps-f33.xml.in.h:150
+#: ../comps-f34.xml.in.h:150
+msgid ""
+"These packages include servers for old network protocols such as rsh and "
+"telnet."
+msgstr "इन संकुलों में rsh और टेलनेट जैसे प्राचीन संजाल प्रोटोकॉल के लिए सर्वर शामिल हैं."
+
+#: ../comps-f32.xml.in.h:155
+msgid "Legacy Software Development"
+msgstr "पुरातन सॉफ़्टवेयर विकास"
+
+#: ../comps-f32.xml.in.h:156
+msgid "These packages provide compatibility with previous releases."
+msgstr "ये संकुल पूर्व विमोचनों लिए सुसंगतता समर्थन उपलब्ध कराता है."
+
+#: ../comps-f32.xml.in.h:157
+msgid "Legacy Software Support"
+msgstr "पुरातन सॉफ़्टवेयर समर्थन"
+
+#: ../comps-f32.xml.in.h:158 ../comps-f33.xml.in.h:151
+#: ../comps-f34.xml.in.h:151
+msgid "LibreOffice"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:159 ../comps-f33.xml.in.h:152
+#: ../comps-f34.xml.in.h:152
+msgid "LibreOffice Productivity Suite"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:160 ../comps-f33.xml.in.h:153
+#: ../comps-f34.xml.in.h:153
+msgid "LibreOffice Development"
+msgstr "लिब्रेऑफ़िस विकास"
+
+#: ../comps-f32.xml.in.h:161 ../comps-f33.xml.in.h:154
+#: ../comps-f34.xml.in.h:154
+msgid ""
+"These packages are helpful when developing LibreOffice extensions or macros."
+msgstr "ये संकुल तब मददगार हैं जब लिब्रेऑफिस या मैक्रो का विकास हो रहा है."
+
+#: ../comps-f32.xml.in.h:162 ../comps-f33.xml.in.h:155
+#: ../comps-f34.xml.in.h:155
+msgid "Load Balancer"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:163 ../comps-f33.xml.in.h:156
+#: ../comps-f34.xml.in.h:156
+msgid "Load balancing support for network traffic"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:164 ../comps-f33.xml.in.h:157
+#: ../comps-f34.xml.in.h:157
+msgid "Applications for the LXDE Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:165 ../comps-f33.xml.in.h:158
+#: ../comps-f34.xml.in.h:158
+msgid "A set of commonly used applications for the LXDE Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:166 ../comps-f33.xml.in.h:159
+#: ../comps-f34.xml.in.h:159
+msgid "LXDE"
+msgstr "LXDE"
+
+#: ../comps-f32.xml.in.h:167 ../comps-f33.xml.in.h:160
+#: ../comps-f34.xml.in.h:160
+msgid ""
+"LXDE is a lightweight X11 desktop environment designed for computers with "
+"low hardware specifications like netbooks, mobile devices or older computers."
+msgstr ""
+"LXDE एक हल्का X11 डेस्कटॉप वातावरण है जो कि वैसे कंप्यूटरों के लिए डिजायन किया गया है जो "
+"नेटबुक, मोबाइल युक्तियाँ या पुराने कंप्यूटर हैं."
+
+#: ../comps-f32.xml.in.h:168 ../comps-f33.xml.in.h:161
+#: ../comps-f34.xml.in.h:161
+msgid "Multimedia support for LXDE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:169 ../comps-f33.xml.in.h:162
+#: ../comps-f34.xml.in.h:162
+msgid "LXDE Office"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:170 ../comps-f33.xml.in.h:163
+#: ../comps-f34.xml.in.h:163
+msgid "Office suite for LXDE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:171 ../comps-f33.xml.in.h:164
+#: ../comps-f34.xml.in.h:164
+#, fuzzy
+msgid "Applications for the LXQt Desktop"
+msgstr "कार्य विविधता के लिये अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:172 ../comps-f33.xml.in.h:165
+#: ../comps-f34.xml.in.h:165
+msgid "A set of commonly used applications for the LXQt Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:173 ../comps-f33.xml.in.h:166
+#: ../comps-f34.xml.in.h:166
+msgid "LXQt"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:174 ../comps-f33.xml.in.h:167
+#: ../comps-f34.xml.in.h:167 ../comps-epel7.xml.in.h:150
+#, fuzzy
+msgid ""
+"LXQt is a lightweight X11 desktop environment designed for computers with "
+"low hardware specifications like netbooks, mobile devices or older computers."
+msgstr ""
+"LXDE एक हल्का X11 डेस्कटॉप वातावरण है जो कि वैसे कंप्यूटरों के लिए डिजायन किया गया है जो "
+"नेटबुक, मोबाइल युक्तियाँ या पुराने कंप्यूटर हैं."
+
+#: ../comps-f32.xml.in.h:175 ../comps-f33.xml.in.h:168
+#: ../comps-f34.xml.in.h:168
+msgid "Translations of LXQt"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:176 ../comps-f33.xml.in.h:169
+#: ../comps-f34.xml.in.h:169
+msgid "Multimedia support for LXQt"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:177 ../comps-f33.xml.in.h:170
+#: ../comps-f34.xml.in.h:170
+msgid "LXQt Office"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:178 ../comps-f33.xml.in.h:171
+#: ../comps-f34.xml.in.h:171
+msgid "Office suite for LXQt"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:179 ../comps-f33.xml.in.h:172
+#: ../comps-f34.xml.in.h:172
+msgid "Mail Server"
+msgstr "डाक सर्वर"
+
+#: ../comps-f32.xml.in.h:180 ../comps-f33.xml.in.h:173
+#: ../comps-f34.xml.in.h:173
+msgid "These packages allow you to configure an IMAP or SMTP mail server."
+msgstr "ये संकुल आपको IMAP या SMTP डाक सर्वर का विन्यास करने का अनुमति देता है."
+
+#: ../comps-f32.xml.in.h:181 ../comps-f33.xml.in.h:174
+#: ../comps-f34.xml.in.h:174
+#, fuzzy
+msgid "MATE Applications"
+msgstr "अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:182 ../comps-f33.xml.in.h:175
+#: ../comps-f34.xml.in.h:175
+#, fuzzy
+msgid "Applications for the MATE Desktop."
+msgstr "कार्य विविधता के लिये अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:183 ../comps-f33.xml.in.h:176
+#: ../comps-f34.xml.in.h:176 ../comps-epel7.xml.in.h:164
+msgid "MATE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:184 ../comps-f33.xml.in.h:177
+#: ../comps-f34.xml.in.h:177 ../comps-epel7.xml.in.h:165
+msgid ""
+"MATE Desktop is based on GNOME 2 and provides a powerful graphical user "
+"interface for users who seek a simple easy to use traditional desktop "
+"interface."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:185
+msgid "Medical Applications"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:186
+msgid "This is a group of applications related to health care."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:187 ../comps-f33.xml.in.h:178
+#: ../comps-f34.xml.in.h:178 ../comps-epel7.xml.in.h:166
+msgid "Milkymist"
+msgstr "मिल्कीमिस्ट"
+
+#: ../comps-f32.xml.in.h:188 ../comps-f33.xml.in.h:179
+#: ../comps-f34.xml.in.h:179 ../comps-epel7.xml.in.h:167
+msgid "Toolchain for Milkymist hardware engineers."
+msgstr "मिल्कीमिस्ट हार्डवेयर इंजीनियर्स के लिए औज़ारशृंखला"
+
+#: ../comps-f32.xml.in.h:189 ../comps-f33.xml.in.h:180
+#: ../comps-f34.xml.in.h:180
+msgid "MinGW cross-compiler"
+msgstr "MinGW क्रॉस कंपाइलर"
+
+#: ../comps-f32.xml.in.h:190 ../comps-f33.xml.in.h:181
+#: ../comps-f34.xml.in.h:181
+msgid ""
+"Support for cross-compiling programs to 32 bit Windows targets, testing "
+"them, and building installers, all from within Fedora."
+msgstr ""
+"32 बिट विंडोज लक्ष्य में क्रास कंपाइलिंग प्रोग्राम के लिए समर्थन, उन्हें जाँचना, और संस्थापक "
+"का निर्माण, सभी कुछ फेडोरा के अंदर."
+
+#: ../comps-f32.xml.in.h:191 ../comps-f33.xml.in.h:182
+#: ../comps-f34.xml.in.h:182
+msgid "MongoDB"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:192 ../comps-f33.xml.in.h:183
+#: ../comps-f34.xml.in.h:183
+msgid "Scalable, high-performance NoSQL database."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:193 ../comps-f33.xml.in.h:184
+#: ../comps-f34.xml.in.h:184
+msgid "Multimedia"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:194 ../comps-f33.xml.in.h:185
+#: ../comps-f34.xml.in.h:185
+msgid "Audio/video framework common to desktops"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:195 ../comps-f33.xml.in.h:186
+#: ../comps-f34.xml.in.h:186
+msgid "MariaDB (MySQL) Database"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:196 ../comps-f33.xml.in.h:187
+#: ../comps-f34.xml.in.h:187
+msgid ""
+"This package group contains packages useful for use with MariaDB (MySQL)."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:197 ../comps-f33.xml.in.h:188
+#: ../comps-f34.xml.in.h:188
+msgid "Network Servers"
+msgstr "संजाल सर्वर"
+
+#: ../comps-f32.xml.in.h:198 ../comps-f33.xml.in.h:189
+#: ../comps-f34.xml.in.h:189
+msgid ""
+"These packages include network-based servers such as DHCP, Kerberos and NIS."
+msgstr "इन संकुल में DHCP, करबरोस और NIS जैसे संजाल-आधारित सर्वर हैं."
+
+#: ../comps-f32.xml.in.h:199 ../comps-f33.xml.in.h:190
+#: ../comps-f34.xml.in.h:190
+msgid "Common NetworkManager Submodules"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:200 ../comps-f33.xml.in.h:191
+#: ../comps-f34.xml.in.h:191
+msgid ""
+"This group contains NetworkManager submodules that are commonly used, but "
+"may not be wanted in some streamlined configurations."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:201 ../comps-f33.xml.in.h:192
+#: ../comps-f34.xml.in.h:192
+msgid "Neuron Modelling Simulators"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:202 ../comps-f33.xml.in.h:193
+#: ../comps-f34.xml.in.h:193
+msgid ""
+"This group includes simulators used in modelling of neurons and their "
+"networks."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:203 ../comps-f33.xml.in.h:194
+#: ../comps-f34.xml.in.h:194
+msgid "News Server"
+msgstr "समाचार सर्वर"
+
+#: ../comps-f32.xml.in.h:204 ../comps-f33.xml.in.h:195
+#: ../comps-f34.xml.in.h:195
+msgid "This group allows you to configure the system as a news server."
+msgstr "यह समूह बतौर समाचार सर्वर तंत्र विन्यासित करने की अनुमति आपको देता है."
+
+#: ../comps-f32.xml.in.h:205 ../comps-f33.xml.in.h:196
+#: ../comps-f34.xml.in.h:196
+msgid "OCaml"
+msgstr "OCaml"
+
+#: ../comps-f32.xml.in.h:206 ../comps-f33.xml.in.h:197
+#: ../comps-f34.xml.in.h:197
+#, fuzzy
+msgid ""
+"Support for developing software using the Objective Caml programming "
+"language and libraries."
+msgstr ""
+"वस्तुनिष्ठ CAML प्रोग्रामिंग भाषा व लाइब्रेरी के प्रयोग से सॉफ़्टवेयर विकास के लिए समर्थन."
+
+#: ../comps-f32.xml.in.h:207 ../comps-f33.xml.in.h:198
+#: ../comps-f34.xml.in.h:198
+msgid "Office/Productivity"
+msgstr "कार्यालय/उत्पादकता"
+
+#: ../comps-f32.xml.in.h:208 ../comps-f33.xml.in.h:199
+#: ../comps-f34.xml.in.h:199
+msgid "The applications include office suites, PDF viewers, and more."
+msgstr "अनुप्रयोग में कार्यालय सर्वांग, PDF दर्शक, और भी कई चीजें हैं."
+
+#: ../comps-f32.xml.in.h:209
+msgid "Online Help and Documentation"
+msgstr "ऑनलाइन मदद व दस्तावेज़ीकरण"
+
+#: ../comps-f32.xml.in.h:210 ../comps-f33.xml.in.h:200
+#: ../comps-f34.xml.in.h:200
+#, fuzzy
+msgid "Pantheon Desktop"
+msgstr "डेस्कटॉप"
+
+#: ../comps-f32.xml.in.h:211 ../comps-f33.xml.in.h:201
+#: ../comps-f34.xml.in.h:201
+msgid "The Pantheon desktop environment is the DE that powers elementaryOS."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:212 ../comps-f33.xml.in.h:202
+#: ../comps-f34.xml.in.h:202
+msgid "Perl Development"
+msgstr "पर्ल विकास"
+
+#: ../comps-f32.xml.in.h:213 ../comps-f33.xml.in.h:203
+#: ../comps-f34.xml.in.h:203
+msgid "Support for developing programs in the Perl programming language."
+msgstr "पर्ल प्रोग्रामिंग भाषा में प्रोग्राम के विकास के लिए समर्थन"
+
+#: ../comps-f32.xml.in.h:214 ../comps-f33.xml.in.h:204
+#: ../comps-f34.xml.in.h:204
+msgid "Perl for Web"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:215 ../comps-f33.xml.in.h:205
+#: ../comps-f34.xml.in.h:205
+msgid "Basic Perl web application support."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:216 ../comps-f33.xml.in.h:208
+#: ../comps-f34.xml.in.h:208
+msgid "PHP"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:217 ../comps-f33.xml.in.h:209
+#: ../comps-f34.xml.in.h:209
+msgid "General-purpose web development scripting language."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:218 ../comps-f33.xml.in.h:210
+#: ../comps-f34.xml.in.h:210
+#, fuzzy
+#| msgid "Marathi Support"
+msgid "VMware Platform Support"
+msgstr "मराठी समर्थन"
+
+#: ../comps-f32.xml.in.h:219 ../comps-f33.xml.in.h:211
+#: ../comps-f34.xml.in.h:211
+msgid "Packages to install in VMware virtual machines"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:220 ../comps-f33.xml.in.h:212
+#: ../comps-f34.xml.in.h:212
+msgid "Printing Support"
+msgstr "छपाई समर्थन"
+
+#: ../comps-f32.xml.in.h:221 ../comps-f33.xml.in.h:213
+#: ../comps-f34.xml.in.h:213
+msgid ""
+"Install these tools to enable the system to print or act as a print server."
+msgstr "तंत्र को छपाई या मुद्रण सर्वर में समर्थ बनाने के लिए इन औज़ारों का संस्थापन करें."
+
+#: ../comps-f32.xml.in.h:222 ../comps-f33.xml.in.h:214
+#: ../comps-f34.xml.in.h:214
+msgid "Python Classroom"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:223 ../comps-f33.xml.in.h:215
+#: ../comps-f34.xml.in.h:215
+msgid "Tools used to teach and learn Python."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:224 ../comps-f33.xml.in.h:216
+#: ../comps-f34.xml.in.h:216
+msgid "Python Science"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:225 ../comps-f33.xml.in.h:217
+#: ../comps-f34.xml.in.h:217
+msgid "Tools used to do science in Python."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:226 ../comps-f33.xml.in.h:218
+#: ../comps-f34.xml.in.h:218
+msgid "Robotics"
+msgstr "रोबोटिक्स"
+
+#: ../comps-f32.xml.in.h:227 ../comps-f33.xml.in.h:219
+#: ../comps-f34.xml.in.h:219
+msgid "Suite of packages for robotics development"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:228 ../comps-f33.xml.in.h:220
+#: ../comps-f34.xml.in.h:220
+msgid "RPM Development Tools"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:229 ../comps-f33.xml.in.h:221
+#: ../comps-f34.xml.in.h:221
+msgid "These tools include core development tools such rpmbuild."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:230 ../comps-f33.xml.in.h:222
+#: ../comps-f34.xml.in.h:222
+msgid "Ruby"
+msgstr "रूबी"
+
+#: ../comps-f32.xml.in.h:231 ../comps-f33.xml.in.h:223
+#: ../comps-f34.xml.in.h:223
+msgid "Basic support for the Ruby programming language."
+msgstr "रूबी प्रोग्रामिंग भाषा के लिए आधारभूत समर्थन"
+
+#: ../comps-f32.xml.in.h:232 ../comps-f33.xml.in.h:224
+#: ../comps-f34.xml.in.h:224
+msgid "Ruby on Rails"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:233 ../comps-f33.xml.in.h:225
+#: ../comps-f34.xml.in.h:225
+msgid "Ruby on Rails web application stack."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:234 ../comps-f33.xml.in.h:226
+#: ../comps-f34.xml.in.h:226
+msgid "Security Lab"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:235 ../comps-f33.xml.in.h:227
+#: ../comps-f34.xml.in.h:227
+msgid ""
+"Tools for security auditing, forensics, system rescue, and teaching security "
+"testing methodologies."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:236 ../comps-f33.xml.in.h:228
+#: ../comps-f34.xml.in.h:228
+msgid "Server Configuration Tools"
+msgstr "सर्वर विन्यास औज़ार"
+
+#: ../comps-f32.xml.in.h:237 ../comps-f33.xml.in.h:229
+#: ../comps-f34.xml.in.h:229
+msgid "This group contains all of Red Hat's custom server configuration tools."
+msgstr "इस समूह में Red Hat के सभी चुनने योग्य सर्वर विन्यास औज़ार समाहित है."
+
+#: ../comps-f32.xml.in.h:238 ../comps-f33.xml.in.h:230
+#: ../comps-f34.xml.in.h:230
+msgid "Hardware Support for Server Systems"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:239 ../comps-f33.xml.in.h:231
+#: ../comps-f34.xml.in.h:231
+msgid ""
+"This group is a limited collection of tools for various uncommon hardware "
+"specific utilities."
+msgstr ""
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:241 ../comps-f33.xml.in.h:233
+#: ../comps-f34.xml.in.h:233
+msgid "Fedora Server product core"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:242 ../comps-f33.xml.in.h:234
+#: ../comps-f34.xml.in.h:234
+#, fuzzy
+msgid "Packages mandatory for the server product."
+msgstr "सर्वर चर के लिए नीति संकुल."
+
+#: ../comps-f32.xml.in.h:243 ../comps-f33.xml.in.h:235
+#: ../comps-f34.xml.in.h:235
+msgid "Windows File Server"
+msgstr "विंडोज़ फ़ाइल सर्वर"
+
+#: ../comps-f32.xml.in.h:244 ../comps-f33.xml.in.h:236
+#: ../comps-f34.xml.in.h:236
+msgid ""
+"This package group allows you to share files between Linux and MS "
+"Windows(tm) systems."
+msgstr ""
+"इस संकुल समूह से आप Linux और MS Windows(tm) तंत्रों के बीच फ़ाइल हिस्सेदारी कर सकते हैं."
+
+#: ../comps-f32.xml.in.h:245 ../comps-f33.xml.in.h:237
+#: ../comps-f34.xml.in.h:237
+msgid "Sound and Video"
+msgstr "ध्वनि और वीडियो"
+
+#: ../comps-f32.xml.in.h:246 ../comps-f33.xml.in.h:238
+#: ../comps-f34.xml.in.h:238
+msgid ""
+"From CD recording to playing audio CDs and multimedia files, this package "
+"group allows you to work with sound and video on the system."
+msgstr ""
+"CD अभिलेखन से लेकर श्रव्य CD और बहुमाध्यम फ़ाइल को चलाने में, यह संकुल समूह, तंत्र पर ध्वनि "
+"और वीडियो के साथ काम करने की अनुमति देता है."
+
+#: ../comps-f32.xml.in.h:247 ../comps-f33.xml.in.h:239
+#: ../comps-f34.xml.in.h:239
+msgid "PostgreSQL Database"
+msgstr "PostgreSQL आंकडा आधार"
+
+#: ../comps-f32.xml.in.h:248 ../comps-f33.xml.in.h:240
+#: ../comps-f34.xml.in.h:240
+#, fuzzy
+msgid "This package group includes packages useful for use with PostgreSQL."
+msgstr "इस संकुल समूह में Postgresql के साथ उपयोग के लिए जरूरी संकुल शामिल है."
+
+#: ../comps-f32.xml.in.h:249 ../comps-f33.xml.in.h:241
+#: ../comps-f34.xml.in.h:241
+msgid "Standard"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:250 ../comps-f33.xml.in.h:242
+#: ../comps-f34.xml.in.h:242
+msgid "Common set of utilities that extend the minimal installation."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:251 ../comps-f33.xml.in.h:243
+#: ../comps-f34.xml.in.h:243
+msgid "Additional Sugar Activities"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:252 ../comps-f33.xml.in.h:244
+#: ../comps-f34.xml.in.h:244
+msgid "Additional activities for use with the Sugar Environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:253 ../comps-f33.xml.in.h:245
+#: ../comps-f34.xml.in.h:245
+msgid "Sugar Desktop Environment"
+msgstr "सुगर डेस्कटॉप वातावरण"
+
+#: ../comps-f32.xml.in.h:254 ../comps-f33.xml.in.h:246
+#: ../comps-f34.xml.in.h:246
+msgid "A software playground for learning about learning."
+msgstr "प्रशिक्षण के बारे में सीखने के लिए सॉफ़्टवेयर क्रीड़ास्थली"
+
+#: ../comps-f32.xml.in.h:255 ../comps-f33.xml.in.h:247
+#: ../comps-f34.xml.in.h:247
+msgid "System Tools"
+msgstr "तंत्र औज़ार"
+
+#: ../comps-f32.xml.in.h:256 ../comps-f33.xml.in.h:248
+#: ../comps-f34.xml.in.h:248
+msgid ""
+"This group is a collection of various tools for the system, such as the "
+"client for connecting to SMB shares and tools to monitor network traffic."
+msgstr ""
+"यह समूह तंत्र के लिए विविध औज़ारों का संचय है, जैसे SMB साझा से क्लाइंट के संबंधन के लिए और "
+"संजाल यातायात मॉनीटर करने के लिए औज़ार."
+
+#: ../comps-f32.xml.in.h:257 ../comps-f33.xml.in.h:249
+#: ../comps-f34.xml.in.h:249
+msgid "Text-based Internet"
+msgstr "पाठ्यांश-आधारित इंटरनेट"
+
+#: ../comps-f32.xml.in.h:258 ../comps-f33.xml.in.h:250
+#: ../comps-f34.xml.in.h:250
+#, fuzzy
+msgid ""
+"This group includes text-based email, web, and chat clients. These "
+"applications do not require the X Window System."
+msgstr ""
+"इस समूह में पाठ्यांश आधारित ईमेल, वेब, और चैट क्लाइंट है. इन अनुप्रयोगों को X विंडो तंत्र "
+"आवश्यक नहीं है."
+
+#: ../comps-f32.xml.in.h:259 ../comps-f33.xml.in.h:251
+#: ../comps-f34.xml.in.h:251
+msgid "Tomcat"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:260 ../comps-f33.xml.in.h:252
+#: ../comps-f34.xml.in.h:252
+msgid "Tomcat web application server."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:261 ../comps-f33.xml.in.h:253
+#: ../comps-f34.xml.in.h:253
+msgid "Vagrant with libvirt support"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:262 ../comps-f33.xml.in.h:254
+#: ../comps-f34.xml.in.h:254
+msgid "These packages provide Vagrant with libvirt provider support"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:263 ../comps-f33.xml.in.h:255
+#: ../comps-f34.xml.in.h:255 ../comps-epel7.xml.in.h:277
+msgid "Virtualization"
+msgstr "दृश्यकरण"
+
+#: ../comps-f32.xml.in.h:264 ../comps-f33.xml.in.h:256
+#: ../comps-f34.xml.in.h:256
+msgid "These packages provide a graphical virtualization environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:265 ../comps-f33.xml.in.h:257
+#: ../comps-f34.xml.in.h:257
+msgid "Headless Virtualization"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:266 ../comps-f33.xml.in.h:258
+#: ../comps-f34.xml.in.h:258
+msgid "These packages provide a headless virtualization environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:267 ../comps-f33.xml.in.h:259
+#: ../comps-f34.xml.in.h:259
+msgid "Basic Web Server"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:268 ../comps-f33.xml.in.h:260
+#: ../comps-f34.xml.in.h:260
+msgid "These tools allow you to run a Web server on the system."
+msgstr "इन औज़ारों से तंत्र पर आप वेब सर्वर चला सकते हैं."
+
+#: ../comps-f32.xml.in.h:269 ../comps-f33.xml.in.h:261
+#: ../comps-f34.xml.in.h:261
+msgid "Window Managers"
+msgstr "विंडो प्रबंधक"
+
+#: ../comps-f32.xml.in.h:270 ../comps-f33.xml.in.h:262
+#: ../comps-f34.xml.in.h:262
+msgid ""
+"Simple window managers that aren't part of a larger desktop environment."
+msgstr "साधारण विंडो प्रबंधक जो कि बड़े डेस्कटॉप वातावरण का हिस्सा नहीं है."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:272 ../comps-f33.xml.in.h:264
+#: ../comps-f34.xml.in.h:264
+#, fuzzy
+msgid "Fedora Workstation ostree support"
+msgstr "वर्कस्टेशन नीति"
+
+#: ../comps-f32.xml.in.h:273 ../comps-f33.xml.in.h:265
+#: ../comps-f34.xml.in.h:265
+#, fuzzy
+msgid "Packages mandatory for the workstation ostree product."
+msgstr "वर्कस्टेशन चर के लिए नीति संकुल."
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:275 ../comps-f33.xml.in.h:267
+#: ../comps-f34.xml.in.h:267
+msgid "Fedora Workstation product core"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:276 ../comps-f33.xml.in.h:268
+#: ../comps-f34.xml.in.h:268
+#, fuzzy
+msgid "Packages mandatory for the workstation product."
+msgstr "वर्कस्टेशन चर के लिए नीति संकुल."
+
+#: ../comps-f32.xml.in.h:277 ../comps-f33.xml.in.h:269
+#: ../comps-f34.xml.in.h:269
+msgid "X Software Development"
+msgstr "X सॉफ़्टवेयर विकास"
+
+#: ../comps-f32.xml.in.h:278 ../comps-f33.xml.in.h:270
+#: ../comps-f34.xml.in.h:270
+msgid ""
+"These packages allow you to develop applications for the X Window System."
+msgstr "इन संकुलों से आप X विन्डो तंत्र के लिए अनुप्रयोगों का विकास कर सकते हैं."
+
+#: ../comps-f32.xml.in.h:279 ../comps-f33.xml.in.h:271
+#: ../comps-f34.xml.in.h:271
+msgid "Applications for the Xfce Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:280 ../comps-f33.xml.in.h:272
+#: ../comps-f34.xml.in.h:272
+msgid "A set of commonly used applications for the Xfce Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:281 ../comps-f33.xml.in.h:273
+#: ../comps-f34.xml.in.h:273 ../comps-epel7.xml.in.h:295
+#: ../comps-epel8.xml.in.h:18
+msgid "Xfce"
+msgstr "एक्सएफसीई"
+
+#: ../comps-f32.xml.in.h:282 ../comps-f33.xml.in.h:274
+#: ../comps-f34.xml.in.h:274 ../comps-epel7.xml.in.h:296
+#: ../comps-epel8.xml.in.h:19
+msgid "A lightweight desktop environment that works well on low end machines."
+msgstr "हल्का डेस्कटॉप वातावरण जो कि न्यूनांत मशीन पर ठीक काम करता है."
+
+#: ../comps-f32.xml.in.h:283 ../comps-f33.xml.in.h:275
+#: ../comps-f34.xml.in.h:275
+msgid "Extra plugins for the Xfce panel"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:284 ../comps-f33.xml.in.h:276
+#: ../comps-f34.xml.in.h:276
+msgid "Extend the functionality of the Xfce panel"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:285 ../comps-f33.xml.in.h:277
+#: ../comps-f34.xml.in.h:277
+msgid "Multimedia support for Xfce"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:286 ../comps-f33.xml.in.h:278
+#: ../comps-f34.xml.in.h:278
+msgid "Xfce Office"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:287 ../comps-f33.xml.in.h:279
+#: ../comps-f34.xml.in.h:279
+msgid "Office suite for Xfce"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:288 ../comps-f33.xml.in.h:280
+#: ../comps-f34.xml.in.h:280
+msgid "Xfce Software Development"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:289 ../comps-f33.xml.in.h:281
+#: ../comps-f34.xml.in.h:281
+msgid ""
+"Install these packages in order to develop GTK+ and Xfce graphical "
+"applications."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:290 ../comps-f33.xml.in.h:282
+#: ../comps-f34.xml.in.h:282
+msgid "XMonad"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:291 ../comps-f33.xml.in.h:283
+#: ../comps-f34.xml.in.h:283
+msgid "A tiling window manager"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:292 ../comps-f33.xml.in.h:284
+#: ../comps-f34.xml.in.h:284
+msgid "XMonad for MATE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:293 ../comps-f33.xml.in.h:285
+#: ../comps-f34.xml.in.h:285
+msgid "XMonad window manager with MATE"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:294 ../comps-f33.xml.in.h:286
+#: ../comps-f34.xml.in.h:286
+msgid "Fedora Custom Operating System"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:295 ../comps-f33.xml.in.h:287
+#: ../comps-f34.xml.in.h:287
+msgid "Basic building block for a custom Fedora system."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:296 ../comps-f33.xml.in.h:288
+#: ../comps-f34.xml.in.h:288
+msgid "Minimal Install"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:297 ../comps-f33.xml.in.h:289
+#: ../comps-f34.xml.in.h:289
+msgid "Basic functionality."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:298 ../comps-f33.xml.in.h:290
+#: ../comps-f34.xml.in.h:290 ../comps-epel8.xml.in.h:20
+msgid "KDE Plasma Workspaces"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:299 ../comps-f33.xml.in.h:291
+#: ../comps-f34.xml.in.h:291
+msgid "Xfce Desktop"
+msgstr ""
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:301 ../comps-f33.xml.in.h:293
+#: ../comps-f34.xml.in.h:293
+msgid "Fedora Server Edition"
+msgstr ""
+
+#. Should eventually say “with a web UI accessible right after installation”
+#. or something else to differentiate from
+#. infrastructure-server-environment.
+#: ../comps-f32.xml.in.h:305 ../comps-f33.xml.in.h:297
+#: ../comps-f34.xml.in.h:297
+msgid "An integrated, easier to manage server."
+msgstr ""
+
+#. Translators: Don't translate this product name
+#: ../comps-f32.xml.in.h:307 ../comps-f33.xml.in.h:299
+#: ../comps-f34.xml.in.h:299
+#, fuzzy
+msgid "Fedora Workstation"
+msgstr "वर्कस्टेशन नीति"
+
+#: ../comps-f32.xml.in.h:308 ../comps-f33.xml.in.h:300
+#: ../comps-f34.xml.in.h:300
+msgid ""
+"Fedora Workstation is a user friendly desktop system for laptops and PCs."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:309 ../comps-f33.xml.in.h:301
+#: ../comps-f34.xml.in.h:301
+msgid "LXDE Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:310 ../comps-f33.xml.in.h:302
+#: ../comps-f34.xml.in.h:302 ../comps-epel7.xml.in.h:149
+#, fuzzy
+msgid "LXQt Desktop"
+msgstr "डेस्कटॉप"
+
+#: ../comps-f32.xml.in.h:311 ../comps-f33.xml.in.h:303
+#: ../comps-f34.xml.in.h:303 ../comps-epel7.xml.in.h:299
+msgid "Cinnamon Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:312 ../comps-f33.xml.in.h:304
+#: ../comps-f34.xml.in.h:304 ../comps-epel7.xml.in.h:300
+msgid "MATE Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:313 ../comps-f33.xml.in.h:305
+#: ../comps-f34.xml.in.h:305
+#, fuzzy
+#| msgid "KDE Desktop"
+msgid "Deepin Desktop"
+msgstr "केडीई डेस्कटॉप"
+
+#: ../comps-f32.xml.in.h:314 ../comps-f33.xml.in.h:306
+#: ../comps-f34.xml.in.h:306
+msgid ""
+"Deepin desktop is the desktop environment released with deepin. It aims at "
+"being elegant and easy to use."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:315 ../comps-f33.xml.in.h:307
+#: ../comps-f34.xml.in.h:307
+#, fuzzy
+msgid "Fedora Cloud Server"
+msgstr "डाक सर्वर"
+
+#: ../comps-f32.xml.in.h:316 ../comps-f33.xml.in.h:308
+#: ../comps-f34.xml.in.h:308
+msgid "A server install with components needed to run in a cloud environment."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:317 ../comps-f33.xml.in.h:309
+#: ../comps-f34.xml.in.h:309
+msgid "Development and Creative Workstation"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:318 ../comps-f33.xml.in.h:310
+#: ../comps-f34.xml.in.h:310
+msgid "Workstation for software, hardware, graphics, or content development."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:319 ../comps-f33.xml.in.h:311
+#: ../comps-f34.xml.in.h:311 ../comps-epel7.xml.in.h:286
+msgid "Web Server"
+msgstr "वेब सर्वर"
+
+#: ../comps-f32.xml.in.h:320 ../comps-f33.xml.in.h:312
+#: ../comps-f34.xml.in.h:312
+msgid "Server for serving static and dynamic internet content."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:321 ../comps-f33.xml.in.h:313
+#: ../comps-f34.xml.in.h:313
+msgid "Infrastructure Server"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:322 ../comps-f33.xml.in.h:314
+#: ../comps-f34.xml.in.h:314
+msgid "Server for operating network infrastructure services."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:323 ../comps-f33.xml.in.h:315
+#: ../comps-f34.xml.in.h:315
+msgid "X Window System with a choice of window manager."
+msgstr ""
+
+#: ../comps-f32.xml.in.h:324 ../comps-f33.xml.in.h:316
+#: ../comps-f34.xml.in.h:316 ../comps-epel7.xml.in.h:128
+#: ../comps-epel8.xml.in.h:21
+msgid "KDE Desktop"
+msgstr "केडीई डेस्कटॉप"
+
+#: ../comps-f32.xml.in.h:325 ../comps-f33.xml.in.h:317
+#: ../comps-f34.xml.in.h:317 ../comps-epel8.xml.in.h:22
+msgid ""
+"The KDE SC includes the KDE Plasma Desktop, a highly-configurable graphical "
+"user interface which includes a panel, desktop, system icons and desktop "
+"widgets, and many powerful KDE applications."
+msgstr ""
+"केडीई एससी में केडीई प्लाजमा डेस्कटॉप, एक उच्च विन्यासयोग्य आलेखी उपयोक्ता अंतरफलक जिसमें "
+"एक पैनल, डेस्कटॉप, तंत्र प्रतीक, और डेस्कटॉप विजेट और कई शक्तिशाली केडीई अनुप्रयोग शामिल "
+"हैं."
+
+#: ../comps-f32.xml.in.h:326 ../comps-f33.xml.in.h:318
+#: ../comps-f34.xml.in.h:318 ../comps-epel7.xml.in.h:303
+msgid "Applications"
+msgstr "अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:327 ../comps-f33.xml.in.h:319
+#: ../comps-f34.xml.in.h:319
+msgid "Applications to perform a variety of tasks"
+msgstr "कार्य विविधता संपन्न करने के लिये अनुप्रयोग"
+
+#: ../comps-f32.xml.in.h:328 ../comps-f33.xml.in.h:320
+#: ../comps-f34.xml.in.h:320
+msgid "GNOME Desktop"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:329 ../comps-f33.xml.in.h:321
+#: ../comps-f34.xml.in.h:321 ../comps-epel7.xml.in.h:305
+msgid "Development"
+msgstr "विकास"
+
+#: ../comps-f32.xml.in.h:330 ../comps-f33.xml.in.h:322
+#: ../comps-f34.xml.in.h:322
+msgid ""
+"Packages which provide functionality for developing and building "
+"applications."
+msgstr "संकुल जो अनुप्रयोग के विकास और निर्माण के लिये प्रकार्यात्मकता देते हैं."
+
+#: ../comps-f32.xml.in.h:331 ../comps-f33.xml.in.h:323
+#: ../comps-f34.xml.in.h:323
+msgid "Servers"
+msgstr "सर्वर"
+
+#: ../comps-f32.xml.in.h:332 ../comps-f33.xml.in.h:324
+#: ../comps-f34.xml.in.h:324
+msgid "Software used for running network servers"
+msgstr "संजाल सर्वर चलाने के लिए प्रयुक्त सॉफ़्टवेयर"
+
+#: ../comps-f32.xml.in.h:333 ../comps-f33.xml.in.h:325
+#: ../comps-f34.xml.in.h:325
+msgid "Base System"
+msgstr "बेस तंत्र"
+
+#: ../comps-f32.xml.in.h:334 ../comps-f33.xml.in.h:326
+#: ../comps-f34.xml.in.h:326
+msgid "Various core pieces of the system."
+msgstr "तंत्र का कई कोर टुकड़ा."
+
+#: ../comps-f32.xml.in.h:335
+msgid "Content"
+msgstr "अंतर्वस्तु"
+
+#: ../comps-f32.xml.in.h:336
+msgid "Text and other Free content."
+msgstr "पाठ और दूसरी निःशुल्क अंतर्वस्तु"
+
+#: ../comps-f32.xml.in.h:337 ../comps-f33.xml.in.h:327
+#: ../comps-f34.xml.in.h:327
+msgid "Neuroscience"
+msgstr ""
+
+#: ../comps-f32.xml.in.h:338 ../comps-f33.xml.in.h:328
+#: ../comps-f34.xml.in.h:328
+msgid "Tools for Neuroscience."
+msgstr ""
+
+#: ../comps-f33.xml.in.h:206 ../comps-f34.xml.in.h:206
+msgid "A phone/tablet UX environment"
+msgstr ""
+
+#: ../comps-f33.xml.in.h:207 ../comps-f34.xml.in.h:207
+msgid "A phone/tablet desktop UX based on GNOME3 technologies."
+msgstr ""
+
+#: ../comps-epel7.xml.in.h:1
+msgid "Additional Development"
+msgstr "अतिरिक्त विकास"
+
+#: ../comps-epel7.xml.in.h:2
+msgid ""
+"Additional development headers and libraries for developing applications"
+msgstr "विकास हो रहे अनुप्रयोग के लिए अतिरिक्त विकास शीर्षिका और लाइब्रेरी"
+
+#: ../comps-epel7.xml.in.h:3
+msgid "Afrikaans Support"
+msgstr "अफ्रीकांस समर्थन"
+
+#: ../comps-epel7.xml.in.h:4
+msgid "Albanian Support"
+msgstr "अल्बानियाई समर्थन"
+
+#: ../comps-epel7.xml.in.h:5
+msgid "Amazigh Support"
+msgstr "आमेजिग समर्थन"
+
+#: ../comps-epel7.xml.in.h:6
+msgid "Arabic Support"
+msgstr "अरबी समर्थन"
+
+#: ../comps-epel7.xml.in.h:7
+msgid "Armenian Support"
+msgstr "आर्मेनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:8
+msgid "Assamese Support"
+msgstr "आसामी समर्थन"
+
+#: ../comps-epel7.xml.in.h:9
+msgid "Azerbaijani Support"
+msgstr "अजरबैजानी समर्थन"
+
+#: ../comps-epel7.xml.in.h:10
+msgid "Backup Client"
+msgstr "बैकअप क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:11
+msgid "Client tools for connecting to a backup server and doing backups."
+msgstr "क्लाइंट औज़ार बैकअप सर्वर से कनेक्ट करने के लिए और बैकअप करने के लिए."
+
+#: ../comps-epel7.xml.in.h:12
+msgid "Backup Server"
+msgstr "बैकअप सर्वर"
+
+#: ../comps-epel7.xml.in.h:13
+msgid "Software to centralize your infrastructure's backups."
+msgstr "आपके बुनियादी ढाँचा के बैकअप केंद्रीयकृत करने के लिए सॉफ़्टवेयर."
+
+#: ../comps-epel7.xml.in.h:14
+msgid "Base"
+msgstr "आधार"
+
+#: ../comps-epel7.xml.in.h:15
+msgid "The basic installation of Enterprise Linux."
+msgstr "एंटरप्राइज लिनक्स का मूल संस्थापन."
+
+#: ../comps-epel7.xml.in.h:16
+msgid "Desktop"
+msgstr "डेस्कटॉप"
+
+#: ../comps-epel7.xml.in.h:17
+msgid "A minimal desktop that can also be used as a thin client."
+msgstr "न्यूनतम डेस्कटॉप जिसे भी थिन क्लाइंट के लिए रूप में प्रयोग किया जा सकता है."
+
+#: ../comps-epel7.xml.in.h:18
+msgid "Basque Support"
+msgstr "बास्क समर्थन"
+
+#: ../comps-epel7.xml.in.h:19
+msgid "Belarusian Support"
+msgstr "बेलारूसी समर्थन"
+
+#: ../comps-epel7.xml.in.h:20
+msgid "Bengali Support"
+msgstr "बंगाली समर्थन"
+
+#: ../comps-epel7.xml.in.h:21
+msgid "Bhutanese Support"
+msgstr "भूटानी समर्थन"
+
+#: ../comps-epel7.xml.in.h:22
+msgid "Brazilian Portuguese Support"
+msgstr "ब्राजीलियन पुर्तगीज समर्थन"
+
+#: ../comps-epel7.xml.in.h:23
+msgid "Breton Support"
+msgstr "ब्रेटन समर्थन"
+
+#: ../comps-epel7.xml.in.h:24
+msgid "English (UK) Support"
+msgstr "अंग्रेजी (यूके) समर्थन"
+
+#: ../comps-epel7.xml.in.h:26
+msgid "Bulgarian Support"
+msgstr "बल्गेरियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:27
+msgid "Myanmar (Burmese) Support"
+msgstr "म्यांमार (बर्मी) समर्थन"
+
+#: ../comps-epel7.xml.in.h:28
+msgid "Catalan Support"
+msgstr "कैटालन समर्थन"
+
+#: ../comps-epel7.xml.in.h:29
+msgid "Chhattisgarhi Support"
+msgstr "छत्तीसगढ़ी समर्थन"
+
+#: ../comps-epel7.xml.in.h:30
+msgid "Chichewa Support"
+msgstr "चिचेवा समर्थन"
+
+#: ../comps-epel7.xml.in.h:31
+msgid "Chinese Support"
+msgstr "चीनी समर्थन"
+
+#: ../comps-epel7.xml.in.h:32
+msgid "CIFS file server"
+msgstr "CIFS फ़ाइल सर्वर"
+
+#: ../comps-epel7.xml.in.h:33
+msgid "Share files between Linux and Microsoft Windows systems."
+msgstr "लिनक्स और माइक्रोसॉफ्ट विंडो प्रणाली के बीच फ़ाइल साझा करता है."
+
+#: ../comps-epel7.xml.in.h:36
+msgid "Compatibility libraries"
+msgstr "सुसंगतता लाइब्रेरी"
+
+#: ../comps-epel7.xml.in.h:37
+msgid ""
+"Compatibility libraries for applications built on previous versions of "
+"Enterprise Linux."
+msgstr "एंटरप्राइज लिनक्स के पिछले संस्करण पर निर्मित अनुप्रयोग के लिए सुसंसगता लाइबेरी."
+
+#: ../comps-epel7.xml.in.h:38
+msgid "Console internet tools"
+msgstr "कंसोल इंटरनेट औज़ार"
+
+#: ../comps-epel7.xml.in.h:39
+msgid "Console internet access tools, often used by administrators."
+msgstr "कंसोल इंटरनेट पहुँच औज़ार, प्रायः प्रशासकों के द्वारा प्रयुक्त."
+
+#: ../comps-epel7.xml.in.h:40
+msgid "Coptic Support"
+msgstr "कोप्टिक समर्थन"
+
+#: ../comps-epel7.xml.in.h:42
+msgid "Smallest possible installation."
+msgstr "सबसे छोटा संभव संस्थापन."
+
+#: ../comps-epel7.xml.in.h:43
+msgid "Croatian Support"
+msgstr "क्रोशियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:44
+msgid "Czech Support"
+msgstr "चेक समर्थन"
+
+#: ../comps-epel7.xml.in.h:45
+msgid "Danish Support"
+msgstr "डैनिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:46
+msgid "Debugging Tools"
+msgstr "डिबगिंग औज़ार"
+
+#: ../comps-epel7.xml.in.h:47
+msgid ""
+"Tools for debugging misbehaving applications and diagnosing performance "
+"problems."
+msgstr "गलत आचरणयुक्त अनुप्रयोग के डिबगिंग और प्रदर्शन समस्या के निदान के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:48
+msgid "Desktop Debugging and Performance Tools"
+msgstr "डेस्कटॉप डिबगिंग और प्रदर्शन औज़ार"
+
+#: ../comps-epel7.xml.in.h:49
+msgid "GUI tools for debugging applications and performance."
+msgstr "अनुप्रयोग डिबगिंग और प्रदर्शन के लिए जीयूआई औज़ार."
+
+#: ../comps-epel7.xml.in.h:50
+msgid "Desktop Platform"
+msgstr "डेस्कटॉप प्लैटफॉर्म"
+
+#: ../comps-epel7.xml.in.h:51
+msgid "Supported libraries for the Enterprise Linux Desktop Platform."
+msgstr "एंटरप्राइज लिनक्स डेस्कटॉप प्लैटफ़ॉर्म के लिए समर्थित लाइब्रेरी."
+
+#: ../comps-epel7.xml.in.h:52
+msgid "Desktop Platform Development"
+msgstr "डेस्कटॉप प्लैटफॉर्म विकास"
+
+#: ../comps-epel7.xml.in.h:53
+msgid ""
+"Development headers and libraries for developing applications to run on the "
+"Enterprise Linux Desktop Platform."
+msgstr ""
+"एंटरप्राइज लिनक्स डेस्कटॉप प्लेटफॉर्म पर अनुप्रयोग विकास के लिए विकास शीर्षका और लाइब्रेरी."
+
+#: ../comps-epel7.xml.in.h:54
+msgid "Development tools"
+msgstr "विकास औज़ार"
+
+#: ../comps-epel7.xml.in.h:55
+msgid "A basic development environment."
+msgstr "मूल विकास वातावरण."
+
+#: ../comps-epel7.xml.in.h:57
+msgid "Tools for connecting via PPP or ISDN."
+msgstr "PPP या ISDN के द्वारा कनेक्ट करने के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:58
+msgid "Directory Client"
+msgstr "निर्देशिका क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:59
+msgid "Clients for integration into a network managed by a directory service."
+msgstr "निर्देशिका सेवा से प्रबंधित संजाल में एकीकरण के लिए क्लाइंट."
+
+#: ../comps-epel7.xml.in.h:62
+msgid "Dutch Support"
+msgstr "डच समर्थन"
+
+#: ../comps-epel7.xml.in.h:63
+msgid "Eclipse"
+msgstr "एक्लीप्स"
+
+#: ../comps-epel7.xml.in.h:64
+msgid "Eclipse-based Integrated Development Environment."
+msgstr "एक्लीप्स आधारित एकीकृत विकास वातावरण."
+
+#: ../comps-epel7.xml.in.h:66
+msgid "Educational software for learning."
+msgstr "सीखने के लिए शैक्षणिक सॉफ़्टवेयर."
+
+#: ../comps-epel7.xml.in.h:68
+msgid "Design and Simulation tools for hardware engineers."
+msgstr "हार्डवेयर इंजीनियर के लिए डिजायन और अनुरूपता."
+
+#: ../comps-epel7.xml.in.h:69
+msgid "Emacs"
+msgstr "Emacs"
+
+#: ../comps-epel7.xml.in.h:70
+msgid "The GNU Emacs extensible, customizable, text editor."
+msgstr "GNU Emacs विस्तार योग्य, पसंदीदा योग्य, पाठ संपादक."
+
+#: ../comps-epel7.xml.in.h:71
+msgid "Esperanto Support"
+msgstr "एस्पेरांटो समर्थन"
+
+#: ../comps-epel7.xml.in.h:72
+msgid "Estonian Support"
+msgstr "इस्टोनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:73
+msgid "Ethiopic Support"
+msgstr "इथियोपियाई समर्थन"
+
+#: ../comps-epel7.xml.in.h:74
+msgid "Faroese Support"
+msgstr "फेयरोसे समर्थन"
+
+#: ../comps-epel7.xml.in.h:76 ../comps-epel8.xml.in.h:2
+msgid "Tools and utilities needed by a Fedora Packager."
+msgstr "फेडोरा पैकेजर के द्वारा जरूरी औज़ार और उपयोगिताएँ."
+
+#: ../comps-epel7.xml.in.h:77
+msgid "Fijian Support"
+msgstr "फिजियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:78
+msgid "Filipino Support"
+msgstr "फिलिपिनो समर्थन"
+
+#: ../comps-epel7.xml.in.h:79
+msgid "Finnish Support"
+msgstr "फिन्निश समर्थन"
+
+#: ../comps-epel7.xml.in.h:81
+msgid "Fonts for rendering text in a variety of languages and scripts."
+msgstr "विभिन्न भाषाओं और लिपियों के रेंडरिंग के लिए फ़ॉन्ट"
+
+#: ../comps-epel7.xml.in.h:82
+msgid "French Support"
+msgstr "फ्रेंच समर्थन"
+
+#: ../comps-epel7.xml.in.h:83
+msgid "Frisian Support"
+msgstr "फ्रिसियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:84
+msgid "Friulian Support"
+msgstr "फ्रायुलियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:85
+msgid "FTP server"
+msgstr "एफटीपी सर्वर"
+
+#: ../comps-epel7.xml.in.h:86
+msgid "Allows the system to act as an FTP server."
+msgstr "तंत्र को बतौर एक FTP सर्वर के रूप में काम करने के लिए अनुमति दें."
+
+#: ../comps-epel7.xml.in.h:87
+msgid "Gaelic Support"
+msgstr "गेलिक समर्थन"
+
+#: ../comps-epel7.xml.in.h:88
+msgid "Galician Support"
+msgstr "गेलिसियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:89
+msgid "General Purpose Desktop"
+msgstr "सामान्य उद्देश्य डेस्कटॉपसामान्य उद्देश्य डेस्कट"
+
+#: ../comps-epel7.xml.in.h:90
+msgid "A general purpose desktop."
+msgstr "एक सामान्य उद्देश्यीय डेस्कटॉप."
+
+#: ../comps-epel7.xml.in.h:91
+msgid "Georgian Support"
+msgstr "ज्यार्जियाई समर्थन"
+
+#: ../comps-epel7.xml.in.h:92
+msgid "German Support"
+msgstr "जर्मन समर्थन"
+
+#: ../comps-epel7.xml.in.h:93
+msgid "Graphical Administration Tools"
+msgstr "आलेखीय प्रशासन औज़ार"
+
+#: ../comps-epel7.xml.in.h:94
+msgid ""
+"Graphical system administration tools for managing many aspects of a system."
+msgstr "किसी तंत्र के लिए कई पहलुओं के लिए आलेखीय तंत्र प्रशासन औज़ार."
+
+#: ../comps-epel7.xml.in.h:95
+msgid "Graphics Creation Tools"
+msgstr "आलेखी निर्माण औज़ार"
+
+#: ../comps-epel7.xml.in.h:96
+msgid "Software for creation and manipulation of still images."
+msgstr "स्थिर छवि के निर्माण और उसमें सुधार के लिए सॉफ़्टवेयर."
+
+#: ../comps-epel7.xml.in.h:97
+msgid "Greek Support"
+msgstr "यूनानी समर्थन"
+
+#: ../comps-epel7.xml.in.h:98
+msgid "Gujarati Support"
+msgstr "गुजराती समर्थन"
+
+#: ../comps-epel7.xml.in.h:99
+msgid "Hardware monitoring utilities"
+msgstr "हार्डवेयर निरीक्षण उपयोगिता"
+
+#: ../comps-epel7.xml.in.h:100
+msgid "A set of tools to monitor server hardware"
+msgstr "सर्वर हार्डवेयर निरीक्षण करने के लिए औज़ारों का एक सेट"
+
+#: ../comps-epel7.xml.in.h:103
+msgid "Hebrew Support"
+msgstr "हीब्रू समर्थन"
+
+#: ../comps-epel7.xml.in.h:104
+msgid "Hiligaynon Support"
+msgstr "हिलिगेनन समर्थन"
+
+#: ../comps-epel7.xml.in.h:105
+msgid "Hindi Support"
+msgstr "हिन्दी समर्थन"
+
+#: ../comps-epel7.xml.in.h:106
+msgid "Hungarian Support"
+msgstr "हंगेरियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:107
+msgid "Icelandic Support"
+msgstr "आईसलैंडिक समर्थन"
+
+#: ../comps-epel7.xml.in.h:108
+msgid "Indonesian Support"
+msgstr "इंडोनेशियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:109
+msgid "Infiniband Support"
+msgstr "Infiniband समर्थन"
+
+#: ../comps-epel7.xml.in.h:110
+msgid ""
+"Software designed for supporting clustering and grid connectivity using RDMA-"
+"based InfiniBand and iWARP fabrics."
+msgstr ""
+"RDMA-आधारित InfiniBand और iWARP फैब्रिक्स के उपयोग से क्लस्टरिंग और ग्रिड कनेक्टिविटी के "
+"समर्थन के लिए डिजायन किया गया सॉफ्टवेयर."
+
+#: ../comps-epel7.xml.in.h:112
+msgid "Software for the input of international text."
+msgstr "अंतरराष्ट्रीय पाठ की इनपुट के लिए सॉफ़्टवेयर."
+
+#: ../comps-epel7.xml.in.h:113
+msgid "Interlingua Support"
+msgstr "इंटरलिंगुआ समर्थन"
+
+#: ../comps-epel7.xml.in.h:114
+msgid "Internet Applications"
+msgstr "इंटरनेट अनुप्रयोग"
+
+#: ../comps-epel7.xml.in.h:115
+msgid "Email, chat, and video conferencing software."
+msgstr "ईमेल, चैट और वीडियो सम्मेलन सॉफ़्टवेयर."
+
+#: ../comps-epel7.xml.in.h:116
+msgid "Internet Browser"
+msgstr "इंटरनेट ब्राउज़र"
+
+#: ../comps-epel7.xml.in.h:117
+msgid "Firefox web browser"
+msgstr "फ़ायरफ़ॉक्स वेब ब्राउज़रफऱ"
+
+#: ../comps-epel7.xml.in.h:118
+msgid "Inuktitut Support"
+msgstr "इनुक्टुट समर्थन"
+
+#: ../comps-epel7.xml.in.h:119
+msgid "Irish Support"
+msgstr "आइरिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:120
+msgid "Italian Support"
+msgstr "इटालियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:121
+msgid "Japanese Support"
+msgstr "जापानी समर्थन"
+
+#: ../comps-epel7.xml.in.h:122
+msgid "Java Platform"
+msgstr "जावा प्लैटफ़ॉर्म"
+
+#: ../comps-epel7.xml.in.h:123
+msgid "Java support for the Enterprise Linux Server and Desktop Platforms."
+msgstr "एंटरप्राइज लिनक्स सर्वर और डेस्कटॉप प्लैटफ़ॉर्म के लिए जावा समर्थन."
+
+#: ../comps-epel7.xml.in.h:124
+msgid "Kannada Support"
+msgstr "कन्नड़ समर्थन"
+
+#: ../comps-epel7.xml.in.h:125
+msgid "Kashmiri Support"
+msgstr "काश्मीरी समर्थन"
+
+#: ../comps-epel7.xml.in.h:126
+msgid "Kashubian Support"
+msgstr "काशुबियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:127
+msgid "Kazakh Support"
+msgstr "कजाख समर्थन"
+
+#: ../comps-epel7.xml.in.h:129
+msgid "A KDE desktop."
+msgstr "केडीई डेस्कटॉप."
+
+#: ../comps-epel7.xml.in.h:130
+msgid "Khmer Support"
+msgstr "ख्मेर समर्थन"
+
+#: ../comps-epel7.xml.in.h:131
+msgid "Kinyarwanda Support"
+msgstr "किनायरंवाडा समर्थन"
+
+#: ../comps-epel7.xml.in.h:132
+msgid "Konkani Support"
+msgstr "कोंकणी समर्थन"
+
+#: ../comps-epel7.xml.in.h:133
+msgid "Korean Support"
+msgstr "कोरिया समर्थन"
+
+#: ../comps-epel7.xml.in.h:134
+msgid "Kurdish Support"
+msgstr "कुर्दिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:135
+msgid "Lao Support"
+msgstr "लाओ समर्थन"
+
+#: ../comps-epel7.xml.in.h:136
+msgid "Large Systems Performance"
+msgstr "व्यापक तंत्र प्रदर्शन"
+
+#: ../comps-epel7.xml.in.h:137
+msgid "Performance support tools for large systems"
+msgstr "बड़े तंत्र के लिए प्रदर्शन समर्थन औज़ार"
+
+#: ../comps-epel7.xml.in.h:138
+msgid "Latin Support"
+msgstr "लैटिन समर्थन"
+
+#: ../comps-epel7.xml.in.h:139
+msgid "Latvian Support"
+msgstr "लातवियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:140
+msgid "Legacy UNIX compatibility"
+msgstr "पुरातन UNIX सुसंगतता"
+
+#: ../comps-epel7.xml.in.h:141
+msgid ""
+"Compatibility programs for migration from or working with legacy UNIX "
+"environments."
+msgstr "पुरातन UNIX वातावरण के साथ कार्य से उत्प्रवासन के लिए सुससंगता प्रोग्राम."
+
+#: ../comps-epel7.xml.in.h:142
+msgid "Legacy X Window System compatibility"
+msgstr "पुरातन X विंडो तंत्र सुसंगतता"
+
+#: ../comps-epel7.xml.in.h:143
+msgid ""
+"Compatibility programs for migration from or working with legacy X Window "
+"System environments."
+msgstr ""
+"पुरातन X विंडो तंत्र वातावरण के साथ कार्य करने या उत्प्रवास के लिए सुसंगतता प्रोग्राम."
+
+#: ../comps-epel7.xml.in.h:144
+msgid "Basic legacy X Window System compatibility"
+msgstr "बेसिक लिगेसी X विंडो सिस्टम संगतता"
+
+#: ../comps-epel7.xml.in.h:145
+msgid ""
+"Minimal set of compatibility programs for migration from or working with "
+"legacy X Window System environments."
+msgstr ""
+"पुरातन X विंडो तंत्र वातावरण के साथ कार्य करने या उत्प्रवास के लिए सुसंगतता प्रोग्राम के "
+"लिए न्यूनतम सेट."
+
+#: ../comps-epel7.xml.in.h:146
+msgid "Lithuanian Support"
+msgstr "लिथुआनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:147
+msgid "Low Saxon Support"
+msgstr "निम्न सैक्सन समर्थन"
+
+#: ../comps-epel7.xml.in.h:148
+msgid "Luxembourgish Support"
+msgstr "लक्समबोर्गिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:151
+msgid "Macedonian Support"
+msgstr "मेसीडोनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:152
+msgid "E-mail server"
+msgstr "ईमेल सर्वर"
+
+#: ../comps-epel7.xml.in.h:153
+msgid "Allows the system to act as a SMTP and/or IMAP e-mail server."
+msgstr "तंत्र को बतौर SMTP और/या IMAP ई-मेल सर्वर दिखाने की छूट दी जाती है."
+
+#: ../comps-epel7.xml.in.h:154
+msgid "Mainframe Access"
+msgstr "मेनफ्रेम पहुँच"
+
+#: ../comps-epel7.xml.in.h:155
+msgid "Tools for accessing mainframe computing resources."
+msgstr "मेनफ्रेम कंप्यूटिंग संसाधन की पहुँच के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:156
+msgid "Maithili Support"
+msgstr "मैथिली समर्थन"
+
+#: ../comps-epel7.xml.in.h:157
+msgid "Malagasy Support"
+msgstr "मलागासी समर्थन"
+
+#: ../comps-epel7.xml.in.h:158
+msgid "Malay Support"
+msgstr "मलय समर्थन"
+
+#: ../comps-epel7.xml.in.h:159
+msgid "Malayalam Support"
+msgstr "मलयालम समर्थन"
+
+#: ../comps-epel7.xml.in.h:160
+msgid "Maltese Support"
+msgstr "माल्टीज समर्थन"
+
+#: ../comps-epel7.xml.in.h:161
+msgid "Manx Support"
+msgstr "मैंक्स समर्थन"
+
+#: ../comps-epel7.xml.in.h:162
+msgid "Maori Support"
+msgstr "माओरी समर्थन"
+
+#: ../comps-epel7.xml.in.h:163
+msgid "Marathi Support"
+msgstr "मराठी समर्थन"
+
+#: ../comps-epel7.xml.in.h:168
+msgid "Mongolian Support"
+msgstr "मंगोलियाई समर्थन"
+
+#: ../comps-epel7.xml.in.h:169
+msgid "MySQL Database server"
+msgstr "MySQL डाटाबेस सर्वर"
+
+#: ../comps-epel7.xml.in.h:170
+msgid "The MySQL SQL database server, and associated packages."
+msgstr "MySQL SQL डेटाबेस सर्वर, और जुड़े संकुल."
+
+#: ../comps-epel7.xml.in.h:171
+msgid "MySQL Database client"
+msgstr "MySQL डाटाबेस क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:172
+msgid "The MySQL SQL database client, and associated packages."
+msgstr "MySQL SQL डेटाबेस क्लाइंट और सहयोगी संकुल."
+
+#: ../comps-epel7.xml.in.h:173
+msgid "Nepali Support"
+msgstr "नेपाली समर्थन"
+
+#: ../comps-epel7.xml.in.h:174
+msgid "Network file system client"
+msgstr "संजाल फ़ाइल तंत्र क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:175
+msgid "Enables the system to attach to network storage."
+msgstr "संजाल भंडार में जोड़ने के लिए सिस्टम सक्रिय करता है."
+
+#: ../comps-epel7.xml.in.h:176
+msgid "Network Infrastructure Server"
+msgstr "संजाल बुनियादी ढाँचा सर्वर"
+
+#: ../comps-epel7.xml.in.h:177
+msgid "Servers for core network protocols and services, such as DHCP or DNS."
+msgstr "DHCP और DNS जैसे केंद्रीय संजाल प्रोटोकॉल और सेवाओं के लिए सर्वर."
+
+#: ../comps-epel7.xml.in.h:178
+msgid "Networking Tools"
+msgstr "संजाल औज़ार"
+
+#: ../comps-epel7.xml.in.h:179
+msgid "Tools for configuring and analyzing computer networks."
+msgstr "कंप्यूटर संजाल के विश्लेषण और विन्यास के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:180
+msgid "NFS file server"
+msgstr "एनएफएस फ़ाइल सर्वर"
+
+#: ../comps-epel7.xml.in.h:181
+msgid "NFS file server."
+msgstr "एनएफएस फ़ाइल सर्वर."
+
+#: ../comps-epel7.xml.in.h:182
+msgid "Northern Sotho Support"
+msgstr "उत्तरी सोथो समर्थन"
+
+#: ../comps-epel7.xml.in.h:183
+msgid "Norwegian Support"
+msgstr "नॉर्वेजियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:184
+msgid "Occitan Support"
+msgstr "ओसिटन समर्थन"
+
+#: ../comps-epel7.xml.in.h:185
+msgid "Office Suite and Productivity"
+msgstr "ऑफ़िस सूइट और उत्पादकता"
+
+#: ../comps-epel7.xml.in.h:186
+msgid "A full-purpose office suite, and other productivity tools."
+msgstr "पूर्ण उद्देश्यीय ऑफ़िस सूइट और दूसरे उत्पादकता औज़ार."
+
+#: ../comps-epel7.xml.in.h:187
+msgid "Oriya Support"
+msgstr "उड़िया समर्थन"
+
+#: ../comps-epel7.xml.in.h:188
+msgid "Performance Tools"
+msgstr "प्रदर्शन औज़ार"
+
+#: ../comps-epel7.xml.in.h:189
+msgid "Tools for diagnosing system and application-level performance problems."
+msgstr "तंत्र और अनुप्रयोग स्तरीय प्रदर्शन समस्या के निदान के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:190
+msgid "Perl Support"
+msgstr "पर्ल समर्थन"
+
+#: ../comps-epel7.xml.in.h:191
+msgid "Perl interfaces to common libraries and functionality."
+msgstr "सामान्य लाइब्रेरी और प्रकार्यात्मकता के लिए पर्ल अंतरफलक."
+
+#: ../comps-epel7.xml.in.h:192
+msgid "Persian Support"
+msgstr "पर्सियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:193
+msgid "PHP Support"
+msgstr "PHP समर्थन"
+
+#: ../comps-epel7.xml.in.h:194
+msgid "PHP web application framework."
+msgstr "PHP वेब अनुप्रयोग फ्रेमवर्क."
+
+#: ../comps-epel7.xml.in.h:195
+msgid "Polish Support"
+msgstr "पोलिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:196
+msgid "Portuguese Support"
+msgstr "पुर्तगाली समर्थन"
+
+#: ../comps-epel7.xml.in.h:197
+msgid "PostgreSQL Database server"
+msgstr "PostgreSQL डेटाबेस सर्वर"
+
+#: ../comps-epel7.xml.in.h:198
+msgid "The PostgreSQL SQL database server, and associated packages."
+msgstr "PostgreSQL SQL डेटाबेस सर्वर, और जुड़े संकुल."
+
+#: ../comps-epel7.xml.in.h:199
+msgid "PostgreSQL Database client"
+msgstr "PostgreSQL डेटाबेस क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:200
+msgid "The PostgreSQL SQL database client, and associated packages."
+msgstr "PostgreSQL SQL डेटाबेस क्लाइंट, और जुड़े संकुल."
+
+#: ../comps-epel7.xml.in.h:201
+msgid "Printing client"
+msgstr "प्रिंटिंग क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:202
+msgid "Tools for printing to a local printer or a remote print server."
+msgstr "किसी स्थानीय प्रिंटर या किसी दूरस्थ प्रिंट सर्वर में छापने के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:203
+msgid "Print Server"
+msgstr "प्रिंट सर्वर"
+
+#: ../comps-epel7.xml.in.h:204
+msgid "Allows the system to act as a print server."
+msgstr "तंत्र को बतौर प्रिंट सर्वर काम करने की छूट देता है."
+
+#: ../comps-epel7.xml.in.h:205
+msgid "Punjabi Support"
+msgstr "पंजाबी समर्थन"
+
+#: ../comps-epel7.xml.in.h:206
+msgid "Remote Desktop Clients"
+msgstr "दूरस्थ डेस्कटॉप क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:207
+msgid "Romanian Support"
+msgstr "रोमानियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:208
+msgid "Russian Support"
+msgstr "रूसी समर्थन"
+
+#: ../comps-epel7.xml.in.h:209
+msgid "Sanskrit Support"
+msgstr "संस्कृत समर्थन"
+
+#: ../comps-epel7.xml.in.h:210
+msgid "Sardinian Support"
+msgstr "सार्डिनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:211
+msgid "Scientific support"
+msgstr "वैज्ञानिक समर्थन"
+
+#: ../comps-epel7.xml.in.h:212
+msgid ""
+"Tools for mathematical and scientific computations, and parallel computing."
+msgstr "गणितीय और वैज्ञानिक कंप्यूटिंग और समांतर कंप्यूटिंग के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:213
+msgid "Security Tools"
+msgstr "सुरक्षा औज़ार"
+
+#: ../comps-epel7.xml.in.h:214
+msgid "Security tools for integrity and trust verification."
+msgstr "एकीकरण और भरोसा सत्यापन के लिए सुरक्षा औज़ार."
+
+#: ../comps-epel7.xml.in.h:215
+msgid "Serbian Support"
+msgstr "सर्बियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:216
+msgid "Server Platform"
+msgstr "सर्वर प्लेटफॉर्म"
+
+#: ../comps-epel7.xml.in.h:217
+msgid "Supported libraries for the Enterprise Linux Server Platform."
+msgstr "एंटरप्राइज लिनक्स सर्वर प्लैटफ़ॉर्म के लिए समर्थित लाइब्रेरी."
+
+#: ../comps-epel7.xml.in.h:218
+msgid "Server Platform Development"
+msgstr "सर्वर प्लेटफॉर्म विकास"
+
+#: ../comps-epel7.xml.in.h:219
+msgid ""
+"Development headers and libraries for developing applications to run on the "
+"Enterprise Linux Server Platform."
+msgstr ""
+"एंटरप्राइज लिनक्स सर्वर प्लेटफॉर्म पर अनुप्रयोग विकास के लिए विकास शीर्षका और लाइब्रेरी."
+
+#: ../comps-epel7.xml.in.h:220
+msgid "Server Policy"
+msgstr "सर्वर नीति"
+
+#: ../comps-epel7.xml.in.h:221
+msgid "Policy packages for the Server variant."
+msgstr "सर्वर चर के लिए नीति संकुल."
+
+#: ../comps-epel7.xml.in.h:222
+msgid "Sindhi Support"
+msgstr "सिंधी समर्थन"
+
+#: ../comps-epel7.xml.in.h:223
+msgid "Sinhala Support"
+msgstr "सिंहाला समर्थन"
+
+#: ../comps-epel7.xml.in.h:224
+msgid "Slovak Support"
+msgstr "स्लोवाक समर्थन"
+
+#: ../comps-epel7.xml.in.h:225
+msgid "Slovenian Support"
+msgstr "स्लोवेनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:226
+msgid "Smart card support"
+msgstr "स्मार्ट कार्ड समर्थन"
+
+#: ../comps-epel7.xml.in.h:227
+msgid "Support for using smart card authentication."
+msgstr "स्मार्ट कार्ड सत्यापन के उपयोग के लिए समर्थन."
+
+#: ../comps-epel7.xml.in.h:228
+msgid "Southern Ndebele Support"
+msgstr "दक्षिणी नडेबेले समर्थन"
+
+#: ../comps-epel7.xml.in.h:229
+msgid "Southern Sotho Support"
+msgstr "दक्षिणी सोथो समर्थन"
+
+#: ../comps-epel7.xml.in.h:230
+msgid "Spanish Support"
+msgstr "स्पेनिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:231
+msgid "FCoE Storage Client"
+msgstr "FCoE भंडार क्लाइंटपFCoE Yx"
+
+#: ../comps-epel7.xml.in.h:232
+msgid "Fiber Channel over Ethernet support"
+msgstr "इथरनेट समर्थन पर फ़ाइबर चैनल"
+
+#: ../comps-epel7.xml.in.h:233
+msgid "iSCSI Storage Client"
+msgstr "iSCSI भंडार क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:234
+msgid "iSCSI client support"
+msgstr "iSCSI क्लाइंट समर्थन"
+
+#: ../comps-epel7.xml.in.h:235
+msgid "Storage Availability Tools"
+msgstr "भंडार उपलब्धता औज़ार"
+
+#: ../comps-epel7.xml.in.h:236
+msgid "A set of tools to manage SAN path availability"
+msgstr "SAN पथ उपलब्धता प्रबंध के लिए औज़ारों का एक सेट"
+
+#: ../comps-epel7.xml.in.h:237
+msgid "Network Storage Server"
+msgstr "संजाल भंडार सर्वर"
+
+#: ../comps-epel7.xml.in.h:238
+msgid "iSCSI, iSER, and iSNS network storage server."
+msgstr "iSCSI, iSER, और iSNS संजाल भंडार सर्वर."
+
+#: ../comps-epel7.xml.in.h:239
+msgid "Swahili Support"
+msgstr "स्वाहिली समर्थन"
+
+#: ../comps-epel7.xml.in.h:240
+msgid "Swati Support"
+msgstr "स्वाती समर्थन"
+
+#: ../comps-epel7.xml.in.h:241
+msgid "Swedish Support"
+msgstr "स्वीडिश समर्थन"
+
+#: ../comps-epel7.xml.in.h:242
+msgid "System administration tools"
+msgstr "तंत्र प्रशासन औज़ार"
+
+#: ../comps-epel7.xml.in.h:243
+msgid "Utilities useful in system administration."
+msgstr "तंत्र प्रशासन में उपयोगी उपयोगिताएँ."
+
+#: ../comps-epel7.xml.in.h:244
+msgid "System Management"
+msgstr "तंत्र प्रबंधन"
+
+#: ../comps-epel7.xml.in.h:245
+msgid "Various low-level hardware management frameworks."
+msgstr "कई निम्नस्तरीय हार्डवेयर प्रबंधन फ्रेमवर्क."
+
+#: ../comps-epel7.xml.in.h:246
+msgid "Messaging Client Support"
+msgstr "मैसेजिंग क्लाइंट समर्थन"
+
+#: ../comps-epel7.xml.in.h:247
+msgid "AMQP messaging client for systems management."
+msgstr "AMQP मैसेजिंग क्लाइंट सिस्टम प्रबंधन के लिए."
+
+#: ../comps-epel7.xml.in.h:248
+msgid "Messaging Server Support"
+msgstr "मैसेजिंग सर्वर समर्थन"
+
+#: ../comps-epel7.xml.in.h:249
+msgid "AMQP messaging broker for systems management."
+msgstr "तंत्र प्रबंधन के लिए एएमक्यूपी मैसेजिंग ब्रोकर AMQP."
+
+#: ../comps-epel7.xml.in.h:250
+msgid "SNMP Support"
+msgstr "SNMP समर्थन"
+
+#: ../comps-epel7.xml.in.h:251
+msgid "SNMP management agent."
+msgstr "SNMP प्रबंधन औज़ार."
+
+#: ../comps-epel7.xml.in.h:252
+msgid "Web-Based Enterprise Management"
+msgstr "वेब आधारित एंटरप्राइज प्रबंधन"
+
+#: ../comps-epel7.xml.in.h:253
+msgid "WBEM interface for Enterprise Linux."
+msgstr "एंटरप्राइज लिनक्स के लिए WBEM अंतरफलक"
+
+#: ../comps-epel7.xml.in.h:254
+msgid "Tagalog Support"
+msgstr "टैगालॉग समर्थन"
+
+#: ../comps-epel7.xml.in.h:255
+msgid "Tajik Support"
+msgstr "ताजिक समर्थन"
+
+#: ../comps-epel7.xml.in.h:256
+msgid "Tamil Support"
+msgstr "तमिल समर्थन"
+
+#: ../comps-epel7.xml.in.h:257
+msgid "Technical Writing"
+msgstr "तकनीकी लेखन"
+
+#: ../comps-epel7.xml.in.h:258
+msgid "Tools for writing technical documentation."
+msgstr "तकनीकी दस्तावेज़ लिखने के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:259
+msgid "Telugu Support"
+msgstr "तेलुगु समर्थन"
+
+#: ../comps-epel7.xml.in.h:260
+msgid "Tetum Support"
+msgstr "टेटम समर्थन"
+
+#: ../comps-epel7.xml.in.h:261
+msgid "TeX support"
+msgstr "TeX समर्थन"
+
+#: ../comps-epel7.xml.in.h:262
+msgid "Support for the TeX document formatting system."
+msgstr "TeX दस्तावेज़ प्रारूपण तंत्र के लिए समर्थन."
+
+#: ../comps-epel7.xml.in.h:263
+msgid "Thai Support"
+msgstr "थाई समर्थन"
+
+#: ../comps-epel7.xml.in.h:264
+msgid "Tibetan Support"
+msgstr "तिब्बती समर्थन"
+
+#: ../comps-epel7.xml.in.h:265
+msgid "Tsonga Support"
+msgstr "त्सोंगा समर्थन"
+
+#: ../comps-epel7.xml.in.h:266
+msgid "Tswana Support"
+msgstr "त्स्वाना समर्थन"
+
+#: ../comps-epel7.xml.in.h:267
+msgid "TurboGears application framework"
+msgstr "TurboGears अनुप्रयोग फ्रेमवर्क"
+
+#: ../comps-epel7.xml.in.h:268
+msgid "TurboGears web application framework."
+msgstr "TurboGears वेब अनुप्रयोग फ्रेमवर्क."
+
+#: ../comps-epel7.xml.in.h:269
+msgid "Turkish Support"
+msgstr "तुर्किश समर्थन"
+
+#: ../comps-epel7.xml.in.h:270
+msgid "Turkmen Support"
+msgstr "तुर्कमेन समर्थन"
+
+#: ../comps-epel7.xml.in.h:271
+msgid "Ukrainian Support"
+msgstr "युक्रेनियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:272
+msgid "Upper Sorbian Support"
+msgstr "अपर सर्बियन समर्थन"
+
+#: ../comps-epel7.xml.in.h:273
+msgid "Urdu Support"
+msgstr "उर्दू समर्थन"
+
+#: ../comps-epel7.xml.in.h:274
+msgid "Uzbek Support"
+msgstr "उज्बेक समर्थन"
+
+#: ../comps-epel7.xml.in.h:275
+msgid "Venda Support"
+msgstr "वेंडा समर्थन"
+
+#: ../comps-epel7.xml.in.h:276
+msgid "Vietnamese Support"
+msgstr "वियतनामी समर्थन"
+
+#: ../comps-epel7.xml.in.h:278
+msgid "Provides an environment for hosting virtualized guests."
+msgstr "वर्चुअलाइज्ड अतिथि के मेजबानित किए जाने के लिए एक वातावरण देता है."
+
+#: ../comps-epel7.xml.in.h:279
+msgid "Virtualization Client"
+msgstr "वर्चुअलाइजेशन क्लाइंट"
+
+#: ../comps-epel7.xml.in.h:280
+msgid "Clients for installing and managing virtualization instances."
+msgstr "वर्चुअलाइजेशन उदाहरणों को प्रबंधित और संस्थापित करने के लिए क्लाइंट."
+
+#: ../comps-epel7.xml.in.h:281
+msgid "Virtualization Platform"
+msgstr "वर्चुअलाइजेशन प्लैटफॉर्म"
+
+#: ../comps-epel7.xml.in.h:282
+msgid ""
+"Provides an interface for accessing and controlling virtualized guests and "
+"containers."
+msgstr ""
+"वर्चुअलाइज्ड अतिथि और कंटेनर की पहुँच और नियंत्रण के लिए कोई अंतरफलक प्रदान करता है."
+
+#: ../comps-epel7.xml.in.h:283
+msgid "Virtualization Tools"
+msgstr "वर्चुअलाइजेशन औज़ार"
+
+#: ../comps-epel7.xml.in.h:284
+msgid "Tools for offline virtual image management."
+msgstr "ऑफ़लाइन वर्चुअल छवि प्रबंधन के लिए औज़ार."
+
+#: ../comps-epel7.xml.in.h:285
+msgid "Walloon Support"
+msgstr "वलून समर्थन"
+
+#: ../comps-epel7.xml.in.h:287
+msgid ""
+"Allows the system to act as a web server, and run Perl and Python web "
+"applications."
+msgstr ""
+"तंत्र को बतौर वेब सर्वर काम करने की छूट देता है, और पर्ल और पाइथन वेब अनुप्रयोग चलाएँ."
+
+#: ../comps-epel7.xml.in.h:288
+msgid "Web Servlet Engine"
+msgstr "वेब सर्वलेट इंजन"
+
+#: ../comps-epel7.xml.in.h:289
+msgid "Allows the system to host Java servlets."
+msgstr "सिस्टम को जावा सर्वलेट होस्ट करने की अनुमति देता है."
+
+#: ../comps-epel7.xml.in.h:290
+msgid "Welsh Support"
+msgstr "वेल्स समर्थन"
+
+#: ../comps-epel7.xml.in.h:291
+msgid "Workstation Policy"
+msgstr "वर्कस्टेशन नीति"
+
+#: ../comps-epel7.xml.in.h:292
+msgid "Policy packages for the Workstation variant."
+msgstr "वर्कस्टेशन चर के लिए नीति संकुल."
+
+#: ../comps-epel7.xml.in.h:293
+msgid "X Window System"
+msgstr "X विंडो तंत्र"
+
+#: ../comps-epel7.xml.in.h:294
+msgid "X Window System Support."
+msgstr "X Window तंत्र समर्थन."
+
+#: ../comps-epel7.xml.in.h:297
+msgid "Xhosa Support"
+msgstr "ज़ोसा समर्थन"
+
+#: ../comps-epel7.xml.in.h:298
+msgid "Zulu Support"
+msgstr "जुलु समर्थन"
+
+#: ../comps-epel7.xml.in.h:301
+msgid "Desktops"
+msgstr "डेस्कटॉप"
+
+#: ../comps-epel7.xml.in.h:302
+msgid "Desktops and thin clients."
+msgstr "डेस्कटॉप और थिन क्लाइंट्स."
+
+#: ../comps-epel7.xml.in.h:304
+msgid "End-user applications."
+msgstr "अंत्य उपयोक्ता अनुप्रयोग."
+
+#: ../comps-epel7.xml.in.h:306
+msgid "Development tools and libraries."
+msgstr "विकास औज़ार और लाइब्रेरी."
+
+#~ msgid "Simplified Chinese Support"
+#~ msgstr "सरल चीनी समर्थन"
+
+#~ msgid "Traditional Chinese Support"
+#~ msgstr "पारंपरिक चीनी समर्थन"
+
+#~ msgid "These packages provide a virtualization environment."
+#~ msgstr "ये संकुल वर्चुअलाइजेशन वातावरण उपलब्ध कराते हैं."
+
+#~ msgid "Yiddish Support"
+#~ msgstr "यिद्दिश समर्थन"
+
+#, fuzzy
+#~ msgid "Fedora Server"
+#~ msgstr "संजाल सर्वर"
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Arabic environments."
+#~ msgstr "अरेबिक वातावरण के लिये यह समूह औज़ारों व संसाधनों का समूह है."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Armenian "
+#~ "environments."
+#~ msgstr "यह समूह आर्मेनियन वातावरण के लिये औज़ारों व संसाधनों का समूह है."
+
+#~ msgid ""
+#~ "These tools allow you to create documentation in the DocBook format and "
+#~ "convert them to HTML, PDF, Postscript, and text."
+#~ msgstr ""
+#~ "इन औज़ारों से DocBook प्रारूप में दस्तावेज़ीकरण करके और उन्हें HTML, PDF, पोस्टस्क्रिप्ट, "
+#~ "और पाठ्यांश में बदल सकते हैं."
+
+#~ msgid ""
+#~ "Install this group of packages to use the base graphical (X) user "
+#~ "interface."
+#~ msgstr ""
+#~ "आधार आलेखी (X) उपयोक्ता अंतरफलक का प्रयोग करने के लिए इस संकुल समूह का संस्थापन करें."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Czech environments."
+#~ msgstr "चेक वातावरण के लिये यह समूह औज़ारों व संसाधनों का समूह है."
+
+#~ msgid ""
+#~ "These tools include core development tools such as automake, gcc, perl, "
+#~ "python, and debuggers."
+#~ msgstr ""
+#~ "इन औज़ारों में ऑटोमेक, जीसीसी, पर्ल, पाइथन, और डिबगर जैसे केंद्रीय विकास औज़ार हैं."
+
+#~ msgid "Dialup Networking Support"
+#~ msgstr "ड़ायलअप संजालन समर्थन"
+
+#~ msgid ""
+#~ "Sometimes called text editors, these are programs that allow you to "
+#~ "create and edit files. These include Emacs and Vi."
+#~ msgstr ""
+#~ "कभी पाठ्यांश संपादक के नाम से जाने जाने वाले ये कार्यक्रम आपको फ़ाइल बनाने और संपादित "
+#~ "करने की अनुमति देते हैं. इनमें ईमेक्स और वीआई है."
+
+#~ msgid "Design and Simulation tools for hardware engineers"
+#~ msgstr "हार्डवेयर इंजीनियर के लिए डिज़ायन व सिमुलेशन औज़ार"
+
+#~ msgid "Tools and Utilities needed by a Fedora Packager"
+#~ msgstr "फेडोरा संकुल के द्वारा जरूरी औज़ार या उपयोगिता"
+
+#~ msgid "GNOME Desktop Environment"
+#~ msgstr "GNOME डेस्कटॉप वातावरण"
+
+#~ msgid ""
+#~ "GNOME is a powerful, graphical user interface which includes a panel, "
+#~ "desktop, system icons, and a graphical file manager."
+#~ msgstr ""
+#~ "GNOME एक शक्तिशाली, आलेखीय उपयोक्ता अंतरफलक है जिसमें पैनल, डेस्कटॉप, तंत्र प्रतीक, और "
+#~ "आलेखीय फ़ाइल प्रबंधक है."
+
+#~ msgid "This group includes graphical email, Web, and chat clients."
+#~ msgstr "इस समूह में आलेखीय ईमेल, वेब और चैट क्लाइंट हैं."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Hebrew environments."
+#~ msgstr "हिब्रू वातावरण के लिये यह समूह औज़ारों व संसाधनों का समूह है."
+
+#~ msgid ""
+#~ "This group is a collection of tools and resources of Japanese "
+#~ "environments."
+#~ msgstr "जापानी वातावरण के लिये यह समूह औज़ारों व संसाधनों का समूह है."
+
+#~ msgid "KDE (K Desktop Environment)"
+#~ msgstr "KDE (K डेस्कटॉप वातावरण)"
+
+#~ msgid ""
+#~ "KDE is a powerful, graphical user interface which includes a panel, "
+#~ "desktop, system icons, and a graphical file manager."
+#~ msgstr ""
+#~ "KDE एक शक्तिशाली, आलेखीय उपयोक्ता अंतरफलक है जिसमें पैनल, डेस्कटॉप, तंत्र प्रतीक, और "
+#~ "आलेखीय फ़ाइल प्रबंधक है."
+
+#~ msgid "Install these packages to develop QT and KDE graphical applications."
+#~ msgstr "QT और KDE आलेखी अनुप्रयोगों का विकास करने के लिए इन संकुलों का संस्थापन करें."
+
+#~ msgid "This group is a collection of network servers for specific purposes"
+#~ msgstr "यह समूह विशिष्ट उपयोगिता के लिये संजाल सर्वर का समूह है."
+
+#~ msgid ""
+#~ "This group includes text-based email, Web, and chat clients. These "
+#~ "applications do not require the X Window System."
+#~ msgstr ""
+#~ "इस समूह में पाठ्यांश आधारित ईमेल, वेब, और चैट क्लाइंट है. इन अनुप्रयोगों को X विंडो तंत्र "
+#~ "आवश्यक नहीं है."
+
+#~ msgid "Web Development"
+#~ msgstr "वेब विकास"
+
+#~ msgid ""
+#~ "These packages are helpful when developing web applications or web pages."
+#~ msgstr "ये संकुल वेब अनुप्रयोग और वेब पृष्ठों के विकास में मददगार हैं."
+
+#~ msgid "XEmacs"
+#~ msgstr "XEmacs"
+
+#~ msgid "The XEmacs text editor."
+#~ msgstr "Xईमेक्स पाठ्यांश संपादक."
+
+#~ msgid "Desktop environments"
+#~ msgstr "डेस्कटॉप वातावरण"
+
+#~ msgid "Applications for a variety of tasks"
+#~ msgstr "कार्य विविधता के लिये अनुप्रयोग"
