@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.129.1
-Release:        1%{?dist}
+Version:        6.6.126.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,9 +460,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Mar 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.129.1-1
-- Auto-upgrade to 6.6.129.1
-
 * Fri Feb 27 2026 Andrew Chiang <andrewchiang@microsoft.com> - 6.6.126.1-2
 - Enable CONFIG_TCP_CONG_BBR3=m
 
