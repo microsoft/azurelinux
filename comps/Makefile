@@ -1,3 +1,4 @@
+SHELL = /bin/bash
 XMLINFILES=$(wildcard *.xml.in)
 XMLFILES = $(patsubst %.xml.in,%.xml,$(XMLINFILES))
 
