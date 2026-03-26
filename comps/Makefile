@@ -1,7 +1,7 @@
 XMLINFILES=$(wildcard *.xml.in)
 XMLFILES = $(patsubst %.xml.in,%.xml,$(XMLINFILES))
 
-all: comps-eln.xml.in po $(XMLFILES) comps-eln.xml sort
+all: po $(XMLFILES) sort
 
 po: $(XMLINFILES)
 	make -C po -f Makefile || exit 1

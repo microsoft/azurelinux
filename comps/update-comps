@@ -8,6 +8,3 @@ if [ -z "$COMPSFILE" ]; then
 fi
 
 LANG=C intltool-merge -x -u po/ $COMPSFILE.in $COMPSFILE
-case $COMPSFILE in
-  comps-eln.xml) xsltproc --stringparam distro eln --novalid -o $COMPSFILE comps-distro-only.xsl $COMPSFILE ;;
-esac
