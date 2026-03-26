@@ -27,7 +27,6 @@ Patch0002: CVE-2024-52338.patch
 Patch0003: CVE-2026-25087.patch
 Patch0004: libarrow-15.0.0-fix-transform-iterator-uninitialized.patch
 
-
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
 # package, and in turn the only consumer of this and liborc is Ceph, which
@@ -181,6 +180,7 @@ pushd cpp
   -DPythonInterp_FIND_VERSION:BOOL=ON \
   -DPythonInterp_FIND_VERSION_MAJOR=3 \
 
+
 export VERBOSE=1
 export GCC_COLORS=
 %cmake_build
@@ -218,14 +218,12 @@ popd
      %{_libdir}/cmake/Arrow/ArrowOptions.cmake
      %{_libdir}/cmake/Arrow/ArrowTargets*.cmake
      %{_libdir}/cmake/Arrow/arrow-config.cmake
-
 %{_libdir}/libarrow.so
 %{_libdir}/pkgconfig/arrow-compute.pc
 %{_libdir}/pkgconfig/arrow-csv.pc
 %{_libdir}/pkgconfig/arrow-filesystem.pc
 %{_libdir}/pkgconfig/arrow-json.pc
 %{_libdir}/pkgconfig/arrow.pc
-
 %{_datadir}/arrow/gdb/gdb_arrow.py
 #%%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
 
@@ -239,7 +237,6 @@ popd
 %{_libdir}/cmake/Parquet/*.cmake
 %{_libdir}/libparquet.so
 %{_libdir}/pkgconfig/parquet*.pc
-
 %exclude /usr/lib/cmake/ArrowAcero/*
 %exclude /usr/lib/cmake/ArrowDataset/*
 %exclude /usr/lib/pkgconfig/arrow-acero.pc
