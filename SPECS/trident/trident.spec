@@ -10,7 +10,7 @@ Summary:        Declarative, security-first OS lifecycle agent designed primaril
 Name:           trident
 # Use hard-coded versions for distro build
 Version:        0.21.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Group:          Applications/System
@@ -31,6 +31,8 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 Source1:        %{name}-%{version}-cargo.tar.gz
 %else
 Source1:        osmodifier
+Patch0:         CVE-2026-33055.patch
+Patch1:         CVE-2026-33056.patch
 %endif
 
 BuildRequires:  openssl-devel
@@ -300,6 +302,9 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Thu Mar 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.21.0-2
+- Patch for CVE-2026-33056, CVE-2026-33055
+
 * Mon Mar 2 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.21.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.
