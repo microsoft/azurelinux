@@ -253,7 +253,7 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Mon Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1

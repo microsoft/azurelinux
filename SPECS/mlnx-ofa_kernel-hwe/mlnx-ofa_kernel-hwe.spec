@@ -449,7 +449,7 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
-* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-7_6.12.57.1.2
+* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-7_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 
 * Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-6_6.12.57.1.6
