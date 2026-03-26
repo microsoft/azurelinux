@@ -1,0 +1,2 @@
+[components.curl.packages.libcurl-debuginfo.publish]
+channel = "rpm-debug"

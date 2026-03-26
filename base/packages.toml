@@ -1,0 +1,28 @@
+#
+# Package publish configuration
+#
+
+# Project-wide baseline publish channel
+[default-package-config]
+publish = { channel = "rpms-base" }
+
+[package-groups.devel-packages]
+description = "Development subpackages"
+packages = ["libcurl-devel", "curl-static", "wget2-devel"]
+
+[package-groups.devel-packages.default-package-config.publish]
+channel = "rpm-build-only"
+
+[package-groups.debug-packages]
+description = "Debug info and source"
+packages = [
+    "libcurl-debuginfo",
+    "libcurl-minimal-debuginfo",
+    "curl-debugsource",
+    "wget2-debuginfo",
+    "wget2-debugsource",
+    "wget2-libs-debuginfo"
+]
+
+[package-groups.debug-packages.default-package-config.publish]
+channel = "rpm-debug"

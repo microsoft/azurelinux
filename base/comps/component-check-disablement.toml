@@ -5,6 +5,7 @@ description = "Components with check failures during initial distro bringup"
 components = [
     "SDL3_image",
     "containerd",
+    "curl",
     "dnf",
     "fakeroot",
     "fontconfig",
@@ -33,6 +34,7 @@ components = [
     "perl-POE",
     "poetry",
     "python-aioquic",
+    "wget2",
     "python-awscrt",
     "python-cairocffi",
     "python-cmd2",

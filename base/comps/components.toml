@@ -32,7 +32,6 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.crontabs]
 [components.crypto-policies]
 [components.cryptsetup]
-[components.curl]
 [components.cyrus-sasl]
 [components.dbus]
 [components.dbus-broker]
