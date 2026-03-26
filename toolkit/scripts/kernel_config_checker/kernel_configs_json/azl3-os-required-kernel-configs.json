@@ -2941,34 +2941,6 @@
             }
           ],
           "justification": "kernel: enable xfrm_interface - PR: https://github.com/microsoft/azurelinux/pull/15463"
-        },
-        {
-          "name": "CONFIG_CRYPTO_LZ4",
-          "values": [
-            {
-              "architecture": "x86_64",
-              "value": "m"
-            },
-            {
-              "architecture": "arm64",
-              "value": "m"
-            }
-          ],
-          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/60759133"
-        },
-        {
-          "name": "CONFIG_CRYPTO_ZSTD",
-          "values": [
-            {
-              "architecture": "x86_64",
-              "value": "m"
-            },
-            {
-              "architecture": "arm64",
-              "value": "m"
-            }
-          ],
-          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/60759133"
         }
       ]
     },
