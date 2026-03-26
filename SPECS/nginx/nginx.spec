@@ -186,7 +186,7 @@ rm -rf nginx-tests
 - Enable webdav module
 - Added tests to verify nginx server and its supported modules
 
-* Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
+* Mon Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
 - Fix CVE-2025-23419
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2
