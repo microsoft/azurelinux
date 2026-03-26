@@ -25,7 +25,7 @@ It has been first written to support particular protocol (SNMP) but then general
 to be suitable for a wide range of protocols based on ASN.1 specification.
 
 %prep
-%autosetup -n pyasn1-%{version}
+%autosetup -p1 -n pyasn1-%{version}
 
 %build
 %py3_build
