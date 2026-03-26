@@ -6,3 +6,8 @@ type = "spec-remove-tag"
 tag = "Requires"
 value = "dnf4"
 package = "systemdeps-core"
+
+[[components.kiwi.overlays]]
+description = "Fix kiwi-live dracut module to return failure for non-LUKS live images"
+type = "patch-add"
+source = "0001-fix-activate-luks-return.patch"

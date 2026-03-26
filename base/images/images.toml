@@ -2,6 +2,10 @@
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
+[images.vm-iso]
+description = "Azure Linux 4 ISO Image"
+definition = { type = "kiwi", path = "vm-iso/vm-iso.kiwi" }
+
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }

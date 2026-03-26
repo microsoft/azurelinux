@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Azure Linux <azurelinux@example.com>
+Date: Thu, 26 Mar 2026 00:00:00 +0000
+Subject: [PATCH] Fix kiwi-live activate_luks return value
+
+The kiwi-live dracut helper must return failure when the probed image is
+not LUKS. Without the explicit non-zero return, callers treat the probe as
+successful and incorrectly switch the mount source to /dev/mapper/luks.
+This breaks normal live ISO boot for non-LUKS squashfs containers.
+
+---
+ dracut/modules.d/55kiwi-live/kiwi-live-lib.sh | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/dracut/modules.d/55kiwi-live/kiwi-live-lib.sh b/dracut/modules.d/55kiwi-live/kiwi-live-lib.sh
+index 318ad2f..54d7876 100755
+--- a/dracut/modules.d/55kiwi-live/kiwi-live-lib.sh
++++ b/dracut/modules.d/55kiwi-live/kiwi-live-lib.sh
+@@ -202,15 +202,17 @@ function activate_luks {
+     local rootfs_image=$1
+     local mapname=$2
+     declare kiwi_luks_empty_passphrase=${kiwi_luks_empty_passphrase}
+-    if cryptsetup isLuks "${rootfs_image}" &>/dev/null;then
+-        if [ "${kiwi_luks_empty_passphrase}" = "true" ];then
+-            cryptsetup \
+-                --key-file /dev/zero \
+-                --keyfile-size 32 \
+-            luksOpen "${rootfs_image}" "${mapname}"
+-        else
+-            systemd-cryptsetup attach "${mapname}" "${rootfs_image}"
+-        fi
++    if ! cryptsetup isLuks "${rootfs_image}" &>/dev/null; then
++        return 1
++    fi
++
++    if [ "${kiwi_luks_empty_passphrase}" = "true" ];then
++        cryptsetup \
++            --key-file /dev/zero \
++            --keyfile-size 32 \
++        luksOpen "${rootfs_image}" "${mapname}"
++    else
++        systemd-cryptsetup attach "${mapname}" "${rootfs_image}"
+     fi
+ }
+
+--
+2.43.0
