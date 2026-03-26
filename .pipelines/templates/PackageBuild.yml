@@ -23,6 +23,10 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
+  - name: extraMacrosFiles
+    type: object
+    default: []
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -239,6 +243,11 @@ steps:
         daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
+      extra_macros_files="${{ join(' ', parameters.extraMacrosFiles) }}"
+      if [[ -n "$extra_macros_files" ]]; then
+        extra_macros_files_arg="EXTRA_MACROS_FILES=$extra_macros_files"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
@@ -253,6 +262,7 @@ steps:
         $allow_toolchain_rebuilds_arg \
         $check_build_retries_arg \
         $daily_build_id_arg \
+        $extra_macros_files_arg \
         $daily_build_update_manifests_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
