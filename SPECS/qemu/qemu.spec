@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -300,6 +300,7 @@ Patch1028:      CVE-2024-4467.patch
 Patch1029:      CVE-2024-6505.patch
 Patch1030:      CVE-2025-11234.patch
 Patch1031:      CVE-2024-7409.patch
+Patch1032:      CVE-2024-8354.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2334,6 +2335,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Mon Mar 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.2.0-27
+- Patch for CVE-2024-8354
+
 * Wed Nov 19 2025 Kshitiz Godara <kgodara@microsoft.com> - 6.2.0-26
 - Add Patch for CVE-2024-7409
 
