@@ -164,7 +164,7 @@ exit 0
 * Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.1-14
 - Patch for CVE-2025-53859
 
-* Mon Fev 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.22.1-13
+* Mon Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.22.1-13
 - Fix CVE-2025-23419
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-12
