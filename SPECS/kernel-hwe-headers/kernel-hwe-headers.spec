@@ -4,13 +4,16 @@
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
 Version:        6.12.57.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+Provides:       glibc-kernheaders = %{version}-%{release}
+Provides:       kernel-headers = %{version}-%{release}
+Obsoletes:      kernel-headers < %{version}-%{release}
 BuildArch:	    noarch
 
 %description
@@ -35,6 +38,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Thu Mar 26 2026 Álvaro Figueroa <alvaro.figueroa@microsoft.com> - 6.12.57.1-6
+- Make kernel-hwe-headers replace and provide kernel-headers
+
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.12.57.1-5
 - Bump release to match kernel-hwe
 
