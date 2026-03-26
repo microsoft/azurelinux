@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model
+    href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng"
+    type="application/xml"?>
+<image schemaversion="8.3" name="azl4-vm-iso-installer">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>user@example.com</contact>
+        <specification>Azure Linux Text-Based ISO Installer</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            installiso="true"
+            installboot="install"
+            installprovidefailsafe="true"
+            initrd_system="dracut"
+            filesystem="ext4"
+            kernelcmdline="console=ttyS0 rd.shell=0"
+            firmware="uefi"
+            bootpartition="false"
+            efipartsize="200">
+            <bootloader name="grub2" timeout="10" />
+            <size unit="M">4096</size>
+            <oemconfig>
+                <oem-unattended>false</oem-unattended>
+                <oem-swap>true</oem-swap>
+                <oem-swapsize>512</oem-swapsize>
+                <oem-systemsize>3500</oem-systemsize>
+            </oemconfig>
+            <initrd action="setup">
+                <dracut uefi="false" />
+            </initrd>
+        </type>
+    </preferences>
+
+    <repository type="rpm-md" alias="local-1">
+        <source path="file:///home/kgodara/azurelinux/base/out" />
+    </repository>
+
+    <repository type="rpm-md" alias="fedora-43-everything">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/x86_64/" />
+    </repository>
+
+    <packages type="image">
+        <!-- Core group -->
+        <package name="azurelinux-release" />
+        <package name="azurelinux-rpm-config" />
+        <package name="azurelinux-repos" />
+        <package name="bash" />
+        <package name="ca-certificates" />
+        <package name="coreutils" />
+
+        <!-- Minimal group -->
+        <package name="acl" />
+        <package name="attr" />
+        <package name="audit" />
+        <package name="bash-completion" />
+        <package name="bc" />
+        <package name="binutils" />
+        <package name="bind-utils" />
+        <package name="brotli" />
+        <package name="bzip2" />
+        <package name="chkconfig" />
+        <package name="chrony" />
+        <package name="cracklib-dicts" />
+        <package name="cronie" />
+        <package name="cryptsetup" />
+        <package name="cyrus-sasl" />
+        <package name="device-mapper-event" />
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+        <package name="elfutils" />
+        <package name="elfutils-default-yama-scope" />
+        <package name="file" />
+        <package name="firewalld" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="grub2" />
+        <package name="grubby" />
+        <package name="gzip" />
+        <package name="hostname" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="kernel" />
+        <package name="kernel-tools" />
+        <package name="lvm2" />
+        <package name="lz4" />
+        <package name="man-db" />
+        <package name="nano" />
+        <package name="ncurses-term" />
+        <package name="net-tools" />
+        <package name="nftables" />
+        <package name="openssh-clients" />
+        <package name="openssh-server" />
+        <package name="parted" />
+        <package name="rsync" />
+        <package name="rsyslog" />
+        <package name="selinux-policy-targeted" />
+        <package name="setup" />
+        <package name="shadow-utils" />
+        <package name="shadow-utils-subid" />
+        <package name="sudo" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-rpm-macros" />
+        <package name="tar" />
+        <package name="tpm2-tss" />
+        <package name="unzip" />
+        <package name="util-linux" />
+        <package name="vim-minimal" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="zchunk" />
+        <package name="zlib" />
+
+        <!-- OEM install + repart support -->
+        <package name="dracut-kiwi-oem-dump" />
+        <package name="dracut-kiwi-oem-repart" />
+
+        <!-- Kernel modules -->
+        <package name="kernel-modules" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="dracut-network" />
+        <package name="filesystem" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
+    </packages>
+
+    <users>
+        <user name="root" password="$6$4zHabktoxP2Z1Ikn$GPsvoQf7uhAnkQcTTB3de4ZPDCR0Ukj.XHinSywQvQJry3wnFnYq7umaqe0yiUFe/7UliH1Y2oTAWU2LI48LS." groups="root" />
+    </users>
+</image>

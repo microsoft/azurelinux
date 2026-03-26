@@ -103,6 +103,7 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.json-c]
 [components.kbd]
 [components.kernel-srpm-macros]
+[components.kexec-tools]
 [components.keyutils]
 [components.kmod]
 [components.krb5]

@@ -6,6 +6,10 @@ definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 description = "Azure Linux 4 ISO Image"
 definition = { type = "kiwi", path = "vm-iso/vm-iso.kiwi" }
 
+[images.vm-iso-installer]
+description = "Azure Linux 4 Text-Based ISO Installer"
+definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi" }
+
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
