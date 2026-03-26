@@ -40,7 +40,7 @@ BuildRequires:  python3-six
 High-level wrapper around a subset of the OpenSSL library.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %py3_build
