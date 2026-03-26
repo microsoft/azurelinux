@@ -1,3 +1,31 @@
+[images.AzureVM]
+description = "AzureVM"
+definition = { profile = "AzureVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.HypervVM]
+description = "HypervVM"
+definition = { profile = "HypervVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.QemuVM]
+description = "QemuVM"
+definition = { profile = "QemuVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.Container-Base-Generic]
+description = "Container-Base-Generic"
+definition = { profile = "Container-Base-Generic", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.Container-Base-Generic-Minimal]
+description = "Container-Base-Generic-Minimal"
+definition = { profile = "Container-Base-Generic-Minimal", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.Container-Base-Generic-Init]
+description = "Container-Base-Generic-Init"
+definition = { profile = "Container-Base-Generic-Init", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.LiveInstall]
+description = "LiveInstall"
+definition = { profile = "LiveInstall", type = "kiwi", path = "AzureLinux.kiwi" }
+
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
