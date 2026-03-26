@@ -55,7 +55,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
 Version:	 1.1.4.90mlnx3
-Release:	 29%{release_suffix}%{?dist}
+Release:	 31%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -241,8 +241,14 @@ fi
 %endif
 
 %changelog
-* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-29_6.12.57.1.2
+* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-31_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-30_6.12.57.1.6
+- Bump to match kernel-hwe.
+
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-29_6.12.57.1.5
+- Bump release to match kernel-hwe
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-28_6.12.57.1.4
 - Bump to match kernel-hwe.

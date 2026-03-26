@@ -68,7 +68,7 @@
 Summary:	 srp driver
 Name:		 srp-hwe
 Version:	 25.07
-Release:	 5%{release_suffix}%{?dist}
+Release:	 7%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -258,8 +258,14 @@ fi
 %endif
 
 %changelog
-* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-5_6.12.57.1.2
+* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-7_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel and MOFED
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-6_6.12.57.1.6
+- Bump to match kernel-hwe.
+
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 25.07-5_6.12.57.1.5
+- Bump release to match kernel-hwe
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-4_6.12.57.1.4
 - Bump to match kernel-hwe.

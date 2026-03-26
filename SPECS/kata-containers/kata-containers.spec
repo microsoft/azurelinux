@@ -2,7 +2,8 @@
 
 Name:           kata-containers
 Version:        3.19.1.kata2
-Release:        5%{?dist}
+Release:        7%{?dist}
+
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -12,7 +13,11 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
-
+Patch2:         CVE-2026-24834.patch
+Patch3:         CVE-2026-25727.patch
+Patch4:         CVE-2026-25541.patch
+Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -40,10 +45,7 @@ Summary:        Kata Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE1}
-popd
+%autosetup -p1 -n %{name}-%{version} -a 1
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -115,8 +117,14 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
+* Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-7
 - Bump release to rebuild with rust
+
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
+- Bump release to rebuild with rust
+
+* Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
+- Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
 
 * Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust

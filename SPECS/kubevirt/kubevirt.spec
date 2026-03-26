@@ -19,8 +19,8 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.7.0
-Release:        2%{?dist}
+Version:        1.7.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -265,6 +265,14 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Feb 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.7.1-1
+- Upgrade KubeVirt to v1.7.1
+- Remove CVE-2025-47911.patch and CVE-2025-58190.patch since
+  vulnerable versions of golang.org/x/net/html no longer used in 1.7.1
+
+* Fri Feb 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-3
+- Patch for CVE-2025-58190, CVE-2025-47911
+
 * Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-2
 - Patch for CVE-2025-11065
 

@@ -29,13 +29,13 @@
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
 %{!?version: %global version 4.33.0}
-%{!?_release: %global _release 4}
+%{!?_release: %global _release 6}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.33.0
-Release:	 5%{release_suffix}%{?dist}
+Release:	 7%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -213,8 +213,14 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue Feb 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-5_6.12.57.1.2
+* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-7_6.12.57.1.2
 - Tweak specs to use dynamic versioning for kernel
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-6_6.12.57.1.6
+- Bump to match kernel-hwe.
+
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.33.0-5_6.12.57.1.5
+- Bump release to match kernel-hwe
 
 * Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-4_6.12.57.1.4
 - Bump to match kernel-hwe.
