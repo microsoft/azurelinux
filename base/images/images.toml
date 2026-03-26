@@ -6,6 +6,10 @@ definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
 
+[images.HypervVM]
+description = "HypervVM"
+definition = { profile = "HypervVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
 [images.QemuVM]
 description = "QemuVM"
 definition = { profile = "QemuVM", type = "kiwi", path = "AzureLinux.kiwi" }
