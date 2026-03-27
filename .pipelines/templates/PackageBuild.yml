@@ -106,6 +106,10 @@ parameters:
     type: string
     default: "LOGS"
 
+  - name: outputArtifactsMacrosSubfolder
+    type: string
+    default: "MACROS"
+
   - name: outputArtifactsPackagesSubfolder
     type: string
     default: "ARTIFACTS"
@@ -115,6 +119,10 @@ parameters:
     default: "TESTS"
 
   - name: maxCPU
+    type: string
+    default: ""
+
+  - name: outputReleseVersionsMacrosFileName
     type: string
     default: ""
 
@@ -305,6 +313,13 @@ steps:
               mkdir -p "$published_artifacts_dir"
               cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.outputSRPMsTarballName }}"
             displayName: "Copy SRPMs for publishing"
+
+      - ${{ if parameters.outputReleseVersionsMacrosFileName }}:
+          - bash: |
+              published_macros_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsMacrosSubfolder }}"
+              mkdir -p "$published_macros_dir"
+              cp "${{ parameters.buildRepoRoot }}/build/pkg_artifacts/macros.releaseversions" "$published_macros_dir/${{ parameters.outputReleseVersionsMacrosFileName }}"
+            displayName: "Copy release versions macros for publishing"
 
       - ${{ if parameters.publishLogs }}:
           - bash: |
