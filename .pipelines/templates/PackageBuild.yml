@@ -125,7 +125,7 @@ parameters:
     type: string
     default: ""
 
-  - name: outputReleseVersionsMacrosFileName
+  - name: outputReleaseVersionsMacrosFileName
     type: string
     default: ""
 
@@ -326,11 +326,11 @@ steps:
               cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.outputSRPMsTarballName }}"
             displayName: "Copy SRPMs for publishing"
 
-      - ${{ if parameters.outputReleseVersionsMacrosFileName }}:
+      - ${{ if parameters.outputReleaseVersionsMacrosFileName }}:
           - bash: |
               published_macros_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsMacrosSubfolder }}"
               mkdir -p "$published_macros_dir"
-              cp "${{ parameters.buildRepoRoot }}/build/pkg_artifacts/macros.releaseversions" "$published_macros_dir/${{ parameters.outputReleseVersionsMacrosFileName }}"
+              cp "${{ parameters.buildRepoRoot }}/build/pkg_artifacts/macros.releaseversions" "$published_macros_dir/${{ parameters.outputReleaseVersionsMacrosFileName }}"
             displayName: "Copy release versions macros for publishing"
 
       - ${{ if parameters.publishLogs }}:
