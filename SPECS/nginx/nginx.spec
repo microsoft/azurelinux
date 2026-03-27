@@ -27,6 +27,7 @@ Patch6:         CVE-2026-27654.patch
 Patch7:         CVE-2026-27784.patch
 Patch8:         CVE-2026-28753.patch
 Patch9:         CVE-2026-32647.patch
+Patch10:        CVE-2026-28755.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -155,7 +156,7 @@ exit 0
 
 %changelog
 * Thu Mar 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.1-16
-- Patch for CVE-2026-32647, CVE-2026-28753, CVE-2026-27784, CVE-2026-27654, CVE-2026-27651
+- Patch for CVE-2026-32647, CVE-2026-28753, CVE-2026-27784, CVE-2026-27654, CVE-2026-27651, CVE-2026-28755
 
 * Tue Feb 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.1-15
 - Patch for CVE-2026-1642
