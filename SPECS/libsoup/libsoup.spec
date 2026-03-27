@@ -4,7 +4,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        3.4.4
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,6 +69,14 @@ Patch19:         CVE-2025-4948.patch
 Patch20:         CVE-2025-4969.patch
 Patch21:         CVE-2025-11021.patch
 Patch22:         CVE-2025-12105.patch
+Patch23:         CVE-2025-32049.patch
+Patch24:         CVE-2026-1467.patch
+Patch25:         CVE-2026-1536.patch
+Patch26:         CVE-2026-1761.patch
+Patch27:         CVE-2026-1801.patch
+Patch28:         fix-ssl-test.patch
+Patch29:         CVE-2026-0716.patch
+Patch30:         CVE-2026-2443.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -100,7 +108,13 @@ These are the additional language files of libsoup.
     -Dntlm=disabled \
     -Ddoc_tests=false \
     -Ddocs=disabled \
+%if 0%{?with_check}
+    -Dtests=true \
+    -Dgssapi=disabled \
+    -Dpkcs11_tests=disabled
+%else
     -Dtests=false
+%endif
 %meson_build
 
 %install
@@ -110,7 +124,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}-%{BaseVersion}
 
 %check
+%if 0%{?with_check}
 %meson_test
+%endif
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -136,6 +152,14 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-13
+- Patch for CVE-2026-0716, CVE-2026-2443
+- enable ptests and fix ssl-test
+- fix patch for CVE-2025-32907 & CVE-2026-1536
+
+* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-12
+- Patch for CVE-2026-1801, CVE-2026-1761, CVE-2026-1536, CVE-2025-32049, CVE-2026-1467
+
 * Tue Dec 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-11
 - Patch for CVE-2025-12105
 
