@@ -26,6 +26,9 @@ parameters:
   - name: extraMacrosFiles
     type: object
     default: []
+    # Sample:
+    #   - macros.versions
+    #   - macros.custom
 
   - name: extraPackageRepos
     type: string
@@ -179,7 +182,7 @@ steps:
       - script: |
           toolchain_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
-            echo "ERROR: toolchain archive not found!" >&2
+            echo "##[error]Toolchain archive not found!" >&2
             exit 1
           fi
           echo "##vso[task.setvariable variable=toolchainArchive]$toolchain_archive"
@@ -191,7 +194,7 @@ steps:
       - script: |
           rpms_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ inputCacheRPMsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
+            echo "##[error]Cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
             exit 1
           fi
 
@@ -251,8 +254,17 @@ steps:
         daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
-      extra_macros_files="${{ join(' ', parameters.extraMacrosFiles) }}"
-      if [[ -n "$extra_macros_files" ]]; then
+      extra_macros_file_names="${{ join(' ', parameters.extraMacrosFiles) }}"
+      if [[ -n "$extra_macros_file_names" ]]; then
+        extra_macros_files=""
+        for macros_file_name in $extra_macros_file_names; do
+          macros_file="$(find "${{ parameters.inputArtifactsFolder }}" -name "$macros_file_name" -print -quit)"
+          if [[ ! -f "$macros_file" ]]; then
+            echo "##[error]Extra macros file '$macros_file_name' not found!" >&2
+            exit 1
+          fi
+          extra_macros_files="$extra_macros_files $macros_file"
+        done
         extra_macros_files_arg="EXTRA_MACROS_FILES=$extra_macros_files"
       fi
 
