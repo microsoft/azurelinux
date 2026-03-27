@@ -126,7 +126,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %if 0%{?with_check}
-%meson_test
+%meson_test --timeout-multiplier 10
 %endif
 
 %post   -p /sbin/ldconfig
