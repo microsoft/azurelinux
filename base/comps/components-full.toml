@@ -532,7 +532,6 @@
 [components.gnustep-make]
 [components.go-vendor-tools]
 [components.gobject-introspection]
-[components.golang]
 [components.golang-github-burntsushi-toml]
 [components.golang-github-cpuguy83-md2man]
 [components.golang-github-evanw-esbuild]

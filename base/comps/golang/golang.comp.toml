@@ -1,0 +1,9 @@
+[components.golang]
+# Override to pick up golang-1.25.8-1.fc43, which fixes an expired TLS test
+# certificate in net/smtp that causes %check failures after 2026-03-18.
+# Upstream: https://github.com/golang/go/issues/77504
+# Backport: https://github.com/golang/go/issues/77531 (Go 1.25.8)
+# Fedora commit: https://src.fedoraproject.org/rpms/golang/c/e0faaabdb215feb6be2b3232f480a03ce76ca132?branch=f43
+# TODO: Drop this override once the default Fedora 43 snapshot
+# in distro/azurelinux.distro.toml advances past this commit.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e0faaabdb215feb6be2b3232f480a03ce76ca132" }
