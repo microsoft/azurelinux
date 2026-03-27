@@ -31,9 +31,14 @@ Patch16:        CVE-2025-47911.patch
 Patch17:        CVE-2025-58190.patch
 Patch18:        CVE-2026-2303.patch
 Patch19:        CVE-2026-26014.patch
+<<<<<<< HEAD
 # Patch added based on customer request https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
 # Fix was introduced 1.37.2, this patch can be removed once we update to 1.37.2 or later
 Patch20:        cisco_telegraf_bug61041768.patch
+=======
+Patch20:        CVE-2026-4645.patch
+
+>>>>>>> e81f959b8 ([AutoPR- Security] Patch telegraf for CVE-2026-4645 [HIGH] (#16322))
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -98,9 +103,14 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+<<<<<<< HEAD
 * Fri Feb 27 2026 Sindhu Karri <lakarri@microsoft.com> - 1.31.0-16
 - Added patch to fix the issue reported in https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
   Fix in telegraf to support cisco telemetry plugin that collects telemetry data from cisco NXOS switches.
+=======
+* Fri Mar 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-16
+- Patch for CVE-2026-4645
+>>>>>>> e81f959b8 ([AutoPR- Security] Patch telegraf for CVE-2026-4645 [HIGH] (#16322))
 
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-15
 - Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
