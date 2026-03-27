@@ -237,13 +237,13 @@ popd
 %{_libdir}/cmake/Parquet/*.cmake
 %{_libdir}/libparquet.so
 %{_libdir}/pkgconfig/parquet*.pc
-%exclude /usr/lib/cmake/ArrowAcero/*
-%exclude /usr/lib/cmake/ArrowDataset/*
-%exclude /usr/lib/pkgconfig/arrow-acero.pc
-%exclude /usr/lib/pkgconfig/arrow-dataset.pc
-%exclude /usr/lib/libarrow_acero.so*
-%exclude /usr/lib/libarrow_dataset.so*
-%exclude /usr/share/gdb/auto-load/usr/lib/libarrow.so.*-gdb.py
+%exclude %{_libdir}/cmake/ArrowAcero/*
+%exclude %{_libdir}/cmake/ArrowDataset/*
+%exclude %{_libdir}/pkgconfig/arrow-acero.pc
+%exclude %{_libdir}/pkgconfig/arrow-dataset.pc
+%exclude %{_libdir}/libarrow_acero.so*
+%exclude %{_libdir}/libarrow_dataset.so*
+%exclude %{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
 
 %changelog
 * Mon Mar 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 15.0.0-8
