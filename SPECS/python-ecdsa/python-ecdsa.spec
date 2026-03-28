@@ -1,7 +1,7 @@
 Summary:        ECDSA cryptographic signature library (pure python)
 Name:           python-ecdsa
-Version:        0.18.0
-Release:        2%{?dist}
+Version:        0.19.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,6 +56,9 @@ into other protocols.
 %{python3_sitelib}/*
 
 %changelog
+* Sat Mar 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19.2-1
+- Auto-upgrade to 0.19.2 - for CVE-2026-33936
+
 * Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.18.0-2
 - Fix Ptest by importing 308 patch from Fedora (License:MIT)
 - Add missing test packages
