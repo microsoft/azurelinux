@@ -22,7 +22,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/kata-uvm-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/kernel-uvm-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
