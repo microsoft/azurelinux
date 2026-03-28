@@ -256,16 +256,16 @@ steps:
 
       extra_macros_file_names="${{ join(' ', parameters.extraMacrosFiles) }}"
       if [[ -n "$extra_macros_file_names" ]]; then
-        extra_macros_files=""
+        extra_macros_files=()
         for macros_file_name in $extra_macros_file_names; do
           macros_file="$(find "${{ parameters.inputArtifactsFolder }}" -name "$macros_file_name" -print -quit)"
           if [[ ! -f "$macros_file" ]]; then
             echo "##[error]Extra macros file '$macros_file_name' not found!" >&2
             exit 1
           fi
-          extra_macros_files="$extra_macros_files $macros_file"
+          extra_macros_files+=("$macros_file")
         done
-        extra_macros_files_arg="EXTRA_MACROS_FILES=$extra_macros_files"
+        extra_macros_files_arg="EXTRA_MACROS_FILES='${extra_macros_files[*]}'"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
