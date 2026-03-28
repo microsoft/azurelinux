@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://pypi.python.org/pypi/ecdsa
 Source0:        https://github.com/tlsfuzzer/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
-Patch0:         308.patch
 BuildRequires:  openssl
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -58,6 +57,7 @@ into other protocols.
 %changelog
 * Sat Mar 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19.2-1
 - Auto-upgrade to 0.19.2 - for CVE-2026-33936
+- Remove PR-308 patch.
 
 * Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.18.0-2
 - Fix Ptest by importing 308 patch from Fedora (License:MIT)
