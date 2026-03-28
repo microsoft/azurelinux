@@ -165,6 +165,6 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
-* Sun Mar 23 2026 Azure Linux Team <azurelinux@microsoft.com> - 6.6.96.mshv1-1
+* Mon Mar 23 2026 Azure Linux Team <azurelinux@microsoft.com> - 6.6.96.mshv1-1
 - Initial kernel-uvm-micro package with lightweight config
 - Minimal filesystem and virtio-fs focused configuration
