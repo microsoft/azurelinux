@@ -4,7 +4,7 @@ ntpconf=/etc/ntp.conf
 ntpstep=/etc/ntp/step-tickers
 
 [ "$EUID" != "0" ] && exit 4
-[ -x /usr/sbin/ntpdate ] || exit 5
+[ -x /usr/bin/ntpdate ] || exit 5
 [ -f /etc/sysconfig/ntpdate ] || exit 6
 . /etc/sysconfig/ntpdate
 
@@ -22,7 +22,7 @@ if ! echo "$tickers" | grep -qi '[a-z0-9]'; then
 	exit 6
 fi
 
-/usr/sbin/ntpdate -s -b $OPTIONS $tickers &> /dev/null
+/usr/bin/ntpdate -s -b $OPTIONS $tickers &> /dev/null
 RETVAL=$?
 
 [ $RETVAL -eq 0 ] && [ "$SYNC_HWCLOCK" = "yes" ] && /sbin/hwclock --systohc

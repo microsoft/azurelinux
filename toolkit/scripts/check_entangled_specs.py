@@ -60,7 +60,6 @@ version_release_matching_groups = [
         "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
     ]),
     frozenset([
-        "SPECS/shim/shim.spec",
         "SPECS/shim-unsigned-x64/shim-unsigned-x64.spec",
         "SPECS/shim-unsigned-aarch64/shim-unsigned-aarch64.spec"
     ]),
