@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "kata-containers-preview-3.27.0-preview1.tar.gz": "",
-    "kata-containers-preview-3.27.0-preview1-cargo.tar.gz": ""
+    "kata-containers-3.27.0.preview1-cargo.tar.gz": "3101c34e955f5d37bb97a66649905d2ae85702e6eb25061dba6691a9d790726a",
+    "kata-containers-3.27.0.preview1.tar.gz": "d3c3006cac4d3b06e03fe865ce719cad6c0004446825c5eac7426095d2d2995a"
   }
 }

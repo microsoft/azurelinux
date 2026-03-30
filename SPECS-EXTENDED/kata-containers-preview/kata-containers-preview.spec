@@ -4,7 +4,7 @@
 %global upstream_ver 3.27.0-preview1
 
 Name:           kata-containers-preview
-Version:        3.27.0~preview1
+Version:        3.27.0.preview1
 Release:        1%{?dist}
 
 Summary:        Kata Containers preview package developed for Pod Sandboxing on AKS
@@ -115,5 +115,5 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Mon Mar 10 2026 Roman Mohyla <romoh@microsoft.com> - 3.27.0~preview1-1
+* Mon Mar 30 2026 Saul Paredes <saulparedes@microsoft.com> - 3.27.0.preview1-1
 - Initial kata-containers-preview package based on msft-preview branch (upstream 3.27.0)
