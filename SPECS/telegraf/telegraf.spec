@@ -102,12 +102,12 @@ fi
 * Fri Mar 27 2026 Sindhu Karri <lakarri@microsoft.com> - 1.31.0-17
 - Added patch to fix the issue reported in https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
   Fix in telegraf to support cisco telemetry plugin that collects telemetry data from cisco NXOS switches.
+  
 * Fri Mar 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-16
 - Patch for CVE-2026-4645
+
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-15
 - Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
-* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-14
-- Patch for CVE-2025-11065
 
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-14
 - Patch for CVE-2025-11065
