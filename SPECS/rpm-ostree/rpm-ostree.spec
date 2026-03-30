@@ -15,6 +15,7 @@ Patch4:         CVE-2022-47085.patch
 Patch5:         CVE-2023-26964.patch
 Patch6:         CVE-2025-58160.patch
 Patch7:         CVE-2026-33055.patch
+Patch8:         CVE-2026-33056.patch
 
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
@@ -162,7 +163,7 @@ make check
 
 %changelog
 * Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2022.1-9
-- Patch for CVE-2026-33055
+- Patch for CVE-2026-33055, CVE-2026-33056
 
 * Wed Jan 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2022.1-8
 - Patch for CVE-2025-58160
