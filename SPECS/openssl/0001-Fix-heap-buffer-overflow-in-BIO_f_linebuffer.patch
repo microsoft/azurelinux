@@ -1,0 +1,67 @@
+From fb41a020b838f8145d07586275053568469a999c Mon Sep 17 00:00:00 2001
+From: Neil Horman <nhorman@openssl.org>
+Date: Wed, 7 Jan 2026 11:52:09 -0500
+Subject: [PATCH] Fix heap buffer overflow in BIO_f_linebuffer
+
+When a FIO_f_linebuffer is part of a bio chain, and the next BIO
+preforms short writes, the remainder of the unwritten buffer is copied
+unconditionally to the internal buffer ctx->obuf, which may not be
+sufficiently sized to handle the remaining data, resulting in a buffer
+overflow.
+
+Fix it by only copying data when ctx->obuf has space, flushing to the
+next BIO to increase available storage if needed.
+
+Fixes CVE-2025-68160
+---
+ crypto/bio/bf_lbuf.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/bio/bf_lbuf.c b/crypto/bio/bf_lbuf.c
+index eed3dc4..ce71231 100644
+--- a/crypto/bio/bf_lbuf.c
++++ b/crypto/bio/bf_lbuf.c
+@@ -186,14 +186,34 @@ static int linebuffer_write(BIO *b, const char *in, int inl)
+     while (foundnl && inl > 0);
+     /*
+      * We've written as much as we can.  The rest of the input buffer, if
+-     * any, is text that doesn't and with a NL and therefore needs to be
+-     * saved for the next trip.
++     * any, is text that doesn't end with a NL and therefore we need to try
++     * free up some space in our obuf so we can make forward progress.
+      */
+-    if (inl > 0) {
+-        memcpy(&(ctx->obuf[ctx->obuf_len]), in, inl);
+-        ctx->obuf_len += inl;
+-        num += inl;
++    while (inl > 0) {
++        size_t avail = (size_t)ctx->obuf_size - (size_t)ctx->obuf_len;
++        size_t to_copy;
++
++        if (avail == 0) {
++            /* Flush buffered data to make room */
++            i = BIO_write(b->next_bio, ctx->obuf, ctx->obuf_len);
++            if (i <= 0) {
++                BIO_copy_next_retry(b);
++                return num > 0 ? num : i;
++            }
++            if (i < ctx->obuf_len)
++                memmove(ctx->obuf, ctx->obuf + i, ctx->obuf_len - i);
++            ctx->obuf_len -= i;
++            continue;
++        }
++
++        to_copy = inl > (int)avail ? avail : (size_t)inl;
++        memcpy(&(ctx->obuf[ctx->obuf_len]), in, to_copy);
++        ctx->obuf_len += (int)to_copy;
++        in += to_copy;
++        inl -= (int)to_copy;
++        num += (int)to_copy;
+     }
++
+     return num;
+ }
+ 
+-- 
+2.45.4
+

@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        12%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,15 @@ Patch10:        CVE-2025-30215.patch
 Patch11:        CVE-2025-22872.patch
 Patch12:        CVE-2025-47913.patch
 Patch13:        CVE-2025-10543.patch
+Patch14:        CVE-2026-27571.patch
+Patch15:        CVE-2025-11065.patch
+Patch16:        CVE-2025-47911.patch
+Patch17:        CVE-2025-58190.patch
+Patch18:        CVE-2026-2303.patch
+Patch19:        CVE-2026-26014.patch
+# Patch added based on customer request https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
+# Fix was introduced 1.37.2, this patch can be removed once we update to 1.37.2 or later
+Patch20:        cisco_telegraf_bug61041768.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -89,6 +98,19 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Fri Feb 27 2026 Sindhu Karri <lakarri@microsoft.com> - 1.31.0-16
+- Added patch to fix the issue reported in https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
+  Fix in telegraf to support cisco telemetry plugin that collects telemetry data from cisco NXOS switches.
+
+* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-15
+- Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
+
+* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-14
+- Patch for CVE-2025-11065
+
+* Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-13
+- Patch for CVE-2026-27571
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-12
 - Patch for CVE-2025-10543
 
@@ -107,7 +129,7 @@ fi
 * Mon Mar 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-7
 - Patch CVE-2025-30204
 
-* Tue Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
+* Wed Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
 - Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 
 * Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-5

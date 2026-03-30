@@ -1,0 +1,30 @@
+From d6baea50cd55bc1ae9df1b8d1327b998ac738e0e Mon Sep 17 00:00:00 2001
+From: Felix Kaechele <felix@kaechele.ca>
+Date: Sun, 7 Jun 2020 12:14:02 -0400
+Subject: [PATCH 1/5] remove Werror in upstream build scripts
+ 
+removes -Werror in upstream build scripts.  -Werror conflicts with
+-D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
+ 
+Signed-off-by: Felix Kaechele <felix@kaechele.ca>
+---
+ auto/cc/gcc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+ 
+diff --git a/auto/cc/gcc b/auto/cc/gcc
+index a5c5c18fba3f..cdbbadb54023 100644
+--- a/auto/cc/gcc
++++ b/auto/cc/gcc
+@@ -166,7 +166,9 @@ esac
+ 
+ 
+ # stop on warning
+-CFLAGS="$CFLAGS -Werror"
++# This combined with Fedora's FORTIFY_SOURCE=2 option causes it nginx
++# to not compile.
++#CFLAGS="$CFLAGS -Werror"
+ 
+ # debug
+ CFLAGS="$CFLAGS -g"
+-- 
+2.52.0
