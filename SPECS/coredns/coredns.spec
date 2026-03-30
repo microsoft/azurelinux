@@ -52,7 +52,7 @@ Patch16:        CVE-2025-68151.patch
 Patch17:        CVE-2026-26017.patch
 Patch18:        CVE-2026-26018.patch
 
-BuildRequires:  golang
+BuildRequires:  msft-golang < 1.25
 
 %description
 CoreDNS is a fast and flexible DNS server.
