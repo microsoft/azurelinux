@@ -5,7 +5,7 @@
 
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 5
+%global target_kernel_release 6
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -15,7 +15,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.33.0
-Release:         5%{release_suffix}%{?dist}
+Release:         6%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -91,6 +91,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-6_6.12.57.1.6
+- Bump to match kernel-hwe.
+
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.33.0-5_6.12.57.1.5
 - Bump release to match kernel-hwe
 

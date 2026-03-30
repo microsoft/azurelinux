@@ -34,6 +34,7 @@ Patch14:        CVE-2026-4519.patch
 
 Patch1001:      CVE-2026-1703.patch
 
+
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
