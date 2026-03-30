@@ -1,7 +1,7 @@
 Summary:        library for configuring and customizing font access.
 Name:           fontconfig
 Version:        2.14.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
 Group:          System Environment/Libraries
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.freedesktop.org/software/fontconfig/release/%{name}-%{version}.tar.gz
 Patch0:         fontconfig-fix-ptest.patch
+Patch1:         CVE-2026-34085.patch
 BuildRequires:  freetype-devel
 BuildRequires:  libxml2
 BuildRequires:  expat-devel
@@ -68,6 +69,9 @@ VERBOSE=1 make -k check
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.2-3
+- Patch for CVE-2026-34085
+
 * Wed Mar 04 2026 Archana Shettigar <v-shettigara@microsoft.com> - 2.14.2-2
 - Provide fix for ptest failure.
 
