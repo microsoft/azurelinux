@@ -3368,8 +3368,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.17",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.17/otp-OTP-26.2.5.17.tar.gz"
+          "version": "26.2.5.18",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.18/otp-OTP-26.2.5.18.tar.gz"
         }
       }
     },
@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.21",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.21.tar.gz"
+          "version": "3.5.28",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.28.tar.gz"
         }
       }
     },
@@ -3960,8 +3960,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "9.1.1",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-9.1.1.tar.gz"
+          "version": "10.5.0",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.0.tar.gz"
         }
       }
     },
@@ -6610,8 +6610,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.130.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.130.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.130.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.130.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.130.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.130.1.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.130.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.130.1.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.126.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.126.1.tar.gz"
+          "version": "6.6.130.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.130.1.tar.gz"
         }
       }
     },
@@ -8581,8 +8581,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
         }
       }
     },
@@ -14392,8 +14392,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.28.2",
-          "downloadUrl": "https://nginx.org/download/nginx-1.28.2.tar.gz"
+          "version": "1.28.3",
+          "downloadUrl": "https://nginx.org/download/nginx-1.28.3.tar.gz"
         }
       }
     },
@@ -28136,8 +28136,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },
@@ -28146,8 +28146,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },
@@ -28776,8 +28776,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.4",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.4.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.5.tar.gz"
         }
       }
     },
@@ -29916,8 +29916,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0173",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0173.tar.gz"
+          "version": "9.2.0240",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0240.tar.gz"
         }
       }
     },
