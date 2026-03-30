@@ -3174,7 +3174,8 @@
                 "bootengine",
                 "coreos-cloudinit",
                 "coreos-init",
-                "python-nocaselist"
+                "python-nocaselist",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {
