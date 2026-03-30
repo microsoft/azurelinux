@@ -33,11 +33,11 @@ libpkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.aarch64.rpm
-ncurses-6.4-3.cm2.aarch64.rpm
-ncurses-compat-6.4-3.cm2.aarch64.rpm
-ncurses-devel-6.4-3.cm2.aarch64.rpm
-ncurses-libs-6.4-3.cm2.aarch64.rpm
-ncurses-term-6.4-3.cm2.aarch64.rpm
+ncurses-6.4-4.cm2.aarch64.rpm
+ncurses-compat-6.4-4.cm2.aarch64.rpm
+ncurses-devel-6.4-4.cm2.aarch64.rpm
+ncurses-libs-6.4-4.cm2.aarch64.rpm
+ncurses-term-6.4-4.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-7.cm2.aarch64.rpm
@@ -173,8 +173,8 @@ openssl-static-1.1.1k-39.cm2.aarch64.rpm
 libcap-2.60-7.cm2.aarch64.rpm
 libcap-devel-2.60-7.cm2.aarch64.rpm
 debugedit-5.0-2.cm2.aarch64.rpm
-libarchive-3.6.1-8.cm2.aarch64.rpm
-libarchive-devel-3.6.1-8.cm2.aarch64.rpm
+libarchive-3.6.1-9.cm2.aarch64.rpm
+libarchive-devel-3.6.1-9.cm2.aarch64.rpm
 rpm-4.18.0-4.cm2.aarch64.rpm
 rpm-build-4.18.0-4.cm2.aarch64.rpm
 rpm-build-libs-4.18.0-4.cm2.aarch64.rpm
@@ -189,7 +189,7 @@ libsolv-devel-0.7.24-1.cm2.aarch64.rpm
 libssh2-1.9.0-4.cm2.aarch64.rpm
 libssh2-devel-1.9.0-4.cm2.aarch64.rpm
 krb5-1.19.4-5.cm2.aarch64.rpm
-nghttp2-1.57.0-2.cm2.aarch64.rpm
+nghttp2-1.57.0-3.cm2.aarch64.rpm
 curl-8.8.0-8.cm2.aarch64.rpm
 curl-devel-8.8.0-8.cm2.aarch64.rpm
 curl-libs-8.8.0-8.cm2.aarch64.rpm
