@@ -29,7 +29,7 @@ either a cloud-config document or an executable script through user-data.
 %build
 export GO111MODULE=on
 export GOFLAGS="-mod=vendor"
-go build -v -o %{name} .
+go build -ldflags "-X main.version=v1.14.0-89-g1c1d7f4" -v -o %{name} .
 
 %check
 export GO111MODULE=on
