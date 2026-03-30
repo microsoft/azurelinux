@@ -9,63 +9,63 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl-fips-provider
 Version: 3.1.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
-Source3: genpatches
-Source9: configuration-switch.h
-Source10: configuration-prefix.h
+#Source3: genpatches
+# Source9: configuration-switch.h
+# Source10: configuration-prefix.h
 Source14: 0025-for-tests.patch
 Source15: fips_prov.cnf
 # Use more general default values in openssl.cnf
-Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
+# Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # # Do not install html docs
-Patch3:   0003-Do-not-install-html-docs-3.1.2-AZL.patch
+# Patch3:   0003-Do-not-install-html-docs-3.1.2-AZL.patch
 # # Override default paths for the CA directory tree
 # AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
 # # apps/ca: fix md option help text
-Patch5:   0005-apps-ca-fix-md-option-help-text.patch
+# Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
-Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
+# Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
 # Add FIPS_mode() compatibility macro
-Patch8:   0008-Add-FIPS_mode-compatibility-macro-3.1.4-fedora.patch
+# Patch8:   0008-Add-FIPS_mode-compatibility-macro-3.1.4-fedora.patch
 # # Add check to see if fips flag is enabled in kernel
-Patch9: 0009-Add-Kernel-FIPS-mode-flag-support-3.1.4-fedora.patch
+# Patch9: 0009-Add-Kernel-FIPS-mode-flag-support-3.1.4-fedora.patch
 # # Add support for PROFILE=SYSTEM system default cipherlist
 # AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
 # # Instead of replacing ectest.c and ec_curve.c, add the changes as a patch so
 # # that new modifications made to these files by upstream are not lost.
-Patch10:  0010-Add-changes-to-ectest-and-eccurve-3.1.4-fedora.patch
+# Patch10:  0010-Add-changes-to-ectest-and-eccurve-3.1.4-fedora.patch
 # # remove unsupported EC curves
-Patch11:  0011-Remove-EC-curves-3.1.4-fedora.patch
+# Patch11:  0011-Remove-EC-curves-3.1.4-fedora.patch
 # # Disable explicit EC curves
 # # https://bugzilla.redhat.com/show_bug.cgi?id=2066412
-Patch12:  0012-Disable-explicit-ec.patch
+# Patch12:  0012-Disable-explicit-ec.patch
 # # Skipped tests from former 0011-Remove-EC-curves.patch
-Patch13:  0013-skipped-tests-EC-curves-3.1.4-fedora.patch
+# Patch13:  0013-skipped-tests-EC-curves-3.1.4-fedora.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
-Patch24:  0024-load-legacy-prov.patch
+# Patch24:  0024-load-legacy-prov.patch
 # # Load the SymCrypt provider by default if present in non-FIPS mode,
 # # and always load it implicitly in FIPS mode
-Patch32:  0032-Force-fips-3.1.2-AZL3-TEMP-SYMCRYPT.patch
+# Patch32:  0032-Force-fips-3.1.2-AZL3-TEMP-SYMCRYPT.patch
 # # Embed HMAC into the fips.so
 Patch33:  0033-FIPS-embed-hmac-3.1.2-AZL.patch
 # # Comment out fipsinstall command-line utility
-Patch34:  0034.fipsinstall_disable-3.1.4-fedora.patch
+# Patch34:  0034.fipsinstall_disable-3.1.4-fedora.patch
 # # Skip unavailable algorithms running `openssl speed`
-Patch35:  0035-speed-skip-unavailable-dgst.patch
+# Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
-Patch49:  0049-Allow-disabling-of-SHA1-signatures-3.1.2-AZL.patch
+# Patch49:  0049-Allow-disabling-of-SHA1-signatures-3.1.2-AZL.patch
 # # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
-Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures-3.1.4-fedora.patch
+# Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures-3.1.4-fedora.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
-Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+# Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -275,17 +275,17 @@ sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
 # define OPENSSL_NO_SSL3\
 #endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/opensslconf.h
 
-%ifarch %{multilib_arches}
-# Do an configuration.h switcheroo to avoid file conflicts on systems where you
-# can have both a 32- and 64-bit version of the library, and they each need
-# their own correct-but-different versions of opensslconf.h to be usable.
-install -m644 %{SOURCE10} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-install -m644 %{SOURCE9} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
-%endif
+# %ifarch %{multilib_arches}
+# # Do an configuration.h switcheroo to avoid file conflicts on systems where you
+# # can have both a 32- and 64-bit version of the library, and they each need
+# # their own correct-but-different versions of opensslconf.h to be usable.
+# install -m644 %{SOURCE10} \
+# 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
+# cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
+# 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
+# install -m644 %{SOURCE9} \
+# 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
+# %endif
 
 # Delete everything but fips.so, since that's all we ship.
 # To do this, we delete all files and links that aren't fips.so.
