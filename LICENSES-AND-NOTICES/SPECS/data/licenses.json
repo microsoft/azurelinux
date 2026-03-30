@@ -3171,6 +3171,7 @@
             "license": "Same as the source project.",
             "specs": [
                 "azure-vm-utils",
+                "bootengine",
                 "python-nocaselist"
             ]
         },
