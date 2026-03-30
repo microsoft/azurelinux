@@ -34,6 +34,8 @@ go build -ldflags "-X main.version=1.14.0" -v -o %{name} .
 %check
 export GO111MODULE=on
 export GOFLAGS="-mod=vendor"
+# vmware datasource is not handled correctly in upstream for arm64 hence disabling test
+# until we add required patch to fix the code behaviour.
 sed -i '/package vmware/i\/\/go:build amd64\n' datasource/vmware/vmware_test.go
 go test ./...
 
