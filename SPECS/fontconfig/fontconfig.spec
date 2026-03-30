@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.freedesktop.org/software/fontconfig/release/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-34085.patch
+Patch1:         fontconfig-fix-ptest.patch
 BuildRequires:  freetype-devel
 BuildRequires:  libxml2
 BuildRequires:  expat-devel
@@ -70,6 +71,7 @@ make -k check
 %changelog
 * Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.95-2
 - Patch for CVE-2026-34085
+- Add patch to fix ptest
 
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.13.95-1
 - Update to 2.13.91
