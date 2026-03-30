@@ -16,7 +16,7 @@ Summary:        Plexus Common Utilities
 #
 Name:           plexus-utils
 Version:        3.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.xml
 Source2:        http://apache.org/licenses/LICENSE-2.0.txt
+Patch0:         CVE-2025-67030.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -45,7 +46,7 @@ Group:          Documentation/HTML
 Javadoc for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 cp %{SOURCE1} build.xml
 cp %{SOURCE2} .
@@ -77,6 +78,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 30 2026 Jyoti kanase <v-jykanase@microsoft.com> - 3.3.0-4
+- Patch for CVE-2025-67030
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.0-3
 - Moved from extended to core
 - License verified
