@@ -2837,6 +2837,7 @@
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
+                "kernel-uvm-micro",
                 "keyutils",
                 "kmod",
                 "krb5",
