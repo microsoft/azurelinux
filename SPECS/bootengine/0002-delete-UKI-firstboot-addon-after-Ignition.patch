@@ -1,5 +1,5 @@
 From 8cd08045b19026fc357c25140a8325f3c07edab0 Mon Sep 17 00:00:00 2001
-From: Lanze Liu <lanzetech@gmail.com>
+From: Lanze Liu <lanzeliu@microsoft.com>
 Date: Tue, 3 Mar 2026 05:03:08 +0000
 Subject: [PATCH] ignition-quench: delete UKI firstboot addon after Ignition
 
