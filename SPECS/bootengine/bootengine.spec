@@ -11,6 +11,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/flatcar/bootengine
 Source0:        https://github.com/flatcar/bootengine/archive/%{commit_hash}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0001-modify-tests.patch
+Patch1:         0002-delete-UKI-firstboot-addon-after-Ignition.patch
 BuildArch:      noarch
 BuildRequires:  dracut
 Requires:       util-linux

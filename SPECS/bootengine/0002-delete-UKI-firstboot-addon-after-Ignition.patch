@@ -1,0 +1,39 @@
+From 8cd08045b19026fc357c25140a8325f3c07edab0 Mon Sep 17 00:00:00 2001
+From: Lanze Liu <lanzetech@gmail.com>
+Date: Tue, 3 Mar 2026 05:03:08 +0000
+Subject: [PATCH] ignition-quench: delete UKI firstboot addon after Ignition
+
+In UKI (systemd-boot) mode there is no GRUB to conditionally inject
+first-boot kernel cmdline args.  Instead, a firstboot.addon.efi is
+placed on the ESP at build time.  systemd-boot auto-discovers it and
+appends its cmdline (flatcar.first_boot=detected) to the main UKI's
+cmdline.
+
+After Ignition completes, ignition-quench.service must remove this
+addon in addition to the legacy /boot/flatcar/first_boot marker file,
+so that subsequent boots do not re-trigger Ignition.
+
+The addon path is fixed: /boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi
+---
+ dracut/30ignition/ignition-quench.service | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/dracut/30ignition/ignition-quench.service b/dracut/30ignition/ignition-quench.service
+index 6460917..f56f2a3 100644
+--- a/dracut/30ignition/ignition-quench.service
++++ b/dracut/30ignition/ignition-quench.service
+@@ -14,6 +14,8 @@ After=sysroot-boot.service
+ 
+ [Service]
+ Type=oneshot
+-# We will only run if GRUB detected this file. Fail if we are unable to
+-# remove it, rather than risking rerunning Ignition at next boot.
+-ExecStart=/bin/sh -c 'if [ ! -e /sysroot/boot/flatcar/first_boot ] && [ ! -e /sysroot/boot/coreos/first_boot ]; then echo "error: /sysroot/boot/(flatcar|coreos)/first_boot not found"; exit 1; else rm -f /sysroot/boot/flatcar/first_boot /sysroot/boot/coreos/first_boot; fi'
++# We will only run if GRUB detected the first_boot marker file or if a UKI
++# firstboot addon exists. Fail if we cannot find either, rather than risking
++# rerunning Ignition at next boot.  In UKI mode, also remove the firstboot
++# addon so systemd-boot stops appending first-boot cmdline args.
++ExecStart=/bin/sh -c 'if [ ! -e /sysroot/boot/flatcar/first_boot ] && [ ! -e /sysroot/boot/coreos/first_boot ] && [ ! -e /sysroot/boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi ]; then echo "error: no first-boot marker or addon found"; exit 1; else rm -f /sysroot/boot/flatcar/first_boot /sysroot/boot/coreos/first_boot /sysroot/boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi; fi'
+-- 
+2.45.4
+

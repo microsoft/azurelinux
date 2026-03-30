@@ -2,6 +2,9 @@ From aa3edfbf9fa3bfe59d945901a2a55d637e677bd9 Mon Sep 17 00:00:00 2001
 From: SumitJenaHCL <v-sumitjena@microsoft.com>
 Date: Thu, 29 Jan 2026 13:40:55 +0530
 Subject: [PATCH] modify tests
+Update 10usr-generator tests to include rescue=nologreplay mount option.
+This change aligns the test mount unit definitions with current expected mount options by appending rescue=nologreplay alongside ro.
+The update ensures the tests correctly reflect the behavior used during rescue scenarios and prevents unnecessary journal replay during usr mounting.
 
 ---
  dracut/10usr-generator/testsuite.sh | 4 ++--
