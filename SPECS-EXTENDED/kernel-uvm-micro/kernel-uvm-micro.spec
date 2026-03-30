@@ -101,7 +101,9 @@ make mrproper
 cp %{config_source} .config
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL= ARCH=%{arch} oldconfig
+# Use olddefconfig (not oldconfig) so that options removed from the config stay
+# disabled instead of being silently re-enabled with their Kconfig defaults.
+make LC_ALL= ARCH=%{arch} olddefconfig
 
 # Verify the config files match
 cp .config new_config
