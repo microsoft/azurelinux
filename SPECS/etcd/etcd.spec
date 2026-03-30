@@ -14,7 +14,7 @@ Source1:        etcd.service
 #   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
 
-BuildRequires:  msft-golang
+BuildRequires:  msft-golang > 1.25
 
 %description
 A highly-available key value store for shared configuration and service discovery.
