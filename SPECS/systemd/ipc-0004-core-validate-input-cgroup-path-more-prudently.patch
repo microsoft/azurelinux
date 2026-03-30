@@ -1,0 +1,33 @@
+From b4a2391f799d5bd14ad62d831e115251d67a5a90 Mon Sep 17 00:00:00 2001
+From: Mike Yuan <me@yhndnzj.com>
+Date: Thu, 26 Feb 2026 11:06:34 +0100
+Subject: [PATCH 4/4] core: validate input cgroup path more prudently
+
+(cherry picked from commit efa6ba2ab625aaa160ac435a09e6482fc63bdbe8)
+(cherry picked from commit 3cee294fe8cf4fa0eff933ab21416d099942cabd)
+(cherry picked from commit 1d22f706bd04f45f8422e17fbde3f56ece17758a)
+(cherry picked from commit 54588d2dedff54bfb6036670820650e4ea74628f)
+---
+ src/core/dbus-manager.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/core/dbus-manager.c b/src/core/dbus-manager.c
+index 9b64a8074d..a9aee2d8f0 100644
+--- a/src/core/dbus-manager.c
++++ b/src/core/dbus-manager.c
+@@ -584,6 +584,12 @@ static int method_get_unit_by_control_group(sd_bus_message *message, void *userd
+         if (r < 0)
+                 return r;
+ 
++        if (!path_is_absolute(cgroup))
++                return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Control group path is not absolute: %s", cgroup);
++
++        if (!path_is_normalized(cgroup))
++                return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Control group path is not normalized: %s", cgroup);
++
+         u = manager_get_unit_by_cgroup(m, cgroup);
+         if (!u)
+                 return sd_bus_error_setf(error, BUS_ERROR_NO_SUCH_UNIT,
+-- 
+2.51.0
+

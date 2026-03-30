@@ -1,0 +1,173 @@
+From 69fd960a8d5a5aad6874cc11be6dc258ae7eef23 Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Mon, 19 May 2025 12:58:52 +0200
+Subject: [PATCH 1/4] path-util: add flavour of path_startswith() that leaves a
+ leading slash in place
+
+(cherry picked from commit ee19edbb9f3455db3f750089082f3e5a925e3a0c)
+(cherry picked from commit 20021e7686426052e3a7505425d7e12085feb2a6)
+---
+ src/basic/fs-util.c       |  2 +-
+ src/basic/mkdir.c         |  4 ++--
+ src/basic/path-util.c     | 39 ++++++++++++++++++++++++++++-----------
+ src/basic/path-util.h     | 10 ++++++++--
+ src/test/test-path-util.c | 16 ++++++++++++++++
+ 5 files changed, 55 insertions(+), 16 deletions(-)
+
+diff --git a/src/basic/fs-util.c b/src/basic/fs-util.c
+index 552986f546..8b2f6cc087 100644
+--- a/src/basic/fs-util.c
++++ b/src/basic/fs-util.c
+@@ -67,7 +67,7 @@ int rmdir_parents(const char *path, const char *stop) {
+                 assert(*slash == '/');
+                 *slash = '\0';
+ 
+-                if (path_startswith_full(stop, p, /* accept_dot_dot= */ false))
++                if (path_startswith_full(stop, p, /* flags= */ 0))
+                         return 0;
+ 
+                 if (rmdir(p) < 0 && errno != ENOENT)
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index 6e2b94d024..454739679c 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -92,7 +92,7 @@ int mkdir_parents_internal(const char *prefix, const char *path, mode_t mode, ui
+         assert(_mkdirat != mkdirat);
+ 
+         if (prefix) {
+-                p = path_startswith_full(path, prefix, /* accept_dot_dot= */ false);
++                p = path_startswith_full(path, prefix, /* flags= */ 0);
+                 if (!p)
+                         return -ENOTDIR;
+         } else
+@@ -137,7 +137,7 @@ int mkdir_parents_internal(const char *prefix, const char *path, mode_t mode, ui
+ 
+                 s[n] = '\0';
+ 
+-                if (!prefix || !path_startswith_full(prefix, path, /* accept_dot_dot= */ false)) {
++                if (!prefix || !path_startswith_full(prefix, path, /* flags= */ 0)) {
+                         r = mkdir_safe_internal(path, mode, uid, gid, flags, _mkdirat);
+                         if (r < 0 && r != -EEXIST)
+                                 return r;
+diff --git a/src/basic/path-util.c b/src/basic/path-util.c
+index 4c952d863c..9b44d5735c 100644
+--- a/src/basic/path-util.c
++++ b/src/basic/path-util.c
+@@ -424,8 +424,8 @@ int path_simplify_and_warn(
+         return 0;
+ }
+ 
+-char *path_startswith_full(const char *path, const char *prefix, bool accept_dot_dot) {
+-        assert(path);
++char* path_startswith_full(const char *original_path, const char *prefix, PathStartWithFlags flags) {
++        assert(original_path);
+         assert(prefix);
+ 
+         /* Returns a pointer to the start of the first component after the parts matched by
+@@ -438,28 +438,45 @@ char *path_startswith_full(const char *path, const char *prefix, bool accept_dot
+          * Returns NULL otherwise.
+          */
+ 
++        const char *path = original_path;
++
+         if ((path[0] == '/') != (prefix[0] == '/'))
+                 return NULL;
+ 
+         for (;;) {
+                 const char *p, *q;
+-                int r, k;
++                int m, n;
+ 
+-                r = path_find_first_component(&path, accept_dot_dot, &p);
+-                if (r < 0)
++                m = path_find_first_component(&path, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &p);
++                if (m < 0)
+                         return NULL;
+ 
+-                k = path_find_first_component(&prefix, accept_dot_dot, &q);
+-                if (k < 0)
++                n = path_find_first_component(&prefix, FLAGS_SET(flags, PATH_STARTSWITH_ACCEPT_DOT_DOT), &q);
++                if (n < 0)
+                         return NULL;
+ 
+-                if (k == 0)
+-                        return (char*) (p ?: path);
++                if (n == 0) {
++                        if (!p)
++                                p = path;
++
++                        if (FLAGS_SET(flags, PATH_STARTSWITH_RETURN_LEADING_SLASH)) {
++
++                                if (p <= original_path)
++                                        return NULL;
++
++                                p--;
++
++                                if (*p != '/')
++                                        return NULL;
++                        }
++
++                        return (char*) p;
++                }
+ 
+-                if (r != k)
++                if (m != n)
+                         return NULL;
+ 
+-                if (!strneq(p, q, r))
++                if (!strneq(p, q, m))
+                         return NULL;
+         }
+ }
+diff --git a/src/basic/path-util.h b/src/basic/path-util.h
+index 518f3340bf..763d1fe1a1 100644
+--- a/src/basic/path-util.h
++++ b/src/basic/path-util.h
+@@ -57,9 +57,15 @@ char* path_make_absolute(const char *p, const char *prefix);
+ int safe_getcwd(char **ret);
+ int path_make_absolute_cwd(const char *p, char **ret);
+ int path_make_relative(const char *from, const char *to, char **ret);
+-char *path_startswith_full(const char *path, const char *prefix, bool accept_dot_dot) _pure_;
++
++typedef enum PathStartWithFlags {
++        PATH_STARTSWITH_ACCEPT_DOT_DOT       = 1U << 0,
++        PATH_STARTSWITH_RETURN_LEADING_SLASH = 1U << 1,
++} PathStartWithFlags;
++
++char* path_startswith_full(const char *path, const char *prefix, PathStartWithFlags flags) _pure_;
+ static inline char* path_startswith(const char *path, const char *prefix) {
+-        return path_startswith_full(path, prefix, true);
++        return path_startswith_full(path, prefix, PATH_STARTSWITH_ACCEPT_DOT_DOT);
+ }
+ int path_compare(const char *a, const char *b) _pure_;
+ 
+diff --git a/src/test/test-path-util.c b/src/test/test-path-util.c
+index b9c4ef4126..c9794244d7 100644
+--- a/src/test/test-path-util.c
++++ b/src/test/test-path-util.c
+@@ -541,6 +541,22 @@ TEST(path_startswith) {
+         test_path_startswith_one("/foo/bar/barfoo/", "/fo", NULL, NULL);
+ }
+ 
++static void test_path_startswith_return_leading_slash_one(const char *path, const char *prefix, const char *expected) {
++        const char *p;
++
++        log_debug("/* %s(%s, %s) */", __func__, path, prefix);
++
++        p = path_startswith_full(path, prefix, PATH_STARTSWITH_RETURN_LEADING_SLASH);
++        assert_se(streq(p, expected));
++}
++
++TEST(path_startswith_return_leading_slash) {
++        test_path_startswith_return_leading_slash_one("/foo/bar", "/", "/foo/bar");
++        test_path_startswith_return_leading_slash_one("/foo/bar", "/foo", "/bar");
++        test_path_startswith_return_leading_slash_one("/foo/bar", "/foo/bar", NULL);
++        test_path_startswith_return_leading_slash_one("/foo/bar/", "/foo/bar", "/");
++}
++
+ static void test_prefix_root_one(const char *r, const char *p, const char *expected) {
+         _cleanup_free_ char *s = NULL;
+         const char *t;
+-- 
+2.51.0
+
