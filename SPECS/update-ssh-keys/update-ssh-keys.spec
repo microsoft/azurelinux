@@ -1,4 +1,6 @@
 %global crate update-ssh-keys
+%global commit be3ce2acc50313a6826c578e9dbb67e17085d60d
+%global shortcommit %(echo %{commit} | cut -c1-7)
 
 # Below is a manually created tarball containing vendored Rust dependencies.
 # The vendored crates are needed because network access is disabled during build time.
@@ -22,7 +24,7 @@ URL:            https://github.com/flatcar/update-ssh-keys
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-Source0:        https://github.com/flatcar/update-ssh-keys/archive/be3ce2acc50313a6826c578e9dbb67e17085d60d.tar.gz
+Source0:        https://github.com/flatcar/update-ssh-keys/archive/%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
 SOURCE1:        update-ssh-keys-0.3.0-vendor.tar.gz
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.60
