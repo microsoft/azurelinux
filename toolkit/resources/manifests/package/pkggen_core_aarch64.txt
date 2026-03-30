@@ -34,11 +34,11 @@ libpkgconf-2.0.2-1.azl3.aarch64.rpm
 pkgconf-2.0.2-1.azl3.aarch64.rpm
 pkgconf-m4-2.0.2-1.azl3.noarch.rpm
 pkgconf-pkg-config-2.0.2-1.azl3.aarch64.rpm
-ncurses-6.4-2.azl3.aarch64.rpm
-ncurses-compat-6.4-2.azl3.aarch64.rpm
-ncurses-devel-6.4-2.azl3.aarch64.rpm
-ncurses-libs-6.4-2.azl3.aarch64.rpm
-ncurses-term-6.4-2.azl3.aarch64.rpm
+ncurses-6.4-3.azl3.aarch64.rpm
+ncurses-compat-6.4-3.azl3.aarch64.rpm
+ncurses-devel-6.4-3.azl3.aarch64.rpm
+ncurses-libs-6.4-3.azl3.aarch64.rpm
+ncurses-term-6.4-3.azl3.aarch64.rpm
 readline-8.2-2.azl3.aarch64.rpm
 readline-devel-8.2-2.azl3.aarch64.rpm
 libattr-2.5.2-1.azl3.aarch64.rpm
