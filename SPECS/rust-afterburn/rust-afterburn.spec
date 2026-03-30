@@ -87,15 +87,9 @@ replace-with = "vendored-sources"
 [source.vendored-sources]
 directory = "vendor"
 EOF
-# afterburn-sshkeys@.service is by default enabled for the 'core' user in
-# CoreOS.
-# Based on https://github.com/coreos/afterburn/blob/master/Makefile.
-sed -e 's,@DEFAULT_INSTANCE@,core,' < \
-  systemd/afterburn-sshkeys@.service.in > \
-  systemd/afterburn-sshkeys@.service
 
 %build
-cargo build --release --offline
+cargo build --features cl-legacy --release --offline 
 
 %install
 %make_install
