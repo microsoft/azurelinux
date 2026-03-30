@@ -89,7 +89,7 @@ directory = "vendor"
 EOF
 
 %build
-cargo build --features cl-legacy --release --offline 
+cargo build --release --offline 
 
 %install
 %make_install
