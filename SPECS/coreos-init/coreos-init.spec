@@ -15,7 +15,8 @@ BuildArch:      noarch
 
 # tarball matches the ebuild SRC_URI pattern:
 Source0:        https://github.com/flatcar/init/archive/%{commit}/init-%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
-
+Patch0:         support-UKI-mode-by-restoring-firstboot-addon.patch
+Patch1:         Add-noop-sysupdate-transfer-config.patch
 # optional tests, analogous to IUSE=test
 %bcond_without tests
 
@@ -47,7 +48,7 @@ and configuration files used during early boot and provisioning. The upstream pr
 organizes content under configs/, scripts/, systemd/, udev/, etc. [1](https://github.com/flatcar/init)
 
 %prep
-%autosetup -n init-%{commit}
+%autosetup -p1 -n init-%{commit}
 
 %install
 rm -rf %{buildroot}
@@ -96,4 +97,7 @@ find %{buildroot} -type f -o -type l \
 %changelog
 * Mon Feb 02 2026 Sumit Jena (HCL Technologies Ltd) - 0.0.1-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
+- Add patch from Flatcar upstream with noop systemd-sysupdate transfer config to prevent service failure.
+- Change .transfer to .conf, since .transfer is only introduced in systemd 257 (.conf stays supported for compatibility)
+- If we bump to more recent upstream commit, we should keep .conf while systemd on < 257.
 - License verified.

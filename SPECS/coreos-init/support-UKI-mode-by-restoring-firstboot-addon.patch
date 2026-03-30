@@ -1,0 +1,76 @@
+From 2f33c344c1b4414c29e58abcd6e6156aae2621ef Mon Sep 17 00:00:00 2001
+From: Lanze Liu <lanzetech@gmail.com>
+Date: Wed, 4 Mar 2026 20:48:20 +0000
+Subject: [PATCH] flatcar-reset: support UKI mode by restoring firstboot addon
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In UKI (systemd-boot) mode there is no grub.cfg, so the traditional
+/boot/flatcar/first_boot marker file alone is not enough to re-trigger
+Ignition — systemd-boot does not check for it.
+
+Add UKI mode detection so that flatcar-reset restores the firstboot
+addon EFI from a pre-built template at /boot/acl/uki-addons/.
+systemd-boot auto-discovers addons in the .extra.d/ directory and
+appends their cmdline (flatcar.first_boot=detected) to the main UKI.
+
+The template is placed on the ESP at image build time by
+uki_install.sh, outside systemd-boot's auto-discovery path so it is
+never loaded automatically.
+
+The --stop action is also updated to clean up the addon.
+---
+ bin/flatcar-reset | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/bin/flatcar-reset b/bin/flatcar-reset
+index 1acfcf0..18768d8 100755
+--- a/bin/flatcar-reset
++++ b/bin/flatcar-reset
+@@ -131,6 +131,14 @@ fi
+ 
+ [ "$EUID" = "0" ] || { echo "Need to be root: sudo $0 $opts" > /dev/stderr ; exit 1 ; }
+ 
++UKI_ADDON_DIR="/boot/EFI/Linux/acl.efi.extra.d"
++UKI_ADDON_TEMPLATE="/boot/acl/uki-addons/firstboot.addon.efi"
++
++# Detect UKI (systemd-boot) mode by the presence of the addon directory.
++is_uki_mode() {
++  [[ -d "${UKI_ADDON_DIR}" ]]
++}
++
+ function generate_regex() {
+   local ENTRY=
+   echo -n '('
+@@ -164,6 +172,7 @@ function walkroot() {
+ if [ "${STOP}" = 1 ]; then
+   echo "Removing /selective-os-reset and /boot/flatcar/first_boot"
+   rm -f "/selective-os-reset" "/boot/flatcar/first_boot"
++  rm -f "${UKI_ADDON_DIR}/firstboot.addon.efi"
+   exit 0
+ elif [ "${PREVIEWDELETE}" = 1 ]; then
+   # For find -not means that we look at all files that are not matched by the keep regex
+@@ -270,5 +279,19 @@ generate_regex > /selective-os-reset
+ 
+ touch /boot/flatcar/first_boot
+ 
++if is_uki_mode; then
++  # In UKI (systemd-boot) mode there is no grub.cfg, so the first_boot
++  # marker file alone cannot re-trigger Ignition.  Restore the firstboot
++  # addon from the template that was saved at image build time.
++  # systemd-boot auto-discovers it and appends flatcar.first_boot=detected
++  # to the kernel cmdline on the next boot.
++  if [[ ! -f "${UKI_ADDON_TEMPLATE}" ]]; then
++    echo "Error: Firstboot addon template not found at ${UKI_ADDON_TEMPLATE}" > /dev/stderr
++    exit 1
++  fi
++  cp "${UKI_ADDON_TEMPLATE}" "${UKI_ADDON_DIR}/firstboot.addon.efi"
++  echo "Restored UKI firstboot addon from template"
++fi
++
+ echo "Prepared /selective-os-reset and /boot/flatcar/first_boot"
+ echo "Staged OS reset, you can reboot now"
+-- 
+2.45.4
+

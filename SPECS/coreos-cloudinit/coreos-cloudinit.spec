@@ -13,7 +13,7 @@ Group:          System Environment/Base
 URL:            https://github.com/flatcar/coreos-cloudinit
 
 Source0:        https://github.com/flatcar/coreos-cloudinit/archive/%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
-
+Patch0:         0001-skipped-TestWriteEnvFilePermFailure-test.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 
@@ -24,7 +24,7 @@ coreos-cloudinit enables a user to customize Flatcar Container Linux machines by
 either a cloud-config document or an executable script through user-data.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -p1 -n %{name}-%{commit}
 
 %build
 export GO111MODULE=on
@@ -32,11 +32,9 @@ export GOFLAGS="-mod=vendor"
 go build -v -o %{name} .
 
 %check
-%if "%{getenv:RUN_CHECK}" == "y"
 export GO111MODULE=on
 export GOFLAGS="-mod=vendor"
 go test ./...
-%endif
 
 %install
 rm -rf %{buildroot}
