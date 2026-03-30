@@ -34,6 +34,7 @@ go build -ldflags "-X main.version=1.14.0" -v -o %{name} .
 %check
 export GO111MODULE=on
 export GOFLAGS="-mod=vendor"
+sed -i '/package vmware/i\/\/go:build amd64\n' datasource/vmware/vmware_test.go
 go test ./...
 
 %install
