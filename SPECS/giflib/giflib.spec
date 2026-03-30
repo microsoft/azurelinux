@@ -1,7 +1,7 @@
 Name:           giflib
 Summary:        A library and utilities for processing GIFs
 Version:        5.2.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Patch2:         CVE-2022-28506.patch
 Patch3:         CVE-2023-39742.patch
 Patch4:         CVE-2025-31344.patch
 Patch5:         CVE-2021-40633.patch
+Patch6:         CVE-2026-23868.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  xmlto
@@ -64,13 +65,16 @@ find %{buildroot} -name '*.a' -print -delete
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Mar 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.1-11
+- Patch for CVE-2026-23868
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.2.1-10
 - Patch CVE-2021-40633 using an upstream patch
 
 * Tue Apr 15 2025 Sudipta Pandit <sudpandit@microsoft.com> - 5.2.1-9
 - Patch CVE-2025-31344
 
-* Fri Feb 14 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
+* Fri Feb 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
 - Patch CVE-2023-39742
 
 * Fri Oct 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 5.2.1-7
