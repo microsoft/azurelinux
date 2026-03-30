@@ -3172,6 +3172,8 @@
             "specs": [
                 "azure-vm-utils",
                 "bootengine",
+                "coreos-cloudinit",
+                "coreos-init",
                 "python-nocaselist"
             ]
         },
