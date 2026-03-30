@@ -1,5 +1,5 @@
 From 2f33c344c1b4414c29e58abcd6e6156aae2621ef Mon Sep 17 00:00:00 2001
-From: Lanze Liu <lanzetech@gmail.com>
+From: Lanze Liu <lanzeliu@microsoft.com>
 Date: Wed, 4 Mar 2026 20:48:20 +0000
 Subject: [PATCH] flatcar-reset: support UKI mode by restoring firstboot addon
 MIME-Version: 1.0
