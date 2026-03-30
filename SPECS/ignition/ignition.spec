@@ -168,8 +168,10 @@ install -p -m 0644 ./ignition-validate-* %{buildroot}%{_datadir}/ignition
 
 %if %{with check}
 %check
+# Removing the format issues as they don't affect the build
 sed -i '34d' ./test
 sed -i '/Checking gofmt/,+5d' ./test
+# Fixing the tests not to use go-rpm-macros since that package is only used in check section.
 sed -i '/Checking gofix.../,/Checking [a-zA-Z0-9_-]\+\.\.\./{ /Checking gofix.../d; /Checking [a-zA-Z0-9_-]\+\.\.\./!d }' ./test
 VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
