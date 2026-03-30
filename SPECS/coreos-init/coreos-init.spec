@@ -60,7 +60,7 @@ rm -rf %{buildroot}
 # In systemd, enabling a unit is implemented by creating symlinks in a target’s .wants dir. [3](https://www.flatcar.org/docs/latest/setup/systemd/getting-started/)
 install -d %{buildroot}%{_sysconfdir}/systemd/system/rpcbind.target.wants
 ln -sf %{_unitdir}/rpcbind.service %{buildroot}%{_sysconfdir}/systemd/system/rpcbind.target.wants/rpcbind.service
-
+# removing files which in conflict with other flatcar packages while installation.
 rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
 rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
 rm -rf  %{buildroot}/etc/issue
