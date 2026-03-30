@@ -61,12 +61,16 @@ cp %{SOURCE1} .
  
 %install
 %mvn_install
+# Remove embedded legal files from javadoc; license is covered by top-level %license files
+rm -rf %{buildroot}%{_javadocdir}/%{name}/legal
 
 %files -f .mfiles
-%doc NOTICE.txt LICENSE-2.0.txt
+%doc NOTICE.txt
+%license LICENSE-2.0.txt
 
 %files javadoc
-%doc NOTICE.txt LICENSE-2.0.txt
+%doc NOTICE.txt
+%license LICENSE-2.0.txt
 %{_javadocdir}/%{name}
 
 %changelog
