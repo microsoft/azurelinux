@@ -168,6 +168,6 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %changelog
 * Mon Mar 23 2026 Azure Linux Team <azurelinux@microsoft.com> - 6.6.96.mshv1-1
-- Original version for Azure Linux.
+- Initial Azure Linux import from Photon (license: Apache2).
 - License verified.
 - Initial kernel-uvm-micro package with lightweight config
