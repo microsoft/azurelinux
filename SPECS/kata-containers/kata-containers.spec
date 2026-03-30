@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.19.1.kata2
-Release:        9%{?dist}
+Release:        8%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -118,20 +118,17 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Thu Mar 12 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-9
+* Thu Mar 12 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-8
 - Patch for CVE-2025-58160 and CVE-2026-27171
 
-* Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-8
+* Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-7
 - Bump release to rebuild with rust
 
-* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-7
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
 - Bump release to rebuild with rust
 
-* Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-6
+* Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
 - Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
-
-* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
-- Bump release to rebuild with rust
 
 * Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
