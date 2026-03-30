@@ -1,0 +1,5 @@
+# Pin to 4.5.60 because the 4.5.59 spec has a build dependency on rust-clap_builder 4.5.59,
+# which is not available in the F43 repos that the Koji builders use for resolution.
+# Remove this pin once Koji builders can see prior completed builds as deps.
+[components.rust-clap]
+spec = { type = "upstream", upstream-commit = "493321dff0ef91c37b738226b3e34631965ae5da" }
