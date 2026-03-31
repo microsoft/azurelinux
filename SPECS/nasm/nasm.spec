@@ -1,20 +1,25 @@
 Summary:        Netwide Assembler.
 Name:           nasm
 Version:        2.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.nasm.us
 Source0:        http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-46456.patch
+
+BuildRequires:  perl
+BuildRequires:  perl(File::Find)
+
 ExclusiveArch:  x86_64
 
 %description
 NASM (Netwide Assembler) is an 80x86 assembler designed for portability and modularity. It includes a disassembler as well.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure
@@ -33,6 +38,9 @@ make %{?_smp_mflags} -k test
 %{_datadir}/*
 
 %changelog
+* Tue Mar 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.16-2
+- Patch for CVE-2022-46456
+
 * Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.16-1
 - Auto-upgrade to 2.16 - patch CVE-2022-44370
 

@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2204.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -177,6 +177,9 @@ fi
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Tue Mar 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.2204.1-5
+- Rebuild for net-snmp-libs to version 5.9.5.2-1
+
 * Fri Nov 08 2024 Andrew Phelps <anphel@microsoft.com> - 8.2204.1-4
 - Add patch to fix upstream issue #5158
 
