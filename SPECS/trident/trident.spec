@@ -10,7 +10,7 @@ Summary:        Declarative, security-first OS lifecycle agent designed primaril
 Name:           trident
 # Use hard-coded versions for distro build
 Version:        0.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Group:          Applications/System
@@ -300,6 +300,9 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.22.0-2
+- Bump release to rebuild with rust
+
 * Thu Mar 26 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.22.0-1
 - Upgrade to version 0.22.0
 
