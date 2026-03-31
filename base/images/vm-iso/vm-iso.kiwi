@@ -106,7 +106,7 @@
         <package name="which" />
         <package name="zchunk" />
         <package name="zlib" />
-	<file
+        <file
             name="20-wired-dhcp.network"
             target="/etc/systemd/network/20-wired-dhcp.network"
             permissions="0644" />
