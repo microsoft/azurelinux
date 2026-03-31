@@ -1,10 +1,10 @@
 %global debug_package %{nil}
-# The upstream GitHub tag uses dashes (e.g. 3.27.0-preview1) while RPM uses
+# The upstream GitHub tag uses dot (e.g. 3.27.0.preview1) while RPM uses
 # tilde notation for pre-release sorting.
-%global upstream_ver 3.27.0-preview1
+%global upstream_ver 3.27.0.preview1
 
 Name:           kata-containers-preview
-Version:        3.27.0.preview1
+Version:        3.27.0~preview1
 Release:        1%{?dist}
 
 Summary:        Kata Containers preview package developed for Pod Sandboxing on AKS
