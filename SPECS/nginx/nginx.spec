@@ -5,7 +5,7 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.28.2
+Version:        1.28.3
 Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
@@ -167,6 +167,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.3-1
+- Auto-upgrade to 1.28.3 - for CVE-2026-27654, CVE-2026-27784, CVE-2026-32647, CVE-2026-27651, CVE-2026-28753, CVE-2026-28755
+
 * Tue Feb 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.28.2-1
 - Upgrade to version 1.28.2 (fixes CVE-2026-1642).
 
@@ -183,7 +186,7 @@ rm -rf nginx-tests
 - Enable webdav module
 - Added tests to verify nginx server and its supported modules
 
-* Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
+* Mon Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
 - Fix CVE-2025-23419
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2

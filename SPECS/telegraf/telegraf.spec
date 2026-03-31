@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,7 @@ Patch16:        CVE-2025-47911.patch
 Patch17:        CVE-2025-58190.patch
 Patch18:        CVE-2026-2303.patch
 Patch19:        CVE-2026-26014.patch
+Patch20:        CVE-2026-4645.patch
 
 
 BuildRequires:  golang
@@ -96,6 +97,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Fri Mar 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-16
+- Patch for CVE-2026-4645
+
 * Fri Feb 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-15
 - Patch for CVE-2026-26014, CVE-2026-2303, CVE-2025-58190, CVE-2025-47911
 
