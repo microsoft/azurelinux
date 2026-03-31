@@ -1,0 +1,5 @@
+[components.rootlesskit]
+# Pin to the f43 commit used to build the current Fedora 43 package.
+# TODO: Drop this override once the default Fedora 43 snapshot
+# in distro/azurelinux.distro.toml advances past this commit.
+spec = { type = "upstream", upstream-name = "golang-github-rootless-containers-rootlesskit", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "eb6bc70fe34cb6947bb1fb1b61b23e34159273e7" }

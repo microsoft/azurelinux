@@ -4885,7 +4885,6 @@
 [components.rocthrust]
 [components.roctracer]
 [components.rocwmma]
-[components.rootlesskit]
 [components.rpcsvc-proto]
 [components.rpm-mpi-hooks]
 [components.rpm-ostree]
