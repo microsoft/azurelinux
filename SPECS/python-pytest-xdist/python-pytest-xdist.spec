@@ -60,6 +60,10 @@ Requires:       python3-py
 # Skip test_warning_captured_deprecated_in_pytest_6
 # This test requires pytest 6+
 # "Do not trigger the deprecated pytest_warning_captured hook in pytest 6+ (#562)"
+# Skip test_handlecrashitem_one
+# pytest 9 changed crash output formatting; the test expects exact stdout
+# matching that no longer holds. Functionality is correct; only test
+# expectations are outdated. Can be removed when upgrading pytest-xdist.
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
@@ -69,11 +73,6 @@ pip3 install atomicwrites>=1.3.0 \
     apipkg
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-# Skip test_handlecrashitem_one:
-# pytest 9 changed crash output formatting; the test expects exact stdout
-# matching that no longer holds. Functionality is correct; only test
-# expectations are outdated. Can be removed when upgrading pytest-xdist.
-
     python%{python3_version} -m pytest -v  -k "not test_warning_captured_deprecated_in_pytest_6 and not test_handlecrashitem_one"
 
 %files -n python3-%{pypi_name}
