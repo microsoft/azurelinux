@@ -116,4 +116,5 @@ popd
 
 %changelog
 * Mon Mar 30 2026 Saul Paredes <saulparedes@microsoft.com> - 3.27.0.preview1-1
-- Initial kata-containers-preview package based on msft-preview branch (upstream 3.27.0)
+- Initial Azure Linux import from Fedora 45 (license: MIT).
+- License verified
