@@ -6401,7 +6401,6 @@
 [components.rust-serial_test]
 [components.rust-serial_test_derive2]
 [components.rust-serial_test_derive]
-[components.'rust-servo_arc0.3']
 [components.rust-servo_arc]
 [components.rust-sev]
 [components.rust-sevctl]
