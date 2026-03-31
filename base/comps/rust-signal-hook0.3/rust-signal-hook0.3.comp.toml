@@ -1,0 +1,5 @@
+[components.'rust-signal-hook0.3']
+# Pin to the f43 commit used to build the current Fedora 43 package.
+# TODO: Drop this override once the default Fedora 43 snapshot
+# in distro/azurelinux.distro.toml advances past this commit.
+spec = { type = "upstream", upstream-name = "rust-signal-hook", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "fa76177769ec9473273fc82487396bcade30c945" }
