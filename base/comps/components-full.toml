@@ -6195,7 +6195,6 @@
 [components.rust-quick-error1]
 [components.rust-quick-error]
 [components.rust-quick-junit]
-[components.'rust-quick-xml0.38']
 [components.rust-quick-xml]
 [components.rust-quickcheck]
 [components.rust-quickcheck_macros]
