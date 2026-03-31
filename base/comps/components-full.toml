@@ -6420,7 +6420,6 @@
 [components.rust-shlex]
 [components.rust-signal-hook-mio]
 [components.rust-signal-hook-registry]
-[components.'rust-signal-hook0.3']
 [components.rust-signal-hook]
 [components.rust-signature]
 [components.rust-signature_derive]
