@@ -5964,7 +5964,6 @@
 [components.rust-munge]
 [components.rust-munge_macro]
 [components.rust-mutate_once]
-[components.'rust-nalgebra-macros0.2']
 [components.rust-nalgebra-macros]
 [components.'rust-nalgebra0.33']
 [components.rust-nalgebra]
