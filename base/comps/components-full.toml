@@ -6475,7 +6475,6 @@
 [components.rust-strip-ansi-escapes]
 [components.rust-strsim]
 [components.'rust-strum0.26']
-[components.'rust-strum0.27']
 [components.rust-strum]
 [components.'rust-strum_macros0.24']
 [components.'rust-strum_macros0.26']
