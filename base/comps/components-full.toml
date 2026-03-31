@@ -6472,7 +6472,6 @@
 [components.'rust-streebog0.9']
 [components.rust-streebog]
 [components.rust-strength_reduce]
-[components.'rust-string_cache0.8']
 [components.rust-string_cache]
 [components.rust-string_cache_codegen]
 [components.rust-stringprep]
