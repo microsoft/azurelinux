@@ -1107,8 +1107,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.18",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.18/bind-9.20.18.tar.xz"
+          "version": "9.20.21",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.21/bind-9.20.21.tar.xz"
         }
       }
     },
@@ -10841,8 +10841,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.55",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.55.tar.xz"
+          "version": "1.6.56",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.56.tar.xz"
         }
       }
     },
