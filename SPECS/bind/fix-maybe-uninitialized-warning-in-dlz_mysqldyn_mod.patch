@@ -1,8 +1,9 @@
-From daa392c65a4a578985fb3188ee81b1e80ee1791c Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Mon, 24 Feb 2025 18:17:20 +0000
+From f396312a54ea526e9aded068980b3ea4c861893a Mon Sep 17 00:00:00 2001
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Sat, 28 Mar 2026 18:49:42 +0000
 Subject: [PATCH] fix maybe-uninitialized warning in dlz_mysqldyn_mod.c
 
+Signed-off-by: Kanishk Bansal <kanbansal@microsoft.com>
 ---
  build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
@@ -30,5 +31,5 @@ index bdd0bcc..4488b94 100644
  	if (querystr == NULL) {
  		goto fail;
 -- 
-2.45.3
+2.45.4
 
