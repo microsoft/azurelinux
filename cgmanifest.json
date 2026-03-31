@@ -8240,9 +8240,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-containers-preview",
+          "version": "3.27.0~preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kata-containers-cc",
           "version": "3.15.0.aks0",
           "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kata-containers-preview",
+          "version": "3.27.0-preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0-preview1.tar.gz"
         }
       }
     },
