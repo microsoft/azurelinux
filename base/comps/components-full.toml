@@ -5945,7 +5945,6 @@
 [components.rust-mime_guess]
 [components.rust-minijinja]
 [components.rust-minimal-lexical]
-[components.'rust-miniz_oxide0.8']
 [components.rust-miniz_oxide]
 [components.rust-mint]
 [components.'rust-mio0.8']
