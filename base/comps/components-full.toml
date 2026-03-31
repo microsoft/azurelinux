@@ -5391,7 +5391,6 @@
 [components.rust-crypto-common]
 [components.rust-crypto-mac]
 [components.rust-cssparser-macros]
-[components.'rust-cssparser0.31']
 [components.rust-cssparser]
 [components.rust-csv-core]
 [components.rust-csv]
