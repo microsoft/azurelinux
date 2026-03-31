@@ -6343,7 +6343,6 @@
 [components.'rust-secrecy0.8']
 [components.rust-secrecy]
 [components.rust-secret-service]
-[components.'rust-selectors0.25']
 [components.rust-selectors]
 [components.rust-self_cell]
 [components.rust-selinux-sys]
