@@ -40,10 +40,6 @@
         </type>
     </preferences>
 
-    <repository type="rpm-md" alias="local-1">
-        <source path="file:///home/kgodara/azurelinux/base/out" />
-    </repository>
-
     <repository type="rpm-md" alias="fedora-43-everything">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/x86_64/" />
@@ -122,6 +118,10 @@
         <package name="which" />
         <package name="zchunk" />
         <package name="zlib" />
+	<file
+            name="20-wired-dhcp.network"
+            target="/etc/systemd/network/20-wired-dhcp.network"
+            permissions="0644" />
 
         <!-- OEM install + repart support -->
         <package name="dracut-kiwi-oem-dump" />
