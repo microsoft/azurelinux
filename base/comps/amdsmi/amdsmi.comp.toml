@@ -1,0 +1,4 @@
+[components.amdsmi]
+
+# Pin to commit that includes libdrm-2.4.130 compatibility fix needed for Azure Linux.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "033e87d8bcd9480840f42e122c2f69e2629240a2" }
