@@ -10,7 +10,6 @@ URL:            https://metacpan.org/pod/XML::Parser
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{version}.tar.gz
 Patch0:         CVE-2006-10002.patch
 Patch1:         CVE-2006-10003.patch
-Patch2:         skip-subtest-in-partial-t.patch
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -60,7 +59,6 @@ make %{?_smp_mflags} test
 %changelog
 * Thu Mar 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.47-2
 - Patch for CVE-2006-10003, CVE-2006-10002
-- Patch for skipping 3rd subtest in t/partial.t
 
 * Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.47-1
 - Upgrade to 2.47
