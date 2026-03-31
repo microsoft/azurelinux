@@ -74,7 +74,9 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 		jobSemaphore:     make(chan struct{}, runtime.NumCPU()*2),
 	}
 
-	err = newLicenseChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, rpmDirPath)
+	noExtraMacrosFile := ""
+
+	err = newLicenseChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, rpmDirPath, noExtraMacrosFile)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return newLicenseChecker, err

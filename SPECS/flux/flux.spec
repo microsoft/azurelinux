@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -146,6 +146,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.194.5-8
+- Bump release to rebuild with rust
+
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 0.194.5-7
 - Bump release to rebuild with rust
 

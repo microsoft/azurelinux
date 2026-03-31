@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -15,6 +15,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2026-27141.patch
 BuildRequires: golang < 1.25
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
@@ -68,8 +69,7 @@ Summary: OS Modifier
 The Azure Linux OS Modifier is a tool that can modify an OS.
 
 %prep
-%autosetup -p1 -n azure-linux-image-tools-%{version}
-tar -xf %{SOURCE1} --no-same-owner
+%autosetup -a1 -p1 -n azure-linux-image-tools-%{version}
 
 %build
 export GOPATH=%{our_gopath}
@@ -112,6 +112,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Thu Mar 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-2
+- Patch for CVE-2026-27141
+
 * Fri Feb 27 2026 Brian Fjeldstad <bfjelds@microsoft.com> 1.2.0-1
 - Add osmodifier subpackage
 - Upgrade to version 1.2.0

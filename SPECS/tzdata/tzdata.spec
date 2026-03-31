@@ -1,13 +1,14 @@
 Summary:        Time zone data
 Name:           tzdata
 Version:        2025c
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.iana.org/time-zones
 Source0:        https://data.iana.org/time-zones/releases/%{name}%{version}.tar.gz
+Source1:        https://data.iana.org/time-zones/releases/tzcode%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -20,6 +21,7 @@ rm -rf %{blddir}
 install -vdm 755 %{blddir}
 cd %{blddir}
 tar xf %{SOURCE0} --no-same-owner
+tar xf %{SOURCE1} --no-same-owner
 
 %build
 
@@ -37,6 +39,8 @@ cp -v zone.tab iso3166.tab zone1970.tab $ZONEINFO
 zic -d $ZONEINFO -p America/New_York
 install -vdm 755 %{buildroot}%{_sysconfdir}
 ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
+make tzdata.zi
+install -vpDm 644 tzdata.zi %{buildroot}%{_datadir}/zoneinfo/tzdata.zi
 
 %files
 %defattr(-,root,root)
@@ -45,6 +49,10 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Tue Jan 06 2026 Madhur Aggarwal <madaggarwal@microsoft.com> - 2025c-2
+- Added Source1 tzcode, which is required to build tzdata.zi 
+- Packaged tzdata.zi file in /usr/share/zoneinfo
+
 * Thu Dec 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2025c-1
 - Auto-upgrade to 2025c - upgrade to version 2025c
 
