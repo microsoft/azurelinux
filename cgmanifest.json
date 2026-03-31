@@ -15633,8 +15633,8 @@
         "type": "other",
         "other": {
           "name": "opensc",
-          "version": "0.26.1",
-          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.26.1/opensc-0.26.1.tar.gz"
+          "version": "0.27.1",
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.27.1/opensc-0.27.1.tar.gz"
         }
       }
     },
