@@ -657,8 +657,6 @@
 [components.fedora-bookmarks]
 [components.fedora-iot-config]
 [components.fedora-logos]
-[components.fedora-release]
-[components.fedora-repos]
 [components.felix-parent]
 [components.felix-utils]
 [components.fence-agents]
