@@ -109,7 +109,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-4
 - Patch for CVE-2025-10148
 
-* Thu Feb 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.11.1-3
+* Fri Feb 27 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.11.1-3
 - Fix CVE-2025-0665, CVE-2025-0167, CVE-2025-0725
 
 * Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 8.11.1-2
