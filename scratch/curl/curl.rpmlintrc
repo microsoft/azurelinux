@@ -1,0 +1,15 @@
+# Intentional stuff we're not concerned about
+addFilter("unversioned-explicit-provides webclient")
+addFilter("package-with-huge-docs")
+addFilter("crypto-policy-non-compliance-openssl /usr/lib(64)?/libcurl.so.4")
+
+# This is just plain wrong (%_configure redefinition)
+addFilter("configure-without-libdir-spec")
+
+# Technical term
+addFilter("E: spelling-error \('kerberos',")
+
+# Artefacts of RemovePathPostfixes: .minimal
+addFilter("W: dangling-relative-symlink /usr/lib/.build-id/.* ../../../../.*curl.*\.minimal")
+#addFilter("W: dangling-relative-symlink /usr/lib.*/libcurl.so.4 libcurl.so.4.*.minimal")
+#addFilter("E: invalid-ldconfig-symlink /usr/lib.*/libcurl.so.4.* libcurl.so.4.*.minimal")

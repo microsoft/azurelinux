@@ -1,0 +1,6 @@
+/curl-[0-9.]*.tar.lzma
+/curl-[0-9.]*.tar.lzma.asc
+/curl-[0-9.]*.tar.xz
+/curl-[0-9.]*.tar.xz.asc
+/curl-[0-9]*.[0-9]*.[0-9]*/
+/*.src.rpm

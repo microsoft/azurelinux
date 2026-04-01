@@ -1,0 +1,18 @@
+summary: various download methods with non-root user
+description: ''
+contact: Daniel Rusek <drusek@redhat.com>
+component:
+  - curl
+require:
+  - findutils
+  - libselinux-utils
+  - openssh-clients
+  - openssh-server
+  - passwd
+test: ./runtest.sh
+framework: beakerlib
+duration: 5m
+enabled: true
+tier: '1'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1049921

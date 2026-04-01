@@ -1,0 +1,92 @@
+From 495c771a6f9be008b783c5f59285d30fdc15fd63 Mon Sep 17 00:00:00 2001
+From: Jan Macku <jamacku@redhat.com>
+Date: Mon, 10 Mar 2025 14:23:59 +0100
+Subject: [PATCH] prevent multilib conflicts on the curl-config script
+
+---
+ curl-config.in      | 23 +++++------------------
+ docs/curl-config.md |  4 +++-
+ libcurl.pc.in       |  1 +
+ 3 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/curl-config.in b/curl-config.in
+index 5518416..324e0b7 100644
+--- a/curl-config.in
++++ b/curl-config.in
+@@ -74,7 +74,7 @@ while test "$#" -gt 0; do
+     ;;
+ 
+   --cc)
+-    echo '@CC@'
++    echo 'gcc'
+     ;;
+ 
+   --prefix)
+@@ -149,16 +149,7 @@ while test "$#" -gt 0; do
+     ;;
+ 
+   --libs)
+-    if test "X@libdir@" != 'X/usr/lib' -a "X@libdir@" != 'X/usr/lib64'; then
+-      curllibdir="-L@libdir@ "
+-    else
+-      curllibdir=''
+-    fi
+-    if test 'X@ENABLE_SHARED@' = 'Xno'; then
+-      echo "${curllibdir}-lcurl @LIBCURL_PC_LIBS_PRIVATE@"
+-    else
+-      echo "${curllibdir}-lcurl"
+-    fi
++    echo '-lcurl'
+     ;;
+ 
+   --ssl-backends)
+@@ -166,16 +157,12 @@ while test "$#" -gt 0; do
+     ;;
+ 
+   --static-libs)
+-    if test 'X@ENABLE_STATIC@' != 'Xno'; then
+-      echo "@libdir@/libcurl.@libext@ @LIBCURL_PC_LDFLAGS_PRIVATE@ @LIBCURL_PC_LIBS_PRIVATE@"
+-    else
+-      echo 'curl was built with static libraries disabled' >&2
+-      exit 1
+-    fi
++    echo 'curl was built with static libraries disabled' >&2
++    exit 1
+     ;;
+ 
+   --configure)
+-    echo @CONFIGURE_OPTIONS@
++    pkg-config libcurl --variable=configure_options | sed 's/^"//;s/"$//'
+     ;;
+ 
+   *)
+diff --git a/docs/curl-config.md b/docs/curl-config.md
+index 12ad245..fa0e03d 100644
+--- a/docs/curl-config.md
++++ b/docs/curl-config.md
+@@ -87,7 +87,9 @@ no, one or several names. If more than one name, they appear comma-separated.
+ ## `--static-libs`
+ 
+ Shows the complete set of libs and other linker options you need in order to
+-link your application with libcurl statically. (Added in 7.17.1)
++link your application with libcurl statically. Note that Fedora/RHEL libcurl
++packages do not provide any static libraries, thus cannot be linked statically.
++(Added in 7.17.1)
+ 
+ ## `--version`
+ 
+diff --git a/libcurl.pc.in b/libcurl.pc.in
+index c0ba524..f3645e1 100644
+--- a/libcurl.pc.in
++++ b/libcurl.pc.in
+@@ -28,6 +28,7 @@ libdir=@libdir@
+ includedir=@includedir@
+ supported_protocols="@SUPPORT_PROTOCOLS@"
+ supported_features="@SUPPORT_FEATURES@"
++configure_options=@CONFIGURE_OPTIONS@
+ 
+ Name: libcurl
+ URL: https://curl.se/
+-- 
+2.48.1
+

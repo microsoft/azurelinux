@@ -1,0 +1,48 @@
+From 82baec8c7cd40361585d8793dfe4531f7aad30e3 Mon Sep 17 00:00:00 2001
+From: Jan Macku <jamacku@redhat.com>
+Date: Wed, 11 Dec 2024 13:16:12 +0100
+Subject: [PATCH] test616: disable valgrind
+
+Valgrind disable was removed in upstream in https://github.com/curl/curl/commit/c91c37b6e87ceee760b7bb334c8e97e03ee93e93#diff-e01fd8774cf5b26329c7dc7dc03ec49745469205f3d501ced72c9d133455d5e7L35
+But test 616 is still failing under valgrind, so disable valgrind for this test.
+
+```
+ valgrind ERROR ==188588== 144 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==188588==    at 0x484B133: calloc (vg_replace_malloc.c:1675)
+==188588==    by 0x4BB7575: ??? (in /usr/lib64/libssh.so.4.10.1)
+==188588==    by 0x4BB8CC6: sftp_fstat (in /usr/lib64/libssh.so.4.10.1)
+==188588==    by 0x48EEAFB: myssh_statemach_act (libssh.c:1610)
+==188588==    by 0x48F1B9D: myssh_multi_statemach.lto_priv.0 (libssh.c:2095)
+==188588==    by 0x48BA971: UnknownInlinedFun (multi.c:1643)
+==188588==    by 0x48BA971: UnknownInlinedFun (multi.c:2314)
+==188588==    by 0x48BA971: multi_runsingle (multi.c:2768)
+==188588==    by 0x48BCCA4: curl_multi_perform (multi.c:3016)
+==188588==    by 0x4884E4A: UnknownInlinedFun (easy.c:701)
+==188588==    by 0x4884E4A: UnknownInlinedFun (easy.c:796)
+==188588==    by 0x4884E4A: curl_easy_perform (easy.c:815)
+==188588==    by 0x10C12B: UnknownInlinedFun (tool_operate.c:2902)
+==188588==    by 0x10C12B: UnknownInlinedFun (tool_operate.c:3127)
+==188588==    by 0x10C12B: UnknownInlinedFun (tool_operate.c:3249)
+==188588==    by 0x10C12B: main (tool_main.c:271)
+==188588==
+```
+---
+ tests/data/test616 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/data/test616 b/tests/data/test616
+index f76c68a..0ebc734 100644
+--- a/tests/data/test616
++++ b/tests/data/test616
+@@ -32,5 +32,8 @@ SFTP retrieval of empty file
+ #
+ # Verify data after the test has been "shot"
+ <verify>
++<valgrind>
++disable
++</valgrind>
+ </verify>
+ </testcase>
+-- 
+2.47.1
+

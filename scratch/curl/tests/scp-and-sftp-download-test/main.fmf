@@ -1,0 +1,20 @@
+summary: downloads test file through scp and sftp
+description: |
+    Test scenario:
+    - scp download
+    - sftp download
+    - scp upload
+    - sftp upload
+
+    When PUBKEY_PARAM global variable is set to 'empty' or 'none', scenarios are executed
+    with empty --pubkey parameter (--pubkey "") or with the paramiter omitted
+contact: Daniel Rusek <drusek@redhat.com>
+require:
+  - findutils
+component:
+  - curl
+test: ./runtest.sh
+path: /tests/scp-and-sftp-download-test
+framework: beakerlib
+duration: 10m
+enabled: true
