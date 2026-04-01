@@ -20,7 +20,7 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 #   cargo vendor > config.toml
 #   tar -czf %%{name}-%%{version}-vendor.tar.gz vendor/
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2026-27211.patch
+# Patch0:         CVE-2026-27211.patch
 %endif
 
 BuildRequires:  binutils
@@ -73,7 +73,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 %prep
 
 %setup -q -n cloud-hypervisor-%{version}
-%patch 0 -p1
+# %patch 0 -p1
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 %endif
