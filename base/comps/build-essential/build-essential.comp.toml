@@ -1,0 +1,2 @@
+[components.build-essential]
+spec = { type = "local", path = "build-essential.spec" }
