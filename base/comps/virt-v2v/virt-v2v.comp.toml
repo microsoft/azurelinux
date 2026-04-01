@@ -1,0 +1,12 @@
+[components.virt-v2v]
+
+# In koji build environments, unshare(CLONE_NEWUSER) is restricted,
+# networking requires passt which requires user namespace.
+# Disable network backend to avoid passt invocation.
+[[components.virt-v2v.overlays]]
+description = "Set LIBGUESTFS_BACKEND_SETTINGS=network:false in %check to bypass libvirt/passt in mock"
+type = "spec-prepend-lines"
+section = "%check"
+lines = [
+    "export LIBGUESTFS_BACKEND_SETTINGS=network:false",
+]
