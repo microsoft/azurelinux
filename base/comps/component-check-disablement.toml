@@ -4,6 +4,7 @@
 description = "Components with check failures during initial distro bringup"
 components = [
     "SDL3_image",
+    "bats",
     "containerd",
     "dnf",
     "fakeroot",
