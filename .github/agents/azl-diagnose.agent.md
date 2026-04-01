@@ -3,7 +3,7 @@ name: azl-diagnose
 description: Diagnose build failures — fetch Koji task info/logs, investigate upstream sources, identify root cause, and suggest fixes. Accepts task IDs, URLs, package names, or general queries.
 argument-hint: Ask a question about a package (e.g., `kernel`) or give a task ID/URL (e.g., `1234`, `https://koji.example.com/koji/taskinfo?taskID=1234`).
 agents: ["*"]
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 handoffs:
   - label: Attempt to diagnose and fix the issue
