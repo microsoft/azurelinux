@@ -1,0 +1,13 @@
+[Unit]
+Description=Generate /proc/version override for legacy OS detection (CBL-Mariner compat)
+DefaultDependencies=no
+After=systemd-tmpfiles-setup.service local-fs.target
+ConditionVirtualization=vm
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/proc-version-override
+
+[Install]
+WantedBy=multi-user.target

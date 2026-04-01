@@ -1,0 +1,104 @@
+# WALinuxAgent — Azure Linux Agent for Azure VMs.
+#
+# Overlays add a /proc/version override scoped to the waagent service namespace
+# so Guest-Configuration-Extension (and other tools that grep for "Mariner") can
+# identify Azure Linux 4.0.  System-wide /proc/version is unchanged.
+[components.WALinuxAgent]
+
+# Bump release so local RPM is preferred over the remote bootstrap repo.
+[[components.WALinuxAgent.overlays]]
+description = "Bump release to 2 so local build outranks bootstrap repo"
+type = "spec-set-tag"
+tag = "Release"
+value = "2%{?dist}"
+
+# --- Add source files for the proc-version override ---
+
+# Generator script: produces /run/proc_version_override with "CBL-Mariner" in
+# the user@host field.
+[[components.WALinuxAgent.overlays]]
+description = "Add proc-version-override generator script"
+type = "file-add"
+file = "proc-version-override.sh"
+source = "proc-version-override.sh"
+
+# Oneshot service that runs the generator at boot.
+[[components.WALinuxAgent.overlays]]
+description = "Add proc-version-override systemd service unit"
+type = "file-add"
+file = "proc-version-override.service"
+source = "proc-version-override.service"
+
+# Drop-in for waagent.service that bind-mounts the override into its namespace.
+[[components.WALinuxAgent.overlays]]
+description = "Add waagent.service drop-in to expose /proc/version override"
+type = "file-add"
+file = "10-proc-version.conf"
+source = "10-proc-version.conf"
+
+# --- Register sources in the spec ---
+
+[[components.WALinuxAgent.overlays]]
+description = "Register proc-version-override.sh as Source10"
+type = "spec-insert-tag"
+tag = "Source10"
+value = "proc-version-override.sh"
+
+[[components.WALinuxAgent.overlays]]
+description = "Register proc-version-override.service as Source11"
+type = "spec-insert-tag"
+tag = "Source11"
+value = "proc-version-override.service"
+
+[[components.WALinuxAgent.overlays]]
+description = "Register 10-proc-version.conf drop-in as Source12"
+type = "spec-insert-tag"
+tag = "Source12"
+value = "10-proc-version.conf"
+
+# --- Install the files ---
+
+[[components.WALinuxAgent.overlays]]
+description = "Install proc-version-override script, service, and drop-in"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# Install proc-version-override (backward-compat for tools that grep /proc/version for \"Mariner\")",
+    "install -Dm0644 %{SOURCE11} -t %{buildroot}%{_unitdir}/",
+    "install -Dm0755 %{SOURCE10} %{buildroot}%{_libexecdir}/proc-version-override",
+    "install -Dm0644 %{SOURCE12} %{buildroot}%{_unitdir}/waagent.service.d/10-proc-version.conf",
+]
+
+# --- Add to %files ---
+
+[[components.WALinuxAgent.overlays]]
+description = "Ship proc-version-override files in main package"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%{_unitdir}/proc-version-override.service",
+    "%{_libexecdir}/proc-version-override",
+    "%{_unitdir}/waagent.service.d/10-proc-version.conf",
+]
+
+# --- Enable the generator service via preset ---
+
+[[components.WALinuxAgent.overlays]]
+description = "Add preset to auto-enable proc-version-override.service"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# Enable proc-version-override.service by default",
+    "install -d %{buildroot}%{_prefix}/lib/systemd/system-preset/",
+    "echo 'enable proc-version-override.service' > %{buildroot}%{_prefix}/lib/systemd/system-preset/90-proc-version-override.preset",
+]
+
+[[components.WALinuxAgent.overlays]]
+description = "Ship the preset file"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%{_prefix}/lib/systemd/system-preset/90-proc-version-override.preset",
+]

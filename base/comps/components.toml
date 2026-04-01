@@ -321,7 +321,6 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.userspace-rcu]
 [components.util-linux]
 [components.vim]
-[components.WALinuxAgent]
 [components.which]
 [components.words]
 [components.xfsdump]
