@@ -4,8 +4,8 @@
 
 Name:           cloud-hypervisor
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of the KVM hypervisor and the Microsoft Hypervisor (MSHV).
-Version:        48.0.246
-Release:        4%{?dist}
+Version:        51.1.56
+Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -139,6 +139,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Wed Apr 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 51.1.56-1
+- Auto-upgrade to 51.1.56
+
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-4
 - Bump release to rebuild with rust
 
