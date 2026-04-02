@@ -68,6 +68,7 @@ Patch33:        CVE-2025-69646.patch
 Patch34:        CVE-2025-69647.patch
 Patch35:        CVE-2025-69649.patch
 Patch36:        CVE-2025-69652.patch
+Patch37:        CVE-2026-4647.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -325,7 +326,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Mar 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-21
-- Patch for CVE-2025-69652, CVE-2025-69649, CVE-2025-69647, CVE-2025-69646, CVE-2025-69645
+- Patch for CVE-2025-69652, CVE-2025-69649, CVE-2025-69647, CVE-2025-69646, CVE-2025-69645, CVE-2026-4647
 
 * Wed Jan 07 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.37-20
 - Patch for CVE-2025-1147, CVE-2025-1148, CVE-2025-11839
