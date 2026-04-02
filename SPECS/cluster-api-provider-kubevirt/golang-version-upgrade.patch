@@ -4,7 +4,7 @@ Date: Mon, 7 Jul 2025 12:43:42 -0700
 Subject: [PATCH] Modifying Golang version and adding makefile targets for
  development
 
-These changes will potentially be removed as the upstream carries out a new release.
+These changes will be removed as the upstream as and when we move to a later release of upstream.
 
 1. Go version upgraded from 1.23.x to 1.24.0 in:
     - Dockerfile

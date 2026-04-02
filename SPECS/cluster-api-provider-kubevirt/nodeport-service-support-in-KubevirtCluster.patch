@@ -12,6 +12,8 @@ Through this patch, if the service type is NodePort:
 - If no port is assigned yet, marks the condition as LoadBalancerProvisioningFailed and requeues.
 - Sets ControlPlaneEndpoint.Host to the host override and .Port to the NodePort.
 
+Partially covered in upstream PR - https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/pull/381
+
 ---
  config/default/credentials.yaml               | 11 ++++
  config/default/kustomization.yaml             |  2 +

@@ -8,6 +8,8 @@ These changes enhance bootstrapping reliability and speed.
 The readiness probe addition is especially useful for rolling updates, 
 where knowing the API server's state is critical.
 
+This patch addresses a behaviour required by Nexus and is not intended to be merged upstream.
+
 ---
  pkg/kubevirt/utils.go | 20 +++++++++++++++++++-
  1 file changed, 19 insertions(+), 1 deletion(-)

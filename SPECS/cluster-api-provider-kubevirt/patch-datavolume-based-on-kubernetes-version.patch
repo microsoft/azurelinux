@@ -7,6 +7,10 @@ This patch adds logic to dynamically modify the name of the root PVC (Persistent
 
 This ensures the correct OS image is selected during VM creation, especially when cloning from PVCs.
 
+This patch is particularly relevant for Nexus, where we maintain a set of pre-cloned PVCs for different Kubernetes versions to speed up VM provisioning. 
+By appending the Kubernetes version to the PVC name, we can ensure that the appropriate pre-cloned PVC is used for each VM based on its specified 
+Kubernetes version. This is not intended to be merged upstream and is specific to our use case in Nexus.
+
 ---
  pkg/kubevirt/utils.go | 40 ++++++++++++++++++++++++++++++++++++++++
  1 file changed, 40 insertions(+)

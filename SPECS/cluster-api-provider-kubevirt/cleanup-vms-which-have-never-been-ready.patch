@@ -8,6 +8,8 @@ in a failed state and have never successfully started.
 It introduces a new Started field to track whether a VM has ever been ready, and 
 implements logic to delete VMs that have been failing for more than 5 minutes.
 
+This code addresses a behaviour required by Nexus and is not intended to be merged upstream.
+
 ### Key Changes
 - API Changes (kubevirtmachine_types.go)
 

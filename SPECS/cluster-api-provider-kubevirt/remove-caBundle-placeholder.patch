@@ -8,6 +8,8 @@ is no longer works with Kubernetes v1.31 [0]
 
 [0] https://github.com/kubernetes/kubernetes/issues/125569#issuecomment-2261245120 
 
+PR upstream - https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/pull/332
+
 ---
  config/crd/patches/webhook_in_kubevirtclusters.yaml | 3 ---
  config/crd/patches/webhook_in_kubevirtmachines.yaml | 3 ---
