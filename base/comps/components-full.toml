@@ -3883,7 +3883,6 @@
 [components.python-backoff]
 [components.python-banal]
 [components.python-bcrypt]
-[components.python-beartype]
 [components.python-beautifulsoup4]
 [components.python-beniget]
 [components.python-betamax]
