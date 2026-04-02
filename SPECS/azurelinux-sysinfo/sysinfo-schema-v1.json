@@ -254,17 +254,38 @@
             "$id": "#/properties/system_info",
             "type": "object",
             "title": "System Information",
-            "description": "Information about the system-wide settings",
+            "description": "Information about the system",
             "properties": {
                 "selinux_mode": {
-                    "$id": "#/properties/package_info/properties/package_count",
+                    "$id": "#/properties/system_info/properties/selinux_mode",
                     "type": "string",
                     "title": "SELinux Mode",
-                    "description": "Enforced or Permissive"
+                    "description": "Provides information about whether SELinux mode is enforcing or permissive"
+                },
+                "architecture": {
+                    "$id": "#/properties/system_info/properties/architecture",
+                    "type": "string",
+                    "title": "Architecture",
+                    "description": "Provides information about the system architecture"
+                },
+                "system_manufacturer": {
+                    "$id": "#/properties/system_info/properties/system_manufacturer",
+                    "type": "string",
+                    "title": "System Manufacturer",
+                    "description": "Provides information about the system manufacturer"
+                },                
+                "host_type": {
+                    "$id": "#/properties/system_info/properties/host_type",
+                    "type": "string",
+                    "title": "Host Type",
+                    "description": "Provides information about whether the host is physical or virtual"
                 }
             },
             "required": [
-                "selinux_mode"
+                "selinux_mode",
+                "architecture",
+                "system_manufacturer",                
+                "host_type"
             ],
             "additionalProperties": false
         }
