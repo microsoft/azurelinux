@@ -124,6 +124,7 @@ Requires: /usr/bin/git
 Requires: createrepo_c >= 0.10.0
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
 Requires: python%{python3_pkgversion}-librepo
+Requires: python%{python3_pkgversion}-cheetah
  
 %description builder
 koji-builder is the daemon that runs on build machines and executes
@@ -161,6 +162,7 @@ Summary: Koji Web UI
 License: LGPL-2.1-only
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-web-code = %{version}-%{release}
+Requires: python%{python3_pkgversion}-cheetah
 %if 0%{?fedora} || 0%{?rhel} > 7
 Suggests: python%{python3_pkgversion}-%{name}-web
 %endif
@@ -186,13 +188,11 @@ koji-web is a web UI to the Koji system.
 # to the wheel we will produce.
 sed -e '/util\/koji/g' -e '/koji_cli_plugins/g' -i setup.py
  
-%if 0%{?fedora} > 42 || 0%{?rhel} >= 10
 # Create a sysusers.d config file
 cat >koji.sysusers.conf <<EOF
 u kojibuilder - - /builddir /bin/bash
 m kojibuilder mock
 EOF
-%endif
  
 %build
 %py3_build_wheel
@@ -227,9 +227,7 @@ for fn in $extra_dirs ; do
     %py_byte_compile %{__python3} %{buildroot}$fn
 done
  
-%if 0%{?fedora} > 42 || 0%{?rhel} >= 10
 install -m0644 -D koji.sysusers.conf %{buildroot}%{_sysusersdir}/koji.conf
-%endif
  
 %files
 %{_bindir}/koji
@@ -310,9 +308,7 @@ install -m0644 -D koji.sysusers.conf %{buildroot}%{_sysusersdir}/koji.conf
 %dir /etc/kojid
 %config(noreplace) /etc/kojid/kojid.conf
 %attr(-,kojibuilder,kojibuilder) /etc/mock/koji
-%if 0%{?fedora} > 42 || 0%{?rhel} >= 10
 %{_sysusersdir}/koji.conf
-%endif
  
 %post builder
 %systemd_post kojid.service
