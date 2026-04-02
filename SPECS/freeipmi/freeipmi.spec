@@ -8,8 +8,8 @@ Version:          1.16.17
 Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
-URL:              http://www.gnu.org/software/freeipmi/
-Source0:          http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+URL:              https://www.gnu.org/software/freeipmi/
+Source0:          https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:          bmc-watchdog.service
 Source2:          ipmidetectd.service
 Source3:          ipmiseld.service
