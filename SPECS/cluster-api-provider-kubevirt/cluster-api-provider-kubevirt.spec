@@ -37,6 +37,7 @@ Patch7:         cleanup-vms-which-have-never-been-ready.patch
 BuildRequires:  gcc
 BuildRequires:  build-essential
 BuildRequires:  golang >= 1.24
+ExclusiveArch:  x86_64
 
 %define our_gopath %{_topdir}/.gopath
 
