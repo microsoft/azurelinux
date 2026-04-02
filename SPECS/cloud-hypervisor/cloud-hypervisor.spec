@@ -20,7 +20,6 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 #   cargo vendor > config.toml
 #   tar -czf %%{name}-%%{version}-vendor.tar.gz vendor/
 Source1:        %{name}-%{version}-vendor.tar.gz
-# Patch0:         CVE-2026-27211.patch
 %endif
 
 BuildRequires:  binutils
@@ -73,7 +72,6 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 %prep
 
 %setup -q -n cloud-hypervisor-%{version}
-# %patch 0 -p1
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 %endif
@@ -141,6 +139,7 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %changelog
 * Wed Apr 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 51.1.56-1
 - Auto-upgrade to 51.1.56
+- Remove CVE-2026-27211.patch since it's already included in 51.1.56
 
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-4
 - Bump release to rebuild with rust
