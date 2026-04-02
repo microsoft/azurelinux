@@ -65,7 +65,7 @@ rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
 rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
 rm -rf  %{buildroot}/etc/issue
 
-# Removing unwanted files causing image check issues in ACL
+# Removing unwanted files that cause failures in Azure Linux image compliance checks
 rm -f %{buildroot}/usr/lib/systemd/system/sysinit.target.wants/ignition-delete-config.service
 
 # Generate file manifest automatically (avoids missing files when upstream changes)
