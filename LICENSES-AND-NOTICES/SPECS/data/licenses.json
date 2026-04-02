@@ -546,6 +546,7 @@
                 "Judy",
                 "jurand",
                 "kata-containers",
+                "kata-containers-preview",
                 "kde-filesystem",
                 "kde-settings",
                 "kernel-srpm-macros",
@@ -2836,6 +2837,7 @@
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
+                "kernel-uvm-micro",
                 "keyutils",
                 "kmod",
                 "krb5",
@@ -3169,7 +3171,12 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "azure-vm-utils",
+                "bootengine",
+                "coreos-cloudinit",
+                "coreos-init",
+                "python-nocaselist",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {

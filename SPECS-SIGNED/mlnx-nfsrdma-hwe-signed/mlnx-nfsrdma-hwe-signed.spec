@@ -31,20 +31,20 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 6
+%global target_azl_build_kernel_version 6.12.78.2
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-6%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-7%{release_suffix}%{?dist}}
 %{!?_name: %define _name mlnx-nfsrdma-hwe}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 6%{release_suffix}%{?dist}
+Release:	 7%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -117,6 +117,9 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-mlnx-nfsrdma-*.conf
 
 %changelog
+* Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-7_6.12.78.2.1
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-6_6.12.57.1.6
 - Bump to match kernel-hwe.
 
