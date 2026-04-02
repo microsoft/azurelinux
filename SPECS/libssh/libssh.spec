@@ -23,6 +23,7 @@ Patch7:         CVE-2026-0964.patch
 Patch8:         CVE-2026-0965.patch
 Patch9:         CVE-2026-0966.patch
 Patch10:        CVE-2026-0967.patch
+Patch11:        CVE-2026-3731.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -157,7 +158,7 @@ popd
 
 %changelog
 * Wed Apr 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-6
-- Patch for CVE-2026-0967, CVE-2026-0966, CVE-2026-0965, CVE-2026-0964
+- Patch for CVE-2026-0967, CVE-2026-0966, CVE-2026-0965, CVE-2026-0964, CVE-2026-3731
 
 * Wed Nov 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-5
 - Patch for CVE-2025-8114
