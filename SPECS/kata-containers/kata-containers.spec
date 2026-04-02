@@ -13,11 +13,10 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
 Patch1:         rust-1.90-fixes.patch
-# Patch2:         CVE-2026-24834.patch
+Patch2:         CVE-2026-24834.patch
 Patch3:         CVE-2026-25727.patch
 Patch4:         CVE-2026-25541.patch
-Patch5:         CVE-2025-65637.patch
-Patch6:         CVE-2025-11065.patch
+Patch5:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -119,6 +118,7 @@ popd
 %changelog
 * Wed Apr 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
 - Auto-upgrade to 3.19.1.kata3
+- remove CVE-2025-65637.patch as it no longer applies
 
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-7
 - Bump release to rebuild with rust
