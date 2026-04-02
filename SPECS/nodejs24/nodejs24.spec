@@ -29,6 +29,12 @@ Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}
 Source1:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-b.zip
 Source2:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
 Source3:        btest402.js
+Patch0:         disable-tlsv1-tlsv1-1.patch
+Patch1:         CVE-2019-10906.patch
+Patch2:         CVE-2024-22195.patch
+Patch3:         CVE-2020-28493.patch
+Patch4:         CVE-2024-34064.patch
+Patch5:         CVE-2025-27516.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
