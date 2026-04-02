@@ -1,0 +1,3 @@
+[components.python-beartype]
+# Pin to upstream commit that fixes build/test issues.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "9c277e0bb3a167c998ea68a99df012d5ad082d3e" }
