@@ -127,6 +127,7 @@ components = [
     "python-markdown_2",
     "python-matplotlib",
     "python-msrest",
+    "python-oslo-config",
     "python-pandas",
     "python-passlib",
     "python-pexpect",

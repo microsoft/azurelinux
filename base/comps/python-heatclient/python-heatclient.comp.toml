@@ -1,0 +1,10 @@
+[components.python-heatclient]
+
+# Disable doc generation to avoid cliff sphinxext Python 3.14 incompatibility.
+# TODO: re-enable doc once cliff sphinxext fix is released upstream
+# Upstream fix: https://github.com/openstack/cliff/commit/391261c849c994ca2d3f42926497e633047ed8c7
+[[components.python-heatclient.overlays]]
+description = "Disable doc generation to work around cliff sphinxext Python 3.14 incompatibility"
+type = "spec-search-replace"
+regex = '^%global with_doc 1$'
+replacement = '%global with_doc 0'
