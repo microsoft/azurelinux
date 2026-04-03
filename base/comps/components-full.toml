@@ -565,7 +565,6 @@
 [components.dom4j]
 [components.dos2unix]
 [components.dotconf]
-[components.'dotnet9.0']
 [components.double-conversion]
 [components.doxygen]
 [components.dpdk]
