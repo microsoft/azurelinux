@@ -5615,7 +5615,6 @@
 [components.rust-git2-curl]
 [components.rust-git2]
 [components.rust-gix-actor]
-[components.rust-gix-archive]
 [components.rust-gix-attributes]
 [components.rust-gix-bitmap]
 [components.rust-gix-blame]
