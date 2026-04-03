@@ -1,0 +1,31 @@
+[components.firefox]
+
+# Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
+# without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
+# C++ standards compliance and no longer leaks these types through transitive includes,
+# causing a compilation failure. The test binaries (controlled by build_tests) are not
+# shipped in the RPM and are only used when run_firefox_tests is enabled (which it is not).
+# Disabling them avoids the broken test compilation without affecting the final package.
+#
+# Upstream spec: https://src.fedoraproject.org/rpms/firefox/blob/f43/f/firefox.spec
+# Koji build failure: task 907428 (aarch64), task 898577 (x86_64)
+# TODO: Remove when upstream Firefox fixes GCC 15 compatibility (missing <cstdint> include).
+[[components.firefox.overlays]]
+description = "Disable build-time test compilation to avoid GCC 15 missing <cstdint> error in TestIntegerRange.cpp"
+type = "spec-search-replace"
+regex = '%global build_tests       1'
+replacement = '%global build_tests       0'
+
+# Firefox 148.0's bundled breakpad crash reporter has a GCC 15 compatibility issue:
+# minidump_descriptor.h references a field 'address_within_principal_mapping_' that
+# does not exist in the class. This fails on x86_64 where the crash reporter is enabled
+# (enable_mozilla_crashreporter = 1). Disabling it aligns with the aarch64/ppc64le
+# configuration and removes the non-essential crash reporter from the build.
+#
+# Upstream spec: https://src.fedoraproject.org/rpms/firefox/blob/f43/f/firefox.spec
+# TODO: Remove when upstream Firefox updates bundled breakpad for GCC 15 compatibility.
+[[components.firefox.overlays]]
+description = "Disable crash reporter to avoid GCC 15 breakpad compilation error in minidump_descriptor.h"
+type = "spec-search-replace"
+regex = '%global enable_mozilla_crashreporter 1'
+replacement = '%global enable_mozilla_crashreporter 0'
