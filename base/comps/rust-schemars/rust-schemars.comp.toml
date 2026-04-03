@@ -1,0 +1,6 @@
+# Pin to commit that ships an in-sync version of rust-schemars_derive, avoiding a
+# missing crate(schemars_derive/default) = 1.2.0 build failure.
+# Remove this pin once Koji builders can see prior completed builds as deps.
+# https://src.fedoraproject.org/rpms/rust-schemars/c/566b6f412bd5454682bdf8d15a33f1b5d4329418
+[components.rust-schemars]
+spec = { type = "upstream", upstream-commit = "566b6f412bd5454682bdf8d15a33f1b5d4329418" }
