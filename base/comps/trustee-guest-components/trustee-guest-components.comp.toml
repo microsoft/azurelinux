@@ -1,0 +1,5 @@
+# Pin to older commit to avoid missing crate(canon-json) and crate(kbs-types) deps
+# which are not available in the build tag at the latest F43 version.
+# https://src.fedoraproject.org/rpms/trustee-guest-components/c/7ac284fd661640027d26cbe0711072c1c835f28e
+[components.trustee-guest-components]
+spec = { type = "upstream", upstream-commit = "7ac284fd661640027d26cbe0711072c1c835f28e" }
