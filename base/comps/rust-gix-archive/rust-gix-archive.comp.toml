@@ -1,0 +1,6 @@
+# Pin to commit that supports rust-zip 8.x (the F43 spec requires zip 5.x-7.x
+# which is not available in the build tag).
+# Remove this pin once Koji builders can see prior completed builds as deps.
+# https://src.fedoraproject.org/rpms/rust-gix-archive/c/b435a6a075cdc705d25c60e17366c570e0880c08
+[components.rust-gix-archive]
+spec = { type = "upstream", upstream-commit = "b435a6a075cdc705d25c60e17366c570e0880c08" }
