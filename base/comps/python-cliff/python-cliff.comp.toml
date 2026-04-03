@@ -1,0 +1,17 @@
+[components.python-cliff]
+
+# Fix cliff sphinxext for Python 3.14: argparse.HelpFormatter._format_actions_usage()
+# was removed in Python 3.14. Upstream fix: https://github.com/openstack/cliff/commit/391261c
+[[components.python-cliff.overlays]]
+description = "Backport upstream fix for sphinxext compatibility with Python 3.14"
+type = "patch-add"
+source = "fix-sphinxext-python314.patch"
+
+# The spec uses %setup (not %autosetup), so patches aren't auto-applied.
+[[components.python-cliff.overlays]]
+description = "Apply the sphinxext patch in %prep since the spec uses %setup not %autosetup"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "%patch -P0 -p1",
+]

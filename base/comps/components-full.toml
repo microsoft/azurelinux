@@ -3923,7 +3923,6 @@
 [components.python-click-man]
 [components.python-click-plugins]
 [components.python-click]
-[components.python-cliff]
 [components.python-cligj]
 [components.python-cloudpickle]
 [components.python-cmd2]
