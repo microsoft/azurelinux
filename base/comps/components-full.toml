@@ -6765,7 +6765,6 @@
 [components.rust-zbus_macros]
 [components.rust-zbus_names]
 [components.rust-zerocopy-derive]
-[components.rust-zerocopy]
 [components.rust-zerofrom-derive]
 [components.rust-zerofrom]
 [components.rust-zeroize]

@@ -1,0 +1,6 @@
+# Pin to commit that ships an in-sync version of rust-zerocopy-derive, avoiding a
+# missing crate(zerocopy-derive/default) = 0.8.31 build failure.
+# Remove this pin once Koji builders can see prior completed builds as deps.
+# https://src.fedoraproject.org/rpms/rust-zerocopy/c/a093bbbabb313f5318b1d934e865edefcdb474ef
+[components.rust-zerocopy]
+spec = { type = "upstream", upstream-commit = "a093bbbabb313f5318b1d934e865edefcdb474ef" }
