@@ -3,7 +3,7 @@
 Summary:        Smart card library and applications
 Name:           opensc
 Version:        0.23.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,9 @@ Patch4:         CVE-2024-1454.patch
 Patch5:         CVE-2023-40660.patch
 Patch6:         CVE-2023-40661.patch
 Patch7:         CVE-2024-45619.patch
+Patch8:         CVE-2025-49010.patch
+Patch9:         CVE-2025-66037.patch
+Patch10:        CVE-2025-66215.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash-completion
@@ -146,6 +149,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
+* Fri Apr 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.23.0-6
+- Patch for CVE-2025-66215, CVE-2025-66037, CVE-2025-49010
+
 * Fri May 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.23.0-5
 - Patch CVE-2023-40661 and CVE-2024-45619
 
