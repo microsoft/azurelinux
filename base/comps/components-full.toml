@@ -1053,7 +1053,6 @@
 [components.golang-github-eclipse-paho-mqtt]
 [components.golang-github-elazarl-goproxy]
 [components.golang-github-emicklei-restful]
-[components.golang-github-envoyproxy-control-plane]
 [components.golang-github-envoyproxy-protoc-gen-validate]
 [components.golang-github-errors]
 [components.golang-github-etcd-io-gofail]

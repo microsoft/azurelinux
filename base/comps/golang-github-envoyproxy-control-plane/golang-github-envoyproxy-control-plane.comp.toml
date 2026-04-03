@@ -1,0 +1,14 @@
+# golang-github-sagikazarmark-crypt has been a dead package since Fedora 43, which breaks
+# the transitive dependency chain: %go_generate_buildrequires generates imports that
+# transitively pull in golang-sigs-k8s-aws-iam-authenticator-devel →
+# golang-github-spf13-viper-devel → golang(github.com/sagikazarmark/crypt/config).
+# Remove this overlay once golang-github-sagikazarmark-crypt is available or viper
+# no longer requires it.
+[components.golang-github-envoyproxy-control-plane]
+
+[[components.golang-github-envoyproxy-control-plane.overlays]]
+description = "Disable dynamic BuildRequires generation — transitive dep on dead golang-github-sagikazarmark-crypt"
+type = "spec-search-replace"
+section = "%generate_buildrequires"
+regex = '%go_generate_buildrequires'
+replacement = '# Disabled: transitive dep on dead golang-github-sagikazarmark-crypt (see comp.toml)'
