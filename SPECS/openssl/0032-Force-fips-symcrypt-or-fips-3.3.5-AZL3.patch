@@ -94,8 +94,8 @@ index 70c9729..5b39131 100644
 +
 +    // Config file paths
 +#  define SYMCRYPT_PROV_CONF           OPENSSLDIR "/symcrypt_prov.cnf"
-+    // Upstream uses fips_local.cnf, we use fips_prov.cnf since we don't use crypto policies.
-+#  define FIPS_PROV_CONF              OPENSSLDIR "/fips_prov.cnf"
++    // Upstream uses fipsmodule.cnf; Fedora uses fips_local.cnf for crypto-policies integration.
++#  define FIPS_PROV_CONF              OPENSSLDIR "/fipsmodule.cnf"
 +
 +    // Context and configuration variables.
 +    OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
@@ -129,7 +129,7 @@ index 70c9729..5b39131 100644
 +            // If neither is available, fail.
 +            symcrypt_prov_activated = load_fips_certified_provider(libctx, "symcryptprovider", SYMCRYPT_PROV_CONF, "symcrypt_prov_sect", 1);
 +            if (symcrypt_prov_activated == 0) {
-+                fips_prov_activated = load_fips_certified_provider(libctx, "fips", FIPS_PROV_CONF, "fips_prov_sect", 1);
++                fips_prov_activated = load_fips_certified_provider(libctx, "fips", FIPS_PROV_CONF, "fips_sect", 1);
 +            }
 +
 +            // If we still don't have a FIPS-certified provider, fail.
@@ -161,4 +161,3 @@ index 70c9729..5b39131 100644
  
 -- 
 2.45.4
-
