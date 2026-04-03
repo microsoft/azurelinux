@@ -3,12 +3,13 @@
 Summary:        Google oAuth Authentication Library
 Name:           python-%{pypi_name}
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/googleapis/google-auth-library-python-oauthlib
 Source0:        https://files.pythonhosted.org/packages/e3/b4/ef2170c5f6aa5bc2461bab959a84e56d2819ce26662b50038d2d0602223e/%{pypi_name}-%{version}.tar.gz
+Patch0:         0001-Fix-ptest-host-name-resolution-for-local-IP-issue.patch
 BuildRequires:  python3-click
 BuildRequires:  python3-devel
 BuildRequires:  python3-google-auth
@@ -32,7 +33,7 @@ Summary:        %{summary}
 This library provides oauthlib integration with google-auth.
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n %{pypi_name}-%{version} -p1
 rm -rf %{pypi_name}.egg-info
 
 %build
@@ -53,6 +54,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v tests
 %{python3_sitelib}/google_auth_oauthlib-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Apr 02 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.0.0-2
+- patch to fix ptest host name resolution for local IP issue
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.0-1
 - Auto-upgrade to 1.0.0 - Azure Linux 3.0 - package upgrades
 
