@@ -1321,7 +1321,6 @@
 [components.golang-uber-zap]
 [components.golang-x-arch]
 [components.golang-x-crypto]
-[components.golang-x-exp]
 [components.golang-x-mod]
 [components.golang-x-net]
 [components.golang-x-oauth2]
