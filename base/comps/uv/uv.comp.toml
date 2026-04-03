@@ -1,0 +1,4 @@
+# Pin to 0.10.12 to avoid missing crate(astral-tokio-tar/default) build dependency.
+# https://src.fedoraproject.org/rpms/uv/c/07f74430e59fb84e925e6d7b238f0b334a42c97c
+[components.uv]
+spec = { type = "upstream", upstream-commit = "07f74430e59fb84e925e6d7b238f0b334a42c97c" }
