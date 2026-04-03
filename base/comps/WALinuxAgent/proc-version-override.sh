@@ -12,7 +12,10 @@ OVERRIDE="/run/proc_version_override"
 KVER=$(uname -r)
 
 # Strip the first parenthesised group (user@host) and keep everything after it.
-TAIL=$(sed 's/^[^)]*)[[:space:]]*//' /proc/version)
+# Also replace "Red Hat" in the GCC version string so tools that pattern-match
+# /proc/version (e.g. GCE's guest-configuration-shim) don't misidentify AZL as
+# RHEL based on the compiler tag.
+TAIL=$(sed 's/^[^)]*)[[:space:]]*//' /proc/version | sed 's/Red Hat/Azure Linux/g')
 
 printf 'Linux version %s (root@CBL-Mariner-azurelinux) %s\n' \
     "${KVER}" "${TAIL}" > "${OVERRIDE}"
