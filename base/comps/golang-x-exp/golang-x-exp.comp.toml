@@ -1,0 +1,9 @@
+# The spec uses %go_generate_buildrequires which auto-detects Go imports. Without the
+# bootstrap bcond, this generates a dependency on golang(golang.org/x/tools/go/packages/packagestest)
+# which golang-x-tools does not provide. Enabling bootstrap skips dynamic dep generation,
+# %build (no CLI binaries), and %check (tests). Only the -devel Go library subpackage
+# is produced.
+[components.golang-x-exp]
+
+[components.golang-x-exp.build]
+with = ["bootstrap"]
