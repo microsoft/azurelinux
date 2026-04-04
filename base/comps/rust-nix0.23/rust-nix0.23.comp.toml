@@ -1,0 +1,16 @@
+[components.'rust-nix0.23']
+
+# Azure Linux kernels use 4-part versions (e.g. 6.6.121.1-1.azl3) which the
+# semver crate in test helpers cannot parse.  Patch the require_kernel_version!
+# macro to handle this by truncating to 3 numeric components.
+[[components.'rust-nix0.23'.overlays]]
+description = "Add patch file to handle 4-part kernel versions in the require_kernel_version test macro"
+type = "file-add"
+file = "fix-4part-kernel-version.patch"
+source = "fix-4part-kernel-version.patch"
+
+[[components.'rust-nix0.23'.overlays]]
+description = "Register the 4-part kernel version fix patch in the spec"
+type = "spec-insert-tag"
+tag = "Patch9999"
+value = "fix-4part-kernel-version.patch"

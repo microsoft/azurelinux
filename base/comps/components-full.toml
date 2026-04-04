@@ -5972,7 +5972,6 @@
 [components.rust-new_debug_unreachable]
 [components.rust-newtype-uuid]
 [components.rust-nibble_vec]
-[components.'rust-nix0.23']
 [components.rust-no-panic]
 [components.rust-no-std-net]
 [components.rust-no_std_io2]
