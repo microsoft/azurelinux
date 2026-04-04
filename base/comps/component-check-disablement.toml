@@ -170,6 +170,12 @@ components = [
     "superlu_dist",
     "trivy",
     "virt-v2v",
+    "perl-SOAP-Lite",
+    "perl-XML-Catalog",
+    "perl-XML-DOM",
+    "perl-XML-Simple",
+    "perl-XML-Twig",
+    "perl-XML-XPath",
 ]
 
 [component-groups.check-skip-initial-failures.default-component-config.build]
