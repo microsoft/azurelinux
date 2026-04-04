@@ -89,6 +89,11 @@
           "type": "array",
           "title": "Source files",
           "description": "Source files to download for this component"
+        },
+        "tests": {
+          "$ref": "#/$defs/TestsConfig",
+          "title": "Tests",
+          "description": "Test suites and selector criteria for validating this component"
         }
       },
       "additionalProperties": false,
@@ -274,6 +279,14 @@
           "title": "Images",
           "description": "Definitions of images for this project"
         },
+        "custom-images": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ImageConfig"
+          },
+          "type": "object",
+          "title": "Custom images",
+          "description": "Definitions of custom images for this project"
+        },
         "tools": {
           "$ref": "#/$defs/ToolsConfig",
           "title": "Tools configuration",
@@ -403,10 +416,216 @@
           "title": "Description",
           "description": "Description of the image"
         },
+        "image-type": {
+          "type": "string",
+          "enum": [
+            "test-only",
+            "1P",
+            "3P"
+          ],
+          "title": "Image type",
+          "description": "Classification for the image lifecycle and ownership"
+        },
+        "parent-image": {
+          "type": "string",
+          "title": "Parent image",
+          "description": "Optional reference to the parent image definition path used as the base for customization (for example '../../base/images/vm-base')"
+        },
         "definition": {
           "$ref": "#/$defs/ImageDefinition",
           "title": "Definition",
           "description": "Identifies where to find the definition for this image"
+        },
+        "tests": {
+          "$ref": "#/$defs/TestsConfig",
+          "title": "Tests",
+          "description": "Test suites and selector criteria for validating this image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestsConfig": {
+      "properties": {
+        "skus": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "SKUs",
+          "description": "List of Azure SKUs the test suites should run against"
+        },
+        "test-suites": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test suites",
+          "description": "List of test suite names enabled for this target"
+        },
+        "tests_selectors": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TestSuiteSelector"
+          },
+          "type": "object",
+          "title": "Test selectors",
+          "description": "Selector criteria keyed by test suite name"
+        },
+        "test-frameworks": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test frameworks",
+          "description": "List of test frameworks enabled for this target"
+        },
+        "test_suites_by_framework": {
+          "additionalProperties": {
+            "$ref": "#/$defs/FrameworkTestsConfig"
+          },
+          "type": "object",
+          "title": "Test suites by framework",
+          "description": "Framework-specific test suite and selector configuration"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "test-suites"
+          ]
+        },
+        {
+          "required": [
+            "test-frameworks"
+          ]
+        }
+      ],
+      "dependentRequired": {
+        "test-frameworks": [
+          "test_suites_by_framework"
+        ]
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FrameworkTestsConfig": {
+      "properties": {
+        "test-suites": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test suites",
+          "description": "List of test suite names enabled for this framework"
+        },
+        "tests_selectors": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TestSuiteSelector"
+          },
+          "type": "object",
+          "title": "Test selectors",
+          "description": "Selector criteria keyed by test suite name for this framework"
+        }
+      },
+      "required": [
+        "test-suites"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteSelector": {
+      "properties": {
+        "area": {
+          "type": "string",
+          "title": "Area",
+          "description": "Functional area that the test suite targets"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "description": "Category of tests such as smoke or functional"
+        },
+        "priority": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Priority",
+          "description": "Priority levels used to filter tests"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Tags",
+          "description": "Tags used to select tests"
+        },
+        "testcase_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test case names",
+          "description": "Explicit list of test case names to run"
+        },
+        "requirements": {
+          "$ref": "#/$defs/TestSuiteRequirements",
+          "title": "Requirements",
+          "description": "Optional environment requirements for this selector"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "area"
+          ]
+        },
+        {
+          "required": [
+            "category"
+          ]
+        },
+        {
+          "required": [
+            "priority"
+          ]
+        },
+        {
+          "required": [
+            "tags"
+          ]
+        },
+        {
+          "required": [
+            "testcase_names"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteRequirements": {
+      "properties": {
+        "image": {
+          "type": "string",
+          "title": "Image",
+          "description": "Specific image identifier required by this test selector"
+        },
+        "image-type": {
+          "type": "string",
+          "title": "Image type",
+          "description": "Image type required by this test selector"
+        },
+        "distro": {
+          "type": "string",
+          "title": "Distro",
+          "description": "Distro required by this test selector"
+        },
+        "delivery-type": {
+          "type": "string",
+          "title": "Delivery type",
+          "description": "Delivery channel required by this test selector"
         }
       },
       "additionalProperties": false,

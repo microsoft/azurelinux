@@ -1,0 +1,23 @@
+[components.openssl.tests]
+skus = ["NCv3-series", "Standard_F72s_v2", "PremiumV2_ZRS", "VpnGw4"]
+test-frameworks = ["LISA", "bvt"]
+
+[components.openssl.tests.test_suites_by_framework.LISA]
+test-suites = ["OpenSSLTestSuite"]
+
+[components.openssl.tests.test_suites_by_framework.LISA.tests_selectors.OpenSSLTestSuite]
+area = "core"
+category = "functional"
+priority = [0]
+tags = ["crypto"]
+testcase_names = ["verify_openssl_basic", "verify_golang_sys_crypto", "verify_openssl_speed_test"]
+
+[components.openssl.tests.test_suites_by_framework.bvt]
+test-suites = ["OpenSSLBvtSuite"]
+
+[components.openssl.tests.test_suites_by_framework.bvt.tests_selectors.OpenSSLBvtSuite]
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["crypto", "bvt"]
+testcase_names = ["verify_openssl_basic"]

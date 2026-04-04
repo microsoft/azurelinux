@@ -1,0 +1,5 @@
+[custom-images.trident-vm-testimage]
+description = "Trident VM Test Image"
+image-type = "test-only"
+parent-image = "../../base/images/vm-base"
+definition = { type = "kiwi", path = "trident-vm-testimage/trident-vm-testimage.kiwi" }
