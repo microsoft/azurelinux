@@ -102,7 +102,6 @@
 [components.'rust-nix0.24']
 [components.'rust-nix0.26']
 [components.'rust-nix0.27']
-[components.'rust-nix0.29']
 [components.'rust-object0.36']
 [components.'rust-object0.37']
 [components.'rust-petgraph0.6']
