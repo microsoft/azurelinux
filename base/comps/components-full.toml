@@ -2175,7 +2175,6 @@
 [components.libvirt-dbus]
 [components.libvirt-glib]
 [components.libvirt-python]
-[components.libvirt]
 [components.libvisio]
 [components.libvisual]
 [components.libvma]

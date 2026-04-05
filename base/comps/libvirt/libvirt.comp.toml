@@ -1,0 +1,6 @@
+[components.libvirt]
+
+# Disable Xen/libxl driver — not applicable to Azure Linux's Hyper-V/KVM environment.
+# The upstream spec enables libxl by default on x86_64/aarch64 when %fedora is set.
+[components.libvirt.build]
+without = ["libxl"]
