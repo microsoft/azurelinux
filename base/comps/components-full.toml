@@ -622,7 +622,6 @@
 [components.esmtp]
 [components.espeak-ng]
 [components.espeak]
-[components.etcd]
 [components.evolution-data-server]
 [components.exec-maven-plugin]
 [components.execstack]
