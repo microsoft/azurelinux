@@ -1,0 +1,10 @@
+[components.qemu]
+
+# Disable Xen support — not applicable to Azure Linux's Hyper-V/KVM environment.
+# The upstream spec enables Xen when %fedora is set (which it is on our builders),
+# so we must explicitly override have_xen back to 0.
+[[components.qemu.overlays]]
+description = "Disable Xen support - not needed for Azure Linux (Hyper-V/KVM only)"
+type = "spec-search-replace"
+regex = '%global have_xen 1'
+replacement = '%global have_xen 0'
