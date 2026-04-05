@@ -1,0 +1,16 @@
+[components.edk2]
+
+# Build edk2 as RHEL 10 instead of Fedora to disable Xen OVMF and other
+# Fedora-only features not needed for Azure Linux (Hyper-V/KVM).
+# This also drops: experimental builds, riscv64, loongarch64, ext4 driver,
+# tools-python, IGVM, 4M qcow2 variants, microvm, stateless, pcrlock.
+# Cross-compilation is disabled (not needed for native-arch builds).
+[components.edk2.build]
+defines = { rhel = "10" }
+
+# build.defines can only set macros, not undefine them. Use a spec overlay
+# to undefine %fedora so that %{defined fedora} evaluates to false.
+[[components.edk2.overlays]]
+description = "Undefine %%fedora to switch edk2 from Fedora to RHEL build path"
+type = "spec-prepend-lines"
+lines = ["%undefine fedora"]
