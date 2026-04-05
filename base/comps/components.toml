@@ -81,7 +81,6 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.gpm]
 [components.grep]
 [components.groff]
-[components.grub2]
 [components.grubby]
 [components.gssproxy]
 [components.gzip]

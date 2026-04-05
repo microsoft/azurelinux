@@ -1,0 +1,18 @@
+[components.grub2]
+
+# Disable Xen module builds — not applicable to Azure Linux (Hyper-V/KVM).
+# grub.macros enables with_xen_arch and with_xen_pvh_arch on x86_64 by default,
+# producing grub2-xen-x64-modules and grub2-xen_pvh-i386-modules subpackages.
+[[components.grub2.overlays]]
+description = "Disable Xen module build (with_xen_arch) in grub.macros"
+type = "file-search-replace"
+file = "grub.macros"
+regex = '%global with_xen_arch 1'
+replacement = '%global with_xen_arch 0'
+
+[[components.grub2.overlays]]
+description = "Disable Xen PVH module build (with_xen_pvh_arch) in grub.macros"
+type = "file-search-replace"
+file = "grub.macros"
+regex = '%global with_xen_pvh_arch 1'
+replacement = '%global with_xen_pvh_arch 0'
