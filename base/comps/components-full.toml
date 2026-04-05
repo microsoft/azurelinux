@@ -653,7 +653,6 @@
 [components.fedora-iot-config]
 [components.felix-parent]
 [components.felix-utils]
-[components.fence-agents]
 [components.festival-freebsoft-utils]
 [components.festival]
 [components.ffcall]

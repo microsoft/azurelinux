@@ -1,0 +1,11 @@
+[components.fence-agents]
+
+# Remove fence-agents-xenapi from the fence-agents-all metapackage.
+# Xen is not applicable to Azure Linux's Hyper-V/KVM environment.
+# Clearing the package name leaves " \\" — a blank continuation that adds
+# only harmless whitespace to the Requires list.
+[[components.fence-agents.overlays]]
+description = "Remove fence-agents-xenapi from fence-agents-all Requires - Xen not needed for Azure Linux"
+type = "spec-search-replace"
+regex = 'fence-agents-xenapi'
+replacement = ''
