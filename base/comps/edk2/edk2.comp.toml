@@ -1,0 +1,41 @@
+[components.edk2]
+
+# Disable the Xen OVMF build variant — not applicable to Azure Linux (Hyper-V/KVM).
+
+# 1. Rename the build config section so edk2-build.py skips the Xen build.
+#    The script iterates sections starting with "build." prefix.
+[[components.edk2.overlays]]
+description = "Disable Xen OVMF build - rename config section so edk2-build.py skips it"
+type = "file-search-replace"
+file = "edk2-build.fedora"
+regex = '\[build\.ovmf\.xen\]'
+replacement = '[disabled.ovmf.xen]'
+
+# 2-3. Skip entire ovmf-xen subpackage: replace its Summary (unique identifier)
+#    with conditional block that suppresses till next package.
+[[components.edk2.overlays]]
+description = "Suppress ovmf-xen subpackage - replace Summary with %if 0 block"
+type = "spec-search-replace"
+regex = 'Open Virtual Machine Firmware, Xen build'
+replacement = 'DISABLED'
+section = "%package"
+package = "ovmf-xen"
+
+# 3. Remove the xen files from %files ovmf-xen to prevent missing-file errors.
+#    The subpackage definition survives (can't easily remove %files section tag)
+#    but contains only %common_files (shared license/dirs), harmless.
+[[components.edk2.overlays]]
+description = "Remove xen directory from %files ovmf-xen"
+type = "spec-search-replace"
+section = "%files"
+package = "ovmf-xen"
+regex = '%dir %\{_datadir\}/%\{name\}/xen'
+replacement = ''
+
+[[components.edk2.overlays]]
+description = "Remove xen files glob from %files ovmf-xen"
+type = "spec-search-replace"
+section = "%files"
+package = "ovmf-xen"
+regex = '%\{_datadir\}/%\{name\}/xen/\*\.fd'
+replacement = ''
