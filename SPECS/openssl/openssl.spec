@@ -79,9 +79,10 @@ Patch109: CVE-2025-69419.patch
 Patch110: CVE-2026-22796.patch
 Patch111: CVE-2026-31789.patch
 Patch112: CVE-2026-28389.patch
-Patch113: CVE-2026-28388.patch
-Patch114: CVE-2026-31791.patch
-Patch115: CVE-2026-31790.patch
+Patch113: CVE-2026-28390.patch
+Patch114: CVE-2026-28388.patch
+Patch115: CVE-2026-31791.patch
+Patch116: CVE-2026-31790.patch
 
 
 License: Apache-2.0
@@ -377,7 +378,8 @@ install -m644 %{SOURCE9} \
 
 %changelog
 * Tue Mar 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-5
-- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-31789, CVE-2026-31790, CVE-2026-31791
+- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-28390, CVE-2026-31789,
+  CVE-2026-31790, CVE-2026-31791
 
 * Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
 - Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
