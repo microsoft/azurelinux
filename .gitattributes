@@ -1,0 +1,3 @@
+# SPECS/ contains auto-generated specs rendered from TOML definitions.
+# Exclude from language stats but keep visible in diffs and search.
+SPECS/** -linguist-detectable
