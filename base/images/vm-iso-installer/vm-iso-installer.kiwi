@@ -22,11 +22,15 @@
             installprovidefailsafe="true"
             initrd_system="dracut"
             filesystem="ext4"
-            kernelcmdline="console=ttyS0 rd.shell=0"
+            kernelcmdline="console=ttyS0 console=tty0 rd.shell=0"
             firmware="uefi"
             bootpartition="false"
             efipartsize="200">
-            <bootloader name="grub2" timeout="10" />
+	    <bootloader
+                name="grub2"
+                timeout="10"
+                input_console="at_keyboard serial"
+                output_console="gfxterm serial" />
             <size unit="M">4096</size>
             <oemconfig>
                 <oem-unattended>false</oem-unattended>
@@ -36,6 +40,7 @@
             </oemconfig>
             <initrd action="setup">
                 <dracut uefi="false" />
+                <dracut module="hyperv_drv" />
             </initrd>
         </type>
     </preferences>
@@ -126,6 +131,9 @@
         <!-- OEM install + repart support -->
         <package name="dracut-kiwi-oem-dump" />
         <package name="dracut-kiwi-oem-repart" />
+
+        <!-- Hyper-V guest integration -->
+        <package name="hyperv-daemons" />
 
         <!-- Kernel modules -->
         <package name="kernel-modules" />
