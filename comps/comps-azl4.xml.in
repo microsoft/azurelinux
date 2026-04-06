@@ -49,8 +49,6 @@
       <packagereq type="mandatory">glibc-all-langpacks</packagereq>
       <packagereq arch="aarch64" type="mandatory">grub2-efi-aa64</packagereq>
       <packagereq arch="aarch64" type="mandatory">grub2-efi-aa64-cdboot</packagereq>
-      <packagereq arch="x86_64" type="mandatory">grub2-efi-ia32</packagereq>
-      <packagereq arch="x86_64" type="mandatory">grub2-efi-ia32-cdboot</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64-cdboot</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-pc</packagereq>
@@ -69,7 +67,6 @@
       <packagereq type="mandatory">nvme-cli</packagereq>
       <packagereq type="mandatory">realmd</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
-      <packagereq arch="x86_64" type="mandatory">shim-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-x64</packagereq>
       <packagereq type="mandatory">teamd</packagereq>
       <packagereq type="mandatory">xfsprogs</packagereq>
@@ -118,14 +115,12 @@
     <packagelist>
       <packagereq arch="aarch64,x86_64" type="mandatory">efibootmgr</packagereq>
       <packagereq arch="aarch64" type="mandatory">grub2-efi-aa64</packagereq>
-      <packagereq arch="x86_64" type="mandatory">grub2-efi-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-pc</packagereq>
       <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-tools-efi</packagereq>
       <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools-extra</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
-      <packagereq arch="x86_64" type="mandatory">shim-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-x64</packagereq>
     </packagelist>
   </group>
