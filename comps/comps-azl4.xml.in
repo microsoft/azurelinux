@@ -54,10 +54,9 @@
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64-cdboot</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-pc</packagereq>
-      <packagereq arch="ppc64le" type="mandatory">grub2-ppc64le</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64" type="mandatory">grub2-tools</packagereq>
+      <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-tools-efi</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64" type="mandatory">grub2-tools-extra</packagereq>
+      <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools-extra</packagereq>
       <packagereq type="mandatory">grubby</packagereq>
       <packagereq type="mandatory">hfsplus-tools</packagereq>
       <packagereq type="mandatory">iscsi-initiator-utils</packagereq>
@@ -124,10 +123,9 @@
       <packagereq arch="x86_64" type="mandatory">grub2-efi-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-pc</packagereq>
-      <packagereq arch="ppc64le" type="mandatory">grub2-ppc64le</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64" type="mandatory">grub2-tools</packagereq>
+      <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-tools-efi</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64" type="mandatory">grub2-tools-extra</packagereq>
+      <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools-extra</packagereq>
       <packagereq arch="s390x" type="mandatory">s390utils</packagereq>
       <packagereq arch="s390x" type="mandatory">s390utils-base</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
@@ -199,10 +197,8 @@
       <packagereq type="default">dracut-config-rescue</packagereq>
       <packagereq type="default">firewalld</packagereq>
       <packagereq type="default">fwupd</packagereq>
-      <packagereq arch="ppc64le" type="default">lsvpd</packagereq>
       <packagereq type="default">NetworkManager</packagereq>
       <packagereq type="default">plymouth</packagereq>
-      <packagereq arch="ppc64le" type="default">powerpc-utils</packagereq>
       <packagereq type="default">prefixdevname</packagereq>
       <packagereq arch="s390x" type="default">s390utils-base</packagereq>
       <packagereq type="default">systemd-resolved</packagereq>
@@ -307,11 +303,11 @@
       <packagereq>exfatprogs</packagereq>
       <packagereq>file</packagereq>
       <packagereq>fpaste</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64">fprintd-pam</packagereq>
+      <packagereq arch="aarch64,x86_64">fprintd-pam</packagereq>
       <packagereq>gnupg2</packagereq>
       <packagereq>hunspell</packagereq>
       <packagereq>iptstate</packagereq>
-      <packagereq arch="aarch64,ppc64le,x86_64">irqbalance</packagereq>
+      <packagereq arch="aarch64,x86_64">irqbalance</packagereq>
       <packagereq>logrotate</packagereq>
       <packagereq>lsof</packagereq>
       <packagereq>mailcap</packagereq>
