@@ -266,7 +266,6 @@
     <default>false</default>
     <uservisible>false</uservisible>
     <packagelist>
-      <packagereq>abrt-cli</packagereq>
       <packagereq>acl</packagereq>
       <packagereq arch="x86_64">amd-ucode-firmware</packagereq>
       <packagereq>at</packagereq>
@@ -278,14 +277,12 @@
       <packagereq>btrfs-progs</packagereq>
       <packagereq>bzip2</packagereq>
       <packagereq>cifs-utils</packagereq>
-      <packagereq>compsize</packagereq>
       <packagereq>cpio</packagereq>
       <packagereq>crontabs</packagereq>
       <packagereq>cryptsetup</packagereq>
       <packagereq>cyrus-sasl-plain</packagereq>
       <packagereq>dbus</packagereq>
       <packagereq>default-editor</packagereq>
-      <packagereq>deltarpm</packagereq>
       <packagereq>dos2unix</packagereq>
       <packagereq>dosfstools</packagereq>
       <packagereq>ed</packagereq>
@@ -296,7 +293,6 @@
       <packagereq arch="aarch64,x86_64">fprintd-pam</packagereq>
       <packagereq>gnupg2</packagereq>
       <packagereq>hunspell</packagereq>
-      <packagereq>iptstate</packagereq>
       <packagereq arch="aarch64,x86_64">irqbalance</packagereq>
       <packagereq>logrotate</packagereq>
       <packagereq>lsof</packagereq>
@@ -312,9 +308,7 @@
       <packagereq>ntfs-3g</packagereq>
       <packagereq>ntfsprogs</packagereq>
       <packagereq>opensc</packagereq>
-      <packagereq>passwdqc</packagereq>
       <packagereq>pciutils</packagereq>
-      <packagereq>pinfo</packagereq>
       <packagereq>plocate</packagereq>
       <packagereq>psacct</packagereq>
       <packagereq>quota</packagereq>
