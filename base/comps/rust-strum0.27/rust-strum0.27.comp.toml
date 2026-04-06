@@ -2,4 +2,4 @@
 # Pin to the f43 commit used to build the current Fedora 43 package.
 # TODO: Drop this override once the default Fedora 43 snapshot
 # in distro/azurelinux.distro.toml advances past this commit.
-spec = { type = "upstream", upstream-name = "rust-strum", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "66d4daf5de82de09f4b565dc35a389bc631eada4" }
+spec = { type = "upstream", upstream-name = "rust-strum0.27", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "4cdd25a6116a755ec1f6b535135b3d3dcb1337eb" }
