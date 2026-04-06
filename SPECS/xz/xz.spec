@@ -95,10 +95,13 @@ make  %{?_smp_mflags}  check
 %{_mandir}/uk/man1/*
 
 %files devel
+%license COPYING COPYING.GPLv2
 %{_includedir}/lzma.h
 %{_includedir}/lzma/*.h
 %{_libdir}/pkgconfig/liblzma.pc
 %{_libdir}/liblzma.so
+%exclude %{_defaultdocdir}/%{name}-%{version}/COPYING
+%exclude %{_defaultdocdir}/%{name}-%{version}/COPYING.GPLv2
 %{_defaultdocdir}/%{name}-%{version}/*
 
 %files libs
