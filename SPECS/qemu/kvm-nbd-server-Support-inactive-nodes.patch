@@ -1,0 +1,68 @@
+From 77ec8365bf04afadee0a2dd7354deedd57606c54 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:14:04 +0100
+Subject: [PATCH 20/23] nbd/server: Support inactive nodes
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [19/22] 8c113dd6a862b1f4ad4e5d498f4e70a5dbfdfb32 (kmwolf/centos-qemu-kvm)
+
+In order to support running an NBD export on inactive nodes, we must
+make sure to return errors for any operations that aren't allowed on
+inactive nodes. Reads are the only operation we know we need for
+inactive images, so to err on the side of caution, return errors for
+everything else, even if some operations could possibly be okay.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Message-ID: <20250204211407.381505-14-kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 2e73a17c68f4d80023dc616e596e8c1f3ea8dd75)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ nbd/server.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index f64e47270c..2076fb2666 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2026,6 +2026,7 @@ static void nbd_export_delete(BlockExport *blk_exp)
+ const BlockExportDriver blk_exp_nbd = {
+     .type               = BLOCK_EXPORT_TYPE_NBD,
+     .instance_size      = sizeof(NBDExport),
++    .supports_inactive  = true,
+     .create             = nbd_export_create,
+     .delete             = nbd_export_delete,
+     .request_shutdown   = nbd_export_request_shutdown,
+@@ -2920,6 +2921,22 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+     NBDExport *exp = client->exp;
+     char *msg;
+     size_t i;
++    bool inactive;
++
++    WITH_GRAPH_RDLOCK_GUARD() {
++        inactive = bdrv_is_inactive(blk_bs(exp->common.blk));
++        if (inactive) {
++            switch (request->type) {
++            case NBD_CMD_READ:
++                /* These commands are allowed on inactive nodes */
++                break;
++            default:
++                /* Return an error for the rest */
++                return nbd_send_generic_reply(client, request, -EPERM,
++                                              "export is inactive", errp);
++            }
++        }
++    }
+ 
+     switch (request->type) {
+     case NBD_CMD_CACHE:
+-- 
+2.48.1
+
