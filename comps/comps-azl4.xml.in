@@ -68,8 +68,6 @@
       <packagereq type="mandatory">ntfsprogs</packagereq>
       <packagereq type="mandatory">nvme-cli</packagereq>
       <packagereq type="mandatory">realmd</packagereq>
-      <packagereq arch="s390x" type="mandatory">s390utils</packagereq>
-      <packagereq arch="s390x" type="mandatory">s390utils-base</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-x64</packagereq>
@@ -126,8 +124,6 @@
       <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-tools-efi</packagereq>
       <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools-extra</packagereq>
-      <packagereq arch="s390x" type="mandatory">s390utils</packagereq>
-      <packagereq arch="s390x" type="mandatory">s390utils-base</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-ia32</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-x64</packagereq>
@@ -200,7 +196,6 @@
       <packagereq type="default">NetworkManager</packagereq>
       <packagereq type="default">plymouth</packagereq>
       <packagereq type="default">prefixdevname</packagereq>
-      <packagereq arch="s390x" type="default">s390utils-base</packagereq>
       <packagereq type="default">systemd-resolved</packagereq>
       <packagereq type="default">zram-generator-defaults</packagereq>
       <packagereq type="optional">dracut-config-generic</packagereq>
