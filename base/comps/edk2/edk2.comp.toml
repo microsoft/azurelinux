@@ -1,0 +1,31 @@
+[components.edk2]
+
+# Disable the Xen OVMF build variant — not applicable to Azure Linux (Hyper-V/KVM).
+
+# 1. Rename the build config section so edk2-build.py skips the Xen build.
+#    The script iterates sections starting with "build." prefix.
+[[components.edk2.overlays]]
+description = "Disable Xen OVMF build - rename config section so edk2-build.py skips it"
+type = "file-search-replace"
+file = "edk2-build.fedora"
+regex = '\[build\.ovmf\.xen\]'
+replacement = '[disabled.ovmf.xen]'
+
+# 2. Remove the ovmf-xen subpackage entirely.
+[[components.edk2.overlays]]
+description = "Remove %package ovmf-xen"
+type = "spec-remove-section"
+section = "%package"
+package = "ovmf-xen"
+
+[[components.edk2.overlays]]
+description = "Remove %description ovmf-xen"
+type = "spec-remove-section"
+section = "%description"
+package = "ovmf-xen"
+
+[[components.edk2.overlays]]
+description = "Remove %files ovmf-xen"
+type = "spec-remove-section"
+section = "%files"
+package = "ovmf-xen"
