@@ -51,14 +51,11 @@
 		<ignore name="kernel-*debug*"/>
 		<package name="grub2-efi-aa64" arch="aarch64"/>
 		<package name="grub2-efi-aa64-modules" arch="aarch64"/>
-		<package name="grub2-efi-ia32" arch="x86_64"/>
-		<package name="grub2-efi-ia32-modules" arch="x86_64"/>
 		<package name="grub2-efi-x64" arch="x86_64"/>
 		<package name="grub2-efi-x64-modules" arch="x86_64"/>
 		<package name="grub2-pc" arch="x86_64"/>
 		<package name="grub2-pc-modules" arch="x86_64"/>
 		<package name="shim-signed-aa64" arch="aarch64"/>
-		<package name="shim-signed-ia32" arch="x86_64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
 		<package name="kernel-core"/>
 		<package name="systemd-oomd-defaults"/>
@@ -66,7 +63,6 @@
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="BootCoreUKI">
 		<package name="shim-signed-aa64" arch="aarch64"/>
-		<package name="shim-signed-ia32" arch="x86_64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
 		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
@@ -76,7 +72,6 @@
 	</packages>
 	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
 		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
-		<package name="grub2-efi-ia32-cdboot" arch="x86_64"/>
 		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="BootDiskCore">
