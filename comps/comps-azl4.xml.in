@@ -136,35 +136,6 @@
     </packagelist>
   </group>
   <group>
-    <id>cloud-infrastructure</id>
-    <_name>Cloud Infrastructure</_name>
-    <_description>Infrastructure packages for cloud computing.</_description>
-    <default>false</default>
-    <uservisible>true</uservisible>
-    <packagelist>
-      <packagereq type="optional">ceph</packagereq>
-      <packagereq type="optional">glusterfs</packagereq>
-      <packagereq type="optional">imagefactory</packagereq>
-      <packagereq type="optional">sheepdog</packagereq>
-    </packagelist>
-  </group>
-  <group>
-    <id>cloud-management</id>
-    <_name>Cloud Management Tools</_name>
-    <_description>Software to manage servers and system images that run in "cloud" environments</_description>
-    <default>false</default>
-    <uservisible>true</uservisible>
-    <packagelist>
-      <packagereq type="default">cloud-utils</packagereq>
-      <packagereq type="default">imagefactory</packagereq>
-      <packagereq type="default">imagefactory-plugins</packagereq>
-      <packagereq type="default">imagefactory-plugins-TinMan</packagereq>
-      <packagereq type="default">python3-boto</packagereq>
-      <packagereq type="default">python3-libcloud</packagereq>
-      <packagereq type="optional">python3-openstackclient</packagereq>
-    </packagelist>
-  </group>
-  <group>
     <id>cloud-server</id>
     <_name>Cloud Server Tools</_name>
     <_description>Software for servers and system images that run in "cloud" environments</_description>
