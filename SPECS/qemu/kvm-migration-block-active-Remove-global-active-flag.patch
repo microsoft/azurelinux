@@ -1,0 +1,158 @@
+From a0ebf9fca3b4c6a11c4476c1d1a67fecce7c7e3e Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:55 +0100
+Subject: [PATCH 11/23] migration/block-active: Remove global active flag
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [10/22] 4bdf1da765bde05e2d427fc3ccca10bcc9f1dfbe (kmwolf/centos-qemu-kvm)
+
+Block devices have an individual active state, a single global flag
+can't cover this correctly. This becomes more important as we allow
+users to manually manage which nodes are active or inactive.
+
+Now that it's allowed to call bdrv_inactivate_all() even when some
+nodes are already inactive, we can remove the flag and just
+unconditionally call bdrv_inactivate_all() and, more importantly,
+bdrv_activate_all() before we make use of the nodes.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-5-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit c2a189976e211c9ff782538d5a5ed5e5cffeccd6)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ migration/block-active.c | 46 ----------------------------------------
+ migration/migration.c    |  8 -------
+ migration/migration.h    |  2 --
+ 3 files changed, 56 deletions(-)
+
+diff --git a/migration/block-active.c b/migration/block-active.c
+index d477cf8182..40e986aade 100644
+--- a/migration/block-active.c
++++ b/migration/block-active.c
+@@ -12,51 +12,12 @@
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ 
+-/*
+- * Migration-only cache to remember the block layer activation status.
+- * Protected by BQL.
+- *
+- * We need this because..
+- *
+- * - Migration can fail after block devices are invalidated (during
+- *   switchover phase).  When that happens, we need to be able to recover
+- *   the block drive status by re-activating them.
+- *
+- * - Currently bdrv_inactivate_all() is not safe to be invoked on top of
+- *   invalidated drives (even if bdrv_activate_all() is actually safe to be
+- *   called any time!).  It means remembering this could help migration to
+- *   make sure it won't invalidate twice in a row, crashing QEMU.  It can
+- *   happen when we migrate a PAUSED VM from host1 to host2, then migrate
+- *   again to host3 without starting it.  TODO: a cleaner solution is to
+- *   allow safe invoke of bdrv_inactivate_all() at anytime, like
+- *   bdrv_activate_all().
+- *
+- * For freshly started QEMU, the flag is initialized to TRUE reflecting the
+- * scenario where QEMU owns block device ownerships.
+- *
+- * For incoming QEMU taking a migration stream, the flag is initialized to
+- * FALSE reflecting that the incoming side doesn't own the block devices,
+- * not until switchover happens.
+- */
+-static bool migration_block_active;
+-
+-/* Setup the disk activation status */
+-void migration_block_active_setup(bool active)
+-{
+-    migration_block_active = active;
+-}
+-
+ bool migration_block_activate(Error **errp)
+ {
+     ERRP_GUARD();
+ 
+     assert(bql_locked());
+ 
+-    if (migration_block_active) {
+-        trace_migration_block_activation("active-skipped");
+-        return true;
+-    }
+-
+     trace_migration_block_activation("active");
+ 
+     bdrv_activate_all(errp);
+@@ -65,7 +26,6 @@ bool migration_block_activate(Error **errp)
+         return false;
+     }
+ 
+-    migration_block_active = true;
+     return true;
+ }
+ 
+@@ -75,11 +35,6 @@ bool migration_block_inactivate(void)
+ 
+     assert(bql_locked());
+ 
+-    if (!migration_block_active) {
+-        trace_migration_block_activation("inactive-skipped");
+-        return true;
+-    }
+-
+     trace_migration_block_activation("inactive");
+ 
+     ret = bdrv_inactivate_all();
+@@ -89,6 +44,5 @@ bool migration_block_inactivate(void)
+         return false;
+     }
+ 
+-    migration_block_active = false;
+     return true;
+ }
+diff --git a/migration/migration.c b/migration/migration.c
+index 38631d1206..999d4cac54 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1875,12 +1875,6 @@ void qmp_migrate_incoming(const char *uri, bool has_channels,
+         return;
+     }
+ 
+-    /*
+-     * Newly setup incoming QEMU.  Mark the block active state to reflect
+-     * that the src currently owns the disks.
+-     */
+-    migration_block_active_setup(false);
+-
+     once = false;
+ }
+ 
+@@ -3825,8 +3819,6 @@ static void migration_instance_init(Object *obj)
+     ms->state = MIGRATION_STATUS_NONE;
+     ms->mbps = -1;
+     ms->pages_per_second = -1;
+-    /* Freshly started QEMU owns all the block devices */
+-    migration_block_active_setup(true);
+     qemu_sem_init(&ms->pause_sem, 0);
+     qemu_mutex_init(&ms->error_mutex);
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index 5b17c1344d..c38d2a37e4 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -534,6 +534,4 @@ int migration_rp_wait(MigrationState *s);
+  */
+ void migration_rp_kick(MigrationState *s);
+ 
+-/* migration/block-active.c */
+-void migration_block_active_setup(bool active);
+ #endif
+-- 
+2.48.1
+
