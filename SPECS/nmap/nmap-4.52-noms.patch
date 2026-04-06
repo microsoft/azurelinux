@@ -1,0 +1,24 @@
+diff -up nmap-4.90RC1/docs/nmap.1.noms nmap-4.90RC1/docs/nmap.1
+--- nmap-4.90RC1/docs/nmap.1.noms	2009-06-25 01:12:51.000000000 +0200
++++ nmap-4.90RC1/docs/nmap.1	2009-07-16 09:58:22.090769947 +0200
+@@ -282,7 +282,7 @@ Nmap 4\&.90RC1 ( http://nmap\&.org )
+ Usage: nmap [Scan Type(s)] [Options] {target specification}
+ TARGET SPECIFICATION:
+   Can pass hostnames, IP addresses, networks, etc\&.
+-  Ex: scanme\&.nmap\&.org, microsoft\&.com/24, 192\&.168\&.0\&.1; 10\&.0\&.0\-255\&.1\-254
++  Ex: scanme\&.nmap\&.org, 192\&.168\&.0\&.1; 10\&.0\&.0\-255\&.1\-254
+   \-iL <inputfilename>: Input from list of hosts/networks
+   \-iR <num hosts>: Choose random targets
+   \-\-exclude <host1[,host2][,host3],\&.\&.\&.>: Exclude hosts/networks
+diff -up nmap-4.90RC1/docs/nmap.usage.txt.noms nmap-4.90RC1/docs/nmap.usage.txt
+--- nmap-4.90RC1/docs/nmap.usage.txt.noms	2009-06-25 01:12:51.000000000 +0200
++++ nmap-4.90RC1/docs/nmap.usage.txt	2009-07-16 09:56:24.758078049 +0200
+@@ -2,7 +2,7 @@ Nmap 4.90RC1 ( http://nmap.org )
+ Usage: nmap [Scan Type(s)] [Options] {target specification}
+ TARGET SPECIFICATION:
+   Can pass hostnames, IP addresses, networks, etc.
+-  Ex: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254
++  Ex: scanme.nmap.org, 192.168.0.1; 10.0.0-255.1-254
+   -iL <inputfilename>: Input from list of hosts/networks
+   -iR <num hosts>: Choose random targets
+   --exclude <host1[,host2][,host3],...>: Exclude hosts/networks

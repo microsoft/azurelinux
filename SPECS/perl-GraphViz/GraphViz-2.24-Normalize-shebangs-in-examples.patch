@@ -1,0 +1,37 @@
+From 51418f0513f39b471ab6d49221a6e89868aef5d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 7 Nov 2019 14:07:32 +0100
+Subject: [PATCH] Normalize shebangs in examples
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ examples/clusters2.pl  | 2 +-
+ examples/primes_aux.pl | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/examples/clusters2.pl b/examples/clusters2.pl
+index 4a8af15..ea5ed4a 100644
+--- a/examples/clusters2.pl
++++ b/examples/clusters2.pl
+@@ -1,4 +1,4 @@
+-#!perl -w
++#!/usr/bin/perl -w
+ 
+ use strict;
+ use lib '.';
+diff --git a/examples/primes_aux.pl b/examples/primes_aux.pl
+index 2540bef..e7222de 100755
+--- a/examples/primes_aux.pl
++++ b/examples/primes_aux.pl
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl -w
++#!/usr/bin/perl -w
+ # badly written program in the hopes it would sound nice
+ # - Greg McCarroll
+ #
+-- 
+2.21.0
+

@@ -1,0 +1,139 @@
+Explicitly specify the return type of main as int for C99 compatibility.
+
+Submitted upstream: <https://github.com/jonathanstowe/TermReadKey/pull/40>
+
+diff --git a/Configure.pm b/Configure.pm
+index aabf136756ff2be5..82aab81c964c3350 100644
+--- a/Configure.pm
++++ b/Configure.pm
+@@ -503,7 +503,7 @@ by the compiler is returned.
+ =cut
+ 
+ sub CheckHeader { #Find a header (or set of headers) that exists
+-	ApplyHeaders("main(){}",@_);
++	ApplyHeaders("int main(){}",@_);
+ }
+ 
+ =head2 CheckStructure
+@@ -516,7 +516,7 @@ properly will be returned. B<undef> will be returned if nothing succeeds.
+ 
+ sub CheckStructure { # Check existance of a structure.
+ 	my($structname,@headers) = @_;
+-	ApplyHeaders("main(){ struct $structname s;}",@headers);
++	ApplyHeaders("int main(){ struct $structname s;}",@headers);
+ }
+ 
+ =head2 CheckField
+@@ -530,7 +530,7 @@ be returned if nothing succeeds.
+ 
+ sub CheckField { # Check for the existance of specified field in structure
+ 	my($structname,$fieldname,@headers) = @_;
+-	ApplyHeaders("main(){ struct $structname s1; struct $structname s2;
++	ApplyHeaders("int main(){ struct $structname s1; struct $structname s2;
+ 		     s1.$fieldname = s2.$fieldname; }",@headers);
+ }
+ 
+@@ -544,7 +544,7 @@ that symbol will be returned. B<undef> will be returned if nothing succeeds.
+ 
+ sub CheckLSymbol { # Check for linkable symbol
+ 	my($symbol,@libs) = @_;
+-	ApplyLibs("main() { void * f = (void *)($symbol); }",@libs);
++	ApplyLibs("int main() { void * f = (void *)($symbol); }",@libs);
+ }
+ 
+ =head2 CheckSymbol
+@@ -558,7 +558,8 @@ B<undef> will be returned if nothing succeeds.
+ 
+ sub CheckSymbol { # Check for linkable/header symbol
+ 	my($symbol,@lookup) = @_;
+-	ApplyHeadersAndLibs("main() { void * f = (void *)($symbol); }",@lookup);
++	ApplyHeadersAndLibs("int main() { void * f = (void *)($symbol); }",
++			    @lookup);
+ }
+ 
+ =head2 CheckHSymbol
+@@ -571,7 +572,7 @@ that symbol will be returned. B<undef> will be returned if nothing succeeds.
+ 
+ sub CheckHSymbol { # Check for header symbol
+ 	my($symbol,@headers) = @_;
+-	ApplyHeaders("main() { void * f = (void *)($symbol); }",@headers);
++	ApplyHeaders("int main() { void * f = (void *)($symbol); }",@headers);
+ }
+ 
+ =head2 CheckHPrototype (unexported)
+@@ -591,7 +592,7 @@ sub CheckHPrototype { # Check for header prototype.
+    # names function doesn't exist, this call will _succeed_. Caveat Utilitor.
+ 	my($function,$proto,@headers) = @_;
+ 	my(@proto) = @{$proto};
+-	ApplyHeaders("main() { extern ".$proto[0]." $function(".
++	ApplyHeaders("int main() { extern ".$proto[0]." $function(".
+                      join(",",@proto[1..$#proto])."); }",@headers);
+ }
+ 
+@@ -612,7 +613,8 @@ Example:
+ sub GetSymbol { # Check for linkable/header symbol
+ 	my($symbol,$printf,$cast,@lookup) = @_,"","";
+ 	scalar(ApplyHeadersAndLibsAndExecute(
+-		"main(){ printf(\"\%$printf\",($cast)($symbol));exit(0);}",@lookup));
++		"int main(){ printf(\"\%$printf\",($cast)($symbol));exit(0);}",
++		 @lookup));
+ }
+ 
+ =head2 GetTextSymbol
+@@ -768,7 +770,7 @@ main(){ }");
+ 			"double","long double",
+ 			"char","unsigned char","short int","unsigned short int");
+ 
+-		if(Compile("main(){flurfie a;}")) { @types = (); }
++		if(Compile("int main(){flurfie a;}")) { @types = (); }
+ 
+ 		$Verbose=0;
+ 
+@@ -781,7 +783,7 @@ main(){ }");
+ 					if(Compile("
+ extern void func($types[$i]);
+ extern void func($types[$j]);
+-main(){}")) {
++int main(){}")) {
+                                             print "Removing type $types[$j] because it equals $types[$i]\n";
+                                             splice(@types,$j,1);
+                                             $j--;
+@@ -795,7 +797,7 @@ main(){}")) {
+ 					if(Compile("
+ $types[$i] func(void);
+ extern $types[$j] func(void);
+-main(){}")) {
++int main(){}")) {
+ 						print "Removing type $types[$j] because it equals $types[$i]\n";
+ 						splice(@types,$j,1);
+ 						$j--;
+@@ -833,7 +835,7 @@ main(){}")) {
+ 	# Can we check the return type without worry about arguements?
+ 	if($checkreturn and (!$checknilargs or !$checkniletcargs)) {
+ 		for (@types) {
+-			if(ApplyHeaders("extern $_ $function(". ($checknilargs?"...":"").");main(){}",[@headers])) {
++			if(ApplyHeaders("extern $_ $function(". ($checknilargs?"...":"").");int main(){}",[@headers])) {
+ 				$rettype = $_; # Great, we found the return type.
+ 				last;
+ 			}
+@@ -847,9 +849,9 @@ main(){}")) {
+ 	my $numargs=-1;
+ 	my $varargs=0;
+ 	for (0..32) {
+-			if(ApplyHeaders("main(){ $function(".join(",",("0") x $_).");}",@headers)) {
++			if(ApplyHeaders("int main(){ $function(".join(",",("0") x $_).");}",@headers)) {
+ 				$numargs=$_;
+-				if(ApplyHeaders("main(){ $function(".join(",",("0") x ($_+1)).");}",@headers)) {
++				if(ApplyHeaders("int main(){ $function(".join(",",("0") x ($_+1)).");}",@headers)) {
+ 					$varargs=1;
+ 				}
+ 				last
+@@ -865,7 +867,7 @@ main(){}")) {
+ 
+ 	if(@args>0 and !defined($rettype)) {
+ 		for (@types) {
+-			if(defined(ApplyHeaders("extern $_ $function(".join(",",@args).");main(){}",[@headers]))) {
++			if(defined(ApplyHeaders("extern $_ $function(".join(",",@args).");int main(){}",[@headers]))) {
+ 				$rettype = $_; # Great, we found the return type.
+ 				last;
+ 			}

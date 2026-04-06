@@ -1,0 +1,30 @@
+diff -rupN --no-dereference binutils-2.45.1/bfd/bfd-in2.h binutils-2.45.1-new/bfd/bfd-in2.h
+--- binutils-2.45.1/bfd/bfd-in2.h	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/bfd/bfd-in2.h	2025-12-30 09:43:50.685405141 +0100
+@@ -30,11 +30,6 @@
+ #ifndef __BFD_H_SEEN__
+ #define __BFD_H_SEEN__
+ 
+-/* PR 14072: Ensure that config.h is included first.  */
+-#if !defined PACKAGE && !defined PACKAGE_VERSION
+-#error config.h must be included before this header
+-#endif
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff -rupN --no-dereference binutils-2.45.1/bfd/bfd-in.h binutils-2.45.1-new/bfd/bfd-in.h
+--- binutils-2.45.1/bfd/bfd-in.h	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/bfd/bfd-in.h	2025-12-30 09:43:50.687012606 +0100
+@@ -23,11 +23,6 @@
+ #ifndef __BFD_H_SEEN__
+ #define __BFD_H_SEEN__
+ 
+-/* PR 14072: Ensure that config.h is included first.  */
+-#if !defined PACKAGE && !defined PACKAGE_VERSION
+-#error config.h must be included before this header
+-#endif
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif

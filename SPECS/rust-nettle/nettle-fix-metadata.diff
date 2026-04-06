@@ -1,0 +1,11 @@
+--- nettle-7.4.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nettle-7.4.0/Cargo.toml	2025-01-12T17:25:57.884269+00:00
+@@ -25,7 +25,7 @@
+     "cryptography",
+ ]
+ categories = ["cryptography"]
+-license = "LGPL-3.0 OR GPL-2.0 OR GPL-3.0"
++license = "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only"
+ repository = "https://gitlab.com/sequoia-pgp/nettle-rs"
+ 
+ [dependencies.getrandom]

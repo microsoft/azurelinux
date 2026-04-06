@@ -1,0 +1,110 @@
+diff --git a/addrtoname.c b/addrtoname.c
+index 33b9378..426839c 100644
+--- a/addrtoname.c
++++ b/addrtoname.c
+@@ -277,7 +277,6 @@ extern cap_channel_t *capdns;
+ const char *
+ ipaddr_string(netdissect_options *ndo, const u_char *ap)
+ {
+-	struct hostent *hp;
+ 	uint32_t addr;
+ 	struct hnamemem *p;
+ 
+@@ -299,13 +298,29 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
+ 	 */
+ 	if (!ndo->ndo_nflag &&
+ 	    (addr & f_netmask) == f_localnet) {
+-#ifdef HAVE_CASPER
+-		if (capdns != NULL) {
+-			hp = cap_gethostbyaddr(capdns, (char *)&addr, 4,
+-			    AF_INET);
+-		} else
+-#endif
+-			hp = gethostbyaddr((char *)&addr, 4, AF_INET);
++#ifdef HAVE_GETNAMEINFO
++		struct sockaddr_in sa;
++		char hbuf[NI_MAXHOST];
++
++		memset(&sa, 0, sizeof (sa));
++		sa.sin_family = AF_INET;
++		sa.sin_addr.s_addr = addr;
++		if (!getnameinfo((struct sockaddr *)&sa, sizeof (sa),
++					hbuf, sizeof (hbuf), NULL, 0, 0)) {
++			if (ndo->ndo_Nflag) {
++				char *dotp;
++
++				/* Remove domain qualifications */
++				dotp = strchr(hbuf, '.');
++				if (dotp)
++					*dotp = '\0';
++			}
++			p->name = strdup(hbuf);
++			return p->name;
++		}
++#else
++		struct hostent *hp;
++		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+ 		if (hp) {
+ 			char *dotp;
+ 
+@@ -321,6 +336,7 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
+ 			}
+ 			return (p->name);
+ 		}
++#endif
+ 	}
+ 	p->name = strdup(intoa(addr));
+ 	if (p->name == NULL)
+@@ -336,7 +352,6 @@ ipaddr_string(netdissect_options *ndo, const u_char *ap)
+ const char *
+ ip6addr_string(netdissect_options *ndo, const u_char *ap)
+ {
+-	struct hostent *hp;
+ 	union {
+ 		nd_ipv6 addr;
+ 		struct for_hash_addr {
+@@ -361,13 +376,29 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
+ 	 * Do not print names if -n was given.
+ 	 */
+ 	if (!ndo->ndo_nflag) {
+-#ifdef HAVE_CASPER
+-		if (capdns != NULL) {
+-			hp = cap_gethostbyaddr(capdns, (char *)&addr,
+-			    sizeof(addr), AF_INET6);
+-		} else
+-#endif
+-			hp = gethostbyaddr((char *)&addr, sizeof(addr),
++#ifdef HAVE_GETNAMEINFO
++		struct sockaddr_in6 sa;
++		char hbuf[NI_MAXHOST];
++
++		memset(&sa, 0, sizeof (sa));
++		sa.sin6_family = AF_INET6;
++		sa.sin6_addr = addr.addr;
++		if (!getnameinfo((struct sockaddr *)&sa, sizeof (sa),
++					hbuf, sizeof (hbuf), NULL, 0, 0)) {
++			if (ndo->ndo_Nflag) {
++				char *dotp;
++
++				/* Remove domain qualifications */
++				dotp = strchr(hbuf, '.');
++				if (dotp)
++					*dotp = '\0';
++			}
++			p->name = strdup(hbuf);
++			return p->name;
++		}
++#else
++		struct hostent *hp;
++		hp = gethostbyaddr((char *)&addr, sizeof(addr),
+ 			    AF_INET6);
+ 		if (hp) {
+ 			char *dotp;
+@@ -384,6 +415,7 @@ ip6addr_string(netdissect_options *ndo, const u_char *ap)
+ 			}
+ 			return (p->name);
+ 		}
++#endif
+ 	}
+ 	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
+ 	p->name = strdup(cp);

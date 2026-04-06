@@ -1,0 +1,10 @@
+--- a/apt-pkg/contrib/strutl.cc~	2025-02-03 13:45:45.000000000 +0100
++++ b/apt-pkg/contrib/strutl.cc	2025-10-06 08:32:17.829833123 +0200
+@@ -40,6 +40,7 @@
+ #include <cstdarg>
+ #include <cstddef>
+ #include <cstdio>
++#include <cstdint>
+ #include <cstdlib>
+ #include <cstring>
+ #include <ctime>

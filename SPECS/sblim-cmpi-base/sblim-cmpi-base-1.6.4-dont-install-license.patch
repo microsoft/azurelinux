@@ -1,0 +1,12 @@
+diff -up sblim-cmpi-base-1.6.4/Makefile.am.orig sblim-cmpi-base-1.6.4/Makefile.am
+--- sblim-cmpi-base-1.6.4/Makefile.am.orig	2018-08-22 13:21:00.740031951 +0200
++++ sblim-cmpi-base-1.6.4/Makefile.am	2018-08-22 13:21:51.421079223 +0200
+@@ -28,7 +28,7 @@ docdir=$(datadir)/doc/$(PACKAGE)
+ #
+ # Automake instructions for documentation
+ #
+-doc_DATA=README AUTHORS COPYING 
++doc_DATA=README AUTHORS
+ 
+ # ADD EXTRA DOC FILES IF PRESENT
+ doc_DATA+=README.INDICATION README.tog-pegasus DEBUG

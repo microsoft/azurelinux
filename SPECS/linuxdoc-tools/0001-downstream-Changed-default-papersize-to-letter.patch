@@ -1,0 +1,41 @@
+From 2f2699aa819103cd53b95230af7bc1f6b6b8644b Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Sun, 5 Feb 2023 23:26:06 +0100
+Subject: [PATCH] [downstream] Changed default papersize to letter
+
+---
+ man/linuxdoc.1            | 4 ++--
+ perl5lib/LinuxDocTools.pm | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/man/linuxdoc.1 b/man/linuxdoc.1
+index 8fb9438..eb9706f 100644
+--- a/man/linuxdoc.1
++++ b/man/linuxdoc.1
+@@ -46,8 +46,8 @@ Set the backend for specified format. Default is none of the actual
+ format, but just output the usage of this suites.
+ Available formats are: html, info, latex, lyx, rtf, txt, check.
+ .IP "--papersize=\fIsize\fR, -p
+-Set the paper size.  Default is ``a4'' (European 297x210mm paper).
+-You may also specify ``letter'' size.
++Set the paper size.  Default is ``letter''.
++You may also specify ``a4'' size (European 297x210mm paper).
+ .IP "--language=\fIlang\fR, -l"
+ Specify the language of the document (this may change which style
+ files are used for formatting by a back end).  The default language is
+diff --git a/perl5lib/LinuxDocTools.pm b/perl5lib/LinuxDocTools.pm
+index b6e6e57..d3f0cfe 100644
+--- a/perl5lib/LinuxDocTools.pm
++++ b/perl5lib/LinuxDocTools.pm
+@@ -203,7 +203,7 @@ sub init {
+ 			  { option => "pass",      type => "s", short => "P" }
+ 			  ];
+   $global->{backend}   = "linuxdoc";
+-  $global->{papersize} = "a4";
++  $global->{papersize} = "letter";
+   $global->{language}  = '';
+   $global->{charset}   = "ascii";
+   $global->{style}     = "";
+-- 
+2.39.1
+

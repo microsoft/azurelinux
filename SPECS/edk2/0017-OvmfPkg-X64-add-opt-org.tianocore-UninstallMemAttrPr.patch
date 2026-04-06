@@ -1,0 +1,126 @@
+From 06cf132d990e77af4e3533e81405df9825905aaa Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 16 Jan 2025 17:20:38 +0100
+Subject: [PATCH 17/21] OvmfPkg/X64: add
+ opt/org.tianocore/UninstallMemAttrProtocol support
+
+Add support for opt/org.tianocore/UninstallMemAttrProtocol, to allow
+turning off EFI_MEMORY_ATTRIBUTE_PROTOCOL, simliar to ArmVirtPkg.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ .../PlatformBootManagerLib.inf                |  2 +
+ .../PlatformBootManagerLib/BdsPlatform.c      | 63 +++++++++++++++++++
+ 2 files changed, 65 insertions(+)
+
+diff --git a/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf b/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+index 9675eb081f56..cc5959c370e5 100644
+--- a/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
++++ b/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+@@ -64,6 +64,7 @@ [Pcd]
+   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
+   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+   gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
++  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol
+   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## CONSUMES
+@@ -82,6 +83,7 @@ [Protocols]
+   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
+   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
++  gEfiMemoryAttributeProtocolGuid
+ 
+ [Guids]
+   gEfiEndOfDxeEventGroupGuid
+diff --git a/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c b/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+index b696f1b3389b..9fc422c00a7b 100644
+--- a/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
++++ b/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+@@ -1596,6 +1596,49 @@ SaveS3BootScript (
+   ASSERT_EFI_ERROR (Status);
+ }
+ 
++/**
++  Uninstall the EFI memory attribute protocol if it exists.
++**/
++STATIC
++VOID
++UninstallEfiMemoryAttributesProtocol (
++  VOID
++  )
++{
++  EFI_STATUS  Status;
++  EFI_HANDLE  Handle;
++  UINTN       Size;
++  VOID        *MemoryAttributeProtocol;
++
++  Size   = sizeof (Handle);
++  Status = gBS->LocateHandle (
++                  ByProtocol,
++                  &gEfiMemoryAttributeProtocolGuid,
++                  NULL,
++                  &Size,
++                  &Handle
++                  );
++
++  if (EFI_ERROR (Status)) {
++    ASSERT (Status == EFI_NOT_FOUND);
++    return;
++  }
++
++  Status = gBS->HandleProtocol (
++                  Handle,
++                  &gEfiMemoryAttributeProtocolGuid,
++                  &MemoryAttributeProtocol
++                  );
++  ASSERT_EFI_ERROR (Status);
++
++  Status = gBS->UninstallProtocolInterface (
++                  Handle,
++                  &gEfiMemoryAttributeProtocolGuid,
++                  MemoryAttributeProtocol
++                  );
++  ASSERT_EFI_ERROR (Status);
++}
++
+ /**
+   Do the platform specific action after the console is ready
+ 
+@@ -1616,6 +1659,7 @@ PlatformBootManagerAfterConsole (
+   )
+ {
+   EFI_BOOT_MODE  BootMode;
++  BOOLEAN        Uninstall;
+ 
+   DEBUG ((DEBUG_INFO, "PlatformBootManagerAfterConsole\n"));
+ 
+@@ -1660,6 +1704,25 @@ PlatformBootManagerAfterConsole (
+   //
+   StoreQemuBootOrder ();
+ 
++  //
++  // Work around shim's terminally broken use of the EFI memory attributes
++  // protocol, by uninstalling it if requested on the QEMU command line.
++  //
++  // E.g.,
++  //       -fw_cfg opt/org.tianocore/UninstallMemAttrProtocol,string=y
++  //
++  Uninstall = FixedPcdGetBool (PcdUninstallMemAttrProtocol);
++  QemuFwCfgParseBool ("opt/org.tianocore/UninstallMemAttrProtocol", &Uninstall);
++  DEBUG ((
++    DEBUG_WARN,
++    "%a: %auninstalling EFI memory protocol\n",
++    __func__,
++    Uninstall ? "" : "not "
++    ));
++  if (Uninstall) {
++    UninstallEfiMemoryAttributesProtocol ();
++  }
++
+   //
+   // Process QEMU's -kernel command line option
+   //
+-- 
+2.51.1
+

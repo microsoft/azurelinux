@@ -1,0 +1,12 @@
+diff -Naur hyperframe-6.1.0/pyproject.toml hyperframe-6.1.0-mod/pyproject.toml
+--- hyperframe-6.1.0/pyproject.toml	2025-01-22 18:38:01.000000000 -0300
++++ hyperframe-6.1.0-mod/pyproject.toml	2025-01-27 14:10:50.765323319 -0300
+@@ -2,7 +2,7 @@
+ # https://packaging.python.org/en/latest/specifications/pyproject-toml/
+
+ [build-system]
+-requires = ["setuptools>=75.6.0"]
++requires = ["setuptools>=74"]
+ build-backend = "setuptools.build_meta"
+
+ [project]

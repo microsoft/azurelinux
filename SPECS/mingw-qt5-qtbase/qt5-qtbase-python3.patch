@@ -1,0 +1,9 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/uikit/devices.py qtbase-everywhere-src-5.15.18-new/mkspecs/features/uikit/devices.py
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/uikit/devices.py	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/uikit/devices.py	2025-11-07 14:10:27.690412293 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!/usr/bin/python3
+ 
+ #############################################################################
+ ##

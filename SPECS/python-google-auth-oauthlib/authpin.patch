@@ -1,0 +1,11 @@
+--- google_auth_oauthlib-1.2.3/setup.py~	2025-10-30 16:05:34.000000000 -0500
++++ google_auth_oauthlib-1.2.3/setup.py	2025-11-05 09:49:59.849308416 -0600
+@@ -25,7 +25,7 @@
+ # google-auth-oauthlib.
+ # Specifically https://github.com/googleapis/google-auth-library-python/commit/36ecb1d65883477d27faf9c2281fc289659b9903
+ # which results in the unit tests to fail. Remove the upper bound once the issue is resolved.
+-DEPENDENCIES = ("google-auth>=2.15.0,<2.42.0", "requests-oauthlib>=0.7.0")
++DEPENDENCIES = ("google-auth>=2.15.0", "requests-oauthlib>=0.7.0")
+ 
+ 
+ with io.open("README.rst", "r") as fh:

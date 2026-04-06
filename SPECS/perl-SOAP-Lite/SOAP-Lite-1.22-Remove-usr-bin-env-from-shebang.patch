@@ -1,0 +1,63 @@
+From d5b14a097c95ad02f1d145c3f7caf2ce35abda55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 7 Nov 2017 16:07:42 +0100
+Subject: [PATCH] Remove /usr/bin/env from shebang
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is forbidden by packaging guidelines now.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ bin/SOAPsh.pl                 | 3 +--
+ bin/stubmaker.pl              | 3 +--
+ examples/XMLRPC/xmlrpc.cgi    | 2 +-
+ examples/XMLRPC/xmlrpc.daemon | 2 +-
+ 4 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/bin/SOAPsh.pl b/bin/SOAPsh.pl
+index 9c9f778..a0c6d05 100644
+--- a/bin/SOAPsh.pl
++++ b/bin/SOAPsh.pl
+@@ -1,5 +1,4 @@
+-#!/usr/bin/env perl
+-#!d:\perl\bin\perl.exe
++#!perl
+ 
+ # -- SOAP::Lite -- soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
+ 
+diff --git a/bin/stubmaker.pl b/bin/stubmaker.pl
+index a99cf79..f3c4b45 100644
+--- a/bin/stubmaker.pl
++++ b/bin/stubmaker.pl
+@@ -1,5 +1,4 @@
+-#!/usr/bin/env perl
+-#!d:\perl\bin\perl.exe
++#!perl
+ #
+ # Filename: stubmaker.pl
+ # Authors: Byrne Reese <byrne at majordojo dot com>
+diff --git a/examples/XMLRPC/xmlrpc.cgi b/examples/XMLRPC/xmlrpc.cgi
+index 0225b90..8c9699c 100644
+--- a/examples/XMLRPC/xmlrpc.cgi
++++ b/examples/XMLRPC/xmlrpc.cgi
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!/usr/bin/perl
+ 
+ # -- XMLRPC::Lite -- services.soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
+ 
+diff --git a/examples/XMLRPC/xmlrpc.daemon b/examples/XMLRPC/xmlrpc.daemon
+index 2c4c2d3..f105cfd 100644
+--- a/examples/XMLRPC/xmlrpc.daemon
++++ b/examples/XMLRPC/xmlrpc.daemon
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!/usr/bin/perl
+ 
+ # -- XMLRPC::Lite -- services.soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
+ 
+-- 
+2.13.6
+

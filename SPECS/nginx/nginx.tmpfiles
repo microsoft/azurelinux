@@ -1,0 +1,3 @@
+d /var/lib/nginx     770 nginx root -
+d /var/lib/nginx/tmp 770 nginx root -
+d /var/log/nginx     711 root  root -

@@ -1,0 +1,142 @@
+From 5fdc289903bd3a77d455583650b00297da0cae8f Mon Sep 17 00:00:00 2001
+From: Omair Majid <omajid@redhat.com>
+Date: Fri, 2 Feb 2024 15:51:23 -0500
+Subject: [PATCH] Revert "Disable implicit rejection for RSA PKCS#1 (#95216)"
+
+This reverts commit a5fc8ff9b03ffb2fdb81dad524ad1a20a0714995.
+
+To quote Clemens Lang:
+
+> [Disabling implcit rejection] re-enables a Bleichenbacher timing oracle
+> attack against PKCS#1v1.5 decryption. See
+> https://people.redhat.com/~hkario/marvin/ for details and
+> https://github.com/dotnet/runtime/pull/95157#issuecomment-1842784399 for a
+> comment by the researcher who published the vulnerability and proposed the
+> change in OpenSSL.
+
+For more details, see:
+https://github.com/dotnet/runtime/pull/95216#issuecomment-1842799314
+---
+ .../RSA/EncryptDecrypt.cs                     | 49 ++++---------------
+ .../opensslshim.h                             |  6 ---
+ .../pal_evp_pkey_rsa.c                        | 13 -----
+ 3 files changed, 10 insertions(+), 58 deletions(-)
+
+diff --git a/src/runtime/src/libraries/Common/tests/System/Security/Cryptography/AlgorithmImplementations/RSA/EncryptDecrypt.cs b/src/runtime/src/libraries/Common/tests/System/Security/Cryptography/AlgorithmImplementations/RSA/EncryptDecrypt.cs
+index 39f3ebc82ec..5b97f468a42 100644
+--- a/src/runtime/src/libraries/Common/tests/System/Security/Cryptography/AlgorithmImplementations/RSA/EncryptDecrypt.cs
++++ b/src/runtime/src/libraries/Common/tests/System/Security/Cryptography/AlgorithmImplementations/RSA/EncryptDecrypt.cs
+@@ -353,10 +353,19 @@ private void RsaCryptRoundtrip(RSAEncryptionPadding paddingMode, bool expectSucc
+             Assert.Equal(TestData.HelloBytes, output);
+         }
+ 
+-        [ConditionalFact(nameof(PlatformSupportsEmptyRSAEncryption))]
++        [ConditionalFact]
+         [SkipOnTargetFramework(TargetFrameworkMonikers.NetFramework)]
+         public void RoundtripEmptyArray()
+         {
++            if (OperatingSystem.IsIOS() && !OperatingSystem.IsIOSVersionAtLeast(13, 6))
++            {
++                throw new SkipTestException("iOS prior to 13.6 does not reliably support RSA encryption of empty data.");
++            }
++            if (OperatingSystem.IsTvOS() && !OperatingSystem.IsTvOSVersionAtLeast(14, 0))
++            {
++                throw new SkipTestException("tvOS prior to 14.0 does not reliably support RSA encryption of empty data.");
++            }
++
+             using (RSA rsa = RSAFactory.Create(TestData.RSA2048Params))
+             {
+                 void RoundtripEmpty(RSAEncryptionPadding paddingMode)
+@@ -757,23 +746,5 @@ public static IEnumerable<object[]> OaepPaddingModes
+                 }
+             }
+         }
+-
+-        public static bool PlatformSupportsEmptyRSAEncryption
+-        {
+-            get
+-            {
+-                if (OperatingSystem.IsIOS() && !OperatingSystem.IsIOSVersionAtLeast(13, 6))
+-                {
+-                    return false;
+-                }
+-
+-                if (OperatingSystem.IsTvOS() && !OperatingSystem.IsTvOSVersionAtLeast(14, 0))
+-                {
+-                    return false;
+-                }
+-
+-                return true;
+-            }
+-        }
+     }
+ }
+diff --git a/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.h b/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.h
+index 0748e305d5c..cf10d2f7949 100644
+--- a/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.h
++++ b/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.h
+@@ -296,10 +296,8 @@ int EVP_DigestFinalXOF(EVP_MD_CTX *ctx, unsigned char *md, size_t len);
+     REQUIRED_FUNCTION(ERR_peek_error) \
+     REQUIRED_FUNCTION(ERR_peek_error_line) \
+     REQUIRED_FUNCTION(ERR_peek_last_error) \
+-    REQUIRED_FUNCTION(ERR_pop_to_mark) \
+     FALLBACK_FUNCTION(ERR_put_error) \
+     REQUIRED_FUNCTION(ERR_reason_error_string) \
+-    REQUIRED_FUNCTION(ERR_set_mark) \
+     LIGHTUP_FUNCTION(ERR_set_debug) \
+     LIGHTUP_FUNCTION(ERR_set_error) \
+     REQUIRED_FUNCTION(EVP_aes_128_cbc) \
+@@ -355,7 +353,6 @@ int EVP_DigestFinalXOF(EVP_MD_CTX *ctx, unsigned char *md, size_t len);
+     REQUIRED_FUNCTION(EVP_PKCS82PKEY) \
+     REQUIRED_FUNCTION(EVP_PKEY2PKCS8) \
+     REQUIRED_FUNCTION(EVP_PKEY_CTX_ctrl) \
+-    REQUIRED_FUNCTION(EVP_PKEY_CTX_ctrl_str) \
+     REQUIRED_FUNCTION(EVP_PKEY_CTX_free) \
+     REQUIRED_FUNCTION(EVP_PKEY_CTX_get0_pkey) \
+     REQUIRED_FUNCTION(EVP_PKEY_CTX_new) \
+@@ -797,10 +794,8 @@ FOR_ALL_OPENSSL_FUNCTIONS
+ #define ERR_peek_error_line ERR_peek_error_line_ptr
+ #define ERR_peek_last_error ERR_peek_last_error_ptr
+ #define ERR_put_error ERR_put_error_ptr
+-#define ERR_pop_to_mark ERR_pop_to_mark_ptr
+ #define ERR_reason_error_string ERR_reason_error_string_ptr
+ #define ERR_set_debug ERR_set_debug_ptr
+-#define ERR_set_mark ERR_set_mark_ptr
+ #define ERR_set_error ERR_set_error_ptr
+ #define EVP_aes_128_cbc EVP_aes_128_cbc_ptr
+ #define EVP_aes_128_cfb8 EVP_aes_128_cfb8_ptr
+@@ -855,7 +850,6 @@ FOR_ALL_OPENSSL_FUNCTIONS
+ #define EVP_PKCS82PKEY EVP_PKCS82PKEY_ptr
+ #define EVP_PKEY2PKCS8 EVP_PKEY2PKCS8_ptr
+ #define EVP_PKEY_CTX_ctrl EVP_PKEY_CTX_ctrl_ptr
+-#define EVP_PKEY_CTX_ctrl_str EVP_PKEY_CTX_ctrl_str_ptr
+ #define EVP_PKEY_CTX_free EVP_PKEY_CTX_free_ptr
+ #define EVP_PKEY_CTX_get0_pkey EVP_PKEY_CTX_get0_pkey_ptr
+ #define EVP_PKEY_CTX_new EVP_PKEY_CTX_new_ptr
+diff --git a/src/runtime/src/native/libs/System.Security.Cryptography.Native/pal_evp_pkey_rsa.c b/src/runtime/src/native/libs/System.Security.Cryptography.Native/pal_evp_pkey_rsa.c
+index 043bf9f9d1e..c9ccdf33e3a 100644
+--- a/src/runtime/src/native/libs/System.Security.Cryptography.Native/pal_evp_pkey_rsa.c
++++ b/src/runtime/src/native/libs/System.Security.Cryptography.Native/pal_evp_pkey_rsa.c
+@@ -67,19 +67,6 @@ static bool ConfigureEncryption(EVP_PKEY_CTX* ctx, RsaPaddingMode padding, const
+         {
+             return false;
+         }
+-
+-        // OpenSSL 3.2 introduced a change where PKCS#1 RSA decryption does not fail for invalid padding.
+-        // If the padding is invalid, the decryption operation returns random data.
+-        // See https://github.com/openssl/openssl/pull/13817 for background.
+-        // Some Linux distributions backported this change to previous versions of OpenSSL.
+-        // Here we do a best-effort to set a flag to revert the behavior to failing if the padding is invalid.
+-        ERR_set_mark();
+-
+-        EVP_PKEY_CTX_ctrl_str(ctx, "rsa_pkcs1_implicit_rejection", "0");
+-
+-        // Undo any changes to the error queue that may have occured while configuring implicit rejection if the
+-        // current version does not support implicit rejection.
+-        ERR_pop_to_mark();
+     }
+     else
+     {
+-- 
+2.43.0
+

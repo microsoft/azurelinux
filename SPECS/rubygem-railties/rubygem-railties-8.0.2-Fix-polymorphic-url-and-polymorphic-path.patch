@@ -1,0 +1,88 @@
+From db0736a6156fd5e6e81e9f654a81f8c03f683e04 Mon Sep 17 00:00:00 2001
+From: Edouard CHIN <chin.edouard@gmail.com>
+Date: Fri, 11 Apr 2025 00:45:52 +0200
+Subject: [PATCH] Fix `polymorphic_url` and `polymorphic_path`:
+
+- Fix #54890
+- ### Problem
+
+  Calling `polyphormic_url` in a integration test or anywhere else
+  when routes may not be loaded yet will result in either crashing
+  or returning a wrong url.
+
+  ### Details
+
+  When the routes are not yet loaded, any `resolve` routes are not
+  taken in consideration when calling `polymorphic_url`.
+
+  ```ruby
+  # config/routes.rb
+  resolve("Post") { "https://example.org" }
+
+  # test.rb
+  polymorphic_url(@post) # Crash: `post_url` is not defined.
+  ```
+
+  ### Solution
+
+  Load the routes when `polymorphic_mappings` ultimately gets called
+  by `polymorphic_url`
+  https://github.com/rails/rails/blob/42a71a03a0adb465dc49b4e21dec8e0ea29e8e35/actionpack/lib/action_dispatch/routing/polymorphic_routes.rb#L179
+
+  ### Side note
+
+  It's worth to note that `polymorphic_url` was overriden to
+  load the routes, but it only worked if one attempted to call it on
+  the singleton route's url_helpers:
+
+  ```ruby
+    class MyTest << ActionDispatch::IntegrationTest
+      test "example" do
+        # Works correctly on main
+        Rails.application.routes.url_helpers.polymorphic_url(@post)
+
+        # Does not work without this patch
+        polymorphic_url(@post)
+      end
+    end
+  ```
+
+  I removed the previous implementation because it was at the wrong
+  level.
+---
+ railties/lib/rails/engine/lazy_route_set.rb | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/railties/lib/rails/engine/lazy_route_set.rb b/railties/lib/rails/engine/lazy_route_set.rb
+index ed6f0305126e4..515e3250227d7 100644
+--- a/railties/lib/rails/engine/lazy_route_set.rb
++++ b/railties/lib/rails/engine/lazy_route_set.rb
+@@ -34,16 +34,6 @@ def optimize_routes_generation?
+           Rails.application&.reload_routes_unless_loaded
+           super
+         end
+-
+-        def polymorphic_url(record_or_hash_or_array, options = {})
+-          Rails.application&.reload_routes_unless_loaded
+-          super
+-        end
+-
+-        def polymorphic_path(record_or_hash_or_array, options = {})
+-          Rails.application&.reload_routes_unless_loaded
+-          super
+-        end
+       end
+ 
+       def initialize(config = DEFAULT_CONFIG)
+@@ -68,6 +58,11 @@ def call(req)
+         super
+       end
+ 
++      def polymorphic_mappings
++        Rails.application&.reload_routes_unless_loaded
++        super
++      end
++
+       def draw(&block)
+         Rails.application&.reload_routes_unless_loaded
+         super

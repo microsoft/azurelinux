@@ -1,0 +1,15 @@
+--- walkdir-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ walkdir-2.5.0/Cargo.toml	2024-03-05T13:34:23.868225+00:00
+@@ -39,11 +39,9 @@
+ [dev-dependencies.doc-comment]
+ version = "0.3"
+ 
+-[target."cfg(windows)".dependencies.winapi-util]
+-version = "0.1.1"
+-
+ [badges.appveyor]
+ repository = "BurntSushi/walkdir"
+ 
+ [badges.travis-ci]
+ repository = "BurntSushi/walkdir"
++

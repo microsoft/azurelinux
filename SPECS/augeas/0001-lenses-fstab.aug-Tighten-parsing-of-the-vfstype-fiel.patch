@@ -1,0 +1,51 @@
+From 9e26cf6459295908afd002f70bb257eb8136269a Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 4 Feb 2025 11:10:53 +0000
+Subject: [PATCH 1/2] lenses/fstab.aug: Tighten parsing of the vfstype field
+
+This can be a list, but there's no evidence in the manual that
+vfstype=value is permitted, it's just a simple list of strings.
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ lenses/fstab.aug | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/lenses/fstab.aug b/lenses/fstab.aug
+index c653c489..69c1b955 100644
+--- a/lenses/fstab.aug
++++ b/lenses/fstab.aug
+@@ -14,10 +14,19 @@ module Fstab =
+ 
+   let file    = /[^# \t\n]+/
+ 
+-  (* An option label can't contain comma, comment, equals, or space *)
+-  let optlabel = /[^,#= \n\t]+/
+   let spec    = /[^,# \n\t][^ \n\t]*/
+ 
++  (* A vfstype, usually just a short string like "ext3" or "fuse.sshfs", but
++     be generous here *)
++  let vfslabel = /[^,#= \n\t]+/
++
++  let vfstype_list (l:string) =
++      let lns = [ label l . store vfslabel ] in
++         Build.opt_list lns comma
++
++  (* A mount option label can't contain comma, comment, equals, or space *)
++  let optlabel = /[^,#= \n\t]+/
++
+   let comma_sep_list (l:string) =
+     let value = [ label "value" . Util.del_str "=" . ( store Rx.neg1 )? ] in
+       let lns = [ label l . store optlabel . value? ] in
+@@ -27,7 +36,7 @@ module Fstab =
+                    Util.indent .
+                    [ label "spec" . store spec ] . sep_tab .
+                    [ label "file" . store file ] . sep_tab .
+-                   comma_sep_list "vfstype" .
++                   vfstype_list "vfstype" .
+                    (sep_tab . comma_sep_list "opt" .
+                     (sep_comma_tab . [ label "dump" . store /[0-9]+/ ] .
+                      ( sep_spc . [ label "passno" . store /[0-9]+/ ])? )? )?
+-- 
+2.49.0
+

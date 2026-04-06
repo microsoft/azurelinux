@@ -1,0 +1,10 @@
+--- build.xml.orig	2023-01-29 17:38:29.477052402 +0800
++++ build.xml	2023-01-29 17:42:03.369583841 +0800
+@@ -216,6 +216,7 @@
+   <!-- Classpaths -->
+   <path id="compile.classpath">
+     <pathelement location="${bnd.jar}"/>
++    <pathelement location="${bnd-annotation.jar}"/>
+     <pathelement location="${jdt.jar}"/>
+     <pathelement location="${jaxrpc-lib.jar}"/>
+     <pathelement location="${wsdl4j-lib.jar}"/>

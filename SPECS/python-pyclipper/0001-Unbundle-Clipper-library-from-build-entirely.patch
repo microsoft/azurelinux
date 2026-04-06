@@ -1,0 +1,54 @@
+From ecc054ad2510a402ec22372c3ee21843d2f3176f Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Thu, 2 Jan 2025 20:50:09 -0500
+Subject: [PATCH] Unbundle Clipper library from build entirely
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ setup.py | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 209dacc..f9071fe 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,20 +1,29 @@
++import subprocess
++
+ from setuptools import setup, find_packages
+ from setuptools.extension import Extension
+ from Cython.Distutils import build_ext
+ 
+ 
+-sources = ["src/pyclipper/_pyclipper.pyx", "src/clipper.cpp"]
++def pkgconf(package):
++    flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
++    output = subprocess.check_output(
++        ['pkg-config', '--cflags', '--libs', package], text=True)
++    kw = {}
++    for token in output.strip().split():
++        kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
++    return kw
++
++
++sources = ["src/pyclipper/_pyclipper.pyx"]
+ 
++extension_kwargs = pkgconf('polyclipping')
++extension_kwargs.setdefault('include_dirs', []).insert(0, 'src')
+ 
+ ext = Extension("pyclipper._pyclipper",
+                 sources=sources,
+                 language="c++",
+-                include_dirs=["src"],
+-                # define extra macro definitions that are used by clipper
+-                # Available definitions that can be used with pyclipper:
+-                # use_lines, use_int32
+-                # See src/clipper.hpp
+-                # define_macros=[('use_lines', 1)]
++                **extension_kwargs
+                 )
+ 
+ with open("README.rst", "r", encoding='utf-8') as readme:
+-- 
+2.52.0
+

@@ -1,0 +1,29 @@
+From a29ff8a77bafeb35d95ebddeb959c4129a783d06 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Fri, 2 Aug 2024 11:46:52 +0900
+Subject: [PATCH] TEST: support curl 8.9 error message
+
+With
+https://github.com/curl/curl/commit/c074ba64a86c36bbb697b89e1b3509fd14d12af3
+curl changes the error message with CURLE_COULDNT_CONNECT and
+so on. Modify typheous side test code to support this curl
+change.
+
+Closes #723 .
+---
+ spec/typhoeus/response/informations_spec.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spec/typhoeus/response/informations_spec.rb b/spec/typhoeus/response/informations_spec.rb
+index 4b863067..8146164c 100644
+--- a/spec/typhoeus/response/informations_spec.rb
++++ b/spec/typhoeus/response/informations_spec.rb
+@@ -24,7 +24,7 @@
+     let(:options) { { :return_code => :couldnt_connect } }
+ 
+     it "returns a message" do
+-      expect(response.return_message).to eq("Couldn't connect to server")
++      expect(response.return_message).to match(/(Couldn't|Could not) connect to server/)
+     end
+ 
+     describe "with nil return_code" do

@@ -1,0 +1,35 @@
+diff -rupN --no-dereference libwebp-1.5.0/CMakeLists.txt libwebp-1.5.0-new/CMakeLists.txt
+--- libwebp-1.5.0/CMakeLists.txt	2024-12-20 02:17:50.000000000 +0100
++++ libwebp-1.5.0-new/CMakeLists.txt	2024-12-21 00:47:47.651834967 +0100
+@@ -587,8 +587,8 @@ endif()
+ 
+ if(WEBP_BUILD_VWEBP)
+   # vwebp
+-  find_package(GLUT)
+-  if(GLUT_FOUND)
++  find_package(FreeGLUT)
++  if(FreeGLUT_FOUND)
+     include_directories(${WEBP_DEP_IMG_INCLUDE_DIRS})
+     parse_makefile_am(${CMAKE_CURRENT_SOURCE_DIR}/examples "VWEBP_SRCS" "vwebp")
+     add_executable(vwebp ${VWEBP_SRCS})
+@@ -596,7 +596,7 @@ if(WEBP_BUILD_VWEBP)
+       vwebp
+       ${OPENGL_LIBRARIES}
+       exampleutil
+-      GLUT::GLUT
++      glut
+       imageioutil
+       webp
+       webpdemux)
+diff -rupN --no-dereference libwebp-1.5.0/examples/vwebp.c libwebp-1.5.0-new/examples/vwebp.c
+--- libwebp-1.5.0/examples/vwebp.c	2024-12-20 02:17:50.000000000 +0100
++++ libwebp-1.5.0-new/examples/vwebp.c	2024-12-21 00:47:47.651834967 +0100
+@@ -28,7 +28,7 @@
+ #if defined(HAVE_GLUT_GLUT_H)
+ #include <GLUT/glut.h>
+ #else
+-#include <GL/glut.h>
++#include <GL/freeglut.h>
+ #ifdef FREEGLUT
+ #include <GL/freeglut.h>
+ #endif

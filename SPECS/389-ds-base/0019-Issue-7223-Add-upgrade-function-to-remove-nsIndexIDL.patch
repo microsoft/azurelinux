@@ -1,0 +1,212 @@
+From ea1b51df9a698915b972923357caba1c78dcc82f Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Thu, 5 Feb 2026 12:17:06 +0100
+Subject: [PATCH] Issue 7223 - Add upgrade function to remove
+ nsIndexIDListScanLimit from parentid
+
+Description:
+Add `upgrade_remove_index_scanlimit()` function that removes the
+nsIndexIDListScanLimit attribute from parentid index configuration
+if present.
+
+This attribute was incorrectly added by a previous version and can
+cause issues with index configuration. The upgrade function runs
+automatically on server startup and removes the attribute if found.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7223
+
+Reviewed by: @progier389, @tbordaz, @droideck (Thanks!)
+---
+ .../healthcheck/health_system_indexes_test.py |  52 +++++++++
+ ldap/servers/slapd/upgrade.c                  | 105 ++++++++++++++++++
+ 2 files changed, 157 insertions(+)
+
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index 140845a33..aea88e0e2 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -453,6 +453,58 @@ def test_multiple_missing_indexes(topology_st, log_buffering_enabled):
+     run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+ 
+ 
++def test_upgrade_removes_parentid_scanlimit(topology_st):
++    """Check if upgrade function removes nsIndexIDListScanLimit from parentid index
++
++    :id: 2808886e-c1c1-441d-b3a3-299c4ef1ab4a
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Use DSEldif to add nsIndexIDListScanLimit to parentid index
++        4. Start the server (triggers upgrade)
++        5. Verify nsIndexIDListScanLimit is removed from parentid index
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. nsIndexIDListScanLimit is no longer present
++    """
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++    PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
++    SCANLIMIT_VALUE = "limit=5000 type=eq flags=AND"
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Add nsIndexIDListScanLimit to parentid index using DSEldif")
++    dse_ldif = DSEldif(standalone)
++    dse_ldif.add(PARENTID_DN, "nsIndexIDListScanLimit", SCANLIMIT_VALUE)
++
++    # Verify it was added
++    scanlimit = dse_ldif.get(PARENTID_DN, "nsIndexIDListScanLimit")
++    assert scanlimit is not None, "Failed to add nsIndexIDListScanLimit"
++    log.info(f"Added nsIndexIDListScanLimit: {scanlimit}")
++
++    log.info("Start the server (triggers upgrade)")
++    standalone.start()
++
++    log.info("Verify nsIndexIDListScanLimit was removed by upgrade")
++    # Check via LDAP - the upgrade should have removed it
++    parentid_index = Index(standalone, PARENTID_DN)
++    scanlimit_after = parentid_index.get_attr_vals_utf8("nsIndexIDListScanLimit")
++    log.info(f"nsIndexIDListScanLimit after upgrade: {scanlimit_after}")
++
++    # The upgrade function should have removed nsIndexIDListScanLimit
++    assert not scanlimit_after, \
++        f"nsIndexIDListScanLimit should have been removed but found: {scanlimit_after}"
++
++    log.info("Upgrade successfully removed nsIndexIDListScanLimit from parentid index")
++
++
+ if __name__ == "__main__":
+     # Run isolated
+     # -s for DEBUG mode
+diff --git a/ldap/servers/slapd/upgrade.c b/ldap/servers/slapd/upgrade.c
+index b02e37ed6..dcd16940b 100644
+--- a/ldap/servers/slapd/upgrade.c
++++ b/ldap/servers/slapd/upgrade.c
+@@ -330,6 +330,107 @@ upgrade_remove_subtree_rename(void)
+     return UPGRADE_SUCCESS;
+ }
+ 
++/*
++ * Remove nsIndexIDListScanLimit from parentid index configuration.
++ *
++ * This attribute was incorrectly added by a previous version and can
++ * cause issues with index configuration. Remove it if present.
++ */
++static upgrade_status
++upgrade_remove_index_scanlimit(void)
++{
++    struct slapi_pblock *pb = slapi_pblock_new();
++    Slapi_Entry **backends = NULL;
++    const char *be_base_dn = "cn=ldbm database,cn=plugins,cn=config";
++    const char *be_filter = "(objectclass=nsBackendInstance)";
++    const char *attrs_to_check[] = {"parentid", NULL};
++    upgrade_status uresult = UPGRADE_SUCCESS;
++
++    /* Search for all backend instances */
++    slapi_search_internal_set_pb(
++            pb, be_base_dn,
++            LDAP_SCOPE_ONELEVEL,
++            be_filter, NULL, 0, NULL, NULL,
++            plugin_get_default_component_id(), 0);
++    slapi_search_internal_pb(pb);
++    slapi_pblock_get(pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &backends);
++
++    if (backends) {
++        for (size_t be_idx = 0; backends[be_idx] != NULL; be_idx++) {
++            const char *be_dn = slapi_entry_get_dn_const(backends[be_idx]);
++            const char *be_name = slapi_entry_attr_get_ref(backends[be_idx], "cn");
++            if (!be_dn || !be_name) {
++                continue;
++            }
++
++            for (size_t attr_idx = 0; attrs_to_check[attr_idx] != NULL; attr_idx++) {
++                const char *attr_name = attrs_to_check[attr_idx];
++                struct slapi_pblock *idx_pb = slapi_pblock_new();
++                Slapi_Entry **idx_entries = NULL;
++                char *idx_dn = slapi_create_dn_string("cn=%s,cn=index,%s",
++                                                       attr_name, be_dn);
++                char *idx_filter = "(objectclass=nsIndex)";
++
++                if (!idx_dn) {
++                    slapi_pblock_destroy(idx_pb);
++                    continue;
++                }
++
++                slapi_search_internal_set_pb(
++                        idx_pb, idx_dn,
++                        LDAP_SCOPE_BASE,
++                        idx_filter, NULL, 0, NULL, NULL,
++                        plugin_get_default_component_id(), 0);
++                slapi_search_internal_pb(idx_pb);
++                slapi_pblock_get(idx_pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &idx_entries);
++
++                if (idx_entries && idx_entries[0]) {
++                    /* Check if nsIndexIDListScanLimit is present */
++                    if (slapi_entry_attr_get_ref(idx_entries[0], "nsIndexIDListScanLimit") != NULL) {
++                        /* Remove nsIndexIDListScanLimit */
++                        Slapi_PBlock *mod_pb = slapi_pblock_new();
++                        Slapi_Mods smods;
++                        int rc;
++
++                        slapi_mods_init(&smods, 1);
++                        slapi_mods_add(&smods, LDAP_MOD_DELETE, "nsIndexIDListScanLimit", 0, NULL);
++
++                        slapi_modify_internal_set_pb(
++                                mod_pb, idx_dn,
++                                slapi_mods_get_ldapmods_byref(&smods),
++                                NULL, NULL,
++                                plugin_get_default_component_id(), 0);
++                        slapi_modify_internal_pb(mod_pb);
++                        slapi_pblock_get(mod_pb, SLAPI_PLUGIN_INTOP_RESULT, &rc);
++
++                        if (rc == LDAP_SUCCESS) {
++                            slapi_log_err(SLAPI_LOG_NOTICE, "upgrade_remove_index_scanlimit",
++                                    "Removed 'nsIndexIDListScanLimit' from index '%s' in backend '%s'\n",
++                                    attr_name, be_name);
++                        } else if (rc != LDAP_NO_SUCH_ATTRIBUTE) {
++                            slapi_log_err(SLAPI_LOG_ERR, "upgrade_remove_index_scanlimit",
++                                    "Failed to remove 'nsIndexIDListScanLimit' from index '%s' in backend '%s': error %d\n",
++                                    attr_name, be_name, rc);
++                        }
++
++                        slapi_mods_done(&smods);
++                        slapi_pblock_destroy(mod_pb);
++                    }
++                }
++
++                slapi_ch_free_string(&idx_dn);
++                slapi_free_search_results_internal(idx_pb);
++                slapi_pblock_destroy(idx_pb);
++            }
++        }
++    }
++
++    slapi_free_search_results_internal(pb);
++    slapi_pblock_destroy(pb);
++
++    return uresult;
++}
++
+ /*
+  * Check if parentid/ancestorid indexes are missing the integerOrderingMatch
+  * matching rule.
+@@ -649,6 +750,10 @@ upgrade_server(void)
+         return UPGRADE_FAILURE;
+     }
+ 
++    if (upgrade_remove_index_scanlimit() != UPGRADE_SUCCESS) {
++        return UPGRADE_FAILURE;
++    }
++
+     if (upgrade_check_id_index_matching_rule() != UPGRADE_SUCCESS) {
+         return UPGRADE_FAILURE;
+     }
+-- 
+2.52.0
+

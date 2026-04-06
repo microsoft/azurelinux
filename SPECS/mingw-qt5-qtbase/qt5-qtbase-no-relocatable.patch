@@ -1,0 +1,12 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/global/qlibraryinfo.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/global/qlibraryinfo.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/global/qlibraryinfo.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/global/qlibraryinfo.cpp	2025-11-07 14:10:35.621757602 +0100
+@@ -677,7 +677,7 @@ static QString getPrefix(
+     if (group == QLibraryInfo::DevicePaths)
+         return QString::fromLocal8Bit(QT_CONFIGURE_PREFIX_PATH);
+ #  endif
+-    return getExtPrefixFromHostBinDir();
++    return QString::fromLocal8Bit(QT_CONFIGURE_PREFIX_PATH);
+ #elif QT_CONFIG(relocatable)
+     return getRelocatablePrefix();
+ #else

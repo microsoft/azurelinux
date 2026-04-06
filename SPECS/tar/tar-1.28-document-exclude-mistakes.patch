@@ -1,0 +1,97 @@
+From 18112ded916cf62b3bd3c0ffb9530e4ade3d2209 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 28 Jul 2014 08:16:33 +0200
+Subject: [PATCH 7/9] Document exclude mistakes with
+
+.. usually with  --no-wildcards-match-slash & --anchored options.
+
+Upstream bugreport (still downstream):
+http://www.mail-archive.com/bug-tar@gnu.org/msg04488.html
+
+Related: #903666
+
+---
+ doc/tar.texi | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+
+diff --git a/doc/tar.texi b/doc/tar.texi
+index a000f3f..2695d22 100644
+--- a/doc/tar.texi
++++ b/doc/tar.texi
+@@ -8051,6 +8051,73 @@ The following table summarizes pattern-matching default values:
+ @item Exclusion @tab @option{--wildcards --no-anchored --wildcards-match-slash}
+ @end multitable
+ 
++@subsubsection Wildcard matching confusion
++Using of @option{--[no-]anchored} and @option{--[no-]wildcards-match-slash}
++was proven to make confusion.  The reasons for this are probably different
++default setting for inclusion and exclusion patterns (in general: you shouldn't
++rely on defaults if possible) and maybe also because when using any of these two
++options, the position on command line matters (these options should be placed
++prior to the member name on command line).
++
++@noindent
++Consider following directory structure:
++
++@smallexample
++$ find path/ | sort
++path/
++path/file1
++path/file2
++path/subpath
++path/subpath/file1
++path/subpath/file2
++path/subpath2
++path/subpath2/file1
++path/subpath2/file2
++@end smallexample
++
++@noindent
++To archive full directory @samp{path} except all files named @samp{file1} may be
++reached by any of the two following commands:
++
++@smallexample
++$ tar -cf a.tar --no-wildcards-match-slash --no-anchored path \
++      --exclude='*/file1'
++$ tar -cf a.tar --wildcards-match-slash path --exclude='*/file1'
++@end smallexample
++
++@noindent
++Note that the @option{--wildcards-match-slash} and @option{--no-anchored} may be
++omitted as it is default for @option{--exclude}.  Anyway, we usually want just
++concrete file (or rather subset of files with the same name).  Assume we want
++exclude only files named @samp{file1} from the first subdirectory level.
++Following command obviously does not work (it still excludes all files having
++@samp{file1} name):
++
++@smallexample
++$ tar -cf a.tar --no-wildcards-match-slash path \
++    --exclude='*/file1' | sort
++@end smallexample
++
++@noindent
++This is because the @option{--no-anchored} is set by default for exclusion.
++What you need to fix is to put @option{--anchored} before pathname:
++
++@smallexample
++$ tar -cvf a.tar --no-wildcards-match-slash --anchored path \
++    --exclude='*/file1' | sort
++path/
++path/file2
++path/subpath1/
++path/subpath1/file1
++path/subpath1/file2
++path/subpath2/
++path/subpath2/file1
++path/subpath2/file2
++@end smallexample
++
++@noindent
++Similarly you can exclude second level by specifying @samp{*/*/file1}.
++
+ @node quoting styles
+ @section Quoting Member Names
+ 
+-- 
+1.9.3
+

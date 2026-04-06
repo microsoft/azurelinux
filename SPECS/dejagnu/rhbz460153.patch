@@ -1,0 +1,31 @@
+diff --git a/runtest.exp b/runtest.exp
+index 01abaf1..55462fe 100644
+--- a/runtest.exp
++++ b/runtest.exp
+@@ -741,7 +741,7 @@ if { [file tail $srcdir] eq "testsuite" } {
+     set testsuitedir $base_dir
+     set testbuilddir $base_dir
+ } else {
+-    if { $testsuitedir eq "testsuite" && $srcdir eq "." && $objdir eq "." } {
++    if { $testsuitedir eq "testsuite" && $testbuilddir eq "testsuite" } {
+ 	# Broken legacy case -- testsuite not actually in testsuite/
+ 	# Produce a warning, but continue.
+ 	send_error "WARNING: testsuite is not in a testsuite/ directory.\n"
+@@ -1594,7 +1594,7 @@ proc runtest { test_file_name } {
+     global prms_id
+     global bug_id
+     global test_result
+-    global errcnt
++    global errcnt warncnt
+     global errorCode
+     global errorInfo
+     global tool
+@@ -1603,6 +1603,8 @@ proc runtest { test_file_name } {
+     clone_output "Running $test_file_name ..."
+     set prms_id	0
+     set bug_id	0
++    set errcnt  0
++    set warncnt 0
+     set test_result ""
+ 
+     # set testdir so testsuite file -test has a starting point

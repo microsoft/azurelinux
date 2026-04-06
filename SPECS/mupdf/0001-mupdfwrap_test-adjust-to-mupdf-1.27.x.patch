@@ -1,0 +1,45 @@
+From a9b308e75b3dbe20dc8fe502b9a212749433ea92 Mon Sep 17 00:00:00 2001
+Message-ID: <a9b308e75b3dbe20dc8fe502b9a212749433ea92.1761772186.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Fri, 23 May 2025 15:57:30 +0200
+Subject: [PATCH] mupdfwrap_test: adjust to mupdf 1.27.x
+
+mupdf 1.27.x started to insist on resynthesis in:
+7db01c78a ("Ensure we have no pending form recalc or annot resynthesis before saving.", 2025-05-16)
+
+Adjust the script accordingly, catching both "pass" and the expected
+"raise".
+---
+ scripts/mupdfwrap_test.py | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/mupdfwrap_test.py b/scripts/mupdfwrap_test.py
+index 7e077981d..4e48ca2c8 100755
+--- a/scripts/mupdfwrap_test.py
++++ b/scripts/mupdfwrap_test.py
+@@ -140,7 +140,21 @@ def test_filter(path):
+             document.pdf_end_operation()
+ 
+     if 1:
+-        document.pdf_save_document('mupdf_test-out0.pdf', mupdf.PdfWriteOptions())
++        try:
++            document.pdf_save_document('mupdf_test-out0.pdf', mupdf.PdfWriteOptions())
++        except mupdf.FzErrorArgument as e:
++            log(f'{type(e)=} {str(e)=} {repr(e)=}.')
++            log(f'{e.what()=}.')
++            expected = 'code=4: annotations need resynthesis before saving' # mupdf 1.27.x
++            assert str(e) == expected and e.what() == expected, (
++                    f'Incorrect exception text:\n'
++                    f'    {str(e)=}\n'
++                    f'    {e.what()=}\n'
++                    f'    {expected=}'
++                    )
++        except Exception as e:
++            assert 0, f'Incorrect exception {type(e)=} {e=}.'
++            
+ 
+ 
+ def test_install_load_system_font(path):
+-- 
+2.51.2.1007.g590f8df4db
+

@@ -1,0 +1,11 @@
+--- dev86-0.16.17/makefile.in.nostrip	2007-01-30 14:28:38.000000000 +0100
++++ dev86-0.16.17/makefile.in	2007-01-30 14:40:56.000000000 +0100
+@@ -78,7 +78,7 @@
+ 
+ # Install files with the userid of the currently running process.
+ INDAT=-m 644
+-INEXE=-m 755 -s
++INEXE=-m 755
+ INSCR=-m 755
+ 
+ #ifdef __CYGWIN__

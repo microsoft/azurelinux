@@ -1,0 +1,12 @@
+--- rustls-pki-types-1.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-pki-types-1.14.0/Cargo.toml	2026-01-16T20:39:39.709227+00:00
+@@ -64,9 +64,6 @@
+ version = "1"
+ optional = true
+ 
+-[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies.crabgrind]
+-version = "=0.1.9"
+-
+ [lints.rust]
+ elided_lifetimes_in_paths = "warn"
+ trivial_numeric_casts = "warn"

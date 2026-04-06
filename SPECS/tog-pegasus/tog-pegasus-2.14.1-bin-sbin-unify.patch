@@ -1,0 +1,13 @@
+diff -up pegasus/env_var_Linux.status.orig pegasus/env_var_Linux.status
+--- pegasus/env_var_Linux.status.orig	2025-01-24 10:15:11.992047851 +0100
++++ pegasus/env_var_Linux.status	2025-01-24 11:13:24.597308490 +0100
+@@ -85,7 +85,7 @@ PEGASUS_MAN_DIR = $(PEGASUS_PROD_DIR)/sh
+ PEGASUS_PRODSHARE_DIR = $(PEGASUS_PROD_DIR)/share/Pegasus
+ PEGASUS_INCLUDE_DIR = $(PEGASUS_PROD_DIR)/include
+ 
+-PEGASUS_SBIN_DIR = $(PEGASUS_PROD_DIR)/sbin
++PEGASUS_SBIN_DIR = $(PEGASUS_PROD_DIR)/bin
+ PEGASUS_BIN_DIR = $(PEGASUS_PROD_DIR)/bin
+ PEGASUS_DEST_LIB_DIR = $(PEGASUS_PROD_DIR)/$(PEGASUS_ARCH_LIB)
+ PEGASUS_DEST_LIB_DIR_2 = $(PEGASUS_PROD_DIR)/%PEGASUS_ARCH_LIB
+diff -up pegasus/Makefile.Release.orig pegasus/Makefile.Release

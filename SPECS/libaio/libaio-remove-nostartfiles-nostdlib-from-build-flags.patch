@@ -1,0 +1,13 @@
+diff --git a/src/Makefile b/src/Makefile
+index eadb336..5911c81 100644
+--- libaio-0.3.111/src/Makefile
++++ libaio-0.3.111/src/Makefile
+@@ -3,7 +3,7 @@ includedir=$(prefix)/include
+ libdir=$(prefix)/lib
+ 
+ CFLAGS ?= -g -fomit-frame-pointer -O2
+-CFLAGS += -nostdlib -nostartfiles -Wall -I. -fPIC
++CFLAGS += -Wall -I. -fPIC
+ SO_CFLAGS=-shared $(CFLAGS)
+ L_CFLAGS=$(CFLAGS)
+ LINK_FLAGS=

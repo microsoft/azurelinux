@@ -1,0 +1,187 @@
+From a91baa4c8cb395568f4c55199e47ce4807e42bd2 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 5 May 2021 13:42:36 +0200
+Subject: [PATCH] Upgrade to 1.52
+
+---
+ lib/Carp.pm           | 12 ++++++------
+ lib/Carp/Heavy.pm     |  2 +-
+ t/Carp.t              |  6 ++++--
+ t/Carp_overloadless.t |  6 ++++--
+ t/broken_can.t        |  5 ++++-
+ t/broken_univ_can.t   | 12 +++++++++---
+ t/vivify_stash.t      |  6 +++++-
+ 7 files changed, 33 insertions(+), 16 deletions(-)
+
+diff --git a/lib/Carp.pm b/lib/Carp.pm
+index 109b7fe..df563d0 100644
+--- a/lib/Carp.pm
++++ b/lib/Carp.pm
+@@ -211,7 +211,7 @@ BEGIN {
+ }
+ 
+ 
+-our $VERSION = '1.50';
++our $VERSION = '1.52';
+ $VERSION =~ tr/_//d;
+ 
+ our $MaxEvalLen = 0;
+@@ -284,7 +284,7 @@ sub shortmess {
+     my $cgc = _cgc();
+ 
+     # Icky backwards compatibility wrapper. :-(
+-    local @CARP_NOT = $cgc ? $cgc->() : caller();
++    local @CARP_NOT = scalar( $cgc ? $cgc->() : caller() );
+     shortmess_heavy(@_);
+ }
+ 
+@@ -944,10 +944,10 @@ This variable sets a general argument formatter to display references.
+ Plain scalars and objects that implement C<CARP_TRACE> will not go through
+ this formatter.  Calling C<Carp> from within this function is not supported.
+ 
+-local $Carp::RefArgFormatter = sub {
+-    require Data::Dumper;
+-    Data::Dumper::Dump($_[0]); # not necessarily safe
+-};
++    local $Carp::RefArgFormatter = sub {
++        require Data::Dumper;
++        Data::Dumper->Dump($_[0]); # not necessarily safe
++    };
+ 
+ =head2 @CARP_NOT
+ 
+diff --git a/lib/Carp/Heavy.pm b/lib/Carp/Heavy.pm
+index a9b803c..fdb3e52 100644
+--- a/lib/Carp/Heavy.pm
++++ b/lib/Carp/Heavy.pm
+@@ -2,7 +2,7 @@ package Carp::Heavy;
+ 
+ use Carp ();
+ 
+-our $VERSION = '1.50';
++our $VERSION = '1.52';
+ $VERSION =~ tr/_//d;
+ 
+ # Carp::Heavy was merged into Carp in version 1.12.  Any mismatched versions
+diff --git a/t/Carp.t b/t/Carp.t
+index b1e399d..02c047e 100644
+--- a/t/Carp.t
++++ b/t/Carp.t
+@@ -1,5 +1,6 @@
++use strict;
+ use warnings;
+-no warnings "once";
++
+ use Config;
+ 
+ use IPC::Open3 1.0103 qw(open3);
+@@ -353,6 +354,7 @@ for my $bodge_job ( 2, 1, 0 ) { SKIP: {
+         print "# required B\n";
+     }
+     my $accum = '';
++    no warnings 'once';
+     local *CORE::GLOBAL::caller = sub {
+         local *__ANON__ = "fakecaller";
+         my @c = CORE::caller(@_);
+@@ -480,7 +482,7 @@ SKIP:
+     );
+ 
+     package Foo::No::Autovivify;
+-    $CARP_NOT = 1;
++    our $CARP_NOT = 1;
+     eval { Carp::croak(1) };
+     ::ok(
+         !defined *{$Foo::No::Autovivify::{CARP_NOT}}{ARRAY},
+diff --git a/t/Carp_overloadless.t b/t/Carp_overloadless.t
+index f4bda04..6b73601 100644
+--- a/t/Carp_overloadless.t
++++ b/t/Carp_overloadless.t
+@@ -1,12 +1,14 @@
++use strict;
+ use warnings;
+-#no warnings 'once';
++
+ use Test::More tests => 1;
+ 
+ use Carp;
+ 
+ # test that enabling overload without loading overload.pm does not trigger infinite recursion
+ 
+-my $p = "OverloadedInXS"; 
++no strict 'refs';
++my $p = "OverloadedInXS";
+ *{$p."::(("} = sub{};
+ *{$p.q!::(""!} = sub { Carp::cluck "<My Stringify>" }; 
+ sub { Carp::longmess("longmess:") }->(bless {}, $p);
+diff --git a/t/broken_can.t b/t/broken_can.t
+index c32fa19..9232d68 100644
+--- a/t/broken_can.t
++++ b/t/broken_can.t
+@@ -1,3 +1,6 @@
++use strict;
++use warnings;
++
+ use Test::More tests => 1;
+ 
+ # [perl #132910]
+@@ -10,6 +13,6 @@ package main;
+ use Carp;
+ 
+ eval {
+-    sub { confess-sins }->(bless[], Foo);
++    sub { confess-sins }->(bless[], 'Foo');
+ };
+ like $@, qr/^-sins at /;
+diff --git a/t/broken_univ_can.t b/t/broken_univ_can.t
+index 0ec19d7..49c7720 100644
+--- a/t/broken_univ_can.t
++++ b/t/broken_univ_can.t
+@@ -1,15 +1,21 @@
++use strict;
++use warnings;
++
+ # [perl #132910]
+ # This mock-up breaks Test::More.  Don’t use Test::More.
+ 
+-sub UNIVERSAL::can { die; }
++{
++    no warnings 'redefine';
++    sub UNIVERSAL::can { die; }
++}
+ 
+ # Carp depends on this to detect the override:
+-BEGIN { $UNIVERSAL::can::VERSION = 0xbaff1ed_bee; }
++BEGIN { no warnings 'portable'; $UNIVERSAL::can::VERSION = 0xbaff1ed_bee; }
+ 
+ use Carp;
+ 
+ eval {
+-    sub { confess-sins }->(bless[], Foo);
++    sub { confess-sins }->(bless[], 'Foo');
+ };
+ print "1..1\n";
+ if ($@ !~ qr/^-sins at /) {
+diff --git a/t/vivify_stash.t b/t/vivify_stash.t
+index 744d0d2..00181f3 100644
+--- a/t/vivify_stash.t
++++ b/t/vivify_stash.t
+@@ -1,3 +1,6 @@
++use strict;
++use warnings;
++
+ BEGIN { print "1..5\n"; }
+ 
+ our $has_utf8; BEGIN { $has_utf8 = exists($::{"utf8::"}); }
+@@ -18,7 +21,8 @@ eval { sub { Carp::longmess() }->(\1) };
+ print $@ eq '' ? "ok 4 # longmess check1\n" : "not ok 4 # longmess check1\n# $@";
+ 
+ # overload:: glob without hash
+-undef *{"overload::"};
++# Clear overload quoted so it happens to the runtime stash.
++{ no strict 'refs'; undef *{"overload::"} }
+ eval { sub { Carp::longmess() }->(\1) };
+ print $@ eq '' ? "ok 5 # longmess check2\n" : "not ok 5 # longmess check2\n# $@";
+ 
+-- 
+2.30.2
+

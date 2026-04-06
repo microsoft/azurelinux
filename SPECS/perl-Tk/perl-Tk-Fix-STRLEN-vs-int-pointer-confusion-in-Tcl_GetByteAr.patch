@@ -1,0 +1,45 @@
+From a26233c844c52f49ef9cca5f88dd9063aac60d0f Mon Sep 17 00:00:00 2001
+From: Niko Tyni <ntyni@debian.org>
+Date: Thu, 11 Jan 2024 18:28:58 +0000
+Subject: [PATCH] Fix STRLEN vs int pointer confusion in
+ Tcl_GetByteArrayFromObj()
+
+Perl 5.37.2, more precisely commit
+
+ https://github.com/Perl/perl5/commit/1ef9039bccbfe64f47f201b6cfb7d6d23e0b08a7
+
+changed the implementation of SvPV() et al., breaking t/balloon.t,
+t/canvas2.t and t/photo.t on big-endian 64-bit architectures such as
+ppc64 and s390x because StringMatchGIF() no longer recognized GIF files.
+
+This is because Tcl_GetByteArrayFromObj() was calling SvPV() with an int
+pointer instead of a correct STRLEN pointer, and the new implementation
+is more sensitive to this: it assigns the pointers as-is, resulting in
+the int pointer pointing at the wrong end of the 64-bit length.
+
+Other functions taking a length pointer, at least Tcl_GetStringFromObj()
+already seem to do things correctly, so presumably this is not a
+systematic issue.
+---
+ objGlue.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/objGlue.c b/objGlue.c
+index d4927ea..dbd6a50 100644
+--- a/objGlue.c
++++ b/objGlue.c
+@@ -627,7 +627,10 @@ Tcl_GetByteArrayFromObj(Tcl_Obj * objPtr, int * lengthPtr)
+  sv_utf8_downgrade(objPtr, 0);
+  if (lengthPtr)
+   {
+-   return (unsigned char *) SvPV(objPtr, *lengthPtr);
++   STRLEN len;
++   unsigned char *s = SvPV(objPtr, len);
++   *lengthPtr = len;
++   return s;
+   }
+  else
+   {
+-- 
+2.30.2
+

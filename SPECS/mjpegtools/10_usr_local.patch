@@ -1,0 +1,19 @@
+Description: transcode installs the binary in /usr/bin (as well as every
+ Debian Policy-compliant package does).
+---
+ scripts/lavtc.sh |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- mjpegtools.orig/scripts/lavtc.sh
++++ mjpegtools/scripts/lavtc.sh
+@@ -768,8 +768,8 @@ do
+ 	#
+ 	# this is the big call
+ 	#
+-	log_debug `for arg in /usr/local/bin/transcode ${passArgs} ${transcodeArgs} ${inputCodecArgs} ${outputCodecArgs} ; do echo -n "${arg} " ; done` " <EOL>"
+-	/usr/local/bin/transcode \
++	log_debug `for arg in transcode ${passArgs} ${transcodeArgs} ${inputCodecArgs} ${outputCodecArgs} ; do echo -n "${arg} " ; done` " <EOL>"
++	transcode \
+ 		${passArgs} \
+ 		${transcodeArgs} \
+ 		${inputCodecArgs} \

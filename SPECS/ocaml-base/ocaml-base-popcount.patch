@@ -1,0 +1,9 @@
+--- base-0.17.3/src/discover/discover.ml.orig	2025-06-10 11:58:16.000000000 -0600
++++ base-0.17.3/src/discover/discover.ml	2025-06-27 11:46:36.205758200 -0600
+@@ -20,5 +20,5 @@ let () =
+         | "macosx" -> false
+         | _ -> c_test c ~c_flags:[ "-mpopcnt" ] program
+       in
+-      Flags.write_sexp !output (if has_popcnt then [ "-mpopcnt" ] else []))
++      Flags.write_sexp !output (if has_popcnt then [ ] else []))
+ ;;

@@ -1,0 +1,48 @@
+--- a/tests/golden_files/serialize.json
++++ b/tests/golden_files/serialize.json
+@@ -1294,7 +1294,7 @@
+                             "type": "line",
+                             "is_current": false,
+                             "lineno": 29,
+-                            "text": "<span class=\"k\">def</span> <span class=\"nf\">bar</span><span class=\"p\">():</span>"
++                            "text": "<span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">bar</span><span class=\"p\">():</span>"
+                         },
+                         {
+                             "type": "line",
+@@ -1323,7 +1323,7 @@
+                             "type": "line",
+                             "is_current": false,
+                             "lineno": 6,
+-                            "text": "<span class=\"k\">def</span> <span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
++                            "text": "<span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
+                         },
+                         {
+                             "type": "line",
+@@ -1369,7 +1369,7 @@
+                             "type": "line",
+                             "is_current": false,
+                             "lineno": 6,
+-                            "text": "<span class=\"k\">def</span> <span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
++                            "text": "<span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
+                         },
+                         {
+                             "type": "line",
+@@ -1425,7 +1425,7 @@
+                             "type": "line",
+                             "is_current": false,
+                             "lineno": 6,
+-                            "text": "<span class=\"k\">def</span> <span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
++                            "text": "<span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">foo</span><span class=\"p\">(</span><span class=\"n\">n</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">):</span>"
+                         },
+                         {
+                             "type": "line",
+@@ -1489,7 +1489,7 @@
+                             "type": "line",
+                             "is_current": true,
+                             "lineno": 26,
+-                            "text": "    <span class=\"k\">raise</span> <span class=\"ne\">TypeError</span> <span class=\"kn\">from</span> <span class=\"nn\">e</span>"
++                            "text": "    <span class=\"k\">raise</span> <span class=\"ne\">TypeError</span> <span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">e</span>"
+                         }
+                     ],
+                     "variables": [
+

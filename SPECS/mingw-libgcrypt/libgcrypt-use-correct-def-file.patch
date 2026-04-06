@@ -1,0 +1,15 @@
+--- src/libgcrypt.def.orig	2012-02-28 00:16:33.422552508 +0100
++++ src/libgcrypt.def	2012-02-28 00:16:59.188018940 +0100
+@@ -1,3 +1,4 @@
++EXPORTS
+ ;; libgcrypt.defs -  Exported symbols for W32
+ ;; Copyright (C) 2003, 2007 Free Software Foundation, Inc.
+ ;;
+@@ -22,7 +23,6 @@
+ ;; never be changed.  Also check libgcrypt.vers and visibility.h.
+ 
+ 
+-EXPORTS
+       gcry_check_version  @1
+       gcry_control  @2
+ 

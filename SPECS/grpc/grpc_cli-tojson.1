@@ -1,0 +1,38 @@
+.TH GRPC_CLI\-TOJSON "1" "May 2021" "" "User Commands"
+.SH NAME
+.B grpc_cli\ tojson
+\(en convert binary message to json
+.SH SYNOPSIS
+.B grpc_cli tojson
+.I protofiles
+.I type
+.RI [ OPTION ]...\:
+.SH OPTIONS
+.TP
+.I protofiles
+Comma separated list of proto files
+.TP
+.I type
+Protocol buffer type name
+.TP
+.B \-\-proto_path
+The search paths of proto files
+.RB ( :
+separated)
+.TP
+.B \-\-infile
+Input filename (defaults to
+.IR stdin )
+.TP
+.B \-\-outfile
+Output filename (defaults to
+.IR stdout )
+.SH "SEE\ ALSO"
+.BR grpc_cli (1),
+.BR grpc_cli\-ls (1),
+.BR grpc_cli\-call (1),
+.BR grpc_cli\-type (1),
+.BR grpc_cli\-parse (1),
+.BR grpc_cli\-totext (1),
+.BR grpc_cli\-tobinary (1),
+.BR grpc_cli\-help (1)

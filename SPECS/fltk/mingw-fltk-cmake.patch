@@ -1,0 +1,13 @@
+Index: fltk-1.3.11/CMake/setup.cmake
+===================================================================
+--- fltk-1.3.11.orig/CMake/setup.cmake
++++ fltk-1.3.11/CMake/setup.cmake
+@@ -58,7 +58,7 @@ set (FLTK_DOCDIR ${CMAKE_INSTALL_DATADIR
+ 
+ # set where config files go
+ if (WIN32 AND NOT CYGWIN)
+-  set (FLTK_CONFIG_PATH CMake)
++  set (FLTK_CONFIG_PATH ${FLTK_DATADIR}/cmake/fltk)
+ elseif (APPLE)
+   set (FLTK_CONFIG_PATH FLTK.framework/Resources/CMake)
+ else ()

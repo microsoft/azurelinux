@@ -1,0 +1,48 @@
+From 98229fe9cde11aede104dfc669274e4e3745b4e8 Mon Sep 17 00:00:00 2001
+From: Mark Reynolds <mreynolds@redhat.com>
+Date: Mon, 12 Jan 2026 13:53:05 -0500
+Subject: [PATCH] Issue 7184 - argparse.HelpFormatter _format_actions_usage()
+ is deprecated
+
+Description:
+
+_format_actions_usage() was removed in python 3.15. Instead we can use
+_get_actions_usage_parts() but it also behaves differently between
+python 3.14 and 3.15 so we need special handling.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7184
+
+Reviewed by: spichugi(Thanks!)
+---
+ src/lib389/lib389/cli_base/__init__.py | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/src/lib389/lib389/cli_base/__init__.py b/src/lib389/lib389/cli_base/__init__.py
+index 06b8f9964..f1055aadc 100644
+--- a/src/lib389/lib389/cli_base/__init__.py
++++ b/src/lib389/lib389/cli_base/__init__.py
+@@ -413,7 +413,20 @@ class CustomHelpFormatter(argparse.HelpFormatter):
+ 
+     def _format_usage(self, usage, actions, groups, prefix):
+         usage = super(CustomHelpFormatter, self)._format_usage(usage, actions, groups, prefix)
+-        formatted_options = self._format_actions_usage(parent_arguments, [])
++
++        if sys.version_info < (3, 13):
++            # Use _format_actions_usage() for Python 3.12 and earlier
++            formatted_options = self._format_actions_usage(parent_arguments, [])
++        else:
++            # Use _get_actions_usage_parts() for Python 3.13 and later
++            action_parts = self._get_actions_usage_parts(parent_arguments, [])
++            if sys.version_info >= (3, 15):
++                # Python 3.15 returns a tuple (list of actions, count of actions)
++                formatted_options = ' '.join(action_parts[0])
++            else:
++                # Python 3.13 and 3.14 return a list of actions
++                formatted_options = ' '.join(action_parts)
++
+         # If formatted_options already in usage - remove them
+         if formatted_options in usage:
+             usage = usage.replace(f' {formatted_options}', '')
+-- 
+2.52.0
+

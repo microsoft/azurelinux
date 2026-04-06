@@ -1,0 +1,29 @@
+From 3cb9853020789c7f4d573ee9bcef3424245fbf40 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Fri, 9 Sep 2022 15:37:49 +0200
+Subject: [PATCH 33/55] Fix compile tests
+
+Broken in c618467da4c06528537026e2b78f92265bce446f
+---
+ tests/auto/client/seatv5/tst_seatv5.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/auto/client/seatv5/tst_seatv5.cpp b/tests/auto/client/seatv5/tst_seatv5.cpp
+index b063e0d9..2ea382f1 100644
+--- a/tests/auto/client/seatv5/tst_seatv5.cpp
++++ b/tests/auto/client/seatv5/tst_seatv5.cpp
+@@ -665,9 +665,9 @@ void tst_seatv5::cancelTouch()
+     {
+         auto e = window.m_events.takeFirst();
+         QCOMPARE(e.type, QEvent::TouchBegin);
+-        QCOMPARE(e.touchPointStates, QEventPoint::State::Pressed);
++        QCOMPARE(e.touchPointStates, Qt::TouchPointPressed);
+         QCOMPARE(e.touchPoints.length(), 1);
+-        QCOMPARE(e.touchPoints.first().position(), QPointF(32-window.frameMargins().left(), 32-window.frameMargins().top()));
++        QCOMPARE(e.touchPoints.first().pos(), QPointF(32-window.frameMargins().left(), 32-window.frameMargins().top()));
+     }
+     {
+         auto e = window.m_events.takeFirst();
+-- 
+2.51.1
+

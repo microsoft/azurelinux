@@ -1,0 +1,29 @@
+From 054c155e71d236febc1995102eb272d005148095 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 9 Aug 2024 13:25:39 +0200
+Subject: [PATCH] drop a test that requires internet connectivity
+
+---
+ src/tests.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/tests.rs b/src/tests.rs
+index a30676e..50fb745 100644
+--- a/src/tests.rs
++++ b/src/tests.rs
+@@ -159,6 +159,7 @@ fn copy_empty_include() {
+     std::fs::remove_dir_all(dst).unwrap();
+ }
+ 
++/*
+ #[test]
+ fn copy_cargo() {
+     std::env::set_var("RUST_LOG", "DEBUG");
+@@ -201,3 +202,4 @@ fn copy_cargo() {
+     std::fs::remove_dir_all(output_dir).unwrap();
+     std::fs::remove_file(archive).unwrap();
+ }
++*/
+-- 
+2.46.0
+

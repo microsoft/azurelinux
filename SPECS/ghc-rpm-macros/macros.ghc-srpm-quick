@@ -1,0 +1,6 @@
+# disable profiling libraries and prof subpkgs
+%ghc_profiling\
+%bcond ghc_prof 0
+
+%ghc_haddocks\
+%bcond haddock 0

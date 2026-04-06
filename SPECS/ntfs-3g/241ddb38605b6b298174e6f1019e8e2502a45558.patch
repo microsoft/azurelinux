@@ -1,0 +1,40 @@
+From 241ddb38605b6b298174e6f1019e8e2502a45558 Mon Sep 17 00:00:00 2001
+From: Erik Larsson <erik@tuxera.com>
+Date: Wed, 3 May 2023 10:44:57 +0200
+Subject: [PATCH] index.c: Fix crash when a reparse tag cannot be found in the
+ index.
+
+When 'remove_reparse_index', called by 'ntfs_delete_reparse_index',
+fails to look up a reparse key in the index, it leaves the
+'ntfs_index_context' without a populated 'INDEX_BLOCK *ib' field.
+
+This causes 'remove_reparse_index' to fail but the index entry is then
+marked dirty unconditionally in 'ntfs_index_entry_mark_dirty', called by
+'ntfs_delete_reparse_index', even though 'ib' may be NULL.
+
+The following 'ntfs_index_ctx_put' call then starts to write out the
+dirty 'INDEX_BLOCK', which causes a crash.
+
+Fixed by only marking the index block dirty in if it's non-NULL.
+
+Thanks to Stephen Greenham <sg@solarisfire.com> for reporting this issue
+and providing debug information.
+---
+ libntfs-3g/index.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libntfs-3g/index.c b/libntfs-3g/index.c
+index e48d6aaf..efe18d89 100644
+--- a/libntfs-3g/index.c
++++ b/libntfs-3g/index.c
+@@ -66,8 +66,9 @@ void ntfs_index_entry_mark_dirty(ntfs_index_context *ictx)
+ {
+ 	if (ictx->is_in_root)
+ 		ntfs_inode_mark_dirty(ictx->actx->ntfs_ino);
+-	else
++	else if (ictx->ib != NULL) {
+ 		ictx->ib_dirty = TRUE;
++	}
+ }
+ 
+ static s64 ntfs_ib_vcn_to_pos(ntfs_index_context *icx, VCN vcn)

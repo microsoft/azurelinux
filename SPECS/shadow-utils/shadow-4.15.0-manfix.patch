@@ -1,0 +1,162 @@
+diff -up shadow-4.15.0/man/groupmems.8.xml.manfix shadow-4.15.0/man/groupmems.8.xml
+--- shadow-4.15.0/man/groupmems.8.xml.manfix	2023-05-26 04:56:11.000000000 +0200
++++ shadow-4.15.0/man/groupmems.8.xml	2024-02-09 10:42:20.337036378 +0100
+@@ -156,20 +156,10 @@
+   <refsect1 id='setup'>
+     <title>SETUP</title>
+     <para>
+-      The <command>groupmems</command> executable should be in mode
+-      <literal>2710</literal> as user <emphasis>root</emphasis> and in group
+-      <emphasis>groups</emphasis>. The system administrator can add users to
+-      group <emphasis>groups</emphasis> to allow or disallow them using the
+-      <command>groupmems</command> utility to manage their own group
+-      membership list.
++      In this operating system the <command>groupmems</command> executable
++      is not setuid and regular users cannot use it to manipulate
++      the membership of their own group.
+     </para>
+-
+-    <programlisting>
+-	$ groupadd -r groups
+-	$ chmod 2710 groupmems
+-	$ chown root:groups groupmems
+-	$ groupmems -g groups -a gk4
+-    </programlisting>
+   </refsect1>
+ 
+   <refsect1 id='configuration'>
+diff -up shadow-4.15.0/man/ja/man5/login.defs.5.manfix shadow-4.15.0/man/ja/man5/login.defs.5
+--- shadow-4.15.0/man/ja/man5/login.defs.5.manfix	2023-03-13 21:58:56.000000000 +0100
++++ shadow-4.15.0/man/ja/man5/login.defs.5	2024-02-09 10:42:20.337036378 +0100
+@@ -123,10 +123,6 @@ 以下の参照表は、
+ shadow パスワード機能のどのプログラムが
+ どのパラメータを使用するかを示したものである。
+ .na
+-.IP chfn 12
+-CHFN_AUTH CHFN_RESTRICT
+-.IP chsh 12
+-CHFN_AUTH
+ .IP groupadd 12
+ GID_MAX GID_MIN
+ .IP newusers 12
+diff -up shadow-4.15.0/man/login.defs.5.xml.manfix shadow-4.15.0/man/login.defs.5.xml
+--- shadow-4.15.0/man/login.defs.5.xml.manfix	2024-01-22 22:36:43.000000000 +0100
++++ shadow-4.15.0/man/login.defs.5.xml	2024-02-09 10:45:49.014407259 +0100
+@@ -144,6 +144,17 @@
+       long numeric parameters is machine-dependent.
+     </para>
+ 
++    <para>
++      Please note that the parameters in this configuration file control the
++      behavior of the tools from the shadow-utils component. None of these
++      tools uses the PAM mechanism, and the utilities that use PAM (such as the
++      passwd command) should be configured elsewhere. The only values that
++      affect PAM modules are <emphasis>ENCRYPT_METHOD</emphasis> and <emphasis>SHA_CRYPT_MAX_ROUNDS</emphasis>
++      for pam_unix module, <emphasis>FAIL_DELAY</emphasis> for pam_faildelay module,
++      and <emphasis>UMASK</emphasis> for pam_umask module. Refer to
++      pam(8) for more information.
++    </para>
++
+     <para>The following configuration items are provided:</para>
+ 
+     <variablelist remap='IP'>
+@@ -240,16 +251,6 @@
+ 	</listitem>
+       </varlistentry>
+       <varlistentry>
+-	<term>chfn</term>
+-	<listitem>
+-	  <para>
+-	    <phrase condition="no_pam">CHFN_AUTH</phrase>
+-	    CHFN_RESTRICT
+-	    <phrase condition="no_pam">LOGIN_STRING</phrase>
+-	  </para>
+-	</listitem>
+-      </varlistentry>
+-      <varlistentry>
+ 	<term>chgpasswd</term>
+ 	<listitem>
+ 	  <para>
+@@ -276,14 +277,6 @@
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+-      <varlistentry condition="no_pam">
+-	<term>chsh</term>
+-	<listitem>
+-	  <para>
+-	    CHSH_AUTH LOGIN_STRING
+-	  </para>
+-	</listitem>
+-      </varlistentry>
+       <!-- expiry: no variables (CONSOLE_GROUPS linked, but not used) -->
+       <!-- faillog: no variables -->
+       <varlistentry>
+@@ -352,34 +345,6 @@
+ 	  <para>LASTLOG_UID_MAX</para>
+ 	</listitem>
+       </varlistentry>
+-      <varlistentry>
+-	<term>login</term>
+-	<listitem>
+-	  <para>
+-	    <phrase condition="no_pam">CONSOLE</phrase>
+-	    CONSOLE_GROUPS DEFAULT_HOME
+-	    <phrase condition="no_pam">ENV_HZ ENV_PATH ENV_SUPATH
+-	    ENV_TZ ENVIRON_FILE</phrase>
+-	    ERASECHAR FAIL_DELAY
+-	    <phrase condition="no_pam">FAILLOG_ENAB</phrase>
+-	    FAKE_SHELL
+-	    <phrase condition="no_pam">FTMP_FILE</phrase>
+-	    HUSHLOGIN_FILE
+-	    <phrase condition="no_pam">ISSUE_FILE</phrase>
+-	    KILLCHAR
+-	    <phrase condition="no_pam">LASTLOG_ENAB LASTLOG_UID_MAX</phrase>
+-	    LOGIN_RETRIES
+-	    <phrase condition="no_pam">LOGIN_STRING</phrase>
+-	    LOGIN_TIMEOUT LOG_OK_LOGINS LOG_UNKFAIL_ENAB
+-	    <phrase condition="no_pam">MAIL_CHECK_ENAB MAIL_DIR MAIL_FILE
+-	    MOTD_FILE NOLOGINS_FILE PORTTIME_CHECKS_ENAB
+-	    QUOTAS_ENAB</phrase>
+-	    TTYGROUP TTYPERM TTYTYPE_FILE
+-	    <phrase condition="no_pam">ULIMIT UMASK</phrase>
+-	    USERGROUPS_ENAB
+-	  </para>
+-	</listitem>
+-      </varlistentry>
+       <!-- logoutd: no variables -->
+       <varlistentry>
+ 	<term>newgrp / sg</term>
+@@ -451,32 +416,6 @@
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+-      <varlistentry>
+-	<term>su</term>
+-	<listitem>
+-	  <para>
+-	    <phrase condition="no_pam">CONSOLE</phrase>
+-	    CONSOLE_GROUPS DEFAULT_HOME
+-	    <phrase condition="no_pam">ENV_HZ ENVIRON_FILE</phrase>
+-	    ENV_PATH ENV_SUPATH
+-	    <phrase condition="no_pam">ENV_TZ LOGIN_STRING MAIL_CHECK_ENAB
+-	    MAIL_DIR MAIL_FILE QUOTAS_ENAB</phrase>
+-	    SULOG_FILE SU_NAME
+-	    <phrase condition="no_pam">SU_WHEEL_ONLY</phrase>
+-	    SYSLOG_SU_ENAB
+-	    <phrase condition="no_pam">USERGROUPS_ENAB</phrase>
+-	  </para>
+-	</listitem>
+-      </varlistentry>
+-      <varlistentry condition="no_pam">
+-	<term>sulogin</term>
+-	<listitem>
+-	  <para>
+-	    ENV_HZ
+-	    ENV_TZ
+-	  </para>
+-	</listitem>
+-      </varlistentry>
+       <varlistentry>
+ 	<term>useradd</term>
+ 	<listitem>

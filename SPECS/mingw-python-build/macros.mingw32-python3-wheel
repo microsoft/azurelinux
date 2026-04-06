@@ -1,0 +1,12 @@
+
+%mingw32_py3_build_wheel \
+  %mingw32_python3 -m build -n -w -o dist_win32
+
+%mingw32_py3_install_wheel \
+  %mingw32_python3 -m installer --destdir %{buildroot} dist_win32/*.whl
+
+%mingw32_py3_build_host_wheel \
+  %mingw32_python3_host -m build -n -w -o dist_win32_host
+
+%mingw32_py3_install_host_wheel \
+  %mingw32_python3_host -m installer --destdir %{buildroot} dist_win32_host/*.whl

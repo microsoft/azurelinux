@@ -1,0 +1,214 @@
+# RPM macros for the Fedora MinGW Cross Compiler collection
+
+%mingw_build_targets        mingw32 mingw64 ucrt64
+%mingw_build_win32          1
+%mingw_build_win64          1
+%mingw_build_ucrt64         0
+
+%mingw_strip                mingw-strip
+%mingw_objdump              mingw-objdump
+%mingw_objcopy              mingw-objcopy
+%mingw_nm                   mingw-nm
+
+%mingw_finddebuginfo        %{_rpmconfigdir}/mingw-find-debuginfo.sh
+
+%mingw_find_lang            %{_rpmconfigdir}/mingw-find-lang.sh %{buildroot}
+
+%mingw_debug_install_post   %{mingw_finddebuginfo} %{_builddir}/%{?buildsubdir} %{mingw_build_targets}
+
+%mingw_debug_package               \
+%global __debug_package 1          \
+%if 0%{?mingw_build_win32} == 1    \
+%{?mingw32_debug_package}          \
+%endif                             \
+%if 0%{?mingw_build_win64} == 1    \
+%{?mingw64_debug_package}          \
+%endif                             \
+%if 0%{?mingw_build_ucrt64} == 1   \
+%{?ucrt64_debug_package}          \
+%endif                             \
+%{nil}
+
+%mingw_package_header                                         \
+%global __strip %{mingw_strip}                                \
+%global __objdump %{mingw_objdump}                            \
+%global __debug_install_post %%{mingw_debug_install_post}     \
+%{nil}
+
+%mingw_configure                                       \
+run_mingw_configure()                                  \
+{                                                      \
+[ "%_configure_gnuconfig_hack" = 1 ] && for i in $(find . -name config.guess -o -name config.sub) ; do \
+    [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i ; \
+done ; \
+%if 0%{?mingw_build_win32} == 1                        \
+mkdir -p build_win32$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win32$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw32_configure} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_win64} == 1                        \
+mkdir -p build_win64$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win64$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw64_configure} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_ucrt64} == 1                       \
+mkdir -p build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+pushd build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+    %{?ucrt64_configure} "$@"                          \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_mingw_configure
+
+%mingw_make                                                         \
+run_mingw_make()                                                    \
+{                                                                   \
+%if 0%{?mingw_build_win32} == 1                                     \
+%{mingw32_env}                                                      \
+%{__make} -C build_win32$MINGW_BUILDDIR_SUFFIX "$@" $MINGW32_MAKE_ARGS   \
+%endif                                                              \
+%if 0%{?mingw_build_win64} == 1                                     \
+%{mingw64_env}                                                      \
+%{__make} -C build_win64$MINGW_BUILDDIR_SUFFIX "$@" $MINGW64_MAKE_ARGS   \
+%endif                                                              \
+%if 0%{?mingw_build_ucrt64} == 1                                    \
+%{ucrt64_env}                                                       \
+%{__make} -C build_ucrt64$MINGW_BUILDDIR_SUFFIX "$@" $UCRT64_MAKE_ARGS   \
+%endif                                                              \
+}                                                                   \
+run_mingw_make
+
+%mingw_cmake                                           \
+run_mingw_cmake()                                      \
+{                                                      \
+%if 0%{?mingw_build_win32} == 1                        \
+mkdir -p build_win32$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win32$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw32_cmake "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_win64} == 1                        \
+mkdir -p build_win64$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win64$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw64_cmake "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_ucrt64} == 1                       \
+mkdir -p build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+pushd build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+    %{?ucrt64_cmake "$@"}                              \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_mingw_cmake
+
+
+%mingw_qmake_qt5                                       \
+run_mingw_qmake_qt5()                                  \
+{                                                      \
+%if 0%{?mingw_build_win32} == 1                        \
+mkdir -p build_win32$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win32$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw32_qmake_qt5} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_win64} == 1                        \
+mkdir -p build_win64$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win64$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw64_qmake_qt5} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_ucrt64} == 1                       \
+mkdir -p build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+pushd build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+    %{?ucrt64_qmake_qt5} "$@"                          \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_mingw_qmake_qt5
+
+
+%mingw_qmake_qt6                                       \
+run_mingw_qmake_qt6()                                  \
+{                                                      \
+%if 0%{?mingw_build_win32} == 1                        \
+mkdir -p build_win32$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win32$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw32_qmake_qt6} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_win64} == 1                        \
+mkdir -p build_win64$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win64$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw64_qmake_qt6} "$@"                         \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_ucrt64} == 1                       \
+mkdir -p build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+pushd build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+    %{?ucrt64_qmake_qt6} "$@"                          \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_mingw_qmake_qt6
+
+
+%mingw_meson                                           \
+run_mingw_meson()                                      \
+{                                                      \
+%if 0%{?mingw_build_win32} == 1                        \
+mkdir -p build_win32$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win32$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw32_meson "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_win64} == 1                        \
+mkdir -p build_win64$MINGW_BUILDDIR_SUFFIX                \
+pushd build_win64$MINGW_BUILDDIR_SUFFIX                \
+    %{?mingw64_meson "$@"}                             \
+popd                                                   \
+%endif                                                 \
+%if 0%{?mingw_build_ucrt64} == 1                       \
+mkdir -p build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+pushd build_ucrt64$MINGW_BUILDDIR_SUFFIX               \
+    %{?ucrt64_meson "$@"}                              \
+popd                                                   \
+%endif                                                 \
+}                                                      \
+run_mingw_meson
+
+%mingw_ninja                                                        \
+run_mingw_ninja()                                                   \
+{                                                                   \
+%if 0%{?mingw_build_win32} == 1                                     \
+ninja -C build_win32$MINGW_BUILDDIR_SUFFIX "$@" $MINGW32_NINJA_ARGS \
+%endif                                                              \
+%if 0%{?mingw_build_win64} == 1                                     \
+ninja -C build_win64$MINGW_BUILDDIR_SUFFIX "$@" $MINGW64_NINJA_ARGS \
+%endif                                                              \
+%if 0%{?mingw_build_ucrt64} == 1                                    \
+ninja -C build_ucrt64$MINGW_BUILDDIR_SUFFIX "$@" $UCRT64_NINJA_ARGS \
+%endif                                                              \
+}                                                                   \
+run_mingw_ninja
+
+%mingw_ninja_install                                                    \
+run_mingw_ninja_install()                                               \
+{                                                                       \
+%if 0%{?mingw_build_win32} == 1                                         \
+DESTDIR=%{buildroot} ninja -C build_win32$MINGW_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+%if 0%{?mingw_build_win64} == 1                                         \
+DESTDIR=%{buildroot} ninja -C build_win64$MINGW_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+%if 0%{?mingw_build_ucrt64} == 1                                        \
+DESTDIR=%{buildroot} ninja -C build_ucrt64$MINGW_BUILDDIR_SUFFIX install \
+%endif                                                                  \
+}                                                                       \
+run_mingw_ninja_install
+
+
+%mingw_make_build           %mingw_make %{_make_output_sync} %{?_smp_mflags} %{_make_verbose}
+%mingw_make_install         %mingw_make install DESTDIR=%{?buildroot} INSTALL="%{__install} -p"

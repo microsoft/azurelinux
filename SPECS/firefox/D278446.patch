@@ -1,0 +1,91 @@
+diff --git a/widget/gtk/WaylandBuffer.h b/widget/gtk/WaylandBuffer.h
+--- a/widget/gtk/WaylandBuffer.h
++++ b/widget/gtk/WaylandBuffer.h
+@@ -60,14 +60,14 @@
+   LayoutDeviceIntSize GetSize() const { return mSize; };
+   bool IsMatchingSize(const LayoutDeviceIntSize& aSize) const {
+     return aSize == mSize;
+   }
+ 
+-  bool IsAttached() const;
+-
++  bool IsAttached(const WaylandSurfaceLock& aSurfaceLock) const;
+   BufferTransaction* GetTransaction(const WaylandSurfaceLock& aSurfaceLock);
+-  void RemoveTransaction(RefPtr<BufferTransaction> aTransaction);
++  void RemoveTransaction(const WaylandSurfaceLock& aSurfaceLock,
++                         RefPtr<BufferTransaction> aTransaction);
+ 
+ #ifdef MOZ_LOGGING
+   virtual void DumpToFile(const char* aHint) = 0;
+ #endif
+ 
+diff --git a/widget/gtk/WaylandBuffer.cpp b/widget/gtk/WaylandBuffer.cpp
+--- a/widget/gtk/WaylandBuffer.cpp
++++ b/widget/gtk/WaylandBuffer.cpp
+@@ -88,11 +88,11 @@
+   MozClearPointer(mShmPool, wl_shm_pool_destroy);
+ }
+ 
+ WaylandBuffer::WaylandBuffer(const LayoutDeviceIntSize& aSize) : mSize(aSize) {}
+ 
+-bool WaylandBuffer::IsAttached() const {
++bool WaylandBuffer::IsAttached(const WaylandSurfaceLock& aSurfaceLock) const {
+   for (const auto& transaction : mBufferTransactions) {
+     if (transaction->IsAttached()) {
+       return true;
+     }
+   }
+@@ -128,11 +128,12 @@
+   auto* transaction = new BufferTransaction(this, buffer, !!mExternalWlBuffer);
+   mBufferTransactions.AppendElement(transaction);
+   return transaction;
+ }
+ 
+-void WaylandBuffer::RemoveTransaction(RefPtr<BufferTransaction> aTransaction) {
++void WaylandBuffer::RemoveTransaction(const WaylandSurfaceLock& aSurfaceLock,
++                                      RefPtr<BufferTransaction> aTransaction) {
+   LOGWAYLAND("WaylandBuffer::RemoveTransaction() [%p]", (void*)aTransaction);
+   [[maybe_unused]] bool removed =
+       mBufferTransactions.RemoveElement(aTransaction);
+   MOZ_DIAGNOSTIC_ASSERT(removed);
+   MOZ_DIAGNOSTIC_ASSERT(!mBufferTransactions.Contains(aTransaction));
+@@ -185,11 +186,11 @@
+   LOGWAYLAND("WaylandBufferSHM::WaylandBufferSHM() [%p]\n", (void*)this);
+ }
+ 
+ WaylandBufferSHM::~WaylandBufferSHM() {
+   LOGWAYLAND("WaylandBufferSHM::~WaylandBufferSHM() [%p]\n", (void*)this);
+-  MOZ_RELEASE_ASSERT(!IsAttached());
++  MOZ_RELEASE_ASSERT(mBufferTransactions.IsEmpty());
+ }
+ 
+ already_AddRefed<gfx::DrawTarget> WaylandBufferSHM::Lock() {
+   LOGWAYLAND("WaylandBufferSHM::lock() [%p]\n", (void*)this);
+   return gfxPlatform::CreateDrawTargetForData(
+@@ -284,11 +285,11 @@
+ }
+ 
+ WaylandBufferDMABUF::~WaylandBufferDMABUF() {
+   LOGWAYLAND("WaylandBufferDMABUF::~WaylandBufferDMABUF [%p] UID %d\n",
+              (void*)this, mDMABufSurface ? mDMABufSurface->GetUID() : -1);
+-  MOZ_RELEASE_ASSERT(!IsAttached());
++  MOZ_RELEASE_ASSERT(mBufferTransactions.IsEmpty());
+ }
+ 
+ #ifdef MOZ_LOGGING
+ void WaylandBufferDMABUF::DumpToFile(const char* aHint) {
+   if (!mDumpSerial) {
+@@ -469,11 +470,11 @@
+   mSurface->RemoveTransactionLocked(aSurfaceLock, this);
+   mSurface = nullptr;
+ 
+   // This can destroy us
+   RefPtr grip{this};
+-  mBuffer->RemoveTransaction(this);
++  mBuffer->RemoveTransaction(aSurfaceLock, this);
+   mBuffer = nullptr;
+ }
+ 
+ BufferTransaction::BufferTransaction(WaylandBuffer* aBuffer,
+                                      wl_buffer* aWLBuffer,
+

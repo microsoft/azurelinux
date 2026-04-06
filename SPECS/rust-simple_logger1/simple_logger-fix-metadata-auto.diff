@@ -1,0 +1,12 @@
+--- simple_logger-1.16.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ simple_logger-1.16.0/Cargo.toml	2023-10-14T20:49:48.762362+00:00
+@@ -53,9 +53,4 @@
+ stderr = []
+ threads = []
+ timestamps = ["time"]
+-[target."cfg(windows)".dependencies.atty]
+-version = "0.2.13"
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["handleapi", "winbase"]

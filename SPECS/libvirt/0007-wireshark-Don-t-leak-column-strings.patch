@@ -1,0 +1,165 @@
+From 002b9f559d69b92e77ab2d234df6966fecdaf0ec Mon Sep 17 00:00:00 2001
+Message-ID: <002b9f559d69b92e77ab2d234df6966fecdaf0ec.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Fri, 10 Oct 2025 19:13:48 +0200
+Subject: [PATCH 7/8] wireshark: Don't leak column strings
+Content-type: text/plain
+
+One of the problems of using val_to_str() is that it may return a
+const string from given table ('vs'), OR return an allocated one.
+Since the caller has no idea which case it is, it resides to safe
+option and don't free returned string. But that might lead to a
+memleak. This behaviour is fixed with wireshark-4.6.0 and support
+for it will be introduced soon. But first, make vir_val_to_str()
+behave like fixed val_to_str() from newer wireshark: just always
+allocate the string.
+
+Now, if val_to_str() needs to allocate new memory it obtains
+allocator by calling wmem_packet_scope() which is what we may do
+too.
+
+Hand in hand with that, we need to free the memory using the
+correct allocator, hence wmem_free(). But let's put it into a
+wrapper vir_wmem_free() because just like val_to_str(), it'll
+need additional argument when adapting to new wireshark.
+
+Oh, and freeing the memory right after col_add_fstr() is safe as
+it uses vsnprintf() under the hood to format passed args.
+
+One last thing, the wmem.h file used to live under epan/wmem/ but
+then in v3.5.0~240 [1] was moved to wsutil/wmem/.
+
+1: https://gitlab.com/wireshark/wireshark/-/commit/7f9c1f5f92c131354fc8b2b88d473706786064c0
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ meson.build                          | 20 ++++++++++++++++
+ tools/wireshark/src/meson.build      |  1 +
+ tools/wireshark/src/packet-libvirt.c | 35 ++++++++++++++++++++++------
+ 3 files changed, 49 insertions(+), 7 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index bcc18b20e5..a1e0e5ecd5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1365,6 +1365,26 @@ if wireshark_dep.found()
+   if cc.check_header('wireshark/ws_version.h')
+     conf.set('WITH_WS_VERSION', 1)
+   endif
++
++  # Find wmem.h
++  # But it's not as easy as you'd think. Ubuntu 20.04 has split parts of
++  # libwireshark.so into libwsutil.so but:
++  # a) wireshark.pc never mentions it,
++  # b) libwsutil-dev package doesn't install pkg-config file.
++  # Fortunately, it's fixed in 24.04.
++  if cc.check_header('wireshark/epan/wmem/wmem.h', dependencies: wireshark_dep)
++    conf.set('WITH_WS_EPAN_WMEM', 1)
++  elif cc.check_header('wireshark/wsutil/wmem/wmem.h', dependencies: wireshark_dep)
++    conf.set('WITH_WS_WSUTIL_WMEM', 1)
++  else
++    error('Unable to locate wmem.h file')
++  endif
++
++  # TODO: drop wsutil dep once support for Ubuntu 20.04 is dropped
++  wsutil_dep = dependency('', required: false)
++  if not cc.has_function('wmem_free', dependencies: wireshark_dep)
++    wsutil_dep = cc.find_library('wsutil', required: true)
++  endif
+ endif
+ 
+ # generic build dependencies checks
+diff --git a/tools/wireshark/src/meson.build b/tools/wireshark/src/meson.build
+index 9b452dc5ca..ba0df913e0 100644
+--- a/tools/wireshark/src/meson.build
++++ b/tools/wireshark/src/meson.build
+@@ -9,6 +9,7 @@ shared_library(
+   ],
+   dependencies: [
+     wireshark_dep,
++    wsutil_dep,
+     xdr_dep,
+     tools_dep,
+   ],
+diff --git a/tools/wireshark/src/packet-libvirt.c b/tools/wireshark/src/packet-libvirt.c
+index f6ad2c4578..3178ac6f27 100644
+--- a/tools/wireshark/src/packet-libvirt.c
++++ b/tools/wireshark/src/packet-libvirt.c
+@@ -21,6 +21,11 @@
+ #include <wireshark/epan/proto.h>
+ #include <wireshark/epan/packet.h>
+ #include <wireshark/epan/dissectors/packet-tcp.h>
++#ifdef WITH_WS_EPAN_WMEM
++# include <wireshark/epan/wmem/wmem.h>
++#elif WITH_WS_WSUTIL_WMEM
++# include <wireshark/wsutil/wmem/wmem.h>
++#endif
+ #include <rpc/types.h>
+ #include <rpc/xdr.h>
+ #include "packet-libvirt.h"
+@@ -140,13 +145,19 @@ static const value_string status_strings[] = {
+     { -1, NULL }
+ };
+ 
+-static const char *
++static char *
+ G_GNUC_PRINTF(3, 0)
+ vir_val_to_str(const uint32_t val,
+                const value_string *vs,
+                const char *fmt)
+ {
+-    return val_to_str(val, vs, fmt);
++    return val_to_str_wmem(wmem_packet_scope(), val, vs, fmt);
++}
++
++static void
++vir_wmem_free(void *ptr)
++{
++    wmem_free(wmem_packet_scope(), ptr);
+ }
+ 
+ static gboolean
+@@ -462,6 +473,10 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+     uint32_t prog, serial;
+     int32_t proc, type, status;
+     const value_string *vs;
++    char *prog_str = NULL;
++    char *proc_str = NULL;
++    char *type_str = NULL;
++    char *status_str = NULL;
+ 
+     col_set_str(pinfo->cinfo, COL_PROTOCOL, "Libvirt");
+     col_clear(pinfo->cinfo, COL_INFO);
+@@ -474,15 +489,21 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+     serial = tvb_get_ntohl(tvb, offset); offset += 4;
+     status = tvb_get_ntohil(tvb, offset); offset += 4;
+ 
+-    col_add_fstr(pinfo->cinfo, COL_INFO, "Prog=%s",
+-                 vir_val_to_str(prog, program_strings, "%x"));
++    prog_str = vir_val_to_str(prog, program_strings, "%x");
++    col_add_fstr(pinfo->cinfo, COL_INFO, "Prog=%s", prog_str);
++    vir_wmem_free(prog_str);
+ 
+     vs = get_program_data(prog, VIR_PROGRAM_PROCSTRINGS);
+-    col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", vir_val_to_str(proc, vs, "%d"));
++    proc_str = vir_val_to_str(proc, vs, "%d");
++    col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", proc_str);
++    vir_wmem_free(proc_str);
+ 
++    type_str = vir_val_to_str(type, type_strings, "%d");
++    status_str = vir_val_to_str(status, status_strings, "%d");
+     col_append_fstr(pinfo->cinfo, COL_INFO, " Type=%s Serial=%u Status=%s",
+-                    vir_val_to_str(type, type_strings, "%d"), serial,
+-                    vir_val_to_str(status, status_strings, "%d"));
++                    type_str, serial, status_str);
++    vir_wmem_free(status_str);
++    vir_wmem_free(type_str);
+ 
+     if (tree) {
+         gint *hf_proc;
+-- 
+2.51.0
+

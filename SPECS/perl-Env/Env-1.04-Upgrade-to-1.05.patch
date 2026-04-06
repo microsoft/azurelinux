@@ -1,0 +1,54 @@
+From a80aecb24bf0fd98090b41c5518c4f5931019465 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 5 May 2021 16:50:50 +0200
+Subject: [PATCH] Upgrade to 1.05
+
+---
+ lib/Env.pm | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/lib/Env.pm b/lib/Env.pm
+index 6e6cd8b..eaf30f1 100644
+--- a/lib/Env.pm
++++ b/lib/Env.pm
+@@ -1,6 +1,6 @@
+ package Env;
+ 
+-our $VERSION = '1.04';
++our $VERSION = '1.05';
+ 
+ =head1 NAME
+ 
+@@ -35,7 +35,7 @@ You may access its value
+ 
+ or modify it
+ 
+-    $PATH .= ":.";
++    $PATH .= ":/any/path";
+     push @LD_LIBRARY_PATH, $dir;
+ 
+ however you'd like. Bear in mind, however, that each access to a tied array
+@@ -44,15 +44,16 @@ variable requires splitting the environment variable's string anew.
+ The code:
+ 
+     use Env qw(@PATH);
+-    push @PATH, '.';
++    push @PATH, '/any/path';
+ 
+-is equivalent to:
++is almost equivalent to:
+ 
+     use Env qw(PATH);
+-    $PATH .= ":.";
++    $PATH .= ":/any/path";
+ 
+ except that if C<$ENV{PATH}> started out empty, the second approach leaves
+-it with the (odd) value "C<:.>", but the first approach leaves it with "C<.>".
++it with the (odd) value "C<:/any/path>", but the first approach leaves it with
++"C</any/path>".
+ 
+ To remove a tied environment variable from
+ the environment, assign it the undefined value
+-- 
+2.30.2
+

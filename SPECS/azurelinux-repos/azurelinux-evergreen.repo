@@ -1,0 +1,45 @@
+# These packages are untested and still under development. This
+# repository is used for development of new releases.
+#
+# This repository can see significant daily turnover and major
+# functionality changes which cause unexpected problems with other
+# development packages. Please use these packages if you want to work
+# with the Azure Linux developers by testing these new development
+# packages.
+#
+# Product: Azure Linux
+# Version: evergreen
+
+[evergreen]
+name=Azure Linux - Evergreen - Developmental packages for future Azure Linux releases
+baseurl=https://packages.microsoft.com/azurelinux/evergreen/base/$basearch
+enabled=AUTO_VALUE
+countme=1
+metadata_expire=6h
+repo_gpgcheck=1
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-evergreen-$basearch AUTO_VALUE
+skip_if_unavailable=False
+
+[evergreen-debuginfo]
+name=Azure Linux - Evergreen - Debug
+baseurl=https://packages.microsoft.com/azurelinux/evergreen/base/debuginfo/$basearch
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=1
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-evergreen-$basearch AUTO_VALUE
+skip_if_unavailable=False
+
+[evergreen-source]
+name=Azure Linux - Evergreen - Source
+baseurl=https://packages.microsoft.com/azurelinux/evergreen/base/srpms
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=1
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-evergreen-$basearch AUTO_VALUE
+skip_if_unavailable=False

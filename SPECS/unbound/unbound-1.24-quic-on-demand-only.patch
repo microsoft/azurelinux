@@ -1,0 +1,171 @@
+From 1dfe06278c1446558b5043d7c57cd901e7d96829 Mon Sep 17 00:00:00 2001
+From: Petr Mensik <pemensik@redhat.com>
+Date: Mon, 24 Nov 2025 13:44:14 +0100
+Subject: [PATCH] Do not initialize quic_table unless it is enabled
+
+Fedora in FIPS mode might fail to initialize ngtcp2 library, because
+some ciphers desired are not available.
+
+Make it possible to skip initialization by setting explicitly quic_port
+to 0. Unless we have some listeners for port 853 configured, skip its
+initialization as well.
+
+Related: https://pagure.io/freeipa/issue/9877
+---
+ daemon/daemon.c           | 14 +++++++++-----
+ services/listen_dnsport.c | 14 +++++++++++---
+ util/configparser.y       | 15 +++++++++------
+ util/netevent.c           |  3 +++
+ 4 files changed, 32 insertions(+), 14 deletions(-)
+
+diff --git a/daemon/daemon.c b/daemon/daemon.c
+index f882bb9ad..a9cc25c67 100644
+--- a/daemon/daemon.c
++++ b/daemon/daemon.c
+@@ -558,9 +558,11 @@ daemon_create_workers(struct daemon* daemon)
+ 	verbose(VERB_ALGO, "total of %d outgoing ports available", numport);
+ 
+ #ifdef HAVE_NGTCP2
+-	daemon->doq_table = doq_table_create(daemon->cfg, daemon->rand);
+-	if(!daemon->doq_table)
+-		fatal_exit("could not create doq_table: out of memory");
++	if (cfg_has_quic(daemon->cfg)) {
++		daemon->doq_table = doq_table_create(daemon->cfg, daemon->rand);
++		if(!daemon->doq_table)
++			fatal_exit("could not create doq_table: out of memory");
++	}
+ #endif
+ 	
+ 	daemon->num = (daemon->cfg->num_threads?daemon->cfg->num_threads:1);
+@@ -917,8 +919,10 @@ daemon_cleanup(struct daemon* daemon)
+ 	daemon->dnscenv = NULL;
+ #endif
+ #ifdef HAVE_NGTCP2
+-	doq_table_delete(daemon->doq_table);
+-	daemon->doq_table = NULL;
++	if (daemon->doq_table) {
++		doq_table_delete(daemon->doq_table);
++		daemon->doq_table = NULL;
++	}
+ #endif
+ 	daemon->cfg = NULL;
+ }
+diff --git a/services/listen_dnsport.c b/services/listen_dnsport.c
+index f7fcca194..ab8f1ba72 100644
+--- a/services/listen_dnsport.c
++++ b/services/listen_dnsport.c
+@@ -1564,7 +1564,7 @@ listen_create(struct comm_base* base, struct listen_port* ports,
+ 			cp = comm_point_create_udp(base, ports->fd,
+ 				front->udp_buff, ports->pp2_enabled, cb,
+ 				cb_arg, ports->socket);
+-		} else if(ports->ftype == listen_type_doq) {
++		} else if(ports->ftype == listen_type_doq && doq_table) {
+ #ifndef HAVE_NGTCP2
+ 			log_warn("Unbound is not compiled with "
+ 				"ngtcp2. This is required to use DNS "
+@@ -3275,7 +3275,11 @@ nghttp2_session_callbacks* http2_req_callbacks_create(void)
+ struct doq_table*
+ doq_table_create(struct config_file* cfg, struct ub_randstate* rnd)
+ {
+-	struct doq_table* table = calloc(1, sizeof(*table));
++	struct doq_table* table;
++
++	if (!cfg->quic_port)
++		return NULL;
++	table = calloc(1, sizeof(*table));
+ 	if(!table)
+ 		return NULL;
+ #ifdef USE_NGTCP2_CRYPTO_OSSL
+@@ -3354,7 +3358,7 @@ conn_tree_del(rbnode_type* node, void* arg)
+ {
+ 	struct doq_table* table = (struct doq_table*)arg;
+ 	struct doq_conn* conn;
+-	if(!node)
++	if(!node || !table)
+ 		return;
+ 	conn = (struct doq_conn*)node->key;
+ 	if(conn->timer.timer_in_list) {
+@@ -3413,6 +3417,7 @@ doq_timer_find_time(struct doq_table* table, struct timeval* tv)
+ {
+ 	struct doq_timer key;
+ 	struct rbnode_type* node;
++	log_assert(table != NULL);
+ 	memset(&key, 0, sizeof(key));
+ 	key.time.tv_sec = tv->tv_sec;
+ 	key.time.tv_usec = tv->tv_usec;
+@@ -4922,6 +4927,7 @@ doq_conid_find(struct doq_table* table, const uint8_t* data, size_t datalen)
+ 	key.node.key = &key;
+ 	key.cid = (void*)data;
+ 	key.cidlen = datalen;
++	log_assert(table != NULL);
+ 	node = rbtree_search(table->conid_tree, &key);
+ 	if(node)
+ 		return (struct doq_conid*)node->key;
+@@ -5662,6 +5668,8 @@ doq_table_quic_size_available(struct doq_table* table,
+ 	struct config_file* cfg, size_t mem)
+ {
+ 	size_t cur;
++	if (!table)
++		return 0;
+ 	lock_basic_lock(&table->size_lock);
+ 	cur = table->current_size;
+ 	lock_basic_unlock(&table->size_lock);
+diff --git a/util/configparser.y b/util/configparser.y
+index bf9c196fc..f159b8cec 100644
+--- a/util/configparser.y
++++ b/util/configparser.y
+@@ -1235,14 +1235,17 @@ server_http_notls_downstream: VAR_HTTP_NOTLS_DOWNSTREAM STRING_ARG
+ server_quic_port: VAR_QUIC_PORT STRING_ARG
+ 	{
+ 		OUTYY(("P(server_quic_port:%s)\n", $2));
++		if(atoi($2) == 0 && strcmp($2,"0")!=0)
++			yyerror("port number expected");
++		else {
++			cfg_parser->cfg->quic_port = atoi($2);
+ #ifndef HAVE_NGTCP2
+-		log_warn("%s:%d: Unbound is not compiled with "
+-			"ngtcp2. This is required to use DNS "
+-			"over QUIC.", cfg_parser->filename, cfg_parser->line);
++			if (cfg_parser->cfg->quic_port != 0)
++				log_warn("%s:%d: Unbound is not compiled with "
++					"ngtcp2. This is required to use DNS "
++					"over QUIC.", cfg_parser->filename, cfg_parser->line);
+ #endif
+-		if(atoi($2) == 0)
+-			yyerror("port number expected");
+-		else cfg_parser->cfg->quic_port = atoi($2);
++		}
+ 		free($2);
+ 	};
+ server_quic_size: VAR_QUIC_SIZE STRING_ARG
+diff --git a/util/netevent.c b/util/netevent.c
+index aedcb5e07..93db16675 100644
+--- a/util/netevent.c
++++ b/util/netevent.c
+@@ -2723,6 +2723,7 @@ doq_server_socket_create(struct doq_table* table, struct ub_randstate* rnd,
+ {
+ 	size_t doq_buffer_size = 4096; /* bytes buffer size, for one packet. */
+ 	struct doq_server_socket* doq_socket;
++	log_assert(doq_table != NULL);
+ 	doq_socket = calloc(1, sizeof(*doq_socket));
+ 	if(!doq_socket) {
+ 		return NULL;
+@@ -2804,6 +2805,7 @@ doq_lookup_repinfo(struct doq_table* table, struct comm_reply* repinfo)
+ {
+ 	struct doq_conn* conn;
+ 	struct doq_conn_key key;
++	log_assert(table != NULL);
+ 	doq_conn_key_from_repinfo(&key, repinfo);
+ 	lock_rw_rdlock(&table->lock);
+ 	conn = doq_conn_find(table, &key.paddr.addr,
+@@ -5880,6 +5882,7 @@ comm_point_create_doq(struct comm_base *base, int fd, sldns_buffer* buffer,
+ 	struct config_file* cfg)
+ {
+ #ifdef HAVE_NGTCP2
++	log_assert(table != NULL);
+ 	struct comm_point* c = (struct comm_point*)calloc(1,
+ 		sizeof(struct comm_point));
+ 	short evbits;
+-- 
+2.52.0
+

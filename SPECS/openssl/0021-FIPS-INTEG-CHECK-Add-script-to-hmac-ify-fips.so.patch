@@ -1,0 +1,32 @@
+From 11959719a0acee26ca505c79f89af7fc5aeca011 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Thu, 20 Feb 2025 15:30:32 -0500
+Subject: [PATCH 21/59] FIPS: INTEG-CHECK: Add script to hmac-ify fips.so
+
+This script rewrites the fips.so binary to embed the hmac result into it
+so that after a build it can be called to make the fips.so as modified
+by Red Hat to properly pass the integrty test
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ fips-hmacify.sh | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ create mode 100755 fips-hmacify.sh
+
+diff --git a/fips-hmacify.sh b/fips-hmacify.sh
+new file mode 100755
+index 0000000000..54ae60b07f
+--- /dev/null
++++ b/fips-hmacify.sh
+@@ -0,0 +1,8 @@
++#!/bin/bash
++
++dd if=/dev/zero bs=1 count=32 of=tmp.mac >/dev/null 2>&1
++objcopy --update-section .rodata1=tmp.mac providers/fips.so providers/fips.so.zeromac
++mv providers/fips.so.zeromac providers/fips.so
++LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
++objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
++mv providers/fips.so.mac providers/fips.so
+-- 
+2.51.0
+

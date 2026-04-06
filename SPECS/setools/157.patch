@@ -1,0 +1,42 @@
+From a33a2e394435316f3822e89ac9c2a9aabab17252 Mon Sep 17 00:00:00 2001
+From: Pranav Lawate <pran.lawate@gmail.com>
+Date: Tue, 30 Sep 2025 22:29:10 +0530
+Subject: [PATCH] Fix seinfo argument parsing when policy path follows query
+ options
+
+Signed-off-by: Pranav Lawate <pran.lawate@gmail.com>
+---
+ seinfo | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/seinfo b/seinfo
+index 99180c36..d04ec320 100755
+--- a/seinfo
++++ b/seinfo
+@@ -12,6 +12,7 @@ import logging
+ import signal
+ import ipaddress
+ import warnings
++from pathlib import Path
+ from typing import Callable, List, Tuple
+ 
+ 
+@@ -102,6 +103,18 @@ xen.add_argument("--devicetreecon", help="Print all devicetreecon statements.",
+ 
+ args = parser.parse_args()
+ 
++# Fix argument misparsing: when policy is None and a query option is a string,
++# check if the string is actually a policy file that is incorrectly consumed by the query option
++if not args.policy:
++    # Check all query options defined in the queries argument group
++    for action in queries._group_actions:
++        value = getattr(args, action.dest, None)
++        if isinstance(value, str) and Path(value).exists():
++            # This query argument consumed the policy path - fix it
++            args.policy = value
++            setattr(args, action.dest, True)
++            break
++
+ if args.debug:
+     logging.basicConfig(level=logging.DEBUG,
+                         format='%(asctime)s|%(levelname)s|%(name)s|%(message)s')

@@ -1,0 +1,35 @@
+Fixes warnings and errors in unicode.c:
+
+unicode.c: In function 'dm_AtoUW':
+unicode.c:1565:16: error: initialization of 'ucs4_t *' {aka 'unsigned int *'} from incompatible pointer type 'wchar_t *' {aka 'long int *'} [-Wincompatible-pointer-types]
+ 1565 |   ucs4_t *us = dest;
+      |                ^~~~
+
+unicode.c: In function 'DM_GetWCharAt':
+unicode.c:2152:12: warning: 'mask' may be used uninitialized [-Wmaybe-uninitialized]
+ 2152 |         wc = (*u8str)&mask;
+      |         ~~~^~~~~~~~~~~~~~~
+unicode.c:2140:13: note: 'mask' was declared here
+ 2140 |         int mask, len, i=0;
+      |             ^~~~
+
+--- iODBC-3.52.16/iodbcinst/unicode.c.orig	2023-05-02 05:17:03.000000000 -0600
++++ iODBC-3.52.16/iodbcinst/unicode.c	2025-01-15 08:45:10.896015600 -0700
+@@ -1562,7 +1562,7 @@ dm_AtoUW(char *src, int ilen, wchar_t *d
+ {
+   size_t n = 0;
+   wchar_t wc;
+-  ucs4_t *us = dest;
++  ucs4_t *us = (ucs4_t *)dest;
+   int count = 0;
+   mbstate_t st;
+   
+@@ -2137,7 +2137,7 @@ DM_GetWCharAt(DM_CONV *conv, void *str,
+     {
+     case CP_UTF8:
+       {
+-        int mask, len, i=0;
++        int mask=0, len, i=0;
+         SQLWCHAR wc = 0;
+         SQLCHAR *u8str = (SQLCHAR*)str;
+         while(i < pos)

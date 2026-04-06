@@ -1,0 +1,35 @@
+From dc9c2eb24269ea925d98e2bebda2d7fde61c086d Mon Sep 17 00:00:00 2001
+From: orbea <orbea@riseup.net>
+Date: Sun, 17 Mar 2024 11:52:48 -0700
+Subject: [PATCH 3/5] configure.ac: don't link plugins with -no-undefined
+
+Many of the plugins depend on mate_settings_plugin_get_type(), but this
+symbol is only available at runtime in the mate-settings-daemon program.
+
+With GNU libtool the -no-undefined flag gets silently ignored and the
+build succeeds, but with slibtool it correctly sets -Wl,--no-undefined
+in the LDFLAGS causing the build to fail.
+
+To solve this simply removing -no-undefined is enough.
+
+Gentoo issue: https://bugs.gentoo.org/922326
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 571817ad..a370771e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -75,7 +75,7 @@ PKG_CHECK_MODULES(SETTINGS_PLUGIN,
+ 	gio-2.0 >= $GIO_REQUIRED_VERSION
+ )
+ 
+-MSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"
++MSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version"
+ case $host_os in
+   darwin*)
+     MSD_PLUGIN_LDFLAGS="${MSD_PLUGIN_LDFLAGS} -Wl,-bundle_loader,\$(top_builddir)/mate-settings-daemon/mate-settings-daemon"
+-- 
+2.49.0
+

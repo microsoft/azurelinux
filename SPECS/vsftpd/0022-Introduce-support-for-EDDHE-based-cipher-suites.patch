@@ -1,0 +1,128 @@
+From a6d641a0ccba1033587f6faa0e5e6749fa35f5c4 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 10:49:22 +0100
+Subject: [PATCH 22/59] Introduce support for EDDHE based cipher suites.
+
+---
+ parseconf.c   |  1 +
+ ssl.c         | 37 ++++++++++++++++++++++++++++++++++++-
+ tunables.c    |  4 +++-
+ tunables.h    |  1 +
+ vsftpd.conf.5 |  8 ++++++++
+ 5 files changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/parseconf.c b/parseconf.c
+index 38e3182..a2c715b 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -177,6 +177,7 @@ parseconf_str_array[] =
+   { "rsa_cert_file", &tunable_rsa_cert_file },
+   { "dsa_cert_file", &tunable_dsa_cert_file },
+   { "dh_param_file", &tunable_dh_param_file },
++  { "ecdh_param_file", &tunable_ecdh_param_file },
+   { "ssl_ciphers", &tunable_ssl_ciphers },
+   { "rsa_private_key_file", &tunable_rsa_private_key_file },
+   { "dsa_private_key_file", &tunable_dsa_private_key_file },
+diff --git a/ssl.c b/ssl.c
+index 22b69b3..96bf8ad 100644
+--- a/ssl.c
++++ b/ssl.c
+@@ -122,7 +122,7 @@ ssl_init(struct vsf_session* p_sess)
+     {
+       die("SSL: could not allocate SSL context");
+     }
+-    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE;
++    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE | SSL_OP_SINGLE_ECDH_USE;
+     if (!tunable_sslv2)
+     {
+       options |= SSL_OP_NO_SSLv2;
+@@ -244,6 +244,33 @@
+ 
+     SSL_CTX_set0_tmp_dh_pkey(p_ctx, DH_get_dh());
+ 
++    if (tunable_ecdh_param_file)
++    {
++      BIO *bio;
++      EVP_PKEY *ec_params = NULL;
++
++      if ((bio = BIO_new_file(tunable_ecdh_param_file, "r")) == NULL)
++        die("SSL: cannot load custom ec params");
++      else
++      {
++        ec_params = PEM_read_bio_Parameters(bio, NULL);
++        BIO_free(bio);
++
++        if (ec_params != NULL)
++        {
++          if (!SSL_CTX_set1_groups_list(p_ctx, ec_params))
++            die("SSL: setting custom EC params failed");
++	       }
++	        else
++        {
++          die("SSL: getting ec group or key failed");
++	       }
++      }
++    }
++    else
++    {
++      SSL_CTX_set1_groups_list(p_ctx, "P-256");
++    }
+     /* Set up ALPN to check for FTP protocol intention of client. */
+     SSL_CTX_set_alpn_select_cb(p_ctx, ssl_alpn_callback, p_sess);
+     /* Set up SNI callback for an optional hostname check. */
+diff --git a/tunables.c b/tunables.c
+index 1ea7227..93f85b1 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -141,6 +141,7 @@ const char* tunable_email_password_file;
+ const char* tunable_rsa_cert_file;
+ const char* tunable_dsa_cert_file;
+ const char* tunable_dh_param_file;
++const char* tunable_ecdh_param_file;
+ const char* tunable_ssl_ciphers;
+ const char* tunable_rsa_private_key_file;
+ const char* tunable_dsa_private_key_file;
+@@ -290,7 +291,8 @@ tunables_load_defaults()
+                       &tunable_rsa_cert_file);
+   install_str_setting(0, &tunable_dsa_cert_file);
+   install_str_setting(0, &tunable_dh_param_file);
+-  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA",
++  install_str_setting(0, &tunable_ecdh_param_file);
++  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA",
+                       &tunable_ssl_ciphers);
+   install_str_setting(0, &tunable_rsa_private_key_file);
+   install_str_setting(0, &tunable_dsa_private_key_file);
+diff --git a/tunables.h b/tunables.h
+index 3995472..3e2d40c 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -143,6 +143,7 @@ extern const char* tunable_email_password_file;
+ extern const char* tunable_rsa_cert_file;
+ extern const char* tunable_dsa_cert_file;
+ extern const char* tunable_dh_param_file;
++extern const char* tunable_ecdh_param_file;
+ extern const char* tunable_ssl_ciphers;
+ extern const char* tunable_rsa_private_key_file;
+ extern const char* tunable_dsa_private_key_file;
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index ff94eca..e242873 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -899,6 +899,14 @@ ephemeral Diffie-Hellman key exchange in SSL.
+ 
+ Default: (none - use built in parameters appropriate for certificate key size)
+ .TP
++.B ecdh_param_file
++This option specifies the location of custom parameters for ephemeral
++Elliptic Curve Diffie-Hellman (ECDH) key exchange.
++
++Default: (none - use built in parameters, NIST P-256 with OpenSSL 1.0.1 and
++automatically selected curve based on client preferences with OpenSSL 1.0.2
++and later)
++.TP
+ .B email_password_file
+ This option can be used to provide an alternate file for usage by the
+ .BR secure_email_list_enable
+-- 
+2.14.4
+

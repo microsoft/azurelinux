@@ -1,0 +1,78 @@
+--- flexmark-java-0.64.6/flexmark-html2md-converter/src/test/resources/html_attribute_converter_issue_spec.md.orig	2023-05-17 10:39:03.000000000 -0600
++++ flexmark-java-0.64.6/flexmark-html2md-converter/src/test/resources/html_attribute_converter_issue_spec.md	2025-07-28 16:09:12.840411609 -0600
+@@ -1246,26 +1246,26 @@ Issue #MN-408
+ 
+ 
+ ```````````````````````````````` example Issue MN-408: 2
+-* 
+ * Equipment
+-* 
++
+ * Chemicals
+-* 
++
+ * Consumables
+-* 
++
+ * Enzymes
+-* 
++
+ * GMO
+-* 
++
+ * Antibodies
+-* 
++
+ * DNA Constructs
+-* 
++
+ * RNA Constructs
+-* 
++
+ * Vectors
+-* 
++
+ * Oligos
++
+ .
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+ <html>
+--- flexmark-java-0.64.6/flexmark-html2md-converter/src/test/resources/html_converter_issue_spec.md.orig	2023-05-17 10:39:03.000000000 -0600
++++ flexmark-java-0.64.6/flexmark-html2md-converter/src/test/resources/html_converter_issue_spec.md	2025-07-28 16:09:24.671955109 -0600
+@@ -1246,26 +1246,26 @@ Issue #MN-408
+ 
+ 
+ ```````````````````````````````` example Issue MN-408: 2
+-* 
+ * Equipment
+-* 
++
+ * Chemicals
+-* 
++
+ * Consumables
+-* 
++
+ * Enzymes
+-* 
++
+ * GMO
+-* 
++
+ * Antibodies
+-* 
++
+ * DNA Constructs
+-* 
++
+ * RNA Constructs
+-* 
++
+ * Vectors
+-* 
++
+ * Oligos
++
+ .
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+ <html>

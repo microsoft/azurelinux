@@ -1,0 +1,182 @@
+From e73bb3b70fa78c58e0959b616586f9ff09e3f293 Mon Sep 17 00:00:00 2001
+From: Sameera Deshpande <sameera.deshpande@linaro.org>
+Date: Fri, 15 Feb 2019 07:46:16 +0530
+Subject: [PATCH 1/4] Add support for FNMADD and FNMSUB.
+
+---
+ src/lj_asm_arm64.h | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/src/lj_asm_arm64.h b/src/lj_asm_arm64.h
+index 507fc084..2faa28bb 100644
+--- a/src/lj_asm_arm64.h
++++ b/src/lj_asm_arm64.h
+@@ -373,6 +373,35 @@ static int asm_fusemadd(ASMState *as, IRIns *ir, A64Ins ai, A64Ins air)
+   return 0;
+ }
+ 
++/* Fuse FP neg-multiply-add/sub. */
++static int asm_fusenmadd(ASMState *as, IRIns *ir, A64Ins ai, A64Ins air)
++{
++  IRRef ref = ir->op1;
++  IRIns *irn = IR(ref);
++  if (irn->o != IR_ADD && irn->o != IR_SUB)
++    return 0;
++
++  if (!mayfuse(as, ref))
++    return 0;
++
++  IRRef lref = irn->op1, rref = irn->op2;
++  IRIns *irm;
++  if (lref != rref &&
++      ((mayfuse(as, lref) && (irm = IR(lref), irm->o == IR_MUL) &&
++       ra_noreg(irm->r)) ||
++       (mayfuse(as, rref) && (irm = IR(rref), irm->o == IR_MUL) &&
++       (rref = lref, ra_noreg(irm->r))))) {
++    Reg dest = ra_dest(as, ir, RSET_FPR);
++    Reg add = ra_hintalloc(as, rref, dest, RSET_FPR);
++    Reg left = ra_alloc2(as, irm,
++			 rset_exclude(rset_exclude(RSET_FPR, dest), add));
++    Reg right = (left >> 8); left &= 255;
++    emit_dnma(as, (irn->o == IR_ADD ? ai : air), (dest & 31), (left & 31), (right & 31), (add & 31));
++    return 1;
++  }
++  return 0;
++}
++
+ /* Fuse BAND + BSHL/BSHR into UBFM. */
+ static int asm_fuseandshift(ASMState *as, IRIns *ir)
+ {
+@@ -1478,7 +1507,8 @@ static void asm_mul(ASMState *as, IRIns *ir)
+ static void asm_neg(ASMState *as, IRIns *ir)
+ {
+   if (irt_isnum(ir->t)) {
+-    asm_fpunary(as, ir, A64I_FNEGd);
++    if (!asm_fusenmadd(as, ir, A64I_FNMADDd))
++      asm_fpunary(as, ir, A64I_FNEGd);
+     return;
+   }
+   asm_intneg(as, ir);
+-- 
+2.52.0
+
+
+From 4d1c87e3cdf853fdee202ee0388f78703c186f52 Mon Sep 17 00:00:00 2001
+From: Vivien HENRIET <bubuabu@bubuabu.org>
+Date: Wed, 30 Jan 2019 23:44:51 +0100
+Subject: [PATCH 2/4] Fix os.date() for timezone change awareness
+
+On POSIX target, system timezone change are not taken into account.
+To reproduce,
+1. call os.date()
+2. change your timezone
+3. call os.date() within the same luajit instance
+
+On POSIX target, os.date use localtime_r to retrieve time.
+On other target, the function localtime is used. But there is a behaviour
+diference between these two function. localtime acts as if it called tzset
+which localtime_r don't.
+
+To fix the issue tzset is called before localtime_r.
+---
+ src/lib_os.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib_os.c b/src/lib_os.c
+index fffc923e..f94a5d90 100644
+--- a/src/lib_os.c
++++ b/src/lib_os.c
+@@ -186,6 +186,7 @@ LJLIB_CF(os_date)
+ #endif
+   } else {
+ #if LJ_TARGET_POSIX
++    tzset();
+     stm = localtime_r(&t, &rtm);
+ #else
+     stm = localtime(&t);
+-- 
+2.52.0
+
+
+From 41fe68efce61f39af31603cbb6b4e716879f2415 Mon Sep 17 00:00:00 2001
+From: Siddhesh Poyarekar <siddhesh@sourceware.org>
+Date: Mon, 25 Mar 2019 17:56:53 +0530
+Subject: [PATCH 3/4] Fix build erro with fnmsub fusing
+
+---
+ src/lj_asm_arm64.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lj_asm_arm64.h b/src/lj_asm_arm64.h
+index 2faa28bb..c06b62b1 100644
+--- a/src/lj_asm_arm64.h
++++ b/src/lj_asm_arm64.h
+@@ -1507,7 +1507,7 @@ static void asm_mul(ASMState *as, IRIns *ir)
+ static void asm_neg(ASMState *as, IRIns *ir)
+ {
+   if (irt_isnum(ir->t)) {
+-    if (!asm_fusenmadd(as, ir, A64I_FNMADDd))
++    if (!asm_fusenmadd(as, ir, A64I_FNMADDd, A64I_FNMSUBd))
+       asm_fpunary(as, ir, A64I_FNEGd);
+     return;
+   }
+-- 
+2.52.0
+
+
+From c80f0814143fa279dfd5b210e1d8b84e0fe06162 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Sur=C3=BD?= <ondrej@sury.org>
+Date: Thu, 19 Nov 2015 16:29:02 +0200
+Subject: [PATCH 4/4] Get rid of LUAJIT_VERSION_SYM that changes ABI on every
+ patch release
+
+---
+ src/lj_dispatch.c    | 5 -----
+ src/luajit.c         | 1 -
+ src/luajit_rolling.h | 3 ---
+ 3 files changed, 9 deletions(-)
+
+diff --git a/src/lj_dispatch.c b/src/lj_dispatch.c
+index 78608316..485d6a3c 100644
+--- a/src/lj_dispatch.c
++++ b/src/lj_dispatch.c
+@@ -318,11 +318,6 @@ int luaJIT_setmode(lua_State *L, int idx, int mode)
+   return 1;  /* OK. */
+ }
+ 
+-/* Enforce (dynamic) linker error for version mismatches. See luajit.c. */
+-LUA_API void LUAJIT_VERSION_SYM(void)
+-{
+-}
+-
+ /* -- Hooks --------------------------------------------------------------- */
+ 
+ /* This function can be called asynchronously (e.g. during a signal). */
+diff --git a/src/luajit.c b/src/luajit.c
+index 2e2e9150..f136158f 100644
+--- a/src/luajit.c
++++ b/src/luajit.c
+@@ -530,7 +530,6 @@ static int pmain(lua_State *L)
+   int argn;
+   int flags = 0;
+   globalL = L;
+-  LUAJIT_VERSION_SYM();  /* Linker-enforced version check. */
+ 
+   argn = collectargs(argv, &flags);
+   if (argn < 0) {  /* Invalid args? */
+diff --git a/src/luajit_rolling.h b/src/luajit_rolling.h
+index 73639aa8..6c8128ed 100644
+--- a/src/luajit_rolling.h
++++ b/src/luajit_rolling.h
+@@ -73,8 +73,5 @@ LUA_API void luaJIT_profile_stop(lua_State *L);
+ LUA_API const char *luaJIT_profile_dumpstack(lua_State *L, const char *fmt,
+ 					     int depth, size_t *len);
+ 
+-/* Enforce (dynamic) linker error for version mismatches. Call from main. */
+-LUA_API void LUAJIT_VERSION_SYM(void);
+-
+ #error "DO NOT USE luajit_rolling.h -- only include build-generated luajit.h"
+ #endif
+-- 
+2.52.0
+

@@ -1,0 +1,25 @@
+diff -up autogen-5.18/autoopts/autoopts-config.in.multilib autogen-5.18/autoopts/autoopts-config.in
+--- autogen-5.18/autoopts/autoopts-config.in.multilib	2013-07-15 02:37:20.000000000 +0200
++++ autogen-5.18/autoopts/autoopts-config.in	2013-07-29 15:41:26.654229342 +0200
+@@ -17,17 +17,17 @@
+   includedir="@includedir@"
+  exec_prefix="@exec_prefix@"
+       bindir="@bindir@"
+-      libdir="@libdir@"
+-      ldopts="@AG_LDFLAGS@"
++      libdir=""
++      ldopts=""
+       exeext="@EXEEXT@"
+      version="@AO_CURRENT@:@AO_REVISION@:@AO_AGE@"
+       dotver="@AO_CURRENT@.@AO_REVISION@.@AO_AGE@"
+   pkgdatadir="${datadir}/${package}"
+      autogen="${bindir}/autogen${exeext}"
+-     ldflags="-L${libdir} -lopts"
++     ldflags="-lopts"
+         libs="${ldflags}"
+       libsrc="${pkgdatadir}/libopts-${dotver}.tar.gz"
+- static_libs="${libdir}/libopts.a"
++ static_libs=""
+       cflags="-I${includedir}"
+ test 'X@ENABLE_STATIC@' = Xno && static_libs=''
+ case "${libdir}" in

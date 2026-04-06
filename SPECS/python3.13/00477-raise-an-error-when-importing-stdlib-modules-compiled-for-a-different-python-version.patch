@@ -1,0 +1,173 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Petr Viktorin <encukou@gmail.com>
+Date: Mon, 9 Feb 2026 10:44:21 +0100
+Subject: 00477: Raise an error when importing stdlib modules compiled for a
+ different Python version
+
+This is a downstream workaround "implementing" python#137212 -
+the mechanism for the check exists in Python 3.15+, where it needs to be
+added to the standard library modules.
+In Fedora, we need it also in previous Python versions, as we experience
+segmentation fault when importing stdlib modules after update while
+Python is running.
+
+_curses, _tkinter, _tracemalloc and readline are not calling PyModuleDef_Init,
+which is modified with this patch, hence they need a
+direct call to the check function.
+
+Co-Authored-By: Karolina Surma <ksurma@redhat.com>
+---
+ Include/moduleobject.h  | 43 +++++++++++++++++++++++++++++++++++++++++
+ Makefile.pre.in         |  3 +++
+ Modules/_cursesmodule.c |  6 ++++++
+ Modules/_tkinter.c      |  6 ++++++
+ Modules/_tracemalloc.c  |  6 ++++++
+ Modules/readline.c      |  6 ++++++
+ Objects/moduleobject.c  |  1 +
+ 7 files changed, 71 insertions(+)
+
+diff --git a/Include/moduleobject.h b/Include/moduleobject.h
+index 2a17c891dd..64017c666c 100644
+--- a/Include/moduleobject.h
++++ b/Include/moduleobject.h
+@@ -116,6 +116,49 @@ struct PyModuleDef {
+   freefunc m_free;
+ };
+ 
++#if defined(_PyHack_check_version_on_modinit) && defined(Py_BUILD_CORE)
++/* The mechanism for the check has been implemented on Python 3.15+:
++ * https://github.com/python/cpython/pull/137212.
++ * In Fedora, we need this in older Pythons too:
++ * if somebody attempts to import a module compiled for a different Python version,
++ * instead of segmentation fault a meaningful error is raised.
++ */
++PyAPI_DATA(const unsigned long) Py_Version;
++
++static inline int
++_PyHack_CheckInternalAPIVersion(const char *mod_name)
++{
++    if (PY_VERSION_HEX != Py_Version) {
++        PyErr_Format(
++            PyExc_ImportError,
++            "internal Python C API version mismatch: "
++            "module %s compiled with %lu.%lu.%lu; "
++            "runtime version is %lu.%lu.%lu",
++            mod_name,
++            (const unsigned long)((PY_VERSION_HEX >> 24) & 0xFF),
++            (const unsigned long)((PY_VERSION_HEX >> 16) & 0xFF),
++            (const unsigned long)((PY_VERSION_HEX >> 8) & 0xFF),
++            (const unsigned long)((Py_Version >> 24) & 0xFF),
++            (const unsigned long)((Py_Version >> 16) & 0xFF),
++            (const unsigned long)((Py_Version >> 8) & 0xFF)
++        );
++        return -1;
++    }
++    return 0;
++}
++
++static inline PyObject *
++PyModuleDef_Init_with_check(PyModuleDef *def)
++{
++    if (_PyHack_CheckInternalAPIVersion(def->m_name) < 0) {
++        return NULL;
++    }
++    return PyModuleDef_Init(def);
++}
++
++#define PyModuleDef_Init PyModuleDef_Init_with_check
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index ecf77bdc41..91bfd06a78 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -3153,3 +3153,6 @@ MODULE__MULTIBYTECODEC_DEPS=$(srcdir)/Modules/cjkcodecs/multibytecodec.h
+ # Local Variables:
+ # mode: makefile
+ # End:
++
++# Fedora-specific, downstream only
++PY_STDMODULE_CFLAGS += -D_PyHack_check_version_on_modinit=1
+diff --git a/Modules/_cursesmodule.c b/Modules/_cursesmodule.c
+index 0200f59020..bb647555c0 100644
+--- a/Modules/_cursesmodule.c
++++ b/Modules/_cursesmodule.c
+@@ -4763,6 +4763,12 @@ curses_destructor(PyObject *op)
+ PyMODINIT_FUNC
+ PyInit__curses(void)
+ {
++    #ifdef _PyHack_check_version_on_modinit
++        if (_PyHack_CheckInternalAPIVersion("_curses") < 0) {
++            return NULL;
++        }
++    #endif
++
+     PyObject *m, *d, *v, *c_api_object;
+ 
+     /* Initialize object type */
+diff --git a/Modules/_tkinter.c b/Modules/_tkinter.c
+index 14efe18db5..70597c2815 100644
+--- a/Modules/_tkinter.c
++++ b/Modules/_tkinter.c
+@@ -3431,6 +3431,12 @@ static struct PyModuleDef _tkintermodule = {
+ PyMODINIT_FUNC
+ PyInit__tkinter(void)
+ {
++    #ifdef _PyHack_check_version_on_modinit
++        if (_PyHack_CheckInternalAPIVersion("_tkinter") < 0) {
++            return NULL;
++        }
++    #endif
++
+     PyObject *m, *uexe, *cexe;
+ 
+     tcl_lock = PyThread_allocate_lock();
+diff --git a/Modules/_tracemalloc.c b/Modules/_tracemalloc.c
+index 0b85187e5f..87f358ed07 100644
+--- a/Modules/_tracemalloc.c
++++ b/Modules/_tracemalloc.c
+@@ -215,6 +215,12 @@ static struct PyModuleDef module_def = {
+ PyMODINIT_FUNC
+ PyInit__tracemalloc(void)
+ {
++    #ifdef _PyHack_check_version_on_modinit
++        if (_PyHack_CheckInternalAPIVersion("_tracemalloc") < 0) {
++            return NULL;
++        }
++    #endif
++
+     PyObject *m;
+     m = PyModule_Create(&module_def);
+     if (m == NULL)
+diff --git a/Modules/readline.c b/Modules/readline.c
+index f9362c312d..66f1ec65a6 100644
+--- a/Modules/readline.c
++++ b/Modules/readline.c
+@@ -1540,6 +1540,12 @@ static struct PyModuleDef readlinemodule = {
+ PyMODINIT_FUNC
+ PyInit_readline(void)
+ {
++    #ifdef _PyHack_check_version_on_modinit
++        if (_PyHack_CheckInternalAPIVersion("readline") < 0) {
++            return NULL;
++        }
++    #endif
++
+     const char *backend = "readline";
+     PyObject *m;
+     readlinestate *mod_state;
+diff --git a/Objects/moduleobject.c b/Objects/moduleobject.c
+index d787f29004..31175ceb3f 100644
+--- a/Objects/moduleobject.c
++++ b/Objects/moduleobject.c
+@@ -43,6 +43,7 @@ _PyModule_IsExtension(PyObject *obj)
+ }
+ 
+ 
++#undef PyModuleDef_Init
+ PyObject*
+ PyModuleDef_Init(PyModuleDef* def)
+ {

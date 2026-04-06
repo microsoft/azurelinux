@@ -1,0 +1,31 @@
+From 61982008ed5e072b5495ae96f17fe39b7b3c483f Mon Sep 17 00:00:00 2001
+From: Hilko Bengen <bengen@hilluzination.de>
+Date: Tue, 18 Feb 2025 19:06:57 +0100
+Subject: [PATCH] Avoid defining bool datatype
+
+This avoids build failures with GCC 15,
+see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1097897
+
+Adapted for sleuthkit-4.13.0 by Nicolas Chauvet <kwizart@gmail.com>
+
+Signed-off-by: Nicolas Chauvet <kwizart@gmail.com>
+---
+ tsk/img/aff.c  | 2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/tsk/img/aff.c b/tsk/img/aff.c
+index ff6df20ad087..d1365d1a4cc4 100644
+--- a/tsk/img/aff.c
++++ b/tsk/img/aff.c
+@@ -14,8 +14,6 @@
+ 
+ #if HAVE_LIBAFFLIB
+ 
+-typedef int bool;
+-
+ #include "aff.h"
+ 
+ /* Note: The routine -assumes- we are under a lock on &(img_info->cache_lock)) */
+-- 
+2.49.0
+

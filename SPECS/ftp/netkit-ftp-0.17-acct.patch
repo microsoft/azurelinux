@@ -1,0 +1,12 @@
+--- netkit-ftp-0.17/ftp/ftp.c.acct	Sun Jan 21 00:08:29 2001
++++ netkit-ftp-0.17/ftp/ftp.c	Sun Jan 21 00:09:04 2001
+@@ -254,7 +254,8 @@
+ 	if (n == CONTINUE) {
+ 		aflag++;
+ 		/* fflush(stdout); */
+-		zacct = getpass("Account:");
++		if(zacct==NULL)
++			zacct = getpass("Account:");
+ 		n = command("ACCT %s", zacct);
+ 	}
+ 	if (n != COMPLETE) {

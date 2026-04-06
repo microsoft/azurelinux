@@ -1,0 +1,157 @@
+diff --git a/lib/error.c b/lib/error.c
+index 8f679c7..4632c9c 100644
+--- a/lib/error.c
++++ b/lib/error.c
+@@ -73,7 +73,7 @@ extern char *program_name;
+ 
+ # if HAVE_STRERROR
+ #  ifndef strerror		/* On some systems, strerror is a macro */
+-char *strerror ();
++char *strerror (int);
+ #  endif
+ # else
+ static char *
+diff --git a/lib/long-options.c b/lib/long-options.c
+index 9ee8f66..2c8d267 100644
+--- a/lib/long-options.c
++++ b/lib/long-options.c
+@@ -40,7 +40,7 @@ parse_long_options (argc, argv,version, usage)
+      int argc;
+      char **argv;
+      void (*version)();
+-     void (*usage)();
++     void (*usage)(int);
+ {
+   int c;
+   int saved_opterr;
+@@ -61,7 +61,7 @@ parse_long_options (argc, argv,version, usage)
+ 	  (*usage) (0);
+ 
+ 	case 'v':
+-	  (*version) (0);
++	  (*version) ();
+ 	  /* printf ("%s (%s) %s\n", command_name, package, version_string); */
+ 	  exit (0);
+ 
+diff --git a/lib/long-options.h b/lib/long-options.h
+index 14459cd..3fb8fa6 100644
+--- a/lib/long-options.h
++++ b/lib/long-options.h
+@@ -6,5 +6,5 @@
+ #endif
+ 
+ void parse_long_options __P ((int _argc, char **_argv, 
+-							  void (*_version) (void), 
++							  void (*_version) (), 
+ 							  void (*_usage) (int)));
+diff --git a/lib/xstrtol.c b/lib/xstrtol.c
+index 8755cf4..0ab337d 100644
+--- a/lib/xstrtol.c
++++ b/lib/xstrtol.c
+@@ -65,8 +65,6 @@ extern int errno;
+ 	}								\
+       while (0)
+ 
+-__unsigned long int __strtol ();
+-
+ /* FIXME: comment.  */
+ 
+ strtol_error
+diff --git a/src/lrz.c b/src/lrz.c
+index c1bdef7..ae3c62d 100644
+--- a/src/lrz.c
++++ b/src/lrz.c
+@@ -41,11 +41,6 @@
+ #include "xstrtoul.h"
+ #include "error.h"
+ 
+-#ifndef STRICT_PROTOTYPES
+-extern time_t time();
+-extern char *strerror();
+-#endif
+-
+ #ifndef HAVE_ERRNO_DECLARATION
+ extern int errno;
+ #endif
+@@ -190,7 +185,7 @@ int enable_syslog=FALSE;
+ 
+ 
+ /* called by signal interrupt or terminate to clean things up */
+-RETSIGTYPE
++void
+ bibi(int n)
+ {
+ 	if (zmodem_requested)
+diff --git a/src/lsz.c b/src/lsz.c
+index 173b4ac..e501362 100644
+--- a/src/lsz.c
++++ b/src/lsz.c
+@@ -50,11 +50,6 @@ void *mm_addr=NULL;
+ #include "xstrtoul.h"
+ #include "error.h"
+ 
+-#ifndef STRICT_PROTOTYPES
+-extern time_t time();
+-extern char *strerror();
+-#endif
+-
+ #ifndef HAVE_ERRNO_DECLARATION
+ extern int errno;
+ #endif
+@@ -217,7 +212,7 @@ static int zrqinits_sent=0;
+ static int play_with_sigint=0;
+ 
+ /* called by signal interrupt or terminate to clean things up */
+-RETSIGTYPE
++void
+ bibi (int n)
+ {
+ 	canit(STDOUT_FILENO);
+@@ -233,7 +228,7 @@ bibi (int n)
+ }
+ 
+ /* Called when ZMODEM gets an interrupt (^C) */
+-static RETSIGTYPE
++static void
+ onintr(int n LRZSZ_ATTRIB_UNUSED)
+ {
+ 	signal(SIGINT, SIG_IGN);
+diff --git a/src/tcp.c b/src/tcp.c
+index 69da8c9..30842ed 100644
+--- a/src/tcp.c
++++ b/src/tcp.c
+@@ -38,7 +38,7 @@
+ #include <stdlib.h>
+ #include "error.h"
+ 
+-static RETSIGTYPE
++static void
+ tcp_alarm_handler(int dummy LRZSZ_ATTRIB_UNUSED)
+ {
+     /* doesn't need to do anything */
+diff --git a/src/zglobal.h b/src/zglobal.h
+index 0f59dba..459007c 100644
+--- a/src/zglobal.h
++++ b/src/zglobal.h
+@@ -360,7 +360,7 @@ extern int no_timeout;
+ extern int Zctlesc;    /* Encode control characters */
+ extern int under_rsh;
+ 
+-RETSIGTYPE bibi __P ((int n));
++void bibi __P ((int n));
+ 
+ #define sendline(c) putchar((c) & 0377)
+ #define xsendline(c) putchar(c)
+diff --git a/src/zreadline.c b/src/zreadline.c
+index aeda95c..c8f8263 100644
+--- a/src/zreadline.c
++++ b/src/zreadline.c
+@@ -43,7 +43,7 @@ static char *readline_buffer;
+ int readline_left=0;
+ char *readline_ptr;
+ 
+-static RETSIGTYPE
++static void
+ zreadline_alarm_handler(int dummy LRZSZ_ATTRIB_UNUSED)
+ {
+ 	/* doesn't need to do anything */

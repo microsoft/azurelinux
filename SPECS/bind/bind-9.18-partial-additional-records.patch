@@ -1,0 +1,54 @@
+From 3f686891729c7d39d879e8b5bb1aa17d874d265d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Thu, 19 Jun 2025 19:51:43 +0200
+Subject: [PATCH] Limit number of additional records fetched
+
+Limit number of started fetches for additional zone instead of doing
+none. Keep limit of NS filled with additional records, but present at
+least some if possible.
+
+Might help broken implementations relying on receiving addresses in the
+response for NS query in authoritative zone.
+---
+ lib/dns/rdataset.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/lib/dns/rdataset.c b/lib/dns/rdataset.c
+index 532e49a..bfa8e37 100644
+--- a/lib/dns/rdataset.c
++++ b/lib/dns/rdataset.c
+@@ -581,6 +581,7 @@ dns_rdataset_additionaldata(dns_rdataset_t *rdataset,
+ 			    size_t limit) {
+ 	dns_rdata_t rdata = DNS_RDATA_INIT;
+ 	isc_result_t result;
++	size_t n = 0;
+ 
+ 	/*
+ 	 * For each rdata in rdataset, call 'add' for each name and type in the
+@@ -590,10 +591,6 @@ dns_rdataset_additionaldata(dns_rdataset_t *rdataset,
+ 	REQUIRE(DNS_RDATASET_VALID(rdataset));
+ 	REQUIRE((rdataset->attributes & DNS_RDATASETATTR_QUESTION) == 0);
+ 
+-	if (limit != 0 && dns_rdataset_count(rdataset) > limit) {
+-		return DNS_R_TOOMANYRECORDS;
+-	}
+-
+ 	result = dns_rdataset_first(rdataset);
+ 	if (result != ISC_R_SUCCESS) {
+ 		return result;
+@@ -603,7 +600,11 @@ dns_rdataset_additionaldata(dns_rdataset_t *rdataset,
+ 		dns_rdataset_current(rdataset, &rdata);
+ 		result = dns_rdata_additionaldata(&rdata, owner_name, add, arg);
+ 		if (result == ISC_R_SUCCESS) {
+-			result = dns_rdataset_next(rdataset);
++			if (limit != 0 && ++n >= limit) {
++				result = DNS_R_TOOMANYRECORDS;
++			} else {
++				result = dns_rdataset_next(rdataset);
++			}
+ 		}
+ 		dns_rdata_reset(&rdata);
+ 	} while (result == ISC_R_SUCCESS);
+-- 
+2.50.1
+

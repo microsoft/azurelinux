@@ -1,0 +1,16 @@
+diff -rupN --no-dereference postgresql-15.4/src/interfaces/libpq/Makefile postgresql-15.4-new/src/interfaces/libpq/Makefile
+--- postgresql-15.4/src/interfaces/libpq/Makefile	2023-08-16 23:05:03.402438519 +0200
++++ postgresql-15.4-new/src/interfaces/libpq/Makefile	2023-08-16 23:05:03.405438607 +0200
+@@ -83,10 +83,10 @@ SHLIB_LINK_INTERNAL = -lpgcommon_shlib -
+ ifneq ($(PORTNAME), win32)
+ SHLIB_LINK += $(filter -lcrypt -ldes -lcom_err -lcrypto -lk5crypto -lkrb5 -lgssapi_krb5 -lgss -lgssapi -lssl -lsocket -lnsl -lresolv -lintl -lm, $(LIBS)) $(LDAP_LIBS_FE) $(PTHREAD_LIBS)
+ else
+-SHLIB_LINK += $(filter -lcrypt -ldes -lcom_err -lcrypto -lk5crypto -lkrb5 -lgssapi32 -lssl -lsocket -lnsl -lresolv -lintl -lm $(PTHREAD_LIBS), $(LIBS)) $(LDAP_LIBS_FE)
++SHLIB_LINK += $(filter -lcrypt -ldes -lcom_err -lcrypto -lz lk5crypto -lkrb5 -lgssapi32 -lssl -lsocket -lnsl -lresolv -lintl -lm $(PTHREAD_LIBS), $(LIBS)) $(LDAP_LIBS_FE)
+ endif
+ ifeq ($(PORTNAME), win32)
+-SHLIB_LINK += -lshell32 -lws2_32 -lsecur32 $(filter -leay32 -lssleay32 -lcomerr32 -lkrb5_32, $(LIBS))
++SHLIB_LINK += -lshell32 -lws2_32 -lsecur32 -lpathcch -liconv $(filter -leay32 -lssleay32 -lcomerr32 -lkrb5_32, $(LIBS))
+ endif
+ SHLIB_PREREQS = submake-libpgport
+ 

@@ -1,0 +1,26 @@
+--- a/fontconfig/urw-nimbus-mono-ps.conf
++++ b/fontconfig/urw-nimbus-mono-ps.conf
+@@ -1,6 +1,22 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+ <fontconfig>
++<!-- Substitution with DejaVu Sans Mono. Nimbus Mono PS is not properly monospaced. -->
+++<match>
+++    <test name="family"><string>Nimbus Mono PS</string></test>
+++    <edit name="family"><string>DejaVu Sans Mono</string></edit>
+++</match>
++
+++<match>
+++    <test name="family"><string>Courier</string></test>
+++    <edit name="family"><string>DejaVu Sans Mono</string></edit>
+++</match>
++
+++<match>
+++    <test name="family"><string>Nimbus Mono L</string></test>
+++    <edit name="family"><string>DejaVu Sans Mono</string></edit>
+++</match>
++
+   <!-- Generic name aliasing -->
+   <alias>
+     <family>monospace</family>
+

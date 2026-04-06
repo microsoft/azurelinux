@@ -1,0 +1,60 @@
+diff -up xpdf-4.01/goo/gmem.cc.alloc xpdf-4.01/goo/gmem.cc
+--- xpdf-4.01/goo/gmem.cc.alloc	2019-02-18 13:24:19.000000000 -0500
++++ xpdf-4.01/goo/gmem.cc	2019-02-22 09:37:02.683498383 -0500
+@@ -84,8 +84,8 @@ static size_t gMaxMemInUse = 0;
+ #endif /* DEBUG_MEM */
+ 
+ #ifdef DEBUG_MEM
+-void *gmalloc(int size, int ignore) GMEM_EXCEP {
+-  int size1;
++void *gmalloc(size_t size, int ignore) GMEM_EXCEP {
++  size_t size1;
+   char *mem;
+   GMemHdr *hdr;
+   void *data;
+@@ -134,7 +134,7 @@ void *gmalloc(int size, int ignore) GMEM
+   return data;
+ }
+ #else
+-void *gmalloc(int size) GMEM_EXCEP {
++void *gmalloc(size_t size) GMEM_EXCEP {
+   void *p;
+ 
+   if (size < 0) {
+@@ -150,11 +150,11 @@ void *gmalloc(int size) GMEM_EXCEP {
+ }
+ #endif
+ 
+-void *grealloc(void *p, int size) GMEM_EXCEP {
++void *grealloc(void *p, size_t size) GMEM_EXCEP {
+ #ifdef DEBUG_MEM
+   GMemHdr *hdr;
+   void *q;
+-  int oldSize;
++  size_t oldSize;
+ 
+   if (size < 0) {
+     gMemError("Invalid memory allocation size");
+diff -up xpdf-4.01/goo/gmem.h.alloc xpdf-4.01/goo/gmem.h
+--- xpdf-4.01/goo/gmem.h.alloc	2019-02-18 13:24:19.000000000 -0500
++++ xpdf-4.01/goo/gmem.h	2019-02-22 09:37:02.683498383 -0500
+@@ -37,16 +37,16 @@ extern "C" {
+  * returns NULL.
+  */
+ #ifdef DEBUG_MEM
+-extern void *gmalloc(int size, int ignore = 0) GMEM_EXCEP;
++extern void *gmalloc(size_t size, int ignore = 0) GMEM_EXCEP;
+ #else
+-extern void *gmalloc(int size) GMEM_EXCEP;
++extern void *gmalloc(size_t size) GMEM_EXCEP;
+ #endif
+ 
+ /*
+  * Same as realloc, but prints error message and exits if realloc()
+  * returns NULL.  If <p> is NULL, calls malloc instead of realloc().
+  */
+-extern void *grealloc(void *p, int size) GMEM_EXCEP;
++extern void *grealloc(void *p, size_t size) GMEM_EXCEP;
+ 
+ /*
+  * These are similar to gmalloc and grealloc, but take an object count

@@ -1,0 +1,23 @@
+diff -up qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/main.cpp.libnm qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/main.cpp
+--- qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/main.cpp.libnm	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/main.cpp	2018-07-21 20:32:28.267494349 -0500
+@@ -41,7 +41,7 @@
+ #if defined(QT_NO_DBUS)
+ sjkp //error is no QtDBus
+ #endif
+-#include <NetworkManager/NetworkManager.h>
++#include <NetworkManager.h>
+ 
+ int main(int argc, char** argv)
+ {
+diff -up qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/networkmanager.pro.libnm qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/networkmanager.pro
+--- qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/networkmanager.pro.libnm	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/config.tests/networkmanager/networkmanager.pro	2018-07-21 20:32:13.362392782 -0500
+@@ -12,3 +12,7 @@ SOURCES += main.cpp
+ !contains(QT_CONFIG,dbus): {
+     DEFINES += QT_NO_DBUS
+ }
++
++CONFIG += link_pkgconfig
++
++PKGCONFIG += libnm 

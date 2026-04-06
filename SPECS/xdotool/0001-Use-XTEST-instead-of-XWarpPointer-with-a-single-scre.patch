@@ -1,0 +1,50 @@
+From 89731d7eeb1515ebb217a59b8ca1c271e29ea0c5 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Mon, 7 Aug 2023 10:20:08 +0200
+Subject: [PATCH] Use XTEST instead of XWarpPointer with a single screen
+
+xdotool uses the XTEST extension for pretty much all input events
+emulation except for mousemove.
+
+For mousemove, it uses XWarpPointer() instead, to work around an old bug
+from 2009 that would ignore the screen number in Zaphod mode.
+
+Unfortunately, that prevents mousemove to work in Xwayland with libEI
+because Xwayland wires XTEST to libEI, whereas xdotool uses the core
+protocol for that command alone.
+
+Zaphod mode is nowadays somehow deprecated, GNOME and GTK have dropped
+support for it and Xwayland supports only one X11 screen (not to be
+confused with multi-monitors), so this workaround in xdotool actually
+causes more harm that good in most current cases nowadays.
+
+So, to preserve compatibility with Zaphod mode while being compatible
+with modern windowing systems, this fix limits the workaround that uses
+XWarpPointer() for when there is more than one screen, and uses the
+XTEST extension otherwise.
+---
+ xdo.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/xdo.c b/xdo.c
+index ffb0333..8cda05c 100644
+--- a/xdo.c
++++ b/xdo.c
+@@ -804,8 +804,12 @@ int xdo_move_mouse(const xdo_t *xdo, int x, int y, int screen)  {
+    * seem to recommend XWarpPointer instead, ie;
+    * https://bugzilla.redhat.com/show_bug.cgi?id=518803
+    */
+-  Window screen_root = RootWindow(xdo->xdpy, screen);
+-  ret = XWarpPointer(xdo->xdpy, None, screen_root, 0, 0, 0, 0, x, y);
++  if (screen > 0) {
++    Window screen_root = RootWindow(xdo->xdpy, screen);
++    ret = XWarpPointer(xdo->xdpy, None, screen_root, 0, 0, 0, 0, x, y);
++  } else {
++    ret = XTestFakeMotionEvent(xdo->xdpy, 0, x, y, CurrentTime);
++  }
+   XFlush(xdo->xdpy);
+   return _is_success("XWarpPointer", ret == 0, xdo);
+ }
+-- 
+2.41.0
+

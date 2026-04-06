@@ -1,0 +1,23 @@
+Fixes this USBAN error:
+
+../src/sort.d:42:18: runtime error: applying non-zero offset 18446744073709551584 to null pointer
+
+--- src/sort.d.orig	2024-12-28 00:47:59.000000000 -0700
++++ src/sort.d	2025-02-10 09:33:00.121016044 -0700
+@@ -39,7 +39,7 @@
+ /* sort(v,n); sorts the array v[0]..v[n-1] in ascending order. */
+ local void SORT(SORTID,sort) (SORT_ELEMENT* v, uintL n)
+ {
+-  var SORT_ELEMENT* w = &v[-1];
++  var SORT_ELEMENT* w;
+   /* w[1]..w[n] point to the same elements as v[0]..v[n-1] .
+      We collect the numbers 1,...,n to a balanced binary subtree,
+      so that k has the children 2*k and 2*k+1.
+@@ -70,6 +70,7 @@ local void SORT(SORTID,sort) (SORT_ELEME
+   }
+   if (n<=1) /* nothing to do? */
+     return;
++  w = &v[-1];
+   { /* Because of 2*(floor(n/2)+1) > n,
+        w[floor(n/2)+1]..w[n] is already sorted. */
+     var uintL r;

@@ -1,0 +1,77 @@
+From 89d2bacc8b67eca8decae7b7508080582fc2c60d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 29 Aug 2024 12:23:30 +0100
+Subject: [PATCH 200/203] Enable pointing sgxssl build to alternative glibc
+ headers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The enclave must be built with headers from a specific glibc version
+for the sake of reproducibility. It does not actually link to glibc,
+merely requiring a few self contained definitions.
+
+The ENCLAVE_SYSTEM_INCLUDES make var can be set from RPM builds.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ Linux/build_openssl.sh | 8 +++++++-
+ Linux/sgx/Makefile     | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
+index 0a99917..4e4a81e 100755
+--- a/Linux/build_openssl.sh
++++ b/Linux/build_openssl.sh
+@@ -89,6 +89,7 @@ fi
+ # Mitigation flags
+ MITIGATION_OPT=""
+ MITIGATION_FLAGS=""
++ENCLAVE_CFLAGS=""
+ CC_VERSION=`gcc -dumpversion`
+ CC_VERSION_MAJOR=`echo "$CC_VERSION" | cut -f1 -d.`
+ for arg in "$@"
+@@ -129,6 +130,10 @@ do
+         MITIGATION_FLAGS+=" $arg"
+         shift
+         ;;
++    -isystem*)
++	ENCLAVE_CFLAGS+=" $arg"
++	shift
++	;;
+     *)
+         # Unknown option
+         shift
+@@ -137,6 +142,7 @@ do
+ done
+ echo $MITIGATION_OPT
+ echo $MITIGATION_FLAGS
++echo $ENCLAVE_CFLAGS
+ echo $SPACE_OPT 
+ 
+ sed -i -- 's/OPENSSL_issetugid/OPENSSLd_issetugid/g' $OPENSSL_VERSION/crypto/uid.c || exit 1
+@@ -145,7 +151,7 @@ cp sgx_config.conf $OPENSSL_VERSION/ || exit 1
+ cp x86_64-xlate.pl $OPENSSL_VERSION/crypto/perlasm/ || exit 1
+ 
+ cd $SGXSSL_ROOT/../openssl_source/$OPENSSL_VERSION || exit 1
+-perl Configure --config=sgx_config.conf sgx-linux-x86_64 --with-rand-seed=none $ADDITIONAL_CONF $SPACE_OPT $MITIGATION_FLAGS no-idea no-mdc2 no-rc5 no-rc4 no-bf no-ec2m no-camellia no-cast no-srp no-async no-padlockeng no-dso no-shared no-ssl3 no-md2 no-md4 no-ui-console no-stdio no-afalgeng -D_FORTIFY_SOURCE=2 -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_POSIX_IO -include$SGXSSL_ROOT/../openssl_source/bypass_to_sgxssl.h || exit 1
++perl Configure --config=sgx_config.conf sgx-linux-x86_64 --with-rand-seed=none $ADDITIONAL_CONF $SPACE_OPT $MITIGATION_FLAGS $ENCLAVE_CFLAGS no-idea no-mdc2 no-rc5 no-rc4 no-bf no-ec2m no-camellia no-cast no-srp no-async no-padlockeng no-dso no-shared no-ssl3 no-md2 no-md4 no-ui-console no-stdio no-afalgeng -D_FORTIFY_SOURCE=2 -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_POSIX_IO -include$SGXSSL_ROOT/../openssl_source/bypass_to_sgxssl.h || exit 1
+ 
+ sed -i 's/ENGINE_set_default_RAND/dummy_ENGINE_set_default_RAND/' crypto/engine/tb_rand.c || exit 1
+ sed -i 's/return RUN_ONCE(&locale_base, ossl_init_locale_base);/return 1;/' crypto/ctype.c || exit 1
+diff --git a/Linux/sgx/Makefile b/Linux/sgx/Makefile
+index e4f3f92..ec1a0c3 100644
+--- a/Linux/sgx/Makefile
++++ b/Linux/sgx/Makefile
+@@ -85,7 +85,7 @@ endif
+ endif
+ 
+ $(PACKAGE_LIB)/$(OPENSSL_LIB):
+-	test -f $(PACKAGE_LIB)/$(OPENSSL_LIB) || $(BUILD_OPENSSL) $(OPENSSL_CONFIG) $(MITIGATION-CVE-2020-0551) $(MITIGATION_CFLAGS)
++	test -f $(PACKAGE_LIB)/$(OPENSSL_LIB) || $(BUILD_OPENSSL) $(OPENSSL_CONFIG) $(MITIGATION-CVE-2020-0551) $(MITIGATION_CFLAGS) $(ENCLAVE_SYSTEM_INCLUDES)
+ 
+ clean:	
+ 	$(MAKE) -C $(TRUSTED_LIB_DIR) clean
+-- 
+2.49.0
+

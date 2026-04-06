@@ -1,0 +1,25 @@
+From e0641952e15e81afd101652240828d30d7ee6726 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 2 Jul 2024 14:24:40 +0200
+Subject: [PATCH] drop is_terminal_polyfill and replace with
+ std::io::IsTerminal
+
+---
+ src/stream.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/stream.rs b/src/stream.rs
+index b30d232..e8472c1 100644
+--- a/src/stream.rs
++++ b/src/stream.rs
+@@ -1,5 +1,7 @@
+ //! Higher-level traits to describe writeable streams
+ 
++use std::io as is_terminal_polyfill;
++
+ /// Required functionality for underlying [`std::io::Write`] for adaptation
+ #[cfg(not(all(windows, feature = "wincon")))]
+ pub trait RawStream: std::io::Write + IsTerminal + private::Sealed {}
+-- 
+2.45.2
+

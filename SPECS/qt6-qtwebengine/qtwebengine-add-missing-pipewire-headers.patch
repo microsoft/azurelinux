@@ -1,0 +1,57 @@
+diff --git a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/pipewire_session.h b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/pipewire_session.h
+index 84273ea695..825bb0000a 100644
+--- a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/pipewire_session.h
++++ b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/pipewire_session.h
+@@ -11,8 +11,10 @@
+ #ifndef MODULES_VIDEO_CAPTURE_LINUX_PIPEWIRE_SESSION_H_
+ #define MODULES_VIDEO_CAPTURE_LINUX_PIPEWIRE_SESSION_H_
+ 
+-#include <pipewire/core.h>
+ #include <pipewire/pipewire.h>
++#include <spa/pod/pod.h>
++#include <spa/utils/dict.h>
++#include <spa/utils/hook.h>
+ 
+ #include <deque>
+ #include <string>
+diff --git a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.cc b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.cc
+index f6cd57ac36..b9c579d2e3 100644
+--- a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.cc
++++ b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.cc
+@@ -10,10 +10,21 @@
+ 
+ #include "modules/video_capture/linux/video_capture_pipewire.h"
+ 
++#include <pipewire/pipewire.h>
++#include <spa/buffer/buffer.h>
++#include <spa/buffer/meta.h>
++#include <spa/param/format-utils.h>
+ #include <spa/param/format.h>
++#include <spa/param/param.h>
+ #include <spa/param/video/format-utils.h>
++#include <spa/param/video/raw.h>
+ #include <spa/pod/builder.h>
++#include <spa/pod/iter.h>
++#include <spa/pod/vararg.h>
++#include <spa/utils/defs.h>
+ #include <spa/utils/result.h>
++#include <spa/utils/type.h>
++#include <sys/mman.h>
+ 
+ #include <vector>
+ 
+diff --git a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.h b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.h
+index 789f2034d3..7c1f9390fc 100644
+--- a/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.h
++++ b/src/3rdparty/chromium/third_party/webrtc/modules/video_capture/linux/video_capture_pipewire.h
+@@ -11,6 +11,10 @@
+ #ifndef MODULES_VIDEO_CAPTURE_LINUX_VIDEO_CAPTURE_PIPEWIRE_H_
+ #define MODULES_VIDEO_CAPTURE_LINUX_VIDEO_CAPTURE_PIPEWIRE_H_
+ 
++#include <pipewire/pipewire.h>
++#include <spa/pod/pod.h>
++#include <spa/utils/hook.h>
++
+ #include "modules/video_capture/linux/pipewire_session.h"
+ #include "modules/video_capture/video_capture_defines.h"
+ #include "modules/video_capture/video_capture_impl.h"

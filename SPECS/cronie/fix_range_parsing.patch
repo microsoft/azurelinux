@@ -1,0 +1,26 @@
+From d037042129eacdd9d7760d74437842ee5a2d116e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Poho=C5=99elsk=C3=BD?= <opohorel@redhat.com>
+Date: Tue, 11 Mar 2025 15:12:38 +0100
+Subject: [PATCH] get_range() fix range parsing for Sunday as 0 or 7
+
+In fc8b0e5, we changed how the ranges are parsed. This created a
+regression for parsing Sunday at the end of the range. This commit adds
+the logic to correctly handle Sunday as the end of the range.
+---
+ src/entry.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/entry.c b/src/entry.c
+index a2077e8..30bedb3 100644
+--- a/src/entry.c
++++ b/src/entry.c
+@@ -642,6 +642,9 @@ get_range(bitstr_t * bits, int low, int high, const char *names[],
+ 					state = R_FINISH;
+ 					break;
+ 				}
++				if (low_ > high_ && high_ == 0) {
++					high_ = 7;
++				}
+ 				return (EOF);
+ 
+ 			case R_RANDOM:

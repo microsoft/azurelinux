@@ -1,0 +1,38 @@
+From 49908db4943c3718a90b3d5f90b8f4aa622bc358 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sat, 18 Jan 2025 12:09:11 +0100
+Subject: [PATCH 1/4] src/daemon: remove obvious use of unitialized data
+
+Previously the code would pseudorandomly omit the error message.
+Emit it always.
+---
+ src/daemon/open_console.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/daemon/open_console.c b/src/daemon/open_console.c
+index 6dd43e60c7..c84f7c6988 100644
+--- a/src/daemon/open_console.c
++++ b/src/daemon/open_console.c
+@@ -42,7 +42,7 @@ int open_console(const int mode)
+    int                  maj;
+    int                  twelve = 12;
+    struct serial_struct si;
+-   struct stat          sb;
++   struct stat          sb = {};
+ 
+    fd = open(option.consolename, mode);
+    if (fd != -1) {
+@@ -50,9 +50,7 @@ int open_console(const int mode)
+       maj = major(sb.st_rdev);
+       if (maj != 4 && (maj < 136 || maj > 143)) {
+           if (ioctl(fd, TIOCLINUX, &twelve) < 0) {
+-              if (si.line > 0) {
+-                  gpm_report(GPM_PR_OOPS,GPM_MESS_OPEN_SERIALCON);
+-               }
++               gpm_report(GPM_PR_OOPS,GPM_MESS_OPEN_SERIALCON);
+           }
+       }
+    } else
+-- 
+2.47.1
+

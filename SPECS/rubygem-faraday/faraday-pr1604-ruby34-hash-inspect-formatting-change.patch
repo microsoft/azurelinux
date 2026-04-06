@@ -1,0 +1,30 @@
+From 74962b2d77af4a1ca6bc557031e6c24759dbafa7 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Tue, 3 Dec 2024 15:48:12 +0900
+Subject: [PATCH] [TEST] fix compatibility with ruby 3.4.0dev
+
+ruby 3.4 changes Hash#inspect formatting as:
+https://bugs.ruby-lang.org/issues/20433
+
+Closes #1602
+---
+ spec/faraday/error_spec.rb | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/spec/faraday/error_spec.rb b/spec/faraday/error_spec.rb
+index fd30e2d34..170f32672 100644
+--- a/spec/faraday/error_spec.rb
++++ b/spec/faraday/error_spec.rb
+@@ -21,7 +21,11 @@
+       it { expect(subject.wrapped_exception).to be_nil }
+       it { expect(subject.response).to eq(exception) }
+       it { expect(subject.message).to eq('the server responded with status 400') }
+-      it { expect(subject.inspect).to eq('#<Faraday::ClientError response={:status=>400}>') }
++      if RUBY_VERSION >= '3.4'
++        it { expect(subject.inspect).to eq('#<Faraday::ClientError response={status: 400}>') }
++      else
++        it { expect(subject.inspect).to eq('#<Faraday::ClientError response={:status=>400}>') }
++      end
+     end
+ 
+     context 'with string' do

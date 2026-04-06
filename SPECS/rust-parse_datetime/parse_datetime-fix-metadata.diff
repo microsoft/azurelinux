@@ -1,0 +1,10 @@
+--- parse_datetime-0.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ parse_datetime-0.6.0/Cargo.toml	2024-08-01T01:10:24.076185+00:00
+@@ -17,6 +17,7 @@
+ readme = "README.md"
+ license = "MIT"
+ repository = "https://github.com/uutils/parse_datetime"
++exclude = ["renovate.json"]
+ 
+ [dependencies.chrono]
+ version = "0.4"

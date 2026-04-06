@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Qt3 Linguist 
+Comment=Add translations to Qt3 applications
+Exec=linguist
+Icon=linguist3
+MimeType=application/x-linguist;
+Terminal=false
+Type=Application
+Categories=Qt;Development;

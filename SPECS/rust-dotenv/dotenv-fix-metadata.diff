@@ -1,0 +1,23 @@
+--- dotenv-0.15.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ dotenv-0.15.0/Cargo.toml	2024-09-13T21:33:47.581153+00:00
+@@ -17,19 +17,10 @@
+ authors = ["Noemi Lapresta <noemi.lapresta@gmail.com>", "Craig Hills <chills@gmail.com>", "Mike Piccolo <mfpiccolo@gmail.com>", "Alice Maz <alice@alicemaz.com>", "Sean Griffin <sean@seantheprogrammer.com>", "Adam Sharp <adam@sharplet.me>", "Arpad Borsos <arpad.borsos@googlemail.com>"]
+ description = "A `dotenv` implementation for Rust"
+ homepage = "https://github.com/dotenv-rs/dotenv"
+-readme = "../README.md"
+ keywords = ["environment", "env", "dotenv", "settings", "config"]
+ license = "MIT"
+ repository = "https://github.com/dotenv-rs/dotenv"
++autobins = false
+ 
+-[[bin]]
+-name = "dotenv"
+-required-features = ["cli"]
+-[dependencies.clap]
+-version = "2"
+-optional = true
+ [dev-dependencies.tempfile]
+ version = "3.0.0"
+-
+-[features]
+-cli = ["clap"]

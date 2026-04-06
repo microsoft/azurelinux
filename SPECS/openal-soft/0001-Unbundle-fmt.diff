@@ -1,0 +1,138 @@
+# This patch is used to unbundle fmt by fetching the system-wide
+# fmt with cmake.
+
+diff -up a/CMakeLists.txt.orig b/CMakeLists.txt
+--- a/CMakeLists.txt.orig	2025-01-11 08:17:23.000000000 +0100
++++ b/CMakeLists.txt	2025-01-30 19:50:31.691247492 +0100
+@@ -100,7 +100,10 @@ include(GNUInstallDirs)
+ find_package(PkgConfig)
+ find_package(SDL3 QUIET)
+ 
+-add_subdirectory(fmt-11.1.1 EXCLUDE_FROM_ALL)
++find_package(fmt REQUIRED)
++if (NOT fmt_FOUND)
++    message(FATAL_ERROR "fmt not found. Please install fmt or ensure it's in your CMake module path.")
++endif()
+ 
+ option(ALSOFT_DLOPEN  "Check for the dlopen API for loading optional libs"  ON)
+ 
+@@ -1375,7 +1378,7 @@ target_include_directories(alsoft.common
+     PUBLIC ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/common)
+ target_compile_definitions(alsoft.common PRIVATE ${CPP_DEFS})
+ target_compile_options(alsoft.common PRIVATE ${C_FLAGS})
+-target_link_libraries(alsoft.common PRIVATE alsoft::fmt)
++target_link_libraries(alsoft.common PRIVATE fmt::fmt)
+ set_target_properties(alsoft.common PROPERTIES ${ALSOFT_STD_VERSION_PROPS}
+     POSITION_INDEPENDENT_CODE TRUE)
+ 
+@@ -1404,7 +1407,7 @@ if(LIBTYPE STREQUAL "STATIC")
+     add_library(${IMPL_TARGET} STATIC ${COMMON_OBJS} ${OPENAL_OBJS} ${ALC_OBJS} ${CORE_OBJS})
+     target_compile_definitions(${IMPL_TARGET} PUBLIC AL_LIBTYPE_STATIC)
+     target_link_libraries(${IMPL_TARGET} PRIVATE ${LINKER_FLAGS} ${EXTRA_LIBS} ${MATH_LIB}
+-        $<BUILD_LOCAL_INTERFACE:alsoft::fmt>)
++        $<BUILD_LOCAL_INTERFACE:fmt::fmt>)
+ 
+     if(WIN32)
+         # This option is for static linking OpenAL Soft into another project
+@@ -1429,7 +1432,7 @@ else()
+             PRIVATE AL_BUILD_LIBRARY AL_ALEXT_PROTOTYPES "ALC_API=${EXPORT_DECL}"
+             "AL_API=${EXPORT_DECL}" ${CPP_DEFS})
+         target_compile_options(OpenAL PRIVATE ${C_FLAGS})
+-        target_link_libraries(OpenAL PRIVATE alsoft.common ${LINKER_FLAGS} alsoft::fmt)
++        target_link_libraries(OpenAL PRIVATE alsoft.common ${LINKER_FLAGS} fmt::fmt)
+         target_include_directories(OpenAL
+           PUBLIC
+             $<BUILD_INTERFACE:${OpenAL_SOURCE_DIR}/include>
+@@ -1461,7 +1464,7 @@ else()
+         set_target_properties(${IMPL_TARGET} PROPERTIES PREFIX "")
+     endif()
+     target_link_libraries(${IMPL_TARGET} PRIVATE alsoft.common ${LINKER_FLAGS} ${EXTRA_LIBS}
+-        ${MATH_LIB} alsoft::fmt)
++        ${MATH_LIB} fmt::fmt)
+ 
+     if(ALSOFT_UWP)
+         find_package(cppwinrt CONFIG)
+@@ -1688,7 +1691,7 @@ if(ALSOFT_UTILS)
+             PRIVATE ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/common)
+         target_compile_options(uhjdecoder PRIVATE ${C_FLAGS})
+         target_link_libraries(uhjdecoder PUBLIC alsoft.common
+-            PRIVATE ${LINKER_FLAGS} SndFile::SndFile ${UNICODE_FLAG} alsoft::fmt)
++            PRIVATE ${LINKER_FLAGS} SndFile::SndFile ${UNICODE_FLAG} fmt::fmt)
+         set_target_properties(uhjdecoder PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+         add_executable(uhjencoder utils/uhjencoder.cpp)
+@@ -1697,7 +1700,7 @@ if(ALSOFT_UTILS)
+             PRIVATE ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/common)
+         target_compile_options(uhjencoder PRIVATE ${C_FLAGS})
+         target_link_libraries(uhjencoder PUBLIC alsoft.common
+-            PRIVATE ${LINKER_FLAGS} SndFile::SndFile ${UNICODE_FLAG} alsoft::fmt)
++            PRIVATE ${LINKER_FLAGS} SndFile::SndFile ${UNICODE_FLAG} fmt::fmt)
+         set_target_properties(uhjencoder PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+     endif()
+ 
+@@ -1710,7 +1713,7 @@ if(ALSOFT_UTILS)
+         target_include_directories(alsoft.sofa-support PUBLIC ${OpenAL_SOURCE_DIR}/common)
+         target_compile_options(alsoft.sofa-support PRIVATE ${C_FLAGS})
+         target_link_libraries(alsoft.sofa-support PUBLIC alsoft.common MySOFA::MySOFA
+-            PRIVATE ${LINKER_FLAGS} alsoft::fmt)
++            PRIVATE ${LINKER_FLAGS} fmt::fmt)
+         set_target_properties(alsoft.sofa-support PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+         set(MAKEMHR_SRCS
+@@ -1726,7 +1729,7 @@ if(ALSOFT_UTILS)
+             PRIVATE ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/utils)
+         target_compile_options(makemhr PRIVATE ${C_FLAGS})
+         target_link_libraries(makemhr PRIVATE ${LINKER_FLAGS} alsoft.sofa-support ${UNICODE_FLAG}
+-            alsoft::fmt)
++            fmt::fmt)
+         set_target_properties(makemhr PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+         if(ALSOFT_INSTALL_EXAMPLES)
+             set(EXTRA_INSTALLS ${EXTRA_INSTALLS} makemhr)
+@@ -1738,7 +1741,7 @@ if(ALSOFT_UTILS)
+         target_include_directories(sofa-info PRIVATE ${OpenAL_SOURCE_DIR}/utils)
+         target_compile_options(sofa-info PRIVATE ${C_FLAGS})
+         target_link_libraries(sofa-info PRIVATE ${LINKER_FLAGS} alsoft.sofa-support
+-            ${UNICODE_FLAG} alsoft::fmt)
++            ${UNICODE_FLAG} fmt::fmt)
+         set_target_properties(sofa-info PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+     endif()
+     message(STATUS "Building utility programs")
+@@ -1772,12 +1775,12 @@ if(ALSOFT_EXAMPLES)
+ 
+     add_executable(aldebug examples/aldebug.cpp)
+     target_link_libraries(aldebug PRIVATE ${LINKER_FLAGS} alsoft.excommon ${UNICODE_FLAG}
+-        alsoft::fmt)
++        fmt::fmt)
+     set_target_properties(aldebug PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+     add_executable(allafplay examples/allafplay.cpp)
+     target_link_libraries(allafplay PRIVATE ${LINKER_FLAGS} alsoft.common alsoft.excommon
+-        ${UNICODE_FLAG} alsoft::fmt)
++        ${UNICODE_FLAG} fmt::fmt)
+     set_target_properties(allafplay PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+     if(ALSOFT_INSTALL_EXAMPLES)
+@@ -1819,12 +1822,12 @@ if(ALSOFT_EXAMPLES)
+ 
+         add_executable(alstreamcb examples/alstreamcb.cpp)
+         target_link_libraries(alstreamcb PRIVATE ${LINKER_FLAGS} SndFile::SndFile alsoft.excommon
+-            ${UNICODE_FLAG} alsoft::fmt)
++            ${UNICODE_FLAG} fmt::fmt)
+         set_target_properties(alstreamcb PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+         add_executable(aldirect examples/aldirect.cpp)
+         target_link_libraries(aldirect PRIVATE ${LINKER_FLAGS} SndFile::SndFile alsoft.excommon
+-            ${UNICODE_FLAG} alsoft::fmt)
++            ${UNICODE_FLAG} fmt::fmt)
+         set_target_properties(aldirect PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+         add_executable(alconvolve examples/alconvolve.c)
+@@ -1881,7 +1884,7 @@ if(ALSOFT_EXAMPLES)
+             add_executable(alffplay examples/alffplay.cpp)
+             target_include_directories(alffplay PRIVATE ${FFMPEG_INCLUDE_DIRS})
+             target_link_libraries(alffplay
+-                PRIVATE ${LINKER_FLAGS} SDL3::SDL3 ${FFMPEG_LIBRARIES} alsoft.excommon alsoft::fmt)
++                PRIVATE ${LINKER_FLAGS} SDL3::SDL3 ${FFMPEG_LIBRARIES} alsoft.excommon fmt::fmt)
+             set_target_properties(alffplay PROPERTIES ${ALSOFT_STD_VERSION_PROPS})
+ 
+             if(ALSOFT_INSTALL_EXAMPLES)

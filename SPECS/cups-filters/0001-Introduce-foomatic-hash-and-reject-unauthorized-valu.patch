@@ -1,0 +1,1485 @@
+From 41c5f2f6139e4d3693c2483ee4281202a80ae451 Mon Sep 17 00:00:00 2001
+From: zdohnal <zdohnal@redhat.com>
+Date: Tue, 22 Jul 2025 15:12:19 +0200
+Subject: [PATCH] Introduce foomatic-hash and reject unauthorized values in
+ foomatic-rip (#648)
+
+The change provides a way for users to have control over what values are
+allowed for the foomatic-rip-related PPD keywords FoomaticRIPCommandLine,
+FoomaticRIPCommandLinePDF, and FoomaticRIPOptionSetting. Since the
+values can be later used when constructing a shell command, the filter
+foomatic-rip was a target of several exploits (caused by issues at
+different places in CUPS or in different projects of the printing stack) to
+do arbitrary code execution when the filter is used.
+
+By default the filter is run by user lp, so the issue is mitigated, but
+this PR gives admin complete control over what can be run in
+foomatic-rip and reject anything injected into system via different
+ways.
+
+First, the new tool - foomatic-hash - can be called on a PPD file or
+directory with drivers/PPDs, with scan output and file with hexadecimal
+representation of hashed values. Once the scan output is reviewed by
+admin, admin can decide to put the resulting hashes into
+/etc/foomatic/hashes.d and allow them for the filter.
+---
+ Makefile.am                           |  44 ++-
+ README.md                             |  23 ++
+ configure.ac                          |   2 +-
+ filter/foomatic-rip/foomatic-hash.1   |  66 ++++
+ filter/foomatic-rip/foomatic-hash.c   | 549 ++++++++++++++++++++++++++
+ filter/foomatic-rip/foomatic-rip.1.in |  16 +
+ filter/foomatic-rip/foomaticrip.c     |  75 ----
+ filter/foomatic-rip/foomaticrip.h     |  40 --
+ filter/foomatic-rip/options.c         |  67 ++++
+ filter/foomatic-rip/process.c         |   9 +
+ filter/foomatic-rip/process.h         |   3 +
+ filter/foomatic-rip/util.c            | 341 +++++++++++++++-
+ filter/foomatic-rip/util.h            |  67 ++++
+ 13 files changed, 1178 insertions(+), 124 deletions(-)
+ create mode 100644 filter/foomatic-rip/foomatic-hash.1
+ create mode 100644 filter/foomatic-rip/foomatic-hash.c
+
+diff --git a/Makefile.am b/Makefile.am
+index f4ff7a1a3..fff4d06f7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -188,6 +188,8 @@ endif
+ if ENABLE_FOOMATIC
+ pkgfilter_PROGRAMS += \
+ 	foomatic-rip
++bin_PROGRAMS = \
++	foomatic-hash
+ endif
+ if ENABLE_UNIVERSAL_CUPS_FILTER
+ pkgfilter_PROGRAMS += \
+@@ -278,6 +280,19 @@ commandtopclx_LDADD = \
+ 	$(LIBPPD_LIBS) \
+ 	$(CUPS_LIBS)
+ 
++noinst_LTLIBRARIES = libfoomatic-util.la
++libfoomatic_util_la_SOURCES = \
++	filter/foomatic-rip/util.c \
++	filter/foomatic-rip/util.h \
++	filter/foomatic-rip/process.c \
++	filter/foomatic-rip/process.h
++libfoomatic_util_la_CFLAGS = \
++	-DSYS_HASH_PATH='"$(datadir)/foomatic/hashes.d"' \
++	-DUSR_HASH_PATH='"$(sysconfdir)/foomatic/hashes.d"' \
++	$(CUPS_CFLAGS)
++libfoomatic_util_la_LIBADD = \
++	$(CUPS_LIBS)
++
+ foomatic_rip_SOURCES = \
+ 	filter/foomatic-rip/foomaticrip.c \
+ 	filter/foomatic-rip/foomaticrip.h \
+@@ -287,24 +302,34 @@ foomatic_rip_SOURCES = \
+ 	filter/foomatic-rip/pdf.h \
+ 	filter/foomatic-rip/postscript.c \
+ 	filter/foomatic-rip/postscript.h \
+-	filter/foomatic-rip/process.c \
+-	filter/foomatic-rip/process.h \
+ 	filter/foomatic-rip/renderer.c \
+ 	filter/foomatic-rip/renderer.h \
+ 	filter/foomatic-rip/spooler.c \
+-	filter/foomatic-rip/spooler.h \
+-	filter/foomatic-rip/util.c \
+-	filter/foomatic-rip/util.h
++	filter/foomatic-rip/spooler.h
+ foomatic_rip_CFLAGS = \
+ 	-DCONFIG_PATH='"$(sysconfdir)/foomatic"' \
+ 	$(CUPS_CFLAGS) \
+ 	$(LIBCUPSFILTERS_CFLAGS) \
+-	$(LIBPPD_CFLAGS)
++	$(LIBPPD_CFLAGS) \
++	-I/$(srcdir)/filter/foomatic-rip/
+ foomatic_rip_LDADD = \
+ 	$(CUPS_LIBS) \
+ 	-lm \
+ 	$(LIBCUPSFILTERS_LIBS) \
+-	$(LIBPPD_LIBS)
++	$(LIBPPD_LIBS) \
++	libfoomatic-util.la
++
++foomatic_hash_SOURCES = \
++	filter/foomatic-rip/foomatic-hash.c
++foomatic_hash_CFLAGS = \
++	$(CUPS_CFLAGS) \
++	$(LIBPPD_CFLAGS) \
++	-I/$(srcdir)/filter/foomatic-rip/
++foomatic_hash_LDADD = \
++	$(CUPS_LIBS) \
++	-lm \
++	$(LIBPPD_LIBS) \
++	libfoomatic-util.la
+ 
+ gstoraster_SOURCES = \
+ 	filter/gstoraster.c
+@@ -576,6 +601,7 @@ man_MANS += $(driverlessmanpages)
+ endif
+ 
+ foomaticmanpages = \
++	filter/foomatic-rip/foomatic-hash.1 \
+ 	filter/foomatic-rip/foomatic-rip.1
+ if ENABLE_FOOMATIC
+ man_MANS += $(foomaticmanpages)
+@@ -615,6 +641,8 @@ install-exec-hook:
+ 	$(INSTALL) -d -m 755 $(DESTDIR)$(pkgbackenddir)
+ if ENABLE_FOOMATIC
+ 	$(LN_SRF) $(DESTDIR)$(pkgfilterdir)/foomatic-rip $(DESTDIR)$(bindir)
++	$(INSTALL) -d -m 755 $(DESTDIR)$(datadir)/foomatic/hashes.d
++	$(INSTALL) -d -m 755 $(DESTDIR)$(sysconfdir)/foomatic/hashes.d
+ endif
+ if ENABLE_DRIVERLESS
+ 	$(LN_SRF) $(DESTDIR)$(pkgppdgendir)/driverless $(DESTDIR)$(bindir)
+@@ -626,6 +654,8 @@ endif
+ uninstall-hook:
+ if ENABLE_FOOMATIC
+ 	$(RM) $(DESTDIR)$(bindir)/foomatic-rip
++	$(RMDIR) $(DESTDIR)$(datadir)/foomatic/hashes.d
++	$(RMDIR) $(DESTDIR)$(sysconfdir)/foomatic/hashes.d
+ endif
+ if ENABLE_DRIVERLESS
+ 	$(RM) $(DESTDIR)$(bindir)/driverless
+diff --git a/README.md b/README.md
+index 10e66aee5..ce521bcb0 100644
+--- a/README.md
++++ b/README.md
+@@ -263,6 +263,29 @@ this filter are the same as for texttopdf (see below) as the texttops
+ filter calls the texttopdf filter plus Ghostscript's pdf2ps.
+ 
+ 
++### Tool FOOMATIC-HASH and allowing values for foomatic-rip filter
++
++Several CVEs for printing stack exploited a different security issue
++to craft a PPD which would call the filter foomatic-rip, and provided
++malicious values for PPD options FoomaticRIPCommandLine, FoomaticRIPCommandLinePDF,
++and FoomaticRIPOptionSetting, because the filter constructs a command
++out of the values and runs it in shell under user lp.
++
++To mitigate the issue, foomatic-rip now allows only values which are allowed
++by admin, and the tool foomatic-hash was invented. The tool scans PPD file or
++a path for drivers with affected values, and generates two files - the first
++with found values for admin to review, and the second with hashes of unique
++values present in the scanned file or path. If admin reviews the found values
++and finds them correct, the found values will be allowed once the file with
++hashes is moved into the directory /etc/foomatic/hashes.d.
++
++The filter foomatic-rip reads files with allowed hashes from two directories -
++/etc/foomatic/hashes.d and /usr/share/foomatic/hashes.d. The former is meant
++for hashes allowed by the local admin, the latter is for printer driver projects
++to put there files with hashes of values which are present in their project
++after the values are reviewed.
++
++
+ ### Filters
+ 
+ 
+diff --git a/configure.ac b/configure.ac
+index 3fed334bc..2d4b147e2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,7 +120,7 @@ PKG_CHECK_MODULES([LIBCUPSFILTERS], [libcupsfilters])
+ # ================
+ # Check for libppd
+ # ================
+-PKG_CHECK_MODULES([LIBPPD], [libppd])
++PKG_CHECK_MODULES([LIBPPD], [libppd], [AC_DEFINE(HAVE_LIBPPD, 1, [Have LIBPPD?])], [AC_MSG_RESULT([not found])])
+ 
+ # ======================
+ # Check system functions
+diff --git a/filter/foomatic-rip/foomatic-hash.1 b/filter/foomatic-rip/foomatic-hash.1
+new file mode 100644
+index 000000000..d53919838
+--- /dev/null
++++ b/filter/foomatic-rip/foomatic-hash.1
+@@ -0,0 +1,66 @@
++.\"
++.\" foomatic-hash man page.
++.\"
++.\" Copyright @ 2025 by Zdenek Dohnal.
++.\"
++.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
++.\" information.
++.\"
++
++
++.TH "foomatic-hash" "1" "2025-06-18" "User Commands"
++
++.SH "NAME"
++
++foomatic-hash - tool for scanning provided drivers for problematic PPD options and hash them using  SHA-256
++
++.SH "SYNOPSIS"
++
++.BI \fBfoomatic-hash\fR\ \fB--ppd\fR\ \fI<ppdfile>\fR\ \fI<scanoutput>\fR\ \fI<hashes_file>\fR
++
++.BI \fBfoomatic-hash\fR\ \fB--ppd-paths\fR\ \fI<path1,path2..pathN>\fR\ \fI<scanoutput>\fR\ \fI<hashes_file>\fR
++
++
++.SH "DESCRIPTION"
++
++The tool scans the provided drivers for values of PPD keywords \fBFoomaticRIPCommandLine\fR, \fBFoomaticRIPCommandLinePDF\fR, and \fBFoomaticRIPOptionSetting\fR, puts the found values into a file for review, and prints out values hashes in hexadecimal format. The hashes are required for allowing the filter \fBfoomatic-rip\fR to process those values.
++
++
++.SH "OPTIONS"
++
++The tool \fBfoomatic-hash\fR supports two options:
++
++.TP 10
++.BI \fB--ppd\fR\ \fI<ppdfile>\fR
++The tool scans the specific PPD file.
++
++.TP 10
++.BI \fB--ppd-paths\fR\ \fI<path1,path2..pathN>\fR
++The tool scans directories \fIpath1\fR, \fIpath2\fR until \fIpathN\fR for values of desired PPD keyword. Paths are absolute, symlinks are ignored. Each path is divided by comma. LibPPD support is required for the functionality.
++
++.SH "EXAMPLES"
++Scans PPD file \fBtest.ppd\fR, prints found values into \fBfound_values\fR, hash them and save them into \fBhashed_values\fR.
++.nf
++
++    foomatic-hash --ppd test.ppd found_values hashed_values
++
++.fi
++
++Scans path \fB/etc/cups/ppd\fR for drivers, finds values if any, puts them into \fBfound_values\fR, and hashes them into \fBhashed_values\fR.
++.nf
++
++    sudo foomatic-hash --ppd-paths /etc/cups/ppd found_value hashed_values
++.fi
++
++.SH "EXIT STATUS"
++
++Returns zero if scan happens successfully, non-zero return value for any error during the process.
++
++
++.SH "SEE ALSO"
++
++.BR foomatic-rip (1)
++
++
++.BR
++.EL
+diff --git a/filter/foomatic-rip/foomatic-hash.c b/filter/foomatic-rip/foomatic-hash.c
+new file mode 100644
+index 000000000..6e563870f
+--- /dev/null
++++ b/filter/foomatic-rip/foomatic-hash.c
+@@ -0,0 +1,549 @@
++//
++// foomatic-hash.c
++//
++// Copyright (C) 2024-2025 Zdenek Dohnal <zdohnal@redhat.com>
++// Copyright (C) 2008 Till Kamppeter <till.kamppeter@gmail.com>
++// Copyright (C) 2008 Lars Karlitski (formerly Uebernickel) <lars@karlitski.net>
++//
++// This file implements the tool foomatic-hash, which scans presented drivers
++// for FoomaticRIP* option values which are used during composing shell command, prints
++// them into a file for review, hashes the found values and puts them into a separate file.
++// The options in question:
++// - FoomaticRIPCommandLine,
++// - FoomaticRIPCommandLinePDF,
++// - FoomaticRIPOptionSetting.
++//
++// Licensed under Apache License v2.0.  See the file "LICENSE" for more
++// information.
++//
++
++#include "util.h"
++#include <ctype.h>
++#include <cups/array.h>
++#include <cups/cups.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++
++#if defined(HAVE_LIBPPD)
++#include <ppd/ppd.h>
++#endif // HAVE_LIBPPD
++
++
++void write_array(cups_array_t *ar, char *filename);
++
++
++//
++// `write_array()` - Writes the CUPS array content into file, line by line...
++//
++
++void
++write_array(cups_array_t *ar,       // I - CUPS array with contents to write
++	    char	 *filename) // I - Path to file where to put data in
++{
++  cups_file_t *f = NULL;	   // CUPS file pointer
++
++  if (cupsArrayCount(ar) == 0)
++    return;
++
++  if ((f = cupsFileOpen(filename, "w")) == NULL)
++  {
++    fprintf(stderr, "Cannot open file \"%s\" for write.\n", filename);
++    return;
++  }
++
++  for (char *s = (char*)cupsArrayGetFirst(ar); s; s = (char*)cupsArrayGetNext(ar))
++    cupsFilePrintf(f, "%s\n", s);
++
++  cupsFileClose(f);
++}
++
++
++//
++// 'generate_hash_file()' - Generate file with unique hashes.
++//
++
++int					 // O - 0 - success/ 1 - error
++generate_hash_file(cups_array_t *values, // I - File with values to hash
++		   char         *output) // I - File where to save new file
++{
++  cups_array_t *syshashes = NULL,	 // Already existing hashes on system
++	       *hashes = NULL;		 // Hashed values from input
++  char	       *data = NULL,		 // Pointer for storing string from array of values
++	       comment[16],		 // Array for storing comment
++	       hash_string[65];		 // Array for hexadecimal representation of hashed value
++
++
++  //
++  // Load existing hashes from system...
++  //
++
++  if (load_system_hashes(&syshashes))
++    return (1);
++
++  //
++  // Load hashes from previous runs if any...
++  //
++
++  if (load_array(&hashes, output))
++    return (1);
++
++  //
++  // Now do the hashing, save the hexadecimal string if it is
++  // unique - if the hash is not on system or in the loaded hash
++  // file from previous runs...
++  //
++
++  for (data = (char*)cupsArrayGetFirst(values); data; data = (char*)cupsArrayGetNext(values))
++  {
++    if (hash_data((unsigned char*)data, strlen(data), hash_string, sizeof(hash_string)))
++      return (1);
++
++    if (!cupsArrayFind(syshashes, hash_string) && !cupsArrayFind(hashes, hash_string))
++      cupsArrayAdd(hashes, hash_string);
++  }
++
++  if (cupsArrayCount(hashes))
++  {
++    //
++    // Add comment mentioning the used hash algorithm
++    //
++
++    snprintf(comment, sizeof(comment), "# %s", hash_alg);
++
++    if (!cupsArrayFind(hashes, comment))
++      cupsArrayAdd(hashes, comment);
++
++    //
++    // Create a new hash file...
++    //
++
++    write_array(hashes, output);
++  }
++
++  cupsArrayDelete(syshashes);
++  cupsArrayDelete(hashes);
++
++  return (0);
++}
++
++
++//
++// `find_foomaticrip_keywords()` - reads PPD file, find FoomaticRIPCommandLine,
++// FoomaticRIPCommandLinePDF and FoomaticRIPOptionSetting, save their values
++// into CUPS array.
++//
++
++void
++find_foomaticrip_keywords(cups_array_t *data, // O - Array with values of FoomaticRIP* PPD keywords
++			  cups_file_t  *file) // I - File descriptor opened via CUPS API
++{
++  char *p;				      // Helper pointer
++  char key[128],			      // PPD keyword
++       line[256],			      // PPD line length is max 255 (excl. \0)
++       name[64],			      // PPD option name
++       text[64];			      // PPD option human-readable text
++
++  //
++  // Allocate struct for saving value data dynamically,
++  // it can span over multiplelines...
++  //
++
++  dstr_t *value = create_dstr();
++
++  dstrassure(value, 256);
++
++  //
++  // Going through the PPD file...
++  //
++
++  while (cupsFileGets(file, line, 256) != NULL)
++  {
++    //
++    // Ignore commmented lines and whatever not starting with '*'
++    // to get the closest keyword
++    //
++
++    if (line[0] != '*' || startswith(line, "*%"))
++      continue;
++
++    //
++    // Get the PPD keyword
++    // Structure of PPD line:
++    //  *keyword [option_name/option_text]: value1 [value2 value3...] 
++    //
++
++    key[0] = name[0] = text[0] = '\0';
++
++    if ((p = strchr(line, ':')) == NULL)
++      continue;
++
++    *p = '\0';
++
++    sscanf(line, "*%127s%*[ \t]%63[^ \t/=)]%*1[/=]%63[^\n]", key, name, text);
++
++    //
++    // Get the value...
++    //
++
++    dstrclear(value);
++    sscanf(p + 1, " %255[^\r\n]", value->data);
++    value->len = strlen(value->data);
++
++    //
++    // If the value is multiline (the current line ends with && or does not end with \"),
++    // continue saving it, and handle quotes if the value is quoted...
++    //
++
++    while (1)
++    {
++      if (dstrendswith(value, "&&"))
++      {
++	//
++	// "&&" is the continue-on-next-line marker
++	//
++
++	value->len -= 2;
++	value->data[value->len] = '\0';
++      }
++      else if (value->data[0] == '\"' && !strchr(value->data +1, '\"'))
++      {
++	//
++	// Quoted but quotes are not yet closed - typically value blocks
++	// ended by keyword *End - append LF for the next line...
++	//
++
++	dstrcat(value, "\n"); // keep newlines in quoted string
++      }
++      // Quotes already closed, we have the whole value...
++      else
++	break;
++
++      //
++      // We read the next line if the value was not complete...
++      //
++
++      if (cupsFileGets(file, line, 256) == NULL)
++	break;
++
++      dstrcat(value, line);
++      dstrremovenewline(value);
++
++      //
++      // 2047 characters to read for value sounds reasonable,
++      // break if we have more and crop the string...
++      //
++
++      if (strlen(value->data) > 2047)
++      {
++	value->data[2047] = '\0';
++	value->len = 2047;
++	break;
++      }
++    }
++
++    //
++    // Skip if the key is not what we look for...
++    //
++
++    if (strcmp(key, "FoomaticRIPCommandLine") && strcmp(key, "FoomaticRIPCommandLinePDF") && strcmp(key, "FoomaticRIPOptionSetting"))
++      continue;
++
++    //
++    // Remove quotes...
++    //
++
++    if (value->data[0] == '\"')
++    {
++      memmove(value->data, value->data +1, value->len +1);
++      p = strrchr(value->data, '\"');
++      if (!p)
++      {
++	fprintf(stderr, "Invalid line: \"%s: ...\"\n", key);
++	continue;
++      }
++      *p = '\0';
++    }
++
++    //
++    // Remove last newline and last whitespace...
++    //
++
++    dstrremovenewline(value);
++
++    dstrtrim_right(value);
++
++    //
++    // Skip empty values if there are any...
++    //
++
++    if (!value->data || !value->data[0])
++      continue;
++
++    //
++    // Save data value
++    //
++
++    if (!cupsArrayFind(data, value->data))
++      cupsArrayAdd(data, value->data);
++  }
++
++  free_dstr(value);
++}
++
++
++//
++// `get_values_from_ppd()` - Open the PPD file and get values of
++//  desired FoomaticRIP PPD keywords...
++//
++
++int					    // O - Return value, 0 - success, 1 - error
++get_values_from_ppd(cups_array_t *data,     // O - Array of found FoomaticRIP* values
++			char     *filename) // I - Path to the file
++{
++  cups_file_t *file = NULL;		    // File descriptor
++  int	      ret = 0;			    // Return value
++
++  if (!is_valid_path(filename, IS_FILE))
++    return (1);
++
++  if ((file = cupsFileOpen(filename, "r")) == NULL)
++  {
++    fprintf(stderr, "Cannot open \"%s\" for reading.\n", filename);
++    return (1);
++  }
++
++  find_foomaticrip_keywords(data, file);
++
++  cupsFileClose(file);
++
++  return (ret);
++}
++
++
++#if defined(HAVE_LIBPPD)
++//
++// `copy_col()` - Allocation function for collection struct.
++//
++
++ppd_collection_t *     // O - Dynamically allocated PPD collection struct
++copy_col(char *path)   // I - Directory with drivers
++{
++  ppd_collection_t *col = NULL;
++
++  if ((col = (ppd_collection_t*)calloc(1, sizeof(ppd_collection_t))) == NULL)
++  {
++    fprintf(stderr, "Cannot allocate memory for PPD collection.\n");
++    return (NULL);
++  }
++
++  if ((col->path = (char*)calloc(strlen(path) + 1, sizeof(char))) == NULL)
++  {
++    fprintf(stderr, "Cannot allocate memory for PPD path.\n");
++    free(col);
++    return (NULL);
++  }
++
++  snprintf(col->path, strlen(path) + 1, "%s", path);
++
++  return (col);
++}
++
++
++//
++// `free_col()` - Free function for PPD collection.
++//
++
++void
++free_col(ppd_collection_t *col) // I - PPD collection
++{
++  free(col->path);
++  free(col);
++}
++
++
++//
++// `compare_col()` - Comparing function for PPD collection.
++//
++
++int				 // O - Result of comparison, 0 - the same, 1 - differs
++compare_col(char             *a, // I - PPD collection
++            ppd_collection_t *b) // I - PPD collection
++{
++  if(!strcmp(a, b->path))
++    return (0);
++
++  return (1);
++}
++#endif // HAVE_LIBPPD
++
++
++//
++// `get_values_from_ppdpaths()` - Goes via sent list of directories, gets
++// PPDs and gets value strings for FoomaticRIP related PPD keywords.
++//
++
++int						 // O - Return value, 0 - success, 1 - error
++get_values_from_ppdpaths(cups_array_t *data,     // O - Array of found values
++			 char	      *ppdpaths) // I - List of directories with drivers, comma separated
++{
++#if defined(HAVE_LIBPPD)
++  char		   *path = NULL,		 // Directory path
++		   *start = NULL,		 // Helper pointer to start of string
++		   *end = NULL;			 // Helper pointer to end of string
++  cups_array_t     *ppd_collections = NULL,	 // Directories with drivers
++		   *ppds = NULL;		 // PPD URIs
++  cups_file_t      *ppdfile = NULL;		 // PPD file descriptor
++  int		   ret = 0;			 // Return value
++  ppd_info_t       *ppd = NULL;			 // In-memory record of PPD
++
++
++  if ((ppd_collections = cupsArrayNew3((cups_array_func_t)compare_col, NULL, NULL, 0, (cups_acopy_func_t)copy_col, (cups_afree_func_t)free_col)) == NULL)
++  {
++    fprintf(stderr, "Could not allocate PPD collection array.\n");
++    return (1);
++  }
++
++  //
++  // Go through input directory list, validate each record,
++  // and add them into array...
++  //
++
++  if ((path = strchr(ppdpaths, ',')) == NULL)
++  {
++    if (is_valid_path(ppdpaths, IS_DIR))
++      cupsArrayAdd(ppd_collections, ppdpaths);
++  }
++  else
++  {
++    for (start = end = ppdpaths; *end; start = end)
++    {
++      if ((end = strchr(start, ',')) != NULL)
++	*end++ = '\0';
++      else
++	end = start + strlen(start);
++
++      if (is_valid_path(start, IS_DIR) && !cupsArrayFind(ppd_collections, start))
++	cupsArrayAdd(ppd_collections, start);
++    }
++  }
++
++  //
++  // Get array of in-memory PPD records, later used for generating the PPDs themselves...
++  //
++
++  if ((ppds = ppdCollectionListPPDs(ppd_collections, 0, 0, NULL, NULL, NULL)) == NULL)
++    goto end;
++
++  //
++  // Go through in-memory PPD records, generate a PPD and search for FoomaticRIP* keywords...
++  //
++
++  for (ppd = (ppd_info_t*)cupsArrayGetFirst(ppds); ppd; ppd = (ppd_info_t*)cupsArrayGetNext(ppds))
++  {
++    if ((ppdfile = ppdCollectionGetPPD(ppd->record.name, ppd_collections, NULL, NULL)) == NULL)
++      continue;
++
++    find_foomaticrip_keywords(data, ppdfile);
++
++    cupsFileClose(ppdfile);
++  }
++
++
++end:
++  for (ppd = (ppd_info_t*)cupsArrayGetFirst(ppds); ppd; ppd = (ppd_info_t*)cupsArrayGetNext(ppds))
++    free(ppd);
++
++  cupsArrayDelete(ppds);
++
++  cupsArrayDelete(ppd_collections);
++
++  return (ret);
++#else
++  fprintf(stdout, "foomatic-hash is not compiled with LIBPPD support.\n");
++
++  return (1);
++#endif // HAVE_LIBPPD
++}
++
++
++void
++help()
++{
++  printf("Usage:\n"
++	 "foomatic-hash --ppd <ppdfile> <scanoutput> <hashes_file>\n"
++	 "foomatic-hash --ppd-paths <path1,path2...pathN> <scanoutput> <hashes_file>\n"
++	 "\n"
++	 "Finds values of FoomaticRIPCommandLine, FoomaticRIPPDFCommandLine\n"
++	 "and FoomaticRIPOptionSetting from the specified PPDs, appends them\n"
++	 "into the specified scan output for review, and hashes the found values.\n"
++	 "\n"
++	 "--ppd <ppdfile>                   - PPD file to read\n"
++	 "--ppd-paths <path1,path2...pathN> - Paths to look for PPDs, available only with libppd\n"
++	 "<scanoutput>    - Found required values from drivers\n"
++	 "<hashes_file>   - Output file with hashes\n");
++}
++
++
++int
++main(int argc,
++     char** argv)
++{
++  cups_array_t *data = NULL; // Found FoomaticRIP* PPD keyword values
++  int	       ret = 1;
++
++
++  if (argc != 5)
++  {
++    help();
++    return (0);
++  }
++
++  //
++  // End up early if we can't write into paths provided as arguments
++  //
++
++  if (!is_valid_path(argv[3], IS_FILE) ||
++      ((data = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free)) == NULL) ||
++      !is_valid_path(argv[4], IS_FILE))
++    return (1);
++
++  //
++  // We scan single PPD file, or from directory (if libppd support is present)
++  //
++
++  if (!strcmp(argv[1], "--ppd"))
++  {
++    if (get_values_from_ppd(data, argv[2]))
++      return (1);
++  }
++  else if (!strcmp(argv[1], "--ppd-paths"))
++  {
++    if (get_values_from_ppdpaths(data, argv[2]))
++      return (1);
++  }
++  else
++  {
++    fprintf(stderr, "Unsupported argument.\n");
++    return (1);
++  }
++
++  //
++  // Write found values of FoomaticRIPCommandLine, FoomaticRIPPDFCommandLine and FoomaticRIPOptionSetting
++  // PPD keywords...
++  //
++
++  write_array(data, argv[3]);
++
++  //
++  // Hash the found values..
++  //
++
++  ret = generate_hash_file(data, argv[4]);
++
++  cupsArrayDelete(data);
++
++ 
++  return (ret);
++}
+diff --git a/filter/foomatic-rip/foomaticrip.c b/filter/foomatic-rip/foomaticrip.c
+index 036d6138b..2e892cb80 100644
+--- a/filter/foomatic-rip/foomaticrip.c
++++ b/filter/foomatic-rip/foomaticrip.c
+@@ -35,72 +35,6 @@
+ #include <cupsfilters/filter.h>
+ 
+ 
+-// Logging
+-FILE* logh = NULL;
+-
+-
+-void
+-_logv(const char *msg,
+-      va_list ap)
+-{
+-  if (!logh)
+-    return;
+-  vfprintf(logh, msg, ap);
+-  fflush(logh);
+-}
+-
+-
+-void
+-_log(const char* msg,
+-     ...)
+-{
+-  va_list ap;
+-  va_start(ap, msg);
+-  _logv(msg, ap);
+-  va_end(ap);
+-}
+-
+-
+-void
+-close_log()
+-{
+-  if (logh && logh != stderr)
+-    fclose(logh);
+-}
+-
+-
+-int
+-redirect_log_to_stderr()
+-{
+-  if (dup2(fileno(logh), fileno(stderr)) < 0)
+-  {
+-    _log("Could not dup logh to stderr\n");
+-    return (0);
+-  }
+-  return (1);
+-}
+-
+-
+-void
+-rip_die(int status,
+-	const char *msg,
+-	...)
+-{
+-  va_list ap;
+-
+-  _log("Process is dying with \"");
+-  va_start(ap, msg);
+-  _logv(msg, ap);
+-  va_end(ap);
+-  _log("\", exit stat %d\n", status);
+-
+-  _log("Cleaning up...\n");
+-  kill_all_processes();
+-
+-  exit(status);
+-}
+-
+-
+ jobparams_t *job = NULL;
+ 
+ 
+@@ -186,8 +120,6 @@ char cupsfilterpath[PATH_MAX] = "/usr/local/lib/cups/filter:"
+                                 "/opt/cups/filter:"
+                                 "/usr/lib/cups/filter";
+ 
+-char modern_shell[] = SHELL;
+-
+ 
+ void
+ config_set_option(const char *key,
+@@ -239,13 +171,6 @@ config_from_file(const char *filename)
+ }
+ 
+ 
+-const char *
+-get_modern_shell()
+-{
+-  return (modern_shell);
+-}
+-
+-
+ // returns position in 'str' after the option
+ char *
+ extract_next_option(char *str,
+diff --git a/filter/foomatic-rip/foomaticrip.h b/filter/foomatic-rip/foomaticrip.h
+index 5c9ecfaf0..60d4059c6 100644
+--- a/filter/foomatic-rip/foomaticrip.h
++++ b/filter/foomatic-rip/foomaticrip.h
+@@ -32,36 +32,6 @@
+ #define LOG_FILE "/tmp/foomatic-rip"
+ #endif
+ 
+-
+-// Constants used by this filter
+-//
+-// Error codes, as some spoolers behave different depending on the reason why
+-// the RIP failed, we return an error code.
+-
+-#define EXIT_PRINTED 0                          // file was printed normally
+-#define EXIT_PRNERR 1                           // printer error occured
+-#define EXIT_PRNERR_NORETRY 2                   // printer error with no hope
+-                                                // of retry
+-#define EXIT_JOBERR 3                           // job is defective
+-#define EXIT_SIGNAL 4                           // terminated after catching
+-                                                // signal
+-#define EXIT_ENGAGED 5                          // printer is otherwise engaged
+-                                                // (connection refused)
+-#define EXIT_STARVED 6                          // starved for system resources
+-#define EXIT_PRNERR_NORETRY_ACCESS_DENIED 7     // bad password? bad port
+-                                                // permissions?
+-#define EXIT_PRNERR_NOT_RESPONDING 8            // just doesn't answer at all
+-                                                // (turned off?)
+-#define EXIT_PRNERR_NORETRY_BAD_SETTINGS 9      // interface settings are
+-                                                // invalid
+-#define EXIT_PRNERR_NO_SUCH_ADDRESS 10          // address lookup failed, may
+-                                                // be transient
+-#define EXIT_PRNERR_NORETRY_NO_SUCH_ADDRESS 11  // address lookup failed, not
+-                                                // transient
+-#define EXIT_INCAPABLE 50                       // printer wants (lacks)
+-                                                // features or resources
+-
+-
+ // Supported spoolers are currently:
+ //
+ //   cups    - CUPS - Common Unix Printing System
+@@ -73,11 +43,6 @@
+ // The spooler from which foomatic-rip was called. set in main()
+ extern int spooler;
+ 
+-#ifndef PATH_MAX
+-#define PATH_MAX 4096
+-#endif
+-#define CMDLINE_MAX 65536
+-
+ typedef struct
+ {
+     char printer[256];
+@@ -95,11 +60,6 @@ typedef struct
+ 
+ jobparams_t *get_current_job();
+ 
+-void _log(const char* msg, ...);
+-int redirect_log_to_stderr();
+-void rip_die(int status, const char *msg, ...);
+-
+-const char *get_modern_shell();
+ FILE *open_postpipe();
+ 
+ extern struct dstr *currentcmd;
+diff --git a/filter/foomatic-rip/process.c b/filter/foomatic-rip/process.c
+index 51bf57571..fc8e81cc7 100644
+--- a/filter/foomatic-rip/process.c
++++ b/filter/foomatic-rip/process.c
+@@ -22,6 +22,8 @@
+ 
+ int kidgeneration = 0;
+ 
++char modern_shell[] = SHELL;
++
+ struct process
+ {
+   char name[64];
+@@ -39,6 +41,13 @@ struct process procs[MAX_CHILDS] =
+ };
+ 
+ 
++const char *
++get_modern_shell()
++{
++  return (modern_shell);
++}
++
++
+ void
+ add_process(const char *name,
+ 	    int pid,
+diff --git a/filter/foomatic-rip/process.h b/filter/foomatic-rip/process.h
+index 54a42923a..db597bcef 100644
+--- a/filter/foomatic-rip/process.h
++++ b/filter/foomatic-rip/process.h
+@@ -18,11 +18,14 @@
+ #include <sys/wait.h>
+ 
+ 
++extern char modern_shell[];
++
+ pid_t start_process(const char *name, int (*proc_func)(FILE*, FILE*, void*), void *user_arg,
+ 		    FILE **fdin, FILE **fdout);
+ pid_t start_system_process(const char *name, const char *command, FILE **fdin,
+ 			   FILE **fdout);
+ 
++const char *get_modern_shell();
+ // returns command's return status (see waitpid(2))
+ int run_system_process(const char *name, const char *command);
+ 
+diff --git a/filter/foomatic-rip/util.c b/filter/foomatic-rip/util.c
+index 78ca5212c..508bc0958 100644
+--- a/filter/foomatic-rip/util.c
++++ b/filter/foomatic-rip/util.c
+@@ -11,7 +11,9 @@
+ //
+ 
+ #include "util.h"
+-#include "foomaticrip.h"
++#include "process.h"
++#include <cups/cups.h>
++#include <cups/dir.h>
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+@@ -20,7 +22,71 @@
+ #include <errno.h>
+ 
+ 
++const char *hash_alg = "sha2-256"; // Used hash algorithm
+ const char *shellescapes = "|;<>&!$\'\"`#*?()[]{}";
++FILE* logh = NULL;
++
++// Logging
++void
++_logv(const char *msg,
++      va_list ap)
++{
++  if (!logh)
++    return;
++  vfprintf(logh, msg, ap);
++  fflush(logh);
++}
++
++
++void
++_log(const char* msg,
++     ...)
++{
++  va_list ap;
++  va_start(ap, msg);
++  _logv(msg, ap);
++  va_end(ap);
++}
++
++
++void
++close_log()
++{
++  if (logh && logh != stderr)
++    fclose(logh);
++}
++
++
++int
++redirect_log_to_stderr()
++{
++  if (dup2(fileno(logh), fileno(stderr)) < 0)
++  {
++    _log("Could not dup logh to stderr\n");
++    return (0);
++  }
++  return (1);
++}
++
++
++void
++rip_die(int status,
++	const char *msg,
++	...)
++{
++  va_list ap;
++
++  _log("Process is dying with \"");
++  va_start(ap, msg);
++  _logv(msg, ap);
++  va_end(ap);
++  _log("\", exit stat %d\n", status);
++
++  _log("Cleaning up...\n");
++  kill_all_processes();
++
++  exit(status);
++}
+ 
+ 
+ const char *
+@@ -1449,3 +1515,276 @@ copy_file(FILE *dest,
+ 
+   return (!ferror(src) && !ferror(dest));
+ }
++
++
++//
++// 'hash_data()' - Hash presented data with CUPS API hash function.
++//
++
++int				      // O - success 0/error 1
++hash_data(unsigned char *data,	      // I - Data to hash
++	  size_t	datalen,      // I - Length of data
++	  char		*hash_string, // O - Hexadecimal hashed string
++	  size_t	string_len)   // I - Length of hexadecimal hashed string
++{
++  unsigned char hash[32];	      // Array for saving hash
++
++
++  if ((cupsHashData(hash_alg, data, datalen, hash, sizeof(hash))) == -1)
++  {
++    fprintf(stderr, "\"%s\" - Error when hashing\n", data);
++    return (1);
++  }
++
++  if ((cupsHashString(hash, sizeof(hash), hash_string, string_len)) == NULL)
++  {
++    fprintf(stderr, "Error when encoding hash to hexadecimal\n");
++    return (1);
++  }
++
++  return (0);
++}
++
++
++//
++// 'load_system_hashes()' - Load hashes from system.
++//
++
++int					  // O - success 0 / error 1
++load_system_hashes(cups_array_t **hashes) // O - Array of existing hashes
++{
++  char		filename[1024];		  // Absolute path to file
++  cups_dir_t    *dir = NULL;		  // CUPS struct representing dir
++  cups_dentry_t *dent = NULL;		  // CUPS struct representing an object in directory
++  int		i = 0;			  // Array index
++
++  //
++  // System directories to load system hashes from (defined in Makefile.am)
++  //
++  // SYS_HASH_PATH - /usr/share/foomatic/hashes.d by default
++  // USR_HASH_PATH - /etc/foomatic/hashes.d by default
++  //
++
++  const char *dirs[] = {
++    SYS_HASH_PATH,
++    USR_HASH_PATH,
++    NULL
++  };
++
++  if (!hashes)
++    return (1);
++
++  if ((*hashes = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free)) == NULL)
++  {
++    fprintf(stderr, "Could not allocate array for hashes.\n");
++    return (1);
++  }
++
++  //
++  // Go through files in directories and load hashes...
++  //
++
++  while (dirs[i] != NULL)
++  {
++    if ((dir = cupsDirOpen(dirs[i])) == NULL)
++    {
++      fprintf(stderr, "Could not open the directory \"%s\" - ignoring...\n", dirs[i++]);
++      continue;
++    }
++
++    while ((dent = cupsDirRead(dir)) != NULL)
++    {
++      // Ignore any unsafe files - dirs, symlinks, hidden files, non-root writable files...
++
++      if (!strncmp(dent->filename, "../", 3) ||
++	  dent->fileinfo.st_uid ||
++	  (dent->fileinfo.st_mode & S_IWGRP) ||
++	  (dent->fileinfo.st_mode & S_ISUID) ||
++	  (dent->fileinfo.st_mode & S_IWOTH))
++        continue;
++
++      snprintf(filename, sizeof(filename), "%s/%s", dirs[i], dent->filename);
++
++      if (!is_valid_path(filename, IS_FILE))
++	continue;
++
++      if (load_array(hashes, filename))
++	continue;
++    }
++
++    cupsDirClose(dir);
++
++    i++;
++  }
++
++  return (0);
++}
++
++
++//
++// `load_array()` - Loads data from file into CUPS array...
++//
++
++int				   // O - Return value, 0 - success, 1 - error
++load_array(cups_array_t **ar,      // O - CUPS array to fill up - NULL/pointer - caller is responsible for freeing memory
++           char         *filename) // I - Path to a file
++{
++  char	      line[2048];	   // Input array for line reading
++  cups_file_t *fp = NULL;	   // File with data
++
++
++  //
++  // Make sure the file is valid and the pointer is not NULL...
++  //
++
++  if (!is_valid_path(filename, IS_FILE) || !ar)
++    return (1);
++
++  memset(line, 0, sizeof(line));
++
++  if (!*ar)
++  {
++    if((*ar = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free)) == NULL)
++    {
++      fprintf(stderr, "Cannot allocate array.\n");
++      *ar = NULL;
++      return (1);
++    }
++  }
++
++  //
++  // Has to be accessible, but it is possible the file does not exist
++  // and will be created in the end...
++  //
++
++  if (access(filename, F_OK))
++  {
++    //
++    // It is fine for the file has not existed yet - it will be created in the end...
++    //
++
++    if (errno == ENOENT)
++      return (0);
++    else
++    {
++      fprintf(stderr, "File \"%s\" is not accessible.\n", filename);
++      return (1);
++    }
++  }
++
++  //
++  // Read the file line by line...
++  //
++
++  if ((fp = cupsFileOpen(filename, "r")) == NULL)
++  {
++    fprintf(stderr, "Cannot open file \"%s\" for read.\n", filename);
++    return (1);
++  }
++
++  while (cupsFileGets(fp, line, sizeof(line)))
++  {
++    if (!cupsArrayFind(*ar, line))
++      cupsArrayAdd(*ar, line);
++
++    memset(line, 0, sizeof(line));
++  }
++
++  cupsFileClose(fp);
++
++  return (0);
++}
++
++
++//
++// `is_valid_path()` - Checks whether the input path is valid
++// - correct length, file type, correct characters...
++//
++
++int				   // O - Boolean value, 0 - invalid/1 - valid
++is_valid_path(char	    *path, // I - Path
++	      enum filetype type)  // I - Desired file type - file/dir
++{
++  char	      *filename = NULL;	  // Filename stripped of possible path
++  struct stat fileinfo;		  // For checking whether file is symlink/dir
++  size_t      len = strlen(path); // Path len
++
++  //
++  // Check whether the whole path is not too long...
++  //
++
++  if (len > PATH_MAX || len == 0)
++    return (0);
++
++  //
++  // Be sure we can access the file, is of the correct filetype and is not symlink...
++  // Non-existing file is okay at the moment.
++  //
++
++  if (stat(path, &fileinfo))
++  {
++    if (errno != ENOENT)
++    {
++      fprintf(stderr, "The provided filename \"%s\" is not an acceptable file - %s.\n", path, strerror(errno));
++      return (0);
++    }
++  }
++  else
++  {
++    if ((type & IS_FILE) && S_ISDIR(fileinfo.st_mode))
++    {
++      fprintf(stderr, "The provided filename \"%s\" is not a file.\n", path);
++      return (0);
++    }
++
++    if ((type & IS_DIR) && !S_ISDIR(fileinfo.st_mode))
++    {
++      fprintf(stderr, "The provided filename \"%s\" is not a directory.\n", path);
++      return (0);
++    }
++
++    if (S_ISLNK(fileinfo.st_mode))
++    {
++      fprintf(stderr, "The provided filename \"%s\" is a symlink, which is not allowed.\n", path);
++      return (0);
++    }
++  }
++
++  //
++  // We accept paths only with alphanumeric characters, dots, dashes, underscores, slashes...
++  //
++
++  for (int i = 0; i < len - 1; i++)
++  {
++    if (!isalnum(path[i]) && path[i] != '.' &&
++	path[i] != '-' && path[i] != '_' &&
++	path[i] != '/')
++    {
++      fprintf(stderr, "The provided path contain non-ASCII characters.\n");
++      return (0);
++    }
++  }
++
++  //
++  // Get the filename itself...
++  //
++
++  if ((filename = strrchr(path, '/')) == NULL)
++    filename = path;
++  else
++    filename++;
++
++  if (strlen(filename) > NAME_MAX)
++  {
++    fprintf(stderr, "The filename is too long.\n");
++    return (0);
++  }
++
++  if (filename[0] == '.')
++  {
++    fprintf(stderr, "No hidden files.\n");
++    return (0);
++  }
++
++  return (1);
++}
+diff --git a/filter/foomatic-rip/util.h b/filter/foomatic-rip/util.h
+index e071e8151..ef275e411 100644
+--- a/filter/foomatic-rip/util.h
++++ b/filter/foomatic-rip/util.h
+@@ -18,11 +18,70 @@
+ #endif
+ 
+ #include "config.h"
++#include <cups/cups.h>
+ #include <string.h>
+ #include <stdio.h>
+ 
++#if CUPS_VERSION_MAJOR <= 2 && CUPS_VERSION_MINOR < 5
++#  define cupsArrayGetFirst(ar) cupsArrayFirst(ar)
++#  define cupsArrayGetNext(ar) cupsArrayNext(ar)
++#endif
++
++// Constants used by this filter
++//
++// Error codes, as some spoolers behave different depending on the reason why
++// the RIP failed, we return an error code.
++
++#define EXIT_PRINTED 0                          // file was printed normally
++#define EXIT_PRNERR 1                           // printer error occured
++#define EXIT_PRNERR_NORETRY 2                   // printer error with no hope
++                                                // of retry
++#define EXIT_JOBERR 3                           // job is defective
++#define EXIT_SIGNAL 4                           // terminated after catching
++                                                // signal
++#define EXIT_ENGAGED 5                          // printer is otherwise engaged
++                                                // (connection refused)
++#define EXIT_STARVED 6                          // starved for system resources
++#define EXIT_PRNERR_NORETRY_ACCESS_DENIED 7     // bad password? bad port
++                                                // permissions?
++#define EXIT_PRNERR_NOT_RESPONDING 8            // just doesn't answer at all
++                                                // (turned off?)
++#define EXIT_PRNERR_NORETRY_BAD_SETTINGS 9      // interface settings are
++                                                // invalid
++#define EXIT_PRNERR_NO_SUCH_ADDRESS 10          // address lookup failed, may
++                                                // be transient
++#define EXIT_PRNERR_NORETRY_NO_SUCH_ADDRESS 11  // address lookup failed, not
++                                                // transient
++#define EXIT_PRNERR_NOTALLOWED 12               // the value is not allowed on the system
++#define EXIT_INCAPABLE 50                       // printer wants (lacks)
++                                                // features or resources
++
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
++#define CMDLINE_MAX 65536
++
++#ifndef NAME_MAX
++#define NAME_MAX 255
++#endif
++
+ 
++extern const char *hash_alg;
+ extern const char* shellescapes;
++extern FILE* logh;
++
++// used for path validation - parameter --ppd supports files, --ppd-paths directories
++enum filetype {
++  IS_FILE,
++  IS_DIR
++};
++
++// logging and exiting...
++void _log(const char* msg, ...);
++void rip_die(int status, const char *msg, ...);
++int redirect_log_to_stderr();
++void close_log();
+ 
+ int isempty(const char *string);
+ const char * temp_dir();
+@@ -132,6 +191,14 @@ int contains_command(const char *cmdline, const char *cmd);
+ int copy_file(FILE *dest, FILE *src, const char *alreadyread,
+ 	      size_t alreadyread_len);
+ 
++// File related functions with CUPS arrays
++int load_array(cups_array_t **ar, char *filename);
++int is_valid_path(char *path, enum filetype type);
++
++// Hash functions
++int hash_data(unsigned char* data, size_t datalen, char *hash_string, size_t string_len);
++int load_system_hashes(cups_array_t **hashes);
++
+ // Dynamic string
+ typedef struct dstr
+ {
+-- 
+2.50.1
+

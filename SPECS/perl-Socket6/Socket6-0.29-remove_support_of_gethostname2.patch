@@ -1,0 +1,238 @@
+Pouze v Socket6-0.29/: autom4te.cache
+Pouze v Socket6-0.29/: blib
+Pouze v Socket6-0.29/: config.h
+Pouze v Socket6-0.29/: config.log
+Pouze v Socket6-0.29/: config.pl
+Pouze v Socket6-0.29/: config.status
+diff -ru Socket6-0.29.orig/configure Socket6-0.29/configure
+--- Socket6-0.29.orig/configure	2021-07-07 12:53:06.767571002 +0200
++++ Socket6-0.29/configure	2021-07-07 12:55:20.938951403 +0200
+@@ -3439,166 +3439,6 @@
+ fi
+ 
+ 
+-ac_fn_c_check_func "$LINENO" "gethostbyname2" "ac_cv_func_gethostbyname2"
+-if test "x$ac_cv_func_gethostbyname2" = xyes; then :
+-    ac_cv_lib_socket_gethostbyname2=no
+-  ac_cv_lib_inet6_gethostbyname2=no
+-
+-else
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gethostbyname2 in -lsocket" >&5
+-$as_echo_n "checking for gethostbyname2 in -lsocket... " >&6; }
+-if ${ac_cv_lib_socket_gethostbyname2+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lsocket  $LIBS"
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-/* Override any GCC internal prototype to avoid an error.
+-   Use char because int might match the return type of a GCC
+-   builtin and then its argument prototype would still apply.  */
+-#ifdef __cplusplus
+-extern "C"
+-#endif
+-char gethostbyname2 ();
+-int
+-main ()
+-{
+-return gethostbyname2 ();
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_socket_gethostbyname2=yes
+-else
+-  ac_cv_lib_socket_gethostbyname2=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-LIBS=$ac_check_lib_save_LIBS
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_socket_gethostbyname2" >&5
+-$as_echo "$ac_cv_lib_socket_gethostbyname2" >&6; }
+-if test "x$ac_cv_lib_socket_gethostbyname2" = xyes; then :
+-      LIBS="$LIBS -lsocket -lnsl"
+-    ac_cv_lib_inet6_gethostbyname2=no
+-
+-else
+-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether your system has IPv6 directory" >&5
+-$as_echo_n "checking whether your system has IPv6 directory... " >&6; }
+-    if ${ipv6_cv_dir+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-        for ipv6_cv_dir in /usr/local/v6 /usr/inet6 no; do
+-	if test $ipv6_cv_dir = no -o -d $ipv6_cv_dir; then
+-	  break
+-	fi
+-      done
+-fi
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ipv6_cv_dir" >&5
+-$as_echo "$ipv6_cv_dir" >&6; }
+-    if test $ipv6_cv_dir = no; then
+-      ac_cv_lib_inet6_gethostbyname2=no
+-    else
+-      if test x$ipv6_libinet6 = x; then
+-	ipv6_libinet6=no
+-	SAVELDFLAGS="$LDFLAGS"
+-	LDFLAGS="$LDFLAGS -L$ipv6_cv_dir/lib"
+-      fi
+-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gethostbyname2 in -linet6" >&5
+-$as_echo_n "checking for gethostbyname2 in -linet6... " >&6; }
+-if ${ac_cv_lib_inet6_gethostbyname2+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_check_lib_save_LIBS=$LIBS
+-LIBS="-linet6  $LIBS"
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-/* Override any GCC internal prototype to avoid an error.
+-   Use char because int might match the return type of a GCC
+-   builtin and then its argument prototype would still apply.  */
+-#ifdef __cplusplus
+-extern "C"
+-#endif
+-char gethostbyname2 ();
+-int
+-main ()
+-{
+-return gethostbyname2 ();
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_inet6_gethostbyname2=yes
+-else
+-  ac_cv_lib_inet6_gethostbyname2=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-LIBS=$ac_check_lib_save_LIBS
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_inet6_gethostbyname2" >&5
+-$as_echo "$ac_cv_lib_inet6_gethostbyname2" >&6; }
+-if test "x$ac_cv_lib_inet6_gethostbyname2" = xyes; then :
+-  	if test $ipv6_libinet6 = no; then
+-	  ipv6_libinet6=yes
+-	  LIBS="$LIBS -linet6"
+-	fi
+-fi
+-      if test $ipv6_libinet6 = no; then
+-	LDFLAGS="$SAVELDFLAGS"
+-      fi
+-    fi
+-fi
+-
+-fi
+-ipv6_cv_gethostbyname2=no
+-if test $ac_cv_func_gethostbyname2 = yes -o $ac_cv_lib_socket_gethostbyname2 = yes \
+-     -o $ac_cv_lib_inet6_gethostbyname2 = yes
+-then
+-  ipv6_cv_gethostbyname2=yes
+-fi
+-if test $ipv6_cv_gethostbyname2 = no; then
+-  if test gethostbyname2 = getaddrinfo; then
+-    for ipv6_cv_pfx in o n; do
+-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-#include <netdb.h>
+-
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "${ipv6_cv_pfx}gethostbyname2" >/dev/null 2>&1; then :
+-  as_ac_var=`$as_echo "ac_cv_func_${ipv6_cv_pfx}gethostbyname2" | $as_tr_sh`
+-ac_fn_c_check_func "$LINENO" "${ipv6_cv_pfx}gethostbyname2" "$as_ac_var"
+-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+-
+-fi
+-
+-fi
+-rm -f conftest*
+-
+-      if eval test X\$ac_cv_func_${ipv6_cv_pfx}gethostbyname2 = Xyes; then
+-	ipv6_cv_gethostbyname2=yes
+-	break
+-      fi
+-    done
+-  fi
+-fi
+-if test $ipv6_cv_gethostbyname2 = yes; then
+-  cat >>confdefs.h <<_ACEOF
+-#define HAVE_GETHOSTBYNAME2 1
+-_ACEOF
+-
+-  :
+-else
+-  :
+-fi
+-
+-
+ ac_fn_c_check_func "$LINENO" "getipnodebyname" "ac_cv_func_getipnodebyname"
+ if test "x$ac_cv_func_getipnodebyname" = xyes; then :
+     ac_cv_lib_socket_getipnodebyname=no
+diff -ru Socket6-0.29.orig/configure.in Socket6-0.29/configure.in
+--- Socket6-0.29.orig/configure.in	2021-07-07 12:53:06.767571002 +0200
++++ Socket6-0.29/configure.in	2021-07-07 12:55:11.497854270 +0200
+@@ -53,7 +53,6 @@
+ 
+ IPv6_CHECK_FUNC(getaddrinfo)
+ IPv6_CHECK_FUNC(getnameinfo)
+-IPv6_CHECK_FUNC(gethostbyname2)
+ IPv6_CHECK_FUNC(getipnodebyname)
+ IPv6_CHECK_FUNC(getipnodebyaddr)
+ IPv6_CHECK_FUNC(inet_pton)
+Pouze v Socket6-0.29/: gailookup.pl
+Pouze v Socket6-0.29/: Makefile
+Pouze v Socket6-0.29/: MYMETA.json
+Pouze v Socket6-0.29/: MYMETA.yml
+Pouze v Socket6-0.29/: pm_to_blib
+Pouze v Socket6-0.29/: Socket6.bs
+Pouze v Socket6-0.29/: Socket6.c
+Pouze v Socket6-0.29/: Socket6.o
+diff -ru Socket6-0.29.orig/Socket6.pm Socket6-0.29/Socket6.pm
+--- Socket6-0.29.orig/Socket6.pm	2021-07-07 12:53:06.767571002 +0200
++++ Socket6-0.29/Socket6.pm	2021-07-07 12:56:54.604915071 +0200
+@@ -129,6 +129,8 @@
+ 
+ =item gethostbyname2 HOSTNAME, FAMILY
+ 
++    This function doesn't supported.
++
+ =item getaddrinfo NODENAME, SERVICENAME, [FAMILY, SOCKTYPE, PROTOCOL, FLAGS]
+ 
+     This function converts node names to addresses and service names
+diff -ru Socket6-0.29.orig/Socket6.xs Socket6-0.29/Socket6.xs
+--- Socket6-0.29.orig/Socket6.xs	2021-07-07 12:53:06.767571002 +0200
++++ Socket6-0.29/Socket6.xs	2021-07-07 12:53:41.416927491 +0200
+@@ -443,27 +443,7 @@
+ 	int	af;
+ 	PPCODE:
+ {
+-#ifdef HAVE_GETHOSTBYNAME2
+-	struct hostent *phe;
+-	int count, i;
+-
+-	if ((phe = gethostbyname2(host, af)) != NULL) {
+-		for (count = 0; phe->h_addr_list[count]; ++count);
+-		EXTEND(sp, 4 + count);
+-		PUSHs(sv_2mortal(newSVpv((char *) phe->h_name,
+-					 strlen(phe->h_name))));
+-		PUSHs(sv_2mortal(newSVpv((char *) phe->h_aliases,
+-					 sizeof(char *))));
+-		PUSHs(sv_2mortal(newSViv((IV) phe->h_addrtype)));
+-		PUSHs(sv_2mortal(newSViv((IV) phe->h_length)));
+-		for (i = 0; i < count; ++i) {
+-			PUSHs(sv_2mortal(newSVpv((char *)phe->h_addr_list[i],
+-						 phe->h_length)));
+-		}
+-	}
+-#else
+ 	ST(0) = (SV *) not_here("gethostbyname2");
+-#endif
+ }
+ 
+ void

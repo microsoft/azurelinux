@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 19 Apr 2017 06:10:01 -0500
+Subject: [PATCH] RH: use rpm optflags if present
+
+Use the passed in optflags when compiling as an RPM, and keep the
+default flags as close as possible to the current fedora flags, while
+still being generic.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index c225a1ed..7774f1f4 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -99,28 +99,39 @@ SYSTEMD_LIBDEPS := $(if $(SYSTEMD),$(if $(shell test $(SYSTEMD) -gt 209 && echo
+ MODPROBE_UNIT := $(shell test "0$(SYSTEMD)" -lt 245 2>/dev/null || \
+ 			echo "modprobe@dm_multipath.service")
+ 
+-OPTFLAGS	:= -O2 -g $(STACKPROT) --param=ssp-buffer-size=4
++ifndef RPM_OPT_FLAGS
++	OPTFLAGS := -O2 -g $(STACKPROT) --param=ssp-buffer-size=4 \
++		    -Wall $(FORTIFY_OPT) -fexceptions -grecord-gcc-switches \
++		    -fasynchronous-unwind-tables
++	ifeq ($(shell test -f /usr/lib/rpm/redhat/redhat-hardened-cc1 && echo 1),1)
++		OPTFLAGS += -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1
++	endif
++	ifeq ($(shell test -f /usr/lib/rpm/redhat/redhat-annobin-cc1 && echo 1),1)
++		OPTFLAGS += -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1
++	endif
++else
++	OPTFLAGS := $(RPM_OPT_FLAGS) --param=ssp-buffer-size=4
++endif
+ 
+ # Set WARN_ONLY=1 to avoid compilation erroring out due to warnings. Useful during development.
+ WARN_ONLY       :=
+ ERROR           := $(if $(WARN_ONLY),,error=)
+ WERROR          := $(if $(WARN_ONLY),,-Werror)
+-WARNFLAGS	:= $(WERROR) -Wall -Wextra -Wformat=2 $(WFORMATOVERFLOW) -W$(ERROR)implicit-int \
++WARNFLAGS	:= $(WERROR) -Wextra -Wformat=2 $(WFORMATOVERFLOW) -W$(ERROR)implicit-int \
+ 		  -W$(ERROR)implicit-function-declaration -W$(ERROR)format-security \
+-		  $(WNOCLOBBERED) -W$(ERROR)cast-qual $(ERROR_DISCARDED_QUALIFIERS) $(W_URCU_TYPE_LIMITS)
++		  $(WNOCLOBBERED) -W$(ERROR)cast-qual $(ERROR_DISCARDED_QUALIFIERS) $(W_URCU_TYPE_LIMITS) -Wstrict-prototypes
+ 
+-CPPFLAGS	:= $(FORTIFY_OPT) $(CPPFLAGS) $(D_URCU_VERSION) \
++CPPFLAGS	:= $(CPPFLAGS) $(D_URCU_VERSION) \
+ 		   -D_FILE_OFFSET_BITS=64 \
+ 		   -DBIN_DIR=\"$(bindir)\" -DMULTIPATH_DIR=\"$(TGTDIR)$(plugindir)\" \
+ 		   -DRUNTIME_DIR=\"$(runtimedir)\" -DCONFIG_DIR=\"$(TGTDIR)$(configdir)\" \
+ 		   -DDEFAULT_CONFIGFILE=\"$(TGTDIR)$(configfile)\" -DSTATE_DIR=\"$(TGTDIR)$(statedir)\" \
+ 		   -DEXTRAVERSION=\"$(EXTRAVERSION)\" -MMD -MP
+-CFLAGS		:= -std=$(C_STD) $(CFLAGS) $(OPTFLAGS) $(WARNFLAGS) -pipe \
+-		   -fexceptions
++CFLAGS		:= -std=$(C_STD) $(CFLAGS) $(OPTFLAGS) $(WARNFLAGS) -pipe
+ BIN_CFLAGS	:= -fPIE -DPIE
+ LIB_CFLAGS	:= -fPIC
+ SHARED_FLAGS	:= -shared
+-LDFLAGS		:= $(LDFLAGS) -Wl,-z,relro -Wl,-z,now -Wl,-z,defs
++LDFLAGS		:= $(LDFLAGS) $(RPM_LD_FLAGS) -Wl,-z,relro -Wl,-z,now -Wl,-z,defs
+ BIN_LDFLAGS	:= -pie
+ 
+ # Source code directories. Don't modify.

@@ -1,0 +1,21 @@
+--- clap_complete_command-0.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ clap_complete_command-0.6.1/Cargo.toml	2024-07-18T21:25:59.729350+00:00
+@@ -32,10 +32,6 @@
+     "docsrs",
+ ]
+ 
+-[dependencies.carapace_spec_clap]
+-version = "1"
+-optional = true
+-
+ [dependencies.clap]
+ version = "4"
+ 
+@@ -55,7 +51,6 @@
+ features = ["derive"]
+ 
+ [features]
+-carapace = ["dep:carapace_spec_clap"]
+ default = ["nushell"]
+ fig = ["dep:clap_complete_fig"]
+ nushell = ["dep:clap_complete_nushell"]

@@ -1,0 +1,25 @@
+From 96f94e650242415b99f8dc53fb9f456801432801 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 7 Mar 2025 21:56:01 +0100
+Subject: [PATCH] skip one doctest that pulls in an additional dependency
+
+---
+ src/macros/select.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros/select.rs b/src/macros/select.rs
+index 351ca24..342edc4 100644
+--- a/src/macros/select.rs
++++ b/src/macros/select.rs
+@@ -529,7 +529,7 @@ macro_rules! doc {
+         /// - [`futures_lite::future::or`](https://docs.rs/futures-lite/latest/futures_lite/future/fn.or.html)
+         /// - [`futures_lite::future::race`](https://docs.rs/futures-lite/latest/futures_lite/future/fn.race.html)
+         ///
+-        /// ```
++        /// ```rust,ignore
+         /// use futures_concurrency::future::Race;
+         ///
+         /// # #[tokio::main(flavor = "current_thread")]
+-- 
+2.51.0
+

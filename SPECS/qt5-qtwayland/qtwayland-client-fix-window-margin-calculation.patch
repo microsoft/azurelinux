@@ -1,0 +1,29 @@
+From e6634936ab661a9b6303d1318392ea109a17dad4 Mon Sep 17 00:00:00 2001
+From: Rob Hall <robxnanocode@outlook.com>
+Date: Sun, 24 Dec 2023 21:46:48 +0000
+Subject: [PATCH] client: Fix window margin calculation
+
+Don't subtract the size of the window frame margin from the content
+area. Fixes an issue where an area of the window is unclickable when
+client-side decorations are in use.
+
+Fixes: QTBUG-120392
+Pick-to: 6.7 6.6 6.5
+Change-Id: I6a89b2d463be084233ea3448cacfbbd09d66b96e
+---
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 610cc9e..bb71638 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -1360,8 +1360,8 @@
+     QMargins marg = frameMargins();
+     QRect windowRect(0 + marg.left(),
+                      0 + marg.top(),
+-                     geometry().size().width() - marg.right(),
+-                     geometry().size().height() - marg.bottom());
++                     geometry().size().width(),
++                     geometry().size().height());
+     if (windowRect.contains(e.local.toPoint()) || mMousePressedInContentArea != Qt::NoButton) {
+         const QPointF localTranslated = mapFromWlSurface(e.local);
+         QPointF globalTranslated = e.global;

@@ -1,0 +1,108 @@
+From a4a42a3c933a2f40023e6c857e60e0bf08a1d913 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Mon, 15 Jul 2024 14:53:17 +0900
+Subject: [PATCH] Fix some compiler warnings
+
+- src-main/context.c: Fix warning[-Waddress]
+  &ce->str will always evaluate as 'true'
+- mkworddic/mkdic.c: Fix warning[-Wformat-overflow=]
+  '%s' directive argument is null
+---
+ mkworddic/mkdic.c  | 21 +++++++++------------
+ src-main/context.c |  5 ++---
+ 2 files changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/mkworddic/mkdic.c b/mkworddic/mkdic.c
+index b0f9f4c..cb68520 100644
+--- a/mkworddic/mkdic.c
++++ b/mkworddic/mkdic.c
+@@ -60,8 +60,6 @@
+ 
+ #define DEFAULT_FN "anthy.wdic"
+ 
+-static const char *progname;
+-
+ /* writewords.cからアクセスするために、global変数 */
+ FILE *yomi_entry_index_out, *yomi_entry_out;
+ FILE *page_out, *page_index_out;
+@@ -127,8 +125,7 @@ open_output_files(void)
+     }
+     /**/
+     if (!(*(fs->fpp))) {
+-      fprintf (stderr, "%s: cannot open temporary file: %s\n",
+-               progname, strerror (errno));
++      fprintf (stderr, "cannot open temporary file: %s\n", strerror (errno));
+       exit (2);
+     }
+   }
+@@ -142,13 +139,13 @@ flush_output_files (void)
+   struct file_section *fs;
+   for (fs = file_array; fs->fpp; fs ++) {
+     if (ferror(*(fs->fpp))) {
+-      fprintf (stderr, "%s: write error\n", progname);
++      fprintf (stderr, "write error\n");
+       exit (1);
+     }
+   }
+   for (fs = file_array; fs->fpp; fs ++) {
+     if (fflush(*(fs->fpp))) {
+-      fprintf (stderr, "%s: write error: %s\n", progname, strerror (errno));
++      fprintf (stderr, "write error: %s\n", strerror (errno));
+       exit (1);
+     }
+   }
+@@ -793,8 +790,8 @@ copy_file(struct mkdic_stat *mds, FILE *in, FILE *out)
+   while ((nread = fread (buf, 1, sizeof buf, in)) > 0) {
+     if (fwrite (buf, 1, nread, out) < nread) {
+       /* Handle short write (maybe disk full).  */
+-      fprintf (stderr, "%s: %s: write error: %s\n",
+-	       progname, mds->output_fn, strerror (errno));
++      fprintf (stderr, "%s: write error: %s\n",
++	       mds->output_fn, strerror (errno));
+       exit (1);
+     }
+   }
+@@ -839,8 +836,8 @@ link_dics(struct mkdic_stat *mds)
+ 
+   fp = fopen (mds->output_fn, "w");
+   if (!fp) {
+-      fprintf (stderr, "%s: %s: cannot create: %s\n",
+-	       progname, mds->output_fn, strerror (errno));
++      fprintf (stderr, "%s: cannot create: %s\n",
++	       mds->output_fn, strerror (errno));
+       exit (1);
+   }
+ 
+@@ -856,8 +853,8 @@ link_dics(struct mkdic_stat *mds)
+   }
+ 
+   if (fclose (fp)) {
+-    fprintf (stderr, "%s: %s: write error: %s\n",
+-	     progname, mds->output_fn, strerror (errno));
++    fprintf (stderr, "%s: write error: %s\n",
++	     mds->output_fn, strerror (errno));
+     exit (1);
+   }
+ }
+diff --git a/src-main/context.c b/src-main/context.c
+index d84858c..f117f7d 100644
+--- a/src-main/context.c
++++ b/src-main/context.c
+@@ -706,12 +706,11 @@ anthy_do_print_context(struct anthy_context *ac, int encoding)
+ void
+ anthy_release_cand_ent(struct cand_ent *ce)
+ {
++  assert (ce);
+   if (ce->elm) {
+     free(ce->elm);
+   }
+-  if (&ce->str) {
+-    anthy_free_xstr_str(&ce->str);
+-  }
++  anthy_free_xstr_str(&ce->str);
+   free(ce);
+ }
+ 
+-- 
+2.45.0
+

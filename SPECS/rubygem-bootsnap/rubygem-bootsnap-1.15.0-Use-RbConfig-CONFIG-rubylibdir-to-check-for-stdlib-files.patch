@@ -1,0 +1,28 @@
+From 72202aab5e5b3602ece4e8748bcdeefe2d789ab5 Mon Sep 17 00:00:00 2001
+From: Jean Boussier <jean.boussier@gmail.com>
+Date: Fri, 13 Jan 2023 09:21:17 +0100
+Subject: [PATCH] Use `RbConfig::CONFIG["rubylibdir"]` to check for stdlib
+ files
+
+Ref: https://github.com/Shopify/bootsnap/issues/431
+---
+ lib/bootsnap/load_path_cache/path.rb | 4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 1aadf9e..f38db3b 100644
+diff --git a/lib/bootsnap/load_path_cache/path.rb b/lib/bootsnap/load_path_cache/path.rb
+index 626740c..e000c60 100644
+--- a/lib/bootsnap/load_path_cache/path.rb
++++ b/lib/bootsnap/load_path_cache/path.rb
+@@ -116,8 +116,8 @@ def latest_mtime(path, dirs)
+       VOLATILE = :volatile
+ 
+       # Built-in ruby lib stuff doesn't change, but things can occasionally be
+-      # installed into sitedir, which generally lives under libdir.
+-      RUBY_LIBDIR  = RbConfig::CONFIG["libdir"]
++      # installed into sitedir, which generally lives under rubylibdir.
++      RUBY_LIBDIR  = RbConfig::CONFIG["rubylibdir"]
+       RUBY_SITEDIR = RbConfig::CONFIG["sitedir"]
+ 
+       def stability

@@ -1,0 +1,38 @@
+From 830df76092aec24f0f454f914161f87e11af270b Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@gmail.com>
+Date: Tue, 30 Nov 2021 17:02:13 +0000
+Subject: [PATCH] Remove usage of internal sun class removed in Java 9
+
+---
+ .../org/kohsuke/args4j/spi/MultiPathOptionHandlerTest.java   | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/args4j/test/org/kohsuke/args4j/spi/MultiPathOptionHandlerTest.java b/args4j/test/org/kohsuke/args4j/spi/MultiPathOptionHandlerTest.java
+index b91f8a4..bdfee88 100644
+--- a/args4j/test/org/kohsuke/args4j/spi/MultiPathOptionHandlerTest.java
++++ b/args4j/test/org/kohsuke/args4j/spi/MultiPathOptionHandlerTest.java
+@@ -2,7 +2,6 @@ package org.kohsuke.args4j.spi;
+ 
+ import junit.framework.TestCase;
+ import org.kohsuke.args4j.CmdLineException;
+-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+ 
+ import java.lang.reflect.AnnotatedElement;
+ import java.nio.file.Path;
+@@ -100,11 +99,11 @@ public class MultiPathOptionHandlerTest extends TestCase {
+         }
+ 
+         public FieldSetter asFieldSetter() {
+-            throw new NotImplementedException();
++            throw new UnsupportedOperationException();
+         }
+ 
+         public AnnotatedElement asAnnotatedElement() {
+-            throw new NotImplementedException();
++            throw new UnsupportedOperationException();
+         }
+ 
+         List<Path> getCollection() {
+-- 
+2.33.1
+

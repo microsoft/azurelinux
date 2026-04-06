@@ -1,0 +1,12 @@
+diff -up libsmi-c5830721/lib/parser-sming.y.missing-semicolon libsmi-c5830721/lib/parser-sming.y
+--- libsmi-c5830721/lib/parser-sming.y.missing-semicolon	2024-01-05 10:02:02.926843140 -0500
++++ libsmi-c5830721/lib/parser-sming.y	2024-01-05 10:02:08.738924418 -0500
+@@ -1550,7 +1550,7 @@ identityStatement:	identityKeyword sep l
+ 			referenceStatement_stmtsep_01
+ 			{
+ 				setIdentityReference(identityPtr, $14, 
+-									 thisParserPtr)
++									 thisParserPtr);
+ 			}
+ 			'}' optsep ';'
+ 			{

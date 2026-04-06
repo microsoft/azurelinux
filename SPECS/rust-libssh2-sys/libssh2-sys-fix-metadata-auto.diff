@@ -1,0 +1,15 @@
+--- libssh2-sys-0.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libssh2-sys-0.3.1/Cargo.toml	2025-04-29T14:44:00.634673+00:00
+@@ -53,12 +53,6 @@
+ vendored-openssl = ["openssl-sys/vendored"]
+ zlib-ng-compat = ["libz-sys/zlib-ng"]
+ 
+-[target.'cfg(target_env = "msvc")'.build-dependencies.vcpkg]
+-version = "0.2"
+-
+ [target."cfg(unix)".dependencies.openssl-sys]
+ version = "0.9.35"
+ 
+-[target."cfg(windows)".dependencies.openssl-sys]
+-version = "0.9.35"
+-optional = true

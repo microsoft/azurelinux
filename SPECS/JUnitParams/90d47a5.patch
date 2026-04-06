@@ -1,0 +1,60 @@
+From 90d47a5c89fb2ccce89bb931776d432b8d10c441 Mon Sep 17 00:00:00 2001
+From: mlip <kiwaczki@gmail.com>
+Date: Fri, 11 May 2018 13:44:32 +0200
+Subject: [PATCH] Fix for #155 Better exception message for missing parameters
+
+---
+ .../junitparams/internal/InvokeParameterisedMethod.java  | 6 +++---
+ .../junitparams/missingparams/MissingParametersTest.java | 9 +++------
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/src/main/java/junitparams/internal/InvokeParameterisedMethod.java b/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
+index 6cbd051..0489ae1 100644
+--- a/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
++++ b/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
+@@ -237,9 +237,9 @@ private void verifyNumberOfParameters(FrameworkMethod testMethod, Object[] provi
+ 
+         if (numberOftestParameters != NumberOfProvidedParameters)
+             throw new IllegalArgumentException(
+-                    "Number of parameters in data provider method doesn't match the number of test method parameters.\nThere are "
+-                            + NumberOfProvidedParameters + " parameters in provider method, while there's " + numberOftestParameters + " parameters in the "
+-                            + testMethod.getName() + " method.");
++                    "Number of parameters in data provider method doesn't match the number of test method parameters.\n" +
++                            "Number of parameters in provider method is " + NumberOfProvidedParameters +
++                            ", while the number of parameters in the " + testMethod.getName() + " test is " + numberOftestParameters);
+     }
+ 
+     private boolean isForSingleParameter(FrameworkMethod testMethod) {
+diff --git a/src/test/java/junitparams/missingparams/MissingParametersTest.java b/src/test/java/junitparams/missingparams/MissingParametersTest.java
+index c09fcc6..0a4f4e1 100644
+--- a/src/test/java/junitparams/missingparams/MissingParametersTest.java
++++ b/src/test/java/junitparams/missingparams/MissingParametersTest.java
+@@ -39,16 +39,13 @@ public void missingParametersInMethodThrowsIllegalArgumentException() {
+         assertEquals(1, testResult.getFailureCount());
+         assertEquals(IllegalArgumentException.class, testFailure.getException().getClass());
+         assertEquals("Number of parameters in data provider method doesn't match the number of test method parameters.\n" +
+-                        "There are 1 parameters in provider method, while there's 2 parameters in the missingParameters method."
++                        "Number of parameters in provider method is 1, while the number of parameters in the missingParameters test is 2"
+                 , testFailure.getException().getMessage());
+     }
+ 
+     @RunWith(JUnitParamsRunner.class)
+     public static class MissingNullParametersInMethodProvider {
+ 
+-        public MissingNullParametersInMethodProvider() {
+-        }
+-
+         @Test
+         @Parameters(method = "withWrongNumberOfNullParams")
+         public void testWithValueAndMethodProviders(String param1, String param2, String param3) {
+@@ -71,8 +68,8 @@ public void missingNullParametersInMethodThrowsIllegalArgumentException() {
+         assertEquals(1, testResult.getFailureCount());
+         assertEquals(IllegalArgumentException.class, testFailure.getException().getClass());
+         assertEquals("Number of parameters in data provider method doesn't match the number of test method parameters.\n" +
+-                        "There are 2 parameters in provider method, while there's 3 parameters in the testWithValueAndMethodProviders method.",
+-                testFailure.getException().getMessage());
++                        "Number of parameters in provider method is 2, while the number of parameters in the testWithValueAndMethodProviders test is 3"
++                , testFailure.getException().getMessage());
+     }
+ 
+ 

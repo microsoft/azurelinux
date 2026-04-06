@@ -1,0 +1,14 @@
+diff -Naur procfs-0.17.0-original/src/lib.rs procfs-0.17.0/src/lib.rs
+--- procfs-0.17.0-original/src/lib.rs	2006-07-23 21:21:28.000000000 -0400
++++ procfs-0.17.0/src/lib.rs	2025-01-21 07:43:11.301712532 -0500
+@@ -639,6 +639,10 @@
+         }
+     }
+ 
++    // Downstream patch: disable this test so we do not have to package failure. (As of this
++    // writing, it is packaged, but unmaintained upstream, and we do not want to branch it into
++    // EPEL10.)
++    #[cfg(any())]
+     /// Test that our error type can be easily used with the `failure` crate
+     #[test]
+     fn test_failure() {

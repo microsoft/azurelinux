@@ -1,0 +1,36 @@
+From 73d49d17ce8db58e090f82719f7c9aad7340cbac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 17 Jan 2012 17:55:00 +0100
+Subject: [PATCH] Fix proxy response parser
+
+If proxy sends overlong HTTP vesion string, the string will be copied
+to unallocatd space (write_buf) causing heap overflow.
+
+This patch fixes it by ignoring the HTTP version string and checking
+the response line has been parsed correctly.
+
+See <https://bugzilla.redhat.com/show_bug.cgi?id=773699> for more
+details.
+---
+ src/client.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/client.c b/src/client.c
+index d0abd41..80872be 100644
+--- a/src/client.c
++++ b/src/client.c
+@@ -3878,9 +3878,9 @@ proxy_connect (root, port_number)
+     
+     /* Wait for HTTP status code, bail out if you don't get back a 2xx code.*/
+     count = read_line (&read_buf);
+-    sscanf (read_buf, "%s %d", write_buf, &codenum);
++    count = sscanf (read_buf, "%*s %d", &codenum);
+     
+-    if ((codenum / 100) != 2)
++    if (count != 1 || (codenum / 100) != 2)
+ 	error (1, 0, "proxy server %s:%d does not support http tunnelling",
+ 	       root->proxy_hostname, root->proxy_port);
+     free (read_buf);
+-- 
+1.7.7.5
+

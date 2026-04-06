@@ -1,0 +1,538 @@
+From 93b4cf22054a0e3f9f5d4ae8eaec85e8ca28944c Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 12 Jun 2023 16:00:23 +0200
+Subject: [PATCH] Upgrade to 3.32
+
+---
+ ChangeLog   |  29 ++++++++++++++
+ Makefile.PL |   2 +-
+ Storable.pm |  30 ++++++++------
+ Storable.xs | 111 ++++++++++++++++++++++++++++++++++++++++++----------
+ t/blessed.t |  53 ++++++++++++++++++++++++-
+ t/boolean.t |  84 +++++++++++++++++++++++++++++++++++++++
+ t/malice.t  |   6 +--
+ 7 files changed, 278 insertions(+), 37 deletions(-)
+ create mode 100644 t/boolean.t
+
+diff --git a/ChangeLog b/ChangeLog
+index b1f4790..6619543 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,32 @@
++2023-05-26 21:36:00 demerphq
++    version 3.32
++        * Update security advisory to be more clear
++
++2023-02-26 00:31:32 demerphq
++    version 3.31
++        * Fixup for ppport fix in 3.30
++
++2023-02-22 09:56:27 leont
++    version 3.30
++        * Use ppport for all modules in dist.
++
++2023-01-04 17:33:24 iabyn
++    version 3.29
++        * Store code fixes identified from refcounted stack patch
++
++2022-11-08 10:12:46 tony
++    version 3.28
++        * Store hook error reporting improvements
++	* Store hook handles regex objects properly.
++
++2022-06-20 20:32:29 toddr
++    version 3.27
++        * Use cBOOL instead of !! in xs code
++
++2022-04-18 17:36:00 toddr
++    version 3.26
++        * Conform to ppport.h 3.68 recommendations
++
+ 2021-08-30 07:46:52 nwclark
+     version 3.25
+         * No changes from previous version
+diff --git a/Makefile.PL b/Makefile.PL
+index e03e141..b705654 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -29,7 +29,7 @@ WriteMakefile(
+                 'ExtUtils::MakeMaker' => '6.31',
+             },
+             TEST_REQUIRES => {
+-                'Test::More' => '0.41',
++                'Test::More' => '0.82',
+             },
+            )
+         : () ),
+diff --git a/Storable.pm b/Storable.pm
+index 8e6ab25..d531f2b 100644
+--- a/Storable.pm
++++ b/Storable.pm
+@@ -28,7 +28,7 @@ our @EXPORT_OK = qw(
+ our ($canonical, $forgive_me);
+ 
+ BEGIN {
+-  our $VERSION = '3.25';
++  our $VERSION = '3.32';
+ }
+ 
+ our $recursion_limit;
+@@ -1197,11 +1197,16 @@ compartment:
+ 
+ =head1 SECURITY WARNING
+ 
+-B<Do not accept Storable documents from untrusted sources!>
++B<Do not accept Storable documents from untrusted sources!> There is
++B<no> way to configure Storable so that it can be used safely to process
++untrusted data.  While there I<are> various options that can be used to
++mitigate specific security issues these options do I<not> comprise a
++complete safety net for the user, and processing untrusted data may
++result in segmentation faults, remote code execution, or privilege
++escalation.  The following lists some known features which represent
++security issues that should be considered by users of this module.
+ 
+-Some features of Storable can lead to security vulnerabilities if you
+-accept Storable documents from untrusted sources with the default
+-flags. Most obviously, the optional (off by default) CODE reference
++Most obviously, the optional (off by default) CODE reference
+ serialization feature allows transfer of code to the deserializing
+ process. Furthermore, any serialized object will cause Storable to
+ helpfully load the module corresponding to the class of the object in
+@@ -1224,12 +1229,15 @@ With the default setting of C<$Storable::flags> = 6, creating or destroying
+ random objects, even renamed objects can be controlled by an attacker.
+ See CVE-2015-1592 and its metasploit module.
+ 
+-If your application requires accepting data from untrusted sources,
+-you are best off with a less powerful and more-likely safe
+-serialization format and implementation. If your data is sufficiently
+-simple, L<Cpanel::JSON::XS>, L<Data::MessagePack> or L<Sereal> are the best
+-choices and offer maximum interoperability, but note that Sereal is
+-L<unsafe by default|Sereal::Decoder/ROBUSTNESS>.
++If your application requires accepting data from untrusted sources, you
++are best off with a less powerful and more-likely safe serialization
++format and implementation.  If your data is sufficiently simple,
++L<Cpanel::JSON::XS> or L<Data::MessagePack> are fine alternatives.  For
++more complex data structures containing various Perl specific data types
++like regular expressions or aliased data L<Sereal> is the best
++alternative and offers maximum interoperability.  Note that Sereal is
++L<unsafe by default|Sereal::Decoder/ROBUSTNESS>, but you can configure
++the encoder and decoder to mitigate any security issues.
+ 
+ =head1 WARNING
+ 
+diff --git a/Storable.xs b/Storable.xs
+index 6944b76..a558dd7 100644
+--- a/Storable.xs
++++ b/Storable.xs
+@@ -16,18 +16,13 @@
+ #include <perl.h>
+ #include <XSUB.h>
+ 
+-#ifndef PERL_VERSION_LT
+-# if !defined(PERL_VERSION) || !defined(PERL_REVISION) || ( PERL_REVISION == 5 && ( PERL_VERSION < 10 || (PERL_VERSION == 10 && PERL_SUBVERSION < 1) ) )
+-#   define NEED_PL_parser
+-#   define NEED_sv_2pv_flags
+-#   define NEED_load_module
+-#   define NEED_vload_module
+-#   define NEED_newCONSTSUB
+-#   define NEED_newSVpvn_flags
+-#   define NEED_newRV_noinc
+-# endif
++#define NEED_sv_2pv_flags
++#define NEED_load_module
++#define NEED_vload_module
++#define NEED_newCONSTSUB
++#define NEED_newSVpvn_flags
++#define NEED_newRV_noinc
+ #include "ppport.h"             /* handle old perls */
+-#endif
+ 
+ #ifdef DEBUGGING
+ #define DEBUGME /* Debug mode, turns assertions on as well */
+@@ -176,7 +171,9 @@
+ #define SX_SVUNDEF_ELEM	C(31)	/* array element set to &PL_sv_undef */
+ #define SX_REGEXP	C(32)	/* Regexp */
+ #define SX_LOBJECT	C(33)	/* Large object: string, array or hash (size >2G) */
+-#define SX_LAST		C(34)	/* invalid. marker only */
++#define SX_BOOLEAN_TRUE	C(34)	/* Boolean true */
++#define SX_BOOLEAN_FALSE	C(35)	/* Boolean false */
++#define SX_LAST		C(36)	/* invalid. marker only */
+ 
+ /*
+  * Those are only used to retrieve "old" pre-0.6 binary images.
+@@ -975,7 +972,7 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
+ #endif
+ 
+ #define STORABLE_BIN_MAJOR	2		/* Binary major "version" */
+-#define STORABLE_BIN_MINOR	11		/* Binary minor "version" */
++#define STORABLE_BIN_MINOR	12		/* Binary minor "version" */
+ 
+ #if !defined (SvVOK)
+ /*
+@@ -1454,6 +1451,8 @@ static const sv_retrieve_t sv_old_retrieve[] = {
+     (sv_retrieve_t)retrieve_other,	/* SX_SVUNDEF_ELEM not supported */
+     (sv_retrieve_t)retrieve_other,	/* SX_REGEXP */
+     (sv_retrieve_t)retrieve_other,  	/* SX_LOBJECT not supported */
++    (sv_retrieve_t)retrieve_other,	/* SX_BOOLEAN_TRUE not supported */
++    (sv_retrieve_t)retrieve_other,	/* SX_BOOLEAN_FALSE not supported */
+     (sv_retrieve_t)retrieve_other,  	/* SX_LAST */
+ };
+ 
+@@ -1477,6 +1476,8 @@ static SV *retrieve_weakoverloaded(pTHX_ stcxt_t *cxt, const char *cname);
+ static SV *retrieve_vstring(pTHX_ stcxt_t *cxt, const char *cname);
+ static SV *retrieve_lvstring(pTHX_ stcxt_t *cxt, const char *cname);
+ static SV *retrieve_svundef_elem(pTHX_ stcxt_t *cxt, const char *cname);
++static SV *retrieve_boolean_true(pTHX_ stcxt_t *cxt, const char *cname);
++static SV *retrieve_boolean_false(pTHX_ stcxt_t *cxt, const char *cname);
+ 
+ static const sv_retrieve_t sv_retrieve[] = {
+     0,					/* SX_OBJECT -- entry unused dynamically */
+@@ -1513,6 +1514,8 @@ static const sv_retrieve_t sv_retrieve[] = {
+     (sv_retrieve_t)retrieve_svundef_elem,/* SX_SVUNDEF_ELEM */
+     (sv_retrieve_t)retrieve_regexp,	/* SX_REGEXP */
+     (sv_retrieve_t)retrieve_lobject,	/* SX_LOBJECT */
++    (sv_retrieve_t)retrieve_boolean_true,	/* SX_BOOLEAN_TRUE */
++    (sv_retrieve_t)retrieve_boolean_false,	/* SX_BOOLEAN_FALSE */
+     (sv_retrieve_t)retrieve_other,  	/* SX_LAST */
+ };
+ 
+@@ -2187,7 +2190,7 @@ static AV *array_call(pTHX_
+     XPUSHs(sv_2mortal(newSViv(cloning)));	/* Cloning flag */
+     PUTBACK;
+ 
+-    count = call_sv(hook, G_ARRAY);	/* Go back to Perl code */
++    count = call_sv(hook, G_LIST);	/* Go back to Perl code */
+ 
+     SPAGAIN;
+ 
+@@ -2454,6 +2457,16 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
+             pv = SvPV(sv, len);		/* We know it's SvPOK */
+             goto string;			/* Share code below */
+         }
++#ifdef SvIsBOOL
++    } else if (SvIsBOOL(sv)) {
++        TRACEME(("mortal boolean"));
++        if (SvTRUE_nomg_NN(sv)) {
++            PUTMARK(SX_BOOLEAN_TRUE);
++        }
++        else {
++            PUTMARK(SX_BOOLEAN_FALSE);
++        }
++#endif
+     } else if (flags & SVf_POK) {
+         /* public string - go direct to string read.  */
+         goto string_readlen;
+@@ -3250,6 +3263,7 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
+         CROAK(("Unexpected return value from B::Deparse::coderef2text\n"));
+ 
+     text = POPs;
++    PUTBACK;
+     len = SvCUR(text);
+     reallen = strlen(SvPV_nolen(text));
+ 
+@@ -3318,7 +3332,7 @@ static int get_regexp(pTHX_ stcxt_t *cxt, SV* sv, SV **re, SV **flags) {
+     XPUSHs(rv);
+     PUTBACK;
+     /* optimize to call the XS directly later */
+-    count = call_sv((SV*)cv, G_ARRAY);
++    count = call_sv((SV*)cv, G_LIST);
+     SPAGAIN;
+     if (count < 2)
+       CROAK(("re::regexp_pattern returned only %d results", (int)count));
+@@ -3567,7 +3581,10 @@ static int store_hook(
+     int need_large_oids = 0;
+ #endif
+ 
+-    TRACEME(("store_hook, classname \"%s\", tagged #%d", HvNAME_get(pkg), (int)cxt->tagnum));
++    classname = HvNAME_get(pkg);
++    len = strlen(classname);
++
++    TRACEME(("store_hook, classname \"%s\", tagged #%d", classname, (int)cxt->tagnum));
+ 
+     /*
+      * Determine object type on 2 bits.
+@@ -3576,6 +3593,7 @@ static int store_hook(
+     switch (type) {
+     case svis_REF:
+     case svis_SCALAR:
++    case svis_REGEXP:
+         obj_type = SHT_SCALAR;
+         break;
+     case svis_ARRAY:
+@@ -3615,13 +3633,20 @@ static int store_hook(
+         }
+         break;
+     default:
+-        CROAK(("Unexpected object type (%d) in store_hook()", type));
++        {
++            /* pkg_can() always returns a ref to a CV on success */
++            CV *cv = (CV*)SvRV(hook);
++            const GV * const gv = CvGV(cv);
++            const char *gvname = GvNAME(gv);
++            const HV * const stash = GvSTASH(gv);
++            const char *hvname = stash ? HvNAME(stash) : NULL;
++
++            CROAK(("Unexpected object type (%s) of class '%s' in store_hook() calling %s::%s",
++                   sv_reftype(sv, FALSE), classname, hvname, gvname));
++        }
+     }
+     flags = SHF_NEED_RECURSE | obj_type;
+ 
+-    classname = HvNAME_get(pkg);
+-    len = strlen(classname);
+-
+     /*
+      * To call the hook, we need to fake a call like:
+      *
+@@ -5882,6 +5907,50 @@ static SV *retrieve_integer(pTHX_ stcxt_t *cxt, const char *cname)
+     return sv;
+ }
+ 
++/*
++ * retrieve_boolean_true
++ *
++ * Retrieve boolean true copy.
++ */
++static SV *retrieve_boolean_true(pTHX_ stcxt_t *cxt, const char *cname)
++{
++    SV *sv;
++    HV *stash;
++
++    TRACEME(("retrieve_boolean_true (#%d)", (int)cxt->tagnum));
++
++    sv = newSVsv(&PL_sv_yes);
++    stash = cname ? gv_stashpv(cname, GV_ADD) : 0;
++    SEEN_NN(sv, stash, 0);  /* Associate this new scalar with tag "tagnum" */
++
++    TRACEME(("boolean true"));
++    TRACEME(("ok (retrieve_boolean_true at 0x%" UVxf ")", PTR2UV(sv)));
++
++    return sv;
++}
++
++/*
++ * retrieve_boolean_false
++ *
++ * Retrieve boolean false copy.
++ */
++static SV *retrieve_boolean_false(pTHX_ stcxt_t *cxt, const char *cname)
++{
++    SV *sv;
++    HV *stash;
++
++    TRACEME(("retrieve_boolean_false (#%d)", (int)cxt->tagnum));
++
++    sv = newSVsv(&PL_sv_no);
++    stash = cname ? gv_stashpv(cname, GV_ADD) : 0;
++    SEEN_NN(sv, stash, 0);  /* Associate this new scalar with tag "tagnum" */
++
++    TRACEME(("boolean false"));
++    TRACEME(("ok (retrieve_boolean_false at 0x%" UVxf ")", PTR2UV(sv)));
++
++    return sv;
++}
++
+ /*
+  * retrieve_lobject
+  *
+@@ -7774,7 +7843,7 @@ CODE:
+         assert(cxt);
+         result = cxt->entry && (cxt->optype & ix) ? TRUE : FALSE;
+     } else {
+-        result = !!last_op_in_netorder(aTHX);
++        result = cBOOL(last_op_in_netorder(aTHX));
+     }
+     ST(0) = boolSV(result);
+ 
+diff --git a/t/blessed.t b/t/blessed.t
+index d9a77b3..dea569b 100644
+--- a/t/blessed.t
++++ b/t/blessed.t
+@@ -44,7 +44,7 @@ use Storable qw(freeze thaw store retrieve fd_retrieve);
+    'long VSTRING' => \(my $lvstring = eval "v" . 0 x 300),
+    LVALUE         => \(my $substr  = substr((my $str = "foo"), 0, 3)));
+ 
+-my $test = 13;
++my $test = 18;
+ my $tests = $test + 41 + (2 * 6 * keys %::immortals) + (3 * keys %::weird_refs);
+ plan(tests => $tests);
+ 
+@@ -414,3 +414,54 @@ is(ref $t, 'STRESS_THE_STACK');
+ 
+     unlink("store$$");
+ }
++
++{
++    # trying to freeze a glob via STORABLE_freeze
++    {
++        package GlobHookedBase;
++
++        sub STORABLE_freeze {
++            return \1;
++        }
++
++        package GlobHooked;
++        our @ISA = "GlobHookedBase";
++    }
++    use Symbol ();
++    my $glob = bless Symbol::gensym(), "GlobHooked";
++    eval {
++        my $data = freeze($glob);
++    };
++    my $msg = $@;
++    like($msg, qr/Unexpected object type \(GLOB\) of class 'GlobHooked' in store_hook\(\) calling GlobHookedBase::STORABLE_freeze/,
++         "check we get the verbose message");
++}
++
++SKIP:
++{
++    $] < 5.012
++      and skip "Can't assign regexps directly before 5.12", 4;
++    my $hook_called;
++    # store regexp via hook
++    {
++        package RegexpHooked;
++        sub STORABLE_freeze {
++            ++$hook_called;
++            "$_[0]";
++        }
++        sub STORABLE_thaw {
++            my ($obj, $cloning, $serialized) = @_;
++            ++$hook_called;
++            $$obj = ${ qr/$serialized/ };
++        }
++    }
++
++    my $obj = bless qr/abc/, "RegexpHooked";
++    my $data = freeze($obj);
++    ok($data, "froze regexp blessed into hooked class");
++    ok($hook_called, "and the hook was actually called");
++    $hook_called = 0;
++    my $obj_thawed = thaw($data);
++    ok($hook_called, "hook called for thaw");
++    like("abc", $obj_thawed, "check the regexp");
++}
+diff --git a/t/boolean.t b/t/boolean.t
+new file mode 100644
+index 0000000..9ba19c0
+--- /dev/null
++++ b/t/boolean.t
+@@ -0,0 +1,84 @@
++use strict;
++use warnings;
++
++my $true_ref;
++my $false_ref;
++BEGIN {
++    $true_ref = \!!1;
++    $false_ref = \!!0;
++}
++
++BEGIN {
++    unshift @INC, 't';
++    unshift @INC, 't/compat' if $] < 5.006002;
++    require Config;
++    if ($ENV{PERL_CORE} and $Config::Config{'extensions'} !~ /\bStorable\b/) {
++        print "1..0 # Skip: Storable was not built\n";
++        exit 0;
++    }
++}
++
++use Test::More tests => 12;
++use Storable qw(thaw freeze);
++
++use constant CORE_BOOLS => defined &builtin::is_bool;
++
++{
++  my $x = $true_ref;
++  my $y = ${thaw freeze \$x};
++  is($y, $x);
++  eval {
++    $$y = 2;
++  };
++  isnt $@, '',
++    'immortal true maintained as immortal';
++}
++
++{
++  my $x = $false_ref;
++  my $y = ${thaw freeze \$x};
++  is($y, $x);
++  eval {
++    $$y = 2;
++  };
++  isnt $@, '',
++    'immortal false maintained as immortal';
++}
++
++{
++  my $true = $$true_ref;
++  my $x = \$true;
++  my $y = ${thaw freeze \$x};
++  is($$y, $$x);
++  is($$y, '1');
++  SKIP: {
++    skip "perl $] does not support tracking boolean values", 1
++      unless CORE_BOOLS;
++    BEGIN { CORE_BOOLS and warnings->unimport('experimental::builtin') }
++    ok builtin::is_bool($$y);
++  }
++  eval {
++    $$y = 2;
++  };
++  is $@, '',
++    'mortal true maintained as mortal';
++}
++
++{
++  my $false = $$false_ref;
++  my $x = \$false;
++  my $y = ${thaw freeze \$x};
++  is($$y, $$x);
++  is($$y, '');
++  SKIP: {
++    skip "perl $] does not support tracking boolean values", 1
++      unless CORE_BOOLS;
++    BEGIN { CORE_BOOLS and warnings->unimport('experimental::builtin') }
++    ok builtin::is_bool($$y);
++  }
++  eval {
++    $$y = 2;
++  };
++  is $@, '',
++    'mortal true maintained as mortal';
++}
+diff --git a/t/malice.t b/t/malice.t
+index 8adae95..7b92d3d 100644
+--- a/t/malice.t
++++ b/t/malice.t
+@@ -32,7 +32,7 @@ our $file_magic_str = 'pst0';
+ our $other_magic = 7 + length $byteorder;
+ our $network_magic = 2;
+ our $major = 2;
+-our $minor = 11;
++our $minor = 12;
+ our $minor_write = $] >= 5.019 ? 11 : $] > 5.008 ? 9 : $] > 5.005_50 ? 8 : 4;
+ 
+ use Test::More;
+@@ -206,7 +206,7 @@ sub test_things {
+     $where = $file_magic + $network_magic;
+   }
+ 
+-  # Just the header and a tag 255. As 33 is currently the highest tag, this
++  # Just the header and a tag 255. As 34 is currently the highest tag, this
+   # is "unexpected"
+   $copy = substr ($contents, 0, $where) . chr 255;
+ 
+@@ -226,7 +226,7 @@ sub test_things {
+   # local $Storable::DEBUGME = 1;
+   # This is the delayed croak
+   test_corrupt ($copy, $sub,
+-                "/^Storable binary image v$header->{major}.$minor6 contains data of type 255. This Storable is v$header->{major}.$minor and can only handle data types up to 33/",
++                "/^Storable binary image v$header->{major}.$minor6 contains data of type 255. This Storable is v$header->{major}.$minor and can only handle data types up to 35/",
+                 "bogus tag, minor plus 4");
+   # And check again that this croak is not delayed:
+   {
+-- 
+2.40.1
+

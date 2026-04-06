@@ -1,0 +1,78 @@
+From 3b81f3a46a3b336b874dcc9dc2cc0afaa4df0949 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:10:28 -0300
+Subject: [PATCH 12/20] system-cpuinfo
+
+---
+ .../external/onnxruntime_external_deps.cmake  | 27 ++-----------------
+ cmake/onnxruntime_common.cmake                |  2 +-
+ 2 files changed, 3 insertions(+), 26 deletions(-)
+
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index 6411190960..ab54134477 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -328,6 +328,7 @@ if (CPUINFO_SUPPORTED)
+   set(CPUINFO_BUILD_UNIT_TESTS OFF CACHE INTERNAL "")
+   set(CPUINFO_BUILD_MOCK_TESTS OFF CACHE INTERNAL "")
+   set(CPUINFO_BUILD_BENCHMARKS OFF CACHE INTERNAL "")
++  find_package(cpuinfo REQUIRED)
+   if(onnxruntime_target_platform STREQUAL "ARM64EC")
+       message(STATUS "Applying a patch for Windows ARM64EC in cpuinfo")
+       FetchContent_Declare(
+@@ -353,29 +354,6 @@ if (CPUINFO_SUPPORTED)
+   endif()
+ endif()
+ 
+-# xnnpack depends on clog
+-# Android build should use the system's log library instead of clog
+-if ((CPUINFO_SUPPORTED OR onnxruntime_USE_XNNPACK) AND NOT ANDROID)
+-  set(CLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+-  FetchContent_Declare(
+-    pytorch_clog
+-    URL ${DEP_URL_pytorch_cpuinfo}
+-    URL_HASH SHA1=${DEP_SHA1_pytorch_cpuinfo}
+-    SOURCE_SUBDIR deps/clog
+-    FIND_PACKAGE_ARGS NAMES cpuinfo
+-  )
+-  set(ONNXRUNTIME_CLOG_PROJ pytorch_clog)
+-  onnxruntime_fetchcontent_makeavailable(${ONNXRUNTIME_CLOG_PROJ})
+-  set(ONNXRUNTIME_CLOG_TARGET_NAME clog)
+-  # if cpuinfo is from find_package, use it with imported name
+-  if(TARGET cpuinfo::clog)
+-    set(ONNXRUNTIME_CLOG_TARGET_NAME cpuinfo::clog)
+-  elseif(onnxruntime_USE_VCPKG)
+-    # however, later cpuinfo versions may not contain clog. use cpuinfo
+-    set(ONNXRUNTIME_CLOG_TARGET_NAME cpuinfo::cpuinfo)
+-  endif()
+-endif()
+-
+ if(onnxruntime_USE_CUDA)
+   FetchContent_Declare(
+     GSL
+@@ -505,8 +483,7 @@ endif()
+ 
+ set(onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_EXTERNAL_LIBRARIES_XNNPACK} nlohmann_json::nlohmann_json
+                                    onnx onnx_proto ${PROTOBUF_LIB} re2::re2 Boost::boost safeint_interface
+-                                   flatbuffers::flatbuffers ${GSL_TARGET} ${ABSEIL_LIBS} date::date
+-                                   ${ONNXRUNTIME_CLOG_TARGET_NAME})
++                                   flatbuffers::flatbuffers ${GSL_TARGET} ${ABSEIL_LIBS} date::date)
+ 
+ # The source code of onnx_proto is generated, we must build this lib first before starting to compile the other source code that uses ONNX protobuf types.
+ # The other libs do not have the problem. All the sources are already there. We can compile them in any order.
+diff --git a/cmake/onnxruntime_common.cmake b/cmake/onnxruntime_common.cmake
+index 7721f9c8d2..1d63f88942 100644
+--- a/cmake/onnxruntime_common.cmake
++++ b/cmake/onnxruntime_common.cmake
+@@ -212,7 +212,7 @@ if (RISCV64 OR ARM64 OR ARM OR X86 OR X64 OR X86_64)
+     # Its functionality in detecting x86 cpu features are lacking, so is support for Windows.
+     if (CPUINFO_SUPPORTED)
+       onnxruntime_add_include_to_target(onnxruntime_common cpuinfo::cpuinfo)
+-      list(APPEND onnxruntime_EXTERNAL_LIBRARIES cpuinfo::cpuinfo ${ONNXRUNTIME_CLOG_TARGET_NAME})
++      list(APPEND onnxruntime_EXTERNAL_LIBRARIES cpuinfo::cpuinfo)
+     endif()
+ endif()
+ 
+-- 
+2.47.1
+

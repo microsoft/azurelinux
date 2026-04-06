@@ -1,0 +1,24 @@
+--- rustfft-6.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustfft-6.2.0/Cargo.toml	2024-01-30T12:39:04.735811+00:00
+@@ -56,16 +56,12 @@
+ 
+ [dev-dependencies.getrandom]
+ version = "^0.2"
+-features = ["js"]
+ 
+ [dev-dependencies.paste]
+ version = "1.0.9"
+ 
+ [dev-dependencies.rand]
+ version = "0.8"
+-
+-[dev-dependencies.wasm-bindgen-test]
+-version = "^0.3.36"
+ 
+ [build-dependencies.version_check]
+ version = "0.9"
+@@ -79,4 +75,3 @@
+ ]
+ neon = []
+ sse = []
+-wasm_simd = []

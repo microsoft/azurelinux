@@ -1,0 +1,25 @@
+From 34b9e1d10c6be736f1b20be8795c655446f38c5e Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 13:14:55 +0100
+Subject: [PATCH 29/59] Fix segfault in config file parser.
+
+---
+ str.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/str.c b/str.c
+index 41b27db..82b8ae4 100644
+--- a/str.c
++++ b/str.c
+@@ -113,7 +113,7 @@ str_strdup_trimmed(const struct mystr* p_str)
+   for (h = 0; h < (int)str_getlen(p_str) && vsf_sysutil_isspace(p_trimmed[h]); h++) ;
+   for (t = str_getlen(p_str) - 1; t >= 0 && vsf_sysutil_isspace(p_trimmed[t]); t--) ;
+   newlen = t - h + 1;
+-  return newlen ? vsf_sysutil_strndup(p_trimmed+h, (unsigned int)newlen) : 0L;
++  return (newlen > 0) ? vsf_sysutil_strndup(p_trimmed+h, (unsigned int)newlen) : 0L;
+ }
+ 
+ void
+-- 
+2.14.4
+

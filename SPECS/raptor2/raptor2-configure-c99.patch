@@ -1,0 +1,35 @@
+Include <stdio.h> for printf in __FUNCTION__ check.  Otherwise, the
+check will fail with compilers which do not implement implicit
+function declarations (a C feature that was removed in 1999 from the
+language), no matter if the compiler supports FUNCTION or not.
+
+Submitted upstream: <https://github.com/dajobe/raptor/pull/56>
+
+diff --git a/configure b/configure
+index b0091892a210361d..08501ac8ed5e4fe1 100755
+--- a/configure
++++ b/configure
+@@ -13747,6 +13747,8 @@ esac
+ $as_echo_n "checking whether __FUNCTION__ is available... " >&6; }
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
++
++#include <stdio.h>
+ int main() { printf(__FUNCTION__); }
+ _ACEOF
+ if ac_fn_c_try_compile "$LINENO"; then :
+diff --git a/configure.ac b/configure.ac
+index 10ff870805b82e65..40a8548b6406866a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -312,7 +312,9 @@ AC_C_BIGENDIAN
+ AC_C_INLINE
+ 
+ AC_MSG_CHECKING(whether __FUNCTION__ is available)
+-AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() { printf(__FUNCTION__); }])],
++AC_COMPILE_IFELSE([AC_LANG_SOURCE([
++#include <stdio.h>
++int main() { printf(__FUNCTION__); }])],
+     [AC_DEFINE([HAVE___FUNCTION__], [1], [Is __FUNCTION__ available])
+      AC_MSG_RESULT(yes)],
+     [AC_MSG_RESULT(no)])

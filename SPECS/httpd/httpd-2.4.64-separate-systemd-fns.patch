@@ -1,0 +1,101 @@
+diff --git a/acinclude.m4 b/acinclude.m4
+index 05abe18..97484c9 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -631,7 +631,6 @@ case $host in
+       if test "${ac_cv_header_systemd_sd_daemon_h}" = "no" || test -z "${SYSTEMD_LIBS}"; then
+         AC_MSG_WARN([Your system does not support systemd.])
+       else
+-        APR_ADDTO(HTTPD_LIBS, [$SYSTEMD_LIBS])
+         AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is supported])
+       fi
+    fi
+diff --git a/modules/arch/unix/mod_systemd.c b/modules/arch/unix/mod_systemd.c
+index af68249..7232a45 100644
+--- a/modules/arch/unix/mod_systemd.c
++++ b/modules/arch/unix/mod_systemd.c
+@@ -40,6 +40,9 @@
+ #include <unistd.h>
+ #endif
+ 
++APR_DECLARE_OPTIONAL_FN(int,
++                        ap_systemd_journal_stream_fd, (const char *, int, int));
++
+ static char describe_listeners[30];
+ 
+ static int systemd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
+@@ -217,10 +220,15 @@ static int ap_systemd_listen_fds(int unset_environment){
+     return sd_listen_fds(unset_environment);
+ }
+ 
++static int ap_systemd_journal_stream_fd(const char *identifier, int priority, int level_prefix){
++    return sd_journal_stream_fd("httpd", priority, 0);
++}
++
+ static void systemd_register_hooks(apr_pool_t *p)
+ {
+     APR_REGISTER_OPTIONAL_FN(ap_systemd_listen_fds);
+     APR_REGISTER_OPTIONAL_FN(ap_find_systemd_socket);
++    APR_REGISTER_OPTIONAL_FN(ap_systemd_journal_stream_fd);
+ 
+     /* Enable ap_extended_status. */
+     ap_hook_pre_config(systemd_pre_config, NULL, NULL, APR_HOOK_LAST);
+diff --git a/modules/loggers/config.m4 b/modules/loggers/config.m4
+index 0848d2e..8af2299 100644
+--- a/modules/loggers/config.m4
++++ b/modules/loggers/config.m4
+@@ -5,7 +5,6 @@ dnl APACHE_MODULE(name, helptext[, objects[, structname[, default[, config]]]])
+ APACHE_MODPATH_INIT(loggers)
+ 	
+ APACHE_MODULE(log_config, logging configuration.  You won't be able to log requests to the server without this module., , , yes)
+-APR_ADDTO(MOD_LOG_CONFIG_LDADD, [$SYSTEMD_LIBS])
+ 
+ APACHE_MODULE(log_debug, configurable debug logging, , , most)
+ APACHE_MODULE(log_forensic, forensic logging)
+diff --git a/modules/loggers/mod_log_config.c b/modules/loggers/mod_log_config.c
+index 694f447..a65b982 100644
+--- a/modules/loggers/mod_log_config.c
++++ b/modules/loggers/mod_log_config.c
+@@ -172,10 +172,6 @@
+ #include <limits.h>
+ #endif
+ 
+-#ifdef HAVE_SYSTEMD
+-#include <systemd/sd-journal.h>
+-#endif
+-
+ #define DEFAULT_LOG_FORMAT "%h %l %u %t \"%r\" %>s %b"
+ 
+ module AP_MODULE_DECLARE_DATA log_config_module;
+@@ -1640,8 +1636,15 @@ static apr_status_t wrap_journal_stream(apr_pool_t *p, apr_file_t **outfd,
+ {
+ #ifdef HAVE_SYSTEMD
+     int fd;
++    APR_OPTIONAL_FN_TYPE(ap_systemd_journal_stream_fd) *systemd_journal_stream_fd;
++    
++    systemd_journal_stream_fd = APR_RETRIEVE_OPTIONAL_FN(ap_systemd_journal_stream_fd);
++    if (systemd_journal_stream_fd == NULL) {
++        return APR_ENOTIMPL;
++    }
+ 
+-    fd = sd_journal_stream_fd("httpd", priority, 0);
++    fd = systemd_journal_stream_fd("httpd", priority, 0);
++    
+     if (fd < 0) return fd;
+ 
+     /* This is an AF_UNIX socket fd so is more pipe-like than
+diff --git a/modules/loggers/mod_log_config.h b/modules/loggers/mod_log_config.h
+index 877a593..bd52a98 100644
+--- a/modules/loggers/mod_log_config.h
++++ b/modules/loggers/mod_log_config.h
+@@ -69,6 +69,10 @@ APR_DECLARE_OPTIONAL_FN(ap_log_writer_init*, ap_log_set_writer_init,(ap_log_writ
+  */
+ APR_DECLARE_OPTIONAL_FN(ap_log_writer*, ap_log_set_writer, (ap_log_writer* func));
+ 
++#ifdef HAVE_SYSTEMD
++APR_DECLARE_OPTIONAL_FN(int, ap_systemd_journal_stream_fd, (const char *, int, int));
++#endif
++
+ #endif /* MOD_LOG_CONFIG */
+ /** @} */
+ 

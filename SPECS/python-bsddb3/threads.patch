@@ -1,0 +1,49 @@
+--- bsddb3-6.2.9/Modules/_bsddb.c~	2020-11-26 09:38:58.000000000 -0600
++++ bsddb3-6.2.9/Modules/_bsddb.c	2023-10-24 10:28:36.370065106 -0500
+@@ -1588,7 +1588,7 @@
+      *  (see pybsddb-users mailing list post on 2002-08-07)
+      */
+ #ifdef WITH_THREAD
+-    PyEval_InitThreads();
++    Py_Initialize();
+ #endif
+     MYDB_BEGIN_ALLOW_THREADS;
+     err = self->db->associate(self->db,
+--- bsddb3-6.2.9/Modules/_bsddb.c.orig	2023-10-24 10:35:34.996165818 -0500
++++ bsddb3-6.2.9/Modules/_bsddb.c	2023-10-24 10:35:54.455077167 -0500
+@@ -1577,7 +1577,7 @@
+     secondaryDB->associateCallback = callback;
+     secondaryDB->primaryDBType = _DB_get_type(self);
+ 
+-    /* PyEval_InitThreads is called here due to a quirk in python 1.5
++    /* Py_Initialize is called here due to a quirk in python 1.5
+      * - 2.2.1 (at least) according to Russell Williamson <merel@wt.net>:
+      * The global interepreter lock is not initialized until the first
+      * thread is created using thread.start_new_thread() or fork() is
+@@ -2723,7 +2723,7 @@
+     /* This is to workaround a problem with un-initialized threads (see
+        comment in DB_associate) */
+ #ifdef WITH_THREAD
+-    PyEval_InitThreads();
++    Py_Initialize();
+ #endif
+ 
+     err = self->db->set_bt_compare(self->db, _db_compareCallback);
+@@ -2845,7 +2845,7 @@
+     /* This is to workaround a problem with un-initialized threads (see
+        comment in DB_associate) */
+ #ifdef WITH_THREAD
+-    PyEval_InitThreads();
++    Py_Initialize();
+ #endif
+ 
+     err = self->db->set_dup_compare(self->db, _db_dupCompareCallback);
+@@ -7115,7 +7115,7 @@
+     /* This is to workaround a problem with un-initialized threads (see
+        comment in DB_associate) */
+ #ifdef WITH_THREAD
+-    PyEval_InitThreads();
++    Py_Initialize();
+ #endif
+ 
+     MYDB_BEGIN_ALLOW_THREADS;

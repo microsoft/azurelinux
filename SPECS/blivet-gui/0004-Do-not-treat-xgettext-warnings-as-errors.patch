@@ -1,0 +1,24 @@
+From c385bb72eac9e1b4a2e4363305ab931f0d05eec6 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 3 Sep 2025 12:49:06 +0200
+Subject: [PATCH] po: Do not treat xgettext warnings as errors
+
+We don't want random warnings to block the build
+---
+ po/Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/po/Makefile b/po/Makefile
+index 59527f68..e319e3da 100644
+--- a/po/Makefile
++++ b/po/Makefile
+@@ -17,8 +17,7 @@ INSTALL_NLS_DIR = $(RPM_BUILD_ROOT)/usr/share/locale
+ 
+ # PO catalog handling
+ MSGMERGE	= msgmerge -v
+-XGETTEXT	= $(TOP)/translation-canary/xgettext_werror.sh --default-domain=$(NLSPACKAGE) \
+-		  --add-comments
++XGETTEXT	= LC_MESSAGES=C xgettext --default-domain=$(NLSPACKAGE) --add-comments
+ MSGFMT		= msgfmt --statistics --verbose
+ 
+ # What do we need to do

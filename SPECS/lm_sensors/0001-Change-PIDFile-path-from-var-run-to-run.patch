@@ -1,0 +1,40 @@
+From 25f4f8793730ef3d170f1f2bd729a82fd61a4784 Mon Sep 17 00:00:00 2001
+From: puneetse <22071208+puneetse@users.noreply.github.com>
+Date: Wed, 11 Mar 2020 09:36:51 -0700
+Subject: [PATCH] Change PIDFile path from /var/run to /run
+
+/var/run is considered a legacy directory by systemd 239+ and having it in unit files causes a warning to be emitted to the journal.
+---
+ prog/init/fancontrol.service | 2 +-
+ prog/init/sensord.service    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/prog/init/fancontrol.service b/prog/init/fancontrol.service
+index 3ac1ed02..43293141 100644
+--- a/prog/init/fancontrol.service
++++ b/prog/init/fancontrol.service
+@@ -5,7 +5,7 @@ After=lm_sensors.service
+ 
+ [Service]
+ Type=simple
+-PIDFile=/var/run/fancontrol.pid
++PIDFile=/run/fancontrol.pid
+ ExecStart=/usr/sbin/fancontrol
+ 
+ [Install]
+diff --git a/prog/init/sensord.service b/prog/init/sensord.service
+index 2448beeb..af2f0ae9 100644
+--- a/prog/init/sensord.service
++++ b/prog/init/sensord.service
+@@ -5,7 +5,7 @@ After=lm_sensors.service
+ [Service]
+ EnvironmentFile=/etc/sysconfig/sensord
+ Type=forking
+-PIDFile=/var/run/sensord.pid
++PIDFile=/run/sensord.pid
+ ExecStart=/usr/sbin/sensord -i $INTERVAL -l $LOG_INTERVAL -f daemon
+ 
+ [Install]
+-- 
+2.25.4
+

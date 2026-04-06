@@ -1,0 +1,11 @@
+--- mod_perl-2.0.4/src/modules/perl/modperl_common_util.h.inline
++++ mod_perl-2.0.4/src/modules/perl/modperl_common_util.h
+@@ -22,7 +22,7 @@
+ #ifdef MP_DEBUG
+ #define MP_INLINE
+ #else
+-#define MP_INLINE APR_INLINE
++#define MP_INLINE
+ #endif
+ 
+ #ifdef CYGWIN

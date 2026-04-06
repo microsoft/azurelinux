@@ -1,0 +1,26 @@
+From ffc7d5ae2d79f98967943fabb2abfbc1b1e047fd Mon Sep 17 00:00:00 2001
+From: Douglas Yung <douglas.yung@sony.com>
+Date: Tue, 24 Jun 2025 04:08:34 +0000
+Subject: [PATCH] Add `REQUIRES: asserts` to test added in #145149 because it
+ uses the `-debug-only=` flag.
+
+This should fix the test failure when building without asserts.
+---
+ llvm/test/CodeGen/PowerPC/pr141642.ll | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/llvm/test/CodeGen/PowerPC/pr141642.ll b/llvm/test/CodeGen/PowerPC/pr141642.ll
+index 38a706574786..61bda4dfaf53 100644
+--- a/llvm/test/CodeGen/PowerPC/pr141642.ll
++++ b/llvm/test/CodeGen/PowerPC/pr141642.ll
+@@ -2,6 +2,7 @@
+ ; RUN:  FileCheck %s
+ ; CHECK-NOT: lxvdsx
+ ; CHECK-NOT: LD_SPLAT
++; REQUIRES: asserts
+ 
+ define weak_odr dso_local void @unpack(ptr noalias noundef %packed_in) local_unnamed_addr {
+ entry:
+-- 
+2.49.0
+

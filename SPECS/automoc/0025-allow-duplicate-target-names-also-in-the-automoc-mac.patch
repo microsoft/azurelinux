@@ -1,0 +1,30 @@
+From 6bd6f6e618b041651408b4dbf8a1b87905369019 Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Thu, 24 Jun 2010 20:30:56 +0000
+Subject: [PATCH 25/33] -allow duplicate target names also in the automoc
+ macros, to make the modules build again
+
+Alex
+
+
+svn path=/trunk/kdesupport/automoc/; revision=1142396
+---
+ Automoc4Config.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 679a77c..95f528d 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -58,6 +58,8 @@ endif(COMMAND cmake_policy)
+ # 2.6.4 is required because of the get_filename_component(REALPATH)
+ cmake_minimum_required( VERSION 2.6.4 FATAL_ERROR )
+ 
++# allow duplicate target names, this is also done in FindKDE4Internal.cmake
++cmake_policy(CMP0002 OLD)
+ 
+ get_filename_component(_AUTOMOC4_CURRENT_DIR  "${CMAKE_CURRENT_LIST_FILE}" PATH)
+ 
+-- 
+2.4.3
+

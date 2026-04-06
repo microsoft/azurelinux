@@ -1,0 +1,76 @@
+--- src/google/protobuf/any_test.cc	2021-10-22 08:52:03.604280348 +0200
++++ src/google/protobuf/any_test.cc.orig	2021-10-22 08:51:46.935156306 +0200
+@@ -60,13 +60,6 @@
+   EXPECT_EQ(12345, submessage.int32_value());
+ }
+ 
+-TEST(AnyTest, TestPackFromSerializationExceedsSizeLimit) {
+-  protobuf_unittest::TestAny submessage;
+-  submessage.mutable_text()->resize(INT_MAX, 'a');
+-  protobuf_unittest::TestAny message;
+-  EXPECT_FALSE(message.mutable_any_value()->PackFrom(submessage));
+-}
+-
+ TEST(AnyTest, TestUnpackWithTypeMismatch) {
+   protobuf_unittest::TestAny payload;
+   payload.set_int32_value(13);
+--- src/google/protobuf/arena_unittest.cc	2021-10-22 08:52:37.804534886 +0200
++++ src/google/protobuf/arena_unittest.cc.orig	2021-10-22 08:51:55.150217437 +0200
+@@ -1341,34 +1341,6 @@
+ // Align n to next multiple of 8
+ uint64_t Align8(uint64_t n) { return (n + 7) & -8; }
+ 
+-TEST(ArenaTest, SpaceAllocated_and_Used) {
+-  Arena arena_1;
+-  EXPECT_EQ(0, arena_1.SpaceAllocated());
+-  EXPECT_EQ(0, arena_1.SpaceUsed());
+-  EXPECT_EQ(0, arena_1.Reset());
+-  Arena::CreateArray<char>(&arena_1, 320);
+-  // Arena will allocate slightly more than 320 for the block headers.
+-  EXPECT_LE(320, arena_1.SpaceAllocated());
+-  EXPECT_EQ(Align8(320), arena_1.SpaceUsed());
+-  EXPECT_LE(320, arena_1.Reset());
+-
+-  // Test with initial block.
+-  std::vector<char> arena_block(1024);
+-  ArenaOptions options;
+-  options.start_block_size = 256;
+-  options.max_block_size = 8192;
+-  options.initial_block = &arena_block[0];
+-  options.initial_block_size = arena_block.size();
+-  Arena arena_2(options);
+-  EXPECT_EQ(1024, arena_2.SpaceAllocated());
+-  EXPECT_EQ(0, arena_2.SpaceUsed());
+-  EXPECT_EQ(1024, arena_2.Reset());
+-  Arena::CreateArray<char>(&arena_2, 55);
+-  EXPECT_EQ(1024, arena_2.SpaceAllocated());
+-  EXPECT_EQ(Align8(55), arena_2.SpaceUsed());
+-  EXPECT_EQ(1024, arena_2.Reset());
+-}
+-
+ TEST(ArenaTest, BlockSizeDoubling) {
+   Arena arena;
+   EXPECT_EQ(0, arena.SpaceUsed());
+@@ -1368,22 +1396,6 @@
+   }
+ }
+ 
+-TEST(ArenaTest, BlockSizeSmallerThanAllocation) {
+-  for (size_t i = 0; i <= 8; ++i) {
+-    ArenaOptions opt;
+-    opt.start_block_size = opt.max_block_size = i;
+-    Arena arena(opt);
+-
+-    *Arena::Create<int64_t>(&arena) = 42;
+-    EXPECT_GE(arena.SpaceAllocated(), 8);
+-    EXPECT_EQ(8, arena.SpaceUsed());
+-
+-    *Arena::Create<int64_t>(&arena) = 42;
+-    EXPECT_GE(arena.SpaceAllocated(), 16);
+-    EXPECT_EQ(16, arena.SpaceUsed());
+-  }
+-}
+-
+ TEST(ArenaTest, GetArenaShouldReturnTheArenaForArenaAllocatedMessages) {
+   Arena arena;
+   ArenaMessage* message = Arena::CreateMessage<ArenaMessage>(&arena);

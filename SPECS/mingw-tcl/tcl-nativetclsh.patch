@@ -1,0 +1,103 @@
+diff -rupN --no-dereference tcl8.6.15/win/Makefile.in tcl8.6.15-new/win/Makefile.in
+--- tcl8.6.15/win/Makefile.in	2024-08-26 19:56:52.000000000 +0200
++++ tcl8.6.15-new/win/Makefile.in	2024-10-18 11:19:05.461746580 +0200
+@@ -444,7 +444,7 @@ tcltest.cmd: Makefile
+ 	  echo 'set BDP=%~dp0'; \
+ 	  echo 'set OWD=%CD%'; \
+ 	  echo 'cd /d %TEMP%'; \
+-	  echo 'rem "%BDP%\$(TCLSH)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" %TESTFLAGS% -load "$(TEST_LOAD_FACILITIES)" %*'; \
++	  echo 'rem "%BDP%\tclsh$(DOTVER)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" %TESTFLAGS% -load "$(TEST_LOAD_FACILITIES)" %*'; \
+ 	  echo '"%BDP%\$(TEST_EXE_FILE)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" %TESTFLAGS% -load "$(TEST_LOAD_PRMS)" %*'; \
+ 	  echo 'cd /d %OWD%'; \
+ 	) > tcltest.cmd;
+@@ -453,7 +453,7 @@ tcltest.cmd: Makefile
+ 	  echo '#LANG=en_US'; \
+ 	  echo 'BDP=$$(dirname $$(readlink -f %0))'; \
+ 	  echo 'cd /tmp'; \
+-	  echo '#"$$BDP/$(TCLSH)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" $$TESTFLAGS -load "$(TEST_LOAD_FACILITIES)" "$$@"'; \
++	  echo '#"$$BDP/tclsh$(DOTVER)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" $$TESTFLAGS -load "$(TEST_LOAD_FACILITIES)" "$$@"'; \
+ 	  echo '"$$BDP/$(TEST_EXE_FILE)" "$(ROOT_DIR_WIN_NATIVE)/tests/all.tcl" $$TESTFLAGS -load "$(TEST_LOAD_PRMS)" "$$@"'; \
+ 	) > tcltest.sh;
+ 
+@@ -461,7 +461,7 @@ tcltest.sh: tcltest.cmd
+ 
+ tcltest: binaries $(TEST_EXE_FILE) $(TEST_DLL_FILE) $(CAT32) tcltest.cmd
+ 
+-binaries: $(TCL_STUB_LIB_FILE) @LIBRARIES@ winextensions $(TCLSH)
++binaries: $(TCL_STUB_LIB_FILE) @LIBRARIES@ winextensions tclsh$(DOTVER)
+ 
+ winextensions: ${DDE_DLL_FILE} ${REG_DLL_FILE}
+ 
+@@ -469,10 +469,10 @@ libraries:
+ 
+ doc:
+ 
+-$(TCLSH): $(TCLSH_OBJS) @LIBRARIES@ $(TCL_STUB_LIB_FILE) tclsh.$(RES)
++tclsh$(DOTVER): $(TCLSH_OBJS) @LIBRARIES@ $(TCL_STUB_LIB_FILE) tclsh.$(RES)
+ 	$(CC) $(CFLAGS) $(TCLSH_OBJS) $(TCL_LIB_FILE) $(TCL_STUB_LIB_FILE) $(LIBS) \
+ 	tclsh.$(RES) $(CC_EXENAME) $(LDFLAGS_CONSOLE)
+-	$(COPY) tclsh.exe.manifest $(TCLSH).manifest
++	$(COPY) tclsh.exe.manifest tclsh$(DOTVER).manifest
+ 	@VC_MANIFEST_EMBED_EXE@
+ 
+ cat32.$(OBJEXT): cat.c
+@@ -659,7 +659,7 @@ install-binaries: binaries
+ 		else true; \
+ 		fi; \
+ 	    done;
+-	@for i in $(TCL_DLL_FILE) $(ZLIB_DLL_FILE) $(TCLSH); \
++	@for i in $(TCL_DLL_FILE) $(ZLIB_DLL_FILE) tclsh$(DOTVER); \
+ 	    do \
+ 	    if [ -f $$i ]; then \
+ 		echo "Installing $$i to $(BIN_INSTALL_DIR)/"; \
+@@ -798,24 +798,24 @@ test: test-tcl test-packages
+ 
+ test-tcl: tcltest
+ 	TCL_LIBRARY="$(LIBRARY_DIR)"; export TCL_LIBRARY; \
+-	./$(TCLSH) "$(ROOT_DIR_NATIVE)/tests/all.tcl" $(TESTFLAGS) \
++	./tclsh$(DOTVER) "$(ROOT_DIR_NATIVE)/tests/all.tcl" $(TESTFLAGS) \
+ 	-load "$(TEST_LOAD_FACILITIES)"
+ 
+ # Useful target to launch a built tclsh with the proper path,...
+ runtest: tcltest
+ 	@TCL_LIBRARY="$(LIBRARY_DIR)"; export TCL_LIBRARY; \
+-	./$(TCLSH) $(TESTFLAGS) -load "$(TEST_LOAD_FACILITIES)" $(SCRIPT)
++	./tclsh$(DOTVER) $(TESTFLAGS) -load "$(TEST_LOAD_FACILITIES)" $(SCRIPT)
+ 
+ # This target can be used to run tclsh from the build directory via
+ # `make shell SCRIPT=foo.tcl`
+ shell: binaries
+ 	@TCL_LIBRARY="$(LIBRARY_DIR)"; export TCL_LIBRARY; \
+-	./$(TCLSH) $(SCRIPT)
++	./tclsh$(DOTVER) $(SCRIPT)
+ 
+ # This target can be used to run tclsh inside either gdb or insight
+ gdb: binaries
+ 	@echo "set env TCL_LIBRARY=$(LIBRARY_DIR)" > gdb.run
+-	$(GDB) ./$(TCLSH) --command=gdb.run
++	$(GDB) ./tclsh$(DOTVER) --command=gdb.run
+ 	rm gdb.run
+ 
+ shquotequote = $(subst ',\",$(subst ",\",$(1)))
+@@ -837,7 +837,7 @@ cleanhelp:
+ 
+ clean: cleanhelp clean-packages
+ 	$(RM) *.lib *.a *.exp *.dll *.$(RES) *.${OBJEXT} *~ \#* TAGS a.out
+-	$(RM) $(TCLSH) $(CAT32) $(TEST_EXE_FILE) $(TEST_DLL_FILE) tcltest.cmd tcltest.sh
++	$(RM) tclsh$(DOTVER) $(CAT32) $(TEST_EXE_FILE) $(TEST_DLL_FILE) tcltest.cmd tcltest.sh
+ 	$(RM) *.pch *.ilk *.pdb *.zip
+ 	$(RMDIR) *.vfs
+ 
+@@ -955,10 +955,10 @@ HTML_INSTALL_DIR=$(ROOT_DIR)/html
+ html:
+ 	$(MAKE) shell SCRIPT="$(TOOL_DIR)/tcltk-man2html.tcl --htmldir=$(HTML_INSTALL_DIR) --srcdir=$(ROOT_DIR)/.. $(BUILD_HTML_FLAGS)"
+ 
+-html-tcl: $(TCLSH)
++html-tcl: tclsh$(DOTVER)
+ 	$(MAKE) shell SCRIPT="$(TOOL_DIR)/tcltk-man2html.tcl --htmldir=$(HTML_INSTALL_DIR) --srcdir=$(ROOT_DIR)/.. $(BUILD_HTML_FLAGS) --tcl"
+ 
+-html-tk: $(TCLSH)
++html-tk: tclsh$(DOTVER)
+ 	$(MAKE) shell SCRIPT="$(TOOL_DIR)/tcltk-man2html.tcl --htmldir=$(HTML_INSTALL_DIR) --srcdir=$(ROOT_DIR)/.. $(BUILD_HTML_FLAGS) --tk"
+ 
+ #

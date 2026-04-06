@@ -1,0 +1,318 @@
+From 5de98cdc10bd333d0695c00d57e137d699f90f1c Mon Sep 17 00:00:00 2001
+From: tbordaz <tbordaz@redhat.com>
+Date: Wed, 7 Jan 2026 11:21:12 +0100
+Subject: [PATCH] Issue 7096 - During replication online total init the
+ function idl_id_is_in_idlist is not scaling with large database (#7145)
+
+Bug description:
+	During a online total initialization, the supplier sorts
+	the candidate list of entries so that the parents are sent before
+	children entries.
+	With large DB the ID array used for the sorting is not
+	scaling. It takes so long to build the candidate list that
+	the connection gets closed
+
+Fix description:
+        Instead of using an ID array, uses a list of ID ranges
+
+fixes: #7096
+
+Reviewed by: Mark Reynolds, Pierre Rogier (Thanks !!)
+---
+ ldap/servers/slapd/back-ldbm/back-ldbm.h      |  12 ++
+ ldap/servers/slapd/back-ldbm/idl_common.c     | 163 ++++++++++++++++++
+ ldap/servers/slapd/back-ldbm/idl_new.c        |  30 ++--
+ .../servers/slapd/back-ldbm/proto-back-ldbm.h |   3 +
+ 4 files changed, 189 insertions(+), 19 deletions(-)
+
+diff --git a/ldap/servers/slapd/back-ldbm/back-ldbm.h b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+index 1bc36720d..b187c26bc 100644
+--- a/ldap/servers/slapd/back-ldbm/back-ldbm.h
++++ b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+@@ -282,6 +282,18 @@ typedef struct _idlist_set
+ #define INDIRECT_BLOCK(idl) ((idl)->b_nids == INDBLOCK)
+ #define IDL_NIDS(idl)       (idl ? (idl)->b_nids : (NIDS)0)
+ 
++/*
++ * used by the supplier during online total init
++ * it stores the ranges of ID that are already present
++ * in the candidate list ('parentid>=1')
++ */
++typedef struct IdRange {
++    ID first;
++    ID last;
++    struct IdRange *next;
++} IdRange_t;
++
++
+ typedef size_t idl_iterator;
+ 
+ /* small hashtable implementation used in the entry cache -- the table
+diff --git a/ldap/servers/slapd/back-ldbm/idl_common.c b/ldap/servers/slapd/back-ldbm/idl_common.c
+index fcb0ece4b..fdc9b4e67 100644
+--- a/ldap/servers/slapd/back-ldbm/idl_common.c
++++ b/ldap/servers/slapd/back-ldbm/idl_common.c
+@@ -172,6 +172,169 @@ idl_min(IDList *a, IDList *b)
+     return (a->b_nids > b->b_nids ? b : a);
+ }
+ 
++/*
++ * This is a faster version of idl_id_is_in_idlist.
++ * idl_id_is_in_idlist uses an array of ID so lookup is expensive
++ * idl_id_is_in_idlist_ranges uses a list of ranges of ID lookup is faster
++ * returns
++ *   1: 'id' is present in idrange_list
++ *   0: 'id' is not present in idrange_list
++ */
++int
++idl_id_is_in_idlist_ranges(IDList *idl, IdRange_t *idrange_list, ID id)
++{
++    IdRange_t *range = idrange_list;
++    int found = 0;
++
++    if (NULL == idl || NOID == id) {
++        return 0; /* not in the list */
++    }
++    if (ALLIDS(idl)) {
++        return 1; /* in the list */
++    }
++
++    for(;range; range = range->next) {
++        if (id > range->last) {
++            /* check if it belongs to the next range */
++            continue;
++        }
++        if (id >= range->first) {
++            /* It belongs to that range [first..last ] */
++            found = 1;
++            break;
++        } else {
++            /* this range is after id */
++            break;
++        }
++    }
++    return found;
++}
++
++/* This function is used during the online total initialisation
++ * (see next function)
++ * It frees all ranges of ID in the list
++ */
++void idrange_free(IdRange_t **head)
++{
++    IdRange_t *curr, *sav;
++
++    if ((head == NULL) || (*head == NULL)) {
++        return;
++    }
++    curr = *head;
++    sav = NULL;
++    for (; curr;) {
++        sav = curr;
++        curr = curr->next;
++        slapi_ch_free((void *) &sav);
++    }
++    if (sav) {
++        slapi_ch_free((void *) &sav);
++    }
++    *head = NULL;
++}
++
++/* This function is used during the online total initialisation
++ * Because a MODRDN can move entries under a parent that
++ * has a higher ID we need to sort the IDList so that parents
++ * are sent, to the consumer, before the children are sent.
++ * The sorting with a simple IDlist does not scale instead
++ * a list of IDs ranges is much faster.
++ * In that list we only ADD/lookup ID.
++ */
++IdRange_t *idrange_add_id(IdRange_t **head, ID id)
++{
++    if (head == NULL) {
++        slapi_log_err(SLAPI_LOG_ERR, "idrange_add_id",
++                      "Can not add ID %d in non defined list\n", id);
++        return NULL;
++    }
++
++    if (*head == NULL) {
++        /* This is the first range */
++        IdRange_t *new_range = (IdRange_t *)slapi_ch_malloc(sizeof(IdRange_t));
++        new_range->first = id;
++        new_range->last = id;
++        new_range->next = NULL;
++        *head = new_range;
++        return *head;
++    }
++
++    IdRange_t *curr = *head, *prev = NULL;
++
++    /* First, find if id already falls within any existing range, or it is adjacent to any */
++    while (curr) {
++        if (id >= curr->first && id <= curr->last) {
++            /* inside a range, nothing to do */
++            return curr;
++        }
++
++        if (id == curr->last + 1) {
++            /* Extend this range upwards */
++            curr->last = id;
++
++            /* Check for possible merge with next range */
++            IdRange_t *next = curr->next;
++            if (next && curr->last + 1 >= next->first) {
++                slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                        "(id=%d) merge current  with next range [%d..%d]\n", id, curr->first, curr->last);
++                curr->last = (next->last > curr->last) ? next->last : curr->last;
++                curr->next = next->next;
++                slapi_ch_free((void*) &next);
++            } else {
++                slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                              "(id=%d) extend forward current range [%d..%d]\n", id, curr->first, curr->last);
++            }
++            return curr;
++        }
++
++        if (id + 1 == curr->first) {
++            /* Extend this range downwards */
++            curr->first = id;
++
++            /* Check for possible merge with previous range */
++            if (prev && prev->last + 1 >= curr->first) {
++                prev->last = curr->last;
++                prev->next = curr->next;
++                slapi_ch_free((void *) &curr);
++                slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                              "(id=%d) merge current with previous range [%d..%d]\n", id, prev->first, prev->last);
++                return prev;
++            } else {
++                slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                              "(id=%d) extend backward current range [%d..%d]\n", id, curr->first, curr->last);
++                return curr;
++            }
++        }
++
++        /* If id is before the current range, break so we can insert before */
++        if (id < curr->first) {
++            break;
++        }
++
++        prev = curr;
++        curr = curr->next;
++    }
++    /* Need to insert a new standalone IdRange */
++    IdRange_t *new_range = (IdRange_t *)slapi_ch_malloc(sizeof(IdRange_t));
++    new_range->first = id;
++    new_range->last = id;
++    new_range->next = curr;
++
++    if (prev) {
++        slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                      "(id=%d) add new range [%d..%d]\n", id, new_range->first, new_range->last);
++        prev->next = new_range;
++    } else {
++        /* Insert at head */
++        slapi_log_err(SLAPI_LOG_REPL, "idrange_add_id",
++                      "(id=%d) head range [%d..%d]\n", id, new_range->first, new_range->last);
++        *head = new_range;
++    }
++    return *head;
++}
++
++
+ int
+ idl_id_is_in_idlist(IDList *idl, ID id)
+ {
+diff --git a/ldap/servers/slapd/back-ldbm/idl_new.c b/ldap/servers/slapd/back-ldbm/idl_new.c
+index 5fbcaff2e..2d978353f 100644
+--- a/ldap/servers/slapd/back-ldbm/idl_new.c
++++ b/ldap/servers/slapd/back-ldbm/idl_new.c
+@@ -417,7 +417,6 @@ idl_new_range_fetch(
+ {
+     int ret = 0;
+     int ret2 = 0;
+-    int idl_rc = 0;
+     dbi_cursor_t cursor = {0};
+     IDList *idl = NULL;
+     dbi_val_t cur_key = {0};
+@@ -436,6 +435,7 @@ idl_new_range_fetch(
+     size_t leftoverlen = 32;
+     size_t leftovercnt = 0;
+     char *index_id = get_index_name(be, db, ai);
++    IdRange_t *idrange_list = NULL;
+ 
+ 
+     if (NULL == flag_err) {
+@@ -578,10 +578,12 @@ idl_new_range_fetch(
+                      * found entry is the one from the suffix
+                      */
+                     suffix = key;
+-                    idl_rc = idl_append_extend(&idl, id);
+-                } else if ((key == suffix) || idl_id_is_in_idlist(idl, key)) {
++                    idl_append_extend(&idl, id);
++                    idrange_add_id(&idrange_list, id);
++                } else if ((key == suffix) || idl_id_is_in_idlist_ranges(idl, idrange_list, key)) {
+                     /* the parent is the suffix or already in idl. */
+-                    idl_rc = idl_append_extend(&idl, id);
++                    idl_append_extend(&idl, id);
++                    idrange_add_id(&idrange_list, id);
+                 } else {
+                     /* Otherwise, keep the {key,id} in leftover array */
+                     if (!leftover) {
+@@ -596,13 +598,7 @@ idl_new_range_fetch(
+                     leftovercnt++;
+                 }
+             } else {
+-                idl_rc = idl_append_extend(&idl, id);
+-            }
+-            if (idl_rc) {
+-                slapi_log_err(SLAPI_LOG_ERR, "idl_new_range_fetch",
+-                              "Unable to extend id list (err=%d)\n", idl_rc);
+-                idl_free(&idl);
+-                goto error;
++                idl_append_extend(&idl, id);
+             }
+ 
+             count++;
+@@ -695,21 +691,17 @@ error:
+ 
+         while(remaining > 0) {
+             for (size_t i = 0; i < leftovercnt; i++) {
+-                if (leftover[i].key > 0 && idl_id_is_in_idlist(idl, leftover[i].key) != 0) {
++                if (leftover[i].key > 0 && idl_id_is_in_idlist_ranges(idl, idrange_list, leftover[i].key) != 0) {
+                     /* if the leftover key has its parent in the idl */
+-                    idl_rc = idl_append_extend(&idl, leftover[i].id);
+-                    if (idl_rc) {
+-                        slapi_log_err(SLAPI_LOG_ERR, "idl_new_range_fetch",
+-                                      "Unable to extend id list (err=%d)\n", idl_rc);
+-                        idl_free(&idl);
+-                        return NULL;
+-                    }
++                    idl_append_extend(&idl, leftover[i].id);
++                    idrange_add_id(&idrange_list, leftover[i].id);
+                     leftover[i].key = 0;
+                     remaining--;
+                 }
+             }
+         }
+         slapi_ch_free((void **)&leftover);
++        idrange_free(&idrange_list);
+     }
+     slapi_log_err(SLAPI_LOG_FILTER, "idl_new_range_fetch",
+                   "Found %d candidates; error code is: %d\n",
+diff --git a/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h b/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
+index 91d61098a..30a7aa11f 100644
+--- a/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
++++ b/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
+@@ -217,6 +217,9 @@ ID idl_firstid(IDList *idl);
+ ID idl_nextid(IDList *idl, ID id);
+ int idl_init_private(backend *be, struct attrinfo *a);
+ int idl_release_private(struct attrinfo *a);
++IdRange_t *idrange_add_id(IdRange_t **head, ID id);
++void idrange_free(IdRange_t **head);
++int idl_id_is_in_idlist_ranges(IDList *idl, IdRange_t *idrange_list, ID id);
+ int idl_id_is_in_idlist(IDList *idl, ID id);
+ 
+ idl_iterator idl_iterator_init(const IDList *idl);
+-- 
+2.52.0
+

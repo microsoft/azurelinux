@@ -1,0 +1,28 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+
+# We need a file to look at.
+if [ -z "$*" ] ; then
+	echo "Usage: $0 uidgid"
+	exit 1
+fi
+error=0
+# The format of the file is (currently)
+for infile in "$@" ; do
+	uidlist=$(grep -v '^#' "$infile" | awk '{print $2}' | grep -v -e - | sort -nu)
+	gidlist=$(grep -v '^#' "$infile" | awk '{print $3}' | grep -v -e - | sort -nu)
+	for uid in $uidlist; do
+		if test "$(grep -v '^#' "$infile" | awk '{print $2}' | grep -c '^'"$uid"'$')" -ne 1 ; then
+			echo "Duplicate UID: $uid"
+			error=1
+		fi
+	done
+	for gid in $gidlist; do
+		if test "$(grep -v '^#' "$infile" | awk '{print $3}' | grep -c '^'"$gid"'$')" -ne 1 ; then
+			echo "Duplicate GID: $gid"
+			error=1
+		fi
+	done
+done
+exit $error

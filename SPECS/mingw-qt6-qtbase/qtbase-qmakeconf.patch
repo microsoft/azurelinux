@@ -1,0 +1,11 @@
+diff -rupN --no-dereference qtbase-everywhere-src-6.10.1/cmake/QtQmakeHelpers.cmake qtbase-everywhere-src-6.10.1-new/cmake/QtQmakeHelpers.cmake
+--- qtbase-everywhere-src-6.10.1/cmake/QtQmakeHelpers.cmake	2025-08-11 06:54:51.000000000 +0200
++++ qtbase-everywhere-src-6.10.1-new/cmake/QtQmakeHelpers.cmake	2025-09-02 15:30:07.715772818 +0200
+@@ -148,6 +148,7 @@ HostLibraryExecutables=${QT${PROJECT_VER
+ HostData=${ext_datadir_relative_to_host_prefix}
+ Sysroot=${sysroot}
+ SysrootifyPrefix=${sysrootify_prefix}
++Headers=${INSTALL_INCLUDEDIR}
+ TargetSpec=${QT_QMAKE_TARGET_MKSPEC}
+ HostSpec=${QT_QMAKE_HOST_MKSPEC}
+ ")

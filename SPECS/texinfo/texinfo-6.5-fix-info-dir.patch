@@ -1,0 +1,41 @@
+This fixes two issues:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1592433
+This is a bug in fix-info-dir --delete
+(Hunk 3)
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1614162
+This is a weird infinite loop that happens when fix-info-dir is run with stderr
+redirected to /dev/null while /dev/null doesn't exist (or isn't a device)
+(Hunks 1 and 2)
+
+diff --git a/contrib/fix-info-dir b/contrib/fix-info-dir
+index 4439ada..9240060 100755
+--- a/contrib/fix-info-dir
++++ b/contrib/fix-info-dir
+@@ -124,6 +124,7 @@ if test "$CREATE_NODE"; then
+ 		fi
+ 		shift
+ 	else
++		SKIP_READ=yes
+ 		SKELETON=/dev/null
+ 
+ 	fi
+@@ -188,7 +189,7 @@ DIR_FILE_END_OF_FILE
+ 
+ 	# Read one line from the file.  This is so that we can echo lines with
+ 	# whitespace and quoted characters in them.
+-	while read fileline; do
++	while test -z "$SKIP_READ" && read fileline; do
+ 		# flag fancy features
+ 		if test ! -z "$echoline"; then        # echo line
+ 			echo "$fileline"
+@@ -294,7 +295,7 @@ else
+ 	DONE_MSG="total invalid menu item(s) were removed from `pwd`/$DIR_FILE"
+ 	for Info_Name in `comm -23 $TMP_FILE1 $TMP_FILE2`; do
+ 		Changed="y"
+-		if install-info --remove $Info_Name $DIR_FILE; then
++		if install-info --remove --remove-exactly $Info_Name $DIR_FILE; then
+ 			Total=`expr "$Total" + "1"`
+ 		fi
+ 	done

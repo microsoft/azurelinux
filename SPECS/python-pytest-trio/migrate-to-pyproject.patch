@@ -1,0 +1,226 @@
+From 8164aef33d2dea001408c28ee999e1addb0ffc71 Mon Sep 17 00:00:00 2001
+From: CoolCat467 <52022020+CoolCat467@users.noreply.github.com>
+Date: Tue, 30 Jul 2024 21:17:36 -0500
+Subject: [PATCH 1/2] Move all configuration to pyproject.toml
+
+---
+ .coveragerc             |  9 ----
+ pyproject.toml          | 91 +++++++++++++++++++++++++++++++++++++++++
+ pytest_trio/_version.py |  2 +-
+ setup.py                | 50 ----------------------
+ 4 files changed, 92 insertions(+), 60 deletions(-)
+ delete mode 100644 .coveragerc
+ delete mode 100644 setup.py
+
+diff --git a/.coveragerc b/.coveragerc
+deleted file mode 100644
+index 5687b73..0000000
+--- a/.coveragerc
++++ /dev/null
+@@ -1,9 +0,0 @@
+-[run]
+-branch=True
+-source=pytest_trio
+-
+-[report]
+-precision = 1
+-exclude_lines =
+-  pragma: no cover
+-  abc.abstractmethod
+diff --git a/pyproject.toml b/pyproject.toml
+index 407fb8b..48270b0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,3 +1,67 @@
++[build-system]
++requires = ["setuptools >= 64"]
++build-backend = "setuptools.build_meta"
++
++[project]
++name = "pytest-trio"
++dynamic = ["version"]
++authors = [
++  { name="Emmanuel Leblond", email="emmanuel.leblond@gmail.com" },
++]
++description = "Pytest plugin for trio"
++readme = {file = "README.md", content-type = "text/markdown"}
++license = {file = "LICENSE"}
++requires-python = ">=3.8"
++classifiers = [
++    "Development Status :: 4 - Beta",
++    "License :: OSI Approved :: MIT License",
++    "License :: OSI Approved :: Apache Software License",
++    "Natural Language :: English",
++    "Programming Language :: Python :: 3",
++    "Programming Language :: Python :: 3.8",
++    "Programming Language :: Python :: 3.9",
++    "Programming Language :: Python :: 3.10",
++    "Programming Language :: Python :: 3.11",
++    "Programming Language :: Python :: 3.12",
++    "Programming Language :: Python :: 3 :: Only",
++    "Programming Language :: Python :: Implementation :: CPython",
++    "Programming Language :: Python :: Implementation :: PyPy",
++    "Operating System :: POSIX :: Linux",
++    "Operating System :: MacOS :: MacOS X",
++    "Operating System :: Microsoft :: Windows",
++    "Operating System :: OS Independent",
++    "Topic :: System :: Networking",
++    "Topic :: Software Development :: Testing",
++    "Framework :: Hypothesis",
++    "Framework :: Pytest",
++    "Framework :: Trio",
++]
++keywords = [
++    "async",
++    "pytest",
++    "testing",
++    "trio",
++]
++dependencies = [
++    "trio >= 0.25.1",  # for upstream Hypothesis integration
++    "outcome >= 1.1.0",
++    "pytest >= 7.2.0",  # for ExceptionGroup support
++]
++
++[tool.setuptools.dynamic]
++version = {attr = "pytest_trio._version.__version__"}
++
++[project.urls]
++"Homepage" = "https://github.com/python-trio/pytest-trio"
++"Source" = "https://github.com/python-trio/pytest-trio"
++"Bug Tracker" = "https://github.com/python-trio/pytest-trio/issues"
++
++[project.entry-points.pytest11]
++trio = "pytest_trio.plugin"
++
++[tool.setuptools.packages]
++find = {namespaces = false}
++
+ [tool.towncrier]
+ package = "pytest_trio"
+ filename = "docs/source/history.rst"
+@@ -5,3 +69,30 @@ directory = "newsfragments"
+ title_format = "pytest-trio {version} ({project_date})"
+ underlines = ["-", "~", "^"]
+ issue_format = "`#{issue} <https://github.com/python-trio/pytest-trio/issues/{issue}>`__"
++
++[tool.coverage.run]
++branch = true
++source_pkgs = ["pytest_trio"]
++
++[tool.coverage.report]
++precision = 1
++skip_covered = true
++exclude_lines = [
++    "pragma: no cover",
++    "abc.abstractmethod",
++    "if TYPE_CHECKING.*:",
++    "if _t.TYPE_CHECKING:",
++    "if t.TYPE_CHECKING:",
++    "@overload",
++    'class .*\bProtocol\b.*\):',
++    "raise NotImplementedError",
++]
++partial_branches = [
++    "pragma: no branch",
++    "if not TYPE_CHECKING:",
++    "if not _t.TYPE_CHECKING:",
++    "if not t.TYPE_CHECKING:",
++    "if .* or not TYPE_CHECKING:",
++    "if .* or not _t.TYPE_CHECKING:",
++    "if .* or not t.TYPE_CHECKING:",
++]
+diff --git a/pytest_trio/_version.py b/pytest_trio/_version.py
+index a149830..2333e2d 100644
+--- a/pytest_trio/_version.py
++++ b/pytest_trio/_version.py
+@@ -1,3 +1,3 @@
+-# This file is imported from __init__.py and exec'd from setup.py
++# This file is imported from __init__.py and parsed by setuptools
+ 
+ __version__ = "0.8.0"
+diff --git a/setup.py b/setup.py
+deleted file mode 100644
+index 997b19a..0000000
+--- a/setup.py
++++ /dev/null
+@@ -1,50 +0,0 @@
+-from setuptools import setup, find_packages
+-
+-exec(open("pytest_trio/_version.py", encoding="utf-8").read())
+-
+-LONG_DESC = open("README.rst", encoding="utf-8").read()
+-
+-setup(
+-    name="pytest-trio",
+-    version=__version__,
+-    description="Pytest plugin for trio",
+-    url="https://github.com/python-trio/pytest-trio",
+-    long_description=open("README.rst").read(),
+-    author="Emmanuel Leblond",
+-    author_email="emmanuel.leblond@gmail.com",
+-    license="MIT OR Apache-2.0",
+-    packages=find_packages(),
+-    entry_points={"pytest11": ["trio = pytest_trio.plugin"]},
+-    install_requires=[
+-        "trio >= 0.22.0",  # for ExceptionGroup support
+-        "outcome >= 1.1.0",
+-        "pytest >= 7.2.0",  # for ExceptionGroup support
+-    ],
+-    keywords=[
+-        "async",
+-        "pytest",
+-        "testing",
+-        "trio",
+-    ],
+-    python_requires=">=3.7",
+-    classifiers=[
+-        "License :: OSI Approved :: MIT License",
+-        "License :: OSI Approved :: Apache Software License",
+-        "Operating System :: POSIX :: Linux",
+-        "Operating System :: MacOS :: MacOS X",
+-        "Operating System :: Microsoft :: Windows",
+-        "Programming Language :: Python :: 3 :: Only",
+-        "Programming Language :: Python :: 3.7",
+-        "Programming Language :: Python :: 3.8",
+-        "Programming Language :: Python :: 3.9",
+-        "Programming Language :: Python :: 3.10",
+-        "Programming Language :: Python :: 3.11",
+-        "Programming Language :: Python :: Implementation :: CPython",
+-        "Programming Language :: Python :: Implementation :: PyPy",
+-        "Topic :: System :: Networking",
+-        "Topic :: Software Development :: Testing",
+-        "Framework :: Hypothesis",
+-        "Framework :: Pytest",
+-        "Framework :: Trio",
+-    ],
+-)
+
+From 340d3fd3228d62e5550a45578a083e72cd0679cd Mon Sep 17 00:00:00 2001
+From: CoolCat467 <52022020+CoolCat467@users.noreply.github.com>
+Date: Tue, 30 Jul 2024 21:22:45 -0500
+Subject: [PATCH 2/2] Switch to using `build`
+
+---
+ ci.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ci.sh b/ci.sh
+index aae8b3c..0a6c4d6 100755
+--- a/ci.sh
++++ b/ci.sh
+@@ -23,11 +23,11 @@ function curl-harder() {
+ }
+ 
+ 
+-python -m pip install -U pip setuptools wheel
++python -m pip install -U pip build
+ python -m pip --version
+ 
+-python setup.py sdist --formats=zip
+-python -m pip install dist/*.zip
++python -m build
++python -m pip install dist/*.whl
+ 
+ if [ "$CHECK_FORMATTING" = "1" ]; then
+     pip install black

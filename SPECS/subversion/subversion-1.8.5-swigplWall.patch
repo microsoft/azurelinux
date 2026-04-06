@@ -1,0 +1,16 @@
+
+Don't drop -Wall in the swig Perl bindings, otherwise building with
+e.g. -Wformat-security might break.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1037341
+
+--- subversion-1.8.5/subversion/bindings/swig/perl/native/Makefile.PL.in.swigplWall
++++ subversion-1.8.5/subversion/bindings/swig/perl/native/Makefile.PL.in
+@@ -54,7 +54,6 @@ my $includes = ' -I/usr/include/apr-1
+ # SWIG is using C++ style comments in an extern "C" code.
+ $cflags =~ s/-ansi\s+//g;
+ $cflags =~ s/-std=c89\s+//g;
+-$cflags =~ s/-Wall//g;
+ $cflags =~ s/-Wunused//g;
+ $cflags =~ s/-Wshadow//g;
+ $cflags =~ s/-Wstrict-prototypes//g;

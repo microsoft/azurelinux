@@ -1,0 +1,278 @@
+From 2aa3d01bca010903b9cdb848e61ca45f84ce6bcf Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 6 May 2021 08:31:26 +0200
+Subject: [PATCH] Upgrade to 3.80
+
+---
+ Cwd.pm                     |   2 +-
+ Cwd.xs                     |  24 +++--
+ META.json                  |   2 +-
+ META.yml                   |   2 +-
+ lib/File/Spec.pm           |   2 +-
+ lib/File/Spec/AmigaOS.pm   |   2 +-
+ lib/File/Spec/Cygwin.pm    |   2 +-
+ lib/File/Spec/Epoc.pm      |   2 +-
+ lib/File/Spec/Functions.pm |   2 +-
+ lib/File/Spec/Mac.pm       |   2 +-
+ lib/File/Spec/OS2.pm       |   2 +-
+ lib/File/Spec/Unix.pm      |   2 +-
+ lib/File/Spec/Win32.pm     |   4 +-
+ t/cwd.t                    |   4 +
+ t/cwd_enoent.t             |   2 +
+ 16 files changed, 232 insertions(+), 20 deletions(-)
+
+diff --git a/Cwd.pm b/Cwd.pm
+index 9b173c2..6a1d2f1 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+diff --git a/Cwd.xs b/Cwd.xs
+index 8662400..223e1a6 100644
+--- a/Cwd.xs
++++ b/Cwd.xs
+@@ -84,6 +84,9 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+ 	unsigned symlinks;
+ 	int serrno;
+ 	char remaining[MAXPATHLEN], next_token[MAXPATHLEN];
++#ifdef PERL_IMPLICIT_SYS
++        dTHX;
++#endif
+ 
+ 	serrno = errno;
+ 	symlinks = 0;
+@@ -119,15 +122,24 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+ 
+             p = strchr(remaining, '/');
+             s = p ? p : remaining + remaining_len;
++
+             if ((STRLEN)(s - remaining) >= (STRLEN)sizeof(next_token)) {
+                 errno = ENAMETOOLONG;
+                 return (NULL);
+             }
+             memcpy(next_token, remaining, s - remaining);
+             next_token[s - remaining] = '\0';
+-            remaining_len -= s - remaining;
+-            if (p != NULL)
+-                memmove(remaining, s + 1, remaining_len + 1);
++
++            /* shift first component off front of path, including '/' */
++            if (p) {
++                s++; /* skip '/' */
++                remaining_len -= s - remaining;
++                /* the +1 includes the trailing '\0' */
++                memmove(remaining, s, remaining_len + 1);
++            }
++            else
++                remaining_len = 0;
++
+             if (resolved[resolved_len - 1] != '/') {
+                 if (resolved_len + 1 >= MAXPATHLEN) {
+                     errno = ENAMETOOLONG;
+@@ -166,8 +178,8 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+             }
+ #if defined(HAS_LSTAT) && defined(HAS_READLINK) && defined(HAS_SYMLINK)
+             {
+-                struct stat sb;
+-                if (lstat(resolved, &sb) != 0) {
++                Stat_t sb;
++                if (PerlLIO_lstat(resolved, &sb) != 0) {
+                     if (errno == ENOENT && p == NULL) {
+                         errno = serrno;
+                         return (resolved);
+@@ -182,7 +194,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                         errno = ELOOP;
+                         return (NULL);
+                     }
+-                    slen = readlink(resolved, symlink, sizeof(symlink) - 1);
++                    slen = PerlLIO_readlink(resolved, symlink, sizeof(symlink) - 1);
+                     if (slen < 0)
+                         return (NULL);
+                     symlink[slen] = '\0';
+diff --git a/META.json b/META.json
+index e41b849..ad429a5 100644
+--- a/META.json
++++ b/META.json
+@@ -50,6 +50,6 @@
+          "url" : "git://perl5.git.perl.org/perl.git"
+       }
+    },
+-   "version" : "3.75",
++   "version" : "3.73",
+    "x_serialization_backend" : "JSON::PP version 2.27400_02"
+ }
+diff --git a/META.yml b/META.yml
+index c53f36e..c2adfcf 100644
+--- a/META.yml
++++ b/META.yml
+@@ -26,5 +26,5 @@ resources:
+   bugtracker: https://rt.perl.org/rt3/
+   homepage: http://dev.perl.org/
+   repository: git://perl5.git.perl.org/perl.git
+-version: '3.75'
++version: '3.73'
+ x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index 7fe3272..30d883b 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -2,7 +2,7 @@ package File::Spec;
+ 
+ use strict;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index 2b7d18a..fd9da81 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index d44ced3..953c233 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index b611cd9..fcb9e89 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index 3f617bd..e14ad2f 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index d920d2f..8026edc 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index 603781a..3c35ba9 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index 6749e60..c06d18f 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index 5934010..1537442 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.78';
++our $VERSION = '3.80';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+@@ -84,7 +84,7 @@ sub tmpdir {
+ MSWin32 case-tolerance depends on GetVolumeInformation() $ouFsFlags == FS_CASE_SENSITIVE,
+ indicating the case significance when comparing file specifications.
+ Since XP FS_CASE_SENSITIVE is effectively disabled for the NT subsubsystem.
+-See http://cygwin.com/ml/cygwin/2007-07/msg00891.html
++See L<http://cygwin.com/ml/cygwin/2007-07/msg00891.html>
+ Default: 1
+ 
+ =cut
+diff --git a/t/cwd.t b/t/cwd.t
+index c056938..d155e33 100644
+--- a/t/cwd.t
++++ b/t/cwd.t
+@@ -187,6 +187,10 @@ rmtree($test_dirs[0], 0, 0);
+ SKIP: {
+     skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless $Config{d_symlink} && $^O !~ m!^(qnx|nto)!;
+ 
++    # on Win32 GetCurrentDirectory() includes the symlink if
++    # you chdir() to a path including the symlink.
++    skip "Win32 symlinks are unusual", 2+$EXTRA_ABSPATH_TESTS if $^O eq "MSWin32";
++
+     my $file = "linktest";
+     mkpath([$Test_Dir], 0, 0777);
+     symlink $Test_Dir, $file;
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index 510c65e..2e94bad 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -26,6 +26,8 @@ foreach my $type (qw(regular perl)) {
+ 	    if $type eq "perl" &&
+ 		!(($Config{prefix} =~ m/\//) && $^O ne "cygwin");
+ 
++        # https://github.com/Perl/perl5/issues/16525
++        # https://bugs.dragonflybsd.org/issues/3250
+ 	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
+ 	    if $type eq 'regular' && $^O eq 'dragonfly';
+ 
+-- 
+2.30.2
+

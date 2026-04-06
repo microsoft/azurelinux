@@ -1,0 +1,28 @@
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 14 Sep 2015 09:37:15 +0200
+Subject: [PATCH 3/7] Support major/minor device numbers over 127 (bz#450109)
+
+diff --git a/src/copyin.c b/src/copyin.c
+index 2e72356..5d88a23 100644
+--- a/src/copyin.c
++++ b/src/copyin.c
+@@ -1287,15 +1287,15 @@ read_in_binary (struct cpio_file_stat *file_hdr,
+       swab_array ((char *) short_hdr, 13);
+     }
+ 
+-  file_hdr->c_dev_maj = major (short_hdr->c_dev);
+-  file_hdr->c_dev_min = minor (short_hdr->c_dev);
++  file_hdr->c_dev_maj = major ((unsigned short)short_hdr->c_dev);
++  file_hdr->c_dev_min = minor ((unsigned short)short_hdr->c_dev);
+   file_hdr->c_ino = short_hdr->c_ino;
+   file_hdr->c_mode = short_hdr->c_mode;
+   file_hdr->c_uid = short_hdr->c_uid;
+   file_hdr->c_gid = short_hdr->c_gid;
+   file_hdr->c_nlink = short_hdr->c_nlink;
+-  file_hdr->c_rdev_maj = major (short_hdr->c_rdev);
+-  file_hdr->c_rdev_min = minor (short_hdr->c_rdev);
++  file_hdr->c_rdev_maj = major ((unsigned short)short_hdr->c_rdev);
++  file_hdr->c_rdev_min = minor ((unsigned short)short_hdr->c_rdev);
+   file_hdr->c_mtime = (unsigned long) short_hdr->c_mtimes[0] << 16
+ 		      | short_hdr->c_mtimes[1];
+   file_hdr->c_filesize = (unsigned long) short_hdr->c_filesizes[0] << 16

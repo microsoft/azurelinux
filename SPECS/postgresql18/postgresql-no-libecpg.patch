@@ -1,0 +1,13 @@
+diff -ur postgresql-18beta1/src/interfaces/Makefile pg18_patch/src/interfaces/Makefile
+--- postgresql-18beta1/src/interfaces/Makefile	2025-05-05 20:25:46.000000000 +0000
++++ pg18_patch/src/interfaces/Makefile	2025-05-21 08:13:15.038986820 +0000
+@@ -12,7 +12,7 @@
+ top_builddir = ../..
+ include $(top_builddir)/src/Makefile.global
+ 
+-SUBDIRS = libpq ecpg
++SUBDIRS = libpq
+ 
+ ifeq ($(with_libcurl), yes)
+ SUBDIRS += libpq-oauth
+Only in pg18_patch/src/interfaces: Makefile.orig

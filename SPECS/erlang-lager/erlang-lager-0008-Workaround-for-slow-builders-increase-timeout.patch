@@ -1,0 +1,19 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 4 Oct 2022 15:50:31 +0200
+Subject: [PATCH] Workaround for slow builders - increase timeout
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/test/lager_manager_killer_test.erl b/test/lager_manager_killer_test.erl
+index 96199b0..93b4307 100644
+--- a/test/lager_manager_killer_test.erl
++++ b/test/lager_manager_killer_test.erl
+@@ -27,7 +27,7 @@ overload_test_() ->
+              Manager = whereis(lager_event),
+              erlang:trace(all, true, [procs]),
+              [lager:info("~p'th message", [N]) || N <- lists:seq(1,KillerHWM+2)],
+-             Margin = 100,
++             Margin = 1000,
+              ok = confirm_manager_exit(Manager, Delay+Margin),
+              ok = confirm_sink_reregister(lager_event, Margin),
+              erlang:trace(all, false, [procs]),

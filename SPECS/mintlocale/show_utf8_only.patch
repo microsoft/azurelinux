@@ -1,0 +1,110 @@
+--- a/usr/lib/linuxmint/mintlocale/mintlocale.py
++++ b/usr/lib/linuxmint/mintlocale/mintlocale.py
+@@ -279,7 +279,7 @@
+                 vbox = Gtk.VBox()
+                 vbox.pack_start(image, False, False, 2)
+                 label = Gtk.Label()
+-                label.set_markup(title)
++                label.set_text(title)
+                 vbox.pack_start(label, False, False, 2)
+                 menuitem.add(vbox)
+             else:
+@@ -720,7 +720,10 @@
+                     vars[var_name] = value
+             if "LANG" in vars:
+                 locale = vars['LANG'].replace('"', '').replace("'", "")
+-                locale = locale.split(".")[0].strip()
++                locale = locale.replace("utf8", "UTF-8")
++                locale = locale.replace("UTF-8", "")
++                locale = locale.replace(".", "")
++                locale = locale.strip()
+                 if "_" in locale:
+                     split = locale.split("_")
+                     if len(split) == 2:
+@@ -745,7 +748,10 @@
+ 
+             if "LC_NUMERIC" in vars:
+                 locale = vars['LC_NUMERIC'].replace('"', '').replace("'", "")
+-                locale = locale.split(".")[0].strip()
++                locale = locale.replace("utf8", "UTF-8")
++                locale = locale.replace("UTF-8", "")
++                locale = locale.replace(".", "")
++                locale = locale.strip()
+                 if "_" in locale:
+                     split = locale.split("_")
+                     if len(split) == 2:
+@@ -773,7 +779,7 @@
+         self.system_label.set_markup("<b>%s</b>\n<small>%s <i>%s</i>\n%s <i>%s</i></small>" % (_("System locale"), language_prefix, language_str, region_prefix, region_str))
+ 
+     def set_num_installed(self):
+-        num_installed = int(subprocess.check_output("localedef --list-archive | wc -l", shell=True))
++        num_installed = int(subprocess.check_output("localedef --list-archive | grep utf8 | wc -l", shell=True))
+         self.install_label.set_markup("<b>%s</b>\n<small>%s</small>" % (_("Language support"), gettext.ngettext("%d language installed", "%d languages installed", num_installed) % num_installed))
+ 
+     def accountservice_ready(self, user, param):
+@@ -827,11 +833,12 @@
+         built_locales = {}
+         for line in locales.rstrip().split("\n"):
+             line = line.replace("utf8", "UTF-8")
+-            cur_index += 1
+-            locale_code = line.split(".")[0].strip()
+-            charmap = None
+-            if len(line.split(".")) > 1:
+-                charmap = line.split(".")[1].strip()
++            if "UTF-8" not in line:
++                continue            
++            cur_index += 1        
++            locale_code = line.replace("UTF-8", "")
++            locale_code = locale_code.replace(".", "")
++            locale_code = locale_code.strip()
+ 
+             if "_" in locale_code:
+                 split = locale_code.split("_")
+@@ -843,16 +850,13 @@
+                     else:
+                         language = language_code
+ 
+-                    country_code = split[1].lower().split('@')[0].strip()
++                    country_code = split[1].lower()
+                     if country_code in self.countries:
+                         country = self.countries[country_code]
+                     else:
+                         country = country_code
+ 
+-                    if '@' in split[1]:
+-                        language_label = u"%s (@%s), %s" % (language, split[1].split('@')[1].strip(), country)
+-                    else:
+-                        language_label = u"%s, %s" % (language, country)
++                    language_label = u"%s, %s" % (language, country)
+ 
+                     flag_path = FLAG_PATH % country_code
+             else:
+@@ -864,9 +868,6 @@
+ 
+             flag_path = self.set_minority_language_flag_path(locale_code, flag_path)
+ 
+-            if charmap is not None and not all_locales_are_utf8:
+-                language_label = u"%s  <small><span foreground='#3c3c3c'>%s</span></small>" % (language_label, charmap)
+-
+             if os.path.exists(flag_path):
+                 flag = flag_path
+             else:
+@@ -892,7 +893,7 @@
+ 
+     def set_user_locale(self, path, locale):
+         self.locale_button.set_button_label(locale.name)
+-        print(u"Setting language to %s" % locale.id)
++        print(u"Setting language to '%s' '%s'" % (locale.name, locale.id))
+         # Set it in Accounts Service
+         try:
+             self.accountService.set_language(locale.id)
+@@ -916,7 +917,7 @@
+ 
+     def set_user_region(self, path, locale):
+         self.region_button.set_button_label(locale.name)
+-        print("Setting region to %s" % locale.id)
++        print("Setting region to '%s' '%s'" % (locale.name, locale.id))
+ 
+         # We don't call self.accountService.set_formats_locale(locale.id) here...
+         # First, we don't really use AccountsService, we're only doing this to be nice to LightDM and all..
+

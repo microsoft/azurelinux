@@ -1,0 +1,15 @@
+--- reflink-copy-0.1.28/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reflink-copy-0.1.28/Cargo.toml	2025-09-08T19:40:14.788944+00:00
+@@ -112,12 +112,3 @@
+ [target.'cfg(target_os = "linux")'.dependencies.libc]
+ version = "0.2.169"
+ 
+-[target."cfg(windows)".dependencies.windows]
+-version = ">=0.61.0,<0.63.0"
+-features = [
+-    "Win32_Storage_FileSystem",
+-    "Win32_Foundation",
+-    "Win32_System_Ioctl",
+-    "Win32_System_IO",
+-    "Win32_System_SystemServices",
+-]

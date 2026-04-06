@@ -1,0 +1,419 @@
+From f8aa9901f3cfa5fb49b809fdb223798623bede63 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Wed, 20 Nov 2024 10:26:28 +0100
+Subject: [PATCH 2/7] Xm/Display: Add optional Xinerama support
+
+Xinerama support is disabled by default, unless the Xresource
+"enableXinerama" is set in the X resources database, e.g.:
+
+  *enableXinerama: True
+
+This also provides an additional private Screen API to get the monitor
+boundaries given a point on screen. This is meant to be used in the
+following commits to implement Xinerama awareness in the relevant
+widgets.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ doc/man/man3/XmDisplay.3 |   2 +
+ lib/Xm/Display.c         |  95 +++++++++++++++++++++++++++++
+ lib/Xm/DisplayP.h        |  18 ++++++
+ lib/Xm/Screen.c          | 128 +++++++++++++++++++++++++++++++++++++++
+ lib/Xm/ScreenP.h         |   8 +++
+ lib/Xm/xmstring.list.in  |   2 +
+ 6 files changed, 253 insertions(+)
+
+diff --git a/doc/man/man3/XmDisplay.3 b/doc/man/man3/XmDisplay.3
+index a57ea089..ec360c80 100644
+--- a/doc/man/man3/XmDisplay.3
++++ b/doc/man/man3/XmDisplay.3
+@@ -158,6 +158,8 @@ XmNnoRenditionCallbackXmCCallbackXtCallbackListNULLC
+ _____
+ XmNuserDataXmCUserDataXtPointerNULLCSG
+ _____
++XmNenableXineramaXmCEnableXineramaBooleanFalseC
++_____
+ .TE
+ .IP "\fBXmNdefaultButtonEmphasis\fP" 10
+ Specifies whether to change the look of the PushButton widget and
+diff --git a/lib/Xm/Display.c b/lib/Xm/Display.c
+index 55fe4cd3..3ab047f2 100644
+--- a/lib/Xm/Display.c
++++ b/lib/Xm/Display.c
+@@ -35,6 +35,9 @@ static char rcsid[] = "$TOG: Display.c /main/23 1997/06/18 17:36:59 samborn $"
+ 
+ #include <X11/Intrinsic.h>
+ #include <X11/extensions/shape.h>
++#ifdef HAVE_LIBXINERAMA
++#include <X11/extensions/Xinerama.h>
++#endif
+ 
+ #include <X11/Xatom.h>
+ #include <Xm/AtomMgr.h>
+@@ -273,6 +276,13 @@ static XtResource resources[] = {
+ 	XtOffsetOf(WMShellRec, wm.wm_hints.icon_pixmap), 
+ 	XmRImmediate, NULL
+     }, 
++    /* Xinerama support */
++    {
++	XmNenableXinerama, XmCEnableXinerama,
++	XmRBoolean, sizeof(Boolean),
++	Offset(display.enable_xinerama),
++	XmRImmediate, (XtPointer) False
++    },
+ };
+ 
+ #undef Offset
+@@ -388,6 +398,45 @@ DisplayClassInitialize( void )
+ 		XmMakeCanonicalString("_MOTIF_DRAG_AND_DROP_MESSAGE");
+ }    
+ 
++static void
++DisplayInitializeXinerama( XmDisplay	xmDisplay )
++{
++#ifdef HAVE_LIBXINERAMA
++    Display     *display = XtDisplay(xmDisplay);
++    int		dummy1, dummy2;
++    Status      have_xinerama;
++
++    xmDisplay->display.monitors = NULL;
++    xmDisplay->display.n_monitors = 0;
++
++    /* Xinerama support is disabled by default, unless XmNenableXinerama is set */
++    if (!xmDisplay->display.enable_xinerama) {
++#ifdef DEBUG_XINERAMA
++      printf("XINERAMA support not enabled\n");
++#endif /* DEBUG_XINERAMA */
++      return;
++    }
++
++    if (!XineramaQueryExtension(display, &dummy1, &dummy2)) {
++#ifdef DEBUG_XINERAMA
++      printf("XINERAMA extension not available\n");
++#endif /* DEBUG_XINERAMA */
++      xmDisplay->display.enable_xinerama = False;
++      return;
++    }
++
++    if (!XineramaIsActive(display)) {
++#ifdef DEBUG_XINERAMA
++      printf("XINERAMA extension not activated\n");
++#endif /* DEBUG_XINERAMA */
++      xmDisplay->display.enable_xinerama = False;
++      return;
++    }
++
++    _XmDisplayUpdateXinerama(xmDisplay);
++#endif /* HAVE_LIBXINERAMA */
++}
++
+ /*ARGSUSED*/
+ static void 
+ SetDragReceiverInfo(
+@@ -553,6 +602,8 @@ DisplayInitialize(
+ 	  XmDRAG_PREFER_PREREGISTER;
+     }
+ 
++    DisplayInitializeXinerama(xmDisplay);
++
+     _XmVirtKeysInitialize (new_widget);
+ 
+     _XmProcessLock();
+@@ -672,6 +723,9 @@ DisplayDestroy(
+ 
+     _XmVirtKeysDestroy (w);
+ 
++#ifdef HAVE_LIBXINERAMA
++    XFree(dd->display.monitors);
++#endif /* HAVE_LIBXINERAMA */
+     XDeleteContext( XtDisplay( w), None, context) ;
+ }
+ 
+@@ -1225,3 +1279,44 @@ _XmSetThicknessDefault0(
+ 	value->addr = (XPointer)&thickness;
+ 
+ }
++
++
++Boolean
++_XmDisplayUseXinerama(
++	XmDisplay xmDisplay )
++{
++    return xmDisplay && xmDisplay->display.enable_xinerama;
++}
++
++
++void
++_XmDisplayUpdateXinerama(
++	XmDisplay xmDisplay )
++{
++#ifdef HAVE_LIBXINERAMA
++#ifdef DEBUG_XINERAMA
++    int i;
++#endif /* DEBUG_XINERAMA */
++
++    if (!_XmDisplayUseXinerama(xmDisplay))
++      return;
++
++#ifdef DEBUG_XINERAMA
++    printf("Updating XINERAMA configuration\n");
++#endif /* DEBUG_XINERAMA */
++
++    if (xmDisplay->display.monitors)
++      XFree(xmDisplay->display.monitors);
++
++    xmDisplay->display.monitors =
++      XineramaQueryScreens (XtDisplay(xmDisplay), &xmDisplay->display.n_monitors);
++
++#ifdef DEBUG_XINERAMA
++    for (i = 0; i < xmDisplay->display.n_monitors; ++i) {
++      printf("XINERAMA Monitor %i: (%i,%i) [%ix%i]\n", i,
++              xmDisplay->display.monitors[i].x_org, xmDisplay->display.monitors[i].y_org,
++              xmDisplay->display.monitors[i].width, xmDisplay->display.monitors[i].height);
++    }
++#endif /* DEBUG_XINERAMA */
++#endif /* HAVE_LIBXINERAMA */
++}
+diff --git a/lib/Xm/DisplayP.h b/lib/Xm/DisplayP.h
+index 655c29b6..a2420f96 100644
+--- a/lib/Xm/DisplayP.h
++++ b/lib/Xm/DisplayP.h
+@@ -23,6 +23,14 @@
+ #ifndef _XmDisplayP_h
+ #define _XmDisplayP_h
+ 
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#ifdef HAVE_LIBXINERAMA
++#include <X11/extensions/Xinerama.h>
++#endif
++
+ #include <Xm/DesktopP.h>
+ #include <Xm/VendorSEP.h>
+ #include <Xm/DropSMgr.h>
+@@ -115,6 +123,11 @@ typedef struct {
+     Boolean			enable_unselectable_drag;
+     Boolean                     enable_thin_thickness;
+     Boolean			enable_multi_key_bindings;
++    Boolean			enable_xinerama;
++#ifdef HAVE_LIBXINERAMA
++    XineramaScreenInfo          *monitors;
++    int                         n_monitors;
++#endif
+ } XmDisplayPart, *XmDisplayPartPtr;
+ 
+ typedef struct _XmDisplayInfo {
+@@ -143,6 +156,11 @@ externalref XmDisplayClassRec 	xmDisplayClassRec;
+ 
+ externalref String _Xm_MOTIF_DRAG_AND_DROP_MESSAGE ;
+ 
++extern Boolean _XmDisplayUseXinerama(
++	XmDisplay xmDisplay ) ;
++
++extern void _XmDisplayUpdateXinerama(
++	XmDisplay xmDisplay ) ;
+ 
+ #ifdef __cplusplus
+ }  /* Close scope of 'extern "C"' declaration which encloses file. */
+diff --git a/lib/Xm/Screen.c b/lib/Xm/Screen.c
+index 10ba8d2b..44abcfb3 100644
+--- a/lib/Xm/Screen.c
++++ b/lib/Xm/Screen.c
+@@ -396,7 +396,67 @@ GetUnitFromFont(
+     }
+ 
+ }
++#ifdef HAVE_LIBXINERAMA
++/* ARGSUSED */
++static void
++StructureNotifyHandler(
++        Widget wid,
++        XtPointer data,
++        XEvent *event,
++        Boolean *cont )
++{
++    Display           *display = XtDisplay(wid);
++
++#ifdef DEBUG_XINERAMA
++    printf("Root event received\n");
++#endif /* DEBUG_XINERAMA */
+ 
++    if (event->type == ConfigureNotify)
++        _XmDisplayUpdateXinerama((XmDisplay) XmGetXmDisplay(display)) ;
++}
++
++/* ARGSUSED */
++static void
++InstallStructureNotifyHandler(
++        XmScreen     xmScreen)
++{
++    Display           *display = XtDisplay(xmScreen);
++    Window            rootwindow;
++    XWindowAttributes rootattributes;
++
++    if (!_XmDisplayUseXinerama((XmDisplay) XmGetXmDisplay(display)))
++        return;
++
++    rootwindow = RootWindowOfScreen(XtScreen(xmScreen));
++    XGetWindowAttributes(display, rootwindow, &rootattributes);
++    XSelectInput(display,
++		 rootwindow,
++		 StructureNotifyMask | rootattributes.your_event_mask);
++    XtRegisterDrawable(display, rootwindow, (Widget)xmScreen);
++    XtAddEventHandler((Widget)xmScreen,
++                         (EventMask) StructureNotifyMask, True,
++			 StructureNotifyHandler, (XtPointer) NULL);
++}
++
++/* ARGSUSED */
++static void
++UninstallStructureNotifyHandler(
++        XmScreen     xmScreen)
++{
++    Display           *display = XtDisplay(xmScreen);
++    Window            rootwindow;
++    XWindowAttributes rootattributes;
++
++    if (!_XmDisplayUseXinerama((XmDisplay) XmGetXmDisplay(display)))
++        return;
++
++    rootwindow = RootWindowOfScreen(XtScreen(xmScreen));
++    XtUnregisterDrawable(display, rootwindow);
++    XtRemoveEventHandler((Widget)xmScreen,
++                         (EventMask) StructureNotifyMask, True,
++			 StructureNotifyHandler, (XtPointer) NULL);
++}
++#endif /* HAVE_LIBXINERAMA */
+ 
+ /************************************************************************
+  *
+@@ -413,6 +473,8 @@ Initialize(
+ {
+     XmScreen     xmScreen = (XmScreen)new_widget;
+     Display      *display = XtDisplay(new_widget);
++    Window       rootwindow;
++    XWindowAttributes rootattributes;
+ 
+     xmScreen->screen.screenInfo = NULL;
+ 
+@@ -474,6 +536,9 @@ Initialize(
+     }
+ #endif
+ 
++#ifdef HAVE_LIBXINERAMA
++    InstallStructureNotifyHandler(xmScreen);
++#endif /* HAVE_LIBXINERAMA */
+ }
+ 
+ /************************************************************************
+@@ -672,6 +737,10 @@ Destroy(
+ 
+     /* need to remove pixmap and GC related to this screen */
+     _XmCleanPixmapCache (XtScreen(widget), NULL);
++
++#ifdef HAVE_LIBXINERAMA
++    UninstallStructureNotifyHandler(xmScreen);
++#endif /* HAVE_LIBXINERAMA */
+ }
+ 
+ static void 
+@@ -1447,3 +1516,62 @@ XmGetXmScreen(
+ 	_XmAppUnlock(app);
+ 	return widget;
+ }
++
++void
++_XmScreenGetBoundariesAtpoint(
++        Screen *screen,
++	Position pt_x,
++	Position pt_y,
++	Position *ret_x,
++	Position *ret_y,
++	Position *ret_max_x,
++	Position *ret_max_y )
++{
++    XmDisplay	xmDisplay;
++    Position screen_x, screen_y;
++    Position screen_max_x, screen_max_y;
++#ifdef HAVE_LIBXINERAMA
++    Position tmp_x, tmp_y;
++    Position tmp_max_x, tmp_max_y;
++    int i;
++#endif /* HAVE_LIBXINERAMA */
++
++    xmDisplay = (XmDisplay) XmGetXmDisplay(DisplayOfScreen(screen));
++    screen_x = 0;
++    screen_y = 0;
++    screen_max_x = WidthOfScreen(screen);
++    screen_max_y = HeightOfScreen(screen);
++
++    if (!_XmDisplayUseXinerama(xmDisplay))
++      goto out;
++
++#ifdef HAVE_LIBXINERAMA
++    for (i = 0; i < xmDisplay->display.n_monitors; ++i) {
++      tmp_x = xmDisplay->display.monitors[i].x_org;
++      tmp_y = xmDisplay->display.monitors[i].y_org;
++      tmp_max_x = tmp_x + xmDisplay->display.monitors[i].width;
++      tmp_max_y = tmp_y + xmDisplay->display.monitors[i].height;
++
++      if (pt_x >= tmp_x && pt_x < tmp_max_x && pt_y >= tmp_y && pt_y < tmp_max_y) {
++	screen_x = tmp_x;
++	screen_y = tmp_y;
++	screen_max_x = tmp_max_x;
++	screen_max_y = tmp_max_y;
++        break; /* We have a match */
++      }
++    }
++#endif /* HAVE_LIBXINERAMA */
++out:
++#ifdef DEBUG_XINERAMA
++    printf("Point (%i,%i) constrained within (%i,%i) and (%i,%i)\n",
++           pt_x, pt_y, screen_x, screen_y, screen_max_x, screen_max_y);
++#endif /* DEBUG_XINERAMA */
++    if (ret_x)
++      *ret_x = screen_x;
++    if (ret_y)
++      *ret_y = screen_y;
++    if (ret_max_x)
++      *ret_max_x = screen_max_x;
++    if (ret_max_y)
++      *ret_max_y = screen_max_y;
++}
+diff --git a/lib/Xm/ScreenP.h b/lib/Xm/ScreenP.h
+index c870c19e..b4b95a6f 100644
+--- a/lib/Xm/ScreenP.h
++++ b/lib/Xm/ScreenP.h
+@@ -134,6 +134,14 @@ typedef struct _XmScreenRec {
+     XmScreenPart		screen;
+ } XmScreenRec;
+ 
++extern void _XmScreenGetBoundariesAtpoint(
++        Screen *screen,
++	Position pt_x,
++	Position pt_y,
++	Position *ret_x,
++	Position *ret_y,
++	Position *ret_max_x,
++	Position *ret_max_y ) ;
+ 
+ #ifdef __cplusplus
+ }  /* Close scope of 'extern "C"' declaration which encloses file. */
+diff --git a/lib/Xm/xmstring.list.in b/lib/Xm/xmstring.list.in
+index 8c0c4f9a..5887e7ad 100644
+--- a/lib/Xm/xmstring.list.in
++++ b/lib/Xm/xmstring.list.in
+@@ -1692,6 +1692,8 @@ CFontEncoding
+ NxftFont
+ CXftFont
+ SUTF8_STRING
++NenableXinerama
++CEnableXinerama
+ 
+ #file XmStrDefsI.h
+ #table _XmStringsI
+-- 
+2.49.0
+

@@ -1,0 +1,62 @@
+# rust_arches: list of architectures where building Rust is supported
+#
+# Since RPM itself now depends on Rust code (via its GPG backend, rpm-sequoia),
+# this list will probably always be a superset of all architectures that are
+# supported by Fedora, which is why it is no longer required to set
+# "ExclusiveArch: rust_arches" for Rust packages in Fedora.
+%rust_arches x86_64 %{ix86} armv7hl aarch64 ppc64 ppc64le riscv64 s390x
+
+# version_no_tilde: lua macro for reconstructing the original crate version
+#       from the RPM version (i.e. replace any "~" characters with "-")
+%version_no_tilde() %{lua:
+    local sep = rpm.expand('%1')
+    local ver = rpm.expand('%2')
+\
+    if sep == '%1' then
+        sep = '-'
+    end
+\
+    if ver == '%2' then
+        ver = rpm.expand('%version')
+    end
+    ver = ver:gsub('~', sep)
+\
+    print(ver)
+}
+
+# __crates_url: default API endpoint for downloading .crate files from crates.io
+%__crates_url https://crates.io/api/v1/crates/
+
+# crates_source: lua macro for constructing the Source URL for a crate
+%crates_source() %{lua:
+    local crate = rpm.expand('%1')
+    local version = rpm.expand('%2')
+    local url = rpm.expand('%__crates_url')
+\
+    -- first argument missing: fall back to %crate
+    if crate == '%1' then
+        crate = rpm.expand('%crate')
+    end
+    -- %crate macro not defined: fall back to %name
+    if crate == '%crate' then
+        crate = rpm.expand('%name')
+    end
+\
+    -- second argument missing: fall back to %crate_version
+    if version == '%2' then
+        version = rpm.expand('%crate_version')
+    end
+    -- %crate_version macro not defined: fall back to %version
+    if version == '%crate_version' then
+        version = rpm.expand('%version')
+    end
+    -- replace '~' with '-' for backwards compatibility
+    -- can be removed in the future
+    version = version:gsub('~', '-')
+\
+    print(url .. crate .. '/' .. version .. '/download#/' .. crate .. '-' .. version .. '.crate')
+}
+
+# __cargo_skip_build: unused macro, set to 0 for backwards compatibility
+%__cargo_skip_build 0
+

@@ -1,0 +1,10 @@
+--- io-close-0.3.7/Cargo.toml	1970-01-01T00:00:00+00:00
++++ io-close-0.3.7/Cargo.toml	2024-02-05T11:54:31.516209+00:00
+@@ -28,6 +28,4 @@
+ version = "3.1.0"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.80"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"
+-features = ["handleapi", "std", "winsock2"]
++

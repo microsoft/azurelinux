@@ -1,0 +1,15 @@
+diff -up Clp-releases-1.17.5/Clp/src/ClpSolver.cpp.orig Clp-releases-1.17.5/Clp/src/ClpSolver.cpp
+--- Clp-releases-1.17.5/Clp/src/ClpSolver.cpp.orig	2020-02-20 09:48:11.863261899 -0700
++++ Clp-releases-1.17.5/Clp/src/ClpSolver.cpp	2020-02-20 09:53:29.722615016 -0700
+@@ -293,7 +293,11 @@ int ClpMain1(int argc, const char *argv[
+   parameters[whichParam(CLP_PARAM_DBL_PRIMALWEIGHT, parameters)].setDoubleValue(models->infeasibilityCost());
+   parameters[whichParam(CLP_PARAM_ACTION_RESTORE, parameters)].setStringValue(restoreFile);
+   parameters[whichParam(CLP_PARAM_ACTION_SAVE, parameters)].setStringValue(saveFile);
++#ifdef COIN_HAS_CBC
++  parameters[whichParam(CBC_PARAM_DBL_TIMELIMIT_BAB, parameters)].setDoubleValue(models->maximumSeconds());
++#else
+   parameters[whichParam(CLP_PARAM_DBL_TIMELIMIT, parameters)].setDoubleValue(models->maximumSeconds());
++#endif
+   parameters[whichParam(CLP_PARAM_ACTION_SOLUTION, parameters)].setStringValue(solutionFile);
+   parameters[whichParam(CLP_PARAM_ACTION_SAVESOL, parameters)].setStringValue(solutionSaveFile);
+   parameters[whichParam(CLP_PARAM_INT_SPRINT, parameters)].setIntValue(doSprint);

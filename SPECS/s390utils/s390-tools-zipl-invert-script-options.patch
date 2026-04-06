@@ -1,0 +1,84 @@
+From 2faae5cf51c49e3f166b8526eee276dab2fe7308 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Wed, 30 May 2018 14:33:25 +0200
+Subject: [PATCH] zipl-switch-to-blscfg: invert ignore-default and
+ use-version-name options
+
+These options were added because the zipl maintainers wanted a different
+default behaviour for the migration script than the one we use. Instead
+of requiring to always use these options, just invert the logic for us.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ scripts/zipl-switch-to-blscfg   | 16 +++++++++-------
+ scripts/zipl-switch-to-blscfg.1 |  8 ++++----
+ 2 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/scripts/zipl-switch-to-blscfg b/scripts/zipl-switch-to-blscfg
+index 871935c783f..d8d5eca5867 100755
+--- a/scripts/zipl-switch-to-blscfg
++++ b/scripts/zipl-switch-to-blscfg
+@@ -57,14 +57,14 @@ Options:
+ 	--backup-suffix=SUFFIX  suffix used for backup files, defaults to .bak
+ 	--bls-directory=DIR     path to generate BLS files, defaults to /boot/loader/entries
+ 	--config-file=FILE      path to zipl configuration file, defaults to /etc/zipl.conf
+-	--ignore-default	ignore the default option from the zipl configuration file
+-	--use-version-name	use the section kernel version as the BLS file name
++	--leave-default	        leave the default option from the zipl configuration file
++	--use-section-name	use the section name as the BLS file name
+ 
+ EOF
+ }
+ 
+ OPTS="$(getopt -o hv --long help,version,backup-suffix:,bls-directory:,config-file:,\
+-ignore-default,use-version-name -n \'$SCRIPTNAME\' -- "$@")"
++leave-default,use-section-name -n \'$SCRIPTNAME\' -- "$@")"
+ eval set -- "$OPTS"
+ 
+ BACKUP_SUFFIX=.bak
+@@ -73,6 +73,8 @@ CMDLINE_LINUX_DEBUG=" systemd.log_level=debug systemd.log_target=kmsg"
+ LINUX_DEBUG_VERSION_POSTFIX="_with_debugging"
+ LINUX_DEBUG_TITLE_POSTFIX=" with debugging"
+ CONFIG="/etc/zipl.conf"
++ignore_default=true
++version_name=true
+ 
+ while [ ${#} -gt 0 ]; do
+     case "$1" in
+@@ -96,11 +98,11 @@ while [ ${#} -gt 0 ]; do
+ 	    CONFIG=${2}
+ 	    shift
+ 	    ;;
+-	--ignore-default)
+-	    ignore_default=true
++	--leave-default)
++	    ignore_default=false
+ 	    ;;
+-	--use-version-name)
+-	    version_name=true
++	--use-section-name)
++	    version_name=false
+ 	    ;;
+ 	--)
+ 	    shift
+diff --git a/scripts/zipl-switch-to-blscfg.8 b/scripts/zipl-switch-to-blscfg.8
+index 6bd14d00d14..71b904ffd1c 100644
+--- a/scripts/zipl-switch-to-blscfg.8
++++ b/scripts/zipl-switch-to-blscfg.8
+@@ -37,9 +37,9 @@ The DIRECTORY where the BLS fragments will be generated. The directory is create
+ The FILE used for zipl configuration file, defaults to /etc/zipl.conf.
+ 
+ .TP
+-\fB\-\-ignore-default\fP
+-Ignore the default option from the zipl configuration file
++\fB\-\-leave-default\fP
++Leave the default option from the zipl configuration file
+ 
+ .TP
+-\fB\-\-use-version-name\fP
+-Use the section kernel version as the BLS file name
++\fB\-\-use-section-name\fP
++Use the section name as the BLS file name
+-- 
+2.17.0
+

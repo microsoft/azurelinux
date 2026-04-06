@@ -1,0 +1,5 @@
+[org.gnome.settings-daemon.plugins.power]
+sleep-inactive-ac-timeout=0
+
+[org.gnome.settings-daemon.plugins.power]
+power-button-action=nothing

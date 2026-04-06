@@ -1,0 +1,27 @@
+diff --git a/gold/options.cc b/gold/options.cc
+index c9834b66159..91d7802fffe 100644
+--- a/gold/options.cc
++++ b/gold/options.cc
+@@ -989,7 +989,7 @@ parse_short_option(int argc, const char** argv, int pos_in_argv_i,
+     }
+ 
+   // If we're a -z option, we need to parse our argument as a
+-  // long-option, e.g. "-z stacksize=8192".
++  // long-option, e.g. "-z stack-size=8192".
+   if (retval == &dash_z)
+     {
+       int dummy_i = 0;
+diff --git a/gold/options.h b/gold/options.h
+index 46f658f23ea..d16e38066da 100644
+--- a/gold/options.h
++++ b/gold/options.h
+@@ -1110,6 +1110,9 @@ class General_options
+ 			 N_("Generate package metadata note"),
+ 			 N_("[=JSON]"));
+ 
++  DEFINE_bool_ignore(pack_relative_relocs, options::DASH_Z, '\0',
++		     N_("Ignored"), N_("Ignored"));
++
+   DEFINE_bool(pie, options::ONE_DASH, '\0', false,
+ 	      N_("Create a position independent executable"),
+ 	      N_("Do not create a position independent executable"));

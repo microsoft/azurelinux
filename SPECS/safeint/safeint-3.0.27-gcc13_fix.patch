@@ -1,0 +1,12 @@
+diff --git a/Test/c_safe_math/safe_math_test.h b/Test/c_safe_math/safe_math_test.h
+index 392ab7f..9a58518 100644
+--- a/Test/c_safe_math/safe_math_test.h
++++ b/Test/c_safe_math/safe_math_test.h
+@@ -7,6 +7,7 @@
+ #include <assert.h>
+ #include <iostream>
+ #include <string>
++#include <cstdint>
+ #pragma warning(pop)
+ 
+ #pragma warning(disable: 4514 5045 4464 4820)

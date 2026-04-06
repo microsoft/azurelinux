@@ -1,0 +1,40 @@
+From 67a818bc7d96d9df9b28be94ceecfdc10beced87 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 6 Feb 2025 20:08:59 +0000
+Subject: [PATCH 112/131] Workaround broken GCC 15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The C++ standard does not allow 'alignas' to be applied to type
+aliases. GNU C++ has allowed it as a non-standard extension, but
+strictly that should have been expressed using 'gnu::aligned'
+instead of 'alignas'. Regardless of the syntax, however, GCC 15
+has a regression causing it to reject alignment requests entirely
+on template aliases.
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=118773
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .../common/inc/internal/linux/sgx_random_buffers.h            | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/QuoteGeneration/common/inc/internal/linux/sgx_random_buffers.h b/QuoteGeneration/common/inc/internal/linux/sgx_random_buffers.h
+index 15fbdd42..4400544b 100644
+--- a/QuoteGeneration/common/inc/internal/linux/sgx_random_buffers.h
++++ b/QuoteGeneration/common/inc/internal/linux/sgx_random_buffers.h
+@@ -258,7 +258,11 @@ struct alignas(A)randomly_placed_buffer
+     }
+ 
+     template <unsigned C = 1>
++#if __GNUC__ == 15 && __GNUC_MINOR__ == 0
++    using storage = char[size(C)];
++#else
+     using storage = char[size(C)] alignas(A);
++#endif
+ 
+ private:
+     struct alignas(A)_T_instantiator_
+-- 
+2.53.0
+

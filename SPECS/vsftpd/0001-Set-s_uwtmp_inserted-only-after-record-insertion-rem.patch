@@ -1,0 +1,53 @@
+From 96698a525784ad91cb27b572dd5f871c183fdfa5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Sun, 28 Jul 2019 12:25:35 +0200
+Subject: [PATCH 1/2] Set s_uwtmp_inserted only after record insertion/removal
+
+pututxline() is the function that actually inserts the new record, so
+setting 's_uwtmp_inserted' before calling pututxline() doesn't make
+sense.
+
+We'll need this change for other fixes.
+---
+ sysdeputil.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeputil.c b/sysdeputil.c
+index 4fe56c2..bd1e8c9 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -1224,7 +1224,6 @@ vsf_insert_uwtmp(const struct mystr* p_user_str,
+                        sizeof(s_utent.ut_line));
+     str_free(&line_str);
+   }
+-  s_uwtmp_inserted = 1;
+   s_utent.ut_type = USER_PROCESS;
+   s_utent.ut_pid = vsf_sysutil_getpid();
+   vsf_sysutil_strcpy(s_utent.ut_user, str_getbuf(p_user_str),
+@@ -1235,6 +1234,7 @@ vsf_insert_uwtmp(const struct mystr* p_user_str,
+   setutxent();
+   (void) pututxline(&s_utent);
+   endutxent();
++  s_uwtmp_inserted = 1;
+   updwtmpx(WTMPX_FILE, &s_utent);
+ }
+ 
+@@ -1245,7 +1245,6 @@ vsf_remove_uwtmp(void)
+   {
+     return;
+   }
+-  s_uwtmp_inserted = 0;
+   s_utent.ut_type = DEAD_PROCESS;
+   vsf_sysutil_memclr(s_utent.ut_user, sizeof(s_utent.ut_user));
+   vsf_sysutil_memclr(s_utent.ut_host, sizeof(s_utent.ut_host));
+@@ -1253,6 +1252,7 @@ vsf_remove_uwtmp(void)
+   setutxent();
+   (void) pututxline(&s_utent);
+   endutxent();
++  s_uwtmp_inserted = 0;
+   s_utent.ut_tv.tv_sec = vsf_sysutil_get_time_sec();
+   updwtmpx(WTMPX_FILE, &s_utent);
+ }
+-- 
+2.20.1
+

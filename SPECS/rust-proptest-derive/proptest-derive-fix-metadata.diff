@@ -1,0 +1,41 @@
+--- proptest-derive-0.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ proptest-derive-0.6.0/Cargo.toml	2025-09-25T10:53:15.794138+00:00
+@@ -49,10 +49,6 @@
+ [[test]]
+ name = "assoc"
+ path = "tests/assoc.rs"
+-
+-[[test]]
+-name = "compiletest"
+-path = "tests/compiletest.rs"
+ 
+ [[test]]
+ name = "enum"
+@@ -118,11 +114,6 @@
+ name = "weight"
+ path = "tests/weight.rs"
+ 
+-[[bench]]
+-name = "large_enum"
+-path = "benches/large_enum.rs"
+-harness = false
+-
+ [dependencies.proc-macro2]
+ version = "1.0"
+ 
+@@ -137,15 +128,5 @@
+     "full",
+ ]
+ 
+-[dev-dependencies.compiletest_rs]
+-version = "0.11"
+-features = [
+-    "tmp",
+-    "stable",
+-]
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.proptest]
+ version = "1.0.0"

@@ -1,0 +1,32 @@
+From 315f9720db94af3319c9550feaf473b9cf09aeac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 3 May 2018 13:20:28 +0200
+Subject: [PATCH 53/59] Always do chdir("/") after chroot()
+
+Always do chdir("/") after chroot() to be more sure we'll never get out
+of it. This will not affect the working directory after calling
+vsf_sysutil_chroot(), because in the current state vsftpd always calls
+vsf_sysutil_chroot(".").
+---
+ sysutil.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sysutil.c b/sysutil.c
+index b68583b..3014c05 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -2588,6 +2588,11 @@ vsf_sysutil_chroot(const char* p_root_path)
+   {
+     die("chroot");
+   }
++  retval = chdir("/");
++  if (retval != 0)
++  {
++    die("chdir");
++  }
+ }
+ 
+ unsigned int
+-- 
+2.14.4
+

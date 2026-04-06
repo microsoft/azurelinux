@@ -1,0 +1,22 @@
+From d7fe479707af57aeedf7e41c08e7fb698cd2e2a3 Mon Sep 17 00:00:00 2001
+From: Nikias Bassen <nikias@gmx.li>
+Date: Tue, 13 May 2025 18:32:50 +0200
+Subject: [PATCH] cython: Fix build with cython 3.1+
+
+---
+ cython/plist.pyx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cython/plist.pyx b/cython/plist.pyx
+index b5f4ef67..4d1f8aae 100644
+--- a/cython/plist.pyx
++++ b/cython/plist.pyx
+@@ -851,7 +851,7 @@ cdef plist_t native_to_plist_t(object native):
+         return plist_new_string(native)
+     if isinstance(native, bool):
+         return plist_new_bool(<bint>native)
+-    if isinstance(native, int) or isinstance(native, long):
++    if isinstance(native, int):
+         return plist_new_uint(native)
+     if isinstance(native, float):
+         return plist_new_real(native)

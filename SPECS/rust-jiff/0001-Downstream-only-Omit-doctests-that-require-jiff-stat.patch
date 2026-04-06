@@ -1,0 +1,39 @@
+From 147ddc0003f70e017c13966073211ed3dbcbcf7a Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 9 Mar 2025 09:12:34 -0400
+Subject: [PATCH] Downstream-only: Omit doctests that require jiff-static
+
+---
+ CHANGELOG.md  | 2 +-
+ src/tz/mod.rs | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index f9651cf..7802eb8 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -6,7 +6,7 @@ This release of Jiff includes a new opt-in proc macro for embedding a
+ `TimeZone` into your binary. Just enable Jiff's `static` feature, and this will
+ print the current time in the `America/New_York` time zone:
+ 
+-```rust
++```ignore
+ use jiff::{
+     tz::{self, TimeZone},
+     Timestamp,
+diff --git a/src/tz/mod.rs b/src/tz/mod.rs
+index e9b1c92..768e070 100644
+--- a/src/tz/mod.rs
++++ b/src/tz/mod.rs
+@@ -100,7 +100,7 @@ a `TimeZone` at compile time. Here, we find the next DST transition from a
+ particular timestamp in `Europe/Zurich`, and then print that in local time for
+ Zurich:
+ 
+-```
++```ignore
+ use jiff::{tz::{self, TimeZone}, Timestamp};
+ 
+ static TZ: TimeZone = tz::get!("Europe/Zurich");
+-- 
+2.48.1
+

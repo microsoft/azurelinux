@@ -1,0 +1,44 @@
+From 96c2b15fc4a5b350d66950041e058d007004ce8e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 27 Feb 2024 15:46:41 +0000
+Subject: [PATCH 103/131] Look for versioned sgx_urts library in
+ PCKRetrievalTool
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Other code is already looking for the versioned library soname,
+so switch to that for PCKRetrievalTool too. The unversioned
+library is typically only installed by -devel packages, not the
+runtime package.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PCKRetrievalTool/App/utility.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/PCKRetrievalTool/App/utility.cpp b/tools/PCKRetrievalTool/App/utility.cpp
+index 634ad27b..9fc1fe1d 100644
+--- a/tools/PCKRetrievalTool/App/utility.cpp
++++ b/tools/PCKRetrievalTool/App/utility.cpp
+@@ -59,7 +59,7 @@ typedef sgx_status_t (SGXAPI *sgx_create_enclave_func_t)(const LPCSTR file_name,
+ #else
+ #define PCE_ENCLAVE_NAME  "libsgx_pce.signed.so.1"
+ #define ID_ENCLAVE_NAME   "libsgx_id_enclave.signed.so.1"
+-#define SGX_URTS_LIBRARY "libsgx_urts.so"             
++#define SGX_URTS_LIBRARY "libsgx_urts.so.2"
+ #define SGX_MULTI_PACKAGE_AGENT_UEFI_LIBRARY "libmpa_uefi.so.1"
+ #define FINDFUNCTIONSYM   dlsym
+ #define CLOSELIBRARYHANDLE  dlclose
+@@ -181,7 +181,7 @@ bool get_urts_library_handle()
+ #else
+     sgx_urts_handle = dlopen(SGX_URTS_LIBRARY, RTLD_LAZY);
+     if (sgx_urts_handle == NULL) {
+-        printf("ERROR: didn't find the sgx_urts.so library, please make sure you have installed sgx_urts installer package. \n");
++        printf("ERROR: didn't find the " SGX_URTS_LIBRARY " library, please make sure you have installed sgx_urts installer package. \n");
+         return false;
+     }
+ #endif
+-- 
+2.53.0
+

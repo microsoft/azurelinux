@@ -1,0 +1,9 @@
+--- snphost-0.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ snphost-0.6.1/Cargo.toml	2025-06-25T19:39:15.809528+00:00
+@@ -83,5 +83,5 @@
+ version = "0.2.0"
+ 
+ [dependencies.sev]
+-version = "6.2.1"
++version = "6.1.0"
+ features = ["openssl"]

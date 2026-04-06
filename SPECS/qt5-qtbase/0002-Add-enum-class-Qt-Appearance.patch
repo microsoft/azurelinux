@@ -1,0 +1,65 @@
+From c41101241ce626dd38ee71d5a37c6aeb434eddf4 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 12:06:29 +0200
+Subject: [PATCH 02/15] Add enum class Qt::Appearance
+
+It has been decided to add an appearance property in QStyleHints, which
+will be propagated to classes that do not include QPlatformTheme.
+
+Therefore an appearance enum class is added to the Qt namespace, thus
+being available to all Qt classes.
+---
+ src/corelib/global/qnamespace.h    |  7 +++++++
+ src/corelib/global/qnamespace.qdoc | 11 +++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/src/corelib/global/qnamespace.h b/src/corelib/global/qnamespace.h
+index bf19b1627b..acf2c26368 100644
+--- a/src/corelib/global/qnamespace.h
++++ b/src/corelib/global/qnamespace.h
+@@ -123,6 +123,12 @@ public:
+         UNICODE_ACCEL = 0x00000000
+     };
+ 
++    enum class Appearance {
++        Unknown = 0x0000,
++        Light   = 0x0001,
++        Dark    = 0x0002
++    };
++
+     enum MouseButton {
+         NoButton         = 0x00000000,
+         LeftButton       = 0x00000001,
+@@ -1820,6 +1826,7 @@ public:
+     QT_Q_ENUM(DayOfWeek)
+     QT_Q_ENUM(CursorShape)
+     QT_Q_ENUM(GlobalColor)
++    QT_Q_ENUM(Appearance)
+     QT_Q_ENUM(AspectRatioMode)
+     QT_Q_ENUM(TransformationMode)
+     QT_Q_FLAG(ImageConversionFlags)
+diff --git a/src/corelib/global/qnamespace.qdoc b/src/corelib/global/qnamespace.qdoc
+index dbb9469bba..70cf8290f5 100644
+--- a/src/corelib/global/qnamespace.qdoc
++++ b/src/corelib/global/qnamespace.qdoc
+@@ -841,6 +841,17 @@
+     \sa QDockWidget::setAllowedAreas, QDockWidget::isAreaAllowed
+ */
+ 
++/*!
++    \enum Qt::Appearance
++
++    Represents the appearance of an application's theme,
++    defined by QGuiApplication::palette().
++
++    \value Unknown The appearance is unknown.
++    \value Light The background colors are lighter than the text color, i.e. the theme is light.
++    \value Dark The background colors are darker than the text color, i.e. the theme is dark.
++*/
++
+ /*!
+     \enum Qt::ImageConversionFlag
+ 
+-- 
+2.41.0
+

@@ -1,0 +1,24 @@
+diff --git a/blosc/blosc.c b/blosc/blosc.c
+index a04e161..ad800df 100644
+--- a/blosc/blosc.c
++++ b/blosc/blosc.c
+@@ -240,6 +240,9 @@ static void my_free(void *block)
+ 
+ 
+ /* Copy 4 bytes from `*pa` to int32_t, changing endianness if necessary. */
++/* This routine is not strict-aliasing safe, particularly if it is
++   inlined into its caller.  So use attributes to prevent that.  */
++__attribute__ ((noinline,noclone,noipa))
+ static int32_t sw32_(const uint8_t *pa)
+ {
+   int32_t idest;
+@@ -266,6 +269,9 @@ static int32_t sw32_(const uint8_t *pa)
+ 
+ 
+ /* Copy 4 bytes from `*pa` to `*dest`, changing endianness if necessary. */
++/* This routine is not strict-aliasing safe, particularly if it is
++   inlined into its caller.  So use attributes to prevent that.  */
++__attribute__ ((noinline,noclone,noipa))
+ static void _sw32(uint8_t* dest, int32_t a)
+ {
+   uint8_t *pa = (uint8_t *)&a;

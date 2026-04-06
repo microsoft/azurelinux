@@ -1,0 +1,36 @@
+# Javascript asset handling for RPM packaging
+
+RPM packages should unbundle Javascript assets during the RPM build
+process.  Currently, this process is not fully automated.
+
+If Doxygen HTML documentation is installed, add
+
+    %{?doxygen_js_requires}
+
+to the subpackage that contains the HTML documentation.
+
+If HTML documentation is installed during the %install phase, invoke
+
+    %{doxygen_unbundle_buildroot}
+
+towards the end of the %install section.  It will process Javascript
+files under %{_docdir} (/usr/share/doc).  If another directory needs
+to be processed, use an explicit directory argument:
+
+    %{doxygen_unbundle_buildroot /usr/share/example/doc}
+
+The path is relative to %{buildroot} or $RPM_BUILD_ROOT.
+
+If HTML documentation is not installed, but propagated into package
+using %doc directives, it is necessary to invoke
+
+    %{doxygen_unbundle}
+
+after running Doxygen (typically from the %build section).  This
+unbundles assets found under the current directory.  A specific
+directory can be processed by passing it as an argument:
+
+    %{doxygen_unbundle example/doc}
+
+In this case, the path argument is relative to the current directory,
+not the buildroot.

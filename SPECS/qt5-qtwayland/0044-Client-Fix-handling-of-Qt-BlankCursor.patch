@@ -1,0 +1,38 @@
+From 4ae771826e431596b94e556ee0e056363898c17c Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Tue, 22 Nov 2022 23:27:34 +0200
+Subject: [PATCH 44/55] Client: Fix handling of Qt::BlankCursor
+
+The cursor may not be properly set when a window has Qt::BlankCursor and
+it's shown. In that case, the cursor surface may not be present and
+wl_pointer.set_cursor won't be called.
+
+On the other hand, wl_pointer.set_cursor must be always called when
+wl_pointer.enter is received.
+
+Pick-to: 6.5
+Change-Id: I8540e7a02df1579b3380a1a1d4cfab42c1ab3104
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+(cherry picked from commit e954853f0e68d78ac1a98bc3533713881496064c)
+---
+ src/client/qwaylandinputdevice.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
+index 9c764d80..447c40fe 100644
+--- a/src/client/qwaylandinputdevice.cpp
++++ b/src/client/qwaylandinputdevice.cpp
+@@ -311,8 +311,7 @@ void QWaylandInputDevice::Pointer::updateCursor()
+     auto shape = seat()->mCursor.shape;
+ 
+     if (shape == Qt::BlankCursor) {
+-        if (mCursor.surface)
+-            mCursor.surface->hide();
++        getOrCreateCursorSurface()->hide();
+         return;
+     }
+ 
+-- 
+2.51.1
+

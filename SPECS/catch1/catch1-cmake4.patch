@@ -1,0 +1,39 @@
+commit 9bcbca3fc4e46d9ba7a9b1a3841a06989750e4e9
+Author: Tom Hughes <tom@compton.nu>
+Date:   Wed Apr 30 20:18:52 2025
+
+    Update minimum cmake version for cmake 4 support
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6e608fa3..32d3b17b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ project(CatchSelfTest)
+ 
+diff --git a/contrib/ParseAndAddCatchTests.cmake b/contrib/ParseAndAddCatchTests.cmake
+index cb2846d0..fa500d2b 100644
+--- a/contrib/ParseAndAddCatchTests.cmake
++++ b/contrib/ParseAndAddCatchTests.cmake
+@@ -41,7 +41,7 @@
+ #                                                                                                  #
+ #==================================================================================================#
+ 
+-cmake_minimum_required(VERSION 2.8.8)
++cmake_minimum_required(VERSION 3.5)
+ 
+ option(PARSE_CATCH_TESTS_VERBOSE "Print Catch to CTest parser debug messages" OFF)
+ option(PARSE_CATCH_TESTS_NO_HIDDEN_TESTS "Exclude tests with [!hide], [.] or [.foo] tags" OFF)
+diff --git a/test_package/CMakeLists.txt b/test_package/CMakeLists.txt
+index 339facbf..ce41c9fc 100644
+--- a/test_package/CMakeLists.txt
++++ b/test_package/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ project(CatchTest CXX)
+ 
+ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

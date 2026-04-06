@@ -1,0 +1,23 @@
+Only require config for CPAN shell operations
+
+Based on forked project app-cpan-upgraded
+
+commit 2617dafe6d0333dcc529e751a3f97c7a60d6db56 (HEAD -> master, origin/master, origin/HEAD)
+Author: brian d foy <briandfoy@pobox.com>
+Date:   Thu Mar 6 12:15:09 2025 -0500
+
+    Only require config for CPAN shell operations (#1, andk/cpanpm#194)
+
+
+diff -up CPAN-2.38/lib/App/Cpan.pm.orig CPAN-2.38/lib/App/Cpan.pm
+--- CPAN-2.38/lib/App/Cpan.pm.orig	2025-02-20 12:17:11.602148818 +0100
++++ CPAN-2.38/lib/App/Cpan.pm	2025-03-07 07:45:28.355696986 +0100
+@@ -431,7 +431,7 @@ sub _process_setup_options
+ 		$Method_table{j}[ $Method_table_index{code} ]->( $options->{j} );
+ 		delete $options->{j};
+ 		}
+-	elsif ( ! $options->{h} ) { # h "ignores all of the other options and arguments"
++	elsif ( grep { exists $options->{$_} } keys %CPAN_METHODS ) { # these are options that need CPAN config
+ 		# this is what CPAN.pm would do otherwise
+ 		local $CPAN::Be_Silent = 1;
+ 		CPAN::HandleConfig->load(

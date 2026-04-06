@@ -1,0 +1,147 @@
+commit ccffe217afa83a60363426d3bd304bcfb0011e85
+Author: Sérgio M. Basto <sergio@serjux.com>
+Date:   Sun Feb 9 02:58:28 2025 +0000
+
+    Log examples that aren't build and if CMAKE_CXX_COMPILER is defined
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 77e48610..49291110 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,6 +5,8 @@ set(PROJECT_LANGUAGES C)
+ if(DEFINED CMAKE_CXX_COMPILER)
+   set(CMAKE_CXX_STANDARD 17)
+   list(APPEND PROJECT_LANGUAGES CXX)
++else()
++    message(STATUS "CMAKE_CXX_COMPILER not DEFINED")
+ endif(DEFINED CMAKE_CXX_COMPILER)
+ 
+ project(LibVNCServer VERSION 0.9.15 LANGUAGES ${PROJECT_LANGUAGES})
+@@ -596,6 +598,8 @@ if(WITH_THREADS AND WITH_TIGHTVNC_FILETRANSFER AND CMAKE_USE_PTHREADS_INIT)
+     ${LIBVNCSERVER_EXAMPLES}
+     filetransfer
+   )
++else()
++  message(STATUS "Skipping filetransfer example")
+ endif(WITH_THREADS AND WITH_TIGHTVNC_FILETRANSFER AND CMAKE_USE_PTHREADS_INIT)
+ 
+ if(ANDROID)
+@@ -615,6 +619,7 @@ else()
+   unset(X11_xcb_LIB CACHE)
+   unset(X11_xcb_xtest_LIB CACHE)
+   unset(X11_xcb_keysyms_LIB CACHE)
++  message(STATUS "Skipping x11 example")
+ endif(X11_xcb_FOUND AND X11_xcb_xtest_FOUND AND X11_xcb_keysyms_FOUND)
+ 
+ set(LIBVNCCLIENT_EXAMPLES
+@@ -628,6 +633,8 @@ if(SDL2_FOUND)
+     ${LIBVNCCLIENT_EXAMPLES}
+     SDLvncviewer
+   )
++else()
++  message(STATUS "Skipping SDLvncviewer example")
+ endif(SDL2_FOUND)
+ 
+ if(GTK2_FOUND)
+@@ -636,6 +643,8 @@ if(GTK2_FOUND)
+     ${LIBVNCCLIENT_EXAMPLES}
+     gtkvncviewer
+   )
++else()
++  message(STATUS "Skipping gtkvncviewer example")
+ endif(GTK2_FOUND)
+ 
+ if(WITH_LIBSSHTUNNEL AND LIBSSHTUNNEL_LIBRARY AND LIBSSHTUNNEL_INCLUDE_DIR)
+@@ -645,6 +654,8 @@ if(WITH_LIBSSHTUNNEL AND LIBSSHTUNNEL_LIBRARY AND LIBSSHTUNNEL_INCLUDE_DIR)
+     ${LIBVNCCLIENT_EXAMPLES}
+     sshtunnel
+   )
++else()
++  message(STATUS "Skipping sshtunnel example")
+ endif()
+ 
+ if(FFMPEG_FOUND)
+@@ -653,6 +664,8 @@ if(FFMPEG_FOUND)
+     ${LIBVNCCLIENT_EXAMPLES}
+     vnc2mpg
+   )
++else()
++  message(STATUS "Skipping vnc2mpg example")
+ endif(FFMPEG_FOUND)
+ 
+ if(WITH_EXAMPLES)
+@@ -679,6 +692,8 @@ if(WITH_EXAMPLES)
+     set_target_properties(client_examples_qt5client PROPERTIES OUTPUT_NAME qt5client)
+     set_target_properties(client_examples_qt5client PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/examples/client)
+     target_link_libraries(client_examples_qt5client vncclient ${CMAKE_THREAD_LIBS_INIT} ${Qt5Widgets_LIBRARIES})
++  else()
++    message(STATUS "Skipping qt5client examples")
+   endif(Qt5Widgets_FOUND AND WITH_QT AND DEFINED CMAKE_CXX_COMPILER)
+ endif(WITH_EXAMPLES)
+ 
+
+commit e8511f1666b5881693d7d522c598c46b645b86f7
+Author: Sérgio M. Basto <sergio@serjux.com>
+Date:   Sat Feb 8 16:32:55 2025 +0000
+
+    Install examples in DATADIR
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2edca8cb..77e48610 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -857,4 +857,35 @@ if(LIBVNCSERVER_INSTALL)
+         ${CMAKE_CURRENT_BINARY_DIR}/libvncclient.pc
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+         )
++
++    install(DIRECTORY
++        ${CMAKE_CURRENT_BINARY_DIR}/examples/server/
++        DESTINATION ${CMAKE_INSTALL_DATADIR}/libvncserver/examples/server
++        USE_SOURCE_PERMISSIONS
++        )
++
++    install(DIRECTORY
++        ${CMAKE_CURRENT_BINARY_DIR}/examples/client/
++        DESTINATION ${CMAKE_INSTALL_DATADIR}/libvncserver/examples/client
++        USE_SOURCE_PERMISSIONS
++        )
++
++    install(DIRECTORY
++        ${CMAKE_CURRENT_SOURCE_DIR}/examples/server/
++        DESTINATION ${CMAKE_INSTALL_DATADIR}/libvncserver/examples/server
++        FILES_MATCHING PATTERN "*"
++        PATTERN "*.o" EXCLUDE
++        PATTERN "*.a" EXCLUDE
++        PATTERN "*.so" EXCLUDE
++    )
++
++    install(DIRECTORY
++        ${CMAKE_CURRENT_SOURCE_DIR}/examples/client/
++        DESTINATION ${CMAKE_INSTALL_DATADIR}/libvncserver/examples/client
++        FILES_MATCHING PATTERN "*"
++        PATTERN "*.o" EXCLUDE
++        PATTERN "*.a" EXCLUDE
++        PATTERN "*.so" EXCLUDE
++    )
++
+ endif()
+
+commit cbba93eef2d770e7c7859eabc956a0c9b7f2a5b1
+Author: Sérgio M. Basto <sergio@serjux.com>
+Date:   Sat Feb 8 16:32:05 2025 +0000
+
+    It makes CMake not include RPATH paths in the binaries during installation
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 205f3928..2edca8cb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,6 +32,7 @@ set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
+ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
++set(CMAKE_SKIP_RPATH TRUE)
+ 
+ if(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
+ # some LSP servers expect compile_commands.json in the project root

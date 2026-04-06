@@ -1,0 +1,42 @@
+diff -Naur plutovg-1.3.0.old/CMakeLists.txt plutovg-1.3.0/CMakeLists.txt
+--- plutovg-1.3.0.old/CMakeLists.txt	2025-07-23 22:23:37.488217199 +0200
++++ plutovg-1.3.0/CMakeLists.txt	2025-07-23 22:49:38.023238444 +0200
+@@ -28,9 +28,6 @@
+     source/plutovg-ft-raster.h
+     source/plutovg-ft-stroker.h
+     source/plutovg-ft-types.h
+-    source/plutovg-stb-image-write.h
+-    source/plutovg-stb-image.h
+-    source/plutovg-stb-truetype.h
+ )
+ 
+ add_library(plutovg ${plutovg_sources} ${plutovg_headers})
+diff -Naur plutovg-1.3.0.old/source/plutovg-font.c plutovg-1.3.0/source/plutovg-font.c
+--- plutovg-1.3.0.old/source/plutovg-font.c	2025-07-23 22:23:37.488610380 +0200
++++ plutovg-1.3.0/source/plutovg-font.c	2025-07-23 22:49:27.998311744 +0200
+@@ -6,7 +6,7 @@
+ 
+ #define STBTT_STATIC
+ #define STB_TRUETYPE_IMPLEMENTATION
+-#include "plutovg-stb-truetype.h"
++#include <stb/stb_truetype.h>
+ 
+ static int plutovg_text_iterator_length(const void* data, plutovg_text_encoding_t encoding)
+ {
+diff -Naur plutovg-1.3.0.old/source/plutovg-surface.c plutovg-1.3.0/source/plutovg-surface.c
+--- plutovg-1.3.0.old/source/plutovg-surface.c	2025-07-23 22:23:37.488610380 +0200
++++ plutovg-1.3.0/source/plutovg-surface.c	2025-07-23 22:49:27.998929748 +0200
+@@ -3,11 +3,11 @@
+ 
+ #define STB_IMAGE_WRITE_STATIC
+ #define STB_IMAGE_WRITE_IMPLEMENTATION
+-#include "plutovg-stb-image-write.h"
++#include <stb/stb_image_write.h>
+ 
+ #define STB_IMAGE_STATIC
+ #define STB_IMAGE_IMPLEMENTATION
+-#include "plutovg-stb-image.h"
++#include <stb/stb_image.h>
+ 
+ static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int height)
+ {

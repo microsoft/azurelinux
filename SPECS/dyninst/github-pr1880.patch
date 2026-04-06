@@ -1,0 +1,23 @@
+commit 165402aa1640afb394b11a096b38c6bc3a5bf9d0 (github-fche/patch-1)
+gpg: Signature made Wed 22 Jan 2025 03:35:55 PM EST
+gpg:                using RSA key B5690EEEBB952194
+gpg: Can't check signature: No public key
+Author: Frank Ch. Eigler <fche@elastic.org>
+Date:   Wed Jan 22 15:35:55 2025 -0500
+
+    Update sha1.C: #include <cstdint>
+    
+    Subject header is needed on gcc15 to compile sha1.C, supplying declaration of types like uint32_t.
+
+diff --git a/common/src/sha1.C b/common/src/sha1.C
+index 91e9ad291561..d6e76c5727ac 100644
+--- a/common/src/sha1.C
++++ b/common/src/sha1.C
+@@ -102,6 +102,7 @@ A million repetitions of "a"
+ 
+ #include <stdio.h>
+ #include <string.h>
++#include <cstdint>
+ 
+ #include "dyntypes.h"
+ #include "common/src/sha1.h"

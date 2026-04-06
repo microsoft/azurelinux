@@ -1,0 +1,43 @@
+From 76f1ac50f4affebf08c1ba71ee1dc31cd2a6a950 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 1 Jun 2020 13:48:33 +0200
+Subject: [PATCH] Upgrade to 3.14
+
+---
+ lib/Thread/Queue.pm | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/Thread/Queue.pm b/lib/Thread/Queue.pm
+index bcdf11d..731d0b2 100644
+--- a/lib/Thread/Queue.pm
++++ b/lib/Thread/Queue.pm
+@@ -3,7 +3,7 @@ package Thread::Queue;
+ use strict;
+ use warnings;
+ 
+-our $VERSION = '3.13';
++our $VERSION = '3.14';          # remember to update version in POD!
+ $VERSION = eval $VERSION;
+ 
+ use threads::shared 1.21;
+@@ -318,7 +318,7 @@ Thread::Queue - Thread-safe queues
+ 
+ =head1 VERSION
+ 
+-This document describes Thread::Queue version 3.13
++This document describes Thread::Queue version 3.14
+ 
+ =head1 SYNOPSIS
+ 
+@@ -547,7 +547,7 @@ VARIABLE"> the queue inside a local block:
+ =item ->peek(INDEX)
+ 
+ Returns an item from the queue without dequeuing anything.  Defaults to the
+-the head of queue (at index position 0) if no index is specified.  Negative
++head of queue (at index position 0) if no index is specified.  Negative
+ index values are supported as with L<arrays|perldata/"Subscripts"> (i.e., -1
+ is the end of the queue, -2 is next to last, and so on).
+ 
+-- 
+2.25.4
+

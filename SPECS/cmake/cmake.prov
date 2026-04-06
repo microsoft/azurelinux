@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+# -*- coding:utf-8 -*-
+#
+# Copyright (C) 2015 Daniel Vrátil <dvratil@redhat.com>
+# Copyright (C) 2017 Daniel Vrátil <dvratil@fedoraproject.org>
+#
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Library General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+
+import sys
+import re
+import glob
+
+class CMakeParser:
+    def __init__(self, filelist = None):
+        if filelist == None:
+            filelist = sys.stdin
+
+        paths = map(lambda x: x.rstrip(), filelist.readlines())
+        for path in paths:
+            modulePath, cmakeModule, lowercase = self.parseCmakeModuleConfig(path)
+            if modulePath and cmakeModule:
+                version = self.resolveCMakeModuleVersion(modulePath, cmakeModule, lowercase)
+
+                if version:
+                    string = "cmake(" + cmakeModule + ") = " + version
+                else:
+                    string = "cmake(" + cmakeModule + ")"
+                if string == string.lower():
+                    print(string)
+                else:
+                    # Temporarily print both variants to satisfy requires
+                    # by the old version of this generator which made mistakes
+                    print(string)
+                    print(string.lower())
+
+
+    def parseCmakeModuleConfig(self, configFile):
+        paths = configFile.rsplit("/", 3)
+
+        modulePath = "%s/cmake/%s" % (paths[0], paths[2])
+        cfgFile = paths[3]
+        if cfgFile.endswith("Config.cmake"):
+           return (modulePath, cfgFile[0:-len("Config.cmake")], False)
+        elif cfgFile.endswith("-config.cmake"):
+           return (modulePath, cfgFile[0:-len("-config.cmake")], True)
+        else:
+            return (None, None, False)
+
+    def resolveCMakeModuleVersion(self, modulePath, cmakeModule, lowercase):
+        versionFile = ("%s/%s-config-version.cmake" if lowercase else "%s/%sConfigVersion.cmake") % (modulePath, cmakeModule)
+        try:
+            f = open(versionFile, 'r')
+        except:
+            return None
+
+        for line in f:
+            line = line.strip()
+
+            # set(PACKAGE_VERSION <version>)
+            version = re.match(r"^set[\ ]*\([\ ]*PACKAGE_VERSION[\ ]+[\"]*([0-9\.]+)[\"]*[\ ]*[.]*\)", line)
+            if version:
+                return version.groups(1)[0]
+
+        return None
+
+if __name__ == "__main__":
+    parser = CMakeParser()

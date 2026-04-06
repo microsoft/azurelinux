@@ -1,0 +1,276 @@
+From 43cb4631c1f42dbfce78288b8ae30b5840ed59b3 Mon Sep 17 00:00:00 2001
+From: Ebuka Ezike <yerimyah1@gmail.com>
+Date: Thu, 8 Jan 2026 18:46:03 +0000
+Subject: [PATCH] [lldb] Fix typed commands not shown on the screen (#174216)
+
+The cause is that in `python3.14`, `fcntl.ioctl` now throws a buffer
+overflow error
+when the buffer is too small or too large (see
+https://github.com/python/cpython/pull/132919). This caused the Python
+interpreter to fail terminal detection and not properly echo user
+commands back to the screen.
+
+Fix by dropping the custom terminal size check entirely and using the
+built-in `sys.stdin.isatty()` instead.
+
+Fixes #173302
+---
+ .../Python/lldbsuite/test/lldbpexpect.py      |  1 +
+ .../Interpreter/embedded_interpreter.py       | 59 +++---------------
+ .../python_api/file_handle/TestFileHandle.py  | 48 +++++++++++++-
+ .../API/terminal/TestPythonInterpreterEcho.py | 62 +++++++++++++++++++
+ .../Shell/ScriptInterpreter/Python/io.test    | 12 ++++
+ 5 files changed, 131 insertions(+), 51 deletions(-)
+ create mode 100644 lldb/test/API/terminal/TestPythonInterpreterEcho.py
+ create mode 100644 lldb/test/Shell/ScriptInterpreter/Python/io.test
+
+diff --git a/lldb/packages/Python/lldbsuite/test/lldbpexpect.py b/lldb/packages/Python/lldbsuite/test/lldbpexpect.py
+index 3279e1fd39f8c..03b2500fbda52 100644
+--- a/lldb/packages/Python/lldbsuite/test/lldbpexpect.py
++++ b/lldb/packages/Python/lldbsuite/test/lldbpexpect.py
+@@ -10,6 +10,7 @@
+ 
+ 
+ @skipIfRemote
++@skipIfWindows
+ @add_test_categories(["pexpect"])
+ class PExpectTest(TestBase):
+     NO_DEBUG_INFO_TESTCASE = True
+diff --git a/lldb/source/Interpreter/embedded_interpreter.py b/lldb/source/Interpreter/embedded_interpreter.py
+index 42a9ab5fc367a..12c47bd712816 100644
+--- a/lldb/source/Interpreter/embedded_interpreter.py
++++ b/lldb/source/Interpreter/embedded_interpreter.py
+@@ -32,18 +32,6 @@ def is_libedit():
+ g_run_one_line_str = None
+ 
+ 
+-def get_terminal_size(fd):
+-    try:
+-        import fcntl
+-        import termios
+-        import struct
+-
+-        hw = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
+-    except:
+-        hw = (0, 0)
+-    return hw
+-
+-
+ class LLDBExit(SystemExit):
+     pass
+ 
+@@ -74,50 +62,21 @@ def readfunc_stdio(prompt):
+ def run_python_interpreter(local_dict):
+     # Pass in the dictionary, for continuity from one session to the next.
+     try:
+-        fd = sys.stdin.fileno()
+-        interacted = False
+-        if get_terminal_size(fd)[1] == 0:
+-            try:
+-                import termios
+-
+-                old = termios.tcgetattr(fd)
+-                if old[3] & termios.ECHO:
+-                    # Need to turn off echoing and restore
+-                    new = termios.tcgetattr(fd)
+-                    new[3] = new[3] & ~termios.ECHO
+-                    try:
+-                        termios.tcsetattr(fd, termios.TCSADRAIN, new)
+-                        interacted = True
+-                        code.interact(
+-                            banner="Python Interactive Interpreter. To exit, type 'quit()', 'exit()'.",
+-                            readfunc=readfunc_stdio,
+-                            local=local_dict,
+-                        )
+-                    finally:
+-                        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+-            except:
+-                pass
+-            # Don't need to turn off echoing
+-            if not interacted:
+-                code.interact(
+-                    banner="Python Interactive Interpreter. To exit, type 'quit()', 'exit()' or Ctrl-D.",
+-                    readfunc=readfunc_stdio,
+-                    local=local_dict,
+-                )
+-        else:
+-            # We have a real interactive terminal
+-            code.interact(
+-                banner="Python Interactive Interpreter. To exit, type 'quit()', 'exit()' or Ctrl-D.",
+-                readfunc=readfunc,
+-                local=local_dict,
+-            )
++        banner = "Python Interactive Interpreter. To exit, type 'quit()', 'exit()'."
++        input_func = readfunc_stdio
++
++        is_atty = sys.stdin.isatty()
++        if is_atty:
++            banner = "Python Interactive Interpreter. To exit, type 'quit()', 'exit()' or Ctrl-D."
++            input_func = readfunc
++
++        code.interact(banner=banner, readfunc=input_func, local=local_dict)
+     except LLDBExit:
+         pass
+     except SystemExit as e:
+         if e.code:
+             print("Script exited with code %s" % e.code)
+ 
+-
+ def run_one_line(local_dict, input_string):
+     global g_run_one_line_str
+     try:
+diff --git a/lldb/test/API/python_api/file_handle/TestFileHandle.py b/lldb/test/API/python_api/file_handle/TestFileHandle.py
+index b38585577f6f6..707044a3afb0f 100644
+--- a/lldb/test/API/python_api/file_handle/TestFileHandle.py
++++ b/lldb/test/API/python_api/file_handle/TestFileHandle.py
+@@ -111,10 +111,11 @@ def setUp(self):
+         super(FileHandleTestCase, self).setUp()
+         self.out_filename = self.getBuildArtifact("output")
+         self.in_filename = self.getBuildArtifact("input")
++        self.err_filename = self.getBuildArtifact("error")
+ 
+     def tearDown(self):
+         super(FileHandleTestCase, self).tearDown()
+-        for name in (self.out_filename, self.in_filename):
++        for name in (self.out_filename, self.in_filename, self.err_filename):
+             if os.path.exists(name):
+                 os.unlink(name)
+ 
+@@ -679,6 +680,51 @@ def test_stdout_file(self):
+             lines = [x for x in f.read().strip().split() if x != "7"]
+             self.assertEqual(lines, ["foobar"])
+ 
++    def test_stdout_file_interactive(self):
++        """Ensure when we read stdin from a file, outputs from python goes to the right I/O stream."""
++        with open(self.in_filename, "w") as f:
++            f.write(
++                "script --language python --\nvalue = 250 + 5\nprint(value)\nprint(vel)"
++            )
++
++        with open(self.out_filename, "w") as outf, open(
++            self.in_filename, "r"
++        ) as inf, open(self.err_filename, "w") as errf:
++            status = self.dbg.SetOutputFile(lldb.SBFile(outf))
++            self.assertSuccess(status)
++            status = self.dbg.SetErrorFile(lldb.SBFile(errf))
++            self.assertSuccess(status)
++            status = self.dbg.SetInputFile(lldb.SBFile(inf))
++            self.assertSuccess(status)
++            auto_handle_events = True
++            spawn_thread = False
++            num_errs = 0
++            quit_requested = False
++            stopped_for_crash = False
++            opts = lldb.SBCommandInterpreterRunOptions()
++            self.dbg.RunCommandInterpreter(
++                auto_handle_events,
++                spawn_thread,
++                opts,
++                num_errs,
++                quit_requested,
++                stopped_for_crash,
++            )
++            self.dbg.GetOutputFile().Flush()
++        expected_out_text = "255"
++        expected_err_text = "NameError"
++        # check stdout
++        with open(self.out_filename, "r") as f:
++            out_text = f.read()
++            self.assertIn(expected_out_text, out_text)
++            self.assertNotIn(expected_err_text, out_text)
++
++        # check stderr
++        with open(self.err_filename, "r") as f:
++            err_text = f.read()
++            self.assertIn(expected_err_text, err_text)
++            self.assertNotIn(expected_out_text, err_text)
++
+     def test_identity(self):
+         f = io.StringIO()
+         sbf = lldb.SBFile(f)
+diff --git a/lldb/test/API/terminal/TestPythonInterpreterEcho.py b/lldb/test/API/terminal/TestPythonInterpreterEcho.py
+new file mode 100644
+index 0000000000000..758a4f9cede5a
+--- /dev/null
++++ b/lldb/test/API/terminal/TestPythonInterpreterEcho.py
+@@ -0,0 +1,62 @@
++"""
++Test that typing python expression in the terminal is echoed back to stdout.
++"""
++
++from lldbsuite.test.decorators import skipIfAsan
++from lldbsuite.test.lldbpexpect import PExpectTest
++
++
++@skipIfAsan
++class PythonInterpreterEchoTest(PExpectTest):
++    PYTHON_PROMPT = ">>> "
++
++    def verify_command_echo(
++        self, command: str, expected_output: str = "", is_regex: bool = False
++    ):
++        assert self.child != None
++        child = self.child
++        self.assertIsNotNone(self.child, "expected a running lldb process.")
++
++        child.sendline(command)
++
++        # Build pattern list: match whichever comes first (output or prompt).
++        # This prevents waiting for a timeout if there's no match.
++        pattern = []
++        match_expected = expected_output and len(expected_output) > 0
++
++        if match_expected:
++            pattern.append(expected_output)
++        pattern.append(self.PYTHON_PROMPT)
++
++        expect_func = child.expect if is_regex else child.expect_exact
++        match_idx = expect_func(pattern)
++        if match_expected:
++            self.assertEqual(
++                match_idx, 0, "Expected output `{expected_output}` in stdout."
++            )
++
++        self.assertIsNotNone(self.child.before, "Expected output before prompt")
++        self.assertIsInstance(self.child.before, bytes)
++        echoed_text: str = self.child.before.decode("ascii").strip()
++        self.assertEqual(
++            command, echoed_text, f"Command '{command}' should be echoed to stdout."
++        )
++
++        if match_expected:
++            child.expect_exact(self.PYTHON_PROMPT)
++
++    def test_python_interpreter_echo(self):
++        """Test that that the user typed commands is echoed to stdout"""
++
++        self.launch(use_colors=False, dimensions=(100, 100))
++
++        # Enter the python interpreter.
++        self.verify_command_echo(
++            "script --language python --", expected_output="Python.*\\.", is_regex=True
++        )
++        self.child_in_script_interpreter = True
++
++        self.verify_command_echo("val = 300")
++        self.verify_command_echo(
++            "print('result =', 300)", expected_output="result = 300"
++        )
+diff --git a/lldb/test/Shell/ScriptInterpreter/Python/io.test b/lldb/test/Shell/ScriptInterpreter/Python/io.test
+new file mode 100644
+index 0000000000000..25e3de41724e0
+--- /dev/null
++++ b/lldb/test/Shell/ScriptInterpreter/Python/io.test
+@@ -0,0 +1,12 @@
++# RUN: rm -rf %t.stdout %t.stderr
++# RUN: cat %s | %lldb --script-language python > %t.stdout 2> %t.stderr
++# RUN: cat %t.stdout | FileCheck %s --check-prefix STDOUT
++# RUN: cat %t.stderr | FileCheck %s --check-prefix STDERR
++script
++variable = 300
++print(variable)
++print(not_value)
++quit
++
++# STDOUT: 300
++# STDERR: NameError{{.*}}is not defined

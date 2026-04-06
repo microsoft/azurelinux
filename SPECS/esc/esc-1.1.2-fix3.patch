@@ -1,0 +1,300 @@
+diff -up ./esc/configure.ac.fix3 ./esc/configure.ac
+--- ./esc/configure.ac.fix3	2018-07-30 14:51:37.000000000 -0700
++++ ./esc/configure.ac	2018-10-12 14:06:48.349544811 -0700
+@@ -56,8 +56,6 @@ AM_PROG_AR
+ AM_SILENT_RULES([yes])
+ LT_INIT
+ 
+-SCARD_LIB_NAME="libpcsclite.so.1"
+-
+ # Versioning
+ ESC_MAJOR_VERSION=esc_major_version
+ ESC_MINOR_VERSION=esc_minor_version
+@@ -75,6 +73,7 @@ GOBJECT_INTROSPECTION_CHECK(1.56.1)
+ # Output
+ AC_DEFINE([DLL_SUFFIX], ["so"], [Description])
+ AC_DEFINE([LINUX], [1], [Description])
++AC_DEFINE([SCARD_LIB_NAME],["libpcsclite.so.1"], [Description])
+ AC_SUBST(ESC_CFLAGS)
+ AC_SUBST(ESC_LIBS)
+ AC_CONFIG_FILES([Makefile src/app/Makefile src/lib/coolkey/Makefile src/lib/nss-http-client/Makefile src/lib/coolkey-mgr/Makefile])
+diff -up ./esc/src/app/esc.js.fix3 ./esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix3	2018-10-12 17:59:36.790939337 -0700
++++ ./esc/src/app/esc.js	2018-10-12 19:26:51.847470201 -0700
+@@ -44,13 +44,16 @@ const CoolKeyNotify = new Lang.Class({
+         this._unique_name = "Unknown";
+         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(CoolKeyNotifyIface, this);
+         this._dbusImpl.export(Gio.DBus.session, '/com/jmagne/CoolKeyNotify');
+-        this._dbusId = Gio.DBus.session.own_name( 'com.rm5248', Gio.BusNameOwnerFlags.NONE, this._nameAcquired.bind(this), this._nameLost);
++        this._dbusId = Gio.DBus.session.own_name( 'com.rm5248', Gio.BusNameOwnerFlags.NONE, this._nameAcquired.bind(this), this._nameLost.bind(this));
+     },
+     _nameAcquired: function( name ) {
+          this._unique_name = name.unique_name;
+          this._client._createCoolKeyMgr(this._unique_name);
+     },
+     _nameLost: function( name ) {
++         if(this._client._window) {
++             this._client._window.destroy();
++         }
+     },
+ 
+     notifyCoolKeyEvent: function(aKeyType, aKeyID, aKeyState, aData, strData) {
+@@ -76,6 +79,7 @@ class ESC {
+         this._window.present();
+     }
+     _onStartup() {
++         this.mgr = null;
+          this._buildUI();
+          this.notify = new CoolKeyNotify(this);
+      }
+@@ -95,8 +99,10 @@ class ESC {
+             this.notify._dbusImpl.unexport();
+             this.notify = null;
+         }
+-        this.mgr.cleanup();
+-        this.mgr = null;
++        if(this.mgr) {
++            this.mgr.cleanup();
++            this.mgr = null;
++        }
+         this._window.destroy();
+     }
+   
+@@ -212,9 +218,7 @@ class ESC {
+ 
+          if (res == false) {
+              this._configFile.set_string("ESC","name","Smart Card Utility");
+-             print("attmpeting to create: " + config_name);
+              res = this._configFile.save_to_file(config_name); 
+-             print("res: " + res);
+          } 
+      }
+ 
+diff -up ./esc/src/lib/coolkey/cky_card.c.fix3 ./esc/src/lib/coolkey/cky_card.c
+--- ./esc/src/lib/coolkey/cky_card.c.fix3	2018-05-03 14:03:07.000000000 -0700
++++ ./esc/src/lib/coolkey/cky_card.c	2018-10-12 14:06:48.350544806 -0700
+@@ -139,21 +139,15 @@ typedef struct _SCard {
+         goto fail; \
+     }
+ 
+-#ifdef WIN32
+-#define SCARD_LIB_NAME "winscard.dll"
+-#else
+-#ifdef MAC
+-#define SCARD_LIB_NAME "PCSC.Framework/PCSC"
+-#else
+ #ifdef LINUX
+-#define SCARD_LIB_NAME "libpcsclite.so"
++#ifndef SCARD_LIB_NAME
++#define SCARD_LIB_NAME "libpcsclite.so.1"
+ #else
+ #ifndef SCARD_LIB_NAME
+ #error "define wincard library for this platform"
+ #endif
+ #endif
+ #endif
+-#endif
+ 
+ static SCard *
+ ckySCard_Init(void)
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix3 ./esc/src/lib/coolkey/CoolKey.cpp
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix3 ./esc/src/lib/coolkey-mgr/coolkey-api.cpp
+--- ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix3	2018-10-12 15:12:59.937348875 -0700
++++ ./esc/src/lib/coolkey-mgr/coolkey-api.cpp	2018-10-12 18:28:34.674060797 -0700
+@@ -71,6 +71,12 @@ tokenInfo *coolkey_get_token_info(int ke
+     if(tInfo == NULL) {
+        exit(1);
+     }
++
++    tInfo ->atr = NULL;
++    tInfo->issuerInfo = NULL;
++    tInfo->issuer = NULL;
++    tInfo->issuedTo = NULL;
++    tInfo->status = 0;
+     
+     coolkey->GetCoolKeyATR(keyType, keyID, &tInfo->atr); 
+ 
+diff -up ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp.fix3 ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp
+--- ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp.fix3	2018-10-12 14:22:05.938864628 -0700
++++ ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp	2018-10-12 19:15:26.447926406 -0700
+@@ -1053,17 +1053,19 @@ HRESULT rhCoolKey::GetCoolKeyCertInfo(PR
+ HRESULT rhCoolKey::GetCoolKeyATR(PRUint32 aKeyType, const char *aKeyID, char **_retval)
+ {
+     char tBuff[56];
++    if(aKeyID == NULL || _retval == NULL) {
++        return E_FAIL;
++    }
+     *_retval  = NULL;
+     AutoCoolKey key(aKeyType, aKeyID);
+-    char atr[128];
+-    HRESULT res =   CoolKeyGetATR(&key, (char *)&atr,sizeof(atr));
+-     PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s Attempting to get the key's ATR: Key: %s, ATR  %s. \n",GetTStamp(tBuff,56),aKeyID, (char *) atr));
+-    if(res == S_OK)
+-    {
+-        char *temp =  (char *) PL_strdup(atr);
+-        *_retval  = temp;
++    char atr[128] = {};
++    HRESULT res = CoolKeyGetATR(&key, (char *)&atr,sizeof(atr));
++    PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s Attempting to get the key's ATR: Key: %s, ATR  %s. \n",GetTStamp(tBuff,56),aKeyID, (char *) atr));
++
++    if(res == S_OK) {
++         *_retval  =  (char *) PL_strdup(atr);
+     }
+-      return NS_OK;
++    return res; 
+   }
+ 
+ /* string GetCoolKeyTokenName (in unsigned long aKeyType, in string aKeyID); */
+@@ -1097,24 +1099,25 @@ HRESULT rhCoolKey::GetCoolKeyTokenName(P
+ HRESULT rhCoolKey::GetCoolKeyIssuerInfo(PRUint32 aKeyType, const char *aKeyID, char **_retval)
+ {
+     char tBuff[56];
++
++    if(aKeyID == NULL || _retval == NULL) {
++        return E_FAIL;
++    }
+     *_retval  = NULL;
+ 
+     AutoCoolKey key(aKeyType, aKeyID);
+ 
+-    char issuerInfo[256];
++    char issuerInfo[256] = {};
+ 
+     HRESULT res =  CoolKeyGetIssuerInfo(&key, (char *)&issuerInfo,256);
+ 
+     ::CoolKeyLogMsg( 1, "%s Attempting to get the key's Issuer: Key: %s, Issuer  %s. \n",GetTStamp(tBuff,56),aKeyID, (char *) issuerInfo);
+ 
+-    if(res == S_OK)
+-    {
+-        char *temp =  (char *) PL_strdup(issuerInfo);
+-        *_retval  = temp;
+-
++    if(res == S_OK) {
++        *_retval =  (char *) PL_strdup(issuerInfo);
+     }
+-    return NS_OK;
+ 
++    return res;
+ }
+ 
+ /* void rhGetCoolKeyPolicy (in unsigned long aKeyType, in string aKeyID, out string policy); */
+@@ -1153,28 +1156,22 @@ HRESULT rhCoolKey::GetCoolKeyPolicy(PRUi
+ HRESULT rhCoolKey::GetCoolKeyUID(PRUint32 aKeyType, const char *aKeyID, char **uid)
+ {
+     char tBuff[56];
+-    if (!aKeyID) {
+-        return NS_ERROR_FAILURE;
++    if (aKeyID  == NULL || uid == NULL) {
++        return E_FAIL;
+     }
+ 
+     AutoCoolKey key(aKeyType, ( char *)aKeyID);
+ 
+-    char buff[512];
++    char buff[512] = {};
+     int bufLength = 512;
+-    buff[0] = 0;
+    
+-    CoolKeyGetUID(&key, (char *) buff, bufLength);
+-
+-    if(!buff[0])
+-    {
+-        return NS_OK;
+-    }
++    HRESULT res = CoolKeyGetUID(&key, (char *) buff, bufLength);
+ 
+     PR_LOG(coolKeyLog,PR_LOG_DEBUG,("%s rhCoolKey::RhGetCoolKeyGetUID  %s \n",GetTStamp(tBuff,56),(char *) buff));
+ 
+-    char *temp =  (char *) PL_strdup(buff);
+-
+-    *uid = temp;
++    if(res == S_OK) {
++        char *uid =  (char *) PL_strdup(buff);
++    }
+ 
+     return NS_OK;
+ 
+@@ -1185,32 +1182,25 @@ HRESULT rhCoolKey::GetCoolKeyUID(PRUint3
+ HRESULT rhCoolKey::GetCoolKeyIssuedTo(PRUint32 aKeyType, const char *aKeyID, char **issuedTo)
+ {
+     char tBuff[56];
+-    if (!aKeyID) {
+-        return NS_ERROR_FAILURE;
++    if (aKeyID == NULL || issuedTo == NULL) {
++        return E_FAIL;
+     }
+ 
++    *issuedTo = NULL;
+     AutoCoolKey key(aKeyType, ( char *)aKeyID);
+ 
+-  //  const char *keyName = CoolKeyGetTokenName(&key);
+-
+-    char buff[512];
++    char buff[512] = {};
+     int bufLength = 512;
+-    buff[0] = 0;
+     
+-    CoolKeyGetIssuedTo(&key, (char *) buff, bufLength);
+-
+-    if(!buff[0])
+-    {
+-        return NS_OK;
+-    }
++    HRESULT res = CoolKeyGetIssuedTo(&key, (char *) buff, bufLength);
+ 
+     PR_LOG(coolKeyLog,PR_LOG_DEBUG,("%s rhCoolKey::RhGetCoolKeyGetIssuedTo  %s \n",GetTStamp(tBuff,56),(char *) buff));
+ 
+-    char *temp =  (char *) PL_strdup(buff);
+-
+-    *issuedTo = temp;
++    if(res == S_OK) {
++        *issuedTo =  (char *) PL_strdup(buff);
++    }
+ 
+-    return NS_OK;
++    return res;
+ 
+ }
+ 
+@@ -1218,32 +1208,24 @@ HRESULT rhCoolKey::GetCoolKeyIssuedTo(PR
+ HRESULT rhCoolKey::GetCoolKeyIssuer(PRUint32 aKeyType, const char *aKeyID, char **issuer)
+ {
+     char tBuff[56];
+-    if (!aKeyID) {
+-        return NS_ERROR_FAILURE;
++    if (!aKeyID || !issuer) {
++        return E_FAIL;
+     }
+ 
+     AutoCoolKey key(aKeyType, ( char *)aKeyID);
+ 
+-  //  const char *keyName = CoolKeyGetTokenName(&key);
+-
+-    char buff[512];
++    char buff[512] =  {};
+     int bufLength = 512;
+-    buff[0] = 0;
+    
+-    CoolKeyGetIssuer(&key, (char *) buff, bufLength);
+-
+-    if(!buff[0])
+-    {
+-        return NS_OK;
+-    }
++    HRESULT res = CoolKeyGetIssuer(&key, (char *) buff, bufLength);
+ 
+     PR_LOG(coolKeyLog,PR_LOG_DEBUG,("%s rhCoolKey::RhGetCoolKeyGetIssuer  %s \n",GetTStamp(tBuff,56),(char *) buff));
+ 
+-    char *temp =  (char *) PL_strdup(buff);
+-
+-    *issuer = temp;
++    if(res == S_OK) {
++        *issuer =  (char *) PL_strdup(buff);
++    }
+ 
+-    return NS_OK;
++    return res;
+ 
+ }
+ 
+diff -up ./esc/src/lib/coolkey-mgr/rhCoolKey.h.fix3 ./esc/src/lib/coolkey-mgr/rhCoolKey.h

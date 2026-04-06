@@ -1,0 +1,35 @@
+From a3114c46294572b648dd88ff5fc8b407bf9defc3 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 26 May 2025 11:28:39 +0200
+Subject: [PATCH] Disable coverage when testing
+
+---
+ pyproject.toml | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 68007ea..aff0181 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -104,12 +104,12 @@ warn_unused_ignores = false
+ 
+ [tool.pytest.ini_options]
+ testpaths = ["tests"]
+-addopts = [
+-    "--cov=cmd2",
+-    "--cov-append",
+-    "--cov-report=term",
+-    "--cov-report=html",
+-]
++# addopts = [
++#     "--cov=cmd2",
++#     "--cov-append",
++#     "--cov-report=term",
++#     "--cov-report=html",
++# ]
+ 
+ [tool.ruff]
+ # Exclude a variety of commonly ignored directories.
+-- 
+2.49.0
+

@@ -1,0 +1,19 @@
+diff -up Cbc-releases-2.10.11/Cbc/test/OsiCbcSolverInterfaceTest.cpp.orig Cbc-releases-2.10.11/Cbc/test/OsiCbcSolverInterfaceTest.cpp
+--- Cbc-releases-2.10.11/Cbc/test/OsiCbcSolverInterfaceTest.cpp.orig	2023-10-27 13:44:56.032074331 -0600
++++ Cbc-releases-2.10.11/Cbc/test/OsiCbcSolverInterfaceTest.cpp	2023-10-27 13:52:39.209521269 -0600
+@@ -121,6 +121,7 @@ void OsiCbcSolverInterfaceUnitTest(const
+     // Test some catches
+     if (!OsiCbcHasNDEBUG()) {
+       OsiCbcSolverInterface solver;
++#ifndef NDEBUG
+       try {
+         solver.setObjCoeff(0, 0.0);
+         OSIUNITTEST_ADD_OUTCOME("cbc", "setObjCoeff on empty model", "should throw exception", OsiUnitTest::TestOutcome::ERROR, false);
+@@ -128,6 +129,7 @@ void OsiCbcSolverInterfaceUnitTest(const
+         if (OsiUnitTest::verbosity >= 1)
+           std::cout << "Correct throw from setObjCoeff on empty model" << std::endl;
+       }
++#endif
+ 
+       std::string fn = mpsDir + "exmip1";
+       solver.readMps(fn.c_str(), "mps");

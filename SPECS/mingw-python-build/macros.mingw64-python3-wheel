@@ -1,0 +1,12 @@
+
+%mingw64_py3_build_wheel \
+  %mingw64_python3 -m build -n -w -o dist_win64
+
+%mingw64_py3_install_wheel \
+  %mingw64_python3 -m installer --destdir %{buildroot} dist_win64/*.whl
+
+%mingw64_py3_build_host_wheel \
+  %mingw64_python3_host -m build -n -w -o dist_win64_host
+
+%mingw64_py3_install_host_wheel \
+  %mingw64_python3_host -m installer --destdir %{buildroot} dist_win64_host/*.whl

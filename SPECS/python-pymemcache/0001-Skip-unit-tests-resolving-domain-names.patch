@@ -1,0 +1,43 @@
+From d8c3f4252d92de53e1b6d4da491d9d7244451d0b Mon Sep 17 00:00:00 2001
+From: Priscila Gutierres <prgutier@redhat.com>
+Date: Thu, 5 Oct 2023 09:48:40 -0300
+Subject: [PATCH] Skip unit tests resolving domain names
+
+As per [1].
+
+[1] https://fedoraproject.org/wiki/Using_Mock_to_test_package_builds#Disable_domain_name_resolution
+---
+ pymemcache/test/test_client.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pymemcache/test/test_client.py b/pymemcache/test/test_client.py
+index 22f8387..aa5ab5a 100644
+--- a/pymemcache/test/test_client.py
++++ b/pymemcache/test/test_client.py
+@@ -1317,6 +1317,7 @@ class TestClientSocketConnect(unittest.TestCase):
+                 socket_keepalive=KeepaliveOpts(),
+             )
+ 
++    @pytest.mark.skip(reason="Cannot resolve domain names in Koji")
+     def test_socket_connect_closes_on_failure(self):
+         server = ("example.com", 11211)
+ 
+@@ -1328,6 +1329,7 @@ class TestClientSocketConnect(unittest.TestCase):
+         assert socket_module.sockets[0].connections == []
+         assert socket_module.sockets[0].closed
+ 
++    @pytest.mark.skip(reason="Cannot resolve domain names in Koji")
+     def test_socket_close(self):
+         server = ("example.com", 11211)
+ 
+@@ -1338,6 +1340,7 @@ class TestClientSocketConnect(unittest.TestCase):
+         client.close()
+         assert client.sock is None
+ 
++    @pytest.mark.skip(reason="Cannot resolve domain names in Koji")
+     def test_socket_close_exception(self):
+         server = ("example.com", 11211)
+ 
+-- 
+2.41.0
+

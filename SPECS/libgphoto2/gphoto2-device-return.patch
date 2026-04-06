@@ -1,0 +1,51 @@
+From 189602f17a2b3363d5b358ce726924a866a4979a Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 23 Oct 2009 13:12:16 +0200
+Subject: [PATCH] Repair reattach of kernel driver if it was unbound
+
+Drah in the header for USBDEVFS_CONNECT.
+
+Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+---
+ libgphoto2_port/usb/libusb.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/libgphoto2_port/usb/libusb.c b/libgphoto2_port/usb/libusb.c
+index 3cd91fa..dfd347c 100644
+--- a/libgphoto2_port/usb/libusb.c
++++ b/libgphoto2_port/usb/libusb.c
+@@ -44,8 +44,30 @@
+ #include <gphoto2/gphoto2-port-result.h>
+ #include <gphoto2/gphoto2-port-log.h>
+ 
+-#include "libgphoto2_port/i18n.h"
++#if defined(LIBUSB_HAS_GET_DRIVER_NP) && defined(LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP)
++/* Pull in USBDEVFS_CONNECT */
++#include <sys/ioctl.h>
++#include <linux/usbdevice_fs.h>
++#endif
+ 
++#ifdef ENABLE_NLS
++#  include <libintl.h>
++#  undef _
++#  define _(String) dgettext (GETTEXT_PACKAGE, String)
++#  ifdef gettext_noop
++#    define N_(String) gettext_noop (String)
++#  else
++#    define N_(String) (String)
++#  endif
++#else
++#  define textdomain(String) (String)
++#  define gettext(String) (String)
++#  define dgettext(Domain,Message) (Message)
++#  define dcgettext(Domain,Message,Type) (Message)
++#  define bindtextdomain(Domain,Directory) (Domain)
++#  define _(String) (String)
++#  define N_(String) (String)
++#endif
+ 
+ #define CHECK(result) {int r=(result); if (r<0) return (r);}
+ 
+-- 
+2.34.1
+

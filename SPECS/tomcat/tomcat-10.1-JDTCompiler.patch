@@ -1,0 +1,30 @@
+--- java/org/apache/jasper/compiler/JDTCompiler.java.orig	2024-12-05 18:01:16.000000000 +0200
++++ java/org/apache/jasper/compiler/JDTCompiler.java	2025-01-07 16:30:34.996302312 +0200
+@@ -302,9 +302,9 @@ public class JDTCompiler extends org.apa
+             } else if (opt.equals("17")) {
+                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_17);
+             } else if (opt.equals("18")) {
+-                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_18);
++                settings.put(CompilerOptions.OPTION_Source, "18");
+             } else if (opt.equals("19")) {
+-                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_19);
++                settings.put(CompilerOptions.OPTION_Source, "19");
+             } else if (opt.equals("20")) {
+                 // Constant not available in latest ECJ version that runs on
+                 // Java 11.
+@@ -392,11 +392,11 @@ public class JDTCompiler extends org.apa
+                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_17);
+                 settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_17);
+             } else if (opt.equals("18")) {
+-                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_18);
+-                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_18);
++                settings.put(CompilerOptions.OPTION_TargetPlatform, "18");
++                settings.put(CompilerOptions.OPTION_Compliance, "18");
+             } else if (opt.equals("19")) {
+-                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_19);
+-                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_19);
++                settings.put(CompilerOptions.OPTION_TargetPlatform, "19");
++                settings.put(CompilerOptions.OPTION_Compliance, "19");
+             } else if (opt.equals("20")) {
+                 // Constant not available in latest ECJ version that runs on
+                 // Java 11.

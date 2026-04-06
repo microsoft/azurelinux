@@ -1,0 +1,219 @@
+diff -up qt-mobility-opensource-src-1.2.2/common.pri.no_rpath qt-mobility-opensource-src-1.2.2/common.pri
+--- qt-mobility-opensource-src-1.2.2/common.pri.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/common.pri	2014-06-04 21:48:47.572302276 -0500
+@@ -105,7 +105,7 @@ contains(build_unit_tests, yes) {
+     MOC_DIR = $$OUTPUT_DIR/build/$$SUBDIRPART/$$TARGET/moc
+     RCC_DIR = $$OUTPUT_DIR/build/$$SUBDIRPART/$$TARGET/rcc
+     UI_DIR = $$OUTPUT_DIR/build/$$SUBDIRPART/$$TARGET/ui
+-    QMAKE_RPATHDIR += $$QT_MOBILITY_LIB
++    #QMAKE_RPATHDIR += $$QT_MOBILITY_LIB
+ } else {
+     # Unit test code (no plugins! test plugins are just normal plugins installed elsewhere)
+     testcase:QT *= testlib
+diff -up qt-mobility-opensource-src-1.2.2/examples/annotatedurl/annotatedurl.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/annotatedurl/annotatedurl.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/audiodevices/audiodevices.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/audiodevices/audiodevices.pro
+--- qt-mobility-opensource-src-1.2.2/examples/audiodevices/audiodevices.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/audiodevices/audiodevices.pro	2014-06-04 21:48:47.579302202 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS       = audiodevices.h
+ 
+diff -up qt-mobility-opensource-src-1.2.2/examples/audioinput/audioinput.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/audioinput/audioinput.pro
+--- qt-mobility-opensource-src-1.2.2/examples/audioinput/audioinput.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/audioinput/audioinput.pro	2014-06-04 21:48:47.579302202 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS       = audioinput.h
+ 
+diff -up qt-mobility-opensource-src-1.2.2/examples/audiooutput/audiooutput.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/audiooutput/audiooutput.pro
+--- qt-mobility-opensource-src-1.2.2/examples/audiooutput/audiooutput.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/audiooutput/audiooutput.pro	2014-06-04 21:48:47.579302202 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS       = audiooutput.h
+ 
+diff -up qt-mobility-opensource-src-1.2.2/examples/audiorecorder/audiorecorder.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/audiorecorder/audiorecorder.pro
+--- qt-mobility-opensource-src-1.2.2/examples/audiorecorder/audiorecorder.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/audiorecorder/audiorecorder.pro	2014-06-04 21:48:47.580302191 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS = \
+     audiorecorder.h
+diff -up qt-mobility-opensource-src-1.2.2/examples/battery-charge/battery-charge.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/battery-charge/battery-charge.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/battery-charge/battery-publisher/battery-publisher.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/battery-charge/battery-publisher/battery-publisher.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/bearercloud/bearercloud.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/bearercloud/bearercloud.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/bearermonitor/bearermonitor.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/bearermonitor/bearermonitor.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/bluetoothtransferplugin/bluetoothtransferplugin.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/bluetoothtransferplugin/bluetoothtransferplugin.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/btchat/btchat.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/btchat/btchat.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/btfiletransfer/btfiletransfer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/btfiletransfer/btfiletransfer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/btscanner/btscanner.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/btscanner/btscanner.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/calendardemo/calendardemo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/calendardemo/calendardemo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/camera/camera.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/camera/camera.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/connectivity/connectivity.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/connectivity/connectivity.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-camera/declarative-camera.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-camera/declarative-camera.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/declarative-connectivity.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/declarative-connectivity.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/poster/poster.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/poster/poster.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/scanner/scanner.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-connectivity/scanner/scanner.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-location/declarative-location.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-location/declarative-location.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-location/flickr/flickr.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-location/flickr/flickr.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-location/landmarkmap/landmarkmap.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-location/landmarkmap/landmarkmap.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-location/mapviewer/mapviewer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-location/mapviewer/mapviewer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-messages/declarative-messages.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-messages/declarative-messages.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-music-browser/declarative-music-browser.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-music-browser/declarative-music-browser.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/declarative-sfw-dialer/declarative-sfw-dialer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/declarative-sfw-dialer/declarative-sfw-dialer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/declarative-sfw-dialer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/declarative-sfw-dialer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/landlinedialer/landlinedialer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/landlinedialer/landlinedialer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/remotedialer/remotedialer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/remotedialer/remotedialer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/voipdialer/voipdialer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-dialer/voipdialer/voipdialer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-notes/declarative-sfw-notes.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-sfw-notes/declarative-sfw-notes.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/battery2/battery2.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/battery2/battery2.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/battery/battery.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/battery/battery.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/declarative-systeminfo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/declarative-systeminfo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/device/device.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/device/device.pro
+--- qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/device/device.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/device/device.pro	2014-06-04 21:49:46.959671949 -0500
+@@ -17,6 +17,6 @@ symbian {
+ }
+ RESOURCES += device.qrc
+ 
+-QMAKE_LFLAGS_DEBUG += "-Wl,-rpath,/home/user/qt/lib"
+-QMAKE_LFLAGS_RPATH += "-Wl,-rpath,/home/user/qt/lib"
+-QMAKE_LFLAGS_RELEASE += "-Wl,-rpath,/home/user/qt/lib"
++#QMAKE_LFLAGS_DEBUG += "-Wl,-rpath,/home/user/qt/lib"
++#QMAKE_LFLAGS_RPATH += "-Wl,-rpath,/home/user/qt/lib"
++#QMAKE_LFLAGS_RELEASE += "-Wl,-rpath,/home/user/qt/lib"
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/network/network.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/network/network.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/storage/storage.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/declarative-systeminfo/storage/storage.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/documentproperties/documentproperties.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/documentproperties/documentproperties.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/filemanagerplugin/filemanagerplugin.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/filemanagerplugin/filemanagerplugin.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/flickrdemo/flickrdemo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/flickrdemo/flickrdemo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/hapticsplayer/hapticsplayer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/hapticsplayer/hapticsplayer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/hapticsquare/hapticsquare.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/hapticsquare/hapticsquare.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/keepintouch/keepintouch.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/keepintouch/keepintouch.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/landmarkbrowser/landmarkbrowser.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/landmarkbrowser/landmarkbrowser.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/logfilepositionsource/logfilepositionsource.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/logfilepositionsource/logfilepositionsource.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/mapsdemo/mapsdemo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/mapsdemo/mapsdemo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/mediabrowser/mediabrowser.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/mediabrowser/mediabrowser.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/ndefeditor/ndefeditor.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/ndefeditor/ndefeditor.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/notesmanagerplugin/notesmanagerplugin.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/notesmanagerplugin/notesmanagerplugin.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/publish-subscribe/publish-subscribe.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/publish-subscribe/publish-subscribe.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/qmlorganizer/qmlorganizer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/qmlorganizer/qmlorganizer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/qsystemalignedtimer/qsystemalignedtimer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/qsystemalignedtimer/qsystemalignedtimer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/querymessages/querymessages.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/querymessages/querymessages.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/quickstart/quickstart.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/quickstart/quickstart.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/radio/radio.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/radio/radio.pro
+--- qt-mobility-opensource-src-1.2.2/examples/radio/radio.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/radio/radio.pro	2014-06-04 21:48:47.590302085 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS = \
+     radio.h
+diff -up qt-mobility-opensource-src-1.2.2/examples/samplephonebook/samplephonebook.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/samplephonebook/samplephonebook.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/accel/accel.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/accel/accel.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/arrowkeys/arrowkeys.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/arrowkeys/arrowkeys.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/cubehouse/cubehouse.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/cubehouse/cubehouse.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/grueapp/grueapp.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/grueapp/grueapp.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/grueplugin/grueplugin.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/grueplugin/grueplugin.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/metadata2/metadata2.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/metadata2/metadata2.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/metadata/metadata.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/metadata/metadata.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/orientation/orientation.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/orientation/orientation.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/sensor_explorer/sensor_explorer.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/sensor_explorer/sensor_explorer.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/sensors.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/sensors.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/shakeit/shakeit.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/shakeit/shakeit.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_acceleration/show_acceleration.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_acceleration/show_acceleration.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_als/show_als.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_als/show_als.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_compass/show_compass.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_compass/show_compass.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_gyroscope/show_gyroscope.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_gyroscope/show_gyroscope.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_light/show_light.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_light/show_light.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_magneticflux/show_magneticflux.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_magneticflux/show_magneticflux.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_orientation/show_orientation.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_orientation/show_orientation.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_proximity/show_proximity.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_proximity/show_proximity.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_reflectance/show_reflectance.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_reflectance/show_reflectance.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_rotation/show_rotation.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_rotation/show_rotation.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_tap_gui/show_tap_gui.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_tap_gui/show_tap_gui.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sensors/show_tap/show_tap.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sensors/show_tap/show_tap.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/servicebrowser/servicebrowser.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/servicebrowser/servicebrowser.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/serviceinstaller_sfw_symbian/exampleinstaller/exampleinstaller.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/serviceinstaller_sfw_symbian/exampleinstaller/exampleinstaller.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/serviceinstaller_sfw_symbian/exampleservices.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/serviceinstaller_sfw_symbian/exampleservices.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_client2/sfwecho_client2.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_client2/sfwecho_client2.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_client/sfwecho_client.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_client/sfwecho_client.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_service/sfwecho_service.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sfwecho/sfwecho_service/sfwecho_service.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sfw-notes/sfw-notes.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sfw-notes/sfw-notes.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/slideshow/slideshow.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/slideshow/slideshow.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/sysinfo/sysinfo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/sysinfo/sysinfo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/todo/todo.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/todo/todo.pro
+diff -up qt-mobility-opensource-src-1.2.2/examples/videographicsitem/videographicsitem.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/videographicsitem/videographicsitem.pro
+--- qt-mobility-opensource-src-1.2.2/examples/videographicsitem/videographicsitem.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/videographicsitem/videographicsitem.pro	2014-06-04 21:48:47.592302064 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ !symbian:contains(QT_CONFIG, opengl): QT += opengl
+ 
+diff -up qt-mobility-opensource-src-1.2.2/examples/videowidget/videowidget.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/videowidget/videowidget.pro
+--- qt-mobility-opensource-src-1.2.2/examples/videowidget/videowidget.pro.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/examples/videowidget/videowidget.pro	2014-06-04 21:48:47.592302064 -0500
+@@ -7,7 +7,7 @@ include(../mobility_examples.pri)
+ CONFIG += mobility
+ MOBILITY = multimedia
+ 
+-QMAKE_RPATHDIR += $$DESTDIR
++#QMAKE_RPATHDIR += $$DESTDIR
+ 
+ HEADERS = \
+     videoplayer.h \
+diff -up qt-mobility-opensource-src-1.2.2/examples/writemessage/writemessage.pro.no_rpath qt-mobility-opensource-src-1.2.2/examples/writemessage/writemessage.pro
+diff -up qt-mobility-opensource-src-1.2.2/features/basic_examples_setup.pri.no_rpath qt-mobility-opensource-src-1.2.2/features/basic_examples_setup.pri
+--- qt-mobility-opensource-src-1.2.2/features/basic_examples_setup.pri.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/features/basic_examples_setup.pri	2014-06-04 21:48:47.572302276 -0500
+@@ -42,7 +42,7 @@ mac:contains(QT_CONFIG,qt_framework) {
+ }
+ QMAKE_LIBDIR = $$OUTPUT_DIR/lib
+ 
+-QMAKE_RPATHDIR+=$$QT_MOBILITY_LIB
++#QMAKE_RPATHDIR+=$$QT_MOBILITY_LIB
+ INCLUDEPATH+= $$QT_MOBILITY_SOURCE_TREE/src/global
+ 
+ maemo6 {
+diff -up qt-mobility-opensource-src-1.2.2/features/mobility.prf.template.no_rpath qt-mobility-opensource-src-1.2.2/features/mobility.prf.template
+--- qt-mobility-opensource-src-1.2.2/features/mobility.prf.template.no_rpath	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/features/mobility.prf.template	2014-06-04 21:48:47.572302276 -0500
+@@ -36,7 +36,7 @@ defineTest(qtMobilityAddLibrary) {
+     LIBS+= -L$${MOBILITY_LIB}
+ }
+ 
+-QMAKE_RPATHDIR+=$${MOBILITY_LIB}
++#QMAKE_RPATHDIR+=$${MOBILITY_LIB}
+ 
+ # versit depends on contacts
+ contains(MOBILITY, versit) {

@@ -1,0 +1,11 @@
+--- strip-ansi-escapes-0.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ strip-ansi-escapes-0.2.1/Cargo.toml	2025-10-25T20:42:16.929231+00:00
+@@ -26,7 +26,7 @@
+ repository = "https://github.com/luser/strip-ansi-escapes"
+ 
+ [dependencies.vte]
+-version = "0.14"
++version = "0.15"
+ default-features = false
+ 
+ [dev-dependencies.doc-comment]

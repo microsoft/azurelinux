@@ -1,0 +1,11 @@
+--- dune-3.20.0/src/dune_lang/dune_project.ml.orig	2025-08-19 00:28:44.000000000 -0600
++++ dune-3.20.0/src/dune_lang/dune_project.ml	2025-08-21 20:42:51.793195598 -0600
+@@ -425,7 +425,7 @@ let interpret_lang_and_extensions ~(lang
+ let filename = "dune-project"
+ let opam_file_location_default ~lang:_ = `Relative_to_project
+ let wrapped_executables_default ~(lang : Lang.Instance.t) = lang.version >= (2, 0)
+-let map_workspace_root_default ~(lang : Lang.Instance.t) = lang.version >= (3, 0)
++let map_workspace_root_default ~(lang : Lang.Instance.t) = false
+ 
+ let executables_implicit_empty_intf_default ~(lang : Lang.Instance.t) =
+   lang.version >= (3, 0)

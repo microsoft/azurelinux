@@ -1,0 +1,94 @@
+From 5ed781b8277921e4d6061744df198d4ec5ca6aae Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 2 May 2025 14:48:24 +0100
+Subject: [PATCH 117/131] qgs: add -m=MODE parameter for UNIX socket mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The UNIX socket mode default is controlled by the process umask, but it
+can be desirable to override this to open up the socket mode, while
+keeping the umask restrictive.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .../quote_wrapper/qgs/server_main.cpp         | 33 +++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+index 62764d04..762bc998 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+@@ -83,9 +83,10 @@ int main(int argc, const char* argv[])
+     bool socket_based_communication = true; // if port is not defined in config file and command line, use socket based communication
+     unsigned long int port = MAX_PORT_NUMBER + 1; // accepted port range 0..65535 (0xFFFF)
+     unsigned long int num_threads = 0;
++    unsigned long int mode = 0;
+     char *endptr = NULL;
+     if (argc > 4) {
+-        cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads] [--verbose] [--debug]"
++        cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-m=unix_socket_mode] [-n=number_threads] [--verbose] [--debug]"
+              << endl;
+         exit(1);
+     }
+@@ -135,6 +136,15 @@ int main(int argc, const char* argv[])
+                          << QGS_CONFIG_FILE << endl;
+                     exit(1);
+                 }
++            } else if (!mode && name.compare("socket_mode") == 0) {
++                errno = 0;
++                endptr = NULL;
++                mode = strtoul(value, &endptr, 8);
++                if (errno || strlen(endptr) || (mode > UINT_MAX)) {
++                    cout << "Please input valid socket mode in "
++                         << QGS_CONFIG_FILE << endl;
++                    exit(1);
++                }
+             }
+             // ignore unrecognized parameters
+         }
+@@ -173,6 +183,19 @@ int main(int argc, const char* argv[])
+             cout << "port number [" << port << "] found in cmdline" << endl;
+             socket_based_communication = false;
+             continue;
++        } else if (strncmp(argv[i], "-m=", 3 ) == 0) {
++            if (strspn(argv[i] + 3, "0123456789") != strlen(argv[i] + 3)) {
++                cout << "Please input valid socket mode" << endl;
++                exit(1);
++            }
++            errno = 0;
++            mode = strtoul(argv[i] + 3, &endptr, 8);
++            if (errno || strlen(endptr) || (mode > UINT_MAX) ) {
++                cout << "Please input valid socket mode" << endl;
++                exit(1);
++            }
++            cout << "socket mode [" << oct << mode << dec << "] found in cmdline" << endl;
++            continue;
+         } else if (strncmp(argv[i], "-n=", 3) == 0) {
+             if (strspn(argv[i] + 3, "0123456789") != strlen(argv[i] + 3)) {
+                 cout << "Please input valid thread number" << endl;
+@@ -187,7 +210,7 @@ int main(int argc, const char* argv[])
+             cout << "thread number [" << num_threads << "] found in cmdline" << endl;
+             continue;
+         } else {
+-            cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads] [--verbose] [--debug]"
++            cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-m=unix_socket_mode] [-n=number_threads] [--verbose] [--debug]"
+                 << endl;
+             exit(1);
+         }
+@@ -236,6 +259,12 @@ int main(int argc, const char* argv[])
+             }
+             QGS_LOG_INFO("About to create QgsServer\n");
+             server = new QgsServer(io_service, ep, (uint8_t)num_threads);
++            /* Allow mode to be determined by umask by default,
++             * overriding only if an explicit mode is requested
++             */
++            if (socket_based_communication && mode != 0) {
++                chmod(QGS_UNIX_SOCKET_FILE, mode);
++            }
+             QGS_LOG_INFO("About to start main loop\n");
+             io_service.run();
+             QGS_LOG_INFO("Quit main loop\n");
+-- 
+2.53.0
+

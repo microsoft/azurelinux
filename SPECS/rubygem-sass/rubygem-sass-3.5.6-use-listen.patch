@@ -1,0 +1,15 @@
+diff --git a/lib/sass/plugin/compiler.rb b/lib/sass/plugin/compiler.rb
+index f3ae6e3d..3979bf30 100644
+--- a/lib/sass/plugin/compiler.rb
++++ b/lib/sass/plugin/compiler.rb
+@@ -377,8 +377,8 @@ module Sass::Plugin
+ 
+     # This is mocked out in compiler_test.rb.
+     def create_listener(*args, &block)
+-      require 'sass-listen'
+-      SassListen.to(*args, &block)
++      require 'listen'
++      Listen.to(*args, &block)
+     end
+ 
+     def remove_redundant_directories(directories)

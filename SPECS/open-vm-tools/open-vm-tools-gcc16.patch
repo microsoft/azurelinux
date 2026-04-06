@@ -1,0 +1,119 @@
+diff -Naur open-vm-tools-13.0.10-25056151.old/lib/hgfs/hgfsEscape.c open-vm-tools-13.0.10-25056151/lib/hgfs/hgfsEscape.c
+--- open-vm-tools-13.0.10-25056151.old/lib/hgfs/hgfsEscape.c	2026-02-02 11:58:01.824872796 +0100
++++ open-vm-tools-13.0.10-25056151/lib/hgfs/hgfsEscape.c	2026-02-02 12:09:50.475102308 +0100
+@@ -198,7 +198,7 @@
+       if (outputSpace < 2) {
+          return FALSE;
+       }
+-      illegal = strchr(HGFS_ILLEGAL_CHARS, bufIn[escapeContext->processedOffset]);
++      illegal = (char *)strchr(HGFS_ILLEGAL_CHARS, bufIn[escapeContext->processedOffset]);
+       escapeContext->processedOffset++;  // Skip illegal input character
+       ASSERT(illegal != NULL);
+       escapeContext->outputBuffer[escapeContext->outputOffset] =
+@@ -583,12 +583,12 @@
+          if (bufIn[offset - 2] == HGFS_ESCAPE_SUBSTITUE_CHAR) {
+             return TRUE;
+          }
+-         substitute = strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 2]);
++         substitute = (char *)strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 2]);
+          if (substitute != NULL) {
+             return TRUE;
+          }
+       }
+-      substitute = strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 1]);
++      substitute = (char *)strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 1]);
+       if (substitute != NULL) {
+          return TRUE;
+       }
+@@ -887,7 +887,7 @@
+       size_t offset = escapePointer - bufIn;
+ 
+       if (HgfsIsEscapeSequence(bufIn, offset, sizeIn)) {
+-         char* substitute = strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 1]);
++         char* substitute = (char *)strchr(HGFS_SUBSTITUTE_CHARS, bufIn[offset - 1]);
+          if (substitute != NULL) {
+             bufIn[offset - 1] = HGFS_ILLEGAL_CHARS[substitute - HGFS_SUBSTITUTE_CHARS];
+          } else if (bufIn[offset - 1] == HGFS_ESCAPE_SUBSTITUE_CHAR) {
+diff -Naur open-vm-tools-13.0.10-25056151.old/lib/hgfsServer/hgfsServerLinux.c open-vm-tools-13.0.10-25056151/lib/hgfsServer/hgfsServerLinux.c
+--- open-vm-tools-13.0.10-25056151.old/lib/hgfsServer/hgfsServerLinux.c	2026-02-02 11:58:01.827518659 +0100
++++ open-vm-tools-13.0.10-25056151/lib/hgfsServer/hgfsServerLinux.c	2026-02-02 12:15:11.740576465 +0100
+@@ -1369,7 +1369,7 @@
+    ASSERT(fileName);
+    ASSERT(attr);
+ 
+-   baseName = strrchr(fileName, DIRSEPC);
++   baseName = (char *)strrchr(fileName, DIRSEPC);
+ 
+    if ((baseName != NULL) &&
+        (baseName[1] == '.') &&
+diff -Naur open-vm-tools-13.0.10-25056151.old/lib/misc/strutil.c open-vm-tools-13.0.10-25056151/lib/misc/strutil.c
+--- open-vm-tools-13.0.10-25056151.old/lib/misc/strutil.c	2026-02-02 11:58:01.835096409 +0100
++++ open-vm-tools-13.0.10-25056151/lib/misc/strutil.c	2026-02-02 12:44:41.158649740 +0100
+@@ -1467,7 +1467,7 @@
+     lenWith = strlen(with);
+ 
+     current = orig;
+-    while ((tmp = strstr(current, what)) != NULL) {
++    while ((tmp = (char *)strstr(current, what)) != NULL) {
+        current = tmp + lenWhat;
+        ++occurrences;
+     }
+@@ -1705,7 +1705,7 @@
+    do {
+       int tokenLen;
+ 
+-      foundDelim = strchr(list, delim);
++      foundDelim = (char *)strchr(list, delim);
+       if (foundDelim == NULL) { // either single or last element
+          tokenLen = strlen(list);
+       } else { // ! last element
+diff -Naur open-vm-tools-13.0.10-25056151.old/lib/nicInfo/nicInfoPosix.c open-vm-tools-13.0.10-25056151/lib/nicInfo/nicInfoPosix.c
+--- open-vm-tools-13.0.10-25056151.old/lib/nicInfo/nicInfoPosix.c	2026-02-02 11:58:01.840536841 +0100
++++ open-vm-tools-13.0.10-25056151/lib/nicInfo/nicInfoPosix.c	2026-02-02 12:48:22.356533606 +0100
+@@ -266,7 +266,7 @@
+    char *p;
+    size_t n;
+ 
+-   if ((p = strchr(label, ':')) != NULL) {
++   if ((p = (char *)strchr(label, ':')) != NULL) {
+       n = p - label;
+    } else {
+       n = strlen(label);
+diff -Naur open-vm-tools-13.0.10-25056151.old/lib/rpcChannel/glib_stubs.c open-vm-tools-13.0.10-25056151/lib/rpcChannel/glib_stubs.c
+--- open-vm-tools-13.0.10-25056151.old/lib/rpcChannel/glib_stubs.c	2026-02-02 11:58:01.806085717 +0100
++++ open-vm-tools-13.0.10-25056151/lib/rpcChannel/glib_stubs.c	2026-02-02 12:53:56.677823841 +0100
+@@ -33,6 +33,10 @@
+ #error "This file should be compiled for RPCI-only channel!"
+ #endif
+ 
++#undef g_malloc0
++#undef g_malloc0_n
++#undef g_free
++
+ void *g_malloc0(size_t s) { return Util_SafeCalloc(1, s); }
+ void *g_malloc0_n(size_t n, size_t s) { return Util_SafeCalloc(n, s); }
+ void g_free(void *p) { free(p); }
+diff -Naur open-vm-tools-13.0.10-25056151.old/libvmtools/i18n.c open-vm-tools-13.0.10-25056151/libvmtools/i18n.c
+--- open-vm-tools-13.0.10-25056151.old/libvmtools/i18n.c	2026-02-02 11:58:01.897187658 +0100
++++ open-vm-tools-13.0.10-25056151/libvmtools/i18n.c	2026-02-02 12:50:57.295350901 +0100
+@@ -698,7 +698,7 @@
+        * If we couldn't find the catalog file for the user's language, see if
+        * we can find a more generic language (e.g., for "en_US", also try "en").
+        */
+-      char *sep = Str_Strrchr(lang, '_');
++      char *sep = (char *)Str_Strrchr(lang, '_');
+       if (sep != NULL) {
+          if (usrlang == NULL) {
+             usrlang = Util_SafeStrdup(lang);
+diff -Naur open-vm-tools-13.0.10-25056151.old/services/plugins/vix/vixTools.c open-vm-tools-13.0.10-25056151/services/plugins/vix/vixTools.c
+--- open-vm-tools-13.0.10-25056151.old/services/plugins/vix/vixTools.c	2026-02-02 11:58:01.887084576 +0100
++++ open-vm-tools-13.0.10-25056151/services/plugins/vix/vixTools.c	2026-02-02 12:59:47.407882923 +0100
+@@ -928,7 +928,7 @@
+       char *whereToSplit;
+       size_t nameLen;
+ 
+-      whereToSplit = strchr(*envp, '=');
++      whereToSplit = (char *)strchr(*envp, '=');
+       if (NULL == whereToSplit) {
+          /* Our code generated this list, so this shouldn't happen. */
+          ASSERT(0);

@@ -1,0 +1,11 @@
+--- uu_cp-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uu_cp-0.0.27/Cargo.toml	2025-07-24T15:29:38.943389+00:00
+@@ -50,7 +50,7 @@
+ version = "0.2.23"
+ 
+ [dependencies.indicatif]
+-version = "0.17.8"
++version = ">=0.17.8, <0.19.0"
+ 
+ [dependencies.libc]
+ version = "0.2.153"

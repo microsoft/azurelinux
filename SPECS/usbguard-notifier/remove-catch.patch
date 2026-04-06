@@ -1,0 +1,366 @@
+diff --git a/Makefile.am b/Makefile.am
+index 64f899e..3625717 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -20,7 +20,6 @@
+ ACLOCAL_AMFLAGS = -I m4
+ CLEANFILES =
+ 
+-SUBDIRS = src/Tests/
+ bin_PROGRAMS = usbguard-notifier
+ if NOTIFIER_CLI_ENABLED
+ bin_PROGRAMS += \
+@@ -31,8 +30,7 @@ EXTRA_DIST = \
+ 	src/BuildConfig.h.in \
+ 	README.md \
+ 	LICENSE \
+-	CHANGELOG.md \
+-	src/ThirdParty/Catch2/single_include/catch2
++	CHANGELOG.md
+ 
+ usbguard_notifier_SOURCES = \
+ 	src/usbguard-icon.hpp \
+diff --git a/configure.ac b/configure.ac
+index 3728e4c..a867ee6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -127,31 +127,6 @@ AC_SUBST(SYSTEMD_UNIT_DIR, $systemd_unit_dir)
+ AC_DEFINE([SYSTEMD_SUPPORT_ENABLED], [1], [Enable systemd support int the project])
+ AM_CONDITIONAL([SYSTEMD_SUPPORT_ENABLED], [test "x$systemd" = xyes ])
+ 
+-# Catch C++ library
+-AC_ARG_WITH([bundled-catch], AS_HELP_STRING([--with-bundled-catch],
+-            [Build using the bundled Catch library]),
+-            [with_bundled_catch=$withval], [with_bundled_catch=no])
+-if test "x$with_bundled_catch" = xyes; then
+-    catch_CFLAGS="-I\$(top_srcdir)/src/ThirdParty/Catch2/single_include/catch2"
+-    catch_LIBS=""
+-    AC_MSG_NOTICE([Using bundled Catch library])
+-    catch_summary="bundled; $catch_CFLAGS $catch_LIBS"
+-else
+-    SAVE_CPPFLAGS=$CPPFLAGS
+-    CPPFLAGS="-std=c++11 $CPPFLAGS -I/usr/include/catch"
+-    AC_LANG_PUSH([C++])
+-    AC_CHECK_HEADER([catch.hpp], [], [AC_MSG_FAILURE(catch.hpp not found or not
+-        usable. Re-run with --with-bundled-catch to use the bundled library.)])
+-    AC_LANG_POP
+-    catch_CFLAGS="-I/usr/include/catch"
+-    catch_LIBS=""
+-    CPPFLAGS=$SAVE_CPPFLAGS
+-    catch_summary="system-wide;
+-    $catch_CFLAGS $catch_LIBS"
+-fi
+-AC_SUBST([catch_CFLAGS])
+-AC_SUBST([catch_LIBS])
+-
+ CXXFLAGS_DEBUG="-g -O2"
+ AC_ARG_ENABLE(
+     [debug-build],
+@@ -184,7 +159,6 @@ AM_CONDITIONAL([CUSTOM_USBGUARD_DEVEL_ENABLED], [test "x$custom_usbguard_devel_e
+ 
+ AC_CONFIG_FILES([
+     Makefile
+-    src/Tests/Makefile
+ ])
+ 
+ AC_OUTPUT
+@@ -194,7 +168,6 @@ echo "============== MACROS ================="
+ echo "          systemd: $systemd_unit_dir"
+ echo ""
+ echo "========== LINKER OPTIONS ============="
+-echo "            Catch: $catch_summary"
+ echo "        libnotify: $libnotify_summary"
+ echo "      libusbguard: $libusbguard_summary"
+ echo "          librsvg: $librsvg_summary"
+diff --git a/src/Tests/Makefile.am b/src/Tests/Makefile.am
+deleted file mode 100644
+index 54c1765..0000000
+--- a/src/Tests/Makefile.am
++++ /dev/null
+@@ -1,45 +0,0 @@
+-##
+-## Copyright (C) 2019 Red Hat, Inc.
+-##
+-## This program is free software: you can redistribute it and/or modify
+-## it under the terms of the GNU General Public License as published by
+-## the Free Software Foundation, either version 2 of the License, or
+-## (at your option) any later version.
+-##
+-## This program is distributed in the hope that it will be useful,
+-## but WITHOUT ANY WARRANTY; without even the implied warranty of
+-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-## GNU General Public License for more details.
+-##
+-## You should have received a copy of the GNU General Public License
+-## along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-##
+-## Author(s): Zoltán Fridrich <zfridric@redhat.com>
+-##  
+-
+-AM_CPPFLAGS = \
+-    -I$(top_srcdir)/src \
+-    @catch_CFLAGS@ \
+-	-fPIC
+-
+-EXTRA_DIST = \
+-    $(top_srcdir)/src/ThirdParty/Catch2
+-
+-TESTS_ENVIRONMENT = \
+-    builddir=$(top_builddir) \
+-    srcdir=$(top_srcdir) \
+-    abs_top_srcdir=$(abs_top_srcdir)
+-
+-TESTS = \
+-    test-unit
+-
+-check_PROGRAMS = \
+-    test-unit
+-
+-test_unit_SOURCES=\
+-    main.cpp \
+-    Unit/test_notifier_cli.cpp \
+-    ../NotifierCLI.hpp \
+-    ../NotifierCLI.cpp \
+-    ../Serializer.hpp \
+-    ../Serializer.cpp
+diff --git a/src/Tests/Unit/test_notifier_cli.cpp b/src/Tests/Unit/test_notifier_cli.cpp
+deleted file mode 100644
+index d77cd71..0000000
+--- a/src/Tests/Unit/test_notifier_cli.cpp
++++ /dev/null
+@@ -1,227 +0,0 @@
+-#include "NotifierCLI.hpp"
+-
+-#include <catch.hpp>
+-
+-using namespace usbguardNotifier;
+-
+-TEST_CASE("Notifier CLI", "[CLI]")
+-{
+-    SECTION("Construct empty") {
+-        CLI::map e;
+-        CLI cli(e);
+-        REQUIRE(cli.getDb().empty());
+-        REQUIRE(cli.getIterator() == cli.getDb().cend());
+-    }
+-    CLI::map db = {
+-        { 1, {}},
+-        { 2, {}},
+-        { 3, {}},
+-        { 4, {}},
+-        { 5, {}},
+-        { 6, {}},
+-        { 7, {}},
+-        { 8, {}},
+-        { 9, {}}
+-    };
+-    CLI cli(db);
+-
+-    SECTION("Construct non-empty") {
+-        REQUIRE(cli.getDb() == db);
+-        REQUIRE(cli.getIterator() == cli.getDb().cbegin());
+-    }
+-
+-    SECTION("Jump") {
+-        cli.jump("2");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.jump("0");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.jump("-1");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.jump("10");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.jump("9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.jump("9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.jump("1");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-
+-    SECTION("Next") {
+-        cli.jump("1");
+-        REQUIRE(cli.getIterator() == cli.getDb().cbegin());
+-
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.next("");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-    }
+-
+-    SECTION("Previous") {
+-        cli.jump("9");
+-        REQUIRE(cli.getIterator() == cli.getDb().find(9));
+-
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-        cli.previous("");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-
+-    SECTION("Execute - jump") {
+-        cli.execute("jump", "2");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("jump", "0");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("jump", "-1");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("jump", "10");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("jump", "9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("jump", "9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("jump", "1");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-
+-    SECTION("Execute - next") {
+-        cli.execute("jump", "1");
+-        REQUIRE(cli.getIterator() == cli.getDb().cbegin());
+-
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("next", "");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-    }
+-
+-    SECTION("Execute - previous") {
+-        cli.execute("jump", "9");
+-        REQUIRE(cli.getIterator() == cli.getDb().find(9));
+-
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-        cli.execute("previous", "");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-
+-    SECTION("Execute short - j") {
+-        cli.execute("j", "2");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("j", "0");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("j", "-1");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("j", "10");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("j", "9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("j", "9");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("j", "1");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-
+-    SECTION("Execute short - n") {
+-        cli.execute("j", "1");
+-        REQUIRE(cli.getIterator() == cli.getDb().cbegin());
+-
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-        cli.execute("n", "");
+-        REQUIRE(cli.getIterator() == db.find(9));
+-    }
+-
+-    SECTION("Execute short - p") {
+-        cli.execute("j", "9");
+-        REQUIRE(cli.getIterator() == cli.getDb().find(9));
+-
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(8));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(7));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(6));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(5));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(4));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(3));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(2));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-        cli.execute("p", "");
+-        REQUIRE(cli.getIterator() == db.find(1));
+-    }
+-}
+diff --git a/src/Tests/main.cpp b/src/Tests/main.cpp
+deleted file mode 100644
+index b3143fb..0000000
+--- a/src/Tests/main.cpp
++++ /dev/null
+@@ -1,2 +0,0 @@
+-#define CATCH_CONFIG_MAIN
+-#include <catch.hpp>

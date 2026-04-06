@@ -1,0 +1,102 @@
+From 0d79e34e6da9d9827cfb7c787e90524176248d67 Mon Sep 17 00:00:00 2001
+From: Harald Hoyer <harald@redhat.com>
+Date: Mon, 6 Apr 2020 19:41:22 +0200
+Subject: [PATCH] Enable linking to a static position independent executable
+
+This also enables address space layout randomization (ASLR).
+
+$ cat hello.c
+
+int main()
+{
+  printf("main = 0x%lxd\n", main);
+  return 0;
+}
+
+$ gcc -static-pie -o hello hello.c -specs musl-gcc.specs
+
+$ ldd hello
+	statically linked
+
+$ file hello
+hello: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), statically linked, BuildID[sha1]=24fe0d02b0558dc37b8ae2268878b118804ae72d, with debug_info, not stripped
+
+$ ./hello
+main = 0x7f858c4e72b9d
+
+$ ./hello
+main = 0x7f0854d312b9d
+
+$ ./hello
+main = 0x7f7179a1d2b9d
+
+$ ./hello
+main = 0x7f37f981b2b9d
+
+$ readelf -l hello
+
+Elf file type is DYN (Shared object file)
+Entry point 0x1058
+There are 9 program headers, starting at offset 64
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x00000000000003c0 0x00000000000003c0  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000001000 0x0000000000001000
+                 0x0000000000002cce 0x0000000000002cce  R E    0x1000
+  LOAD           0x0000000000004000 0x0000000000004000 0x0000000000004000
+                 0x0000000000001550 0x0000000000001550  R      0x1000
+  LOAD           0x0000000000005e50 0x0000000000006e50 0x0000000000006e50
+                 0x00000000000002e0 0x00000000000009a0  RW     0x1000
+  DYNAMIC        0x0000000000005e70 0x0000000000006e70 0x0000000000006e70
+                 0x0000000000000170 0x0000000000000170  RW     0x8
+  NOTE           0x0000000000000238 0x0000000000000238 0x0000000000000238
+                 0x0000000000000024 0x0000000000000024  R      0x4
+  GNU_EH_FRAME   0x0000000000004b60 0x0000000000004b60 0x0000000000004b60
+                 0x00000000000001ec 0x00000000000001ec  R      0x4
+  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000000 0x0000000000000000  RW     0x10
+  GNU_RELRO      0x0000000000005e50 0x0000000000006e50 0x0000000000006e50
+                 0x00000000000001b0 0x00000000000001b0  R      0x1
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .note.gnu.build-id .gnu.hash .dynsym .dynstr .rela.dyn
+   01     .init .plt .text .fini
+   02     .rodata .eh_frame_hdr .eh_frame
+   03     .init_array .fini_array .data.rel.ro .dynamic .got .got.plt .data .bss
+   04     .dynamic
+   05     .note.gnu.build-id
+   06     .eh_frame_hdr
+   07
+   08     .init_array .fini_array .data.rel.ro .dynamic .got
+---
+ tools/musl-gcc.specs.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 tools/musl-gcc.specs.sh
+
+diff --git a/tools/musl-gcc.specs.sh b/tools/musl-gcc.specs.sh
+old mode 100644
+new mode 100755
+index 30492574..4d93626a
+--- a/tools/musl-gcc.specs.sh
++++ b/tools/musl-gcc.specs.sh
+@@ -17,13 +17,13 @@ cat <<EOF
+ libgcc.a%s %:if-exists(libgcc_eh.a%s)
+ 
+ *startfile:
+-%{!shared: $libdir/Scrt1.o} $libdir/crti.o crtbeginS.o%s
++%{shared:;static:$libdir/crt1.o%s; static-pie:$libdir/rcrt1.o%s; pie:$libdir/Scrt1.o%s; :$libdir/crt1.o%s} $libdir/crti.o%s %{static:crtbeginT.o%s; shared|static-pie|pie:crtbeginS.o%s; :crtbegin.o%s}
+ 
+ *endfile:
+-crtendS.o%s $libdir/crtn.o
++%{static:crtend.o%s; shared|static-pie|pie:crtendS.o%s; :crtend.o%s} $libdir/crtn.o%s
+ 
+ *link:
+--dynamic-linker $ldso -nostdlib %{shared:-shared} %{static:-static} %{rdynamic:-export-dynamic}
++%{!r:--build-id} --no-add-needed %{!static|static-pie:--eh-frame-hdr} --hash-style=gnu %{shared:-shared} %{!shared:%{!static:%{!static-pie:%{rdynamic:-export-dynamic} -dynamic-linker $ldso}} %{static:-static} %{static-pie:-static -pie --no-dynamic-linker -z text}}
+ 
+ *esp_link:
+ 

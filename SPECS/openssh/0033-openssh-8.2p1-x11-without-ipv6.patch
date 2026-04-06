@@ -1,0 +1,33 @@
+From cfe5a99d335eb57b8c08b4eb6b4535dd042d96e3 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 33/50] openssh-8.2p1-x11-without-ipv6
+
+---
+ channels.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/channels.c b/channels.c
+index 7438c1a5..95836d50 100644
+--- a/channels.c
++++ b/channels.c
+@@ -5055,6 +5055,16 @@ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
+ 				debug2_f("bind port %d: %.100s", port,
+ 				    strerror(errno));
+ 				close(sock);
++
++				/* do not remove successfully opened
++				 * sockets if the request failed because
++				 * the protocol IPv4/6 is not available
++				 * (e.g. IPv6 may be disabled while being
++				 * supported)
++				 */
++				if (EADDRNOTAVAIL == errno)
++    					continue;
++
+ 				for (n = 0; n < num_socks; n++)
+ 					close(socks[n]);
+ 				num_socks = 0;
+-- 
+2.49.0
+

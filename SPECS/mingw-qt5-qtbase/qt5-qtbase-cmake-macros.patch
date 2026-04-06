@@ -1,0 +1,50 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/Qt5CoreMacros.cmake qtbase-everywhere-src-5.15.18-new/src/corelib/Qt5CoreMacros.cmake
+--- qtbase-everywhere-src-5.15.18/src/corelib/Qt5CoreMacros.cmake	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/Qt5CoreMacros.cmake	2025-11-07 14:10:26.542411649 +0100
+@@ -153,8 +153,9 @@ function(qt5_create_moc_command infile o
+     endif()
+ 
+     set(_moc_extra_parameters_file @${_moc_parameters_file})
++    get_target_property(MOC_LOC ${Qt5Core_MOC_EXECUTABLE} IMPORTED_LOCATION)
+     add_custom_command(OUTPUT ${outfile}
+-                       COMMAND ${Qt5Core_MOC_EXECUTABLE} ${_moc_extra_parameters_file}
++                       COMMAND ${MOC_LOC} ${_moc_extra_parameters_file}
+                        DEPENDS ${infile} ${moc_depends}
+                        ${_moc_working_dir}
+                        VERBATIM)
+@@ -295,8 +296,9 @@ function(qt5_add_binary_resources target
+         set(rc_depends ${rc_depends} ${_rc_depends})
+     endforeach()
+ 
++    get_target_property(RCC_LOC ${Qt5Core_RCC_EXECUTABLE} IMPORTED_LOCATION)
+     add_custom_command(OUTPUT ${rcc_destination}
+-                       COMMAND ${Qt5Core_RCC_EXECUTABLE}
++                       COMMAND ${RCC_LOC}
+                        ARGS ${rcc_options} --binary --name ${target} --output ${rcc_destination} ${infiles}
+                        DEPENDS ${rc_depends} ${out_depends} ${infiles} VERBATIM)
+     add_custom_target(${target} ALL DEPENDS ${rcc_destination})
+@@ -339,8 +341,9 @@ function(qt5_add_resources outfiles)
+         _qt5_parse_qrc_file(${infile} _out_depends _rc_depends)
+         set_source_files_properties(${infile} PROPERTIES SKIP_AUTORCC ON)
+ 
++        get_target_property(MOC_LOC ${Qt5Core_RCC_EXECUTABLE} IMPORTED_LOCATION)
+         add_custom_command(OUTPUT ${outfile}
+-                           COMMAND ${Qt5Core_RCC_EXECUTABLE}
++                           COMMAND ${MOC_LOC}
+                            ARGS ${rcc_options} --name ${outfilename} --output ${outfile} ${infile}
+                            MAIN_DEPENDENCY ${infile}
+                            DEPENDS ${_rc_depends} "${_out_depends}" VERBATIM)
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/widgets/Qt5WidgetsMacros.cmake qtbase-everywhere-src-5.15.18-new/src/widgets/Qt5WidgetsMacros.cmake
+--- qtbase-everywhere-src-5.15.18/src/widgets/Qt5WidgetsMacros.cmake	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/widgets/Qt5WidgetsMacros.cmake	2025-11-07 14:10:26.542713376 +0100
+@@ -55,8 +55,9 @@ function(qt5_wrap_ui outfiles )
+         get_filename_component(outfile ${it} NAME_WE)
+         get_filename_component(infile ${it} ABSOLUTE)
+         set(outfile ${CMAKE_CURRENT_BINARY_DIR}/ui_${outfile}.h)
++        get_target_property(UIC_LOC ${Qt5Widgets_UIC_EXECUTABLE} IMPORTED_LOCATION)
+         add_custom_command(OUTPUT ${outfile}
+-          COMMAND ${Qt5Widgets_UIC_EXECUTABLE}
++          COMMAND ${UIC_LOC}
+           ARGS ${ui_options} -o ${outfile} ${infile}
+           MAIN_DEPENDENCY ${infile} VERBATIM)
+         set_source_files_properties(${infile} PROPERTIES SKIP_AUTOUIC ON)

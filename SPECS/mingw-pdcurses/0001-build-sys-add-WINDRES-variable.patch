@@ -1,0 +1,34 @@
+From 20dc63c46308f26b96550e051cd3e4f7ab176adc Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 14 Aug 2019 11:45:31 +0400
+Subject: [PATCH] build-sys: add WINDRES variable
+
+Signed-off-by: rpm-build <rpm-build>
+---
+ wincon/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/wincon/Makefile b/wincon/Makefile
+index 6c5808f..46e0c34 100644
+--- a/wincon/Makefile
++++ b/wincon/Makefile
+@@ -30,6 +30,7 @@ CC		= gcc
+ AR		= ar
+ STRIP		= strip
+ LINK		= gcc
++WINDRES         = windres
+ 
+ ifeq ($(DEBUG),Y)
+ 	CFLAGS  = -g -Wall -DPDCDEBUG
+@@ -87,7 +88,7 @@ $(LIBCURSES) : $(LIBOBJS) $(PDCOBJS) $(RESOURCE)
+ 	$(LIBEXE) $(LIBFLAGS) $@ $?
+ 
+ pdcurses.o: $(common)/pdcurses.rc
+-	windres -i $(common)/pdcurses.rc pdcurses.o
++	$(WINDRES) -i $(common)/pdcurses.rc pdcurses.o
+ 
+ $(LIBOBJS) $(PDCOBJS) : $(PDCURSES_HEADERS)
+ $(PDCOBJS) : $(PDCURSES_WIN_H)
+-- 
+2.23.0.rc1
+

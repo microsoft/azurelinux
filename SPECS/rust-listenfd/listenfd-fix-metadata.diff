@@ -1,0 +1,23 @@
+--- listenfd-1.0.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ listenfd-1.0.2/Cargo.toml	2025-01-24T16:37:39.077275+00:00
+@@ -36,20 +36,6 @@
+ name = "listenfd"
+ path = "src/lib.rs"
+ 
+-[[example]]
+-name = "demo"
+-path = "examples/demo.rs"
+-
+-[dev-dependencies.hyper]
+-version = "0.14.16"
+-
+-[dev-dependencies.tokio]
+-version = "1.15.0"
+-features = ["full"]
+-
+-[dev-dependencies.warp]
+-version = "0.3.2"
+-
+ [target."cfg(not(windows))".dependencies.libc]
+ version = "0.2.40"
+ 

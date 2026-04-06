@@ -1,0 +1,53 @@
+From 47e0972cfc1820b05c42e4b4841124a2109e23e6 Mon Sep 17 00:00:00 2001
+From: Ahei <aheicx@gmail.com>
+Date: Fri, 19 Jul 2024 17:06:28 +0800
+Subject: [PATCH 1/2] add riscv64 support
+
+---
+ Makefile               | 2 +-
+ efi-rpm-macros.spec.in | 2 +-
+ macros.efi-srpm.in     | 2 ++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index eedd32613de..725cc86b5b3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,7 +14,7 @@ override EFI_ESP_ROOT=/boot/efi
+ endif
+ EFI_ARCHES	?= $(call get-config,arches)
+ ifeq ($(EFI_ARCHES),)
+-override EFI_ARCHES="x86_64 aarch64 %{arm} %{ix86}"
++override EFI_ARCHES="x86_64 aarch64 %{arm} %{ix86} riscv64"
+ endif
+ EFI_VENDOR	?= $(call get-config,vendor)
+ 
+diff --git a/efi-rpm-macros.spec.in b/efi-rpm-macros.spec.in
+index 6f0e7b0258a..7f56e873066 100644
+--- a/efi-rpm-macros.spec.in
++++ b/efi-rpm-macros.spec.in
+@@ -36,7 +36,7 @@ machine bootloaders and tools.
+ %autosetup -S git_am -n %{name}-@@EFI_SOURCE_VERSION@@
+ git config --local --add efi.vendor "%{_efi_vendor_}"
+ git config --local --add efi.esp-root /boot/efi
+-git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86}"
++git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86} riscv64"
+ 
+ %build
+ %make_build clean all
+diff --git a/macros.efi-srpm.in b/macros.efi-srpm.in
+index f91ea31b54e..e78c0f0d512 100644
+--- a/macros.efi-srpm.in
++++ b/macros.efi-srpm.in
+@@ -37,6 +37,8 @@
+       return("aa64")
+     elseif arch("%{arm}") then
+       return("arm")
++    elseif arch("riscv64") then
++      return("riscv64")
+     else
+       return("none")
+     end
+-- 
+2.51.0
+

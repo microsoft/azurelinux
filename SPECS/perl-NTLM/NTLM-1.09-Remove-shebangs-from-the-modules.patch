@@ -1,0 +1,46 @@
+From 767179c773e45c28ef6ecaff01c8b62f8e240bc5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 17 Mar 2020 14:44:38 +0100
+Subject: [PATCH] Remove shebangs from the modules
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ DES/DES.pm | 1 -
+ MD4/MD4.pm | 1 -
+ NTLM.pm    | 2 --
+ 3 files changed, 4 deletions(-)
+
+diff --git a/DES/DES.pm b/DES/DES.pm
+index 04ab365..6210f44 100644
+--- a/DES/DES.pm
++++ b/DES/DES.pm
+@@ -1,4 +1,3 @@
+-#!/usr/local/bin/perl
+ #
+ # This is an implementation of part of the DES specification.  According
+ # to the code this is ported from, this code does NOT enable 2-way
+diff --git a/MD4/MD4.pm b/MD4/MD4.pm
+index ba8f735..7d2b49d 100644
+--- a/MD4/MD4.pm
++++ b/MD4/MD4.pm
+@@ -1,4 +1,3 @@
+-#!/usr/local/bin/perl
+ #
+ # This is a partial implentation of the MD4 checksum code.
+ #
+diff --git a/NTLM.pm b/NTLM.pm
+index 60af70e..d7ae5ff 100644
+--- a/NTLM.pm
++++ b/NTLM.pm
+@@ -1,5 +1,3 @@
+-#!/usr/local/bin/perl
+-
+ package Authen::NTLM;
+ use strict;
+ use Authen::NTLM::DES;
+-- 
+2.21.1
+

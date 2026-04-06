@@ -1,0 +1,25 @@
+From b46a7ea600ddbc94994371a4b8135d0ee8235c03 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 20 May 2025 23:48:08 +0200
+Subject: [PATCH] fix FromPyObject impl for uuid::Uuid on big-endian arches
+
+---
+ src/conversions/uuid.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/conversions/uuid.rs b/src/conversions/uuid.rs
+index 6f6775b..3debdf2 100644
+--- a/src/conversions/uuid.rs
++++ b/src/conversions/uuid.rs
+@@ -85,7 +85,7 @@ impl FromPyObject<'_> for Uuid {
+ 
+         if obj.is_instance(uuid_cls)? {
+             let uuid_int: u128 = obj.getattr(intern!(py, "int"))?.extract()?;
+-            Ok(Uuid::from_u128(uuid_int.to_le()))
++            Ok(Uuid::from_u128(uuid_int))
+         } else {
+             Err(PyTypeError::new_err("Expected a `uuid.UUID` instance."))
+         }
+-- 
+2.49.0
+

@@ -1,0 +1,42 @@
+--- lalrpop-0.22.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lalrpop-0.22.2/Cargo.toml	2026-02-09T17:53:09.769693+00:00
+@@ -22,7 +22,6 @@
+ autoexamples = false
+ autotests = false
+ autobenches = false
+-default-run = "lalrpop"
+ description = "convenient LR(1) parser generator"
+ readme = "README.md"
+ keywords = [
+@@ -43,7 +42,6 @@
+ default = [
+     "lexer",
+     "unicode",
+-    "pico-args",
+ ]
+ lexer = [
+     "lalrpop-util/lexer",
+@@ -59,11 +57,6 @@
+ name = "lalrpop"
+ path = "src/lib.rs"
+ doctest = false
+-
+-[[bin]]
+-name = "lalrpop"
+-path = "src/main.rs"
+-required-features = ["pico-args"]
+ 
+ [dependencies.ascii-canvas]
+ version = "4.0"
+@@ -88,11 +81,6 @@
+ 
+ [dependencies.petgraph]
+ version = "0.7"
+-default-features = false
+-
+-[dependencies.pico-args]
+-version = "0.5"
+-optional = true
+ default-features = false
+ 
+ [dependencies.regex]

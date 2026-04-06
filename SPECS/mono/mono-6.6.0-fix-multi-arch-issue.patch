@@ -1,0 +1,15 @@
+--- a/mono/eglib/eglib-config.h.in	2020-10-12 14:57:46.354634946 +0200
++++ b/mono/eglib/eglib-config.h.in	2020-10-12 15:00:10.106637683 +0200
+@@ -26,7 +26,11 @@
+ typedef @GSIZE@ gsize;
+ typedef @GSSIZE@ gssize;
+ 
+-#define G_GSIZE_FORMAT   @GSIZE_FORMAT@
++#ifdef __i386__
++#define G_GSIZE_FORMAT   "u"
++#else
++#define G_GSIZE_FORMAT   "lu"
++#endif
+ 
+ #if defined (HOST_WATCHOS)
+ #undef G_BREAKPOINT

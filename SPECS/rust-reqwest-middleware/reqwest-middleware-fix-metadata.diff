@@ -1,0 +1,16 @@
+--- reqwest-middleware-0.5.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqwest-middleware-0.5.1/Cargo.toml	2026-02-06T06:55:01.357426+00:00
+@@ -79,13 +79,3 @@
+ [dev-dependencies.reqwest]
+ version = "0.13.1"
+ features = ["rustls"]
+-
+-[dev-dependencies.tokio]
+-version = "1.0.0"
+-features = [
+-    "macros",
+-    "rt-multi-thread",
+-]
+-
+-[dev-dependencies.wiremock]
+-version = "0.6.0"

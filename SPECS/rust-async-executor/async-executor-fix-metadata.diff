@@ -1,0 +1,14 @@
+--- async-executor-1.14.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ async-executor-1.14.0/Cargo.toml	2026-02-16T17:57:41.355989+00:00
+@@ -117,11 +117,6 @@
+ [dev-dependencies.async-lock]
+ version = "3.0.0"
+ 
+-[dev-dependencies.criterion]
+-version = "0.8"
+-features = ["cargo_bench_support"]
+-default-features = false
+-
+ [dev-dependencies.easy-parallel]
+ version = "3.1.0"
+ 

@@ -1,0 +1,22 @@
+diff -up gt-0.4/src/sfz2pat.c~ gt-0.4/src/sfz2pat.c
+--- gt-0.4/src/sfz2pat.c~	2008-01-30 09:53:36.000000000 +0100
++++ gt-0.4/src/sfz2pat.c	2008-01-30 09:53:36.000000000 +0100
+@@ -3897,7 +3897,6 @@ int read_sample(char *name)
+ 		}
+ 	}
+ #else
+-	else
+ 	    /* convert to machine byte order */
+ 	{
+ 	    int32   data_len = datasize / 2;
+diff -up gt-0.4/src/sfz2pat.l~ gt-0.4/src/sfz2pat.l
+--- gt-0.4/src/sfz2pat.l~	2008-01-30 09:57:29.000000000 +0100
++++ gt-0.4/src/sfz2pat.l	2008-01-30 09:57:29.000000000 +0100
+@@ -1878,7 +1878,6 @@ int read_sample(char *name)
+ 		}
+ 	}
+ #else
+-	else
+ 	    /* convert to machine byte order */
+ 	{
+ 	    int32   data_len = datasize / 2;

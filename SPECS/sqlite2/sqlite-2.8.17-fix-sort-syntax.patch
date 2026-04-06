@@ -1,0 +1,12 @@
+diff -up sqlite-2.8.17/Makefile.in.fix-sort-syntax sqlite-2.8.17/Makefile.in
+--- sqlite-2.8.17/Makefile.in.fix-sort-syntax	2019-04-10 15:00:15.804634056 -0400
++++ sqlite-2.8.17/Makefile.in	2019-04-10 15:00:26.075425567 -0400
+@@ -184,7 +184,7 @@ Makefile: $(TOP)/Makefile.in
+ # of the most recently modified source code file
+ #
+ last_change:	$(SRC)
+-	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -n 1 \
++	cat $(SRC) | grep '$$Id: ' | sort -k 4 | tail -n 1 \
+           | awk '{print $$5,$$6}' >last_change
+ 
+ libsqlite.la:	$(LIBOBJ)

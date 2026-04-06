@@ -1,0 +1,79 @@
+From 6713f24bc70e025473463db0803ba9f1ac5f8026 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:47:14 -0300
+Subject: [PATCH 20/20] disable-locale-tests
+
+---
+ .../providers/cpu/text/string_normalizer_test.cc   | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/onnxruntime/test/providers/cpu/text/string_normalizer_test.cc b/onnxruntime/test/providers/cpu/text/string_normalizer_test.cc
+index 724fdb078e..cd44e3f7fe 100644
+--- a/onnxruntime/test/providers/cpu/text/string_normalizer_test.cc
++++ b/onnxruntime/test/providers/cpu/text/string_normalizer_test.cc
+@@ -58,7 +58,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveNoCase) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutNoCase) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutNoCase) {
+   // - casesensitive approach
+   // - filter out monday
+   // - No change case action
+@@ -76,7 +76,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveFilterOutNoCase) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutLower) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutLower) {
+   // - casesensitive approach
+   // - filter out monday
+   // - LOWER should produce the same output as they are all lower.
+@@ -93,7 +93,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveFilterOutLower) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpper) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutUpper) {
+   // - casesensitive approach
+   // - filter out monday
+   // - UPPER should produce the same output as they are all lower.
+@@ -111,7 +111,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpper) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpperWithLocale) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutUpperWithLocale) {
+   // - case-SENSITIVE approach en_US locale
+   // - we test the behavior of a mix of english, french, german, russian and chinese
+   //   with en_US locale
+@@ -152,7 +152,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpperWithLocale) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerInsensitiveFilterOutUpperWithLocale) {
++TEST(ContribOpTest, DISABLED_StringNormalizerInsensitiveFilterOutUpperWithLocale) {
+   // - case-INSENSITIVE approach en_US locale
+   // - we test the behavior of a mix of english, french, german, russian and chinese
+   //   with en_US locale
+@@ -194,7 +194,7 @@ TEST(ContribOpTest, StringNormalizerInsensitiveFilterOutUpperWithLocale) {
+   test.Run(OpTester::ExpectResult::kExpectSuccess);
+ }
+ 
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpperEmptyCase) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutUpperEmptyCase) {
+   // Empty output case
+   // - casesensitive approach
+   // - filter out monday
+@@ -214,7 +214,7 @@ TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpperEmptyCase) {
+ // Fails on iOS because necessary locales are not installed
+ // MacOS runs fine.
+ #ifndef ORT_IOS
+-TEST(ContribOpTest, StringNormalizerSensitiveFilterOutUpperSameOutput) {
++TEST(ContribOpTest, DISABLED_StringNormalizerSensitiveFilterOutUpperSameOutput) {
+   // Empty output case
+   // - casesensitive approach
+   // - filter out monday
+-- 
+2.47.1
+

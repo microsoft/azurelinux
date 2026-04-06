@@ -1,0 +1,21 @@
+commit 835bb2be9e00c50e5751d271380ac00fe98f8d07
+Author: Karolina Surma <33810531+befeleme@users.noreply.github.com>
+Date:   Tue Jun 15 18:47:42 2021
+
+    Replace call to add_stylesheet with add_css_file
+    
+    This should prevent documentation build failures with Sphinx 4.
+
+diff --git a/docs/source/conf.py b/docs/source/conf.py
+index c3f6e2f..ab160e1 100644
+--- a/docs/source/conf.py
++++ b/docs/source/conf.py
+@@ -38,7 +38,7 @@ extensions = [
+ ]
+ 
+ def setup(app):
+-    app.add_stylesheet("hack.css")
++    app.add_css_file("hack.css")
+ 
+ intersphinx_mapping = {
+     "sphinx": ("http://www.sphinx-doc.org/en/stable/", None),

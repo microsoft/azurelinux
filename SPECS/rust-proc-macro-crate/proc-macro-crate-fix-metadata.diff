@@ -1,0 +1,11 @@
+--- proc-macro-crate-3.4.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ proc-macro-crate-3.4.0/Cargo.toml	2026-01-14T12:04:01.441905+00:00
+@@ -45,7 +45,7 @@
+ path = "tests/workspace_deps.rs"
+ 
+ [dependencies.toml_edit]
+-version = "0.23.2"
++version = ">=0.23.2, <0.25.0"
+ features = ["parse"]
+ default-features = false
+ 

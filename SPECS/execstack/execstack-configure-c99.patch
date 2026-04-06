@@ -1,0 +1,37 @@
+Avoid implicit function declarations, a C feature removed in 1999.
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index a357ef74b30a09a6..2d2af334d5369e8e 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -6727,6 +6727,7 @@ AC_DEFUN(AC_LIBELF_SXWORD,
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ static unsigned char sparc64_elf[] = {
+ 0x7f,0x45,0x4c,0x46,0x02,0x02,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+diff --git a/configure b/configure
+index 9f2a746fbf3f7471..960e140559761417 100755
+--- a/configure
++++ b/configure
+@@ -4438,8 +4438,8 @@ main ()
+   for (i = 0; i < 256; i++)
+     if (XOR (islower (i), ISLOWER (i))
+         || toupper (i) != TOUPPER (i))
+-      exit(2);
+-  exit (0);
++      return 2;
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+@@ -19411,6 +19411,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ static unsigned char sparc64_elf[] = {
+ 0x7f,0x45,0x4c,0x46,0x02,0x02,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

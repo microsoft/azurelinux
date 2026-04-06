@@ -1,0 +1,44 @@
+From 52f0949e92ab898978baafaa341d43896ffcb8c7 Mon Sep 17 00:00:00 2001
+Message-ID: <52f0949e92ab898978baafaa341d43896ffcb8c7.1753130592.git.github@grubix.eu>
+From: Michael J Gruber <github@grubix.eu>
+Date: Mon, 21 Jul 2025 22:41:48 +0200
+Subject: [PATCH] remove shebangs from non-scripts
+
+These python files are pure modules without any code to be called as
+script, so remove the shebangs.
+---
+ lib/dbtexmf/dblatex/xetex/fontspec.py  | 1 -
+ lib/dbtexmf/dblatex/xetex/fsconfig.py  | 1 -
+ lib/dbtexmf/dblatex/xetex/fsencoder.py | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/lib/dbtexmf/dblatex/xetex/fontspec.py b/lib/dbtexmf/dblatex/xetex/fontspec.py
+index 767d003..3bda923 100644
+--- a/lib/dbtexmf/dblatex/xetex/fontspec.py
++++ b/lib/dbtexmf/dblatex/xetex/fontspec.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/env python
+ # -*- coding: utf-8 -*-
+ # Time-stamp: <2008-06-23 22:21:26 ah>
+ 
+diff --git a/lib/dbtexmf/dblatex/xetex/fsconfig.py b/lib/dbtexmf/dblatex/xetex/fsconfig.py
+index 2b9fa7d..0b475c9 100644
+--- a/lib/dbtexmf/dblatex/xetex/fsconfig.py
++++ b/lib/dbtexmf/dblatex/xetex/fsconfig.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/env python
+ # -*- coding: utf-8 -*-
+ # Time-stamp: <2008-06-23 22:21:26 ah>
+ 
+diff --git a/lib/dbtexmf/dblatex/xetex/fsencoder.py b/lib/dbtexmf/dblatex/xetex/fsencoder.py
+index b22e59b..f685c43 100644
+--- a/lib/dbtexmf/dblatex/xetex/fsencoder.py
++++ b/lib/dbtexmf/dblatex/xetex/fsencoder.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/env python
+ # -*- coding: utf-8 -*-
+ # Time-stamp: <2008-06-23 22:21:26 ah>
+ from __future__ import print_function
+-- 
+2.50.1.480.g41fff1fbcf
+

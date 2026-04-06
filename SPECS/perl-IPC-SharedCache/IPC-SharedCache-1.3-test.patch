@@ -1,0 +1,140 @@
+diff -up IPC-SharedCache-1.3/SharedCache.pm.old IPC-SharedCache-1.3/SharedCache.pm
+--- IPC-SharedCache-1.3/SharedCache.pm.old	2000-03-23 09:00:19.000000000 +0100
++++ IPC-SharedCache-1.3/SharedCache.pm	2010-12-17 13:45:02.309198942 +0100
+@@ -580,11 +580,13 @@ sub STORE {
+   my $share;
+   if (exists $root_record->{'map'}{$key}) {
+     # we've got a key, get the share and cache it
+-    $share = IPC::ShareLite->new('-key' => $root_record->{'map'}{$key},
++    $share = eval {
++             IPC::ShareLite->new('-key' => $root_record->{'map'}{$key},
+                                  '-mode' => $options->{ipc_mode},
+                                  '-size' => $options->{ipc_segment_size},
+                                  '-create' => 0,
+                                  '-destroy' => 0);
++    };
+     confess("IPC::SharedCache: Unable to get shared cache block $root_record->{'map'}{$key} : $!") unless defined $share;  
+ 
+     $root_record->{'size'} -= $root_record->{'length_map'}{$key};
+@@ -596,13 +598,15 @@ sub STORE {
+     for ( my $end = $obj_ipc_key + 10000 ; 
+           $obj_ipc_key != $end ; 
+           $obj_ipc_key++ ) {
+-      $share = IPC::ShareLite->new('-key' => $obj_ipc_key,
++      $share = eval {
++               IPC::ShareLite->new('-key' => $obj_ipc_key,
+                                    '-mode' => $options->{ipc_mode},
+                                    '-size' => $options->{ipc_segment_size},
+                                    '-create' => 1,
+                                    '-exclusive' => 1,
+                                    '-destroy' => 0,
+                                   );
++      };
+       last if defined $share;
+     }        
+     croak("IPC::SharedCache : searched through 10,000 consecutive locations for a free shared memory segment, giving up : $!")
+@@ -625,11 +629,13 @@ sub STORE {
+       my $delete_key = shift @{$root_record->{'queue'}};
+       # delete the segment for this object
+       { 
+-        my $share = IPC::ShareLite->new('-key' => $root_record->{map}{$delete_key},
++        my $share = eval {
++                    IPC::ShareLite->new('-key' => $root_record->{map}{$delete_key},
+                                         '-mode' => $options->{ipc_mode},
+                                         '-size' => $options->{ipc_segment_size},
+                                         '-create' => 0,
+                                     '-destroy' => 1);
++        };
+         confess("IPC::SharedCache: Unable to get shared cache block $root_record->{'map'}{$key} : $!") unless defined $share;
+         # share is now deleted since destroy == 1 and $share goes out of scope
+       }
+@@ -684,11 +690,13 @@ sub DELETE { 
+ 
+   # delete the segment for this object
+   { 
+-    my $share = IPC::ShareLite->new('-key' => $obj_ipc_key,
++    my $share = eval {
++                IPC::ShareLite->new('-key' => $obj_ipc_key,
+                                     '-mode' => $options->{ipc_mode},
+                                     '-size' => $options->{ipc_segment_size},
+                                     '-create' => 0,
+                                     '-destroy' => 1);
++    };
+     confess("IPC::SharedCache: Unable to get shared cache block $root_record->{'map'}{$key} : $!") unless defined $share;
+     # share is now deleted since destroy == 1 and $share goes out of scope
+   }
+@@ -830,11 +838,13 @@ sub walk {
+   require "Data/Dumper.pm";
+   
+   # make sure the cache actually exists here
+-  my $test = IPC::ShareLite->new('-key' => $key,
++  my $test = eval {
++             IPC::ShareLite->new('-key' => $key,
+                                  '-mode' => 0666,
+                                  '-size' => $segment_size,
+                                  '-create' => 0, 
+                                  '-destroy' => 0);
++  };
+   die "Unable to find a cache at key $key : $!" unless defined $test;
+ 
+   my %self;
+@@ -911,10 +921,12 @@ sub remove {
+   
+   # delete the root segment
+   { 
+-    my $share = IPC::ShareLite->new('-key' => $key,
++    my $share = eval {
++                IPC::ShareLite->new('-key' => $key,
+                                     '-size' => $segment_size,
+                                     '-create' => 0,
+                                     '-destroy' => 1);
++    };
+     confess("IPC::SharedCache: Unable to get shared cache block $key : $!") unless defined $share;
+     # share is now deleted since destroy == 1 and $share goes out of scope
+   }
+@@ -938,11 +950,13 @@ sub _init_root {
+   return if defined $root;
+ 
+   # try to get a handle on an existing root for this key
+-  $root = IPC::ShareLite->new('-key' => $ipc_key,
++  $root = eval {
++          IPC::ShareLite->new('-key' => $ipc_key,
+                               '-mode' => $options->{ipc_mode},
+                               '-size' => $options->{ipc_segment_size},
+                               '-create' => 0, 
+                               '-destroy' => 0);
++  };
+   if (defined $root) {
+     $ROOT_SHARE_CACHE{$ipc_key} = $root;
+     return;
+@@ -961,12 +975,14 @@ sub _init_root {
+   #                           if $options->{debug};
+ 
+   # try to create it if that didn't work (and do initialization)
+-  $root = IPC::ShareLite->new('-key' => $options->{ipc_key},
++  $root = eval {
++          IPC::ShareLite->new('-key' => $options->{ipc_key},
+                               '-mode' => $options->{ipc_mode},
+                               '-size' => $options->{ipc_segment_size},
+                               '-create' => 1, 
+                               '-exclusive' => 1,
+                               '-destroy' => 0);
++  };
+   confess("IPC::SharedCache object initialization : Unable to initialize root ipc shared memory segment : $!") 
+     unless defined($root);
+ 
+@@ -1032,11 +1048,13 @@ sub _get_share_object {
+   my $options = $self->{options};
+ 
+   # we've got a key, get the share and cache it
+-  my $share = IPC::ShareLite->new('-key' => $obj_ipc_key,
++  my $share = eval {
++              IPC::ShareLite->new('-key' => $obj_ipc_key,
+                                   '-mode' => $options->{ipc_mode},
+                                   '-size' => $options->{ipc_segment_size},
+                                   '-create' => 0,
+                                   '-destroy' => 0);
++  };
+   confess("IPC::SharedCache: Unable to get shared cache block $obj_ipc_key : $!") unless defined $share;
+   
+   # get the cache block

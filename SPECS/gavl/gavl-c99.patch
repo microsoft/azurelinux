@@ -1,0 +1,21 @@
+Include <string.h> for memset, to avoid an implicit function
+declaration and build failures with future compilers.
+
+Fixed upstream as part of:
+
+r5451 | gmerlin | 2018-11-27 20:38:42 +0100 (Tue, 27 Nov 2018) | 2 lines
+
+* Update
+
+diff --git a/src/fill_test.c b/src/fill_test.c
+index 1d362bea4af85745..6fd97dab9e192baa 100644
+--- a/src/fill_test.c
++++ b/src/fill_test.c
+@@ -23,6 +23,7 @@
+ //#include "colorspace.h" // Common routines
+ #include <stdio.h>
+ #include <png.h>
++#include <string.h>
+ 
+ static void
+ write_png(char * filename, gavl_video_format_t * format, gavl_video_frame_t * frame)

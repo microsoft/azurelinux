@@ -1,0 +1,95 @@
+diff -up vim91/runtime/defaults.vim.copypaste vim91/runtime/defaults.vim
+--- vim91/runtime/defaults.vim.copypaste	2025-06-27 06:43:53.000000000 +0200
++++ vim91/runtime/defaults.vim	2025-07-11 09:16:19.013363739 +0200
+@@ -70,18 +70,6 @@ sunmap Q
+ " Revert with ":iunmap <C-U>".
+ inoremap <C-U> <C-G>u<C-U>
+ 
+-" In many terminal emulators the mouse works just fine.  By enabling it you
+-" can position the cursor, Visually select and scroll with the mouse.
+-" Only xterm can grab the mouse events when using the shift key, for other
+-" terminals use ":", select text and press Esc.
+-if has('mouse')
+-  if &term =~ 'xterm'
+-    set mouse=a
+-  else
+-    set mouse=nvi
+-  endif
+-endif
+-
+ " Only do this part when Vim was compiled with the +eval feature.
+ if 1
+ 
+diff -up vim91/src/testdir/test_balloon.vim.copypaste vim91/src/testdir/test_balloon.vim
+--- vim91/src/testdir/test_balloon.vim.copypaste	2025-07-11 09:16:19.013500976 +0200
++++ vim91/src/testdir/test_balloon.vim	2025-07-11 09:17:20.168187029 +0200
+@@ -7,6 +7,7 @@ CheckFeature balloon_eval_term
+ source util/screendump.vim
+ 
+ let s:common_script =<< trim [CODE]
++  set mouse=a
+   call setline(1, ["one one one", "two tXo two", "three three three"])
+   set balloonevalterm balloonexpr=MyBalloonExpr()..s:trailing balloondelay=100
+   let s:trailing = '<'  " check that script context is set
+diff -up vim91/src/testdir/test_popup.vim.copypaste vim91/src/testdir/test_popup.vim
+--- vim91/src/testdir/test_popup.vim.copypaste	2025-07-11 08:58:40.000000000 +0200
++++ vim91/src/testdir/test_popup.vim	2025-07-11 09:16:19.013692144 +0200
+@@ -957,6 +957,7 @@ func Test_mouse_popup_position()
+   let script =<< trim END
+     set mousemodel=popup_setpos
+     source $VIMRUNTIME/menu.vim
++    set mouse=a
+     call setline(1, join(range(20)))
+     func Trigger(col)
+       call test_setmouse(1, a:col)
+diff -up vim91/src/testdir/test_popupwin.vim.copypaste vim91/src/testdir/test_popupwin.vim
+--- vim91/src/testdir/test_popupwin.vim.copypaste	2025-07-11 08:58:40.000000000 +0200
++++ vim91/src/testdir/test_popupwin.vim	2025-07-11 09:16:19.013971633 +0200
+@@ -556,6 +556,7 @@ func Test_popup_drag()
+   " create a popup that covers the command line
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
++	set mouse=a
+ 	split
+ 	vsplit
+ 	$wincmd w
+@@ -623,6 +624,7 @@ func Test_popup_drag_minwidth()
+ 
+   " create a popup that does not fit
+   let lines =<< trim END
++      set mouse=a
+       call range(40)
+ 	      \ ->map({_,i -> string(i)})
+ 	      \ ->popup_create({
+@@ -670,6 +672,7 @@ func Test_popup_drag_termwin()
+   let lines =<< trim END
+ 	set foldmethod=marker
+ 	call setline(1, range(100))
++	set mouse=a
+ 	for nr in range(7)
+ 	  call setline(nr * 12 + 1, "fold {{{")
+ 	  call setline(nr * 12 + 11, "end }}}")
+@@ -722,6 +725,7 @@ func Test_popup_close_with_mouse()
+ 
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
++	set mouse=a
+ 	" With border, can click on X
+ 	let winid = popup_create('foobar', #{
+ 	      \ close: 'button',
+@@ -1559,6 +1563,7 @@ func Test_popup_beval()
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
+ 	call setline(5, 'here is some text to hover over')
++	set mouse=a
+ 	set balloonevalterm
+ 	set balloonexpr=BalloonExpr()
+ 	set balloondelay=100
+@@ -2269,6 +2274,7 @@ func Test_popup_scrollbar()
+ 
+   let lines =<< trim END
+     call setline(1, range(1, 20))
++    set mouse=a
+     hi ScrollThumb ctermbg=blue
+     hi ScrollBar ctermbg=red
+     let winid = popup_create(['one', 'two', 'three', 'four', 'five',

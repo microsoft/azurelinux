@@ -1,0 +1,10 @@
+[Unit]
+Description=Festival server
+Documentation=man:festival(1)
+[Service]
+ExecStart=/usr/bin/festival --server
+User=festival
+Group=festival
+
+[Install]
+WantedBy=multi-user.target

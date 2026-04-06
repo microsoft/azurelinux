@@ -1,0 +1,106 @@
+From 9a5bfbe011be8d79e4bde1f8db2369beb063eb3a Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 2 May 2017 17:19:20 +0200
+Subject: [PATCH] module: drop link-time vs. run-time TLS backend check
+
+This effectively reverts the following commit:
+8891398a31119ce7c872509ed60328926c51cdfb
+
+Bug: https://bugzilla.redhat.com/1446850
+---
+ src/module.c | 69 ----------------------------------------------------
+ 1 file changed, 69 deletions(-)
+
+diff --git a/src/module.c b/src/module.c
+index a81391f..b87d1d5 100644
+--- a/src/module.c
++++ b/src/module.c
+@@ -336,15 +336,6 @@ initpycurl(void)
+     PyObject *collections_module = NULL;
+     PyObject *named_tuple = NULL;
+     PyObject *arglist = NULL;
+-#ifdef HAVE_CURL_GLOBAL_SSLSET
+-    const curl_ssl_backend **ssllist = NULL;
+-    CURLsslset sslset;
+-    int i, runtime_supported_backend_found = 0;
+-    char backends[200];
+-    size_t backends_len = 0;
+-#else
+-    const char *runtime_ssl_lib;
+-#endif
+ 
+     assert(Curl_Type.tp_weaklistoffset > 0);
+     assert(CurlMulti_Type.tp_weaklistoffset > 0);
+@@ -362,69 +353,6 @@ initpycurl(void)
+         goto error;
+     }
+ 
+-    /* Our compiled crypto locks should correspond to runtime ssl library. */
+-#ifdef HAVE_CURL_GLOBAL_SSLSET
+-    sslset = curl_global_sslset(-1, COMPILE_SSL_LIB, &ssllist);
+-    if (sslset != CURLSSLSET_OK) {
+-        if (sslset == CURLSSLSET_NO_BACKENDS) {
+-            strcpy(backends, "none");
+-        } else {
+-            for (i = 0; ssllist[i] != NULL; i++) {
+-                switch (ssllist[i]->id) {
+-                case CURLSSLBACKEND_OPENSSL:
+-                case CURLSSLBACKEND_GNUTLS:
+-                case CURLSSLBACKEND_NSS:
+-                case CURLSSLBACKEND_WOLFSSL:
+-                case CURLSSLBACKEND_SCHANNEL:
+-                case CURLSSLBACKEND_MBEDTLS:
+-#if LIBCURL_VERSION_NUM >= MAKE_LIBCURL_VERSION(7, 64, 1)
+-                case CURLSSLBACKEND_SECURETRANSPORT:
+-#else
+-                case CURLSSLBACKEND_DARWINSSL:
+-#endif
+-                    runtime_supported_backend_found = 1;
+-                    break;
+-                default:
+-                    break;
+-                }
+-                if (backends_len < sizeof(backends)) {
+-                    backends_len += snprintf(backends + backends_len, sizeof(backends) - backends_len, "%s%s", (i > 0) ? ", " : "", ssllist[i]->name);
+-                }
+-            }
+-        }
+-        /* Don't error if both the curl library and pycurl itself is compiled without SSL */
+-        if (runtime_supported_backend_found || COMPILE_SUPPORTED_SSL_BACKEND_FOUND) {
+-            PyErr_Format(PyExc_ImportError, "pycurl: libcurl link-time ssl backends (%s) do not include compile-time ssl backend (%s)", backends, COMPILE_SSL_LIB);
+-            goto error;
+-        }
+-    }
+-#else
+-    if (vi->ssl_version == NULL) {
+-        runtime_ssl_lib = "none/other";
+-    } else if (!strncmp(vi->ssl_version, "OpenSSL/", 8) || !strncmp(vi->ssl_version, "LibreSSL/", 9) ||
+-               !strncmp(vi->ssl_version, "BoringSSL", 9)) {
+-        runtime_ssl_lib = "openssl";
+-    } else if (!strncmp(vi->ssl_version, "wolfSSL/", 8)) {
+-        runtime_ssl_lib = "wolfssl";
+-    } else if (!strncmp(vi->ssl_version, "GnuTLS/", 7)) {
+-        runtime_ssl_lib = "gnutls";
+-    } else if (!strncmp(vi->ssl_version, "NSS/", 4)) {
+-        runtime_ssl_lib = "nss";
+-    } else if (!strncmp(vi->ssl_version, "mbedTLS/", 8)) {
+-        runtime_ssl_lib = "mbedtls";
+-    } else if (!strncmp(vi->ssl_version, "Secure Transport", 16)) {
+-        runtime_ssl_lib = "secure-transport";
+-    } else if (!strncmp(vi->ssl_version, "Schannel", 8)) {
+-        runtime_ssl_lib = "schannel";
+-    } else {
+-        runtime_ssl_lib = "none/other";
+-    }
+-    if (strcmp(runtime_ssl_lib, COMPILE_SSL_LIB)) {
+-        PyErr_Format(PyExc_ImportError, "pycurl: libcurl link-time ssl backend (%s) is different from compile-time ssl backend (%s)", runtime_ssl_lib, COMPILE_SSL_LIB);
+-        goto error;
+-    }
+-#endif
+-
+     /* Initialize the type of the new type objects here; doing it here
+      * is required for portability to Windows without requiring C++. */
+     p_Curl_Type = &Curl_Type;
+-- 
+2.35.1
+

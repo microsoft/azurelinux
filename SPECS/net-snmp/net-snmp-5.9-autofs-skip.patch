@@ -1,0 +1,12 @@
+diff --git a/agent/mibgroup/host/hr_filesys.c b/agent/mibgroup/host/hr_filesys.c
+index e7ca92f..80b3e0d 100644
+--- a/agent/mibgroup/host/hr_filesys.c
++++ b/agent/mibgroup/host/hr_filesys.c
+@@ -704,6 +704,7 @@ static const char *HRFS_ignores[] = {
+     "shm",
+     "sockfs",
+     "sysfs",
++    "tmpfs",
+     "usbdevfs",
+     "usbfs",
+ #endif

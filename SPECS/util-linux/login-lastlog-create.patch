@@ -1,0 +1,12 @@
+diff -up util-linux-2.36/login-utils/login.c.kzak util-linux-2.36/login-utils/login.c
+--- util-linux-2.36/login-utils/login.c.kzak	2020-07-23 14:13:26.777030764 +0200
++++ util-linux-2.36/login-utils/login.c	2020-07-23 14:11:22.793686983 +0200
+@@ -585,7 +585,7 @@ static void log_lastlog(struct login_con
+ 	sa.sa_handler = SIG_IGN;
+ 	sigaction(SIGXFSZ, &sa, &oldsa_xfsz);
+ 
+-	fd = open(_PATH_LASTLOG, O_RDWR, 0);
++	fd = open(_PATH_LASTLOG, O_RDWR | O_CREAT, 0);
+ 	if (fd < 0)
+ 		goto done;
+ 	offset = cxt->pwd->pw_uid * sizeof(ll);

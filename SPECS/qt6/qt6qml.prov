@@ -1,0 +1,6 @@
+#! /bin/sh
+
+grep '/qt6/qml/.*/qmldir$' |
+while read fn; do
+   sed -ne "s/^module \(.*\)/qt6qml(\1)/p" "${fn}"
+done

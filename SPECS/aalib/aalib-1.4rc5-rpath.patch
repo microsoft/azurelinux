@@ -1,0 +1,40 @@
+--- aalib-1.4.0/configure.in~	2006-07-23 09:29:19.000000000 +0200
++++ aalib-1.4.0/configure.in	2006-07-23 09:29:19.000000000 +0200
+@@ -371,17 +371,6 @@
+ 	;;
+ esac
+ 
+-# Set runtime shared library paths as needed
+-
+-if test $ARCH = linux -o $ARCH = freebsd -o $ARCH = bsdi; then
+-  AALIB_RLD_FLAGS="-Wl,-rpath,\${exec_prefix}/lib"
+-fi
+-
+-if test $ARCH = solaris; then
+-  AALIB_RLD_FLAGS="-R\${exec_prefix}/lib"
+-fi
+-
+-
+ dnl Expand the cflags and libraries needed by apps using AALIB
+ AC_SUBST(AALIB_CFLAGS)
+ AC_SUBST(AALIB_LIBS)
+--- aalib-1.4.0/configure~	2006-07-23 09:29:18.000000000 +0200
++++ aalib-1.4.0/configure	2006-07-23 09:29:18.000000000 +0200
+@@ -4313,17 +4313,6 @@
+ 	;;
+ esac
+ 
+-# Set runtime shared library paths as needed
+-
+-if test $ARCH = linux -o $ARCH = freebsd -o $ARCH = bsdi; then
+-  AALIB_RLD_FLAGS="-Wl,-rpath,\${exec_prefix}/lib"
+-fi
+-
+-if test $ARCH = solaris; then
+-  AALIB_RLD_FLAGS="-R\${exec_prefix}/lib"
+-fi
+-
+-
+ 
+ 
+ 

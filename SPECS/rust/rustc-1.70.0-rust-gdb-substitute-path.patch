@@ -1,0 +1,21 @@
+diff --git a/src/etc/rust-gdb b/src/etc/rust-gdb
+index 9abed30ea6f7..e4bf55df3688 100755
+--- a/src/etc/rust-gdb
++++ b/src/etc/rust-gdb
+@@ -13,8 +13,6 @@ fi
+ # Find out where the pretty printer Python module is
+ RUSTC_SYSROOT="$("$RUSTC" --print=sysroot)"
+ GDB_PYTHON_MODULE_DIRECTORY="$RUSTC_SYSROOT/lib/rustlib/etc"
+-# Get the commit hash for path remapping
+-RUSTC_COMMIT_HASH="$("$RUSTC" -vV | sed -n 's/commit-hash: \([a-zA-Z0-9_]*\)/\1/p')"
+ 
+ # Run GDB with the additional arguments that load the pretty printers
+ # Set the environment variable `RUST_GDB` to overwrite the call to a
+@@ -23,6 +21,6 @@ RUST_GDB="${RUST_GDB:-gdb}"
+ PYTHONPATH="$PYTHONPATH:$GDB_PYTHON_MODULE_DIRECTORY" exec ${RUST_GDB} \
+   --directory="$GDB_PYTHON_MODULE_DIRECTORY" \
+   -iex "add-auto-load-safe-path $GDB_PYTHON_MODULE_DIRECTORY" \
+-  -iex "set substitute-path /rustc/$RUSTC_COMMIT_HASH $RUSTC_SYSROOT/lib/rustlib/src/rust" \
++  -iex "set substitute-path @BUILDDIR@ $RUSTC_SYSROOT/lib/rustlib/src/rust" \
+   "$@"
+  

@@ -1,0 +1,13 @@
+--- sequoia-wot-0.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-wot-0.14.0/Cargo.toml	2025-03-08T12:15:32.749387+00:00
+@@ -85,10 +85,3 @@
+ ]
+ default-features = false
+ 
+-[target."cfg(windows)".dev-dependencies.sequoia-openpgp]
+-version = "2"
+-features = [
+-    "crypto-cng",
+-    "__implicit-crypto-backend-for-tests",
+-]
+-default-features = false

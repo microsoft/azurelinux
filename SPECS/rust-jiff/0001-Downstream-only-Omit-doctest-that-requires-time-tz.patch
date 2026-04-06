@@ -1,0 +1,26 @@
+From 50880498ea71e96c99526e1b938ebfc0e79b9805 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 12 Feb 2026 12:40:54 +0000
+Subject: [PATCH] Downstream-only: Omit doctest that requires time-tz
+
+It is not worth packaging it solely for a single doctest.
+---
+ COMPARE.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/COMPARE.md b/COMPARE.md
+index a28e9e3..d444b38 100644
+--- a/COMPARE.md
++++ b/COMPARE.md
+@@ -801,7 +801,7 @@ fn main() -> anyhow::Result<()> {
+ 
+ If you use `time-tz`, then you can make the above example with `time` work:
+ 
+-```rust
++```ignore
+ use anyhow::Context;
+ use time::{ext::NumericalDuration, macros::datetime, Duration};
+ use time_tz::{OffsetDateTimeExt, Tz};
+-- 
+2.53.0
+

@@ -1,0 +1,57 @@
+From b52cdd7a8525325deba04554d8a00a578c397d56 Mon Sep 17 00:00:00 2001
+From: David Mitchell <davem@iabyn.com>
+Date: Thu, 11 Jul 2019 15:17:48 +0100
+Subject: [PATCH] threads::shared: fix leak
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When assigning a shared reference value to a variable containing a
+shared string, the PV buffer in the shared space was leaked. For
+example:
+
+    my $s :shared = "foo";
+    my $t :shared  = shared_clone(\"bar");
+    $s = $t; # "foo" in shared space leaked
+
+This was showing up as failed smokes under ASan.
+
+Petr Písař: Ported to 1.60 from perl commit
+59c73bd3d62c5096a6f9b2e3cbe05e1ab4c158cf.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ shared.xs | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/shared.xs b/shared.xs
+index 6cdf094..858c6d6 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -818,12 +818,19 @@ sharedsv_scalar_store(pTHX_ SV *sv, SV *ssv)
+         SV *obj = SvRV(sv);
+         SV *sobj = Perl_sharedsv_find(aTHX_ obj);
+         if (sobj) {
++            SV* tmpref;
+             SHARED_CONTEXT;
+-            (void)SvUPGRADE(ssv, SVt_RV);
+-            sv_setsv_nomg(ssv, &PL_sv_undef);
++            /* Creating a tmp ref to sobj then assigning it to ssv ensures
++             * that any previous contents of ssv are correctly freed
++             * by sv_setsv(). Not sure if there is a better, API-legal way
++             * to achieve this */
++            tmpref = newSV_type(SVt_RV);
++            SvRV_set(tmpref, sobj);
++            SvROK_on(tmpref);
++            SvREFCNT_inc_simple_NN(sobj);
++            sv_setsv_nomg(ssv, tmpref);
++            SvREFCNT_dec_NN(tmpref);
+ 
+-            SvRV_set(ssv, SvREFCNT_inc(sobj));
+-            SvROK_on(ssv);
+             if (SvOBJECT(sobj)) {
+                 /* Remove any old blessing */
+                 SvREFCNT_dec(SvSTASH(sobj));
+-- 
+2.20.1
+

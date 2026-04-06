@@ -1,0 +1,39 @@
+From 92bbd814b9b57bd8fac50a32aaf7e750faf91992 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sat, 9 Dec 2023 23:47:01 -0500
+Subject: [PATCH] Remove unused build requirements
+
+- The real pandoc is installed, so no need for the Python package.
+- We don't need coverage results.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index ad5c068a..c9839eb4 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -62,18 +62,15 @@ docs = [
+     "myst-parser",
+     "nbsphinx",
+     "numpydoc",
+-    "pandoc",
+     "sphinx",
+     "sphinxcontrib-bibtex",
+     "sphinx_bootstrap_theme",
+ ]
+ tests = [
+-    "codecov",
+     "geodatasets>=2023.12.0",
+     "matplotlib>=3.8",
+     "pytest",
+     "pytest-mpl",
+-    "pytest-cov",
+     "pytest-xdist",
+ ]
+ 
+-- 
+2.52.0
+

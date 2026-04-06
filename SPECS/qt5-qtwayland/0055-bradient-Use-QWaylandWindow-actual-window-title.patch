@@ -1,0 +1,111 @@
+From df49b9f3badce793a0a9ea850cf1a02cc5bafef6 Mon Sep 17 00:00:00 2001
+From: Kai Uwe Broulik <kde@privat.broulik.de>
+Date: Thu, 4 Jan 2024 20:30:33 +0100
+Subject: [PATCH 55/55] bradient: Use QWaylandWindow actual window title
+
+It may include a suffix containing the application name
+and is also what's set on the XDG Toplevel, i.e. what
+the rest of the environment (task switcher, etc) sees.
+
+This stores the title in QWaylandWindow and adds a
+getter to retrieve it.
+
+Pick-to: 6.7
+Change-Id: I84f41c68b16b680cdbb5cf656c7078d1e41767d4
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+
+(cherry-picked from commit 34c1dca)
+---
+ src/client/qwaylandwindow.cpp             | 35 ++++++++++++++---------
+ src/client/qwaylandwindow_p.h             |  2 ++
+ src/plugins/decorations/bradient/main.cpp |  2 +-
+ 3 files changed, 24 insertions(+), 15 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 7a9bccc1..7c338d27 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -303,26 +303,33 @@ void QWaylandWindow::setParent(const QPlatformWindow *parent)
+     }
+ }
+ 
++QString QWaylandWindow::windowTitle() const
++{
++    return mWindowTitle;
++}
++
+ void QWaylandWindow::setWindowTitle(const QString &title)
+ {
+-    if (mShellSurface) {
+-        const QString separator = QString::fromUtf8(" \xe2\x80\x94 "); // unicode character U+2014, EM DASH
+-        const QString formatted = formatWindowTitle(title, separator);
++    const QString separator = QString::fromUtf8(" \xe2\x80\x94 "); // unicode character U+2014, EM DASH
++    const QString formatted = formatWindowTitle(title, separator);
+ 
+-        const int libwaylandMaxBufferSize = 4096;
+-        // Some parts of the buffer is used for metadata, so subtract 100 to be on the safe side.
+-        // Also, QString is in utf-16, which means that in the worst case each character will be
+-        // three bytes when converted to utf-8 (which is what libwayland uses), so divide by three.
+-        const int maxLength = libwaylandMaxBufferSize / 3 - 100;
++    const int libwaylandMaxBufferSize = 4096;
++    // Some parts of the buffer is used for metadata, so subtract 100 to be on the safe side.
++    // Also, QString is in utf-16, which means that in the worst case each character will be
++    // three bytes when converted to utf-8 (which is what libwayland uses), so divide by three.
++    const int maxLength = libwaylandMaxBufferSize / 3 - 100;
+ 
+-        auto truncated = QStringRef(&formatted).left(maxLength);
+-        if (truncated.length() < formatted.length()) {
+-            qCWarning(lcQpaWayland) << "Window titles longer than" << maxLength << "characters are not supported."
+-                                    << "Truncating window title (from" << formatted.length() << "chars)";
+-        }
+-        mShellSurface->setTitle(truncated.toString());
++    auto truncated = QStringRef(&formatted).left(maxLength);
++    if (truncated.length() < formatted.length()) {
++        qCWarning(lcQpaWayland) << "Window titles longer than" << maxLength << "characters are not supported."
++                                << "Truncating window title (from" << formatted.length() << "chars)";
+     }
+ 
++    mWindowTitle = truncated.toString();
++
++    if (mShellSurface)
++        mShellSurface->setTitle(mWindowTitle);
++
+     if (mWindowDecoration && window()->isVisible())
+         mWindowDecoration->update();
+ }
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 741f9e5c..5e9f4ebf 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -107,6 +107,7 @@ public:
+     void setVisible(bool visible) override;
+     void setParent(const QPlatformWindow *parent) override;
+ 
++    QString windowTitle() const;
+     void setWindowTitle(const QString &title) override;
+ 
+     inline QIcon windowIcon() const;
+@@ -263,6 +264,7 @@ protected:
+     int mScale = 1;
+     QPlatformScreen *mLastReportedScreen = nullptr;
+ 
++    QString mWindowTitle;
+     QIcon mWindowIcon;
+ 
+     Qt::WindowFlags mFlags;
+diff --git a/src/plugins/decorations/bradient/main.cpp b/src/plugins/decorations/bradient/main.cpp
+index fa885143..fbdbe284 100644
+--- a/src/plugins/decorations/bradient/main.cpp
++++ b/src/plugins/decorations/bradient/main.cpp
+@@ -171,7 +171,7 @@ void QWaylandBradientDecoration::paint(QPaintDevice *device)
+     }
+ 
+     // Window title
+-    QString windowTitleText = window()->title();
++    QString windowTitleText = waylandWindow()->windowTitle();
+     if (!windowTitleText.isEmpty()) {
+         if (m_windowTitle.text() != windowTitleText) {
+             m_windowTitle.setText(windowTitleText);
+-- 
+2.51.1
+

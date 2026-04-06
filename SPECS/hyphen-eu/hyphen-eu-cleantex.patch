@@ -1,0 +1,15 @@
+--- hyph-eu.tex.old	2021-06-08 10:49:02.497003737 +0530
++++ hyph-eu.tex	2021-06-08 10:49:13.164173562 +0530
+@@ -72,7 +72,6 @@
+ % happen in Basque. Would they happen, they would be hyphenated
+ % according to the rules.
+ %
+-\patterns{
+ % Rule SR1
+ % Vowels are kept together by the defaults
+ % Rule SR2
+@@ -120,4 +119,3 @@
+ 1t2ra 1t2re 1t2ro 1t2ri 1t2ru
+ % We now avoid some problematic breaks.
+ su2b2r su2b2l
+-}

@@ -1,0 +1,12 @@
+diff -up bzip2-1.0.6/Makefile-libbz2_so.pom bzip2-1.0.6/Makefile-libbz2_so
+--- bzip2-1.0.6/Makefile-libbz2_so.pom	2010-09-11 01:07:52.000000000 +0200
++++ bzip2-1.0.6/Makefile-libbz2_so	2010-09-22 10:31:46.000000000 +0200
+@@ -35,7 +35,7 @@ OBJS= blocksort.o  \
+       bzlib.o
+ 
+ all: $(OBJS)
+-	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.8 $(OBJS)
++	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1 -o libbz2.so.1.0.8 $(OBJS)
+ 	$(CC) $(CFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.8
+ 	rm -f libbz2.so.1.0
+ 	ln -s libbz2.so.1.0.8 libbz2.so.1.0

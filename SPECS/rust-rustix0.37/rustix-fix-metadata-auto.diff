@@ -1,0 +1,22 @@
+--- rustix-0.37.28/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustix-0.37.28/Cargo.toml	2025-01-14T21:24:31.815212+00:00
+@@ -240,19 +240,3 @@
+ version = "1.5.2"
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.libc_errno]
+-version = "0.3.1"
+-default-features = false
+-package = "errno"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.48.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Networking_WinSock",
+-    "Win32_NetworkManagement_IpHelper",
+-    "Win32_System_Threading",
+-]
+-
+-[target."cfg(windows)".dev-dependencies.ctor]
+-version = "0.2.0"

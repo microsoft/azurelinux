@@ -1,0 +1,47 @@
+diff -urp '--exclude=*~' minitest-4.7.0.orig/test/minitest/metametameta.rb minitest-4.7.0/test/minitest/metametameta.rb
+--- minitest-4.7.0.orig/test/minitest/metametameta.rb	2024-11-15 15:13:45.702281333 +0900
++++ minitest-4.7.0/test/minitest/metametameta.rb	2024-11-15 15:27:04.360163775 +0900
+@@ -28,6 +28,8 @@ class MetaMetaMetaTestCase < MiniTest::U
+     output.gsub!(/ = \d+.\d\d s = /, ' = 0.00 s = ')
+     output.gsub!(/0x[A-Fa-f0-9]+/, '0xXXX')
+ 
++    output.gsub!(/in '/, 'in `')
++
+     if windows? then
+       output.gsub!(/\[(?:[A-Za-z]:)?[^\]:]+:\d+\]/, '[FILE:LINE]')
+       output.gsub!(/^(\s+)(?:[A-Za-z]:)?[^:]+:\d+:in/, '\1FILE:LINE:in')
+diff -urp '--exclude=*~' minitest-4.7.0.orig/test/minitest/test_minitest_unit.rb minitest-4.7.0/test/minitest/test_minitest_unit.rb
+--- minitest-4.7.0.orig/test/minitest/test_minitest_unit.rb	2024-11-15 15:13:45.860281612 +0900
++++ minitest-4.7.0/test/minitest/test_minitest_unit.rb	2024-11-15 15:43:11.248448321 +0900
+@@ -1188,6 +1188,7 @@ class TestMiniTestUnitTestCase < MiniTes
+ 
+     actual = e.message.gsub(/^.+:\d+/, 'FILE:LINE')
+     actual.gsub!(/block \(\d+ levels\) in /, '') if RUBY_VERSION >= '1.9.0'
++    actual.gsub!(/['`][a-zA-Z]+#/, '`')
+ 
+     assert_equal expected, actual
+   end
+@@ -1211,6 +1212,7 @@ class TestMiniTestUnitTestCase < MiniTes
+ 
+     actual = e.message.gsub(/^.+:\d+/, 'FILE:LINE')
+     actual.gsub!(/block \(\d+ levels\) in /, '') if RUBY_VERSION >= '1.9.0'
++    actual.gsub!(/['`][a-zA-Z]+#/, '`')
+ 
+     assert_equal expected.chomp, actual
+   end
+@@ -1257,6 +1259,7 @@ class TestMiniTestUnitTestCase < MiniTes
+ 
+     actual = e.message.gsub(/^.+:\d+/, 'FILE:LINE')
+     actual.gsub!(/block \(\d+ levels\) in /, '') if RUBY_VERSION >= '1.9.0'
++    actual.gsub!(/['`][a-zA-Z]+#/, '`')
+ 
+     assert_equal expected, actual
+   end
+@@ -1711,6 +1714,7 @@ class TestMiniTestUnitTestCase < MiniTes
+ 
+     msg = e.message.sub(/(---Backtrace---).*/m, '\1')
+     msg.gsub!(/\(oid=[-0-9]+\)/, '(oid=N)')
++    msg.gsub!(/ => /, '=>')
+ 
+     assert_equal expected, msg
+   end

@@ -1,0 +1,40 @@
+diff --git a/Makefile.am b/Makefile.am
+index 71333b0..52317da 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2092,14 +2092,14 @@ endif
+ ## The @$(MKDIR_P) line is added due to a bug in Automake 1.10 and can be removed if using Automake 1.12.
+ 	@$(MKDIR_P) $(DESTDIR)$(bindir)
+ 	cd $(DESTDIR)$(bindir) && \
+-	  $(LN_S) -f imtest httptest && \
+-	  $(LN_S) -f imtest lmtptest && \
+-	  $(LN_S) -f imtest mupdatetest && \
+-	  $(LN_S) -f imtest nntptest && \
+-	  $(LN_S) -f imtest pop3test && \
+-	  $(LN_S) -f imtest sivtest && \
+-	  $(LN_S) -f imtest smtptest && \
+-	  $(LN_S) -f imtest synctest
++	  $(LN_S) -f cyr_imtest httptest && \
++	  $(LN_S) -f cyr_imtest lmtptest && \
++	  $(LN_S) -f cyr_imtest mupdatetest && \
++	  $(LN_S) -f cyr_imtest nntptest && \
++	  $(LN_S) -f cyr_imtest pop3test && \
++	  $(LN_S) -f cyr_imtest sivtest && \
++	  $(LN_S) -f cyr_imtest smtptest && \
++	  $(LN_S) -f cyr_imtest synctest
+ 
+ uninstall-hook: cyrus-makemaker-uninstall-workaround
+ if PERL
+diff --git a/imtest/imtest.c b/imtest/imtest.c
+index 725ff62..d9406e1 100644
+--- a/imtest/imtest.c
++++ b/imtest/imtest.c
+@@ -3040,7 +3040,7 @@ int main(int argc, char **argv)
+     }
+ 
+     if (!*prot) {
+-        if (!strcasecmp(prog, "imtest"))
++        if (!strcasecmp(prog, "cyr_imtest"))
+             prot = "imap";
+         else if (!strcasecmp(prog, "pop3test"))
+             prot = "pop3";

@@ -1,0 +1,36 @@
+From be3243b5f4f3423b8e8e29245a2401e52dd52baf Mon Sep 17 00:00:00 2001
+From: Sergio Correia <scorreia@redhat.com>
+Date: Fri, 13 Feb 2026 07:22:46 -0500
+Subject: [PATCH 2/2] Fix efivar availability check in test_create_mb_policy
+
+Import tpm_bootlog_enrich instead of the elparsing package so the
+CDLL("libefivar.so.1") load is actually triggered, allowing tests
+to skip gracefully when the library is absent.
+
+Signed-off-by: Sergio Correia <scorreia@redhat.com>
+---
+ test/test_create_mb_policy.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/test/test_create_mb_policy.py b/test/test_create_mb_policy.py
+index 04ed779..fc79c3b 100644
+--- a/test/test_create_mb_policy.py
++++ b/test/test_create_mb_policy.py
+@@ -10,9 +10,12 @@ import unittest
+ 
+ from keylime.policy import create_mb_policy
+ 
+-# Check if efivarlibs is available for measured boot parsing
++# Check if efivarlibs is available for measured boot parsing.
++# We need to import tpm_bootlog_enrich (not just the elparsing package)
++# because the CDLL("libefivar.so.1") load happens at module level in
++# tpm_bootlog_enrich, and importing just the package won't trigger it.
+ try:
+-    from keylime.mba import elparsing  # pylint: disable=unused-import
++    from keylime.mba.elparsing import tpm_bootlog_enrich  # pylint: disable=unused-import
+ 
+     EFIVAR_AVAILABLE = True
+ except Exception:
+-- 
+2.53.0
+

@@ -1,0 +1,25 @@
+From 6779a40d7907c2f86818cbed56030d330a137541 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 7 Feb 2022 12:09:52 +0100
+Subject: [PATCH] Explicitly require six
+
+six is imported but was not required.
+In the past, it might have been transitively pulled in by pytest.
+---
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 7ad98d2..ba135c0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -28,7 +28,8 @@
+ 
+     install_requires=[
+         "pytest",
+-        "u-msgpack-python"
++        "six",
++        "u-msgpack-python",
+     ],
+ 
+     packages=["pytest_expect"],

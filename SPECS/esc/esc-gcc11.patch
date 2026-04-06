@@ -1,0 +1,26 @@
+diff --git a/esc/src/lib/coolkey/CoolKey_Message.cpp b/esc/src/lib/coolkey/CoolKey_Message.cpp
+index 87ee309..7b80f70 100644
+--- a/esc/src/lib/coolkey/CoolKey_Message.cpp
++++ b/esc/src/lib/coolkey/CoolKey_Message.cpp
+@@ -213,7 +213,7 @@ void  eCKMessage::setBinValue(string &aKey,unsigned char*aValue,int *aSize)
+     if(!aKey.length())
+         return;
+ 
+-    if(aSize <=0 || !aValue)
++    if(aSize ==0 || !aValue)
+         return;
+ 
+     string data = "";
+diff --git a/esc/src/lib/nss-http-client/request.cpp b/esc/src/lib/nss-http-client/request.cpp
+index cabd94f..5428350 100644
+--- a/esc/src/lib/nss-http-client/request.cpp
++++ b/esc/src/lib/nss-http-client/request.cpp
+@@ -192,7 +192,7 @@ PRBool PSHttpRequest::setBody(int size, const char* body) {
+     }
+ 
+     _bodyLength = size;
+-     sprintf(_body,body);
++     sprintf(_body,"%s",body);
+     //_body = (char *)body;
+ 
+     return PR_TRUE;

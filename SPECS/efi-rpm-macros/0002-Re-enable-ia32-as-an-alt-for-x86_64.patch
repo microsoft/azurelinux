@@ -1,0 +1,30 @@
+From 69b51e08d92de5167b00539f134556c16b86a205 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 27 Oct 2025 14:36:38 -0400
+Subject: [PATCH 2/2] Re-enable ia32 as an alt for x86_64
+
+Signed-off-by: Peter Jones <rpm-build>
+---
+ macros.efi-srpm.in | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/macros.efi-srpm.in b/macros.efi-srpm.in
+index e78c0f0d512..7f258c797a9 100644
+--- a/macros.efi-srpm.in
++++ b/macros.efi-srpm.in
+@@ -45,7 +45,11 @@
+   end
+   -- alt arch
+   local function getaltarch()
+-    return("none")
++    if arch("x86_64") then
++      return("ia32")
++    else
++      return("none")
++    end
+   end
+   -- make some macros
+   local done = rpm.expand("%{?_efi}")
+-- 
+2.51.0
+

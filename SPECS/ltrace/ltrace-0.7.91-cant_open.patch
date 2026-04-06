@@ -1,0 +1,36 @@
+diff -urp ltrace-0.7.91/libltrace.c master/libltrace.c
+--- ltrace-0.7.91/libltrace.c	2014-01-14 16:31:37.696174464 +0100
++++ master/libltrace.c	2013-11-21 14:06:38.623701688 +0100
+@@ -113,9 +117,13 @@ ltrace_init(int argc, char **argv) {
+ 	if (command) {
+ 		/* Check that the binary ABI is supported before
+ 		 * calling execute_program.  */
+-		struct ltelf lte;
+-		ltelf_init(&lte, command);
+-		ltelf_destroy(&lte);
++		{
++			struct ltelf lte;
++			if (ltelf_init(&lte, command) == 0)
++				ltelf_destroy(&lte);
++			else
++				exit(EXIT_FAILURE);
++		}
+ 
+ 		pid_t pid = execute_program(command, argv);
+ 		struct process *proc = open_program(command, pid);
+diff -urp ltrace-0.7.91/ltrace-elf.c master/ltrace-elf.c
+--- ltrace-0.7.91/ltrace-elf.c	2014-01-14 16:31:37.688174420 +0100
++++ master/ltrace-elf.c	2013-11-22 18:17:11.767721609 +0100
+@@ -361,8 +361,11 @@ ltelf_init(struct ltelf *lte, const char
+ {
+ 	memset(lte, 0, sizeof *lte);
+ 	lte->fd = open(filename, O_RDONLY);
+-	if (lte->fd == -1)
++	if (lte->fd == -1) {
++		fprintf(stderr, "Can't open %s: %s\n", filename,
++			strerror(errno));
+ 		return 1;
++	}
+ 
+ 	elf_version(EV_CURRENT);
+ 

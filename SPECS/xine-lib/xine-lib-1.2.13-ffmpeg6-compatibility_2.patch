@@ -1,0 +1,475 @@
+# HG changeset patch
+# User Torsten Jager <t.jager@gmx.de>
+# Date 1715025355 -7200
+#      Mon May 06 21:55:55 2024 +0200
+# Node ID 1e7b184008860c8be2289c3cefd9dee57f06193a
+# Parent  d1954d852980ddc887a67a9f1a26626909561ff5
+ffmpeg compatibility update 1.
+
+diff -r d1954d852980 -r 1e7b18400886 src/combined/ffmpeg/ff_audio_decoder.c
+--- a/src/combined/ffmpeg/ff_audio_decoder.c	Mon Apr 08 13:25:10 2024 +0200
++++ b/src/combined/ffmpeg/ff_audio_decoder.c	Mon May 06 21:55:55 2024 +0200
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001-2023 the xine project
++ * Copyright (C) 2001-2024 the xine project
+  *
+  * This file is part of xine, a free video player.
+  *
+@@ -67,6 +67,7 @@
+ 
+   xine_t                 *xine;
+   float                   gain;
++  int                     bitexact;
+ } ff_audio_class_t;
+ 
+ typedef struct ff_audio_decoder_s {
+@@ -188,14 +189,25 @@
+         xprintf (this->stream->xine, XINE_VERBOSITY_DEBUG,
+           "ffmpeg_audio_dec: found AAC ADTS syncword after %d bytes\n", i);
+         if (this->buftype == BUF_AUDIO_AAC_LATM) {
++          uint8_t *ed = NULL;
++          int es = 0;
+           xprintf (this->stream->xine, XINE_VERBOSITY_DEBUG,
+             "ffmpeg_audio_dec: stream says LATM but is ADTS -> switching decoders\n");
+-          if (this->decoder_ok) {
+-            pthread_mutex_lock (&ffmpeg_lock);
+-            avcodec_close (this->context);
+-            pthread_mutex_unlock (&ffmpeg_lock);
+-            this->decoder_ok = 0;
++          pthread_mutex_lock (&ffmpeg_lock);
++          if (this->context) {
++            ed = this->context->extradata;
++            es = this->context->extradata_size;
++            this->context->extradata = NULL;
++            this->context->extradata_size = 0;
++            XFF_FREE_CONTEXT (this->context);
+           }
++          this->decoder_ok = 0;
++          this->context = XFF_ALLOC_CONTEXT ();
++          if (this->context) {
++            this->context->extradata = ed;
++            this->context->extradata_size = es;
++          }
++          pthread_mutex_unlock (&ffmpeg_lock);
+           this->codec = NULL;
+           ff_audio_open_codec (this, BUF_AUDIO_AAC);
+         }
+@@ -349,6 +361,11 @@
+     return -1;
+   }
+ 
++  if (this->class->bitexact)
++    this->context->flags |= CODEC_FLAG_BITEXACT;
++  else
++    this->context->flags &= ~CODEC_FLAG_BITEXACT;
++
+   pthread_mutex_lock (&ffmpeg_lock);
+   if (XFF_AVCODEC_OPEN (this->context, this->codec) < 0) {
+     pthread_mutex_unlock (&ffmpeg_lock);
+@@ -1377,9 +1394,21 @@
+     }
+ #endif
+     pthread_mutex_lock (&ffmpeg_lock);
+-    avcodec_close (this->context);
+-    if (XFF_AVCODEC_OPEN (this->context, this->codec) < 0)
++    {
++      uint8_t *ed = this->context->extradata;
++      int es = this->context->extradata_size;
++      this->context->extradata = NULL;
++      this->context->extradata_size = 0;
++      XFF_FREE_CONTEXT (this->context);
+       this->decoder_ok = 0;
++      this->context = XFF_ALLOC_CONTEXT ();
++      if (this->context) {
++        this->context->extradata = ed;
++        this->context->extradata_size = es;
++      }
++    }
++    if (XFF_AVCODEC_OPEN (this->context, this->codec) >= 0)
++      this->decoder_ok = 1;
+     pthread_mutex_unlock (&ffmpeg_lock);
+   }
+ 
+@@ -1418,20 +1447,20 @@
+       XFF_FREE_FRAME (this->av_frame);
+     }
+ #endif
+-    pthread_mutex_lock (&ffmpeg_lock);
+-    avcodec_close (this->context);
+-    pthread_mutex_unlock (&ffmpeg_lock);
+   }
++  pthread_mutex_lock (&ffmpeg_lock);
++  if (this->context) {
++    _x_freep (&this->context->extradata);
++    this->context->extradata_size = 0;
++    XFF_FREE_CONTEXT (this->context);
++  }
++  pthread_mutex_unlock (&ffmpeg_lock);
+ 
+   ff_audio_output_close(this);
+ 
+   xine_free_aligned (this->buf);
+   xine_free_aligned (this->decode_buffer);
+ 
+-  _x_freep (&this->context->extradata);
+-  this->context->extradata_size = 0;
+-  XFF_FREE_CONTEXT (this->context);
+-
+   XFF_PACKET_UNREF (this->avpkt);
+ 
+   xine_pts_queue_delete (&this->pts_queue);
+@@ -1513,6 +1542,12 @@
+   free (this);
+ }
+ 
++static void ff_bitexact_cb (void *user_data, xine_cfg_entry_t *entry) {
++  ff_audio_class_t *class = (ff_audio_class_t *)user_data;
++
++  class->bitexact = entry->num_value;
++}
++
+ void *init_audio_plugin (xine_t *xine, const void *data) {
+ 
+   ff_audio_class_t *this ;
+@@ -1540,5 +1575,12 @@
+       10, ff_gain_cb, this)
+     / (float)20);
+ 
++  this->bitexact = xine->config->register_bool (xine->config,
++      "audio.processing.ffmpeg_bitexact", 0,
++      _("Let FFmpeg use precise but slower math"),
++      _("Get slightly better sound, at the expense of speed.\n"
++        "Takes effect with next stream."),
++      10, ff_bitexact_cb, this);
++
+   return this;
+ }
+diff -r d1954d852980 -r 1e7b18400886 src/combined/ffmpeg/ff_video_decoder.c
+--- a/src/combined/ffmpeg/ff_video_decoder.c	Mon Apr 08 13:25:10 2024 +0200
++++ b/src/combined/ffmpeg/ff_video_decoder.c	Mon May 06 21:55:55 2024 +0200
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2001-2022 the xine project
++ * Copyright (C) 2001-2024 the xine project
+  *
+  * This file is part of xine, a free video player.
+  *
+@@ -128,6 +128,7 @@
+ 
+   int64_t           pts;
+   int64_t           last_pts;
++  int64_t           tagged_pts;
+   int               video_step;
+   int               reported_video_step;
+   uint8_t           pts_tag_pass;
+@@ -551,7 +552,9 @@
+ #  ifdef XFF_FRAME_AGE
+   av_frame->age = 1;
+ #  endif
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
+   av_frame->reordered_opaque = context->reordered_opaque;
++#endif
+ 
+   ffsf = ffsf_new (this);
+   if (!ffsf)
+@@ -862,7 +865,9 @@
+ # endif
+ 
+   /* take over pts for this frame to have it reordered */
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
+   av_frame->reordered_opaque = context->reordered_opaque;
++#endif
+ 
+   return 0;
+ }
+@@ -1142,9 +1147,13 @@
+   if (this->codec->id == CODEC_ID_VC1 &&
+       (!this->bih.biWidth || !this->bih.biHeight)) {
+     /* VC1 codec must be re-opened with correct width and height. */
+-    avcodec_close(this->context);
+-
+-    if (XFF_AVCODEC_OPEN (this->context, this->codec) < 0) {
++    if (this->context) {
++      _x_freep (&this->context->extradata);
++      this->context->extradata_size = 0;
++      XFF_FREE_CONTEXT (this->context);
++    }
++    this->context = XFF_ALLOC_CONTEXT ();
++    if (!(this->context && XFF_AVCODEC_OPEN (this->context, this->codec) >= 0)) {
+       pthread_mutex_unlock(&ffmpeg_lock);
+       xprintf (this->stream->xine, XINE_VERBOSITY_LOG,
+ 	       _("ffmpeg_video_dec: couldn't open decoder (pass 2)\n"));
+@@ -1211,6 +1220,11 @@
+   /* dont want initial AV_NOPTS_VALUE here */
+   this->context->reordered_opaque = 0;
+ #endif
++
++#ifdef XFF_AVCODEC_FRAME_PTS
++  this->context->time_base.num = 1;
++  this->context->time_base.den = 90000 << 8;
++#endif
+ }
+ 
+ #ifdef ENABLE_VAAPI
+@@ -1959,7 +1973,26 @@
+   return (pts * 256) | this->pts_tag_pass;
+ }
+ 
+-static int64_t ff_untag_pts (ff_video_decoder_t *this, int64_t pts) {
++static int64_t ff_untag_pts (ff_video_decoder_t *this, AVFrame *av_frame) {
++  int64_t pts;
++#if defined(XFF_AVCODEC_FRAME_PTS)
++  pts = (av_frame->pts != AV_NOPTS_VALUE) ? av_frame->pts : 0;
++#  if defined(XFF_AVCODEC_REORDERED_OPAQUE)
++  /* paranoia !!! */
++  if (pts != av_frame->reordered_opaque) {
++    xprintf (this->stream->xine, XINE_VERBOSITY_DEBUG,
++      LOG_MODULE ": WARNING: frame pts %" PRId64 " != reordered_opaque %" PRId64 ".\n",
++      pts, av_frame->reordered_opaque);
++    pts = av_frame->reordered_opaque;
++  }
++  av_frame->reordered_opaque = 0;
++#  endif
++#elif defined(XFF_AVCODEC_REORDERED_OPAQUE)
++  pts = av_frame->reordered_opaque;
++  av_frame->reordered_opaque = 0;
++#else
++  pts = this->tagged_pts;
++#endif
+   if ((uint8_t)(pts & 0xff) == this->pts_tag_pass) {
+     /* restore sign. */
+     return pts >> 8;
+@@ -1984,7 +2017,9 @@
+   this->avpkt->data = buf;
+   this->avpkt->size = buf_size;
+   this->avpkt->flags = AV_PKT_FLAG_KEY;
+-
++# ifdef XFF_AVCODEC_FRAME_PTS
++  this->avpkt->pts = this->tagged_pts;
++# endif
+ # if XFF_PALETTE == 2 || XFF_PALETTE == 3
+   if (buf && this->palette_changed) {
+     uint8_t *sd = av_packet_new_side_data (this->avpkt, AV_PKT_DATA_PALETTE, 256 * 4);
+@@ -2094,9 +2129,14 @@
+ #endif
+ 
+     /* apply valid pts to first frame _starting_ thereafter only */
+-    if (this->pts && !this->context->reordered_opaque) {
+-      this->context->reordered_opaque = 
+-      this->av_frame->reordered_opaque = ff_tag_pts (this, this->pts);
++    if (this->pts && !this->tagged_pts) {
++      this->tagged_pts = ff_tag_pts (this, this->pts);
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
++      this->context->reordered_opaque = this->av_frame->reordered_opaque = this->tagged_pts;
++#endif
++#ifdef XFF_AVCODEC_FRAME_PTS
++      this->av_frame->pts = this->tagged_pts;
++#endif
+       this->pts = 0;
+     }
+ 
+@@ -2207,9 +2247,11 @@
+       img->top_field_first   = this->av_frame->top_field_first;
+ 
+       /* get back reordered pts */
+-      img->pts = ff_untag_pts (this, this->av_frame->reordered_opaque);
+-      this->av_frame->reordered_opaque = 0;
++      img->pts = ff_untag_pts (this, this->av_frame);
++      this->tagged_pts = 0;
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
+       this->context->reordered_opaque = 0;
++#endif
+ 
+       if (this->av_frame->repeat_pict)
+         img->duration = this->video_step * 3 / 2;
+@@ -2330,9 +2372,14 @@
+   }
+ 
+   if (this->size == 0) {
++    this->tagged_pts = ff_tag_pts (this, this->pts);
+     /* take over pts when we are about to buffer a frame */
+-    this->av_frame->reordered_opaque = ff_tag_pts(this, this->pts);
+-    this->context->reordered_opaque = ff_tag_pts(this, this->pts);
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
++    this->av_frame->reordered_opaque = this->context->reordered_opaque = this->tagged_pts;
++#endif
++#ifdef XFF_AVCODEC_FRAME_PTS
++    this->av_frame->pts = this->tagged_pts;
++#endif
+     this->pts = 0;
+   }
+ 
+@@ -2405,7 +2452,10 @@
+         need_unref = 1;
+ #endif
+         /* reset consumed pts value */
+-        this->context->reordered_opaque = ff_tag_pts(this, 0);
++        this->tagged_pts = ff_tag_pts (this, 0);
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
++        this->context->reordered_opaque = this->tagged_pts;
++#endif
+ 
+         if (err) {
+ 
+@@ -2439,10 +2489,14 @@
+             ff_check_bufsize(this, this->size);
+             memmove (this->buf, &chunk_buf[offset], this->size);
+             chunk_buf = this->buf;
+-
+             /* take over pts for next access unit */
+-            this->av_frame->reordered_opaque = ff_tag_pts(this, this->pts);
+-            this->context->reordered_opaque = ff_tag_pts(this, this->pts);
++            this->tagged_pts = ff_tag_pts (this, this->pts);
++#ifdef XFF_AVCODEC_REORDERED_OPAQUE
++            this->av_frame->reordered_opaque = this->context->reordered_opaque = this->tagged_pts;
++#endif
++#ifdef XFF_AVCODEC_FRAME_PTS
++            this->av_frame->pts = this->tagged_pts;
++#endif
+             this->pts = 0;
+           }
+         }
+@@ -2559,8 +2613,7 @@
+           ff_convert_frame(this, img, this->av_frame);
+         }
+ 
+-        img->pts  = ff_untag_pts(this, this->av_frame->reordered_opaque);
+-        this->av_frame->reordered_opaque = 0;
++        img->pts  = ff_untag_pts(this, this->av_frame);
+ 
+         /* workaround for weird 120fps streams */
+         if( video_step_to_use == 750 ) {
+@@ -2600,8 +2653,7 @@
+                                                 this->output_format,
+                                                 VO_BOTH_FIELDS|this->frame_flags);
+       /* set PTS to allow early syncing */
+-      img->pts       = ff_untag_pts(this, this->av_frame->reordered_opaque);
+-      this->av_frame->reordered_opaque = 0;
++      img->pts       = ff_untag_pts(this, this->av_frame);
+ 
+       img->duration  = video_step_to_use;
+ 
+@@ -2783,7 +2835,7 @@
+       ff_convert_frame (this, img, this->av_frame2);
+     }
+ 
+-    img->pts = ff_untag_pts (this, this->av_frame2->reordered_opaque);
++    img->pts = ff_untag_pts (this, this->av_frame2);
+ 
+     if (video_step_to_use == 750)
+       video_step_to_use = 0;
+@@ -2903,7 +2955,9 @@
+   if (this->decoder_ok) {
+ 
+     pthread_mutex_lock(&ffmpeg_lock);
+-    avcodec_close (this->context);
++    _x_freep (&this->context->extradata);
++    this->context->extradata_size = 0;
++    XFF_FREE_CONTEXT (this->context);
+     pthread_mutex_unlock(&ffmpeg_lock);
+ 
+ #ifdef ENABLE_DIRECT_RENDERING
+@@ -2912,16 +2966,15 @@
+ 
+     this->stream->video_out->close(this->stream->video_out, this->stream);
+     this->decoder_ok = 0;
++  } else if (this->context) {
++    _x_freep (&this->context->extradata);
++    this->context->extradata_size = 0;
++    XFF_FREE_CONTEXT (this->context);
+   }
+ 
+   if (this->slice_offset_table)
+     free (this->slice_offset_table);
+ 
+-  if (this->context) {
+-    _x_freep (&this->context->extradata);
+-    this->context->extradata_size = 0;
+-    XFF_FREE_CONTEXT (this->context);
+-  }
+ 
+ #if XFF_VIDEO > 1
+   XFF_PACKET_UNREF (this->avpkt);
+diff -r d1954d852980 -r 1e7b18400886 src/combined/ffmpeg/ffmpeg_compat.h
+--- a/src/combined/ffmpeg/ffmpeg_compat.h	Mon Apr 08 13:25:10 2024 +0200
++++ b/src/combined/ffmpeg/ffmpeg_compat.h	Mon May 06 21:55:55 2024 +0200
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2000-2022 the xine project
++ * Copyright (C) 2000-2024 the xine project
+  *
+  * This file is part of xine, a unix video player.
+  *
+@@ -54,9 +54,16 @@
+ #endif
+ 
+ /* reordered_opaque appeared in libavcodec 51.68.0 */
+-#define XFF_AVCODEC_REORDERED_OPAQUE
+-#if LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(51,68,0)
+-# undef XFF_AVCODEC_REORDERED_OPAQUE
++#if LIBAVCODEC_VERSION_INT >= XFF_INT_VERSION(51,68,0) && LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(60,0,0)
++#  define XFF_AVCODEC_REORDERED_OPAQUE
++#else
++#  undef XFF_AVCODEC_REORDERED_OPAQUE
++#endif
++
++#if LIBAVCODEC_VERSION_INT >= XFF_INT_VERSION(58,33,100)
++#  define XFF_AVCODEC_FRAME_PTS
++#else
++#  undef XFF_AVCODEC_FRAME_PTS
+ #endif
+ 
+ /* colorspace and color_range were added before 52.29.0 */
+@@ -210,9 +217,11 @@
+ #endif
+ 
+ #if LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(55,63,100)
+-#  define XFF_FREE_CONTEXT(pp) do {av_free(pp); pp = NULL;} while (0)
++#  define XFF_FREE_CONTEXT(pp) do {if (pp) avcodec_close (pp); av_free (pp); pp = NULL;} while (0)
++#elif LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(58,33,100)
++#  define XFF_FREE_CONTEXT(pp) do {if (pp) avcodec_close (pp); avcodec_free_context (&(pp));} while (0)
+ #else
+-#  define XFF_FREE_CONTEXT(pp) avcodec_free_context(&(pp))
++#  define XFF_FREE_CONTEXT(pp) avcodec_free_context (&(pp))
+ #endif
+ 
+ #if LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(54,59,100)
+@@ -303,4 +312,3 @@
+ #endif /* defined(LIBAVCODEC_VERSION_INT) */
+ 
+ #endif /* XINE_AVCODEC_COMPAT_H */
+-
+diff -r d1954d852980 -r 1e7b18400886 src/dxr3/ffmpeg_encoder.c
+--- a/src/dxr3/ffmpeg_encoder.c	Mon Apr 08 13:25:10 2024 +0200
++++ b/src/dxr3/ffmpeg_encoder.c	Mon May 06 21:55:55 2024 +0200
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2000-2022 the xine project
++ * Copyright (C) 2000-2024 the xine project
+  *
+  * This file is part of xine, a unix video player.
+  *
+@@ -127,10 +127,8 @@
+   unsigned char use_quantizer;
+ 
+   if (this->context) {
+-    avcodec_close(this->context);
+-    free(this->context);
++    XFF_FREE_CONTEXT (this->context);
+     free(this->picture);
+-    this->context = NULL;
+     this->picture = NULL;
+   }
+ 
+@@ -344,10 +342,8 @@
+ #if XFF_ENCVIDEO > 1
+     XFF_PACKET_UNREF (this->pkt);
+ #endif
+-    avcodec_close(this->context);
+     XFF_FREE_CONTEXT (this->context);
+     free(this->picture);
+-    this->context = NULL;
+     this->picture = NULL;
+   }
+   return 1;

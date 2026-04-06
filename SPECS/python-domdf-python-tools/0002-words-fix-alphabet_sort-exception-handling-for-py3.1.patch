@@ -1,0 +1,42 @@
+From 490be2c90b1d6e4da5b3828ab568071694153ebd Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Tue, 26 Aug 2025 17:04:47 -0500
+Subject: [PATCH 2/2] words: fix alphabet_sort exception handling for py3.14
+
+As of https://github.com/python/cpython/pull/121395, the format of the
+list.index exception has changed and parsing it like this no longer
+works. Relying on implementation details like this is always risky, so
+this solution should be more future-proof.
+---
+ domdf_python_tools/words.py | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/domdf_python_tools/words.py b/domdf_python_tools/words.py
+index d8bc36c..b26693a 100644
+--- a/domdf_python_tools/words.py
++++ b/domdf_python_tools/words.py
+@@ -171,14 +171,13 @@ def alpha_sort(
+ 
+ 	alphabet_ = list(alphabet)
+ 
+-	try:
+-		return sorted(iterable, key=lambda attr: [alphabet_.index(letter) for letter in attr], reverse=reverse)
+-	except ValueError as e:
+-		m = re.match(r"'(.*)' is not in list", str(e))
+-		if m:
+-			raise ValueError(f"The character {m.group(1)!r} was not found in the alphabet.") from None
+-		else:  # pragma: no cover
+-			raise e
++	def _alphabet_index(letter: str) -> int:
++		try:
++			return alphabet_.index(letter)
++		except ValueError:
++			raise ValueError(f"The character {letter!r} was not found in the alphabet.") from None
++
++	return sorted(iterable, key=lambda attr: [_alphabet_index(letter) for letter in attr], reverse=reverse)
+ 
+ 
+ class Font(Dict[str, str]):
+-- 
+2.51.0
+

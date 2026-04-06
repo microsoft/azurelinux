@@ -1,0 +1,46 @@
+From 94c7b0cf4713060ba74d9c36921576445ae0cffb Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 12 Jun 2024 14:50:09 -0700
+Subject: [PATCH] Adjust for _PyLong_AsByteArray signature change in Python
+ 3.13
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ src/params.cpp | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/params.cpp b/src/params.cpp
+index 6d3e6b4..089202a 100644
+--- a/src/params.cpp
++++ b/src/params.cpp
+@@ -247,8 +247,13 @@ static int PyToCType(Cursor *cur, unsigned char **outbuf, PyObject *cell, ParamI
+             pNum->precision = (SQLCHAR)pi->ColumnSize;
+             pNum->scale = (SQLCHAR)pi->DecimalDigits;
+             pNum->sign = _PyLong_Sign(cell) >= 0;
+-            if (_PyLong_AsByteArray((PyLongObject*)absVal, pNum->val, sizeof(pNum->val), 1, 0))
++#if PY_VERSION_HEX < 0x030D0000
++            if (_PyLong_AsByteArray((PyLongObject*)absVal, pNum->val, sizeof(pNum->val), 1, 0)) {
++#else
++            if (_PyLong_AsByteArray((PyLongObject*)absVal, pNum->val, sizeof(pNum->val), 1, 0, 1)) {
++#endif
+                 goto NumericOverflow;
++            }
+             Py_XDECREF(absVal);
+             *outbuf += pi->BufferLength;
+             ind = sizeof(SQL_NUMERIC_STRUCT);
+@@ -477,7 +482,12 @@ static int PyToCType(Cursor *cur, unsigned char **outbuf, PyObject *cell, ParamI
+         pNum->precision = (SQLCHAR)pi->ColumnSize;
+         pNum->scale = (SQLCHAR)pi->DecimalDigits;
+ 
++
++#if PY_VERSION_HEX < 0x030D0000
+         int ret = _PyLong_AsByteArray((PyLongObject*)digitLong, pNum->val, sizeof(pNum->val), 1, 0);
++#else
++        int ret = _PyLong_AsByteArray((PyLongObject*)digitLong, pNum->val, sizeof(pNum->val), 1, 0, 1);
++#endif
+         Py_XDECREF(digitLong);
+         if (ret)
+         {
+-- 
+2.45.2
+

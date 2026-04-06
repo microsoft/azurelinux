@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>jupyterlab.desktop</id>
+  <metadata_license>BSD-3-Clause</metadata_license>
+  <project_license>Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND (CC-BY-4.0 AND OFL-1.1 AND MIT) AND ISC AND MIT AND Unlicense</project_license>
+  <name>JupyterLab</name>
+  <summary>JupyterLab computational environment</summary>
+  <description>
+    <p>
+        JupyterLab is the next-generation user interface for Project Jupyter
+        offering all the familiar building blocks of the classic Jupyter
+        Notebook (notebook, terminal, text editor, file browser, rich outputs, etc.)
+        in a flexible and powerful user interface.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://jupyter.org/assets/homepage/labpreview.webp</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://jupyter.org/</url>
+  <update_contact>jupyter-maintainers@fedoraproject.org</update_contact>
+</component>

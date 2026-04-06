@@ -1,0 +1,13 @@
+--- glib-1.2.10/gthread/Makefile.am	2009-04-17 15:47:42.000000000 +0100
++++ glib-1.2.10/gthread/Makefile.am	2009-04-17 15:49:26.000000000 +0100
+@@ -20,8 +20,8 @@
+ 	-no-undefined -Wl,--no-undefined \
+ 	-export-dynamic
+ 
+-libgthread_la_DEPENDENCIES = $(libglib) $(top_builddir)/gmodule/libgmodule.la
+-libgthread_la_LIBADD = @G_THREAD_LIBS@ $(libglib) $(top_builddir)/gmodule/libgmodule.la
++libgthread_la_DEPENDENCIES = $(libglib)
++libgthread_la_LIBADD = @G_THREAD_LIBS@ $(libglib)
+ 
+ noinst_PROGRAMS = testgthread
+ testgthread_LDADD = libgthread.la 

@@ -1,0 +1,43 @@
+From: Robert Luberda <robert@debian.org>
+Date: Thu, 9 Feb 2006 19:35:25 +0100
+Subject: 020 man2html escape_N
+
+Add support for \N'n' groff sequences (closes: #348553).
+---
+ man2html/man2html.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 6e866f3..167a2bb 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -511,7 +511,7 @@ static int single_escape=0;
+ static char *
+ scan_escape(char *c) {
+     char *h=NULL;
+-    char b[5];
++    char b[10];
+     INTDEF *intd;
+     int exoutputp,exskipescape;
+     int i,j;
+@@ -661,6 +661,20 @@ scan_escape(char *c) {
+ 	output_possible=exoutputp;
+ 	skip_escape=exskipescape;
+ 	break;
++    case 'N':	
++	/* convert \N'ddd' into &#ddd; */
++	c++;
++	i=*c;
++	j=0;
++	b[j++] = '&';
++	b[j++] = '#';
++	while (*(++c) != i)
++	    if (isdigit(*c) && j < sizeof(b) - 2)
++		    b[j++] = *c;
++	b[j++] = ';';
++	b[j] = '\0';
++	h = b;
++	break;
+     case 'c': no_newline_output=1; break;
+     case '{': newline_for_fun++; h="";break;
+     case '}': if (newline_for_fun) newline_for_fun--; h="";break;

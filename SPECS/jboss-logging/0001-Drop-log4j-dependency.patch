@@ -1,0 +1,949 @@
+From a9ef03521b65e6f94637a8bfba86d10d7c842084 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Mon, 17 Jun 2024 20:52:24 +0100
+Subject: [PATCH 1/2] Drop log4j dependency
+
+---
+ pom.xml                                       |  31 ----
+ .../java/org/jboss/logging/Log4j2Logger.java  |  99 -----------
+ .../jboss/logging/Log4j2LoggerProvider.java   | 102 ------------
+ .../java/org/jboss/logging/Log4jLogger.java   |  82 ---------
+ .../jboss/logging/Log4jLoggerProvider.java    | 105 ------------
+ .../org/jboss/logging/LoggerProviders.java    |  36 ----
+ .../logging/Log4j2ClassPathTestCase.java      |  30 ----
+ .../jboss/logging/Log4j2ProviderTestCase.java | 155 ------------------
+ .../jboss/logging/Log4jClassPathTestCase.java |  30 ----
+ .../jboss/logging/Log4jProviderTestCase.java  | 138 ----------------
+ 10 files changed, 808 deletions(-)
+ delete mode 100644 src/main/java/org/jboss/logging/Log4j2Logger.java
+ delete mode 100644 src/main/java/org/jboss/logging/Log4j2LoggerProvider.java
+ delete mode 100644 src/main/java/org/jboss/logging/Log4jLogger.java
+ delete mode 100644 src/main/java/org/jboss/logging/Log4jLoggerProvider.java
+ delete mode 100644 src/test/java/org/jboss/logging/Log4j2ClassPathTestCase.java
+ delete mode 100644 src/test/java/org/jboss/logging/Log4j2ProviderTestCase.java
+ delete mode 100644 src/test/java/org/jboss/logging/Log4jClassPathTestCase.java
+ delete mode 100644 src/test/java/org/jboss/logging/Log4jProviderTestCase.java
+
+diff --git a/pom.xml b/pom.xml
+index 35f65aa..76bcbfb 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -56,8 +56,6 @@
+         <!-- Dependency versions -->
+         <version.ch.qos.logback>1.5.6</version.ch.qos.logback>
+         <version.module-info>2.1</version.module-info>
+-        <version.org.apache.log4j>1.2.17</version.org.apache.log4j>
+-        <version.org.apache.logging.log4j>2.23.1</version.org.apache.logging.log4j>
+         <version.org.jboss.logmanager>3.0.6.Final</version.org.jboss.logmanager>
+         <version.org.junit>5.10.2</version.org.junit>
+         <version.org.sfl4j>2.0.12</version.org.sfl4j>
+@@ -88,28 +86,6 @@
+             <version>${version.org.jboss.logmanager}</version>
+             <scope>provided</scope>
+         </dependency>
+-        <dependency>
+-            <groupId>log4j</groupId>
+-            <artifactId>log4j</artifactId>
+-            <version>${version.org.apache.log4j}</version>
+-            <scope>provided</scope>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>com.sun.jdmk</groupId>
+-                    <artifactId>jmxtools</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>com.sun.jmx</groupId>
+-                    <artifactId>jmxri</artifactId>
+-                </exclusion>
+-            </exclusions>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.apache.logging.log4j</groupId>
+-            <artifactId>log4j-api</artifactId>
+-            <version>${version.org.apache.logging.log4j}</version>
+-            <scope>provided</scope>
+-        </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-api</artifactId>
+@@ -129,12 +105,6 @@
+             <version>${version.ch.qos.logback}</version>
+             <scope>test</scope>
+         </dependency>
+-        <dependency>
+-            <groupId>org.apache.logging.log4j</groupId>
+-            <artifactId>log4j-core</artifactId>
+-            <version>${version.org.apache.logging.log4j}</version>
+-            <scope>test</scope>
+-        </dependency>
+     </dependencies>
+ 
+     <build>
+@@ -349,7 +319,6 @@
+                             ${project.groupId}.*;version=${project.version};-split-package:=error
+                         </Export-Package>
+                         <Import-Package>
+-                            org.apache.log4j.config;resolution:=optional,
+                             *;resolution:=optional
+                         </Import-Package>
+                     </instructions>
+diff --git a/src/main/java/org/jboss/logging/Log4j2Logger.java b/src/main/java/org/jboss/logging/Log4j2Logger.java
+deleted file mode 100644
+index 4dc2fed..0000000
+--- a/src/main/java/org/jboss/logging/Log4j2Logger.java
++++ /dev/null
+@@ -1,99 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.LoggingException;
+-import org.apache.logging.log4j.message.MessageFormatMessageFactory;
+-import org.apache.logging.log4j.message.StringFormattedMessage;
+-import org.apache.logging.log4j.spi.AbstractLogger;
+-
+-final class Log4j2Logger extends Logger {
+-
+-    private static final long serialVersionUID = -2507841068232627725L;
+-
+-    private final AbstractLogger logger;
+-    private final MessageFormatMessageFactory messageFactory;
+-
+-    Log4j2Logger(final String name) {
+-        super(name);
+-        org.apache.logging.log4j.Logger logger = LogManager.getLogger(name);
+-        if (!(logger instanceof AbstractLogger)) {
+-            throw new LoggingException("The logger for [" + name + "] does not extend AbstractLogger. Actual logger: "
+-                    + logger.getClass().getName());
+-        }
+-        this.logger = (AbstractLogger) logger;
+-        this.messageFactory = new MessageFormatMessageFactory();
+-    }
+-
+-    @Override
+-    public boolean isEnabled(final Level level) {
+-        return this.logger.isEnabled(Log4j2Logger.translate(level));
+-    }
+-
+-    @Override
+-    protected void doLog(final Level level, final String loggerClassName, final Object message, final Object[] parameters,
+-            final Throwable thrown) {
+-        final org.apache.logging.log4j.Level translatedLevel = Log4j2Logger.translate(level);
+-        if (this.logger.isEnabled(translatedLevel)) {
+-            try {
+-                this.logger.logMessage(loggerClassName, translatedLevel, null,
+-                        (parameters == null || parameters.length == 0) ? this.messageFactory.newMessage(String.valueOf(message))
+-                                : this.messageFactory.newMessage(String.valueOf(message), parameters),
+-                        thrown);
+-            } catch (Throwable ignored) {
+-            }
+-        }
+-    }
+-
+-    @Override
+-    protected void doLogf(final Level level, final String loggerClassName, final String format, final Object[] parameters,
+-            final Throwable thrown) {
+-        final org.apache.logging.log4j.Level translatedLevel = Log4j2Logger.translate(level);
+-        if (this.logger.isEnabled(translatedLevel)) {
+-            try {
+-                this.logger.logMessage(loggerClassName, translatedLevel, null, new StringFormattedMessage(format, parameters),
+-                        thrown);
+-            } catch (Throwable ignored) {
+-            }
+-        }
+-    }
+-
+-    private static org.apache.logging.log4j.Level translate(final Level level) {
+-        if (level == Level.TRACE) {
+-            return org.apache.logging.log4j.Level.TRACE;
+-        } else if (level == Level.DEBUG) {
+-            return org.apache.logging.log4j.Level.DEBUG;
+-        }
+-        return infoOrHigher(level);
+-    }
+-
+-    private static org.apache.logging.log4j.Level infoOrHigher(final Level level) {
+-        if (level == Level.INFO) {
+-            return org.apache.logging.log4j.Level.INFO;
+-        } else if (level == Level.WARN) {
+-            return org.apache.logging.log4j.Level.WARN;
+-        } else if (level == Level.ERROR) {
+-            return org.apache.logging.log4j.Level.ERROR;
+-        } else if (level == Level.FATAL) {
+-            return org.apache.logging.log4j.Level.FATAL;
+-        }
+-        return org.apache.logging.log4j.Level.ALL;
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/Log4j2LoggerProvider.java b/src/main/java/org/jboss/logging/Log4j2LoggerProvider.java
+deleted file mode 100644
+index b9109be..0000000
+--- a/src/main/java/org/jboss/logging/Log4j2LoggerProvider.java
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.util.HashMap;
+-import java.util.Map;
+-
+-import org.apache.logging.log4j.ThreadContext;
+-
+-/**
+- * An implementation of the {@linkplain LoggerProvider log provider} for Log4j 2.
+- * <p>
+- * This binds to the Log4j 2 API and does not require a specific implementation of the Log4j 2 API.
+- * </p>
+- */
+-public final class Log4j2LoggerProvider implements LoggerProvider {
+-
+-    @Override
+-    public Log4j2Logger getLogger(String name) {
+-        return new Log4j2Logger(name);
+-    }
+-
+-    @Override
+-    public void clearMdc() {
+-        ThreadContext.clearMap();
+-    }
+-
+-    @Override
+-    public Object putMdc(String key, Object value) {
+-        try {
+-            return ThreadContext.get(key);
+-        } finally {
+-            ThreadContext.put(key, String.valueOf(value));
+-        }
+-    }
+-
+-    @Override
+-    public Object getMdc(String key) {
+-        return ThreadContext.get(key);
+-    }
+-
+-    @Override
+-    public void removeMdc(String key) {
+-        ThreadContext.remove(key);
+-    }
+-
+-    @Override
+-    public Map<String, Object> getMdcMap() {
+-        return new HashMap<>(ThreadContext.getImmutableContext());
+-    }
+-
+-    @Override
+-    public void clearNdc() {
+-        ThreadContext.clearStack();
+-    }
+-
+-    @Override
+-    public String getNdc() {
+-        return ThreadContext.peek();
+-    }
+-
+-    @Override
+-    public int getNdcDepth() {
+-        return ThreadContext.getDepth();
+-    }
+-
+-    @Override
+-    public String popNdc() {
+-        return ThreadContext.pop();
+-    }
+-
+-    @Override
+-    public String peekNdc() {
+-        return ThreadContext.peek();
+-    }
+-
+-    @Override
+-    public void pushNdc(String message) {
+-        ThreadContext.push(message);
+-    }
+-
+-    @Override
+-    public void setNdcMaxDepth(int maxDepth) {
+-        ThreadContext.trim(maxDepth);
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/Log4jLogger.java b/src/main/java/org/jboss/logging/Log4jLogger.java
+deleted file mode 100644
+index 8d9128d..0000000
+--- a/src/main/java/org/jboss/logging/Log4jLogger.java
++++ /dev/null
+@@ -1,82 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.text.MessageFormat;
+-
+-final class Log4jLogger extends Logger {
+-
+-    private static final long serialVersionUID = -5446154366955151335L;
+-
+-    private final org.apache.log4j.Logger logger;
+-
+-    Log4jLogger(final String name) {
+-        super(name);
+-        logger = org.apache.log4j.Logger.getLogger(name);
+-    }
+-
+-    public boolean isEnabled(final Level level) {
+-        final org.apache.log4j.Level l = translate(level);
+-        return logger.isEnabledFor(l) && l.isGreaterOrEqual(logger.getEffectiveLevel());
+-    }
+-
+-    protected void doLog(final Level level, final String loggerClassName, final Object message, final Object[] parameters,
+-            final Throwable thrown) {
+-        final org.apache.log4j.Level translatedLevel = translate(level);
+-        if (logger.isEnabledFor(translatedLevel))
+-            try {
+-                logger.log(loggerClassName, translatedLevel, parameters == null || parameters.length == 0 ? message
+-                        : MessageFormat.format(String.valueOf(message), parameters), thrown);
+-            } catch (Throwable ignored) {
+-            }
+-    }
+-
+-    protected void doLogf(final Level level, final String loggerClassName, final String format, final Object[] parameters,
+-            final Throwable thrown) {
+-        final org.apache.log4j.Level translatedLevel = translate(level);
+-        if (logger.isEnabledFor(translatedLevel))
+-            try {
+-                logger.log(loggerClassName, translatedLevel,
+-                        parameters == null ? String.format(format) : String.format(format, parameters), thrown);
+-            } catch (Throwable ignored) {
+-            }
+-    }
+-
+-    private static org.apache.log4j.Level translate(final Level level) {
+-        if (level == Level.TRACE) {
+-            return org.apache.log4j.Level.TRACE;
+-        } else if (level == Level.DEBUG) {
+-            return org.apache.log4j.Level.DEBUG;
+-        }
+-        return infoOrHigher(level);
+-    }
+-
+-    private static org.apache.log4j.Level infoOrHigher(final Level level) {
+-        if (level == Level.INFO) {
+-            return org.apache.log4j.Level.INFO;
+-        } else if (level == Level.WARN) {
+-            return org.apache.log4j.Level.WARN;
+-        } else if (level == Level.ERROR) {
+-            return org.apache.log4j.Level.ERROR;
+-        } else if (level == Level.FATAL) {
+-            return org.apache.log4j.Level.FATAL;
+-        }
+-        return org.apache.log4j.Level.ALL;
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/Log4jLoggerProvider.java b/src/main/java/org/jboss/logging/Log4jLoggerProvider.java
+deleted file mode 100644
+index 9bb0c74..0000000
+--- a/src/main/java/org/jboss/logging/Log4jLoggerProvider.java
++++ /dev/null
+@@ -1,105 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.util.Collections;
+-import java.util.Map;
+-
+-import org.apache.log4j.MDC;
+-import org.apache.log4j.NDC;
+-
+-/**
+- * An implementation of the {@linkplain LoggerProvider log provider} for log4j.
+- * <p>
+- * Please note that log4j reached end of life on August 5, 2015. Prefer using a log manager and provider.
+- * </p>
+- */
+-public final class Log4jLoggerProvider implements LoggerProvider {
+-
+-    @Override
+-    public Logger getLogger(final String name) {
+-        return new Log4jLogger("".equals(name) ? "ROOT" : name);
+-    }
+-
+-    @Override
+-    public void clearMdc() {
+-        MDC.clear();
+-    }
+-
+-    @Override
+-    public Object getMdc(String key) {
+-        return MDC.get(key);
+-    }
+-
+-    @Override
+-    public Map<String, Object> getMdcMap() {
+-        @SuppressWarnings("unchecked")
+-        final Map<String, Object> map = MDC.getContext();
+-        return map == null ? Collections.emptyMap() : map;
+-    }
+-
+-    @Override
+-    public Object putMdc(String key, Object val) {
+-        try {
+-            return MDC.get(key);
+-        } finally {
+-            MDC.put(key, val);
+-        }
+-    }
+-
+-    @Override
+-    public void removeMdc(String key) {
+-        MDC.remove(key);
+-    }
+-
+-    @Override
+-    public void clearNdc() {
+-        NDC.remove();
+-    }
+-
+-    @Override
+-    public String getNdc() {
+-        return NDC.get();
+-    }
+-
+-    @Override
+-    public int getNdcDepth() {
+-        return NDC.getDepth();
+-    }
+-
+-    @Override
+-    public String peekNdc() {
+-        return NDC.peek();
+-    }
+-
+-    @Override
+-    public String popNdc() {
+-        return NDC.pop();
+-    }
+-
+-    @Override
+-    public void pushNdc(String message) {
+-        NDC.push(message);
+-    }
+-
+-    @Override
+-    public void setNdcMaxDepth(int maxDepth) {
+-        NDC.setMaxDepth(maxDepth);
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/LoggerProviders.java b/src/main/java/org/jboss/logging/LoggerProviders.java
+index 08c16ce..584fa79 100644
+--- a/src/main/java/org/jboss/logging/LoggerProviders.java
++++ b/src/main/java/org/jboss/logging/LoggerProviders.java
+@@ -45,10 +45,6 @@ final class LoggerProviders {
+                     return tryJBossLogManager(cl, "system property");
+                 } else if ("jdk".equalsIgnoreCase(loggerProvider)) {
+                     return tryJDK("system property");
+-                } else if ("log4j2".equalsIgnoreCase(loggerProvider)) {
+-                    return tryLog4j2(cl, "system property");
+-                } else if ("log4j".equalsIgnoreCase(loggerProvider)) {
+-                    return tryLog4j(cl, "system property");
+                 } else if ("slf4j".equalsIgnoreCase(loggerProvider)) {
+                     return trySlf4j("system property");
+                 }
+@@ -81,11 +77,6 @@ final class LoggerProviders {
+         } catch (Throwable t) {
+             // nope...
+         }
+-        try {
+-            return tryLog4j2(cl, null);
+-        } catch (Throwable t) {
+-            // nope...
+-        }
+         try {
+             // only use slf4j if Logback is in use
+             Class.forName("ch.qos.logback.classic.Logger", false, cl);
+@@ -93,12 +84,6 @@ final class LoggerProviders {
+         } catch (Throwable t) {
+             // nope...
+         }
+-        try {
+-            // log4j has been EOL'd since 2015. It should be checked last.
+-            return tryLog4j(cl, null);
+-        } catch (Throwable t) {
+-            // nope...
+-        }
+         return tryJDK(null);
+     }
+ 
+@@ -114,27 +99,6 @@ final class LoggerProviders {
+         return provider;
+     }
+ 
+-    // JBLOGGING-95 - Add support for Log4j 2.x
+-    private static LoggerProvider tryLog4j2(final ClassLoader cl, final String via) throws ClassNotFoundException {
+-        Class.forName("org.apache.logging.log4j.Logger", true, cl);
+-        Class.forName("org.apache.logging.log4j.LogManager", true, cl);
+-        Class.forName("org.apache.logging.log4j.spi.AbstractLogger", true, cl);
+-        LoggerProvider provider = new Log4j2LoggerProvider();
+-        // if Log4j 2 has a bad implementation that doesn't extend AbstractLogger, we won't know until getting the first logger throws an exception
+-        logProvider(provider, via);
+-        return provider;
+-    }
+-
+-    private static LoggerProvider tryLog4j(final ClassLoader cl, final String via) throws ClassNotFoundException {
+-        Class.forName("org.apache.log4j.LogManager", true, cl);
+-        // JBLOGGING-65 - slf4j can disguise itself as log4j.  Test for a class that slf4j doesn't provide.
+-        // JBLOGGING-94 - JBoss Logging does not detect org.apache.logging.log4j:log4j-1.2-api:2.0
+-        Class.forName("org.apache.log4j.config.PropertySetter", true, cl);
+-        final LoggerProvider provider = new Log4jLoggerProvider();
+-        logProvider(provider, via);
+-        return provider;
+-    }
+-
+     private static LoggerProvider tryJBossLogManager(final ClassLoader cl, final String via) throws ClassNotFoundException {
+         final Class<? extends LogManager> logManagerClass = LogManager.getLogManager().getClass();
+         final Class<?> jblLogManager = Class.forName("org.jboss.logmanager.LogManager", false,
+diff --git a/src/test/java/org/jboss/logging/Log4j2ClassPathTestCase.java b/src/test/java/org/jboss/logging/Log4j2ClassPathTestCase.java
+deleted file mode 100644
+index 88f05f4..0000000
+--- a/src/test/java/org/jboss/logging/Log4j2ClassPathTestCase.java
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class Log4j2ClassPathTestCase extends AbstractClassPathTestCase {
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return Log4j2Logger.class;
+-    }
+-}
+diff --git a/src/test/java/org/jboss/logging/Log4j2ProviderTestCase.java b/src/test/java/org/jboss/logging/Log4j2ProviderTestCase.java
+deleted file mode 100644
+index 63aa43c..0000000
+--- a/src/test/java/org/jboss/logging/Log4j2ProviderTestCase.java
++++ /dev/null
+@@ -1,155 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.io.Serializable;
+-import java.util.concurrent.BlockingQueue;
+-import java.util.concurrent.LinkedBlockingQueue;
+-
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.ThreadContext;
+-import org.apache.logging.log4j.core.Filter;
+-import org.apache.logging.log4j.core.Layout;
+-import org.apache.logging.log4j.core.LogEvent;
+-import org.apache.logging.log4j.core.LoggerContext;
+-import org.apache.logging.log4j.core.appender.AbstractAppender;
+-import org.apache.logging.log4j.core.config.Configuration;
+-import org.apache.logging.log4j.core.config.plugins.Plugin;
+-import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+-import org.apache.logging.log4j.core.config.plugins.PluginElement;
+-import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+-import org.apache.logging.log4j.core.layout.PatternLayout;
+-import org.junit.jupiter.api.Assertions;
+-import org.junit.jupiter.api.BeforeAll;
+-import org.junit.jupiter.api.BeforeEach;
+-import org.junit.jupiter.api.Test;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class Log4j2ProviderTestCase extends AbstractLoggerTestCase {
+-    private TestAppender appender;
+-    private Logger logger;
+-
+-    @BeforeAll
+-    public static void setup() {
+-        System.setProperty("org.jboss.logging.provider", "log4j2");
+-    }
+-
+-    @BeforeEach
+-    public void setupLogContext() {
+-        logger = Logger.getLogger(getClass());
+-        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+-        final Configuration config = ctx.getConfiguration();
+-        appender = (TestAppender) config.getAppenders().get("TestAppender");
+-    }
+-
+-    @Test
+-    public void testMdc() {
+-        MDC.put("test.key", "value");
+-        Assertions.assertEquals("value", MDC.get("test.key"));
+-        Assertions.assertEquals("value", ThreadContext.get("test.key"));
+-    }
+-
+-    @Test
+-    public void testNdc() {
+-        NDC.push("value1");
+-        NDC.push("value2");
+-        Assertions.assertEquals("value2", NDC.peek());
+-        // TODO (jrp) This is a weird case we should validate. NDC.get() does ThreadContext.peek() which doesn't seem
+-        // TODO (jrp) correct. The method should likely do ThreadContext.getImmutableStack().toString(). At least that
+-        // TODO (jrp) is what the NdcPatternConverter does.
+-        //Assertions.assertEquals("[value1, value2]", NDC.get());
+-        Assertions.assertEquals(2, NDC.getDepth());
+-
+-        // Test the log manager values
+-        Assertions.assertEquals("[value1, value2]", ThreadContext.getImmutableStack().toString());
+-        Assertions.assertEquals(2, ThreadContext.getDepth());
+-
+-        // Pop the stack
+-        Assertions.assertEquals("value2", NDC.pop());
+-        Assertions.assertEquals(1, NDC.getDepth());
+-        Assertions.assertEquals("value1", NDC.get());
+-        Assertions.assertEquals("value1", ThreadContext.peek());
+-        Assertions.assertEquals(1, ThreadContext.getDepth());
+-    }
+-
+-    @Override
+-    void testLog(final Logger.Level level) {
+-        final String msg = String.format("Test log message at %s", level);
+-        logger.log(level, msg);
+-
+-        Assertions.assertTrue(logger.isEnabled(level), String.format("Logger not enabled for level %s", level));
+-        testLog(msg, level);
+-    }
+-
+-    @Override
+-    void testLog(final String msg, final Logger.Level level) {
+-        final LogEvent event = appender.queue.poll();
+-        Assertions.assertNotNull(event, String.format("No record found for %s", level));
+-        Assertions.assertEquals(level.name(), event.getLevel().toString());
+-        Assertions.assertEquals(msg, event.getMessage().getFormattedMessage());
+-    }
+-
+-    @Override
+-    Logger getLogger() {
+-        return logger;
+-    }
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return Log4j2Logger.class;
+-    }
+-
+-    @SuppressWarnings("unused")
+-    @Plugin(name = "TestAppender", category = "Core", elementType = "appender", printObject = true)
+-    public static class TestAppender extends AbstractAppender {
+-        final BlockingQueue<LogEvent> queue = new LinkedBlockingQueue<>();
+-
+-        protected TestAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
+-            super(name, filter, layout, false, null);
+-        }
+-
+-        @Override
+-        public void append(final LogEvent event) {
+-            queue.add(event.toImmutable());
+-        }
+-
+-        @Override
+-        public void stop() {
+-            queue.clear();
+-            super.stop();
+-        }
+-
+-        @PluginFactory
+-        public static TestAppender createAppender(@PluginAttribute("name") String name,
+-                @PluginElement("Layout") Layout<? extends Serializable> layout,
+-                @PluginElement("Filter") final Filter filter,
+-                @PluginAttribute("otherAttribute") String otherAttribute) {
+-            if (name == null) {
+-                LOGGER.error("No name provided for TestAppender");
+-                return null;
+-            }
+-            if (layout == null) {
+-                layout = PatternLayout.createDefaultLayout();
+-            }
+-            return new TestAppender(name, filter, layout);
+-        }
+-    }
+-}
+diff --git a/src/test/java/org/jboss/logging/Log4jClassPathTestCase.java b/src/test/java/org/jboss/logging/Log4jClassPathTestCase.java
+deleted file mode 100644
+index 9647fe8..0000000
+--- a/src/test/java/org/jboss/logging/Log4jClassPathTestCase.java
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class Log4jClassPathTestCase extends AbstractClassPathTestCase {
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return Log4jLogger.class;
+-    }
+-}
+diff --git a/src/test/java/org/jboss/logging/Log4jProviderTestCase.java b/src/test/java/org/jboss/logging/Log4jProviderTestCase.java
+deleted file mode 100644
+index cb2fe9d..0000000
+--- a/src/test/java/org/jboss/logging/Log4jProviderTestCase.java
++++ /dev/null
+@@ -1,138 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.util.concurrent.BlockingQueue;
+-import java.util.concurrent.LinkedBlockingQueue;
+-
+-import org.apache.log4j.AppenderSkeleton;
+-import org.apache.log4j.Level;
+-import org.apache.log4j.spi.LoggingEvent;
+-import org.junit.jupiter.api.AfterEach;
+-import org.junit.jupiter.api.Assertions;
+-import org.junit.jupiter.api.BeforeAll;
+-import org.junit.jupiter.api.BeforeEach;
+-import org.junit.jupiter.api.Test;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class Log4jProviderTestCase extends AbstractLoggerTestCase {
+-    private TestAppender appender;
+-    private Logger logger;
+-
+-    @BeforeAll
+-    public static void setup() {
+-        System.setProperty("org.jboss.logging.provider", "log4j");
+-    }
+-
+-    @BeforeEach
+-    public void setupLogContext() {
+-        logger = Logger.getLogger(getClass());
+-        appender = createAppender(logger.getName());
+-    }
+-
+-    @AfterEach
+-    public void removeAppender() {
+-        org.apache.log4j.Logger.getLogger(logger.getName()).removeAppender(appender);
+-        appender.close();
+-    }
+-
+-    @Test
+-    public void testMdc() {
+-        AssumeUtil.assumeNotJavaEa();
+-        MDC.put("test.key", "value");
+-        Assertions.assertEquals("value", MDC.get("test.key"));
+-        Assertions.assertEquals("value", org.apache.log4j.MDC.get("test.key"));
+-    }
+-
+-    @Test
+-    public void testNdc() {
+-        NDC.push("value1");
+-        NDC.push("value2");
+-        Assertions.assertEquals("value2", NDC.peek());
+-        Assertions.assertEquals("value1 value2", NDC.get());
+-        Assertions.assertEquals(2, NDC.getDepth());
+-
+-        // Test the log manager values
+-        Assertions.assertEquals("value1 value2", org.apache.log4j.NDC.get());
+-        Assertions.assertEquals(2, org.apache.log4j.NDC.getDepth());
+-
+-        // Pop the stack
+-        Assertions.assertEquals("value2", NDC.pop());
+-        Assertions.assertEquals(1, NDC.getDepth());
+-        Assertions.assertEquals("value1", NDC.get());
+-        Assertions.assertEquals("value1", org.apache.log4j.NDC.get());
+-        Assertions.assertEquals(1, org.apache.log4j.NDC.getDepth());
+-    }
+-
+-    @Override
+-    void testLog(final Logger.Level level) {
+-        final String msg = String.format("Test log message at %s", level);
+-        logger.log(level, msg);
+-
+-        Assertions.assertTrue(logger.isEnabled(level), String.format("Logger not enabled for level %s", level));
+-        testLog(msg, level);
+-    }
+-
+-    @Override
+-    void testLog(final String msg, final Logger.Level level) {
+-        final LoggingEvent event = appender.queue.poll();
+-        Assertions.assertNotNull(event, String.format("No record found for %s", level));
+-        Assertions.assertEquals(level.name(), event.getLevel().toString());
+-        Assertions.assertEquals(msg, event.getMessage());
+-    }
+-
+-    @Override
+-    Logger getLogger() {
+-        return logger;
+-    }
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return Log4jLogger.class;
+-    }
+-
+-    private static TestAppender createAppender(final String loggerName) {
+-        final TestAppender appender = new TestAppender();
+-        final org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger(loggerName);
+-        log4jLogger.addAppender(appender);
+-        log4jLogger.setLevel(Level.ALL);
+-        return appender;
+-    }
+-
+-    private static class TestAppender extends AppenderSkeleton {
+-        final BlockingQueue<LoggingEvent> queue = new LinkedBlockingQueue<>();
+-
+-        @Override
+-        protected void append(final LoggingEvent loggingEvent) {
+-            queue.add(loggingEvent);
+-        }
+-
+-        @Override
+-        public void close() throws SecurityException {
+-            queue.clear();
+-        }
+-
+-        @Override
+-        public boolean requiresLayout() {
+-            return false;
+-        }
+-    }
+-}
+-- 
+2.44.0
+

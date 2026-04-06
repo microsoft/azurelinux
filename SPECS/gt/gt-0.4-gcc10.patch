@@ -1,0 +1,11 @@
+diff -up gt-0.4/src/playmidi.c~ gt-0.4/src/playmidi.c
+--- gt-0.4/src/playmidi.c~	2004-11-18 21:36:17.000000000 +0100
++++ gt-0.4/src/playmidi.c	2020-03-06 23:23:58.056972233 +0100
+@@ -3140,7 +3140,6 @@ static int xmp_epoch = -1;
+ static unsigned xxmp_epoch = 0;
+ static unsigned time_expired = 0;
+ static unsigned last_time_expired = 0;
+-extern int gettimeofday (struct timeval *, struct timezone *);
+ static struct timeval tv;
+ static struct timezone tz;
+ static void

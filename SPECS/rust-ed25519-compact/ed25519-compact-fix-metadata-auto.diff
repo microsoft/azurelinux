@@ -1,0 +1,22 @@
+--- ed25519-compact-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ed25519-compact-2.2.0/Cargo.toml	2025-12-12T19:19:53.194919+00:00
+@@ -71,18 +71,10 @@
+ [dev-dependencies.ct-codecs]
+ version = "1.1"
+ 
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies.getrandom]
+-version = "0.3"
+-features = ["wasm_js"]
+-optional = true
+-
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies.getrandom]
+-version = "0.3"
+-features = ["wasm_js"]
+-
+ [target.'cfg(not(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown")))'.dependencies.getrandom]
+ version = "0.3"
+ optional = true
+ 
+ [target.'cfg(not(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown")))'.dev-dependencies.getrandom]
+ version = "0.3"
++

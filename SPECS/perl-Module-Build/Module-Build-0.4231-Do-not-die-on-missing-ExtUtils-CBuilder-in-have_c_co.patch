@@ -1,0 +1,39 @@
+From 043add527dd6bc05d5ef5750839ab21c2fdab9e6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 28 Mar 2022 11:18:38 +0200
+Subject: [PATCH] Do not die on missing ExtUtils::CBuilder in have_c_compiler()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In Fedora, ExtUtils::CBuilder is optional to allow installing perl
+without gcc (bug #1547165). Module::Build::have_c_compiler() uses
+ExtUtils::CBuilder to detect a presence of a C compiler. If
+ExtUtils::CBuilder was not installed, have_c_compiler() died instead
+of returning a false value.
+
+This error manifested in perl-Alien-Base-ModuleBuild tests. This patch
+changes have_c_compiler() to return true if ExtUtils::CBuilder is not
+available.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/Module/Build/Base.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Module/Build/Base.pm b/lib/Module/Build/Base.pm
+index 1352fcf..4e0f843 100644
+--- a/lib/Module/Build/Base.pm
++++ b/lib/Module/Build/Base.pm
+@@ -5315,7 +5315,7 @@ sub have_c_compiler {
+   return $p->{_have_c_compiler} if defined $p->{_have_c_compiler};
+ 
+   $self->log_verbose("Checking if compiler tools configured... ");
+-  my $b = $self->cbuilder;
++  my $b = eval { $self->cbuilder };
+   my $have = $b && eval { $b->have_compiler };
+   $self->log_verbose($have ? "ok.\n" : "failed.\n");
+   return $p->{_have_c_compiler} = $have;
+-- 
+2.34.1
+

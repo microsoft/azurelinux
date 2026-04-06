@@ -1,0 +1,86 @@
+From 8a186b2754997ed35f8a88d11457699517dd737c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 21 Jun 2013 13:01:55 +0200
+Subject: [PATCH] Allow CVS server to use any Kerberos key with cvs service
+ name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This removes restriction for host to be equalled to local hostname.
+Previous pinning to hostname prevented from deploying multiple
+instances of a CVS server into a cluster where each node has different
+hostname.
+
+<https://bugzilla.redhat.com/show_bug.cgi?id=671460>
+<https://bugzilla.redhat.com/show_bug.cgi?id=722972>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ doc/cvs.texinfo |  8 ++++----
+ src/server.c    | 19 +++----------------
+ 2 files changed, 7 insertions(+), 20 deletions(-)
+
+diff --git a/doc/cvs.texinfo b/doc/cvs.texinfo
+index ad3a414..3c7796a 100644
+--- a/doc/cvs.texinfo
++++ b/doc/cvs.texinfo
+@@ -2771,10 +2771,10 @@ an empty @file{CVSROOT/passwd} password file, and set
+ @code{SystemAuth=no} in the config file
+ (@pxref{config}).
+ 
+-The GSSAPI server uses a principal name of
+-cvs/@var{hostname}, where @var{hostname} is the
+-canonical name of the server host.  You will have to
+-set this up as required by your GSSAPI mechanism.
++The GSSAPI server uses a principal name of cvs/@var{hostname}, where
++@var{hostname} can be any name.  There is no restriction to canonical
++hostname to allow DNS load-balanced clusters.  It assumes your GSSAPI
++mechanism can select a key with a host name matching client's request.
+ 
+ To connect using GSSAPI, use the @samp{:gserver:} method.  For
+ example,
+diff --git a/src/server.c b/src/server.c
+index 0505ab9..586b5da 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -6168,9 +6168,7 @@ error 0 kerberos: can't get local name: %s\n", krb_get_err_text(status));
+ static void
+ gserver_authenticate_connection ()
+ {
+-    char hostname[MAXHOSTNAMELEN];
+     char hbuf[1025];
+-    struct addrinfo hints, *res0;
+     gss_buffer_desc tok_in, tok_out;
+     char buf[1024];
+     char *credbuf;
+@@ -6181,23 +6179,12 @@ gserver_authenticate_connection ()
+     int nbytes;
+     gss_OID mechid;
+ 
+-    gethostname (hostname, sizeof hostname);
+-    hostname[sizeof(hostname)-1] = '\0';
+-    memset (&hints, 0, sizeof(hints));
+-    hints.ai_family = af;
+-    hints.ai_socktype = SOCK_STREAM;
+-    hints.ai_flags = AI_CANONNAME;
+-    if (getaddrinfo (hostname, NULL, &hints, &res0))
+-	error (1, 0, "can't get canonical hostname");
+-
+-    sprintf (buf, "cvs@%s", res0->ai_canonname);
+-    freeaddrinfo (res0);
+-    tok_in.value = buf;
+-    tok_in.length = strlen (buf);
++    tok_in.value = "cvs";
++    tok_in.length = strlen (tok_in.value);
+ 
+     if (gss_import_name (&stat_min, &tok_in, GSS_C_NT_HOSTBASED_SERVICE,
+ 			 &server_name) != GSS_S_COMPLETE)
+-	error (1, 0, "could not import GSSAPI service name %s", buf);
++	error (1, 0, "could not import GSSAPI service name %s", tok_in.value);
+ 
+     /* Acquire the server credential to verify the client's
+        authentication.  */
+-- 
+1.8.1.4
+

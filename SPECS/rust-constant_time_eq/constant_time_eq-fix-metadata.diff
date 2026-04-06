@@ -1,0 +1,47 @@
+--- constant_time_eq-0.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ constant_time_eq-0.4.2/Cargo.toml	2026-01-09T11:08:34.906827+00:00
+@@ -29,29 +29,16 @@
+     "cryptography",
+     "no-std",
+ ]
+-license = "CC0-1.0 OR MIT-0 OR Apache-2.0"
++license = "MIT-0 OR Apache-2.0"
+ repository = "https://github.com/cesarb/constant_time_eq"
+ 
+ [features]
+-count_instructions_test = []
+ default = ["std"]
+ std = []
+ 
+ [lib]
+ name = "constant_time_eq"
+ path = "src/lib.rs"
+-
+-[[test]]
+-name = "count_instructions"
+-path = "tests/count_instructions.rs"
+-
+-[[test]]
+-name = "count_instructions_classic"
+-path = "tests/count_instructions_classic.rs"
+-
+-[[test]]
+-name = "count_instructions_generic"
+-path = "tests/count_instructions_generic.rs"
+ 
+ [[test]]
+ name = "exhaustive"
+@@ -71,13 +58,3 @@
+ name = "bench_generic"
+ path = "benches/bench_generic.rs"
+ harness = false
+-
+-[dev-dependencies.count_instructions]
+-version = "0.2.0"
+-
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+-features = [
+-    "cargo_bench_support",
+-    "html_reports",
+-]

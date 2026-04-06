@@ -1,0 +1,270 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 5;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+%bcond tests 1
+# Enable tests that require Pydantic?
+%bcond pydantic_tests 1
+
+# for github etc. use the forgemacros
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/SourceURL/#_using_forges_hosted_revision_control
+
+%global _description %{expand:
+versioningit is yet another Python packaging plugin for automatically
+determining your package’s version based on your version control repository’s
+tags. Unlike others, it allows easy customization of the version format and
+even lets you easily override the separate functions used for version
+extraction & calculation.
+
+Features:
+
+• Works with both setuptools and Hatch
+• Installed & configured through PEP 518’s pyproject.toml
+• Supports Git, modern Git archives, and Mercurial
+• Formatting of the final version uses format template strings, with fields for
+  basic VCS information and separate template strings for distanced vs. dirty
+  vs. distanced-and-dirty repository states
+• Can optionally write the final version to a file for loading at runtime
+• Provides custom hooks for inserting the final version and other details into
+  a source file at build time
+• The individual methods for VCS querying, tag-to-version calculation, version
+  bumping, version formatting, and writing the version to a file can all be
+  customized using either functions defined alongside one’s project code or via
+  publicly-distributed entry points
+• Can alternatively be used as a library for use in setup.py or the like, in
+  case you don’t want to or can’t configure it via pyproject.toml
+• The only thing it does is calculate your version and optionally write it to a
+  file; there’s no overriding of your sdist contents based on what is in your
+  Git repository, especially not without a way to turn it off, because that
+  would just be rude.}
+
+Name:           python-versioningit
+Version:        3.3.0
+Release:        %{autorelease}
+Summary:        Versioning It with your Version In Git
+
+# SPDX
+License:        MIT
+URL:            https://pypi.org/pypi/versioningit
+Source0:        %{pypi_source versioningit}
+# Man page written for Fedora in groff_man(7) format based on --help output
+Source1:        versioningit.1
+
+BuildArch:      noarch
+
+%description %_description
+
+
+%package -n python3-versioningit
+Summary:        %{summary}
+
+# It calls git and hg so these need to be installed
+Recommends:     git-core
+Recommends:     mercurial
+
+BuildRequires:  python3-devel
+%if %{with tests}
+BuildRequires:  git-core
+BuildRequires:  mercurial
+%endif
+
+%description -n python3-versioningit %_description
+
+
+%prep
+%autosetup -n versioningit-%{version}
+
+# Tweak build requirements to use what we have in Fedora. For test
+# dependencies, we change all semver pins to minimum versions.
+sed -r -i 's/~=/>=/g' tox.ini
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+sed -r -i 's/^([[:blank:]]*)(pytest-cov|.*--(.*-)?cov)/\1# \2/g' tox.ini
+sed -r -i 's/^([[:blank:]]*)(ignore:.*coverage)/\1# \2/g' tox.ini
+%if %{without pydantic_tests}
+sed -r -i 's/^([[:blank:]]*)(pydantic\b)/\1# \2/g' tox.ini
+%endif
+# Do not error on DeprecationWarning; this makes sense for upstream CI, but is
+# too strict for downstream builds.
+sed -r -i 's/^(filterwarnings = )error/\1default/' tox.ini
+
+# Comment out to remove /usr/bin/env shebangs
+# Can use something similar to correct/remove /usr/bin/python shebangs also
+# find . -type f -name "*.py" -exec sed -i '/^#![  ]*\/usr\/bin\/env.*$/ d' {} 2>/dev/null ';'
+
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
+
+%build
+%pyproject_wheel
+
+
+%install
+%pyproject_install
+%pyproject_save_files -l versioningit
+
+install -p -m 0644 -Dt %{buildroot}%{_mandir}/man1/ %{SOURCE1}
+
+
+%check
+%if %{with tests}
+# Editable mode doesn’t work when operating on the system site-packages
+k="${k-}${k+ and }not test_editable_mode"
+# These require network access.
+k="${k-}${k+ and }not test_install_from_git_url"
+k="${k-}${k+ and }not test_install_from_zip_url"
+%if %{without pydantic_tests}
+ignore="${ignore-} --ignore=test/test_methods/test_hg.py"
+ignore="${ignore-} --ignore=test/test_methods/test_git.py"
+ignore="${ignore-} --ignore=test/test_end2end.py"
+%endif
+
+%pytest -k "${k-}" ${ignore-}
+%endif
+
+
+%files -n python3-versioningit -f %{pyproject_files}
+%doc README.rst CHANGELOG.md
+%{_bindir}/versioningit
+%{_mandir}/man1/versioningit.1*
+
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 3.3.0-5
+- Latest state for python-versioningit
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.3.0-4
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 3.3.0-3
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Sat Jun 28 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.3.0-1
+- Update to 3.3.0 (close RHBZ#2375298)
+
+* Sat Jun 28 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0-3
+- Re-enable Pydantic tests
+
+* Wed Jun 11 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0-2
+- Disable tests with Pydantic until it supports Python 3.14
+- Close RHBZ#2372192
+
+* Wed Jun 11 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0-1
+- Update to 3.2.0 (close RHBZ#2371636)
+
+* Mon May 12 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.3-1
+- Update to 3.1.3 (close RHBZ#2365654)
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Mon Jul 29 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.2-4
+- F41 mercurial workarounds are no longer needed
+
+* Mon Jul 22 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.2-3
+- Apply a better workaround for F41 mercurial issues
+
+* Mon Jul 22 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.2-2
+- Temporarily work around broken mercurial in F41 with Python 3.13.0b4
+
+* Mon Jul 22 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.2-1
+- Update to 3.1.2 (close RHBZ#2299028)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 29 2024 Sandro <devel@penguinpee.nl> - 3.1.1-2
+- Rebuild for Python 3.13
+
+* Thu May 09 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.1-1
+- Update to 3.1.1 (close RHBZ#2277741)
+
+* Tue Mar 19 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.0-1
+- Update to 3.1.0 (close RHBZ#2269885)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 05 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.0.0-2
+- Assert that a license file is present in the .dist-info directory
+
+* Thu Dec 14 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 3.0.0-1
+- Update to 3.0.0 (close RHBZ#2254458)
+
+* Tue Nov 21 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.3.0-1
+- Update to 2.3.0 (close RHBZ#2240288)
+
+* Sat Sep 30 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.2.1-1
+- Update to 2.2.1 (close RHBZ#2240288)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jul 16 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.2.0-3
+- Do not error on DeprecationWarning; fix RHBZ#2220554
+
+* Thu Jun 29 2023 Python Maint <python-maint@redhat.com> - 2.2.0-2
+- Rebuilt for Python 3.12
+
+* Thu Feb 16 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.2.0-1
+- Update to 2.2.0 (close RHBZ#2169123)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 04 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.1.0-1
+- Update to 2.1.0 (close RHBZ#2137705)
+
+* Wed Jan 04 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.1-3
+- Patch out test coverage analysis
+
+* Wed Jan 04 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.1-2
+- Confirm License is SPDX MIT
+
+* Tue Aug 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.1-1
+- Update to 2.0.1 (close RHBZ#2112994)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 22 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 2.0.0-1
+- Update to 2.0.0 (close RHBZ#2096113)
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 1.1.1-2
+- Rebuilt for Python 3.11
+
+* Fri Apr 08 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.1.1-1
+- Update to 1.1.1 (close RHBZ#2060653)
+
+* Fri Mar 04 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.2.1-5
+- Allow tomli 2.0 until we can update versioningit to 1.0.0 or later
+
+* Wed Feb 02 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.2.1-4
+- Stop allowing pydantic 1.7 (fix RHBZ#2012631)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Oct 10 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.2.1-2
+- Fix FTBFS with pytest-cov 3.0
+
+* Mon Sep 20 2021 Ankur Sinha (Ankur Sinha Gmail) <sanjay.ankur@gmail.com> - 0.2.1-1
+- feat: init
+## END: Generated by rpmautospec

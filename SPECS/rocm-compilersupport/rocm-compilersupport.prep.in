@@ -1,0 +1,89 @@
+# Remove third-party
+rm -rf third-party
+# Force clang to be shared
+sed -i -e 's@if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY OR ARG_INSTALL_WITH_TOOLCHAIN)@if (ARG_SHARED AND (NOT LLVM_INSTALL_TOOLCHAIN_ONLY OR ARG_INSTALL_WITH_TOOLCHAIN))@' clang/cmake/modules/AddClang.cmake
+# Force lld to be shared
+# sed -i -e 's@llvm_add_library(${name} ${ARG_ENABLE_SHARED} ${ARG_UNPARSED_ARGUMENTS})@llvm_add_library(${name} SHARED ${ARG_UNPARSED_ARGUMENTS})@' lld/cmake/modules/AddLLD.cmake
+
+##Fix issue with HIP, where compilation flags are incorrect, see issue:
+#https://github.com/RadeonOpenCompute/ROCm-CompilerSupport/issues/49
+#Remove redundant includes:
+sed -i '/Args.push_back("-isystem");/,+3d' amd/comgr/src/comgr-compiler.cpp
+#Source hard codes the libdir too:
+sed -i 's/lib\(\/clang\)/%{_lib}\1/' amd/comgr/src/comgr-compiler.cpp
+
+# Fixup finding /opt/llvm
+sed -i -e 's@sys::path::append(LLVMPath, "llvm");@//sys::path::append(LLVMPath, "llvm");@' amd/comgr/src/comgr-env.cpp
+# Fixup finding /opt/rocm/hip
+sed -i -e 's@sys::path::append(HIPPath, "hip");@//sys::path::append(HIPPath, "hip");@' amd/comgr/src/comgr-env.cpp
+
+# Tests known to fail with upstream LLVM (as opposed to the bundled llvm):
+sed -i  -e "/add_isa_test(fract/d" \
+        -e "/add_isa_test(frexp/d" \
+        amd/device-libs/test/compile/CMakeLists.txt
+sed -i -e "/add_comgr_test(compile_source_with_device_libs_to_bc_test/d" \
+        -e "/add_comgr_test(name_expression_map_test/d" \
+        -e "/add_comgr_test(nested_kernel_test/d" \
+        amd/comgr/test/CMakeLists.txt
+
+# Fix script shebang (Fedora doesn't allow using "env"):
+sed -i -e 's@env perl@perl@' amd/hipcc/bin/hipcc.pl
+sed -i -e 's@env perl@perl@' amd/hipcc/bin/hipconfig.pl
+# ROCm upstream uses /opt for rocm-runtime, but Fedora uses /usr
+# Don't include it again since /usr/include is already included:
+sed -i '/" -isystem " + hsaPath + "\/include"/d' amd/hipcc/src/hipBin_amd.h
+# Same thing for hipcc.pl:
+sed -i '/^# Add paths to common HIP includes:/,/^$HIPCFLAGS/d' \
+        amd/hipcc/bin/hipcc.pl
+
+sed -i -e 's@env python3@python3@' clang-tools-extra/clang-tidy/tool/run-clang-tidy.py
+sed -i -e 's@env python@python3@' clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+
+# Default rocm path is _prefix
+sed -i -e 's@/opt/rocm@%{_prefix}@' amd/hipcc/bin/hipvars.pm
+sed -i -e 's@/opt/rocm@%{_prefix}@' amd/hipcc/src/hipBin_base.h
+
+LLVM_BINDIR=%{bundle_prefix}/bin
+
+echo "s@\$ROCM_PATH/lib/llvm/bin@${LLVM_BINDIR}@" > pm.sed
+sed -i -f pm.sed amd/hipcc/bin/hipvars.pm
+
+echo "s@hipClangPath /= \"lib/llvm/bin\"@hipClangPath = \"${LLVM_BINDIR}\"@" > h.sed
+sed -i -f h.sed amd/hipcc/src/hipBin_amd.h
+
+# Fix up the path to the device libs hipcc uses
+sed -i -e 's@amdgcnBitcode = roccmPath@amdgcnBitcode = "%{_prefix}/%{amd_device_libs_prefix}/"@' amd/hipcc/src/hipBin_amd.h
+
+# Fix up the location AMD_DEVICE_LIBS_PREFIX
+sed -i 's|@AMD_DEVICE_LIBS_PREFIX_CODE@|set(AMD_DEVICE_LIBS_PREFIX "%{_prefix}/%{amd_device_libs_prefix}")|' amd/device-libs/AMDDeviceLibsConfig.cmake.in
+
+# default hash to both
+sed -i 's@gnuHash = false@gnuHash = true@' lld/ELF/Config.h
+sed -i 's@sysvHash = false@sysvHash = true@' lld/ELF/Config.h
+
+# default build-id to sha1
+sed -i -e 's@"fast"@"sha1"@' lld/ELF/Options.td
+
+sed -i -e 's@env python@python3@' llvm/tools/opt-viewer/*.py
+sed -i -e 's@env python@python@' clang/tools/clang-format/git-clang-format
+sed -i -e 's@env python@python@' clang/utils/hmaptool/hmaptool
+sed -i -e 's@env python@python@' clang/tools/clang-format/clang-format-diff.py
+sed -i -e 's@env python@python@' clang-tools-extra/clang-tidy/tool/clang-tidy-diff.py
+
+# Help finding libc++
+sed -i -e 's@Args.hasArg(options::OPT_fopenmp)@1 || Args.hasArg(options::OPT_fopenmp)@' clang/lib/Driver/ToolChains/Gnu.cpp
+
+# clang is used in cmake to find the install path
+sed -i -e 's@D.SysRoot + "/opt/rocm"@D.SysRoot + "/usr"@' clang/lib/Driver/ToolChains/AMDGPU.cpp
+
+# CMake Error at cmake/OCL.cmake:12 (cmake_policy):
+# Policy CMP0053 may not be set to OLD behavior because this version of CMake no longer supports it.
+sed -i -e 's@cmake_policy(SET CMP0053 OLD)@#cmake_policy(SET CMP0053 OLD)@' amd/device-libs/cmake/OCL.cmake
+
+# gcc 15 include cstdint
+sed -i '/#include <memory*/a#include <cstdint>' llvm/include/llvm/ADT/SmallVector.h
+sed -i '/#include <memory*/a#include <cstdint>' llvm/lib/Target/AMDGPU/MCTargetDesc/AMDGPUMCTargetDesc.h
+
+# ConstantFolding.cpp:2129:16: error: no matching function for call to 'ConstantFoldFP128'
+# signature of function is wrong
+sed -i -e 's@long double@float128@g' llvm/lib/Analysis/ConstantFolding.cpp

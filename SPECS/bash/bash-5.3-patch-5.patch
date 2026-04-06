@@ -1,0 +1,22 @@
+diff --git a/patchlevel.h b/patchlevel.h
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[ 	]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 4
++#define PATCHLEVEL 5
+ 
+ #endif /* _PATCHLEVEL_H_ */
+diff --git a/trap.c b/trap.c
+--- a/trap.c
++++ b/trap.c
+@@ -964,6 +964,7 @@ restore_default_signal (int sig)
+       original_signals[sig] = SIG_DFL;	/* XXX */
+       set_signal_handler (sig, SIG_DFL);
+       change_signal (sig, (char *)DEFAULT_SIG);
++      sigmodes[sig] &= ~SIG_TRAPPED;	/* no longer trapped */
+       return;
+     }
+     

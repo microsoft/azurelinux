@@ -1,0 +1,130 @@
+From 3f9e3da40a77274705c9cb9103a6046daa950f5d Mon Sep 17 00:00:00 2001
+From: Jari Aalto <jari.aalto@cante.net>
+Date: Sat, 8 May 2010 20:16:14 +0300
+Subject: [PATCH 7/9] doc/cscope.1: Fix hyphens
+
+Signed-off-by: Jari Aalto <jari.aalto@cante.net>
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ doc/cscope.1 | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/doc/cscope.1 b/doc/cscope.1
+index ca94e8b..0318347 100644
+--- a/doc/cscope.1
++++ b/doc/cscope.1
+@@ -1,4 +1,3 @@
+-.PU
+ .TH CSCOPE "1" "January 2007" "The Santa Cruz Operation"
+ .SH NAME
+ cscope - interactively examine a C program 
+@@ -106,7 +105,7 @@ below. (The #include files
+ may be specified with either double quotes or angle brackets.)
+ The incdir directory is searched in addition to the current
+ directory (which is searched first) and the standard list
+-(which is searched last). If more than one occurrence of -I
++(which is searched last). If more than one occurrence of \-I
+ appears, the directories are searched in the order they appear
+ on the command line.
+ .TP
+@@ -129,7 +128,7 @@ source trees generally do not use it.
+ .TP
+ .B -L
+ Do a single search with line-oriented output when used with the
+--num pattern option.
++\-num pattern option.
+ .TP
+ .B -l
+ Line-oriented interface (see ``Line-Oriented Interface''
+@@ -146,7 +145,7 @@ Prepend
+ .I path 
+ to relative file names in a pre-built cross-reference file so you do
+ not have to change to the directory where the cross-reference file was
+-built. This option is only valid with the -d option.
++built. This option is only valid with the \-d option.
+ .TP
+ .BI -p n
+ Display the last
+@@ -195,7 +194,7 @@ Remove the cscope reference file and inverted indexes when exiting
+ .I files
+ A list of file names to operate on.
+ .PP
+-The -I, -c, -k, -p, -q, and -T options can also be in the cscope.files file.
++The \-I, \-c, \-k, \-p, \-q, and \-T options can also be in the cscope.files file.
+ .PP
+ .SS Requesting the initial search
+ .PP
+@@ -266,7 +265,7 @@ Append the displayed list of lines to a file.
+ .TP
+ .B <
+ Read lines from a file that is in symbol reference format
+-(created by > or >>), just like the -F option.
++(created by > or >>), just like the \-F option.
+ .TP
+ .B ^
+ Filter all lines through a shell command and display the
+@@ -371,7 +370,7 @@ commands, respectively.
+ .PP   
+ .SS Line-Oriented interface
+ .PP  
+-The -l option lets you use cscope where a screen-oriented interface
++The \-l option lets you use cscope where a screen-oriented interface
+ would not be useful, for example, from another screen-oriented
+ program.
+ .PP  
+@@ -380,10 +379,10 @@ with the field number (counting from 0) immediately followed by the
+ search pattern, for example, ``lmain'' finds the definition of the
+ main function.
+ .PP   
+-If you just want a single search, instead of the -l option use the -L
+-and -num pattern options, and you won't get the >> prompt.
++If you just want a single search, instead of the \-l option use the \-L
++and \-num pattern options, and you won't get the >> prompt.
+ .PP 
+-For -l, cscope outputs the number of reference lines
++For \-l, cscope outputs the number of reference lines
+ cscope: 2 lines
+ .PP  
+ For each reference found, cscope outputs a line consisting of the file
+@@ -468,11 +467,11 @@ is not set, cscope searches only in the current directory.
+ .SH FILES
+ .TP
+ .B cscope.files
+-Default files containing -I, -p, -q, and -T options and the
+-list of source files (overridden by the -i option).
++Default files containing \-I, \-p, \-q, and \-T options and the
++list of source files (overridden by the \-i option).
+ .TP
+ .B cscope.out
+-Symbol cross-reference file (overridden by the -f option),
++Symbol cross-reference file (overridden by the \-f option),
+ which is put in the home directory if it cannot be created in
+ the current directory.
+ .TP
+@@ -482,11 +481,11 @@ the current directory.
+ .B cscope.po.out
+ .PD 1
+ Default files containing the inverted index used for quick
+-symbol searching (-q option). If you use the -f option to
++symbol searching (\-q option). If you use the \-f option to
+ rename the cross-reference file (so it's not cscope.out), the
+ names for these inverted index files will be created by adding
+- .in and .po to the name you supply with -f. For example, if you
+-indicated -f xyz, then these files would be named xyz.in and
++ .in and .po to the name you supply with \-f. For example, if you
++indicated \-f xyz, then these files would be named xyz.in and
+ xyz.po.
+ .TP
+ .B INCDIR
+@@ -554,7 +553,7 @@ definition, for example,
+ .PP
+  char flag
+  #ifdef ALLOCATE_STORAGE
+-      = -1
++      = \-1
+  #endif
+  ;
+ .PP
+-- 
+2.26.2
+

@@ -1,0 +1,38 @@
+From ff0a79b707eb6603c0cb0bd3778c3c88fbacfac8 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 13 Dec 2024 02:03:33 -0500
+Subject: [PATCH 3/5] Unpin meson-python build requirement
+
+This is pinned to fix sdists, but we already have one and are building a
+wheel, which should be fine.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 23c441b52c..f762c85d98 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -48,7 +48,7 @@ requires-python = ">=3.10"
+ [project.optional-dependencies]
+ # Should be a copy of the build dependencies below.
+ dev = [
+-    "meson-python>=0.13.1,<0.17.0",
++    "meson-python>=0.13.1",
+     "pybind11>=2.13.2,!=2.13.3",
+     "setuptools_scm>=7",
+     # Not required by us but setuptools_scm without a version, cso _if_
+@@ -72,7 +72,7 @@ dev = [
+ build-backend = "mesonpy"
+ # Also keep in sync with optional dependencies above.
+ requires = [
+-    "meson-python>=0.13.1,<0.17.0",
++    "meson-python>=0.13.1",
+     "pybind11>=2.13.2,!=2.13.3",
+     "setuptools_scm>=7",
+ ]
+-- 
+2.52.0
+

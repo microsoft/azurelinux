@@ -1,0 +1,11 @@
+--- ceph-19.2.0/src/tracing/CMakeLists.txt.orig	2025-01-23 17:51:43.874162594 -0500
++++ ceph-19.2.0/src/tracing/CMakeLists.txt	2025-01-23 17:54:21.877186735 -0500
+@@ -6,6 +6,8 @@
+ set(header_dir ${working_dir}/tracing)
+ file(MAKE_DIRECTORY ${header_dir})
+ 
++set(CMAKE_C99_EXTENSION_COMPILE_OPTION "-std=gnu23")
++
+ add_custom_target(tracepoint_libraries)
+ 
+ file(GLOB tps "*.tp")

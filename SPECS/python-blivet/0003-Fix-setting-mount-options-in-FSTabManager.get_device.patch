@@ -1,0 +1,46 @@
+From 9aca86eacaa333695f8c4cba47893e903ea3be34 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 14 Oct 2025 15:52:46 +0200
+Subject: [PATCH 3/3] Fix setting mount options in FSTabManager.get_device
+
+---
+ blivet/fstab.py                   | 2 +-
+ tests/storage_tests/fstab_test.py | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/blivet/fstab.py b/blivet/fstab.py
+index 37c524f1..e8c5e7f8 100644
+--- a/blivet/fstab.py
++++ b/blivet/fstab.py
+@@ -560,7 +560,7 @@ class FSTabManager(object):
+         if hasattr(device.format, "mountpoint"):
+             device.format.mountpoint = _file
+ 
+-        device.format.options = _mntopts
++        device.format.options = _mntopts_str
+ 
+         return device
+ 
+diff --git a/tests/storage_tests/fstab_test.py b/tests/storage_tests/fstab_test.py
+index 7b9f2bba..2c7758a5 100644
+--- a/tests/storage_tests/fstab_test.py
++++ b/tests/storage_tests/fstab_test.py
+@@ -125,6 +125,7 @@ class FstabTestCase(StorageTestCase):
+             self.assertIsNotNone(dev)
+             self.assertEqual(dev, lv)
+             self.assertEqual(dev.format.mountpoint, "/mnt/test2")
++            self.assertEqual(dev.format.options, "optionA,optionB")
+ 
+             # remove the device
+             dev = self.storage.devicetree.get_device_by_name("blivetTestVG-blivetTestLVMine")
+@@ -259,6 +260,7 @@ class FstabTestCase(StorageTestCase):
+             self.assertIsNotNone(dev)
+             self.assertEqual(dev, sub)
+             self.assertEqual(dev.format.mountpoint, "/home")
++            self.assertEqual(dev.format.options, "subvol=blivetTestSubVol1")
+ 
+     def test_swap_creation(self):
+         # test swap creation for presence of FSTabOptions object
+-- 
+2.51.0
+

@@ -1,0 +1,12 @@
+diff -urNp a/snmplib/snmp_logging.c b/snmplib/snmp_logging.c
+--- a/snmplib/snmp_logging.c	2023-02-15 10:19:15.691827254 +0100
++++ b/snmplib/snmp_logging.c	2023-02-15 10:24:41.006642974 +0100
+@@ -490,7 +490,7 @@ snmp_log_options(char *optarg, int argc,
+ char *
+ snmp_log_syslogname(const char *pstr)
+ {
+-  if (pstr)
++  if (pstr && (pstr != syslogname))
+     strlcpy (syslogname, pstr, sizeof(syslogname));
+ 
+   return syslogname;

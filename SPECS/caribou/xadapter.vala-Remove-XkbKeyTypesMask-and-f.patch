@@ -1,0 +1,46 @@
+From 00653c5dcc4be5e983b670d00d5724fc21da2e82 Mon Sep 17 00:00:00 2001
+From: Clement Lefebvre <clement.lefebvre@linuxmint.com>
+Date: Tue, 12 Jan 2021 18:01:47 +0000
+Subject: [PATCH 3/4] [mtwebster] xadapter.vala: Remove XkbKeyTypesMask and
+ fields from XKbChangeMap call.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This was originally a workaround for xFree86 4.3 - see:
+https://bugzilla.gnome.org/show_bug.cgi?id=673547
+​
+As of https://gitlab.freedesktop.org/xorg/xserver/-/commit/87c64fc5b0 this
+causes a BadLength error when attempting to use shifted characters.
+​
+Ref:
+https://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Changing_Map_Components_in_the_Server
+---
+ libcaribou/xadapter.vala | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/libcaribou/xadapter.vala b/libcaribou/xadapter.vala
+index 22858b7..1da5a78 100644
+--- a/libcaribou/xadapter.vala
++++ b/libcaribou/xadapter.vala
+@@ -195,15 +195,10 @@ namespace Caribou {
+ 
+             Xkb.MapChanges changes = Xkb.MapChanges ();
+ 
+-            // We don't touch key types here but include the
+-            // information in XkbSetMap request to the server, because
+-            // some X servers need the information to check the sanity
+-            // of the keysyms change.
+-            changes.changed = (ushort) (Xkb.KeySymsMask | Xkb.KeyTypesMask);
++            changes.changed = (ushort) Xkb.KeySymsMask;
+             changes.first_key_sym = (char) this.reserved_keycode;
+             changes.num_key_syms = this.xkbdesc.map.key_sym_map[this.reserved_keycode].width;
+-            changes.first_type = 0;
+-            changes.num_types = this.xkbdesc.map.num_types;
++
+             Xkb.change_map (this.xdisplay, this.xkbdesc, changes);
+ 
+             this.xdisplay.flush ();
+-- 
+2.29.2
+

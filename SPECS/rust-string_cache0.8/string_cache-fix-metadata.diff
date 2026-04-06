@@ -1,0 +1,14 @@
+--- string_cache-0.8.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ string_cache-0.8.9/Cargo.toml	2025-05-01T10:01:44.945120+00:00
+@@ -40,11 +40,6 @@
+ path = "tests/small-stack.rs"
+ harness = false
+ 
+-[dependencies.malloc_size_of]
+-version = "0.1"
+-optional = true
+-default-features = false
+-
+ [dependencies.new_debug_unreachable]
+ version = "1.0.2"
+ 

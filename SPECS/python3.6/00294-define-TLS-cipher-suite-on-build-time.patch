@@ -1,0 +1,248 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Christian Heimes <christian@python.org>
+Date: Fri, 19 Jun 2020 17:13:03 +0200
+Subject: 00294: Define TLS cipher suite on build time
+
+Define TLS cipher suite on build time depending
+on the OpenSSL default cipher suite selection.
+Fixed upstream on CPython's 3.7 branch:
+https://bugs.python.org/issue31429
+See also: https://bugzilla.redhat.com/show_bug.cgi?id=1489816
+
+Co-Authored-By: Christian Heimes <christian@python.org>
+Co-Authored-By: Charalampos Stratakis <cstratak@redhat.com>
+---
+ Lib/ssl.py           | 48 ++------------------------------------------
+ Lib/test/test_ssl.py | 16 ++++++++++++++-
+ Modules/_ssl.c       | 35 +++++++++++++++++++++++++++++++-
+ configure.ac         | 36 +++++++++++++++++++++++++++++++++
+ 4 files changed, 87 insertions(+), 48 deletions(-)
+
+diff --git a/Lib/ssl.py b/Lib/ssl.py
+index 58d3e93922..0114387c57 100644
+--- a/Lib/ssl.py
++++ b/Lib/ssl.py
+@@ -116,6 +116,7 @@ except ImportError:
+ 
+ 
+ from _ssl import HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN, HAS_TLSv1_3
++from _ssl import _DEFAULT_CIPHERS
+ from _ssl import _OPENSSL_API_VERSION
+ 
+ 
+@@ -174,48 +175,7 @@ else:
+     CHANNEL_BINDING_TYPES = []
+ 
+ 
+-# Disable weak or insecure ciphers by default
+-# (OpenSSL's default setting is 'DEFAULT:!aNULL:!eNULL')
+-# Enable a better set of ciphers by default
+-# This list has been explicitly chosen to:
+-#   * TLS 1.3 ChaCha20 and AES-GCM cipher suites
+-#   * Prefer cipher suites that offer perfect forward secrecy (DHE/ECDHE)
+-#   * Prefer ECDHE over DHE for better performance
+-#   * Prefer AEAD over CBC for better performance and security
+-#   * Prefer AES-GCM over ChaCha20 because most platforms have AES-NI
+-#     (ChaCha20 needs OpenSSL 1.1.0 or patched 1.0.2)
+-#   * Prefer any AES-GCM and ChaCha20 over any AES-CBC for better
+-#     performance and security
+-#   * Then Use HIGH cipher suites as a fallback
+-#   * Disable NULL authentication, NULL encryption, 3DES and MD5 MACs
+-#     for security reasons
+-_DEFAULT_CIPHERS = (
+-    'TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:'
+-    'TLS13-AES-128-GCM-SHA256:'
+-    'ECDH+AESGCM:ECDH+CHACHA20:DH+AESGCM:DH+CHACHA20:ECDH+AES256:DH+AES256:'
+-    'ECDH+AES128:DH+AES:ECDH+HIGH:DH+HIGH:RSA+AESGCM:RSA+AES:RSA+HIGH:'
+-    '!aNULL:!eNULL:!MD5:!3DES'
+-    )
+-
+-# Restricted and more secure ciphers for the server side
+-# This list has been explicitly chosen to:
+-#   * TLS 1.3 ChaCha20 and AES-GCM cipher suites
+-#   * Prefer cipher suites that offer perfect forward secrecy (DHE/ECDHE)
+-#   * Prefer ECDHE over DHE for better performance
+-#   * Prefer AEAD over CBC for better performance and security
+-#   * Prefer AES-GCM over ChaCha20 because most platforms have AES-NI
+-#   * Prefer any AES-GCM and ChaCha20 over any AES-CBC for better
+-#     performance and security
+-#   * Then Use HIGH cipher suites as a fallback
+-#   * Disable NULL authentication, NULL encryption, MD5 MACs, DSS, RC4, and
+-#     3DES for security reasons
+-_RESTRICTED_SERVER_CIPHERS = (
+-    'TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:'
+-    'TLS13-AES-128-GCM-SHA256:'
+-    'ECDH+AESGCM:ECDH+CHACHA20:DH+AESGCM:DH+CHACHA20:ECDH+AES256:DH+AES256:'
+-    'ECDH+AES128:DH+AES:ECDH+HIGH:DH+HIGH:RSA+AESGCM:RSA+AES:RSA+HIGH:'
+-    '!aNULL:!eNULL:!MD5:!DSS:!RC4:!3DES'
+-)
++_RESTRICTED_SERVER_CIPHERS = _DEFAULT_CIPHERS
+ 
+ 
+ class CertificateError(ValueError):
+@@ -389,8 +349,6 @@ class SSLContext(_SSLContext):
+ 
+     def __new__(cls, protocol=PROTOCOL_TLS, *args, **kwargs):
+         self = _SSLContext.__new__(cls, protocol)
+-        if protocol != _SSLv2_IF_EXISTS:
+-            self.set_ciphers(_DEFAULT_CIPHERS)
+         return self
+ 
+     def __init__(self, protocol=PROTOCOL_TLS):
+@@ -505,8 +463,6 @@ def create_default_context(purpose=Purpose.SERVER_AUTH, *, cafile=None,
+         # verify certs and host name in client mode
+         context.verify_mode = CERT_REQUIRED
+         context.check_hostname = True
+-    elif purpose == Purpose.CLIENT_AUTH:
+-        context.set_ciphers(_RESTRICTED_SERVER_CIPHERS)
+ 
+     if cafile or capath or cadata:
+         context.load_verify_locations(cafile, capath, cadata)
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index 74adebc0fb..510bb09501 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -19,6 +19,7 @@ import weakref
+ import platform
+ import re
+ import functools
++import sysconfig
+ try:
+     import ctypes
+ except ImportError:
+@@ -37,7 +38,7 @@ PROTOCOLS = sorted(ssl._PROTOCOL_NAMES)
+ HOST = support.HOST
+ IS_LIBRESSL = ssl.OPENSSL_VERSION.startswith('LibreSSL')
+ IS_OPENSSL_1_1 = not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 0)
+-
++PY_SSL_DEFAULT_CIPHERS = sysconfig.get_config_var('PY_SSL_DEFAULT_CIPHERS')
+ 
+ def data_file(*name):
+     return os.path.join(os.path.dirname(__file__), *name)
+@@ -952,6 +953,19 @@ class ContextTests(unittest.TestCase):
+         with self.assertRaisesRegex(ssl.SSLError, "No cipher can be selected"):
+             ctx.set_ciphers("^$:,;?*'dorothyx")
+ 
++    @unittest.skipUnless(PY_SSL_DEFAULT_CIPHERS == 1,
++                         "Test applies only to Python default ciphers")
++    def test_python_ciphers(self):
++        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
++        ciphers = ctx.get_ciphers()
++        for suite in ciphers:
++            name = suite['name']
++            self.assertNotIn("PSK", name)
++            self.assertNotIn("SRP", name)
++            self.assertNotIn("MD5", name)
++            self.assertNotIn("RC4", name)
++            self.assertNotIn("3DES", name)
++
+     @unittest.skipIf(ssl.OPENSSL_VERSION_INFO < (1, 0, 2, 0, 0), 'OpenSSL too old')
+     def test_get_ciphers(self):
+         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index 7365630a5e..ec366f019d 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -238,6 +238,31 @@ SSL_SESSION_get_ticket_lifetime_hint(const SSL_SESSION *s)
+ 
+ #endif /* OpenSSL < 1.1.0 or LibreSSL < 2.7.0 */
+ 
++/* Default cipher suites */
++#ifndef PY_SSL_DEFAULT_CIPHERS
++#define PY_SSL_DEFAULT_CIPHERS 1
++#endif
++
++#if PY_SSL_DEFAULT_CIPHERS == 0
++  #ifndef PY_SSL_DEFAULT_CIPHER_STRING
++     #error "Py_SSL_DEFAULT_CIPHERS 0 needs Py_SSL_DEFAULT_CIPHER_STRING"
++  #endif
++#elif PY_SSL_DEFAULT_CIPHERS == 1
++/* Python custom selection of sensible ciper suites
++ * DEFAULT: OpenSSL's default cipher list. Since 1.0.2 the list is in sensible order.
++ * !aNULL:!eNULL: really no NULL ciphers
++ * !MD5:!3DES:!DES:!RC4:!IDEA:!SEED: no weak or broken algorithms on old OpenSSL versions.
++ * !aDSS: no authentication with discrete logarithm DSA algorithm
++ * !SRP:!PSK: no secure remote password or pre-shared key authentication
++ */
++  #define PY_SSL_DEFAULT_CIPHER_STRING "DEFAULT:!aNULL:!eNULL:!MD5:!3DES:!DES:!RC4:!IDEA:!SEED:!aDSS:!SRP:!PSK"
++#elif PY_SSL_DEFAULT_CIPHERS == 2
++/* Ignored in SSLContext constructor, only used to as _ssl.DEFAULT_CIPHER_STRING */
++  #define PY_SSL_DEFAULT_CIPHER_STRING SSL_DEFAULT_CIPHER_LIST
++#else
++  #error "Unsupported PY_SSL_DEFAULT_CIPHERS"
++#endif
++
+ 
+ enum py_ssl_error {
+     /* these mirror ssl.h */
+@@ -2861,7 +2886,12 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
+     /* A bare minimum cipher list without completely broken cipher suites.
+      * It's far from perfect but gives users a better head start. */
+     if (proto_version != PY_SSL_VERSION_SSL2) {
+-        result = SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL:!eNULL:!MD5");
++#if PY_SSL_DEFAULT_CIPHERS == 2
++        /* stick to OpenSSL's default settings */
++        result = 1;
++#else
++        result = SSL_CTX_set_cipher_list(ctx, PY_SSL_DEFAULT_CIPHER_STRING);
++#endif
+     } else {
+         /* SSLv2 needs MD5 */
+         result = SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL:!eNULL");
+@@ -5457,6 +5487,9 @@ PyInit__ssl(void)
+                              (PyObject *)&PySSLSession_Type) != 0)
+         return NULL;
+ 
++    PyModule_AddStringConstant(m, "_DEFAULT_CIPHERS",
++                               PY_SSL_DEFAULT_CIPHER_STRING);
++
+     PyModule_AddIntConstant(m, "SSL_ERROR_ZERO_RETURN",
+                             PY_SSL_ERROR_ZERO_RETURN);
+     PyModule_AddIntConstant(m, "SSL_ERROR_WANT_READ",
+diff --git a/configure.ac b/configure.ac
+index f764536d65..d5ca7172ca 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5663,6 +5663,42 @@ if test "$have_getrandom" = yes; then
+               [Define to 1 if the getrandom() function is available])
+ fi
+ 
++# ssl module default cipher suite string
++AH_TEMPLATE(PY_SSL_DEFAULT_CIPHERS,
++  [Default cipher suites list for ssl module.
++   1: Python's preferred selection, 2: leave OpenSSL defaults untouched, 0: custom string])
++AH_TEMPLATE(PY_SSL_DEFAULT_CIPHER_STRING,
++  [Cipher suite string for PY_SSL_DEFAULT_CIPHERS=0]
++)
++AC_MSG_CHECKING(for --with-ssl-default-suites)
++AC_ARG_WITH(ssl-default-suites,
++            AS_HELP_STRING([--with-ssl-default-suites=@<:@python|openssl|STRING@:>@],
++                           [Override default cipher suites string,
++                            python: use Python's preferred selection (default),
++                            openssl: leave OpenSSL's defaults untouched,
++                            STRING: use a custom string,
++                            PROTOCOL_SSLv2 ignores the setting]),
++[
++AC_MSG_RESULT($withval)
++case "$withval" in
++    python)
++        AC_DEFINE(PY_SSL_DEFAULT_CIPHERS, 1)
++        ;;
++    openssl)
++        AC_DEFINE(PY_SSL_DEFAULT_CIPHERS, 2)
++        ;;
++    *)
++        AC_DEFINE(PY_SSL_DEFAULT_CIPHERS, 0)
++        AC_DEFINE_UNQUOTED(PY_SSL_DEFAULT_CIPHER_STRING, "$withval")
++        ;;
++esac
++],
++[
++AC_MSG_RESULT(python)
++AC_DEFINE(PY_SSL_DEFAULT_CIPHERS, 1)
++])
++
++
+ # generate output files
+ AC_CONFIG_FILES(Makefile.pre Modules/Setup.config Misc/python.pc Misc/python-config.sh)
+ AC_CONFIG_FILES([Modules/ld_so_aix], [chmod +x Modules/ld_so_aix])

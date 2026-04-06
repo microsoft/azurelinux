@@ -1,0 +1,18 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## fix-444648.dpatch by Bernhard R. Link <brlink@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Do proper PS stream encoding on 64 bit architectures
+
+@DPATCH@
+--- xpdf-3.02/xpdf/Stream.cc.BAD	2008-12-10 12:16:16.000000000 -0500
++++ xpdf-3.02/xpdf/Stream.cc	2008-12-10 12:16:21.000000000 -0500
+@@ -4514,7 +4514,7 @@ void ASCII85Encoder::reset() {
+ GBool ASCII85Encoder::fillBuf() {
+   Guint t;
+   char buf1[5];
+-  int c0, c1, c2, c3;
++  unsigned int c0, c1, c2, c3;
+   int n, i;
+ 
+   if (eof) {

@@ -1,0 +1,11 @@
+--- Changes
++++ Changes
+@@ -175,7 +175,7 @@
+     -   Fixed the installation errors that everybody has been rightly 
+         complaining about for the last year:
+         -   Prerequisities in requires, not build_requires
+-        -   Tests no longer rely on hard coded test output (thanks Martín 
++        -   Tests no longer rely on hard coded test output (thanks Mart√≠n 
+             Ferrari and Nicholas Clark for patches)
+         -   Require appropriate version of Test::Exception
+     -   Added link to del.icio.us perl+testing links in POD

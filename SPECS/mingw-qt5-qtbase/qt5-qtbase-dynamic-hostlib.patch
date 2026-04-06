@@ -1,0 +1,21 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/qt_module.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt_module.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/qt_module.prf	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt_module.prf	2025-11-07 14:10:24.196311390 +0100
+@@ -25,7 +25,7 @@ requires(!$$skip)
+ 
+ # Compile as shared/DLL or static according to the option given to configure
+ # unless overridden. Host builds are always static
+-host_build|staticlib: CONFIG += static
++staticlib: CONFIG += static
+ 
+ host_build {
+     QT -= gui   # no host module will ever use gui
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/tools/bootstrap-dbus/bootstrap-dbus.pro qtbase-everywhere-src-5.15.18-new/src/tools/bootstrap-dbus/bootstrap-dbus.pro
+--- qtbase-everywhere-src-5.15.18/src/tools/bootstrap-dbus/bootstrap-dbus.pro	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/tools/bootstrap-dbus/bootstrap-dbus.pro	2025-11-07 14:10:24.196585913 +0100
+@@ -27,4 +27,4 @@ SOURCES = \
+ load(qt_module)
+ 
+ lib.CONFIG = dummy_install
+-INSTALLS = lib
++INSTALLS += lib

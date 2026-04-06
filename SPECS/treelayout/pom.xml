@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.abego.treelayout</groupId>
+    <artifactId>org.abego.treelayout.project</artifactId>
+    <packaging>pom</packaging>
+    <version>%{version}</version>
+
+    <modules>
+        <module>org.abego.treelayout</module>
+        <module>org.abego.treelayout.demo</module>
+        <!-- Use org.netbeans.api:org-netbeans-api-visual:RELEASE67: -->
+        <!--module>org.abego.treelayout.netbeans</module-->
+        <!--module>org.abego.treelayout.netbeans.demo</module-->
+    </modules>
+</project>

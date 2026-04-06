@@ -1,0 +1,14 @@
+
+Suppress gcc 10 warning.
+
+--- subversion-1.14.0/subversion/tests/svn_test.h.testwarn
++++ subversion-1.14.0/subversion/tests/svn_test.h
+@@ -128,7 +128,7 @@
+       return svn_error_createf(SVN_ERR_TEST_FAILED, NULL,           \
+           "Strings not equal\n  Expected: '%s'\n  Found:    '%s'"   \
+           "\n  at %s:%d",                                           \
+-          tst_str2, tst_str1, __FILE__, __LINE__);                  \
++          tst_str2 ? tst_str2 : "(NULL)", tst_str1 ? tst_str1 : "(NULL)", __FILE__, __LINE__); \
+   } while(0)
+ 
+  /** Handy macro for testing integer equality.

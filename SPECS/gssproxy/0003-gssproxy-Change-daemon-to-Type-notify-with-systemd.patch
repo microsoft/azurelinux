@@ -1,0 +1,244 @@
+From ce463d5b0231f654297e4d1e33e622e5196aa3a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?David=20H=C3=A4rdeman?= <david@hardeman.nu>
+Date: Fri, 20 Oct 2023 01:31:23 +0200
+Subject: [PATCH] [gssproxy] Change daemon to Type=notify with systemd
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This avoids the need for daemonization, pid files, etc and also provides nicer
+output from systemctl. The notify integration is already prepared to work with
+Type=notify-reload (which is a bit too recent to make the default at the
+moment, requires systemd 253+).
+
+With this patch applied:
+
+  root@qtest1:~# systemctl status gssproxy
+  ● gssproxy.service - GSSAPI Proxy Daemon
+       Loaded: loaded (/lib/systemd/system/gssproxy.service; enabled; preset: enabled)
+       Active: active (running) since Fri 2023-10-20 12:59:32 CEST; 4s ago
+     Main PID: 58516 (gssproxy)
+       Status: "Running, 1 service(s) configured"
+           ...
+  root@qtest1:~# ls -1 /etc/gssproxy/
+  24-nfs-server.conf
+  gssproxy.conf
+  root@qtest1:~# vi /etc/gssproxy/50-nfs-client.conf
+  root@qtest1:~# ls -1 /etc/gssproxy/
+  24-nfs-server.conf
+  50-nfs-client.conf
+  gssproxy.conf
+  root@qtest1:~# systemctl reload gssproxy
+  root@qtest1:~# systemctl status gssproxy
+  ● gssproxy.service - GSSAPI Proxy Daemon
+       Loaded: loaded (/lib/systemd/system/gssproxy.service; enabled; preset: enabled)
+       Active: active (running) since Fri 2023-10-20 12:59:32 CEST; 1min 39s ago
+      Process: 58576 ExecReload=/bin/kill -HUP $MAINPID (code=exited, status=0/SUCCESS)
+     Main PID: 58516 (gssproxy)
+       Status: "Running, 2 service(s) configured"
+           ...
+
+Signed-off-by: David Härdeman <david@hardeman.nu>
+(cherry picked from commit 92e87872846c400598db30fb1759cd7c6f00db34)
+---
+ contrib/gssproxy.spec.in        |  1 +
+ src/gp_common.h                 | 10 ++++++++++
+ src/gp_init.c                   | 21 +++++++++++++++++++--
+ src/gp_mgmt.c                   |  3 +++
+ src/gp_util.c                   | 29 +++++++++++++++++++++++++++++
+ systemd/gssproxy.service.in     |  9 ++++-----
+ systemd/gssuserproxy.service.in |  2 +-
+ 7 files changed, 67 insertions(+), 8 deletions(-)
+
+diff --git a/contrib/gssproxy.spec.in b/contrib/gssproxy.spec.in
+index 7f01f1f..a2c2267 100644
+--- a/contrib/gssproxy.spec.in
++++ b/contrib/gssproxy.spec.in
+@@ -44,6 +44,7 @@ BuildRequires: libcap-devel
+ BuildRequires: popt-devel
+ BuildRequires: findutils
+ BuildRequires: systemd-units
++BuildRequires: systemd-devel
+ 
+ 
+ %description
+diff --git a/src/gp_common.h b/src/gp_common.h
+index 18b6eb4..8a53d64 100644
+--- a/src/gp_common.h
++++ b/src/gp_common.h
+@@ -46,6 +46,16 @@
+ /* max out at 1MB for now */
+ #define MAX_RPC_SIZE 1024*1024
+ 
++#ifdef HAVE_SYSTEMD_DAEMON
++#include <systemd/sd-daemon.h>
++#else
++__inline__ int sd_notifyf(int unset_environment UNUSED, const char *format UNUSED, ...)
++{
++    return 0;
++}
++#endif
++
++uint64_t time_now_usec(void);
+ bool gp_same(const char *a, const char *b);
+ bool gp_boolean_is_true(const char *s);
+ char *gp_getenv(const char *name);
+diff --git a/src/gp_init.c b/src/gp_init.c
+index 5e7074f..131bf08 100644
+--- a/src/gp_init.c
++++ b/src/gp_init.c
+@@ -14,6 +14,7 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <unistd.h>
++#include <inttypes.h>
+ 
+ #ifdef HAVE_CAP
+ 
+@@ -260,10 +261,19 @@ static void hup_handler(verto_ctx *vctx UNUSED, verto_ev *ev)
+ 
+     gpctx = verto_get_private(ev);
+ 
++    sd_notifyf(0, "RELOADING=1\n"
++               "MONOTONIC_USEC=%" PRIu64 "\n"
++               "STATUS=Reloading configuration\n",
++               time_now_usec());
++
+     GPDEBUG("Received SIGHUP; re-reading config.\n");
+     new_config = read_config(gpctx->config_file, gpctx->config_dir,
+                              gpctx->config_socket, gpctx->daemonize);
+     if (!new_config) {
++        sd_notifyf(0, "READY=1\n"
++                   "STATUS=Running, %i service(s) configured"
++                   " (failed to re-read config)\n",
++                   gpctx->config->num_svcs);
+         GPERROR("Error reading new configuration on SIGHUP; keeping old "
+                 "configuration instead!\n");
+         return;
+@@ -281,12 +291,16 @@ static void hup_handler(verto_ctx *vctx UNUSED, verto_ev *ev)
+ 
+     free_config(&old_config);
+ 
++    sd_notifyf(0, "READY=1\n"
++               "STATUS=Running, %i service(s) configured\n",
++               gpctx->config->num_svcs);
+     GPDEBUG("New config loaded successfully.\n");
+     return;
+ }
+ 
+ static void break_loop(verto_ctx *vctx, verto_ev *ev UNUSED)
+ {
++    sd_notifyf(0, "STOPPING=1\nSTATUS=Signal received, stopping\n");
+     GPDEBUG("Exiting after receiving a signal\n");
+     verto_break(vctx);
+ }
+@@ -354,11 +368,14 @@ fail:
+  * is done. */
+ static void delayed_init(verto_ctx *vctx UNUSED, verto_ev *ev)
+ {
+-    struct gssproxy_ctx *gpctx;
++    struct gssproxy_ctx *gpctx = verto_get_private(ev);
++
++    sd_notifyf(0, "READY=1\n"
++	       "STATUS=Running, %i service(s) configured\n",
++	       gpctx->config->num_svcs);
+ 
+     GPDEBUG("Initialization complete.\n");
+ 
+-    gpctx = verto_get_private(ev);
+     idle_handler(gpctx);
+ }
+ 
+diff --git a/src/gp_mgmt.c b/src/gp_mgmt.c
+index 9f03ed2..57466c1 100644
+--- a/src/gp_mgmt.c
++++ b/src/gp_mgmt.c
+@@ -18,6 +18,9 @@ static void idle_terminate(verto_ctx *vctx, verto_ev *ev)
+ {
+     struct gssproxy_ctx *gpctx = verto_get_private(ev);
+ 
++    sd_notifyf(0, "STOPPING=1\nSTATUS=Idle for %ld seconds, stopping\n",
++               (long)gpctx->term_timeout/1000);
++
+     GPDEBUG("Terminating, after idling for %ld seconds!\n",
+             (long)gpctx->term_timeout/1000);
+     verto_break(vctx);
+diff --git a/src/gp_util.c b/src/gp_util.c
+index 9b55244..cff7f13 100644
+--- a/src/gp_util.c
++++ b/src/gp_util.c
+@@ -7,9 +7,38 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <unistd.h>
++#include <stdint.h>
++#include <time.h>
+ 
+ #include "gp_common.h"
+ 
++#define USEC_INFINITY ((uint64_t)UINT64_MAX)
++#define NSEC_PER_USEC ((uint64_t)1000ULL)
++#define USEC_PER_SEC  ((uint64_t)1000000ULL)
++uint64_t time_now_usec(void)
++{
++    struct timespec ts;
++
++    if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0) {
++        goto out;
++    }
++
++    if (ts.tv_sec < 0 || ts.tv_nsec < 0) {
++        goto out;
++    }
++
++    if ((uint64_t)ts.tv_sec >
++        (UINT64_MAX - (ts.tv_nsec / NSEC_PER_USEC)) / USEC_PER_SEC) {
++        goto out;
++    }
++
++    return (uint64_t)ts.tv_sec * USEC_PER_SEC +
++           (uint64_t)ts.tv_nsec / NSEC_PER_USEC;
++
++out:
++    return USEC_INFINITY;
++}
++
+ bool gp_same(const char *a, const char *b)
+ {
+     if (a == b || (a && b && strcmp(a, b) == 0)) {
+diff --git a/systemd/gssproxy.service.in b/systemd/gssproxy.service.in
+index b8f1f77..693b569 100644
+--- a/systemd/gssproxy.service.in
++++ b/systemd/gssproxy.service.in
+@@ -8,11 +8,10 @@ Before=rpc-gssd.service
+ StateDirectory=gssproxy/clients gssproxy/rcache
+ StateDirectoryMode=0700
+ Environment=KRB5RCACHEDIR=/var/lib/gssproxy/rcache
+-ExecStart=@sbindir@/gssproxy -D
+-# These two should be used with traditional UNIX forking daemons
+-# consult systemd.service(5) for more details
+-Type=forking
+-PIDFile=/run/gssproxy.pid
++ExecStart=@sbindir@/gssproxy -i
++# This can be changed to notify-reload and ExecReload= can be removed once
++#   systemd 253 is common enough
++Type=notify
+ ExecReload=/bin/kill -HUP $MAINPID
+ 
+ ProtectSystem=full
+diff --git a/systemd/gssuserproxy.service.in b/systemd/gssuserproxy.service.in
+index 4a00098..7852523 100644
+--- a/systemd/gssuserproxy.service.in
++++ b/systemd/gssuserproxy.service.in
+@@ -3,7 +3,7 @@ Description=GSS User Proxy
+ Documentation=man:gssproxy(8)
+ 
+ [Service]
+-Type=exec
++Type=notify
+ StandardError=journal
+ ExecStart=@sbindir@/gssproxy -i -u
+ Restart=on-failure
+-- 
+2.47.1
+

@@ -1,0 +1,22 @@
+commit 01aee0f3601c60e570aeb9040c036c83d053cc5a
+Author: Florian Weimer <fweimer@redhat.com>
+Date:   Thu Dec 8 13:01:07 2022 +0100
+
+    m4/progname.m4: Include <stdio.h> for printf in lldp_CHECK___PROGNAME
+    
+    Otherwise the checks always fails with a compiler that does not
+    support implict function declarations.
+
+diff --git a/configure b/configure
+index 10baaca5824a3568..f43b2fd9beb18847 100755
+--- a/configure
++++ b/configure
+@@ -19039,7 +19039,7 @@
+ do CFLAGS="$ac_save_CFLAGS $LLDP_CFLAGS "`echo $ac_arg | sed -e 's,%%.*,,' -e 's,%,,'`
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++#include<stdio.h>
+ int
+ main (void)
+ {

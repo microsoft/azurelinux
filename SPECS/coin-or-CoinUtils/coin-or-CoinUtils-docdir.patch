@@ -1,0 +1,21 @@
+diff -up CoinUtils-releases-2.11.10/CoinUtils/Makefile.in.orig CoinUtils-releases-2.11.10/CoinUtils/Makefile.in
+--- CoinUtils-releases-2.11.10/CoinUtils/Makefile.in.orig	2023-10-24 20:38:25.000000000 -0600
++++ CoinUtils-releases-2.11.10/CoinUtils/Makefile.in	2023-10-26 13:07:16.171140892 -0600
+@@ -344,7 +344,7 @@ EXTRA_DIST = $(am__append_2)
+ ########################################################################
+ pkgconfiglibdir = $(libdir)/pkgconfig
+ pkgconfiglib_DATA = coinutils.pc
+-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/CoinUtils
++addlibsdir = $(DESTDIR)$(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ 
+ ########################################################################
+ #                         Maintainer Stuff                             #
+@@ -354,7 +354,7 @@ CLEANFILES =
+ # Files that are generated and should be cleaned with make distclean
+ DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
+ DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md 
+-DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
++DocInstallDir = $(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+ COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
+ all: all-recursive

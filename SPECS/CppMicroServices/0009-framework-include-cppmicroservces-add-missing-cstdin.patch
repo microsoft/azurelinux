@@ -1,0 +1,68 @@
+From 07c23b083db871c3f9d120eec0215ff91207f5f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 3 Feb 2025 11:52:12 +0000
+Subject: [PATCH 09/12] framework/include/cppmicroservces: add missing cstdint
+ includes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With GCC 15 the code fails to compile due to undefined uint8_t and
+uint32_t types. The release notes for GCC 15 caution:
+
+[quote]
+  In particular, the following headers are used less widely within
+  libstdc++ and may need to be included explicitly when compiling
+  with GCC 15:
+
+    <stdint.h> (for int8_t, int32_t etc.) and <cstdint> (for
+    std::int8_t, std::int32_t etc.)
+    <ostream> (for std::endl, std::flush etc.)
+[/quote]
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ framework/include/cppmicroservices/Any.h            | 1 +
+ framework/include/cppmicroservices/BundleEvent.h    | 1 +
+ framework/include/cppmicroservices/FrameworkEvent.h | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/framework/include/cppmicroservices/Any.h b/framework/include/cppmicroservices/Any.h
+index 4c86f810..4e707d7f 100644
+--- a/framework/include/cppmicroservices/Any.h
++++ b/framework/include/cppmicroservices/Any.h
+@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
+ #include <typeinfo>
+ #include <utility>
+ #include <vector>
++#include <cstdint>
+ 
+ namespace cppmicroservices
+ {
+diff --git a/framework/include/cppmicroservices/BundleEvent.h b/framework/include/cppmicroservices/BundleEvent.h
+index 5a6f8f72..5a85cd49 100644
+--- a/framework/include/cppmicroservices/BundleEvent.h
++++ b/framework/include/cppmicroservices/BundleEvent.h
+@@ -27,6 +27,7 @@
+ 
+ #include <iostream>
+ #include <memory>
++#include <cstdint>
+ 
+ // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+ US_MSVC_PUSH_DISABLE_WARNING(4251)
+diff --git a/framework/include/cppmicroservices/FrameworkEvent.h b/framework/include/cppmicroservices/FrameworkEvent.h
+index ea645f0e..7db55ddc 100644
+--- a/framework/include/cppmicroservices/FrameworkEvent.h
++++ b/framework/include/cppmicroservices/FrameworkEvent.h
+@@ -27,6 +27,7 @@
+ 
+ #include <iostream>
+ #include <memory>
++#include <cstdint>
+ 
+ US_MSVC_PUSH_DISABLE_WARNING(
+     4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+-- 
+2.48.1
+

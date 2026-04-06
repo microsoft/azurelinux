@@ -1,0 +1,13 @@
+diff -up expect5.45/example/mkpasswd.orig expect5.45/example/mkpasswd
+--- expect5.45/example/mkpasswd.orig	2011-03-16 13:23:23.125480017 +0100
++++ expect5.45/example/mkpasswd	2011-03-16 13:24:08.739353139 +0100
+@@ -202,7 +202,8 @@ if {[info exists user]} {
+ 	expect {
+ 		"assword*:" {
+ 			# some systems say "Password (again):"
+-			send "$password\r"
++			send -- "$password\r"
++			# "--" because of passwords beginning with dash
+ 			exp_continue
+ 		}
+ 	}

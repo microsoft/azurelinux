@@ -1,0 +1,36 @@
+--- qt-x11-free-3.3.6/mkspecs/linux-g++/qmake.conf.orig	2006-06-21 15:37:53.000000000 +0200
++++ qt-x11-free-3.3.6/mkspecs/linux-g++/qmake.conf	2006-06-21 15:38:02.000000000 +0200
+@@ -84,7 +84,7 @@
+ QMAKE_MOVE		= mv -f
+ QMAKE_DEL_FILE		= rm -f
+ QMAKE_DEL_DIR		= rmdir
+-QMAKE_STRIP             = strip
+-QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
++QMAKE_STRIP             =
++QMAKE_STRIPFLAGS_LIB 	+=
+ QMAKE_CHK_DIR_EXISTS	= test -d
+ QMAKE_MKDIR		= mkdir -p
+--- qt-x11-free-3.3.6/mkspecs/linux-g++-32/qmake.conf.orig	2006-06-21 15:37:09.000000000 +0200
++++ qt-x11-free-3.3.6/mkspecs/linux-g++-32/qmake.conf	2006-06-21 15:37:19.000000000 +0200
+@@ -84,7 +84,7 @@
+ QMAKE_MOVE		= mv -f
+ QMAKE_DEL_FILE		= rm -f
+ QMAKE_DEL_DIR		= rmdir
+-QMAKE_STRIP             = strip
+-QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
++QMAKE_STRIP             =
++QMAKE_STRIPFLAGS_LIB 	+=
+ QMAKE_CHK_DIR_EXISTS	= test -d
+ QMAKE_MKDIR		= mkdir -p
+--- qt-x11-free-3.3.6/mkspecs/linux-g++-64/qmake.conf.orig	2006-06-21 15:36:23.000000000 +0200
++++ qt-x11-free-3.3.6/mkspecs/linux-g++-64/qmake.conf	2006-06-21 15:36:56.000000000 +0200
+@@ -87,7 +87,7 @@
+ QMAKE_MOVE		= mv -f
+ QMAKE_DEL_FILE		= rm -f
+ QMAKE_DEL_DIR		= rmdir
+-QMAKE_STRIP             = strip
+-QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
++QMAKE_STRIP             =
++QMAKE_STRIPFLAGS_LIB 	+=
+ QMAKE_CHK_DIR_EXISTS	= test -d
+ QMAKE_MKDIR		= mkdir -p

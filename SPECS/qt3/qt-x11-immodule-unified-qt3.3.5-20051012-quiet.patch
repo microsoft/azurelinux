@@ -1,0 +1,134 @@
+diff -Nur qt-x11-free-3.3.5.orig/plugins/src/inputmethods/imsw-multi/qmultiinputcontext.cpp qt-x11-free-3.3.5/plugins/src/inputmethods/imsw-multi/qmultiinputcontext.cpp
+--- qt-x11-free-3.3.5.orig/plugins/src/inputmethods/imsw-multi/qmultiinputcontext.cpp	2005-10-13 16:09:36.000000000 +0200
++++ qt-x11-free-3.3.5/plugins/src/inputmethods/imsw-multi/qmultiinputcontext.cpp	2005-10-13 16:09:31.000000000 +0200
+@@ -306,8 +306,8 @@
+ 
+         currentIMKey = key;
+ 
+-	qDebug( "QMultiInputContext::changeInputMethod(): index=%d, slave=%s",
+-		imIndex, (const char *)_slave->identifierName() );
++	/* qDebug( "QMultiInputContext::changeInputMethod(): index=%d, slave=%s",
++		imIndex, (const char *)_slave->identifierName() ); */
+     }
+ }
+ 
+diff -Nur qt-x11-free-3.3.5.orig/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp qt-x11-free-3.3.5/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp
+--- qt-x11-free-3.3.5.orig/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp	2005-10-13 16:09:36.000000000 +0200
++++ qt-x11-free-3.3.5/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp	2005-10-13 16:09:31.000000000 +0200
+@@ -140,7 +140,7 @@
+         // only one character. See description of
+         // QInputContext::filterEvent() about key compression.
+         val = text[0].unicode();
+-        qDebug( "str = %s", (const char*)keyevent->text().local8Bit() );
++        // qDebug( "str = %s", (const char*)keyevent->text().local8Bit() );
+     }
+ 
+     // Store value
+@@ -164,14 +164,14 @@
+ 
+ void QSimpleInputContext::setFocus()
+ {
+-    qDebug( "QSimpleInputContext: %p->setFocus(), focusWidget()=%p",
+-            this, focusWidget() );
++    /* qDebug( "QSimpleInputContext: %p->setFocus(), focusWidget()=%p",
++            this, focusWidget() ); */
+ }
+ 
+ void QSimpleInputContext::unsetFocus()
+ {
+-    qDebug( "QSimpleInputContext: %p->unsetFocus(), focusWidget()=%p",
+-            this, focusWidget() );
++    /* qDebug( "QSimpleInputContext: %p->unsetFocus(), focusWidget()=%p",
++            this, focusWidget() ); */
+     reset();
+ }
+ 
+@@ -188,8 +188,8 @@
+     case QEvent::MouseButtonRelease:
+     case QEvent::MouseButtonDblClick:
+     case QEvent::MouseMove:
+-        qDebug( "QSimpleInputContext::mouseHandler: "
+-                "x=%d, type=%d, button=%d, state=%d", x, type, button, state );
++        /* qDebug( "QSimpleInputContext::mouseHandler: "
++                "x=%d, type=%d, button=%d, state=%d", x, type, button, state ); */
+         break;
+     default:
+         break;
+@@ -240,7 +240,7 @@
+ 
+     // no entries were found
+     if ( p == composeTable->data + composeTable->size ) {
+-        qDebug( "no match" );
++        // qDebug( "no match" );
+         clearComposeBuffer();
+         return FALSE;
+     }
+@@ -250,18 +250,18 @@
+ 
+         // check if partial match
+         if ( composeBuffer[i] == 0 && p->keys[i] ) {
+-            qDebug("partial match");
++            // qDebug("partial match");
+             return TRUE;
+         }
+ 
+         if ( composeBuffer[i] != p->keys[i] ) {
+-            qDebug("different entry");
++            // qDebug("different entry");
+             clearComposeBuffer();
+             return i!=0;
+         }
+     }
+ 
+-    qDebug("match exactly");
++    // qDebug("match exactly");
+ 
+     // match exactly
+     commitChar( p->value );
+diff -Nur qt-x11-free-3.3.5.orig/src/kernel/qinputcontext.cpp qt-x11-free-3.3.5/src/kernel/qinputcontext.cpp
+--- qt-x11-free-3.3.5.orig/src/kernel/qinputcontext.cpp	2005-10-13 16:09:37.000000000 +0200
++++ qt-x11-free-3.3.5/src/kernel/qinputcontext.cpp	2005-10-13 16:09:31.000000000 +0200
+@@ -526,17 +526,17 @@
+ 	return;
+ 
+     if ( type == QEvent::IMStart ) {
+-	qDebug( "sending IMStart with %d chars to %p",
+-		text.length(), receiver );
++	/* qDebug( "sending IMStart with %d chars to %p",
++		text.length(), receiver ); */
+ 	event = new QIMEvent( type, text, cursorPosition );
+     } else if ( type == QEvent::IMEnd ) {
+-	qDebug( "sending IMEnd with %d chars to %p, text=%s",
+-		text.length(), receiver, (const char*)text.local8Bit() );
++	/* qDebug( "sending IMEnd with %d chars to %p, text=%s",
++		text.length(), receiver, (const char*)text.local8Bit() ); */
+ 	event = new QIMEvent( type, text, cursorPosition );
+     } else if ( type == QEvent::IMCompose ) {
+-	qDebug( "sending IMCompose to %p with %d chars, cpos=%d, sellen=%d, text=%s",
++	/* qDebug( "sending IMCompose to %p with %d chars, cpos=%d, sellen=%d, text=%s",
+ 		receiver, text.length(), cursorPosition, selLength,
+-		(const char*)text.local8Bit() );
++		(const char*)text.local8Bit() ); */
+ 	event = new QIMComposeEvent( type, text, cursorPosition, selLength );
+     }
+ 
+--- qt-x11-free-3.3.5/plugins/src/inputmethods/xim/qximinputcontext_x11.cpp.quiet	2005-10-13 19:00:56.000000000 +0200
++++ qt-x11-free-3.3.5/plugins/src/inputmethods/xim/qximinputcontext_x11.cpp	2005-10-25 15:36:43.000000000 +0200
+@@ -356,7 +356,7 @@
+ #if !defined(QT_NO_XIM)
+     fontsetRefCount++;
+     if (! qt_xim) {
+-	qWarning("QInputContext: no input method context available");
++	// qWarning("QInputContext: no input method context available");
+ 	return;
+     }
+ 
+@@ -742,7 +742,7 @@
+ 
+ void QXIMInputContext::close( const QString &errMsg )
+ {
+-    qDebug( errMsg );
++    // qDebug( errMsg );
+     emit deletionRequested();
+ }
+ 

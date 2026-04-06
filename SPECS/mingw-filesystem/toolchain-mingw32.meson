@@ -1,0 +1,23 @@
+[binaries]
+c = 'i686-w64-mingw32-gcc'
+cpp = 'i686-w64-mingw32-g++'
+fortran = 'i686-w64-mingw32-gfortran'
+rust = ['rustc', '--target', 'i686-pc-windows-gnu']
+ar = '/usr/bin/i686-w64-mingw32-ar'
+pkg-config = '/usr/bin/i686-w64-mingw32-pkg-config'
+ranlib = '/usr/bin/x86_64-w64-mingw32-ranlib'
+strip = '/usr/bin/i686-w64-mingw32-strip'
+windres = '/usr/bin/i686-w64-mingw32-windres'
+dlltool = '/usr/bin/i686-w64-mingw32-dlltool'
+libgcrypt-config = '/usr/i686-w64-mingw32/sys-root/mingw/bin/libgcrypt-config'
+glib-mkenums = '/usr/i686-w64-mingw32/sys-root/mingw/bin/glib-mkenums'
+
+[properties]
+root = '/usr/i686-w64-mingw32/sys-root/mingw'
+needs_exe_wrapper = true
+
+[host_machine]
+system = 'windows'
+cpu_family = 'x86'
+cpu = 'i686'
+endian = 'little'

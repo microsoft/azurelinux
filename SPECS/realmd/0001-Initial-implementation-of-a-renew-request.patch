@@ -1,0 +1,335 @@
+From 7a19dbe6620565817769f6862d3af5bac761235e Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Mon, 2 Dec 2024 17:22:06 +0100
+Subject: [PATCH 1/3] Initial implementation of a renew request
+
+This patch implements a new D-Bus request for realmd to renew the machine
+account credentials in a keytab. This patch does not implement calling
+the membership-software to do the actual update.
+
+https://issues.redhat.com/browse/SSSD-8347
+---
+ dbus/org.freedesktop.realmd.xml          |   9 ++
+ service/org.freedesktop.realmd.policy.in |  10 ++
+ service/realm-invocation.c               |   1 +
+ service/realm-kerberos.c                 |  15 ++
+ tools/Makefile.am                        |   1 +
+ tools/realm-renew.c                      | 179 +++++++++++++++++++++++
+ tools/realm.c                            |   1 +
+ tools/realm.h                            |   4 +
+ 8 files changed, 220 insertions(+)
+ create mode 100644 tools/realm-renew.c
+
+diff --git a/dbus/org.freedesktop.realmd.xml b/dbus/org.freedesktop.realmd.xml
+index c34a47a..58e5773 100644
+--- a/dbus/org.freedesktop.realmd.xml
++++ b/dbus/org.freedesktop.realmd.xml
+@@ -725,6 +725,15 @@
+ 			<arg name="options" type="a{sv}" direction="in"/>
+ 		</method>
+ 
++		<!--
++		  Renew:
++
++		  Renew the client's credential in the realm.
++		-->
++		<method name="Renew">
++			<arg name="options" type="a{sv}" direction="in"/>
++		</method>
++
+ 	</interface>
+ 
+ </node>
+diff --git a/service/org.freedesktop.realmd.policy.in b/service/org.freedesktop.realmd.policy.in
+index 562cbbc..4ce97d7 100644
+--- a/service/org.freedesktop.realmd.policy.in
++++ b/service/org.freedesktop.realmd.policy.in
+@@ -44,6 +44,16 @@
+ 		</defaults>
+ 	</action>
+ 
++	<action id="org.freedesktop.realmd.renew-realm">
++		<description>Renew machine creadentials in realm</description>
++		<message>Authentication is required to renew the credentials of this  computer in a realm or domain.</message>
++		<defaults>
++			<allow_any>auth_admin</allow_any>
++			<allow_inactive>auth_admin</allow_inactive>
++			<allow_active>auth_admin_keep</allow_active>
++		</defaults>
++	</action>
++
+ 	<action id="org.freedesktop.realmd.login-policy">
+ 		<description>Change login policy</description>
+ 		<message>Authentication is required to change the policy of who can log in on this computer.</message>
+diff --git a/service/realm-invocation.c b/service/realm-invocation.c
+index bb26fe3..91977e9 100644
+--- a/service/realm-invocation.c
++++ b/service/realm-invocation.c
+@@ -37,6 +37,7 @@ static InvocationMethod invocation_methods[] = {
+ 	{ REALM_DBUS_PROVIDER_INTERFACE, "Discover", "org.freedesktop.realmd.discover-realm", 2 },
+ 	{ REALM_DBUS_KERBEROS_MEMBERSHIP_INTERFACE, "Join", "org.freedesktop.realmd.configure-realm", 2 },
+ 	{ REALM_DBUS_KERBEROS_MEMBERSHIP_INTERFACE, "Leave", "org.freedesktop.realmd.deconfigure-realm", 2 },
++	{ REALM_DBUS_KERBEROS_MEMBERSHIP_INTERFACE, "Renew", "org.freedesktop.realmd.renew-realm", 1 },
+ 	{ REALM_DBUS_REALM_INTERFACE, "Deconfigure", "org.freedesktop.realmd.deconfigure-realm", 1 },
+ 	{ REALM_DBUS_REALM_INTERFACE, "ChangeLoginPolicy", "org.freedesktop.realmd.login-policy", 4 },
+ };
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 51a1b11..3c9c71c 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -407,6 +407,19 @@ handle_leave (RealmDbusKerberosMembership *membership,
+ 	return TRUE;
+ }
+ 
++static gboolean
++handle_renew (RealmDbusKerberosMembership *membership,
++               GDBusMethodInvocation *invocation,
++               GVariant *options,
++               gpointer user_data)
++{
++	//RealmKerberos *self = REALM_KERBEROS (user_data);
++
++	g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD,
++	                                       "Renew is currently not impemented.");
++	return TRUE;
++}
++
+ static gboolean
+ handle_deconfigure (RealmDbusRealm *realm,
+                     GDBusMethodInvocation *invocation,
+@@ -567,6 +580,8 @@ realm_kerberos_constructed (GObject *obj)
+ 		                  G_CALLBACK (handle_join), self);
+ 		g_signal_connect (self->pv->membership_iface, "handle-leave",
+ 		                  G_CALLBACK (handle_leave), self);
++		g_signal_connect (self->pv->membership_iface, "handle-renew",
++		                  G_CALLBACK (handle_renew), self);
+ 		g_dbus_object_skeleton_add_interface (G_DBUS_OBJECT_SKELETON (self),
+ 		                                      G_DBUS_INTERFACE_SKELETON (self->pv->membership_iface));
+ 
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 97b67e7..65abb60 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -9,6 +9,7 @@ realm_SOURCES = \
+ 	tools/realm-discover.c \
+ 	tools/realm-join.c \
+ 	tools/realm-leave.c \
++	tools/realm-renew.c \
+ 	tools/realm-logins.c \
+ 	service/realm-kerberos-helper.c \
+ 	$(NULL)
+diff --git a/tools/realm-renew.c b/tools/realm-renew.c
+new file mode 100644
+index 0000000..7b28e48
+--- /dev/null
++++ b/tools/realm-renew.c
+@@ -0,0 +1,179 @@
++/* realmd -- Realm configuration service
++ *
++ * Copyright 2024 Red Hat Inc
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; either version 2 of the licence or (at
++ * your option) any later version.
++ *
++ * See the included COPYING file for more information.
++ *
++ * Author: Sumit Bose <sbose@redhat.com>
++ */
++
++#include "config.h"
++
++#include "realm.h"
++#include "realm-client.h"
++#include "realm-dbus-constants.h"
++#include "realm-dbus-generated.h"
++
++#include <glib.h>
++#include <glib/gi18n.h>
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <string.h>
++
++typedef struct {
++	GAsyncResult *result;
++	GMainLoop *loop;
++} SyncClosure;
++
++static void
++on_complete_get_result (GObject *source,
++                        GAsyncResult *result,
++                        gpointer user_data)
++{
++	SyncClosure *sync = user_data;
++	sync->result = g_object_ref (result);
++	g_main_loop_quit (sync->loop);
++}
++
++static int
++call_renew (RealmDbusKerberosMembership *membership,
++            GVariant *options,
++            GError **error)
++{
++	SyncClosure sync;
++	gboolean ret;
++
++	sync.result = NULL;
++	sync.loop = g_main_loop_new (NULL, FALSE);
++
++	/* Start actual operation */
++	realm_dbus_kerberos_membership_call_renew (membership, options, NULL,
++	                                           on_complete_get_result, &sync);
++
++	/* This mainloop is quit by on_complete_get_result */
++	g_main_loop_run (sync.loop);
++
++	ret = realm_dbus_kerberos_membership_call_renew_finish (membership, sync.result, error);
++
++	g_object_unref (sync.result);
++	g_main_loop_unref (sync.loop);
++
++	return ret ? 0 : 1;
++}
++
++typedef struct {
++	gchar *membership_software;
++	gboolean use_ldaps;
++} RealmRenewArgs;
++
++static void
++realm_renew_args_clear (gpointer data)
++{
++	RealmRenewArgs *args = data;
++	g_free (args->membership_software);
++}
++
++static int
++perform_renew (RealmClient *client,
++               const gchar *string,
++               RealmRenewArgs *args)
++{
++	RealmDbusKerberosMembership *membership;
++	gboolean had_mismatched = FALSE;
++	RealmDbusRealm *realm;
++	GError *error = NULL;
++	GVariant *options;
++	GList *realms;
++	gint ret;
++
++	realms = realm_client_discover (client, string, args->use_ldaps, NULL,
++	                                NULL, args->membership_software,
++	                                REALM_DBUS_KERBEROS_MEMBERSHIP_INTERFACE,
++	                                &had_mismatched, &error);
++
++	if (error != NULL) {
++		realm_handle_error(error, NULL);
++		return 1;
++	} else if (realms == NULL) {
++		if (had_mismatched)
++			realm_handle_error (NULL, _("Cannot renew credentials for this realm"));
++		else
++			realm_handle_error(NULL, _("No such realm found"));
++		return 1;
++	}
++
++	membership = realms->data;
++	realm = realm_client_to_realm (client, membership);
++	if (!realm_is_configured (realm)) {
++		realm_handle_error (NULL, _("Not joined to this domain"));
++		return 1;
++	}
++
++	options = realm_build_options (REALM_DBUS_OPTION_MEMBERSHIP_SOFTWARE, args->membership_software,
++	                               REALM_DBUS_OPTION_USE_LDAPS, args->use_ldaps ? "True" : "False",
++	                               NULL);
++	g_variant_ref_sink (options);
++
++	ret = call_renew (membership, options, &error);
++	if (error != NULL) {
++		realm_handle_error (error, _("Couldn't renew realm credentials"));
++	}
++
++	g_variant_unref (options);
++	g_list_free_full (realms, g_object_unref);
++	return ret;
++}
++
++int
++realm_renew (RealmClient *client,
++             int argc,
++             char *argv[])
++{
++	GOptionContext *context;
++	GError *error = NULL;
++	const gchar *realm_name;
++	RealmRenewArgs args;
++	GOptionGroup *group;
++	gint ret = 0;
++
++	GOptionEntry option_entries[] = {
++		{ "membership-software", 0, 0, G_OPTION_ARG_STRING, &args.membership_software,
++		  N_("Use specific membership software"), NULL },
++		{ "use-ldaps", 0, 0, G_OPTION_ARG_NONE, &args.use_ldaps,
++		  N_("Use ldaps to connect to LDAP"), NULL },
++		{ NULL, }
++	};
++
++	memset (&args, 0, sizeof (args));
++
++	context = g_option_context_new ("renew REALM");
++	g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
++
++	group = g_option_group_new (NULL, NULL, NULL, &args, realm_renew_args_clear);
++	g_option_group_add_entries (group, option_entries);
++	g_option_group_add_entries (group, realm_global_options);
++	g_option_context_set_main_group (context, group);
++
++	if (!g_option_context_parse (context, &argc, &argv, &error)) {
++		g_printerr ("%s: %s\n", g_get_prgname (), error->message);
++		g_error_free (error);
++		ret = 2;
++
++	} else if (argc > 2) {
++		g_printerr ("%s: %s\n", g_get_prgname (), _("Specify one realm to renew credentials"));
++		ret = 2;
++
++	} else {
++		realm_name = argc < 2 ? "" : argv[1];
++		ret = perform_renew (client, realm_name, &args);
++	}
++
++	g_option_context_free (context);
++	return ret;
++}
+diff --git a/tools/realm.c b/tools/realm.c
+index 8fdca16..3902017 100644
+--- a/tools/realm.c
++++ b/tools/realm.c
+@@ -40,6 +40,7 @@ struct {
+ 	{ "discover", realm_discover, "realm discover -v [realm-name]", N_("Discover available realm") },
+ 	{ "join", realm_join, "realm join -v [-U user] realm-name", N_("Enroll this machine in a realm") },
+ 	{ "leave", realm_leave, "realm leave -v [-U user] [realm-name]", N_("Unenroll this machine from a realm") },
++	{ "renew", realm_renew, "realm renew -v [realm-name]", N_("Renew credentials for this machine in a realm") },
+ 	{ "list", realm_list, "realm list", N_("List known realms") },
+ 	{ "permit", realm_permit, "realm permit [-ax] [-R realm] user ...", N_("Permit user logins") },
+ 	{ "deny", realm_deny, "realm deny --all [-R realm]", N_("Deny user logins") },
+diff --git a/tools/realm.h b/tools/realm.h
+index 380b58b..68118e3 100644
+--- a/tools/realm.h
++++ b/tools/realm.h
+@@ -41,6 +41,10 @@ int                   realm_leave                  (RealmClient *client,
+                                                     int argc,
+                                                     char *argv[]);
+ 
++int                   realm_renew                  (RealmClient *client,
++                                                    int argc,
++                                                    char *argv[]);
++
+ int                   realm_discover               (RealmClient *client,
+                                                     int argc,
+                                                     char *argv[]);
+-- 
+2.49.0
+

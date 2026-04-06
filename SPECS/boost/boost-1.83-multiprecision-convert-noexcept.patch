@@ -1,0 +1,78 @@
+From ea786494db78efdf178cbe36810f3326156e3347 Mon Sep 17 00:00:00 2001
+From: Kefu Chai <tchaikov@gmail.com>
+Date: Fri, 3 May 2024 15:08:05 +0800
+Subject: [PATCH] make sure eval_convert_to() do not terminate with super large
+ number
+
+this change is a follow-up of d51f2e9dbb. it intends to
+address the exception thrown in a noexcept functon.
+
+a minimal reproducer looks like
+
+```c++
+
+int main() {
+    std::string s = "32767456456456456456545678943512357658768763546575675";
+    boost::multiprecision::cpp_int num(s);
+    std::cout << num.convert_to<float>() << std::endl;
+}
+```
+
+since boost 1.79, the code above terminates like
+```
+Program returned: 139
+Program stderr
+terminate called after throwing an instance of 'boost::wrapexcept<std::domain_error>'
+  what():  Error in function float_next<float>(float): Argument must be finite, but got inf
+Program terminated with signal: SIGSEGV
+```
+
+because `float_next_imp()` throws 'boost::wrapexcept<std::domain_error>'
+if the number is NAN of INF. and `eval_convert_to()` is marked as
+`noexcept(boost::multiprecision::detail::is_arithmetic<R>::value &&
+          std::numeric_limits<R>::has_infinity)`,
+but only `overflow_error` is ignored in the policy passed to
+`float_next()`.
+
+so, in this change, `std::domain_error` is ignored as well, so that
+``num.convert_to<float>()` returns a NaN in this case.
+
+Refs #553
+
+Signed-off-by: Kefu Chai <tchaikov@gmail.com>
+---
+ include/boost/multiprecision/cpp_int/misc.hpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/include/boost/multiprecision/cpp_int/misc.hpp b/include/boost/multiprecision/cpp_int/misc.hpp
+index cdae2f75..a8a76400 100644
+--- a/boost/multiprecision/cpp_int/misc.hpp
++++ b/boost/multiprecision/cpp_int/misc.hpp
+@@ -184,7 +184,9 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+ 
+ template <class R, std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_floating_point<R>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, void>::type
+-eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend) noexcept(boost::multiprecision::detail::is_arithmetic<R>::value && std::numeric_limits<R>::has_infinity)
++eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& backend) noexcept(boost::multiprecision::detail::is_arithmetic<R>::value &&
++                                                                                                                         (std::numeric_limits<R>::has_infinity ||
++                                                                                                                          std::numeric_limits<R>::has_quiet_NaN))
+ {
+    BOOST_MP_FLOAT128_USING using std::ldexp;
+    if (eval_is_zero(backend))
+@@ -244,10 +246,11 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+          if ((eval_lsb_imp(backend) < static_cast<std::size_t>(bits)) || eval_bit_test(backend, static_cast<std::size_t>(bits + 1)))
+          {
+             #ifdef BOOST_MP_MATH_AVAILABLE
+-            BOOST_IF_CONSTEXPR(std::numeric_limits<R>::has_infinity)
++            BOOST_IF_CONSTEXPR(std::numeric_limits<R>::has_infinity || std::numeric_limits<R>::has_quiet_NaN)
+             {
+                // Must NOT throw:
+-               *result = boost::math::float_next(*result, boost::math::policies::make_policy(boost::math::policies::overflow_error<boost::math::policies::ignore_error>()));
++               *result = boost::math::float_next(*result, boost::math::policies::make_policy(boost::math::policies::overflow_error<boost::math::policies::ignore_error>(),
++                                                                                             boost::math::policies::domain_error<boost::math::policies::ignore_error>()));
+             }
+             else
+             {
+-- 
+2.44.0
+

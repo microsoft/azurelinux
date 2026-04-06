@@ -1,0 +1,9 @@
+diff -rupN --no-dereference harfbuzz-11.5.1/src/gen-def.py harfbuzz-11.5.1-new/src/gen-def.py
+--- harfbuzz-11.5.1/src/gen-def.py	2025-09-22 18:58:28.000000000 +0200
++++ harfbuzz-11.5.1-new/src/gen-def.py	2025-09-24 09:28:30.986317110 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!/usr/bin/python3
+ 
+ "usage: gen-def.py harfbuzz.def hb.h [hb-blob.h hb-buffer.h ...]"
+ 

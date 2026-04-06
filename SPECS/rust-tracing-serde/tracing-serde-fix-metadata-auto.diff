@@ -1,0 +1,29 @@
+--- tracing-serde-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-serde-0.2.0/Cargo.toml	2025-01-03T16:54:37.845621+00:00
+@@ -55,21 +55,8 @@
+ 
+ [features]
+ valuable = [
+-    "valuable_crate",
+-    "valuable-serde",
+     "tracing-core/valuable",
+ ]
+-
+-[target."cfg(tracing_unstable)".dependencies.valuable-serde]
+-version = "0.1.0"
+-optional = true
+-default-features = false
+-
+-[target."cfg(tracing_unstable)".dependencies.valuable_crate]
+-version = "0.1.0"
+-optional = true
+-default-features = false
+-package = "valuable"
+ 
+ [badges.maintenance]
+ status = "experimental"
+@@ -81,3 +68,4 @@
+     "cfg(flaky_tests)",
+     "cfg(tracing_unstable)",
+ ]
++

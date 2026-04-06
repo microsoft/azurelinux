@@ -1,0 +1,13 @@
+--- Osi-releases-0.108.9/Osi/src/Osi/OsiSolverInterface.cpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/Osi/OsiSolverInterface.cpp	2023-10-26 21:31:49.349103142 -0600
+@@ -1512,8 +1512,8 @@ int OsiSolverInterface::readLp(FILE *fp,
+   CoinLpIO m;
+   m.readLp(fp, epsilon);
+ 
+-  // set objective function offest
+-  setDblParam(OsiObjOffset, 0);
++  // set objective function offset
++  setDblParam(OsiObjOffset, m.objectiveOffset());
+ 
+   // set problem name
+   setStrParam(OsiProbName, m.getProblemName());

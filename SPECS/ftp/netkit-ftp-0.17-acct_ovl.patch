@@ -1,0 +1,13 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.acct_ovl netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.acct_ovl	2011-09-09 15:36:36.087956561 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2011-09-09 15:41:16.457495370 +0200
+@@ -1837,8 +1837,7 @@ account(int argc, char *argv[])
+ 		while (argc > 1) {
+ 			--argc;
+ 			++argv;
+-			strncat(buf, *argv, sizeof(buf)-strlen(buf));
+-			buf[sizeof(buf)-1] = 0;
++			strncat(buf, *argv, sizeof(buf)-strlen(buf)-1);
+ 		}
+ 		ap = buf;
+ 	}

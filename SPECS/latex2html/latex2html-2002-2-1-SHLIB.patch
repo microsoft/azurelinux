@@ -1,0 +1,20 @@
+--- latex2html-2002-2-1/config/config.pl.orig	2004-11-02 20:17:57.000000000 +0900
++++ latex2html-2002-2-1/config/config.pl	2004-11-02 20:48:22.024993493 +0900
+@@ -1915,12 +1915,12 @@
+ else {
+   # similar to the perl installation procedure, append latex2html only
+   # if it does not appear in the PREFIX
+-  if($newcfg{'PREFIX'} =~ /l2h|latex2html/i) {
+-    $newcfg{'SHLIBDIR'} = $newcfg{'PREFIX'};
+-  }
+-  else {
++#  if($newcfg{'PREFIX'} =~ /l2h|latex2html/i) {
++#    $newcfg{'SHLIBDIR'} = $newcfg{'PREFIX'};
++#  }
++#  else {
+     $newcfg{'SHLIBDIR'} = "$newcfg{'PREFIX'}${dd}share${dd}lib${dd}latex2html";
+-  }
++#  }
+ }
+ add_drive_letter($newcfg{'SHLIBDIR'});
+ 

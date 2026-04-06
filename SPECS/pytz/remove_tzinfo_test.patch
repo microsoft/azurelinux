@@ -1,0 +1,12 @@
+diff --git a/pytz/tests/test_tzinfo.py b/pytz/tests/test_tzinfo.py
+index b2640a8..4f5322b 100644
+--- a/pytz/tests/test_tzinfo.py
++++ b/pytz/tests/test_tzinfo.py
+@@ -155,6 +155,7 @@ class PicklingTest(unittest.TestCase):
+             self._roundtrip_tzinfo(localized_tz)
+             self._roundtrip_datetime(dt.replace(tzinfo=localized_tz))
+ 
++    @unittest.skip('Fails with system-wide timezone database')
+     def testRoundtrip(self):
+         for zone in pytz.all_timezones:
+             tz = pytz.timezone(zone)

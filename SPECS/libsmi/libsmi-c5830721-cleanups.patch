@@ -1,0 +1,105 @@
+diff -up libsmi-c5830721/lib/parser-sming.y.cleanups libsmi-c5830721/lib/parser-sming.y
+--- libsmi-c5830721/lib/parser-sming.y.cleanups	2024-01-05 10:18:45.522863586 -0500
++++ libsmi-c5830721/lib/parser-sming.y	2024-01-05 10:26:01.760964005 -0500
+@@ -86,7 +86,8 @@ static int bitsFlag = 0;
+  * and typedef to tie the type statement respectively to class or
+  * module.
+  */
+-static int attributeFlag = 0;
++/* UNUSED? */
++/* static int attributeFlag = 0; */
+ 
+ #define SMI_EPOCH	631152000	/* 01 Jan 1990 00:00:00 */ 
+  
+@@ -179,7 +180,7 @@ checkTypes(Parser *parserPtr, Module *mo
+ 	 * Complain about empty description clauses.
+ 	 */
+ 
+-	if (! parserPtr->flags & SMI_FLAG_NODESCR
++	if (!(parserPtr->flags & SMI_FLAG_NODESCR)
+ 	    && (! typePtr->export.description
+ 		|| ! typePtr->export.description[0])) {
+ 	    smiPrintErrorAtLine(parserPtr, ERR_EMPTY_DESCRIPTION,
+@@ -876,8 +877,8 @@ typedefStatement:	typedefKeyword sep ucI
+ 			    /* 
+ 			     *check for duplicate names in the module 
+ 			     */
+-			    if(typePtr = 
+-			    	findType(typeIdentifier, thisParserPtr,thisModulePtr)) 
++			    if((typePtr = 
++			    	findType(typeIdentifier, thisParserPtr,thisModulePtr))) 
+ 					if( typePtr->modulePtr == thisParserPtr->modulePtr)
+ 					       smiPrintError(thisParserPtr,
+ 							     ERR_DUPLICATE_TYPE_NAME,
+@@ -910,8 +911,8 @@ typedefStatement:	typedefKeyword sep ucI
+ 			    	if (typePtr->export.basetype == SMI_BASETYPE_ENUM) {
+ 				    /* check ENUM value for correctness */
+ 				    if ($11->len) {
+-    	 				if (namedNumberPtr = findNamedNumberByName(typePtr,
+-										   $11->value.ptr)) {
++    	 				if ((namedNumberPtr = findNamedNumberByName(typePtr,
++										   $11->value.ptr))) {
+ 					    smiFree($11);
+ 					    $11 = &namedNumberPtr->export.value;
+     	 				} else {
+@@ -1056,11 +1057,11 @@ classStatement: classKeyword sep ucIdent
+ 				    classPtr->uniqueList->nextPtr = NULL;
+ 				    smiFree($11);
+ 				} else {
+-				    tmpList = $11;
++				    /* tmpList = $11; */
+ 				    /* convert  all attribute names to attributes */
+-				    for (tmpList; tmpList; tmpList=tmpList->nextPtr) {
+-					if (tmpAttribute = 
+-					    (Attribute*)smiGetAttribute(&(classPtr->export),(char*)(tmpList->ptr)))
++				    for (tmpList = $11; tmpList; tmpList=tmpList->nextPtr) {
++					if ((tmpAttribute = 
++					    (Attribute*)smiGetAttribute(&(classPtr->export),(char*)(tmpList->ptr))))
+ 					{
+ 					    smiFree(tmpList->ptr);
+ 					    tmpList->ptr = tmpAttribute;
+diff -up libsmi-c5830721/tools/dump-cm.c.cleanups libsmi-c5830721/tools/dump-cm.c
+--- libsmi-c5830721/tools/dump-cm.c.cleanups	2024-01-05 10:12:26.501563299 -0500
++++ libsmi-c5830721/tools/dump-cm.c	2024-01-05 10:12:54.195950583 -0500
+@@ -48,7 +48,7 @@ static const float HEADSPACESIZETABLE  =
+ static const float ATTRFONTSIZE        = (float)0.48;
+ static const float ATTRSPACESIZE       = (float)2.4;
+ static const float RECTCORRECTION      = (float)0.85;
+-static const float EDGEYSPACING        = (float)2.0;
++/* static const float EDGEYSPACING        = (float)2.0; */
+ static const float TABLEHEIGHT         = (float)2.6;   /* headline of the table */
+ static const float TABLEELEMHEIGHT     = (float)0.675; /* height of one attribute */
+ 
+diff -up libsmi-c5830721/tools/dump-identifiers.c.cleanups libsmi-c5830721/tools/dump-identifiers.c
+--- libsmi-c5830721/tools/dump-identifiers.c.cleanups	2024-01-05 10:09:51.788399769 -0500
++++ libsmi-c5830721/tools/dump-identifiers.c	2024-01-05 10:10:19.927793271 -0500
+@@ -148,7 +148,7 @@ static void fprintYangAll(FILE *f, const
+ 			fprintf(f, ":%d:", 0);
+ 		    }
+ 		    fprintf(f, " %*s %s\n", -identifierLen, childNode->value,
+-			    yangDeclAsString(childNode->nodeKind), childNode);
++			    yangDeclAsString(childNode->nodeKind));
+ 		}
+ 	    }
+ 	    break;
+@@ -161,7 +161,7 @@ static void fprintYangAll(FILE *f, const
+ 
+ static void fprintYangIdentifiers(FILE *f, int modc, SmiModule **modv)
+ {
+-    YangNode *typeNode;
++    /* YangNode *typeNode; */
+     int	      i;
+ 
+     for (i = 0; i < modc; i++) {
+diff -up libsmi-c5830721/tools/dump-tree.c.cleanups libsmi-c5830721/tools/dump-tree.c
+--- libsmi-c5830721/tools/dump-tree.c.cleanups	2024-01-05 10:10:33.185978677 -0500
++++ libsmi-c5830721/tools/dump-tree.c	2024-01-05 10:12:07.117292227 -0500
+@@ -373,7 +373,7 @@ static void fprintSubTree(FILE *f, SmiNo
+ 			  char *prefix, size_t typefieldlen)
+ {
+     SmiNode     *childNode, *indexNode;
+-    SmiType     *type;
++    /* SmiType     *type; */
+     int         i = 0, cnt, prefixlen;
+     size_t      newtypefieldlen = 9;
+     char        c = 0;

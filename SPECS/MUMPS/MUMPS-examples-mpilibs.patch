@@ -1,0 +1,31 @@
+Set flags according to the Make.seq.inc file
+
+Index: mumps/examples/Makefile
+===================================================================
+--- mumps.orig/examples/Makefile
++++ mumps/examples/Makefile
+@@ -29,19 +29,19 @@
+ LIBZMUMPS = -L$(libdir) -lzmumps$(PLAT) -lmumps_common$(PLAT)
+ 
+ ssimpletest:   $$@.o
+-	$(FL) -o $@ $(OPTL) ssimpletest.o  $(LIBSMUMPS) $(LORDERINGS) $(LIBS) $(RPATH_OPT) $(LIBBLAS) $(LIBOTHERS)
++	$(FL) -o $@ $(OPTL) ssimpletest.o  $(LIBSMUMPS) $(LORDERINGS) $(LIBS) $(MUMPS_LIBF77) $(LIBBLAS) $(LIBOTHERS)
+ 
+ dsimpletest:  $$@.o 
+-	$(FL) -o $@ $(OPTL) dsimpletest.o  $(LIBDMUMPS) $(LORDERINGS) $(LIBS) $(RPATH_OPT) $(LIBBLAS) $(LIBOTHERS)
++	$(FL) -o $@ $(OPTL) dsimpletest.o  $(LIBDMUMPS) $(LORDERINGS) $(LIBS) $(MUMPS_LIBF77) $(LIBBLAS) $(LIBOTHERS)
+ 
+ csimpletest:  $$@.o
+-	$(FL) -o $@ $(OPTL) csimpletest.o  $(LIBCMUMPS) $(LORDERINGS) $(LIBS) $(RPATH_OPT) $(LIBBLAS) $(LIBOTHERS)
++	$(FL) -o $@ $(OPTL) csimpletest.o  $(LIBCMUMPS) $(LORDERINGS) $(LIBS) $(MUMPS_LIBF77) $(LIBBLAS) $(LIBOTHERS)
+ 
+ zsimpletest:  $$@.o
+-	$(FL) -o $@ $(OPTL) zsimpletest.o  $(LIBZMUMPS) $(LORDERINGS) $(LIBS) $(RPATH_OPT) $(LIBBLAS) $(LIBOTHERS)
++	$(FL) -o $@ $(OPTL) zsimpletest.o  $(LIBZMUMPS) $(LORDERINGS) $(LIBS) $(MUMPS_LIBF77) $(LIBBLAS) $(LIBOTHERS)
+ 
+ c_example: $$@.o
+-	$(FL) -o $@ $(OPTL) $@.o $(LIBDMUMPS) $(LORDERINGS) $(LIBS) $(RPATH_OPT) $(LIBBLAS) $(LIBOTHERS)
++	$(FL) -o $@ $(OPTL) $@.o $(LIBDMUMPS) $(LORDERINGS) $(LIBS) $(MUMPS_LIBF77) $(LIBBLAS) $(LIBOTHERS)
+ 
+ 
+ multiple_arithmetics_example: $$@.o

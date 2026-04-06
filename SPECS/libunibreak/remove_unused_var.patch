@@ -1,0 +1,37 @@
+diff --git a/src/tests.c b/src/tests.c
+index 2135144..658c919 100644
+--- a/src/tests.c
++++ b/src/tests.c
+@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
+     clock_t t1;
+     clock_t t2;
+ 
+-    char noBreak, mustBreak, insideChar;
++    char noBreak, mustBreak;
+     const unsigned int *testSkips; /* Zero terminated array of line numbers to skip in the test. */
+ 
+     if (argc != 2)
+@@ -72,7 +72,6 @@ int main(int argc, char *argv[])
+         testType = TEST_TYPE_LINE;
+         noBreak = LINEBREAK_NOBREAK;
+         mustBreak = LINEBREAK_MUSTBREAK;
+-        insideChar = LINEBREAK_INSIDEACHAR;
+         testSkips = testSkipsLine;
+         break;
+     case 'w':
+@@ -80,7 +79,6 @@ int main(int argc, char *argv[])
+         testType = TEST_TYPE_WORD;
+         noBreak = WORDBREAK_NOBREAK;
+         mustBreak = WORDBREAK_BREAK;
+-        insideChar = WORDBREAK_INSIDEACHAR;
+         testSkips = testSkipsWord;
+         break;
+     case 'g':
+@@ -88,7 +86,6 @@ int main(int argc, char *argv[])
+         testType = TEST_TYPE_GRAPHEME;
+         noBreak = GRAPHEMEBREAK_NOBREAK;
+         mustBreak = GRAPHEMEBREAK_BREAK;
+-        insideChar = GRAPHEMEBREAK_INSIDEACHAR;
+         testSkips = testSkipsGrapheme;
+         break;
+     default:

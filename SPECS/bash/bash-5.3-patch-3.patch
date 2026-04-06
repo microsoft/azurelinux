@@ -1,0 +1,1463 @@
+diff --git a/po/ka.po b/po/ka.po
+--- a/po/ka.po
++++ b/po/ka.po
+@@ -1,14 +1,14 @@
+ # Georgian translation for bash.
+ # Copyright (C) 2022 Free Software Foundation, Inc.
+ # This file is distributed under the same license as the bash package.
+-# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2022, 2023.
++# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2022, 2023, 2025.
+ #
+ msgid ""
+ msgstr ""
+-"Project-Id-Version: bash-5.2-rc1\n"
++"Project-Id-Version: bash-5.3-rc2\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2025-04-22 09:37-0400\n"
+-"PO-Revision-Date: 2023-09-02 11:33+0200\n"
++"PO-Revision-Date: 2025-07-13 06:08+0200\n"
+ "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
+ "Language-Team: Georgian <(nothing)>\n"
+ "Language: ka\n"
+@@ -17,7 +17,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+ "X-Bugs: Report translation errors to the Language-Team address.\n"
+-"X-Generator: Poedit 3.3.2\n"
++"X-Generator: Poedit 3.6\n"
+ 
+ #: arrayfunc.c:63
+ msgid "bad array subscript"
+@@ -42,13 +42,11 @@ msgstr "%s: არა-რიცხვული ინდექსის მი
+ #: arrayfunc.c:841
+ #, c-format
+ msgid "%s: %s: must use subscript when assigning associative array"
+-msgstr ""
+-"%s: %s: ასოციაციური მასივის მინიჭებისას ქვესკრიპტის გამოყენება აუცილებელია"
++msgstr "%s: %s: ასოციაციური მასივის მინიჭებისას ქვესკრიპტის გამოყენება აუცილებელია"
+ 
+ #: bashhist.c:464
+-#, fuzzy
+ msgid "cannot create"
+-msgstr "%s: შექმნის შეცდომა: %s"
++msgstr "შექმნის შეცდომა"
+ 
+ #: bashline.c:4642
+ msgid "bash_execute_unix_command: cannot find keymap for command"
+@@ -65,9 +63,9 @@ msgid "no closing `%c' in %s"
+ msgstr "'%c' %s-ში არ იხურება"
+ 
+ #: bashline.c:4873
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: missing separator"
+-msgstr "%s: სვეტის გამყოფი აღმოჩენილი არაა"
++msgstr "%s: გამყოფი აღმოჩენილი არაა"
+ 
+ #: bashline.c:4920
+ #, c-format
+@@ -80,9 +78,9 @@ msgid "brace expansion: cannot allocate memory for %s"
+ msgstr "ფრჩხილის გაფართოება: %s-სთვის მეხსიერების გამოყოფა შეუძლებელია"
+ 
+ #: braces.c:403
+-#, fuzzy, c-format
++#, c-format
+ msgid "brace expansion: failed to allocate memory for %s elements"
+-msgstr "ფრჩხილის გაფართოება: %u ელემენტისთვის მეხსიერების გამოყოფა შეუძლებელია"
++msgstr "ფრჩხილის გაფართოება: %s ელემენტისთვის მეხსიერების გამოყოფა შეუძლებელია"
+ 
+ #: braces.c:462
+ #, c-format
+@@ -104,9 +102,8 @@ msgid "`%s': invalid keymap name"
+ msgstr "`%s': არასწორი განლაგების სახელი"
+ 
+ #: builtins/bind.def:277
+-#, fuzzy
+ msgid "cannot read"
+-msgstr "%s: წაკითხვა შეუძლებელია: %s"
++msgstr "წაკითხვის შეცდომა"
+ 
+ #: builtins/bind.def:353 builtins/bind.def:382
+ #, c-format
+@@ -274,9 +271,9 @@ msgid "no job control"
+ msgstr "დავალებების კონტროლის გარეშე"
+ 
+ #: builtins/common.c:279
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: invalid job specification"
+-msgstr "%s: არასწორი ვადის სპეციფიკაცია"
++msgstr "%s: არასწორი დავალების სპეციფიკაცია"
+ 
+ #: builtins/common.c:289
+ #, c-format
+@@ -293,24 +290,20 @@ msgid "%s: not a shell builtin"
+ msgstr "%s: გარსში ჩაშენებული არაა"
+ 
+ #: builtins/common.c:307
+-#, fuzzy
+ msgid "write error"
+-msgstr "ჩაწერის შეცდომა: %s"
++msgstr "ჩაწერის შეცდომა"
+ 
+ #: builtins/common.c:314
+-#, fuzzy
+ msgid "error setting terminal attributes"
+-msgstr "ტერმინალის ატრიბუტების დაყენების შეცდომა: %s"
++msgstr "ტერმინალის ატრიბუტების დაყენების შეცდომა"
+ 
+ #: builtins/common.c:316
+-#, fuzzy
+ msgid "error getting terminal attributes"
+-msgstr "ტერმინალის ატრიბუტების მიღების შეცდომა: %s"
++msgstr "ტერმინალის ატრიბუტების მიღების შეცდომა"
+ 
+ #: builtins/common.c:611
+-#, fuzzy
+ msgid "error retrieving current directory"
+-msgstr "%s: მიმდინარე საქაღალდის მიღების შეცდომა: %s: %s\n"
++msgstr "მიმდინარე საქაღალდის მიღების შეცდომა"
+ 
+ #: builtins/common.c:675 builtins/common.c:677
+ #, c-format
+@@ -318,9 +311,9 @@ msgid "%s: ambiguous job spec"
+ msgstr "%s: გაურკვეველი დავალების სპეციფიკაცია"
+ 
+ #: builtins/common.c:709
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: job specification requires leading `%%'"
+-msgstr "%s: პარამეტრს არგუმენტი ესაჭიროება"
++msgstr "%s: დავალების სპეციფიკაციას წინ სჭირდება `%%'"
+ 
+ #: builtins/common.c:937
+ msgid "help not available in this version"
+@@ -468,9 +461,8 @@ msgstr "%s: ფაილი ძალიან დიდია"
+ 
+ #: builtins/evalfile.c:189 builtins/evalfile.c:207 execute_cmd.c:6222
+ #: shell.c:1687
+-#, fuzzy
+ msgid "cannot execute binary file"
+-msgstr "%s: ბინარული ფაილის გაშვება შეუძლებელია"
++msgstr "ბინარული ფაილის შესრულება შეუძლებელია"
+ 
+ #: builtins/evalstring.c:478
+ #, c-format
+@@ -478,9 +470,8 @@ msgid "%s: ignoring function definition attempt"
+ msgstr ""
+ 
+ #: builtins/exec.def:158 builtins/exec.def:160 builtins/exec.def:249
+-#, fuzzy
+ msgid "cannot execute"
+-msgstr "%s: %s-ის გასვება შეუძლებელია"
++msgstr "გაშვება შეუძლებელია"
+ 
+ #: builtins/exit.def:61
+ #, c-format
+@@ -511,9 +502,8 @@ msgid "history specification"
+ msgstr "ისტორიის სპეციფიკაცია"
+ 
+ #: builtins/fc.def:462
+-#, fuzzy
+ msgid "cannot open temp file"
+-msgstr "%s: დროებითი ფაილის გახსნის შეცდომა: %s"
++msgstr "დროებითი ფაილის გახსნა შეუძლებელია"
+ 
+ #: builtins/fg_bg.def:150 builtins/jobs.def:293
+ msgid "current"
+@@ -564,20 +554,17 @@ msgstr ""
+ 
+ #: builtins/help.def:185
+ #, c-format
+-msgid ""
+-"no help topics match `%s'.  Try `help help' or `man -k %s' or `info %s'."
++msgid "no help topics match `%s'.  Try `help help' or `man -k %s' or `info %s'."
+ msgstr ""
+ 
+ #: builtins/help.def:214
+-#, fuzzy
+ msgid "cannot open"
+-msgstr "შეჩერება შეუძლებელია"
++msgstr "გახსნის შეცდომა"
+ 
+ #: builtins/help.def:264 builtins/help.def:306 builtins/history.def:306
+ #: builtins/history.def:325 builtins/read.def:909
+-#, fuzzy
+ msgid "read error"
+-msgstr "კითხვის შეცდომა: %d: %s"
++msgstr "წაკითხვის შეცდომა"
+ 
+ #: builtins/help.def:517
+ #, c-format
+@@ -601,9 +588,8 @@ msgid "history position"
+ msgstr "ისტორიის პოზიცია"
+ 
+ #: builtins/history.def:280
+-#, fuzzy
+ msgid "empty filename"
+-msgstr "ცარიელი მასივის ცვლადის სახელი"
++msgstr "ფაილის სახელი ცარიელია"
+ 
+ #: builtins/history.def:282 subst.c:8226
+ #, c-format
+@@ -643,9 +629,8 @@ msgid "%s: invalid file descriptor specification"
+ msgstr "%s: არასწორი ფაილის დესკრიპტორის აღწერა"
+ 
+ #: builtins/mapfile.def:257 builtins/read.def:380
+-#, fuzzy
+ msgid "invalid file descriptor"
+-msgstr "%d: არასწორი ფაილის დესკრიპტორი: %s"
++msgstr "არასწორი ფაილის დესკრიპტორი"
+ 
+ #: builtins/mapfile.def:266 builtins/mapfile.def:304
+ #, c-format
+@@ -682,7 +667,7 @@ msgstr "`%c': არასწორი დროის ფორმატის
+ 
+ #: builtins/printf.def:711
+ msgid "string length"
+-msgstr ""
++msgstr "სტრიქონის სიგრძე"
+ 
+ #: builtins/printf.def:811
+ #, c-format
+@@ -739,12 +724,10 @@ msgid ""
+ "    \twith its position in the stack\n"
+ "    \n"
+ "    Arguments:\n"
+-"      +N\tDisplays the Nth entry counting from the left of the list shown "
+-"by\n"
++"      +N\tDisplays the Nth entry counting from the left of the list shown by\n"
+ "    \tdirs when invoked without options, starting with zero.\n"
+ "    \n"
+-"      -N\tDisplays the Nth entry counting from the right of the list shown "
+-"by\n"
++"      -N\tDisplays the Nth entry counting from the right of the list shown by\n"
+ "\tdirs when invoked without options, starting with zero."
+ msgstr ""
+ 
+@@ -902,18 +885,16 @@ msgid "`%c': bad command"
+ msgstr "`%c': არასწორი ბრძანება"
+ 
+ #: builtins/ulimit.def:465 builtins/ulimit.def:748
+-#, fuzzy
+ msgid "cannot get limit"
+-msgstr "%s: ზღვარის მიღების შეცდომა: %s"
++msgstr "ლიმიტის მიღება შეუძლებელია"
+ 
+ #: builtins/ulimit.def:498
+ msgid "limit"
+ msgstr "ლიმიტი"
+ 
+ #: builtins/ulimit.def:511 builtins/ulimit.def:812
+-#, fuzzy
+ msgid "cannot modify limit"
+-msgstr "%s: ვერ შევცვალე ლიმიტი: %s"
++msgstr "ვერ შევცვალე ლიმიტი"
+ 
+ #: builtins/umask.def:114
+ msgid "octal number"
+@@ -1000,12 +981,12 @@ msgstr "ფაიფის შეცდომა"
+ #: execute_cmd.c:4100
+ #, c-format
+ msgid "invalid regular expression `%s': %s"
+-msgstr ""
++msgstr "არასწორი რეგულარული გამოსახულება '%s': %s"
+ 
+ #: execute_cmd.c:4102
+ #, c-format
+ msgid "invalid regular expression `%s'"
+-msgstr ""
++msgstr "არასწორი რეგულარული გამოსახულება: '%s'"
+ 
+ #: execute_cmd.c:5056
+ #, c-format
+@@ -1023,9 +1004,8 @@ msgid "%s: maximum function nesting level exceeded (%d)"
+ msgstr ""
+ 
+ #: execute_cmd.c:5754
+-#, fuzzy
+ msgid "command not found"
+-msgstr "%s: ბრძანება ვერ ვიპოვე"
++msgstr "ბრძანება ვერ ვიპოვე"
+ 
+ #: execute_cmd.c:5783
+ #, c-format
+@@ -1033,9 +1013,8 @@ msgid "%s: restricted: cannot specify `/' in command names"
+ msgstr ""
+ 
+ #: execute_cmd.c:6176
+-#, fuzzy
+ msgid "bad interpreter"
+-msgstr "%s: %s: არასწორი ინტერპრეტატორი"
++msgstr "არასწორი ინტერპრეტატორი"
+ 
+ #: execute_cmd.c:6185
+ #, c-format
+@@ -1056,18 +1035,16 @@ msgid "recursion stack underflow"
+ msgstr "რესურსის სტეკის არშევსება"
+ 
+ #: expr.c:485
+-#, fuzzy
+ msgid "arithmetic syntax error in expression"
+-msgstr "გამოსახულების სინტაქსის შეცდომა"
++msgstr "არითმეტიკული სინტაქსის შეცდომა გამოსახულებაში"
+ 
+ #: expr.c:529
+ msgid "attempted assignment to non-variable"
+ msgstr ""
+ 
+ #: expr.c:538
+-#, fuzzy
+ msgid "arithmetic syntax error in variable assignment"
+-msgstr "სინტაქსის შეცდომა ცვლადის მინიჭებისას"
++msgstr "არითმეტიკული სინტაქსის შეცდომა ცვლადის მინიჭებისას"
+ 
+ #: expr.c:552 expr.c:917
+ msgid "division by 0"
+@@ -1094,9 +1071,8 @@ msgid "missing `)'"
+ msgstr "აკლია `)'"
+ 
+ #: expr.c:1120 expr.c:1507
+-#, fuzzy
+ msgid "arithmetic syntax error: operand expected"
+-msgstr "სინტაქსის შეცდომა: მოველოდი ოპერანდს"
++msgstr "არითმეტიკული სინტაქსის შეცდომა: მოველოდი ოპერანდს"
+ 
+ #: expr.c:1468 expr.c:1489
+ msgid "--: assignment requires lvalue"
+@@ -1107,9 +1083,8 @@ msgid "++: assignment requires lvalue"
+ msgstr ""
+ 
+ #: expr.c:1509
+-#, fuzzy
+ msgid "arithmetic syntax error: invalid arithmetic operator"
+-msgstr "სინტაქსის შეცდომა: არასწორი არითმეტიკული ოპერატორი"
++msgstr "არითმეტიკული სინტაქსის შეცდომა: არასწორი არითმეტიკული ოპერატორი"
+ 
+ #: expr.c:1532
+ #, c-format
+@@ -1411,9 +1386,8 @@ msgid "network operations not supported"
+ msgstr "ქსელური ოპერაციები მხარდაუჭერელია"
+ 
+ #: locale.c:226 locale.c:228 locale.c:301 locale.c:303
+-#, fuzzy
+ msgid "cannot change locale"
+-msgstr "setlocale: %s: ვერ შევცვალე ლოკალი (%s)"
++msgstr "ვერ შევცვალე ლოკალი"
+ 
+ #: mailcheck.c:435
+ msgid "You have mail in $_"
+@@ -1458,15 +1432,12 @@ msgstr ""
+ 
+ #: parse.y:2572
+ #, c-format
+-msgid ""
+-"shell_getc: shell_input_line_size (%zu) exceeds SIZE_MAX (%lu): line "
+-"truncated"
++msgid "shell_getc: shell_input_line_size (%zu) exceeds SIZE_MAX (%lu): line truncated"
+ msgstr ""
+ 
+ #: parse.y:2864
+-#, fuzzy
+ msgid "script file read error"
+-msgstr "ჩაწერის შეცდომა: %s"
++msgstr "სკრიპტის ფაილის წაკითხვის შეცდომა"
+ 
+ #: parse.y:3101
+ msgid "maximum here-document count exceeded"
+@@ -1542,9 +1513,9 @@ msgid "unexpected token %d in conditional command"
+ msgstr ""
+ 
+ #: parse.y:6827
+-#, fuzzy, c-format
++#, c-format
+ msgid "syntax error near unexpected token `%s' while looking for matching `%c'"
+-msgstr "სინტაქსის შეცდომა: ფაილის მოულოდნელი დასასრული"
++msgstr ""
+ 
+ #: parse.y:6829
+ #, c-format
+@@ -1557,14 +1528,14 @@ msgid "syntax error near `%s'"
+ msgstr "სინტაქსის შეცდომა `%s' -სთან ახლოს"
+ 
+ #: parse.y:6867
+-#, fuzzy, c-format
++#, c-format
+ msgid "syntax error: unexpected end of file from `%s' command on line %d"
+-msgstr "სინტაქსის შეცდომა: ფაილის მოულოდნელი დასასრული"
++msgstr "სინტაქსის შეცდომა: ფაილის მოულოდნელი დასასრული '%s' ბრძანებიდან ხაზზე %d"
+ 
+ #: parse.y:6869
+-#, fuzzy, c-format
++#, c-format
+ msgid "syntax error: unexpected end of file from command on line %d"
+-msgstr "სინტაქსის შეცდომა: ფაილის მოულოდნელი დასასრული"
++msgstr "სინტაქსის შეცდომა: ფაილის მოულოდნელი დასასრული ბრძანებიდან ხაზზე %d"
+ 
+ #: parse.y:6873
+ msgid "syntax error: unexpected end of file"
+@@ -1584,9 +1555,8 @@ msgid "unexpected EOF while looking for matching `)'"
+ msgstr ""
+ 
+ #: pathexp.c:897
+-#, fuzzy
+ msgid "invalid glob sort type"
+-msgstr "არასწორი ბაზა"
++msgstr "არასწორი გლობების დალაგების ტიპი"
+ 
+ #: pcomplete.c:1070
+ #, c-format
+@@ -1632,28 +1602,24 @@ msgid "file descriptor out of range"
+ msgstr "ფაილის დესკრიპტორი დიაპაზონს გარეთაა"
+ 
+ #: redir.c:201
+-#, fuzzy
+ msgid "ambiguous redirect"
+-msgstr "%s: ყალბი გადამისამართება"
++msgstr "გაურკვეველი გადამისამართება"
+ 
+ #: redir.c:205
+-#, fuzzy
+ msgid "cannot overwrite existing file"
+-msgstr "%s: არსებული ფაილის გადაწერის შეცდომა"
++msgstr "არსებული ფაილის თავზე გადაწერის შეუძლებელია"
+ 
+ #: redir.c:210
+-#, fuzzy
+ msgid "restricted: cannot redirect output"
+-msgstr "%s: შეზღუდვა: გამოტანის გადამისამართება შეუძლებელია"
++msgstr "შეზღუდვა: გამოტანის გადამისამართება შეუძლებელია"
+ 
+ #: redir.c:215
+ msgid "cannot create temp file for here-document"
+ msgstr ""
+ 
+ #: redir.c:219
+-#, fuzzy
+ msgid "cannot assign fd to variable"
+-msgstr "%s: fd -ის ცვლადზე მინიჭება შეუძლებელია"
++msgstr "fd-ის ცვლადზე მინიჭება შეუძლებელია"
+ 
+ #: redir.c:639
+ msgid "/dev/(tcp|udp)/host/port not supported without networking"
+@@ -1731,8 +1697,7 @@ msgstr "გარსის პარამეტრები:\n"
+ 
+ #: shell.c:2071
+ msgid "\t-ilrsD or -c command or -O shopt_option\t\t(invocation only)\n"
+-msgstr ""
+-"\t-ilrsD or -c ბრძანება ან -O მოკლე_პარამეტრი\t\t(მხოლოდ ჩაწოდებისას)\n"
++msgstr "\t-ilrsD or -c ბრძანება ან -O მოკლე_პარამეტრი\t\t(მხოლოდ ჩაწოდებისას)\n"
+ 
+ #: shell.c:2090
+ #, c-format
+@@ -1747,9 +1712,7 @@ msgstr ""
+ #: shell.c:2097
+ #, c-format
+ msgid "Type `%s -c help' for more information about shell builtin commands.\n"
+-msgstr ""
+-"გარსის ჩადგმული ბრძანებების შესახებ მეტი ინფორმაციის სანახავად გაუშვით '%s -"
+-"c help'.\n"
++msgstr "გარსის ჩადგმული ბრძანებების შესახებ მეტი ინფორმაციის სანახავად გაუშვით '%s -c help'.\n"
+ 
+ #: shell.c:2098
+ #, c-format
+@@ -2029,9 +1992,7 @@ msgid "$%s: cannot assign in this way"
+ msgstr "$%s: ამ გზით ვერ მივანიჭებ"
+ 
+ #: subst.c:10855
+-msgid ""
+-"future versions of the shell will force evaluation as an arithmetic "
+-"substitution"
++msgid "future versions of the shell will force evaluation as an arithmetic substitution"
+ msgstr ""
+ 
+ #: subst.c:11563
+@@ -2049,9 +2010,9 @@ msgid "argument expected"
+ msgstr "მოველოდი არგუმენტს"
+ 
+ #: test.c:164
+-#, fuzzy, c-format
++#, c-format
+ msgid "%s: integer expected"
+-msgstr "%s: მოსალოდნელია მთელი რიცხვის გამოსახულება"
++msgstr "%s: მოველოდი მთელ რიცხვს"
+ 
+ #: test.c:292
+ msgid "`)' expected"
+@@ -2093,8 +2054,7 @@ msgstr "run_pending_traps: არასწორი მნიშვნელო
+ 
+ #: trap.c:459
+ #, c-format
+-msgid ""
+-"run_pending_traps: signal handler is SIG_DFL, resending %d (%s) to myself"
++msgid "run_pending_traps: signal handler is SIG_DFL, resending %d (%s) to myself"
+ msgstr ""
+ 
+ #: trap.c:592
+@@ -2103,9 +2063,8 @@ msgid "trap_handler: bad signal %d"
+ msgstr "trap_handler: არასწორი სიგნალი %d"
+ 
+ #: unwind_prot.c:246 unwind_prot.c:292
+-#, fuzzy
+ msgid "frame not found"
+-msgstr "%s: ფაილი ნაპოვნი არაა"
++msgstr "ჩარჩო ნაპოვნი არაა"
+ 
+ #: variables.c:441
+ #, c-format
+@@ -2191,14 +2150,11 @@ msgid "%s: %s: compatibility value out of range"
+ msgstr "%s: %s: თავსებადობის მნიშვნელობა დიაპაზონს გარეთაა"
+ 
+ #: version.c:50
+-#, fuzzy
+ msgid "Copyright (C) 2025 Free Software Foundation, Inc."
+-msgstr "(C) 2022 Free Software Foundation, Inc. , ყველა უფლება დაცულია."
++msgstr "(C) 2025 Free Software Foundation, Inc. , ყველა უფლება დაცულია."
+ 
+ #: version.c:51
+-msgid ""
+-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+-"html>\n"
++msgid "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+ msgstr ""
+ 
+ #: version.c:90
+@@ -2243,9 +2199,7 @@ msgid "unalias [-a] name [name ...]"
+ msgstr "unalias [-a] სახელი [სახელი ...]"
+ 
+ #: builtins.c:53
+-msgid ""
+-"bind [-lpsvPSVX] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-"
+-"x keyseq:shell-command] [keyseq:readline-function or readline-command]"
++msgid "bind [-lpsvPSVX] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-x keyseq:shell-command] [keyseq:readline-function or readline-command]"
+ msgstr ""
+ 
+ #: builtins.c:56
+@@ -2265,9 +2219,8 @@ msgid "caller [expr]"
+ msgstr "caller [გამოს]"
+ 
+ #: builtins.c:66
+-#, fuzzy
+ msgid "cd [-L|[-P [-e]]] [-@] [dir]"
+-msgstr "cd [-L|[-P [-e]] [-@]] [საქაღლდე]"
++msgstr "cd [-L|[-P [-e]]] [-@] [საქაღალდე]"
+ 
+ #: builtins.c:68
+ msgid "pwd [-LP]"
+@@ -2278,15 +2231,11 @@ msgid "command [-pVv] command [arg ...]"
+ msgstr "command [-pVv] ბრძანება [არგ ...]"
+ 
+ #: builtins.c:78
+-msgid ""
+-"declare [-aAfFgiIlnrtux] [name[=value] ...] or declare -p [-aAfFilnrtux] "
+-"[name ...]"
++msgid "declare [-aAfFgiIlnrtux] [name[=value] ...] or declare -p [-aAfFilnrtux] [name ...]"
+ msgstr ""
+ 
+ #: builtins.c:80
+-msgid ""
+-"typeset [-aAfFgiIlnrtux] name[=value] ... or typeset -p [-aAfFilnrtux] "
+-"[name ...]"
++msgid "typeset [-aAfFgiIlnrtux] name[=value] ... or typeset -p [-aAfFilnrtux] [name ...]"
+ msgstr ""
+ 
+ #: builtins.c:82
+@@ -2315,8 +2264,7 @@ msgstr "getopts optstring სახელი [არგ ...]"
+ 
+ #: builtins.c:98
+ msgid "exec [-cl] [-a name] [command [argument ...]] [redirection ...]"
+-msgstr ""
+-"exec [-cl] [-a სახელი] [ბრძანება [არგუმენტი ...]] [გადამისამართება ...]"
++msgstr "exec [-cl] [-a სახელი] [ბრძანება [არგუმენტი ...]] [გადამისამართება ...]"
+ 
+ #: builtins.c:100
+ msgid "exit [n]"
+@@ -2347,9 +2295,7 @@ msgid "help [-dms] [pattern ...]"
+ msgstr "help [-dms] [შაბლონი ...]"
+ 
+ #: builtins.c:123
+-msgid ""
+-"history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg "
+-"[arg...]"
++msgid "history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg [arg...]"
+ msgstr ""
+ 
+ #: builtins.c:127
+@@ -2361,9 +2307,7 @@ msgid "disown [-h] [-ar] [jobspec ... | pid ...]"
+ msgstr "disown [-h] [-ar] [დავალების_სპეციფიკაცია ... | pid ...]"
+ 
+ #: builtins.c:134
+-msgid ""
+-"kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l "
+-"[sigspec]"
++msgid "kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]"
+ msgstr ""
+ 
+ #: builtins.c:136
+@@ -2371,9 +2315,7 @@ msgid "let arg [arg ...]"
+ msgstr "let არგ [არგ ...]"
+ 
+ #: builtins.c:138
+-msgid ""
+-"read [-Eers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p "
+-"prompt] [-t timeout] [-u fd] [name ...]"
++msgid "read [-Eers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]"
+ msgstr ""
+ 
+ #: builtins.c:140
+@@ -2389,9 +2331,8 @@ msgid "unset [-f] [-v] [-n] [name ...]"
+ msgstr "unset [-f] [-v] [-n] [სახელი ...]"
+ 
+ #: builtins.c:146
+-#, fuzzy
+ msgid "export [-fn] [name[=value] ...] or export -p [-f]"
+-msgstr "export [-fn] [სახელი[=მნიშვნელობა] ...] or export -p"
++msgstr "export [-fn] [სახელი[=მნიშვნელობა...] ან export -p [-f]"
+ 
+ #: builtins.c:148
+ msgid "readonly [-aAf] [name[=value] ...] or readonly -p"
+@@ -2402,14 +2343,12 @@ msgid "shift [n]"
+ msgstr "shift [n]"
+ 
+ #: builtins.c:152
+-#, fuzzy
+ msgid "source [-p path] filename [arguments]"
+-msgstr "source ფაილისსახელი [არგუმენტები]"
++msgstr "source [-p ბილიკი] ფაილისსახელი [არგუმენტები]"
+ 
+ #: builtins.c:154
+-#, fuzzy
+ msgid ". [-p path] filename [arguments]"
+-msgstr ". ფაილისსახელი [არგუმენტები]"
++msgstr ". [-p ბილიკი] ფაილისსახელი [არგუმენტები]"
+ 
+ #: builtins.c:157
+ msgid "suspend [-f]"
+@@ -2424,9 +2363,8 @@ msgid "[ arg... ]"
+ msgstr "[ arg... ]"
+ 
+ #: builtins.c:166
+-#, fuzzy
+ msgid "trap [-Plp] [[action] signal_spec ...]"
+-msgstr "trap [-lp] [[არგ] სიგნალის_სპეციფიკაცია ...]"
++msgstr "trap [-Plp] [[ქმედება] სიგნალის_სპეციფიკაცია ...]"
+ 
+ #: builtins.c:168
+ msgid "type [-afptP] name [name ...]"
+@@ -2473,12 +2411,8 @@ msgid "case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac"
+ msgstr "case სიტყვა in [შაბლონი [| შაბლონი]...) ბრძანებები ;;]... esac"
+ 
+ #: builtins.c:196
+-msgid ""
+-"if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]... [ else "
+-"COMMANDS; ] fi"
+-msgstr ""
+-"if ბრძანებები; then ბრძანებები; [ elif ბრძანებები; then ბრძანებები; ]... "
+-"[ else ბრძანებები; ] fi"
++msgid "if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]... [ else COMMANDS; ] fi"
++msgstr "if ბრძანებები; then ბრძანებები; [ elif ბრძანებები; then ბრძანებები; ]... [ else ბრძანებები; ] fi"
+ 
+ #: builtins.c:198
+ msgid "while COMMANDS; do COMMANDS-2; done"
+@@ -2537,17 +2471,11 @@ msgid "printf [-v var] format [arguments]"
+ msgstr "printf [-v var] ფორმატი [არგუმენტები]"
+ 
+ #: builtins.c:233
+-msgid ""
+-"complete [-abcdefgjksuv] [-pr] [-DEI] [-o option] [-A action] [-G globpat] [-"
+-"W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S "
+-"suffix] [name ...]"
++msgid "complete [-abcdefgjksuv] [-pr] [-DEI] [-o option] [-A action] [-G globpat] [-W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [name ...]"
+ msgstr ""
+ 
+ #: builtins.c:237
+-msgid ""
+-"compgen [-V varname] [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-"
+-"W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S "
+-"suffix] [word]"
++msgid "compgen [-V varname] [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"
+ msgstr ""
+ 
+ #: builtins.c:241
+@@ -2555,15 +2483,11 @@ msgid "compopt [-o|+o option] [-DEI] [name ...]"
+ msgstr "compopt [-o|+o პარამეტრი] [-DEI] [სახელი ...]"
+ 
+ #: builtins.c:244
+-msgid ""
+-"mapfile [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C "
+-"callback] [-c quantum] [array]"
++msgid "mapfile [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]"
+ msgstr ""
+ 
+ #: builtins.c:246
+-msgid ""
+-"readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C "
+-"callback] [-c quantum] [array]"
++msgid "readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]"
+ msgstr ""
+ 
+ #: builtins.c:258
+@@ -2581,8 +2505,7 @@ msgid ""
+ "      -p\tprint all defined aliases in a reusable format\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    alias returns true unless a NAME is supplied for which no alias has "
+-"been\n"
++"    alias returns true unless a NAME is supplied for which no alias has been\n"
+ "    defined."
+ msgstr ""
+ 
+@@ -2608,34 +2531,28 @@ msgid ""
+ "    Options:\n"
+ "      -m  keymap         Use KEYMAP as the keymap for the duration of this\n"
+ "                         command.  Acceptable keymap names are emacs,\n"
+-"                         emacs-standard, emacs-meta, emacs-ctlx, vi, vi-"
+-"move,\n"
++"                         emacs-standard, emacs-meta, emacs-ctlx, vi, vi-move,\n"
+ "                         vi-command, and vi-insert.\n"
+ "      -l                 List names of functions.\n"
+ "      -P                 List function names and bindings.\n"
+ "      -p                 List functions and bindings in a form that can be\n"
+ "                         reused as input.\n"
+-"      -S                 List key sequences that invoke macros and their "
+-"values\n"
+-"      -s                 List key sequences that invoke macros and their "
+-"values\n"
++"      -S                 List key sequences that invoke macros and their values\n"
++"      -s                 List key sequences that invoke macros and their values\n"
+ "                         in a form that can be reused as input.\n"
+ "      -V                 List variable names and values\n"
+ "      -v                 List variable names and values in a form that can\n"
+ "                         be reused as input.\n"
+ "      -q  function-name  Query about which keys invoke the named function.\n"
+-"      -u  function-name  Unbind all keys which are bound to the named "
+-"function.\n"
++"      -u  function-name  Unbind all keys which are bound to the named function.\n"
+ "      -r  keyseq         Remove the binding for KEYSEQ.\n"
+ "      -f  filename       Read key bindings from FILENAME.\n"
+ "      -x  keyseq:shell-command\tCause SHELL-COMMAND to be executed when\n"
+ "    \t\t\t\tKEYSEQ is entered.\n"
+-"      -X                 List key sequences bound with -x and associated "
+-"commands\n"
++"      -X                 List key sequences bound with -x and associated commands\n"
+ "                         in a form that can be reused as input.\n"
+ "    \n"
+-"    If arguments remain after option processing, the -p and -P options "
+-"treat\n"
++"    If arguments remain after option processing, the -p and -P options treat\n"
+ "    them as readline command names and restrict output to those names.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -2670,8 +2587,7 @@ msgid ""
+ "    \n"
+ "    Execute SHELL-BUILTIN with arguments ARGs without performing command\n"
+ "    lookup.  This is useful when you wish to reimplement a shell builtin\n"
+-"    as a shell function, but need to execute the builtin within the "
+-"function.\n"
++"    as a shell function, but need to execute the builtin within the function.\n"
+ "    \n"
+ "    Exit Status:\n"
+ "    Returns the exit status of SHELL-BUILTIN, or false if SHELL-BUILTIN is\n"
+@@ -2698,22 +2614,16 @@ msgstr ""
+ msgid ""
+ "Change the shell working directory.\n"
+ "    \n"
+-"    Change the current directory to DIR.  The default DIR is the value of "
+-"the\n"
++"    Change the current directory to DIR.  The default DIR is the value of the\n"
+ "    HOME shell variable. If DIR is \"-\", it is converted to $OLDPWD.\n"
+ "    \n"
+-"    The variable CDPATH defines the search path for the directory "
+-"containing\n"
+-"    DIR.  Alternative directory names in CDPATH are separated by a colon "
+-"(:).\n"
+-"    A null directory name is the same as the current directory.  If DIR "
+-"begins\n"
++"    The variable CDPATH defines the search path for the directory containing\n"
++"    DIR.  Alternative directory names in CDPATH are separated by a colon (:).\n"
++"    A null directory name is the same as the current directory.  If DIR begins\n"
+ "    with a slash (/), then CDPATH is not used.\n"
+ "    \n"
+-"    If the directory is not found, and the shell option `cdable_vars' is "
+-"set,\n"
+-"    the word is assumed to be  a variable name.  If that variable has a "
+-"value,\n"
++"    If the directory is not found, and the shell option `cdable_vars' is set,\n"
++"    the word is assumed to be  a variable name.  If that variable has a value,\n"
+ "    its value is used for DIR.\n"
+ "    \n"
+ "    Options:\n"
+@@ -2729,13 +2639,11 @@ msgid ""
+ "    \t\tattributes as a directory containing the file attributes\n"
+ "    \n"
+ "    The default is to follow symbolic links, as if `-L' were specified.\n"
+-"    `..' is processed by removing the immediately previous pathname "
+-"component\n"
++"    `..' is processed by removing the immediately previous pathname component\n"
+ "    back to a slash or the beginning of DIR.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns 0 if the directory is changed, and if $PWD is set successfully "
+-"when\n"
++"    Returns 0 if the directory is changed, and if $PWD is set successfully when\n"
+ "    -P is used; non-zero otherwise."
+ msgstr ""
+ 
+@@ -2794,8 +2702,7 @@ msgid ""
+ "Execute a simple command or display information about commands.\n"
+ "    \n"
+ "    Runs COMMAND with ARGS suppressing  shell function lookup, or display\n"
+-"    information about the specified COMMANDs.  Can be used to invoke "
+-"commands\n"
++"    information about the specified COMMANDs.  Can be used to invoke commands\n"
+ "    on disk when a function with the same name exists.\n"
+ "    \n"
+ "    Options:\n"
+@@ -2843,8 +2750,7 @@ msgid ""
+ "    Variables with the integer attribute have arithmetic evaluation (see\n"
+ "    the `let' command) performed when the variable is assigned a value.\n"
+ "    \n"
+-"    When used in a function, `declare' makes NAMEs local, as with the "
+-"`local'\n"
++"    When used in a function, `declare' makes NAMEs local, as with the `local'\n"
+ "    command.  The `-g' option suppresses this behavior.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -2881,8 +2787,7 @@ msgstr ""
+ msgid ""
+ "Write arguments to the standard output.\n"
+ "    \n"
+-"    Display the ARGs, separated by a single space character and followed by "
+-"a\n"
++"    Display the ARGs, separated by a single space character and followed by a\n"
+ "    newline, on the standard output.\n"
+ "    \n"
+ "    Options:\n"
+@@ -2906,11 +2811,9 @@ msgid ""
+ "    \t\t0 to 3 octal digits\n"
+ "      \\xHH\tthe eight-bit character whose value is HH (hexadecimal).  HH\n"
+ "    \t\tcan be one or two hex digits\n"
+-"      \\uHHHH\tthe Unicode character whose value is the hexadecimal value "
+-"HHHH.\n"
++"      \\uHHHH\tthe Unicode character whose value is the hexadecimal value HHHH.\n"
+ "    \t\tHHHH can be one to four hex digits.\n"
+-"      \\UHHHHHHHH the Unicode character whose value is the hexadecimal "
+-"value\n"
++"      \\UHHHHHHHH the Unicode character whose value is the hexadecimal value\n"
+ "    \t\tHHHHHHHH. HHHHHHHH can be one to eight hex digits.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -2952,8 +2855,7 @@ msgid ""
+ "    \n"
+ "    On systems with dynamic loading, the shell variable BASH_LOADABLES_PATH\n"
+ "    defines a search path for the directory containing FILENAMEs that do\n"
+-"    not contain a slash. It may include \".\" to force a search of the "
+-"current\n"
++"    not contain a slash. It may include \".\" to force a search of the current\n"
+ "    directory.\n"
+ "    \n"
+ "    To use the `test' found in $PATH instead of the shell builtin\n"
+@@ -2967,8 +2869,7 @@ msgstr ""
+ msgid ""
+ "Execute arguments as a shell command.\n"
+ "    \n"
+-"    Combine ARGs into a single string, use the result as input to the "
+-"shell,\n"
++"    Combine ARGs into a single string, use the result as input to the shell,\n"
+ "    and execute the resulting commands.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -3021,8 +2922,7 @@ msgid ""
+ "Replace the shell with the given command.\n"
+ "    \n"
+ "    Execute COMMAND, replacing this shell with the specified program.\n"
+-"    ARGUMENTS become the arguments to COMMAND.  If COMMAND is not "
+-"specified,\n"
++"    ARGUMENTS become the arguments to COMMAND.  If COMMAND is not specified,\n"
+ "    any redirections take effect in the current shell.\n"
+ "    \n"
+ "    Options:\n"
+@@ -3030,13 +2930,11 @@ msgid ""
+ "      -c\texecute COMMAND with an empty environment\n"
+ "      -l\tplace a dash in the zeroth argument to COMMAND\n"
+ "    \n"
+-"    If the command cannot be executed, a non-interactive shell exits, "
+-"unless\n"
++"    If the command cannot be executed, a non-interactive shell exits, unless\n"
+ "    the shell option `execfail' is set.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success unless COMMAND is not found or a redirection error "
+-"occurs."
++"    Returns success unless COMMAND is not found or a redirection error occurs."
+ msgstr ""
+ 
+ #: builtins.c:730
+@@ -3051,8 +2949,7 @@ msgstr ""
+ msgid ""
+ "Exit a login shell.\n"
+ "    \n"
+-"    Exits a login shell with exit status N.  Returns an error if not "
+-"executed\n"
++"    Exits a login shell with exit status N.  Returns an error if not executed\n"
+ "    in a login shell."
+ msgstr ""
+ 
+@@ -3060,15 +2957,13 @@ msgstr ""
+ msgid ""
+ "Display or execute commands from the history list.\n"
+ "    \n"
+-"    fc is used to list or edit and re-execute commands from the history "
+-"list.\n"
++"    fc is used to list or edit and re-execute commands from the history list.\n"
+ "    FIRST and LAST can be numbers specifying the range, or FIRST can be a\n"
+ "    string, which means the most recent command beginning with that\n"
+ "    string.\n"
+ "    \n"
+ "    Options:\n"
+-"      -e ENAME\tselect which editor to use.  Default is FCEDIT, then "
+-"EDITOR,\n"
++"      -e ENAME\tselect which editor to use.  Default is FCEDIT, then EDITOR,\n"
+ "    \t\tthen vi\n"
+ "      -l \tlist lines instead of editing\n"
+ "      -n\tomit line numbers when listing\n"
+@@ -3084,8 +2979,7 @@ msgid ""
+ "    The history builtin also operates on the history list.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success or status of executed command; non-zero if an error "
+-"occurs."
++"    Returns success or status of executed command; non-zero if an error occurs."
+ msgstr ""
+ 
+ #: builtins.c:781
+@@ -3104,10 +2998,8 @@ msgstr ""
+ msgid ""
+ "Move jobs to the background.\n"
+ "    \n"
+-"    Place the jobs identified by each JOB_SPEC in the background, as if "
+-"they\n"
+-"    had been started with `&'.  If JOB_SPEC is not present, the shell's "
+-"notion\n"
++"    Place the jobs identified by each JOB_SPEC in the background, as if they\n"
++"    had been started with `&'.  If JOB_SPEC is not present, the shell's notion\n"
+ "    of the current job is used.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -3119,8 +3011,7 @@ msgid ""
+ "Remember or display program locations.\n"
+ "    \n"
+ "    Determine and remember the full pathname of each command NAME.  If\n"
+-"    no arguments are given, information about remembered commands is "
+-"displayed.\n"
++"    no arguments are given, information about remembered commands is displayed.\n"
+ "    \n"
+ "    Options:\n"
+ "      -d\tforget the remembered location of each NAME\n"
+@@ -3156,8 +3047,7 @@ msgid ""
+ "      PATTERN\tPattern specifying a help topic\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success unless PATTERN is not found or an invalid option is "
+-"given."
++"    Returns success unless PATTERN is not found or an invalid option is given."
+ msgstr ""
+ 
+ #: builtins.c:859
+@@ -3194,8 +3084,7 @@ msgid ""
+ "    \n"
+ "    If the HISTTIMEFORMAT variable is set and not null, its value is used\n"
+ "    as a format string for strftime(3) to print the time stamp associated\n"
+-"    with each displayed history entry.  No time stamps are printed "
+-"otherwise.\n"
++"    with each displayed history entry.  No time stamps are printed otherwise.\n"
+ "    \n"
+ "    Exit Status:\n"
+ "    Returns success unless an invalid option is given or an error occurs."
+@@ -3272,8 +3161,7 @@ msgid ""
+ "    Evaluate each ARG as an arithmetic expression.  Evaluation is done in\n"
+ "    fixed-width integers with no check for overflow, though division by 0\n"
+ "    is trapped and flagged as an error.  The following list of operators is\n"
+-"    grouped into levels of equal-precedence operators.  The levels are "
+-"listed\n"
++"    grouped into levels of equal-precedence operators.  The levels are listed\n"
+ "    in order of decreasing precedence.\n"
+ "    \n"
+ "    \tid++, id--\tvariable post-increment, post-decrement\n"
+@@ -3315,18 +3203,14 @@ msgid ""
+ "Read a line from the standard input and split it into fields.\n"
+ "    \n"
+ "    Reads a single line from the standard input, or from file descriptor FD\n"
+-"    if the -u option is supplied.  The line is split into fields as with "
+-"word\n"
++"    if the -u option is supplied.  The line is split into fields as with word\n"
+ "    splitting, and the first word is assigned to the first NAME, the second\n"
+ "    word to the second NAME, and so on, with any leftover words assigned to\n"
+-"    the last NAME.  Only the characters found in $IFS are recognized as "
+-"word\n"
+-"    delimiters. By default, the backslash character escapes delimiter "
+-"characters\n"
++"    the last NAME.  Only the characters found in $IFS are recognized as word\n"
++"    delimiters. By default, the backslash character escapes delimiter characters\n"
+ "    and newline.\n"
+ "    \n"
+-"    If no NAMEs are supplied, the line read is stored in the REPLY "
+-"variable.\n"
++"    If no NAMEs are supplied, the line read is stored in the REPLY variable.\n"
+ "    \n"
+ "    Options:\n"
+ "      -a array\tassign the words read to sequential indices of the array\n"
+@@ -3340,8 +3224,7 @@ msgid ""
+ "      -n nchars\treturn after reading NCHARS characters rather than waiting\n"
+ "    \t\tfor a newline, but honor a delimiter if fewer than\n"
+ "    \t\tNCHARS characters are read before the delimiter\n"
+-"      -N nchars\treturn only after reading exactly NCHARS characters, "
+-"unless\n"
++"      -N nchars\treturn only after reading exactly NCHARS characters, unless\n"
+ "    \t\tEOF is encountered or read times out, ignoring any\n"
+ "    \t\tdelimiter\n"
+ "      -p prompt\toutput the string PROMPT without a trailing newline before\n"
+@@ -3359,10 +3242,8 @@ msgid ""
+ "      -u fd\tread from file descriptor FD instead of the standard input\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    The return code is zero, unless end-of-file is encountered, read times "
+-"out\n"
+-"    (in which case it's greater than 128), a variable assignment error "
+-"occurs,\n"
++"    The return code is zero, unless end-of-file is encountered, read times out\n"
++"    (in which case it's greater than 128), a variable assignment error occurs,\n"
+ "    or an invalid file descriptor is supplied as the argument to -u."
+ msgstr ""
+ 
+@@ -3421,8 +3302,7 @@ msgid ""
+ "              physical     same as -P\n"
+ "              pipefail     the return value of a pipeline is the status of\n"
+ "                           the last command to exit with a non-zero status,\n"
+-"                           or zero if no command exited with a non-zero "
+-"status\n"
++"                           or zero if no command exited with a non-zero status\n"
+ "              posix        change the behavior of bash where the default\n"
+ "                           operation differs from the Posix standard to\n"
+ "                           match the standard\n"
+@@ -3446,8 +3326,7 @@ msgid ""
+ "          by default when the shell is interactive.\n"
+ "      -P  If set, do not resolve symbolic links when executing commands\n"
+ "          such as cd which change the current directory.\n"
+-"      -T  If set, the DEBUG and RETURN traps are inherited by shell "
+-"functions.\n"
++"      -T  If set, the DEBUG and RETURN traps are inherited by shell functions.\n"
+ "      --  Assign any remaining arguments to the positional parameters.\n"
+ "          If there are no remaining arguments, the positional parameters\n"
+ "          are unset.\n"
+@@ -3480,8 +3359,7 @@ msgid ""
+ "      -n\ttreat each NAME as a name reference and unset the variable itself\n"
+ "    \t\trather than the variable it references\n"
+ "    \n"
+-"    Without options, unset first tries to unset a variable, and if that "
+-"fails,\n"
++"    Without options, unset first tries to unset a variable, and if that fails,\n"
+ "    tries to unset a function.\n"
+ "    \n"
+ "    Some variables cannot be unset; also see `readonly'.\n"
+@@ -3495,8 +3373,7 @@ msgid ""
+ "Set export attribute for shell variables.\n"
+ "    \n"
+ "    Marks each NAME for automatic export to the environment of subsequently\n"
+-"    executed commands.  If VALUE is supplied, assign VALUE before "
+-"exporting.\n"
++"    executed commands.  If VALUE is supplied, assign VALUE before exporting.\n"
+ "    \n"
+ "    Options:\n"
+ "      -f\trefer to shell functions\n"
+@@ -3549,8 +3426,7 @@ msgid ""
+ "    -p option is supplied, the PATH argument is treated as a colon-\n"
+ "    separated list of directories to search for FILENAME. If -p is not\n"
+ "    supplied, $PATH is searched to find FILENAME. If any ARGUMENTS are\n"
+-"    supplied, they become the positional parameters when FILENAME is "
+-"executed.\n"
++"    supplied, they become the positional parameters when FILENAME is executed.\n"
+ "    \n"
+ "    Exit Status:\n"
+ "    Returns the status of the last command executed in FILENAME; fails if\n"
+@@ -3607,8 +3483,7 @@ msgid ""
+ "      -x FILE        True if the file is executable by you.\n"
+ "      -O FILE        True if the file is effectively owned by you.\n"
+ "      -G FILE        True if the file is effectively owned by your group.\n"
+-"      -N FILE        True if the file has been modified since it was last "
+-"read.\n"
++"      -N FILE        True if the file has been modified since it was last read.\n"
+ "    \n"
+ "      FILE1 -nt FILE2  True if file1 is newer than file2 (according to\n"
+ "                       modification date).\n"
+@@ -3629,8 +3504,7 @@ msgid ""
+ "      STRING1 != STRING2\n"
+ "                     True if the strings are not equal.\n"
+ "      STRING1 < STRING2\n"
+-"                     True if STRING1 sorts before STRING2 "
+-"lexicographically.\n"
++"                     True if STRING1 sorts before STRING2 lexicographically.\n"
+ "      STRING1 > STRING2\n"
+ "                     True if STRING1 sorts after STRING2 lexicographically.\n"
+ "    \n"
+@@ -3668,8 +3542,7 @@ msgstr ""
+ msgid ""
+ "Display process times.\n"
+ "    \n"
+-"    Prints the accumulated user and system times for the shell and all of "
+-"its\n"
++"    Prints the accumulated user and system times for the shell and all of its\n"
+ "    child processes.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -3680,8 +3553,7 @@ msgstr ""
+ msgid ""
+ "Trap signals and other events.\n"
+ "    \n"
+-"    Defines and activates handlers to be run when the shell receives "
+-"signals\n"
++"    Defines and activates handlers to be run when the shell receives signals\n"
+ "    or other conditions.\n"
+ "    \n"
+ "    ACTION is a command to be read and executed when the shell receives the\n"
+@@ -3691,17 +3563,14 @@ msgid ""
+ "    shell and by the commands it invokes.\n"
+ "    \n"
+ "    If a SIGNAL_SPEC is EXIT (0) ACTION is executed on exit from the shell.\n"
+-"    If a SIGNAL_SPEC is DEBUG, ACTION is executed before every simple "
+-"command\n"
++"    If a SIGNAL_SPEC is DEBUG, ACTION is executed before every simple command\n"
+ "    and selected other commands. If a SIGNAL_SPEC is RETURN, ACTION is\n"
+ "    executed each time a shell function or a script run by the . or source\n"
+-"    builtins finishes executing.  A SIGNAL_SPEC of ERR means to execute "
+-"ACTION\n"
++"    builtins finishes executing.  A SIGNAL_SPEC of ERR means to execute ACTION\n"
+ "    each time a command's failure would cause the shell to exit when the -e\n"
+ "    option is enabled.\n"
+ "    \n"
+-"    If no arguments are supplied, trap prints the list of commands "
+-"associated\n"
++"    If no arguments are supplied, trap prints the list of commands associated\n"
+ "    with each trapped signal in a form that may be reused as shell input to\n"
+ "    restore the same signal dispositions.\n"
+ "    \n"
+@@ -3710,19 +3579,16 @@ msgid ""
+ "      -p\tdisplay the trap commands associated with each SIGNAL_SPEC in a\n"
+ "    \t\tform that may be reused as shell input; or for all trapped\n"
+ "    \t\tsignals if no arguments are supplied\n"
+-"      -P\tdisplay the trap commands associated with each SIGNAL_SPEC. At "
+-"least\n"
++"      -P\tdisplay the trap commands associated with each SIGNAL_SPEC. At least\n"
+ "    \t\tone SIGNAL_SPEC must be supplied. -P and -p cannot be used\n"
+ "    \t\ttogether.\n"
+ "    \n"
+-"    Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal "
+-"number.\n"
++"    Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal number.\n"
+ "    Signal names are case insensitive and the SIG prefix is optional.  A\n"
+ "    signal may be sent to the shell with \"kill -signal $$\".\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success unless a SIGSPEC is invalid or an invalid option is "
+-"given."
++"    Returns success unless a SIGSPEC is invalid or an invalid option is given."
+ msgstr ""
+ 
+ #: builtins.c:1441
+@@ -3751,16 +3617,14 @@ msgid ""
+ "      NAME\tCommand name to be interpreted.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success if all of the NAMEs are found; fails if any are not "
+-"found."
++"    Returns success if all of the NAMEs are found; fails if any are not found."
+ msgstr ""
+ 
+ #: builtins.c:1472
+ msgid ""
+ "Modify shell resource limits.\n"
+ "    \n"
+-"    Provides control over the resources available to the shell and "
+-"processes\n"
++"    Provides control over the resources available to the shell and processes\n"
+ "    it creates, on systems that allow such control.\n"
+ "    \n"
+ "    Options:\n"
+@@ -3831,23 +3695,19 @@ msgstr ""
+ msgid ""
+ "Wait for job completion and return exit status.\n"
+ "    \n"
+-"    Waits for each process identified by an ID, which may be a process ID or "
+-"a\n"
++"    Waits for each process identified by an ID, which may be a process ID or a\n"
+ "    job specification, and reports its termination status.  If ID is not\n"
+ "    given, waits for all currently active child processes, and the return\n"
+ "    status is zero.  If ID is a job specification, waits for all processes\n"
+ "    in that job's pipeline.\n"
+ "    \n"
+-"    If the -n option is supplied, waits for a single job from the list of "
+-"IDs,\n"
+-"    or, if no IDs are supplied, for the next job to complete and returns "
+-"its\n"
++"    If the -n option is supplied, waits for a single job from the list of IDs,\n"
++"    or, if no IDs are supplied, for the next job to complete and returns its\n"
+ "    exit status.\n"
+ "    \n"
+ "    If the -p option is supplied, the process or job identifier of the job\n"
+ "    for which the exit status is returned is assigned to the variable VAR\n"
+-"    named by the option argument. The variable will be unset initially, "
+-"before\n"
++"    named by the option argument. The variable will be unset initially, before\n"
+ "    any assignment. This is useful only when the -n option is supplied.\n"
+ "    \n"
+ "    If the -f option is supplied, and job control is enabled, waits for the\n"
+@@ -3863,14 +3723,12 @@ msgstr ""
+ msgid ""
+ "Wait for process completion and return exit status.\n"
+ "    \n"
+-"    Waits for each process specified by a PID and reports its termination "
+-"status.\n"
++"    Waits for each process specified by a PID and reports its termination status.\n"
+ "    If PID is not given, waits for all currently active child processes,\n"
+ "    and the return status is zero.  PID must be a process ID.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns the status of the last PID; fails if PID is invalid or an "
+-"invalid\n"
++"    Returns the status of the last PID; fails if PID is invalid or an invalid\n"
+ "    option is given."
+ msgstr ""
+ 
+@@ -3964,17 +3822,12 @@ msgstr ""
+ msgid ""
+ "Execute commands based on conditional.\n"
+ "    \n"
+-"    The `if COMMANDS' list is executed.  If its exit status is zero, then "
+-"the\n"
+-"    `then COMMANDS' list is executed.  Otherwise, each `elif COMMANDS' list "
+-"is\n"
++"    The `if COMMANDS' list is executed.  If its exit status is zero, then the\n"
++"    `then COMMANDS' list is executed.  Otherwise, each `elif COMMANDS' list is\n"
+ "    executed in turn, and if its exit status is zero, the corresponding\n"
+-"    `then COMMANDS' list is executed and the if command completes.  "
+-"Otherwise,\n"
+-"    the `else COMMANDS' list is executed, if present.  The exit status of "
+-"the\n"
+-"    entire construct is the exit status of the last command executed, or "
+-"zero\n"
++"    `then COMMANDS' list is executed and the if command completes.  Otherwise,\n"
++"    the `else COMMANDS' list is executed, if present.  The exit status of the\n"
++"    entire construct is the exit status of the last command executed, or zero\n"
+ "    if no condition tested true.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -3985,8 +3838,7 @@ msgstr ""
+ msgid ""
+ "Execute commands as long as a test succeeds.\n"
+ "    \n"
+-"    Expand and execute COMMANDS-2 as long as the final command in COMMANDS "
+-"has\n"
++"    Expand and execute COMMANDS-2 as long as the final command in COMMANDS has\n"
+ "    an exit status of zero.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -3997,8 +3849,7 @@ msgstr ""
+ msgid ""
+ "Execute commands as long as a test does not succeed.\n"
+ "    \n"
+-"    Expand and execute COMMANDS-2 as long as the final command in COMMANDS "
+-"has\n"
++"    Expand and execute COMMANDS-2 as long as the final command in COMMANDS has\n"
+ "    an exit status which is not zero.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -4023,8 +3874,7 @@ msgid ""
+ "Define shell function.\n"
+ "    \n"
+ "    Create a shell function named NAME.  When invoked as a simple command,\n"
+-"    NAME runs COMMANDs in the calling shell's context.  When NAME is "
+-"invoked,\n"
++"    NAME runs COMMANDs in the calling shell's context.  When NAME is invoked,\n"
+ "    the arguments are passed to the function as $1...$n, and the function's\n"
+ "    name is in $FUNCNAME.\n"
+ "    \n"
+@@ -4072,12 +3922,9 @@ msgstr ""
+ msgid ""
+ "Execute conditional command.\n"
+ "    \n"
+-"    Returns a status of 0 or 1 depending on the evaluation of the "
+-"conditional\n"
+-"    expression EXPRESSION.  Expressions are composed of the same primaries "
+-"used\n"
+-"    by the `test' builtin, and may be combined using the following "
+-"operators:\n"
++"    Returns a status of 0 or 1 depending on the evaluation of the conditional\n"
++"    expression EXPRESSION.  Expressions are composed of the same primaries used\n"
++"    by the `test' builtin, and may be combined using the following operators:\n"
+ "    \n"
+ "      ( EXPRESSION )\tReturns the value of EXPRESSION\n"
+ "      ! EXPRESSION\t\tTrue if EXPRESSION is false; else false\n"
+@@ -4265,36 +4112,29 @@ msgid ""
+ "      -v var\tassign the output to shell variable VAR rather than\n"
+ "    \t\tdisplay it on the standard output\n"
+ "    \n"
+-"    FORMAT is a character string which contains three types of objects: "
+-"plain\n"
+-"    characters, which are simply copied to standard output; character "
+-"escape\n"
++"    FORMAT is a character string which contains three types of objects: plain\n"
++"    characters, which are simply copied to standard output; character escape\n"
+ "    sequences, which are converted and copied to the standard output; and\n"
+-"    format specifications, each of which causes printing of the next "
+-"successive\n"
++"    format specifications, each of which causes printing of the next successive\n"
+ "    argument.\n"
+ "    \n"
+-"    In addition to the standard format characters csndiouxXeEfFgGaA "
+-"described\n"
++"    In addition to the standard format characters csndiouxXeEfFgGaA described\n"
+ "    in printf(3), printf interprets:\n"
+ "    \n"
+ "      %b\texpand backslash escape sequences in the corresponding argument\n"
+ "      %q\tquote the argument in a way that can be reused as shell input\n"
+ "      %Q\tlike %q, but apply any precision to the unquoted argument before\n"
+ "    \t\tquoting\n"
+-"      %(fmt)T\toutput the date-time string resulting from using FMT as a "
+-"format\n"
++"      %(fmt)T\toutput the date-time string resulting from using FMT as a format\n"
+ "    \t        string for strftime(3)\n"
+ "    \n"
+ "    The format is re-used as necessary to consume all of the arguments.  If\n"
+ "    there are fewer arguments than the format requires,  extra format\n"
+-"    specifications behave as if a zero value or null string, as "
+-"appropriate,\n"
++"    specifications behave as if a zero value or null string, as appropriate,\n"
+ "    had been supplied.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success unless an invalid option is given or a write or "
+-"assignment\n"
++"    Returns success unless an invalid option is given or a write or assignment\n"
+ "    error occurs."
+ msgstr ""
+ 
+@@ -4302,10 +4142,8 @@ msgstr ""
+ msgid ""
+ "Specify how arguments are to be completed by Readline.\n"
+ "    \n"
+-"    For each NAME, specify how arguments are to be completed.  If no "
+-"options\n"
+-"    or NAMEs are supplied, display existing completion specifications in a "
+-"way\n"
++"    For each NAME, specify how arguments are to be completed.  If no options\n"
++"    or NAMEs are supplied, display existing completion specifications in a way\n"
+ "    that allows them to be reused as input.\n"
+ "    \n"
+ "    Options:\n"
+@@ -4320,10 +4158,8 @@ msgid ""
+ "    \t\tcommand) word\n"
+ "    \n"
+ "    When completion is attempted, the actions are applied in the order the\n"
+-"    uppercase-letter options are listed above. If multiple options are "
+-"supplied,\n"
+-"    the -D option takes precedence over -E, and both take precedence over -"
+-"I.\n"
++"    uppercase-letter options are listed above. If multiple options are supplied,\n"
++"    the -D option takes precedence over -E, and both take precedence over -I.\n"
+ "    \n"
+ "    Exit Status:\n"
+ "    Returns success unless an invalid option is supplied or an error occurs."
+@@ -4334,12 +4170,10 @@ msgid ""
+ "Display possible completions depending on the options.\n"
+ "    \n"
+ "    Intended to be used from within a shell function generating possible\n"
+-"    completions.  If the optional WORD argument is present, generate "
+-"matches\n"
++"    completions.  If the optional WORD argument is present, generate matches\n"
+ "    against WORD.\n"
+ "    \n"
+-"    If the -V option is supplied, store the possible completions in the "
+-"indexed\n"
++"    If the -V option is supplied, store the possible completions in the indexed\n"
+ "    array VARNAME instead of printing them to the standard output.\n"
+ "    \n"
+ "    Exit Status:\n"
+@@ -4350,12 +4184,9 @@ msgstr ""
+ msgid ""
+ "Modify or display completion options.\n"
+ "    \n"
+-"    Modify the completion options for each NAME, or, if no NAMEs are "
+-"supplied,\n"
+-"    the completion currently being executed.  If no OPTIONs are given, "
+-"print\n"
+-"    the completion options for each NAME or the current completion "
+-"specification.\n"
++"    Modify the completion options for each NAME, or, if no NAMEs are supplied,\n"
++"    the completion currently being executed.  If no OPTIONs are given, print\n"
++"    the completion options for each NAME or the current completion specification.\n"
+ "    \n"
+ "    Options:\n"
+ "    \t-o option\tSet completion option OPTION for each NAME\n"
+@@ -4382,22 +4213,17 @@ msgstr ""
+ msgid ""
+ "Read lines from the standard input into an indexed array variable.\n"
+ "    \n"
+-"    Read lines from the standard input into the indexed array variable "
+-"ARRAY, or\n"
+-"    from file descriptor FD if the -u option is supplied.  The variable "
+-"MAPFILE\n"
++"    Read lines from the standard input into the indexed array variable ARRAY, or\n"
++"    from file descriptor FD if the -u option is supplied.  The variable MAPFILE\n"
+ "    is the default ARRAY.\n"
+ "    \n"
+ "    Options:\n"
+ "      -d delim\tUse DELIM to terminate lines, instead of newline\n"
+-"      -n count\tCopy at most COUNT lines.  If COUNT is 0, all lines are "
+-"copied\n"
+-"      -O origin\tBegin assigning to ARRAY at index ORIGIN.  The default "
+-"index is 0\n"
++"      -n count\tCopy at most COUNT lines.  If COUNT is 0, all lines are copied\n"
++"      -O origin\tBegin assigning to ARRAY at index ORIGIN.  The default index is 0\n"
+ "      -s count\tDiscard the first COUNT lines read\n"
+ "      -t\tRemove a trailing DELIM from each line read (default newline)\n"
+-"      -u fd\tRead lines from file descriptor FD instead of the standard "
+-"input\n"
++"      -u fd\tRead lines from file descriptor FD instead of the standard input\n"
+ "      -C callback\tEvaluate CALLBACK each time QUANTUM lines are read\n"
+ "      -c quantum\tSpecify the number of lines read between each call to\n"
+ "    \t\t\tCALLBACK\n"
+@@ -4410,13 +4236,11 @@ msgid ""
+ "    element to be assigned and the line to be assigned to that element\n"
+ "    as additional arguments.\n"
+ "    \n"
+-"    If not supplied with an explicit origin, mapfile will clear ARRAY "
+-"before\n"
++"    If not supplied with an explicit origin, mapfile will clear ARRAY before\n"
+ "    assigning to it.\n"
+ "    \n"
+ "    Exit Status:\n"
+-"    Returns success unless an invalid option is given or ARRAY is readonly "
+-"or\n"
++"    Returns success unless an invalid option is given or ARRAY is readonly or\n"
+ "    not an indexed array."
+ msgstr ""
+ 
+@@ -4435,6 +4259,10 @@ msgstr ""
+ #~ msgid "%s: inlib failed"
+ #~ msgstr "%s: inlib -ის შეცდომა"
+ 
++#, c-format
++#~ msgid "warning: %s: %s"
++#~ msgstr "გაფრთხლება: %s: %s"
++
+ #, c-format
+ #~ msgid "%s: %s"
+ #~ msgstr "%s: %s"
+@@ -4454,7 +4282,3 @@ msgstr ""
+ #, c-format
+ #~ msgid "setlocale: %s: cannot change locale (%s): %s"
+ #~ msgstr "setlocale: %s: ვერ შევცვალე ლოკალი (%s): %s"
+-
+-#, c-format
+-#~ msgid "warning: %s: %s"
+-#~ msgstr "გაფრთხლება: %s: %s"

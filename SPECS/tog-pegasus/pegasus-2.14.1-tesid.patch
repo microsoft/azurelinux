@@ -1,0 +1,28 @@
+diff -up pegasus/src/Clients/benchmarkTest/Load/Makefile.orig pegasus/src/Clients/benchmarkTest/Load/Makefile
+--- pegasus/src/Clients/benchmarkTest/Load/Makefile.orig	2015-10-12 13:19:57.029090805 +0200
++++ pegasus/src/Clients/benchmarkTest/Load/Makefile	2015-10-12 13:20:43.379003285 +0200
+@@ -33,11 +33,7 @@ include $(ROOT)/mak/configschema.mak
+ include $(ROOT)/mak/test.mak
+ include $(ROOT)/mak/commands.mak
+ 
+-ifdef TESTID
+-   BenchmarkMOF_NAME = benchmarkProvider_$(TESTID)
+-else
+-   BenchmarkMOF_NAME = benchmarkProvider
+-endif
++BenchmarkMOF_NAME = benchmarkProvider
+ 
+ PROVIDERNS=root/benchmark
+ PROVIDERNSDIRECTORY=$(REPOSITORY_ROOT)/root\#benchmark
+@@ -74,11 +70,7 @@ unregisterproviders:
+ changeconfig:
+ 	$(MAKE) -i cimstart
+ 	$(MAKE) unregister
+-ifdef TESTID
+-	$(MAKE) repositoryServer TESTID=$(TESTID)
+-else
+ 	$(MAKE) repositoryServer
+-endif
+ 
+ 
+ depend:

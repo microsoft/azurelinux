@@ -1,0 +1,24 @@
+Index: ltrace-0.7.91/sysdeps/linux-gnu/aarch64/regs.c
+===================================================================
+--- ltrace-0.7.91.orig/sysdeps/linux-gnu/aarch64/regs.c
++++ ltrace-0.7.91/sysdeps/linux-gnu/aarch64/regs.c
+@@ -23,6 +23,7 @@
+ #include <linux/uio.h>
+ #include <assert.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ 
+ #include "backend.h"
+ #include "proc.h"
+Index: ltrace-0.7.91/sysdeps/linux-gnu/aarch64/trace.c
+===================================================================
+--- ltrace-0.7.91.orig/sysdeps/linux-gnu/aarch64/trace.c
++++ ltrace-0.7.91/sysdeps/linux-gnu/aarch64/trace.c
+@@ -24,6 +24,7 @@
+ #include <asm/ptrace.h>
+ #include <string.h>
+ #include <errno.h>
++#include <stdio.h>
+ 
+ #include "backend.h"
+ #include "proc.h"

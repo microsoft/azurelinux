@@ -1,0 +1,24 @@
+commit a87d9e8f89f946a733c756c72bf5ec41e0a738b8
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Apr 14 15:51:27 2021 +0900
+
+    pinentry: Fix memory leaks
+    
+    * pinentry/pinentry.c (pinentry_inq_genpin): Free VALUE on error.
+    --
+    
+    GnuPG-bug-id: 5384
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+diff --git a/pinentry/pinentry.c b/pinentry/pinentry.c
+index ef81f12..26ec77a 100644
+--- a/pinentry/pinentry.c
++++ b/pinentry/pinentry.c
+@@ -656,6 +656,7 @@ pinentry_inq_genpin (pinentry_t pin)
+           if (rc)
+             {
+               fprintf (stderr, "ASSUAN READ LINE failed: rc=%d\n", rc);
++              free (value);
+               return 0;
+             }
+         }

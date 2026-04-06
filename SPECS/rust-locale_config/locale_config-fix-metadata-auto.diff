@@ -1,0 +1,17 @@
+--- locale_config-0.3.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ locale_config-0.3.0/Cargo.toml	2023-05-16T22:42:50.952876+00:00
+@@ -29,14 +29,6 @@
+ 
+ [dependencies.regex]
+ version = "1"
+-[target."cfg(target_os = \"macos\")".dependencies.objc]
+-version = "^0.2"
+-
+-[target."cfg(target_os = \"macos\")".dependencies.objc-foundation]
+-version = "^0.1"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["winnls"]
+ [badges.appveyor]
+ repository = "rust-locale/locale_config"
+ 

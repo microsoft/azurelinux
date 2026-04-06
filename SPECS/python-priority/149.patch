@@ -1,0 +1,22 @@
+From 1d8eb321e0b9f7ada1babb055963da16e1ed3771 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 13 Jun 2025 05:37:24 -0400
+Subject: [PATCH] Update intersphinx_mapping for Sphinx 8 compatibility
+
+---
+ docs/source/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/source/conf.py b/docs/source/conf.py
+index 3162008..92a5411 100644
+--- a/docs/source/conf.py
++++ b/docs/source/conf.py
+@@ -54,7 +54,7 @@
+ exclude_patterns = []
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'http://docs.python.org/': None}
++intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
+ 
+ # -- Options for HTML output ----------------------------------------------
+ 

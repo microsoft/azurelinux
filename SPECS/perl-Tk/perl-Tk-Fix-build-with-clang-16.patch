@@ -1,0 +1,12 @@
+diff -up Tk-804.036/pTk/Xlib.t.orig Tk-804.036/pTk/Xlib.t
+--- Tk-804.036/pTk/Xlib.t.orig	2024-02-15 10:07:51.542657507 +0100
++++ Tk-804.036/pTk/Xlib.t	2024-02-15 10:08:51.500167194 +0100
+@@ -331,7 +331,7 @@ VFUNC(int,XIntersectRegion,V_XIntersectR
+ #endif /* !DO_X_EXCLUDE */
+ 
+ #ifndef XKeycodeToKeysym
+-VFUNC(KeySym,XKeycodeToKeysym,V_XKeycodeToKeysym,_ANSI_ARGS_((Display *, unsigned int, int)))
++VFUNC(KeySym,XKeycodeToKeysym,V_XKeycodeToKeysym,_ANSI_ARGS_((Display *, KeyCode, int)))
+ #endif /* #ifndef XKeycodeToKeysym */
+ 
+ #ifndef XKeysymToString

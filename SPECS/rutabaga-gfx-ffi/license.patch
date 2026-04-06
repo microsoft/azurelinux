@@ -1,0 +1,26 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 99172e3..b3de801 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -4,7 +4,7 @@ version = "0.1.3"
+ authors = ["The ChromiumOS Authors + Android Open Source Project"]
+ edition = "2021"
+ description = "Handling virtio-gpu protocols"
+-license-file = "LICENSE"
++license = "BSD-3-Clause"
+ 
+ [features]
+ gfxstream = []
+diff --git a/ffi/Cargo.toml b/ffi/Cargo.toml
+index 8842efd..fea0253 100644
+--- a/ffi/Cargo.toml
++++ b/ffi/Cargo.toml
+@@ -4,7 +4,7 @@ version = "0.1.3"
+ authors = ["The ChromiumOS Authors + Android Open Source Project"]
+ edition = "2021"
+ description = "Handling virtio-gpu protocols with C API"
+-license-file = "LICENSE"
++license = "BSD-3-Clause"
+ 
+ [lib]
+ name = "rutabaga_gfx_ffi"

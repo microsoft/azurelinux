@@ -1,0 +1,68 @@
+From 88b8086833deabbb92c4392351e5b516dd8ab567 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 4 Feb 2025 18:29:49 -0500
+Subject: [PATCH] Downstream-only: work around Distribution.tests_require
+ removal
+
+This is not suitable for offering upstream because we are so far behind
+upstream, and because it means test dependencies are no longer correctly
+generated (but the alternative is for the package not to buiild with
+setuptools 74+ at all).
+---
+ src/python/grpcio_tests/commands.py | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/src/python/grpcio_tests/commands.py b/src/python/grpcio_tests/commands.py
+index b9336d899d..ed1965c1a0 100644
+--- a/src/python/grpcio_tests/commands.py
++++ b/src/python/grpcio_tests/commands.py
+@@ -103,7 +103,7 @@ class TestLite(setuptools.Command):
+     def _add_eggs_to_path(self):
+         """Fetch install and test requirements"""
+         self.distribution.fetch_build_eggs(self.distribution.install_requires)
+-        self.distribution.fetch_build_eggs(self.distribution.tests_require)
++        self.distribution.fetch_build_eggs(getattr(self.distribution, 'tests_require', []))
+ 
+ 
+ class TestPy3Only(setuptools.Command):
+@@ -134,7 +134,7 @@ class TestPy3Only(setuptools.Command):
+ 
+     def _add_eggs_to_path(self):
+         self.distribution.fetch_build_eggs(self.distribution.install_requires)
+-        self.distribution.fetch_build_eggs(self.distribution.tests_require)
++        self.distribution.fetch_build_eggs(getattr(self.distribution, 'tests_require', []))
+ 
+ 
+ class TestAio(setuptools.Command):
+@@ -166,7 +166,7 @@ class TestAio(setuptools.Command):
+     def _add_eggs_to_path(self):
+         """Fetch install and test requirements"""
+         self.distribution.fetch_build_eggs(self.distribution.install_requires)
+-        self.distribution.fetch_build_eggs(self.distribution.tests_require)
++        self.distribution.fetch_build_eggs(getattr(self.distribution, 'tests_require', []))
+ 
+ 
+ class TestGevent(setuptools.Command):
+@@ -307,8 +307,7 @@ class RunInterop(test.test):
+         if self.distribution.install_requires:
+             self.distribution.fetch_build_eggs(
+                 self.distribution.install_requires)
+-        if self.distribution.tests_require:
+-            self.distribution.fetch_build_eggs(self.distribution.tests_require)
++        self.distribution.fetch_build_eggs(getattr(self.distribution, 'tests_require', []))
+         if self.client:
+             self.run_client()
+         elif self.server:
+@@ -352,8 +351,7 @@ class RunFork(test.test):
+         if self.distribution.install_requires:
+             self.distribution.fetch_build_eggs(
+                 self.distribution.install_requires)
+-        if self.distribution.tests_require:
+-            self.distribution.fetch_build_eggs(self.distribution.tests_require)
++        self.distribution.fetch_build_eggs(getattr(self.distribution, 'tests_require', []))
+         # We import here to ensure that our setuptools parent has had a chance to
+         # edit the Python system path.
+         from tests.fork import client
+-- 
+2.48.1
+

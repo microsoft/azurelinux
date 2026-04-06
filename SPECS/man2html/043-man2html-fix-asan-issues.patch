@@ -1,0 +1,102 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 31 Jan 2024 23:00:37 +0100
+Subject: Fix some AddressSanitizer issues
+
+Fix an issue found by AddressSanitizer: curfield variable
+was used after it was freed by some previous call to
+clear_table().
+
+Fix issues related to referring to array[-1] elements.
+
+Make another call to clear_table() to fix some of memory
+leaks reported by AddressSanitizer.
+---
+ man2html/man2html.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 6379a74..ca666d3 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -1188,7 +1188,7 @@ scan_table(char *c) {
+ 		else {
+ 		    do {
+ 			ti2=ti2->next;
+-		    } while (ti2 && curfield->align=='S');
++		    } while (ti2 && ti2->align=='S');
+ 		}
+ 		break;
+ 	    }
+@@ -1262,7 +1262,13 @@ scan_table(char *c) {
+ 	    curfield=curfield->next;
+ 	}
+ 	out_html("</TR>\n");
+-	currow=currow->next;
++	if (currow->next)
++		currow=currow->next;
++	else {
++		/* clear_table() needs the very last row of the table */
++		clear_table(currow);
++		currow=layout=NULL;
++	}
+     }
+     if (box && !border) out_html("</TABLE>");
+     out_html("</TABLE>");
+@@ -2073,7 +2079,7 @@ scan_request(char *c) {
+ 	    j=0;
+ 	    while (*c!='\n') {
+ 		sl=scan_expression(c, &tabstops[j]);
+-		if (*c == '-' || *c == '+') tabstops[j]+=tabstops[j-1];
++		if (j && (*c == '-' || *c == '+')) tabstops[j]+=tabstops[j-1];
+ 		c=sl;
+ 		while (*c == ' ' || *c == '\t') c++;
+ 		if (j+1 < SIZE(tabstops))
+@@ -2661,26 +2667,31 @@ scan_request(char *c) {
+ 	     /* Translate xyz 1 to xyz(1) 
+ 	      * Allow for multiple spaces.  Allow the section to be missing.
+ 	      */
+-	     char buff[100];
+-	     char *bufptr;
++	     char buff[128];
++	     buff[0] = '\0';
++	     /* scan_troff_mandoc(char *c, ...) called below refers to a c[-1],
++	     * so make sure the following code treats buff as starting at
++	     * index 1, not 0.
++	     */
++	     const size_t bufflen = SIZE(buff) - 1;
++	     char *bufptr = buff + 1;
+ 	     trans_char(c,'"','\a');
+-	     bufptr = buff;
+ 	     c = c+j;
+ 	     if (*c == '\n') c++; /* Skip spaces */
+ 	     while (isspace(*c) && *c != '\n') c++;
+-	     while (isalnum(*c) && bufptr < buff + SIZE(buff)-4) {
++	     while (isalnum(*c) && bufptr < buff + bufflen - 4) {
+ 		  /* Copy the xyz part */
+ 		  *bufptr++ = *c++;
+ 	     }
+ 	     while (isspace(*c) && *c != '\n') c++;	/* Skip spaces */
+ 	     if (isdigit(*c)) { /* Convert the number if there is one */
+ 		  *bufptr++ = '(';
+-		  while (isalnum(*c) && bufptr < buff + SIZE(buff)-3) {
++	     while (isalnum(*c) && bufptr < buff + bufflen - 3) {
+ 		       *bufptr++ = *c++;
+ 		  }
+ 		  *bufptr++ = ')';
+ 	     }
+-	     while (*c != '\n' && bufptr < buff + SIZE(buff)-2) {
++	    while (*c != '\n' && bufptr < buff + bufflen - 2) {
+ 		  /* Copy the remainder */
+ 		  if (!isspace(*c)) {
+ 		       *bufptr++ = *c;
+@@ -2688,8 +2699,8 @@ scan_request(char *c) {
+ 		  c++;
+ 	     }
+ 	     *bufptr++ = '\n';
+-	     *bufptr = 0;
+-	     scan_troff_mandoc(buff, 1, NULL);
++	     *bufptr = '\0';
++	     scan_troff_mandoc(buff + 1, 1, NULL);
+ 	     out_html(NEWLINE);
+ 	     if (fillout) curpos++; else curpos=0;
+ 	}

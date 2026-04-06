@@ -1,0 +1,192 @@
+diff -up source/texk/dvi2tty/dvi2tty-5.3.4/DVI.format source/texk/dvi2tty/dvi2tty-5.3.4/DVI
+diff -up source/texk/dvidvi/dvidvi.c.format source/texk/dvidvi/dvidvi.c
+--- source/texk/dvidvi/dvidvi.c.format	2015-07-28 21:21:51.170212574 -0400
++++ source/texk/dvidvi/dvidvi.c	2015-07-28 21:22:27.842988620 -0400
+@@ -327,7 +327,7 @@ static void stringdvibuf(integer p, inte
+  *   Print a usage error messsage, and quit.
+  */
+ static void usage(void) {
+-   (void)fprintf(stderr,banner);
++   (void)fprintf(stderr,"%s",banner);
+    (void)fprintf(stderr,"Usage:  dvidvi [options] input[.dvi] [output]\n");
+    (void)fprintf(stderr,"where options are:\n");
+    (void)fprintf(stderr,"    [-f n] first page printed     [-l n] last page printed\n");
+@@ -806,7 +806,7 @@ default:
+       } /* else argument with '-' */
+    }  /* for */
+    if (*iname == 0) {
+-       (void)fprintf(stderr, banner) ;
++       (void)fprintf(stderr, "%s", banner) ;
+        error("! no input file specified");
+    }
+    /* Inserted by djc@dsmail.hmi.de 3.8.1994 */
+@@ -817,7 +817,7 @@ default:
+    }
+ 
+    if (*oname != 0 && !quiet) {
+-       (void)fprintf(stderr, banner) ;
++       (void)fprintf(stderr, "%s", banner) ;
+        (void)fprintf(stderr, "%s -> %s\n",iname,oname);
+        temp = nextstring ;
+    }
+diff -up source/texk/ps2pk/objects.h.format source/texk/ps2pk/objects.h
+--- source/texk/ps2pk/objects.h.format	2015-07-28 21:24:03.356405337 -0400
++++ source/texk/ps2pk/objects.h	2015-07-28 21:24:21.397295166 -0400
+@@ -231,7 +231,7 @@ struct xobject {
+ /*SHARED*/
+ /* NDW: personally, I want to see status and error messages! */
+ #define IfTrace0(condition,model)                                 \
+-        {if (condition) printf(model);}
++        {if (condition) printf("%s",model);}
+ #define IfTrace1(condition,model,arg0)                            \
+         {if (condition) printf(model,arg0);}
+ #define IfTrace2(condition,model,arg0,arg1)                       \
+diff -up source/texk/web2c/cwebboot.cin.format source/texk/web2c/cwebboot.cin
+--- source/texk/web2c/cwebboot.cin.format	2015-07-28 21:24:28.351252699 -0400
++++ source/texk/web2c/cwebboot.cin	2015-07-28 21:24:48.779127949 -0400
+@@ -1098,7 +1098,7 @@ void
+  fatal(const char*s,const char*t)
+ #line 1182 "cwebdir/common.w"
+ {
+-if(*s)printf(s);
++if(*s)printf("%s",s);
+ err_print(t);
+ history= fatal_message;exit(wrap_up());
+ }
+diff -up source/texk/web2c/cwebdir/common.c.format source/texk/web2c/cwebdir/common.c
+--- source/texk/web2c/cwebdir/common.c.format	2015-07-28 21:24:56.764079186 -0400
++++ source/texk/web2c/cwebdir/common.c	2015-07-28 21:25:24.830907788 -0400
+@@ -1063,7 +1063,7 @@ void
+ fatal(s,t)
+ char*s,*t;
+ {
+-if(*s)printf(s);
++if(*s)printf("%s",s);
+ err_print(t);
+ history= fatal_message;exit(wrap_up());
+ }
+diff -up source/texk/web2c/cwebdir/common.w.format source/texk/web2c/cwebdir/common.w
+--- source/texk/web2c/cwebdir/common.w.format	2015-07-28 21:25:32.886858591 -0400
++++ source/texk/web2c/cwebdir/common.w	2015-07-28 21:25:46.117777793 -0400
+@@ -1180,7 +1180,7 @@ concatenated to print the final error me
+ fatal(s,t)
+   char *s,*t;
+ {
+-  if (*s) printf(s);
++  if (*s) printf("%s",s);
+   err_print(t);
+   history=fatal_message; exit(wrap_up());
+ }
+diff -up source/texk/web2c/cwebdir/cweave.w.format source/texk/web2c/cwebdir/cweave.w
+--- source/texk/web2c/cwebdir/cweave.w.format	2015-07-28 21:25:55.096722960 -0400
++++ source/texk/web2c/cwebdir/cweave.w	2015-07-28 21:26:13.680609471 -0400
+@@ -1784,7 +1784,7 @@ void
+ print_cat(c) /* symbolic printout of a category */
+ eight_bits c;
+ {
+-  printf(cat_name[c]);
++  printf("%s",cat_name[c]);
+ }
+ 
+ @ The token lists for translated \TEX/ output contain some special control
+diff -up source/texk/web2c/omegafonts/error_routines.c.format source/texk/web2c/omegafonts/error_routines.c
+--- source/texk/web2c/omegafonts/error_routines.c.format	2015-07-28 21:26:21.654560776 -0400
++++ source/texk/web2c/omegafonts/error_routines.c	2015-07-28 21:27:54.356994659 -0400
+@@ -62,7 +62,7 @@ void
+ yyerror(const_string fmt)
+ {
+     fprintf(stderr, "line %d (parsing): ", line_number);
+-    fprintf(stderr, fmt);
++    fprintf(stderr, "%s", fmt);
+     fprintf(stderr, "\n");
+     num_errors++;
+ }
+@@ -72,7 +72,7 @@ void
+ warning_0(const_string fmt)
+ {
+     fprintf(stderr, "line %d (warning): ", line_number);
+-    fprintf(stderr, fmt);
++    fprintf(stderr, "%s", fmt);
+     fprintf(stderr, "\n");
+ }
+ 
+@@ -120,7 +120,7 @@ void
+ fatal_error_0(const_string fmt)
+ {
+     fprintf(stderr, "line %d (fatal): ", line_number);
+-    fprintf(stderr, fmt);
++    fprintf(stderr, "%s", fmt);
+     fprintf(stderr, "\n");
+     exit(1);
+ }
+@@ -156,7 +156,7 @@ void
+ internal_error_0(const_string fmt)
+ {
+     fprintf(stderr, "line %d (internal): ", line_number);
+-    fprintf(stderr, fmt);
++    fprintf(stderr, "%s", fmt);
+     fprintf(stderr, "\n");
+     exit(2);
+ }
+diff -up source/texk/web2c/omegafonts/out_routines.c.format source/texk/web2c/omegafonts/out_routines.c
+--- source/texk/web2c/omegafonts/out_routines.c.format	2015-07-28 21:28:09.547901891 -0400
++++ source/texk/web2c/omegafonts/out_routines.c	2015-07-28 21:28:22.209824567 -0400
+@@ -368,5 +368,5 @@ out_digits(unsigned counter)
+ void
+ out(const_string sval)
+ {
+-	fprintf(file_output, sval);
++	fprintf(file_output, "%s", sval);
+ }
+diff -up source/texk/web2c/tiedir/tie.c.format source/texk/web2c/tiedir/tie.c
+--- source/texk/web2c/tiedir/tie.c.format	2015-07-28 21:28:30.242775511 -0400
++++ source/texk/web2c/tiedir/tie.c	2015-07-28 21:29:04.979563380 -0400
+@@ -27,14 +27,14 @@
+  \
+ 
+ #define term_out stdout
+-#define print(a)fprintf(term_out,a)
++#define print(a)fprintf(term_out,"%s",a)
+ #define print2(a,b)fprintf(term_out,a,b)
+ #define print3(a,b,c)fprintf(term_out,a,b,c)
+ #define print_c(v)fputc(v,term_out);
+ #define new_line(v)fputc('\n',v)
+ #define term_new_line new_line(term_out) \
+ 
+-#define print_ln(v){fprintf(term_out,v);term_new_line;} \
++#define print_ln(v){fprintf(term_out,"%s",v);term_new_line;} \
+ 
+ #define print2_ln(a,b){print2(a,b);term_new_line;}
+ #define print3_ln(a,b,c){print3(a,b,c);term_new_line;} \
+diff -up source/texk/web2c/tiedir/tie.w.format source/texk/web2c/tiedir/tie.w
+--- source/texk/web2c/tiedir/tie.w.format	2015-07-28 21:29:13.361512193 -0400
++++ source/texk/web2c/tiedir/tie.w	2015-07-28 21:30:18.135116633 -0400
+@@ -458,14 +458,14 @@ for terminating an output line and writi
+ 
+ @^system dependencies@>
+ @d term_out  stdout
+-@d print(a)  fprintf(term_out,a) /* `|print|' means write on the terminal */
++@d print(a)  fprintf(term_out,"%s",a) /* `|print|' means write on the terminal */
+ @d print2(a,b)  fprintf(term_out,a,b) /* same with two arguments */
+ @d print3(a,b,c)  fprintf(term_out,a,b,c) /* same with three arguments */
+ @d print_c(v)  fputc(v,term_out); /* print a single character */
+ @d new_line(v)  fputc('\n',v) /* start new line */
+ @d term_new_line  new_line(term_out)
+ 	/* start new line of the terminal */
+-@d print_ln(v)  {fprintf(term_out,v);term_new_line;}
++@d print_ln(v)  {fprintf(term_out,"%s",v);term_new_line;}
+ 	/* `|print|' and then start new line */
+ @d print2_ln(a,b)  {print2(a,b);term_new_line;} /* same with two arguments */
+ @d print3_ln(a,b,c)  {print3(a,b,c);term_new_line;}
+diff -up source/utils/devnag/src/devnag.c.format source/utils/devnag/src/devnag.c
+--- source/utils/devnag/src/devnag.c.format	2015-07-28 21:23:26.446630739 -0400
++++ source/utils/devnag/src/devnag.c	2015-07-28 21:23:34.215583295 -0400
+@@ -2400,7 +2400,7 @@ void put_macro(short macro) {
+ void err_ill(const char *str) {
+    fprintf(stderr, "Error: illegal character(s) \"%s\" detected at line %d:\n",
+ 	  str, linenumber);
+-   fprintf(stderr, inbuf);
++   fprintf(stderr, "%s", inbuf);
+    exit(1);
+ }
+ 

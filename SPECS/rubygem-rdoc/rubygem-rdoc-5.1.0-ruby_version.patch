@@ -1,0 +1,24 @@
+From 518850aba6eee76de7715aae8d37330e34b01983 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 31 Mar 2015 16:37:26 +0200
+Subject: Add ruby_version_dir_name support for RDoc.
+
+---
+ lib/rdoc/ri/paths.rb | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/lib/rdoc/ri/paths.rb b/lib/rdoc/ri/paths.rb
+index 970cb91..5bf8230 100644
+--- a/lib/rdoc/ri/paths.rb
++++ b/lib/rdoc/ri/paths.rb
+@@ -10,7 +10,7 @@ module RDoc::RI::Paths
+   #:stopdoc:
+   require 'rbconfig'
+ 
+-  version = RbConfig::CONFIG['ruby_version']
++  version = RbConfig::CONFIG['ruby_version_dir_name'] || RbConfig::CONFIG['ruby_version']
+ 
+   BASE    = File.join RbConfig::CONFIG['ridir'], version
+ 
+-- 
+2.1.0

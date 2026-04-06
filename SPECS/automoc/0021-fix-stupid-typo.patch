@@ -1,0 +1,26 @@
+From 78fe4cc51ec5c1c5bb2076a215e7795dc2f57737 Mon Sep 17 00:00:00 2001
+From: Patrick Spendrin <ps_ml@gmx.de>
+Date: Sat, 22 May 2010 19:45:41 +0000
+Subject: [PATCH 21/33] fix stupid typo
+
+svn path=/trunk/kdesupport/automoc/; revision=1129541
+---
+ Automoc4Config.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index d52c59c..2d2d9d2 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -63,7 +63,7 @@ else(EXISTS ${_AUTOMOC4_CURRENT_DIR}/kde4automoc.cpp)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_CURRENT_DIR}" PATH)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR}" PATH)
+    if(WIN32)
+-      get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR} REALPATH")
++      get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR}" REALPATH)
+    endif(WIN32)
+    find_program(AUTOMOC4_EXECUTABLE automoc4 PATHS  "${_AUTOMOC4_BIN_DIR}/bin" NO_DEFAULT_PATH)
+    set(_AUTOMOC4_EXECUTABLE_DEP)
+-- 
+2.4.3
+

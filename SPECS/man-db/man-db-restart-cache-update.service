@@ -1,0 +1,11 @@
+[Unit]
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/rm -rf /var/cache/man/*
+ExecStart=/usr/bin/systemd-run /usr/bin/systemctl start man-db-cache-update.service
+ExecStartPost=/usr/bin/systemctl disable man-db-restart-cache-update.service
+
+[Install]
+WantedBy=multi-user.target

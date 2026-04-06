@@ -1,0 +1,242 @@
+From 1e6fe345218bc089c385711fbbb9941df6672b66 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 13 Nov 2024 16:28:21 +0100
+Subject: [PATCH 5/7] Various fixes for issues found by static code scanners
+
+---
+ service/realm-adcli-enroll.c  | 10 +++++-----
+ service/realm-ini-config.c    |  1 +
+ service/realm-kerberos.c      | 11 +++++++----
+ service/realm-ldap.c          |  9 +++++++--
+ service/realm-samba-winbind.c |  1 +
+ service/realm-samba.c         |  5 ++---
+ tools/realm-client.c          | 16 ++++++++++------
+ 7 files changed, 33 insertions(+), 20 deletions(-)
+
+diff --git a/service/realm-adcli-enroll.c b/service/realm-adcli-enroll.c
+index c913987..c58175e 100644
+--- a/service/realm-adcli-enroll.c
++++ b/service/realm-adcli-enroll.c
+@@ -226,10 +226,10 @@ realm_adcli_enroll_join_async (RealmDisco *disco,
+ 
+ 	if (input)
+ 		g_bytes_unref (input);
+-	free (ccache_arg);
+-	free (upn_arg);
+-	free (server_arg);
+-	free (ou_arg);
++	g_free (ccache_arg);
++	g_free (upn_arg);
++	g_free (server_arg);
++	g_free (ou_arg);
+ }
+ 
+ gboolean
+@@ -319,7 +319,7 @@ realm_adcli_enroll_delete_async (RealmDisco *disco,
+ 	if (input)
+ 		g_bytes_unref (input);
+ 
+-	free (ccache_arg);
++	g_free (ccache_arg);
+ 	g_free (server_arg);
+ }
+ 
+diff --git a/service/realm-ini-config.c b/service/realm-ini-config.c
+index 2e6813b..7bbea34 100644
+--- a/service/realm-ini-config.c
++++ b/service/realm-ini-config.c
+@@ -650,6 +650,7 @@ realm_ini_config_read_file (RealmIniConfig *self,
+ 
+ 	if (err != NULL) {
+ 		g_propagate_error (error, err);
++		g_free (contents);
+ 		return FALSE;
+ 	}
+ 
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 7994e1e..8810f87 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -300,7 +300,7 @@ join_or_leave (RealmKerberos *self,
+ {
+ 	RealmKerberosMembershipIface *iface = REALM_KERBEROS_MEMBERSHIP_GET_IFACE (self);
+ 	RealmKerberosMembership *membership = REALM_KERBEROS_MEMBERSHIP (self);
+-	RealmCredential *cred;
++	RealmCredential *cred = NULL;
+ 	MethodClosure *method;
+ 	GError *error = NULL;
+ 
+@@ -317,6 +317,7 @@ join_or_leave (RealmKerberos *self,
+ 	cred = realm_credential_parse (credential, &error);
+ 	if (error != NULL) {
+ 		g_dbus_method_invocation_return_gerror (invocation, error);
++		realm_credential_unref (cred);
+ 		g_error_free (error);
+ 		return;
+ 	}
+@@ -331,6 +332,8 @@ join_or_leave (RealmKerberos *self,
+ 	if (!realm_invocation_lock_daemon (invocation)) {
+ 		g_dbus_method_invocation_return_error (invocation, REALM_ERROR, REALM_ERROR_BUSY,
+ 		                                       _("Already running another action"));
++		realm_credential_unref (cred);
++		g_error_free (error);
+ 		return;
+ 	}
+ 
+@@ -1067,7 +1070,7 @@ flush_keytab_entries (krb5_context ctx,
+ 			count = 0;
+ 		}
+ 
+-		code = krb5_kt_free_entry (ctx, &entry);
++		code = krb5_free_keytab_entry_contents (ctx, &entry);
+ 		return_val_if_krb5_failed (ctx, code, FALSE);
+ 	}
+ 
+@@ -1175,13 +1178,13 @@ realm_kerberos_get_netbios_name_from_keytab (const gchar *realm_name)
+ 				                && name_data->data[name_data->length - 1] == '$') {
+ 					netbios_name = g_strndup (name_data->data, name_data->length - 1);
+ 					if (netbios_name == NULL) {
+-						code = krb5_kt_free_entry (ctx, &entry);
++						code = krb5_free_keytab_entry_contents (ctx, &entry);
+ 						warn_if_krb5_failed (ctx, code);
+ 						break;
+ 					}
+ 				}
+ 			}
+-			code = krb5_kt_free_entry (ctx, &entry);
++			code = krb5_free_keytab_entry_contents (ctx, &entry);
+ 			warn_if_krb5_failed (ctx, code);
+ 		}
+ 	}
+diff --git a/service/realm-ldap.c b/service/realm-ldap.c
+index f7b6d13..c28e8d1 100644
+--- a/service/realm-ldap.c
++++ b/service/realm-ldap.c
+@@ -228,6 +228,7 @@ realm_ldap_connect_anonymous (GSocketAddress *address,
+ 		/* Not an expected failure */
+ 		if (ls->sock < 0) {
+ 			g_critical ("couldn't open socket to: %s: %s", addrname, strerror (errno));
++			g_free (addrname);
+ 			return NULL;
+ 		}
+ 
+@@ -236,8 +237,10 @@ realm_ldap_connect_anonymous (GSocketAddress *address,
+ 
+ 		native_len = g_socket_address_get_native_size (address);
+ 		native = g_malloc (native_len);
+-		if (!g_socket_address_to_native (address, native, native_len, NULL))
++		if (!g_socket_address_to_native (address, native, native_len, NULL)) {
++			g_free (addrname);
+ 			g_return_val_if_reached (NULL);
++		}
+ 
+ 		if (connect (ls->sock, native, native_len) < 0 &&
+ 		    errno != EINPROGRESS) {
+@@ -280,6 +283,7 @@ realm_ldap_connect_anonymous (GSocketAddress *address,
+ 		g_free (url);
+ 
+ 		g_free (native);
++		g_free (addrname);
+ 
+ 		/* Not an expected failure */
+ 		if (rc != LDAP_SUCCESS) {
+@@ -326,6 +330,7 @@ realm_ldap_connect_anonymous (GSocketAddress *address,
+ 
+ 	case G_SOCKET_PROTOCOL_UDP:
+ 		url = g_strdup_printf ("cldap://%s:%d", addrname, port);
++		g_free (addrname);
+ 
+ 		/*
+ 		 * HACK: ldap_init_fd() does not work for UDP, otherwise we
+@@ -367,11 +372,11 @@ realm_ldap_connect_anonymous (GSocketAddress *address,
+ 		break;
+ 
+ 	default:
++		g_free (addrname);
+ 		g_return_val_if_reached (NULL);
+ 		break;
+ 	}
+ 
+-	g_free (addrname);
+ 
+ 	version = LDAP_VERSION3;
+ 	if (ldap_set_option (ls->ldap, LDAP_OPT_PROTOCOL_VERSION, &version) != 0)
+diff --git a/service/realm-samba-winbind.c b/service/realm-samba-winbind.c
+index 61988eb..30f0433 100644
+--- a/service/realm-samba-winbind.c
++++ b/service/realm-samba-winbind.c
+@@ -154,6 +154,7 @@ realm_samba_winbind_configure_async (RealmIniConfig *config,
+ 		realm_ini_config_finish_change (config, &error);
+ 		g_free (idmap_config_backend);
+ 		g_free (idmap_config_range);
++		g_free (idmap_config_schema_mode);
+ 	}
+ 
+ 	/* Setup pam_winbind.conf with decent defaults matching our expectations */
+diff --git a/service/realm-samba.c b/service/realm-samba.c
+index 677c848..bc976f1 100644
+--- a/service/realm-samba.c
++++ b/service/realm-samba.c
+@@ -134,10 +134,9 @@ lookup_login_prefix (RealmSamba *self)
+ 		return NULL;
+ 
+ 	separator = realm_ini_config_get (self->config, REALM_SAMBA_CONFIG_GLOBAL, "winbind separator");
+-	if (separator == NULL)
+-		separator = g_strdup ("\\");
+ 
+-	return g_strdup_printf ("%s%s", workgroup, separator);
++	return g_strdup_printf ("%s%s", workgroup,
++	                        separator != NULL ? separator : "\\");
+ }
+ 
+ typedef struct {
+diff --git a/tools/realm-client.c b/tools/realm-client.c
+index 06420ea..a63652d 100644
+--- a/tools/realm-client.c
++++ b/tools/realm-client.c
+@@ -287,8 +287,8 @@ realm_client_new_installer (gboolean verbose,
+ 	socket = g_socket_new_from_fd (pair[0], &error);
+ 	if (error != NULL) {
+ 		realm_handle_error (error, _("Couldn't create socket"));
+-		close(pair[0]);
+-		close(pair[1]);
++		close (pair[0]);
++		close (pair[1]);
+ 		return NULL;
+ 	}
+ 
+@@ -296,11 +296,12 @@ realm_client_new_installer (gboolean verbose,
+ 	               G_SPAWN_LEAVE_DESCRIPTORS_OPEN | G_SPAWN_DO_NOT_REAP_CHILD,
+ 	               NULL, NULL, &pid, &error);
+ 
+-	close(pair[1]);
++	close (pair[1]);
+ 
+ 	if (error != NULL) {
+ 		realm_handle_error (error, _("Couldn't run realmd"));
+-		close(pair[0]);
++		close (pair[0]);
++		g_object_unref (socket);
+ 		return NULL;
+ 	}
+ 
+@@ -770,11 +771,14 @@ build_ccache_credential (const gchar *user_name,
+ 	if (ccache) {
+ 		ret = copy_or_kinit_to_ccache (krb5, ccache, user_name, realm_name, error);
+ 		krb5_cc_close (krb5, ccache);
+-		krb5_free_context (krb5);
+ 	}
++	krb5_free_context (krb5);
+ 
+-	if (!ret)
++	if (!ret) {
++		g_unlink (filename);
++		g_free (filename);
+ 		return NULL;
++	}
+ 
+ 	result = read_file_into_variant (filename);
+ 
+-- 
+2.47.1
+

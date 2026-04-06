@@ -1,0 +1,42 @@
+#!/bin/bash
+
+[[ -f /etc/os-release ]] && . /etc/os-release
+[[ -f /etc/sysconfig/kernel ]] && . /etc/sysconfig/kernel
+
+COMMAND="$1"
+KERNEL_VERSION="$2"
+BOOT_DIR_ABS="$3"
+KERNEL_IMAGE="$4"
+
+MACHINE_ID=$KERNEL_INSTALL_MACHINE_ID
+
+BLS_DIR="/boot/loader/entries"
+
+[[ "$KERNEL_VERSION" == *\+* ]] && flavor=-"${KERNEL_VERSION##*+}"
+case "$COMMAND" in
+    add)
+        if [[ ! -f /sbin/new-kernel-pkg || -d "${BLS_DIR}" ]]; then
+            declare -a BOOT_OPTIONS
+            if [[ -f /etc/kernel/cmdline ]]; then
+                read -r -d '' -a BOOT_OPTIONS < /etc/kernel/cmdline
+            fi
+
+            if ! [[ ${BOOT_OPTIONS[*]} ]]; then
+                read -r -d '' -a line < /proc/cmdline
+                for i in "${line[@]}"; do
+                    [[ "${i#initrd=*}" != "$i" ]] && continue
+                    BOOT_OPTIONS+=("$i")
+                done
+            fi
+
+            BLS_RESCUE="${BLS_DIR}/${MACHINE_ID}-0-rescue.conf"
+            if [[ -f "${BLS_RESCUE}" ]] && grep -q '^options.*$kernelopts' "${BLS_RESCUE}"; then
+               sed -i -e "s,^linux.*,linux /boot/vmlinuz-0-rescue-${MACHINE_ID},g" "${BLS_RESCUE}"
+               sed -i -e "s,^initrd.*,initrd /boot/initramfs-0-rescue-${MACHINE_ID}.img,g" "${BLS_RESCUE}"
+               sed -i -e "s#^options.*#options ${BOOT_OPTIONS[*]}#g" "${BLS_RESCUE}"
+            fi
+        fi
+        ;;
+    *)
+        ;;
+esac

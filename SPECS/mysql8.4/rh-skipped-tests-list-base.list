@@ -1,0 +1,36 @@
+innodb.alter_kill                          : BUG#0 failing on F34+
+
+# Expected to fail in Fedora 33+
+#  TLS 1.1 and older has been disabled by system-wide crypto-policies setting
+#  https://fedoraproject.org/wiki/Changes/StrongCryptoSettings2
+#  Tests pass when using legacy crypto-policies seetings
+x.connection_tls_version                   : BUG#0 Expected to fail on F33+
+
+# We intentionaly compile in a different default value than the upstream
+# Thus the commands expected by upstream to fail succeeds in our builds
+# and thus the test fails
+#   Cmake option: -DENABLED_LOCAL_INFILE=ON
+main.mysql_load_data_local_dir             : BUG#0 Intentional divergence from the upstream compiled-in default
+
+# Failing since 8.0.37
+main.archive                               : BUG#0
+innodb.check_ibd_filesize_16k              : BUG#0
+
+# ELN specific
+# Failing since 8.0.37, on x86-64-v3 only
+main.subquery_sj_mat_bka_nobnl             : BUG#0 https://bugzilla.redhat.com/show_bug.cgi?id=2317132
+main.subquery_sj_all_bka_nobnl             : BUG#0 https://bugzilla.redhat.com/show_bug.cgi?id=2317132
+
+# Failing since 8.4 only on Rawhide (F43)
+auth_sec.fips                              : BUG#0
+auth_sec.fips_persisted_option             : BUG#0
+auth_sec.fips_tlsv13                       : BUG#0
+rpl.rpl_fips                               : BUG#0
+x.connection_fips                          : BUG#0
+
+# Fails since 8.4.7
+perfschema.statement_digest_query_sample   : BUG#0
+rpl.rpl_eventlog_psi_memory                : BUG#0
+perfschema.system_events_component         : BUG#0
+rpl.rpl_json                               : BUG#0
+perfschema.system_events_plugin            : BUG#0

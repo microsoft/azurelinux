@@ -1,0 +1,76 @@
+From 5c24d725d5a5f50f0544fbcc544f08a3f9e90e5d Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 8 Aug 2019 05:41:36 -0400
+Subject: [PATCH] Add 'RPMOPTFLAGS' to CFLAGS for some stuff.
+
+---
+ extlinux/Makefile | 4 ++--
+ linux/Makefile    | 4 ++--
+ mtools/Makefile   | 4 ++--
+ utils/Makefile    | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/extlinux/Makefile b/extlinux/Makefile
+index 1721ee54aff..d504e23133e 100644
+--- a/extlinux/Makefile
++++ b/extlinux/Makefile
+@@ -18,9 +18,9 @@ include $(MAKEDIR)/syslinux.mk
+ 
+ OPTFLAGS = -g -Os
+ INCLUDES = -I$(SRC) -I$(objdir) -I$(SRC)/../libinstaller
+-CFLAGS	 = $(GCCWARN) -Wno-sign-compare -D_FILE_OFFSET_BITS=64 \
++CFLAGS	 = $(RPMCFLAGS) $(GCCWARN) -Wno-sign-compare -D_FILE_OFFSET_BITS=64 \
+ 	   $(OPTFLAGS) $(INCLUDES)
+-LDFLAGS	 = 
++LDFLAGS	 = $(RPMLDFLAGS)
+ 
+ SRCS     = main.c \
+ 	   mountinfo.c \
+diff --git a/linux/Makefile b/linux/Makefile
+index 5a49d813de1..9fed68d02c6 100644
+--- a/linux/Makefile
++++ b/linux/Makefile
+@@ -18,8 +18,8 @@ include $(MAKEDIR)/syslinux.mk
+ 
+ OPTFLAGS = -g -Os
+ INCLUDES = -I$(SRC) -I$(objdir) -I$(SRC)/../libinstaller
+-CFLAGS	 = $(GCCWARN) -D_FILE_OFFSET_BITS=64 $(OPTFLAGS) $(INCLUDES)
+-LDFLAGS	 = 
++CFLAGS	 = $(RPMCFLAGS) $(GCCWARN) -D_FILE_OFFSET_BITS=64 $(OPTFLAGS) $(INCLUDES)
++LDFLAGS	 = $(RPMLDFLAGS)
+ 
+ SRCS     = syslinux.c \
+ 	   ../libinstaller/syslxopt.c \
+diff --git a/mtools/Makefile b/mtools/Makefile
+index 632b185ba2f..b6e5ebdba6b 100755
+--- a/mtools/Makefile
++++ b/mtools/Makefile
+@@ -2,8 +2,8 @@ include $(MAKEDIR)/syslinux.mk
+ 
+ OPTFLAGS = -g -Os
+ INCLUDES = -I$(SRC) -I$(objdir) -I$(SRC)/../libfat -I$(SRC)/../libinstaller
+-CFLAGS	 = $(GCCWARN) -D_FILE_OFFSET_BITS=64 $(OPTFLAGS) $(INCLUDES)
+-LDFLAGS	 = 
++CFLAGS	 = $(RPMCFLAGS) $(GCCWARN) -D_FILE_OFFSET_BITS=64 $(OPTFLAGS) $(INCLUDES)
++LDFLAGS	 = $(RPMLDFLAGS)
+ 
+ SRCS     = syslinux.c \
+ 	   ../libinstaller/fs.c \
+diff --git a/utils/Makefile b/utils/Makefile
+index dfe625902ce..b4962353f20 100644
+--- a/utils/Makefile
++++ b/utils/Makefile
+@@ -17,8 +17,8 @@
+ VPATH = $(SRC)
+ include $(MAKEDIR)/syslinux.mk
+ 
+-CFLAGS   = $(GCCWARN) -Os -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -I$(SRC)
+-LDFLAGS  = -O2
++CFLAGS   = $(RPMCFLAGS) $(GCCWARN) -Os -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -I$(SRC)
++LDFLAGS  = $(RPMLDFLAGS) -O2
+ 
+ C_TARGETS	 = isohybrid gethostip memdiskfind
+ SCRIPT_TARGETS	 = mkdiskimage
+-- 
+2.21.0
+

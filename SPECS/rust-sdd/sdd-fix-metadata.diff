@@ -1,0 +1,20 @@
+--- sdd-3.0.10/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sdd-3.0.10/Cargo.toml	2025-07-19T16:50:30.210103+00:00
+@@ -43,17 +43,5 @@
+ name = "sdd"
+ path = "src/lib.rs"
+ 
+-[[bench]]
+-name = "ebr"
+-path = "benches/ebr.rs"
+-harness = false
+-
+-[dependencies.loom]
+-version = "0.7"
+-optional = true
+-
+-[dev-dependencies.criterion]
+-version = "0.6"
+-
+ [dev-dependencies.static_assertions]
+ version = "1.1"

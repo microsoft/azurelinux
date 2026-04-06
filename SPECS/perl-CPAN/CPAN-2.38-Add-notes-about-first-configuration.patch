@@ -1,0 +1,22 @@
+Add notes about the first configuration and about creating site repository
+which is specific for Fedora/RHEL.
+
+diff -up CPAN-2.38/scripts/cpan.orig CPAN-2.38/scripts/cpan
+--- CPAN-2.38/scripts/cpan.orig	2025-03-03 09:43:52.018624326 +0100
++++ CPAN-2.38/scripts/cpan	2025-03-03 09:43:52.021439999 +0100
+@@ -302,6 +302,15 @@ not control. For now, the exit codes are
+ 
+ 	8	A module failed to install
+ 
++=head1 NOTES  
++
++If the configuration is not defined when C<cpan> is used for the first
++time, CPAN::Config initialization is triggered using L<CPAN::FirstTime>.
++This step is skipped only when using the C<-h> option.
++
++If the user has write permissions to /usr/local, site library repositories
++may also be created.
++
+ =head1 TO DO
+ 
+ * one shot configuration values from the command line

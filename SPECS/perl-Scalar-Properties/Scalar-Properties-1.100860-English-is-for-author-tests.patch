@@ -1,0 +1,72 @@
+From 64fcb58c734bc6f3903e4f02d308214ef4d8aa54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 27 Jan 2021 10:09:30 +0100
+Subject: [PATCH] English is for author tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If author tests are not performed (default), English module is
+not used (t/author-critic.t). But because it is listed in META.yml,
+t/000-report-versions.t fails if English is not installed:
+
+    t/00-compile.t ............... ok
+    # Testing with Perl 5.032000, /usr/bin/perl
+    #     Carp version is 1.50
+
+    #   Failed test 'use English;'
+    #   at t/000-report-versions.t line 424.
+    #     Tried to use 'English'.
+    #     Error:  Can't locate English.pm in @INC (you may need to install the English module) (@INC contains: /home/test/fedora/perl-Scalar-Properties/Scalar-Properties-1.100860/blib/lib /home/test/fedora/perl-Scalar-Properties/Scalar-Properties-1.100860/blib/arch /usr/local/lib64/perl5/5.32 /usr/local/share/perl5/5.32 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at t/000-report-versions.t line 424.
+    # BEGIN failed--compilation aborted at t/000-report-versions.t line 424.
+    Bailout called.  Further testing stopped:  can't load English
+    FAILED--Further testing stopped: can't load English
+
+This patch fixes it by removing English from a list of the hard dependencies.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ META.json   | 1 -
+ META.yml    | 1 -
+ Makefile.PL | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/META.json b/META.json
+index e82205e..17820db 100644
+--- a/META.json
++++ b/META.json
+@@ -26,7 +26,6 @@
+       "Test::More" : "0.88",
+       "perl" : "5.008",
+       "Scalar::Util" : "0",
+-      "English" : "0",
+       "File::Find" : "0",
+       "File::Temp" : "0",
+       "overload" : "0",
+diff --git a/META.yml b/META.yml
+index 1c24c9f..ea1d90e 100644
+--- a/META.yml
++++ b/META.yml
+@@ -17,7 +17,6 @@ provides:
+     version: 1.100860
+ requires:
+   Carp: 0
+-  English: 0
+   File::Find: 0
+   File::Temp: 0
+   Scalar::Util: 0
+diff --git a/Makefile.PL b/Makefile.PL
+index f190a17..c4c950b 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -25,7 +25,6 @@ my %WriteMakefileArgs = (
+                        'PREREQ_PM' => {
+                                         'Test::More' => '0.88',
+                                         'Scalar::Util' => '0',
+-                                        'English' => '0',
+                                         'File::Find' => '0',
+                                         'File::Temp' => '0',
+                                         'overload' => '0',
+-- 
+2.26.2
+

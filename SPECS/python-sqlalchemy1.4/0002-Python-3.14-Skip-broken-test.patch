@@ -1,0 +1,79 @@
+From 5c5b02931e9edf030fd3542afef8b17a7b970c3c Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@tiptoe.de>
+Date: Wed, 11 Jun 2025 23:09:29 +0200
+Subject: [PATCH 2/2] Python 3.14: Skip broken test
+
+This is a partial backport of commit b8b07a2f28657e57ae9b4071b6313df372b7f8cb
+
+Signed-off-by: Nils Philippsen <nils@tiptoe.de>
+---
+ lib/sqlalchemy/testing/requirements.py | 14 ++++++++++++++
+ lib/sqlalchemy/util/__init__.py        |  1 +
+ lib/sqlalchemy/util/compat.py          |  1 +
+ test/base/test_concurrency_py3k.py     |  1 +
+ 4 files changed, 17 insertions(+)
+
+diff --git a/lib/sqlalchemy/testing/requirements.py b/lib/sqlalchemy/testing/requirements.py
+index 9164faa93..d8247dc28 100644
+--- a/lib/sqlalchemy/testing/requirements.py
++++ b/lib/sqlalchemy/testing/requirements.py
+@@ -1331,6 +1331,20 @@ class SuiteRequirements(Requirements):
+             lambda: util.py38, "Python 3.8 or above required"
+         )
+ 
++    @property
++    def not_python314(self):
++        """This requirement is interim to assist with backporting of
++        issue #12405.
++
++        SQLAlchemy 1.4 still includes the ``await_fallback()`` method that
++        makes use of ``asyncio.get_event_loop_policy()``.  This is removed
++        in SQLAlchemy 2.1.
++
++        """
++        return exclusions.skip_if(
++            lambda: util.py314, "Python 3.14 or above not supported"
++        )
++
+     @property
+     def cpython(self):
+         return exclusions.only_if(
+diff --git a/lib/sqlalchemy/util/__init__.py b/lib/sqlalchemy/util/__init__.py
+index 078723c04..b77f70f76 100644
+--- a/lib/sqlalchemy/util/__init__.py
++++ b/lib/sqlalchemy/util/__init__.py
+@@ -82,6 +82,7 @@ from .compat import py310
+ from .compat import py311
+ from .compat import py312
+ from .compat import py313
++from .compat import py314
+ from .compat import py37
+ from .compat import py38
+ from .compat import py39
+diff --git a/lib/sqlalchemy/util/compat.py b/lib/sqlalchemy/util/compat.py
+index bdb4a9785..fe7e7d635 100644
+--- a/lib/sqlalchemy/util/compat.py
++++ b/lib/sqlalchemy/util/compat.py
+@@ -14,6 +14,7 @@ import operator
+ import platform
+ import sys
+ 
++py314 = sys.version_info >= (3, 14)
+ py313 = sys.version_info >= (3, 13)
+ py312 = sys.version_info >= (3, 12)
+ py311 = sys.version_info >= (3, 11)
+diff --git a/test/base/test_concurrency_py3k.py b/test/base/test_concurrency_py3k.py
+index de7157c78..c639f24fe 100644
+--- a/test/base/test_concurrency_py3k.py
++++ b/test/base/test_concurrency_py3k.py
+@@ -81,6 +81,7 @@ class TestAsyncioCompat(fixtures.TestBase):
+         with expect_raises_message(ValueError, "sync error"):
+             await greenlet_spawn(go)
+ 
++    @testing.requires.not_python314
+     def test_await_fallback_no_greenlet(self):
+         to_await = run1()
+         await_fallback(to_await)
+-- 
+2.49.0
+

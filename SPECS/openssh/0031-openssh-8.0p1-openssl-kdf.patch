@@ -1,0 +1,157 @@
+From 430bd33963725beb8ec01a1e581529ae6bf6bec0 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 31/50] openssh-8.0p1-openssl-kdf
+
+---
+ configure.ac |   1 +
+ kex.c        | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 108 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d9bd2f51..d92a8580 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3137,6 +3137,7 @@ if test "x$openssl" = "xyes" ; then
+ 		HMAC_CTX_init \
+ 		RSA_generate_key_ex \
+ 		RSA_get_default_method \
++		EVP_KDF_CTX_new \
+ 	])
+ 
+ 	# OpenSSL_add_all_algorithms may be a macro.
+diff --git a/kex.c b/kex.c
+index 19a56e8e..8b200ff4 100644
+--- a/kex.c
++++ b/kex.c
+@@ -40,6 +40,11 @@
+ #ifdef WITH_OPENSSL
+ #include <openssl/crypto.h>
+ #include <openssl/dh.h>
++# ifdef HAVE_EVP_KDF_CTX_NEW
++# include <openssl/kdf.h>
++# include <openssl/param_build.h>
++# include <openssl/core_names.h>
++# endif
+ #endif
+ 
+ #include "ssh.h"
+@@ -1078,6 +1083,107 @@ kex_choose_conf(struct ssh *ssh, uint32_t seq)
+ 	return r;
+ }
+ 
++#ifdef HAVE_EVP_KDF_CTX_NEW
++static const char *
++digest_to_md(int digest_type)
++{
++	switch (digest_type) {
++	case SSH_DIGEST_SHA1:
++		return SN_sha1;
++	case SSH_DIGEST_SHA256:
++		return SN_sha256;
++	case SSH_DIGEST_SHA384:
++		return SN_sha384;
++	case SSH_DIGEST_SHA512:
++		return SN_sha512;
++	}
++	return NULL;
++}
++
++static int
++derive_key(struct ssh *ssh, int id, u_int need, u_char *hash, u_int hashlen,
++    const struct sshbuf *shared_secret, u_char **keyp)
++{
++	struct kex *kex = ssh->kex;
++	u_char *key = NULL;
++	int r, key_len;
++
++	EVP_KDF *kdf = EVP_KDF_fetch(NULL, "SSHKDF", NULL);
++	EVP_KDF_CTX *ctx = EVP_KDF_CTX_new(kdf);
++	OSSL_PARAM_BLD *param_bld = OSSL_PARAM_BLD_new();
++	OSSL_PARAM *params = NULL;
++       const char *md = digest_to_md(kex->hash_alg);
++       char keytype = (char)id;
++
++	EVP_KDF_free(kdf);
++	if (!ctx) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (md == NULL) {
++		r = SSH_ERR_INVALID_ARGUMENT;
++		goto out;
++	}
++
++	if (param_bld == NULL) {
++		EVP_KDF_CTX_free(ctx);
++		return -1;
++	}
++	if ((key_len = ssh_digest_bytes(kex->hash_alg)) == 0) {
++		r = SSH_ERR_INVALID_ARGUMENT;
++		goto out;
++	}
++
++	key_len = ROUNDUP(need, key_len);
++	if ((key = calloc(1, key_len)) == NULL) {
++		r = SSH_ERR_ALLOC_FAIL;
++		goto out;
++	}
++
++	r =     OSSL_PARAM_BLD_push_utf8_string(param_bld, OSSL_KDF_PARAM_DIGEST,
++		                md, strlen(md)) && /* SN */
++		OSSL_PARAM_BLD_push_octet_string(param_bld, OSSL_KDF_PARAM_KEY,
++				sshbuf_ptr(shared_secret), sshbuf_len(shared_secret)) &&
++		OSSL_PARAM_BLD_push_octet_string(param_bld, OSSL_KDF_PARAM_SSHKDF_XCGHASH,
++				hash, hashlen) &&
++		OSSL_PARAM_BLD_push_octet_string(param_bld, OSSL_KDF_PARAM_SSHKDF_SESSION_ID,
++				sshbuf_ptr(kex->session_id), sshbuf_len(kex->session_id)) &&
++		OSSL_PARAM_BLD_push_utf8_string(param_bld, OSSL_KDF_PARAM_SSHKDF_TYPE,
++				&keytype, 1);
++	if (r != 1) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++
++	params = OSSL_PARAM_BLD_to_param(param_bld);
++	if (params == NULL) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	r = EVP_KDF_derive(ctx, key, key_len, params);
++	if (r != 1) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++#ifdef DEBUG_KEX
++	fprintf(stderr, "key '%c'== ", id);
++	dump_digest("key", key, key_len);
++#endif
++	*keyp = key;
++	key = NULL;
++	r = 0;
++
++out:
++	OSSL_PARAM_BLD_free(param_bld);
++	OSSL_PARAM_free(params);
++	free (key);
++	EVP_KDF_CTX_free(ctx);
++	if (r < 0) {
++		return r;
++	}
++	return 0;
++}
++#else
+ static int
+ derive_key(struct ssh *ssh, int id, u_int need, u_char *hash, u_int hashlen,
+     const struct sshbuf *shared_secret, u_char **keyp)
+@@ -1141,6 +1247,7 @@ derive_key(struct ssh *ssh, int id, u_int need, u_char *hash, u_int hashlen,
+ 	ssh_digest_free(hashctx);
+ 	return r;
+ }
++#endif /* HAVE_OPENSSL_EVP_KDF_CTX_NEW */
+ 
+ #define NKEYS	6
+ int
+-- 
+2.49.0
+

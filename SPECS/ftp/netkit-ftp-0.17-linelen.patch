@@ -1,0 +1,33 @@
+--- netkit-ftp-0.17-dist/ftp/ftp_var.h	2012-10-29 10:02:44.455342130 +0100
++++ netkit-ftp-0.17-new/ftp/ftp_var.h	2012-10-29 10:02:31.292342775 +0100
+@@ -54,6 +54,7 @@
+ #define Extern extern
+ #endif
+ 
++#define LINELEN PATH_MAX+200
+ 
+ /*
+  * Options and other state info.
+@@ -109,9 +110,9 @@ Extern int	ftp_port;	/* htons'd port num
+ 
+ Extern sigjmp_buf toplevel;	/* non-local goto stuff for cmd scanner */
+ 
+-Extern char	line[200];	/* input line buffer */
++Extern char	line[LINELEN];	/* input line buffer */
+ Extern char	*stringbase;	/* current scan point in line buffer */
+-Extern char	argbuf[200];	/* argument storage buffer */
++Extern char	argbuf[LINELEN];	/* argument storage buffer */
+ Extern char	*argbase;	/* current storage point in arg buffer */
+ Extern int	cpend;		/* flag: if != 0, then pending server reply */
+ Extern int	mflag;		/* flag: if != 0, then active multi command */
+--- netkit-ftp-0.17/ftp/domacro.c	2012-10-29 10:02:44.394342130 +0100
++++ netkit-ftp-0.17-new/ftp/domacro.c	2012-10-29 10:02:31.292342775 +0100
+@@ -53,7 +53,7 @@ domacro(int argc, char *argv[])
+ 	register int i, j;
+ 	register char *cp1, *cp2;
+ 	int count = 2, loopflg = 0;
+-	char line2[200];
++	char line2[LINELEN];
+ 	struct cmd *c;
+ 
+ 	if (argc < 2 && !another(&argc, &argv, "macro name")) {

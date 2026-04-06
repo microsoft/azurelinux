@@ -1,0 +1,57 @@
+From 7693d5335c498de1dbb783042cc4acec0138e44d Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Mon, 5 Jan 2026 18:32:52 -0800
+Subject: [PATCH] Issue 7160 - Add lib389 version sync check to configure
+ (#7165)
+
+Description: Add version validation during configure that ensures
+lib389 version in pyproject.toml matches the main project version
+in VERSION.sh. Configure fails with clear error message and fix
+instructions when versions mismatch, preventing inconsistent releases.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7160
+
+Reviewed by: @progier389 (Thanks!)
+---
+ configure.ac | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index e94f72647..7fd061a8c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -7,6 +7,31 @@ AC_CONFIG_HEADERS([config.h])
+ # include the version information
+ . $srcdir/VERSION.sh
+ AC_MSG_NOTICE(This is configure for $PACKAGE_TARNAME $PACKAGE_VERSION)
++
++# Validate lib389 version matches main project version
++AC_MSG_CHECKING([lib389 version sync])
++lib389_pyproject="$srcdir/src/lib389/pyproject.toml"
++if test -f "$lib389_pyproject"; then
++    lib389_version=$(grep -E '^version\s*=' "$lib389_pyproject" | sed 's/.*"\(.*\)".*/\1/')
++    if test "x$lib389_version" != "x$RPM_VERSION"; then
++        AC_MSG_RESULT([MISMATCH])
++        AC_MSG_ERROR([
++lib389 version mismatch detected!
++  Main project version (VERSION.sh): $RPM_VERSION
++  lib389 version (pyproject.toml):   $lib389_version
++
++To fix this, run:
++  cd $srcdir/src/lib389 && python3 validate_version.py --update
++
++lib389 version MUST match the main project version before release.
++])
++    else
++        AC_MSG_RESULT([ok ($lib389_version)])
++    fi
++else
++    AC_MSG_RESULT([MISSING])
++    AC_MSG_ERROR([lib389 pyproject.toml not found at $lib389_pyproject - source tree is incomplete])
++fi
+ AM_INIT_AUTOMAKE([1.9 foreign subdir-objects dist-bzip2 no-dist-gzip no-define tar-pax])
+ AC_SUBST([RPM_VERSION])
+ AC_SUBST([RPM_RELEASE])
+-- 
+2.52.0
+

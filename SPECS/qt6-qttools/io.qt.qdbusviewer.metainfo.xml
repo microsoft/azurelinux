@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop-application">
+  <!--Created with jdAppStreamEdit 8.0-->
+  <id>io.qt.qdbusviewer</id>
+  <name>Qt QDBusViewer</name>
+  <summary>Debug D-Bus applications</summary>
+  <developer id="io.qt">
+    <name>The Qt Company</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-3.0-only</project_license>
+  <project_group>Qt</project_group>
+  <description>
+    <p>The Qt D-Bus Viewer is a tool that lets you introspect D-Bus objects and messages. You can choose between the system bus and the session bus.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The Main Window</caption>
+      <image type="source">https://github.com/flathub/io.qt.qdbusviewer/blob/5df144729039a83d41d5c3e285e8d090884564a7/Screenshots/MainWindow.png?raw=true</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://www.qt.io/</url>
+  <url type="bugtracker">https://bugreports.qt.io</url>
+  <url type="vcs-browser">https://code.qt.io/cgit/qt/qttools.git/tree/src/qdbus/qdbusviewer</url>
+  <url type="contribute">https://www.qt.io/community/contribute-to-qt</url>
+  <categories>
+    <category>Development</category>
+    <category>Debugger</category>
+    <category>Qt</category>
+  </categories>
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">qt6-qdbusviewer.desktop</launchable>
+  <provides>
+    <binary>qdbusviewer</binary>
+  </provides>
+</component>

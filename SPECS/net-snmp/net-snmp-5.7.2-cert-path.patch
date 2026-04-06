@@ -1,0 +1,30 @@
+1134475 - dependency in perl package
+
+Use hardcoded path to configuration directories instead of net-snmp-config.
+net-snmp-config is in net-snmp-devel package and we do not want net-snmp-perl
+depending on -devel.
+
+diff -up net-snmp-5.7.2/local/net-snmp-cert.cert-path net-snmp-5.7.2/local/net-snmp-cert
+--- net-snmp-5.7.2/local/net-snmp-cert.cert-path	2012-10-10 00:28:58.000000000 +0200
++++ net-snmp-5.7.2/local/net-snmp-cert	2014-09-01 12:05:10.582427036 +0200
+@@ -819,8 +819,7 @@ sub set_default {
+ sub cfg_path {
+   my $path;
+ 
+-  $path = `$NetSNMP::Cert::CFGTOOL --snmpconfpath`;
+-  chomp $path;
++  $path = "/etc/snmp:/usr/share/snmp:/usr/lib64/snmp:/home/jsafrane/.snmp:/var/lib/net-snmp";
+   return (wantarray ? split(':', $path) : $path);
+ }
+ 
+@@ -1414,8 +1413,8 @@ sub checkReqs {
+   die("$NetSNMP::Cert::OPENSSL (v$ossl_ver): must be $ossl_min_ver or later")
+     if ($ossl_ver cmp $ossl_min_ver) < 0;
+ 
+-  die("$NetSNMP::Cert::CFGTOOL not found: please install")
+-    if system("$NetSNMP::Cert::CFGTOOL > /dev/null 2>&1");
++#  die("$NetSNMP::Cert::CFGTOOL not found: please install")
++#    if system("$NetSNMP::Cert::CFGTOOL > /dev/null 2>&1");
+ }
+ 
+ sub initOpts {

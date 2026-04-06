@@ -1,0 +1,25 @@
+From 83aab94724a226c04bf8b85c9ceb2be91dca8dd5 Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Tue, 27 May 2025 18:54:56 +0000
+Subject: [PATCH] fix pasto (use proper variable) From Vincent Mihalkovic
+
+---
+ src/readelf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/readelf.c b/src/readelf.c
+index 43296c3..aede140 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -1824,7 +1824,7 @@ dophn_exec(struct magic_set *ms, int clazz, int swap, int fd, off_t off,
+ 				str = CAST(const char *, nbuf);
+ 			} else
+ 				str = "*empty*";
+-			strlcpy(interp, "*empty*", sizeof(interp));
++			strlcpy(interp, str, sizeof(interp));
+ 			break;
+ 		case PT_NOTE:
+ 			if (ms->flags & MAGIC_MIME)
+-- 
+2.49.0
+

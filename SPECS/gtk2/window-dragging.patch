@@ -1,0 +1,116 @@
+diff -up gtk+-2.24.7/gtk/gtkmenushell.c.window-dragging gtk+-2.24.7/gtk/gtkmenushell.c
+--- gtk+-2.24.7/gtk/gtkmenushell.c.window-dragging	2011-08-15 22:30:52.000000000 -0400
++++ gtk+-2.24.7/gtk/gtkmenushell.c	2011-10-17 19:50:52.180468086 -0400
+@@ -589,18 +589,45 @@ gtk_menu_shell_button_press (GtkWidget
+ 
+   if (!menu_shell->active || !menu_shell->button)
+     {
+-      gtk_menu_shell_activate (menu_shell);
++      gboolean initially_active = menu_shell->active;
+ 
+       menu_shell->button = event->button;
+ 
+-      if (menu_item && _gtk_menu_item_is_selectable (menu_item) &&
+-	  menu_item->parent == widget &&
+-          menu_item != menu_shell->active_menu_item)
++      if (menu_item)
+         {
+-          if (GTK_MENU_SHELL_GET_CLASS (menu_shell)->submenu_placement == GTK_TOP_BOTTOM)
++          if (_gtk_menu_item_is_selectable (menu_item) &&
++              menu_item->parent == widget &&
++              menu_item != menu_shell->active_menu_item)
+             {
+-              menu_shell->activate_time = event->time;
+-              gtk_menu_shell_select_item (menu_shell, menu_item);
++              gtk_menu_shell_activate (menu_shell);
++              menu_shell->button = event->button;
++
++              if (GTK_MENU_SHELL_GET_CLASS (menu_shell)->submenu_placement == GTK_TOP_BOTTOM)
++                {
++                  menu_shell->activate_time = event->time;
++                  gtk_menu_shell_select_item (menu_shell, menu_item);
++                }
++            }
++        }
++      else
++        {
++          if (!initially_active)
++            {
++              gboolean window_drag = FALSE;
++
++              gtk_widget_style_get (widget,
++                                    "window-dragging", &window_drag,
++                                    NULL);
++
++              if (window_drag)
++                {
++                  gtk_menu_shell_deactivate (menu_shell);
++                  gtk_window_begin_move_drag (GTK_WINDOW (gtk_widget_get_toplevel (widget)),
++                                              event->button,
++                                              event->x_root,
++                                              event->y_root,
++                                              event->time);
++                }
+             }
+         }
+     }
+diff -up gtk+-2.24.7/gtk/gtktoolbar.c.window-dragging gtk+-2.24.7/gtk/gtktoolbar.c
+--- gtk+-2.24.7/gtk/gtktoolbar.c.window-dragging	2011-10-01 11:29:06.000000000 -0400
++++ gtk+-2.24.7/gtk/gtktoolbar.c	2011-10-17 19:52:56.104463657 -0400
+@@ -2701,6 +2701,8 @@ static gboolean
+ gtk_toolbar_button_press (GtkWidget      *toolbar,
+     			  GdkEventButton *event)
+ {
++  GtkWidget *window;
++
+   if (_gtk_button_event_triggers_context_menu (event))
+     {
+       gboolean return_value;
+@@ -2711,7 +2713,29 @@ gtk_toolbar_button_press (GtkWidget
+       
+       return return_value;
+     }
+-  
++
++  window = gtk_widget_get_toplevel (toolbar);
++
++  if (window)
++    {
++      gboolean window_drag = FALSE;
++
++      gtk_widget_style_get (toolbar,
++                            "window-dragging", &window_drag,
++                            NULL);
++
++      if (window_drag)
++        {
++          gtk_window_begin_move_drag (GTK_WINDOW (window),
++                                      event->button,
++                                      event->x_root,
++                                      event->y_root,
++                                      event->time);
++
++          return TRUE;
++        }
++    }
++
+   return FALSE;
+ }
+ 
+diff -up gtk+-2.24.7/gtk/gtkwidget.c.window-dragging gtk+-2.24.7/gtk/gtkwidget.c
+--- gtk+-2.24.7/gtk/gtkwidget.c.window-dragging	2011-10-17 19:50:52.175468086 -0400
++++ gtk+-2.24.7/gtk/gtkwidget.c	2011-10-17 19:50:52.184468086 -0400
+@@ -2467,6 +2467,13 @@ gtk_widget_class_init (GtkWidgetClass *k
+ 							       0.0, 1.0, 0.04,
+ 							       GTK_PARAM_READABLE));
+ 
++  gtk_widget_class_install_style_property (klass,
++                                           g_param_spec_boolean ("window-dragging",
++                                                                 P_("Window dragging"),
++                                                                 P_("Window dragging"),
++                                                                 FALSE,
++                                                                 GTK_PARAM_READWRITE));
++
+   /**
+    * GtkWidget:draw-border:
+    *

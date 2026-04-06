@@ -1,0 +1,47 @@
+--- procmail-3.22/src/mailfold.c.truncate	2007-03-27 13:24:05.000000000 +0200
++++ procmail-3.22/src/mailfold.c	2007-03-27 13:25:06.000000000 +0200
+@@ -30,6 +30,7 @@
+ 
+ int logopened,rawnonl;
+ off_t lasttell;
++static int trunced;
+ static long lastdump;
+ static volatile int mailread;	/* if the mail is completely read in already */
+ static struct dyna_array confield;		  /* escapes, concatenations */
+@@ -81,6 +82,7 @@
+  long len;
+ { int i;long part;
+   lasttell=i= -1;SETerrno(EBADF);
++  trunced=0;
+   if(s>=0)
+    { if(ft_lock(type)&&(lseek(s,(off_t)0,SEEK_END),fdlock(s)))
+ 	nlog("Kernel-lock failed\n");
+@@ -120,13 +122,18 @@
+       }
+ writefin:
+      i=type!=ft_PIPE&&fsync(s)&&errno!=EINVAL;	  /* EINVAL => wasn't a file */
++     if ((i||len)&&lasttell>=0)
++      { int serrno=errno;
++	if(!ftruncate(s,lasttell)) trunced=1;
++	SETerrno(serrno);
++      }
+      if(ft_lock(type))
+       { int serrno=errno;		       /* save any error information */
+ 	if(fdunlock())
+ 	   nlog("Kernel-unlock failed\n");
+ 	SETerrno(serrno);
+       }
+-     i=rclose(s)||i;
++     i=rclose(s)||i; /* if this fails, we should truncate, but it's too late */
+    }			   /* return an error even if nothing was to be sent */
+   return i&&!len?-1:len;
+ }
+@@ -237,7 +244,7 @@
+ #endif
+ 	      default:writeerr(buf);
+ 	    }
+-	   if(lasttell>=0&&!truncate(boxname,lasttell)&&(logopened||verbose))
++	   if(lasttell>=0&&trunced&&(logopened||verbose))
+ 	      nlog("Truncated file to former size\n");	    /* undo garbage */
+ ret0:	   return 0;
+ 	 }

@@ -1,0 +1,25 @@
+From aaf6eab5c13e1d63f33f4ddf5a08ca1140f44959 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 1 Sep 2024 02:28:28 +0200
+Subject: [PATCH] Fix compiling tests with compat and io-compat feature removed
+
+---
+ tests/_require_features.rs | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/_require_features.rs b/tests/_require_features.rs
+index 8046cc9..e04b4ff 100644
+--- a/tests/_require_features.rs
++++ b/tests/_require_features.rs
+@@ -2,8 +2,6 @@
+     feature = "std",
+     feature = "alloc",
+     feature = "async-await",
+-    feature = "compat",
+-    feature = "io-compat",
+     feature = "executor",
+     feature = "thread-pool",
+ )))]
+-- 
+2.47.0
+

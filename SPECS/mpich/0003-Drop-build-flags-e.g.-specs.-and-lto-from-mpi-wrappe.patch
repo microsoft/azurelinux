@@ -1,0 +1,148 @@
+From 695102787fde0b3adb3917b12b97f8c49f7f57a5 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 2 Mar 2023 17:50:52 -0700
+Subject: [PATCH 3/3] Drop build flags, e.g. -specs... and -lto from mpi
+ wrappers (mpicc and mpicxx)
+
+For discussion see:
+https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/7TFWEKTDWBYBHEGMIWBVI3AVGORZGNBS/
+---
+ src/env/mpicc.bash.in   | 8 ++++----
+ src/env/mpicc.sh.in     | 8 ++++----
+ src/env/mpicxx.bash.in  | 8 ++++----
+ src/env/mpicxx.sh.in    | 8 ++++----
+ src/env/mpifort.bash.in | 6 +++---
+ src/env/mpifort.sh.in   | 6 +++---
+ 6 files changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/src/env/mpicc.bash.in b/src/env/mpicc.bash.in
+index 3fc695f..d8659e5 100644
+--- a/src/env/mpicc.bash.in
++++ b/src/env/mpicc.bash.in
+@@ -247,13 +247,13 @@ if [ -n "$profConf" ] ; then
+     fi
+ fi
+ 
+-final_cflags="@MPICH_MPICC_CFLAGS@ @WRAPPER_CFLAGS@"
+-final_cppflags="@MPICH_MPICC_CPPFLAGS@ @WRAPPER_CPPFLAGS@"
+-final_ldflags="@MPICH_MPICC_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_cflags="@MPICH_MPICC_CFLAGS@"
++final_cppflags="@MPICH_MPICC_CPPFLAGS@"
++final_ldflags="@MPICH_MPICC_LDFLAGS@"
+ final_libs="@MPICH_MPICC_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ # -----------------------------------------------------------------------
+diff --git a/src/env/mpicc.sh.in b/src/env/mpicc.sh.in
+index 99a8c90..e093907 100644
+--- a/src/env/mpicc.sh.in
++++ b/src/env/mpicc.sh.in
+@@ -253,13 +253,13 @@ if [ -n "$profConf" ] ; then
+     fi
+ fi
+ 
+-final_cflags="@MPICH_MPICC_CFLAGS@ @WRAPPER_CFLAGS@"
+-final_cppflags="@MPICH_MPICC_CPPFLAGS@ @WRAPPER_CPPFLAGS@"
+-final_ldflags="@MPICH_MPICC_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_cflags="@MPICH_MPICC_CFLAGS@"
++final_cppflags="@MPICH_MPICC_CPPFLAGS@"
++final_ldflags="@MPICH_MPICC_LDFLAGS@"
+ final_libs="@MPICH_MPICC_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ # -----------------------------------------------------------------------
+diff --git a/src/env/mpicxx.bash.in b/src/env/mpicxx.bash.in
+index 29566ba..acf897b 100644
+--- a/src/env/mpicxx.bash.in
++++ b/src/env/mpicxx.bash.in
+@@ -253,13 +253,13 @@ if [ -n "$profConf" ] ; then
+     fi
+ fi
+ 
+-final_cxxflags="@MPICH_MPICXX_CXXFLAGS@ @WRAPPER_CXXFLAGS@"
+-final_cppflags="@MPICH_MPICXX_CPPFLAGS@ @WRAPPER_CPPFLAGS@"
+-final_ldflags="@MPICH_MPICXX_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_cxxflags="@MPICH_MPICXX_CXXFLAGS@"
++final_cppflags="@MPICH_MPICXX_CPPFLAGS@"
++final_ldflags="@MPICH_MPICXX_LDFLAGS@"
+ final_libs="@MPICH_MPICXX_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ # A temporary statement to invoke the compiler
+diff --git a/src/env/mpicxx.sh.in b/src/env/mpicxx.sh.in
+index 0b830fe..36c2486 100644
+--- a/src/env/mpicxx.sh.in
++++ b/src/env/mpicxx.sh.in
+@@ -259,13 +259,13 @@ if [ -n "$profConf" ] ; then
+     fi
+ fi
+ 
+-final_cxxflags="@MPICH_MPICXX_CXXFLAGS@ @WRAPPER_CXXFLAGS@"
+-final_cppflags="@MPICH_MPICXX_CPPFLAGS@ @WRAPPER_CPPFLAGS@"
+-final_ldflags="@MPICH_MPICXX_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_cxxflags="@MPICH_MPICXX_CXXFLAGS@"
++final_cppflags="@MPICH_MPICXX_CPPFLAGS@"
++final_ldflags="@MPICH_MPICXX_LDFLAGS@"
+ final_libs="@MPICH_MPICXX_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ # A temporary statement to invoke the compiler
+diff --git a/src/env/mpifort.bash.in b/src/env/mpifort.bash.in
+index 5312aea..c1e557b 100644
+--- a/src/env/mpifort.bash.in
++++ b/src/env/mpifort.bash.in
+@@ -335,12 +335,12 @@ elif [ -n "$FCMODINC" ] ; then
+     FCMODDIRS="${FCMODINC}$modincdir"
+ fi
+ 
+-final_fcflags="@MPICH_MPIFORT_FCFLAGS@ @WRAPPER_FCFLAGS@"
+-final_ldflags="@MPICH_MPIFORT_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_fcflags="@MPICH_MPIFORT_FCFLAGS@"
++final_ldflags="@MPICH_MPIFORT_LDFLAGS@"
+ final_libs="@MPICH_MPIFORT_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ extra_f77_flags="@WRAPPER_EXTRA_F77_FLAGS@"
+diff --git a/src/env/mpifort.sh.in b/src/env/mpifort.sh.in
+index 902b0f7..95c1232 100644
+--- a/src/env/mpifort.sh.in
++++ b/src/env/mpifort.sh.in
+@@ -352,12 +352,12 @@ elif [ -n "$FCMODINC" ] ; then
+     FCMODDIRS="${FCMODINC}$modincdir"
+ fi
+ 
+-final_fcflags="@MPICH_MPIFORT_FCFLAGS@ @WRAPPER_FCFLAGS@"
+-final_ldflags="@MPICH_MPIFORT_LDFLAGS@ @WRAPPER_LDFLAGS@"
++final_fcflags="@MPICH_MPIFORT_FCFLAGS@"
++final_ldflags="@MPICH_MPIFORT_LDFLAGS@"
+ final_libs="@MPICH_MPIFORT_LIBS@"
+ if test "@INTERLIB_DEPS@" = "no" -o "${interlib_deps}" = "no" ; then
+     final_ldflags="${final_ldflags} @LDFLAGS@"
+-    final_libs="${final_libs} __LIBS_TO_BE_FILLED_AT_INSTALL_TIME__"
++    final_libs="${final_libs}"
+ fi
+ 
+ extra_f77_flags="@WRAPPER_EXTRA_F77_FLAGS@"
+-- 
+2.40.0.rc1
+

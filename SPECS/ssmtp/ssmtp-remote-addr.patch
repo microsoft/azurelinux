@@ -1,0 +1,26 @@
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=557741
+
+Patch by Victor Sudakov <sudakov@sibptus.tomsk.ru>
+Modified by Anibal Monsalve Salazar <anibal@debian.org>
+
+--- a/ssmtp.c	2009-11-23 20:55:11.000000000 +1100
++++ b/ssmtp.c	2009-11-24 13:27:58.000000000 +1100
+@@ -1409,6 +1409,7 @@
+ int ssmtp(char *argv[])
+ {
+ 	char b[(BUF_SZ + 2)], *buf = b+1, *p, *q;
++	char *remote_addr;
+ #ifdef MD5AUTH
+ 	char challenge[(BUF_SZ + 1)];
+ #endif
+@@ -1612,6 +1613,10 @@
+ 		outbytes += smtp_write(sock, "From: %s", from);
+ 	}
+ 
++	if(remote_addr=getenv("REMOTE_ADDR")) {
++		outbytes += smtp_write(sock, "X-Originating-IP: %s", remote_addr);
++	}
++
+ 	if(have_date == False) {
+ 		outbytes += smtp_write(sock, "Date: %s", arpadate);
+ 	}

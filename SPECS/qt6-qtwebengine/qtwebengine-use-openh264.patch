@@ -1,0 +1,13 @@
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+index cc992b4..7b6326f 100644
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -449,6 +449,8 @@ foreach(arch ${archs})
+                 use_bluez=false
+                 is_cfi=false
+                 use_ozone=true
++                media_use_openh264=true
++                rtc_use_h264=true
+                 ozone_auto_platforms=false
+                 ozone_platform_headless=false
+                 ozone_platform_external=true

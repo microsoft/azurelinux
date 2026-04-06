@@ -1,0 +1,24 @@
+--- actix-server-2.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ actix-server-2.6.0/Cargo.toml	2025-05-10T13:04:17.974258+00:00
+@@ -47,10 +47,6 @@
+ 
+ [features]
+ default = []
+-io-uring = [
+-    "tokio-uring",
+-    "actix-rt/io-uring",
+-]
+ 
+ [lib]
+ name = "actix_server"
+@@ -158,10 +154,6 @@
+     "env-filter",
+ ]
+ 
+-[target.'cfg(target_os = "linux")'.dependencies.tokio-uring]
+-version = "0.5"
+-optional = true
+-
+ [lints.rust]
+ future_incompatible = "deny"
+ nonstandard-style = "deny"

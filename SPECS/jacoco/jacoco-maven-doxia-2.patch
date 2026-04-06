@@ -1,0 +1,11 @@
+--- jacoco-0.8.11/jacoco-maven-plugin/src/org/jacoco/maven/AbstractReportMojo.java.orig	2023-10-14 14:46:33.000000000 -0600
++++ jacoco-0.8.11/jacoco-maven-plugin/src/org/jacoco/maven/AbstractReportMojo.java	2025-01-08 08:30:33.599574366 -0700
+@@ -154,7 +154,7 @@ public abstract class AbstractReportMojo
+ 	abstract File getOutputDirectory();
+ 
+ 	public void generate(
+-			@SuppressWarnings("deprecation") final org.codehaus.doxia.sink.Sink sink,
++			final org.apache.maven.doxia.sink.Sink sink,
+ 			final Locale locale) throws MavenReportException {
+ 		generate(sink, null, locale);
+ 	}

@@ -1,0 +1,50 @@
+From fb1add21b0e0c11f4e64562695458996010c79ac Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Sun, 26 Nov 2023 16:23:06 +0900
+Subject: [PATCH] change: make nil_safe_casecmp judge compatible for nil-nil
+ comparison
+
+Ruby returns 0 (not nil) for nil <=> nil, i.e. nil and nil are judged
+as equal for comparison, and so returns nil_safe_compare .
+ref: https://github.com/Shopify/liquid/pull/1476
+
+To make the behavior of nil_safe_casecmp consistent with
+nil_safe_compare , change nil_safe_casecmp so that comparison between
+nil <=> nil return 0 (equal).
+
+Also change testsuite to reflect this change.
+
+Fixes #1759 .
+---
+ lib/liquid/standardfilters.rb            | 2 ++
+ test/integration/standard_filter_test.rb | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/liquid/standardfilters.rb b/lib/liquid/standardfilters.rb
+index 7a92c6753..29aacd2f5 100644
+--- a/lib/liquid/standardfilters.rb
++++ b/lib/liquid/standardfilters.rb
+@@ -944,6 +944,8 @@ def nil_safe_compare(a, b)
+     def nil_safe_casecmp(a, b)
+       if !a.nil? && !b.nil?
+         a.to_s.casecmp(b.to_s)
++      elsif a.nil? && b.nil?
++         0
+       else
+         a.nil? ? 1 : -1
+       end
+diff --git a/test/integration/standard_filter_test.rb b/test/integration/standard_filter_test.rb
+index 28c006cb9..0564404c3 100644
+--- a/test/integration/standard_filter_test.rb
++++ b/test/integration/standard_filter_test.rb
+@@ -331,8 +331,8 @@ def test_sort_natural_when_property_is_sometimes_missing_puts_nils_last
+       { "price" => "1", "handle" => "gamma" },
+       { "price" => 2, "handle" => "epsilon" },
+       { "price" => "4", "handle" => "alpha" },
+-      { "handle" => "delta" },
+-      { "handle" => "beta" }
++      { "handle" => "beta" },
++      { "handle" => "delta" },
+     ]
+     assert_equal expectation, @filters.sort_natural(input, "price")
+   end

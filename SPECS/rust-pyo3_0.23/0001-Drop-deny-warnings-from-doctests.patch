@@ -1,0 +1,26 @@
+From 29bbfe91c8c53a727d0e3b21d685759615a247b1 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 18 Aug 2025 14:06:12 +0200
+Subject: [PATCH] Drop deny(warnings) from doctests
+
+---
+ src/lib.rs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 46a2fd5..eca8565 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -10,8 +10,7 @@
+     deny(
+         rust_2018_idioms,
+         unused_lifetimes,
+-        rust_2021_prelude_collisions,
+-        warnings
++        rust_2021_prelude_collisions
+     ),
+     allow(
+         unused_variables,
+-- 
+2.50.1
+

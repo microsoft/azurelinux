@@ -1,0 +1,13 @@
+diff -up xvidcore/src/encoder.h.c23 xvidcore/src/encoder.h
+--- xvidcore/src/encoder.h.c23	2019-12-28 15:19:24.000000000 +0100
++++ xvidcore/src/encoder.h	2025-01-29 12:22:35.863665766 +0100
+@@ -42,7 +42,9 @@
+  * Types
+  ****************************************************************************/
+ 
++#if __STDC_VERSION__ < 202311L
+ typedef int bool;
++#endif
+ 
+ /*****************************************************************************
+  * Structures

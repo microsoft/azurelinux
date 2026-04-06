@@ -1,0 +1,30 @@
+From 15b168ffc762f99997c57a34c4cbb595697ede79 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 20 Jun 2023 09:05:35 -0400
+Subject: [PATCH] Use ssl.SSLContext.wrap_socket, not ssl.wrap_socket
+
+The latter emits a DeprecationWarning since Python 3.10 and is removed
+in Python 3.12.
+---
+ test/core/http/test_server.py | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/test/core/http/test_server.py b/test/core/http/test_server.py
+index abd26c53d3..7c01638d8b 100755
+--- a/test/core/http/test_server.py
++++ b/test/core/http/test_server.py
+@@ -62,8 +62,7 @@ class Handler(BaseHTTPRequestHandler):
+ 
+ httpd = HTTPServer(('localhost', args.port), Handler)
+ if args.ssl:
+-    httpd.socket = ssl.wrap_socket(httpd.socket,
+-                                   certfile=_PEM,
+-                                   keyfile=_KEY,
+-                                   server_side=True)
++    ctx = ssl.SSLContext()
++    ctx.load_cert_chain(certfile=_PEM, keyfile=_KEY)
++    httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+ httpd.serve_forever()
+-- 
+2.40.1
+

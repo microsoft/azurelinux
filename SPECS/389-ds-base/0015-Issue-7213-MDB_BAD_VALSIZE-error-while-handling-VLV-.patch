@@ -1,0 +1,197 @@
+From 46ce38c02d0f86725829592bbff27679a625e9a0 Mon Sep 17 00:00:00 2001
+From: progier389 <progier@redhat.com>
+Date: Mon, 2 Feb 2026 15:39:18 +0100
+Subject: [PATCH] Issue 7213 - MDB_BAD_VALSIZE error while handling VLV (#7214)
+
+* Issue 7213 - MDB_BAD_VALSIZE error while handling VLV
+Avoid failing lmdb operation when handling VLV index by truncating the key so that key+data is small enough.
+
+Issue: #7213
+
+Reviewed by: @mreynolds389 , @vashirov (Thanks!)
+
+Assisted by: Claude A/I
+
+(cherry picked from commit 5ebce22d4214bec5ed94ad84c4448164be99389a)
+---
+ .../tests/suites/vlv/regression_test.py       | 110 ++++++++++++++++++
+ .../slapd/back-ldbm/db-mdb/mdb_layer.c        |   5 +
+ ldap/servers/slapd/back-ldbm/vlv.c            |   7 +-
+ 3 files changed, 121 insertions(+), 1 deletion(-)
+
+diff --git a/dirsrvtests/tests/suites/vlv/regression_test.py b/dirsrvtests/tests/suites/vlv/regression_test.py
+index f7847ac74..7cdf16a84 100644
+--- a/dirsrvtests/tests/suites/vlv/regression_test.py
++++ b/dirsrvtests/tests/suites/vlv/regression_test.py
+@@ -1175,6 +1175,116 @@ def test_vlv_with_mr(vlv_setup_with_uid_mr):
+ 
+ 
+ 
++def test_vlv_long_attribute_value(topology_st, request):
++    """
++    Test VLV with an entry containing a very long attribute value (2K).
++
++    :id: 99126fa4-003e-11f1-b7d6-c85309d5c3e3
++    :setup: Standalone instance.
++    :steps:
++        1. Cleanup leftover from previous tests
++        2. Create VLV search and index on cn attribute
++        3. Reindex VLV
++        4. Add an entry with a cn attribute having 2K character value
++        5. Verify the entry was added successfully
++        6. Perform a VLV search to ensure it still works
++        7. Add another entry with a cn attribute having 2K character value
++        8. Verify the entry was added successfully
++        9. Perform a VLV search to ensure it still works
++    :expectedresults:
++        1. Should Success.
++        2. Should Success.
++        3. Should Success.
++        4. Should Success.
++        5. Should Success.
++        6. Should Success.
++        7. Should Success.
++        8. Should Success.
++        9. Should Success.
++    """
++    inst = topology_st.standalone
++    reindex_task = Tasks(inst)
++
++    users_to_delete = []
++
++    def fin():
++        cleanup(inst)
++        # Clean the added users
++        for user in users_to_delete:
++            user.delete()
++
++    if not DEBUGGING:
++        request.addfinalizer(fin)
++
++    # Clean previous tests leftover
++    fin()
++
++    # Create VLV search and index
++    vlv_search, vlv_index = create_vlv_search_and_index(inst)
++    assert reindex_task.reindex(
++        suffix=DEFAULT_SUFFIX,
++        attrname=vlv_index.rdn,
++        args={TASK_WAIT: True},
++        vlv=True
++    ) == 0
++
++    # Add a few regular users first
++    add_users(inst, 10)
++
++    # Create a very long cn value (2K characters)
++    long_cn_value = 'a' * 2048 + '1'
++
++    # Add an entry with the long cn attribute
++    users = UserAccounts(inst, DEFAULT_SUFFIX)
++    user_properties = {
++        'uid': 'longcnuser1',
++        'cn': long_cn_value,
++        'sn': 'user1',
++        'uidNumber': '99999',
++        'gidNumber': '99999',
++        'homeDirectory': '/home/longcnuser1'
++    }
++    user = users.create(properties=user_properties)
++    users_to_delete.append(user);
++
++    # Verify the entry was created and has the long cn value
++    entry = user.get_attr_vals_utf8('cn')
++    assert entry[0] == long_cn_value
++    log.info(f'Successfully created user with cn length: {len(entry[0])}')
++
++    # Perform VLV search to ensure VLV still works with long attribute values
++    conn = open_new_ldapi_conn(inst.serverid)
++    count = len(conn.search_s(DEFAULT_SUFFIX, ldap.SCOPE_SUBTREE, "(uid=*)"))
++    assert count > 0
++    log.info(f'VLV search successful with {count} entries including entry with 2K cn value')
++
++    # Add another entry with the long cn attribute
++    long_cn_value = 'a' * 2048 + '2'
++
++    user_properties = {
++        'uid': 'longcnuser2',
++        'cn': long_cn_value,
++        'sn': 'user2',
++        'uidNumber': '99998',
++        'gidNumber': '99998',
++        'homeDirectory': '/home/longcnuser2'
++    }
++    user = users.create(properties=user_properties)
++    users_to_delete.append(user);
++
++    # Verify the entry was created and has the long cn value
++    entry = user.get_attr_vals_utf8('cn')
++    assert entry[0] == long_cn_value
++    log.info(f'Successfully created user with cn length: {len(entry[0])}')
++
++    # Perform VLV search to ensure VLV still works with long attribute values
++    conn = open_new_ldapi_conn(inst.serverid)
++    count = len(conn.search_s(DEFAULT_SUFFIX, ldap.SCOPE_SUBTREE, "(uid=*)"))
++    assert count > 1
++    log.info(f'VLV search successful with {count} entries including entry with 2K cn value')
++
++
++
+ if __name__ == "__main__":
+     # Run isolated
+     # -s for DEBUG mode
+diff --git a/ldap/servers/slapd/back-ldbm/db-mdb/mdb_layer.c b/ldap/servers/slapd/back-ldbm/db-mdb/mdb_layer.c
+index d320ecbeb..cd797621d 100644
+--- a/ldap/servers/slapd/back-ldbm/db-mdb/mdb_layer.c
++++ b/ldap/servers/slapd/back-ldbm/db-mdb/mdb_layer.c
+@@ -2134,10 +2134,15 @@ void *dbmdb_recno_cache_build(void *arg)
+         recno = 1;
+     }
+     while (rc == 0) {
++        struct ldbminfo *li = (struct ldbminfo *)rcctx->cursor->be->be_database->plg_private;
+         slapi_log_err(SLAPI_LOG_DEBUG, "dbmdb_recno_cache_build", "recno=%d\n", recno);
+         if (recno % RECNO_CACHE_INTERVAL == 1) {
+             /* Prepare the cache data */
+             len = sizeof(*rce) + data.mv_size + key.mv_size;
++            if (len > li->li_max_key_len) {
++                key.mv_size = li->li_max_key_len - data.mv_size - sizeof(*rce);
++                len = li->li_max_key_len;
++            }
+             rce = (dbmdb_recno_cache_elmt_t*)slapi_ch_malloc(len);
+             rce->len = len;
+             rce->recno = recno;
+diff --git a/ldap/servers/slapd/back-ldbm/vlv.c b/ldap/servers/slapd/back-ldbm/vlv.c
+index 8f9263f25..f2f882b5a 100644
+--- a/ldap/servers/slapd/back-ldbm/vlv.c
++++ b/ldap/servers/slapd/back-ldbm/vlv.c
+@@ -866,6 +866,7 @@ do_vlv_update_index(back_txn *txn, struct ldbminfo *li, Slapi_PBlock *pb, struct
+     struct vlv_key *key = NULL;
+     dbi_val_t data = {0};
+     dblayer_private *priv = NULL;
++    size_t key_size_limit = li->li_max_key_len - sizeof(entry->ep_id);
+ 
+     slapi_pblock_get(pb, SLAPI_BACKEND, &be);
+     priv = (dblayer_private *)li->li_dblayer_private;
+@@ -886,6 +887,10 @@ do_vlv_update_index(back_txn *txn, struct ldbminfo *li, Slapi_PBlock *pb, struct
+         return rc;
+     }
+ 
++    /* Truncate the key if it is too long */
++    if (key->key.size > key_size_limit) {
++        key->key.size = key_size_limit;
++    }
+     if (NULL != txn) {
+         db_txn = txn->back_txn_txn;
+     } else {
+@@ -930,7 +935,7 @@ do_vlv_update_index(back_txn *txn, struct ldbminfo *li, Slapi_PBlock *pb, struct
+         if (txn && txn->back_special_handling_fn) {
+             rc = txn->back_special_handling_fn(be, BTXNACT_VLV_DEL, db, &key->key, &data, txn);
+         } else {
+-            rc = dblayer_db_op(be, db, db_txn, DBI_OP_DEL, &key->key, NULL);
++            rc = dblayer_db_op(be, db, db_txn, DBI_OP_DEL, &key->key, &data);
+         }
+         if (rc == 0) {
+             if (txn && txn->back_special_handling_fn) {
+-- 
+2.52.0
+

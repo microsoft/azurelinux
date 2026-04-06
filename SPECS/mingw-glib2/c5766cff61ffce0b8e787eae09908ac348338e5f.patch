@@ -1,0 +1,32 @@
+diff -rupN --no-dereference glib-2.86.3/gio/gbufferedinputstream.c glib-2.86.3-new/gio/gbufferedinputstream.c
+--- glib-2.86.3/gio/gbufferedinputstream.c	2025-12-08 16:46:06.000000000 +0100
++++ glib-2.86.3-new/gio/gbufferedinputstream.c	2026-01-17 10:40:17.635317018 +0100
+@@ -590,7 +590,7 @@ g_buffered_input_stream_peek (GBufferedI
+ 
+   available = g_buffered_input_stream_get_available (stream);
+ 
+-  if (offset > available)
++  if (offset > available || offset > G_MAXSIZE - count)
+     return 0;
+ 
+   end = MIN (offset + count, available);
+diff -rupN --no-dereference glib-2.86.3/gio/tests/buffered-input-stream.c glib-2.86.3-new/gio/tests/buffered-input-stream.c
+--- glib-2.86.3/gio/tests/buffered-input-stream.c	2025-12-08 16:46:06.000000000 +0100
++++ glib-2.86.3-new/gio/tests/buffered-input-stream.c	2026-01-17 10:40:17.635610424 +0100
+@@ -60,6 +60,16 @@ test_peek (void)
+   g_assert_cmpint (npeek, ==, 0);
+   g_free (buffer);
+ 
++  buffer = g_new0 (char, 64);
++  npeek = g_buffered_input_stream_peek (G_BUFFERED_INPUT_STREAM (in), buffer, 8, 0);
++  g_assert_cmpint (npeek, ==, 0);
++  g_free (buffer);
++
++  buffer = g_new0 (char, 64);
++  npeek = g_buffered_input_stream_peek (G_BUFFERED_INPUT_STREAM (in), buffer, 5, G_MAXSIZE);
++  g_assert_cmpint (npeek, ==, 0);
++  g_free (buffer);
++
+   g_object_unref (in);
+   g_object_unref (base);
+ }

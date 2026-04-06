@@ -1,0 +1,799 @@
+diff -up ply-3.11/test/testlex.py.262 ply-3.11/test/testlex.py
+--- ply-3.11/test/testlex.py.262	2018-02-15 13:44:15.000000000 -0500
++++ ply-3.11/test/testlex.py	2021-12-30 13:21:51.894852923 -0500
+@@ -97,68 +97,68 @@ class LexErrorWarningTests(unittest.Test
+     def test_lex_doc1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_doc1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                               "lex_doc1.py:18: No regular expression defined for rule 't_NUMBER'\n"))
+     def test_lex_dup1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_dup1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_dup1.py:20: Rule t_NUMBER redefined. Previously defined on line 18\n" ))        
+         
+     def test_lex_dup2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_dup2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_dup2.py:22: Rule t_NUMBER redefined. Previously defined on line 18\n" ))
+             
+     def test_lex_dup3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_dup3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_dup3.py:20: Rule t_NUMBER redefined. Previously defined on line 18\n" ))
+ 
+     def test_lex_empty(self):
+         self.assertRaises(SyntaxError,run_import,"lex_empty")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "No rules of the form t_rulename are defined\n"
+                                     "No rules defined for state 'INITIAL'\n"))
+ 
+     def test_lex_error1(self):
+         run_import("lex_error1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "No t_error rule is defined\n"))
+ 
+     def test_lex_error2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_error2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Rule 't_error' must be defined as a function\n")
+                      )
+ 
+     def test_lex_error3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_error3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_error3.py:20: Rule 't_error' requires an argument\n"))
+ 
+     def test_lex_error4(self):
+         self.assertRaises(SyntaxError,run_import,"lex_error4")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_error4.py:20: Rule 't_error' has too many arguments\n"))
+ 
+     def test_lex_ignore(self):
+         self.assertRaises(SyntaxError,run_import,"lex_ignore")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_ignore.py:20: Rule 't_ignore' must be defined as a string\n"))
+ 
+     def test_lex_ignore2(self):
+         run_import("lex_ignore2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "t_ignore contains a literal backslash '\\'\n"))
+ 
+ 
+@@ -169,20 +169,20 @@ class LexErrorWarningTests(unittest.Test
+             msg = "Invalid regular expression for rule 't_NUMBER'. unbalanced parenthesis\n"
+         else:
+             msg = "Invalid regular expression for rule 't_NUMBER'. missing ), unterminated subpattern at position 0"
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     msg,
+                                     contains=True))
+ 
+     def test_lex_re2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_re2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Regular expression for rule 't_PLUS' matches empty string\n"))
+ 
+     def test_lex_re3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_re3")
+         result = sys.stderr.getvalue()
+-#        self.assert_(check_expected(result,
++#        self.assertTrue(check_expected(result,
+ #                                    "Invalid regular expression for rule 't_POUND'. unbalanced parenthesis\n"
+ #                                    "Make sure '#' in rule 't_POUND' is escaped with '\\#'\n"))
+ 
+@@ -192,78 +192,78 @@ class LexErrorWarningTests(unittest.Test
+         else:
+             msg = ("Invalid regular expression for rule 't_POUND'. missing ), unterminated subpattern at position 0\n"
+                    "ERROR: Make sure '#' in rule 't_POUND' is escaped with '\#'")
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     msg,
+                                     contains=True), result)
+ 
+     def test_lex_rule1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_rule1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "t_NUMBER not defined as a function or string\n"))
+ 
+     def test_lex_rule2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_rule2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_rule2.py:18: Rule 't_NUMBER' requires an argument\n"))
+ 
+     def test_lex_rule3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_rule3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "lex_rule3.py:18: Rule 't_NUMBER' has too many arguments\n"))
+ 
+ 
+     def test_lex_state1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                    "states must be defined as a tuple or list\n"))
+ 
+     def test_lex_state2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Invalid state specifier 'comment'. Must be a tuple (statename,'exclusive|inclusive')\n"
+                                     "Invalid state specifier 'example'. Must be a tuple (statename,'exclusive|inclusive')\n"))
+ 
+     def test_lex_state3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "State name 1 must be a string\n"
+                                     "No rules defined for state 'example'\n"))
+ 
+     def test_lex_state4(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state4")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "State type for state comment must be 'inclusive' or 'exclusive'\n"))
+ 
+ 
+     def test_lex_state5(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state5")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "State 'comment' already defined\n"))
+ 
+     def test_lex_state_noerror(self):
+         run_import("lex_state_noerror")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "No error rule is defined for exclusive state 'comment'\n"))    
+ 
+     def test_lex_state_norule(self):
+         self.assertRaises(SyntaxError,run_import,"lex_state_norule")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "No rules defined for state 'example'\n"))
+ 
+     def test_lex_token1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_token1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "No token list is defined\n"
+                                     "Rule 't_NUMBER' defined for an unspecified token NUMBER\n"
+                                     "Rule 't_PLUS' defined for an unspecified token PLUS\n"
+@@ -273,7 +273,7 @@ class LexErrorWarningTests(unittest.Test
+     def test_lex_token2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_token2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "tokens must be a list or tuple\n"
+                                     "Rule 't_NUMBER' defined for an unspecified token NUMBER\n"
+                                     "Rule 't_PLUS' defined for an unspecified token PLUS\n"
+@@ -283,14 +283,14 @@ class LexErrorWarningTests(unittest.Test
+     def test_lex_token3(self):
+         self.assertRaises(SyntaxError,run_import,"lex_token3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Rule 't_MINUS' defined for an unspecified token MINUS\n"))
+ 
+ 
+     def test_lex_token4(self):
+         self.assertRaises(SyntaxError,run_import,"lex_token4")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Bad token name '-'\n"))
+ 
+ 
+@@ -299,25 +299,25 @@ class LexErrorWarningTests(unittest.Test
+             run_import("lex_token5")
+         except ply.lex.LexError:
+             e = sys.exc_info()[1]
+-        self.assert_(check_expected(str(e),"lex_token5.py:19: Rule 't_NUMBER' returned an unknown token type 'NUM'"))
++        self.assertTrue(check_expected(str(e),"lex_token5.py:19: Rule 't_NUMBER' returned an unknown token type 'NUM'"))
+ 
+     def test_lex_token_dup(self):
+         run_import("lex_token_dup")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Token 'MINUS' multiply defined\n"))   
+ 
+         
+     def test_lex_literal1(self):
+         self.assertRaises(SyntaxError,run_import,"lex_literal1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Invalid literal '**'. Must be a single character\n"))
+ 
+     def test_lex_literal2(self):
+         self.assertRaises(SyntaxError,run_import,"lex_literal2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Invalid literals specification. literals must be a sequence of characters\n"))
+ 
+ import os
+@@ -340,7 +340,7 @@ class LexBuildOptionTests(unittest.TestC
+     def test_lex_module(self):
+         run_import("lex_module")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+@@ -348,7 +348,7 @@ class LexBuildOptionTests(unittest.TestC
+     def test_lex_object(self):
+         run_import("lex_object")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+@@ -356,7 +356,7 @@ class LexBuildOptionTests(unittest.TestC
+     def test_lex_closure(self):
+         run_import("lex_closure")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+@@ -377,34 +377,34 @@ class LexBuildOptionTests(unittest.TestC
+         run_import("lex_optimize")
+ 
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+-        self.assert_(os.path.exists("lextab.py"))
++        self.assertTrue(os.path.exists("lextab.py"))
+ 
+         p = subprocess.Popen([sys.executable,'-O','lex_optimize.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+ 
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("lextab.pyo", 1))
++            self.assertTrue(pymodule_out_exists("lextab.pyo", 1))
+             pymodule_out_remove("lextab.pyo", 1)
+ 
+         p = subprocess.Popen([sys.executable,'-OO','lex_optimize.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+ 
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("lextab.pyo", 2))
++            self.assertTrue(pymodule_out_exists("lextab.pyo", 2))
+         try:
+             os.remove("lextab.py")
+         except OSError:
+@@ -433,31 +433,31 @@ class LexBuildOptionTests(unittest.TestC
+             pass
+         run_import("lex_optimize2")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+-        self.assert_(os.path.exists("opt2tab.py"))
++        self.assertTrue(os.path.exists("opt2tab.py"))
+ 
+         p = subprocess.Popen([sys.executable,'-O','lex_optimize2.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("opt2tab.pyo", 1))
++            self.assertTrue(pymodule_out_exists("opt2tab.pyo", 1))
+             pymodule_out_remove("opt2tab.pyo", 1)
+         p = subprocess.Popen([sys.executable,'-OO','lex_optimize2.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("opt2tab.pyo", 2))
++            self.assertTrue(pymodule_out_exists("opt2tab.pyo", 2))
+         try:
+             os.remove("opt2tab.py")
+         except OSError:
+@@ -483,32 +483,32 @@ class LexBuildOptionTests(unittest.TestC
+         open("lexdir/sub/__init__.py","w").write("")
+         run_import("lex_optimize3")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+-        self.assert_(os.path.exists("lexdir/sub/calctab.py"))
++        self.assertTrue(os.path.exists("lexdir/sub/calctab.py"))
+ 
+         p = subprocess.Popen([sys.executable,'-O','lex_optimize3.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("lexdir/sub/calctab.pyo", 1))
++            self.assertTrue(pymodule_out_exists("lexdir/sub/calctab.pyo", 1))
+             pymodule_out_remove("lexdir/sub/calctab.pyo", 1)
+ 
+         p = subprocess.Popen([sys.executable,'-OO','lex_optimize3.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(PLUS,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("lexdir/sub/calctab.pyo", 2))
++            self.assertTrue(pymodule_out_exists("lexdir/sub/calctab.pyo", 2))
+         try:
+             shutil.rmtree("lexdir")
+         except OSError:
+@@ -549,33 +549,33 @@ class LexBuildOptionTests(unittest.TestC
+             pass
+         run_import("lex_opt_alias")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(+,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+-        self.assert_(os.path.exists("aliastab.py"))
++        self.assertTrue(os.path.exists("aliastab.py"))
+ 
+         p = subprocess.Popen([sys.executable,'-O','lex_opt_alias.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(+,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("aliastab.pyo", 1))
++            self.assertTrue(pymodule_out_exists("aliastab.pyo", 1))
+             pymodule_out_remove("aliastab.pyo", 1)
+ 
+         p = subprocess.Popen([sys.executable,'-OO','lex_opt_alias.py'],
+                              stdout=subprocess.PIPE)
+         result = p.stdout.read()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,3,1,0)\n"
+                                     "(+,'+',1,1)\n"
+                                     "(NUMBER,4,1,2)\n"))
+ 
+         if test_pyo:
+-            self.assert_(pymodule_out_exists("aliastab.pyo", 2))
++            self.assertTrue(pymodule_out_exists("aliastab.pyo", 2))
+         try:
+             os.remove("aliastab.py")
+         except OSError:
+@@ -604,7 +604,7 @@ class LexBuildOptionTests(unittest.TestC
+             pass
+         run_import("lex_many_tokens")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(TOK34,'TOK34:',1,0)\n"
+                                     "(TOK143,'TOK143:',1,7)\n"
+                                     "(TOK269,'TOK269:',1,15)\n"
+@@ -614,13 +614,13 @@ class LexBuildOptionTests(unittest.TestC
+                                     "(TOK999,'TOK999:',1,47)\n"
+                                     ))
+ 
+-        self.assert_(os.path.exists("manytab.py"))
++        self.assertTrue(os.path.exists("manytab.py"))
+ 
+         if implementation() == 'CPython':
+             p = subprocess.Popen([sys.executable,'-O','lex_many_tokens.py'],
+                                  stdout=subprocess.PIPE)
+             result = p.stdout.read()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "(TOK34,'TOK34:',1,0)\n"
+                                         "(TOK143,'TOK143:',1,7)\n"
+                                         "(TOK269,'TOK269:',1,15)\n"
+@@ -630,7 +630,7 @@ class LexBuildOptionTests(unittest.TestC
+                                         "(TOK999,'TOK999:',1,47)\n"
+                                         ))
+ 
+-            self.assert_(pymodule_out_exists("manytab.pyo", 1))
++            self.assertTrue(pymodule_out_exists("manytab.pyo", 1))
+             pymodule_out_remove("manytab.pyo", 1)
+         try:
+             os.remove("manytab.py")
+@@ -657,7 +657,7 @@ class LexRunTests(unittest.TestCase):
+     def test_lex_hedit(self):
+         run_import("lex_hedit")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(H_EDIT_DESCRIPTOR,'abc',1,0)\n"
+                                     "(H_EDIT_DESCRIPTOR,'abcdefghij',1,6)\n"
+                                     "(H_EDIT_DESCRIPTOR,'xy',1,20)\n"))
+@@ -665,7 +665,7 @@ class LexRunTests(unittest.TestCase):
+     def test_lex_state_try(self):
+         run_import("lex_state_try")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "(NUMBER,'3',1,0)\n"
+                                     "(PLUS,'+',1,2)\n"
+                                     "(NUMBER,'4',1,4)\n"
+diff -up ply-3.11/test/testyacc.py.262 ply-3.11/test/testyacc.py
+--- ply-3.11/test/testyacc.py.262	2018-02-15 13:44:15.000000000 -0500
++++ ply-3.11/test/testyacc.py	2021-12-30 13:18:40.237690758 -0500
+@@ -97,14 +97,14 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_badargs(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_badargs")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_badargs.py:23: Rule 'p_statement_assign' has too many arguments\n"
+                                     "yacc_badargs.py:27: Rule 'p_statement_expr' requires an argument\n"
+                                     ))        
+     def test_yacc_badid(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_badid")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_badid.py:32: Illegal name 'bad&rule' in rule 'statement'\n"
+                                     "yacc_badid.py:36: Illegal rule name 'bad&rule'\n"
+                                     ))
+@@ -114,20 +114,20 @@ class YaccErrorWarningTests(unittest.Tes
+             run_import("yacc_badprec")
+         except ply.yacc.YaccError:
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "precedence must be a list or tuple\n"
+                                         ))
+     def test_yacc_badprec2(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_badprec2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Bad precedence table\n"
+                                     ))
+ 
+     def test_yacc_badprec3(self):
+         run_import("yacc_badprec3")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Precedence already specified for terminal 'MINUS'\n"
+                                     "Generating LALR tables\n"
+ 
+@@ -136,7 +136,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_badrule(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_badrule")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_badrule.py:24: Syntax error. Expected ':'\n"
+                                     "yacc_badrule.py:28: Syntax error in rule 'statement'\n"
+                                     "yacc_badrule.py:33: Syntax error. Expected ':'\n"
+@@ -148,13 +148,13 @@ class YaccErrorWarningTests(unittest.Tes
+             run_import("yacc_badtok")
+         except ply.yacc.YaccError:
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "tokens must be a list or tuple\n"))
+ 
+     def test_yacc_dup(self):
+         run_import("yacc_dup")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_dup.py:27: Function p_statement redefined. Previously defined on line 23\n"
+                                     "Token 'EQUALS' defined, but not used\n"
+                                     "There is 1 unused token\n"
+@@ -166,7 +166,7 @@ class YaccErrorWarningTests(unittest.Tes
+             run_import("yacc_error1")
+         except ply.yacc.YaccError:
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "yacc_error1.py:61: p_error() requires 1 argument\n"))
+ 
+     def test_yacc_error2(self):
+@@ -174,7 +174,7 @@ class YaccErrorWarningTests(unittest.Tes
+             run_import("yacc_error2")
+         except ply.yacc.YaccError:
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "yacc_error2.py:61: p_error() requires 1 argument\n"))
+ 
+     def test_yacc_error3(self):
+@@ -183,13 +183,13 @@ class YaccErrorWarningTests(unittest.Tes
+         except ply.yacc.YaccError:
+             e = sys.exc_info()[1]
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "'p_error' defined, but is not a function or method\n"))
+             
+     def test_yacc_error4(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_error4")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_error4.py:62: Illegal rule name 'error'. Already defined as a token\n"
+                                     ))
+ 
+@@ -197,7 +197,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_error5(self):
+         run_import("yacc_error5")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Group at 3:10 to 3:12\n"
+                                     "Undefined name 'a'\n"
+                                     "Syntax error at 'b'\n"
+@@ -209,7 +209,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_error6(self):
+         run_import("yacc_error6")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "a=7\n"
+                                     "Line 3: Syntax error at '*'\n"
+                                     "c=21\n"
+@@ -218,7 +218,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_error7(self):
+         run_import("yacc_error7")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "a=7\n"
+                                     "Line 3: Syntax error at '*'\n"
+                                     "c=21\n"
+@@ -227,7 +227,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_inf(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_inf")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Token 'NUMBER' defined, but not used\n"
+                                     "There is 1 unused token\n"
+                                     "Infinite recursion detected for symbol 'statement'\n"
+@@ -236,27 +236,27 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_literal(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_literal")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_literal.py:36: Literal token '**' in rule 'expression' may only be a single character\n"
+                                     ))
+     def test_yacc_misplaced(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_misplaced")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_misplaced.py:32: Misplaced '|'\n"
+                                     ))
+ 
+     def test_yacc_missing1(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_missing1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_missing1.py:24: Symbol 'location' used, but not defined as a token or a rule\n"
+                                     ))
+ 
+     def test_yacc_nested(self):
+         run_import("yacc_nested")
+         result = sys.stdout.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "A\n"
+                                     "A\n"
+                                     "A\n",
+@@ -265,7 +265,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_nodoc(self):
+         run_import("yacc_nodoc")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_nodoc.py:27: No documentation string specified in function 'p_statement_expr' (ignored)\n"
+                                     "Generating LALR tables\n"
+                                     ))
+@@ -273,7 +273,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_noerror(self):
+         run_import("yacc_noerror")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "no p_error() function is defined\n"
+                                     "Generating LALR tables\n"
+                                     ))
+@@ -281,7 +281,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_nop(self):
+         run_import("yacc_nop")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_nop.py:27: Possible grammar rule 'statement_expr' defined without p_ prefix\n"
+                                     "Generating LALR tables\n"
+                                     ))
+@@ -289,7 +289,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_notfunc(self):
+         run_import("yacc_notfunc")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "'p_statement_assign' not defined as a function\n"
+                                     "Token 'EQUALS' defined, but not used\n"
+                                     "There is 1 unused token\n"
+@@ -300,13 +300,13 @@ class YaccErrorWarningTests(unittest.Tes
+             run_import("yacc_notok")
+         except ply.yacc.YaccError:
+             result = sys.stderr.getvalue()
+-            self.assert_(check_expected(result,
++            self.assertTrue(check_expected(result,
+                                         "No token list is defined\n"))
+ 
+     def test_yacc_rr(self):
+         run_import("yacc_rr")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Generating LALR tables\n"
+                                     "1 reduce/reduce conflict\n"
+                                     "reduce/reduce conflict in state 15 resolved using rule (statement -> NAME EQUALS NUMBER)\n"
+@@ -317,7 +317,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_rr_unused(self):
+         run_import("yacc_rr_unused")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "no p_error() function is defined\n"
+                                     "Generating LALR tables\n"
+                                     "3 reduce/reduce conflicts\n"
+@@ -333,14 +333,14 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_simple(self):
+         run_import("yacc_simple")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Generating LALR tables\n"
+                                     ))
+ 
+     def test_yacc_sr(self):
+         run_import("yacc_sr")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Generating LALR tables\n"
+                                     "20 shift/reduce conflicts\n"
+                                     ))
+@@ -348,21 +348,21 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_term1(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_term1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_term1.py:24: Illegal rule name 'NUMBER'. Already defined as a token\n"
+                                     ))
+ 
+     def test_yacc_unicode_literals(self):
+         run_import("yacc_unicode_literals")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Generating LALR tables\n"
+                                     ))
+ 
+     def test_yacc_unused(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_unused")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_unused.py:62: Symbol 'COMMA' used, but not defined as a token or a rule\n"
+                                     "Symbol 'COMMA' is unreachable\n"
+                                     "Symbol 'exprlist' is unreachable\n"
+@@ -370,7 +370,7 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_unused_rule(self):
+         run_import("yacc_unused_rule")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_unused_rule.py:62: Rule 'integer' defined, but not used\n"
+                                     "There is 1 unused rule\n"
+                                     "Symbol 'integer' is unreachable\n"
+@@ -380,21 +380,21 @@ class YaccErrorWarningTests(unittest.Tes
+     def test_yacc_uprec(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_uprec")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_uprec.py:37: Nothing known about the precedence of 'UMINUS'\n"
+                                     ))
+ 
+     def test_yacc_uprec2(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_uprec2")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "yacc_uprec2.py:37: Syntax error. Nothing follows %prec\n"
+                                     ))
+ 
+     def test_yacc_prec1(self):
+         self.assertRaises(ply.yacc.YaccError,run_import,"yacc_prec1")
+         result = sys.stderr.getvalue()
+-        self.assert_(check_expected(result,
++        self.assertTrue(check_expected(result,
+                                     "Precedence rule 'left' defined for unknown symbol '+'\n"
+                                     "Precedence rule 'left' defined for unknown symbol '*'\n"
+                                     "Precedence rule 'left' defined for unknown symbol '-'\n"

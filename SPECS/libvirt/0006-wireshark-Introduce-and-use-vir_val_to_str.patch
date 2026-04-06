@@ -1,0 +1,68 @@
+From ba2c4bdd5cbccd5c0673149cf76802c98b70d2f7 Mon Sep 17 00:00:00 2001
+Message-ID: <ba2c4bdd5cbccd5c0673149cf76802c98b70d2f7.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Fri, 10 Oct 2025 18:23:18 +0200
+Subject: [PATCH 6/8] wireshark: Introduce and use vir_val_to_str()
+Content-type: text/plain
+
+Wireshark offers val_to_str() function which converts numeric
+value to string by looking up value ('val') in an array ('vs') of
+<val, string> pairs. If no corresponding string is found, then
+the value is formatted using given 'fmt' string.
+
+Starting from wireshark-4.6.0 not only this function gained
+another argument but also returns a strdup()-ed string. To keep
+our code simple, let's introduce a wrapper so which can be then
+adjusted as needed.
+
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ tools/wireshark/src/packet-libvirt.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/tools/wireshark/src/packet-libvirt.c b/tools/wireshark/src/packet-libvirt.c
+index 6c729801d4..f6ad2c4578 100644
+--- a/tools/wireshark/src/packet-libvirt.c
++++ b/tools/wireshark/src/packet-libvirt.c
+@@ -140,6 +140,15 @@ static const value_string status_strings[] = {
+     { -1, NULL }
+ };
+ 
++static const char *
++G_GNUC_PRINTF(3, 0)
++vir_val_to_str(const uint32_t val,
++               const value_string *vs,
++               const char *fmt)
++{
++    return val_to_str(val, vs, fmt);
++}
++
+ static gboolean
+ dissect_xdr_string(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+                    guint32 maxlen)
+@@ -466,14 +475,14 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+     status = tvb_get_ntohil(tvb, offset); offset += 4;
+ 
+     col_add_fstr(pinfo->cinfo, COL_INFO, "Prog=%s",
+-                 val_to_str(prog, program_strings, "%x"));
++                 vir_val_to_str(prog, program_strings, "%x"));
+ 
+     vs = get_program_data(prog, VIR_PROGRAM_PROCSTRINGS);
+-    col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", val_to_str(proc, vs, "%d"));
++    col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", vir_val_to_str(proc, vs, "%d"));
+ 
+     col_append_fstr(pinfo->cinfo, COL_INFO, " Type=%s Serial=%u Status=%s",
+-                    val_to_str(type, type_strings, "%d"), serial,
+-                    val_to_str(status, status_strings, "%d"));
++                    vir_val_to_str(type, type_strings, "%d"), serial,
++                    vir_val_to_str(status, status_strings, "%d"));
+ 
+     if (tree) {
+         gint *hf_proc;
+-- 
+2.51.0
+

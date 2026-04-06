@@ -1,0 +1,55 @@
+From 398eb7080936481b6b8c4921ff59aea7a8951883 Mon Sep 17 00:00:00 2001
+From: Orien Madgwick <497874+orien@users.noreply.github.com>
+Date: Fri, 27 Dec 2024 23:09:58 +1100
+Subject: [PATCH] Fix error backtrace formatting on Ruby 3.4+
+
+Accomodate the new Ruby 3.4+ backtrace display format
+---
+ lib/cucumber/formatter/backtrace_filter.rb |  2 +-
+ lib/cucumber/glue/invoke_in_world.rb       | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/lib/cucumber/formatter/backtrace_filter.rb b/lib/cucumber/formatter/backtrace_filter.rb
+index 82c0628f73..b4dafa4b24 100644
+--- a/lib/cucumber/formatter/backtrace_filter.rb
++++ b/lib/cucumber/formatter/backtrace_filter.rb
+@@ -43,7 +43,7 @@ def exception
+         if ::ENV['CUCUMBER_TRUNCATE_OUTPUT']
+           # Strip off file locations
+           filtered = filtered.map do |line|
+-            line =~ /(.*):in `/ ? Regexp.last_match(1) : line
++            line =~ /(.*):in ('|`)/ ? Regexp.last_match(1) : line
+           end
+         end
+ 
+diff --git a/lib/cucumber/glue/invoke_in_world.rb b/lib/cucumber/glue/invoke_in_world.rb
+index 6e957d1b88..667afdf3c0 100644
+--- a/lib/cucumber/glue/invoke_in_world.rb
++++ b/lib/cucumber/glue/invoke_in_world.rb
+@@ -13,7 +13,10 @@ def self.replace_instance_exec_invocation_line!(backtrace, instance_exec_invocat
+         instance_exec_pos = backtrace.index(instance_exec_invocation_line)
+         return unless instance_exec_pos
+         replacement_line = instance_exec_pos + INSTANCE_EXEC_OFFSET
+-        backtrace[replacement_line].gsub!(/`.*'/, "`#{pseudo_method}'") if pseudo_method
++        if pseudo_method
++          pattern = RUBY_VERSION >= '3.4' ? /'.*'/ : /`.*'/
++          backtrace[replacement_line].gsub!(pattern, "`#{pseudo_method}'")
++        end
+ 
+         depth = backtrace.count { |line| line == instance_exec_invocation_line }
+         end_pos = depth > 1 ? instance_exec_pos : -1
+@@ -49,7 +52,12 @@ def self.cucumber_compatible_arity?(args, block)
+       def self.cucumber_run_with_backtrace_filtering(pseudo_method)
+         yield
+       rescue Exception => e # rubocop:disable Lint/RescueException
+-        instance_exec_invocation_line = "#{__FILE__}:#{__LINE__ - 2}:in `cucumber_run_with_backtrace_filtering'"
++        instance_exec_invocation_line =
++          if RUBY_VERSION >= '3.4'
++            "#{__FILE__}:#{__LINE__ - 4}:in '#{name}.#{__method__}'"
++          else
++            "#{__FILE__}:#{__LINE__ - 6}:in `#{__method__}'"
++          end
+         replace_instance_exec_invocation_line!((e.backtrace || []), instance_exec_invocation_line, pseudo_method)
+         raise e
+       end
+

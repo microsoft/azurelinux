@@ -1,0 +1,3292 @@
+From ffab9df46c5f2cb411765f72ecd6f5dcdb62fbb4 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 11:54:44 +0200
+Subject: [PATCH 06/15] Re-implement palette, standardPixmap, file icons, fonts
+ in QGtk3Theme
+
+Read theme colors from GTK3 style context and build platform theme
+palettes in Qt.
+React to runtime theme changes.
+Re-implement methods to retrieve GTK3 styled standardPixmaps, fonts
+and file icons.
+---
+ .../5.15.18/QtCore/private/qflatmap_p.h       |    2 +
+ src/corelib/tools/qflatmap_p.h                | 1107 +++++++++++++++++
+ src/plugins/platformthemes/gtk3/gtk3.pro      |    6 +
+ .../platformthemes/gtk3/qgtk3interface.cpp    |  558 +++++++++
+ .../platformthemes/gtk3/qgtk3interface_p.h    |  170 +++
+ src/plugins/platformthemes/gtk3/qgtk3json.cpp |  475 +++++++
+ src/plugins/platformthemes/gtk3/qgtk3json_p.h |  102 ++
+ .../platformthemes/gtk3/qgtk3storage.cpp      |  470 +++++++
+ .../platformthemes/gtk3/qgtk3storage_p.h      |  234 ++++
+ .../platformthemes/gtk3/qgtk3theme.cpp        |   23 +
+ src/plugins/platformthemes/gtk3/qgtk3theme.h  |    8 +
+ 11 files changed, 3155 insertions(+)
+ create mode 100644 include/QtCore/5.15.18/QtCore/private/qflatmap_p.h
+ create mode 100644 src/corelib/tools/qflatmap_p.h
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3json.cpp
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3json_p.h
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+ create mode 100644 src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+
+diff --git a/include/QtCore/5.15.18/QtCore/private/qflatmap_p.h b/include/QtCore/5.15.18/QtCore/private/qflatmap_p.h
+new file mode 100644
+index 0000000000..e629799f72
+--- /dev/null
++++ b/include/QtCore/5.15.18/QtCore/private/qflatmap_p.h
+@@ -0,0 +1,2 @@
++#include "../../../../../src/corelib/tools/qflatmap_p.h"
++
+diff --git a/src/corelib/tools/qflatmap_p.h b/src/corelib/tools/qflatmap_p.h
+new file mode 100644
+index 0000000000..45153e23db
+--- /dev/null
++++ b/src/corelib/tools/qflatmap_p.h
+@@ -0,0 +1,1107 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#ifndef QFLATMAP_P_H
++#define QFLATMAP_P_H
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists for the convenience
++// of a number of Qt sources files.  This header file may change from
++// version to version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include "qlist.h"
++#include "private/qglobal_p.h"
++
++#include <algorithm>
++#include <functional>
++#include <initializer_list>
++#include <iterator>
++#include <numeric>
++#include <type_traits>
++#include <utility>
++#include <vector>
++#include <optional>
++
++QT_BEGIN_NAMESPACE
++
++/*
++  QFlatMap provides an associative container backed by sorted sequential
++  containers. By default, QList is used.
++
++  Keys and values are stored in two separate containers. This provides improved
++  cache locality for key iteration and makes keys() and values() fast
++  operations.
++
++  One can customize the underlying container type by passing the KeyContainer
++  and MappedContainer template arguments:
++      QFlatMap<float, int, std::less<float>, std::vector<float>, std::vector<int>>
++*/
++
++// Qt 6.4:
++// - removed QFlatMap API which was incompatible with STL semantics
++// - will be released with said API disabled, to catch any out-of-tree users
++// - also allows opting in to the new API using QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++// Qt 6.5
++// - will make QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT the default:
++
++#ifndef QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++#  define QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++#endif
++
++namespace Qt {
++
++struct OrderedUniqueRange_t {};
++constexpr OrderedUniqueRange_t OrderedUniqueRange = {};
++
++} // namespace Qt
++
++template <class Key, class T, class Compare>
++class QFlatMapValueCompare : protected Compare
++{
++public:
++    QFlatMapValueCompare() = default;
++    QFlatMapValueCompare(const Compare &key_compare)
++        : Compare(key_compare)
++    {
++    }
++
++    using value_type = std::pair<const Key, T>;
++    static constexpr bool is_comparator_noexcept = noexcept(
++        std::declval<Compare>()(std::declval<const Key &>(), std::declval<const Key &>()));
++
++    bool operator()(const value_type &lhs, const value_type &rhs) const
++        noexcept(is_comparator_noexcept)
++    {
++        return Compare::operator()(lhs.first, rhs.first);
++    }
++};
++
++namespace qflatmap {
++namespace detail {
++template <class T>
++class QFlatMapMockPointer
++{
++    T ref;
++public:
++    QFlatMapMockPointer(T r)
++        : ref(r)
++    {
++    }
++
++    T *operator->()
++    {
++        return &ref;
++    }
++};
++} // namespace detail
++} // namespace qflatmap
++
++template<class Key, class T, class Compare = std::less<Key>, class KeyContainer = QList<Key>,
++         class MappedContainer = QList<T>>
++class QFlatMap : private QFlatMapValueCompare<Key, T, Compare>
++{
++    static_assert(std::is_nothrow_destructible_v<T>, "Types with throwing destructors are not supported in Qt containers.");
++
++    template<class U>
++    using mock_pointer = qflatmap::detail::QFlatMapMockPointer<U>;
++
++public:
++    using key_type = Key;
++    using mapped_type = T;
++    using value_compare = QFlatMapValueCompare<Key, T, Compare>;
++    using value_type = typename value_compare::value_type;
++    using key_container_type = KeyContainer;
++    using mapped_container_type = MappedContainer;
++    using size_type = typename key_container_type::size_type;
++    using key_compare = Compare;
++
++    struct containers
++    {
++        key_container_type keys;
++        mapped_container_type values;
++    };
++
++    class iterator
++    {
++    public:
++        using difference_type = ptrdiff_t;
++        using value_type = std::pair<const Key, T>;
++        using reference = std::pair<const Key &, T &>;
++        using pointer = mock_pointer<reference>;
++        using iterator_category = std::random_access_iterator_tag;
++
++        iterator() = default;
++
++        iterator(containers *ac, size_type ai)
++            : c(ac), i(ai)
++        {
++        }
++
++        reference operator*() const
++        {
++            return { c->keys[i], c->values[i] };
++        }
++
++        pointer operator->() const
++        {
++            return { operator*() };
++        }
++
++        bool operator==(const iterator &o) const
++        {
++            return c == o.c && i == o.i;
++        }
++
++        bool operator!=(const iterator &o) const
++        {
++            return !operator==(o);
++        }
++
++        iterator &operator++()
++        {
++            ++i;
++            return *this;
++        }
++
++        iterator operator++(int)
++        {
++
++            iterator r = *this;
++            ++*this;
++            return r;
++        }
++
++        iterator &operator--()
++        {
++            --i;
++            return *this;
++        }
++
++        iterator operator--(int)
++        {
++            iterator r = *this;
++            --*this;
++            return r;
++        }
++
++        iterator &operator+=(size_type n)
++        {
++            i += n;
++            return *this;
++        }
++
++        friend iterator operator+(size_type n, const iterator a)
++        {
++            iterator ret = a;
++            return ret += n;
++        }
++
++        friend iterator operator+(const iterator a, size_type n)
++        {
++            return n + a;
++        }
++
++        iterator &operator-=(size_type n)
++        {
++            i -= n;
++            return *this;
++        }
++
++        friend iterator operator-(const iterator a, size_type n)
++        {
++            iterator ret = a;
++            return ret -= n;
++        }
++
++        friend difference_type operator-(const iterator b, const iterator a)
++        {
++            return b.i - a.i;
++        }
++
++        reference operator[](size_type n) const
++        {
++            size_type k = i + n;
++            return { c->keys[k], c->values[k] };
++        }
++
++        bool operator<(const iterator &other) const
++        {
++            return i < other.i;
++        }
++
++        bool operator>(const iterator &other) const
++        {
++            return i > other.i;
++        }
++
++        bool operator<=(const iterator &other) const
++        {
++            return i <= other.i;
++        }
++
++        bool operator>=(const iterator &other) const
++        {
++            return i >= other.i;
++        }
++
++        const Key &key() const { return c->keys[i]; }
++        T &value() const { return c->values[i]; }
++
++    private:
++        containers *c = nullptr;
++        size_type i = 0;
++        friend QFlatMap;
++    };
++
++    class const_iterator
++    {
++    public:
++        using difference_type = ptrdiff_t;
++        using value_type = std::pair<const Key, const T>;
++        using reference = std::pair<const Key &, const T &>;
++        using pointer = mock_pointer<reference>;
++        using iterator_category = std::random_access_iterator_tag;
++
++        const_iterator() = default;
++
++        const_iterator(const containers *ac, size_type ai)
++            : c(ac), i(ai)
++        {
++        }
++
++        const_iterator(iterator o)
++            : c(o.c), i(o.i)
++        {
++        }
++
++        reference operator*() const
++        {
++            return { c->keys[i], c->values[i] };
++        }
++
++        pointer operator->() const
++        {
++            return { operator*() };
++        }
++
++        bool operator==(const const_iterator &o) const
++        {
++            return c == o.c && i == o.i;
++        }
++
++        bool operator!=(const const_iterator &o) const
++        {
++            return !operator==(o);
++        }
++
++        const_iterator &operator++()
++        {
++            ++i;
++            return *this;
++        }
++
++        const_iterator operator++(int)
++        {
++
++            const_iterator r = *this;
++            ++*this;
++            return r;
++        }
++
++        const_iterator &operator--()
++        {
++            --i;
++            return *this;
++        }
++
++        const_iterator operator--(int)
++        {
++            const_iterator r = *this;
++            --*this;
++            return r;
++        }
++
++        const_iterator &operator+=(size_type n)
++        {
++            i += n;
++            return *this;
++        }
++
++        friend const_iterator operator+(size_type n, const const_iterator a)
++        {
++            const_iterator ret = a;
++            return ret += n;
++        }
++
++        friend const_iterator operator+(const const_iterator a, size_type n)
++        {
++            return n + a;
++        }
++
++        const_iterator &operator-=(size_type n)
++        {
++            i -= n;
++            return *this;
++        }
++
++        friend const_iterator operator-(const const_iterator a, size_type n)
++        {
++            const_iterator ret = a;
++            return ret -= n;
++        }
++
++        friend difference_type operator-(const const_iterator b, const const_iterator a)
++        {
++            return b.i - a.i;
++        }
++
++        reference operator[](size_type n) const
++        {
++            size_type k = i + n;
++            return { c->keys[k], c->values[k] };
++        }
++
++        bool operator<(const const_iterator &other) const
++        {
++            return i < other.i;
++        }
++
++        bool operator>(const const_iterator &other) const
++        {
++            return i > other.i;
++        }
++
++        bool operator<=(const const_iterator &other) const
++        {
++            return i <= other.i;
++        }
++
++        bool operator>=(const const_iterator &other) const
++        {
++            return i >= other.i;
++        }
++
++        const Key &key() const { return c->keys[i]; }
++        const T &value() const { return c->values[i]; }
++
++    private:
++        const containers *c = nullptr;
++        size_type i = 0;
++        friend QFlatMap;
++    };
++
++private:
++    template <class, class = void>
++    struct is_marked_transparent_type : std::false_type { };
++
++    template <class X>
++    struct is_marked_transparent_type<X, std::void_t<typename X::is_transparent>> : std::true_type { };
++
++    template <class X>
++    using is_marked_transparent = typename std::enable_if<
++        is_marked_transparent_type<X>::value>::type *;
++
++    template <typename It>
++    using is_compatible_iterator = typename std::enable_if<
++        std::is_same<value_type, typename std::iterator_traits<It>::value_type>::value>::type *;
++
++public:
++    QFlatMap() = default;
++
++#ifdef QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++    explicit QFlatMap(const key_container_type &keys, const mapped_container_type &values)
++        : c{keys, values}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(key_container_type &&keys, const mapped_container_type &values)
++        : c{std::move(keys), values}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(const key_container_type &keys, mapped_container_type &&values)
++        : c{keys, std::move(values)}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(key_container_type &&keys, mapped_container_type &&values)
++        : c{std::move(keys), std::move(values)}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(std::initializer_list<value_type> lst)
++        : QFlatMap(lst.begin(), lst.end())
++    {
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    explicit QFlatMap(InputIt first, InputIt last)
++    {
++        initWithRange(first, last);
++        ensureOrderedUnique();
++    }
++#endif
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, const key_container_type &keys,
++                      const mapped_container_type &values)
++        : c{keys, values}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, key_container_type &&keys,
++                      const mapped_container_type &values)
++        : c{std::move(keys), values}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, const key_container_type &keys,
++                      mapped_container_type &&values)
++        : c{keys, std::move(values)}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, key_container_type &&keys,
++                      mapped_container_type &&values)
++        : c{std::move(keys), std::move(values)}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, std::initializer_list<value_type> lst)
++        : QFlatMap(Qt::OrderedUniqueRange, lst.begin(), lst.end())
++    {
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, InputIt first, InputIt last)
++    {
++        initWithRange(first, last);
++    }
++
++    explicit QFlatMap(const Compare &compare)
++        : value_compare(compare)
++    {
++    }
++
++#ifdef QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++    explicit QFlatMap(const key_container_type &keys, const mapped_container_type &values,
++                      const Compare &compare)
++        : value_compare(compare), c{keys, values}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(key_container_type &&keys, const mapped_container_type &values,
++                      const Compare &compare)
++        : value_compare(compare), c{std::move(keys), values}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(const key_container_type &keys, mapped_container_type &&values,
++                      const Compare &compare)
++        : value_compare(compare), c{keys, std::move(values)}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(key_container_type &&keys, mapped_container_type &&values,
++                      const Compare &compare)
++        : value_compare(compare), c{std::move(keys), std::move(values)}
++    {
++        ensureOrderedUnique();
++    }
++
++    explicit QFlatMap(std::initializer_list<value_type> lst, const Compare &compare)
++        : QFlatMap(lst.begin(), lst.end(), compare)
++    {
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    explicit QFlatMap(InputIt first, InputIt last, const Compare &compare)
++        : value_compare(compare)
++    {
++        initWithRange(first, last);
++        ensureOrderedUnique();
++    }
++#endif
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, const key_container_type &keys,
++                      const mapped_container_type &values, const Compare &compare)
++        : value_compare(compare), c{keys, values}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, key_container_type &&keys,
++                      const mapped_container_type &values, const Compare &compare)
++        : value_compare(compare), c{std::move(keys), values}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, const key_container_type &keys,
++                      mapped_container_type &&values, const Compare &compare)
++        : value_compare(compare), c{keys, std::move(values)}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, key_container_type &&keys,
++                      mapped_container_type &&values, const Compare &compare)
++        : value_compare(compare), c{std::move(keys), std::move(values)}
++    {
++    }
++
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, std::initializer_list<value_type> lst,
++                      const Compare &compare)
++        : QFlatMap(Qt::OrderedUniqueRange, lst.begin(), lst.end(), compare)
++    {
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    explicit QFlatMap(Qt::OrderedUniqueRange_t, InputIt first, InputIt last, const Compare &compare)
++        : value_compare(compare)
++    {
++        initWithRange(first, last);
++    }
++
++    size_type count() const noexcept { return c.keys.size(); }
++    size_type size() const noexcept { return c.keys.size(); }
++    size_type capacity() const noexcept { return c.keys.capacity(); }
++    bool isEmpty() const noexcept { return c.keys.empty(); }
++    bool empty() const noexcept { return c.keys.empty(); }
++    containers extract() && { return std::move(c); }
++    const key_container_type &keys() const noexcept { return c.keys; }
++    const mapped_container_type &values() const noexcept { return c.values; }
++
++    void reserve(size_type s)
++    {
++        c.keys.reserve(s);
++        c.values.reserve(s);
++    }
++
++    void clear()
++    {
++        c.keys.clear();
++        c.values.clear();
++    }
++
++    bool remove(const Key &key)
++    {
++        return do_remove(find(key));
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    bool remove(const X &key)
++    {
++        return do_remove(find(key));
++    }
++
++    iterator erase(iterator it)
++    {
++        c.values.erase(toValuesIterator(it));
++        return fromKeysIterator(c.keys.erase(toKeysIterator(it)));
++    }
++
++    T take(const Key &key)
++    {
++        return do_take(find(key));
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    T take(const X &key)
++    {
++        return do_take(find(key));
++    }
++
++    bool contains(const Key &key) const
++    {
++        return find(key) != end();
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    bool contains(const X &key) const
++    {
++        return find(key) != end();
++    }
++
++    T value(const Key &key, const T &defaultValue) const
++    {
++        auto it = find(key);
++        return it == end() ? defaultValue : it.value();
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    T value(const X &key, const T &defaultValue) const
++    {
++        auto it = find(key);
++        return it == end() ? defaultValue : it.value();
++    }
++
++    T value(const Key &key) const
++    {
++        auto it = find(key);
++        return it == end() ? T() : it.value();
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    T value(const X &key) const
++    {
++        auto it = find(key);
++        return it == end() ? T() : it.value();
++    }
++
++    T &operator[](const Key &key)
++    {
++        return try_emplace(key).first.value();
++    }
++
++    T &operator[](Key &&key)
++    {
++        return try_emplace(std::move(key)).first.value();
++    }
++
++    T operator[](const Key &key) const
++    {
++        return value(key);
++    }
++
++#ifdef QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++    std::pair<iterator, bool> insert(const Key &key, const T &value)
++    {
++        return try_emplace(key, value);
++    }
++
++    std::pair<iterator, bool> insert(Key &&key, const T &value)
++    {
++        return try_emplace(std::move(key), value);
++    }
++
++    std::pair<iterator, bool> insert(const Key &key, T &&value)
++    {
++        return try_emplace(key, std::move(value));
++    }
++
++    std::pair<iterator, bool> insert(Key &&key, T &&value)
++    {
++        return try_emplace(std::move(key), std::move(value));
++    }
++#endif
++
++    template <typename...Args>
++    std::pair<iterator, bool> try_emplace(const Key &key, Args&&...args)
++    {
++        auto it = lower_bound(key);
++        if (it == end() || key_compare::operator()(key, it.key())) {
++            c.values.insert(toValuesIterator(it), std::forward<Args>(args)...);
++            return { fromKeysIterator(c.keys.insert(toKeysIterator(it), key)), true };
++        } else {
++            return {it, false};
++        }
++    }
++
++    template <typename...Args>
++    std::pair<iterator, bool> try_emplace(Key &&key, Args&&...args)
++    {
++        auto it = lower_bound(key);
++        if (it == end() || key_compare::operator()(key, it.key())) {
++            c.values.insert(toValuesIterator(it), std::forward<Args>(args)...);
++            return { fromKeysIterator(c.keys.insert(toKeysIterator(it), std::move(key))), true };
++        } else {
++            return {it, false};
++        }
++    }
++
++    template <typename M>
++    std::pair<iterator, bool> insert_or_assign(const Key &key, M &&obj)
++    {
++        auto r = try_emplace(key, std::forward<M>(obj));
++        if (!r.second)
++            *toValuesIterator(r.first) = std::forward<M>(obj);
++        return r;
++    }
++
++    template <typename M>
++    std::pair<iterator, bool> insert_or_assign(Key &&key, M &&obj)
++    {
++        auto r = try_emplace(std::move(key), std::forward<M>(obj));
++        if (!r.second)
++            *toValuesIterator(r.first) = std::forward<M>(obj);
++        return r;
++    }
++
++#ifdef QFLATMAP_ENABLE_STL_COMPATIBLE_INSERT
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    void insert(InputIt first, InputIt last)
++    {
++        insertRange(first, last);
++    }
++
++    // ### Merge with the templated version above
++    //     once we can use std::disjunction in is_compatible_iterator.
++    void insert(const value_type *first, const value_type *last)
++    {
++        insertRange(first, last);
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    void insert(Qt::OrderedUniqueRange_t, InputIt first, InputIt last)
++    {
++        insertOrderedUniqueRange(first, last);
++    }
++
++    // ### Merge with the templated version above
++    //     once we can use std::disjunction in is_compatible_iterator.
++    void insert(Qt::OrderedUniqueRange_t, const value_type *first, const value_type *last)
++    {
++        insertOrderedUniqueRange(first, last);
++    }
++#endif
++
++    iterator begin() { return { &c, 0 }; }
++    const_iterator begin() const { return { &c, 0 }; }
++    const_iterator cbegin() const { return begin(); }
++    const_iterator constBegin() const { return cbegin(); }
++    iterator end() { return { &c, c.keys.size() }; }
++    const_iterator end() const { return { &c, c.keys.size() }; }
++    const_iterator cend() const { return end(); }
++    const_iterator constEnd() const { return cend(); }
++    std::reverse_iterator<iterator> rbegin() { return std::reverse_iterator<iterator>(end()); }
++    std::reverse_iterator<const_iterator> rbegin() const
++    {
++        return std::reverse_iterator<const_iterator>(end());
++    }
++    std::reverse_iterator<const_iterator> crbegin() const { return rbegin(); }
++    std::reverse_iterator<iterator> rend() {
++        return std::reverse_iterator<iterator>(begin());
++    }
++    std::reverse_iterator<const_iterator> rend() const
++    {
++        return std::reverse_iterator<const_iterator>(begin());
++    }
++    std::reverse_iterator<const_iterator> crend() const { return rend(); }
++
++    iterator lower_bound(const Key &key)
++    {
++        auto cit = std::as_const(*this).lower_bound(key);
++        return { &c, cit.i };
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    iterator lower_bound(const X &key)
++    {
++        auto cit = std::as_const(*this).lower_bound(key);
++        return { &c, cit.i };
++    }
++
++    const_iterator lower_bound(const Key &key) const
++    {
++        return fromKeysIterator(std::lower_bound(c.keys.begin(), c.keys.end(), key, key_comp()));
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    const_iterator lower_bound(const X &key) const
++    {
++        return fromKeysIterator(std::lower_bound(c.keys.begin(), c.keys.end(), key, key_comp()));
++    }
++
++    iterator find(const Key &key)
++    {
++        return { &c, std::as_const(*this).find(key).i };
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    iterator find(const X &key)
++    {
++        return { &c, std::as_const(*this).find(key).i };
++    }
++
++    const_iterator find(const Key &key) const
++    {
++        auto it = lower_bound(key);
++        if (it != end()) {
++            if (!key_compare::operator()(key, it.key()))
++                return it;
++            it = end();
++        }
++        return it;
++    }
++
++    template <class X, class Y = Compare, is_marked_transparent<Y> = nullptr>
++    const_iterator find(const X &key) const
++    {
++        auto it = lower_bound(key);
++        if (it != end()) {
++            if (!key_compare::operator()(key, it.key()))
++                return it;
++            it = end();
++        }
++        return it;
++    }
++
++    template <typename Predicate>
++    size_type remove_if(Predicate pred)
++    {
++        const auto indirect_call_to_pred = [pred = std::move(pred)](iterator it) {
++            using Pair = decltype(*it);
++            using K = decltype(it.key());
++            using V = decltype(it.value());
++            using P = Predicate;
++            if constexpr (std::is_invocable_v<P, K, V>) {
++                return pred(it.key(), it.value());
++            } else if constexpr (std::is_invocable_v<P, Pair> && !std::is_invocable_v<P, K>) {
++                return pred(*it);
++            } else if constexpr (std::is_invocable_v<P, K> && !std::is_invocable_v<P, Pair>) {
++                return pred(it.key());
++            } else {
++                static_assert(std::false_type(),
++                    "Don't know how to call the predicate.\n"
++                    "Options:\n"
++                    "- pred(*it)\n"
++                    "- pred(it.key(), it.value())\n"
++                    "- pred(it.key())");
++            }
++        };
++
++        auto first = begin();
++        const auto last = end();
++
++        // find_if prefix loop
++        while (first != last && !indirect_call_to_pred(first))
++            ++first;
++
++        if (first == last)
++            return 0; // nothing to do
++
++        // we know that we need to remove *first
++
++        auto kdest = toKeysIterator(first);
++        auto vdest = toValuesIterator(first);
++
++        ++first;
++
++        auto k = std::next(kdest);
++        auto v = std::next(vdest);
++
++        // Main Loop
++        // - first is used only for indirect_call_to_pred
++        // - operations are done on k, v
++        // Loop invariants:
++        // - first, k, v are pointing to the same element
++        // - [begin(), first[, [c.keys.begin(), k[, [c.values.begin(), v[: already processed
++        // - [first, end()[,   [k, c.keys.end()[,   [v, c.values.end()[:   still to be processed
++        // - [c.keys.begin(), kdest[ and [c.values.begin(), vdest[ are keepers
++        // - [kdest, k[, [vdest, v[ are considered removed
++        // - kdest is not c.keys.end()
++        // - vdest is not v.values.end()
++        while (first != last) {
++            if (!indirect_call_to_pred(first)) {
++                // keep *first, aka {*k, *v}
++                *kdest = std::move(*k);
++                *vdest = std::move(*v);
++                ++kdest;
++                ++vdest;
++            }
++            ++k;
++            ++v;
++            ++first;
++        }
++
++        const size_type r = std::distance(kdest, c.keys.end());
++        c.keys.erase(kdest, c.keys.end());
++        c.values.erase(vdest, c.values.end());
++        return r;
++    }
++
++    key_compare key_comp() const noexcept
++    {
++        return static_cast<key_compare>(*this);
++    }
++
++    value_compare value_comp() const noexcept
++    {
++        return static_cast<value_compare>(*this);
++    }
++
++private:
++    bool do_remove(iterator it)
++    {
++        if (it != end()) {
++            erase(it);
++            return true;
++        }
++        return false;
++    }
++
++    T do_take(iterator it)
++    {
++        if (it != end()) {
++            T result = std::move(it.value());
++            erase(it);
++            return result;
++        }
++        return {};
++    }
++
++    template <class InputIt, is_compatible_iterator<InputIt> = nullptr>
++    void initWithRange(InputIt first, InputIt last)
++    {
++        QtPrivate::reserveIfForwardIterator(this, first, last);
++        while (first != last) {
++            c.keys.push_back(first->first);
++            c.values.push_back(first->second);
++            ++first;
++        }
++    }
++
++    iterator fromKeysIterator(typename key_container_type::iterator kit)
++    {
++        return { &c, static_cast<size_type>(std::distance(c.keys.begin(), kit)) };
++    }
++
++    const_iterator fromKeysIterator(typename key_container_type::const_iterator kit) const
++    {
++        return { &c, static_cast<size_type>(std::distance(c.keys.begin(), kit)) };
++    }
++
++    typename key_container_type::iterator toKeysIterator(iterator it)
++    {
++        return c.keys.begin() + it.i;
++    }
++
++    typename mapped_container_type::iterator toValuesIterator(iterator it)
++    {
++        return c.values.begin() + it.i;
++    }
++
++    template <class InputIt>
++    void insertRange(InputIt first, InputIt last)
++    {
++        size_type i = c.keys.size();
++        c.keys.resize(i + std::distance(first, last));
++        c.values.resize(c.keys.size());
++        for (; first != last; ++first, ++i) {
++            c.keys[i] = first->first;
++            c.values[i] = first->second;
++        }
++        ensureOrderedUnique();
++    }
++
++    class IndexedKeyComparator
++    {
++    public:
++        IndexedKeyComparator(const QFlatMap *am)
++            : m(am)
++        {
++        }
++
++        bool operator()(size_type i, size_type k) const
++        {
++            return m->key_comp()(m->c.keys[i], m->c.keys[k]);
++        }
++
++    private:
++        const QFlatMap *m;
++    };
++
++    template <class InputIt>
++    void insertOrderedUniqueRange(InputIt first, InputIt last)
++    {
++        const size_type s = c.keys.size();
++        c.keys.resize(s + std::distance(first, last));
++        c.values.resize(c.keys.size());
++        for (size_type i = s; first != last; ++first, ++i) {
++            c.keys[i] = first->first;
++            c.values[i] = first->second;
++        }
++
++        std::vector<size_type> p(size_t(c.keys.size()));
++        std::iota(p.begin(), p.end(), 0);
++        std::inplace_merge(p.begin(), p.begin() + s, p.end(), IndexedKeyComparator(this));
++        applyPermutation(p);
++        makeUnique();
++    }
++
++    void ensureOrderedUnique()
++    {
++        std::vector<size_type> p(size_t(c.keys.size()));
++        std::iota(p.begin(), p.end(), 0);
++        std::stable_sort(p.begin(), p.end(), IndexedKeyComparator(this));
++        applyPermutation(p);
++        makeUnique();
++    }
++
++    void applyPermutation(const std::vector<size_type> &p)
++    {
++        const size_type s = c.keys.size();
++        std::vector<bool> done(s);
++        for (size_type i = 0; i < s; ++i) {
++            if (done[i])
++                continue;
++            done[i] = true;
++            size_type j = i;
++            size_type k = p[i];
++            while (i != k) {
++                qSwap(c.keys[j], c.keys[k]);
++                qSwap(c.values[j], c.values[k]);
++                done[k] = true;
++                j = k;
++                k = p[j];
++            }
++        }
++    }
++
++    void makeUnique()
++    {
++        // std::unique, but over two ranges
++        auto equivalent = [this](const auto &lhs, const auto &rhs) {
++            return !key_compare::operator()(lhs, rhs) && !key_compare::operator()(rhs, lhs);
++        };
++        const auto kb = c.keys.begin();
++        const auto ke = c.keys.end();
++        auto k = std::adjacent_find(kb, ke, equivalent);
++        if (k == ke)
++            return;
++
++        // equivalent keys found, we need to do actual work:
++        auto v = std::next(c.values.begin(), std::distance(kb, k));
++
++        auto kdest = k;
++        auto vdest = v;
++
++        ++k;
++        ++v;
++
++        // Loop Invariants:
++        //
++        // - [keys.begin(), kdest] and [values.begin(), vdest] are unique
++        // - k is not keys.end(), v is not values.end()
++        // - [next(k), keys.end()[ and [next(v), values.end()[ still need to be checked
++        while ((++v, ++k) != ke) {
++            if (!equivalent(*kdest, *k)) {
++                *++kdest = std::move(*k);
++                *++vdest = std::move(*v);
++            }
++        }
++
++        c.keys.erase(std::next(kdest), ke);
++        c.values.erase(std::next(vdest), c.values.end());
++    }
++
++    containers c;
++};
++
++template<class Key, class T, qsizetype N = 256, class Compare = std::less<Key>>
++using QVarLengthFlatMap = QFlatMap<Key, T, Compare, QVarLengthArray<Key, N>, QVarLengthArray<T, N>>;
++
++QT_END_NAMESPACE
++
++#endif // QFLATMAP_P_H
++
+diff --git a/src/plugins/platformthemes/gtk3/gtk3.pro b/src/plugins/platformthemes/gtk3/gtk3.pro
+index 8d217396d3..c442b24a0a 100644
+--- a/src/plugins/platformthemes/gtk3/gtk3.pro
++++ b/src/plugins/platformthemes/gtk3/gtk3.pro
+@@ -15,11 +15,17 @@ QMAKE_CXXFLAGS_WARN_ON += -Wno-error=parentheses
+ 
+ HEADERS += \
+         qgtk3dialoghelpers.h \
++        qgtk3interface_p.h \
++        qgtk3json_p.h \
+         qgtk3menu.h \
++        qgtk3storage_p.h \
+         qgtk3theme.h
+ 
+ SOURCES += \
+         main.cpp \
+         qgtk3dialoghelpers.cpp \
++        qgtk3interface.cpp \
++        qgtk3json.cpp \
+         qgtk3menu.cpp \
++        qgtk3storage.cpp \
+         qgtk3theme.cpp
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+new file mode 100644
+index 0000000000..d932b250a5
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+@@ -0,0 +1,558 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++
++#include "qgtk3interface_p.h"
++#include "qgtk3storage_p.h"
++#include <QtCore/QMetaEnum>
++#include <QtCore/QSettings>
++#include <QtCore/QFileInfo>
++#include <QtGui/QFontDatabase>
++#include <QtGui/QIcon>
++
++QT_BEGIN_NAMESPACE
++Q_LOGGING_CATEGORY(lcQGtk3Interface, "qt.qpa.gtk");
++
++
++// Callback for gnome event loop has to be static
++static QGtk3Storage *m_storage = nullptr;
++
++QGtk3Interface::QGtk3Interface(QGtk3Storage *s)
++{
++    initColorMap();
++
++    if (!s) {
++        qCDebug(lcQGtk3Interface) << "QGtk3Interface instantiated without QGtk3Storage."
++                                  << "No reaction to runtime theme changes.";
++        return;
++    }
++
++    // Connect to the GTK settings changed signal
++    auto handleThemeChange = [] {
++        if (m_storage)
++            m_storage->handleThemeChange();
++    };
++
++    GtkSettings *settings = gtk_settings_get_default();
++    const gboolean success = g_signal_connect(settings, "notify::gtk-theme-name",
++                                        G_CALLBACK(handleThemeChange), nullptr);
++    if (success == FALSE) {
++        qCDebug(lcQGtk3Interface) << "Connection to theme change signal failed."
++                                  << "No reaction to runtime theme changes.";
++    } else {
++        m_storage = s;
++    }
++}
++
++QGtk3Interface::~QGtk3Interface()
++{
++    // Ignore theme changes when destructor is reached
++    m_storage = nullptr;
++
++    // QGtkWidgets have to be destroyed manually
++    for (auto v : cache)
++        gtk_widget_destroy(v.second);
++}
++
++int QGtk3Interface::toGtkState(const QString &state)
++{
++#define CASE(x) \
++    if (QLatin1String(QByteArray(state.toLatin1())) == #x) \
++        return GTK_STATE_FLAG_ ##x
++
++#define CONVERT\
++    CASE(NORMAL);\
++    CASE(ACTIVE);\
++    CASE(PRELIGHT);\
++    CASE(SELECTED);\
++    CASE(INSENSITIVE);\
++    CASE(INCONSISTENT);\
++    CASE(FOCUSED);\
++    CASE(BACKDROP);\
++    CASE(DIR_LTR);\
++    CASE(DIR_RTL);\
++    CASE(LINK);\
++    CASE(VISITED);\
++    CASE(CHECKED);\
++    CASE(DROP_ACTIVE)
++
++    CONVERT;
++    return -1;
++#undef CASE
++}
++
++const QLatin1String QGtk3Interface::fromGtkState(GtkStateFlags state)
++{
++#define CASE(x) case GTK_STATE_FLAG_ ##x: return QLatin1String(#x)
++    switch (state) {
++    CONVERT;
++    }
++    Q_UNREACHABLE();
++#undef CASE
++#undef CONVERT
++}
++
++void QGtk3Interface::initColorMap()
++{
++    // Populate map with default values
++ #define SAVE(src, state, prop, def)\
++    {ColorKey({QGtkColorSource::src, GTK_STATE_FLAG_ ##state}), ColorValue({#prop, QGtkColorDefault::def})}
++
++    gtkColorMap = ColorMap {
++        SAVE(Foreground, NORMAL, theme_fg_color, Foreground),
++        SAVE(Foreground, BACKDROP, theme_unfocused_selected_fg_color, Foreground),
++        SAVE(Foreground, INSENSITIVE, insensitive_fg_color, Foreground),
++        SAVE(Foreground, SELECTED, theme_selected_fg_color, Foreground),
++        SAVE(Foreground, ACTIVE, theme_unfocused_fg_color, Foreground),
++        SAVE(Text, NORMAL, theme_text_color, Foreground),
++        SAVE(Text, ACTIVE, theme_unfocused_text_color, Foreground),
++        SAVE(Base, NORMAL, theme_base_color, Background),
++        SAVE(Base, INSENSITIVE, insensitive_base_color, Background),
++        SAVE(Background, NORMAL, theme_bg_color, Background),
++        SAVE(Background, SELECTED, theme_selected_bg_color, Background),
++        SAVE(Background, INSENSITIVE, insensitive_bg_color, Background),
++        SAVE(Background, ACTIVE, theme_unfocused_bg_color, Background),
++        SAVE(Background, BACKDROP, theme_unfocused_selected_bg_color, Background),
++        SAVE(Border, NORMAL, borders, Border),
++        SAVE(Border, ACTIVE, unfocused_borders, Border)
++    };
++#undef SAVE
++
++    qCDebug(lcQGtk3Interface) << "Color map populated from defaults.";
++}
++
++// Return an image rather than an icon or a pixmap:
++// Image can be cached and re-scaled to different sizes if requested multiple times
++QImage QGtk3Interface::standardPixmap(QPlatformTheme::StandardPixmap standardPixmap) const
++{
++    switch (standardPixmap) {
++    case QPlatformTheme::DialogDiscardButton:
++        return qt_gtk_get_icon(GTK_STOCK_DELETE);
++    case QPlatformTheme::DialogOkButton:
++        return qt_gtk_get_icon(GTK_STOCK_OK);
++    case QPlatformTheme::DialogCancelButton:
++        return qt_gtk_get_icon(GTK_STOCK_CANCEL);
++    case QPlatformTheme::DialogYesButton:
++        return qt_gtk_get_icon(GTK_STOCK_YES);
++    case QPlatformTheme::DialogNoButton:
++        return qt_gtk_get_icon(GTK_STOCK_NO);
++    case QPlatformTheme::DialogOpenButton:
++        return qt_gtk_get_icon(GTK_STOCK_OPEN);
++    case QPlatformTheme::DialogCloseButton:
++        return qt_gtk_get_icon(GTK_STOCK_CLOSE);
++    case QPlatformTheme::DialogApplyButton:
++        return qt_gtk_get_icon(GTK_STOCK_APPLY);
++    case QPlatformTheme::DialogSaveButton:
++        return qt_gtk_get_icon(GTK_STOCK_SAVE);
++    case QPlatformTheme::MessageBoxWarning:
++        return qt_gtk_get_icon(GTK_STOCK_DIALOG_WARNING);
++    case QPlatformTheme::MessageBoxQuestion:
++        return qt_gtk_get_icon(GTK_STOCK_DIALOG_QUESTION);
++    case QPlatformTheme::MessageBoxInformation:
++        return qt_gtk_get_icon(GTK_STOCK_DIALOG_INFO);
++    case QPlatformTheme::MessageBoxCritical:
++        return qt_gtk_get_icon(GTK_STOCK_DIALOG_ERROR);
++    case QPlatformTheme::CustomBase:
++    case QPlatformTheme::TitleBarMenuButton:
++    case QPlatformTheme::TitleBarMinButton:
++    case QPlatformTheme::TitleBarMaxButton:
++    case QPlatformTheme::TitleBarCloseButton:
++    case QPlatformTheme::TitleBarNormalButton:
++    case QPlatformTheme::TitleBarShadeButton:
++    case QPlatformTheme::TitleBarUnshadeButton:
++    case QPlatformTheme::TitleBarContextHelpButton:
++    case QPlatformTheme::DockWidgetCloseButton:
++    case QPlatformTheme::DesktopIcon:
++    case QPlatformTheme::TrashIcon:
++    case QPlatformTheme::ComputerIcon:
++    case QPlatformTheme::DriveFDIcon:
++    case QPlatformTheme::DriveHDIcon:
++    case QPlatformTheme::DriveCDIcon:
++    case QPlatformTheme::DriveDVDIcon:
++    case QPlatformTheme::DriveNetIcon:
++    case QPlatformTheme::DirOpenIcon:
++    case QPlatformTheme::DirClosedIcon:
++    case QPlatformTheme::DirLinkIcon:
++    case QPlatformTheme::DirLinkOpenIcon:
++    case QPlatformTheme::FileIcon:
++    case QPlatformTheme::FileLinkIcon:
++    case QPlatformTheme::ToolBarHorizontalExtensionButton:
++    case QPlatformTheme::ToolBarVerticalExtensionButton:
++    case QPlatformTheme::FileDialogStart:
++    case QPlatformTheme::FileDialogEnd:
++    case QPlatformTheme::FileDialogToParent:
++    case QPlatformTheme::FileDialogNewFolder:
++    case QPlatformTheme::FileDialogDetailedView:
++    case QPlatformTheme::FileDialogInfoView:
++    case QPlatformTheme::FileDialogContentsView:
++    case QPlatformTheme::FileDialogListView:
++    case QPlatformTheme::FileDialogBack:
++    case QPlatformTheme::DirIcon:
++    case QPlatformTheme::DialogHelpButton:
++    case QPlatformTheme::DialogResetButton:
++    case QPlatformTheme::ArrowUp:
++    case QPlatformTheme::ArrowDown:
++    case QPlatformTheme::ArrowLeft:
++    case QPlatformTheme::ArrowRight:
++    case QPlatformTheme::ArrowBack:
++    case QPlatformTheme::ArrowForward:
++    case QPlatformTheme::DirHomeIcon:
++    case QPlatformTheme::CommandLink:
++    case QPlatformTheme::VistaShield:
++    case QPlatformTheme::BrowserReload:
++    case QPlatformTheme::BrowserStop:
++    case QPlatformTheme::MediaPlay:
++    case QPlatformTheme::MediaStop:
++    case QPlatformTheme::MediaPause:
++    case QPlatformTheme::MediaSkipForward:
++    case QPlatformTheme::MediaSkipBackward:
++    case QPlatformTheme::MediaSeekForward:
++    case QPlatformTheme::MediaSeekBackward:
++    case QPlatformTheme::MediaVolume:
++    case QPlatformTheme::MediaVolumeMuted:
++    case QPlatformTheme::LineEditClearButton:
++    case QPlatformTheme::DialogYesToAllButton:
++    case QPlatformTheme::DialogNoToAllButton:
++    case QPlatformTheme::DialogSaveAllButton:
++    case QPlatformTheme::DialogAbortButton:
++    case QPlatformTheme::DialogRetryButton:
++    case QPlatformTheme::DialogIgnoreButton:
++    case QPlatformTheme::RestoreDefaultsButton:
++    case QPlatformTheme::NStandardPixmap:
++        return QImage();
++    }
++    Q_UNREACHABLE();
++}
++
++QImage QGtk3Interface::qt_gtk_get_icon(const char* iconName) const
++{
++    GtkIconSet* iconSet  = gtk_icon_factory_lookup_default (iconName);
++    GdkPixbuf* icon = gtk_icon_set_render_icon_pixbuf(iconSet, context(), GTK_ICON_SIZE_DIALOG);
++    return qt_convert_gdk_pixbuf(icon);
++}
++
++QImage QGtk3Interface::qt_convert_gdk_pixbuf(GdkPixbuf *buf) const
++{
++    if (!buf)
++        return QImage();
++
++    // Ability to convert GdkPixbuf to QImage relies on the assumptions, that
++    // - QImage uses uchar as a data container
++    // - the types guint8 and uchar are identical
++    const guint8 *gdata = gdk_pixbuf_read_pixels(buf);
++    static_assert(std::is_same<decltype(gdata), const uchar *>::value,
++            "guint8 has diverted from uchar. Code needs fixing.");
++    Q_ASSUME(gdk_pixbuf_get_bits_per_sample(buf) == 8);
++    Q_ASSUME(gdk_pixbuf_get_n_channels(buf) == 4);
++    const uchar *data = static_cast<const uchar *>(gdata);
++
++    const int width = gdk_pixbuf_get_width(buf);
++    const int height = gdk_pixbuf_get_height(buf);
++    const int bpl = gdk_pixbuf_get_rowstride(buf);
++    QImage converted(data, width, height, bpl, QImage::Format_ARGB32);
++    return converted.copy(); // detatch to survive lifetime of buf
++}
++
++GtkWidget *QGtk3Interface::qt_new_gtkWidget(QGtkWidget type) const
++{
++#define CASE(Type)\
++    case QGtkWidget::Type: return Type ##_new();
++#define CASEN(Type)\
++    case QGtkWidget::Type: return Type ##_new(nullptr);
++
++    switch (type) {
++    CASE(gtk_menu_bar)
++    CASE(gtk_menu)
++    CASE(gtk_button)
++    case QGtkWidget::gtk_button_box: return gtk_button_box_new(GtkOrientation::GTK_ORIENTATION_HORIZONTAL);
++    CASE(gtk_check_button)
++    CASEN(gtk_radio_button)
++    CASEN(gtk_frame)
++    CASE(gtk_statusbar)
++    CASE(gtk_entry)
++    case QGtkWidget::gtk_popup: return gtk_window_new(GTK_WINDOW_POPUP);
++    CASE(gtk_notebook)
++    CASE(gtk_toolbar)
++    CASE(gtk_tree_view)
++    CASE(gtk_combo_box)
++    CASE(gtk_combo_box_text)
++    CASE(gtk_progress_bar)
++    CASE(gtk_fixed)
++    CASE(gtk_separator_menu_item)
++    CASE(gtk_offscreen_window)
++    case QGtkWidget::gtk_Default: return nullptr;
++    }
++#undef CASE
++#undef CASEN
++    Q_UNREACHABLE();
++}
++
++GdkRGBA QGtk3Interface::genericColor(GtkStyleContext *con, GtkStateFlags state, QGtkColorDefault def) const
++{
++    GdkRGBA color;
++
++#define CASE(def, call)\
++    case QGtkColorDefault::def:\
++        gtk_style_context_get_ ##call(con, state, &color);\
++        break;
++
++    switch (def) {
++    CASE(Foreground, color)
++    CASE(Background, background_color)
++    CASE(Border, border_color)
++    }
++    return color;
++#undef CASE
++}
++
++// Deliver a QColor from a GTK widget, a source type and a GTK widget state
++// Fall back to the generic color getter of source/state if the property name does not exist
++// Fall back to a hard coded generic color getter of source/state are not mapped
++QColor QGtk3Interface::color(GtkWidget *widget, QGtkColorSource source, GtkStateFlags state) const
++{
++    GdkRGBA col;
++    GtkStyleContext *con = context(widget);
++
++#define CASE(src, def)\
++    case QGtkColorSource::src: {\
++        const ColorKey key = ColorKey({QGtkColorSource::src, state});\
++        if (gtkColorMap.contains(key)) {\
++            const ColorValue val = gtkColorMap.value(key);\
++            if (!gtk_style_context_lookup_color(con, val.propertyName.toUtf8().constData(), &col)) {\
++                col = genericColor(con, state, val.genericSource);\
++                qCDebug(lcQGtk3Interface) << "Property name" << val.propertyName << "not found.\n"\
++                                          << "Falling back to " << val.genericSource;\
++            }\
++         } else {\
++           col = genericColor(con, state, QGtkColorDefault::def);\
++           qCDebug(lcQGtk3Interface) << "No color source found for" << QGtkColorSource::src\
++                                     << fromGtkState(state) << "\n Falling back to"\
++                                     << QGtkColorDefault::def;\
++         }\
++    }\
++         break;
++
++    switch (source) {
++    CASE(Foreground, Foreground)
++    CASE(Background, Background)
++    CASE(Text, Foreground)
++    CASE(Base, Background)
++    CASE(Border, Border)
++    }
++
++    return fromGdkColor(col);
++#undef CASE
++}
++
++// Deliver a widget pointer
++GtkWidget *QGtk3Interface::widget(QGtkWidget type) const
++{
++    if (type == QGtkWidget::gtk_Default)
++        return nullptr;
++
++    // Return from cache
++    if (GtkWidget *w = cache.value(type))
++        return w;
++
++    // Create new item and cache it
++    GtkWidget *w = qt_new_gtkWidget(type);
++    cache.insert(type, w);
++    return w;
++}
++
++// Return widget syle context or default style
++GtkStyleContext *QGtk3Interface::context(GtkWidget *w) const
++{
++    if (w)
++        return gtk_widget_get_style_context(w);
++
++    return gtk_widget_get_style_context(widget(QGtkWidget::gtk_entry));
++}
++
++// FIXME
++// Brush assets (e.g. 9-patches) can't be accessed by the GTK API.
++// => brush height and width from GTK will be ignored for the time being,
++// because it is unknown if they relate to a plain brush or an image brush.
++QBrush QGtk3Interface::brush(QGtkWidget wtype, QGtkColorSource source, GtkStateFlags state) const
++{
++    return QBrush(color(widget(wtype), source, state));
++}
++
++const QString QGtk3Interface::themeName() const
++{
++    gchar *theme_name;
++    GtkSettings *settings = gtk_settings_get_default();
++    if (!settings)
++        return QString();
++
++    g_object_get(settings, "gtk-theme-name", &theme_name, nullptr);
++    return QLatin1String(theme_name);
++}
++
++inline constexpr QGtk3Interface::QGtkWidget QGtk3Interface::toWidgetType(QPlatformTheme::Font type)
++{
++    switch (type) {
++    case QPlatformTheme::SystemFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::MenuFont: return QGtkWidget::gtk_menu;
++    case QPlatformTheme::MenuBarFont: return QGtkWidget::gtk_menu_bar;
++    case QPlatformTheme::MenuItemFont: return QGtkWidget::gtk_menu;
++    case QPlatformTheme::MessageBoxFont: return QGtkWidget::gtk_popup;
++    case QPlatformTheme::LabelFont: return QGtkWidget::gtk_popup;
++    case QPlatformTheme::TipLabelFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::StatusBarFont: return QGtkWidget::gtk_statusbar;
++    case QPlatformTheme::TitleBarFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::MdiSubWindowTitleFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::DockWidgetTitleFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::PushButtonFont: return QGtkWidget::gtk_button;
++    case QPlatformTheme::CheckBoxFont: return QGtkWidget::gtk_check_button;
++    case QPlatformTheme::RadioButtonFont: return QGtkWidget::gtk_radio_button;
++    case QPlatformTheme::ToolButtonFont: return QGtkWidget::gtk_button;
++    case QPlatformTheme::ItemViewFont: return QGtkWidget::gtk_entry;
++    case QPlatformTheme::ListViewFont: return QGtkWidget::gtk_tree_view;
++    case QPlatformTheme::HeaderViewFont: return QGtkWidget::gtk_fixed;
++    case QPlatformTheme::ListBoxFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::ComboMenuItemFont: return QGtkWidget::gtk_combo_box;
++    case QPlatformTheme::ComboLineEditFont: return QGtkWidget::gtk_combo_box_text;
++    case QPlatformTheme::SmallFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::MiniFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::FixedFont: return QGtkWidget::gtk_fixed;
++    case QPlatformTheme::GroupBoxTitleFont: return QGtkWidget::gtk_Default;
++    case QPlatformTheme::TabButtonFont: return QGtkWidget::gtk_button;
++    case QPlatformTheme::EditorFont: return QGtkWidget::gtk_entry;
++    case QPlatformTheme::NFonts: return QGtkWidget::gtk_Default;
++    }
++    Q_UNREACHABLE();
++}
++
++inline constexpr QFont::Style QGtk3Interface::toFontStyle(PangoStyle style)
++{
++     switch (style) {
++     case PANGO_STYLE_ITALIC: return QFont::StyleItalic;
++     case PANGO_STYLE_OBLIQUE: return QFont::StyleOblique;
++     case PANGO_STYLE_NORMAL: return QFont::StyleNormal;
++     }
++     // This is reached when GTK has introduced a new font style
++     Q_UNREACHABLE();
++}
++
++inline constexpr int QGtk3Interface::toFontWeight(PangoWeight weight)
++{
++    // GTK PangoWeight can be directly converted to QFont::Weight
++    // unless one of the enums changes.
++    static_assert(PANGO_WEIGHT_THIN == 100 && PANGO_WEIGHT_ULTRAHEAVY == 1000,
++                  "Pango font weight enum changed. Fix conversion.");
++
++    return qBound(1, static_cast<int>(weight), 1000);
++}
++
++inline constexpr QFont::Weight QGtk3Interface::toQFontWeight(int weight)
++{
++    if (weight <= 100)
++        return QFont::Thin;
++    else if (weight <= 200)
++        return QFont::ExtraLight;
++    else if (weight <= 300)
++        return QFont::Light;
++    else if (weight <= 400)
++        return QFont::Normal;
++    else if (weight <= 500)
++        return QFont::Medium;
++    else if (weight <= 600)
++        return QFont::DemiBold;
++    else if (weight <= 700)
++        return QFont::Bold;
++    else if (weight <= 800)
++        return QFont::ExtraBold;
++    else
++        return QFont::Black;
++}
++
++QFont QGtk3Interface::font(QPlatformTheme::Font type) const
++{
++    GtkStyleContext *con = context(widget(toWidgetType(type)));
++    if (!con)
++        return QFont();
++
++    const PangoFontDescription *gtkFont = gtk_style_context_get_font(con, GTK_STATE_FLAG_NORMAL);
++    if (!gtkFont)
++        return QFont();
++
++    const QString family = QString::fromLatin1(pango_font_description_get_family(gtkFont));
++    if (family.isEmpty())
++        return QFont();
++
++    const int weight = toFontWeight(pango_font_description_get_weight(gtkFont));
++
++    // Creating a QFont() creates a futex lockup on a theme change
++    // QFont doesn't have a constructor with float point size
++    // => create a dummy point size and set it later.
++    QFont font(family, 1, toQFontWeight(weight));
++    font.setPointSizeF(static_cast<float>(pango_font_description_get_size(gtkFont)/PANGO_SCALE));
++    font.setStyle(toFontStyle(pango_font_description_get_style(gtkFont)));
++
++    // fix pixel pitch if fixed font is requested
++    // NOTE: GTK allows to specify a non fixed font as the system's fixed font.
++    // => the returned font may still not be a fixed font.
++    if (type == QPlatformTheme::FixedFont) {
++        font.setFixedPitch(true);
++        if (!QFontInfo(font).fixedPitch()) {
++            qCDebug(lcQGtk3Interface) << "No fixed pitch font found in font family"
++                                      << font.family() << ". falling back to a default"
++                                      << "fixed pitch font";
++            font.setFamily("monospace");
++        }
++    }
++    return font;
++}
++
++QIcon QGtk3Interface::fileIcon(const QFileInfo &fileInfo) const
++{
++    GFile *file = g_file_new_for_path(fileInfo.absoluteFilePath().toLatin1().constData());
++    if (!file)
++        return QIcon();
++
++    GFileInfo *info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
++                                         G_FILE_QUERY_INFO_NONE, nullptr, nullptr);
++    if (!info) {
++        g_object_unref(file);
++        return QIcon();
++    }
++
++    GIcon *icon = g_file_info_get_icon(info);
++    if (!icon) {
++        g_object_unref(file);
++        g_object_unref(info);
++        return QIcon();
++    }
++
++    GtkIconTheme *theme = gtk_icon_theme_get_default();
++    GtkIconInfo *iconInfo = gtk_icon_theme_lookup_by_gicon(theme, icon, GTK_ICON_SIZE_BUTTON,
++                                                                  GTK_ICON_LOOKUP_FORCE_SIZE);
++    if (!iconInfo) {
++        g_object_unref(file);
++        g_object_unref(info);
++        g_object_unref(icon);
++        return QIcon();
++    }
++
++    GdkPixbuf *buf = gtk_icon_info_load_icon(iconInfo, nullptr);
++    QImage image = qt_convert_gdk_pixbuf(buf);
++    g_object_unref(file);
++    g_object_unref(info);
++    g_object_unref(icon);
++    g_object_unref(buf);
++    return QIcon(QPixmap::fromImage(image));
++}
++
++QT_END_NAMESPACE
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+new file mode 100644
+index 0000000000..8997a64e76
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+@@ -0,0 +1,170 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#ifndef QGTK3INTERFACE_H
++#define QGTK3INTERFACE_H
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include <QtCore/QString>
++#include <QtCore/QLibrary>
++#include <QtCore/QCache>
++#include <private/qflatmap_p.h>
++#include <QtCore/QObject>
++#include <QtGui/QPalette>
++#include <QtWidgets/QWidget>
++#include <QtCore/QLoggingCategory>
++#include <QtGui/QPixmap>
++#include <qpa/qplatformtheme.h>
++
++#undef signals // Collides with GTK symbols
++#include <gtk/gtk.h>
++#include <gdk/gdk.h>
++#include <glib.h>
++
++QT_BEGIN_NAMESPACE
++
++Q_DECLARE_LOGGING_CATEGORY(lcQGtk3Interface);
++
++class QGtk3Storage;
++class QGtk3Interface
++{
++    Q_GADGET
++public:
++    QGtk3Interface(QGtk3Storage *);
++    ~QGtk3Interface();
++
++    // Enum representing GTK widget types
++    enum class QGtkWidget {
++        gtk_menu_bar,
++        gtk_menu,
++        gtk_button,
++        gtk_button_box,
++        gtk_check_button,
++        gtk_radio_button,
++        gtk_frame,
++        gtk_statusbar,
++        gtk_entry,
++        gtk_popup,
++        gtk_notebook,
++        gtk_toolbar,
++        gtk_tree_view,
++        gtk_combo_box,
++        gtk_combo_box_text,
++        gtk_progress_bar,
++        gtk_fixed,
++        gtk_separator_menu_item,
++        gtk_Default,
++        gtk_offscreen_window
++    };
++    Q_ENUM(QGtkWidget)
++
++    // Enum representing color sources of a GTK theme
++    enum class QGtkColorSource {
++        Foreground,
++        Background,
++        Text,
++        Base,
++        Border
++    };
++    Q_ENUM(QGtkColorSource)
++
++    // Enum for default color getter
++    enum class QGtkColorDefault {
++        Foreground,
++        Background,
++        Border
++    };
++    Q_ENUM(QGtkColorDefault)
++
++    // Create a brush from GTK widget type, color source and color state
++    QBrush brush(QGtkWidget wtype, QGtkColorSource source, GtkStateFlags state) const;
++
++    // Font & icon getters
++    QImage standardPixmap(QPlatformTheme::StandardPixmap standardPixmap) const;
++    QFont font(QPlatformTheme::Font type) const;
++    QIcon fileIcon(const QFileInfo &fileInfo) const;
++
++    // Return current GTK theme name
++    const QString themeName() const;
++
++    // Convert GTK state to/from string
++    static int toGtkState(const QString &state);
++    static const QLatin1String fromGtkState(GtkStateFlags state);
++
++private:
++
++    // Map colors to GTK property names and default to generic color getters
++    struct ColorKey {
++        QGtkColorSource colorSource = QGtkColorSource::Background;
++        GtkStateFlags state = GTK_STATE_FLAG_NORMAL;
++
++        // struct becomes key of a map, so operator< is needed
++        bool operator<(const ColorKey& other) const {
++           return std::tie(colorSource, state) <
++                  std::tie(other.colorSource, other.state);
++        }
++
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtk3Interface::ColorKey(colorSource=" << colorSource << ", GTK state=" << fromGtkState(state) << ")";
++        }
++    };
++
++    struct ColorValue {
++        QString propertyName = QString();
++        QGtkColorDefault genericSource = QGtkColorDefault::Background;
++
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtk3Interface::ColorValue(propertyName=" << propertyName << ", genericSource=" << genericSource << ")";
++        }
++    };
++
++    typedef QFlatMap<ColorKey, ColorValue> ColorMap;
++    ColorMap gtkColorMap;
++    void initColorMap();
++
++    GdkRGBA genericColor(GtkStyleContext *con, GtkStateFlags state, QGtkColorDefault def) const;
++
++    // Cache for GTK widgets
++    mutable QFlatMap<QGtkWidget, GtkWidget *> cache;
++
++    // Converters for GTK icon and GDK pixbuf
++    QImage qt_gtk_get_icon(const char *iconName) const;
++    QImage qt_convert_gdk_pixbuf(GdkPixbuf *buf) const;
++
++    // Create new GTK widget object
++    GtkWidget *qt_new_gtkWidget(QGtkWidget type) const;
++
++    // Deliver GTK Widget from cache or create new
++    GtkWidget *widget(QGtkWidget type) const;
++
++    // Get a GTK widget's style context. Default settings style context if nullptr
++    GtkStyleContext *context(GtkWidget *widget = nullptr) const;
++
++    // Convert GTK color into QColor
++    static inline QColor fromGdkColor (const GdkRGBA &c)
++    { return QColor::fromRgbF(c.red, c.green, c.blue, c.alpha); }
++
++    // get a QColor of a GTK widget (default settings style if nullptr)
++    QColor color (GtkWidget *widget, QGtkColorSource source, GtkStateFlags state) const;
++
++    // Mappings for GTK fonts
++    inline static constexpr QGtkWidget toWidgetType(QPlatformTheme::Font);
++    inline static constexpr QFont::Style toFontStyle(PangoStyle style);
++    inline static constexpr int toFontWeight(PangoWeight weight);
++    inline static constexpr QFont::Weight toQFontWeight(int weight);
++
++};
++QT_END_NAMESPACE
++#endif // QGTK3INTERFACE_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3json.cpp b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+new file mode 100644
+index 0000000000..f4d5b50ec5
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+@@ -0,0 +1,475 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include "qgtk3json_p.h"
++#include <QtCore/QFile>
++#include <QMetaEnum>
++
++QT_BEGIN_NAMESPACE
++
++QLatin1String QGtk3Json::fromPalette(QPlatformTheme::Palette palette)
++{
++    switch (palette) {
++    case QPlatformTheme::SystemPalette:
++        return QLatin1String("SystemPalette");
++    case QPlatformTheme::ToolTipPalette:
++        return QLatin1String("ToolTipPalette");
++    case QPlatformTheme::ToolButtonPalette:
++        return QLatin1String("ToolButtonPalette");
++    case QPlatformTheme::ButtonPalette:
++        return QLatin1String("ButtonPalette");
++    case QPlatformTheme::CheckBoxPalette:
++        return QLatin1String("CheckBoxPalette");
++    case QPlatformTheme::RadioButtonPalette:
++        return QLatin1String("RadioButtonPalette");
++    case QPlatformTheme::HeaderPalette:
++        return QLatin1String("HeaderPalette");
++    case QPlatformTheme::ComboBoxPalette:
++        return QLatin1String("ComboBoxPalette");
++    case QPlatformTheme::ItemViewPalette:
++        return QLatin1String("ItemViewPalette");
++    case QPlatformTheme::MessageBoxLabelPalette:
++        return QLatin1String("MessageBoxLabelPalette");
++    case QPlatformTheme::TabBarPalette:
++        return QLatin1String("TabBarPalette");
++    case QPlatformTheme::LabelPalette:
++        return QLatin1String("LabelPalette");
++    case QPlatformTheme::GroupBoxPalette:
++        return QLatin1String("GroupBoxPalette");
++    case QPlatformTheme::MenuPalette:
++        return QLatin1String("MenuPalette");
++    case QPlatformTheme::MenuBarPalette:
++        return QLatin1String("MenuBarPalette");
++    case QPlatformTheme::TextEditPalette:
++        return QLatin1String("TextEditPalette");
++    case QPlatformTheme::TextLineEditPalette:
++        return QLatin1String("TextLineEditPalette");
++    default:
++        return QLatin1String();
++    }
++    return QLatin1String();
++}
++
++QLatin1String QGtk3Json::fromGtkState(GtkStateFlags state)
++{
++    return QGtk3Interface::fromGtkState(state);
++}
++
++QLatin1String fromColor(const QColor &color)
++{
++    return QLatin1String(QByteArray(color.name(QColor::HexRgb).toLatin1()));
++}
++
++QLatin1String QGtk3Json::fromColorRole(QPalette::ColorRole role)
++{
++    return QLatin1String(QMetaEnum::fromType<QPalette::ColorRole>().valueToKey(static_cast<int>(role)));
++}
++
++QLatin1String QGtk3Json::fromColorGroup(QPalette::ColorGroup group)
++{
++    return QLatin1String(QMetaEnum::fromType<QPalette::ColorGroup>().valueToKey(static_cast<int>(group)));
++}
++
++QLatin1String QGtk3Json::fromGdkSource(QGtk3Interface::QGtkColorSource source)
++{
++    return QLatin1String(QMetaEnum::fromType<QGtk3Interface::QGtkColorSource>().valueToKey(static_cast<int>(source)));
++}
++
++QLatin1String QGtk3Json::fromWidgetType(QGtk3Interface::QGtkWidget widgetType)
++{
++    return QLatin1String(QMetaEnum::fromType<QGtk3Interface::QGtkWidget>().valueToKey(static_cast<int>(widgetType)));
++}
++
++QLatin1String QGtk3Json::fromAppearance(Qt::Appearance app)
++{
++    return QLatin1String(QMetaEnum::fromType<Qt::Appearance>().valueToKey(static_cast<int>(app)));
++}
++
++#define CONVERT(type, key, def)\
++    bool ok;\
++    const int intVal = QMetaEnum::fromType<type>().keyToValue(key.toLatin1().constData(), &ok);\
++    return ok ? static_cast<type>(intVal) : type::def
++
++Qt::Appearance QGtk3Json::toAppearance(const QString &appearance)
++{
++    CONVERT(Qt::Appearance, appearance, Unknown);
++}
++
++QPlatformTheme::Palette QGtk3Json::toPalette(const QString &palette)
++{
++    if (palette == QLatin1String("SystemPalette"))
++        return QPlatformTheme::SystemPalette;
++    else if (palette == QLatin1String("ToolTipPalette"))
++        return QPlatformTheme::ToolTipPalette;
++    else if (palette == QLatin1String("ToolButtonPalette"))
++        return QPlatformTheme::ToolButtonPalette;
++    else if (palette == QLatin1String("ButtonPalette"))
++        return QPlatformTheme::ButtonPalette;
++    else if (palette == QLatin1String("CheckBoxPalette"))
++        return QPlatformTheme::CheckBoxPalette;
++    else if (palette == QLatin1String("RadioButtonPalette"))
++        return QPlatformTheme::RadioButtonPalette;
++    else if (palette == QLatin1String("HeaderPalette"))
++        return QPlatformTheme::HeaderPalette;
++    else if (palette == QLatin1String("ComboBoxPalette"))
++        return QPlatformTheme::ComboBoxPalette;
++    else if (palette == QLatin1String("ItemViewPalette"))
++        return QPlatformTheme::ItemViewPalette;
++    else if (palette == QLatin1String("MessageBoxLabelPelette"))
++        return QPlatformTheme::MessageBoxLabelPelette;
++    else if (palette == QLatin1String("TabBarPalette"))
++        return QPlatformTheme::TabBarPalette;
++    else if (palette == QLatin1String("LabelPalette"))
++        return QPlatformTheme::LabelPalette;
++    else if (palette == QLatin1String("GroupBoxPalette"))
++        return QPlatformTheme::GroupBoxPalette;
++    else if (palette == QLatin1String("MenuPalette"))
++        return QPlatformTheme::MenuPalette;
++    else if (palette == QLatin1String("MenuBarPalette"))
++        return QPlatformTheme::MenuBarPalette;
++    else if (palette == QLatin1String("TextEditPalette"))
++        return QPlatformTheme::TextEditPalette;
++    else if (palette == QLatin1String("TextLineEditPalette"))
++        return QPlatformTheme::TextLineEditPalette;
++
++    return QPlatformTheme::NPalettes;
++}
++
++GtkStateFlags QGtk3Json::toGtkState(const QString &type)
++{
++    int i = QGtk3Interface::toGtkState(type);
++    if (i < 0)
++        return GTK_STATE_FLAG_NORMAL;
++    return static_cast<GtkStateFlags>(i);
++}
++
++QColor toColor(const QStringView &color)
++{
++    return QColor(color);
++}
++
++QPalette::ColorRole QGtk3Json::toColorRole(const QString &role)
++{
++    CONVERT(QPalette::ColorRole, role, NColorRoles);
++}
++
++QPalette::ColorGroup QGtk3Json::toColorGroup(const QString &group)
++{
++    CONVERT(QPalette::ColorGroup, group, NColorGroups);
++}
++
++QGtk3Interface::QGtkColorSource QGtk3Json::toGdkSource(const QString &source)
++{
++    CONVERT(QGtk3Interface::QGtkColorSource, source, Background);
++}
++
++QLatin1String QGtk3Json::fromSourceType(QGtk3Storage::SourceType sourceType)
++{
++    return QLatin1String(QMetaEnum::fromType<QGtk3Storage::SourceType>().valueToKey(static_cast<int>(sourceType)));
++}
++
++QGtk3Storage::SourceType QGtk3Json::toSourceType(const QString &sourceType)
++{
++    CONVERT(QGtk3Storage::SourceType, sourceType, Invalid);
++}
++
++QGtk3Interface::QGtkWidget QGtk3Json::toWidgetType(const QString &widgetType)
++{
++    CONVERT(QGtk3Interface::QGtkWidget, widgetType, gtk_offscreen_window);
++}
++
++#undef CONVERT
++
++bool QGtk3Json::save(const QGtk3Storage::PaletteMap &map, const QString &fileName,
++                     QJsonDocument::JsonFormat format)
++{
++    QJsonDocument doc = save(map);
++    if (doc.isEmpty()) {
++        qWarning() << "Nothing to save to" << fileName;
++        return false;
++    }
++
++    QFile file(fileName);
++    if (!file.open(QIODevice::WriteOnly)) {
++        qWarning() << "Unable to open file" << fileName << "for writing.";
++        return false;
++    }
++
++    if (!file.write(doc.toJson(format))) {
++        qWarning() << "Unable to serialize Json document.";
++        return false;
++    }
++
++    file.close();
++    qInfo() << "Saved mapping data to" << fileName;
++    return true;
++}
++
++const QJsonDocument QGtk3Json::save(const QGtk3Storage::PaletteMap &map)
++{
++    QJsonObject paletteObject;
++    for (auto paletteIterator = map.constBegin(); paletteIterator != map.constEnd();
++         ++paletteIterator) {
++        const QGtk3Storage::BrushMap &bm = paletteIterator.value();
++        QFlatMap<QPalette::ColorRole, QGtk3Storage::BrushMap> brushMaps;
++        for (auto brushIterator = bm.constBegin(); brushIterator != bm.constEnd();
++             ++brushIterator) {
++            const QPalette::ColorRole role = brushIterator.key().colorRole;
++            if (brushMaps.contains(role)) {
++                brushMaps.value(role).insert(brushIterator.key(), brushIterator.value());
++            } else {
++                QGtk3Storage::BrushMap newMap;
++                newMap.insert(brushIterator.key(), brushIterator.value());
++                brushMaps.insert(role, newMap);
++            }
++        }
++
++        QJsonObject brushArrayObject;
++        for (auto brushMapIterator = brushMaps.constBegin();
++             brushMapIterator != brushMaps.constEnd(); ++brushMapIterator) {
++
++            QJsonArray brushArray;
++            int brushIndex = 0;
++            const QGtk3Storage::BrushMap &bm = brushMapIterator.value();
++            for (auto brushIterator = bm.constBegin(); brushIterator != bm.constEnd();
++                 ++brushIterator) {
++                QJsonObject brushObject;
++                const QGtk3Storage::TargetBrush tb = brushIterator.key();
++                QGtk3Storage::Source s = brushIterator.value();
++                brushObject.insert(ceColorGroup, fromColorGroup(tb.colorGroup));
++                brushObject.insert(ceAppearance, fromAppearance(tb.appearance));
++                brushObject.insert(ceSourceType, fromSourceType(s.sourceType));
++
++                QJsonObject sourceObject;
++                switch (s.sourceType) {
++                case QGtk3Storage::SourceType::Gtk: {
++                    sourceObject.insert(ceGtkWidget, fromWidgetType(s.gtk3.gtkWidgetType));
++                    sourceObject.insert(ceGdkSource, fromGdkSource(s.gtk3.source));
++                    sourceObject.insert(ceGtkState, fromGtkState(s.gtk3.state));
++                    sourceObject.insert(ceWidth, s.gtk3.width);
++                    sourceObject.insert(ceHeight, s.gtk3.height);
++                }
++                break;
++
++                case QGtk3Storage::SourceType::Fixed: {
++                        QJsonObject fixedObject;
++                        fixedObject.insert(ceColor, s.fix.fixedBrush.color().name());
++                        fixedObject.insert(ceWidth, s.fix.fixedBrush.texture().width());
++                        fixedObject.insert(ceHeight, s.fix.fixedBrush.texture().height());
++                        sourceObject.insert(ceBrush, fixedObject);
++                    }
++                    break;
++
++                case QGtk3Storage::SourceType::Modified:{
++                        sourceObject.insert(ceColorGroup, fromColorGroup(s.rec.colorGroup));
++                        sourceObject.insert(ceColorRole, fromColorRole(s.rec.colorRole));
++                        sourceObject.insert(ceAppearance, fromAppearance(s.rec.appearance));
++                        sourceObject.insert(ceRed, s.rec.deltaRed);
++                        sourceObject.insert(ceGreen, s.rec.deltaGreen);
++                        sourceObject.insert(ceBlue, s.rec.deltaBlue);
++                        sourceObject.insert(ceWidth, s.rec.width);
++                        sourceObject.insert(ceHeight, s.rec.height);
++                        sourceObject.insert(ceLighter, s.rec.lighter);
++                    }
++                    break;
++
++                case QGtk3Storage::SourceType::Invalid:
++                    break;
++                }
++
++                brushObject.insert(ceData, sourceObject);
++                brushArray.insert(brushIndex, brushObject);
++                ++brushIndex;
++            }
++            brushArrayObject.insert(fromColorRole(brushMapIterator.key()), brushArray);
++        }
++        paletteObject.insert(fromPalette(paletteIterator.key()), brushArrayObject);
++    }
++
++    QJsonObject top;
++    top.insert(cePalettes, paletteObject);
++    return paletteObject.keys().isEmpty() ? QJsonDocument() : QJsonDocument(top);
++}
++
++bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QString &fileName)
++{
++    QFile file(fileName);
++    if (!file.open(QIODevice::ReadOnly)) {
++        qCWarning(lcQGtk3Interface) << "Unable to open file:" << fileName;
++        return false;
++    }
++
++    QJsonParseError err;
++    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &err);
++    if (err.error != QJsonParseError::NoError) {
++        qWarning(lcQGtk3Interface) << "Unable to parse Json document from" << fileName
++                                   << err.error << err.errorString();
++        return false;
++    }
++
++    if (Q_LIKELY(load(map, doc))) {
++        qInfo() << "GTK mapping successfully imported from" << fileName;
++        return true;
++    }
++
++    qWarning() << "File" << fileName << "could not be loaded.";
++    return false;
++}
++
++bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
++{
++#define GETSTR(obj, key)\
++    if (!obj.contains(key)) {\
++        qCDebug(lcQGtk3Interface) << key << "missing for palette" << paletteName\
++                                  << ", Brush" << colorRoleName;\
++        return false;\
++    }\
++    value = obj[key].toString()
++
++#define GETINT(obj, key, var) GETSTR(obj, key);\
++    if (!obj[key].isDouble()) {\
++        qCDebug(lcQGtk3Interface) << key << "type mismatch" << value\
++                                  << "is not an integer!"\
++                                  << "(Palette" << paletteName << "), Brush" << colorRoleName;\
++        return false;\
++    }\
++    const int var = obj[key].toInt()
++
++    map.clear();
++    const QJsonObject top(doc.object());
++    if (doc.isEmpty() || top.isEmpty() || !top.contains(cePalettes)) {
++        qCDebug(lcQGtk3Interface) << "Document does not contain Palettes.";
++        return false;
++    }
++
++    const QStringList &paletteList = top[cePalettes].toObject().keys();
++    for (const QString &paletteName : paletteList) {
++        bool ok;
++        const QPlatformTheme::Palette paletteType = toPalette(paletteName);
++        if (paletteType == QPlatformTheme::NPalettes) {
++            qCDebug(lcQGtk3Interface) << "Invalid Palette name:" << paletteName;
++            return false;
++        }
++        const QJsonObject &paletteObject = top[cePalettes][paletteName].toObject();
++        const QStringList &brushList = paletteObject.keys();
++        if (brushList.isEmpty()) {
++            qCDebug(lcQGtk3Interface) << "Palette" << paletteName << "does not contain brushes";
++            return false;
++        }
++
++        QGtk3Storage::BrushMap brushes;
++        const QStringList &colorRoles = paletteObject.keys();
++        for (const QString &colorRoleName : colorRoles) {
++            const int intVal = QMetaEnum::fromType<QPalette::ColorRole>().keyToValue(colorRoleName
++                                                                    .toLatin1().constData(), &ok);
++            if (!ok) {
++                qCDebug(lcQGtk3Interface) << "Palette" << paletteName
++                                          << "contains invalid color role" << colorRoleName;
++                return false;
++            }
++            const QPalette::ColorRole colorRole = static_cast<QPalette::ColorRole>(intVal);
++            const QJsonArray &brushArray = paletteObject[colorRoleName].toArray();
++            for (int brushIndex = 0; brushIndex < brushArray.size(); ++brushIndex) {
++                const QJsonObject brushObject = brushArray.at(brushIndex).toObject();
++                if (brushObject.isEmpty()) {
++                    qCDebug(lcQGtk3Interface) << "Brush specification missing at for palette"
++                                              << paletteName << ", Brush" << colorRoleName;
++                    return false;
++                }
++
++                QString value;
++                GETSTR(brushObject, ceSourceType);
++                const QGtk3Storage::SourceType sourceType = toSourceType(value);
++                GETSTR(brushObject, ceColorGroup);
++                const QPalette::ColorGroup colorGroup = toColorGroup(value);
++                GETSTR(brushObject, ceAppearance);
++                const Qt::Appearance appearance = toAppearance(value);
++                QGtk3Storage::TargetBrush tb(colorGroup, colorRole, appearance);
++                QGtk3Storage::Source s;
++
++                if (!brushObject.contains(ceData) || !brushObject[ceData].isObject()) {
++                    qCDebug(lcQGtk3Interface) << "Source specification missing for palette" << paletteName
++                                                  << "Brush" << colorRoleName;
++                    return false;
++                }
++                const QJsonObject &sourceObject = brushObject[ceData].toObject();
++
++                switch (sourceType) {
++                case QGtk3Storage::SourceType::Gtk: {
++                        GETSTR(sourceObject, ceGdkSource);
++                        const QGtk3Interface::QGtkColorSource gtkSource = toGdkSource(value);
++                        GETSTR(sourceObject, ceGtkState);
++                        const GtkStateFlags gtkState = toGtkState(value);
++                        GETSTR(sourceObject, ceGtkWidget);
++                        const QGtk3Interface::QGtkWidget widgetType = toWidgetType(value);
++                        GETINT(sourceObject, ceHeight, height);
++                        GETINT(sourceObject, ceWidth, width);
++                        s = QGtk3Storage::Source(widgetType, gtkSource, gtkState, width, height);
++                    }
++                    break;
++
++                case QGtk3Storage::SourceType::Fixed: {
++                        if (!sourceObject.contains(ceBrush)) {
++                            qCDebug(lcQGtk3Interface) << "Fixed brush specification missing for palette" << paletteName
++                                                      << "Brush" << colorRoleName;
++                            return false;
++                        }
++                        const QJsonObject &fixedSource = sourceObject[ceBrush].toObject();
++                        GETINT(fixedSource, ceWidth, width);
++                        GETINT(fixedSource, ceHeight, height);
++                        GETSTR(fixedSource, ceColor);
++                        const QColor color(value);
++                        if (!color.isValid()) {
++                            qCDebug(lcQGtk3Interface) << "Color" << value << "can't be parsed for:" << paletteName
++                                                      << "Brush" << colorRoleName;
++                            return false;
++                        }
++                        const QBrush fixedBrush = (width < 0 && height < 0)
++                                                  ? QBrush(color, QPixmap(width, height))
++                                                  : QBrush(color);
++                        s = QGtk3Storage::Source(fixedBrush);
++                    }
++                    break;
++
++                case QGtk3Storage::SourceType::Modified: {
++                        GETSTR(sourceObject, ceColorGroup);
++                        const QPalette::ColorGroup colorGroup = toColorGroup(value);
++                        GETSTR(sourceObject, ceColorRole);
++                        const QPalette::ColorRole colorRole = toColorRole(value);
++                        GETSTR(sourceObject, ceAppearance);
++                        const Qt::Appearance appearance = toAppearance(value);
++                        GETINT(sourceObject, ceLighter, lighter);
++                        GETINT(sourceObject, ceRed, red);
++                        GETINT(sourceObject, ceBlue, blue);
++                        GETINT(sourceObject, ceGreen, green);
++                        s = QGtk3Storage::Source(colorGroup, colorRole, appearance,
++                                                 lighter, red, green, blue);
++                    }
++                    break;
++
++                case QGtk3Storage::SourceType::Invalid:
++                    qCDebug(lcQGtk3Interface) << "Invalid source type for palette" << paletteName
++                                              << "Brush." << colorRoleName;
++                    return false;
++                }
++                brushes.insert(tb, s);
++            }
++        }
++        map.insert(paletteType, brushes);
++    }
++    return true;
++}
++
++QT_END_NAMESPACE
++
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3json_p.h b/src/plugins/platformthemes/gtk3/qgtk3json_p.h
+new file mode 100644
+index 0000000000..b3680eb7dc
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3json_p.h
+@@ -0,0 +1,102 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++#ifndef QGTK3JSON_P_H
++#define QGTK3JSON_P_H
++
++#include <QtCore/QCache>
++#include <QtCore/QJsonArray>
++#include <QtCore/QJsonDocument>
++#include <QtCore/QJsonObject>
++#include <QtCore/QMap>
++#include <QtCore/QString>
++#include <QtGui/QGuiApplication>
++#include <QtGui/QPalette>
++
++#include <qpa/qplatformtheme.h>
++#include "qgtk3interface_p.h"
++#include "qgtk3storage_p.h"
++
++#undef signals // Collides with GTK symbols
++#include <gtk/gtk.h>
++#include <gdk/gdk.h>
++#include <glib.h>
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++QT_BEGIN_NAMESPACE
++
++class QGtk3Json
++{
++    Q_GADGET
++private:
++    QGtk3Json(){};
++
++public:
++    // Convert enums to strings
++    static QLatin1String fromPalette(QPlatformTheme::Palette palette);
++    static QLatin1String fromGtkState(GtkStateFlags type);
++    static QLatin1String fromColor(const QColor &Color);
++    static QLatin1String fromColorRole(QPalette::ColorRole role);
++    static QLatin1String fromColorGroup(QPalette::ColorGroup group);
++    static QLatin1String fromGdkSource(QGtk3Interface::QGtkColorSource source);
++    static QLatin1String fromSourceType(QGtk3Storage::SourceType sourceType);
++    static QLatin1String fromWidgetType(QGtk3Interface::QGtkWidget widgetType);
++    static QLatin1String fromAppearance(Qt::Appearance app);
++
++    // Convert strings to enums
++    static QPlatformTheme::Palette toPalette(const QString &palette);
++    static GtkStateFlags toGtkState(const QString &type);
++    static QColor toColor(const QString &Color);
++    static QPalette::ColorRole toColorRole(const QString &role);
++    static QPalette::ColorGroup toColorGroup(const QString &group);
++    static QGtk3Interface::QGtkColorSource toGdkSource(const QString &source);
++    static QGtk3Storage::SourceType toSourceType(const QString &sourceType);
++    static QGtk3Interface::QGtkWidget toWidgetType(const QString &widgetType);
++    static Qt::Appearance toAppearance(const QString &appearance);
++
++    // Json keys
++    static constexpr QStringView cePalettes = u"QtGtk3Palettes";
++    static constexpr QStringView cePalette = u"PaletteType";
++    static constexpr QStringView ceGtkState = u"GtkStateType";
++    static constexpr QStringView ceGtkWidget = u"GtkWidgetType";
++    static constexpr QStringView ceColor = u"Color";
++    static constexpr QStringView ceColorRole = u"ColorRole";
++    static constexpr QStringView ceColorGroup = u"ColorGroup";
++    static constexpr QStringView ceGdkSource = u"GdkSource";
++    static constexpr QStringView ceSourceType = u"SourceType";
++    static constexpr QStringView ceLighter = u"Lighter";
++    static constexpr QStringView ceRed = u"DeltaRed";
++    static constexpr QStringView ceGreen = u"DeltaGreen";
++    static constexpr QStringView ceBlue = u"DeltaBlue";
++    static constexpr QStringView ceWidth = u"Width";
++    static constexpr QStringView ceHeight = u"Height";
++    static constexpr QStringView ceBrush = u"FixedBrush";
++    static constexpr QStringView ceData = u"SourceData";
++    static constexpr QStringView ceBrushes = u"Brushes";
++    static constexpr QStringView ceAppearance = u"Appearance";
++
++    // Save to a file
++    static bool save(const QGtk3Storage::PaletteMap &map, const QString &fileName,
++              QJsonDocument::JsonFormat format = QJsonDocument::Indented);
++
++    // Save to a Json document
++    static const QJsonDocument save(const QGtk3Storage::PaletteMap &map);
++
++    // Load from a file
++    static bool load(QGtk3Storage::PaletteMap &map, const QString &fileName);
++
++    // Load from a Json document
++    static bool load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc);
++};
++
++QT_END_NAMESPACE
++#endif // QGTK3JSON_P_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+new file mode 100644
+index 0000000000..0a1fa6ef97
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -0,0 +1,470 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include "qgtk3json_p.h"
++#include "qgtk3storage_p.h"
++#include <qpa/qwindowsysteminterface.h>
++
++QT_BEGIN_NAMESPACE
++
++QGtk3Storage::QGtk3Storage()
++{
++    m_interface.reset(new QGtk3Interface(this));
++    populateMap();
++}
++
++// Set a brush from a source and resolve recursions
++QBrush QGtk3Storage::brush(const Source &source, const BrushMap &map) const
++{
++    switch (source.sourceType) {
++    case SourceType::Gtk:
++        return m_interface ? QBrush(m_interface->brush(source.gtk3.gtkWidgetType,
++                                    source.gtk3.source, source.gtk3.state))
++                           : QBrush();
++
++    case SourceType::Modified: {
++        // don't loop through modified sources, break if modified source not found
++        Source recSource = brush(TargetBrush(source.rec.colorGroup, source.rec.colorRole,
++                                              source.rec.appearance), map);
++
++        if (!recSource.isValid() || (recSource.sourceType == SourceType::Modified))
++            return QBrush();
++
++        // Set brush and alter color
++        QBrush b = brush(recSource, map);
++        if (source.rec.width > 0 && source.rec.height > 0)
++            b.setTexture(QPixmap(source.rec.width, source.rec.height));
++        QColor c = b.color().lighter(source.rec.lighter);
++        c = QColor((c.red() + source.rec.deltaRed),
++                   (c.green() + source.rec.deltaGreen),
++                   (c.blue() + source.rec.deltaBlue));
++        b.setColor(c);
++        return b;
++    }
++
++    case SourceType::Fixed:
++        return source.fix.fixedBrush;
++
++    case SourceType::Invalid:
++        return QBrush();
++    }
++
++    // needed because of the scope after recursive
++    Q_UNREACHABLE();
++}
++
++// Find source for a recursion and take dark/light/unknown into consideration
++QGtk3Storage::Source QGtk3Storage::brush(const TargetBrush &b, const BrushMap &map) const
++{
++#define FIND(brush) if (map.contains(brush))\
++                        return map.value(brush)
++
++    // Return exact match
++    FIND(b);
++
++    // unknown appearance can find anything
++    if (b.appearance == Qt::Appearance::Unknown) {
++        FIND(TargetBrush(b, Qt::Appearance::Dark));
++        FIND(TargetBrush(b, Qt::Appearance::Light));
++    }
++
++    // Color group All can always be found
++    if (b.colorGroup != QPalette::All)
++        return brush(TargetBrush(QPalette::All, b.colorRole, b.appearance), map);
++
++    // Brush not found
++    return Source();
++#undef FIND
++}
++
++// Create a simple standard palette
++QPalette QGtk3Storage::standardPalette()
++{
++    QColor backgroundColor(0xd4, 0xd0, 0xc8);
++    QColor lightColor(backgroundColor.lighter());
++    QColor darkColor(backgroundColor.darker());
++    const QBrush darkBrush(darkColor);
++    QColor midColor(Qt::gray);
++    QPalette palette(Qt::black, backgroundColor, lightColor, darkColor,
++                     midColor, Qt::black, Qt::white);
++    palette.setBrush(QPalette::Disabled, QPalette::WindowText, darkBrush);
++    palette.setBrush(QPalette::Disabled, QPalette::Text, darkBrush);
++    palette.setBrush(QPalette::Disabled, QPalette::ButtonText, darkBrush);
++    palette.setBrush(QPalette::Disabled, QPalette::Base, QBrush(backgroundColor));
++    return palette;
++}
++
++// Deliver a palette styled according to the current GTK Theme
++const QPalette *QGtk3Storage::palette(QPlatformTheme::Palette type) const
++{
++    if (type >= QPlatformTheme::NPalettes)
++        return nullptr;
++
++    if (m_paletteCache[type].has_value()) {
++        qCDebug(lcQGtk3Interface) << "Returning palette from cache:"
++                                  << QGtk3Json::fromPalette(type);
++
++        return &m_paletteCache[type].value();
++    }
++
++    // Read system palette as a baseline first
++    if (!m_paletteCache[QPlatformTheme::SystemPalette].has_value() && type != QPlatformTheme::SystemPalette)
++        palette();
++
++    // Fall back to system palette for unknown types
++    if (!m_palettes.contains(type) &&  type != QPlatformTheme::SystemPalette) {
++        qCDebug(lcQGtk3Interface) << "Returning system palette for unknown type"
++                                  << QGtk3Json::fromPalette(type);
++        return palette();
++    }
++
++    BrushMap brushes = m_palettes.value(type);
++
++    // Standard palette is base for system palette. System palette is base for all others.
++    QPalette p = QPalette( type == QPlatformTheme::SystemPalette ? standardPalette()
++                                   : m_paletteCache[QPlatformTheme::SystemPalette].value());
++
++    qCDebug(lcQGtk3Interface) << "Creating palette:" << QGtk3Json::fromPalette(type);
++    for (auto i = brushes.begin(); i != brushes.end(); ++i) {
++        Source source = i.value();
++
++        // Brush is set if
++        // - theme and source appearance match
++        // - or either of them is unknown
++        const auto appSource = i.key().appearance;
++        const auto appTheme = appearance();
++        const bool setBrush = (appSource == appTheme) ||
++                              (appSource == Qt::Appearance::Unknown) ||
++                              (appTheme == Qt::Appearance::Unknown);
++
++        if (setBrush) {
++            p.setBrush(i.key().colorGroup, i.key().colorRole, brush(source, brushes));
++        }
++    }
++
++    m_paletteCache[type].emplace(p);
++    if (type == QPlatformTheme::SystemPalette)
++        qCDebug(lcQGtk3Interface) << "System Palette defined" << themeName() << appearance() << p;
++
++    return &m_paletteCache[type].value();
++}
++
++const QFont *QGtk3Storage::font(QPlatformTheme::Font type) const
++{
++    if (m_fontCache[type].has_value())
++        return &m_fontCache[type].value();
++
++    m_fontCache[type].emplace(m_interface->font(type));
++    return &m_fontCache[type].value();
++}
++
++QPixmap QGtk3Storage::standardPixmap(QPlatformTheme::StandardPixmap standardPixmap,
++                                     const QSizeF &size) const
++{
++    if (m_pixmapCache.contains(standardPixmap))
++        return QPixmap::fromImage(m_pixmapCache.object(standardPixmap)->scaled(size.toSize()));
++
++    if (!m_interface)
++        return QPixmap();
++
++    QImage image = m_interface->standardPixmap(standardPixmap);
++    if (image.isNull())
++        return QPixmap();
++
++    m_pixmapCache.insert(standardPixmap, new QImage(image));
++    return QPixmap::fromImage(image.scaled(size.toSize()));
++}
++
++QIcon QGtk3Storage::fileIcon(const QFileInfo &fileInfo) const
++{
++    return m_interface ? m_interface->fileIcon(fileInfo) : QIcon();
++}
++
++void QGtk3Storage::clear()
++{
++    m_appearance = Qt::Appearance::Unknown;
++    m_palettes.clear();
++    for (auto &cache : m_paletteCache)
++        cache.reset();
++
++    for (auto &cache : m_fontCache)
++        cache.reset();
++}
++
++void QGtk3Storage::handleThemeChange()
++{
++    clear();
++    populateMap();
++    QWindowSystemInterface::handleThemeChange(nullptr);
++}
++
++void QGtk3Storage::populateMap()
++{
++    static QString m_themeName;
++
++    // Distiguish initialization, theme change or call without theme change
++    const QString newThemeName = themeName();
++    if (m_themeName == newThemeName)
++        return;
++
++    clear();
++
++    // Derive appearance from theme name
++    m_appearance = newThemeName.contains("dark", Qt::CaseInsensitive)
++                   ? Qt::Appearance::Dark : Qt::Appearance::Light;
++
++    if (m_themeName.isEmpty()) {
++        qCDebug(lcQGtk3Interface) << "GTK theme initialized:" << newThemeName << m_appearance;
++    } else {
++        qCDebug(lcQGtk3Interface) << "GTK theme changed to:" << newThemeName << m_appearance;
++    }
++    m_themeName = newThemeName;
++
++    // create standard mapping or load from Json file?
++    const QString jsonInput = qEnvironmentVariable("QT_GUI_GTK_JSON");
++    if (!jsonInput.isEmpty()) {
++        if (load(jsonInput)) {
++            return;
++        } else {
++            qWarning() << "Falling back to standard GTK mapping.";
++        }
++    }
++
++    createMapping();
++
++    const QString jsonOutput = qEnvironmentVariable("QT_GUI_GTK_JSON_SAVE");
++    if (!jsonOutput.isEmpty() && !save(jsonOutput))
++        qWarning() << "File" << jsonOutput << "could not be saved.\n";
++}
++
++const QGtk3Storage::PaletteMap QGtk3Storage::savePalettes() const
++{
++    const QString hard = qEnvironmentVariable("QT_GUI_GTK_JSON_HARDCODED");
++    if (!hard.contains("true", Qt::CaseInsensitive))
++        return m_palettes;
++
++    // Json output is supposed to be readable without GTK connection
++    // convert palette map into hard coded brushes
++    PaletteMap map = m_palettes;
++    for (auto paletteIterator = map.begin(); paletteIterator != map.end();
++         ++paletteIterator) {
++        QGtk3Storage::BrushMap &bm = paletteIterator.value();
++        for (auto brushIterator = bm.begin(); brushIterator != bm.end();
++             ++brushIterator) {
++            QGtk3Storage::Source &s = brushIterator.value();
++            switch (s.sourceType) {
++
++            // Read the brush and convert it into a fixed brush
++            case SourceType::Gtk: {
++                const QBrush fixedBrush = brush(s, bm);
++                s.fix.fixedBrush = fixedBrush;
++                s.sourceType = SourceType::Fixed;
++            }
++                break;
++            case SourceType::Fixed:
++            case SourceType::Modified:
++            case SourceType::Invalid:
++                break;
++            }
++        }
++    }
++    return map;
++}
++
++bool QGtk3Storage::save(const QString &filename, QJsonDocument::JsonFormat f) const
++{
++    return QGtk3Json::save(savePalettes(), filename, f);
++}
++
++QJsonDocument QGtk3Storage::save() const
++{
++    return QGtk3Json::save(savePalettes());
++}
++
++bool QGtk3Storage::load(const QString &filename)
++{
++    return QGtk3Json::load(m_palettes, filename);
++}
++
++void QGtk3Storage::createMapping()
++{
++    // Hard code standard mapping
++    BrushMap map;
++    Source source;
++
++    // Define a GTK source
++#define GTK(wtype, colorSource, state)\
++    source = Source(QGtk3Interface::QGtkWidget::gtk_ ##wtype,\
++                    QGtk3Interface::QGtkColorSource::colorSource, GTK_STATE_FLAG_ ##state)
++
++    // Define a modified source
++#define LIGHTER(group, role, lighter)\
++    source = Source(QPalette::group, QPalette::role,\
++                    Qt::Appearance::Unknown, lighter)
++#define MODIFY(group, role, red, green, blue)\
++    source = Source(QPalette::group, QPalette::role,\
++                    Qt::Appearance::Unknown, red, green, blue)
++
++    // Define fixed source
++#define FIX(color) source = FixedSource(color);
++
++    // Add the source to a target brush
++    // Use default Qt::Appearance::Unknown, if no appearance was specified
++#define ADD_2(group, role) map.insert(TargetBrush(QPalette::group, QPalette::role), source);
++#define ADD_3(group, role, app) map.insert(TargetBrush(QPalette::group, QPalette::role,\
++    Qt::Appearance::app), source);
++#define ADD_X(x, group, role, app, FUNC, ...) FUNC
++#define ADD(...) ADD_X(,##__VA_ARGS__, ADD_3(__VA_ARGS__), ADD_2(__VA_ARGS__))
++    // Save target brushes to a palette type
++#define SAVE(palette) m_palettes.insert(QPlatformTheme::palette, map)
++    // Clear brushes to start next palette
++#define CLEAR map.clear()
++
++    /*
++     *  Macro ussage:
++     *
++     *  1. Define a source
++     *
++     *  GTK(QGtkWidget, QGtkColorSource, GTK_STATE_FLAG)
++     *  Fetch the color from a GtkWidget, related to a source and a state.
++     *
++     *  LIGHTER(ColorGroup, ColorROle, lighter)
++     *  Use a color of the same QPalette related to ColorGroup and ColorRole.
++     *  Make the color lighter (if lighter >100) or darker (if lighter < 100)
++     *
++     *  MODIFY(ColorGroup, ColorRole, red, green, blue)
++     *  Use a color of the same QPalette related to ColorGroup and ColorRole.
++     *  Modify it by adding red, green, blue.
++     *
++     *  FIX(const QBrush &)
++     *  Use a fixed brush without querying GTK
++     *
++     *  2. Define the target
++     *
++     *  Use ADD(ColorGroup, ColorRole) to use the defined source for the
++     *  color group / role in the current palette.
++     *
++     *  Use ADD(ColorGroup, ColorRole, Appearance) to use the defined source
++     *  only for a specific appearance
++     *
++     *  3. Save mapping
++     *  Save the defined mappings for a specific palette.
++     *  If a mapping entry does not cover all color groups and roles of a palette,
++     *  the system palette will be used for the remaining values.
++     *  If the system palette does not have all combination of color groups and roles,
++     *  the remaining ones will be populated by a hard coded fusion-style like palette.
++     *
++     *  4. Clear mapping
++     *  Use CLEAR to clear the mapping and begin a new one.
++     */
++
++
++    // System palette
++    // background color and calculate derivates
++    GTK(Default, Background, INSENSITIVE);
++    ADD(Normal, Window);
++    ADD(Normal, Button);
++    ADD(Normal, Base);
++    ADD(Inactive, Base);
++    ADD(Normal, Window); // redundant
++    ADD(Inactive, Window);
++    LIGHTER(Normal, Window, 125);
++    ADD(Normal, Light);
++    LIGHTER(Normal, Window, 70);
++    ADD(Normal, Shadow);
++    LIGHTER(Normal, Window, 80);
++    ADD(Normal, Dark);
++    GTK(button, Foreground, ACTIVE);
++    ADD(Normal, WindowText);
++    ADD(Inactive, WindowText);
++    LIGHTER(Normal, WindowText, 50);
++    ADD(Disabled, Text);
++    ADD(Disabled, WindowText);
++    //ADD(Normal, ButtonText);
++    ADD(Inactive, ButtonText);
++    GTK(button, Text, NORMAL);
++    ADD(Disabled, ButtonText);
++    // special background colors
++    GTK(Default, Background, SELECTED);
++    ADD(Disabled, Highlight);
++    ADD(Normal, Highlight);
++    GTK(entry, Foreground, SELECTED);
++    ADD(Normal, HighlightedText);
++    GTK(entry, Background, ACTIVE);
++    ADD(Inactive, HighlightedText);
++    // text color and friends
++    GTK(entry, Text, NORMAL);
++    ADD(Normal, ButtonText);
++    ADD(Normal, WindowText);
++    ADD(Disabled, WindowText);
++    ADD(Disabled, HighlightedText);
++    GTK(Default, Text, NORMAL);
++    ADD(Normal, Text);
++    ADD(Inactive, Text);
++    ADD(Normal, HighlightedText);
++    LIGHTER(Normal, Base, 93);
++    ADD(All, AlternateBase);
++    GTK(Default, Foreground, NORMAL);
++    ADD(All, ToolTipText);
++    MODIFY(Normal, Text, 100, 100, 100);
++    ADD(All, PlaceholderText, Light);
++    MODIFY(Normal, Text, -100, -100, -100);
++    ADD(All, PlaceholderText, Dark);
++    SAVE(SystemPalette);
++    CLEAR;
++
++    // Checkbox and Radio Button
++    GTK(button, Text, ACTIVE);
++    ADD(Normal, Base, Dark);
++    GTK(button, Text, NORMAL);
++    ADD(Normal, Base, Light);
++    SAVE(CheckBoxPalette);
++    SAVE(RadioButtonPalette);
++    CLEAR;
++
++    // ComboBox, GroupBox, Frame
++    GTK(combo_box, Text, NORMAL);
++    ADD(Normal, ButtonText, Dark);
++    ADD(Normal, Text, Dark);
++    GTK(combo_box, Text, ACTIVE);
++    ADD(Normal, ButtonText, Light);
++    ADD(Normal, Text, Light);
++    SAVE(ComboBoxPalette);
++    SAVE(GroupBoxPalette);
++    CLEAR;
++
++    // Menu bar
++    GTK(Default, Text, ACTIVE);
++    ADD(Normal, ButtonText);
++    SAVE(MenuPalette);
++    CLEAR;
++
++    // LineEdit
++    GTK(Default, Background, NORMAL);
++    ADD(All, Base);
++    SAVE(TextLineEditPalette);
++    CLEAR;
++
++#undef GTK
++#undef REC
++#undef FIX
++#undef ADD
++#undef ADD_2
++#undef ADD_3
++#undef ADD_X
++#undef SAVE
++#undef LOAD
++}
++
++QT_END_NAMESPACE
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage_p.h b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+new file mode 100644
+index 0000000000..57f6aeea96
+--- /dev/null
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+@@ -0,0 +1,234 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#ifndef QGTK3STORAGE_P_H
++#define QGTK3STORAGE_P_H
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include "qgtk3interface_p.h"
++
++#include <QtCore/QJsonDocument>
++#include <QtCore/QCache>
++#include <QtCore/QString>
++#include <QtGui/QGuiApplication>
++#include <QtGui/QPalette>
++
++#include <qpa/qplatformtheme.h>
++#include <private/qflatmap_p.h>
++
++QT_BEGIN_NAMESPACE
++class QGtk3Storage
++{
++    Q_GADGET
++public:
++    QGtk3Storage();
++
++    enum class SourceType {
++        Gtk,
++        Fixed,
++        Modified,
++        Invalid
++    };
++    Q_ENUM(SourceType)
++
++    // Standard GTK source: Populate a brush from GTK
++    struct Gtk3Source  {
++        QGtk3Interface::QGtkWidget gtkWidgetType;
++        QGtk3Interface::QGtkColorSource source;
++        GtkStateFlags state;
++        int width = -1;
++        int height = -1;
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtkStorage::Gtk3Source(gtkwidgetType=" << gtkWidgetType << ", source="
++                       << source << ", state=" << state << ", width=" << width << ", height="
++                       << height << ")";
++        }
++    };
++
++    // Recursive source: Populate a brush by altering another source
++    struct RecursiveSource  {
++        QPalette::ColorGroup colorGroup;
++        QPalette::ColorRole colorRole;
++        Qt::Appearance appearance;
++        int lighter = 100;
++        int deltaRed = 0;
++        int deltaGreen = 0;
++        int deltaBlue = 0;
++        int width = -1;
++        int height = -1;
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtkStorage::RecursiceSource(colorGroup=" << colorGroup << ", colorRole="
++                       << colorRole << ", appearance=" << appearance << ", lighter=" << lighter
++                       << ", deltaRed="<< deltaRed << "deltaBlue =" << deltaBlue << "deltaGreen="
++                       << deltaGreen << ", width=" << width << ", height=" << height << ")";
++        }
++    };
++
++    // Fixed source: Populate a brush with fixed values rather than reading GTK
++    struct FixedSource  {
++        QBrush fixedBrush;
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtkStorage::FixedSource(" << fixedBrush << ")";
++        }
++    };
++
++    // Data source for brushes
++    struct Source {
++        SourceType sourceType = SourceType::Invalid;
++        Gtk3Source gtk3;
++        RecursiveSource rec;
++        FixedSource fix;
++
++        // GTK constructor
++        Source(QGtk3Interface::QGtkWidget wtype, QGtk3Interface::QGtkColorSource csource,
++               GtkStateFlags cstate, int bwidth = -1, int bheight = -1) : sourceType(SourceType::Gtk)
++        {
++             gtk3.gtkWidgetType = wtype;
++             gtk3.source = csource;
++             gtk3.state = cstate;
++             gtk3.width = bwidth;
++             gtk3.height = bheight;
++        }
++
++        // Recursive constructor for darker/lighter colors
++        Source(QPalette::ColorGroup group, QPalette::ColorRole role,
++               Qt::Appearance app, int p_lighter = 100)
++               : sourceType(SourceType::Modified)
++        {
++            rec.colorGroup = group;
++            rec.colorRole = role;
++            rec.appearance = app;
++            rec.lighter = p_lighter;
++        }
++
++        // Recursive ocnstructor for color modification
++        Source(QPalette::ColorGroup group, QPalette::ColorRole role,
++               Qt::Appearance app, int p_red, int p_green, int p_blue)
++               : sourceType(SourceType::Modified)
++        {
++            rec.colorGroup = group;
++            rec.colorRole = role;
++            rec.appearance = app;
++            rec.deltaRed = p_red;
++            rec.deltaGreen = p_green;
++            rec.deltaBlue = p_blue;
++        }
++
++        // Recursive constructor for all: color modification and darker/lighter
++        Source(QPalette::ColorGroup group, QPalette::ColorRole role,
++               Qt::Appearance app, int p_lighter,
++               int p_red, int p_green, int p_blue) : sourceType(SourceType::Modified)
++        {
++            rec.colorGroup = group;
++            rec.colorRole = role;
++            rec.appearance = app;
++            rec.lighter = p_lighter;
++            rec.deltaRed = p_red;
++            rec.deltaGreen = p_green;
++            rec.deltaBlue = p_blue;
++        }
++
++        // Fixed Source constructor
++        Source(const QBrush &brush) : sourceType(SourceType::Fixed)
++        {
++            fix.fixedBrush = brush;
++        };
++
++        // Invalid constructor and getter
++        Source() : sourceType(SourceType::Invalid) {};
++        bool isValid() const { return sourceType != SourceType::Invalid; }
++
++        // Debug
++        QDebug operator<<(QDebug dbg)
++        {
++            return dbg << "QGtk3Storage::Source(sourceType=" << sourceType << ")";
++        }
++    };
++
++    // Struct with key attributes to identify a brush: color group, color role and appearance
++    struct TargetBrush {
++        QPalette::ColorGroup colorGroup;
++        QPalette::ColorRole colorRole;
++        Qt::Appearance appearance;
++
++        // Generic constructor
++        TargetBrush(QPalette::ColorGroup group, QPalette::ColorRole role,
++                    Qt::Appearance app = Qt::Appearance::Unknown) :
++                    colorGroup(group), colorRole(role), appearance(app) {};
++
++        // Copy constructor with appearance modifier for dark/light aware search
++        TargetBrush(const TargetBrush &other, Qt::Appearance app) :
++            colorGroup(other.colorGroup), colorRole(other.colorRole), appearance(app) {};
++
++        // struct becomes key of a map, so operator< is needed
++        bool operator<(const TargetBrush& other) const {
++           return std::tie(colorGroup, colorRole, appearance) <
++                  std::tie(other.colorGroup, other.colorRole, other.appearance);
++        }
++    };
++
++    // Mapping a palette's brushes to their GTK sources
++    typedef QFlatMap<TargetBrush, Source> BrushMap;
++
++    // Storage of palettes and their GTK sources
++    typedef QFlatMap<QPlatformTheme::Palette, BrushMap> PaletteMap;
++
++    // Public getters
++    const QPalette *palette(QPlatformTheme::Palette = QPlatformTheme::SystemPalette) const;
++    QPixmap standardPixmap(QPlatformTheme::StandardPixmap standardPixmap, const QSizeF &size) const;
++    Qt::Appearance appearance() const { return m_appearance; };
++    static QPalette standardPalette();
++    const QString themeName() const { return m_interface ? m_interface->themeName() : QString(); };
++    const QFont *font(QPlatformTheme::Font type) const;
++    QIcon fileIcon(const QFileInfo &fileInfo) const;
++
++    // Initialization
++    void populateMap();
++    void handleThemeChange();
++
++private:
++    // Storage for palettes and their brushes
++    PaletteMap m_palettes;
++
++    std::unique_ptr<QGtk3Interface> m_interface;
++
++
++    Qt::Appearance m_appearance = Qt::Appearance::Unknown;
++
++    // Caches for Pixmaps, fonts and palettes
++    mutable QCache<QPlatformTheme::StandardPixmap, QImage> m_pixmapCache;
++    mutable std::array<std::optional<QPalette>, QPlatformTheme::Palette::NPalettes> m_paletteCache;
++    mutable std::array<std::optional<QFont>, QPlatformTheme::NFonts> m_fontCache;
++
++    // Search brush with a given GTK3 source
++    QBrush brush(const Source &source, const BrushMap &map) const;
++
++    // Get GTK3 source for a target brush
++    Source brush (const TargetBrush &brush, const BrushMap &map) const;
++
++    // clear cache, palettes and appearance
++    void clear();
++
++    // Data creation, import & export
++    void createMapping ();
++    const PaletteMap savePalettes() const;
++    bool save(const QString &filename, const QJsonDocument::JsonFormat f = QJsonDocument::Indented) const;
++    QJsonDocument save() const;
++    bool load(const QString &filename);
++};
++
++QT_END_NAMESPACE
++#endif // QGTK3STORAGE_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+index aceacda4b8..ee6e0f3dd9 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+@@ -135,6 +135,8 @@ QGtk3Theme::QGtk3Theme()
+                 qputenv("XCURSOR_THEME", cursorTheme.toUtf8());
+         }
+     }
++
++    m_storage.reset(new QGtk3Storage);
+ }
+ 
+ static inline QVariant gtkGetLongPressTime()
+@@ -235,4 +237,25 @@ bool QGtk3Theme::useNativeFileDialog()
+     return gtk_check_version(3, 15, 5) == nullptr;
+ }
+ 
++const QPalette *QGtk3Theme::palette(Palette type) const
++{
++    return m_storage ? m_storage->palette(type) : QPlatformTheme::palette(type);
++}
++
++QPixmap QGtk3Theme::standardPixmap(StandardPixmap sp, const QSizeF &size) const
++{
++    return m_storage ? m_storage->standardPixmap(sp, size) : QPlatformTheme::standardPixmap(sp, size);
++}
++
++const QFont *QGtk3Theme::font(Font type) const
++{
++    return m_storage ? m_storage->font(type) : QGnomeTheme::font(type);
++}
++
++QIcon QGtk3Theme::fileIcon(const QFileInfo &fileInfo,
++                           QPlatformTheme::IconOptions iconOptions) const
++{
++    return m_storage ? m_storage->fileIcon(fileInfo) : QGnomeTheme::fileIcon(fileInfo, iconOptions);
++}
++
+ QT_END_NAMESPACE
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.h b/src/plugins/platformthemes/gtk3/qgtk3theme.h
+index 54296d2ff1..99e896c020 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.h
+@@ -41,6 +41,7 @@
+ #define QGTK3THEME_H
+ 
+ #include <private/qgenericunixthemes_p.h>
++#include "qgtk3storage_p.h"
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -58,9 +59,16 @@ public:
+     QPlatformMenu* createPlatformMenu() const override;
+     QPlatformMenuItem* createPlatformMenuItem() const override;
+ 
++    const QPalette *palette(Palette type = SystemPalette) const override;
++    const QFont *font(Font type = SystemFont) const override;
++    QPixmap standardPixmap(StandardPixmap sp, const QSizeF &size) const override;
++    QIcon fileIcon(const QFileInfo &fileInfo,
++                           QPlatformTheme::IconOptions iconOptions = { }) const override;
++
+     static const char *name;
+ private:
+     static bool useNativeFileDialog();
++    std::unique_ptr<QGtk3Storage> m_storage;
+ };
+ 
+ QT_END_NAMESPACE
+-- 
+2.41.0
+

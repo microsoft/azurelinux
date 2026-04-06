@@ -1,0 +1,31 @@
+From 95b877cfa36c1571487c2a67a3902f1f5c4dc747 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Tue, 7 Jan 2025 16:50:21 -0800
+Subject: [PATCH 5/8] libparted: Fix sun disklabel unhandled exception
+
+The CHS warning should only continue if ignored, not if unhandled.
+
+Script mode, or exception handlers can return PED_EXCEPTION_UNHANDLED
+which should act the same as a cancel. Previously it would only exit if
+cancel was selected, allowing it to continue to use the bad CHS and
+crash later.
+---
+ libparted/labels/sun.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libparted/labels/sun.c b/libparted/labels/sun.c
+index 5ed2886..853576b 100644
+--- a/libparted/labels/sun.c
++++ b/libparted/labels/sun.c
+@@ -284,7 +284,7 @@ _check_geometry_sanity (PedDisk* disk, SunRawLabel* label)
+ 				PED_BE16_TO_CPU(label->pcylcount),
+ 				PED_BE16_TO_CPU(label->ntrks),
+ 				PED_BE16_TO_CPU(label->nsect))
+-			== PED_EXCEPTION_CANCEL)
++			!= PED_EXCEPTION_IGNORE)
+ 			return 0;
+ #endif
+ 		dev->bios_geom.sectors = PED_BE16_TO_CPU(label->nsect);
+-- 
+2.47.1
+

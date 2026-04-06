@@ -1,0 +1,33 @@
+From 6c9234f3b27b3be7d89c277302464015f413e462 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 11 Mar 2013 09:44:22 +0100
+Subject: [PATCH] Reset CFLAGS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index af2c0c3..65f4771 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -64,12 +64,6 @@ if ($^O eq 'VMS') {
+ 	}
+ }
+ 
+-	# Enhance performance on Intel when using gcc
+-
+-if ($Config{archname} =~ /^i[3456]86/ && $Config{ccname} eq 'gcc') {
+-	push(@extra, OPTIMIZE => '-O1 -fomit-frame-pointer');
+-}
+-
+ my $fussy = '-Wall -Wextra -Wconversion -Wcast-align -Wpointer-arith ';
+ push(@extra, CCFLAGS => $fussy . $Config{ccflags}) if $opt_w;
+ 
+-- 
+1.9.3
+

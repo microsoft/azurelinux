@@ -1,0 +1,10 @@
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -31,7 +31,6 @@ classifiers = [
+ ]
+ dependencies = [
+     "typing-extensions>=4.0.0",
+-    "soupsieve >1.2",
+ ]
+ 
+ [project.optional-dependencies]

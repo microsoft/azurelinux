@@ -1,0 +1,11 @@
+--- a/config/BuildSystem/config/packages/MUMPS.orig.py	2020-03-30 05:33:12.000000000 +0200
++++ b/config/BuildSystem/config/packages/MUMPS.py	2020-04-03 17:01:49.237255499 +0200
+@@ -54,7 +54,7 @@
+       if self.scalartypes.scalartype == 'real': l = 'd'
+       else: l = 'z'
+     self.functions = [l+'mumps_c']
+-    self.includes  = [l+'mumps_c.h']
++    self.includes  = ['MUMPS/dmumps_c.h']
+     liblist_common = [['libmumps_common.a','libpord.a','libpthread.a'],
+                      ['libmumps_common.a','libpord.a'],
+                      ['libmumps_common.a','libpord.a','libmpiseq.a'],

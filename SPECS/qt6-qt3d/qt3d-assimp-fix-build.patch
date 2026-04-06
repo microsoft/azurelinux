@@ -1,0 +1,41 @@
+diff --git a/src/3rdparty/assimp/src/code/AssetLib/FBX/FBXBinaryTokenizer.cpp b/src/3rdparty/assimp/src/code/AssetLib/FBX/FBXBinaryTokenizer.cpp
+index 3f56006..a26a928 100644
+--- a/src/3rdparty/assimp/src/code/AssetLib/FBX/FBXBinaryTokenizer.cpp
++++ b/src/3rdparty/assimp/src/code/AssetLib/FBX/FBXBinaryTokenizer.cpp
+@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <assimp/DefaultLogger.hpp>
+ #include <assimp/StringUtils.h>
+ 
++#include <cstdint>
++
+ namespace Assimp {
+ namespace FBX {
+ 
+diff --git a/src/3rdparty/assimp/src/code/Common/Importer.h b/src/3rdparty/assimp/src/code/Common/Importer.h
+index bb37f3b..131e766 100644
+--- a/src/3rdparty/assimp/src/code/Common/Importer.h
++++ b/src/3rdparty/assimp/src/code/Common/Importer.h
+@@ -50,6 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <string>
+ #include <assimp/matrix4x4.h>
+ 
++#include <exception>
++#include <stdexcept>
++
+ struct aiScene;
+ 
+ namespace Assimp {
+diff --git a/src/3rdparty/assimp/src/include/assimp/Importer.hpp b/src/3rdparty/assimp/src/include/assimp/Importer.hpp
+index 44a07eb..ca5ae0b 100644
+--- a/src/3rdparty/assimp/src/include/assimp/Importer.hpp
++++ b/src/3rdparty/assimp/src/include/assimp/Importer.hpp
+@@ -59,6 +59,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include <exception>
+ 
++#include <exception>
++#include <stdexcept>
++
+ namespace Assimp {
+ // =======================================================================
+ // Public interface to Assimp

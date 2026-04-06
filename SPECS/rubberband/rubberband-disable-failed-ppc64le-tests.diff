@@ -1,0 +1,34 @@
+--- a/src/test/TestStretcher.cpp
++++ b/src/test/TestStretcher.cpp
+@@ -1007,6 +1007,7 @@ BOOST_AUTO_TEST_CASE(impulses_slow_highe
+                       false);
+ }
+ 
++#ifndef __PPC64__
+ BOOST_AUTO_TEST_CASE(impulses_slow_lower_realtime_finer)
+ {
+     impulses_realtime(RubberBandStretcher::OptionEngineFiner |
+@@ -1014,6 +1015,7 @@ BOOST_AUTO_TEST_CASE(impulses_slow_lower
+                       8.0, 0.5,
+                       false);
+ }
++#endif
+ 
+ BOOST_AUTO_TEST_CASE(impulses_slow_lower_realtime_finer_hqpitch)
+ {
+@@ -1024,6 +1026,7 @@ BOOST_AUTO_TEST_CASE(impulses_slow_lower
+                       false);
+ }
+ 
++#ifndef __PPC64__
+ BOOST_AUTO_TEST_CASE(impulses_slow_lower_realtime_finer_hcpitch)
+ {
+     impulses_realtime(RubberBandStretcher::OptionEngineFiner |
+@@ -1032,6 +1035,7 @@ BOOST_AUTO_TEST_CASE(impulses_slow_lower
+                       8.0, 0.5,
+                       false);
+ }
++#endif
+ 
+ static void final_realtime(RubberBandStretcher::Options options,
+                            double timeRatio,

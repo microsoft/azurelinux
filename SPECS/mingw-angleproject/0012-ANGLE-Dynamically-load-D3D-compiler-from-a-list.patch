@@ -1,0 +1,59 @@
+From dff9676c60c51fa7af0749e1cb54305f112183e3 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Mon, 10 Dec 2018 08:33:14 +0100
+Subject: [PATCH] ANGLE: Dynamically load D3D compiler from a list
+
+If the default compiler cannot be found, load it from a list of DLL names,
+including a non-versioned proxy DLL provided by Qt. On Desktop Windows,
+the default compiler can also be specified by an environment variable,
+QT_D3DCOMPILER_DLL.
+---
+ src/3rdparty/angle/src/libANGLE/renderer/d3d/HLSLCompiler.cpp | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/HLSLCompiler.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/HLSLCompiler.cpp
+index b38765070..5d47308d6 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/HLSLCompiler.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/HLSLCompiler.cpp
+@@ -14,6 +14,10 @@
+ #include "libANGLE/histogram_macros.h"
+ #include "third_party/trace_event/trace_event.h"
+ 
++#ifndef QT_D3DCOMPILER_DLL
++#define QT_D3DCOMPILER_DLL D3DCOMPILER_DLL
++#endif
++
+ #if ANGLE_APPEND_ASSEMBLY_TO_SHADER_DEBUG_INFO == ANGLE_ENABLED
+ namespace
+ {
+@@ -130,6 +134,27 @@ gl::Error HLSLCompiler::ensureInitialized()
+     }
+ #endif  // ANGLE_PRELOADED_D3DCOMPILER_MODULE_NAMES
+ 
++    // Load the compiler DLL specified by the environment, or default to QT_D3DCOMPILER_DLL
++    const wchar_t *defaultCompiler = _wgetenv(L"QT_D3DCOMPILER_DLL");
++    if (!defaultCompiler)
++        defaultCompiler = QT_D3DCOMPILER_DLL;
++
++    const wchar_t *compilerDlls[] = {
++        defaultCompiler,
++        L"d3dcompiler_47.dll",
++        L"d3dcompiler_46.dll",
++        L"d3dcompiler_43.dll",
++        0
++    };
++
++    // Load the first available known compiler DLL
++    for (int i = 0; compilerDlls[i]; ++i)
++    {
++        mD3DCompilerModule = LoadLibrary(compilerDlls[i]);
++        if (mD3DCompilerModule)
++            break;
++    }
++
+     if (!mD3DCompilerModule)
+     {
+         // Load the version of the D3DCompiler DLL associated with the Direct3D version ANGLE was built with.
+-- 
+2.15.0.windows.1
+

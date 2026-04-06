@@ -1,0 +1,14 @@
+diff -rup a/configure b/configure
+--- a/configure	2023-03-02 16:47:06.631784108 -0500
++++ b/configure	2023-03-02 17:05:12.237816689 -0500
+@@ -4593,8 +4593,8 @@ main ()
+   for (i = 0; i < 256; i++)
+     if (XOR (islower (i), ISLOWER (i))
+ 	|| toupper (i) != TOUPPER (i))
+-      exit(2);
+-  exit (0);
++      return 2;
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext

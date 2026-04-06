@@ -1,0 +1,21 @@
+Partial backport of:
+
+commit 345d865ac6b2f7760503ab144dd68e6062438b80
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Wed Jan 18 00:57:20 2012 -0500
+
+    GtkScale: Fix late setting of marks
+
+diff --git a/gtk/gtkscale.c b/gtk/gtkscale.c
+index 4317523fb8f1918a..a573b2f6ba203b92 100644
+--- a/gtk/gtkscale.c
++++ b/gtk/gtkscale.c
+@@ -1471,7 +1471,7 @@ gtk_scale_add_mark (GtkScale        *scale,
+   mark->position = position;
+  
+   priv->marks = g_slist_insert_sorted_with_data (priv->marks, mark,
+-                                                 (GCompareFunc) compare_marks,
++                                                 compare_marks,
+                                                  GINT_TO_POINTER (
+                                                    gtk_range_get_inverted (GTK_RANGE (scale)) 
+                                                    ));

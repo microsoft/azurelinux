@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# set -x
+
+if [[ "$(uname -m)" == arm* || "$(uname -m)" == aarch64 || "$(uname -m)" == riscv64 ]]
+then
+COMMAND="$1"
+KERNEL_VERSION="$2"
+#BOOT_DIR_ABS="$3"
+#KERNEL_IMAGE="$4"
+
+[ -f /etc/u-boot.conf ] && source /etc/u-boot.conf || true
+[ -z "$FIRMWAREDT" ] || FirmwareDT=$FIRMWAREDT
+
+if [[ $FirmwareDT == "True" ]]
+then
+	# if we want to use firmware DT we remove symlink to current kernel DT
+        if [ -h /boot/dtb ]; then
+            rm -f /boot/dtb
+        fi
+	exit 0
+fi
+
+# Setup a /boot/dtb -> /boot/dtb-$newest_kernel_version symlink so that
+# u-boot can find the correct dtb to load.
+#
+# If invoked to 'add' a new kernel, find the newest based on `sort`ing
+# the kernel versions dtb.  If 'remove', then follow basically the same
+# procedure but exclude the version currently being removed.
+#
+# The theory of operation here is that, while newer kernels may add new
+# dtb nodes and fields, as upstreaming hw support for some particular
+# device progresses, it should never make backward incompatible changes.
+# So it should always be safe to use a newer dtb with an older kernel.
+
+    list_dtb_versions() {
+        excluded_version="$1"
+        for dtbdir in /boot/dtb-*; do
+            dtbver=${dtbdir#*-}
+            if [ "$dtbver" != "$excluded_version" ]; then
+                echo $dtbver
+            fi
+        done
+    }
+
+    setup_dtb_link() {
+        ver=`list_dtb_versions $1 | sort -r --sort=version | head -1`
+        if [ -h /boot/dtb ]; then
+            rm -f /boot/dtb
+        fi
+        ln -s dtb-$ver /boot/dtb
+    }
+
+    ret=0
+    case "$COMMAND" in
+        add)
+            # If we're adding a kernel we want that version
+            if [ -h /boot/dtb ]; then
+                rm -f /boot/dtb
+            fi
+            ln -s dtb-$KERNEL_VERSION /boot/dtb
+            ret=$?
+            ;;
+        remove)
+            setup_dtb_link $KERNEL_VERSION
+            ret=$?
+            ;;
+    esac
+    exit $ret
+else
+    # Just exit on non ARM
+    exit 0
+fi

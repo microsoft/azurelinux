@@ -1,0 +1,83 @@
+X-Pobox-Client-Address: 209.85.214.175
+X-Me-Vsscore: 0
+X-GM-Message-State: ABy/qLbzCx0sN0wd4P84t6gIeK2SsHjgOeAnST/QaCvsPKpurKlNRSEU q3+IBB3pvI2eKMerOXQKqvvtf9+R+YLC+3Qgg+9m+Q==
+X-Pobox-Delivery-ID: E285A3-6275672D6E65742D69646E2D656E636F64654072742E6370616E2E6F7267-7F2BD1A1C1-1690087117-54540213!pb-mx11.pobox.com
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kojima-org.20221208.gappssmtp.com; s=20221208; t=1690087115; x=1690691915; h=content-transfer-encoding:mime-version:message-id:date:subject:cc :to:from:from:to:cc:subject:date:message-id:reply-to; bh=rRGJOoNEL1mEPwJyV0bKQpbJuQbGZz6vW6b0zLT0Kg0=; b=VZByYvq3apQYUEkcq/vjRjfffPBOzZq0FRzZ82jbkNL/Cz5QUe3efOTkPt90aTDsKs TsXymsxB5p/563V5SRrptWI2+qnYylgTt19xu88Rq9noLl5YQPWWiQVj9bK5JaAK9KP7 Q+Id/YOfEGfD23b76Mf87jZvBrYOUE46lYXE/0JQV+AS6eHwQrRCaYuT78MbbIDOgH5Z XU0FOunHLdX683OqiJEL8ShmG3xqwOXwizNqIynib+JZP4l9OhbLONkYsUbkZ3Q8uriY 2H1R2e/EL7DAFu5uT/4+JB3iYP2hC219lKZejeLZDxsRpvmu+NUYQEG9sAnu3kTqDk7h ITDA==
+Authentication-Results: pb-mx11.pobox.com; arc=none (no signatures found); bimi=skipped (DMARC did not pass); dkim=pass (2048-bit rsa key sha256) header.d=kojima-org.20221208.gappssmtp.com header.i=@kojima-org.20221208.gappssmtp.com header.b=VZByYvq3 header.a=rsa-sha256 header.s=20221208 x-bits=2048; dmarc=none policy.published-domain-policy=none policy.applied-disposition=none policy.evaluated-disposition=none (p=none,d=none,d.eval=none) policy.policy-from=p header.from=kojima.org; iprev=pass smtp.remote-ip=209.85.214.175 (mail-pl1-f175.google.com); spf=none smtp.mailfrom=shin@kojima.org smtp.helo=mail-pl1-f175.google.com; x-aligned-from=pass (Address match); x-google-dkim=pass (2048-bit rsa key) header.d=1e100.net header.i=@1e100.net header.b=EIjEFjpq; x-me-sender=none; x-ptr=pass smtp.helo=mail-pl1-f175.google.com policy.ptr=mail-pl1-f175.google.com; x-return-mx=pass header.domain=kojima.org policy.is_org=yes (MX Records found: aspmx3.googlemail.com,alt2.aspmx.l.google.com,aspmx2.googlemail.com,alt1.aspmx.l.google.com,aspmx.l.google.com); x-return-mx=pass smtp.domain=kojima.org policy.is_org=yes (MX Records found: aspmx3.googlemail.com,alt2.aspmx.l.google.com,aspmx2.googlemail.com,alt1.aspmx.l.google.com,aspmx.l.google.com); x-tls=pass smtp.version=TLSv1.2 smtp.cipher=ECDHE-RSA-AES128-GCM-SHA256 smtp.bits=128/128; x-vs=clean score=0 state=0
+Arc-Authentication-Results: i=1; pb-mx11.pobox.com; arc=none (no signatures found); bimi=skipped (DMARC did not pass); dkim=pass (2048-bit rsa key sha256) header.d=kojima-org.20221208.gappssmtp.com header.i=@kojima-org.20221208.gappssmtp.com header.b=VZByYvq3 header.a=rsa-sha256 header.s=20221208 x-bits=2048; dmarc=none policy.published-domain-policy=none policy.applied-disposition=none policy.evaluated-disposition=none (p=none,d=none,d.eval=none) policy.policy-from=p header.from=kojima.org; iprev=pass smtp.remote-ip=209.85.214.175 (mail-pl1-f175.google.com); spf=none smtp.mailfrom=shin@kojima.org smtp.helo=mail-pl1-f175.google.com; x-aligned-from=pass (Address match); x-google-dkim=pass (2048-bit rsa key) header.d=1e100.net header.i=@1e100.net header.b=EIjEFjpq; x-me-sender=none; x-ptr=pass smtp.helo=mail-pl1-f175.google.com policy.ptr=mail-pl1-f175.google.com; x-return-mx=pass header.domain=kojima.org policy.is_org=yes (MX Records found: aspmx3.googlemail.com,alt2.aspmx.l.google.com,aspmx2.googlemail.com,alt1.aspmx.l.google.com,aspmx.l.google.com); x-return-mx=pass smtp.domain=kojima.org policy.is_org=yes (MX Records found: aspmx3.googlemail.com,alt2.aspmx.l.google.com,aspmx2.googlemail.com,alt1.aspmx.l.google.com,aspmx.l.google.com); x-tls=pass smtp.version=TLSv1.2 smtp.cipher=ECDHE-RSA-AES128-GCM-SHA256 smtp.bits=128/128; x-vs=clean score=0 state=0
+X-RT-Mail-Extension: net-idn-encode
+X-Scanned-BY: Hosted RT Scanning Service on 127.0.1.1
+X-Mailer: git-send-email 2.41.0
+Subject: [PATCH] use uvchr_to_utf8_flags instead of uvuni_to_utf8_flags (which is removed in perl 5.38.0)
+X-Me-Vscategory: clean
+X-Spam-Score: 0.24 ()
+From: "Shin Kojima" <shin@kojima.org>
+X-Pobox-Loop-ID: 4fb7f633aae9f9ee4ea454b892cae4d25e3469f0
+Content-Transfer-Encoding: 8bit
+Received-SPF: none (kojima.org: No applicable sender policy available) receiver=pb-mx11.pobox.com; identity=mailfrom; envelope-from="shin@kojima.org"; helo=mail-pl1-f175.google.com; client-ip=209.85.214.175
+Delivered-To: bug-Net-IDN-Encode@rt-cpan-org.hostedrt.com
+Delivered-To: bug-Net-IDN-Encode@rt.cpan.org
+X-Pobox-Client-Helo: mail-pl1-f175.google.com
+Arc-Seal: i=1; a=rsa-sha256; cv=none; d=pobox.com; s=arcseal; t= 1690087117; b=tXMSky5aBonIUPhzHDfUvvgVMn/kAbGUowxNeZWFkfKoso7FjY FyTJYqN3dUweP5Uz/WVxngq0HLuaONCzDOfGmNHpXFWA70tUVNjudr4hOXwd8d36 RGrzLqATTr4X/mnP2ca6ONAKmYgjpe+EDIiWS+L+X3vLLjxx+wMgTG+0Vcv1Qhbr D2G+VSCzypFm2sp7yRJTPnHQ2iC9Ewf86zdQHFNDISU9JxW+GC7UyKsnysLhx2/z fsqzgZOQUM7DwTcOwNZ+dmYZD7aM5kkGU9w/DqArJD/8bV6OZlDSeroaZoVehzwm DE0pOSgGcu3/2+CZ35G/m6lyev4rddzMXifg==
+X-RT-Incoming-Encryption: Not encrypted
+X-Google-SMTP-Source: APBJJlFSGxzynsS3f8NNag+Lduj0SK+mX3JNJlhlzWlk6vx7Vr9vpRdX3JA1OjiQOeq4Ii3G0UbM5Q==
+MIME-Version: 1.0
+Date: Sun, 23 Jul 2023 13:37:45 +0900
+To: bug-Net-IDN-Encode@rt.cpan.org
+X-Received: by 2002:a17:902:f681:b0:1b6:bced:1dc2 with SMTP id l1-20020a170902f68100b001b6bced1dc2mr6338681plg.0.1690087115277; Sat, 22 Jul 2023 21:38:35 -0700 (PDT)
+Arc-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d= pobox.com; h=from:to:cc:subject:date:message-id:mime-version :content-transfer-encoding; s=arcseal; t=1690087117; bh=rRGJOoNE L1mEPwJyV0bKQpbJuQbGZz6vW6b0zLT0Kg0=; b=kntCIrYGzoFgMYyWE0ikzXbn 1Anv1WggFaOpX0q6SwrR9QOJcP3zX4Jybh4PwCoGZpRkfNYqZDdLxtl/6bdaRfY6 on1qFm3llrHh4EkuFh8RVkf/sriUuldDfLn83HMYvm925KR+bXqfELx9zzm3Gfzy wmb5MqUpISCgREvDryzc7BbJVPzg0pRxUg7lQYLvJQkSceY3rCtFnjgy7fmN2mTB HunOlww7m9aKmIuU6HaKJkk8QGVnow+6ANmYpA27Ppd9b3YYAMEIxoQl9KbH2s5W P3yt3c1/ZbPnRk4pjpRiz+bJhXMuSYZjde1EHfkoiAAb7R9dAxZ5HeDbjVq4IA==
+Received: from mail2.hostedrt.com (mail2.hostedrt.com [54.235.7.195]) by rt.cpan.org (Postfix) with ESMTPS id B0566A01D0 for <bug-Net-IDN-Encode@rt-cpan-org.hostedrt.com>; Sun, 23 Jul 2023 04:38:39 +0000 (UTC)
+Received: from pb-mx11.pobox.com (pb-mx11.pobox.com [64.147.108.52]) by mail2.hostedrt.com (Postfix) with ESMTPS id E50FD60688 for <bug-Net-IDN-Encode@rt-cpan-org.hostedrt.com>; Sun, 23 Jul 2023 04:38:37 +0000 (UTC)
+Received: from pb-mx11.nyi.icgroup.com (localhost.local [127.0.0.1]) by pb-mx11.pobox.com (Postfix) with ESMTP id 9BF0B1A1C2 for <bug-Net-IDN-Encode@rt-cpan-org.hostedrt.com>; Sun, 23 Jul 2023 00:38:37 -0400 (EDT) (envelope-from SRS0=wVxx=DJ=kojima.org=shin@bounce2.pobox.com)
+Received: from pb-mx11.pobox.com (localhost.local [127.0.0.1]) by pb-mx11.pobox.com (Postfix) with ESMTP id 7F2BD1A1C1 for <bug-Net-IDN-Encode@rt.cpan.org>; Sun, 23 Jul 2023 00:38:37 -0400 (EDT) (envelope-from shin@kojima.org)
+Received: from pb-mx11.pobox.com (localhost [127.0.0.1]) by pb-mx11.pobox.com (Authentication Milter) with ESMTP id 19A6438E24C; Sun, 23 Jul 2023 00:38:37 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175]) (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits)) (No client certificate requested) by pb-mx11.pobox.com (Postfix) with ESMTPS for <bug-Net-IDN-Encode@rt.cpan.org>; Sun, 23 Jul 2023 00:38:36 -0400 (EDT) (envelope-from shin@kojima.org)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b8b4748fe4so18700765ad.1 for <bug-Net-IDN-Encode@rt.cpan.org>; Sat, 22 Jul 2023 21:38:36 -0700 (PDT)
+Received: from localhost.localdomain ([2409:10:85a0:a00:2887:70cd:9384:1466]) by smtp.gmail.com with ESMTPSA id r16-20020a170902be1000b001b8422f1000sm6157752pls.201.2023.07.22.21.38.33 (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256); Sat, 22 Jul 2023 21:38:34 -0700 (PDT)
+CC: CFAERBER@cpan.org, "Shin Kojima" <shin@kojima.org>
+X-Me-Vscause: gggruggvucftvghtrhhoucdtuddrgedviedrheehgdekgecutefuodetggdotefrodftvf curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecunecujfgurhephffvvefuff fkofgggfestdekredtredttdenucfhrhhomhepufhhihhnucfmohhjihhmrgcuoehshhhi nheskhhojhhimhgrrdhorhhgqeenucggtffrrghtthgvrhhnpeegueejveehffduudfhge egtdejkeefudeffefhlefftedvteeluefhjeegvdfgffenucffohhmrghinhepphgvrhhl rdhorhhgnecukfhppedvtdelrdekhedrvddugedrudejhedpvdegtdelmedutdemkeehrg dtmegrtddtmedvkeekjeemjedttggumeelfeekgeemudegieeinecuvehluhhsthgvrhfu ihiivgeptdenucfrrghrrghmpehinhgvthepvddtledrkeehrddvudegrddujeehpdhhvg hlohepmhgrihhlqdhplhduqdhfudejhedrghhoohhglhgvrdgtohhmpdhmrghilhhfrhho mhepoehshhhinheskhhojhhimhgrrdhorhhgqe
+X-Pobox-Original-Sender: shin@kojima.org
+X-Google-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20221208; t=1690087115; x=1690691915; h=content-transfer-encoding:mime-version:message-id:date:subject:cc :to:from:x-gm-message-state:from:to:cc:subject:date:message-id :reply-to; bh=rRGJOoNEL1mEPwJyV0bKQpbJuQbGZz6vW6b0zLT0Kg0=; b=EIjEFjpq+hh0bh9dsyY58lJ4isebVzStVI6mt7zj+076NwEAnFm5yUbfncyz6KacBn jmy/CNJHyTMqPb+wOtGWpwNQyr6j0//gmEwWzg9kRNLs73+5uAZMAkUX8NF8gY7JWXHg LYuCnski5/csTjlx1Feo/Cy4XiIRA2cTy1jgs448gCxuac3VIpkdIWvv1CO/3uCY30mH Q94m9zGahe4JxCuuA66y0hb0JbSfq68UMiACseLAicLJpnadj88Wh7fGGHN7WwGb+WEY DTS8FKsqf1kKhVHJw8xyPXx6tbsYvhvm1kbm6D8qr+ImoKwo8H1/Fe1BayBRiu4VQXZa uqAQ==
+X-Original-To: bug-Net-IDN-Encode@rt-cpan-org.hostedrt.com
+From SRS0=wVxx=DJ=kojima.org=shin@bounce2.pobox.com  Sun Jul 23 04:38:39 2023
+X-Pobox-Client-Name: mail-pl1-f175.google.com
+Return-Path: <SRS0=wVxx=DJ=kojima.org=shin@bounce2.pobox.com>
+Message-ID: <20230723043758.58472-1-shin@kojima.org>
+X-RT-Original-Encoding: ascii
+content-type: text/plain; charset="utf-8"
+X-RT-Interface: Email
+Content-Length: 1112
+
+https://perldoc.perl.org/5.36.0/perlintern#uvuni_to_utf8_flags
+Signed-off-by: Shin Kojima <shin@kojima.org>
+---
+ lib/Net/IDN/Punycode.xs | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/Net/IDN/Punycode.xs b/lib/Net/IDN/Punycode.xs
+index 211ef9c..36530dd 100644
+--- a/lib/Net/IDN/Punycode.xs
++++ b/lib/Net/IDN/Punycode.xs
+@@ -24,6 +24,10 @@
+ #define utf8_to_uvchr_buf(in_p,in_e,u8) utf8_to_uvchr(in_p,u8);
+ #endif
+ 
++#ifndef uvchr_to_utf8_flags
++#define uvchr_to_utf8_flags(d, uv, flags) uvuni_to_utf8_flags(d, uv, flags);
++#endif
++
+ static char enc_digit[BASE] = {
+   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+   'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+@@ -253,7 +257,7 @@ decode_punycode(input)
+ 		  if(skip_p < re_p)				/* move succeeding chars */
+ 		    Move(skip_p, skip_p + u8, re_p - skip_p, char);
+ 		  re_p += u8;
+-		  uvuni_to_utf8_flags((U8*)skip_p, n, UNICODE_ALLOW_ANY);
++		  uvchr_to_utf8_flags((U8*)skip_p, n, UNICODE_ALLOW_ANY);
+ 		}
+ 
+ 		if(!first) SvUTF8_on(RETVAL);			/* UTF-8 chars have been inserted */
+-- 
+2.41.0
+

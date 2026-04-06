@@ -1,0 +1,68 @@
+From: Roger Lipscombe <roger@differentpla.net>
+Date: Fri, 11 Jun 2021 20:42:49 +0100
+Subject: [PATCH] Separate 'line' and 'col' metadata on OTP-24
+
+
+diff --git a/src/lager_transform.erl b/src/lager_transform.erl
+index bd03512..089ea60 100644
+--- a/src/lager_transform.erl
++++ b/src/lager_transform.erl
+@@ -136,28 +136,41 @@ add_function_transforms(Line, DefaultAttrs, [{Atom, on_log, {Module, Function}}|
+     add_function_transforms(Line, {cons, Line, NewFunction, DefaultAttrs}, Remainder).
+ 
+ 
++build_dynamic_attrs(Line) ->
++    {cons, Line, {tuple, Line, [
++                                {atom, Line, pid},
++                                {call, Line, {atom, Line, pid_to_list}, [
++                                                                         {call, Line, {atom, Line ,self}, []}]}]},
++     {cons, Line, {tuple, Line, [
++                                 {atom, Line, node},
++                                 {call, Line, {atom, Line, node}, []}]},
++      %% get the metadata with lager:md(), this will always return a list so we can use it as the tail here
++      {call, Line, {remote, Line, {atom, Line, lager}, {atom, Line, md}}, []}}}.
++
++build_mf_attrs(Line, Attrs0) ->
++    {cons, Line, {tuple, Line, [
++                                {atom, Line, module}, {atom, Line, get(module)}]},
++     {cons, Line, {tuple, Line, [
++                                 {atom, Line, function}, {atom, Line, get(function)}]},
++      Attrs0}}.
++
++build_loc_attrs(Line, Attrs0) when is_integer(Line) ->
++    {cons, Line, {tuple, Line, [
++                                {atom, Line, line}, {integer, Line, Line}]},
++     Attrs0};
++build_loc_attrs(Line = {LineNum, Col}, Attrs0) when is_integer(LineNum), is_integer(Col) ->
++    {cons, Line, {tuple, Line, [
++                                {atom, Line, line}, {integer, Line, LineNum}]},
++     {cons, Line, {tuple, Line, [
++                                 {atom, Line, col}, {integer, Line, Col}]},
++      Attrs0}}.
++
+ do_transform(Line, SinkName, Severity, Arguments0) ->
+     do_transform(Line, SinkName, Severity, Arguments0, safe).
+ 
+ do_transform(Line, SinkName, Severity, Arguments0, Safety) ->
+     SeverityAsInt=lager_util:level_to_num(Severity),
+-    DefaultAttrs0 = {cons, Line, {tuple, Line, [
+-                                                {atom, Line, module}, {atom, Line, get(module)}]},
+-                     {cons, Line, {tuple, Line, [
+-                                                 {atom, Line, function}, {atom, Line, get(function)}]},
+-                      {cons, Line, {tuple, Line, [
+-                                                  {atom, Line, line},
+-                                                  {integer, Line, Line}]},
+-                       {cons, Line, {tuple, Line, [
+-                                                   {atom, Line, pid},
+-                                                   {call, Line, {atom, Line, pid_to_list}, [
+-                                                                                            {call, Line, {atom, Line ,self}, []}]}]},
+-                        {cons, Line, {tuple, Line, [
+-                                                    {atom, Line, node},
+-                                                    {call, Line, {atom, Line, node}, []}]},
+-                         %% get the metadata with lager:md(), this will always return a list so we can use it as the tail here
+-                         {call, Line, {remote, Line, {atom, Line, lager}, {atom, Line, md}}, []}}}}}},
+-                                                %{nil, Line}}}}}}},
++    DefaultAttrs0 = build_mf_attrs(Line, build_loc_attrs(Line, build_dynamic_attrs(Line))),
+     Functions = get(functions),
+     DefaultAttrs1 = add_function_transforms(Line, DefaultAttrs0, Functions),
+     DefaultAttrs = case erlang:get(application) of

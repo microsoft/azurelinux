@@ -1,0 +1,39 @@
+d /run/keylime 0700 keylime keylime -
+
+d /var/lib/keylime 0700 keylime keylime -
+
+d /etc/keylime 0500 keylime keylime -
+d /etc/keylime/logging.conf.d 0500 keylime keylime -
+d /etc/keylime/verifier.conf.d 0500 keylime keylime -
+d /etc/keylime/registrar.conf.d 0500 keylime keylime -
+d /etc/keylime/tenant.conf.d 0500 keylime keylime -
+d /etc/keylime/agent.conf.d 0500 keylime keylime -
+
+# TPM certificate store.
+# Copy the cert store from /usr/share/keylime/tpm_cert_store
+# to /var/lib/keylime/tpm_cert_store.
+# Files inside /var/lib/keylime/tpm_cert_store/ have
+# 0400 permission and are owned by keylime/keylime,
+# while /var/lib/keylime/tpm_cert_store/ itself has
+# permission 0500, also owned by keylime/keylime.
+C /var/lib/keylime/tpm_cert_store 0500 keylime keylime - /usr/share/keylime/tpm_cert_store
+Z /var/lib/keylime/tpm_cert_store 0400 keylime keylime -
+z /var/lib/keylime/tpm_cert_store 0500 keylime keylime -
+# Finally, /var/lib/keylime itself has 0700 permission,
+# and is owned by keylime/keylime.
+z /var/lib/keylime 0700 keylime keylime -
+
+# Keylime configuration in /etc/keylime has permission 0400
+# owned by keylime/keylime, while snippet directories and
+# the actual /etc/keylime directory have permission 0500,
+# also owned by keylime/keylime.
+Z /etc/keylime 0400 keylime keylime -
+# Now fix the directories:
+z /etc/keylime/ca.conf.d 0500 keylime keylime -
+z /etc/keylime/logging.conf.d 0500 keylime keylime -
+z /etc/keylime/verifier.conf.d 0500 keylime keylime -
+z /etc/keylime/registrar.conf.d 0500 keylime keylime -
+z /etc/keylime/tenant.conf.d 0500 keylime keylime -
+z /etc/keylime/agent.conf.d 0500 keylime keylime -
+# And finally, /etc/keylime itself.
+z /etc/keylime 0500 keylime keylime -

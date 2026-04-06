@@ -1,0 +1,195 @@
+From 01b646d2af0ed885d01d31a6479898a3c423a630 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 26 Apr 2018 10:00:19 +0200
+Subject: [PATCH 52/59] Fix rDNS with IPv6
+
+Previously IPv6 addresses were not translated to hostnames for PAM to use.
+---
+ privops.c    |  3 ++-
+ sysdeputil.c | 28 +++++++++++++++-------------
+ sysdeputil.h |  5 ++++-
+ sysutil.c    | 35 +++++++++++++++++++++++++++++++++++
+ sysutil.h    |  4 ++++
+ 5 files changed, 60 insertions(+), 15 deletions(-)
+
+diff --git a/privops.c b/privops.c
+index f27c5c4..e577a27 100644
+--- a/privops.c
++++ b/privops.c
+@@ -383,7 +383,8 @@ handle_local_login(struct vsf_session* p_sess,
+                    struct mystr* p_user_str,
+                    const struct mystr* p_pass_str)
+ {
+-  if (!vsf_sysdep_check_auth(p_user_str, p_pass_str, &p_sess->remote_ip_str))
++  if (!vsf_sysdep_check_auth(p_sess, p_user_str, p_pass_str,
++                             &p_sess->remote_ip_str))
+   {
+     return kVSFLoginFail;
+   }
+diff --git a/sysdeputil.c b/sysdeputil.c
+index 2063c87..4fe56c2 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -16,10 +16,6 @@
+ #include "tunables.h"
+ #include "builddefs.h"
+ 
+-/* For gethostbyaddr, inet_addr */
+-#include <netdb.h>
+-#include <arpa/inet.h>
+-
+ /* For Linux, this adds nothing :-) */
+ #include "port/porting_junk.h"
+ 
+@@ -242,13 +238,15 @@ void vsf_remove_uwtmp(void);
+ 
+ #ifndef VSF_SYSDEP_HAVE_PAM
+ int
+-vsf_sysdep_check_auth(struct mystr* p_user_str,
++vsf_sysdep_check_auth(struct vsf_session* p_sess,
++                      struct mystr* p_user_str,
+                       const struct mystr* p_pass_str,
+                       const struct mystr* p_remote_host)
+ {
+   const char* p_crypted;
+   const struct passwd* p_pwd = getpwnam(str_getbuf(p_user_str));
+   (void) p_remote_host;
++  (void) p_sess;
+   if (p_pwd == NULL)
+   {
+     return 0;
+@@ -322,14 +320,14 @@ static int pam_conv_func(int nmsg, const struct pam_message** p_msg,
+ static void vsf_auth_shutdown(void);
+ 
+ int
+-vsf_sysdep_check_auth(struct mystr* p_user_str,
++vsf_sysdep_check_auth(struct vsf_session* p_sess,
++                      struct mystr* p_user_str,
+                       const struct mystr* p_pass_str,
+                       const struct mystr* p_remote_host)
+ {
+   int retval = -1;
+ #ifdef PAM_RHOST
+-  struct sockaddr_in sin;
+-  struct hostent *host;
++  struct mystr hostname = INIT_MYSTR;
+ #endif
+   pam_item_t item;
+   const char* pam_user_name = 0;
+@@ -354,13 +352,17 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
+     return 0;
+   }
+ #ifdef PAM_RHOST
+-  if (tunable_reverse_lookup_enable) {
+-    sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
+-    host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
+-    if (host != (struct hostent*)0)
+-      retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
++  if (tunable_reverse_lookup_enable)
++  {
++    if (vsf_sysutil_get_hostname(p_sess->p_remote_addr, &hostname) == 0)
++    {
++      retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(&hostname));
++      str_free(&hostname);
++    }
+     else
++    {
+       retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
++    }
+   } else {
+     retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
+   }
+diff --git a/sysdeputil.h b/sysdeputil.h
+index 3b6b30a..6f2aa0a 100644
+--- a/sysdeputil.h
++++ b/sysdeputil.h
+@@ -5,6 +5,8 @@
+ #include "filesize.h"
+ #endif
+ 
++#include "session.h"
++
+ /* VSF_SYSDEPUTIL_H:
+  * Support for highly system dependent features, and querying for support
+  * or lack thereof
+@@ -15,7 +17,8 @@ struct mystr;
+ 
+ /* Authentication of local users */
+ /* Return 0 for fail, 1 for success */
+-int vsf_sysdep_check_auth(struct mystr* p_user,
++int vsf_sysdep_check_auth(struct vsf_session* p_sess,
++                          struct mystr* p_user,
+                           const struct mystr* p_pass,
+                           const struct mystr* p_remote_host);
+ 
+diff --git a/sysutil.c b/sysutil.c
+index e847650..b68583b 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -2356,6 +2356,41 @@ vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
+   }
+ }
+ 
++int
++vsf_sysutil_get_hostname(struct vsf_sysutil_sockaddr *p_addr,
++                         struct mystr* p_str)
++{
++  struct sockaddr *sa;
++  socklen_t sa_len = 0;
++  char hostname[NI_MAXHOST];
++  int res;
++
++  sa = &p_addr->u.u_sockaddr;
++  if (sa->sa_family == AF_INET)
++  {
++    sa_len = sizeof(struct sockaddr_in);
++  }
++  else if (sa->sa_family == AF_INET6)
++  {
++    sa_len = sizeof(struct sockaddr_in6);
++  }
++  else
++  {
++    die("can only support ipv4 and ipv6 currently");
++  }
++  res = getnameinfo(sa, sa_len, hostname, sizeof(hostname), NULL, 0,
++                    NI_NAMEREQD);
++  if (res == 0)
++  {
++    str_alloc_text(p_str, hostname);
++    return 0;
++  }
++  else
++  {
++    return -1;
++  }
++}
++
+ struct vsf_sysutil_user*
+ vsf_sysutil_getpwuid(const unsigned int uid)
+ {
+diff --git a/sysutil.h b/sysutil.h
+index 7a59f13..2df14ed 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -7,6 +7,8 @@
+ #include "filesize.h"
+ #endif
+ 
++#include "str.h"
++
+ /* Return value queries */
+ int vsf_sysutil_retval_is_error(int retval);
+ enum EVSFSysUtilError
+@@ -266,6 +268,8 @@ int vsf_sysutil_connect_timeout(int fd,
+                                 unsigned int wait_seconds);
+ void vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
+                              const char* p_name);
++int vsf_sysutil_get_hostname(struct vsf_sysutil_sockaddr *p_addr,
++                             struct mystr* p_str);
+ /* Option setting on sockets */
+ void vsf_sysutil_activate_keepalive(int fd);
+ void vsf_sysutil_rcvtimeo(int fd);
+-- 
+2.14.4
+

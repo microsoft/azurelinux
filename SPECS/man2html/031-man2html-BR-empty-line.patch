@@ -1,0 +1,25 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sun, 7 Sep 2008 11:11:19 +0200
+Subject: 031 man2html BR empty line
+
+Ignore font change requests that are note followed by any words (closes: #489181).
+---
+ man2html/man2html.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index d5da097..e291536 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -2131,7 +2131,10 @@ scan_request(char *c) {
+ 		char font[2];
+ 		font[0] = c[0]; font[1] = c[1];
+ 		c = c+j;
+-		if (*c == '\n') c++;
++		if (*c == '\n') {
++		    c++;
++		    break;
++		}
+ 		sl = fill_words(c, wordlist, SIZE(wordlist), &words, '\n');
+ 		c = sl+1;
+ 		/* .BR name (section)

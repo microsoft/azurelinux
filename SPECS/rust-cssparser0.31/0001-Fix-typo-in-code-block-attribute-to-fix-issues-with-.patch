@@ -1,0 +1,63 @@
+From e21e48330ed0f28d15429374b5f8b846547c490c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 16:48:17 +0200
+Subject: [PATCH] Fix typo in code block attribute to fix issues with Rust
+ 1.80+
+
+---
+ src/lib.rs        | 4 ++--
+ src/parser.rs     | 2 +-
+ src/serializer.rs | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 7ab88e8..8d0074e 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -41,7 +41,7 @@ As a consequence, when calling another parsing function, either:
+ 
+ Examples:
+ 
+-```{rust,ignore}
++```rust,ignore
+ // 'none' | <image>
+ fn parse_background_image(context: &ParserContext, input: &mut Parser)
+                                     -> Result<Option<Image>, ()> {
+@@ -53,7 +53,7 @@ fn parse_background_image(context: &ParserContext, input: &mut Parser)
+ }
+ ```
+ 
+-```{rust,ignore}
++```rust,ignore
+ // [ <length> | <percentage> ] [ <length> | <percentage> ]?
+ fn parse_border_spacing(_context: &ParserContext, input: &mut Parser)
+                           -> Result<(LengthOrPercentage, LengthOrPercentage), ()> {
+diff --git a/src/parser.rs b/src/parser.rs
+index afc6281..88a1726 100644
+--- a/src/parser.rs
++++ b/src/parser.rs
+@@ -270,7 +270,7 @@ impl BlockType {
+ ///
+ /// The union of two sets can be obtained with the `|` operator. Example:
+ ///
+-/// ```{rust,ignore}
++/// ```rust,ignore
+ /// input.parse_until_before(Delimiter::CurlyBracketBlock | Delimiter::Semicolon)
+ /// ```
+ #[derive(Copy, Clone, PartialEq, Eq, Debug)]
+diff --git a/src/serializer.rs b/src/serializer.rs
+index ec970d1..936037b 100644
+--- a/src/serializer.rs
++++ b/src/serializer.rs
+@@ -283,7 +283,7 @@ where
+ ///
+ /// Typical usage:
+ ///
+-/// ```{rust,ignore}
++/// ```rust,ignore
+ /// fn write_foo<W>(foo: &Foo, dest: &mut W) -> fmt::Result where W: fmt::Write {
+ ///     dest.write_str("\"")?;
+ ///     {
+-- 
+2.46.0
+

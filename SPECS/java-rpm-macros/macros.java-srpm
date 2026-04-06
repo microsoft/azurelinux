@@ -1,0 +1,27 @@
+# Arches that OpenJDK and dependent packages run on
+%java_arches aarch64 ppc64le s390x x86_64 riscv64
+
+
+%buildsystem_maven_conf(-) %{lua:
+  __dola_buildoption_jpb = false
+  if rpm.expand("%2") == "usesJavapackagesBootstrap" then
+    __dola_buildoption_jpb = true
+  end
+  print("echo Error: unexpected invocation of a dummy conf script for BuildSystem: maven >&2; exit 1")
+}
+
+%buildsystem_maven_generate_buildrequires(-) %{lua:
+  if rpm.expand("%{with bootstrap}") ~= "0" and __dola_buildoption_jpb then
+    print("echo javapackages-bootstrap")
+  else
+    print("echo dola")
+  end
+}
+
+%buildsystem_maven_build(-) %{lua:
+  print("echo Error: unexpected invocation of a dummy build script for BuildSystem: maven >&2; exit 1")
+}
+
+%buildsystem_maven_install(-) %{lua:
+  print("echo Error: unexpected invocation of a dummy install script for BuildSystem: maven >&2; exit 1")
+}

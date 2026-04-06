@@ -1,0 +1,27 @@
+From f028fc042ef2875a13c6abf3828626a313e4a8e6 Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Fri, 1 Aug 2025 15:38:22 +0000
+Subject: [PATCH] clang: Add a hack to fix the offload build with the
+ mtls-dialect option
+
+---
+ clang/lib/Driver/ToolChains/CommonArgs.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/clang/lib/Driver/ToolChains/CommonArgs.cpp b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+index 097d186ad8ea..0dc9e60f8428 100644
+--- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
++++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
+@@ -920,6 +920,9 @@ bool tools::isTLSDESCEnabled(const ToolChain &TC,
+   } else if (Triple.isX86()) {
+     SupportedArgument = V == "gnu" || V == "gnu2";
+     EnableTLSDESC = V == "gnu2";
++  } else if( Triple.isGPU()) {
++    // HACK To fix the offload build.
++    return false;
+   } else {
+     Unsupported = true;
+   }
+-- 
+2.49.0
+

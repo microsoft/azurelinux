@@ -1,0 +1,53 @@
+converterSample.asl     15:     Name (b, 5)
+Remark   2182 -                      ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (B___)
+
+converterSample.asl     16:     Name(p008, Package()
+Remark   2182 -                        ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (P008)
+
+converterSample.asl     48:             Name(b,0);
+Remark   2182 -                             ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (B___)
+
+converterSample.asl     53:    Name (a,
+Remark   2182 -                     ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (A___)
+
+converterSample.asl     68:         Name (a1, 0x04)
+Remark   2182 -                           ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (A1__)
+
+converterSample.asl     15:     Name (b, 5)
+Remark   2182 -                      ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (B___)
+
+converterSample.asl     16:     Name(p008, Package()
+Remark   2182 -                        ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (P008)
+
+converterSample.asl     37:     Method(MAIN) {
+Remark   2120 -                          ^ Control Method should be made Serialized due to creation of named objects within (\MAIN)
+
+converterSample.asl     48:             Name(b,0);
+Remark   2182 -                             ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (B___)
+
+converterSample.asl     48:             Name(b,0);
+Remark   2089 -    Object is not referenced ^  (Name [B___] is within a method [MAIN])
+
+converterSample.asl     53:    Name (a,
+Remark   2182 -                     ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (A___)
+
+converterSample.asl     65:     Method(SCOP)
+Remark   2120 -                          ^ Control Method should be made Serialized due to creation of named objects within (\SCOP)
+
+converterSample.asl     68:         Name (a1, 0x04)
+Remark   2182 -                           ^ At least one lower case letter found in NameSeg, ASL is case insensitive - converting to upper case (A1__)
+
+converterSample.asl     68:         Name (a1, 0x04)
+Remark   2089 -  Object is not referenced ^  (Name [A1__] is within a method [SCOP])
+
+
+Intel ACPI Component Architecture
+ASL+ Optimizing Compiler/Disassembler version VVVVVVVV
+Copyright (c) 2000 - 2023 Intel Corporation
+
+Ignoring all errors, forcing AML file generation
+
+ASL Input:     converterSample.asl -    1968 bytes     11 keywords      0 source lines
+AML Output:    converterSample.aml -     184 bytes      2 opcodes       9 named objects
+
+Compilation successful. 0 Errors, 0 Warnings, 9 Remarks, 9 Optimizations

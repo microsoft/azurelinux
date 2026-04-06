@@ -1,0 +1,21 @@
+From 69c45b857ca4168522942a59cb5d064fec230155 Mon Sep 17 00:00:00 2001
+From: Christian Schmidt <github@chsc.dk>
+Date: Fri, 2 Aug 2024 17:22:58 +0200
+Subject: [PATCH] Rescue exceptions
+
+---
+ lib/webmock/request_pattern.rb    | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/webmock/request_pattern.rb b/lib/webmock/request_pattern.rb
+index 44c3f28b..124087ff 100644
+--- a/lib/webmock/request_pattern.rb
++++ b/lib/webmock/request_pattern.rb
+@@ -309,6 +309,7 @@ def body_as_hash(body, content_type)
+       else
+         WebMock::Util::QueryMapper.query_to_values(body, notation: Config.instance.query_values_notation)
+       end
++    rescue Psych::SyntaxError, REXML::ParseException
+     end
+ 
+     def body_format(content_type)

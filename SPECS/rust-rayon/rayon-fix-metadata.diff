@@ -1,0 +1,26 @@
+--- rayon-1.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rayon-1.11.0/Cargo.toml	2025-08-16T19:24:10.831153+00:00
+@@ -37,12 +37,6 @@
+ categories = ["concurrency"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/rayon-rs/rayon"
+-
+-[features]
+-web_spin_lock = [
+-    "dep:wasm_sync",
+-    "rayon-core/web_spin_lock",
+-]
+ 
+ [lib]
+ name = "rayon"
+@@ -119,10 +113,6 @@
+ [dependencies.rayon-core]
+ version = "1.13.0"
+ 
+-[dependencies.wasm_sync]
+-version = "0.1.0"
+-optional = true
+-
+ [dev-dependencies.rand]
+ version = "0.9"
+ 

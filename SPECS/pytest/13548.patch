@@ -1,0 +1,120 @@
+From 09bb9a1354310c366052b92e907690f89a8aa2b4 Mon Sep 17 00:00:00 2001
+From: Ben Gartner <gartner@gmail.com>
+Date: Fri, 20 Jun 2025 20:45:13 -0500
+Subject: [PATCH 1/5] Fix test_doctest_unexpected_exception
+
+---
+ testing/test_doctest.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/testing/test_doctest.py b/testing/test_doctest.py
+index 1a852ebc82a..49b6a4e9012 100644
+--- a/testing/test_doctest.py
++++ b/testing/test_doctest.py
+@@ -223,9 +223,8 @@ def test_doctest_unexpected_exception(self, pytester: Pytester):
+                 "002 >>> 0 / i",
+                 "UNEXPECTED EXCEPTION: ZeroDivisionError*",
+                 "Traceback (most recent call last):",
+-                '  File "*/doctest.py", line *, in __run',
+-                "    *",
+-                *((" *^^^^*", " *", " *") if sys.version_info >= (3, 13) else ()),
++                *(('  File "*/doctest.py", line *, in __run', "    *") if sys.version_info <= (3, 14) else ()),
++                *((" *^^^^*", " *", " *") if sys.version_info[:2] == (3, 13) else ()),
+                 '  File "<doctest test_doctest_unexpected_exception.txt[1]>", line 1, in <module>',
+                 "ZeroDivisionError: division by zero",
+                 "*/test_doctest_unexpected_exception.txt:2: UnexpectedException",
+
+From deb49db0af701e4eeeae2fb06a6c2afa3cc493c0 Mon Sep 17 00:00:00 2001
+From: Ben Gartner <gartner@gmail.com>
+Date: Fri, 20 Jun 2025 21:42:00 -0500
+Subject: [PATCH 2/5] Bugfix message
+
+---
+ changelog/13547.bugfix.rst | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 changelog/13547.bugfix.rst
+
+diff --git a/changelog/13547.bugfix.rst b/changelog/13547.bugfix.rst
+new file mode 100644
+index 00000000000..3aa0e3671db
+--- /dev/null
++++ b/changelog/13547.bugfix.rst
+@@ -0,0 +1 @@
++Corrected expected message for test_doctest_unexpected_exception in Python 3.14
+\ No newline at end of file
+
+From 358da327c8c0b78840344e055202dce14529d1d8 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Sat, 21 Jun 2025 02:43:23 +0000
+Subject: [PATCH 3/5] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ testing/test_doctest.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/testing/test_doctest.py b/testing/test_doctest.py
+index 49b6a4e9012..f4ed976c839 100644
+--- a/testing/test_doctest.py
++++ b/testing/test_doctest.py
+@@ -223,7 +223,11 @@ def test_doctest_unexpected_exception(self, pytester: Pytester):
+                 "002 >>> 0 / i",
+                 "UNEXPECTED EXCEPTION: ZeroDivisionError*",
+                 "Traceback (most recent call last):",
+-                *(('  File "*/doctest.py", line *, in __run', "    *") if sys.version_info <= (3, 14) else ()),
++                *(
++                    ('  File "*/doctest.py", line *, in __run', "    *")
++                    if sys.version_info <= (3, 14)
++                    else ()
++                ),
+                 *((" *^^^^*", " *", " *") if sys.version_info[:2] == (3, 13) else ()),
+                 '  File "<doctest test_doctest_unexpected_exception.txt[1]>", line 1, in <module>',
+                 "ZeroDivisionError: division by zero",
+
+From e851833a4875d2705284b2ebcb576c9b3a4a4c29 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Sat, 21 Jun 2025 02:43:43 +0000
+Subject: [PATCH 4/5] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ changelog/13547.bugfix.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/changelog/13547.bugfix.rst b/changelog/13547.bugfix.rst
+index 3aa0e3671db..84db9d627ce 100644
+--- a/changelog/13547.bugfix.rst
++++ b/changelog/13547.bugfix.rst
+@@ -1 +1 @@
+-Corrected expected message for test_doctest_unexpected_exception in Python 3.14
+\ No newline at end of file
++Corrected expected message for test_doctest_unexpected_exception in Python 3.14
+
+From 6975dd475f745c701c234918854019dbe1d1fef1 Mon Sep 17 00:00:00 2001
+From: Bruno Oliveira <bruno@soliv.dev>
+Date: Sun, 22 Jun 2025 12:09:46 -0300
+Subject: [PATCH 5/5] Update and rename 13547.bugfix.rst to 13547.contrib.rst
+
+---
+ changelog/13547.bugfix.rst  | 1 -
+ changelog/13547.contrib.rst | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ delete mode 100644 changelog/13547.bugfix.rst
+ create mode 100644 changelog/13547.contrib.rst
+
+diff --git a/changelog/13547.bugfix.rst b/changelog/13547.bugfix.rst
+deleted file mode 100644
+index 84db9d627ce..00000000000
+--- a/changelog/13547.bugfix.rst
++++ /dev/null
+@@ -1 +0,0 @@
+-Corrected expected message for test_doctest_unexpected_exception in Python 3.14
+diff --git a/changelog/13547.contrib.rst b/changelog/13547.contrib.rst
+new file mode 100644
+index 00000000000..d8a240c0506
+--- /dev/null
++++ b/changelog/13547.contrib.rst
+@@ -0,0 +1 @@
++Self-testing: corrected expected message for ``test_doctest_unexpected_exception`` in Python ``3.14``.

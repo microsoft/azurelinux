@@ -1,0 +1,38 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 29 Jan 2003 21:05:37 +0100
+Subject: 002 man2html default cgibase
+
+Set default cgibase for man2html to an empty string, so hyperlinks
+will be like `href="/cgi-bin/..."'
+---
+ man2html/cgibase.c  | 2 +-
+ man2html/man2html.1 | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/man2html/cgibase.c b/man2html/cgibase.c
+index de31cdf..e39370a 100644
+--- a/man2html/cgibase.c
++++ b/man2html/cgibase.c
+@@ -24,7 +24,7 @@ static int relat_html_style = 0;
+ static char *man2htmlpath = "/cgi-bin/man/man2html"; 	/* default */
+ static char *cgibase_format = "http://%s"; 		/* host.domain:port */
+ static char *cgibase_ll_format = "lynxcgi:%s"; 		/* directory */
+-static char *cgibase = "http://localhost";		/* default */
++static char *cgibase = "";				/* default */
+ 
+ /*
+  * Separator between URL and argument string.
+diff --git a/man2html/man2html.1 b/man2html/man2html.1
+index c1c25b3..385e3a7 100644
+--- a/man2html/man2html.1
++++ b/man2html/man2html.1
+@@ -79,7 +79,8 @@ with a default as shown above. The parts of this hyperlink
+ are set using the various options.
+ .TP
+ .B \-\^h
+-Set method:cgipath to http://localhost. This is the default.
++Set method:cgipath to http://localhost.
++.\" This is the default.
+ .TP
+ .BI \-\^H " host[.domain][:port]"
+ Set method:cgipath to

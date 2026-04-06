@@ -1,0 +1,529 @@
+diff --git a/arp.c b/arp.c
+index 5db71a7..30dd56d 100644
+--- a/arp.c
++++ b/arp.c
+@@ -93,7 +93,7 @@ struct hwtype *hw;		/* current hardware type        */
+ int sockfd = 0;			/* active socket descriptor     */
+ int hw_set = 0;			/* flag if hw-type was set (-H) */
+ char device[16] = "";		/* current device               */
+-static void usage(void);
++static void usage(int rc);
+ 
+ /* Delete an entry from the ARP cache. */
+ static int arp_del(char **args)
+@@ -169,14 +169,14 @@ static int arp_del(char **args)
+ 	}
+ 	if (!strcmp(*args, "dev")) {
+ 	    if (*++args == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    safe_strncpy(device, *args, sizeof(device));
+ 	    args++;
+ 	    continue;
+ 	}
+ 	if (!strcmp(*args, "netmask")) {
+ 	    if (*++args == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    if (strcmp(*args, "255.255.255.255") != 0) {
+ 		safe_strncpy(host, *args, (sizeof host));
+ 		if (ap->input(0, host, &ss) < 0) {
+@@ -190,7 +190,7 @@ static int arp_del(char **args)
+ 	    args++;
+ 	    continue;
+ 	}
+-	usage();
++	usage(E_OPTERR);
+     }
+ 
+     // if neighter priv nor pub is given, work on both
+@@ -346,14 +346,14 @@ static int arp_set(char **args)
+ 	}
+ 	if (!strcmp(*args, "dev")) {
+ 	    if (*++args == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    safe_strncpy(device, *args, sizeof(device));
+ 	    args++;
+ 	    continue;
+ 	}
+ 	if (!strcmp(*args, "netmask")) {
+ 	    if (*++args == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    if (strcmp(*args, "255.255.255.255") != 0) {
+ 		safe_strncpy(host, *args, (sizeof host));
+ 		if (ap->input(0, host, &ss) < 0) {
+@@ -367,7 +367,7 @@ static int arp_set(char **args)
+ 	    args++;
+ 	    continue;
+ 	}
+-	usage();
++	usage(E_OPTERR);
+     }
+ 
+     /* Fill in the remainder of the request. */
+@@ -621,7 +621,7 @@ static void version(void)
+     exit(E_VERSION);
+ }
+ 
+-static void usage(void)
++static void usage(int rc)
+ {
+     fprintf(stderr, _("Usage:\n  arp [-vn]  [<HW>] [-i <if>] [-a] [<hostname>]             <-Display ARP cache\n"));
+     fprintf(stderr, _("  arp [-v]          [-i <if>] -d  <host> [pub]               <-Delete ARP entry\n"));
+@@ -643,7 +643,7 @@ static void usage(void)
+     fprintf(stderr, _("  <HW>=Use '-H <hw>' to specify hardware address type. Default: %s\n"), DFLT_HW);
+     fprintf(stderr, _("  List of possible hardware types (which support ARP):\n"));
+     print_hwlist(1); /* 1 = ARPable */
+-    exit(E_USAGE);
++    exit(rc);
+ }
+ 
+ int main(int argc, char **argv)
+@@ -745,10 +745,11 @@ int main(int argc, char **argv)
+ 
+ 	case 'V':
+ 	    version();
+-	case '?':
+ 	case 'h':
++	    usage(E_USAGE);
++	case '?':
+ 	default:
+-	    usage();
++	    usage(E_OPTERR);
+ 	}
+ 
+     if (ap->af != AF_INET) {
+@@ -797,7 +798,7 @@ int main(int argc, char **argv)
+ 	break;
+ 
+     default:
+-	usage();
++	usage(E_OPTERR);
+     }
+ 
+     exit(what);
+diff --git a/ipmaddr.c b/ipmaddr.c
+index e4ed41d..c45b62a 100644
+--- a/ipmaddr.c
++++ b/ipmaddr.c
+@@ -53,14 +53,14 @@ static void version(void)
+ 	exit(E_VERSION);
+ }
+ 
+-static void usage(void) __attribute__((noreturn));
++static void usage(int rc) __attribute__((noreturn));
+ 
+-static void usage(void)
++static void usage(int rc)
+ {
+ 	fprintf(stderr, _("Usage: ipmaddr [ add | del ] MULTIADDR dev STRING\n"));
+ 	fprintf(stderr, _("       ipmaddr show [ dev STRING ] [ ipv4 | ipv6 | link | all ]\n"));
+ 	fprintf(stderr, _("       ipmaddr -V | -version\n"));
+-	exit(E_USAGE);
++	exit(rc);
+ }
+ 
+ static void print_lla(FILE *fp, int len, unsigned char *addr)
+@@ -294,7 +294,7 @@ static int multiaddr_list(int argc, char **argv)
+ 			NEXT_ARG();
+ 			l = strlen(*argv);
+ 			if (l <= 0 || l >= sizeof(filter_dev))
+-				usage();
++				usage(E_OPTERR);
+ 			strncpy(filter_dev, *argv, sizeof (filter_dev));
+ 		} else if (strcmp(*argv, "all") == 0) {
+ 			filter_family = AF_UNSPEC;
+@@ -307,7 +307,7 @@ static int multiaddr_list(int argc, char **argv)
+ 		} else {
+ 			l = strlen(*argv);
+ 			if (l <= 0 || l >= sizeof(filter_dev))
+-				usage();
++				usage(E_OPTERR);
+ 			strncpy(filter_dev, *argv, sizeof (filter_dev));
+ 		}
+ 		argv++; argc--;
+@@ -339,18 +339,18 @@ int multiaddr_modify(int cmd, int argc, char **argv)
+ 		if (strcmp(*argv, "dev") == 0) {
+ 			NEXT_ARG();
+ 			if (ifr.ifr_name[0])
+-				usage();
++				usage(E_OPTERR);
+ 			strncpy(ifr.ifr_name, *argv, IFNAMSIZ);
+ 		} else {
+ 			if (ifr.ifr_hwaddr.sa_data[0])
+-				usage();
++				usage(E_OPTERR);
+ 			if (parse_lla(*argv, ifr.ifr_hwaddr.sa_data) < 0)
+-				usage();
++				usage(E_OPTERR);
+ 		}
+ 		argc--; argv++;
+ 	}
+ 	if (ifr.ifr_name[0] == 0)
+-		usage();
++		usage(E_OPTERR);
+ 
+ 	fd = socket(AF_INET, SOCK_DGRAM, 0);
+ 	if (fd < 0) {
+@@ -378,7 +378,7 @@ int do_multiaddr(int argc, char **argv)
+ 	if (matches(*argv, "list") == 0 || matches(*argv, "show") == 0
+ 	    || matches(*argv, "lst") == 0)
+ 		return multiaddr_list(argc-1, argv+1);
+-	usage();
++	usage(E_OPTERR);
+ }
+ 
+ int preferred_family = AF_UNSPEC;
+@@ -408,13 +408,13 @@ int main(int argc, char **argv)
+ 			argc--;
+ 			argv++;
+ 			if (argc <= 1)
+-				usage();
++				usage(E_OPTERR);
+ 			if (strcmp(argv[1], "inet") == 0)
+ 				preferred_family = AF_INET;
+ 			else if (strcmp(argv[1], "inet6") == 0)
+ 				preferred_family = AF_INET6;
+ 			else
+-				usage();
++				usage(E_OPTERR);
+ 		} else if (matches(argv[1], "-stats") == 0 ||
+ 			   matches(argv[1], "-statistics") == 0) {
+ 			++show_stats;
+@@ -423,7 +423,7 @@ int main(int argc, char **argv)
+ 		} else if ((matches(argv[1], "-V") == 0) || matches(argv[1], "--version") == 0) {
+ 			version();
+ 		} else
+-			usage();
++			usage(E_OPTERR);
+ 		argc--;	argv++;
+ 	}
+ 
+diff --git a/include/util-ank.h b/include/util-ank.h
+index c8fcd08..c78604a 100644
+--- a/include/util-ank.h
++++ b/include/util-ank.h
+@@ -23,7 +23,7 @@ extern int resolve_hosts;
+ #define NEXT_ARG() \
+ argv++; \
+ if (--argc <= 0) \
+-	usage();
++	usage(E_OPTERR);
+ 
+ typedef struct
+ {
+diff --git a/iptunnel.c b/iptunnel.c
+index 2215d68..42b2a9e 100644
+--- a/iptunnel.c
++++ b/iptunnel.c
+@@ -76,9 +76,9 @@ static void version(void)
+ 	exit(E_VERSION);
+ }
+ 
+-static void usage(void) __attribute__((noreturn));
++static void usage(int rc) __attribute__((noreturn));
+ 
+-static void usage(void)
++static void usage(int rc)
+ {
+ 	fprintf(stderr, _("Usage: iptunnel { add | change | del | show } [ NAME ]\n"));
+ 	fprintf(stderr, _("          [ mode { ipip | gre | sit } ] [ remote ADDR ] [ local ADDR ]\n"));
+@@ -90,7 +90,7 @@ static void usage(void)
+ 	fprintf(stderr, _("       TOS  := { NUMBER | inherit }\n"));
+ 	fprintf(stderr, _("       TTL  := { 1..255 | inherit }\n"));
+ 	fprintf(stderr, _("       KEY  := { DOTTED_QUAD | NUMBER }\n"));
+-	exit(E_USAGE);
++	exit(rc);
+ }
+ 
+ static int do_ioctl_get_ifindex(char *dev)
+@@ -217,18 +217,18 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 			NEXT_ARG();
+ 			if (strcmp(*argv, "ipip") == 0) {
+ 				if (p->iph.protocol)
+-					usage();
++					usage(E_OPTERR);
+ 				p->iph.protocol = IPPROTO_IPIP;
+ 			} else if (strcmp(*argv, "gre") == 0) {
+ 				if (p->iph.protocol)
+-					usage();
++					usage(E_OPTERR);
+ 				p->iph.protocol = IPPROTO_GRE;
+ 			} else if (strcmp(*argv, "sit") == 0) {
+ 				if (p->iph.protocol)
+-					usage();
++					usage(E_OPTERR);
+ 				p->iph.protocol = IPPROTO_IPV6;
+ 			} else
+-				usage();
++				usage(E_OPTERR);
+ 		} else if (strcmp(*argv, "key") == 0) {
+ 			unsigned uval;
+ 			NEXT_ARG();
+@@ -238,7 +238,7 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 				p->i_key = p->o_key = get_addr32(*argv);
+ 			else {
+ 				if (scan_number(*argv, &uval)<0)
+-					usage();
++					usage(E_OPTERR);
+ 				p->i_key = p->o_key = htonl(uval);
+ 			}
+ 		} else if (strcmp(*argv, "ikey") == 0) {
+@@ -249,7 +249,7 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 				p->o_key = get_addr32(*argv);
+ 			else {
+ 				if (scan_number(*argv, &uval)<0)
+-					usage();
++					usage(E_OPTERR);
+ 				p->i_key = htonl(uval);
+ 			}
+ 		} else if (strcmp(*argv, "okey") == 0) {
+@@ -260,7 +260,7 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 				p->o_key = get_addr32(*argv);
+ 			else {
+ 				if (scan_number(*argv, &uval)<0)
+-					usage();
++					usage(E_OPTERR);
+ 				p->o_key = htonl(uval);
+ 			}
+ 		} else if (strcmp(*argv, "seq") == 0) {
+@@ -295,9 +295,9 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 			NEXT_ARG();
+ 			if (strcmp(*argv, "inherit") != 0) {
+ 				if (scan_number(*argv, &uval)<0)
+-					usage();
++					usage(E_OPTERR);
+ 				if (uval > 255)
+-					usage();
++					usage(E_OPTERR);
+ 				p->iph.ttl = uval;
+ 			}
+ 		} else if (strcmp(*argv, "tos") == 0) {
+@@ -305,15 +305,15 @@ static int parse_args(int argc, char **argv, struct ip_tunnel_parm *p)
+ 			NEXT_ARG();
+ 			if (strcmp(*argv, "inherit") != 0) {
+ 				if (scan_number(*argv, &uval)<0)
+-					usage();
++					usage(E_OPTERR);
+ 				if (uval > 255)
+-					usage();
++					usage(E_OPTERR);
+ 				p->iph.tos = uval;
+ 			} else
+ 				p->iph.tos = 1;
+ 		} else {
+ 			if (p->name[0])
+-				usage();
++				usage(E_OPTERR);
+ 			safe_strncpy(p->name, *argv, IFNAMSIZ);
+ 		}
+ 		argc--; argv++;
+@@ -574,7 +574,7 @@ int do_iptunnel(int argc, char **argv)
+ 	} else
+ 		return do_show(0, NULL);
+ 
+-	usage();
++	usage(E_OPTERR);
+ }
+ 
+ 
+@@ -605,13 +605,13 @@ int main(int argc, char **argv)
+ 			argc--;
+ 			argv++;
+ 			if (argc <= 1)
+-				usage();
++				usage(E_OPTERR);
+ 			if (strcmp(argv[1], "inet") == 0)
+ 				preferred_family = AF_INET;
+ 			else if (strcmp(argv[1], "inet6") == 0)
+ 				preferred_family = AF_INET6;
+ 			else
+-				usage();
++				usage(E_OPTERR);
+ 		} else if (matches(argv[1], "-stats") == 0 ||
+ 			   matches(argv[1], "-statistics") == 0) {
+ 			++show_stats;
+@@ -620,7 +620,7 @@ int main(int argc, char **argv)
+ 		} else if ((matches(argv[1], "-V") == 0) || (matches(argv[1], "--version") == 0)) {
+ 			version();
+ 		} else
+-			usage();
++			usage(E_OPTERR);
+ 		argc--;	argv++;
+ 	}
+ 
+diff --git a/nameif.c b/nameif.c
+index b280e59..13e3033 100644
+--- a/nameif.c
++++ b/nameif.c
+@@ -192,10 +192,10 @@ struct option lopt[] = {
+ 	{NULL},
+ };
+ 
+-void usage(void)
++void usage(int rc)
+ {
+ 	fprintf(stderr, _("usage: nameif [-c configurationfile] [-s] {ifname macaddress}\n"));
+-	exit(E_USAGE);
++	exit(rc);
+ }
+ 
+ int main(int ac, char **av)
+@@ -214,7 +214,7 @@ int main(int ac, char **av)
+ 		switch (c) {
+ 		default:
+ 		case '?':
+-			usage();
++			usage(E_OPTERR);
+ 		case 'c':
+ 			fname = optarg;
+ 			break;
+@@ -232,7 +232,7 @@ int main(int ac, char **av)
+ 		char pos[30];
+ 
+ 		if ((ac-optind) & 1)
+-			usage();
++			usage(E_OPTERR);
+ 		if (strlen(av[optind])+1>IFNAMSIZ)
+ 			complain(_("interface name `%s' too long"), av[optind]);
+ 		safe_strncpy(ch->ifname, av[optind], sizeof(ch->ifname));
+diff --git a/plipconfig.c b/plipconfig.c
+index 86fa890..1caeed3 100644
+--- a/plipconfig.c
++++ b/plipconfig.c
+@@ -57,12 +57,12 @@ static void version(void)
+     exit(E_VERSION);
+ }
+ 
+-void usage(void)
++void usage(int rc)
+ {
+     fprintf(stderr, _("Usage: plipconfig interface [nibble NN] [trigger NN]\n"));
+     fprintf(stderr, _("       plipconfig -V | --version\n"));
+     fprintf(stderr, _("       plipconfig -h | --help\n"));
+-    exit(E_USAGE);
++    exit(rc);
+ }
+ 
+ void print_plip(void)
+@@ -89,16 +89,18 @@ int main(int argc, char **argv)
+     argc--;
+     argv++;
+     while (argv[0] && *argv[0] == '-') {
+-	if (!strcmp(*argv, "-V") || !strcmp(*argv, "--version"))
++	if ((!strcmp(*argv, "-V") || !strcmp(*argv, "--version")) && argc==1)
+ 	    version();
++	if ((!strcmp(*argv, "-h") || !strcmp(*argv, "--help")) && argc==1)
++	    usage(E_USAGE);
+ 	else
+-            usage();
++            usage(E_OPTERR);
+ 	argv++;
+ 	argc--;
+     }
+ 
+     if (argc == 0)
+-	usage();
++	usage(E_OPTERR);
+ 
+     spp = argv;
+     safe_strncpy(ifr.ifr_name, *spp++, IFNAMSIZ);
+@@ -117,19 +119,19 @@ int main(int argc, char **argv)
+     while (*spp != (char *) NULL) {
+ 	if (!strcmp(*spp, "nibble")) {
+ 	    if (*++spp == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    plip->nibble = atoi(*spp);
+ 	    spp++;
+ 	    continue;
+ 	}
+ 	if (!strcmp(*spp, "trigger")) {
+ 	    if (*++spp == NULL)
+-		usage();
++		usage(E_OPTERR);
+ 	    plip->trigger = atoi(*spp);
+ 	    spp++;
+ 	    continue;
+ 	}
+-	usage();
++	usage(E_OPTERR);
+     }
+ 
+     plip->pcmd = PLIP_SET_TIMEOUT;
+diff --git a/slattach.c b/slattach.c
+index 5c81584..dbb2658 100644
+--- a/slattach.c
++++ b/slattach.c
+@@ -581,7 +581,7 @@ sig_catch(int sig)
+ 
+ 
+ static void
+-usage(void)
++usage(int rc)
+ {
+   char *usage_msg = "Usage: slattach [-ehlLmnqv] "
+ #ifdef SIOCSKEEPALIVE
+@@ -594,7 +594,7 @@ usage(void)
+ 	  "       slattach -V | --version\n";
+ 
+   fputs(usage_msg, stderr);
+-  exit(E_USAGE);
++  exit(rc);
+ }
+ 
+ 
+@@ -691,7 +691,7 @@ main(int argc, char *argv[])
+ 		/*NOTREACHED*/
+ 
+ 	default:
+-		usage();
++		usage(E_OPTERR);
+ 		/*NOTREACHED*/
+   }
+ 
+@@ -707,7 +707,7 @@ main(int argc, char *argv[])
+        opt_m++;
+ 
+   /* Is a terminal given? */
+-  if (optind != (argc - 1)) usage();
++  if (optind != (argc - 1)) usage(E_OPTERR);
+   safe_strncpy(path_buf, argv[optind], sizeof(path_buf));
+   if (!strcmp(path_buf, "-")) {
+ 	opt_e = 1;
+diff --git a/netstat.c.old b/netstat.c
+index dbcba2b..d04f0ff 100644
+--- a/netstat.c.old
++++ b/netstat.c
+@@ -2286,7 +2286,7 @@ int main
+ 
+     if(argc == optind + 1) {
+     	if((reptimer = atoi(argv[optind])) <= 0)
+-    		usage(E_USAGE);
++    		usage(E_OPTERR);
+         flag_cnt++;
+     }
+ 
+diff --git a/route.c.old b/route.c
+index f86bb8e..b0a885e 100644
+--- a/route.c.old
++++ b/route.c
+@@ -186,6 +186,7 @@ int main(int argc, char **argv)
+ 	case 'V':
+ 	    version();
+ 	case 'h':
++	    usage(E_USAGE);
+ 	case '?':
+ 	    opt_h++;
+ 	    break;
+@@ -198,7 +199,7 @@ int main(int argc, char **argv)
+ 
+     if (opt_h) {
+ 	if (!afname[0])
+-	    usage(E_USAGE);
++	    usage(E_OPTERR);
+ 	else
+ 	    what = RTACTION_HELP;
+     } else {

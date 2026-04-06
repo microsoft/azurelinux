@@ -1,0 +1,65 @@
+From f1a6e8d840a28eb2ab7a488e0d06450b7192c76d Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 2 Apr 2024 14:11:26 +0100
+Subject: [PATCH] coreutils-python3.patch
+
+---
+ init.cfg                              | 4 ++--
+ tests/d_type-check                    | 2 +-
+ tests/du/move-dir-while-traversing.sh | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/init.cfg b/init.cfg
+index 612d287..9a6fa2d 100644
+--- a/init.cfg
++++ b/init.cfg
+@@ -597,10 +597,10 @@ seek_data_capable_()
+ # Skip the current test if "." lacks d_type support.
+ require_dirent_d_type_()
+ {
+-  python < /dev/null \
++  python3 < /dev/null \
+     || skip_ python missing: assuming no d_type support
+ 
+-  python "$abs_srcdir"/tests/d_type-check \
++  python3 "$abs_srcdir"/tests/d_type-check \
+     || skip_ requires d_type support
+ }
+ 
+diff --git a/tests/d_type-check b/tests/d_type-check
+index 1a2f76f..42d3924 100644
+--- a/tests/d_type-check
++++ b/tests/d_type-check
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # Exit 0 if "." and "./tempfile" have useful d_type information, else 1.
+ # Intended to exit 0 only on Linux/GNU systems.
+ import os
+diff --git a/tests/du/move-dir-while-traversing.sh b/tests/du/move-dir-while-traversing.sh
+index 1d0a359..bd03542 100755
+--- a/tests/du/move-dir-while-traversing.sh
++++ b/tests/du/move-dir-while-traversing.sh
+@@ -21,8 +21,8 @@ print_ver_ du
+ require_trap_signame_
+ 
+ # We use a python-inotify script, so...
+-python -m pyinotify -h > /dev/null \
+-  || skip_ 'python inotify package not installed'
++python3 -m pyinotify -h > /dev/null \
++  || skip_ 'python3 inotify package not installed'
+ 
+ # Move a directory "up" while du is processing its sub-directories.
+ # While du is processing a hierarchy .../B/C/D/... this script
+@@ -33,7 +33,7 @@ python -m pyinotify -h > /dev/null \
+ # rename syscall before du finishes processing the subtree under D/.
+ 
+ cat <<'EOF' > inotify-watch-for-dir-access.py
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ import pyinotify as pn
+ import os,sys
+ 
+-- 
+2.48.1
+

@@ -1,0 +1,70 @@
+From 66bae20fc8c94024ffeeceb89b3318381d17ee93 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?=
+ <30413512+eclipseo@users.noreply.github.com>
+Date: Sun, 15 Oct 2023 14:37:55 +0200
+Subject: [PATCH] Depends on tomli instead of deprecated toml
+
+---
+ dparse2/parser.py | 2 +-
+ setup.py          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dparse2/parser.py b/dparse2/parser.py
+index 0cef9ec..95ab8f1 100644
+--- a/dparse2/parser.py
++++ b/dparse2/parser.py
+@@ -11,7 +11,7 @@ from configparser import ConfigParser
+ from configparser import NoOptionError
+ from io import StringIO
+ 
+-import toml
++import tomllib
+ import yaml
+ 
+ from packvers.requirements import InvalidRequirement
+@@ -158,7 +158,7 @@ class PipfileParser(Parser):
+         Parse a Pipfile (as seen in pipenv)
+         """
+         try:
+-            data = toml.loads(self.obj.content, _dict=OrderedDict)
++            data = tomllib.loads(self.obj.content)
+             if not data:
+                 return
+             for package_type in ["packages", "dev-packages"]:
+@@ -181,7 +181,7 @@ class PipfileParser(Parser):
+                             section=package_type,
+                         )
+                     )
+-        except (toml.TomlDecodeError, IndexError):
++        except (tomllib.TOMLDecodeError, IndexError):
+             pass
+ 
+ 
+diff --git a/setup.py b/setup.py
+index ab7f7e1..20dcd40 100644
+--- a/setup.py
++++ b/setup.py
+@@ -25,7 +25,6 @@ setup(
+     install_requires=[
+         "packvers",
+         "pyyaml",
+-        "toml",
+     ],
+     license="MIT",
+     zip_safe=False,
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+index a20d4e9..920ee24 100644
+--- a/tests/test_parse.py
++++ b/tests/test_parse.py
+@@ -93,7 +93,7 @@ django-allauth = "*"
+ 
+ [dev-packages]
+ 
+-toml = "*"
++tomllib = "*"
+ """
+     dep_file = parse(content, file_name="Pipfile")
+     assert len(dep_file.dependencies) == 4
+-- 
+2.41.0
+

@@ -1,0 +1,27 @@
+From 566c45f0a3093f3b0af3b0f6e1a03551373575e1 Mon Sep 17 00:00:00 2001
+From: Sandro <devel@penguinpee.nl>
+Date: Thu, 23 Oct 2025 21:12:49 +0200
+Subject: [PATCH 7/7] Replace deprecated xarray.cftime_range
+
+This is the recommended replacement for `xarray.cftime_range` according
+to the DeprecationWarning shown.
+---
+ pandas/tests/test_downstream.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pandas/tests/test_downstream.py b/pandas/tests/test_downstream.py
+index d448773c3b..7f21282074 100644
+--- a/pandas/tests/test_downstream.py
++++ b/pandas/tests/test_downstream.py
+@@ -103,7 +103,7 @@ def test_xarray_cftimeindex_nearest():
+     cftime = pytest.importorskip("cftime")
+     xarray = pytest.importorskip("xarray")
+ 
+-    times = xarray.cftime_range("0001", periods=2)
++    times = xarray.date_range("0001", periods=2, use_cftime=True)
+     key = cftime.DatetimeGregorian(2000, 1, 1)
+     result = times.get_indexer([key], method="nearest")
+     expected = 1
+-- 
+2.51.0
+

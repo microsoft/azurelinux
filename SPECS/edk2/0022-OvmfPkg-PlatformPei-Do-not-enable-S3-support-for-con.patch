@@ -1,0 +1,31 @@
+From b291dc23e749f9cd85a1d35316b824c3c5f7367b Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 18 Nov 2025 11:38:52 -0500
+Subject: [PATCH 22/22] OvmfPkg/PlatformPei: Do not enable S3 support for
+ confidential VMs
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 9ff73832ea0440b86fa0dfa42158fce1ef3b57d2)
+---
+ OvmfPkg/PlatformPei/Platform.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/OvmfPkg/PlatformPei/Platform.c b/OvmfPkg/PlatformPei/Platform.c
+index 30dbd87e1120..ca86d30ee4d2 100644
+--- a/OvmfPkg/PlatformPei/Platform.c
++++ b/OvmfPkg/PlatformPei/Platform.c
+@@ -343,7 +343,10 @@ InitializePlatform (
+ 
+   PlatformDebugDumpCmos ();
+ 
+-  if (QemuFwCfgS3Enabled ()) {
++  if (!TdIsEnabled () &&
++      !PlatformInfoHob->SevEsIsEnabled &&
++      QemuFwCfgS3Enabled ())
++  {
+     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
+     PlatformInfoHob->S3Supported = TRUE;
+     Status                       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
+-- 
+2.51.1
+

@@ -1,0 +1,87 @@
+# ./pullrev.sh 1848298
+
+http://svn.apache.org/viewvc?view=revision&revision=1848298
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1652493
+
+--- mod_fcgid-2.3.9/modules/fcgid/fcgid_bridge.c
++++ mod_fcgid-2.3.9/modules/fcgid/fcgid_bridge.c
+@@ -526,7 +526,8 @@
+ }
+ 
+ static int add_request_body(request_rec *r, apr_pool_t *request_pool,
+-                            apr_bucket_brigade *output_brigade)
++                            apr_bucket_brigade *output_brigade,
++                            apr_off_t *body_length)
+ {
+     apr_bucket *bucket_input, *bucket_header;
+     apr_file_t *fd = NULL;
+@@ -729,22 +730,49 @@
+     }
+     APR_BRIGADE_INSERT_TAIL(output_brigade, bucket_header);
+ 
++    *body_length = request_size;
++    
+     return 0;
+ }
+ 
+ int bridge_request(request_rec * r, int role, fcgid_cmd_conf *cmd_conf)
+ {
+-    apr_bucket_brigade *output_brigade;
++    apr_bucket_brigade *output_brigade, *body_brigade;
+     apr_bucket *bucket_eos;
+-    char **envp = ap_create_environment(r->pool,
+-                                        r->subprocess_env);
++    char **envp;
+     int rc;
+ 
+     /* Create brigade for the request to fastcgi server */
++    body_brigade
++        = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+     output_brigade =
+         apr_brigade_create(r->pool, r->connection->bucket_alloc);
+ 
+-    /* Build the begin request and environ request, append them to output_brigade */
++    /* In responder mode, handle the request body up front to ensure
++     * the content-length is known (even if the request body is
++     * chunked) and sent in the header. */
++    if (role == FCGI_RESPONDER) {
++        apr_off_t body_length;
++        
++        rc = add_request_body(r, r->pool, body_brigade, &body_length);
++        if (rc) {
++            return rc;
++        }
++
++        if (body_length && !apr_table_get(r->headers_in, "Content-Length")) {
++            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r,
++                          "mod_fcgid: dechunked request body length %" APR_OFF_T_FMT,
++                          body_length);
++        
++            apr_table_set(r->subprocess_env, "CONTENT_LENGTH",
++                          apr_off_t_toa(r->pool, body_length));
++            apr_table_unset(r->subprocess_env, "HTTP_TRANSFER_ENCODING");
++        }
++    }
++
++    envp = ap_create_environment(r->pool, r->subprocess_env);
++          
++    /* Build the begin request and environ request, add them to output_brigade */
+     if (!build_begin_block
+         (role, r, r->connection->bucket_alloc, output_brigade)
+         || !build_env_block(r, envp, r->connection->bucket_alloc,
+@@ -754,12 +782,8 @@
+         return HTTP_INTERNAL_SERVER_ERROR;
+     }
+ 
+-    if (role == FCGI_RESPONDER) {
+-        rc = add_request_body(r, r->pool, output_brigade);
+-        if (rc) {
+-            return rc;
+-        }
+-    }
++    /* Append the body output. */
++    APR_BRIGADE_CONCAT(output_brigade, body_brigade);
+ 
+     /* The eos bucket now */
+     bucket_eos = apr_bucket_eos_create(r->connection->bucket_alloc);

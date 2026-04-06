@@ -1,0 +1,57 @@
+From 82b582996ce691eb635bed124603207515b92efe Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 8 Jan 2025 14:01:39 -0800
+Subject: [PATCH 8/8] tests: Add test for dvh with a bad checksum
+
+When using script mode it should return an unknown partition type, not
+dvh, because the exception is unhandled.
+---
+ tests/Makefile.am           |  1 +
+ tests/t4101-dvh-badlabel.sh | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+ create mode 100644 tests/t4101-dvh-badlabel.sh
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 00f4a9d..5eeab08 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -71,6 +71,7 @@ TESTS = \
+   t4100-msdos-partition-limits.sh \
+   t4100-dvh-partition-limits.sh \
+   t4100-msdos-starting-sector.sh \
++  t4101-dvh-badlabel.sh \
+   t4200-partprobe.sh \
+   t4300-nilfs2-tiny.sh \
+   t4301-nilfs2-badsb2.sh \
+diff --git a/tests/t4101-dvh-badlabel.sh b/tests/t4101-dvh-badlabel.sh
+new file mode 100644
+index 0000000..075c044
+--- /dev/null
++++ b/tests/t4101-dvh-badlabel.sh
+@@ -0,0 +1,23 @@
++#!/bin/sh
++# Test exception handling on a bad DVH disklabel
++
++. "${srcdir=.}/init.sh"; path_prepend_ ../parted $srcdir
++ss=$sector_size_
++
++n_sectors=2000 # number of sectors
++dev=sun-disk-file
++# create an empty file as a test disk
++dd if=/dev/zero of=$dev bs=$ss count=$n_sectors 2> /dev/null || fail=1
++
++# label the test disk as a dvh disk
++parted -s $dev mklabel dvh > out 2>&1 || fail=1
++compare /dev/null out || fail=1
++
++# Mangle the disklabel to have incorrect checksum
++dd if=/dev/zero of=$dev conv=notrunc bs=4 count=1 seek=1
++
++# Check the output (this should return 1, but depend on checking the output for the test)
++parted -m -s $dev p > out 2>&1
++grep unknown out || { cat out; fail=1; }
++
++Exit $fail
+-- 
+2.47.1
+

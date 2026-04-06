@@ -1,0 +1,82 @@
+From 4da66c66f92438443e66b67555673c9cb898b0ae Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Mon, 12 May 2025 18:25:48 -0400
+Subject: [PATCH] tests: Retry NVWrite command after 0x922 return code and inc
+ lockout counter
+
+When returncode 0x922 is received from NVWrite then retry the command so
+that it gets the expected error code from failing to provide a password.
+When checking the lockout counter, increase the numbers now.
+
+Patched versions of libtpms may not return 0x922 anymore, so write the code
+that it can test both cases.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ tests/_test_tpm2_avoid_da_lockout | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/tests/_test_tpm2_avoid_da_lockout b/tests/_test_tpm2_avoid_da_lockout
+index e4f0121a9..fc26a8cf6 100755
+--- a/tests/_test_tpm2_avoid_da_lockout
++++ b/tests/_test_tpm2_avoid_da_lockout
+@@ -53,6 +53,11 @@ fi
+ cmd='\x80\x02\x00\x00\x00\x24\x00\x00\x01\x37\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x09\x40\x00\x00\x09\x00\x00\x00\x00\x00\x00\x01\x41\x00\x00'
+ RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
+ exp=' 80 01 00 00 00 0a 00 00 09 22'
++if [ "$RES" == "$exp" ]; then
++	# 0x922 : retry command
++	RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
++fi
++exp=' 80 01 00 00 00 0a 00 00 09 8e'
+ if [ "$RES" != "$exp" ]; then
+ 	echo "Error: Did not get expected result from TPM2_NV_Write"
+ 	echo "expected: $exp"
+@@ -63,9 +68,9 @@ fi
+ # The TPM_PT_LOCKOUT_COUNTER must be 0 now: tssgetcapability -cap 6 -pr 0x20e -pc 1
+ cmd='\x80\x01\x00\x00\x00\x16\x00\x00\x01\x7a\x00\x00\x00\x06\x00\x00\x02\x0e\x00\x00\x00\x01'
+ RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
+-exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 00'
++exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 01'
+ if [ "$RES" != "$exp" ]; then
+-	echo "Error: Did not get expected result from TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
++	echo "Error: Did not get expected result from 1st TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
+ 	echo "expected: $exp"
+ 	echo "received: $RES"
+ 	exit 1
+@@ -92,9 +97,9 @@ fi
+ # Without swtpm sending TPM2_Shutdown, it would be '1' now
+ cmd='\x80\x01\x00\x00\x00\x16\x00\x00\x01\x7a\x00\x00\x00\x06\x00\x00\x02\x0e\x00\x00\x00\x01'
+ RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
+-exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 00'
++exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 01'
+ if [ "$RES" != "$exp" ]; then
+-	echo "Error: Did not get expected result from TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
++	echo "Error: Did not get expected result from 2nd TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
+ 	echo "expected: $exp"
+ 	echo "received: $RES"
+ 	exit 1
+@@ -104,6 +109,11 @@ fi
+ cmd='\x80\x02\x00\x00\x00\x24\x00\x00\x01\x37\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x09\x40\x00\x00\x09\x00\x00\x00\x00\x00\x00\x01\x41\x00\x00'
+ RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
+ exp=' 80 01 00 00 00 0a 00 00 09 22'
++if [ "$RES" == "$exp" ]; then
++	# 0x922 : retry command
++	RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
++fi
++exp=' 80 01 00 00 00 0a 00 00 09 8e'
+ if [ "$RES" != "$exp" ]; then
+ 	echo "Error: Did not get expected result from TPM2_NV_Write"
+ 	echo "expected: $exp"
+@@ -136,9 +146,9 @@ fi
+ # Without swtpm sending TPM2_Shutdown, it would be '2' now
+ cmd='\x80\x01\x00\x00\x00\x16\x00\x00\x01\x7a\x00\x00\x00\x06\x00\x00\x02\x0e\x00\x00\x00\x01'
+ RES=$(swtpm_cmd_tx "${SWTPM_INTERFACE}" ${cmd})
+-exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 00'
++exp=' 80 01 00 00 00 1b 00 00 00 00 01 00 00 00 06 00 00 00 01 00 00 02 0e 00 00 00 02'
+ if [ "$RES" != "$exp" ]; then
+-	echo "Error: Did not get expected result from TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
++	echo "Error: Did not get expected result from 3rd TPM2_GetCapability(TPM_PT_LOCKOUT_COUNTER)"
+ 	echo "expected: $exp"
+ 	echo "received: $RES"
+ 	exit 1

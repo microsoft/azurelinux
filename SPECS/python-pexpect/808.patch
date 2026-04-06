@@ -1,0 +1,104 @@
+From 456bc10d94b57e254568e7ea9a8b3cffb856ebff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 22 Nov 2024 16:41:55 +0100
+Subject: [PATCH] Tests: Avoid the multiprocessing forkserver method
+
+Fixes https://github.com/pexpect/pexpect/issues/807
+---
+ tests/test_expect.py | 12 ++++++++++--
+ tests/test_socket.py | 24 ++++++++++++++++--------
+ 2 files changed, 26 insertions(+), 10 deletions(-)
+
+diff --git a/tests/test_expect.py b/tests/test_expect.py
+index c16e0551..fb1e30e2 100755
+--- a/tests/test_expect.py
++++ b/tests/test_expect.py
+@@ -33,6 +33,14 @@
+ 
+ PY3 = bool(sys.version_info.major >= 3)
+ 
++# Python 3.14 changed the non-macOS POSIX default to forkserver
++# but the code in this module does not work with it
++# See https://github.com/python/cpython/issues/125714
++if multiprocessing.get_start_method() == 'forkserver':
++    mp_context = multiprocessing.get_context(method='fork')
++else:
++    mp_context = multiprocessing.get_context()
++
+ # Many of these test cases blindly assume that sequential directory
+ # listings of the /bin directory will yield the same results.
+ # This may not be true, but seems adequate for testing now.
+@@ -682,7 +690,7 @@ def test_stdin_closed(self):
+         '''
+         Ensure pexpect continues to operate even when stdin is closed
+         '''
+-        class Closed_stdin_proc(multiprocessing.Process):
++        class Closed_stdin_proc(mp_context.Process):
+             def run(self):
+                 sys.__stdin__.close()
+                 cat = pexpect.spawn('cat')
+@@ -698,7 +706,7 @@ def test_stdin_stdout_closed(self):
+         '''
+         Ensure pexpect continues to operate even when stdin and stdout is closed
+         '''
+-        class Closed_stdin_stdout_proc(multiprocessing.Process):
++        class Closed_stdin_stdout_proc(mp_context.Process):
+             def run(self):
+                 sys.__stdin__.close()
+                 sys.__stdout__.close()
+diff --git a/tests/test_socket.py b/tests/test_socket.py
+index b801b00a..6521d368 100644
+--- a/tests/test_socket.py
++++ b/tests/test_socket.py
+@@ -29,6 +29,14 @@
+ import time
+ import errno
+ 
++# Python 3.14 changed the non-macOS POSIX default to forkserver
++# but the code in this module does not work with it
++# See https://github.com/python/cpython/issues/125714
++if multiprocessing.get_start_method() == 'forkserver':
++    mp_context = multiprocessing.get_context(method='fork')
++else:
++    mp_context = multiprocessing.get_context()
++
+ 
+ class SocketServerError(Exception):
+     pass
+@@ -83,8 +91,8 @@ def setUp(self):
+         self.prompt3 = b'Press X to exit:'
+         self.enter = b'\r\n'
+         self.exit = b'X\r\n'
+-        self.server_up = multiprocessing.Event()
+-        self.server_process = multiprocessing.Process(target=self.socket_server, args=(self.server_up,))
++        self.server_up = mp_context.Event()
++        self.server_process = mp_context.Process(target=self.socket_server, args=(self.server_up,))
+         self.server_process.daemon = True
+         self.server_process.start()
+         counter = 0
+@@ -189,9 +197,9 @@ def test_timeout(self):
+             session.expect(b'Bogus response')
+ 
+     def test_interrupt(self):
+-        timed_out = multiprocessing.Event()
+-        all_read = multiprocessing.Event()
+-        test_proc = multiprocessing.Process(target=self.socket_fn, args=(timed_out, all_read))
++        timed_out = mp_context.Event()
++        all_read = mp_context.Event()
++        test_proc = mp_context.Process(target=self.socket_fn, args=(timed_out, all_read))
+         test_proc.daemon = True
+         test_proc.start()
+         while not all_read.is_set():
+@@ -203,9 +211,9 @@ def test_interrupt(self):
+         self.assertEqual(test_proc.exitcode, errno.ETIMEDOUT)
+ 
+     def test_multiple_interrupts(self):
+-        timed_out = multiprocessing.Event()
+-        all_read = multiprocessing.Event()
+-        test_proc = multiprocessing.Process(target=self.socket_fn, args=(timed_out, all_read))
++        timed_out = mp_context.Event()
++        all_read = mp_context.Event()
++        test_proc = mp_context.Process(target=self.socket_fn, args=(timed_out, all_read))
+         test_proc.daemon = True
+         test_proc.start()
+         while not all_read.is_set():

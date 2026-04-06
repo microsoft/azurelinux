@@ -1,0 +1,69 @@
+From cdb0cd3480f5ab6cac9df1e13bed78dd1088c7a1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 4 Dec 2025 13:31:54 +0000
+Subject: [PATCH 118/131] pcsclient: make 'keyring' module optional
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is not available in some distros, and since it is merely a
+convenience to avoid repeated password entry, it can be made
+optional.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .../PcsClientTool/lib/intelsgx/credential.py  | 29 +++++++++++--------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/credential.py b/tools/PcsClientTool/lib/intelsgx/credential.py
+index fa1e38d0..e0e32ddb 100644
+--- a/tools/PcsClientTool/lib/intelsgx/credential.py
++++ b/tools/PcsClientTool/lib/intelsgx/credential.py
+@@ -1,4 +1,7 @@
+-import keyring
++try:
++    import keyring
++except:
++    keyring = None
+ import getpass
+ 
+ class Credentials:
+@@ -7,11 +10,12 @@ class Credentials:
+ 
+     def get_pcs_api_key(self):
+         pcs_api_key = ""
+-        try:
+-            print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
+-            pcs_api_key = keyring.get_password(self.APPNAME, self.KEY_PCS_APIKEY)
+-        except keyring.errors.KeyringError as ke:
+-            pcs_api_key = ""
++        if keyring is not None:
++            try:
++                print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
++                pcs_api_key = keyring.get_password(self.APPNAME, self.KEY_PCS_APIKEY)
++            except keyring.errors.KeyringError as ke:
++                pcs_api_key = ""
+         
+         while pcs_api_key is None or pcs_api_key == '':
+             pcs_api_key = getpass.getpass(prompt="Please input ApiKey for Intel PCS:")
+@@ -24,10 +28,11 @@ class Credentials:
+         return pcs_api_key
+ 
+     def set_pcs_api_key(self, apikey):
+-        try:
+-            print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
+-            keyring.set_password(self.APPNAME, self.KEY_PCS_APIKEY, apikey)
+-        except keyring.errors.PasswordSetError as ke:
+-            print("Failed to store PCS API key.")
+-            return False
++        if keyring is not None:
++            try:
++                print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
++                keyring.set_password(self.APPNAME, self.KEY_PCS_APIKEY, apikey)
++            except keyring.errors.PasswordSetError as ke:
++                print("Failed to store PCS API key.")
++                return False
+         return True
+-- 
+2.53.0
+

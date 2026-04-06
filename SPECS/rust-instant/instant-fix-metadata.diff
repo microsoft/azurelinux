@@ -1,0 +1,26 @@
+--- instant-0.1.13/Cargo.toml	1970-01-01T00:00:01+00:00
++++ instant-0.1.13/Cargo.toml	2024-06-11T14:05:35.515236+00:00
+@@ -14,7 +14,7 @@
+ name = "instant"
+ version = "0.1.13"
+ authors = ["sebcrozet <developer@crozet.re>"]
+-description = "Unmaintained, consider using web-time instead - A partial replacement for std::time::Instant that works on WASM to."
++description = "A partial replacement for std::time::Instant that works on WASM too"
+ readme = "README.md"
+ keywords = [
+     "time",
+@@ -26,14 +26,9 @@
+ [dependencies.cfg-if]
+ version = "1.0"
+ 
+-[dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+ [features]
+ inaccurate = []
+ now = []
+-wasm-bindgen = [
+-]
+ 
+ [badges.maintenance]
+ status = "looking-for-maintainer"

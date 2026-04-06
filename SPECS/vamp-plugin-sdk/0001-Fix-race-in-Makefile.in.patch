@@ -1,0 +1,38 @@
+From da2d66f570b14b62c5ad5a5c9de38f024ac4e217 Mon Sep 17 00:00:00 2001
+From: Levi Zim <rsworktech@outlook.com>
+Date: Wed, 20 Nov 2024 22:24:34 +0800
+Subject: [PATCH] Fix race in Makefile.in
+
+The usage of ranlib in sdkstatic target could race with other targets, leading to compiler errors. This commit fixes it.
+---
+ Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 49482b1..d30dde0 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -238,8 +238,6 @@ RDFGEN_TARGET	= \
+ sdk:		sdkstatic $(SDK_DYNAMIC) $(HOSTSDK_DYNAMIC)
+ 
+ sdkstatic:	$(SDK_STATIC) $(HOSTSDK_STATIC)
+-		$(RANLIB) $(SDK_STATIC)
+-		$(RANLIB) $(HOSTSDK_STATIC)
+ 
+ plugins:	$(PLUGIN_TARGET)
+ 
+@@ -251,9 +249,11 @@ all:		sdk plugins host rdfgen test
+ 
+ $(SDK_STATIC):	$(SDK_OBJECTS) $(API_HEADERS) $(SDK_HEADERS)
+ 		$(AR) r $@ $(SDK_OBJECTS)
++		$(RANLIB) $(SDK_STATIC)
+ 
+ $(HOSTSDK_STATIC):	$(HOSTSDK_OBJECTS) $(API_HEADERS) $(HOSTSDK_HEADERS)
+ 		$(AR) r $@ $(HOSTSDK_OBJECTS)
++		$(RANLIB) $(HOSTSDK_STATIC)
+ 
+ $(SDK_DYNAMIC):	$(SDK_OBJECTS) $(API_HEADERS) $(SDK_HEADERS)
+ 		$(CXX) $(LDFLAGS) $(SDK_DYNAMIC_LDFLAGS) -o $@ $(SDK_OBJECTS)
+-- 
+2.52.0
+

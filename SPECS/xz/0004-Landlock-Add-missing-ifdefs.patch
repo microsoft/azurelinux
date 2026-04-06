@@ -1,0 +1,59 @@
+From 8bb516887c1912106a72db96216cab46954e6190 Mon Sep 17 00:00:00 2001
+From: Lasse Collin <lasse.collin@tukaani.org>
+Date: Sun, 23 Nov 2025 20:39:28 +0200
+Subject: [PATCH 4/4] Landlock: Add missing #ifdefs
+
+The build was broken on distros that have an old <sys/landlock.h>.
+
+Fixes: 2b2652e914b1 ("Landlock: Workaround a bug in RHEL 9 kernel")
+---
+ src/common/my_landlock.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/common/my_landlock.h b/src/common/my_landlock.h
+index 0f8e04e0..5f761695 100644
+--- a/src/common/my_landlock.h
++++ b/src/common/my_landlock.h
+@@ -43,17 +43,20 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ 	// >0 = Landlock ABI version
+ 	static int abi_version = 0;
+ 
++#ifdef LANDLOCK_SCOPE_SIGNAL
+ 	// Red Hat Enterprise Linux 9 kernel since 5.14.0-603.el9 (2025-07-30)
+ 	// claims ABI version 6 support, but as of 5.14.0-643.el9 (2025-11-22)
+ 	// it lacks LANDLOCK_SCOPE_SIGNAL. ABI version 6 was added in upstream
+ 	// Linux 6.12 while RHEL 9 has Linux 5.14 with lots of backports.
+ 	// We assume that any kernel version 5.14 with ABI version 6 is buggy.
+ 	static bool is_rhel9 = false;
++#endif
+ 
+ 	if (abi_version == 0) {
+ 		abi_version = syscall(SYS_landlock_create_ruleset,
+ 			(void *)NULL, 0, LANDLOCK_CREATE_RULESET_VERSION);
+ 
++#ifdef LANDLOCK_SCOPE_SIGNAL
+ 		if (abi_version == 6) {
+ 			static const char rel[] = "5.14.";
+ 			const size_t rel_len = sizeof(rel) - 1;
+@@ -63,6 +66,7 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ 					un.release, rel, rel_len) == 0)
+ 				is_rhel9 = true;
+ 		}
++#endif
+ 	}
+ 
+ 	if (abi_version <= 0)
+@@ -141,8 +145,10 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ 		FALLTHROUGH;
+ 
+ 	case 6:
++#ifdef LANDLOCK_SCOPE_SIGNAL
+ 		if (is_rhel9)
+ 			attr->scoped &= ~LANDLOCK_SCOPE_SIGNAL;
++#endif
+ 
+ 		FALLTHROUGH;
+ 
+-- 
+2.51.1
+

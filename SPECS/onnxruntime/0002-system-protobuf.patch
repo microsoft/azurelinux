@@ -1,0 +1,53 @@
+From 5f73b687854e8def5b929b03104be52830f65e09 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 18:30:27 -0300
+Subject: [PATCH 02/20] system-protobuf
+
+---
+ .../external/onnxruntime_external_deps.cmake  | 27 +------------------
+ 1 file changed, 1 insertion(+), 26 deletions(-)
+
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index ec6aa78672..292856eb99 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -211,35 +211,10 @@ else()
+  set(ONNXRUNTIME_PROTOBUF_PATCH_COMMAND "")
+ endif()
+ 
+-#Protobuf depends on absl and utf8_range
+-FetchContent_Declare(
+-  Protobuf
+-  URL ${DEP_URL_protobuf}
+-  URL_HASH SHA1=${DEP_SHA1_protobuf}
+-  PATCH_COMMAND ${ONNXRUNTIME_PROTOBUF_PATCH_COMMAND}
+-  FIND_PACKAGE_ARGS NAMES Protobuf protobuf
+-)
+-
+-set(protobuf_BUILD_TESTS OFF CACHE BOOL "Build protobuf tests" FORCE)
+-#TODO: we'd better to turn the following option off. However, it will cause
+-# ".\build.bat --config Debug --parallel --skip_submodule_sync --update" fail with an error message:
+-# install(EXPORT "ONNXTargets" ...) includes target "onnx_proto" which requires target "libprotobuf-lite" that is
+-# not in any export set.
+-#set(protobuf_INSTALL OFF CACHE BOOL "Install protobuf binaries and files" FORCE)
+-set(protobuf_USE_EXTERNAL_GTEST ON CACHE BOOL "" FORCE)
+-
+-if (ANDROID)
+-  set(protobuf_WITH_ZLIB OFF CACHE BOOL "Build protobuf with zlib support" FORCE)
+-endif()
+-
+-if (onnxruntime_DISABLE_RTTI)
+-  set(protobuf_DISABLE_RTTI ON CACHE BOOL "Remove runtime type information in the binaries" FORCE)
+-endif()
+-
++find_package(Protobuf REQUIRED)
+ include(protobuf_function)
+ #protobuf end
+ 
+-onnxruntime_fetchcontent_makeavailable(Protobuf)
+ if(Protobuf_FOUND)
+   message(STATUS "Protobuf version: ${Protobuf_VERSION}")
+ else()
+-- 
+2.47.1
+

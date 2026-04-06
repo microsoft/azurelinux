@@ -1,0 +1,34 @@
+Do not define _ISOC11_SOURCE in parser-sming.y
+
+It overrides _DEFAULT_SOURCE, thereby hiding the declaration of timegm
+in <time.h>.  This will result in build failures with future compilers
+that do not support implicit function declarations.
+
+Submitted upstream:
+
+<https://lists.ibr.cs.tu-bs.de/hyperkitty/list/libsmi@ibr.cs.tu-bs.de/thread/MI6XPAR7JE2AY6UZIMXA3Q7JGD635JRR/>
+
+diff --git a/lib/parser-sming.y b/lib/parser-sming.y
+index 555e570613ad689f..32bddeac93eac7e8 100644
+--- a/lib/parser-sming.y
++++ b/lib/parser-sming.y
+@@ -17,7 +17,7 @@
+     
+ #ifdef BACKEND_SMING
+ 
+-#define _ISOC99_SOURCE
++
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+diff -up a/lib/parser-yang.y b/lib/parser-yang.y
+--- a/lib/parser-yang.y	2024-01-05 09:28:40.994847831 -0500
++++ b/lib/parser-yang.y	2024-01-05 09:28:54.247033152 -0500
+@@ -20,7 +20,6 @@
+     
+ #ifdef BACKEND_YANG
+ 
+-#define _ISOC99_SOURCE
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>

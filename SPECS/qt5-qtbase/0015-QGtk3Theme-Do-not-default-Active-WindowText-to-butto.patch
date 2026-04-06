@@ -1,0 +1,56 @@
+From 6a9a896ae86a69a3c8bcbaaf7e2e2fd2105723a4 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:44:31 +0200
+Subject: [PATCH 15/15] QGtk3Theme: Do not default Active WindowText to button
+ foreground
+
+QGtk3Theme uses the GTK button foreground as a default for the
+WindowText color role. When a GTK3 theme has no specific color for the
+entry text, this can lead to text on certain assets looking darker
+and thus disabled.
+
+This discontinues usage of the button foreground for the window text.
+
+Finding the WindowText color role in QPlatformTheme::SystemPalette now
+follows the following logic:
+(1) GTK normal entry text is used if specified. This is the preferred
+option, copying GTK behavior.
+(2) If (1) is not specified, the GTK default text color is used, making
+WindowText equal to Text.
+(3) If neither (1), nor (2) are specified, the WindowText color role is
+taken from qt_fusionPalette, where it is also equal to Text.
+
+The SystemPalette is used as a default template for all other control
+or widget speicific palettes. The rules above therefor apply to all
+screen assets (unless they use a JSON file to specify a their
+individual WindowText).
+
+[ChangeLog][QGtk3Theme][SystemPalette][WindowText] Default to GTK
+Entry Text / Normal Text / qt_fusionPalette
+---
+ src/plugins/platformthemes/gtk3/qgtk3storage.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 7775ac66e4..fb4069ba3c 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -538,7 +538,6 @@ void QGtk3Storage::createMapping()
+     LIGHTER(Normal, Window, 80);
+     ADD(Normal, Dark);
+     GTK(button, Foreground, ACTIVE);
+-    ADD(Normal, WindowText);
+     ADD(Inactive, WindowText);
+     LIGHTER(Normal, WindowText, 50);
+     ADD(Disabled, Text);
+@@ -562,6 +561,7 @@ void QGtk3Storage::createMapping()
+     ADD(Disabled, HighlightedText);
+     GTK(Default, Text, NORMAL);
+     ADD(Normal, Text);
++    ADD(Normal, WindowText);
+     ADD(Inactive, Text);
+     ADD(Normal, HighlightedText);
+     LIGHTER(Normal, Base, 93);
+-- 
+2.41.0
+

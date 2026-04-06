@@ -1,0 +1,145 @@
+From e067c7944c9bf92145fd1a21fc966a791c0a9f9e Mon Sep 17 00:00:00 2001
+From: Venelin Stoykov <vkstoykov@gmail.com>
+Date: Thu, 24 Oct 2019 02:18:06 +0300
+Subject: [PATCH 1/3] Fix regular expression deprecaation warnings
+
+---
+ openid/extensions/draft/pape5.py | 2 +-
+ openid/urinorm.py                | 2 +-
+ openid/yadis/xri.py              | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/openid/extensions/draft/pape5.py b/openid/extensions/draft/pape5.py
+index 1441dd3a..e4132502 100644
+--- a/openid/extensions/draft/pape5.py
++++ b/openid/extensions/draft/pape5.py
+@@ -32,7 +32,7 @@
+ AUTH_NONE = \
+     'http://schemas.openid.net/pape/policies/2007/06/none'
+ 
+-TIME_VALIDATOR = re.compile('^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$')
++TIME_VALIDATOR = re.compile(r'^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$')
+ 
+ LEVELS_NIST = 'http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf'
+ LEVELS_JISA = 'http://www.jisa.or.jp/spec/auth_level.html'
+diff --git a/openid/urinorm.py b/openid/urinorm.py
+index 485245c5..5fb49b4d 100644
+--- a/openid/urinorm.py
++++ b/openid/urinorm.py
+@@ -13,7 +13,7 @@
+ #
+ # unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+ 
+-uri_illegal_char_re = re.compile("[^-A-Za-z0-9:/?#[\]@!$&'()*+,;=._~%]",
++uri_illegal_char_re = re.compile(r"[^-A-Za-z0-9:/?#[\]@!$&'()*+,;=._~%]",
+                                  re.UNICODE)
+ 
+ authority_pattern = r'^([^@]*@)?([^:]*)(:.*)?'
+diff --git a/openid/yadis/xri.py b/openid/yadis/xri.py
+index a88027f7..621d3046 100644
+--- a/openid/yadis/xri.py
++++ b/openid/yadis/xri.py
+@@ -31,7 +31,7 @@ def toIRINormal(xri):
+     return escapeForIRI(xri)
+ 
+ 
+-_xref_re = re.compile('\((.*?)\)')
++_xref_re = re.compile(r'\((.*?)\)')
+ 
+ 
+ def _escape_xref(xref_match):
+
+From 2b93970b20b7315198590e5fefe3a9e0c4120abd Mon Sep 17 00:00:00 2001
+From: Venelin Stoykov <vkstoykov@gmail.com>
+Date: Thu, 24 Oct 2019 02:18:36 +0300
+Subject: [PATCH 2/3] Fix collection.abc deprecationwarning
+
+---
+ openid/yadis/filters.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/openid/yadis/filters.py b/openid/yadis/filters.py
+index 4a7fbc67..81bafee6 100644
+--- a/openid/yadis/filters.py
++++ b/openid/yadis/filters.py
+@@ -12,7 +12,10 @@
+ ]
+ 
+ from openid.yadis.etxrd import expandService
+-import collections
++try:
++    from collections.abc import Callable
++except ImportError:
++    from collections import Callable
+ 
+ 
+ class BasicServiceEndpoint(object):
+@@ -192,7 +195,7 @@ def mkCompoundFilter(parts):
+                 # conversion attribute into the list of endpoint
+                 # transformers
+                 transformers.append(subfilter.fromBasicServiceEndpoint)
+-            elif isinstance(subfilter, collections.Callable):
++            elif isinstance(subfilter, Callable):
+                 # It's a simple callable, so add it to the list of
+                 # endpoint transformers
+                 transformers.append(subfilter)
+
+From e4ff2e361f1bb666e7b1618b8907fd80524a7afb Mon Sep 17 00:00:00 2001
+From: Venelin Stoykov <vkstoykov@gmail.com>
+Date: Thu, 24 Oct 2019 02:19:07 +0300
+Subject: [PATCH 3/3] Fix resource warning
+
+Even if it is in the tests it's better to not have warnings
+---
+ admin/build_discover_data.py  | 4 ++--
+ openid/test/test_accept.py    | 7 ++-----
+ openid/test/test_parsehtml.py | 3 ++-
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/admin/build_discover_data.py b/admin/build_discover_data.py
+index 45391f16..3854d823 100755
+--- a/admin/build_discover_data.py
++++ b/admin/build_discover_data.py
+@@ -53,8 +53,8 @@ def writeTestFile(test_name):
+                                          discoverdata.example_xrds)
+ 
+         out_file_name = os.path.join(out_dir, test_name)
+-        out_file = open(out_file_name, 'w', encoding="utf-8")
+-        out_file.write(data)
++        with open(out_file_name, 'w', encoding="utf-8") as out_file:
++            out_file.write(data)
+ 
+     manifest = [manifest_header]
+     for success, input_name, id_name, result_name in discoverdata.testlist:
+diff --git a/openid/test/test_accept.py b/openid/test/test_accept.py
+index a4084ea3..81fa05ea 100644
+--- a/openid/test/test_accept.py
++++ b/openid/test/test_accept.py
+@@ -9,11 +9,8 @@ def getTestData():
+     () -> [(int, str)]
+     """
+     filename = os.path.join(os.path.dirname(__file__), 'data', 'accept.txt')
+-    i = 1
+-    lines = []
+-    for line in open(filename):
+-        lines.append((i, line))
+-        i += 1
++    with open(filename, 'rt') as data_file:
++        lines = list(enumerate(data_file, 1))
+     return lines
+ 
+ 
+diff --git a/openid/test/test_parsehtml.py b/openid/test/test_parsehtml.py
+index fdeecd04..d3edd07f 100644
+--- a/openid/test/test_parsehtml.py
++++ b/openid/test/test_parsehtml.py
+@@ -74,7 +74,8 @@ def getCases(test_files=default_test_files):
+     cases = []
+     for filename in test_files:
+         test_num = 0
+-        data = open(filename).read()
++        with open(filename) as data_file:
++            data = data_file.read()
+         for expected, case in parseCases(data):
+             test_num += 1
+             cases.append((filename, test_num, expected, case))

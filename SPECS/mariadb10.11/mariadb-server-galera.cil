@@ -1,0 +1,15 @@
+(optional mariadb-server-galera-1_0
+	(typeattributeset cil_gen_require mysqld_t)
+	(typeattributeset cil_gen_require rsync_exec_t)
+	(typeattributeset cil_gen_require anon_inodefs_t)
+	(typeattributeset cil_gen_require proc_net_t)
+	(typeattributeset cil_gen_require kerberos_port_t)
+	; allow mysqld to run rsyncd
+	(allow mysqld_t self (process (setpgid)))
+	(allow mysqld_t rsync_exec_t (file (read execute execute_no_trans getattr open)))
+	(allow mysqld_t anon_inodefs_t (file (getattr)))
+	(allow mysqld_t proc_net_t (file (read open)))
+
+	; allow rsyncd to listen on port 4444
+	(allow mysqld_t kerberos_port_t (tcp_socket (name_bind name_connect)))
+)

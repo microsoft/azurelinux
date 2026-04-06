@@ -1,0 +1,103 @@
+From be7c2d639127dd8af0139caf94f8c29f431d3753 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Mon, 18 Jun 2018 10:13:48 +0200
+Subject: [PATCH 58/59] Make the max number of bind retries tunable
+
+Resolves: rhbz#1318198
+---
+ parseconf.c   | 1 +
+ privops.c     | 8 ++++++--
+ tunables.c    | 2 ++
+ tunables.h    | 1 +
+ vsftpd.conf.5 | 5 +++++
+ 5 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/parseconf.c b/parseconf.c
+index aeb401a..3cfe7da 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -143,6 +143,7 @@ parseconf_uint_array[] =
+   { "delay_successful_login", &tunable_delay_successful_login },
+   { "max_login_fails", &tunable_max_login_fails },
+   { "chown_upload_mode", &tunable_chown_upload_mode },
++  { "bind_retries", &tunable_bind_retries },
+   { 0, 0 }
+ };
+ 
+diff --git a/privops.c b/privops.c
+index 010d28d..83b25c7 100644
+--- a/privops.c
++++ b/privops.c
+@@ -120,8 +120,8 @@ unsigned short
+ vsf_privop_pasv_listen(struct vsf_session* p_sess)
+ {
+   static struct vsf_sysutil_sockaddr* s_p_sockaddr;
+-  int bind_retries = 10;
+-  unsigned short the_port;
++  int bind_retries = tunable_bind_retries + 1;
++  unsigned short the_port = 0;
+   /* IPPORT_RESERVED */
+   unsigned short min_port = 1024;
+   unsigned short max_port = 65535;
+@@ -131,6 +131,10 @@ vsf_privop_pasv_listen(struct vsf_session* p_sess)
+     die("listed fd already active");
+   }
+ 
++  if (bind_retries < 2)
++  {
++    bind_retries = 2;
++  }
+   if (tunable_pasv_min_port > min_port && tunable_pasv_min_port <= max_port)
+   {
+     min_port = (unsigned short) tunable_pasv_min_port;
+diff --git a/tunables.c b/tunables.c
+index 63de8e6..a7ce9c8 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -115,6 +115,7 @@ unsigned int tunable_delay_failed_login;
+ unsigned int tunable_delay_successful_login;
+ unsigned int tunable_max_login_fails;
+ unsigned int tunable_chown_upload_mode;
++unsigned int tunable_bind_retries;
+ 
+ const char* tunable_secure_chroot_dir;
+ const char* tunable_ftp_username;
+@@ -268,6 +269,7 @@ tunables_load_defaults()
+   tunable_max_login_fails = 3;
+   /* -rw------- */
+   tunable_chown_upload_mode = 0600;
++  tunable_bind_retries = 9;
+ 
+   install_str_setting("/usr/share/empty", &tunable_secure_chroot_dir);
+   install_str_setting("ftp", &tunable_ftp_username);
+diff --git a/tunables.h b/tunables.h
+index 8a4b8b2..029d645 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -120,6 +120,7 @@ extern unsigned int tunable_delay_failed_login;
+ extern unsigned int tunable_delay_successful_login;
+ extern unsigned int tunable_max_login_fails;
+ extern unsigned int tunable_chown_upload_mode;
++extern unsigned int tunable_bind_retries;
+ 
+ /* String defines */
+ extern const char* tunable_secure_chroot_dir;
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index f246906..ce3fba3 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -760,6 +760,11 @@ value will be treated as a base 10 integer!
+ 
+ Default: 077
+ .TP
++.B bind_retries
++Maximum number of attempts to find a free listening port in passive mode.
++
++Default: 9
++.TP
+ .B chown_upload_mode
+ The file mode to force for chown()ed anonymous uploads. (Added in v2.0.6).
+ 
+-- 
+2.14.4
+

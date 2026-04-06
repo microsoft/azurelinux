@@ -1,0 +1,80 @@
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ACPIHELP 1 "January 23, 2013"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+acpihelp \- ACPI help utility
+.SH SYNOPSIS
+.B acpihelp
+.RI <option> ...
+.RI [<name-prefix>|<hex-value>]
+
+.SH DESCRIPTION
+This manual page briefly documents the
+.B acpihelp
+command. The option list is taken from the acpihelp interactive help.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+.B acpihelp
+provides descriptive text for AML and ASL keywords, methods, and opcodes.
+.PP
+Much more detailed documentation may be found at
+http://www.acpica.org/documentation/.
+.PP
+If neither a <name-prefix> or a <hex-value> is provided,
+.B acpihelp
+will do the logical equivalent of a "display all."
+.PP
+A default search (that is, a search with no options) and a <name-prefix>
+can mean two different things: (1) if <name-prefix> does not start with
+an underscore, find ASL operator names, or (2) if <name-prefix> does start
+with an underscore, find ASL predefined method names.
+
+.SH OPTIONS
+
+.PP
+.SS ACPI Names and Symbols
+.TP
+.B \-k [<name-prefix>]
+Find/Display ASL non-operator keyword(s)
+.TP
+.B \-m [<name-prefix>]
+Find/Display AML opcode name(s)
+.TP
+.B \-p [<name-prefix>]
+Find/Display ASL predefined method name(s)
+.TP
+.B \-s [<name-prefix>]
+Find/Display ASL operator name(s)
+
+.PP
+.SS ACPI Values
+.TP
+.B \-e [<hex-value>]
+Decode ACPICA exception code
+.TP
+.B \-i
+Display known ACPI Device IDs (_HID)
+.TP
+.B \-i [<hex-value>]
+Decode hex AML opcode
+
+.SH AUTHOR
+acpihelp was written by Robert Moore <robert.moore@intel.com>.
+.PP
+This manual page was written by Al Stone <ahs3@redhat.com> for the
+Fedora project (but may be used by others).

@@ -1,0 +1,101 @@
+From 1fb91bd063bff1b9f6eae57f4facc0355b311d42 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 16 Apr 2025 11:48:52 +0100
+Subject: [PATCH 116/131] Don't stomp on "VERBOSE" variable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The VERBOSE=1 variable is set to make various cmake builds run in
+verbose mode. It must not be used for other purposes by the makefiles
+otherwise the usage will clash.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ driver/win/PLE/Makefile | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/driver/win/PLE/Makefile b/driver/win/PLE/Makefile
+index 3d474bbc..0f593f5e 100644
+--- a/driver/win/PLE/Makefile
++++ b/driver/win/PLE/Makefile
+@@ -75,9 +75,9 @@ ifneq ($(PUBKEY_FILE),)
+ 	CSS_PUBKEY_FILE = $(shell realpath $(PUBKEY_FILE))
+ endif
+ 
+-VERBOSE := @
++CMD_VERBOSE := @
+ ifeq ($(V),1)
+-	VERBOSE :=
++	CMD_VERBOSE :=
+ endif
+ 
+ SGX_LE_SIGNING_KEY_PATH := sgx_signing_key.pem
+@@ -89,47 +89,47 @@ PUBLIC_KEY_PATH := $(shell realpath $(SGX_LE_PUBLIC_KEY_PATH))
+ SIGNING_MATERIAL := $(shell realpath $(SGX_LE_SIGNING_MATERIAL))
+ 
+ $(SIGNING_KEY_PATH):
+-	$(VERBOSE) openssl genrsa -3 -out $(SIGNING_KEY_PATH) 3072
++	$(CMD_VERBOSE) openssl genrsa -3 -out $(SIGNING_KEY_PATH) 3072
+ 
+ $(PUBLIC_KEY_PATH): $(SIGNING_KEY_PATH)
+-	$(VERBOSE) openssl rsa -in $(SIGNING_KEY_PATH) -outform PEM -pubout -out $(PUBLIC_KEY_PATH)
++	$(CMD_VERBOSE) openssl rsa -in $(SIGNING_KEY_PATH) -outform PEM -pubout -out $(PUBLIC_KEY_PATH)
+ 
+ SGX_LE_C_OBJS := $(addprefix $(TARGET)/,main.o string.o cmac.o)
+ SGX_LE_S_OBJS := $(addprefix $(TARGET)/,encl_bootstrap.o)
+ 
+ $(TARGET):
+-	$(VERBOSE) mkdir $@
++	$(CMD_VERBOSE) mkdir $@
+ 
+ $(SGX_LE_C_OBJS): $(TARGET)/%.o: %.c | $(TARGET)
+-	$(VERBOSE) $(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
++	$(CMD_VERBOSE) $(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+ 
+ $(SGX_LE_S_OBJS): $(TARGET)/%.o: %.S | $(TARGET)
+-	$(VERBOSE) $(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
++	$(CMD_VERBOSE) $(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+ 
+ $(TARGET)/sgx_le.elf: sgx_le.lds $(SGX_LE_C_OBJS) $(SGX_LE_S_OBJS)
+-	$(VERBOSE) $(LD) $(LDFLAGS) -T $^ -o $@
++	$(CMD_VERBOSE) $(LD) $(LDFLAGS) -T $^ -o $@
+ 
+ $(TARGET)/sgx_le.bin: $(TARGET)/sgx_le.elf
+-	$(VERBOSE) objcopy --remove-section=.got.plt -O binary $< $@
++	$(CMD_VERBOSE) objcopy --remove-section=.got.plt -O binary $< $@
+ 
+ $(TARGET)/sgxsign: sgxsign.c | $(TARGET)
+-	$(VERBOSE) $(CC) -Wall $(INCLUDES) -o $@ $< -lcrypto
++	$(CMD_VERBOSE) $(CC) -Wall $(INCLUDES) -o $@ $< -lcrypto
+ 
+ $(TARGET)/bin2c: bin2c.c | $(TARGET)
+-	$(VERBOSE) $(CC) -Wall $(INCLUDES) -o $@ $<
++	$(CMD_VERBOSE) $(CC) -Wall $(INCLUDES) -o $@ $<
+ 
+ sign: $(SIGNING_KEY_PATH) $(TARGET)/sgx_le.bin $(TARGET)/sgxsign $(TARGET)/bin2c
+-	$(VERBOSE) $(TARGET)/sgxsign sign $(SIGNING_KEY_PATH) $(TARGET)/sgx_le.bin $(TARGET)/sgx_le.ss $(SIGN_EXTRA)
+-	$(VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.bin $(TARGET)/sgx_le_blob.h sgx_le_blob
+-	$(VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.ss $(TARGET)/sgx_le_ss.h sgx_le_ss
++	$(CMD_VERBOSE) $(TARGET)/sgxsign sign $(SIGNING_KEY_PATH) $(TARGET)/sgx_le.bin $(TARGET)/sgx_le.ss $(SIGN_EXTRA)
++	$(CMD_VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.bin $(TARGET)/sgx_le_blob.h sgx_le_blob
++	$(CMD_VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.ss $(TARGET)/sgx_le_ss.h sgx_le_ss
+ 
+ gendata: $(TARGET)/sgx_le.bin $(TARGET)/sgxsign
+-	$(VERBOSE) $(TARGET)/sgxsign gendata $(TARGET)/sgx_le.bin $(SIGNING_MATERIAL) $(SIGN_EXTRA)
++	$(CMD_VERBOSE) $(TARGET)/sgxsign gendata $(TARGET)/sgx_le.bin $(SIGNING_MATERIAL) $(SIGN_EXTRA)
+ 
+ usesig: $(TARGET)/sgx_le.bin $(TARGET)/sgxsign $(TARGET)/bin2c
+-	$(VERBOSE) $(TARGET)/sgxsign usesig $(CSS_PUBKEY_FILE) $(TARGET)/sgx_le.bin $(CSS_SIG_FILE) $(TARGET)/sgx_le.ss $(SIGN_EXTRA)
+-	$(VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.bin $(TARGET)/sgx_le_blob.h sgx_le_blob
+-	$(VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.ss $(TARGET)/sgx_le_ss.h sgx_le_ss
++	$(CMD_VERBOSE) $(TARGET)/sgxsign usesig $(CSS_PUBKEY_FILE) $(TARGET)/sgx_le.bin $(CSS_SIG_FILE) $(TARGET)/sgx_le.ss $(SIGN_EXTRA)
++	$(CMD_VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.bin $(TARGET)/sgx_le_blob.h sgx_le_blob
++	$(CMD_VERBOSE) $(TARGET)/bin2c $(TARGET)/sgx_le.ss $(TARGET)/sgx_le_ss.h sgx_le_ss
+ 
+ clean:
+-	$(VERBOSE) rm -vrf $(TARGET) $(SIGNING_MATERIAL)
++	$(CMD_VERBOSE) rm -vrf $(TARGET) $(SIGNING_MATERIAL)
+-- 
+2.53.0
+

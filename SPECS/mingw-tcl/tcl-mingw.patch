@@ -1,0 +1,24 @@
+diff -rupN --no-dereference tcl8.6.15/win/configure.in tcl8.6.15-new/win/configure.in
+--- tcl8.6.15/win/configure.in	2024-08-26 20:13:27.000000000 +0200
++++ tcl8.6.15-new/win/configure.in	2024-10-18 11:19:05.353746364 +0200
+@@ -62,9 +62,17 @@ AC_PROG_CC
+ AC_C_INLINE
+ AC_HEADER_STDC
+ 
+-AC_CHECK_TOOL(AR, ar)
+-AC_CHECK_TOOL(RANLIB, ranlib)
+-AC_CHECK_TOOL(RC, windres)
++if test "${target_alias}" = "i686-w64-mingw32" ; then
++   AC_CHECK_TOOL(AR, i686-w64-mingw32-ar)
++   AC_CHECK_TOOL(RANLIB, i686-w64-mingw32-ranlib)
++   AC_CHECK_TOOL(RC, i686-w64-mingw32-windres)
++fi
++if test "${target_alias}" = "x86_64-w64-mingw32" ; then
++   AC_CHECK_TOOL(AR, x86_64-w64-mingw32-ar)
++   AC_CHECK_TOOL(RANLIB, x86_64-w64-mingw32-ranlib)
++   AC_CHECK_TOOL(RC, x86_64-w64-mingw32-windres)
++fi
++
+ 
+ #--------------------------------------------------------------------
+ # Checks to see if the make program sets the $MAKE variable.

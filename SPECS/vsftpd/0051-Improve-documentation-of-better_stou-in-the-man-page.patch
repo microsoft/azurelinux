@@ -1,0 +1,30 @@
+From 765f99b26705c8d6fe2be4feb07f4c91e7eb96f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 5 Apr 2018 12:29:03 +0200
+Subject: [PATCH 51/59] Improve documentation of better_stou in the man page
+
+---
+ vsftpd.conf.5 | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 6911a73..e9ae474 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -68,7 +68,12 @@ trick the C library into loading a user-created configuration file from the
+ Default: NO
+ .TP
+ .B better_stou
+-Use better file name generation algorithm for the STOU command.
++Use a better file name generation algorithm for the STOU command. The default
++original algorithm simply adds an increasing number suffix to the file name,
++which is prone to race conditions if multiple uploaders use the STOU command
++with the same file name simultaneously, which can result in failure of the
++command. The new algorithm adds a unique random six character suffix to
++the file name, which works much better in face of concurrent uploads.
+ 
+ Default: NO
+ .TP
+-- 
+2.14.4
+

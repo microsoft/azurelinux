@@ -1,0 +1,38 @@
+From 0c37e7ace585cfb550a0ffd9d5c331d059fd687f Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Tue, 2 Dec 2025 12:12:26 -0500
+Subject: [PATCH] Avoid segfault on receiving bad CLI arguments
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ src/sscg.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/sscg.c b/src/sscg.c
+index b9b191f109300f6447262858f57a3a8321a14966..00e2862c2d6be5c44a4a362fc926e1a07d31d7bf 100644
+--- a/src/sscg.c
++++ b/src/sscg.c
+@@ -59,7 +59,7 @@ int
+ main (int argc, const char **argv)
+ {
+   int ret, sret;
+-  struct sscg_options *options;
++  struct sscg_options *options = NULL;
+   bool build_client_cert = false;
+   char *dhparams_file = NULL;
+ 
+@@ -342,7 +342,10 @@ main (int argc, const char **argv)
+ done:
+   if (ret != EOK)
+     {
+-      sscg_io_utils_delete_output_files (options->streams);
++      if (options)
++        {
++          sscg_io_utils_delete_output_files (options->streams);
++        }
+     }
+   talloc_zfree (main_ctx);
+   if (getenv ("SSCG_TALLOC_REPORT"))
+-- 
+2.52.0
+

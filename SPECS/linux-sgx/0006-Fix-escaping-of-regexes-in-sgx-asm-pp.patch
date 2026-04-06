@@ -1,0 +1,282 @@
+From bf5044bd0ad6c2eb41900104547747a51be005c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 2 Sep 2024 16:49:18 +0100
+Subject: [PATCH 06/17] Fix escaping of regexes in sgx-asm-pp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Running sgx-asm-pp.py on recent Python generates many warnings
+
+  sgx-asm-pp.py:64: SyntaxWarning: invalid escape sequence '\s'
+  sgx-asm-pp.py:85: SyntaxWarning: invalid escape sequence '\s'
+  sgx-asm-pp.py:65: SyntaxWarning: invalid escape sequence '\s'
+  sgx-asm-pp.py:86: SyntaxWarning: invalid escape sequence '\s'
+  sgx-asm-pp.py:66: SyntaxWarning: invalid escape sequence '\s'
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ build-scripts/sgx-asm-pp.py | 242 ++++++++++++++++++------------------
+ 1 file changed, 121 insertions(+), 121 deletions(-)
+
+diff --git a/build-scripts/sgx-asm-pp.py b/build-scripts/sgx-asm-pp.py
+index 2b02396b..0df3fc47 100644
+--- a/build-scripts/sgx-asm-pp.py
++++ b/build-scripts/sgx-asm-pp.py
+@@ -38,132 +38,132 @@ import re
+ import shutil
+ import argparse
+ 
+-LOCK = 'lock'
+-REP = 'rep[a-z]*'
+-REX = 'rex(?:\.[a-zA-Z]+)?'
+-SCALAR = '(?:(?:[+-]\s*)?(?:[0-9][0-9a-fA-F]*|0x[0-9a-fA-F]+))'
+-IMMEDIATE = '(?:%s[hb]?)' %(SCALAR)
+-REG = '(?:[a-zA-Z][a-zA-Z0-9]*)'
+-SYM = '(?:[_a-zA-Z][_a-zA-Z0-9]*(?:@[0-9a-zA-Z]+)?)'
+-LABEL = '(?:[._a-zA-Z0-9]+)'
+-SEP = '(?:(?:^|:)\s*)'
+-PFX = '(?:%s\s+)?' %(REX)
+-CONST = '(?:(?:%s|%s|%s)(?:\s*[/*+-]\s*(?:%s|%s|%s))*)' %(SYM, SCALAR, LABEL, SYM, SCALAR, LABEL)
+-OFFSET = '(?:%s|%s|%s\s*:\s*(?:%s|%s|))' %(CONST, SYM, REG, CONST, SYM)
+-MEMORYOP = '(?:\[*(?:[a-zA-Z]+\s+)*(?:%s\s*:\s*%s?|(?:%s\s*)?\[[^]]+\]\]*))' %(REG, CONST, OFFSET)
+-ANYOP = '(?:%s|%s|%s|%s|%s)' %(MEMORYOP, IMMEDIATE, REG, SYM, LABEL)
+-MEMORYOP = '(?:%s|(?:[a-zA-Z]+\s+(?:ptr|PTR)\s+%s))' %(MEMORYOP, ANYOP)
+-MEMORYSRC = '(?:%s\s*,\s*)+%s(?:\s*,\s*%s)*' %(ANYOP, MEMORYOP, ANYOP)
+-MEMORYANY = '(?:%s\s*,\s*)*%s(?:\s*,\s*%s)*' %(ANYOP, MEMORYOP, ANYOP)
++LOCK = r'lock'
++REP = r'rep[a-z]*'
++REX = r'rex(?:\.[a-zA-Z]+)?'
++SCALAR = r'(?:(?:[+-]\s*)?(?:[0-9][0-9a-fA-F]*|0x[0-9a-fA-F]+))'
++IMMEDIATE = r'(?:%s[hb]?)' %(SCALAR)
++REG = r'(?:[a-zA-Z][a-zA-Z0-9]*)'
++SYM = r'(?:[_a-zA-Z][_a-zA-Z0-9]*(?:@[0-9a-zA-Z]+)?)'
++LABEL = r'(?:[._a-zA-Z0-9]+)'
++SEP = r'(?:(?:^|:)\s*)'
++PFX = r'(?:%s\s+)?' %(REX)
++CONST = r'(?:(?:%s|%s|%s)(?:\s*[/*+-]\s*(?:%s|%s|%s))*)' %(SYM, SCALAR, LABEL, SYM, SCALAR, LABEL)
++OFFSET = r'(?:%s|%s|%s\s*:\s*(?:%s|%s|))' %(CONST, SYM, REG, CONST, SYM)
++MEMORYOP = r'(?:\[*(?:[a-zA-Z]+\s+)*(?:%s\s*:\s*%s?|(?:%s\s*)?\[[^]]+\]\]*))' %(REG, CONST, OFFSET)
++ANYOP = r'(?:%s|%s|%s|%s|%s)' %(MEMORYOP, IMMEDIATE, REG, SYM, LABEL)
++MEMORYOP = r'(?:%s|(?:[a-zA-Z]+\s+(?:ptr|PTR)\s+%s))' %(MEMORYOP, ANYOP)
++MEMORYSRC = r'(?:%s\s*,\s*)+%s(?:\s*,\s*%s)*' %(ANYOP, MEMORYOP, ANYOP)
++MEMORYANY = r'(?:%s\s*,\s*)*%s(?:\s*,\s*%s)*' %(ANYOP, MEMORYOP, ANYOP)
+ ATTSTAR = ''
+-GPR = '(?:rax|rcx|rdx|rbx|rdi|rsi|rbp|rsp|r8|r9|r10|r11|r12|r13|r14|r15|RAX|RCX|RDX|RBX|RDI|RSI|RBP|RSP|R8|R9|R10|R11|R12|R13|R14|R15)'
++GPR = r'(?:rax|rcx|rdx|rbx|rdi|rsi|rbp|rsp|r8|r9|r10|r11|r12|r13|r14|r15|RAX|RCX|RDX|RBX|RDI|RSI|RBP|RSP|R8|R9|R10|R11|R12|R13|R14|R15)'
+ 
+ LFENCE = [
+-    '(?:%s%smov(?:[a-rt-z][a-z0-9]*)?\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%s(?:vpmask|vmask|mask|c|v|p|vp)mov[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%spop[bswlqt]?\s+(?:%s|%s))' %(SEP, PFX, MEMORYOP, REG),
+-    '(?:%s%spopad?\s+%s\s*)' %(SEP, PFX, REG),
+-    '(?:%s%s(?:%s\s+)?xchg[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?(?:x|p|vp|ph|h|pm|vpm|)add[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?(?:p|vp|ph|h|)sub[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?ad[co]x?[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?sbb[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?v?p?cmp(?:[a-rt-z][a-z0-9]*)?\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?inc[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?dec[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?not[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?neg[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:i|v|p|vp|)mul[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%s(?:i|v|p|vp|)div[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%spopcnt[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%scrc32[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?v?p?and[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?v?p?or[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?v?p?xor[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%sv?p?test[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%ss[ah][lr][a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%ssar[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%s(?:vp|)ro(?:r|l)[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%src(?:r|l)[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%s(?:%s\s+)?bt[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
+-    '(?:%s%sbs[fr][a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%s(?:vp|)[lt]zcnt[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sblsi[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sblsmsk[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sblsr[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sbextr[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sbzhi[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%spdep[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%spext[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%s(?:%s\s+)?lods[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
+-    '(?:%s%s(?:%s\s+)?scas[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
+-    '(?:%s%s(?:%s\s+)?outs[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
+-    '(?:%s%s(?:%s\s+)?cmps[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
+-    '(?:%s%s(?:%s\s+)?movs[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
+-    '(?:%s%slddqu\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?pack[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?p?unpck[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?p?shuf[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?p?align[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?pblend[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%svperm[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?p?insr[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?insert[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?p?expand[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%svp?broadcast[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svp?gather[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?pavg[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?p?min[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?p?max[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?phminpos[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?pabs[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?psign[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?(?:m|db|)psad[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?psll[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?psrl[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?psra[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?pclmulqdq\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?aesdec(?:last)?\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?aesenc(?:last)?\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?aesimc\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?aeskeygenassist\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?sha(?:1|256)(?:nexte|rnds4|msg1|msg2)\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?cvt[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?rcp(?:ss|ps)\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?u?comis[sd]\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?round[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?dpp[sd]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sv?r?sqrt[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
+-    '(?:%s%sv?ldmxcsr\s+%s)' %(SEP, PFX, MEMORYOP),
+-    '(?:%s%sf?x?rstors?\s+%s)' %(SEP, PFX, MEMORYOP),
+-    '(?:%s%sl[gi]dt\s+%s)' %(SEP, PFX, MEMORYOP),
+-    '(?:%s%slmsw\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svmptrld\s+%s)' %(SEP, PFX, MEMORYOP),
+-    '(?:%s%sf(?:b|i|)ld[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sfi?add[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sfi?sub[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sfi?mul[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sfi?div[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sf(?:i|u|)com[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sleave[bswlqt]?)' %(SEP, PFX),
+-    '(?:%s%spopf[bswlqt]?)' %(SEP, PFX),
+-    '(?:%s%svfixupimm[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svf[m|n]add[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svfpclass[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svget[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svpconflict[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svpternlog[d|q]\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svrange[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svreduce[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svrndscale[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%svscalef[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sxlat\s+%s)' %(SEP, PFX, MEMORYANY),
+-    '(?:%s%sxlatb?)' %(SEP, PFX),
++    r'(?:%s%smov(?:[a-rt-z][a-z0-9]*)?\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%s(?:vpmask|vmask|mask|c|v|p|vp)mov[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%spop[bswlqt]?\s+(?:%s|%s))' %(SEP, PFX, MEMORYOP, REG),
++    r'(?:%s%spopad?\s+%s\s*)' %(SEP, PFX, REG),
++    r'(?:%s%s(?:%s\s+)?xchg[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?(?:x|p|vp|ph|h|pm|vpm|)add[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?(?:p|vp|ph|h|)sub[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?ad[co]x?[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?sbb[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?v?p?cmp(?:[a-rt-z][a-z0-9]*)?\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?inc[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?dec[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?not[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?neg[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:i|v|p|vp|)mul[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%s(?:i|v|p|vp|)div[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%spopcnt[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%scrc32[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?v?p?and[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?v?p?or[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?v?p?xor[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%sv?p?test[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%ss[ah][lr][a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%ssar[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%s(?:vp|)ro(?:r|l)[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%src(?:r|l)[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%s(?:%s\s+)?bt[a-z]*\s+%s)' %(SEP, PFX, LOCK, MEMORYANY),
++    r'(?:%s%sbs[fr][a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%s(?:vp|)[lt]zcnt[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sblsi[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sblsmsk[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sblsr[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sbextr[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sbzhi[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%spdep[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%spext[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%s(?:%s\s+)?lods[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
++    r'(?:%s%s(?:%s\s+)?scas[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
++    r'(?:%s%s(?:%s\s+)?outs[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
++    r'(?:%s%s(?:%s\s+)?cmps[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
++    r'(?:%s%s(?:%s\s+)?movs[a-z]*(?:\s+%s|\s*(?:#|$)))' %(SEP, PFX, REP, MEMORYSRC),
++    r'(?:%s%slddqu\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?pack[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?p?unpck[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?p?shuf[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?p?align[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?pblend[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%svperm[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?p?insr[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?insert[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?p?expand[a-z]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%svp?broadcast[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svp?gather[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?pavg[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?p?min[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?p?max[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?phminpos[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?pabs[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?psign[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?(?:m|db|)psad[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?psll[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?psrl[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?psra[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?pclmulqdq\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?aesdec(?:last)?\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?aesenc(?:last)?\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?aesimc\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?aeskeygenassist\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?sha(?:1|256)(?:nexte|rnds4|msg1|msg2)\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?cvt[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?rcp(?:ss|ps)\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?u?comis[sd]\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?round[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?dpp[sd]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sv?r?sqrt[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYSRC),
++    r'(?:%s%sv?ldmxcsr\s+%s)' %(SEP, PFX, MEMORYOP),
++    r'(?:%s%sf?x?rstors?\s+%s)' %(SEP, PFX, MEMORYOP),
++    r'(?:%s%sl[gi]dt\s+%s)' %(SEP, PFX, MEMORYOP),
++    r'(?:%s%slmsw\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svmptrld\s+%s)' %(SEP, PFX, MEMORYOP),
++    r'(?:%s%sf(?:b|i|)ld[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sfi?add[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sfi?sub[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sfi?mul[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sfi?div[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sf(?:i|u|)com[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sleave[bswlqt]?)' %(SEP, PFX),
++    r'(?:%s%spopf[bswlqt]?)' %(SEP, PFX),
++    r'(?:%s%svfixupimm[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svf[m|n]add[a-z0-9]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svfpclass[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svget[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svpconflict[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svpternlog[d|q]\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svrange[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svreduce[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svrndscale[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%svscalef[a-z]*\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sxlat\s+%s)' %(SEP, PFX, MEMORYANY),
++    r'(?:%s%sxlatb?)' %(SEP, PFX),
+ ]
+ 
+-RET = '(?:%s%sret[a-z]*(?:\s+%s)?(?:#|$))' %(SEP, PFX, IMMEDIATE)
+-MEM_INDBR = '(?:%s%s(?:call|jmp)[a-z]*\s+%s%s)' %(SEP, PFX, ATTSTAR, MEMORYOP)
+-REG_INDBR = '(?:%s%s(?:call|jmp)[a-z]*\s+%s)' %(SEP, PFX, GPR)
++RET = r'(?:%s%sret[a-z]*(?:\s+%s)?(?:#|$))' %(SEP, PFX, IMMEDIATE)
++MEM_INDBR = r'(?:%s%s(?:call|jmp)[a-z]*\s+%s%s)' %(SEP, PFX, ATTSTAR, MEMORYOP)
++REG_INDBR = r'(?:%s%s(?:call|jmp)[a-z]*\s+%s)' %(SEP, PFX, GPR)
+ 
+ #
+ # File Operations - read/write
+-- 
+2.52.0
+

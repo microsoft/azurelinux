@@ -1,0 +1,88 @@
+From 170a1e6037554c6b302f0aa166455a955c92eefe Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Mon, 25 Aug 2025 17:06:02 -0400
+Subject: [PATCH] fix: avoid dependency cycle on Fedora
+
+Starting with 25.2, Fedora's automated test suite began failing for
+Cloud images[0] due to a dependency loop. This was due to the
+`Before=auditd.service` directive added to cloud-init-local.service -
+auditd.service in Fedora is configured with `DefaultDependencies=no` and
+`Before=sysinit.target`, but cloud-init-local.service does not include
+`DefaultDependencies=no`.
+
+This patch adds Fedora to most of the if blocks that include its
+derivative distributions. The exceptions are the one waiting for
+firewalld.service, since currently Fedora Cloud doesn't include it,
+and the one that requires dbus.socket, as that runs after
+sysinit.target.
+
+[0] https://bugzilla.redhat.com/show_bug.cgi?id=2390898
+
+Fixes: cc8d1b4c464d ("chore: make auditd wait for cloud-init-local.service (#6138)")
+Signed-off-by: Jeremy Cline <jeremycline@linux.microsoft.com>
+---
+ systemd/cloud-init-local.service.tmpl   | 4 ++--
+ systemd/cloud-init-main.service.tmpl    | 4 ++--
+ systemd/cloud-init-network.service.tmpl | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+index 26a6aee1d..bebcf0862 100644
+--- a/systemd/cloud-init-local.service.tmpl
++++ b/systemd/cloud-init-local.service.tmpl
+@@ -2,7 +2,7 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Local Stage (pre-network)
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
++{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=network-pre.target
+@@ -23,7 +23,7 @@ ConditionEnvironment=!KERNEL_CMDLINE=cloud-init=disabled
+ 
+ [Service]
+ Type=oneshot
+-{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ # This service is a shim which preserves systemd ordering while allowing a
+diff --git a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.service.tmpl
+index 2ca6220c2..a1f017722 100644
+--- a/systemd/cloud-init-main.service.tmpl
++++ b/systemd/cloud-init-main.service.tmpl
+@@ -8,7 +8,7 @@
+ # https://www.freedesktop.org/software/systemd/man/latest/systemd-remount-fs.service.html
+ [Unit]
+ Description=Cloud-init: Single Process
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel"] %}
++{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+@@ -31,7 +31,7 @@ ExecStart=/usr/bin/cloud-init --all-stages
+ KillMode=process
+ TasksMax=infinity
+ TimeoutStartSec=infinity
+-{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ 
+diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
+index 61425b4a9..6fd2624aa 100644
+--- a/systemd/cloud-init-network.service.tmpl
++++ b/systemd/cloud-init-network.service.tmpl
+@@ -2,7 +2,7 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Network Stage
+-{% if variant not in ["almalinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel"] %}
++{% if variant not in ["almalinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=cloud-init-local.service
+-- 
+2.51.0
+

@@ -1,0 +1,23 @@
+diff -up qt-x11-free-3.3.8b/plugins/src/inputmethods/imsw-none/qnoneinputcontextplugin.cpp.gcc43 qt-x11-free-3.3.8b/plugins/src/inputmethods/imsw-none/qnoneinputcontextplugin.cpp
+--- qt-x11-free-3.3.8b/plugins/src/inputmethods/imsw-none/qnoneinputcontextplugin.cpp.gcc43	2008-02-15 23:51:58.000000000 +0100
++++ qt-x11-free-3.3.8b/plugins/src/inputmethods/imsw-none/qnoneinputcontextplugin.cpp	2008-02-16 00:42:09.000000000 +0100
+@@ -44,7 +44,7 @@
+ #include "qnoneinputcontextplugin.h"
+ #include <qinputcontextfactory.h>
+ #include <qsettings.h>
+-
++#include <stdlib.h>
+ 
+ QNoneInputContextPlugin::QNoneInputContextPlugin()
+ {
+diff -up qt-x11-free-3.3.8b/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp.gcc43 qt-x11-free-3.3.8b/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp
+--- qt-x11-free-3.3.8b/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp.gcc43	2008-02-15 23:54:26.000000000 +0100
++++ qt-x11-free-3.3.8b/plugins/src/inputmethods/simple/qsimpleinputcontext.cpp	2008-02-16 00:33:49.000000000 +0100
+@@ -45,6 +45,7 @@
+ #include <qnamespace.h>
+ #include <qevent.h>
+ #include <qglobal.h>
++#include <algorithm>
+ 
+ static const int ignoreKeys[] = {
+     Qt::Key_Shift,

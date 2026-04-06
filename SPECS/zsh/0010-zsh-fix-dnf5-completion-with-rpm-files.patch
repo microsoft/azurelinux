@@ -1,0 +1,19 @@
+commit 071e325c826a89b792056c3faf0c400b8c0c5738
+Author: Christoph Erhardt <christoph.erhardt@sicherha.de>
+Date:   Tue Sep 30 08:47:15 2025 +0900
+
+    53981: _dnf5: fix completion of local rpm files
+
+diff --git a/Completion/Redhat/Command/_dnf5 b/Completion/Redhat/Command/_dnf5
+index e194dd5a7..9cbf451a8 100644
+--- a/Completion/Redhat/Command/_dnf5
++++ b/Completion/Redhat/Command/_dnf5
+@@ -38,7 +38,7 @@ _dnf5_rpm_files() {
+ 
+ _dnf5_packages_or_rpms() {
+   if [[ "$words[CURRENT]" = (*/*|\~*) ]]; then # if looks like a path name
+-    _dnf_rpm_files
++    _dnf5_rpm_files
+   else
+     _dnf5_packages "$@"
+   fi

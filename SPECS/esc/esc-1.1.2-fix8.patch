@@ -1,0 +1,60 @@
+diff -up ./esc/src/app/opensc.esc.conf.fix8 ./esc/src/app/opensc.esc.conf
+--- ./esc/src/app/opensc.esc.conf.fix8	2020-08-07 16:17:37.464650003 -0700
++++ ./esc/src/app/opensc.esc.conf	2020-08-07 16:20:21.861957011 -0700
+@@ -89,12 +89,12 @@ app default {
+     }
+     reader_driver openct {
+     };
+-    card_drivers = coolkey, cac,cac1, piv, default;
++    card_drivers = coolkey, cac,cac1, PIV-II, default;
+     secure_messaging local_authentic  {
+         module_path = /usr/lib64;
+     }
+     framework pkcs15 {
+-        builtin_emulators = coolkey, cac, cac1, piv;
++        builtin_emulators = coolkey, cac, cac1, PIV-II;
+     }
+ }
+ app opensc-pkcs11 {
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix8 ./esc/src/lib/coolkey/CoolKey.cpp
+--- ./esc/src/lib/coolkey/CoolKey.cpp.fix8	2020-08-07 12:05:35.982966019 -0700
++++ ./esc/src/lib/coolkey/CoolKey.cpp	2020-08-07 16:08:16.747602873 -0700
+@@ -593,6 +593,7 @@ char *CoolKeyGetFullReaderName(const cha
+ 	} else {
+             fullReaderName = strdup(thisReader);
+             PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s CoolKeyGetFullReaderName correct full name:  %s \n",fullReaderName,GetTStamp(tBuff,56)));
++	    break;
+         }
+     }
+ 
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix8 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix8	2020-08-07 12:05:44.394982245 -0700
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2020-08-07 16:10:35.504862004 -0700
+@@ -2225,8 +2225,17 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     HRESULT hres,atrRes,cycleRes,cuidRes;
+ 
+     char *readerName =  PK11_GetSlotName(aSlot);
++    int readerNameLen = strlen(readerName);
+ 
+-    char *actualReaderName = CoolKeyGetFullReaderName(readerName);
++    //Since there is no local support to get a reader name by slot,
++    //Will simply do a partial substring compare, using less characters
++    //to avoid any hard coded trailing chars.
++    
++    char partialReaderName[60];
++    memset(partialReaderName, 0, 60);
++
++    strncpy(partialReaderName,readerName, 59);
++    char *actualReaderName =   CoolKeyGetFullReaderName(partialReaderName);
+ 
+     memset((void *) &tokenInfo,0,sizeof(tokenInfo));
+     ATR.data = NULL; // initialize for error processing
+@@ -2348,7 +2357,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+      if(isACOOLKey && cuidRes == E_FAIL) {
+         //Let's try to get the cuid directly from the token.
+ 
+-        cuidRes = CoolKeyGetCUIDDirectly(cuidChar, 100, readerName);
++        cuidRes = CoolKeyGetCUIDDirectly(cuidChar, 100, actualReaderName);
+ 
+         if(cuidRes != S_OK) {
+            strcpy(info->mCUID, "unknown");

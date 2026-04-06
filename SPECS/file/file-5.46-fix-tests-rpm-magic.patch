@@ -1,0 +1,44 @@
+From 8d2c4277d776aabddf6286419b67ef725ae5f643 Mon Sep 17 00:00:00 2001
+From: Vincent Mihalkovic <vmihalko@redhat.com>
+Date: Thu, 5 Dec 2024 14:35:06 +0100
+Subject: [PATCH] tests: Fix test after adding magic for RPM arcs.
+
+fixup: https://github.com/file/file/commit/f701c71f80e73b9196bd00375d161c3c0248a0a7
+---
+ tests/rpm-v3.0-bin-aarch64.result   | 2 +-
+ tests/rpm-v3.0-bin-powerpc64.result | 2 +-
+ tests/rpm-v3.0-bin-s390x.result     | 2 +-
+ tests/rpm-v3.0-bin-x86_64.result    | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/rpm-v3.0-bin-aarch64.result b/tests/rpm-v3.0-bin-aarch64.result
+index b173034..76077e4 100644
+--- a/tests/rpm-v3.0-bin-aarch64.result
++++ b/tests/rpm-v3.0-bin-aarch64.result
+@@ -1 +1 @@
+-RPM v3.0 bin AArch64
++RPM v3.0 bin AArch64 test-0-0.fc40
+diff --git a/tests/rpm-v3.0-bin-powerpc64.result b/tests/rpm-v3.0-bin-powerpc64.result
+index c4526e2..c0facac 100644
+--- a/tests/rpm-v3.0-bin-powerpc64.result
++++ b/tests/rpm-v3.0-bin-powerpc64.result
+@@ -1 +1 @@
+-RPM v3.0 bin PowerPC64
++RPM v3.0 bin PowerPC64 test-0-0.fc40
+diff --git a/tests/rpm-v3.0-bin-s390x.result b/tests/rpm-v3.0-bin-s390x.result
+index 0008d7e..ef672b6 100644
+--- a/tests/rpm-v3.0-bin-s390x.result
++++ b/tests/rpm-v3.0-bin-s390x.result
+@@ -1 +1 @@
+-RPM v3.0 bin S/390x
++RPM v3.0 bin S/390x test-0-0.fc40
+diff --git a/tests/rpm-v3.0-bin-x86_64.result b/tests/rpm-v3.0-bin-x86_64.result
+index e3fcc7d..597448a 100644
+--- a/tests/rpm-v3.0-bin-x86_64.result
++++ b/tests/rpm-v3.0-bin-x86_64.result
+@@ -1 +1 @@
+-RPM v3.0 bin i386/x86_64
++RPM v3.0 bin i386/x86_64 test-0-0.fc40
+-- 
+2.47.0
+

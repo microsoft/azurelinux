@@ -1,0 +1,26 @@
+From 35293517604f9cfb9dd8c441c6f10f480ca7436d Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 16 Dec 2025 22:37:32 +0000
+Subject: [PATCH] Document --directories in the man page
+
+---
+ doc/diskus.1 | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/doc/diskus.1 b/doc/diskus.1
+index 8ffc5c7..6592ec0 100644
+--- a/doc/diskus.1
++++ b/doc/diskus.1
+@@ -17,6 +17,12 @@ Output format for file sizes (decimal: MB, binary: MiB) [default: decimal]
+ \fB\-v\fR, \fB\-\-verbose\fR
+ Do not hide filesystem errors
+ .TP
++\fB\-\-directories\fR <mode>
++Whether to count directory sizes
++(auto: included for disk usage, excluded for apparent size)
++[default: auto]
++[possible values: auto, included, excluded]
++.TP
+ \fB\-b\fR, \fB\-\-apparent\-size\fR
+ Compute apparent size instead of disk usage
+ .TP

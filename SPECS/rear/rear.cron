@@ -1,0 +1,4 @@
+# cronjob for ReaR
+# periodically check if disk layout has changed and update
+# the rescue image
+30 1 * * * root test -f /var/lib/rear/layout/disklayout.conf && /usr/sbin/rear checklayout || /usr/sbin/rear mkrescue

@@ -1,0 +1,13 @@
+diff -up hdparm-9.60/sysfs.c.bak hdparm-9.60/sysfs.c
+--- hdparm-9.60/sysfs.c.bak	2021-04-15 15:48:56.806354847 +0200
++++ hdparm-9.60/sysfs.c	2021-04-16 14:44:42.520395436 +0200
+@@ -61,7 +61,8 @@ static int sysfs_write_attr (char *path,
+ 		if (count < 0)
+ 			err = errno;
+ 	}
+-	fclose(fp);
++	if (fp)
++		fclose(fp);
+ 	if (err && verbose) perror(path);
+ 	*pathtail = '\0';
+ 	return err;

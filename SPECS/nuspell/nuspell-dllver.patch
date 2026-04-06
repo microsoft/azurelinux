@@ -1,0 +1,14 @@
+diff -rupN --no-dereference nuspell-5.1.6/src/nuspell/CMakeLists.txt nuspell-5.1.6-new/src/nuspell/CMakeLists.txt
+--- nuspell-5.1.6/src/nuspell/CMakeLists.txt	2024-07-04 13:45:35.000000000 +0200
++++ nuspell-5.1.6-new/src/nuspell/CMakeLists.txt	2024-07-05 09:59:49.374087496 +0200
+@@ -23,6 +23,10 @@ set_target_properties(nuspell PROPERTIES
+ 	SOVERSION ${PROJECT_VERSION_MAJOR}
+ 	CXX_VISIBILITY_PRESET hidden)
+ 
++if(MINGW)
++    set_target_properties(nuspell PROPERTIES SUFFIX "-${PROJECT_VERSION_MAJOR}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++endif(MINGW)
++
+ target_compile_features(nuspell PUBLIC cxx_std_17)
+ 
+ target_include_directories(nuspell

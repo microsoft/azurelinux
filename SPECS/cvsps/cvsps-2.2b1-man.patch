@@ -1,0 +1,29 @@
+diff -up cvsps-2.2b1/cvsps.1~ cvsps-2.2b1/cvsps.1
+--- cvsps-2.2b1/cvsps.1~	2008-04-02 04:18:44.000000000 +0300
++++ cvsps-2.2b1/cvsps.1	2010-05-18 21:10:39.000000000 +0300
+@@ -11,7 +11,7 @@ to a collection of files, and all commit
+ single 'cvs commit' command).  This information is valuable to seeing the
+ big picture of the evolution of a cvs project.  While cvs tracks revision
+ information, it is often difficult to see what changes were committed
+-'atomically' to the repository.
++\'atomically' to the repository.
+ .SH OPTIONS
+ .TP
+ .B \-h
+@@ -83,7 +83,7 @@ some hacks which are not generally appli
+ disable the use of rlog internally.  Note: rlog is
+ required for stable PatchSet numbering.  Use with care.
+ .TP
+-.B \-\-diffs\-opts <option string>
++.B \-\-diff\-opts <option string>
+ send a custom set of options to diff, for example to increase
+ the number of context lines, or change the diff format.
+ .TP
+@@ -103,6 +103,7 @@ Override the setting of CVSROOT (overrid
+ .TP
+ .B \-q
+ Be quiet about warnings.
++.TP
+ .B \-A
+ Show ancestor branch when a new branch is found.
+ .TP

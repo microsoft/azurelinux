@@ -1,0 +1,11 @@
+--- expect5.45.4/Makefile.in	2025-02-05 11:22:09.315807390 -0800
++++ expect5.45.4/Makefile.in.new	2025-02-05 11:23:38.156274900 -0800
+@@ -385,7 +385,7 @@
+ 	cp $(DIST_ROOT)/$(PKG_DIR).tar.gz $(top_builddir)
+ 
+ $(SCRIPTS):
+-	$(TCLSH) $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
++	$(TCLSH_ENV) sed -e s,tclsh,$(TCLSH_PROG), $(srcdir)/example/$@ | $(TCLSH_PROG) $(srcdir)/fixline1 $(SHORT_BINDIR) > $@
+ 
+ ## We cannot use TCL_LIBS below (after TCL_LIB_SPEC) because its
+ ## expansion references the contents of LIBS, which contains linker

@@ -1,0 +1,11 @@
+--- quickcheck-0.9.2/Cargo.toml	2020-01-14T14:10:18+00:00
++++ quickcheck-0.9.2/Cargo.toml	2024-08-29T11:54:30.331748+00:00
+@@ -28,7 +28,7 @@
+ [lib]
+ name = "quickcheck"
+ [dependencies.env_logger]
+-version = "0.7.0"
++version = "0.8.0"
+ optional = true
+ default-features = false
+ 

@@ -1,0 +1,27 @@
+diff -uNrp a/src/backends/x11/meta-input-settings-x11.c b/src/backends/x11/meta-input-settings-x11.c
+--- a/src/backends/x11/meta-input-settings-x11.c	2023-03-16 13:59:31.000000000 +0000
++++ b/src/backends/x11/meta-input-settings-x11.c	2023-05-18 22:11:00.420424887 +0100
+@@ -656,12 +656,12 @@ set_device_accel_profile (ClutterInputDe
+   guchar values[2] = { 0 }; /* adaptive, flat */
+ 
+   defaults = get_property (device, "libinput Accel Profile Enabled Default",
+-                           XA_INTEGER, 8, 2);
++                           XA_INTEGER, 8, 3);
+   if (!defaults)
+     return;
+ 
+   available = get_property (device, "libinput Accel Profiles Available",
+-                           XA_INTEGER, 8, 2);
++                           XA_INTEGER, 8, 3);
+   if (!available)
+     goto err_available;
+ 
+@@ -684,7 +684,7 @@ set_device_accel_profile (ClutterInputDe
+     }
+ 
+   change_property (device, "libinput Accel Profile Enabled",
+-                   XA_INTEGER, 8, &values, 2);
++                   XA_INTEGER, 8, &values, 3);
+ 
+   meta_XFree (available);
+ 

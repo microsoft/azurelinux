@@ -1,0 +1,11 @@
+*** hypre-2.14.0/src/test/runtest.sh~
+--- hypre-2.14.0/src/test/runtest.sh
+@@ -16,7 +16,7 @@
+ RunEcho=""
+ ExecFileNames=""           # string of executable file names used
+ TestDirNames=""            # string of names of TEST_* directories used
+-HOST=`hostname`
++HOST=
+ NumThreads=0               # number of OpenMP threads to use if > 0
+ Valgrind=""                # string to add to MpirunString when using valgrind
+ cudamemcheck=""            # string to add to MpirunString when using cudamemcheck

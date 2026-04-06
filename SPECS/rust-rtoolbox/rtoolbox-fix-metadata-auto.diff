@@ -1,0 +1,19 @@
+--- rtoolbox-0.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rtoolbox-0.0.1/Cargo.toml	2023-03-12T13:42:14.316431+00:00
+@@ -36,16 +36,3 @@
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2"
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = [
+-    "std",
+-    "winnt",
+-    "fileapi",
+-    "processenv",
+-    "winbase",
+-    "handleapi",
+-    "consoleapi",
+-    "minwindef",
+-    "wincon",
+-]

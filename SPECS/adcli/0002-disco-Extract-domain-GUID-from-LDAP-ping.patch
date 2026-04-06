@@ -1,0 +1,65 @@
+From f443691a420b37f84e5af04ffd8fd2e7e1e7be25 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Thu, 31 Aug 2023 13:40:08 +0200
+Subject: [PATCH 02/17] disco: Extract domain GUID from LDAP ping
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/addisco.c | 14 ++------------
+ library/addisco.h |  1 +
+ 2 files changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/library/addisco.c b/library/addisco.c
+index ac073e5..7136f0e 100644
+--- a/library/addisco.c
++++ b/library/addisco.c
+@@ -407,17 +407,6 @@ parse_guid (unsigned char **at,
+ 	return 1;
+ }
+ 
+-static int
+-skip_n (unsigned char **at,
+-        unsigned char *end,
+-        int n)
+-{
+-	if (end - (*at) < n)
+-		return 0;
+-	(*at) += n;
+-	return 1;
+-}
+-
+ static adcli_disco *
+ parse_disco_data (struct berval *bv)
+ {
+@@ -436,7 +425,7 @@ parse_disco_data (struct berval *bv)
+ 	/* domain forest */
+ 	if (!get_32_le (&at, end, &type) || type != 23 ||
+ 	    !get_32_le (&at, end, &disco->flags) ||
+-	    !skip_n (&at, end, 16) || /* guid */
++	    !parse_guid (&at, end, &disco->domain_guid) ||
+ 	    !parse_disco_string (beg, end, &at, &disco->forest) ||
+ 	    !parse_disco_string (beg, end, &at, &disco->domain) ||
+ 	    !parse_disco_string (beg, end, &at, &disco->host_name) ||
+@@ -1077,6 +1066,7 @@ adcli_disco_free (adcli_disco *disco)
+ 		free (disco->host_addr);
+ 		free (disco->host_name);
+ 		free (disco->host_short);
++		free (disco->domain_guid);
+ 		free (disco->forest);
+ 		free (disco->domain);
+ 		free (disco->domain_short);
+diff --git a/library/addisco.h b/library/addisco.h
+index 718db7d..11a1464 100644
+--- a/library/addisco.h
++++ b/library/addisco.h
+@@ -48,6 +48,7 @@ typedef struct _adcli_disco {
+ 	char *forest;
+ 	char *domain;
+ 	char *domain_short;
++	char *domain_guid;
+ 	char *host_name;
+ 	char *host_addr;
+ 	char *host_short;
+-- 
+2.47.0
+

@@ -1,0 +1,59 @@
+From 33f3c97f7d45c8bb1b43a8d551cb01a9873bb123 Mon Sep 17 00:00:00 2001
+From: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+Date: Tue, 28 Feb 2023 03:59:16 -0500
+Subject: [PATCH] coredump: fix building failure due to undefined macros
+ MAPLE_TREE_{COUNT,GATHER}
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+As of the commit 13794ace3830bf0274fe7b2e0e579ad72e31848f (coredump:
+fix failure of executing gcore command due to introduction of maple
+tree management on vma list), gcore.so fails to get built with the
+following error messages with defs.h without maple tree API support:
+
+    libgcore/gcore_coredump.c:189:50: error: ‘MAPLE_TREE_COUNT’ undeclared (first use in this function); did you mean ‘RADIX_TREE_COUNT’?
+      189 |                 entry_num = do_maple_tree(mm_mt, MAPLE_TREE_COUNT, NULL);
+	  |                                                  ^~~~~~~~~~~~~~~~
+	  |                                                  RADIX_TREE_COUNT
+    libgcore/gcore_coredump.c:189:50: note: each undeclared identifier is reported only once for each function it appears in
+    libgcore/gcore_coredump.c:191:38: error: ‘MAPLE_TREE_GATHER’ undeclared (first use in this function); did you mean ‘RADIX_TREE_GATHER’?
+      191 |                 do_maple_tree(mm_mt, MAPLE_TREE_GATHER, entry_list);
+	  |                                      ^~~~~~~~~~~~~~~~~
+	  |                                      RADIX_TREE_GATHER
+
+This is caused by the missing macros MAPLE_TREE_COUNT and
+MAPLE_TREE_GATHER.
+
+To fix the issue, define the two macros within crash gcore so that
+build is successfully done expecting the resulting binary works well
+when it is ran against new crash utility that has maple tree API
+support.
+
+Signed-off-by: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+---
+ src/libgcore/gcore_coredump.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/libgcore/gcore_coredump.c b/src/libgcore/gcore_coredump.c
+index fa744d4..8eece96 100644
+--- a/src/libgcore/gcore_coredump.c
++++ b/src/libgcore/gcore_coredump.c
+@@ -128,6 +128,14 @@ void gcore_readmem_user(ulong addr, void *buf, long size, char *type)
+ 	}
+ }
+ 
++#if !defined(MAPLE_TREE_COUNT)
++#define MAPLE_TREE_COUNT (1)
++#endif
++
++#if !defined(MAPLE_TREE_GATHER)
++#define MAPLE_TREE_GATHER (4)
++#endif
++
+ ulong __attribute__((weak))
+ do_maple_tree(ulong root, int flag, struct list_pair *lp)
+ {
+-- 
+2.39.2
+

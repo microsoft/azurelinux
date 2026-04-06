@@ -1,0 +1,60 @@
+diff --git a/tests/amd_smi_test/functional/frequencies_read.cc b/tests/amd_smi_test/functional/frequencies_read.cc
+index 4e893315..096c7371 100644
+--- a/tests/amd_smi_test/functional/frequencies_read.cc
++++ b/tests/amd_smi_test/functional/frequencies_read.cc
+@@ -23,6 +23,7 @@
+ #include <cstdint>
+ #include <iostream>
+ #include <string>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ #include "amd_smi/amdsmi.h"
+diff --git a/tests/amd_smi_test/functional/hw_topology_read.cc b/tests/amd_smi_test/functional/hw_topology_read.cc
+index 390dbec0..3169f4a4 100644
+--- a/tests/amd_smi_test/functional/hw_topology_read.cc
++++ b/tests/amd_smi_test/functional/hw_topology_read.cc
+@@ -27,6 +27,7 @@
+ #include <iostream>
+ #include <string>
+ #include <vector>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ #include "amd_smi/amdsmi.h"
+diff --git a/tests/amd_smi_test/functional/id_info_read.cc b/tests/amd_smi_test/functional/id_info_read.cc
+index edc0bfaa..6cb89d09 100644
+--- a/tests/amd_smi_test/functional/id_info_read.cc
++++ b/tests/amd_smi_test/functional/id_info_read.cc
+@@ -27,6 +27,7 @@
+ #include <iostream>
+ #include <string>
+ #include <map>
++#include <iomanip>
+ #include "amd_smi/amdsmi.h"
+ #include "id_info_read.h"
+ #include "../test_common.h"
+diff --git a/tests/amd_smi_test/functional/sys_info_read.cc b/tests/amd_smi_test/functional/sys_info_read.cc
+index eac51cce..9cf0d407 100644
+--- a/tests/amd_smi_test/functional/sys_info_read.cc
++++ b/tests/amd_smi_test/functional/sys_info_read.cc
+@@ -26,6 +26,7 @@
+ #include <iostream>
+ #include <string>
+ #include <limits>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ #include "amd_smi/amdsmi.h"
+diff --git a/tests/amd_smi_test/test_base.cc b/tests/amd_smi_test/test_base.cc
+index 564ea5de..a2fa7df9 100644
+--- a/tests/amd_smi_test/test_base.cc
++++ b/tests/amd_smi_test/test_base.cc
+@@ -23,6 +23,7 @@
+ #include <gtest/gtest.h>
+ #include <cassert>
+ #include <limits>
++#include <iomanip>
+ 
+ #include "amd_smi/amdsmi.h"
+ #include "amd_smi/impl/amd_smi_utils.h"

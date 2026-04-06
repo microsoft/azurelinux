@@ -1,0 +1,193 @@
+From 768b3ff900664dc57131cd90decc12d557445e59 Mon Sep 17 00:00:00 2001
+From: Emanuel Lima <emlima@redhat.com>
+Date: Mon, 6 Jan 2025 16:11:19 -0300
+Subject: [PATCH 1000/1000] Remove warnings as compilation errors
+
+Signed-off-by: Emanuel Lima <emlima@redhat.com>
+Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+---
+ src/agent/Makefile                 | 4 ++--
+ src/dragonball/Makefile            | 2 +-
+ src/libs/Makefile                  | 2 +-
+ src/runtime-rs/Makefile            | 4 ++--
+ src/tools/agent-ctl/Makefile       | 4 ++--
+ src/tools/genpolicy/Makefile       | 6 +++---
+ src/tools/kata-ctl/Makefile        | 6 +++---
+ src/tools/trace-forwarder/Makefile | 2 +-
+ utils.mk                           | 2 +-
+ 9 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/src/agent/Makefile b/src/agent/Makefile
+index cd66a88..f6d2917 100644
+--- a/src/agent/Makefile
++++ b/src/agent/Makefile
+@@ -128,14 +128,14 @@ static-checks-build: $(GENERATED_CODE)
+ $(TARGET): $(GENERATED_CODE) $(TARGET_PATH)
+
+ $(TARGET_PATH): show-summary
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
+
+ $(GENERATED_FILES): %: %.in $(VERSION_FILE)
+ 	@sed $(foreach r,$(GENERATED_REPLACEMENTS),-e 's|@$r@|$($r)|g') "$<" > "$@"
+
+ ##TARGET optimize: optimized  build
+ optimize: show-summary show-header
+-	@RUSTFLAGS="-C link-arg=-s $(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="-C link-arg=-s $(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
+
+ ##TARGET install: install agent
+ install: install-services
+diff --git a/src/dragonball/Makefile b/src/dragonball/Makefile
+index e9881a1..4a80dc0 100644
+--- a/src/dragonball/Makefile
++++ b/src/dragonball/Makefile
+@@ -27,7 +27,7 @@ clippy:
+ 	@echo "INFO: cargo clippy..."
+ 	cargo clippy --all-targets --all-features \
+ 		-- \
+-		-D warnings
++
+
+ vendor:
+ 	@echo "INFO: vendor do nothing.."
+diff --git a/src/libs/Makefile b/src/libs/Makefile
+index aabaa33..1fb6b20 100644
+--- a/src/libs/Makefile
++++ b/src/libs/Makefile
+@@ -25,7 +25,7 @@ clippy:
+ 	@echo "INFO: cargo clippy..."
+ 	cargo clippy --all-targets --all-features --release \
+ 		-- \
+-		-D warnings
++
+
+ format:
+ 	@echo "INFO: cargo fmt..."
+diff --git a/src/runtime-rs/Makefile b/src/runtime-rs/Makefile
+index a5f8bed..5d14316 100644
+--- a/src/runtime-rs/Makefile
++++ b/src/runtime-rs/Makefile
+@@ -734,7 +734,7 @@ static-checks-build: $(GENERATED_FILES)
+ $(TARGET): $(GENERATED_FILES) $(TARGET_PATH)
+
+ $(TARGET_PATH): $(SOURCES) | show-summary
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
+
+ $(GENERATED_FILES): %: %.in
+ 	@sed \
+@@ -744,7 +744,7 @@ $(GENERATED_FILES): %: %.in
+
+ ##TARGET optimize: optimized  build
+ optimize: $(SOURCES) | show-summary show-header
+-	@RUSTFLAGS="-C link-arg=-s $(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) --$(BUILD_TYPE) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="-C link-arg=-s $(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) --$(BUILD_TYPE) $(EXTRA_RUSTFEATURES)
+
+ ##TARGET clean: clean build
+ clean: clean-generated-files
+diff --git a/src/tools/agent-ctl/Makefile b/src/tools/agent-ctl/Makefile
+index 980e47c..ea1d76c 100644
+--- a/src/tools/agent-ctl/Makefile
++++ b/src/tools/agent-ctl/Makefile
+@@ -9,7 +9,7 @@ include ../../../utils.mk
+ default: build
+
+ build:
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) --$(BUILD_TYPE)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) --$(BUILD_TYPE)
+
+ static-checks-build:
+ 	@echo "INFO: static-checks-build do nothing.."
+@@ -23,7 +23,7 @@ vendor:
+ test:
+
+ install:
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo install --locked --target $(TRIPLE) --path .
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo install --locked --target $(TRIPLE) --path .
+
+ check: standard_rust_check
+
+diff --git a/src/tools/genpolicy/Makefile b/src/tools/genpolicy/Makefile
+index 3cd6b35..ccc9be3 100644
+--- a/src/tools/genpolicy/Makefile
++++ b/src/tools/genpolicy/Makefile
+@@ -24,7 +24,7 @@ $(GENERATED_FILES): %: %.in
+ default: build
+
+ build: $(GENERATED_FILES)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release)
+
+ static-checks-build:
+ 	@echo "INFO: static-checks-build do nothing.."
+@@ -37,10 +37,10 @@ vendor:
+ 	cargo vendor
+
+ test: $(GENERATED_FILES)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo test --all-targets --all-features --target $(TRIPLE)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo test --all-targets --all-features --target $(TRIPLE)
+
+ install: $(GENERATED_FILES)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo install --locked --target $(TRIPLE) --path .
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo install --locked --target $(TRIPLE) --path .
+
+ check:  $(GENERATED_CODE) standard_rust_check
+
+diff --git a/src/tools/kata-ctl/Makefile b/src/tools/kata-ctl/Makefile
+index 7595c0c..05d171f 100644
+--- a/src/tools/kata-ctl/Makefile
++++ b/src/tools/kata-ctl/Makefile
+@@ -43,7 +43,7 @@ default: $(TARGET) build
+ $(TARGET): $(GENERATED_CODE)
+
+ build:
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
+
+ static-checks-build: $(GENERATED_CODE)
+
+@@ -59,10 +59,10 @@ vendor:
+ 	cargo vendor
+
+ test: $(GENERATED_CODE)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo test --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES) -- --nocapture
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo test --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES) -- --nocapture
+
+ install:
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo install --locked --target $(TRIPLE) --path . --root $(INSTALL_PATH)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo install --locked --target $(TRIPLE) --path . --root $(INSTALL_PATH)
+
+ check: $(GENERATED_CODE) standard_rust_check
+
+diff --git a/src/tools/trace-forwarder/Makefile b/src/tools/trace-forwarder/Makefile
+index 5a529e2..94e9eac 100644
+--- a/src/tools/trace-forwarder/Makefile
++++ b/src/tools/trace-forwarder/Makefile
+@@ -9,7 +9,7 @@ include ../../../utils.mk
+ default: build
+
+ build:
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) --$(BUILD_TYPE)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) --$(BUILD_TYPE)
+
+ static-checks-build:
+ 	@echo "INFO: static-checks-build do nothing.."
+diff --git a/utils.mk b/utils.mk
+index a842dd3..aa462e2 100644
+--- a/utils.mk
++++ b/utils.mk
+@@ -182,7 +182,7 @@ standard_rust_check:
+ 	@echo "standard rust check..."
+ 	cargo fmt -- --check
+ 	cargo clippy --all-targets --all-features --release \
+ 		-- \
+-		-D warnings
++
+ 	cargo check
+ 	@DIFF=$$(git diff HEAD); \
+
+ # Install a file (full version).
+ #
+--
+2.52.0

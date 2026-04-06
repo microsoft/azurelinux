@@ -1,0 +1,175 @@
+From 284c64f2ad8f104b15983f7ff37e90486847c5b1 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 14 Apr 2025 15:25:40 -0400
+Subject: [PATCH 48/59] FIPS: KDF key lenght errors
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ test/recipes/30-test_evp_data/evpkdf_ss.txt        |  8 ++++----
+ test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt |  6 +++---
+ test/recipes/30-test_evp_data/evpkdf_tls13_kdf.txt | 11 ++++++-----
+ test/recipes/30-test_evp_data/evpkdf_x942.txt      |  3 +--
+ test/recipes/30-test_evp_data/evpkdf_x963.txt      |  6 ++----
+ test/recipes/30-test_evp_data/evpmac_common.txt    |  2 +-
+ test/recipes/30-test_evp_data/evppkey_kdf_hkdf.txt |  2 +-
+ 7 files changed, 18 insertions(+), 20 deletions(-)
+
+diff --git a/test/recipes/30-test_evp_data/evpkdf_ss.txt b/test/recipes/30-test_evp_data/evpkdf_ss.txt
+index 4503af711f..7ef2894ae6 100644
+--- a/test/recipes/30-test_evp_data/evpkdf_ss.txt
++++ b/test/recipes/30-test_evp_data/evpkdf_ss.txt
+@@ -1189,8 +1189,8 @@ KDF = SSKDF
+ Ctrl.digest = digest:SHA1
+ Ctrl.hexsecret = hexsecret:d7e6
+ Ctrl.hexinfo = hexinfo:0bbe1fa8722023d7c3da4fff
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
++Result = KDF_DERIVE_ERROR
++#Reason = invalid key length
+ 
+ Availablein = fips
+ FIPSversion = >=3.4.0
+@@ -1200,8 +1200,8 @@ Ctrl.digest = digest:SHA224
+ Ctrl.salt = hexsalt:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+ Ctrl.hexsecret = hexsecret:40B6E03711EBEBA14011ACE96C
+ Ctrl.hexinfo = hexinfo:5D437C2F1035A4F1F751E59CF10650171EF5769FCFBE438DFBC5BD8EA724100076447AB804F91DFA680E592FE2621A45DAB4C6A77B678059FC29E572DE4424EB5459F53523002ED38AAB1D9DD96C3523D1907C5EFBAE93DFFE680F716498720110D2A3B9CE9B66DB2884C83E9BEB546754874C0CA1967AF000000400
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
++Result = KDF_DERIVE_ERROR
++#Reason = invalid key length
+ 
+ Availablein = fips
+ FIPSversion = >=3.4.0
+diff --git a/test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt b/test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt
+index edb2e81273..d663e5e5a5 100644
+--- a/test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt
++++ b/test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt
+@@ -104,8 +104,8 @@ Ctrl.Secret = hexsecret:f8938ecc9edebc5030c0c6a441e213cd24e6f770a50dda07876f8d55
+ Ctrl.label = seed:extended master secret
+ Ctrl.client_random = hexseed:36c129d01a3200894b9179faac589d9835d58775f9b5ea3587cb8fd0364cae8c
+ Ctrl.server_random = hexseed:f6c9575ed7ddd73e1f7d16eca115415812a43c2b747daaaae043abfb50053fce
+-Result = KDF_CTRL_ERROR
+-Reason = digest not allowed
++Result = KDF_DERIVE_ERROR
++Reason = invalid key length
+ 
+ # Test that the operation with unapproved digest function is is reported as
+ # unapproved
+@@ -131,7 +131,7 @@ Ctrl.Secret = hexsecret:0102030405060708090a0b
+ Ctrl.label = seed:extended master secret
+ Ctrl.client_random = hexseed:36c129d01a3200894b9179faac589d9835d58775f9b5ea3587cb8fd0364cae8c
+ Ctrl.server_random = hexseed:f6c9575ed7ddd73e1f7d16eca115415812a43c2b747daaaae043abfb50053fce
+-Result = KDF_CTRL_ERROR
++Result = KDF_DERIVE_ERROR
+ Reason = invalid key length
+ 
+ # Test that the key whose length is shorter than 112 bits is reported as
+diff --git a/test/recipes/30-test_evp_data/evpkdf_tls13_kdf.txt b/test/recipes/30-test_evp_data/evpkdf_tls13_kdf.txt
+index f2ea9ac44a..0f2f6e3904 100644
+--- a/test/recipes/30-test_evp_data/evpkdf_tls13_kdf.txt
++++ b/test/recipes/30-test_evp_data/evpkdf_tls13_kdf.txt
+@@ -4963,7 +4963,7 @@ KDF = TLS13-KDF
+ Ctrl.mode = mode:EXTRACT_ONLY
+ Ctrl.digest = digest:SHA512-256
+ Ctrl.key = hexkey:f8af6aea2d397baf2948a25b2834200692cff17eee9165e4e27babee9edefd05
+-Result = KDF_CTRL_ERROR
++Result = KDF_DERIVE_ERROR
+ 
+ # Test that the operation with unapproved digest function is is reported as
+ # unapproved
+@@ -4985,20 +4985,21 @@ KDF = TLS13-KDF
+ Ctrl.mode = mode:EXTRACT_ONLY
+ Ctrl.digest = digest:SHA2-256
+ Ctrl.key = hexkey:0102030405060708090a0b
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
++Result = KDF_DERIVE_ERROR
++Reason = wrong output buffer size
+ 
+ Availablein = fips
+ FIPSversion = >=3.4.0
+ KDF = TLS13-KDF
++Unapproved = 1
+ Ctrl.mode = mode:EXPAND_ONLY
+ Ctrl.digest = digest:SHA2-256
+ Ctrl.key = hexkey:0102030405060708090a0b
+ Ctrl.data = hexdata:7c92f68bd5bf3638ea338a6494722e1b44127e1b7e8aad535f2322a644ff22b3
+ Ctrl.prefix = hexprefix:746c73313320
+ Ctrl.label = hexlabel:6320652074726166666963
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
++Result = KDF_MISMATCH
++#Reason = invalid key length
+ 
+ # Test that the key whose length is shorter than 112 bits is reported as
+ # unapproved
+diff --git a/test/recipes/30-test_evp_data/evpkdf_x942.txt b/test/recipes/30-test_evp_data/evpkdf_x942.txt
+index b1774592e9..6869fd0f20 100644
+--- a/test/recipes/30-test_evp_data/evpkdf_x942.txt
++++ b/test/recipes/30-test_evp_data/evpkdf_x942.txt
+@@ -124,11 +124,10 @@ Reason = xof digests not allowed
+ Availablein = fips
+ FIPSversion = >=3.4.0
+ KDF = X942KDF-ASN1
++Unapproved = 1
+ Ctrl.digest = digest:SHA256
+ Ctrl.hexsecret = hexsecret:6B
+ Ctrl.use-keybits = use-keybits:0
+ Ctrl.cekalg = cekalg:id-aes128-wrap
+ Ctrl.hexacvp-info = hexacvp-info:a020299D468D60BC6A257E0B6523D691A3FC1602453B35F308C762FBBAC6069A88BCa12080D49BFE5BE01C7D56489AB017663C22B8CBB34C3174D1D71F00CB7505AC759Aa2203C21A5EA5988562C007986E0503D039E7231D9F152FE72A231A1FD98C59BCA6Aa320FD47477542989B51E4A0845DFABD6EEAA465F69B3D75349B2520051782C7F3FC
+ Output = C2E6A0978C24AF3932F478583ADBFB5F57D491822592EAD3C538875F46EB057A
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
+diff --git a/test/recipes/30-test_evp_data/evpkdf_x963.txt b/test/recipes/30-test_evp_data/evpkdf_x963.txt
+index b8f3cff3d3..74524c4694 100644
+--- a/test/recipes/30-test_evp_data/evpkdf_x963.txt
++++ b/test/recipes/30-test_evp_data/evpkdf_x963.txt
+@@ -148,8 +148,7 @@ KDF = X963KDF
+ Ctrl.digest = digest:SHA1
+ Ctrl.hexsecret = hexsecret:fd17198b89ab39c4ab5d7cca363b82f9fd7e23c3984dc8a2
+ Ctrl.hexinfo = hexinfo:856a53f3e36a26bbc5792879f307cce2
+-Result = KDF_CTRL_ERROR
+-Reason = digest not allowed
++Result = KDF_DERIVE_ERROR
+ 
+ # Test that the operation with unapproved digest function is is reported as
+ # unapproved
+@@ -170,8 +169,7 @@ KDF = X963KDF
+ Ctrl.digest = digest:SHA224
+ Ctrl.hexsecret = hexsecret:0102030405060908090a0b
+ Ctrl.hexinfo = hexinfo:0102030405060708090a0b0c0d0e0f10
+-Result = KDF_CTRL_ERROR
+-Reason = invalid key length
++Result = KDF_DERIVE_ERROR
+ 
+ # Test that the key whose length is shorter than 112 bits is reported as
+ # unapproved
+diff --git a/test/recipes/30-test_evp_data/evpmac_common.txt b/test/recipes/30-test_evp_data/evpmac_common.txt
+index af92ceea98..a1541bf226 100644
+--- a/test/recipes/30-test_evp_data/evpmac_common.txt
++++ b/test/recipes/30-test_evp_data/evpmac_common.txt
+@@ -271,7 +271,7 @@ MAC = HMAC
+ Algorithm = SHA256
+ Input = "Test Input"
+ Key = 0001020304
+-Result = MAC_INIT_ERROR
++Output = db70da6176d87813b059879ccc27bc53e295c6eca74db8bdc4e77d7e951d894b
+ 
+ Title = HMAC FIPS short key indicator test
+ 
+diff --git a/test/recipes/30-test_evp_data/evppkey_kdf_hkdf.txt b/test/recipes/30-test_evp_data/evppkey_kdf_hkdf.txt
+index 1fb2472001..93c07ede7c 100644
+--- a/test/recipes/30-test_evp_data/evppkey_kdf_hkdf.txt
++++ b/test/recipes/30-test_evp_data/evppkey_kdf_hkdf.txt
+@@ -216,7 +216,7 @@ Ctrl.digest = digest:SHA1
+ Ctrl.IKM = hexkey:0b0b0b0b0b0b0b0b0b0b0b
+ Ctrl.salt = hexsalt:000102030405060708090a0b0c
+ Ctrl.info = hexinfo:f0f1f2f3f4f5f6f7f8f9
+-Result = PKEY_CTRL_ERROR
++Result = KDF_DERIVE_ERROR
+ Reason = invalid key length
+ 
+ # Test that the key whose length is shorter than 112 bits is reported as
+-- 
+2.51.0
+

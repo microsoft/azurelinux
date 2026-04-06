@@ -1,0 +1,42 @@
+From 4e6cea5f5bb44bf06dd30a723cf13334693c3150 Mon Sep 17 00:00:00 2001
+From: Christian Heimes <christian@python.org>
+Date: Fri, 22 Sep 2023 14:01:50 +0200
+Subject: [PATCH] Improve tests (partial)
+
+- `makeSuite` is deprecated
+
+diff --git a/tests.py b/tests.py
+index ab52aab..c60335e 100644
+--- a/tests.py
++++ b/tests.py
+@@ -542,17 +559,19 @@ def test_defused_gzip_response(self):
+ 
+ def test_main():
+     suite = unittest.TestSuite()
+-    suite.addTests(unittest.makeSuite(TestDefusedcElementTree))
+-    suite.addTests(unittest.makeSuite(TestDefusedElementTree))
+-    suite.addTests(unittest.makeSuite(TestDefusedMinidom))
+-    suite.addTests(unittest.makeSuite(TestDefusedMinidomWithParser))
+-    suite.addTests(unittest.makeSuite(TestDefusedPulldom))
+-    suite.addTests(unittest.makeSuite(TestDefusedSax))
+-    suite.addTests(unittest.makeSuite(TestXmlRpc))
+-    if lxml is not None:
+-        suite.addTests(unittest.makeSuite(TestDefusedLxml))
+-    if gzip is not None:
+-        suite.addTests(unittest.makeSuite(TestDefusedGzip))
++    cls = [
++        TestDefusedElementTree,
++        TestDefusedcElementTree,
++        TestDefusedMinidom,
++        TestDefusedMinidomWithParser,
++        TestDefusedPulldom,
++        TestDefusedSax,
++        TestDefusedLxml,
++        TestXmlRpc,
++        TestDefusedGzip,
++    ]
++    for c in cls:
++        suite.addTest(unittest.defaultTestLoader.loadTestsFromTestCase(c))
+     return suite
+ 
+ 

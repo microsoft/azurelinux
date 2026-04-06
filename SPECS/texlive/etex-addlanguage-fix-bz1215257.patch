@@ -1,0 +1,25 @@
+--- etex.src.orig	2015-09-16 14:17:48.263123165 -0400
++++ etex.src	2015-09-16 14:14:20.673610421 -0400
+@@ -290,8 +290,10 @@
+ 
+ \def \addlanguage #1#2#3#4#5% language patterns exceptions lhm rhm
+     {\expandafter \et@xlang \csname lang@#1\endcsname
+-     \expandafter \chardef \csname lhm@#1\endcsname=#4 % V1.0-1
+-     \expandafter \chardef \csname rhm@#1\endcsname=#5 % V1.0-1
++     \def\paramD{#4}\ifx\paramD\empty\def\paramD{1}\fi % Default value lhm is 1 % V2.1-1
++     \def\paramE{#5}\ifx\paramD\empty\def\paramE{1}\fi % Default value rhm is 1 % V2.1-1
++     \expandafter \chardef \csname lhm@#1\endcsname=\paramD % V2.1-1
++     \expandafter \chardef \csname rhm@#1\endcsname=\paramE % V2.1-1
+      \uselanguage {#1}%
+      \input #2
+      \if *#3*\else \input #3 \fi
+@@ -776,6 +778,9 @@
+ 
+ %% Revision-history:
+ 
++24-ARP-2015: 2.1;1  Allow empty values on \addlanguages for parameters 4 and 5
++                         Changed by Edgar Hoch
++
+ 01-FEB-1999: 2.1;0  Allow file to be used with e-TeX versions 2.0 and 2.1
+ 
+ 25-MAR-1998: 2.0;19 Improved log message for \{glob|loc}{marks|box}vector (PEB)

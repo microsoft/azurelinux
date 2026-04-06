@@ -1,0 +1,27 @@
+From 12fc8daae656ccb09441c4a3c376b5de3af05172 Mon Sep 17 00:00:00 2001
+From: Jeremy Daer <jeremy@rubyonrails.org>
+Date: Tue, 12 Sep 2023 22:14:07 -0700
+Subject: [PATCH] CI: fix JRuby build
+
+---
+ marcel.gemspec         | 1 -
+ test/mime_type_test.rb | 1 +
+ test/test_helper.rb    | 4 +---
+ 3 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index 477445c..7e052f1 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -1,10 +1,8 @@
+ require 'minitest/autorun'
+-require 'byebug'
+-
+ require 'marcel'
+ require 'pathname'
+ 
+-class Marcel::TestCase < MiniTest::Test
++class Marcel::TestCase < Minitest::Test
+   class << self
+     def setup(&block)
+       define_method(:setup, &block)

@@ -1,0 +1,40 @@
+diff --git a/src/arch/Cargo.toml b/src/arch/Cargo.toml
+index 4b6efd6..562f39d 100644
+--- a/src/arch/Cargo.toml
++++ b/src/arch/Cargo.toml
+@@ -7,7 +7,6 @@ edition = "2021"
+ [features]
+ tee = []
+ amd-sev = [ "tee" ]
+-tdx = [ "tee", "dep:tdx" ]
+ efi = []
+ 
+ [dependencies]
+@@ -22,7 +21,6 @@ utils = { path = "../utils" }
+ [target.'cfg(target_os = "linux")'.dependencies]
+ kvm-bindings = { version = ">=0.11", features = ["fam-wrappers"] }
+ kvm-ioctls = ">=0.21"
+-tdx = { version = "0.1.0", optional = true }
+ 
+ [dev-dependencies]
+ utils = { path = "../utils" }
+diff --git a/src/vmm/Cargo.toml b/src/vmm/Cargo.toml
+index 95deedb..35b6fdd 100644
+--- a/src/vmm/Cargo.toml
++++ b/src/vmm/Cargo.toml
+@@ -7,7 +7,6 @@ edition = "2021"
+ [features]
+ tee = []
+ amd-sev = [ "blk", "bitfield", "bitflags", "iocuddle", "tee", "kbs-types", "serde", "serde_json" ]
+-tdx = [ "blk", "tee", "kbs-types", "serde", "serde_json", "dep:tdx" ]
+ net = []
+ blk = []
+ efi = [ "blk", "net" ]
+@@ -49,7 +48,6 @@ cpuid = { path = "../cpuid" }
+ zstd = "0.13"
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-tdx = { version = "0.1.0", optional = true }
+ kvm-bindings = { version = ">=0.11", features = ["fam-wrappers"] }
+ kvm-ioctls = ">=0.21"
+ 

@@ -1,0 +1,20 @@
+--- boxcar-0.2.14/Cargo.toml	1970-01-01T00:00:01+00:00
++++ boxcar-0.2.14/Cargo.toml	2026-02-23T17:02:57.902239+00:00
+@@ -19,6 +19,7 @@
+ exclude = [
+     ".gitignore",
+     ".github/**",
++    "benches/**",
+ ]
+ autolib = false
+ autobins = false
+@@ -63,9 +64,6 @@
+ 
+ [dependencies]
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

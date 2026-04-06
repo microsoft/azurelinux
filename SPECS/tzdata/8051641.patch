@@ -1,0 +1,17 @@
+diff -r c8a71253d6e2 -r 189490f29d1e make/src/classes/build/tools/tzdb/ZoneRulesBuilder.java
+--- javazic-1.8/build/tools/tzdb/ZoneRulesBuilder.java	Thu Oct 23 11:42:20 2014 +0200
++++ javazic-1.8/build/tools/tzdb/ZoneRulesBuilder.java	Mon Dec 29 21:42:22 2014 +0300
+@@ -491,10 +491,10 @@
+                 TZRule rule = new TZRule(year, month, dayOfMonthIndicator, dayOfWeek, time, timeEndOfDay, timeDefinition, savingAmountSecs);
+                 if (lastRule) {
+                     lastRuleList.add(rule);
+-                    maxLastRuleStartYear = Math.max(startYear, maxLastRuleStartYear);
+                 } else {
+                     ruleList.add(rule);
+                 }
++                maxLastRuleStartYear = Math.max(startYear, maxLastRuleStartYear);
+                 year++;
+             }
+         }
+--
+cgit v0.9.2

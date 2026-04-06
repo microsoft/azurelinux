@@ -1,0 +1,28 @@
+diff --git a/agent/mibgroup/hardware/memory/memory_linux.c b/agent/mibgroup/hardware/memory/memory_linux.c
+index 6d5e86c..68b55d2 100644
+--- a/agent/mibgroup/hardware/memory/memory_linux.c
++++ b/agent/mibgroup/hardware/memory/memory_linux.c
+@@ -123,6 +123,13 @@ int netsnmp_mem_arch_load( netsnmp_cache *cache, void *magic ) {
+         if (first)
+             snmp_log(LOG_ERR, "No SwapTotal line in /proc/meminfo\n");
+     }
++    b = strstr(buff, "SReclaimable: ");
++    if (b)
++        sscanf(b, "SReclaimable: %lu", &sreclaimable);
++    else {
++        if (first)
++            snmp_log(LOG_ERR, "No SReclaimable line in /proc/meminfo\n");
++    }
+     b = strstr(buff, "SwapFree: ");
+     if (b)
+         sscanf(b, "SwapFree: %lu", &swapfree);
+@@ -130,9 +137,6 @@ int netsnmp_mem_arch_load( netsnmp_cache *cache, void *magic ) {
+         if (first)
+             snmp_log(LOG_ERR, "No SwapFree line in /proc/meminfo\n");
+     }
+-    b = strstr(buff, "SReclaimable: ");
+-    if (b)
+-        sscanf(b, "SReclaimable: %lu", &sreclaimable);
+     first = 0;
+ 
+ 

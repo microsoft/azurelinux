@@ -1,0 +1,57 @@
+From c48ee9c79eb7c4a36b7758fc4c3209ca0e5d759b Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 21 Apr 2020 12:52:31 +0200
+Subject: [PATCH] Upgrade to 1.61
+
+---
+ lib/threads/shared.pm | 4 ++--
+ t/stress.t            | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index 45ad154..bd0e437 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.60'; # Please update the pod, too.
++our $VERSION = '1.61'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -196,7 +196,7 @@ threads::shared - Perl extension for sharing data structures between threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads::shared version 1.60
++This document describes threads::shared version 1.61
+ 
+ =head1 SYNOPSIS
+ 
+diff --git a/t/stress.t b/t/stress.t
+index 1dd95e3..ccdeb0e 100644
+--- a/t/stress.t
++++ b/t/stress.t
+@@ -12,7 +12,7 @@ BEGIN {
+         exit(0);
+     }
+ 
+-    # http://lists.alioth.debian.org/pipermail/perl-maintainers/2011-June/002285.html
++    # https://lists.alioth.debian.org/pipermail/perl-maintainers/2011-June/002285.html
+     # There _is_ TLS support on m68k, but this stress test is overwhelming
+     # for the hardware
+     if ($^O eq 'linux' && $Config{archname} =~ /^m68k/) {
+@@ -179,7 +179,7 @@ use threads::shared;
+     } elsif ($timeouts) {
+         # Frequently fails under MSWin32 due to deadlocking bug in Windows
+         # hence test is TODO under MSWin32
+-        #   http://rt.perl.org/rt3/Public/Bug/Display.html?id=41574
++        #   https://rt.perl.org/rt3/Public/Bug/Display.html?id=41574
+         #   http://support.microsoft.com/kb/175332
+         if ($^O eq 'MSWin32') {
+             print("not ok 1 # TODO - not reliable under MSWin32\n")
+-- 
+2.21.1
+

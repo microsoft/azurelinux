@@ -1,0 +1,50 @@
+From 4ee5ba36570d94ce27e4023f15b8b3a6b8b9daf9 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Mon, 13 Oct 2025 21:41:13 +0100
+Subject: [PATCH] config: JetsonTX2: Fix upstream device tree naming
+
+The upstream naming for the Jetson TX2 is p2771-0000 so fix
+the device tree name so the firmware will find the right
+name on disk.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ arch/arm/dts/Makefile                                           | 2 +-
+ .../{tegra186-p2771-0000-500.dts => tegra186-p2771-0000.dts}    | 0
+ configs/p2771-0000-500_defconfig                                | 2 +-
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ rename arch/arm/dts/{tegra186-p2771-0000-500.dts => tegra186-p2771-0000.dts} (100%)
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 7c8cf3a5a1d..86a7b4fda35 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -134,7 +134,7 @@ dtb-$(CONFIG_ARCH_TEGRA) += \
+ 	tegra124-venice2.dtb \
+ 	tegra124-xiaomi-mocha.dtb \
+ 	tegra186-p2771-0000-000.dtb \
+-	tegra186-p2771-0000-500.dtb \
++	tegra186-p2771-0000.dtb \
+ 	tegra210-p2371-0000.dtb \
+ 	tegra210-p2371-2180.dtb \
+ 	tegra210-p2571.dtb \
+diff --git a/arch/arm/dts/tegra186-p2771-0000-500.dts b/arch/arm/dts/tegra186-p2771-0000.dts
+similarity index 100%
+rename from arch/arm/dts/tegra186-p2771-0000-500.dts
+rename to arch/arm/dts/tegra186-p2771-0000.dts
+diff --git a/configs/p2771-0000-500_defconfig b/configs/p2771-0000-500_defconfig
+index 42043277e2d..e1e5c47ddfa 100644
+--- a/configs/p2771-0000-500_defconfig
++++ b/configs/p2771-0000-500_defconfig
+@@ -7,7 +7,7 @@ CONFIG_TEXT_BASE=0x80080000
+ CONFIG_NR_DRAM_BANKS=1026
+ CONFIG_ENV_SIZE=0x2000
+ CONFIG_ENV_OFFSET=0xFFFFE000
+-CONFIG_DEFAULT_DEVICE_TREE="tegra186-p2771-0000-500"
++CONFIG_DEFAULT_DEVICE_TREE="tegra186-p2771-0000"
+ CONFIG_SYS_BOOTM_LEN=0x800000
+ CONFIG_SYS_LOAD_ADDR=0x80080000
+ CONFIG_TEGRA186=y
+-- 
+2.51.0
+

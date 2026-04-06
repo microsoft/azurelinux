@@ -1,0 +1,12 @@
+/var/log/cron
+/var/log/maillog
+/var/log/messages
+/var/log/secure
+/var/log/spooler
+{
+    missingok
+    sharedscripts
+    postrotate
+        /usr/bin/systemctl reload rsyslog.service >/dev/null 2>&1 || true
+    endscript
+}

@@ -1,0 +1,56 @@
+From 6bc6cf03ad4ad136088260e22f30c6d191c161a3 Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Sat, 29 Mar 2025 15:16:46 +0000
+Subject: [PATCH] PR/638: pbrook: fix buffer overrun
+
+---
+ src/readelf.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/readelf.c b/src/readelf.c
+index 1be2dcd..43296c3 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -1718,7 +1718,7 @@ dophn_exec(struct magic_set *ms, int clazz, int swap, int fd, off_t off,
+ {
+ 	Elf32_Phdr ph32;
+ 	Elf64_Phdr ph64;
+-	const char *linking_style;
++	const char *str;
+ 	unsigned char nbuf[NBUFSIZE];
+ 	char interp[128];
+ 	ssize_t bufsize;
+@@ -1821,9 +1821,10 @@ dophn_exec(struct magic_set *ms, int clazz, int swap, int fd, off_t off,
+ 				continue;
+ 			if (bufsize && nbuf[0]) {
+ 				nbuf[bufsize - 1] = '\0';
+-				memcpy(interp, nbuf, CAST(size_t, bufsize));
++				str = CAST(const char *, nbuf);
+ 			} else
+-				strlcpy(interp, "*empty*", sizeof(interp));
++				str = "*empty*";
++			strlcpy(interp, "*empty*", sizeof(interp));
+ 			break;
+ 		case PT_NOTE:
+ 			if (ms->flags & MAGIC_MIME)
+@@ -1853,13 +1854,13 @@ dophn_exec(struct magic_set *ms, int clazz, int swap, int fd, off_t off,
+ 		return 0;
+ 	if (dynamic) {
+ 		if (pie && need == 0)
+-			linking_style = "static-pie";
++			str = "static-pie";
+ 		else
+-			linking_style = "dynamically";
++			str = "dynamically";
+ 	} else {
+-		linking_style = "statically";
++		str = "statically";
+ 	}
+-	if (file_printf(ms, ", %s linked", linking_style) == -1)
++	if (file_printf(ms, ", %s linked", str) == -1)
+ 		return -1;
+ 	if (interp[0])
+ 		if (file_printf(ms, ", interpreter %s", file_printable(ms,
+-- 
+2.49.0
+

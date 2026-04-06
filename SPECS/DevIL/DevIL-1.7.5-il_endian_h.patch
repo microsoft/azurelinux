@@ -1,0 +1,35 @@
+diff -up devil-1.7.8/src-IL/include/il_endian.h~ devil-1.7.8/src-IL/include/il_endian.h
+--- devil-1.7.8/src-IL/include/il_endian.h~	2009-03-08 08:10:08.000000000 +0100
++++ devil-1.7.8/src-IL/include/il_endian.h	2009-03-09 10:11:33.000000000 +0100
+@@ -15,6 +15,10 @@
+ 
+ #include "il_internal.h"
+ 
++#ifdef GCC_X86_ASM
++#include <byteswap.h>
++#endif
++
+ #ifdef WORDS_BIGENDIAN  // This is defined by ./configure.
+ 	#ifndef __BIG_ENDIAN__
+ 	#define __BIG_ENDIAN__ 1
+@@ -104,9 +108,7 @@ INLINE void iSwapUShort(ILushort *s)  {
+ 		}
+ 	#else
+ 	#ifdef GCC_X86_ASM
+-		asm("ror $8,%0"
+-			: "=r" (*s)
+-			: "0" (*s));
++		*s = __bswap_16(*s);
+ 	#else
+ 		*s = ((*s)>>8) | ((*s)<<8);
+ 	#endif //GCC_X86_ASM
+@@ -127,8 +129,7 @@ INLINE void iSwapUInt(ILuint *i) {
+ 		}
+ 	#else
+ 	#ifdef GCC_X86_ASM
+-			asm("bswap %0;"
+-				: "+r" (*i));
++		*i = __bswap_32(*i);
+ 	#else
+ 		*i = ((*i)>>24) | (((*i)>>8) & 0xff00) | (((*i)<<8) & 0xff0000) | ((*i)<<24);
+ 	#endif //GCC_X86_ASM

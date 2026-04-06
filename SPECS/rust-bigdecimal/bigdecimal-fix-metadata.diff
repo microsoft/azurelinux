@@ -1,0 +1,19 @@
+--- bigdecimal-0.4.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bigdecimal-0.4.9/Cargo.toml	2025-11-04T14:15:32.381441+00:00
+@@ -37,6 +37,7 @@
+ ]
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/akubera/bigdecimal-rs"
++exclude = ["/scripts/"]
+ 
+ [features]
+ default = ["std"]
+@@ -105,7 +106,7 @@
+ version = "1"
+ 
+ [dev-dependencies.serde_test]
+-version = "<1.0.176"
++version = "1.0"
+ 
+ [dev-dependencies.siphasher]
+ version = "0.3.10"

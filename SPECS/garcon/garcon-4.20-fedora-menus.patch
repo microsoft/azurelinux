@@ -1,0 +1,53 @@
+--- garcon-4.16.1-orig/data/xfce/xfce-applications.menu	2020-05-25 16:32:47.000000000 -0400
++++ garcon-4.16.1/data/xfce/xfce-applications.menu	2021-02-05 19:37:50.883567150 -0500
+@@ -20,6 +20,7 @@
+         <Filename>xfce4-web-browser.desktop</Filename>
+         <Separator/>
+         <Menuname>Settings</Menuname>
++        <Menuname>Administration</Menuname>
+         <Separator/>
+         <Merge type="all"/>
+         <Separator/>
+@@ -40,13 +41,20 @@
+             <Merge type="all"/>
+         </Layout>
+ 
+-        <Menu>
+-            <Name>Screensavers</Name>
+-            <Directory>xfce-screensavers.directory</Directory>
+-            <Include>
+-                <Category>Screensaver</Category>
+-            </Include>
+-        </Menu>
++    </Menu>
++
++    <Menu>
++        <Name>Administration</Name>
++        <Directory>SystemConfig.directory</Directory>
++        <Include>
++            <And>
++                <Category>Settings</Category>
++                <Category>System</Category>
++                <Not><Category>Screensaver</Category></Not>
++            </And>
++            <Filename>gpk-application.desktop</Filename>
++            <Filename>gpk-update-viewer.desktop</Filename>
++        </Include>
+     </Menu>
+ 
+     <Menu>
+@@ -71,6 +79,14 @@
+     </Menu>
+ 
+     <Menu>
++        <Name>Documentation</Name>
++        <Directory>Documentation.directory</Directory>
++        <Include>
++            <Category>Documentation</Category>
++        </Include>
++    </Menu>
++
++    <Menu>
+         <Name>Development</Name>
+         <Directory>xfce-development.directory</Directory>
+         <Include>

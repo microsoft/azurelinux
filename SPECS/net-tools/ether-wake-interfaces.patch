@@ -1,0 +1,178 @@
+diff -up net-tools-2.0/ether-wake.c.interfaces net-tools-2.0/ether-wake.c
+--- net-tools-2.0/ether-wake.c.interfaces	2015-09-15 18:02:18.595968129 +0200
++++ net-tools-2.0/ether-wake.c	2015-09-15 18:02:18.607968095 +0200
+@@ -22,7 +22,7 @@ static char usage_msg[] =
+ "	Options:\n"
+ "		-b	Send wake-up packet to the broadcast address.\n"
+ "		-D	Increase the debug level.\n"
+-"		-i ifname	Use interface IFNAME instead of the default 'eth0'.\n"
++"		-i ifname	Use interface ifname instead of sending a wake packet to all interfaces.\n"
+ "		-p <pw>		Append the four or six byte password PW to the packet.\n"
+ "					A password is only required for a few adapter types.\n"
+ "					The password may be specified in ethernet hex format\n"
+@@ -89,6 +89,9 @@ static char usage_msg[] =
+ #include <netdb.h>
+ #include <netinet/ether.h>
+ 
++#include "interface.h"
++#include "sockets.h"
++
+ /* Grrr, no consistency between include versions.
+    Enable this if setsockopt() isn't declared with your library. */
+ #if 0
+@@ -110,20 +113,29 @@ static int get_dest_addr(const char *arg
+ static int get_fill(unsigned char *pkt, struct ether_addr *eaddr);
+ static int get_wol_pw(const char *optarg);
+ 
++typedef struct {
++	int s;
++	int verbose;
++	int pktsize;
++} if_info;
++
++static int send_wol_packet(char *ifname, int s, int verbose, int pktsize);
++
++static int do_wake(struct interface *ife, void *cookie) {
++	if_info *info = (if_info *)cookie;
++	send_wol_packet(ife->name, info->s, info->verbose, info->pktsize);
++	return 0;
++}
++
+ int main(int argc, char *argv[])
+ {
+-	char *ifname = "eth0";
+-	int one = 1;				/* True, for socket options. */
++	char *ifname = NULL;
+ 	int s;						/* Raw socket */
+ 	int errflag = 0, verbose = 0, do_version = 0;
+ 	int perm_failure = 0;
+-	int i, c, pktsize;
+-#if defined(PF_PACKET)
+-	struct sockaddr_ll whereto;
+-#else
+-	struct sockaddr whereto;	/* who to wake up */
+-#endif
++	int c, pktsize;
+ 	struct ether_addr eaddr;
++	if_info info;
+ 
+ 	while ((c = getopt(argc, argv, "bDi:p:uvV")) != -1)
+ 		switch (c) {
+@@ -131,7 +143,7 @@ int main(int argc, char *argv[])
+ 		case 'D': debug++;			break;
+ 		case 'i': ifname = optarg;	break;
+ 		case 'p': get_wol_pw(optarg); break;
+-		case 'u': printf(usage_msg); return 0;
++		case 'u': printf("%s",usage_msg); return 0;
+ 		case 'v': verbose++;		break;
+ 		case 'V': do_version++;		break;
+ 		case '?':
+@@ -140,7 +152,7 @@ int main(int argc, char *argv[])
+ 	if (verbose || do_version)
+ 		printf("%s\n", version_msg);
+ 	if (errflag) {
+-		fprintf(stderr, brief_usage_msg);
++		fprintf(stderr,"%s", brief_usage_msg);
+ 		return 3;
+ 	}
+ 
+@@ -177,13 +189,45 @@ int main(int argc, char *argv[])
+ 
+ 	pktsize = get_fill(outpack, &eaddr);
+ 
++	if (ifname == NULL) {
++		info.s = s;
++		info.verbose = verbose;
++		info.pktsize = pktsize;
++
++		/* Create a channel to the NET kernel. */
++		if ((sockets_open(0)) < 0) {
++			perror("socket");
++			exit(1);
++		}
++
++		return for_all_interfaces(do_wake, &info);
++	}
++
++	return send_wol_packet(ifname, s, verbose, pktsize);
++}
++
++/* Send a Wake-On-LAN (WOL) "Magic Packet" to Interface IFNAME using
++   Socket S with a packet size PKTSIZE.  VERBOSE implies
++   verbosity.  */
++
++static int send_wol_packet(char *ifname, int s, int verbose, int pktsize)
++{
++	int i;
++	int one = 1;				/* True, for socket options. */
++#if defined(PF_PACKET)
++	struct sockaddr_ll whereto;
++#else
++	struct sockaddr whereto;	/* who to wake up */
++#endif
++
+ 	/* Fill in the source address, if possible.
+ 	   The code to retrieve the local station address is Linux specific. */
+ 	if (! opt_no_src_addr) {
+ 		struct ifreq if_hwaddr;
+-		unsigned char *hwaddr = if_hwaddr.ifr_hwaddr.sa_data;
++		const char *hwaddr = if_hwaddr.ifr_hwaddr.sa_data;
+ 
+-		strcpy(if_hwaddr.ifr_name, ifname);
++		strncpy(if_hwaddr.ifr_name, ifname, IFNAMSIZ);
++		if_hwaddr.ifr_name[IFNAMSIZ-1] = '\0';
+ 		if (ioctl(s, SIOCGIFHWADDR, &if_hwaddr) < 0) {
+ 			fprintf(stderr, "SIOCGIFHWADDR on %s failed: %s\n", ifname,
+ 					strerror(errno));
+@@ -220,7 +264,8 @@ int main(int argc, char *argv[])
+ #if defined(PF_PACKET)
+ 	{
+ 		struct ifreq ifr;
+-		strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
++		strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
++		ifr.ifr_name[IFNAMSIZ-1] = '\0';
+ 		if (ioctl(s, SIOCGIFINDEX, &ifr) == -1) {
+ 			fprintf(stderr, "SIOCGIFINDEX on %s failed: %s\n", ifname,
+ 					strerror(errno));
+@@ -240,11 +285,14 @@ int main(int argc, char *argv[])
+ 	strcpy(whereto.sa_data, ifname);
+ #endif
+ 
++	char senderrmsg[IFNAMSIZ+16] = "'";
++	strcat(senderrmsg, ifname);
++	strcat(senderrmsg, "', sendto");
+ 	if ((i = sendto(s, outpack, pktsize, 0, (struct sockaddr *)&whereto,
+ 					sizeof(whereto))) < 0)
+-		perror("sendto");
++		perror(senderrmsg);
+ 	else if (debug)
+-		printf("Sendto worked ! %d.\n", i);
++		printf("'%s', Sendto worked ! %d.\n", ifname, i);
+ 
+ #ifdef USE_SEND
+ 	if (bind(s, (struct sockaddr *)&whereto, sizeof(whereto)) < 0)
+diff -up net-tools-2.0/Makefile.interfaces net-tools-2.0/Makefile
+--- net-tools-2.0/Makefile.interfaces	2015-09-15 18:02:18.608968093 +0200
++++ net-tools-2.0/Makefile	2015-09-15 18:04:06.273668275 +0200
+@@ -193,6 +193,9 @@ ipmaddr:	$(NET_LIB) ipmaddr.o
+ mii-tool:	$(NET_LIB) mii-tool.o
+ 		$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mii-tool.o $(NLIB)
+ 
++ether-wake:	$(NET_LIB) ether-wake.o
++		$(CC) $(CFLAGS) $(LDFLAGS) -o ether-wake ether-wake.o $(NLIB)
++
+ installbin:
+ 	@echo
+ 	@echo "######################################################"
+diff -up net-tools-2.0/man/en_US/ether-wake.8.interfaces net-tools-2.0/man/en_US/ether-wake.8
+--- net-tools-2.0/man/en_US/ether-wake.8.interfaces	2015-09-15 18:02:18.597968123 +0200
++++ net-tools-2.0/man/en_US/ether-wake.8	2015-09-15 18:02:18.608968093 +0200
+@@ -49,7 +49,7 @@ Send the wake-up packet to the broadcast
+ Increase the Debug Level.
+ .TP
+ .B \-i ifname
+-Use interface ifname instead of the default "eth0".
++Use interface ifname instead of sending a wake packet to all interfaces.
+ .TP
+ .B \-p passwd
+ Append a four or six byte password to the packet. Only a few adapters

@@ -1,0 +1,12 @@
+diff -Naur addr2line-0.25.1-original/src/frame.rs addr2line-0.25.1/src/frame.rs
+--- addr2line-0.25.1-original/src/frame.rs	2006-07-24 02:21:28.000000000 +0100
++++ addr2line-0.25.1/src/frame.rs	2025-11-04 18:14:44.750755496 +0000
+@@ -196,7 +196,7 @@
+         | gimli::DW_LANG_C_plus_plus_11
+         | gimli::DW_LANG_C_plus_plus_14 => cpp_demangle::Symbol::new(name)
+             .ok()
+-            .and_then(|x| x.demangle(&Default::default()).ok()),
++            .and_then(|x| x.demangle_with_options(&Default::default()).ok()),
+         _ => None,
+     }
+ }

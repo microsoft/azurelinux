@@ -1,0 +1,6 @@
+d /run/tog-pegasus 1750 root pegasus -
+
+d /var/lib/Pegasus 0750 root pegasus -
+d /var/lib/Pegasus/cache 0750 root pegasus -
+d /var/lib/Pegasus/log 0750 root pegasus -
+d /var/lib/Pegasus/repository 0750 root pegasus -

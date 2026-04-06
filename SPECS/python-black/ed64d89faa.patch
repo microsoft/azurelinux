@@ -1,0 +1,73 @@
+From ed64d89faa7c738c4ba0006710f7e387174478af Mon Sep 17 00:00:00 2001
+From: "Michael R. Crusoe" <1330696+mr-c@users.noreply.github.com>
+Date: Thu, 27 Feb 2025 17:46:59 +0100
+Subject: [PATCH] additional fix for click 8.2.0 (#4591)
+
+---
+ tests/test_black.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tests/test_black.py b/tests/test_black.py
+index 4bdbdbba5cf..ca19c17678b 100644
+--- a/tests/test_black.py
++++ b/tests/test_black.py
+@@ -192,10 +192,10 @@ def test_piping(self) -> None:
+             input=BytesIO(source.encode("utf-8")),
+         )
+         self.assertEqual(result.exit_code, 0)
+-        self.assertFormatEqual(expected, result.output)
+-        if source != result.output:
+-            black.assert_equivalent(source, result.output)
+-            black.assert_stable(source, result.output, DEFAULT_MODE)
++        self.assertFormatEqual(expected, result.stdout)
++        if source != result.stdout:
++            black.assert_equivalent(source, result.stdout)
++            black.assert_stable(source, result.stdout, DEFAULT_MODE)
+ 
+     def test_piping_diff(self) -> None:
+         diff_header = re.compile(
+@@ -215,7 +215,7 @@ def test_piping_diff(self) -> None:
+             black.main, args, input=BytesIO(source.encode("utf-8"))
+         )
+         self.assertEqual(result.exit_code, 0)
+-        actual = diff_header.sub(DETERMINISTIC_HEADER, result.output)
++        actual = diff_header.sub(DETERMINISTIC_HEADER, result.stdout)
+         actual = actual.rstrip() + "\n"  # the diff output has a trailing space
+         self.assertEqual(expected, actual)
+ 
+@@ -300,7 +300,7 @@ def test_expression_diff(self) -> None:
+             self.assertEqual(result.exit_code, 0)
+         finally:
+             os.unlink(tmp_file)
+-        actual = result.output
++        actual = result.stdout
+         actual = diff_header.sub(DETERMINISTIC_HEADER, actual)
+         if expected != actual:
+             dump = black.dump_to_file(actual)
+@@ -409,7 +409,7 @@ def test_skip_magic_trailing_comma(self) -> None:
+             self.assertEqual(result.exit_code, 0)
+         finally:
+             os.unlink(tmp_file)
+-        actual = result.output
++        actual = result.stdout
+         actual = diff_header.sub(DETERMINISTIC_HEADER, actual)
+         actual = actual.rstrip() + "\n"  # the diff output has a trailing space
+         if expected != actual:
+@@ -1831,7 +1831,7 @@ def test_bpo_2142_workaround(self) -> None:
+             self.assertEqual(result.exit_code, 0)
+         finally:
+             os.unlink(tmp_file)
+-        actual = result.output
++        actual = result.stdout
+         actual = diff_header.sub(DETERMINISTIC_HEADER, actual)
+         self.assertEqual(actual, expected)
+ 
+@@ -1841,7 +1841,7 @@ def compare_results(
+     ) -> None:
+         """Helper method to test the value and exit code of a click Result."""
+         assert (
+-            result.output == expected_value
++            result.stdout == expected_value
+         ), "The output did not match the expected value."
+         assert result.exit_code == expected_exit_code, "The exit code is incorrect."
+ 

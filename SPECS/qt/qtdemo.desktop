@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Qt4 Demo 
+Comment=Show Qt4 demos and programming examples
+Exec=qtdemo-qt4
+Icon=qt4-logo
+Terminal=false
+Type=Application
+Categories=Qt;Development;

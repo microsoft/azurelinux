@@ -1,0 +1,24 @@
+--- urw-base35-fonts-20200910/fontconfig/urw-d050000l.conf	2021-06-08 08:40:17.408120093 +0200
++++ urw-base35-fonts-20200910/fontconfig/urw-d050000l.conf	2021-06-08 08:40:32.902248846 +0200
+@@ -1,21 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+ <fontconfig>
+-  <!-- Generic name aliasing -->
+-  <alias>
+-    <family>fantasy</family>
+-    <prefer>
+-      <family>D050000L</family>
+-    </prefer>
+-  </alias>
+-
+-  <!-- Generic name assignment -->
+-  <alias>
+-    <family>D050000L</family>
+-    <default>
+-      <family>fantasy</family>
+-    </default>
+-  </alias>
+ 
+   <!-- Original PostScript base font mapping -->
+   <alias binding="same">

@@ -1,0 +1,11 @@
+--- a/traces.c
++++ b/traces.c
+@@ -10160,7 +10160,7 @@ struct trie *trie_make(trie *t, int valu
+ 
+ struct trie *trie_new(int n, struct TracesVars* tv) {
+     
+-    TrieArray[0] = malloc(n*sizeof(trie));
++    TrieArray[0] = calloc(n, sizeof(trie));
+     if (TrieArray[0] == NULL) {
+         fprintf(ERRFILE, "\nError, memory not allocated.\n");
+         exit(1);

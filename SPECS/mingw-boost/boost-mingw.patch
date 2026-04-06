@@ -1,0 +1,83 @@
+--- ./libs/context/build/Jamfile.v2.mingw	2021-12-02 07:47:31.000000000 +0100
++++ ./libs/context/build/Jamfile.v2	2022-08-02 16:15:30.470756432 +0200
+@@ -57,10 +57,11 @@
+ local rule default_binary_format ( )
+ {
+     local tmp = elf ;
+-    if [ os.name ] = "NT" { tmp = pe ; }
+-    else if [ os.name ] = "CYGWIN" { tmp = pe ; }
+-    else if [ os.name ] = "AIX" { tmp = xcoff ; }
+-    else if [ os.name ] = "MACOSX" { tmp = mach-o ; }
++    #if [ os.name ] = "NT" { tmp = pe ; }
++    #else if [ os.name ] = "CYGWIN" { tmp = pe ; }
++    #else if [ os.name ] = "AIX" { tmp = xcoff ; }
++    #else if [ os.name ] = "MACOSX" { tmp = mach-o ; }
++    tmp = pe ;
+     return $(tmp) ;
+ }
+ 
+@@ -77,11 +78,12 @@
+ local rule default_abi ( )
+ {
+     local tmp = sysv ;
+-    if [ os.name ] = "NT" { tmp = ms ; }
+-    else if [ os.name ] = "CYGWIN" { tmp = ms ; }
+-    else if [ os.platform ] = "ARM" { tmp = aapcs ; }
+-    else if [ os.platform ] = "MIPS32" { tmp = o32 ; }
+-    else if [ os.platform ] = "MIPS64" { tmp = n64 ; }
++    #if [ os.name ] = "NT" { tmp = ms ; }
++    #else if [ os.name ] = "CYGWIN" { tmp = ms ; }
++    #else if [ os.platform ] = "ARM" { tmp = aapcs ; }
++    #else if [ os.platform ] = "MIPS32" { tmp = o32 ; }
++    #else if [ os.platform ] = "MIPS64" { tmp = n64 ; }
++    tmp = ms ;
+     return $(tmp) ;
+ }
+ 
+--- ./libs/locale/build/Jamfile.v2.mingw	2021-12-02 07:47:33.000000000 +0100
++++ ./libs/locale/build/Jamfile.v2	2022-08-02 16:15:30.470756432 +0200
+@@ -26,8 +26,7 @@
+ 
+ ## iconv
+ 
+-obj has_iconv_libc_obj : ../build/has_iconv.cpp ;
+-exe has_iconv : has_iconv_libc_obj ;
++obj has_iconv : ../build/has_iconv.cpp ;
+ explicit has_iconv ;
+ 
+ ICONV_PATH = [ modules.peek : ICONV_PATH ] ;
+@@ -41,8 +40,7 @@
+ 
+ explicit iconv ;
+ 
+-obj has_iconv_libc_ext : ../build/has_iconv.cpp iconv ;
+-exe has_external_iconv : has_iconv_libc_ext iconv ;
++obj has_external_iconv : ../build/has_iconv.cpp iconv ;
+ explicit has_external_iconv ;
+ 
+ exe accepts_shared_option   : ../build/option.cpp 
+@@ -189,11 +187,8 @@
+     
+ }
+ 
+-obj has_icu_obj     : ../build/has_icu_test.cpp : $(ICU_OPTS)   ;
+-obj has_icu64_obj   : ../build/has_icu_test.cpp : $(ICU64_OPTS) ;
+-
+-exe has_icu   : has_icu_obj   : $(ICU_OPTS)   ;
+-exe has_icu64 : has_icu64_obj : $(ICU64_OPTS) ;
++obj has_icu     : ../build/has_icu_test.cpp : $(ICU_OPTS)   ;
++obj has_icu64   : ../build/has_icu_test.cpp : $(ICU64_OPTS) ;
+ 
+ explicit has_icu has_icu64 ;
+ 
+--- ./libs/regex/build/Jamfile.v2.mingw	2022-08-02 16:15:30.471756438 +0200
++++ ./libs/regex/build/Jamfile.v2	2022-08-02 16:21:08.751823306 +0200
+@@ -139,7 +139,7 @@
+ 
+ }
+ 
+-exe has_icu : has_icu_test.cpp : $(ICU_OPTS) ;
++obj has_icu : has_icu_test.cpp : $(ICU_OPTS) ;
+ explicit has_icu ;
+ 
+ obj is_legacy_03 : is_legacy_03.cpp ;

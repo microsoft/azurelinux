@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenSSH key agent
+Documentation=man:ssh-agent(1) man:ssh-add(1) man:ssh(1)
+
+[Socket]
+ListenStream=%t/ssh-agent.socket
+Service=ssh-agent.service
+Priority=6
+Backlog=5
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target

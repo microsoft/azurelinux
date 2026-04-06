@@ -1,0 +1,21 @@
+--- rustls-pemfile-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-pemfile-2.2.0/Cargo.toml	2025-12-13T13:08:43.773132+00:00
+@@ -37,18 +37,10 @@
+ path = "tests/integration.rs"
+ required-features = ["std"]
+ 
+-[[bench]]
+-name = "benchmark"
+-path = "benches/benchmark.rs"
+-harness = false
+-
+ [dependencies.pki-types]
+ version = "1.9"
+ package = "rustls-pki-types"
+ 
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+-
+ [features]
+ default = ["std"]
+ std = ["pki-types/std"]

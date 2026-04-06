@@ -1,0 +1,52 @@
+From 61327320b54a59e319c522151f7a61c74ec94f2f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 2 Jan 2018 16:25:55 +0100
+Subject: [PATCH 45/59] Expand explanation of ascii_* options behaviour in man
+ page
+
+---
+ vsftpd.conf.5 | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index df14027..a5abeb2 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -114,16 +114,30 @@ Default: YES
+ .B ascii_download_enable
+ When enabled, ASCII mode data transfers will be honoured on downloads.
+ When disabled, the server will pretend to allow ASCII mode but in fact
+-ignore the request. Turn this option on to have the server actually do
++ignore requests to activate it. So the client will think the ASCII mode
++is active and therefore may still translate any
++.BR <CRLF>
++character sequences in the received file. See the following article for
++a detailed explanation of the behaviour:
++https://access.redhat.com/articles/3250241.
++
++Turn this option on to have the server actually do
+ ASCII mangling on files when in ASCII mode.
+ 
+ Default: NO
+ .TP
+ .B ascii_upload_enable
+ When enabled, ASCII mode data transfers will be honoured on uploads.
+-See also
+-.BR ascii_download_enable
+-for more details.
++When disabled, the server will pretend to allow ASCII mode but in fact
++ignore requests to activate it. So the client will think the ASCII mode
++is active and will translate native line terminators to the standard
++.BR <CRLF>
++line terminators for transmission, but the server will not do
++any translation. See the following article for a detailed explanation
++of the behaviour: https://access.redhat.com/articles/3250241.
++
++Turn this option on to have the server actually do
++ASCII mangling on files when in ASCII mode.
+ 
+ Default: NO
+ .TP
+-- 
+2.14.4
+

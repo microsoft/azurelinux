@@ -1,0 +1,32 @@
+From 936c1451a4348ebba0394fcd68758d140a1e6223 Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Wed, 2 Apr 2025 10:45:51 +0200
+Subject: [PATCH 8/9] fix(ossl): ignore compiler warnings
+
+```
+src/ossl-files.c:37:8: error: type qualifiers ignored on function return type [-Werror=ignored-qualifiers]
+
+src/ossl-files.c:38:34: error: comparison of integer expressions of different signedness: 'size_t' {aka 'long unsigned int'} and 'int' [-Werror=sign-compare]
+src/ossl-files.c:109:34: error: comparison of integer expressions of different signedness: 'size_t' {aka 'long unsigned int'} and 'int' [-Werror=sign-compare]
+src/ossl-files.c:150:34: error: comparison of integer expressions of different signedness: 'size_t' {aka 'long unsigned int'} and 'int' [-Werror=sign-compare]
+```
+---
+ src/ossl/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ossl/Makefile b/src/ossl/Makefile
+index 86cf14b3..2e76d52a 100644
+--- a/src/ossl/Makefile
++++ b/src/ossl/Makefile
+@@ -1,7 +1,7 @@
+ .PHONY: all clean tests
+ 
+ CFLAGS ?= -std=c99 -Wall -Werror -pedantic -D_XOPEN_SOURCE=600
+-CRYPTO_FLAGS = -lcrypto -Wl,-pie -Wl,-z,now -fPIE -pie -fPIC
++CRYPTO_FLAGS = -lcrypto -Wl,-pie -Wl,-z,now -fPIE -pie -fPIC -Wno-ignored-qualifiers -Wno-sign-compare
+ TARGETS = src/ossl-config src/ossl-files
+ 
+ TESTS_CONFIG = $(wildcard tests/config/*.cnf)
+-- 
+2.49.0
+

@@ -1,0 +1,32 @@
+From 5e20982db23a736d28aeb6729912ff85575add30 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 6 Mar 2025 06:58:00 -0500
+Subject: [PATCH] Use a range for CMake minimum versions, 3.2...3.12: support
+ CMake 4.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+CMake 4.0 drops support for CMake <3.5, so minimum versions need to be
+adjusted for forward compatibility. Since CMake <3.10 is already
+deprecated, and 3.12 is the first “modern” CMake release, let’s support
+policy versions up to 3.12.
+
+https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3f65107..6626569 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.2)
++cmake_minimum_required(VERSION 3.2...3.12)
+ project(earcut_hpp)
+ 
+ option(EARCUT_BUILD_TESTS "Build the earcut test program" ON)
+-- 
+2.48.1
+

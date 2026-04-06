@@ -1,0 +1,62 @@
+From f5ce76603178e5465a744cb4feed4686489bebb9 Mon Sep 17 00:00:00 2001
+Message-ID: <f5ce76603178e5465a744cb4feed4686489bebb9.1688648379.git.github@grubix.eu>
+From: Michael J Gruber <github@grubix.eu>
+Date: Thu, 6 Jul 2023 14:58:03 +0200
+Subject: [PATCH] Python 3.12 compatibility: adjust submodule imports
+
+importlib imports behave differently in py 3.11 and py 3.12: py 3.12
+requires explicit imports of the submodules.
+
+While fixing this, reduce the imports to the used submodules. Currently,
+the base is still imported automatically.
+---
+ lib/dbtexmf/core/dbtex.py              | 3 ++-
+ lib/dbtexmf/dblatex/grubber/plugins.py | 3 ++-
+ lib/dbtexmf/xslt/xslt.py               | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/lib/dbtexmf/core/dbtex.py b/lib/dbtexmf/core/dbtex.py
+index adac781..4cf9591 100644
+--- a/lib/dbtexmf/core/dbtex.py
++++ b/lib/dbtexmf/core/dbtex.py
+@@ -15,7 +15,8 @@ try:
+ except ImportError:
+     from urllib.request import pathname2url
+ import glob
+-import importlib
++import importlib.machinery
++import importlib.util
+ from optparse import OptionParser
+ from io import open
+ 
+diff --git a/lib/dbtexmf/dblatex/grubber/plugins.py b/lib/dbtexmf/dblatex/grubber/plugins.py
+index 047f2bb..6b4ecb4 100644
+--- a/lib/dbtexmf/dblatex/grubber/plugins.py
++++ b/lib/dbtexmf/dblatex/grubber/plugins.py
+@@ -4,7 +4,8 @@
+ Mechanisms to dynamically load extra modules to help the LaTeX compilation.
+ All the modules must be derived from the TexModule class.
+ """
+-import importlib
++import importlib.machinery
++import importlib.util
+ 
+ from os.path import *
+ from dbtexmf.dblatex.grubber.msg import _, msg
+diff --git a/lib/dbtexmf/xslt/xslt.py b/lib/dbtexmf/xslt/xslt.py
+index 57c99a2..7cc2038 100644
+--- a/lib/dbtexmf/xslt/xslt.py
++++ b/lib/dbtexmf/xslt/xslt.py
+@@ -2,7 +2,8 @@
+ # Very simple plugin loader for Xslt classes
+ #
+ import os
+-import importlib
++import importlib.machinery
++import importlib.util
+ import glob
+ import sys
+ 
+-- 
+2.41.0.411.gd9071d4297
+

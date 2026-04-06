@@ -1,0 +1,48 @@
+commit 8209874fc0ea78079aa21c386df0f385ee0e5dca
+Author: Ingo Franzki <ifranzki@linux.ibm.com>
+Date:   Wed Jul 9 09:09:32 2025 +0200
+
+    COMMON: Fix detection of EC curve not supported by OpenSSL
+    
+    OpenSSL 3.5 recently changed the behavior in regards of error reporting
+    with EVP_PKEY_keygen(). When the EC curve is not supported it used to
+    return error EC_R_INVALID_CURVE as top most entry in the error stack.
+    
+    Since commit https://github.com/openssl/openssl/commit/72351b0d18078170af270418b2d5e9fc579cb1af
+    this is no longer the case, instead a generic EVP_R_PROVIDER_KEYMGMT_FAILURE
+    error is now the top most entry, and EC_R_INVALID_CURVE is the second one.
+    
+    Make the detection independent of the error reporting and check for the
+    curve already in curve_nid_from_params().
+    
+    Closes: https://github.com/opencryptoki/opencryptoki/issues/877
+    
+    Signed-off-by: Ingo Franzki <ifranzki@linux.ibm.com>
+
+diff --git a/usr/lib/common/mech_openssl.c b/usr/lib/common/mech_openssl.c
+index f29b4946..e1bb6b83 100644
+--- a/usr/lib/common/mech_openssl.c
++++ b/usr/lib/common/mech_openssl.c
+@@ -1854,6 +1854,7 @@ static int curve_nid_from_params(const CK_BYTE *params, CK_ULONG params_len)
+ {
+     const unsigned char *oid;
+     ASN1_OBJECT *obj = NULL;
++    EC_GROUP *grp;
+     int nid;
+ 
+     oid = params;
+@@ -1866,6 +1867,14 @@ static int curve_nid_from_params(const CK_BYTE *params, CK_ULONG params_len)
+     nid = OBJ_obj2nid(obj);
+     ASN1_OBJECT_free(obj);
+ 
++    grp = EC_GROUP_new_by_curve_name(nid);
++    if (grp == NULL) {
++        TRACE_ERROR("curve not supported by OpenSSL.\n");
++        return NID_undef;
++    }
++
++    EC_GROUP_free(grp);
++
+     return nid;
+ }
+ 

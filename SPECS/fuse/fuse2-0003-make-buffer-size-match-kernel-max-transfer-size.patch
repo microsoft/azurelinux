@@ -1,0 +1,42 @@
+From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Date: Thu, 20 Apr 2017 14:53:01 +0200
+Subject: [PATCH] make buffer size match kernel max transfer size
+
+Currently libfuse has a hardcoded buffer limit to 128kib, while fuse
+kernel module has a limit up to 32 pages.
+
+This patch changes buffer limit to match the current page size, instead
+of assuming 4096 bytes pages, enabling architectures with bigger pages
+to use larger buffers, improving performance.
+
+Also, add a new macro (HEADER_SIZE) to specify the space needed to
+accommodate the header, making it easier to understand why those extra
+4096 bytes are needed
+
+Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+diff --git a/lib/fuse_kern_chan.c b/lib/fuse_kern_chan.c
+index 4a9beb8..640b91a 100644
+--- a/lib/fuse_kern_chan.c
++++ b/lib/fuse_kern_chan.c
+@@ -83,7 +83,10 @@ static void fuse_kern_chan_destroy(struct fuse_chan *ch)
+ 		close(fd);
+ }
+ 
+-#define MIN_BUFSIZE 0x21000
++#define KERNEL_BUF_PAGES 32
++
++/* room needed in buffer to accommodate header */
++#define HEADER_SIZE 0x1000
+ 
+ struct fuse_chan *fuse_kern_chan_new(int fd)
+ {
+@@ -92,7 +95,6 @@ struct fuse_chan *fuse_kern_chan_new(int fd)
+ 		.send = fuse_kern_chan_send,
+ 		.destroy = fuse_kern_chan_destroy,
+ 	};
+-	size_t bufsize = getpagesize() + 0x1000;
+-	bufsize = bufsize < MIN_BUFSIZE ? MIN_BUFSIZE : bufsize;
++	size_t bufsize = KERNEL_BUF_PAGES * getpagesize() + HEADER_SIZE;
+ 	return fuse_chan_new(&op, fd, bufsize, NULL);
+ }

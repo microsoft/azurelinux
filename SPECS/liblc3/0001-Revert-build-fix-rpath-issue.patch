@@ -1,0 +1,31 @@
+From 061232c5fdce9783009c3d9878653188001942fd Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sun, 21 Apr 2024 21:00:46 +0100
+Subject: [PATCH] Revert "build: fix rpath issue"
+
+This reverts commit 5e528fc54368ce826a3bb5751499061cfa1bda71.
+---
+ tools/meson.build | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/tools/meson.build b/tools/meson.build
+index 5da77e7..8d0cf49 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -24,11 +24,9 @@ lc3toolslib = static_library('lc3toolslib',
+ executable('elc3', ['elc3.c'],
+     link_with : lc3toolslib,
+     include_directories: inc,
+-    install: true,
+-    install_rpath: join_paths(get_option('prefix'), get_option('libdir')))
++    install: true)
+ 
+ executable('dlc3', ['dlc3.c'],
+     link_with : lc3toolslib,
+     include_directories: inc,
+-    install: true,
+-    install_rpath: join_paths(get_option('prefix'), get_option('libdir')))
++    install: true)
+-- 
+2.44.0
+

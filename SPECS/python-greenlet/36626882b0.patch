@@ -1,0 +1,76 @@
+From 36626882b0b9afee71cdc63fc40fb0fe19687d53 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Thu, 8 May 2025 18:24:01 +0200
+Subject: [PATCH] Update to Python 3.14 beta 1
+
+Beta 1 removed the PyThreadState.c_recursion_remaining member and the
+Py_C_RECURSION_LIMIT constant.
+---
+ src/greenlet/TGreenlet.hpp    |  4 +++-
+ src/greenlet/TPythonState.cpp | 17 +++++++++++++----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/src/greenlet/TGreenlet.hpp b/src/greenlet/TGreenlet.hpp
+index 9e917e7..f69b881 100644
+--- a/src/greenlet/TGreenlet.hpp
++++ b/src/greenlet/TGreenlet.hpp
+@@ -110,7 +110,9 @@ namespace greenlet
+         _PyCFrame* cframe;
+         int use_tracing;
+ #endif
+-#if GREENLET_PY312
++#if GREENLET_PY314
++        int py_recursion_depth;
++#elif GREENLET_PY312
+         int py_recursion_depth;
+         int c_recursion_depth;
+ #else
+diff --git a/src/greenlet/TPythonState.cpp b/src/greenlet/TPythonState.cpp
+index cc5dff5..a7f743c 100644
+--- a/src/greenlet/TPythonState.cpp
++++ b/src/greenlet/TPythonState.cpp
+@@ -12,7 +12,9 @@ PythonState::PythonState()
+     ,cframe(nullptr)
+     ,use_tracing(0)
+ #endif
+-#if GREENLET_PY312
++#if GREENLET_PY314
++    ,py_recursion_depth(0)
++#elif GREENLET_PY312
+     ,py_recursion_depth(0)
+     ,c_recursion_depth(0)
+ #else
+@@ -132,7 +134,9 @@ void PythonState::operator<<(const PyThreadState *const tstate) noexcept
+   #endif
+ #endif // GREENLET_USE_CFRAME
+ #if GREENLET_PY311
+-  #if GREENLET_PY312
++  #if GREENLET_PY314
++    this->py_recursion_depth = tstate->py_recursion_limit - tstate->py_recursion_remaining;
++  #elif GREENLET_PY312
+     this->py_recursion_depth = tstate->py_recursion_limit - tstate->py_recursion_remaining;
+     this->c_recursion_depth = Py_C_RECURSION_LIMIT - tstate->c_recursion_remaining;
+   #else // not 312
+@@ -207,7 +211,10 @@ void PythonState::operator>>(PyThreadState *const tstate) noexcept
+   #endif
+ #endif // GREENLET_USE_CFRAME
+ #if GREENLET_PY311
+-  #if GREENLET_PY312
++  #if GREENLET_PY314
++    tstate->py_recursion_remaining = tstate->py_recursion_limit - this->py_recursion_depth;
++    this->unexpose_frames();
++  #elif GREENLET_PY312
+     tstate->py_recursion_remaining = tstate->py_recursion_limit - this->py_recursion_depth;
+     tstate->c_recursion_remaining = Py_C_RECURSION_LIMIT - this->c_recursion_depth;
+     this->unexpose_frames();
+@@ -253,7 +260,9 @@ inline void PythonState::will_switch_from(PyThreadState *const origin_tstate) no
+ void PythonState::set_initial_state(const PyThreadState* const tstate) noexcept
+ {
+     this->_top_frame = nullptr;
+-#if GREENLET_PY312
++#if GREENLET_PY314
++    this->py_recursion_depth = tstate->py_recursion_limit - tstate->py_recursion_remaining;
++#elif GREENLET_PY312
+     this->py_recursion_depth = tstate->py_recursion_limit - tstate->py_recursion_remaining;
+     // XXX: TODO: Comment from a reviewer:
+     //     Should this be ``Py_C_RECURSION_LIMIT - tstate->c_recursion_remaining``?

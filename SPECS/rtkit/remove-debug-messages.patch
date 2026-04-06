@@ -1,0 +1,22 @@
+diff --git rtkit-0.11/rtkit-daemon.c~ rtkit-0.11/rtkit-daemon.c
+index fdff7f63dc..5f108d842d 100644
+--- rtkit-0.11/rtkit-daemon.c~
++++ rtkit-0.11/rtkit-daemon.c
+@@ -1485,17 +1485,6 @@ static DBusHandlerResult dbus_handler(DBusConnection *c, DBusMessage *m, void *u
+         } else
+                 return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ 
+-        syslog(LOG_DEBUG, "Supervising %u threads of %u processes of %u users.\n",
+-                n_total_threads,
+-                n_total_processes,
+-                n_users);
+-
+-        sd_notifyf(0,
+-                   "STATUS=Supervising %u threads of %u processes of %u users.",
+-                   n_total_threads,
+-                   n_total_processes,
+-                   n_users);
+-
+ finish:
+         if (r) {
+                 assert_se(dbus_connection_send(c, r, NULL));

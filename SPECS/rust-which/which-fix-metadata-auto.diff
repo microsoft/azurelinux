@@ -1,0 +1,18 @@
+--- which-8.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ which-8.0.0/Cargo.toml	2025-06-24T23:00:34.751071+00:00
+@@ -45,7 +45,6 @@
+ real-sys = [
+     "dep:env_home",
+     "dep:rustix",
+-    "dep:winsafe",
+ ]
+ regex = ["dep:regex"]
+ tracing = ["dep:tracing"]
+@@ -83,7 +82,3 @@
+ version = "0.1.0"
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.winsafe]
+-version = "0.0.19"
+-features = ["kernel"]
+-optional = true

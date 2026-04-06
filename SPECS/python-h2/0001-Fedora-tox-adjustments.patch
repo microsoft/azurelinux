@@ -1,0 +1,21 @@
+diff -Naur h2-4.2.0-orig/pyproject.toml h2-4.2.0/pyproject.toml
+--- h2-4.2.0-orig/pyproject.toml	2025-02-03 09:02:58.163303875 -0300
++++ h2-4.2.0/pyproject.toml	2025-02-03 09:04:58.134351767 -0300
+@@ -58,8 +58,6 @@
+
+ testing = [
+   "pytest>=8.3.3,<9",
+-  "pytest-cov>=6.0.0,<7",
+-  "pytest-xdist>=3.6.1,<4",
+   "hypothesis>=6.119.4,<7",
+ ]
+
+@@ -188,7 +186,7 @@
+ [tool.tox.env_run_base]
+ dependency_groups = ["testing"]
+ commands = [
+-  ["python", "-bb", "-m", "pytest", "--cov-report=xml", "--cov-report=term", "--cov=h2", { replace = "posargs", extend = true }]
++  ["python", "-bb", "-m", "pytest", { replace = "posargs", extend = true }]
+ ]
+
+ [tool.tox.env.pypy3]

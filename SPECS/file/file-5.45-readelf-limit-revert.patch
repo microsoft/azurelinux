@@ -1,0 +1,104 @@
+diff --git a/doc/file.man b/doc/file.man
+index 366e4c3..c895a44 100644
+--- a/doc/file.man
++++ b/doc/file.man
+@@ -339,13 +339,12 @@ attempt to preserve the access time of files analyzed, to pretend that
+ never read them.
+ .It Fl P , Fl Fl parameter Ar name=value
+ Set various parameter limits.
+-.Bl -column "elf_phnum" "Default" "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
++.Bl -column "elf_phnum" "Default" "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -offset indent
+ .It Sy "Name" Ta Sy "Default" Ta Sy "Explanation"
+ .It Li bytes Ta 1M Ta max number of bytes to read from file
+ .It Li elf_notes Ta 256 Ta max ELF notes processed
+ .It Li elf_phnum Ta 2K Ta max ELF program sections processed
+ .It Li elf_shnum Ta 32K Ta max ELF sections processed
+-.It Li elf_shsize Ta 128MB Ta max ELF section size processed
+ .It Li encoding Ta 65K Ta max number of bytes to determine encoding
+ .It Li indir Ta 50 Ta recursion limit for indirect magic
+ .It Li name Ta 100 Ta use count limit for name/use magic
+diff --git a/src/apprentice.c b/src/apprentice.c
+index 080cfe7..ecc6787 100644
+--- a/src/apprentice.c
++++ b/src/apprentice.c
+@@ -580,7 +580,6 @@ file_ms_alloc(int flags)
+ 	ms->indir_max = FILE_INDIR_MAX;
+ 	ms->name_max = FILE_NAME_MAX;
+ 	ms->elf_shnum_max = FILE_ELF_SHNUM_MAX;
+-	ms->elf_shsize_max = FILE_ELF_SHSIZE_MAX;
+ 	ms->elf_phnum_max = FILE_ELF_PHNUM_MAX;
+ 	ms->elf_notes_max = FILE_ELF_NOTES_MAX;
+ 	ms->regex_max = FILE_REGEX_MAX;
+diff --git a/src/file.c b/src/file.c
+index 947fb76..56e4d1a 100644
+--- a/src/file.c
++++ b/src/file.c
+@@ -156,8 +156,6 @@ file_private struct {
+ 	    MAGIC_PARAM_ELF_PHNUM_MAX, 0 },
+ 	{ "elf_shnum", 0, FILE_ELF_SHNUM_MAX, "max ELF sections processed",
+ 	    MAGIC_PARAM_ELF_SHNUM_MAX, 0 },
+-	{ "elf_shsize", 0, FILE_ELF_SHSIZE_MAX, "max ELF section size",
+-	    MAGIC_PARAM_ELF_SHSIZE_MAX, 0 },
+ 	{ "encoding", 0, FILE_ENCODING_MAX, "max bytes to scan for encoding",
+ 	    MAGIC_PARAM_ENCODING_MAX, 0 },
+ 	{ "indir", 0, FILE_INDIR_MAX, "recursion limit for indirection",
+diff --git a/src/file.h b/src/file.h
+index 9922632..82f6d2b 100644
+--- a/src/file.h
++++ b/src/file.h
+@@ -504,14 +504,12 @@ struct magic_set {
+ 	uint16_t magwarn_max;
+ 	size_t bytes_max;		/* number of bytes to read from file */
+ 	size_t encoding_max;		/* bytes to look for encoding */
+-	size_t elf_shsize_max;
+ #ifndef FILE_BYTES_MAX
+ # define FILE_BYTES_MAX (7 * 1024 * 1024)/* how much of the file to look at */
+ #endif /* above 0x6ab0f4 map offset for HelveticaNeue.dfont */
+ #define	FILE_ELF_NOTES_MAX		256
+ #define	FILE_ELF_PHNUM_MAX		2048
+ #define	FILE_ELF_SHNUM_MAX		32768
+-#define	FILE_ELF_SHSIZE_MAX		(128 * 1024 * 1024)
+ #define	FILE_INDIR_MAX			50
+ #define	FILE_NAME_MAX			100
+ #define	FILE_REGEX_MAX			8192
+diff --git a/src/magic.c b/src/magic.c
+index def46fa..1eb6fae 100644
+--- a/src/magic.c
++++ b/src/magic.c
+@@ -626,9 +626,6 @@ magic_setparam(struct magic_set *ms, int param, const void *val)
+ 	case MAGIC_PARAM_ELF_SHNUM_MAX:
+ 		ms->elf_shnum_max = CAST(uint16_t, v);
+ 		return 0;
+-	case MAGIC_PARAM_ELF_SHSIZE_MAX:
+-		ms->elf_shsize_max = v;
+-		return 0;
+ 	case MAGIC_PARAM_ELF_NOTES_MAX:
+ 		ms->elf_notes_max = CAST(uint16_t, v);
+ 		return 0;
+@@ -668,9 +665,6 @@ magic_getparam(struct magic_set *ms, int param, void *val)
+ 	case MAGIC_PARAM_ELF_SHNUM_MAX:
+ 		*CAST(size_t *, val) = ms->elf_shnum_max;
+ 		return 0;
+-	case MAGIC_PARAM_ELF_SHSIZE_MAX:
+-		*CAST(size_t *, val) = ms->elf_shsize_max;
+-		return 0;
+ 	case MAGIC_PARAM_ELF_NOTES_MAX:
+ 		*CAST(size_t *, val) = ms->elf_notes_max;
+ 		return 0;
+diff --git a/src/readelf.c b/src/readelf.c
+index fe4cf54..1be2dcd 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -1514,12 +1514,6 @@ doshn(struct magic_set *ms, int clazz, int swap, int fd, off_t off, int num,
+ 					return -1;
+ 				return 0;
+ 			}
+-			if (xsh_size > ms->elf_shsize_max) {
+-				file_error(ms, errno, "Note section size too "
+-				    "big (%ju > %zu)", (uintmax_t)xsh_size,
+-				    ms->elf_shsize_max);
+-				return -1;
+-			}
+ 			if ((nbuf = malloc(xsh_size)) == NULL) {
+ 				file_error(ms, errno, "Cannot allocate memory"
+ 				    " for note");

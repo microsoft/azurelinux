@@ -1,0 +1,16 @@
+This was causing Qt5 to be linked into every binary in zbar, where it is only
+needed for the Qt bindings (which already specify QT_CFLAGS, QT_LIBS, etc).
+
+diff --git a/configure.ac b/configure.ac
+index f0f9723..2a26973 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -689,8 +689,6 @@ AM_CONDITIONAL([HAVE_QT], [test "x$with_qt" = "xyes"])
+ AM_COND_IF([HAVE_QT],
+            [AC_MSG_NOTICE([using Qt version $QT_VERSION])
+             AC_MSG_NOTICE([using moc from $MOC])
+-            CPPFLAGS="$CPPFLAGS $QT_CPPFLAGS"
+-            LIBS="$LIBS $QT_LIBS"
+             AC_CONFIG_FILES([zbar-qt.pc:"${qt_pkgconfig_file}.in"])
+             #dnl -fPIC has no effect on Windows and breaks windres
+             AS_IF([test "x$win32" = "xno"], [CPPFLAGS="$CPPFLAGS -fPIC"])])

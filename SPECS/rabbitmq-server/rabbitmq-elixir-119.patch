@@ -1,0 +1,22 @@
+From 0e172a9e736cc91a93fdc76ea8cf1c6ec5615f09 Mon Sep 17 00:00:00 2001
+From: Michal Kuratczyk <michal.kuratczyk@broadcom.com>
+Date: Thu, 6 Nov 2025 22:16:56 +0100
+Subject: [PATCH] Allow Elixir 1.19
+
+---
+ deps/rabbitmq_cli/mix.exs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deps/rabbitmq_cli/mix.exs b/deps/rabbitmq_cli/mix.exs
+index b18794477907..17a056eac748 100644
+--- a/deps/rabbitmq_cli/mix.exs
++++ b/deps/rabbitmq_cli/mix.exs
+@@ -11,7 +11,7 @@ defmodule RabbitMQCtl.MixfileBase do
+     [
+       app: :rabbitmqctl,
+       version: "4.0.0-dev",
+-      elixir: ">= 1.13.4 and < 1.19.0",
++      elixir: ">= 1.13.4 and < 1.20.0",
+       build_embedded: Mix.env() == :prod,
+       start_permanent: Mix.env() == :prod,
+       escript: [

@@ -1,0 +1,21 @@
+--- argfile-1.0.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ argfile-1.0.0/Cargo.toml	2026-02-16T17:25:35.808264+00:00
+@@ -81,7 +81,6 @@
+ 
+ [features]
+ default = []
+-response = ["dep:winsplit"]
+ 
+ [lib]
+ name = "argfile"
+@@ -92,10 +91,6 @@
+ 
+ [dependencies.os_str_bytes]
+ version = "7.0"
+-
+-[dependencies.winsplit]
+-version = "0.1.0"
+-optional = true
+ 
+ [dev-dependencies.clap]
+ version = "4.5.4"

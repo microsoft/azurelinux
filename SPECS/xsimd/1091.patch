@@ -1,0 +1,29 @@
+From 49bcf64aed77285962352786d6a94e2bef57f8e0 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Tue, 4 Mar 2025 20:42:44 +0100
+Subject: [PATCH] Fix copy-pasted headers
+
+---
+ include/xsimd/arch/xsimd_avx512ifma.hpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/xsimd/arch/xsimd_avx512ifma.hpp b/include/xsimd/arch/xsimd_avx512ifma.hpp
+index df382881b..206319348 100644
+--- a/include/xsimd/arch/xsimd_avx512ifma.hpp
++++ b/include/xsimd/arch/xsimd_avx512ifma.hpp
+@@ -9,12 +9,12 @@
+  * The full license is in the file LICENSE, distributed with this software. *
+  ****************************************************************************/
+ 
+-#ifndef XSIMD_AVX512VBMI_HPP
+-#define XSIMD_AVX512VBMI_HPP
++#ifndef XSIMD_AVX512IFMA_HPP
++#define XSIMD_AVX512IFMA_HPP
+ 
+ #include <array>
+ #include <type_traits>
+ 
+-#include "../types/xsimd_avx512vbmi_register.hpp"
++#include "../types/xsimd_avx512ifma_register.hpp"
+ 
+ #endif

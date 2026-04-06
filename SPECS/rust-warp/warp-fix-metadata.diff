@@ -1,0 +1,47 @@
+--- warp-0.3.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ warp-0.3.7/Cargo.toml	2024-07-03T21:39:37.225862+00:00
+@@ -123,10 +123,6 @@
+ [dependencies.pin-project]
+ version = "1.0"
+ 
+-[dependencies.rustls-pemfile]
+-version = "2.0"
+-optional = true
+-
+ [dependencies.scoped-tls]
+ version = "1.0"
+ 
+@@ -147,12 +143,8 @@
+     "time",
+ ]
+ 
+-[dependencies.tokio-rustls]
+-version = "0.25"
+-optional = true
+-
+ [dependencies.tokio-tungstenite]
+-version = "0.21"
++version = "0.23"
+ optional = true
+ 
+ [dependencies.tokio-util]
+@@ -202,10 +194,8 @@
+ 
+ [features]
+ compression = [
+-    "compression-brotli",
+     "compression-gzip",
+ ]
+-compression-brotli = ["async-compression/brotli"]
+ compression-gzip = [
+     "async-compression/deflate",
+     "async-compression/gzip",
+@@ -215,8 +205,4 @@
+     "websocket",
+ ]
+ multipart = ["multer"]
+-tls = [
+-    "tokio-rustls",
+-    "rustls-pemfile",
+-]
+ websocket = ["tokio-tungstenite"]

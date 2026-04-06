@@ -1,0 +1,10 @@
+--- string-template-maven-plugin-string-template-maven-plugin-1.1/pom.xml.orig	2024-01-27 09:40:43.432080485 -0700
++++ string-template-maven-plugin-string-template-maven-plugin-1.1/pom.xml	2024-01-27 10:20:52.343277608 -0700
+@@ -371,6 +371,7 @@
+                         </goals>
+                         <configuration>
+                             <goalPrefix>string-template</goalPrefix>
++                            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                         </configuration>
+                     </execution>
+                     <execution>

@@ -1,0 +1,77 @@
+diff -up lame-398-2/libmp3lame/i386/choose_table.nas.noexec lame-398-2/libmp3lame/i386/choose_table.nas
+--- lame-398-2/libmp3lame/i386/choose_table.nas.noexec	2008-08-31 14:28:37.000000000 +0200
++++ lame-398-2/libmp3lame/i386/choose_table.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -445,3 +445,7 @@ from2:
+ 	ret
+ 
+ 	end
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/cpu_feat.nas.noexec lame-398-2/libmp3lame/i386/cpu_feat.nas
+--- lame-398-2/libmp3lame/i386/cpu_feat.nas.noexec	2003-11-10 16:41:00.000000000 +0100
++++ lame-398-2/libmp3lame/i386/cpu_feat.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -105,3 +105,7 @@ return0:
+ 	ret
+         
+         end
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/fft3dn.nas.noexec lame-398-2/libmp3lame/i386/fft3dn.nas
+--- lame-398-2/libmp3lame/i386/fft3dn.nas.noexec	2008-08-31 14:28:37.000000000 +0200
++++ lame-398-2/libmp3lame/i386/fft3dn.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -486,3 +486,7 @@ proc	fht_E3DN
+ 	add	esp,20
+ 	popd	ebp, ebx, esi, edi
+ endproc
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/fftfpu.nas.noexec lame-398-2/libmp3lame/i386/fftfpu.nas
+--- lame-398-2/libmp3lame/i386/fftfpu.nas.noexec	2000-10-04 14:13:26.000000000 +0200
++++ lame-398-2/libmp3lame/i386/fftfpu.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -617,3 +617,7 @@ fht_FPU_FXCH_3rd_part:
+ endproc
+ 
+ 	end
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/fft.nas.noexec lame-398-2/libmp3lame/i386/fft.nas
+--- lame-398-2/libmp3lame/i386/fft.nas.noexec	2000-10-04 14:13:26.000000000 +0200
++++ lame-398-2/libmp3lame/i386/fft.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -265,3 +265,7 @@ fht_3DN:
+ 	pop	esi
+ 	pop	ebx
+ 	ret
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/fftsse.nas.noexec lame-398-2/libmp3lame/i386/fftsse.nas
+--- lame-398-2/libmp3lame/i386/fftsse.nas.noexec	2008-08-31 14:28:37.000000000 +0200
++++ lame-398-2/libmp3lame/i386/fftsse.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -420,3 +420,7 @@ fht_SSE:
+ 	ret
+ 
+ 	end
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif
+diff -up lame-398-2/libmp3lame/i386/ffttbl.nas.noexec lame-398-2/libmp3lame/i386/ffttbl.nas
+--- lame-398-2/libmp3lame/i386/ffttbl.nas.noexec	2000-10-04 14:13:26.000000000 +0200
++++ lame-398-2/libmp3lame/i386/ffttbl.nas	2008-10-20 22:34:23.000000000 +0200
+@@ -76,3 +76,7 @@ gray_index:
+ 	segment_code
+ 
+ 	end
++
++%ifidn __OUTPUT_FORMAT__,elf
++section .note.GNU-stack noalloc noexec nowrite progbits
++%endif

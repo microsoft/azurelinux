@@ -1,0 +1,60 @@
+From 2a157921861e651f43456cb7941b250c89feb736 Mon Sep 17 00:00:00 2001
+From: Arno Rehn <a.rehn@menlosystems.com>
+Date: Wed, 8 Dec 2021 22:44:49 +0100
+Subject: [PATCH 3/3] QMetaObjectPublisher: Never send stale queued messages
+
+If the client is connected with an in-process transport, it can happen
+that a transmitted message triggers a subsequent property change.
+In that case, we need to ensure that the queued messages have already
+been cleared; otherwise the recursive call will send everythig again.
+
+Case in point: The qmlwebchannel tests fail if we don't clear the
+queued messages before sending them out.
+
+For that same reason set the client to "busy" (aka non-idle) just right
+before sending out the messages; otherwise a potential "Idle" type
+message will not correctly restore the Idle state.
+
+Pick-to: 6.2
+Pick-to: 6.3
+Change-Id: Idc4afdd5cf4b4e03b8de8953a03d28442d74a3ab
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit b4bf8f5e043120341cd9caa59f25a2beecd94ad0)
+---
+ src/webchannel/qmetaobjectpublisher.cpp | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/src/webchannel/qmetaobjectpublisher.cpp b/src/webchannel/qmetaobjectpublisher.cpp
+index 3897c07..898d769 100644
+--- a/src/webchannel/qmetaobjectpublisher.cpp
++++ b/src/webchannel/qmetaobjectpublisher.cpp
+@@ -878,11 +878,23 @@ void QMetaObjectPublisher::sendEnqueuedPropertyUpdates(QWebChannelAbstractTransp
+     auto found = transportState.find(transport);
+     if (found != transportState.end() && found.value().clientIsIdle
+         && !found.value().queuedMessages.isEmpty()) {
+-        for (auto message : found.value().queuedMessages) {
++
++        // If the client is connected with an in-process transport, it can
++        // happen that a message triggers a subsequent property change. In
++        // that case, we need to ensure that the queued messages have already
++        // been cleared; otherwise the recursive call will send everythig again.
++        // Case in point: The qmlwebchannel tests fail if we don't clear the
++        // queued messages before sending them out.
++        // For that same reason set the client to "busy" (aka non-idle) just
++        // right before sending out the messages; otherwise a potential
++        // "Idle" type message will not correctly restore the Idle state.
++        const auto messages = std::move(found.value().queuedMessages);
++        Q_ASSERT(found.value().queuedMessages.isEmpty());
++        found.value().clientIsIdle = false;
++
++        for (const auto &message : messages) {
+             transport->sendMessage(message);
+         }
+-        found.value().queuedMessages.clear();
+-        found.value().clientIsIdle = false;
+     }
+ }
+ 
+-- 
+2.51.1
+

@@ -1,0 +1,17 @@
+GCC 15 defaults to C23, which changes the interpretation of function
+declarations without parameters from unspecified to `void`.  This is a
+workaround until a proper fix is created.
+
+https://github.com/ipxe/ipxe/issues/1419
+
+diff -up ./src/Makefile.housekeeping.orig ./src/Makefile.housekeeping
+--- ./src/Makefile.housekeeping.orig	2024-01-19 17:08:48.000000000 -0500
++++ ./src/Makefile.housekeeping	2025-03-07 12:05:12.795289039 -0500
+@@ -457,6 +457,7 @@ endif
+ CFLAGS		+= $(foreach INC,$(INCDIRS),-I$(INC))
+ CFLAGS		+= -Os
+ CFLAGS		+= -g
++CFLAGS		+= -std=gnu17
+ ifeq ($(CCTYPE),gcc)
+ CFLAGS		+= -ffreestanding
+ CFLAGS		+= -fcommon

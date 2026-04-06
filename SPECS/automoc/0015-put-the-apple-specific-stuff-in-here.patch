@@ -1,0 +1,35 @@
+From e1df41943ff34f1ee0693160181ebfc4f5cab67a Mon Sep 17 00:00:00 2001
+From: Benjamin Reed <ranger@befunk.com>
+Date: Wed, 27 May 2009 20:04:12 +0000
+Subject: [PATCH 15/33] put the apple-specific stuff in here
+
+svn path=/trunk/kdesupport/automoc/; revision=973781
+---
+ CMakeLists.txt | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 570d6a4..bb8a9d3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,14 +14,13 @@ endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
+ include(Automoc4Version.cmake)
+ 
+ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Automatic moc for Qt 4 packages")
+-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/cpack/README.txt")
+-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cpack/LICENSE.txt")
+-set(CPACK_PACKAGE_VERSION ${AUTOMOC4_VERSION})
+ set(CPACK_PACKAGE_VERSION_MAJOR ${AUTOMOC4_VERSION_MAJOR})
+ set(CPACK_PACKAGE_VERSION_MINOR ${AUTOMOC4_VERSION_MINOR})
+ set(CPACK_PACKAGE_VERSION_PATCH ${AUTOMOC4_VERSION_PATCH})
+-set(CPACK_SET_DESTDIR ON)
+ if (APPLE)
++	set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/cpack/README.txt")
++	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cpack/LICENSE.txt")
++	set(CPACK_SET_DESTDIR ON)
+    set(CPACK_PACKAGE_RELOCATABLE OFF)
+ endif (APPLE)
+ 
+-- 
+2.4.3
+

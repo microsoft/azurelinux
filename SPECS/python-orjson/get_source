@@ -1,0 +1,49 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+if [ "$#" != '1' ]
+then
+	cat 1>&2 <<EOF
+Usage: $0 VERSION
+
+Downloads the requested version and creates a filtered source tarball.
+EOF
+	exit 1
+fi
+
+VERSION="${1}"
+OUTDIR="${PWD}"
+TMPDIR="$(mktemp -d)"
+trap "rm -rf '${TMPDIR}'" INT TERM EXIT
+
+cd "${TMPDIR}"
+REPO="https://github.com/ijl/orjson"
+URL="${REPO}/archive/${VERSION}/orjson-${VERSION}.tar.gz"
+echo "--> Downloading: ${URL}" 1>&2
+curl -L -O "${URL}"
+
+ARCHIVE="$(find . -mindepth 1 -maxdepth 1 -type f -name '*.tar.gz' -print -quit)"
+echo "--> Extracting: $(basename "${ARCHIVE}")" 1>&2
+tar -xzf "${ARCHIVE}"
+echo '--> Removing data/ due to licensing issues' 1>&2
+TARDIR="$(basename "${ARCHIVE}" '.tar.gz')"
+MTIME="$(stat -c '%Y' "${TARDIR}")"
+rm -rvf "${TARDIR}/data/"
+# Make sure the original mtime is preserved even though we modified the base
+# directory by removing something at the top level.
+touch -d @"${MTIME}" "${TARDIR}"
+FILTERED="$(basename "${ARCHIVE}" .tar.gz)-filtered.tar.xz"
+echo "--> Re-archiving: ${FILTERED}" 1>&2
+# https://www.gnu.org/software/tar/manual/html_section/Reproducibility.html
+TZ=UTC LC_ALL=C tar \
+    --create --verbose \
+    --sort=name \
+    --format=posix \
+    --numeric-owner --owner=0 --group=0 \
+    --mode=go+u,go-w \
+    --pax-option='delete=atime,delete=ctime' \
+    "${TARDIR}/" |
+  xz -9e > "${FILTERED}"
+mv -v "${FILTERED}" "${OUTDIR}"
+echo 'Done.' 1>&2

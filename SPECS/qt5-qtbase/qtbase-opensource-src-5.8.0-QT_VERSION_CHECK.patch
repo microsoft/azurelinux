@@ -1,0 +1,11 @@
+--- qtbase-opensource-src-5.8.0/src/corelib/global/qglobal.h.orig	2017-01-26 10:45:40.905010896 +0100
++++ qtbase-opensource-src-5.8.0/src/corelib/global/qglobal.h	2017-01-26 10:46:50.299858887 +0100
+@@ -55,7 +55,7 @@
+ /*
+    can be used like #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+ */
+-#define QT_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
++#define QT_VERSION_CHECK(qt_version_check_major, qt_version_check_minor, qt_version_check_patch) ((qt_version_check_major<<16)|(qt_version_check_minor<<8)|(qt_version_check_patch))
+ 
+ #ifdef QT_BOOTSTRAPPED
+ #include <QtCore/qconfig-bootstrapped.h>

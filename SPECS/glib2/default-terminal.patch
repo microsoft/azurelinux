@@ -1,0 +1,33 @@
+diff --git a/gio/gdesktopappinfo.c b/gio/gdesktopappinfo.c
+index 1e5a752ac6d9..79530826bd61 100644
+--- a/gio/gdesktopappinfo.c
++++ b/gio/gdesktopappinfo.c
+@@ -2720,6 +2720,7 @@ prepend_terminal_to_vector (int          *argc,
+     const char *exec_arg;
+   } known_terminals[] = {
+     { "xdg-terminal-exec", NULL },
++    { "ptyxis", "--" },
+     { "kgx", "-e" },
+     { "gnome-terminal", "--" },
+     { "mate-terminal", "-x" },
+diff --git a/gio/tests/desktop-app-info.c b/gio/tests/desktop-app-info.c
+index aa705f9a4c0e..3a0d27eb5cc1 100644
+--- a/gio/tests/desktop-app-info.c
++++ b/gio/tests/desktop-app-info.c
+@@ -1418,6 +1418,8 @@ get_terminal_divider (const char *terminal_name)
+ {
+   if (g_str_equal (terminal_name, "xdg-terminal-exec"))
+     return NULL;
++  if (g_str_equal (terminal_name, "ptyxis"))
++    return "--";
+   if (g_str_equal (terminal_name, "kgx"))
+     return "-e";
+   if (g_str_equal (terminal_name, "gnome-terminal"))
+@@ -1940,6 +1942,7 @@ main (int   argc,
+   guint i;
+   const gchar *supported_terminals[] = {
+     "xdg-terminal-exec",
++    "ptyxis",
+     "kgx",
+     "gnome-terminal",
+     "mate-terminal",

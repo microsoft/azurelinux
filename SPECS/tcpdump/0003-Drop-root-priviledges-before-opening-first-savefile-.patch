@@ -1,0 +1,101 @@
+From 9bee0dffaebbc53b9762df7a6d84a553969e7b00 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Fri, 3 Feb 2017 09:36:26 +0100
+Subject: [PATCH 3/8] Drop root priviledges before opening first savefile if
+ running with -Z root
+
+---
+ tcpdump.1.in |  7 ++++++-
+ tcpdump.c    | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/tcpdump.1.in b/tcpdump.1.in
+index f04a579..ca5cff2 100644
+--- a/tcpdump.1.in
++++ b/tcpdump.1.in
+@@ -249,6 +249,9 @@ have the name specified with the
+ By adding a suffix of k/K, m/M or g/G to the value, the unit
+ can be changed to 1,024 (KiB), 1,048,576 (MiB), or 1,073,741,824 (GiB)
+ respectively.
++
++Note that when used with \fB\-Z\fR option (enabled by default), privileges
++are dropped before opening the first savefile.
+ .TP
+ .B \-d
+ Dump the compiled packet-matching code in a human readable form to
+@@ -860,7 +863,9 @@ but before opening any savefiles for output, change the user ID to
+ and the group ID to the primary group of
+ .IR user .
+ .IP
+-This behavior can also be enabled by default at compile time.
++This behavior is enabled by default (\fB\-Z tcpdump\fR), and can
++be disabled by \fB\-Z root\fR.
++
+ .IP "\fI expression\fP"
+ .RS
+ selects which packets will be dumped.
+@@ -366,6 +366,10 @@ If no time format is specified, each new file will overwrite the previous.
+ If used in conjunction with the
+ .B \-C
+ option, filenames will take the form of `\fIfile\fP<count>'.
++.IP
++Note that when used with 
++.B \-Z 
++option (enabled by default), privileges are dropped before opening the first savefile.
+ .TP
+ .B \-h
+ .PD 0
+diff --git a/tcpdump.c b/tcpdump.c
+index 73bf138..29f7f87 100644
+--- a/tcpdump.c
++++ b/tcpdump.c
+@@ -1133,6 +1133,7 @@ main(int argc, char **argv)
+ 	cap_rights_t rights;
+ 	int cansandbox;
+ #endif	/* HAVE_CAPSICUM */
++	int chown_flag = 0;
+ 	int Oflag = 1;			/* run filter code optimizer */
+ 	int yflag_dlt = -1;
+ 	const char *yflag_dlt_name = NULL;
+@@ -1843,6 +1844,16 @@ main(int argc, char **argv)
+ 		}
+ 		capng_apply(CAPNG_SELECT_BOTH);
+ #endif /* HAVE_LIBCAP_NG */
++	/* If user is running tcpdump as root and wants to write to the savefile,
++	 * we will check if -C is set and if it is, we will drop root
++	 * privileges right away and consequent call to>pcap_dump_open()
++	 * will most likely fail for the first file. If -C flag is not set we
++	 * will create file as root then change ownership of file to proper
++	 * user(default tcpdump) and drop root privileges.
++	 */
++	if (WFileName && !Cflag && !Gflag && username)
++			chown_flag = 1;
++	else
+ 		if (username || chroot_dir)
+ 			droproot(username, chroot_dir);
+ 
+@@ -1881,6 +1895,22 @@ main(int argc, char **argv)
+ 		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
+ 
+ 		pdd = pcap_dump_open(pd, dumpinfo.CurrentFileName);
++
++	/* Change ownership of file and drop root privileges */
++	if (chown_flag) {
++		struct passwd *pwd;
++
++		pwd = getpwnam(username);
++		if (!pwd)
++			error("Couldn't find user '%s'", username);
++
++		if (strcmp(WFileName, "-") && chown(dumpinfo.CurrentFileName, pwd->pw_uid, pwd->pw_gid) < 0)
++			error("Couldn't change ownership of savefile");
++
++		if (username || chroot_dir)
++			droproot(username, chroot_dir);
++    }
++
+ #ifdef HAVE_LIBCAP_NG
+ 		/* Give up CAP_DAC_OVERRIDE capability.
+ 		 * Only allow it to be restored if the -C or -G flag have been
+-- 
+2.9.3

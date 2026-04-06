@@ -1,0 +1,20 @@
+Part of this upstream commit:
+
+commit cb17f478bb102bc437976046ac9d39182aa758aa
+Author: Ross Burton <ross.burton@intel.com>
+Date:   Mon Dec 10 11:33:32 2012 +0000
+
+    Remove some unused variables
+
+diff --git a/libmb/mbpixbuf.c b/libmb/mbpixbuf.c
+index 3811d0874b19fa47..f0da64b0a8aa221d 100644
+--- a/libmb/mbpixbuf.c
++++ b/libmb/mbpixbuf.c
+@@ -22,6 +22,7 @@
+ 
+ #include <strings.h>
+ #include "mbpixbuf.h"
++#include "mbutil.h"
+ 
+ #define BYTE_ORD_24_RGB  0
+ #define BYTE_ORD_24_RBG  1

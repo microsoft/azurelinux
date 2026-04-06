@@ -1,0 +1,25 @@
+The CMake prepares file AUTHORS for packing.
+It only contains one line, and isn't packed in any upstream-produced packagess.
+I don't find it useful and since upstream doesn't pack it either, stop packing it here.
+
+The README file contains infromation on how to build the project from sources, and thus isn't useful for the end users.
+
+On the other hand, the README-MySQL isn't prepared for packing by CMake, but contains useful information about the software usage and it is package in upstream-produced packages.
+
+Offered upstream:
+https://github.com/codership/galera/pull/666
+https://groups.google.com/g/codership-team/c/Cn4UO3MkNQs
+
+--- galera-26.4.18/CMakeLists.txt	2024-06-09 04:54:56.281408893 +0200
++++ galera-26.4.18/CMakeLists.txt_patched	2024-06-09 06:52:58.093217968 +0200
+@@ -118,9 +118,8 @@ endif()
+ 
+ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD")
+   install(FILES
+-    ${PROJECT_SOURCE_DIR}/AUTHORS
+     ${PROJECT_SOURCE_DIR}/COPYING
+-    ${PROJECT_SOURCE_DIR}/README
++    ${PROJECT_SOURCE_DIR}/scripts/packages/README-MySQL
+     DESTINATION ${INSTALL_DOCDIR} )
+   install(FILES ${PROJECT_SOURCE_DIR}/asio/LICENSE_1_0.txt
+     DESTINATION ${INSTALL_DOCDIR}

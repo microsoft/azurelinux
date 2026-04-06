@@ -1,0 +1,37 @@
+From 3ff6a9372bdc141daa34a664252b359899244356 Mon Sep 17 00:00:00 2001
+From: Jonathan Marler <johnnymarler@gmail.com>
+Date: Thu, 7 Aug 2025 15:45:26 -0600
+Subject: [PATCH 6/6] stream: fix array out-of-bounds in
+ stream_get_timing_info_callback
+
+This issue was found by enabling ubsan. For me it consistently triggered
+after about 28 seconds running a simple example that plays a sine wave
+via the mainloop api.
+
+I added a log and confirmed that before the ubsan is triggered the
+index variable j is indeed 32 which is out-of-bounds.
+
+Co-authored-by: Arun Raghavan <arun@asymptotic.io>
+---
+ src/pulse/stream.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/pulse/stream.c b/src/pulse/stream.c
+index 3585b27e8..0cceb14e0 100644
+--- a/src/pulse/stream.c
++++ b/src/pulse/stream.c
+@@ -1917,7 +1917,10 @@ static void stream_get_timing_info_callback(pa_pdispatch *pd, uint32_t command,
+              * total correction.*/
+             for (n = 0, j = o->stream->current_write_index_correction+1;
+                  n < PA_MAX_WRITE_INDEX_CORRECTIONS;
+-                 n++, j = (j + 1) % PA_MAX_WRITE_INDEX_CORRECTIONS) {
++                 n++, j++) {
++
++                /* First fix up the index to be within the array */
++                j  = j % PA_MAX_WRITE_INDEX_CORRECTIONS;
+ 
+                 /* Step over invalid data or out-of-date data */
+                 if (!o->stream->write_index_corrections[j].valid ||
+-- 
+2.52.0
+

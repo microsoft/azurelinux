@@ -1,0 +1,2 @@
+This scripts dir contains only samples, but are generally not used directly.
+In practice, plasmalogin runtime uses items under /etc/plasmalogin by default

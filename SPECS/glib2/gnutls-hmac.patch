@@ -1,0 +1,1047 @@
+From c5c7cd05fe62d7bef7d7de96a60913bb1ee3eb36 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 7 Jun 2019 18:44:43 +0000
+Subject: [PATCH 1/4] ghmac: Split off wrapper functions into ghmac-utils.c
+
+Prep for adding a GnuTLS HMAC implementation; these are just
+utility functions that call the "core" API.
+---
+ glib/ghmac-utils.c | 145 +++++++++++++++++++++++++++++++++++++++++++++
+ glib/ghmac.c       | 112 ----------------------------------
+ glib/meson.build   |   1 +
+ 3 files changed, 146 insertions(+), 112 deletions(-)
+ create mode 100644 glib/ghmac-utils.c
+
+diff --git a/glib/ghmac-utils.c b/glib/ghmac-utils.c
+new file mode 100644
+index 000000000000..a17359ff1505
+--- /dev/null
++++ b/glib/ghmac-utils.c
+@@ -0,0 +1,145 @@
++/* ghmac.h - data hashing functions
++ *
++ * Copyright (C) 2011  Collabora Ltd.
++ * Copyright (C) 2019  Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <string.h>
++
++#include "ghmac.h"
++
++#include "glib/galloca.h"
++#include "gatomic.h"
++#include "gslice.h"
++#include "gmem.h"
++#include "gstrfuncs.h"
++#include "gtestutils.h"
++#include "gtypes.h"
++#include "glibintl.h"
++
++/**
++ * g_compute_hmac_for_data:
++ * @digest_type: a #GChecksumType to use for the HMAC
++ * @key: (array length=key_len): the key to use in the HMAC
++ * @key_len: the length of the key
++ * @data: (array length=length): binary blob to compute the HMAC of
++ * @length: length of @data
++ *
++ * Computes the HMAC for a binary @data of @length. This is a
++ * convenience wrapper for g_hmac_new(), g_hmac_get_string()
++ * and g_hmac_unref().
++ *
++ * The hexadecimal string returned will be in lower case.
++ *
++ * Returns: the HMAC of the binary data as a string in hexadecimal.
++ *   The returned string should be freed with g_free() when done using it.
++ *
++ * Since: 2.30
++ */
++gchar *
++g_compute_hmac_for_data (GChecksumType  digest_type,
++                         const guchar  *key,
++                         gsize          key_len,
++                         const guchar  *data,
++                         gsize          length)
++{
++  GHmac *hmac;
++  gchar *retval;
++
++  g_return_val_if_fail (length == 0 || data != NULL, NULL);
++
++  hmac = g_hmac_new (digest_type, key, key_len);
++  if (!hmac)
++    return NULL;
++
++  g_hmac_update (hmac, data, length);
++  retval = g_strdup (g_hmac_get_string (hmac));
++  g_hmac_unref (hmac);
++
++  return retval;
++}
++
++/**
++ * g_compute_hmac_for_bytes:
++ * @digest_type: a #GChecksumType to use for the HMAC
++ * @key: the key to use in the HMAC
++ * @data: binary blob to compute the HMAC of
++ *
++ * Computes the HMAC for a binary @data. This is a
++ * convenience wrapper for g_hmac_new(), g_hmac_get_string()
++ * and g_hmac_unref().
++ *
++ * The hexadecimal string returned will be in lower case.
++ *
++ * Returns: the HMAC of the binary data as a string in hexadecimal.
++ *   The returned string should be freed with g_free() when done using it.
++ *
++ * Since: 2.50
++ */
++gchar *
++g_compute_hmac_for_bytes (GChecksumType  digest_type,
++                          GBytes        *key,
++                          GBytes        *data)
++{
++  gconstpointer byte_data;
++  gsize length;
++  gconstpointer key_data;
++  gsize key_len;
++
++  g_return_val_if_fail (data != NULL, NULL);
++  g_return_val_if_fail (key != NULL, NULL);
++
++  byte_data = g_bytes_get_data (data, &length);
++  key_data = g_bytes_get_data (key, &key_len);
++  return g_compute_hmac_for_data (digest_type, key_data, key_len, byte_data, length);
++}
++
++
++/**
++ * g_compute_hmac_for_string:
++ * @digest_type: a #GChecksumType to use for the HMAC
++ * @key: (array length=key_len): the key to use in the HMAC
++ * @key_len: the length of the key
++ * @str: the string to compute the HMAC for
++ * @length: the length of the string, or -1 if the string is nul-terminated
++ *
++ * Computes the HMAC for a string.
++ *
++ * The hexadecimal string returned will be in lower case.
++ *
++ * Returns: the HMAC as a hexadecimal string.
++ *     The returned string should be freed with g_free()
++ *     when done using it.
++ *
++ * Since: 2.30
++ */
++gchar *
++g_compute_hmac_for_string (GChecksumType  digest_type,
++                           const guchar  *key,
++                           gsize          key_len,
++                           const gchar   *str,
++                           gssize         length)
++{
++  g_return_val_if_fail (length == 0 || str != NULL, NULL);
++
++  if (length < 0)
++    length = strlen (str);
++
++  return g_compute_hmac_for_data (digest_type, key, key_len,
++                                  (const guchar *) str, length);
++}
+diff --git a/glib/ghmac.c b/glib/ghmac.c
+index 97e2fff90994..de89d826d548 100644
+--- a/glib/ghmac.c
++++ b/glib/ghmac.c
+@@ -356,115 +356,3 @@ g_hmac_get_digest (GHmac  *hmac,
+   g_checksum_update (hmac->digesto, buffer, len_signed);
+   g_checksum_get_digest (hmac->digesto, buffer, digest_len);
+ }
+-
+-/**
+- * g_compute_hmac_for_data:
+- * @digest_type: a #GChecksumType to use for the HMAC
+- * @key: (array length=key_len): the key to use in the HMAC
+- * @key_len: the length of the key
+- * @data: (array length=length): binary blob to compute the HMAC of
+- * @length: length of @data
+- *
+- * Computes the HMAC for a binary @data of @length. This is a
+- * convenience wrapper for g_hmac_new(), g_hmac_get_string()
+- * and g_hmac_unref().
+- *
+- * The hexadecimal string returned will be in lower case.
+- *
+- * Returns: the HMAC of the binary data as a string in hexadecimal.
+- *   The returned string should be freed with g_free() when done using it.
+- *
+- * Since: 2.30
+- */
+-gchar *
+-g_compute_hmac_for_data (GChecksumType  digest_type,
+-                         const guchar  *key,
+-                         gsize          key_len,
+-                         const guchar  *data,
+-                         gsize          length)
+-{
+-  GHmac *hmac;
+-  gchar *retval;
+-
+-  g_return_val_if_fail (length == 0 || data != NULL, NULL);
+-
+-  hmac = g_hmac_new (digest_type, key, key_len);
+-  if (!hmac)
+-    return NULL;
+-
+-  g_hmac_update (hmac, data, length);
+-  retval = g_strdup (g_hmac_get_string (hmac));
+-  g_hmac_unref (hmac);
+-
+-  return retval;
+-}
+-
+-/**
+- * g_compute_hmac_for_bytes:
+- * @digest_type: a #GChecksumType to use for the HMAC
+- * @key: the key to use in the HMAC
+- * @data: binary blob to compute the HMAC of
+- *
+- * Computes the HMAC for a binary @data. This is a
+- * convenience wrapper for g_hmac_new(), g_hmac_get_string()
+- * and g_hmac_unref().
+- *
+- * The hexadecimal string returned will be in lower case.
+- *
+- * Returns: the HMAC of the binary data as a string in hexadecimal.
+- *   The returned string should be freed with g_free() when done using it.
+- *
+- * Since: 2.50
+- */
+-gchar *
+-g_compute_hmac_for_bytes (GChecksumType  digest_type,
+-                          GBytes        *key,
+-                          GBytes        *data)
+-{
+-  gconstpointer byte_data;
+-  gsize length;
+-  gconstpointer key_data;
+-  gsize key_len;
+-
+-  g_return_val_if_fail (data != NULL, NULL);
+-  g_return_val_if_fail (key != NULL, NULL);
+-
+-  byte_data = g_bytes_get_data (data, &length);
+-  key_data = g_bytes_get_data (key, &key_len);
+-  return g_compute_hmac_for_data (digest_type, key_data, key_len, byte_data, length);
+-}
+-
+-
+-/**
+- * g_compute_hmac_for_string:
+- * @digest_type: a #GChecksumType to use for the HMAC
+- * @key: (array length=key_len): the key to use in the HMAC
+- * @key_len: the length of the key
+- * @str: the string to compute the HMAC for
+- * @length: the length of the string, or -1 if the string is nul-terminated
+- *
+- * Computes the HMAC for a string.
+- *
+- * The hexadecimal string returned will be in lower case.
+- *
+- * Returns: the HMAC as a hexadecimal string.
+- *     The returned string should be freed with g_free()
+- *     when done using it.
+- *
+- * Since: 2.30
+- */
+-gchar *
+-g_compute_hmac_for_string (GChecksumType  digest_type,
+-                           const guchar  *key,
+-                           gsize          key_len,
+-                           const gchar   *str,
+-                           gssize         length)
+-{
+-  g_return_val_if_fail (length == 0 || str != NULL, NULL);
+-
+-  if (length < 0)
+-    length = strlen (str);
+-
+-  return g_compute_hmac_for_data (digest_type, key, key_len,
+-                                  (const guchar *) str, length);
+-}
+diff --git a/glib/meson.build b/glib/meson.build
+index 209bcbfd119b..98e4533e3fb8 100644
+--- a/glib/meson.build
++++ b/glib/meson.build
+@@ -285,6 +285,7 @@ glib_sources += files(
+   'ggettext.c',
+   'ghash.c',
+   'ghmac.c',
++  'ghmac-utils.c',
+   'ghook.c',
+   'ghostutils.c',
+   'giochannel.c',
+-- 
+2.51.1
+
+
+From b8adbcabb18e524fedcf53be2fc4c577c8a43609 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 7 Jun 2019 19:36:54 +0000
+Subject: [PATCH 2/4] Add a gnutls backend for GHmac
+
+For RHEL we want apps to use FIPS-certified crypto libraries,
+and HMAC apparently counts as "keyed" and hence needs to
+be validated.
+
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1630260
+Replaces: https://gitlab.gnome.org/GNOME/glib/merge_requests/897
+
+This is a build-time option that backs the GHmac API with GnuTLS.
+Most distributors ship glib-networking built with GnuTLS, and
+most apps use glib-networking, so this isn't a net-new library
+in most cases.
+
+=======================================================================
+
+mcatanzaro note:
+
+I've updated Colin's original patch with several enhancements:
+
+Implement g_hmac_copy() using gnutls_hmac_copy(), which didn't exist
+when Colin developed this patch.
+
+Removed use of GSlice
+
+Better error checking in g_hmac_new(). It is possible for
+gnutls_hmac_init() to fail if running in FIPS mode and an MD5 digest is
+requested. In this case, we should return NULL rather than returning a
+broken GHmac with a NULL gnutls_hmac_hd_t. This was leading to a later
+null pointer dereference inside gnutls_hmac_update(). Applications are
+responsible for checking to ensure the return value of g_hmac_new() is
+not NULL since it is annotated as nullable. Added documentation to
+indicate this possibility.
+
+Properly handle length -1 in g_hmac_update(). This means we've been
+given a NUL-terminated string and should use strlen(). GnuTLS doesn't
+accept -1, so let's call strlen() ourselves.
+
+Crash the application with g_error() if gnutls_hmac() fails for any
+reason. This is necessary because g_hmac_update() is not fallible, so we
+have no way to indicate error. Crashing seems better than returning the
+wrong result later when g_hmac_get_string() or g_hmac_get_digest() is
+later called. (Those functions are also not fallible.) Fortunately, I
+don't think this error should actually be hit in practice.
+
+https://gitlab.gnome.org/GNOME/glib/-/merge_requests/903
+---
+ glib/gchecksum.c        |   9 +-
+ glib/gchecksumprivate.h |  32 +++++++
+ glib/ghmac-gnutls.c     | 187 ++++++++++++++++++++++++++++++++++++++++
+ glib/ghmac.c            |  15 ++++
+ glib/meson.build        |  10 ++-
+ meson.build             |   7 ++
+ meson.options           |   5 ++
+ 7 files changed, 260 insertions(+), 5 deletions(-)
+ create mode 100644 glib/gchecksumprivate.h
+ create mode 100644 glib/ghmac-gnutls.c
+
+diff --git a/glib/gchecksum.c b/glib/gchecksum.c
+index 196fda24a58b..fb9d4ff33777 100644
+--- a/glib/gchecksum.c
++++ b/glib/gchecksum.c
+@@ -22,7 +22,7 @@
+ 
+ #include <string.h>
+ 
+-#include "gchecksum.h"
++#include "gchecksumprivate.h"
+ 
+ #include "gslice.h"
+ #include "gmem.h"
+@@ -176,9 +176,9 @@ sha_byte_reverse (guint32 *buffer,
+ }
+ #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
+ 
+-static gchar *
+-digest_to_string (guint8 *digest,
+-                  gsize   digest_len)
++gchar *
++gchecksum_digest_to_string (guint8 *digest,
++                            gsize   digest_len)
+ {
+   gsize i, len = digest_len * 2;
+   gchar *retval;
+@@ -197,6 +197,7 @@ digest_to_string (guint8 *digest,
+ 
+   return retval;
+ }
++#define digest_to_string gchecksum_digest_to_string
+ 
+ /*
+  * MD5 Checksum
+diff --git a/glib/gchecksumprivate.h b/glib/gchecksumprivate.h
+new file mode 100644
+index 000000000000..86c7a3b61a18
+--- /dev/null
++++ b/glib/gchecksumprivate.h
+@@ -0,0 +1,32 @@
++/* gstdioprivate.h - Private GLib stdio functions
++ *
++ * Copyright 2017 Руслан Ижбулатов
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef __G_CHECKSUMPRIVATE_H__
++#define __G_CHECKSUMPRIVATE_H__
++
++#include "gchecksum.h"
++
++G_BEGIN_DECLS
++
++gchar *
++gchecksum_digest_to_string (guint8 *digest,
++                            gsize   digest_len);
++
++G_END_DECLS
++
++#endif
+\ No newline at end of file
+diff --git a/glib/ghmac-gnutls.c b/glib/ghmac-gnutls.c
+new file mode 100644
+index 000000000000..9fb775f89aaf
+--- /dev/null
++++ b/glib/ghmac-gnutls.c
+@@ -0,0 +1,187 @@
++/* ghmac.h - data hashing functions
++ *
++ * Copyright (C) 2011  Collabora Ltd.
++ * Copyright (C) 2019  Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <string.h>
++#include <gnutls/crypto.h>
++
++#include "ghmac.h"
++
++#include "glib/galloca.h"
++#include "gatomic.h"
++#include "gslice.h"
++#include "gmem.h"
++#include "gstrfuncs.h"
++#include "gchecksumprivate.h"
++#include "gtestutils.h"
++#include "gtypes.h"
++#include "glibintl.h"
++
++#ifndef HAVE_GNUTLS
++#error "build configuration error"
++#endif
++
++struct _GHmac
++{
++  int ref_count;
++  GChecksumType digest_type;
++  gnutls_hmac_hd_t hmac;
++  gchar *digest_str;
++};
++
++GHmac *
++g_hmac_new (GChecksumType  digest_type,
++            const guchar  *key,
++            gsize          key_len)
++{
++  gnutls_mac_algorithm_t algo;
++  GHmac *hmac = g_new0 (GHmac, 1);
++  int ret;
++
++  hmac->ref_count = 1;
++  hmac->digest_type = digest_type;
++
++  switch (digest_type)
++    {
++    case G_CHECKSUM_MD5:
++      algo = GNUTLS_MAC_MD5;
++      break;
++    case G_CHECKSUM_SHA1:
++      algo = GNUTLS_MAC_SHA1;
++      break;
++    case G_CHECKSUM_SHA256:
++      algo = GNUTLS_MAC_SHA256;
++      break;
++    case G_CHECKSUM_SHA384:
++      algo = GNUTLS_MAC_SHA384;
++      break;
++    case G_CHECKSUM_SHA512:
++      algo = GNUTLS_MAC_SHA512;
++      break;
++    default:
++      g_free (hmac);
++      g_return_val_if_reached (NULL);
++    }
++
++  ret = gnutls_hmac_init (&hmac->hmac, algo, key, key_len);
++  if (ret != 0)
++    {
++      /* There is no way to report an error here, but one possible cause of
++       * failure is that the requested digest may be disabled by FIPS mode.
++       */
++      g_free (hmac);
++      return NULL;
++    }
++
++  return hmac;
++}
++
++GHmac *
++g_hmac_copy (const GHmac *hmac)
++{
++  GHmac *copy;
++
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  copy = g_new0 (GHmac, 1);
++  copy->ref_count = 1;
++  copy->digest_type = hmac->digest_type;
++  copy->hmac = gnutls_hmac_copy (hmac->hmac);
++
++  /* g_hmac_copy is not allowed to fail, so we'll have to crash on error. */
++  if (!copy->hmac)
++    g_error ("gnutls_hmac_copy failed");
++
++  return copy;
++}
++
++GHmac *
++g_hmac_ref (GHmac *hmac)
++{
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  g_atomic_int_inc (&hmac->ref_count);
++
++  return hmac;
++}
++
++void
++g_hmac_unref (GHmac *hmac)
++{
++  g_return_if_fail (hmac != NULL);
++
++  if (g_atomic_int_dec_and_test (&hmac->ref_count))
++    {
++      gnutls_hmac_deinit (hmac->hmac, NULL);
++      g_free (hmac->digest_str);
++      g_free (hmac);
++    }
++}
++
++
++void
++g_hmac_update (GHmac        *hmac,
++               const guchar *data,
++               gssize        length)
++{
++  int ret;
++
++  g_return_if_fail (hmac != NULL);
++  g_return_if_fail (length == 0 || data != NULL);
++
++  if (length == -1)
++    length = strlen ((const char *)data);
++
++  /* g_hmac_update is not allowed to fail, so we'll have to crash on error. */
++  ret = gnutls_hmac (hmac->hmac, data, length);
++  if (ret != 0)
++    g_error ("gnutls_hmac failed: %s", gnutls_strerror (ret));
++}
++
++const gchar *
++g_hmac_get_string (GHmac *hmac)
++{
++  guint8 *buffer;
++  gsize digest_len;
++
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  if (hmac->digest_str)
++    return hmac->digest_str;
++
++  digest_len = g_checksum_type_get_length (hmac->digest_type);
++  buffer = g_alloca (digest_len);
++
++  gnutls_hmac_output (hmac->hmac, buffer);
++  hmac->digest_str = gchecksum_digest_to_string (buffer, digest_len);
++  return hmac->digest_str;
++}
++
++
++void
++g_hmac_get_digest (GHmac  *hmac,
++                   guint8 *buffer,
++                   gsize  *digest_len)
++{
++  g_return_if_fail (hmac != NULL);
++
++  gnutls_hmac_output (hmac->hmac, buffer);
++  *digest_len = g_checksum_type_get_length (hmac->digest_type);
++}
+diff --git a/glib/ghmac.c b/glib/ghmac.c
+index de89d826d548..616e167e7ff2 100644
+--- a/glib/ghmac.c
++++ b/glib/ghmac.c
+@@ -35,6 +35,9 @@
+ #include "gtypes.h"
+ #include "glibintl.h"
+ 
++#ifdef HAVE_GNUTLS
++#error "build configuration error"
++#endif
+ 
+ /**
+  * GHmac:
+@@ -89,6 +92,18 @@ struct _GHmac
+  * Support for digests of type %G_CHECKSUM_SHA512 has been added in GLib 2.42.
+  * Support for %G_CHECKSUM_SHA384 was added in GLib 2.52.
+  *
++ * Note that #GHmac creation may fail, in which case this function will
++ * return %NULL. Since there is no error parameter, it is not possible
++ * to indicate why.
++ *
++ * In Fedora, CentOS Stream, and Red Hat Enterprise Linux, GLib is
++ * configured to use GnuTLS to implement #GHmac in order to support FIPS
++ * compliance. This introduces additional failure possibilities that are
++ * not present in upstream GLib. For example, the creation of a #GHmac
++ * will fail if @digest_type is %G_CHECKSUM_MD5 and the system is
++ * running in FIPS mode. #GHmac creation may also fail if GLib is unable
++ * to load GnuTLS.
++ *
+  * Returns: (nullable) (transfer full): the newly created #GHmac, or %NULL.
+  *   Use g_hmac_unref() to free the memory allocated by it.
+  *
+diff --git a/glib/meson.build b/glib/meson.build
+index 98e4533e3fb8..39b37310e810 100644
+--- a/glib/meson.build
++++ b/glib/meson.build
+@@ -284,7 +284,6 @@ glib_sources += files(
+   'gfileutils.c',
+   'ggettext.c',
+   'ghash.c',
+-  'ghmac.c',
+   'ghmac-utils.c',
+   'ghook.c',
+   'ghostutils.c',
+@@ -339,6 +338,8 @@ glib_sources += files(
+   'gunidecomp.c',
+   'guri.c',
+   'gutils.c',
++  'gutilsprivate.h',
++  'gchecksumprivate.h',
+   'guuid.c',
+   'gvariant.c',
+   'gvariant-core.c',
+@@ -397,6 +398,12 @@ else
+   glib_dtrace_hdr = []
+ endif
+ 
++if get_option('gnutls')
++  glib_sources += files('ghmac-gnutls.c')
++else
++  glib_sources += files('ghmac.c')
++endif
++
+ pcre2_static_args = []
+ 
+ if use_pcre2_static_flag
+@@ -418,6 +425,7 @@ libglib = library('glib-2.0',
+   dependencies : [
+     atomic_dep,
+     gnulib_libm_dependency,
++    libgnutls_dep,
+     libiconv,
+     libintl_deps,
+     libm,
+diff --git a/meson.build b/meson.build
+index 9aa931903927..2184790b3399 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2370,6 +2370,13 @@ if host_system == 'linux'
+   endif
+ endif
+ 
++# gnutls is used optionally by ghmac
++libgnutls_dep = []
++if get_option('gnutls')
++  libgnutls_dep = [dependency('gnutls', version : '>=3.6.9', required : true)]
++  glib_conf.set('HAVE_GNUTLS', 1)
++endif
++
+ if host_system == 'windows'
+   winsock2 = cc.find_library('ws2_32')
+   # Used for g_win32_clear_com() tests...
+diff --git a/meson.options b/meson.options
+index 5ebbe4d87bbe..b6faedd3f606 100644
+--- a/meson.options
++++ b/meson.options
+@@ -37,6 +37,11 @@ option('libmount',
+        value : 'auto',
+        description : 'build with libmount support')
+ 
++option('gnutls',
++       type : 'boolean',
++       value : false,
++       description : 'build with gnutls support')
++
+ option('man',
+        type : 'boolean',
+        value : false,
+-- 
+2.51.1
+
+
+From 00dd9e5dc3627e8598fdb2644484a6b02b14de1e Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Wed, 16 Jun 2021 20:35:00 -0500
+Subject: [PATCH 3/4] dlopen GnuTLS instead of linking directly
+
+I'd like to enable our GnuTLS GHmac patchset in Fedora in order to
+ensure it is receiving sufficient real-world testing, since we've
+discovered several bugs thus far. Problem is Fedora has one requirement
+that RHEL does not: it needs to build glib as a static lib. This is
+needed by QEMU in Fedora for complicated technical reasons that I don't
+understand. However, nothing in RHEL needs it. This means we failed to
+notice that glib2-static is broken in RHEL, because there is no
+gnutls-static! We could fix this by adding a gnutls-static package, but
+that seems like overkill, and adding more static libraries where they're
+not truly necessary is not the direction we want to move in anyway. So
+instead, let's just dlopen GnuTLS to sidestep this problem entirely.
+
+This would not be a good solution for upstream, but upstream has made
+clear that this patchset is already non-upstreamable, so it will be fine
+for our purposes.
+---
+ glib/ghmac-gnutls.c | 101 ++++++++++++++++++++++++++++++++++++++++++--
+ glib/ghmac.c        |   2 +-
+ glib/meson.build    |   1 -
+ meson.build         |  10 ++---
+ 4 files changed, 103 insertions(+), 11 deletions(-)
+
+diff --git a/glib/ghmac-gnutls.c b/glib/ghmac-gnutls.c
+index 9fb775f89aaf..1800fc2e059e 100644
+--- a/glib/ghmac-gnutls.c
++++ b/glib/ghmac-gnutls.c
+@@ -19,8 +19,8 @@
+ 
+ #include "config.h"
+ 
++#include <dlfcn.h>
+ #include <string.h>
+-#include <gnutls/crypto.h>
+ 
+ #include "ghmac.h"
+ 
+@@ -31,13 +31,16 @@
+ #include "gstrfuncs.h"
+ #include "gchecksumprivate.h"
+ #include "gtestutils.h"
++#include "gthread.h"
+ #include "gtypes.h"
+ #include "glibintl.h"
+ 
+-#ifndef HAVE_GNUTLS
++#ifndef USE_GNUTLS
+ #error "build configuration error"
+ #endif
+ 
++typedef gpointer gnutls_hmac_hd_t;
++
+ struct _GHmac
+ {
+   int ref_count;
+@@ -46,15 +49,107 @@ struct _GHmac
+   gchar *digest_str;
+ };
+ 
++typedef enum
++{
++  GNUTLS_MAC_MD5 = 2,
++  GNUTLS_MAC_SHA1 = 3,
++  GNUTLS_MAC_SHA256 = 6,
++  GNUTLS_MAC_SHA384 = 7,
++  GNUTLS_MAC_SHA512 = 8,
++} gnutls_mac_algorithm_t;
++
++/* Why are we dlopening GnuTLS instead of linking to it directly? Because we
++ * want to be able to build GLib as a static library without depending on a
++ * static build of GnuTLS. QEMU depends on static linking with GLib, but Fedora
++ * does not ship a static build of GnuTLS, and this allows us to avoid changing
++ * that.
++ */
++static int              (*gnutls_hmac_init)   (gnutls_hmac_hd_t *dig, gnutls_mac_algorithm_t algorithm, const void *key, size_t keylen);
++static gnutls_hmac_hd_t (*gnutls_hmac_copy)   (gnutls_hmac_hd_t handle);
++static void             (*gnutls_hmac_deinit) (gnutls_hmac_hd_t handle, void *digest);
++static int              (*gnutls_hmac)        (gnutls_hmac_hd_t handle, const void *ptext, size_t ptext_len);
++static void             (*gnutls_hmac_output) (gnutls_hmac_hd_t handle, void *digest);
++static const char *     (*gnutls_strerror)    (int error);
++
++static gsize gnutls_initialize_attempted = 0;
++static gboolean gnutls_initialize_successful = FALSE;
++
++static void
++initialize_gnutls (void)
++{
++  gpointer libgnutls;
++
++  libgnutls = dlopen ("libgnutls.so.30", RTLD_LAZY | RTLD_GLOBAL);
++  if (!libgnutls)
++    {
++      g_warning ("Cannot use GHmac: failed to load libgnutls.so.30: %s", dlerror ());
++      return;
++    }
++
++  gnutls_hmac_init = dlsym (libgnutls, "gnutls_hmac_init");
++  if (!gnutls_hmac_init)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_hmac_init: %s", dlerror ());
++      return;
++    }
++
++  gnutls_hmac_copy = dlsym (libgnutls, "gnutls_hmac_copy");
++  if (!gnutls_hmac_copy)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_hmac_copy: %s", dlerror ());
++      return;
++    }
++
++  gnutls_hmac_deinit = dlsym (libgnutls, "gnutls_hmac_deinit");
++  if (!gnutls_hmac_deinit)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_hmac_deinit: %s", dlerror ());
++      return;
++    }
++
++  gnutls_hmac = dlsym (libgnutls, "gnutls_hmac");
++  if (!gnutls_hmac)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_hmac: %s", dlerror ());
++      return;
++    }
++
++  gnutls_hmac_output = dlsym (libgnutls, "gnutls_hmac_output");
++  if (!gnutls_hmac_output)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_hmac_output: %s", dlerror ());
++      return;
++    }
++
++  gnutls_strerror = dlsym (libgnutls, "gnutls_strerror");
++  if (!gnutls_strerror)
++    {
++      g_warning ("Cannot use GHmac: failed to load gnutls_strerror: %s", dlerror ());
++      return;
++    }
++
++  gnutls_initialize_successful = TRUE;
++}
++
+ GHmac *
+ g_hmac_new (GChecksumType  digest_type,
+             const guchar  *key,
+             gsize          key_len)
+ {
+   gnutls_mac_algorithm_t algo;
+-  GHmac *hmac = g_new0 (GHmac, 1);
++  GHmac *hmac;
+   int ret;
+ 
++  if (g_once_init_enter (&gnutls_initialize_attempted))
++    {
++      initialize_gnutls ();
++      g_once_init_leave (&gnutls_initialize_attempted, 1);
++    }
++
++  if (!gnutls_initialize_successful)
++    return NULL;
++
++  hmac = g_new0 (GHmac, 1);
+   hmac->ref_count = 1;
+   hmac->digest_type = digest_type;
+ 
+diff --git a/glib/ghmac.c b/glib/ghmac.c
+index 616e167e7ff2..ddb1635578db 100644
+--- a/glib/ghmac.c
++++ b/glib/ghmac.c
+@@ -35,7 +35,7 @@
+ #include "gtypes.h"
+ #include "glibintl.h"
+ 
+-#ifdef HAVE_GNUTLS
++#ifdef USE_GNUTLS
+ #error "build configuration error"
+ #endif
+ 
+diff --git a/glib/meson.build b/glib/meson.build
+index 39b37310e810..57a7d3efb7f2 100644
+--- a/glib/meson.build
++++ b/glib/meson.build
+@@ -425,7 +425,6 @@ libglib = library('glib-2.0',
+   dependencies : [
+     atomic_dep,
+     gnulib_libm_dependency,
+-    libgnutls_dep,
+     libiconv,
+     libintl_deps,
+     libm,
+diff --git a/meson.build b/meson.build
+index 2184790b3399..a83ac15224d4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2370,12 +2370,10 @@ if host_system == 'linux'
+   endif
+ endif
+ 
+-# gnutls is used optionally by ghmac
+-libgnutls_dep = []
+-if get_option('gnutls')
+-  libgnutls_dep = [dependency('gnutls', version : '>=3.6.9', required : true)]
+-  glib_conf.set('HAVE_GNUTLS', 1)
+-endif
++# gnutls is used optionally by GHmac
++ if get_option('gnutls')
++  glib_conf.set('USE_GNUTLS', 1)
++ endif
+ 
+ if host_system == 'windows'
+   winsock2 = cc.find_library('ws2_32')
+-- 
+2.51.1
+
+
+From b823c32d8fe939ffc3d9f774514b01a8d249cfb8 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Wed, 16 Jun 2021 20:46:24 -0500
+Subject: [PATCH 4/4] Disable MD5 and SHA-1 HMac tests
+
+These are expected to be broken, depending on system crypto policy,
+which may disable the algorithms.
+---
+ glib/tests/hmac.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/glib/tests/hmac.c b/glib/tests/hmac.c
+index 3ac3206df3eb..e7f3fdf089b8 100644
+--- a/glib/tests/hmac.c
++++ b/glib/tests/hmac.c
+@@ -1,7 +1,10 @@
++#include "config.h"
++
+ #include <glib.h>
+ #include <string.h>
+ #include <stdlib.h>
+ 
++#ifndef USE_GNUTLS
+ /* HMAC-MD5 test vectors as per RFC 2202 */
+ 
+ /* Test 1 */
+@@ -81,6 +84,7 @@ guint8 key_md5_test7[] = {
+ guint8 result_md5_test7[] = {
+     0x6f, 0x63, 0x0f, 0xad, 0x67, 0xcd, 0xa0, 0xee, 0x1f, 0xb1,
+     0xf5, 0x62, 0xdb, 0x3a, 0xa5, 0x3e };
++#endif
+ 
+ /* HMAC-SHA1, HMAC-SHA256, HMAC-SHA384 and HMAC-SHA512 test vectors
+  * as per RFCs 2202 and 4868.
+@@ -299,6 +303,7 @@ typedef struct {
+   gconstpointer result;
+ } HmacCase;
+ 
++#ifndef USE_GNUTLS
+ HmacCase hmac_md5_tests[] = {
+   { G_CHECKSUM_MD5, key_md5_test1, 16, "Hi There", 8, result_md5_test1 },
+   { G_CHECKSUM_MD5, "Jefe", 4, "what do ya want for nothing?", 28,
+@@ -336,6 +341,7 @@ HmacCase hmac_sha1_tests[] = {
+                " Than One Block-Size Data", 73, result_sha1_test7, },
+   { -1, NULL, 0, NULL, 0, NULL },
+ };
++#endif
+ 
+ HmacCase hmac_sha256_tests[] = {
+   { G_CHECKSUM_SHA256, key_sha_test1, 20, "Hi There", 8, result_sha256_test1 },
+@@ -498,8 +504,10 @@ main (int argc,
+     char **argv)
+ {
+   int i;
++
+   g_test_init (&argc, &argv, NULL);
+ 
++#ifndef USE_GNUTLS
+   for (i = 0 ; hmac_sha1_tests[i].key_len > 0 ; i++)
+     {
+       gchar *name = g_strdup_printf ("/hmac/sha1-%d", i + 1);
+@@ -507,6 +515,7 @@ main (int argc,
+         (void (*)(const void *)) test_hmac);
+       g_free (name);
+     }
++#endif
+ 
+   for (i = 0 ; hmac_sha256_tests[i].key_len > 0 ; i++)
+     {
+@@ -532,6 +541,7 @@ main (int argc,
+       g_free (name);
+     }
+ 
++#ifndef USE_GNUTLS
+   for (i = 0 ; hmac_md5_tests[i].key_len > 0 ; i++)
+     {
+       gchar *name = g_strdup_printf ("/hmac/md5-%d", i + 1);
+@@ -539,6 +549,7 @@ main (int argc,
+         (void (*)(const void *)) test_hmac);
+       g_free (name);
+     }
++#endif
+ 
+   g_test_add_func ("/hmac/ref-unref", test_hmac_ref_unref);
+   g_test_add_func ("/hmac/copy", test_hmac_copy);
+-- 
+2.51.1
+

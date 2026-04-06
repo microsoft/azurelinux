@@ -1,0 +1,85 @@
+From f0117fa2110e8b6d71c82272fda1d264e7921a24 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:40:32 +0200
+Subject: [PATCH 10/15] Detect appearance by colors unless GTK theme name
+ contains "dark"
+
+QGtk3Theme detects the appearance property by theme name: If the name
+contains the keyword "dark", the theme is considered to be dark and
+otherwise light.
+
+This detection logic fails, when the GTK theme is dark without
+containing the "dark" keyword, e.g. the dark theme "Adapta-Nokto".
+While QGtk3Theme imports the right colors in that case, it wrongly
+identifies a light theme.
+
+This patch adapts the detection logic: If the theme name contains the
+"dark" keyword, it is considered a dark theme without further checks.
+If it doesn't, the current GTK3 theme's default background and
+foreground colors will be read. If the foreground is lighter than the
+background, the theme is considered dark. If the background is lighter
+than the foreground, the theme is considered light. If both colors are
+identical, the appearance will be Qt::Appearance::Unknown.
+---
+ .../platformthemes/gtk3/qgtk3interface.cpp       | 16 ++++++++++++++++
+ .../platformthemes/gtk3/qgtk3interface_p.h       |  3 +++
+ src/plugins/platformthemes/gtk3/qgtk3storage.cpp |  2 +-
+ 3 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+index d932b250a5..e2444197da 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+@@ -400,6 +400,22 @@ const QString QGtk3Interface::themeName() const
+     return QLatin1String(theme_name);
+ }
+ 
++Qt::Appearance QGtk3Interface::appearanceByColors() const
++{
++    const QColor background = color(widget(QGtkWidget::gtk_Default),
++                                    QGtkColorSource::Background,
++                                    GTK_STATE_FLAG_ACTIVE);
++    const QColor foreground = color(widget(QGtkWidget::gtk_Default),
++                                    QGtkColorSource::Foreground,
++                                    GTK_STATE_FLAG_ACTIVE);
++
++    if (foreground.lightness() > background.lightness())
++        return Qt::Appearance::Dark;
++    if (foreground.lightness() < background.lightness())
++        return Qt::Appearance::Light;
++    return Qt::Appearance::Unknown;
++}
++
+ inline constexpr QGtk3Interface::QGtkWidget QGtk3Interface::toWidgetType(QPlatformTheme::Font type)
+ {
+     switch (type) {
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+index 8997a64e76..e04025923d 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+@@ -97,6 +97,9 @@ public:
+     // Return current GTK theme name
+     const QString themeName() const;
+ 
++    // Derive appearance from default colors
++    Qt::Appearance appearanceByColors() const;
++
+     // Convert GTK state to/from string
+     static int toGtkState(const QString &state);
+     static const QLatin1String fromGtkState(GtkStateFlags state);
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index d5d0e2c8e6..0b6b8e8523 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -222,7 +222,7 @@ void QGtk3Storage::populateMap()
+ 
+     // Derive appearance from theme name
+     m_appearance = newThemeName.contains("dark", Qt::CaseInsensitive)
+-                   ? Qt::Appearance::Dark : Qt::Appearance::Light;
++                   ? Qt::Appearance::Dark : m_interface->appearanceByColors();
+ 
+     if (m_themeName.isEmpty()) {
+         qCDebug(lcQGtk3Interface) << "GTK theme initialized:" << newThemeName << m_appearance;
+-- 
+2.41.0
+

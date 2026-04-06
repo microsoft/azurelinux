@@ -1,0 +1,11 @@
+--- a/tests/test_ssl_protocols.rb
++++ b/tests/test_ssl_protocols.rb
+@@ -88,7 +88,7 @@
+ 
+     def test_case_insensitivity
+       lower_case = SSL_AVAIL.map { |p| p.downcase }
+-      client_server %w(tlsv1), lower_case
++      client_server %w(tlsv1_2), lower_case
+       assert Client.handshake_completed?
+       assert Server.handshake_completed?
+     end

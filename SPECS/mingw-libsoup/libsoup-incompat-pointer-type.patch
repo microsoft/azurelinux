@@ -1,0 +1,12 @@
+diff -rupN --no-dereference libsoup-2.74.3/libsoup/soup-socket.c libsoup-2.74.3-new/libsoup/soup-socket.c
+--- libsoup-2.74.3/libsoup/soup-socket.c	2022-10-11 20:27:22.000000000 +0200
++++ libsoup-2.74.3-new/libsoup/soup-socket.c	2025-05-30 08:55:03.411984985 +0200
+@@ -1322,7 +1322,7 @@ soup_socket_listen_full (SoupSocket *soc
+ 		fd = g_socket_get_fd (priv->gsock);
+ 		v6_only = TRUE;
+ 		setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY,
+-			    &v6_only, sizeof (v6_only));
++			    (char *) &v6_only, sizeof (v6_only));
+ 	}
+ #endif
+ 

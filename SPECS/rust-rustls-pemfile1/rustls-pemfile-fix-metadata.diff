@@ -1,0 +1,15 @@
+--- rustls-pemfile-1.0.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-pemfile-1.0.4/Cargo.toml	2024-04-19T18:19:54.417209+00:00
+@@ -23,12 +23,5 @@
+ license = "Apache-2.0 OR ISC OR MIT"
+ repository = "https://github.com/rustls/pemfile"
+ 
+-[[bench]]
+-name = "benchmark"
+-harness = false
+-
+ [dependencies.base64]
+ version = "0.21"
+-
+-[dev-dependencies.bencher]
+-version = "0.1.5"

@@ -1,0 +1,41 @@
+diff -rupN --no-dereference postgresql-15.4/src/pl/tcl/Makefile postgresql-15.4-new/src/pl/tcl/Makefile
+--- postgresql-15.4/src/pl/tcl/Makefile	2023-08-07 22:08:18.000000000 +0200
++++ postgresql-15.4-new/src/pl/tcl/Makefile	2023-08-16 23:05:01.171372714 +0200
+@@ -13,10 +13,7 @@ include $(top_builddir)/src/Makefile.glo
+ 
+ override CPPFLAGS := -I. -I$(srcdir) $(TCL_INCLUDE_SPEC) $(CPPFLAGS)
+ 
+-# On Windows, we don't link directly with the Tcl library; see below
+-ifneq ($(PORTNAME), win32)
+ SHLIB_LINK = $(TCL_LIB_SPEC) $(TCL_LIBS)
+-endif
+ 
+ PGFILEDESC = "PL/Tcl - procedural language"
+ 
+@@ -36,6 +33,7 @@ REGRESS = pltcl_setup pltcl_queries pltc
+ # which are not compatible with mingw gcc. Therefore we need to build a
+ # new import library to link with.
+ ifeq ($(PORTNAME), win32)
++ifneq ($(host_os), mingw32)
+ 
+ tclwithver = $(subst -l,,$(filter -l%, $(TCL_LIB_SPEC)))
+ TCLDLL = $(dir $(TCLSH))/$(tclwithver).dll
+@@ -48,6 +46,7 @@ lib$(tclwithver).a: $(tclwithver).def
+ $(tclwithver).def: $(TCLDLL)
+ 	gendef - $^ > $@
+ 
++endif # mingw32
+ endif # win32
+ 
+ 
+@@ -96,8 +95,10 @@ clean distclean: clean-lib
+ 	rm -f $(OBJS)
+ 	rm -rf $(pg_regress_clean_files)
+ ifeq ($(PORTNAME), win32)
++ifneq ($(host_os), mingw32)
+ 	rm -f $(tclwithver).def
+ endif
++endif
+ 
+ maintainer-clean: distclean
+ 	rm -f pltclerrcodes.h

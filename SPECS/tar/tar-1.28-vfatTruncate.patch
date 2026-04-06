@@ -1,0 +1,52 @@
+From 90f446f9b04ab820a99b9408e68c01dc6b57056c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 28 Jul 2014 08:10:10 +0200
+Subject: [PATCH 2/9] vfat-like FS & sparse (still downstream)
+
+Fix extracting sparse files to a file system like vfat, when
+ftruncate may fail to grow the size of a file.  Still downstram,
+(do we need this now? ftruncate & vfat works is now OK).
+
+Resolves: #179507
+
+Upstream bugreport:
+http://lists.gnu.org/archive/html/bug-tar/2006-02/msg00000.html
+
+---
+ src/system.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/src/system.c b/src/system.c
+index 9414233..37e9a3e 100644
+--- a/src/system.c
++++ b/src/system.c
+@@ -243,8 +243,25 @@ sys_compare_links (struct stat *link_data, struct stat *stat_data)
+ int
+ sys_truncate (int fd)
+ {
++  struct stat st;
+   off_t pos = lseek (fd, (off_t) 0, SEEK_CUR);
+-  return pos < 0 ? -1 : ftruncate (fd, pos);
++
++  if ( pos < 0) 
++    return -1;
++
++  if ( ftruncate(fd, pos) && errno == EPERM ) {
++    /* wrapper around ftruncate:
++     * ftruncate may fail to grow the size of a file with some OS and filesystem
++     * combinations. Linux and vfat/fat is one example. If this is the case do
++     * a write to grow the file to the desired length.
++     */
++    if( (fstat( fd, &st ) == -1) || 
++        (st.st_size >= pos)  ||
++        (lseek( fd, pos - 1, SEEK_SET) == (off_t)-1) ||
++        (write( fd, "\0", 1) == -1) )
++	return -1;
++  }
++  return 0;
+ }
+ 
+ /* Return nonzero if NAME is the name of a regular file, or if the file
+-- 
+1.9.3
+

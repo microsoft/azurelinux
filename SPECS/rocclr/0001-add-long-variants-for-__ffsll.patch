@@ -1,0 +1,67 @@
+From ec1ada09aa0c719ac224f6fef880d78bcbb9d9eb Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sun, 8 Dec 2024 05:17:15 -0800
+Subject: [PATCH] add long variants for __ffsll
+
+When building blender there is this error
+
+/usr/include/nanovdb/NanoVDB.h:1880:12: error: call to '__ffsll' is ambiguous
+    return __ffsll(v);
+           ^~~~~~~
+/usr/include/hip/amd_detail/amd_device_functions.h:70:39: note: candidate function
+__device__ static inline unsigned int __ffsll(unsigned long long int input) {
+                                      ^
+/usr/include/hip/amd_detail/amd_device_functions.h:78:39: note: candidate function
+__device__ static inline unsigned int __ffsll(long long int input) {
+
+on a 64 bit arch uint64_t can be an unsigned long, so add the long variants
+
+Signed-off-by: Tom Rix <trix@redhat.com>add long variants for __ffsll
+
+When building blender there is this error
+
+/usr/include/nanovdb/NanoVDB.h:1880:12: error: call to '__ffsll' is ambiguous
+    return __ffsll(v);
+           ^~~~~~~
+/usr/include/hip/amd_detail/amd_device_functions.h:70:39: note: candidate function
+__device__ static inline unsigned int __ffsll(unsigned long long int input) {
+                                      ^
+/usr/include/hip/amd_detail/amd_device_functions.h:78:39: note: candidate function
+__device__ static inline unsigned int __ffsll(long long int input) {
+
+on a 64 bit arch uint64_t can be an unsigned long, so add the long variants
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ hipamd/include/hip/amd_detail/amd_device_functions.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/hipamd/include/hip/amd_detail/amd_device_functions.h b/hipamd/include/hip/amd_detail/amd_device_functions.h
+index 4fc5cde83bb5..6bac3a69ca2d 100644
+--- a/hipamd/include/hip/amd_detail/amd_device_functions.h
++++ b/hipamd/include/hip/amd_detail/amd_device_functions.h
+@@ -71,6 +71,10 @@ __device__ static inline int __ffsll(unsigned long long int input) {
+     return ( input == 0 ? -1 : __builtin_ctzll(input) ) + 1;
+ }
+ 
++__device__ static inline unsigned int __ffsll(unsigned long int input) {
++    return ( input == 0 ? -1 : __builtin_ctzll(input) ) + 1;
++}
++
+ __device__ static inline int __ffs(int input) {
+     return ( input == 0 ? -1 : __builtin_ctz(input) ) + 1;
+ }
+@@ -79,6 +83,10 @@ __device__ static inline int __ffsll(long long int input) {
+     return ( input == 0 ? -1 : __builtin_ctzll(input) ) + 1;
+ }
+ 
++__device__ static inline unsigned int __ffsll(long int input) {
++    return ( input == 0 ? -1 : __builtin_ctzll(input) ) + 1;
++}
++
+ // Given a 32/64-bit value exec mask and an integer value base (between 0 and WAVEFRONT_SIZE),
+ // find the n-th (given by offset) set bit in the exec mask from the base bit, and return the bit position.
+ // If not found, return -1.
+-- 
+2.47.1
+

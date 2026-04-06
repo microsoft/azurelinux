@@ -1,0 +1,6 @@
+[3.3]
+libraryPath=@@QTDIR@@/plugins:@@KDE3_PLUGIN_PATH@@
+
+[General]
+font=Sans,10,-1,0,50,0,0,0,0,0
+style=Platinum

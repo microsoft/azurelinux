@@ -1,0 +1,30 @@
+From 6d939a46a3d964fc0a4d577571db39d6487b1c1c Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Thu, 20 Jun 2024 00:29:06 -0400
+Subject: [PATCH 7/7] Avoid using sys.prefix in CLI test
+
+We haven't yet installed dask-scheduler, so the test can't assume it's
+in `{sys.prefix}/bin/`. Making the path absolute will avoid that in the
+`popen` helper.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ distributed/cli/tests/test_dask_scheduler.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/distributed/cli/tests/test_dask_scheduler.py b/distributed/cli/tests/test_dask_scheduler.py
+index 6f35089c..50730cc0 100644
+--- a/distributed/cli/tests/test_dask_scheduler.py
++++ b/distributed/cli/tests/test_dask_scheduler.py
+@@ -693,7 +693,7 @@ def test_single_executable_deprecated(loop):
+     port = open_port()
+     with popen(
+         [
+-            "dask-scheduler",
++            shutil.which("dask-scheduler"),
+             "--no-dashboard",
+             f"--port={port}",
+         ],
+-- 
+2.50.0
+

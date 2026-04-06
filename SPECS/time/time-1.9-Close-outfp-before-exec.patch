@@ -1,0 +1,34 @@
+From 6a5c4499aab677d19157c7adcf598d14267283c1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 16 Nov 2020 17:45:04 +0100
+Subject: [PATCH] Close outfp before exec
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When called with --outfile, we open an output file to which
+we log timing results. Close that descriptor in the child
+fork before exec'ing the process to be timed.
+
+Reported-by: Ed Santiago <santiago@redhat.com>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/time.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/time.c b/src/time.c
+index f76265a..2f2b702 100644
+--- a/src/time.c
++++ b/src/time.c
+@@ -738,6 +738,8 @@ run_command (cmd, resp)
+     error (EXIT_CANCELED, errno, "cannot fork");
+   else if (pid == 0)
+     {				/* If child.  */
++      if (outfp != stderr)
++        fclose(outfp);
+       /* Don't cast execvp arguments; that causes errors on some systems,
+ 	 versus merely warnings if the cast is left off.  */
+       execvp (cmd[0], cmd);
+-- 
+2.25.4
+

@@ -1,0 +1,45 @@
+diff -Naur grpc-1.36.4-original/src/python/grpcio_tests/tests/health_check/_health_servicer_test.py grpc-1.36.4/src/python/grpcio_tests/tests/health_check/_health_servicer_test.py
+--- grpc-1.36.4-original/src/python/grpcio_tests/tests/health_check/_health_servicer_test.py	2021-03-17 15:59:05.000000000 -0400
++++ grpc-1.36.4/src/python/grpcio_tests/tests/health_check/_health_servicer_test.py	2021-03-22 16:39:05.558398948 -0400
+@@ -234,9 +234,7 @@
+ 
+     def setUp(self):
+         self._thread_pool = thread_pool.RecordingThreadPool(max_workers=None)
+-        super(HealthServicerTest,
+-              self).start_server(non_blocking=True,
+-                                 thread_pool=self._thread_pool)
++        super().start_server(non_blocking=True, thread_pool=self._thread_pool)
+ 
+     def test_check_empty_service(self):
+         request = health_pb2.HealthCheckRequest()
+@@ -273,8 +271,7 @@
+ class HealthServicerBackwardsCompatibleWatchTest(BaseWatchTests.WatchTests):
+ 
+     def setUp(self):
+-        super(HealthServicerBackwardsCompatibleWatchTest,
+-              self).start_server(non_blocking=False, thread_pool=None)
++        super().start_server(non_blocking=False, thread_pool=None)
+ 
+ 
+ if __name__ == '__main__':
+diff -Naur grpc-1.36.4-original/src/python/grpcio_tests/tests/protoc_plugin/_python_plugin_test.py grpc-1.36.4/src/python/grpcio_tests/tests/protoc_plugin/_python_plugin_test.py
+--- grpc-1.36.4-original/src/python/grpcio_tests/tests/protoc_plugin/_python_plugin_test.py	2021-03-17 15:59:05.000000000 -0400
++++ grpc-1.36.4/src/python/grpcio_tests/tests/protoc_plugin/_python_plugin_test.py	2021-03-22 16:39:05.559398954 -0400
+@@ -532,7 +532,7 @@
+                 request_iterator, context)
+ 
+     def setUp(self):
+-        super(SimpleStubsPluginTest, self).setUp()
++        super().setUp()
+         self._server = test_common.test_server()
+         service_pb2_grpc.add_TestServiceServicer_to_server(
+             self.Servicer(), self._server)
+@@ -542,7 +542,7 @@
+ 
+     def tearDown(self):
+         self._server.stop(None)
+-        super(SimpleStubsPluginTest, self).tearDown()
++        super().tearDown()
+ 
+     def testUnaryCall(self):
+         request = request_pb2.SimpleRequest(response_size=13)

@@ -1,0 +1,39 @@
+From 456990090bfc0e229abf09e7e43ba544e990de43 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 3 Oct 2024 14:42:29 +0100
+Subject: [PATCH 107/131] qgs: add space between program name & first arg in
+ usage
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/server_main.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+index acf7a199..b9f3eed3 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+@@ -85,7 +85,7 @@ int main(int argc, const char* argv[])
+     unsigned long int num_threads = 0;
+     char *endptr = NULL;
+     if (argc > 4) {
+-        cout << "Usage: " << argv[0] << "[--no-daemon] [-p=port_number] [-n=number_threads]"
++        cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads]"
+              << endl;
+         exit(1);
+     }
+@@ -181,7 +181,7 @@ int main(int argc, const char* argv[])
+             cout << "thread number [" << num_threads << "] found in cmdline" << endl;
+             continue;
+         } else {
+-            cout << "Usage: " << argv[0] << "[--no-daemon] [-p=port_number] [-n=number_threads]"
++            cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads]"
+                 << endl;
+             exit(1);
+         }
+-- 
+2.53.0
+

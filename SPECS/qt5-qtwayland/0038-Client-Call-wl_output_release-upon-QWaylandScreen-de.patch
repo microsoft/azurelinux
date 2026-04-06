@@ -1,0 +1,31 @@
+From 2bf52ebd6b683003d1f0c28a622a5c7a88b4a159 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Mon, 21 Nov 2022 18:39:40 +0200
+Subject: [PATCH 38/55] Client: Call wl_output_release() upon QWaylandScreen
+ destruction
+
+It ensures that the proxy gets destroyed.
+
+Change-Id: I915cc8814e33dd3b0405b2bf82bd12ce6b5f785b
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 054e54759dbd6c3e76b55d5c4a9a54f62967ad1a)
+---
+ src/client/qwaylandscreen.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
+index 7c2d9be3..64ae4fe7 100644
+--- a/src/client/qwaylandscreen.cpp
++++ b/src/client/qwaylandscreen.cpp
+@@ -81,6 +81,8 @@ QWaylandScreen::~QWaylandScreen()
+ {
+     if (zxdg_output_v1::isInitialized())
+         zxdg_output_v1::destroy();
++    if (wl_output::isInitialized() && wl_output_get_version(wl_output::object()) >= WL_OUTPUT_RELEASE_SINCE_VERSION)
++        wl_output::release();
+ }
+ 
+ uint QWaylandScreen::requiredEvents() const
+-- 
+2.51.1
+

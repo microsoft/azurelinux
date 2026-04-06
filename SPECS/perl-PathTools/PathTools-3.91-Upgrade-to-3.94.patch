@@ -1,0 +1,255 @@
+From 7567704165f8fdbb2808d06fdf1376cbe72e19da Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 30 Apr 2025 17:55:18 +0200
+Subject: [PATCH] Upgrade to 3.94
+
+---
+ Cwd.pm                     |  2 +-
+ lib/File/Spec.pm           |  2 +-
+ lib/File/Spec/AmigaOS.pm   |  2 +-
+ lib/File/Spec/Cygwin.pm    |  2 +-
+ lib/File/Spec/Epoc.pm      |  2 +-
+ lib/File/Spec/Functions.pm |  2 +-
+ lib/File/Spec/Mac.pm       |  2 +-
+ lib/File/Spec/OS2.pm       |  4 ++--
+ lib/File/Spec/Unix.pm      |  4 ++--
+ lib/File/Spec/VMS.pm       |  6 ++++--
+ lib/File/Spec/Win32.pm     |  2 +-
+ t/Spec.t                   | 22 ++++++++++++++++++++++
+ t/cwd_enoent.t             |  6 ++++--
+ 13 files changed, 42 insertions(+), 16 deletions(-)
+
+diff --git a/Cwd.pm b/Cwd.pm
+index 549aa94..b8828b6 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index 7e1d76f..a6a5e7c 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -4,7 +4,7 @@ use strict;
+ 
+ # Keep $VERSION consistent in all *.pm files in this distribution, including
+ # Cwd.pm.
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index c500d23..2a95123 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index ef1c9ec..2c97c81 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index 1bc81f6..a95fb3b 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index 6068506..94f3126 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 08d7fdb..4dc2e19 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index d8533c0..77a9509 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+@@ -25,7 +25,7 @@ sub file_name_is_absolute {
+ sub path {
+     my $path = $ENV{PATH};
+     $path =~ s:\\:/:g;
+-    my @path = split(';',$path);
++    my @path = split(';',$path,-1);
+     foreach (@path) { $_ = '.' if $_ eq '' }
+     return @path;
+ }
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index dbe36fb..96d1d6c 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+@@ -253,7 +253,7 @@ Takes no argument, returns the environment variable PATH as an array.
+ 
+ sub path {
+     return () unless exists $ENV{PATH};
+-    my @path = split(':', $ENV{PATH});
++    my @path = split(':', $ENV{PATH}, -1);
+     foreach (@path) { $_ = '.' if $_ eq '' }
+     return @path;
+ }
+diff --git a/lib/File/Spec/VMS.pm b/lib/File/Spec/VMS.pm
+index a99b4a4..3730d6d 100644
+--- a/lib/File/Spec/VMS.pm
++++ b/lib/File/Spec/VMS.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+@@ -508,7 +508,9 @@ sub rel2abs {
+                   ? vmspath($path)             # whether it's a directory
+                   : vmsify($path) );
+     }
+-    $base = vmspath($base) if defined $base && $base =~ m/\//;
++    # If there is no device or directory syntax on $base, make sure it
++    # is treated as a directory.
++    $base = vmspath($base) if defined $base && $base !~ m{(?<!\^)[\[<:]};
+ 
+     # Clean up and split up $path
+     if ( ! $self->file_name_is_absolute( $path ) ) {
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index f9225e6..297a757 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.91';
++our $VERSION = '3.94';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/t/Spec.t b/t/Spec.t
+index c953391..7a33d39 100644
+--- a/t/Spec.t
++++ b/t/Spec.t
+@@ -660,5 +660,27 @@ for ( @tests ) {
+ }
+ 
+ is +File::Spec::Unix->canonpath(), undef;
++# Test that trailing empty path components are removed
++# See Perl/perl5#22346
++my @path_tests = (
++  [ 'File::Spec::Unix->path()', "", '' ],
++  [ 'File::Spec::Unix->path()', ":", '.,.' ],
++  [ 'File::Spec::Unix->path()', "/some/path:", '/some/path,.' ],
++  [ 'File::Spec::Unix->path()', "/some/path::", '/some/path,.,.' ],
++  [ 'File::Spec::Unix->path()', ":/some/path:", '.,/some/path,.' ],
++
++  [ 'File::Spec::OS2->path()', "", '' ],
++  [ 'File::Spec::OS2->path()', ";", '.,.' ],
++  [ 'File::Spec::OS2->path()', "/some/path;", '/some/path,.' ],
++  [ 'File::Spec::OS2->path()', "/some/path;;", '/some/path,.,.' ],
++  [ 'File::Spec::OS2->path()', ";/some/path;", '.,/some/path,.' ],
++);
++
++for ( @path_tests ) {
++  my ($function, $path, $expected) = @$_;
++  local $ENV{PATH} = $path;
++  my $got = join ',', eval $function;
++  is $got, $expected, $function . " with PATH=$path";
++}
+ 
+ done_testing();
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index 05b30b3..fcd0008 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -10,6 +10,8 @@ if($^O eq "cygwin") {
+     # This test skipping should be removed when the Cygwin bug is fixed.
+     plan skip_all => "getcwd() fails to fail on Cygwin [perl #132733]";
+ }
++my $prefix = $Config{prefix};
++my $osvers = $Config{osvers};
+ 
+ my $tmp = tempdir(CLEANUP => 1);
+ unless(mkdir("$tmp/testdir") && chdir("$tmp/testdir") && rmdir("$tmp/testdir")){
+@@ -24,11 +26,11 @@ foreach my $type (qw(regular perl)) {
+     SKIP: {
+ 	skip "_perl_abs_path() not expected to work", 4
+ 	    if $type eq "perl" &&
+-		!(($Config{prefix} =~ m/\//) && $^O ne "cygwin");
++		!(($prefix =~ m/\//) && $^O ne "cygwin");
+ 
+         # https://github.com/Perl/perl5/issues/16525
+         # https://bugs.dragonflybsd.org/issues/3250
+-        my @vlist = ($Config{osvers} =~ /(\d+)/g);
++        my @vlist = ($osvers =~ /(\d+)/g);
+         my $osver = sprintf("%d%03d", map { defined() ? $_ : '0' } @vlist[0,1]);
+ 	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
+ 	    if $type eq 'regular' && $^O eq 'dragonfly' && $osver < 6002;
+-- 
+2.49.0
+

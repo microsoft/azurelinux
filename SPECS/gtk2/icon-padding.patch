@@ -1,0 +1,258 @@
+diff -up gtk+-2.19.7/gtk/gtkstatusicon.c.icon-padding gtk+-2.19.7/gtk/gtkstatusicon.c
+--- gtk+-2.19.7/gtk/gtkstatusicon.c.icon-padding	2010-03-08 08:42:22.000000000 -0500
++++ gtk+-2.19.7/gtk/gtkstatusicon.c	2010-03-10 00:40:11.165527903 -0500
+@@ -170,6 +170,7 @@ static void     gtk_status_icon_screen_c
+ 						  GdkScreen      *old_screen);
+ static void     gtk_status_icon_embedded_changed (GtkStatusIcon *status_icon);
+ static void     gtk_status_icon_orientation_changed (GtkStatusIcon *status_icon);
++static void     gtk_status_icon_padding_changed  (GtkStatusIcon *status_icon);
+ static gboolean gtk_status_icon_scroll           (GtkStatusIcon  *status_icon,
+ 						  GdkEventScroll *event);
+ static gboolean gtk_status_icon_query_tooltip    (GtkStatusIcon *status_icon,
+@@ -850,6 +851,8 @@ gtk_status_icon_init (GtkStatusIcon *sta
+ 			    G_CALLBACK (gtk_status_icon_embedded_changed), status_icon);
+   g_signal_connect_swapped (priv->tray_icon, "notify::orientation",
+ 			    G_CALLBACK (gtk_status_icon_orientation_changed), status_icon);
++  g_signal_connect_swapped (priv->tray_icon, "notify::padding",
++			    G_CALLBACK (gtk_status_icon_padding_changed), status_icon);
+   g_signal_connect_swapped (priv->tray_icon, "button-press-event",
+ 			    G_CALLBACK (gtk_status_icon_button_press), status_icon);
+   g_signal_connect_swapped (priv->tray_icon, "button-release-event",
+@@ -975,6 +978,8 @@ gtk_status_icon_finalize (GObject *objec
+   g_signal_handlers_disconnect_by_func (priv->tray_icon,
+ 			                gtk_status_icon_orientation_changed, status_icon);
+   g_signal_handlers_disconnect_by_func (priv->tray_icon,
++			                gtk_status_icon_padding_changed, status_icon);
++  g_signal_handlers_disconnect_by_func (priv->tray_icon,
+ 			                gtk_status_icon_button_press, status_icon);
+   g_signal_handlers_disconnect_by_func (priv->tray_icon,
+ 			                gtk_status_icon_button_release, status_icon);
+@@ -1679,14 +1684,32 @@ gtk_status_icon_screen_changed (GtkStatu
+ #ifdef GDK_WINDOWING_X11
+ 
+ static void
++gtk_status_icon_padding_changed (GtkStatusIcon *status_icon)
++{
++  GtkStatusIconPrivate *priv = status_icon->priv;
++  GtkOrientation orientation;
++  gint padding;
++
++  orientation = _gtk_tray_icon_get_orientation (GTK_TRAY_ICON (priv->tray_icon));
++  padding = _gtk_tray_icon_get_padding (GTK_TRAY_ICON (priv->tray_icon));
++
++  if (orientation == GTK_ORIENTATION_HORIZONTAL)
++    gtk_misc_set_padding (GTK_MISC (priv->image), padding, 0);
++  else
++    gtk_misc_set_padding (GTK_MISC (priv->image), 0, padding);
++}
++
++static void
+ gtk_status_icon_embedded_changed (GtkStatusIcon *status_icon)
+ {
++  gtk_status_icon_padding_changed (status_icon);
+   g_object_notify (G_OBJECT (status_icon), "embedded");
+ }
+ 
+ static void
+ gtk_status_icon_orientation_changed (GtkStatusIcon *status_icon)
+ {
++  gtk_status_icon_padding_changed (status_icon);
+   g_object_notify (G_OBJECT (status_icon), "orientation");
+ }
+ 
+@@ -1804,7 +1827,7 @@ gtk_status_icon_reset_image_data (GtkSta
+ 
+       g_object_notify (G_OBJECT (status_icon), "stock");
+       break;
+-      
++
+     case GTK_IMAGE_ICON_NAME:
+       g_free (priv->image_data.icon_name);
+       priv->image_data.icon_name = NULL;
+diff -up gtk+-2.19.7/gtk/gtktrayicon.h.icon-padding gtk+-2.19.7/gtk/gtktrayicon.h
+--- gtk+-2.19.7/gtk/gtktrayicon.h.icon-padding	2009-10-18 01:35:45.000000000 -0400
++++ gtk+-2.19.7/gtk/gtktrayicon.h	2010-03-10 00:40:11.169528392 -0500
+@@ -69,7 +69,8 @@ void           _gtk_tray_icon_cancel_mes
+ 					       guint        id);
+ 
+ GtkOrientation _gtk_tray_icon_get_orientation (GtkTrayIcon *icon);
+-					    
++gint           _gtk_tray_icon_get_padding     (GtkTrayIcon *icon);
++
+ G_END_DECLS
+ 
+ #endif /* __GTK_TRAY_ICON_H__ */
+diff -up gtk+-2.19.7/gtk/gtktrayicon-x11.c.icon-padding gtk+-2.19.7/gtk/gtktrayicon-x11.c
+--- gtk+-2.19.7/gtk/gtktrayicon-x11.c.icon-padding	2010-03-08 21:01:28.000000000 -0500
++++ gtk+-2.19.7/gtk/gtktrayicon-x11.c	2010-03-10 00:49:48.229509604 -0500
+@@ -43,23 +43,26 @@
+ 
+ enum {
+   PROP_0,
+-  PROP_ORIENTATION
++  PROP_ORIENTATION,
++  PROP_PADDING
+ };
+ 
+ struct _GtkTrayIconPrivate
+ {
+   guint stamp;
+-  
++
+   Atom selection_atom;
+   Atom manager_atom;
+   Atom system_tray_opcode_atom;
+   Atom orientation_atom;
+   Atom visual_atom;
++  Atom padding_atom;
+   Window manager_window;
+   GdkVisual *manager_visual;
+   gboolean manager_visual_rgba;
+ 
+   GtkOrientation orientation;
++  gint padding;
+ };
+ 
+ static void gtk_tray_icon_constructed   (GObject     *object);
+@@ -113,6 +116,16 @@ gtk_tray_icon_class_init (GtkTrayIconCla
+ 						      GTK_ORIENTATION_HORIZONTAL,
+ 						      GTK_PARAM_READABLE));
+ 
++  g_object_class_install_property (gobject_class,
++				   PROP_PADDING,
++				   g_param_spec_int ("padding",
++						     P_("Padding"),
++						     P_("Padding that should be put around icons in the tray"),
++						     0,
++                                                     G_MAXINT,
++                                                     0,
++						     GTK_PARAM_READABLE));
++
+   g_type_class_add_private (class, sizeof (GtkTrayIconPrivate));
+ }
+ 
+@@ -124,6 +137,7 @@ gtk_tray_icon_init (GtkTrayIcon *icon)
+   
+   icon->priv->stamp = 1;
+   icon->priv->orientation = GTK_ORIENTATION_HORIZONTAL;
++  icon->priv->padding = 0;
+ 
+   gtk_widget_set_app_paintable (GTK_WIDGET (icon), TRUE);
+   gtk_widget_add_events (GTK_WIDGET (icon), GDK_PROPERTY_CHANGE_MASK);
+@@ -161,6 +175,10 @@ gtk_tray_icon_constructed (GObject *obje
+ 					 "_NET_SYSTEM_TRAY_VISUAL",
+ 					 False);
+ 
++  icon->priv->padding_atom = XInternAtom (xdisplay,
++					 "_NET_SYSTEM_TRAY_PADDING",
++					 False);
++
+   /* Add a root window filter so that we get changes on MANAGER */
+   gdk_window_add_filter (root_window,
+ 			 gtk_tray_icon_manager_filter, icon);
+@@ -212,6 +230,9 @@ gtk_tray_icon_get_property (GObject    *
+     case PROP_ORIENTATION:
+       g_value_set_enum (value, icon->priv->orientation);
+       break;
++    case PROP_PADDING:
++      g_value_set_int (value, icon->priv->padding);
++      break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+       break;
+@@ -372,9 +393,58 @@ gtk_tray_icon_get_visual_property (GtkTr
+     XFree (prop.prop);
+ }
+ 
++static void
++gtk_tray_icon_get_padding_property (GtkTrayIcon *icon)
++{
++  GdkScreen *screen = gtk_widget_get_screen (GTK_WIDGET (icon));
++  GdkDisplay *display = gdk_screen_get_display (screen);
++  Display *xdisplay = GDK_DISPLAY_XDISPLAY (display);
++
++  Atom type;
++  int format;
++  union {
++	gulong *prop;
++	guchar *prop_ch;
++  } prop = { NULL };
++  gulong nitems;
++  gulong bytes_after;
++  int error, result;
++
++  g_assert (icon->priv->manager_window != None);
++
++  gdk_error_trap_push ();
++  type = None;
++  result = XGetWindowProperty (xdisplay,
++			       icon->priv->manager_window,
++			       icon->priv->padding_atom,
++			       0, G_MAXLONG, FALSE,
++			       XA_CARDINAL,
++			       &type, &format, &nitems,
++			       &bytes_after, &(prop.prop_ch));
++  error = gdk_error_trap_pop ();
++
++  if (!error && result == Success &&
++      type == XA_CARDINAL && nitems == 1 && format == 32)
++    {
++      gint padding;
++
++      padding = prop.prop[0];
++
++      if (icon->priv->padding != padding)
++	{
++	  icon->priv->padding = padding;
++
++	  g_object_notify (G_OBJECT (icon), "padding");
++	}
++    }
++
++  if (type != None)
++    XFree (prop.prop);
++}
++
+ static GdkFilterReturn
+-gtk_tray_icon_manager_filter (GdkXEvent *xevent, 
+-			      GdkEvent  *event, 
++gtk_tray_icon_manager_filter (GdkXEvent *xevent,
++			      GdkEvent  *event,
+ 			      gpointer   user_data)
+ {
+   GtkTrayIcon *icon = user_data;
+@@ -399,6 +469,11 @@ gtk_tray_icon_manager_filter (GdkXEvent 
+ 
+ 	  gtk_tray_icon_get_orientation_property (icon);
+ 	}
++      else if (xev->xany.type == PropertyNotify &&
++               xev->xproperty.atom == icon->priv->padding_atom)
++        {
++          gtk_tray_icon_get_padding_property (icon);
++        }
+       else if (xev->xany.type == DestroyNotify)
+ 	{
+           GTK_NOTE (PLUGSOCKET,
+@@ -504,6 +579,7 @@ gtk_tray_icon_update_manager_window (Gtk
+ 
+       gtk_tray_icon_get_orientation_property (icon);
+       gtk_tray_icon_get_visual_property (icon);
++      gtk_tray_icon_get_padding_property (icon);
+ 
+       if (gtk_widget_get_realized (GTK_WIDGET (icon)))
+ 	{
+@@ -740,6 +816,14 @@ _gtk_tray_icon_get_orientation (GtkTrayI
+   return icon->priv->orientation;
+ }
+ 
++gint
++_gtk_tray_icon_get_padding (GtkTrayIcon *icon)
++{
++  g_return_val_if_fail (GTK_IS_TRAY_ICON (icon), 0);
++
++  return icon->priv->padding;
++}
++
+ 
+ #define __GTK_TRAY_ICON_X11_C__
+ #include "gtkaliasdef.c"

@@ -1,0 +1,15 @@
+diff --git a/cassandane/Cassandane/Instance.pm b/cassandane/Cassandane/Instance.pm
+index 78e7100..edf6f5d 100644
+--- a/cassandane/Cassandane/Instance.pm
++++ b/cassandane/Cassandane/Instance.pm
+@@ -492,9 +492,7 @@ sub _find_binary
+     my $base = $self->{cyrus_destdir} . $self->{cyrus_prefix};
+ 
+     if ($name eq 'delve') {
+-        my $lib = `ldd $base/libexec/imapd` || die "can't ldd imapd";
+-        $lib =~ m{(/\S+)/lib/libxapian-([0-9.]+)\.so};
+-        return "$1/bin/xapian-delve-$2";
++        return "/bin/xapian-delve";
+     }
+ 
+     foreach (qw( bin sbin libexec libexec/cyrus-imapd lib cyrus/bin ))

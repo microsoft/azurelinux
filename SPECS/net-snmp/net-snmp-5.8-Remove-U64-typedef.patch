@@ -1,0 +1,12 @@
+diff -urNp a/include/net-snmp/library/int64.h b/include/net-snmp/library/int64.h
+--- a/include/net-snmp/library/int64.h	2018-07-18 14:37:16.543348832 +0200
++++ b/include/net-snmp/library/int64.h	2018-07-18 15:31:31.516999288 +0200
+@@ -10,7 +10,7 @@ extern          "C" {
+      * Note: using the U64 typedef is deprecated because this typedef conflicts
+      * with a typedef with the same name defined in the Perl header files.
+      */
+-    typedef struct counter64 U64;
++//    typedef struct counter64 U64;
+ #endif
+ 
+ #define I64CHARSZ 21

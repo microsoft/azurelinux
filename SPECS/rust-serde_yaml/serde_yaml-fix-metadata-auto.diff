@@ -1,0 +1,16 @@
+--- serde_yaml-0.9.34+deprecated/Cargo.toml	1970-01-01T00:00:01+00:00
++++ serde_yaml-0.9.34+deprecated/Cargo.toml	2024-05-16T20:43:59.833589+00:00
+@@ -13,7 +13,7 @@
+ edition = "2021"
+ rust-version = "1.64"
+ name = "serde_yaml"
+-version = "0.9.34+deprecated"
++version = "0.9.34"
+ authors = ["David Tolnay <dtolnay@gmail.com>"]
+ description = "YAML data format for Serde"
+ documentation = "https://docs.rs/serde_yaml/"
+@@ -60,3 +60,4 @@
+ 
+ [dev-dependencies.serde_derive]
+ version = "1.0.195"
++

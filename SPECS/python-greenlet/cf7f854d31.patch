@@ -1,0 +1,167 @@
+From cf7f854d31bd144d75f284d406dae06882e44730 Mon Sep 17 00:00:00 2001
+From: Jason Madden <jamadden@gmail.com>
+Date: Fri, 11 Apr 2025 12:30:10 -0500
+Subject: [PATCH] Add initial support for Python 3.14a7.
+
+- Header files have moved around.
+- Reference counting has changed. It appears to be
+  https://github.com/python/cpython/pull/130708 that's eliding some
+  reference counting within functions and caused us to need to lower
+  our expected reference count in a few places. NOTE: I'm not 100%
+  sure this is the case; but `dis.dis` shows the new opcode being used
+  for the variables we're testing the refcount of.
+---
+ src/greenlet/TGreenlet.hpp               | 5 +++++
+ src/greenlet/greenlet_cpython_compat.hpp | 6 ++++++
+ src/greenlet/tests/__init__.py           | 8 ++++----
+ src/greenlet/tests/test_contextvars.py   | 8 +++++---
+ src/greenlet/tests/test_greenlet.py      | 9 ++++++---
+ src/greenlet/tests/test_leaks.py         | 8 ++++++--
+ 6 files changed, 32 insertions(+), 12 deletions(-)
+
+diff --git a/src/greenlet/TGreenlet.hpp b/src/greenlet/TGreenlet.hpp
+index 512f7fb3..9e917e74 100644
+--- a/src/greenlet/TGreenlet.hpp
++++ b/src/greenlet/TGreenlet.hpp
+@@ -27,6 +27,11 @@ using greenlet::refs::BorrowedGreenlet;
+ #  include "internal/pycore_frame.h"
+ #endif
+ 
++#if GREENLET_PY314
++#  include "internal/pycore_interpframe_structs.h"
++#  include "internal/pycore_interpframe.h"
++#endif
++
+ // XXX: TODO: Work to remove all virtual functions
+ // for speed of calling and size of objects (no vtable).
+ // One pattern is the Curiously Recurring Template
+diff --git a/src/greenlet/greenlet_cpython_compat.hpp b/src/greenlet/greenlet_cpython_compat.hpp
+index ce5fd882..979d6f94 100644
+--- a/src/greenlet/greenlet_cpython_compat.hpp
++++ b/src/greenlet/greenlet_cpython_compat.hpp
+@@ -61,6 +61,12 @@ Greenlet won't compile on anything older than Python 3.11 alpha 4 (see
+ #    define GREENLET_PY313 0
+ #endif
+ 
++#if PY_VERSION_HEX >= 0x30E0000
++#    define GREENLET_PY314 1
++#else
++#    define GREENLET_PY314 0
++#endif
++
+ #ifndef Py_SET_REFCNT
+ /* Py_REFCNT and Py_SIZE macros are converted to functions
+ https://bugs.python.org/issue39573 */
+diff --git a/src/greenlet/tests/__init__.py b/src/greenlet/tests/__init__.py
+index e69392e4..5929f2a7 100644
+--- a/src/greenlet/tests/__init__.py
++++ b/src/greenlet/tests/__init__.py
+@@ -25,6 +25,9 @@
+ 
+ PY312 = sys.version_info[:2] >= (3, 12)
+ PY313 = sys.version_info[:2] >= (3, 13)
++# XXX: First tested on 3.14a7. Revisit all uses of this on later versions to ensure they
++# are still valid.
++PY314 = sys.version_info[:2] >= (3, 14)
+ 
+ WIN = sys.platform.startswith("win")
+ RUNNING_ON_GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS')
+@@ -55,10 +58,7 @@ def __new__(cls, classname, bases, classDict):
+         return type.__new__(cls, classname, bases, classDict)
+ 
+ 
+-class TestCase(TestCaseMetaClass(
+-        "NewBase",
+-        (unittest.TestCase,),
+-        {})):
++class TestCase(unittest.TestCase, metaclass=TestCaseMetaClass):
+ 
+     cleanup_attempt_sleep_duration = 0.001
+     cleanup_max_sleep_seconds = 1
+diff --git a/src/greenlet/tests/test_contextvars.py b/src/greenlet/tests/test_contextvars.py
+index 9a16f671..b0d1ccf3 100644
+--- a/src/greenlet/tests/test_contextvars.py
++++ b/src/greenlet/tests/test_contextvars.py
+@@ -11,7 +11,7 @@
+ from greenlet import greenlet
+ from greenlet import getcurrent
+ from . import TestCase
+-
++from . import PY314
+ 
+ try:
+     from contextvars import Context
+@@ -208,8 +208,10 @@ def target():
+         # Make sure there are no reference leaks
+         gr = None
+         gc.collect()
+-        self.assertEqual(sys.getrefcount(old_context), 2)
+-        self.assertEqual(sys.getrefcount(new_context), 2)
++        # Python 3.14 elides reference counting operations
++        # in some cases. See https://github.com/python/cpython/pull/130708
++        self.assertEqual(sys.getrefcount(old_context), 2 if not PY314 else 1)
++        self.assertEqual(sys.getrefcount(new_context), 2 if not PY314 else 1)
+ 
+     def test_context_assignment_different_thread(self):
+         import threading
+diff --git a/src/greenlet/tests/test_greenlet.py b/src/greenlet/tests/test_greenlet.py
+index c4aabea7..fd05c0db 100644
+--- a/src/greenlet/tests/test_greenlet.py
++++ b/src/greenlet/tests/test_greenlet.py
+@@ -12,6 +12,7 @@
+ from . import TestCase
+ from . import RUNNING_ON_MANYLINUX
+ from . import PY313
++from . import PY314
+ from .leakcheck import fails_leakcheck
+ 
+ 
+@@ -123,13 +124,15 @@ def g():
+             g = RawGreenlet(f)
+             g.switch()
+             lst.append('c')
+-
++        self.assertEqual(sys.getrefcount(g), 2 if not PY314 else 1)
+         g = RawGreenlet(g)
+-        self.assertEqual(sys.getrefcount(g), 2)
++        # Python 3.14 elides reference counting operations
++        # in some cases. See https://github.com/python/cpython/pull/130708
++        self.assertEqual(sys.getrefcount(g), 2 if not PY314 else 1)
+         g.switch()
+         self.assertEqual(lst, ['a', 'b', 'c'])
+         # Just the one in this frame, plus the one on the stack we pass to the function
+-        self.assertEqual(sys.getrefcount(g), 2)
++        self.assertEqual(sys.getrefcount(g), 2 if not PY314 else 1)
+ 
+     def test_threads(self):
+         success = []
+diff --git a/src/greenlet/tests/test_leaks.py b/src/greenlet/tests/test_leaks.py
+index ed1fa717..99da4ebe 100644
+--- a/src/greenlet/tests/test_leaks.py
++++ b/src/greenlet/tests/test_leaks.py
+@@ -14,6 +14,7 @@
+ 
+ import greenlet
+ from . import TestCase
++from . import PY314
+ from .leakcheck import fails_leakcheck
+ from .leakcheck import ignores_leakcheck
+ from .leakcheck import RUNNING_ON_MANYLINUX
+@@ -52,12 +53,15 @@ def test_arg_refs(self):
+ 
+     def test_kwarg_refs(self):
+         kwargs = {}
++        self.assertEqual(sys.getrefcount(kwargs), 2 if not PY314 else 1)
+         # pylint:disable=unnecessary-lambda
+         g = greenlet.greenlet(
+-            lambda **kwargs: greenlet.getcurrent().parent.switch(**kwargs))
++            lambda **gkwargs: greenlet.getcurrent().parent.switch(**gkwargs))
+         for _ in range(100):
+             g.switch(**kwargs)
+-        self.assertEqual(sys.getrefcount(kwargs), 2)
++        # Python 3.14 elides reference counting operations
++        # in some cases. See https://github.com/python/cpython/pull/130708
++        self.assertEqual(sys.getrefcount(kwargs), 2 if not PY314 else 1)
+ 
+ 
+     @staticmethod

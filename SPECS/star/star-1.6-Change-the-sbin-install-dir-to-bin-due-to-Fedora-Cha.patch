@@ -1,0 +1,26 @@
+From 94afc660cec9533ddc2da80da8b00fe373b65dcc Mon Sep 17 00:00:00 2001
+From: Lukas Javorsky <ljavorsk@redhat.com>
+Date: Thu, 30 Jan 2025 13:03:34 +0000
+Subject: [PATCH] Change the sbin install dir to bin due to Fedora Change
+
+https://fedoraproject.org/wiki/Changes/Unify_bin_and_sbin
+---
+ rmt/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rmt/Makefile b/rmt/Makefile
+index 1bc76a0..2c349f6 100644
+--- a/rmt/Makefile
++++ b/rmt/Makefile
+@@ -5,7 +5,7 @@ RULESDIR=	RULES
+ include		$(SRCROOT)/$(RULESDIR)/rules.top
+ ###########################################################################
+ 
+-INSDIR=		sbin
++INSDIR=		bin
+ TARGET=		rmt
+ CPPOPTS +=	-DUSE_REMOTE
+ CPPOPTS +=	-DUSE_LARGEFILES
+-- 
+2.48.1
+

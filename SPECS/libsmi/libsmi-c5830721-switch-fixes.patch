@@ -1,0 +1,37 @@
+diff -up libsmi-c5830721/lib/smi-check.c.switch-fixes libsmi-c5830721/lib/smi-check.c
+--- libsmi-c5830721/lib/smi-check.c.switch-fixes	2021-01-15 06:10:12.000000000 -0500
++++ libsmi-c5830721/lib/smi-check.c	2024-01-05 09:54:57.791897987 -0500
+@@ -884,6 +884,7 @@ smiCheckIndex(Parser *parser, Object *ob
+ 	case SMI_BASETYPE_FLOAT32:
+ 	case SMI_BASETYPE_FLOAT64:
+ 	case SMI_BASETYPE_FLOAT128:
++	case SMI_BASETYPE_POINTER:
+ 	case SMI_BASETYPE_UNKNOWN:
+ 	    smiPrintErrorAtLine(parser, ERR_INDEX_BASETYPE, object->line,
+ 				typePtr->export.name ? typePtr->export.name
+diff -up libsmi-c5830721/lib/yang-check.c.switch-fixes libsmi-c5830721/lib/yang-check.c
+--- libsmi-c5830721/lib/yang-check.c.switch-fixes	2021-01-15 06:10:12.000000000 -0500
++++ libsmi-c5830721/lib/yang-check.c	2024-01-05 09:56:01.209784830 -0500
+@@ -1103,6 +1103,22 @@ static void typeHandler(_YangNode* nodeP
+                     smiPrintErrorAtLine(currentParser, ERR_CHILD_REQUIRED, nodePtr->line, "decimal64", "fraction-digits");
+                 }
+                 break;
++            case YANG_TYPE_BINARY:
++            case YANG_TYPE_BOOLEAN:
++            case YANG_TYPE_EMPTY:
++            case YANG_TYPE_INSTANCE_IDENTIFIER:
++            case YANG_TYPE_INT8:
++            case YANG_TYPE_INT16:
++            case YANG_TYPE_INT32:
++            case YANG_TYPE_INT64:
++            case YANG_TYPE_NONE:
++            case YANG_TYPE_STRING:
++            case YANG_TYPE_UINT8:
++            case YANG_TYPE_UINT16:
++            case YANG_TYPE_UINT32:
++            case YANG_TYPE_UINT64:
++            /* Should we do anything with these types? */
++                break;
+         }
+     }
+ 

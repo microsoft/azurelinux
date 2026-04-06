@@ -1,0 +1,215 @@
+From 062aa6eab12d00adffa4e46d58722f6c0e5eeac1 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Fri, 9 Jan 2026 11:39:50 +0100
+Subject: [PATCH] Issue 7172 - Index ordering mismatch after upgrade (#7173)
+
+Bug Description:
+Commit daf731f55071d45eaf403a52b63d35f4e699ff28 introduced a regression.
+After upgrading to a version that adds `integerOrderingMatch` matching
+rule to `parentid` and `ancestorid` indexes, searches may return empty
+or incorrect results.
+
+This happens because the existing index data was created with
+lexicographic ordering, but the new compare function expects integer
+ordering. Index lookups fail because the compare function doesn't match
+the data ordering.
+The root cause is that `ldbm_instance_create_default_indexes()` calls
+`attr_index_config()` unconditionally for `parentid` and `ancestorid`
+indexes, which triggers `ainfo_dup()` to overwrite `ai_key_cmp_fn` on
+existing indexes. This breaks indexes that were created without the
+`integerOrderingMatch` matching rule.
+
+Fix Description:
+* Call `attr_index_config()` for `parentid` and `ancestorid` indexes
+only if index config doesn't exist.
+
+* Add `upgrade_check_id_index_matching_rule()` that logs an error on
+server startup if `parentid` or `ancestorid` indexes are missing the
+integerOrderingMatch matching rule, advising administrators to reindex.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7172
+
+Reviewed by: @tbordaz, @progier389, @droideck (Thanks!)
+---
+ ldap/servers/slapd/back-ldbm/instance.c |  25 ++++--
+ ldap/servers/slapd/upgrade.c            | 107 +++++++++++++++++++++++-
+ 2 files changed, 123 insertions(+), 9 deletions(-)
+
+diff --git a/ldap/servers/slapd/back-ldbm/instance.c b/ldap/servers/slapd/back-ldbm/instance.c
+index cb002c379..71bf0f6fa 100644
+--- a/ldap/servers/slapd/back-ldbm/instance.c
++++ b/ldap/servers/slapd/back-ldbm/instance.c
+@@ -190,6 +190,7 @@ ldbm_instance_create_default_indexes(backend *be)
+     char *ancestorid_indexes_limit = NULL;
+     char *parentid_indexes_limit = NULL;
+     struct attrinfo *ai = NULL;
++    struct attrinfo *index_already_configured = NULL;
+     struct index_idlistsizeinfo *iter;
+     int cookie;
+     int limit;
+@@ -248,10 +249,14 @@ ldbm_instance_create_default_indexes(backend *be)
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+-    e = ldbm_instance_init_config_entry(LDBM_PARENTID_STR, "eq", 0, 0, 0, "integerOrderingMatch", parentid_indexes_limit);
+-    ldbm_instance_config_add_index_entry(inst, e, flags);
+-    attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+-    slapi_entry_free(e);
++    ainfo_get(be, (char *)LDBM_PARENTID_STR, &ai);
++    index_already_configured = ai;
++    if (!index_already_configured) {
++        e = ldbm_instance_init_config_entry(LDBM_PARENTID_STR, "eq", 0, 0, 0, "integerOrderingMatch", parentid_indexes_limit);
++        ldbm_instance_config_add_index_entry(inst, e, flags);
++        attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
++        slapi_entry_free(e);
++    }
+ 
+     e = ldbm_instance_init_config_entry("objectclass", "eq", 0, 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+@@ -288,10 +293,14 @@ ldbm_instance_create_default_indexes(backend *be)
+      * ancestorid is special, there is actually no such attr type
+      * but we still want to use the attr index file APIs.
+      */
+-    e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch", ancestorid_indexes_limit);
+-    ldbm_instance_config_add_index_entry(inst, e, flags);
+-    attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+-    slapi_entry_free(e);
++    ainfo_get(be, (char *)LDBM_ANCESTORID_STR, &ai);
++    index_already_configured = ai;
++    if (!index_already_configured) {
++        e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch", ancestorid_indexes_limit);
++        ldbm_instance_config_add_index_entry(inst, e, flags);
++        attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
++        slapi_entry_free(e);
++    }
+ 
+     slapi_ch_free_string(&ancestorid_indexes_limit);
+     slapi_ch_free_string(&parentid_indexes_limit);
+diff --git a/ldap/servers/slapd/upgrade.c b/ldap/servers/slapd/upgrade.c
+index 858392564..b02e37ed6 100644
+--- a/ldap/servers/slapd/upgrade.c
++++ b/ldap/servers/slapd/upgrade.c
+@@ -330,6 +330,107 @@ upgrade_remove_subtree_rename(void)
+     return UPGRADE_SUCCESS;
+ }
+ 
++/*
++ * Check if parentid/ancestorid indexes are missing the integerOrderingMatch
++ * matching rule.
++ *
++ * This function logs a warning if we detect this condition, advising
++ * the administrator to reindex the affected attributes.
++ */
++static upgrade_status
++upgrade_check_id_index_matching_rule(void)
++{
++    struct slapi_pblock *pb = slapi_pblock_new();
++    Slapi_Entry **backends = NULL;
++    const char *be_base_dn = "cn=ldbm database,cn=plugins,cn=config";
++    const char *be_filter = "(objectclass=nsBackendInstance)";
++    const char *attrs_to_check[] = {"parentid", "ancestorid", NULL};
++    upgrade_status uresult = UPGRADE_SUCCESS;
++
++    /* Search for all backend instances */
++    slapi_search_internal_set_pb(
++            pb, be_base_dn,
++            LDAP_SCOPE_ONELEVEL,
++            be_filter, NULL, 0, NULL, NULL,
++            plugin_get_default_component_id(), 0);
++    slapi_search_internal_pb(pb);
++    slapi_pblock_get(pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &backends);
++
++    if (backends) {
++        for (size_t be_idx = 0; backends[be_idx] != NULL; be_idx++) {
++            const char *be_name = slapi_entry_attr_get_ref(backends[be_idx], "cn");
++            if (!be_name) {
++                continue;
++            }
++
++            /* Check each attribute that should have integerOrderingMatch */
++            for (size_t attr_idx = 0; attrs_to_check[attr_idx] != NULL; attr_idx++) {
++                const char *attr_name = attrs_to_check[attr_idx];
++                struct slapi_pblock *idx_pb = slapi_pblock_new();
++                Slapi_Entry **idx_entries = NULL;
++                char *idx_dn = slapi_create_dn_string("cn=%s,cn=index,cn=%s,%s",
++                                                       attr_name, be_name, be_base_dn);
++                char *idx_filter = "(objectclass=nsIndex)";
++                PRBool has_matching_rule = PR_FALSE;
++
++                if (!idx_dn) {
++                    slapi_pblock_destroy(idx_pb);
++                    continue;
++                }
++
++                slapi_search_internal_set_pb(
++                        idx_pb, idx_dn,
++                        LDAP_SCOPE_BASE,
++                        idx_filter, NULL, 0, NULL, NULL,
++                        plugin_get_default_component_id(), 0);
++                slapi_search_internal_pb(idx_pb);
++                slapi_pblock_get(idx_pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &idx_entries);
++
++                if (idx_entries && idx_entries[0]) {
++                    /* Index exists, check if it has integerOrderingMatch */
++                    Slapi_Attr *mr_attr = NULL;
++                    if (slapi_entry_attr_find(idx_entries[0], "nsMatchingRule", &mr_attr) == 0) {
++                        Slapi_Value *sval = NULL;
++                        int idx;
++                        for (idx = slapi_attr_first_value(mr_attr, &sval);
++                             idx != -1;
++                             idx = slapi_attr_next_value(mr_attr, idx, &sval)) {
++                            const struct berval *bval = slapi_value_get_berval(sval);
++                            if (bval && bval->bv_val &&
++                                strcasecmp(bval->bv_val, "integerOrderingMatch") == 0) {
++                                has_matching_rule = PR_TRUE;
++                                break;
++                            }
++                        }
++                    }
++
++                    if (!has_matching_rule) {
++                        /* Index exists but doesn't have integerOrderingMatch, log a warning */
++                        slapi_log_err(SLAPI_LOG_ERR, "upgrade_check_id_index_matching_rule",
++                                "Index '%s' in backend '%s' is missing 'nsMatchingRule: integerOrderingMatch'. "
++                                "Incorrectly configured system indexes can lead to poor search performance, replication issues, and other operational problems. "
++                                "To fix this, add the matching rule and reindex: "
++                                "dsconf <instance> backend index set --add-mr integerOrderingMatch --attr %s %s && "
++                                "dsconf <instance> backend index reindex --attr %s %s. "
++                                "WARNING: Reindexing can be resource-intensive and may impact server performance on a live system. "
++                                "Consider scheduling reindexing during maintenance windows or periods of low activity.\n",
++                                attr_name, be_name, attr_name, be_name, attr_name, be_name);
++                    }
++                }
++
++                slapi_ch_free_string(&idx_dn);
++                slapi_free_search_results_internal(idx_pb);
++                slapi_pblock_destroy(idx_pb);
++            }
++        }
++    }
++
++    slapi_free_search_results_internal(pb);
++    slapi_pblock_destroy(pb);
++
++    return uresult;
++}
++
+ /*
+  * Upgrade the base config of the PAM PTA plugin.
+  *
+@@ -547,7 +648,11 @@ upgrade_server(void)
+     if (upgrade_pam_pta_default_config() != UPGRADE_SUCCESS) {
+         return UPGRADE_FAILURE;
+     }
+-    
++
++    if (upgrade_check_id_index_matching_rule() != UPGRADE_SUCCESS) {
++        return UPGRADE_FAILURE;
++    }
++
+     return UPGRADE_SUCCESS;
+ }
+ 
+-- 
+2.52.0
+

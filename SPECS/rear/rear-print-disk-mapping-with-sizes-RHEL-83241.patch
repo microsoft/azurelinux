@@ -1,0 +1,107 @@
+From 21d1dd5bec16598b52d8358909dd3896304949c1 Mon Sep 17 00:00:00 2001
+From: "D'Haese, Gratien [GTSBE - Non JJ]" <GDHAESE1@ITS.JNJ.COM>
+Date: Fri, 28 Feb 2025 11:36:53 +0100
+Subject: [PATCH 1/2] enhance 300_map_disks.sh script to also print the disk
+ sizes
+
+---
+ .../rear/layout/prepare/default/300_map_disks.sh    | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/usr/share/rear/layout/prepare/default/300_map_disks.sh b/usr/share/rear/layout/prepare/default/300_map_disks.sh
+index 6579391683..fa4ba16949 100644
+--- a/usr/share/rear/layout/prepare/default/300_map_disks.sh
++++ b/usr/share/rear/layout/prepare/default/300_map_disks.sh
+@@ -111,7 +111,7 @@ done
+ while read keyword orig_device orig_size junk ; do
+     # Continue with next original device when it is already used as source in the mapping file:
+     if is_mapping_source "$orig_device" ; then
+-        DebugPrint "Skip automapping $orig_device (already exists as source in $MAPPING_FILE)"
++        DebugPrint "Skip automapping $orig_device with size $orig_size (already exists as source in $MAPPING_FILE)"
+         continue
+     fi
+     # The original device is not yet mapped (i.e. not used as source in the mapping file) so it needs to be mapped.
+@@ -185,17 +185,17 @@ while read keyword orig_device orig_size junk ; do
+         IsInArray "$preferred_target_device_name" "${excluded_target_device_names[@]}" && continue
+         # Continue with next block device if the current one is already used as target in the mapping file:
+         if is_mapping_target "$preferred_target_device_name" ; then
+-            DebugPrint "Cannot use $preferred_target_device_name (same size) for recreating $orig_device ($preferred_target_device_name already exists as target in $MAPPING_FILE)"
++            DebugPrint "Cannot use $preferred_target_device_name (same $current_size size) for recreating $orig_device ($preferred_target_device_name already exists as target in $MAPPING_FILE)"
+             continue
+         fi
+         # Ensure the determined target device is not write-protected (cf. above):
+         if is_write_protected "$preferred_target_device_name" ; then
+-            DebugPrint "Cannot use $preferred_target_device_name (same size) for recreating $orig_device ($preferred_target_device_name is write-protected)"
++            DebugPrint "Cannot use $preferred_target_device_name (same $current_size size) for recreating $orig_device ($preferred_target_device_name is write-protected)"
+             continue
+         fi
+         # The first of all current block devices with same size as the original that is not yet used as target gets used:
+         add_mapping "$orig_device" "$preferred_target_device_name"
+-        LogPrint "Using $preferred_target_device_name (same size $current_size) for recreating $orig_device"
++        LogPrint "Using $preferred_target_device_name (same $current_size size) for recreating $orig_device"
+         # Continue the outer while loop with next original device because the current one is now mapped:
+         continue 2
+     done
+@@ -260,6 +260,7 @@ while read keyword orig_device orig_size junk ; do
+             Log "$preferred_target_device_name excluded from device mapping choices (is designated as write-protected)"
+             continue
+         fi
++        LogPrint "The size of $preferred_target_device_name is $(blockdev --getsize64 $current_device_path)"
+         # Add the current device as possible choice for the user:
+         possible_targets+=( "$preferred_target_device_name" )
+     done
+@@ -272,7 +273,7 @@ while read keyword orig_device orig_size junk ; do
+     # At the end the mapping file is shown and the user can edit it if he does not like an automated mapping:
+     if test "1" -eq "${#possible_targets[@]}" ; then
+         add_mapping "$orig_device" "$possible_targets"
+-        LogPrint "Using $possible_targets (the only available of the disks) for recreating $orig_device"
++        LogPrint "Using $possible_targets (the only available of the disks) for recreating $orig_device with size $orig_size"
+         # Continue with next original device in the LAYOUT_FILE:
+         continue
+     fi
+@@ -280,7 +281,7 @@ while read keyword orig_device orig_size junk ; do
+     skip_choice="Do not map $preferred_orig_device_name"
+     regular_choices=( "${possible_targets[@]}" "$skip_choice" )
+     rear_shell_choice="Use Relax-and-Recover shell and return back to here"
+-    prompt="Choose an appropriate replacement for $preferred_orig_device_name"
++    prompt="Choose an appropriate replacement for $preferred_orig_device_name with size $orig_size"
+     choice=""
+     wilful_input=""
+     # Generate a runtime-specific user_input_ID so that for each unmapped original device
+
+From ef7297064f0525da1cd98664b53d67782ec88af9 Mon Sep 17 00:00:00 2001
+From: "D'Haese, Gratien [GTSBE - Non JJ]" <GDHAESE1@ITS.JNJ.COM>
+Date: Fri, 28 Feb 2025 13:53:06 +0100
+Subject: [PATCH 2/2] Improved script 300_map_disks.sh to always print the disk
+ sizes in the log file
+
+---
+ usr/share/rear/layout/prepare/default/300_map_disks.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/usr/share/rear/layout/prepare/default/300_map_disks.sh b/usr/share/rear/layout/prepare/default/300_map_disks.sh
+index fa4ba16949..c88477a151 100644
+--- a/usr/share/rear/layout/prepare/default/300_map_disks.sh
++++ b/usr/share/rear/layout/prepare/default/300_map_disks.sh
+@@ -185,17 +185,17 @@ while read keyword orig_device orig_size junk ; do
+         IsInArray "$preferred_target_device_name" "${excluded_target_device_names[@]}" && continue
+         # Continue with next block device if the current one is already used as target in the mapping file:
+         if is_mapping_target "$preferred_target_device_name" ; then
+-            DebugPrint "Cannot use $preferred_target_device_name (same $current_size size) for recreating $orig_device ($preferred_target_device_name already exists as target in $MAPPING_FILE)"
++            DebugPrint "Cannot use $preferred_target_device_name (same size $current_size) for recreating $orig_device ($preferred_target_device_name already exists as target in $MAPPING_FILE)"
+             continue
+         fi
+         # Ensure the determined target device is not write-protected (cf. above):
+         if is_write_protected "$preferred_target_device_name" ; then
+-            DebugPrint "Cannot use $preferred_target_device_name (same $current_size size) for recreating $orig_device ($preferred_target_device_name is write-protected)"
++            DebugPrint "Cannot use $preferred_target_device_name (same size $current_size) for recreating $orig_device ($preferred_target_device_name is write-protected)"
+             continue
+         fi
+         # The first of all current block devices with same size as the original that is not yet used as target gets used:
+         add_mapping "$orig_device" "$preferred_target_device_name"
+-        LogPrint "Using $preferred_target_device_name (same $current_size size) for recreating $orig_device"
++        LogPrint "Using $preferred_target_device_name (same size $current_size) for recreating $orig_device"
+         # Continue the outer while loop with next original device because the current one is now mapped:
+         continue 2
+     done
+

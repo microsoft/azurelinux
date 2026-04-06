@@ -1,0 +1,46 @@
+From d96fedc52a7326941ff9a4036bdf2c6ffe100b3b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 18 Apr 2016 15:15:44 +0200
+Subject: [PATCH] Replace EU::MM dependnecy with EU::MM::Utils
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This allows to free from a run-time dependency on fat ExtUtils::MakeMaker.
+
+<https://bugzilla.redhat.com/show_bug.cgi?id=1129443>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL    | 1 +
+ lib/IPC/Cmd.pm | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 540012e..a014be8 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -9,6 +9,7 @@ my $prereqs = {
+     'File::Spec'                => 0,
+     'File::Temp'                => 0,
+     'ExtUtils::MakeMaker'       => 0,
++    'ExtUtils::MM::Utils'       => 0,
+ };
+ 
+ WriteMakefile1(
+diff --git a/lib/IPC/Cmd.pm b/lib/IPC/Cmd.pm
+index 13f3c6b..6191dc3 100644
+--- a/lib/IPC/Cmd.pm
++++ b/lib/IPC/Cmd.pm
+@@ -232,7 +232,7 @@ sub can_run {
+     }
+ 
+     require File::Spec;
+-    require ExtUtils::MakeMaker;
++    require ExtUtils::MM::Utils;
+ 
+     my @possibles;
+ 
+-- 
+2.5.5
+

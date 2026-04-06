@@ -1,0 +1,44 @@
+Short description: Adjust CS_PATH and the test container layout.
+Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+Origin: PATCH
+Upstream status: not-needed
+
+In Fedora we should return only /usr/bin as CS_PATH because /bin is just
+a symlink to /usr/bin after MoveToUsr transition (which glibc has not
+really completed).
+
+We also create /{bin,lib,lib64,sbin} in the test container as symbolic
+links.  This brings the test container in line with Fedora's filesystem
+layout and avoids some test failures.  For example, because Fedora's
+CS_PATH is /usr/bin, tst-vfork3 will try to execute /usr/bin/echo in the
+container.  Without this change the container installs `echo' in /bin
+not /usr/bin, causing the test to fail.
+
+diff --git a/Makefile b/Makefile
+index a49870d3d1e636a9..feb2599203b10098 100644
+--- a/Makefile
++++ b/Makefile
+@@ -598,9 +598,13 @@ $(tests-container) $(addsuffix /tests,$(subdirs)) : \
+ $(objpfx)testroot.pristine/install.stamp :
+ 	test -d $(objpfx)testroot.pristine || \
+ 	  mkdir $(objpfx)testroot.pristine
+-	# We need a working /bin/sh for some of the tests.
+-	test -d $(objpfx)testroot.pristine/bin || \
+-	  mkdir $(objpfx)testroot.pristine/bin
++	# Set up symlinks to directories whose contents got moved to /usr
++	for moved in bin lib lib64 sbin; do \
++		test -d $(objpfx)testroot.pristine/usr/$$moved || \
++		  mkdir -p $(objpfx)testroot.pristine/usr/$$moved ;\
++		test -e $(objpfx)testroot.pristine/$$moved || \
++		  ln -s usr/$$moved $(objpfx)testroot.pristine/$$moved ;\
++	done
+ 	# We need the compiled locale dir for localedef tests.
+ 	test -d $(objpfx)testroot.pristine/$(complocaledir) || \
+ 	  mkdir -p $(objpfx)testroot.pristine/$(complocaledir)
+diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
+index 15859c3b2759878e..9b63b7f8069866fd 100644
+--- a/sysdeps/unix/confstr.h
++++ b/sysdeps/unix/confstr.h
+@@ -1 +1 @@
+-#define	CS_PATH	"/bin:/usr/bin"
++#define	CS_PATH	"/usr/bin"

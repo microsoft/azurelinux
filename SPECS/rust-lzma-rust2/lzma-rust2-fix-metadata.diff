@@ -1,0 +1,14 @@
+--- lzma-rust2-0.16.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ lzma-rust2-0.16.2/Cargo.toml	2026-02-18T10:04:49.500984+00:00
+@@ -177,11 +177,3 @@
+ [dependencies.sha2]
+ version = "0.10"
+ optional = true
+-
+-[dev-dependencies.criterion]
+-version = "=0.7"
+-features = ["html_reports"]
+-
+-[dev-dependencies.liblzma]
+-version = "0.4"
+-features = ["static"]

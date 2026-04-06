@@ -1,0 +1,117 @@
+Date: Thu, 15 Jan 2009 15:41:16 +0100 (CET)
+From: Stefan Richter <stefanr@s5r6.in-berlin.de>
+Subject: [PATCH libiec61883] cmp: replace open-coded channel allocation by
+	raw1394_channel_modify
+To: Dan Dennedy <dan@dennedy.org>
+Cc: linux1394-devel@lists.sourceforge.net
+
+On 15 Jan, Dan Dennedy wrote:
+> On Thu, Jan 1, 2009 at 5:13 AM, Stefan Richter
+> <stefanr@s5r6.in-berlin.de> wrote:
+>> input plug register on the local node?  AFAICT neither dvgrab nor kino
+>> use raw1394_channel_modify and raw1394_bandwidth_modify, not even
+>> through libiec61883.)
+> 
+> dvgrab indirectly uses channel_modify when you use its -guid option to
+> establish a point-to-point connection.
+> 
+
+Hmm.
+
+$ dvgrab -guid 0x008088030960484b
+libiec61883 error: Failed to get channels available.
+Established connection over channel 63
+[...proceeds with capture...]
+
+
+--------------------------------- 8< ---------------------------------
+
+cmp: replace open-coded channel allocation by raw1394_channel_modify
+
+The benefit is that it works on kernel 2.6.30 firewire-core without
+write permission to the IRM's device file (provided that libraw1394 is
+extended for 2.6.30 ioctls too, otherwise it still needs access to the
+IRM's file).
+
+If I read the code correctly, iec61883_cmp_normalize_output doesn't care
+whether the channel was already allocated by somebody else; it only
+cares that the channel is allocated.  That's what the new code does too.
+---
+ src/cmp.c |   56 +++++++++---------------------------------------------
+ 1 file changed, 10 insertions(+), 46 deletions(-)
+
+Index: libiec61883-1.2.0/src/cmp.c
+===================================================================
+--- libiec61883-1.2.0.orig/src/cmp.c
++++ libiec61883-1.2.0/src/cmp.c
+@@ -973,55 +973,19 @@ iec61883_cmp_normalize_output (raw1394ha
+ 
+ 	DEBUG ("iec61883_cmp_normalize_output: node %d\n", (int) node & 0x3f);
+ 
+-	// Check for plugs on output
++	/* Check for plugs on output */
+ 	result = iec61883_get_oMPR (handle, node, &ompr);
+ 	if (result < 0)
+ 		return result;
+ 	
+-	// locate an ouput plug that has a connection
+-	for (oplug = 0; oplug < ompr.n_plugs; oplug++) {
+-		if (iec61883_get_oPCRX (handle, node, &opcr, oplug) == 0) {
+-			if (opcr.online && (opcr.n_p2p_connections > 0 || 
+-				                opcr.bcast_connection == 1)) {
++	/* Locate an ouptut plug that has a connection,
++	 * make sure the plug's channel is allocated with IRM */
++	for (oplug = 0; oplug < ompr.n_plugs; oplug++)
++		if (iec61883_get_oPCRX (handle, node, &opcr, oplug) == 0
++		    && opcr.online
++		    && (opcr.n_p2p_connections > 0 || opcr.bcast_connection == 1)
++		    && raw1394_channel_modify (handle, opcr.channel, RAW1394_MODIFY_ALLOC) < 0)
++			DEBUG ("Channel %d already allocated, or can't reach IRM", opcr.channel);
+ 
+-				// Make sure the plug's channel is allocated with IRM
+-				quadlet_t buffer;
+-				nodeaddr_t addr = CSR_REGISTER_BASE;
+-				unsigned int c = opcr.channel;
+-				quadlet_t compare, swap = 0;
+-				quadlet_t new;
+-				
+-				if (c > 31 && c < 64) {
+-					addr += CSR_CHANNELS_AVAILABLE_LO;
+-					c -= 32;
+-				} else if (c < 64)
+-					addr += CSR_CHANNELS_AVAILABLE_HI;
+-				else
+-					FAIL ("Invalid channel");
+-				c = 31 - c;
+-
+-				result = iec61883_cooked_read (handle, raw1394_get_irm_id (handle), addr, 
+-					sizeof (quadlet_t), &buffer);
+-				if (result < 0)
+-					FAIL ("Failed to get channels available.");
+-				
+-				buffer = ntohl (buffer);
+-				DEBUG ("channels available before: 0x%08x", buffer);
+-
+-				if ((buffer & (1 << c)) != 0) {
+-					swap = htonl (buffer & ~(1 << c));
+-					compare = htonl (buffer);
+-
+-					result = raw1394_lock (handle, raw1394_get_irm_id (handle), addr,
+-							   EXTCODE_COMPARE_SWAP, swap, compare, &new);
+-					if ( (result < 0) || (new != compare) ) {
+-						FAIL ("Failed to modify channel %d", opcr.channel);
+-					}
+-					DEBUG ("channels available after: 0x%08x", ntohl (swap));
+-				}
+-			}
+-		}
+-	}
+-		
+-	return result;
++	return 0;
+ }
+
+-- 
+Stefan Richter
+-=====-==--= ---= -====
+http://arcgraph.de/sr/

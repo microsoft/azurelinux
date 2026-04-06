@@ -1,0 +1,113 @@
+From 7532e7c62b67cb16fbe2a9bcd48afb7011e1bfd6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20S=C3=BAkup?= <mimi.vx@gmail.com>
+Date: Mon, 25 Sep 2023 10:31:37 +0200
+Subject: [PATCH] Fix regexps and tests for python3.12
+
+---
+ smartypants.py    |  4 ++--
+ tests/test.py     |  4 ++--
+ tests/test_cli.py | 16 ++++++++--------
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/smartypants.py b/smartypants.py
+index c39f409..37368fb 100755
+--- a/smartypants.py
++++ b/smartypants.py
+@@ -268,13 +268,13 @@ def smartypants(text, attr=None):
+                 if do_quotes:
+                     if t == "'":
+                         # Special case: single-character ' token
+-                        if re.match("\S", prev_token_last_char):
++                        if re.match(r"\S", prev_token_last_char):
+                             t = "&#8217;"
+                         else:
+                             t = "&#8216;"
+                     elif t == '"':
+                         # Special case: single-character " token
+-                        if re.match("\S", prev_token_last_char):
++                        if re.match(r"\S", prev_token_last_char):
+                             t = "&#8221;"
+                         else:
+                             t = "&#8220;"
+diff --git a/tests/test.py b/tests/test.py
+index 2c1a0ea..ac5075a 100644
+--- a/tests/test.py
++++ b/tests/test.py
+@@ -24,7 +24,7 @@ class SmartyPantsTestCase(unittest.TestCase):
+ 
+         T = sp(TEXT)
+         E = '&#8220;foo&#8221; -- bar'
+-        self.assertEquals(T, E)
++        self.assertEqual(T, E)
+ 
+         attr = Attr.q | Attr.d
+         Attr.default = attr
+@@ -32,7 +32,7 @@ class SmartyPantsTestCase(unittest.TestCase):
+ 
+         T = sp(TEXT)
+         E = '&#8220;foo&#8221; &#8212; bar'
+-        self.assertEquals(T, E)
++        self.assertEqual(T, E)
+ 
+     def test_dates(self):
+ 
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index e85545a..6b5e136 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -34,7 +34,7 @@ class TestCLI(unittest.TestCase):
+         E = '&#8220;foobar&#8221;'
+ 
+         output = self._p([CLI_SCRIPT], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+     def test_pipe_attr(self):
+ 
+@@ -42,11 +42,11 @@ class TestCLI(unittest.TestCase):
+ 
+         E = T
+         output = self._p([CLI_SCRIPT, '--attr', '0'], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+         E = """"foo" &#8220;bar&#8221;"""
+         output = self._p([CLI_SCRIPT, '--attr', 'b'], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+     def test_skipped_elements(self):
+ 
+@@ -54,19 +54,19 @@ class TestCLI(unittest.TestCase):
+ 
+         E = '<a>&#8220;foo&#8221;</a> <b>&#8220;bar&#8221;</b>'
+         output = self._p([CLI_SCRIPT], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+         E = '<a>"foo"</a> <b>&#8220;bar&#8221;</b>'
+         output = self._p([CLI_SCRIPT, '--skip', 'a'], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+         E = '<a>&#8220;foo&#8221;</a> <b>"bar"</b>'
+         output = self._p([CLI_SCRIPT, '--skip', 'b'], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+         E = T
+         output = self._p([CLI_SCRIPT, '--skip', 'a,b'], T)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+ 
+     def test_file(self):
+ 
+@@ -81,4 +81,4 @@ class TestCLI(unittest.TestCase):
+             output = self._p([CLI_SCRIPT, F])
+         finally:
+             os.remove(F)
+-        self.assertEquals(output, E)
++        self.assertEqual(output, E)
+-- 
+2.46.0
+

@@ -1,0 +1,14 @@
+%__nginxmods_requires() %{lua:
+    -- Match buildroot paths of the form
+    --    /PATH/OF/BUILDROOT/usr/lib/nginx/modules/  and
+    --    /PATH/OF/BUILDROOT/usr/lib64/nginx/modules/
+    -- generating a line of the form:
+    --    nginx(abi) = VERSION
+    local path = rpm.expand("%1")
+    if path:match("/usr/lib%d*/nginx/modules/.*") then
+        local requires = "nginx(abi) = " .. rpm.expand("%{_nginx_abiversion}")
+        print(requires)
+    end
+}
+
+%__nginxmods_path ^%{_prefix}/lib(64)?/nginx/modules/.*\\.so$

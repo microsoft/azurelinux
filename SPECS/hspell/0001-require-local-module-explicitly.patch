@@ -1,0 +1,54 @@
+From 4573c39c4a5bfbcd36941c2ead3d4d93d9ac85e4 Mon Sep 17 00:00:00 2001
+From: Dan Kenigsberg <danken@cs.technion.ac.il>
+Date: Sat, 15 Jul 2017 21:28:03 +0300
+Subject: [PATCH] require local module explicitly
+
+this allows build hspell when perl runs in taint mode which does not
+include the current directory in @INC
+---
+ binarize-desc.pl | 2 +-
+ genprefixes.pl   | 2 +-
+ pmerge           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/binarize-desc.pl b/binarize-desc.pl
+index dbf0b1c..f62ebc6 100755
+--- a/binarize-desc.pl
++++ b/binarize-desc.pl
+@@ -8,7 +8,7 @@
+ 
+ use Carp;
+ 
+-require "PrefixBits.pl";
++require "./PrefixBits.pl";
+ 
+ # "perl -w" warns about variables only used once (it assumes they are a
+ # typo). This ugliness gets rid of this warning. Is there a more sensible way?
+diff --git a/genprefixes.pl b/genprefixes.pl
+index 450a7ca..9ae9e50 100755
+--- a/genprefixes.pl
++++ b/genprefixes.pl
+@@ -1,6 +1,6 @@
+ #!/usr/bin/perl -w
+ 
+-require "PrefixBits.pl";
++require "./PrefixBits.pl";
+ 
+ sub find_prefixes {
+ 	my $INQUISITIVE_HE=shift;
+diff --git a/pmerge b/pmerge
+index 83ad949..9ceb9de 100755
+--- a/pmerge
++++ b/pmerge
+@@ -8,7 +8,7 @@
+ use IO::File;
+ use Carp;
+ 
+-require "PrefixBits.pl";
++require "./PrefixBits.pl";
+ 
+ # "perl -w" warns about variables only used once (it assumes they are a
+ # typo). This ugliness gets rid of this warning. Is there a more sensible way?
+-- 
+2.9.4
+

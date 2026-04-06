@@ -1,0 +1,28 @@
+Avoid implicit int and implicit function declarations.
+
+A mostly equivalent patch has been posted upstream:
+
+<https://sourceforge.net/p/setserial/discussion/7060/thread/95d874c12c/?limit=25#1643>
+
+diff --git a/setserial.c b/setserial.c
+index f184e98db07ceb59..d181327fc568ede4 100644
+--- a/setserial.c
++++ b/setserial.c
+@@ -15,6 +15,9 @@
+ #include <termios.h>
+ #include <string.h>
+ #include <errno.h>
++#include <sys/ioctl.h>
++#include <unistd.h>
++#include <stdlib.h>
+ 
+ #ifdef HAVE_ASM_IOCTLS_H
+ #include <asm/ioctls.h>
+@@ -714,6 +717,7 @@ fprintf(stderr, "\t* port\t\tset the I/O port\n");
+ 	exit(1);
+ }
+ 
++int
+ main(int argc, char **argv)
+ {
+ 	int	get_flag = 0, wild_intr_flag = 0;

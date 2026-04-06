@@ -1,0 +1,13 @@
+diff -up which-2.22/tilde.c.me which-2.22/tilde.c
+--- which-2.22/tilde.c.me	2025-01-27 10:30:39.731725763 +0100
++++ which-2.22/tilde.c	2025-01-27 10:32:11.158379146 +0100
+@@ -189,7 +189,8 @@ char *tilde_expand(const char *string)
+   int result_size, result_index;
+ 
+   result_index = result_size = 0;
+-  if (result = strchr(string, '~'))
++  result = strchr(string, '~');
++  if (result)
+     result = (char *) xmalloc(result_size = (strlen(string) + 16));
+   else
+     result = (char *) xmalloc(result_size = (strlen(string) + 1));

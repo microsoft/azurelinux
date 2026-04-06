@@ -1,0 +1,87 @@
+From fc96cab095d704e8bf9934812dd8d6f87fbf4be4 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 30 Aug 2023 17:19:58 +0200
+Subject: [PATCH] coreutils-selinux.patch
+
+---
+ src/cp.c      | 19 ++++++++++++++++++-
+ src/install.c | 12 +++++++++++-
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/src/cp.c b/src/cp.c
+index a0ec067..1169c6a 100644
+--- a/src/cp.c
++++ b/src/cp.c
+@@ -996,7 +996,7 @@ main (int argc, char **argv)
+   selinux_enabled = (0 < is_selinux_enabled ());
+   cp_option_init (&x);
+ 
+-  while ((c = getopt_long (argc, argv, "abdfHilLnprst:uvxPRS:TZ",
++  while ((c = getopt_long (argc, argv, "abcdfHilLnprst:uvxPRS:TZ",
+                            long_opts, nullptr))
+          != -1)
+     {
+@@ -1048,6 +1048,23 @@ main (int argc, char **argv)
+           copy_contents = true;
+           break;
+ 
++        case 'c':
++          fprintf (stderr, "%s: warning: option '-c' is deprecated,"
++                  " please use '--preserve=context' instead\n", argv[0]);
++          if (x.set_security_context)
++            {
++              fprintf (stderr,
++                      "%s: cannot force target context and preserve it\n",
++                      argv[0]);
++              exit (1);
++            }
++          else if (selinux_enabled)
++            {
++              x.preserve_security_context = true;
++              x.require_preserve_context = true;
++            }
++          break;
++
+         case 'd':
+           x.preserve_links = true;
+           x.dereference = DEREF_NEVER;
+diff --git a/src/install.c b/src/install.c
+index b3b26ab..2d2f072 100644
+--- a/src/install.c
++++ b/src/install.c
+@@ -807,7 +807,7 @@ main (int argc, char **argv)
+   dir_arg = false;
+   umask (0);
+ 
+-  while ((optc = getopt_long (argc, argv, "bcCsDdg:m:o:pt:TvS:Z", long_options,
++  while ((optc = getopt_long (argc, argv, "bcCsDdg:m:o:pPt:TvS:Z", long_options,
+                               nullptr))
+          != -1)
+     {
+@@ -872,6 +872,9 @@ main (int argc, char **argv)
+           no_target_directory = true;
+           break;
+ 
++        case 'P':
++          fprintf (stderr, "%s: warning: option '-P' is deprecated,"
++                  " please use '--preserve-context' instead\n", argv[0]);
+         case PRESERVE_CONTEXT_OPTION:
+           if (! selinux_enabled)
+             {
+@@ -879,6 +882,13 @@ main (int argc, char **argv)
+                              "this kernel is not SELinux-enabled"));
+               break;
+             }
++          if (x.set_security_context)
++            {
++              fprintf (stderr,
++                      "%s: cannot force target context and preserve it\n",
++                      argv[0]);
++              exit (1);
++            }
+           x.preserve_security_context = true;
+           use_default_selinux_context = false;
+           break;
+-- 
+2.48.1
+

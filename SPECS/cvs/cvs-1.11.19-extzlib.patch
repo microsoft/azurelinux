@@ -1,0 +1,44 @@
+--- cvs-1.11.19/configure.in.old.old4	2005-02-01 00:10:49.000000000 +0100
++++ cvs-1.11.19/configure.in	2005-02-28 13:27:10.000000000 +0100
+@@ -1040,8 +1040,8 @@
+ 	  tools/Makefile \
+ 	  vms/Makefile \
+ 	  windows-NT/Makefile \
+-	  windows-NT/SCC/Makefile \
+-	  zlib/Makefile])
++	  windows-NT/SCC/Makefile
++	  ])
+ 
+ dnl and we're done
+ AC_OUTPUT
+--- cvs-1.11.19/Makefile.am.old.old4	2004-11-11 23:30:36.000000000 +0100
++++ cvs-1.11.19/Makefile.am	2005-02-28 13:25:32.000000000 +0100
+@@ -17,7 +17,7 @@
+ ## Subdirectories to run make in for the primary targets.
+ # Unix source subdirs, where we'll want to run lint and etags:
+ # This is a legacy variable from b4 Automake
+-USOURCE_SUBDIRS = lib zlib diff src
++USOURCE_SUBDIRS = lib diff src
+ # All other subdirs:
+ SUBDIRS = $(USOURCE_SUBDIRS) man doc contrib tools \
+ 	windows-NT os2 emx vms
+--- cvs-1.11.19/src/Makefile.am.old.old4	2005-01-31 23:07:35.000000000 +0100
++++ cvs-1.11.19/src/Makefile.am	2005-02-28 13:24:26.000000000 +0100
+@@ -24,7 +24,7 @@
+ # try and remove naming ocnflicts and fix Automake to allow particular includes
+ # to be attached only to particular object files.  Short term fix is either or.
+ ##INCLUDES = -I. -I.. -I$(srcdir) -I$(top_srcdir)/lib
+-INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/diff -I$(top_srcdir)/zlib $(includeopt)
++INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/diff $(includeopt)
+ 
+ bin_PROGRAMS = cvs
+ bin_SCRIPTS = cvsbug
+@@ -105,7 +105,7 @@
+ cvs_LDADD = \
+ 	../diff/libdiff.a \
+ 	../lib/libcvs.a \
+-	../zlib/libz.a
++	-lz
+ 
+ # extra clean targets
+ # wish this could be distclean-hdr-local but it's not part of automake

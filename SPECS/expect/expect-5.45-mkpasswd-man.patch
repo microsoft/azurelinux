@@ -1,0 +1,38 @@
+diff -up expect5.45/example/mkpasswd.man.mkpasswd-man expect5.45/example/mkpasswd.man
+--- expect5.45/example/mkpasswd.man.mkpasswd-man	2000-08-04 20:01:56.000000000 +0200
++++ expect5.45/example/mkpasswd.man	2013-08-13 16:36:26.860711972 +0200
+@@ -40,8 +40,8 @@ The following example creates a 20 chara
+ 
+ The
+ .B \-d
+-flag defines the minimum number of digits that must be in the password.
+-The default is 2.  The following example creates a password with at least
++flag defines the number of digits that must be in the password.
++The default is 2.  The following example creates a password with
+ 3 digits.
+ 
+ 	mkpasswd -d 3
+@@ -53,12 +53,12 @@ The default is 2.
+ 
+ The
+ .B \-C
+-flag defines the minimum number of uppercase alphabetic characters that must be in the password.
++flag defines the number of uppercase alphabetic characters that must be in the password.
+ The default is 2.
+ 
+ The
+ .B \-s
+-flag defines the minimum number of special characters that must be in the password.
++flag defines the number of special characters that must be in the password.
+ The default is 1.
+ 
+ The
+@@ -80,7 +80,7 @@ By default, it is suppressed.
+ 
+ .SH EXAMPLE
+ The following example creates a 15-character password
+-that contains at least 3 digits and 5 uppercase characters.
++that contains 3 digits and 5 uppercase characters.
+ 
+ 	mkpasswd -l 15 -d 3 -C 5
+ 

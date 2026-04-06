@@ -1,0 +1,115 @@
+commit 072f06abf713d7536ce2a84a5ac266f585c88d39
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Fri Dec 8 17:48:47 2017 -0500
+
+    Fix fallout from g_object_ref change
+
+    g_object_ref now returns the type of the object that was
+    passed. Introduce cast as necessary to avoid warnings due
+    to this.
+
+diff --git a/gtk/gtkcellrendererspin.c b/gtk/gtkcellrendererspin.c
+index 2a3961bf203cbe59..7129d05e3b2c1ae6 100644
+--- a/gtk/gtkcellrendererspin.c
++++ b/gtk/gtkcellrendererspin.c
+@@ -207,7 +207,8 @@ gtk_cell_renderer_spin_set_property (GObject      *object,
+ 	}
+ 
+       if (obj)
+-	priv->adjustment = g_object_ref_sink (obj);
++	priv->adjustment = GTK_ADJUSTMENT (g_object_ref_sink (obj));
++
+       break;
+     case PROP_CLIMB_RATE:
+       priv->climb_rate = g_value_get_double (value);
+diff --git a/gtk/gtkcomboboxtext.c b/gtk/gtkcomboboxtext.c
+index 9ffba687660c1214..5e75323c2c55d491 100644
+--- a/gtk/gtkcomboboxtext.c
++++ b/gtk/gtkcomboboxtext.c
+@@ -275,7 +275,7 @@ gtk_combo_box_text_buildable_custom_tag_start (GtkBuildable     *buildable,
+ 
+       parser_data = g_slice_new0 (ItemParserData);
+       parser_data->builder = g_object_ref (builder);
+-      parser_data->object = g_object_ref (buildable);
++      parser_data->object = (GObject *)g_object_ref (buildable);
+       parser_data->domain = gtk_builder_get_translation_domain (builder);
+       *parser = item_parser;
+       *data = parser_data;
+diff --git a/gtk/gtklabel.c b/gtk/gtklabel.c
+index c47de5924f6f0b49..879586b0d9855374 100644
+--- a/gtk/gtklabel.c
++++ b/gtk/gtklabel.c
+@@ -1336,7 +1336,7 @@ gtk_label_buildable_custom_tag_start (GtkBuildable     *buildable,
+ 
+       parser_data = g_slice_new0 (PangoParserData);
+       parser_data->builder = g_object_ref (builder);
+-      parser_data->object = g_object_ref (buildable);
++      parser_data->object = (GObject *) g_object_ref (buildable);
+       *parser = pango_parser;
+       *data = parser_data;
+       return TRUE;
+diff --git a/gtk/gtktoolpalette.c b/gtk/gtktoolpalette.c
+index b984193ca3375223..ba4e472dea4ebd77 100644
+--- a/gtk/gtktoolpalette.c
++++ b/gtk/gtktoolpalette.c
+@@ -734,7 +734,7 @@ gtk_tool_palette_add (GtkContainer *container,
+ 
+   g_ptr_array_add (palette->priv->groups, info);
+   info->pos = palette->priv->groups->len - 1;
+-  info->widget = g_object_ref_sink (child);
++  info->widget = (GtkToolItemGroup *)g_object_ref_sink (child);
+ 
+   gtk_widget_set_parent (child, GTK_WIDGET (palette));
+ }
+diff --git a/gtk/gtktreeview.c b/gtk/gtktreeview.c
+index 89301eb91d21c793..0d2d15b4883a7110 100644
+--- a/gtk/gtktreeview.c
++++ b/gtk/gtktreeview.c
+@@ -14147,7 +14147,7 @@ gtk_tree_view_set_search_entry (GtkTreeView *tree_view,
+ 
+   if (entry)
+     {
+-      tree_view->priv->search_entry = g_object_ref (entry);
++      tree_view->priv->search_entry = GTK_WIDGET (g_object_ref (entry));
+       tree_view->priv->search_custom_entry_set = TRUE;
+ 
+       if (tree_view->priv->search_entry_changed_id == 0)
+diff --git a/gtk/gtkwidget.c b/gtk/gtkwidget.c
+index d8f6023ba3ae164c..b6d7b815505760da 100644
+--- a/gtk/gtkwidget.c
++++ b/gtk/gtkwidget.c
+@@ -10686,7 +10686,7 @@ gtk_widget_buildable_custom_tag_start (GtkBuildable     *buildable,
+       AccelGroupParserData *parser_data;
+ 
+       parser_data = g_slice_new0 (AccelGroupParserData);
+-      parser_data->object = g_object_ref (buildable);
++      parser_data->object = (GObject *)g_object_ref (buildable);
+       *parser = accel_group_parser;
+       *data = parser_data;
+       return TRUE;
+diff --git a/modules/printbackends/cups/gtkprintbackendcups.c b/modules/printbackends/cups/gtkprintbackendcups.c
+index 2a000dc16ff57582..e081a70c45743fd2 100644
+--- a/modules/printbackends/cups/gtkprintbackendcups.c
++++ b/modules/printbackends/cups/gtkprintbackendcups.c
+@@ -3479,7 +3479,7 @@ cups_request_ppd (GtkPrinter *printer)
+   g_io_channel_set_encoding (data->ppd_io, NULL, NULL);
+   g_io_channel_set_close_on_unref (data->ppd_io, TRUE);
+ 
+-  data->printer = g_object_ref (printer);
++  data->printer = (GtkPrinterCups *) g_object_ref (printer);
+ 
+   resource = g_strdup_printf ("/printers/%s.ppd", 
+                               gtk_printer_cups_get_ppd_name (GTK_PRINTER_CUPS (printer)));
+diff --git a/tests/testentrycompletion.c b/tests/testentrycompletion.c
+index 36c41f78a42fb928..c556734b72ef71b0 100644
+--- a/tests/testentrycompletion.c
++++ b/tests/testentrycompletion.c
+@@ -237,7 +237,7 @@ animation_timer (GtkEntryCompletion *completion)
+ 	{
+ 	  g_print ("removing model!\n");
+ 
+-	  old_store = g_object_ref (gtk_entry_completion_get_model (completion));
++	  old_store = GTK_LIST_STORE (g_object_ref (gtk_entry_completion_get_model (completion)));
+ 	  gtk_entry_completion_set_model (completion, NULL);
+ 	}
+       else

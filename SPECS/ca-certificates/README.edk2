@@ -1,0 +1,13 @@
+This directory /etc/pki/ca-trust/extracted/edk2/ contains a
+CA certificate bundle file which is automatically created
+based on the information found in the
+/usr/share/pki/ca-trust-source/ and /etc/pki/ca-trust/source/
+directories.
+
+The file is in the EDK2 (EFI Development Kit II) file format.
+
+Please never manually edit the files stored in this directory,
+because your changes will be lost and the files automatically overwritten,
+each time the update-ca-trust command gets executed.
+
+Please refer to the update-ca-trust(8) manual page for additional information.

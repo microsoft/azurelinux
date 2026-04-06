@@ -1,0 +1,36 @@
+Description: explicit extern declaration for gt_numorbits
+Origin: debian
+Author: Jerome Benoit <calculus@rezozer.net>
+Last-Update: 2017-11-24
+
+--- a/labelg.c
++++ b/labelg.c
+@@ -91,7 +91,6 @@
+ 
+ static nauty_counter orbtotal;
+ static double unorbtotal;
+-extern int gt_numorbits;
+ 
+ /**************************************************************************/
+ 
+--- a/gtools-h.in
++++ b/gtools-h.in
+@@ -330,6 +330,7 @@
+ extern TLS_ATTR char *readg_line;
+ extern TLS_ATTR size_t ogf_linelen;
+ extern TLS_ATTR boolean is_pipe;
++extern TLS_ATTR int gt_numorbits;
+ 
+ #ifdef __cplusplus
+ }
+--- a/gtnauty.c
++++ b/gtnauty.c
+@@ -23,7 +23,7 @@
+ static int fuzz2[] = {006532,070236,035523,062437};
+ #define FUZZ2(x) ((x) ^ fuzz2[(x)&3])
+ 
+-int gt_numorbits;
++TLS_ATTR int gt_numorbits;
+ 
+ #ifdef REFINE
+ void REFINE(graph*,int*,int*,int,int*,int*,set*,int*,int,int);

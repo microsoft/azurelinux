@@ -1,0 +1,81 @@
+From 97cfa1700287075f2d87905aa895d570122ec725 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 11 Feb 2025 14:58:58 +0000
+Subject: [PATCH] Disable inclusion of AESM in installer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Disabling AESM will allow optionally building without the
+CppMicroServices dependency
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ linux/installer/common/psw-dcap/Makefile | 27 +-----------------------
+ psw/ae/Makefile                          |  4 ++--
+ 2 files changed, 3 insertions(+), 28 deletions(-)
+
+diff --git a/linux/installer/common/psw-dcap/Makefile b/linux/installer/common/psw-dcap/Makefile
+index a85c8b82..3ea22440 100644
+--- a/linux/installer/common/psw-dcap/Makefile
++++ b/linux/installer/common/psw-dcap/Makefile
+@@ -150,13 +150,7 @@ post_$(1): $(1) | $(PACKAGE_ROOT_PATH)
+ 	cp -fr $$|/$$</* $(DESTDIR)/$$< ) ||:
+ endef
+ 
+-AESM_SERVICE_PKGS:= $(AESM_PCE_PACKAGE)      \
+-                    $(AESM_EPID_PACKAGE)     \
+-                    $(AESM_ECDSA_PACKAGE)    \
+-                    $(AESM_LAUNCH_PACKAGE)   \
+-                    $(AESM_QUOTE_EX_PACKAGE) \
+-                    $(AESM_SERVICE_PACKAGE)  \
+-                    $(QE3_LOGIC_PACKAGE)     \
++AESM_SERVICE_PKGS:= $(QE3_LOGIC_PACKAGE)     \
+                     $(PCE_LOGIC_PACKAGE)
+ 
+ AE_PKGS:= $(AE_EPID_PACKAGE)                 \
+@@ -200,25 +194,6 @@ PHONY+=$(foreach PKG,$(ALL_PKGS),post_$(PKG))
+ 
+ PHONY+=install_$(AESM_SERVICE_PACKAGE)
+ install_$(AESM_SERVICE_PACKAGE): $(foreach PKG,$(AESM_SERVICE_PKGS),post_$(PKG))
+-	install -d $(shell readlink -m $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(VAR_OPT_PATH))
+-	install -d $(shell readlink -m $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(AESMD_CONF_PATH))
+-	sed -e "s:@aesm_folder@:$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm:"                                   \
+-		$(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/$(AESMD_CONF)    \
+-		> $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(AESMD_CONF_PATH)/$(AESMD_CONF)
+-	rm -f $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/$(AESMD_CONF)
+-	rm -f $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/$(AESMD_CONF_DEL)
+-	$(if $(wildcard $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/conf/*), \
+-		install -d $(shell readlink -m $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(ETC_DIR))                     && \
+-		cp -fr $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/conf/*    \
+-			$(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(ETC_DIR)                                             && \
+-		rm -fr $(DESTDIR)/$(AESM_SERVICE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm/conf)
+-	cd $(shell readlink -m $(DESTDIR)/$(AESM_ECDSA_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm) && \
+-	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_qe3.signed.so.$(QE3_MAJOR_VER))                         && \
+-	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_qe3.signed.so)
+-	cd $(shell readlink -m $(DESTDIR)/$(AESM_PCE_PACKAGE)/$(SGX_INSTALL_PATH)/$(AESM_SERVICE_PACKAGE)/aesm)   && \
+-	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_pce.signed.so.$(PCE_MAJOR_VER))                         && \
+-	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_pce.signed.so)                                          && \
+-	ln -fs liburts_internal.so libsgx_urts.so.$(URTS_MAJOR_VER)
+ 
+ PHONY+=install_$(DCAP_PCCS_PACKAGE)
+ install_$(DCAP_PCCS_PACKAGE): pre_$(DCAP_PCCS_PACKAGE) | $(PACKAGE_ROOT_PATH)
+diff --git a/psw/ae/Makefile b/psw/ae/Makefile
+index a810d6b9..82a07af1 100644
+--- a/psw/ae/Makefile
++++ b/psw/ae/Makefile
+@@ -46,9 +46,9 @@ endif
+ 
+ .PHONY: all
+ ifeq ($(BUILD_REF_LE), 1)
+-all: $(CMAKE_RESULT) AESM REF_LE COPY_AES| $(BUILD_DIR)
++all: $(CMAKE_RESULT) REF_LE COPY_AES| $(BUILD_DIR)
+ else
+-all: $(CMAKE_RESULT) AESM COPY_AES| $(BUILD_DIR)
++all: $(CMAKE_RESULT) COPY_AES| $(BUILD_DIR)
+ endif #($(BUILD_REF_LE), 1)
+ 
+ # COPY_AES: currently copy le, qe, pve, pce, qe3
+-- 
+2.52.0
+

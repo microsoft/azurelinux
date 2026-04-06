@@ -1,0 +1,37 @@
+2010-02-08  Roland McGrath  <roland@redhat.com>
+
+	* config/gnu-user.h (LINK_EH_SPEC): Pass --no-add-needed to the linker.
+	* config/alpha/elf.h (LINK_EH_SPEC): Likewise.
+	* config/ia64/linux.h (LINK_EH_SPEC): Likewise.
+
+--- gcc/config/alpha/elf.h.jj	2011-01-03 12:52:31.118056764 +0100
++++ gcc/config/alpha/elf.h	2011-01-04 18:14:10.931874160 +0100
+@@ -168,5 +168,5 @@ extern int alpha_this_gpdisp_sequence_nu
+    I imagine that other systems will catch up.  In the meantime, it
+    doesn't harm to make sure that the data exists to be used later.  */
+ #if defined(HAVE_LD_EH_FRAME_HDR)
+-#define LINK_EH_SPEC "%{!static|static-pie:--eh-frame-hdr} "
++#define LINK_EH_SPEC "--no-add-needed %{!static|static-pie:--eh-frame-hdr} "
+ #endif
+--- gcc/config/ia64/linux.h.jj	2011-01-03 13:02:11.462994522 +0100
++++ gcc/config/ia64/linux.h	2011-01-04 18:14:10.931874160 +0100
+@@ -76,7 +76,7 @@ do {						\
+    Signalize that because we have fde-glibc, we don't need all C shared libs
+    linked against -lgcc_s.  */
+ #undef LINK_EH_SPEC
+-#define LINK_EH_SPEC ""
++#define LINK_EH_SPEC "--no-add-needed "
+ 
+ #undef TARGET_INIT_LIBFUNCS
+ #define TARGET_INIT_LIBFUNCS ia64_soft_fp_init_libfuncs
+--- gcc/config/gnu-user.h.jj	2011-01-03 12:53:03.739057299 +0100
++++ gcc/config/gnu-user.h	2011-01-04 18:14:10.932814884 +0100
+@@ -106,7 +106,7 @@ see the files COPYING3 and COPYING.RUNTI
+ #define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
+ 
+ #if defined(HAVE_LD_EH_FRAME_HDR)
+-#define LINK_EH_SPEC "%{!static|static-pie:--eh-frame-hdr} "
++#define LINK_EH_SPEC "--no-add-needed %{!static|static-pie:--eh-frame-hdr} "
+ #endif
+ 
+ #define GNU_USER_TARGET_LINK_GCC_C_SEQUENCE_SPEC \

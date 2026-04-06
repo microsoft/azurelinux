@@ -1,0 +1,311 @@
+qt-bugs@ issue : none
+bugs.kde.org number : none
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+
+Support for _NET_WM_SYNC_REQUEST - allows the WM to find out when the app
+finished one redraw - less flicker during resize and with compositing
+also when opening a window.
+
+--- src/kernel/qwidget.h.sav	2007-06-22 14:14:05.000000000 +0200
++++ src/kernel/qwidget.h	2007-06-23 11:53:39.000000000 +0200
+@@ -586,6 +586,14 @@ private:
+     void	 destroyInputContext();
+     void	 focusInputContext();
+     void	 checkChildrenDnd();
++
++#ifndef QT_NO_XSYNC
++    void        createSyncCounter();
++    void        destroySyncCounter();
++    void        incrementSyncCounter();
++    void        handleSyncRequest( void* ev );
++#endif
++
+ #elif defined(Q_WS_MAC)
+     uint    own_id : 1, macDropEnabled : 1;
+     EventHandlerRef window_event;
+@@ -962,8 +970,12 @@ struct Q_EXPORT QTLWExtra {
+     uint     uspos : 1;				// User defined position
+     uint     ussize : 1;			// User defined size
+ #if defined(QT_NO_IM_EXTENSIONS)
+     void    *xic;				// Input Context
+ #endif
++#ifndef QT_NO_XSYNC
++    ulong    syncCounter;
++    uint     syncRequestValue[2];
++#endif
+ #endif
+ #if defined(Q_WS_MAC)
+     WindowGroupRef group;
+--- src/kernel/qt_x11_p.h.sav	2007-02-23 14:01:18.000000000 +0100
++++ src/kernel/qt_x11_p.h	2007-06-23 11:53:39.000000000 +0200
+@@ -174,6 +174,11 @@ extern "C" {
+ #endif // QT_NO_XRENDER
+ 
+ 
++#ifndef QT_NO_XSYNC
++#  include <X11/extensions/sync.h>
++#endif // QT_NO_XSYNC
++
++
+ #ifndef QT_NO_XKB
+ #  include <X11/XKBlib.h>
+ #endif // QT_NO_XKB
+--- src/kernel/qwidget_x11.cpp.sav	2007-04-16 13:47:26.000000000 +0200
++++ src/kernel/qwidget_x11.cpp	2007-06-23 19:48:44.000000000 +0200
+@@ -87,6 +87,12 @@ static QWidget *keyboardGrb = 0;
+ extern Time qt_x_time;
+ extern Time qt_x_user_time;
+ 
++#ifndef QT_NO_XSYNC
++extern Atom qt_net_wm_sync_request_counter;
++extern Atom qt_net_wm_sync_request;
++extern bool qt_use_xsync;
++#endif
++
+ // defined in qfont_x11.cpp
+ extern bool qt_has_xft;
+ 
+@@ -595,11 +601,14 @@ void QWidget::create( WId window, bool i
+ 
+ 	XResizeWindow( dpy, id, crect.width(), crect.height() );
+ 	XStoreName( dpy, id, qAppName() );
+-	Atom protocols[4];
++	Atom protocols[5];
+ 	int n = 0;
+ 	protocols[n++] = qt_wm_delete_window;	// support del window protocol
+ 	protocols[n++] = qt_wm_take_focus;	// support take focus window protocol
+ 	protocols[n++] = qt_net_wm_ping;	// support _NET_WM_PING protocol
++#ifndef QT_NO_XSYNC
++	protocols[n++] = qt_net_wm_sync_request;// support the _NET_WM_SYNC_REQUEST protocol
++#endif
+ 	if ( testWFlags( WStyle_ContextHelp ) )
+ 	    protocols[n++] = qt_net_wm_context_help;
+ 	XSetWMProtocols( dpy, id, protocols, n );
+@@ -625,6 +634,14 @@ void QWidget::create( WId window, bool i
+ 	XChangeProperty(dpy, id, qt_net_wm_pid, XA_CARDINAL, 32, PropModeReplace,
+ 			(unsigned char *) &curr_pid, 1);
+ 
++#ifndef QT_NO_XSYNC
++        // set _NET_WM_SYNC_COUNTER
++        createSyncCounter();
++        long counterVal = topData()->syncCounter;
++        XChangeProperty( dpy, id, qt_net_wm_sync_request_counter, XA_CARDINAL, 32, PropModeReplace,
++                         (unsigned char*) &counterVal, 1);
++#endif
++
+ 	// when we create a toplevel widget, the frame strut should be dirty
+ 	fstrut_dirty = 1;
+ 
+@@ -720,6 +737,9 @@ void QWidget::destroy( bool destroyWindo
+ 	    if ( destroyWindow )
+ 		qt_XDestroyWindow( this, x11Display(), winid );
+ 	}
++#ifndef QT_NO_XSYNC
++        destroySyncCounter();
++#endif
+ 	setWinId( 0 );
+ 
+ 	extern void qPRCleanup( QWidget *widget ); // from qapplication_x11.cpp
+@@ -769,6 +789,10 @@ void QWidget::reparentSys( QWidget *pare
+         destroyInputContext();
+     }
+ 
++#ifndef QT_NO_XSYNC
++    destroySyncCounter();
++#endif
++
+     if ( isTopLevel() || !parent ) // we are toplevel, or reparenting to toplevel
+         topData()->parentWinId = 0;
+ 
+@@ -2456,8 +2480,13 @@ void QWidget::createTLSysExtra()
+ {
+ #if defined(QT_NO_IM_EXTENSIONS)
+     // created lazily
+     extra->topextra->xic = 0;
+ #endif
++#ifndef QT_NO_XSYNC
++    extra->topextra->syncCounter = 0;
++    extra->topextra->syncRequestValue[0] = 0;
++    extra->topextra->syncRequestValue[1] = 0;
++#endif
+ }
+ 
+ void QWidget::deleteTLSysExtra()
+@@ -2501,6 +2530,51 @@ void QWidget::checkChildrenDnd()
+     }
+ }
+ 
++
++#ifndef QT_NO_XSYNC
++// create a window's XSyncCounter
++void QWidget::createSyncCounter()
++{
++    if( !qt_use_xsync || !isTopLevel() || topData()->syncCounter )
++        return;
++    XSyncValue zero;
++    XSyncIntToValue( &zero, 0 );
++    topData()->syncCounter = XSyncCreateCounter( x11Display(), zero );
++}
++
++// destroy a window's XSyncCounter
++void QWidget::destroySyncCounter()
++{
++    if( !qt_use_xsync || !extra || !extra->topextra
++        || !extra->topextra->syncCounter )
++        return;
++    XSyncDestroyCounter( x11Display(), extra->topextra->syncCounter );
++    extra->topextra->syncCounter = 0;
++}
++
++// increment a window's XSyncCounter
++void QWidget::incrementSyncCounter()
++{
++    if( qt_use_xsync && topData()->syncCounter &&
++        !(topData()->syncRequestValue[0] == 0 &&
++         topData()->syncRequestValue[1] == 0) ) {
++        XSyncValue val;
++        XSyncIntsToValue( &val, topData()->syncRequestValue[ 0 ], topData()->syncRequestValue[ 1 ] );
++        XSyncSetCounter( x11Display(), topData()->syncCounter, val );
++        topData()->syncRequestValue[0] = topData()->syncRequestValue[1] = 0;
++    }
++}
++
++// handle _NET_WM_SYNC_REQUEST
++void QWidget::handleSyncRequest( void* ev )
++{
++    XEvent* xev = (XEvent*)ev;
++    topData()->syncRequestValue[ 0 ] = xev->xclient.data.l[ 2 ];
++    topData()->syncRequestValue[ 1 ] = xev->xclient.data.l[ 3 ];
++}
++#endif  // QT_NO_XSYNC
++
++
+ /*!
+     \property QWidget::acceptDrops
+     \brief whether drop events are enabled for this widget
+--- src/kernel/qapplication_x11.cpp.sav	2007-04-16 13:47:26.000000000 +0200
++++ src/kernel/qapplication_x11.cpp	2007-06-23 19:49:15.000000000 +0200
+@@ -285,6 +285,11 @@ Atom		*qt_net_supported_list	= 0;
+ Window		*qt_net_virtual_root_list	= 0;
+ 
+ 
++// X11 SYNC support
++#ifndef QT_NO_XSYNC
++Atom		qt_net_wm_sync_request_counter	= 0;
++Atom		qt_net_wm_sync_request     	= 0;
++#endif
+ 
+ // client leader window
+ Window qt_x11_wm_client_leader = 0;
+@@ -309,6 +314,13 @@ static int xrandr_eventbase;
+ // Display
+ Q_EXPORT bool qt_use_xrender = FALSE;
+ 
++#ifndef QT_NO_XSYNC
++// True if SYNC extension exists on the connected display
++bool qt_use_xsync = FALSE;
++static int xsync_eventbase;
++static int xsync_errorbase;
++#endif
++
+ // modifier masks for alt/meta - detected when the application starts
+ static long qt_alt_mask = 0;
+ static long qt_meta_mask = 0;
+@@ -1938,6 +1950,11 @@ void qt_init_internal( int *argcptr, cha
+ 	qt_x11_intern_atom( "UTF8_STRING", &qt_utf8_string );
+         qt_x11_intern_atom( "_SGI_DESKS_MANAGER", &qt_sgi_desks_manager );
+ 
++#ifndef QT_NO_XSYNC
++	qt_x11_intern_atom( "_NET_WM_SYNC_REQUEST_COUNTER", &qt_net_wm_sync_request_counter );
++	qt_x11_intern_atom( "_NET_WM_SYNC_REQUEST", &qt_net_wm_sync_request );
++#endif
++
+ 	qt_xdnd_setup();
+ 	qt_x11_motifdnd_init();
+ 
+@@ -1974,6 +1991,15 @@ void qt_init_internal( int *argcptr, cha
+ 	}
+ #endif // QT_NO_XRENDER
+ 
++#ifndef QT_NO_XSYNC
++	// Try to initialize SYNC extension on the connected display
++	int xsync_major, xsync_minor;
++	if ( XSyncQueryExtension( appDpy, &xsync_eventbase, &xsync_errorbase ) && 
++	     XSyncInitialize( appDpy, &xsync_major,  &xsync_minor ) ) {
++	     qt_use_xsync = TRUE;
++	}
++#endif 
++
+ #ifndef QT_NO_XKB
+ 	// If XKB is detected, set the GrabsUseXKBState option so input method
+ 	// compositions continue to work (ie. deadkeys)
+@@ -3141,6 +3167,10 @@ int QApplication::x11ClientMessage(QWidg
+ 		    XSendEvent( event->xclient.display, event->xclient.window,
+ 				False, SubstructureNotifyMask|SubstructureRedirectMask, event );
+ 		}
++#ifndef QT_NO_XSYNC
++	    } else if (a == qt_net_wm_sync_request ) {
++		    widget->handleSyncRequest( event );
++#endif
+ 	    }
+ 	} else if ( event->xclient.message_type == qt_qt_scrolldone ) {
+ 	    widget->translateScrollDoneEvent(event);
+@@ -5681,6 +5711,21 @@ bool QETWidget::translateScrollDoneEvent
+     return FALSE;
+ }
+ 
++#if defined(Q_C_CALLBACKS)
++extern "C" {
++#endif
++#ifndef QT_NO_XSYNC
++static Bool qt_net_wm_sync_request_scanner(Display*, XEvent* event, XPointer arg)
++{
++    return (event->type == ClientMessage && event->xclient.window == *(Window*)arg
++        && event->xclient.message_type == qt_wm_protocols
++        && event->xclient.data.l[ 0 ] == qt_net_wm_sync_request );
++}
++#endif
++
++#if defined(Q_C_CALLBACKS)
++}
++#endif
+ 
+ //
+ // ConfigureNotify (window move and resize) event translation
+@@ -5712,6 +5757,7 @@ bool QETWidget::translateConfigEvent( co
+         if (! extra || extra->compress_events) {
+             // ConfigureNotify compression for faster opaque resizing
+             XEvent otherEvent;
++            int compressed_configs = 0;
+             while ( XCheckTypedWindowEvent( x11Display(), winId(), ConfigureNotify,
+                                             &otherEvent ) ) {
+                 if ( qt_x11EventFilter( &otherEvent ) )
+@@ -5732,7 +5778,18 @@ bool QETWidget::translateConfigEvent( co
+                     newCPos.ry() = otherEvent.xconfigure.y +
+                                    otherEvent.xconfigure.border_width;
+                 }
++                ++compressed_configs;
++            }
++#ifndef QT_NO_XSYNC
++            // _NET_WM_SYNC_REQUEST compression 
++            Window wid = winId();
++            while ( compressed_configs &&
++                    XCheckIfEvent( x11Display(), &otherEvent,
++                    qt_net_wm_sync_request_scanner, (XPointer)&wid ) ) {
++                handleSyncRequest( (void*)&otherEvent );
++                --compressed_configs;
+             }
++#endif
+         }
+ 
+ 	QRect cr ( geometry() );
+@@ -5786,6 +5843,8 @@ bool QETWidget::translateConfigEvent( co
+ 	repaint( !testWFlags(WResizeNoErase) || transbg );
+     }
+ 
++    incrementSyncCounter();
++
+     return TRUE;
+ }
+ 

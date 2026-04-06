@@ -1,0 +1,14 @@
+[Unit]
+Description=Kerberos 5 KDC
+Wants=network-online.target
+After=syslog.target network.target network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/krb5kdc.pid
+EnvironmentFile=-/etc/sysconfig/krb5kdc
+ExecStart=/usr/sbin/krb5kdc -P /run/krb5kdc.pid $KRB5KDC_ARGS
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

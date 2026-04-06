@@ -1,0 +1,55 @@
+From: =?UTF-8?q?Timoth=C3=A9e=20Floure?= <timothee.floure@fnux.ch>
+Date: Sun, 19 Aug 2018 12:22:21 +0200
+Subject: [PATCH] Enforce Fedora CA bundle
+
+
+diff --git a/src/certifi.erl b/src/certifi.erl
+index 431b941..2c6c944 100644
+--- a/src/certifi.erl
++++ b/src/certifi.erl
+@@ -14,16 +14,7 @@
+ -spec cacertfile() -> Result when
+ 	Result :: file:filename_all().
+ cacertfile() ->
+-  PrivDir = case code:priv_dir(certifi) of
+-    {error, _} ->
+-      %% try to get relative priv dir. useful for tests.
+-      AppDir = filename:dirname(
+-                 filename:dirname(code:which(?MODULE))
+-                ),
+-      filename:join(AppDir, "priv");
+-    Dir -> Dir
+-  end,
+-  filename:join(PrivDir, "cacerts.pem").
++  "/etc/ssl/certs/ca-bundle.crt".
+ 
+ %% @doc CACerts builds an X.509 certificate list containing the Mozilla CA
+ %% Certificate.
+diff --git a/src/certifi_pt.erl b/src/certifi_pt.erl
+index 3566ecf..d39a4e3 100644
+--- a/src/certifi_pt.erl
++++ b/src/certifi_pt.erl
+@@ -5,7 +5,7 @@ parse_transform(Forms, _Opts) ->
+   [replace_cacerts(Form) || Form <- Forms].
+ 
+ replace_cacerts({function, Ann, cacerts, 0, [_]}) ->
+-  {ok, Binary} = file:read_file(cert_file() ),
++  {ok, Binary} = file:read_file("/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"),
+   Pems = public_key:pem_decode(Binary),
+   Cacerts = [Der || {'Certificate', Der, _} <- Pems],
+   Body = lists:foldl(fun(Cert, Acc) ->
+@@ -15,14 +15,6 @@ replace_cacerts({function, Ann, cacerts, 0, [_]}) ->
+ replace_cacerts(Other) ->
+   Other.
+ 
+--spec cert_file() -> Result when
+-	Result :: file:filename_all().
+-cert_file() ->
+-  AppDir = filename:dirname(
+-             filename:dirname(code:which(?MODULE))
+-            ),
+-  filename:join([AppDir, "priv", "cacerts.pem"]).
+-
+ -spec cert_to_bin_ast(Cert) -> Result when
+ 	Cert :: binary(),
+ 	Result :: {bin, 0, [{bin_element, 0, {string, 0, list()}, default, default}]}.

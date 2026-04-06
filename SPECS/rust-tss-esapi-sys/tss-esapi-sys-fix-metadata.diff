@@ -1,0 +1,11 @@
+--- tss-esapi-sys-0.5.0/Cargo.toml.orig	2024-01-15 12:55:40.018573768 +0000
++++ tss-esapi-sys-0.5.0/Cargo.toml	2024-01-15 12:56:02.501753357 +0000
+@@ -33,7 +33,7 @@
+ repository = "https://github.com/parallaxsecond/rust-tss-esapi"
+ 
+ [build-dependencies.bindgen]
+-version = "0.66.1"
++version = "0.68.1"
+ optional = true
+ 
+ [build-dependencies.pkg-config]

@@ -1,0 +1,18 @@
+diff -up ./bin/php-parse.rpm ./bin/php-parse
+--- ./bin/php-parse.rpm	2016-04-19 15:41:41.000000000 +0200
++++ ./bin/php-parse	2016-04-20 06:33:22.712063600 +0200
+@@ -1,12 +1,7 @@
+ #!/usr/bin/env php
+ <?php
+ 
+-foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+-    if (file_exists($file)) {
+-        require $file;
+-        break;
+-    }
+-}
++require '/usr/share/php/PhpParser5/autoload.php';
+ 
+ ini_set('xdebug.max_nesting_level', 3000);
+ 
+

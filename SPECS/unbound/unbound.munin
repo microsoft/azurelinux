@@ -1,0 +1,11 @@
+#
+# For this plugin to work, unbound.conf needs to have:
+# remote-control:	control-enable: yes
+# 
+[unbound*]
+user root
+env.statefile /var/lib/munin/plugin-state/unbound-state
+env.unbound_conf /etc/unbound/unbound.conf
+env.unbound_control /usr/sbin/unbound-control
+env.spoof_warn 1000
+env.spoof_crit 100000

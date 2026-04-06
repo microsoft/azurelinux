@@ -1,0 +1,21 @@
+diff -up wrk/mpn/m4-ccas.wrk wrk/mpn/m4-ccas
+--- wrk/mpn/m4-ccas.wrk	2015-04-02 16:44:03.645305407 +0200
++++ wrk/mpn/m4-ccas	2015-04-02 16:21:57.893870969 +0200
+@@ -104,4 +104,4 @@ echo "$CC"
+ $CC || exit
+ 
+ # Comment this out to preserve .s intermediates
+-rm -f $TMP
++#rm -f $TMP
+diff -up wrk/mpn/Makeasm.am.wrk wrk/mpn/Makeasm.am
+--- wrk/mpn/Makeasm.am.wrk	2015-04-02 16:42:41.692278742 +0200
++++ wrk/mpn/Makeasm.am	2015-04-02 16:21:57.891870945 +0200
+@@ -66,7 +66,7 @@ SUFFIXES = .s .S .asm
+ 
+ 
+ # can be overridden during development, eg. "make RM_TMP=: mul_1.lo"
+-RM_TMP = rm -f
++RM_TMP = true
+ 
+ 
+ # .S assembler, preprocessed with cpp.

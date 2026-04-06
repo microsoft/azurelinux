@@ -1,0 +1,10 @@
+[Unit]
+Description=Telnet Server Activation Socket
+Documentation=man:telnetd(8)
+
+[Socket]
+ListenStream=23
+Accept=true
+
+[Install]
+WantedBy=sockets.target

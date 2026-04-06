@@ -1,0 +1,26 @@
+From 223b0aab7b431dc1d1d4eb5fb12db5ae30463c5b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 18 May 2021 12:00:07 +0200
+Subject: [PATCH] Normalize shebangs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ bin/biber | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bin/biber b/bin/biber
+index 873550b..48b4419 100755
+--- a/bin/biber
++++ b/bin/biber
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!perl
+ 
+ use v5.24;
+ use strict;
+-- 
+2.26.3
+

@@ -1,0 +1,36 @@
+From abee31b9d76be9d7518883358037421cded1d97f Mon Sep 17 00:00:00 2001
+Message-ID: <abee31b9d76be9d7518883358037421cded1d97f.1761772186.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Tue, 4 Feb 2025 10:17:18 +0100
+Subject: [PATCH] pdf_choice_widget_options2: avoid core dump with
+ _GLIBCXX_ASSERTIONS
+
+From a C programmer's view, &opts[0] == opts, but for the vector class
+in stdc++ there is a difference in if, where and when the existence of a
+zeroth element is checked. This matters for "empty" vectors only, but
+depending on g++/stdc++ version and flags this may throw an unexpected
+assertion and abort on run time. Noticed with gcc 15 on Fedora rawhide
+(42).
+
+Replace &opts[0] by opts.data() which gives the pointer to the data
+storage of the vector, which is what pdf_choice_widget_options expects.
+---
+ scripts/wrap/cpp.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/wrap/cpp.py b/scripts/wrap/cpp.py
+index 5ff6f30b4..0d6823282 100644
+--- a/scripts/wrap/cpp.py
++++ b/scripts/wrap/cpp.py
+@@ -1263,7 +1263,7 @@ g_extra_definitions = textwrap.dedent(f'''
+         {{
+             int n = pdf_choice_widget_options(ctx, tw, exportval, nullptr);
+             std::vector<const char*> opts(n);
+-            int n2 = pdf_choice_widget_options(ctx, tw, exportval, &opts[0]);
++            int n2 = pdf_choice_widget_options(ctx, tw, exportval, opts.data());
+             assert(n2 == n);
+             std::vector<std::string> ret(n);
+             for (int i=0; i<n; ++i)
+-- 
+2.51.2.1007.g590f8df4db
+

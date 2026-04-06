@@ -1,0 +1,609 @@
+From 9d31f90e71a4a3eadc3224db8800a8fa7fbdbb03 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 10 Feb 2025 11:55:37 +0900
+Subject: [PATCH] nettle-3.10-hobble-to-configure.patch
+
+Signed-off-by: rpm-build <rpm-build>
+---
+ Makefile.in                   | 16 +++++----
+ configure.ac                  | 64 ++++++++++++++++++++++++++++++++++-
+ examples/ecc-benchmark.c      |  4 +++
+ examples/hogweed-benchmark.c  |  6 ++++
+ examples/nettle-benchmark.c   | 16 +++++++--
+ nettle-meta-aeads.c           |  2 ++
+ nettle-meta-ciphers.c         |  2 ++
+ nettle-meta-hashes.c          |  2 ++
+ nettle-meta-macs.c            |  2 ++
+ testsuite/Makefile.in         |  5 ++-
+ testsuite/ecdh-test.c         |  4 +++
+ testsuite/ecdsa-sign-test.c   |  6 ++++
+ testsuite/ecdsa-verify-test.c |  4 +++
+ testsuite/gcm-test.c          |  2 ++
+ testsuite/hmac-test.c         |  2 ++
+ testsuite/meta-aead-test.c    |  2 ++
+ testsuite/meta-cipher-test.c  |  4 ++-
+ testsuite/meta-hash-test.c    |  2 ++
+ testsuite/meta-mac-test.c     |  2 ++
+ testsuite/testutils.c         | 10 +++++-
+ 20 files changed, 145 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 71ad761..1e9ed61 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -117,17 +117,16 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c aes-decrypt-table.c \
+ 		 gcm-aes256.c gcm-aes256-meta.c \
+ 		 gcm-camellia128.c gcm-camellia128-meta.c \
+ 		 gcm-camellia256.c gcm-camellia256-meta.c \
+-		 gcm-sm4.c gcm-sm4-meta.c \
+ 		 cmac.c cmac64.c cmac-aes128.c cmac-aes256.c cmac-des3.c \
+ 		 cmac-aes128-meta.c cmac-aes256-meta.c cmac-des3-meta.c \
+ 		 gost28147.c gosthash94.c gosthash94-meta.c \
+ 		 hmac.c hmac-gosthash94.c hmac-md5.c hmac-ripemd160.c \
+ 		 hmac-sha1.c hmac-sha224.c hmac-sha256.c hmac-sha384.c \
+-		 hmac-sha512.c hmac-streebog.c hmac-sm3.c \
++		 hmac-sha512.c hmac-streebog.c \
+ 		 hmac-md5-meta.c hmac-ripemd160-meta.c hmac-sha1-meta.c \
+ 		 hmac-sha224-meta.c hmac-sha256-meta.c hmac-sha384-meta.c \
+ 		 hmac-sha512-meta.c hmac-gosthash94-meta.c \
+-		 hmac-streebog-meta.c hmac-sm3-meta.c \
++		 hmac-streebog-meta.c \
+ 		 knuth-lfib.c hkdf.c \
+ 		 md2.c md2-meta.c md4.c md4-meta.c \
+ 		 md5.c md5-compat.c md5-meta.c \
+@@ -153,12 +152,10 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c aes-decrypt-table.c \
+ 		 sha3-224.c sha3-224-meta.c sha3-256.c sha3-256-meta.c \
+ 		 sha3-384.c sha3-384-meta.c sha3-512.c sha3-512-meta.c \
+ 		 sha3-shake.c shake128.c shake256.c \
+-		 sm3.c sm3-meta.c \
+ 		 serpent-set-key.c serpent-encrypt.c serpent-decrypt.c \
+ 		 serpent-meta.c \
+ 		 streebog.c streebog-meta.c \
+ 		 twofish.c twofish-meta.c \
+-		 sm4.c sm4-meta.c \
+ 		 umac-nh.c umac-nh-n.c umac-l2.c umac-l3.c \
+ 		 umac-poly64.c umac-poly128.c umac-set-key.c \
+ 		 umac32.c umac64.c umac96.c umac128.c \
+@@ -205,7 +202,7 @@ hogweed_SOURCES = sexp.c sexp-format.c \
+ 		  ecc-mod-arith.c ecc-pp1-redc.c ecc-pm1-redc.c \
+ 		  ecc-curve25519.c ecc-curve448.c \
+ 		  ecc-gost-gc256b.c ecc-gost-gc512a.c \
+-		  ecc-secp192r1.c ecc-secp224r1.c ecc-secp256r1.c \
++		  ecc-secp256r1.c \
+ 		  ecc-secp384r1.c ecc-secp521r1.c \
+ 		  ecc-size.c ecc-j-to-a.c ecc-a-to-j.c \
+ 		  ecc-dup-jj.c ecc-add-jja.c ecc-add-jjj.c ecc-nonsec-add-jjj.c \
+@@ -228,6 +225,13 @@ hogweed_SOURCES = sexp.c sexp-format.c \
+ 		  ed448-shake256.c ed448-shake256-pubkey.c \
+ 		  ed448-shake256-sign.c ed448-shake256-verify.c
+ 
++
++nettle_SOURCES += @IF_SM3@ hmac-sm3.c hmac-sm3-meta.c sm3.c sm3-meta.c
++nettle_SOURCES += @IF_SM4@ gcm-sm4.c gcm-sm4-meta.c sm4.c sm4-meta.c
++
++hogweed_SOURCES += @IF_ECC_SECP192R1@ ecc-secp192r1.c
++hogweed_SOURCES += @IF_ECC_SECP224R1@ ecc-secp224r1.c
++
+ OPT_SOURCES = fat-arm.c fat-arm64.c fat-ppc.c fat-s390x.c fat-x86_64.c mini-gmp.c
+ 
+ HEADERS = aes.h arcfour.h arctwo.h asn1.h blowfish.h balloon.h \
+diff --git a/configure.ac b/configure.ac
+index 7c003bb..105640e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -124,6 +124,22 @@ AC_ARG_ENABLE(mini-gmp,
+   AS_HELP_STRING([--enable-mini-gmp], [Enable mini-gmp, used instead of libgmp.]),,
+   [enable_mini_gmp=no])
+ 
++AC_ARG_ENABLE(sm3,
++  AS_HELP_STRING([--disable-sm3], [Disable SM3 hash algorithm]),,
++  [enable_sm3=yes])
++
++AC_ARG_ENABLE(sm4,
++  AS_HELP_STRING([--disable-sm4], [Disable SM4 symmetric cipher algorithm]),,
++  [enable_sm4=yes])
++
++AC_ARG_ENABLE(ecc-secp192r1,
++  AS_HELP_STRING([--disable-ecc-secp192r1], [Disable NIST secp192r1 curve]),,
++  [enable_ecc_secp192r1=yes])
++
++AC_ARG_ENABLE(ecc-secp224r1,
++  AS_HELP_STRING([--disable-ecc-secp224r1], [Disable NIST secp224r1 curve]),,
++  [enable_ecc_secp224r1=yes])
++
+ AC_ARG_VAR(ASM_FLAGS, [Extra flags for processing assembly source files])
+ 
+ if test "x$enable_mini_gmp" = xyes ; then
+@@ -616,9 +632,15 @@ asm_nettle_optional_list="cpuid.asm cpu-facility.asm \
+ 
+ asm_hogweed_optional_list=""
+ if test "x$enable_public_key" = "xyes" ; then
+-  asm_hogweed_optional_list="ecc-secp192r1-modp.asm ecc-secp224r1-modp.asm \
++  asm_hogweed_optional_list="\
+     ecc-secp256r1-redc.asm ecc-secp384r1-modp.asm ecc-secp521r1-modp.asm \
+     ecc-curve25519-modp.asm ecc-curve448-modp.asm"
++  if test "x$enable_ecc_secp192r1" = "xyes" ; then
++    asm_hogweed_optional_list="ecc-secp192r1-modp.asm $asm_hogweed_optional_list"
++  fi
++  if test "x$enable_ecc_secp224r1" = "xyes" ; then
++    asm_hogweed_optional_list="ecc-secp224r1-modp.asm $asm_hogweed_optional_list"
++  fi
+ fi
+ 
+ OPT_NETTLE_OBJS=""
+@@ -1157,6 +1179,42 @@ else
+   IF_MINI_GMP='#'
+ fi
+   
++AH_TEMPLATE([WITH_SM3], [Defined if SM3 hash algorithm is enabled])
++
++if test "x$enable_sm3" = xyes ; then
++  AC_DEFINE(WITH_SM3)
++  IF_SM3=''
++else
++  IF_SM3='#'
++fi
++
++AH_TEMPLATE([WITH_SM4], [Defined if SM4 symmetric cipher is enabled])
++
++if test "x$enable_sm4" = xyes ; then
++  AC_DEFINE(WITH_SM4)
++  IF_SM4=''
++else
++  IF_SM4='#'
++fi
++
++AH_TEMPLATE([WITH_ECC_SECP192R1], [Defined if NIST secp192r1 curve is enabled])
++
++if test "x$enable_ecc_secp192r1" = xyes ; then
++  AC_DEFINE(WITH_ECC_SECP192R1)
++  IF_ECC_SECP192R1=''
++else
++  IF_ECC_SECP192R1='#'
++fi
++
++AH_TEMPLATE([WITH_ECC_SECP224R1], [Defined if NIST secp224r1 curve is enabled])
++
++if test "x$enable_ecc_secp224r1" = xyes ; then
++  AC_DEFINE(WITH_ECC_SECP224R1)
++  IF_ECC_SECP224R1=''
++else
++  IF_ECC_SECP224R1='#'
++fi
++
+ AC_SUBST(IF_HOGWEED)
+ AC_SUBST(IF_STATIC)
+ AC_SUBST(IF_SHARED)
+@@ -1165,6 +1223,10 @@ AC_SUBST(IF_DLOPEN_TEST)
+ AC_SUBST(IF_DOCUMENTATION)
+ AC_SUBST(IF_DLL)
+ AC_SUBST(IF_MINI_GMP)
++AC_SUBST(IF_SM3)
++AC_SUBST(IF_SM4)
++AC_SUBST(IF_ECC_SECP192R1)
++AC_SUBST(IF_ECC_SECP224R1)
+ 
+ OPENSSL_LIBFLAGS=''
+ 
+diff --git a/examples/ecc-benchmark.c b/examples/ecc-benchmark.c
+index 7e857f8..ebcced6 100644
+--- a/examples/ecc-benchmark.c
++++ b/examples/ecc-benchmark.c
+@@ -314,8 +314,12 @@ bench_curve (const struct ecc_curve *ecc)
+ }
+ 
+ const struct ecc_curve * const curves[] = {
++#if WITH_ECC_SECP192R1
+   &_nettle_secp_192r1,
++#endif
++#if WITH_ECC_SECP224R1
+   &_nettle_secp_224r1,
++#endif
+   &_nettle_curve25519,
+   &_nettle_secp_256r1,
+   &_nettle_secp_384r1,
+diff --git a/examples/hogweed-benchmark.c b/examples/hogweed-benchmark.c
+index 3f85883..df608ff 100644
+--- a/examples/hogweed-benchmark.c
++++ b/examples/hogweed-benchmark.c
+@@ -410,6 +410,7 @@ bench_ecdsa_init (unsigned size)
+ 
+   switch (size)
+     {
++#if WITH_ECC_SECP192R1
+     case 192:
+       ecc = &_nettle_secp_192r1;
+       xs = "8e8e07360350fb6b7ad8370cfd32fa8c6bba785e6e200599";
+@@ -418,6 +419,8 @@ bench_ecdsa_init (unsigned size)
+       ctx->digest = hash_string (&nettle_sha1, "abc");
+       ctx->digest_size = 20;
+       break;
++#endif
++#if WITH_ECC_SECP224R1
+     case 224:
+       ecc = &_nettle_secp_224r1;
+       xs = "993bf363f4f2bc0f255f22563980449164e9c894d9efd088d7b77334";
+@@ -426,6 +429,7 @@ bench_ecdsa_init (unsigned size)
+       ctx->digest = hash_string (&nettle_sha224, "abc");
+       ctx->digest_size = 28;
+       break;
++#endif
+ 
+       /* From RFC 4754 */
+     case 256:
+@@ -864,7 +868,9 @@ struct alg alg_list[] = {
+ #if 0
+   { "dsa",2048, bench_dsa_init, bench_dsa_sign,   bench_dsa_verify, bench_dsa_clear },
+ #endif
++#if WITH_ECC_SECP192R1
+   { "ecdsa",  192, bench_ecdsa_init, bench_ecdsa_sign, bench_ecdsa_verify, bench_ecdsa_clear },
++#endif
+   { "ecdsa",  224, bench_ecdsa_init, bench_ecdsa_sign, bench_ecdsa_verify, bench_ecdsa_clear },
+   { "ecdsa",  256, bench_ecdsa_init, bench_ecdsa_sign, bench_ecdsa_verify, bench_ecdsa_clear },
+   { "ecdsa",  384, bench_ecdsa_init, bench_ecdsa_sign, bench_ecdsa_verify, bench_ecdsa_clear },
+diff --git a/examples/nettle-benchmark.c b/examples/nettle-benchmark.c
+index 2a11a69..66f92f6 100644
+--- a/examples/nettle-benchmark.c
++++ b/examples/nettle-benchmark.c
+@@ -901,6 +901,18 @@ bench_ghash_update(void)
+ # define OPENSSL(x)
+ #endif
+ 
++#if WITH_SM3
++# define SM3(x) x,
++#else
++# define SM3(x)
++#endif
++
++#if WITH_SM4
++# define SM4(x) x,
++#else
++# define SM4(x)
++#endif
++
+ int
+ main(int argc, char **argv)
+ {
+@@ -920,7 +932,7 @@ main(int argc, char **argv)
+       &nettle_sha3_384, &nettle_sha3_512,
+       &nettle_ripemd160, &nettle_gosthash94,
+       &nettle_gosthash94cp, &nettle_streebog256,
+-      &nettle_streebog512, &nettle_sm3,
++      &nettle_streebog512, SM3(&nettle_sm3)
+       NULL
+     };
+ 
+@@ -937,7 +949,7 @@ main(int argc, char **argv)
+       &nettle_des3,
+       &nettle_serpent256,
+       &nettle_twofish128, &nettle_twofish192, &nettle_twofish256,
+-      &nettle_sm4,
++      SM4(&nettle_sm4)
+       NULL
+     };
+ 
+diff --git a/nettle-meta-aeads.c b/nettle-meta-aeads.c
+index 78f38a3..c94fecd 100644
+--- a/nettle-meta-aeads.c
++++ b/nettle-meta-aeads.c
+@@ -43,7 +43,9 @@ const struct nettle_aead * const _nettle_aeads[] = {
+   &nettle_gcm_aes256,
+   &nettle_gcm_camellia128,
+   &nettle_gcm_camellia256,
++#if WITH_SM4
+   &nettle_gcm_sm4,
++#endif
+   &nettle_eax_aes128,
+   &nettle_chacha_poly1305,
+   NULL
+diff --git a/nettle-meta-ciphers.c b/nettle-meta-ciphers.c
+index f8d691c..6a84a43 100644
+--- a/nettle-meta-ciphers.c
++++ b/nettle-meta-ciphers.c
+@@ -54,7 +54,9 @@ const struct nettle_cipher * const _nettle_ciphers[] = {
+   &nettle_arctwo64,
+   &nettle_arctwo128,
+   &nettle_arctwo_gutmann128,
++#if WITH_SM4
+   &nettle_sm4,
++#endif
+   NULL
+ };
+ 
+diff --git a/nettle-meta-hashes.c b/nettle-meta-hashes.c
+index 2245dfb..6d4563d 100644
+--- a/nettle-meta-hashes.c
++++ b/nettle-meta-hashes.c
+@@ -57,7 +57,9 @@ const struct nettle_hash * const _nettle_hashes[] = {
+   &nettle_sha3_512,
+   &nettle_streebog256,
+   &nettle_streebog512,
++#if WITH_SM3
+   &nettle_sm3,
++#endif
+   NULL
+ };
+ 
+diff --git a/nettle-meta-macs.c b/nettle-meta-macs.c
+index 48b2176..866f076 100644
+--- a/nettle-meta-macs.c
++++ b/nettle-meta-macs.c
+@@ -52,7 +52,9 @@ const struct nettle_mac * const _nettle_macs[] = {
+   &nettle_hmac_sha512,
+   &nettle_hmac_streebog256,
+   &nettle_hmac_streebog512,
++#if WITH_SM3
+   &nettle_hmac_sm3,
++#endif
+   NULL
+ };
+ 
+diff --git a/testsuite/Makefile.in b/testsuite/Makefile.in
+index 0699fa0..3483f40 100644
+--- a/testsuite/Makefile.in
++++ b/testsuite/Makefile.in
+@@ -25,7 +25,7 @@ TS_NETTLE_SOURCES = aes-test.c aes-keywrap-test.c arcfour-test.c arctwo-test.c \
+ 		    sha3-permute-test.c sha3-224-test.c sha3-256-test.c \
+ 		    sha3-384-test.c sha3-512-test.c \
+ 		    shake128-test.c shake256-test.c \
+-		    streebog-test.c sm3-test.c sm4-test.c \
++		    streebog-test.c \
+ 		    serpent-test.c twofish-test.c version-test.c \
+ 		    knuth-lfib-test.c \
+ 		    cbc-test.c cfb-test.c ctr-test.c gcm-test.c eax-test.c ccm-test.c \
+@@ -60,6 +60,9 @@ TS_HOGWEED_SOURCES = sexp-test.c sexp-format-test.c \
+ 		     gostdsa-sign-test.c gostdsa-verify-test.c \
+ 		     gostdsa-keygen-test.c gostdsa-vko-test.c
+ 
++TS_NETTLE_SOURCES += @IF_SM3@ sm3-test.c
++TS_NETTLE_SOURCES += @IF_SM4@ sm4-test.c
++
+ TS_SOURCES = $(TS_NETTLE_SOURCES) $(TS_HOGWEED_SOURCES)
+ CXX_SOURCES = cxx-test.cxx
+ 
+diff --git a/testsuite/ecdh-test.c b/testsuite/ecdh-test.c
+index ff4f723..f852d81 100644
+--- a/testsuite/ecdh-test.c
++++ b/testsuite/ecdh-test.c
+@@ -159,6 +159,7 @@ test_public_key (const char *label, const struct ecc_curve *ecc,
+ void
+ test_main(void)
+ {
++#if WITH_ECC_SECP192R1
+   test_public_key ("(0,0) with secp-192r1", &_nettle_secp_192r1, "0", "0", 0);
+   test_public_key (
+     "(P,0) with secp-192r1", &_nettle_secp_192r1,
+@@ -188,7 +189,9 @@ test_main(void)
+ 	   "293088185788565313717816218507714888251468410990708684573",
+ 	   "149293809021051532782730990145509724807636529827149481690",
+ 	   "2891131861147398318714693938158856874319184314120776776192");
++#endif
+ 
++#if WITH_ECC_SECP224R1
+   test_dh ("secp-224r1", &_nettle_secp_224r1,
+ 	   "1321072106881784386340709783538698930880431939595776773514895067682",
+ 	   "6768311794185371282972144247871764855860666277647541840973645586477",
+@@ -198,6 +201,7 @@ test_main(void)
+ 	   "24223309755162432227459925493224336241652868856405241018762887667883",
+ 	   "8330362698029245839097779050425944245826040430538860338085968752913",
+ 	   "24167244512472228715617822000878192535267113543393576038737592837010");	   
++#endif
+ 
+   test_dh ("secp-256r1", &_nettle_secp_256r1,
+ 	   "94731533361265297353914491124013058635674217345912524033267198103710636378786",
+diff --git a/testsuite/ecdsa-sign-test.c b/testsuite/ecdsa-sign-test.c
+index 46fc273..aa44adb 100644
+--- a/testsuite/ecdsa-sign-test.c
++++ b/testsuite/ecdsa-sign-test.c
+@@ -74,6 +74,7 @@ test_main (void)
+   if (test_side_channel)
+     SKIP();
+ #endif
++#if WITH_ECC_SECP224R1
+   /* Producing the signature for corresponding test in
+      ecdsa-verify-test.c, with special u1 and u2. */
+   test_ecdsa (&_nettle_secp_224r1,
+@@ -86,6 +87,7 @@ test_main (void)
+ 	      "d16dc18032d268fd1a704fa6", /* r */
+ 	      "3a41e1423b1853e8aa89747b1f987364"
+ 	      "44705d6d6d8371ea1f578f2e"); /* s */
++#endif
+ 
+   /* Produce a signature where verify operation results in a point duplication. */
+   test_ecdsa (&_nettle_secp_256r1,
+@@ -99,6 +101,7 @@ test_main (void)
+ 	      "53f097727a0e0dc284a0daa0da0ab77d"
+ 	      "5792ae67ed075d1f8d5bda0f853fa093"); /* s */
+ 
++#if WITH_ECC_SECP192R1
+   /* Test cases for the smaller groups, verified with a
+      proof-of-concept implementation done for Yubico AB. */
+   test_ecdsa (&_nettle_secp_192r1,
+@@ -116,7 +119,9 @@ test_main (void)
+ 
+ 	      "a91fb738f9f175d72f9c98527e881c36"
+ 	      "8de68cb55ffe589"); /* s */
++#endif
+ 
++#if WITH_ECC_SECP224R1
+   test_ecdsa (&_nettle_secp_224r1,
+ 	      "446df0a771ed58403ca9cb316e617f6b"
+ 	      "158420465d00a69601e22858",  /* z */
+@@ -132,6 +137,7 @@ test_main (void)
+ 
+ 	      "d0f069fd0f108eb07b7bbc54c8d6c88d"
+ 	      "f2715c38a95c31a2b486995f"); /* s */
++#endif
+ 
+   /* From RFC 4754 */
+   test_ecdsa (&_nettle_secp_256r1,
+diff --git a/testsuite/ecdsa-verify-test.c b/testsuite/ecdsa-verify-test.c
+index 8d52700..1fa69f0 100644
+--- a/testsuite/ecdsa-verify-test.c
++++ b/testsuite/ecdsa-verify-test.c
+@@ -81,6 +81,7 @@ test_ecdsa (const struct ecc_curve *ecc,
+ void
+ test_main (void)
+ {
++#if WITH_ECC_SECP224R1
+   /* Corresponds to nonce k = 2 and private key z =
+      0x99b5b787484def12894ca507058b3bf543d72d82fa7721d2e805e5e6. z and
+      hash are chosen so that intermediate scalars in the verify
+@@ -100,7 +101,9 @@ test_main (void)
+ 	      "d16dc18032d268fd1a704fa6", /* r */
+ 	      "3a41e1423b1853e8aa89747b1f987364"
+ 	      "44705d6d6d8371ea1f578f2e"); /* s */
++#endif
+ 
++#if WITH_ECC_SECP192R1
+   /* Test case provided by Guido Vranken, from oss-fuzz */
+   test_ecdsa (&_nettle_secp_192r1,
+ 	      "14683086 f1734c6d e68743a6 48181b54 a74d4c5b 383eb6a8", /* x */
+@@ -108,6 +111,7 @@ test_main (void)
+ 	      SHEX("00"), /* h == 0 corner case*/
+ 	      "952800792ed19341fdeeec047f2514f3b0f150d6066151fb", /* r */
+ 	      "ec5971222014878b50d7a19d8954bc871e7e65b00b860ffb"); /* s */
++#endif
+ 
+   /* Test case provided by Guido Vranken, from oss-fuzz. Triggers
+      point duplication in the verify operation by using private key =
+diff --git a/testsuite/gcm-test.c b/testsuite/gcm-test.c
+index e8228ed..fad9184 100644
+--- a/testsuite/gcm-test.c
++++ b/testsuite/gcm-test.c
+@@ -825,6 +825,7 @@ test_main(void)
+ 		 "16aedbf5a0de6a57 a637b39b"),	/* iv */
+ 	    SHEX("5791883f822013f8bd136fc36fb9946b"));	/* tag */
+ 
++#if WITH_SM4
+   /*
+    * GCM-SM4 Test Vectors from
+    * https://datatracker.ietf.org/doc/html/rfc8998
+@@ -842,6 +843,7 @@ test_main(void)
+ 	         "A56834CBCF98C397B4024A2691233B8D"),
+ 	    SHEX("00001234567800000000ABCD"),
+ 	    SHEX("83DE3541E4C2B58177E065A9BF7B62EC"));
++#endif
+ 
+   /* Test gcm_hash, with varying message size, keys and iv all zero.
+      Not compared to any other implementation. */
+diff --git a/testsuite/hmac-test.c b/testsuite/hmac-test.c
+index d7af247..d34127b 100644
+--- a/testsuite/hmac-test.c
++++ b/testsuite/hmac-test.c
+@@ -949,9 +949,11 @@ test_main (void)
+ 	    SHEX("a1aa5f7de402d7b3d323f2991c8d4534"
+ 		 "013137010a83754fd0af6d7cd4922ed9"));
+ 
++#if WITH_SM3
+   test_mac (&nettle_hmac_sm3, (nettle_hash_update_func*) hmac_sm3_set_key,
+ 	    SDATA("monkey monkey monkey monkey"),
+ 	    SDATA("abc"),
+ 	    SHEX("7a9388e2ca5343b5d76e7c2c3d84f239"
+ 		 "f306c0b60d5e0dc4d2771e42860a6a2b"));
++#endif
+ }
+diff --git a/testsuite/meta-aead-test.c b/testsuite/meta-aead-test.c
+index ceeca22..d1a3193 100644
+--- a/testsuite/meta-aead-test.c
++++ b/testsuite/meta-aead-test.c
+@@ -8,7 +8,9 @@ const char* aeads[] = {
+   "gcm_aes256",
+   "gcm_camellia128",
+   "gcm_camellia256",
++#if WITH_SM4
+   "gcm_sm4",
++#endif
+   "eax_aes128",
+   "chacha_poly1305",
+ };
+diff --git a/testsuite/meta-cipher-test.c b/testsuite/meta-cipher-test.c
+index 912fac5..b57fcbe 100644
+--- a/testsuite/meta-cipher-test.c
++++ b/testsuite/meta-cipher-test.c
+@@ -20,7 +20,9 @@ const char* ciphers[] = {
+   "twofish128",
+   "twofish192",
+   "twofish256",
+-  "sm4"
++#if WITH_SM4
++  "sm4",
++#endif
+ };
+ 
+ void
+diff --git a/testsuite/meta-hash-test.c b/testsuite/meta-hash-test.c
+index ec4e0d1..8427e0a 100644
+--- a/testsuite/meta-hash-test.c
++++ b/testsuite/meta-hash-test.c
+@@ -24,7 +24,9 @@ const char* hashes[] = {
+   "sha3_512",
+   "streebog256",
+   "streebog512",
++#if WITH_SM3
+   "sm3",
++#endif
+ };
+ 
+ void
+diff --git a/testsuite/meta-mac-test.c b/testsuite/meta-mac-test.c
+index 6c848a8..c00efd3 100644
+--- a/testsuite/meta-mac-test.c
++++ b/testsuite/meta-mac-test.c
+@@ -16,7 +16,9 @@ const char* macs[] = {
+   "hmac_sha512",
+   "hmac_streebog256",
+   "hmac_streebog512",
++#if WITH_SM3
+   "hmac_sm3",
++#endif
+ };
+ 
+ void
+diff --git a/testsuite/testutils.c b/testsuite/testutils.c
+index 76aa556..5b7c7de 100644
+--- a/testsuite/testutils.c
++++ b/testsuite/testutils.c
+@@ -2230,8 +2230,12 @@ test_dsa_key(const struct dsa_params *params,
+ }
+ 
+ const struct ecc_curve * const ecc_curves[] = {
++#if WITH_ECC_SECP192R1
+   &_nettle_secp_192r1,
++#endif
++#if WITH_ECC_SECP224R1
+   &_nettle_secp_224r1,
++#endif
+   &_nettle_secp_256r1,
+   &_nettle_secp_384r1,
+   &_nettle_secp_521r1,
+@@ -2355,7 +2359,8 @@ test_ecc_point (const struct ecc_curve *ecc,
+ }
+ 
+ /* For each curve, the points g, 2 g, 3 g and 4 g */
+-static const struct ecc_ref_point ecc_ref[9][4] = {
++static const struct ecc_ref_point ecc_ref[][4] = {
++#if WITH_ECC_SECP192R1
+   { { "188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012",
+       "07192b95ffc8da78631011ed6b24cdd573f977a11e794811" },
+     { "dafebf5828783f2ad35534631588a3f629a70fb16982a888",
+@@ -2365,6 +2370,8 @@ static const struct ecc_ref_point ecc_ref[9][4] = {
+     { "35433907297cc378b0015703374729d7a4fe46647084e4ba",
+ 	"a2649984f2135c301ea3acb0776cd4f125389b311db3be32" }
+   },
++#endif
++#if WITH_ECC_SECP224R1
+   { { "b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
+ 	"bd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34" },
+     { "706a46dc76dcb76798e60e6d89474788d16dc18032d268fd1a704fa6",
+@@ -2374,6 +2381,7 @@ static const struct ecc_ref_point ecc_ref[9][4] = {
+     { "ae99feebb5d26945b54892092a8aee02912930fa41cd114e40447301",
+ 	"482580a0ec5bc47e88bc8c378632cd196cb3fa058a7114eb03054c9" },
+   },
++#endif
+   { { "6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+ 	"4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5" },
+     { "7cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc47669978",
+-- 
+2.48.1
+

@@ -1,0 +1,27 @@
+diff -up gnuplot-5.2.4/docs/gnuplot.doc gnuplot-5.2.4/docs/gnuplot
+diff -up gnuplot-5.2.4/docs/gnuplot-ja.doc gnuplot-5.2.4/docs/gnuplot-ja
+diff -up gnuplot-5.2.4/docs/Makefile.am.doc gnuplot-5.2.4/docs/Makefile.am
+--- gnuplot-5.2.4/docs/Makefile.am.doc	2017-12-22 18:32:48.000000000 +0100
++++ gnuplot-5.2.4/docs/Makefile.am	2018-08-08 14:00:40.014932164 +0200
+@@ -322,7 +322,7 @@ ${ELCS}: gnuplot-eldoc.el
+ # that only appears to work with a non-generated texi file for input.
+ 
+ gnuplot.info: gnuplot.texi
+-	$(AM_V_GEN) $(MAKEINFO) -I$(srcdir) $< --no-split --output=$@
++	$(AM_V_GEN) $(MAKEINFO) -I$(srcdir) $< --no-split  --force --output=$@
+ 
+ install-info: gnuplot.info
+ 	$(AM_V_at) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
+diff -up gnuplot-5.2.4/docs/Makefile.in.doc gnuplot-5.2.4/docs/Makefile.in
+--- gnuplot-5.2.4/docs/Makefile.in.doc	2018-06-01 03:51:14.000000000 +0200
++++ gnuplot-5.2.4/docs/Makefile.in	2018-08-08 14:03:26.797479806 +0200
+@@ -1090,7 +1090,7 @@ ${ELCS}: gnuplot-eldoc.el
+ # that only appears to work with a non-generated texi file for input.
+ 
+ gnuplot.info: gnuplot.texi
+-	$(AM_V_GEN) $(MAKEINFO) -I$(srcdir) $< --no-split --output=$@
++	$(AM_V_GEN) $(MAKEINFO) -I$(srcdir) $< --no-split  --force --output=$@
+ 
+ install-info: gnuplot.info
+ 	$(AM_V_at) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
+diff -up gnuplot-5.2.4/docs/psdoc/ps_file.doc gnuplot-5.2.4/docs/psdoc/ps_file

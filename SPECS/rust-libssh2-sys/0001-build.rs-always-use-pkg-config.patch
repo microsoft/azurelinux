@@ -1,0 +1,42 @@
+From 9bc1ff5c78821b5056d4009f19761ad0beb6b6b3 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Sat, 14 Jul 2018 09:32:07 +0200
+Subject: [PATCH] build.rs: always use pkg-config
+
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ build.rs | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index d4bd6a0..1720f12 100644
+--- a/build.rs
++++ b/build.rs
+@@ -16,20 +16,11 @@ fn main() {
+         return;
+     }
+ 
+-    // The system copy of libssh2 is not used by default because it
+-    // can lead to having two copies of libssl loaded at once.
+-    // See https://github.com/alexcrichton/ssh2-rs/pull/88
+-    println!("cargo:rerun-if-env-changed=LIBSSH2_SYS_USE_PKG_CONFIG");
+-    if env::var("LIBSSH2_SYS_USE_PKG_CONFIG").is_ok() {
+-        if zlib_ng_compat {
+-            panic!("LIBSSH2_SYS_USE_PKG_CONFIG set, but cannot use zlib-ng-compat with system libssh2");
+-        }
+-        if let Ok(lib) = pkg_config::find_library("libssh2") {
+-            for path in &lib.include_paths {
+-                println!("cargo:include={}", path.display());
+-            }
+-            return;
++    if let Ok(lib) = pkg_config::find_library("libssh2") {
++        for path in &lib.include_paths {
++            println!("cargo:include={}", path.display());
+         }
++        return;
+     }
+ 
+     if !Path::new("libssh2/.git").exists() {
+-- 
+2.22.0
+

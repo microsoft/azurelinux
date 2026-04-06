@@ -1,0 +1,25 @@
+From b09db38d4f9cc9907abbd10bac42cb6043c51f9b Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 17 Apr 2024 22:49:33 -0400
+Subject: [PATCH] Fix IPv4 initialization for test_address_ipv4
+
+The address used in the test was incorrectly initialized on big-endian hosts.
+
+Fixes #347.
+---
+ src/device.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/device.rs b/src/device.rs
+index 48ca4db9..561b11fd 100644
+--- a/src/device.rs
++++ b/src/device.rs
+@@ -388,7 +388,7 @@ mod tests {
+         let mut addr: WinSock::SOCKADDR_IN = InetAddressV4::new();
+ 
+         addr.sin_port = 1075;
+-        addr.set_addr(0x4200000A);
++        addr.set_addr(0x0A000042_u32.to_be());
+ 
+         Sockaddr::SockaddrIn(addr)
+     }

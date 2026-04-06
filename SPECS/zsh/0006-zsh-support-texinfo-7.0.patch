@@ -1,0 +1,53 @@
+From ecd3f9c9506c7720dc6c0833dc5d5eb00e4459c4 Mon Sep 17 00:00:00 2001
+From: Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+Date: Mon, 19 Jun 2023 11:19:25 +0900
+Subject: [PATCH] 51862: support texinfo-7.0
+
+Upstream-commit: ecd3f9c9506c7720dc6c0833dc5d5eb00e4459c4
+Cherry-picked-by: Lukáš Zaoral <lzaoral@redhat.com>
+---
+ Doc/Makefile.in | 3 ++-
+ configure.ac    | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Doc/Makefile.in b/Doc/Makefile.in
+index 136b080d6..dabe11fe3 100644
+--- a/Doc/Makefile.in
++++ b/Doc/Makefile.in
+@@ -43,6 +43,7 @@ TEXI2DVI = @TEXI2DVI@
+ DVIPS = dvips
+ TEXI2PDF  = @TEXI2PDF@
+ TEXI2HTML = @TEXI2HTML@
++SET_TEXI2ANY_VAR = @SET_TEXI2ANY_VAR@
+ PAPERSIZE = @PAPERSIZE@
+ 
+ .SUFFIXES: .yo .1
+@@ -266,7 +267,7 @@ texi2html.conf: $(sdir_top)/Config/version.mk
+ 	d=`echo $(VERSION_DATE)`; \
+ 	v="<font size=\"-1\">Zsh version $(VERSION), released on $$d.</font>"; \
+ 	case '$(TEXI2HTML)' in \
+-	  *texi2any*) echo "set_from_init_file('PRE_BODY_CLOSE','$$v');" ;; \
++	  *texi2any*) echo "$(SET_TEXI2ANY_VAR)('PRE_BODY_CLOSE','$$v');" ;; \
+ 	  *) echo "\$$PRE_BODY_CLOSE = '$$v';" ;; \
+ 	esac > $@
+ 
+diff --git a/configure.ac b/configure.ac
+index 4710d1659..ba76f9a60 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -623,7 +623,12 @@ fi
+ 
+ if test x"$TEXI2HTML" = xtexi2any; then
+   TEXI2HTML='texi2any -c TEXI2HTML=1'
++  case `texi2any --version 2>/dev/null | sed -e 's/^.*) *//' -e 1q` in
++    [[1-6]].*) SET_TEXI2ANY_VAR=set_from_init_file ;;
++    *) SET_TEXI2ANY_VAR=texinfo_set_from_init_file ;;
++  esac
+ fi
++AC_SUBST(SET_TEXI2ANY_VAR)
+ 
+ case "$LC_PAPER" in
+   ??_US*) PAPERSIZE=us ;;
+-- 
+2.42.0
+

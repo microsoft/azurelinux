@@ -1,0 +1,31 @@
+From effc87130085ec84e955214d9fff78d3f6afa187 Mon Sep 17 00:00:00 2001
+From: Antonio Alvarez Feijoo <antonio.feijoo@suse.com>
+Date: Mon, 28 Jul 2025 10:10:45 +0200
+Subject: [PATCH 13/13] fix(systemd-udevd): handle root=gpt-auto for
+ systemd-v258
+
+A new file 90-image-dissect.rules was split from 99-systemd.rules to handle
+gpt-root.
+
+Since https://github.com/systemd/systemd/commit/e3f6ae1d09d28dbe31ccf67122486ad037d25ed0
+
+(cherry picked from commit ea5649f5ca23f7a85f9035ef304ae960347624a3)
+---
+ modules.d/01systemd-udevd/module-setup.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules.d/01systemd-udevd/module-setup.sh b/modules.d/01systemd-udevd/module-setup.sh
+index e8f6e5ba..8b0d5c75 100755
+--- a/modules.d/01systemd-udevd/module-setup.sh
++++ b/modules.d/01systemd-udevd/module-setup.sh
+@@ -34,6 +34,7 @@ depends() {
+ # Install the required file(s) and directories for the module in the initramfs.
+ install() {
+     inst_multiple -o \
++        "$udevrulesdir"/90-image-dissect.rules \
+         "$udevrulesdir"/99-systemd.rules \
+         "$systemdutildir"/systemd-udevd \
+         "$systemdsystemunitdir"/systemd-udevd.service \
+-- 
+2.50.1
+

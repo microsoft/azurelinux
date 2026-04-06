@@ -1,0 +1,17 @@
+diff -up firefox-124.0/toolkit/xre/nsAppRunner.cpp.fedora-customization firefox-124.0/toolkit/xre/nsAppRunner.cpp
+diff -up firefox-124.0/widget/gtk/nsWindow.cpp.fedora-customization firefox-124.0/widget/gtk/nsWindow.cpp
+--- firefox-124.0/widget/gtk/nsWindow.cpp.fedora-customization	2024-03-13 12:35:57.098591719 +0100
++++ firefox-124.0/widget/gtk/nsWindow.cpp	2024-03-13 12:43:17.375928494 +0100
+@@ -3459,6 +3459,12 @@ nsresult nsWindow::SetTitle(const nsAStr
+     return NS_OK;
+   }
+ 
++  const char* appTitle = getenv("MOZ_APP_TITLE");
++  if (appTitle) {
++    gtk_window_set_title(GTK_WINDOW(mShell), appTitle);
++    return NS_OK;
++  }
++
+   // convert the string into utf8 and set the title.
+ #define UTF8_FOLLOWBYTE(ch) (((ch) & 0xC0) == 0x80)
+   NS_ConvertUTF16toUTF8 titleUTF8(aTitle);

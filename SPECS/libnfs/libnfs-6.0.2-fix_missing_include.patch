@@ -1,0 +1,21 @@
+From 2cdfedaba379cbb512d3c203a1b9eae795f4fb23 Mon Sep 17 00:00:00 2001
+From: kangjialong <kjialong@163.com>
+Date: Sun, 30 Mar 2025 14:26:18 +0800
+Subject: [PATCH] Fix using size_t without including 'stddef.h'
+
+---
+ include/nfsc/libnfs.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/nfsc/libnfs.h b/include/nfsc/libnfs.h
+index 6f910024..2bd5c3b0 100755
+--- a/include/nfsc/libnfs.h
++++ b/include/nfsc/libnfs.h
+@@ -27,6 +27,7 @@
+ #include "ps2_compat.h"
+ #endif
+ 
++#include <stddef.h>
+ #include <stdint.h>
+ #if !defined(_WIN32)
+ #include <sys/time.h>

@@ -1,0 +1,21 @@
+From 10df8765b47550d3404f1aaa6ff50071ac870a4e Mon Sep 17 00:00:00 2001
+From: Romain Geissler <romain.geissler@amadeus.com>
+Date: Sun, 26 Jan 2025 22:20:26 +0000
+Subject: [PATCH] Fix doc build with Sphinx 8.
+
+See this Fedora failure following the upgrade to Sphinx 8:
+https://bugzilla.redhat.com/show_bug.cgi?id=2329853
+---
+ docs/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index 17f81b1..9c533da 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -291,4 +291,4 @@
+ 
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'https://docs.python.org/': None}
++intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

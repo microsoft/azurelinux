@@ -1,0 +1,13 @@
+diff --git a/config-top.h b/config-top.h
+index e5cc147..f5e0a52 100644
+--- a/config-top.h
++++ b/config-top.h
+@@ -106,7 +106,7 @@
+    sshd and source the .bashrc if so (like the rshd behavior).  This checks
+    for the presence of SSH_CLIENT or SSH2_CLIENT in the initial environment,
+    which can be fooled under certain not-uncommon circumstances. */
+-/* #define SSH_SOURCE_BASHRC */
++#define SSH_SOURCE_BASHRC
+ 
+ /* Define if you want the case-toggling operators (~[~]) and the
+    `capcase' variable attribute (declare -c). */

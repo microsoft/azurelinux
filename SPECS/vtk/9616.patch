@@ -1,0 +1,79 @@
+From a2ca9a079ecc8926f6ddf7a72803340a4944e7cf Mon Sep 17 00:00:00 2001
+From: Eric Larson <larson.eric.d@gmail.com>
+Date: Tue, 11 Oct 2022 12:12:38 -0400
+Subject: [PATCH] BUG: Fix bug with vtkPlotBar.GetLookupTable()
+
+Also remove old nullptr assignments as they are unnecessary
+when using vtkSmartPointer.
+---
+ .../Core/Testing/Cxx/TestPlotBarRangeHandlesItem.cxx   |  2 ++
+ Charts/Core/vtkPlotBar.cxx                             | 10 +++++++---
+ .../release/dev/fix-vtkPlotBar-GetLookupTable.md       |  4 ++++
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/release/dev/fix-vtkPlotBar-GetLookupTable.md
+
+diff --git a/Charts/Core/Testing/Cxx/TestPlotBarRangeHandlesItem.cxx b/Charts/Core/Testing/Cxx/TestPlotBarRangeHandlesItem.cxx
+index 2d0ed46b128..919319a6b4d 100644
+--- a/Charts/Core/Testing/Cxx/TestPlotBarRangeHandlesItem.cxx
++++ b/Charts/Core/Testing/Cxx/TestPlotBarRangeHandlesItem.cxx
+@@ -88,6 +88,8 @@ int TestPlotBarRangeHandlesItem(int, char*[])
+ 
+   // Add bar plot and handles
+   vtkPlotBar* barPlot = vtkPlotBar::SafeDownCast(chart->AddPlot(vtkChart::BAR));
++  // smoke test for https://gitlab.kitware.com/vtk/vtk/-/issues/18682#note_1258974
++  barPlot->GetLookupTable();
+   barPlot->SetInputData(table, "Months", "Books");
+   chart->SetBarWidthFraction(1.0);
+ 
+diff --git a/Charts/Core/vtkPlotBar.cxx b/Charts/Core/vtkPlotBar.cxx
+index a68a26c0ecd..220e8199d02 100644
+--- a/Charts/Core/vtkPlotBar.cxx
++++ b/Charts/Core/vtkPlotBar.cxx
+@@ -535,12 +535,11 @@ vtkStandardNewMacro(vtkPlotBar);
+ vtkPlotBar::vtkPlotBar()
+ {
+   this->Private = new vtkPlotBarPrivate(this);
++  // Points is not a vtkSmartPointer, so set it explicitly to nullptr
+   this->Points = nullptr;
+-  this->AutoLabels = nullptr;
+   this->Width = 1.0;
+   this->Pen->SetWidth(1.0);
+   this->Offset = 1.0;
+-  this->ColorSeries = nullptr;
+   this->Orientation = vtkPlotBar::VERTICAL;
+   this->ScalarVisibility = false;
+   this->EnableOpacityMapping = true;
+@@ -612,6 +611,10 @@ void vtkPlotBar::GetBounds(double bounds[4], bool unscaled)
+ 
+   // Get the x and y arrays (index 0 and 1 respectively)
+   vtkTable* table = this->Data->GetInput();
++  if (!table)
++  {
++    return;
++  }
+   vtkDataArray* x =
+     this->UseIndexForXSeries ? nullptr : this->Data->GetInputArrayToProcess(0, table);
+   vtkDataArray* y = this->Data->GetInputArrayToProcess(1, table);
+@@ -945,7 +948,8 @@ void vtkPlotBar::CreateDefaultLookupTable()
+   // rainbow - blue to red
+   lut->SetHueRange(0.6667, 0.0);
+   lut->Build();
+-  double bounds[4];
++  // set reasonable defaults in case no data has been set
++  double bounds[4] = { 0.0, 1.0, 0.0, 1.0 };
+   this->GetBounds(bounds);
+   lut->SetRange(bounds[0], bounds[1]);
+   this->LookupTable = lut;
+diff --git a/Documentation/release/dev/fix-vtkPlotBar-GetLookupTable.md b/Documentation/release/dev/fix-vtkPlotBar-GetLookupTable.md
+new file mode 100644
+index 00000000000..ba6a96753ac
+--- /dev/null
++++ b/Documentation/release/dev/fix-vtkPlotBar-GetLookupTable.md
+@@ -0,0 +1,4 @@
++## Fixes for vtkPlotBar.GetLookupTable
++
++Fixes a bug where calling vtkPlotBar.GetLookupTable caused a segmentation
++fault in the case where no data had been plotted yet.
+-- 
+GitLab
+

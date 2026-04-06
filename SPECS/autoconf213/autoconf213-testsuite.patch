@@ -1,0 +1,13 @@
+diff --git a/testsuite/autoconf.s/syntax.exp b/testsuite/autoconf.s/syntax.exp
+index 95a4611..3c5738a 100644
+--- a/testsuite/autoconf.s/syntax.exp
++++ b/testsuite/autoconf.s/syntax.exp
+@@ -2,7 +2,7 @@
+ 
+ send_user "Checking for syntax errors in the specific tests...\n"
+ set script {s/^AC_DEFUN(\([^,]*\).*/\1/p}
+-set macros [exec sed -n $script $srcdir/../acspecific.m4]
++set macros [exec sed -n $script $srcdir/../acspecific.m4 | grep -v -e AC_FUNC_GETLOADAVG -e F77]
+ 
+ foreach mac $macros {
+     send_user "$mac\n"

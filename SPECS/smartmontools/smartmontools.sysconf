@@ -1,0 +1,3 @@
+# command line options for smartd
+# Add -s /var/lib/smartmontools/ to enable state persistence
+smartd_opts="-q never --capabilities=mail"

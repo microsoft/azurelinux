@@ -1,0 +1,27 @@
+From a11a703a0d622fb0735ebafb4bbd1be68f0352ac Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 22 Jan 2026 20:30:47 +0000
+Subject: [PATCH] Downstream-only: Do not compile with -Werror
+
+This makes sense upstream, but is too strict for downstream packaging
+across various architectures, compiler versions, and so on.
+---
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 5e3f1d4..6a45a9c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -73,7 +73,7 @@ endif()
+ if(MSVC)
+   add_compile_options(/W4 /WX)
+ else()
+-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
++  add_compile_options(-Wall -Wextra -Wpedantic)
+ endif()
+ 
+ add_subdirectory(lib)
+-- 
+2.52.0
+

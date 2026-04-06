@@ -1,0 +1,31 @@
+--- wasi-libc-wasi-sdk-29/Makefile.orig	2026-01-08 16:43:58.310813769 -0600
++++ wasi-libc-wasi-sdk-29/Makefile	2026-01-08 16:49:21.516204812 -0600
+@@ -643,17 +643,15 @@ builtins: $(BUILTINS_LIB_PATH)
+ 
+ # Note: libc.so is special because it shouldn't link to libc.so, and the
+ # -nodefaultlibs flag here disables the default `-lc` logic that clang
+-# has. Note though that this also disables linking of compiler-rt
+-# libraries so that is explicitly passed in via `$(BUILTINS_LIB_PATH)`
++# has.
+ #
+ # Note: --allow-undefined-file=linker-provided-symbols.txt is
+ # a workaround for https://github.com/llvm/llvm-project/issues/103592
+-$(SYSROOT_LIB)/libc.so: $(OBJDIR)/libc.so.a $(BUILTINS_LIB_PATH)
++$(SYSROOT_LIB)/libc.so: $(OBJDIR)/libc.so.a
+ 	$(CC) --target=${TARGET_TRIPLE} -nodefaultlibs \
+ 	-shared --sysroot=$(SYSROOT) \
+ 	-o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive \
+ 	-Wl,--allow-undefined-file=linker-provided-symbols.txt \
+-	$(BUILTINS_LIB_PATH) \
+ 	$(EXTRA_CFLAGS) $(LDFLAGS)
+ 
+ # Note that unlike `libc.so` above this rule does not pass `-nodefaultlibs`
+@@ -865,7 +863,7 @@ STATIC_LIBS += \
+ 	$(SYSROOT_LIB)/libsetjmp.a
+ endif
+ 
+-libc: $(INCLUDE_DIRS) $(STATIC_LIBS) builtins
++libc: $(INCLUDE_DIRS) $(STATIC_LIBS)
+ 
+ DUMMY := m rt pthread crypt util xnet resolv
+ DUMMY_LIBS := $(patsubst %,$(SYSROOT_LIB)/lib%.a,$(DUMMY))

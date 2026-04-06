@@ -1,0 +1,38 @@
+https://github.com/miyagawa/module-install-repository/pull/2
+
+diff --git a/MYMETA.json b/MYMETA.json
+index e90a848..3bbd4ea 100644
+--- a/MYMETA.json
++++ b/MYMETA.json
+@@ -24,7 +24,6 @@
+       "build" : {
+          "requires" : {
+             "ExtUtils::MakeMaker" : "6.36",
+-            "Path::Class" : "0",
+             "Test::More" : "0"
+          }
+       },
+diff --git a/MYMETA.yml b/MYMETA.yml
+index 04c7832..b0196d6 100644
+--- a/MYMETA.yml
++++ b/MYMETA.yml
+@@ -4,7 +4,6 @@ author:
+   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+ build_requires:
+   ExtUtils::MakeMaker: '6.36'
+-  Path::Class: '0'
+   Test::More: '0'
+ configure_requires:
+   ExtUtils::MakeMaker: '0'
+diff --git a/Makefile.PL b/Makefile.PL
+index ac02038..3d08871 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -6,7 +6,6 @@ all_from 'lib/Module/Install/Repository.pm';
+ auto_set_repository;
+ 
+ test_requires 'Test::More';
+-test_requires 'Path::Class';
+ 
+ author_tests('xt');
+ WriteAll;

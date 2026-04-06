@@ -1,0 +1,24 @@
+From e1308c630a7b8751800bede0a68b8e2ec5477ee5 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Thu, 30 Oct 2025 03:55:16 -0400
+Subject: [PATCH 10/15] Fedora: zeroize 1.8.2
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index a4f5261..94a0b61 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -47,4 +47,4 @@ tonic = "0.12"
+ tonic-build = "0.12"
+ url = "2.5.4"
+ uuid = "1"
+-zeroize = "1.5.7"
++zeroize = "1.8.2"
+-- 
+2.51.1
+

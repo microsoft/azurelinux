@@ -1,0 +1,51 @@
+From eb193dce2b7f8ce80004d14ccf64c53552ae103c Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 21 Nov 2024 14:30:23 +0100
+Subject: [PATCH 7/7] Xm/ComboBox: Use Xinerama for placement
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/ComboBox.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/lib/Xm/ComboBox.c b/lib/Xm/ComboBox.c
+index 1472e458..0f49de50 100644
+--- a/lib/Xm/ComboBox.c
++++ b/lib/Xm/ComboBox.c
+@@ -43,6 +43,7 @@
+ #include <Xm/DisplayP.h>
+ #include <Xm/DrawP.h>
+ #include <Xm/GrabShellP.h>
++#include <Xm/ScreenP.h>
+ #include <Xm/List.h>
+ #include <Xm/TextF.h>
+ #include <Xm/TraitP.h>
+@@ -1791,6 +1792,7 @@ CBDropDownList(Widget    widget,
+ 	  Cardinal n;
+ 	  int tmp;
+ 	  Position root_x, root_y, shell_x, shell_y;
++	  Position dispX, dispY, dispMaxX, dispMaxY;
+ 	  Dimension shell_width;
+ 
+ 	  XtTranslateCoords((Widget)cb, XtX(cb), XtY(cb), &root_x, &root_y);
+@@ -1801,12 +1803,13 @@ CBDropDownList(Widget    widget,
+ 	    XtY(cb); 
+ 	
+ 	  /* Try to position the shell on the screen. */
+-	  tmp = WidthOfScreen(XtScreen(cb)) - XtWidth(CB_ListShell(cb));
++	  _XmScreenGetBoundariesAtpoint(XtScreen(cb), shell_x, shell_y, &dispX, &dispY, &dispMaxX, &dispMaxY);
++	  tmp = dispMaxX - XtWidth(CB_ListShell(cb));
+ 	  tmp = MIN(tmp, shell_x);
+-	  shell_x = MAX(0, tmp);
+-	  tmp = HeightOfScreen(XtScreen(cb)) - XtHeight(CB_ListShell(cb));
++	  shell_x = MAX(dispX, tmp);
++	  tmp = dispMaxY - XtHeight(CB_ListShell(cb));
+ 	  tmp = MIN(tmp, shell_y);
+-	  shell_y = MAX(0, tmp);
++	  shell_y = MAX(dispY, tmp);
+ 
+ 	  /* CR 8446: The shell width may have changed unexpectedly. */
+ 	  shell_width = XtWidth(cb) - 2 * CB_HighlightThickness(cb);
+-- 
+2.49.0
+

@@ -1,0 +1,113 @@
+diff -pruN fontconfig-2.17.0.orig/test/meson.build fontconfig-2.17.0/test/meson.build
+--- fontconfig-2.17.0.orig/test/meson.build	2025-06-27 12:12:04.000000000 +0900
++++ fontconfig-2.17.0/test/meson.build	2025-06-27 14:41:08.843726446 +0900
+@@ -1,16 +1,16 @@
+-fetch_test_fonts = custom_target(
+-  'fetch_test_fonts',
+-  output: 'testfonts',
+-  command: [
+-    python3,
+-    join_paths(meson.project_source_root(), 'build-aux', 'fetch-testfonts.py'),
+-    '--target-dir',
+-    '@BUILD_ROOT@/testfonts',
+-    '--try-symlink',
+-  ],
+-  build_by_default: false,
+-  build_always_stale: true,
+-)
++#fetch_test_fonts = custom_target(
++#  'fetch_test_fonts',
++#  output: 'testfonts',
++#  command: [
++#    python3,
++#    join_paths(meson.project_source_root(), 'build-aux', 'fetch-testfonts.py'),
++#    '--target-dir',
++#    '@BUILD_ROOT@/testfonts',
++#    '--try-symlink',
++#  ],
++#  build_by_default: false,
++#  build_always_stale: true,
++#)
+ 
+ tests = [
+   ['test-bz89617.c', {'c_args': ['-DSRCDIR="@0@"'.format(meson.current_source_dir())]}],
+@@ -33,7 +33,7 @@ if host_machine.system() != 'windows'
+   ]
+   tests_not_parallel += [
+     # FIXME: this needs NotoSans-hinted.zip font downloaded and unpacked into test build directory! see run-test.sh
+-    ['test-crbug1004254.c', {'dependencies': dependency('threads')}], # for pthread
++    # ['test-crbug1004254.c', {'dependencies': dependency('threads')}], # for pthread
+     ['test-mt-fccfg.c', {'include_directories': include_directories('../src'), 'dependencies': dependency('threads')}],
+   ]
+ 
+@@ -74,10 +74,10 @@ foreach test_data : tests + tests_not_pa
+ endforeach
+ 
+ 
+-if get_option('fontations').enabled()
+-  rust = import('rust')
+-  rust.test('fc_fontations_rust_tests', fc_fontations, link_with: [libfontconfig_internal], depends: fetch_test_fonts, env: ['builddir=@0@'.format(meson.project_build_root())],)
+-endif
++#if get_option('fontations').enabled()
++#  rust = import('rust')
++#  rust.test('fc_fontations_rust_tests', fc_fontations, link_with: [libfontconfig_internal], depends: fetch_test_fonts, env: ['builddir=@0@'.format(meson.project_build_root())],)
++#endif
+ 
+ fs = import('fs')
+ 
+@@ -92,14 +92,14 @@ if host_machine.system() != 'windows'
+ 
+   test('run_test_sh', find_program('run-test.sh'), timeout: 600, env: ['srcdir=@0@'.format(meson.current_source_dir()), 'builddir=@0@'.format(meson.current_build_dir()), 'EXEEXT=@0@'.format(conf.get('EXEEXT')), 'VERBOSE=1'])
+ 
+-  if pytest.found()
+-    test('pytest', pytest, args: ['--tap'],
+-         workdir: meson.current_source_dir(),
+-         env: ['builddir=@0@'.format(meson.project_build_root())],
+-         protocol: 'tap',
+-         timeout: 600,
+-         depends: fetch_test_fonts)
+-  endif
++#  if pytest.found()
++#    test('pytest', pytest, args: ['--tap'],
++#         workdir: meson.current_source_dir(),
++#         env: ['builddir=@0@'.format(meson.project_build_root())],
++#         protocol: 'tap',
++#         timeout: 600,
++#         depends: fetch_test_fonts)
++#  endif
+ endif
+ 
+ if jsonc_dep.found()
+diff -pruN fontconfig-2.17.0.orig/test/run-test.sh fontconfig-2.17.0/test/run-test.sh
+--- fontconfig-2.17.0.orig/test/run-test.sh	2025-06-27 12:12:04.000000000 +0900
++++ fontconfig-2.17.0/test/run-test.sh	2025-06-27 14:39:19.098581228 +0900
+@@ -521,18 +521,18 @@ rm -rf "$MYCACHEBASEDIR" "$MYCONFIG" "$B
+ 
+ fi # if [ "x$EXEEXT" = "x" ]
+ 
+-if [ -x "$BUILDTESTDIR"/test-crbug1004254 ]; then
+-    dotest "MT-safe global config"
+-    prep
+-    curl -s -o "$FONTDIR"/noto.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSans-hinted.zip
+-    (cd "$FONTDIR"; unzip noto.zip)
+-    if [ -n "${SOURCE_DATE_EPOCH:-}" ] && [ ${#SOURCE_DATE_EPOCH} -gt 0 ]; then
+-        touch -m -t "$(fdate ${SOURCE_DATE_EPOCH})" "$FONTDIR"
+-    fi
+-    "$BUILDTESTDIR"/test-crbug1004254
+-else
++#if [ -x "$BUILDTESTDIR"/test-crbug1004254 ]; then
++#    dotest "MT-safe global config"
++#    prep
++#    curl -s -o "$FONTDIR"/noto.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSans-hinted.zip
++#    (cd "$FONTDIR"; unzip noto.zip)
++#    if [ -n "${SOURCE_DATE_EPOCH:-}" ] && [ ${#SOURCE_DATE_EPOCH} -gt 0 ]; then
++#        touch -m -t "$(fdate ${SOURCE_DATE_EPOCH})" "$FONTDIR"
++#    fi
++#    "$BUILDTESTDIR"/test-crbug1004254
++#else
+     echo "No test-crbug1004254: skipped"
+-fi
++#fi
+ 
+ if [ "x$EXEEXT" = "x" ]; then
+ 

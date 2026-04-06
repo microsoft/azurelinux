@@ -1,0 +1,35 @@
+diff -up firefox-134.0.1/toolkit/moz.configure.wasi firefox-134.0.1/toolkit/moz.configure
+--- firefox-134.0.1/toolkit/moz.configure.wasi	2025-01-13 14:46:04.000000000 +0100
++++ firefox-134.0.1/toolkit/moz.configure	2025-01-17 08:39:38.870092763 +0100
+@@ -2767,7 +2776,7 @@ with only_when(requires_wasm_sandboxing
+     def wasi_sysroot_flags(wasi_sysroot):
+         if wasi_sysroot:
+             log.info("Using wasi sysroot in %s", wasi_sysroot)
+-            return ["--sysroot=%s" % wasi_sysroot]
++            return ["--sysroot=%s" % wasi_sysroot, "-nodefaultlibs",  "-lc", "-lwasi-emulated-process-clocks", "-lc++", "-lc++abi", "LIBCLANG_RT_PLACEHOLDER"]
+         return []
+ 
+     set_config("WASI_SYSROOT", wasi_sysroot)
+diff -up firefox-134.0.1/wasi-sdk-25/cmake/wasi-sdk-toolchain.cmake.wasi firefox-134.0.1/wasi-sdk-25/cmake/wasi-sdk-toolchain.cmake
+--- firefox-134.0.1/wasi-sdk-25/cmake/wasi-sdk-toolchain.cmake.wasi	2025-01-17 08:40:23.004159900 +0100
++++ firefox-134.0.1/wasi-sdk-25/cmake/wasi-sdk-toolchain.cmake	2025-01-17 08:40:35.478178790 +0100
+@@ -126,7 +126,7 @@ endif()
+ add_custom_command(
+   OUTPUT ${wasm_component_ld}
+   COMMAND
+-    cargo install --root ${wasm_component_ld_root} ${rust_target_flag}
++    cargo install --offline --root ${wasm_component_ld_root} ${rust_target_flag}
+       wasm-component-ld@${wasm_component_ld_version}
+   COMMAND
+     cmake -E make_directory ${wasi_tmp_install}/bin
+diff -up firefox-134.0.2/wasi-sdk-25/version.py.wasi firefox-134.0.2/wasi-sdk-25/version.py
+--- firefox-134.0.2/wasi-sdk-25/version.py.wasi	2025-01-16 08:03:26.042654800 +0100
++++ firefox-134.0.2/wasi-sdk-25/version.py	2025-01-22 14:08:34.563909971 +0100
+@@ -60,6 +60,7 @@ assert parse_git_version(
+ 
+ 
+ def git_version():
++    return 25
+     version = exec(['git', 'describe', '--long', '--candidates=999',
+                     '--match=wasi-sdk-*', '--dirty=+m', f'--abbrev={GIT_REF_LEN}'],
+                     os.path.dirname(sys.argv[0]))

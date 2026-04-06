@@ -1,0 +1,8 @@
+--- same-file-1.0.6/Cargo.toml	2020-01-11T17:02:30+00:00
++++ same-file-1.0.6/Cargo.toml	2023-05-25T18:13:37.729141+00:00
+@@ -25,5 +25,3 @@
+ repository = "https://github.com/BurntSushi/same-file"
+ [dev-dependencies.doc-comment]
+ version = "0.3"
+-[target."cfg(windows)".dependencies.winapi-util]
+-version = "0.1.1"

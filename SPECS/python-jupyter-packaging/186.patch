@@ -1,0 +1,78 @@
+From 47614d55dbe2e800c4393ce17f2f284a3c42893d Mon Sep 17 00:00:00 2001
+From: Ben Greiner <code@bnavigator.de>
+Date: Mon, 16 Sep 2024 21:27:04 +0200
+Subject: [PATCH 1/3] Try to import bdist_wheel from setuptools first
+
+---
+ jupyter_packaging/setupbase.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/jupyter_packaging/setupbase.py b/jupyter_packaging/setupbase.py
+index f0ebbf4..cb5cd6e 100644
+--- a/jupyter_packaging/setupbase.py
++++ b/jupyter_packaging/setupbase.py
+@@ -44,10 +44,14 @@
+ from setuptools.command.develop import develop
+ from setuptools.command.sdist import sdist
+ 
++
+ try:
+-    from wheel.bdist_wheel import bdist_wheel
++    from setuptools.command.bdist_wheel import bdist_wheel
+ except ImportError:  # pragma: no cover
+-    bdist_wheel = None
++    try:
++        from wheel.bdist_wheel import bdist_wheel
++    except ImportError:
++        bdist_wheel = None
+ 
+ if sys.platform == "win32":  # pragma: no cover
+     from subprocess import list2cmdline
+
+From 49920607b6682df3c6cf480eebf5dc3ee4497c0d Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 16 Sep 2024 19:30:46 +0000
+Subject: [PATCH 2/3] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ jupyter_packaging/setupbase.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/jupyter_packaging/setupbase.py b/jupyter_packaging/setupbase.py
+index cb5cd6e..ddc4b13 100644
+--- a/jupyter_packaging/setupbase.py
++++ b/jupyter_packaging/setupbase.py
+@@ -44,7 +44,6 @@
+ from setuptools.command.develop import develop
+ from setuptools.command.sdist import sdist
+ 
+-
+ try:
+     from setuptools.command.bdist_wheel import bdist_wheel
+ except ImportError:  # pragma: no cover
+
+From b565482ebbad9b132526a463a70841976a030330 Mon Sep 17 00:00:00 2001
+From: Ben Greiner <code@bnavigator.de>
+Date: Mon, 16 Sep 2024 21:47:28 +0200
+Subject: [PATCH 3/3] Ignore wheel warning
+
+---
+ pyproject.toml | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b6739fe..0741903 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -80,5 +80,8 @@ filterwarnings= [
+   # Ignore our own deprecation warnings.
+   "ignore:.*:deprecation.DeprecatedWarning",
+   # Ignore warning raised when importing setuptools.command.develop.
+-  "ignore:pkg_resources is deprecated as an API:DeprecationWarning"
++  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
++  # bdist_wheel moved from wheel 0.44+ to setuptools 0.70.1+.
++  # We already handle it but wheel 0.44 could still emit the warning with an older setuptools.
++  "ignore:The 'wheel' package is no longer the canonical location of the 'bdist_wheel' command:DeprecationWarning",
+ ]

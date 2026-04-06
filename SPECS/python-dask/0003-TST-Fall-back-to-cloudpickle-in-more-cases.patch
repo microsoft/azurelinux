@@ -1,0 +1,26 @@
+From 34d8b8c71a86921846f250613253c64117c36631 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Tue, 5 Aug 2025 15:09:10 -0400
+Subject: [PATCH 3/4] TST: Fall back to cloudpickle in more cases
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/dataframe/dask_expr/tests/_util.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dask/dataframe/dask_expr/tests/_util.py b/dask/dataframe/dask_expr/tests/_util.py
+index 43093a709..4a49d882d 100644
+--- a/dask/dataframe/dask_expr/tests/_util.py
++++ b/dask/dataframe/dask_expr/tests/_util.py
+@@ -32,7 +32,7 @@ def assert_eq(a, b, *args, serialize_graph=True, **kwargs):
+                 if hasattr(obj, "dask"):
+                     try:
+                         pickle.dumps(obj.dask)
+-                    except AttributeError:
++                    except (AttributeError, pickle.PicklingError):
+                         try:
+                             import cloudpickle as cp
+ 
+-- 
+2.52.0
+

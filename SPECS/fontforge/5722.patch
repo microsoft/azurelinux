@@ -1,0 +1,27 @@
+From f99b1c886c0d9324440517a7a4253c5432e284ad Mon Sep 17 00:00:00 2001
+From: Ahmet Furkan Kavraz <kavraz@amazon.com>
+Date: Thu, 8 Jan 2026 15:38:57 +0000
+Subject: [PATCH] Fix CVE-2025-15269: Use-after-free in SFD ligature parsing
+
+Prevent circular linked list in LigaCreateFromOldStyleMultiple by clearing
+the next pointer after shallow copy. The shallow copy propagates liga's
+modified next pointer from previous iterations, creating a cycle that
+causes double-free when the list is traversed and freed.
+
+Fixes: CVE-2025-15269 | ZDI-25-1195 | ZDI-CAN-28564
+---
+ fontforge/sfd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fontforge/sfd.c b/fontforge/sfd.c
+index 6b980a4785..48b2b5f651 100644
+--- a/fontforge/sfd.c
++++ b/fontforge/sfd.c
+@@ -4711,6 +4711,7 @@ static PST1 *LigaCreateFromOldStyleMultiple(PST1 *liga) {
+     while ( (pt = strrchr(liga->pst.u.lig.components,';'))!=NULL ) {
+ 	new = chunkalloc(sizeof( PST1 ));
+ 	*new = *liga;
++	new->pst.next = NULL;
+ 	new->pst.u.lig.components = copy(pt+1);
+ 	last->pst.next = (PST *) new;
+ 	last = new;

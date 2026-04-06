@@ -1,0 +1,24 @@
+diff -Nrup a/configure.in b/configure.in
+--- a/configure.in	2010-12-13 10:24:39.000000000 -0700
++++ b/configure.in	2019-11-05 16:49:49.268231272 -0700
+@@ -1198,7 +1198,7 @@ GUILE_STRUCT_UTIMBUF
+ SCM_I_GSC_STACK_GROWS_UP=0
+ AC_RUN_IFELSE([AC_LANG_SOURCE(
+ [AC_INCLUDES_DEFAULT
+-int
++int __attribute__ ((noipa,noline,noclone))
+ find_stack_direction ()
+ {
+   static char *addr = 0;
+diff -Nrup a/configure b/configure
+--- a/configure	2010-12-13 12:29:32.000000000 -0700
++++ b/configure	2019-11-05 16:50:43.151922013 -0700
+@@ -18834,7 +18834,7 @@ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ $ac_includes_default
+-int
++int __attribute__ ((noipa,noinline,noclone))
+ find_stack_direction ()
+ {
+   static char *addr = 0;

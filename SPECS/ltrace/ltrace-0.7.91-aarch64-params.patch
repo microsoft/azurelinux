@@ -1,0 +1,37 @@
+diff -rup a/sysdeps/linux-gnu/aarch64/fetch.c b/sysdeps/linux-gnu/aarch64/fetch.c
+--- a/sysdeps/linux-gnu/aarch64/fetch.c	2018-07-05 16:06:10.066626252 -0400
++++ b/sysdeps/linux-gnu/aarch64/fetch.c	2018-07-05 16:17:17.659748481 -0400
+@@ -308,12 +308,9 @@ arch_fetch_arg_init(enum tof type, struc
+ 	struct fetch_script how = pass_arg(context, proc, ret_info);
+ 	if (how.c == CVT_ERR)
+ 		goto fail;
+-	if (how.c == CVT_NOP && how.f == FETCH_STACK) {
++	if (how.c == CVT_BYREF && how.f == FETCH_GPR) {
+ 		/* XXX double cast.  */
+ 		context->x8 = (arch_addr_t) (uintptr_t) context->gregs.regs[8];
+-		/* See the comment above about the assert.  */
+-		assert(! "Unexpected: first argument passed on stack.");
+-		abort();
+ 	}
+ 
+ 	return context;
+diff -rup a/testsuite/ltrace.main/system_call_params.exp b/testsuite/ltrace.main/system_call_params.exp
+--- a/testsuite/ltrace.main/system_call_params.exp	2018-07-05 16:06:10.516624926 -0400
++++ b/testsuite/ltrace.main/system_call_params.exp	2018-07-05 16:58:01.549830643 -0400
+@@ -61,13 +61,13 @@ set conf [ltraceNamedSource "$dir/syscal
+ # doesn't list readdir, that would be taken from somelib.conf with a
+ # wrong prototype.
+ 
+-ltraceMatch1 [ltraceRun -L -S -F $conf -- $bin] {^open@SYS\("/some/path"} == 0
++ltraceMatch1 [ltraceRun -L -S -F $conf -- $bin] {^open@SYS\("/some/path", 0\)} == 0
+ 
+ # On the other hand, if -F somedir/ is given, we want to accept
+ # syscalls.conf found there.
+ 
+ ltraceMatch [ltraceRun -L -S -F $dir -- $bin] {
+-    {{^open@SYS\("/some/path"} == 1}
++    {{^open@SYS\("/some/path", 0\)} == 1}
+     {{^write@SYS\(1, "something", 10\)} == 1}
+     {{^mount@SYS\("source", "target", "filesystemtype"} == 1}
+ }
+Only in b/testsuite/ltrace.main: system_call_params.exp~

@@ -1,0 +1,11 @@
+--- qt-x11-free-3.3.6/src/kernel/qfontdatabase_x11.cpp.fonts	2004-08-05 16:42:06.000000000 +0200
++++ qt-x11-free-3.3.6/src/kernel/qfontdatabase_x11.cpp	2004-09-28 16:11:54.955374161 +0200
+@@ -975,7 +981,7 @@
+     };
+     const XftDefaultFont defaults[] = {
+ 	{ "Serif", "serif", FALSE },
+-	{ "Sans Serif", "sans-serif", FALSE },
++	{ "Sans", "sans-serif", FALSE },
+         { "Monospace", "monospace", TRUE },
+ 	{ 0, 0, FALSE }
+     };

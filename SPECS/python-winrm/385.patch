@@ -1,0 +1,53 @@
+From aee25d6e597158bb08cda53d7dcf7590393746f5 Mon Sep 17 00:00:00 2001
+From: Alexandre Detiste <alexandre.detiste@gmail.com>
+Date: Thu, 18 Jul 2024 07:58:17 +0200
+Subject: [PATCH] drop dependency on old external mock module
+
+---
+ requirements-test.txt         | 3 +--
+ winrm/tests/conftest.py       | 2 +-
+ winrm/tests/test_transport.py | 3 +--
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/requirements-test.txt b/requirements-test.txt
+index 8f54e8b..19c6b8d 100644
+--- a/requirements-test.txt
++++ b/requirements-test.txt
+@@ -4,6 +4,5 @@ isort == 5.13.2
+ mypy == 1.10.0
+ pytest
+ pytest-cov
+-mock
+ types-requests
+-types-xmltodict
+\ No newline at end of file
++types-xmltodict
+diff --git a/winrm/tests/conftest.py b/winrm/tests/conftest.py
+index 2857d1c..8631c3f 100644
+--- a/winrm/tests/conftest.py
++++ b/winrm/tests/conftest.py
+@@ -1,9 +1,9 @@
+ # flake8: noqa
+ import os
+ import uuid
++from unittest.mock import patch
+ 
+ import xmltodict
+-from mock import patch
+ from pytest import fixture, skip
+ 
+ open_shell_request = """\
+diff --git a/winrm/tests/test_transport.py b/winrm/tests/test_transport.py
+index c86dec2..0c8660f 100644
+--- a/winrm/tests/test_transport.py
++++ b/winrm/tests/test_transport.py
+@@ -1,8 +1,7 @@
+ # coding=utf-8
+ import os
+ import unittest
+-
+-import mock
++from unittest import mock
+ 
+ from winrm import transport
+ from winrm.exceptions import InvalidCredentialsError, WinRMError

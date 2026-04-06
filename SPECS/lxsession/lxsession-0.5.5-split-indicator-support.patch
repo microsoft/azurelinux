@@ -1,0 +1,144 @@
+diff --git a/Makefile.am b/Makefile.am
+index 5a1177e..7d20d37 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -459,9 +459,13 @@ lxsession_lxsession_CPPFLAGS += \
+ lxsession_lxsession_LDADD += \
+     $(GTK_LIBS)
+ 
++if USE_INDICATOR
++lxsession_lxsession_VALAFLAGS +=     \
++    --pkg appindicator-0.1
++endif
++
+ if USE_ADVANCED_NOTIFICATIONS
+ lxsession_lxsession_VALAFLAGS +=     \
+-    --pkg appindicator-0.1 \
+     --pkg libnotify \
+     -D USE_ADVANCED_NOTIFICATIONS
+ 
+diff --git a/configure.ac b/configure.ac
+index 38c6c93..33a6fc7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -108,7 +108,6 @@ else
+       AS_HELP_STRING([--enable-advanced-notifications],
+                      [Build with advanced notification using indicators and libnotify (default: no)]),
+       use_advanced_notifications=$enableval, use_advanced_notifications="no")
+-
+ fi
+ 
+ AM_CONDITIONAL(USE_BUILDIN_CLIPBOARD, test "$use_buildin_clipboard" = "yes")
+@@ -117,7 +116,8 @@ AM_CONDITIONAL(USE_GTK3, test "$enable_gtk3" = "yes")
+ AM_CONDITIONAL(USE_ADVANCED_NOTIFICATIONS, test "$use_advanced_notifications" = "yes")
+ 
+ if test "$use_advanced_notifications" = "yes"; then
+-  PKG_CHECK_MODULES(INDICATORS, [indicator-0.4 >= 0.4.93 appindicator-0.1])
++  use_indicator=no
++  PKG_CHECK_MODULES(INDICATORS, [indicator-0.4 >= 0.4.93 appindicator-0.1], [use_indicator=no], [use_indicator=no])
+   AC_SUBST(INDICATORS_CFLAGS)
+   AC_SUBST(INDICATORS_LIBS)
+ 
+@@ -126,6 +126,9 @@ if test "$use_advanced_notifications" = "yes"; then
+   AC_SUBST(LIBNOTIFY_LIBS)
+ fi
+ 
++AM_CONDITIONAL(USE_INDICATOR, test "$use_indicator" = "yes")
++
++
+ if test "$use_buildin_polkit" = "yes"; then
+   HIDE_LXPOLKIT_AUTOSTART=true
+ else
+diff --git a/lxsession/notifications.vala b/lxsession/notifications.vala
+index 5432aa8..b706ab8 100644
+--- a/lxsession/notifications.vala
++++ b/lxsession/notifications.vala
+@@ -19,7 +19,9 @@
+ #if USE_GTK
+ using Gtk;
+ #if USE_ADVANCED_NOTIFICATIONS
++#if USE_INDICATOR
+ using AppIndicator;
++#endif
+ using Notify;
+ #endif
+ #endif
+@@ -78,7 +80,9 @@ namespace Lxsession
+         public MenuObject menu;
+ #if USE_GTK
+ #if USE_ADVANCED_NOTIFICATIONS
++#if USE_INDICATOR
+         public Indicator indicator;
++#endif
+         public Notify.Notification notification;
+ #endif
+ #endif
+@@ -106,7 +110,9 @@ namespace Lxsession
+             this.menu = menu_param;
+ #if USE_GTK
+ #if USE_ADVANCED_NOTIFICATIONS
++#if USE_INDICATOR
+             this.indicator = new Indicator(this.name, this.icon_name, IndicatorCategory.APPLICATION_STATUS);
++#endif
+             this.notification = new Notify.Notification ("LXsession", this.notification_text, this.icon_name);
+             this.notification.set_timeout(6000);
+ #endif
+@@ -117,6 +123,7 @@ namespace Lxsession
+ #if USE_ADVANCED_NOTIFICATIONS
+         public void init()
+         {
++#if USE_INDICATOR
+             if (this.indicator == null)
+             {
+                 this.indicator = new Indicator(this.name, this.icon_name, IndicatorCategory.APPLICATION_STATUS);
+@@ -128,10 +135,12 @@ namespace Lxsession
+             {
+                 this.indicator.set_menu(this.menu);
+             }
++#endif
+         }
+ 
+         public void activate()
+         {
++#if USE_INDICATOR
+             message("Try activate");
+             if (this.indicator != null)
+             {
+@@ -147,10 +156,12 @@ namespace Lxsession
+                 }
+                 message("Activate done");
+             }
++#endif
+         }
+ 
+         public void inactivate()
+         {
++#if USE_INDICATOR
+             message("Try inactivate");
+             if (this.indicator != null)
+             {
+@@ -158,19 +169,24 @@ namespace Lxsession
+                 this.indicator.set_status(IndicatorStatus.PASSIVE);
+                 message("Inactivate done");
+             }
++#endif
+         }
+ 
+         public void set_icon(string param_icon_name)
+         {
++#if USE_INDICATOR
+             this.icon_name = param_icon_name;   
+             message("Set new icon");
+             this.indicator.icon_name = param_icon_name;
++#endif
+         }
+ 
+         public void set_menu(MenuObject param_menu)
+         {
++#if USE_INDICATOR
+             this.menu = param_menu;
+             this.indicator.set_menu(param_menu);
++#endif
+         }
+ 
+         public void add_action (string action, string label, owned ActionCallback callback)

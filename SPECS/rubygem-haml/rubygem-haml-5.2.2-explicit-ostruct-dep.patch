@@ -1,0 +1,9 @@
+--- ./test/helpers_for_rails_test.rb.orig	2021-07-28 02:11:01.000000000 +0900
++++ ./test/helpers_for_rails_test.rb	2024-05-04 15:01:47.313758032 +0900
+@@ -1,5 +1,6 @@
+ # frozen_string_literal: true
+ 
++require 'ostruct'
+ require 'test_helper'
+ require "active_model/naming"
+ 

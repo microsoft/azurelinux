@@ -1,0 +1,70 @@
+From 3ef8c038b06f136a6abe7cfa23afec4d514af4f0 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 21 Nov 2024 14:17:21 +0100
+Subject: [PATCH 5/7] Xm/RCMenu: Use Xinerama for placement
+
+Please note that when building with Xinerama enabled, the placement
+logic changes, as the original location of the CascadeButton is not
+taken into account when relocating the RCMenu widget.
+
+Reason for that is because I reckon the current code is not correct, as
+it moves the RCMenu way off the screen, yet it doesn't show without
+Xinerama because there is another check later to make sure the widget
+remains on the overall screen, hence hiding the problem.
+
+With Xinerama, that breaks in-between monitors and the RCMenu ends up
+completely misplaced, which is why I think the code was wrong, yet the
+logic is preserved when building without XINERAMA support to preserve
+the current behavior if needed.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/RCMenu.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/lib/Xm/RCMenu.c b/lib/Xm/RCMenu.c
+index 2c698d4f..abd7a70e 100644
+--- a/lib/Xm/RCMenu.c
++++ b/lib/Xm/RCMenu.c
+@@ -537,6 +537,7 @@ LocatePulldown(
+         XEvent *event )
+ {   
+     Position x, y, x1, y1;
++    Position dispX, dispMaxX;
+ 
+     if (root == NULL) 
+       return;
+@@ -617,17 +618,26 @@ LocatePulldown(
+      * window co-ords.
+      */
+     XtTranslateCoords( (Widget) p, x, y, &x1, &y1);
++    _XmScreenGetBoundariesAtpoint(XtScreen(m), x1, y1, &dispX, NULL, &dispMaxX, NULL);
+ 
+     /* Oh no!  we're going off screen.  Let's try and do 
+        something reasonable.  We're only doing the cascade
+        off a menu case for now.  (CR 6421) */
+-    if ((x1 + XtWidth(m)) > WidthOfScreen(XtScreen(m))) {
++    if ((x1 + XtWidth(m)) > dispMaxX) {
+       if (!IsOption(root) && (XmIsCascadeButton(p) || XmIsCascadeButtonGadget(p))) {
+-	x1 -= XtWidth(m) + x - XtX(p);
++	x1 -= XtWidth(m) + x;
++#ifndef HAVE_LIBXINERAMA
++	/* XXX: I don't think it's correct, but that's what the original code was doing… */
++	x1 -= XtX(p);
++#endif /* not HAVE_LIBXINERAMA */
+       }
+-    } else if (x1 < 0) { /* R to L case */
++    } else if (x1 < dispX) { /* R to L case */
+       if (!IsOption(root) && (XmIsCascadeButton(p) || XmIsCascadeButtonGadget(p))) {
+-	x1 += XtWidth(m) + x - XtX(p);
++	x1 += XtWidth(m) + x;
++#ifndef HAVE_LIBXINERAMA
++	/* XXX: I don't think it's correct, but that's what the original code was doing… */
++	x1 -= XtX(p);
++#endif /* not HAVE_LIBXINERAMA */
+       }
+     }
+ 
+-- 
+2.49.0
+

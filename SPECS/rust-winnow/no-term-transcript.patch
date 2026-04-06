@@ -1,0 +1,12 @@
+diff -Naur winnow-0.7.13-original/src/combinator/debug/mod.rs winnow-0.7.13/src/combinator/debug/mod.rs
+--- winnow-0.7.13-original/src/combinator/debug/mod.rs	2006-07-24 02:21:28.000000000 +0100
++++ winnow-0.7.13/src/combinator/debug/mod.rs	2025-10-06 10:03:56.377548889 +0100
+@@ -77,6 +77,8 @@
+ #[cfg_attr(miri, ignore)]
+ #[cfg(unix)]
+ #[cfg(feature = "debug")]
++// Downstream: requires term-transcript crate, not packaged
++#[cfg(any())]
+ fn example() {
+     use term_transcript::{test::TestConfig, ShellOptions};
+ 

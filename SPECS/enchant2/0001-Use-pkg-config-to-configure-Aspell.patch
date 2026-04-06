@@ -1,0 +1,27 @@
+diff -rupN --no-dereference enchant-2.8.15/configure.ac enchant-2.8.15-new/configure.ac
+--- enchant-2.8.15/configure.ac	2026-02-13 22:22:16.000000000 +0100
++++ enchant-2.8.15-new/configure.ac	2026-02-17 10:33:36.688104002 +0100
+@@ -209,11 +209,10 @@ dnl Check for providers
+ build_providers=
+ 
+ dnl Standard providers
+-AC_CHECK_HEADERS([aspell.h], [HAVE_ASPELL_H=yes])
+ AC_CHECK_HEADERS([hspell.h], [HAVE_HSPELL_H=yes])
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([hunspell], [HUNSPELL])
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([nuspell], [NUSPELL], [nuspell >= 5.1.0])
+-ENCHANT_CHECK_LIB_PROVIDER([aspell], [ASPELL], [get_aspell_dict_info_list],,, [ASPELL_H])
++ENCHANT_CHECK_PKG_CONFIG_PROVIDER([aspell], [ASPELL])
+ ENCHANT_CHECK_LIB_PROVIDER([hspell], [HSPELL], [hspell_get_dictionary_path],, [-lz], [HSPELL_H])
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([voikko], [VOIKKO], [libvoikko])
+ dnl FIXME: The test below assumes GCC(-compatible) ObjC++ compiler, but
+diff -rupN --no-dereference enchant-2.8.15/providers/Makefile.am enchant-2.8.15-new/providers/Makefile.am
+--- enchant-2.8.15/providers/Makefile.am	2025-07-22 23:13:04.000000000 +0200
++++ enchant-2.8.15-new/providers/Makefile.am	2026-02-17 10:33:36.688403238 +0100
+@@ -23,6 +23,7 @@ AM_LDFLAGS = -module -avoid-version -no-
+ 
+ if WITH_ASPELL
+ provider_LTLIBRARIES += enchant_aspell.la
++enchant_aspell_la_LIBADD = $(ASPELL_LIBS)
+ endif
+ 
+ if WITH_HSPELL

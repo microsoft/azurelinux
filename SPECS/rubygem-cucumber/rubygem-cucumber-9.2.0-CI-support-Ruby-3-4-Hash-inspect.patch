@@ -1,0 +1,65 @@
+From b9065c96098b893c75fcbb41b7558332b3bfd23b Mon Sep 17 00:00:00 2001
+From: Orien Madgwick <497874+orien@users.noreply.github.com>
+Date: Fri, 27 Dec 2024 23:10:07 +1100
+Subject: [PATCH] CI: support Ruby 3.4+ Hash#inspect
+
+---
+ .../extending_cucumber/custom_formatter.feature     |  4 ++--
+ spec/cucumber/glue/proto_world_spec.rb              | 13 ++++++++++---
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/features/docs/extending_cucumber/custom_formatter.feature b/features/docs/extending_cucumber/custom_formatter.feature
+index a5728db932..187996c9da 100644
+--- a/features/docs/extending_cucumber/custom_formatter.feature
++++ b/features/docs/extending_cucumber/custom_formatter.feature
+@@ -45,7 +45,7 @@ Feature: Custom Formatter
+           def initialize(config, options)
+             @io = config.out_stream
+             config.on_event :test_run_finished do |event|
+-              @io.print options.inspect
++              @io.print options.to_json
+             end
+           end
+         end
+@@ -54,5 +54,5 @@ Feature: Custom Formatter
+     When I run `cucumber features/f.feature --format MyCustom::Formatter,foo=bar,one=two --publish-quiet`
+     Then it should pass with exactly:
+     """
+-    {"foo"=>"bar", "one"=>"two"}
++    {"foo":"bar","one":"two"}
+     """
+diff --git a/spec/cucumber/glue/proto_world_spec.rb b/spec/cucumber/glue/proto_world_spec.rb
+index c9f37b0730..41158cd5cc 100644
+--- a/spec/cucumber/glue/proto_world_spec.rb
++++ b/spec/cucumber/glue/proto_world_spec.rb
+@@ -72,8 +72,9 @@ module Glue
+             end
+           end
+ 
+-          it 'attached the styring version on the object' do
+-            expect(@out.string).to include '{:a=>1, :b=>2, :c=>3}'
++          it 'attached the string version on the object' do
++            expected_string = RUBY_VERSION >= '3.4' ? '{a: 1, b: 2, c: 3}' : '{:a=>1, :b=>2, :c=>3}'
++            expect(@out.string).to include expected_string
+           end
+         end
+ 
+@@ -92,11 +93,17 @@ module Glue
+           end
+ 
+           it 'logs each parameter independently' do
++            expected_hash =
++              if RUBY_VERSION >= '3.4'
++                '{subject: "monkey", verb: "eats", complement: "banana"}'
++              else
++                '{:subject=>"monkey", :verb=>"eats", :complement=>"banana"}'
++              end
+             expect(@out.string).to include [
+               '      subject: monkey',
+               '      verb: eats',
+               '      complement: banana',
+-              '      {:subject=>"monkey", :verb=>"eats", :complement=>"banana"}'
++              "      #{expected_hash}"
+             ].join("\n")
+           end
+         end

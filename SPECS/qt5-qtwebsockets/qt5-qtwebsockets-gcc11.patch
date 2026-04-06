@@ -1,0 +1,12 @@
+diff --git a/src/websockets/qwebsocketprotocol.cpp b/src/websockets/qwebsocketprotocol.cpp
+index df87a93..9556d18 100644
+--- a/src/websockets/qwebsocketprotocol.cpp
++++ b/src/websockets/qwebsocketprotocol.cpp
+@@ -38,6 +38,7 @@
+ ****************************************************************************/
+ 
+ #include "qwebsocketprotocol_p.h"
++#include <limits>
+ #include <QtCore/QString>
+ #include <QtCore/QSet>
+ #include <QtCore/QtEndian>

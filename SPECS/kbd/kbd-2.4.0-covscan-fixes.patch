@@ -1,0 +1,11 @@
+diff -up kbd-2.6.1/src/libkfont/psffontop.c.orig kbd-2.6.1/src/libkfont/psffontop.c
+--- kbd-2.6.1/src/libkfont/psffontop.c.orig	2023-06-23 10:29:44.000000000 +0200
++++ kbd-2.6.1/src/libkfont/psffontop.c	2023-06-30 14:06:06.363944776 +0200
+@@ -236,6 +236,7 @@ kfont_read_psffont(struct kfont_context
+ 
+ 		if (psfhdr->mode > PSF1_MAXMODE) {
+ 			KFONT_ERR(ctx, _("Unsupported psf file mode (%d)"), psfhdr->mode);
++			free(psfhdr);
+ 			return -EX_DATAERR;
+ 		}
+ 		fontlen   = ((psfhdr->mode & PSF1_MODE512) ? 512 : 256);

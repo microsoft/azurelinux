@@ -1,0 +1,11 @@
+--- DyLP-1.10.4/src/OsiDylp/OsiDylpSolverInterface.cpp.orig	2011-12-10 16:19:09.000000000 -0700
++++ DyLP-1.10.4/src/OsiDylp/OsiDylpSolverInterface.cpp	2019-06-19 11:42:50.349820872 -0600
+@@ -4580,7 +4580,7 @@ void ODSI::initialSolve ()
+     initialSolveOptions->finpurge.cons = false ; }
+   lp_retval = do_lp(startCold,initial_gtxecho) ;
+   if (presolving == true)
+-  { lpprob->ctlopts = setflg(lpprob->ctlopts,save_ctlopts) ;
++  { setflg(lpprob->ctlopts,save_ctlopts) ;
+     initialSolveOptions->finpurge.vars = save_finpurge_vars ;
+     initialSolveOptions->finpurge.cons = save_finpurge_cons ; }
+ # ifdef ODSI_INFOMSGS

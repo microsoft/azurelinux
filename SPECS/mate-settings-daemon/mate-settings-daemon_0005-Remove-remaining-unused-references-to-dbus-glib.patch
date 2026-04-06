@@ -1,0 +1,52 @@
+From e57d532ac69fc3f6f5a34d9ce648bbdfb6a81185 Mon Sep 17 00:00:00 2001
+From: lukefromdc <lukefromdc@hushmail.com>
+Date: Mon, 30 Sep 2024 03:50:18 -0400
+Subject: [PATCH 5/5] Remove remaining unused references to dbus-glib
+
+---
+ configure.ac                                | 1 -
+ data/mate-settings-daemon-uninstalled.pc.in | 2 +-
+ data/mate-settings-daemon.pc.in             | 2 +-
+ 3 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a370771e..4ee59b23 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,7 +52,6 @@ dnl ---------------------------------------------------------------------------
+ dnl - Dependencies
+ dnl ---------------------------------------------------------------------------
+ 
+-DBUS_GLIB_REQUIRED_VERSION=0.74
+ GLIB_REQUIRED_VERSION=2.58.0
+ GIO_REQUIRED_VERSION=2.50.0
+ GTK_REQUIRED_VERSION=3.22.0
+diff --git a/data/mate-settings-daemon-uninstalled.pc.in b/data/mate-settings-daemon-uninstalled.pc.in
+index 89dadcde..0addf2f0 100644
+--- a/data/mate-settings-daemon-uninstalled.pc.in
++++ b/data/mate-settings-daemon-uninstalled.pc.in
+@@ -6,7 +6,7 @@ binary=${pc_top_builddir}/mate-settings-daemon/mate-settings-daemon
+ 
+ Name: mate-settings-daemon
+ Description: Utility library for accessing mate-settings-daemon over DBUS
+-Requires: glib-2.0 dbus-1 dbus-glib-1
++Requires: glib-2.0 dbus-1
+ Version: @VERSION@
+ Libs: ${pc_top_builddir}/${pcfiledir}/libmate-settings-daemon.la
+ Cflags: -I${pc_top_builddir}/${pcfiledir}/..
+diff --git a/data/mate-settings-daemon.pc.in b/data/mate-settings-daemon.pc.in
+index e5317261..76345c38 100644
+--- a/data/mate-settings-daemon.pc.in
++++ b/data/mate-settings-daemon.pc.in
+@@ -8,7 +8,7 @@ binary=${libexecdir}/mate-settings-daemon
+ 
+ Name: mate-settings-daemon
+ Description: Utility library for accessing mate-settings-daemon over DBUS
+-Requires: glib-2.0 dbus-1 dbus-glib-1
++Requires: glib-2.0 dbus-1
+ Version: @VERSION@
+ Libs: -L${libdir}
+ Cflags: -I${includedir}/mate-settings-daemon
+-- 
+2.49.0
+

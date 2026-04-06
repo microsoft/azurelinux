@@ -1,0 +1,31 @@
+From deba76fffc806ade793798b9ffeb36d14518d3db Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@tiptoe.de>
+Date: Fri, 13 Jun 2025 14:02:18 +0200
+Subject: [PATCH] Fix tests with doxygen 1.14
+
+This version is more strict about ignoring non-linkable definitions, so
+make the referenced testlib_manifesto a public symbol.
+
+See commit d1666a643c24c1b28945361a12b0fc02be09fe5b in doxygen.
+
+Signed-off-by: Nils Philippsen <nils@tiptoe.de>
+---
+ test/c/include/testlib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/c/include/testlib.h b/test/c/include/testlib.h
+index 58e59c3..b64449c 100644
+--- a/test/c/include/testlib.h
++++ b/test/c/include/testlib.h
+@@ -181,7 +181,7 @@ typedef struct {
+ */
+ 
+ /// A string
+-static const char* const testlib_manifesto = "A spectre is haunting Doxygen";
++const char* const testlib_manifesto = "A spectre is haunting Doxygen";
+ 
+ /// A version as an array of integers
+ static const int testlib_version[3] = {1, 2, 3};
+-- 
+2.49.0
+

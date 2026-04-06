@@ -1,0 +1,51 @@
+From 9cda20bbb966fe1e4ae51921d566c668654ee5e1 Mon Sep 17 00:00:00 2001
+From: Vincent Vanlaer <vincent.vanlaer@skynet.be>
+Date: Sun, 3 Sep 2023 00:00:54 +0200
+Subject: [PATCH] Remove trio.tests import causing warnings
+
+It is deprecated and the replacement is made private as trio._tests.
+While we could be using that, this commit copies over the one relevant
+function that is actually necessary. The other two imports just repeat
+tests that are already in trio and do not need repeating here.
+---
+ .../_tests/test_hypothesis_interaction.py     | 21 ++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/pytest_trio/_tests/test_hypothesis_interaction.py b/pytest_trio/_tests/test_hypothesis_interaction.py
+index 75aa9f7..cb95a96 100644
+--- a/pytest_trio/_tests/test_hypothesis_interaction.py
++++ b/pytest_trio/_tests/test_hypothesis_interaction.py
+@@ -1,10 +1,5 @@
+ import pytest
+ import trio
+-from trio.tests.test_scheduler_determinism import (
+-    scheduler_trace,
+-    test_the_trio_scheduler_is_not_deterministic,
+-    test_the_trio_scheduler_is_deterministic_if_seeded,
+-)
+ from hypothesis import given, settings, strategies as st
+ 
+ from pytest_trio.plugin import _trio_test_runner_factory
+@@ -38,6 +33,22 @@ async def test_mark_and_parametrize(x, y):
+     assert y in (1, 2)
+ 
+ 
++async def scheduler_trace():
++    """Returns a scheduler-dependent value we can use to check determinism."""
++    trace = []
++
++    async def tracer(name):
++        for i in range(10):
++            trace.append((name, i))
++            await trio.sleep(0)
++
++    async with trio.open_nursery() as nursery:
++        for i in range(5):
++            nursery.start_soon(tracer, i)
++
++    return tuple(trace)
++
++
+ def test_the_trio_scheduler_is_deterministic_under_hypothesis():
+     traces = []
+ 

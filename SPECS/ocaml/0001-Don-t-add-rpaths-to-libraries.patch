@@ -1,0 +1,25 @@
+From 507a1382cb82160c2a6cfc0ea5bcb3e33ece7307 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 24 Jun 2014 10:00:15 +0100
+Subject: [PATCH 1/2] Don't add rpaths to libraries.
+
+---
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0c9d63859a..48aa9f0a29 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1221,8 +1221,6 @@ AS_IF([test x"$enable_shared" != "xno"],
+          [[*-*-openbsd7.[3-9]|*-*-openbsd[89].*]],
+            [mkdll_flags="${mkdll_flags} -Wl,--no-execute-only"])
+       oc_ldflags="$oc_ldflags -Wl,-E"
+-      rpath="-Wl,-rpath,"
+-      mksharedlibrpath="-Wl,-rpath,"
+       natdynlinkopts="-Wl,-E"
+       supports_shared_libraries=true],
+       [mkdll='shared-libs-not-available'])
+-- 
+2.44.0
+

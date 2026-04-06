@@ -1,0 +1,108 @@
+diff --git a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+index 159b490c..110f2dcf 100644
+--- a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
++++ b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+@@ -951,6 +951,7 @@ void QFontconfigDatabase::setupFontEngine(QFontEngineFT *engine, const QFontDef
+     QFontEngine::GlyphFormat format;
+     // try and get the pattern
+     FcPattern *pattern = FcPatternCreate();
++    FcPattern *match = NULL;
+
+     FcValue value;
+     value.type = FcTypeString;
+@@ -977,7 +978,41 @@ void QFontconfigDatabase::setupFontEngine(QFontEngineFT *engine, const QFontDef
+     FcConfigSubstitute(nullptr, pattern, FcMatchPattern);
+     FcDefaultSubstitute(pattern);
+
+-    FcPattern *match = FcFontMatch(nullptr, pattern, &result);
++    if (!fid.filename.isEmpty()) {
++        // FC_INDEX is ignored during processing in FcFontMatch.
++        // So iterate FcPatterns directly and find it out.
++        FcFontSet *fcsets[2], *fcfs;
++
++        fcsets[0] = FcConfigGetFonts(nullptr, FcSetSystem);
++        fcsets[1] = FcConfigGetFonts(nullptr, FcSetApplication);
++        for (int nset = 0; nset < 2; nset++) {
++            fcfs = fcsets[nset];
++            for (int fnum = 0; fnum < fcfs->nfont; fnum++) {
++                FcPattern *fcpat = fcfs->fonts[fnum];
++                FcChar8 *fcfile;
++                FcBool variable;
++                int fcindex;
++
++                // FIXME: Ignore a FcPattern which has variable=true at this point.
++                if (FcPatternGetBool(fcpat, FC_VARIABLE, 0, &variable) == FcResultMatch &&
++                    variable == FcTrue)
++                    continue;
++                if (FcPatternGetString(fcpat, FC_FILE, 0, &fcfile) == FcResultMatch &&
++                    FcPatternGetInteger(fcpat, FC_INDEX, 0, &fcindex) == FcResultMatch) {
++                    QByteArray f = QByteArray::fromRawData((const char *)fcfile,
++                                                           strlen((const char *)fcfile));
++                    if (f == fid.filename && fcindex == fid.index) {
++                        // We found it.
++                        match = FcFontRenderPrepare(nullptr, pattern, fcpat);
++                        goto bail;
++                    }
++                }
++            }
++        }
++    }
++bail:
++    if (!match)
++        match = FcFontMatch(nullptr, pattern, &result);
+     if (match) {
+         engine->setDefaultHintStyle(defaultHintStyleFromMatch((QFont::HintingPreference)fontDef.hintingPreference, match, useXftConf));
+
+@@ -997,6 +1032,11 @@ void QFontconfigDatabase::setupFontEngine(QFontEngineFT *engine, const QFontDef
+                 antialias = fc_antialias;
+         }
+
++        FcBool embolden;
++        engine->auto_embolden = true;
++        if (FcPatternGetBool(match, FC_EMBOLDEN, 0, &embolden) == FcResultMatch)
++            engine->embolden = embolden;
++
+         if (antialias) {
+             QFontEngine::SubpixelAntialiasingType subpixelType = QFontEngine::Subpixel_None;
+             if (!(fontDef.styleStrategy & QFont::NoSubpixelAntialias))
+diff --git a/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp b/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp
+index 52ce36b0..9626490b 100644
+--- a/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp
++++ b/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp
+@@ -681,6 +681,7 @@ QFontEngineFT::QFontEngineFT(const QFontDef &fd)
+     kerning_pairs_loaded = false;
+     transform = false;
+     embolden = false;
++    auto_embolden = false;
+     obliquen = false;
+     antialias = true;
+     freetype = nullptr;
+@@ -748,7 +749,7 @@ bool QFontEngineFT::init(FaceId faceId, bool antialias, GlyphFormat format,
+         FT_Set_Transform(face, &matrix, nullptr);
+         freetype->matrix = matrix;
+         // fake bold
+-        if ((fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
++        if (!auto_embolden && (fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
+             if (const TT_OS2 *os2 = reinterpret_cast<const TT_OS2 *>(FT_Get_Sfnt_Table(face, ft_sfnt_os2))) {
+                 if (os2->usWeightClass < 700 &&
+                     (fontDef.pixelSize < 64 || qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD_LIMIT"))) {
+@@ -2104,6 +2105,7 @@ bool QFontEngineFT::initFromFontEngine(const QFontEngineFT *fe)
+     antialias = fe->antialias;
+     transform = fe->transform;
+     embolden = fe->embolden;
++    auto_embolden = fe->auto_embolden;
+     obliquen = fe->obliquen;
+     subpixelType = fe->subpixelType;
+     lcdFilterType = fe->lcdFilterType;
+diff --git a/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h b/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h
+index 2e3aef69..4372f913 100644
+--- a/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h
++++ b/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h
+@@ -295,6 +295,7 @@ protected:
+     bool cacheEnabled;
+     bool forceAutoHint;
+     bool stemDarkeningDriver;
++    bool auto_embolden;        // a flag to decide if embolden is set by fontconfig
+
+ private:
+     friend class QFontEngineFTRawFont;

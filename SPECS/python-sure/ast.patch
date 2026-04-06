@@ -1,0 +1,12 @@
+--- a/setup.py~	2024-11-11 11:46:59.418001141 -0600
++++ b/setup.py	2024-11-11 11:52:49.672165670 -0600
+@@ -83,7 +83,8 @@
+ 
+ install_requires = ["six"]
+ tests_require = ["nose"]
+-version = read_version()
++import sure.version
++version = sure.version.version
+ 
+ if __name__ == "__main__":
+     setup(

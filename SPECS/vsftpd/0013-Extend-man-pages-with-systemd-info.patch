@@ -1,0 +1,86 @@
+From 813a4bc45d45f4af94c699893cb2d2ba998d5d31 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 11:53:07 +0200
+Subject: [PATCH 13/59] Extend man pages with systemd info.
+
+Man pages now reflect how is vsftpd used as
+systemd service.
+---
+ vsftpd.8      | 24 ++++++++++++++++++++++++
+ vsftpd.conf.5 | 18 +++++++++++++++++-
+ 2 files changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/vsftpd.8 b/vsftpd.8
+index c920e7d..fbeb1a2 100644
+--- a/vsftpd.8
++++ b/vsftpd.8
+@@ -25,6 +25,23 @@ in
+ Direct execution of the
+ .Nm vsftpd
+ binary will then launch the FTP service ready for immediate client connections.
++.Pp
++Systemd changes the vsftpd daemon start-up. The vsftpd package contains vsftpd-generator script generating symbolic links to /var/run/systemd/generator/vsftpd.target.wants directory. The generator is called during e.g. 'systemctl --system daemon-reload'. All these symbolic links link /usr/lib/systemd/system/vsftpd@.service file.
++The vsftpd daemon(s) is/are controlled by one of following ways:
++.Pp
++1. Single daemon using default /etc/vsftpd/vsftpd.conf configuration file
++.br
++# systemctl {start,stop,...} vsftpd[.service]
++.Pp
++2. Single daemon using /etc/vsftpd/<conf-name>.conf
++.br
++# systemctl {start,stop,...} vsftpd@<conf-name>[.service]
++.Pp
++3. All instances together
++.br
++# systemctl {restart,stop} vsftpd.target
++.Pp
++See systemd.unit(5), systemd.target(5) for further details.
+ .Sh OPTIONS
+ An optional
+ configuration file or files
+@@ -55,6 +72,13 @@ the "ftpd_banner" setting is set to "blah", which overrides any default vsftpd
+ setting and any identical setting that was in the config file.
+ .Sh FILES
+ .Pa /etc/vsftpd/vsftpd.conf
++.Pp
++.Pa /usr/lib/systemd/system/vsftpd.service
++.Pp
++.Pa /usr/lib/systemd/system/vsftpd@.service
++.Pp
++.Pa /usr/lib/systemd/system/vsftpd.target
+ .Sh SEE ALSO
+ .Xr vsftpd.conf 5
++.Xr systemd.unit 5
+ .end
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 9d767b1..0744f85 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -12,7 +12,23 @@ inetd such as
+ .BR xinetd
+ to launch vsftpd with different configuration files on a per virtual host
+ basis.
+-
++.P
++Systemd changes the vsftpd daemon start-up. The vsftpd package contains vsftpd-generator script generating symbolic links to /var/run/systemd/generator/vsftpd.target.wants directory. The generator is called during e. g. 'systemctl --system daemon-reload'. All these symbolic links link /usr/lib/systemd/system/vsftpd@.service file.
++The vsftpd daemon(s) is/are controlled by one of following ways:
++.P
++1. Single daemon using default /etc/vsftpd/vsftpd.conf configuration file
++.br
++# systemctl {start,stop,...} vsftpd[.service]
++.P
++2. Single daemon using /etc/vsftpd/<config-filename>.conf
++.br
++# systemctl {start,stop,...} vsftpd@<config-filename-without-extension>[.service]
++.P
++3. All instances together
++.br
++# systemctl {restart,stop} vsftpd.target
++.P
++See systemd.unit(5), systemd.target(5) for further details.
+ .SH FORMAT
+ The format of vsftpd.conf is very simple. Each line is either a comment or
+ a directive. Comment lines start with a # and are ignored. A directive line
+-- 
+2.14.4
+

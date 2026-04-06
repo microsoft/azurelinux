@@ -1,0 +1,33 @@
+From ed7d6c2fa6e7848295893d455789ecb3e692b49f Mon Sep 17 00:00:00 2001
+Message-Id: <ed7d6c2fa6e7848295893d455789ecb3e692b49f.1613646685.git.github@grubix.eu>
+From: Michael J Gruber <github@grubix.eu>
+Date: Thu, 18 Feb 2021 12:09:29 +0100
+Subject: [PATCH] replace inkscape by rsvg
+
+Inkscape broke headless commandline usage and appears not be fixing it,
+see: https://gitlab.com/inkscape/inkscape/-/issues/1342
+
+Switch to rsvg as recommended by upstream, see:
+https://sourceforge.net/p/dblatex/mailman/message/37005820/
+
+Signed-off-by: Michael J Gruber <github@grubix.eu>
+---
+ lib/dbtexmf/core/imagedata.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/dbtexmf/core/imagedata.py b/lib/dbtexmf/core/imagedata.py
+index 32b7746..7c13e79 100644
+--- a/lib/dbtexmf/core/imagedata.py
++++ b/lib/dbtexmf/core/imagedata.py
+@@ -181,7 +181,7 @@ class FigConverter(ImageConverter):
+ class SvgConverter(ImageConverter):
+     def __init__(self, imgsrc, imgdst="", docformat="", backend=""):
+         ImageConverter.__init__(self, imgsrc="svg", imgdst=imgdst)
+-        self.add_command(["inkscape", "-z", "-D", "--export-%(dst)s=%(output)s",
++        self.add_command(["rsvg-convert", "-a", "-f", "%(dst)s", "-o", "%(output)s",
+                           "%(input)s"])
+ 
+ 
+-- 
+2.30.1.672.g8d3081386a
+

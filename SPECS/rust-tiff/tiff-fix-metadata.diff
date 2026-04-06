@@ -1,0 +1,21 @@
+--- tiff-0.10.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tiff-0.10.3/Cargo.toml	2025-09-29T13:58:28.128205+00:00
+@@ -88,11 +88,6 @@
+ name = "subsubifds"
+ path = "tests/subsubifds.rs"
+ 
+-[[bench]]
+-name = "lzw"
+-path = "benches/lzw.rs"
+-harness = false
+-
+ [dependencies.fax34]
+ version = "0.2.6"
+ optional = true
+@@ -122,6 +117,3 @@
+ 
+ [dev-dependencies.crc32fast]
+ version = "1.5"
+-
+-[dev-dependencies.criterion]
+-version = "0.3.1"

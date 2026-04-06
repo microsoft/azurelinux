@@ -1,0 +1,131 @@
+From d3fb975c9b58696ad1707f14f376af1c64726a0c Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Fri, 15 Sep 2023 05:48:18 -0700
+Subject: [PATCH] Prep fxdiv cmake for fedora packaging
+
+There is no fxdiv library, this is header only.
+Do not download and build source if the system provides them.
+gtest needs to be at least c++14
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CMakeLists.txt | 42 ++++++++++++++++++++++++++----------------
+ 1 file changed, 26 insertions(+), 16 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bcae6b5..f1f6054 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,6 +5,7 @@ PROJECT(FXdiv C CXX)
+ 
+ # ---[ Options.
+ OPTION(FXDIV_USE_INLINE_ASSEMBLY "Allow use of inline assembly in FXdiv" OFF)
++OPTION(FXDIV_USE_SYSTEM_LIBS "Use system-provided dependency libraries" OFF)
+ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}")
+   OPTION(FXDIV_BUILD_TESTS "Build FXdiv unit tests" ON)
+   OPTION(FXDIV_BUILD_BENCHMARKS "Build FXdiv micro-benchmarks" ON)
+@@ -21,6 +22,7 @@ IF(FXDIV_BUILD_TESTS)
+ ENDIF()
+ 
+ # ---[ Download deps
++IF(NOT FXDIV_USE_SYSTEM_LIBS)
+ IF(FXDIV_BUILD_TESTS AND NOT DEFINED GOOGLETEST_SOURCE_DIR)
+   MESSAGE(STATUS "Downloading Google Test to ${CMAKE_BINARY_DIR}/googletest-source (define GOOGLETEST_SOURCE_DIR to avoid it)")
+   CONFIGURE_FILE(cmake/DownloadGoogleTest.cmake "${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt")
+@@ -40,6 +42,7 @@ IF(FXDIV_BUILD_BENCHMARKS AND NOT DEFINED GOOGLEBENCHMARK_SOURCE_DIR)
+     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/googlebenchmark-download")
+   SET(GOOGLEBENCHMARK_SOURCE_DIR "${CMAKE_BINARY_DIR}/googlebenchmark-source" CACHE STRING "Google Benchmark source directory")
+ ENDIF()
++ENDIF()
+ 
+ # ---[ FXdiv library
+ ADD_LIBRARY(fxdiv INTERFACE)
+@@ -54,7 +57,7 @@ INSTALL(FILES include/fxdiv.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ 
+ IF(FXDIV_BUILD_TESTS)
+   # ---[ Build google test
+-  IF(NOT TARGET gtest)
++  IF(NOT TARGET gtest AND NOT FXDIV_USE_SYSTEM_LIBS)
+     SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+     ADD_SUBDIRECTORY(
+       "${GOOGLETEST_SOURCE_DIR}"
+@@ -63,22 +66,24 @@ IF(FXDIV_BUILD_TESTS)
+ 
+   ADD_EXECUTABLE(multiply-high-test test/multiply-high.cc)
+   SET_TARGET_PROPERTIES(multiply-high-test PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(multiply-high-test fxdiv gtest gtest_main)
++  TARGET_INCLUDE_DIRECTORIES(multiply-high-test PRIVATE include)
++  TARGET_LINK_LIBRARIES(multiply-high-test gtest gtest_main)
+   ADD_TEST(multiply-high multiply-high-test)
+ 
+   ADD_EXECUTABLE(quotient-test test/quotient.cc)
+   SET_TARGET_PROPERTIES(quotient-test PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(quotient-test fxdiv gtest gtest_main)
++  TARGET_INCLUDE_DIRECTORIES(quotient-test PRIVATE include)
++  TARGET_LINK_LIBRARIES(quotient-test gtest gtest_main)
+   ADD_TEST(quotient quotient-test)
+ ENDIF()
+ 
+ IF(FXDIV_BUILD_BENCHMARKS)
+   # ---[ Build google benchmark
+-  IF(NOT TARGET benchmark)
++  IF(NOT TARGET benchmark AND NOT FXDIV_USE_SYSTEM_LIBS)
+     SET(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+     ADD_SUBDIRECTORY(
+       "${GOOGLEBENCHMARK_SOURCE_DIR}"
+@@ -87,31 +92,36 @@ IF(FXDIV_BUILD_BENCHMARKS)
+ 
+   ADD_EXECUTABLE(init-bench bench/init.cc)
+   SET_TARGET_PROPERTIES(init-bench PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(init-bench fxdiv benchmark)
++  TARGET_INCLUDE_DIRECTORIES(init-bench PRIVATE include)
++  TARGET_LINK_LIBRARIES(init-bench benchmark)
+ 
+   ADD_EXECUTABLE(multiply-bench bench/multiply.cc)
+   SET_TARGET_PROPERTIES(multiply-bench PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(multiply-bench fxdiv benchmark)
++  TARGET_INCLUDE_DIRECTORIES(multiply-bench PRIVATE include)
++  TARGET_LINK_LIBRARIES(multiply-bench benchmark)
+ 
+   ADD_EXECUTABLE(divide-bench bench/divide.cc)
+   SET_TARGET_PROPERTIES(divide-bench PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(divide-bench fxdiv benchmark)
++  TARGET_INCLUDE_DIRECTORIES(divide-bench PRIVATE include)
++  TARGET_LINK_LIBRARIES(divide-bench benchmark)
+ 
+   ADD_EXECUTABLE(quotient-bench bench/quotient.cc)
+   SET_TARGET_PROPERTIES(quotient-bench PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(quotient-bench fxdiv benchmark)
++  TARGET_INCLUDE_DIRECTORIES(quotient-bench PRIVATE include)
++  TARGET_LINK_LIBRARIES(quotient-bench benchmark)
+ 
+   ADD_EXECUTABLE(round-down-bench bench/round-down.cc)
+   SET_TARGET_PROPERTIES(round-down-bench PROPERTIES
+-    CXX_STANDARD 11
++    CXX_STANDARD 14
+     CXX_EXTENSIONS YES)
+-  TARGET_LINK_LIBRARIES(round-down-bench fxdiv benchmark)
++  TARGET_INCLUDE_DIRECTORIES(round-down-bench PRIVATE include)
++  TARGET_LINK_LIBRARIES(round-down-bench benchmark)
+ ENDIF()
+-- 
+2.41.0
+

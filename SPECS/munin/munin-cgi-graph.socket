@@ -1,0 +1,11 @@
+[Unit]
+Description=Munin FastCGI Graphs Socket
+
+[Socket]
+ListenStream=/run/munin/munin-cgi-graph.sock
+SocketMode=0660
+SocketUser=nginx
+SocketGroup=munin
+
+[Install]
+WantedBy=sockets.target

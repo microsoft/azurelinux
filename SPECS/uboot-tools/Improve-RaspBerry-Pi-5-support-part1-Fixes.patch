@@ -1,0 +1,557 @@
+From patchwork Fri Oct 10 16:17:21 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2148352
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4cjsMv27rFz1y1V
+	for <incoming@patchwork.ozlabs.org>; Sat, 11 Oct 2025 03:17:31 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 7D6398424E;
+	Fri, 10 Oct 2025 18:17:28 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id E86C084229; Fri, 10 Oct 2025 18:17:26 +0200 (CEST)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 3264783FF9
+ for <u-boot@lists.denx.de>; Fri, 10 Oct 2025 18:17:25 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 7B915227AAE; Fri, 10 Oct 2025 18:17:21 +0200 (CEST)
+From: Torsten Duwe <duwe@lst.de>
+To: Matthias Brugger <mbrugger@suse.com>, Simon Glass <sjg@chromium.org>
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+ Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>,
+ Quentin Schulz <quentin.schulz@cherry.de>, u-boot@lists.denx.de
+Subject: [PATCH 1/4] macb: wrap asm/arch/clk.h with ifndef CLK
+In-Reply-To: <20251010161442.410C4227AAE@verein.lst.de>
+References: <20251010161442.410C4227AAE@verein.lst.de>
+Message-Id: <20251010161721.7B915227AAE@verein.lst.de>
+Date: Fri, 10 Oct 2025 18:17:21 +0200 (CEST)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+macb.c includes asm/arch/clk.h solely to declare get_macb_pclk_rate().
+That function is platform specific and only required if CONFIG_CLK
+is not set. In case the machine does not provide it, compilation fails
+even when the MACB pclk is detected via the CLK framework.
+
+Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Reviewed-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/net/macb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/macb.c b/drivers/net/macb.c
+index cbf5f605518..a54a268036d 100644
+--- a/drivers/net/macb.c
++++ b/drivers/net/macb.c
+@@ -38,7 +38,9 @@
+ #include <linux/mii.h>
+ #include <asm/io.h>
+ #include <linux/dma-mapping.h>
++#ifndef CONFIG_CLK
+ #include <asm/arch/clk.h>
++#endif
+ #include <linux/errno.h>
+ 
+ #include "macb.h"
+
+From patchwork Fri Oct 10 16:17:25 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2148353
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4cjsN11kswz1y1V
+	for <incoming@patchwork.ozlabs.org>; Sat, 11 Oct 2025 03:17:37 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 283AF84051;
+	Fri, 10 Oct 2025 18:17:31 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 7C7A8843F5; Fri, 10 Oct 2025 18:17:29 +0200 (CEST)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id B9A1C83FF9
+ for <u-boot@lists.denx.de>; Fri, 10 Oct 2025 18:17:27 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 658FA227AAE; Fri, 10 Oct 2025 18:17:25 +0200 (CEST)
+From: Torsten Duwe <duwe@lst.de>
+To: Matthias Brugger <mbrugger@suse.com>, Simon Glass <sjg@chromium.org>
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+ Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>,
+ Quentin Schulz <quentin.schulz@cherry.de>, u-boot@lists.denx.de
+Subject: [PATCH 2/4] pci-uclass: respect ofnode_read_pci_vendev retval
+In-Reply-To: <20251010161442.410C4227AAE@verein.lst.de>
+References: <20251010161442.410C4227AAE@verein.lst.de>
+Message-Id: <20251010161725.658FA227AAE@verein.lst.de>
+Date: Fri, 10 Oct 2025 18:17:25 +0200 (CEST)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The vendor:device read in pci_uclass_child_post_bind() might fail,
+which is currently ignored. In that case e.g. the RP1 on the RasPi5
+is erroneously being treated as a host bridge.
+
+Mark the device's PCI info as invalid in case of failure.
+
+Signed-off-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+Reviewed-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pci-uclass.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/pci/pci-uclass.c b/drivers/pci/pci-uclass.c
+index c370f8c6400..4092e8ff5a9 100644
+--- a/drivers/pci/pci-uclass.c
++++ b/drivers/pci/pci-uclass.c
+@@ -1200,6 +1200,7 @@ static int pci_uclass_post_probe(struct udevice *bus)
+ static int pci_uclass_child_post_bind(struct udevice *dev)
+ {
+ 	struct pci_child_plat *pplat;
++	int err;
+ 
+ 	if (!dev_has_ofnode(dev))
+ 		return 0;
+@@ -1207,7 +1208,13 @@ static int pci_uclass_child_post_bind(struct udevice *dev)
+ 	pplat = dev_get_parent_plat(dev);
+ 
+ 	/* Extract vendor id and device id if available */
+-	ofnode_read_pci_vendev(dev_ofnode(dev), &pplat->vendor, &pplat->device);
++	err = ofnode_read_pci_vendev(dev_ofnode(dev), &pplat->vendor,
++				     &pplat->device);
++	if (err) {
++		/* Mark PCI device structure as invalid */
++		pplat->devfn = -1;
++		return 0;
++	}
+ 
+ 	/* Extract the devfn from fdt_pci_addr */
+ 	pplat->devfn = pci_get_devfn(dev);
+
+From patchwork Fri Oct 10 16:17:29 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2148354
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4cjsNB0gW1z1y1V
+	for <incoming@patchwork.ozlabs.org>; Sat, 11 Oct 2025 03:17:46 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 79F208444B;
+	Fri, 10 Oct 2025 18:17:36 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 96BF884401; Fri, 10 Oct 2025 18:17:34 +0200 (CEST)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+ PP_MIME_FAKE_ASCII_TEXT,RCVD_IN_DNSWL_BLOCKED,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 509D784401
+ for <u-boot@lists.denx.de>; Fri, 10 Oct 2025 18:17:32 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id EDBF8227AAE; Fri, 10 Oct 2025 18:17:29 +0200 (CEST)
+From: Torsten Duwe <duwe@lst.de>
+To: Matthias Brugger <mbrugger@suse.com>, Simon Glass <sjg@chromium.org>
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+ Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>,
+ Quentin Schulz <quentin.schulz@cherry.de>, u-boot@lists.denx.de
+Subject: [PATCH 3/4] Fix #cells lookup in of_get_dma_range
+In-Reply-To: <20251010161442.410C4227AAE@verein.lst.de>
+References: <20251010161442.410C4227AAE@verein.lst.de>
+Message-Id: <20251010161729.EDBF8227AAE@verein.lst.de>
+Date: Fri, 10 Oct 2025 18:17:29 +0200 (CEST)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+of_get_dma_range uses (of_bus *)->count_cells to look up the
+#cells for addresses and sizes. It tries to do so for the current
+device node and for the parent tree. count_cells defaults to 
+of_bus_default_count_cells, which _starts_ looking at the parent
+node already, and then upwards. The correct way is to use
+of_simple_*_cells for the current node, and count_cells(dev) for
+the parent tree.
+
+Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Reviewed-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+
+Here is the original, very detailed analysis and explanation
+[edited] :
+
+According to the Section 2.3.9 of the Device Tree specification[0]
+the format of the value of the dma-ranges property is an arbitrary
+number of triplets of (child-bus-address,
+parent-bus-address, length).
+Where:
+* The child-bus-address is a physical address within the child bus’
+  address space. The number of cells to represent the address depends on
+  the bus and can be determined from the #address-cells of this node
+  (the node in which the dma-ranges property appears).
+* The parent-bus-address is a physical address within the parent bus’
+  address space. The number of cells to represent the parent address
+  is bus dependent and can be determined from the #address-cells
+  property of the node that defines the parent’s address space.
+* The length specifies the size of the range in the child’s address
+  space. The number of cells to represent the size can be determined
+  from the #size-cells of this node (the node in which the dma-ranges
+  property appears)
+
+This description matches comments in the of_addr source code. But the
+actual implementation does not match the specification.
+'of_match_bus' returns address-cells and size-cells of the parent
+device. That's why the following calls were used to receive addr_cells
+and size_cells of the current device:
+- of_simple_addr_cells
+- of_simple_size_cells
+
+This fix was tested on RPI5 board with both device types: directly
+connected (e.g Serial) and connected over PCIe (e.g ethernet).
+
+For example when dma_ranges are parsing the following device tree
+structure:
+/ {
+	pcie2: {
+		#address-cells = <3>;
+		#size-cells = <2>;
+		// 64GB system RAM space at PCIe 10_00000000
+		dma-ranges =
+			   <0x02000000 0x00 0x00000000
+			    0x1f 0x00000000
+			    0x00 0x00400000>,
+			   <0x43000000 0x10 0x00000000
+			    0x00 0x00000000
+			    0x10 0x00000000>;
+		rp1: {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			dma-ranges =
+			// inbound RP1 1x_xxxxxxxx -> PCIe 1x_xxxxxxxx
+			  <0x10 0x00000000
+			  0x43000000 0x10 0x00000000
+			  0x10 0x00000000>,
+
+			// inbound RP1 c0_40xxxxxx -> PCIe 00_00xxxxxx
+			  <0xc0 0x40000000
+			  0x02000000 0x0 0x00000000
+			  0x0 0x00400000>,
+
+			// inbound RP1 0x_xxxxxxxx -> PCIe 1x_xxxxxxxx
+			  <0x00 0x00000000
+			  0x02000000 0x10 0x00000000
+			  0x10 0x00000000>;
+		};
+	};
+};
+
+So when we parse ranges on rp1, #address-cells of the rp1 node should
+be taken into account.
+In the provided example we have the following format:
+pcie2:
+   #addres-cells = <0x3>;
+   #size-cells = <0x2>;
+   dma-ranges = < addr_hi addr_mid addr_lo
+                  trans_addr_hi trans_addr_lo
+		  size_hi size_lo>;
+
+rp1:
+   #addres-cells = <0x2>;
+   #size-cells = <0x2>;
+   dma-ranges = < addr_hi addr_lo
+                  trans_addr_hi trans_addr_mid trans_addr_lo
+		  size_hi size_lo>;
+
+of_get_dma_range searches for the first dev with dma_ranges
+and then executes of_match_bus which follows by count_cells call
+for both device and parent.
+
+count_cells returns #address-cells for the parent device to
+the caller.
+So in the provided example address cells should be 2 for rp1,
+but we get 3 when using count_cells.
+This breaks address translation and is fixed in the provided patch
+by using the of_simple_addr_cells call, which will return correct
+address-cells for the node. This matches the requirements of the
+device-tree specification.
+
+[0] https://readthedocs.org/projects/devicetree-specification/downloads/pdf/latest/
+
+Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Reviewed-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+---
+ drivers/core/of_addr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/core/of_addr.c b/drivers/core/of_addr.c
+index 250dd175b55..823a4d70a6b 100644
+--- a/drivers/core/of_addr.c
++++ b/drivers/core/of_addr.c
+@@ -374,16 +374,16 @@ int of_get_dma_range(const struct device_node *dev, phys_addr_t *cpu,
+ 	}
+ 
+ 	/* Get the address sizes both for the bus and its parent */
+-	bus_node = of_match_bus((struct device_node*)dev);
+-	bus_node->count_cells(dev, &na, &ns);
++	na = of_simple_addr_cells(dev);
++	ns = of_simple_size_cells(dev);
+ 	if (!OF_CHECK_COUNTS(na, ns)) {
+ 		printf("Bad cell count for %s\n", of_node_full_name(dev));
+ 		ret = -EINVAL;
+ 		goto out_parent;
+ 	}
+ 
+-	bus_node = of_match_bus(parent);
+-	bus_node->count_cells(parent, &pna, &pns);
++	bus_node = of_match_bus((struct device_node *)dev);
++	bus_node->count_cells(dev, &pna, &pns);
+ 	if (!OF_CHECK_COUNTS(pna, pns)) {
+ 		printf("Bad cell count for %s\n", of_node_full_name(parent));
+ 		ret = -EINVAL;
+
+From patchwork Fri Oct 10 16:17:34 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2148355
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4cjsNM6Lnmz1y1V
+	for <incoming@patchwork.ozlabs.org>; Sat, 11 Oct 2025 03:17:55 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id BE4DF83966;
+	Fri, 10 Oct 2025 18:17:38 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 0E72584347; Fri, 10 Oct 2025 18:17:38 +0200 (CEST)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 3E8BF836D2
+ for <u-boot@lists.denx.de>; Fri, 10 Oct 2025 18:17:36 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 0A81B227AAF; Fri, 10 Oct 2025 18:17:34 +0200 (CEST)
+From: Torsten Duwe <duwe@lst.de>
+To: Matthias Brugger <mbrugger@suse.com>, Simon Glass <sjg@chromium.org>
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+ Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>,
+ Quentin Schulz <quentin.schulz@cherry.de>, u-boot@lists.denx.de
+Subject: [PATCH 4/4] pcie_brcmstb: use bus_base for PCI config devices
+In-Reply-To: <20251010161442.410C4227AAE@verein.lst.de>
+References: <20251010161442.410C4227AAE@verein.lst.de>
+Message-Id: <20251010161734.0A81B227AAF@verein.lst.de>
+Date: Fri, 10 Oct 2025 18:17:34 +0200 (CEST)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+BRCM PCIe controller has different means of accessing to its own
+config space and to device's config space. To support this quirk,
+its driver uses simple heuristic:
+when PCI subsystem probes Bus 0, the driver assumes
+that the subsystem tries to accesses PCIe controller config space,
+when PCI subsystem probes other busses, the driver uses mechanism
+for device config space access. This heuristic works well when
+there is only one PCIe controller in the system.
+But U-Boot does not support concept of "PCI Segment", so when there
+are more than one PCI controller:
+- first one gets Bus address 0,
+- second one - Bus address 2 and so on.
+This breaks the brcm driver, because it tries to access second PCIe
+controller config space as if it is device. To fix this, we introduce
+additional property bus_base that holds a PCIe controller own Bus
+address.
+We use this property to calculate "real" Bus address for
+underlying devices.
+Please note that this fix may not support a case when we have
+PCI-to-PCI bridges behind the second PCIe controller.
+
+Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Reviewed-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pcie_brcmstb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index f089c48f028..ca5951974ce 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -61,6 +61,7 @@ struct brcm_pcie {
+ 
+ 	int			gen;
+ 	bool			ssc;
++	uint16_t		bus_base;
+ };
+ 
+ /**
+@@ -134,6 +135,7 @@ static int brcm_pcie_config_address(const struct udevice *dev, pci_dev_t bdf,
+ 	 * Busses 0 (host PCIe bridge) and 1 (its immediate child)
+ 	 * are limited to a single device each
+ 	 */
++	pci_bus -= pcie->bus_base;
+ 	if (pci_bus < 2 && pci_dev > 0)
+ 		return -EINVAL;
+ 
+@@ -360,6 +362,8 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	u16 nlw, cls, lnksta;
+ 	u32 tmp;
+ 
++	pcie->bus_base = hose->first_busno;
++
+ 	/*
+ 	 * Reset the bridge, assert the fundamental reset. Note for some SoCs,
+ 	 * e.g. BCM7278, the fundamental reset should not be asserted here.

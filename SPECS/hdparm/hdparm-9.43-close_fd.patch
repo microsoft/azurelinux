@@ -1,0 +1,12 @@
+Index: hdparm-9.43/fallocate.c
+===================================================================
+--- hdparm-9.43.orig/fallocate.c
++++ hdparm-9.43/fallocate.c
+@@ -41,6 +41,7 @@ int do_fallocate_syscall (const char *pa
+ 			exit(0);
+ 		}
+ 		err = errno;
++		close(fd);
+ 		unlink(path);
+ 	}
+ 	perror(path);

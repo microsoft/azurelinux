@@ -1,0 +1,68 @@
+# GdkPixbuf Image Loader Modules file
+# Automatically generated file, do not edit
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.44.1
+#
+# LoaderDir = Z:\usr\i686-w64-mingw32\sys-root\mingw\lib\gdk-pixbuf-2.0\2.10.0\loaders
+#
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-ani.dll"
+"ani" 4 "gdk-pixbuf" "Windows animated cursor" "LGPL"
+"application/x-navi-animation" ""
+"ani" ""
+"RIFF    ACON" "    xxxx    " 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-icns.dll"
+"icns" 4 "gdk-pixbuf" "MacOS X icon" "GPL"
+"image/x-icns" ""
+"icns" ""
+"icns" "" 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-pnm.dll"
+"pnm" 4 "gdk-pixbuf" "PNM/PBM/PGM/PPM" "LGPL"
+"image/x-portable-anymap" "image/x-portable-bitmap" "image/x-portable-graymap" "image/x-portable-pixmap" ""
+"pnm" "pbm" "pgm" "ppm" ""
+"P1" "" 100
+"P2" "" 100
+"P3" "" 100
+"P4" "" 100
+"P5" "" 100
+"P6" "" 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-qtif.dll"
+"qtif" 4 "gdk-pixbuf" "QuickTime" "LGPL"
+"image/x-quicktime" "image/qtif" ""
+"qtif" "qif" ""
+"abcdidsc" "xxxx    " 100
+"abcdidat" "xxxx    " 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-svg.dll"
+"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
+"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
+"svg" "svgz" "svg.gz" ""
+" <svg" "*    " 100
+" <!DOCTYPE svg" "*             " 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-tga.dll"
+"tga" 4 "gdk-pixbuf" "Targa" "LGPL"
+"image/x-tga" ""
+"tga" "targa" ""
+" \001\001" "x  " 100
+" \001\t" "x  " 100
+"  \002" "xz " 99
+"  \003" "xz " 100
+"  \n" "xz " 100
+"  \v" "xz " 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-xbm.dll"
+"xbm" 4 "gdk-pixbuf" "XBM" "LGPL"
+"image/x-xbitmap" ""
+"xbm" ""
+"#define " "" 100
+"/*" "" 50
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-xpm.dll"
+"xpm" 4 "gdk-pixbuf" "XPM" "LGPL"
+"image/x-xpixmap" ""
+"xpm" ""
+"/* XPM */" "" 100
+
+

@@ -1,0 +1,37 @@
+diff --git a/config-top.h b/config-top.h
+--- a/config-top.h
++++ b/config-top.h
+@@ -97,7 +97,7 @@
+ /* #define SYS_BASHRC "/etc/bash.bashrc" */
+ 
+ /* System-wide .bash_logout for login shells. */
+-/* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */
++#define SYS_BASH_LOGOUT "/etc/bash.bash_logout"
+ 
+ /* Define this to make non-interactive shells begun with argv[0][0] == '-'
+    run the startup files when not in posix mode. */
+diff --git a/doc/bash.1 b/doc/bash.1
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -378,9 +378,8 @@ option may be used when the shell is started to inhibit this behavior.
+ When an interactive login shell exits,
+ or a non-interactive login shell executes the \fBexit\fP builtin command,
+ .B bash
+-reads and executes commands from the file
+-.FN \*~/.bash_logout ,
+-if it exists.
++reads and executes commands from the files \fI~/.bash_logout\fP
++and \fI/etc/bash.bash_logout\fP, if the files exists.
+ .PP
+ When an interactive shell that is not a login shell is started,
+ .B bash
+@@ -13404,6 +13403,9 @@ The \fBbash\fP executable
+ .FN /etc/profile
+ The systemwide initialization file, executed for login shells
+ .TP
++.FN /etc/bash.bash_logout
++The systemwide login shell cleanup file, executed when a login shell exits
++.TP
+ .FN \*~/.bash_profile
+ The personal initialization file, executed for login shells
+ .TP

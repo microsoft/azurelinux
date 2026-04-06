@@ -1,0 +1,76 @@
+--- orc-2.1.0/c++/src/CMakeLists.txt.orig	2025-01-10 07:56:55.009987235 -0500
++++ orc-2.1.0/c++/src/CMakeLists.txt	2025-01-10 15:02:24.751973878 -0500
+@@ -200,17 +200,22 @@
+     BpackingAvx512.cc)
+ endif(BUILD_ENABLE_AVX512)
+ 
+-add_library (orc STATIC ${SOURCE_FILES})
++add_library (orc SHARED ${SOURCE_FILES})
++
++set_target_properties(orc PROPERTIES
++  POSITION_INDEPENDENT_CODE ON
++  VERSION 2.1.4
++  SOVERSION 2)
+ 
+ target_link_libraries (orc
+   INTERFACE
+     ${ORC_INSTALL_INTERFACE_TARGETS}
+   PRIVATE
+-    $<BUILD_INTERFACE:orc::protobuf>
+-    $<BUILD_INTERFACE:orc::zlib>
+-    $<BUILD_INTERFACE:orc::snappy>
+-    $<BUILD_INTERFACE:orc::lz4>
+-    $<BUILD_INTERFACE:orc::zstd>
++    protobuf
++    z
++    snappy
++    lz4
++    zstd
+     $<BUILD_INTERFACE:${LIBHDFSPP_LIBRARIES}>
+   )
+ 
+--- orc-2.1.4/cmake_modules/ThirdpartyToolchain.cmake.orig	2026-01-06 06:19:30.000000000 -0500
++++ orc-2.1.4/cmake_modules/ThirdpartyToolchain.cmake	2026-01-12 14:30:35.608240496 -0500
+@@ -20,19 +20,19 @@
+ set(ORC_INSTALL_INTERFACE_TARGETS)
+ 
+ set(ORC_FORMAT_VERSION "1.1.0")
+-set(LZ4_VERSION "1.10.0")
+-set(SNAPPY_VERSION "1.2.2")
+-set(ZLIB_VERSION "1.3.1")
+-set(GTEST_VERSION "1.12.1")
+-set(PROTOBUF_VERSION "3.5.1")
+-set(ZSTD_VERSION "1.5.7")
+-
+-option(ORC_PREFER_STATIC_PROTOBUF "Prefer static protobuf library, if available" ON)
+-option(ORC_PREFER_STATIC_SNAPPY   "Prefer static snappy library, if available"   ON)
+-option(ORC_PREFER_STATIC_LZ4      "Prefer static lz4 library, if available"      ON)
+-option(ORC_PREFER_STATIC_ZSTD     "Prefer static zstd library, if available"     ON)
+-option(ORC_PREFER_STATIC_ZLIB     "Prefer static zlib library, if available"     ON)
+-option(ORC_PREFER_STATIC_GMOCK    "Prefer static gmock library, if available"    ON)
++#set(LZ4_VERSION "1.10.0")
++#set(SNAPPY_VERSION "1.2.2")
++#set(ZLIB_VERSION "1.3.1")
++#set(GTEST_VERSION "1.12.1")
++#set(PROTOBUF_VERSION "3.5.1")
++#set(ZSTD_VERSION "1.5.7")
++
++#option(ORC_PREFER_STATIC_PROTOBUF "Prefer static protobuf library, if available" ON)
++#option(ORC_PREFER_STATIC_SNAPPY   "Prefer static snappy library, if available"   ON)
++#option(ORC_PREFER_STATIC_LZ4      "Prefer static lz4 library, if available"      ON)
++#option(ORC_PREFER_STATIC_ZSTD     "Prefer static zstd library, if available"     ON)
++#option(ORC_PREFER_STATIC_ZLIB     "Prefer static zlib library, if available"     ON)
++#option(ORC_PREFER_STATIC_GMOCK    "Prefer static gmock library, if available"    ON)
+ 
+ # zstd requires us to add the threads
+ FIND_PACKAGE(Threads REQUIRED)
+@@ -144,8 +144,7 @@
+   message(STATUS "Using DEFAULT URL: ${ORC_FORMAT_SOURCE_URL}")
+ endif()
+ ExternalProject_Add (orc-format_ep
+-  URL ${ORC_FORMAT_SOURCE_URL}
+-  URL_HASH SHA256=d4a7ac76c5442abf7119e2cb84e71b677e075aff53518aa866055e2ead0450d7
++  URL "file:///builddir/build/SOURCES/orc-format-${ORC_FORMAT_VERSION}.tar.gz"
+   CONFIGURE_COMMAND ""
+   BUILD_COMMAND     ""
+   INSTALL_COMMAND     ""

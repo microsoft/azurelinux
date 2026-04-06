@@ -1,0 +1,21 @@
+From 9e4bd88acbb037560b84aabc8c87efd98fd2c8d3 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 3 Feb 2026 12:41:23 +0000
+Subject: [PATCH] Update trybuild output for ui test for Rust 1.93
+
+---
+ tests/compile-fail/old-format.stderr | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/compile-fail/old-format.stderr b/tests/compile-fail/old-format.stderr
+index 0b7a6620d..744235dcb 100644
+--- a/tests/compile-fail/old-format.stderr
++++ b/tests/compile-fail/old-format.stderr
+@@ -6,6 +6,7 @@ error: this format is no longer supported -- please switch to specifying as:
+        }
+ 
+        note: patterns are now evaluated relative to the provided root, not to the crate root
++
+  --> tests/compile-fail/old-format.rs:1:1
+   |
+ 1 | datatest_stable::harness!(foo, "path1", r"^.*/*$", bar::baz, "path2", r"^.*/*$");

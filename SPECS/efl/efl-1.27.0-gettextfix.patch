@@ -1,0 +1,59 @@
+diff -up efl-1.27.0/src/examples/edje/en_IN/domain_name.po.gettextfix ./src/examples/edje/en_IN/domain_name.po
+--- efl-1.27.0/src/examples/edje/en_IN/domain_name.po.gettextfix	2024-01-02 21:15:30.831945344 +1000
++++ efl-1.27.0/src/examples/edje/en_IN/domain_name.po	2024-01-02 21:20:07.733210129 +1000
+@@ -1,16 +1,27 @@
+ msgid ""
+ msgstr ""
++"Project-Id-Version: Efl\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2024-01-02 21:55+1000\n"
++"PO-Revision-Date: 2024-01-02 21:55+1000\n"
++"Last-Translator: Unknown\n"
++"Language-Team: General\n"
++"Language: en_IN\n"
++"MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+-"Content-Transfer-Encoding: UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"#-#-#-#-#  domain_name.po (Efl)  #-#-#-#-#\n"
++"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
++"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+ 
+ msgid "LOADING"
+-msgstr "Loading..."
++msgstr "लोड हो रहा है..."
+ 
+ msgid "LANG"
+-msgstr "Language English"
++msgstr "भाषा हिन्दी"
+ 
+ msgid "SYSTEM LANGUAGE"
+-msgstr "System Language"
++msgstr "सिस्टम भाषा"
+ 
+ msgid "CHANGED"
+-msgstr "Changed"
++msgstr "बदल"
+diff -up efl-1.27.0/src/examples/edje/hi_IN/domain_name.po.gettextfix ./src/examples/edje/hi_IN/domain_name.po
+--- efl-1.27.0/src/examples/edje/hi_IN/domain_name.po.gettextfix	2024-01-02 21:15:36.258028915 +1000
++++ efl-1.27.0/src/examples/edje/hi_IN/domain_name.po	2024-01-02 21:21:17.001276977 +1000
+@@ -1,7 +1,18 @@
+ msgid ""
+ msgstr ""
++"Project-Id-Version: Efl\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2024-01-02 21:55+1000\n"
++"PO-Revision-Date: 2024-01-02 21:55+1000\n"
++"Last-Translator: Unknown\n"
++"Language-Team: General\n"
++"Language: en_IN\n"
++"MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+-"Content-Transfer-Encoding: UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"#-#-#-#-#  domain_name.po (Efl)  #-#-#-#-#\n"
++"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
++"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+ 
+ msgid "LOADING"
+ msgstr "लोड हो रहा है..."

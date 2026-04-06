@@ -1,0 +1,24 @@
+Avoid an implicit declaration of exit.  Partial backport of this
+upstream commit:
+
+commit a91b95cca2d397c84f8b9bbd602d40209a7092ce
+Author: Andy Wingo <wingo@pobox.com>
+Date:   Wed Jan 20 21:52:54 2021 +0100
+
+    Update Gnulib to v0.1-4379-g2ef5a9b4b
+    
+    Also bump required autoconf version to 2.64, as required by Gnulib.
+
+diff --git a/m4/round.m4 b/m4/round.m4
+index 45b7df4591e83648..1561225a5355366d 100644
+--- a/m4/round.m4
++++ b/m4/round.m4
+@@ -57,7 +57,7 @@ int main()
+     * (double) (1U << ((DBL_MANT_DIG + 3) / 5))
+     * (double) (1U << ((DBL_MANT_DIG + 4) / 5));
+   volatile double x = 0.5 - 0.5 / TWO_MANT_DIG;
+-  exit (x < 0.5 && round (x) != 0.0);
++  return x < 0.5 && round (x) != 0.0;
+ }]])], [gl_cv_func_round_works=yes], [gl_cv_func_round_works=no],
+         [case "$host_os" in
+            netbsd* | aix*) gl_cv_func_round_works="guessing no";;

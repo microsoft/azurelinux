@@ -1,0 +1,22 @@
+diff --git a/common/toolcommon/tool-config-file-common.c b/common/toolcommon/tool-config-file-common.c
+index 609e7a3b3..20dfad512 100644
+--- a/common/toolcommon/tool-config-file-common.c
++++ b/common/toolcommon/tool-config-file-common.c
+@@ -78,14 +78,14 @@ _config_file_bool (conffile_t cf,
+                    void *app_ptr,
+                    int app_data)
+ {
+-  int *bool;
++  int *value;
+ 
+   assert (data);
+   assert (optionname);
+   assert (option_ptr);
+ 
+-  bool = (int *)option_ptr;
+-  *bool = data->boolval;
++  value = (int *)option_ptr;
++  *value = data->boolval;
+   return (0);
+ }
+ 

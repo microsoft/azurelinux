@@ -1,0 +1,71 @@
+From 6d254a3afd3ae207181fb299414befa0447778f7 Mon Sep 17 00:00:00 2001
+From: Jeremy Linton <jeremy.linton@arm.com>
+Date: Tue, 27 Aug 2024 20:11:01 -0500
+Subject: [PATCH] hack test
+
+The opencsd tests have an option to test an installed
+trc_pkt_lister for basic decoding, yet the comparison fails
+because they shift off the parameter after checking it the
+first time. Hack off the 'shift' and it works for our purposes.
+
+Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
+---
+ decoder/tests/run_pkt_decode_tests.bash | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/decoder/tests/run_pkt_decode_tests.bash b/decoder/tests/run_pkt_decode_tests.bash
+index 2f7c8da..c1fe897 100755
+--- a/decoder/tests/run_pkt_decode_tests.bash
++++ b/decoder/tests/run_pkt_decode_tests.bash
+@@ -46,6 +46,8 @@
+ # run_pkt_decode_tests.bash -bindir <custom>/<path>/ <options>
+ #
+ 
++set -e
++
+ OUT_DIR=./results
+ SNAPSHOT_DIR=./snapshots
+ BIN_DIR=./bin/linux64/rel/
+@@ -73,10 +75,7 @@ echo "Running trc_pkt_lister on snapshot directories."
+ 
+ mkdir -p ${OUT_DIR}
+ 
+-if [ "$1" == "use-installed" ]; then
+-    BIN_DIR=""
+-    shift
+-elif [ "$1" == "-bindir" ]; then
++if [ "$1" == "-bindir" ]; then
+     BIN_DIR=$2
+     shift
+     shift
+@@ -84,11 +83,6 @@ fi
+ 
+ echo "Tests using BIN_DIR = ${BIN_DIR}"
+ 
+-if [ "${BIN_DIR}" != "" ]; then
+-    export LD_LIBRARY_PATH=${BIN_DIR}.
+-    echo "LD_LIBRARY_PATH set to ${BIN_DIR}"
+-fi
+-
+ # === test the decode set ===
+ for test_dir in "${test_dirs_decode[@]}"
+ do
+@@ -105,7 +99,6 @@ env | grep OPENCSD
+ ${BIN_DIR}trc_pkt_lister -ss_dir "${SNAPSHOT_DIR}/juno_r1_1" $@ -decode -no_time_print -logfilename "${OUT_DIR}/juno_r1_1_rangelimit.ppl"
+ unset OPENCSD_INSTR_RANGE_LIMIT
+ echo "Done : Return $?"
+-env | grep OPENCSD
+ 
+ echo "Test with bad opcode detect on using env var..."
+ export OPENCSD_ERR_ON_AA64_BAD_OPCODE=1
+@@ -113,7 +106,6 @@ env | grep OPENCSD
+ ${BIN_DIR}trc_pkt_lister -ss_dir "${SNAPSHOT_DIR}/juno_r1_1" $@ -decode -no_time_print -logfilename "${OUT_DIR}/juno_r1_1_badopcode.ppl"
+ unset OPENCSD_ERR_ON_AA64_BAD_OPCODE
+ echo "Done : Return $?"
+-env | grep OPENCSD
+ 
+ echo "Test with bad opcode detect on using flag..."
+ ${BIN_DIR}trc_pkt_lister -ss_dir "${SNAPSHOT_DIR}/juno_r1_1" $@ -decode -no_time_print -aa64_opcode_chk -logfilename "${OUT_DIR}/juno_r1_1_badopcode_flag.ppl"
+-- 
+2.48.1
+

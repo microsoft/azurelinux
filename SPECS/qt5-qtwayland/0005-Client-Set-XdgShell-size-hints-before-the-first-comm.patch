@@ -1,0 +1,58 @@
+From c335d953adcfb14bc274026cbb6a91dc43d16309 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Mon, 3 May 2021 23:01:53 +0100
+Subject: [PATCH 05/55] Client: Set XdgShell size hints before the first commit
+
+propagateSizeHints is only called in QWindow we have platform window and
+minimumSizeHint is then sent. We also need to send existing hints when
+we create the shell window.
+
+Sending them when we apply configure is too late, we need these hints
+available for the compositor to correctly configure the window.
+
+Change-Id: I6cbb294b11db06ecd87535fa4816bb8ad34a29c6
+Reviewed-by: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Reviewed-by: Aleix Pol Gonzalez <aleixpol@kde.org>
+(cherry picked from commit d6e074d0d35221b0fac14c94fc79c98363f2f6c3)
+---
+ src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp | 3 +--
+ tests/auto/client/xdgshell/tst_xdgshell.cpp                 | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index 77ae62d6..45519ae5 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -106,8 +106,6 @@ void QWaylandXdgSurface::Toplevel::applyConfigure()
+         m_xdgSurface->m_window->resizeFromApplyConfigure(m_pending.size);
+     }
+ 
+-    m_xdgSurface->setSizeHints();
+-
+     m_applied = m_pending;
+     qCDebug(lcQpaWayland) << "Applied pending xdg_toplevel configure event:" << m_applied.size << m_applied.states;
+ }
+@@ -270,6 +268,7 @@ QWaylandXdgSurface::QWaylandXdgSurface(QWaylandXdgShell *shell, ::xdg_surface *s
+                 m_toplevel->set_parent(parentXdgSurface->m_toplevel->object());
+         }
+     }
++    setSizeHints();
+ }
+ 
+ QWaylandXdgSurface::~QWaylandXdgSurface()
+diff --git a/tests/auto/client/xdgshell/tst_xdgshell.cpp b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+index 1c23728b..1423d647 100644
+--- a/tests/auto/client/xdgshell/tst_xdgshell.cpp
++++ b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+@@ -505,7 +505,7 @@ void tst_xdgshell::minMaxSize()
+     window.show();
+     QCOMPOSITOR_TRY_VERIFY(xdgToplevel());
+ 
+-    exec([=] { xdgToplevel()->sendCompleteConfigure(); });
++    // we don't roundtrip with our configuration the initial commit should be correct
+ 
+     QCOMPOSITOR_TRY_COMPARE(xdgToplevel()->m_committed.minSize, QSize(100, 100));
+     QCOMPOSITOR_TRY_COMPARE(xdgToplevel()->m_committed.maxSize, QSize(1000, 1000));
+-- 
+2.51.1
+

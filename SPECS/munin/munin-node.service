@@ -1,0 +1,18 @@
+[Unit]
+Description=Munin Node
+Documentation=man:munin-node(1) http://guide.munin-monitoring.org/en/latest/node/index.html
+After=network.target
+After=network-online.target
+PartOf=munin-asyncd.service
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/munin-node --foreground
+PrivateDevices=no
+PrivateTmp=yes
+ProtectHome=read-only
+ProtectSystem=full
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target

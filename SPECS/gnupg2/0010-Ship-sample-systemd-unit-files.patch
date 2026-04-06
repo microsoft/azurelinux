@@ -1,0 +1,268 @@
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+Date: Mon, 23 Jan 2023 16:34:19 +0100
+Subject: Ship sample systemd unit files
+
+This reverts the systemd-relevant parts of upstream's
+eae28f1bd4a5632e8f8e85b7248d1c4d4a10a5ed
+
+In that commit, Werner Koch wrote:
+
+> The use of systemd is deprecated because of additional complexity
+> and the race between systemd based autolaunching and the explicit
+> gnupg based and lockfile protected autolaunching.
+
+FreePG aims to support socket-activated systemd integration for modern
+Gnu/Linux systems that use GnuPG.  That integration does not appear to
+actually have the race condition posited by Werner above, as described
+by Coelacanthus in https://dev.gnupg.org/T6336#171407
+
+GnuPG-bug-id: 6336
+---
+ doc/Makefile.am                               |  8 +++
+ doc/examples/README                           |  2 +
+ doc/examples/systemd-user/README              | 66 +++++++++++++++++++
+ doc/examples/systemd-user/dirmngr.service     |  8 +++
+ doc/examples/systemd-user/dirmngr.socket      | 11 ++++
+ .../systemd-user/gpg-agent-browser.socket     | 13 ++++
+ .../systemd-user/gpg-agent-extra.socket       | 13 ++++
+ .../systemd-user/gpg-agent-ssh.socket         | 13 ++++
+ doc/examples/systemd-user/gpg-agent.service   |  8 +++
+ doc/examples/systemd-user/gpg-agent.socket    | 12 ++++
+ 10 files changed, 154 insertions(+), 0 deletions(-)
+ create mode 100644 doc/examples/systemd-user/README
+ create mode 100644 doc/examples/systemd-user/dirmngr.service
+ create mode 100644 doc/examples/systemd-user/dirmngr.socket
+ create mode 100644 doc/examples/systemd-user/gpg-agent-browser.socket
+ create mode 100644 doc/examples/systemd-user/gpg-agent-extra.socket
+ create mode 100644 doc/examples/systemd-user/gpg-agent-ssh.socket
+ create mode 100644 doc/examples/systemd-user/gpg-agent.service
+ create mode 100644 doc/examples/systemd-user/gpg-agent.socket
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index de032bffc..c0e3786e1 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -25,6 +25,14 @@ examples = examples/README examples/scd-event examples/trustlist.txt	\
+            examples/qualified.txt                                       \
+ 	   examples/common.conf                                         \
+            examples/gpgconf.rnames examples/gpgconf.conf                \
++	   examples/systemd-user/README 				\
++	   examples/systemd-user/dirmngr.service 			\
++	   examples/systemd-user/dirmngr.socket				\
++	   examples/systemd-user/gpg-agent.service 			\
++	   examples/systemd-user/gpg-agent.socket 			\
++	   examples/systemd-user/gpg-agent-ssh.socket 			\
++	   examples/systemd-user/gpg-agent-browser.socket		\
++	   examples/systemd-user/gpg-agent-extra.socket 		\
+ 	   examples/pwpattern.list
+ 
+ helpfiles = help.txt help.be.txt help.ca.txt help.cs.txt		\
+diff --git a/doc/examples/README b/doc/examples/README
+index cd341ab57..67508c471 100644
+--- a/doc/examples/README
++++ b/doc/examples/README
+@@ -8,6 +8,8 @@ trustlist.txt   A list of trustworthy root certificates
+ 
+ gpgconf.conf    A sample configuration file for gpgconf.
+ 
++systemd-user    Sample files for a Linux-only init system.
++
+ qualified.txt   Sample file for qualified.txt.
+ 
+ common.conf     Sample file for common options.
+diff --git a/doc/examples/systemd-user/README b/doc/examples/systemd-user/README
+new file mode 100644
+index 000000000..43122f568
+--- /dev/null
++++ b/doc/examples/systemd-user/README
+@@ -0,0 +1,66 @@
++Socket-activated dirmngr and gpg-agent with systemd
++===================================================
++
++When used on a GNU/Linux system supervised by systemd, you can ensure
++that the GnuPG daemons dirmngr and gpg-agent are launched
++automatically the first time they're needed, and shut down cleanly at
++session logout.  This is done by enabling user services via
++socket-activation.
++
++System distributors
++-------------------
++
++The *.service and *.socket files (from this directory) should be
++placed in /usr/lib/systemd/user/ alongside other user-session services
++and sockets.
++
++To enable socket-activated dirmngr for all accounts on the system,
++use:
++
++    systemctl --user --global enable dirmngr.socket
++
++To enable socket-activated gpg-agent for all accounts on the system,
++use:
++
++    systemctl --user --global enable gpg-agent.socket
++
++Additionally, you can enable socket-activated gpg-agent ssh-agent
++emulation for all accounts on the system with:
++
++    systemctl --user --global enable gpg-agent-ssh.socket
++
++You can also enable restricted ("--extra-socket"-style) gpg-agent
++sockets for all accounts on the system with:
++
++    systemctl --user --global enable gpg-agent-extra.socket
++
++Individual users
++----------------
++
++A user on a system with systemd where this has not been installed
++system-wide can place these files in ~/.config/systemd/user/ to make
++them available.
++
++If a given service isn't installed system-wide, or if it's installed
++system-wide but not globally enabled, individual users will still need
++to enable them.  For example, to enable socket-activated dirmngr for
++all future sessions:
++
++    systemctl --user enable dirmngr.socket
++
++To enable socket-activated gpg-agent with ssh support, do:
++
++    systemctl --user enable gpg-agent.socket gpg-agent-ssh.socket
++
++These changes won't take effect until your next login after you've
++fully logged out (be sure to terminate any running daemons before
++logging out).
++
++If you'd rather try a socket-activated GnuPG daemon in an
++already-running session without logging out (with or without enabling
++it for all future sessions), kill any existing daemon and start the
++user socket directly.  For example, to set up socket-activated dirmgnr
++in the current session:
++
++    gpgconf --kill dirmngr
++    systemctl --user start dirmngr.socket
+diff --git a/doc/examples/systemd-user/dirmngr.service b/doc/examples/systemd-user/dirmngr.service
+new file mode 100644
+index 000000000..3c060cde5
+--- /dev/null
++++ b/doc/examples/systemd-user/dirmngr.service
+@@ -0,0 +1,8 @@
++[Unit]
++Description=GnuPG network certificate management daemon
++Documentation=man:dirmngr(8)
++Requires=dirmngr.socket
++
++[Service]
++ExecStart=/usr/bin/dirmngr --supervised
++ExecReload=/usr/bin/gpgconf --reload dirmngr
+diff --git a/doc/examples/systemd-user/dirmngr.socket b/doc/examples/systemd-user/dirmngr.socket
+new file mode 100644
+index 000000000..ebabf896a
+--- /dev/null
++++ b/doc/examples/systemd-user/dirmngr.socket
+@@ -0,0 +1,11 @@
++[Unit]
++Description=GnuPG network certificate management daemon
++Documentation=man:dirmngr(8)
++
++[Socket]
++ListenStream=%t/gnupg/S.dirmngr
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+diff --git a/doc/examples/systemd-user/gpg-agent-browser.socket b/doc/examples/systemd-user/gpg-agent-browser.socket
+new file mode 100644
+index 000000000..bc8d344e1
+--- /dev/null
++++ b/doc/examples/systemd-user/gpg-agent-browser.socket
+@@ -0,0 +1,13 @@
++[Unit]
++Description=GnuPG cryptographic agent and passphrase cache (access for web browsers)
++Documentation=man:gpg-agent(1)
++
++[Socket]
++ListenStream=%t/gnupg/S.gpg-agent.browser
++FileDescriptorName=browser
++Service=gpg-agent.service
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+diff --git a/doc/examples/systemd-user/gpg-agent-extra.socket b/doc/examples/systemd-user/gpg-agent-extra.socket
+new file mode 100644
+index 000000000..5b87d09df
+--- /dev/null
++++ b/doc/examples/systemd-user/gpg-agent-extra.socket
+@@ -0,0 +1,13 @@
++[Unit]
++Description=GnuPG cryptographic agent and passphrase cache (restricted)
++Documentation=man:gpg-agent(1)
++
++[Socket]
++ListenStream=%t/gnupg/S.gpg-agent.extra
++FileDescriptorName=extra
++Service=gpg-agent.service
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+diff --git a/doc/examples/systemd-user/gpg-agent-ssh.socket b/doc/examples/systemd-user/gpg-agent-ssh.socket
+new file mode 100644
+index 000000000..798c1d967
+--- /dev/null
++++ b/doc/examples/systemd-user/gpg-agent-ssh.socket
+@@ -0,0 +1,13 @@
++[Unit]
++Description=GnuPG cryptographic agent (ssh-agent emulation)
++Documentation=man:gpg-agent(1) man:ssh-add(1) man:ssh-agent(1) man:ssh(1)
++
++[Socket]
++ListenStream=%t/gnupg/S.gpg-agent.ssh
++FileDescriptorName=ssh
++Service=gpg-agent.service
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+diff --git a/doc/examples/systemd-user/gpg-agent.service b/doc/examples/systemd-user/gpg-agent.service
+new file mode 100644
+index 000000000..a050fccdc
+--- /dev/null
++++ b/doc/examples/systemd-user/gpg-agent.service
+@@ -0,0 +1,8 @@
++[Unit]
++Description=GnuPG cryptographic agent and passphrase cache
++Documentation=man:gpg-agent(1)
++Requires=gpg-agent.socket
++
++[Service]
++ExecStart=/usr/bin/gpg-agent --supervised
++ExecReload=/usr/bin/gpgconf --reload gpg-agent
+diff --git a/doc/examples/systemd-user/gpg-agent.socket b/doc/examples/systemd-user/gpg-agent.socket
+new file mode 100644
+index 000000000..4257c2c80
+--- /dev/null
++++ b/doc/examples/systemd-user/gpg-agent.socket
+@@ -0,0 +1,12 @@
++[Unit]
++Description=GnuPG cryptographic agent and passphrase cache
++Documentation=man:gpg-agent(1)
++
++[Socket]
++ListenStream=%t/gnupg/S.gpg-agent
++FileDescriptorName=std
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+-- 
+2.43.0
+
+

@@ -1,0 +1,29 @@
+--- ureq-2.12.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ureq-2.12.1/Cargo.toml	2025-12-30T19:41:38.209718+00:00
+@@ -104,17 +104,13 @@
+ [dependencies.base64]
+ version = "0.22"
+ 
+-[dependencies.brotli-decompressor]
+-version = "4.0.0"
+-optional = true
+-
+ [dependencies.cookie]
+ version = "0.18"
+ optional = true
+ default-features = false
+ 
+ [dependencies.cookie_store]
+-version = "0.21.1"
++version = "0.22"
+ features = [
+     "preserve_order",
+     "serde_json",
+@@ -212,7 +208,6 @@
+ features = ["derive"]
+ 
+ [features]
+-brotli = ["dep:brotli-decompressor"]
+ charset = ["dep:encoding_rs"]
+ cookies = [
+     "dep:cookie",

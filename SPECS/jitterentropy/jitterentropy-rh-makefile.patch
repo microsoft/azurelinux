@@ -1,0 +1,56 @@
+diff -up Makefile.orig Makefile
+--- Makefile	2021-07-13 17:23:42.954652287 +0200
++++ Makefile	2021-07-13 17:27:27.958549833 +0200
+@@ -4,7 +4,7 @@ CC ?= gcc
+ #Hardening
+ ENABLE_STACK_PROTECTOR ?= 1
+ CFLAGS ?= -fwrapv --param ssp-buffer-size=4 -fvisibility=hidden -fPIE -Wcast-align -Wmissing-field-initializers -Wshadow -Wswitch-enum
+-CFLAGS +=-Wextra -Wall -pedantic -fPIC -O0 -fwrapv -Wconversion
++CFLAGS +=-Wp,-U_FORTIFY_SOURCE -Wextra -Wall -pedantic -fPIC -O0 -fwrapv -Wconversion
+ LDFLAGS +=-Wl,-z,relro,-z,now -lpthread
+ 
+ # Enable internal timer support
+@@ -34,7 +34,7 @@ LIBDIR := lib
+ INCDIR := include
+ SRCDIR := src
+ 
+-INSTALL_STRIP ?= install -s
++INSTALL ?= install
+ 
+ NAME := jitterentropy
+ LIBMAJOR=$(shell cat jitterentropy.h | egrep "define\s+JENT_MAJVERSION" | awk '{print $$3}')
+@@ -83,25 +83,25 @@ cppcheck:
+ install: install-man install-shared install-includes
+ 
+ install-man:
+-	install -d -m 0755 $(DESTDIR)$(PREFIX)/share/man/man3
+-	install -m 644 doc/$(NAME).3 $(DESTDIR)$(PREFIX)/share/man/man3/
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(PREFIX)/share/man/man3
++	$(INSTALL) -m 644 doc/$(NAME).3 $(DESTDIR)$(PREFIX)/share/man/man3/
+ 	gzip -n -f -9 $(DESTDIR)$(PREFIX)/share/man/man3/$(NAME).3
+ 
+ install-shared:
+-	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
+-	$(INSTALL_STRIP) -m 0755 lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
++	$(INSTALL) -m 0755 lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/
+ 	$(RM) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so.$(LIBMAJOR)
+ 	ln -sf lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so.$(LIBMAJOR)
+ 	ln -sf lib$(NAME).so.$(LIBMAJOR) $(DESTDIR)$(PREFIX)/$(LIBDIR)/lib$(NAME).so
+ 
+ install-includes:
+-	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(INCDIR)
+-	install -m 0644 jitterentropy.h $(DESTDIR)$(PREFIX)/$(INCDIR)/
+-	install -m 0644 jitterentropy-base-user.h $(DESTDIR)$(PREFIX)/$(INCDIR)/
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(PREFIX)/$(INCDIR)
++	$(INSTALL) -m 0644 jitterentropy.h $(DESTDIR)$(PREFIX)/$(INCDIR)/
++	$(INSTALL) -m 0644 jitterentropy-base-user.h $(DESTDIR)$(PREFIX)/$(INCDIR)/
+ 
+ install-static:
+-	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
+-	install -m 0755 lib$(NAME).a $(DESTDIR)$(PREFIX)/$(LIBDIR)/
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
++	$(INSTALL) -m 0755 lib$(NAME).a $(DESTDIR)$(PREFIX)/$(LIBDIR)/
+ 
+ clean:
+ 	@- $(RM) $(NAME)

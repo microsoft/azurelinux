@@ -1,0 +1,14 @@
+diff -up less-691/less.nro.manpage-add-old-bot-option less-691/less.nro
+--- less-691/less.nro.manpage-add-old-bot-option	2026-01-10 17:50:42.000000000 +0100
++++ less-691/less.nro	2026-01-27 15:06:39.347883753 +0100
+@@ -1100,6 +1100,10 @@ This can cause
+ to run somewhat faster than the default.
+ .IP "\fB\-G\fP or \fB\-\-HILITE\-SEARCH\fP"
+ The \-G option suppresses all highlighting of strings found by search commands.
++.IP "\-\-old-bot"
++Reverts to the old bottom of screen behavior.  This can be sometimes
++desirable  if  the  long lines are not wrapped  correctly
++when  reaching  the  bottom  of  the  terminal,  while scrolling forward.
+ .IP "\fB\-h\fP\fIn\fP or \fB\-\-max\-back\-scroll=\fP\fIn\fP"
+ Specifies a maximum number of lines to scroll backward.
+ If it is necessary to scroll backward more than \fIn\fP lines,

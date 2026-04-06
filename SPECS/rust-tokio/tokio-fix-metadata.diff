@@ -1,0 +1,72 @@
+--- tokio-1.49.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-1.49.0/Cargo.toml	2026-01-08T17:52:16.088641+00:00
+@@ -186,10 +186,6 @@
+ path = "tests/io_copy.rs"
+ 
+ [[test]]
+-name = "io_copy_bidirectional"
+-path = "tests/io_copy_bidirectional.rs"
+-
+-[[test]]
+ name = "io_driver"
+ path = "tests/io_driver.rs"
+ 
+@@ -232,22 +228,6 @@
+ [[test]]
+ name = "io_read_exact"
+ path = "tests/io_read_exact.rs"
+-
+-[[test]]
+-name = "io_read_line"
+-path = "tests/io_read_line.rs"
+-
+-[[test]]
+-name = "io_read_to_end"
+-path = "tests/io_read_to_end.rs"
+-
+-[[test]]
+-name = "io_read_to_string"
+-path = "tests/io_read_to_string.rs"
+-
+-[[test]]
+-name = "io_read_until"
+-path = "tests/io_read_until.rs"
+ 
+ [[test]]
+ name = "io_repeat"
+@@ -732,14 +712,11 @@
+ version = "0.3.0"
+ features = ["async-await"]
+ 
+-[dev-dependencies.futures-concurrency]
+-version = "7.6.3"
+-
+ [dev-dependencies.futures-test]
+ version = "0.3.31"
+ 
+ [dev-dependencies.mockall]
+-version = "0.13.0"
++version = ">=0.11,<0.14"
+ 
+ [dev-dependencies.tokio-stream]
+ version = "0.1"
+@@ -769,11 +746,6 @@
+     "time",
+ ]
+ io-std = []
+-io-uring = [
+-    "libc",
+-    "mio/os-poll",
+-    "mio/os-ext",
+-]
+ io-util = ["bytes"]
+ macros = ["tokio-macros"]
+ net = [
+@@ -801,7 +773,6 @@
+     "signal-hook-registry",
+ ]
+ sync = []
+-taskdump = []
+ test-util = [
+     "rt",
+     "sync",

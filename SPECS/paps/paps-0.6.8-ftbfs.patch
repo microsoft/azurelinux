@@ -1,0 +1,13 @@
+バイナリーファイル paps-0.6.8.orig/src/paps-paps.o とpaps-0.6.8/src/paps-paps.o は異なります
+diff -pruN paps-0.6.8.orig/src/paps.c paps-0.6.8/src/paps.c
+--- paps-0.6.8.orig/src/paps.c	2025-01-27 18:18:12.130570673 +0900
++++ paps-0.6.8/src/paps.c	2025-01-27 18:47:05.214883811 +0900
+@@ -515,7 +515,7 @@ int main(int argc, char *argv[])
+   } /* if (!cups_mode) */
+   
+   paps = paps_new();
+-  pango_context = paps_get_pango_context (paps);
++  pango_context = paps_get_pango_context ();
+   
+   /* Setup pango */
+   pango_context_set_language (pango_context, get_language ());

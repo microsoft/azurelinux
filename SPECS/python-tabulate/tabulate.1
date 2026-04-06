@@ -1,0 +1,67 @@
+.TH TABULATE "1" "October 2022" "" "User Commands"
+.SH NAME
+.B tabulate
+\(en pretty-print tabular data
+.SH SYNOPSIS
+.B tabulate
+.RI [ options ]
+.RI [ FILE \ ...]
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I FILE
+a filename of the file with tabular data;
+if
+.RB \(lq \- \(rq
+or missing, read data from
+.IR stdin .
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR, \fB\-\-help
+Show a help message
+.TP
+.B \-1\fR, \fB\-\-header
+use the first row of data as a table header
+.TP
+.B \-o\ \fIFILE\fR, \fB\-\-output\ \fIFILE
+print table to
+.I FILE
+(default:
+.IR stdout )
+.TP
+.B \-s\ \fIREGEXP\fR, \fB\-\-sep\ \fIREGEXP
+use a custom column separator
+(default:
+.IR whitespace )
+.TP
+.B \-F\ \fIFPFMT\fR, \fB\-\-float\ \fIFPFMT
+floating point number format
+(default:
+.BR g )
+.TP
+.B \-I\ \fIINTFMT\fR, \fB\-\-int\ \fIINTFMT
+integer point number format
+(default:
+\(lq\(rq)
+.TP
+.B \-f\ \fIFMT\fR, \fB\-\-format\ \fIFMT
+set output table format;
+supported formats:
+.BR plain ,
+.BR simple ,
+.BR grid ,
+.BR fancy_grid ,
+.BR pipe ,
+.BR orgtbl ,
+.BR rst ,
+.BR mediawiki ,
+.BR html ,
+.BR latex ,
+.BR latex_raw ,
+.BR latex_booktabs ,
+.BR latex_longtable ,
+.B tsv
+(default:
+.BR simple )
+.SH "SEE\ ALSO"
+https://github.com/astanin/python-tabulate

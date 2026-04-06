@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop-application">
+  <!--Created with jdAppStreamEdit 8.0-->
+  <id>io.qt.Designer</id>
+  <name>Qt Designer</name>
+  <summary>Design GUIs for Qt applications</summary>
+  <summary xml:lang="de">Erstelle GUIs for Qt Anwendungen</summary>
+  <developer id="io.qt">
+    <name>The Qt Company</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-3.0-only</project_license>
+  <project_group>Qt</project_group>
+  <description>
+    <p>Qt Designer lets you created and edit .ui files for your Qt Widgets Application</p>
+    <p xml:lang="de">Mit Qt Designer kannst du .ui Dateien für deine Qt Anwendung erstellen und bearbeiten</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source">https://doc.qt.io/qt-6/images/designer-multiple-screenshot.png</image>
+    </screenshot>
+    <screenshot>
+      <image type="source">https://doc.qt.io/qt-6/images/designer-screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://www.qt.io/</url>
+  <url type="bugtracker">https://bugreports.qt.io</url>
+  <url type="help">https://doc.qt.io/qt-6/qtdesigner-manual.html</url>
+  <url type="vcs-browser">https://code.qt.io/cgit/qt/qttools.git/tree/src/designer</url>
+  <url type="contribute">https://www.qt.io/community/contribute-to-qt</url>
+  <categories>
+    <category>Development</category>
+    <category>Qt</category>
+  </categories>
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">qt6-designer.desktop</launchable>
+  <provides>
+    <binary>designer</binary>
+    <mediatype>application/x-designer</mediatype>
+  </provides>
+</component>

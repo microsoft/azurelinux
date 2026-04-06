@@ -1,0 +1,42 @@
+Date: Thu, 6 May 2021 08:28:06 +0200
+Subject: [PATCH] Remove waffle-jna
+
+---
+ .../authentication/addon/gssapi/GssUtility.java | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/src/main/java/org/mariadb/jdbc/plugin/authentication/addon/gssapi/GssUtility.java b/src/main/java/org/mariadb/jdbc/plugin/authentication/addon/gssapi/GssUtility.java
+index 5f050df..1801701 100644
+--- a/src/main/java/org/mariadb/jdbc/plugin/authentication/addon/gssapi/GssUtility.java
++++ b/src/main/java/org/mariadb/jdbc/plugin/authentication/addon/gssapi/GssUtility.java
+@@ -9,26 +9,11 @@ import com.sun.jna.Platform;
+ public class GssUtility {
+ 
+   /**
+-   * Get authentication method according to classpath. Windows native authentication is using
+-   * Waffle-jna.
++   * Get authentication method according to classpath
+    *
+    * @return authentication method
+    */
+   public static GssapiAuth getAuthenticationMethod() {
+-    try {
+-      // Waffle-jna has jna as dependency, so if not available on classpath, just use standard
+-      // authentication
+-      if (Platform.isWindows()) {
+-        try {
+-          Class.forName("waffle.windows.auth.impl.WindowsAuthProviderImpl");
+-          return new WindowsNativeSspiAuthentication();
+-        } catch (ClassNotFoundException cle) {
+-          // waffle not in the classpath
+-        }
+-      }
+-    } catch (Throwable cle) {
+-      // jna jar's are not in classpath
+-    }
+     return new StandardGssapiAuthentication();
+   }
+ }
+-- 
+2.30.2
+

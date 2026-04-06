@@ -1,0 +1,33 @@
+Fix compilation with GCC 15
+
+| In file included from /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.cc:26:
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h:37:42: error: ‘uint32_t’ does not name a type
+|    37 |   Warning(const std::string &text, const uint32_t code, const bool is_note)
+|       |                                          ^~~~~~~~
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h:34:1: note: ‘uint32_t’ is defined in header ‘<cstdint>’; this is probably fixable by adding ‘#include <cstdint>’
+|    33 | #include <vector>
+|   +++ |+#include <cstdint>
+|    34 | 
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h:41:3: error: ‘uint32_t’ does not name a type
+|    41 |   uint32_t m_code;
+|       |   ^~~~~~~~
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h:41:3: note: ‘uint32_t’ is defined in header ‘<cstdint>’; this is probably fixable by adding ‘#include <cstdint>’
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h: In constructor ‘Warning::Warning(const std::string&, int, bool)’:
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.h:38:23: error: class ‘Warning’ does not have any field named ‘m_code’
+|    38 |       : m_text(text), m_code(code), m_is_note(is_note) {}
+|       |                       ^~~~~~
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.cc: In function ‘std::ostream& operator<<(std::ostream&, const Warning&)’:
+| /builddir/build/BUILD/mysql8.0-8.0.40-build/mysql-8.0.40/plugin/x/tests/driver/connector/warning.cc:33:58: error: ‘const class Warning’ has no member named ‘m_code’
+|    33 |   os << (w.m_is_note ? "NOTE" : "WARNING") << " | " << w.m_code << " | "
+|       |                                                          ^~~~~~
+
+--- mysql-8.0.40/plugin/x/tests/driver/connector/warning.h	2024-09-18 12:08:24.000000000 +0200
++++ mysql-8.0.40/plugin/x/tests/driver/connector/warning.h_patched	2025-01-24 01:41:57.879753104 +0100
+@@ -31,6 +31,7 @@
+ #include <string>
+ #include <utility>
+ #include <vector>
++#include <cstdint>
+ 
+ class Warning {
+  public:

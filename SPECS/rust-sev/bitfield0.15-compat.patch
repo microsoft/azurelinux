@@ -1,0 +1,13 @@
+diff --git a/src/firmware/guest/types/snp.rs b/src/firmware/guest/types/snp.rs
+index 3afec65..c588813 100644
+--- a/src/firmware/guest/types/snp.rs
++++ b/src/firmware/guest/types/snp.rs
+@@ -908,7 +908,7 @@ bitfield! {
+     /// Indicates that alias detection has completed since the last system reset and there are no aliasing addresses. Resets to 0.
+     pub alias_check_complete, _: 5;
+     /// Indicates that SEV-TIO is enabled.
+-    pub tio_enabled, _ : 7
++    pub tio_enabled, _ : 7;
+ 
+ }
+ 

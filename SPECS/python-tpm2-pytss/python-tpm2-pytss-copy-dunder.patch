@@ -1,0 +1,74 @@
+From 6ab4c74e6fb3da7cd38e97c1f8e92532312f8439 Mon Sep 17 00:00:00 2001
+From: Erik Larsson <who+github@cnackers.org>
+Date: Sun, 18 May 2025 14:01:20 +0200
+Subject: [PATCH] cryptograpy: add copy dunder for private keys
+
+cryptography >= 45.0.0 requires the copy dunder for private key implementations.
+
+Signed-off-by: Erik Larsson <who+github@cnackers.org>
+---
+ src/tpm2_pytss/cryptography.py | 12 ++++++++++++
+ test/test_cryptography.py      | 19 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/src/tpm2_pytss/cryptography.py b/src/tpm2_pytss/cryptography.py
+index dd75623a..5b8432cc 100644
+--- a/src/tpm2_pytss/cryptography.py
++++ b/src/tpm2_pytss/cryptography.py
+@@ -257,6 +257,12 @@ def private_bytes(
+         """Always raises a NotImplementedError."""
+         raise NotImplementedError()
+ 
++    def __copy__(self) -> "tpm_rsa_private_key":
++        """Returns a shallow copy of the private key."""
++        return tpm_rsa_private_key(
++            ectx=self._ectx, handle=self._handle, session=self._session
++        )
++
+ 
+ class tpm_ecc_private_key(ec.EllipticCurvePrivateKey):
+     """Interface to a TPM ECC key for use with the cryptography module.
+@@ -428,3 +434,9 @@ def private_bytes(
+     ) -> None:
+         """Always raises a NotImplementedError."""
+         raise NotImplementedError()
++
++    def __copy__(self) -> "tpm_ecc_private_key":
++        """Returns a shallow copy of the private key."""
++        return tpm_ecc_private_key(
++            ectx=self._ectx, handle=self._handle, session=self._session
++        )
+diff --git a/test/test_cryptography.py b/test/test_cryptography.py
+index 3f81f6a6..3e4f30d4 100644
+--- a/test/test_cryptography.py
++++ b/test/test_cryptography.py
+@@ -11,6 +11,7 @@
+ from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
+ from cryptography import x509
+ import datetime
++import copy
+ 
+ 
+ rsa_template = TPM2B_PUBLIC.parse(
+@@ -502,3 +503,21 @@ def test_csr_builder_ecc(self):
+         halg = privkey.get_digest_algorithm()
+         csr = builder.sign(privkey, algorithm=halg())
+         self.assertEqual(csr.is_signature_valid, True)
++
++    def test_rsa_copy(self):
++        handle, _, _, _, _ = self.ectx.create_primary(
++            in_sensitive=None, in_public=rsa_template
++        )
++        privkey = tpm_rsa_private_key(self.ectx, handle)
++        privkey_copy = copy.copy(privkey)
++
++        self.assertEqual(privkey.key_size, privkey_copy.key_size)
++
++    def test_ecc_copy(self):
++        handle, _, _, _, _ = self.ectx.create_primary(
++            in_sensitive=None, in_public=ecc_template
++        )
++        privkey = tpm_ecc_private_key(self.ectx, handle)
++        privkey_copy = copy.copy(privkey)
++
++        self.assertEqual(type(privkey.curve), type(privkey_copy.curve))

@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY date SYSTEM "date.xml">
+<!ENTITY version SYSTEM "version.xml">
+]>
+
+<refentry id="nspr-config">
+
+  <refentryinfo>
+    <date>&date;</date>
+    <title>Netscape Portable Runtime</title>
+    <productname>nspr</productname>
+    <productnumber>&version;</productnumber>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>nspr-config</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>nspr-config</refname>
+    <refpurpose>Return meta information about nspr libraries</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>nspr-config</command>
+      <arg><option>--prefix</option></arg>
+      <arg><option>--exec-prefix</option></arg>
+      <arg><option>--includedir</option></arg>
+      <arg><option>--libs</option></arg>
+      <arg><option>--cflags</option></arg>
+      <arg><option>--libdir</option></arg>
+      <arg><option>--version</option></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+<refsection id="description">
+    <title>Description</title>
+    <para><command>nspr-config</command> is a shell script which can be used to obtain gcc options for building client pacakges of nspr.</para>
+  </refsection>
+  
+  <refsection>
+    <title>Options</title>
+    
+    <variablelist>
+      <varlistentry>
+        <term><option>--prefix</option></term>
+        <listitem><simpara>Returns the top level system directory under which the nspr libraries are installed.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--exec-prefix</option></term>
+        <listitem><simpara>Returns the top level system directory under which any nspr binaries would be installed.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--includedir</option> <replaceable>count</replaceable></term>
+        <listitem><simpara>Returns the path to the directory were the nspr headers are installed.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--version</option></term>
+        <listitem><simpara>Returns the upstream version of nspr in the form major_version-minor_version-patch_version.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--libs</option></term>
+        <listitem><simpara>Returns the compiler linking flags.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--cflags</option></term>
+        <listitem><simpara>Returns the compiler include flags.</simpara></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--libdir</option></term>
+        <listitem><simpara>Returns the path to the directory were the nspr libraries are installed.</simpara></listitem>
+      </varlistentry>
+
+    </variablelist>
+  </refsection>
+
+  <refsection>
+    <title>Examples</title>
+
+    <para>The following example will query for both include path and linkage flags:
+      <programlisting>
+        /usr/bin/nspr-config --cflags --libs
+      </programlisting>
+    </para>
+
+   
+  </refsection>
+
+  <refsection>
+    <title>Files</title>
+
+    <para><filename>/usr/bin/nspr-config</filename></para>
+
+  </refsection>
+
+  <refsection>
+    <title>See also</title>
+    <para>pkg-config(1)</para>
+  </refsection>
+
+  <refsection id="authors">
+    <title>Authors</title>
+    <para>The NSPR liraries were written and maintained by developers with Netscape, Red Hat,  Sun, Oracle, Mozilla, and Google.</para>
+    <para>
+	Authors: Elio Maldonado &lt;emaldona@redhat.com>.
+    </para>
+  </refsection>
+
+<!-- don't change -->
+  <refsection id="license">
+    <title>LICENSE</title>
+    <para>Licensed under the Mozilla Public License, v. 2.0.  If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    </para>
+  </refsection>
+
+</refentry>
+

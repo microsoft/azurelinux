@@ -1,0 +1,3 @@
+%bash_completions_dir   %{_datadir}/bash-completion/completions
+%zsh_completions_dir    %{_datadir}/zsh/site-functions
+%fish_completions_dir   %{_datadir}/fish/vendor_completions.d

@@ -1,0 +1,13 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.orig netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.orig	2011-09-05 14:41:34.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2011-09-05 14:44:44.000000000 +0200
+@@ -499,6 +499,9 @@ usage:
+ 	}
+ 	sendrequest(cmd, argv[1], argv[2],
+ 	    argv[1] != oldargv1 || argv[2] != oldargv2);
++	if (argv[1] != oldargv1) {
++		free(argv[1]);
++	}
+ }
+ 
+ void mabort(int);

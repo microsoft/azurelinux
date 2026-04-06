@@ -1,0 +1,46 @@
+From b1fe07d8f8039ca241738a75462dee02cef5abec Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Mon, 14 Jun 2021 12:45:37 +0100
+Subject: [PATCH 06/55] Fix build
+
+1b5e43a593e917610e6245f7a272ac081c508ba4 relied on a patch that we can't
+backport.
+
+This adds that extra internal boolean backporting just the tiny part of
+d6ac8cf6.
+---
+ src/client/global/qwaylandclientextension.cpp | 5 ++++-
+ src/client/global/qwaylandclientextension_p.h | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/global/qwaylandclientextension.cpp b/src/client/global/qwaylandclientextension.cpp
+index 2dc61b77..36609c08 100644
+--- a/src/client/global/qwaylandclientextension.cpp
++++ b/src/client/global/qwaylandclientextension.cpp
+@@ -74,7 +74,10 @@ void QWaylandClientExtensionPrivate::handleRegistryGlobal(void *data, ::wl_regis
+ void QWaylandClientExtension::addRegistryListener()
+ {
+     Q_D(QWaylandClientExtension);
+-    d->waylandIntegration->display()->addRegistryListener(&QWaylandClientExtensionPrivate::handleRegistryGlobal, this);
++    if (!d->registered) {
++        d->waylandIntegration->display()->addRegistryListener(&QWaylandClientExtensionPrivate::handleRegistryGlobal, this);
++        d->registered = true;
++    }
+ }
+ 
+ QWaylandClientExtension::QWaylandClientExtension(const int ver)
+diff --git a/src/client/global/qwaylandclientextension_p.h b/src/client/global/qwaylandclientextension_p.h
+index 69cc46a0..9091efbe 100644
+--- a/src/client/global/qwaylandclientextension_p.h
++++ b/src/client/global/qwaylandclientextension_p.h
+@@ -68,6 +68,7 @@ public:
+     QtWaylandClient::QWaylandIntegration *waylandIntegration = nullptr;
+     int version = -1;
+     bool active = false;
++    bool registered = false;
+ };
+ 
+ class Q_WAYLAND_CLIENT_EXPORT QWaylandClientExtensionTemplatePrivate : public QWaylandClientExtensionPrivate
+-- 
+2.51.1
+

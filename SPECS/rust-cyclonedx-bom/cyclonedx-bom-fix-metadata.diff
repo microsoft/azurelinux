@@ -1,0 +1,45 @@
+--- cyclonedx-bom-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cyclonedx-bom-0.8.0/Cargo.toml	2025-12-14T10:28:42.789140+00:00
+@@ -50,13 +50,13 @@
+ path = "src/lib.rs"
+ 
+ [dependencies.base64]
+-version = "0.21.2"
++version = "0.22.1"
+ 
+ [dependencies.cyclonedx-bom-macros]
+ version = "0.1.0"
+ 
+ [dependencies.fluent-uri]
+-version = "0.1.4"
++version = "0.4.1"
+ 
+ [dependencies.indexmap]
+ version = "2.2.2"
+@@ -65,7 +65,7 @@
+ version = "1.18.0"
+ 
+ [dependencies.ordered-float]
+-version = "4.2.0"
++version = "5.0.0"
+ default-features = false
+ 
+ [dependencies.purl]
+@@ -83,14 +83,14 @@
+ version = "1.0.108"
+ 
+ [dependencies.spdx]
+-version = "0.10.6"
++version = "0.13.0"
+ 
+ [dependencies.strum]
+-version = "0.26.2"
++version = "0.27.0"
+ features = ["derive"]
+ 
+ [dependencies.thiserror]
+-version = "1.0.48"
++version = "2.0.0"
+ 
+ [dependencies.time]
+ version = "0.3.29"

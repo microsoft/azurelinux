@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenSSH Server Socket
+Documentation=man:sshd(8) man:sshd_config(5)
+Conflicts=sshd.service
+
+[Socket]
+ListenStream=22
+Accept=yes
+
+[Install]
+WantedBy=sockets.target

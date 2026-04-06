@@ -1,0 +1,46 @@
+From deaea7a5d34e6dc3453040d6a59218285cf80a4f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Wed, 18 Jun 2025 12:13:50 +0200
+Subject: [PATCH] Fix Rack 3 compatibility
+
+Rack 3 / Rackup are assumed by default, but if their load attempt fails,
+Rack 2 is tried.
+---
+ spec/support/localhost_server.rb | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/spec/support/localhost_server.rb b/spec/support/localhost_server.rb
+index c5a7508..bde25de 100644
+--- a/spec/support/localhost_server.rb
++++ b/spec/support/localhost_server.rb
+@@ -1,5 +1,11 @@
+ require 'rack'
+-require 'rack/handler/webrick'
++begin
++  require 'rackup/handler/webrick'
++rescue LoadError
++  # If Rackup handler (and Rack 3.x) cannot be loaded, try to fallback to Rack 2.x.
++  require 'rack/handler/webrick'
++  Rackup = Rack
++end
+ require 'net/http'
+ 
+ # The code for this is inspired by Capybara's server:
+@@ -43,7 +49,7 @@ class LocalhostServer
+     # Use WEBrick since it's part of the ruby standard library and is available on all ruby interpreters.
+     options = { :Port => port }
+     options.merge!(:AccessLog => [], :Logger => WEBrick::BasicLog.new(StringIO.new)) unless ENV['VERBOSE_SERVER']
+-    Rack::Handler::WEBrick.run(Identify.new(@rack_app), **options)
++    Rackup::Handler::WEBrick.run(Identify.new(@rack_app), **options)
+   end
+ 
+   def booted?
+@@ -58,7 +64,7 @@ class LocalhostServer
+   def concurrently
+     if should_use_subprocess?
+       pid = Process.fork do
+-        trap(:INT) { ::Rack::Handler::WEBrick.shutdown }
++        trap(:INT) { ::Rackup::Handler::WEBrick.shutdown }
+         yield
+         exit # manually exit; otherwise this sub-process will re-run the specs that haven't run yet.
+       end

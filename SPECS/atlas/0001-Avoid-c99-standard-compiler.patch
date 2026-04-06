@@ -1,0 +1,30 @@
+From 036562b66fa607152c6c54f0d6d030cd19bfcb7f Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Tue, 19 Feb 2019 19:03:52 +0100
+Subject: [PATCH 1/8] Avoid c99 standard compiler
+
+When probing for a usable GCC, the existing code already dropped path
+names that contained "c89" or "c90", because these compilers don't have
+the GCC extensions enabled.  This patch also drops names with "c99" in
+them.
+---
+ CONFIG/src/atlconf_misc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CONFIG/src/atlconf_misc.c b/CONFIG/src/atlconf_misc.c
+index 63cb1ef..fb62214 100644
+--- a/CONFIG/src/atlconf_misc.c
++++ b/CONFIG/src/atlconf_misc.c
+@@ -824,7 +824,8 @@ int CompIsGcc(char *comp)
+    int i;
+ 
+    cmpname = NameWithoutPath(comp);
+-   if (strstr(cmpname, "c89") || strstr(cmpname, "c90"))
++   if (strstr(cmpname, "c89") || strstr(cmpname, "c90") ||
++       strstr(cmpname, "c99"))
+    {
+       free(cmpname);
+       return(0);
+-- 
+2.23.0
+

@@ -1,0 +1,19 @@
+--- bytecount-0.6.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bytecount-0.6.9/Cargo.toml	2025-06-19T11:34:40.464548+00:00
+@@ -56,16 +56,7 @@
+ name = "check"
+ path = "tests/check.rs"
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies]
+-
+-[dev-dependencies.criterion]
+-version = "0.4"
+-default-features = false
+ 
+ [dev-dependencies.quickcheck]
+ version = "1.0"

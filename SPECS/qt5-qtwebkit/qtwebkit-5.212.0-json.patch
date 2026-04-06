@@ -1,0 +1,12 @@
+diff -up qtwebkit-5.212.0-alpha4/Source/JavaScriptCore/generate-bytecode-files.me qtwebkit-5.212.0-alpha4/Source/JavaScriptCore/generate-bytecode-files
+--- qtwebkit-5.212.0-alpha4/Source/JavaScriptCore/generate-bytecode-files.me	2020-08-27 13:50:06.506653244 +0200
++++ qtwebkit-5.212.0-alpha4/Source/JavaScriptCore/generate-bytecode-files	2020-08-27 14:00:52.802018893 +0200
+@@ -163,7 +163,7 @@ if __name__ == "__main__":
+         initBytecodesFile = openOrExit(initASMFileName, "w")
+ 
+     try:
+-        bytecodeSections = json.load(bytecodeFile, encoding = "utf-8")
++        bytecodeSections = json.load(bytecodeFile)
+     except:
+         print("Unexpected error parsing {0}: {1}".format(bytecodeJSONFile, sys.exc_info()))
+ 

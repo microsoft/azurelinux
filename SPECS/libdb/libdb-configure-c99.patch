@@ -1,0 +1,285 @@
+Port the configure script to C99.  Add missing header files, avoid
+calling the undeclared exit function, and add missing return types
+main.  This improves compatibility with compilers which do not accept
+language features that were removed from C99.
+
+diff -ur db-5.3.28.orig/dist/aclocal/clock.m4 db-5.3.28/dist/aclocal/clock.m4
+--- db-5.3.28.orig/dist/aclocal/clock.m4	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/aclocal/clock.m4	2022-12-10 12:35:08.415288426 +0100
+@@ -21,12 +21,14 @@
+ AC_CACHE_CHECK([for clock_gettime monotonic clock], db_cv_clock_monotonic, [
+ AC_TRY_RUN([
+ #include <sys/time.h>
+-main() {
++#include <time.h>
++int main() {
+ 	struct timespec t;
+ 	return (clock_gettime(CLOCK_MONOTONIC, &t) != 0);
+ }], db_cv_clock_monotonic=yes, db_cv_clock_monotonic=no,
+ AC_TRY_LINK([
+-#include <sys/time.h>], [
++#include <sys/time.h>
++#include <time.h>], [
+ struct timespec t;
+ clock_gettime(CLOCK_MONOTONIC, &t);
+ ], db_cv_clock_monotonic=yes, db_cv_clock_monotonic=no))
+diff -u db-5.3.28/dist/aclocal/mmap.m4 db-5.3.28/dist/aclocal/mmap.m4
+--- db-5.3.28/dist/aclocal/mmap.m4	2024-01-05 16:07:07.340002918 +0100
++++ db-5.3.28/dist/aclocal/mmap.m4	2024-01-05 16:45:12.128407358 +0100
+@@ -42,13 +42,11 @@
+     #define MAP_FAILED (-1)
+     #endif
+ 
+-    int catch_sig(sig)
+-	    int sig;
++    void catch_sig(int sig)
+     {
+-	    exit(1);
+     }
+ 
+-    main() {
++    int main() {
+ 	    const char *underlying;
+ 	    unsigned gapsize;
+ 	    char *base;
+diff -ur db-5.3.28.orig/dist/aclocal/mutex.m4 db-5.3.28/dist/aclocal/mutex.m4
+--- db-5.3.28.orig/dist/aclocal/mutex.m4	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/aclocal/mutex.m4	2022-12-10 12:35:08.415288426 +0100
+@@ -5,7 +5,7 @@
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_mutex_t mutex;
+ 	pthread_condattr_t condattr;
+@@ -49,7 +49,7 @@
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_mutex_t mutex;
+ 	pthread_condattr_t condattr;
+@@ -89,7 +89,7 @@
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_condattr_t condattr;
+ 	exit(pthread_condattr_init(&condattr) ||
+@@ -110,7 +110,7 @@
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_rwlock_t rwlock;
+ 	pthread_rwlockattr_t rwlockattr;
+ 	exit(pthread_rwlockattr_init(&rwlockattr) ||
+@@ -282,7 +282,7 @@
+ 	# x86/gcc: FreeBSD, NetBSD, BSD/OS, Linux
+ 	AC_TRY_COMPILE(,[
+ 	#if (defined(i386) || defined(__i386__)) && defined(__GNUC__)
+-		exit(0);
++		return 0;
+ 	#else
+ 		FAIL TO COMPILE/LINK
+ 	#endif
+@@ -291,7 +291,7 @@
+ 	# x86_64/gcc: FreeBSD, NetBSD, BSD/OS, Linux
+ 	AC_TRY_COMPILE(,[
+ 	#if (defined(x86_64) || defined(__x86_64__)) && defined(__GNUC__)
+-		exit(0);
++		return 0;
+ 	#else
+ 		FAIL TO COMPILE/LINK
+ 	#endif
+@@ -314,7 +314,7 @@
+ 	AC_TRY_COMPILE(,[
+ 	#if defined(__sparc__) && defined(__GNUC__)
+ 		asm volatile ("membar #StoreStore|#StoreLoad|#LoadStore");
+-		exit(0);
++		return 0;
+ 	#else
+ 		FAIL TO COMPILE/LINK
+ 	#endif
+@@ -356,7 +356,7 @@
+ 	msem_init(&x, 0);
+ 	msem_lock(&x, 0);
+ 	msem_unlock(&x, 0);
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -373,7 +373,7 @@
+ 	msem_init(&x, 0);
+ 	msem_lock(&x, 0);
+ 	msem_unlock(&x, 0);
+-	exit(0);
++	return 0;
+ ], [db_cv_mutex=UNIX/msem_init])
+ fi
+ 
+@@ -395,7 +395,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__USLC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -452,7 +452,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__alpha) && defined(__DECC)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -463,7 +463,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__alpha) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -474,7 +474,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__arm__) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -485,7 +485,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if (defined(__mips) || defined(__mips__)) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -496,7 +496,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if (defined(__hppa) || defined(__hppa__)) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -507,7 +507,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if (defined(__powerpc__) || defined(__ppc__)) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -518,7 +518,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if (defined(mc68020) || defined(sun3)) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -529,7 +529,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__MVS__) && defined(__IBMC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -540,7 +540,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__s390__) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -551,7 +551,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(__ia64) && defined(__GNUC__)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -562,7 +562,7 @@
+ if test "$db_cv_mutex" = no; then
+ AC_TRY_COMPILE(,[
+ #if defined(_UTS)
+-	exit(0);
++	return 0;
+ #else
+ 	FAIL TO COMPILE/LINK
+ #endif
+@@ -910,9 +910,9 @@
+ if test "$db_cv_atomic" = no; then
+ 	AC_TRY_COMPILE(,[
+ 	#if ((defined(i386) || defined(__i386__)) && defined(__GNUC__))
+-		exit(0);
++		return 0;
+ 	#elif ((defined(x86_64) || defined(__x86_64__)) && defined(__GNUC__))
+-		exit(0);
++		return 0;
+ 	#else
+ 		FAIL TO COMPILE/LINK
+ 	#endif
+diff -ur db-5.3.28.orig/dist/aclocal/sequence.m4 db-5.3.28/dist/aclocal/sequence.m4
+--- db-5.3.28.orig/dist/aclocal/sequence.m4	2022-12-10 12:29:48.598322433 +0100
++++ db-5.3.28/dist/aclocal/sequence.m4	2022-12-10 12:35:08.415288426 +0100
+@@ -43,7 +43,9 @@
+ 	# test, which won't test for the appropriate printf format strings.
+ 	if test "$db_cv_build_sequence" = "yes"; then
+ 		AC_TRY_RUN([
+-		main() {
++		#include <stdio.h>
++		#include <string.h>
++		int main() {
+ 			$db_cv_seq_type l;
+ 			unsigned $db_cv_seq_type u;
+ 			char buf@<:@100@:>@;
+@@ -59,7 +61,10 @@
+ 				return (1);
+ 			return (0);
+ 		}],, [db_cv_build_sequence="no"],
+-		AC_TRY_LINK(,[
++		AC_TRY_LINK([
++		#include <stdio.h>
++		#include <string.h>
++		],[
+ 			$db_cv_seq_type l;
+ 			unsigned $db_cv_seq_type u;
+ 			char buf@<:@100@:>@;
+diff -ur db-5.3.28.orig/dist/configure.ac db-5.3.28/dist/configure.ac
+--- db-5.3.28.orig/dist/configure.ac	2022-12-10 12:29:48.610322320 +0100
++++ db-5.3.28/dist/configure.ac	2022-12-10 12:43:38.840398043 +0100
+@@ -1047,6 +1047,7 @@
+ AC_CACHE_CHECK([for dl_iterate_phdr], db_cv_dl_iterate_phdr, [
+ AC_TRY_LINK([
+ #include <sys/types.h>
++#include <link.h>
+ #include <netdb.h>], [
+ 	dl_iterate_phdr(0, 0);
+ ], [db_cv_dl_iterate_phdr=yes], [db_cv_dl_iterate_phdr=no])])

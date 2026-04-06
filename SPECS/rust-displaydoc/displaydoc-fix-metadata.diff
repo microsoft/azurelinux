@@ -1,0 +1,11 @@
+--- displaydoc-0.2.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ displaydoc-0.2.5/Cargo.toml	2024-12-11T12:17:38.790823+00:00
+@@ -96,7 +96,7 @@
+ default-features = false
+ 
+ [dev-dependencies.pretty_assertions]
+-version = "0.6.1"
++version = "1.4.0"
+ 
+ [dev-dependencies.rustversion]
+ version = "1.0.0"

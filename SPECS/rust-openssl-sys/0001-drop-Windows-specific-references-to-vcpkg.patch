@@ -1,0 +1,78 @@
+From 4bc8e7604326a1b71a3352ef206bec7c12d81178 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 13 Jul 2025 18:32:15 +0200
+Subject: [PATCH] drop Windows-specific references to vcpkg
+
+---
+ build/find_normal.rs | 35 -----------------------------------
+ build/main.rs        |  1 -
+ 2 files changed, 36 deletions(-)
+
+diff --git a/build/find_normal.rs b/build/find_normal.rs
+index cad0afda..b2fd044f 100644
+--- a/build/find_normal.rs
++++ b/build/find_normal.rs
+@@ -90,7 +90,6 @@ fn find_openssl_dir(target: &str) -> OsString {
+     }
+ 
+     try_pkg_config();
+-    try_vcpkg();
+ 
+     // FreeBSD, OpenBSD, and AIX ship with Libre|OpenSSL
+     // TODO: see of this is still needed for OpenBSD
+@@ -239,40 +238,6 @@ fn try_pkg_config() {
+     process::exit(0);
+ }
+ 
+-/// Attempt to find OpenSSL through vcpkg.
+-///
+-/// Note that if this succeeds then the function does not return as vcpkg
+-/// should emit all of the cargo metadata that we need.
+-fn try_vcpkg() {
+-    let target = env::var("TARGET").unwrap();
+-    if !target.contains("windows") {
+-        return;
+-    }
+-
+-    // vcpkg will not emit any metadata if it can not find libraries
+-    // appropriate for the target triple with the desired linkage.
+-
+-    let lib = match vcpkg::Config::new()
+-        .emit_includes(true)
+-        .find_package("openssl")
+-    {
+-        Ok(lib) => lib,
+-        Err(e) => {
+-            println!("note: vcpkg did not find openssl: {e}");
+-            return;
+-        }
+-    };
+-
+-    super::postprocess(&lib.include_paths);
+-
+-    println!("cargo:rustc-link-lib=user32");
+-    println!("cargo:rustc-link-lib=gdi32");
+-    println!("cargo:rustc-link-lib=crypt32");
+-    println!("cargo:rustc-link-lib=advapi32");
+-
+-    process::exit(0);
+-}
+-
+ fn execute_command_and_get_output(cmd: &str, args: &[&str]) -> Option<String> {
+     let out = Command::new(cmd).args(args).output();
+     if let Ok(ref r1) = out {
+diff --git a/build/main.rs b/build/main.rs
+index cbbeb961..745284a6 100644
+--- a/build/main.rs
++++ b/build/main.rs
+@@ -4,7 +4,6 @@ extern crate cc;
+ #[cfg(feature = "vendored")]
+ extern crate openssl_src;
+ extern crate pkg_config;
+-extern crate vcpkg;
+ 
+ use std::collections::HashSet;
+ use std::env;
+-- 
+2.52.0
+

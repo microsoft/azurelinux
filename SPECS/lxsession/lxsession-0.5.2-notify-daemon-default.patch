@@ -1,0 +1,13 @@
+--- lxsession-0.5.2/lxsession/settings.vala.notify	2015-08-11 14:14:22.187535605 +0900
++++ lxsession-0.5.2/lxsession/settings.vala	2015-08-11 14:37:18.868694268 +0900
+@@ -258,6 +258,10 @@
+             set_generic_default("Session", "proxy_manager", "command", "string", "build-in");
+             set_generic_default("Session", "keyring", "command", "string", "ssh-agent");
+ 
++            set_generic_default("Session", "notification", "command", "string", "/usr/libexec/notification-daemon");
++            set_generic_default("Session", "notification", "autostart", "string", "true");
++
++
+             /* Set Xsettings default */
+ 
+             set_generic_default("GTK", "iXft", "Antialias", "string", "1");

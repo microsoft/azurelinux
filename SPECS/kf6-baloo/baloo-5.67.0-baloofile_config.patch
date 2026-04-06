@@ -1,0 +1,21 @@
+diff -ur baloo-5.67.0/src/lib/baloosettings.kcfg baloo-5.67.0-baloofile_config/src/lib/baloosettings.kcfg
+--- baloo-5.67.0/src/lib/baloosettings.kcfg	2020-02-02 13:42:43.000000000 +0100
++++ baloo-5.67.0-baloofile_config/src/lib/baloosettings.kcfg	2020-02-03 22:19:59.824381582 +0100
+@@ -31,11 +31,15 @@
+     </entry>
+     <entry name="excludedFolders" key="exclude folders" type="PathList">
+       <label>exclude folders</label>
+-      <default code="true">QStringList()</default>
++      <default code="true">QStringList() &lt;&lt; QDir::homePath()</default>
+     </entry>
+     <entry name="folders" type="PathList">
+       <label>folders</label>
+-      <default code="true">QStringList() &lt;&lt; QDir::homePath()</default>
++      <default code="true">QStringList() &lt;&lt;
++         QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation) &lt;&lt;
++         QStandardPaths::standardLocations(QStandardPaths::MusicLocation) &lt;&lt;
++         QStandardPaths::standardLocations(QStandardPaths::MoviesLocation) &lt;&lt;
++         QStandardPaths::standardLocations(QStandardPaths::PicturesLocation)</default>
+     </entry>
+     <entry name="excludedMimetypes" key="exclude mimetypes" type="StringList">
+       <label>exclude mimetypes</label>

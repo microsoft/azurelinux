@@ -1,0 +1,89 @@
+diff -up nfs-utils-2.6.1/utils/mountd/mountd.man.orig nfs-utils-2.6.1/utils/mountd/mountd.man
+--- nfs-utils-2.6.1/utils/mountd/mountd.man.orig	2022-03-02 15:53:18.898475385 -0500
++++ nfs-utils-2.6.1/utils/mountd/mountd.man	2022-03-02 15:54:02.362872285 -0500
+@@ -291,36 +291,7 @@ section include
+ which each have the same meaning as given by
+ .BR rpc.nfsd (8).
+ 
+-.SH TCP_WRAPPERS SUPPORT
+-You can protect your
+-.B rpc.mountd
+-listeners using the
+-.B tcp_wrapper
+-library or
+-.BR iptables (8).
+-.PP
+-Note that the
+-.B tcp_wrapper
+-library supports only IPv4 networking.
+-.PP
+-Add the hostnames of NFS peers that are allowed to access
+-.B rpc.mountd
+-to
+-.IR /etc/hosts.allow .
+-Use the daemon name
+-.B mountd
+-even if the
+-.B rpc.mountd
+-binary has a different name.
+-.PP
+-Hostnames used in either access file will be ignored when
+-they can not be resolved into IP addresses.
+-For further information see the
+-.BR tcpd (8)
+-and
+-.BR hosts_access (5)
+-man pages.
+-.SS IPv6 and TI-RPC support
++.SH IPv6 and TI-RPC support
+ TI-RPC is a pre-requisite for supporting NFS on IPv6.
+ If TI-RPC support is built into
+ .BR rpc.mountd ,
+@@ -347,7 +318,6 @@ table of clients accessing server's expo
+ .BR nfs (5),
+ .BR nfs.conf (5),
+ .BR tcpd (8),
+-.BR hosts_access (5),
+ .BR iptables (8),
+ .BR netconfig (5)
+ .sp
+diff -up nfs-utils-2.6.1/utils/statd/statd.man.orig nfs-utils-2.6.1/utils/statd/statd.man
+--- nfs-utils-2.6.1/utils/statd/statd.man.orig	2022-03-02 15:53:18.899475395 -0500
++++ nfs-utils-2.6.1/utils/statd/statd.man	2022-03-02 15:54:02.363872294 -0500
+@@ -325,28 +325,6 @@ chooses, simply use
+ .BR chown (1)
+ to set the owner of
+ the state directory.
+-.PP
+-You can also protect your
+-.B rpc.statd
+-listeners using the
+-.B tcp_wrapper
+-library or
+-.BR iptables (8).
+-To use the
+-.B tcp_wrapper
+-library, add the hostnames of peers that should be allowed access to
+-.IR /etc/hosts.allow .
+-Use the daemon name
+-.B statd
+-even if the
+-.B rpc.statd
+-binary has a different filename.
+-.P
+-For further information see the
+-.BR tcpd (8)
+-and
+-.BR hosts_access (5)
+-man pages.
+ .SH ADDITIONAL NOTES
+ Lock recovery after a reboot is critical to maintaining data integrity
+ and preventing unnecessary application hangs.
+@@ -451,7 +429,6 @@ network transport capability database
+ .BR rpc.nfsd (8),
+ .BR rpcbind (8),
+ .BR tcpd (8),
+-.BR hosts_access (5),
+ .BR iptables (8),
+ .BR netconfig (5)
+ .sp

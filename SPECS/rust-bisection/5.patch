@@ -1,0 +1,36 @@
+From e8acfd44ac6fb1cf46bf64fc7b6706b6fc35dced Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 8 May 2024 09:10:53 -0400
+Subject: [PATCH] Fix integer overflow in midpoint calculation
+
+Fixes #2 as suggested by @kaltu (Yulin Liu) in the issue.
+
+See also:
+
+https://research.google/blog/extra-extra-read-all-about-it-nearly-all-binary-searches-and-mergesorts-are-broken/
+---
+ src/lib.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 3089e54..63a6c09 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -137,7 +137,7 @@ where
+ {
+     let (mut lo, mut hi) = bounds_to_indices(a, within);
+     while lo < hi {
+-        let mid = (lo + hi) / 2;
++        let mid = lo + (hi - lo) / 2;
+         if f(&a[mid]) == Ordering::Less {
+             hi = mid;
+         } else {
+@@ -278,7 +278,7 @@ where
+ {
+     let (mut lo, mut hi) = bounds_to_indices(a, within);
+     while lo < hi {
+-        let mid = (lo + hi) / 2;
++        let mid = lo + (hi - lo) / 2;
+         let cmp = f(&a[mid]);
+         if cmp == Ordering::Less {
+             lo = mid + 1;

@@ -1,0 +1,65 @@
+From 6df40a3934e5615a595e7e5b300e44254d50d681 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 20 Jan 2025 23:25:38 +0100
+Subject: [PATCH] Port tests from tempdir to tempfile
+
+---
+ tests/capture/activated/mod.rs | 6 +++---
+ tests/lib.rs                   | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tests/capture/activated/mod.rs b/tests/capture/activated/mod.rs
+index 740f5c0..1de6649 100644
+--- a/tests/capture/activated/mod.rs
++++ b/tests/capture/activated/mod.rs
+@@ -1,6 +1,6 @@
+ mod offline;
+ 
+-use tempdir::TempDir;
++use tempfile::TempDir;
+ 
+ use pcap::{Capture, Linktype};
+ 
+@@ -24,7 +24,7 @@ fn capture_dead_savefile() {
+     packets.push(1460408319, 1234, 1, 1, &[1]);
+     packets.push(1460408320, 4321, 1, 1, &[2]);
+ 
+-    let dir = TempDir::new("pcap").unwrap();
++    let dir = TempDir::new().unwrap();
+     let tmpfile = dir.path().join("test.pcap");
+ 
+     let cap = Capture::dead(Linktype(1)).unwrap();
+@@ -47,7 +47,7 @@ fn capture_dead_savefile_append() {
+     packets2.push(1460408322, 5432, 1, 1, &[4]);
+     let packets = &packets1 + &packets2;
+ 
+-    let dir = TempDir::new("pcap").unwrap();
++    let dir = TempDir::new().unwrap();
+     let tmpfile = dir.path().join("test.pcap");
+ 
+     let cap = Capture::dead(Linktype(1)).unwrap();
+diff --git a/tests/lib.rs b/tests/lib.rs
+index 669218c..a475beb 100644
+--- a/tests/lib.rs
++++ b/tests/lib.rs
+@@ -95,7 +95,7 @@ fn test_raw_fd_api() {
+     use std::os::unix::io::{FromRawFd, RawFd};
+     use std::thread;
+ 
+-    use tempdir::TempDir;
++    use tempfile::TempDir;
+ 
+     use pcap::Linktype;
+     use pcap::{Error, Precision};
+@@ -114,7 +114,7 @@ fn test_raw_fd_api() {
+         );
+     }
+ 
+-    let dir = TempDir::new("pcap").unwrap();
++    let dir = TempDir::new().unwrap();
+     let tmpfile = dir.path().join("test.pcap");
+ 
+     // Write all packets to test.pcap savefile
+-- 
+2.48.1
+

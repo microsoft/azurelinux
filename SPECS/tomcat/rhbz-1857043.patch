@@ -1,0 +1,215 @@
+--- build.xml.orig	2024-08-02 18:14:43.000000000 +0300
++++ build.xml	2024-08-19 13:56:38.991730088 +0300
+@@ -1121,7 +1121,7 @@
+       filesDir="${tomcat.classes}"
+       filesId="files.annotations-api"
+       manifest="${tomcat.manifests}/annotations-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Servlet Implementation JAR File -->
+     <jarIt jarfile="${servlet-api.jar}"
+@@ -1130,48 +1130,48 @@
+       manifest="${tomcat.manifests}/servlet-api.jar.manifest"
+       notice="${tomcat.manifests}/servlet-api.jar.notice"
+       license="${tomcat.manifests}/servlet-api.jar.license"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- EL Implementation JAR File -->
+     <jarIt jarfile="${el-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.el-api"
+       manifest="${tomcat.manifests}/el-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- JSP Implementation JAR File -->
+     <jarIt jarfile="${jsp-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.jsp-api"
+       manifest="${tomcat.manifests}/jsp-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- WebSocket API JAR File -->
+     <jarIt jarfile="${websocket-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.websocket-api"
+       manifest="${tomcat.manifests}/websocket-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- WebSocket Client API JAR File -->
+     <jarIt jarfile="${websocket-client-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.websocket-client-api"
+       manifest="${tomcat.manifests}/websocket-client-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- JASPIC API JAR File -->
+     <jarIt jarfile="${jaspic-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.jaspic-api"
+       manifest="${tomcat.manifests}/jaspic-api.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Tomcat-juli JAR File -->
+     <jarIt jarfile="${tomcat-juli.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-juli"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Bootstrap JAR File -->
+     <jarIt jarfile="${bootstrap.jar}"
+@@ -1183,68 +1183,68 @@
+     <jarIt jarfile="${tomcat-util.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-util"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Tomcat API JAR File -->
+     <jarIt jarfile="${tomcat-api.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-api"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Tomcat Util Scan JAR File -->
+     <jarIt jarfile="${tomcat-util-scan.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-util-scan"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <jarIt jarfile="${tomcat-jni.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-jni"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Protocol handlers - Coyote -->
+     <jarIt jarfile="${tomcat-coyote.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-coyote"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- OpenSSL FFM - Coyote -->
+     <jarIt jarfile="${tomcat-coyote-ffm.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-coyote-ffm"
+       manifest="${tomcat.manifests}/tomcat-coyote-ffm.jar.manifest"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- WebSocket implementation JAR File -->
+     <jarIt jarfile="${tomcat-websocket.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-websocket"
+       meta-inf="${tomcat.manifests}/tomcat-websocket.jar"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Catalina GroupCom/Tribes JAR File -->
+     <jarIt jarfile="${catalina-tribes.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.catalina-tribes"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Catalina Main JAR File -->
+     <jarIt jarfile="${catalina.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.catalina"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Catalina Cluster/HA JAR File -->
+     <jarIt jarfile="${catalina-ha.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.catalina-ha"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Server-Side Includes (SSI) -->
+     <jarIt jarfile="${catalina-ssi.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.catalina-ssi"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Catalina Ant Tasks JAR File -->
+     <jarIt jarfile="${catalina-ant.jar}"
+@@ -1255,27 +1255,27 @@
+     <jarIt jarfile="${catalina-storeconfig.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.catalina-storeconfig"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Jasper EL Implementation JAR File -->
+     <jarIt jarfile="${jasper-el.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.jasper-el"
+       meta-inf="${tomcat.manifests}/jasper-el.jar"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Jasper Implementation JAR File -->
+     <jarIt jarfile="${jasper.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.jasper"
+       meta-inf="${tomcat.manifests}/jasper.jar"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- Re-packaged Apache Commons DBCP 2-->
+     <jarIt jarfile="${tomcat-dbcp.jar}"
+       filesDir="${tomcat.classes}"
+       filesId="files.tomcat-dbcp"
+-      addOSGi="true" />
++      addOSGi="false" />
+ 
+     <!-- i18n JARs -->
+     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-cs.jar"
+@@ -1748,7 +1748,7 @@
+            filesId="files.tomcat-embed-core"
+            notice="${tomcat.manifests}/servlet-api.jar.notice"
+            license="${tomcat.manifests}/servlet-api.jar.license"
+-           addOSGi="true"
++           addOSGi="false"
+            addGraal="true"
+            graalPrefix="org.apache.tomcat.embed/tomcat-embed-core"
+            graalFiles="res/graal/tomcat-embed-core/native-image"
+@@ -1756,7 +1756,7 @@
+     <jarIt jarfile="${tomcat-embed-el.jar}"
+            filesDir="${tomcat.classes}"
+            filesId="files.tomcat-embed-el"
+-           addOSGi="true"
++           addOSGi="false"
+            addGraal="true"
+            graalPrefix="org.apache.tomcat.embed/tomcat-embed-el"
+            graalFiles="res/graal/tomcat-embed-el/native-image"
+@@ -1765,7 +1765,7 @@
+            filesDir="${tomcat.classes}"
+            filesId="files.tomcat-embed-jasper"
+            meta-inf="${tomcat.manifests}/jasper.jar"
+-           addOSGi="true"
++           addOSGi="false"
+            addGraal="true"
+            graalPrefix="org.apache.tomcat.embed/tomcat-embed-jasper"
+            graalFiles="res/graal/tomcat-embed-jasper/native-image"
+@@ -1774,7 +1774,7 @@
+            filesDir="${tomcat.classes}"
+            filesId="files.tomcat-embed-websocket"
+            meta-inf="${tomcat.manifests}/tomcat-websocket.jar"
+-           addOSGi="true"
++           addOSGi="false"
+            addGraal="true"
+            graalPrefix="org.apache.tomcat.embed/tomcat-embed-websocket"
+            graalFiles="res/graal/tomcat-embed-websocket/native-image"

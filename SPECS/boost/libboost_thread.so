@@ -1,0 +1,21 @@
+changequote(`[', `]')dnl
+/* GNU ld script
+
+   Boost.Thread header files pull in enough of Boost.System that
+   symbols from the latter library are referenced by a compiled object
+   that includes Boost.Thread headers.  libboost_system-mt.so is among
+   libboost_thread-mt.so's DT_NEEDED, but program linker requires that
+   missing symbols are satisfied by direct dependency, not by a
+   transitive one.  Hence this linker script, which brings in the
+   Boost.System DSO.  */
+
+INPUT(libboost_thread.so.VERSION)
+INPUT(libboost_system.so.VERSION)
+ifdef([HAS_ATOMIC_FLAG_LOCKFREE],[],
+[
+/* If the given architecture doesn't have lock-free implementation of
+   boost::atomic_flag, the dependency on Boost.Atomic may leak from
+   the header files to client binaries.  */
+
+INPUT(libboost_atomic.so.VERSION)
+])dnl

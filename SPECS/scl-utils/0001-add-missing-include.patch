@@ -1,0 +1,23 @@
+From 27471d28d4387e3368c4b46ab6d7cf24c20caabd Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Tue, 5 Aug 2025 15:59:31 +0200
+Subject: [PATCH] add missing include
+
+---
+ tests/test_scllib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/test_scllib.c b/tests/test_scllib.c
+index 0f8f34b..9e089f2 100644
+--- a/tests/test_scllib.c
++++ b/tests/test_scllib.c
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ #include <string.h>
+-- 
+2.50.1
+

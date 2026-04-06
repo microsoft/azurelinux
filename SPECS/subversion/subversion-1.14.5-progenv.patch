@@ -1,0 +1,21 @@
+
+ra-test execution of svnserve (a libtool wrapper script) fails
+with package notes enabled since LDFLAGS depend on $RPM_ARCH etc
+being set in the environment, which is empty.
+
+This switches the execution of svnserve to inheriting the
+build environment.
+
+https://github.com/apache/subversion/pull/25
+
+--- subversion-1.14.5/subversion/tests/libsvn_ra/ra-test.c.progenv	2020-03-25 09:54:07.000000000 +0000
++++ subversion-1.14.5/subversion/tests/libsvn_ra/ra-test.c	2024-12-13 08:53:20.268424556 +0000
+@@ -242,7 +242,7 @@ open_tunnel(svn_stream_t **request, svn_
+   if (status == APR_SUCCESS)
+     status = apr_procattr_io_set(attr, 1, 1, 0);
+   if (status == APR_SUCCESS)
+-    status = apr_procattr_cmdtype_set(attr, APR_PROGRAM);
++    status = apr_procattr_cmdtype_set(attr, APR_PROGRAM_ENV);
+   proc = apr_palloc(pool, sizeof(*proc));
+   if (status == APR_SUCCESS)
+     status = apr_proc_create(proc,

@@ -1,0 +1,97 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index a4c65f2..28ea4a6 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -13,7 +13,7 @@ bin_PROGRAMS = execstack
+ arch_SOURCES = arch-i386.c arch-alpha.c arch-ppc.c arch-ppc64.c \
+ 	       arch-sparc.c arch-sparc64.c arch-x86_64.c arch-mips.c \
+ 	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c \
+-	       arch-aarch64.c
++	       arch-aarch64.c arch-riscv64.c
+ common_SOURCES = checksum.c data.c dso.c dwarf2.c dwarf2.h fptr.c fptr.h     \
+ 		 hashtab.c hashtab.h mdebug.c prelink.h stabs.c crc32.c
+ prelink_SOURCES = cache.c conflict.c cxx.c doit.c exec.c execle_open.c get.c \
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 863dc83..15f7b78 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -108,7 +108,7 @@ bin_PROGRAMS = execstack
+ arch_SOURCES = arch-i386.c arch-alpha.c arch-ppc.c arch-ppc64.c \
+ 	       arch-sparc.c arch-sparc64.c arch-x86_64.c arch-mips.c \
+ 	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c \
+-	       arch-aarch64.c
++	       arch-aarch64.c arch-riscv64.c
+ 
+ common_SOURCES = checksum.c data.c dso.c dwarf2.c dwarf2.h fptr.c fptr.h     \
+ 		 hashtab.c hashtab.h mdebug.c prelink.h stabs.c crc32.c
+@@ -141,7 +141,7 @@ am__objects_2 = arch-i386.$(OBJEXT) arch-alpha.$(OBJEXT) \
+ 	arch-sparc64.$(OBJEXT) arch-x86_64.$(OBJEXT) \
+ 	arch-mips.$(OBJEXT) arch-s390.$(OBJEXT) arch-s390x.$(OBJEXT) \
+ 	arch-arm.$(OBJEXT) arch-sh.$(OBJEXT) arch-ia64.$(OBJEXT) \
+-	arch-aarch64.$(OBJEXT)
++	arch-aarch64.$(OBJEXT) arch-riscv64.$(OBJEXT)
+ am_execstack_OBJECTS = execstack.$(OBJEXT) $(am__objects_1) \
+ 	$(am__objects_2)
+ execstack_OBJECTS = $(am_execstack_OBJECTS)
+@@ -169,7 +169,7 @@ am__depfiles_maybe = depfiles
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-ppc.Po ./$(DEPDIR)/arch-ppc64.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-s390.Po ./$(DEPDIR)/arch-s390x.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-sh.Po ./$(DEPDIR)/arch-sparc.Po \
+-@AMDEP_TRUE@	./$(DEPDIR)/arch-sparc64.Po \
++@AMDEP_TRUE@	./$(DEPDIR)/arch-sparc64.Po ./$(DEPDIR)/arch-riscv64.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-x86_64.Po ./$(DEPDIR)/cache.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/canonicalize.Po ./$(DEPDIR)/checksum.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/conflict.Po ./$(DEPDIR)/crc32.Po \
+@@ -290,6 +290,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-sh.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-sparc.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-sparc64.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-riscv64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-x86_64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/canonicalize.Po@am__quote@
+diff --git a/src/arch-riscv64.c b/src/arch-riscv64.c
+new file mode 100644
+index 0000000..927fbb7
+--- /dev/null
++++ b/src/arch-riscv64.c
+@@ -0,0 +1,38 @@
++/* Copyright (C) 2019 David Abdurachmanov
++   Written by David Abdurachmanov <david.abdurachmanov@gmail.com>, 2019.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2, or (at your option)
++   any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software Foundation,
++   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
++
++#include <config.h>
++#include <assert.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <string.h>
++#include <locale.h>
++#include <error.h>
++#include <argp.h>
++#include <stdlib.h>
++
++#include "prelink.h"
++
++PL_ARCH = {
++  .name = "RISCV64",
++  .class = ELFCLASS64,
++  .machine = EM_RISCV,
++  .alternate_machine = { EM_NONE },
++  .max_page_size = 0x1000,
++  .page_size = 0x1000
++};
+\ No newline at end of file

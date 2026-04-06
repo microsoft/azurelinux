@@ -1,0 +1,24 @@
+diff --git a/Info.plist b/Info.plist
+index ed473da..9d59815 100644
+--- a/Info.plist
++++ b/Info.plist
+@@ -14,6 +14,7 @@
+         <string>ASEKey</string>
+         <string>ASEKey</string>
+     </array>
++    <key>CFBundleExecutable</key>
+     <array>
+         <string>libASEKey.so</string>
+         <string>libASEKey.so</string>
+diff --git a/Makefile b/Makefile
+index 285ceff..1b06fd1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,7 +28,6 @@ clean:
+ 
+ install:	all
+ 	install -c -d "${DRIVER_DIR}/Contents/${KERNEL_NAME}"
+-	install -c -m 0755 libASEKey.so "${DRIVER_DIR}"
+ 	install -c -m 0644 Info.plist "${DRIVER_DIR}/Contents/"
+ 	install -c -m 0755 libASEKey.so "${DRIVER_DIR}/Contents/${KERNEL_NAME}"
+ 	install -c -d "${UDEV_DIR}"

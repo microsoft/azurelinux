@@ -1,0 +1,25 @@
+From 51ac6e634d6a53f4f2c78eafae599079c628e28e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 25 Oct 2010 16:21:54 +0200
+Subject: [PATCH] Remove undefinded date from cvs(1) header
+
+---
+ doc/cvs.1 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/doc/cvs.1 b/doc/cvs.1
+index b696d9a..07b7923 100644
+--- a/doc/cvs.1
++++ b/doc/cvs.1
+@@ -23,7 +23,7 @@
+ .ds Rv \\$3
+ .ds Dt \\$4
+ ..
+-.TH CVS 1 "\*(Dt"
++.TH CVS 1
+ .\" Full space in nroff; half space in troff
+ .de SP
+ .if n .sp
+-- 
+1.7.2.3
+

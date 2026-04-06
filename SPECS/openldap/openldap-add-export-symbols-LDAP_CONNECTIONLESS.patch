@@ -1,0 +1,37 @@
+From 6779e56fafb0aa8ae5efa7068da34a630b51b530 Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Fri, 5 Aug 2022 13:23:52 -0700
+Subject: [PATCH] Add export symbols related to LDAP_CONNECTIONLESS
+
+---
+ libraries/liblber/lber.map | 1 +
+ libraries/libldap/ldap.map | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libraries/liblber/lber.map b/libraries/liblber/lber.map
+index 9a4094b0f..083cd1f32 100644
+--- a/libraries/liblber/lber.map
++++ b/libraries/liblber/lber.map
+@@ -121,6 +121,7 @@ OPENLDAP_2.200
+     ber_sockbuf_io_fd;
+     ber_sockbuf_io_readahead;
+     ber_sockbuf_io_tcp;
++    ber_sockbuf_io_udp;
+     ber_sockbuf_remove_io;
+     ber_sos_dump;
+     ber_start;
+diff --git a/libraries/libldap/ldap.map b/libraries/libldap/ldap.map
+index b28c9c21e..021aaba63 100644
+--- a/libraries/libldap/ldap.map
++++ b/libraries/libldap/ldap.map
+@@ -200,6 +200,7 @@ OPENLDAP_2.200
+     ldap_is_ldap_url;
+     ldap_is_ldapi_url;
+     ldap_is_ldaps_url;
++    ldap_is_ldapc_url;
+     ldap_is_read_ready;
+     ldap_is_write_ready;
+     ldap_ld_free;
+-- 
+2.37.1
+

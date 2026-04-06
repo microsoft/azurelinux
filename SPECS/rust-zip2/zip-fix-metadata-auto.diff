@@ -1,0 +1,9 @@
+--- zip-2.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zip-2.4.2/Cargo.toml	2026-01-09T22:17:36.639224+00:00
+@@ -251,6 +251,3 @@
+ [target.'cfg(any(all(target_arch = "arm", target_pointer_width = "32"), target_arch = "mips", target_arch = "powerpc"))'.dependencies.crossbeam-utils]
+ version = "0.8.21"
+ 
+-[target."cfg(fuzzing)".dependencies.arbitrary]
+-version = "1.4.1"
+-features = ["derive"]

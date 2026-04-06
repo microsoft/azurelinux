@@ -1,0 +1,42 @@
+--- clap-2.34.0/Cargo.toml	2021-11-30T02:05:38+00:00
++++ clap-2.34.0/Cargo.toml	2025-05-30T12:31:04.107157+00:00
+@@ -15,7 +15,7 @@
+ name = "clap"
+ version = "2.34.0"
+ authors = ["Kevin K. <kbknapp@gmail.com>"]
+-exclude = ["examples/*", "clap-test/*", "tests/*", "benches/*", "*.png", "clap-perf/*", "*.dot"]
++exclude = ["examples/*", "clap-test/*", "tests/*", "benches/*", "*.png", "clap-perf/*", "*.dot", "/.azure-pipelines.yml", "/.clog.toml", ".github/*", "/.travis.yml"]
+ description = "A simple to use, efficient, and full-featured Command Line Argument Parser\n"
+ homepage = "https://clap.rs/"
+ documentation = "https://docs.rs/clap/"
+@@ -57,9 +57,6 @@
+ debug = true
+ debug-assertions = true
+ rpath = false
+-[dependencies.atty]
+-version = "0.2.2"
+-optional = true
+ 
+ [dependencies.bitflags]
+ version = "1.0"
+@@ -69,7 +66,7 @@
+ optional = true
+ 
+ [dependencies.strsim]
+-version = "0.8"
++version = "0.11"
+ optional = true
+ 
+ [dependencies.term_size]
+@@ -96,9 +93,10 @@
+ version = "1"
+ 
+ [dev-dependencies.version-sync]
+-version = "0.8"
++version = "0.9"
+ 
+ [features]
++atty = []
+ color = ["ansi_term", "atty"]
+ debug = []
+ default = ["suggestions", "color", "vec_map"]

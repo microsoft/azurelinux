@@ -1,0 +1,24 @@
+--- firefox-109.0.1/gfx/2d/Rect.h.old   2023-02-07 09:44:24.946279843 +0100
++++ firefox-109.0.1/gfx/2d/Rect.h       2023-02-07 09:44:47.969032049 +0100
+@@ -324,8 +324,8 @@ IntRectTyped<Units> RoundedToInt(const R
+
+ template <class Units>
+ bool RectIsInt32Safe(const RectTyped<Units>& aRect) {
+-  float min = (float)std::numeric_limits<std::int32_t>::min();
+-  float max = (float)std::numeric_limits<std::int32_t>::max();
++  float min = (float)std::numeric_limits<int32_t>::min();
++  float max = (float)std::numeric_limits<int32_t>::max();
+   return aRect.x > min && aRect.y > min && aRect.width < max &&
+          aRect.height < max && aRect.XMost() < max && aRect.YMost() < max;
+ }
+diff -up firefox-109.0.1/toolkit/components/telemetry/pingsender/pingsender.cpp.old firefox-109.0.1/toolkit/components/telemetry/pingsender/pingsender.cpp
+--- firefox-109.0.1/toolkit/components/telemetry/pingsender/pingsender.cpp.old  2023-02-07 11:03:41.788720090 +0100
++++ firefox-109.0.1/toolkit/components/telemetry/pingsender/pingsender.cpp      2023-02-07 11:04:29.195345659 +0100
+@@ -10,6 +10,7 @@
+ #include <iomanip>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+
+ #include <zlib.h>
+

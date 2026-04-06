@@ -1,0 +1,142 @@
+From ff49d71b0cdbab75f8a22717c4f88343a5961868 Mon Sep 17 00:00:00 2001
+From: Adriano dos Santos Fernandes <adrianosf@gmail.com>
+Date: Mon, 31 May 2021 08:55:26 -0300
+Subject: [PATCH] Set POSIX build to use C++17.
+
+---
+ CMakeLists.txt                       | 4 ++--
+ builds/posix/make.defaults           | 2 +-
+ builds/posix/prefix.freebsd_amd64    | 2 +-
+ configure.ac                         | 2 +-
+ examples/extauth/Makefile            | 2 +-
+ examples/interfaces/makefile         | 2 +-
+ extern/icu/android/aarch64/config.sh | 2 +-
+ extern/icu/android/armv7a/config.sh  | 4 ++--
+ extern/icu/android/linux/config.sh   | 2 +-
+ 9 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 620fd032af4..5f336efd611 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -206,14 +206,14 @@ if (MINGW)
+     set(CMAKE_STATIC_LIBRARY_PREFIX)
+ 
+     add_definitions(-D_WIN32_WINNT=0x0600)
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4 -std=c++11")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4 -std=c++17")
+ endif()
+ 
+ if (UNIX)
+     set(OS_DIR posix)
+ 
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -msse4 -std=c++11")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -msse4 -std=c++17")
+ 
+     if (NOT CMAKE_CROSSCOMPILING)
+         set(LIB_readline readline)
+diff --git a/builds/posix/prefix.freebsd_amd64 b/builds/posix/prefix.freebsd_amd64
+index f27567a2715..0736d87e935 100644
+--- a/builds/posix/prefix.freebsd_amd64
++++ b/builds/posix/prefix.freebsd_amd64
+@@ -26,4 +26,4 @@ DEV_FLAGS=-ggdb -DFREEBSD -DAMD64 -pipe -MMD -p -fPIC -Wall -Wno-non-virtual-dto
+ # This file must be compiled with SSE4.2 support
+ %/CRC32C.o: CXXFLAGS += -msse4
+ 
+-CXXFLAGS := $(CXXFLAGS) -std=c++11
++CXXFLAGS := $(CXXFLAGS) -std=c++17
+diff --git a/configure.ac b/configure.ac
+index 9b40be43101..e4a83cf8d3b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -899,7 +899,7 @@ dnl if 64-bit mode, then archive tool, ar, needs -X64 option
+ fi
+ 
+ XE_SAVE_ENV()
+-CXXFLAGS="$CXXFLAGS -std=c++11"
++CXXFLAGS="$CXXFLAGS -std=c++17"
+ AC_CACHE_CHECK([whether the C++ compiler understands noexcept], [ac_cv_cxx_noexcept], [
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[int f(int x) noexcept { return x + 1; }]], [[]])],
+ 	[ac_cv_cxx_noexcept=yes], [ac_cv_cxx_noexcept=no])])
+diff --git a/examples/extauth/Makefile b/examples/extauth/Makefile
+index 9da7bbd357f..3c8b878d225 100644
+--- a/examples/extauth/Makefile
++++ b/examples/extauth/Makefile
+@@ -61,7 +61,7 @@ KEYGEN_objects=$(INTERMED)/keygen.o
+ TCWRAP_objects=$(INTERMED)/TcWrapper.o
+ KEY_AUTH_objects=$(INTERMED)/ExtAuth.o
+ 
+-CXXFLAGS=-std=c++11 -pthread -I$(ROOT)/include -fPIC $(TOMCRYPT_COMPILE)
++CXXFLAGS=-std=c++17 -pthread -I$(ROOT)/include -fPIC $(TOMCRYPT_COMPILE)
+ LDFLAGS=-pthread -L$(LIB) -Wl,-rpath,'$$ORIGIN/../lib' $(TOMCRYPT_LINK)
+ 
+ LINK_LIBS=-lfbclient -ltomcrypt -ltommath
+diff --git a/examples/interfaces/makefile b/examples/interfaces/makefile
+index 153c3d558dc..b65dba90a7d 100644
+--- a/examples/interfaces/makefile
++++ b/examples/interfaces/makefile
+@@ -33,7 +33,7 @@ FBCLIENT = $(FIREBIRD)/lib/libfbclient.so
+ # General Compiler and linker Defines for Linux
+ # ---------------------------------------------------------------------
+ CXX	= c++
+-CXXFLAGS= -c -Wall -g3 -std=c++11  -fno-rtti $(INCLUDE)
++CXXFLAGS= -c -Wall -g3 -std=c++17  -fno-rtti $(INCLUDE)
+ RM	= rm -f
+ 
+ #
+diff --git a/extern/icu/android/aarch64/config.sh b/extern/icu/android/aarch64/config.sh
+index 51ef623a3c5..f464d930ec2 100755
+--- a/extern/icu/android/aarch64/config.sh
++++ b/extern/icu/android/aarch64/config.sh
+@@ -18,7 +18,7 @@
+     --enable-dyload \
+     --with-cross-build=$CROSS_BUILD_DIR \
+     CFLAGS='-Os' \
+-    CXXFLAGS='--std=c++11' \
++    CXXFLAGS='--std=c++17' \
+     LDFLAGS='-static-libstdc++' \
+     CC=aarch64-linux-android24-clang \
+     CXX=aarch64-linux-android24-clang++ \
+diff --git a/extern/icu/android/armv7a/config.sh b/extern/icu/android/armv7a/config.sh
+index fe1bd037456..0e458c690e7 100755
+--- a/extern/icu/android/armv7a/config.sh
++++ b/extern/icu/android/armv7a/config.sh
+@@ -18,10 +18,10 @@
+     --enable-dyload \
+     --with-cross-build=$CROSS_BUILD_DIR \
+     CFLAGS='-Os -march=armv7-a -mfloat-abi=softfp -mfpu=neon' \
+-    CXXFLAGS='--std=c++11 -march=armv7-a -mfloat-abi=softfp -mfpu=neon' \
++    CXXFLAGS='--std=c++17 -march=armv7-a -mfloat-abi=softfp -mfpu=neon' \
+     LDFLAGS='-static-libstdc++ -march=armv7-a -Wl,--fix-cortex-a8' \
+     CC=arm-linux-androideabi-clang \
+     CXX=arm-linux-androideabi-clang++ \
+     AR=arm-linux-androideabi-ar \
+     RANLIB=arm-linux-androideabi-ranlib \
+-    --with-data-packaging=archive
+\ No newline at end of file
++    --with-data-packaging=archive
+diff --git a/extern/icu/android/linux/config.sh b/extern/icu/android/linux/config.sh
+index a8b56024aae..6e7d9c5f5c8 100755
+--- a/extern/icu/android/linux/config.sh
++++ b/extern/icu/android/linux/config.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ ../source/runConfigureICU Linux --prefix=$PWD/prebuilt \
+     CFLAGS="-Os" \
+-    CXXFLAGS="--std=c++11" \
++    CXXFLAGS="--std=c++17" \
+     --enable-static \
+     --enable-shared=no \
+     --enable-extras=no \
+--- Firebird-4.0.6.3221-0/builds/posix/make.defaults~	2025-07-14 02:27:01.000000000 -0500
++++ Firebird-4.0.6.3221-0/builds/posix/make.defaults	2025-09-25 08:37:36.864575311 -0500
+@@ -104,7 +104,7 @@
+ #____________________________________________________________________________
+ 
+ # Global c++ flags: firebird needs no RTTI, choose build standard, make it build with icu-76.1
+-PLUSPLUS_FLAGS:= -fno-rtti -std=c++11 -DU_SHOW_CPLUSPLUS_API=0 -DU_SHOW_CPLUSPLUS_HEADER_API=0
++PLUSPLUS_FLAGS:= -fno-rtti -std=c++17 -DU_SHOW_CPLUSPLUS_API=0 -DU_SHOW_CPLUSPLUS_HEADER_API=0
+ 
+ # If this is defined then we use special rules useful for developers only
+ IsDeveloper = @DEVEL_FLG@

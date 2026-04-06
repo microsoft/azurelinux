@@ -1,0 +1,30 @@
+From a2449cee8c995b56f1892502aab3dfad3d6f3ca1 Mon Sep 17 00:00:00 2001
+From: Tulio Magno Quites Machado Filho <tuliom@redhat.com>
+Date: Fri, 8 Sep 2023 11:45:34 -0300
+Subject: [PATCH] Workaround a bug in ORC on ppc64le
+
+The Jit code appears to be returning the wrong printf symbol on ppc64le
+after the transition of the default long double to IEEE 128-bit floating
+point.
+---
+ clang/unittests/Interpreter/InterpreterTest.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/clang/unittests/Interpreter/InterpreterTest.cpp b/clang/unittests/Interpreter/InterpreterTest.cpp
+index abb8e6377aab..7b6697ebc6ed 100644
+--- a/clang/unittests/Interpreter/InterpreterTest.cpp
++++ b/clang/unittests/Interpreter/InterpreterTest.cpp
+@@ -243,7 +243,9 @@ TEST(IncrementalProcessing, FindMangledNameSymbol) {
+   EXPECT_FALSE(!Addr);
+ 
+   // FIXME: Re-enable when we investigate the way we handle dllimports on Win.
+-#ifndef _WIN32
++  // FIXME: The printf symbol returned from the Jit may not be correct on
++  //        ppc64le when the default long double is IEEE 128-bit fp.
++#if !defined _WIN32 && !(defined __PPC64__ && defined __LITTLE_ENDIAN__)
+   EXPECT_EQ((uintptr_t)&printf, Addr->getValue());
+ #endif // _WIN32
+ }
+-- 
+2.41.0
+

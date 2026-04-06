@@ -1,0 +1,108 @@
+From 104697d613232de6a96c2c8323eac721c19dbaa2 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Thu, 13 Feb 2025 16:09:09 -0500
+Subject: [PATCH 14/59] RH: Export two symbols for OPENSSL_str[n]casecmp
+
+We accidentally exported the symbols with the incorrect verison number
+in an early version of RHEL-9 so we need to keep the wrong symbols for
+ABI backwards compatibility and the correct symbols to be compatible
+with upstream.
+---
+ crypto/evp/digest.c                    |  2 +-
+ crypto/evp/evp_enc.c                   |  2 +-
+ crypto/o_str.c                         | 14 ++++++++++++--
+ test/recipes/01-test_symbol_presence.t |  2 +-
+ util/libcrypto.num                     |  2 ++
+ 5 files changed, 17 insertions(+), 5 deletions(-)
+ mode change 100644 => 100755 test/recipes/01-test_symbol_presence.t
+
+diff --git a/crypto/evp/digest.c b/crypto/evp/digest.c
+index 3c80b9dfe1..8ee9db73dd 100644
+--- a/crypto/evp/digest.c
++++ b/crypto/evp/digest.c
+@@ -573,7 +573,7 @@ int EVP_DigestSqueeze(EVP_MD_CTX *ctx, unsigned char *md, size_t size)
+ }
+ 
+ EVP_MD_CTX
+-#if !defined(FIPS_MODULE)
++#if !defined(FIPS_MODULE) && !defined(OPENSSL_SYS_UEFI)
+ __attribute__ ((symver ("EVP_MD_CTX_dup@@OPENSSL_3.1.0"),
+                     symver ("EVP_MD_CTX_dup@OPENSSL_3.2.0")))
+ #endif
+diff --git a/crypto/evp/evp_enc.c b/crypto/evp/evp_enc.c
+index 7c51786515..619cf4f385 100644
+--- a/crypto/evp/evp_enc.c
++++ b/crypto/evp/evp_enc.c
+@@ -1763,7 +1763,7 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
+ }
+ 
+ EVP_CIPHER_CTX
+-#if !defined(FIPS_MODULE)
++#if !defined(FIPS_MODULE) && !defined(OPENSSL_SYS_UEFI)
+ __attribute__ ((symver ("EVP_CIPHER_CTX_dup@@OPENSSL_3.1.0"),
+                     symver ("EVP_CIPHER_CTX_dup@OPENSSL_3.2.0")))
+ #endif
+diff --git a/crypto/o_str.c b/crypto/o_str.c
+index 93af73561f..86442a939e 100644
+--- a/crypto/o_str.c
++++ b/crypto/o_str.c
+@@ -403,7 +403,12 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
+ #endif
+ }
+ 
+-int OPENSSL_strcasecmp(const char *s1, const char *s2)
++int
++#if !defined(FIPS_MODULE) && !defined(OPENSSL_SYS_UEFI)
++__attribute__ ((symver ("OPENSSL_strcasecmp@@OPENSSL_3.0.3"),
++                    symver ("OPENSSL_strcasecmp@OPENSSL_3.0.1")))
++#endif
++OPENSSL_strcasecmp(const char *s1, const char *s2)
+ {
+     int t;
+ 
+@@ -413,7 +418,12 @@ int OPENSSL_strcasecmp(const char *s1, const char *s2)
+     return t;
+ }
+ 
+-int OPENSSL_strncasecmp(const char *s1, const char *s2, size_t n)
++int
++#if !defined(FIPS_MODULE) && !defined(OPENSSL_SYS_UEFI)
++__attribute__ ((symver ("OPENSSL_strncasecmp@@OPENSSL_3.0.3"),
++                    symver ("OPENSSL_strncasecmp@OPENSSL_3.0.1")))
++#endif
++OPENSSL_strncasecmp(const char *s1, const char *s2, size_t n)
+ {
+     int t;
+     size_t i;
+diff --git a/test/recipes/01-test_symbol_presence.t b/test/recipes/01-test_symbol_presence.t
+old mode 100644
+new mode 100755
+index cc947d4821..de2dcd90c2
+--- a/test/recipes/01-test_symbol_presence.t
++++ b/test/recipes/01-test_symbol_presence.t
+@@ -186,7 +186,7 @@ foreach (sort keys %stlibname) {
+     }
+ }
+ my @duplicates = sort grep { $symbols{$_} > 1 } keys %symbols;
+-@duplicates = grep {($_ ne "OPENSSL_ia32cap_P") && ($_ ne "EVP_CIPHER_CTX_dup") && ($_ ne "EVP_MD_CTX_dup") } @duplicates;
++@duplicates = grep {($_ ne "OPENSSL_ia32cap_P") && ($_ ne "EVP_CIPHER_CTX_dup") && ($_ ne "EVP_MD_CTX_dup") && ($_ ne "OPENSSL_strcasecmp") && ($_ ne "OPENSSL_strncasecmp")} @duplicates;
+ if (@duplicates) {
+     note "Duplicates:";
+     note join('\n', @duplicates);
+diff --git a/util/libcrypto.num b/util/libcrypto.num
+index eab3987a6b..d377d542db 100644
+--- a/util/libcrypto.num
++++ b/util/libcrypto.num
+@@ -5426,7 +5426,9 @@ ASN1_TIME_print_ex                      5553	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_get0_provider                  5554	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_CTX_get0_provider              5555	3_0_0	EXIST::FUNCTION:
+ OPENSSL_strcasecmp                      5556	3_0_3	EXIST::FUNCTION:
++OPENSSL_strcasecmp                      ?	3_0_1	EXIST::FUNCTION:
+ OPENSSL_strncasecmp                     5557	3_0_3	EXIST::FUNCTION:
++OPENSSL_strncasecmp                     ? 	3_0_1	EXIST::FUNCTION:
+ EVP_RAND_CTX_up_ref                     5558	3_1_0	EXIST::FUNCTION:
+ RAND_set0_public                        5559	3_1_0	EXIST::FUNCTION:
+ RAND_set0_private                       5560	3_1_0	EXIST::FUNCTION:
+-- 
+2.51.0
+

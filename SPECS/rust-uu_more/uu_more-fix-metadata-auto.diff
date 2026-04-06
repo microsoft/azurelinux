@@ -1,0 +1,9 @@
+--- uu_more-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uu_more-0.0.27/Cargo.toml	2024-10-11T12:11:22.648893+00:00
+@@ -58,6 +58,3 @@
+ version = "0.28"
+ default-features = false
+ 
+-[target."cfg(target_os = \"macos\")".dependencies.crossterm]
+-version = ">=0.27.0"
+-features = ["use-dev-tty"]

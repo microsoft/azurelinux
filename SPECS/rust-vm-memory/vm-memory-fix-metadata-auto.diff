@@ -1,0 +1,17 @@
+--- vm-memory-0.16.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ vm-memory-0.16.2/Cargo.toml	2025-08-29T12:48:34.316993+00:00
+@@ -81,13 +81,7 @@
+ [dev-dependencies.vmm-sys-util]
+ version = "0.14.0"
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = [
+-    "errhandlingapi",
+-    "sysinfoapi",
+-]
+-
+ [profile.bench]
+ lto = true
+ codegen-units = 1
++

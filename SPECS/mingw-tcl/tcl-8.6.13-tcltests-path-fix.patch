@@ -1,0 +1,12 @@
+diff -rupN --no-dereference tcl8.6.15/unix/Makefile.in tcl8.6.15-new/unix/Makefile.in
+--- tcl8.6.15/unix/Makefile.in	2024-09-09 22:28:25.000000000 +0200
++++ tcl8.6.15-new/unix/Makefile.in	2024-10-18 11:19:05.128745912 +0200
+@@ -701,7 +701,7 @@ topDirName:
+ # This keeps tcltest from picking up an already installed version of the Tcl
+ # library.
+ SHELL_ENV =	@LD_LIBRARY_PATH_VAR@=`pwd`:${@LD_LIBRARY_PATH_VAR@} \
+-		TCLLIBPATH="@abs_builddir@/pkgs" \
++		TCLLIBPATH="@abs_builddir@/pkgs @abs_builddir@/../tests" \
+ 		TCL_LIBRARY="${TCL_BUILDTIME_LIBRARY}"
+ 
+ ${TCLTEST_EXE}: ${TCLTEST_OBJS} ${TCL_LIB_FILE} ${TCL_STUB_LIB_FILE} ${BUILD_DLTEST}

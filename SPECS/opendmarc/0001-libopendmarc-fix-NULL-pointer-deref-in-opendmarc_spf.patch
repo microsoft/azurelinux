@@ -1,0 +1,63 @@
+From 5d6a7ac74cb9aed124c3f32a657619d7830d473c Mon Sep 17 00:00:00 2001
+From: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+Date: Fri, 2 May 2025 23:07:50 +0200
+Subject: [PATCH] =?UTF-8?q?libopendmarc:=20fix=20NULL=E2=80=93pointer=20de?=
+ =?UTF-8?q?ref=20in=20opendmarc=5Fspf=5Fipv6=5Fexplode()?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When parsing IPv6 literals the loop in opendmarc_spf_ipv6_explode()
+advances the working pointer with
+
+        cp = ep + 1;
+
+unconditionally.  For the last 16-bit chunk of the address
+‛strchr(cp, ':')’ returns NULL, so the assignment produces the invalid
+pointer (NULL + 1).  On the following iteration strchr() immediately
+reads from that address and the milter crashes with SIGSEGV.
+
+The bug is exposed whenever OpenDMARC evaluates an “ip6:” SPF mechanism
+whose prefix lacks a trailing colon, e.g.
+
+    ip6:2001:db8::/32
+
+Typical trigger path:
+  * Postfix submission (SASL) from ::1
+  * OpenDMARC runs SPF check against the domain’s own record
+  * ::1 is matched against the record above
+  * opendmarc_spf_ipv6_explode() crashes
+
+Guard the assignment by bailing out of the loop when no further ‘:’
+is present, thereby preserving the valid value of ‘cp’.
+
+Closes: #274
+Signed-off-by: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+---
+ libopendmarc/opendmarc_spf.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/libopendmarc/opendmarc_spf.c b/libopendmarc/opendmarc_spf.c
+index e015183..c02ba6f 100644
+--- a/libopendmarc/opendmarc_spf.c
++++ b/libopendmarc/opendmarc_spf.c
+@@ -745,7 +745,15 @@ opendmarc_spf_ipv6_explode(char *str, TXT_ARY_T *ap)
+ 			}
+ 			i+= 1;
+ 		}
+-		cp = ep+1;
++		/*
++		* If strchr() did not find another ':' we have reached the
++		* last chunk of the IPv6 literal.  Advancing the pointer
++		* when ep is NULL would yield (NULL + 1) and lead to a
++		* segmentation fault on the next iteration.
++		*/
++		if (ep == NULL)
++			break;
++		cp = ep + 1;
+ 	}
+ 	ap->nstrs = 8 - i;
+ 	return 0;
+-- 
+2.49.0
+

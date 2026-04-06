@@ -1,0 +1,87 @@
+From 4ba21b30b81c9f775932674d4c29f1b81e15bfa2 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 21 Apr 2020 09:01:47 +0200
+Subject: [PATCH] Upgrade to 0.96
+
+---
+ lib/Filter/Simple.pm                 |  3 ++-
+ t/filter_only.t                      | 19 ++++++++++++++++++-
+ t/lib/Filter/Simple/ExeNoComments.pm | 11 +++++++++++
+ 3 files changed, 31 insertions(+), 2 deletions(-)
+ create mode 100644 t/lib/Filter/Simple/ExeNoComments.pm
+
+diff --git a/lib/Filter/Simple.pm b/lib/Filter/Simple.pm
+index 1dcf3c8..924c2ae 100644
+--- a/lib/Filter/Simple.pm
++++ b/lib/Filter/Simple.pm
+@@ -2,7 +2,7 @@ package Filter::Simple;
+ 
+ use Text::Balanced ':ALL';
+ 
+-our $VERSION = '0.95';
++our $VERSION = '0.96';
+ 
+ use Filter::Util::Call;
+ use Carp;
+@@ -70,6 +70,7 @@ my %extractor_for = (
+ my %selector_for = (
+     all   => sub { my ($t)=@_; sub{ $_=$$_; $t->(@_); $_} },
+     executable=> sub { my ($t)=@_; sub{ref() ? $_=$$_ : $t->(@_); $_} }, 
++    executable_no_comments=> sub { my ($t)=@_; sub{ref() ? $_=$$_ : $t->(@_); $_} },
+     quotelike => sub { my ($t)=@_; sub{ref() && do{$_=$$_; $t->(@_)}; $_} },
+     regex     => sub { my ($t)=@_;
+                sub{ref() or return $_;
+diff --git a/t/filter_only.t b/t/filter_only.t
+index 57f1086..cd86707 100644
+--- a/t/filter_only.t
++++ b/t/filter_only.t
+@@ -4,7 +4,7 @@ BEGIN {
+ 
+ use Filter::Simple::FilterOnlyTest qr/not ok/ => "ok", 
+                                    "bad" => "ok", fail => "die";
+-print "1..9\n";
++print "1..11\n";
+ 
+ sub fail { print "ok ", $_[0], "\n" }
+ sub ok { print "ok ", $_[0], "\n" }
+@@ -41,3 +41,20 @@ print "ok 8\n";
+ 
+ print "not " unless "bad" =~ /bad/;
+ print "ok 9\n";
++
++use Filter::Simple::ExeNoComments;
++
++=for us
++
++shromplex
++
++=cut
++
++# shromplex
++
++# test the difference from code*
++my $x = "ABC";
++
++print $x eq "TEST" ? "" : "not ", "ok 10 # check strings processed\n";
++
++print "ok 11 # executable_no_comments\n";
+diff --git a/t/lib/Filter/Simple/ExeNoComments.pm b/t/lib/Filter/Simple/ExeNoComments.pm
+new file mode 100644
+index 0000000..3eaa454
+--- /dev/null
++++ b/t/lib/Filter/Simple/ExeNoComments.pm
+@@ -0,0 +1,11 @@
++package Filter::Simple::ExeNoComments;
++
++use Filter::Simple;
++
++FILTER_ONLY
++  executable_no_comments => sub {
++            $_ =~ /shromplex/ and die "We wants no shromplexes!";
++            s/ABC/TEST/g;
++	};
++
++1;
+-- 
+2.21.1
+

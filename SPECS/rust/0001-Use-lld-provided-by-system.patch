@@ -1,0 +1,79 @@
+From d2fa68624463426e82f2ba19703159a46867384b Mon Sep 17 00:00:00 2001
+From: Josh Stone <jistone@redhat.com>
+Date: Fri, 16 Aug 2024 10:12:58 -0700
+Subject: [PATCH] Use lld provided by system
+
+---
+ compiler/rustc_target/src/spec/base/wasm.rs                    | 3 +--
+ .../src/spec/targets/aarch64_unknown_none_softfloat.rs         | 1 -
+ compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs | 1 +
+ compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs  | 2 +-
+ compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs  | 1 +
+ 5 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/compiler/rustc_target/src/spec/base/wasm.rs b/compiler/rustc_target/src/spec/base/wasm.rs
+index 7ede45766ea..b22362227bb 100644
+--- a/compiler/rustc_target/src/spec/base/wasm.rs
++++ b/compiler/rustc_target/src/spec/base/wasm.rs
+@@ -81,8 +81,7 @@ macro_rules! args {
+         // threaded model which will legalize atomics to normal operations.
+         singlethread: true,
+ 
+-        // we use the LLD shipped with the Rust toolchain by default
+-        linker: Some("rust-lld".into()),
++        linker: Some("lld".into()),
+         linker_flavor: LinkerFlavor::WasmLld(Cc::No),
+ 
+         pre_link_args,
+diff --git a/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs b/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
+index ad444c139bf..f5f8f18f8b8 100644
+--- a/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
++++ b/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
+@@ -15,7 +15,6 @@ pub(crate) fn target() -> Target {
+     let opts = TargetOptions {
+         abi: Abi::SoftFloat,
+         linker_flavor: LinkerFlavor::Gnu(Cc::No, Lld::Yes),
+-        linker: Some("rust-lld".into()),
+         features: "+v8a,+strict-align,-neon".into(),
+         relocation_model: RelocModel::Static,
+         disable_redzone: true,
+diff --git a/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs b/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
+index e2c1888e408..4869f85d1e6 100644
+--- a/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
++++ b/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
+@@ -9,6 +9,7 @@ pub(crate) fn target() -> Target {
+     base.max_atomic_width = Some(128);
+     base.add_pre_link_args(LinkerFlavor::Msvc(Lld::No), &["/machine:arm64"]);
+     base.features = "+v8a".into();
++    base.linker = Some("lld".into());
+ 
+     Target {
+         llvm_target: "aarch64-unknown-windows".into(),
+diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
+index 520a59d6a6f..1606618b683 100644
+--- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
++++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
+@@ -19,7 +19,7 @@ pub(crate) fn target() -> Target {
+         static_position_independent_executables: true,
+         relro_level: RelroLevel::Full,
+         linker_flavor: LinkerFlavor::Gnu(Cc::No, Lld::Yes),
+-        linker: Some("rust-lld".into()),
++        linker: Some("lld".into()),
+         rustc_abi: Some(RustcAbi::X86Softfloat),
+         features: "-mmx,-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2,+soft-float".into(),
+         supported_sanitizers: SanitizerSet::KCFI | SanitizerSet::KERNELADDRESS,
+diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
+index 8a494d0e56d..d2f4f3f42b4 100644
+--- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
++++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
+@@ -15,6 +15,7 @@ pub(crate) fn target() -> Target {
+     base.plt_by_default = false;
+     base.max_atomic_width = Some(64);
+     base.entry_abi = CanonAbi::X86(X86Call::Win64);
++    base.linker = Some("lld".into());
+ 
+     // We disable MMX and SSE for now, even though UEFI allows using them. Problem is, you have to
+     // enable these CPU features explicitly before their first use, otherwise their instructions
+-- 
+2.51.1
+

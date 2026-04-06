@@ -1,0 +1,102 @@
+From d75171fdf8d03d2e070fcc3dbb5afb942dbd7828 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sat, 5 Jul 2025 17:20:11 +0200
+Subject: [PATCH] autoreconf: Adapt to the on-disk situation after autopoint
+ has run.
+
+Reported in <https://savannah.gnu.org/support/?111273>.
+
+* bin/autoreconf.in (autoreconf_current_directory): After invoking autopoint,
+rerun aclocal. When doing so, pass extra options "-I m4" if the configure.ac
+does not specify a macro dir.
+---
+ bin/autoreconf.in | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/bin/autoreconf.in b/bin/autoreconf.in
+index 3f6a74fe..eb0d96a9 100644
+--- a/bin/autoreconf.in
++++ b/bin/autoreconf.in
+@@ -489,6 +489,7 @@ sub autoreconf_current_directory ($)
+   # Actually, it is even more restrictive, as it greps for
+   # '^AM_GNU_GETTEXT_(REQUIRE_)?VERSION('.  We did this above, while
+   # scanning configure.ac.
++  my $invoked_autopoint;
+   if (!$uses_liblink && !$uses_iconv && !$uses_gettext)
+     {
+       verb "$configure_ac: not using Gettext";
+@@ -514,6 +515,7 @@ sub autoreconf_current_directory ($)
+           xsystem_hint ("autopoint is needed because this package uses AC_LIB_LINKFLAGS",
+                         $autopoint);
+         }
++      $invoked_autopoint = 1;
+     }
+ 
+ 
+@@ -593,6 +595,7 @@ sub autoreconf_current_directory ($)
+   # from the final autoconf invocation.
+   my $aux_dir;
+   my @aux_files;
++  my @macro_dirs;
+   my $uses_liblink_via_traces;
+   my $uses_iconv_via_traces;
+   my $uses_gettext_via_traces;
+@@ -616,6 +619,8 @@ sub autoreconf_current_directory ($)
+                'AC_CONFIG_AUX_DIR',
+                'AC_CONFIG_HEADERS',
+                'AC_CONFIG_SUBDIRS',
++               'AC_CONFIG_MACRO_DIR_TRACE',
++               'AC_CONFIG_MACRO_DIR',
+                'AC_INIT',
+                'AC_REQUIRE_AUX_FILE',
+                'AC_PROG_LIBTOOL',
+@@ -640,6 +645,8 @@ sub autoreconf_current_directory ($)
+       my ($macro, @args) = split (/::/);
+       $aux_dir = $args[0]           if $macro eq "AC_CONFIG_AUX_DIR";
+       push @aux_files, $args[0]     if $macro eq "AC_REQUIRE_AUX_FILE";
++      push @macro_dirs, $args[0]    if $macro eq "AC_CONFIG_MACRO_DIR_TRACE"
++                                       || $macro eq "AC_CONFIG_MACRO_DIR";
+       $uses_autoconf = 1            if $macro eq "AC_INIT";
+       # Here we need to explicitly test for GUILE_FLAGS, because in the
+       # typical situation where configure.ac invokes GUILE_FLAGS,
+@@ -679,6 +686,15 @@ sub autoreconf_current_directory ($)
+ 	}
+     }
+ 
++  # When configure.ac does not specify a macro dir, autopoint has
++  # created a directory named 'm4' and copied its *.m4 files into it.
++  # In this case, we need to rerun 'aclocal', in order to pass it the
++  # options "-I m4" this time.
++  if ($invoked_autopoint && !@macro_dirs)
++    {
++      $rerun_aclocal = 1;
++    }
++
+   # Gettext consistency checks.
+   # Some projects intentionally don't call AM_GNU_GETTEXT_(REQUIRE_)VERSION
+   # because they have all of the gettext infrastructure checked into version
+@@ -807,6 +823,8 @@ sub autoreconf_current_directory ($)
+           xsystem_hint ("autopoint is needed because this package uses AC_LIB_LINKFLAGS",
+                         $autopoint);
+         }
++      $invoked_autopoint = 1;
++      $rerun_aclocal = 1;
+     }
+ 
+ 
+@@ -824,6 +842,12 @@ sub autoreconf_current_directory ($)
+ 	}
+       else
+ 	{
++	  # When configure.ac does not specify a macro dir, autopoint has
++	  # created a directory named 'm4' and copied its *.m4 files into it.
++	  if ($invoked_autopoint && !@macro_dirs)
++	    {
++	      $aclocal_flags .= " -I m4";
++	    }
+ 	  xsystem ("$aclocal $aclocal_flags");
+ 	}
+     }
+-- 
+2.43.0
+

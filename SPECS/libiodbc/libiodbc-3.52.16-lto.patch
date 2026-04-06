@@ -1,0 +1,50 @@
+Fixes these warnings:
+
+SQLRemoveDSNFromIni.c:87:13: warning: type of 'ValidDSNW' does not match original declaration [-Wlto-type-mismatch]
+   87 | extern BOOL ValidDSNW (LPCSTR);
+      |             ^
+SQLValidDSN.c:105:1: note: 'ValidDSNW' was previously declared here
+  105 | ValidDSNW (LPCWSTR lpszDSN)
+      | ^
+SQLValidDSN.c:105:1: note: code may be misoptimized unless '-fno-strict-aliasing' is used
+
+connect.c:493:18: warning: type of 'SQLFreeConnect_Internal' does not match original declaration [-Wlto-type-mismatch]
+  493 | extern SQLRETURN SQLFreeConnect_Internal (SQLHDBC hdbc);
+      |                  ^
+hdbc.c:265:1: note: type mismatch in parameter 2
+  265 | SQLFreeConnect_Internal (SQLHDBC hdbc, int ver)
+      | ^
+hdbc.c:265:1: note: type 'int' should match type 'void'
+hdbc.c:265:1: note: 'SQLFreeConnect_Internal' was previously declared here
+
+--- iODBC-3.52.16/iodbc/connect.c.orig	2023-05-02 05:17:03.000000000 -0600
++++ iODBC-3.52.16/iodbc/connect.c	2025-01-15 08:26:48.829128427 -0700
+@@ -490,7 +490,7 @@ _iodbcdm_pool_set_retry_wait (HDBC hdbc)
+ }
+ 
+ 
+-extern SQLRETURN SQLFreeConnect_Internal (SQLHDBC hdbc);
++extern SQLRETURN SQLFreeConnect_Internal (SQLHDBC hdbc, int ver);
+ 
+ /*
+  * Drop connection from the pool
+@@ -518,7 +518,7 @@ _iodbcdm_pool_drop_conn (HDBC hdbc, HDBC
+ 
+   /* finish disconnect and free connection */
+   _iodbcdm_finish_disconnect (hdbc, TRUE);
+-  SQLFreeConnect_Internal (hdbc);
++  SQLFreeConnect_Internal (hdbc, 3);
+   MEM_FREE (hdbc);
+ }
+ 
+--- iODBC-3.52.16/iodbcinst/SQLRemoveDSNFromIni.c.orig	2023-05-02 05:17:03.000000000 -0600
++++ iODBC-3.52.16/iodbcinst/SQLRemoveDSNFromIni.c	2025-01-15 08:25:17.180280659 -0700
+@@ -84,7 +84,7 @@
+ #include "iodbc_error.h"
+ 
+ extern BOOL ValidDSN (LPCSTR);
+-extern BOOL ValidDSNW (LPCSTR);
++extern BOOL ValidDSNW (LPCWSTR);
+ 
+ BOOL
+ RemoveDSNFromIni (SQLPOINTER lpszDSN, SQLCHAR waMode)

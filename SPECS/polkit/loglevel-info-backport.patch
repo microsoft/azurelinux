@@ -1,0 +1,124 @@
+diff --git a/src/polkitbackend/polkitbackendcommon.c b/src/polkitbackend/polkitbackendcommon.c
+index 47ef0b7..217ef1c 100644
+--- a/src/polkitbackend/polkitbackendcommon.c
++++ b/src/polkitbackend/polkitbackendcommon.c
+@@ -349,7 +349,7 @@ polkit_backend_common_on_dir_monitor_changed (GFileMonitor     *monitor,
+            event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT))
+         {
+           polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_NOTICE,
++                                        LOG_LEVEL_INFO,
+                                         "Reloading rules");
+           polkit_backend_common_reload_scripts (authority);
+         }
+diff --git a/src/polkitbackend/polkitbackendduktapeauthority.c b/src/polkitbackend/polkitbackendduktapeauthority.c
+index de25296..6eb3a87 100644
+--- a/src/polkitbackend/polkitbackendduktapeauthority.c
++++ b/src/polkitbackend/polkitbackendduktapeauthority.c
+@@ -114,7 +114,7 @@ load_scripts (PolkitBackendJsAuthority  *authority)
+       GDir *dir = NULL;
+ 
+       polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                    LOG_LEVEL_NOTICE,
++                                    LOG_LEVEL_INFO,
+                                     "Loading rules from directory %s",
+                                     dir_name);
+ 
+@@ -134,7 +134,7 @@ load_scripts (PolkitBackendJsAuthority  *authority)
+       else
+         {
+           polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_NOTICE,
++                                        (error->code == G_FILE_ERROR_NOENT) ? LOG_LEVEL_INFO : LOG_LEVEL_WARNING,
+                                         "Error opening rules directory: %s (%s, %d)",
+                                         error->message, g_quark_to_string (error->domain), error->code);
+           g_clear_error (&error);
+@@ -157,7 +157,7 @@ load_scripts (PolkitBackendJsAuthority  *authority)
+     }
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "Finished loading, compiling and executing %d rules",
+                                 num_scripts);
+   g_list_free_full (files, g_free);
+@@ -180,7 +180,7 @@ polkit_backend_common_reload_scripts (PolkitBackendJsAuthority *authority)
+   duk_call_prop (cx, 0, 0);
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "Collecting garbage unconditionally...");
+ 
+   load_scripts (authority);
+diff --git a/src/polkitbackend/polkitbackendinteractiveauthority.c b/src/polkitbackend/polkitbackendinteractiveauthority.c
+index 84ceec5..48016d5 100644
+--- a/src/polkitbackend/polkitbackendinteractiveauthority.c
++++ b/src/polkitbackend/polkitbackendinteractiveauthority.c
+@@ -598,7 +598,7 @@ log_result (PolkitBackendInteractiveAuthority    *authority,
+     caller_cmdline = g_strdup ("<unknown>");
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "%s action %s for %s [%s] owned by %s (check requested by %s [%s])",
+                                 log_result_str,
+                                 action_id,
+@@ -707,7 +707,7 @@ check_authorization_challenge_cb (AuthenticationAgent         *agent,
+       if (is_temp)
+         {
+           polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_NOTICE,
++                                        LOG_LEVEL_INFO,
+                                         "Operator of %s successfully authenticated as %s to gain "
+                                         "TEMPORARY authorization for action %s for %s [%s] (owned by %s)",
+                                         scope_str,
+@@ -720,7 +720,7 @@ check_authorization_challenge_cb (AuthenticationAgent         *agent,
+       else
+         {
+           polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_NOTICE,
++                                        LOG_LEVEL_INFO,
+                                         "Operator of %s successfully authenticated as %s to gain "
+                                         "ONE-SHOT authorization for action %s for %s [%s] (owned by %s)",
+                                         scope_str,
+@@ -2665,7 +2665,7 @@ polkit_backend_interactive_authority_register_authentication_agent (PolkitBacken
+            locale);
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "Registered Authentication Agent for %s "
+                                 "(system bus name %s [%s], object path %s, locale %s)",
+                                 subject_as_string,
+@@ -2823,7 +2823,7 @@ polkit_backend_interactive_authority_unregister_authentication_agent (PolkitBack
+            agent->locale);
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "Unregistered Authentication Agent for %s "
+                                 "(system bus name %s, object path %s, locale %s)",
+                                 scope_str,
+@@ -2976,7 +2976,7 @@ polkit_backend_interactive_authority_system_bus_name_owner_changed (PolkitBacken
+                    agent->object_path);
+ 
+           polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_NOTICE,
++                                        LOG_LEVEL_INFO,
+                                         "Unregistered Authentication Agent for %s "
+                                         "(system bus name %s, object path %s, locale %s) (disconnected from bus)",
+                                         scope_str,
+diff --git a/src/polkitbackend/polkitd.c b/src/polkitbackend/polkitd.c
+index 5262446..7d1e700 100644
+--- a/src/polkitbackend/polkitd.c
++++ b/src/polkitbackend/polkitd.c
+@@ -94,7 +94,7 @@ on_name_acquired (GDBusConnection *connection,
+   exit_status = EXIT_SUCCESS;
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_NOTICE,
++                                LOG_LEVEL_INFO,
+                                 "Acquired the name org.freedesktop.PolicyKit1 on the system bus");
+ }
+ 

@@ -1,0 +1,10 @@
+--- curl-0.4.49/Cargo.toml	1970-01-01T00:00:01+00:00
++++ curl-0.4.49/Cargo.toml	2025-08-17T19:32:12.035475+00:00
+@@ -30,6 +30,7 @@
+ ]
+ license = "MIT"
+ repository = "https://github.com/alexcrichton/curl-rust"
++exclude = ["/ci/"]
+ 
+ [features]
+ default = ["ssl"]

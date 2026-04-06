@@ -1,0 +1,105 @@
+diff -up Clp-releases-1.17.9/Clp/src/ClpModel.cpp.orig Clp-releases-1.17.9/Clp/src/ClpModel.cpp
+--- Clp-releases-1.17.9/Clp/src/ClpModel.cpp.orig	2023-10-27 06:58:31.229571794 -0600
++++ Clp-releases-1.17.9/Clp/src/ClpModel.cpp	2023-10-27 07:03:25.664684792 -0600
+@@ -1340,7 +1340,7 @@ void ClpModel::resize(int newNumberRows,
+     if (numberRowNames < newNumberRows) {
+       rowNames_.resize(newNumberRows);
+       lengthNames_ = CoinMax(lengthNames_, 8);
+-      char name[10];
++      char name[16];
+       for (unsigned int iRow = numberRowNames; iRow < newNumberRows; iRow++) {
+         sprintf(name, "R%7.7d", iRow);
+         rowNames_[iRow] = name;
+@@ -1350,7 +1350,7 @@ void ClpModel::resize(int newNumberRows,
+     if (numberColumnNames < newNumberColumns) {
+       columnNames_.resize(newNumberColumns);
+       lengthNames_ = CoinMax(lengthNames_, 8);
+-      char name[10];
++      char name[16];
+       for (unsigned int iColumn = numberColumnNames;
+            iColumn < newNumberColumns; iColumn++) {
+         sprintf(name, "C%7.7d", iColumn);
+@@ -3453,7 +3453,7 @@ ClpModel::getRowName(int iRow) const
+   if (size > iRow) {
+     return rowNames_[iRow];
+   } else {
+-    char name[10];
++    char name[12];
+     sprintf(name, "R%7.7d", iRow);
+     std::string rowName(name);
+     return rowName;
+@@ -3489,7 +3489,7 @@ ClpModel::getColumnName(int iColumn) con
+   if (size > iColumn) {
+     return columnNames_[iColumn];
+   } else {
+-    char name[10];
++    char name[12];
+     sprintf(name, "C%7.7d", iColumn);
+     std::string columnName(name);
+     return columnName;
+@@ -3571,7 +3571,7 @@ void ClpModel::copyRowNames(const char *
+       maxLength = CoinMax(maxLength, static_cast< unsigned int >(strlen(rowNames[iRow - first])));
+     } else {
+       maxLength = CoinMax(maxLength, static_cast< unsigned int >(8));
+-      char name[10];
++      char name[12];
+       sprintf(name, "R%7.7d", iRow);
+       rowNames_[iRow] = name;
+     }
+@@ -3598,7 +3598,7 @@ void ClpModel::copyColumnNames(const cha
+       maxLength = CoinMax(maxLength, static_cast< unsigned int >(strlen(columnNames[iColumn - first])));
+     } else {
+       maxLength = CoinMax(maxLength, static_cast< unsigned int >(8));
+-      char name[10];
++      char name[12];
+       sprintf(name, "C%7.7d", iColumn);
+       columnNames_[iColumn] = name;
+     }
+@@ -3843,7 +3843,7 @@ ClpModel::rowNamesAsChar() const
+       if (rowName(iRow) != "") {
+         rowNames[iRow] = CoinStrdup(rowName(iRow).c_str());
+       } else {
+-        char name[10];
++        char name[12];
+         sprintf(name, "R%7.7d", iRow);
+         rowNames[iRow] = CoinStrdup(name);
+       }
+@@ -3859,7 +3859,7 @@ ClpModel::rowNamesAsChar() const
+       xx[n] = '\0';
+ #endif
+     }
+-    char name[10];
++    char name[12];
+     for (; iRow < numberRows_; iRow++) {
+       sprintf(name, "R%7.7d", iRow);
+       rowNames[iRow] = CoinStrdup(name);
+@@ -3882,7 +3882,7 @@ ClpModel::columnNamesAsChar() const
+       if (columnName(iColumn) != "") {
+         columnNames[iColumn] = CoinStrdup(columnName(iColumn).c_str());
+       } else {
+-        char name[10];
++        char name[12];
+         sprintf(name, "C%7.7d", iColumn);
+         columnNames[iColumn] = CoinStrdup(name);
+       }
+@@ -3898,7 +3898,7 @@ ClpModel::columnNamesAsChar() const
+       xx[n] = '\0';
+ #endif
+     }
+-    char name[10];
++    char name[12];
+     for (; iColumn < numberColumns_; iColumn++) {
+       sprintf(name, "C%7.7d", iColumn);
+       columnNames[iColumn] = CoinStrdup(name);
+diff -up Clp-releases-1.17.9/Clp/src/ClpSimplexOther.cpp.orig Clp-releases-1.17.9/Clp/src/ClpSimplexOther.cpp
+--- Clp-releases-1.17.9/Clp/src/ClpSimplexOther.cpp.orig	2023-10-27 07:01:11.067416496 -0600
++++ Clp-releases-1.17.9/Clp/src/ClpSimplexOther.cpp	2023-10-27 07:03:25.666684769 -0600
+@@ -2284,7 +2284,7 @@ int ClpSimplexOther::parametrics(const c
+ {
+   int returnCode = -2;
+   FILE *fp = fopen(dataFile, "r");
+-  char line[200];
++  char line[400];
+   if (!fp) {
+     handler_->message(CLP_UNABLE_OPEN, messages_)
+       << dataFile << CoinMessageEol;

@@ -1,0 +1,57 @@
+--- libcst-1.8.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libcst-1.8.6/Cargo.toml	2025-12-30T19:04:45.241203+00:00
+@@ -34,17 +34,12 @@
+ repository = "https://github.com/Instagram/LibCST"
+ 
+ [features]
+-default = ["py"]
+-py = [
+-    "pyo3",
+-    "pyo3/extension-module",
+-]
++default = []
+ trace = ["peg/trace"]
+ 
+ [lib]
+ name = "libcst_native"
+ crate-type = [
+-    "cdylib",
+     "rlib",
+ ]
+ path = "src/lib.rs"
+@@ -52,15 +47,6 @@
+ [[bin]]
+ name = "parse"
+ path = "src/bin.rs"
+-
+-[[test]]
+-name = "parser_roundtrip"
+-path = "tests/parser_roundtrip.rs"
+-
+-[[bench]]
+-name = "parser_benchmark"
+-path = "benches/parser_benchmark.rs"
+-harness = false
+ 
+ [dependencies.annotate-snippets]
+ version = "0.11.5"
+@@ -77,19 +63,11 @@
+ [dependencies.peg]
+ version = "0.8.5"
+ 
+-[dependencies.pyo3]
+-version = "0.26"
+-optional = true
+-
+ [dependencies.regex]
+ version = "1.11.2"
+ 
+ [dependencies.thiserror]
+ version = "2.0.12"
+-
+-[dev-dependencies.criterion]
+-version = "0.6.0"
+-features = ["html_reports"]
+ 
+ [dev-dependencies.difference]
+ version = "2.0.0"

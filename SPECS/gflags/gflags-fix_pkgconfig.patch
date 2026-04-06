@@ -1,0 +1,12 @@
+diff -up gflags-2.2.2/cmake/package.pc.in.orig gflags-2.2.2/cmake/package.pc.in
+--- gflags-2.2.2/cmake/package.pc.in.orig	2018-11-11 22:21:00.000000000 +0100
++++ gflags-2.2.2/cmake/package.pc.in	2020-03-09 13:54:40.797884193 +0100
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+ bindir=${prefix}/@RUNTIME_INSTALL_DIR@
+-libdir=${prefix}/@LIBRARY_INSTALL_DIR@
++libdir=@LIBRARY_INSTALL_DIR@
+ includedir=${prefix}/@INCLUDE_INSTALL_DIR@
+ 
+ Name: @PACKAGE_NAME@

@@ -1,0 +1,19 @@
+#!/usr/bin/escript
+%% -*- erlang -*-
+%%! -noinput +B
+
+main(Argv) ->
+    case gpb_compile:parse_opts_and_args(Argv) of
+        {ok, {Opts, Files}} ->
+            Opts1 = Opts ++ [{show_usage_fn, fun() -> show_usage() end}],
+            gpb_compile:c(Opts1, Files); %% will halt
+        {error, Reason} ->
+            io:format("Error: ~s.~n", [Reason]),
+            show_usage(),
+            halt(1)
+    end.
+
+show_usage() ->
+    io:format("Usage: ~s [options] X.proto [...]~n",
+              [filename:basename(escript:script_name())]),
+    gpb_compile:show_args().

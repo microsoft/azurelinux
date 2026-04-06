@@ -1,0 +1,343 @@
+From f78b07d7648a1efe543c01cc4019928791eb39e9 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Sun, 8 Jun 2025 19:00:10 +0200
+Subject: [PATCH 1/4] Use more generic way of checking bool value of an object
+
+This avoid bad interaction with numpy.bool_ as reported in #2322
+---
+ pythran/pythonic/types/bool.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pythran/pythonic/types/bool.hpp b/pythran/pythonic/types/bool.hpp
+index 35ac01d37..1436871f1 100644
+--- a/pythran/pythonic/types/bool.hpp
++++ b/pythran/pythonic/types/bool.hpp
+@@ -28,7 +28,7 @@ inline bool from_python<bool>::convert(PyObject *obj)
+   else if (obj == Py_False)
+     return false;
+   else
+-    return PyInt_AsLong(obj);
++    return PyObject_IsTrue(obj);
+ }
+ 
+ PYTHONIC_NS_END
+
+From 2847f56dbbb388aeab5f3cab18c70fe26298d254 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Tue, 10 Jun 2025 07:23:03 +0200
+Subject: [PATCH 2/4] Add support for numpy.frombuffer
+
+Even though we have very partial support for bytes in Pythran
+---
+ pythran/analyses/dependencies.py              |  2 ++
+ pythran/backend.py                            |  8 +++++
+ pythran/pythonic/include/numpy/frombuffer.hpp | 26 ++++++++++++++
+ pythran/pythonic/numpy/frombuffer.hpp         | 35 +++++++++++++++++++
+ pythran/tables.py                             |  1 +
+ pythran/tests/test_numpy_func0.py             | 14 +++++++-
+ pythran/tests/test_numpy_random.py            |  4 +--
+ pythran/types/conversion.py                   |  1 +
+ 8 files changed, 88 insertions(+), 3 deletions(-)
+ create mode 100644 pythran/pythonic/include/numpy/frombuffer.hpp
+ create mode 100644 pythran/pythonic/numpy/frombuffer.hpp
+
+diff --git a/pythran/analyses/dependencies.py b/pythran/analyses/dependencies.py
+index f153558f8..e0988e103 100644
+--- a/pythran/analyses/dependencies.py
++++ b/pythran/analyses/dependencies.py
+@@ -127,6 +127,8 @@ def visit_Yield(self, node):
+     def visit_Constant(self, node):
+         if node.value is None:
+             self.result.add(('builtins', 'None'))
++        elif isinstance(node.value, bytes):
++            self.result.add(('types', 'str'))  # FIXME: using str as backend
+         elif isinstance(node.value, str):
+             self.result.add(('types', 'str'))
+         elif isinstance(node.value, complex):
+diff --git a/pythran/backend.py b/pythran/backend.py
+index e5728ab3e..7b12773fa 100644
+--- a/pythran/backend.py
++++ b/pythran/backend.py
+@@ -1012,6 +1012,14 @@ def visit_Constant(self, node):
+             ret = 'pythonic::builtins::None'
+         elif isinstance(node.value, bool):
+             ret = str(node.value).lower()
++        elif isinstance(node.value, bytes):
++            quoted = "".join('\\' + hex(b)[1:] for b in node.value)
++            # FIXME: using str type as backend
++            if len(node.value) == 1:
++                quoted = quoted.replace("'", r"\'")
++                ret = 'pythonic::types::chr(\'' + quoted + '\')'
++            else:
++                ret = 'pythonic::types::str("' + quoted + '")'
+         elif isinstance(node.value, str):
+             quoted = quote_cxxstring(node.value)
+             if len(node.value) == 1:
+diff --git a/pythran/pythonic/include/numpy/frombuffer.hpp b/pythran/pythonic/include/numpy/frombuffer.hpp
+new file mode 100644
+index 000000000..bb685d8b5
+--- /dev/null
++++ b/pythran/pythonic/include/numpy/frombuffer.hpp
+@@ -0,0 +1,26 @@
++#ifndef PYTHONIC_INCLUDE_NUMPY_FROMBUFFER_HPP
++#define PYTHONIC_INCLUDE_NUMPY_FROMBUFFER_HPP
++
++#include "pythonic/include/numpy/float64.hpp"
++#include "pythonic/include/types/list.hpp"
++#include "pythonic/include/types/ndarray.hpp"
++#include "pythonic/include/types/str.hpp"
++#include "pythonic/include/utils/functor.hpp"
++
++#include <limits>
++#include <sstream>
++
++PYTHONIC_NS_BEGIN
++
++namespace numpy
++{
++  template <class dtype = functor::float64>
++  types::ndarray<typename dtype::type, types::pshape<long>>
++  frombuffer(types::str const &string, dtype d = dtype(), long count = -1,
++             long offset = 0);
++
++  DEFINE_FUNCTOR(pythonic::numpy, frombuffer);
++} // namespace numpy
++PYTHONIC_NS_END
++
++#endif
+diff --git a/pythran/pythonic/numpy/frombuffer.hpp b/pythran/pythonic/numpy/frombuffer.hpp
+new file mode 100644
+index 000000000..c0f625142
+--- /dev/null
++++ b/pythran/pythonic/numpy/frombuffer.hpp
+@@ -0,0 +1,35 @@
++#ifndef PYTHONIC_NUMPY_FROMBUFFER_HPP
++#define PYTHONIC_NUMPY_FROMBUFFER_HPP
++
++#include "pythonic/include/numpy/frombuffer.hpp"
++
++#include "pythonic/types/list.hpp"
++#include "pythonic/types/ndarray.hpp"
++#include "pythonic/types/str.hpp"
++#include "pythonic/utils/functor.hpp"
++
++#include <limits>
++#include <sstream>
++
++PYTHONIC_NS_BEGIN
++
++namespace numpy
++{
++  template <class dtype>
++  types::ndarray<typename dtype::type, types::pshape<long>>
++  frombuffer(types::str const &string, dtype d, long count, long offset)
++  {
++    if (count < 0)
++      count = string.size() / sizeof(typename dtype::type);
++    types::pshape<long> shape = count;
++    utils::shared_ref<types::raw_array<typename dtype::type>> buffer(
++        std::get<0>(shape));
++    auto const *tstring =
++        reinterpret_cast<typename dtype::type const *>(string.c_str()) + offset;
++    std::copy(tstring, tstring + std::get<0>(shape), buffer->data);
++    return {buffer, shape};
++  }
++} // namespace numpy
++PYTHONIC_NS_END
++
++#endif
+diff --git a/pythran/tables.py b/pythran/tables.py
+index a61709d19..bf0d9b220 100644
+--- a/pythran/tables.py
++++ b/pythran/tables.py
+@@ -3752,6 +3752,7 @@ def expand_numpy_2_args(args, defaults=None, force=False):
+         "fmin": UFunc(REDUCED_BINARY_UFUNC),
+         "fmod": UFunc(BINARY_UFUNC),
+         "frexp": ConstFunctionIntr(),
++        "frombuffer": ConstFunctionIntr(),
+         "fromfunction": ConstFunctionIntr(),
+         "fromiter": ConstFunctionIntr(args=("iterable", "dtype", "count"),
+                                       defaults=(-1,)),
+diff --git a/pythran/tests/test_numpy_func0.py b/pythran/tests/test_numpy_func0.py
+index 41f716d90..a97a43c50 100644
+--- a/pythran/tests/test_numpy_func0.py
++++ b/pythran/tests/test_numpy_func0.py
+@@ -560,11 +560,23 @@ def test_fromstring1(self):
+         self.run_test("def np_fromstring1(a): from numpy import fromstring, uint8 ; a = '\x01\x02\x03\x04' ; return fromstring(a, uint8,3)", '\x01\x02\x03\x04', np_fromstring1=[str])
+ 
+     def test_fromstring2(self):
+-        self.run_test("def np_fromstring2(a): from numpy import fromstring, uint32 ; return fromstring(a, uint32,-1, ' ')", '1 2 3 4', np_fromstring2=[str])
++        self.run_test("def np_fromstring2(a): from numpy import fromstring, uint32 ; return fromstring(a, uint32,-1, ' ')", '1 20 3 40', np_fromstring2=[str])
+ 
+     def test_fromstring3(self):
+         self.run_test("def np_fromstring3(a): from numpy import fromstring, uint32 ; return fromstring(a, uint32,2, ',')", '1,2, 3, 4', np_fromstring3=[str])
+ 
++    def test_frombuffer0(self):
++        self.run_test("def np_frombuffer0(a): from numpy import frombuffer, uint8 ; return frombuffer(b'\x01\x02' * a, uint8)", 1, np_frombuffer0=[int])
++
++    def test_frombuffer1(self):
++        self.run_test("def np_frombuffer1(a): from numpy import frombuffer, uint8 ; return frombuffer(b'\x01\x02\x03\x04' * a, uint8, 3)", 1, np_frombuffer1=[int])
++
++    def test_frombuffer2(self):
++        self.run_test("def np_frombuffer2(a): from numpy import frombuffer, uint16 ; return frombuffer(a * b'\x01\x02', uint16)", 1, np_frombuffer2=[int])
++
++    def test_frombuffer3(self):
++        self.run_test("def np_frombuffer3(a): from numpy import frombuffer, int8 ; return frombuffer(a * b'\x01\x02\x03\x04', int8, 3, 1)", 1, np_frombuffer3=[int])
++
+     def test_outer0(self):
+         self.run_test("def np_outer0(x): from numpy import outer ; return outer(x, x+2)", numpy.arange(6).reshape(2,3), np_outer0=[NDArray[int,:,:]])
+ 
+diff --git a/pythran/tests/test_numpy_random.py b/pythran/tests/test_numpy_random.py
+index aa3f22815..6547a2e92 100644
+--- a/pythran/tests/test_numpy_random.py
++++ b/pythran/tests/test_numpy_random.py
+@@ -638,9 +638,9 @@ def test_numpy_random_bytes1(self):
+         self.run_test("""
+             def numpy_random_bytes1(n):
+                 from numpy.random import bytes
+-                from numpy import mean, fromstring, uint8, asarray
++                from numpy import mean, frombuffer, uint8, asarray
+                 a = bytes(n)
+-                return (abs(mean(asarray(fromstring(a, uint8), dtype=float)) - 127.5) < .05)""",
++                return (abs(mean(asarray(frombuffer(a, uint8), dtype=float)) - 127.5) < .05)""",
+                       10 ** 8, numpy_random_bytes1=[int])
+ 
+     ###########################################################################
+diff --git a/pythran/types/conversion.py b/pythran/types/conversion.py
+index e149b7fb4..b3c86b5fd 100644
+--- a/pythran/types/conversion.py
++++ b/pythran/types/conversion.py
+@@ -9,6 +9,7 @@
+ PYTYPE_TO_CTYPE_TABLE = {
+     numpy.uint: 'npy_uint',
+     #
++    bytes: 'pythonic::types::str',  # FIXME: using types::str as backend
+     complex: 'std::complex<double>',
+     bool: 'bool',
+     int: 'long',
+
+From c01d4224ca0c34af6157ee4e82893a82f3e9bb43 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Sun, 8 Jun 2025 19:15:28 +0200
+Subject: [PATCH 3/4] Do not test binary mode of numpy.fromstring for recent
+ numpy version
+
+It's no longer supported as of numpy 2.3, see
+https://numpy.org/devdocs/release/2.3.0-notes.html and
+https://github.com/numpy/numpy/pull/28254
+
+Fix #2322
+---
+ pythran/tests/test_numpy_func0.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pythran/tests/test_numpy_func0.py b/pythran/tests/test_numpy_func0.py
+index a97a43c50..91c37e979 100644
+--- a/pythran/tests/test_numpy_func0.py
++++ b/pythran/tests/test_numpy_func0.py
+@@ -553,9 +553,11 @@ def test_fromfile5(self):
+         finally:
+             os.remove(temp_name)
+ 
++    @unittest.skipIf(np_version > version.Version("2.2"), reason="np.fromstring no longer supports binary mode")
+     def test_fromstring0(self):
+         self.run_test("def np_fromstring0(a): from numpy import fromstring, uint8 ; return fromstring(a, uint8)", '\x01\x02', np_fromstring0=[str])
+ 
++    @unittest.skipIf(np_version > version.Version("2.2"), reason="np.fromstring no longer supports binary mode")
+     def test_fromstring1(self):
+         self.run_test("def np_fromstring1(a): from numpy import fromstring, uint8 ; a = '\x01\x02\x03\x04' ; return fromstring(a, uint8,3)", '\x01\x02\x03\x04', np_fromstring1=[str])
+ 
+
+From ef869953fbb16a31c5eb06c72296d4f23cf73e55 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Sun, 8 Jun 2025 19:22:49 +0200
+Subject: [PATCH 4/4] Adjust doc validation to recent python 3.13
+
+- force COLUMNS width for reproducible argparse help output
+- gast Constant pretty printing has changed
+
+Fix #2317
+---
+ .github/workflows/core.yml |  2 +-
+ docs/TUTORIAL.rst          |  6 +++---
+ pythran/tests/test_xdoc.py | 14 +++++++++++++-
+ 3 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/.github/workflows/core.yml b/.github/workflows/core.yml
+index 5dca25973..8609be87e 100644
+--- a/.github/workflows/core.yml
++++ b/.github/workflows/core.yml
+@@ -12,7 +12,7 @@ jobs:
+     runs-on: ubuntu-22.04
+     strategy:
+       matrix:
+-        python-version: [3.7, 3.9, 3.11, 3.12, pypy-3.9]
++        python-version: [3.7, 3.9, 3.11, 3.12, 3.13, pypy-3.9]
+         cpp-version: [g++-12, clang-13]
+     steps:
+     - uses: actions/checkout@v2
+diff --git a/docs/TUTORIAL.rst b/docs/TUTORIAL.rst
+index e1dd80c4f..31ff4fffc 100644
+--- a/docs/TUTORIAL.rst
++++ b/docs/TUTORIAL.rst
+@@ -20,7 +20,7 @@ Python ships a standard module, ``ast`` to turn Python code into an AST. For ins
+   >>> code = "a=1"
+   >>> tree = ast.parse(code)  # turn the code into an AST
+   >>> print(ast.dump(tree))  # view it as a string
+-  Module(body=[Assign(targets=[Name(id='a', ctx=Store())], value=Constant(value=1, kind=None))])
++  Module(body=[Assign(targets=[Name(id='a', ctx=Store())], value=Constant(value=1))])
+ 
+ Deciphering the above line, one learns that the single assignment is parsed as
+ a module containing a single statement, which is an assignment to a single
+@@ -33,7 +33,7 @@ Eventually, one needs to parse more complex codes, and things get a bit more cry
+   ...     return n if n< 2 else fib(n-1) + fib(n-2)"""
+   >>> tree = ast.parse(fib_src)
+   >>> print(ast.dump(tree))
+-  Module(body=[FunctionDef(name='fib', args=arguments(args=[Name(id='n', ctx=Param())]), body=[Return(value=IfExp(test=Compare(left=Name(id='n', ctx=Load()), ops=[Lt()], comparators=[Constant(value=2, kind=None)]), body=Name(id='n', ctx=Load()), orelse=BinOp(left=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=1, kind=None))]), op=Add(), right=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=2, kind=None))]))))])])
++  Module(body=[FunctionDef(name='fib', args=arguments(args=[Name(id='n', ctx=Param())]), body=[Return(value=IfExp(test=Compare(left=Name(id='n', ctx=Load()), ops=[Lt()], comparators=[Constant(value=2)]), body=Name(id='n', ctx=Load()), orelse=BinOp(left=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=1))]), op=Add(), right=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=2))]))))])])
+ 
+ The idea remains the same. The whole Python syntax is described in
+ http://docs.python.org/2/library/ast.html and is worth a glance, otherwise
+@@ -199,7 +199,7 @@ constant expressions. In the previous code, there is only two constant
+ 
+   >>> ce = pm.gather(analyses.ConstantExpressions, tree)
+   >>> sorted(map(ast.dump, ce))
+-  ["Attribute(value=Name(id='math', ctx=Load()), attr='cos', ctx=Load())", 'Constant(value=3, kind=None)']
++  ["Attribute(value=Name(id='math', ctx=Load()), attr='cos', ctx=Load())", 'Constant(value=3)']
+ 
+ One of the most critical analyse of Pythran is the points-to analysis. There
+ are two flavors of this analyse, one that computes an over-set of the aliased
+diff --git a/pythran/tests/test_xdoc.py b/pythran/tests/test_xdoc.py
+index 862dec1fa..1dddf36ca 100644
+--- a/pythran/tests/test_xdoc.py
++++ b/pythran/tests/test_xdoc.py
+@@ -20,6 +20,8 @@ class TestDoctest(unittest.TestCase):
+ 
+     @pytest.mark.skipif(sys.platform == "win32",
+                         reason="We should create a file for windows.")
++    @pytest.mark.skipif(sys.version_info < (3, 13),
++                        reason="ast output changed with 3.13")
+     def test_tutorial(self):
+         failed, _ = doctest.testfile('../../docs/TUTORIAL.rst')
+         self.assertEqual(failed, 0)
+@@ -34,9 +36,19 @@ def test_internal(self):
+ 
+     @pytest.mark.skipif(sys.platform == "win32",
+                         reason="We should create a file for windows.")
++    @pytest.mark.skipif(sys.version_info <= (3, 12),
++                        reason="argparse output changed with 3.13")
+     def test_cli(self):
+         tmpfile = self.adapt_rst('../../docs/CLI.rst')
+-        failed, _ = doctest.testfile(tmpfile, False)
++        columns = os.environ.get('COLUMNS', None)
++        os.environ['COLUMNS'] = '80'
++        try:
++            failed, _ = doctest.testfile(tmpfile, False)
++        finally:
++            if columns is None:
++                del os.environ['COLUMNS']
++            else:
++                os.environ['COLUMNS'] = columns
+         self.assertEqual(failed, 0)
+         os.remove(tmpfile)
+ 

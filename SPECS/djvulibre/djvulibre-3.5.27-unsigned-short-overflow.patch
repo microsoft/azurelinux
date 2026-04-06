@@ -1,0 +1,21 @@
+diff --git a/libdjvu/GBitmap.cpp b/libdjvu/GBitmap.cpp
+index c2fdbe4..e271a1d 100644
+--- a/libdjvu/GBitmap.cpp
++++ b/libdjvu/GBitmap.cpp
+@@ -69,6 +69,7 @@
+ #include <stddef.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <limits.h>
+ 
+ // - Author: Leon Bottou, 05/1997
+ 
+@@ -1284,6 +1285,8 @@ GBitmap::decode(unsigned char *runs)
+   // initialize pixel array
+   if (nrows==0 || ncolumns==0)
+     G_THROW( ERR_MSG("GBitmap.not_init") );
++  if (ncolumns > USHRT_MAX - border)
++    G_THROW("GBitmap: row size exceeds maximum (corrupted file?)");
+   bytes_per_row = ncolumns + border;
+   if (runs==0)
+     G_THROW( ERR_MSG("GBitmap.null_arg") );

@@ -1,0 +1,231 @@
+From ccd0b27504707e4f3099f0b9fd7a89489c6973fb Mon Sep 17 00:00:00 2001
+From: Alexander Naumov <alexander_naumov@opensuse.org>
+Date: Sat, 3 Jan 2026 17:26:27 +0100
+Subject: Fix: unable to type in screen on big-endian systems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Thanks to Petr Sumbera <petr.sumbera@oracle.com>
+and Dan Horák <dan@danny.cz>
+
+bug#67607
+---
+ src/telnet.c |  2 +-
+ src/telnet.h |  2 +-
+ src/window.c | 38 +++++++++++++++++++-------------------
+ src/window.h |  6 +++---
+ 4 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/src/telnet.c b/src/telnet.c
+index 69d75ee..c70e2da 100644
+--- a/telnet.c
++++ b/telnet.c
+@@ -228,7 +228,7 @@ void TelProcessLine(char **bufpp, size_t *lenp)
+ 	*lenp = 0;
+ }
+ 
+-int DoTelnet(char *buf, size_t *lenp, int f)
++int DoTelnet(char *buf, int *lenp, int f)
+ {
+ 	int echo = !fore->w_telropts[TO_ECHO];
+ 	int cmode = fore->w_telropts[TO_SGA];
+diff --git a/src/telnet.h b/src/telnet.h
+index fefcc0a..792a93a 100644
+--- a/telnet.h
++++ b/telnet.h
+@@ -9,7 +9,7 @@
+ int TelOpenAndConnect(Window *);
+ int TelIsline(Window *);
+ void TelProcessLine(char **, size_t *);
+-int DoTelnet(char *, size_t *, int);
++int DoTelnet(char *, int *, int);
+ int TelIn(Window *, char *, size_t, int);
+ void TelBreak(Window *);
+ void TelWindowSize(Window *);
+diff --git a/src/window.c b/src/window.c
+index cee06fd..68fc006 100644
+--- a/window.c
++++ b/window.c
+@@ -61,7 +61,7 @@ static void WinRedisplayLine(int, int, int, int);
+ static void WinClearLine(int, int, int, int);
+ static int WinResize(int, int);
+ static void WinRestore(void);
+-static int DoAutolf(char *, size_t *, int);
++static int DoAutolf(char *, int *, int);
+ static void ZombieProcess(char **, size_t *);
+ static void win_readev_fn(Event *, void *);
+ static void win_writeev_fn(Event *, void *);
+@@ -74,9 +74,9 @@ static void win_silenceev_fn(Event *, void *);
+ static void win_destroyev_fn(Event *, void *);
+ 
+ static int ForkWindow(Window *, char **, char *);
+-static void zmodem_found(Window *, int, char *, size_t);
++static void zmodem_found(Window *, int, char *, int);
+ static void zmodemFin(char *, size_t, void *);
+-static int zmodem_parse(Window *, char *, size_t);
++static int zmodem_parse(Window *, char *, int);
+ 
+ bool VerboseCreate = false;		/* XXX move this to user.h */
+ 
+@@ -191,10 +191,10 @@ const struct LayFuncs WinLf = {
+ 	NULL
+ };
+ 
+-static int DoAutolf(char *buf, size_t *lenp, int fr)
++static int DoAutolf(char *buf, int *lenp, int fr)
+ {
+ 	char *p;
+-	size_t len = *lenp;
++	int len = *lenp;
+ 	int trunc = 0;
+ 
+ 	for (p = buf; len > 0; p++, len--) {
+@@ -215,7 +215,7 @@ static int DoAutolf(char *buf, size_t *lenp, int fr)
+ 
+ static void WinProcess(char **bufpp, size_t *lenp)
+ {
+-	size_t l2 = 0, f, *ilen, l = *lenp, trunc;
++	int l2 = 0, f, *ilen, l = *lenp, trunc;
+ 	char *ibuf;
+ 
+ 	fore = (Window *)flayer->l_data;
+@@ -291,7 +291,7 @@ static void WinProcess(char **bufpp, size_t *lenp)
+ 
+ static void ZombieProcess(char **bufpp, size_t *lenp)
+ {
+-	size_t l = *lenp;
++	int l = *lenp;
+ 	char *buf = *bufpp, b1[10], b2[10];
+ 
+ 	fore = (Window *)flayer->l_data;
+@@ -699,7 +699,7 @@ int MakeWindow(struct NewWindow *newwin)
+ 	p->w_readev.data = p->w_writeev.data = (char *)p;
+ 	p->w_readev.handler = win_readev_fn;
+ 	p->w_writeev.handler = win_writeev_fn;
+-	p->w_writeev.condpos = (int *)&p->w_inlen;
++	p->w_writeev.condpos = &p->w_inlen;
+ 	evenq(&p->w_readev);
+ 	evenq(&p->w_writeev);
+ 	p->w_paster.pa_slowev.type = EV_TIMEOUT;
+@@ -1344,7 +1344,7 @@ int winexec(char **av)
+ 	pwin->p_readev.data = pwin->p_writeev.data = (char *)w;
+ 	pwin->p_readev.handler = pseu_readev_fn;
+ 	pwin->p_writeev.handler = pseu_writeev_fn;
+-	pwin->p_writeev.condpos = (int *)&pwin->p_inlen;
++	pwin->p_writeev.condpos = &pwin->p_inlen;
+ 	if (pwin->p_fdpat & (F_PFRONT << F_PSHIFT * 2 | F_PFRONT << F_PSHIFT))
+ 		evenq(&pwin->p_readev);
+ 	evenq(&pwin->p_writeev);
+@@ -1378,7 +1378,7 @@ void FreePseudowin(Window *w)
+ 	}
+ 	evdeq(&pwin->p_readev);
+ 	evdeq(&pwin->p_writeev);
+-	if (w->w_readev.condneg == (int *)&pwin->p_inlen)
++	if (w->w_readev.condneg == &pwin->p_inlen)
+ 		w->w_readev.condpos = w->w_readev.condneg = NULL;
+ 	evenq(&w->w_readev);
+ 	free((char *)pwin);
+@@ -1484,7 +1484,7 @@ static void win_readev_fn(Event *event, void *data)
+ 		size = IOSIZE - p->w_pwin->p_inlen;
+ 		if (size <= 0) {
+ 			event->condpos = &const_IOSIZE;
+-			event->condneg = (int *)&p->w_pwin->p_inlen;
++			event->condneg = &p->w_pwin->p_inlen;
+ 			return;
+ 		}
+ 	}
+@@ -1563,7 +1563,7 @@ static void win_resurrect_zombie_fn(Event *event, void *data)
+ static void win_writeev_fn(Event *event, void *data)
+ {
+ 	Window *p = (Window *)data;
+-	size_t len;
++	int len;
+ 	if (p->w_inlen) {
+ 		if ((len = write(event->fd, p->w_inbuf, p->w_inlen)) <= 0)
+ 			len = p->w_inlen;	/* dead window */
+@@ -1600,7 +1600,7 @@ static void pseu_readev_fn(Event *event, void *data)
+ 		size = IOSIZE - p->w_inlen;
+ 		if (size <= 0) {
+ 			event->condpos = &const_IOSIZE;
+-			event->condneg = (int *)&p->w_inlen;
++			event->condneg = &p->w_inlen;
+ 			return;
+ 		}
+ 	}
+@@ -1643,7 +1643,7 @@ static void pseu_writeev_fn(Event *event, void *data)
+ {
+ 	Window *p = (Window *)data;
+ 	struct pseudowin *pw = p->w_pwin;
+-	size_t len;
++	int len;
+ 
+ 	if (pw->p_inlen == 0)
+ 		return;
+@@ -1683,10 +1683,10 @@ static void win_destroyev_fn(Event *event, void *data)
+ 	WindowDied(p, p->w_exitstatus, 1);
+ }
+ 
+-static int zmodem_parse(Window *p, char *bp, size_t len)
++static int zmodem_parse(Window *p, char *bp, int len)
+ {
+ 	char *b2 = bp;
+-	for (size_t i = 0; i < len; i++, b2++) {
++	for (int i = 0; i < len; i++, b2++) {
+ 		if (p->w_zauto == 0) {
+ 			for (; i < len; i++, b2++)
+ 				if (*b2 == 030)
+@@ -1756,14 +1756,14 @@ static void zmodemFin(char *buf, size_t len, void *data)
+ 	}
+ }
+ 
+-static void zmodem_found(Window *p, int send, char *bp, size_t len)
++static void zmodem_found(Window *p, int send, char *bp, int len)
+ {
+ 	char *s;
+ 	size_t n;
+ 
+ 	/* check for abort sequence */
+ 	n = 0;
+-	for (size_t i = 0; i < len; i++)
++	for (int i = 0; i < len; i++)
+ 		if (bp[i] != 030)
+ 			n = 0;
+ 		else if (++n > 4)
+@@ -1792,7 +1792,7 @@ static void zmodem_found(Window *p, int send, char *bp, size_t len)
+ 		display = d;
+ 		evdeq(&D_blockedev);
+ 		D_readev.condpos = &const_IOSIZE;
+-		D_readev.condneg = (int *)&p->w_inlen;
++		D_readev.condneg = &p->w_inlen;
+ 		ClearAll();
+ 		GotoPos(0, 0);
+ 		SetRendition(&mchar_blank);
+diff --git a/src/window.h b/src/window.h
+index 3834650..e1c1a68 100644
+--- a/window.h
++++ b/window.h
+@@ -79,7 +79,7 @@ struct pseudowin {
+ 	char	p_cmd[MAXSTR];
+ 	char	p_tty[MAXSTR];
+ 	char	p_inbuf[IOSIZE];	/* buffered writing to p_ptyfd */
+-	size_t	p_inlen;
++	int	p_inlen;
+ };
+ 
+ /* bits for fdpat: */
+@@ -157,9 +157,9 @@ struct Window {
+ 	int	 w_poll_zombie_timeout;
+ 	int	 w_ptyfd;		/* fd of the master pty */
+ 	char	 w_inbuf[IOSIZE];
+-	size_t	 w_inlen;
++	int	 w_inlen;
+ 	char	 w_outbuf[IOSIZE];
+-	size_t	 w_outlen;
++	int	 w_outlen;
+ 	bool	 w_aflag;		/* (-a option) */
+ 	bool	 w_dynamicaka;		/* should we change name */
+ 	char	*w_title;		/* name of the window */
+-- 
+cgit v1.2.3
+

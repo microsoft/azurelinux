@@ -1,0 +1,23 @@
+diff -pruN imsettings-1.8.3.orig/data/imsettings-target-checker.sh.in imsettings-1.8.3/data/imsettings-target-checker.sh.in
+--- imsettings-1.8.3.orig/data/imsettings-target-checker.sh.in	2022-10-03 20:17:48.034832740 +0900
++++ imsettings-1.8.3/data/imsettings-target-checker.sh.in	2022-10-03 20:18:29.157906544 +0900
+@@ -81,19 +81,6 @@ case $(get_desktop|tr '[A-Z]' '[a-z]') i
+         log "** GNOME isn't supported at all"
+         exit 0
+ 	;;
+-    cinnamon*)
+-	dbus_send 'org.Cinnamon' '/' 'org.freedesktop.DBus.Peer.Ping'
+-	if [ $? = 0 ]; then
+-	    if gsettings_get_bool org.cinnamon.settings-daemon.plugins.keyboard active; then
+-		log "** org.cinnamon.settings-daemon.plugins.keyboard.active is true. imsettings is going to be disabled."
+-		exit 0
+-	    else
+-		exit 1
+-	    fi
+-	else
+-	    exit 1
+-	fi
+-	;;
+     *)
+ 	exit 1
+ 	;;

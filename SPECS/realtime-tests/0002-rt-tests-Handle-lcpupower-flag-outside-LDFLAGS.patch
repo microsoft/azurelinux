@@ -1,0 +1,45 @@
+From 623f6908ef3bc8367661a2e1440dd8c5bee91397 Mon Sep 17 00:00:00 2001
+From: Tomas Glozar <tglozar@redhat.com>
+Date: Wed, 4 Dec 2024 16:40:04 +0100
+Subject: [PATCH 2/5] rt-tests: Handle -lcpupower flag outside LDFLAGS
+
+The rt-tests Makefile adds -lcpupower to LDFLAGS if libcpupower support
+is detected on the system. However, this does not work when LDFLAGS is
+overwritten by an external source.
+
+Add separate variable LIBCPUPOWER to contain the flag and pass it to the
+cyclictest linking phase. This also avoids unnecessarily passing the
+flag to the linking of other rt-tests binaries which do not use
+libcpupower.
+
+Signed-off-by: Tomas Glozar <tglozar@redhat.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f656e34d168c..0fa0928bbca7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -43,7 +43,7 @@ PYLIB ?= $(shell python3 -m get_pylib)
+ ifneq ($(no_libcpupower), 1)
+ ifeq ($(call test-feature,libcpupower), 0)
+ CPPFLAGS += -DHAVE_LIBCPUPOWER_SUPPORT
+-LDFLAGS += -lcpupower
++LIBCPUPOWER += -lcpupower
+ else
+ $(warning libcpupower is missing, building without --deepest-idle-state support.)
+ $(warning Please install libcpupower-dev/kernel-tools-libs-devel)
+@@ -135,7 +135,7 @@ $(OBJDIR):
+ -include $(addprefix $(OBJDIR)/,$(sources:.c=.d))
+ 
+ cyclictest: $(OBJDIR)/cyclictest.o $(OBJDIR)/librttest.a $(OBJDIR)/librttestnuma.a
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(RTTESTNUMA)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(RTTESTNUMA) $(LIBCPUPOWER)
+ 
+ cyclicdeadline: $(OBJDIR)/cyclicdeadline.o $(OBJDIR)/librttest.a
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB)
+-- 
+2.47.1
+

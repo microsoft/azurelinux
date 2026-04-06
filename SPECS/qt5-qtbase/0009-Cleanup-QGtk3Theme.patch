@@ -1,0 +1,51 @@
+From 41d23f13c9aede66a6c9044869b0ef5f52f7d71d Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:38:53 +0200
+Subject: [PATCH 09/15] Cleanup QGtk3Theme
+
+1. Remove unused include.
+2. Replace unnecessary null checks with asserts.
+3. Remove dead code after the cleanup.
+---
+ src/plugins/platformthemes/gtk3/qgtk3theme.cpp | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+index 5f5fee4f3b..0de9dd3866 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+@@ -239,23 +239,27 @@ bool QGtk3Theme::useNativeFileDialog()
+ 
+ const QPalette *QGtk3Theme::palette(Palette type) const
+ {
+-    return m_storage ? m_storage->palette(type) : QPlatformTheme::palette(type);
++    Q_ASSERT(m_storage);
++    return m_storage->palette(type);
+ }
+ 
+ QPixmap QGtk3Theme::standardPixmap(StandardPixmap sp, const QSizeF &size) const
+ {
+-    return m_storage ? m_storage->standardPixmap(sp, size) : QPlatformTheme::standardPixmap(sp, size);
++    Q_ASSERT(m_storage);
++    return m_storage->standardPixmap(sp, size);
+ }
+ 
+ const QFont *QGtk3Theme::font(Font type) const
+ {
+-    return m_storage ? m_storage->font(type) : QGnomeTheme::font(type);
++    Q_ASSERT(m_storage);
++    return m_storage->font(type);
+ }
+ 
+ QIcon QGtk3Theme::fileIcon(const QFileInfo &fileInfo,
+                            QPlatformTheme::IconOptions iconOptions) const
+ {
+-    return m_storage ? m_storage->fileIcon(fileInfo) : QGnomeTheme::fileIcon(fileInfo, iconOptions);
++    Q_ASSERT(m_storage);
++    return m_storage->fileIcon(fileInfo);
+ }
+ 
+ QT_END_NAMESPACE
+-- 
+2.41.0
+

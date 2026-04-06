@@ -1,0 +1,33 @@
+diff --git a/pptp.8 b/pptp.8
+index 017b5db..9407a2a 100644
+--- a/pptp.8
++++ b/pptp.8
+@@ -119,6 +119,15 @@ Sets the number of packets to pass before causing a reordering test.
+ Default is 100.  Has no effect if test-type is zero.  The result of
+ test types 2 and 3 are undefined if this value is less than ten.
+ 
++.TP
++.B \-\-missing-window <n>
++Enable 'missing window' validation and set packet tolerance
++(300=default, 6000=recommended).
++
++.TP
++.B \-\-version
++Display version.
++
+ 
+ .SH "ROUTING"
+ When PPTP is used in conjunction with a default route on top of the
+diff --git a/pptp.c b/pptp.c
+index 92e3170..25f385c 100644
+--- a/pptp.c
++++ b/pptp.c
+@@ -127,7 +127,7 @@ void usage(char *progname)
+             "  --test-type <type>	Damage the packet stream by reordering\n"
+             "  --test-rate <n>          Do the test every n packets\n"
+             "  --missing-window <n>     Enable 'missing window' validation and set packet\n"
+-            "                           polerance (300=default, 6000=recommended)\n",
++            "                           tolerance (300=default, 6000=recommended)\n",
+ 
+             version, progname, progname);
+     log("%s called with wrong arguments, program not started.", progname);

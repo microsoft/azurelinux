@@ -1,0 +1,36 @@
+diff -pruN gyp-0.1-gitfcd686f1.orig/gyp gyp-0.1-gitfcd686f1/gyp
+--- gyp-0.1-gitfcd686f1.orig/gyp	2015-04-30 09:48:21.000000000 +0000
++++ gyp-0.1-gitfcd686f1/gyp	2019-08-14 09:41:05.343208034 +0000
+@@ -5,4 +5,4 @@
+ 
+ set -e
+ base=$(dirname "$0")
+-exec python "${base}/gyp_main.py" "$@"
++exec python3 "${base}/gyp_main.py" "$@"
+diff -pruN gyp-0.1-gitfcd686f1.orig/gyp_main.py gyp-0.1-gitfcd686f1/gyp_main.py
+--- gyp-0.1-gitfcd686f1.orig/gyp_main.py	2016-10-17 02:00:37.000000000 +0000
++++ gyp-0.1-gitfcd686f1/gyp_main.py	2019-08-14 09:41:43.380207320 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright (c) 2009 Google Inc. All rights reserved.
+ # Use of this source code is governed by a BSD-style license that can be
+diff -pruN gyp-0.1-gitfcd686f1.orig/gyptest.py gyp-0.1-gitfcd686f1/gyptest.py
+--- gyp-0.1-gitfcd686f1.orig/gyptest.py	2019-08-14 09:05:50.000000000 +0000
++++ gyp-0.1-gitfcd686f1/gyptest.py	2019-08-14 09:41:48.578208719 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2012 Google Inc. All rights reserved.
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+diff -pruN gyp-0.1-gitfcd686f1.orig/setup.py gyp-0.1-gitfcd686f1/setup.py
+--- gyp-0.1-gitfcd686f1.orig/setup.py	2015-04-30 09:48:21.000000000 +0000
++++ gyp-0.1-gitfcd686f1/setup.py	2019-08-14 09:41:53.510210046 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright (c) 2009 Google Inc. All rights reserved.
+ # Use of this source code is governed by a BSD-style license that can be

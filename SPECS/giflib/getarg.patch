@@ -1,0 +1,308 @@
+diff -rupN --no-dereference giflib-5.2.2/getarg.c giflib-5.2.2-new/getarg.c
+--- giflib-5.2.2/getarg.c	2024-02-19 04:01:27.000000000 +0100
++++ giflib-5.2.2-new/getarg.c	2025-04-15 16:56:27.276152030 +0200
+@@ -112,7 +112,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ 
+ #define MAX_PARAM 100 /* maximum number of parameters allowed. */
+ #define CTRL_STR_MAX_LEN 1024
+diff -rupN --no-dereference giflib-5.2.2/getarg.h giflib-5.2.2-new/getarg.h
+--- giflib-5.2.2/getarg.h	2024-02-19 03:20:00.000000000 +0100
++++ giflib-5.2.2-new/getarg.h	1970-01-01 01:00:00.000000000 +0100
+@@ -1,54 +0,0 @@
+-/***************************************************************************
+-
+-getarg.h - Support routines for the giflib utilities
+-
+-SPDX-License-Identifier: MIT
+-
+- **************************************************************************/
+-
+-#ifndef _GETARG_H
+-#define _GETARG_H
+-
+-#include "gif_lib.h"
+-#include <stdbool.h>
+-
+-#define VERSION_COOKIE " Version %d.%d, "
+-
+-/***************************************************************************
+-   Error numbers as returned by GAGetArg routine:
+-***************************************************************************/
+-#define CMD_ERR_NotAnOpt 1  /* None Option found. */
+-#define CMD_ERR_NoSuchOpt 2 /* Undefined Option Found. */
+-#define CMD_ERR_WildEmpty 3 /* Empty input for !*? seq. */
+-#define CMD_ERR_NumRead 4   /* Failed on reading number. */
+-#define CMD_ERR_AllSatis 5  /* Fail to satisfy (must-'!') option. */
+-
+-bool GAGetArgs(int argc, char **argv, char *CtrlStr, ...);
+-void GAPrintErrMsg(int Error);
+-void GAPrintHowTo(char *CtrlStr);
+-
+-/******************************************************************************
+- From qprintf.c
+-******************************************************************************/
+-extern void GifQprintf(char *Format, ...);
+-extern void PrintGifError(int ErrorCode);
+-
+-/******************************************************************************
+- Color table quantization
+-******************************************************************************/
+-int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
+-                      int *ColorMapSize, GifByteType *RedInput,
+-                      GifByteType *GreenInput, GifByteType *BlueInput,
+-                      GifByteType *OutputBuffer, GifColorType *OutputColorMap);
+-
+-/* These used to live in the library header */
+-#define GIF_MESSAGE(Msg) fprintf(stderr, "\n%s: %s\n", PROGRAM_NAME, Msg)
+-#define GIF_EXIT(Msg)                                                          \
+-	{                                                                      \
+-		GIF_MESSAGE(Msg);                                              \
+-		exit(-3);                                                      \
+-	}
+-
+-#endif /* _GETARG_H */
+-
+-/* end */
+diff -rupN --no-dereference giflib-5.2.2/gif2rgb.c giflib-5.2.2-new/gif2rgb.c
+--- giflib-5.2.2/gif2rgb.c	2025-04-15 16:56:27.247167987 +0200
++++ giflib-5.2.2-new/gif2rgb.c	2025-04-15 16:56:27.276617411 +0200
+@@ -34,7 +34,7 @@ with our utilities mainly interesting as
+ #include <io.h>
+ #endif /* _WIN32 */
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gif2rgb"
+diff -rupN --no-dereference giflib-5.2.2/gifbg.c giflib-5.2.2-new/gifbg.c
+--- giflib-5.2.2/gifbg.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gifbg.c	2025-04-15 16:56:27.276870781 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifbg"
+diff -rupN --no-dereference giflib-5.2.2/gifbuild.c giflib-5.2.2-new/gifbuild.c
+--- giflib-5.2.2/gifbuild.c	2024-02-19 04:05:16.000000000 +0100
++++ giflib-5.2.2-new/gifbuild.c	2025-04-15 16:56:27.277111740 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifbuild"
+diff -rupN --no-dereference giflib-5.2.2/gifclrmp.c giflib-5.2.2-new/gifclrmp.c
+--- giflib-5.2.2/gifclrmp.c	2024-02-19 04:01:27.000000000 +0100
++++ giflib-5.2.2-new/gifclrmp.c	2025-04-15 16:56:27.277368098 +0200
+@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifclrmp"
+diff -rupN --no-dereference giflib-5.2.2/gifcolor.c giflib-5.2.2-new/gifcolor.c
+--- giflib-5.2.2/gifcolor.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gifcolor.c	2025-04-15 16:56:27.277585194 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifcolor"
+diff -rupN --no-dereference giflib-5.2.2/gifecho.c giflib-5.2.2-new/gifecho.c
+--- giflib-5.2.2/gifecho.c	2024-02-19 04:01:27.000000000 +0100
++++ giflib-5.2.2-new/gifecho.c	2025-04-15 16:56:27.277769355 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifecho"
+diff -rupN --no-dereference giflib-5.2.2/giffilter.c giflib-5.2.2-new/giffilter.c
+--- giflib-5.2.2/giffilter.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/giffilter.c	2025-04-15 16:56:27.277955467 +0200
+@@ -25,7 +25,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "giffilter"
+diff -rupN --no-dereference giflib-5.2.2/giffix.c giflib-5.2.2-new/giffix.c
+--- giflib-5.2.2/giffix.c	2024-02-19 04:01:27.000000000 +0100
++++ giflib-5.2.2-new/giffix.c	2025-04-15 16:56:27.278150152 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "giffix"
+diff -rupN --no-dereference giflib-5.2.2/gif_getarg.h giflib-5.2.2-new/gif_getarg.h
+--- giflib-5.2.2/gif_getarg.h	1970-01-01 01:00:00.000000000 +0100
++++ giflib-5.2.2-new/gif_getarg.h	2025-04-15 16:56:27.278343984 +0200
+@@ -0,0 +1,54 @@
++/***************************************************************************
++
++getarg.h - Support routines for the giflib utilities
++
++SPDX-License-Identifier: MIT
++
++ **************************************************************************/
++
++#ifndef _GETARG_H
++#define _GETARG_H
++
++#include "gif_lib.h"
++#include <stdbool.h>
++
++#define VERSION_COOKIE " Version %d.%d, "
++
++/***************************************************************************
++   Error numbers as returned by GAGetArg routine:
++***************************************************************************/
++#define CMD_ERR_NotAnOpt 1  /* None Option found. */
++#define CMD_ERR_NoSuchOpt 2 /* Undefined Option Found. */
++#define CMD_ERR_WildEmpty 3 /* Empty input for !*? seq. */
++#define CMD_ERR_NumRead 4   /* Failed on reading number. */
++#define CMD_ERR_AllSatis 5  /* Fail to satisfy (must-'!') option. */
++
++bool GAGetArgs(int argc, char **argv, char *CtrlStr, ...);
++void GAPrintErrMsg(int Error);
++void GAPrintHowTo(char *CtrlStr);
++
++/******************************************************************************
++ From qprintf.c
++******************************************************************************/
++extern void GifQprintf(char *Format, ...);
++extern void PrintGifError(int ErrorCode);
++
++/******************************************************************************
++ Color table quantization
++******************************************************************************/
++int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
++                      int *ColorMapSize, GifByteType *RedInput,
++                      GifByteType *GreenInput, GifByteType *BlueInput,
++                      GifByteType *OutputBuffer, GifColorType *OutputColorMap);
++
++/* These used to live in the library header */
++#define GIF_MESSAGE(Msg) fprintf(stderr, "\n%s: %s\n", PROGRAM_NAME, Msg)
++#define GIF_EXIT(Msg)                                                          \
++	{                                                                      \
++		GIF_MESSAGE(Msg);                                              \
++		exit(-3);                                                      \
++	}
++
++#endif /* _GETARG_H */
++
++/* end */
+diff -rupN --no-dereference giflib-5.2.2/gifhisto.c giflib-5.2.2-new/gifhisto.c
+--- giflib-5.2.2/gifhisto.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gifhisto.c	2025-04-15 16:56:27.278489203 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifhisto"
+diff -rupN --no-dereference giflib-5.2.2/gifinto.c giflib-5.2.2-new/gifinto.c
+--- giflib-5.2.2/gifinto.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gifinto.c	2025-04-15 16:56:27.278753624 +0200
+@@ -19,7 +19,7 @@ SPDX-License-Identifier: MIT
+ #include <unistd.h>
+ #endif /* _WIN32 */
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifinto"
+diff -rupN --no-dereference giflib-5.2.2/gifsponge.c giflib-5.2.2-new/gifsponge.c
+--- giflib-5.2.2/gifsponge.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gifsponge.c	2025-04-15 16:56:27.278945283 +0200
+@@ -25,7 +25,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifsponge"
+diff -rupN --no-dereference giflib-5.2.2/giftext.c giflib-5.2.2-new/giftext.c
+--- giflib-5.2.2/giftext.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/giftext.c	2025-04-15 16:56:27.279142751 +0200
+@@ -16,7 +16,7 @@ SPDX-License-Identifier: MIT
+ #include <io.h>
+ #endif /* _WIN32 */
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "giftext"
+diff -rupN --no-dereference giflib-5.2.2/giftool.c giflib-5.2.2-new/giftool.c
+--- giflib-5.2.2/giftool.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/giftool.c	2025-04-15 16:56:27.279376975 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "getopt.h"
+ #include "gif_lib.h"
+ 
+diff -rupN --no-dereference giflib-5.2.2/gifwedge.c giflib-5.2.2-new/gifwedge.c
+--- giflib-5.2.2/gifwedge.c	2024-02-19 04:01:27.000000000 +0100
++++ giflib-5.2.2-new/gifwedge.c	2025-04-15 16:56:27.279666309 +0200
+@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include "getarg.h"
++#include "gif_getarg.h"
+ #include "gif_lib.h"
+ 
+ #define PROGRAM_NAME "gifwedge"
+diff -rupN --no-dereference giflib-5.2.2/Makefile giflib-5.2.2-new/Makefile
+--- giflib-5.2.2/Makefile	2025-04-15 16:56:27.223615747 +0200
++++ giflib-5.2.2-new/Makefile	2025-04-15 16:56:27.279870038 +0200
+@@ -34,7 +34,7 @@ HEADERS = gif_hash.h  gif_lib.h  gif_lib
+ OBJECTS = $(SOURCES:.c=.o)
+ 
+ USOURCES = qprintf.c getarg.c
+-UHEADERS = getarg.h
++UHEADERS = gif_getarg.h
+ UOBJECTS = $(USOURCES:.c=.o)
+ 
+ UNAME:=$(shell uname)

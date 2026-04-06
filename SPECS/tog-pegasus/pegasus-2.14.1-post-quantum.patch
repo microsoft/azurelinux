@@ -1,0 +1,62 @@
+diff -up pegasus/src/Pegasus/Common/SSLContext.cpp.orig pegasus/src/Pegasus/Common/SSLContext.cpp
+--- pegasus/src/Pegasus/Common/SSLContext.cpp.orig	2025-05-30 09:11:14.935204675 +0200
++++ pegasus/src/Pegasus/Common/SSLContext.cpp	2025-06-18 09:29:02.485778858 +0200
+@@ -1095,6 +1095,58 @@ SSL_CTX* SSLContextRep::_makeSSLContext(
+         keyLoaded = true;
+     }
+ 
++    //
++    // Load fall back certificate/key pair if both exist
++    //
++
++    const String& certFallbackPath = "/etc/pki/Pegasus/server-fallback.pem";
++    const String& keyFallbackPath = "/etc/pki/Pegasus/file-fallback.pem";
++
++    FILE* certIs = Executor::openFile(certFallbackPath.getCString(), 'r');
++    FILE* keyIs = Executor::openFile(keyFallbackPath.getCString(), 'r');
++
++    if (certIs && keyIs)
++    {
++        fclose(certIs);
++        fclose(keyIs);
++
++        PEG_TRACE((TRC_SSL, Tracer::LEVEL4,
++            "---> SSL: Loading server certificate fall back from: %s",
++            (const char*)certFallbackPath.getCString()));
++
++        if (SSL_CTX_use_certificate_file(sslContext,
++            (const char*)certFallbackPath.getCString(), SSL_FILETYPE_PEM) != 1)
++        {
++            PEG_TRACE((TRC_SSL, Tracer::LEVEL1,
++                "---> SSL: No server certificate fall back found in %s",
++                (const char*)certFallbackPath.getCString()));
++            MessageLoaderParms parms(
++                "Common.SSLContext.COULD_NOT_ACCESS_SERVER_CERTIFICATE",
++                "Could not access server certificate fall back in $0.",
++                (const char*)certFallbackPath.getCString());
++
++            SSL_CTX_free(sslContext);
++            sslContext = NULL;
++            PEG_METHOD_EXIT();
++            throw SSLException(parms);
++        }
++
++        PEG_TRACE((TRC_SSL, Tracer::LEVEL4,
++            "---> SSL: loading private key fall back from: %s",
++            (const char*)keyFallbackPath.getCString()));
++
++        if (SSL_CTX_use_PrivateKey_file(sslContext, (const char*)keyFallbackPath.getCString(), SSL_FILETYPE_PEM) != 1)
++        {
++            MessageLoaderParms parms(
++                "Common.SSLContext.COULD_NOT_GET_PRIVATE_KEY",
++                "Could not get private key fall back.");
++            SSL_CTX_free(sslContext);
++            sslContext = NULL;
++            PEG_METHOD_EXIT();
++            throw SSLException(parms);
++        }
++    }
++
+     PEG_METHOD_EXIT();
+     return sslContext;
+ }

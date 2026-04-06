@@ -1,0 +1,15 @@
+[Unit]
+Description=Kerberos 5 Password-changing and Administration
+Wants=network-online.target
+After=syslog.target network.target network-online.target
+AssertPathExists=!/var/kerberos/krb5kdc/kpropd.acl
+
+[Service]
+Type=forking
+PIDFile=/run/kadmind.pid
+EnvironmentFile=-/etc/sysconfig/kadmin
+ExecStart=/usr/sbin/kadmind -P /run/kadmind.pid $KADMIND_ARGS
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

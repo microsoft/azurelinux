@@ -1,0 +1,15 @@
+[Unit]
+Description=Check that SELinux is not disabled the unsafe way
+ConditionKernelCommandLine=!selinux=0
+After=sysinit.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/selinux/config
+ExecCondition=test "$SELINUX" = disabled
+ExecStart=/usr/bin/echo 'SELINUX=disabled in /etc/selinux/config, but no selinux=0 on kernel command line - SELinux may not be fully disabled. Please update bootloader configuration to pass selinux=0 to kernel at boot.'
+StandardOutput=journal+console
+SyslogLevel=warning
+
+[Install]
+WantedBy=multi-user.target

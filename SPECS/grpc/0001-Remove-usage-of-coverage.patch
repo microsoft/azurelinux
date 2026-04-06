@@ -1,0 +1,121 @@
+From a30b55f51196b446dfb7bc1422cad0dc98274571 Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Mon, 9 Sep 2024 18:46:13 -0500
+Subject: [PATCH] Remove usage of coverage
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ src/python/grpcio_tests/setup.py         |  2 +-
+ src/python/grpcio_tests/tests/_loader.py |  8 ------
+ src/python/grpcio_tests/tests/_result.py | 35 ++----------------------
+ 3 files changed, 3 insertions(+), 42 deletions(-)
+
+diff --git a/src/python/grpcio_tests/setup.py b/src/python/grpcio_tests/setup.py
+index f0679eb170..4345b94253 100644
+--- a/src/python/grpcio_tests/setup.py
++++ b/src/python/grpcio_tests/setup.py
+@@ -37,7 +37,7 @@ PACKAGE_DIRECTORIES = {
+ }
+ 
+ INSTALL_REQUIRES = (
+-    'coverage>=4.0', 'grpcio>={version}'.format(version=grpc_version.VERSION),
++    'grpcio>={version}'.format(version=grpc_version.VERSION),
+     'grpcio-channelz>={version}'.format(version=grpc_version.VERSION),
+     'grpcio-status>={version}'.format(version=grpc_version.VERSION),
+     'grpcio-tools>={version}'.format(version=grpc_version.VERSION),
+diff --git a/src/python/grpcio_tests/tests/_loader.py b/src/python/grpcio_tests/tests/_loader.py
+index 80c107aa8e..cb4e934c1b 100644
+--- a/src/python/grpcio_tests/tests/_loader.py
++++ b/src/python/grpcio_tests/tests/_loader.py
+@@ -19,8 +19,6 @@ import pkgutil
+ import re
+ import unittest
+ 
+-import coverage
+-
+ TEST_MODULE_REGEX = r'^.*_test$'
+ 
+ 
+@@ -44,10 +42,6 @@ class Loader(object):
+     def loadTestsFromNames(self, names, module=None):
+         """Function mirroring TestLoader::loadTestsFromNames, as expected by
+     setuptools.setup argument `test_loader`."""
+-        # ensure that we capture decorators and definitions (else our coverage
+-        # measure unnecessarily suffers)
+-        coverage_context = coverage.Coverage(data_suffix=True)
+-        coverage_context.start()
+         imported_modules = tuple(
+             importlib.import_module(name) for name in names)
+         for imported_module in imported_modules:
+@@ -58,8 +52,6 @@ class Loader(object):
+             except AttributeError:
+                 continue
+             self.walk_packages(package_paths)
+-        coverage_context.stop()
+-        coverage_context.save()
+         return self.suite
+ 
+     def walk_packages(self, package_paths):
+diff --git a/src/python/grpcio_tests/tests/_result.py b/src/python/grpcio_tests/tests/_result.py
+index 389d5f4f96..9d3e0cf15c 100644
+--- a/src/python/grpcio_tests/tests/_result.py
++++ b/src/python/grpcio_tests/tests/_result.py
+@@ -20,7 +20,6 @@ import traceback
+ import unittest
+ from xml.etree import ElementTree
+ 
+-import coverage
+ from six import moves
+ 
+ from tests import _loader
+@@ -216,36 +215,6 @@ class AugmentedResult(unittest.TestResult):
+                 if filter(self.cases[case_id]))
+ 
+ 
+-class CoverageResult(AugmentedResult):
+-    """Extension to AugmentedResult adding coverage.py support per test.\
+-
+-  Attributes:
+-    coverage_context (coverage.Coverage): coverage.py management object.
+-  """
+-
+-    def __init__(self, id_map):
+-        """See AugmentedResult.__init__."""
+-        super(CoverageResult, self).__init__(id_map=id_map)
+-        self.coverage_context = None
+-
+-    def startTest(self, test):
+-        """See unittest.TestResult.startTest.
+-
+-    Additionally initializes and begins code coverage tracking."""
+-        super(CoverageResult, self).startTest(test)
+-        self.coverage_context = coverage.Coverage(data_suffix=True)
+-        self.coverage_context.start()
+-
+-    def stopTest(self, test):
+-        """See unittest.TestResult.stopTest.
+-
+-    Additionally stops and deinitializes code coverage tracking."""
+-        super(CoverageResult, self).stopTest(test)
+-        self.coverage_context.stop()
+-        self.coverage_context.save()
+-        self.coverage_context = None
+-
+-
+ class _Colors(object):
+     """Namespaced constants for terminal color magic numbers."""
+     HEADER = '\033[95m'
+@@ -258,8 +227,8 @@ class _Colors(object):
+     END = '\033[0m'
+ 
+ 
+-class TerminalResult(CoverageResult):
+-    """Extension to CoverageResult adding basic terminal reporting."""
++class TerminalResult(AugmentedResult):
++    """Extension to AugmentedResult adding basic terminal reporting."""
+ 
+     def __init__(self, out, id_map):
+         """Initialize the result object.
+-- 
+2.46.0
+

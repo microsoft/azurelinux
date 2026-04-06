@@ -1,0 +1,25 @@
+From b89cbe2e762c9669989e76323dbb5d972901945d Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 11 Aug 2025 13:18:43 +0200
+Subject: [PATCH] Fix Java version parsing for non-standard versions
+
+---
+ .../java/org/mariadb/jdbc/integration/CredentialPluginTest.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/java/org/mariadb/jdbc/integration/CredentialPluginTest.java b/src/test/java/org/mariadb/jdbc/integration/CredentialPluginTest.java
+index a031f1b..a199830 100644
+--- a/src/test/java/org/mariadb/jdbc/integration/CredentialPluginTest.java
++++ b/src/test/java/org/mariadb/jdbc/integration/CredentialPluginTest.java
+@@ -20,7 +20,7 @@ public class CredentialPluginTest extends Common {
+    */
+   @BeforeAll
+   public static void beforeTest() throws SQLException {
+-    String version = System.getProperty("java.version");
++    String version = System.getProperty("java.version").replaceAll("[^.\\d]", "");
+     int majorVersion =
+         (version.indexOf(".") >= 0)
+             ? Integer.parseInt(version.substring(0, version.indexOf(".")))
+-- 
+2.50.1
+

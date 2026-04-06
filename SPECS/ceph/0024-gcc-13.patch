@@ -1,0 +1,42 @@
+--- ceph-18.1.2/src/common/subsys_types.h.orig	2023-06-27 15:59:59.000000000 -0400
++++ ceph-18.1.2/src/common/subsys_types.h	2023-07-04 19:36:55.941238973 -0400
+@@ -54,7 +54,7 @@
+ #undef DEFAULT_SUBSYS
+ }
+ 
+-constexpr static std::uint8_t
++constexpr static uint8_t
+ ceph_subsys_get_max_default_level(const std::size_t subidx) {
+   const auto item = ceph_subsys_get_as_array()[subidx];
+   return std::max(item.log_level, item.gather_level);
+--- ceph-18.1.2/src/msg/async/crypto_onwire.h.orig	2023-06-27 15:59:59.000000000 -0400
++++ ceph-18.1.2/src/msg/async/crypto_onwire.h	2023-07-04 19:36:55.957238704 -0400
+@@ -95,7 +95,7 @@
+   // Transmitter can append extra bytes of ciphertext at the -final step.
+   // This method return how much was added, and thus let client translate
+   // plaintext size into ciphertext size to grab from wire.
+-  virtual std::uint32_t get_extra_size_at_final() = 0;
++  virtual uint32_t get_extra_size_at_final() = 0;
+ 
+   // Instance of RxHandler must be reset before doing any decrypt-update
+   // step. This applies also to situation when decrypt-final was already
+--- ceph-18.1.2/src/rocksdb/table/block_based/data_block_hash_index.h.orig	2023-05-24 15:55:23.000000000 -0400
++++ ceph-18.1.2/src/rocksdb/table/block_based/data_block_hash_index.h	2023-07-04 19:36:55.971238469 -0400
+@@ -8,6 +8,7 @@
+ #include <cstdint>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "rocksdb/slice.h"
+ 
+--- ceph-18.1.2/src/rocksdb/util/string_util.h.orig	2023-05-24 15:55:23.000000000 -0400
++++ ceph-18.1.2/src/rocksdb/util/string_util.h	2023-07-04 19:36:55.991238133 -0400
+@@ -11,6 +11,7 @@
+ #include <string>
+ #include <unordered_map>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "rocksdb/rocksdb_namespace.h"
+ 

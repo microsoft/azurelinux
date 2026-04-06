@@ -1,0 +1,28 @@
+From 19a83736d99acc42308f8003094c27b920d1c285 Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Sun, 7 Jul 2024 05:07:39 -0600
+Subject: [PATCH] Prepare magma cmake for fedora
+
+Need to version *.so'
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0c9b41c7d7fb..06e401e1199f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -760,6 +760,8 @@ foreach( TEST ${sparse_testing_all} )
+ endforeach()
+ add_custom_target( sparse-testing DEPENDS ${sparse-testing} )
+ 
++SET_TARGET_PROPERTIES(magma PROPERTIES VERSION magma_VERSION SOVERSION magma_VERSION)
++SET_TARGET_PROPERTIES(magma_sparse PROPERTIES VERSION magma_VERSION SOVERSION magma_VERSION)
+ 
+ # ----------------------------------------
+ # what to install
+-- 
+2.45.1
+

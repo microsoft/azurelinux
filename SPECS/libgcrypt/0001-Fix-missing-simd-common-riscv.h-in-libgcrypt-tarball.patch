@@ -1,0 +1,33 @@
+From 62f84bb3040fc138f061032889574f82ce72a0bc Mon Sep 17 00:00:00 2001
+Message-ID: <62f84bb3040fc138f061032889574f82ce72a0bc.1764154972.git.marcin@juszkiewicz.com.pl>
+From: Collin Funk via Gcrypt-devel <gcrypt-devel@gnupg.org>
+Date: Fri, 16 May 2025 21:10:37 -0700
+Subject: [PATCH] Fix missing simd-common-riscv.h in libgcrypt tarball.
+
+* cipher/Makefile.am (EXTRA_libcipher_la_SOURCES): Add
+simd-common-riscv.h.
+
+--
+
+GnuPG-bug-id: 7647
+Signed-off-by: Collin Funk <collin.funk1@gmail.com>
+---
+ cipher/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index c33cce0a..2e129cab 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -129,7 +129,7 @@ EXTRA_libcipher_la_SOURCES = \
+ 	seed.c \
+ 	serpent.c serpent-sse2-amd64.S serpent-avx2-amd64.S \
+ 	serpent-avx512-x86.c serpent-armv7-neon.S \
+-	simd-common-aarch64.h simd-common-ppc.h \
++	simd-common-aarch64.h simd-common-ppc.h simd-common-riscv.h \
+ 	sm4.c sm4-aesni-avx-amd64.S sm4-aesni-avx2-amd64.S \
+ 	sm4-gfni-avx2-amd64.S sm4-gfni-avx512-amd64.S \
+ 	sm4-aarch64.S sm4-armv8-aarch64-ce.S sm4-armv9-aarch64-sve-ce.S \
+-- 
+2.52.0
+

@@ -1,0 +1,31 @@
+From ae671b1b1f4219b090628f259b994eada336d965 Mon Sep 17 00:00:00 2001
+From: John Pye <john.pye@anu.edu.au>
+Date: Wed, 3 Nov 2021 09:07:03 +1100
+Subject: [PATCH] adding an alias to 'Century'
+
+(see https://docs.microsoft.com/en-us/typography/font-list/century)
+---
+ fontconfig/urw-c059.conf | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/fontconfig/urw-c059.conf b/fontconfig/urw-c059.conf
+index 8d3126e..35b3a24 100644
+--- a/fontconfig/urw-c059.conf
++++ b/fontconfig/urw-c059.conf
+@@ -40,6 +40,13 @@
+     </accept>
+   </alias>
+ 
++  <alias binding="same">
++    <family>Century</family>
++    <accept>
++      <family>C059</family>
++    </accept>
++  </alias>
++
+   <alias binding="same">
+     <family>Tex Gyre Schola</family>
+     <accept>
+-- 
+2.35.3
+

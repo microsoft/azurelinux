@@ -1,0 +1,207 @@
+From bec77f8fdc985ecf152ae0ab041db78bccaa45c1 Mon Sep 17 00:00:00 2001
+From: Cristian Le <git@lecris.dev>
+Date: Thu, 13 Mar 2025 09:44:52 +0100
+Subject: [PATCH 1/2] Switch to using built-in CMakePackageConfigHelpers
+
+---
+ libgeotiff/cmake/CMakeLists.txt               | 41 ++++++++-----------
+ .../cmake/project-config-version.cmake.in     | 33 ---------------
+ libgeotiff/cmake/project-config.cmake.in      | 22 ++++------
+ 3 files changed, 27 insertions(+), 69 deletions(-)
+ delete mode 100644 libgeotiff/cmake/project-config-version.cmake.in
+
+diff --git a/cmake/CMakeLists.txt b/cmake/CMakeLists.txt
+index b7668afd..438da2ee 100644
+--- a/cmake/CMakeLists.txt
++++ b/cmake/CMakeLists.txt
+@@ -2,33 +2,28 @@
+ # Config file generation and installation
+ #############################################################################
+ 
+-# geotiff-config.cmake for the install tree.  It's installed in
+-# ${INSTALL_CMAKE_DIR} and @PROJECT_ROOT_DIR@ is the relative
+-# path to the root from there.  (Note that the whole install tree can
+-# be relocated.)
+-if (NOT WIN32)
+-  set (INSTALL_CMAKE_DIR "share/cmake/${PROJECT_NAME}")
+-  set (PROJECT_ROOT_DIR "../../..")
+-else ()
+-  set (INSTALL_CMAKE_DIR "cmake")
+-  set (PROJECT_ROOT_DIR "..")
+-endif ()
+ 
+-configure_file (project-config.cmake.in project-config.cmake @ONLY)
+-configure_file (project-config-version.cmake.in
+-  project-config-version.cmake @ONLY)
+-install (FILES
+-  "${CMAKE_CURRENT_BINARY_DIR}/project-config.cmake"
+-  DESTINATION "${INSTALL_CMAKE_DIR}"
+-  RENAME "${PROJECT_NAME_LOWER}-config.cmake")
++set (INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
++
++include(CMakePackageConfigHelpers)
++configure_package_config_file(
++    project-config.cmake.in
++    ${PROJECT_NAME_LOWER}Config.cmake
++    PATH_VARS CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_INCLUDEDIR CMAKE_INSTALL_BINDIR
++    INSTALL_DESTINATION ${INSTALL_CMAKE_DIR}
++)
++write_basic_package_version_file(
++    ${PROJECT_NAME_LOWER}ConfigVersion.cmake
++    VERSION ${PROJECT_VERSION}
++    COMPATIBILITY AnyNewerVersion
++)
+ install (FILES
+-  "${CMAKE_CURRENT_BINARY_DIR}/project-config-version.cmake"
++  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWER}Config.cmake"
++  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWER}ConfigVersion.cmake"
+   DESTINATION "${INSTALL_CMAKE_DIR}"
+-  RENAME "${PROJECT_NAME_LOWER}-config-version.cmake")
+-# Make information about the cmake targets (the library and the tools)
+-# available.
++)
+ install (EXPORT depends
+-  FILE ${PROJECT_NAME_LOWER}-depends.cmake
++  FILE ${PROJECT_NAME_LOWER}Targets.cmake
+   DESTINATION "${INSTALL_CMAKE_DIR}")
+ 
+ 
+diff --git a/cmake/project-config-version.cmake.in b/cmake/project-config-version.cmake.in
+deleted file mode 100644
+index d695aa2e..00000000
+--- a/cmake/project-config-version.cmake.in
++++ /dev/null
+@@ -1,33 +0,0 @@
+-# Version checking for @PROJECT_NAME@
+-
+-set (PACKAGE_VERSION "@PROJECT_VERSION@")
+-set (PACKAGE_VERSION_MAJOR "@PROJECT_VERSION_MAJOR@")
+-set (PACKAGE_VERSION_MINOR "@PROJECT_VERSION_MINOR@")
+-set (PACKAGE_VERSION_PATCH "@PROJECT_VERSION_PATCH@")
+-
+-if (NOT PACKAGE_FIND_NAME STREQUAL "@PROJECT_NAME@")
+-  # Check package name (in particular, because of the way cmake finds
+-  # package config files, the capitalization could easily be "wrong").
+-  # This is necessary to ensure that the automatically generated
+-  # variables, e.g., <package>_FOUND, are consistently spelled.  Make
+-  # this a WARNING, because this is a user error that needs to be fixed.
+-  message (WARNING
+-    "Mismatched package names: use find_package(@PROJECT_NAME@ ...) instead"
+-    " of find_package(${PACKAGE_FIND_NAME} ...)")
+-  set (PACKAGE_VERSION_UNSUITABLE TRUE)
+-elseif (NOT (APPLE OR CMAKE_SIZEOF_VOID_P EQUAL @CMAKE_SIZEOF_VOID_P@))
+-  # Reject if there's a 32-bit/64-bit mismatch (may not be necessary
+-  # with Apple since a multi-architecture library might be built for
+-  # that platform).
+-  message (STATUS
+-    "${CMAKE_CURRENT_LIST_FILE} unsuitable because package built with "
+-    "sizeof(*void) =  @CMAKE_SIZEOF_VOID_P@")
+-  set (PACKAGE_VERSION_UNSUITABLE TRUE)
+-elseif (PACKAGE_FIND_VERSION)
+-  if (PACKAGE_FIND_VERSION VERSION_EQUAL PACKAGE_VERSION)
+-    set (PACKAGE_VERSION_EXACT TRUE)
+-  elseif (PACKAGE_FIND_VERSION VERSION_LESS PACKAGE_VERSION
+-    AND PACKAGE_FIND_VERSION_MAJOR EQUAL PACKAGE_VERSION_MAJOR)
+-    set (PACKAGE_VERSION_COMPATIBLE TRUE)
+-  endif ()
+-endif ()
+diff --git a/cmake/project-config.cmake.in b/cmake/project-config.cmake.in
+index f8a97526..954d3896 100644
+--- a/cmake/project-config.cmake.in
++++ b/cmake/project-config.cmake.in
+@@ -1,10 +1,10 @@
+-# Configure @PROJECT_NAME@
+-#
++@PACKAGE_INIT@
++
+ # Set
+ #  @PROJECT_NAME@_FOUND = 1
+-#  @PROJECT_NAME@_INCLUDE_DIRS = /usr/local/include
+-#  @PROJECT_NAME@_LIBRARY_DIRS = /usr/local/lib
+-#  @PROJECT_NAME@_BINARY_DIRS = /usr/local/bin
++#  @PROJECT_NAME@_INCLUDE_DIRS = ${CMAKE_INSTALL_INCLUDEDIR}
++#  @PROJECT_NAME@_LIBRARY_DIRS = ${CMAKE_INSTALL_LIBDIR}
++#  @PROJECT_NAME@_BINARY_DIRS = ${CMAKE_INSTALL_BINDIR}
+ #  @PROJECT_NAME@_VERSION = 1.4.1 (for example)
+ 
+ # For compatibility with FindGeoTIFF.cmake, also set
+@@ -14,13 +14,9 @@
+ # @PROJECT_NAME_UPPER@_LIBRARIES
+ 
+ # Tell the user project where to find our headers and libraries
+-get_filename_component (_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+-get_filename_component (_ROOT "${_DIR}/@PROJECT_ROOT_DIR@" ABSOLUTE)
+-set (@PROJECT_NAME@_INCLUDE_DIRS "${_ROOT}/include")
+-set (@PROJECT_NAME@_LIBRARY_DIRS "${_ROOT}/lib")
+-set (@PROJECT_NAME@_BINARY_DIRS "${_ROOT}/bin")
+-unset (_ROOT)
+-unset (_DIR)
++set (@PROJECT_NAME@_INCLUDE_DIRS @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@)
++set (@PROJECT_NAME@_LIBRARY_DIRS @PACKAGE_CMAKE_INSTALL_LIBDIR@)
++set (@PROJECT_NAME@_BINARY_DIRS @PACKAGE_CMAKE_INSTALL_BINDIR@)
+ 
+ include(CMakeFindDependencyMacro)
+ @CONFIG_PUBLIC_DEPENDENCIES@
+@@ -46,7 +42,7 @@ if(NOT @PROJECT_NAME@_FIND_QUIETLY)
+ endif()
+ 
+ # Read in the exported definition of the library
+-include ("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME_LOWER@-depends.cmake")
++include ("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME_LOWER@Targets.cmake")
+ 
+ # For compatibility with FindGeoTIFF.cmake
+ set (@PROJECT_NAME_UPPER@_FOUND 1)
+
+From 9b5a853570c4a0c5c666b6ef24fdaf3bf63d1813 Mon Sep 17 00:00:00 2001
+From: Cristian Le <git@lecris.dev>
+Date: Thu, 13 Mar 2025 09:52:46 +0100
+Subject: [PATCH 2/2] Revise some usage for `CMAKE_INSTALL_*` variables
+
+- install(TARGETS) does not need explicitly setting variables
+- Genex $<INSTALL_PREFIX> is more reliable than hard-coded CMAKE_INSTALL_PREFIX
+
+Signed-off-by: Cristian Le <git@lecris.dev>
+---
+ libgeotiff/CMakeLists.txt     | 8 ++------
+ libgeotiff/bin/CMakeLists.txt | 5 +----
+ 2 files changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0216ead5..54680fb4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -291,7 +291,7 @@ if(UNIX)
+       set_target_properties(
+         ${GEOTIFF_LIBRARY_TARGET}
+         PROPERTIES
+-        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
++        INSTALL_NAME_DIR "$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}")
+    endif()
+ endif()
+ 
+@@ -350,11 +350,7 @@ target_include_directories( ${GEOTIFF_LIBRARY_TARGET} PUBLIC
+             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+ 
+ INSTALL( TARGETS ${GEOTIFF_LIBRARY_TARGET}
+-     EXPORT depends
+-     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+-     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
++     EXPORT depends)
+ 
+ IF (MSVC)
+ IF (BUILD_SHARED_LIBS)
+diff --git a/bin/CMakeLists.txt b/bin/CMakeLists.txt
+index 87957b1a..dd4b4f4a 100644
+--- a/bin/CMakeLists.txt
++++ b/bin/CMakeLists.txt
+@@ -39,7 +39,4 @@ MESSAGE(STATUS "Adding GeoTIFF utilities to build - done: ${GEOTIFF_UTILITIES}")
+ ###############################################################################
+ # Targets installation
+ 
+-INSTALL(TARGETS ${GEOTIFF_UTILITIES}
+-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++INSTALL(TARGETS ${GEOTIFF_UTILITIES})

@@ -1,0 +1,55 @@
+From 8623f65e1fd064a679f75e3e075dff86f30282a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Old=C5=99ich=20Jedli=C4=8Dka?= <oldium.pro@gmail.com>
+Date: Sat, 6 Apr 2024 19:21:11 +0200
+Subject: [PATCH] libparted: Fail early when detecting nilfs2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When the disk is encrypted with TCG Opal HW encryption (supported by
+cryptsetup 2.7.0+), the partition initially contains locked area, which
+shows reading errors in kernel logs and may lead to configuring the disk
+to work with lower reading speed. When the disk area is unlocked with
+password, the reading succeeds. The beginning of the protected partition is
+not locked and contains LUKS header, this is always readable.
+
+To work around the errors when reading from the locked area, try first
+detecting nilfs2 at the beginning (may be an unprotected LUKS header area)
+and only check the second superblock that is at the end of the area (and
+possibly locked) if the first one is valid (meaning the partition is not
+LUKS-protected).
+
+This is a change in behavior, but is consistent with the nilfs2 code, which
+considers both superblocks mandatory, see [1].
+
+[1] https://github.com/nilfs-dev/nilfs-utils/blob/master/lib/sb.c#L135-L158
+
+Signed-off-by: Oldřich Jedlička <oldium.pro@gmail.com>
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ libparted/fs/nilfs2/nilfs2.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/libparted/fs/nilfs2/nilfs2.c b/libparted/fs/nilfs2/nilfs2.c
+index 6204542..40f8567 100644
+--- a/libparted/fs/nilfs2/nilfs2.c
++++ b/libparted/fs/nilfs2/nilfs2.c
+@@ -118,11 +118,12 @@ nilfs2_probe (PedGeometry* geom)
+ 
+ 	if (ped_geometry_read(geom, buf, 0, sectors))
+ 		sb = (struct nilfs2_super_block*)(buf + 1024);
++	if (!sb || !is_valid_nilfs_sb(sb))
++		return NULL;
++
+ 	if (ped_geometry_read(geom, buff2, sb2off, sectors2))
+ 		sb2 = (struct nilfs2_super_block*)buff2;
+-
+-	if ((!sb || !is_valid_nilfs_sb(sb)) &&
+-	    (!sb2 || !is_valid_nilfs_sb(sb2)))
++	if (!sb2 || !is_valid_nilfs_sb(sb2))
+ 		return NULL;
+ 
+ 	/* reserve 4k bytes for secondary superblock */
+-- 
+2.47.0
+

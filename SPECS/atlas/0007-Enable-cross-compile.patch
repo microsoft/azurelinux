@@ -1,0 +1,265 @@
+From 14e717c4367c04570863220c3faf5ce41dabbf05 Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Wed, 29 May 2019 17:51:34 +0200
+Subject: [PATCH 7/8] Enable "cross-compile"
+
+This adds support for building ATLAS without running any target code.  In
+order for this to work, the archdefs must contain some additional files
+that would otherwise be built during various tuning steps; see the new
+targets extra_get and extra_put in "CONFIG/ARCHS/Makefile".
+
+Even if the archdefs contain these additional files, cross compilation
+is *not* automatically enabled.  To activate it and disable tuning at
+build time, add the option "-Si archdef 2" when running "configure".
+---
+ CONFIG/ARCHS/Makefile | 24 ++++++++++++++++++++++++
+ bin/atlas_install.c   |  2 ++
+ makes/Make.aux        | 10 +++++-----
+ makes/Make.bin        | 22 ++++++++++++++++++++++
+ makes/Make.l3tune     |  6 ++++++
+ makes/Make.sysinfo    |  8 +++++++-
+ 6 files changed, 66 insertions(+), 6 deletions(-)
+
+diff --git a/CONFIG/ARCHS/Makefile b/CONFIG/ARCHS/Makefile
+index 321e05c..e61b5a0 100644
+--- a/CONFIG/ARCHS/Makefile
++++ b/CONFIG/ARCHS/Makefile
+@@ -211,3 +211,27 @@ ArchNew : $(mach) xnegflt
+ 	- cp $(BLDdir)/bin/INSTALL_LOG/?PerfSumm.txt $(adefd)/.
+ 	rm -f xnegflt
+ archput : sys_put kern_put gemm_put la_put
++
++ifdef ATL_NOTUNE
++
++# To avoid tuning, some extra files are needed.
++
++extra_get :
++	- cp $(INCAdir)/atlas_type.h $(adefd)/kern/
++	- cp $(INCAdir)/atlas_[sdcz]sysinfo.h $(adefd)/kern/
++	- cp $(INCAdir)/atlas_[sd]lamch.h $(adefd)/kern/
++	- cp $(INCAdir)/atlas_[sdcz]trsmXover.h $(adefd)/kern/
++	- cp $(INCAdir)/atlas_[sdcz]syr*NX.h $(adefd)/kern/
++
++extra_put :
++	- cp $(adefd)/kern/atlas_type.h $(INCAdir)/.
++	- cp $(adefd)/kern/atlas_[sdcz]sysinfo.h $(INCAdir)/.
++	- cp $(adefd)/kern/atlas_[sd]lamch.h $(INCAdir)/.
++	- cp $(adefd)/kern/atlas_[sdcz]trsmXover.h $(INCAdir)/.
++	- cp $(adefd)/kern/atlas_[sdcz]syr*NX.h  $(INCAdir)/.
++
++ArchNew : extra_get
++
++archput : extra_put
++
++endif
+diff --git a/bin/atlas_install.c b/bin/atlas_install.c
+index de3eb3a..3c811e6 100644
+--- a/bin/atlas_install.c
++++ b/bin/atlas_install.c
+@@ -697,6 +697,8 @@ void GoToTown(int ARCHDEF, int L1DEF, int TuneLA)
+       ATL_Cassert(system("make IBozoL1.grd\n")==0,
+                   "USING BOZO L1 DEFAULTS", NULL);
+    }
++   if (ARCHDEF >= 2)
++      setenv("ATL_NOTUNE", "1", 1);
+    if (ARCHDEF)
+       DefInstall = !system("make IArchDef.grd\n");
+ 
+diff --git a/makes/Make.aux b/makes/Make.aux
+index 1f769c8..c793028 100644
+--- a/makes/Make.aux
++++ b/makes/Make.aux
+@@ -113,23 +113,23 @@ clean :
+ 
+ $(ATLFWAIT) :
+ 	cd $(BINdir) ; $(MAKE) xatlas_waitfile
+-$(INCAdir)/atlas_type.h : $(ATLFWAIT)
++$(INCAdir)/atlas_type.h : | $(ATLFWAIT)
+ 	cd $(SYSdir) ; $(MAKE) $(INCAdir)/atlas_type.h
+ 	$(ATLFWAIT) -f $(INCAdir)/atlas_type.h
+ sINCdep = $(INCAdir)/atlas_ssysinfo.h $(INCAdir)/atlas_type.h 
+-$(INCAdir)/atlas_ssysinfo.h : $(ATLFWAIT)
++$(INCAdir)/atlas_ssysinfo.h : | $(ATLFWAIT)
+ 	cd $(SYSdir) ; $(MAKE) $(INCAdir)/atlas_ssysinfo.h
+ 	$(ATLFWAIT) -f $(INCAdir)/atlas_ssysinfo.h
+ dINCdep = $(INCAdir)/atlas_dsysinfo.h $(INCAdir)/atlas_type.h 
+-$(INCAdir)/atlas_dsysinfo.h : $(ATLFWAIT)
++$(INCAdir)/atlas_dsysinfo.h : | $(ATLFWAIT)
+ 	cd $(SYSdir) ; $(MAKE) $(INCAdir)/atlas_dsysinfo.h
+ 	$(ATLFWAIT) -f $(INCAdir)/atlas_dsysinfo.h
+ cINCdep = $(INCAdir)/atlas_csysinfo.h $(INCAdir)/atlas_type.h 
+-$(INCAdir)/atlas_csysinfo.h : $(ATLFWAIT)
++$(INCAdir)/atlas_csysinfo.h : | $(ATLFWAIT)
+ 	cd $(SYSdir) ; $(MAKE) $(INCAdir)/atlas_csysinfo.h
+ 	$(ATLFWAIT) -f $(INCAdir)/atlas_csysinfo.h
+ zINCdep = $(INCAdir)/atlas_zsysinfo.h $(INCAdir)/atlas_type.h 
+-$(INCAdir)/atlas_zsysinfo.h : $(ATLFWAIT)
++$(INCAdir)/atlas_zsysinfo.h : | $(ATLFWAIT)
+ 	cd $(SYSdir) ; $(MAKE) $(INCAdir)/atlas_zsysinfo.h
+ 	$(ATLFWAIT) -f $(INCAdir)/atlas_zsysinfo.h
+ 
+diff --git a/makes/Make.bin b/makes/Make.bin
+index 1035cb9..acad578 100644
+--- a/makes/Make.bin
++++ b/makes/Make.bin
+@@ -163,7 +163,9 @@ IRunMADef :
+ 	cd $(SYSdir) ; $(MAKE) RunMADef pre=$(pre)
+ 
+ IRunMMDef :
++ifndef ATL_NOTUNE
+ 	cd $(MMTdir) ; $(MAKE) RunMMDef pre=$(pre)
++endif
+ 	cd $(MMTdir) ; ./xemit_mm  -p $(pre) -R -2
+ 	cd $(MMTdir) ; $(MAKE) install pre=$(pre)
+ IKillL1 : force_build
+@@ -303,22 +305,42 @@ INSTALL_LOG/$(pre)bestTT_$(nb)x$(nb)x$(nb) : \
+ 	cp $(MMTdir)/res/$(pre)bestTT_$(nb)x$(nb)x$(nb) INSTALL_LOG/.
+ 
+ $(R1Tdir)/res/$(pre)R2K.sum : $(R1Tdir)/res/$(pre)R1K.sum force_build
++ifdef ATL_NOTUNE
++	cd $(R1Tdir) ; $(MAKE) $(pre)r2install
++else
+ 	cd $(R1Tdir) ; $(MAKE) res/$(pre)R2K.sum pre=$(pre)
++endif
+ $(R1Tdir)/res/$(pre)R1K.sum : force_build
++ifdef ATL_NOTUNE
++	cd $(R1Tdir) ; $(MAKE) $(pre)r1install
++else
+ 	cd $(R1Tdir) ; $(MAKE) res/$(pre)R1K.sum pre=$(pre)
++endif
+ INSTALL_LOG/$(pre)R1K.sum : $(R1Tdir)/res/$(pre)R1K.sum
+ 	cp $(R1Tdir)/res/$(pre)R1K.sum INSTALL_LOG/.
+ INSTALL_LOG/$(pre)R2K.sum : INSTALL_LOG/$(pre)R1K.sum \
+    $(R1Tdir)/res/$(pre)R2K.sum
+ 	cp $(R1Tdir)/res/$(pre)R2K.sum INSTALL_LOG/.
++ifndef ATL_NOTUNE
+ 	cd $(R1Tdir) ; $(MAKE) $(pre)nxtune
++else
++	cd $(BLDdir)/src/blas/reference/level2 ; make $(pre)lib
++endif
+ 
+ $(MVTdir)/res/$(pre)MVNK.sum : force_build
++ifdef ATL_NOTUNE
++	cd $(MVTdir) ; $(MAKE) $(pre)mvninstall
++else
+ 	cd $(MVTdir) ; $(MAKE) res/$(pre)MVNK.sum pre=$(pre)
++endif
+ INSTALL_LOG/$(pre)MVNK.sum : $(MVTdir)/res/$(pre)MVNK.sum
+ 	cp $(MVTdir)/res/$(pre)MVNK.sum INSTALL_LOG/.
+ $(MVTdir)/res/$(pre)MVTK.sum : force_build
++ifdef ATL_NOTUNE
++	cd $(MVTdir) ; $(MAKE) $(pre)mvtinstall
++else
+ 	cd $(MVTdir) ; $(MAKE) res/$(pre)MVTK.sum pre=$(pre)
++endif
+ INSTALL_LOG/$(pre)MVTK.sum : $(MVTdir)/res/$(pre)MVTK.sum
+ 	cp $(MVTdir)/res/$(pre)MVTK.sum INSTALL_LOG/.
+ 
+diff --git a/makes/Make.l3tune b/makes/Make.l3tune
+index eaf7d7d..cd7f5f1 100644
+--- a/makes/Make.l3tune
++++ b/makes/Make.l3tune
+@@ -118,6 +118,7 @@ res/atlas_strsmXover.h :
+ 	cp $(strsmXover) res/.
+ 
+ stsmfc :
++ifndef ATL_NOTUNE
+ 	rm -f $(strsmXover)
+ 	cd $(L3Bdir) ; $(MAKE) slib
+ 	$(MAKE) xstsmfc2 pre=s typ=SREAL side=$(side) uplo=Upper_ \
+@@ -128,6 +129,7 @@ stsmfc :
+                 tran=NoTranspose_ diag=$(diag)
+ 	$(MAKE) xstsmfc2 pre=s typ=SREAL side=$(side) uplo=Lower_ \
+                 tran=Transpose_ diag=$(diag)
++endif
+ 	cd $(L3Bdir) ; $(MAKE) slib
+ dtrsmXover = $(INCAdir)/atlas_dtrsmXover.h
+ 
+@@ -138,6 +140,7 @@ res/atlas_dtrsmXover.h :
+ 	cp $(dtrsmXover) res/.
+ 
+ dtsmfc :
++ifndef ATL_NOTUNE
+ 	rm -f $(dtrsmXover)
+ 	cd $(L3Bdir) ; $(MAKE) dlib
+ 	$(MAKE) xdtsmfc2 pre=d typ=DREAL side=$(side) uplo=Upper_ \
+@@ -148,6 +151,7 @@ dtsmfc :
+                 tran=NoTranspose_ diag=$(diag)
+ 	$(MAKE) xdtsmfc2 pre=d typ=DREAL side=$(side) uplo=Lower_ \
+                 tran=Transpose_ diag=$(diag)
++endif
+ 	cd $(L3Bdir) ; $(MAKE) dlib
+ qtrsmXover = $(INCAdir)/atlas_qtrsmXover.h
+ 
+@@ -158,6 +162,7 @@ res/atlas_qtrsmXover.h :
+ 	cp $(qtrsmXover) res/.
+ 
+ qtsmfc :
++ifndef ATL_NOTUNE
+ 	rm -f $(qtrsmXover)
+ 	cd $(L3Bdir) ; $(MAKE) qlib
+ 	$(MAKE) xqtsmfc2 pre=q typ=QREAL side=$(side) uplo=Upper_ \
+@@ -168,6 +173,7 @@ qtsmfc :
+                 tran=NoTranspose_ diag=$(diag)
+ 	$(MAKE) xqtsmfc2 pre=q typ=QREAL side=$(side) uplo=Lower_ \
+                 tran=Transpose_ diag=$(diag)
++endif
+ 	cd $(L3Bdir) ; $(MAKE) qlib
+ 
+ $(pre)tsmfc.o : force_build
+diff --git a/makes/Make.sysinfo b/makes/Make.sysinfo
+index 2b7dfdc..8e5dab2 100644
+--- a/makes/Make.sysinfo
++++ b/makes/Make.sysinfo
+@@ -5,6 +5,7 @@ maxlat=6
+ mflop=200
+ flags=
+ 
++ifndef ATL_NOTUNE
+ sTestFlags : force_build
+ 	$(MAKE) srbob `cat res/sBEST` pre='s' type=float
+ 
+@@ -85,12 +86,14 @@ RunLamch : xemit_lamch
+ 	cp res/atlas_?lamch.h $(INCAdir)/.
+ RunTyp: xemit_typ
+ 	$(ATLRUN) $(SYSdir) xemit_typ > $(INCAdir)/atlas_type.h
++endif
+ 
+ xemit_buildinfo : emit_buildinfo.o
+ 	$(XCC) $(XCCFLAGS) -o $@ emit_buildinfo.o
+ xsyssum : GetSysSum.o
+ 	$(XCC) $(XCCFLAGS) -o $@ GetSysSum.o
+ 
++ifndef ATL_NOTUNE
+ xL1 : time.o L1CacheSize.o
+ 	$(KC) $(KCFLAGS) -o $@ L1CacheSize.o time.o
+ 
+@@ -125,6 +128,7 @@ smatime.o : $(mySRCdir)/matime.c
+ 	$(KC) -c $(KCFLAGS) -DSREAL $(mySRCdir)/matime.c
+ xmasrch : $(mySRCdir)/masrch.c
+ 	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/masrch.c
++endif
+ 
+ ATL_cputime.c : 
+ 	cp $(mySRCdir)/ATL_cputime.c .
+@@ -143,6 +147,8 @@ emit_buildinfo.o : $(mySRCdir)/emit_buildinfo.c
+ 	$(XCC) -c $(XCCFLAGS) $(mySRCdir)/emit_buildinfo.c
+ GetSysSum.o : $(INCAdir)/atlas_type.h $(mySRCdir)/GetSysSum.c
+ 	$(XCC) -c $(XCCFLAGS) $(mySRCdir)/GetSysSum.c
++
++ifndef ATL_NOTUNE
+ time.o : $(mySRCdir)/time.c
+ 	$(KC) -c $(KCFLAGS) -I./ $(mySRCdir)/time.c
+ emit_lamch.o : $(mySRCdir)/emit_lamch.c
+@@ -155,7 +161,7 @@ findNT.o : $(mySRCdir)/findNT.c
+ 	$(KC) -c $(KCFLAGS) $(mySRCdir)/findNT.c
+ tlb.o : $(mySRCdir)/tlb.c
+ 	$(KC) -c $(KCFLAGS) $(mySRCdir)/tlb.c
+-
++endif
+ 
+ 
+ force_build :
+-- 
+2.23.0
+

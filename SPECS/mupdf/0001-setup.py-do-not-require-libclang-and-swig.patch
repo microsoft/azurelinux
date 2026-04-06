@@ -1,0 +1,37 @@
+From 89611f9bf7c8d7e3b959cd2fb78571c3e3f1f2aa Mon Sep 17 00:00:00 2001
+Message-ID: <89611f9bf7c8d7e3b959cd2fb78571c3e3f1f2aa.1761772186.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Thu, 31 Oct 2024 23:53:31 +0100
+Subject: [PATCH] setup.py: do not require libclang and swig
+
+libclang and swig may be present but under different package names (e.g.
+on Fedora), so do not add them to the requirements by default.
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 6b2c8b841..0462eeaa7 100755
+--- a/setup.py
++++ b/setup.py
+@@ -540,7 +540,7 @@ def get_requires_for_build_wheel(config_settings=None):
+         #print(f'OpenBSD: libclang not available via pip; assuming `pkg_add py3-llvm`.')
+         pass
+     else:
+-        ret.append('libclang')
++        pass
+     if msys2():
+         #print(f'msys2: pip install of swig does not build; assuming `pacman -S swig`.')
+         pass
+@@ -548,7 +548,7 @@ def get_requires_for_build_wheel(config_settings=None):
+         #print(f'OpenBSD: pip install of swig does not build; assuming `pkg_add swig`.')
+         pass
+     else:
+-        ret.append( 'swig')
++        pass
+     return ret
+ 
+ 
+-- 
+2.51.2.1007.g590f8df4db
+

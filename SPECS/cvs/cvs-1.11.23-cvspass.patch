@@ -1,0 +1,113 @@
+From e4a25dba948af9211ffea6b27293fe15c4b3ba07 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 4 Dec 2013 08:37:24 +0100
+Subject: [PATCH] Create ~/.cvspass at login if it does not exists
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<https://bugzilla.redhat.com/show_bug.cgi?id=47457>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/login.c   | 9 +++++++++
+ src/logmsg.c  | 2 +-
+ src/sanity.sh | 7 ++++++-
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/src/login.c b/src/login.c
+index 50b292b..75dc53a 100644
+--- a/src/login.c
++++ b/src/login.c
+@@ -315,6 +315,15 @@ internal error: can only call password_entry_operation with pserver method");
+     fp = CVS_FOPEN (passfile, "r");
+     if (fp == NULL)
+     {
++       fp = CVS_FOPEN (passfile, "w");
++       if (fp != NULL)
++       {
++           fclose (fp);
++           fp = CVS_FOPEN (passfile, "r");
++       }
++    }
++    if (fp == NULL)
++    {
+ 	error (0, errno, "warning: failed to open %s for reading", passfile);
+ 	goto process;
+     }
+diff --git a/src/logmsg.c b/src/logmsg.c
+index 741231b..0d4d6a2 100644
+--- a/src/logmsg.c
++++ b/src/logmsg.c
+@@ -269,7 +269,7 @@ do_editor (dir, messagep, repository, changes)
+     }
+ 
+     (void) fprintf (fp,
+-  "%s----------------------------------------------------------------------\n",
++  "\n%s----------------------------------------------------------------------\n",
+ 		    CVSEDITPREFIX);
+     (void) fprintf (fp,
+   "%sEnter Log.  Lines beginning with `%.*s' are removed automatically\n%s\n",
+diff --git a/src/sanity.sh b/src/sanity.sh
+index dbcae19..f119840 100755
+--- a/src/sanity.sh
++++ b/src/sanity.sh
+@@ -4195,7 +4195,6 @@ ${PROG} commit: Rebuilding administrative file database"
+ "$PROG logout: WARNING: Ignoring method options found in CVSROOT: \`proxy=localhost;proxyport=8080'\.
+ $PROG logout: Use CVS version 1\.12\.7 or later to handle method options\.
+ Logging out of :pserver:$username@localhost:2401/dev/null
+-$PROG logout: warning: failed to open $HOME/\.cvspass for reading: No such file or directory
+ $PROG logout: Entry not found\."
+ 	  fi
+ 
+@@ -15552,6 +15551,7 @@ description:
+ revision 1\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15563,6 +15563,7 @@ xCVS: ----------------------------------------------------------------------
+ ----------------------------
+ revision 1\.1\.2\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;  lines: ${PLUS}1 -0
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15590,6 +15591,7 @@ description:
+ revision 1\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15601,6 +15603,7 @@ xCVS: ----------------------------------------------------------------------
+ ----------------------------
+ revision 1\.1\.2\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;  lines: ${PLUS}1 -0
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15622,6 +15625,7 @@ description:
+ revision 1\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15633,6 +15637,7 @@ xCVS: ----------------------------------------------------------------------
+ ----------------------------
+ revision 1\.1\.2\.1
+ date: [0-9/]* [0-9:]*;  author: ${username};  state: Exp;  lines: ${PLUS}1 -0
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+-- 
+1.8.3.1
+

@@ -1,0 +1,62 @@
+From 14aecb100dbd52832a12db5dc5beb77361c24635 Mon Sep 17 00:00:00 2001
+From: Henry Schreiner <HenrySchreinerIII@gmail.com>
+Date: Sat, 2 Aug 2025 23:06:15 -0400
+Subject: [PATCH] tests: fix test failure when flit-core is installed (#921)
+
+* tests: fix test failure when flit-core is installed
+
+Signed-off-by: Henry Schreiner <henryschreineriii@gmail.com>
+
+* Update test_projectbuilder.py
+
+---------
+
+Signed-off-by: Henry Schreiner <henryschreineriii@gmail.com>
+---
+ pyproject.toml               |  1 +
+ tests/test_projectbuilder.py | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1f39bd60..685aaccd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -92,6 +92,7 @@ typing = [
+   { include-group = "extra" },
+ ]
+ dev = [
++  "flit-core",
+   { include-group = "test" },
+   { include-group = "typing" },
+ ]
+diff --git a/tests/test_projectbuilder.py b/tests/test_projectbuilder.py
+index 2498ebe7..9275a350 100644
+--- a/tests/test_projectbuilder.py
++++ b/tests/test_projectbuilder.py
+@@ -8,6 +8,8 @@
+ import sys
+ import textwrap
+ 
++from typing import NoReturn
++
+ import pyproject_hooks
+ import pytest
+ 
+@@ -248,10 +250,16 @@ def test_build_missing_backend(packages_path, distribution, tmpdir):
+         builder.build(distribution, str(tmpdir))
+ 
+ 
+-def test_check_dependencies(mocker, package_test_flit):
++def _nothing_installed(name: str) -> NoReturn:
++    raise _importlib.metadata.PackageNotFoundError(name)
++
++
++def test_check_dependencies(mocker, package_test_flit, monkeypatch):
+     mocker.patch('pyproject_hooks.BuildBackendHookCaller.get_requires_for_build_sdist')
+     mocker.patch('pyproject_hooks.BuildBackendHookCaller.get_requires_for_build_wheel')
+ 
++    monkeypatch.setattr(_importlib.metadata, 'distribution', _nothing_installed)
++
+     builder = build.ProjectBuilder(package_test_flit)
+ 
+     side_effects = [

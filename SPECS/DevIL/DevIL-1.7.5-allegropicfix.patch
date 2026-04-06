@@ -1,0 +1,12 @@
+diff -up devil-1.7.5/configure~ devil-1.7.5/configure
+--- devil-1.7.5/configure~	2009-01-13 20:36:43.000000000 +0100
++++ devil-1.7.5/configure	2009-01-13 20:36:43.000000000 +0100
+@@ -21763,7 +21763,7 @@ echo $ECHO_N "checking for Allegro - ver
+     no_allegro=yes
+   else
+     allegro_CFLAGS=`$ALLEGRO_CONFIG $ALLEGRO_CONFIG_args --cflags`
+-    allegro_LIBS=`$ALLEGRO_CONFIG $ALLEGRO_CONFIG_args --libs`
++    allegro_LIBS=`$ALLEGRO_CONFIG $ALLEGRO_CONFIG_args --libs | sed 's/-lalleg_unsharable//'`
+     ALLEGRO_CONFIG_major_version=`$ALLEGRO_CONFIG $ALLEGRO_CONFIG_args --version | \
+            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+     ALLEGRO_CONFIG_minor_version=`$ALLEGRO_CONFIG $ALLEGRO_CONFIG_args --version | \

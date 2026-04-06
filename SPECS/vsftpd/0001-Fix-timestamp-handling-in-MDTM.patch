@@ -1,0 +1,151 @@
+From 6a4dc470e569df38b8a7ea09ee6aace3c73b7353 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Wed, 28 Mar 2018 09:06:34 +0200
+Subject: [PATCH 1/2] Fix timestamp handling in MDTM
+
+There were two problems with the timestamp handling with MDTM:
+
+1. In vsf_sysutil_parse_time(), the `the_time.tm_isdst` attribute was
+   always set to 0, regardless of whether DST (daylight saving time)
+   is active on the given date or not.
+
+   This made glibc shift the timestamp when DST was in fact active on
+   the given date, in an attempt to correct the discrepancy between
+   the given timestamp and the `tm_isdst` attribute. The shifting
+   produced incorrect results however.
+
+   We fix this by setting `tm_isdst` to -1 to let glibc decide if DST
+   is active or not at the time of the timestamp. glibc won't touch
+   the timestamp then.
+
+2. vsftpd used to record the offset from UTC of the current timezone
+   in the global variable `s_timezone`. This variable was then
+   subtracted from the variable `the_time` in vsf_sysutil_setmodtime()
+   when the config option use_localtime=NO was set. This was done to
+   compensate for the fact that mktime(), used in
+   vsf_sysutil_parse_time(), expects a timestamp expressed as local
+   time, whereas vsftpd is dealing with universal time.
+
+   However, this did not work in the case when the offset stored in
+   `s_timezone` did not match the timezone of the timestamp given to
+   mktime() - this happens when DST is active at the current time, but
+   DST is not active at the time of the timestamp, or vice versa.
+
+   We fix this by subtracting the real timezone offset directly in
+   vsf_sysutil_parse_time().
+
+   Note that the `tm_gmtoff` attribute, used in this fix, is a
+   BSD/glic extension. However, using `tm_gmtoff` seems like the
+   simplest solution and we need to make this work only with glibc
+   anyway.
+
+The fix was tested in the following way. We checked that the timestamp
+given to the MDTM command when setting modification time exactly
+matches the timestamp received as response from MDTM when reading back
+the modification time. Additionally, we checked that the modification
+time was set correctly on the given file on disk.
+
+These two checks were performed under various conditions - all the
+combinations of DST/non-DST system time, DST/non-DST modification
+time, use_localtime=YES/NO.
+
+Note that (I think) this will still not work if the rules for when DST
+is active change. For example, if DST is ever completely cancelled in
+the Europe/Prague timezone, and vsftpd is dealing with a timestamp
+from a time when DST was active, it will produce incorrect results. I
+think we would need the full zone file to fix this, but the zone file
+is hard to provide when we're chroot-ed.
+
+Resolves: rhbz#1567855
+---
+ postlogin.c |  5 +++--
+ sysutil.c   | 17 ++++++++++-------
+ sysutil.h   |  4 ++--
+ 3 files changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/postlogin.c b/postlogin.c
+index 7c749ef..8a3d9d2 100644
+--- a/postlogin.c
++++ b/postlogin.c
+@@ -1788,7 +1788,8 @@ handle_mdtm(struct vsf_session* p_sess)
+   if (do_write != 0)
+   {
+     str_split_char(&p_sess->ftp_arg_str, &s_filename_str, ' ');
+-    modtime = vsf_sysutil_parse_time(str_getbuf(&p_sess->ftp_arg_str));
++    modtime = vsf_sysutil_parse_time(
++      str_getbuf(&p_sess->ftp_arg_str), tunable_use_localtime);
+     str_copy(&p_sess->ftp_arg_str, &s_filename_str);
+   }
+   resolve_tilde(&p_sess->ftp_arg_str, p_sess);
+@@ -1809,7 +1810,7 @@ handle_mdtm(struct vsf_session* p_sess)
+     else
+     {
+       retval = vsf_sysutil_setmodtime(
+-        str_getbuf(&p_sess->ftp_arg_str), modtime, tunable_use_localtime);
++        str_getbuf(&p_sess->ftp_arg_str), modtime);
+       if (retval != 0)
+       {
+         vsf_cmdio_write(p_sess, FTP_FILEFAIL,
+diff --git a/sysutil.c b/sysutil.c
+index e847650..66d4c5e 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -2819,11 +2819,13 @@ vsf_sysutil_syslog(const char* p_text, int severe)
+ }
+ 
+ long
+-vsf_sysutil_parse_time(const char* p_text)
++vsf_sysutil_parse_time(const char* p_text, int is_localtime)
+ {
++  long res;
+   struct tm the_time;
+   unsigned int len = vsf_sysutil_strlen(p_text);
+   vsf_sysutil_memclr(&the_time, sizeof(the_time));
++  the_time.tm_isdst = -1;
+   if (len >= 8)
+   {
+     char yr[5];
+@@ -2848,17 +2850,18 @@ vsf_sysutil_parse_time(const char* p_text)
+     the_time.tm_min = vsf_sysutil_atoi(mins);
+     the_time.tm_sec = vsf_sysutil_atoi(sec);
+   }
+-  return mktime(&the_time);
++  res = mktime(&the_time);
++  if (!is_localtime)
++  {
++    res += the_time.tm_gmtoff;
++  }
++  return res;
+ }
+ 
+ int
+-vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime)
++vsf_sysutil_setmodtime(const char* p_file, long the_time)
+ {
+   struct utimbuf new_times;
+-  if (!is_localtime)
+-  {
+-    the_time -= s_timezone;
+-  }
+   vsf_sysutil_memclr(&new_times, sizeof(new_times));
+   new_times.actime = the_time;
+   new_times.modtime = the_time;
+diff --git a/sysutil.h b/sysutil.h
+index 7a59f13..b90f6ca 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -349,9 +349,9 @@ void vsf_sysutil_chroot(const char* p_root_path);
+  */
+ long vsf_sysutil_get_time_sec(void);
+ long vsf_sysutil_get_time_usec(void);
+-long vsf_sysutil_parse_time(const char* p_text);
++long vsf_sysutil_parse_time(const char* p_text, int is_localtime);
+ void vsf_sysutil_sleep(double seconds);
+-int vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime);
++int vsf_sysutil_setmodtime(const char* p_file, long the_time);
+ 
+ /* Limits */
+ void vsf_sysutil_set_address_space_limit(unsigned long bytes);
+-- 
+2.24.1
+

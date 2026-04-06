@@ -1,0 +1,11 @@
+--- a/Drivers/Speech/SpeechDispatcher/speech.c~	2025-05-25 03:58:25.000000000 -0500
++++ b/Drivers/Speech/SpeechDispatcher/speech.c	2025-07-07 08:58:19.519919859 -0500
+@@ -36,7 +36,7 @@
+ 
+ #include "spk_driver.h"
+ 
+-#include <libspeechd.h>
++#include <speech-dispatcher/libspeechd.h>
+ 
+ static SPDConnection *connectionHandle = NULL;
+ static unsigned int autospawn;

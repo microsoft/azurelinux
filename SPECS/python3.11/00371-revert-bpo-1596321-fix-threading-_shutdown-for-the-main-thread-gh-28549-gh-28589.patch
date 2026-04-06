@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Tue, 7 Dec 2021 14:41:59 +0100
+Subject: 00371: Revert "bpo-1596321: Fix threading._shutdown() for the main
+ thread (GH-28549) (GH-28589)"
+
+This reverts commit 38c67738c64304928c68d5c2bd78bbb01d979b94. It
+introduced regression causing FreeIPA's tests to fail.
+
+For more info see:
+https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
+https://github.com/GrahamDumpleton/mod_wsgi/issues/730
+---
+ Lib/test/test_threading.py | 33 ---------------------------------
+ Lib/threading.py           | 25 ++++++++-----------------
+ 2 files changed, 8 insertions(+), 50 deletions(-)
+
+diff --git a/Lib/test/test_threading.py b/Lib/test/test_threading.py
+index ec6a319486..1dbb9d0baa 100644
+--- a/Lib/test/test_threading.py
++++ b/Lib/test/test_threading.py
+@@ -1045,39 +1045,6 @@ def test_debug_deprecation(self):
+                b'is deprecated and will be removed in Python 3.12')
+         self.assertIn(msg, err)
+ 
+-    def test_import_from_another_thread(self):
+-        # bpo-1596321: If the threading module is first import from a thread
+-        # different than the main thread, threading._shutdown() must handle
+-        # this case without logging an error at Python exit.
+-        code = textwrap.dedent('''
+-            import _thread
+-            import sys
+-
+-            event = _thread.allocate_lock()
+-            event.acquire()
+-
+-            def import_threading():
+-                import threading
+-                event.release()
+-
+-            if 'threading' in sys.modules:
+-                raise Exception('threading is already imported')
+-
+-            _thread.start_new_thread(import_threading, ())
+-
+-            # wait until the threading module is imported
+-            event.acquire()
+-            event.release()
+-
+-            if 'threading' not in sys.modules:
+-                raise Exception('threading is not imported')
+-
+-            # don't wait until the thread completes
+-        ''')
+-        rc, out, err = assert_python_ok("-c", code)
+-        self.assertEqual(out, b'')
+-        self.assertEqual(err, b'')
+-
+ 
+ class ThreadJoinOnShutdown(BaseTestCase):
+ 
+diff --git a/Lib/threading.py b/Lib/threading.py
+index 29b8ec7465..2145f5a6dc 100644
+--- a/Lib/threading.py
++++ b/Lib/threading.py
+@@ -1553,29 +1553,20 @@ def _shutdown():
+ 
+     global _SHUTTING_DOWN
+     _SHUTTING_DOWN = True
++    # Main thread
++    tlock = _main_thread._tstate_lock
++    # The main thread isn't finished yet, so its thread state lock can't have
++    # been released.
++    assert tlock is not None
++    assert tlock.locked()
++    tlock.release()
++    _main_thread._stop()
+ 
+     # Call registered threading atexit functions before threads are joined.
+     # Order is reversed, similar to atexit.
+     for atexit_call in reversed(_threading_atexits):
+         atexit_call()
+ 
+-    # Main thread
+-    if _main_thread.ident == get_ident():
+-        tlock = _main_thread._tstate_lock
+-        # The main thread isn't finished yet, so its thread state lock can't
+-        # have been released.
+-        assert tlock is not None
+-        assert tlock.locked()
+-        tlock.release()
+-        _main_thread._stop()
+-    else:
+-        # bpo-1596321: _shutdown() must be called in the main thread.
+-        # If the threading module was not imported by the main thread,
+-        # _main_thread is the thread which imported the threading module.
+-        # In this case, ignore _main_thread, similar behavior than for threads
+-        # spawned by C libraries or using _thread.start_new_thread().
+-        pass
+-
+     # Join all non-deamon threads
+     while True:
+         with _shutdown_locks_lock:

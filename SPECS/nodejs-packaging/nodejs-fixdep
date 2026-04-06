@@ -1,0 +1,117 @@
+#!/usr/bin/python3
+
+"""Modify a dependency listed in a package.json file"""
+
+# Copyright 2013 T.C. Hollingsworth <tchollingsworth@gmail.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+import json
+import optparse
+import os
+import re
+import shutil
+import sys
+
+RE_VERSION = re.compile(r'\s*v?([<>=~^]{0,2})\s*([0-9][0-9\.\-]*)\s*')
+
+p = optparse.OptionParser(
+        description='Modifies dependency entries in package.json files')
+
+p.add_option('-r', '--remove', action='store_true')
+p.add_option('-m', '--move', action='store_true')
+p.add_option('--dev', action='store_const', const='devDependencies', 
+             dest='deptype', help='affect devDependencies')
+p.add_option('--optional', action='store_const', const='optionalDependencies', 
+             dest='deptype', help='affect optionalDependencies')
+p.add_option('--caret', action='store_true',
+             help='convert all or specified dependencies to use the caret operator')
+
+options, args = p.parse_args()
+
+if not os.path.exists('package.json~'):
+    shutil.copy2('package.json', 'package.json~')
+
+md = json.load(open('package.json'))
+
+deptype = options.deptype if options.deptype is not None else 'dependencies'
+
+if deptype not in md:
+    md[deptype] = {}
+
+# convert alternate JSON dependency representations to a dictionary
+if not options.caret and not isinstance(md[deptype], dict):
+    if isinstance(md[deptype], list):
+        deps = md[deptype]
+        md[deptype] = {}
+        for dep in deps:
+            md[deptype][dep] = '*'
+    elif isinstance(md[deptype], str):
+        md[deptype] = { md[deptype] : '*' }
+
+if options.remove:
+    dep = args[0]
+    del md[deptype][dep]
+elif options.move:
+    dep = args[0]
+    ver = None
+    for fromtype in ['dependencies', 'optionalDependencies', 'devDependencies']:
+        if fromtype in md:
+            if isinstance(md[fromtype], dict) and dep in md[fromtype]:
+                ver = md[fromtype][dep]
+                del md[fromtype][dep]
+            elif isinstance(md[fromtype], list) and md[fromtype].count(dep) > 0:
+                ver = '*'
+                md[fromtype].remove(dep)
+            elif isinstance(md[fromtype], str) and md[fromtype] == dep:
+                ver = '*'
+                del md[fromtype]
+    if ver != None:
+        md[deptype][dep] = ver
+elif options.caret:
+    if not isinstance(md[deptype], dict):
+        sys.stderr.write('All dependencies are unversioned.  Unable to apply ' +
+                         'caret operator.\n')
+        sys.exit(2)
+        
+    deps = args if len(args) > 0 else md[deptype].keys()
+    for dep in deps:
+        if md[deptype][dep][0] == '^':
+            continue
+        elif md[deptype][dep][0] in ('~','0','1','2','3','4','5','6','7','8','9'):
+            ver = re.match(RE_VERSION, md[deptype][dep]).group(2)
+            md[deptype][dep] = '^' + ver
+        else:
+            sys.stderr.write('Attempted to convert non-numeric or tilde ' +
+                'dependency to caret.  This is not permitted.\n')
+            sys.exit(1)
+else:
+    dep = args[0]
+
+    if len(args) > 1:
+        ver = args[1]
+    else:
+        ver = '*'
+
+    md[deptype][dep] = ver
+
+fh = open('package.json', 'w')
+data = json.JSONEncoder(indent=4).encode(md)
+fh.write(data)
+fh.close()

@@ -1,0 +1,57 @@
+diff -ur Mozilla-PublicSuffix-v1.0.7/Build.PL Mozilla-PublicSuffix-v1.0.7.unbundle/Build.PL
+--- Mozilla-PublicSuffix-v1.0.7/Build.PL	2024-08-19 19:50:34.000000000 +0300
++++ Mozilla-PublicSuffix-v1.0.7.unbundle/Build.PL	2024-08-20 17:32:08.243375527 +0300
+@@ -42,6 +42,7 @@
+ );
+ 
+ my $dat_file = "effective_tld_names.dat";
++my $system_dat_file = $builder->config('system_publicsuffix_list');
+ my $get_new_list = $builder->y_n(
+     "Check for a new version of the Public Suffix List?", "N"
+ );
+@@ -75,7 +76,13 @@
+ } IO::File->new($dat_file)->getlines;
+ 
+ tie my @pm, "Tie::File", "lib/Mozilla/PublicSuffix.pm";
+-for (@pm) { s/(my %rules = qw\()\)/$1$rules)/ and last }
++for (@pm) {
++	if ($system_dat_file) {
++		s/(my %rules = qw\(\);)/$1\n_parse_file(\\%rules,\"$system_dat_file\");/ and last
++	} else {
++		s/(my %rules = qw\()\)/$1$rules)/ and last
++	}
++}
+ untie @pm;
+ 
+ $builder->create_build_script;
+diff -ur Mozilla-PublicSuffix-v1.0.7/lib/Mozilla/PublicSuffix.pm Mozilla-PublicSuffix-v1.0.7.unbundle/lib/Mozilla/PublicSuffix.pm
+--- Mozilla-PublicSuffix-v1.0.7/lib/Mozilla/PublicSuffix.pm	2024-08-19 19:50:34.000000000 +0300
++++ Mozilla-PublicSuffix-v1.0.7.unbundle/lib/Mozilla/PublicSuffix.pm	2024-08-20 17:32:08.243375527 +0300
+@@ -3,6 +3,7 @@
+ use strict;
+ use warnings FATAL => 'all';
+ use utf8;
++use open ":encoding(UTF-8)";
+ use Exporter qw(import);
+ use URI::_idna;
+ 
+@@ -93,6 +94,19 @@
+     }
+ }
+ 
++sub _parse_file {
++    my $rulesref = shift;
++    my $dat_file = shift;
++    open DAT ,"<:encoding(UTF-8)", "$dat_file";
++    foreach (<DAT>) {
++        s/\s//g;
++        if    ( s/^!// )        { $rulesref->{$_} = "e" }  # exception rule
++        elsif ( s/^\*\.// )     { $rulesref->{$_} = "w" }  # wildcard rule
++        elsif ( /^[\p{Word}]/ ) { $rulesref->{$_} = "i" }  # identity rule
++    }
++    close DAT;
++}
++
+ 1;
+ 
+ 

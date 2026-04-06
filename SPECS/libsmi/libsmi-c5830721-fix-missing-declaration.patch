@@ -1,0 +1,12 @@
+diff -up libsmi-c5830721/lib/yang-data.h.fix-missing-declaration libsmi-c5830721/lib/yang-data.h
+--- libsmi-c5830721/lib/yang-data.h.fix-missing-declaration	2024-01-05 09:33:06.136555606 -0500
++++ libsmi-c5830721/lib/yang-data.h	2024-01-05 09:33:24.150807519 -0500
+@@ -164,6 +164,8 @@ int removeYangNode(_YangNode* target, _Y
+ 
+ _YangModuleInfo *createModuleInfo(_YangNode *modulePtr);
+ 
++void createIdentifierRef(_YangNode *node, char* prefix, char* ident);
++
+ void createTypeInfo(_YangNode *node);
+ 
+ _YangNode *findYangModuleByName(const char *modulename, char* revision);

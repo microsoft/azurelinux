@@ -1,0 +1,35 @@
+From fce4cfb4f5d617f13e48a268552c812a1740c52f Mon Sep 17 00:00:00 2001
+From: Maximilian Goldstein <max.goldstein@qt.io>
+Date: Wed, 9 Jun 2021 15:02:45 +0200
+Subject: [PATCH 15/22] qv4function: Fix crash due to reference being
+ invalidated
+
+Function::updateInternalClass creates a reference to a QStringList that is appended to before being used.
+This is unsafe and can leads to a segfault if the append() causes a reallocation.
+
+Fixes: QTBUG-94360
+Pick-to: 5.15 6.1 6.2
+Change-Id: Iac49e8d816cf440ca2b70e133c88314eb8df6b91
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Andrei Golubev <andrei.golubev@qt.io>
+(cherry picked from commit 7fa28f98824a94396106eadfc028b329985a0cfc)
+---
+ src/qml/jsruntime/qv4function.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qml/jsruntime/qv4function.cpp b/src/qml/jsruntime/qv4function.cpp
+index cf8a53cf9f..223e64271e 100644
+--- a/src/qml/jsruntime/qv4function.cpp
++++ b/src/qml/jsruntime/qv4function.cpp
+@@ -136,7 +136,7 @@ void Function::updateInternalClass(ExecutionEngine *engine, const QList<QByteArr
+         if (duplicate == -1) {
+             parameterNames.append(QString::fromUtf8(param));
+         } else {
+-            const QString &dup = parameterNames[duplicate];
++            const QString dup = parameterNames[duplicate];
+             parameterNames.append(dup);
+             parameterNames[duplicate] =
+                     QString(0xfffe) + QString::number(duplicate) + dup;
+-- 
+2.51.1
+

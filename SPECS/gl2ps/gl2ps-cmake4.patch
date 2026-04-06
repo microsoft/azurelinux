@@ -1,0 +1,12 @@
+diff -up gl2ps-1.4.2/CMakeLists.txt.orig gl2ps-1.4.2/CMakeLists.txt
+--- gl2ps-1.4.2/CMakeLists.txt.orig	2020-04-07 20:12:36.000000000 +0200
++++ gl2ps-1.4.2/CMakeLists.txt	2025-03-12 13:31:01.270162091 +0100
+@@ -31,7 +31,7 @@
+ #
+ #  Please report all bugs and problems to <gl2ps@geuz.org>.
+ 
+-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
++cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+ 
+ # do not warn about non-definition of WIN32 on Cygwin
+ set(CMAKE_LEGACY_CYGWIN_WIN32 0)

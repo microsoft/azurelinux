@@ -1,0 +1,11 @@
+--- ppmd-rust-1.4.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ ppmd-rust-1.4.0/Cargo.toml	2026-02-12T16:07:27.073334+00:00
+@@ -25,7 +25,7 @@
+ homepage = "https://github.com/hasenbanck/ppmd-rust"
+ readme = "README.md"
+ keywords = ["ppmd"]
+-license = "CC0-1.0 OR MIT-0"
++license = "MIT-0"
+ repository = "https://github.com/hasenbanck/ppmd-rust"
+ 
+ [features]

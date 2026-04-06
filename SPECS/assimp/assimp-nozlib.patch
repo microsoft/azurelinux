@@ -1,0 +1,12 @@
+diff -rupN --no-dereference assimp-6.0.4/contrib/zlib/CMakeLists.txt assimp-6.0.4-new/contrib/zlib/CMakeLists.txt
+--- assimp-6.0.4/contrib/zlib/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/contrib/zlib/CMakeLists.txt	2026-01-27 13:39:45.210518736 +0100
+@@ -196,7 +196,7 @@ if(MINGW)
+     set(ZLIB_DLL_SRCS ${CMAKE_CURRENT_BINARY_DIR}/zlib1rc.obj)
+ endif(MINGW)
+ 
+-add_library(zlibstatic STATIC ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
++add_library(zlibstatic OBJECT ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
+ 
+ IF(ASSIMP_INSTALL)
+     INSTALL( TARGETS zlibstatic

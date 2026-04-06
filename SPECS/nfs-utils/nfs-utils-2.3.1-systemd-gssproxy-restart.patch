@@ -1,0 +1,11 @@
+diff -up nfs-utils-2.7.1/systemd/nfs-server.service.orig nfs-utils-2.7.1/systemd/nfs-server.service
+--- nfs-utils-2.7.1/systemd/nfs-server.service.orig	2024-10-16 16:55:21.403217444 -0400
++++ nfs-utils-2.7.1/systemd/nfs-server.service	2024-10-16 16:57:59.684068552 -0400
+@@ -24,6 +24,7 @@ Type=oneshot
+ RemainAfterExit=yes
+ ExecStartPre=-/usr/sbin/exportfs -r
+ ExecStart=/bin/sh -c '/usr/sbin/nfsdctl autostart || /usr/sbin/rpc.nfsd'
++ExecStart=-/bin/sh -c 'if systemctl -q is-active gssproxy; then systemctl reload gssproxy ; fi'
+ ExecStop=/bin/sh -c '/usr/sbin/nfsdctl threads 0 || /usr/sbin/rpc.nfsd 0'
+ ExecStopPost=/usr/sbin/exportfs -au
+ ExecStopPost=/usr/sbin/exportfs -f

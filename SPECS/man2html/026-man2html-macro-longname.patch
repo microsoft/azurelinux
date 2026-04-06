@@ -1,0 +1,158 @@
+From: Robert Luberda <robert@debian.org>
+Date: Tue, 17 Apr 2007 20:48:31 +0200
+Subject: 026 man2html macro longname
+
+Support macro names longer than two chars (closes: #408232).
+---
+ man2html/defs.h     | 13 ++++++++++++-
+ man2html/man2html.c | 17 +++++++++--------
+ man2html/strdefs.c  | 26 +++++++++++++++++++++++++-
+ 3 files changed, 46 insertions(+), 10 deletions(-)
+
+diff --git a/man2html/defs.h b/man2html/defs.h
+index f3e75ef..1f843e7 100644
+--- a/man2html/defs.h
++++ b/man2html/defs.h
+@@ -8,6 +8,15 @@ struct STRDEF {
+     STRDEF *next;
+ };
+ 
++typedef struct LONGSTRDEF LONGSTRDEF;
++struct LONGSTRDEF {
++    int nr,slen;
++    char *longname;
++    char *st;
++    LONGSTRDEF *next;
++};
++
++
+ typedef struct INTDEF INTDEF;
+ struct INTDEF {
+     int nr;
+@@ -16,12 +25,14 @@ struct INTDEF {
+     INTDEF *next;
+ };
+ 
+-extern STRDEF *chardef, *strdef, *defdef;
++extern STRDEF *chardef, *strdef;
++extern LONGSTRDEF *defdef;
+ extern INTDEF *intdef;
+ 
+ #define V(A,B) ((A)*256+(B))
+ 
+ #include <sys/types.h>
++extern LONGSTRDEF *find_longstrdef(LONGSTRDEF* head, int nr, char * longname, char ** out_longname);
+ extern void stdinit(void);
+ extern void print_sig(void);
+ extern char *lookup_abbrev(char *);
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 845b243..6d77e80 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -1676,7 +1676,7 @@ scan_request(char *c) {
+     char *wordlist[20];
+     int words;
+     char *sl;
+-    STRDEF *owndef;
++    LONGSTRDEF *owndef;
+ 
+     while (*c == ' ' || *c == '\t')
+ 	    c++;
+@@ -2378,11 +2378,13 @@ scan_request(char *c) {
+             /* .de xx yy : define or redefine macro xx; end at .yy (..) */
+             /* define or handle as .ig yy */
+ 	    {
+-		STRDEF *de;
++		LONGSTRDEF *de;
++		char *longname;
+ 		int olen=0;
+ 		c=c+j;
+ 		sl=fill_words(c, wordlist, SIZE(wordlist), &words, '\n');
+ 		i=V(c[0],c[1]);j=2;
++		longname = c;
+ 		if (words == 1) wordlist[1]=".."; else {
+ 		    wordlist[1]--;
+ 		    wordlist[1][0]='.';
+@@ -2391,8 +2393,7 @@ scan_request(char *c) {
+ 		c=sl+1;
+ 		sl=c;
+ 		while (*c && strncmp(c,wordlist[1],j)) c=skip_till_newline(c);
+-		de=defdef;
+-		while (de && de->nr!= i) de=de->next;
++		de = find_longstrdef(defdef, i, longname, &longname); 
+ 		if (mode && de) olen=strlen(de->st);
+ 		j=olen+c-sl;
+ 		h= (char*) xmalloc((j*2+4)*sizeof(char));
+@@ -2413,8 +2414,9 @@ scan_request(char *c) {
+ 			if (de->st) free(de->st);
+ 			de->st=h;
+ 		    } else {
+-			de = (STRDEF*) xmalloc(sizeof(STRDEF));
++			de = (LONGSTRDEF*) xmalloc(sizeof(LONGSTRDEF));
+ 			de->nr=i;
++			de->longname=longname;
+ 			de->next=defdef;
+ 			de->st=h;
+ 			defdef=de;
+@@ -2893,13 +2895,12 @@ scan_request(char *c) {
+ 
+  	default:
+              /* search macro database of self-defined macros */
+- 	    owndef = defdef;
+-	    while (owndef && owndef->nr!=i) owndef=owndef->next;
++	    owndef = find_longstrdef(defdef, i, c, NULL);
+ 	    if (owndef) {
+ 		char **oldargument;
+ 		int deflen;
+ 		int onff;
+-		sl=fill_words(c+j, wordlist, SIZE(wordlist), &words, '\n');
++		sl=fill_words(c+strlen(owndef->longname), wordlist, SIZE(wordlist), &words, '\n');
+ 		c=sl+1;
+ 		*sl=0;
+ 		for (i=1; i<words; i++)
+diff --git a/man2html/strdefs.c b/man2html/strdefs.c
+index 65acb28..caf90c9 100644
+--- a/man2html/strdefs.c
++++ b/man2html/strdefs.c
+@@ -1,4 +1,6 @@
+ #include "defs.h"
++#include <ctype.h>
++#include <string.h>
+ 
+ #ifndef NULL
+ #define NULL	((void *) 0)
+@@ -9,7 +11,8 @@ int nroff = 1;
+ #define NROFF (-666)
+ #define TROFF (-667)
+ 
+-STRDEF *chardef, *strdef, *defdef;
++STRDEF *chardef, *strdef;
++LONGSTRDEF *defdef;
+ INTDEF *intdef;
+ 
+ static INTDEF standardint[] = {
+@@ -178,3 +181,24 @@ void stdinit(void) {
+     intdef = &standardint[0];
+     defdef = NULL;
+ }
++
++
++LONGSTRDEF* find_longstrdef(LONGSTRDEF * head, int nr, char * longname, char ** out_longname)
++{
++	char *p, c;
++	LONGSTRDEF *de;
++	
++	p = longname;
++	while (p && !isspace(*p)) p++;
++	c = *p;
++	*p = 0;
++
++	de = head;
++	while (de && (de->nr != nr || (de->longname && strcmp(longname, de->longname))))
++		de = de->next;
++
++	if (out_longname)
++		*out_longname = de ? de->longname : xstrdup(longname);
++	*p = c;
++	return de;
++}

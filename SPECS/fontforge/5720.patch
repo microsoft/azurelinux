@@ -1,0 +1,45 @@
+From c8c96212cf28d011f8294c66dc4bda70e9c09256 Mon Sep 17 00:00:00 2001
+From: Ahmet Furkan Kavraz <kavraz@amazon.com>
+Date: Wed, 7 Jan 2026 14:46:09 +0000
+Subject: [PATCH] Fix CVE-2025-15279: Heap buffer overflow in BMP RLE
+ decompression
+
+The readpixels() function reads RLE count values from BMP files without
+validating buffer bounds. A malicious BMP can specify excessive counts
+causing heap buffer overflow during pixel decompression, potentially
+leading to remote code execution.
+
+Add bounds checking after each count read to ensure ii + cnt does not
+exceed the allocated buffer size (head->height * head->width). Return 0
+on validation failure to trigger error handling.
+
+CVE-2025-15279
+CVSS: 7.8 (High)
+ZDI-CAN-27517
+---
+ gutils/gimagereadbmp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/gutils/gimagereadbmp.c b/gutils/gimagereadbmp.c
+index 5a137e28af..133336787c 100644
+--- a/gutils/gimagereadbmp.c
++++ b/gutils/gimagereadbmp.c
+@@ -181,12 +181,18 @@ static int readpixels(FILE *file,struct bmpheader *head) {
+ 	int ii = 0;
+ 	while ( ii<head->height*head->width ) {
+ 	    int cnt = getc(file);
++	    if (cnt < 0 || ii + cnt > head->height * head->width) {
++		return 0;
++	    }
+ 	    if ( cnt!=0 ) {
+ 		int ch = getc(file);
+ 		while ( --cnt>=0 )
+ 		    head->byte_pixels[ii++] = ch;
+ 	    } else {
+ 		cnt = getc(file);
++		if (cnt < 0 || ii + cnt > head->height * head->width) {
++		    return 0;
++		}
+ 		if ( cnt>= 3 ) {
+ 		    int odd = cnt&1;
+ 		    while ( --cnt>=0 )

@@ -1,0 +1,120 @@
+diff -up efl-1.27.0/src/bin/embryo/embryo_cc_sc6.c.bigendian efl-1.27.0/src/bin/embryo/embryo_cc_sc6.c
+--- efl-1.27.0/src/bin/embryo/embryo_cc_sc6.c.bigendian	2024-01-30 14:34:22.656090548 -0500
++++ efl-1.27.0/src/bin/embryo/embryo_cc_sc6.c	2024-01-30 14:45:03.931829865 -0500
+@@ -203,7 +203,15 @@ write_encoded(FILE * fbin, ucell * c, in
+ 	else
+ 	  {
+ 	     assert((sc_lengthbin(fbin) % sizeof(cell)) == 0);
++#if defined WORDS_BIGENDIAN
++#if defined BIT16
++	     writeerror |= !sc_writebin(fbin, aligncell((short *)c), sizeof *c);
++#else
++	     writeerror |= !sc_writebin(fbin, aligncell((long *)c), sizeof *c);
++#endif
++#else
+ 	     writeerror |= !sc_writebin(fbin, aligncell(c), sizeof *c);
++#endif
+ 	  }			/* if */
+ 	c++;
+      }				/* while */
+@@ -790,21 +798,21 @@ assemble(FILE * fout, FILE * fin)
+    hdr.cip = mainaddr;
+    hdr.size = hdr.hea;	/* preset, this is incorrect in case of compressed output */
+ #ifdef WORDS_BIGENDIAN
+-   align32(&hdr.size);
+-   align16(&hdr.magic);
+-   align16(&hdr.flags);
+-   align16(&hdr.defsize);
+-   align32(&hdr.cod);
+-   align32(&hdr.dat);
+-   align32(&hdr.hea);
+-   align32(&hdr.stp);
+-   align32(&hdr.cip);
+-   align32(&hdr.publics);
+-   align32(&hdr.natives);
+-   align32(&hdr.libraries);
+-   align32(&hdr.pubvars);
+-   align32(&hdr.tags);
+-   align32(&hdr.nametable);
++   align32((long *)&hdr.size);
++   align16((short *)&hdr.magic);
++   align16((short *)&hdr.flags);
++   align16((short *)&hdr.defsize);
++   align32((long *)&hdr.cod);
++   align32((long *)&hdr.dat);
++   align32((long *)&hdr.hea);
++   align32((long *)&hdr.stp);
++   align32((long *)&hdr.cip);
++   align32((long *)&hdr.publics);
++   align32((long *)&hdr.natives);
++   align32((long *)&hdr.libraries);
++   align32((long *)&hdr.pubvars);
++   align32((long *)&hdr.tags);
++   align32((long *)&hdr.nametable);
+ #endif
+    sc_writebin(fout, &hdr, sizeof hdr);
+ 
+@@ -824,8 +832,8 @@ assemble(FILE * fout, FILE * fin)
+ 	     func.address = sym->addr;
+ 	     func.nameofs = nameofs;
+ #ifdef WORDS_BIGENDIAN
+-	     align32(&func.address);
+-	     align32(&func.nameofs);
++	     align32((long *)&func.address);
++	     align32((long *)&func.nameofs);
+ #endif
+ 	     if (fseek(fout, publics + count * sizeof(FUNCSTUB), SEEK_SET) < 0)
+                fprintf(stderr, "Error seeking\n");
+@@ -882,8 +890,8 @@ assemble(FILE * fout, FILE * fin)
+ 	     func.address = 0;
+ 	     func.nameofs = nameofs;
+ #ifdef WORDS_BIGENDIAN
+-	     align32(&func.address);
+-	     align32(&func.nameofs);
++	     align32((long *)&func.address);
++	     align32((long *)&func.nameofs);
+ #endif
+ 	     if (fseek(fout, natives + count * sizeof(FUNCSTUB), SEEK_SET) < 0)
+                fprintf(stderr, "Error seeking\n");
+@@ -908,8 +916,8 @@ assemble(FILE * fout, FILE * fin)
+ 	     func.address = 0;
+ 	     func.nameofs = nameofs;
+ #ifdef WORDS_BIGENDIAN
+-	     align32(&func.address);
+-	     align32(&func.nameofs);
++	     align32((long *)&func.address);
++	     align32((long *)&func.nameofs);
+ #endif
+ 	     if (fseek(fout, libraries + count * sizeof(FUNCSTUB), SEEK_SET) < 0)
+                fprintf(stderr, "Error seeking\n");
+@@ -933,8 +941,8 @@ assemble(FILE * fout, FILE * fin)
+ 	     func.address = sym->addr;
+ 	     func.nameofs = nameofs;
+ #ifdef WORDS_BIGENDIAN
+-	     align32(&func.address);
+-	     align32(&func.nameofs);
++	     align32((long *)&func.address);
++	     align32((long *)&func.nameofs);
+ #endif
+ 	     if (fseek(fout, pubvars + count * sizeof(FUNCSTUB), SEEK_SET) < 0)
+                fprintf(stderr, "Error seeking\n");
+@@ -958,8 +966,8 @@ assemble(FILE * fout, FILE * fin)
+ 	     func.address = constptr->value & TAGMASK;
+ 	     func.nameofs = nameofs;
+ #ifdef WORDS_BIGENDIAN
+-	     align32(&func.address);
+-	     align32(&func.nameofs);
++	     align32((long *)&func.address);
++	     align32((long *)&func.nameofs);
+ #endif
+ 	     if (fseek(fout, tags + count * sizeof(FUNCSTUB), SEEK_SET) < 0)
+                fprintf(stderr, "Error seeking\n");
+@@ -1084,7 +1092,7 @@ assemble(FILE * fout, FILE * fin)
+      {
+ 	hdr.size = sc_lengthbin(fout);
+ #ifdef WORDS_BIGENDIAN
+-	align32(&hdr.size);
++	align32((long *)&hdr.size);
+ #endif
+ 	sc_resetbin(fout);	/* "size" is the very first field */
+ 	sc_writebin(fout, &hdr.size, sizeof hdr.size);

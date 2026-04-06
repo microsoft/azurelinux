@@ -1,0 +1,47 @@
+Author:Filip Januš <fjanus@redhat.com>
+This patch fixs inconsistency between filename and configure.ac
+
+diff -ur hexedit-1.6.old/configure.ac hexedit-1.6/configure.ac
+--- hexedit-1.6.old/configure.ac	2022-04-22 09:06:10.000000000 +0100
++++ hexedit-1.6/configure.ac	2022-05-02 22:30:54.942894809 +0100
+@@ -15,7 +15,7 @@
+ VERSION=TheVERSION
+ INCL=hexedit.h
+ SRCS="hexedit.c display.c mark.c page.c file.c interact.c misc.c search.c"
+-OTHER="COPYING Changes TODO install-sh configure config.h.in hexedit.1 hexedit-TheVERSION.lsm Makefile.in configure.ac Makefile-build.in"
++OTHER="COPYING Changes TODO install-sh configure config.h.in hexedit.1 hexedit.lsm Makefile.in configure.ac Makefile-build.in"
+ AC_SUBST(PRODUCT)
+ AC_SUBST(VERSION)
+ AC_SUBST(INCL)
+@@ -74,5 +74,5 @@
+ #endif
+ )
+ 
+-AC_CONFIG_FILES([Makefile Makefile-build hexedit.1])
++AC_CONFIG_FILES([Makefile Makefile-build hexedit.1 hexedit.lsm])
+ AC_OUTPUT
+Only in hexedit-1.6: configure.ac~
+Only in hexedit-1.6: configure.ac.orig
+Only in hexedit-1.6: configure.ac.rej
+diff -ur hexedit-1.6.old/hexedit.lsm.in hexedit-1.6/hexedit.lsm.in
+--- hexedit-1.6.old/hexedit.lsm.in	2022-04-22 09:06:10.000000000 +0100
++++ hexedit-1.6/hexedit.lsm.in	2022-05-02 22:30:07.618550082 +0100
+@@ -1,6 +1,6 @@
+ Begin3
+ Title:          hexedit
+-Version:        TheVERSION
++Version:        @VERSION@
+ Entered-date:   10SEP98
+ Description: 	view and edit files in hexadecimal or in ASCII.
+ 		hexedit shows a file both in ASCII and in hexadecimal. 
+@@ -13,8 +13,8 @@
+ Author:         pixel@rigaux.org (Pixel)
+ Maintained-by:  pixel@rigaux.org (Pixel)
+ Primary-site:   sunsite.unc.edu /pub/Linux/utils/file/hex
+-                39kB hexedit-VERSION.src.tgz
+-		14kB hexedit-VERSION.bin.i386.dynamic.tgz
++                39kB hexedit-@VERSION@.src.tgz
++		14kB hexedit-@VERSION@.bin.i386.dynamic.tgz
+ Original-site:  rigaux.org /
+ Platforms:      Linux Unix SunOS Solaris SGI curses
+ Copying-policy: GPL

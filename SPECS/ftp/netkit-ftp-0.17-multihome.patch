@@ -1,0 +1,98 @@
+--- netkit-ftp-0.17/ftp/ftp_var.h.rasold	2006-01-12 11:23:16.000000000 +0100
++++ netkit-ftp-0.17/ftp/ftp_var.h	2006-01-12 11:24:06.000000000 +0100
+@@ -69,6 +69,7 @@
+ Extern int	bell;		/* ring bell on cmd completion */
+ Extern int	doglob;		/* glob local file names */
+ Extern int	autologin;	/* establish user account on connection */
++Extern int	multihome;	/* multi homed host, use same interface for cmd and data channels */
+ Extern int	proxy;		/* proxy server connection active */
+ Extern int	proxflag;	/* proxy connection exists */
+ Extern int	sunique;	/* store files on server with unique name */
+--- netkit-ftp-0.17/ftp/ftp.c.rasold	2006-01-12 11:14:55.000000000 +0100
++++ netkit-ftp-0.17/ftp/ftp.c	2006-01-12 11:22:42.000000000 +0100
+@@ -132,6 +132,7 @@
+ static sigjmp_buf ptabort;
+ static int ptabflg = 0;
+ static int abrtflag = 0;
++struct sockaddr_in source;
+ 
+ void lostpeer(int);
+ extern int connected;
+@@ -153,7 +154,7 @@
+ char *
+ hookup(const char *host, const char *port)
+ {
+-	int s, tos, error;
++	int s, tos, error, alen;
+ 	socklen_t len;
+ 	static char hostnamebuf[256];
+ 	struct addrinfo hints, *res, *res0;
+@@ -278,7 +279,11 @@
+ 	}
+ 	if (verbose)
+ 		printf("Connected to %s (%s).\n", hostname, hbuf);
+-	if (getreply(0) > 2) { 	/* read startup message from server */
++	alen = sizeof(source);
++	getsockname(s,(struct sockaddr*)&source, &alen);
++	source.sin_port = 0;    /* We just want the addr, not the port */
++
++	if (getreply(0) > 2) { 	/* read startup message from server    */
+ 		if (cin)
+ 			(void) fclose(cin);
+ 		if (cout)
+@@ -1254,6 +1259,13 @@
+ 			perror("ftp: socket");
+ 			return(1);
+ 		}
++		if((multihome) &&
++			bind(data, (struct sockaddr*)&source, sizeof(source)) == -1) {
++			close(data);
++			data = -1;
++			perror("ftp multihome bind");
++			return(1);
++                }
+ 		if (options & SO_DEBUG &&
+ 		    setsockopt(data, SOL_SOCKET, SO_DEBUG, (char *)&on,
+ 			       sizeof (on)) < 0)
+--- netkit-ftp-0.17/ftp/main.c.rasold	2006-01-12 11:24:27.000000000 +0100
++++ netkit-ftp-0.17/ftp/main.c	2006-01-12 11:27:20.000000000 +0100
+@@ -93,6 +93,7 @@
+ 	printf("\t   -n: inhibit auto-login\n");
+ 	printf("\t   -e: disable readline support, if present\n");
+ 	printf("\t   -g: disable filename globbing\n");
++	printf("\t   -m: don't force data channel interface to the same as control channel\n");
+ 	printf("\t   -v: verbose mode\n");
+ 	printf("\t   -t: enable packet tracing [nonfunctional]\n");
+ 	printf("\t   -d: enable debugging\n");
+@@ -120,6 +121,7 @@
+ 	doglob = 1;
+ 	interactive = 1;
+ 	autologin = 1;
++	multihome = 1;
+ 	passivemode = 1;
+ 
+         cp = strrchr(argv[0], '/');
+@@ -172,6 +174,10 @@
+ 				rl_inhibit = 1;
+ 				break;
+ 				
++			case 'm':
++				multihome = 0;
++				break;
++
+ 			case 'h':
+ 				usage();
+ 				exit(0);
+--- netkit-ftp-0.17/ftp/ftp.1.rasold	2006-01-12 11:14:09.000000000 +0100
++++ netkit-ftp-0.17/ftp/ftp.1	2006-01-12 11:15:48.000000000 +0100
+@@ -92,6 +92,10 @@
+ executable. Otherwise, does nothing.
+ .It Fl g
+ Disables file name globbing.
++.It Fl m
++The default requires that ftp explicitly binds to the same interface for the data
++channel as the control channel in passive mode. Useful on multi-homed
++clients. This option disables this behavior.
+ .It Fl v
+ Verbose option forces
+ .Nm ftp

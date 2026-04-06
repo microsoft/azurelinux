@@ -1,0 +1,24 @@
+diff -up cyrus-sasl-2.1.26/saslauthd/testsaslauthd.8.man cyrus-sasl-2.1.26/saslauthd/testsaslauthd.8
+--- cyrus-sasl-2.1.26/saslauthd/testsaslauthd.8.man	2013-09-03 15:25:26.818042047 +0200
++++ cyrus-sasl-2.1.26/saslauthd/testsaslauthd.8	2013-09-03 15:25:26.818042047 +0200
+@@ -0,0 +1,20 @@
++.\"                                      Hey, EMACS: -*- nroff -*-
++.TH TESTSASLAUTHD 8 "14 October 2006"
++.SH NAME
++testsaslauthd \- test utility for the SASL authentication server
++.SH SYNOPSIS
++.B testsaslauthd
++.RI "[ " \(hyr " " realm " ] [ " \(hys " " servicename " ] [ " \(hyf " " socket " " path " ] [ " \(hyR " " repeatnum " ]"
++.SH DESCRIPTION
++This manual page documents briefly the
++.B testsaslauthd
++command.
++.PP
++.SH SEE ALSO
++.BR saslauthd (8).
++.br
++.SH AUTHOR
++testsaslauthd was written by Carnegie Mellon University.
++.PP
++This manual page was written by Roberto C. Sanchez <roberto@connexer.com>,
++for the Debian project (but may be used by others).

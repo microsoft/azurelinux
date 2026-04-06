@@ -1,0 +1,27 @@
+--- cpufeatures-0.3.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ cpufeatures-0.3.0/Cargo.toml	2026-02-14T14:28:16.472236+00:00
+@@ -54,19 +54,7 @@
+ name = "x86"
+ path = "tests/x86.rs"
+ 
+-[target.'cfg(all(target_arch = "aarch64", target_os = "android"))'.dependencies.libc]
+-version = "0.2.155"
+-default-features = false
+-
+ [target.'cfg(all(target_arch = "aarch64", target_os = "linux"))'.dependencies.libc]
+-version = "0.2.155"
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "aarch64", target_vendor = "apple"))'.dependencies.libc]
+-version = "0.2.155"
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "loongarch64", target_os = "linux"))'.dependencies.libc]
+ version = "0.2.155"
+ default-features = false
+ 
+@@ -109,3 +97,4 @@
+ trivial_numeric_casts = "warn"
+ unused_lifetimes = "warn"
+ unused_qualifications = "warn"
++

@@ -1,0 +1,12 @@
+diff -up qjson-0.9.0/tests/qobjecthelper/CMakeLists.txt.static qjson-0.9.0/tests/qobjecthelper/CMakeLists.txt
+--- qjson-0.9.0/tests/qobjecthelper/CMakeLists.txt.static	2016-11-29 09:44:51.000000000 -0600
++++ qjson-0.9.0/tests/qobjecthelper/CMakeLists.txt	2016-12-21 14:14:21.794182731 -0600
+@@ -20,7 +20,7 @@ IF (NOT Qt5Core_FOUND)
+   QT4_WRAP_CPP(qjson_test_support_MOC_SRCS person.h)
+ ENDIF()
+ 
+-ADD_LIBRARY (qjson_test_support STATIC ${qjson_test_support_SRCS}
++ADD_LIBRARY (qjson_test_support ${qjson_test_support_SRCS}
+                                        ${qjson_test_support_MOC_SRCS})
+ 
+ SET( UNIT_TESTS

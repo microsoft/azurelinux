@@ -1,0 +1,44 @@
+From 683a5216502be770ad21a7dc616acdec70d77f68 Mon Sep 17 00:00:00 2001
+From: Jiri Popelka <jpopelka@redhat.com>
+Date: Tue, 22 Jun 2021 18:09:22 +0200
+Subject: [PATCH 2/2] Apply patch skip-test_passthrough.patch
+
+patch_name: skip-test_passthrough.patch
+patch_id: 2
+description: |-
+    Remote access (these tests were skipped upstream in <= 0.9.7)
+---
+ tests/functional/test_passthrough.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/functional/test_passthrough.py b/tests/functional/test_passthrough.py
+index 47c9e79..7a77d23 100644
+--- a/tests/functional/test_passthrough.py
++++ b/tests/functional/test_passthrough.py
+@@ -24,6 +24,7 @@
+ import requests
+ import httpretty
+ 
++from unittest import skip
+ from sure import expect
+ 
+ 
+@@ -35,6 +36,7 @@ def http():
+     return sess
+ 
+ 
++@skip
+ def test_http_passthrough():
+     url = 'http://httpbin.org/status/200'
+     response1 = http().get(url)
+@@ -57,6 +59,7 @@ def test_http_passthrough():
+     (response4.content).should.equal(response1.content)
+ 
+ 
++@skip
+ def test_https_passthrough():
+     url = 'https://httpbin.org/status/200'
+ 
+-- 
+2.31.1
+

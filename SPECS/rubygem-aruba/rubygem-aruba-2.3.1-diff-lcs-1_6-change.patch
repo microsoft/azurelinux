@@ -1,0 +1,42 @@
+From bd2aea600f7e989e4da734c3e823c3ce12ce629b Mon Sep 17 00:00:00 2001
+From: Matijs van Zuijlen <matijs@matijs.net>
+Date: Sun, 6 Apr 2025 23:32:36 +0200
+Subject: [PATCH] Update expected diff output to match changes in diff-lcs
+
+Version 1.6.0 of diff-lcs included a bug fix that corrects the hunk
+ranges it outputs. This change bumps the minimum version of diff-lcs to
+1.6.0 so this change is sure to be included, and updates the
+expectations in the cucumber scenarios that depend on exact diff-lcs
+output.
+---
+ aruba.gemspec                                                   | 1 +
+ .../cucumber/steps/command/check_output_of_command.feature      | 2 +-
+ .../cucumber/steps/command/check_stderr_of_command.feature      | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/features/03_testing_frameworks/cucumber/steps/command/check_output_of_command.feature b/features/03_testing_frameworks/cucumber/steps/command/check_output_of_command.feature
+index 3266514b..1f0d1997 100644
+--- a/features/03_testing_frameworks/cucumber/steps/command/check_output_of_command.feature
++++ b/features/03_testing_frameworks/cucumber/steps/command/check_output_of_command.feature
+@@ -353,7 +353,7 @@ Feature: All output of commands which were executed
+     world" to output string is eq: "hello
+     worl"
+           Diff:
+-          @@ -1,3 +1,3 @@
++          @@ -1,2 +1,2 @@
+            hello
+           -worl
+           +world
+diff --git a/features/03_testing_frameworks/cucumber/steps/command/check_stderr_of_command.feature b/features/03_testing_frameworks/cucumber/steps/command/check_stderr_of_command.feature
+index cc0e7aad..d3b4c9a9 100644
+--- a/features/03_testing_frameworks/cucumber/steps/command/check_stderr_of_command.feature
++++ b/features/03_testing_frameworks/cucumber/steps/command/check_stderr_of_command.feature
+@@ -82,7 +82,7 @@ Feature: STDERR of commands which were executed
+           expected "hello
+     world!" to output string is eq: ""
+           Diff:
+-          @@ -1,2 +1,4 @@
++          @@ -0,0 +1,2 @@
+           +hello
+           +world!
+     """

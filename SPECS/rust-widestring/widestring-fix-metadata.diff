@@ -1,0 +1,22 @@
+--- widestring-1.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ widestring-1.2.1/Cargo.toml	2025-11-02T07:24:44.560822+00:00
+@@ -57,19 +57,3 @@
+ [lib]
+ name = "widestring"
+ path = "src/lib.rs"
+-
+-[[test]]
+-name = "debugger_visualizer"
+-path = "tests/debugger_visualizer.rs"
+-test = false
+-required-features = ["debugger_visualizer"]
+-
+-[dev-dependencies.debugger_test]
+-version = "0.1"
+-
+-[dev-dependencies.debugger_test_parser]
+-version = "0.1"
+-
+-[dev-dependencies.windows-sys]
+-version = "0.59"
+-features = ["Win32_System_Diagnostics_Debug"]

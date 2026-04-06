@@ -1,0 +1,23 @@
+--- tracing-chrome-0.7.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-chrome-0.7.2/Cargo.toml	2024-05-13T20:50:38.763094+00:00
+@@ -32,10 +32,6 @@
+ license = "MIT"
+ repository = "https://github.com/thoren-d/tracing-chrome"
+ 
+-[[bench]]
+-name = "overhead"
+-harness = false
+-
+ [dependencies.serde_json]
+ version = "1.0.114"
+ 
+@@ -45,9 +41,6 @@
+ [dependencies.tracing-subscriber]
+ version = "0.3.18"
+ 
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+-
+ [dev-dependencies.rayon]
+ version = "1.9.0"
+ 

@@ -1,0 +1,30 @@
+From 119aab0c40001c9ff803dac8d7a6fd975cd6de6e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 4 Feb 2026 15:10:02 +0000
+Subject: [PATCH 131/131] pcsclient: fix name of input file in 'cache' command
+ help text
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/pcsclient.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/PcsClientTool/pcsclient.py b/tools/PcsClientTool/pcsclient.py
+index 1759833f..eef984af 100755
+--- a/tools/PcsClientTool/pcsclient.py
++++ b/tools/PcsClientTool/pcsclient.py
+@@ -50,7 +50,7 @@ def main():
+     parser_cache = subparsers.add_parser('cache')
+     # add optional arguments for cache
+     parser_cache.add_argument("-u", "--url", help="The URL of the Intel PCS service; default: https://api.trustedservices.intel.com/sgx/certification/v4/")
+-    parser_cache.add_argument("-i", "--input_file", help="The input file name for platform list; default: platform_list.csv")
++    parser_cache.add_argument("-i", "--input_file", help="The input file name for platform list; default: platform_list.json")
+     parser_cache.add_argument("-o", "--output_dir", help="The destination directory for storing the generated cache files")
+     parser_cache.add_argument("-s", "--sub_dir", help="Store output cache files in subdirectories named according to QE ID or Platform ID", action="store_true")
+     parser_cache.add_argument("-e", "--expire", type=Utils.check_expire_hours, help="How many hours the cache files will be valid for. Default is 2160 hours (90 days).")
+-- 
+2.53.0
+

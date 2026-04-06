@@ -1,0 +1,47 @@
+From f132f8cb2e416585dd781c19a557aa9be65f8f40 Mon Sep 17 00:00:00 2001
+From: Yonghong Song <yonghong.song@linux.dev>
+Date: Mon, 14 Jul 2025 19:44:01 -0700
+Subject: [PATCH] Fix a build failure with clang21
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The build error message:
+  src/cc/frontends/clang/loader.cc:400:73: error: no matching function for
+   call to ‘clang::TextDiagnosticPrinter::TextDiagnosticPrinter(
+     llvm::raw_fd_ostream&, clang::DiagnosticOptions*)’
+  400 |   auto diag_client = new TextDiagnosticPrinter(llvm::errs(), &*diag_opts);
+      |                                                                         ^
+The llvm commit
+  https://github.com/llvm/llvm-project/pull/139584
+caused the build failure.
+
+Adjust the code properly and the error is fixed.
+---
+ src/cc/frontends/clang/loader.cc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/cc/frontends/clang/loader.cc b/src/cc/frontends/clang/loader.cc
+index 07dc9d6ab019..6f8387aaf017 100644
+--- a/src/cc/frontends/clang/loader.cc
++++ b/src/cc/frontends/clang/loader.cc
+@@ -396,11 +396,19 @@ int ClangLoader::do_compile(
+                     flags_cstr_rem.end());
+ 
+   // set up the error reporting class
++#if LLVM_VERSION_MAJOR >= 21
++  DiagnosticOptions diag_opts;
++  auto diag_client = new TextDiagnosticPrinter(llvm::errs(), diag_opts);
++
++  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
++  DiagnosticsEngine diags(DiagID, diag_opts, diag_client);
++#else
+   IntrusiveRefCntPtr<DiagnosticOptions> diag_opts(new DiagnosticOptions());
+   auto diag_client = new TextDiagnosticPrinter(llvm::errs(), &*diag_opts);
+ 
+   IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+   DiagnosticsEngine diags(DiagID, &*diag_opts, diag_client);
++#endif
+ 
+   // set up the command line argument wrapper
+ 

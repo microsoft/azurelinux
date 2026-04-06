@@ -1,0 +1,22 @@
+diff -up linux-atm-2.5.1/src/maint/atmdump.c.siocgstamp linux-atm-2.5.1/src/maint/atmdump.c
+--- linux-atm-2.5.1/src/maint/atmdump.c.siocgstamp	2001-10-09 18:33:07.000000000 -0400
++++ linux-atm-2.5.1/src/maint/atmdump.c	2019-06-17 23:12:50.570085260 -0400
+@@ -16,6 +16,7 @@
+ #include <sys/socket.h>
+ #include <netinet/in.h> /* for htonl and ntohl */
+ #include <atm.h>
++#include <linux/sockios.h>
+ 
+ 
+ static const char *pti[] = { "Data SDU 0","Data SDU 1","Data SDU 0, CE",
+diff -up linux-atm-2.5.1/src/maint/saaldump.c.siocgstamp linux-atm-2.5.1/src/maint/saaldump.c
+--- linux-atm-2.5.1/src/maint/saaldump.c.siocgstamp	2001-10-09 18:33:07.000000000 -0400
++++ linux-atm-2.5.1/src/maint/saaldump.c	2019-06-17 23:13:06.620200319 -0400
+@@ -16,6 +16,7 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <atm.h>
++#include <linux/sockios.h>
+ 
+ #include "pdu.h"
+ #define DUMP_MODE

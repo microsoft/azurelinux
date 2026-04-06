@@ -1,0 +1,41 @@
+From 57ccebf15bd566c146e6267e6d89c5b3c7a3d98b Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Thu, 19 Oct 2023 02:57:44 +0000
+Subject: [PATCH] test_regressions: use tomllib instead of toml
+
+https://fedoraproject.org/wiki/Changes/DeprecatePythonToml
+---
+ tests/test_regressions.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_regressions.py b/tests/test_regressions.py
+index 0368c13..4b90beb 100644
+--- a/tests/test_regressions.py
++++ b/tests/test_regressions.py
+@@ -1,13 +1,13 @@
+ # stdlib
+ import pathlib
+ import sys
++import tomllib
+ from collections import ChainMap, Counter, OrderedDict, defaultdict, namedtuple
+ from types import MappingProxyType
+ from typing import Any, Dict, Iterator, Mapping, NamedTuple, Sequence
+ 
+ # 3rd party
+ import pytest
+-import toml
+ from domdf_python_tools.compat import PYPY37_PLUS
+ from domdf_python_tools.paths import PathPlus
+ from domdf_python_tools.stringlist import StringList
+@@ -100,7 +100,7 @@ some_toml = "[section]\ntable = {a = 1, b = 2, c = 3}"
+ 						CustomSequence([MappingProxyType({'a': 1})]), id="Nested_CustomSequence_MappingProxyType"
+ 						),
+ 				pytest.param(CustomMapping({'a': Count(a=1, b=2, c=3)}), id="Nested_CustomMapping_NamedTuple"),
+-				pytest.param(toml.loads(some_toml)["section"]["table"], id="Toml_InlineTableDict"),
++				pytest.param(tomllib.loads(some_toml)["section"]["table"], id="Toml_InlineTableDict"),
+ 				pytest.param(pathlib.PurePath("/foo/bar/baz"), id="pathlib_purepath"),
+ 				pytest.param(pathlib.PurePosixPath("/foo/bar/baz"), id="pathlib_pureposixpath"),
+ 				pytest.param(pathlib.PureWindowsPath(r"c:\foo\bar\baz"), id="pathlib_purewindowspath"),
+-- 
+2.41.0
+

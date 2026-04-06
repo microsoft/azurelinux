@@ -1,0 +1,165 @@
+From 0fc1b9c7e87ab6cdb6bf7c81a1eee0a1d1f74e92 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 22 Aug 2018 13:24:43 +0200
+Subject: [PATCH 6/8] ANGLE: Fix flickering on resize when D3D9 is used
+
+By reverting ANGLE change d3b84ab51db09de238459b0dff2e8420c09aabf3
+we get rid of the flickering that happens on resize when D3D9 is
+used. The issue that was fixed there is not relevant in Qt's
+context so it is safe to revert the change.
+
+Task-number: QTBUG-59893
+Change-Id: I9306314b892612fbd1f7a058a2e606aedc0367bb
+---
+ .../angle/src/libANGLE/renderer/d3d/SurfaceD3D.cpp | 89 ++++++++++++++++++++++
+ .../angle/src/libANGLE/renderer/d3d/SurfaceD3D.h   |  4 +
+ 2 files changed, 93 insertions(+)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.cpp
+index ceb022d14c..8d3f44f2ad 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.cpp
+@@ -38,6 +38,7 @@ SurfaceD3D::SurfaceD3D(const egl::SurfaceState &state,
+       mDepthStencilFormat(state.config->depthStencilFormat),
+       mSwapChain(nullptr),
+       mSwapIntervalDirty(true),
++      mWindowSubclassed(false),
+       mNativeWindow(renderer->createNativeWindow(window, state.config, attribs)),
+       mWidth(static_cast<EGLint>(attribs.get(EGL_WIDTH, 0))),
+       mHeight(static_cast<EGLint>(attribs.get(EGL_HEIGHT, 0))),
+@@ -45,6 +46,7 @@ SurfaceD3D::SurfaceD3D(const egl::SurfaceState &state,
+       mShareHandle(0),
+       mD3DTexture(nullptr)
+ {
++    subclassWindow();
+     if (window != nullptr && !mFixedSize)
+     {
+         mWidth  = -1;
+@@ -72,6 +74,7 @@ SurfaceD3D::SurfaceD3D(const egl::SurfaceState &state,
+ 
+ SurfaceD3D::~SurfaceD3D()
+ {
++    unsubclassWindow();
+     releaseSwapChain();
+     SafeDelete(mNativeWindow);
+     SafeRelease(mD3DTexture);
+@@ -256,6 +259,94 @@ egl::Error SurfaceD3D::swapRect(const gl::Context *context,
+     return egl::NoError();
+ }
+ 
++#if !defined(ANGLE_ENABLE_WINDOWS_STORE)
++#define kSurfaceProperty _TEXT("Egl::SurfaceOwner")
++#define kParentWndProc _TEXT("Egl::SurfaceParentWndProc")
++#define kDisplayProperty _TEXT("Egl::Display")
++
++static LRESULT CALLBACK SurfaceWindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
++{
++    if (message == WM_SIZE)
++    {
++        SurfaceD3D* surf = reinterpret_cast<SurfaceD3D*>(GetProp(hwnd, kSurfaceProperty));
++        if(surf)
++        {
++            egl::Display *display = reinterpret_cast<egl::Display *>(GetProp(hwnd, kDisplayProperty));
++            surf->checkForOutOfDateSwapChain(display->getProxyContext());
++        }
++    }
++    WNDPROC prevWndFunc = reinterpret_cast<WNDPROC >(GetProp(hwnd, kParentWndProc));
++    return CallWindowProc(prevWndFunc, hwnd, message, wparam, lparam);
++}
++#endif
++
++void SurfaceD3D::subclassWindow()
++{
++#if !defined(ANGLE_ENABLE_WINDOWS_STORE)
++    HWND window = mNativeWindow->getNativeWindow();
++    if (!window)
++    {
++        return;
++    }
++
++    DWORD processId;
++    DWORD threadId = GetWindowThreadProcessId(window, &processId);
++    if (processId != GetCurrentProcessId() || threadId != GetCurrentThreadId())
++    {
++        return;
++    }
++
++    SetLastError(0);
++    LONG_PTR oldWndProc = SetWindowLongPtr(window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(SurfaceWindowProc));
++    if(oldWndProc == 0 && GetLastError() != ERROR_SUCCESS)
++    {
++        mWindowSubclassed = false;
++        return;
++    }
++
++    SetProp(window, kSurfaceProperty, reinterpret_cast<HANDLE>(this));
++    SetProp(window, kParentWndProc, reinterpret_cast<HANDLE>(oldWndProc));
++    SetProp(window, kDisplayProperty, reinterpret_cast<HANDLE>(mDisplay));
++    mWindowSubclassed = true;
++#endif
++}
++
++void SurfaceD3D::unsubclassWindow()
++{
++    if (!mWindowSubclassed)
++    {
++        return;
++    }
++
++#if !defined(ANGLE_ENABLE_WINDOWS_STORE)
++    HWND window = mNativeWindow->getNativeWindow();
++    if (!window)
++    {
++        return;
++    }
++
++    // un-subclass
++    LONG_PTR parentWndFunc = reinterpret_cast<LONG_PTR>(GetProp(window, kParentWndProc));
++
++    // Check the windowproc is still SurfaceWindowProc.
++    // If this assert fails, then it is likely the application has subclassed the
++    // hwnd as well and did not unsubclass before destroying its EGL context. The
++    // application should be modified to either subclass before initializing the
++    // EGL context, or to unsubclass before destroying the EGL context.
++    if(parentWndFunc)
++    {
++        LONG_PTR prevWndFunc = SetWindowLongPtr(window, GWLP_WNDPROC, parentWndFunc);
++        ASSERT(prevWndFunc == reinterpret_cast<LONG_PTR>(SurfaceWindowProc));
++    }
++
++    RemoveProp(window, kSurfaceProperty);
++    RemoveProp(window, kParentWndProc);
++    RemoveProp(window, kDisplayProperty);
++#endif
++    mWindowSubclassed = false;
++}
++
++
+ egl::Error SurfaceD3D::checkForOutOfDateSwapChain(const gl::Context *context)
+ {
+     RECT client;
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.h b/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.h
+index 4fd45a6dfd..01d2573244 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.h
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/SurfaceD3D.h
+@@ -82,6 +82,9 @@ class SurfaceD3D : public SurfaceImpl
+                                int backbufferWidth,
+                                int backbufferHeight);
+ 
++    void subclassWindow();
++    void unsubclassWindow();
++
+     RendererD3D *mRenderer;
+     egl::Display *mDisplay;
+ 
+@@ -93,6 +96,7 @@ class SurfaceD3D : public SurfaceImpl
+ 
+     SwapChainD3D *mSwapChain;
+     bool mSwapIntervalDirty;
++    bool mWindowSubclassed; // Indicates whether we successfully subclassed mWindow for WM_RESIZE hooking
+ 
+     NativeWindowD3D *mNativeWindow;  // Handler for the Window that the surface is created for.
+     EGLint mWidth;
+-- 
+2.15.0.windows.1
+

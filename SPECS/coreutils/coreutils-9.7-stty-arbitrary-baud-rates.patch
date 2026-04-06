@@ -1,0 +1,669 @@
+From 8e5ee22042931bdac6488d61c5d59bcd1b0dba5f Mon Sep 17 00:00:00 2001
+From: "H. Peter Anvin" <hpa@zytor.com>
+Date: Mon, 16 Jun 2025 14:58:01 -0700
+Subject: [PATCH 1/5] stty: arbitrary or non-a priori known speed_t support
+
+Support the case where speed_t is simply a number, and in that case
+assume that arbitrary values can be passed.  This is assumed to be the
+case when all known speed_t macros equal their own value.
+
+Try to probe for a variety of speed_t constants by trying to coax
+$(CC) into emitting macro definitions (-E -dM).  If this is not
+supported, use a fairly extensive list of constants as a
+fallback.  This both improves the test for arbitrary speed support, as
+well as allowing proper operation in the case where the constants are
+not plain numbers and allows for handing enumerated speed constants
+that were not known a priori when the source code was written.
+
+A simple shell script (mostly using sed) is used to turn the list of
+constants (probed and predefined) into a pair of conversion functions,
+baud_to_value() and value_to_baud(); string_to_baud() is then
+reimplemented as a wrapper around the latter.
+
+* src/local.mk: Generate speedlist.h.
+* src/speedgen: Portable shell script to generate speedlist.h.
+* src/stty.c: Adjust string_to_baud to
+convert from arbitrary numeric values.
+* src/termios.c: A helper used when generating speedlist.h
+
+@lzaoral:  This patch was amended to fix build failure in the
+"single-binary" mode.
+
+(cherry picked from commit 357fda90d15fd3f7dba61e1ab322b183a48d0081)
+---
+ src/local.mk  |  15 +++++-
+ src/speedgen  |  85 ++++++++++++++++++++++++++++++
+ src/stty.c    | 143 +++++++++++++++++++-------------------------------
+ src/termios.c |  34 ++++++++++++
+ 4 files changed, 188 insertions(+), 89 deletions(-)
+ create mode 100755 src/speedgen
+ create mode 100644 src/termios.c
+
+diff --git a/src/local.mk b/src/local.mk
+index fd9dc81..3b8a34e 100644
+--- a/src/local.mk
++++ b/src/local.mk
+@@ -71,7 +71,8 @@ EXTRA_DIST +=		\
+   src/dircolors.hin	\
+   src/primes.h		\
+   src/tac-pipe.c	\
+-  src/extract-magic
++  src/extract-magic	\
++  src/speedgen
+ 
+ CLEANFILES += $(SCRIPTS)
+ 
+@@ -672,6 +673,18 @@ src/version.h: Makefile
+ 	$(AM_V_at)chmod a-w $@t
+ 	$(AM_V_at)mv $@t $@
+ 
++# Target-specific termios baud rate file. This is opportunistic;
++# if cc -E doesn't support -dM, the speedgen script still includes
++# an extensive fallback list of common constants.
++BUILT_SOURCES += src/speedlist.h
++src/speedlist.h: src/termios.c lib/config.h src/speedgen
++	$(AM_V_GEN)rm -f $@
++	$(AM_V_at)${MKDIR_P} src
++	$(AM_V_at)$(COMPILE) -E -dM $< 2>/dev/null |		\
++		  $(SHELL) $(srcdir)/src/speedgen $@t
++	$(AM_V_at)chmod a-w $@t
++	$(AM_V_at)mv $@t $@
++
+ # Generates a list of macro invocations like:
+ #   SINGLE_BINARY_PROGRAM(program_name_str, main_name)
+ # once for each program list on $(single_binary_progs). Note that
+diff --git a/src/speedgen b/src/speedgen
+new file mode 100755
+index 0000000..f1647d9
+--- /dev/null
++++ b/src/speedgen
+@@ -0,0 +1,85 @@
++#!/bin/sh -e
++
++out="$1"
++tmp="$out.tmp"
++
++if [ -z "$out" ]; then
++    echo "Usage: $0 outfile" 2>&1
++    exit 1
++fi
++
++s='[[:space:]]'			# For brevity's sake
++
++trap "rm -f '$tmp'" EXIT
++trap "rm -f '$tmp' '$out'" ERR HUP INT QUIT TERM
++
++# Fallback list of speeds that are always tested for
++defspeeds="0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 7200 9600 \
++14400 19200 28800 33600 38400 57600 76800 115200 153600 230400 307200 \
++460800 500000 576000 614400 921600 1000000 1152000 1500000 \
++2000000 2500000 3000000 3500000 4000000 5000000 10000000"
++(
++    sed -n -e "s/^$s*\#$s*define$s$s*B\\([1-9][0-9]*\\)$s.*\$/\\1/p"
++    for s in $defspeeds; do echo "$s"; done
++) | sort -n | uniq > "$tmp"
++
++cat > "$out" <<'EOF'
++#ifndef SPEEDLIST_H
++# define SPEEDLIST_H 1
++
++# if 1 \
++EOF
++
++sed -e 's/^.*$/ \&\& (!defined(B&) || B& == &) \\/' < "$tmp" >> "$out"
++
++cat >> "$out" <<'EOF'
++
++#  define TERMIOS_SPEED_T_SANE 1
++
++# endif
++
++ATTRIBUTE_CONST
++static unsigned long int
++baud_to_value (speed_t speed)
++{
++# ifdef TERMIOS_SPEED_T_SANE
++  return speed;
++# else
++  switch (speed)
++    {
++EOF
++
++sed -e 's/^.*$/#  ifdef B&\n      case B&: return &;\n#  endif/' \
++    < "$tmp" >> "$out"
++
++cat >> "$out" <<'EOF'
++      default: return -1;
++    }
++# endif
++}
++
++ATTRIBUTE_CONST
++static speed_t
++value_to_baud (unsigned long int value)
++{
++# ifdef TERMIOS_SPEED_T_SANE
++  speed_t speed = value;
++  if (speed != value)
++    speed = (speed_t) -1;	/* Unrepresentable (overflow?) */
++  return speed;
++# else
++  switch (value)
++    {
++EOF
++
++sed -e 's/^.*$/#  ifdef B&\n      case &: return B&;\n#  endif/' \
++    < "$tmp" >> "$out"
++
++cat >> "$out" <<'EOF'
++      default: return (speed_t) -1;
++    }
++# endif
++}
++
++#endif
++EOF
+diff --git a/src/stty.c b/src/stty.c
+index 133b33c..561de1c 100644
+--- a/src/stty.c
++++ b/src/stty.c
+@@ -55,6 +55,7 @@
+ 
+ #include "system.h"
+ #include "assure.h"
++#include "c-ctype.h"
+ #include "fd-reopen.h"
+ #include "quote.h"
+ #include "xdectoint.h"
+@@ -2172,100 +2173,66 @@ recover_mode (char const *arg, struct termios *mode)
+   return true;
+ }
+ 
+-struct speed_map
+-{
+-  char const *string;		/* ASCII representation. */
+-  speed_t speed;		/* Internal form. */
+-  unsigned long int value;	/* Numeric value. */
+-};
+-
+-static struct speed_map const speeds[] =
+-{
+-  {"0", B0, 0},
+-  {"50", B50, 50},
+-  {"75", B75, 75},
+-  {"110", B110, 110},
+-  {"134", B134, 134},
+-  {"134.5", B134, 134},
+-  {"150", B150, 150},
+-  {"200", B200, 200},
+-  {"300", B300, 300},
+-  {"600", B600, 600},
+-  {"1200", B1200, 1200},
+-  {"1800", B1800, 1800},
+-  {"2400", B2400, 2400},
+-  {"4800", B4800, 4800},
+-  {"9600", B9600, 9600},
+-  {"19200", B19200, 19200},
+-  {"38400", B38400, 38400},
+-  {"exta", B19200, 19200},
+-  {"extb", B38400, 38400},
+-#ifdef B57600
+-  {"57600", B57600, 57600},
+-#endif
+-#ifdef B115200
+-  {"115200", B115200, 115200},
+-#endif
+-#ifdef B230400
+-  {"230400", B230400, 230400},
+-#endif
+-#ifdef B460800
+-  {"460800", B460800, 460800},
+-#endif
+-#ifdef B500000
+-  {"500000", B500000, 500000},
+-#endif
+-#ifdef B576000
+-  {"576000", B576000, 576000},
+-#endif
+-#ifdef B921600
+-  {"921600", B921600, 921600},
+-#endif
+-#ifdef B1000000
+-  {"1000000", B1000000, 1000000},
+-#endif
+-#ifdef B1152000
+-  {"1152000", B1152000, 1152000},
+-#endif
+-#ifdef B1500000
+-  {"1500000", B1500000, 1500000},
+-#endif
+-#ifdef B2000000
+-  {"2000000", B2000000, 2000000},
+-#endif
+-#ifdef B2500000
+-  {"2500000", B2500000, 2500000},
+-#endif
+-#ifdef B3000000
+-  {"3000000", B3000000, 3000000},
+-#endif
+-#ifdef B3500000
+-  {"3500000", B3500000, 3500000},
+-#endif
+-#ifdef B4000000
+-  {"4000000", B4000000, 4000000},
+-#endif
+-  {nullptr, 0, 0}
+-};
++/* Autogenerated conversion functions to/from speed_t */
++#include "speedlist.h"
+ 
+ ATTRIBUTE_PURE
+ static speed_t
+ string_to_baud (char const *arg)
+ {
+-  for (int i = 0; speeds[i].string != nullptr; ++i)
+-    if (STREQ (arg, speeds[i].string))
+-      return speeds[i].speed;
+-  return (speed_t) -1;
+-}
++  char *ep;
++  unsigned long value;
++  unsigned char c;
+ 
+-ATTRIBUTE_PURE
+-static unsigned long int
+-baud_to_value (speed_t speed)
+-{
+-  for (int i = 0; speeds[i].string != nullptr; ++i)
+-    if (speed == speeds[i].speed)
+-      return speeds[i].value;
+-  return 0;
++  /* Explicitly disallow negative numbers.  */
++  while (c_isspace (*arg))
++    arg++;
++  if (*arg == '-')
++    return (speed_t) -1;
++
++  value = strtoul (arg, &ep, 10);
++
++  c = *ep++;
++  if (c == '.')
++    {
++      /* Number includes a fraction. Round it to nearest-even.
++         Note in particular that 134.5 must round to 134! */
++      c = *ep++;
++      if (c)
++        {
++          c -= '0';
++          if (c > 9)
++            {
++              return (speed_t) -1; /* Garbage after otherwise valid number */
++            }
++          else if (c > 5)
++            {
++              value++;
++            }
++          else if (c == 5)
++            {
++              while ((c = *ep++) == '0')
++              ; /* Skip zeroes after .5 */
++
++              if (c >= '1' && c <= '9')
++                value++;                /* Nonzero digit, round up */
++              else
++                value += (value & 1);   /* Exactly in the middle, round even */
++            }
++        }
++    }
++  else if (c)
++    {
++      /* Not a valid number; check for legacy aliases "exta" and "extb" */
++      if (STREQ (arg, "exta"))
++        return B19200;
++      else if (STREQ (arg, "extb"))
++        return B38400;
++      else
++        return (speed_t) -1;
++    }
++
++  return value_to_baud (value);
+ }
+ 
+ static void
+diff --git a/src/termios.c b/src/termios.c
+new file mode 100644
+index 0000000..f17e12e
+--- /dev/null
++++ b/src/termios.c
+@@ -0,0 +1,34 @@
++/* termios.c -- coax out Bxxx macros from termios.h
++
++   Copyright (C) 2025 Free Software Foundation, Inc.
++
++   This program is free software: you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation, either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++/* This simply #includes headers which may or may not provide Bxxx
++   constant macros.  This is run through the C preprocessor and defined
++   macros are extracted.
++
++   In the case where the C preprocessor isn't capable of doing so,
++   the script this is fed through contains a pre-defined set of common
++   constants. */
++
++#include <config.h>
++
++#ifdef TERMIOS_NEEDS_XOPEN_SOURCE
++# define _XOPEN_SOURCE
++#endif
++
++#include <sys/types.h>
++#include <termios.h>
++#include <sys/ioctl.h>
+-- 
+2.50.0
+
+
+From 60c9206391e2fac32639d3a143435d1dd9ec6421 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Tue, 17 Jun 2025 23:32:05 +0100
+Subject: [PATCH 2/5] tests: stty: adjust tests for arbitary speeds
+
+* tests/stty/stty-invalid.sh: Adjust to what is now invalid.
+* tests/stty/stty.sh: Add checks for valid speed variants.
+* tests/stty/bad-speed.sh: New test to ensure unsupported speeds
+are diagnosed.
+
+(cherry picked from commit efaec8078142996d958b6720b85a13b12497c3d0)
+---
+ tests/local.mk             |  1 +
+ tests/stty/bad-speed.sh    | 50 ++++++++++++++++++++++++++++++++++++++
+ tests/stty/stty-invalid.sh | 10 ++++++--
+ tests/stty/stty.sh         | 10 ++++++++
+ 4 files changed, 69 insertions(+), 2 deletions(-)
+ create mode 100755 tests/stty/bad-speed.sh
+
+diff --git a/tests/local.mk b/tests/local.mk
+index 642d225..b68df41 100644
+--- a/tests/local.mk
++++ b/tests/local.mk
+@@ -425,6 +425,7 @@ all_tests =					\
+   tests/stat/stat-printf.pl			\
+   tests/stat/stat-slash.sh			\
+   tests/misc/stdbuf.sh				\
++  tests/stty/bad-speed.sh			\
+   tests/stty/stty.sh				\
+   tests/stty/stty-invalid.sh			\
+   tests/stty/stty-pairs.sh			\
+diff --git a/tests/stty/bad-speed.sh b/tests/stty/bad-speed.sh
+new file mode 100755
+index 0000000..d80d2e7
+--- /dev/null
++++ b/tests/stty/bad-speed.sh
+@@ -0,0 +1,50 @@
++#!/bin/sh
++# Ensure we handle cfsetispeed failing
++# which we did not before coreutils v9.1
++
++# Copyright (C) 2025 Free Software Foundation, Inc.
++
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++. "${srcdir=.}/tests/init.sh"; path_prepend_ ./src
++print_ver_ stty
++require_gcc_shared_
++
++# Replace each cfsetispeed call with a call to these stubs.
++cat > k.c <<'EOF' || framework_failure_
++#include <stdio.h>
++#include <errno.h>
++#include <termios.h>
++#include <unistd.h>
++
++int cfsetispeed(struct termios *termios_p, speed_t speed)
++{
++  /* Leave a marker so we can identify if the function was intercepted.  */
++  fclose(fopen("preloaded", "w"));
++
++  errno=EINVAL;
++  return -1;
++}
++EOF
++
++# Then compile/link it:
++gcc_shared_ k.c k.so \
++  || skip_ 'failed to build shared library'
++
++( export LD_PRELOAD=$LD_PRELOAD:./k.so
++  returns_ 1 stty ispeed 9600 ) || fail=1
++
++test -e preloaded || skip_ 'LD_PRELOAD interception failed'
++
++Exit $fail
+diff --git a/tests/stty/stty-invalid.sh b/tests/stty/stty-invalid.sh
+index 4b87e2a..a1442a8 100755
+--- a/tests/stty/stty-invalid.sh
++++ b/tests/stty/stty-invalid.sh
+@@ -20,6 +20,7 @@
+ print_ver_ stty
+ require_controlling_input_terminal_
+ require_trap_signame_
++getlimits_
+ 
+ trap '' TTOU # Ignore SIGTTOU
+ 
+@@ -50,8 +51,13 @@ if tty -s </dev/tty; then
+   returns_ 1 stty eol -F/dev/tty eol || fail=1
+ fi
+ 
+-# coreutils <= 9.1 would not validate speeds to ispeed or ospeed
+-returns_ 1 stty ispeed 420 || fail=1
++# coreutils >= 9.8 supports arbitrary speeds on some systems
++# so restrict tests here to invalid numbers
++# We simulate unsupported numbers in a separate "LD_PRELOAD" test.
++WRAP_9600="$(expr $ULONG_OFLOW - 9600)"
++for speed in 9600.. ++9600 -$WRAP_9600 --$WRAP_9600 0x2580 96E2; do
++  returns_ 1 stty ispeed "$speed" || fail=1
++done
+ 
+ # Just in case either of the above mistakenly succeeds (and changes
+ # the state of our tty), try to restore the initial state.
+diff --git a/tests/stty/stty.sh b/tests/stty/stty.sh
+index dab4cd0..c0f7494 100755
+--- a/tests/stty/stty.sh
++++ b/tests/stty/stty.sh
+@@ -95,4 +95,14 @@ for W in $(seq 80 90); do
+   test "$output_width" -le "$W" || fail=1
+ done
+ 
++# Ensure we support varied numeric forms
++# with appropriate rounding
++if stty ispeed '9600'; then
++  stty ispeed '  +9600' || fail=1
++  stty ispeed '9600.49' || fail=1
++  stty ispeed '9600.50' || fail=1
++  stty ispeed '9599.51' || fail=1
++  stty ispeed '  9600.' || fail=1
++fi
++
+ Exit $fail
+-- 
+2.50.0
+
+
+From a47c15eea3ffe08662415ae13873b40c7ffcdb43 Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Sat, 21 Jun 2025 22:05:19 -0700
+Subject: [PATCH 3/5] build: add src/termios.c to the tarball
+
+* src/local.mk (EXTRA_DIST): Add src/termios.c.
+
+(cherry picked from commit b7db7757831e93ca44ae59e1921bc4ebbc87974f)
+---
+ src/local.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/local.mk b/src/local.mk
+index 3b8a34e..188dda1 100644
+--- a/src/local.mk
++++ b/src/local.mk
+@@ -72,7 +72,8 @@ EXTRA_DIST +=		\
+   src/primes.h		\
+   src/tac-pipe.c	\
+   src/extract-magic	\
+-  src/speedgen
++  src/speedgen		\
++  src/termios.c
+ 
+ CLEANFILES += $(SCRIPTS)
+ 
+-- 
+2.50.0
+
+
+From caa439bf750193bcbed215a6676053f0b3c96e21 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Sun, 22 Jun 2025 15:01:21 +0100
+Subject: [PATCH 4/5] doc: stty: adjust description of supported speeds
+
+* doc/coreutils.texi (stty invocation): Remove now imprecise
+list of speeds given we may now support higher or arbitrary speeds.
+Mention that we may support higher or arbitrary speeds.
+
+(cherry picked from commit 8b05eca972f70858749a946ac24f08d0718c1be6)
+---
+ doc/coreutils.texi | 21 ++-------------------
+ 1 file changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/doc/coreutils.texi b/doc/coreutils.texi
+index 6d1ee11..c04af2b 100644
+--- a/doc/coreutils.texi
++++ b/doc/coreutils.texi
+@@ -15932,25 +15932,8 @@ Print the terminal speed.
+ Set the input and output speeds to @var{n}.  @var{n} can be one of: 0
+ 50 75 110 134 134.5 150 200 300 600 1200 1800 2400 4800 9600 19200
+ 38400 @code{exta} @code{extb}.  @code{exta} is the same as 19200;
+-@code{extb} is the same as 38400.  Many systems, including GNU/Linux,
+-support higher speeds.  The @command{stty} command includes support
+-for speeds of
+-57600,
+-115200,
+-230400,
+-460800,
+-500000,
+-576000,
+-921600,
+-1000000,
+-1152000,
+-1500000,
+-2000000,
+-2500000,
+-3000000,
+-3500000,
+-or
+-4000000 where the system supports these.
++@code{extb} is the same as 38400.  Many systems, support arbitrary
++or higher speeds.
+ 0 hangs up the line if @option{-clocal} is set.
+ @end table
+ 
+-- 
+2.50.0
+
+
+From 8e48d56c2aa10f9875ffe1ec051a17f0eab6d2f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Sun, 22 Jun 2025 16:40:04 +0100
+Subject: [PATCH 5/5] stty: stricter floating point parsing
+
+* src/stty.c (string_to_baud): Disallow extraneous characters
+after floating point numbers.
+* tests/stty/stty-invalid.sh: Add test cases.
+
+(cherry picked from commit 3d35b3c0e56bd556c90dc98c3e5e2e7289b0eb0d)
+---
+ src/stty.c                 | 27 +++++++++++++--------------
+ tests/stty/stty-invalid.sh |  3 ++-
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/src/stty.c b/src/stty.c
+index 561de1c..0163ea4 100644
+--- a/src/stty.c
++++ b/src/stty.c
+@@ -2200,25 +2200,24 @@ string_to_baud (char const *arg)
+       c = *ep++;
+       if (c)
+         {
+-          c -= '0';
+-          if (c > 9)
++          unsigned char d = c - '0';
++          if (d > 5)
++            value++;
++          else if (d == 5)
+             {
+-              return (speed_t) -1; /* Garbage after otherwise valid number */
+-            }
+-          else if (c > 5)
+-            {
+-              value++;
+-            }
+-          else if (c == 5)
+-            {
+-              while ((c = *ep++) == '0')
+-              ; /* Skip zeroes after .5 */
++              while ((c = *ep++) == '0'); /* Skip zeroes after .5 */
+ 
+-              if (c >= '1' && c <= '9')
+-                value++;                /* Nonzero digit, round up */
++              if (c)
++                value++;                /* Nonzero, round up */
+               else
+                 value += (value & 1);   /* Exactly in the middle, round even */
+             }
++
++          while (c_isdigit (c)) /* Skip remaining digits.  */
++            c = *ep++;
++
++          if (c)
++            return (speed_t) -1; /* Garbage after otherwise valid number */
+         }
+     }
+   else if (c)
+diff --git a/tests/stty/stty-invalid.sh b/tests/stty/stty-invalid.sh
+index a1442a8..868ed1d 100755
+--- a/tests/stty/stty-invalid.sh
++++ b/tests/stty/stty-invalid.sh
+@@ -55,7 +55,8 @@ fi
+ # so restrict tests here to invalid numbers
+ # We simulate unsupported numbers in a separate "LD_PRELOAD" test.
+ WRAP_9600="$(expr $ULONG_OFLOW - 9600)"
+-for speed in 9600.. ++9600 -$WRAP_9600 --$WRAP_9600 0x2580 96E2; do
++for speed in 9599.. 9600.. 9600.5. 9600.50. 9600.0. ++9600 \
++             -$WRAP_9600 --$WRAP_9600 0x2580 96E2 9600,0 '9600.0 '; do
+   returns_ 1 stty ispeed "$speed" || fail=1
+ done
+ 
+-- 
+2.50.0
+

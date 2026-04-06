@@ -1,0 +1,16 @@
+# Sample configuration snippet for nftables service.
+# Meant to be included by main.nft, not for direct use.
+
+# a common table for both IPv4 and IPv6
+table inet nftables_svc {
+
+	# base-chain for traffic forwarded by this host
+	# re-uses 'allow' chain from main.nft
+	chain FORWARD {
+		type filter hook forward priority filter + 20
+		policy accept
+
+		jump allow
+		reject with icmpx type host-unreachable
+	}
+}

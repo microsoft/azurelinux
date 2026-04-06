@@ -1,0 +1,79 @@
+diff --git a/cassandane/Cassandane/Util/Log.pm b/cassandane/Cassandane/Util/Log.pm
+index a44005c..5bb5710 100644
+--- a/cassandane/Cassandane/Util/Log.pm
++++ b/cassandane/Cassandane/Util/Log.pm
+@@ -51,9 +51,6 @@ our @EXPORT = qw(
+ 
+ my $verbose = 0;
+ 
+-openlog('cassandane', '', LOG_LOCAL6)
+-    or die "Cannot openlog";
+-
+ sub xlog
+ {
+     my $id;
+@@ -87,7 +84,6 @@ sub xlog
+     else {
+         print STDERR "$msg\n";
+     }
+-    syslog(LOG_ERR, "$msg");
+ }
+ 
+ sub set_verbose
+diff --git a/cassandane/utils/syslog.c b/cassandane/utils/syslog.c
+index 20d3763..0238d82 100644
+--- a/cassandane/utils/syslog.c
++++ b/cassandane/utils/syslog.c
+@@ -116,14 +116,28 @@ EXPORTED void syslog(int priority, const char *format, ...)
+     va_start(ap, format);
+     fake_vsyslog(priority, format, ap);
+     va_end(ap);
++}
++
++EXPORTED void
++__attribute__((format(printf, 3, 4)))
++__syslog_chk(int priority, int whatever __attribute__((unused)),
++             const char *format, ...)
++{
++    va_list ap;
+ 
+     va_start(ap, format);
+-    real_vsyslog(priority, format, ap);
++    fake_vsyslog(priority, format, ap);
+     va_end(ap);
+ }
+ 
+ EXPORTED void vsyslog(int priority, const char *format, va_list ap)
+ {
+     fake_vsyslog(priority, format, ap);
+-    real_vsyslog(priority, format, ap);
++}
++
++EXPORTED void
++__attribute__((format(printf, 3, 0)))
++__vsyslog_chk(int priority, int whatever __attribute__((unused)), const char *format, va_list ap)
++{
++    fake_vsyslog(priority, format, ap);
+ }
+diff --git a/cassandane/Cassandane/Instance.pm b/cassandane/Cassandane/Instance.pm
+index 77ddd54..3162fc6 100644
+--- a/cassandane/Cassandane/Instance.pm
++++ b/cassandane/Cassandane/Instance.pm
+@@ -2347,17 +2347,6 @@ sub setup_syslog_replacement
+         return;
+     }
+ 
+-    # Can't reliably replace syslog when source fortification is in play,
+-    # and syslog_probe can't reliably detect whether the replacement has
+-    # worked or not in this case, so just turn syslog replacement off if
+-    # we detect source fortification
+-    if ($self->{buildinfo}->get('version', 'FORTIFY_LEVEL')) {
+-        xlog "Cyrus was built with -D_FORTIFY_SOURCE";
+-        xlog "tests will not examine syslog output";
+-        $self->{have_syslog_replacement} = 0;
+-        return;
+-    }
+-
+     $self->{syslog_fname} = "$self->{basedir}/conf/log/syslog";
+     $self->{have_syslog_replacement} = 1;
+ 

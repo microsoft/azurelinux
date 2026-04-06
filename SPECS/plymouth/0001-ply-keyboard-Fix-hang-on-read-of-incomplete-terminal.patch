@@ -1,0 +1,40 @@
+From 45655f12fa2d5553ab4ba509f2e203c249191664 Mon Sep 17 00:00:00 2001
+From: D Scott Phillips <scott@os.amperecomputing.com>
+Date: Mon, 26 Jan 2026 09:25:32 -0800
+Subject: [PATCH 1/2] ply-keyboard: Fix hang on read of incomplete terminal
+ control sequence
+
+It's possible for a read from the terminal to provide a partial command
+sequence, starting with the CSI ('\x1b\x5b') but not terminating with
+its function character ('\x40'..'\x7e'). In that case, the input byte
+handling loop would not terminate, causing plymouthd to hang both itself
+and possibly completion of the boot.
+
+Break from the input byte handling loop when an incomplete command
+sequence is found so that the program does not hang. The incomplete
+command sequence will remain in the input buffer so that a later
+completion of the command sequence can be handled.
+
+Fixes: b41e40e065c6 ("Add support for CSI sequences")
+Fixes: plymouth/plymouth#321
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2433079
+---
+ src/libply-splash-core/ply-keyboard.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libply-splash-core/ply-keyboard.c b/src/libply-splash-core/ply-keyboard.c
+index 59f125fe..dc19f5cc 100644
+--- a/src/libply-splash-core/ply-keyboard.c
++++ b/src/libply-splash-core/ply-keyboard.c
+@@ -315,7 +315,7 @@ on_key_event (ply_keyboard_t *keyboard,
+                                  */
+                         }
+                         if (csi_seq_size == 0) /* No final byte found */
+-                                continue;
++                                break;
+                         process_keyboard_input (keyboard, bytes + i, csi_seq_size);
+                         i += csi_seq_size;
+                         continue;
+-- 
+2.52.0
+

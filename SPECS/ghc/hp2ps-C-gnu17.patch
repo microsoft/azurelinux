@@ -1,0 +1,37 @@
+From 65fa9969280fac5d2c08219a7178e7a0c0da2a17 Mon Sep 17 00:00:00 2001
+From: Jens Petersen <juhpetersen@gmail.com>
+Date: Tue, 28 Jan 2025 09:32:55 +0000
+Subject: [PATCH] hp2ps Utilities.c: include stdlib.h instead of extern malloc
+ and realloc
+
+---
+ utils/hp2ps/Utilities.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/utils/hp2ps/Utilities.c b/utils/hp2ps/Utilities.c
+index f79ddd827154..fc0fdd1e30a5 100644
+--- a/utils/hp2ps/Utilities.c
++++ b/utils/hp2ps/Utilities.c
+@@ -1,10 +1,9 @@
+ #include "Main.h"
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include "Error.h"
+ 
+-extern void* malloc();
+-
+ char*
+ Basename(char *name)
+ {
+@@ -89,7 +88,6 @@ void *
+ xrealloc(void *p, size_t n)
+ {
+     void *r;
+-    extern void *realloc();
+ 
+     r = realloc(p, n);
+     if (!r) {
+-- 
+GitLab
+

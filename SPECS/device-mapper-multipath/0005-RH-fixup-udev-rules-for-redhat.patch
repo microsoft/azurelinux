@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 13 Apr 2017 07:22:23 -0500
+Subject: [PATCH] RH: fixup udev rules for redhat
+
+The multipath rules need to run after scsi_id is run. This means moving
+them after 60-persistent-storage.rules for redhat. Redhat also uses a
+different naming scheme for partitions than SuSE.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc           | 2 +-
+ kpartx/kpartx.rules.in | 2 +-
+ multipath/Makefile     | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 65f6efc8..c225a1ed 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -34,7 +34,7 @@ endif
+ # Paths. All these can be overridden on the "make" command line.
+ prefix		:=
+ # Prefix for binaries
+-exec_prefix	:= $(prefix)
++exec_prefix	:= $(prefix)/usr
+ # Prefix for non-essential libraries (libdmmp)
+ usr_prefix	:= $(if $(prefix),$(prefix),/usr)
+ # Prefix for configuration files (multipath.conf)
+diff --git a/kpartx/kpartx.rules.in b/kpartx/kpartx.rules.in
+index 9d879609..2049eb8f 100644
+--- a/kpartx/kpartx.rules.in
++++ b/kpartx/kpartx.rules.in
+@@ -39,6 +39,6 @@ LABEL="mpath_kpartx_end"
+ GOTO="kpartx_end"
+ 
+ LABEL="run_kpartx"
+-RUN+="@BINDIR@/kpartx -un -p -part /dev/$name"
++RUN+="@BINDIR@/kpartx -un /dev/$name"
+ 
+ LABEL="kpartx_end"
+diff --git a/multipath/Makefile b/multipath/Makefile
+index 67fb5e62..2ea9e528 100644
+--- a/multipath/Makefile
++++ b/multipath/Makefile
+@@ -27,7 +27,7 @@ install:
+ 	$(Q)$(INSTALL_PROGRAM) -d $(DESTDIR)$(udevrulesdir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 644 11-dm-mpath.rules $(DESTDIR)$(udevrulesdir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 644 99-z-dm-mpath-late.rules $(DESTDIR)$(udevrulesdir)
+-	$(Q)$(INSTALL_PROGRAM) -m 644 multipath.rules $(DESTDIR)$(udevrulesdir)/56-multipath.rules
++	$(Q)$(INSTALL_PROGRAM) -m 644 multipath.rules $(DESTDIR)$(udevrulesdir)/62-multipath.rules
+ 	$(Q)$(INSTALL_PROGRAM) -d $(DESTDIR)$(tmpfilesdir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 644 tmpfiles.conf $(DESTDIR)$(tmpfilesdir)/multipath.conf
+ 	$(Q)$(INSTALL_PROGRAM) -d $(DESTDIR)$(mandir)/man8
+@@ -50,7 +50,7 @@ uninstall:
+ 	$(Q)$(RM) $(DESTDIR)$(udevrulesdir)/99-z-dm-mpath-late.rules
+ 	$(Q)$(RM) $(DESTDIR)$(modulesloaddir)/multipath.conf
+ 	$(Q)$(RM) $(DESTDIR)$(modulesloaddir)/scsi_dh.conf
+-	$(Q)$(RM) $(DESTDIR)$(libudevdir)/rules.d/56-multipath.rules
++	$(Q)$(RM) $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
+ 	$(Q)$(RM) $(DESTDIR)$(mandir)/man8/$(EXEC).8
+ 	$(Q)$(RM) $(DESTDIR)$(mandir)/man5/$(EXEC).conf.5
+ 	$(Q)$(RM) $(DESTDIR)$(tmpfilesdir)/multipath.conf

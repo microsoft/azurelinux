@@ -1,0 +1,70 @@
+diff --git a/ssl.c b/ssl.c
+--- ssl.c	
++++ ssl.c	
+@@ -28,17 +28,17 @@
+ #include <openssl/err.h>
+ #include <openssl/rand.h>
+ #include <openssl/bio.h>
+ #include <openssl/bn.h>
+ #include <openssl/param_build.h>
+ #include <errno.h>
+ #include <limits.h>
+ 
+ static char* get_ssl_error();
+ static SSL* get_ssl(struct vsf_session* p_sess, int fd);
+ static int ssl_session_init(struct vsf_session* p_sess);
+ static void setup_bio_callbacks();
+ static long bio_callback(
+-  BIO* p_bio, int oper, const char* p_arg, int argi, long argl, long retval);
++  BIO* p_bio, int oper, const char* p_arg, size_t len, int argi, long argl, int ret, size_t *processed);
+ static int ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx);
+ static int ssl_alpn_callback(SSL* p_ssl,
+                              const unsigned char** p_out,
+@@ -88,7 +88,7 @@
+     long options;
+     int verify_option = 0;
+     SSL_library_init();
+-    p_ctx = SSL_CTX_new(SSLv23_server_method());
++    p_ctx = SSL_CTX_new_ex(NULL, NULL, TLS_server_method());
+     if (p_ctx == NULL)
+     {
+       die("SSL: could not allocate SSL context");
+@@ -180,13 +180,10 @@
+       die("SSL: RNG is not seeded");
+     }
+     {
+-      EC_KEY* key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+-      if (key == NULL)
++      if (!SSL_CTX_set1_groups_list(p_ctx, "P-256"))
+       {
+         die("SSL: failed to get curve p256");
+       }
+-      SSL_CTX_set_tmp_ecdh(p_ctx, key);
+-      EC_KEY_free(key);
+     }
+     if (tunable_ssl_request_cert)
+     {
+@@ -692,17 +689,19 @@
+ static void setup_bio_callbacks(SSL* p_ssl)
+ {
+   BIO* p_bio = SSL_get_rbio(p_ssl);
+-  BIO_set_callback(p_bio, bio_callback);
++  BIO_set_callback_ex(p_bio, bio_callback);
+   p_bio = SSL_get_wbio(p_ssl);
+-  BIO_set_callback(p_bio, bio_callback);
++  BIO_set_callback_ex(p_bio, bio_callback);
+ }
+ 
+ static long
+ bio_callback(
+-  BIO* p_bio, int oper, const char* p_arg, int argi, long argl, long ret)
++  BIO* p_bio, int oper, const char* p_arg, size_t len, int argi, long argl, int ret, size_t *processed)
+ {
+   int retval = 0;
+   int fd = 0;
++  (void) len;
++  (void) processed;
+   (void) p_arg;
+   (void) argi;
+   (void) argl;
+

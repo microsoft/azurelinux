@@ -1,0 +1,30 @@
+From 20f199d608d7aa4c8eb21067480dc3a682f6188c Mon Sep 17 00:00:00 2001
+From: groff owner <groff-owner@fedoraproject.org>
+Date: Mon, 10 Jul 2023 10:54:23 +0000
+Subject: [PATCH] missing groff-x11 info message when gxditview not found
+
+Adds info message that 'groff-x11' package might be missing when
+executing 'groff -X' and 'gxditview' is not found.
+
+Resolves: #530788
+
+---
+ src/roff/groff/pipeline.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/roff/groff/pipeline.c b/src/roff/groff/pipeline.c
+index defafc2..188b98e 100644
+--- a/src/roff/groff/pipeline.c
++++ b/src/roff/groff/pipeline.c
+@@ -485,6 +485,8 @@ int run_pipeline(int ncommands, char ***commands, int no_pipe)
+       execvp(commands[i][0], commands[i]);
+       c_error("couldn't exec %1: %2",
+ 	      commands[i][0], strerror(errno), (char *)0);
++      if (strcmp(commands[i][0], "gxditview") == 0)
++	fprintf(stderr, "You might be missing 'groff-x11' package.\n");
+       _exit(EXEC_FAILED_EXIT_STATUS);
+     }
+     /* in the parent */
+-- 
+2.41.0
+

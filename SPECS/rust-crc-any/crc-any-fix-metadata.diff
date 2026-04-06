@@ -1,0 +1,12 @@
+--- crc-any-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crc-any-2.5.0/Cargo.toml	2024-10-29T14:11:56.176934+00:00
+@@ -51,9 +51,6 @@
+ version = "0.8"
+ optional = true
+ 
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+-
+ [features]
+ alloc = ["debug-helper"]
+ default = ["alloc"]

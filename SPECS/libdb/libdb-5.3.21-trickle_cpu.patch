@@ -1,0 +1,150 @@
+diff -up db-5.3.21/src/dbinc_auto/int_def.in.trickle db-5.3.21/src/dbinc_auto/int_def.in
+--- db-5.3.21/src/dbinc_auto/int_def.in.trickle	2018-08-21 10:54:06.066757392 +0200
++++ db-5.3.21/src/dbinc_auto/int_def.in	2018-08-21 10:54:06.111756561 +0200
+@@ -1458,6 +1458,7 @@
+ #define	__memp_sync_int __memp_sync_int@DB_VERSION_UNIQUE_NAME@
+ #define	__memp_mf_sync __memp_mf_sync@DB_VERSION_UNIQUE_NAME@
+ #define	__memp_purge_dead_files __memp_purge_dead_files@DB_VERSION_UNIQUE_NAME@
++#define	__memp_purge_dead_and_count __memp_purge_dead_and_count@DB_VERSION_UNIQUE_NAME@
+ #define	__memp_trickle_pp __memp_trickle_pp@DB_VERSION_UNIQUE_NAME@
+ #define	__mutex_alloc __mutex_alloc@DB_VERSION_UNIQUE_NAME@
+ #define	__mutex_alloc_int __mutex_alloc_int@DB_VERSION_UNIQUE_NAME@
+diff -up db-5.3.21/src/dbinc_auto/mp_ext.h.trickle db-5.3.21/src/dbinc_auto/mp_ext.h
+--- db-5.3.21/src/dbinc_auto/mp_ext.h.trickle	2018-08-21 10:54:06.103756709 +0200
++++ db-5.3.21/src/dbinc_auto/mp_ext.h	2018-08-21 10:54:06.112756543 +0200
+@@ -101,6 +101,7 @@ int __mp_xxx_fh __P((DB_MPOOLFILE *, DB_
+ int __memp_sync_int __P((ENV *, DB_MPOOLFILE *, u_int32_t, u_int32_t, u_int32_t *, int *));
+ int __memp_mf_sync __P((DB_MPOOL *, MPOOLFILE *, int));
+ int __memp_purge_dead_files __P((ENV *));
++int __memp_purge_dead_and_count __P((ENV *, u_int32_t *, u_int32_t *));
+ int __memp_trickle_pp __P((DB_ENV *, int, int *));
+ 
+ #if defined(__cplusplus)
+diff -up db-5.3.21/src/mp/mp_sync.c.trickle db-5.3.21/src/mp/mp_sync.c
+--- db-5.3.21/src/mp/mp_sync.c.trickle	2018-08-21 10:54:06.105756672 +0200
++++ db-5.3.21/src/mp/mp_sync.c	2018-09-04 09:43:57.502992291 +0200
+@@ -965,17 +965,34 @@ __bhcmp(p1, p2)
+ 	return (0);
+ }
+ 
++
+ /*
+  * __memp_purge_dead_files --
++ *  Thin wrapper over __memp_purge_dead_and_count. Does not return any
++ *  information about the number of total/dirty buffers.
++ *
++ * PUBLIC: int __memp_purge_dead_files __P((ENV *));
++ */
++int
++__memp_purge_dead_files(env)
++    ENV *env;
++{
++    return __memp_purge_dead_and_count(env, NULL, NULL);
++}
++
++/*
++ * __memp_purge_dead_and_count --
+  *	Remove all dead files and their buffers from the mpool. The caller
+  *	cannot hold any lock on the dead MPOOLFILE handles, their buffers
+  *	or their hash buckets.
+  *
+- * PUBLIC: int __memp_purge_dead_files __P((ENV *));
++ * PUBLIC: int __memp_purge_dead_and_count __P((ENV *, u_int32_t *, u_int32_t *));
+  */
+ int
+-__memp_purge_dead_files(env)
++__memp_purge_dead_and_count(env, totalp, dirtyp)
+ 	ENV *env;
++    u_int32_t *totalp;
++    u_int32_t *dirtyp;
+ {
+ 	BH *bhp;
+ 	DB_MPOOL *dbmp;
+@@ -983,7 +1000,7 @@ __memp_purge_dead_files(env)
+ 	REGINFO *infop;
+ 	MPOOL *c_mp, *mp;
+ 	MPOOLFILE *mfp;
+-	u_int32_t i_cache;
++	u_int32_t i_cache, dirty, total;
+ 	int ret, t_ret, h_lock;
+ 
+ 	if (!MPOOL_ON(env))
+@@ -992,6 +1009,7 @@ __memp_purge_dead_files(env)
+ 	dbmp = env->mp_handle;
+ 	mp = dbmp->reginfo[0].primary;
+ 	ret = t_ret = h_lock = 0;
++    dirty = total = 0;
+ 
+ 	/*
+ 	 * Walk each cache's list of buffers and free all buffers whose
+@@ -1000,6 +1018,7 @@ __memp_purge_dead_files(env)
+ 	for (i_cache = 0; i_cache < mp->nreg; i_cache++) {
+ 		infop = &dbmp->reginfo[i_cache]; 
+ 		c_mp = infop->primary;
++        total += c_mp->pages;
+ 
+ 		hp = R_ADDR(infop, c_mp->htab);
+ 		hp_end = &hp[c_mp->htab_buckets];
+@@ -1008,6 +1027,9 @@ __memp_purge_dead_files(env)
+ 			if (SH_TAILQ_FIRST(&hp->hash_bucket, __bh) == NULL)
+ 				continue;
+ 
++            /* Count dirty pages first as we do not wait on mutex locks */
++            dirty += (u_int32_t)atomic_read(&hp->hash_page_dirty);
++
+ 			/* 
+ 			 * Search for a dead buffer. Other places that call
+ 			 * __memp_bhfree() acquire the buffer lock before the
+@@ -1073,6 +1095,11 @@ __memp_purge_dead_files(env)
+ 		}
+ 	}
+ 
++    if (dirtyp != NULL)
++		*dirtyp = dirty;
++    if (totalp != NULL)
++		*totalp = total;
++
+ 	return (ret);
+ }
+ 
+diff -up db-5.3.21/src/mp/mp_trickle.c.trickle db-5.3.21/src/mp/mp_trickle.c
+--- db-5.3.21/src/mp/mp_trickle.c.trickle	2018-08-21 10:54:06.105756672 +0200
++++ db-5.3.21/src/mp/mp_trickle.c	2018-08-21 10:54:06.112756543 +0200
+@@ -56,6 +56,7 @@ __memp_trickle(env, pct, nwrotep)
+ 
+ 	dbmp = env->mp_handle;
+ 	mp = dbmp->reginfo[0].primary;
++    dirty = total = 0;
+ 
+ 	if (nwrotep != NULL)
+ 		*nwrotep = 0;
+@@ -67,12 +68,8 @@ __memp_trickle(env, pct, nwrotep)
+ 		return (EINVAL);
+ 	}
+ 
+-	/* First we purge all dead files and their buffers. */
+-	if ((ret = __memp_purge_dead_files(env)) != 0)
+-		return (ret);
+-
+-	/*
+-	 * Loop through the caches counting total/dirty buffers.
++	/* First we purge all dead files and their buffers and
++	 * loop through the caches counting total/dirty buffers.
+ 	 *
+ 	 * XXX
+ 	 * Using hash_page_dirty is our only choice at the moment, but it's not
+@@ -80,12 +77,8 @@ __memp_trickle(env, pct, nwrotep)
+ 	 * than one page size, as a free 512B buffer may not be equivalent to
+ 	 * having a free 8KB buffer.
+ 	 */
+-	for (ret = 0, i = dirty = total = 0; i < mp->nreg; ++i) {
+-		c_mp = dbmp->reginfo[i].primary;
+-		total += c_mp->pages;
+-		__memp_stat_hash(&dbmp->reginfo[i], c_mp, &dtmp);
+-		dirty += dtmp;
+-	}
++	if ((ret = __memp_purge_dead_and_count(env, &total, &dirty)) != 0)
++		return (ret);
+ 
+ 	/*
+ 	 * If there are sufficient clean buffers, no buffers or no dirty

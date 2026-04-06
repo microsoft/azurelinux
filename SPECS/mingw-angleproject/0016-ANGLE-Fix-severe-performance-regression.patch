@@ -1,0 +1,37 @@
+From b215999d63d6e6b087e53e24a47b8b60520ec9e4 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 11 Mar 2020 13:59:39 +0100
+Subject: [PATCH] ANGLE: Fix severe performance regression
+
+The changed buffer usage priority that was introduced in our ANGLE
+update caused severe performance regressions for Qt applications.
+
+Fixes: QTBUG-73835
+Change-Id: I49839bb272cdeec0027264f2751b88bc149665ad
+---
+ src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Buffer11.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Buffer11.h b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Buffer11.h
+index ddbeeb90d2..f92a68454b 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Buffer11.h
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Buffer11.h
+@@ -31,7 +31,6 @@ struct TranslatedAttribute;
+ // The order of this enum governs priority of 'getLatestBufferStorage'.
+ enum BufferUsage
+ {
+-    BUFFER_USAGE_SYSTEM_MEMORY,
+     BUFFER_USAGE_STAGING,
+     BUFFER_USAGE_VERTEX_OR_TRANSFORM_FEEDBACK,
+     BUFFER_USAGE_INDEX,
+@@ -40,6 +39,7 @@ enum BufferUsage
+     BUFFER_USAGE_PIXEL_UNPACK,
+     BUFFER_USAGE_PIXEL_PACK,
+     BUFFER_USAGE_UNIFORM,
++    BUFFER_USAGE_SYSTEM_MEMORY,
+     BUFFER_USAGE_EMULATED_INDEXED_VERTEX,
+ 
+     BUFFER_USAGE_COUNT,
+-- 
+2.20.1.windows.1
+

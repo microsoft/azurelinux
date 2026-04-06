@@ -1,0 +1,25 @@
+From c9b65320d64a60cde74c4c1f9cb4a05198a456c2 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Wed, 10 Sep 2025 13:27:52 +0100
+Subject: [PATCH] further size reductions
+
+---
+ configs/p3450-0000_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configs/p3450-0000_defconfig b/configs/p3450-0000_defconfig
+index 2ebcf8b83fc..a5e717a02ed 100644
+--- a/configs/p3450-0000_defconfig
++++ b/configs/p3450-0000_defconfig
+@@ -27,6 +27,8 @@ CONFIG_CONSOLE_MUX=y
+ CONFIG_SYS_STDIO_DEREGISTER=y
+ CONFIG_SYS_PROMPT="Tegra210 (P3450-0000) # "
+ # CONFIG_BOOTM_PLAN9 is not set
++# CONFIG_SYS_DTC_PAD_BYTES is not set
++# CONFIG_LEGACY_IMAGE_FORMAT is not set
+ # CONFIG_BOOTM_RTEMS is not set
+ # CONFIG_BOOTM_VXWORKS is not set
+ # CONFIG_CMD_ELF is not set
+-- 
+2.51.0
+

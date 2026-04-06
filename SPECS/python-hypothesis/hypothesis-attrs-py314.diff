@@ -1,0 +1,8 @@
+--- a/requirements/test.in
++++ b/requirements/test.in
+@@ -1,4 +1,4 @@
+-attrs==24.1.0  # too early for https://github.com/python-attrs/attrs/pull/1329
++attrs>=24.2.0  # for https://github.com/python-attrs/attrs/pull/1329
+ pexpect
+ pytest
+ pytest-xdist

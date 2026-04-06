@@ -1,0 +1,33 @@
+diff -rupN --no-dereference binutils-2.45.1/bfd/Makefile.am binutils-2.45.1-new/bfd/Makefile.am
+--- binutils-2.45.1/bfd/Makefile.am	2025-12-30 09:43:49.655428165 +0100
++++ binutils-2.45.1-new/bfd/Makefile.am	2025-12-30 09:43:49.659405039 +0100
+@@ -38,7 +38,7 @@ bfdlibdir = @bfdlibdir@
+ bfdincludedir = @bfdincludedir@
+ bfdlib_LTLIBRARIES = libbfd.la
+ bfdinclude_HEADERS = $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h \
+-		     $(INCDIR)/diagnostics.h $(INCDIR)/bfdlink.h
++		     $(INCDIR)/diagnostics.h $(INCDIR)/bfdlink.h $(INCDIR)/demangle.h
+ else !INSTALL_LIBBFD
+ # Empty these so that the respective installation directories will not be created.
+ bfdlibdir =
+diff -rupN --no-dereference binutils-2.45.1/bfd/Makefile.in binutils-2.45.1-new/bfd/Makefile.in
+--- binutils-2.45.1/bfd/Makefile.in	2025-12-30 09:43:49.655822126 +0100
++++ binutils-2.45.1-new/bfd/Makefile.in	2025-12-30 09:43:49.659778518 +0100
+@@ -284,7 +284,7 @@ am__can_run_installinfo = \
+   esac
+ am__bfdinclude_HEADERS_DIST = $(INCDIR)/plugin-api.h bfd.h \
+ 	$(INCDIR)/ansidecl.h $(INCDIR)/symcat.h \
+-	$(INCDIR)/diagnostics.h $(INCDIR)/bfdlink.h
++	$(INCDIR)/diagnostics.h $(INCDIR)/bfdlink.h $(INCDIR)/demangle.h
+ HEADERS = $(bfdinclude_HEADERS)
+ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+   distclean-recursive maintainer-clean-recursive
+@@ -514,7 +514,7 @@ libbfd_la_LDFLAGS = $(am__append_1) -rel
+ @INSTALL_LIBBFD_FALSE@bfdinclude_HEADERS = $(am__append_2)
+ @INSTALL_LIBBFD_TRUE@bfdinclude_HEADERS = $(BFD_H) \
+ @INSTALL_LIBBFD_TRUE@	$(INCDIR)/ansidecl.h $(INCDIR)/symcat.h \
+-@INSTALL_LIBBFD_TRUE@	$(INCDIR)/diagnostics.h \
++@INSTALL_LIBBFD_TRUE@	$(INCDIR)/diagnostics.h $(INCDIR)/demangle.h \
+ @INSTALL_LIBBFD_TRUE@	$(INCDIR)/bfdlink.h $(am__append_2)
+ @INSTALL_LIBBFD_FALSE@rpath_bfdlibdir = @bfdlibdir@
+ @INSTALL_LIBBFD_FALSE@noinst_LTLIBRARIES = libbfd.la

@@ -1,0 +1,146 @@
+From 8455b8894ea77076656ee90ded863e14bcb288f4 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Wed, 5 May 2021 20:49:26 +0300
+Subject: [PATCH 01/55] Client: Announce an output after receiving more
+ complete state
+
+Output initialization is not atomic, meaning that the compositor may
+process a wl_output bind request in one event loop cycle, and the
+xdg_output_manager.get_xdg_output in another event loop cycle.
+
+This means that xdg_output properties may arrive in another wl_output
+done frame. Prior to xdg-output v3, that wasn't an issue because the
+compositor is required to send an xdg_output.done event after sending
+xdg_output properties.
+
+Starting with v3, the compositor may choose not to send an
+xdg_output.done event after sending xdg_output properties. Therefore,
+as is, QtWayland may announce an output with bad logical geometry or
+even worse without name assigned by the compositor.
+
+Unfortunately, that breaks applications such as plasmashell. Plasma uses
+output names as a criterion to determine what kind of contents should be
+displayed on a particular output.
+
+In order to fix the initialization sequence, this change makes every
+QWaylandScreen track processed events. After all required events have
+been received, the screen can be announced to the rest of Qt.
+
+Change-Id: If5da747edd7af277ec1364cbea105c6994f47402
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 69ea480f2e53ad4a5bbca78cde044eb8d4c48896)
+
+Original Ticket: https://codereview.qt-project.org/c/qt/qtwayland/+/347774
+CCBUG: 435124
+---
+ src/client/qwaylandscreen.cpp | 32 +++++++++++++++++++++++---------
+ src/client/qwaylandscreen_p.h | 10 ++++++++--
+ 2 files changed, 31 insertions(+), 11 deletions(-)
+
+diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
+index 6cb337de..7c2d9be3 100644
+--- a/src/client/qwaylandscreen.cpp
++++ b/src/client/qwaylandscreen.cpp
+@@ -72,7 +72,7 @@ QWaylandScreen::QWaylandScreen(QWaylandDisplay *waylandDisplay, int version, uin
+         qCWarning(lcQpaWayland) << "wl_output done event not supported by compositor,"
+                                 << "QScreen may not work correctly";
+         mWaylandDisplay->forceRoundTrip(); // Give the compositor a chance to send geometry etc.
+-        mOutputDone = true; // Fake the done event
++        mProcessedEvents |= OutputDoneEvent; // Fake the done event
+         maybeInitialize();
+     }
+ }
+@@ -83,14 +83,25 @@ QWaylandScreen::~QWaylandScreen()
+         zxdg_output_v1::destroy();
+ }
+ 
++uint QWaylandScreen::requiredEvents() const
++{
++    uint ret = OutputDoneEvent;
++
++    if (mWaylandDisplay->xdgOutputManager()) {
++        ret |= XdgOutputNameEvent;
++
++        if (mWaylandDisplay->xdgOutputManager()->version() < 3)
++            ret |= XdgOutputDoneEvent;
++    }
++    return ret;
++}
++
+ void QWaylandScreen::maybeInitialize()
+ {
+     Q_ASSERT(!mInitialized);
+ 
+-    if (!mOutputDone)
+-        return;
+-
+-    if (mWaylandDisplay->xdgOutputManager() && !mXdgOutputDone)
++    const uint requiredEvents = this->requiredEvents();
++    if ((mProcessedEvents & requiredEvents) != requiredEvents)
+         return;
+ 
+     mInitialized = true;
+@@ -276,9 +287,8 @@ void QWaylandScreen::output_scale(int32_t factor)
+ 
+ void QWaylandScreen::output_done()
+ {
+-    mOutputDone = true;
+-    if (zxdg_output_v1::isInitialized() && mWaylandDisplay->xdgOutputManager()->version() >= 3)
+-        mXdgOutputDone = true;
++    mProcessedEvents |= OutputDoneEvent;
++
+     if (mInitialized) {
+         updateOutputProperties();
+         if (zxdg_output_v1::isInitialized())
+@@ -339,7 +349,7 @@ void QWaylandScreen::zxdg_output_v1_done()
+     if (Q_UNLIKELY(mWaylandDisplay->xdgOutputManager()->version() >= 3))
+         qWarning(lcQpaWayland) << "zxdg_output_v1.done received on version 3 or newer, this is most likely a bug in the compositor";
+ 
+-    mXdgOutputDone = true;
++    mProcessedEvents |= XdgOutputDoneEvent;
+     if (mInitialized)
+         updateXdgOutputProperties();
+     else
+@@ -348,7 +358,11 @@ void QWaylandScreen::zxdg_output_v1_done()
+ 
+ void QWaylandScreen::zxdg_output_v1_name(const QString &name)
+ {
++    if (Q_UNLIKELY(mInitialized))
++        qWarning(lcQpaWayland) << "zxdg_output_v1.name received after output has been initialized, this is most likely a bug in the compositor";
++
+     mOutputName = name;
++    mProcessedEvents |= XdgOutputNameEvent;
+ }
+ 
+ void QWaylandScreen::updateXdgOutputProperties()
+diff --git a/src/client/qwaylandscreen_p.h b/src/client/qwaylandscreen_p.h
+index df1c94f2..050cfdc0 100644
+--- a/src/client/qwaylandscreen_p.h
++++ b/src/client/qwaylandscreen_p.h
+@@ -116,6 +116,13 @@ public:
+     static QWaylandScreen *fromWlOutput(::wl_output *output);
+ 
+ private:
++    enum Event : uint {
++        XdgOutputDoneEvent = 0x1,
++        OutputDoneEvent = 0x2,
++        XdgOutputNameEvent = 0x4,
++    };
++    uint requiredEvents() const;
++
+     void output_mode(uint32_t flags, int width, int height, int refresh) override;
+     void output_geometry(int32_t x, int32_t y,
+                          int32_t width, int32_t height,
+@@ -148,8 +155,7 @@ private:
+     QSize mPhysicalSize;
+     QString mOutputName;
+     Qt::ScreenOrientation m_orientation = Qt::PrimaryOrientation;
+-    bool mOutputDone = false;
+-    bool mXdgOutputDone = false;
++    uint mProcessedEvents = 0;
+     bool mInitialized = false;
+ 
+ #if QT_CONFIG(cursor)
+-- 
+2.51.1
+

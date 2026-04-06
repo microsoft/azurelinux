@@ -1,0 +1,187 @@
+From a37894585ba4894f54a3d35487acafa1350c91fa Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 18 May 2023 11:42:29 +0200
+Subject: [PATCH] Upgrade to 2.76
+
+---
+ Makefile.PL         | 8 ++++----
+ lib/Net/Ping.pm     | 2 +-
+ t/000_load.t        | 2 +-
+ t/001_new.t         | 5 +++++
+ t/010_pingecho.t    | 6 +++++-
+ t/450_service.t     | 4 ++--
+ t/500_ping_icmp.t   | 5 ++---
+ t/501_ping_icmpv6.t | 5 ++---
+ 8 files changed, 22 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index dadc57f..ebf05a0 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -30,11 +30,11 @@ push @extras,
+         resources   => {
+             # TODO: 26 old issues still open at RT
+             # https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Ping
+-            bugtracker  => 'https://github.com/rurban/Net-Ping/issues',
++            bugtracker  => 'https://github.com/Perl/perl5/issues',
+             repository  => {
+                 type => 'git',
+-                url => 'https://github.com/rurban/Net-Ping.git',
+-                web => 'https://github.com/rurban/Net-Ping',
++                url => 'https://github.com/Perl/perl5.git',
++                web => 'https://github.com/Perl/perl5',
+             },
+             license     => [ 'http://dev.perl.org/licenses/' ],
+         },
+@@ -55,7 +55,7 @@ WriteMakefile(
+     'Test::Pod'           => '1.22',
+     'Test::More'          => 0,
+   },
+-  INSTALLDIRS => ($ENV{PERL_CORE} ? 'perl' : 'site'),
++  INSTALLDIRS => ( $] < 5.011 ? 'perl' : 'site' ),
+   clean      => { FILES => 'Net-Ping-*' },
+   @extras
+ );
+diff --git a/lib/Net/Ping.pm b/lib/Net/Ping.pm
+index 0b7be8c..b4c8f2f 100644
+--- a/lib/Net/Ping.pm
++++ b/lib/Net/Ping.pm
+@@ -22,7 +22,7 @@ use Time::HiRes;
+ @ISA = qw(Exporter);
+ @EXPORT = qw(pingecho);
+ @EXPORT_OK = qw(wakeonlan);
+-$VERSION = "2.75";
++$VERSION = "2.76";
+ 
+ # Globals
+ 
+diff --git a/t/000_load.t b/t/000_load.t
+index 4bf05c6..87f55d9 100644
+--- a/t/000_load.t
++++ b/t/000_load.t
+@@ -12,5 +12,5 @@ BEGIN {
+     use_ok( 'Net::Ping' )   || print "No Net::Ping!\n";
+ }
+ 
+-diag( "Testing Net::Ping $Net::Ping::VERSION, Perl $] on $^O, $^X" );
++note( "Testing Net::Ping $Net::Ping::VERSION, Perl $], $^X" );
+ 
+diff --git a/t/001_new.t b/t/001_new.t
+index 6b097d7..46965b7 100644
+--- a/t/001_new.t
++++ b/t/001_new.t
+@@ -1,11 +1,16 @@
+ use warnings;
+ use strict;
++use Config;
+ 
+ BEGIN {
+   unless (my $port = getservbyname('echo', 'tcp')) {
+     print "1..0 \# Skip: no echo port\n";
+     exit;
+   }
++  unless ($Config{d_getpbyname}) {
++    print "1..0 \# Skip: no getprotobyname\n";
++    exit;
++  }
+ }
+ 
+ use Test::More qw(no_plan);
+diff --git a/t/010_pingecho.t b/t/010_pingecho.t
+index e26332b..0c3c815 100644
+--- a/t/010_pingecho.t
++++ b/t/010_pingecho.t
+@@ -1,11 +1,16 @@
+ use warnings;
+ use strict;
++use Config;
+ 
+ BEGIN {
+   unless (my $port = getservbyname('echo', 'tcp')) {
+     print "1..0 \# Skip: no echo port\n";
+     exit;
+   }
++  unless ($Config{d_getpbyname}) {
++    print "1..0 \# Skip: no getprotobyname\n";
++    exit;
++  }
+ }
+ 
+ use Test::More tests => 2;
+@@ -14,7 +19,6 @@ BEGIN {use_ok('Net::Ping')};
+ TODO: {
+     local $TODO = "Not working on os390 smoker; may be a permissions problem"
+       if $^O eq 'os390';
+-    $TODO = "Not working on freebsd" if $^O eq 'freebsd';
+     my $result = pingecho("127.0.0.1");
+     is($result, 1, "pingecho 127.0.0.1 works");
+ }
+diff --git a/t/450_service.t b/t/450_service.t
+index 203d86b..8bfd91e 100644
+--- a/t/450_service.t
++++ b/t/450_service.t
+@@ -78,7 +78,7 @@ is($p->ping("127.0.0.1"), 1, 'first port is reachable');
+ $p->{port_num} = $port2;
+ 
+ {
+-    local $TODO = "Believed not to work on $^O" if $^O =~ /^(?:hpux|MSWin32|os390|freebsd)$/;
++    local $TODO = "Believed not to work on $^O" if $^O =~ /^(?:MSWin32|os390)$/;
+     is($p->ping("127.0.0.1"), 1, 'second port is reachable');
+ }
+ 
+@@ -133,7 +133,7 @@ SKIP: {
+ 
+   {
+     local $TODO = "Believed not to work on $^O"
+-      if $^O =~ /^(?:hpux|MSWin32|os390|freebsd)$/;
++      if $^O =~ /^(?:MSWin32|os390)$/;
+     is($p->ack(), '127.0.0.1', 'IP should be reachable');
+   }
+ }
+diff --git a/t/500_ping_icmp.t b/t/500_ping_icmp.t
+index 7476f60..e355711 100644
+--- a/t/500_ping_icmp.t
++++ b/t/500_ping_icmp.t
+@@ -19,14 +19,13 @@ BEGIN {
+ }
+ 
+ my $is_devel = $ENV{PERL_CORE} || -d ".git" ? 1 : 0;
+-$ENV{TEST_PING_HOST} = "127.0.0.1" if $ENV{NO_NETWORK_TESTING};
+ # Note this rawsocket test code is considered anti-social in p5p and was removed in
+ # their variant.
+-# See See https://www.nntp.perl.org/group/perl.perl5.porters/2016/11/msg240707.html
++# See http://nntp.perl.org/group/perl.perl5.porters/240707
+ # Problem is that ping_icmp needs root perms, and previous bugs were
+ # never caught. So I rather execute it via sudo in the core test suite
+ # and on devel CPAN dirs, than not at all and risk further bitrot of this API.
+-if (!Net::Ping::_isroot()) {
++if ( 0 && !Net::Ping::_isroot()) { # disable in blead via 7bfdd8260c
+     my $file = __FILE__;
+     my $lib = $ENV{PERL_CORE} ? '-I../../lib' : '-Mblib';
+     if ($is_devel and $Config{ccflags} =~ /fsanitize=address/ and $^O eq 'linux') {
+diff --git a/t/501_ping_icmpv6.t b/t/501_ping_icmpv6.t
+index 9b5b8b8..d59d4be 100644
+--- a/t/501_ping_icmpv6.t
++++ b/t/501_ping_icmpv6.t
+@@ -19,8 +19,7 @@ BEGIN {
+ }
+ 
+ my $is_devel = $ENV{PERL_CORE} || -d ".git" ? 1 : 0;
+-$ENV{TEST_PING6_HOST} = "::1" if $ENV{NO_NETWORK_TESTING};
+-if (!Net::Ping::_isroot()) {
++if (0 && !Net::Ping::_isroot()) {
+     my $file = __FILE__;
+     my $lib = $ENV{PERL_CORE} ? '-I../../lib' : '-Mblib';
+     # -n prevents from asking for a password. rather fail then
+@@ -60,7 +59,7 @@ SKIP: {
+   my $rightip = "2001:4860:4860::8888"; # pingable ip of google's dnsserver
+   # for a firewalled ipv6 network try an optional local ipv6 host
+   $rightip = $ENV{TEST_PING6_HOST} if $ENV{TEST_PING6_HOST};
+-  my $wrongip = "2001:db8::"; # non existing ip
++  my $wrongip = "2001:4860:4860::1234"; # non existing ip
+   # diag "Pinging existing IPv6 ";
+   my $result = $p->ping($rightip);
+   if ($result == 1) {
+-- 
+2.40.1
+

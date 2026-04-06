@@ -1,0 +1,5 @@
+# for qemu machine types 2.0 + newer
+CONFIG_QEMU=y
+CONFIG_ROM_SIZE=256
+CONFIG_ATA_DMA=n
+CONFIG_USE_SMM=n

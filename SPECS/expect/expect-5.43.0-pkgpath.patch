@@ -1,0 +1,46 @@
+diff -up expect5.45/configure.in.orig expect5.45/configure.in
+--- expect5.45/configure.in.orig	2011-01-18 16:58:14.860806442 +0100
++++ expect5.45/configure.in	2011-01-18 16:58:30.378753210 +0100
+@@ -977,6 +977,7 @@ AC_SUBST(EXP_CC_SEARCH_FLAGS)
+ AC_SUBST(SETUID)
+ AC_SUBST(SETPGRP_VOID)
+ AC_SUBST(DEFAULT_STTY_ARGS)
++AC_SUBST(TCL_VERSION)
+ # Expect uses these from tclConfig.sh to make the main executable
+ AC_SUBST(TCL_DL_LIBS)
+ AC_SUBST(TCL_CC_SEARCH_FLAGS)
+diff -up expect5.45/Makefile.in.orig expect5.45/Makefile.in
+--- expect5.45/Makefile.in.orig	2011-01-18 16:58:37.787723824 +0100
++++ expect5.45/Makefile.in	2011-01-18 17:05:10.697636907 +0100
+@@ -121,8 +121,8 @@ includedir	= @includedir@
+ DESTDIR		=
+ 
+ PKG_DIR		= $(PACKAGE_NAME)$(PACKAGE_VERSION)
+-pkgdatadir	= $(datadir)/$(PKG_DIR)
+-pkglibdir	= $(libdir)/$(PKG_DIR)
++pkgdatadir     = $(datadir)/tcl@TCL_VERSION@/$(PKG_DIR)
++pkglibdir      = $(libdir)/tcl@TCL_VERSION@/$(PKG_DIR)
+ pkgincludedir	= $(includedir)/$(PKG_DIR)
+ 
+ top_builddir	= .
+@@ -263,7 +263,7 @@ install-doc: doc
+ 	  else true; fi ; \
+ 	done
+ 
+-test: binaries libraries
++test: binaries libraries pkgIndex.tcl-test
+ 	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
+ 
+ shell: binaries libraries
+@@ -331,6 +331,11 @@ pkgIndex.tcl:
+ pkgIndex.tcl-hand:
+ 	(echo 'if {![package vsatisfies [package provide Tcl] @TCL_VERSION@]} {return}' ; \
+ 	 echo 'package ifneeded Expect $(PACKAGE_VERSION) \
++	    [list load [file join $$dir .. .. $(PKG_LIB_FILE)]]'\
++	) > pkgIndex.tcl
++
++pkgIndex.tcl-test:
++	(echo 'package ifneeded Expect $(PACKAGE_VERSION) \
+ 	    [list load [file join $$dir $(PKG_LIB_FILE)]]'\
+ 	) > pkgIndex.tcl
+ 

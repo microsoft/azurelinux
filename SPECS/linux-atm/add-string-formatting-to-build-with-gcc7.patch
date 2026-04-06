@@ -1,0 +1,11 @@
+--- linux-atm-2.5.1-orig/src/test/ttcp.c	2017-05-28 12:16:24.984611487 +0000
++++ linux-atm-2.5.1/src/test/ttcp.c	2017-05-28 12:17:25.370338343 +0000
+@@ -663,7 +663,7 @@ int no_check = 0;
+     exit(0);
+ 
+   usage:
+-    fprintf(stderr, Usage);
++    fprintf(stderr, "%s", Usage);
+     exit(1);
+ }
+ 

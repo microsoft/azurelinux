@@ -1,0 +1,35 @@
+From ce2017a2568100e5bbe6e0d46f9a9dfcfc362345 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 27 Oct 2017 12:56:51 +0200
+Subject: [PATCH] Deliver mail to <user>@localhost locally using a MDA
+
+Some utilities, such as rkhunter, send mail to root@localhost.
+This mail cannot be delivered using esmtp, if there is no
+SMTP server running on localhost. With this patch, esmtp delivers
+this mail directly using a MDA, just as if it were sent to 'root'
+instead of 'root@localhost'.
+
+Resolves: rhbz#1404768
+---
+ local.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/local.c b/local.c
+index e4afa29..31530ca 100644
+--- a/local.c
++++ b/local.c
+@@ -33,7 +33,10 @@ int local_address(const char *address)
+ 		 *
+ 		 * Maybe it should be delivered locally?
+ 		 */
+-		return !strchr(address, '@');
++		const char *host = strchr(address, '@');
++		if (host == NULL)
++			return 1;
++		return strcmp(host + 1, "localhost") == 0;
+ 	}
+ 
+ 	return 1;
+-- 
+2.14.3
+

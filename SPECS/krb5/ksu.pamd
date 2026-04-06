@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth    include  su
+account include  su
+session include  su

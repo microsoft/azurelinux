@@ -1,0 +1,90 @@
+From 386db86fe865fb552b1867af4bf4b78dbf9080cf Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 12:44:26 +0100
+Subject: [PATCH 25/59] Improve local_max_rate option.
+
+Now it should work as expected.
+---
+ ftpdataio.c | 14 +++++++-------
+ main.c      |  2 +-
+ session.h   |  3 ++-
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/ftpdataio.c b/ftpdataio.c
+index 3e4e9c9..00f9021 100644
+--- a/ftpdataio.c
++++ b/ftpdataio.c
+@@ -249,7 +249,7 @@ handle_io(int retval, int fd, void* p_private)
+ {
+   long curr_sec;
+   long curr_usec;
+-  unsigned int bw_rate;
++  unsigned long bw_rate;
+   double elapsed;
+   double pause_time;
+   double rate_ratio;
+@@ -276,19 +276,16 @@ handle_io(int retval, int fd, void* p_private)
+   {
+     elapsed = (double) 0.01;
+   }
+-  bw_rate = (unsigned int) ((double) retval / elapsed);
+-  if (bw_rate <= p_sess->bw_rate_max)
++  p_sess->bw_retval += retval;
++  bw_rate = (unsigned long) ((double) p_sess->bw_retval / elapsed);
++  if (bw_rate <= p_sess->bw_rate_max || p_sess->bw_retval < (unsigned long)(10*retval))
+   {
+-    p_sess->bw_send_start_sec = curr_sec;
+-    p_sess->bw_send_start_usec = curr_usec;
+     return;
+   }
+   /* Tut! Rate exceeded, calculate a pause to bring things back into line */
+   rate_ratio = (double) bw_rate / (double) p_sess->bw_rate_max;
+   pause_time = (rate_ratio - (double) 1) * elapsed;
+   vsf_sysutil_sleep(pause_time);
+-  p_sess->bw_send_start_sec = vsf_sysutil_get_time_sec();
+-  p_sess->bw_send_start_usec = vsf_sysutil_get_time_usec();
+ }
+ 
+ int
+@@ -441,6 +438,9 @@ struct vsf_transfer_ret
+ vsf_ftpdataio_transfer_file(struct vsf_session* p_sess, int remote_fd,
+                             int file_fd, int is_recv, int is_ascii)
+ {
++  p_sess->bw_send_start_sec = vsf_sysutil_get_time_sec();
++  p_sess->bw_send_start_usec = vsf_sysutil_get_time_usec();
++  p_sess->bw_retval = 0;
+   if (!is_recv)
+   {
+     if (is_ascii || p_sess->data_use_ssl)
+diff --git a/main.c b/main.c
+index eaba265..f1e2f69 100644
+--- a/main.c
++++ b/main.c
+@@ -40,7 +40,7 @@
+     /* Control connection */
+     0, 0, 0, 0, 0, 0,
+     /* Data connection */
+-    -1, 0, -1, 0, 0, 0, 0,
++    -1, 0, -1, 0, 0, 0, 0, 0,
+     /* Login */
+     1, 0, INIT_MYSTR, INIT_MYSTR,
+     /* Protocol state */
+diff --git a/session.h b/session.h
+index 956bfb7..3e8fdd5 100644
+--- a/session.h
++++ b/session.h
+@@ -29,9 +29,10 @@ struct vsf_session
+   struct vsf_sysutil_sockaddr* p_port_sockaddr;
+   int data_fd;
+   int data_progress;
+-  unsigned int bw_rate_max;
++  unsigned long bw_rate_max;
+   long bw_send_start_sec;
+   long bw_send_start_usec;
++  unsigned long bw_retval;
+ 
+   /* Details of the login */
+   int is_anonymous;
+-- 
+2.14.4
+

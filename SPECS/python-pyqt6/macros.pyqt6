@@ -1,0 +1,8 @@
+%pyqt6 @@NAME@@
+%pyqt6_epoch @@EPOCH@@
+%pyqt6_version @@VERSION@@
+%pyqt6_evr @@EVR@@
+
+%pyqt6_requires \
+Requires: %{pyqt6} >= %{pyqt6_evr} \
+%{nil}

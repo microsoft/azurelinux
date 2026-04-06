@@ -1,0 +1,44 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 9 Aug 2010 12:10:40 +0400
+Subject: [PATCH] More parentheses
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/fuse.c b/lib/fuse.c
+index d1d873a..ca1709c 100644
+--- a/lib/fuse.c
++++ b/lib/fuse.c
+@@ -1529,17 +1529,15 @@ static int fuse_compat_open(struct fuse_fs *fs, const char *path,
+ {
+ 	int err;
+ 	if (!fs->compat || fs->compat >= 25)
+-		err = fs->op.open(path, fi);
++		err = (fs->op.open)(path, fi);
+ 	else if (fs->compat == 22) {
+ 		struct fuse_file_info_compat tmp;
+ 		memcpy(&tmp, fi, sizeof(tmp));
+-		err = ((struct fuse_operations_compat22 *) &fs->op)->open(path,
+-									  &tmp);
++		err = (((struct fuse_operations_compat22 *) &fs->op)->open)(path, &tmp);
+ 		memcpy(fi, &tmp, sizeof(tmp));
+ 		fi->fh = tmp.fh;
+ 	} else
+-		err = ((struct fuse_operations_compat2 *) &fs->op)
+-			->open(path, fi->flags);
++		err = (((struct fuse_operations_compat2 *) &fs->op)->open)(path, fi->flags);
+ 	return err;
+ }
+ 
+diff --git a/lib/fuse_lowlevel.c b/lib/fuse_lowlevel.c
+index ff03c63..255f733 100644
+--- a/lib/fuse_lowlevel.c
++++ b/lib/fuse_lowlevel.c
+@@ -1211,7 +1211,7 @@ static void do_open(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
+ 	fi.flags = arg->flags;
+ 
+ 	if (req->f->op.open)
+-		req->f->op.open(req, nodeid, &fi);
++		(req->f->op.open)(req, nodeid, &fi);
+ 	else
+ 		fuse_reply_open(req, &fi);
+ }

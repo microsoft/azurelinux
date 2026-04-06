@@ -1,0 +1,8 @@
+[Unit]
+Description=fast remote file copy program daemon
+ConditionPathExists=/etc/rsyncd.conf
+
+[Service]
+EnvironmentFile=/etc/sysconfig/rsyncd
+ExecStart=/usr/bin/rsync --daemon --no-detach "$OPTIONS"
+StandardInput=socket

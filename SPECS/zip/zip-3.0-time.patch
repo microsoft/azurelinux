@@ -1,0 +1,11 @@
+--- zip-2.31/unix/Makefile.time	2007-02-07 09:36:30.000000000 +0100
++++ zip-2.31/unix/Makefile	2007-02-07 09:38:42.000000000 +0100
+@@ -24,7 +24,7 @@
+ E =
+ 
+ # probably can change this to 'install' if you have it
+-INSTALL_PROGRAM = cp
++INSTALL_PROGRAM = cp -p
+ # probably can change this to 'install -d' if you have it
+ # XXX NextStep 3.3 and Openstep 4.x don't know about -p !
+ INSTALL_D = mkdir -p

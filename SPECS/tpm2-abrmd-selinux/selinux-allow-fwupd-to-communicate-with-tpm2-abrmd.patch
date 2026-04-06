@@ -1,0 +1,31 @@
+From 0bb388cc57231cb46f5bfa1a52425588fa149e89 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Wed, 12 Feb 2020 13:48:29 +0100
+Subject: [PATCH] selinux: allow fwupd to communicate with tpm2-abrmd
+
+In Fedora, we have the following SELinux AVC error:
+
+Mar 07 09:18:35 river audit[1078]: USER_AVC pid=1078 uid=81 auid=4294967295 ses=4294967295 subj=system_u:system_r:system_dbusd_t:s0-s0:c0.c1023 msg='avc:  denied  { send_msg } for msgtype=method_return dest=:1.558 spid=8554 tpid=8550 scontext=system_u:system_r:tabrmd_t:s0 tcontext=system_u:system_r:fwupd_t:s0 tclass=dbus permissive=0 exe="/usr/bin/dbus-daemon" sauid=81 hostname=? addr=? terminal=?'
+
+Allow fwupd to chat with tpm2-abrmd over D-BUS.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ selinux/tabrmd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/selinux/tabrmd.te b/selinux/tabrmd.te
+index 59d7e548051..8996a46a0ea 100644
+--- a/selinux/tabrmd.te
++++ b/selinux/tabrmd.te
+@@ -21,6 +21,7 @@ optional_policy(`
+     dbus_stub()
+     dbus_system_domain(tabrmd_t, tabrmd_exec_t)
+     allow system_dbusd_t tabrmd_t:unix_stream_socket rw_stream_socket_perms;
++    fwupd_dbus_chat(tabrmd_t)
+ ')
+ 
+ tunable_policy(`tabrmd_connect_all_unreserved',`
+-- 
+2.24.1
+

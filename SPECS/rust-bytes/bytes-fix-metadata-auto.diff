@@ -1,0 +1,14 @@
+--- bytes-1.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bytes-1.11.1/Cargo.toml	2026-02-06T23:41:04.238589+00:00
+@@ -128,10 +128,8 @@
+ [dev-dependencies.serde_test]
+ version = "1.0"
+ 
+-[target."cfg(loom)".dev-dependencies.loom]
+-version = "0.7"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(loom)"]
++

@@ -1,0 +1,122 @@
+From 547e7145f335dc07144f35eaacc520475068852e Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 30 Aug 2019 10:22:22 +0200
+Subject: [PATCH 1/3] Revert "fts: cleanup after FTS_NOATIME removal"
+
+This reverts commit dce8759f0f0236a860a3e68b63c5e99cc6f168f9.
+---
+ gl/lib/fts_.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/gl/lib/fts_.h b/gl/lib/fts_.h
+index fb5558f..0122262 100644
+--- a/gl/lib/fts_.h
++++ b/gl/lib/fts_.h
+@@ -149,14 +149,16 @@ typedef struct {
+      dirent.d_type data.  */
+ # define FTS_DEFER_STAT         0x0400
+ 
++/* 0x0800 unused, was non-working FTS_NOATIME */
++
+   /* Use this flag to disable stripping of trailing slashes
+      from input path names during fts_open initialization.  */
+-# define FTS_VERBATIM   0x0800
++# define FTS_VERBATIM   0x1000
+ 
+-# define FTS_OPTIONMASK 0x0fff          /* valid user option mask */
++# define FTS_OPTIONMASK 0x1fff          /* valid user option mask */
+ 
+-# define FTS_NAMEONLY   0x1000          /* (private) child names only */
+-# define FTS_STOP       0x2000          /* (private) unrecoverable error */
++# define FTS_NAMEONLY   0x2000          /* (private) child names only */
++# define FTS_STOP       0x4000          /* (private) unrecoverable error */
+         int fts_options;                /* fts_open options, global flags */
+ 
+         /* Map a directory's device number to a boolean.  The boolean is
+-- 
+2.20.1
+
+
+From 1328926a705fdb4728c1f255dd368de928736d39 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 25 Sep 2015 16:09:39 +0200
+Subject: [PATCH 2/3] fts: introduce the FTS_NOLEAF flag
+
+The flag is needed to implement the -noleaf option of find.
+* lib/fts.c (link_count_optimize_ok): Implement the FTS_NOLEAF flag.
+* lib/fts_.h (FTS_NOLEAF): New macro, shifted conflicting constants.
+---
+ gl/lib/fts.c  |  4 ++++
+ gl/lib/fts_.h | 12 +++++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/gl/lib/fts.c b/gl/lib/fts.c
+index d2d404f..808466f 100644
+--- a/gl/lib/fts.c
++++ b/gl/lib/fts.c
+@@ -706,6 +706,10 @@ filesystem_type (FTSENT const *p, int fd)
+   struct dev_type *ent;
+   struct statfs fs_buf;
+ 
++  if (ISSET(FTS_NOLEAF))
++    /* leaf optimization explicitly disabled by the FTS_NOLEAF flag */
++    return 0;
++
+   /* If we're not in CWDFD mode, don't bother with this optimization,
+      since the caller is not serious about performance.  */
+   if (!ISSET (FTS_CWDFD))
+diff --git a/gl/lib/fts_.h b/gl/lib/fts_.h
+index 63d4b74..f1d519b 100644
+--- a/gl/lib/fts_.h
++++ b/gl/lib/fts_.h
+@@ -155,10 +155,16 @@ typedef struct {
+      from input path names during fts_open initialization.  */
+ # define FTS_VERBATIM   0x1000
+ 
+-# define FTS_OPTIONMASK 0x1fff          /* valid user option mask */
++  /* Disable leaf optimization (which eliminates stat() calls during traversal,
++     based on the count of nested directories stored in stat.st_nlink of each
++     directory).  Note that the optimization is by default enabled only for
++     selected file systems, and only if the FTS_CWDFD flag is set.  */
++# define FTS_NOLEAF     0x2000
+ 
+-# define FTS_NAMEONLY   0x2000          /* (private) child names only */
+-# define FTS_STOP       0x4000          /* (private) unrecoverable error */
++# define FTS_OPTIONMASK 0x3fff          /* valid user option mask */
++
++# define FTS_NAMEONLY   0x4000          /* (private) child names only */
++# define FTS_STOP       0x8000          /* (private) unrecoverable error */
+         int fts_options;                /* fts_open options, global flags */
+ 
+         /* Map a directory's device number to a boolean.  The boolean is
+-- 
+2.5.0
+
+
+From c186934e6e37ddadf7511abb9b1045192757618e Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 25 Sep 2015 19:13:15 +0200
+Subject: [PATCH 3/3] ftsfind: propagate the -noleaf option to FTS
+
+* find/ftsfind.c (find): Propagate the -noleaf option to FTS.
+---
+ find/ftsfind.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/find/ftsfind.c b/find/ftsfind.c
+index 5159470..e34b672 100644
+--- a/find/ftsfind.c
++++ b/find/ftsfind.c
+@@ -509,6 +509,9 @@ find (char *arg)
+   if (options.stay_on_filesystem)
+     ftsoptions |= FTS_XDEV;
+ 
++  if (options.no_leaf_check)
++    ftsoptions |= FTS_NOLEAF;
++
+   p = fts_open (arglist, ftsoptions, NULL);
+   if (NULL == p)
+     {
+-- 
+2.5.0
+

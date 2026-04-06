@@ -1,0 +1,37 @@
+From e34c1477cfa446f1b44287b10425a9e69602b519 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Fri, 12 Jul 2024 16:24:58 -0700
+Subject: [PATCH 2/2] doc: Document IEC unit behavior in the manpage
+
+Previously this has only been documented in the info page.
+---
+ doc/C/parted.8 | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/doc/C/parted.8 b/doc/C/parted.8
+index 3069c33..171269c 100644
+--- a/doc/C/parted.8
++++ b/doc/C/parted.8
+@@ -151,6 +151,19 @@ Toggle the state of the disk \fIflag\fP.
+ .B version
+ Display version information and a copyright message.
+ .RE
++.SH UNITS
++\fBparted\fP will compute sensible ranges for the locations you specify when using
++units like "GB", "MB", etc. Use the sector unit "s" or IEC binary units like
++"GiB", "MiB", to specify exact locations.
++
++When you specify start or end values using IEC binary units like "MiB",
++"GiB", "TiB", etc., \fBparted\fP treats those values as exact, and equivalent to
++the same number specified in bytes (i.e., with the "B" suffix), in that it
++provides no helpful range of sloppiness.  Contrast that with a partition
++start request of "4GB", which may actually resolve to some sector up to 500MB
++before or after that point.  Thus, when creating a partition in an exact location
++you should use units of bytes ("B"), sectors ("s"), or IEC binary units like
++"MiB", "GiB", but not "MB", "GB", etc.
+ .SH REPORTING BUGS
+ Report bugs to <bug-parted@gnu.org>
+ .SH SEE ALSO
+-- 
+2.45.2
+

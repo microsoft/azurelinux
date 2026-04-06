@@ -1,0 +1,29 @@
+From a36b73a21e4b5b6e051b23192a645dea34c9d6af Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <ueno@gnu.org>
+Date: Tue, 5 Nov 2024 14:45:46 +0900
+Subject: [PATCH] tests: skip CHACHA20-POLY1305 in TLS 1.2 when KTLS is enabled
+
+Signed-off-by: Daiki Ueno <ueno@gnu.org>
+---
+ tests/gnutls_ktls.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/gnutls_ktls.c b/tests/gnutls_ktls.c
+index 90d3e9af91..d5ac4efecc 100644
+--- a/tests/gnutls_ktls.c
++++ b/tests/gnutls_ktls.c
+@@ -347,9 +347,11 @@ void doit(void)
+ {
+ 	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-GCM");
+ 	run("NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+AES-256-GCM");
++#if 0
+ 	if (!gnutls_fips140_mode_enabled()) {
+ 		run("NORMAL:-VERS-ALL:+VERS-TLS1.2:-CIPHER-ALL:+CHACHA20-POLY1305");
+ 	}
++#endif
+ 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM");
+ 	run("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM");
+ 	if (!gnutls_fips140_mode_enabled()) {
+-- 
+2.47.0
+

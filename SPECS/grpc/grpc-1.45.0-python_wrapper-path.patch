@@ -1,0 +1,15 @@
+diff -Naur grpc-1.45.0-original/test/core/http/httpcli_test_util.cc grpc-1.45.0/test/core/http/httpcli_test_util.cc
+--- grpc-1.45.0-original/test/core/http/httpcli_test_util.cc	2022-03-18 13:20:52.000000000 -0400
++++ grpc-1.45.0/test/core/http/httpcli_test_util.cc	2022-03-31 13:14:49.481349132 -0400
+@@ -53,9 +53,9 @@
+       lslash = me + (lslash - me) - sizeof("http");
+     }
+     root = static_cast<char*>(
+-        gpr_malloc(static_cast<size_t>(lslash - me + sizeof("/../.."))));
++        gpr_malloc(static_cast<size_t>(lslash - me + sizeof("/.."))));
+     memcpy(root, me, static_cast<size_t>(lslash - me));
+-    memcpy(root + (lslash - me), "/../..", sizeof("/../.."));
++    memcpy(root + (lslash - me), "/..", sizeof("/.."));
+   } else {
+     root = gpr_strdup(".");
+   }

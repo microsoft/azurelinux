@@ -1,0 +1,34 @@
+From 0954a179d4ef72597efea44a91071eb9a55a385f Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Sun, 23 Mar 2025 01:29:27 +0100
+Subject: [PATCH] Fix build
+
+---
+ src/server/drm_fourcc.h | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/server/drm_fourcc.h b/src/server/drm_fourcc.h
+index 51124993..e10dbbcc 100644
+--- a/src/server/drm_fourcc.h
++++ b/src/server/drm_fourcc.h
+@@ -11,9 +11,14 @@
+ 
+ //#include "drm.h"
+ 
+-// These typedefs are copied from drm.h
+-typedef uint32_t __u32;
+-typedef uint64_t __u64;
++// This is  copied from drm.h
++#if   defined(__linux__)
++   #include <linux/types.h>
++   #include <asm/ioctl.h>
++#else /* One of the BSDs */
++  typedef uint32_t __u32;
++  typedef uint64_t __u64;
++#endif
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+-- 
+GitLab
+

@@ -1,0 +1,16 @@
+--- lz4-sys-1.11.1+lz4-1.10.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lz4-sys-1.11.1+lz4-1.10.0/Cargo.toml	2025-05-12T23:30:14.866645+00:00
+@@ -11,7 +11,7 @@
+ 
+ [package]
+ name = "lz4-sys"
+-version = "1.11.1+lz4-1.10.0"
++version = "1.11.1"
+ authors = [
+     "Jens Heyens <jens.heyens@ewetel.net>",
+     "Artem V. Navrotskiy <bozaro@buzzsoft.ru>",
+@@ -28,3 +28,4 @@
+ 
+ [build-dependencies.cc]
+ version = "1.1"
++

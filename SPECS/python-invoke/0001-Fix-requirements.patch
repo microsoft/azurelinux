@@ -1,0 +1,40 @@
+diff --git a/setup.py b/setup.py
+index 1786a59..de6a4a4 100644
+--- a/setup.py
++++ b/setup.py
+@@ -41,6 +41,16 @@ setup(
+         "CI": "https://app.circleci.com/pipelines/github/pyinvoke/invoke",
+     },
+     python_requires=">=3.6",
++    install_requires=[
++        "fluidity-sm",
++        "lexicon",
++        "PyYAML",
++    ],
++    extras_require={
++        "test": [
++            "pytest-relaxed >=2",
++        ],
++    },
+     packages=find_packages(exclude=exclude),
+     include_package_data=True,
+     entry_points={
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 1130148..a685f1b 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -9,9 +9,12 @@ from unittest.mock import patch
+ from _util import support
+ 
+ # Set up icecream globally for convenience.
+-from icecream import install
++try:
++    from icecream import install
+ 
+-install()
++    install()
++except ImportError:
++    pass
+ 
+ 
+ # pytest seems to tweak logging such that Invoke's debug logs go to stderr,

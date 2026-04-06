@@ -1,0 +1,22 @@
+--- a/tools/ref/CMakeLists.txt	2024-05-20 13:53:43.311894008 +0300
++++ b/tools/ref/CMakeLists.txt	2024-05-20 13:54:00.348855509 +0300
+@@ -29,7 +29,7 @@
+ target_compile_options(qplref PUBLIC
+                        "$<$<CONFIG:Debug>:>"
+                        "$<$<CONFIG:Release>:>"
+-                       PRIVATE "$<$<C_COMPILER_ID:GNU>:-Werror>"
++                       PRIVATE "$<$<C_COMPILER_ID:GNU>:>"
+                        PRIVATE "$<$<C_COMPILER_ID:MSVC>:/WX>")
+ 
+ target_compile_definitions(qplref PUBLIC REF_BAD_ARG_CHECK)
+--- a/tools/utils/common/CMakeLists.txt	2024-05-20 14:39:39.433629047 +0300
++++ b/tools/utils/common/CMakeLists.txt	2024-05-20 14:39:51.294601995 +0300
+@@ -29,7 +29,7 @@
+ target_compile_options(tool_common
+         PRIVATE $<$<CONFIG:Debug>:>
+         PRIVATE $<$<CONFIG:Release>:>
+-        PRIVATE $<$<C_COMPILER_ID:GNU>:-m64;-Werror>
++        PRIVATE $<$<C_COMPILER_ID:GNU>:-m64>
+         PRIVATE $<$<C_COMPILER_ID:MSVC>:/WX; /wd4996>)
+ 
+ if (WIN32)

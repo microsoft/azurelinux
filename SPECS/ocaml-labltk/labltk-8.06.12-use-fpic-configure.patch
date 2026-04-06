@@ -1,0 +1,28 @@
+This patch is required because of the following problem when linking
+the test binary in ./configure.  This seems unrelated to OCaml and
+somehow caused by changes in Tcl (or Fedora) itself:
+
+runtest: gcc -o tst -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5 -I/usr/local/include tclversion.c  -Wl,-z,relro -Wl,--as-needed  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -Wl,--build-id=sha1  -lm 
+tclversion.c:21:1: warning: return type defaults to 'int' [-Wimplicit-int]
+   21 | main ()
+      | ^~~~
+/usr/bin/ld: /tmp/ccDzgQio.o: relocation R_RISCV_HI20 against `a local symbol' can not be used when making a shared object; recompile with -fPIC
+/usr/bin/ld: .gnu.build.attributes has both ordered [`.gnu.build.attributes.lo.exit' in /lib64/lp64d/../lib64/lp64d/Scrt1.o] and unordered [`.gnu.build.attributes' in /lib64/lp64d/../lib64/lp64d/Scrt1.o] sections
+/usr/bin/ld: final link failed: bad value
+collect2: error: ld returned 1 exit status
+
+RWMJ 2022-09-20
+
+--- labltk-8.06.12.old/config/auto-aux/runtest	2022-09-20 14:32:40.445384080 +0100
++++ labltk-8.06.12/config/auto-aux/runtest	2022-09-20 14:37:08.035133820 +0100
+@@ -15,8 +15,8 @@
+ 
+ if test "$verbose" = yes; then
+ echo "runtest: $cc -o tst $* $cclibs" >&2
+-$cc -o tst $* $cclibs || exit 100
++$cc -fPIC -o tst $* $cclibs || exit 100
+ else
+-$cc -o tst $* $cclibs 2> /dev/null || exit 100
++$cc -fPIC -o tst $* $cclibs 2> /dev/null || exit 100
+ fi
+ exec ./tst

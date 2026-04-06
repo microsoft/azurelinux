@@ -1,0 +1,19 @@
+Make sure the network is actually up at the moment of the service startup:
+https://systemd.io/NETWORK_ONLINE/
+
+Offered upstream:
+https://github.com/codership/galera/pull/667
+https://groups.google.com/g/codership-team/c/Cn4UO3MkNQs
+
+--- galera-26.4.18/garb/files/garb.service	2024-04-17 19:39:35.000000000 +0200
++++ galera-26.4.18/garb/files/garb.service_patched	2024-06-09 07:47:19.245480639 +0200
+@@ -4,7 +4,8 @@
+ Description=Galera Arbitrator Daemon
+ Documentation=man:garbd(8)
+ Documentation=https://galeracluster.com/library/documentation/arbitrator.html
+-After=network.target
++After=network-online.target
++Wants=network-online.target
+ 
+ [Install]
+ WantedBy=multi-user.target

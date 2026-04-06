@@ -1,0 +1,57 @@
+From e952763aae9ab4409e8a950a6eced6f98cd315cd Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Mon, 2 Feb 2026 16:00:08 -0800
+Subject: [PATCH] initrd format detection: make dracut --printconfig optional
+
+In https://github.com/OSInside/kiwi/pull/2921 , based on the
+commit message and the fact that the code uses an `if`, it's
+pretty clear the use of `dracut --printconfig` is meant to be
+optional. But setting the misleadingly-named `raise_on_error`
+to `True` means it isn't. `raise_on_error` makes
+`has_option_in_help` raise an exception if it *fails* - doesn't
+find the specified flag - not if it *errors*. Since it does not
+handle the exception, this code crashes if dracut does not have
+the argument:
+https://koji.fedoraproject.org/koji/taskinfo?taskID=141808928
+
+DEBUG util.py:459:  [ ERROR   ]: 06:03:28 | KiwiCommandCapabilitiesError: Could not parse dracut output
+
+I've sent https://github.com/OSInside/kiwi/pull/2943 to make the
+message less of a lie, and this makes us stop crashing if the
+arg isn't available.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ kiwi/boot/image/base.py           | 2 +-
+ test/unit/boot/image/base_test.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kiwi/boot/image/base.py b/kiwi/boot/image/base.py
+index aab09de78..0be4155c4 100644
+--- a/kiwi/boot/image/base.py
++++ b/kiwi/boot/image/base.py
+@@ -545,7 +545,7 @@ class BootImageBase:
+     ) -> Optional[str]:
+         if CommandCapabilities.has_option_in_help(
+             'dracut', '--printconfig', ['--help'],
+-            root=self.boot_root_directory, raise_on_error=True
++            root=self.boot_root_directory, raise_on_error=False
+         ):
+             dracut_call = Command.run(
+                 ['chroot', self.boot_root_directory, 'dracut', '--printconfig']
+diff --git a/test/unit/boot/image/base_test.py b/test/unit/boot/image/base_test.py
+index bd0868608..dff54464e 100644
+--- a/test/unit/boot/image/base_test.py
++++ b/test/unit/boot/image/base_test.py
+@@ -247,7 +247,7 @@ class TestBootImageBase:
+             )
+             mock_CommandCapabilities_has_option_in_help.assert_called_once_with(
+                 'dracut', '--printconfig', ['--help'],
+-                root='system-directory', raise_on_error=True
++                root='system-directory', raise_on_error=False
+             )
+             mock_Command_run.assert_called_once_with(
+                 ['chroot', 'system-directory', 'dracut', '--printconfig']
+-- 
+2.52.0
+

@@ -1,0 +1,12 @@
+diff -up db-4.7.25/dist/configure.ac.jni db-4.7.25/dist/configure.ac
+--- db-4.7.25/dist/configure.ac.jni	2008-08-20 14:22:59.000000000 +0200
++++ db-4.7.25/dist/configure.ac	2008-08-20 14:23:39.000000000 +0200
+@@ -418,7 +418,7 @@ if test "$db_cv_java" = "yes"; then
+ 	AC_PROG_JAVAC
+ 	AC_PROG_JAR
+ 	AC_PROG_JAVA
+-	AC_JNI_INCLUDE_DIR
++	JNI_INCLUDE_DIRS="/usr/lib/jvm/java/include /usr/lib/jvm/java/include/linux"
+ 
+ 	AC_MSG_CHECKING(java version)
+         case "$JAVA" in

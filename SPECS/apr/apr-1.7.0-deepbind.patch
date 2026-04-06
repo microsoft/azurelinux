@@ -1,0 +1,60 @@
+
+Add $APR_DEEPBIND to enable use of RTLD_DEEPBIND in apr_dso_open().
+
+--- apr-1.7.0/dso/unix/dso.c.deepbind
++++ apr-1.7.0/dso/unix/dso.c
+@@ -38,6 +38,8 @@
+ #define DYLD_LIBRARY_HANDLE (void *)-1
+ #endif
+ 
++static int use_deepbind; /* 0 = unset, 1 = use DEEPBIND, -1, don't use DEEPBIND */
++
+ APR_DECLARE(apr_status_t) apr_os_dso_handle_put(apr_dso_handle_t **aprdso,
+                                                 apr_os_dso_handle_t osdso,
+                                                 apr_pool_t *pool)
+@@ -125,6 +127,12 @@
+ #else
+     int flags = RTLD_NOW | RTLD_GLOBAL;
+     void *os_handle;
++
++    if (use_deepbind == 0)
++        use_deepbind = secure_getenv("APR_DEEPBIND") != NULL ? 1 : -1;
++    if (use_deepbind == 1)
++        flags |= RTLD_DEEPBIND;
++
+ #ifdef _AIX
+     if (strchr(path + 1, '(') && path[strlen(path) - 1] == ')')
+     {
+--- apr-1.7.0/README.deepbind.deepbind
++++ apr-1.7.0/README.deepbind
+@@ -0,0 +1,30 @@
++This distribution of APR contains a modification of the behaviour of
++the apr_dso_open() function which allows users enable the
++"RTLD_DEEPBIND" flag when dlopen() is called.
++
++If the "APR_DEEPBIND" environment variable is set at runtime, the
++RTLD_DEEPBIND flag is always added to the flags passed to dlopen().
++
++With normal use of dlopen(), dynamically loaded objects will use
++global symbols in preference to any symbols defined within the object.
++Using RTLD_DEEPBIND reverses this binding order.  See the dlopen(3)
++man page for more information.
++
++This can be useful with Apache httpd, where two different modules are
++loaded like:
++
++1. mod_foo.so uses library "libfoo.so"
++   libfoo.so defines a function "SomeSym"
++2. mod_bar.so uses library "libbar.so"
++   libbar.so defines a different "SomeSym" function
++
++By default, mod_bar or mod_foo would use the "SomeSym" definition from
++the "wrong" library depending on the load order.  If RTLD_DEEPBIND is
++used, the "SomeSym" definition will always be mapped to the definition
++from the corresponding dependent library.  This can avoid symbol
++conflicts.
++
++There are some risks with using RTLD_DEEPBIND, in particular potential
++issues with modules written in C++.  It is not recommended to enable
++$APR_DEEPBIND unless it solves a specific problem and after thorough
++testing of the configuration.

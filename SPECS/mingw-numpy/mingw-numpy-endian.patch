@@ -1,0 +1,23 @@
+diff -rupN --no-dereference numpy-2.3.3/numpy/_core/meson.build numpy-2.3.3-new/numpy/_core/meson.build
+--- numpy-2.3.3/numpy/_core/meson.build	2025-09-14 16:55:18.088461214 +0200
++++ numpy-2.3.3-new/numpy/_core/meson.build	2025-09-14 16:55:18.093066697 +0200
+@@ -524,12 +524,13 @@ if longdouble_format == 'UNKNOWN' or lon
+ endif
+ cdata.set10('HAVE_LDOUBLE_' + longdouble_format, true)
+ 
+-if cc.has_header('endian.h')
+-  cdata.set10('NPY_HAVE_ENDIAN_H', true)
+-endif
+-if cc.has_header('sys/endian.h')
+-  cdata.set10('NPY_HAVE_SYS_ENDIAN_H', true)
+-endif
++# NOTE: mingw does not have endian.h
++# if cc.has_header('endian.h')
++#   cdata.set10('NPY_HAVE_ENDIAN_H', true)
++# endif
++# if cc.has_header('sys/endian.h')
++#   cdata.set10('NPY_HAVE_SYS_ENDIAN_H', true)
++# endif
+ # Build-time option to disable threading is stored and exposed in numpyconfig.h
+ # Note: SMP is an old acronym for threading (Symmetric/Shared-memory MultiProcessing)
+ cdata.set10('NPY_NO_SMP', get_option('disable-threading'))

@@ -1,0 +1,17 @@
+Do not call undeclared exit function in __thread support check
+
+Submitted upstream: <https://github.com/pmodels/json-c/pull/2>
+
+diff --git a/modules/json-c/configure.ac b/modules/json-c/configure.ac
+index 9eb80bcf1c1d2e62..1511d7def23e8c39 100644
+--- a/modules/json-c/configure.ac
++++ b/modules/json-c/configure.ac
+@@ -69,7 +69,7 @@ AC_CACHE_CHECK([for __thread support], ac_cv___thread, [dnl
+ AC_LINK_IFELSE([dnl
+ AC_LANG_PROGRAM([[#undef __thread
+ static __thread int a; int foo (int b) { return a + b; }]],
+-		[[exit (foo (0));]])],
++		[[return foo (0);]])],
+ 	       ac_cv___thread=yes, ac_cv___thread=no)
+ ])
+ AS_IF([test "x$ac_cv___thread" != xno],

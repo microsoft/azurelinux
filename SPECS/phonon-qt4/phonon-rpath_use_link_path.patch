@@ -1,0 +1,18 @@
+--- a/cmake/PhononQt4.cmake.rpath	2016-04-21 13:00:50.788470084 -0500
++++ b/cmake/PhononQt4.cmake	2016-04-21 13:04:39.194600944 -0500
+@@ -33,7 +33,6 @@
+ # These two options below make it set the RPATH of the installed targets to all
+ # RPATH directories outside the current CMAKE_BINARY_DIR and also the library
+ # install directory. Alex
+-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH  TRUE)
+ set(_abs_LIB_INSTALL_DIR "${LIB_INSTALL_DIR}")
+ if (NOT IS_ABSOLUTE "${_abs_LIB_INSTALL_DIR}")
+    set(_abs_LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
+@@ -41,6 +40,7 @@ endif()
+ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${_abs_LIB_INSTALL_DIR}" _isSystemPlatformLibDir)
+ list(FIND CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "${_abs_LIB_INSTALL_DIR}" _isSystemCxxLibDir)
+ if("${_isSystemPlatformLibDir}" STREQUAL "-1" AND "${_isSystemCxxLibDir}" STREQUAL "-1")
++   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH  TRUE)
+    set(CMAKE_INSTALL_RPATH "${_abs_LIB_INSTALL_DIR}")
+ endif("${_isSystemPlatformLibDir}" STREQUAL "-1" AND "${_isSystemCxxLibDir}" STREQUAL "-1")
+ 

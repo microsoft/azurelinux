@@ -1,0 +1,50 @@
+From 26aaeb86431dc81234a46e63386a9a0b5c1f2af8 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Fri, 28 Jun 2024 10:34:49 +1000
+Subject: [PATCH app/xhost] Replace inet_addr()/inet_aton() with a call to
+ inet_pton()
+
+We unconditionally require inet_pton() for our IPv6 check so let's use
+the same call for the IPv4 check too. This removes the need for
+inet_aton() which is labelled as deprecated because it doesn't support
+IPv4.
+---
+ configure.ac | 3 ---
+ xhost.c      | 7 +------
+ 2 files changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 60a74c21e580..802eccb959ad 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -42,9 +42,6 @@ case $host_os in
+   ;;
+ esac
+ 
+-# Checks for library functions.
+-AC_CHECK_FUNCS([inet_aton])
+-
+ # Internationalization & localization support
+ AC_SEARCH_LIBS([gettext], [intl], [USE_GETTEXT="yes"], [USE_GETTEXT="no"])
+ AC_MSG_CHECKING([where to install localized messages])
+diff --git a/xhost.c b/xhost.c
+index 22304bd814b4..26ba179272bb 100644
+--- a/xhost.c
++++ b/xhost.c
+@@ -544,12 +544,7 @@ change_host(Display *dpy, char *name, Bool add)
+      * First see if inet_aton/inet_addr can grok the name; if so, then use it.
+      */
+     if (((family == FamilyWild) || (family == FamilyInternet)) &&
+-#ifdef HAVE_INET_ATON
+-	(inet_aton (name, &addr) != 0)
+-#else
+-	((addr.s_addr = inet_addr(name)) != -1)
+-#endif
+-        ) {
++	(inet_pton (AF_INET, name, &addr) == 1)) {
+ 	ha.family = FamilyInternet;
+ 	ha.length = sizeof(addr.s_addr);
+ 	ha.address = (char *) &addr.s_addr;
+-- 
+2.45.2
+

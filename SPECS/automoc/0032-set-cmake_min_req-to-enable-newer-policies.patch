@@ -1,0 +1,24 @@
+From b094e11e24e5fb7672d73613cceb4af4cd8158bc Mon Sep 17 00:00:00 2001
+From: David Faure <faure@kde.org>
+Date: Mon, 27 Jul 2015 13:06:07 +0200
+Subject: [PATCH 32/33] set cmake_min_req to enable newer policies
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2effd95..1617d4c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,6 @@
++cmake_minimum_required(VERSION 2.8.9)
+ project(Automoc4)
+ 
+-cmake_minimum_required(VERSION 2.4.5 FATAL_ERROR)
+ 
+ if(WIN32)
+     # make cmake 2.6 happy
+-- 
+2.4.3
+

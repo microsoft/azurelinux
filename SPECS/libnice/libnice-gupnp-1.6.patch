@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index 609dc47..06c9e1f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -274,7 +274,7 @@ gst_dep = dependency('gstreamer-base-1.0', version: gst_req,
+ cdata.set('HAVE_GSTREAMER', gst_dep.found(), description: 'Build GStreamer plugin')
+ 
+ # GUPnP IGD
+-gupnp_igd_dep = dependency('gupnp-igd-1.0', version: gupnp_igd_req, required: get_option('gupnp'))
++gupnp_igd_dep = dependency('gupnp-igd-1.6', version: gupnp_igd_req, required: get_option('gupnp'))
+ cdata.set('HAVE_GUPNP', gupnp_igd_dep.found(), description: 'Use the GUPnP IGD library')
+ 
+ libm = cc.find_library('m', required: false)

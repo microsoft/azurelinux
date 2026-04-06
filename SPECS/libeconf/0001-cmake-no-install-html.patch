@@ -1,0 +1,13 @@
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index f1a43c6..3b58d80 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -17,8 +17,6 @@ if(BUILD_DOCUMENTATION)
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+         COMMENT "Generating API documentation with Doxygen"
+         VERBATIM)
+-
+-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../html DESTINATION share/doc)
+ endif()
+ 
+ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/man/libeconf.3 DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)

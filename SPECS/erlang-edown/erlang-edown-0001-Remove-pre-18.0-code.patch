@@ -1,0 +1,46 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 1 Jun 2016 17:25:30 +0300
+Subject: [PATCH] Remove pre-18.0 code
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/src/edown_doclet.erl b/src/edown_doclet.erl
+index a974e87..cfd8cba 100644
+--- a/src/edown_doclet.erl
++++ b/src/edown_doclet.erl
+@@ -125,7 +125,7 @@ gen(Sources, App, Modules, Ctxt) ->
+         ++ lists:concat([modules_frame(Modules1) || Modules1 =/= []]),
+     Text = edown_lib:export(Data, Options),
+     write_file(Text, Dir, right_suffix(?INDEX_FILE, Options)),
+-    write_info_file(App, Modules1, Dir),
++    edoc_lib:write_info_file(App, Modules1, Dir),
+     copy_stylesheet(Dir, Options),
+     copy_image(Dir, Options),
+     make_top_level_README(Data, Options),
+@@ -326,25 +326,7 @@ write_file(Text, Dir, F) ->
+     write_file(Text, Dir, F, F, auto).
+ 
+ write_file(Text, Dir, LastName, Name, Enc) ->
+-    %% edoc_lib:write_file/5 (with encoding support) was added in OTP R16B
+-    %% -- and removed in 18.0; we reuse the check to detect 18, since we don't
+-    %% -- care about pre-R16
+-    case lists:member({write_file,5}, edoc_lib:module_info(exports)) of
+-        true ->
+-            edoc_lib:write_file(Text, Dir, LastName, '',
+-                                [{encoding, encoding(Enc, Name)}]);
+-        false ->
+-            edoc_lib:write_file(Text, Dir, LastName,
+-				[{encoding, encoding(Enc, Name)}])
+-    end.
+-
+-write_info_file(App, Modules, Dir) ->
+-    case erlang:function_exported(edoc_lib, write_info_file, 4) of
+-	true ->
+-	    edoc_lib:write_info_file(App, [], Modules, Dir);
+-	false ->
+-	    edoc_lib:write_info_file(App, Modules, Dir)
+-    end.
++    edoc_lib:write_file(Text, Dir, LastName, [{encoding, encoding(Enc, Name)}]).
+ 
+ encoding(auto, Name) ->
+     edoc_lib:read_encoding(Name, []);

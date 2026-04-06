@@ -1,0 +1,127 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sat, 22 Mar 2003 16:17:45 +0100
+Subject: 004 spelling
+
+s/manpage/man page/g
+---
+ man2html/README     |  4 ++--
+ man2html/TODO       |  4 ++--
+ man2html/man2html.c | 20 ++++++++++----------
+ 3 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/man2html/README b/man2html/README
+index 6dabd52..4fba43f 100644
+--- a/man2html/README
++++ b/man2html/README
+@@ -40,8 +40,8 @@ able to write this directory to that group.)
+ Structure of the collection of scripts:
+ 	man2html is the main script.
+ 	It uses man.aux when called without arguments.
+-	It uses manwhatis when asked for an index of manpages+descriptions.
+-	It uses mansec when asked for a compact index of manpages.
++	It uses manwhatis when asked for an index of man pages+descriptions.
++	It uses mansec when asked for a compact index of man pages.
+ 	It uses mansearch when asked for a glimpse search.
+ 	  In its turn mansearch uses mansearch.aux when called
+ 	  without arguments. It uses mansearchhelp (which uses
+diff --git a/man2html/TODO b/man2html/TODO
+index b0101ad..aaac9de 100644
+--- a/man2html/TODO
++++ b/man2html/TODO
+@@ -21,7 +21,7 @@ On a RedHat 5.0 system:
+     </a>
+   but this requires parsing of the surrounding html markup.
+   Easy, but not done yet.
+-- Some manpages generate bad whatis information
++- Some man pages generate bad whatis information
+   [where the name in the whatis line is not the filename of the man page].
+   (E.g., tc589_cs.4, auto.master.5, pcmcia.5, proc.5 and autofs.8
+    generate whatis lines
+@@ -32,7 +32,7 @@ On a RedHat 5.0 system:
+ 	/proc (5)            - process information pseudo-filesystem
+   )
+   As a consequence, the corresponding manwhatis links are bad.
+-- Some manpages have bad .so information.
++- Some man pages have bad .so information.
+   (E.g., TIFFScanlineSize.3t contains .so TIFFsize.3t
+    instead of .so man3/TIFFsize.3t .)
+   This also confuses whatis, and generates bad links.
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 86d5040..1b4a24d 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -124,7 +124,7 @@ add_links(char *c)
+     */
+     int i,j,nr;
+     char *f, *g, *h;
+-    char *idtest[6]; /* url, mailto, www, ftp, manpage, include file */
++    char *idtest[6]; /* url, mailto, www, ftp, man page, include file */
+ 
+     out_length+=strlen(c);
+ 
+@@ -161,7 +161,7 @@ add_links(char *c)
+ 		c=f+5;
+ 	    }
+ 	    break;
+-	case 4:			/* manpage? */
++	case 4:			/* man page? */
+ 	    f=idtest[j];
+ 	    /* find section - accept (1), (3F), (3Xt), (n), (l) */
+ 	    g=strchr(f,')');
+@@ -202,7 +202,7 @@ add_links(char *c)
+ 	    *f='(';
+ 	    idtest[4]=f-1;
+ 	    c=f;
+-	    break; /* manpage */
++	    break; /* man page */
+ 	case 3: /* ftp */
+ 	case 2: /* www */
+ 	    g=f=idtest[j];
+@@ -1848,9 +1848,9 @@ scan_request(char *c) {
+ 		    if (!t) t=fname;
+ 		    fprintf(stderr, "ln -s %s.html %s.html\n", h, t);
+ 		    s=strrchr(t, '.');if (!s) s=t;
+-		    printf("<HTML><HEAD><TITLE> Manpage of %s</TITLE>\n"
++		    printf("<HTML><HEAD><TITLE> Man page of %s</TITLE>\n"
+ 			   "</HEAD><BODY>\n"
+-			   "See the manpage for <A HREF=\"%s.html\">%s</A>.\n"
++			   "See the man page for <A HREF=\"%s.html\">%s</A>.\n"
+ 			   "</BODY></HTML>\n",
+ 			   s, h, h);
+ 		} else
+@@ -1923,7 +1923,7 @@ scan_request(char *c) {
+ 	    out_html(NEWLINE);
+ 	    if (fillout) curpos++; else curpos=0;
+ 	    break;
+-	case V('O','P'):  /* groff manpages use this construction */
++	case V('O','P'):  /* groff man pages use this construction */
+             /* .OP a b : [ <B>a</B> <I>b</I> ] */
+ 	    mode=1;
+ 	    c[0]='B'; c[1]='I';
+@@ -2102,7 +2102,7 @@ scan_request(char *c) {
+ 		*sl = 0;
+ 		if (words > 1) {
+ 		    output_possible=1;
+-		    out_html("<HTML><HEAD><TITLE>Manpage of ");
++		    out_html("<HTML><HEAD><TITLE>Man page of ");
+ 		    out_html(wordlist[0]);
+ 		    out_html("</TITLE>\n</HEAD><BODY>\n<H1>");
+ 		    out_html(wordlist[0]);
+@@ -3222,14 +3222,14 @@ main(int argc, char **argv) {
+ 	if (!filename)
+ 	     filename = fname;
+ 	if (*filename == '/')
+-	     error_page("Invalid Manpage",
++	     error_page("Invalid Man Page",
+ 		   "The requested file %s is not a valid (unformatted) "
+-		   "man page.\nIf the file is a formatted manpage, "
++		   "man page.\nIf the file is a formatted man page, "
+ 		   "you could try to load the\n"
+ 		   "<A HREF=\"file://localhost%s\">plain file</A>.\n",
+ 		   filename, filename);
+ 	else
+-	     error_page("Invalid Manpage",
++	     error_page("Invalid Man Page",
+ 		   "The requested file %s is not a valid (unformatted) "
+ 		   "man page.", filename);
+     }

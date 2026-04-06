@@ -1,0 +1,115 @@
+From 715f0fe6d14e6381e2d50d7ad2a27e5feffb0066 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 19 Apr 2025 09:05:50 -0700
+Subject: [PATCH] hipblaslt find toolchain
+
+---
+ CMakeLists.txt                                     | 14 +++++++-------
+ .../rocblaslt/src/kernels/compile_code_object.sh   |  8 +++++---
+ tensilelite/Tensile/Ops/gen_assembly.sh            |  6 ++++--
+ tensilelite/Tensile/Utilities/Toolchain.py         | 10 +++++-----
+ 4 files changed, 21 insertions(+), 17 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0aa0d8e65e16..69c06c3dd64a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,13 +61,13 @@ else()
+   set(rocm_bin "/opt/rocm/bin")
+ endif()
+ 
+-if (NOT DEFINED ENV{CXX} AND NOT CMAKE_CXX_COMPILER)
+-  set(CMAKE_CXX_COMPILER "${rocm_bin}/amdclang++")
+-endif()
++#if (NOT DEFINED ENV{CXX} AND NOT CMAKE_CXX_COMPILER)
++#  set(CMAKE_CXX_COMPILER "${rocm_bin}/amdclang++")
++#endif()
+ 
+-if (NOT DEFINED ENV{CC} AND NOT CMAKE_C_COMPILER)
+-  set(CMAKE_C_COMPILER "${rocm_bin}/amdclang")
+-endif()
++#if (NOT DEFINED ENV{CC} AND NOT CMAKE_C_COMPILER)
++#  set(CMAKE_C_COMPILER "${rocm_bin}/amdclang")
++#endif()
+ 
+ # TODO: move FC and CXX and CC compiler vars above to new toolchain-linux.cmake (Fortran for clients)
+ if (NOT DEFINED ENV{FC} AND NOT CMAKE_Fortran_COMPILER)
+@@ -196,7 +196,7 @@ else()
+ 
+     set( Tensile_LOGIC "asm_full" CACHE STRING "Tensile to use which logic?")
+     set( Tensile_CODE_OBJECT_VERSION "default" CACHE STRING "Tensile code_object_version")
+-    set( Tensile_COMPILER "amdclang++" CACHE STRING "Tensile compiler")
++#    set( Tensile_COMPILER "amdclang++" CACHE STRING "Tensile compiler")
+     set( Tensile_LIBRARY_FORMAT "msgpack" CACHE STRING "Tensile library format")
+     set( Tensile_CPU_THREADS "" CACHE STRING "Number of threads for Tensile parallel build")
+ 
+diff --git a/library/src/amd_detail/rocblaslt/src/kernels/compile_code_object.sh b/library/src/amd_detail/rocblaslt/src/kernels/compile_code_object.sh
+index 4ff71ea0414b..baffb6572d6a 100644
+--- a/library/src/amd_detail/rocblaslt/src/kernels/compile_code_object.sh
++++ b/library/src/amd_detail/rocblaslt/src/kernels/compile_code_object.sh
+@@ -33,6 +33,8 @@ elif [ "$build_type" = "Debug" ]; then
+     additional_options="-O0 -g"
+ fi
+ 
+-rocm_path="${ROCM_PATH:-/opt/rocm}"
+-clang_path="${rocm_path}/bin/amdclang++"
+-$clang_path -x hip "$sources" --offload-arch="${archs}" -c --offload-device-only -Xoffload-linker --build-id=$build_id_kind $additional_options -o "$dest"
+\ No newline at end of file
++#rocm_path="${ROCM_PATH:-/opt/rocm}"
++#clang_path="${rocm_path}/bin/amdclang++"
++rocm_path="/usr"
++clang_path="/usr/lib64/rocm/llvm/bin/clang++"
++$clang_path -x hip "$sources" --offload-arch="${archs}" -c --offload-device-only -Xoffload-linker --build-id=$build_id_kind $additional_options -o "$dest"
+diff --git a/tensilelite/Tensile/Ops/gen_assembly.sh b/tensilelite/Tensile/Ops/gen_assembly.sh
+index 160d708f33b5..621726e76202 100755
+--- a/tensilelite/Tensile/Ops/gen_assembly.sh
++++ b/tensilelite/Tensile/Ops/gen_assembly.sh
+@@ -28,12 +28,14 @@ dst=$2
+ venv=$3
+ build_id_kind=$4
+ 
+-rocm_path=/opt/rocm
++# rocm_path=/opt/rocm
++rocm_path=/usr
+ if ! [ -z ${ROCM_PATH+x} ]; then
+     rocm_path=${ROCM_PATH}
+ fi
+ 
+-toolchain=${rocm_path}/bin/amdclang++
++# toolchain=${rocm_path}/bin/amdclang++
++toolchain=/usr/lib64/rocm/llvm/bin/clang++
+ 
+ . ${venv}/bin/activate
+ 
+diff --git a/tensilelite/Tensile/Utilities/Toolchain.py b/tensilelite/Tensile/Utilities/Toolchain.py
+index 6158bd52f92e..5f53e1a432b4 100644
+--- a/tensilelite/Tensile/Utilities/Toolchain.py
++++ b/tensilelite/Tensile/Utilities/Toolchain.py
+@@ -5,8 +5,8 @@ from typing import List, NamedTuple, Union
+ from warnings import warn
+ from subprocess import run, PIPE
+ 
+-ROCM_BIN_PATH = Path("/opt/rocm/bin")
+-ROCM_LLVM_BIN_PATH = Path("/opt/rocm/lib/llvm/bin")
++ROCM_BIN_PATH = Path("/usr/bin")
++ROCM_LLVM_BIN_PATH = Path("/usr/lib64/rocm/llvm/bin")
+ 
+ if os.name == "nt":
+     def _windowsLatestRocmBin(path: Union[Path, str]) -> Path:
+@@ -35,10 +35,10 @@ osSelect = lambda linux, windows: linux if os.name != "nt" else windows
+ 
+ 
+ class ToolchainDefaults(NamedTuple):
+-    CXX_COMPILER= osSelect(linux="amdclang++", windows="clang++.exe")
+-    C_COMPILER= osSelect(linux="amdclang", windows="clang.exe")
++    CXX_COMPILER= osSelect(linux="clang++", windows="clang++.exe")
++    C_COMPILER= osSelect(linux="clang", windows="clang.exe")
+     OFFLOAD_BUNDLER= osSelect(linux="clang-offload-bundler", windows="clang-offload-bundler.exe")
+-    ASSEMBLER = osSelect(linux="amdclang++", windows="clang++.exe")
++    ASSEMBLER = osSelect(linux="clang++", windows="clang++.exe")
+     HIP_CONFIG = osSelect(linux="hipconfig", windows="hipconfig")
+ 
+ 
+-- 
+2.48.1
+

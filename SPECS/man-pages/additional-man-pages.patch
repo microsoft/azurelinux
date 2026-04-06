@@ -1,0 +1,190 @@
+Sources for rtas.2 and swapcontext.2 come from this Fedora man-pages commit:
+commit e7ba749ed5143c2cbe8b65ecfb55cf4dda6424cc (HEAD, tag: man-pages-3_00-1_fc10)
+Author: Ivana Varekova <varekova@fedoraproject.org>
+Date:   Wed Jun 18 10:26:46 2008 +0000
+
+    - update to 3.00
+    - source files changes
+
+Source for con.saver.8 comes from this Fedora man-pages commit:
+commit e12ffa774d7fae2e6800eb8cbbad584984451661 (HEAD, tag: man-pages-2_55-2_fc8)
+Author: Štěpán Kasal <kasal@fedoraproject.org>
+Date:   Wed Jun 20 13:33:55 2007 +0000
+
+    - Add man-suid-bins.tar.bz2 and uuname.1 to document suid binaries
+        (submitted through bug #196352).
+    - Add man-pages-2.51-sched_setaffinity.patch, fixing the prototypes.
+    - Remove sccs-related man pages.
+    - Add man-pages-2.55-syscalls-2.6.9.patch, updating syscalls.2 to kernel
+        version 2.6.9.
+    - Add man-pages-2.55-clone2.patch; s/clone2/__&/, clone2 is not exported.
+    - Add man-pages-2.55-signal.patch; SIGRTMIN is not constant.
+
+diff -Nrup a/man2/rtas.2 b/man2/rtas.2
+--- a/man2/rtas.2	1969-12-31 19:00:00.000000000 -0500
++++ b/man2/rtas.2	2025-08-07 13:39:08.050815165 -0400
+@@ -0,0 +1,61 @@
++.\" Copyright (C) 2004 IBM Corporation
++.\" This file is distributed according to the GNU General Public License.
++.\" See the file COPYING in the top level source directory for details.
++.\"
++.\" This page documents the differences between the low-level kernel system call interface .\" and that made available to applications by glibc.  Portable applications should always .\" use the official library interface.
++.\"
++.de Sh \" Subsection
++.br
++.if t .Sp
++.ne 5
++.PP
++\fB\\$1\fR
++.PP
++..
++.de Sp \" Vertical space (when we can't use .PP)
++.if t .sp .5v
++.if n .sp
++..
++.de Ip \" List item
++.br
++.ie \\n(.$>=3 .ne \\$3
++.el .ne 3
++.IP "\\$1" \\$2
++..
++.TH "RTAS" 2 
++.SH NAME
++rtas \- Allows userspace to call RTAS (Run Time Abstraction Services)
++.SH "SYNOPSIS"
++.ad l
++.hy 0
++.HP 17
++int\ \fBppc_rtas\fR\ (struct rtas_args\ \fI*uargs\fR);
++.ad
++.hy
++
++.SH "DESCRIPTION"
++\fBppc_rtas\fR enables userspace manipulation of the RunTime Abstraction Services (RTAS). RTAS provides for a portable method of access and setting system information. For example, you could gather information on various system sensors and set poweron values. RTAS is accessed via the /proc entry called "rtas". Manipulations on RTAS are implemented via command line arguments on /proc/rtas. 
++The values for \fIuargs\fR vary greatly. 
++For more information, see the \fIview/arch/ppcKconfig\fR file.
++
++.SH "RETURN VALUE"
++
++.PP
++\fBrtas\fR returns 0 on success; otherwise it returns one of the errors listed in the "Errors" section.
++
++.SH "ERRORS"
++
++.TP
++-EPERM
++User does not have CAP_SYS_ADMIN capabilities.
++
++.TP
++-EFAULT
++Problem copying \fIuargs\fR values to/from user space.
++
++.TP
++-EINVAL
++Either number of \fIuargs\fR passed in too large or size of \fIuargs\fR array too large.
++
++.SH AUTHOR
++Niki Rahimi. 
+diff -Nrup a/man2/swapcontext.2 b/man2/swapcontext.2
+--- a/man2/swapcontext.2	1969-12-31 19:00:00.000000000 -0500
++++ b/man2/swapcontext.2	2025-08-07 13:39:08.050995683 -0400
+@@ -0,0 +1,63 @@
++.\" Copyright (C) 2004 IBM Corporation
++.\" This file is distributed according to the GNU General Public License.
++.\" See the file COPYING in the top level source directory for details.
++.\"
++ 
++.de Sh \" Subsection
++.br
++.if t .Sp
++.ne 5
++.PP
++\fB\\$1\fR
++.PP
++..
++.de Sp \" Vertical space (when we can't use .PP)
++.if t .sp .5v
++.if n .sp
++..
++.de Ip \" List item
++.br
++.ie \\n(.$>=3 .ne \\$3
++.el .ne 3
++.IP "\\$1" \\$2
++..
++.TH "SWAPCONTEXT" 2 "2004-March-12" "Linux 2.6" "Linux 2.6 Programmer's Guide"
++.SH NAME
++swapcontext \- Swap out old context with new context
++.SH "SYNOPSIS"
++.ad l
++.hy 0
++.HP 21
++int\ \fBsys_swapcontext\fR\ (struct\ ucontext\ \fI*old_ctx\fR, struct\ ucontext\ \fI*new_ctx\fR, int\ \fIr5\fR, int\ \fIr6\fR, int\ \fIr7\fR, int\ \fIr8\fR, struct\ pt_regs\ \fI*regs\fR);
++.ad
++.hy
++
++.SH "DESCRIPTION"
++
++.PP
++\fBswapcontext\fR swaps out context \fIold_ctx\fR with new context \fInew_ctx\fR. The \fIint r#\fR values have no place in the system call functionality. The \fIregs\fR value indicates the current user register values from the user stack.
++
++.SH "RETURN VALUE"
++
++.PP
++\fBswapcontext\fR returns 0 on success; otherwise, \fBswapcontext\fR returns one of the errors listed in the "Errors" section.
++
++.SH "ERRORS"
++
++.TP
++-EFAULT
++\fIswapcontext\fR could not verify that the memory area pointed to by \fIold_ctx\fR or \fInew_ctx\fR was accessible for the operation.
++
++.TP
++-SIGSEGV
++A fault occurred when the context was being copied into the kernel's image of the user's registers. The should only occur in an out-of-memory situation.
++
++.SH "SEE ALSO"
++.BR getcontext(2),
++.BR sigaction(2),
++.BR sigaltstack(2),
++.BR sigprocmask(2)
++\fB\fR 
++
++.SH AUTHOR
++Niki Rahimi 
+diff -Nrup a/man8/cons.saver.8 b/man8/cons.saver.8
+--- a/man8/cons.saver.8	1969-12-31 19:00:00.000000000 -0500
++++ b/man8/cons.saver.8	2025-08-07 13:39:22.408790338 -0400
+@@ -0,0 +1,32 @@
++.\" This file is distributed in the hope that it will be useful,
++.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
++.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++.\" the GNU General Public License for more details.
++.\"
++.\" You should have received a copy of the GNU General Public License
++.\" along with this file; if not, write to the Free Software
++.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston,
++.\" MA 02111-1307 USA
++.\"
++.\" HISTORY:
++.\" 2006-05-16, created by Rodrigo Rubira Branco <rrbranco@br.ibm.com>
++.TH cons.saver 8 "May 16, 2006" Linux "User Manuals"
++.SH NAME
++cons.saver \- general-purpose Linux console screen save and restore server
++.SH SYNOPSIS
++.nf
++.fam C
++cons.saver \fITTY\fP
++.fam T
++.fi
++.SH DESCRIPTION
++.TP
++Invoke this helper program with the Ctrl-o key combination to save and restore the user session on the screen.
++.SH OPTIONS
++cons.saver takes only one argument, the \fITTY\fP \fINAME\fP from which the system  will save and restore.
++.SH SECURITY
++Cons.saver does not need to be invoked by root.  It only needs read and write access to /dev/vcsa*, which is a priviledged operation.  You should create an unprivileged user, make cons.saver setuid to that user, and assure that all the vcsa* are owned by that user too.
++.SH AUTHOR
++Manpage written by Rodrigo Rubira Branco <rrbranco@br.ibm.com>
++.SH SEE ALSO
++\fBmc\fP(1), \fBmcserv\fP(8)

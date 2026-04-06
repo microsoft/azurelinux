@@ -1,0 +1,1309 @@
+From 103a1a1d7027d90eab7577a8860dba2b09e94ec6 Mon Sep 17 00:00:00 2001
+From: Frank Dana <ferdnyc@gmail.com>
+Date: Thu, 11 Sep 2025 03:18:36 -0400
+Subject: [PATCH] 100% coverage (#500)
+
+* Tests: Clean up test_pydot.py
+
+- Add a bunch of type annotations and defensive coding to eliminate
+  red squiggles.
+- Use `# pragma: no cover` and `# pragma: no branch` comments
+  to exclude uncovered code that only runs when tests fail.
+  (If those lines _do_ have coverage, it's a bad thing!)
+- Remove some inheritable methods of the RenderResult subclasses
+
+* test_pydot._compare_images: Rename 'pydot' arg to 'pd'
+
+I don't know what I was thinking with that.
+
+* Tests: from __future__ import annotations
+
+And requisite changes to type annotations. Ruff is appeased.
+
+* core: Annotate Dot.create() as returning bytes
+
+Correct the declared return type of `create()`, which has never
+returned a string (and couldn't possibly, since it produces
+things like JPEG and PNG binary images).
+
+This has knock-on effects for several other parts of the code,
+though mostly they're positive ones. (I even got to remove a
+`# type: ignore`, because the annotation is now correct.)
+
+Other affected code:
+
+* The generated `.create_*()` methods also now return `bytes`,
+  of course.
+* The return type of `call_graphviz()` becomes
+  `tuple[bytes, bytes, subprocess.Popen[bytes]]`, because we
+  were never passing in `universal_newlines` / `text` set to `True`.
+* The `subprocess.Popen` _call_ that creates those return values
+  becomes a call to a generic with `bytes` as the argument, in
+  Python 3.9+. (I left a guard to protect earlier versions.)
+* The `stdout_data` and `stderr_data` have to be decoded if we
+  want to `print()` them.
+
+* Tests: Add a test for parsing failure (bad input)
+
+* Tests: Test FrozenDict.__repr__
+
+* Tests: Test an invalid Graph(graph_type=) arg
+
+Also completes the coverage on our exceptions module.
+
+* Parser: pragma:no-branch some defensive conditions
+
+A couple of if conditions are purely defensive, so they're always
+True when running the tests. Mark them so they won't get scored as
+incomplete branch coverage.
+
+* Tests: More test coverage for graph modifications
+
+Test more forms of add/get/del_edge
+Test get_subgraph thoroughly
+Test more forms of del_node
+
+* More coverage: sequence, generated methods
+
+Test get/set_attr() methods
+Test create/write_format() methods
+
+* Tests: Test failure modes of subprocess calls
+
+* Tests: Test graph_from_edges
+
+* Tests: Remaining coverage
+
+Cover just about everything left, except some broken features
+
+* Tests: Add some expected failures
+
+Test a few features that DON'T work the way they should.
+To help us keep track of them and hopefully motivate fixes.
+
+* Coverage: pragmas, and explanatory comments
+
+* Ruff fixes
+
+* Tests: Don't use a negative return code
+
+They're not portable between Windows and POSIX. Just exit(1) instead.
+
+* Tests: Strip newlines for portability
+
+* Tests: Eliminate PydotTestCase class
+
+* Tests: Eliminate graph_directed fixture
+
+It was too simple to be worth the trouble. The whole definition was:
+`return pydot.Graph("testgraph", graph_type="digraph")`
+
+And the name was soooo long to type.
+
+* Remove some dead code from id_needs_quotes
+
+* Tests: Test cluster obj_dict casting
+---
+ .coveragerc             |   1 +
+ src/pydot/core.py       |  58 +++---
+ src/pydot/dot_parser.py |   4 +-
+ test/badexit.py         |  10 +
+ test/conftest.py        |  10 +-
+ test/test_api.py        | 446 +++++++++++++++++++++++++++++++++-------
+ test/test_classes.py    |  15 ++
+ test/test_logging.py    |   2 +
+ test/test_parser.py     |  19 ++
+ test/test_pydot.py      | 109 ++++------
+ 10 files changed, 505 insertions(+), 169 deletions(-)
+ create mode 100644 test/badexit.py
+
+diff --git a/.coveragerc b/.coveragerc
+index 2bcc335a..0547efc0 100644
+--- a/.coveragerc
++++ b/.coveragerc
+@@ -17,6 +17,7 @@ source_pkgs =
+   pydot
+ omit =
+   **/_vendor/*
++  test/badexit.py
+ 
+ [report]
+ omit =
+diff --git a/src/pydot/core.py b/src/pydot/core.py
+index 8dcca582..3ef47662 100644
+--- a/src/pydot/core.py
++++ b/src/pydot/core.py
+@@ -172,11 +172,11 @@ def __generate_format_methods(Klass: type) -> None:
+     for frmt in OUTPUT_FORMATS:
+ 
+         def __create_method(
+-            self: Any,
++            self: Dot,
+             f: str = frmt,
+             prog: str | None = None,
+             encoding: str | None = None,
+-        ) -> Any:
++        ) -> bytes:
+             """Refer to docstring of method `create`."""
+             return self.create(format=f, prog=prog, encoding=encoding)
+ 
+@@ -185,7 +185,7 @@ def __create_method(
+     for frmt in OUTPUT_FORMATS ^ {"raw"}:
+ 
+         def __write_method(
+-            self: Any,
++            self: Dot,
+             path: str,
+             f: str = frmt,
+             prog: str | None = None,
+@@ -220,10 +220,7 @@ def call_graphviz(
+     arguments: list[str],
+     working_dir: str | bytes,
+     **kwargs: Any,
+-) -> tuple[str, str, subprocess.Popen[str]]:
+-    # explicitly inherit `$PATH`, on Windows too,
+-    # with `shell=False`
+-
++) -> tuple[bytes, bytes, subprocess.Popen[bytes]]:
+     if program in DEFAULT_PROGRAMS:
+         extension = get_executable_extension()
+         program += extension
+@@ -238,6 +235,8 @@ def call_graphviz(
+         # specify that the new process shall not create a new window
+         kwargs.update(creationflags=subprocess.CREATE_NO_WINDOW)
+ 
++    # explicitly inherit `$PATH`, on Windows too,
++    # with `shell=False`
+     env = {
+         "PATH": os.environ.get("PATH", ""),
+         "LD_LIBRARY_PATH": os.environ.get("LD_LIBRARY_PATH", ""),
+@@ -246,7 +245,12 @@ def call_graphviz(
+ 
+     program_with_args = [program] + arguments
+ 
+-    process = subprocess.Popen(
++    if sys.version_info < (3, 9):
++        my_popen = subprocess.Popen  # pragma: no cover
++    else:
++        my_popen = subprocess.Popen[bytes]
++
++    process = my_popen(
+         program_with_args,
+         env=env,
+         cwd=working_dir,
+@@ -325,7 +329,8 @@ def id_needs_quotes(s: str) -> bool:
+     # false indicating that a keyword string, if provided as-is, won't
+     # need quotes.
+     if s.lower() in dot_keywords:
+-        return False
++        # Our callers shield us from ever reaching here, fortunately
++        return False  # pragma: no cover
+ 
+     any_result = any_needs_quotes(s)
+     if any_result is not None:
+@@ -356,9 +361,8 @@ def quote_id_if_necessary(
+     if isinstance(s, bool):
+         return str(s).lower()
+     if not isinstance(s, str):
+-        return s
+-    if not s:
+-        return s
++        # Based on type annotations, should never happen
++        return s  # pragma: no cover
+ 
+     if s.lower() in unquoted:
+         return s
+@@ -569,16 +573,21 @@ def set_parent_graph(self, parent_graph: Common | None) -> None:
+         self.obj_dict["parent_graph"] = parent_graph
+ 
+     def get_parent_graph(self) -> Graph | None:
+-        return self.obj_dict.get("parent_graph", None)
++        return cast("Graph", self.obj_dict.get("parent_graph", None))
+ 
+     def get_top_graph_type(self, default: str = "graph") -> str:
+         """Find the topmost parent graph type for the current object."""
+         parent = self.get_parent_graph()
+         while parent is not None:
+             parent_ = parent.get_parent_graph()
+-            if parent_ == parent:
++            if parent_ == parent:  # pragma: no branch
+                 break
+-            parent = parent_
++            # Currently every added element gets re-parented to
++            # the topmost graph of the current hierarchy (which
++            # is also its own parent) every time subgraphs are
++            # joined, so most of this loop is unreachable. The
++            # first get_parent_graph() returns THE parent graph.
++            parent = parent_  # pragma: no cover
+         if parent is None:
+             return default
+         return cast("str", parent.obj_dict.get("type", default))
+@@ -619,7 +628,8 @@ def get_sequence(self) -> int | None:
+         """Get sequence"""
+         seq = self.obj_dict.get("sequence")
+         if seq is None:
+-            return seq
++            # Should never happen
++            return seq  # pragma: no cover
+         return int(seq)
+ 
+     @staticmethod
+@@ -887,7 +897,7 @@ def parse_node_ref(self, node_ref: EdgeEndpoint) -> EdgeEndpoint:
+ 
+         if node_port_idx > 0:
+             a = node_ref[:node_port_idx]
+-            b = node_ref[node_port_idx + 1 :]
++            b = node_ref[(node_port_idx + 1) :]
+ 
+             node = quote_id_if_necessary(a)
+             node += ":" + quote_id_if_necessary(b)
+@@ -1652,7 +1662,7 @@ def __getstate__(self) -> AttributeDict:
+     def __setstate__(self, state: AttributeDict) -> None:
+         if "obj_dict" not in state:
+             # Backwards compatibility for old picklings
+-            state = {"obj_dict": state}
++            state = {"obj_dict": state}  # pragma: no cover
+         self.obj_dict = state.get("obj_dict", {})
+         self.prog = state.get("prog", "dot")
+         self.shape_files = state.get("shape_files", [])
+@@ -1727,9 +1737,9 @@ def write(
+             with open(path, mode="w", encoding=encoding) as f:
+                 f.write(s)
+         else:
+-            s = self.create(prog, format, encoding=encoding)
++            b = self.create(prog, format, encoding=encoding)
+             with open(path, mode="wb") as f:
+-                f.write(s)  # type: ignore
++                f.write(b)
+         return True
+ 
+     def create(
+@@ -1737,7 +1747,7 @@ def create(
+         prog: list[str] | tuple[str] | str | None = None,
+         format: str = "ps",
+         encoding: str | None = None,
+-    ) -> str:
++    ) -> bytes:
+         """Creates and returns a binary image for the graph.
+ 
+         create will write the graph to a tempworary dot file in the
+@@ -1832,13 +1842,15 @@ def create(
+                     args[1] = f'"{prog}" not found in path.'  # type: ignore
+                     raise OSError(*args)
+                 else:
+-                    raise
++                    raise  # pragma: no cover
+ 
+         if process.returncode != 0:
+             code = process.returncode
+             print(
+                 f'"{prog}" with args {arguments} returned code: {code}\n\n'
+-                f"stdout, stderr:\n {stdout_data}\n{stderr_data}\n"
++                f"stdout, stderr:\n"
++                f" {stdout_data.decode('utf-8')}\n"
++                f" {stderr_data.decode('utf-8')}\n"
+             )
+ 
+         assert process.returncode == 0, (
+diff --git a/src/pydot/dot_parser.py b/src/pydot/dot_parser.py
+index d3d96091..885828fb 100644
+--- a/src/pydot/dot_parser.py
++++ b/src/pydot/dot_parser.py
+@@ -124,7 +124,7 @@ def push_top_graph_stmt(toks: ParseResults) -> list[pydot.core.Dot]:
+ 
+         g = pydot.core.Dot(id_, graph_type=gtype, strict=strict)
+         g.set_parent_graph(g)
+-        if isinstance(result.contents, ParseResults):
++        if isinstance(result.contents, ParseResults):  # pragma: no branch
+             add_elements(g, result.contents)
+         update_parent_graph_hierarchy(g)
+         top_graphs.append(g)
+@@ -215,7 +215,7 @@ def push_subgraph_stmt(toks: ParseResults) -> pydot.core.Subgraph:
+     show_kw = "keyword" in toks
+     g = pydot.core.Subgraph(id_)
+     g.obj_dict["show_keyword"] = show_kw
+-    if isinstance(toks.contents, ParseResults):
++    if isinstance(toks.contents, ParseResults):  # pragma: no branch
+         add_elements(g, toks.contents)
+     return g
+ 
+diff --git a/test/badexit.py b/test/badexit.py
+new file mode 100644
+index 00000000..cb09c0ee
+--- /dev/null
++++ b/test/badexit.py
+@@ -0,0 +1,10 @@
++# SPDX-FileCopyrightText: 2025 pydot contributors
++#
++# SPDX-License-Identifier: MIT
++"""Helper script that does nothing but fail."""
++
++import sys
++
++if __name__ == "__main__":
++    print("I'm a failure.", file=sys.stderr)
++    sys.exit(1)
+diff --git a/test/conftest.py b/test/conftest.py
+index 42f202d4..378f1d86 100644
+--- a/test/conftest.py
++++ b/test/conftest.py
+@@ -1,16 +1,15 @@
+ # SPDX-FileCopyrightText: 2024 pydot contributors
+ #
+ # SPDX-License-Identifier: MIT
++from __future__ import annotations
+ 
+ import typing as T
+ 
+ import pytest
+ 
+-import pydot.core
+-
+ 
+ @pytest.fixture
+-def objdict() -> T.Dict[str, T.Any]:
++def objdict() -> dict[str, T.Any]:
+     return {
+         "attributes": {},
+         "name": "G",
+@@ -44,8 +43,3 @@ def objdict() -> T.Dict[str, T.Any]:
+         "edges": {},
+         "subgraphs": {},
+     }
+-
+-
+-@pytest.fixture
+-def graph_directed() -> pydot.core.Graph:
+-    return pydot.core.Graph("testgraph", graph_type="digraph")
+diff --git a/test/test_api.py b/test/test_api.py
+index f410fc3f..19cb94f3 100644
+--- a/test/test_api.py
++++ b/test/test_api.py
+@@ -4,15 +4,19 @@
+ 
+ """Unit testing of pydot api calls."""
+ 
++from __future__ import annotations
++
+ import os
+ import pickle
+ import string
+ import textwrap
+ import typing as T
++from pathlib import Path
+ 
+ import pytest
+ 
+ import pydot
++import pydot.exceptions
+ from pydot._vendor import tempfile
+ 
+ 
+@@ -45,6 +49,11 @@ def test_create_simple_graph_with_node() -> None:
+     assert s == expected
+ 
+ 
++def test_boolean_attribute() -> None:
++    n = pydot.Node("n", color=True)
++    assert str(n) == "n [color=true];"
++
++
+ def test_attribute_with_implicit_value() -> None:
+     d = 'digraph {\na -> b[label="hi", decorate];\n}'
+     graphs = pydot.graph_from_dot_data(d)
+@@ -54,6 +63,69 @@ def test_attribute_with_implicit_value() -> None:
+     assert "decorate" in attrs
+ 
+ 
++def test_node_handling() -> None:
++    g = pydot.Graph("N")
++    a = pydot.Node("a")
++    b = pydot.Node("b")
++    c = pydot.Node("c")
++    g.add_node(a)
++    g.add_node(b)
++    g.add_node(c)
++
++    assert len(g.get_nodes()) == 3
++    assert g.del_node("a")
++    assert not g.del_node(a)
++    assert g.del_node(b, 0)
++    assert len(g.get_nodes()) == 1
++
++
++def test_edge_handling() -> None:
++    g = pydot.Graph("G")
++    a = pydot.Node("a")
++    b = pydot.Node("b")
++    c = pydot.Node("c")
++    g.add_edge(pydot.Edge(a.get_name(), b.get_name()))
++    g.add_edge(pydot.Edge(b.get_name(), c.get_name()))
++    g.add_edge(pydot.Edge(b, c))
++
++    a_b_out = g.get_edge("a", "b")
++    assert len(a_b_out) == 1
++    a_b = a_b_out[0]
++    assert isinstance(a_b, pydot.Edge)
++    assert a_b.get_source() == "a"
++    assert a_b.get_destination() == "b"
++
++    b_c_out = g.get_edge(("b", "c"))
++    assert len(b_c_out) == 2
++    b_c = b_c_out[0]
++    assert isinstance(b_c, pydot.Edge)
++    assert b_c.get_source() == "b"
++    assert b_c.get_destination() == "c"
++
++    bad_out = g.get_edge(("e", "f"))
++    assert len(bad_out) == 0
++
++    assert g.del_edge(("a", "b"), "badarg")
++    assert g.del_edge(("b", "c"), 0)
++    assert g.del_edge(b, c)
++    assert not g.del_edge("b", "c")
++    assert g.get_edges() == []
++
++
++def test_edge_compare_fail() -> None:
++    e1 = pydot.Edge("a", "b")
++    e2 = pydot.Edge("c", "d")
++    assert e1 != e2
++
++
++def test_edge_compare_bad() -> None:
++    n = pydot.Node("n")
++    e = pydot.Edge("a", "b")
++    with pytest.raises(pydot.Error) as err:
++        bool(n == e)
++    assert "edge to a non-edge" in str(err)
++
++
+ def test_subgraphs() -> None:
+     g = pydot.Graph()
+     s = pydot.Subgraph("foo")
+@@ -67,6 +139,58 @@ def test_subgraphs() -> None:
+     assert g.get_subgraph_list()[0].get_name() == s.get_name()
+ 
+ 
++def test_get_subgraph() -> None:
++    g = pydot.Graph()
++    g.add_subgraph(pydot.Subgraph("sub"))
++
++    badres = g.get_subgraph("NOTHOME")
++    assert badres == []
++
++    res = g.get_subgraph("sub")
++    assert len(res) == 1
++    sout = res[0]
++    assert isinstance(sout, pydot.Subgraph)
++    assert sout.get_name() == "sub"
++
++
++def test_cluster_casting() -> None:
++    c = pydot.Cluster("sg")
++    assert c.get_type() == "subgraph"
++    assert c.get_name() == "cluster_sg"
++    sg = pydot.Graph("sg")
++    sg_c = pydot.Cluster(obj_dict=sg.obj_dict)
++    assert sg_c.get_type() == "digraph"
++    assert sg_c.get_name() == "sg"
++
++
++def test_graph_defaults() -> None:
++    g = pydot.Graph()
++    g.set_graph_defaults(rank="TB", color="red")
++    dflts = g.get_graph_defaults()
++    assert dflts == [{"rank": "TB", "color": "red"}]
++
++
++def test_node_defaults() -> None:
++    g = pydot.Graph()
++    g.set_node_defaults(shape="box", penwidth=5)
++    dflts = g.get_node_defaults()
++    assert dflts == [{"shape": "box", "penwidth": 5}]
++
++
++def test_edge_defaults() -> None:
++    g = pydot.Graph()
++    g.set_edge_defaults(arrows="both", color="brown")
++    dflts = g.get_edge_defaults()
++    assert dflts == [{"arrows": "both", "color": "brown"}]
++
++
++def test_graph_methods() -> None:
++    g = pydot.Graph("di")
++    assert g.get_graph_type() == "digraph"
++    g.set_name("rekted")
++    assert g.get_name() == "rekted"
++
++
+ def test_graph_pickling() -> None:
+     g = pydot.Graph()
+     s = pydot.Subgraph("foo")
+@@ -164,9 +288,16 @@ def test_multiple_graphs() -> None:
+     assert names == ["A", "B"]
+ 
+ 
+-def test_numeric_node_id(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_node(pydot.Node(1))
+-    assert graph_directed.get_nodes()[0].get_name() == "1"
++def test_numeric_node_id() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node(1))
++    assert g.get_nodes()[0].get_name() == "1"
++
++
++def test_boolean_node_id() -> None:
++    n = pydot.Node("n", color="blue")
++    n.set_name(True)
++    assert str(n) == "true [color=blue];"
+ 
+ 
+ def test_numeric_quoting() -> None:
+@@ -176,69 +307,113 @@ def test_numeric_quoting() -> None:
+     assert non.to_string() == '"1.2.3" [label="1.4.0"];'
+ 
+ 
+-def test_quoted_node_id(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_node(pydot.Node('"node"'))
+-    assert graph_directed.get_nodes()[0].get_name() == '"node"'
++def test_quoted_node_id() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node('"node"'))
++    assert g.get_nodes()[0].get_name() == '"node"'
+ 
+ 
+-def test_quoted_node_id_to_string_no_attributes(
+-    graph_directed: pydot.Graph,
+-) -> None:
+-    graph_directed.add_node(pydot.Node('"node"'))
+-    assert graph_directed.get_nodes()[0].to_string() == '"node";'
++def test_quoted_node_id_to_string_no_attributes() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node('"node"'))
++    assert g.get_nodes()[0].to_string() == '"node";'
+ 
+ 
+-def test_keyword_node_id(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_node(pydot.Node("node"))
+-    assert graph_directed.get_nodes()[0].get_name() == "node"
++def test_keyword_node_id() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node("node"))
++    assert g.get_nodes()[0].get_name() == "node"
+ 
+ 
+-def test_keyword_node_id_to_string_no_attributes(
+-    graph_directed: pydot.Graph,
+-) -> None:
+-    graph_directed.add_node(pydot.Node("node"))
+-    assert graph_directed.get_nodes()[0].to_string() == ""
++def test_keyword_node_id_to_string_no_attributes() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node("node"))
++    assert g.get_nodes()[0].to_string() == ""
+ 
+ 
+-def test_keyword_node_id_to_string_with_attributes(
+-    graph_directed: pydot.Graph,
+-) -> None:
+-    graph_directed.add_node(pydot.Node("node", shape="box"))
+-    assert graph_directed.get_nodes()[0].to_string() == "node [shape=box];"
++def test_keyword_node_id_to_string_with_attributes() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node("node", shape="box"))
++    assert g.get_nodes()[0].to_string() == "node [shape=box];"
+ 
+ 
+-def test_keyword_node_id_in_label(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_node(pydot.Node("Node", label="Node"))
+-    assert graph_directed.get_nodes()[0].to_string() == 'Node [label="Node"];'
++def test_keyword_node_id_in_label() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node("Node", label="Node"))
++    assert g.get_nodes()[0].to_string() == 'Node [label="Node"];'
+ 
+ 
+-def test_comma_separated_attribute_values_to_string(
+-    graph_directed: pydot.Graph,
+-) -> None:
+-    graph_directed.add_node(
+-        pydot.Node("node", color="green", style="rounded,filled")
+-    )
++def test_keywords_with_ports() -> None:
++    g = pydot.Graph("KW")
++    g.add_edge(pydot.Edge("graph:edge", "strict:graph"))
++    eout = g.get_edges()[0]
++    assert isinstance(eout, pydot.Edge)
++    assert str(eout) == '"graph":"edge" -> "strict":"graph";'
++    n = pydot.Node(str(eout.get_source()))
++    assert n.get_name() == "graph"
++    assert n.get_port() == ":edge"
++
++
++@pytest.mark.xfail(reason="The port logic is a broken mess")
++def test_broken_port_handling() -> None:
++    n = pydot.Node("edge:12", color="red")
++    e = pydot.Edge(n, "strict:node")
++    assert str(e) == '"edge":12 -- "strict":"node";'
++
++
++@pytest.mark.xfail(reason="We use bad regexps to parse numbers")
++def test_broken_negatives() -> None:
++    assert str(pydot.Node(-2)) == "-2;"
++
++
++@pytest.mark.xfail(reason="We use bad regexps to parse numbers")
++def test_broken_negatives_2() -> None:
++    assert str(pydot.Node("a", penwidth="-2")) == "a [penwidth=-2];"
++
++
++@pytest.mark.xfail(reason="Our quoting can be broken by set_name")
++def test_set_name_breakage() -> None:
++    n = pydot.Node("n:strict")
++    n.set_name("graph")
++    assert str(n) == '"graph";'
++
++
++def test_comma_separated_attribute_values_to_string() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_node(pydot.Node("node", color="green", style="rounded,filled"))
+     assert (
+-        graph_directed.get_nodes()[0].to_string()
++        g.get_nodes()[0].to_string()
+         == 'node [color=green, style="rounded,filled"];'
+     )
+ 
+ 
+-def test_attribute_string_values_quoting(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_node(
+-        pydot.Node("node", length=1.234, size="2.345", radius="9,876")
+-    )
+-    assert (
+-        graph_directed.get_nodes()[0].to_string()
+-        == 'node [length=1.234, size=2.345, radius="9,876"];'
++def test_attribute_values_quoting() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    n1 = pydot.Node(
++        "n1",
++        length=1.234,
++        size="2.345",
++        taste=None,
+     )
++    n2 = pydot.Node("n2", radius="9,876", graph="strict", silence="")
++    expected = {
++        "n1": "n1 [length=1.234, size=2.345, taste];",
++        "n2": 'n2 [radius="9,876", graph="strict", silence=""];',
++    }
++
++    g.add_node(n1)
++    g.add_node(n2)
++    nodes = g.get_nodes()
++    for nout in filter(lambda n: n.get_name() in ["n1", "n2"], nodes):
++        assert str(nout) == expected[nout.get_name()]
+ 
+ 
+-def test_names_of_a_thousand_nodes(graph_directed: pydot.Graph) -> None:
++def test_names_of_a_thousand_nodes() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
+     names = {f"node_{i:05d}" for i in range(10**3)}
+     for name in names:
+-        graph_directed.add_node(pydot.Node(name, label=name))
+-    assert {n.get_name() for n in graph_directed.get_nodes()} == names
++        g.add_node(pydot.Node(name, label=name))
++    assert {n.get_name() for n in g.get_nodes()} == names
+ 
+ 
+ def test_executable_not_found_exception() -> None:
+@@ -247,25 +422,48 @@ def test_executable_not_found_exception() -> None:
+         graph.create(prog="dothehe")
+ 
+ 
+-def test_graph_add_node_argument_type(graph_directed: pydot.Graph) -> None:
++def test_subprocess_bad_exit() -> None:
++    script = Path(__file__).parent / "badexit.py"
++    (out, err, proc) = pydot.call_graphviz("python", [script], ".")
++    assert isinstance(out, bytes)
++    assert isinstance(err, bytes)
++    assert proc.returncode == 1
++    assert err.strip() == b"I'm a failure."
++
++
++def test_dot_bad_input() -> None:
++    class MyDot(pydot.Dot):
++        def to_string(self, indent="", indent_level=0) -> str:
++            return "graph G { {{[{red=blue}]}}; }"
++
++    g = MyDot("G")
++    with pytest.raises(AssertionError) as e:
++        g.create(format="svg")
++    assert "returned code: 1" in str(e)
++
++
++def test_graph_add_node_argument_type() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
+     with pytest.raises(TypeError):
+-        graph_directed.add_node(1)
++        g.add_node(1)
+     with pytest.raises(TypeError):
+-        graph_directed.add_node("a")
++        g.add_node("a")
+ 
+ 
+-def test_graph_add_edge_argument_type(graph_directed: pydot.Graph) -> None:
++def test_graph_add_edge_argument_type() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
+     with pytest.raises(TypeError):
+-        graph_directed.add_edge(1)
++        g.add_edge(1)
+     with pytest.raises(TypeError):
+-        graph_directed.add_edge("a")
++        g.add_edge("a")
+ 
+ 
+-def test_graph_add_subgraph_argument_type(graph_directed: pydot.Graph) -> None:
++def test_graph_add_subgraph_argument_type() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
+     with pytest.raises(TypeError):
+-        graph_directed.add_subgraph(1)
++        g.add_subgraph(1)
+     with pytest.raises(TypeError):
+-        graph_directed.add_subgraph("a")
++        g.add_subgraph("a")
+ 
+ 
+ def test_node_parenting() -> None:
+@@ -416,6 +614,35 @@ def test_id_storage_and_lookup() -> None:
+     assert sg.get_edges() == []
+ 
+ 
++def test_generated_setter_getters() -> None:
++    g = pydot.Graph("G", graph_type="graph")
++    n = pydot.Node("A")
++    n.set_shape("box")
++    n.set_penwidth(2)
++    g.add_node(n)
++
++    nout = g.get_nodes()[0]
++    assert nout.get_shape() == "box"
++    assert nout.get_penwidth() == 2
++
++    expected = "graph G {\nA [shape=box, penwidth=2];\n}\n"
++    assert g.to_string() == expected
++
++
++def test_generated_create_write() -> None:
++    g = pydot.Dot()
++    g.add_node(pydot.Node("N"))
++    svg = g.create_svg()
++    assert isinstance(svg, bytes)
++    assert svg.startswith(b"<?xml version")
++    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp_dir:
++        outfile = os.path.join(tmp_dir, "write.svg")
++        g.write_svg(outfile)
++        with open(outfile, "rb") as outf:
++            written = outf.read()
++    assert svg == written
++
++
+ def test_dot_args() -> None:
+     g = pydot.Dot()
+     u = pydot.Node("a")
+@@ -426,6 +653,30 @@ def test_dot_args() -> None:
+         assert os.path.exists(outfile)
+ 
+ 
++def test_bad_graph_type() -> None:
++    with pytest.raises(pydot.exceptions.Error) as e:
++        pydot.Graph("G", graph_type="round")
++    assert str(e.value) == (
++        'Invalid type "round".' + " Accepted graph types are: graph, digraph"
++    )
++
++
++def test_sequence() -> None:
++    g = pydot.Graph("G")
++    for i in range(10):
++        n = pydot.Node(f"n{i}", penwidth=i)
++        g.add_node(n)
++    nout = g.get_node("n9")[0]
++    assert nout.get_name() == "n9"
++    assert nout.get_sequence() == 10
++    for i in range(5, 10):
++        ndel = g.get_node(f"n{i}")[0]
++        g.del_node(ndel.get_name())
++    nnew = pydot.Node("n11", shape="box")
++    g.add_node(nnew)
++    assert nnew.get_sequence() == 11
++
++
+ def test_suppress_disconnected() -> None:
+     g1 = pydot.graph_from_dot_data(
+         "graph G { a; b; a -- b; c; d; a -- c; b -- c; e; }"
+@@ -441,7 +692,7 @@ def test_suppress_disconnected() -> None:
+     assert gr1.to_string() == gr2.to_string()
+ 
+ 
+-def test_strict(objdict: T.Dict[str, T.Any]) -> None:
++def test_strict(objdict: dict[str, T.Any]) -> None:
+     g = pydot.Dot(obj_dict=objdict)
+     g.set_parent_graph(g)
+     g.set_strict(True)
+@@ -449,6 +700,30 @@ def test_strict(objdict: T.Dict[str, T.Any]) -> None:
+     assert s == "strict graph G {\n3;\n16;\n}\n"
+ 
+ 
++def test_tostring_indent() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    expected = textwrap.dedent("""
++        digraph testgraph {
++            a -> b;
++            subgraph subG {
++                sga [shape=box];
++                sgb [shape=circle];
++                1 -> 2;
++            }
++        }""").strip()
++
++    g.add_edge(pydot.Edge("a", "b"))
++    sg = pydot.Subgraph("subG")
++    sg.add_node(pydot.Node("sga", shape="box"))
++    sg.add_node(pydot.Node("sgb", shape="circle"))
++    sg.add_edge(pydot.Edge(1, 2))
++    g.add_subgraph(sg)
++    sgout = g.to_string(indent=4).strip()
++    assert sgout == expected
++    sgout2 = g.to_string(indent=4.0).strip()
++    assert sgout2 == expected
++
++
+ def test_edge_equality_basics_3_same_points_not_not_equal() -> None:
+     # Fail example: pydot 1.4.1 on Python 2.
+     g = pydot.Graph()
+@@ -459,28 +734,28 @@ def test_edge_equality_basics_3_same_points_not_not_equal() -> None:
+     assert (e1 != e2) is False
+ 
+ 
+-def test_edge_point_namestr(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_edge(pydot.Edge("a", "b"))
+-    assert graph_directed.get_edges()[0].to_string() == "a -> b;"
++def test_edge_point_namestr() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_edge(pydot.Edge("a", "b"))
++    assert g.get_edges()[0].to_string() == "a -> b;"
+ 
+ 
+-def test_edge_point_object_node(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_edge(pydot.Edge(pydot.Node("a"), pydot.Node("b")))
+-    assert graph_directed.get_edges()[0].to_string() == "a -> b;"
++def test_edge_point_object_node() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_edge(pydot.Edge(pydot.Node("a"), pydot.Node("b")))
++    assert g.get_edges()[0].to_string() == "a -> b;"
+ 
+ 
+-def test_edge_point_object_subgraph(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_edge(
+-        pydot.Edge(pydot.Subgraph("a"), pydot.Subgraph("b"))
+-    )
+-    assert graph_directed.get_edges()[0].to_string() == "a -> b;"
++def test_edge_point_object_subgraph() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_edge(pydot.Edge(pydot.Subgraph("a"), pydot.Subgraph("b")))
++    assert g.get_edges()[0].to_string() == "a -> b;"
+ 
+ 
+-def test_edge_point_object_cluster(graph_directed: pydot.Graph) -> None:
+-    graph_directed.add_edge(pydot.Edge(pydot.Cluster("a"), pydot.Cluster("b")))
+-    assert (
+-        graph_directed.get_edges()[0].to_string() == "cluster_a -> cluster_b;"
+-    )
++def test_edge_point_object_cluster() -> None:
++    g = pydot.Graph("testgraph", graph_type="digraph")
++    g.add_edge(pydot.Edge(pydot.Cluster("a"), pydot.Cluster("b")))
++    assert g.get_edges()[0].to_string() == "cluster_a -> cluster_b;"
+ 
+ 
+ def test_graph_from_adjacency_matrix() -> None:
+@@ -505,11 +780,40 @@ def test_graph_from_incidence_matrix() -> None:
+     assert s == "digraph G { 1 -> 2; 2 -> 1; 3 -> 2; }"
+ 
+     g = pydot.graph_from_incidence_matrix(
+-        [[1, 1, 0], [0, 1, 1]], directed=False
++        [[1, 1, 0], [0, 1, 1], [98]], directed=False
+     )
+     s = " ".join(g.to_string().split())
+     assert s == "graph G { 1 -- 2; 2 -- 3; }"
+ 
+ 
++def test_graph_from_edges() -> None:
++    edge_list = [
++        ("a", "b"),
++        ("b", "c"),
++        ("c", 1),
++        (1, 2),
++    ]
++    g1 = pydot.graph_from_edges(edge_list[0:2], "node_")
++    g2 = pydot.graph_from_edges(edge_list[2:4], "node_", True)
++
++    expected1 = textwrap.dedent("""
++        graph G {
++        node_a -- node_b;
++        node_b -- node_c;
++        }""").strip()
++    expected2 = textwrap.dedent("""
++        digraph G {
++        node_c -> node_1;
++        node_1 -> node_2;
++        }""").strip()
++    assert str(g1).strip() == expected1
++    assert str(g2).strip() == expected2
++
++
+ def test_version() -> None:
+     assert isinstance(pydot.__version__, str)
++
++
++def test_call_graphviz() -> None:
++    with pytest.raises(FileNotFoundError):
++        pydot.call_graphviz("__dotnotexist", None, ".")
+diff --git a/test/test_classes.py b/test/test_classes.py
+index 05a98fab..92103b14 100644
+--- a/test/test_classes.py
++++ b/test/test_classes.py
+@@ -4,6 +4,8 @@
+ 
+ """Unit testing of `pydot.classes`."""
+ 
++from __future__ import annotations
++
+ import pytest
+ 
+ import pydot
+@@ -65,6 +67,19 @@ def test_FrozenDict_compare():
+     assert fd2 == dict_in  # Unfortunate fallback to dict.__eq__
+ 
+ 
++def test_FrozenDict_repr() -> None:
++    dict_in = {
++        "one": 1,
++        "two": 2,
++        "group": {"three": 3, "four": 4},
++    }
++    fd = FrozenDict(dict_in)
++    assert repr(fd) == (
++        "FrozenDict({'one': 1, 'two': 2, 'group':"
++        + " FrozenDict({'three': 3, 'four': 4})})"
++    )
++
++
+ def test_frozendict_deprecation(objdict):
+     with pytest.warns(DeprecationWarning):
+         fd = pydot.frozendict(objdict)
+diff --git a/test/test_logging.py b/test/test_logging.py
+index dd1ac4ca..89572a9e 100644
+--- a/test/test_logging.py
++++ b/test/test_logging.py
+@@ -4,6 +4,8 @@
+ 
+ """Unit testing of pydot logging setup."""
+ 
++from __future__ import annotations
++
+ import importlib
+ import logging
+ 
+diff --git a/test/test_parser.py b/test/test_parser.py
+index cd94acbd..d94169ab 100644
+--- a/test/test_parser.py
++++ b/test/test_parser.py
+@@ -4,6 +4,8 @@
+ 
+ """Unit testing of individual dot_parser classes."""
+ 
++from __future__ import annotations
++
+ import textwrap
+ 
+ import pyparsing as pp
+@@ -153,3 +155,20 @@ def test_plus_concatenation() -> None:
+     assert edge.get_source() == f"{nodes[1].get_name()}:p45:sw"
+     assert edge.get_destination() == '"myconcatenatedname":ne'
+     assert edge.get("arrows") == '"both"'
++
++
++def test_bad_parse(capsys) -> None:
++    src = textwrap.dedent(r"""
++        graph G {
++            a -- b;
++            {{[{foo:bar:baz}]}}};
++        }""")
++    expected = textwrap.dedent("""
++        {{[{foo:bar:baz}]}}};
++        ^
++    Expected rbrace, found '{'  (at char 27), (line:4, col:5)
++    """).strip()
++    res = dot_parser.parse_dot_data(src)
++    assert res is None
++    captured = capsys.readouterr()
++    assert captured.out.strip() == expected
+diff --git a/test/test_pydot.py b/test/test_pydot.py
+index c0d1a1c3..6974112e 100644
+--- a/test/test_pydot.py
++++ b/test/test_pydot.py
+@@ -4,10 +4,7 @@
+ 
+ """Unit testing of `pydot`."""
+ 
+-# TODO:
+-# -test graph generation APIs (from adjacency, etc..)
+-# -test del_node, del_edge methods
+-# -test Common.set method
++from __future__ import annotations
+ 
+ import functools
+ import os
+@@ -33,30 +30,35 @@
+ class RenderResult:
+     """Results object returned by Renderer methods."""
+ 
+-    def __init__(self, data, dot_file=None, dot_src=None) -> None:
++    def __init__(
++        self,
++        data: bytes,
++        dot_file: str | None = None,
++        dot_src: str | None = None,
++    ) -> None:
+         self._data = data
+-        self._dot_file: T.Optional[str] = dot_file
+-        self._dot_src: T.Optional[str] = dot_src
++        self._dot_file: str | None = dot_file
++        self._dot_src: str | None = dot_src
+ 
+     @property
+-    def data(self):
++    def data(self) -> bytes:
+         """Get the raw image data for the result."""
+         return self._data
+ 
+     @property
+-    def dot_file(self):
++    def dot_file(self) -> str:
+         """Get the graph data used to generate the file."""
+-        return self._dot_file
++        return self._dot_file or ""  # pragma: no cover
+ 
+     @property
+-    def dot_src(self):
+-        if self._dot_src is None and self._dot_file is not None:
+-            with open(self._dot_file, encoding="utf-8") as _in:
++    def dot_src(self) -> str:  # pragma: no cover
++        if self._dot_src is None and self.dot_file is not None:
++            with open(self.dot_file, encoding="utf-8") as _in:
+                 self._dot_src = _in.read()
+-        return self._dot_src
++        return self._dot_src or ""
+ 
+     @functools.cached_property
+-    def checksum(self):
++    def checksum(self) -> str:
+         """Get the sha256 checksum for the result."""
+         return sha256(self.data).hexdigest()
+ 
+@@ -67,21 +69,10 @@ class GVRenderResult(RenderResult):
+     Unlike RenderResult, GVRenderResult will always have a dot_file.
+     """
+ 
+-    def __init__(self, data, dot_file: str) -> None:
++    def __init__(self, data: bytes, dot_file: str) -> None:
+         super().__init__(data)
+         self._dot_file: str = dot_file
+ 
+-    @property
+-    def dot_file(self):
+-        return self._dot_file
+-
+-    @property
+-    def dot_src(self):
+-        if self._dot_src is None:
+-            with open(self._dot_file, encoding="utf-8") as _in:
+-                self._dot_src = _in.read()
+-        return self._dot_src
+-
+ 
+ class PydotRenderResult(RenderResult):
+     """Results object returned by Renderer methods.
+@@ -89,20 +80,16 @@ class PydotRenderResult(RenderResult):
+     Unlike RenderResult, PydotRenderResult will always have a dot_src.
+     """
+ 
+-    def __init__(self, data, dot_src: str) -> None:
++    def __init__(self, data: bytes, dot_src: str) -> None:
+         super().__init__(data)
+         self._dot_src: str = dot_src
+ 
+-    @property
+-    def dot_src(self):
+-        return self._dot_src
+-
+ 
+ class Renderer:
+     """Call pydot renderers for data files."""
+ 
+     @classmethod
+-    def graphviz(cls, filename, encoding):
++    def graphviz(cls, filename: str, encoding: str) -> GVRenderResult:
+         with open(filename, encoding=encoding) as stdin:
+             stdout_data, stderr_data, process = pydot.call_graphviz(
+                 program=TEST_PROGRAM,
+@@ -114,9 +101,9 @@ def graphviz(cls, filename, encoding):
+         return GVRenderResult(stdout_data, filename)
+ 
+     @classmethod
+-    def pydot(cls, filename, encoding):
++    def pydot(cls, filename: str, encoding: str) -> PydotRenderResult:
+         c = pydot.graph_from_dot_file(filename, encoding=encoding)
+-        if not c:
++        if not c:  # pragma: no cover
+             raise RuntimeError("No data returned from pydot!")
+         jpe_data = bytearray()
+         for g in c:
+@@ -127,19 +114,18 @@ def pydot(cls, filename, encoding):
+         return PydotRenderResult(jpe_data, src)
+ 
+ 
+-def _load_test_cases(casedir):
++def _load_test_cases(casedir: str) -> list[tuple[str, str, str]]:
+     """Return a list of testcase files,
+ 
+     Returns a list of tuples of the form:
+         ("case_file_name", "case_file_name.dot", "path/to/directory")
+     """
+-    global _test_root
+     path = os.path.join(_test_root, casedir)
+     dot_files = filter(lambda x: x.endswith(".dot"), os.listdir(path))
+ 
+     def _case_name(fname: str) -> str:
+         """No str.removesuffix() until Python 3.9."""
+-        if sys.version_info < (3, 9):
++        if sys.version_info < (3, 9):  # pragma: no cover
+             return fname
+         return fname.removesuffix(".dot")
+ 
+@@ -147,50 +133,42 @@ def _case_name(fname: str) -> str:
+ 
+ 
+ def _compare_images(
+-    fname: str, pydot: PydotRenderResult, gv: GVRenderResult
++    fname: str, pd: PydotRenderResult, gv: GVRenderResult
+ ) -> bool:
+     """Compare two RenderResult objects for the named test.
+ 
+     If the images differ and a ``TEST_ERROR_DIR`` has been provided, create
+     a subdir for the test and dump both images there for examination."""
+-    if pydot.checksum == gv.checksum:
++    if pd.checksum == gv.checksum:
+         return True
+-    if TEST_ERROR_DIR is not None:
++    if TEST_ERROR_DIR is not None:  # pragma: no cover
+         dirname = fname.replace(".", "_")
+         out_dir = os.path.join(os.path.normpath(TEST_ERROR_DIR), dirname)
+         os.makedirs(out_dir)
+-        pydot_path = os.path.join(out_dir, "err_pydot.jpeg")
++        pd_path = os.path.join(out_dir, "err_pydot.jpeg")
+         gv_path = os.path.join(out_dir, "err_graphviz.jpeg")
+-        with open(pydot_path, "wb") as p, open(gv_path, "wb") as g:
+-            p.write(pydot.data)
++        with open(pd_path, "wb") as p, open(gv_path, "wb") as g:
++            p.write(pd.data)
+             g.write(gv.data)
+         src_filename = os.path.basename(gv.dot_file)
+         gv_src = os.path.join(out_dir, src_filename)
+         pd_src = os.path.join(out_dir, f"pydot_{src_filename}")
+         with open(gv_src, "w") as gs, open(pd_src, "w") as ps:
+-            ps.write(pydot.dot_src)
++            ps.write(pd.dot_src)
+             gs.write(gv.dot_src)
+-    return False
+-
+-
+-class PydotTestCase(unittest.TestCase):
+-    def setUp(self):
+-        self._reset_graphs()
+-
+-    def _reset_graphs(self):
+-        self.graph_directed = pydot.Graph("testgraph", graph_type="digraph")
++    return False  # pragma: no cover
+ 
+ 
+-class TestShapeFiles(PydotTestCase):
++class TestShapeFiles(unittest.TestCase):
+     shapefile_dir = os.path.join(_test_root, "from-past-to-future")
+ 
+     # image files are omitted from sdist
+-    @unittest.skipUnless(
++    @unittest.skipUnless(  # pragma: no cover
+         os.path.isdir(shapefile_dir),
+         "Skipping tests that involve images,"
+         + " they can be found in the git repository",
+     )
+-    def test_graph_with_shapefiles(self):
++    def test_graph_with_shapefiles(self) -> None:
+         dot_file = os.path.join(self.shapefile_dir, "from-past-to-future.dot")
+ 
+         pngs = [
+@@ -199,7 +177,7 @@ def test_graph_with_shapefiles(self):
+             if fname.endswith(".png")
+         ]
+ 
+-        with open(dot_file) as f:
++        with open(dot_file, encoding="utf-8") as f:
+             graph_data = f.read()
+ 
+         graphs = pydot.graph_from_dot_data(graph_data)
+@@ -220,15 +198,15 @@ def test_graph_with_shapefiles(self):
+             )
+ 
+ 
+-class RenderedTestCase(PydotTestCase):
+-    def _render_and_compare_dot_file(self, fdir, fname):
++class RenderedTestCase(unittest.TestCase):
++    def _render_and_compare_dot_file(self, fdir: str, fname: str) -> None:
+         # files that confuse `chardet`
+         encodings = {"Latin1.dot": "latin-1"}
+         fpath = os.path.join(fdir, fname)
+         with open(fpath, "rb") as f:
+             s = f.read()
+-        estimate = chardet.detect(s)
+-        encoding = encodings.get(fname, estimate["encoding"])
++        estimate: str = chardet.detect(s).get("encoding") or "utf-8"
++        encoding: str = encodings.get(fname, estimate)
+         rendered = Renderer.pydot(
+             fpath,
+             encoding,
+@@ -237,7 +215,8 @@ def _render_and_compare_dot_file(self, fdir, fname):
+             fpath,
+             encoding,
+         )
+-        if not _compare_images(fname, rendered, graphviz):
++        output_matches = _compare_images(fname, rendered, graphviz)
++        if not output_matches:  # pragma: no cover
+             raise AssertionError(
+                 f"{fname}: {rendered.checksum} != {graphviz.checksum} "
+                 "(found pydot vs graphviz difference)"
+@@ -248,7 +227,7 @@ class TestMyRegressions(RenderedTestCase):
+     """Perform regression tests in my_tests dir."""
+ 
+     @parameterized.expand(functools.partial(_load_test_cases, TESTS_DIR_1))
+-    def test_regression(self, _, fname, path):
++    def test_regression(self, _: T.Never, fname: str, path: str) -> None:
+         self._render_and_compare_dot_file(path, fname)
+ 
+ 
+@@ -256,5 +235,5 @@ class TestGraphvizRegressions(RenderedTestCase):
+     """Perform regression tests in graphs dir."""
+ 
+     @parameterized.expand(functools.partial(_load_test_cases, TESTS_DIR_2))
+-    def test_regression(self, _, fname, path):
++    def test_regression(self, _: T.Never, fname: str, path: str) -> None:
+         self._render_and_compare_dot_file(path, fname)

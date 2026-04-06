@@ -1,0 +1,35 @@
+From 5ff81b29e89509ad425a792fa1bf786940254a52 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 3 May 2018 12:02:45 +0200
+Subject: [PATCH] Close a configuration file on a syntax error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If a configuration file contains a syntax error, then its file
+descriptor is not closed and subsequently executed programs gets
+access to the descriptor.
+
+This patch fixes it.
+
+http://savannah.nongnu.org/bugs/?36276
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/parseinfo.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/parseinfo.c b/src/parseinfo.c
+index 477740a..17c9a69 100644
+--- a/src/parseinfo.c
++++ b/src/parseinfo.c
+@@ -476,6 +476,7 @@ set_defaults_and_return:
+     return 0;
+ 
+  error_return:
++    fclose (fp_info);
+     if (!logHistory)
+ 	logHistory = xstrdup (ALL_HISTORY_REC_TYPES);
+     if (infopath != NULL)
+-- 
+2.14.3
+

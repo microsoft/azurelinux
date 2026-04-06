@@ -1,0 +1,24 @@
+[binaries]
+c = 'x86_64-w64-mingw32ucrt-gcc'
+cpp = 'x86_64-w64-mingw32ucrt-g++'
+fortran = 'x86_64-w64-mingw32ucrt-gfortran'
+rust = ['rustc', '--target', 'x86_64-pc-windows-gnu']
+# XXX: there is no mingw/rustc target for UCRT yet, but this should do
+rust_ld = 'x86_64-w64-mingw32ucrt-gcc'
+ar = '/usr/bin/x86_64-w64-mingw32ucrt-ar'
+pkg-config = '/usr/bin/x86_64-w64-mingw32ucrt-pkg-config'
+ranlib = '/usr/bin/x86_64-w64-mingw32ucrt-ranlib'
+strip = '/usr/bin/x86_64-w64-mingw32ucrt-strip'
+windres = '/usr/bin/x86_64-w64-mingw32ucrt-windres'
+dlltool = '/usr/bin/x86_64-w64-mingw32ucrt-dlltool'
+libgcrypt-config = '/usr/x86_64-w64-mingw32ucrt/sys-root/mingw/bin/libgcrypt-config'
+
+[properties]
+root = '/usr/x86_64-w64-mingw32ucrt/sys-root/mingw'
+needs_exe_wrapper = true
+
+[host_machine]
+system = 'windows'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'

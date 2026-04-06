@@ -1,0 +1,19 @@
+commit cf6c2c029edc9c288122bcd603a72eb7f6d042d2
+Author: Jan Synacek <jsynacek@redhat.com>
+Date:   Mon Oct 30 11:37:45 2017 +0100
+
+    recognize -m option correctly
+
+diff --git a/numad.c b/numad.c
+index 4c85486..0721af4 100644
+--- a/numad.c
++++ b/numad.c
+@@ -2395,7 +2395,7 @@ int main(int argc, char *argv[]) {
+     int x_flag = 0;
+     int tmp_int = 0;
+     long list_pid = 0;
+-    while ((opt = getopt(argc, argv, "C:dD:hH:i:K:l:p:r:R:S:t:u:vVw:x:")) != -1) {
++    while ((opt = getopt(argc, argv, "C:dD:hH:i:K:l:m:p:r:R:S:t:u:vVw:x:")) != -1) {
+         switch (opt) {
+         case 'C':
+             C_flag = 1;

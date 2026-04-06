@@ -1,0 +1,108 @@
+From c7ac05fdf2a7b53d901bfc3afeb9a61916aaaaf1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Wed, 9 May 2018 20:26:37 +0200
+Subject: [PATCH 55/59] vsf_sysutil_get_tz: Check the return value of syscalls
+
+Check the return value of syscalls. There's always the possibility that
+they'll fail. (Failure of close() is not handled though, apart from EINTR.
+The file is open read-only so it shouldn't fail, and even if it does,
+it's not tragic.)
+
+We return NULL in case of syscall failure. One might be tempted to simply
+call die() when any kind of error occurs when parsing the timezone data,
+but I think it's more in line with the behaviour of tzset(3) not to do
+anything drastic in such a case (tzset() will silently use UTC when
+the value given in the TZ environment variable is invalid).
+---
+ sysutil.c | 46 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
+
+diff --git a/sysutil.c b/sysutil.c
+index de5f876..fd07d99 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -2647,12 +2647,12 @@ error:
+   die("reopening standard file descriptors to /dev/null failed");
+ }
+ 
+-char* vsf_sysutil_get_tz()
++char* vsf_sysutil_get_tz(void)
+ {
+   char *ret_tz = NULL;
+   char buff[BUFTZSIZ];
+   off_t s_pos, e_pos;
+-  size_t rcnt, rest;
++  ssize_t rcnt, rest;
+   int fd;
+ 
+   if ((fd = open(F_LOCALTIME, O_RDONLY)) > -1)
+@@ -2663,8 +2663,12 @@ char* vsf_sysutil_get_tz()
+       return NULL;
+     }
+     s_pos = e_pos > BUFTZSIZ ? e_pos - BUFTZSIZ : 0;
+-    lseek(fd, s_pos, SEEK_SET);
+-    rcnt = read(fd, buff, BUFTZSIZ);
++    if (lseek(fd, s_pos, SEEK_SET) == -1 ||
++        (rcnt = vsf_sysutil_read(fd, buff, BUFTZSIZ)) == -1)
++    {
++      close(fd);
++      return NULL;
++    }
+ 
+     if (rcnt && buff[rcnt-1] == '\n')
+     {
+@@ -2680,10 +2684,25 @@ char* vsf_sysutil_get_tz()
+          int len = e_pos - s_pos - offset;
+          if (len)
+          {
+-           lseek(fd, s_pos + offset, SEEK_SET);
++           if (lseek(fd, s_pos + offset, SEEK_SET) == -1)
++           {
++             close(fd);
++             return NULL;
++           }
+            ret_tz = calloc(1, len+4);
++           if (ret_tz == NULL)
++           {
++             close(fd);
++             return NULL;
++           }
+            memcpy(ret_tz, "TZ=", 3);
+-           rcnt = read(fd, ret_tz+3, len);
++           rcnt = vsf_sysutil_read(fd, ret_tz+3, len);
++           if (rcnt == -1)
++           {
++             free(ret_tz);
++             close(fd);
++             return NULL;
++           }
+          }
+          break;
+        }
+@@ -2693,11 +2712,20 @@ char* vsf_sysutil_get_tz()
+        }
+        rest = s_pos > BUFTZSIZ ? s_pos - BUFTZSIZ : 0;
+        s_pos -= rest;
+-       lseek(fd, s_pos, SEEK_SET);
+-       rcnt = read(fd, buff, rest);
++       if (lseek(fd, s_pos, SEEK_SET) == -1)
++       {
++         close(fd);
++         return NULL;
++       }
++       rcnt = vsf_sysutil_read(fd, buff, rest);
++       if (rcnt == -1)
++       {
++         close(fd);
++         return NULL;
++       }
+     } while (rcnt > 0);
+ 
+-    close (fd);
++    (void) vsf_sysutil_close_errno(fd);
+   }
+ 
+   return ret_tz;
+-- 
+2.14.4
+

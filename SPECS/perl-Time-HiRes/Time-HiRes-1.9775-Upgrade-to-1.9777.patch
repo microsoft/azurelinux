@@ -1,0 +1,106 @@
+From fc8161302a9a90e3cd69461820a1ca8911fa0722 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 9 May 2024 16:39:13 +0200
+Subject: [PATCH] Upgrade to 1.9777
+
+---
+ Changes  |  2 ++
+ HiRes.pm |  6 +++---
+ HiRes.xs | 16 ++++++++++++----
+ 3 files changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/Changes b/Changes
+index 2b681e9..31f28fe 100644
+--- a/Changes
++++ b/Changes
+@@ -17,6 +17,8 @@ Revision history for the Perl extension Time::HiRes.
+    https://github.com/Perl/perl5/issues/19321
+  - don't use C++ guards around the perl header files, it caused C++
+    build failures with MSVC.
++ - don't try to suppress C++ compatibility warnings in C++ builds, since
++   that warns.
+ 
+ 1.9764 [2020-08-10]
+  - Fix a bunch of repeated-word typos
+diff --git a/HiRes.pm b/HiRes.pm
+index b8cd263..4555e8e 100644
+--- a/HiRes.pm
++++ b/HiRes.pm
+@@ -50,7 +50,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+                  stat lstat utime
+                 );
+ 
+-our $VERSION = '1.9775';
++our $VERSION = '1.9777';
+ our $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -143,8 +143,8 @@ Time::HiRes - High resolution alarm, sleep, gettimeofday, interval timers
+   getitimer ($which);
+ 
+   use Time::HiRes qw( clock_gettime clock_getres clock_nanosleep
+-                      ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF
+-                      ITIMER_REALPROF );
++            CLOCK_REALTIME ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF
++            ITIMER_REALPROF );
+ 
+   $realtime   = clock_gettime(CLOCK_REALTIME);
+   $resolution = clock_getres(CLOCK_REALTIME);
+diff --git a/HiRes.xs b/HiRes.xs
+index 7320cb8..b879198 100644
+--- a/HiRes.xs
++++ b/HiRes.xs
+@@ -47,6 +47,14 @@
+ #  define GCC_DIAG_RESTORE_STMT GCC_DIAG_RESTORE NOOP
+ #endif
+ 
++#ifdef __cplusplus
++#  define GCC_DIAG_IGNORE_CPP_COMPAT_STMT NOOP
++#  define GCC_DIAG_IGNORE_CPP_COMPAT_RESTORE_STMT NOOP
++#else
++#  define GCC_DIAG_IGNORE_CPP_COMPAT_STMT GCC_DIAG_IGNORE_STMT(-Wc++-compat)
++#  define GCC_DIAG_IGNORE_CPP_COMPAT_RESTORE_STMT GCC_DIAG_RESTORE_STMT
++#endif
++
+ #if PERL_VERSION_GE(5,7,3) && !PERL_VERSION_GE(5,10,1)
+ #  undef SAVEOP
+ #  define SAVEOP() SAVEVPTR(PL_op)
+@@ -1238,7 +1246,7 @@ setitimer(which, seconds, interval = 0)
+         /* on some platforms the 1st arg to setitimer is an enum, which
+          * causes -Wc++-compat to complain about passing an int instead
+          */
+-        GCC_DIAG_IGNORE_STMT(-Wc++-compat);
++        GCC_DIAG_IGNORE_CPP_COMPAT_STMT;
+         if (setitimer(which, &newit, &oldit) == 0) {
+             EXTEND(sp, 1);
+             PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_value))));
+@@ -1247,7 +1255,7 @@ setitimer(which, seconds, interval = 0)
+                 PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_interval))));
+             }
+         }
+-        GCC_DIAG_RESTORE_STMT;
++        GCC_DIAG_IGNORE_CPP_COMPAT_RESTORE_STMT;
+ 
+ void
+ getitimer(which)
+@@ -1258,7 +1266,7 @@ getitimer(which)
+         /* on some platforms the 1st arg to getitimer is an enum, which
+          * causes -Wc++-compat to complain about passing an int instead
+          */
+-        GCC_DIAG_IGNORE_STMT(-Wc++-compat);
++        GCC_DIAG_IGNORE_CPP_COMPAT_STMT;
+         if (getitimer(which, &nowit) == 0) {
+             EXTEND(sp, 1);
+             PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_value))));
+@@ -1267,7 +1275,7 @@ getitimer(which)
+                 PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_interval))));
+             }
+         }
+-        GCC_DIAG_RESTORE_STMT;
++        GCC_DIAG_IGNORE_CPP_COMPAT_RESTORE_STMT;
+ 
+ #endif /* #if defined(HAS_GETITIMER) && defined(HAS_SETITIMER) */
+ 
+-- 
+2.45.0
+

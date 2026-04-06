@@ -1,0 +1,22 @@
+--- async-signal-0.2.13/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-signal-0.2.13/Cargo.toml	2025-09-14T14:46:42.828156+00:00
+@@ -92,19 +92,3 @@
+ [target."cfg(unix)".dev-dependencies.libc]
+ version = "0.2.139"
+ 
+-[target."cfg(windows)".dependencies.async-lock]
+-version = "3.3.0"
+-
+-[target."cfg(windows)".dependencies.atomic-waker]
+-version = "1.1.1"
+-
+-[target."cfg(windows)".dependencies.slab]
+-version = "0.4.8"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Console",
+-]
+-default-features = false

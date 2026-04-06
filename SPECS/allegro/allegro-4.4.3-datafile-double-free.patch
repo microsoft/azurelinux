@@ -1,0 +1,14 @@
+Fix double free in load_file_object
+
+unload_datafile already calls _AL_FREE.
+diff -up allegro-4.4.3/src/datafile.c~ allegro-4.4.3/src/datafile.c
+--- allegro-4.4.3/src/datafile.c~	2019-02-25 23:33:13.000000000 +0100
++++ allegro-4.4.3/src/datafile.c	2019-02-25 23:39:39.320622137 +0100
+@@ -1348,7 +1348,6 @@ static void *load_file_object(PACKFILE *
+    /* gracefully handle failure */
+    if (failed) {
+       unload_datafile(dat);
+-      _AL_FREE(dat);
+       dat = NULL;
+    }
+ 

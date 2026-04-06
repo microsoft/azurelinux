@@ -1,0 +1,67 @@
+From a6a51c152c994ee4012b0c659c081f88f7bf8c95 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:05:58 -0300
+Subject: [PATCH 09/20] gcc-false-positive
+
+---
+ onnxruntime/core/framework/node_unit.cc                         | 2 ++
+ .../optimizer/selectors_actions/selector_action_transformer.cc  | 2 ++
+ onnxruntime/core/providers/cpu/tensor/scatter.cc                | 2 ++
+ onnxruntime/test/framework/sparse_kernels_test.cc               | 2 ++
+ 4 files changed, 8 insertions(+)
+
+diff --git a/onnxruntime/core/framework/node_unit.cc b/onnxruntime/core/framework/node_unit.cc
+index 850cb167a3..7d855be689 100644
+--- a/onnxruntime/core/framework/node_unit.cc
++++ b/onnxruntime/core/framework/node_unit.cc
+@@ -1,6 +1,8 @@
+ // Copyright (c) Microsoft Corporation. All rights reserved.
+ // Licensed under the MIT License.
+ 
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++
+ #if !defined(ORT_MINIMAL_BUILD) || defined(ORT_EXTENDED_MINIMAL_BUILD)
+ 
+ #include "node_unit.h"
+diff --git a/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc b/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
+index b68cbaf85b..89981ceaf8 100644
+--- a/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
++++ b/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
+@@ -1,6 +1,8 @@
+ // Copyright (c) Microsoft Corporation. All rights reserved.
+ // Licensed under the MIT License.
+ 
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++
+ #include "core/optimizer/selectors_actions/selector_action_transformer.h"
+ 
+ #include <algorithm>
+diff --git a/onnxruntime/core/providers/cpu/tensor/scatter.cc b/onnxruntime/core/providers/cpu/tensor/scatter.cc
+index c7a2005924..1f54679393 100644
+--- a/onnxruntime/core/providers/cpu/tensor/scatter.cc
++++ b/onnxruntime/core/providers/cpu/tensor/scatter.cc
+@@ -16,6 +16,8 @@
+ #include "orttraining/training_ops/cpu/tensor/gather_elements_grad_impl.h"
+ #endif
+ 
++#pragma GCC diagnostic ignored "-Warray-bounds"
++
+ namespace onnxruntime {
+ 
+ namespace op_kernel_type_control {
+diff --git a/onnxruntime/test/framework/sparse_kernels_test.cc b/onnxruntime/test/framework/sparse_kernels_test.cc
+index 7bd6b47f52..bbe791ea5c 100644
+--- a/onnxruntime/test/framework/sparse_kernels_test.cc
++++ b/onnxruntime/test/framework/sparse_kernels_test.cc
+@@ -27,6 +27,8 @@
+ #include "core/util/math_cpuonly.h"
+ #include <Eigen/SparseCore>
+ 
++#pragma GCC diagnostic ignored "-Wdangling-reference"
++
+ using namespace ONNX_NAMESPACE;
+ using namespace onnxruntime::common;
+ 
+-- 
+2.47.1
+

@@ -1,0 +1,28 @@
+From 7d83bae4e2577ffa2afaf2fddb6948c1756a403c Mon Sep 17 00:00:00 2001
+From: Paul Murphy <paumurph@redhat.com>
+Date: Thu, 10 Jul 2025 09:06:22 -0500
+Subject: [PATCH] only copy rustlib into stage0 sysroot
+
+Otherwise, much more is copied, and doing so likely runs into
+permissions errors if the bootstrap toolchain lives in the host's
+sysroot.
+---
+ src/bootstrap/src/core/build_steps/compile.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bootstrap/src/core/build_steps/compile.rs b/src/bootstrap/src/core/build_steps/compile.rs
+index 4d0ae54e1ef..4ef70dd9b97 100644
+--- a/src/bootstrap/src/core/build_steps/compile.rs
++++ b/src/bootstrap/src/core/build_steps/compile.rs
+@@ -811,7 +811,7 @@ fn run(self, builder: &Builder<'_>) {
+                 let _ = fs::remove_dir_all(sysroot.join("lib/rustlib/src/rust"));
+             }
+ 
+-            builder.cp_link_r(&builder.initial_sysroot.join("lib"), &sysroot.join("lib"));
++            builder.cp_link_r(&builder.initial_sysroot.join("lib/rustlib"), &sysroot.join("lib/rustlib"));
+         } else {
+             if builder.download_rustc() {
+                 // Ensure there are no CI-rustc std artifacts.
+-- 
+2.49.0
+

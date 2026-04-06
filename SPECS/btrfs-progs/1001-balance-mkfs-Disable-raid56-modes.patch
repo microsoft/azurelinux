@@ -1,0 +1,99 @@
+From c840e616c03a1d735c7a6c0ba1c6473da1595ba2 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@centosproject.org>
+Date: Wed, 1 Sep 2021 19:25:55 -0400
+Subject: [PATCH] balance, mkfs: Disable raid56 modes
+
+The RAID 5/6 modes in Btrfs are not yet suitable for production use,
+so it is disabled.
+
+Signed-off-by: Neal Gompa <ngompa@centosproject.org>
+---
+ cmds/balance.c | 34 ++++------------------------------
+ mkfs/main.c    |  4 ++--
+ 2 files changed, 6 insertions(+), 32 deletions(-)
+
+diff --git a/cmds/balance.c b/cmds/balance.c
+index 4c73273d..fec6a1a3 100644
+--- a/cmds/balance.c
++++ b/cmds/balance.c
+@@ -365,7 +365,7 @@ static const char * const cmd_balance_start_usage[] = {
+ 	OPTLINE("-d[filters]", "act on data chunks with optional filters (no space in between)"),
+ 	OPTLINE("-m[filters]", "act on metadata chunks with optional filters (no space in between)"),
+ 	OPTLINE("-s[filters]", "act on system chunks (only under -f) with optional filters (no space in between)"),
+-	OPTLINE("-f", "force a reduction of metadata integrity, or skip timeout when converting to RAID56 profiles"),
++	OPTLINE("-f", "force a reduction of metadata integrity"),
+ 	OPTLINE("--full-balance", "do not print warning and do not delay start"),
+ 	OPTLINE("--background|--bg", "run the balance as a background process"),
+ 	OPTLINE("--enqueue", "wait if there's another exclusive operation running, otherwise continue"),
+@@ -386,7 +386,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+ 	bool background = false;
+ 	bool enqueue = false;
+ 	unsigned start_flags = 0;
+-	bool raid56_warned = false;
+ 	bool convert_warned  = false;
+ 	int i;
+ 
+@@ -492,8 +491,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+ 
+ 	/* soft makes sense only when convert for corresponding type is set */
+ 	for (i = 0; ptrs[i]; i++) {
+-		int delay = 10;
+-
+ 		if ((ptrs[i]->flags & BTRFS_BALANCE_ARGS_SOFT) &&
+ 		    !(ptrs[i]->flags & BTRFS_BALANCE_ARGS_CONVERT)) {
+ 			error("'soft' option can be used only when converting profiles");
+@@ -503,33 +500,10 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+ 		if (!(ptrs[i]->flags & BTRFS_BALANCE_ARGS_CONVERT))
+ 			continue;
+ 
+-		if (!(ptrs[i]->target & BTRFS_BLOCK_GROUP_RAID56_MASK))
+-			continue;
+-
+-		if (raid56_warned)
+-			continue;
+-
+-		raid56_warned = true;
+-		printf("WARNING:\n\n");
+-		printf("\tRAID5/6 support has known problems and is strongly discouraged\n");
+-		printf("\tto be used besides testing or evaluation. It is recommended that\n");
+-		printf("\tyou use one of the other RAID profiles.\n");
+-		/*
+-		 * Override timeout by the --force option too, though it's
+-		 * otherwise used for allowing redundancy reduction.
+-		 */
+-		if (force) {
+-			printf("\tSafety timeout skipped due to --force\n\n");
+-			continue;
+-		}
+-		printf("\tThe operation will continue in %d seconds.\n", delay);
+-		printf("\tUse Ctrl-C to stop.\n");
+-		while (delay) {
+-			printf("%2d", delay--);
+-			fflush(stdout);
+-			sleep(1);
++		if (ptrs[i]->target & BTRFS_BLOCK_GROUP_RAID56_MASK) {
++			error("RAID5/6 support has known problems and is disabled.");
++			return 1;
+ 		}
+-		printf("\nStarting conversion to RAID5/6.\n");
+ 	}
+ 
+ 	if (!(start_flags & BALANCE_START_FILTERS) && !(start_flags & BALANCE_START_NOWARN)) {
+diff --git a/mkfs/main.c b/mkfs/main.c
+index c9dbd234..e1a5b190 100644
+--- a/mkfs/main.c
++++ b/mkfs/main.c
+@@ -1501,8 +1501,8 @@ int BOX_MAIN(mkfs)(int argc, char **argv)
+ 
+ 	if ((data_profile | metadata_profile) & BTRFS_BLOCK_GROUP_RAID56_MASK) {
+ 		features.incompat_flags |= BTRFS_FEATURE_INCOMPAT_RAID56;
+-		warning("RAID5/6 support has known problems is strongly discouraged\n"
+-			"\t to be used besides testing or evaluation.\n");
++		error("RAID5/6 support has known problems and is disabled.");
++		exit(1);
+ 	}
+ 
+ 	if ((data_profile | metadata_profile) &
+-- 
+2.48.0
+

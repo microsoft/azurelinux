@@ -1,0 +1,29 @@
+--- libfyaml-0.8/configure.ac.original	2023-07-12 16:02:52.654450371 +0300
++++ libfyaml-0.8/configure.ac	2023-07-12 16:03:08.318386957 +0300
+@@ -72,7 +72,7 @@
+ 
+ AC_PROG_MKDIR_P
+ AC_PROG_CC
+-AC_PROG_CC_C99
++AC_PROG_CC
+ AM_PROG_CC_C_O
+ 
+ AC_PROG_GCC_TRADITIONAL
+@@ -100,7 +100,7 @@
+ AC_LIBLTDL_INSTALLABLE
+ AC_LIBTOOL_DLOPEN
+ AC_LIBTOOL_WIN32_DLL
+-AC_PROG_LIBTOOL
++LT_INIT
+ AC_SUBST(LTDLINCL)
+ AC_SUBST(LIBLTDL)
+ AC_CONFIG_SUBDIRS(libltdl)
+@@ -113,7 +113,7 @@
+ AC_CHECK_TYPES(ssize_t, , [AC_DEFINE([ssize_t], [signed long],
+     [Define ssize_t if it is not done by the standard libs.])])
+ AC_TYPE_OFF_T
+-AC_TYPE_SIGNAL
++
+ AC_TYPE_UID_T
+ AC_CHECK_DECLS(environ)
+ 

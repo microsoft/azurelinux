@@ -1,0 +1,9 @@
+--- triomphe-0.1.15/Cargo.toml	1970-01-01T00:00:01+00:00
++++ triomphe-0.1.15/Cargo.toml	2025-10-21T14:49:38.791636+00:00
+@@ -69,6 +69,3 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.unsize]
+-version = "1.1"
+-optional = true

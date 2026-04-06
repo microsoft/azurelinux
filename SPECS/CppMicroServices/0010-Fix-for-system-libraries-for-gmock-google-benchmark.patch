@@ -1,0 +1,55 @@
+From 60f7c50dfee9deefaec2dd72642eceed59a6c72b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 4 Feb 2025 19:05:27 +0000
+Subject: [PATCH 10/12] Fix for system libraries for gmock & google-benchmark
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ CMakeLists.txt                                           | 1 +
+ compendium/DeclarativeServices/test/bench/CMakeLists.txt | 1 +
+ framework/test/bench/CMakeLists.txt                      | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7feeff5a..19885d95 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -436,6 +436,7 @@ if(US_BUILD_TESTING)
+ 
+   if(US_USE_SYSTEM_GTEST)
+     find_package(GTest REQUIRED)
++    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
+   else()
+     # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
+     us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
+diff --git a/compendium/DeclarativeServices/test/bench/CMakeLists.txt b/compendium/DeclarativeServices/test/bench/CMakeLists.txt
+index b0079630..6bfd7a8c 100644
+--- a/compendium/DeclarativeServices/test/bench/CMakeLists.txt
++++ b/compendium/DeclarativeServices/test/bench/CMakeLists.txt
+@@ -129,6 +129,7 @@ target_link_libraries(${us_declarativeservices_bench_test_exe_name}
+   usLogService
+   usAsyncWorkService
+   gtest
++  benchmark
+   benchmark_main
+   util
+ )
+diff --git a/framework/test/bench/CMakeLists.txt b/framework/test/bench/CMakeLists.txt
+index bf6cb6bd..c51183a7 100755
+--- a/framework/test/bench/CMakeLists.txt
++++ b/framework/test/bench/CMakeLists.txt
+@@ -41,7 +41,7 @@ add_executable(${us_bench_test_exe_name} ${_bench_src} ${_additional_srcs} )
+ 
+ target_include_directories(${us_bench_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
+ 
+-target_link_libraries(${us_bench_test_exe_name} benchmark_main usLogService)
++target_link_libraries(${us_bench_test_exe_name} benchmark benchmark_main usLogService)
+ target_link_libraries(${us_bench_test_exe_name} ${Framework_TARGET})
+ 
+ set_property(TARGET ${us_bench_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
+-- 
+2.48.1
+

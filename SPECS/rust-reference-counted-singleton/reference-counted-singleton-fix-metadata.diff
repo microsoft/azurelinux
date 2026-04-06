@@ -1,0 +1,10 @@
+--- reference-counted-singleton-0.1.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reference-counted-singleton-0.1.5/Cargo.toml	2024-09-16T20:42:40.480381+00:00
+@@ -39,6 +39,7 @@
+ ]
+ license = "MIT"
+ repository = "https://codeberg.org/koutheir/reference-counted-singleton.git"
++exclude = ["coverage*"]
+ 
+ [lib]
+ name = "reference_counted_singleton"

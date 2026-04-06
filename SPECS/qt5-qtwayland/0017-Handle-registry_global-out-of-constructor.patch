@@ -1,0 +1,85 @@
+From 90a95226b6662a7a4c3cff81b48b4deb367183e4 Mon Sep 17 00:00:00 2001
+From: Elvis Lee <kwangwoong.lee@lge.com>
+Date: Thu, 18 Feb 2021 15:45:49 +0900
+Subject: [PATCH 17/55] Handle registry_global out of constructor
+
+Factory functions in QWaylandDisplay::registry_global() can be overridden.
+Later, other classes instantiated in the registry_global can support
+platform specific implementation with inheritance and some factory function.
+
+Change-Id: I92ce574e049b8c91587687cc7c30611f3dfdbe56
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 3793a82038682db77966ea5daf8e75964e4250fe)
+---
+ src/client/qwaylanddisplay.cpp     | 19 ++++++++++++-------
+ src/client/qwaylanddisplay_p.h     |  2 ++
+ src/client/qwaylandintegration.cpp |  3 +++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index 7f28d01c..c2482030 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -160,13 +160,6 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+     if (!mXkbContext)
+         qCWarning(lcQpaWayland, "failed to create xkb context");
+ #endif
+-
+-    forceRoundTrip();
+-
+-    if (!mWaitingScreens.isEmpty()) {
+-        // Give wl_output.done and zxdg_output_v1.done events a chance to arrive
+-        forceRoundTrip();
+-    }
+ }
+ 
+ QWaylandDisplay::~QWaylandDisplay(void)
+@@ -191,6 +184,18 @@ QWaylandDisplay::~QWaylandDisplay(void)
+         wl_display_disconnect(mDisplay);
+ }
+ 
++// Steps which is called just after constructor. This separates registry_global() out of the constructor
++// so that factory functions in integration can be overridden.
++void QWaylandDisplay::initialize()
++{
++    forceRoundTrip();
++
++    if (!mWaitingScreens.isEmpty()) {
++        // Give wl_output.done and zxdg_output_v1.done events a chance to arrive
++        forceRoundTrip();
++    }
++}
++
+ void QWaylandDisplay::ensureScreen()
+ {
+     if (!mScreens.empty() || mPlaceholderScreen)
+diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
+index 15104d65..49820255 100644
+--- a/src/client/qwaylanddisplay_p.h
++++ b/src/client/qwaylanddisplay_p.h
+@@ -131,6 +131,8 @@ public:
+     QWaylandDisplay(QWaylandIntegration *waylandIntegration);
+     ~QWaylandDisplay(void) override;
+ 
++    void initialize();
++
+ #if QT_CONFIG(xkbcommon)
+     struct xkb_context *xkbContext() const { return mXkbContext.get(); }
+ #endif
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index cd8569b1..8afecb31 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -200,6 +200,9 @@ void QWaylandIntegration::initialize()
+     QSocketNotifier *sn = new QSocketNotifier(fd, QSocketNotifier::Read, mDisplay.data());
+     QObject::connect(sn, SIGNAL(activated(QSocketDescriptor)), mDisplay.data(), SLOT(flushRequests()));
+ 
++    // Call after eventDispatcher is fully connected, for QWaylandDisplay::forceRoundTrip()
++    mDisplay->initialize();
++
+     // Qt does not support running with no screens
+     mDisplay->ensureScreen();
+ }
+-- 
+2.51.1
+

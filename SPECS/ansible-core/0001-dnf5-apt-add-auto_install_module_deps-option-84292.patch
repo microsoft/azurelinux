@@ -1,0 +1,348 @@
+From 9c9f20128efdf041a093f0de37fc316c6ec18b66 Mon Sep 17 00:00:00 2001
+From: Martin Krizek <martin.krizek@gmail.com>
+Date: Thu, 21 Nov 2024 17:06:18 +0100
+Subject: [PATCH 1/2] dnf5,apt: add auto_install_module_deps option (#84292)
+
+* dnf5,apt: add auto_install_module_deps option
+
+Fixes #84206
+
+(cherry picked from commit 2a53b851fee8ebaa07c1341122dd905354659237)
+---
+ ...4206-dnf5-apt-auto-install-module-deps.yml |  2 +
+ lib/ansible/modules/apt.py                    | 90 +++++++++++--------
+ lib/ansible/modules/dnf5.py                   | 52 ++++++++---
+ test/integration/targets/apt/tasks/apt.yml    | 28 ++++--
+ test/integration/targets/dnf5/playbook.yml    | 21 ++++-
+ 5 files changed, 133 insertions(+), 60 deletions(-)
+ create mode 100644 changelogs/fragments/84206-dnf5-apt-auto-install-module-deps.yml
+
+diff --git a/changelogs/fragments/84206-dnf5-apt-auto-install-module-deps.yml b/changelogs/fragments/84206-dnf5-apt-auto-install-module-deps.yml
+new file mode 100644
+index 0000000000..14d595449c
+--- /dev/null
++++ b/changelogs/fragments/84206-dnf5-apt-auto-install-module-deps.yml
+@@ -0,0 +1,2 @@
++minor_changes:
++  - dnf5, apt - add ``auto_install_module_deps`` option (https://github.com/ansible/ansible/issues/84206)
+diff --git a/lib/ansible/modules/apt.py b/lib/ansible/modules/apt.py
+index 70a2a07cc0..c18bd36fe4 100644
+--- a/lib/ansible/modules/apt.py
++++ b/lib/ansible/modules/apt.py
+@@ -17,6 +17,12 @@ description:
+   - Manages I(apt) packages (such as for Debian/Ubuntu).
+ version_added: "0.0.2"
+ options:
++  auto_install_module_deps:
++    description:
++      - Automatically install dependencies required to run this module.
++    type: bool
++    default: yes
++    version_added: 2.19
+   name:
+     description:
+       - A list of package names, like V(foo), or package specifier with version, like V(foo=1.0) or V(foo>=1.0).
+@@ -191,8 +197,7 @@ options:
+     default: 60
+     version_added: "2.12"
+ requirements:
+-   - python-apt (python 2)
+-   - python3-apt (python 3)
++   - python3-apt
+    - aptitude (before 2.4)
+ author: "Matthew Williams (@mgwilliams)"
+ extends_documentation_fragment: action_common_attributes
+@@ -214,8 +219,8 @@ notes:
+    - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name) option.
+    - When O(default_release) is used, an implicit priority of 990 is used. This is the same behavior as C(apt-get -t).
+    - When an exact version is specified, an implicit priority of 1001 is used.
+-   - If the interpreter can't import C(python-apt)/C(python3-apt) the module will check for it in system-owned interpreters as well.
+-     If the dependency can't be found, the module will attempt to install it.
++   - If the interpreter can't import C(python3-apt) the module will check for it in system-owned interpreters as well.
++     If the dependency can't be found, depending on the value of O(auto_install_module_deps) the module will attempt to install it.
+      If the dependency is found or installed, the module will be respawned under the correct interpreter.
+ '''
+ 
+@@ -1233,6 +1238,7 @@ def main():
+             allow_downgrade=dict(type='bool', default=False, aliases=['allow-downgrade', 'allow_downgrades', 'allow-downgrades']),
+             allow_change_held_packages=dict(type='bool', default=False),
+             lock_timeout=dict(type='int', default=60),
++            auto_install_module_deps=dict(type='bool', default=True),
+         ),
+         mutually_exclusive=[['deb', 'package', 'upgrade']],
+         required_one_of=[['autoremove', 'deb', 'package', 'update_cache', 'upgrade']],
+@@ -1268,7 +1274,7 @@ def main():
+     if not HAS_PYTHON_APT:
+         # This interpreter can't see the apt Python library- we'll do the following to try and fix that:
+         # 1) look in common locations for system-owned interpreters that can see it; if we find one, respawn under it
+-        # 2) finding none, try to install a matching python-apt package for the current interpreter version;
++        # 2) finding none, try to install a matching python3-apt package for the current interpreter version;
+         #    we limit to the current interpreter version to try and avoid installing a whole other Python just
+         #    for apt support
+         # 3) if we installed a support package, try to respawn under what we think is the right interpreter (could be
+@@ -1294,39 +1300,47 @@ def main():
+ 
+         # don't make changes if we're in check_mode
+         if module.check_mode:
+-            module.fail_json(msg="%s must be installed to use check mode. "
+-                                 "If run normally this module can auto-install it." % apt_pkg_name)
+-
+-        # We skip cache update in auto install the dependency if the
+-        # user explicitly declared it with update_cache=no.
+-        if module.params.get('update_cache') is False:
+-            module.warn("Auto-installing missing dependency without updating cache: %s" % apt_pkg_name)
+-        else:
+-            module.warn("Updating cache and auto-installing missing dependency: %s" % apt_pkg_name)
+-            module.run_command([APT_GET_CMD, 'update'], check_rc=True)
+-
+-        # try to install the apt Python binding
+-        apt_pkg_cmd = [APT_GET_CMD, 'install', apt_pkg_name, '-y', '-q', dpkg_options]
+-
+-        if install_recommends is False:
+-            apt_pkg_cmd.extend(["-o", "APT::Install-Recommends=no"])
+-        elif install_recommends is True:
+-            apt_pkg_cmd.extend(["-o", "APT::Install-Recommends=yes"])
+-        # install_recommends is None uses the OS default
+-
+-        module.run_command(apt_pkg_cmd, check_rc=True)
+-
+-        # try again to find the bindings in common places
+-        interpreter = probe_interpreters_for_module(interpreters, 'apt')
+-
+-        if interpreter:
+-            # found the Python bindings; respawn this module under the interpreter where we found them
+-            # NB: respawn is somewhat wasteful if it's this interpreter, but simplifies the code
+-            respawn_module(interpreter)
+-            # this is the end of the line for this process, it will exit here once the respawned module has completed
+-        else:
+-            # we've done all we can do; just tell the user it's busted and get out
+-            module.fail_json(msg="{0} must be installed and visible from {1}.".format(apt_pkg_name, sys.executable))
++            module.fail_json(
++                msg=f"{apt_pkg_name} must be installed to use check mode. "
++                    "If run normally this module can auto-install it, "
++                    "see the auto_install_module_deps option.",
++            )
++        elif p['auto_install_module_deps']:
++            # We skip cache update in auto install the dependency if the
++            # user explicitly declared it with update_cache=no.
++            if module.params.get('update_cache') is False:
++                module.warn("Auto-installing missing dependency without updating cache: %s" % apt_pkg_name)
++            else:
++                module.warn("Updating cache and auto-installing missing dependency: %s" % apt_pkg_name)
++                module.run_command([APT_GET_CMD, 'update'], check_rc=True)
++
++            # try to install the apt Python binding
++            apt_pkg_cmd = [APT_GET_CMD, 'install', apt_pkg_name, '-y', '-q', dpkg_options]
++
++            if install_recommends is False:
++                apt_pkg_cmd.extend(["-o", "APT::Install-Recommends=no"])
++            elif install_recommends is True:
++                apt_pkg_cmd.extend(["-o", "APT::Install-Recommends=yes"])
++            # install_recommends is None uses the OS default
++
++            module.run_command(apt_pkg_cmd, check_rc=True)
++
++            # try again to find the bindings in common places
++            interpreter = probe_interpreters_for_module(interpreters, 'apt')
++
++            if interpreter:
++                # found the Python bindings; respawn this module under the interpreter where we found them
++                # NB: respawn is somewhat wasteful if it's this interpreter, but simplifies the code
++                respawn_module(interpreter)
++                # this is the end of the line for this process, it will exit here once the respawned module has completed
++
++        # we've done all we can do; just tell the user it's busted and get out
++        py_version = sys.version.replace("\n", "")
++        module.fail_json(
++            msg=f"Could not import the {apt_pkg_name} module using {sys.executable} ({py_version}). "
++            f"Ensure {apt_pkg_name} package is installed (either manually or via the auto_install_module_deps option) "
++            f"or that you have specified the correct ansible_python_interpreter. (attempted {interpreters}).",
++        )
+ 
+     if p['clean'] is True:
+         aptclean_stdout, aptclean_stderr, aptclean_diff = aptclean(module)
+diff --git a/lib/ansible/modules/dnf5.py b/lib/ansible/modules/dnf5.py
+index 24ae91432b..a0e4a4ef5a 100644
+--- a/lib/ansible/modules/dnf5.py
++++ b/lib/ansible/modules/dnf5.py
+@@ -14,6 +14,12 @@ description:
+     provides are implemented in M(ansible.builtin.dnf5), please consult specific options for more information."
+ short_description: Manages packages with the I(dnf5) package manager
+ options:
++  auto_install_module_deps:
++    description:
++      - Automatically install dependencies required to run this module.
++    type: bool
++    default: yes
++    version_added: 2.19
+   name:
+     description:
+       - "A package name or package specifier with version, like C(name-1.0).
+@@ -246,6 +252,10 @@ attributes:
+         platforms: rhel
+ requirements:
+   - "python3-libdnf5"
++notes:
++  - If the interpreter can't import C(python3-libdnf5) the module will check for it in system-owned interpreters as well.
++    If the dependency can't be found, depending on the value of O(auto_install_module_deps) the module will attempt to install it.
++    If the dependency is found or installed, the module will be respawned under the correct interpreter.
+ version_added: 2.15
+ """
+ 
+@@ -474,6 +484,8 @@ def get_unneeded_pkgs(base):
+ class Dnf5Module(YumDnf):
+     def __init__(self, module):
+         super(Dnf5Module, self).__init__(module)
++        self.auto_install_module_deps = self.module.params["auto_install_module_deps"]
++
+         self._ensure_dnf()
+ 
+         self.pkg_mgr_name = "dnf5"
+@@ -530,21 +542,30 @@ class Dnf5Module(YumDnf):
+         ]
+ 
+         if not has_respawned():
+-            # probe well-known system Python locations for accessible bindings, favoring py3
+-            interpreter = probe_interpreters_for_module(system_interpreters, "libdnf5")
+-
+-            if interpreter:
+-                # respawn under the interpreter where the bindings should be found
+-                respawn_module(interpreter)
+-                # end of the line for this module, the process will exit here once the respawned module completes
++            for attempt in (1, 2):
++                # probe well-known system Python locations for accessible bindings
++                interpreter = probe_interpreters_for_module(system_interpreters, "libdnf5")
++                if interpreter:
++                    # respawn under the interpreter where the bindings should be found
++                    respawn_module(interpreter)
++                    # end of the line for this module, the process will exit here once the respawned module completes
++                if attempt == 1:
++                    if self.module.check_mode:
++                        self.module.fail_json(
++                            msg="python3-libdnf5 must be installed to use check mode. "
++                                "If run normally this module can auto-install it, "
++                                "see the auto_install_module_deps option.",
++                        )
++                    elif self.auto_install_module_deps:
++                        self.module.run_command(["dnf", "install", "-y", "python3-libdnf5"], check_rc=True)
++                    else:
++                        break
+ 
+-        # done all we can do, something is just broken (auto-install isn't useful anymore with respawn, so it was removed)
++        py_version = sys.version.replace("\n", "")
+         self.module.fail_json(
+-            msg="Could not import the libdnf5 python module using {0} ({1}). "
+-            "Please install python3-libdnf5 package or ensure you have specified the "
+-            "correct ansible_python_interpreter. (attempted {2})".format(
+-                sys.executable, sys.version.replace("\n", ""), system_interpreters
+-            ),
++            msg=f"Could not import the libdnf5 python module using {sys.executable} ({py_version}). "
++            "Ensure python3-libdnf5 package is installed (either manually or via the auto_install_module_deps option) "
++            f"or that you have specified the correct ansible_python_interpreter. (attempted {system_interpreters}).",
+             failures=[],
+         )
+ 
+@@ -795,6 +816,11 @@ class Dnf5Module(YumDnf):
+ 
+ 
+ def main():
++    yumdnf_argument_spec["argument_spec"].update(
++        dict(
++            auto_install_module_deps=dict(type="bool", default=True),
++        )
++    )
+     module = AnsibleModule(**yumdnf_argument_spec)
+     try:
+         Dnf5Module(module).run()
+diff --git a/test/integration/targets/apt/tasks/apt.yml b/test/integration/targets/apt/tasks/apt.yml
+index 64e00d3ca9..dda5fc1fab 100644
+--- a/test/integration/targets/apt/tasks/apt.yml
++++ b/test/integration/targets/apt/tasks/apt.yml
+@@ -8,17 +8,17 @@
+     distro_mirror: http://archive.ubuntu.com/ubuntu
+   when: ansible_distribution == 'Ubuntu'
+ 
+-# UNINSTALL 'python-apt'
+-#  The `apt` module has the smarts to auto-install `python-apt(3)`.  To test, we
+-#  will first uninstall `python-apt`.
+-- name: uninstall python-apt with apt
++# UNINSTALL 'python3-apt'
++#  The `apt` module has the smarts to auto-install `python3-apt`.  To test, we
++#  will first uninstall `python3-apt`.
++- name: uninstall python3-apt with apt
+   apt:
+-    pkg: [python-apt, python3-apt]
++    pkg: python3-apt
+     state: absent
+     purge: yes
+   register: apt_result
+ 
+-# In check mode, auto-install of `python-apt` must fail
++# In check mode, auto-install of `python3-apt` must fail
+ - name: test fail uninstall hello without required apt deps in check mode
+   apt:
+     pkg: hello
+@@ -32,13 +32,25 @@
+   assert:
+     that:
+     - apt_result is failed
+-    - '"If run normally this module can auto-install it." in apt_result.msg'
++    - '"If run normally this module can auto-install it" in apt_result.msg'
+ 
+ - name: check with dpkg
+-  shell: dpkg -s python-apt python3-apt
++  shell: dpkg -s python3-apt
+   register: dpkg_result
+   ignore_errors: true
+ 
++- name: Test the auto_install_module_deps option
++  apt:
++    pkg: hello
++    auto_install_module_deps: false
++  register: r
++  ignore_errors: true
++
++- assert:
++    that:
++      - r is failed
++      - r.msg is contains("Could not import the python3-apt module")
++
+ # UNINSTALL 'hello'
+ #   With 'python-apt' uninstalled, the first call to 'apt' should install
+ #   python-apt without updating the cache.
+diff --git a/test/integration/targets/dnf5/playbook.yml b/test/integration/targets/dnf5/playbook.yml
+index d9a79ced7e..a36c17a202 100644
+--- a/test/integration/targets/dnf5/playbook.yml
++++ b/test/integration/targets/dnf5/playbook.yml
+@@ -1,8 +1,27 @@
+ - hosts: localhost
+   tasks:
+     - block:
+-        - command: dnf install -y python3-libdnf5
++        - command: "dnf install -y 'dnf-command(copr)'"
++        - name: Test against dnf5 nightly build to detect any issues early
++          command: dnf copr enable -y rpmsoftwaremanagement/dnf-nightly
+ 
++        - name: Ensure module deps are not installed
++          command: dnf remove -y python3-libdnf5
++
++        - name: Test the auto_install_module_deps option
++          dnf5:
++            name: sos
++            auto_install_module_deps: false
++          register: r
++          ignore_errors: true
++
++        - assert:
++            that:
++              - r is failed
++              - r.msg is contains("Could not import the libdnf5 python module")
++
++        # Now the first dnf5 task in the dnf role should auto install python3-libdnf5 as
++        # auto_install_module_deps is true by default.
+         - include_role:
+             name: dnf
+           vars:
+-- 
+2.50.1
+

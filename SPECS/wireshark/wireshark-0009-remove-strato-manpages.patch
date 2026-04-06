@@ -1,0 +1,39 @@
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index adcfa0c..fd92872 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -40,8 +40,6 @@ endmacro()
+ 
+ ADD_MAN_PAGE(wireshark   1)
+ ADD_MAN_PAGE(tshark      1)
+-ADD_MAN_PAGE(stratoshark 1)
+-ADD_MAN_PAGE(strato      1)
+ 
+ ADD_MAN_PAGE(androiddump 1)
+ ADD_MAN_PAGE(capinfos    1)
+@@ -55,10 +53,8 @@ ADD_MAN_PAGE(randpktdump 1)
+ ADD_MAN_PAGE(etwdump     1)
+ ADD_MAN_PAGE(rawshark    1)
+ ADD_MAN_PAGE(reordercap  1)
+-ADD_MAN_PAGE(sshdig      1)
+ ADD_MAN_PAGE(sshdump     1)
+ ADD_MAN_PAGE(text2pcap   1)
+-ADD_MAN_PAGE(falcodump   1)
+ ADD_MAN_PAGE(udpdump     1)
+ ADD_MAN_PAGE(wifidump    1)
+ 
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 71a04e8..a797ad1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2272,10 +2272,7 @@ if (ASCIIDOCTOR_FOUND)
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/etwdump.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/rawshark.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/reordercap.html
+-		${CMAKE_BINARY_DIR}/doc/man_pages/sshdig.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/sshdump.html
+-		${CMAKE_BINARY_DIR}/doc/man_pages/strato.html
+-		${CMAKE_BINARY_DIR}/doc/man_pages/stratoshark.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/wifidump.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/text2pcap.html
+ 		${CMAKE_BINARY_DIR}/doc/man_pages/tshark.html

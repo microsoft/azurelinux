@@ -1,0 +1,29 @@
+--- av-scenechange-0.14.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ av-scenechange-0.14.1/Cargo.toml	2025-12-30T13:21:50.479616+00:00
+@@ -23,7 +23,7 @@
+ autobenches = false
+ description = "Estimates frames in a video where a scenecut would be ideal"
+ readme = "README.md"
+-license = "MIT"
++license = "MIT AND BSD-2-Clause AND ISC AND LicenseRef-BSD-2-Clause-WITH-AdditionRef-AOMPL-1.0"
+ repository = "https://github.com/rust-av/av-scenechange"
+ 
+ [features]
+@@ -83,7 +83,7 @@
+ optional = true
+ 
+ [dependencies.console]
+-version = "0.15"
++version = "0.16"
+ optional = true
+ 
+ [dependencies.fern]
+@@ -114,7 +114,7 @@
+ version = "0.2.19"
+ 
+ [dependencies.pastey]
+-version = "0.1.0"
++version = "0.2.0"
+ 
+ [dependencies.rayon]
+ version = "1.10.0"

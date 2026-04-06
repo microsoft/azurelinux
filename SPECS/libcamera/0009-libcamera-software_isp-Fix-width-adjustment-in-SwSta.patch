@@ -1,0 +1,33 @@
+From 248673e69bfe78ade48f92f97bb9978b6d8a0ed5 Mon Sep 17 00:00:00 2001
+From: Milan Zamazal <mzamazal@redhat.com>
+Date: Thu, 25 Sep 2025 21:28:50 +0200
+Subject: [PATCH 09/15] libcamera: software_isp: Fix width adjustment in
+ SwStatsCpu::setWindow
+
+SwStatsCpu::setWindow reduces the window width by the added x-offset, to
+prevent exceeding image bounds.  But if the window width is smaller than
+the x-offset, we get unsigned integer underflow.  Fix it by setting the
+window width to 0 in such a case.
+
+Signed-off-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/libcamera/software_isp/swstats_cpu.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcamera/software_isp/swstats_cpu.cpp b/src/libcamera/software_isp/swstats_cpu.cpp
+index 634ebfc3c..43d8d79e5 100644
+--- a/src/libcamera/software_isp/swstats_cpu.cpp
++++ b/src/libcamera/software_isp/swstats_cpu.cpp
+@@ -438,7 +438,7 @@ void SwStatsCpu::setWindow(const Rectangle &window)
+ 	window_.y &= ~(patternSize_.height - 1);
+ 
+ 	/* width_ - xShift_ to make sure the window fits */
+-	window_.width -= xShift_;
++	window_.width = (window_.width > xShift_ ? window_.width - xShift_ : 0);
+ 	window_.width &= ~(patternSize_.width - 1);
+ 	window_.height &= ~(patternSize_.height - 1);
+ }
+-- 
+2.51.0
+

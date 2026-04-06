@@ -1,0 +1,47 @@
+*PPD-Adobe: "4.3"
+*%
+*% Text-only printer definition
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"LFTOCRLF.PPD"
+*Manufacturer:	"Generic"
+*Product:	"(Generic)"
+*cupsVersion:   1.0
+*cupsManualCopies: True
+*cupsModelNumber:  2
+*cupsFilter:    "text/plain 0 lftocrlf"
+*ModelName:     "Generic LF-to-CRLF printer"
+*ShortNickName: "Generic LF-to-CRLF printer"
+*NickName:      "Generic LF-to-CRLF printer"
+*PSVersion:	"(2017.000) 0"
+*LanguageLevel:	"2"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"8"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+*DefaultImageableArea: Letter
+*ImageableArea Letter/US Letter:	"18 36 594 756"
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/Letter:		"612 792"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*OpenUI *SendFF: Boolean
+*DefaultSendFF: False
+*SendFF True/True:        ""
+*SendFF False/False:   ""
+*CloseUI: *SendFF

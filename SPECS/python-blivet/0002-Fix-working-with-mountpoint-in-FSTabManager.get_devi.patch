@@ -1,0 +1,54 @@
+From 164a9729ce0d651feb9ee209e9e121130d21e719 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 14 Oct 2025 15:46:39 +0200
+Subject: [PATCH 2/3] Fix working with mountpoint in FSTabManager.get_device
+
+---
+ blivet/fstab.py                   | 3 ++-
+ tests/storage_tests/fstab_test.py | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/blivet/fstab.py b/blivet/fstab.py
+index b7daafbc..37c524f1 100644
+--- a/blivet/fstab.py
++++ b/blivet/fstab.py
+@@ -530,6 +530,7 @@ class FSTabManager(object):
+         _mntopts = mntopts or (entry.mntopts if entry is not None else None)
+         _mntopts_str = ",".join(_mntopts) if _mntopts is not None else None
+         _vfstype = vfstype or (entry.vfstype if entry is not None else None)
++        _file = file or (entry.file if entry is not None else None)
+ 
+         # find device in the tree
+         device = devicetree.resolve_device(_spec, options=_mntopts_str, blkid_tab=blkid_tab, crypt_tab=crypt_tab)
+@@ -557,7 +558,7 @@ class FSTabManager(object):
+             raise UnrecognizedFSTabEntryError("Unrecognized filesystem type for %s: '%s'" % (_spec, vfstype))
+ 
+         if hasattr(device.format, "mountpoint"):
+-            device.format.mountpoint = file
++            device.format.mountpoint = _file
+ 
+         device.format.options = _mntopts
+ 
+diff --git a/tests/storage_tests/fstab_test.py b/tests/storage_tests/fstab_test.py
+index ed34dbcb..7b9f2bba 100644
+--- a/tests/storage_tests/fstab_test.py
++++ b/tests/storage_tests/fstab_test.py
+@@ -124,6 +124,7 @@ class FstabTestCase(StorageTestCase):
+             dev = fstab.get_device(devicetree=self.storage.devicetree, entry=entry)
+             self.assertIsNotNone(dev)
+             self.assertEqual(dev, lv)
++            self.assertEqual(dev.format.mountpoint, "/mnt/test2")
+ 
+             # remove the device
+             dev = self.storage.devicetree.get_device_by_name("blivetTestVG-blivetTestLVMine")
+@@ -257,6 +258,7 @@ class FstabTestCase(StorageTestCase):
+             dev = fstab.get_device(devicetree=self.storage.devicetree, entry=entry)
+             self.assertIsNotNone(dev)
+             self.assertEqual(dev, sub)
++            self.assertEqual(dev.format.mountpoint, "/home")
+ 
+     def test_swap_creation(self):
+         # test swap creation for presence of FSTabOptions object
+-- 
+2.51.0
+

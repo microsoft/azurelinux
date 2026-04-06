@@ -1,0 +1,58 @@
+From 4cb6e6422bc06a6436c8492fef3ef5cdff343b4c Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Thu, 23 Nov 2023 14:40:27 +0100
+Subject: [PATCH] drop-hatch-nodejs-version
+
+---
+ pyproject.toml | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b21c51a..5aba02e 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,12 +2,12 @@
+ requires = [
+     "hatchling>=1.5.0",
+     "jupyterlab>=4.0.0,<5",
+-    "hatch-nodejs-version>=0.3.2",
+ ]
+ build-backend = "hatchling.build"
+ 
+ [project]
+ name = "jupyterlab_pygments"
++version = "##VERSION##"
+ readme = "README.md"
+ requires-python = ">=3.8"
+ classifiers = [
+@@ -26,27 +26,10 @@ classifiers = [
+     "Programming Language :: Python :: 3.12",
+ ]
+ dependencies = []
+-dynamic = [
+-    "version",
+-    "description",
+-    "authors",
+-    "urls",
+-    "keywords",
+-]
+ 
+ [project.license]
+ file = "LICENSE"
+ 
+-[tool.hatch.version]
+-source = "nodejs"
+-
+-[tool.hatch.metadata.hooks.nodejs]
+-fields = [
+-    "description",
+-    "authors",
+-    "urls",
+-]
+-
+ [tool.hatch.build.targets.sdist]
+ artifacts = [
+     "jupyterlab_pygments/labextension",
+-- 
+2.42.0
+

@@ -1,0 +1,31 @@
+From f05f178f6960e85f6cdb6d6bf8c1812fd83af74a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 20 Jun 2025 13:41:39 +0200
+Subject: [PATCH] Fix `cache_format` for Rails 8
+
+Rails 8 have not introduced new cache format such as `8.0`. Keep using
+the highest available ATM.
+---
+ test/cases/railtie_test.rb | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/test/cases/railtie_test.rb b/test/cases/railtie_test.rb
+index fe2fcfb..4fb34eb 100644
+--- a/test/cases/railtie_test.rb
++++ b/test/cases/railtie_test.rb
+@@ -16,7 +16,14 @@ def setup
+     @app.config.eager_load = false
+     @app.config.logger = Logger.new(nil)
+     @app.config.secret_key_base = ('x' * 30)
+-    @app.config.active_support.cache_format_version = Rails::VERSION::STRING.to_f
++    # Rails supports `cache_format` up to `7.1`.
++    # https://github.com/rails/rails/blob/aa66aece44f191e6330c04ce4942c3edf31d85d7/activesupport/lib/active_support/cache.rb#L800-L809
++    @app.config.active_support.cache_format_version = if Rails::VERSION::STRING.to_f < 8
++      Rails::VERSION::STRING.to_f
++    else
++      7.1
++    end
++    @app.config.active_support.cache_format_version = 7.0
+   end
+ 
+   test 'GlobalID.app for Blog::Application defaults to blog' do

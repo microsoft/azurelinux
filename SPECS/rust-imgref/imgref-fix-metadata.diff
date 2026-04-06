@@ -1,0 +1,11 @@
+--- imgref-1.12.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ imgref-1.12.0/Cargo.toml	2025-10-20T16:22:45.836210+00:00
+@@ -36,7 +36,7 @@
+     "rust-patterns",
+     "multimedia::images",
+ ]
+-license = "CC0-1.0 OR Apache-2.0"
++license = "Apache-2.0"
+ repository = "https://github.com/kornelski/imgref"
+ 
+ [package.metadata.docs.rs]

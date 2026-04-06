@@ -1,0 +1,39 @@
+From ff0028f6f60eba3038a765e4ea3c59addb52ccc2 Mon Sep 17 00:00:00 2001
+From: Igor Raits <igor.raits@gmail.com>
+Date: Sat, 6 May 2023 12:06:16 +0200
+Subject: [PATCH] Use buildah by default for OCI image builds
+
+---
+ kiwi.yml         | 2 +-
+ kiwi/defaults.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kiwi.yml b/kiwi.yml
+index 4c5922138..987898e2a 100644
+--- a/kiwi.yml
++++ b/kiwi.yml
+@@ -67,7 +67,7 @@
+ #  # Specify OCI archive tool which should be used on creation of
+ #  # container archives for OCI compliant images, e.g docker
+ #  # Possible values are umoci and buildah
+-#  - archive_tool: umoci
++#  - archive_tool: buildah
+ 
+ 
+ # Specify build constraints that applies during the image build
+diff --git a/kiwi/defaults.py b/kiwi/defaults.py
+index ae0251a71..b11deb968 100644
+--- a/kiwi/defaults.py
++++ b/kiwi/defaults.py
+@@ -1732,7 +1732,7 @@ class Defaults:
+ 
+         :rtype: str
+         """
+-        return 'umoci'
++        return 'buildah'
+ 
+     @staticmethod
+     def get_part_mapper_tool():
+-- 
+2.40.1
+

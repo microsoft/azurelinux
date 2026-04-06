@@ -1,0 +1,147 @@
+From 75c172596aa9e7a9f32062579f7f98783341c924 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 10:17:17 +0200
+Subject: [PATCH 08/59] Write denied logins into the log.
+
+This patch adds a new option 'userlist_log'. If enabled,
+every login denial based on the user list will be logged.
+---
+ logging.c     |  7 +++++++
+ logging.h     | 11 +++++++++++
+ parseconf.c   |  1 +
+ prelogin.c    | 14 ++++++++++++++
+ tunables.c    |  2 ++
+ tunables.h    |  1 +
+ vsftpd.conf.5 |  8 ++++++++
+ 7 files changed, 44 insertions(+)
+
+diff --git a/logging.c b/logging.c
+index ad531d6..99671b4 100644
+--- a/logging.c
++++ b/logging.c
+@@ -103,6 +103,13 @@ vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
+   vsf_log_common(p_sess, 1, what, p_str);
+ }
+ 
++void
++vsf_log_failed_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
++             struct mystr* p_str)
++{
++  vsf_log_common(p_sess, 0, what, p_str);
++}
++
+ int
+ vsf_log_entry_pending(struct vsf_session* p_sess)
+ {
+diff --git a/logging.h b/logging.h
+index 48f88ec..1ff57d1 100644
+--- a/logging.h
++++ b/logging.h
+@@ -80,5 +80,16 @@ void vsf_log_do_log(struct vsf_session* p_sess, int succeeded);
+ void vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
+                   struct mystr* p_str);
+ 
++/* vsf_log_failed_line()
++ * PURPOSE
++ * Same as vsf_log_line(), except that it logs the line as failed operation.
++ * PARAMETERS
++ * p_sess       - the current session object
++ * what         - the type of operation to log
++ * p_str        - the string to log
++ */
++void vsf_log_failed_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
++                  struct mystr* p_str);
++
+ #endif /* VSF_LOGGING_H */
+ 
+diff --git a/parseconf.c b/parseconf.c
+index ea2242b..385afd2 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -91,6 +91,7 @@ parseconf_bool_array[] =
+   { "mdtm_write", &tunable_mdtm_write },
+   { "lock_upload_files", &tunable_lock_upload_files },
+   { "pasv_addr_resolve", &tunable_pasv_addr_resolve },
++  { "userlist_log", &tunable_userlist_log },
+   { "debug_ssl", &tunable_debug_ssl },
+   { "require_cert", &tunable_require_cert },
+   { "validate_cert", &tunable_validate_cert },
+diff --git a/prelogin.c b/prelogin.c
+index df4aade..1588bc1 100644
+--- a/prelogin.c
++++ b/prelogin.c
+@@ -246,6 +246,20 @@ handle_user_command(struct vsf_session* p_sess)
+       check_login_delay();
+       vsf_cmdio_write(p_sess, FTP_LOGINERR, "Permission denied.");
+       check_login_fails(p_sess);
++      if (tunable_userlist_log)
++      {
++        struct mystr str_log_line = INIT_MYSTR;
++        if (tunable_userlist_deny)
++        {
++          str_alloc_text(&str_log_line, "User is in the deny user list.");
++        }
++        else
++        {
++          str_alloc_text(&str_log_line, "User is not in the allow user list.");
++        }
++        vsf_log_failed_line(p_sess, kVSFLogEntryLogin, &str_log_line);
++        str_free(&str_log_line);
++      }
+       str_empty(&p_sess->user_str);
+       return;
+     }
+diff --git a/tunables.c b/tunables.c
+index 0ac4c34..b30fca1 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -72,6 +72,7 @@ int tunable_force_anon_data_ssl;
+ int tunable_mdtm_write;
+ int tunable_lock_upload_files;
+ int tunable_pasv_addr_resolve;
++int tunable_userlist_log;
+ int tunable_debug_ssl;
+ int tunable_require_cert;
+ int tunable_validate_cert;
+@@ -212,6 +213,7 @@ tunables_load_defaults()
+   tunable_mdtm_write = 1;
+   tunable_lock_upload_files = 1;
+   tunable_pasv_addr_resolve = 0;
++  tunable_userlist_log = 0;
+   tunable_debug_ssl = 0;
+   tunable_require_cert = 0;
+   tunable_validate_cert = 0;
+diff --git a/tunables.h b/tunables.h
+index 05d2456..e44d64c 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -73,6 +73,7 @@ extern int tunable_force_anon_data_ssl;       /* Require anon data uses SSL */
+ extern int tunable_mdtm_write;                /* Allow MDTM to set timestamps */
+ extern int tunable_lock_upload_files;         /* Lock uploading files */
+ extern int tunable_pasv_addr_resolve;         /* DNS resolve pasv_addr */
++extern int tunable_userlist_log;              /* Log every failed login attempt */
+ extern int tunable_debug_ssl;                 /* Verbose SSL logging */
+ extern int tunable_require_cert;              /* SSL client cert required */
+ extern int tunable_validate_cert;             /* SSL certs must be valid */
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 5e46a2f..9d767b1 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -586,6 +586,14 @@ Default: NO
+ If set to yes, all SSL client certificates received must validate OK.
+ Self-signed certs do not constitute OK validation. (New in v2.0.6).
+ 
++Default: NO
++.TP
++.B userlist_log
++This option is examined if
++.BR userlist_enable
++is activated. If enabled, every login denial based on the user list will be
++logged.
++
+ Default: NO
+ .TP
+ .B virtual_use_local_privs
+-- 
+2.14.4
+

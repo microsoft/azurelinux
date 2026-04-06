@@ -1,0 +1,25 @@
+From bd21ba16df85ec58dbaec1cc275d63143922740d Mon Sep 17 00:00:00 2001
+From: Marc Mutz <mutz@kde.org>
+Date: Mon, 21 Jun 2010 13:38:00 +0000
+Subject: [PATCH 22/33] CMake >= 2.6.4 is required, because older versions
+ don't have REALPATH for get_filename_component()
+
+svn path=/trunk/kdesupport/automoc/; revision=1140777
+---
+ Automoc4Config.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 2d2d9d2..a91e68c 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -1,4 +1,6 @@
+ 
++cmake_minimum_required( VERSION 2.6.4 FATAL_ERROR )
++
+ # It also adds the following macros
+ #  AUTOMOC4(<target> <SRCS_VAR>)
+ #    Use this to run automoc4 on all files contained in the list <SRCS_VAR>.
+-- 
+2.4.3
+

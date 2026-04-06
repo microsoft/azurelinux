@@ -1,0 +1,27 @@
+From ca548f4fdc801d30f2365c47b0da3a3361055cc3 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Tue, 10 Jun 2025 14:55:26 -0500
+Subject: [PATCH 1/4] tests: fix pytest traceback
+
+shutil.get_terminal_size has an optional `fallback` parameter which
+pytest tries to pass internally.
+---
+ src/scancode/cli_test_utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/scancode/cli_test_utils.py b/src/scancode/cli_test_utils.py
+index 7e86d49..fe1680a 100644
+--- a/src/scancode/cli_test_utils.py
++++ b/src/scancode/cli_test_utils.py
+@@ -106,7 +106,7 @@ def run_scan_click(
+ 
+     if monkeypatch:
+         monkeypatch.setattr(click._termui_impl, 'isatty', lambda _: True)
+-        monkeypatch.setattr(shutil , 'get_terminal_size', lambda: (80, 43,))
++        monkeypatch.setattr(shutil , 'get_terminal_size', lambda fallback=None: (80, 43,))
+ 
+     if not env:
+         env = dict(os.environ)
+-- 
+2.51.0
+

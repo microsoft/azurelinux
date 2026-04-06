@@ -1,0 +1,27 @@
+From 48bda63c81b43abde0d584b02c017aeb080316ac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sun, 19 Jan 2025 16:52:41 +0100
+Subject: [PATCH] docs: update intersphinx_mapping
+
+Newer sphinx doesn't like the old syntax:
+  Running Sphinx v8.1.3
+  loading translations [en]... done
+  making output directory... done
+  Converting `source_suffix = '.rst'` to `source_suffix = {'.rst': 'restructuredtext'}`.
+  ERROR: Invalid value `None` in intersphinx_mapping['http://docs.python.org/']. Expected a two-element tuple or list.
+---
+ docs/conf.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index 05df507..c4ca874 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -275,6 +275,5 @@
+ # Allow duplicate toc entries.
+ #epub_tocdup = True
+ 
+-
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'http://docs.python.org/': None}
++intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

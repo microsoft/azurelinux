@@ -1,0 +1,200 @@
+
+https://github.com/apache/apr/pull/68
+
+--- apr-1.7.6/build/apr_common.m4.5
++++ apr-1.7.6/build/apr_common.m4
+@@ -467,19 +467,11 @@
+    CFLAGS="$CFLAGS -Werror"
+  fi
+  AC_COMPILE_IFELSE(
+-  [AC_LANG_SOURCE(
+-   [
+-#ifndef PACKAGE_NAME
+-#include "confdefs.h"
+-#endif
+-   ]
+-   [[$1]]
+-   [int main(int argc, const char *const *argv) {]
+-   [[$2]]
+-   [   return 0; }]
+-  )], [CFLAGS=$apr_save_CFLAGS
+-$3],  [CFLAGS=$apr_save_CFLAGS
+-$4])
++  [AC_LANG_PROGRAM([[$1]], [[$2]])],
++  [CFLAGS=$apr_save_CFLAGS
++   $3],
++  [CFLAGS=$apr_save_CFLAGS
++   $4])
+ ])
+ 
+ dnl
+--- apr-1.7.6/build/apr_network.m4.5
++++ apr-1.7.6/build/apr_network.m4
+@@ -259,11 +259,12 @@
+ #ifdef HAVE_STDLIB_H
+ #include <stdlib.h>
+ #endif
++#include <stdio.h>
+ ],[
+ int tmp = gethostbyname_r((const char *) 0, (struct hostent *) 0, 
+                           (char *) 0, 0, (struct hostent **) 0, &tmp);
+ /* use tmp to suppress the warning */
+-tmp=0;
++puts(tmp ? "non-zero" : "zero");
+ ], ac_cv_gethostbyname_r_style=glibc2, ac_cv_gethostbyname_r_style=none))
+ 
+ if test "$ac_cv_gethostbyname_r_style" = "glibc2"; then
+@@ -287,11 +288,12 @@
+ #ifdef HAVE_STDLIB_H
+ #include <stdlib.h>
+ #endif
++#include <stdio.h>
+ ],[
+ int tmp = gethostbyname_r((const char *) 0, (struct hostent *) 0, 
+                           (struct hostent_data *) 0);
+ /* use tmp to suppress the warning */
+-tmp=0;
++puts(tmp ? "non-zero" : "zero");
+ ], ac_cv_gethostbyname_r_arg=hostent_data, ac_cv_gethostbyname_r_arg=char))
+ 
+ if test "$ac_cv_gethostbyname_r_arg" = "hostent_data"; then
+@@ -327,12 +329,13 @@
+ #ifdef HAVE_STDLIB_H
+ #include <stdlib.h>
+ #endif
++#include <stdio.h>
+ ],[
+ int tmp = getservbyname_r((const char *) 0, (const char *) 0,
+                           (struct servent *) 0, (char *) 0, 0,
+                           (struct servent **) 0);
+ /* use tmp to suppress the warning */
+-tmp=0;
++puts(tmp ? "non-zero" : "zero");
+ ], ac_cv_getservbyname_r_style=glibc2, ac_cv_getservbyname_r_style=none)
+ 
+ if test "$ac_cv_getservbyname_r_style" = "none"; then
+@@ -354,11 +357,12 @@
+     #ifdef HAVE_STDLIB_H
+     #include <stdlib.h>
+     #endif
++    #include <stdio.h>
+     ],[
+     struct servent *tmp = getservbyname_r((const char *) 0, (const char *) 0,
+                                           (struct servent *) 0, (char *) 0, 0);
+     /* use tmp to suppress the warning */
+-    tmp=NULL;
++    puts(tmp ? "non-zero" : "zero");
+     ], ac_cv_getservbyname_r_style=solaris, ac_cv_getservbyname_r_style=none)
+ fi
+ 
+@@ -381,11 +385,12 @@
+     #ifdef HAVE_STDLIB_H
+     #include <stdlib.h>
+     #endif
++    #include <stdio.h>
+     ],[
+     int tmp = getservbyname_r((const char *) 0, (const char *) 0,
+                               (struct servent *) 0, (struct servent_data *) 0);
+     /* use tmp to suppress the warning */
+-    tmp=0;
++    puts(tmp ? "non-zero" : "zero");
+     ], ac_cv_getservbyname_r_style=osf1, ac_cv_getservbyname_r_style=none)
+ fi
+ ])
+--- apr-1.7.6/build/buildcheck.sh.5
++++ apr-1.7.6/build/buildcheck.sh
+@@ -15,11 +15,11 @@
+   echo "buildconf: python version $py_version (ok)"
+ fi
+ 
+-# autoconf 2.59 or newer
++# autoconf 2.61 or newer
+ ac_version=`${AUTOCONF:-autoconf} --version 2>/dev/null|sed -e 's/^[^0-9]*//;s/[a-z]* *$//;q'`
+ if test -z "$ac_version"; then
+   echo "buildconf: autoconf not found."
+-  echo "           You need autoconf version 2.59 or newer installed"
++  echo "           You need autoconf version 2.61 or newer installed"
+   echo "           to build APR from SVN."
+   res=1
+ else
+--- apr-1.7.6/configure.in.5
++++ apr-1.7.6/configure.in
+@@ -145,12 +145,14 @@
+     APR_CROSS_COMPILING=maybe
+   elif test "x$build_alias" != "x$host_alias"; then
+     APR_CROSS_COMPILING=yes
++  else
++    APR_CROSS_COMPILING=no
+   fi
+ else
+     APR_CROSS_COMPILING=no
+ fi
+-
+ AC_SUBST(APR_CROSS_COMPILING)
++AC_MSG_NOTICE([cross-compilation detection: $APR_CROSS_COMPILING])
+ 
+ # Libtool might need this symbol -- it must point to the location of
+ # the generated libtool script (not necessarily the "top" build dir).
+@@ -1876,6 +1878,7 @@
+ AC_CHECK_TYPE(ssize_t, int)
+ AC_C_INLINE
+ AC_C_CONST
++AC_C_VARARRAYS
+ AC_FUNC_SETPGRP
+ 
+ APR_CHECK_SOCKLEN_T
+@@ -1971,6 +1974,8 @@
+     AC_ERROR([could not detect a 64-bit integer type])
+ fi
+ 
++AC_MSG_NOTICE([for apr_(u)int64_t using $int64_strfn and ${int64_value}/${uint64_value}])
++
+ # If present, allow the C99 macro INT64_C to override our conversion.
+ #
+ # HP-UX's ANSI C compiler provides this without any includes, so we
+@@ -2152,7 +2157,6 @@
+     aprlfs=0     
+ fi
+ 
+-AC_MSG_CHECKING([which type to use for apr_off_t])
+ if test "${ac_cv_sizeof_off_t}${apr_cv_use_lfs64}" = "4yes"; then
+     # LFS is go!
+     off_t_fmt='#define APR_OFF_T_FMT APR_INT64_T_FMT'
+@@ -2203,7 +2207,7 @@
+    off_t_fmt=d
+    off_t_strfn='strtoi'
+ fi
+-AC_MSG_RESULT($off_t_value)
++AC_MSG_NOTICE([for apr_off_t using $off_t_strfn and $off_t_value])
+ 
+ # Regardless of whether _LARGEFILE64_SOURCE is used, on some
+ # platforms _FILE_OFFSET_BITS will affect the size of ino_t and hence
+@@ -2234,7 +2238,7 @@
+     fi
+     ;;
+ esac
+-AC_MSG_NOTICE([using $ino_t_value for ino_t])
++AC_MSG_NOTICE([for apr_ino_t using $ino_t_value])
+ 
+ # Checks for endianness
+ AC_C_BIGENDIAN
+--- apr-1.7.6/poll/unix/poll.c.5
++++ apr-1.7.6/poll/unix/poll.c
+@@ -73,7 +73,7 @@
+                                    apr_interval_time_t timeout)
+ {
+     int i, num_to_poll;
+-#ifdef HAVE_VLA
++#ifdef HAVE_C_VARARRAYS
+     /* XXX: I trust that this is a segv when insufficient stack exists? */
+     struct pollfd pollset[num + 1]; /* +1 since allocating 0 is undefined behaviour */
+ #elif defined(HAVE_ALLOCA)
+@@ -130,7 +130,7 @@
+         }
+     }
+     
+-#if !defined(HAVE_VLA) && !defined(HAVE_ALLOCA)
++#if !defined(HAVE_C_VARARRAYS) && !defined(HAVE_ALLOCA)
+     if (num > SMALL_POLLSET_LIMIT) {
+         free(pollset);
+     }

@@ -1,0 +1,42 @@
+From 260fec7f2a203093cb6626d464e30fab3ec70de7 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 15 Sep 2025 05:49:16 -0400
+Subject: [PATCH 1/2] Drop pydap from dependencies
+
+We didn't have it since it wasn't available in Python 3.10+, and it's
+not yet pcakaged.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml                | 1 -
+ xarray/tests/test_backends.py | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 52897064..23d0b8ee 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -38,7 +38,6 @@ complete = ["xarray[accel,etc,io,parallel,viz]"]
+ io = [
+   "netCDF4>=1.6.0",
+   "h5netcdf",
+-  "pydap",
+   "scipy>=1.13",
+   "zarr>=2.18",
+   "fsspec",
+diff --git a/xarray/tests/test_backends.py b/xarray/tests/test_backends.py
+index 5aab1531..89461b0a 100644
+--- a/xarray/tests/test_backends.py
++++ b/xarray/tests/test_backends.py
+@@ -7457,7 +7457,7 @@ def test_remote_url_backend_auto_detection() -> None:
+         "https://disc2.gesdisc.eosdis.nasa.gov/dods/TRMM_3B42",  # GrADS /dods/
+     ]
+ 
+-    for url in dap_urls:
++    for url in dap_urls[:0]:
+         engine = guess_engine(url)
+         assert engine == expected_dap_backend, (
+             f"URL {url!r} should select {expected_dap_backend!r} but got {engine!r}"
+-- 
+2.52.0
+

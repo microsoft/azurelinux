@@ -1,0 +1,194 @@
+commit 03875f1ea5c4c0eeeb30a7d1fc5fdd53236f4ac2
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Oct 21 14:06:38 2025 +0200
+
+    sys_linux: allow ioctl(TCGETS2) in seccomp filter
+    
+    Add TCGETS2 to the list of allowed ioctls. It seems to be called by the
+    latest glibc version from isatty(), which is called from libpcsclite
+    used by gnutls in an NTS-KE session.
+    
+    Include the linux termios header instead of glibc header to get a usable
+    definition of TCGETS2.
+
+diff --git a/sys_linux.c b/sys_linux.c
+index ca5540f2..e20e459d 100644
+--- a/sys_linux.c
++++ b/sys_linux.c
+@@ -48,7 +48,7 @@
+ #ifdef FEAT_SCFILTER
+ #include <sys/prctl.h>
+ #include <seccomp.h>
+-#include <termios.h>
++#include <linux/termios.h>
+ #ifdef FEAT_PPS
+ #include <linux/pps.h>
+ #endif
+@@ -615,7 +615,7 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+   const static int fcntls[] = { F_GETFD, F_SETFD, F_GETFL, F_SETFL };
+ 
+   const static unsigned long ioctls[] = {
+-    FIONREAD, TCGETS, TIOCGWINSZ,
++    FIONREAD, TCGETS, TCGETS2, TIOCGWINSZ,
+ #if defined(FEAT_PHC) || defined(HAVE_LINUX_TIMESTAMPING)
+     PTP_EXTTS_REQUEST, PTP_SYS_OFFSET,
+ #ifdef PTP_PIN_SETFUNC
+commit 3c39afa13c769452d4c340bfc987e229b7c9caeb
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Wed Oct 22 10:53:11 2025 +0200
+
+    sys_linux: fix building with older compilers and some archs
+    
+    The recent replacement of <termios.h> with <linux/termios.h> to get
+    TCGETS2 seems to work only with compilers (or C standards) that allow
+    the same structure to be defined multiple times. There is a conflict
+    between <sys/ioctl.h> and <linux/termios.h>.
+    
+    Another problem is that TCGETS2 is not used on some archs like ppc64.
+    
+    Switch back to <termios.h> and move TCGETS2 to a list in a separate
+    file where it can be compiled without <sys/ioctl.h>.
+    
+    Fixes: 03875f1ea5c4 ("sys_linux: allow ioctl(TCGETS2) in seccomp filter")
+
+diff --git a/configure b/configure
+index 195b1ed7..ca64475d 100755
+--- a/configure
++++ b/configure
+@@ -808,6 +808,7 @@ then
+   # a time and the async resolver would block the main thread
+   priv_ops="NAME2IPADDRESS RELOADDNS"
+   EXTRA_LIBS="$EXTRA_LIBS -lseccomp"
++  EXTRA_OBJECTS="$EXTRA_OBJECTS sys_linux_scmp.o"
+ fi
+ 
+ if [ "x$priv_ops" != "x" ]; then
+diff --git a/sys_linux.c b/sys_linux.c
+index e20e459d..89eec950 100644
+--- a/sys_linux.c
++++ b/sys_linux.c
+@@ -48,7 +48,7 @@
+ #ifdef FEAT_SCFILTER
+ #include <sys/prctl.h>
+ #include <seccomp.h>
+-#include <linux/termios.h>
++#include <termios.h>
+ #ifdef FEAT_PPS
+ #include <linux/pps.h>
+ #endif
+@@ -63,6 +63,7 @@
+ #endif
+ 
+ #include "sys_linux.h"
++#include "sys_linux_scmp.h"
+ #include "sys_timex.h"
+ #include "conf.h"
+ #include "local.h"
+@@ -615,7 +616,7 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+   const static int fcntls[] = { F_GETFD, F_SETFD, F_GETFL, F_SETFL };
+ 
+   const static unsigned long ioctls[] = {
+-    FIONREAD, TCGETS, TCGETS2, TIOCGWINSZ,
++    FIONREAD, TCGETS, TIOCGWINSZ,
+ #if defined(FEAT_PHC) || defined(HAVE_LINUX_TIMESTAMPING)
+     PTP_EXTTS_REQUEST, PTP_SYS_OFFSET,
+ #ifdef PTP_PIN_SETFUNC
+@@ -728,6 +729,14 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+                            SCMP_A1(SCMP_CMP_EQ, ioctls[i])) < 0)
+         goto add_failed;
+     }
++
++    /* Allow selected ioctls that need to be specified in a separate
++       file to avoid conflicting headers (e.g. TCGETS2) */
++    for (i = 0; SYS_Linux_GetExtraScmpIoctl(i) != 0; i++) {
++      if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(ioctl), 1,
++                           SCMP_A1(SCMP_CMP_EQ, SYS_Linux_GetExtraScmpIoctl(i))) < 0)
++        goto add_failed;
++    }
+   }
+ 
+   if (seccomp_load(ctx) < 0)
+diff --git a/sys_linux_scmp.c b/sys_linux_scmp.c
+new file mode 100644
+index 00000000..a907a97d
+--- /dev/null
++++ b/sys_linux_scmp.c
+@@ -0,0 +1,44 @@
++/*
++  chronyd/chronyc - Programs for keeping computer clocks accurate.
++
++ **********************************************************************
++ * Copyright (C) Miroslav Lichvar  2025
++ * 
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ * 
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ * 
++ **********************************************************************
++
++  =======================================================================
++
++  Lists of values that are needed in seccomp filters but need to
++  be compiled separately from sys_linux.c due to conflicting headers.
++  */
++
++#include <linux/termios.h>
++
++#include "sys_linux_scmp.h"
++
++unsigned long
++SYS_Linux_GetExtraScmpIoctl(int index)
++{
++  const unsigned long ioctls[] = {
++#ifdef TCGETS2
++    /* Conflict between <linux/termios.h> and <sys/ioctl.h> */
++    TCGETS2,
++#endif
++    0
++  };
++
++  return ioctls[index];
++}
+diff --git a/sys_linux_scmp.h b/sys_linux_scmp.h
+new file mode 100644
+index 00000000..62a9d548
+--- /dev/null
++++ b/sys_linux_scmp.h
+@@ -0,0 +1,28 @@
++/*
++  chronyd/chronyc - Programs for keeping computer clocks accurate.
++
++ **********************************************************************
++ * Copyright (C) Miroslav Lichvar  2025
++ * 
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ * 
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ * 
++ **********************************************************************
++
++  =======================================================================
++
++  Header file for lists that are needed in seccomp filters but need to
++  be compiled separately from sys_linux.c due to conflicting headers.
++  */
++
++extern unsigned long SYS_Linux_GetExtraScmpIoctl(int index);

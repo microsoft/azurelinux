@@ -1,0 +1,26 @@
+diff -up cyrus-sasl-2.1.27/saslauthd/saslauthd.mdoc.path cyrus-sasl-2.1.27/saslauthd/saslauthd.mdoc
+--- cyrus-sasl-2.1.27/saslauthd/saslauthd.mdoc.path	2015-10-15 15:44:43.000000000 +0200
++++ cyrus-sasl-2.1.27/saslauthd/saslauthd.mdoc	2015-11-20 15:05:30.421377527 +0100
+@@ -221,7 +221,7 @@ instead.
+ .Em (All platforms that support OpenLDAP 2.0 or higher)
+ .Pp
+ Authenticate against an ldap server.  The ldap configuration parameters are
+-read from /usr/local/etc/saslauthd.conf.  The location of this file can be
++read from /etc/saslauthd.conf.  The location of this file can be
+ changed with the -O parameter. See the LDAP_SASLAUTHD file included with the
+ distribution for the list of available parameters.
+ .It Li sia
+@@ -251,10 +251,10 @@ these ticket files can cause serious per
+ servers. (Kerberos
+ was never intended to be used in this manner, anyway.)
+ .Sh FILES
+-.Bl -tag -width "/var/run/saslauthd/mux"
+-.It Pa /var/run/saslauthd/mux
++.Bl -tag -width "/run/saslauthd/mux"
++.It Pa /run/saslauthd/mux
+ The default communications socket.
+-.It Pa /usr/local/etc/saslauthd.conf
++.It Pa /etc/saslauthd.conf
+ The default configuration file for ldap support.
+ .El
+ .Sh SEE ALSO

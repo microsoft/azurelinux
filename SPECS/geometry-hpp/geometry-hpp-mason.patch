@@ -1,0 +1,55 @@
+From 94c4eba5083f15b8896e54556ea29dfce8fa1ca6 Mon Sep 17 00:00:00 2001
+From: Tom Hughes <tom@compton.nu>
+Date: Wed, 14 Nov 2018 10:31:02 +0000
+Subject: [PATCH 2/2] Rip out mason stuff - we use our own packages
+
+---
+ CMakeLists.txt | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bed07f4..55c2943 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -24,26 +24,18 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   set(DESIRED_WARNINGS "${DESIRED_WARNINGS} -Wmost")
+ endif()
+ 
+-# Note: -D_GLIBCXX_USE_CXX11_ABI=0 is needed to support mason packages that are precompiled libs
+-# Currently we only depend on a header only library, but this will help avoid issues when more libs are added via mason
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTIMIZATION_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0 ${DESIRED_WARNINGS}")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTIMIZATION_FLAGS} ${DESIRED_WARNINGS}")
+ 
+ if (WERROR)
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+ endif()
+ 
+-# mason_use is a mason function within the mason.cmake file and provides ready-to-go vars, like "STATIC_LIBS" and "INCLUDE_DIRS"
+-mason_use(catch VERSION 1.9.6 HEADER_ONLY)
+-include_directories(SYSTEM ${MASON_PACKAGE_catch_INCLUDE_DIRS})
++include_directories(SYSTEM /usr/include/catch)
+ 
+ if (BENCHMARKS)
+-  mason_use(benchmark VERSION 1.2.0)
+-  include_directories(SYSTEM ${MASON_PACKAGE_benchmark_INCLUDE_DIRS})
++  find_package(benchmark REQUIRED)
+ endif()
+ 
+-mason_use(variant VERSION 1.1.5 HEADER_ONLY)
+-include_directories(SYSTEM ${MASON_PACKAGE_variant_INCLUDE_DIRS})
+-
+ include_directories("${PROJECT_SOURCE_DIR}/include")
+ 
+ file(GLOB TEST_SOURCES test/*.cpp)
+@@ -55,6 +47,6 @@ if (BENCHMARKS)
+   file(GLOB BENCH_SOURCES bench/*.cpp)
+   add_executable(bench-tests ${BENCH_SOURCES})
+ 
+-  # link benchmark static library to the bench-tests binary so the bench tests know where to find the benchmark impl code
+-  target_link_libraries(bench-tests ${MASON_PACKAGE_benchmark_STATIC_LIBS} ${CMAKE_THREAD_LIBS_INIT})
++  # link benchmark library to the bench-tests binary so the bench tests know where to find the benchmark impl code
++  target_link_libraries(bench-tests benchmark::benchmark)
+ endif()
+-- 
+2.49.0
+

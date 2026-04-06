@@ -1,0 +1,46 @@
+From c4cd966ed0997e2acb1fdcaf112c55a78ed50847 Mon Sep 17 00:00:00 2001
+From: Christopher Chavez <chrischavez@gmx.us>
+Date: Mon, 19 Feb 2024 14:18:43 -0600
+Subject: [PATCH] Avoid using incompatible pointer type for `old_warn`
+
+See https://github.com/eserte/perl-tk/issues/98#issuecomment-1944054296
+---
+ Event/Event.xs | 2 +-
+ tkGlue.c       | 7 +------
+ 2 files changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/Event/Event.xs b/Event/Event.xs
+index 82bbb244..f2c95234 100644
+--- a/Event/Event.xs
++++ b/Event/Event.xs
+@@ -1532,7 +1532,7 @@ PROTOTYPES: DISABLE
+ BOOT:
+  {
+ #ifdef pWARN_NONE
+-  SV *old_warn = PL_curcop->cop_warnings;
++  void *old_warn = PL_curcop->cop_warnings;
+   PL_curcop->cop_warnings = pWARN_NONE;
+ #endif
+   newXS("Tk::Event::INIT", XS_Tk__Event_INIT, file);
+diff --git a/tkGlue.c b/tkGlue.c
+index 68a7e0fa..ca4a13aa 100644
+--- a/tkGlue.c
++++ b/tkGlue.c
+@@ -5543,13 +5543,8 @@ _((pTHX))
+  char *XEventMethods = "abcdfhkmopstvwxyABDEKNRSTWXY#";
+  char buf[128];
+  CV *cv;
+-#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 9)
+-#define COP_WARNINGS_TYPE STRLEN*
+-#else
+-#define COP_WARNINGS_TYPE SV*
+-#endif
+ #ifdef pWARN_NONE
+- COP_WARNINGS_TYPE old_warn = PL_curcop->cop_warnings;
++ void *old_warn = PL_curcop->cop_warnings;
+  PL_curcop->cop_warnings = pWARN_NONE;
+ #endif
+ 
+-- 
+2.43.0
+

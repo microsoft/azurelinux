@@ -1,0 +1,24 @@
+diff --git a/h5py/h5t.pyx b/h5py/h5t.pyx
+index 1d5d57d..548a76b 100644
+--- a/h5py/h5t.pyx
++++ b/h5py/h5t.pyx
+@@ -293,18 +293,7 @@ cdef (int, int, int) _correct_float_info(ftype_, finfo):
+     nmant = finfo.nmant
+     maxexp = finfo.maxexp
+     minexp = finfo.minexp
+-    # workaround for numpy's buggy finfo on float128 on ppc64 archs
+-    if ftype_ == np.longdouble and _IS_PPC64:
+-        # values reported by hdf5
+-        nmant = 116
+-        maxexp = 1024
+-        minexp = -1022
+-    elif ftype_ == np.longdouble and _IS_PPC64LE:
+-        # values reported by hdf5
+-        nmant = 52
+-        maxexp = 1024
+-        minexp = -1022
+-    elif nmant == 63 and finfo.nexp == 15:
++    if nmant == 63 and finfo.nexp == 15:
+         # This is an 80-bit float, correct mantissa size
+         nmant += 1
+ 

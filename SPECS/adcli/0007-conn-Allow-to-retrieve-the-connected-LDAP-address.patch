@@ -1,0 +1,45 @@
+From 77794bc757af097682f0aa9cf85c2208c478b6f1 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Thu, 31 Aug 2023 17:11:55 +0200
+Subject: [PATCH 07/17] conn: Allow to retrieve the connected LDAP address
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adconn.c | 7 +++++++
+ library/adconn.h | 2 ++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/library/adconn.c b/library/adconn.c
+index 34b6fe1..087225d 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -1542,6 +1542,13 @@ adcli_conn_get_ldap_connection (adcli_conn *conn)
+ 	return conn->ldap;
+ }
+ 
++struct sockaddr *
++adcli_conn_get_ldap_address (adcli_conn *conn)
++{
++	return_val_if_fail (conn != NULL, NULL);
++	return conn->addr;
++}
++
+ krb5_context
+ adcli_conn_get_krb5_context (adcli_conn *conn)
+ {
+diff --git a/library/adconn.h b/library/adconn.h
+index f377ea7..7c615df 100644
+--- a/library/adconn.h
++++ b/library/adconn.h
+@@ -110,6 +110,8 @@ const char *        adcli_conn_get_domain_guid       (adcli_conn *conn);
+ 
+ LDAP *              adcli_conn_get_ldap_connection   (adcli_conn *conn);
+ 
++struct sockaddr *   adcli_conn_get_ldap_address      (adcli_conn *conn);
++
+ krb5_context        adcli_conn_get_krb5_context      (adcli_conn *conn);
+ 
+ void                adcli_conn_set_krb5_context      (adcli_conn *conn,
+-- 
+2.47.0
+

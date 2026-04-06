@@ -1,0 +1,69 @@
+From a84fdd7c8f77935ecce99ff2b0bdba738821ed79 Mon Sep 17 00:00:00 2001
+From: Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+Date: Mon, 26 Jun 2023 17:13:04 +0900
+Subject: [PATCH] 51889: fix module loading problem with full RELRO
+
+If full RELRO (relocation read-only, one of the security enhancement
+methods for ELF-based systems) is used when building zsh (as in binary
+packages of most Linuxes), loading a module (e.g. zsh/zftp) fails unless
+all the modules it depends on are already loaded. With this patch the
+necessary modules are automatically loaded.
+
+Upstream-commit: a84fdd7c8f77935ecce99ff2b0bdba738821ed79
+Signed-off-by: Lukáš Zaoral <lzaoral@redhat.com>
+---
+ Src/Modules/zftp.c |  2 +-
+ Src/mkbltnmlst.sh  | 24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/Src/Modules/zftp.c b/Src/Modules/zftp.c
+index 49b3ffa89..47a5e9de9 100644
+--- a/Src/Modules/zftp.c
++++ b/Src/Modules/zftp.c
+@@ -3172,7 +3172,7 @@ static struct features module_features = {
+ int
+ setup_(UNUSED(Module m))
+ {
+-    return (require_module("zsh/net/tcp", NULL, 0) == 1);
++    return 0;
+ }
+ 
+ /**/
+diff --git a/Src/mkbltnmlst.sh b/Src/mkbltnmlst.sh
+index c4611d8b3..067ecdaf9 100644
+--- a/Src/mkbltnmlst.sh
++++ b/Src/mkbltnmlst.sh
+@@ -76,6 +76,30 @@ for x_mod in $x_mods; do
+     test "x$linked" = xno && echo "#endif"
+ done
+ 
++# if dynamic module 'mod' with load=no has moddeps in its .mdd,
++# then output add_dep(mod, dep) for each 'dep' in moddeps.
++dyn_mods="`grep ' link=dynamic .* load=no ' $CFMOD | \
++          sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`"
++
++for mod in $dyn_mods; do
++    modfile="`grep '^name='$mod' ' $CFMOD | \
++              sed -e 's/^.* modfile=//' -e 's/ .*//'`"
++    if test "x$modfile" = x; then
++	echo >&2 "WARNING: no name for \`$mod' in $CFMOD (ignored)"
++	continue
++    fi
++    unset moddeps
++    . $srcdir/../$modfile
++    if test -n "$moddeps"; then
++        echo '#ifdef DYNAMIC'
++        echo "/* non-linked-in known module \`$mod' */"
++        for dep in $moddeps; do
++          echo "  add_dep(\"$mod\", \"$dep\");"
++        done
++        echo '#endif'
++    fi
++done
++
+ echo
+ done_mods=" "
+ for bin_mod in $bin_mods; do
+-- 
+2.41.0
+

@@ -1,0 +1,44 @@
+From 085cc4ff56857d234e80f37d0316c13eb5718696 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 3 Jul 2018 10:46:58 +0200
+Subject: [PATCH] test/runwrapper: copy the preloaded library
+
+... to a temporary directory because the original location might
+not be accessible by other users.
+---
+ test/runwrapper | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/test/runwrapper b/test/runwrapper
+index 6e0e899..de4555a 100755
+--- a/test/runwrapper
++++ b/test/runwrapper
+@@ -1,7 +1,23 @@
+ #!/bin/bash
+ 
+-if [ -e "$PWD/.libs/libtestlookup.so" ]; then
+-	export LD_PRELOAD="$PWD/.libs/libtestlookup.so"
++src="$PWD/.libs/libtestlookup.so"
++dst=
++if [ -e "$src" ]; then
++	# copy the preloaded library to a temporary directory because
++	# the original location might not be accessible by other users
++	tmp="$(mktemp -d)"
++	chmod 0755 "$tmp"
++	dst="${tmp}/libtestlookup.so"
++	cp -L "$src" "$dst"
++	export LD_PRELOAD="$dst"
+ fi
+ 
+ "${srcdir:-${PWD}}"/test/run "$@"
++ec="$?"
++
++if [ -n "$dst" ]; then
++	# remove the temporary location
++	rm -rf "$dst"
++fi
++
++exit "$ec"
+-- 
+2.14.4
+

@@ -1,0 +1,32 @@
+--- a/libdv/dv.orig.c	2024-03-17 21:51:33.216006756 +0100
++++ b/libdv/dv.c	2024-03-17 21:53:50.975829509 +0100
+@@ -35,6 +35,13 @@
+  *  @{
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #if HAVE_CONFIG_H
+ # include <config.h>
+ #endif
+--- a/libdv/quant.orig.c	2024-03-17 22:16:58.212228098 +0100
++++ b/libdv/quant.c	2024-03-17 22:18:20.503660888 +0100
+@@ -37,6 +37,13 @@
+  *  @{
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #if HAVE_CONFIG_H
+ # include <config.h>
+ #endif

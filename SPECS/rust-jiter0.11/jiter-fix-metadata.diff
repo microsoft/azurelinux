@@ -1,0 +1,12 @@
+--- jiter-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jiter-0.11.1/Cargo.toml	2025-11-21T07:07:58.981170+00:00
+@@ -99,9 +99,6 @@
+ [dependencies.smallvec]
+ version = "1.11.0"
+ 
+-[dev-dependencies.codspeed-criterion-compat]
+-version = "2.7.2"
+-
+ [dev-dependencies.paste]
+ version = "1.0.7"
+ 

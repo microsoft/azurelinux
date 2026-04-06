@@ -1,0 +1,38 @@
+diff --git a/test/unit/debug.rb b/test/unit/debug.rb
+index 88baf56..b694f21 100644
+--- a/test/unit/debug.rb
++++ b/test/unit/debug.rb
+@@ -24,7 +24,8 @@ class DebugEncoderTest < Test::Unit::TestCase
+     ["   \n", :space],
+     ["[]", :method],
+     [:end_line, :head],
+-  ].flatten
++  ]
++  TEST_INPUT.flatten!
+   TEST_OUTPUT = <<-'DEBUG'.chomp
+ integer(10)operator((\\\))string<content(test)>head[
+ 
+diff --git a/test/unit/statistic.rb b/test/unit/statistic.rb
+index 1326dca..776774d 100644
+--- a/test/unit/statistic.rb
++++ b/test/unit/statistic.rb
+@@ -24,7 +24,8 @@ class StatisticEncoderTest < Test::Unit::TestCase
+     ["   \n", :space],
+     ["[]", :method],
+     [:end_line, :test],
+-  ].flatten
++  ]
++  TEST_INPUT.flatten!
+   TEST_OUTPUT = <<-'DEBUG'
+ 
+ Code Statistics
+@@ -56,4 +57,4 @@ Token Types (7):
+     assert_equal TEST_OUTPUT, TEST_INPUT.statistic
+   end
+   
+-end
+\ No newline at end of file
++end
+-- 
+2.29.2
+

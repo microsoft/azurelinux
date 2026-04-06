@@ -1,0 +1,21 @@
+diff -up xpdf-4.01/fofi/FoFiType1.cc.crash xpdf-4.01/fofi/FoFiType1.cc
+--- xpdf-4.01/fofi/FoFiType1.cc.crash	2019-02-22 09:33:55.304458147 -0500
++++ xpdf-4.01/fofi/FoFiType1.cc	2019-02-22 09:36:30.966169469 -0500
+@@ -276,9 +276,14 @@ void FoFiType1::parse() {
+ 	    p += 3;
+ 	  }
+ 	} else {
+-	  if (strtok(buf, " \t") &&
+-	      (p = strtok(NULL, " \t\n\r")) && !strcmp(p, "def")) {
+-	    break;
++          p = strtok(buf, " \t\n\r");
++          if (p)
++          {
++            if (!strcmp(p, "def")) break;
++            if (!strcmp(p, "readonly")) break;
++            // the spec does not says this but i'm mantaining old xpdf behaviour that accepts "foo def" as end of the encoding array
++            p = strtok(buf, " \t\n\r");
++            if (p && !strcmp(p, "def")) break;
+ 	  }
+ 	}
+       }

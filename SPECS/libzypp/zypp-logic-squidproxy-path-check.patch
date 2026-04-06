@@ -1,0 +1,13 @@
+diff --git a/zypp-logic/tests/lib/CMakeLists.txt b/zypp-logic/tests/lib/CMakeLists.txt
+index 5217ed425..1de600e80 100644
+--- a/zypp-logic/tests/lib/CMakeLists.txt
++++ b/zypp-logic/tests/lib/CMakeLists.txt
+@@ -4,7 +4,7 @@ if( NOT DISABLE_MEDIABACKEND_TESTS )
+   find_program( NGINX nginx )
+   find_program( VSFTPD vsftpd )
+   find_program( SQUIDPROXY squid )
+-  find_program( SQUIDPROXY_AUTH basic_ncsa_auth HINTS ${CMAKE_INSTALL_BINDIR} ${CMAKE_INSTALL_SBINDIR} ${CMAKE_INSTALL_LIBEXECDIR} "/usr/libexec" "/usr/lib" PATH_SUFFIXES squid)
++  find_program( SQUIDPROXY_AUTH basic_ncsa_auth HINTS ${CMAKE_INSTALL_BINDIR} ${CMAKE_INSTALL_SBINDIR} ${CMAKE_INSTALL_LIBEXECDIR} "/usr/libexec" "/usr/lib" "/usr/lib64" PATH_SUFFIXES squid)
+   find_library( LIBFCGI NAMES fcgi )
+   find_library( LIBFCGI++ NAMES fcgi++ )
+ 

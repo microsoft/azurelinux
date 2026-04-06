@@ -1,0 +1,25 @@
+From 05017fced8af7adac6de7ffd3241ac04e0fbb73c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 18 Aug 2025 13:57:13 +0200
+Subject: [PATCH] Drop deny(warnings) from doctests
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index fbcf494..75a1212 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -235,7 +235,7 @@
+ #![cfg_attr(docsrs, feature(doc_cfg))]
+ #![doc(test(
+     no_crate_inject,
+-    attr(deny(warnings/*, rust_2018_idioms*/), allow(dead_code, unused_variables))
++    attr(allow(dead_code, unused_variables))
+ ))]
+ #![no_std]
+ 
+-- 
+2.50.1
+

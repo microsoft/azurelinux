@@ -1,0 +1,28 @@
+--- opener-0.7.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ opener-0.7.2/Cargo.toml	2025-07-27T14:47:07.779429+00:00
+@@ -48,7 +48,6 @@
+ reveal = [
+     "dep:url",
+     "dep:dbus",
+-    "windows-sys/Win32_System_Com",
+ ]
+ 
+ [target.'cfg(target_os = "linux")'.dependencies.bstr]
+@@ -62,16 +61,6 @@
+ version = "2"
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.normpath]
+-version = "1"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.59"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_UI_Shell",
+-    "Win32_UI_WindowsAndMessaging",
+-]
+-
+ [badges.maintenance]
+ status = "passively-maintained"
++

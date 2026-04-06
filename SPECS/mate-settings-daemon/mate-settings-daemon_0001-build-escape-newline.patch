@@ -1,0 +1,25 @@
+From 2194cb268ddc7289ba7f7ec36544527c238fa797 Mon Sep 17 00:00:00 2001
+From: orbea <orbea@riseup.net>
+Date: Sun, 17 Mar 2024 10:35:26 -0700
+Subject: [PATCH 1/5] build: escape newline
+
+---
+ mate-settings-daemon/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mate-settings-daemon/Makefile.am b/mate-settings-daemon/Makefile.am
+index 0dda4ac3..c99712d7 100644
+--- a/mate-settings-daemon/Makefile.am
++++ b/mate-settings-daemon/Makefile.am
+@@ -21,7 +21,7 @@ libmsd_profile_la_SOURCES =		\
+ 	$(NULL)
+ 
+ libmsd_profile_la_CPPFLAGS = 		\
+-	$(AM_CPPFLAGS)
++	$(AM_CPPFLAGS)			\
+ 	$(DISABLE_DEPRECATED_CFLAGS)	\
+ 	$(NULL)
+ 
+-- 
+2.49.0
+

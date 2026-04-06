@@ -1,0 +1,50 @@
+diff --git a/src/qc_test.rs b/src/qc_test.rs
+index bc76d65..1e02159 100644
+--- a/src/qc_test.rs
++++ b/src/qc_test.rs
+@@ -16,18 +16,18 @@ const KEY_RUN_LEN: usize = 8;
+ const KEY_MAX_VAL: u8 = 4;
+ 
+ impl Arbitrary for Key {
+-    fn arbitrary<G: Gen>(g: &mut G) -> Key {
+-        let len = g.gen::<usize>() % KEY_RUN_LEN;
++    fn arbitrary(g: &mut Gen) -> Key {
++        let len = usize::arbitrary(g) % KEY_RUN_LEN;
+         let mut key = Vec::with_capacity(len);
+         for _ in 0..len {
+-            key.push(g.gen::<u8>() % KEY_MAX_VAL);
++            key.push(u8::arbitrary(g) % KEY_MAX_VAL);
+         }
+         Key(key)
+     }
+ }
+ 
+ impl Key {
+-    fn extend_random<G: Gen>(&self, g: &mut G) -> Key {
++    fn extend_random(&self, g: &mut Gen) -> Key {
+         self.extend(Key::arbitrary(g))
+     }
+ 
+@@ -49,18 +49,18 @@ impl TrieKey for Key {
+ }
+ 
+ impl Arbitrary for RandomKeys {
+-    fn arbitrary<G: Gen>(g: &mut G) -> RandomKeys {
+-        let num_keys = g.gen::<usize>() % MAX_KEYS;
++    fn arbitrary(g: &mut Gen) -> RandomKeys {
++        let num_keys = usize::arbitrary(g) % MAX_KEYS;
+         let mut keys = Vec::with_capacity(num_keys);
+         keys.push(Key::arbitrary(g));
+ 
+         for _ in 0..num_keys {
+-            match g.gen::<u8>() % 10 {
++            match u8::arbitrary(g) % 10 {
+                 // Generate a new random key.
+                 1 => keys.push(Key::arbitrary(g)),
+                 // Extend an existing key.
+                 _ => {
+-                    let i = g.gen::<usize>() % keys.len();
++                    let i = usize::arbitrary(g) % keys.len();
+                     let key = keys[i].extend_random(g);
+                     keys.push(key);
+                 }

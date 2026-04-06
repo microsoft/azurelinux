@@ -1,0 +1,304 @@
+From 66d2d8d8239f781f20f913dbe388b52e14f8dffb Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Thu, 18 May 2023 11:28:37 -0400
+Subject: [PATCH] tools: Add a url handler that generates html from
+ documentation
+
+Some systems don't install yelp by default but still want to show
+documentation.
+
+This commit adds a small url handler to automatically convert
+documentation to html format and then launch a web browser to show
+it.
+---
+ meson_options.txt                       |   4 +
+ tools/meson.build                       |  24 +++
+ tools/yelp-build-url-handler.desktop.in |   6 +
+ tools/yelp-build-url-handler.in         | 212 ++++++++++++++++++++++++
+ 4 files changed, 246 insertions(+)
+ create mode 100644 tools/yelp-build-url-handler.desktop.in
+ create mode 100755 tools/yelp-build-url-handler.in
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 0526e6f..03e9050 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -5,3 +5,7 @@ option('yelpm4',
+ option('help',
+        type: 'boolean', value: false,
+        description: 'Install help files')
++
++option('url_handler',
++       type: 'feature', value: 'disabled',
++       description: 'Install URL handler to open help in web browesr, use when not building Yelp')
+diff --git a/tools/meson.build b/tools/meson.build
+index 35187ca..b2518d6 100644
+--- a/tools/meson.build
++++ b/tools/meson.build
+@@ -1,5 +1,10 @@
+ yelp_tools_in = configuration_data()
+ yelp_tools_in.set('DATADIR', pkgdir)
++yelp_tools_in.set('HELPDIR', join_paths (
++  datadir,
++  'help',
++  )
++)
+ 
+ yelp_tools_in.set('YELP_JS_DIR', yelp_js_dir)
+ 
+@@ -48,3 +53,22 @@ if get_option('yelpm4') == true
+     )
+   )
+ endif
++
++if get_option('url_handler').enabled()
++  configure_file(
++    input: 'yelp-build-url-handler.in',
++    output: 'yelp-build-url-handler',
++    configuration: yelp_tools_in,
++    install: true,
++    install_dir: bindir,
++  )
++
++  configure_file(
++    input: 'yelp-build-url-handler.desktop.in',
++    output: '@BASENAME@',
++    configuration: {
++      'bindir': join_paths(get_option('prefix'), get_option('bindir'))
++    },
++    install_dir: join_paths(datadir, 'applications')
++  )
++endif
+diff --git a/tools/yelp-build-url-handler.desktop.in b/tools/yelp-build-url-handler.desktop.in
+new file mode 100644
+index 0000000..9ead646
+--- /dev/null
++++ b/tools/yelp-build-url-handler.desktop.in
+@@ -0,0 +1,6 @@
++[Desktop Entry]
++Name=Yelp URL Handler
++Exec=@bindir@/yelp-build-url-handler %u
++Type=Application
++MimeType=x-scheme-handler/help;
++NoDisplay=true
+diff --git a/tools/yelp-build-url-handler.in b/tools/yelp-build-url-handler.in
+new file mode 100755
+index 0000000..8742d67
+--- /dev/null
++++ b/tools/yelp-build-url-handler.in
+@@ -0,0 +1,212 @@
++#!/usr/bin/python3
++#
++# yelp-build-url-handler
++# Copyright (C) 2023, 2024 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++
++import os
++import sys
++import subprocess
++import urllib.parse
++import gi
++import errno
++import dbus
++from dbus import Interface, SessionBus
++
++gi.require_version('Gio', '2.0')
++from gi.repository import Gio, GLib
++
++class YelpBuildUrlHandler:
++    def main(self):
++        if len(sys.argv) != 2:
++            print('Usage: yelp-build-url-handler <URL>', file=sys.stderr)
++            return 1
++        url = sys.argv[1]
++        return self.handle_url(url)
++
++    def determine_paths_from_url(self, url):
++        parsed_url = urllib.parse.urlparse(url)
++        if parsed_url.scheme != 'help':
++            print(f'Invalid URI scheme: {parsed_url.scheme}', file=sys.stderr)
++            return None
++
++        path = parsed_url.path.lstrip('/')
++        languages = GLib.get_language_names() + ['C']
++
++        for language in languages:
++            base_path = os.path.join('@HELPDIR@', language)
++            cache_path = os.path.join(GLib.get_user_cache_dir(), 'yelp-build', language)
++            full_source_path = os.path.join(base_path, path)
++
++            if os.path.isdir(full_source_path):
++                source_dir = full_source_path
++                output_dir = os.path.join(cache_path, path)
++                output_file = os.path.join(output_dir, 'index.html')
++                return {
++                    'source_dir': source_dir,
++                    'output_dir': output_dir,
++                    'output_file': output_file,
++                    'full_source_path': full_source_path
++                }
++            else:
++                full_source_file = full_source_path + '.page'
++                if os.path.isfile(full_source_file):
++                    source_dir = os.path.dirname(full_source_file)
++                    output_file = os.path.join(cache_path, path + '.html')
++                    output_dir = os.path.dirname(output_file)
++                    return {
++                        'source_dir': source_dir,
++                        'output_dir': output_dir,
++                        'output_file': output_file,
++                        'full_source_path': full_source_file
++                    }
++
++        print(f'Help content not found for path: {path}', file=sys.stderr)
++        return None
++
++    def handle_url(self, url):
++        paths = self.determine_paths_from_url(url)
++
++        if paths is None:
++            return 1
++
++        source_dir = paths['source_dir']
++        output_dir = paths['output_dir']
++        output_file = paths['output_file']
++        full_source_path = paths['full_source_path']
++
++        cache_stale = True
++        try:
++            output_status = os.stat(output_dir)
++            source_status = os.stat(source_dir)
++            if output_status.st_mtime < source_status.st_mtime:
++                cache_stale = False
++        except OSError as e:
++            pass
++
++        if cache_stale:
++            cache_stale = not self.generate_html(source_dir, output_dir)
++
++            if cache_stale:
++                print(f'Failed to generate HTML for path {full_source_path}', file=sys.stderr)
++                return 1
++
++        sandboxed_dir = self.grant_access_to_browser(output_dir)
++        if sandboxed_dir is None:
++            print(f'Failed to grant browser access to generated HTML for path {full_source_path}', file=sys.stderr)
++            return 1
++
++        basename = os.path.basename(output_file)
++        sandboxed_file = os.path.join(sandboxed_dir, basename)
++        redirect_file = self.write_redirect_file(sandboxed_dir, sandboxed_file)
++        if redirect_file is None:
++            return 1
++
++        if not self.show_generated_html(redirect_file):
++            print('Failed to start browser', file=sys.stderr)
++            return 1
++
++    def generate_html(self, source_dir, output_dir):
++        os.makedirs(output_dir, exist_ok=True)
++        argv = ['yelp-build', 'html', '.', '-o', output_dir]
++        try:
++            subprocess.run(argv, cwd=source_dir, check=True)
++            return True
++        except subprocess.CalledProcessError as e:
++            print(f'Could not run "{" ".join(argv)}": {e}', file=sys.stderr)
++            return False
++
++    def grant_access_to_browser(self, output_dir):
++        default_browser = Gio.AppInfo.get_default_for_type('text/html', False)
++        if default_browser is None:
++            print('Default web browser not found!', file=sys.stderr)
++            return None
++
++        app_id = default_browser.get_id()
++        if app_id is None:
++            print('Default web browser has no app ID!', file=sys.stderr)
++            return None
++
++        app_id = app_id.removesuffix('.desktop')
++
++        try:
++            dir_fd = os.open(output_dir, os.O_PATH)
++        except OSError as e:
++            print(f'Failed to open directory {output_dir}: {e}', file=sys.stderr)
++            return None
++
++        bus = SessionBus()
++        try:
++            portal_documents_object = bus.get_object('org.freedesktop.portal.Documents', '/org/freedesktop/portal/documents')
++            portal_documents = Interface(portal_documents_object, dbus_interface='org.freedesktop.portal.Documents')
++        except dbus.DBusException as e:
++            print(f'Failed to connect to Documents portal: {e}', file=sys.stderr)
++            os.close(dir_fd)
++            return None
++
++        flags = (
++            1 << 0    # ReuseExisting
++            | 1 << 1  # Persistent
++            | 1 << 3  # ExportDirectory
++        )
++        permissions = ['read']
++
++        try:
++            doc_with_signature, *_ = portal_documents.AddFull([dbus.types.UnixFd(dir_fd)], flags, app_id, permissions)
++            if not doc_with_signature:
++                print('No document IDs returned from portal', file=sys.stderr)
++                os.close(dir_fd)
++                return None
++
++            doc_id, *_ = doc_with_signature
++            sandboxed_dir = os.path.join(GLib.get_user_runtime_dir(), 'doc', doc_id, os.path.basename(output_dir))
++            os.close(dir_fd)
++        except dbus.DBusException as e:
++            print(f'Failed to call AddFull method: {e}', file=sys.stderr)
++            os.close(dir_fd)
++            return None
++
++        return sandboxed_dir
++
++    def show_generated_html(self, output):
++        try:
++            uri = GLib.filename_to_uri(output)
++            Gio.AppInfo.launch_default_for_uri(uri, None)
++        except Exception as e:
++            print(f'Failed to launch default application: {e}', file=sys.stderr)
++            return False
++
++        return True
++
++    def write_redirect_file(self, sandboxed_dir, sandboxed_file):
++        html = f'<meta http-equiv="refresh" content="0; url=file://{sandboxed_file}">'
++        redirect_file = os.path.join(sandboxed_dir, 'yelp-build-redirect.html')
++
++        try:
++            with open(redirect_file, 'w') as f:
++                f.write(html)
++        except Exception as e:
++            print(f'Error writing redirect file {redirect_file}: {e}', file=sys.stderr)
++            return None
++
++        return redirect_file
++
++if __name__ == '__main__':
++    try:
++        sys.exit(YelpBuildUrlHandler().main())
++    except KeyboardInterrupt:
++        sys.exit(1)
++
+-- 
+GitLab
+

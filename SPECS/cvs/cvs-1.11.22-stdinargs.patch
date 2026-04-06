@@ -1,0 +1,121 @@
+--- cvs-1.11.22.orig/src/cvs.h	2008-09-09 13:46:07.000000000 -0400
++++ cvs-1.11.22/src/cvs.h	2008-09-09 13:46:13.000000000 -0400
+@@ -695,6 +695,8 @@ void sleep_past PROTO ((time_t desttime)
+ #define	RUN_STDOUT_APPEND     0x0004    /* append to stdout, don't truncate */
+ #define	RUN_STDERR_APPEND     0x0008    /* append to stderr, don't truncate */
+ #define	RUN_SIGIGNORE         0x0010    /* ignore interrupts for command */
++#define	RUN_PIPE              0x0020	/* pass the arguments by stdin instead
++                                         * as arguments */
+ #define	RUN_TTY               (char *)0 /* for the benefit of lint */
+ 
+ void run_add_arg_p PROTO ((int *, size_t *, char ***, const char *s));
+--- cvs-1.11.22.orig/src/run.c	2005-10-03 16:31:12.000000000 -0400
++++ cvs-1.11.22/src/run.c	2008-09-09 13:49:15.000000000 -0400
+@@ -123,6 +123,8 @@ run_exec (stin, stout, sterr, flags)
+     int rc = -1;
+     int rerrno = 0;
+     int pid, w;
++    int pipefd[2];
++    char *run_argv2[3] = { NULL, "-", NULL };
+ 
+ #ifdef POSIX_SIGNALS
+     sigset_t sigset_mask, sigset_omask;
+@@ -163,7 +165,26 @@ run_exec (stin, stout, sterr, flags)
+     mode_out |= ((flags & RUN_STDOUT_APPEND) ? O_APPEND : O_TRUNC);
+     mode_err |= ((flags & RUN_STDERR_APPEND) ? O_APPEND : O_TRUNC);
+ 
+-    if (stin && (shin = open (stin, O_RDONLY)) == -1)
++    if (*(run_argv[0]) == '|')
++    {
++        char *buf;
++
++        if (pipe(pipefd) == -1) {
++           rerrno = errno;
++           error (0, errno, "unable to open pipe");
++           goto out0;
++        }
++        flags |= RUN_PIPE;
++        shin = pipefd[0];
++        buf = strdup(run_argv[0] + 1); /* skip '|' */
++        if (buf == NULL) {
++            rc = ENOMEM;
++            error (0, errno, "unable to allocate memory");
++            goto out1;
++        }
++        run_argv2[0] = buf;
++    }
++    else if (stin && (shin = open (stin, O_RDONLY)) == -1)
+     {
+ 	rerrno = errno;
+ 	error (0, errno, "cannot open %s for reading (prog %s)",
+@@ -239,8 +260,14 @@ run_exec (stin, stout, sterr, flags)
+ #endif
+ 
+ 	/* dup'ing is done.  try to run it now */
+-	(void) execvp (run_argv[0], run_argv);
+-	error (0, errno, "cannot exec %s", run_argv[0]);
++        if (flags & RUN_PIPE) {
++            close(pipefd[1]);
++            (void) execvp (run_argv2[0], run_argv2);
++	    error (0, errno, "cannot exec %s", run_argv2[0]);
++        } else {
++	    (void) execvp (run_argv[0], run_argv);
++	    error (0, errno, "cannot exec %s", run_argv[0]);
++        }
+ 	_exit (127);
+     }
+     else if (pid == -1)
+@@ -283,6 +310,39 @@ run_exec (stin, stout, sterr, flags)
+ #endif
+ #endif
+ 
++    /* write all the arguments in the stdout if requested */
++    if (flags & RUN_PIPE) {
++        int size, s;
++
++	close(pipefd[0]);
++        for (w = 0; run_argv[w] != NULL; w++) {
++             size = strlen(run_argv[w]);
++             s = 0;
++             while (s < size) {
++                 rc = write(pipefd[1], run_argv[w] + s, size - s);
++                 if (rc < 0 && errno != EINTR) {
++                     /* all other cases we'll just fail */
++                     rerrno = errno;
++                     error (0, errno, "unable to write to the application's stdin %s",
++                            run_argv2[0]);
++                     goto wait_for_process;
++                 } else if (rc > 0)
++                     s += rc;
++             }
++             do {
++                 rc = write(pipefd[1], "\n", 1);
++                 if (rc < 0 && errno != EINTR) {
++                     rerrno = errno;
++                     error (0, errno, "unable to write to the application's stdin %s",
++                            run_argv2[0]);
++                     goto wait_for_process;
++                 }
++             } while (rc != 1);
++        }
++wait_for_process:
++        close(pipefd[1]);
++        pipefd[1] = -1;
++    }
+     /* wait for our process to die and munge return status */
+ #ifdef POSIX_SIGNALS
+     while ((w = waitpid (pid, &status, 0)) == -1 && errno == EINTR)
+@@ -356,7 +416,14 @@ run_exec (stin, stout, sterr, flags)
+ 	 * relative to the protocol pipe
+ 	 */
+ 	cvs_flushout();
++    if (flags & RUN_PIPE)
++        free(run_argv2[0]);
+   out1:
++    if (flags & RUN_PIPE) {
++        shin = -1;
++        if (pipefd[1] != -1)
++            close(pipefd[1]);
++    }
+     if (stin)
+ 	(void) close (shin);

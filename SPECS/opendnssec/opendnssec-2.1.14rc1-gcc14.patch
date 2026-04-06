@@ -1,0 +1,34 @@
+From 17e9e444e052ca43ab31da77e9327f159baf5b9c Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Thu, 8 Feb 2024 13:10:53 +0200
+Subject: [PATCH] Fix missing include
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+scheduler/task.c: In function ‘task_perform’:
+scheduler/task.c:137:25: error: implicit declaration of function ‘clamp’ [-Wimplicit-function-declaration]
+  137 |         task->backoff = clamp(task->backoff * 2, 60, ODS_SE_MAX_BACKOFF);
+      |                         ^~~~~
+make[2]: *** [Makefile:600: scheduler/task.o] Error 1
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ common/scheduler/task.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/common/scheduler/task.c b/common/scheduler/task.c
+index 4dcf9e900..0dfa496a2 100644
+--- a/common/scheduler/task.c
++++ b/common/scheduler/task.c
+@@ -40,6 +40,7 @@
+ #include "duration.h"
+ #include "file.h"
+ #include "log.h"
++#include "utilities.h"
+ 
+ static const char* task_str = "task";
+ static pthread_mutex_t worklock = PTHREAD_MUTEX_INITIALIZER;
+-- 
+2.43.0
+

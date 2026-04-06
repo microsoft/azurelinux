@@ -1,0 +1,20 @@
+###############
+Dynamic modules
+###############
+
+Dynamic modules are loaded using the "load_modules" directive. The RPM package
+for each module has a '.conf' file in the /usr/share/nginx/modules directory.
+The '.conf' file contains a single "load_modules" directive.
+
+This means that whenever a new dynamic module is installed, it will
+automatically be enabled and Nginx will be reloaded.
+
+--------------------------------------------------------
+Prevent dynamic modules from being enabled automatically
+--------------------------------------------------------
+
+You may want to avoid dynamic modules being enabled automatically. Simply
+remove this line from the top of /etc/nginx/nginx.conf:
+
+    include /usr/share/nginx/modules/*.conf;
+

@@ -1,0 +1,14 @@
+Patch cargo metadata for Fedora build
+
+diff --git a/rust/hg-core/Cargo.toml b/rust/hg-core/Cargo.toml
+--- a/rust/hg-core/Cargo.toml
++++ b/rust/hg-core/Cargo.toml
+@@ -33,7 +33,7 @@ rand_pcg = "0.9.0"
+ rand_distr = "0.5.1"
+ rayon = "1.10.0"
+ regex = "1.11.1"
+-self_cell = "1.2"
++self_cell = "1.1"
+ serde = { version = "1.0", features = ["derive"] }
+ sha-1 = "0.10.1"
+ twox-hash = "2.1.0"

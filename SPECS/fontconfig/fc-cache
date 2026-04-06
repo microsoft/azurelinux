@@ -1,0 +1,4 @@
+#! /bin/sh
+
+[ -x /usr/bin/fc-cache-32 ] && /usr/bin/fc-cache-32 "$@" || :
+[ -x /usr/bin/fc-cache-64 ] && /usr/bin/fc-cache-64 "$@" || :

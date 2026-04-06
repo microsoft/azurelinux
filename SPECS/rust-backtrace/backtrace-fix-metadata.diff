@@ -1,0 +1,23 @@
+--- backtrace-0.3.76/Cargo.toml	1970-01-01T00:00:01+00:00
++++ backtrace-0.3.76/Cargo.toml	2025-11-04T14:27:57.627075+00:00
+@@ -59,20 +59,8 @@
+ required-features = ["std"]
+ 
+ [[test]]
+-name = "accuracy"
+-path = "tests/accuracy/main.rs"
+-required-features = ["std"]
+-edition = "2021"
+-
+-[[test]]
+ name = "concurrent-panics"
+ path = "tests/concurrent-panics.rs"
+-harness = false
+-required-features = ["std"]
+-
+-[[test]]
+-name = "current-exe-mismatch"
+-path = "tests/current-exe-mismatch.rs"
+ harness = false
+ required-features = ["std"]
+ 

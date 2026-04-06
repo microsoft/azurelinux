@@ -1,0 +1,7 @@
+diff --git a/usbguard-tmpfiles.conf b/usbguard-tmpfiles.conf
+index e90908f9..aff00c56 100644
+--- a/usbguard-tmpfiles.conf
++++ b/usbguard-tmpfiles.conf
+@@ -1 +1 @@
+-d /var/log/usbguard 0700 root root - -
++d /var/log/usbguard 0755 root root - -

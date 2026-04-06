@@ -1,0 +1,40 @@
+From 3119c671c566761a79ac98405cb619892acde3e8 Mon Sep 17 00:00:00 2001
+From: Lukas Slebodnik <lslebodn@redhat.com>
+Date: Fri, 20 Sep 2013 09:26:58 +0200
+Subject: [PATCH] atlas-shared_libraries
+
+---
+ ATLAS/makes/Make.lib | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/ATLAS/makes/Make.lib b/ATLAS/makes/Make.lib
+index ab1eb9963d36678972a0a410905169aaa563dc64..27c6e316b442e09b0f46afac7940aaa11e25e45c 100644
+--- a/ATLAS/makes/Make.lib
++++ b/ATLAS/makes/Make.lib
+@@ -4,6 +4,8 @@ mySRCdir = $(SRCdir)/lib
+ #
+ # override with libatlas.so only when atlas is built to one lib
+ #
++so_ver_major=3
++so_ver = $(so_ver_major).10
+ DYNlibs = liblapack.so libf77blas.so libcblas.so libatlas.so 
+ PTDYNlibs = liblapack.so libptf77blas.so libptcblas.so libatlas.so 
+ CDYNlibs = liblapack.so libcblas.so libatlas.so 
+@@ -116,9 +116,12 @@ LDTRY:
+            -rpath-link $(LIBINSTdir)  \
+            --whole-archive $(libas) --no-whole-archive $(LIBS)
+ GCCTRY:
+-	$(GOODGCC) -shared -o $(outso)  \
+-           -Wl,"-rpath-link $(LIBINSTdir)" \
++	$(GOODGCC) -shared -o $(outso).$(so_ver)  \
++           \
++           -Wl,-soname,"$(outso).$(so_ver_major)" \
+            -Wl,--whole-archive $(libas) -Wl,--no-whole-archive $(LIBS)
++	  ln -s $(outso).$(so_ver) $(outso).$(so_ver_major)
++	  ln -s $(outso).$(so_ver) $(outso)
+ GCCTRY_norp:
+ 	$(GOODGCC) -shared -o $(outso)  \
+            -Wl,--whole-archive $(libas) -Wl,--no-whole-archive $(LIBS)
+-- 
+1.8.3.1
+

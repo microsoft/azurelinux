@@ -1,0 +1,16 @@
+--- tftp-hpa-5.2/tftp/main.c	2013-04-19 09:34:09.737410319 +0200
++++ tftp-hpa-5.2/tftp/main.c	2013-04-19 09:42:53.559946374 +0200
+@@ -195,9 +195,11 @@
+ {
+     fprintf(stderr,
+ #ifdef HAVE_IPV6
+-            "Usage: %s [-4][-6][-v][-l][-m mode] [host [port]] [-c command]\n",
++            "Usage: %s [-4][-6][-v][-V][-l][-m mode] [-R port:port] "
++			"[host [port]] [-c command]\n",
+ #else
+-            "Usage: %s [-v][-l][-m mode] [host [port]] [-c command]\n",
++            "Usage: %s [-v][-V][-l][-m mode] [-R port:port] "
++			"[host [port]] [-c command]\n",
+ #endif
+             program);
+     exit(errcode);

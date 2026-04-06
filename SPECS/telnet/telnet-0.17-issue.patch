@@ -1,0 +1,81 @@
+--- netkit-telnet-0.17/telnetd/utility.c.issue	Sun Dec 12 09:59:45 1999
++++ netkit-telnet-0.17/telnetd/utility.c	Wed Jul 18 11:14:11 2001
+@@ -460,13 +460,13 @@
+ 	putlocation = where;
+ 
+ 	while (*cp) {
+-		if (*cp != '%') {
++		if (*cp != '%' && *cp != '\\') {
+ 			putchr(*cp++);
+ 			continue;
+ 		}
+ 		switch (*++cp) {
+ 
+-		case 't':
++		case 'l':
+ 			slash = strrchr(line, '/');
+ 			if (slash == NULL)
+ 				putstr(line);
+@@ -474,21 +474,28 @@
+ 				putstr(slash+1);
+ 			break;
+ 
++		case 'n':
+ 		case 'h':
+ 			putstr(editedhost);
+ 			break;
+ 
++		case 't':
+ 		case 'd':
+ 			(void)time(&t);
+ 			(void)strftime(db, sizeof(db), fmtstr, localtime(&t));
+ 			putstr(db);
+ 			break;
+ 
++		case '\\':
++			putchr('\\');
++			break;
++			  
+ 		case '%':
+ 			putchr('%');
+ 			break;
+ 
+ 		case 'D':
++		case 'o':
+ 			{
+ 				char	buff[128];
+ 
+@@ -515,7 +522,7 @@
+ 							c = fgetc(fp);
+ 						} while (c != EOF && c != '\n');
+ 						continue;
+-					} else if (c == '%') {
++					} else if (c == '%' || c == '\\') {
+ 						buff[0] = c;
+ 						c = fgetc(fp);
+ 						if (c == EOF) break;
+--- netkit-telnet-0.17/telnetd/issue.net.5.issue	Sun Jul 30 19:57:09 2000
++++ netkit-telnet-0.17/telnetd/issue.net.5	Wed Jul 18 11:03:09 2001
+@@ -15,16 +15,17 @@
+ .Pa /etc/issue.net
+ is a text file which contains a message or system identification to be
+ printed before the login prompt of a telnet session. It may contain
+-various `%-char' sequences. The following sequences are supported by
++various `%-char' (or, alternatively, '\\-char') sequences. The following
++sequences are supported by
+ .Ic telnetd :
+ .Bl -tag -offset indent -compact -width "abcde"
+-.It %t
++.It %l
+ - show the current tty
+-.It %h
++.It %h, %n
+ - show the system node name (FQDN)
+-.It %D
++.It %D, %o
+ - show the name of the NIS domain
+-.It %d
++.It %d, %t
+ - show the current time and date
+ .It %s
+ - show the name of the operating system

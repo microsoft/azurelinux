@@ -1,0 +1,14 @@
+diff -rupN --no-dereference poppler-25.07.0/poppler/StructTreeRoot.cc poppler-25.07.0-new/poppler/StructTreeRoot.cc
+--- poppler-25.07.0/poppler/StructTreeRoot.cc	2025-07-04 13:19:05.000000000 +0200
++++ poppler-25.07.0-new/poppler/StructTreeRoot.cc	2025-10-29 09:43:06.832413231 +0100
+@@ -137,6 +137,10 @@ void StructTreeRoot::parseNumberTreeNode
+                 }
+                 int keyVal = key.getInt();
+                 std::vector<Parent> &vec = parentTree[keyVal];
++                if (!vec.empty()) {
++                    error(errSyntaxError, -1, "Nums item at position {0:d} is a duplicate entry for key {1:d}", i, keyVal);
++                    continue;
++                }
+ 
+                 Object valueArray = nums.arrayGet(i + 1);
+                 if (valueArray.isArray()) {

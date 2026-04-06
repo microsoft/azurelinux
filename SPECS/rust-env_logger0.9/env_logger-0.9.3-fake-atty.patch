@@ -1,0 +1,20 @@
+diff -Naur env_logger-0.9.3-original/src/fmt/writer/atty.rs env_logger-0.9.3/src/fmt/writer/atty.rs
+--- env_logger-0.9.3-original/src/fmt/writer/atty.rs	2006-07-24 02:21:28.000000000 +0100
++++ env_logger-0.9.3/src/fmt/writer/atty.rs	2026-02-21 14:32:30.552425774 +0000
+@@ -9,12 +9,14 @@
+ 
+ #[cfg(feature = "atty")]
+ mod imp {
++    use std::io::IsTerminal;
++
+     pub(in crate::fmt) fn is_stdout() -> bool {
+-        atty::is(atty::Stream::Stdout)
++        std::io::stdout().is_terminal()
+     }
+ 
+     pub(in crate::fmt) fn is_stderr() -> bool {
+-        atty::is(atty::Stream::Stderr)
++        std::io::stderr().is_terminal()
+     }
+ }
+ 

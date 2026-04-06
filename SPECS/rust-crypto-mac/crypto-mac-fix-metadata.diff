@@ -1,0 +1,11 @@
+--- crypto-mac-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crypto-mac-0.11.1/Cargo.toml	2023-05-25T08:15:25.663839+00:00
+@@ -37,7 +37,7 @@
+ version = "0.14"
+ 
+ [dependencies.subtle]
+-version = "=2.4"
++version = "2.4"
+ default-features = false
+ 
+ [features]

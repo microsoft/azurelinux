@@ -1,0 +1,46 @@
+From 53f802f68ddbba6591ff8b2756ded9ad669784ee Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Thu, 27 Mar 2025 21:58:20 -0500
+Subject: [PATCH] Fedora dependency adjustments
+
+- disable coverage to avoid pytest-cov
+- remove pre-commit
+- relax pytz version restriction
+---
+ pyproject.toml | 4 +---
+ tox.ini        | 2 +-
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 89609bd..99f8e79 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -41,11 +41,9 @@ dynamic = ["version"]
+ [project.optional-dependencies]
+ test = [
+     "dateparser==1.*",
+-    "pre-commit",
+     "pytest",
+-    "pytest-cov",
+     "pytest-mock",
+-    "pytz==2021.1",
++    "pytz>=2021.1",
+     "simplejson==3.*",
+ ]
+ doc = [
+diff --git a/tox.ini b/tox.ini
+index c410a8e..4d994cd 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -46,7 +46,7 @@ allowlist_externals = flit
+ commands = flit publish --setup-py
+ 
+ [pytest]
+-addopts = -v --cov-branch --cov=arrow --cov-fail-under=99 --cov-report=term-missing --cov-report=xml
++addopts = -v
+ testpaths = tests
+ 
+ [isort]
+-- 
+2.49.0
+

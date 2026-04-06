@@ -1,0 +1,36 @@
+From 153629a96b07a8ae96b0b28cce100fde9ea1398d Mon Sep 17 00:00:00 2001
+From: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+Date: Thu, 28 Jan 2021 00:08:35 -0500
+Subject: [PATCH 1/2] Makefile: set DT_SONAME to trace.so
+
+Fedora never requires SONAME versioning for plugins according to the
+Packaging Guidelines:
+
+    https://docs.fedoraproject.org/en-US/packaging-guidelines/#_downstream_so_name_versioning
+
+    In cases where upstream ships unversioned .so library (so this is
+    not needed for plugins, drivers, etc.), the packager MUST try to
+    convince upstream to start versioning it.
+
+On the other hand, fedpkg lint still prints warning if the shared
+library doesn't have DT_SONAME. To surpress this, we set DT_SONAME
+field to trace.so for in case.
+
+Signed-off-by: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index a9e0a21..b4573b4 100755
+--- a/Makefile
++++ b/Makefile
+@@ -28,4 +28,4 @@ INCDIR=/usr/include/crash
+ all: trace.so
+ 	
+ trace.so: $(INCDIR)/defs.h trace.c 
+-	gcc $(RPM_OPT_FLAGS) -Wall -I$(INCDIR) -nostartfiles -shared -rdynamic -o trace.so trace.c -fPIC -D$(TARGET) $(TARGET_CFLAGS)
++	gcc $(RPM_OPT_FLAGS) -Wall -I$(INCDIR) -nostartfiles -shared -rdynamic -Wl,-soname,trace.so -o trace.so trace.c -fPIC -D$(TARGET) $(TARGET_CFLAGS)
+-- 
+2.29.2
+

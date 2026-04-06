@@ -1,0 +1,5 @@
+# these are intentionally unversioned, they are virtual provides
+# declared by every Django stack's subpackages
+addFilter("W: unversioned-explicit-provides python-django-bash-completion-impl")
+addFilter("W: unversioned-explicit-provides python-django-doc-impl")
+addFilter("W: unversioned-explicit-provides python-django-impl")

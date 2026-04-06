@@ -1,0 +1,61 @@
+diff -up ./sentinel.conf.rpm ./sentinel.conf
+--- ./sentinel.conf.rpm	2025-07-24 10:05:46.477794769 +0200
++++ ./sentinel.conf	2025-07-24 10:07:27.023483441 +0200
+@@ -17,7 +17,7 @@ daemonize no
+ # When running daemonized, Valkey Sentinel writes a pid file in
+ # /var/run/valkey-sentinel.pid by default. You can specify a custom pid file
+ # location here.
+-pidfile /var/run/valkey-sentinel.pid
++pidfile /run/valkey/sentinel.pid
+ 
+ # Specify the server verbosity level.
+ # This can be one of:
+@@ -31,7 +31,7 @@ loglevel notice
+ # Specify the log file name. Also the empty string can be used to force
+ # Sentinel to log on the standard output. Note that if you use standard
+ # output for logging but daemonize, logs will be sent to /dev/null
+-logfile ""
++logfile /var/log/valkey/sentinel.log
+ 
+ # To enable logging to the system logger, just set 'syslog-enabled' to yes,
+ # and optionally update the other syslog parameters to suit your needs.
+diff -up ./valkey.conf.rpm ./valkey.conf
+--- ./valkey.conf.rpm	2025-07-24 10:05:46.475591081 +0200
++++ ./valkey.conf	2025-07-24 10:07:23.219331838 +0200
+@@ -43,6 +43,9 @@
+ # include /path/to/other.conf
+ # include /path/to/fragments/*.conf
+ #
++# Module configuration files
++include /etc/valkey/modules/*.conf
++
+ 
+ ################################## MODULES #####################################
+ 
+@@ -153,7 +156,7 @@ tcp-backlog 511
+ # incoming connections. There is no default, so the server will not listen
+ # on a unix socket when not specified.
+ #
+-# unixsocket /run/valkey.sock
++unixsocket /run/valkey/valkey.sock
+ # unixsocketgroup wheel
+ # unixsocketperm 700
+ 
+@@ -385,7 +388,7 @@ daemonize no
+ #
+ # Note that on modern Linux systems "/run/valkey.pid" is more conforming
+ # and should be used instead.
+-pidfile /var/run/valkey_6379.pid
++pidfile /run/valkey/valkey.pid
+ 
+ # Specify the server verbosity level.
+ # This can be one of:
+@@ -416,7 +419,7 @@ loglevel notice
+ # Specify the log file name. Also the empty string can be used to force
+ # the server to log on the standard output. Note that if you use standard
+ # output for logging but daemonize, logs will be sent to /dev/null
+-logfile ""
++logfile /var/log/valkey/valkey.log
+ 
+ # To enable logging to the system logger, just set 'syslog-enabled' to yes,
+ # and optionally update the other syslog parameters to suit your needs.

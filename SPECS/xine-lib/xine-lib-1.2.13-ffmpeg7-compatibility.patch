@@ -1,0 +1,318 @@
+# HG changeset patch
+# User Torsten Jager <t.jager@gmx.de>
+# Date 1715160885 -7200
+#      Wed May 08 11:34:45 2024 +0200
+# Node ID 73b833e7fe356cd2d9490dda4ebc9bfe16fce958
+# Parent  1e7b184008860c8be2289c3cefd9dee57f06193a
+ffmpeg compatibility update 2.
+
+diff -r 1e7b18400886 -r 73b833e7fe35 src/combined/ffmpeg/ff_audio_decoder.c
+--- a/src/combined/ffmpeg/ff_audio_decoder.c	Mon May 06 21:55:55 2024 +0200
++++ b/src/combined/ffmpeg/ff_audio_decoder.c	Wed May 08 11:34:45 2024 +0200
+@@ -1393,6 +1393,9 @@
+       XFF_FREE_FRAME (this->av_frame);
+     }
+ #endif
++#if 1
++    avcodec_flush_buffers (this->context);
++#else
+     pthread_mutex_lock (&ffmpeg_lock);
+     {
+       uint8_t *ed = this->context->extradata;
+@@ -1410,6 +1413,7 @@
+     if (XFF_AVCODEC_OPEN (this->context, this->codec) >= 0)
+       this->decoder_ok = 1;
+     pthread_mutex_unlock (&ffmpeg_lock);
++#endif
+   }
+ 
+   ff_audio_reset_parser(this);
+diff -r 1e7b18400886 -r 73b833e7fe35 src/combined/ffmpeg/ff_video_decoder.c
+--- a/src/combined/ffmpeg/ff_video_decoder.c	Mon May 06 21:55:55 2024 +0200
++++ b/src/combined/ffmpeg/ff_video_decoder.c	Wed May 08 11:34:45 2024 +0200
+@@ -89,6 +89,11 @@
+ # define ENABLE_EMMS
+ #endif
+ 
++/*
++#undef XFF_AVCODEC_SLICE_TABLE
++#define XFF_AVCODEC_SLICE_TABLE 1
++*/
++
+ #define VIDEOBUFSIZE        (128*1024)
+ #define SLICE_BUFFER_SIZE   (1194*1024)
+ 
+@@ -148,11 +153,11 @@
+   int               bufsize;
+   int               size;
+   int               skipframes;
+-
++#if XFF_AVCODEC_SLICE_TABLE == 1
+   int              *slice_offset_table;
+   int               slice_offset_size;
+   int               slice_offset_pos;
+-
++#endif
+   AVFrame          *av_frame;
+   AVFrame          *av_frame2;
+   AVCodecContext   *context;
+@@ -238,6 +243,13 @@
+ #if XFF_VIDEO > 1
+   XFF_PACKET_DECL (avpkt);
+ #endif
++
++#if XFF_AVCODEC_SLICE_TABLE == 2
++  uint8_t          *temp_buf;
++  uint32_t          temp_size;
++  int               slice_num;
++  uint8_t           slice_table[1 + 256 * 8];
++#endif
+ };
+ 
+ /* import color matrix names */
+@@ -1783,10 +1795,9 @@
+   this->size += buf->size;
+ 
+   if (buf->decoder_flags & BUF_FLAG_FRAME_END) {
+-    int codec_type;
++    uint32_t codec_type = buf->type & 0xFFFF0000;
+ 
+     lprintf ("header complete\n");
+-    codec_type = buf->type & 0xFFFF0000;
+ 
+     if (buf->decoder_flags & BUF_FLAG_STDHEADER) {
+ 
+@@ -1912,33 +1923,44 @@
+ #endif
+   }
+   else if (buf->decoder_info[1] == BUF_SPECIAL_RV_CHUNK_TABLE) {
+-    /* o dear. Multiple decoding threads use individual contexts.
+-      av_decode_video2 () does only copy the _pointer_ to the offsets,
+-      not the offsets themselves. So we must not overwrite anything
+-      that another thread has not yet read. */
+-    int i, l, total;
+-
+-    lprintf("BUF_SPECIAL_RV_CHUNK_TABLE\n");
+-    l = buf->decoder_info[2] + 1;
+-
+-    total = l * this->class->thread_count;
+-    if (total < SLICE_OFFSET_SIZE)
+-      total = SLICE_OFFSET_SIZE;
+-    if (total > this->slice_offset_size) {
+-      this->slice_offset_table = realloc (this->slice_offset_table, total * sizeof (int));
+-      this->slice_offset_size = total;
+-    }
+-
+-    if (this->slice_offset_pos + l > this->slice_offset_size)
+-      this->slice_offset_pos = 0;
+-    this->context->slice_offset = this->slice_offset_table + this->slice_offset_pos;
+-    this->context->slice_count = l;
+-
+-    lprintf ("slice_count=%d\n", l);
+-    for (i = 0; i < l; i++) {
+-      this->slice_offset_table[this->slice_offset_pos++] =
+-        ((uint32_t *)buf->decoder_info_ptr[2])[(2 * i) + 1];
+-      lprintf("slice_offset[%d]=%d\n", i, this->context->slice_offset[i]);
++    {
++#if XFF_AVCODEC_SLICE_TABLE == 1
++      /* o dear. Multiple decoding threads use individual contexts.
++       * av_decode_video2 () does only copy the _pointer_ to the offsets,
++       * not the offsets themselves. So we must not overwrite anything
++       * that another thread has not yet read. */
++      int i, l, total;
++
++      lprintf("BUF_SPECIAL_RV_CHUNK_TABLE\n");
++      l = buf->decoder_info[2] + 1;
++
++      total = l * this->class->thread_count;
++      if (total < SLICE_OFFSET_SIZE)
++        total = SLICE_OFFSET_SIZE;
++      if (total > this->slice_offset_size) {
++        this->slice_offset_table = realloc (this->slice_offset_table, total * sizeof (int));
++        this->slice_offset_size = total;
++      }
++
++      if (this->slice_offset_pos + l > this->slice_offset_size)
++        this->slice_offset_pos = 0;
++      this->context->slice_offset = this->slice_offset_table + this->slice_offset_pos;
++      this->context->slice_count = l;
++
++      lprintf ("slice_count=%d\n", l);
++      for (i = 0; i < l; i++) {
++        this->slice_offset_table[this->slice_offset_pos++] =
++          ((uint32_t *)buf->decoder_info_ptr[2])[(2 * i) + 1];
++        lprintf("slice_offset[%d]=%d\n", i, this->context->slice_offset[i]);
++      }
++#elif XFF_AVCODEC_SLICE_TABLE == 2
++      /* (count-1):1, 1:4, (offs[0]):4, 1:4, (offs[1]:4, ... just in front of the frame bitstream.
++       * reverse engineered from ffmpeg/libavcodec/rv34.c. they seem to expect no
++       * external use of rv decoders, and did not document this. */
++      this->slice_table[0] = buf->decoder_info[2];
++      this->slice_num = this->slice_table[0] + 1;
++      memcpy (this->slice_table + 1, buf->decoder_info_ptr[2], 8 * this->slice_num);
++#endif
+     }
+   }
+ }
+@@ -2004,6 +2026,7 @@
+ 
+ static int decode_video_wrapper (ff_video_decoder_t *this,
+   AVFrame *av_frame, int *err, void *buf, size_t buf_size) {
++  uint32_t tsize = 0;
+   int len;
+ 
+ #if ENABLE_VAAPI
+@@ -2013,9 +2036,32 @@
+   }
+ #endif /* ENABLE_VAAPI */
+ 
++#if XFF_AVCODEC_SLICE_TABLE == 2
++  if ((this->slice_num > 0) && buf) {
++    uint32_t nsize;
++    tsize = 1 + this->slice_num * 8;
++    nsize = tsize + buf_size + AV_INPUT_BUFFER_PADDING_SIZE;
++    if (this->temp_size < nsize) {
++      nsize = nsize * 3 / 2;
++      free (this->temp_buf);
++      this->temp_buf = malloc (nsize);
++      if (!this->temp_buf)
++        nsize = 0;
++      this->temp_size = nsize;
++      nsize = tsize + buf_size + AV_INPUT_BUFFER_PADDING_SIZE;
++    }
++    if (this->temp_size >= nsize) {
++      memcpy (this->temp_buf, this->slice_table, tsize);
++      memcpy (this->temp_buf + tsize, buf, buf_size + AV_INPUT_BUFFER_PADDING_SIZE);
++      buf = this->temp_buf;
++    }
++    this->slice_num = 0;
++  }
++#endif
++
+ #if XFF_VIDEO > 1
+   this->avpkt->data = buf;
+-  this->avpkt->size = buf_size;
++  this->avpkt->size = buf_size + tsize;
+   this->avpkt->flags = AV_PKT_FLAG_KEY;
+ # ifdef XFF_AVCODEC_FRAME_PTS
+   this->avpkt->pts = this->tagged_pts;
+@@ -2486,7 +2532,6 @@
+           this->size -= len;
+ 
+           if (this->size > 0) {
+-            ff_check_bufsize(this, this->size);
+             memmove (this->buf, &chunk_buf[offset], this->size);
+             chunk_buf = this->buf;
+             /* take over pts for next access unit */
+@@ -2615,8 +2660,8 @@
+ 
+         img->pts  = ff_untag_pts(this, this->av_frame);
+ 
+-        /* workaround for weird 120fps streams */
+-        if( video_step_to_use == 750 ) {
++        /* workaround for weird 120fps streams, as well as some rv20 with frame duration 3pts. */
++        if (video_step_to_use <= 750) {
+           /* fallback to the VIDEO_PTS_MODE */
+           video_step_to_use = 0;
+         }
+@@ -2837,7 +2882,7 @@
+ 
+     img->pts = ff_untag_pts (this, this->av_frame2);
+ 
+-    if (video_step_to_use == 750)
++    if (video_step_to_use <= 750)
+       video_step_to_use = 0;
+     img->duration = this->av_frame2->repeat_pict ? video_step_to_use * 3 / 2 : video_step_to_use;
+     img->progressive_frame = !this->av_frame2->interlaced_frame;
+@@ -2941,6 +2986,9 @@
+     mpeg_parser_reset(this->mpeg_parser);
+ 
+   /* this->pts_tag_pass = 0; */
++#if XFF_AVCODEC_SLICE_TABLE == 2
++  this->slice_num = 0;
++#endif
+ }
+ 
+ static void ff_dispose (video_decoder_t *this_gen) {
+@@ -2953,12 +3001,15 @@
+   rgb2yuy2_free (this->rgb2yuy2);
+ 
+   if (this->decoder_ok) {
++    uint8_t *ed;
+ 
+     pthread_mutex_lock(&ffmpeg_lock);
+-    _x_freep (&this->context->extradata);
++    ed = this->context->extradata;
++    this->context->extradata = NULL;
+     this->context->extradata_size = 0;
+     XFF_FREE_CONTEXT (this->context);
+     pthread_mutex_unlock(&ffmpeg_lock);
++    _x_freep (&ed);
+ 
+ #ifdef ENABLE_DIRECT_RENDERING
+     ff_free_dr1_frames (this, 1);
+@@ -2972,9 +3023,11 @@
+     XFF_FREE_CONTEXT (this->context);
+   }
+ 
+-  if (this->slice_offset_table)
+-    free (this->slice_offset_table);
+-
++#if XFF_AVCODEC_SLICE_TABLE == 1
++  free (this->slice_offset_table);
++#elif XFF_AVCODEC_SLICE_TABLE == 2
++  free (this->temp_buf);
++#endif
+ 
+ #if XFF_VIDEO > 1
+   XFF_PACKET_UNREF (this->avpkt);
+@@ -3062,21 +3115,25 @@
+   this->decoder_ok      = 0;
+   this->aspect_ratio    = 0;
+   this->pts_tag_pass    = 0;
+-#ifdef HAVE_POSTPROC
++#  ifdef HAVE_POSTPROC
+   this->pp_quality      = 0;
+   this->our_context     = NULL;
+   this->our_mode        = NULL;
+-#endif
++#  endif
+   this->mpeg_parser     = NULL;
+   this->set_stream_info = 0;
+   this->rgb2yuy2        = NULL;
+-#ifdef ENABLE_VAAPI
++#  ifdef ENABLE_VAAPI
+   this->accel           = NULL;
+   this->accel_img       = NULL;
+-#endif
+-#if XFF_VIDEO == 3
++#  endif
++#  if XFF_VIDEO == 3
+   this->flush_packet_sent = 0;
+-#endif
++#  endif
++#  if XFF_AVCODEC_SLICE_TABLE == 2
++  this->temp_size       = 0;
++  this->temp_buf        = NULL;
++#  endif
+ #endif
+ 
+   this->video_decoder.decode_data   = ff_decode_data;
+diff -r 1e7b18400886 -r 73b833e7fe35 src/combined/ffmpeg/ffmpeg_compat.h
+--- a/src/combined/ffmpeg/ffmpeg_compat.h	Mon May 06 21:55:55 2024 +0200
++++ b/src/combined/ffmpeg/ffmpeg_compat.h	Wed May 08 11:34:45 2024 +0200
+@@ -139,6 +139,14 @@
+ #  define XFF_PALETTE 3
+ #endif
+ 
++#if LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(59,42,100)
++/* AVCodecContext.slice_{offset,count} */
++#  define XFF_AVCODEC_SLICE_TABLE 1
++#else
++/* inline offset table before the frame. */
++#  define XFF_AVCODEC_SLICE_TABLE 2
++#endif
++
+ #if LIBAVCODEC_VERSION_INT < XFF_INT_VERSION(59,0,100) /** << revise this */
+ #  define XFF_VAAPI 1 /** << libavcodec/vaapi.h */
+ #else

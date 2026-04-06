@@ -1,0 +1,67 @@
+From 52175648f4e1b415f93b24a3ef970983024659f2 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <neal@gompa.dev>
+Date: Wed, 28 Feb 2024 16:47:16 -0500
+Subject: [PATCH] Default to Qt6 and always use versioned greeters
+
+Distributors can handle creating an unversioned name if necessary.
+---
+ src/common/ThemeMetadata.cpp | 4 ++--
+ src/daemon/Greeter.cpp       | 3 +--
+ src/greeter/CMakeLists.txt   | 9 +--------
+ 3 files changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/src/common/ThemeMetadata.cpp b/src/common/ThemeMetadata.cpp
+index 2cb3762..003056a 100644
+--- a/src/common/ThemeMetadata.cpp
++++ b/src/common/ThemeMetadata.cpp
+@@ -28,7 +28,7 @@ namespace SDDM {
+         QString mainScript { QStringLiteral("Main.qml") };
+         QString configFile;
+         QString translationsDirectory { QStringLiteral(".") };
+-        int qtVersion = 5;
++        int qtVersion = 6;
+     };
+ 
+     ThemeMetadata::ThemeMetadata(const QString &path, QObject *parent) : QObject(parent), d(new ThemeMetadataPrivate()) {
+@@ -61,6 +61,6 @@ namespace SDDM {
+         d->mainScript = settings.value(QStringLiteral("SddmGreeterTheme/MainScript"), QStringLiteral("Main.qml")).toString();
+         d->configFile = settings.value(QStringLiteral("SddmGreeterTheme/ConfigFile"), QStringLiteral("theme.conf")).toString();
+         d->translationsDirectory = settings.value(QStringLiteral("SddmGreeterTheme/TranslationsDirectory"), QStringLiteral(".")).toString();
+-        d->qtVersion = settings.value(QStringLiteral("SddmGreeterTheme/QtVersion"), 5).toInt();
++        d->qtVersion = settings.value(QStringLiteral("SddmGreeterTheme/QtVersion"), 6).toInt();
+     }
+ }
+diff --git a/src/daemon/Greeter.cpp b/src/daemon/Greeter.cpp
+index 07fccde..5a956b6 100644
+--- a/src/daemon/Greeter.cpp
++++ b/src/daemon/Greeter.cpp
+@@ -82,8 +82,7 @@ namespace SDDM {
+ 
+     QString Greeter::greeterPathForQt(int qtVersion)
+     {
+-        const QString suffix = qtVersion == 5 ? QString() : QStringLiteral("-qt%1").arg(qtVersion);
+-        return QStringLiteral(BIN_INSTALL_DIR "/sddm-greeter%1").arg(suffix);
++        return QStringLiteral(BIN_INSTALL_DIR "/sddm-greeter-qt%1").arg(qtVersion);
+     }
+ 
+     bool Greeter::start() {
+diff --git a/src/greeter/CMakeLists.txt b/src/greeter/CMakeLists.txt
+index 72769e4..524368d 100644
+--- a/src/greeter/CMakeLists.txt
++++ b/src/greeter/CMakeLists.txt
+@@ -1,11 +1,4 @@
+-if(QT_MAJOR_VERSION EQUAL "5")
+-    # Keep the unversioned name for Qt5. When upgrading SDDM, the old daemon
+-    # might still be running and only know about "sddm-greeter". Keeping the
+-    # previous name around also helps users calling it directly.
+-    set(GREETER_TARGET sddm-greeter)
+-else()
+-    set(GREETER_TARGET sddm-greeter-qt${QT_MAJOR_VERSION})
+-endif()
++set(GREETER_TARGET sddm-greeter-qt${QT_MAJOR_VERSION})
+ 
+ message(STATUS "Building greeter for Qt ${QT_MAJOR_VERSION} as ${GREETER_TARGET}")
+ 
+-- 
+2.43.0
+

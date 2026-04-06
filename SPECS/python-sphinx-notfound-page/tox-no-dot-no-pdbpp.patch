@@ -1,0 +1,35 @@
+From 8a35db2217033c69b87a3b06e1dbe52214186614 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 23 Oct 2023 17:52:42 +0200
+Subject: [PATCH] tox installs the package by default, the dot is not needed
+
+Remove pdbpp which is not used anywhere in the project's code.
+---
+ tox.ini | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tox.ini b/tox.ini
+index a25b197..cedb779 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -9,9 +9,7 @@ envlist =
+ [testenv]
+ deps =
+   pytest
+-  pdbpp
+   defusedxml
+-  .
+   sphinx5: sphinx<6.0
+   sphinx6: sphinx<7.0
+   sphinx7: sphinx<8.0
+@@ -21,7 +19,6 @@ commands = pytest {posargs}
+ [testenv:docs]
+ deps =
+   -r {toxinidir}/docs/requirements.txt
+-  .
+ changedir = {toxinidir}/docs
+ commands =
+     sphinx-build -q -W -b html -d {envtmpdir}/doctrees . {envtmpdir}/html
+-- 
+2.45.0
+

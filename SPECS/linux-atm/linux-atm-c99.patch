@@ -1,0 +1,16 @@
+Include <string.h> for the strcmp function.  Avoids an implicit
+function declaration and build failures with future compilers.
+
+Submitted upstream: <https://sourceforge.net/p/linux-atm/patches/9/>
+
+diff --git a/src/maint/hediag.c b/src/maint/hediag.c
+index 8a4312a1561f14c2..a4f792f9398b0259 100644
+--- a/src/maint/hediag.c
++++ b/src/maint/hediag.c
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #include <sys/types.h>

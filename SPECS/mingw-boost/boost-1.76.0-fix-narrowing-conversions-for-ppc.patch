@@ -1,0 +1,32 @@
+From 0039878782516ea3313608f99f0d50e846151bc2 Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <jwakely@fedoraproject.org>
+Date: Mon, 31 Jan 2022 11:37:29 +0000
+Subject: [PATCH] Fix narrowing conversions for ppc
+
+These constants are too large for `long long` so are unsigned,
+and then cannot be narrowed to the signed type.
+
+Fixes #29
+---
+ .../numeric/interval/detail/ppc_rounding_control.hpp      | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/boost/numeric/interval/detail/ppc_rounding_control.hpp b/include/boost/numeric/interval/detail/ppc_rounding_control.hpp
+index 87fe8ee..99f9986 100644
+--- a/include/boost/numeric/interval/detail/ppc_rounding_control.hpp
++++ b/include/boost/numeric/interval/detail/ppc_rounding_control.hpp
+@@ -28,10 +28,10 @@ typedef union {
+   double dmode;
+ } rounding_mode_struct;
+ 
+-static const rounding_mode_struct mode_upward      = { 0xFFF8000000000002LL };
+-static const rounding_mode_struct mode_downward    = { 0xFFF8000000000003LL };
+-static const rounding_mode_struct mode_to_nearest  = { 0xFFF8000000000000LL };
+-static const rounding_mode_struct mode_toward_zero = { 0xFFF8000000000001LL };
++static const rounding_mode_struct mode_upward      = { (::boost::long_long_type)0xFFF8000000000002LL };
++static const rounding_mode_struct mode_downward    = { (::boost::long_long_type)0xFFF8000000000003LL };
++static const rounding_mode_struct mode_to_nearest  = { (::boost::long_long_type)0xFFF8000000000000LL };
++static const rounding_mode_struct mode_toward_zero = { (::boost::long_long_type)0xFFF8000000000001LL };
+ 
+ struct ppc_rounding_control
+ {

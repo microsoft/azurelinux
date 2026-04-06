@@ -1,0 +1,12 @@
+diff -up pydot-4.0.1/test/test_api.py.fixtest pydot-4.0.1/test/test_api.py
+--- pydot-4.0.1/test/test_api.py.fixtest	2025-09-15 13:09:52.218025892 -0400
++++ pydot-4.0.1/test/test_api.py	2025-09-15 13:10:11.394105096 -0400
+@@ -492,7 +492,7 @@ def test_node_parenting() -> None:
+ def test_quoting() -> None:
+     g = pydot.Dot()
+     g.add_node(pydot.Node("test", label=string.printable))
+-    data = g.create(format="jpe")
++    data = g.create(format="png")
+     assert len(data) > 0
+ 
+ 

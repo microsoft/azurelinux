@@ -1,0 +1,48 @@
+From a9ba72f6d194da60c05acd761a1679b8a5db1722 Mon Sep 17 00:00:00 2001
+From: Martin Tournoij <martin@arp242.net>
+Date: Fri, 19 Jan 2024 00:57:03 +0000
+Subject: [PATCH 3/6] Don't log battery level and dock status every minute
+
+My log files get completely clobbered by this; thousands of lines of:
+
+	Jan 18 18:14:44 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:15:39 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+	Jan 18 18:15:39 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:16:34 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+	Jan 18 18:16:34 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:17:29 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+	Jan 18 18:17:29 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:18:25 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+	Jan 18 18:18:25 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:19:20 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+	Jan 18 18:19:20 pulseaudio[29946]: [pulseaudio] backend-native.c: Dock Status: undocked
+	Jan 18 18:20:15 pulseaudio[29946]: [pulseaudio] backend-native.c: Battery Level: 50%
+
+This seems like it should be a debug log, not a notice.
+
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/810>
+---
+ src/modules/bluetooth/backend-native.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/modules/bluetooth/backend-native.c b/src/modules/bluetooth/backend-native.c
+index 263736ad4..569cc6d36 100644
+--- a/src/modules/bluetooth/backend-native.c
++++ b/src/modules/bluetooth/backend-native.c
+@@ -969,11 +969,11 @@ static void rfcomm_io_callback(pa_mainloop_api *io, pa_io_event *e, int fd, pa_i
+ 
+                     switch (key) {
+                         case 1:
+-                            pa_log_notice("Battery Level: %d0%%", val + 1);
++                            pa_log_debug("Battery Level: %d0%%", val + 1);
+                             pa_bluetooth_device_report_battery_level(t->device, (val + 1) * 10, "Apple accessory indication");
+                             break;
+                         case 2:
+-                            pa_log_notice("Dock Status: %s", val ? "docked" : "undocked");
++                            pa_log_debug("Dock Status: %s", val ? "docked" : "undocked");
+                             break;
+                         default:
+                             pa_log_debug("Unexpected IPHONEACCEV key %#x", key);
+-- 
+2.52.0
+

@@ -1,0 +1,11 @@
+--- fs-err-3.2.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fs-err-3.2.2/Cargo.toml	2026-01-27T12:49:14.879264+00:00
+@@ -75,7 +75,7 @@
+ default-features = false
+ 
+ [dev-dependencies.serde_json]
+-version = "=1.0.64"
++version = "1.0.64"
+ 
+ [build-dependencies.autocfg]
+ version = "1"

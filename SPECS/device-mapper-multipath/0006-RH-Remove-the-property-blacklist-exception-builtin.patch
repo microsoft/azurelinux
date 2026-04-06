@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 2 Jul 2014 12:49:53 -0500
+Subject: [PATCH] RH: Remove the property blacklist exception builtin
+
+Multipath set the default property blacklist exceptions to
+(ID_SCSI_VPD|ID_WWN).  This has the effect of blacklisting some internal
+devices.  These devices may never have multiple paths, but it is nice
+to be able to set multipath up on them all the same.  This patch simply
+removes the default, and makes it so that if no property
+blacklist_exception is given, then devices aren't failed for not matching
+it.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/blacklist.c      |  5 ++---
+ multipath/multipath.conf.5.in | 11 ++++++-----
+ tests/blacklist.c             |  7 ++-----
+ 3 files changed, 10 insertions(+), 13 deletions(-)
+
+diff --git a/libmultipath/blacklist.c b/libmultipath/blacklist.c
+index 17e1b54a..10d13e98 100644
+--- a/libmultipath/blacklist.c
++++ b/libmultipath/blacklist.c
+@@ -230,8 +230,6 @@ setup_default_blist (struct config * conf)
+ 			      ORIGIN_DEFAULT))
+ 			return 1;
+ 	}
+-	if (store_ble(conf->elist_property, "(SCSI_IDENT_|ID_WWN)", ORIGIN_DEFAULT))
+-		return 1;
+ 
+ 	vector_foreach_slot (conf->hwtable, hwe, i) {
+ 		if (hwe->bl_product) {
+@@ -438,7 +436,8 @@ filter_property(const struct config *conf, struct udev_device *udev,
+ 			*uid_attribute != '\0';
+ 		bool uid_attr_seen = false;
+ 
+-		r = MATCH_PROPERTY_BLIST_MISSING;
++		if (VECTOR_SIZE(conf->elist_property))
++			r = MATCH_PROPERTY_BLIST_MISSING;
+ 		udev_list_entry_foreach(list_entry,
+ 				udev_device_get_properties_list_entry(udev)) {
+ 
+diff --git a/multipath/multipath.conf.5.in b/multipath/multipath.conf.5.in
+index 4388baad..af9fbb96 100644
+--- a/multipath/multipath.conf.5.in
++++ b/multipath/multipath.conf.5.in
+@@ -1469,9 +1469,14 @@ keywords. Both are regular expressions. For a full description of these keywords
+ Regular expression for an udev property. All
+ devices that have matching udev properties will be excluded/included.
+ The handling of the \fIproperty\fR keyword is special,
+-because devices \fBmust\fR have at least one whitelisted udev property;
++because if a property blacklist_exception is set, devices \fBmust\fR have at
++least one whitelisted udev property;
+ otherwise they're treated as blacklisted, and the message
+ "\fIblacklisted, udev property missing\fR" is displayed in the logs.
++For example, setting the property blacklist_exception to
++\fB(SCSI_IDENT_|ID_WWN)\fR, will cause well-behaved SCSI devices and devices
++that provide a WWN (World Wide Number) to be included, and all others to be
++excluded. This works to exclude most non-multipathable devices.
+ .
+ .RS
+ .PP
+@@ -1482,10 +1487,6 @@ Blacklisting by missing properties is only applied to devices which do have the
+ property specified by \fIuid_attribute\fR (e.g. \fIID_SERIAL\fR)
+ set. Previously, it was applied to every device, possibly causing devices to be
+ blacklisted because of temporary I/O error conditions.
+-.PP
+-The default \fIblacklist exception\fR is: \fB(SCSI_IDENT_|ID_WWN)\fR, causing
+-well-behaved SCSI devices and devices that provide a WWN (World Wide Number)
+-to be included, and all others to be excluded.
+ .RE
+ .TP
+ .B protocol
+diff --git a/tests/blacklist.c b/tests/blacklist.c
+index ba8dfd07..693db3fa 100644
+--- a/tests/blacklist.c
++++ b/tests/blacklist.c
+@@ -384,9 +384,8 @@ static void test_property_missing(void **state)
+ {
+ 	static struct udev_device udev = { "sdb", { "ID_FOO", "ID_BAZ", "ID_BAR", "ID_SERIAL", NULL } };
+ 	conf.blist_property = blist_property_wwn;
+-	expect_condlog(3, "sdb: blacklisted, udev property missing\n");
+ 	assert_int_equal(filter_property(&conf, &udev, 3, "ID_SERIAL"),
+-			 MATCH_PROPERTY_BLIST_MISSING);
++			 MATCH_NOTHING);
+ 	assert_int_equal(filter_property(&conf, &udev, 3, "ID_BLAH"),
+ 			 MATCH_NOTHING);
+ 	assert_int_equal(filter_property(&conf, &udev, 3, ""),
+@@ -478,9 +477,7 @@ static void test_filter_path_missing1(void **state)
+ 	conf.blist_device = blist_device_foo_bar;
+ 	conf.blist_protocol = blist_protocol_fcp;
+ 	conf.blist_wwid = blist_wwid_xyzzy;
+-	expect_condlog(3, "sdb: blacklisted, udev property missing\n");
+-	assert_int_equal(filter_path(&conf, &miss1_pp),
+-			 MATCH_PROPERTY_BLIST_MISSING);
++	assert_int_equal(filter_path(&conf, &miss1_pp), MATCH_NOTHING);
+ }
+ 
+ /* This one matches the property whitelist, to test the other missing

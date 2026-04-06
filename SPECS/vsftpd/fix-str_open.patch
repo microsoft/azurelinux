@@ -1,0 +1,27 @@
+--- sysstr-orig.c	2022-07-27 09:44:52.606408000 +0200
++++ sysstr.c	2022-07-27 09:54:24.043081352 +0200
+@@ -74,19 +74,11 @@
+ int
+ str_open(const struct mystr* p_str, const enum EVSFSysStrOpenMode mode)
+ {
+-  enum EVSFSysUtilOpenMode open_mode = kVSFSysUtilOpenUnknown;
+-  switch (mode)
+-  {
+-    case kVSFSysStrOpenReadOnly:
+-      open_mode = kVSFSysUtilOpenReadOnly;
+-      break;
+-    case kVSFSysStrOpenUnknown:
+-      /* Fall through */
+-    default:
+-      bug("unknown mode value in str_open");
+-      break;
+-  }
+-  return vsf_sysutil_open_file(str_getbuf(p_str), open_mode);
++  if (mode == kVSFSysStrOpenReadOnly)
++    return vsf_sysutil_open_file(str_getbuf(p_str), kVSFSysUtilOpenReadOnly);
++
++  bug("unknown mode value in str_open");
++  return -1;
+ }
+ 
+ int

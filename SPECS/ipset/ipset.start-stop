@@ -1,0 +1,359 @@
+#!/bin/sh
+#
+# ipset      Start and stop ipset firewall sets
+#
+# config: /etc/sysconfig/ipset-config
+
+IPSET_BIN=/usr/sbin/ipset
+IPSET_CONFIG=/etc/sysconfig/ipset-config
+IPSET_DATA_COMPAT=/etc/sysconfig/ipset
+IPSET_DATA_COMPAT_BACKUP=${IPSET_DATA_COMPAT}.save
+IPSET_DATA_DIR=/etc/sysconfig/ipset.d
+IPSET_DATA_DIR_BACKUP=${IPSET_DATA_DIR}.save
+IPSET_DATA_SAVED_FLAG=${IPSET_DATA_DIR}/.saved
+IPSET_LOCK=/run/ipset.lock
+IPSET_RUN=/run/ipset.run
+CLEAN_FILES=""
+
+trap "rm -rf \${CLEAN_FILES}" EXIT
+
+info() {
+	echo "ipset: ${*}" >&2
+}
+
+warn() {
+	echo "<4>ipset: ${*}" >&2
+}
+
+err() {
+	echo "<3>ipset: ${*}" >&2
+}
+
+[ -x ${IPSET_BIN} ] || { err "Cannot execute ${IPSET_BIN}"; exit 1; }
+
+# Source ipset configuration
+# shellcheck source=ipset-config
+[ -f ${IPSET_CONFIG} ] && . ${IPSET_CONFIG}
+
+set -f
+
+lock() {
+	CLEAN_FILES="${CLEAN_FILES} ${IPSET_LOCK}"
+	until mkdir ${IPSET_LOCK} 2>/dev/null; do :; done
+}
+
+save() {
+	fail=0
+
+	# Make backups of existing configuration first, if any
+	[ -d ${IPSET_DATA_DIR} ] && mv -Tf ${IPSET_DATA_DIR} ${IPSET_DATA_DIR_BACKUP}
+	[ -f ${IPSET_DATA_COMPAT} ] && mv -Tf ${IPSET_DATA_COMPAT} ${IPSET_DATA_COMPAT_BACKUP}
+
+	rm -f ${IPSET_DATA_SAVED_FLAG}
+
+	# Save each set in a separate file
+	mkdir -p ${IPSET_DATA_DIR}
+	chmod 0700 ${IPSET_DATA_DIR}
+	IFS="
+"
+	for set in $(${IPSET_BIN} list -n -t); do
+		# Empty name allowed, use ".set" as suffix. 'ipset save' doesn't
+		# quote set names with spaces: if we have a space in the name,
+		# work around this by quoting it ourselves in the output.
+		# shellcheck disable=SC2003 # No POSIX equivalent to expr index
+		if expr index "${set}" " " >/dev/null; then
+			:> "${IPSET_DATA_DIR}/${set}.set"
+			for line in $(${IPSET_BIN} save "${set}"); do
+				create=0
+				echo "${line}" | grep -q "^create " && create=1
+				if [ $create -eq 1 ]; then
+					line=${line#create *}
+				else
+					line=${line#add *}
+				fi
+				line=${line#${set} *}
+				set="$(echo "${set}" | sed 's/"/\\"/g')"
+				if [ $create -eq 1 ]; then
+					echo "create \"${set}\" ${line}" >> "${IPSET_DATA_DIR}/${set}.set"
+				else
+					echo "add \"${set}\" ${line}" >> "${IPSET_DATA_DIR}/${set}.set"
+				fi
+			done
+		else
+			${IPSET_BIN} save "${set}" > "${IPSET_DATA_DIR}/${set}.set" || fail=1
+		fi
+		[ -f "${IPSET_DATA_DIR}/${set}.set" ] && chmod 600 "${IPSET_DATA_DIR}/${set}.set"
+		[ $fail -eq 1 ] && err "Cannot save set ${set}" && unset IFS && return 1
+	done
+	touch ${IPSET_DATA_SAVED_FLAG} || { unset IFS; return 1; }
+	unset IFS
+
+	# Done: remove backups
+	rm -rf ${IPSET_DATA_DIR_BACKUP}
+	rm -rf ${IPSET_DATA_COMPAT_BACKUP}
+
+	return 0
+}
+
+# Generate a grep regexp matching abbreviated command forms. E.g., for create:
+# \(c\|cr\|cre\|crea\|creat\|create\)
+cmd_short_expr() {
+	out=
+	cmd_len=1
+	while [ "${cmd_len}" -le "${#1}" ]; do
+		[ -z "${out}" ] && out='\(' || out="${out}"'\|'
+		# shellcheck disable=SC2003 # No POSIX equivalent to expr substr
+		out="${out}$(expr substr "${1}" 1 "${cmd_len}")"
+		cmd_len=$((cmd_len + 1))
+	done
+	echo "${out}"'\)'
+}
+
+ipset_restore() {
+	file="${1}"
+
+	retfile="$(mktemp -q /tmp/ipset.XXXXXX)"
+	CLEAN_FILES="${CLEAN_FILES} ${retfile}"
+
+	# If restore fails due to invalid lines, remove them and retry
+	while ! restore_err="$( (${IPSET_BIN} -f "${file}" -! restore 2>&1; echo $? >"${retfile}") | head -n1; exit "$(cat "${retfile}")" )"; do
+		warn "${restore_err}"
+		case ${restore_err#*: } in
+		"No command specified"*)
+			line="$(grep -m1 -n "^${restore_err##* }" "${file}")"
+			line="${line%:*}"
+			;;
+		"Missing second mandatory argument to command "*)
+			cmd="${restore_err##* }"
+			cmd_expr="$(cmd_short_expr "${cmd}")"
+			line="$(grep -n '^'"${cmd_expr}" "${file}" | grep -m1 -v '^[0-9]\+\:'"${cmd_expr}"'[[:blank:]]\+[^[:blank:]]\+[[:blank:]]\+[^[:blank:]]\+')"
+			line="${line%:*}"
+			;;
+		"Missing mandatory argument to command "*)
+			cmd="${restore_err##* }"
+			cmd_expr="$(cmd_short_expr "${cmd}")"
+			line="$(grep -n '^'"${cmd_expr}" "${file}" | grep -m1 -v '^[0-9]\+\:'"${cmd_expr}"'[[:blank:]]\+[^[:blank:]]\+')"
+			line="${line%:*}"
+			;;
+		"Command "*"is invalid in restore mode"*)
+			restore_err_cmd="${restore_err#*: }"
+			restore_err_cmd="${restore_err_cmd#*\`}"
+			restore_err_cmd="${restore_err_cmd%%\'*}"
+			cmd="${restore_err_cmd##* }"
+			cmd_expr="$(cmd_short_expr "${cmd}")"
+			line="$(grep -m1 -ne '^'"${cmd_expr}"'[[:blank:]]\+' -e '^'"${restore_err_cmd}"'$' "${file}")"
+			line="${line%:*}"
+			;;
+		"Error in line "*)
+			line="${restore_err%: *}"
+			line="${line##* }"
+			;;
+		*)
+			rm "${retfile}"
+			CLEAN_FILES="${CLEAN_FILES%* ${retfile}}"
+			return 1
+			;;
+		esac
+
+		[ -z "${line}" ] && return 1
+
+		warn "Skipped invalid entry: $(sed "${line}q;d" "${file}")"
+		sed -i -e "${line}d" "${file}"
+
+		[ -s "${file}" ] || return 1
+	done
+
+	rm "${retfile}"
+	CLEAN_FILES="${CLEAN_FILES%* ${retfile}}"
+}
+
+load() {
+	if [ -f ${IPSET_DATA_SAVED_FLAG} ]; then
+		# If we have a cleanly saved directory with all sets, we can
+		# delete any left-overs and use it
+		rm -rf ${IPSET_DATA_DIR_BACKUP}
+		rm -f ${IPSET_DATA_COMPAT_BACKUP}
+	else
+		# If sets weren't cleanly saved, restore from backups
+		[ -d ${IPSET_DATA_DIR_BACKUP} ] && rm -rf ${IPSET_DATA_DIR} && mv -Tf ${IPSET_DATA_DIR_BACKUP} ${IPSET_DATA_DIR}
+		[ -f ${IPSET_DATA_COMPAT_BACKUP} ] && rm -f ${IPSET_DATA_COMPAT} && mv -Tf ${IPSET_DATA_COMPAT_BACKUP} ${IPSET_DATA_COMPAT}
+	fi
+
+	if [ ! -d ${IPSET_DATA_DIR} ] && [ ! -f ${IPSET_DATA_COMPAT} ]; then
+		info "No existing configuration available, none loaded"
+		touch ${IPSET_RUN}
+		return
+	fi
+
+	# Merge all sets into temporary file
+	merged="$(mktemp -q /tmp/ipset.XXXXXX)"
+	CLEAN_FILES="${CLEAN_FILES} ${merged}"
+	chmod 600 "${merged}"
+	set +f
+	if [ -d ${IPSET_DATA_DIR} ]; then
+		# Copy create commands from each saved set first, then the rest:
+		# list:set entries depend on other sets, so make sure they all
+		# get created first
+		for f in "${IPSET_DATA_DIR}"/*; do
+			[ "${f}" = "${IPSET_DATA_DIR}/*" ] && break
+			[ -f "${f}" ] || continue
+			grep '^c' "${f}" >> "${merged}"
+		done
+		for f in "${IPSET_DATA_DIR}"/*; do
+			[ "${f}" = "${IPSET_DATA_DIR}/*" ] && break
+			[ -f "${f}" ] || continue
+			grep -v '^c' "${f}" >> "${merged}"
+		done
+	fi
+	set -f
+	[ -f ${IPSET_DATA_COMPAT} ] && cat ${IPSET_DATA_COMPAT} >> "${merged}"
+
+	# Drop sets that aren't in saved data, mark conflicts with existing sets
+	conflicts=""
+	IFS="
+"
+	for set in $(${IPSET_BIN} list -n -t); do
+		grep -q "^create ${set} " "${merged}" && conflicts="${conflicts}|${set}" && continue
+
+		# We can't destroy the set if it's in use, flush it instead
+		if ! ${IPSET_BIN} destroy "${set}" 2>/dev/null; then
+			${IPSET_BIN} flush "${set}"
+		fi
+	done
+	unset IFS
+	conflicts="${conflicts#|*}"
+
+	# Common case: if we have no conflicts, just restore in one shot
+	if [ -z "${conflicts}" ]; then
+		if ! ipset_restore "${merged}"; then
+			err "Failed to restore configured sets"
+			exit 1
+		fi
+		rm "${merged}"
+		CLEAN_FILES="${CLEAN_FILES%* ${merged}}"
+		touch ${IPSET_RUN}
+		return
+	fi
+
+	# Find a salt for md5sum that makes names of saved sets unique
+	salt=0
+	while true; do
+		unique=1
+		IFS="
+"
+		for set in $(${IPSET_BIN} list -n -t); do
+			if grep -q "^create $(echo "${salt}${set}" | md5sum | head -c31) " "${merged}"; then
+				unique=0
+				break
+			fi
+		done
+		unset IFS
+		[ ${unique} -eq 1 ] && break
+		salt=$((salt + 1))
+	done
+
+	# Add sets, mangling names for conflicting sets
+	mangled="$(mktemp -q /tmp/ipset.XXXXXX)"
+	CLEAN_FILES="${CLEAN_FILES} ${mangled}"
+	chmod 600 "${mangled}"
+
+	cat "${merged}" > "${mangled}"
+	IFS='|'
+	for set in ${conflicts}; do
+		new_name=$(echo "${salt}${set}" | md5sum | head -c31)
+		echo "s/^(add|create) $set /\1 $new_name /"
+	done | sed -i -r -f - "${mangled}"
+	unset IFS
+	if ! ipset_restore "${mangled}"; then
+		err "Failed to restore configured sets"
+		exit 1
+	fi
+
+	rm "${mangled}"
+	CLEAN_FILES="${CLEAN_FILES%* ${mangled}}"
+
+	# Swap and delete old sets
+	IFS='|'
+	for set in ${conflicts}; do
+		mangled="$(echo "${salt}${set}" | md5sum | head -c31)"
+		if ! ${IPSET_BIN} swap "${set}" "${mangled}" 2>/dev/null; then
+			# This fails if set types are different: try to destroy
+			# existing set
+			if ! ${IPSET_BIN} destroy "${set}" 2>/dev/null; then
+				# Conflicting set is in use, we can only warn
+				# and flush the existing set
+				err "Cannot load set \"${set}\", set with same name and conflicting type in use"
+				${IPSET_BIN} flush "${set}"
+				${IPSET_BIN} destroy "${mangled}"
+			else
+				${IPSET_BIN} rename "${mangled}" "${set}"
+			fi
+		else
+			${IPSET_BIN} destroy "${mangled}"
+		fi
+	done
+	unset IFS
+
+	rm "${merged}"
+	CLEAN_FILES="${CLEAN_FILES%* ${merged}}"
+	touch ${IPSET_RUN}
+}
+
+cleanup() {
+	${IPSET_BIN} flush || err "Failed to flush sets"
+
+	# Try to destroy all sets at once. This will fail if some are in use,
+	# destroy all the other ones in that case
+	${IPSET_BIN} destroy 2>/dev/null && return
+	IFS="
+"
+	for set in $(${IPSET_BIN} list -n -t); do
+		if ! ${IPSET_BIN} destroy "${set}"; then
+			err "Failed to destroy set ${set}"
+		fi
+	done
+	unset IFS
+}
+
+stop() {
+	[ -f ${IPSET_RUN} ] || { info "Not running"; return 0; }
+	[ "${IPSET_SAVE_ON_STOP}" = "yes" ] && { save || err "Failed to save sets"; }
+
+	# Nothing to stop if the ip_set module is not loaded
+	lsmod | grep -q "^ip_set " || { info "Not running"; rm ${IPSET_RUN}; return 0; }
+
+	# If the xt_set module is in use, then iptables is using ipset, so
+	# refuse to stop the service
+	if mod="$(lsmod | grep ^xt_set)"; then
+		if [ "$(echo "${mod}" | tr -s ' ' | cut -d' ' -f3)" != "0" ]; then
+			err "Current iptables configuration requires ipset" && return 1
+		fi
+	fi
+
+	cleanup
+
+	rm ${IPSET_RUN}
+	return 0
+}
+
+lock
+case "$1" in
+start)
+	load
+	;;
+stop)
+	stop
+	;;
+reload)
+	cleanup
+	load
+	;;
+save)
+	save
+	;;
+*)
+	info "Usage: $0 {start|stop|reload|save}"
+	exit 1
+esac
+
+exit $?

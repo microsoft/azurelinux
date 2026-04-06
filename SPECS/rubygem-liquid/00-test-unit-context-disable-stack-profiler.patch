@@ -1,0 +1,59 @@
+From 8e6e8d1ab24bb42d87f4b5493be10d42ce679db3 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 9 Mar 2019 20:38:31 +0100
+Subject: [PATCH] test/unit/context: disable stack profiler
+
+
+diff --git a/test/unit/context_unit_test.rb b/test/unit/context_unit_test.rb
+index d9bfedb1..2ba51c65 100644
+--- a/test/unit/context_unit_test.rb
++++ b/test/unit/context_unit_test.rb
+@@ -446,12 +446,12 @@ class ContextUnitTest < Minitest::Test
+     assert_equal @context, @context['category'].context
+   end
+ 
+-  def test_interrupt_avoids_object_allocations
+-    @context.interrupt? # ruby 3.0.0 allocates on the first call
+-    assert_no_object_allocations do
+-      @context.interrupt?
+-    end
+-  end
++  # def test_interrupt_avoids_object_allocations
++  #   @context.interrupt? # ruby 3.0.0 allocates on the first call
++  #   assert_no_object_allocations do
++  #     @context.interrupt?
++  #   end
++  # end
+ 
+   def test_context_initialization_with_a_proc_in_environment
+     contx = Context.new([test: ->(c) { c['poutine'] }], { test: :foo })
+@@ -476,15 +476,15 @@ class ContextUnitTest < Minitest::Test
+ 
+   private
+ 
+-  def assert_no_object_allocations
+-    unless RUBY_ENGINE == 'ruby'
+-      skip "stackprof needed to count object allocations"
+-    end
+-    require 'stackprof'
+-
+-    profile = StackProf.run(mode: :object) do
+-      yield
+-    end
+-    assert_equal 0, profile[:samples]
+-  end
++#  def assert_no_object_allocations
++#    unless RUBY_ENGINE == 'ruby'
++#      skip "stackprof needed to count object allocations"
++#    end
++#    require 'stackprof'
++
++#    profile = StackProf.run(mode: :object) do
++#      yield
++#    end
++#    assert_equal 0, profile[:samples]
++#  end
+ end # ContextTest
+-- 
+2.47.1
+

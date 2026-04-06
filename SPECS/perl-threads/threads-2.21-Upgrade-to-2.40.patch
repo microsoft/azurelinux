@@ -1,0 +1,956 @@
+From eccb4c8b9d51bca62104bf80839572c2b5a31caa Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Fri, 3 May 2024 12:09:37 +0200
+Subject: [PATCH] Upgrade to 2.40
+
+---
+ lib/threads.pm    |   53 +-
+ t/libc.t          |    3 +
+ t/pod.t           |   87 ---
+ t/stack.t         |   82 ++-
+ t/stack_env.t     |   46 +-
+ t/test.pl         | 1749 ---------------------------------------------
+ t/thread.t        |    4 +-
+ t/version.t       |   31 +
+ threads.h         |   31 -
+ threads.xs        |  142 ++--
+ 29 files changed, 265 insertions(+), 214 deletions(-)
+ delete mode 100755 t/pod.t
+ create mode 100644 t/version.t
+
+diff --git a/lib/threads.pm b/lib/threads.pm
+index 2eb926a..471ceec 100644
+--- a/lib/threads.pm
++++ b/lib/threads.pm
+@@ -5,9 +5,9 @@ use 5.008;
+ use strict;
+ use warnings;
+ 
+-our $VERSION = '2.21';      # remember to update version in POD!
++our $VERSION = '2.40';      # remember to update version in POD!
+ my $XS_VERSION = $VERSION;
+-$VERSION = eval $VERSION;
++#$VERSION = eval $VERSION;
+ 
+ # Verify this Perl supports threads
+ require Config;
+@@ -134,13 +134,13 @@ threads - Perl interpreter-based threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads version 2.21
++This document describes threads version 2.40
+ 
+ =head1 WARNING
+ 
+ The "interpreter-based threads" provided by Perl are not the fast, lightweight
+ system for multitasking that one might expect or hope for.  Threads are
+-implemented in a way that make them easy to misuse.  Few people know how to
++implemented in a way that makes them easy to misuse.  Few people know how to
+ use them correctly or will be able to provide help.
+ 
+ The use of interpreter-based threads in perl is officially
+@@ -914,7 +914,7 @@ C<-E<gt>import()>) after any threads are started, and in such a way that no
+ other threads are started afterwards.
+ 
+ If the above does not work, or is not adequate for your application, then file
+-a bug report on L<http://rt.cpan.org/Public/> against the problematic module.
++a bug report on L<https://rt.cpan.org/Public/> against the problematic module.
+ 
+ =item Memory consumption
+ 
+@@ -937,6 +937,33 @@ C<chdir()>) will affect all the threads in the application.
+ On MSWin32, each thread maintains its own the current working directory
+ setting.
+ 
++=item Locales
++
++Prior to Perl 5.28, locales could not be used with threads, due to various
++race conditions.  Starting in that release, on systems that implement
++thread-safe locale functions, threads can be used, with some caveats.
++This includes Windows starting with Visual Studio 2005, and systems compatible
++with POSIX 2008.  See L<perllocale/Multi-threaded operation>.
++
++Each thread (except the main thread) is started using the C locale.  The main
++thread is started like all other Perl programs; see L<perllocale/ENVIRONMENT>.
++You can switch locales in any thread as often as you like.
++
++If you want to inherit the parent thread's locale, you can, in the parent, set
++a variable like so:
++
++    $foo = POSIX::setlocale(LC_ALL, NULL);
++
++and then pass to threads->create() a sub that closes over C<$foo>.  Then, in
++the child, you say
++
++    POSIX::setlocale(LC_ALL, $foo);
++
++Or you can use the facilities in L<threads::shared> to pass C<$foo>;
++or if the environment hasn't changed, in the child, do
++
++    POSIX::setlocale(LC_ALL, "");
++
+ =item Environment variables
+ 
+ Currently, on all platforms except MSWin32, all I<system> calls (e.g., using
+@@ -999,7 +1026,7 @@ signalling behavior is only in effect in the following situations:
+ 
+ =over 4
+ 
+-=item * Perl has been built with C<PERL_OLD_SIGNALS> (see C<perl -V>).
++=item * Perl has been built with C<PERL_OLD_SIGNALS> (see S<C<perl -V>>).
+ 
+ =item * The environment variable C<PERL_SIGNALS> is set to C<unsafe>
+ (see L<perlrun/"PERL_SIGNALS">).
+@@ -1063,7 +1090,7 @@ determine whether your system supports it.
+ 
+ In prior perl versions, spawning threads with open directory handles would
+ crash the interpreter.
+-L<[perl #75154]|http://rt.perl.org/rt3/Public/Bug/Display.html?id=75154>
++L<[perl #75154]|https://rt.perl.org/rt3/Public/Bug/Display.html?id=75154>
+ 
+ =item Detached threads and global destruction
+ 
+@@ -1091,8 +1118,8 @@ unreferenced scalars.  However, such warnings are harmless, and may safely be
+ ignored.
+ 
+ You can search for L<threads> related bug reports at
+-L<http://rt.cpan.org/Public/>.  If needed submit any new bugs, problems,
+-patches, etc. to: L<http://rt.cpan.org/Public/Dist/Display.html?Name=threads>
++L<https://rt.cpan.org/Public/>.  If needed submit any new bugs, problems,
++patches, etc. to: L<https://rt.cpan.org/Public/Dist/Display.html?Name=threads>
+ 
+ =back
+ 
+@@ -1110,14 +1137,14 @@ L<https://github.com/Dual-Life/threads>
+ 
+ L<threads::shared>, L<perlthrtut>
+ 
+-L<http://www.perl.com/pub/a/2002/06/11/threads.html> and
+-L<http://www.perl.com/pub/a/2002/09/04/threads.html>
++L<https://www.perl.com/pub/a/2002/06/11/threads.html> and
++L<https://www.perl.com/pub/a/2002/09/04/threads.html>
+ 
+ Perl threads mailing list:
+-L<http://lists.perl.org/list/ithreads.html>
++L<https://lists.perl.org/list/ithreads.html>
+ 
+ Stack size discussion:
+-L<http://www.perlmonks.org/?node_id=532956>
++L<https://www.perlmonks.org/?node_id=532956>
+ 
+ Sample code in the I<examples> directory of this distribution on CPAN.
+ 
+diff --git a/t/libc.t b/t/libc.t
+index 4f6f6ed..592b8d3
+--- a/t/libc.t
++++ b/t/libc.t
+@@ -9,6 +9,9 @@ BEGIN {
+         skip_all(q/Perl not compiled with 'useithreads'/);
+     }
+ 
++    # Guard against bugs that result in deadlock
++    watchdog(1 * 60);
++
+     plan(11);
+ }
+ 
+diff --git a/t/pod.t b/t/pod.t
+deleted file mode 100755
+index 390f7e2..0000000
+--- a/t/pod.t
++++ /dev/null
+@@ -1,87 +0,0 @@
+-use strict;
+-use warnings;
+-
+-use Test::More;
+-if ($ENV{RUN_MAINTAINER_TESTS}) {
+-    plan 'tests' => 3;
+-} else {
+-    plan 'skip_all' => 'Module maintainer tests';
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Pod 1.26; 1') {
+-        skip('Test::Pod 1.26 required for testing POD', 1);
+-    }
+-
+-    pod_file_ok('lib/threads.pm');
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Pod::Coverage 1.08; 1') {
+-        skip('Test::Pod::Coverage 1.08 required for testing POD coverage', 1);
+-    }
+-
+-    pod_coverage_ok('threads',
+-                    {
+-                        'trustme' => [
+-                            qr/^new$/,
+-                            qr/^exit$/,
+-                            qr/^async$/,
+-                            qr/^\(/,
+-                            qr/^(all|running|joinable)$/,
+-                        ],
+-                        'private' => [
+-                            qr/^import$/,
+-                            qr/^DESTROY$/,
+-                            qr/^bootstrap$/,
+-                        ]
+-                    }
+-    );
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Spelling; 1') {
+-        skip('Test::Spelling required for testing POD spelling', 1);
+-    }
+-    if (system('aspell help >/dev/null 2>&1')) {
+-        skip(q/'aspell' required for testing POD spelling/, 1);
+-    }
+-    set_spell_cmd('aspell list --lang=en');
+-    add_stopwords(<DATA>);
+-    pod_file_spelling_ok('lib/threads.pm', 'thread.pm spelling');
+-    unlink("/home/$ENV{'USER'}/en.prepl", "/home/$ENV{'USER'}/en.pws");
+-}
+-
+-exit(0);
+-
+-__DATA__
+-
+-API
+-async
+-cpan
+-MSWin32
+-pthreads
+-SIGTERM
+-TID
+-Config.pm
+-
+-Hedden
+-Artur
+-Soderberg
+-crystalflame
+-brecon
+-netrus
+-Rocco
+-Caputo
+-netrus
+-vipul
+-Ved
+-Prakash
+-presicient
+-
+-okay
+-unjoinable
+-incrementing
+-
+-MetaCPAN
+-__END__
+diff --git a/t/stack.t b/t/stack.t
+index cfd6cf7..0dcc947
+--- a/t/stack.t
++++ b/t/stack.t
+@@ -9,6 +9,20 @@ BEGIN {
+     }
+ }
+ 
++my $frame_size;
++my $frames;
++my $size;
++
++BEGIN {
++    # XXX Note that if the default stack size happens to be the same as these
++    # numbers, that test 2 would return success just out of happenstance.
++    # This possibility could be lessened by choosing $frames to be something
++    # less likely than a power of 2
++    $frame_size = 4096;
++    $frames     = 128;
++    $size       = $frames * $frame_size;
++}
++
+ use ExtUtils::testlib;
+ 
+ sub ok {
+@@ -25,77 +39,101 @@ sub ok {
+     return ($ok);
+ }
+ 
++sub is {
++    my ($id, $got, $expected, $name) = @_;
++
++    my $ok = ok($id, $got == $expected, $name);
++    if (! $ok) {
++        print("     GOT: $got\n");
++        print("EXPECTED: $expected\n");
++    }
++
++    return ($ok);
++}
++
+ BEGIN {
+     $| = 1;
+     print("1..18\n");   ### Number of tests that will be run ###
+ };
+ 
+-use threads ('stack_size' => 128*4096);
++use threads ('stack_size' => $size);
+ ok(1, 1, 'Loaded');
+ 
+ ### Start of Testing ###
+ 
+-ok(2, threads->get_stack_size() == 128*4096,
+-        'Stack size set in import');
+-ok(3, threads->set_stack_size(160*4096) == 128*4096,
++my $actual_size = threads->get_stack_size();
++
++{
++    if ($actual_size > $size) {
++        print("ok 2 # skip because system needs larger minimum stack size\n");
++        $size = $actual_size;
++    }
++    else {
++        is(2, $actual_size, $size, 'Stack size set in import');
++    }
++}
++
++my $size_plus_quarter = $size * 1.25;   # 128 frames map to 160
++is(3, threads->set_stack_size($size_plus_quarter), $size,
+         'Set returns previous value');
+-ok(4, threads->get_stack_size() == 160*4096,
++is(4, threads->get_stack_size(), $size_plus_quarter,
+         'Get stack size');
+ 
+ threads->create(
+     sub {
+-        ok(5, threads->get_stack_size() == 160*4096,
++        is(5, threads->get_stack_size(), $size_plus_quarter,
+                 'Get stack size in thread');
+-        ok(6, threads->self()->get_stack_size() == 160*4096,
++        is(6, threads->self()->get_stack_size(), $size_plus_quarter,
+                 'Thread gets own stack size');
+-        ok(7, threads->set_stack_size(128*4096) == 160*4096,
++        is(7, threads->set_stack_size($size), $size_plus_quarter,
+                 'Thread changes stack size');
+-        ok(8, threads->get_stack_size() == 128*4096,
++        is(8, threads->get_stack_size(), $size,
+                 'Get stack size in thread');
+-        ok(9, threads->self()->get_stack_size() == 160*4096,
++        is(9, threads->self()->get_stack_size(), $size_plus_quarter,
+                 'Thread stack size unchanged');
+     }
+ )->join();
+ 
+-ok(10, threads->get_stack_size() == 128*4096,
++is(10, threads->get_stack_size(), $size,
+         'Default thread sized changed in thread');
+ 
+ threads->create(
+-    { 'stack' => 160*4096 },
++    { 'stack' => $size_plus_quarter },
+     sub {
+-        ok(11, threads->get_stack_size() == 128*4096,
++        is(11, threads->get_stack_size(), $size,
+                 'Get stack size in thread');
+-        ok(12, threads->self()->get_stack_size() == 160*4096,
++        is(12, threads->self()->get_stack_size(), $size_plus_quarter,
+                 'Thread gets own stack size');
+     }
+ )->join();
+ 
+-my $thr = threads->create( { 'stack' => 160*4096 }, sub { } );
++my $thr = threads->create( { 'stack' => $size_plus_quarter }, sub { } );
+ 
+ $thr->create(
+     sub {
+-        ok(13, threads->get_stack_size() == 128*4096,
++        is(13, threads->get_stack_size(), $size,
+                 'Get stack size in thread');
+-        ok(14, threads->self()->get_stack_size() == 160*4096,
++        is(14, threads->self()->get_stack_size(), $size_plus_quarter,
+                 'Thread gets own stack size');
+     }
+ )->join();
+ 
++my $size_plus_eighth  = $size * 1.125;  # 128 frames map to 144
+ $thr->create(
+-    { 'stack' => 144*4096 },
++    { 'stack' => $size_plus_eighth },
+     sub {
+-        ok(15, threads->get_stack_size() == 128*4096,
++        is(15, threads->get_stack_size(), $size,
+                 'Get stack size in thread');
+-        ok(16, threads->self()->get_stack_size() == 144*4096,
++        is(16, threads->self()->get_stack_size(), $size_plus_eighth,
+                 'Thread gets own stack size');
+-        ok(17, threads->set_stack_size(160*4096) == 128*4096,
++        is(17, threads->set_stack_size($size_plus_quarter), $size,
+                 'Thread changes stack size');
+     }
+ )->join();
+ 
+ $thr->join();
+ 
+-ok(18, threads->get_stack_size() == 160*4096,
++is(18, threads->get_stack_size(), $size_plus_quarter,
+         'Default thread sized changed in thread');
+ 
+ exit(0);
+diff --git a/t/stack_env.t b/t/stack_env.t
+index e36812f..fdb38cc
+--- a/t/stack_env.t
++++ b/t/stack_env.t
+@@ -25,11 +25,36 @@ sub ok {
+     return ($ok);
+ }
+ 
++sub is {
++    my ($id, $got, $expected, $name) = @_;
++
++    my $ok = ok($id, $got == $expected, $name);
++    if (! $ok) {
++        print("     GOT: $got\n");
++        print("EXPECTED: $expected\n");
++    }
++
++    return ($ok);
++}
++
++my $frame_size;
++my $frames;
++my $size;
++
+ BEGIN {
+     $| = 1;
+     print("1..4\n");   ### Number of tests that will be run ###
+ 
+-    $ENV{'PERL5_ITHREADS_STACK_SIZE'} = 128*4096;
++    # XXX Note that if the default stack size happens to be the same as these
++    # numbers, that test 2 would return success just out of happenstance.
++    # This possibility could be lessened by choosing $frames to be something
++    # less likely than a power of 2
++
++    $frame_size = 4096;
++    $frames     = 128;
++    $size       = $frames * $frame_size;
++
++    $ENV{'PERL5_ITHREADS_STACK_SIZE'} = $size;
+ };
+ 
+ use threads;
+@@ -37,11 +62,22 @@ ok(1, 1, 'Loaded');
+ 
+ ### Start of Testing ###
+ 
+-ok(2, threads->get_stack_size() == 128*4096,
+-        '$ENV{PERL5_ITHREADS_STACK_SIZE}');
+-ok(3, threads->set_stack_size(144*4096) == 128*4096,
++my $actual_size = threads->get_stack_size();
++
++{
++    if ($actual_size > $size) {
++        print("ok 2 # skip because system needs larger minimum stack size\n");
++        $size = $actual_size;
++    }
++    else {
++        is(2, $actual_size, $size, '$ENV{PERL5_ITHREADS_STACK_SIZE}');
++    }
++}
++
++my $size_plus_eighth = $size * 1.125;   # 128 frames map to 144
++is(3, threads->set_stack_size($size_plus_eighth), $size,
+         'Set returns previous value');
+-ok(4, threads->get_stack_size() == 144*4096,
++is(4, threads->get_stack_size(), $size_plus_eighth,
+         'Get stack size');
+ 
+ exit(0);
+diff --git a/t/thread.t b/t/thread.t
+index 4dc1a29..8a56bb6
+--- a/t/thread.t
++++ b/t/thread.t
+@@ -11,6 +11,7 @@ BEGIN {
+ }
+ 
+ use ExtUtils::testlib;
++use Data::Dumper;
+ 
+ use threads;
+ 
+@@ -156,7 +157,8 @@ package main;
+     rand(10);
+     threads->create( sub { $rand{int(rand(10000000000))}++ } ) foreach 1..25;
+     $_->join foreach threads->list;
+-    ok((keys %rand >= 23), "Check that rand() is randomized in new threads");
++    ok((keys %rand >= 23), "Check that rand() is randomized in new threads")
++        or diag Dumper(\%rand);
+ }
+ 
+ # bugid #24165
+diff --git a/t/version.t b/t/version.t
+new file mode 100644
+index 0000000..fb91309
+--- /dev/null
++++ b/t/version.t
+@@ -0,0 +1,31 @@
++use strict;
++use warnings;
++use Test::More;
++
++BEGIN {
++    use Config;
++    if (! $Config{'useithreads'}) {
++        print("1..0 # SKIP Perl not compiled with 'useithreads'\n");
++        exit(0);
++    }
++}
++
++use threads;
++
++# test that the version documented in threads.pm pod matches
++# that of the code.
++
++open my $fh, "<", $INC{"threads.pm"}
++    or die qq(Failed to open '$INC{"threads.pm"}': $!);
++my $file= do { local $/; <$fh> };
++close $fh;
++my $pod_version = 0; 
++if ($file=~/This document describes threads version (\d.\d+)/) {
++    $pod_version = $1;
++}
++is($pod_version, $threads::VERSION, 
++   "Check that pod and \$threads::VERSION match");
++done_testing();
++
++
++    
+diff --git a/threads.h b/threads.h
+index bdfab49..e69de29 100644
+--- a/threads.h
++++ b/threads.h
+@@ -1,31 +0,0 @@
+-#ifndef _THREADS_H_
+-#define _THREADS_H_
+-
+-/* Needed for 5.8.0 */
+-#ifndef CLONEf_JOIN_IN
+-#  define CLONEf_JOIN_IN        8
+-#endif
+-#ifndef SAVEBOOL
+-#  define SAVEBOOL(a)
+-#endif
+-
+-/* Added in 5.11.x */
+-#ifndef G_WANT
+-#  define G_WANT                (128|1)
+-#endif
+-
+-/* Added in 5.24.x */
+-#ifndef PERL_TSA_RELEASE
+-#  define PERL_TSA_RELEASE(x)
+-#endif
+-#ifndef PERL_TSA_EXCLUDES
+-#  define PERL_TSA_EXCLUDES(x)
+-#endif
+-#ifndef CLANG_DIAG_IGNORE
+-#  define CLANG_DIAG_IGNORE(x)
+-#endif
+-#ifndef CLANG_DIAG_RESTORE
+-#  define CLANG_DIAG_RESTORE
+-#endif
+-
+-#endif
+diff --git a/threads.xs b/threads.xs
+index 4e9e31f..b128f53 100644
+--- a/threads.xs
++++ b/threads.xs
+@@ -1,32 +1,22 @@
+ #define PERL_NO_GET_CONTEXT
+-/* Workaround for mingw 32-bit compiler by mingw-w64.sf.net - has to come before any #include.
+- * It also defines USE_NO_MINGW_SETJMP_TWO_ARGS for the mingw.org 32-bit compilers ... but
+- * that's ok as that compiler makes no use of that symbol anyway */
+-#if defined(WIN32) && defined(__MINGW32__) && !defined(__MINGW64__)
+-#  define USE_NO_MINGW_SETJMP_TWO_ARGS 1
+-#endif
++/* Tell XSUB.h not to redefine common functions. Its setjmp() override has a
++ * circular definition in Perls < 5.40. */
++#define NO_XSLOCKS
++
+ #include "EXTERN.h"
+ #include "perl.h"
+ #include "XSUB.h"
+-/* Workaround for XSUB.h bug under WIN32 */
+-#ifdef WIN32
+-#  undef setjmp
+-#  if defined(USE_NO_MINGW_SETJMP_TWO_ARGS) || (!defined(__BORLANDC__) && !defined(__MINGW64__))
+-#    define setjmp(x) _setjmp(x)
+-#  endif
+-#  if defined(__MINGW64__)
+-#    define setjmp(x) _setjmpex((x), mingw_getsp())
+-#  endif
+-#endif
+-#ifdef HAS_PPPORT_H
+-#  define NEED_PL_signals
+-#  define NEED_sv_2pv_flags
+-#  include "ppport.h"
+-#  include "threads.h"
+-#endif
++
++#define NEED_PL_signals
++#define NEED_sv_2pv_flags
++#include "ppport.h"
++#include "threads.h"
+ #ifndef sv_dup_inc
+ #  define sv_dup_inc(s,t) SvREFCNT_inc(sv_dup(s,t))
+ #endif
++#ifndef SvREFCNT_dec_NN
++#  define SvREFCNT_dec_NN(x)  SvREFCNT_dec(x)
++#endif
+ #ifndef PERL_UNUSED_RESULT
+ #  if defined(__GNUC__) && defined(HASATTRIBUTE_WARN_UNUSED_RESULT)
+ #    define PERL_UNUSED_RESULT(v) STMT_START { __typeof__(v) z = (v); (void)sizeof(z); } STMT_END
+@@ -91,8 +81,8 @@ typedef perl_os_thread pthread_t;
+ typedef struct _ithread {
+     struct _ithread *next;      /* Next thread in the list */
+     struct _ithread *prev;      /* Prev thread in the list */
+-    PerlInterpreter *interp;    /* The threads interpreter */
+-    UV tid;                     /* Threads module's thread id */
++    PerlInterpreter *interp;    /* The thread's interpreter */
++    UV tid;                     /* Thread's module's thread id */
+     perl_mutex mutex;           /* Mutex for updating things in this struct */
+     int count;                  /* Reference count. See S_ithread_create. */
+     int state;                  /* Detached, joined, finished, etc. */
+@@ -241,18 +231,31 @@ S_ithread_clear(pTHX_ ithread *thread)
+     S_block_most_signals(&origmask);
+ #endif
+ 
++#if PERL_VERSION_GE(5, 37, 5)
++    int save_veto = PL_veto_switch_non_tTHX_context;
++#endif
++
+     interp = thread->interp;
+     if (interp) {
+         dTHXa(interp);
+ 
++        /* We will pretend to be a thread that we are not by switching tTHX,
++         * which doesn't work with things that don't rely on tTHX during
++         * tear-down, as they will tend to rely on a mapping from the tTHX
++         * structure, and that structure is being destroyed. */
++#if PERL_VERSION_GE(5, 37, 5)
++        PL_veto_switch_non_tTHX_context = true;
++#endif
++
+         PERL_SET_CONTEXT(interp);
++
+         S_ithread_set(aTHX_ thread);
+ 
+         SvREFCNT_dec(thread->params);
+         thread->params = NULL;
+ 
+         if (thread->err) {
+-            SvREFCNT_dec(thread->err);
++            SvREFCNT_dec_NN(thread->err);
+             thread->err = Nullsv;
+         }
+ 
+@@ -262,6 +265,10 @@ S_ithread_clear(pTHX_ ithread *thread)
+     }
+ 
+     PERL_SET_CONTEXT(aTHX);
++#if PERL_VERSION_GE(5, 37, 5)
++    PL_veto_switch_non_tTHX_context = save_veto;
++#endif
++
+ #ifdef THREAD_SIGNAL_BLOCKING
+     S_set_sigmask(&origmask);
+ #endif
+@@ -421,7 +428,7 @@ STATIC const MGVTBL ithread_vtbl = {
+     ithread_mg_free,    /* free */
+     0,                  /* copy */
+     ithread_mg_dup,     /* dup */
+-#if (PERL_VERSION > 8) || (PERL_VERSION == 8 && PERL_SUBVERSION > 8)
++#if PERL_VERSION_GT(5,8,8)
+     0                   /* local */
+ #endif
+ };
+@@ -525,11 +532,11 @@ S_jmpenv_run(pTHX_ int action, ithread *thread,
+     return jmp_rc;
+ }
+ 
+-
+ /* Starts executing the thread.
+  * Passed as the C level function to run in the new thread.
+  */
+ #ifdef WIN32
++PERL_STACK_REALIGN
+ STATIC THREAD_RET_TYPE
+ S_ithread_run(LPVOID arg)
+ #else
+@@ -580,6 +587,8 @@ S_ithread_run(void * arg)
+     S_set_sigmask(&thread->initial_sigmask);
+ #endif
+ 
++    thread_locale_init();
++
+     PL_perl_destruct_level = 2;
+ 
+     {
+@@ -588,16 +597,26 @@ S_ithread_run(void * arg)
+         int ii;
+         int jmp_rc;
+ 
+-        dSP;
++#ifdef PERL_RC_STACK
++        assert(rpp_stack_is_rc());
++#endif
++
+         ENTER;
+         SAVETMPS;
+ 
+         /* Put args on the stack */
+-        PUSHMARK(SP);
++        PUSHMARK(PL_stack_sp);
+         for (ii=0; ii < len; ii++) {
+-            XPUSHs(av_shift(params));
++            SV *sv = av_shift(params);
++#ifdef PERL_RC_STACK
++            rpp_xpush_1(sv);
++#else
++            /* temporary workaround until rpp_* are in ppport.h */
++            dSP;
++            XPUSHs(sv);
++            PUTBACK;
++#endif
+         }
+-        PUTBACK;
+ 
+         jmp_rc = S_jmpenv_run(aTHX_ 0, thread, &len, &exit_app, &exit_code);
+ 
+@@ -610,12 +629,17 @@ S_ithread_run(void * arg)
+ #endif
+ 
+         /* Remove args from stack and put back in params array */
+-        SPAGAIN;
+         for (ii=len-1; ii >= 0; ii--) {
+-            SV *sv = POPs;
++            SV *sv = *PL_stack_sp;
+             if (jmp_rc == 0 && (thread->gimme & G_WANT) != G_VOID) {
+                 av_store(params, ii, SvREFCNT_inc(sv));
+             }
++#ifdef PERL_RC_STACK
++            rpp_popfree_1();
++#else
++            /* temporary workaround until rpp_* are in ppport.h */
++            PL_stack_sp--;
++#endif
+         }
+ 
+         FREETMPS;
+@@ -665,6 +689,8 @@ S_ithread_run(void * arg)
+     MUTEX_UNLOCK(&thread->mutex);
+     MUTEX_UNLOCK(&MY_POOL.create_destruct_mutex);
+ 
++    thread_locale_term();
++
+     /* Exit application if required */
+     if (exit_app) {
+         (void)S_jmpenv_run(aTHX_ 2, thread, NULL, &exit_app, &exit_code);
+@@ -672,7 +698,7 @@ S_ithread_run(void * arg)
+     }
+ 
+     /* At this point, the interpreter may have been freed, so call
+-     * free in the the context of of the 'main' interpreter which
++     * free in the context of the 'main' interpreter which
+      * can't have been freed due to the veto_cleanup mechanism.
+      */
+     aTHX = MY_POOL.main_thread.interp;
+@@ -747,7 +773,7 @@ S_ithread_create(
+     AV          *params;
+     SV          **array;
+ 
+-#if PERL_VERSION <= 8 && PERL_SUBVERSION <= 7
++#if PERL_VERSION_LE(5,8,7)
+     SV         **tmps_tmp = PL_tmps_stack;
+     IV           tmps_ix  = PL_tmps_ix;
+ #endif
+@@ -770,7 +796,8 @@ S_ithread_create(
+           int fd = PerlIO_fileno(Perl_error_log);
+           if (fd >= 0) {
+             /* If there's no error_log, we cannot scream about it missing. */
+-            PERL_UNUSED_RESULT(PerlLIO_write(fd, PL_no_mem, strlen(PL_no_mem)));
++            static const char oomp[] = "Out of memory in perl:threads:ithread_create\n";
++            PERL_UNUSED_RESULT(PerlLIO_write(fd, oomp, sizeof oomp - 1));
+           }
+         }
+         my_exit(1);
+@@ -803,6 +830,7 @@ S_ithread_create(
+     thread->gimme = gimme;
+     thread->state = exit_opt;
+ 
++
+     /* "Clone" our interpreter into the thread's interpreter.
+      * This gives thread access to "static data" and code.
+      */
+@@ -845,7 +873,7 @@ S_ithread_create(
+      * context for the duration of our work for new interpreter.
+      */
+     {
+-#if (PERL_VERSION > 13) || (PERL_VERSION == 13 && PERL_SUBVERSION > 1)
++#if PERL_VERSION_GE(5,13,2)
+         CLONE_PARAMS *clone_param = Perl_clone_params_new(aTHX, thread->interp);
+ #else
+         CLONE_PARAMS clone_param_s;
+@@ -855,7 +883,7 @@ S_ithread_create(
+ 
+         MY_CXT_CLONE;
+ 
+-#if (PERL_VERSION < 13) || (PERL_VERSION == 13 && PERL_SUBVERSION <= 1)
++#if PERL_VERSION_LT(5,13,2)
+         clone_param->flags = 0;
+ #endif
+ 
+@@ -882,7 +910,7 @@ S_ithread_create(
+            perl_clone() and sv_dup_inc(). Hence copy the parameters
+            somewhere under our control first, before duplicating.  */
+         if (num_params) {
+-#if (PERL_VERSION > 8)
++#if PERL_VERSION_GE(5,9,0)
+             Copy(parent_perl->Istack_base + params_start, array, num_params, SV *);
+ #else
+             Copy(parent_perl->Tstack_base + params_start, array, num_params, SV *);
+@@ -893,11 +921,11 @@ S_ithread_create(
+             }
+         }
+ 
+-#if (PERL_VERSION > 13) || (PERL_VERSION == 13 && PERL_SUBVERSION > 1)
++#if PERL_VERSION_GE(5,13,2)
+         Perl_clone_params_del(clone_param);
+ #endif
+ 
+-#if PERL_VERSION <= 8 && PERL_SUBVERSION <= 7
++#if PERL_VERSION_LT(5,8,8)
+         /* The code below checks that anything living on the tmps stack and
+          * has been cloned (so it lives in the ptr_table) has a refcount
+          * higher than 0.
+@@ -1030,10 +1058,10 @@ S_ithread_create(
+     MUTEX_UNLOCK(&my_pool->create_destruct_mutex);
+     return (thread);
+ 
+-    CLANG_DIAG_IGNORE_STMT(-Wthread-safety);
++    CLANG_DIAG_IGNORE(-Wthread-safety)
+     /* warning: mutex 'thread->mutex' is not held on every path through here [-Wthread-safety-analysis] */
+ }
+-CLANG_DIAG_RESTORE_DECL;
++CLANG_DIAG_RESTORE
+ 
+ #endif /* USE_ITHREADS */
+ 
+@@ -1111,7 +1139,7 @@ ithread_create(...)
+                     case 'A':
+                     case 'l':
+                     case 'L':
+-                        context = G_ARRAY;
++                        context = G_LIST;
+                         break;
+                     case 's':
+                     case 'S':
+@@ -1126,11 +1154,11 @@ ithread_create(...)
+                 }
+             } else if ((svp = hv_fetchs(specs, "array", 0))) {
+                 if (SvTRUE(*svp)) {
+-                    context = G_ARRAY;
++                    context = G_LIST;
+                 }
+             } else if ((svp = hv_fetchs(specs, "list", 0))) {
+                 if (SvTRUE(*svp)) {
+-                    context = G_ARRAY;
++                    context = G_LIST;
+                 }
+             } else if ((svp = hv_fetchs(specs, "scalar", 0))) {
+                 if (SvTRUE(*svp)) {
+@@ -1152,7 +1180,7 @@ ithread_create(...)
+         if (context == -1) {
+             context = GIMME_V;  /* Implicit context */
+         } else {
+-            context |= (GIMME_V & (~(G_ARRAY|G_SCALAR|G_VOID)));
++            context |= (GIMME_V & (~(G_LIST|G_SCALAR|G_VOID)));
+         }
+ 
+         /* Create thread */
+@@ -1167,6 +1195,7 @@ ithread_create(...)
+         if (! thread) {
+             XSRETURN_UNDEF;     /* Mutex already unlocked */
+         }
++        PERL_SRAND_OVERRIDE_NEXT_PARENT();
+         ST(0) = sv_2mortal(S_ithread_to_SV(aTHX_ Nullsv, thread, classname, FALSE));
+ 
+         /* Let thread run. */
+@@ -1175,7 +1204,6 @@ ithread_create(...)
+         /* warning: releasing mutex 'thread->mutex' that was not held [-Wthread-safety-analysis] */
+         MUTEX_UNLOCK(&thread->mutex);
+         CLANG_DIAG_RESTORE_STMT;
+-
+         /* XSRETURN(1); - implied */
+ 
+ 
+@@ -1197,7 +1225,7 @@ ithread_list(...)
+         classname = (char *)SvPV_nolen(ST(0));
+ 
+         /* Calling context */
+-        list_context = (GIMME_V == G_ARRAY);
++        list_context = (GIMME_V == G_LIST);
+ 
+         /* Running or joinable parameter */
+         if (items > 1) {
+@@ -1335,7 +1363,7 @@ ithread_join(...)
+         /* Get the return value from the call_sv */
+         /* Objects do not survive this process - FIXME */
+         if ((thread->gimme & G_WANT) != G_VOID) {
+-#if (PERL_VERSION < 13) || (PERL_VERSION == 13 && PERL_SUBVERSION <= 1)
++#if PERL_VERSION_LT(5,13,2)
+             AV *params_copy;
+             PerlInterpreter *other_perl;
+             CLONE_PARAMS clone_params;
+@@ -1562,11 +1590,15 @@ ithread_object(...)
+         }
+         classname = (char *)SvPV_nolen(ST(0));
+ 
++        if (items < 2) {
++            XSRETURN_UNDEF;
++        }
++
+         /* Turn $tid from PVLV to SV if needed (bug #73330) */
+         arg = ST(1);
+         SvGETMAGIC(arg);
+ 
+-        if ((items < 2) || ! SvOK(arg)) {
++        if (! SvOK(arg)) {
+             XSRETURN_UNDEF;
+         }
+ 
+@@ -1722,9 +1754,9 @@ ithread_wantarray(...)
+     CODE:
+         PERL_UNUSED_VAR(items);
+         thread = S_SV_to_ithread(aTHX_ ST(0));
+-        ST(0) = ((thread->gimme & G_WANT) == G_ARRAY) ? &PL_sv_yes :
+-                ((thread->gimme & G_WANT) == G_VOID)  ? &PL_sv_undef
+-                                       /* G_SCALAR */ : &PL_sv_no;
++        ST(0) = ((thread->gimme & G_WANT) == G_LIST) ? &PL_sv_yes :
++                ((thread->gimme & G_WANT) == G_VOID) ? &PL_sv_undef
++                                      /* G_SCALAR */ : &PL_sv_no;
+         /* XSRETURN(1); - implied */
+ 
+ 
+@@ -1762,7 +1794,7 @@ ithread_error(...)
+ 
+         /* If thread died, then clone the error into the calling thread */
+         if (thread->state & PERL_ITHR_DIED) {
+-#if (PERL_VERSION < 13) || (PERL_VERSION == 13 && PERL_SUBVERSION <= 1)
++#if PERL_VERSION_LT(5,13,2)
+             PerlInterpreter *other_perl;
+             CLONE_PARAMS clone_params;
+             ithread *current_thread;
+-- 
+2.44.0
+

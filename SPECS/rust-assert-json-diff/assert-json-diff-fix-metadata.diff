@@ -1,0 +1,11 @@
+--- assert-json-diff-2.0.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ assert-json-diff-2.0.2/Cargo.toml	2024-10-09T11:17:51.819068+00:00
+@@ -38,7 +38,7 @@
+ features = ["derive"]
+ 
+ [dev-dependencies.version-sync]
+-version = "0.8"
++version = "0.9"
+ 
+ [badges.maintenance]
+ status = "passively-maintained"

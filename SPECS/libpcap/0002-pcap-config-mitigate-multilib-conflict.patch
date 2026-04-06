@@ -1,0 +1,71 @@
+From 5b80ca39b1f01177e98c78bbc622dfda6f7a7e71 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 29 Sep 2014 08:27:15 +0200
+Subject: [PATCH 2/4] pcap-config: mitigate multilib conflict
+
+libdir path is different on 64bit and 32bit arches. Hence when installing both
+multilib versions on the system yum complains about conflicting pcap-config
+file.
+
+Hence remove libdir references from pcap-config, libdir is in dynamic linker
+path anyway.
+---
+ pcap-config.in | 27 ++++++++-------------------
+ 1 file changed, 8 insertions(+), 19 deletions(-)
+--
+1.8.3.1
+
+diff --git a/pcap-config.in b/pcap-config.in
+index 6039ef3..72297bf 100644
+--- a/pcap-config.in
++++ b/pcap-config.in
+@@ -11,7 +11,6 @@
+ prefix="@prefix@"
+ exec_prefix="@exec_prefix@"
+ includedir="@includedir@"
+-libdir="@libdir@"
+ LIBS="@LIBS@"
+ LIBS_STATIC="@LIBS_STATIC@"
+ VERSION="@PACKAGE_VERSION@"
+@@ -90,16 +89,16 @@ then
+ 	#
+ 	if [ "$show_cflags" = 1 -a "$show_libs" = 1 ]
+ 	then
+-		echo "-I$includedir $LPATH -l@PACKAGE_NAME@ $LIBS_STATIC"
++		echo "-lpcap @LIBS@"
+ 	elif [ "$show_cflags" = 1 -a "$show_additional_libs" = 1 ]
+ 	then
+-		echo "-I$includedir $LPATH $LIBS_STATIC"
++		echo "@LIBS@"
+ 	elif [ "$show_cflags" = 1 ]
+ 	then
+-		echo "-I$includedir"
++		echo ""
+ 	elif [ "$show_libs" = 1 ]
+ 	then
+-		echo "$LPATH -l@PACKAGE_NAME@ $LIBS_STATIC"
++		echo "-lpcap @LIBS@"
+ 	elif [ "$show_additional_libs" = 1 ]
+ 	then
+ 		echo "$LIBS_STATIC"
+@@ -117,16 +116,16 @@ then
+ 	#
+ 	if [ "$show_cflags" = 1 -a "$show_libs" = 1 ]
+ 	then
+-		echo "-I$includedir $LPATH -l@PACKAGE_NAME@ $LIBS"
++		echo "-lpcap"
+ 	elif [ "$show_cflags" = 1 -a "$show_additional_libs" = 1 ]
+ 	then
+-		echo "-I$includedir $LPATH $LIBS"
++		echo ""
+ 	elif [ "$show_cflags" = 1 ]
+ 	then
+-		echo "-I$includedir"
++		echo ""
+ 	elif [ "$show_libs" = 1 ]
+ 	then
+-		echo "$LPATH -l@PACKAGE_NAME@ $LIBS"
++		echo "-lpcap"
+ 	elif [ "$show_additional_libs" = 1 ]
+ 	then
+ 		echo "$LIBS"

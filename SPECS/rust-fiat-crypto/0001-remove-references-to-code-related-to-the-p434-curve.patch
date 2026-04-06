@@ -1,0 +1,24 @@
+From 7a7e54ad467d1b7e66b6bc1489ced88052cca71f Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 5 Feb 2024 14:52:47 +0100
+Subject: [PATCH] remove references to code related to the p434 curve
+
+---
+ src/lib.rs | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 6284852..4efef95 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -15,7 +15,6 @@ pub mod p384_32;
+ pub mod p384_64;
+ pub mod p384_scalar_32;
+ pub mod p384_scalar_64;
+-pub mod p434_64;
+ pub mod p448_solinas_32;
+ pub mod p448_solinas_64;
+ pub mod p521_32;
+-- 
+2.50.1
+

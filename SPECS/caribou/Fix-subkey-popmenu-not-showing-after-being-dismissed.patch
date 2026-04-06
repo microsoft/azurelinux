@@ -1,0 +1,32 @@
+From 85ac8f9e210243d95163cf8b1013470a6d9c7eaa Mon Sep 17 00:00:00 2001
+From: Clement Lefebvre <clement.lefebvre@linuxmint.com>
+Date: Tue, 12 Jan 2021 17:30:25 +0000
+Subject: [PATCH 2/4] Fix subkey popmenu not showing after being dismissed
+
+To reproduce the issue:
+
+- long-press the "e" button
+- don't select any sub button.. just select "e" again to close the menu
+
+After this the menu no long appears when long-pressing "e".
+
+This commit fixes that.
+---
+ libcaribou/key-model.vala | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libcaribou/key-model.vala b/libcaribou/key-model.vala
+index e88342e..2f640f2 100644
+--- a/libcaribou/key-model.vala
++++ b/libcaribou/key-model.vala
+@@ -179,6 +179,7 @@ namespace Caribou {
+                 hold_tid = GLib.Timeout.add (1000, on_key_held);
+ 
+             key_pressed(this);
++            show_subkeys = false;
+         }
+ 
+         public void release () {
+-- 
+2.29.2
+

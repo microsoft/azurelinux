@@ -1,0 +1,29 @@
+From 221f35f302d53f5a89f8e79592492e7cb322e81a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 26 Oct 2017 13:08:32 +0200
+Subject: [PATCH 37/59] Document the relationship of text_userdb_names and
+ chroot_local_user
+
+Note in vsftpd.conf(5) that text_userdb_names may not work when
+chroot_local_user is set to YES.
+---
+ vsftpd.conf.5 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index a3d569e..45b3f9c 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -578,6 +578,9 @@ Default: NO
+ By default, numeric IDs are shown in the user and group fields of directory
+ listings. You can get textual names by enabling this parameter. It is off
+ by default for performance reasons.
++Note that textual names are not guaranteed when
++.BR chroot_local_user
++is set to YES.
+ 
+ Default: NO
+ .TP
+-- 
+2.14.4
+

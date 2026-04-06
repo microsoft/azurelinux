@@ -1,0 +1,26 @@
+From 5647e956617fe21b3ce5e8fcc1bcd6aae1eac934 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 1 Jul 2023 12:12:27 -0400
+Subject: [PATCH 2/2] Downstream-only: allow newer Sphinx for testing
+
+(We have no choice; we must use what we have!)
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index cc846e4..225b267 100755
+--- a/setup.py
++++ b/setup.py
+@@ -12,7 +12,7 @@ EXTRAS_DEV_LINT = [
+ EXTRAS_DEV_TEST = [
+     "pytest-asyncio>=0.17",
+     "pytest>=3.10",
+-    "sphinx<=4.3.2",  # `docutils` from sphinx is used in tests
++    "sphinx",  # `docutils` from sphinx is used in tests
+ ]
+ 
+ EXTRAS_DEV_DOCS = [
+-- 
+2.41.0
+

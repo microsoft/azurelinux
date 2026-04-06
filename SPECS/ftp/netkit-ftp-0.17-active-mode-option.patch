@@ -1,0 +1,35 @@
+--- netkit-ftp-0.17/ftp/main.c.orig	2012-08-22 14:13:47.452058828 +0200
++++ netkit-ftp-0.17/ftp/main.c	2012-08-22 14:16:47.964124112 +0200
+@@ -87,7 +87,8 @@ static
+ void
+ usage(void)
+ {
+-	printf("\n\tUsage: { ftp | pftp } [-pinegvtd] [hostname]\n");
++	printf("\n\tUsage: { ftp | pftp } [-Apinegvtd] [hostname]\n");
++	printf("\t   -A: enable active mode\n");
+ 	printf("\t   -p: enable passive mode (default for ftp and pftp)\n");
+ 	printf("\t   -i: turn off prompting during mget\n");
+ 	printf("\t   -n: inhibit auto-login\n");
+@@ -166,6 +167,10 @@ main(volatile int argc, char **volatile
+ 				passivemode = 1;
+ 				break;
+ 
++			case 'A':
++				passivemode = 0;
++				break;
++
+ 			case 'g':
+ 				doglob = 0;
+ 				break;
+--- netkit-ftp-0.17/ftp/ftp.1.orig      2009-10-26 15:38:34.000000000 -0500
++++ netkit-ftp-0.17/ftp/ftp.1   2009-10-26 15:41:12.000000000 -0500
+@@ -58,6 +58,9 @@
+ Options may be specified at the command line, or to the
+ command interpreter.
+ .Bl -tag -width flag
++.It Fl A
++Use active mode for data transfers. This is useful for transmissions
++to servers which do not support passive connections (for whatever reason.)
+ .It Fl p
+ Use passive mode for data transfers. Allows use of ftp in environments
+ where a firewall prevents connections from the outside world back to

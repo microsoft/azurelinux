@@ -1,0 +1,37 @@
+From 4403007ea2be2aa3c0090a107c5e1a7ca6406787 Mon Sep 17 00:00:00 2001
+From: Justin Stephenson <jstephen@redhat.com>
+Date: Thu, 23 Jan 2025 10:09:01 -0500
+Subject: [PATCH 1/1] Add missing argument for sigchld handler
+
+rec.c: In function 'tlog_rec_transfer':
+rec.c:877:19: error: assignment to '__sighandler_t' {aka 'void (*)(int)'} from incompatible pointer type 'void (*)(void)' [-Wincompatible-pointer-types]
+  877 |     sa.sa_handler = tlog_rec_sigchld_handler;
+      |                   ^
+rec.c:81:1: note: 'tlog_rec_sigchld_handler' declared here
+   81 | tlog_rec_sigchld_handler()
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+In file included from rec.c:45:
+/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+make[4]: *** [Makefile:734: rec.lo] Error 1
+---
+ lib/tlog/rec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/tlog/rec.c b/lib/tlog/rec.c
+index 1d4031f..af6af6d 100644
+--- a/lib/tlog/rec.c
++++ b/lib/tlog/rec.c
+@@ -78,7 +78,7 @@ tlog_rec_alarm_sighandler(int signum)
+ }
+ 
+ static void
+-tlog_rec_sigchld_handler()
++tlog_rec_sigchld_handler(int signum)
+ {
+     tlog_rec_child_exited = true;
+ }
+-- 
+2.47.1
+

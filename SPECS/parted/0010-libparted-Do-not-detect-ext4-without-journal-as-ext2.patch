@@ -1,0 +1,61 @@
+From e61584ddeb952ff04823936dabd1a6a241f04f38 Mon Sep 17 00:00:00 2001
+From: Pascal Hambourg <pascal@plouf.fr.eu.org>
+Date: Thu, 17 Apr 2025 18:42:33 +0200
+Subject: [PATCH 10/12] libparted: Do not detect ext4 without journal as ext2
+
+ext4 may have other incompatible features than journal and cannot be
+mounted as ext2 by linux, so detect it as ext4 even without journal
+if it has other incompatible features.
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ libparted/fs/ext2/interface.c | 33 +++++++++++++++------------------
+ 1 file changed, 15 insertions(+), 18 deletions(-)
+
+diff --git a/libparted/fs/ext2/interface.c b/libparted/fs/ext2/interface.c
+index 7e0b197..5f64ab3 100644
+--- a/libparted/fs/ext2/interface.c
++++ b/libparted/fs/ext2/interface.c
+@@ -52,24 +52,21 @@ _ext2_generic_probe (PedGeometry* geom, int expect_ext_ver)
+ 		int is_ext3 = 0;
+ 		int is_ext4 = 0;
+ 
+-		is_ext3 = (EXT2_SUPER_FEATURE_COMPAT (*sb)
+-			   & EXT3_FEATURE_COMPAT_HAS_JOURNAL) != 0;
+-		if (is_ext3) {
+-			is_ext4 = ((EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
+-				    & EXT4_FEATURE_RO_COMPAT_HUGE_FILE)
+-				   || (EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
+-				       & EXT4_FEATURE_RO_COMPAT_GDT_CSUM)
+-				   || (EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
+-				       & EXT4_FEATURE_RO_COMPAT_DIR_NLINK)
+-				   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
+-				       & EXT4_FEATURE_INCOMPAT_EXTENTS)
+-				   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
+-				       & EXT4_FEATURE_INCOMPAT_64BIT)
+-				   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
+-				       & EXT4_FEATURE_INCOMPAT_FLEX_BG));
+-			if (is_ext4)
+-				is_ext3 = 0;
+-		}
++		is_ext4 = ((EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
++			    & EXT4_FEATURE_RO_COMPAT_HUGE_FILE)
++			   || (EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
++			       & EXT4_FEATURE_RO_COMPAT_GDT_CSUM)
++			   || (EXT2_SUPER_FEATURE_RO_COMPAT (*sb)
++			       & EXT4_FEATURE_RO_COMPAT_DIR_NLINK)
++			   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
++			       & EXT4_FEATURE_INCOMPAT_EXTENTS)
++			   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
++			       & EXT4_FEATURE_INCOMPAT_64BIT)
++			   || (EXT2_SUPER_FEATURE_INCOMPAT (*sb)
++			       & EXT4_FEATURE_INCOMPAT_FLEX_BG));
++		if (!is_ext4)
++			is_ext3 = (EXT2_SUPER_FEATURE_COMPAT (*sb)
++				   & EXT3_FEATURE_COMPAT_HAS_JOURNAL) != 0;
+ 		if (expect_ext_ver == 2 && (is_ext3 || is_ext4))
+ 			return NULL;
+ 		if (expect_ext_ver == 3 && !is_ext3)
+-- 
+2.49.0
+

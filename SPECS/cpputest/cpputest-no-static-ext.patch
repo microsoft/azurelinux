@@ -1,0 +1,12 @@
+diff -ruN cpputest-4.0/src/CppUTestExt/CMakeLists.txt cpputest-4.0-no-static/src/CppUTestExt/CMakeLists.txt
+--- cpputest-4.0/src/CppUTestExt/CMakeLists.txt	2020-05-26 04:24:07.000000000 -0700
++++ cpputest-4.0-no-static/src/CppUTestExt/CMakeLists.txt	2022-01-14 13:38:03.443550810 -0800
+@@ -40,7 +40,7 @@
+         ${CppUTestRootDirectory}/include/CppUTestExt/MockSupport.h
+ )
+ 
+-add_library(CppUTestExt STATIC ${CppUTestExt_src} ${CppUTestExt_headers})
++add_library(CppUTestExt ${CppUTestExt_src} ${CppUTestExt_headers})
+ target_link_libraries(CppUTestExt ${CPPUNIT_EXTERNAL_LIBRARIES})
+ 
+ #[[Arrange for the include directory to be added to the include paths of any CMake target depending on CppUTestExt.]]

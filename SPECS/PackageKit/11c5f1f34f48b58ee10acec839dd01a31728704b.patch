@@ -1,0 +1,24 @@
+From 11c5f1f34f48b58ee10acec839dd01a31728704b Mon Sep 17 00:00:00 2001
+From: Matthias Klumpp <matthias@tenstral.net>
+Date: Wed, 28 Jan 2026 21:43:50 +0100
+Subject: [PATCH] meson: test.depends does not accept a dummy dependency, give
+ it an empty array instead
+
+This fixes an issue when building without Python backend support.
+---
+ lib/python/packagekit/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/python/packagekit/meson.build b/lib/python/packagekit/meson.build
+index 8bee90a33..1f77863f9 100644
+--- a/lib/python/packagekit/meson.build
++++ b/lib/python/packagekit/meson.build
+@@ -7,7 +7,7 @@ packagekit_py_sources = [
+   'misc.py',
+ ]
+ 
+-packagekit_test_py = dependency('', required: false)
++packagekit_test_py = []
+ if get_option('python_backend')
+ 
+ enums_py = custom_target(

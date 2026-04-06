@@ -1,0 +1,56 @@
+From fd4f81d136ba44e041442dbcbae7908901d17633 Mon Sep 17 00:00:00 2001
+From: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+Date: Mon, 23 May 2022 09:47:24 +0200
+Subject: [PATCH 43/55] client: Avoid protocol error with invalid min/max size
+
+If the application sets an invalid minimum and maximum size
+(where the minimum is higher than the maximum), then we
+would blindly send this over the protocol, which is a protocol
+error according to the spec. Qt compositors will warn about
+this and ignore the size, but mainly because "but there's no
+matching error defined" according to the comment. Other
+compositors may close the connection when this happens.
+
+To avoid crashing the app based on bogus min/max size, we
+make sure we never send a maximum size which is less than
+the minimum size. This corresponds to the behavior of
+compositors which accept the size without raising an error:
+the minimum size takes precedence.
+
+Note that 0 means "no maximum size" in the protocol, so we
+cap the value before applying this logic.
+
+[ChangeLog][Client] Fixed an issue where setting an invalid
+minimum and maximum size on a window would cause some
+compositors to raise a protocol error.
+
+Pick-to: 6.2 6.3
+Fixes: QTBUG-102626
+Fixes: QTBUG-103391
+Change-Id: I4004a4550a9fe3dae6a27169b4d1a9a616e21841
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 487de47277ccc31891f6340ce4c971c91336d9a4)
+---
+ src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index c79b0e49..6ddcc410 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -387,10 +387,10 @@ void QWaylandXdgSurface::setSizeHints()
+         const int minHeight = qMax(0, m_window->windowMinimumSize().height());
+         m_toplevel->set_min_size(minWidth, minHeight);
+ 
+-        int maxWidth = qMax(0, m_window->windowMaximumSize().width());
++        int maxWidth = qMax(minWidth, m_window->windowMaximumSize().width());
+         if (maxWidth == QWINDOWSIZE_MAX)
+             maxWidth = 0;
+-        int maxHeight = qMax(0, m_window->windowMaximumSize().height());
++        int maxHeight = qMax(minHeight, m_window->windowMaximumSize().height());
+         if (maxHeight == QWINDOWSIZE_MAX)
+             maxHeight = 0;
+         m_toplevel->set_max_size(maxWidth, maxHeight);
+-- 
+2.51.1
+

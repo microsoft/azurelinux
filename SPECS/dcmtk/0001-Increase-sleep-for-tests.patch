@@ -1,0 +1,73 @@
+From 1805f767eff572b15a8a5e9499cfb04b0086ffcc Mon Sep 17 00:00:00 2001
+From: "Ankur Sinha (Ankur Sinha Gmail)" <sanjay.ankur@gmail.com>
+Date: Tue, 2 Aug 2022 20:50:43 +0100
+Subject: [PATCH 1/2] Increase sleep for tests
+
+---
+ dcmnet/tests/tscusession.cc | 6 +++---
+ dcmtls/tests/tscuscptls.cc  | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/dcmnet/tests/tscusession.cc b/dcmnet/tests/tscusession.cc
+index 08a24dbbf..4d3020208 100644
+--- a/dcmnet/tests/tscusession.cc
++++ b/dcmnet/tests/tscusession.cc
+@@ -280,7 +280,7 @@ void configure_scp_for_sop_class(DcmSCPConfig& cfg,
+ void scu_session(const OFString& called_ae_title, const OFString& sop_class)
+ {
+     // Make sure server is up
+-    force_sleep(1);
++    force_sleep(10);
+     // Basic configuration
+     SessionSCU scu;
+     scu.setAETitle("TEST_SCU");
+@@ -334,13 +334,13 @@ OFTEST_FLAGS(dcmnet_scu_session_handler, EF_Slow)
+ 
+     // Send FIND, and wait to be sure SCP has time to exit
+     scu_session("FIND_SESSION", UID_FINDPatientRootQueryRetrieveInformationModel);
+-    force_sleep(1);
++    force_sleep(10);
+     scp.join();
+ 
+     // Send MOVE, and wait to be sure SCP has time to exit
+     scp.start();
+     scu_session("MOVE_SESSION", UID_MOVEPatientRootQueryRetrieveInformationModel);
+-    force_sleep(1);
++    force_sleep(10);
+     scp.join();
+ 
+     // TODO: Test C-GET
+diff --git a/dcmtls/tests/tscuscptls.cc b/dcmtls/tests/tscuscptls.cc
+index 119c6a1a0..df9dc6490 100644
+--- a/dcmtls/tests/tscuscptls.cc
++++ b/dcmtls/tests/tscuscptls.cc
+@@ -347,7 +347,7 @@ OFTEST_FLAGS(dcmtls_scp_tls, EF_None)
+       port_number = 0xF000 + (rnd.getRND16() & 0xFFF);
+       config.setPort(port_number);
+       scp.start();
+-      force_sleep(2); // wait 2 seconds for the SCP process to start
++      force_sleep(10); // wait 10 seconds for the SCP process to start
+       memory_barrier.lock();
+       memory_barrier.unlock();
+     }
+@@ -429,7 +429,7 @@ OFTEST_FLAGS(dcmtls_scp_pool_tls, EF_None)
+       port_number = 0xF000 + (rnd.getRND16() & 0xFFF);
+       config.setPort(port_number);
+       pool.start();
+-      force_sleep(2); // wait 2 seconds for the SCP process to start
++      force_sleep(10); // wait 10 seconds for the SCP process to start
+       memory_barrier.lock();
+       memory_barrier.unlock();
+     }
+@@ -460,7 +460,7 @@ OFTEST_FLAGS(dcmtls_scp_pool_tls, EF_None)
+ 
+     // "ensure" the pool is initialized before any SCU starts connecting to it. The initialization
+     // can take a couple of seconds on older systems, e.g. debian i368.
+-    force_sleep(5);
++    force_sleep(15);
+ 
+     for (OFVector<TestTLSSCU*>::const_iterator it2 = scus.begin(); it2 != scus.end(); ++it2)
+     {
+-- 
+2.48.1
+

@@ -1,0 +1,12 @@
+--- reqwest-retry-0.9.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqwest-retry-0.9.1/Cargo.toml	2026-02-06T06:57:23.211354+00:00
+@@ -94,9 +94,3 @@
+ features = ["time"]
+ default-features = false
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
+-version = "0.2.0"
+-features = ["js"]
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.wasmtimer]
+-version = "0.4.3"

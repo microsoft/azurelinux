@@ -1,0 +1,25 @@
+From 2a431ea9318111535d37112daeeeccdc4df249ee Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Fri, 13 Jan 2023 09:02:11 +0100
+Subject: [PATCH] Inform about no support for 'limit memoryuse' in manpage
+
+Related: #247637
+---
+ tcsh.man.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tcsh.man.in b/tcsh.man.in
+index 24a9629..d405a70 100644
+--- a/tcsh.man.in
++++ b/tcsh.man.in
+@@ -5960,6 +5960,7 @@ Maximum amount of swap space reserved or used for this user.
+ Maximum number of threads for this process.
+ .
+ .It Ic vmemoryuse
++NOTE: Changing this value has no effect. Support has been removed from Linux kernel v2.6 and newer.
+ Maximum amount of virtual memory a process
+ may have allocated to it at a given time (address space).
+ .
+-- 
+2.39.0
+

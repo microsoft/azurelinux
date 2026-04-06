@@ -1,0 +1,84 @@
+diff -up kbd-2.7-rc1/src/vlock/auth.c.orig kbd-2.7-rc1/src/vlock/auth.c
+--- kbd-2.7-rc1/src/vlock/auth.c.orig	2024-10-09 15:14:58.000000000 +0200
++++ kbd-2.7-rc1/src/vlock/auth.c	2024-10-29 12:20:40.451059945 +0100
+@@ -91,6 +91,12 @@ int get_password(pam_handle_t *pamh, con
+ 		}
+ 		fflush(stdout);
+ 
++		if (prompt) {
++			printf(_("Press ENTER to continue.\n"));
++			fflush(stdout);
++			(void )getchar();
++		}
++
+ 		/*
+ 		 * No need to request a delay on failure via pam_fail_delay(3):
+ 		 * authentication module should do it for us.
+diff -up kbd-2.7-rc1/src/vlock/parse.c.orig kbd-2.7-rc1/src/vlock/parse.c
+--- kbd-2.7-rc1/src/vlock/parse.c.orig	2024-10-19 00:12:27.000000000 +0200
++++ kbd-2.7-rc1/src/vlock/parse.c	2024-10-29 12:23:51.730369348 +0100
+@@ -39,6 +39,13 @@
+  */
+ int o_lock_all;
+ 
++/*
++ * This determines whether there will be prompt before invoking pam
++ * auth stack.
++ * 0 means no, 1 means yes.
++ */
++int prompt;
++
+ const char *
+ locked_name(void)
+ {
+@@ -64,6 +71,8 @@ show_help(void)
+ 	         "       switch to other virtual consoles.\n"
+ 	         "-a or --all: lock all virtual consoles by preventing other users\n"
+ 	         "       from switching virtual consoles.\n"
++	         "-p or --prompt: wait for keypress before invoking pam auth stack,\n"
++	         "       useful for unlocking with smartcard setup.\n"
+ 	         "-v or --version: Print the version number of vlock and exit.\n"
+ 	         "-h or --help: Print this help message and exit.\n"),
+ 	       program_invocation_short_name, program_invocation_short_name);
+@@ -75,13 +84,14 @@ void parse(int ac, char *const av[])
+ 	static struct option long_options[] = {
+ 		{ "current", 0, NULL, 'c' },
+ 		{ "all", 0, NULL, 'a' },
++		{ "prompt", 0, NULL, 'p' },
+ 		{ "version", 0, NULL, 'v' },
+ 		{ "help", 0, NULL, 'h' },
+ 		{ NULL, 0, NULL, 0 },
+ 	};
+ 	int c;
+ 
+-	while ((c = getopt_long(ac, av, "acvh", long_options, NULL)) != -1) {
++	while ((c = getopt_long(ac, av, "acpvh", long_options, NULL)) != -1) {
+ 		switch (c) {
+ 			case 'c':
+ 				o_lock_all = 0;
+@@ -89,6 +99,9 @@ void parse(int ac, char *const av[])
+ 			case 'a':
+ 				o_lock_all = 1;
+ 				break;
++			case 'p':
++				prompt = 1;
++				break;
+ 			case 'v':
+ 				fprintf(stderr, "%s\n", VERSION);
+ 				exit(EXIT_SUCCESS);
+diff -up kbd-2.7-rc1/src/vlock/vlock.h.orig kbd-2.7-rc1/src/vlock/vlock.h
+--- kbd-2.7-rc1/src/vlock/vlock.h.orig	2024-10-08 12:35:16.000000000 +0200
++++ kbd-2.7-rc1/src/vlock/vlock.h	2024-10-29 12:24:21.315417215 +0100
+@@ -40,5 +40,12 @@ const char *locked_name(void);
+  */
+ extern int o_lock_all;
+ 
++/*
++ * This determines whether there will be prompt before invoking pam
++ * auth stack.
++ * 0 means no, 1 means yes.
++ */
++extern int prompt;
++
+ /* Copy of the VT mode when the program was started. */
+ extern int is_vt;

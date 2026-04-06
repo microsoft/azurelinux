@@ -1,0 +1,38 @@
+From 3b3c8e37cca418e07bdeceaf3a601805df28d925 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Wed, 15 Jul 2020 08:27:39 +0200
+Subject: [PATCH] build: Copy headers on install instead of symlinking
+
+Patch by Philip Chimento ported forward to mozjs78
+---
+ python/mozbuild/mozbuild/backend/recursivemake.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/python/mozbuild/mozbuild/backend/recursivemake.py b/python/mozbuild/mozbuild/backend/recursivemake.py
+index 858d4d4..8c229e8 100644
+--- a/python/mozbuild/mozbuild/backend/recursivemake.py
++++ b/python/mozbuild/mozbuild/backend/recursivemake.py
+@@ -1533,9 +1533,9 @@ class RecursiveMakeBackend(MakeBackend):
+                                     " of srcdir-relative or absolute paths."
+                                 )
+
+-                            install_manifest.add_pattern_link(basepath, wild, dest_dir)
++                            install_manifest.add_pattern_copy(basepath, wild, dest_dir)
+                         else:
+-                            install_manifest.add_pattern_link(f.srcdir, f, dest_dir)
++                            install_manifest.add_pattern_copy(f.srcdir, f, dest_dir)
+                     elif isinstance(f, AbsolutePath):
+                         if not f.full_path.lower().endswith((".dll", ".pdb", ".so")):
+                             raise Exception(
+@@ -1546,7 +1546,7 @@ class RecursiveMakeBackend(MakeBackend):
+                         install_manifest.add_optional_exists(dest_file)
+                         absolute_files.append(f.full_path)
+                     else:
+-                        install_manifest.add_link(f.full_path, dest_file)
++                        install_manifest.add_copy(f.full_path, dest_file)
+                 else:
+                     install_manifest.add_optional_exists(dest_file)
+                     objdir_files.append(self._pretty_path(f, backend_file))
+--
+2.37.1
+

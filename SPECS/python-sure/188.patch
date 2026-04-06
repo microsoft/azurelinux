@@ -1,0 +1,68 @@
+From a8620178a6f7c8726413c9a17a28b57cbe6fe942 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 19 Dec 2023 20:58:21 -0500
+Subject: [PATCH] Drop PyPI mock dependency; use unittest.mock instead
+
+This is available in the Python standard library from version 3.3; sure
+advertises support for 3.6 and later in setup.py
+---
+ setup.py                        | 2 +-
+ sure/core.py                    | 5 +----
+ tests/test_assertion_builder.py | 2 +-
+ tox.ini                         | 1 -
+ 4 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index ebc24c5..9e6d653 100755
+--- a/setup.py
++++ b/setup.py
+@@ -81,7 +81,7 @@ def read_readme():
+         return __doc__
+ 
+ 
+-install_requires = ["mock", "six"]
++install_requires = ["six"]
+ tests_require = ["nose"]
+ version = read_version()
+ 
+diff --git a/sure/core.py b/sure/core.py
+index e953c52..57e95fe 100644
+--- a/sure/core.py
++++ b/sure/core.py
+@@ -18,10 +18,7 @@
+ 
+ import os
+ 
+-try:
+-    from mock import _CallList
+-except ImportError:
+-    from mock.mock import _CallList
++from unittest.mock import _CallList
+ 
+ import inspect
+ from six import (
+diff --git a/tests/test_assertion_builder.py b/tests/test_assertion_builder.py
+index 2653f1a..15bc612 100644
+--- a/tests/test_assertion_builder.py
++++ b/tests/test_assertion_builder.py
+@@ -17,7 +17,7 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ from __future__ import unicode_literals
+ import re
+-import mock
++from unittest import mock
+ from collections import OrderedDict
+ 
+ from datetime import datetime, timedelta
+diff --git a/tox.ini b/tox.ini
+index e29633e..bb94414 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -10,7 +10,6 @@ envlist = py27, pypy, py34, py35, py36, py37
+ commands = nosetests --rednose -vv --with-coverage --cover-package=sure
+ deps =
+     six
+-    mock
+     nose
+     rednose
+     coverage

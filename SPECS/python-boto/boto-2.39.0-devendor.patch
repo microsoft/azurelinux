@@ -1,0 +1,54 @@
+Index: boto-2.39.0/boto/compat.py
+===================================================================
+--- boto-2.39.0.orig/boto/compat.py
++++ boto-2.39.0/boto/compat.py
+@@ -46,16 +46,27 @@ except (AttributeError, ImportError):
+     # This is probably running on App Engine.
+     expanduser = (lambda x: x)
+ 
+-from boto.vendored import six
++try:
++    import six
++    from six import BytesIO, StringIO
++    from six.moves import filter, http_client, map, _thread, \
++                          urllib, zip
++    from six.moves.queue import Queue
++    from six.moves.urllib.parse import parse_qs, quote, unquote, \
++                                       urlparse, urlsplit
++    from six.moves.urllib.parse import unquote_plus
++    from six.moves.urllib.request import urlopen
++except ImportError:
++    from boto.vendored import six
+ 
+-from boto.vendored.six import BytesIO, StringIO
+-from boto.vendored.six.moves import filter, http_client, map, _thread, \
+-                                    urllib, zip
+-from boto.vendored.six.moves.queue import Queue
+-from boto.vendored.six.moves.urllib.parse import parse_qs, quote, unquote, \
+-                                                 urlparse, urlsplit
+-from boto.vendored.six.moves.urllib.parse import unquote_plus
+-from boto.vendored.six.moves.urllib.request import urlopen
++    from boto.vendored.six import BytesIO, StringIO
++    from boto.vendored.six.moves import filter, http_client, map, _thread, \
++                                        urllib, zip
++    from boto.vendored.six.moves.queue import Queue
++    from boto.vendored.six.moves.urllib.parse import parse_qs, quote, unquote, \
++                                                     urlparse, urlsplit
++    from boto.vendored.six.moves.urllib.parse import unquote_plus
++    from boto.vendored.six.moves.urllib.request import urlopen
+ 
+ if six.PY3:
+     # StandardError was removed, so use the base exception type instead
+Index: boto-2.39.0/setup.py
+===================================================================
+--- boto-2.39.0.orig/setup.py
++++ boto-2.39.0/setup.py
+@@ -76,7 +76,7 @@ setup(name = "boto",
+                   "boto.elastictranscoder", "boto.opsworks", "boto.redshift",
+                   "boto.dynamodb2", "boto.support", "boto.cloudtrail",
+                   "boto.directconnect", "boto.kinesis", "boto.rds2",
+-                  "boto.cloudsearch2", "boto.logs", "boto.vendored",
++                  "boto.cloudsearch2", "boto.logs",
+                   "boto.route53.domains", "boto.cognito",
+                   "boto.cognito.identity", "boto.cognito.sync",
+                   "boto.cloudsearchdomain", "boto.kms",

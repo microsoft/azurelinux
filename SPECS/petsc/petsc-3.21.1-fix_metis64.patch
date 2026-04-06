@@ -1,0 +1,32 @@
+--- a/config/BuildSystem/config/packages/metis.orig.py	2020-03-29 16:29:06.000000000 +0200
++++ b/config/BuildSystem/config/packages/metis.py	2020-04-03 18:00:37.013851959 +0200
+@@ -8,8 +8,8 @@
+     self.download          = ['git://https://bitbucket.org/petsc/pkg-metis.git','https://bitbucket.org/petsc/pkg-metis/get/'+self.gitcommit+'.tar.gz']
+     self.downloaddirnames  = ['petsc-pkg-metis']
+     self.functions         = ['METIS_PartGraphKway']
+-    self.includes          = ['metis.h']
+-    self.liblist           = [['libmetis.a'],['libmetis.a','libexecinfo.a']]
++    self.includes          = ['metis64.h']
++    self.liblist           = [['libmetis64.a'],['libmetis64.a','libexecinfo.a']]
+     self.hastests          = 1
+     self.useddirectly      = 0
+     self.downloadonWindows = 1
+@@ -50,7 +50,7 @@
+     config.package.Package.configureLibrary(self)
+     oldFlags = self.compilers.CPPFLAGS
+     self.compilers.CPPFLAGS += ' '+self.headers.toString(self.include)
+-    if not self.checkCompile('#include "metis.h"', '#if (IDXTYPEWIDTH != '+ str(self.getDefaultIndexSize())+')\n#error incompatible IDXTYPEWIDTH\n#endif\n'):
++    if not self.checkCompile('#include "metis64.h"', '#if (IDXTYPEWIDTH != '+ str(self.getDefaultIndexSize())+')\n#error incompatible IDXTYPEWIDTH\n#endif\n'):
+       if self.defaultIndexSize == 64:
+         msg= '--with-64-bit-indices option requires a metis build with IDXTYPEWIDTH=64.\n'
+       else:
+--- a/src/mat/graphops/order/metisnd/metisnd.orig.c	2024-03-30 01:34:11.000000000 +0100
++++ b/src/mat/graphops/order/metisnd/metisnd.c	2024-05-09 19:18:46.723155414 +0200
+@@ -1,6 +1,6 @@
+ #include <petscmat.h>
+ #include <petsc/private/matorderimpl.h>
+-#include <metis.h>
++#include <metis64.h>
+ 
+ /*
+     MatGetOrdering_METISND - Find the nested dissection ordering of a given matrix.

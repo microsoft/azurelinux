@@ -1,0 +1,46 @@
+From 7d99960508f5158863b7d31894cefa999cb1afe5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 3 Jun 2024 20:19:41 +0200
+Subject: [PATCH] Skip tests that fail on s390x
+
+---
+ tables/tests/test_index_backcompat.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tables/tests/test_index_backcompat.py b/tables/tests/test_index_backcompat.py
+index d921baa..d17a278 100644
+--- a/tables/tests/test_index_backcompat.py
++++ b/tables/tests/test_index_backcompat.py
+@@ -2,6 +2,7 @@ from tables.tests import common
+ 
+ 
+ # Check indexes from PyTables version 2.0
++@common.unittest.skipIf(common.platform.machine() == 's390x', 'GH#735')
+ class IndexesTestCase(common.TestFileMixin, common.PyTablesTestCase):
+ 
+     def setUp(self):
+@@ -139,17 +140,21 @@ class IndexesTestCase(common.TestFileMixin, common.PyTablesTestCase):
+ 
+ 
+ # Check indexes from PyTables version 2.0
++@common.unittest.skipIf(common.platform.machine() == 's390x', 'GH#735')
+ class Indexes2_0TestCase(IndexesTestCase):
+     h5fname = common.test_filename("indexes_2_0.h5")
+ 
+ 
+ # Check indexes from PyTables version 2.1
++@common.unittest.skipIf(common.platform.machine() == 's390x', 'GH#735')
+ class Indexes2_1TestCase(IndexesTestCase):
+     h5fname = common.test_filename("indexes_2_1.h5")
+ 
+ 
+ def suite():
+     theSuite = common.unittest.TestSuite()
++    if common.platform.machine() == 's390x':
++        return theSuite
+     niter = 1
+ 
+     for n in range(niter):
+-- 
+2.45.0
+

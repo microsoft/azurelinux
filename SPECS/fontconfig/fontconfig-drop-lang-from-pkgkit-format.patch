@@ -1,0 +1,12 @@
+diff -pruN fontconfig-2.16.1.orig/src/fcformat.c fontconfig-2.16.1/src/fcformat.c
+--- fontconfig-2.16.1.orig/src/fcformat.c	2025-03-13 20:16:47.000000000 +0900
++++ fontconfig-2.16.1/src/fcformat.c	2025-03-13 20:42:03.633324643 +0900
+@@ -77,7 +77,7 @@
+ #define FCCAT_FORMAT   "\"%{file|basename|cescape}\" %{index} \"%{-file{%{=unparse|cescape}}}\""
+ #define FCMATCH_FORMAT "%{file:-<unknown filename>|basename}: \"%{family[0]:-<unknown family>}\" \"%{style[0]:-<unknown style>}\""
+ #define FCLIST_FORMAT  "%{?file{%{file}: }}%{-file{%{=unparse}}}"
+-#define PKGKIT_FORMAT  "%{[]family{font(%{family|downcase|delete( )})\n}}%{[]lang{font(:lang=%{lang|downcase|translate(_,-)})\n}}"
++#define PKGKIT_FORMAT  "%{[]family{font(%{family|downcase|delete( )})\n}}"
+ 
+ static void
+ message (const char *fmt, ...)

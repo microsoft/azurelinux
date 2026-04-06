@@ -1,0 +1,54 @@
+diff -rupN --no-dereference openssl-3.2.2/Configurations/10-main.conf openssl-3.2.2-new/Configurations/10-main.conf
+--- openssl-3.2.2/Configurations/10-main.conf	2024-07-07 14:55:39.165377739 +0200
++++ openssl-3.2.2-new/Configurations/10-main.conf	2024-07-07 14:55:50.983000666 +0200
+@@ -1654,7 +1654,7 @@ my %targets = (
+         cppflags         => combine("-DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN",
+                                     threads("-D_MT")),
+         lib_cppflags     => "-DL_ENDIAN",
+-        ex_libs          => add("-lws2_32 -lgdi32 -lcrypt32"),
++        ex_libs          => add("-lws2_32 -lgdi32 -lcrypt32 -lpathcch"),
+         thread_scheme    => "winthreads",
+         dso_scheme       => "win32",
+         shared_target    => "mingw-shared",
+diff -rupN --no-dereference openssl-3.2.2/crypto/provider_core.c openssl-3.2.2-new/crypto/provider_core.c
+--- openssl-3.2.2/crypto/provider_core.c	2024-06-04 15:00:52.000000000 +0200
++++ openssl-3.2.2-new/crypto/provider_core.c	2024-07-07 14:55:50.983000666 +0200
+@@ -33,6 +33,10 @@
+ #ifndef FIPS_MODULE
+ # include <openssl/self_test.h>
+ #endif
++#ifdef _WIN32
++# include <windows.h>
++# include <pathcch.h>
++#endif
+ 
+ /*
+  * This file defines and uses a number of different structures:
+@@ -919,6 +923,27 @@ static int provider_init(OSSL_PROVIDER *
+ 
+             if (load_dir == NULL) {
+                 load_dir = ossl_safe_getenv("OPENSSL_MODULES");
++#ifdef _WIN32
++                if (load_dir == NULL) {
++                    WCHAR execPath[MAX_PATH] = {0};
++                    if( GetModuleFileNameW(NULL, execPath, _countof(execPath)) > 0)
++                    {
++                        PathCchRemoveFileSpec(execPath, MAX_PATH);
++                        PathCchRemoveFileSpec(execPath, MAX_PATH);
++                        wcsncat(execPath, L"\\lib\\ossl-modules", MAX_PATH);
++                        int len = WideCharToMultiByte(CP_UTF8, 0, execPath, -1, NULL, 0, NULL, NULL);
++                        if (len > 0)
++                        {
++                            allocated_load_dir = OPENSSL_malloc(len);
++                            if (WideCharToMultiByte(CP_UTF8, 0, execPath, -1, allocated_load_dir, len, NULL, NULL) == len)
++                            {
++                                load_dir = allocated_load_dir;
++                            }
++                        }
++                    }
++                }
++#endif
++
+                 if (load_dir == NULL)
+                     load_dir = MODULESDIR;
+             }

@@ -1,0 +1,241 @@
+--- src/org/antlr/stringtemplate/language/ASTExpr.java.orig	2025-07-05 13:29:38.535051589 -0600
++++ src/org/antlr/stringtemplate/language/ASTExpr.java	2025-07-05 15:21:11.427272073 -0600
+@@ -263,8 +263,8 @@ public class ASTExpr extends Expr {
+ 			if ( numEmpty==numAttributes ) {
+ 				break;
+ 			}
+-			argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, new Integer(i+1));
+-			argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, new Integer(i));
++			argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, Integer.valueOf(i+1));
++			argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, Integer.valueOf(i));
+ 			org.antlr.stringtemplate.StringTemplate embedded = templateToApply.getInstanceOf();
+ 			embedded.setEnclosingInstance(self);
+ 			embedded.setArgumentContext(argumentContext);
+@@ -323,8 +323,8 @@ public class ASTExpr extends Expr {
+ 					argumentContext.put(DEFAULT_ATTRIBUTE_NAME, ithValue);
+ 	                argumentContext.put(DEFAULT_ATTRIBUTE_NAME_DEPRECATED, ithValue);
+ 				}
+-				argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, new Integer(i+1));
+-				argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, new Integer(i));
++				argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, Integer.valueOf(i+1));
++				argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, Integer.valueOf(i));
+                 embedded.setArgumentContext(argumentContext);
+                 evaluateArguments(embedded);
+                 /*
+@@ -358,8 +358,8 @@ public class ASTExpr extends Expr {
+ 				argumentContext.put(DEFAULT_ATTRIBUTE_NAME, attributeValue);
+ 				argumentContext.put(DEFAULT_ATTRIBUTE_NAME_DEPRECATED, attributeValue);
+ 			}
+-			argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, new Integer(1));
+-			argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, new Integer(0));
++			argumentContext.put(DEFAULT_INDEX_VARIABLE_NAME, Integer.valueOf(1));
++			argumentContext.put(DEFAULT_INDEX0_VARIABLE_NAME, Integer.valueOf(0));
+             embedded.setArgumentContext(argumentContext);
+             evaluateArguments(embedded);
+             return embedded;
+@@ -1093,7 +1093,7 @@ public class ASTExpr extends Expr {
+ 	 */
+ 	public Object length(Object attribute) {
+ 		if ( attribute == null) {
+-			return new Integer(0);
++			return Integer.valueOf(0);
+ 		}
+ 		int i = 1;		// we have at least one of something. Iterator and arrays might be empty.
+ 		if (attribute instanceof Map) {
+@@ -1130,7 +1130,7 @@ public class ASTExpr extends Expr {
+ 				i++;
+ 			}
+ 		}
+-		return new Integer(i);
++		return Integer.valueOf(i);
+ 	}
+ 
+ 	public Object getOption(String name) {
+--- src/org/antlr/stringtemplate/language/eval.g.orig	2025-07-05 13:18:54.006186164 -0600
++++ src/org/antlr/stringtemplate/language/eval.g	2025-07-05 15:21:51.882969554 -0600
+@@ -262,7 +262,7 @@ attribute returns [Object value=null]
+         value=self.getAttribute(i3.getText());
+         }
+ 
+-    |   i:INT {value=new Integer(i.getText());}
++    |   i:INT {value=Integer.valueOf(i.getText());}
+ 
+     |   s:STRING
+     	{
+--- src/org/antlr/stringtemplate/StringTemplate.java.orig	2009-09-22 15:00:17.000000000 -0600
++++ src/org/antlr/stringtemplate/StringTemplate.java	2025-07-05 15:19:18.460303635 -0600
+@@ -541,7 +541,7 @@ public class StringTemplate {
+ 
+ 	/** Convenience method to box ints */
+ 	public void setAttribute(String name, int value) {
+-		setAttribute(name, new Integer(value));
++		setAttribute(name, Integer.valueOf(value));
+ 	}
+ 
+ 	/** Set an aggregate attribute with two values.  The attribute name
+--- test/org/antlr/stringtemplate/test/TestStringTemplate.java.orig	2025-07-05 15:16:42.836799197 -0600
++++ test/org/antlr/stringtemplate/test/TestStringTemplate.java	2025-07-05 15:25:30.627306739 -0600
+@@ -1632,11 +1632,11 @@ public class TestStringTemplate extends
+ 		org.antlr.stringtemplate.StringTemplate t =
+ 			new org.antlr.stringtemplate.StringTemplate(group,
+ 					  "$if(b)$x$endif$ $if(!b)$y$endif$");
+-		t.setAttribute("b", new Boolean(true));
++		t.setAttribute("b", Boolean.TRUE);
+ 		assertEquals(t.toString(), "x ");
+ 
+ 		t = t.getInstanceOf();
+-		t.setAttribute("b", new Boolean(false));
++		t.setAttribute("b", Boolean.FALSE);
+ 		assertEquals(" y", t.toString());
+ 	}
+ 
+@@ -1668,7 +1668,7 @@ public class TestStringTemplate extends
+         org.antlr.stringtemplate.StringTemplate t =
+             new org.antlr.stringtemplate.StringTemplate(group,
+                       "$if(names:{$it$})$Fail!$endif$ $if(!names:{$it$})$Works!$endif$");
+-        t.setAttribute("b", new Boolean(true));
++        t.setAttribute("b", Boolean.TRUE);
+         assertEquals(t.toString(), " Works!");
+     }
+ 
+@@ -1690,7 +1690,7 @@ public class TestStringTemplate extends
+ 		public String getLastName() { return "Burns"; }
+ 		public String getEmail() { return "tombu@jguru.com"; }
+ 		public String getBio() { return "Superhero by day..."; }
+-		public Boolean getCanEdit() { return new Boolean(true); }
++		public Boolean getCanEdit() { return Boolean.TRUE; }
+ 	}
+ 
+     public void testObjectPropertyReference() throws Exception {
+@@ -2906,10 +2906,10 @@ public class TestStringTemplate extends
+         group.setErrorListener(errors);
+         org.antlr.stringtemplate.StringTemplate t = new org.antlr.stringtemplate.StringTemplate(group,
+             "$users:{$if(it.ok)$$it.name$$endif$}; separator=\",\"$");
+-        t.setAttribute("users.{name,ok}", "Terence", new Boolean(true));
+-        t.setAttribute("users.{name,ok}", "Tom", new Boolean(false));
+-        t.setAttribute("users.{name,ok}", "Frank", new Boolean(true));
+-        t.setAttribute("users.{name,ok}", "Johnny", new Boolean(false));
++        t.setAttribute("users.{name,ok}", "Terence", Boolean.TRUE);
++        t.setAttribute("users.{name,ok}", "Tom", Boolean.FALSE);
++        t.setAttribute("users.{name,ok}", "Frank", Boolean.TRUE);
++        t.setAttribute("users.{name,ok}", "Johnny", Boolean.FALSE);
+         // empty conditional values get no separator
+         String expecting="Terence,Frank";
+         String result = t.toString();
+@@ -2923,10 +2923,10 @@ public class TestStringTemplate extends
+         group.setErrorListener(errors);
+         org.antlr.stringtemplate.StringTemplate t = new org.antlr.stringtemplate.StringTemplate(group,
+             "$users:{$if(it.ok)$$it.name$$endif$}; separator=\",\"$");
+-        t.setAttribute("users.{name,ok}", "Terence", new Boolean(true));
+-        t.setAttribute("users.{name,ok}", "Tom", new Boolean(false));
+-        t.setAttribute("users.{name,ok}", "Frank", new Boolean(false));
+-        t.setAttribute("users.{name,ok}", "Johnny", new Boolean(false));
++        t.setAttribute("users.{name,ok}", "Terence", Boolean.TRUE);
++        t.setAttribute("users.{name,ok}", "Tom", Boolean.FALSE);
++        t.setAttribute("users.{name,ok}", "Frank", Boolean.FALSE);
++        t.setAttribute("users.{name,ok}", "Johnny", Boolean.FALSE);
+         // empty conditional values get no separator
+         String expecting="Terence";
+         String result = t.toString();
+@@ -2940,10 +2940,10 @@ public class TestStringTemplate extends
+         group.setErrorListener(errors);
+         org.antlr.stringtemplate.StringTemplate t = new org.antlr.stringtemplate.StringTemplate(group,
+             "$users:{$if(it.ok)$$it.name$$endif$$if(it.ok)$$it.name$$endif$}; separator=\",\"$");
+-        t.setAttribute("users.{name,ok}", "Terence", new Boolean(false));
+-        t.setAttribute("users.{name,ok}", "Tom", new Boolean(true));
+-        t.setAttribute("users.{name,ok}", "Frank", new Boolean(true));
+-        t.setAttribute("users.{name,ok}", "Johnny", new Boolean(true));
++        t.setAttribute("users.{name,ok}", "Terence", Boolean.FALSE);
++        t.setAttribute("users.{name,ok}", "Tom", Boolean.TRUE);
++        t.setAttribute("users.{name,ok}", "Frank", Boolean.TRUE);
++        t.setAttribute("users.{name,ok}", "Johnny", Boolean.TRUE);
+         // empty conditional values get no separator
+         String expecting="TomTom,FrankFrank,JohnnyJohnny";
+         String result = t.toString();
+@@ -2957,10 +2957,10 @@ public class TestStringTemplate extends
+ 		group.setErrorListener(errors);
+ 		org.antlr.stringtemplate.StringTemplate t = new org.antlr.stringtemplate.StringTemplate(group,
+ 			"$users:{$if(it.ok)$$it.name$$else$$endif$}; separator=\",\"$");
+-		t.setAttribute("users.{name,ok}", "Terence", new Boolean(true));
+-		t.setAttribute("users.{name,ok}", "Tom", new Boolean(false));
+-		t.setAttribute("users.{name,ok}", "Frank", new Boolean(true));
+-		t.setAttribute("users.{name,ok}", "Johnny", new Boolean(false));
++		t.setAttribute("users.{name,ok}", "Terence", Boolean.TRUE);
++		t.setAttribute("users.{name,ok}", "Tom", Boolean.FALSE);
++		t.setAttribute("users.{name,ok}", "Frank", Boolean.TRUE);
++		t.setAttribute("users.{name,ok}", "Johnny", Boolean.FALSE);
+ 		// empty conditional values get no separator
+ 		String expecting="Terence,,Frank,";
+ 		String result = t.toString();
+@@ -5329,7 +5329,7 @@ public class TestStringTemplate extends
+ 			group.defineTemplate("t", "<data; null=\"\", separator=\", \">");
+ 		List data = new ArrayList();
+ 		data.add(null);
+-		data.add(new Integer(1));
++		data.add(Integer.valueOf(1));
+ 		t.setAttribute("data", data);
+ 		String expecting=", 1";
+ 		assertEquals(expecting, t.toString());
+@@ -5355,10 +5355,10 @@ public class TestStringTemplate extends
+ 			group.defineTemplate("t", "<data; null=\"-1\", separator=\", \">");
+ 		List data = new ArrayList();
+ 		data.add(null);
+-		data.add(new Integer(1));
++		data.add(Integer.valueOf(1));
+ 		data.add(null);
+-		data.add(new Integer(3));
+-		data.add(new Integer(4));
++		data.add(Integer.valueOf(3));
++		data.add(Integer.valueOf(4));
+ 		data.add(null);
+ 		t.setAttribute("data", data);
+ 		//System.out.println(t);
+@@ -5373,10 +5373,10 @@ public class TestStringTemplate extends
+ 			group.defineTemplate("t", "<data; separator=\", \">");
+ 		List data = new ArrayList();
+ 		data.add(null);
+-		data.add(new Integer(1));
++		data.add(Integer.valueOf(1));
+ 		data.add(null);
+-		data.add(new Integer(3));
+-		data.add(new Integer(4));
++		data.add(Integer.valueOf(3));
++		data.add(Integer.valueOf(4));
+ 		data.add(null);
+ 		t.setAttribute("data", data);
+ 		//System.out.println(t);
+@@ -5391,9 +5391,9 @@ public class TestStringTemplate extends
+ 			group.defineTemplate("t", "<data:array(); null=\"-1\", separator=\", \">");
+ 		group.defineTemplate("array", "<it>");
+ 		List data = new ArrayList();
+-		data.add(new Integer(0));
++		data.add(Integer.valueOf(0));
+ 		data.add(null);
+-		data.add(new Integer(2));
++		data.add(Integer.valueOf(2));
+ 		data.add(null);
+ 		t.setAttribute("data", data);
+ 		String expecting="0, -1, 2, -1";
+@@ -5408,9 +5408,9 @@ public class TestStringTemplate extends
+ 		group.defineTemplate("array", "<it>");
+ 		List data = new ArrayList();
+ 		data.add(null);
+-		data.add(new Integer(0));
++		data.add(Integer.valueOf(0));
+ 		data.add(null);
+-		data.add(new Integer(2));
++		data.add(Integer.valueOf(2));
+ 		t.setAttribute("data", data);
+ 		String expecting="-1, 0, -1, 2";
+ 		assertEquals(expecting, t.toString());
+@@ -5669,8 +5669,8 @@ public class TestStringTemplate extends
+ 			new org.antlr.stringtemplate.StringTemplate(group,
+ 				"<aMap.keys:{k|<k>:<aMap.(k)>}; separator=\", \">");
+ 		Map map = new HashMap();
+-		map.put(new Integer(1),new ArrayList(){{add("ick"); add("foo");}});
+-		map.put(new Integer(2),new ArrayList(){{add("x"); add("y");}});
++		map.put(Integer.valueOf(1),new ArrayList(){{add("ick"); add("foo");}});
++		map.put(Integer.valueOf(2),new ArrayList(){{add("x"); add("y");}});
+ 		t.setAttribute("aMap", map);
+         
+         String res = t.toString();

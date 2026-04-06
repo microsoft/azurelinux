@@ -1,0 +1,12 @@
+--- heapless-0.7.17/Cargo.toml	1970-01-01T00:00:01+00:00
++++ heapless-0.7.17/Cargo.toml	2024-03-25T22:10:35.867072+00:00
+@@ -55,9 +55,6 @@
+ version = "0.1"
+ optional = true
+ 
+-[dev-dependencies.ufmt]
+-version = "0.1"
+-
+ [build-dependencies.rustc_version]
+ version = "0.4.0"
+ 

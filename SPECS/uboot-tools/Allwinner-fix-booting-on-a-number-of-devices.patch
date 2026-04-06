@@ -1,0 +1,27 @@
+From b8ea3cebde98866b7cbb4e8f9bb6dfdee529a549 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Wed, 27 Aug 2025 00:23:28 +0100
+Subject: [PATCH] Allwinner: fix booting on a number of devices
+
+Revert "sunxi: enable MMU_PGPROT proper page table protection"
+
+This reverts commit 16cfccda4dbf0b53473b8212897f5c63bfbeb6e1.
+---
+ arch/arm/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 40368abc297..b8be270e4d7 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1207,7 +1207,6 @@ config ARCH_SUNXI
+ 	select DM_SPI_FLASH if SPI && MTD
+ 	select DM_KEYBOARD
+ 	select DM_SERIAL
+-	select MMU_PGPROT if ARM64
+ 	select OF_BOARD_SETUP
+ 	select OF_CONTROL
+ 	select PINCTRL
+-- 
+2.51.0
+

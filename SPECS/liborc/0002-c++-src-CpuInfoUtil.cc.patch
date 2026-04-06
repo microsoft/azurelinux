@@ -1,0 +1,16 @@
+--- orc-2.1.0/c++/src/CpuInfoUtil.cc.orig	2025-02-07 05:05:41.778368680 -0500
++++ orc-2.1.0/c++/src/CpuInfoUtil.cc	2025-02-07 05:08:36.721157844 -0500
+@@ -484,11 +484,11 @@
+ 
+ #else
+     //------------------------------ PPC, ... ------------------------------//
+-    bool ArchParseUserSimdLevel(const std::string& simdLevel, int64_t* hardwareFlags) {
++    bool ArchParseUserSimdLevel([[maybe_unused]] const std::string& simdLevel, [[maybe_unused]] int64_t* hardwareFlags) {
+       return true;
+     }
+ 
+-    void ArchVerifyCpuRequirements(const CpuInfo* ci) {}
++    void ArchVerifyCpuRequirements([[maybe_unused]] const CpuInfo* ci) {}
+ 
+ #endif  // X86, ARM, PPC
+ 

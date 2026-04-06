@@ -1,0 +1,43 @@
+From c98c00d6957601b95f3982f3d9460868469a299e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 10 Jul 2023 13:45:36 +0100
+Subject: [PATCH 4/8] drop bogus '_s' suffix from yajl dynamic library
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ reformatter/CMakeLists.txt | 2 +-
+ verify/CMakeLists.txt      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/reformatter/CMakeLists.txt b/reformatter/CMakeLists.txt
+index 52a9bee..4b7b3fa 100644
+--- a/reformatter/CMakeLists.txt
++++ b/reformatter/CMakeLists.txt
+@@ -26,7 +26,7 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../${YAJL_DIST_NAME}/lib)
+ 
+ ADD_EXECUTABLE(json_reformat ${SRCS})
+ 
+-TARGET_LINK_LIBRARIES(json_reformat yajl_s)
++TARGET_LINK_LIBRARIES(json_reformat yajl)
+ 
+ # In some environments, we must explicitly link libm (like qnx,
+ # thanks @shahbag)
+diff --git a/verify/CMakeLists.txt b/verify/CMakeLists.txt
+index 967fca1..2bceb26 100644
+--- a/verify/CMakeLists.txt
++++ b/verify/CMakeLists.txt
+@@ -26,7 +26,7 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../${YAJL_DIST_NAME}/lib)
+ 
+ ADD_EXECUTABLE(json_verify ${SRCS})
+ 
+-TARGET_LINK_LIBRARIES(json_verify yajl_s)
++TARGET_LINK_LIBRARIES(json_verify yajl)
+ 
+ # copy in the binary
+ GET_TARGET_PROPERTY(binPath json_verify LOCATION)
+-- 
+2.41.0
+

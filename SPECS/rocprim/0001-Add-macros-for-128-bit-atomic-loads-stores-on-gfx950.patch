@@ -1,0 +1,57 @@
+From 7f5575f10c73a6ed4d88350d65dc6448b9327816 Mon Sep 17 00:00:00 2001
+From: Wayne Franz <wayfranz@amd.com>
+Date: Thu, 6 Mar 2025 18:45:37 -0500
+Subject: [PATCH] Add macros for 128-bit atomic loads/stores on gfx950 (#700)
+
+This change adds an architecture macro for gfx950 in rocprim/config.hpp,
+then uses it to define ROCPRIM_ATOMIC_LOAD/STORE macros for 128-bit
+atomic loads on gfx950.
+---
+ rocprim/include/rocprim/config.hpp            | 5 ++++-
+ rocprim/include/rocprim/intrinsics/atomic.hpp | 4 ++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/rocprim/include/rocprim/config.hpp b/rocprim/include/rocprim/config.hpp
+index 3b6d2929..ff8ea89a 100644
+--- a/rocprim/include/rocprim/config.hpp
++++ b/rocprim/include/rocprim/config.hpp
+@@ -77,10 +77,13 @@
+ #undef ROCPRIM_TARGET_CDNA1
+ #undef ROCPRIM_TARGET_CDNA2
+ #undef ROCPRIM_TARGET_CDNA3
++#undef ROCPRIM_TARGET_CDNA4
+ #undef ROCPRIM_TARGET_UNKNOWN
+ 
+ // See https://llvm.org/docs/AMDGPUUsage.html#instructions
+-#if defined(__gfx940__) || defined(__gfx941__) || defined(__gfx942__) || defined(__gfx9_4_generic__)
++#if defined(__gfx950__)
++    #define ROCPRIM_TARGET_CDNA4 1
++#elif defined(__gfx940__) || defined(__gfx941__) || defined(__gfx942__) || defined(__gfx9_4_generic__)
+     #define ROCPRIM_TARGET_CDNA3 1
+ #elif defined(__gfx90a__)
+     #define ROCPRIM_TARGET_CDNA2 1
+diff --git a/rocprim/include/rocprim/intrinsics/atomic.hpp b/rocprim/include/rocprim/intrinsics/atomic.hpp
+index b20fc68a..c9685520 100644
+--- a/rocprim/include/rocprim/intrinsics/atomic.hpp
++++ b/rocprim/include/rocprim/intrinsics/atomic.hpp
+@@ -170,7 +170,7 @@ namespace detail
+ #define ROCPRIM_ATOMIC_LOAD(inst, mod, wait, ptr) \
+     asm volatile(inst " %0, %1 " mod "\t\n" wait : "=v"(result) : "v"(ptr) : "memory")
+ 
+-#if ROCPRIM_TARGET_CDNA3
++#if ROCPRIM_TARGET_CDNA4 || ROCPRIM_TARGET_CDNA3
+     #define ROCPRIM_ATOMIC_LOAD_FLAT(ptr) \
+         ROCPRIM_ATOMIC_LOAD("flat_load_dwordx4", "sc1", "s_waitcnt vmcnt(0)", ptr)
+     #define ROCPRIM_ATOMIC_LOAD_SHARED(ptr) \
+@@ -280,7 +280,7 @@ namespace detail
+ #define ROCPRIM_ATOMIC_STORE(inst, mod, wait, ptr) \
+     asm volatile(inst " %0, %1 " mod "\t\n" wait : : "v"(ptr), "v"(value) : "memory")
+ 
+-#if ROCPRIM_TARGET_CDNA3
++#if ROCPRIM_TARGET_CDNA4 || ROCPRIM_TARGET_CDNA3
+     #define ROCPRIM_ATOMIC_STORE_FLAT(ptr) \
+         ROCPRIM_ATOMIC_STORE("flat_store_dwordx4", "sc1", "s_waitcnt vmcnt(0)", ptr)
+     #define ROCPRIM_ATOMIC_STORE_SHARED(ptr) \
+-- 
+2.50.1
+

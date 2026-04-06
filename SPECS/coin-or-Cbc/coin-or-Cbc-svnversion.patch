@@ -1,0 +1,12 @@
+diff -up Cbc-releases-2.10.4/Cbc/src/CbcSolver.cpp.orig Cbc-releases-2.10.4/Cbc/src/CbcSolver.cpp
+--- Cbc-releases-2.10.4/Cbc/src/CbcSolver.cpp.orig	2020-01-31 04:34:18.000000000 -0700
++++ Cbc-releases-2.10.4/Cbc/src/CbcSolver.cpp	2020-02-20 11:56:31.207301868 -0700
+@@ -1907,7 +1907,7 @@ int CbcMain1(int argc, const char *argv[
+       }
+       sprintf(generalPrint + strlen(generalPrint),
+         "Build Date: %s \n", __DATE__);
+-#ifdef CBC_SVN_REV
++#if 0
+       sprintf(generalPrint + strlen(generalPrint),
+         "Revision Number: %d \n", CBC_SVN_REV);
+ #endif

@@ -1,0 +1,33 @@
+--- crash-9.0.1/Makefile.orig
++++ crash-9.0.1/Makefile
+@@ -204,7 +204,7 @@ GDB_FLAGS=
+ # TARGET_CFLAGS will be configured automatically by configure
+ TARGET_CFLAGS=
+ 
+-CRASH_CFLAGS=-g -D${TARGET} ${TARGET_CFLAGS} ${GDB_FLAGS} ${CFLAGS}
++CRASH_CFLAGS=-g -D${TARGET} ${TARGET_CFLAGS} ${GDB_FLAGS} ${CFLAGS} ${CPPFLAGS} -fPIE
+ 
+ GPL_FILES=
+ TAR_FILES=${SOURCE_FILES} Makefile ${GPL_FILES} README .rh_rpm_package crash.8 \
+@@ -256,7 +256,7 @@ all: make_configure
+ gdb_merge: force
+ 	@if [ ! -f ${GDB}/README ]; then \
+ 	  $(MAKE) gdb_unzip; fi
+-	@echo "${LDFLAGS} -lz -llzo2 -lsnappy -lzstd -ldl -rdynamic" > ${GDB}/gdb/mergelibs
++	@echo "${LDFLAGS} -lz -llzo2 -lsnappy -lzstd -ldl -rdynamic -Wl,-z,now -fPIE" > ${GDB}/gdb/mergelibs
+ 	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
+ 	@rm -f ${PROGRAM}
+ 	@if [ ! -f ${GDB}/config.status ]; then \
+--- crash-9.0.1/configure.c.orig
++++ crash-9.0.1/configure.c
+@@ -810,7 +810,8 @@ build_configure(struct supported_gdb_version *sp)
+                         fprintf(fp2, "%s\n", sp->GDB);
+                         sprintf(target_data.gdb_version, "%s", &sp->GDB[4]);
+ 		} else if (strncmp(buf, "LDFLAGS=", strlen("LDFLAGS=")) == 0) {
+-                       	fprintf(fp2, "LDFLAGS=%s\n", ldflags ? ldflags : "");
++			if (ldflags)
++				fprintf(fp2, "LDFLAGS=%s\n", ldflags ? ldflags : "");
+ 		} else
+ 			fprintf(fp2, "%s", buf);
+ 
+

@@ -1,0 +1,89 @@
+From 7d46c195498b06f6fe0562f957f7309140c24a46 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Mon, 3 Feb 2020 20:51:40 +0100
+Subject: [PATCH] Reenable mdoc.exe build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ mcs/docs/Makefile       |  4 ----
+ mcs/tools/mdoc/Makefile | 18 ++++++------------
+ 2 files changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/mcs/docs/Makefile b/mcs/docs/Makefile
+index 92e8f2adbe5..88bddb66268 100644
+--- a/mcs/docs/Makefile
++++ b/mcs/docs/Makefile
+@@ -38,10 +38,6 @@ DISABLE_MCS_DOCS = yes
+ endif
+ endif
+ 
+-ifdef MCS_MODE
+-DISABLE_MCS_DOCS = yes
+-endif
+-
+ csproj-local test-local run-test-local run-test-ondotnet-local doc-update:
+ 
+ clean-local:
+diff --git a/mcs/tools/mdoc/Makefile b/mcs/tools/mdoc/Makefile
+index e3c5a321d1a..00820361636 100644
+--- a/mcs/tools/mdoc/Makefile
++++ b/mcs/tools/mdoc/Makefile
+@@ -44,12 +44,6 @@ $(PROGRAM): $(PROGRAM_DEPS)
+ 
+ PROGRAM_COMPILE = $(CSCOMPILE)
+ 
+-ifdef MCS_MODE
+-NO_INSTALL=1
+-NO_BUILD=1
+-NO_TEST=1
+-endif
+-
+ include ../../build/executable.make
+ 
+ MONO = \
+@@ -63,6 +57,11 @@ DIFF = diff -rupZ
+ DIFF_QUIET = diff --brief -Z
+ endif
+ 
++ifdef MCS_MODE
++DIFF = echo "WARNING: running in mcs mode, tests are specific to roslyn and would fail. Skipping diff check."
++DIFF_QUIET = $(DIFF)
++endif
++
+ dist-local: dist-default dist-tests
+ 
+ dist-tests:
+@@ -360,7 +359,7 @@ check-mdoc-export-msxdoc-update:
+ 
+ check-mdoc-export-msxdoc:
+ 	$(MONO) $(PROGRAM) export-msxdoc -o - Test/en.expected.importslashdoc \
+-		| $(DIFF) - Test/msxdoc-expected.importslashdoc.xml
++		| $(DIFF_QUIET) - Test/msxdoc-expected.importslashdoc.xml
+ 
+ my_abs_top_srcdir = $(shell cd . && pwd)
+ 
+@@ -390,10 +389,6 @@ run-test-local: check-doc-tools
+ 
+ run-test-update : check-doc-tools-update
+ 
+-ifdef MCS_MODE
+-check-doc-tools:
+-	@echo "WARNING: running in mcs mode, mdoc doesn't compile with mcs. Skipping."
+-else
+ check-doc-tools:  \
+ 	check-monodocer-since \
+ 	check-monodocer-importecmadoc \
+@@ -412,7 +407,6 @@ check-doc-tools:  \
+ 	check-monodocer-dropns-multi-withexisting
+ 
+ #check-monodocer-dropns-delete
+-endif
+ 
+ check-doc-tools-update: check-monodocer-since-update \
+ 	check-monodocer-importecmadoc-update \
+-- 
+2.24.1
+

@@ -1,0 +1,23 @@
+diff -up tftp-hpa-5.3/tftpd/recvfrom.c.pktinfo tftp-hpa-5.3/tftpd/recvfrom.c
+--- tftp-hpa-5.3/tftpd/recvfrom.c.pktinfo	2024-05-30 00:40:13.000000000 +0200
++++ tftp-hpa-5.3/tftpd/recvfrom.c	2025-12-26 22:30:37.142522362 +0100
+@@ -170,16 +170,16 @@ myrecvfrom(int s, void *buf, int len, un
+ 
+     /* Try to enable getting the return address */
+ #ifdef IP_RECVDSTADDR
+-    if (from->sa.sa_family == AF_INET)
++    if (from->sa.sa_family == AF_INET || !from->sa.sa_family)
+         setsockopt(s, IPPROTO_IP, IP_RECVDSTADDR, &on, sizeof(on));
+ #endif
+ #ifdef IP_PKTINFO
+-    if (from->sa.sa_family == AF_INET)
++    if (from->sa.sa_family == AF_INET || !from->sa.sa_family)
+         setsockopt(s, IPPROTO_IP, IP_PKTINFO, &on, sizeof(on));
+ #endif
+ #ifdef HAVE_IPV6
+ #ifdef IPV6_RECVPKTINFO
+-    if (from->sa.sa_family == AF_INET6)
++    if (from->sa.sa_family == AF_INET6 || !from->sa.sa_family)
+         setsockopt(s, IPPROTO_IPV6, IPV6_RECVPKTINFO, &on, sizeof(on));
+ #endif
+ #endif

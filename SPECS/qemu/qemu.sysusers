@@ -1,0 +1,3 @@
+g kvm 36
+u qemu 107 'qemu user' - -
+m qemu kvm

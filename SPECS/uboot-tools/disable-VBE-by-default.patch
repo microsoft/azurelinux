@@ -1,0 +1,32 @@
+From d9e3a49bc2a29922da5bddd95772279f6edba802 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Fri, 18 Aug 2023 13:28:05 +0100
+Subject: [PATCH] disable VBE by default
+
+The VBE protocol needs explicit device support and as
+such isn't particularly useful by itself without that,
+it also adds size and the potential of an attack vector
+so devices that wish to use this protocol should
+explicitly opt in to it like all other large features
+in U-Boot.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ boot/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/boot/Kconfig b/boot/Kconfig
+index 30eb5b328d7..e8c3fbcb11d 100644
+--- a/boot/Kconfig
++++ b/boot/Kconfig
+@@ -635,7 +635,6 @@ config BOOTMETH_QFW
+ config BOOTMETH_VBE
+ 	bool "Bootdev support for Verified Boot for Embedded"
+ 	depends on FIT
+-	default y
+ 	select BOOTMETH_GLOBAL
+ 	select EVENT
+ 	help
+-- 
+2.49.0
+

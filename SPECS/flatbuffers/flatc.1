@@ -1,0 +1,529 @@
+.TH FLATC "1" "January 2025" "" "User Commands"
+.SH NAME
+.B flatc
+\(en FlatBuffers compiler
+.SH SYNOPSIS
+.B flatc
+.RI [\  GENERATOR_OPTIONS \ ]
+.RB [\  \-o\ \fIPATH \ ]
+.IR FILES ...
+.RB [\  \-\-\ \fIBINARY_FILES  ...\ ]
+.SH DESCRIPTION
+The main compiler for FlatBuffers is called
+.BR flatc (1)
+and is used to convert schema definitions into generated code files
+for a variety of languages.
+.SH OPTIONS
+.IP \(bu 2
+The
+.I GENERATOR_OPTIONS
+specify the language(s) to compile code for
+as well as various features to enable/disable.
+.IP \(bu 2
+The
+.B \-o\ \fIPATH
+specifies the path where the generated files are placed.
+It defaults to the current path if not specified.
+.IP \(bu 2
+The
+.B \-I\ \fIPATH
+specifies the path where included schema files are located.
+It defaults to the current path if not specified.
+.SS "INPUT FILES"
+\fIFILES\fR... specifies one or more schema or data files to process.
+They are processed in the order provided.
+.SS "SCHEMA FILES"
+For schema files, language specifiers indicate
+what languages to generate code for.
+.IP \(bu 2
+.BR \-\-cpp :
+C++
+.PD 0
+.IP \(bu 2
+.BR \-\-java :
+Java
+.IP \(bu 2
+.BR \-\-kotlin :
+Kotlin
+.IP \(bu 2
+.BR \-\-csharp :
+C#
+.IP \(bu 2
+.BR \-\-go :
+Golang
+.IP \(bu 2
+.BR \-\-python :
+Python
+.IP \(bu 2
+.BR \-\-js :
+JavaScript
+.IP \(bu 2
+.BR \-\-ts :
+TypeScript
+.IP \(bu 2
+.BR \-\-php :
+PHP
+.IP \(bu 2
+.BR \-\-dart :
+Dart
+.IP \(bu 2
+.BR \-\-lua :
+Lua
+.IP \(bu 2
+.BR \-\-lobster :
+Lobster
+.IP \(bu 2
+.BR \-\-rust :
+Rust
+.IP \(bu 2
+.BR \-\-swift :
+Swift
+.IP \(bu 2
+.BR \-\-nim :
+Nim
+.PD
+.P
+Additionally, adding
+.B \-\-grpc
+will generate RPC stub code for gRPC (not available in all languages).
+.SS "DATA FILES"
+If \fIFILES\fR... contain data files,
+they can be exported to either a binary or JSON representation.
+.TP
+.B \-\-binary\fR, \fB\-b\fR
+Generate a binary file containing a serialized flatbuffer.
+.PD 0
+.TP
+.B \-\-json\fR, \fB\-j\fR
+Generate JSON file from a serialized flatbuffer.
+.PD
+.P
+Both options require the corresponding schema file to be included first
+in the list of \fIFILES\fR....
+.TP
+.B To Binary
+To serialize the JSON data in
+.B mydata.json
+using the schema
+.BR myschema.fbs :
+.RS +3n
+.IP
+.EX
+.B flatc --binary myschema.fbs mydata.json
+.EE
+.RE
+.IP
+This will generate a
+.B mydata_wire.bin
+file containing the serialized flatbuffer data.
+.TP
+.B To JSON
+To convert the serialized binary flatbuffer
+.B mydata.bin
+using the schema
+.B myschema.fbs
+to JSON:
+.RS +3n
+.IP
+.EX
+.B flatc --json myschema.fbs mydata.bin
+.EE
+.RE
+.IP
+This will generate a
+.B mydata.json
+file.
+.SS "ADDITIONAL OPTIONS"
+.TP
+.B \-o\ \fIPATH
+Output all generated files to
+.I PATH
+(either absolute, or relative to the current directory).
+If omitted,
+.I PATH
+will be the current directory.
+.I PATH
+should end in your system\(cqs path separator,
+e.g. \fB/\fR or \fB\\\fR.
+.TP
+.B \-I\ \fIPATH
+When encountering
+.B include
+statements, attempt to load the files from this path.
+Paths will be tried in the order given,
+and if all fail (or none are specified)
+it will try to load relative to the path
+of the schema file being parsed.
+.TP
+.B \-M
+Print make rules for generated files.
+.TP
+.B \-\-strict\-json
+Require and generate strict JSON
+(field names are enclosed in quotes,
+no trailing commas in tables/vectors).
+By default, no quotes are required/generated,
+and trailing commas are allowed.
+.TP
+.B \-\-allow\-non\-utf8
+Pass non-UTF-8 input through parser and emit nonstandard
+.BI \\\\\\\\ x
+escapes in JSON.
+(Default is to raise parse error on non-UTF-8 input.)
+.B \-\-natural\-utf8
+Output strings with UTF-8 as human-readable strings.
+By default, UTF-8 characters are printed as
+.BI \\\\\\\\u XXXX
+escapes.
+.TP
+.B \-\-defaults\-json
+Output fields whose value is equal to the default value
+when writing JSON text.
+.TP
+.B \-\-no\-prefix
+Don\(cqt prefix enum values in generated C++ by their enum type.
+.TP
+.B \-\-scoped\-enums
+Use C++11 style scoped and strongly typed enums in generated C++.
+This also implies
+.BR \-\-no\-prefix .
+.TP
+.B \-\-no\-emit\-min\-max\-enum\-values
+Disable generation of
+.B MIN
+and
+.B MAX
+enumerated values for scoped enums and prefixed enums.
+.TP
+.B \-\-gen\-includes
+.RI ( deprecated )
+This is the default behavior.
+If the original behavior is required (no
+.B include
+statements) use
+.BR \-\-no\-includes.
+.TP
+.B \-\-no\-includes
+Don\(cqt generate include statements for included schemas
+the generated file depends on (C++ / Python).
+.TP
+.B \-\-gen\-mutable
+Generate additional non-const accessors
+for mutating FlatBuffers in-place.
+.TP
+.B \-\-gen\-onefile
+Generate single output file for C#, Go, and Python.
+.TP
+.B \-\-gen\-name\-strings
+Generate type name functions for C++.
+.TP
+.B \-\-gen\-object\-api
+Generate an additional object-based API.
+This API is more convenient for object construction and mutation
+than the base API, at the cost of efficiency (object allocation).
+Recommended only to be used if other options are insufficient.
+.TP
+.B \-\-gen\-compare
+Generate
+.B operator==
+for object-based API types.
+.TP
+.B \-\-gen\-nullable
+Add Clang
+.B _Nullable
+for C++ pointer or
+.B @Nullable
+for Java.
+.TP
+.B \-\-gen\-generated
+Add
+.B @Generated
+annotation for Java.
+.TP
+.B \-\-gen\-jvmstatic
+Add
+.B @JvmStatic
+annotation for Kotlin methods in companion object
+for interop from Java to Kotlin.
+.TP
+.B \-\-gen\-all
+Generate not just code for the current schema files,
+but for all files it includes as well.
+If the language uses a single file for output
+(by default the case for C++ and JS),
+all code will end up in this one file.
+.TP
+.B \-\-cpp\-include
+Adds an
+.B #include
+in generated file.
+.TP
+.B \-\-cpp\-ptr\-type\ \fIT
+Set object API pointer type
+(default
+.BR std::unique_ptr )
+.TP
+.B \-\-cpp\-str\-type\ \fIT
+Set object API string type
+(default
+.BR std::string ).
+.IB T ::c_str()\fR,
+.IB T ::length()
+and
+.IB T ::empty()
+must be supported.
+The custom type also needs to be constructible from
+.B std::string
+(see the
+.B \-\-cpp\-str\-flex\-ctor
+option to change this behavior).
+.TP
+.B \-\-cpp\-str\-flex\-ctor
+Don\(cqt construct custom string types by passing
+.B std::string
+from Flatbuffers, but
+.BR (char*\ +\ length) .
+This allows efficient construction of custom string types,
+including zero-copy construction.
+.TP
+.B \-\-no\-cpp\-direct\-copy
+Don\(cqt generate direct copy methods for C++ object-based API.
+.TP
+.B \-\-cpp\-std\ \fICPP_STD
+Generate a C++ code using features of selected C++ standard.
+Supported
+.I CPP_STD
+values:
+.PD 0
+.RS +10n
+.IP \(bu 2n
+.B c++0x
+\(en generate code compatible with old compilers (VS2010),
+.IP \(bu 2n
+.B c++11
+\(en use C++11 code generator
+.RI ( default ),
+.IP \(bu 2n
+.B c++17
+\(en use C++17 features in generated code
+.RI ( experimental ).
+.RE
+.PD
+.TP
+.B \-\-object\-prefix
+Customise class prefix for C++ object-based API.
+.TP
+.B \-\-object\-suffix
+Customise class suffix for C++ object-based API.
+.TP
+.B \-\-go\-namespace
+Generate the overrided namespace in Golang.
+.TP
+.B \-\-go\-import
+Generate the overrided import for flatbuffers in Golang.
+(default is
+.BR "github.com/google/flatbuffers/go" ).
+.TP
+.B \-\-raw\-binary
+Allow binaries without a
+.B file_indentifier
+to be read.
+This may crash
+.BR flatc (1)
+given a mismatched schema.
+.TP
+.B \-\-size\-prefixed
+Input binaries are size prefixed buffers.
+.TP
+.B \-\-proto
+Expect input files to be
+.B .proto
+files (protocol buffers).
+Output the corresponding
+.B .fbs
+file.
+Currently supports:
+.BR package ,
+.BR message ,
+.BR enum ,
+nested declarations,
+.B import
+(use
+.B \-I
+for paths),
+.BR extend ,
+.BR oneof ,
+.BR group .
+Does not support, but will skip without error:
+.BR option ,
+.BR service ,
+.BR extensions ,
+and most everything else.
+.TP
+.B \-\-oneof\-union
+Translate
+.B .proto
+.BR oneof s
+to flatbuffer unions.
+.TP
+.B \-\-grpc
+Generate GRPC interfaces for the specified languages.
+.TP
+.B \-\-schema
+Serialize schemas instead of JSON (use with
+.BR \-b ).
+This will output a binary version of the specified schema
+that itself corresponds to the
+.BR reflection / reflection.fbs
+schema.
+Loading this binary file is the basis for reflection functionality.
+.TP
+.B \-\-bfbs\-comments
+Add doc comments to the binary schema files.
+.TP
+.B \-\-conform\ \fIFILE
+Specify a schema the following schemas should be an evolution of.
+Gives errors if not.
+Useful to check if schema modifications don\(cqt break
+schema evolution rules.
+.TP
+.B \-\-conform\-includes\ \fIPATH
+Include path for the schema given with
+.BR \-\-conform\ \fIPATH .
+.TP
+.B \-\-filename\-suffix\ \fISUFFIX
+The suffix appended to the generated file names.
+Default is
+.BR _generated .
+.TP
+.B \-\-filename\-ext\ \fIEXTENSION
+The extension appended to the generated file names.
+Default is language-specific (e.g. \fB"h"\fR for C++).
+This should not be used when multiple languages are specified.
+.TP
+.B \-\-include\-prefix\ \fIPATH
+Prefix this path to any generated include statements.
+.TP
+.B \-\-keep\-prefix
+Keep original prefix of schema include statement.
+.TP
+.B \-\-reflect\-types
+Add minimal type reflection to code generation.
+.TP
+.B \-\-reflect\-names
+Add minimal type/name reflection.
+.TP
+.B \-\-root\-type\ \fIT
+Select or override the default
+.BR root_type .
+.TP
+.B \-\-require\-explicit\-ids
+When parsing schemas, require explicit ids
+.RB ( id:\ \fIx ).
+.TP
+.B \-\-force\-defaults
+Emit default values in binary output from JSON.
+.TP
+.B \-\-force\-empty
+When serializing from object API representation,
+force strings and vectors to empty rather than null.
+.TP
+.B \-\-force\-empty\-vectors
+When serializing from object API representation,
+force vectors to empty rather than null.
+.TP
+.B \-\-flexbuffers
+Used with
+.B \-\-binary
+and
+.B \-\-json
+options,
+it generates data using schema-less FlexBuffers.
+.TP
+.B \-\-no\-warnings
+Inhibit all warning messages.
+.TP
+.B \-\-cs\-global\-alias
+Prepend
+.B global::
+to all user generated csharp classes and structs.
+.TP
+.B \-\-json\-nested\-bytes
+Allow a
+.B nested_flatbuffer
+field to be parsed as a vector of bytes in JSON,
+which is unsafe unless checked by a verifier afterwards.
+.TP
+.B \-\-python\-no\-type\-prefix\-suffix
+Skip emission of Python functions that are prefixed with typenames.
+.TP
+.B \-\-python\-typing
+Generate Python type annotations.
+.SS "ADDITIONAL gRPC OPTIONS"
+.TP
+.B \-\-grpc\-filename\-suffix
+.BI [ C++ ]
+An optional suffix for the generated files\(cq names.
+For example, compiling gRPC for C++ with
+.B \-\-grpc\-filename\-suffix=.fbs
+will generate
+.RI { name }\fB.fbs.h
+and
+.RI { name }\fB.fbs.cc
+files.
+.TP
+.B \-\-grpc\-additional\-header
+.BI [ C++ ]
+Additional headers to include in the generated files.
+.TP
+.B \-\-grpc\-search\-path
+.BI [ C++ ]
+An optional prefix for the gRPC runtime path.
+For example, compiling gRPC for C++ with
+.B \-\-grpc\-search\-path=some/path
+will generate the following includes:
+.RS +3n
+.IP
+.EX
+.B #include\ "some/path/grpcpp/impl/codegen/async_stream.h"
+.B #include\ "some/path/grpcpp/impl/codegen/async_unary_call.h"
+.B #include\ "some/path/grpcpp/impl/codegen/method_handler.h"
+.B ...\:
+.EE
+.RE
+.TP
+.B \-\-grpc\-use\-system\-headers
+.BI [ C++ ]
+Whether to generate
+.B #include\ <header>
+instead of
+.B #include\ "header.h"
+for all headers when compiling gRPC for C++.
+For example, compiling gRPC for C++ with
+.B \-\-grpc\-use\-system\-headers
+will generate the following includes:
+.RS +3n
+.IP
+.EX
+.B #include\ <some/path/grpcpp/impl/codegen/async_stream.h>
+.B #include\ <some/path/grpcpp/impl/codegen/async_unary_call.h>
+.B #include\ <some/path/grpcpp/impl/codegen/method_handler.h>
+.B ...\:
+.EE
+.RE
+.IP
+.IR NOTE :
+This option can be negated with
+.BR \-\-no\-grpc\-use\-system\-headers .
+.TP
+.B \-\-grpc\-python\-typed\-handlers
+.BI [ Python ]
+Whether to generate the typed handlers that use the generated
+Python classes instead of raw bytes for requests/responses.
+.SH NOTES
+Short-form options for generators are deprecated;
+use the long form whenever possible.
+.SH "SEE ALSO"
+.UR https://google.github.io/flatbuffers
+Official documentation
+.UE

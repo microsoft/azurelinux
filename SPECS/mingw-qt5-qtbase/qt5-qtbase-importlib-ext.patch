@@ -1,0 +1,79 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/create_cmake.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/create_cmake.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/create_cmake.prf	2025-11-07 14:10:24.191919567 +0100
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/create_cmake.prf	2025-11-07 14:10:25.321802389 +0100
+@@ -339,8 +339,14 @@ mac {
+         CMAKE_WINMAIN_FILE_LOCATION_DEBUG = libqt5main$${QT_LIBINFIX}$${debug_suffix}.a
+         CMAKE_WINMAIN_FILE_LOCATION_RELEASE = libqt5main$${QT_LIBINFIX}.a
+ 
+-        CMAKE_IMPLIB_FILE_LOCATION_DEBUG = lib$${CMAKE_QT_STEM}$${debug_suffix}.a
+-        CMAKE_IMPLIB_FILE_LOCATION_RELEASE = lib$${CMAKE_QT_STEM}.a
++        isEmpty(QMAKE_EXTENSION_IMPORTLIB): QMAKE_EXTENSION_IMPORTLIB = a
++        !isEmpty(CMAKE_STATIC_TYPE) {
++            CMAKE_IMPLIB_FILE_LOCATION_DEBUG = lib$${CMAKE_QT_STEM}d.a
++            CMAKE_IMPLIB_FILE_LOCATION_RELEASE = lib$${CMAKE_QT_STEM}.a
++        } else {
++            CMAKE_IMPLIB_FILE_LOCATION_DEBUG = lib$${CMAKE_QT_STEM}d.$${QMAKE_EXTENSION_IMPORTLIB}
++            CMAKE_IMPLIB_FILE_LOCATION_RELEASE = lib$${CMAKE_QT_STEM}.$${QMAKE_EXTENSION_IMPORTLIB}
++        }
+     } else {
+         CMAKE_WINMAIN_FILE_LOCATION_DEBUG = qt5main$${QT_LIBINFIX}$${debug_suffix}.lib
+         CMAKE_WINMAIN_FILE_LOCATION_RELEASE = qt5main$${QT_LIBINFIX}.lib
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/qt.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/qt.prf	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt.prf	2025-11-07 14:10:25.322123570 +0100
+@@ -217,13 +217,18 @@ for(ever) {
+             } else {
+                 candidates = $$MODULE_MODULE$$qtPlatformTargetSuffix()
+                 darwin: candidates *= $$MODULE_MODULE
+-                win32|contains(MODULE_CONFIG, staticlib) {
++                contains(MODULE_CONFIG, staticlib) {
+                     lib_prefix = $$MODULE_LIBS/$$QMAKE_PREFIX_STATICLIB
+                     lib_suffix = $$QMAKE_EXTENSION_STATICLIB
+                     add_lib_to_pretargetdeps = true
+                 } else {
+-                    lib_prefix = $$MODULE_LIBS/$$QMAKE_PREFIX_SHLIB
+-                    lib_suffix = $$QMAKE_EXTENSION_SHLIB
++                    win32 {
++                        lib_prefix = $$MODULE_LIBS/$$QMAKE_PREFIX_STATICLIB
++                        lib_suffix = $$QMAKE_EXTENSION_IMPORTLIB
++                    } else {
++                        lib_prefix = $$MODULE_LIBS/$$QMAKE_PREFIX_SHLIB
++                        lib_suffix = $$QMAKE_EXTENSION_SHLIB
++                    }
+                     add_lib_to_pretargetdeps = false
+                 }
+                 lib_missing = true
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/qmake/generators/win32/winmakefile.cpp qtbase-everywhere-src-5.15.18-new/qmake/generators/win32/winmakefile.cpp
+--- qtbase-everywhere-src-5.15.18/qmake/generators/win32/winmakefile.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/qmake/generators/win32/winmakefile.cpp	2025-11-07 14:10:25.322407134 +0100
+@@ -99,9 +99,13 @@ private:
+ bool
+ Win32MakefileGenerator::findLibraries(bool linkPrl, bool mergeLflags)
+ {
+-    ProStringList impexts = project->values("QMAKE_LIB_EXTENSIONS");
+-    if (impexts.isEmpty())
+-        impexts = project->values("QMAKE_EXTENSION_STATICLIB");
++    ProStringList impexts;
++    if (project->isActiveConfig("staticlib")) {
++        impexts.append(project->values("QMAKE_EXTENSION_STATICLIB"));
++    } else {
++        impexts.append(project->values("QMAKE_EXTENSION_IMPORTLIB"));
++        impexts.append(project->values("QMAKE_EXTENSION_STATICLIB"));
++    }
+     QVector<LibrarySearchPath> dirs;
+     int libidx = 0;
+     for (const ProString &dlib : project->values("QMAKE_DEFAULT_LIBDIRS"))
+@@ -283,9 +287,12 @@ void Win32MakefileGenerator::fixTargetEx
+     if (!project->values("QMAKE_APP_FLAG").isEmpty()) {
+         project->values("TARGET_EXT").append(".exe");
+     } else if (project->isActiveConfig("shared")) {
++        ProString impext = project->first("QMAKE_EXTENSION_IMPORTLIB");
++        if (impext.isEmpty())
++          impext = project->first("QMAKE_PREFIX_STATICLIB");
+         project->values("LIB_TARGET").prepend(project->first("QMAKE_PREFIX_STATICLIB")
+                                               + project->first("TARGET") + project->first("TARGET_VERSION_EXT")
+-                                              + '.' + project->first("QMAKE_EXTENSION_STATICLIB"));
++                                              + '.' + impext);
+         project->values("TARGET_EXT").append(project->first("TARGET_VERSION_EXT") + "."
+                 + project->first("QMAKE_EXTENSION_SHLIB"));
+         project->values("TARGET").first() = project->first("QMAKE_PREFIX_SHLIB") + project->first("TARGET");

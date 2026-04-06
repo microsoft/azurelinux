@@ -1,0 +1,120 @@
+diff -up ./doc/certutil.xml.no-dbm ./doc/certutil.xml
+--- ./doc/certutil.xml.no-dbm	2021-05-29 10:26:21.853386165 -0700
++++ ./doc/certutil.xml	2021-05-29 10:31:15.057058619 -0700
+@@ -205,8 +205,7 @@ If this option is not used, the validity
+           <para><command>certutil</command> supports two types of databases: the legacy security databases (<filename>cert8.db</filename>, <filename>key3.db</filename>, and <filename>secmod.db</filename>) and new SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). </para>
+           <para>NSS recognizes the following prefixes:</para>
+           <itemizedlist>
+-            <listitem><para><command>sql:</command> requests the newer database</para></listitem>
+-	    <listitem><para><command>dbm:</command> requests the legacy database</para></listitem>
++            <listitem><para><command>sql:</command> requests the sql-lite database</para></listitem>
+           </itemizedlist>
+           <para>If no prefix is specified the default type is retrieved from NSS_DEFAULT_DB_TYPE. If NSS_DEFAULT_DB_TYPE is not set then <command>sql:</command> is the default.</para>
+         </listitem>
+@@ -1205,17 +1204,9 @@ BerkeleyDB. These new databases provide
+ 	</listitem>
+ </itemizedlist>
+ 
+-<para>Because the SQLite databases are designed to be shared, these are the <emphasis>shared</emphasis> database type. The shared database type is preferred; the legacy format is included for backward compatibility.</para>
++<para>Because the SQLite databases are designed to be shared, these are the <emphasis>shared</emphasis> database type. </para>
+ 
+-<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.
+-Using the legacy databases must be manually specified by using the <command>dbm:</command> prefix with the given security directory. For example:</para>
+-
+-<programlisting>$ certutil -L -d dbm:/home/my/sharednssdb</programlisting>
+-
+-<para>To set the legacy database type as the default type for the tools, set the <envar>NSS_DEFAULT_DB_TYPE</envar> environment variable to <envar>dbm</envar>:</para>
+-<programlisting>export NSS_DEFAULT_DB_TYPE="dbm"</programlisting>
+-
+-<para>This line can be set added to the <filename>~/.bashrc</filename> file to make the change permanent.</para>
++<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.</para>
+ 
+ <itemizedlist>
+ 	<listitem>
+diff -up ./doc/modutil.xml.no-dbm ./doc/modutil.xml
+--- ./doc/modutil.xml.no-dbm	2021-05-29 10:26:21.854386171 -0700
++++ ./doc/modutil.xml	2021-05-29 10:28:23.293078869 -0700
+@@ -151,7 +151,7 @@
+       <varlistentry>
+         <term>-dbdir directory</term>
+ 	  <listitem><para>Specify the database directory in which to access or create security module database files.</para>
+-	<para><command>modutil</command> supports two types of databases: the legacy security databases (<filename>cert8.db</filename>, <filename>key3.db</filename>, and <filename>secmod.db</filename>) and SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). If the prefix <command>dbm:</command> is not used, then the tool assumes that the given databases are in SQLite format.</para></listitem>
++	<para><command>modutil</command> supports SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). </para></listitem>
+       </varlistentry>
+ 
+       <varlistentry>
+@@ -689,15 +689,7 @@ BerkleyDB. These new databases provide m
+ 
+ <para>Because the SQLite databases are designed to be shared, these are the <emphasis>shared</emphasis> database type. The shared database type is preferred; the legacy format is included for backward compatibility.</para>
+ 
+-<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.
+-Using the legacy databases must be manually specified by using the <command>dbm:</command> prefix with the given security directory. For example:</para>
+-
+-<programlisting>modutil -create -dbdir dbm:/home/my/sharednssdb</programlisting>
+-
+-<para>To set the legacy database type as the default type for the tools, set the <envar>NSS_DEFAULT_DB_TYPE</envar> environment variable to <envar>dbm</envar>:</para>
+-<programlisting>export NSS_DEFAULT_DB_TYPE="dbm"</programlisting>
+-
+-<para>This line can be added to the <filename>~/.bashrc</filename> file to make the change permanent for the user.</para>
++<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.  </para> 
+ 
+ <itemizedlist>
+ 	<listitem>
+diff -up ./doc/pk12util.xml.no-dbm ./doc/pk12util.xml
+--- ./doc/pk12util.xml.no-dbm	2021-05-29 10:26:21.854386171 -0700
++++ ./doc/pk12util.xml	2021-05-29 10:28:23.293078869 -0700
+@@ -90,7 +90,7 @@
+       <varlistentry>
+         <term>-d directory</term>
+         <listitem><para>Specify the database directory into which to import to or export from certificates and keys.</para>
+-	<para><command>pk12util</command> supports two types of databases: the legacy security databases (<filename>cert8.db</filename>, <filename>key3.db</filename>, and <filename>secmod.db</filename>) and new SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). If the prefix <command>dbm:</command> is not used, then the tool assumes that the given databases are in the SQLite format.</para></listitem>
++	<para><command>pk12util</command> supports SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). </para></listitem>
+       </varlistentry>
+ 
+       <varlistentry>
+@@ -394,15 +394,7 @@ BerkleyDB. These new databases provide m
+ 
+ <para>Because the SQLite databases are designed to be shared, these are the <emphasis>shared</emphasis> database type. The shared database type is preferred; the legacy format is included for backward compatibility.</para>
+ 
+-<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type
+-Using the legacy databases must be manually specified by using the <command>dbm:</command> prefix with the given security directory. For example:</para>
+-
+-<programlisting># pk12util -i /tmp/cert-files/users.p12 -d dbm:/home/my/sharednssdb</programlisting>
+-
+-<para>To set the legacy database type as the default type for the tools, set the <envar>NSS_DEFAULT_DB_TYPE</envar> environment variable to <envar>dbm</envar>:</para>
+-<programlisting>export NSS_DEFAULT_DB_TYPE="dbm"</programlisting>
+-
+-<para>This line can be set added to the <filename>~/.bashrc</filename> file to make the change permanent.</para>
++<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.  </para>
+ 
+ <itemizedlist>
+ 	<listitem>
+diff -up ./doc/signver.xml.no-dbm ./doc/signver.xml
+--- ./doc/signver.xml.no-dbm	2021-05-29 10:26:21.854386171 -0700
++++ ./doc/signver.xml	2021-05-29 10:28:23.293078869 -0700
+@@ -66,7 +66,7 @@
+       <varlistentry>
+         <term>-d <emphasis>directory</emphasis></term>
+         <listitem><para>Specify the database directory which contains the certificates and keys.</para>
+-	<para><command>signver</command> supports two types of databases: the legacy security databases (<filename>cert8.db</filename>, <filename>key3.db</filename>, and <filename>secmod.db</filename>) and new SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). If the prefix <command>dbm:</command> is not used, then the tool assumes that the given databases are in the SQLite format.</para></listitem>
++	<para><command>signver</command> supports SQLite databases (<filename>cert9.db</filename>, <filename>key4.db</filename>, and <filename>pkcs11.txt</filename>). </para></listitem>
+       </varlistentry>
+       <varlistentry>
+         <term>-a</term>
+@@ -155,15 +155,7 @@ BerkleyDB. These new databases provide m
+ 
+ <para>Because the SQLite databases are designed to be shared, these are the <emphasis>shared</emphasis> database type. The shared database type is preferred; the legacy format is included for backward compatibility.</para>
+ 
+-<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type
+-Using the legacy databases must be manually specified by using the <command>dbm:</command> prefix with the given security directory. For example:</para>
+-
+-<programlisting># signver -A -s <replaceable>signature</replaceable> -d dbm:/home/my/sharednssdb</programlisting>
+-
+-<para>To set the legacy database type as the default type for the tools, set the <envar>NSS_DEFAULT_DB_TYPE</envar> environment variable to <envar>dbm</envar>:</para>
+-<programlisting>export NSS_DEFAULT_DB_TYPE="dbm"</programlisting>
+-
+-<para>This line can be added to the <filename>~/.bashrc</filename> file to make the change permanent for the user.</para>
++<para>By default, the tools (<command>certutil</command>, <command>pk12util</command>, <command>modutil</command>) assume that the given security databases use the SQLite type.</para>
+ 
+ <itemizedlist>
+ 	<listitem>

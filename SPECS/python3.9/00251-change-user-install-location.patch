@@ -1,0 +1,110 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michal Cyprian <m.cyprian@gmail.com>
+Date: Mon, 26 Jun 2017 16:32:56 +0200
+Subject: 00251: Change user install location
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Set values of prefix and exec_prefix in distutils install command
+to /usr/local if executable is /usr/bin/python* and RPM build
+is not detected to make pip and distutils install into separate location.
+
+Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+Downstream only: Reworked in Fedora 36+/Python 3.10+ to follow https://bugs.python.org/issue43976
+
+pypa/distutils integration: https://github.com/pypa/distutils/pull/70
+
+Also set sysconfig._PIP_USE_SYSCONFIG = False, to force pip-upgraded-pip
+to respect this patched distutils install command.
+See https://bugzilla.redhat.com/show_bug.cgi?id=2014513
+
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+---
+ Lib/distutils/command/install.py |  9 +++++++--
+ Lib/site.py                      |  9 ++++++++-
+ Lib/sysconfig.py                 | 17 +++++++++++++++++
+ 3 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index aaa300efa9..18f01f10d4 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -3,6 +3,7 @@
+ Implements the Distutils 'install' command."""
+ 
+ import sys
++import sysconfig
+ import os
+ 
+ from distutils import log
+@@ -142,6 +143,8 @@ class install(Command):
+ 
+     negative_opt = {'no-compile' : 'compile'}
+ 
++    # Allow Fedora to add components to the prefix
++    _prefix_addition = getattr(sysconfig, '_prefix_addition', '')
+ 
+     def initialize_options(self):
+         """Initializes options."""
+@@ -419,8 +422,10 @@ class install(Command):
+                     raise DistutilsOptionError(
+                           "must not supply exec-prefix without prefix")
+ 
+-                self.prefix = os.path.normpath(sys.prefix)
+-                self.exec_prefix = os.path.normpath(sys.exec_prefix)
++                self.prefix = (
++                    os.path.normpath(sys.prefix) + self._prefix_addition)
++                self.exec_prefix = (
++                    os.path.normpath(sys.exec_prefix) + self._prefix_addition)
+ 
+             else:
+                 if self.exec_prefix is None:
+diff --git a/Lib/site.py b/Lib/site.py
+index 54ffc4fdc0..930b91813e 100644
+--- a/Lib/site.py
++++ b/Lib/site.py
+@@ -362,7 +362,14 @@ def getsitepackages(prefixes=None):
+     return sitepackages
+ 
+ def addsitepackages(known_paths, prefixes=None):
+-    """Add site-packages to sys.path"""
++    """Add site-packages to sys.path
++
++    '/usr/local' is included in PREFIXES if RPM build is not detected
++    to make packages installed into this location visible.
++
++    """
++    if ENABLE_USER_SITE and 'RPM_BUILD_ROOT' not in os.environ:
++        PREFIXES.insert(0, "/usr/local")
+     for sitedir in getsitepackages(prefixes):
+         if os.path.isdir(sitedir):
+             addsitedir(sitedir, known_paths)
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index e3f79bfde5..e124104876 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -86,6 +86,23 @@ _INSTALL_SCHEMES = {
+         },
+     }
+ 
++# Force pip to use distutils paths instead of sysconfig
++# https://github.com/pypa/pip/issues/10647
++_PIP_USE_SYSCONFIG = False
++
++# This is used by distutils.command.install in the stdlib
++# as well as pypa/distutils (e.g. bundled in setuptools).
++# The self.prefix value is set to sys.prefix + /local/
++# if neither RPM build nor virtual environment is
++# detected to make distutils install packages
++# into the separate location.
++# https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
++if (not (hasattr(sys, 'real_prefix') or
++    sys.prefix != sys.base_prefix) and
++    'RPM_BUILD_ROOT' not in os.environ):
++    _prefix_addition = "/local"
++
++
+ _SCHEME_KEYS = ('stdlib', 'platstdlib', 'purelib', 'platlib', 'include',
+                 'scripts', 'data')
+ 

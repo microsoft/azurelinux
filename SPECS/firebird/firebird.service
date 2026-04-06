@@ -1,0 +1,14 @@
+[Unit]
+Description=Firebird Database Server
+After=network.target
+Conflicts=firebird-classic.socket
+
+[Service]
+User=firebird
+Group=firebird
+ExecStart=/usr/sbin/fbguard -forever
+RuntimeDirectory=firebird
+RuntimeDirectoryMode=0775
+
+[Install]
+WantedBy=multi-user.target

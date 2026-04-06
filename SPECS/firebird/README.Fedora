@@ -1,0 +1,17 @@
+Differences between upstream and the Fedora package
+===================================================
+
+* In /usr/bin you have isql-fb for Firebird isql.
+  We can't name it isql to avoid conflict with isql from UNIX-ODBC.
+  In /usr/bin you have also gstat-fb for Firebird gstat.
+  We can't name it gstat to avoid conflict with gstat from Ganglia-gmond.
+
+* By default, Firebird is set as superserver mode.
+  Please read the Firebird doc if you want to change the mode.
+
+* According to Fedora packaging rules, firebird service is not started 
+  automatically. You need to start it, as root : 
+    systemctl start firebird.service
+  If you want to have firebird started at each boot, as root :
+    systemctl enable firebird.service 
+

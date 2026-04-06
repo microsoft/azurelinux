@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Exec=doxywizard
+Name=Doxygen Wizard
+Icon=doxywizard
+Categories=Qt;Development;

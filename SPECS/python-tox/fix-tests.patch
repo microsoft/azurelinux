@@ -1,0 +1,135 @@
+From 42a461b71597e85e7902571348786aa4ab848cf8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Fri, 28 Mar 2025 09:44:24 +0100
+Subject: [PATCH] Fix tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Lumir Balhar <lbalhar@redhat.com>
+Co-Authored-By: Miro Hrončok <miro@hroncok.cz>
+---
+ pyproject.toml                                     | 4 +---
+ src/tox/pytest.py                                  | 14 ++------------
+ tests/test_provision.py                            | 11 ++++-------
+ .../package/test_python_package_util.py            | 10 ++++++++--
+ 4 files changed, 15 insertions(+), 30 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 6920d19..53326bc 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -222,9 +217,6 @@ report.omit = [
+   "tests/type_check/*",
+ ]
+ run.parallel = true
+-run.plugins = [
+-  "covdefaults",
+-]
+ 
+ [tool.towncrier]
+ name = "tox"
+diff --git a/src/tox/pytest.py b/src/tox/pytest.py
+index 31b3e6f..c358313 100644
+--- a/src/tox/pytest.py
++++ b/src/tox/pytest.py
+@@ -17,7 +17,6 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
+ 
+ import pytest
+ from _pytest.fixtures import SubRequest  # noqa: PLC2701
+-from devpi_process import IndexServer
+ from virtualenv.info import fs_supports_symlink
+ 
+ import tox.run
+@@ -285,8 +284,8 @@ class ToxProject:
+                 m.setattr(sys, "argv", [sys.executable, "-m", "tox", *list(args)])
+                 m.setenv("VIRTUALENV_SYMLINK_APP_DATA", "1")
+                 m.setenv("VIRTUALENV_SYMLINKS", "1")
+-                m.setenv("VIRTUALENV_PIP", "embed")
+-                m.setenv("VIRTUALENV_SETUPTOOLS", "embed")
++                m.setenv("VIRTUALENV_PIP", "bundle")
++                m.setenv("VIRTUALENV_SETUPTOOLS", "bundle")
+                 try:
+                     tox_run(args)
+                 except SystemExit as exception:
+@@ -479,15 +478,6 @@ def enable_pypi_server(monkeypatch: pytest.MonkeyPatch, url: str | None) -> None
+     monkeypatch.setenv("PIP_TIMEOUT", str(2))
+ 
+ 
+-@pytest.fixture(scope="session")
+-def pypi_server(tmp_path_factory: pytest.TempPathFactory) -> Iterator[IndexServer]:
+-    # takes around 2.5s
+-    path = tmp_path_factory.mktemp("pypi")
+-    with IndexServer(path) as server:
+-        server.create_index("empty", "volatile=False")
+-        yield server
+-
+-
+ @pytest.fixture(scope="session")
+ def _invalid_index_fake_port() -> int:
+     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
+diff --git a/tests/test_provision.py b/tests/test_provision.py
+index d1b6b2d..022e340 100644
+--- a/tests/test_provision.py
++++ b/tests/test_provision.py
+@@ -126,15 +126,13 @@ def _use_pypi_index(pypi_index: Index, monkeypatch: MonkeyPatch) -> None:
+ 
+ 
+ @pytest.fixture
+-def _pypi_index_mirrored(local_pypi_indexes: tuple[Index, Index], monkeypatch: MonkeyPatch) -> None:
+-    pypi_index_mirrored, _ = local_pypi_indexes
+-    _use_pypi_index(pypi_index_mirrored, monkeypatch)
++def _pypi_index_mirrored() -> None:
++    pytest.skip("needs devpi-process")
+ 
+ 
+ @pytest.fixture
+-def _pypi_index_self(local_pypi_indexes: tuple[Index, Index], monkeypatch: MonkeyPatch) -> None:
+-    _, pypi_index_self = local_pypi_indexes
+-    _use_pypi_index(pypi_index_self, monkeypatch)
++def _pypi_index_self() -> None:
++    pytest.skip("needs devpi-process")
+ 
+ 
+ def test_provision_requires_nok(tox_project: ToxProjectCreator) -> None:
+@@ -183,7 +181,6 @@ def test_provision_requires_ok(tox_project: ToxProjectCreator, tmp_path: Path) -
+ 
+ 
+ @pytest.mark.integration
+-@pytest.mark.usefixtures("_pypi_index_self")
+ def test_provision_platform_check(tox_project: ToxProjectCreator) -> None:
+     ini = "[tox]\nrequires=demo-pkg-inline\n[testenv]\npackage=skip\n[testenv:.tox]\nplatform=wrong_platform"
+     proj = tox_project({"tox.ini": ini})
+diff --git a/tests/tox_env/python/virtual_env/package/test_python_package_util.py b/tests/tox_env/python/virtual_env/package/test_python_package_util.py
+index 3802147..7f64d90 100644
+--- a/tests/tox_env/python/virtual_env/package/test_python_package_util.py
++++ b/tests/tox_env/python/virtual_env/package/test_python_package_util.py
+@@ -15,6 +15,12 @@ if TYPE_CHECKING:
+ 
+ from importlib.metadata import Distribution, PathDistribution
+ 
++from importlib.metadata import version
++from packaging.version import Version
++
++SETUPTOOLS_VERSION = Version(version("setuptools"))
++SETUPTOOLS_75_6 = SETUPTOOLS_VERSION >= Version("75.6")
++
+ 
+ @pytest.fixture(scope="session")
+ def pkg_with_extras(pkg_with_extras_project: Path) -> PathDistribution:
+@@ -43,10 +49,10 @@ def test_load_dependency_many_extra(pkg_with_extras: PathDistribution) -> None:
+     exp = [
+         Requirement("platformdirs>=4.3.8"),
+         Requirement("colorama>=0.4.6"),
+-        *(sphinx if sys.version_info[0:2] <= (3, 8) else []),
++        *(sphinx if not SETUPTOOLS_75_6 else []),
+         Requirement(f'covdefaults>=1.2; python_version == "2.7" or python_version == "{py_ver}"'),
+         Requirement(f'pytest>=5.4.1; python_version == "{py_ver}"'),
+-        *(sphinx if sys.version_info[0:2] > (3, 8) else []),
++        *(sphinx if SETUPTOOLS_75_6 else []),
+     ]
+     for left, right in zip_longest(result, exp):
+         assert isinstance(right, Requirement)
+-- 
+2.51.1
+

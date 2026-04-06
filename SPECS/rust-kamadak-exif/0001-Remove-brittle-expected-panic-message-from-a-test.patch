@@ -1,0 +1,25 @@
+From 706979b3a924d2595a9ad339212b1c66fbe212aa Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 1 Jan 2026 22:08:22 +0100
+Subject: [PATCH] Remove brittle expected panic message from a test
+
+---
+ src/endian.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/endian.rs b/src/endian.rs
+index db82ae7..22dc4bc 100644
+--- a/src/endian.rs
++++ b/src/endian.rs
+@@ -177,7 +177,7 @@ mod tests {
+     // check, and "slice index starts at 18446744073709551615 but ends
+     // at 1" without it.
+     #[test]
+-    #[should_panic(expected = "at")]
++    #[should_panic]
+     fn wrap_around() {
+         BigEndian::loadu16(&[0x01, 0x02], (-1isize) as usize);
+     }
+-- 
+2.52.0
+

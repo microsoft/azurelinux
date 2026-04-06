@@ -1,0 +1,12 @@
+diff --git a/lib/readline/rlconf.h b/lib/readline/rlconf.h
+--- a/lib/readline/rlconf.h
++++ b/lib/readline/rlconf.h
+@@ -64,7 +64,7 @@
+ 
+ /* Define this if you want to enable code that talks to the Linux kernel
+    tty auditing system. */
+-/* #define ENABLE_TTY_AUDIT_SUPPORT */
++#define ENABLE_TTY_AUDIT_SUPPORT
+ 
+ /* Defaults for the various editing mode indicators, inserted at the beginning
+    of the last (maybe only) line of the prompt if show-mode-in-prompt is on */

@@ -1,0 +1,50 @@
+From cc16c451c0560c9484c8530caa167af71c77bc67 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 13 Sep 2023 07:40:41 -0400
+Subject: [PATCH 1/2] Remove shebang from urlpy.py
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In addition to not having the executable bit set, this is an importable
+module and has no “main routine” or interesting side effects.
+
+Signed-off-by: Benjamin A. Beasley <code@musicinmybrain.net>
+---
+ urlpy.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/urlpy.py b/urlpy.py
+index 95c500c..c3f2136 100644
+--- a/urlpy.py
++++ b/urlpy.py
+@@ -1,5 +1,3 @@
+-#!/usr/bin/env python
+-#
+ # Copyright (c) nexB, Inc.
+ # Copyright (c) 2012-2015 SEOmoz, Inc.
+ #
+
+From bcaadd7f978861d7e45b41a8ccf5eabec5ae6755 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 13 Sep 2023 07:42:03 -0400
+Subject: [PATCH 2/2] Remove shebang from setup.py
+
+While this file is script-like, it does not have the executable bit set,
+so the shebang line is not useful.
+
+Signed-off-by: Benjamin A. Beasley <code@musicinmybrain.net>
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 18c9487..8d85550 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,5 +1,3 @@
+-#!/usr/bin/env python
+-
+ # Copyright (c) nexB, Inc.
+ # Copyright (c) 2012-2015 SEOmoz, Inc.
+ #

@@ -1,0 +1,11 @@
+--- mailparse-0.16.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ mailparse-0.16.1/Cargo.toml	2025-03-04T15:07:10.137199+00:00
+@@ -47,7 +47,7 @@
+ version = "0.5.0"
+ 
+ [dev-dependencies.ouroboros]
+-version = "0.17.0"
++version = ">=0.17.0, <0.19.0"
+ 
+ [badges.maintenance]
+ status = "passively-maintained"

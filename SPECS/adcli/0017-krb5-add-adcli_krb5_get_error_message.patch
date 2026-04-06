@@ -1,0 +1,226 @@
+From d3db46e8b03f0f2db0df01466b597fde588a06bf Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 5 Nov 2024 19:00:54 +0100
+Subject: [PATCH 17/17] krb5: add adcli_krb5_get_error_message()
+
+The krb5_get_error_message() call returns an error message in an
+allocated string which must be freed. This makes it hard to simply use
+krb5_get_error_message() in a printf() argument list.
+adcli_krb5_get_error_message() used a static memory area to make the
+usage more easy.
+---
+ library/adconn.c    | 10 +++++-----
+ library/adenroll.c  | 18 +++++++++---------
+ library/adentry.c   |  2 +-
+ library/adkrb5.c    | 22 +++++++++++++++++++---
+ library/adprivate.h |  2 ++
+ 5 files changed, 36 insertions(+), 18 deletions(-)
+
+diff --git a/library/adconn.c b/library/adconn.c
+index e668b8d..2c94af9 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -367,20 +367,20 @@ handle_kinit_krb5_code (adcli_conn *conn,
+ 	           code == KRB5_PREAUTH_FAILED) {
+ 		if (type == ADCLI_LOGIN_COMPUTER_ACCOUNT) {
+ 			_adcli_err ("Couldn't authenticate as machine account: %s: %s",
+-			            name, krb5_get_error_message (conn->k5, code));
++			            name, adcli_krb5_get_error_message (conn->k5, code));
+ 		} else {
+ 			_adcli_err ("Couldn't authenticate as: %s: %s",
+-			            name, krb5_get_error_message (conn->k5, code));
++			            name, adcli_krb5_get_error_message (conn->k5, code));
+ 		}
+ 		return ADCLI_ERR_CREDENTIALS;
+ 
+ 	} else {
+ 		if (type == ADCLI_LOGIN_COMPUTER_ACCOUNT) {
+ 			_adcli_err ("Couldn't get kerberos ticket for machine account: %s: %s",
+-			            name, krb5_get_error_message (conn->k5, code));
++			            name, adcli_krb5_get_error_message (conn->k5, code));
+ 		} else {
+ 			_adcli_err ("Couldn't get kerberos ticket for: %s: %s",
+-			            name, krb5_get_error_message (conn->k5, code));
++			            name, adcli_krb5_get_error_message (conn->k5, code));
+ 		}
+ 		return ADCLI_ERR_DIRECTORY;
+ 	}
+@@ -726,7 +726,7 @@ prep_kerberos_and_kinit (adcli_conn *conn)
+ 
+ 			if (code != 0) {
+ 				_adcli_err ("Couldn't open kerberos credential cache: %s: %s",
+-				            conn->login_ccache_name, krb5_get_error_message (NULL, code));
++				            conn->login_ccache_name, adcli_krb5_get_error_message (NULL, code));
+ 				return ADCLI_ERR_CONFIG;
+ 			}
+ 		}
+diff --git a/library/adenroll.c b/library/adenroll.c
+index e978f46..c854c9e 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -549,7 +549,7 @@ ensure_keytab_principals (adcli_result res,
+ 			if (code != 0) {
+ 				_adcli_err ("Couldn't parse kerberos user principal: %s: %s",
+ 				            enroll->user_principal,
+-				            krb5_get_error_message (k5, code));
++				            adcli_krb5_get_error_message (k5, code));
+ 				return ADCLI_ERR_CONFIG;
+ 			}
+ 		}
+@@ -1523,7 +1523,7 @@ set_password_with_user_creds (adcli_enroll *enroll)
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't set password for %s account: %s: %s",
+ 		            s_or_c (enroll),
+-		            enroll->computer_sam, krb5_get_error_message (k5, code));
++		            enroll->computer_sam, adcli_krb5_get_error_message (k5, code));
+ 		/* TODO: Parse out these values */
+ 		res = ADCLI_ERR_DIRECTORY;
+ 
+@@ -1584,7 +1584,7 @@ set_password_with_computer_creds (adcli_enroll *enroll)
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't get change password ticket for %s account: %s: %s",
+ 		            s_or_c (enroll),
+-		            enroll->computer_sam, krb5_get_error_message (k5, code));
++		            enroll->computer_sam, adcli_krb5_get_error_message (k5, code));
+ 		return ADCLI_ERR_DIRECTORY;
+ 	}
+ 
+@@ -1596,7 +1596,7 @@ set_password_with_computer_creds (adcli_enroll *enroll)
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't change password for %s account: %s: %s",
+ 		            s_or_c (enroll),
+-		            enroll->computer_sam, krb5_get_error_message (k5, code));
++		            enroll->computer_sam, adcli_krb5_get_error_message (k5, code));
+ 		/* TODO: Parse out these values */
+ 		res = ADCLI_ERR_DIRECTORY;
+ 
+@@ -2113,7 +2113,7 @@ load_host_keytab (adcli_enroll *enroll)
+ 		code = _adcli_krb5_keytab_enumerate (k5, keytab, load_keytab_entry, enroll);
+ 		if (code != 0) {
+ 			_adcli_err ("Couldn't enumerate keytab: %s: %s",
+-		                    enroll->keytab_name, krb5_get_error_message (k5, code));
++		                    enroll->keytab_name, adcli_krb5_get_error_message (k5, code));
+ 			res = ADCLI_ERR_FAIL;
+ 		}
+ 		krb5_kt_close (k5, keytab);
+@@ -2225,7 +2225,7 @@ remove_principal_from_keytab (adcli_enroll *enroll,
+ 
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't update keytab: %s: %s",
+-		            enroll->keytab_name, krb5_get_error_message (k5, code));
++		            enroll->keytab_name, adcli_krb5_get_error_message (k5, code));
+ 		return ADCLI_ERR_FAIL;
+ 	}
+ 
+@@ -2257,7 +2257,7 @@ add_principal_to_keytab (adcli_enroll *enroll,
+ 
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't update keytab: %s: %s",
+-		            enroll->keytab_name, krb5_get_error_message (k5, code));
++		            enroll->keytab_name, adcli_krb5_get_error_message (k5, code));
+ 		return ADCLI_ERR_FAIL;
+ 	}
+ 
+@@ -2296,7 +2296,7 @@ add_principal_to_keytab (adcli_enroll *enroll,
+ 			                                         enctypes, salts, which_salt);
+ 			if (code != 0) {
+ 				_adcli_warn ("Couldn't authenticate with keytab while discovering which salt to use: %s: %s",
+-				             principal_name, krb5_get_error_message (k5, code));
++				             principal_name, adcli_krb5_get_error_message (k5, code));
+ 				*which_salt = DEFAULT_SALT;
+ 			} else {
+ 				assert (*which_salt >= 0);
+@@ -2313,7 +2313,7 @@ add_principal_to_keytab (adcli_enroll *enroll,
+ 
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't add keytab entries: %s: %s",
+-		            enroll->keytab_name, krb5_get_error_message (k5, code));
++		            enroll->keytab_name, adcli_krb5_get_error_message (k5, code));
+ 		return ADCLI_ERR_FAIL;
+ 	}
+ 
+diff --git a/library/adentry.c b/library/adentry.c
+index 0d9b9af..38ec7ca 100644
+--- a/library/adentry.c
++++ b/library/adentry.c
+@@ -515,7 +515,7 @@ adcli_entry_set_passwd (adcli_entry *entry, const char *user_pwd)
+ 	if (code != 0) {
+ 		_adcli_err ("Couldn't set password for %s account: %s: %s",
+ 		            entry->object_class,
+-		            entry->sam_name, krb5_get_error_message (k5, code));
++		            entry->sam_name, adcli_krb5_get_error_message (k5, code));
+ 		/* TODO: Parse out these values */
+ 		res = ADCLI_ERR_DIRECTORY;
+ 
+diff --git a/library/adkrb5.c b/library/adkrb5.c
+index be3ede5..7a9ee8f 100644
+--- a/library/adkrb5.c
++++ b/library/adkrb5.c
+@@ -33,6 +33,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <stdio.h>
++#include <sys/param.h>
+ 
+ krb5_error_code
+ _adcli_krb5_build_principal (krb5_context k5,
+@@ -174,7 +175,7 @@ _adcli_krb5_init_context (krb5_context *k5)
+ 
+ 	} else if (code != 0) {
+ 		_adcli_err ("Failed to create kerberos context: %s",
+-		            krb5_get_error_message (NULL, code));
++		            adcli_krb5_get_error_message (NULL, code));
+ 		return ADCLI_ERR_UNEXPECTED;
+ 	}
+ 
+@@ -192,7 +193,7 @@ _adcli_krb5_open_keytab (krb5_context k5,
+ 		code = krb5_kt_resolve (k5, keytab_name, keytab);
+ 		if (code != 0) {
+ 			_adcli_err ("Failed to open keytab: %s: %s",
+-			            keytab_name, krb5_get_error_message (k5, code));
++			            keytab_name, adcli_krb5_get_error_message (k5, code));
+ 			return ADCLI_ERR_FAIL;
+ 		}
+ 
+@@ -200,7 +201,7 @@ _adcli_krb5_open_keytab (krb5_context k5,
+ 		code = krb5_kt_default (k5, keytab);
+ 		if (code != 0) {
+ 			_adcli_err ("Failed to open default keytab: %s",
+-			            krb5_get_error_message (k5, code));
++			            adcli_krb5_get_error_message (k5, code));
+ 			return ADCLI_ERR_FAIL;
+ 		}
+ 	}
+@@ -570,3 +571,18 @@ _adcli_krb5_format_enctypes (krb5_enctype *enctypes)
+ 
+ 	return value;
+ }
++
++const char *adcli_krb5_get_error_message (krb5_context ctx, krb5_error_code code)
++{
++	static char out[4096];
++	const char *tmp;
++	size_t len;
++
++	tmp = krb5_get_error_message (ctx, code);
++	len = strlen (tmp);
++	memcpy (out, tmp, MIN (sizeof (out), len));
++	out[sizeof(out) - 1] = '\0';
++	krb5_free_error_message (ctx, tmp);
++
++	return out;
++}
+diff --git a/library/adprivate.h b/library/adprivate.h
+index bf0381c..cca58f9 100644
+--- a/library/adprivate.h
++++ b/library/adprivate.h
+@@ -323,4 +323,6 @@ adcli_result     _adcli_call_external_program     (const char *binary,
+                                                    uint8_t **stdout_data,
+                                                    size_t *stdout_data_len);
+ 
++const char *adcli_krb5_get_error_message          (krb5_context ctx,
++                                                   krb5_error_code code);
+ #endif /* ADPRIVATE_H_ */
+-- 
+2.47.0
+

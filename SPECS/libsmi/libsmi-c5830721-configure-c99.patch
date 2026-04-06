@@ -1,0 +1,47 @@
+diff -up libsmi-c5830721/configure.ac.c99 libsmi-c5830721/configure.ac
+--- libsmi-c5830721/configure.ac.c99	2024-01-05 09:24:57.348720326 -0500
++++ libsmi-c5830721/configure.ac	2024-01-05 09:26:13.074779292 -0500
+@@ -42,8 +42,8 @@ AC_ARG_WITH(cc,
+ CC="$withval")
+ 
+ AC_MSG_CHECKING([for additional required compiler flags])
+-AC_TRY_RUN([#include <stdio.h>
+-  main() {
++AC_TRY_RUN([#include <stdlib.h>
++  int main(void) {
+   #ifdef __SUNPRO_C
+         exit(0);
+   #else
+@@ -104,8 +104,8 @@ dirseparator="$withval", dirseparator=""
+ 
+ AC_MSG_CHECKING([for path separator character])
+ if test "$pathseparator" = "" ; then
+-  AC_TRY_RUN([#include <stdio.h>
+-    main() {
++  AC_TRY_RUN([#include <stdlib.h>
++    int main(void) {
+     #ifdef _WIN32
+ 	  exit(0);
+     #else
+@@ -118,8 +118,8 @@ echo $pathseparator
+ 
+ AC_MSG_CHECKING([for dir separator character])
+ if test "$dirseparator" = "" ; then
+-  AC_TRY_RUN([#include <stdio.h>
+-    main() {
++  AC_TRY_RUN([#include <stdlib.h>
++    int main(void) {
+     #ifdef _WIN32
+ 	  exit(0);
+     #else
+@@ -144,8 +144,8 @@ AC_MSG_CHECKING([for 64 bit types])
+ # "warning: decimal constant is so large that it is unsigned"
+ # if used with the (correct) value -9223372036854775808LL.
+ #
+-AC_TRY_RUN([#include <stdio.h>
+-      main() {
++AC_TRY_RUN([#include <stdlib.h>
++      int main(void) {
+ 	  long long ll;
+ 	  unsigned long long ull;
+ 	  exit(0);

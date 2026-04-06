@@ -1,0 +1,82 @@
+--- netkit-ftp-0.17/ftp/ftp.c.segv	2004-06-14 11:04:38.000000000 -0400
++++ netkit-ftp-0.17/ftp/ftp.c	2004-06-14 11:06:46.000000000 -0400
+@@ -472,6 +472,8 @@
+ 					return (0);
+ 				}
+ 				lostpeer(0);
++				fclose(cout);
++				cout = NULL;
+ 				if (verbose) {
+ 					printf("421 Service not available, remote server has closed connection\n");
+ 					(void) fflush(stdout);
+@@ -529,7 +531,14 @@
+ 			cpend = 0;
+ 		(void) signal(SIGINT,oldintr);
+ 		if (code == 421 || originalcode == 421)
++		{
+ 			lostpeer(0);
++			if(cout)
++			{
++				fclose(cout);
++				cout = NULL;
++			}
++		}
+ 		if (abrtflag && oldintr != cmdabort && oldintr != SIG_IGN)
+ 			(*oldintr)(SIGINT);
+ 		return (n - '0');
+@@ -1790,6 +1799,11 @@
+ 			if (ptabflg)
+ 				code = -1;
+ 			lostpeer(0);
++			if(cout != NULL)
++			{
++				fclose(cout);
++				cout = NULL;
++			}
+ 		}
+ 		(void) getreply(0);
+ 		(void) getreply(0);
+@@ -1815,6 +1829,11 @@
+ 			perror("reset");
+ 			code = -1;
+ 			lostpeer(0);
++			if(cout != NULL)
++			{
++				fclose(cout);
++				cout = NULL;
++			}
+ 		}
+ 		else if (nfnd) {
+ 			(void) getreply(0);
+@@ -1897,6 +1916,11 @@
+ 		if (ptabflg)
+ 			code = -1;
+ 		lostpeer(0);
++		if(cout != NULL)
++		{
++			fclose(cout);
++			cout = NULL;
++		}
+ 	}
+ 	if (din && FD_ISSET(fileno(din), &mask)) {
+ 		while (read(fileno(din), buf, BUFSIZ) > 0)
+--- netkit-ftp-0.17/ftp/main.c.segv	2004-06-14 11:03:18.000000000 -0400
++++ netkit-ftp-0.17/ftp/main.c	2004-06-14 11:03:42.000000000 -0400
+@@ -235,8 +235,6 @@
+ 	if (connected) {
+ 		if (cout != NULL) {
+ 			shutdown(fileno(cout), 1+1);
+-			fclose(cout);
+-			cout = NULL;
+ 		}
+ 		if (data >= 0) {
+ 			shutdown(data, 1+1);
+@@ -249,8 +247,6 @@
+ 	if (connected) {
+ 		if (cout != NULL) {
+ 			shutdown(fileno(cout), 1+1);
+-			fclose(cout);
+-			cout = NULL;
+ 		}
+ 		connected = 0;
+ 	}

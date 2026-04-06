@@ -1,0 +1,106 @@
+From 9513443e414115b3cb65c77a87f872a24baa5453 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 5 Feb 2025 15:51:57 +0000
+Subject: [PATCH 11/12] Use -fPIC on all architectures, not just x86_64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ cmake/usFunctionCreateTestBundle.cmake                  | 6 ++----
+ compendium/ConfigurationAdmin/src/CMakeLists.txt        | 6 ++----
+ compendium/DeclarativeServices/src/CMakeLists.txt       | 6 ++----
+ framework/doc/snippets/uServices-staticbundles/main.cpp | 4 ++--
+ framework/include/cppmicroservices/BundleImport.h       | 2 +-
+ 5 files changed, 9 insertions(+), 15 deletions(-)
+
+diff --git a/cmake/usFunctionCreateTestBundle.cmake b/cmake/usFunctionCreateTestBundle.cmake
+index 1620e5aa..43801b58 100644
+--- a/cmake/usFunctionCreateTestBundle.cmake
++++ b/cmake/usFunctionCreateTestBundle.cmake
+@@ -9,10 +9,8 @@ macro(_us_create_test_bundle_helper)
+                APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_bundle_symbolic_name})
+   set_property(TARGET ${name} PROPERTY US_BUNDLE_NAME ${_bundle_symbolic_name})
+   # Clear a possible debug postfix
+-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+-    get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
+-    set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+-  endif()
++  get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
++  set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+ 
+   target_include_directories(${name}
+     PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
+diff --git a/compendium/ConfigurationAdmin/src/CMakeLists.txt b/compendium/ConfigurationAdmin/src/CMakeLists.txt
+index a079c20f..5d1908fa 100644
+--- a/compendium/ConfigurationAdmin/src/CMakeLists.txt
++++ b/compendium/ConfigurationAdmin/src/CMakeLists.txt
+@@ -29,10 +29,8 @@ set(_private_headers
+ 
+ add_library(ConfigurationAdminObjs OBJECT ${_srcs} ${_private_headers})
+ 
+-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+-  get_property(_compile_flags TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS)
+-  set_property(TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+-endif()
++get_property(_compile_flags TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS)
++set_property(TARGET ConfigurationAdminObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+ 
+ target_include_directories(ConfigurationAdminObjs PRIVATE
+   ${CMAKE_CURRENT_SOURCE_DIR}/src
+diff --git a/compendium/DeclarativeServices/src/CMakeLists.txt b/compendium/DeclarativeServices/src/CMakeLists.txt
+index 726d402b..2e0ad4c9 100644
+--- a/compendium/DeclarativeServices/src/CMakeLists.txt
++++ b/compendium/DeclarativeServices/src/CMakeLists.txt
+@@ -83,10 +83,8 @@ set(_private_headers
+   
+ add_library(DeclarativeServicesObjs OBJECT ${_srcs} ${_private_headers})
+ 
+-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+-  get_property(_compile_flags TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS)
+-  set_property(TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+-endif()
++get_property(_compile_flags TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS)
++set_property(TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+ 
+ add_compile_definitions(US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME})
+ add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
+diff --git a/framework/doc/snippets/uServices-staticbundles/main.cpp b/framework/doc/snippets/uServices-staticbundles/main.cpp
+index 683ce1ef..8efc9fa4 100644
+--- a/framework/doc/snippets/uServices-staticbundles/main.cpp
++++ b/framework/doc/snippets/uServices-staticbundles/main.cpp
+@@ -38,7 +38,7 @@ extern "C" void
+ _us_import_bundle_initializer_MyStaticBundle2()
+ {
+ }
+-extern "C" BundleContext*
++extern "C" BundleContextPrivate*
+ _us_get_bundle_context_instance_MyStaticBundle1()
+ {
+     return nullptr;
+@@ -47,7 +47,7 @@ extern "C" void
+ _us_set_bundle_context_instance_MyStaticBundle1(BundleContextPrivate*)
+ {
+ }
+-extern "C" BundleContext*
++extern "C" BundleContextPrivate*
+ _us_get_bundle_context_instance_MyStaticBundle2()
+ {
+     return nullptr;
+diff --git a/framework/include/cppmicroservices/BundleImport.h b/framework/include/cppmicroservices/BundleImport.h
+index 53234e2d..368c98f8 100644
+--- a/framework/include/cppmicroservices/BundleImport.h
++++ b/framework/include/cppmicroservices/BundleImport.h
+@@ -66,7 +66,7 @@ namespace cppmicroservices
+  * \endrststar
+  */
+ #define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                             \
+-    extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name)();            \
++    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(_bundle_name)();     \
+     extern "C" void US_SET_CTX_FUNC(_bundle_name)(cppmicroservices::BundleContextPrivate*); \
+     void _dummy_reference_to_##_bundle_name##_bundle_context()                              \
+     {                                                                                       \
+-- 
+2.48.1
+

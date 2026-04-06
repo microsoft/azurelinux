@@ -1,0 +1,13 @@
+--- self_cell-1.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ self_cell-1.2.1/Cargo.toml	2025-12-30T14:20:36.164000+00:00
+@@ -51,8 +51,8 @@
+ path = "src/lib.rs"
+ 
+ [dependencies.rustversion]
+-version = ">=1"
++version = "1"
+ optional = true
+ 
+ [dev-dependencies.once_cell]
+-version = "=1.1.0"
++version = "1.1.0"

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Assumes java is on the path
+java -cp "/usr/share/java/tomcat-jakartaee-migration/*:/usr/share/java/*" org.apache.tomcat.jakartaee.MigrationCLI "$@"

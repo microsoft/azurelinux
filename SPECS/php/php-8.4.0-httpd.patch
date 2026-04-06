@@ -1,0 +1,30 @@
+Disable MPM detection
+mod_php is always build as NTS for prefork
+
+Disable httpd.conf change
+
+diff -up ./sapi/apache2handler/config.m4.mpmcheck ./sapi/apache2handler/config.m4
+--- ./sapi/apache2handler/config.m4.mpmcheck	2025-05-06 14:31:58.000000000 +0200
++++ ./sapi/apache2handler/config.m4	2025-05-19 15:14:27.710935097 +0200
+@@ -78,8 +78,7 @@ if test "$PHP_APXS2" != "no"; then
+     INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
+                 \$(mkinstalldirs) '$APXS_SYSCONFDIR' && \
+                  $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
+-                       -S SYSCONFDIR='$APXS_SYSCONFDIR' \
+-                       -i -a -n php"
++                       -i -n php"
+   fi
+ 
+   LIBPHP_CFLAGS="-shared"
+@@ -120,11 +119,6 @@ if test "$PHP_APXS2" != "no"; then
+       -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1
+     ])
+ 
+-  AS_IF([$APXS_HTTPD -V 2>/dev/null | grep 'threaded:.*yes' >/dev/null 2>&1], [
+-    APACHE_THREADED_MPM=yes
+-    enable_zts=yes
+-  ], [APACHE_THREADED_MPM=no])
+-
+ AC_CONFIG_COMMANDS([apache2handler], [AS_VAR_IF([enable_zts], [yes],,
+   [AS_VAR_IF([APACHE_THREADED_MPM], [no],
+     [AC_MSG_WARN([

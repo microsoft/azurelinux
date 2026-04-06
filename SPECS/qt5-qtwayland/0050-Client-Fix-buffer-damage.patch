@@ -1,0 +1,71 @@
+From 1716594c31b28991b31a8ac17b13fc6990fdf82b Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Thu, 3 Aug 2023 12:28:44 +0300
+Subject: [PATCH 50/55] Client: Fix buffer damage
+
+If the specified damage rectangle has fractional coordinates in the buffer
+local coordinate space, the buffer damage needs to be expanded, i.e.
+
+- bufferRect.left = floor(rect.left * scale)
+- bufferRect.right = ceil(rect.right * scale) = ceil((rect.x + rect.width) * scale)
+
+Flooring the coordinates and ceiling the size is not enough. It can
+produce incorrect results.
+
+For example, consider that a rectangle with logical coordinates of
+QRect(0, 23, 179, 46) has been damaged in a window with scale 1.5. When
+flooring the coordinates and ceiling the size, the following buffer
+damage rect will be produced: QRect(0, 34, 269, 69). Its height is off by
+1, the expected height is 70 (ceil((23 + 46) * 1.5) - floor(23 * 1.5) =
+ceil(103.5) - floor(34.5) = 104 - 34 = 70).
+
+Pick-to: 5.15 6.5 6.6
+Change-Id: I927e75a2224bb58b4634125011d1305dbdfbb3aa
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit d79db699866b37bd3e3358ca18a210dfc5c0b4b9)
+---
+ src/client/qwaylandwindow.cpp | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 38b10269..5d01507d 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -573,10 +573,15 @@ void QWaylandWindow::damage(const QRect &rect)
+         return;
+ 
+     const qreal s = scale();
+-    if (mDisplay->compositorVersion() >= 4)
+-        mSurface->damage_buffer(qFloor(s * rect.x()), qFloor(s * rect.y()), qCeil(s * rect.width()), qCeil(s * rect.height()));
+-    else
++    if (mDisplay->compositorVersion() >= 4) {
++        const QRect bufferRect =
++                QRectF(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height())
++                        .toAlignedRect();
++        mSurface->damage_buffer(bufferRect.x(), bufferRect.y(), bufferRect.width(),
++                                bufferRect.height());
++    } else {
+         mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
++    }
+ }
+ 
+ void QWaylandWindow::safeCommit(QWaylandBuffer *buffer, const QRegion &damage)
+@@ -614,8 +619,13 @@ void QWaylandWindow::commit(QWaylandBuffer *buffer, const QRegion &damage)
+     attachOffset(buffer);
+     if (mDisplay->compositorVersion() >= 4) {
+         const qreal s = scale();
+-        for (const QRect &rect: damage)
+-            mSurface->damage_buffer(qFloor(s * rect.x()), qFloor(s * rect.y()), qCeil(s * rect.width()), qCeil(s * rect.height()));
++        for (const QRect &rect : damage) {
++            const QRect bufferRect =
++                    QRectF(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height())
++                            .toAlignedRect();
++            mSurface->damage_buffer(bufferRect.x(), bufferRect.y(), bufferRect.width(),
++                                    bufferRect.height());
++        }
+     } else {
+         for (const QRect &rect: damage)
+             mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
+-- 
+2.51.1
+

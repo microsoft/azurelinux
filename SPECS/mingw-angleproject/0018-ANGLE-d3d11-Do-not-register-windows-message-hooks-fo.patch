@@ -1,0 +1,45 @@
+From 3d23de2ad72968d0bf43dac4a9a0f237cc9e03e2 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 1 Apr 2020 14:48:48 +0200
+Subject: [PATCH] ANGLE: d3d11: Do not register windows message hooks for d3d11
+ windows
+
+These message hooks are used to handle ALT+ENTER to enter/exit fullscreen
+mode and PRINTSCREEN to take screenshots. Qt is implementing these
+functionalities itself so we do not have to register these hooks.
+
+If too many of these hooks are registered, callbacks are no longer called
+and Qt's message queue is no longer handling messages. By saving these
+hooks we can make sure that more Qt windows at the same time are possible
+without getting unresponsive due to too many hooks being registered.
+
+Change-Id: I5354f91f08cbfeda5e8dc3ad7f824fbd5b3b2932
+---
+ .../src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp     | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp
+index 5394e3d..f5e6c93 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp
+@@ -168,7 +168,7 @@ HRESULT NativeWindow11Win32::createSwapChain(ID3D11Device *device,
+                                                           nullptr, nullptr, &swapChain1);
+         if (SUCCEEDED(result))
+         {
+-            factory2->MakeWindowAssociation(getNativeWindow(), DXGI_MWA_NO_ALT_ENTER);
++            factory2->MakeWindowAssociation(getNativeWindow(), DXGI_MWA_NO_WINDOW_CHANGES);
+             *swapChain = static_cast<IDXGISwapChain *>(swapChain1);
+         }
+         SafeRelease(factory2);
+@@ -196,7 +196,7 @@ HRESULT NativeWindow11Win32::createSwapChain(ID3D11Device *device,
+     HRESULT result = factory->CreateSwapChain(device, &swapChainDesc, swapChain);
+     if (SUCCEEDED(result))
+     {
+-        factory->MakeWindowAssociation(getNativeWindow(), DXGI_MWA_NO_ALT_ENTER);
++        factory->MakeWindowAssociation(getNativeWindow(), DXGI_MWA_NO_WINDOW_CHANGES);
+     }
+     return result;
+ }
+-- 
+2.7.4.windows.1
+

@@ -1,0 +1,81 @@
+From eaea31cb93ecddda69a373f83f632e1a450c3c90 Mon Sep 17 00:00:00 2001
+From: Brock Zheng Techyauld Ltd <yzheng@techyauld.com>
+Date: Tue, 25 Aug 2020 20:28:11 +0800
+Subject: [PATCH 9/9] emacs plugin fixup: GNU/Emacs 27.1 removes function
+ process-kill-without-query
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ contrib/xcscope/xcscope.el | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/contrib/xcscope/xcscope.el b/contrib/xcscope/xcscope.el
+index 0e814ea..859dff5 100644
+--- a/contrib/xcscope/xcscope.el
++++ b/contrib/xcscope/xcscope.el
+@@ -180,7 +180,7 @@
+ ;; variable is used to determine the mapping.  One use for this
+ ;; variable is when you want to share the database file with other
+ ;; users; in this case, the database may be located in a directory
+-;; separate from the source files.  
++;; separate from the source files.
+ ;;
+ ;; Setting the variable, `cscope-initial-directory', is useful when a
+ ;; search is to be expanded by specifying a cscope database directory
+@@ -366,7 +366,7 @@
+ ;;      disable automatic database creation, updating, and
+ ;;      maintenance.
+ ;;
+-;; "cscope-display-cscope-buffer" 
++;; "cscope-display-cscope-buffer"
+ ;;      If non-nil, display the *cscope* buffer after each search
+ ;;      (default).  This variable can be set in order to reduce the
+ ;;      number of keystrokes required to navigate through the matches.
+@@ -1233,7 +1233,7 @@ directory should begin.")
+ 			:style toggle :selected cscope-use-relative-paths ]
+ 		      [ "No mouse prompts" (setq cscope-no-mouse-prompts
+ 						 (not cscope-no-mouse-prompts))
+-			:style toggle :selected cscope-no-mouse-prompts ] 
++			:style toggle :selected cscope-no-mouse-prompts ]
+ 		      )
+ 		    ))
+ 
+@@ -1291,7 +1291,7 @@ The text properties to be added:
+   )
+ 
+ 
+-(defun cscope-show-entry-internal (file line-number 
++(defun cscope-show-entry-internal (file line-number
+ 					&optional save-mark-p window arrow-p)
+   "Display the buffer corresponding to FILE and LINE-NUMBER
+ in some window.  If optional argument WINDOW is given,
+@@ -1943,7 +1943,7 @@ using the mouse."
+ 			    cscope-directory
+ 			    (file-name-directory cscope-directory))
+ 		      ))
+-		(setq cscope-directory 
++		(setq cscope-directory
+ 		      (file-name-as-directory cscope-directory))
+ 		(if (not (member cscope-directory cscope-searched-dirs))
+ 		    (progn
+@@ -2006,7 +2006,7 @@ using the mouse."
+ 	      (set-process-filter cscope-process cscope-filter-func)
+ 	      (set-process-sentinel cscope-process cscope-sentinel-func)
+ 	      (set-marker (process-mark cscope-process) (point))
+-	      (process-kill-without-query cscope-process)
++              (set-process-query-on-exit-flag cscope-process nil)
+ 	      (if cscope-running-in-xemacs
+ 		  (setq modeline-process ": Searching ..."))
+ 	      (setq buffer-read-only t)
+@@ -2139,7 +2139,7 @@ SENTINEL-FUNC are optional process filter and sentinel, respectively."
+ 		   cscope-indexing-script args))
+       (set-process-sentinel cscope-unix-index-process
+ 			    'cscope-unix-index-files-sentinel)
+-      (process-kill-without-query cscope-unix-index-process)
++      (set-process-query-on-exit-flag cscope-unix-index-process nil)
+       )
+     ))
+ 
+-- 
+2.26.2
+

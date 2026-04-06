@@ -1,0 +1,42 @@
+From 18e36d68c1c7b6db2a4fe51482e2f46107e764c6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 21 Apr 2020 08:01:21 +0200
+Subject: [PATCH] Adapt to changes in Moo 2.004000
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Moo-2.004000 refactored "creation and installation of helper subs" and
+as a result a direct Moo::import execution stopped working and
+Module-Manifest-Skip tests either:
+
+t/create.t .............. Can't locate object method "_install_subs" via package "Module::Manifest::Skip" at /usr/share/perl5/vendor_perl/Moo.pm line 47.
+BEGIN failed--compilation aborted at t/TestModuleManifestSkip.pm line 6.
+Compilation failed in require at t/create.t line 3.
+
+Because Moo::import() is already executed when Module::Manifest::Skip does "use
+Moo;", the simplest fix is to stop calling it again.
+
+https://github.com/ingydotnet/module-manifest-skip-pm/issues/7
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/Module/Manifest/Skip.pm | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/lib/Module/Manifest/Skip.pm b/lib/Module/Manifest/Skip.pm
+index 434f7ce..27c1ac7 100644
+--- a/lib/Module/Manifest/Skip.pm
++++ b/lib/Module/Manifest/Skip.pm
+@@ -28,9 +28,6 @@ sub import {
+         close MS;
+         exit;
+     }
+-    else {
+-        goto &Moo::import;
+-    }
+ }
+ 
+ sub add {
+-- 
+2.21.2
+

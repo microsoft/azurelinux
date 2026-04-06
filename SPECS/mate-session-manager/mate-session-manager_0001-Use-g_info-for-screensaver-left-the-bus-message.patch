@@ -1,0 +1,30 @@
+From 54248174640de5c6079f7f85d3a44ea3923d3445 Mon Sep 17 00:00:00 2001
+From: Andrew Sayers <andrew-github.com@pileofstuff.org>
+Date: Tue, 18 Mar 2025 11:52:33 +0000
+Subject: [PATCH] Use g_info() for "screensaver left the bus" message
+
+This message is only useful for people developing screensavers,
+but occurs normally when the user logs out.
+
+Change it to a g_info() message, so screensaver devs can find it
+but normal users don't think they have a bug.
+---
+ mate-session/gsm-presence.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mate-session/gsm-presence.c b/mate-session/gsm-presence.c
+index 7fc2304..4c28542 100644
+--- a/mate-session/gsm-presence.c
++++ b/mate-session/gsm-presence.c
+@@ -201,7 +201,7 @@ on_screensaver_proxy_destroy (GObject     *proxy,
+ {
+         GsmPresencePrivate *priv;
+ 
+-        g_warning ("Detected that screensaver has left the bus");
++        g_info ("Detected that screensaver has left the bus");
+         priv = gsm_presence_get_instance_private (presence);
+ 
+         priv->screensaver_proxy = NULL;
+-- 
+2.49.0
+

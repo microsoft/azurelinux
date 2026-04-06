@@ -1,0 +1,67 @@
+From 1ca518c2a0e675ace956ef71bc79d67e4990562b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Fri, 7 Mar 2025 13:03:14 +0100
+Subject: [PATCH] 445_guess_bootloader: fix PReP Boot detection on GPT layouts
+ (#3420)
+
+In layout/save/default/445_guess_bootloader.sh
+fix PPC PReP Boot detection on GPT formatted disks
+by checking for a "part ... prep ..." entry in disklayout.conf
+as in finalize/Linux-ppc64/680_install_PPC_bootlist.sh
+The before used 'file $disk_device' output is not stable.
+In particular 'grep' for "ID=0x41" (PPC PReP Boot)
+in the 'file' output does not work on GPT formatted disks.
+Apparently 'file' detects the GPT protective MBR ("ID=0xee").
+For example on PPC64le with PowerNV like
+# file -s /dev/sdb
+/dev/sdb: DOS/MBR boot sector; partition 1 : ID=0xee, ...
+# parted -s /dev/sdb print
+Partition Table: gpt
+Disk Flags: pmbr_boot
+Number ... Flags
+1      ... prep
+And also on x86_64 with a EFI system partition (ID=0xEF) like
+# file -s /dev/nvme0n1
+/dev/nvme0n1: DOS/MBR boot sector; partition 1 : ID=0xee, ...
+# parted -s /dev/nvme0n1 print
+Partition Table: gpt
+Number ... Flags
+1      ... boot, esp
+---
+ .../layout/save/default/445_guess_bootloader.sh   | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/usr/share/rear/layout/save/default/445_guess_bootloader.sh b/usr/share/rear/layout/save/default/445_guess_bootloader.sh
+index 1beffc9a9..f10a3834c 100644
+--- a/usr/share/rear/layout/save/default/445_guess_bootloader.sh
++++ b/usr/share/rear/layout/save/default/445_guess_bootloader.sh
+@@ -47,6 +47,15 @@ if [ "$ARCH" = "Linux-arm" ] ; then
+     return
+ fi
+ 
++# Check if any disk contains a PPC PReP boot partition.
++# Detection taken from usr/share/rear/finalize/Linux-ppc64/680_install_PPC_bootlist.sh
++disk_device="$( awk -F ' ' '/^part / {if ($6 ~ /prep/) {print $2}}' $LAYOUT_FILE )"
++if test "$disk_device" ; then
++   LogPrint "Using guessed bootloader 'PPC' for 'rear recover' (found PPC PReP boot partition on $disk_device)"
++   echo "PPC" >$bootloader_file
++   return
++fi
++
+ # Finally guess the used bootloader by inspecting the first bytes on all disks
+ # and use the first one that matches a known bootloader string:
+ for block_device in /sys/block/* ; do
+@@ -54,12 +63,6 @@ for block_device in /sys/block/* ; do
+     # Continue with the next block device when the current block device is not a disk that can be used for booting:
+     [[ $blockd = hd* || $blockd = sd* || $blockd = cciss* || $blockd = vd* || $blockd = xvd* || $blockd = nvme* || $blockd = mmcblk* || $blockd = dasd*  ]] || continue
+     disk_device=$( get_device_name $block_device )
+-    # Check if the disk contains a PPC PreP boot partition (ID=0x41):
+-    if file -s $disk_device | grep -q "ID=0x41" ; then
+-       LogPrint "Using guessed bootloader 'PPC' for 'rear recover' (found PPC PreP boot partition 'ID=0x41' on $disk_device)"
+-       echo "PPC" >$bootloader_file
+-       return
+-    fi
+     # Get all strings in the first 512*4=2048 bytes on the disk:
+     bootloader_area_strings_file="$TMP_DIR/bootloader_area_strings"
+     block_size=$( get_block_size ${disk_device##*/} )
+

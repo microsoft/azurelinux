@@ -1,0 +1,17 @@
+diff --git a/ext/extconf.rb b/ext/extconf.rb
+--- a/ext/extconf.rb
++++ b/ext/extconf.rb
+@@ -54,13 +54,6 @@ else
+ 		dlldir = libdir
+ 	end
+ 
+-	# Try to use runtime path linker option, even if RbConfig doesn't know about it.
+-	# The rpath option is usually set implicit by dir_config(), but so far not
+-	# on MacOS-X.
+-	if dlldir && RbConfig::CONFIG["RPATHFLAG"].to_s.empty?
+-		append_ldflags "-Wl,-rpath,#{dlldir.quote}"
+-	end
+-
+ 	if /mswin/ =~ RUBY_PLATFORM
+ 		$libs = append_library($libs, 'ws2_32')
+ 	end

@@ -1,0 +1,93 @@
+From 3bd67bf63ee68c88cc05a66607a79c5cd314a6d2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 14 Jul 2015 14:25:57 +0200
+Subject: [PATCH] Respect Config's cc ccflags and ldflags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The ExtUils::MakeMaker expects LIBS contains only libs and INC contain
+only include paths. Thus you cannot put ldflags od ccflags there. They
+will be injected later when generating the Makefile.
+
+However to use the flags when checking for libidn, you have to use
+apply them manually only for the manual check.
+
+This patch adds cc and ccflags into consideration as some systems
+needs them when using cusotm ldflags.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 6709fe1..47f63db 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -47,23 +47,17 @@ sub InitMakeParams
+ 		"disable-tld" => \$disable_tld
+ 	);
+ 
++	$Params{LIBS} = '';
+ 	if ($libdir)
+ 	{
+-		$Params{LIBS} = "-L$libdir -lidn";
+-	}
+-	else
+-	{
+-		$Params{LIBS} = $Config{ldflags} . ' -lidn';
++		$Params{LIBS} .= "-L$libdir ";
+ 	}
++	$Params{LIBS} .= '-lidn';
+ 
+ 	if ($incdir)
+ 	{
+ 		$Params{INC} = "-I$incdir";
+ 	}
+-	else
+-	{
+-		$Params{INC} = '';
+-	}
+ 
+ 	my $libidn = CheckLibidn($Params{INC}, $Params{LIBS});
+ 
+@@ -146,11 +140,24 @@ sub FilterTLD
+ 	}
+ }
+ 
++sub concat {
++	my ($a, $b) = @_;
++	if (!defined $a)
++	{
++		$a = '';
++	}
++	if (!defined $b)
++	{
++		$b = '';
++	};
++	return ($a . ' ' . $b);
++}
++
+ sub CheckCCode
+ {
+ 	my $code = shift;
+-	my $cflags = shift;
+-	my $ldflags = shift;
++	my $cflags = concat($Config{ccflags}, shift);
++	my $ldflags = concat($Config{ldflags}, shift);
+ 	my $output = shift;
+ 	my $test = '__test'.$testno++;
+ 	local * FILE;
+@@ -165,7 +172,7 @@ sub CheckCCode
+ 		return 0;
+ 	}
+ 
+-	foreach my $cc (qw/cc gcc/)
++	foreach my $cc ($Config{cc}, qw/cc gcc/)
+ 	{
+ 		unlink($test);
+ 		system "$cc $cflags -o $test $test.c $ldflags";
+-- 
+2.4.3
+

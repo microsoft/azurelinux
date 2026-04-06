@@ -1,0 +1,29 @@
+From 7a274a7f71c30b556b20152bdd2996aa106ac9a5 Mon Sep 17 00:00:00 2001
+From: Ben Gamari <ben@smart-cactus.org>
+Date: Mon, 25 Nov 2024 14:19:14 -0500
+Subject: [PATCH] compiler: Fix bootstrapping with 9.8.3
+
+Bump the CPP in genSym to ensure that we don't look for
+`ghc_unique_counter64` in any compilers earlier than 9.8.4.
+
+Inconsistency noticed in #25519.
+---
+ compiler/cbits/genSym.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compiler/cbits/genSym.c b/compiler/cbits/genSym.c
+index e7ce7321824c..91a59906efea 100644
+--- a/compiler/cbits/genSym.c
++++ b/compiler/cbits/genSym.c
+@@ -9,7 +9,7 @@
+ //
+ // The CPP is thus about the RTS version GHC is linked against, and not the
+ // version of the GHC being built.
+-#if !MIN_VERSION_GLASGOW_HASKELL(9,7,0,0)
++#if !MIN_VERSION_GLASGOW_HASKELL(9,8,4,0)
+ HsWord64 ghc_unique_counter64 = 0;
+ #endif
+ #if !MIN_VERSION_GLASGOW_HASKELL(9,3,0,0)
+-- 
+GitLab
+

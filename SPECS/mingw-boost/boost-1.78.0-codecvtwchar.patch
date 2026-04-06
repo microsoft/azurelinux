@@ -1,0 +1,29 @@
+From aab8477eb1456896bf7311e913fb9b20b5f5e335 Mon Sep 17 00:00:00 2001
+From: xantares <xantares09@hotmail.com>
+Date: Sat, 14 May 2016 16:16:51 +0200
+Subject: [PATCH] Fix undefined reference to codecvt_null<wchar_t>
+
+See https://svn.boost.org/trac/boost/ticket/12205
+---
+ build/Jamfile.v2 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/serialization/build/Jamfile.v2 b/libs/serialization/build/Jamfile.v2
+--- a/libs/serialization/build/Jamfile.v2.codecvtwchar	2022-08-02 16:25:38.251424867 +0200
++++ b/libs/serialization/build/Jamfile.v2	2022-08-02 16:27:27.430061839 +0200
+@@ -85,7 +85,6 @@
+     xml_grammar
+     xml_iarchive
+     xml_archive_exception
+-    codecvt_null
+  ;
+ 
+ SOURCES_HAS_STD_LOCALE = 
+@@ -105,6 +104,7 @@
+     xml_woarchive
+     polymorphic_xml_wiarchive
+     polymorphic_xml_woarchive
++    codecvt_null
+ ;
+ 
+ rule has-config-flag ( flag : properties * )

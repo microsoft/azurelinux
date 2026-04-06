@@ -1,0 +1,53 @@
+diff --git a/src/md5.c b/src/md5.c
+index a22f6d2..fc5693f 100644
+--- a/src/md5.c
++++ b/src/md5.c
+@@ -296,6 +296,7 @@ static void DigestToBase16(unsigned char *digest, char *zBuf){
+ static int md5_cmd(void*cd, Tcl_Interp *interp, int argc, const char **argv){
+   MD5Context ctx;
+   unsigned char digest[16];
++  char buf[64];
+ 
+   if( argc!=2 ){
+     Tcl_AppendResult(interp,"wrong # args: should be \"", argv[0], 
+@@ -305,7 +306,8 @@ static int md5_cmd(void*cd, Tcl_Interp *interp, int argc, const char **argv){
+   MD5Init(&ctx);
+   MD5Update(&ctx, (unsigned char*)argv[1], (unsigned)strlen(argv[1]));
+   MD5Final(digest, &ctx);
+-  DigestToBase16(digest, interp->result);
++  DigestToBase16(digest, buf);
++  Tcl_SetResult(interp, buf, TCL_VOLATILE);
+   return TCL_OK;
+ }
+ 
+@@ -318,6 +320,7 @@ static int md5file_cmd(void*cd, Tcl_Interp*interp, int argc, const char **argv){
+   MD5Context ctx;
+   unsigned char digest[16];
+   char zBuf[10240];
++  char buf[64];
+ 
+   if( argc!=2 ){
+     Tcl_AppendResult(interp,"wrong # args: should be \"", argv[0], 
+@@ -339,7 +342,8 @@ static int md5file_cmd(void*cd, Tcl_Interp*interp, int argc, const char **argv){
+   }
+   fclose(in);
+   MD5Final(digest, &ctx);
+-  DigestToBase16(digest, interp->result);
++  DigestToBase16(digest, buf);
++  Tcl_SetResult(interp, buf, TCL_VOLATILE);
+   return TCL_OK;
+ }
+ 
+diff --git a/src/tclsqlite.c b/src/tclsqlite.c
+index cc8daa1..7337ed7 100644
+--- a/src/tclsqlite.c
++++ b/src/tclsqlite.c
+@@ -1246,7 +1246,7 @@ int TCLSH_MAIN(int argc, char **argv){
+     }
+     if( Tcl_EvalFile(interp, argv[1])!=TCL_OK ){
+       const char *zInfo = Tcl_GetVar(interp, "errorInfo", TCL_GLOBAL_ONLY);
+-      if( zInfo==0 ) zInfo = interp->result;
++      if( zInfo==0 ) zInfo = Tcl_GetStringResult(interp);
+       fprintf(stderr,"%s: %s\n", *argv, zInfo);
+       return TCL_ERROR;
+     }

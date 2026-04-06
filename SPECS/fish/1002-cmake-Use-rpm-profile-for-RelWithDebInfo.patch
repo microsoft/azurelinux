@@ -1,0 +1,40 @@
+From a5071482a04385e7faeb130c74867af86e283a05 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Wed, 26 Feb 2025 12:24:39 -0500
+Subject: [PATCH 1002/1003] cmake: Use rpm profile for RelWithDebInfo
+
+This matches what we expect for packaging Rust software.
+---
+ CMakeLists.txt   | 2 +-
+ cmake/Rust.cmake | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d161def83..f5eda6d8a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,7 +67,7 @@ function(CREATE_TARGET target)
+           ${Rust_CARGO}
+             build --bin ${target}
+             $<$<CONFIG:Release>:--release>
+-            $<$<CONFIG:RelWithDebInfo>:--profile=release-with-debug>
++            $<$<CONFIG:RelWithDebInfo>:--profile=rpm>
+             --target ${Rust_CARGO_TARGET}
+             --no-default-features
+             --features=${FISH_CARGO_FEATURES}
+diff --git a/cmake/Rust.cmake b/cmake/Rust.cmake
+index 1de0da580..cd7d8dac3 100644
+--- a/cmake/Rust.cmake
++++ b/cmake/Rust.cmake
+@@ -20,7 +20,7 @@ else()
+     set(rust_target_dir "${FISH_RUST_BUILD_DIR}/${Rust_CARGO_HOST_TARGET}")
+ endif()
+ 
+-set(rust_profile $<IF:$<CONFIG:Debug>,debug,$<IF:$<CONFIG:RelWithDebInfo>,release-with-debug,release>>)
++set(rust_profile $<IF:$<CONFIG:Debug>,debug,$<IF:$<CONFIG:RelWithDebInfo>,rpm,release>>)
+ set(rust_debugflags "$<$<CONFIG:Debug>:-g>$<$<CONFIG:RelWithDebInfo>:-g>")
+ 
+ option(WITH_GETTEXT "Build with gettext localization support. Requires `msgfmt` to work." ON)
+-- 
+2.51.1
+

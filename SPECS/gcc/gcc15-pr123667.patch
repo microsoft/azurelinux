@@ -1,0 +1,94 @@
+2026-01-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/123667
+	* semantics.cc (finish_decltype_type): Allow a structured binding
+	for ptds.saved to have DECL_HAS_VALUE_EXPR_P cleared, if it is
+	not within current_function_decl, but in that case assert that
+	lookup_decomp_type succeeded.
+
+	* g++.dg/cpp1z/decomp66.C: New test.
+	* g++.dg/cpp1z/decomp67.C: New test.
+
+--- gcc/cp/semantics.cc.jj	2026-01-15 16:33:46.000000000 +0100
++++ gcc/cp/semantics.cc	2026-01-21 17:55:14.272577246 +0100
+@@ -13062,12 +13062,16 @@ finish_decltype_type (tree expr, bool id
+ 	{
+ 	  if (ptds.saved)
+ 	    {
+-	      gcc_checking_assert (DECL_HAS_VALUE_EXPR_P (expr));
++	      gcc_checking_assert (DECL_HAS_VALUE_EXPR_P (expr)
++				   || (DECL_CONTEXT (expr)
++				       != current_function_decl));
+ 	      /* DECL_HAS_VALUE_EXPR_P is always set if
+-		 processing_template_decl.  If lookup_decomp_type
++		 processing_template_decl at least for structured bindings
++		 within the template.  If lookup_decomp_type
+ 		 returns non-NULL, it is the tuple case.  */
+ 	      if (tree ret = lookup_decomp_type (expr))
+ 		return ret;
++	      gcc_checking_assert (DECL_HAS_VALUE_EXPR_P (expr));
+ 	    }
+ 	  if (DECL_HAS_VALUE_EXPR_P (expr))
+ 	    /* Expr is an array or struct subobject proxy, handle
+--- gcc/testsuite/g++.dg/cpp1z/decomp66.C.jj	2026-01-21 17:59:28.122275457 +0100
++++ gcc/testsuite/g++.dg/cpp1z/decomp66.C	2026-01-21 17:58:30.737247916 +0100
+@@ -0,0 +1,23 @@
++// PR c++/123667
++// { dg-do compile { target c++14 } }
++// { dg-options "" }
++
++namespace std {
++  template <typename T> struct tuple_size;
++  template <int, typename> struct tuple_element;
++}
++
++struct A {
++  int i;
++  template <int I> int &get () { return i; }
++};
++
++template <> struct std::tuple_size <A> { static const int value = 2; };
++template <int I> struct std::tuple_element <I,A> { using type = int; };
++
++int
++main ()
++{
++  auto [ x, y ] = A { 0 };	// { dg-warning "structured bindings only available with" "" { target c++14_down } }
++  [] (auto t) { using z = decltype (x); } (1);
++}
+--- gcc/testsuite/g++.dg/cpp1z/decomp67.C.jj	2026-01-21 17:59:31.139224331 +0100
++++ gcc/testsuite/g++.dg/cpp1z/decomp67.C	2026-01-21 17:59:07.235629406 +0100
+@@ -0,0 +1,33 @@
++// PR c++/123667
++// { dg-do compile { target c++11 } }
++// { dg-options "" }
++
++namespace std {
++  template <typename T> struct tuple_size;
++  template <int, typename> struct tuple_element;
++}
++
++struct A {
++  int i;
++  template <int I> int &get () { return i; }
++};
++
++template <> struct std::tuple_size <A> { static const int value = 2; };
++template <int I> struct std::tuple_element <I,A> { using type = int; };
++
++auto [ x, y ] = A { 0 };	// { dg-warning "structured bindings only available with" "" { target c++14_down } }
++
++template <int N>
++void
++foo ()
++{
++  using a = decltype (x);
++  auto [ x, y ] = A { 0 };	// { dg-warning "structured bindings only available with" "" { target c++14_down } }
++  using b = decltype (x);
++}
++
++void
++bar ()
++{
++  foo <42> ();
++}

@@ -1,0 +1,89 @@
+From 0be66603ac37474fe884ad1b384510d1ddc37417 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Tue, 6 Jan 2026 12:14:36 +0100
+Subject: [PATCH 2/3] Avoid passing addrspacecast to lifetime intrinsics
+
+Since LLVM 22 the alloca must be passed directly. Do this by
+stripping the addrspacecast if it exists.
+---
+ compiler/rustc_codegen_llvm/src/builder.rs       |  3 +++
+ compiler/rustc_codegen_llvm/src/llvm/ffi.rs      |  1 +
+ compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp |  4 ++++
+ tests/codegen-llvm/amdgpu-addrspacecast.rs       | 11 ++++++++++-
+ 4 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/compiler/rustc_codegen_llvm/src/builder.rs b/compiler/rustc_codegen_llvm/src/builder.rs
+index 557ae7b0333e..9379faf1156f 100644
+--- a/compiler/rustc_codegen_llvm/src/builder.rs
++++ b/compiler/rustc_codegen_llvm/src/builder.rs
+@@ -1788,6 +1788,9 @@ fn call_lifetime_intrinsic(&mut self, intrinsic: &'static str, ptr: &'ll Value,
+         }
+ 
+         if crate::llvm_util::get_version() >= (22, 0, 0) {
++            // LLVM 22 requires the lifetime intrinsic to act directly on the alloca,
++            // there can't be an addrspacecast in between.
++            let ptr = unsafe { llvm::LLVMRustStripPointerCasts(ptr) };
+             self.call_intrinsic(intrinsic, &[self.val_ty(ptr)], &[ptr]);
+         } else {
+             self.call_intrinsic(intrinsic, &[self.val_ty(ptr)], &[self.cx.const_u64(size), ptr]);
+diff --git a/compiler/rustc_codegen_llvm/src/llvm/ffi.rs b/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
+index c535fade9c04..a3d4e9f9d32a 100644
+--- a/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
++++ b/compiler/rustc_codegen_llvm/src/llvm/ffi.rs
+@@ -1967,6 +1967,7 @@ pub(crate) fn LLVMRustGlobalAddMetadata<'a>(
+         Metadata: &'a Metadata,
+     );
+     pub(crate) fn LLVMRustIsNonGVFunctionPointerTy(Val: &Value) -> bool;
++    pub(crate) fn LLVMRustStripPointerCasts<'a>(Val: &'a Value) -> &'a Value;
+ 
+     // Operations on scalar constants
+     pub(crate) fn LLVMRustConstIntGetZExtValue(ConstantVal: &ConstantInt, Value: &mut u64) -> bool;
+diff --git a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+index 336d58974036..599f79d01198 100644
+--- a/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/RustWrapper.cpp
+@@ -1760,6 +1760,10 @@ extern "C" bool LLVMRustIsNonGVFunctionPointerTy(LLVMValueRef V) {
+   return false;
+ }
+ 
++extern "C" LLVMValueRef LLVMRustStripPointerCasts(LLVMValueRef V) {
++  return wrap(unwrap(V)->stripPointerCasts());
++}
++
+ extern "C" bool LLVMRustLLVMHasZlibCompression() {
+   return llvm::compression::zlib::isAvailable();
+ }
+diff --git a/tests/codegen-llvm/amdgpu-addrspacecast.rs b/tests/codegen-llvm/amdgpu-addrspacecast.rs
+index 16a0c276ac0e..144565f7e28c 100644
+--- a/tests/codegen-llvm/amdgpu-addrspacecast.rs
++++ b/tests/codegen-llvm/amdgpu-addrspacecast.rs
+@@ -1,16 +1,25 @@
+ // Check that pointers are casted to addrspace(0) before they are used
+ 
+-//@ compile-flags: --crate-type=rlib --target=amdgcn-amd-amdhsa -Ctarget-cpu=gfx900
++//@ compile-flags: --crate-type=rlib --target=amdgcn-amd-amdhsa -Ctarget-cpu=gfx900 -O
+ //@ needs-llvm-components: amdgpu
+ //@ add-minicore
++//@ revisions: LLVM21 LLVM22
++//@ [LLVM21] max-llvm-major-version: 21
++//@ [LLVM22] min-llvm-version: 22
+ #![feature(no_core)]
+ #![no_core]
+ 
+ extern crate minicore;
+ 
++// Make sure that on LLVM 22, the alloca is passed directly to the lifetime intrinsics,
++// not the addrspacecast.
++
+ // CHECK-LABEL: @ref_of_local
+ // CHECK: [[alloca:%[0-9]]] = alloca
+ // CHECK: %i = addrspacecast ptr addrspace(5) [[alloca]] to ptr
++// LLVM22: call void @llvm.lifetime.start.p5(ptr addrspace(5) [[alloca]])
++// CHECK: call void %f(ptr{{.*}}%i)
++// LLVM22: call void @llvm.lifetime.end.p5(ptr addrspace(5) [[alloca]])
+ #[no_mangle]
+ pub fn ref_of_local(f: fn(&i32)) {
+     let i = 0;
+-- 
+2.53.0
+

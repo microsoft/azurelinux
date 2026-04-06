@@ -1,0 +1,137 @@
+diff -rupN --no-dereference Python-3.11.14/Misc/NEWS.d/next/Library/2024-06-04-19-03-25.gh-issue-112672.K2XfZH.rst Python-3.11.14-new/Misc/NEWS.d/next/Library/2024-06-04-19-03-25.gh-issue-112672.K2XfZH.rst
+--- Python-3.11.14/Misc/NEWS.d/next/Library/2024-06-04-19-03-25.gh-issue-112672.K2XfZH.rst	1970-01-01 01:00:00.000000000 +0100
++++ Python-3.11.14-new/Misc/NEWS.d/next/Library/2024-06-04-19-03-25.gh-issue-112672.K2XfZH.rst	2025-10-12 16:37:18.467003247 +0200
+@@ -0,0 +1 @@
++Support building :mod:`tkinter` with Tcl 9.0.
+diff -rupN --no-dereference Python-3.11.14/Modules/_tkinter.c Python-3.11.14-new/Modules/_tkinter.c
+--- Python-3.11.14/Modules/_tkinter.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/_tkinter.c	2025-10-12 16:37:18.467290741 +0200
+@@ -66,6 +66,12 @@ Copyright (C) 1994 Steen Lumholt.
+ #define USE_DEPRECATED_TOMMATH_API 1
+ #endif
+ 
++// As suggested by https://core.tcl-lang.org/tcl/wiki?name=Migrating+C+extensions+to+Tcl+9
++#ifndef TCL_SIZE_MAX
++typedef int Tcl_Size;
++#define TCL_SIZE_MAX INT_MAX
++#endif
++
+ #if !(defined(MS_WINDOWS) || defined(__CYGWIN__))
+ #define HAVE_CREATEFILEHANDLER
+ #endif
+@@ -492,7 +498,7 @@ unicodeFromTclString(const char *s)
+ static PyObject *
+ unicodeFromTclObj(Tcl_Obj *value)
+ {
+-    int len;
++    Tcl_Size len;
+ #if USE_TCL_UNICODE
+     int byteorder = NATIVE_BYTEORDER;
+     const Tcl_UniChar *u = Tcl_GetUnicodeFromObj(value, &len);
+@@ -520,6 +526,10 @@ class _tkinter.tktimertoken "TkttObject
+ 
+ /**** Tkapp Object ****/
+ 
++#if TK_MAJOR_VERSION >= 9
++int Tcl_AppInit(Tcl_Interp *);
++#endif
++
+ #ifndef WITH_APPINIT
+ int
+ Tcl_AppInit(Tcl_Interp *interp)
+@@ -1150,7 +1160,7 @@ FromObj(TkappObject *tkapp, Tcl_Obj *val
+     }
+ 
+     if (value->typePtr == tkapp->ByteArrayType) {
+-        int size;
++        Tcl_Size size;
+         char *data = (char*)Tcl_GetByteArrayFromObj(value, &size);
+         return PyBytes_FromStringAndSize(data, size);
+     }
+@@ -1184,8 +1194,8 @@ FromObj(TkappObject *tkapp, Tcl_Obj *val
+     }
+ 
+     if (value->typePtr == tkapp->ListType) {
+-        int size;
+-        int i, status;
++        Tcl_Size i, size;
++        int status;
+         PyObject *elem;
+         Tcl_Obj *tcl_elem;
+ 
+@@ -1250,9 +1260,9 @@ typedef struct Tkapp_CallEvent {
+ } Tkapp_CallEvent;
+ 
+ static void
+-Tkapp_CallDeallocArgs(Tcl_Obj** objv, Tcl_Obj** objStore, int objc)
++Tkapp_CallDeallocArgs(Tcl_Obj** objv, Tcl_Obj** objStore, Tcl_Size objc)
+ {
+-    int i;
++    Tcl_Size i;
+     for (i = 0; i < objc; i++)
+         Tcl_DecrRefCount(objv[i]);
+     if (objv != objStore)
+@@ -1263,7 +1273,7 @@ Tkapp_CallDeallocArgs(Tcl_Obj** objv, Tc
+    interpreter thread, which may or may not be the calling thread. */
+ 
+ static Tcl_Obj**
+-Tkapp_CallArgs(PyObject *args, Tcl_Obj** objStore, int *pobjc)
++Tkapp_CallArgs(PyObject *args, Tcl_Obj** objStore, Tcl_Size *pobjc)
+ {
+     Tcl_Obj **objv = objStore;
+     Py_ssize_t objc = 0, i;
+@@ -1311,10 +1321,10 @@ Tkapp_CallArgs(PyObject *args, Tcl_Obj**
+             Tcl_IncrRefCount(objv[i]);
+         }
+     }
+-    *pobjc = (int)objc;
++    *pobjc = (Tcl_Size)objc;
+     return objv;
+ finally:
+-    Tkapp_CallDeallocArgs(objv, objStore, (int)objc);
++    Tkapp_CallDeallocArgs(objv, objStore, (Tcl_Size)objc);
+     return NULL;
+ }
+ 
+@@ -1357,7 +1367,7 @@ Tkapp_CallProc(Tkapp_CallEvent *e, int f
+ {
+     Tcl_Obj *objStore[ARGSZ];
+     Tcl_Obj **objv;
+-    int objc;
++    Tcl_Size objc;
+     int i;
+     ENTER_PYTHON
+     objv = Tkapp_CallArgs(e->args, objStore, &objc);
+@@ -1408,7 +1418,7 @@ Tkapp_Call(PyObject *selfptr, PyObject *
+ {
+     Tcl_Obj *objStore[ARGSZ];
+     Tcl_Obj **objv = NULL;
+-    int objc, i;
++    Tcl_Size objc;
+     PyObject *res = NULL;
+     TkappObject *self = (TkappObject*)selfptr;
+     int flags = TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL;
+@@ -1454,6 +1464,7 @@ Tkapp_Call(PyObject *selfptr, PyObject *
+     else
+     {
+ 
++        int i;
+         objv = Tkapp_CallArgs(args, objStore, &objc);
+         if (!objv)
+             return NULL;
+@@ -2139,13 +2150,12 @@ _tkinter_tkapp_splitlist(TkappObject *se
+ /*[clinic end generated code: output=13b51d34386d36fb input=2b2e13351e3c0b53]*/
+ {
+     char *list;
+-    int argc;
++    Tcl_Size argc, i;
+     const char **argv;
+     PyObject *v;
+-    int i;
+ 
+     if (PyTclObject_Check(arg)) {
+-        int objc;
++        Tcl_Size objc;
+         Tcl_Obj **objv;
+         if (Tcl_ListObjGetElements(Tkapp_Interp(self),
+                                    ((PyTclObject*)arg)->value,

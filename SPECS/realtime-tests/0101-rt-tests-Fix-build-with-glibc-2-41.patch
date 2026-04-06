@@ -1,0 +1,42 @@
+These APIs were added to glibc 2.41, and these definitions now conflict.
+
+https://sourceware.org/git/?p=glibc.git;a=commit;h=21571ca0d70302909cf72707b2a7736cf12190a0
+
+diff --git a/src/include/rt-sched.h b/src/include/rt-sched.h
+index 80171c7..b13851d 100644
+--- a/src/include/rt-sched.h
++++ b/src/include/rt-sched.h
+@@ -42,6 +42,7 @@
+ #define __NR_sched_getattr		275
+ #endif
+ 
++#if ! __GLIBC_PREREQ(2, 41)
+ struct sched_attr {
+ 	uint32_t size;
+ 	uint32_t sched_policy;
+@@ -67,5 +68,6 @@ int sched_getattr(pid_t pid,
+ 		  struct sched_attr *attr,
+ 		  unsigned int size,
+ 		  unsigned int flags);
++#endif
+ 
+ #endif /* __RT_SCHED_H__ */
+diff --git a/src/lib/rt-sched.c b/src/lib/rt-sched.c
+index 8023bc7..100866f 100644
+--- a/src/lib/rt-sched.c
++++ b/src/lib/rt-sched.c
+@@ -14,6 +14,8 @@
+ 
+ #include "rt-sched.h"
+ 
++#if ! __GLIBC_PREREQ(2, 41)
++
+ int sched_setattr(pid_t pid,
+ 		  const struct sched_attr *attr,
+ 		  unsigned int flags)
+@@ -28,3 +30,5 @@ int sched_getattr(pid_t pid,
+ {
+ 	return syscall(__NR_sched_getattr, pid, attr, size, flags);
+ }
++
++#endif

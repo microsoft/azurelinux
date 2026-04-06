@@ -1,0 +1,24 @@
+From ced8baacd3bccba7ebaba80785b891bf579af215 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Tue, 31 Jan 2017 14:21:19 +0100
+Subject: [PATCH 4/6] Fix javadoc build
+
+---
+ build.xml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/build.xml b/build.xml
+index 8f5733a..fb8d544 100644
+--- a/build.xml
++++ b/build.xml
+@@ -1343,6 +1343,7 @@ cd ..
+       <group title="Platform Specific" packages="com.sun.jna.platform.*"/>
+ 
+       <arg value="-notimestamp"/>
++      <arg value="--allow-script-in-comments"/>
+     </javadoc>
+     <!--
+     Create an empty resources/fonts/dejavu.css - the file is reference by default
+-- 
+2.49.0
+

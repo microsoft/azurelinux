@@ -1,0 +1,67 @@
+From 8d6f8eefcb0b0edafa585d23d6b3f2169d8e1c6f Mon Sep 17 00:00:00 2001
+From: Fabio Fantoni <fantonifabio@tiscali.it>
+Date: Sat, 22 Feb 2025 12:52:58 +0100
+Subject: [PATCH] {src/pam,pyproject.toml}: Stop using six module. Deprecated.
+
+See https://bugs.debian.org/1098415 for details.
+---
+ pyproject.toml         |  2 --
+ src/pam/__internals.py | 10 ++++------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 83d8bee..551da23 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,7 +2,6 @@
+ requires = [
+     'setuptools>=44',
+     'wheel>=0.30.0',
+-    'six',
+ ]
+ build-backend = 'setuptools.build_meta'
+ 
+@@ -32,7 +31,6 @@ deps =
+     bandit
+     flake8
+     mypy
+-    types-six
+     coverage
+     pytest-cov
+     pytest
+diff --git a/src/pam/__internals.py b/src/pam/__internals.py
+index 99a0397..ba40457 100644
+--- a/src/pam/__internals.py
++++ b/src/pam/__internals.py
+@@ -1,5 +1,4 @@
+ import os
+-import six
+ import sys
+ from ctypes import cdll
+ from ctypes import CFUNCTYPE
+@@ -296,11 +295,11 @@ def __conv(n_messages, messages, p_response, app_data):
+ 
+             return my_conv(n_messages, messages, p_response, self.libc, msg_list, password, encoding)
+ 
+-        if isinstance(username, six.text_type):
++        if isinstance(username, str):
+             username = username.encode(encoding)
+-        if isinstance(password, six.text_type):
++        if isinstance(password, str):
+             password = password.encode(encoding)
+-        if isinstance(service, six.text_type):
++        if isinstance(service, str):
+             service = service.encode(encoding)
+ 
+         if b'\x00' in username or b'\x00' in password or b'\x00' in service:
+@@ -482,9 +481,8 @@
+             return PAM_SYSTEM_ERR
+ 
+         #  can't happen unless someone is using internals directly
+-        if sys.version_info >= (3, ):  # pragma: no branch
+-            if isinstance(key, six.text_type):  # pragma: no branch
+-                key = key.encode(encoding)
++        if isinstance(key, str):  # pragma: no branch
++            key = key.encode(encoding)
+ 
+         value = self.pam_getenv(self.handle, key)

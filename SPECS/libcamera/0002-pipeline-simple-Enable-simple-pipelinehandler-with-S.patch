@@ -1,0 +1,42 @@
+From 473e2dc89323863e47fbe5c210581e7cc891dedd Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Fri, 29 Aug 2025 18:04:25 +0200
+Subject: [PATCH] pipeline: simple: Enable simple pipelinehandler with SoftISP
+ on Intel IPU7
+
+Enable the simple pipelinehandler with SoftISP on Intel IPU7 machines.
+
+This has been successfully tested with the IPU7 CSI2 receiver driver in
+drivers/media/staging in kernel version 6.17-rc# on a Lenovo ThinkPad X1
+Carbon Gen 13 (Lunar Lake, ov08x40 sensor).
+
+On this specific laptop a couple of kernel patches which are pending
+upstream are necessary on top of 6.17-rc#:
+
+https://lore.kernel.org/linux-usb/20250809102326.6032-1-hansg@kernel.org/
+https://lore.kernel.org/linux-acpi/20250829142748.21089-1-hansg@kernel.org/
+
+Tested-by: Hans de Goede <hansg@kernel.org> # Lenovo ThinkPad Carbon X1 Gen 13
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Reviewed-by: Paul Elder <paul.elder@ideasonboard.com>
+Signed-off-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+---
+ src/libcamera/pipeline/simple/simple.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libcamera/pipeline/simple/simple.cpp b/src/libcamera/pipeline/simple/simple.cpp
+index 9b24a0db..4f914be8 100644
+--- a/src/libcamera/pipeline/simple/simple.cpp
++++ b/src/libcamera/pipeline/simple/simple.cpp
+@@ -252,6 +252,7 @@ static const SimplePipelineInfo supportedDevices[] = {
+ 	{ "dcmipp", {}, false },
+ 	{ "imx7-csi", { { "pxp", 1 } }, false },
+ 	{ "intel-ipu6", {}, true },
++	{ "intel-ipu7", {}, true },
+ 	{ "j721e-csi2rx", {}, true },
+ 	{ "mtk-seninf", { { "mtk-mdp", 3 } }, false },
+ 	{ "mxc-isi", {}, false },
+-- 
+2.51.0
+

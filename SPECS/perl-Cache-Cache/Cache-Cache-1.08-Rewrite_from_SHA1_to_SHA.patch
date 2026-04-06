@@ -1,0 +1,60 @@
+diff -u -r Cache-Cache-1.08.orig/lib/Cache/FileBackend.pm Cache-Cache-1.08/lib/Cache/FileBackend.pm
+--- Cache-Cache-1.08.orig/lib/Cache/FileBackend.pm	2015-01-22 16:59:26.000000000 +0100
++++ Cache-Cache-1.08/lib/Cache/FileBackend.pm	2024-09-04 11:24:56.706120294 +0200
+@@ -12,7 +12,7 @@
+ 
+ use strict;
+ use Cache::CacheUtils qw( Assert_Defined Build_Path Freeze_Data Thaw_Data );
+-use Digest::SHA1 qw( sha1_hex );
++use Digest::SHA qw( sha1_hex );
+ use Error;
+ use File::Path qw( mkpath );
+ use File::Temp qw( tempfile );
+diff -u -r Cache-Cache-1.08.orig/Makefile.PL Cache-Cache-1.08/Makefile.PL
+--- Cache-Cache-1.08.orig/Makefile.PL	2014-09-17 15:56:35.000000000 +0200
++++ Cache-Cache-1.08/Makefile.PL	2024-09-04 11:24:32.547958901 +0200
+@@ -11,7 +11,7 @@
+ my $COMPRESS = 'gzip';
+ my $SUFFIX = '.gz';
+ my $DEFAULT_PREREQ_PM = {
+-                         'Digest::SHA1' => '2.02',
++                         'Digest::SHA' => '6.00',
+                          'File::Spec' => '0.82',
+                          'Storable' => '1.014',
+                          'IPC::ShareLite' => '0.09',
+diff -u -r Cache-Cache-1.08.orig/META.json Cache-Cache-1.08/META.json
+--- Cache-Cache-1.08.orig/META.json	2015-01-22 17:12:18.000000000 +0100
++++ Cache-Cache-1.08/META.json	2024-09-04 11:25:34.305371482 +0200
+@@ -32,7 +32,7 @@
+       },
+       "runtime" : {
+          "requires" : {
+-            "Digest::SHA1" : "2.02",
++            "Digest::SHA" : "6.00",
+             "Error" : "0.15",
+             "File::Spec" : "0.82",
+             "IPC::ShareLite" : "0.09",
+diff -u -r Cache-Cache-1.08.orig/META.yml Cache-Cache-1.08/META.yml
+--- Cache-Cache-1.08.orig/META.yml	2015-01-22 17:12:17.000000000 +0100
++++ Cache-Cache-1.08/META.yml	2024-09-04 11:25:25.475312492 +0200
+@@ -18,7 +18,7 @@
+     - t
+     - inc
+ requires:
+-  Digest::SHA1: '2.02'
++  Digest::SHA: '6.00'
+   Error: '0.15'
+   File::Spec: '0.82'
+   IPC::ShareLite: '0.09'
+diff -u -r Cache-Cache-1.08.orig/README Cache-Cache-1.08/README
+--- Cache-Cache-1.08.orig/README	2014-09-17 15:55:39.000000000 +0200
++++ Cache-Cache-1.08/README	2024-09-04 11:25:15.650246854 +0200
+@@ -46,7 +46,7 @@
+ 
+ REQUIREMENTS
+ 
+-  Digest::SHA1
++  Digest::SHA
+   Error
+   File::Spec
+   File::Path

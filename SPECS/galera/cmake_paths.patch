@@ -1,0 +1,119 @@
+This patch has been offered upstream with slight typo fixes:
+  https://github.com/codership/galera/pull/614
+on 21/02/2022
+
+#----------------------
+
+
+1) Documentation files
+
+--- galera-26.4.11/CMakeLists.txt	2022-02-20 03:35:32.039968825 +0100
++++ galera-26.4.11/CMakeLists.txt_patched	2022-02-20 03:34:57.710641631 +0100
+@@ -109,14 +109,19 @@ add_subdirectory(galera)
+ add_subdirectory(scripts/packages)
+ add_subdirectory(wsrep/tests)
+ 
++# Make the intall destination for documentation files configurable
++if(NOT DEFINED INSTALL_DOCDIR)
++  set(INSTALL_DOCDIR "doc" CACHE STRING "path to install documentaion to")
++endif()
++
+ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD")
+   install(FILES
+     ${PROJECT_SOURCE_DIR}/AUTHORS
+     ${PROJECT_SOURCE_DIR}/COPYING
+     ${PROJECT_SOURCE_DIR}/README
+-    DESTINATION doc)
++    DESTINATION ${INSTALL_DOCDIR} )
+   install(FILES ${PROJECT_SOURCE_DIR}/asio/LICENSE_1_0.txt
+-    DESTINATION doc
++    DESTINATION ${INSTALL_DOCDIR}
+     RENAME LICENSE.asio)
+ endif()
+ 
+
+
+2) Configuration file
+3) Executable files
+4) Systemd service file
+
+--- galera-26.4.23/garb/CMakeLists.txt	2025-07-15 07:34:42.000000000 +0200
++++ galera-26.4.23/garb/CMakeLists.txt_patched	2025-08-08 15:22:15.492953438 +0200
+@@ -35,14 +35,51 @@ target_compile_options(garbd
+ target_link_libraries(garbd gcs4garb gcomm gcache
+   ${Boost_PROGRAM_OPTIONS_LIBRARY})
+ 
+-install(TARGETS garbd DESTINATION bin)
++# Make the install destination for garbd binary configurable
++if(NOT DEFINED INSTALL_GARBD)
++  set(INSTALL_GARBD "bin" CACHE STRING "path to install garbd binary to")
++endif()
++
++install(TARGETS garbd
++  DESTINATION ${INSTALL_GARBD})
++
+ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES ".*BSD")
++
++  # Make the install destination for garbd-systemd wrapper script configurable
++  if(NOT DEFINED INSTALL_GARBD-SYSTEMD)
++    set(INSTALL_GARBD-SYSTEMD "share" CACHE STRING "path to install garbd-systemd wrapper script to")
++  endif()
++
++  install(FILES
++    ${CMAKE_CURRENT_SOURCE_DIR}/files/garb-systemd
++    DESTINATION ${INSTALL_GARBD-SYSTEMD})
++
++  # Make the install destination for garbd configuration file configurable
++  if(NOT DEFINED INSTALL_CONFIGURATION)
++    set(INSTALL_CONFIGURATION "share" CACHE STRING "path to install garbd configuration to")
++  endif()
++
+   install(FILES
+     ${CMAKE_CURRENT_SOURCE_DIR}/files/garb.cnf
++    DESTINATION ${INSTALL_CONFIGURATION}
++    RENAME garb)
++
++  # Make the install destination for garbd systemd service file configurable
++  if(NOT DEFINED INSTALL_SYSTEMD_SERVICE)
++    set(INSTALL_SYSTEMD_SERVICE "share" CACHE STRING "path to install garbd Systemd service to")
++  endif()
++
++  install(FILES
+     ${CMAKE_CURRENT_SOURCE_DIR}/files/garb.service
+-    ${CMAKE_CURRENT_SOURCE_DIR}/files/garb-systemd
+-    DESTINATION share)
++    DESTINATION ${INSTALL_SYSTEMD_SERVICE})
++
++  # Make the install destination for manpage configurable
++  if(NOT DEFINED INSTALL_MANPAGE)
++    set(INSTALL_MANPAGE "man/man8" CACHE STRING "path to install manpage to")
++  endif()
++
+   install(FILES
+     ${PROJECT_SOURCE_DIR}/man/garbd.8
+-    DESTINATION man/man8)
++    DESTINATION ${INSTALL_MANPAGE})
++
+ endif()
+
+
+
+5) Shared library path
+
+--- galera-26.4.8/galera/src/CMakeLists.txt	2021-06-10 03:13:05.465005845 +0200
++++ galera-26.4.8/galera/src/CMakeLists.txt_patched	2021-06-10 03:16:53.388699046 +0200
+@@ -112,7 +112,12 @@ endif()
+ 
+ target_link_libraries(galera_smm galera ${GALERA_LINK_OPTIONS})
+ 
+-install(TARGETS galera_smm DESTINATION lib)
++# Make the install destination for garbd binary configurable
++if(NOT DEFINED INSTALL_LIBDIR)
++  set(INSTALL_LIBDIR "lib" CACHE STRING "path to install shared libraries to")
++endif()
++
++install(TARGETS galera_smm DESTINATION ${INSTALL_LIBDIR})
+ 
+ # The following checks are guaranteed to work only
+ # Linux platform, we skip them on others.
+

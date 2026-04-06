@@ -1,0 +1,48 @@
+%mingw32_python3_version @PY_VER@
+%mingw32_python3_version_nodots @PY_VER_NODOTS@
+%mingw32_py3_libdir       %{mingw32_libdir}/python%{mingw32_python3_version}
+%mingw32_py3_hostlibdir   %{_prefix}/%{mingw32_target}/lib/python%{mingw32_python3_version}
+%mingw32_py3_incdir       %{mingw32_includedir}/python%{mingw32_python3_version}
+%mingw32_python3_sitearch %{mingw32_libdir}/python%{mingw32_python3_version}/site-packages
+%mingw32_python3_hostsitearch %{_prefix}/%{mingw32_target}/lib/python%{mingw32_python3_version}/site-packages
+
+%mingw32_python3 %{mingw32_env} ; \
+    pylibdynload=`/usr/bin/python%{mingw32_python3_version} -c 'import sysconfig; import os; print(os.path.join(sysconfig.get_path("stdlib"), "lib-dynload"))'`; \
+    _PYTHON_HOST_PLATFORM=mingw32 \\\
+    _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata__win32_" \\\
+    PYTHONHOME=%{mingw32_prefix} \\\
+    PYTHONPATH=\$PYTHONPATH:%{mingw32_py3_hostlibdir}:%{mingw32_py3_hostlibdir}/site-packages:$pylibdynload:%{mingw32_py3_libdir}:%{mingw32_python3_sitearch} \\\
+    PYTHONPLATLIBDIR=lib \\\
+    /usr/bin/python%{mingw32_python3_version} "$@"
+
+%mingw32_py3_build \
+  %mingw32_python3 %{py_setup} %{?py_setup_args} build --executable="/usr/bin/python%{mingw32_python3_version} %{py3_shbang_opts}" -b build_mingw32 %{?*}
+
+%mingw32_py3_install \
+  [ -d build ] && mv build build_native; \
+  ln -s build_mingw32 build; \
+  %mingw32_python3 %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}; \
+  rm build; \
+  [ -d build_native ] && mv build_native build; \
+  rm -rfv %{buildroot}%{mingw32_bindir}/__pycache__
+
+
+%mingw32_python3_host \
+    pylib=`/usr/bin/python%{mingw32_python3_version} -c 'import sysconfig; print(sysconfig.get_path("stdlib"))'`; \
+    pylibdynload=`/usr/bin/python%{mingw32_python3_version} -c 'import sysconfig; import os; print(os.path.join(sysconfig.get_path("stdlib"), "lib-dynload"))'`; \
+    PATH=\$PATH:%{_prefix}/%{mingw32_target}/bin \\\
+    PYTHONHOME=%{_prefix}/%{mingw32_target} \\\
+    PYTHONPATH=\$PYTHONPATH:%{mingw32_py3_hostlibdir}:%{mingw32_py3_hostlibdir}/site-packages:$pylib:$pylibdynload \\\
+    PYTHONPLATLIBDIR=lib \\\
+    /usr/bin/python%{mingw32_python3_version} "$@"
+
+%mingw32_py3_build_host \
+  %mingw32_python3_host %{py_setup} %{?py_setup_args} build --executable="/usr/bin/python%{mingw32_python3_version} %{py3_shbang_opts}" -b build_mingw32_host %{?*}
+
+%mingw32_py3_install_host \
+  [ -d build ] && mv build build_native; \
+  ln -s build_mingw32_host build; \
+  %mingw32_python3_host %{py_setup} %{?py_setup_args} install -O1 --skip-build --root %{buildroot} %{?*}; \
+  rm build; \
+  [ -d build_native ] && mv build_native build; \
+  rm -rfv %{buildroot}%{mingw32_bindir}/__pycache__

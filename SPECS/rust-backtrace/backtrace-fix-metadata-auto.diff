@@ -1,0 +1,17 @@
+--- backtrace-0.3.76/Cargo.toml	1970-01-01T00:00:01+00:00
++++ backtrace-0.3.76/Cargo.toml	2025-11-04T14:27:57.625291+00:00
+@@ -120,9 +120,6 @@
+ [dev-dependencies.libloading]
+ version = "0.8"
+ 
+-[target.'cfg(any(windows, target_os = "cygwin"))'.dependencies.windows-link]
+-version = "0.2"
+-
+ [target.'cfg(not(all(windows, target_env = "msvc", not(target_vendor = "uwp"))))'.dependencies.addr2line]
+ version = "0.25.0"
+ default-features = false
+@@ -155,3 +152,4 @@
+ 
+ [lints.rust]
+ unexpected_cfgs = "allow"
++

@@ -1,0 +1,56 @@
+From 74e0c6ccc615fa38ee793899ca80f3351c10c60e Mon Sep 17 00:00:00 2001
+From: Henry Schreiner <HenrySchreinerIII@gmail.com>
+Date: Tue, 13 Aug 2024 09:48:48 -0400
+Subject: [PATCH 1/2] fix: bdist_wheel was unmodified
+
+---
+ setup.py | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 8040320fe..72018345c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -93,11 +93,6 @@
+     if with_cython:
+         raise
+ 
+-try:
+-    from wheel.bdist_wheel import bdist_wheel
+-except ImportError:
+-    bdist_wheel = None
+-
+ 
+ try:
+     from _pyyaml_pep517 import ActiveConfigSettings
+@@ -325,8 +320,6 @@ def run(self):
+     'build_ext': build_ext,
+     'test': test,
+ }
+-if bdist_wheel:
+-    cmdclass['bdist_wheel'] = bdist_wheel
+ 
+ 
+ if __name__ == '__main__':
+
+From bdc81567884bedab456f62ccfd3c1ec800c57e36 Mon Sep 17 00:00:00 2001
+From: Henry Schreiner <HenrySchreinerIII@gmail.com>
+Date: Tue, 13 Aug 2024 09:50:19 -0400
+Subject: [PATCH 2/2] Update pyproject.toml
+
+---
+ pyproject.toml | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index d8e5b9695..00ce069c6 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,7 +1,6 @@
+ [build-system]
+ requires = [
+     "setuptools",  # FIXME: declare min/max setuptools versions?
+-    "wheel",
+     "Cython; python_version < '3.13'",
+     "Cython>=3.0; python_version >= '3.13'"
+ ]

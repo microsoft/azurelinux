@@ -1,0 +1,51 @@
+From 4e517492a03b6c0b710a2d9a3df05922ac233992 Mon Sep 17 00:00:00 2001
+From: Christophe Marin <christophe@krop.fr>
+Date: Wed, 24 May 2023 11:23:39 +0200
+Subject: [PATCH] CMake: Install objects files into 'ARCHDATADIR'
+
+Change-Id: I917a9ef4d83f93eb5c3e47964bf1814d1b53fdab
+---
+ cmake/QtResourceHelpers.cmake | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/QtResourceHelpers.cmake b/cmake/QtResourceHelpers.cmake
+index 2df1fed50f..e4f34b5ff1 100644
+--- a/cmake/QtResourceHelpers.cmake
++++ b/cmake/QtResourceHelpers.cmake
+@@ -38,7 +38,7 @@ function(qt_internal_add_resource target resourceName)
+    if (out_targets)
+         qt_install(TARGETS ${out_targets}
+             EXPORT "${INSTALL_CMAKE_NAMESPACE}${target}Targets"
+-            DESTINATION "${INSTALL_LIBDIR}"
++            DESTINATION "${INSTALL_ARCHDATADIR}"
+         )
+         qt_internal_add_targets_to_additional_targets_export_file(
+             TARGETS ${out_targets}
+@@ -47,7 +47,7 @@ function(qt_internal_add_resource target resourceName)
+ 
+         qt_internal_install_resource_pdb_files("${out_targets}")
+         qt_internal_record_rcc_object_files("${target}" "${out_targets}"
+-                                            INSTALL_DIRECTORY "${INSTALL_LIBDIR}")
++                                            INSTALL_DIRECTORY "${INSTALL_ARCHDATADIR}")
+    endif()
+ 
+    if (arg_OUTPUT_TARGETS)
+@@ -77,7 +77,7 @@ function(qt_internal_record_rcc_object_files target resource_targets)
+             # It's comprised of thee following path parts:
+             #
+             # part (1) INSTALL_DIRECTORY.
+-            #          A usual value is '${INSTALL_LIBDIR}/' for libraries
++            #          A usual value is '${INSTALL_ARCHDATADIR}/' for libraries
+             #          and '${INSTALL_QMLDIR}/foo/bar/' for qml plugin resources.
+             #
+             # part (2) the value computed by CMake's computeInstallObjectDir comprised of an
+@@ -128,6 +128,6 @@ function(qt_internal_install_resource_pdb_files objlib_targets)
+             _qt_resource_generated_cpp_relative_path)
+         get_filename_component(rel_obj_file_dir "${generated_cpp_file_relative_path}" DIRECTORY)
+         qt_internal_install_pdb_files(${target}
+-            "${INSTALL_LIBDIR}/objects-$<CONFIG>/${target}/${rel_obj_file_dir}")
++            "${INSTALL_ARCHDATADIR}/objects-$<CONFIG>/${target}/${rel_obj_file_dir}")
+     endforeach()
+ endfunction()
+-- 
+2.40.1

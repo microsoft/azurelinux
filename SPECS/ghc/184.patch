@@ -1,0 +1,36 @@
+From 6045b93c4ef7a713c8f3d6837ca69f8e96b12bf1 Mon Sep 17 00:00:00 2001
+From: Matthew Pickering <matthewtpickering@gmail.com>
+Date: Thu, 1 Aug 2024 16:06:20 +0100
+Subject: [PATCH] Remove "install-includes: HsDirectoryConfig.h"
+
+This header file is not supposed to be installed for users, users are
+not supposed to use it. The file exists to be used interally (and this
+is explained by the "include-dirs" field in the cabal file.
+
+It seems likely that this removal was overlooked in
+c87be9908023896a7f270bb076731ffba6c151b5
+---
+ directory.buildinfo | 1 -
+ directory.cabal     | 1 -
+ 2 files changed, 2 deletions(-)
+ delete mode 100644 directory.buildinfo
+
+diff --git a/directory.buildinfo b/directory.buildinfo
+deleted file mode 100644
+index e19f7726..00000000
+--- a/directory.buildinfo
++++ /dev/null
+@@ -1 +0,0 @@
+-install-includes: HsDirectoryConfig.h
+diff --git a/directory.cabal b/directory.cabal
+index af35f1d1..9921cfa1 100644
+--- a/directory.cabal
++++ b/directory.cabal
+@@ -28,7 +28,6 @@ extra-source-files:
+     System/Directory/Internal/*.h
+     configure
+     configure.ac
+-    directory.buildinfo
+     tests/*.hs
+     tests/util.inl
+ 

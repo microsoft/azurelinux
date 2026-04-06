@@ -1,0 +1,24 @@
+diff -up texinfo-7.2/tp/Texinfo/Convert/Converter.pm.orig texinfo-7.2/tp/Texinfo/Convert/Converter.pm
+--- texinfo-7.2/tp/Texinfo/Convert/Converter.pm.orig	2024-12-19 19:31:42.000000000 +0100
++++ texinfo-7.2/tp/Texinfo/Convert/Converter.pm	2025-08-01 10:31:55.845929864 +0200
+@@ -386,7 +386,7 @@ sub output_tree($$)
+ 
+   my $fh;
+   my $encoded_output_file;
+-  if (! $output_file eq '') {
++  if ($output_file ne '') {
+     my $path_encoding;
+     ($encoded_output_file, $path_encoding)
+       = $self->encoded_output_file_name($output_file);
+diff -up texinfo-7.2/tp/Texinfo/Convert/LaTeX.pm.orig texinfo-7.2/tp/Texinfo/Convert/LaTeX.pm
+--- texinfo-7.2/tp/Texinfo/Convert/LaTeX.pm.orig	2024-12-19 19:31:42.000000000 +0100
++++ texinfo-7.2/tp/Texinfo/Convert/LaTeX.pm	2025-08-01 10:32:57.790836873 +0200
+@@ -1085,7 +1085,7 @@ sub output($$)
+ 
+   my $fh;
+   my $encoded_output_file;
+-  if (! $output_file eq '') {
++  if ($output_file ne '') {
+     my $path_encoding;
+     ($encoded_output_file, $path_encoding)
+       = $self->encoded_output_file_name($output_file);

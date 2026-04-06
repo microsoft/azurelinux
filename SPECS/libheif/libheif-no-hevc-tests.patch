@@ -1,0 +1,17 @@
+diff -up libheif-1.16.2/tests/encode.cc.no-hevc libheif-1.16.2/tests/encode.cc
+--- libheif-1.16.2/tests/encode.cc.no-hevc	2023-05-22 21:00:47.000000000 +0200
++++ libheif-1.16.2/tests/encode.cc	2023-09-08 14:22:08.408234336 +0200
+@@ -148,11 +148,13 @@ static void test_ispe_size(heif_compress
+ 
+ TEST_CASE( "ispe odd size", "[heif_context]" ) {
+ 
++#if 0
+   // HEVC encoders typically encode with even dimensions only
+   test_ispe_size(heif_compression_HEVC, heif_orientation_normal, 121,99, 122,100);
+   test_ispe_size(heif_compression_HEVC, heif_orientation_rotate_180, 121,99, 122,100);
+   test_ispe_size(heif_compression_HEVC, heif_orientation_rotate_90_cw, 121,99, 122,100);
+   test_ispe_size(heif_compression_HEVC, heif_orientation_rotate_90_cw, 120,100, 120,100);
++#endif
+ 
+   // AVIF encoders typically encode with odd dimensions
+   test_ispe_size(heif_compression_AV1, heif_orientation_normal, 121,99, 121,99);

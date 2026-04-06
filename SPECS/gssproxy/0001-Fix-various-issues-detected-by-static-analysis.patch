@@ -1,0 +1,173 @@
+From 1917dad3d56b65c070c49c387196b2d4314ca6c4 Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Tue, 6 Aug 2024 10:38:01 +0200
+Subject: [PATCH] Fix various issues detected by static analysis
+
+Signed-off-by: Julien Rische <jrische@redhat.com>
+(cherry picked from commit be676f3c6338971d953c8da52f4172040c5e06a4)
+---
+ src/client/gpm_accept_sec_context.c |  1 +
+ src/gp_creds.c                      |  1 +
+ src/gp_rpc_init_sec_context.c       |  2 ++
+ tests/interposetest.c               |  5 +++--
+ tests/t_accept.c                    |  2 +-
+ tests/userproxytest.c               | 35 +++++++++++++++++------------
+ 6 files changed, 29 insertions(+), 17 deletions(-)
+
+diff --git a/src/client/gpm_accept_sec_context.c b/src/client/gpm_accept_sec_context.c
+index ab20b03..d508615 100644
+--- a/src/client/gpm_accept_sec_context.c
++++ b/src/client/gpm_accept_sec_context.c
+@@ -105,6 +105,7 @@ OM_uint32 gpm_accept_sec_context(OM_uint32 *minor_status,
+     if (outbuf) {
+         *output_token = *outbuf;
+         free(outbuf);
++        outbuf = NULL;
+     }
+     if (ret_flags) {
+         *ret_flags = ctx->ctx_flags;
+diff --git a/src/gp_creds.c b/src/gp_creds.c
+index 843d1a3..1a0258a 100644
+--- a/src/gp_creds.c
++++ b/src/gp_creds.c
+@@ -800,6 +800,7 @@ done:
+     gss_release_cred(&discard, &user_cred);
+     gss_release_name(&discard, &target_name);
+     gss_delete_sec_context(&discard, &initiator_context, NULL);
++    gss_delete_sec_context(&discard, &acceptor_context, NULL);
+     gss_release_buffer(&discard, &init_token);
+     gss_release_buffer(&discard, &accept_token);
+     gss_release_name(&discard, &req_name);
+diff --git a/src/gp_rpc_init_sec_context.c b/src/gp_rpc_init_sec_context.c
+index f362dbc..7fe7365 100644
+--- a/src/gp_rpc_init_sec_context.c
++++ b/src/gp_rpc_init_sec_context.c
+@@ -33,6 +33,7 @@ int gp_init_sec_context(struct gp_call_ctx *gpcall,
+     };
+     uint32_t gccn_before = 0;
+     uint32_t gccn_after = 0;
++    uint32_t discard;
+     int ret;
+ 
+     isca = &arg->init_sec_context;
+@@ -192,6 +193,7 @@ done:
+ 
+     GPRPCDEBUG(gssx_res_init_sec_context, iscr);
+ 
++    gss_delete_sec_context(&discard, &ctx, NULL);
+     gss_release_name(&ret_min, &target_name);
+     gss_release_oid(&ret_min, &mech_type);
+     gss_release_cred(&ret_min, &ich);
+diff --git a/tests/interposetest.c b/tests/interposetest.c
+index 0cdd473..7ab8ecc 100644
+--- a/tests/interposetest.c
++++ b/tests/interposetest.c
+@@ -377,7 +377,7 @@ void run_server(struct aproc *data)
+     uint32_t ret_min;
+     gss_ctx_id_t context_handle = GSS_C_NO_CONTEXT;
+     gss_cred_id_t cred_handle = GSS_C_NO_CREDENTIAL;
+-    gss_name_t src_name;
++    gss_name_t src_name = GSS_C_NO_NAME;
+     gss_buffer_desc out_token = GSS_C_EMPTY_BUFFER;
+     gss_cred_id_t deleg_cred = GSS_C_NO_CREDENTIAL;
+     gss_OID_set mech_set = GSS_C_NO_OID_SET;
+@@ -591,7 +591,8 @@ void run_server(struct aproc *data)
+         goto done;
+     }
+ 
+-    fprintf(stdout, "Server, RECV: %s\n", (char *)out_token.value);
++    fprintf(stdout, "Server, RECV: %*s\n", (int)out_token.length,
++                                           (char *)out_token.value);
+ 
+     gss_release_buffer(&ret_min, &out_token);
+ 
+diff --git a/tests/t_accept.c b/tests/t_accept.c
+index 3afb7ac..8a663fe 100644
+--- a/tests/t_accept.c
++++ b/tests/t_accept.c
+@@ -9,7 +9,7 @@ int main(int argc, const char *argv[])
+     gss_ctx_id_t context_handle = GSS_C_NO_CONTEXT;
+     gss_buffer_desc in_token = GSS_C_EMPTY_BUFFER;
+     gss_buffer_desc out_token = GSS_C_EMPTY_BUFFER;
+-    gss_name_t src_name;
++    gss_name_t src_name = GSS_C_NO_NAME;
+     uint32_t ret_maj;
+     uint32_t ret_min;
+     int ret = -1;
+diff --git a/tests/userproxytest.c b/tests/userproxytest.c
+index 8aea41a..8c863c6 100644
+--- a/tests/userproxytest.c
++++ b/tests/userproxytest.c
+@@ -33,14 +33,19 @@ int mock_activation_sockets(void)
+     unlink(addr.sun_path);
+ 
+     fd = socket(AF_UNIX, SOCK_STREAM, 0);
+-    if (fd == -1) return -1;
++    if (fd == -1) {
++        ret = -1;
++        goto done;
++    }
+ 
+     ret = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
+-    if (ret == -1) return -1;
++    if (ret == -1) goto done;
+ 
+     ret = listen(fd, 1);
+-    if (ret == -1) return -1;
++    if (ret == -1) goto done;
+ 
++done:
++    if (ret == -1) close(fd);
+     return 0;
+ }
+ 
+@@ -75,19 +80,19 @@ int wait_and_check_output(int outfd, int timeout)
+     useconds_t interval = 100 * 1000; /* 100 msec */
+     char outbuf[1024];
+     char *line;
+-    FILE *out;
+-    int ret;
++    FILE *out = NULL;
++    int err, ret = -1;
+ 
+     /* make pipe non blocking */
+-    ret = fcntl(outfd, F_SETFL, O_NONBLOCK);
+-    if (ret) return -1;
++    err = fcntl(outfd, F_SETFL, O_NONBLOCK);
++    if (err) goto done;
+ 
+     out = fdopen(outfd, "r");
+-    if (!out) return -1;
++    if (!out) goto done;
+ 
+     while (now < start + timeout) {
+-        ret = usleep(interval);
+-        if (ret) return -1;
++        err = usleep(interval);
++        if (err) goto done;
+ 
+         line = fgets(outbuf, 1023, out);
+         if (line) {
+@@ -101,13 +106,15 @@ int wait_and_check_output(int outfd, int timeout)
+         now = time(NULL);
+     }
+ 
+-    fclose(out);
+-
+     for (int i = 0; checks[i].match != NULL; i++) {
+-        if (checks[i].matched == false) return -1;
++        if (checks[i].matched == false) goto done;
+     }
+ 
+-    return 0;
++    ret = 0;
++
++done:
++    if (out) fclose(out);
++    return ret;
+ }
+ 
+ int child(int outpipe[])
+-- 
+2.45.2
+

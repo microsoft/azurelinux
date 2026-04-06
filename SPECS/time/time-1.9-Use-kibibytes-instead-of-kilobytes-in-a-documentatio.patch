@@ -1,0 +1,189 @@
+From 9fd52d5705fad70c0cb4ad8d508596a488262acf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 13 Jul 2020 09:24:35 +0200
+Subject: [PATCH] Use kibibytes instead of kilobytes in a documentation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch does not changes any output of the time program. It only
+clarifies a manual and the comments.
+
+<https://lists.gnu.org/archive/html/bug-time/2020-07/msg00000.html>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ configure.ac          |  6 +++---
+ doc/time.texi         | 12 ++++++------
+ src/rusage-kb.c       |  4 ++--
+ src/rusage-kb.h       | 10 +++++-----
+ src/time.c            |  6 +++---
+ tests/time-max-rss.sh |  4 ++--
+ 6 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d2950bd..67738b5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -90,7 +90,7 @@ if test -z "$time_getrusage_mem_units" ; then
+ 
+     solaris*)        time_getrusage_mem_units=pages ;;
+ 
+-    # As a fallback, assume KB (the most common value).
++    # As a fallback, assume KiB (the most common value).
+     # Set the 'warn' variable to warn the user at the end
+     # of ./configure
+     *) time_getrusage_mem_units=kb
+@@ -104,7 +104,7 @@ case $time_getrusage_mem_units in
+   kb)
+      AC_DEFINE([GETRUSAGE_RETURNS_KB],[1],
+                 [Define to 1 if getrusage(2) on this systems returns
+-                 ru_maxrss in kilobytes])
++                 ru_maxrss in kibibytes])
+      ;;
+ 
+   bytes)
+@@ -140,7 +140,7 @@ AC_OUTPUT
+ # Warn the user if getrusage(2) behaviour on this OS is unknown
+ if test "$warn_getrusage_mem_units" ; then
+   AC_MSG_WARN([unknown getrusage behavior on operating system '$host_os'.
+-               Assuming Kilobytes.
++               Assuming kibibytes.
+                please report this with the output of 'uname -a' to
+                bug-time@gnu.org])
+ fi
+diff --git a/doc/time.texi b/doc/time.texi
+index dac65b4..3a05ed9 100644
+--- a/doc/time.texi
++++ b/doc/time.texi
+@@ -241,22 +241,22 @@ times divied by the total running time.
+ @table @code
+ @item M
+ Maximum resident set size of the process during its lifetime, in
+-Kilobytes.
++kibibytes.
+ 
+ @item t
+-Average resident set size of the process, in Kilobytes.
++Average resident set size of the process, in kibibytes.
+ 
+ @item K
+-Average total (data+stack+text) memory use of the process, in Kilobytes.
++Average total (data+stack+text) memory use of the process, in kibibytes.
+ 
+ @item D
+-Average size of the process's unshared data area, in Kilobytes.
++Average size of the process's unshared data area, in kibibytes.
+ 
+ @item p
+-Average size of the process's unshared stack, in Kilobytes.
++Average size of the process's unshared stack, in kibibytes.
+ 
+ @item X
+-Average size of the process's shared text, in Kilobytes.
++Average size of the process's shared text, in kibibytes.
+ 
+ @item Z
+ System's page size, in bytes.  This is a per-system constant, but
+diff --git a/src/rusage-kb.c b/src/rusage-kb.c
+index aad06b8..04352cd 100644
+--- a/src/rusage-kb.c
++++ b/src/rusage-kb.c
+@@ -25,8 +25,8 @@
+ #include <limits.h>
+ #include <unistd.h>
+ 
+-/* Return the number of kilobytes corresponding to a number of pages PAGES.
+-   (Actually, we use it to convert pages*ticks into kilobytes*ticks.)
++/* Return the number of kibibytes corresponding to a number of pages PAGES.
++   (Actually, we use it to convert pages*ticks into kibibytes*ticks.)
+ 
+    Try to do arithmetic so that the risk of overflow errors is minimized.
+    This is funky since the pagesize could be less than 1K.
+diff --git a/src/rusage-kb.h b/src/rusage-kb.h
+index 4a53515..b7b1155 100644
+--- a/src/rusage-kb.h
++++ b/src/rusage-kb.h
+@@ -19,7 +19,7 @@
+ #ifndef _RUSAGE_KB_
+ #define _RUSAGE_KB_
+ 
+-/* As of 2017, most kernels' getrusage(2) returns ru_maxrss in kilobytes:
++/* As of 2017, most kernels' getrusage(2) returns ru_maxrss in kibibytes:
+       Linux, Hurd, Free/Open/Net-BSD, MINIX, AIX7
+ 
+    OpenSolaris's getrusage(2) documents a return value in pages,
+@@ -32,20 +32,20 @@
+ 
+ #if GETRUSAGE_RETURNS_KB
+ 
+-/* define as no-op, as RUSAGE values are already in KB */
++/* define as no-op, as RUSAGE values are already in KiB */
+ #define RUSAGE_MEM_TO_KB(x) (x)
+ 
+ #elif GETRUSAGE_RETURNS_BYTES
+ 
+-/* Convert bytes to kilobytes */
++/* Convert bytes to kibibytes */
+ #define RUSAGE_MEM_TO_KB(x) ((x)/1024)
+ 
+ #elif GETRUSAGE_RETURNS_PAGES
+ 
+-/* Convert bytes to kilobytes */
++/* Convert bytes to kibibytes */
+ #define RUSAGE_MEM_TO_KB(x) (ptok (x))
+ 
+-/* A function to get the system's page size and convert pages to KB */
++/* A function to get the system's page size and convert pages to KiB */
+ unsigned long
+ ptok (unsigned long pages);
+ 
+diff --git a/src/time.c b/src/time.c
+index 7e07995..f76265a 100644
+--- a/src/time.c
++++ b/src/time.c
+@@ -108,8 +108,8 @@ typedef RETSIGTYPE (*sighandler) ();
+    and 100 on the sun4.
+ 
+    Some manuals have an apparent error, claiming that units for average
+-   sizes are kb*sec.  Judging by the contents of `struct rusage', it
+-   looks like it should be kb*ticks, like on SunOS.  Ticks/sec seems
++   sizes are KiB*sec.  Judging by the contents of `struct rusage', it
++   looks like it should be KiB*ticks, like on SunOS.  Ticks/sec seems
+    to be (empirically):
+    50 Mt. Xinu
+    250 Ultrix (mips)
+@@ -412,7 +412,7 @@ linear_argv (argv)
+    x == exit status of command
+ 
+    Various memory usages are found by converting from page-seconds
+-   to kbytes by multiplying by the page size, dividing by 1024,
++   to kibibytes by multiplying by the page size, dividing by 1024,
+    and dividing by elapsed real time.
+ 
+    FP is the stream to print to.
+diff --git a/tests/time-max-rss.sh b/tests/time-max-rss.sh
+index 0adda5c..5ecd3f2 100755
+--- a/tests/time-max-rss.sh
++++ b/tests/time-max-rss.sh
+@@ -27,7 +27,7 @@ fail=
+ # The auxiliary program should be built and runnable
+ time-aux || framework_failure_ "time-aux is missing/not runnable"
+ 
+-# Get the baseline number of MAX-RSS kilobytes
++# Get the baseline number of MAX-RSS kibibytes
+ # use by the program when not allocating any extra memory
+ env time -o mem-baseline -f "%M" time-aux \
+   || framework_failure_ "failed to run time/time-aux (baseline max-rss)"
+@@ -49,7 +49,7 @@ test "$b" -eq "0" && test "$c" -eq 0 \
+ # There could be alot of variation between each invocation,
+ # accept a reasonable range
+ if test "$d" -ge 5000 && test "$d" -le 6000 ; then
+-    : # acceptable values: 5000-6000 KB
++    : # acceptable values: 5000-6000 KiB
+ else
+     cat<<EOF>&2
+ time(1) failed to detect 5MB allcoation.
+-- 
+2.25.4
+

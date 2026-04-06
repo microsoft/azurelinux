@@ -1,0 +1,21 @@
+[Unit]
+Description=QEMU Guest Agent
+BindsTo=dev-virtio\x2dports-org.qemu.guest_agent.0.device
+After=dev-virtio\x2dports-org.qemu.guest_agent.0.device
+IgnoreOnIsolate=True
+
+[Service]
+UMask=0077
+EnvironmentFile=/etc/sysconfig/qemu-ga
+# Support upgrades from QEMU < 9.1
+ExecStartPre=/bin/sh -c "if grep '^BLACKLIST_RPC' /etc/sysconfig/qemu-ga >/dev/null ; then sed -i 's/^BLACKLIST_RPC=/QEMU_GA_ARGS=--block-rpcs=/' /etc/sysconfig/qemu-ga ; fi"
+ExecStart=/usr/bin/qemu-ga \
+  --method=virtio-serial \
+  --path=/dev/virtio-ports/org.qemu.guest_agent.0 \
+  -F${FSFREEZE_HOOK_PATHNAME} \
+  $QEMU_GA_ARGS
+Restart=always
+RestartSec=0
+
+[Install]
+WantedBy=dev-virtio\x2dports-org.qemu.guest_agent.0.device

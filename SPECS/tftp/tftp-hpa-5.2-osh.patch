@@ -1,0 +1,91 @@
+# Fix leaked_handle: Handle variable "fd" going out of scope leaks the handle.
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index 364e7d2..cbd6093 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -1505,6 +1505,7 @@ static int validate_access(char *filename, int mode,
+ 
+     if (mode == RRQ) {
+         if (!unixperms && (stbuf.st_mode & (S_IREAD >> 6)) == 0) {
++            close(fd);
+             *errmsg = "File must have global read permissions";
+             return (EACCESS);
+         }
+@@ -1514,6 +1515,7 @@ static int validate_access(char *filename, int mode,
+     } else {
+         if (!unixperms) {
+             if ((stbuf.st_mode & (S_IWRITE >> 6)) == 0) {
++                close(fd);
+                 *errmsg = "File must have global write permissions";
+                 return (EACCESS);
+             }
+@@ -1522,6 +1524,7 @@ static int validate_access(char *filename, int mode,
+ #ifdef HAVE_FTRUNCATE
+ 	/* We didn't get to truncate the file at open() time */
+ 	if (ftruncate(fd, (off_t) 0)) {
++	  close(fd);
+ 	  *errmsg = "Cannot reset file size";
+ 	  return (EACCESS);
+ 	}
+
+
+# Patches for negative_returns: "fd" is passed to a parameter of pmtu_discovery_off
+# that cannot be negative
+From 0b44159b3a2f51d350f309d3f6d14a17e74e8231 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Wed, 6 Apr 2022 09:33:33 +0200
+Subject: [PATCH 1/2] tftpd: Correctly disable path MTU discovery in
+ standalone mode
+
+---
+ tftpd/tftpd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index 364e7d2..00fa1cf 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -769,7 +769,7 @@ int main(int argc, char **argv)
+     }
+ 
+     /* Disable path MTU discovery */
+-    pmtu_discovery_off(fd);
++    pmtu_discovery_off(fdmax);
+ 
+     /* This means we don't want to wait() for children */
+ #ifdef SA_NOCLDWAIT
+-- 
+2.35.1
+
+
+From 5f60355c4bd10b866847a0d58a9582bda7db72aa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Wed, 6 Apr 2022 09:34:46 +0200
+Subject: [PATCH 2/2] tftpd: Fix a possible usage of -1 file descriptor in
+ standalone mode
+
+---
+ tftpd/tftpd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index 00fa1cf..afd595d 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -622,6 +622,13 @@ int main(int argc, char **argv)
+                         exit(EX_USAGE);
+                     }
+                     ai_fam = AF_INET6;
++
++                    if (fd6 < 0) {
++                        syslog(LOG_ERR,
++                               "IPv6 was disabled but address %s is in address "
++                               "family AF_INET6", address);
++                        exit(EX_USAGE);
++                    }
+                 }
+                 break;
+ #endif
+-- 
+2.35.1
+

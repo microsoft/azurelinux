@@ -1,0 +1,9 @@
+/var/log/kadmind.log {
+    missingok
+    notifempty
+    monthly
+    rotate 12
+    postrotate
+        systemctl reload kadmin.service || true
+    endscript
+}

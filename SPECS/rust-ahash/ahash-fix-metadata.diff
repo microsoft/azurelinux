@@ -1,0 +1,54 @@
+--- ahash-0.8.12/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ahash-0.8.12/Cargo.toml	2025-05-10T18:56:33.422062+00:00
+@@ -53,13 +53,6 @@
+     "target-feature=+aes",
+ ]
+ 
+-[profile.bench]
+-opt-level = 3
+-lto = "fat"
+-codegen-units = 1
+-debug = 0
+-debug-assertions = false
+-
+ [profile.release]
+ opt-level = 3
+ lto = "fat"
+@@ -80,26 +73,8 @@
+ doc = true
+ 
+ [[test]]
+-name = "bench"
+-path = "tests/bench.rs"
+-
+-[[test]]
+-name = "map_tests"
+-path = "tests/map_tests.rs"
+-
+-[[test]]
+ name = "nopanic"
+ path = "tests/nopanic.rs"
+-
+-[[bench]]
+-name = "ahash"
+-path = "tests/bench.rs"
+-harness = false
+-
+-[[bench]]
+-name = "map"
+-path = "tests/map_tests.rs"
+-harness = false
+ 
+ [dependencies.cfg-if]
+ version = "1.0"
+@@ -124,10 +99,6 @@
+ version = "0.8.24"
+ features = ["simd"]
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.3.2"
+-features = ["html_reports"]
+ 
+ [dev-dependencies.fnv]
+ version = "1.0.5"

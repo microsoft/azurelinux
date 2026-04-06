@@ -1,0 +1,74 @@
+From 602c3ce7ce193938aab911a74d13b9d2a070e1e4 Mon Sep 17 00:00:00 2001
+From: Hendrik Makait <hendrik@makait.com>
+Date: Thu, 10 Oct 2024 19:16:25 +0200
+Subject: [PATCH 1/2] Test against 3.14-dev on CI
+
+---
+ .github/workflows/test.yml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 75a0d135..e62bc9a9 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -18,7 +18,8 @@ jobs:
+           - "3.10"
+           - "3.11"
+           - "3.12"
+-          - "3.13-dev"
++          - "3.13"
++          - "3.14-dev"
+           - "pypy-3.8"
+           - "pypy-3.9"
+           - "pypy-3.10"
+
+From 6a3fe8f682e1558ab4e3dda46edaface9f25fa76 Mon Sep 17 00:00:00 2001
+From: Erik Welch <erik.n.welch@gmail.com>
+Date: Sat, 21 Jun 2025 15:09:49 -0500
+Subject: [PATCH 2/2] Fixes to support Python 3.14-dev
+
+---
+ .github/workflows/test.yml       | 1 +
+ toolz/curried/operator.py        | 2 +-
+ toolz/tests/test_inspect_args.py | 3 ++-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index e62bc9a9..ee9f6da3 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -23,6 +23,7 @@ jobs:
+           - "pypy-3.8"
+           - "pypy-3.9"
+           - "pypy-3.10"
++          - "pypy-3.11"
+     steps:
+       - name: Checkout
+         uses: actions/checkout@v4
+diff --git a/toolz/curried/operator.py b/toolz/curried/operator.py
+index 35979a68..78e54f98 100644
+--- a/toolz/curried/operator.py
++++ b/toolz/curried/operator.py
+@@ -9,7 +9,7 @@
+ IGNORE = {
+     "__abs__", "__index__", "__inv__", "__invert__", "__neg__", "__not__",
+     "__pos__", "_abs", "abs", "attrgetter", "index", "inv", "invert",
+-    "itemgetter", "neg", "not_", "pos", "truth"
++    "is_none", "is_not_none", "itemgetter", "neg", "not_", "pos", "truth"
+ }
+ locals().update(
+     {name: f if name in IGNORE else curry(f)
+diff --git a/toolz/tests/test_inspect_args.py b/toolz/tests/test_inspect_args.py
+index f26dbc64..b7f623c4 100644
+--- a/toolz/tests/test_inspect_args.py
++++ b/toolz/tests/test_inspect_args.py
+@@ -286,7 +286,8 @@ def test_has_keywords():
+     assert has_keywords(int)
+     assert has_keywords(sorted)
+     assert has_keywords(max)
+-    assert has_keywords(map) is False
++    # map gained `strict=False` keyword in Python 3.14
++    assert has_keywords(map) == (sys.version_info[1] >= 14)
+     assert has_keywords(bytearray) is None
+ 
+ 

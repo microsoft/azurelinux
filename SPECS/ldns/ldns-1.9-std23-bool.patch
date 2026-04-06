@@ -1,0 +1,34 @@
+From d2fc4ef2f3c64b246c67ffb613d4d26c2d74f596 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Thu, 4 Dec 2025 17:01:59 +0100
+Subject: [PATCH] Skip definition of bool on -std=c23 or newer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fedora gcc compiler switched to c23 standard by default. It now does not
+compile ldns in default settings.
+
+Signed-off-by: Petr Menšík <pemensik@redhat.com>
+---
+ ldns-1.8.4/ldns/common.h.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ldns-1.8.4/ldns/common.h.in b/ldns-1.8.4/ldns/common.h.in
+index db55960..c4e473c 100644
+--- a/ldns-1.8.4/ldns/common.h.in
++++ b/ldns-1.8.4/ldns/common.h.in
+@@ -40,6 +40,10 @@
+  */
+ /*@ignore@*/
+ /* splint barfs on this construct */
++#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
++/* c23 defines bool already and deprecates stdbool.h */
++#define __bool_true_false_are_defined
++#endif
+ #ifndef __bool_true_false_are_defined
+ # ifdef HAVE_STDBOOL_H
+ #  include <stdbool.h>
+-- 
+2.52.0
+

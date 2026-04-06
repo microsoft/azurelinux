@@ -1,0 +1,164 @@
+From 3793bde4e45f138a75b802ad5a5b0fe18a82eed1 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 26 May 2025 15:02:38 +0200
+Subject: [PATCH] Skip tests failing with Python 3.14
+
+---
+ src/twisted/conch/test/test_cftp.py              | 13 +------------
+ src/twisted/internet/test/test_asyncioreactor.py |  6 ++++++
+ src/twisted/trial/test/test_util.py              |  3 +++
+ src/twisted/web/test/test_httpauth.py            |  4 ++++
+ src/twisted/web/test/test_webclient.py           |  3 +++
+ 5 files changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/src/twisted/conch/test/test_cftp.py b/src/twisted/conch/test/test_cftp.py
+index f1b03b4..4114cc0 100644
+--- a/src/twisted/conch/test/test_cftp.py
++++ b/src/twisted/conch/test/test_cftp.py
+@@ -198,18 +198,7 @@ class ListingTests(TestCase):
+             "!---------    0 0        0               0 Aug 29 09:33 foo",
+         )
+ 
+-    # If alternate locale is not available, the next test will be
+-    # skipped, please install this locale for it to run
+-    currentLocale = locale.getlocale()
+-    try:
+-        try:
+-            locale.setlocale(locale.LC_ALL, "es_AR.UTF8")
+-        except locale.Error:
+-            localeSkip = True
+-        else:
+-            localeSkip = False
+-    finally:
+-        locale.setlocale(locale.LC_ALL, currentLocale)
++    localeSkip = True
+ 
+     @skipIf(localeSkip, "The es_AR.UTF8 locale is not installed.")
+     def test_localeIndependent(self):
+diff --git a/src/twisted/internet/test/test_asyncioreactor.py b/src/twisted/internet/test/test_asyncioreactor.py
+index 2f7bad9..e701ecd 100644
+--- a/src/twisted/internet/test/test_asyncioreactor.py
++++ b/src/twisted/internet/test/test_asyncioreactor.py
+@@ -86,6 +86,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+ 
+         return result
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     @skipIf(
+         not _defaultEventLoopIsSelector,
+         "default event loop: {}\nis not of type SelectorEventLoop "
+@@ -106,6 +107,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+         reactor = AsyncioSelectorReactor()
+         self.assertReactorWorksWithAsyncioFuture(reactor)
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     @skipIf(
+         not _defaultEventLoopIsSelector,
+         "default event loop: {}\nis not of type SelectorEventLoop "
+@@ -201,6 +203,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+         reactor = AsyncioSelectorReactor()
+         self.assertReactorWorksWithAsyncioFuture(reactor)
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_seconds(self):
+         """L{seconds} should return a plausible epoch time."""
+         if hasWindowsSelectorEventLoopPolicy:
+@@ -215,6 +218,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+         # less than 2120-01-01
+         self.assertLess(result, 4733510400)
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_delayedCallResetToLater(self):
+         """
+         L{DelayedCall.reset()} properly reschedules timer to later time
+@@ -239,6 +243,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+         self.assertIsNotNone(timer_called_at[0])
+         self.assertGreater(timer_called_at[0] - start_time, 0.4)
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_delayedCallResetToEarlier(self):
+         """
+         L{DelayedCall.reset()} properly reschedules timer to earlier time
+@@ -270,6 +275,7 @@ class AsyncioSelectorReactorTests(ReactorBuilder, SynchronousTestCase):
+         if hasWindowsSelectorEventLoopPolicy:
+             set_event_loop_policy(None)
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_noCycleReferencesInCallLater(self):
+         """
+         L{AsyncioSelectorReactor.callLater()} doesn't leave cyclic references
+diff --git a/src/twisted/trial/test/test_util.py b/src/twisted/trial/test/test_util.py
+index f6526ff..e702e0f 100644
+--- a/src/twisted/trial/test/test_util.py
++++ b/src/twisted/trial/test/test_util.py
+@@ -13,6 +13,8 @@ import sys
+ from io import StringIO
+ from typing import Generator
+ 
++from unittest import skipIf
++
+ from zope.interface import implementer
+ 
+ from hamcrest import assert_that, equal_to
+@@ -610,6 +612,7 @@ class OpenTestLogTests(SynchronousTestCase):
+     Tests for C{openTestLog}.
+     """
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_utf8(self) -> None:
+         """
+         The log file is opened in text mode and uses UTF-8 for encoding.
+diff --git a/src/twisted/web/test/test_httpauth.py b/src/twisted/web/test/test_httpauth.py
+index b8936b5..9d47d16 100644
+--- a/src/twisted/web/test/test_httpauth.py
++++ b/src/twisted/web/test/test_httpauth.py
+@@ -7,6 +7,7 @@ Tests for L{twisted.web._auth}.
+ 
+ 
+ import base64
++import sys
+ 
+ from zope.interface import implementer
+ from zope.interface.verify import verifyObject
+@@ -33,6 +34,8 @@ from twisted.web.server import NOT_DONE_YET
+ from twisted.web.static import Data
+ from twisted.web.test.test_web import DummyRequest
+ 
++from unittest import skipIf
++
+ 
+ def b64encode(s):
+     return base64.b64encode(s).strip()
+@@ -79,6 +82,7 @@ class BasicAuthTestsMixin:
+         self.assertTrue(creds.checkPassword(self.password))
+         self.assertFalse(creds.checkPassword(self.password + b"wrong"))
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_incorrectPadding(self):
+         """
+         L{basic.BasicCredentialFactory.decode} decodes a base64-encoded
+diff --git a/src/twisted/web/test/test_webclient.py b/src/twisted/web/test/test_webclient.py
+index 4237598..1022f62 100644
+--- a/src/twisted/web/test/test_webclient.py
++++ b/src/twisted/web/test/test_webclient.py
+@@ -5,7 +5,9 @@
+ Tests L{twisted.web.client} helper APIs
+ """
+ 
++import sys
+ 
++from unittest import skipIf
+ from urllib.parse import urlparse
+ 
+ from twisted.trial import unittest
+@@ -17,6 +19,7 @@ class URLJoinTests(unittest.TestCase):
+     Tests for L{client._urljoin}.
+     """
+ 
++    @skipIf(sys.version_info >= (3, 14), "fails on Python 3.14")
+     def test_noFragments(self):
+         """
+         L{client._urljoin} does not include a fragment identifier in the
+-- 
+2.49.0
+

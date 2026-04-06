@@ -1,0 +1,40 @@
+diff -uNr texinfo-6.5.orig/contrib/fix-info-dir texinfo-6.5/contrib/fix-info-dir
+--- texinfo-6.5.orig/contrib/fix-info-dir	2014-04-22 03:56:56.000000000 +0200
++++ texinfo-6.5/contrib/fix-info-dir	2018-02-04 13:48:35.979359350 +0100
+@@ -163,29 +163,23 @@
+ {
+ 
+ 	### output the dir header
+-	echo "-*- Text -*-"
+-	echo "This file was generated automatically by $0."
+-	echo "This version was generated on `date`"
+-	echo "by `whoami`@`hostname` for `pwd`"
+ 
+ 	cat<<DIR_FILE_END_OF_FILE
+-This is the file .../info/$DIR_FILE, which contains the topmost node of the
+-Info hierarchy.  The first time you invoke Info you start off
+-looking at that node, which is ($DIR_FILE)Top.
+-
++This is the file .../info/$DIR_FILE, which contains the
++topmost node of the Info hierarchy, called ($DIR_FILE)Top.
++The first time you invoke Info you start off looking at this node.
+ 
+-File: $DIR_FILE       Node: Top       This is the top of the INFO tree
++File: $DIR_FILE,	Node: Top	This is the top of the INFO tree
+ 
+   This (the Directory node) gives a menu of major topics.
+-  Typing "q" exits, "?" lists all Info commands, "d" returns here,
++  Typing "q" exits, "H" lists all Info commands, "d" returns here,
+   "h" gives a primer for first-timers,
+-  "mEmacs<Return>" visits the Emacs topic, etc.
++  "mEmacs<Return>" visits the Emacs manual, etc.
+ 
+   In Emacs, you can click mouse button 2 on a menu item or cross reference
+   to select it.
+ 
+-* Menu: The list of major topics begins on the next line.
+-
++* Menu:
+ DIR_FILE_END_OF_FILE
+ 
+ ### go through the list of files in the skeleton.  If an info file

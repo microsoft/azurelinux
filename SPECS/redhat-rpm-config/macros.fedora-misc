@@ -1,0 +1,45 @@
+# Fedora macros, safe to use after the SRPM build stage
+
+# Lists files matching inclusion globs, excluding files matching exclusion
+# globs
+#   – globs are space-separated lists of shell globs. Such lists require
+#     %{quote:} use when passed as rpm arguments or flags.
+# Control variables, flags and arguments:
+#   %{listfiles_include}  inclusion globs
+#   %{listfiles_exclude}  exclusion globs
+#   -i <globs>            inclusion globs
+#   -x <globs>            exclusion globs
+#   …                     arguments passed to the macro without flags will be
+#                         interpreted as inclusion globs
+%listfiles(i:x:) %{expand:
+%if %{lua: print(string.len(rpm.expand("%{?-i*}%{?listfiles_include}%*")))}
+  listfiles_include=$(realpath -e --relative-base=. %{?-i*} %{?listfiles_include} %* | sort -u)
+  %if  %{lua: print(string.len(rpm.expand("%{?-x*}%{?listfiles_exclude}")))}
+    while IFS= read -r finc ; do
+      realpath -qe --relative-base=. %{?-x*} %{?listfiles_exclude} \\
+        | sort -u | grep -q "${finc}" || echo "${finc}"
+    done <<< "${listfiles_include}"
+  %else
+    echo "${listfiles_include}"
+  %endif
+%endif
+}
+
+# https://github.com/rpm-software-management/rpm/issues/581
+# Writes the contents of a list of rpm variables to a macro file
+# Control variables, flags and arguments:
+#   -f <filename>  the macro file to process:
+#                    – it must contain corresponding anchors
+#                    – for example %writevars -f myfile foo bar will replace:
+#                        @@FOO@@ with the rpm evaluation of %{foo} and
+#                        @@BAR@@ with the rpm evaluation of %{bar}
+#                      in myfile
+%writevars(f:) %{lua:
+local    fedora = require "fedora.common"
+local macrofile = rpm.expand("%{-f*}")
+local   rpmvars = {}
+for i = 1, rpm.expand("%#") do
+  table.insert(rpmvars, rpm.expand("%" .. i))
+end
+fedora.writevars(macrofile,rpmvars)
+}

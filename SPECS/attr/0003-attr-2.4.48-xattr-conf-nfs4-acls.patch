@@ -1,0 +1,64 @@
+From 5c04ee88bc3a8fe4bde91d488d74bbadb836a5e6 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 4 Mar 2019 16:13:42 +0100
+Subject: [PATCH 1/2] xattr.conf: document how libattr itself uses the file
+
+Otherwise users could think that only entries with the `skip` action
+are excluded by libattr functions attr_copy_file() and attr_copy_fd()
+by default.
+---
+ xattr.conf | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xattr.conf b/xattr.conf
+index dcbc12c..7361fbd 100644
+--- a/xattr.conf
++++ b/xattr.conf
+@@ -6,6 +6,10 @@
+ # Actions:
+ #   permissions - copy when trying to preserve permissions.
+ #   skip - do not copy.
++#
++# Note that libattr functions attr_copy_file() and attr_copy_fd() by default
++# skip all extended attributes that are matched by any of the below patterns,
++# regardless of the specified action.
+ 
+ system.nfs4_acl			permissions
+ system.nfs4acl			permissions
+-- 
+2.20.1
+
+
+From 951fbb74d402a96619b6b9ee894d272650ec7100 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 4 Mar 2019 16:21:52 +0100
+Subject: [PATCH 2/2] xattr.conf: remove entries for NFSv4 ACLs namespaces
+
+... in order to make it possible to copy NFSv4 ACLs by GNU coreutils'
+implementation of cp(1).  There is no way to make GNU coreutils copy
+extended attributes that are matched by any entry from /etc/xattr.conf.
+
+GNU coreutils upstream says that NFS-related entries should be removed
+from the default /etc/xattr.conf to make copying of NFSv4 ACLs work:
+
+http://lists.gnu.org/archive/html/bug-coreutils/2019-03/msg00008.html
+---
+ xattr.conf | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/xattr.conf b/xattr.conf
+index 7361fbd..1ac5b2f 100644
+--- a/xattr.conf
++++ b/xattr.conf
+@@ -11,8 +11,6 @@
+ # skip all extended attributes that are matched by any of the below patterns,
+ # regardless of the specified action.
+ 
+-system.nfs4_acl			permissions
+-system.nfs4acl			permissions
+ system.posix_acl_access		permissions
+ system.posix_acl_default	permissions
+ trusted.SGI_ACL_DEFAULT		skip		# xfs specific
+-- 
+2.20.1
+

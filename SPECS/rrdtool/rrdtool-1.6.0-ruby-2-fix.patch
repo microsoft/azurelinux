@@ -1,0 +1,26 @@
+diff --git a/bindings/Makefile.am b/bindings/Makefile.am
+index 54f5c23..ee85c23 100644
+--- a/bindings/Makefile.am
++++ b/bindings/Makefile.am
+@@ -35,8 +35,9 @@ install-data-local:
+                 && $(MAKE) install ) \
+            || true
+ 	$(AM_V_GEN)test -f ${builddir}/ruby/Makefile \
+-           && ( cd ${builddir}/ruby \
+-                && $(MAKE) EPREFIX=$(DESTDIR)$(exec_prefix) $(RUBY_MAKE_OPTIONS) install ) \
++           && ( $(MKDIR_P) $(DESTDIR)$(libdir)/ruby/vendor_ruby && cd ${builddir}/ruby \
++                && $(MAKE) EPREFIX=$(DESTDIR)$(exec_prefix) $(RUBY_MAKE_OPTIONS) \
++                hdrdir="$(includedir)" rubyhdrdir="$(includedir)" includedir="$(includedir)" install ) \
+            || true
+ 	$(AM_V_GEN)test -d ${builddir}/python/build \
+            && ( cd ${builddir}/python \
+@@ -57,7 +58,8 @@ ruby:
+              EPREFIX=$(exec_prefix) \
+              ABS_TOP_SRCDIR=${abs_top_srcdir} \
+              ABS_TOP_BUILDDIR=${abs_top_builddir} \
+-             $(RUBY_MAKE_OPTIONS) RUBYARCHDIR= )
++             $(RUBY_MAKE_OPTIONS) hdrdir="$(includedir)" \
++             rubyhdrdir="$(includedir)" includedir="$(includedir)" RUBYARCHDIR= )
+ 
+ # rules for building the python module
+ python:

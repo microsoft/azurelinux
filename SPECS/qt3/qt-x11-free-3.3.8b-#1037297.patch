@@ -1,0 +1,172 @@
+diff -ur qt-x11-free-3.3.8b/src/kernel/qjpegio.cpp qt-x11-free-3.3.8b-#1037297/src/kernel/qjpegio.cpp
+--- qt-x11-free-3.3.8b/src/kernel/qjpegio.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/kernel/qjpegio.cpp	2014-01-14 03:59:20.000000000 +0100
+@@ -80,7 +80,7 @@
+     my_error_mgr* myerr = (my_error_mgr*) cinfo->err;
+     char buffer[JMSG_LENGTH_MAX];
+     (*cinfo->err->format_message)(cinfo, buffer);
+-    qWarning(buffer);
++    qWarning("%s", buffer);
+     longjmp(myerr->setjmp_buffer, 1);
+ }
+ 
+diff -ur qt-x11-free-3.3.8b/src/moc/moc.y qt-x11-free-3.3.8b-#1037297/src/moc/moc.y
+--- qt-x11-free-3.3.8b/src/moc/moc.y	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/moc/moc.y	2014-01-14 03:39:28.000000000 +0100
+@@ -2831,11 +2831,6 @@
+ 
+ void generateClass()		      // generate C++ source code for a class
+ {
+-    const char *hdr1 = "/****************************************************************************\n"
+-		 "** %s meta object code from reading C++ file '%s'\n**\n";
+-    const char *hdr2 = "** Created: %s\n"
+-    const char *hdr3 = "** WARNING! All changes made in this file will be lost!\n";
+-    const char *hdr4 = "*****************************************************************************/\n\n";
+     int   i;
+ 
+     if ( skipClass )				// don't generate for class
+@@ -2871,10 +2866,10 @@
+ 	    i--;				// skip path
+ 	if ( i >= 0 )
+ 	    fn = &g->fileName[i];
+-	fprintf( out, hdr1, (const char*)qualifiedClassName(),(const char*)fn);
+-	fprintf( out, hdr2, (const char*)dstr );
+-	fprintf( out, hdr3 );
+-	fprintf( out, hdr4 );
++	fprintf( out, "/****************************************************************************\n** %s meta object code from reading C++ file '%s'\n**\n", (const char*)qualifiedClassName(),(const char*)fn);
++	fprintf( out, "** Created: %s\n", (const char*)dstr );
++	fprintf( out, "** WARNING! All changes made in this file will be lost!\n" );
++	fprintf( out, "*****************************************************************************/\n\n" );
+ 
+ 	if ( !g->noInclude ) {
+ 	    /*
+diff -ur qt-x11-free-3.3.8b/src/moc/moc_yacc.cpp qt-x11-free-3.3.8b-#1037297/src/moc/moc_yacc.cpp
+--- qt-x11-free-3.3.8b/src/moc/moc_yacc.cpp	2008-01-14 13:24:36.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/moc/moc_yacc.cpp	2014-01-14 03:40:19.000000000 +0100
+@@ -2870,12 +2870,6 @@
+ 
+ void generateClass()		      // generate C++ source code for a class
+ {
+-    const char *hdr1 = "/****************************************************************************\n"
+-		 "** %s meta object code from reading C++ file '%s'\n**\n";
+-    const char *hdr2 = "** Created: %s\n"
+-		 "**      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.8   edited Feb 2 14:59 $)\n**\n";
+-    const char *hdr3 = "** WARNING! All changes made in this file will be lost!\n";
+-    const char *hdr4 = "*****************************************************************************/\n\n";
+     int   i;
+ 
+     if ( skipClass )				// don't generate for class
+@@ -2911,10 +2905,10 @@
+ 	    i--;				// skip path
+ 	if ( i >= 0 )
+ 	    fn = &g->fileName[i];
+-	fprintf( out, hdr1, (const char*)qualifiedClassName(),(const char*)fn);
+-	fprintf( out, hdr2, (const char*)dstr );
+-	fprintf( out, hdr3 );
+-	fprintf( out, hdr4 );
++	fprintf( out, "/****************************************************************************\n** %s meta object code from reading C++ file '%s'\n**\n", (const char*)qualifiedClassName(),(const char*)fn);
++	fprintf( out, "** Created: %s\n**      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.8   edited Feb 2 14:59 $)\n**\n", (const char*)dstr );
++	fprintf( out, "** WARNING! All changes made in this file will be lost!\n" );
++	fprintf( out, "*****************************************************************************/\n\n" );
+ 
+ 	if ( !g->noInclude ) {
+ 	    /*
+diff -ur qt-x11-free-3.3.8b/src/sql/drivers/odbc/qsql_odbc.cpp qt-x11-free-3.3.8b-#1037297/src/sql/drivers/odbc/qsql_odbc.cpp
+--- qt-x11-free-3.3.8b/src/sql/drivers/odbc/qsql_odbc.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/sql/drivers/odbc/qsql_odbc.cpp	2014-01-14 04:24:04.000000000 +0100
+@@ -540,7 +540,7 @@
+ 		} else if ( val == "SQL_MODE_READ_WRITE" ) {
+ 		    v = SQL_MODE_READ_WRITE;
+ 		} else {
+-		    qWarning( QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ) );
++		    qWarning( "%s", QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ).ascii() );
+ 		    break;
+ 		}
+ 		r = SQLSetConnectAttr( hDbc, SQL_ATTR_ACCESS_MODE, (SQLPOINTER) v, 0 );
+@@ -565,7 +565,7 @@
+ 		} else if ( val == "SQL_FALSE" ) {
+ 		    v = SQL_FALSE;
+ 		} else {
+-		    qWarning( QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ) );
++		    qWarning( "%s", QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ).ascii() );
+ 		    break;
+ 		}
+ 		r = SQLSetConnectAttr( hDbc, SQL_ATTR_METADATA_ID, (SQLPOINTER) v, 0 );
+@@ -587,14 +587,14 @@
+ 		} else if ( val == "SQL_OPT_TRACE_ON" ) {
+ 		    v = SQL_OPT_TRACE_ON;
+ 		} else {
+-		    qWarning( QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ) );
++		    qWarning( "%s", QString( "QODBCDriver::open: Unknown option value '%1'" ).arg( *it ).ascii() );
+ 		    break;
+ 		}
+ 		r = SQLSetConnectAttr( hDbc, SQL_ATTR_TRACE, (SQLPOINTER) v, 0 );
+ 	    }
+ #ifdef QT_CHECK_RANGE
+               else {
+-		  qWarning( QString("QODBCDriver::open: Unknown connection attribute '%1'").arg( opt ) );
++		  qWarning( "%s", QString("QODBCDriver::open: Unknown connection attribute '%1'").arg( opt ).ascii() );
+ 	    }
+ #endif
+ 	    if ( r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO ) {
+diff -ur qt-x11-free-3.3.8b/src/tools/qgcache.cpp qt-x11-free-3.3.8b-#1037297/src/tools/qgcache.cpp
+--- qt-x11-free-3.3.8b/src/tools/qgcache.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/tools/qgcache.cpp	2014-01-14 03:10:08.000000000 +0100
+@@ -639,9 +639,7 @@
+ void QGCache::statistics() const
+ {
+ #if defined(QT_DEBUG)
+-    QString line;
+-    line.fill( '*', 80 );
+-    qDebug( line.ascii() );
++    qDebug( "********************************************************************************" );
+     qDebug( "CACHE STATISTICS:" );
+     qDebug( "cache contains %d item%s, with a total cost of %d",
+ 	   count(), count() != 1 ? "s" : "", tCost );
+@@ -662,7 +660,7 @@
+ 	   lruList->dumps != 1 ? "have" : "has", lruList->dumpCosts );
+     qDebug( "Statistics from internal dictionary class:" );
+     dict->statistics();
+-    qDebug( line.ascii() );
++    qDebug( "********************************************************************************" );
+ #endif
+ }
+ 
+diff -ur qt-x11-free-3.3.8b/src/tools/qgdict.cpp qt-x11-free-3.3.8b-#1037297/src/tools/qgdict.cpp
+--- qt-x11-free-3.3.8b/src/tools/qgdict.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-#1037297/src/tools/qgdict.cpp	2014-01-14 02:46:07.000000000 +0100
+@@ -843,14 +843,12 @@
+ void QGDict::statistics() const
+ {
+ #if defined(QT_DEBUG)
+-    QString line;
+-    line.fill( '-', 60 );
+     double real, ideal;
+-    qDebug( line.ascii() );
++    qDebug( "------------------------------------------------------------" );
+     qDebug( "DICTIONARY STATISTICS:" );
+     if ( count() == 0 ) {
+ 	qDebug( "Empty!" );
+-	qDebug( line.ascii() );
++	qDebug( "------------------------------------------------------------" );
+ 	return;
+     }
+     real = 0.0;
+@@ -871,7 +869,7 @@
+ 	while ( b-- )
+ 	    *pbuf++ = '*';
+ 	*pbuf = '\0';
+-	qDebug( buf );
++	qDebug( "%s", buf );
+ 	i++;
+     }
+     qDebug( "Array size = %d", size() );
+@@ -879,7 +877,7 @@
+     qDebug( "Real dist  = %g", real );
+     qDebug( "Rand dist  = %g", ideal );
+     qDebug( "Real/Rand  = %g", real/ideal );
+-    qDebug( line.ascii() );
++    qDebug( "------------------------------------------------------------" );
+ #endif // QT_DEBUG
+ }
+ 

@@ -1,0 +1,15 @@
+diff -pruN qt-x11-free-3.3.6.org/src/kernel/qscriptengine_x11.cpp qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp
+--- qt-x11-free-3.3.6.org/src/kernel/qscriptengine_x11.cpp	2006-12-04 18:47:11.000000000 +0530
++++ qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp	2006-12-05 12:05:10.000000000 +0530
+@@ -1412,7 +1412,10 @@ static bool indic_shape_syllable(QOpenTy
+                     toPos += 2;
+                 if (script == QFont::Devanagari || script == QFont::Gujarati || script == QFont::Bengali) {
+                     if (matra_position == Post || matra_position == Split) {
+-                        toPos = matra+1;
++                        if (matra_position == Post )
++			toPos = matra;
++			else
++			toPos = matra+1;
+                         matra -= 2;
+                     }
+                 } else if (script == QFont::Kannada) {

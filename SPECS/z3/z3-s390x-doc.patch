@@ -1,0 +1,505 @@
+--- a/doc/api/html/z3.z3core.html
++++ b/doc/api/html/z3.z3core.html
+@@ -277,13 +277,21 @@ Data descriptors defined here:<br>
+     a3,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_ast_map_keys"><strong>Z3_ast_map_keys</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_ast_map_keys"><strong>Z3_ast_map_keys</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_ast_map_reset"><strong>Z3_ast_map_reset</strong></a>(
+     a0,
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_ast_map_size"><strong>Z3_ast_map_size</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_ast_map_size"><strong>Z3_ast_map_size</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_ast_map_to_string"><strong>Z3_ast_map_to_string</strong></a>(
+     a0,
+     a1,
+@@ -833,7 +841,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_get_app_decl"><strong>Z3_get_app_decl</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_get_app_decl"><strong>Z3_get_app_decl</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_get_app_num_args"><strong>Z3_get_app_num_args</strong></a>(
+     a0,
+     a1,
+@@ -866,9 +878,17 @@ Data descriptors defined here:<br>
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_get_ast_hash"><strong>Z3_get_ast_hash</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_get_ast_hash"><strong>Z3_get_ast_hash</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_get_ast_id"><strong>Z3_get_ast_id</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_get_ast_kind"><strong>Z3_get_ast_kind</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_get_ast_kind"><strong>Z3_get_ast_kind</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_get_bool_value"><strong>Z3_get_bool_value</strong></a>(
+     a0,
+     a1,
+@@ -1347,7 +1367,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_goal_dec_ref"><strong>Z3_goal_dec_ref</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_goal_dec_ref"><strong>Z3_goal_dec_ref</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_goal_depth"><strong>Z3_goal_depth</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_goal_formula"><strong>Z3_goal_formula</strong></a>(
+     a0,
+@@ -1355,7 +1379,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_goal_inc_ref"><strong>Z3_goal_inc_ref</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_goal_inc_ref"><strong>Z3_goal_inc_ref</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_goal_inconsistent"><strong>Z3_goal_inconsistent</strong></a>(
+     a0,
+     a1,
+@@ -1420,7 +1448,11 @@ Data descriptors defined here:<br>
+ )</dt></dl>
+  <dl><dt><a name="-Z3_is_app"><strong>Z3_is_app</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_is_as_array"><strong>Z3_is_as_array</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_is_char_sort"><strong>Z3_is_char_sort</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_is_char_sort"><strong>Z3_is_char_sort</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_is_eq_ast"><strong>Z3_is_eq_ast</strong></a>(
+     a0,
+     a1,
+@@ -1532,7 +1564,12 @@ Data descriptors defined here:<br>
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+  <dl><dt><a name="-Z3_mk_bool_sort"><strong>Z3_mk_bool_sort</strong></a>(a0, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bound"><strong>Z3_mk_bound</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bound"><strong>Z3_mk_bound</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bv2int"><strong>Z3_mk_bv2int</strong></a>(
+     a0,
+     a1,
+@@ -1546,7 +1583,12 @@ Data descriptors defined here:<br>
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+  <dl><dt><a name="-Z3_mk_bv_sort"><strong>Z3_mk_bv_sort</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvadd"><strong>Z3_mk_bvadd</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvadd"><strong>Z3_mk_bvadd</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvadd_no_overflow"><strong>Z3_mk_bvadd_no_overflow</strong></a>(
+     a0,
+     a1,
+@@ -1560,7 +1602,12 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvand"><strong>Z3_mk_bvand</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvand"><strong>Z3_mk_bvand</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvashr"><strong>Z3_mk_bvashr</strong></a>(
+     a0,
+     a1,
+@@ -1573,7 +1620,12 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvmul"><strong>Z3_mk_bvmul</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvmul"><strong>Z3_mk_bvmul</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvmul_no_overflow"><strong>Z3_mk_bvmul_no_overflow</strong></a>(
+     a0,
+     a1,
+@@ -1599,7 +1651,12 @@ Data descriptors defined here:<br>
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvnor"><strong>Z3_mk_bvnor</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvnor"><strong>Z3_mk_bvnor</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvnot"><strong>Z3_mk_bvnot</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvor"><strong>Z3_mk_bvor</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvredand"><strong>Z3_mk_bvredand</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+@@ -1616,11 +1673,36 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvsge"><strong>Z3_mk_bvsge</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvsgt"><strong>Z3_mk_bvsgt</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvshl"><strong>Z3_mk_bvshl</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvsle"><strong>Z3_mk_bvsle</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvslt"><strong>Z3_mk_bvslt</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvsge"><strong>Z3_mk_bvsge</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvsgt"><strong>Z3_mk_bvsgt</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvshl"><strong>Z3_mk_bvshl</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvsle"><strong>Z3_mk_bvsle</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvslt"><strong>Z3_mk_bvslt</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvsmod"><strong>Z3_mk_bvsmod</strong></a>(
+     a0,
+     a1,
+@@ -1633,7 +1715,12 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvsub"><strong>Z3_mk_bvsub</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvsub"><strong>Z3_mk_bvsub</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvsub_no_overflow"><strong>Z3_mk_bvsub_no_overflow</strong></a>(
+     a0,
+     a1,
+@@ -1653,10 +1740,30 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvuge"><strong>Z3_mk_bvuge</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvugt"><strong>Z3_mk_bvugt</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvule"><strong>Z3_mk_bvule</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvult"><strong>Z3_mk_bvult</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvuge"><strong>Z3_mk_bvuge</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvugt"><strong>Z3_mk_bvugt</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvule"><strong>Z3_mk_bvule</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvult"><strong>Z3_mk_bvult</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_bvurem"><strong>Z3_mk_bvurem</strong></a>(
+     a0,
+     a1,
+@@ -1669,7 +1776,12 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_bvxor"><strong>Z3_mk_bvxor</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_bvxor"><strong>Z3_mk_bvxor</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_char"><strong>Z3_mk_char</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_char_from_bv"><strong>Z3_mk_char_from_bv</strong></a>(
+     a0,
+@@ -1705,7 +1817,12 @@ Data descriptors defined here:<br>
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+  <dl><dt><a name="-Z3_mk_config"><strong>Z3_mk_config</strong></a>(_elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_const"><strong>Z3_mk_const</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_const"><strong>Z3_mk_const</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_const_array"><strong>Z3_mk_const_array</strong></a>(
+     a0,
+     a1,
+@@ -1765,7 +1882,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_empty_set"><strong>Z3_mk_empty_set</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_empty_set"><strong>Z3_mk_empty_set</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_enumeration_sort"><strong>Z3_mk_enumeration_sort</strong></a>(
+     a0,
+     a1,
+@@ -2056,7 +2177,10 @@ Data descriptors defined here:<br>
+     a0,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_fpa_sort_half"><strong>Z3_mk_fpa_sort_half</strong></a>(a0, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_fpa_sort_half"><strong>Z3_mk_fpa_sort_half</strong></a>(
++    a0,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_fpa_sort_quadruple"><strong>Z3_mk_fpa_sort_quadruple</strong></a>(
+     a0,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+@@ -2197,7 +2321,12 @@ Data descriptors defined here:<br>
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+  <dl><dt><a name="-Z3_mk_int2real"><strong>Z3_mk_int2real</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_mk_int64"><strong>Z3_mk_int64</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_int64"><strong>Z3_mk_int64</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_int_sort"><strong>Z3_mk_int_sort</strong></a>(a0, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_int_symbol"><strong>Z3_mk_int_symbol</strong></a>(
+     a0,
+@@ -2333,7 +2462,12 @@ Data descriptors defined here:<br>
+     a5,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_power"><strong>Z3_mk_power</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_power"><strong>Z3_mk_power</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_probe"><strong>Z3_mk_probe</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_quantifier"><strong>Z3_mk_quantifier</strong></a>(
+     a0,
+@@ -2426,7 +2560,11 @@ Data descriptors defined here:<br>
+     a3,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_re_option"><strong>Z3_mk_re_option</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_re_option"><strong>Z3_mk_re_option</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_re_plus"><strong>Z3_mk_re_plus</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_re_power"><strong>Z3_mk_re_power</strong></a>(
+     a0,
+@@ -2520,7 +2658,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_seq_empty"><strong>Z3_mk_seq_empty</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_seq_empty"><strong>Z3_mk_seq_empty</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_seq_extract"><strong>Z3_mk_seq_extract</strong></a>(
+     a0,
+     a1,
+@@ -2627,7 +2769,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_seq_to_re"><strong>Z3_mk_seq_to_re</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_seq_to_re"><strong>Z3_mk_seq_to_re</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_seq_unit"><strong>Z3_mk_seq_unit</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_mk_set_add"><strong>Z3_mk_set_add</strong></a>(
+     a0,
+@@ -2683,7 +2829,10 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_mk_simple_solver"><strong>Z3_mk_simple_solver</strong></a>(a0, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_mk_simple_solver"><strong>Z3_mk_simple_solver</strong></a>(
++    a0,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_mk_simplifier"><strong>Z3_mk_simplifier</strong></a>(
+     a0,
+     a1,
+@@ -3052,7 +3201,11 @@ Data descriptors defined here:<br>
+     a2,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_optimize_pop"><strong>Z3_optimize_pop</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_optimize_pop"><strong>Z3_optimize_pop</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_optimize_push"><strong>Z3_optimize_push</strong></a>(
+     a0,
+     a1,
+@@ -3288,8 +3441,18 @@ Data descriptors defined here:<br>
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_probe_eq"><strong>Z3_probe_eq</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_probe_ge"><strong>Z3_probe_ge</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_probe_eq"><strong>Z3_probe_eq</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_probe_ge"><strong>Z3_probe_ge</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_probe_get_descr"><strong>Z3_probe_get_descr</strong></a>(
+     a0,
+     a1,
+@@ -3300,16 +3463,36 @@ Data descriptors defined here:<br>
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_probe_gt"><strong>Z3_probe_gt</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_probe_gt"><strong>Z3_probe_gt</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_probe_inc_ref"><strong>Z3_probe_inc_ref</strong></a>(
+     a0,
+     a1,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_probe_le"><strong>Z3_probe_le</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_probe_lt"><strong>Z3_probe_lt</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_probe_le"><strong>Z3_probe_le</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
++ <dl><dt><a name="-Z3_probe_lt"><strong>Z3_probe_lt</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_probe_not"><strong>Z3_probe_not</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_probe_or"><strong>Z3_probe_or</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_probe_or"><strong>Z3_probe_or</strong></a>(
++    a0,
++    a1,
++    a2,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_qe_lite"><strong>Z3_qe_lite</strong></a>(a0, a1, a2, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+  <dl><dt><a name="-Z3_qe_model_project"><strong>Z3_qe_model_project</strong></a>(
+     a0,
+@@ -3605,7 +3788,11 @@ Data descriptors defined here:<br>
+     a3,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_solver_check"><strong>Z3_solver_check</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_solver_check"><strong>Z3_solver_check</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_solver_check_assumptions"><strong>Z3_solver_check_assumptions</strong></a>(
+     a0,
+     a1,
+@@ -3862,7 +4049,11 @@ Data descriptors defined here:<br>
+     a3,
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+- <dl><dt><a name="-Z3_solver_reset"><strong>Z3_solver_reset</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_solver_reset"><strong>Z3_solver_reset</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_solver_set_initial_value"><strong>Z3_solver_set_initial_value</strong></a>(
+     a0,
+     a1,
+@@ -4118,7 +4309,11 @@ Data descriptors defined here:<br>
+     _elems=&lt;z3.z3core.Elementaries object&gt;
+ )</dt></dl>
+  <dl><dt><a name="-Z3_to_app"><strong>Z3_to_app</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
+- <dl><dt><a name="-Z3_to_func_decl"><strong>Z3_to_func_decl</strong></a>(a0, a1, _elems=&lt;z3.z3core.Elementaries object&gt;)</dt></dl>
++ <dl><dt><a name="-Z3_to_func_decl"><strong>Z3_to_func_decl</strong></a>(
++    a0,
++    a1,
++    _elems=&lt;z3.z3core.Elementaries object&gt;
++)</dt></dl>
+  <dl><dt><a name="-Z3_toggle_warning_messages"><strong>Z3_toggle_warning_messages</strong></a>(
+     a0,
+     _elems=&lt;z3.z3core.Elementaries object&gt;

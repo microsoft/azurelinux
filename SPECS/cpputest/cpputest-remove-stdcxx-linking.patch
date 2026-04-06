@@ -1,0 +1,10 @@
+diff --git a/cpputest.pc.in b/cpputest.pc.in
+index 9a2f0e6..6d946d5 100644
+--- a/cpputest.pc.in
++++ b/cpputest.pc.in
+@@ -8,4 +8,4 @@ URL: https://github.com/cpputest/cpputest
+ Description: Easy to use unit test framework for C/C++
+ Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir}
+-Libs: -L${libdir} -lstdc++ -lCppUTest -lCppUTestExt
++Libs: -L${libdir} -lCppUTest -lCppUTestExt

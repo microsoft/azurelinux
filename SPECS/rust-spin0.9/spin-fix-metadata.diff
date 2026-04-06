@@ -1,0 +1,12 @@
+--- spin-0.9.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ spin-0.9.8/Cargo.toml	2025-12-04T20:55:34.378972+00:00
+@@ -50,9 +50,6 @@
+ optional = true
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.4"
+-
+ [features]
+ barrier = ["mutex"]
+ default = [

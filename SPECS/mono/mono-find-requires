@@ -1,0 +1,86 @@
+#!/usr/bin/bash
+#
+# mono-find-requires
+#
+# Authors:
+#       Ben Maurer (bmaurer@ximian.com)
+#
+# (C) 2005 Novell (http://www.novell.com)
+#
+# Args: builddir buildroot libdir
+
+IFS=$'\n'
+filelist=($(grep -Ev "$3/doc/|$3/share/doc/"))
+monolist=($(printf "%s\n" "${filelist[@]}" | grep -E "\\.(exe|dll)\$"))
+
+# If monodis is in the package being installed, use that one
+# This is to support building mono
+build_bindir="$2$3/bin"
+build_libdir="$2$3/$4"
+
+if [ -x $build_bindir/monodis ]; then
+    monodis="$build_bindir/monodis"
+    export LD_LIBRARY_PATH=$build_libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+elif [ -x $3/bin/monodis ]; then
+    monodis="$3/bin/monodis"
+else
+    exit 0;
+fi
+
+export MONO_SHARED_DIR=$1
+
+REQUIRES=$(
+	for i in "${monolist[@]}"; do
+		($monodis --assemblyref $i | awk '
+			BEGIN { START=0; LIBNAME=""; VERSION=""; }
+			(START==0) && /^[0-9]+: Version=/ {
+				START=1;
+				sub(/Version=/, "", $2);
+				VERSION=$2
+			}
+	
+			(START==1) && /^\tName=/ {
+				sub(/Name=/, "", $1);
+				LIBNAME=$1
+	
+				print "mono(" LIBNAME ") = " VERSION
+				START=0
+			}
+		    ') 2> /dev/null
+	done
+)
+
+PROVIDES=$(
+	for i in "${monolist[@]}"; do
+		($monodis --assembly $i | awk '
+			BEGIN { LIBNAME=""; VERSION=""; }
+			/^Version:/ { VERSION=$2 }
+			/^Name:/    { LIBNAME=$2 }
+			END {
+				if (VERSION && LIBNAME)
+					print "mono(" LIBNAME ") = " VERSION
+			}
+		    ') 2>/dev/null
+	done
+)
+#
+# This is a little magic trick to get all REQUIRES that are not
+# in PROVIDES. While RPM functions correctly when such deps exist,
+# they make the metadata a bit bloated.
+#
+
+# Filter out dups from both lists
+REQUIRES=$(echo "$REQUIRES" | sort | uniq)
+PROVIDES=$(echo "$PROVIDES" | sort | uniq)
+
+#
+# Get a list of elements that exist in exactly one of PROVIDES or REQUIRES
+#
+UNIQ=$(echo "$PROVIDES
+$REQUIRES" | sort | uniq -u)
+
+#
+# Of those, only chose the ones that are in REQUIRES
+#
+echo "$UNIQ
+$REQUIRES" | sort | uniq -d

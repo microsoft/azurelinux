@@ -1,0 +1,41 @@
+From 3a5c4d311755910f07e60fd30d4736ac98bea8eb Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Tue, 10 Feb 2026 10:06:28 +0100
+Subject: [PATCH] emulator: Fix compilation on big endian systems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes the build on big endian systems like s390x:
+
+Remove the "static" so the array doesn't need to be initialised
+with constants.
+
+emulator/bthost.c: In function ‘bthost_setup_sco’:
+./src/shared/util.h:43:26: error: initializer element is not constant
+   43 | #define cpu_to_le32(val) bswap_32(val)
+      |                          ^~~~~~~~
+etc.
+
+Fixes: 85888a8357ea ("bthost: add bthost_setup_sco() and accept
+incoming eSCO")
+---
+ emulator/bthost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index d09ad1e76c50..53b12f828675 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -3560,7 +3560,7 @@ void bthost_hci_disconnect(struct bthost *bthost, uint16_t handle,
+ int bthost_setup_sco(struct bthost *bthost, uint16_t acl_handle,
+ 							uint16_t setting)
+ {
+-	static const struct bt_hci_cmd_setup_sync_conn settings[] = {
++	const struct bt_hci_cmd_setup_sync_conn settings[] = {
+ 		{
+ 			.tx_bandwidth = cpu_to_le32(0x00001f40),
+ 			.rx_bandwidth = cpu_to_le32(0x00001f40),
+-- 
+2.52.0
+

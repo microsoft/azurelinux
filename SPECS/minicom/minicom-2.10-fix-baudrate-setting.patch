@@ -1,0 +1,41 @@
+From 964ae563cb5a78545ae1a4a3b6784c69ec73bc48 Mon Sep 17 00:00:00 2001
+From: Stefan Becker <chemobejk@gmail.com>
+Date: Mon, 17 Nov 2025 11:57:32 +0200
+Subject: [PATCH] src/sysdep.h: remove cfset{i,o}speed macros for glibc
+
+glibc 2.42 added support for arbitrary termios speeds on Linux, i.e.
+speed_t and Bxxx defines changed from bitmasks to unsigned integers:
+Therefore speed_t can no longer be used together with c_flag's internal
+bitmask CBAUD.
+
+When minicom is compiled on such a system the baudrate setting is broken
+and the user experiences garbled UART output.
+
+Remove the macros for glibc, i.e. call cfset{i,o}speed() instead.
+
+Fixes #17
+---
+ NEWS         | 1 +
+ src/sysdep.h | 9 ---------
+ 2 files changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/src/sysdep.h b/src/sysdep.h
+index b11945c..9ba8836 100644
+--- a/src/sysdep.h
++++ b/src/sysdep.h
+@@ -139,12 +139,3 @@
+ #  define cfsetospeed(tty, spd)
+ #endif
+ #endif
+-
+-/* Redefine cfset{i,o}speed for Linux > 1.1.68 && libc < 4.5.21 */
+-#if defined (__GLIBC__) && defined(CBAUDEX)
+-#  undef cfsetispeed
+-#  undef cfsetospeed
+-#  define cfsetispeed(xtty, xspd) \
+-		((xtty)->c_cflag = ((xtty)->c_cflag & ~CBAUD) | (xspd))
+-#  define cfsetospeed(tty, spd)
+-#endif
+-- 
+2.51.1
+

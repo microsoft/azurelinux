@@ -1,0 +1,57 @@
+diff -ur beakerlib-1.18.old/src/python/journal-compare.py beakerlib-1.18.new/src/python/journal-compare.py
+--- beakerlib-1.18.old/src/python/journal-compare.py	2019-04-04 11:20:55.000000000 +0200
++++ beakerlib-1.18.new/src/python/journal-compare.py	2019-04-04 11:20:23.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright (c) 2006 Red Hat, Inc. All rights reserved. This copyrighted material
+ # is made available to anyone wishing to use, modify, copy, or
+diff -ur beakerlib-1.18.old/src/python/journalling.py beakerlib-1.18.new/src/python/journalling.py
+--- beakerlib-1.18.old/src/python/journalling.py	2019-04-04 11:20:55.000000000 +0200
++++ beakerlib-1.18.new/src/python/journalling.py	2019-04-04 11:20:27.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Authors:  Jakub Heger        <jheger@redhat.com>
+ #           Dalibor Pospisil   <dapospis@redhat.com>
+diff -ur beakerlib-1.18.old/src/python/rlMemAvg.py beakerlib-1.18.new/src/python/rlMemAvg.py
+--- beakerlib-1.18.old/src/python/rlMemAvg.py	2019-04-04 11:20:55.000000000 +0200
++++ beakerlib-1.18.new/src/python/rlMemAvg.py	2019-04-04 11:20:30.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Authors:  Petr Muller     <pmuller@redhat.com>
+ #
+diff -ur beakerlib-1.18.old/src/python/rlMemPeak.py beakerlib-1.18.new/src/python/rlMemPeak.py
+--- beakerlib-1.18.old/src/python/rlMemPeak.py	2019-04-04 11:20:55.000000000 +0200
++++ beakerlib-1.18.new/src/python/rlMemPeak.py	2019-04-04 11:20:33.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Authors:  Petr Muller     <pmuller@redhat.com>
+ #
+diff -ur beakerlib-1.18.old/src/python/testwatcher.py beakerlib-1.18.new/src/python/testwatcher.py
+--- beakerlib-1.18.old/src/python/testwatcher.py	2019-04-04 11:20:55.000000000 +0200
++++ beakerlib-1.18.new/src/python/testwatcher.py	2019-04-04 11:20:36.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Authors:  Jiri Jaburek    <jjaburek@redhat.com>
+ #
+diff -ur beakerlib-1.18.old/src/journal.sh beakerlib-1.18.new/src/journal.sh
+--- beakerlib-1.18.old/src/journal.sh
++++ beakerlib-1.18.new/src/journal.sh
+@@ -299,7 +299,7 @@ rlJournalEnd(){
+ __INTERNAL_JournalXMLCreate() {
+     local res=0
+     [[ "$BEAKERLIB_JOURNAL" == "0" ]] || {
+-      if which python &> /dev/null; then
++      if which python3 &> /dev/null; then
+         $__INTERNAL_JOURNALIST $__INTERNAL_XSLT --metafile \
+           "$__INTERNAL_BEAKERLIB_METAFILE" --journal "$__INTERNAL_BEAKERLIB_JOURNAL"
+         res=$?

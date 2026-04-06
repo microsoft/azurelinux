@@ -1,0 +1,17 @@
+--- env_logger-0.8.4/Cargo.toml	2021-06-11T09:11:49+00:00
++++ env_logger-0.8.4/Cargo.toml	2026-02-21T14:02:43.842088+00:00
+@@ -39,9 +39,6 @@
+ [[test]]
+ name = "init-twice-retains-filter"
+ harness = false
+-[dependencies.atty]
+-version = "0.2.5"
+-optional = true
+ 
+ [dependencies.humantime]
+ version = "2.0.0"
+@@ -63,3 +60,4 @@
+ 
+ [features]
+ default = ["termcolor", "atty", "humantime", "regex"]
++atty = []

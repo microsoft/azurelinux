@@ -1,0 +1,39 @@
+commit 8be2bee7f6861fd27d5c181b15d3126fc7dbf73b
+Author: Keith Seitz <keiths@redhat.com>
+Date:   Sat Jan 20 09:25:05 2024 -0700
+
+    lesspipe may contain ".sh" extension
+    
+    On Fedora, the "lesspipe" script is actually called
+    "lesspipe.sh". This patch proposes to use "$(which NAME)"
+    to figure out the actual name of the script to use.
+    
+    If neither "lesspipe" nor "lesspipe.sh" exists in $PATH,
+    the patch simply uses "lesspipe", preserving the current behavior.
+    
+    It was based on the 3.1.9 release tarball, but should
+    apply cleanly to current git.
+    
+    This was reported as Fedora bugzilla 2256374.
+
+diff --git a/src/src-hilite-lesspipe.sh.in b/src/src-hilite-lesspipe.sh.in
+index eb5c3ee..76231c7 100644
+--- a/src/src-hilite-lesspipe.sh.in
++++ b/src/src-hilite-lesspipe.sh.in
+@@ -7,7 +7,15 @@ for source in "$@"; do
+ 	*Makefile|*makefile) 
+         source-highlight --failsafe -f esc --lang-def=makefile.lang --style-file=esc.style -i "$source" ;;
+ 	*.tar|*.tgz|*.gz|*.bz2|*.xz)
+-        lesspipe "$source" ;;
++	# The "lesspipe" script may or may not have ".sh" extension.
++	lesspipe=$(which lesspipe 2>/dev/null)
++	if [ -z "$lesspipe" ]; then
++	    lesspipe=$(which lesspipe.sh 2>/dev/null)
++	    if [ -z "$lesspipe" ]; then
++		lesspipe="lesspipe"
++	    fi
++	fi
++        $lesspipe "$source" ;;
+         *) source-highlight --failsafe --infer-lang -f esc --style-file=esc.style -i "$source" ;;
+     esac
+ done

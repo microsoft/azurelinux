@@ -1,0 +1,181 @@
+From b3e8ab9ead7532eccf687df2fafe3af425fab1e9 Mon Sep 17 00:00:00 2001
+From: Milian Wolff <milian.wolff@kdab.com>
+Date: Fri, 13 Dec 2019 18:07:26 +0100
+Subject: [PATCH 1/3] Handle signals in the registered object's thread
+
+Do not call `sender()` from a different thread. As the API documentation
+indicates, that is not supported and can lead to crashes as experienced
+on the CI frequently.
+
+Instead, we now have per-thread SignalHandlers and use those to get
+notified about signals and metacall events.
+
+Moving a registered object into a different thread isn't supported once
+it was registered. But the object can be deregistered, moved, and then
+re-registered.
+
+[ChangeLog] Signals from objects living in a different thread than the
+QWebChannel are now handled correctly.
+
+Task-number: QTBUG-51366
+Change-Id: I1edb0694b946a494b6c0d4a8a6dc6b452dcb2c7a
+Reviewed-by: Arno Rehn <a.rehn@menlosystems.com>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+(cherry picked from commit 28455e59c0b940200fe0223472a80104ce1a02dd)
+---
+ src/webchannel/qmetaobjectpublisher.cpp  | 23 +++++++++++++++++------
+ src/webchannel/qmetaobjectpublisher_p.h  |  5 ++++-
+ src/webchannel/signalhandler_p.h         |  3 +++
+ tests/auto/webchannel/tst_webchannel.cpp |  4 +---
+ 4 files changed, 25 insertions(+), 10 deletions(-)
+
+diff --git a/src/webchannel/qmetaobjectpublisher.cpp b/src/webchannel/qmetaobjectpublisher.cpp
+index 536eb5c..e997b75 100644
+--- a/src/webchannel/qmetaobjectpublisher.cpp
++++ b/src/webchannel/qmetaobjectpublisher.cpp
+@@ -186,7 +186,6 @@ Q_DECLARE_TYPEINFO(OverloadResolutionCandidate, Q_MOVABLE_TYPE);
+ QMetaObjectPublisher::QMetaObjectPublisher(QWebChannel *webChannel)
+     : QObject(webChannel)
+     , webChannel(webChannel)
+-    , signalHandler(this)
+     , clientIsIdle(false)
+     , blockUpdates(false)
+     , propertyUpdatesInitialized(false)
+@@ -333,6 +332,7 @@ QJsonObject QMetaObjectPublisher::initializeClient(QWebChannelAbstractTransport
+ 
+ void QMetaObjectPublisher::initializePropertyUpdates(const QObject *const object, const QJsonObject &objectInfo)
+ {
++    auto *signalHandler = signalHandlerFor(object);
+     foreach (const QJsonValue &propertyInfoVar, objectInfo[KEY_PROPERTIES].toArray()) {
+         const QJsonArray &propertyInfo = propertyInfoVar.toArray();
+         if (propertyInfo.size() < 2) {
+@@ -353,14 +353,14 @@ void QMetaObjectPublisher::initializePropertyUpdates(const QObject *const object
+ 
+         // Only connect for a property update once
+         if (connectedProperties.isEmpty()) {
+-            signalHandler.connectTo(object, signalIndex);
++            signalHandler->connectTo(object, signalIndex);
+         }
+ 
+         connectedProperties.insert(propertyIndex);
+     }
+ 
+     // also always connect to destroyed signal
+-    signalHandler.connectTo(object, s_destroyedSignalIndex);
++    signalHandler->connectTo(object, s_destroyedSignalIndex);
+ }
+ 
+ void QMetaObjectPublisher::sendPendingPropertyUpdates()
+@@ -590,7 +590,7 @@ void QMetaObjectPublisher::objectDestroyed(const QObject *object)
+     // only remove from handler when we initialized the property updates
+     // cf: https://bugreports.qt.io/browse/QTBUG-60250
+     if (propertyUpdatesInitialized) {
+-        signalHandler.remove(object);
++        signalHandlerFor(object)->remove(object);
+         signalToPropertyMap.remove(object);
+     }
+     pendingPropertyUpdates.remove(object);
+@@ -913,9 +913,9 @@ void QMetaObjectPublisher::handleMessage(const QJsonObject &message, QWebChannel
+                 return;
+             transport->sendMessage(createResponse(message.value(KEY_ID), wrapResult(result, transport)));
+         } else if (type == TypeConnectToSignal) {
+-            signalHandler.connectTo(object, message.value(KEY_SIGNAL).toInt(-1));
++            signalHandlerFor(object)->connectTo(object, message.value(KEY_SIGNAL).toInt(-1));
+         } else if (type == TypeDisconnectFromSignal) {
+-            signalHandler.disconnectFrom(object, message.value(KEY_SIGNAL).toInt(-1));
++            signalHandlerFor(object)->disconnectFrom(object, message.value(KEY_SIGNAL).toInt(-1));
+         } else if (type == TypeSetProperty) {
+             setProperty(object, message.value(KEY_PROPERTY).toInt(-1),
+                         message.value(KEY_VALUE));
+@@ -948,4 +948,15 @@ void QMetaObjectPublisher::timerEvent(QTimerEvent *event)
+     }
+ }
+ 
++SignalHandler<QMetaObjectPublisher> *QMetaObjectPublisher::signalHandlerFor(const QObject *object)
++{
++    auto thread = object->thread();
++    auto it = signalHandlers.find(thread);
++    if (it == signalHandlers.end()) {
++        it = signalHandlers.emplace(thread, this).first;
++        it->second.moveToThread(thread);
++    }
++    return &it->second;
++}
++
+ QT_END_NAMESPACE
+diff --git a/src/webchannel/qmetaobjectpublisher_p.h b/src/webchannel/qmetaobjectpublisher_p.h
+index bbd9875..ded0d33 100644
+--- a/src/webchannel/qmetaobjectpublisher_p.h
++++ b/src/webchannel/qmetaobjectpublisher_p.h
+@@ -60,6 +60,8 @@
+ #include <QPointer>
+ #include <QJsonObject>
+ 
++#include <unordered_map>
++
+ #include "qwebchannelglobal.h"
+ 
+ QT_BEGIN_NAMESPACE
+@@ -272,7 +274,8 @@ private:
+     friend class TestWebChannel;
+ 
+     QWebChannel *webChannel;
+-    SignalHandler<QMetaObjectPublisher> signalHandler;
++    std::unordered_map<const QThread*, SignalHandler<QMetaObjectPublisher>> signalHandlers;
++    SignalHandler<QMetaObjectPublisher> *signalHandlerFor(const QObject *object);
+ 
+     // true when the client is idle, false otherwise
+     bool clientIsIdle;
+diff --git a/src/webchannel/signalhandler_p.h b/src/webchannel/signalhandler_p.h
+index 66b6147..1b08643 100644
+--- a/src/webchannel/signalhandler_p.h
++++ b/src/webchannel/signalhandler_p.h
+@@ -56,6 +56,7 @@
+ #include <QVector>
+ #include <QMetaMethod>
+ #include <QDebug>
++#include <QThread>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -71,6 +72,7 @@ static const int s_destroyedSignalIndex = QObject::staticMetaObject.indexOfMetho
+ template<class Receiver>
+ class SignalHandler : public QObject
+ {
++    Q_DISABLE_COPY(SignalHandler)
+ public:
+     SignalHandler(Receiver *receiver, QObject *parent = 0);
+ 
+@@ -268,6 +270,7 @@ int SignalHandler<Receiver>::qt_metacall(QMetaObject::Call call, int methodId, v
+     if (call == QMetaObject::InvokeMetaMethod) {
+         const QObject *object = sender();
+         Q_ASSERT(object);
++        Q_ASSERT(QThread::currentThread() == object->thread());
+         Q_ASSERT(senderSignalIndex() == methodId);
+         Q_ASSERT(m_connectionsCounter.contains(object));
+         Q_ASSERT(m_connectionsCounter.value(object).contains(methodId));
+diff --git a/tests/auto/webchannel/tst_webchannel.cpp b/tests/auto/webchannel/tst_webchannel.cpp
+index 181da9e..7f846f5 100644
+--- a/tests/auto/webchannel/tst_webchannel.cpp
++++ b/tests/auto/webchannel/tst_webchannel.cpp
+@@ -943,8 +943,6 @@ void TestWebChannel::testInfiniteRecursion()
+ 
+ void TestWebChannel::testAsyncObject()
+ {
+-    QSKIP("This test is broken. See QTBUG-80729");
+-
+     QWebChannel channel;
+     channel.connectTo(m_dummyTransport);
+ 
+@@ -1082,7 +1080,7 @@ void TestWebChannel::benchInitializeClients()
+ 
+         publisher->propertyUpdatesInitialized = false;
+         publisher->signalToPropertyMap.clear();
+-        publisher->signalHandler.clear();
++        publisher->signalHandlers.clear();
+     }
+ }
+ 
+-- 
+2.51.1
+

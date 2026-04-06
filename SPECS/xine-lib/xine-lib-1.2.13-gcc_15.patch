@@ -1,0 +1,160 @@
+# HG changeset patch
+# User Torsten Jager <t.jager@gmx.de>
+# Date 1738622090 -3600
+#      Mon Feb 03 23:34:50 2025 +0100
+# Node ID a38be398e202da7b8e414969b74fbd65eb34798d
+# Parent  ea7071a960a1ca8719422e80e130994c8f549731
+Fix qsort compare func.
+gcc 15 no longer accepts type (*func) () as a generic pointer
+to any fuction returning type, and sometimes also bails on
+obvious type pun then dereference.
+Thanks to Xavier Bachelot <xavier@bachelot.org>.
+
+diff -r ea7071a960a1 -r a38be398e202 contrib/libfaad/sbr_fbt.c
+--- a/contrib/libfaad/sbr_fbt.c	Tue Dec 17 23:15:30 2024 +0100
++++ b/contrib/libfaad/sbr_fbt.c	Mon Feb 03 23:34:50 2025 +0100
+@@ -105,9 +105,11 @@
+     }
+ }
+ 
+-static int longcmp(const void *a, const void *b)
+-{
+-    return ((int)(*(int32_t*)a - *(int32_t*)b));
++static int longcmp (const void *a, const void *b) {
++    const int32_t *d = (const int32_t *)a;
++    const int32_t *e = (const int32_t *)b;
++
++    return (int)(*d - *e);
+ }
+ 
+ /* calculate the stop QMF channel for the master frequency band table */
+diff -r ea7071a960a1 -r a38be398e202 src/input/input_file.c
+--- a/src/input/input_file.c	Tue Dec 17 23:15:30 2024 +0100
++++ b/src/input/input_file.c	Mon Feb 03 23:34:50 2025 +0100
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2000-2022 the xine project
++ * Copyright (C) 2000-2025 the xine project
+  *
+  * This file is part of xine, a free video player.
+  *
+@@ -649,10 +649,13 @@
+ }
+ 
+ /*
+- * Wrapper to file_input_strverscmp() for qsort() calls, which sort mrl_t type array.
++ * Wrapper to file_input_strverscmp () for qsort () calls, which sort mrl_t type array.
+  */
+-static int file_input_sortfiles_default (const xine_mrl_t *s1, const xine_mrl_t *s2) {
+-  return(file_input_strverscmp(s1->mrl, s2->mrl));
++static int file_input_sortfiles_default (const void *a, const void *b) {
++  const xine_mrl_t *d = (const xine_mrl_t *)a;
++  const xine_mrl_t *e = (const xine_mrl_t *)b;
++
++  return file_input_strverscmp (d->mrl, e->mrl);
+ }
+ 
+ /*
+@@ -735,7 +738,7 @@
+   int                   num_dir_files   = 0;
+   int                   num_norm_files  = 0;
+   int                   num_files       = -1;
+-  int                 (*func) ()        = file_input_sortfiles_default;
++  int                 (*cmp) (const void *a, const void *b) = file_input_sortfiles_default;
+   int                   already_tried   = 0;
+   int                   show_hidden_files;
+ 
+@@ -914,14 +917,14 @@
+     /*
+      * Sort arrays
+      */
+-    if(num_dir_files)
+-      qsort(dir_files, num_dir_files, sizeof(xine_mrl_t), func);
++    if (num_dir_files)
++      qsort (dir_files, num_dir_files, sizeof (xine_mrl_t), cmp);
+ 
+-    if(num_hide_files)
+-      qsort(hide_files, num_hide_files, sizeof(xine_mrl_t), func);
++    if (num_hide_files)
++      qsort (hide_files, num_hide_files, sizeof (xine_mrl_t), cmp);
+ 
+-    if(num_norm_files)
+-      qsort(norm_files, num_norm_files, sizeof(xine_mrl_t), func);
++    if (num_norm_files)
++      qsort (norm_files, num_norm_files, sizeof (xine_mrl_t), cmp);
+ 
+     /*
+      * Add directories entries
+diff -r ea7071a960a1 -r a38be398e202 src/input/input_smb.c
+--- a/src/input/input_smb.c	Tue Dec 17 23:15:30 2024 +0100
++++ b/src/input/input_smb.c	Mon Feb 03 23:34:50 2025 +0100
+@@ -229,10 +229,13 @@
+ }
+ 
+ /*
+- * Wrapper to _strverscmp() for qsort() calls, which sort mrl_t type array.
++ * Wrapper to _strverscmp () for qsort () calls, which sort mrl_t type array.
+  */
+-static int _sortfiles_default(const xine_mrl_t *s1, const xine_mrl_t *s2) {
+-  return(_strverscmp(s1->mrl, s2->mrl));
++static int smb_input_sortfiles_default (const void *a, const void *b) {
++  const xine_mrl_t *d = (const xine_mrl_t *)a;
++  const xine_mrl_t *e = (const xine_mrl_t *)b;
++
++  return file_input_strverscmp (d->mrl, e->mrl);
+ }
+ 
+ 
+@@ -240,7 +243,7 @@
+           const char *filename, int *nFiles) {
+ 
+ 	smb_input_class_t   *this = (smb_input_class_t *) this_gen;
+-	int                 (*func) ()        = _sortfiles_default;
++	int                (*cmp) (const void *a, const void *b) = smb_input_sortfiles_default;
+ 	int        dir;
+ 	int i;
+ 	struct smbc_dirent  *pdirent;
+@@ -338,11 +341,11 @@
+ 		/*
+ 		 * Sort arrays
+ 		 */
+-		if(num_dir_files)
+-			qsort(dir_files, num_dir_files, sizeof(xine_mrl_t), func);
++		if (num_dir_files)
++			qsort (dir_files, num_dir_files, sizeof (xine_mrl_t), cmp);
+ 
+-		if(num_norm_files)
+-			qsort(norm_files, num_norm_files, sizeof(xine_mrl_t), func);
++		if (num_norm_files)
++			qsort (norm_files, num_norm_files, sizeof (xine_mrl_t), cmp);
+ 
+ 		/*
+ 		 * Add directories entries
+# HG changeset patch
+# User Torsten Jager <t.jager@gmx.de>
+# Date 1738881040 -3600
+#      Thu Feb 06 23:30:40 2025 +0100
+# Node ID b5fd08a878bb80072ba5b71e30391ab52698c22f
+# Parent  a38be398e202da7b8e414969b74fbd65eb34798d
+Fix qsort compare func 2.
+Thanks to Xavier Bachelot <xavier@bachelot.org>.
+
+diff -r a38be398e202 -r b5fd08a878bb src/input/input_smb.c
+--- a/src/input/input_smb.c	Mon Feb 03 23:34:50 2025 +0100
++++ b/src/input/input_smb.c	Thu Feb 06 23:30:40 2025 +0100
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2008-2020 the xine project
++ * Copyright (C) 2008-2025 the xine project
+  *
+  * This file is part of xine, a free video player.
+  *
+@@ -235,7 +235,7 @@
+   const xine_mrl_t *d = (const xine_mrl_t *)a;
+   const xine_mrl_t *e = (const xine_mrl_t *)b;
+ 
+-  return file_input_strverscmp (d->mrl, e->mrl);
++  return _strverscmp (d->mrl, e->mrl);
+ }
+ 
+ 

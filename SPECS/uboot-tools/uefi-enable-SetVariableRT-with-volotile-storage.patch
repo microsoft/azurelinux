@@ -1,0 +1,33 @@
+From fd736dd720b29fa69a4bb87492f3f94dc6076996 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Tue, 25 Mar 2025 17:13:44 +0000
+Subject: [PATCH] efi: enable SetVariableRT with volotile storage
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ lib/efi_loader/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/efi_loader/Kconfig b/lib/efi_loader/Kconfig
+index d4f6b56afaa..3e522131b01 100644
+--- a/lib/efi_loader/Kconfig
++++ b/lib/efi_loader/Kconfig
+@@ -108,6 +108,7 @@ choice
+ config EFI_VARIABLE_FILE_STORE
+ 	bool "Store non-volatile UEFI variables as file"
+ 	depends on FAT_WRITE
++	default y
+ 	help
+ 	  Select this option if you want non-volatile UEFI variables to be
+ 	  stored as file /ubootefi.var on the EFI system partition.
+@@ -115,6 +116,7 @@ config EFI_VARIABLE_FILE_STORE
+ config EFI_RT_VOLATILE_STORE
+ 	bool "Allow variable runtime services in volatile storage (e.g RAM)"
+ 	depends on EFI_VARIABLE_FILE_STORE
++	default y
+ 	help
+ 	  When EFI variables are stored on file we don't allow SetVariableRT,
+ 	  since the OS doesn't know how to write that file. At the same time
+-- 
+2.49.0
+

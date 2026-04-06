@@ -1,0 +1,23 @@
+From c9205e8a61ce6b0763a57826c8a9105a3c11782d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alexander=20Kj=C3=A4ll?= <alexander.kjall@gmail.com>
+Date: Mon, 10 Jul 2023 20:54:52 +0200
+Subject: [PATCH] document the different behavior between 64 and 32 bit
+ platforms
+
+---
+ src/reader/tests.rs | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/reader/tests.rs b/src/reader/tests.rs
+index d893ff0a..16f03823 100644
+--- a/src/reader/tests.rs
++++ b/src/reader/tests.rs
+@@ -1662,5 +1662,8 @@ fn test_ber_read_overflow() {
+ 
+     let err = r.unwrap_err();
+ 
++    #[cfg(target_pointer_width = "32")]
++    assert_eq!(err.kind(), ASN1ErrorKind::Eof);
++    #[cfg(target_pointer_width = "64")]
+     assert_eq!(err.kind(), ASN1ErrorKind::IntegerOverflow);
+ }

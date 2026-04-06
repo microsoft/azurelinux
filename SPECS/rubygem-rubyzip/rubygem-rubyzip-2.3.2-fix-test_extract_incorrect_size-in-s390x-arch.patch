@@ -1,0 +1,40 @@
+From 262ba001a4a0cd2b32956b1a4a597ce7c32c85e7 Mon Sep 17 00:00:00 2001
+From: Lucas Kanashiro <lucas.kanashiro@canonical.com>
+Date: Wed, 25 Mar 2020 14:45:09 -0300
+Subject: [PATCH] test/file_extract_test.rb: fix test_extract_incorrect_size in
+ s390x arch
+
+Using the current pack directives makes test_extract_incorrect_size fail
+in s390x architecture because of the endian probably. This is the output
+of the command executed by the test in amd64:
+
+irb(main):001:0> [501, 500000, 1].pack('LLS')
+=> "\xF5\x01\x00\x00 \xA1\a\x00\x01\x00"
+
+And the output of the same command in s390x:
+
+irb(main):001:0> [501, 500000, 1].pack('LLS')
+=> "\x00\x00\x01\xF5\x00\a\xA1 \x00\x01"
+
+Changing to 'VVv' pack directives like is used in
+lib/zib/entry.rb fixes the test in s390x and does not add a
+regression in amd64.
+---
+ test/file_extract_test.rb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/file_extract_test.rb b/test/file_extract_test.rb
+index 0e697187..d8306b35 100644
+--- a/test/file_extract_test.rb
++++ b/test/file_extract_test.rb
+@@ -110,8 +110,8 @@ def test_extract_incorrect_size
+         assert_equal true_size, a_entry.size
+       end
+ 
+-      true_size_bytes = [compressed_size, true_size, file_name.size].pack('LLS')
+-      fake_size_bytes = [compressed_size, fake_size, file_name.size].pack('LLS')
++      true_size_bytes = [compressed_size, true_size, file_name.size].pack('VVv')
++      fake_size_bytes = [compressed_size, fake_size, file_name.size].pack('VVv')
+ 
+       data = File.binread(real_zip)
+       assert data.include?(true_size_bytes)

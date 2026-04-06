@@ -1,0 +1,255 @@
+From 825018f5f2d892655f3d63167a0d1f3391cec678 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 19/50] openssh-6.6.1p1-log-in-chroot
+
+---
+ log.c              | 11 +++++++++--
+ log.h              |  1 +
+ monitor.c          | 17 +++++++++++++++--
+ monitor.h          |  2 +-
+ session.c          | 26 +++++++++++++++-----------
+ sftp-server-main.c |  2 +-
+ sftp-server.c      |  6 +++---
+ sftp.h             |  2 +-
+ sshd-session.c     |  7 ++++++-
+ 9 files changed, 52 insertions(+), 22 deletions(-)
+
+diff --git a/log.c b/log.c
+index 6617f267..9782cfb0 100644
+--- a/log.c
++++ b/log.c
+@@ -196,6 +196,11 @@ void
+ log_init(const char *av0, LogLevel level, SyslogFacility facility,
+     int on_stderr)
+ {
++	log_init_handler(av0, level, facility, on_stderr, 1);
++}
++
++void
++log_init_handler(const char *av0, LogLevel level, SyslogFacility facility, int on_stderr, int reset_handler) {
+ #if defined(HAVE_OPENLOG_R) && defined(SYSLOG_DATA_INIT)
+ 	struct syslog_data sdata = SYSLOG_DATA_INIT;
+ #endif
+@@ -208,8 +213,10 @@ log_init(const char *av0, LogLevel level, SyslogFacility facility,
+ 		exit(1);
+ 	}
+ 
+-	log_handler = NULL;
+-	log_handler_ctx = NULL;
++	if (reset_handler) {
++		log_handler = NULL;
++		log_handler_ctx = NULL;
++	}
+ 
+ 	log_on_stderr = on_stderr;
+ 	if (on_stderr)
+diff --git a/log.h b/log.h
+index 8e8dfc23..70048a8a 100644
+--- a/log.h
++++ b/log.h
+@@ -52,6 +52,7 @@ typedef enum {
+ typedef void (log_handler_fn)(LogLevel, int, const char *, void *);
+ 
+ void     log_init(const char *, LogLevel, SyslogFacility, int);
++void     log_init_handler(const char *, LogLevel, SyslogFacility, int, int);
+ LogLevel log_level_get(void);
+ int      log_change_level(LogLevel);
+ int      log_is_on_stderr(void);
+diff --git a/monitor.c b/monitor.c
+index 2ef16cc8..43c10a4e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -2001,9 +2001,22 @@ monitor_init(void)
+ }
+ 
+ void
+-monitor_reinit(struct monitor *mon)
++monitor_reinit(struct monitor *mon, const char *chroot_dir)
+ {
+-	monitor_openfds(mon, 0);
++	struct stat dev_log_stat;
++	char *dev_log_path;
++	int do_logfds = 0;
++
++	if (chroot_dir != NULL) {
++		xasprintf(&dev_log_path, "%s/dev/log", chroot_dir);
++
++		if (stat(dev_log_path, &dev_log_stat) != 0) {
++			debug_f("/dev/log doesn't exist in %s chroot - will try to log via monitor using [postauth] suffix", chroot_dir);
++			do_logfds = 1;
++		}
++		free(dev_log_path);
++	}
++	monitor_openfds(mon, do_logfds);
+ }
+ 
+ #ifdef GSSAPI
+diff --git a/monitor.h b/monitor.h
+index dbc7e003..d4d631dd 100644
+--- a/monitor.h
++++ b/monitor.h
+@@ -85,7 +85,7 @@ struct monitor {
+ };
+ 
+ struct monitor *monitor_init(void);
+-void monitor_reinit(struct monitor *);
++void monitor_reinit(struct monitor *, const char *);
+ 
+ struct Authctxt;
+ void monitor_child_preauth(struct ssh *, struct monitor *);
+diff --git a/session.c b/session.c
+index 2620dd11..54da09d5 100644
+--- a/session.c
++++ b/session.c
+@@ -169,6 +169,7 @@ login_cap_t *lc;
+ 
+ static int is_child = 0;
+ static int in_chroot = 0;
++static int have_dev_log = 1;
+ 
+ /* File containing userauth info, if ExposeAuthInfo set */
+ static char *auth_info_file = NULL;
+@@ -670,6 +671,7 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+ 	int ret;
+ 	const char *forced = NULL, *tty = NULL;
+ 	char session_type[1024];
++	struct stat dev_log_stat;
+ 
+ 	if (options.adm_forced_command) {
+ 		original_command = command;
+@@ -729,6 +731,10 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+ 			tty += 5;
+ 	}
+ 
++	if (lstat("/dev/log", &dev_log_stat) != 0) {
++		have_dev_log = 0;
++	}
++
+ 	verbose("Starting session: %s%s%s for %s from %.200s port %d id %d",
+ 	    session_type,
+ 	    tty == NULL ? "" : " on ",
+@@ -1512,14 +1518,6 @@ child_close_fds(struct ssh *ssh)
+ 
+ 	/* Stop directing logs to a high-numbered fd before we close it */
+ 	log_redirect_stderr_to(NULL);
+-
+-	/*
+-	 * Close any extra open file descriptors so that we don't have them
+-	 * hanging around in clients.  Note that we want to do this after
+-	 * initgroups, because at least on Solaris 2.3 it leaves file
+-	 * descriptors open.
+-	 */
+-	closefrom(STDERR_FILENO + 1);
+ }
+ 
+ /*
+@@ -1652,8 +1650,6 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+ 			exit(1);
+ 	}
+ 
+-	closefrom(STDERR_FILENO + 1);
+-
+ 	do_rc_files(ssh, s, shell);
+ 
+ 	/* restore SIGPIPE for child */
+@@ -1678,9 +1674,17 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+ 		argv[i] = NULL;
+ 		optind = optreset = 1;
+ 		__progname = argv[0];
+-		exit(sftp_server_main(i, argv, s->pw));
++		exit(sftp_server_main(i, argv, s->pw, have_dev_log));
+ 	}
+ 
++	/*
++	 * Close any extra open file descriptors so that we don't have them
++	 * hanging around in clients.  Note that we want to do this after
++	 * initgroups, because at least on Solaris 2.3 it leaves file
++	 * descriptors open.
++	 */
++	closefrom(STDERR_FILENO + 1);
++
+ 	fflush(NULL);
+ 
+ 	/* Get the last component of the shell name. */
+diff --git a/sftp-server-main.c b/sftp-server-main.c
+index 2c70f89b..bbb79f27 100644
+--- a/sftp-server-main.c
++++ b/sftp-server-main.c
+@@ -48,5 +48,5 @@ main(int argc, char **argv)
+ 		return 1;
+ 	}
+ 
+-	return (sftp_server_main(argc, argv, user_pw));
++	return (sftp_server_main(argc, argv, user_pw, 0));
+ }
+diff --git a/sftp-server.c b/sftp-server.c
+index a4abb9f7..4985da38 100644
+--- a/sftp-server.c
++++ b/sftp-server.c
+@@ -1901,7 +1901,7 @@ sftp_server_usage(void)
+ }
+ 
+ int
+-sftp_server_main(int argc, char **argv, struct passwd *user_pw)
++sftp_server_main(int argc, char **argv, struct passwd *user_pw, int reset_handler)
+ {
+ 	int i, r, in, out, ch, skipargs = 0, log_stderr = 0;
+ 	ssize_t len, olen;
+@@ -1913,7 +1913,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
+ 	extern char *__progname;
+ 
+ 	__progname = ssh_get_progname(argv[0]);
+-	log_init(__progname, log_level, log_facility, log_stderr);
++	log_init_handler(__progname, log_level, log_facility, log_stderr, reset_handler);
+ 
+ 	pw = pwcopy(user_pw);
+ 
+@@ -1986,7 +1986,7 @@ sftp_server_main(int argc, char **argv, struct passwd *user_pw)
+ 		}
+ 	}
+ 
+-	log_init(__progname, log_level, log_facility, log_stderr);
++	log_init_handler(__progname, log_level, log_facility, log_stderr, reset_handler);
+ 
+ 	/*
+ 	 * On platforms where we can, avoid making /proc/self/{mem,maps}
+diff --git a/sftp.h b/sftp.h
+index 2bde8bb7..ddf1a396 100644
+--- a/sftp.h
++++ b/sftp.h
+@@ -97,5 +97,5 @@
+ 
+ struct passwd;
+ 
+-int	sftp_server_main(int, char **, struct passwd *);
++int	sftp_server_main(int, char **, struct passwd *, int);
+ void	sftp_server_cleanup_exit(int) __attribute__((noreturn));
+diff --git a/sshd-session.c b/sshd-session.c
+index 478381db..9342e416 100644
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -437,7 +437,7 @@ privsep_postauth(struct ssh *ssh, Authctxt *authctxt)
+ #endif
+ 
+ 	/* New socket pair */
+-	monitor_reinit(pmonitor);
++	monitor_reinit(pmonitor, options.chroot_directory);
+ 
+ 	pmonitor->m_pid = fork();
+ 	if (pmonitor->m_pid == -1)
+@@ -456,6 +456,11 @@ privsep_postauth(struct ssh *ssh, Authctxt *authctxt)
+ 
+ 	close(pmonitor->m_sendfd);
+ 	pmonitor->m_sendfd = -1;
++	close(pmonitor->m_log_recvfd);
++	pmonitor->m_log_recvfd = -1;
++
++	if (pmonitor->m_log_sendfd != -1)
++		set_log_handler(mm_log_handler, pmonitor);
+ 
+ 	/* Demote the private keys to public keys. */
+ 	demote_sensitive_data();
+-- 
+2.49.0
+

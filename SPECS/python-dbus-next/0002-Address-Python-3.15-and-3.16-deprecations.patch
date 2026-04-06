@@ -1,0 +1,102 @@
+From 162566e581b4713c00edb6e41b608e7fd80e1bec Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Sun, 21 Sep 2025 10:28:02 -0700
+Subject: [PATCH 2/3] Address Python 3.15 and 3.16 deprecations
+
+---
+ dbus_next/aio/message_bus.py | 3 ++-
+ dbus_next/service.py         | 9 +++------
+ setup.py                     | 1 -
+ 3 files changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/dbus_next/aio/message_bus.py b/dbus_next/aio/message_bus.py
+index 22a11c0..d99b703 100644
+--- a/dbus_next/aio/message_bus.py
++++ b/dbus_next/aio/message_bus.py
+@@ -12,6 +12,7 @@ import logging
+ import array
+ import asyncio
+ from asyncio import Queue
++import inspect
+ import socket
+ from copy import copy
+ from typing import Optional
+@@ -342,7 +343,7 @@ class MessageBus(BaseMessageBus):
+         return await self._disconnect_future
+ 
+     def _make_method_handler(self, interface, method):
+-        if not asyncio.iscoroutinefunction(method.fn):
++        if not inspect.iscoroutinefunction(method.fn):
+             return super()._make_method_handler(interface, method)
+ 
+         def handler(msg, send_reply):
+diff --git a/dbus_next/service.py b/dbus_next/service.py
+index b2a96cf..77092af 100644
+--- a/dbus_next/service.py
++++ b/dbus_next/service.py
+@@ -6,7 +6,7 @@ from ._private.util import signature_contains_type, replace_fds_with_idx, replac
+ 
+ from functools import wraps
+ import inspect
+-from typing import no_type_check_decorator, Dict, List, Any
++from typing import Dict, List, Any
+ import copy
+ import asyncio
+ 
+@@ -84,7 +84,6 @@ def method(name: str = None, disabled: bool = False):
+     if type(disabled) is not bool:
+         raise TypeError('disabled must be a bool')
+ 
+-    @no_type_check_decorator
+     def decorator(fn):
+         @wraps(fn)
+         def wrapped(*args, **kwargs):
+@@ -159,7 +158,6 @@ def signal(name: str = None, disabled: bool = False):
+     if type(disabled) is not bool:
+         raise TypeError('disabled must be a bool')
+ 
+-    @no_type_check_decorator
+     def decorator(fn):
+         fn_name = name if name else fn.__name__
+         signal = _Signal(fn, fn_name, disabled)
+@@ -290,7 +288,6 @@ def dbus_property(access: PropertyAccess = PropertyAccess.READWRITE,
+     if type(disabled) is not bool:
+         raise TypeError('disabled must be a bool')
+ 
+-    @no_type_check_decorator
+     def decorator(fn):
+         options = {'name': name, 'access': access, 'disabled': disabled}
+         return _Property(fn, options=options)
+@@ -471,7 +468,7 @@ class ServiceInterface:
+     def _get_property_value(interface, prop, callback):
+         # XXX MUST CHECK TYPE RETURNED BY GETTER
+         try:
+-            if asyncio.iscoroutinefunction(prop.prop_getter):
++            if inspect.iscoroutinefunction(prop.prop_getter):
+                 task = asyncio.ensure_future(prop.prop_getter(interface))
+ 
+                 def get_property_callback(task):
+@@ -494,7 +491,7 @@ class ServiceInterface:
+     def _set_property_value(interface, prop, value, callback):
+         # XXX MUST CHECK TYPE TO SET
+         try:
+-            if asyncio.iscoroutinefunction(prop.prop_setter):
++            if inspect.iscoroutinefunction(prop.prop_setter):
+                 task = asyncio.ensure_future(prop.prop_setter(interface, value))
+ 
+                 def set_property_callback(task):
+diff --git a/setup.py b/setup.py
+index f6e815a..e92c3bd 100644
+--- a/setup.py
++++ b/setup.py
+@@ -53,7 +53,6 @@ setup(
+         'Topic :: Desktop Environment :: Gnome',
+         'Topic :: Software Development :: Embedded Systems',
+         'Framework :: AsyncIO',
+-        'License :: OSI Approved :: MIT License',
+         'Programming Language :: Python',
+         'Programming Language :: Python :: 3',
+         'Programming Language :: Python :: 3.6',
+-- 
+2.51.0
+

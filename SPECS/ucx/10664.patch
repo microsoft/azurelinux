@@ -1,0 +1,38 @@
+From 2e6f69db88da2c38c89c688a932817b6b4912920 Mon Sep 17 00:00:00 2001
+From: Thomas Vegas <tvegas@nvidia.com>
+Date: Tue, 29 Apr 2025 05:22:28 +0000
+Subject: [PATCH] TOOLS/PERF: Include omp.h outside of extern C declarations
+
+---
+ src/tools/perf/lib/libperf_int.h | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/tools/perf/lib/libperf_int.h b/src/tools/perf/lib/libperf_int.h
+index 3e6d9f77f53..ae3f489f2df 100644
+--- a/src/tools/perf/lib/libperf_int.h
++++ b/src/tools/perf/lib/libperf_int.h
+@@ -11,6 +11,12 @@
+ 
+ #include <tools/perf/api/libperf.h>
+ 
++
++#if _OPENMP
++#include <omp.h>
++#endif
++
++
+ BEGIN_C_DECLS
+ 
+ /** @file libperf_int.h */
+@@ -20,11 +26,6 @@ BEGIN_C_DECLS
+ #include <ucs/sys/math.h>
+ 
+ 
+-#if _OPENMP
+-#include <omp.h>
+-#endif
+-
+-
+ #define TIMING_QUEUE_SIZE    2048
+ #define UCT_PERF_TEST_AM_ID  5
+ #define ADDR_BUF_SIZE        4096

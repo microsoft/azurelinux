@@ -1,0 +1,72 @@
+diff -up Clp-releases-1.17.9/Clp/src/ClpModel.cpp.orig Clp-releases-1.17.9/Clp/src/ClpModel.cpp
+--- Clp-releases-1.17.9/Clp/src/ClpModel.cpp.orig	2023-10-27 07:03:25.664684792 -0600
++++ Clp-releases-1.17.9/Clp/src/ClpModel.cpp	2023-10-27 07:03:58.104302324 -0600
+@@ -1341,7 +1341,7 @@ void ClpModel::resize(int newNumberRows,
+       rowNames_.resize(newNumberRows);
+       lengthNames_ = CoinMax(lengthNames_, 8);
+       char name[16];
+-      for (unsigned int iRow = numberRowNames; iRow < newNumberRows; iRow++) {
++      for (int iRow = numberRowNames; iRow < newNumberRows; iRow++) {
+         sprintf(name, "R%7.7d", iRow);
+         rowNames_[iRow] = name;
+       }
+@@ -1351,7 +1351,7 @@ void ClpModel::resize(int newNumberRows,
+       columnNames_.resize(newNumberColumns);
+       lengthNames_ = CoinMax(lengthNames_, 8);
+       char name[16];
+-      for (unsigned int iColumn = numberColumnNames;
++      for (int iColumn = numberColumnNames;
+            iColumn < newNumberColumns; iColumn++) {
+         sprintf(name, "C%7.7d", iColumn);
+         columnNames_[iColumn] = name;
+@@ -3564,7 +3564,7 @@ void ClpModel::copyRowNames(const char *
+   int size = static_cast< int >(rowNames_.size());
+   if (size != numberRows_)
+     rowNames_.resize(numberRows_);
+-  unsigned int iRow;
++  int iRow;
+   for (iRow = first; iRow < last; iRow++) {
+     if (rowNames && rowNames[iRow - first] && strlen(rowNames[iRow - first])) {
+       rowNames_[iRow] = rowNames[iRow - first];
+@@ -3591,7 +3591,7 @@ void ClpModel::copyColumnNames(const cha
+   int size = static_cast< int >(columnNames_.size());
+   if (size != numberColumns_)
+     columnNames_.resize(numberColumns_);
+-  unsigned int iColumn;
++  int iColumn;
+   for (iColumn = first; iColumn < last; iColumn++) {
+     if (columnNames && columnNames[iColumn - first] && strlen(columnNames[iColumn - first])) {
+       columnNames_[iColumn] = columnNames[iColumn - first];
+@@ -3838,7 +3838,7 @@ ClpModel::rowNamesAsChar() const
+     rowNames = new char *[numberRows_ + 1];
+     int numberNames = static_cast< int >(rowNames_.size());
+     numberNames = CoinMin(numberRows_, numberNames);
+-    unsigned int iRow;
++    int iRow;
+     for (iRow = 0; iRow < numberNames; iRow++) {
+       if (rowName(iRow) != "") {
+         rowNames[iRow] = CoinStrdup(rowName(iRow).c_str());
+@@ -3877,7 +3877,7 @@ ClpModel::columnNamesAsChar() const
+     columnNames = new char *[numberColumns_];
+     int numberNames = static_cast< int >(columnNames_.size());
+     numberNames = CoinMin(numberColumns_, numberNames);
+-    unsigned int iColumn;
++    int iColumn;
+     for (iColumn = 0; iColumn < numberNames; iColumn++) {
+       if (columnName(iColumn) != "") {
+         columnNames[iColumn] = CoinStrdup(columnName(iColumn).c_str());
+diff -up Clp-releases-1.17.9/Clp/src/ClpSolver.cpp.orig Clp-releases-1.17.9/Clp/src/ClpSolver.cpp
+--- Clp-releases-1.17.9/Clp/src/ClpSolver.cpp.orig	2023-10-27 06:58:31.230571780 -0600
++++ Clp-releases-1.17.9/Clp/src/ClpSolver.cpp	2023-10-27 07:03:58.105302312 -0600
+@@ -3798,9 +3798,9 @@ static void statistics(ClpSimplex *origi
+       numberWritten = fwrite(stats, sizeof(int), 3, fpBlocks);
+       assert(numberWritten == 3);
+       numberWritten = fwrite(blockStart, sizeof(int), numberRows, fpBlocks);
+-      assert(numberWritten == numberRows);
++      assert(numberWritten == (size_t)numberRows);
+       numberWritten = fwrite(columnBlock, sizeof(int), numberColumns, fpBlocks);
+-      assert(numberWritten == numberColumns);
++      assert(numberWritten == (size_t)numberColumns);
+       fclose(fpBlocks);
+       if (writeMatrices) {
+         int *whichRows = new int[numberRows + numberColumns];

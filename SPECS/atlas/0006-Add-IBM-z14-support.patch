@@ -1,0 +1,276 @@
+From dce732e9fe47b44d1a985d10a0eb97aac6afa28e Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Wed, 25 Mar 2020 20:11:19 +0100
+Subject: [PATCH 6/8] Add IBM z14 support
+
+Add general support for IBM z14.  Also detect and handle the vector
+enhancements facility 1, which specifically adds single-precision FP
+arithmetic for vectors.
+---
+ CONFIG/include/atlconf.h            | 14 ++++----
+ CONFIG/src/Makefile                 |  6 ++++
+ CONFIG/src/atlcomp.txt              |  4 +++
+ CONFIG/src/backend/Make.ext         |  4 ++-
+ CONFIG/src/backend/archinfo_linux.c |  3 +-
+ CONFIG/src/backend/probe_vxz2.c     | 12 +++++++
+ CONFIG/src/probe_comp.c             |  3 +-
+ include/atlas_prefetch.h            |  3 +-
+ include/atlas_simd.h                | 53 +++++++++++++++++++++++++++++
+ 9 files changed, 91 insertions(+), 11 deletions(-)
+ create mode 100644 CONFIG/src/backend/probe_vxz2.c
+
+diff --git a/CONFIG/include/atlconf.h b/CONFIG/include/atlconf.h
+index e51d56d..3828fdb 100644
+--- a/CONFIG/include/atlconf.h
++++ b/CONFIG/include/atlconf.h
+@@ -25,11 +25,11 @@ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS,
+  * Corei3EP: v3 Haswell, E5-26XX
+  * Corei4: skylake
+  */
+-#define NMACH 62
++#define NMACH 63
+ static char *machnam[NMACH] =
+    {"UNKNOWN", "PPCG4", "PPCG5", "POWER3", "POWER4", "POWER5",
+     "POWER6", "POWER7", "POWER8", "POWERe6500",
+-    "IBMz9", "IBMz10", "IBMz196", "IBMz12", "IBMz13",
++    "IBMz9", "IBMz10", "IBMz196", "IBMz12", "IBMz13", "IBMz14",
+     "x86x87", "x86SSE1", "x86SSE2", "x86SSE3",
+     "P5", "P5MMX", "PPRO", "PII", "PIII", "PM", "CoreSolo",
+     "CoreDuo", "Core2Solo", "Core2", "Corei1", "Corei2", "Corei3",
+@@ -42,7 +42,7 @@ static char *machnam[NMACH] =
+     "ARM64xgene1", "ARM64a53", "ARM64a57"};
+ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+                IbmPwr6, IbmPwr7, IbmPwr8, Pwre6500,
+-               IbmZ9, IbmZ10, IbmZ196, IbmZ12, IbmZ13, /* s390(x) in Linux */
++               IbmZ9, IbmZ10, IbmZ196, IbmZ12, IbmZ13, IbmZ14, /* s390(x) */
+                x86x87, x86SSE1, x86SSE2, x86SSE3, /* generic targets */
+                IntP5, IntP5MMX, IntPPRO, IntPII, IntPIII, IntPM, IntCoreS,
+                IntCoreDuo, IntCore2Solo, IntCore2, IntCorei1, IntCorei2,
+@@ -82,7 +82,7 @@ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+ #define MachIsARM64(mach_) \
+    ( (mach_) >= ARM64xg && || (mach_) <= ARM64a57)
+ #define MachIsS390(mach_) \
+-   ( (mach_) >= IbmZ9 && (mach_) <= IbmZ13 )
++   ( (mach_) >= IbmZ9 && (mach_) <= IbmZ14 )
+ 
+ 
+ static char *f2c_namestr[5] = {"UNKNOWN","Add_", "Add__", "NoChange", "UpCase"};
+@@ -96,13 +96,13 @@ enum F2CNAME {f2c_NamErr=0, f2c_Add_, f2c_Add__, f2c_NoChange, f2c_UpCase};
+ enum F2CINT {f2c_IntErr=0, FintCint, FintClong, FintClonglong, FintCshort};
+ enum F2CSTRING {f2c_StrErr=0, fstrSun, fstrCray, fstrStructVal, fstrStructPtr};
+ 
+-#define NISA 15
++#define NISA 16
+ static char *ISAXNAM[NISA] =
+-   {"", "VSX", "VXZ", "AltiVec",
++   {"", "VSX", "VXZ2", "VXZ", "AltiVec",
+     "AVXMAC", "AVXFMA4", "AVX", "SSE3", "SSE2", "SSE1", "3DNow",
+     "FPV3D2MACNEON", "FPV3D16MACNEON", "FPV3D32MAC", "FPV3D16MAC"};
+ enum ISAEXT
+-   {ISA_None=0, ISA_VSX, ISA_VXZ, ISA_AV,
++   {ISA_None=0, ISA_VSX, ISA_VXZ2, ISA_VXZ, ISA_AV,
+     ISA_AVXMAC, ISA_AVXFMA4, ISA_AVX, ISA_SSE3, ISA_SSE2, ISA_SSE1, ISA_3DNow,
+     ISA_NEON, ISA_NEON16, ISA_VFP3D32MAC, ISA_VFP3D16MAC};
+ 
+diff --git a/CONFIG/src/Makefile b/CONFIG/src/Makefile
+index 212b9d7..782a4cf 100644
+--- a/CONFIG/src/Makefile
++++ b/CONFIG/src/Makefile
+@@ -158,6 +158,12 @@ IRun_NEON :
+ 	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_neon args="$(args)" \
+                 redir=config0.out
+ 	- cat config0.out
++IRun_VXZ2 :
++	$(CC) $(CCFLAGS) -march=native -mvx -mzvector -o xprobe_vxz2 \
++           $(SRCdir)/backend/probe_svec.c $(SRCdir)/backend/probe_vxz2.c
++	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_vxz2 args="$(args)" \
++                redir=config0.out
++	- cat config0.out
+ IRun_VXZ :
+ 	$(CC) $(CCFLAGS) -march=native -mvx -mzvector -o xprobe_vxz \
+            $(SRCdir)/backend/probe_dvec.c $(SRCdir)/backend/probe_vxz.c
+diff --git a/CONFIG/src/atlcomp.txt b/CONFIG/src/atlcomp.txt
+index 2ac71cf..2cfacc2 100644
+--- a/CONFIG/src/atlcomp.txt
++++ b/CONFIG/src/atlcomp.txt
+@@ -250,6 +250,10 @@ MACH=IBMz13 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+    'gcc' '-march=z13 -mtune=z13 -O2'
+ MACH=IBMz13 OS=ALL LVL=1000 COMPS=f77
+    'gfortran' '-march=z13 -mtune=z13 -O2'
++MACH=IBMz14 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
++   'gcc' '-march=z14 -mtune=z14 -O2'
++MACH=IBMz14 OS=ALL LVL=1000 COMPS=f77
++   'gfortran' '-march=z14 -mtune=z14 -O2'
+ #
+ # Windows defaults ; need to make SSE/SSE2 arch dep.
+ #
+diff --git a/CONFIG/src/backend/Make.ext b/CONFIG/src/backend/Make.ext
+index 4743353..794babf 100644
+--- a/CONFIG/src/backend/Make.ext
++++ b/CONFIG/src/backend/Make.ext
+@@ -39,7 +39,7 @@ files = archinfo_aix.c archinfo_freebsd.c archinfo_irix.c archinfo_linux.c \
+         probe_gas_mips.S probe_gas_parisc.S probe_gas_ppc.S probe_gas_s390.S \
+         probe_gas_sparc.S probe_gas_wow64.S probe_gas_x8632.S \
+         probe_gas_x8664.S probe_smac.c probe_svec.c probe_this_asm.c \
+-        probe_vxz.c
++        probe_vxz2.c probe_vxz.c
+ 
+ all : $(files)
+ 
+@@ -107,6 +107,8 @@ flibchkF.f : $(basf)
+ 	$(extF) -b $(basf) -o flibchkF.f rout=flibchkF.f
+ probe_arm32_FPABI.c : $(basf)
+ 	$(extC) -b $(basf) -o probe_arm32_FPABI.c rout=probe_arm32_FPABI
++probe_vxz2.c : $(basf)
++	$(extC) -b $(basf) -o probe_vxz2.c rout=probe_vxz2
+ probe_vxz.c : $(basf)
+ 	$(extC) -b $(basf) -o probe_vxz.c rout=probe_vxz
+ probe_aff_SETAFFNP.c : $(basf)
+diff --git a/CONFIG/src/backend/archinfo_linux.c b/CONFIG/src/backend/archinfo_linux.c
+index cdcee92..ed6f476 100644
+--- a/CONFIG/src/backend/archinfo_linux.c
++++ b/CONFIG/src/backend/archinfo_linux.c
+@@ -336,7 +336,8 @@ enum MACHTYPE ProbeArch()
+          else if (strstr(res, "2817") || strstr(res, "2818")) mach = IbmZ196;
+          else if (strstr(res, "2827") || strstr(res, "2828")) mach = IbmZ12;
+          else if (strstr(res, "2964") || strstr(res, "2965")) mach = IbmZ13;
+-         else mach = IbmZ13;  /* looks risky to me, but IBM folks did it */
++         else if (strstr(res, "3906") || strstr(res, "3907")) mach = IbmZ14;
++         else mach = IbmZ14;  /* looks risky to me, but IBM folks did it */
+          free(res);
+       }
+       break;
+diff --git a/CONFIG/src/backend/probe_vxz2.c b/CONFIG/src/backend/probe_vxz2.c
+new file mode 100644
+index 0000000..a69d92d
+--- /dev/null
++++ b/CONFIG/src/backend/probe_vxz2.c
+@@ -0,0 +1,12 @@
++#include <vecintrin.h>
++void do_vsum(float *z, float *x, float *y) // RETURNS: z = x + y
++{
++   vector float vx, vy;
++   vx = (vector float) {x[0], x[1], x[2], x[3]};
++   vy = (vector float) {y[0], y[1], y[2], y[3]};
++   vy += vx;
++   z[0] = vy[0];
++   z[1] = vy[1];
++   z[2] = vy[2];
++   z[3] = vy[3];
++}
+diff --git a/CONFIG/src/probe_comp.c b/CONFIG/src/probe_comp.c
+index 1652e24..857ea82 100644
+--- a/CONFIG/src/probe_comp.c
++++ b/CONFIG/src/probe_comp.c
+@@ -452,7 +452,7 @@ COMPNODE **GetDefaultComps(enum OSTYPE OS, enum MACHTYPE arch, int verb,
+       vp = "-mavx2 -mfma";
+    else if (vecexts & (1<<ISA_VSX))
+       vp = "-mvsx";
+-   else if (vecexts & (1<<ISA_VXZ))
++   else if ((vecexts & (1<<ISA_VXZ)) || (vecexts & (1<<ISA_VXZ2)))
+       vp = "-mvx -mzvector";
+    else if (vecexts & (1<<ISA_AV))
+       vp = "-maltivec";
+@@ -1207,6 +1207,7 @@ void GetBestGccVers(enum OSTYPE OS, enum MACHTYPE arch,
+    {
+    case IbmZ12:
+    case IbmZ13:
++   case IbmZ14:
+    case IntCorei3:
+    case IntCorei4:
+    case IntCorei2:
+diff --git a/include/atlas_prefetch.h b/include/atlas_prefetch.h
+index e7988a7..fa426ac 100644
+--- a/include/atlas_prefetch.h
++++ b/include/atlas_prefetch.h
+@@ -155,7 +155,8 @@
+    #define ATL_L1LS 32
+    #define ATL_L2LS 64
+ #elif defined(ATL_ARCH_IBMz196) || defined(ATL_ARCH_IBMz10) || \
+-      defined(ATL_ARCH_IBMzEC12) || defined(ATL_ARCH_IBMz13)
++      defined(ATL_ARCH_IBMzEC12) || defined(ATL_ARCH_IBMz13) || \
++      defined(ATL_ARCH_IbmZ14)
+    #define ATL_pfl1R(mem) __builtin_prefetch(mem, 0, 3)
+    #define ATL_pfl1W(mem) __builtin_prefetch(mem, 1, 3)
+    #define ATL_GOT_L1PREFETCH
+diff --git a/include/atlas_simd.h b/include/atlas_simd.h
+index f171933..eb75577 100644
+--- a/include/atlas_simd.h
++++ b/include/atlas_simd.h
+@@ -68,6 +68,11 @@
+           ((defined(DREAL) || defined(DCPLX)) && ATL_VLEN != 2)
+          #define ATL_FRCGNUVEC
+       #endif
++   #elif defined(ATL_VXZ2)
++      #if ((defined(SREAL) || defined(SCPLX)) && ATL_VLEN != 4) || \
++          ((defined(DREAL) || defined(DCPLX)) && ATL_VLEN != 2)
++         #define ATL_FRCGNUVEC
++      #endif
+    #elif defined(ATL_VXZ)
+       #if ATL_VLEN != 2
+          #define ATL_FRCGNUVEC
+@@ -113,6 +118,12 @@
+       #else
+          #define ATL_VLEN 2
+       #endif
++   #elif defined(ATL_VXZ2)
++      #if defined(SREAL) || defined(SCPLX)
++         #define ATL_VLEN 4
++      #else
++         #define ATL_VLEN 2
++      #endif
+    #elif defined(ATL_VXZ)
+       #define ATL_VLEN 2
+    #elif defined(ATL_NEON)
+@@ -376,6 +387,48 @@
+       #define ATL_vsplat0(d_, s_) d_ = vec_splat(s_, 0)
+       #define ATL_vsplat1(d_, s_) d_ = vec_splat(s_, 1)
+    #endif
++#elif defined(ATL_VXZ2)
++   #include <vecintrin.h>
++
++   #define ATL_VPERMI(s_, t_, i_) \
++     ((ATL_VTYPE) vec_permi((vector double) s_, (vector double) t_, i_))
++
++   #if defined(SREAL) || defined(SCPLX)
++      #define ATL_VTYPE vector float
++      #if ATL_VLEN != 4
++         #error "VSXZ2 supports only VLEN = 4 for floats!"
++      #endif
++      //#define ATL_vvrsum4(s0_, s1_, s2_, s3_) \
++      //{	 ATL_VTYPE t0_, t1_; \
++      //   t0_ = vec_mergeh(s0_, s1_) + vec_mergel(s0_, s1_); \
++      //   t1_ = vec_mergeh(s2_, s3_) + vec_mergel(s2_, s3_); \
++      //   s0_ = ATL_VPERMI(t0_, t1_, 0) + ATL_VPERMI(t0_, t1_, 3); \
++      //}
++      #define ATL_vsplat2(d_, s_) d_ = vec_splat(s_, 2)
++      #define ATL_vsplat3(d_, s_) d_ = vec_splat(s_, 3)
++   #else        /* double precision */
++      #define ATL_VTYPE vector double
++      #if ATL_VLEN != 2
++         #error "VSXZ2 supports only VLEN = 2 for doubles!"
++      #endif
++      #define ATL_vvrsum1(s0_) \
++      {  s0_ = vec_mergeh(s0_, s0_) + vec_mergel(s0_, s0_); }
++      #define ATL_vvrsum2(s0_, s1_) \
++      {  s0_ = vec_mergeh(s0_, s1_) + vec_mergel(s0_, s1_); }
++   #endif
++   #define ATL_vld(v_, p_) v_ = *(ATL_VTYPE *)(p_)
++   #define ATL_vst(p_, v_) *(ATL_VTYPE *)(p_) = v_
++   #define ATL_vzero(v_) v_ = vec_splats((TYPE)0.0)
++   #define ATL_vcopy(d_, s_) d_ = s_
++   #define ATL_vbcast(v_, p_) v_ = vec_splats(*((TYPE*)(p_)))
++   #define ATL_vuld(v_, p_) v_ = vec_xl(0, (TYPE *)(p_))
++   #define ATL_vust(p_, v_) vec_xst(v_, 0, (TYPE *)(p_))
++   #define ATL_vadd(d_, s1_, s2_) d_ =  s1_ + s2_
++   #define ATL_vsub(d_, s1_, s2_) d_ =  s1_ - s2_
++   #define ATL_vmul(d_, s1_, s2_) d_ =  s1_ * s2_
++   #define ATL_vmac(d_, s1_, s2_) d_ = __builtin_s390_vec_madd(s1_, s2_, d_)
++   #define ATL_vsplat0(d_, s_) d_ = vec_splat(s_, 0)
++   #define ATL_vsplat1(d_, s_) d_ = vec_splat(s_, 1)
+ #elif defined(ATL_VXZ)
+    #include <vecintrin.h>
+ 
+-- 
+2.23.0
+

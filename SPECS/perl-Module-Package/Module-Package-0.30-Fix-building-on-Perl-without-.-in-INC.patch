@@ -1,0 +1,25 @@
+From fc4e65f8d43226739624e15fe3eefa0d05fd8f96 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 17 May 2017 16:48:56 +0200
+Subject: [PATCH] Fix building on Perl without "." in @INC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 93b5ed5..fffb0d1 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,3 +1,4 @@
++BEGIN { push @INC, '.'; }
+ use inc::Module::Package 'Ingy:modern 0.17';
+ 
+ # The default module 'lib/Module/Package.pm' has to be very strict
+-- 
+2.9.4
+

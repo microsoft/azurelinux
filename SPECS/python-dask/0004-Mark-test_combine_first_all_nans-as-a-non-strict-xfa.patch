@@ -1,0 +1,28 @@
+From 496c3363ca3bca4e0785f94e66bd3ff7f7ebb303 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 18 Aug 2025 00:22:38 -0400
+Subject: [PATCH 4/4] Mark test_combine_first_all_nans as a non-strict xfail
+
+It seems to be fine.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/dataframe/tests/test_dataframe.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dask/dataframe/tests/test_dataframe.py b/dask/dataframe/tests/test_dataframe.py
+index 904736fc9..6e77ffb3f 100644
+--- a/dask/dataframe/tests/test_dataframe.py
++++ b/dask/dataframe/tests/test_dataframe.py
+@@ -1877,7 +1877,7 @@ def test_combine_first():
+ 
+ 
+ # This will likely break when the deprecation is enacted in Pandas 3.0
+-@pytest.mark.xfail(PANDAS_GE_210, reason="https://github.com/dask/dask/issues/10931")
++@pytest.mark.xfail(PANDAS_GE_210, reason="https://github.com/dask/dask/issues/10931", strict=False)
+ @pytest.mark.parametrize(
+     "dtype_lhs,dtype_rhs",
+     [("f8", "i8"), ("f8", "f4"), ("datetime64[s]", "datetime64[ns]")],
+-- 
+2.52.0
+

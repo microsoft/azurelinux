@@ -1,0 +1,104 @@
+From: Bo YU <tsu.yubo@gmail.com>
+Date: Mon, 27 Jun 2022 20:11:46 +0800
+Subject: add-support-riscv64
+
+add support for riscv64 arch
+
+Original reference e2k code for supporting riscv64 arch
+---
+ include/libEMF/wine/winnt.h | 75 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/include/libEMF/wine/winnt.h b/include/libEMF/wine/winnt.h
+index 39e2f90..1609f38 100644
+--- a/include/libEMF/wine/winnt.h
++++ b/include/libEMF/wine/winnt.h
+@@ -69,6 +69,10 @@
+ # define  WORDS_BIGENDIAN
+ # define  BITFIELDS_BIGENDIAN
+ # undef  ALLOW_UNALIGNED_ACCESS
++#elif defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 64
++# undef  WORDS_BIGENDIAN
++# undef  BITFIELDS_BIGENDIAN
++# undef  ALLOW_UNALIGNED_ACCESS
+ #elif !defined(RC_INVOKED)
+ # error Unknown CPU architecture!
+ #endif
+@@ -1582,6 +1586,77 @@ typedef struct _CONTEXT {
+ 
+ #endif /* __e2k__ */
+ 
++#if defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen==64
++/*
++ * FIXME:
++ *
++ * There is not yet an official CONTEXT structure defined for the
++ * riscv64 architecture (64-bit LE), so I just made one up.
++ *
++ */
++
++#define CONTEXT_RISCV64             0x4000000
++#define CONTEXT_CONTROL         (CONTEXT_RISCV64 | 0x00000001)
++#define CONTEXT_INTEGER         (CONTEXT_RISCV64 | 0x00000002)
++#define CONTEXT_FLOATING_POINT  (CONTEXT_RISCV64 | 0x00000004)
++#define CONTEXT_DEBUG_REGISTERS (CONTEXT_RISCV64 | 0x00000008)
++
++#define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_INTEGER)
++
++#define EXCEPTION_READ_FAULT    0
++#define EXCEPTION_WRITE_FAULT   1
++#define EXCEPTION_EXECUTE_FAULT 8
++
++typedef struct _CONTEXT {
++    ULONG ContextFlags;
++
++    /* This section is specified/returned if the ContextFlags word contains
++       the flag CONTEXT_INTEGER. */
++    ULONGLONG X0;
++    ULONGLONG X1;
++    ULONGLONG X2;
++    ULONGLONG X3;
++    ULONGLONG X4;
++    ULONGLONG X5;
++    ULONGLONG X6;
++    ULONGLONG X7;
++    ULONGLONG X8;
++    ULONGLONG X9;
++    ULONGLONG X10;
++    ULONGLONG X11;
++    ULONGLONG X12;
++    ULONGLONG X13;
++    ULONGLONG X14;
++    ULONGLONG X15;
++    ULONGLONG X16;
++    ULONGLONG X17;
++    ULONGLONG X18;
++    ULONGLONG X19;
++    ULONGLONG X20;
++    ULONGLONG X21;
++    ULONGLONG X22;
++    ULONGLONG X23;
++    ULONGLONG X24;
++    ULONGLONG X25;
++    ULONGLONG X26;
++    ULONGLONG X27;
++    ULONGLONG X28;
++    ULONGLONG X29;
++    ULONGLONG X30;
++    ULONGLONG X31;
++
++    /* These are selected by CONTEXT_CONTROL */
++    ULONGLONG Sp;
++    ULONGLONG Pc;
++    ULONGLONG PState;
++
++    /* These are selected by CONTEXT_FLOATING_POINT */
++    /* FIXME */
++} CONTEXT;
++
++#endif /* __riscv64__ */
++
++
+ #if !defined(CONTEXT_FULL) && !defined(RC_INVOKED)
+ #error You need to define a CONTEXT for your CPU
+ #endif

@@ -1,0 +1,51 @@
+diff --git a/plugins/gssapi.c b/plugins/gssapi.c
+index 5d900c5e..4688bb9a 100644
+--- a/plugins/gssapi.c
++++ b/plugins/gssapi.c
+@@ -1567,7 +1567,6 @@ int gssapiv2_server_plug_init(
+ {
+ #ifdef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+     const char *keytab = NULL;
+-    char keytab_path[1024];
+     unsigned int rl;
+ #endif
+     
+@@ -1589,15 +1588,7 @@ int gssapiv2_server_plug_init(
+ 	    return SASL_FAIL;
+ 	}
+ 	
+-	if(strlen(keytab) > 1024) {
+-	    utils->log(NULL, SASL_LOG_ERR,
+-		       "path to keytab is > 1024 characters");
+-	    return SASL_BUFOVER;
+-	}
+-	
+-	strncpy(keytab_path, keytab, 1024);
+-	
+-	gsskrb5_register_acceptor_identity(keytab_path);
++	gsskrb5_register_acceptor_identity(keytab);
+     }
+ #endif
+     
+diff --git a/plugins/ntlm.c b/plugins/ntlm.c
+index aeb3ac34..8a7d9065 100644
+--- a/plugins/ntlm.c
++++ b/plugins/ntlm.c
+@@ -375,10 +375,15 @@ static unsigned char *P16_lm(unsigned char *P16, sasl_secret_t *passwd,
+ 			     unsigned *buflen __attribute__((unused)),
+ 			     int *result)
+ {
+-    char P14[14];
++    char P14[14] = { 0 };
++    int Plen;
+     unsigned char S8[] = { 0x4b, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 };
+ 
+-    strncpy(P14, (const char *) passwd->data, sizeof(P14));
++    Plen = sizeof(P14);
++    if (passwd->len < Plen) {
++        Plen = passwd->len;
++    }
++    memcpy(P14, (const char *) passwd->data, Plen);
+     ucase(P14, sizeof(P14));
+ 
+     E(P16, (unsigned char *) P14, sizeof(P14), S8, sizeof(S8));

@@ -1,0 +1,10 @@
+diff -up pegasus/src/Pegasus/ExportClient/tests/libraries.mak.orig pegasus/src/Pegasus/ExportClient/tests/libraries.mak
+--- pegasus/src/Pegasus/ExportClient/tests/libraries.mak.orig	2020-11-26 10:20:13.938292092 +0100
++++ pegasus/src/Pegasus/ExportClient/tests/libraries.mak	2020-11-26 10:25:30.248432039 +0100
+@@ -35,4 +35,5 @@ LIBRARIES= \
+     pegrepository \
+     pegconfig \
+     pegclient \
+-    pegcommon
++    pegcommon \
++    pegwsmserver

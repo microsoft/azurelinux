@@ -1,0 +1,88 @@
+diff --git a/src/Common/Utility.cpp b/src/Common/Utility.cpp
+index aee50ce0..b84d2480 100644
+--- a/src/Common/Utility.cpp
++++ b/src/Common/Utility.cpp
+@@ -543,7 +543,22 @@ namespace usbguard
+     return rulefile_list;
+   }
+ 
+-  bool isValidName(const std::string& name)
++  static bool isValidUID(const std::string& uid)
++  {
++    if (uid.empty()) {
++      return false;
++    }
++
++    for (char c : uid) {
++      if (!std::isdigit(c)) {
++        return false;
++      }
++    }
++
++    return true;
++  }
++
++  static bool isValidName(const std::string& name)
+   {
+     const char* s = name.data();
+ 
+@@ -568,6 +583,10 @@ namespace usbguard
+     return true;
+   }
+ 
++  bool isValidNameOrUID(const std::string& input) {
++    return isValidName(input) || isValidUID(input);
++  }
++
+ } /* namespace usbguard */
+ 
+ /* vim: set ts=2 sw=2 et */
+diff --git a/src/Common/Utility.hpp b/src/Common/Utility.hpp
+index d49e24dc..ac0bae4f 100644
+--- a/src/Common/Utility.hpp
++++ b/src/Common/Utility.hpp
+@@ -319,12 +319,11 @@ namespace usbguard
+   /**
+    * @brief Checks whether a given name is a valid group/user name
+    *
+-   * User/group names must match [A-Za-z_][A-Za-z0-9_-]*[$]
+    *
+    * @param name Name to check
+    * @return True if given name is valid, false otherwise
+    */
+-  bool isValidName(const std::string& name);
++  bool isValidNameOrUID(const std::string& name);
+ 
+ } /* namespace usbguard */
+ 
+diff --git a/src/Library/public/usbguard/IPCServer.cpp b/src/Library/public/usbguard/IPCServer.cpp
+index 973eb8bd..b75df136 100644
+--- a/src/Library/public/usbguard/IPCServer.cpp
++++ b/src/Library/public/usbguard/IPCServer.cpp
+@@ -36,8 +36,8 @@ namespace usbguard
+       throw Exception("IPC access control", "name too long", name);
+     }
+ 
+-    if (!isValidName(name)) {
+-      throw Exception("IPC access control", "invalid name format", name);
++	if (!isValidNameOrUID(name)) {
++      throw Exception("IPC access control", "invalid name or UID format", name);
+     }
+   }
+ 
+diff --git a/src/Library/public/usbguard/IPCServer.hpp b/src/Library/public/usbguard/IPCServer.hpp
+index ddb1d8a7..0ba6f93d 100644
+--- a/src/Library/public/usbguard/IPCServer.hpp
++++ b/src/Library/public/usbguard/IPCServer.hpp
+@@ -50,9 +50,9 @@ namespace usbguard
+     /**
+      * @brief Checks whether given name is a valid access control name.
+      *
+-     * Name is a valid access control name iff:
++     * Name is a valid access control name if:
+      *  1. it is not longer then 32 characters
+-     *  2. it matches regex [A-Za-z_][A-Za-z0-9_-]*[$]
++     *  2. it is aligned with the syntax of useradd(8)
+      *
+      * @param name Name to be verified.
+      * @throw Exception If \p name is not a valid access control name.

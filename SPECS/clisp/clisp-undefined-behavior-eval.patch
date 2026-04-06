@@ -1,0 +1,15 @@
+Fixes this UBSAN error:
+
+../src/eval.d:5808:11: runtime error: variable length array bound evaluates to non-positive value 0
+
+--- src/eval.d.orig	2024-12-28 00:47:59.000000000 -0700
++++ src/eval.d	2025-02-10 09:39:02.285198247 -0700
+@@ -5805,7 +5805,7 @@ local /*maygc*/ Values interpret_bytecod
+   var uintL private_SP_length =
+     (uintL)(((Codevec)codeptr)->ccv_spdepth_1)
+     + jmpbufsize * (uintL)(((Codevec)codeptr)->ccv_spdepth_jmpbufsize);
+-  var DYNAMIC_ARRAY(private_SP_space,SPint,private_SP_length);
++  var DYNAMIC_ARRAY(private_SP_space,SPint,private_SP_length+1);
+   var SPint* private_SP = &private_SP_space[private_SP_length];
+   #undef SP_
+   #undef _SP_

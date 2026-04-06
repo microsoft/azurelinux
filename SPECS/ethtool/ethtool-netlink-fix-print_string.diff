@@ -1,0 +1,45 @@
+From bcbd52b65d55d0ea80678b9d14b3f0bd8c717b91 Mon Sep 17 00:00:00 2001
+From: Michel Lind <michel@michel-slm.name>
+Date: Thu, 24 Jul 2025 17:10:22 -0500
+Subject: [PATCH ethtool] netlink: fix print_string when the value is NULL
+
+The previous fix in commit b70c92866102 ("netlink: fix missing headers
+in text output") handles the case when value is NULL by still using
+`fprintf` but passing no value.
+
+This fails if `-Werror=format-security` is passed to gcc, as is the
+default in distros like Fedora.
+
+```
+json_print.c: In function 'print_string':
+json_print.c:147:25: error: format not a string literal and no format arguments [-Werror=format-security]
+  147 |                         fprintf(stdout, fmt);
+      |
+```
+
+Use `fprintf(stdout, "%s", fmt)` instead, using the format string as the
+value, since in this case we know it is just a string without format
+chracters.
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Michel Lind <michel@michel-slm.name>
+---
+ json_print.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/json_print.c b/json_print.c
+index e07c651..75e6cd9 100644
+--- a/json_print.c
++++ b/json_print.c
+@@ -144,7 +144,7 @@ void print_string(enum output_type type,
+ 		if (value)
+ 			fprintf(stdout, fmt, value);
+ 		else
+-			fprintf(stdout, fmt);
++			fprintf(stdout, "%s", fmt);
+ 	}
+ }
+ 
+-- 
+2.50.1
+

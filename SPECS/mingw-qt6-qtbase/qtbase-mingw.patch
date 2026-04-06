@@ -1,0 +1,18 @@
+diff -rupN --no-dereference qtbase-everywhere-src-6.10.1/src/gui/CMakeLists.txt qtbase-everywhere-src-6.10.1-new/src/gui/CMakeLists.txt
+--- qtbase-everywhere-src-6.10.1/src/gui/CMakeLists.txt	2025-08-11 06:54:51.000000000 +0200
++++ qtbase-everywhere-src-6.10.1-new/src/gui/CMakeLists.txt	2025-09-02 15:30:08.787836142 +0200
+@@ -784,12 +784,12 @@ qt_internal_extend_target(Gui CONDITION
+         WrapFreetype::WrapFreetype
+ )
+ 
+-qt_internal_extend_target(Gui CONDITION UNIX AND NOT APPLE
++qt_internal_extend_target(Gui CONDITION (UNIX OR MINGW) AND NOT APPLE
+     SOURCES
+         text/unix/qgenericunixfontdatabase_p.h
+ )
+ 
+-qt_internal_extend_target(Gui CONDITION QT_FEATURE_fontconfig AND QT_FEATURE_freetype AND UNIX AND NOT APPLE
++qt_internal_extend_target(Gui CONDITION QT_FEATURE_fontconfig AND QT_FEATURE_freetype AND (UNIX OR MINGW) AND NOT APPLE
+     SOURCES
+         text/unix/qfontconfigdatabase.cpp text/unix/qfontconfigdatabase_p.h
+         text/unix/qfontenginemultifontconfig.cpp text/unix/qfontenginemultifontconfig_p.h

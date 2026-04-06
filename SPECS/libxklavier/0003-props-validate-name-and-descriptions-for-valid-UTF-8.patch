@@ -1,0 +1,96 @@
+From c95e5dd9c041bc7e41fb40df96076200458fc19e Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Mon, 22 Jan 2024 09:39:41 +1000
+Subject: [PATCH 3/3] props: validate name and descriptions for valid UTF-8
+
+All three are truncated to a fixed max length, potentially leading to
+invalid UTF-8 sequences. Ensure that can't happen by chopping off any
+invalid sequences.
+
+See
+https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config/-/issues/435
+---
+ libxklavier/xklavier_props.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/libxklavier/xklavier_props.c b/libxklavier/xklavier_props.c
+index 73996d6..8929de7 100644
+--- a/libxklavier/xklavier_props.c
++++ b/libxklavier/xklavier_props.c
+@@ -21,6 +21,8 @@
+ #include <locale.h>
+ #include <string.h>
+ 
++#include <glib.h>
++
+ #include <X11/Xlib.h>
+ #include <X11/Xatom.h>
+ 
+@@ -30,6 +32,19 @@
+ 
+ #include "xklavier_private.h"
+ 
++/* Truncate the given null-terminated string (within an allocation
++ * of sz bytes) to the longest continuously valid UTF-8 sequence */
++static void
++utf8_truncate(gchar string[], size_t sz)
++{
++	const char *end;
++
++	if (!g_utf8_validate (string, -1, &end)) {
++		ptrdiff_t valid = end - (const gchar *)string;
++		memset (&string[valid], 0, sz - valid);
++	}
++}
++
+ static GObjectClass *parent_class = NULL;
+ 
+ static void xkl_config_rec_destroy(XklConfigRec * data);
+@@ -64,10 +79,12 @@ void
+ xkl_config_item_set_name(XklConfigItem * item,
+ 			 const gchar * name)
+ {
+-	if (name != NULL)
++	if (name != NULL) {
+ 		strncpy (item->name, name, XKL_MAX_CI_NAME_LENGTH-1);
+-	else
++		utf8_truncate (item->name, sizeof (item->name));
++	} else {
+ 		item->name[0] = '\0';
++	}
+ }
+ 
+ const gchar *
+@@ -80,10 +97,12 @@ void
+ xkl_config_item_set_short_description(XklConfigItem * item,
+ 				      const gchar * short_description)
+ {
+-	if (short_description != NULL)
++	if (short_description != NULL) {
+ 		strncpy (item->short_description, short_description, XKL_MAX_CI_SHORT_DESC_LENGTH-1);
+-	else
++		utf8_truncate (item->short_description, sizeof (item->short_description));
++	} else {
+ 		item->short_description[0] = '\0';
++	}
+ }
+ 
+ const gchar *
+@@ -96,10 +115,12 @@ void
+ xkl_config_item_set_description(XklConfigItem * item,
+ 				const gchar * description)
+ {
+-	if (description != NULL)
++	if (description != NULL) {
+ 		strncpy (item->description, description, XKL_MAX_CI_DESC_LENGTH-1);
+-	else
++		utf8_truncate (item->description, sizeof (item->description));
++	} else {
+ 		item->description[0] = '\0';
++	}
+ }
+ 
+ G_DEFINE_TYPE(XklConfigRec, xkl_config_rec, G_TYPE_OBJECT)
+-- 
+2.43.0
+

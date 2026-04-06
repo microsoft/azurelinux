@@ -1,0 +1,12 @@
+diff -up hexedit/Makefile-build.in~ hexedit/Makefile-build.in
+--- hexedit/Makefile-build.in~	2008-11-07 17:50:57.000000000 +0200
++++ hexedit/Makefile-build.in	2013-03-26 17:14:29.755829478 +0200
+@@ -23,7 +23,7 @@ FROMINFILES = hexedit-$(VERSION).lsm hex
+ dynamic:
+ 	$(MAKE) $(PRODUCT)
+ 	install -d -m 755 usr/bin
+-	install -s -m 755 $(PRODUCT) usr/bin
++	install -m 755 $(PRODUCT) usr/bin
+ 	install -d -m 755 usr/man/man1
+ 	install -m 644 $(PRODUCT).1 usr/man/man1
+ 	tar cfz $(DYNAMICBIN) usr

@@ -1,0 +1,79 @@
+From 159042c71bbdd5909f792208dcdffffb1674ecfe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 19 Aug 2021 16:07:06 +0200
+Subject: [PATCH] Fix a crash in gss_release_oid() when destructing out_mech
+ returned by gss_accept_sec_context()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If Perl GSSAPI was built against MIT krb5, an example gss-server.pl
+script crashed like this:
+
+    Program terminated with signal SIGSEGV, Segmentation fault.
+    #0  0x00007f27f3d48b23 in __GI___libc_free (mem=<optimized out>)
+        at malloc.c:3131
+    3131	  ar_ptr = arena_for_chunk (p);
+    (gdb) bt
+    #0  0x00007f27f3d48b23 in __GI___libc_free (mem=<optimized out>)
+        at malloc.c:3131
+    #1  0x00007f27f2fe17c6 in generic_gss_release_oid (
+        minor_status=minor_status@entry=0x7fffc750333c,
+        oid=oid@entry=0x7fffc7503340) at oid_ops.c:102
+    #2  0x00007f27f2fee6df in gss_release_oid (
+        minor_status=minor_status@entry=0x7fffc750333c,
+        oid=oid@entry=0x7fffc7503340) at g_initialize.c:202
+    #3  0x00007f27f322f5cf in XS_GSSAPI__OID_DESTROY (my_perl=<optimized out>,
+        cv=0x564037c87130) at ./xs/OID.xs:24
+    #4  0x00007f27f4f58149 in Perl_pp_entersub (my_perl=0x5640378d42a0)
+        at pp_hot.c:4227
+
+The cause is that gss_accept_sec_context() returns a pointer to
+a static storage in out_mech argument. When GSSAPI passed out_mech to
+a desctructor, the invoked gss_release_oid() crashed when freeing the
+memory.
+
+Accoding to RFC 2744, the static storage is correct. Hence the flaw is
+on Perl GSSAPI side. This patch fixes it by copying the out_mech OID
+object on a heap which is then correctly processed by
+gss_release_oid().
+
+CPAN RT#121873.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ xs/Context.xs | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/xs/Context.xs b/xs/Context.xs
+index d176f08..4549595 100644
+--- a/xs/Context.xs
++++ b/xs/Context.xs
+@@ -80,6 +80,24 @@ accept(context, acc_cred, in_token, binding, out_name, out_mech, out_token, out_
+ 				       &in_token, binding, out_name, out_mech,
+ 				       &out_token, out_flags, out_time,
+ 				       delegated_cred);
++#if !defined(HEIMDAL)
++	if (out_mech && *out_mech) {
++		/* RFC 2744 documents that the returned *out_mech is a pointer
++		 * to static data. To prevent from freeing them when destructing
++		 * out_mech, we change *out_mech into a pointer to a heap-allocated
++		 * buffer with the same content. Otherwise, MITKRB5-provided
++		 * gss_release_oid() deallocator which cannot recognize this static
++		 * storage would crash. We use malloc() because gss_release_oid() used
++		 * free(). */
++		GSSAPI__OID copy = malloc(sizeof(*copy));
++		if (!copy) croak("Not enough memory for copying out_mech!");
++		copy->elements = malloc((*out_mech)->length);
++		if (!copy->elements) croak("Not enough memory for copying out_mech!");
++		memcpy(copy->elements, (*out_mech)->elements, (*out_mech)->length);
++		copy->length = (*out_mech)->length;
++		*out_mech = copy;
++    }
++#endif
+     OUTPUT:
+ 	RETVAL
+ 	context
+-- 
+2.31.1
+

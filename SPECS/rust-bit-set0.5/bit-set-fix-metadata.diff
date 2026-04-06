@@ -1,0 +1,18 @@
+--- bit-set-0.5.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bit-set-0.5.3/Cargo.toml	2025-01-07T21:12:41.751169+00:00
+@@ -23,14 +23,12 @@
+ ]
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/contain-rs/bit-set"
++exclude = ["/*.sh"]
+ 
+ [dependencies.bit-vec]
+ version = "0.6.1"
+ default-features = false
+ 
+-[dev-dependencies.rand]
+-version = "0.3"
+-
+ [features]
+ default = ["std"]
+ std = ["bit-vec/std"]

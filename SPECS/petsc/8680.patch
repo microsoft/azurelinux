@@ -1,0 +1,345 @@
+From 39933f976f417254249fc71ce65f98b56facd961 Mon Sep 17 00:00:00 2001
+From: Stefano Zampini <stefano.zampini@gmail.com>
+Date: Mon, 1 Sep 2025 17:57:08 +0300
+Subject: [PATCH 1/2] petsc4py: fix tests for python3.14 failures with
+ getrefcount
+
+---
+ src/binding/petsc4py/test/test_mat_py.py |  6 ++----
+ src/binding/petsc4py/test/test_nsp.py    |  4 ----
+ src/binding/petsc4py/test/test_pc_py.py  | 10 +++-------
+ src/binding/petsc4py/test/test_tao_py.py | 20 +++++++++++---------
+ src/binding/petsc4py/test/test_ts_py.py  | 17 +++++++++--------
+ 5 files changed, 25 insertions(+), 32 deletions(-)
+
+diff --git a/src/binding/petsc4py/test/test_mat_py.py b/src/binding/petsc4py/test/test_mat_py.py
+index e91f6ba73438..d8d487b7b6b0 100644
+--- a/src/binding/petsc4py/test/test_mat_py.py
++++ b/src/binding/petsc4py/test/test_mat_py.py
+@@ -322,17 +322,15 @@ class TestMatrix(unittest.TestCase):
+             self.assertEqual(getrefcount(self._getCtx()), 2)
+ 
+     def tearDown(self):
+-        ctx = self.A.getPythonContext()
+-        self.assertEqual(getrefcount(ctx), 3)
++        self.assertEqual(getrefcount(self._getCtx()), 2)
+         self.A.destroy()  # XXX
+         self.A = None
+         PETSc.garbage_cleanup()
+-        self.assertEqual(getrefcount(ctx), 2)
+ 
+     def testBasic(self):
++        self.assertEqual(getrefcount(self._getCtx()), 2)
+         ctx = self.A.getPythonContext()
+         self.assertTrue(self._getCtx() is ctx)
+-        self.assertEqual(getrefcount(ctx), 3)
+ 
+     def testSetUp(self):
+         ctx = self.A.getPythonContext()
+diff --git a/src/binding/petsc4py/test/test_nsp.py b/src/binding/petsc4py/test/test_nsp.py
+index d5c478a8118f..fe7ee64dea7a 100644
+--- a/src/binding/petsc4py/test/test_nsp.py
++++ b/src/binding/petsc4py/test/test_nsp.py
+@@ -1,6 +1,5 @@
+ import unittest
+ from petsc4py import PETSc
+-from sys import getrefcount
+ 
+ # --------------------------------------------------------------------
+ 
+@@ -67,15 +66,12 @@ class TestNullSpace(unittest.TestCase):
+             vec.set(0)
+ 
+         self.nullsp.setFunction(rem)
+-        self.assertEqual(getrefcount(rem) - 1, 2)
+         dct = self.nullsp.getDict()
+         self.assertTrue(dct is not None)
+-        self.assertEqual(getrefcount(dct) - 1, 2)
+         fun, a, kw = dct['__function__']
+         self.assertTrue(fun is rem)
+         self.nullsp.setFunction(None)
+         fun = dct.get('__function__')
+-        self.assertEqual(getrefcount(rem) - 1, 1)
+         self.assertTrue(fun is None)
+ 
+ 
+diff --git a/src/binding/petsc4py/test/test_pc_py.py b/src/binding/petsc4py/test/test_pc_py.py
+index 755988f239b5..a98ad7079ea8 100644
+--- a/src/binding/petsc4py/test/test_pc_py.py
++++ b/src/binding/petsc4py/test/test_pc_py.py
+@@ -149,8 +149,7 @@ class TestPCPYTHON(unittest.TestCase):
+         del OptDB['pc_python_type']
+         self.assertTrue(self._getCtx().log['create'] == 1)
+         self.assertTrue(self._getCtx().log['setFromOptions'] == 1)
+-        ctx = self._getCtx()
+-        self.assertEqual(getrefcount(ctx), 3)
++        self.assertEqual(getrefcount(self._getCtx()), 2)
+ 
+     def testGetType(self):
+         ctx = self.pc.getPythonContext()
+@@ -163,7 +162,6 @@ class TestPCPYTHON(unittest.TestCase):
+         self.pc = None
+         PETSc.garbage_cleanup()
+         self.assertTrue(ctx.log['destroy'] == 1)
+-        self.assertEqual(getrefcount(ctx), 2)
+ 
+     def _prepare(self):
+         A = PETSc.Mat().createAIJ([3, 3], comm=PETSc.COMM_SELF)
+@@ -273,10 +271,8 @@ class TestPCPYTHON(unittest.TestCase):
+         self.assertEqual(self.pc.getRefCount(), 1)
+ 
+     def testGetSetContext(self):
+-        ctx = self.pc.getPythonContext()
+-        self.pc.setPythonContext(ctx)
+-        self.assertEqual(getrefcount(ctx), 3)
+-        del ctx
++        self.pc.setPythonContext(self._getCtx())
++        self.assertEqual(getrefcount(self.pc.getPythonContext()), 2)
+ 
+ 
+ class TestPCPYTHON2(TestPCPYTHON):
+diff --git a/src/binding/petsc4py/test/test_tao_py.py b/src/binding/petsc4py/test/test_tao_py.py
+index 1c7340624ef1..abd4515c7cd5 100644
+--- a/src/binding/petsc4py/test/test_tao_py.py
++++ b/src/binding/petsc4py/test/test_tao_py.py
+@@ -63,20 +63,18 @@ class TestTaoPython(unittest.TestCase):
+     def setUp(self):
+         self.tao = PETSc.TAO()
+         self.tao.createPython(MyTao(), comm=PETSc.COMM_SELF)
+-        ctx = self.tao.getPythonContext()
+-        self.assertEqual(getrefcount(ctx), 3)
+-        self.assertEqual(ctx.log['create'], 1)
++        self.assertEqual(getrefcount(self._getCtx()), 2)
++        self.assertEqual(self._getCtx().log['create'], 1)
+         self.nsolve = 0
+ 
+     def tearDown(self):
+-        ctx = self.tao.getPythonContext()
+-        self.assertEqual(getrefcount(ctx), 3)
+-        self.assertTrue('destroy' not in ctx.log)
++        self.assertEqual(getrefcount(self._getCtx()), 2)
++        self.assertTrue('destroy' not in self._getCtx().log)
++        ctx = self._getCtx()
+         self.tao.destroy()
+         self.tao = None
+         PETSc.garbage_cleanup()
+         self.assertEqual(ctx.log['destroy'], 1)
+-        self.assertEqual(getrefcount(ctx), 2)
+ 
+     def testGetType(self):
+         ctx = self.tao.getPythonContext()
+@@ -98,9 +96,10 @@ class TestTaoPython(unittest.TestCase):
+         tao.setMaximumIterations(3)
+ 
+         def _update(tao, it, cnt):
+-             cnt += 1
++            cnt += 1
++
+         cnt_up = numpy.array(0)
+-        tao.setUpdate(_update, (cnt_up,) )
++        tao.setUpdate(_update, (cnt_up,))
+         tao.setSolution(x)
+ 
+         # Call the solve method of MyTAO
+@@ -136,6 +135,9 @@ class TestTaoPython(unittest.TestCase):
+         self.assertEqual(cnt_up, 2 * n)
+         tao.cancelMonitor()
+ 
++    def _getCtx(self):
++        return self.tao.getPythonContext()
++
+ 
+ # --------------------------------------------------------------------
+ 
+diff --git a/src/binding/petsc4py/test/test_ts_py.py b/src/binding/petsc4py/test/test_ts_py.py
+index 08c5380fe1e6..477a49138591 100644
+--- a/src/binding/petsc4py/test/test_ts_py.py
++++ b/src/binding/petsc4py/test/test_ts_py.py
+@@ -74,20 +74,18 @@ class TestTSPython(unittest.TestCase):
+         self.ts.createPython(MyTS(), comm=PETSc.COMM_SELF)
+         eft = PETSc.TS.ExactFinalTime.STEPOVER
+         self.ts.setExactFinalTime(eft)
+-        ctx = self.ts.getPythonContext()
+-        self.assertEqual(getrefcount(ctx), 3)
+-        self.assertEqual(ctx.log['create'], 1)
++        self.assertEqual(getrefcount(self._getCtx()), 2)
++        self.assertEqual(self._getCtx().log['create'], 1)
+         self.nsolve = 0
+ 
+     def tearDown(self):
+-        ctx = self.ts.getPythonContext()
+-        self.assertEqual(getrefcount(ctx), 3)
+-        self.assertTrue('destroy' not in ctx.log)
+-        self.ts.destroy()  # XXX
++        self.assertEqual(getrefcount(self._getCtx()), 2)
++        self.assertTrue('destroy' not in self._getCtx().log)
++        ctx = self._getCtx()
++        self.ts.destroy()
+         self.ts = None
+         PETSc.garbage_cleanup()
+         self.assertEqual(ctx.log['destroy'], 1)
+-        self.assertEqual(getrefcount(ctx), 2)
+ 
+     def testGetType(self):
+         ctx = self.ts.getPythonContext()
+@@ -183,6 +181,9 @@ class TestTSPython(unittest.TestCase):
+         self.assertEqual(1.0, hmin)
+         self.assertEqual(2.0, hmax)
+ 
++    def _getCtx(self):
++        return self.ts.getPythonContext()
++
+ 
+ # --------------------------------------------------------------------
+ 
+-- 
+GitLab
+
+
+From 4468a054538fa5416e50cfb02b1f30fb3d47059f Mon Sep 17 00:00:00 2001
+From: Stefano Zampini <stefano.zampini@gmail.com>
+Date: Tue, 2 Sep 2025 08:47:41 +0300
+Subject: [PATCH 2/2] petsc4py: fix leaks in test
+
+---
+ src/binding/petsc4py/test/test_mat_py.py | 75 +++++++++++++-----------
+ 1 file changed, 40 insertions(+), 35 deletions(-)
+
+diff --git a/src/binding/petsc4py/test/test_mat_py.py b/src/binding/petsc4py/test/test_mat_py.py
+index d8d487b7b6b0..ba5edb4f922a 100644
+--- a/src/binding/petsc4py/test/test_mat_py.py
++++ b/src/binding/petsc4py/test/test_mat_py.py
+@@ -101,13 +101,13 @@ class ScaledIdentity(Matrix):
+                 raise RuntimeError('wrong configuration')
+         elif producttype == 'PtAP':
+             if mat is A:  # product = P^T * identity * P
+-                self.tmp = PETSc.Mat()
+-                B.transposeMatMult(B, self.tmp)
+-                product.setType(self.tmp.getType())
+-                product.setSizes(self.tmp.getSizes())
++                tmp = PETSc.Mat()
++                B.transposeMatMult(B, tmp)
++                product.setType(tmp.getType())
++                product.setSizes(tmp.getSizes())
+                 product.setUp()
+                 product.assemble()
+-                self.tmp.copy(product)
++                tmp.copy(product)
+             elif mat is B:  # product = identity^T * A * identity
+                 product.setType(A.getType())
+                 product.setSizes(A.getSizes())
+@@ -118,13 +118,13 @@ class ScaledIdentity(Matrix):
+                 raise RuntimeError('wrong configuration')
+         elif producttype == 'RARt':
+             if mat is A:  # product = R * identity * R^t
+-                self.tmp = PETSc.Mat()
+-                B.matTransposeMult(B, self.tmp)
+-                product.setType(self.tmp.getType())
+-                product.setSizes(self.tmp.getSizes())
++                tmp = PETSc.Mat()
++                B.matTransposeMult(B, tmp)
++                product.setType(tmp.getType())
++                product.setSizes(tmp.getSizes())
+                 product.setUp()
+                 product.assemble()
+-                self.tmp.copy(product)
++                tmp.copy(product)
+             elif mat is B:  # product = identity * A * identity^T
+                 product.setType(A.getType())
+                 product.setSizes(A.getSizes())
+@@ -135,29 +135,29 @@ class ScaledIdentity(Matrix):
+                 raise RuntimeError('wrong configuration')
+         elif producttype == 'ABC':
+             if mat is A:  # product = identity * B * C
+-                self.tmp = PETSc.Mat()
+-                B.matMult(C, self.tmp)
+-                product.setType(self.tmp.getType())
+-                product.setSizes(self.tmp.getSizes())
++                tmp = PETSc.Mat()
++                B.matMult(C, tmp)
++                product.setType(tmp.getType())
++                product.setSizes(tmp.getSizes())
+                 product.setUp()
+                 product.assemble()
+-                self.tmp.copy(product)
++                tmp.copy(product)
+             elif mat is B:  # product = A * identity * C
+-                self.tmp = PETSc.Mat()
+-                A.matMult(C, self.tmp)
+-                product.setType(self.tmp.getType())
+-                product.setSizes(self.tmp.getSizes())
++                tmp = PETSc.Mat()
++                A.matMult(C, tmp)
++                product.setType(tmp.getType())
++                product.setSizes(tmp.getSizes())
+                 product.setUp()
+                 product.assemble()
+-                self.tmp.copy(product)
++                tmp.copy(product)
+             elif mat is C:  # product = A * B * identity
+-                self.tmp = PETSc.Mat()
+-                A.matMult(B, self.tmp)
+-                product.setType(self.tmp.getType())
+-                product.setSizes(self.tmp.getSizes())
++                tmp = PETSc.Mat()
++                A.matMult(B, tmp)
++                product.setType(tmp.getType())
++                product.setSizes(tmp.getSizes())
+                 product.setUp()
+                 product.assemble()
+-                self.tmp.copy(product)
++                tmp.copy(product)
+             else:
+                 raise RuntimeError('wrong configuration')
+         else:
+@@ -193,8 +193,9 @@ class ScaledIdentity(Matrix):
+             product.scale(self.s)
+         elif producttype == 'PtAP':
+             if mat is A:  # product = P^T * identity * P
+-                B.transposeMatMult(B, self.tmp)
+-                self.tmp.copy(product, structure=True)
++                tmp = PETSc.Mat()
++                B.transposeMatMult(B, tmp)
++                tmp.copy(product, structure=True)
+                 product.scale(self.s)
+             elif mat is B:  # product = identity^T * A * identity
+                 A.copy(product, structure=True)
+@@ -203,8 +204,9 @@ class ScaledIdentity(Matrix):
+                 raise RuntimeError('wrong configuration')
+         elif producttype == 'RARt':
+             if mat is A:  # product = R * identity * R^t
+-                B.matTransposeMult(B, self.tmp)
+-                self.tmp.copy(product, structure=True)
++                tmp = PETSc.Mat()
++                B.matTransposeMult(B, tmp)
++                tmp.copy(product, structure=True)
+                 product.scale(self.s)
+             elif mat is B:  # product = identity * A * identity^T
+                 A.copy(product, structure=True)
+@@ -213,14 +215,17 @@ class ScaledIdentity(Matrix):
+                 raise RuntimeError('wrong configuration')
+         elif producttype == 'ABC':
+             if mat is A:  # product = identity * B * C
+-                B.matMult(C, self.tmp)
+-                self.tmp.copy(product, structure=True)
++                tmp = PETSc.Mat()
++                B.matMult(C, tmp)
++                tmp.copy(product, structure=True)
+             elif mat is B:  # product = A * identity * C
+-                A.matMult(C, self.tmp)
+-                self.tmp.copy(product, structure=True)
++                tmp = PETSc.Mat()
++                A.matMult(C, tmp)
++                tmp.copy(product, structure=True)
+             elif mat is C:  # product = A * B * identity
+-                A.matMult(B, self.tmp)
+-                self.tmp.copy(product, structure=True)
++                tmp = PETSc.Mat()
++                A.matMult(B, tmp)
++                tmp.copy(product, structure=True)
+             else:
+                 raise RuntimeError('wrong configuration')
+             product.scale(self.s)
+-- 
+GitLab
+

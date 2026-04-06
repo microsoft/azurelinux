@@ -1,0 +1,11 @@
+diff -up waf-2.0.18/docs/sphinx/wscript.orig waf-2.0.18/docs/sphinx/wscript
+--- waf-2.0.18/docs/sphinx/wscript.orig	2019-04-20 19:06:49.000000000 +0200
++++ waf-2.0.18/docs/sphinx/wscript	2019-10-05 18:00:54.822911036 +0200
+@@ -19,7 +19,6 @@ def configure(cfg):
+ 	cfg.find_program('convert', var='CONVERT')
+ 	cfg.load('daemon', tooldir=['../../playground/daemon/'])
+ 	cfg.find_program("sphinx-build", var="SPHINX_BUILD")
+-	cfg.env.SPHINX_ARGS = ['-W']
+ 
+ def build(bld):
+ 	bld.path.make_node('_static').mkdir()

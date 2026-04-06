@@ -1,0 +1,43 @@
+diff -ur labltk-8.06.13.old/support/Makefile labltk-8.06.13/support/Makefile
+--- labltk-8.06.13.old/support/Makefile	2022-10-31 16:54:15.000000000 -0600
++++ labltk-8.06.13/support/Makefile	2023-06-15 20:40:04.891751478 -0600
+@@ -28,7 +28,7 @@
+       cltkFile.$(O) cltkMain.$(O) cltkMisc.$(O) cltkTimer.$(O) \
+       cltkVar.$(O) cltkWait.$(O) cltkImg.$(O)
+ 
+-CCFLAGS=-I$(LIBDIR)/caml $(TK_DEFS) $(SHAREDCCCOMPOPTS)
++CCFLAGS=-I$(LIBDIR)/caml $(TK_DEFS) $(SHAREDCCCOMPOPTS) -g
+ 
+ COMPFLAGS=-I +unix
+ THFLAGS=-I +threads -I vmthreads
+diff -ur labltk-8.06.13.old/support/Makefile.common labltk-8.06.13/support/Makefile.common
+--- labltk-8.06.13.old/support/Makefile.common.orig	2022-10-31 16:54:15.000000000 -0600
++++ labltk-8.06.13/support/Makefile.common	2023-06-15 20:40:04.891751478 -0600
+@@ -21,19 +21,19 @@
+ ## Tools from the OCaml distribution
+ 
+ CAMLRUN=$(BINDIR)/ocamlrun
+-CAMLC=$(BINDIR)/ocamlc$(OPT)
+-CAMLOPT=$(BINDIR)/ocamlopt$(OPT) $(WARNERR)
+-CAMLCB=$(BINDIR)/ocamlc
+-CAMLOPTB=$(BINDIR)/ocamlopt
+-CAMLCOMP=$(CAMLC) -c $(WARNERR)
++CAMLC=$(BINDIR)/ocamlc$(OPT) -g
++CAMLOPT=$(BINDIR)/ocamlopt$(OPT) $(WARNERR) -g
++CAMLCB=$(BINDIR)/ocamlc -g
++CAMLOPTB=$(BINDIR)/ocamlopt -g
++CAMLCOMP=$(CAMLC) -c $(WARNERR) -g
+ CAMLYACC=$(BINDIR)/ocamlyacc -v
+ CAMLLEX=$(BINDIR)/ocamllex
+-CAMLLIBR=$(CAMLC) -a
++CAMLLIBR=$(CAMLC) -a -g
+ CAMLDEP=$(BINDIR)/ocamldep
+ COMPFLAGS=-g
+ LINKFLAGS=
+-CAMLOPTLIBR=$(CAMLOPT) -a
+-MKLIB=$(BINDIR)/ocamlmklib
++CAMLOPTLIBR=$(CAMLOPT) -a -g
++MKLIB=$(BINDIR)/ocamlmklib -g
+ CAMLRUNGEN=$(BINDIR)/ocamlrun
+ ifeq (x$(RANLIB),x)
+ RANLIB=":"

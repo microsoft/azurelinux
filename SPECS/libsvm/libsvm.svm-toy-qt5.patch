@@ -1,0 +1,65 @@
+diff -up svm-toy/qt/Makefile.orig svm-toy/qt/Makefile
+--- svm-toy/qt/Makefile.orig	2023-02-28 01:31:32.000000000 -0700
++++ svm-toy/qt/Makefile	2023-02-28 14:19:22.252890728 -0700
+@@ -1,13 +1,14 @@
+ # use  ``export QT_SELECT=qt5'' in a command window for using qt5
+ # may need to adjust the path of header files
+ CXX? = g++
+-INCLUDE = /usr/include/x86_64-linux-gnu/qt5
+-CFLAGS = -Wall -O3 -I$(INCLUDE) -I$(INCLUDE)/QtWidgets -I$(INCLUDE)/QtGui -I$(INCLUDE)/QtCore -fPIC -std=c++11
+-LIB = -lQt5Widgets -lQt5Gui -lQt5Core
+-MOC = /usr/bin/moc
++INCLUDE = /usr/include/qt5
++CPP_STD ?= c++11
++CFLAGS = ${RPM_CFLAGS} -I$(INCLUDE) -I$(INCLUDE)/QtWidgets -I$(INCLUDE)/QtGui -I$(INCLUDE)/QtCore -fPIC -std=${CPP_STD}
++LIB = -fopenmp -lQt5Widgets -lQt5Gui -lQt5Core
++MOC ?= /usr/bin/moc-qt5
+ 
+ svm-toy: svm-toy.cpp svm-toy.moc ../../svm.o
+-	$(CXX) $(CFLAGS) svm-toy.cpp ../../svm.o -o svm-toy $(LIB)
++	$(CXX) $(CFLAGS) svm-toy.cpp ../../svm.o -o svm-toy-qt $(LIB)
+ 
+ svm-toy.moc: svm-toy.cpp
+ 	$(MOC) svm-toy.cpp -o svm-toy.moc
+@@ -16,4 +17,4 @@ svm-toy.moc: svm-toy.cpp
+ 	make -C ../.. svm.o
+ 
+ clean:
+-	rm -f *~ svm-toy svm-toy.moc ../../svm.o
++	rm -f *~ svm-toy-qt svm-toy.moc ../../svm.o
+diff -up svm-toy/qt/svm-toy.cpp.orig svm-toy/qt/svm-toy.cpp
+--- svm-toy/qt/svm-toy.cpp.orig	2023-02-28 01:31:32.000000000 -0700
++++ svm-toy/qt/svm-toy.cpp	2023-02-28 14:19:03.158156750 -0700
+@@ -326,12 +326,12 @@ private slots:
+ 					double x,y;
+ 					if(sscanf(buf,"%d%*d:%lf%*d:%lf",&v,&x,&y)==3)
+ 					{
+-						point p = {x,y,v};
++						point p = {x,y,(signed char) v};
+ 						point_list.push_back(p);
+ 					}
+ 					else if(sscanf(buf,"%lf%*d:%lf",&y,&x)==2)
+ 					{
+-						point p = {x,y,current_value};
++						point p = {x,y,(signed char) current_value};
+ 						point_list.push_back(p);
+ 					}
+ 					else
+@@ -375,7 +375,7 @@ SvmToyWindow::SvmToyWindow()
+ 			 SLOT(button_run_clicked()));
+ 
+   	// don't blank the window before repainting
+-	setAttribute(Qt::WA_NoBackground);
++	setAttribute(Qt::WA_OpaquePaintEvent);
+ 
+ 	icon1 = QPixmap(4,4);
+ 	icon2 = QPixmap(4,4);
+@@ -413,7 +413,7 @@ SvmToyWindow::~SvmToyWindow()
+ 
+ void SvmToyWindow::mousePressEvent( QMouseEvent* event )
+ {
+-	point p = {(double)event->x()/XLEN, (double)event->y()/YLEN, current_value};
++	point p = {(double)event->x()/XLEN, (double)event->y()/YLEN,(signed char) current_value};
+ 	point_list.push_back(p);
+ 	draw_point(p);
+ }

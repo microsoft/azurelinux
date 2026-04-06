@@ -1,0 +1,36 @@
+From e6c2853856c3103a4add4c3673b3306cc21d341e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Poho=C5=99elsk=C3=BD?= <opohorel@redhat.com>
+Date: Wed, 7 May 2025 13:25:19 +0200
+Subject: [PATCH] get_range() move parsing code before separator check
+
+In the previous commit the parsing fix was added after a separator check
+by accident, making it not execute properly. This commit moves it into the
+right place.
+---
+ src/entry.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/entry.c b/src/entry.c
+index 30bedb3..da1a02c 100644
+--- a/src/entry.c
++++ b/src/entry.c
+@@ -638,13 +638,13 @@ get_range(bitstr_t * bits, int low, int high, const char *names[],
+ 					state = R_STEP;
+ 					break;
+ 				}
++				if (low_ > high_ && high_ == 0) {
++					high_ = 7;
++				}
+ 				if (is_separator(ch)) {
+ 					state = R_FINISH;
+ 					break;
+ 				}
+-				if (low_ > high_ && high_ == 0) {
+-					high_ = 7;
+-				}
+ 				return (EOF);
+ 
+ 			case R_RANDOM:
+-- 
+2.49.0
+

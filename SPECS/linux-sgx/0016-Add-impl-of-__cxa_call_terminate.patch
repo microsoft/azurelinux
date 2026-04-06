@@ -1,0 +1,36 @@
+From a59e761be86d61203639a6d9f5e1952cb57216f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 2 Feb 2026 15:38:23 +0000
+Subject: [PATCH 16/17] Add impl of __cxa_call_terminate
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Newer GCC will now invoke __cxa_call_terminate instead of std::terminate
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ sdk/cpprt/linux/exception.cc | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/sdk/cpprt/linux/exception.cc b/sdk/cpprt/linux/exception.cc
+index 2223b8bb..9ff48873 100644
+--- a/sdk/cpprt/linux/exception.cc
++++ b/sdk/cpprt/linux/exception.cc
+@@ -1237,6 +1237,13 @@ extern "C" void __cxa_call_unexpected(void*exception)
+ 	abort();
+ }
+ 
++extern "C" void __cxa_call_terminate(void*exception)
++{
++	std::terminate();
++	// Should not be reached.
++	abort();
++}
++
+ /**
+  * ABI function, returns the adjusted pointer to the exception object.
+  */
+-- 
+2.52.0
+

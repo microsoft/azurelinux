@@ -1,0 +1,119 @@
+diff -up gnupg-2.4.7/common/server-help.c.coverity gnupg-2.4.7/common/server-help.c
+--- gnupg-2.4.7/common/server-help.c.coverity	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/common/server-help.c	2025-01-23 19:06:59.035508041 +0100
+@@ -156,7 +156,7 @@ get_option_value (char *line, const char
+   *pend = 0;
+   *r_value = xtrystrdup (p);
+   *pend = c;
+-  if (!p)
++  if (!*r_value)
+     return my_error_from_syserror ();
+   return 0;
+ }
+diff -up gnupg-2.4.7/dirmngr/domaininfo.c.coverity gnupg-2.4.7/dirmngr/domaininfo.c
+--- gnupg-2.4.7/dirmngr/domaininfo.c.coverity	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/dirmngr/domaininfo.c	2025-01-23 19:06:59.035508041 +0100
+@@ -194,6 +194,7 @@ insert_or_update (const char *domain,
+           log_error ("domaininfo: error allocating helper array: %s\n",
+                      gpg_strerror (gpg_err_code_from_syserror ()));
+           drop_extra = bucket;
++          xfree (di_new);
+           goto leave;
+         }
+       narray = 0;
+diff -up gnupg-2.4.7/g10/card-util.c.coverity gnupg-2.4.7/g10/card-util.c
+--- gnupg-2.4.7/g10/card-util.c.coverity	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/g10/card-util.c	2025-01-23 19:06:59.035508041 +0100
+@@ -134,7 +134,7 @@ change_pin (int unblock_v2, int allow_ad
+   else
+     for (;;)
+       {
+-	char *answer;
++	char *answer = NULL;
+ 
+ 	tty_printf ("\n");
+ 	tty_printf ("1 - change PIN\n"
+diff -up gnupg-2.4.7/g10/tofu.c.coverity gnupg-2.4.7/g10/tofu.c
+--- gnupg-2.4.7/g10/tofu.c.coverity	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/g10/tofu.c	2025-01-23 19:06:59.035508041 +0100
+@@ -1707,6 +1707,8 @@ ask_about_binding (ctrl_t ctrl,
+          GPGSQL_ARG_END);
+       if (rc)
+         {
++          sqlite3_free (sqerr);
++          sqerr = NULL;
+           rc = gpg_error (GPG_ERR_GENERAL);
+           break;
+         }
+diff -up gnupg-2.4.7/scd/app-piv.c.coverity gnupg-2.4.7/scd/app-piv.c
+--- gnupg-2.4.7/scd/app-piv.c.coverity	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/scd/app-piv.c	2025-01-23 19:06:59.036508035 +0100
+@@ -2483,7 +2483,7 @@ do_decipher (app_t app, ctrl_t ctrl, con
+   gpg_error_t err;
+   data_object_t dobj;
+   unsigned char *outdata = NULL;
+-  size_t outdatalen;
++  size_t outdatalen = 0;
+   const unsigned char *s;
+   size_t n;
+   int keyref, mechanism;
+@@ -2582,7 +2582,7 @@ do_decipher (app_t app, ctrl_t ctrl, con
+   /* Now verify the Application PIN.  */
+   err = verify_chv (app, ctrl, 0x80, 0, pincb, pincb_arg);
+   if (err)
+-    return err;
++    goto leave;
+ 
+   /* Build the Dynamic Authentication Template.  */
+   err = concat_tlv_list (0, &apdudata, &apdudatalen,
+diff -up gnupg-2.4.7/scd/command.c.coverity gnupg-2.4.7/scd/command.c
+--- gnupg-2.4.7/scd/command.c.coverity	2024-09-20 12:07:25.000000000 +0200
++++ gnupg-2.4.7/scd/command.c	2025-01-23 19:06:59.036508035 +0100
+@@ -1969,7 +1969,8 @@ cmd_getinfo (assuan_context_t ctx, char
+         rc = assuan_send_data (ctx, p, strlen (p));
+       else
+         rc = gpg_error (GPG_ERR_NO_DATA);
+-      xfree (p);
++      /* allocated by scd/ccid-driver.c which is not using x*alloc/gcry_* */
++      free (p);
+     }
+   else if (!strcmp (line, "deny_admin"))
+     rc = opt.allow_admin? gpg_error (GPG_ERR_GENERAL) : 0;
+diff -up gnupg-2.4.7/tools/wks-util.c.coverity gnupg-2.4.7/tools/wks-util.c
+--- gnupg-2.4.7/tools/wks-util.c.coverity	2024-06-10 09:30:45.000000000 +0200
++++ gnupg-2.4.7/tools/wks-util.c	2025-01-23 19:06:59.036508035 +0100
+@@ -1443,11 +1443,14 @@ gpg_error_t
+ wks_cmd_print_wkd_hash (const char *userid)
+ {
+   gpg_error_t err;
+-  char *addrspec, *fname;
++  char *addrspec = NULL, *fname;
+ 
+   err = wks_fname_from_userid (userid, 1, &fname, &addrspec);
+   if (err)
+-    return err;
++    {
++      xfree (addrspec);
++      return err;
++    }
+ 
+   es_printf ("%s %s\n", fname, addrspec);
+ 
+@@ -1462,12 +1465,15 @@ gpg_error_t
+ wks_cmd_print_wkd_url (const char *userid)
+ {
+   gpg_error_t err;
+-  char *addrspec, *fname;
++  char *addrspec = NULL, *fname;
+   char *domain;
+ 
+   err = wks_fname_from_userid (userid, 1, &fname, &addrspec);
+   if (err)
+-    return err;
++    {
++      xfree (addrspec);
++      return err;
++    }
+ 
+   domain = strchr (addrspec, '@');
+   if (domain)

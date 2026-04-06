@@ -1,0 +1,44 @@
+From 950898fa0ce1e473e774b4e809bc9570867bd599 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 15 Jan 2026 11:23:35 +0000
+Subject: [PATCH 126/131] qgs: add compat for boost 1.87 which drops
+ asio::io_service
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: Jonathan Wakely <jwakely@redhat.com>
+
+The asio::io_service type was deprecated since 1.66 in 2017,
+with asio::io_context being its drop-in replacement.
+
+Release 1.87 finally dropped the back-compat support for
+asio::io_service entirely.
+
+To retain compat with old boost this change conditionally
+re-adds the compat definition for asio::io_service.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/qgs_server.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h b/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
+index f3f5b9f9..91eb41a4 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
+@@ -36,6 +36,11 @@
+ #include <boost/asio.hpp>
+ #include <boost/scoped_ptr.hpp>
+ 
++#if BOOST_VERSION >= 108700
++// Asio no longer defines the deprecated io_service alias.
++namespace boost { namespace asio { using io_service = io_context; } }
++#endif
++
+ namespace intel { namespace sgx { namespace dcap { namespace qgs {
+ 
+     namespace asio = boost::asio;
+-- 
+2.53.0
+

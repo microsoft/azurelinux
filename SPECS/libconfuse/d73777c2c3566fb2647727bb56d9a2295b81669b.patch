@@ -1,0 +1,25 @@
+--- src/confuse.c~	2020-06-21 15:53:26.000000000 -0500
++++ src/confuse.c	2022-09-12 08:41:44.448638314 -0500
+@@ -1865,16 +1865,19 @@
+ 		} else {
+ 			/* ~user or ~user/path */
+ 			char *user;
++                       size_t len;
+ 
+ 			file = strchr(filename, '/');
+ 			if (file == 0)
+ 				file = filename + strlen(filename);
+ 
+-			user = malloc(file - filename);
+-			if (!user)
++			len = file - filename - 1;
++                       user = malloc(len + 1);
++                       if (!user)
+ 				return NULL;
+ 
+-			strncpy(user, filename + 1, file - filename - 1);
++			strncpy(user, &filename[1], len);
++                       user[len] = 0;
+ 			passwd = getpwnam(user);
+ 			free(user);
+ 		}

@@ -1,0 +1,78 @@
+From 182162bcf255c6ba8add7ee080340a8b29654d0a Mon Sep 17 00:00:00 2001
+From: Dan Callaghan <dcallagh@redhat.com>
+Date: Tue, 8 Jan 2013 21:22:31 +1000
+Subject: [PATCH 2/2] hide symbols for private utility functions
+
+
+diff --git a/Makefile b/Makefile
+index fa08b2b..1569544 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,7 +4,8 @@ SONAME = liblinenoise.so.$(MAJOR_VERSION)
+ LIB = $(SONAME)$(EXTRA_VERSION)
+ 
+ export CFLAGS ?= -Os -g
+-CFLAGS += -Wall -fpic
++CFLAGS += -Wall -fpic \
++    -fvisibility=hidden -DHAVE_VISIBILITY=1 -DBUILDING_LINENOISE=1
+ LIBDIR ?= /usr/lib
+ INCLUDEDIR ?= /usr/include
+ 
+diff --git a/linenoise.h b/linenoise.h
+index 6dfee73..207174f 100644
+--- a/linenoise.h
++++ b/linenoise.h
+@@ -39,6 +39,12 @@
+ #ifndef __LINENOISE_H
+ #define __LINENOISE_H
+ 
++#if BUILDING_LINENOISE && HAVE_VISIBILITY
++#define LINENOISE_EXPORTED __attribute__((__visibility__("default")))
++#else
++#define LINENOISE_EXPORTED
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -51,22 +57,22 @@ typedef struct linenoiseCompletions {
+ typedef void(linenoiseCompletionCallback)(const char *, linenoiseCompletions *);
+ typedef char*(linenoiseHintsCallback)(const char *, int *color, int *bold);
+ typedef void(linenoiseFreeHintsCallback)(void *);
+-void linenoiseSetCompletionCallback(linenoiseCompletionCallback *);
+-void linenoiseSetHintsCallback(linenoiseHintsCallback *);
+-void linenoiseSetFreeHintsCallback(linenoiseFreeHintsCallback *);
+-void linenoiseAddCompletion(linenoiseCompletions *, const char *);
++LINENOISE_EXPORTED void linenoiseSetCompletionCallback(linenoiseCompletionCallback *);
++LINENOISE_EXPORTED void linenoiseSetHintsCallback(linenoiseHintsCallback *);
++LINENOISE_EXPORTED void linenoiseSetFreeHintsCallback(linenoiseFreeHintsCallback *);
++LINENOISE_EXPORTED void linenoiseAddCompletion(linenoiseCompletions *, const char *);
+ 
+-char *linenoise(const char *prompt);
+-void linenoiseFree(void *ptr);
+-int linenoiseHistoryAdd(const char *line);
+-int linenoiseHistorySetMaxLen(int len);
+-int linenoiseHistorySave(const char *filename);
+-int linenoiseHistoryLoad(const char *filename);
+-void linenoiseClearScreen(void);
+-void linenoiseSetMultiLine(int ml);
+-void linenoisePrintKeyCodes(void);
+-void linenoiseMaskModeEnable(void);
+-void linenoiseMaskModeDisable(void);
++LINENOISE_EXPORTED char *linenoise(const char *prompt);
++LINENOISE_EXPORTED void linenoiseFree(void *ptr);
++LINENOISE_EXPORTED int linenoiseHistoryAdd(const char *line);
++LINENOISE_EXPORTED int linenoiseHistorySetMaxLen(int len);
++LINENOISE_EXPORTED int linenoiseHistorySave(const char *filename);
++LINENOISE_EXPORTED int linenoiseHistoryLoad(const char *filename);
++LINENOISE_EXPORTED void linenoiseClearScreen(void);
++LINENOISE_EXPORTED void linenoiseSetMultiLine(int ml);
++LINENOISE_EXPORTED void linenoisePrintKeyCodes(void);
++LINENOISE_EXPORTED void linenoiseMaskModeEnable(void);
++LINENOISE_EXPORTED void linenoiseMaskModeDisable(void);
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.31.1
+

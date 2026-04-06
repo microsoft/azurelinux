@@ -1,0 +1,25 @@
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,9 +1,9 @@
+-# 
++#
+ # Generated from:
+ # https://github.com/zopefoundation/meta/tree/master/config/pure-python
+ 
+ [build-system]
+-requires = ["setuptools<74"]
++requires = ["setuptools"]
+ build-backend = "setuptools.build_meta"
+ 
+ [tool.coverage.run]
+--- a/tox.ini
++++ b/tox.ini
+@@ -21,7 +21,7 @@ usedevelop = true
+ package = wheel
+ wheel_build_env = .pkg
+ deps =
+-    setuptools  <74
++    setuptools
+ commands =
+     zope-testrunner --test-path=src {posargs:-vc}
+ extras =

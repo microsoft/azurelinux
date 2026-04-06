@@ -1,0 +1,19 @@
+--- der-parser-10.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ der-parser-10.0.0/Cargo.toml	2025-12-04T06:49:55.735062+00:00
+@@ -21,7 +21,6 @@
+     "CHANGELOG.md",
+     "README.md",
+     "UPGRADING.md",
+-    ".gitignore",
+     "Cargo.toml",
+     "examples/*.rs",
+     "src/*.rs",
+@@ -143,7 +142,7 @@
+ version = "4.0"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.pretty_assertions]
+ version = "1.0"

@@ -1,0 +1,120 @@
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c.jx	2012-02-01 12:17:19.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c	2014-06-18 13:44:45.125620007 -0400
+@@ -296,11 +296,8 @@ static volatile int    keep_going = 1;
+ #undef printf
+ 
+ // prototype
+-void print_to_mem(int type, const char *fmt, const char *str, va_list ap);
+-
+-#define  DO_VPRINT   1    // types for print_to_mem
+-#define  DO_STR      2
+-
++void vprint_to_mem(const char *fmt, va_list ap);
++void print_to_mem(const char *fmt, ...);
+ 
+ static void *
+ fsck_printing_thread(void *arg)
+@@ -547,8 +544,8 @@ setup_logging(void)
+ 		cur_in_mem = in_mem_log;
+ 
+ 		t = time(NULL);
+-		print_to_mem(DO_STR, "\n%s: ", cdevname ? cdevname : "UNKNOWN-DEV", NULL); 
+-		print_to_mem(DO_STR, "fsck_hfs run at %s", ctime(&t), NULL);
++		print_to_mem("\n%s: ", cdevname ? cdevname : "UNKNOWN-DEV"); 
++		print_to_mem("fsck_hfs run at %s", ctime(&t));
+ 
+ 		if (live_fsck && log_file) {
+ 		    pthread_cond_init(&mem_buf_cond, NULL);
+@@ -576,26 +573,20 @@ setup_logging(void)
+ 
+ 
+ void
+-print_to_mem(int type, const char *fmt, const char *str, va_list ap)
++vprint_to_mem(const char *fmt, va_list ap)
+ {
+     int ret;
+     size_t size_remaining;
+     va_list ap_copy;
+     
+-    if (type == DO_VPRINT) {
+-	va_copy(ap_copy, ap);
+-    }
++    va_copy(ap_copy, ap);
+     
+     if (live_fsck) {
+ 	pthread_mutex_lock(&mem_buf_lock);
+     }
+ 	
+     size_remaining = in_mem_size - (ptrdiff_t)(cur_in_mem - in_mem_log);
+-    if (type == DO_VPRINT) {
+-	ret = vsnprintf(cur_in_mem, size_remaining, fmt, ap);
+-    } else {
+-	ret = snprintf(cur_in_mem, size_remaining, fmt, str);
+-    }
++    ret = vsnprintf(cur_in_mem, size_remaining, fmt, ap);
+     if (ret > size_remaining) {
+ 	char *new_log;
+ 	size_t amt;
+@@ -619,11 +610,7 @@ print_to_mem(int type, const char *fmt,
+ 	cur_in_mem = new_log + (cur_in_mem - in_mem_log);
+ 	in_mem_log = new_log;
+ 	size_remaining = in_mem_size - (ptrdiff_t)(cur_in_mem - new_log);
+-	if (type == DO_VPRINT) {
+-	    ret = vsnprintf(cur_in_mem, size_remaining, fmt, ap_copy);
+-	} else {
+-	    ret = snprintf(cur_in_mem, size_remaining, fmt, str);
+-	}
++	ret = vsnprintf(cur_in_mem, size_remaining, fmt, ap_copy);
+ 	if (ret <= size_remaining) {
+ 	    cur_in_mem += ret;
+ 	}
+@@ -636,11 +623,18 @@ print_to_mem(int type, const char *fmt,
+ 	pthread_mutex_unlock(&mem_buf_lock);
+     }
+ done:
+-    if (type == DO_VPRINT) {
+-	va_end(ap_copy);
+-    }
++    va_end(ap_copy);
+ }
+ 
++void
++print_to_mem(const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    vprint_to_mem(fmt, ap);
++    va_end(ap);
++}
+ 
+ static int need_prefix=1;
+ 
+@@ -662,7 +656,7 @@ static int need_prefix=1;
+ 	LOG_PREFIX \
+ 	vfprintf(log_file, fmt, ap); \
+     } else { \
+-	print_to_mem(DO_VPRINT, fmt, NULL, ap);	\
++	vprint_to_mem(fmt, ap);	\
+     }
+ 
+ #define FLOG(fmt, str) \
+@@ -670,7 +664,7 @@ static int need_prefix=1;
+ 	LOG_PREFIX;				\
+ 	fprintf(log_file, fmt, str);		\
+     } else { \
+-	print_to_mem(DO_STR, fmt, str, NULL);	\
++	print_to_mem(fmt, str);	\
+     }
+ 
+ 
+@@ -800,7 +794,7 @@ vplog(const char *fmt, va_list ap)
+ 	LOG_PREFIX;
+ 	vfprintf(log_file, fmt, ap);
+     } else {
+-	print_to_mem(DO_VPRINT, fmt, NULL, ap);
++	vprint_to_mem(fmt, ap);
+     }
+ }
+ 

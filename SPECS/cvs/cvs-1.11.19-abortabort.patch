@@ -1,0 +1,70 @@
+--- cvs-1.11.19/src/server.c.old3	2004-09-24 21:59:08.000000000 +0200
++++ cvs-1.11.19/src/server.c	2005-02-28 13:09:22.000000000 +0100
+@@ -4900,6 +4900,15 @@
+     int status;
+     int save_noexec;
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, server_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     if (buf_to_net != NULL)
+     {
+ 	/* Since we're done, go ahead and put BUF_TO_NET back into blocking
+--- cvs-1.11.19/src/main.c.old3	2005-02-03 15:50:51.000000000 +0100
++++ cvs-1.11.19/src/main.c	2005-02-28 13:02:52.000000000 +0100
+@@ -341,6 +341,13 @@
+     const char *name;
+     char temp[10];
+ 
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, main_cleanup);
++#endif
++
+     switch (sig)
+     {
+ #ifdef SIGABRT
+--- cvs-1.11.19/src/rcs.c.old3	2005-01-31 23:15:08.000000000 +0100
++++ cvs-1.11.19/src/rcs.c	2005-02-28 13:06:06.000000000 +0100
+@@ -8314,6 +8314,15 @@
+        called from a signal handler, so we don't know whether the
+        files got created.  */
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, rcs_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     /* FIXME: Do not perform buffered I/O from an interrupt handler like
+        this (via error).  However, I'm leaving the error-calling code there
+        in the hope that on the rare occasion the error call is actually made
+--- cvs-1.11.19/src/patch.c.old3	2005-01-31 23:15:02.000000000 +0100
++++ cvs-1.11.19/src/patch.c	2005-02-28 13:04:16.000000000 +0100
+@@ -796,6 +796,15 @@
+        called from a signal handler, without SIG_begincrsect, so
+        we don't know whether the files got created.  */
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, patch_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     if (tmpfile1 != NULL)
+     {
+ 	if (unlink_file (tmpfile1) < 0

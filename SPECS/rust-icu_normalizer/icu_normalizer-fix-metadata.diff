@@ -1,0 +1,39 @@
+--- icu_normalizer-2.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ icu_normalizer-2.1.1/Cargo.toml	2025-10-29T14:35:42.383304+00:00
+@@ -20,7 +20,6 @@
+     "data/**/*",
+     "src/**/*",
+     "examples/**/*",
+-    "benches/**/*",
+     "tests/**/*",
+     "Cargo.toml",
+     "LICENSE",
+@@ -180,18 +179,12 @@
+ version = "0.11.3"
+ default-features = false
+ 
+-[dev-dependencies.arraystring]
+-version = "0.3.0"
+-
+ [dev-dependencies.arrayvec]
+ version = "0.7.2"
+ default-features = false
+ 
+ [dev-dependencies.atoi]
+ version = "2.0.0"
+-
+-[dev-dependencies.detone]
+-version = "1.0.0"
+ 
+ [dev-dependencies.write16]
+ version = "1.0.0"
+@@ -201,9 +194,6 @@
+ ]
+ default-features = false
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

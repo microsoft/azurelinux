@@ -1,0 +1,2 @@
+# /etc/sysconfig/lm_sensors - Defines modules loaded by the lm_sensors service
+# Run 'sensors-detect' to generate this config file

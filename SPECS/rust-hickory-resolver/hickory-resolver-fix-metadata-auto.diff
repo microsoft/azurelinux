@@ -1,0 +1,23 @@
+--- hickory-resolver-0.25.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hickory-resolver-0.25.2/Cargo.toml	2025-09-09T22:22:51.515992+00:00
+@@ -122,7 +122,6 @@
+     "hickory-proto/serde",
+ ]
+ system-config = [
+-    "dep:ipconfig",
+     "dep:resolv-conf",
+ ]
+ tls-aws-lc-rs = [
+@@ -293,11 +292,8 @@
+ ]
+ default-features = false
+ 
+-[target."cfg(windows)".dependencies.ipconfig]
+-version = "0.3.0"
+-optional = true
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(nightly)"]
++

@@ -1,0 +1,19 @@
+diff -Naur widestring-1.2.1-original/src/lib.rs widestring-1.2.1/src/lib.rs
+--- widestring-1.2.1-original/src/lib.rs	2006-07-24 02:21:28.000000000 +0100
++++ widestring-1.2.1/src/lib.rs	2025-11-02 07:12:19.666079008 +0000
+@@ -125,6 +125,7 @@
+ //! ```rust
+ //! # #[cfg(any(not(windows), not(feature = "alloc")))]
+ //! # fn main() {}
++//! # #[cfg(all(windows, feature = "alloc"))]
+ //! # extern crate windows_sys;
+ //! # extern crate widestring;
+ //! # #[cfg(all(windows, feature = "alloc"))]
+@@ -167,6 +168,7 @@
+ //! ```rust
+ //! # #[cfg(any(not(windows), not(feature = "alloc")))]
+ //! # fn main() {}
++//! # #[cfg(all(windows, feature = "alloc"))]
+ //! # extern crate windows_sys;
+ //! # extern crate widestring;
+ //! # #[cfg(all(windows, feature = "alloc"))]

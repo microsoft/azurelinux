@@ -1,0 +1,47 @@
+--- netkit-telnet-0.17/telnetd/telnetd.c.orig	2011-01-31 12:05:37.942942871 -0600
++++ netkit-telnet-0.17/telnetd/telnetd.c	2011-01-31 18:20:22.400743499 -0600
+@@ -82,6 +82,7 @@ char	ptyibuf2[BUFSIZ];
+ int	hostinfo = 1;			/* do we print login banner? */
+ 
+ int debug = 0;
++int debugsix = 0;
+ int keepalive = 1;
+ char *loginprg = _PATH_LOGIN;
+ char *progname;
+@@ -150,8 +151,11 @@ main(int argc, char *argv[], char *env[]
+ #endif /* BFTPDAEMON */
+ 
+ 		case 'd':
+-			if (strcmp(optarg, "ebug") == 0) {
++			if (strncmp(optarg, "ebug", 4) == 0) {
+ 				debug++;
++				if (strncmp(optarg, "ebug6", 5) == 0) {
++					debugsix++;
++				}
+ 				break;
+ 			}
+ 			usage();
+@@ -271,6 +275,8 @@ main(int argc, char *argv[], char *env[]
+ 	        hints.ai_socktype = SOCK_STREAM;
+ 	        hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
+ 	        hints.ai_protocol = IPPROTO_TCP;
++		if (debugsix)
++			hints.ai_family = AF_INET6;
+ 
+ 	        if (argc == 0) {
+ 	            if (getaddrinfo(NULL, "telnet", &hints, &ai) != 0) {
+@@ -380,12 +386,12 @@ usage(void)
+ {
+ 	fprintf(stderr, "Usage: telnetd");
+ #ifdef	AUTHENTICATE
+-	fprintf(stderr, " [-a (debug|other|user|valid|off)]\n\t");
++	fprintf(stderr, " [-a (debug|debug6|other|user|valid|off)]\n\t");
+ #endif
+ #ifdef BFTPDAEMON
+ 	fprintf(stderr, " [-B]");
+ #endif
+-	fprintf(stderr, " [-debug]");
++	fprintf(stderr, " [-debug|-debug6]");
+ #ifdef DIAGNOSTICS
+ 	fprintf(stderr, " [-D (options|report|exercise|netdata|ptydata)]\n\t");
+ #endif

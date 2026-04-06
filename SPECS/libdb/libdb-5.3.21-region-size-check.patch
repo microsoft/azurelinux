@@ -1,0 +1,39 @@
+diff -up db-5.3.21/src/env/env_region.c.zero-region db-5.3.21/src/env/env_region.c
+--- db-5.3.21/src/env/env_region.c.zero-region	2012-05-11 19:57:53.000000000 +0200
++++ db-5.3.21/src/env/env_region.c	2017-09-06 08:50:45.310276385 +0200
+@@ -1060,6 +1060,7 @@ __env_region_attach(env, infop, init, ma
+ 	REGION *rp;
+ 	int ret;
+ 	char buf[sizeof(DB_REGION_FMT) + 20];
++	struct stat st;
+ 
+ 	/*
+ 	 * Find or create a REGION structure for this region.  If we create
+@@ -1090,6 +1091,14 @@ __env_region_attach(env, infop, init, ma
+ 	if ((ret = __env_sys_attach(env, infop, rp)) != 0)
+ 		goto err;
+ 
++        /* Check the size of the underlying file */
++        if (infop->fhp != NULL && F_ISSET(infop->fhp, DB_FH_OPENED) &&
++            infop->fhp->fd != -1 && fstat(infop->fhp->fd, &st) != -1 &&
++            st.st_size == 0) {
++            ret = DB_RUNRECOVERY;
++            goto err;
++        }
++
+ 	/*
+ 	 * Fault the pages into memory.  Note, do this BEFORE we initialize
+ 	 * anything because we're writing pages in created regions, not just
+diff -up db-5.3.21/src/os/os_map.c.zero-region db-5.3.21/src/os/os_map.c
+--- db-5.3.21/src/os/os_map.c.zero-region	2012-05-11 19:57:54.000000000 +0200
++++ db-5.3.21/src/os/os_map.c	2017-09-06 08:49:39.144546552 +0200
+@@ -265,6 +265,9 @@ __os_detach(env, infop, destroy)
+ 	dbenv = env->dbenv;
+ 
+ 	rp = infop->rp;
++	/* Do not touch the region information if it no longer exists */
++	if (rp == NULL)
++	    return EINVAL;
+ 
+ 	/* If the user replaced the unmap call, call through their interface. */
+ 	if (DB_GLOBAL(j_region_unmap) != NULL)

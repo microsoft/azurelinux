@@ -1,0 +1,21 @@
+diff -urN caribou-0.4.20.old/bin/antler-keyboard.in caribou-0.4.20/bin/antler-keyboard.in
+--- caribou-0.4.20.old/bin/antler-keyboard.in	2016-06-27 19:31:55.547580177 +0530
++++ caribou-0.4.20/bin/antler-keyboard.in	2016-06-27 19:37:00.369738066 +0530
+@@ -38,4 +38,4 @@
+   export ANTLER_THEME_PATH="$(dirname $script_dir)/data"
+ fi
+ 
+-@PYTHON@ -m caribou.antler.main "$@"
++exec @PYTHON@ -m caribou.antler.main "$@"
+diff -urN caribou-0.4.20.old/bin/caribou-preferences.in caribou-0.4.20/bin/caribou-preferences.in
+--- caribou-0.4.20.old/bin/caribou-preferences.in	2016-06-27 19:31:55.547580177 +0530
++++ caribou-0.4.20/bin/caribou-preferences.in	2016-06-27 19:37:14.392561317 +0530
+@@ -37,7 +37,7 @@
+   export LD_LIBRARY_PATH="$(dirname $script_dir)/libcaribou/.lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+ fi
+ 
+-@PYTHON@ -c "
++exec @PYTHON@ -c "
+ import signal
+ signal.signal(signal.SIGINT, signal.SIG_DFL)
+ 

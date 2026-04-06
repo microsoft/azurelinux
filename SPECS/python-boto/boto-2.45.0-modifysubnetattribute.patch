@@ -1,0 +1,73 @@
+Index: boto-2.45.0/boto/vpc/__init__.py
+===================================================================
+--- boto-2.45.0.orig/boto/vpc/__init__.py
++++ boto-2.45.0/boto/vpc/__init__.py
+@@ -1269,6 +1269,33 @@ class VPCConnection(EC2Connection):
+             params['DryRun'] = 'true'
+         return self.get_status('DeleteSubnet', params)
+ 
++    def modify_subnet_attribute(self, subnet_id, map_public_ip_on_launch,
++                                dry_run=False):
++        """
++        :type subnet_id: str
++        :param subnet_id: The ID of the subnet.
++
++        :type map_public_ip_on_launch: bool
++        :param map_public_ip_on_launch: Specifies whether public IP addresses
++               are provided for the instances launched into this subnet.
++
++        :type dry_run: bool
++        :param dry_run: Set to True if the operation should not actually run.
++
++        :rtype: bool
++        :return: True if successful
++        """
++        params = {
++            'SubnetId': subnet_id
++        }
++
++        params['MapPublicIpOnLaunch.Value'] = (
++                'true' if map_public_ip_on_launch else 'false')
++
++        if dry_run:
++            params['DryRun'] = 'true'
++        return self.get_status('ModifySubnetAttribute', params)
++
+     # DHCP Options
+ 
+     def get_all_dhcp_options(self, dhcp_options_ids=None, filters=None, dry_run=False):
+Index: boto-2.45.0/tests/unit/vpc/test_subnet.py
+===================================================================
+--- boto-2.45.0.orig/tests/unit/vpc/test_subnet.py
++++ boto-2.45.0/tests/unit/vpc/test_subnet.py
+@@ -129,5 +129,30 @@ class TestDeleteSubnet(AWSMockServiceTes
+         self.assertEquals(api_response, True)
+ 
+ 
++class TestModifySubnetAttribute(AWSMockServiceTestCase):
++
++    connection_class = VPCConnection
++
++    def default_body(self):
++        return b"""
++            <ModifySubnetAttributeResponse xmlns="http://ec2.amazonaws.com/doc/2013-10-01/">
++               <requestId>7a62c49f-347e-4fc4-9331-6e8eEXAMPLE</requestId>
++               <return>true</return>
++            </ModifySubnetAttributeResponse>
++        """
++
++    def test_modify_subnet_attribute(self):
++        self.set_http_response(status_code=200)
++        api_response = self.service_connection.modify_subnet_attribute('subnet-a605r929',
++                                                                       True)
++        self.assert_request_parameters({
++            'Action': 'ModifySubnetAttribute',
++            'SubnetId': 'subnet-a605r929', 'MapPublicIpOnLaunch.Value': 'true'},
++            ignore_params_values=['AWSAccessKeyId', 'SignatureMethod',
++                                  'SignatureVersion', 'Timestamp',
++                                  'Version'])
++        self.assertEquals(api_response, True)
++
++
+ if __name__ == '__main__':
+     unittest.main()

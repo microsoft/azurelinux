@@ -1,0 +1,8 @@
+d @PID_FILE_DIR@ 0755 mysql mysql -
+
+# Rules for ephemeral file systems (ImageMode)
+d /var/lib/mysql 0755 mysql mysql -
+d /var/log/mysql 0750 mysql mysql -
+f /var/log/mysql/mysql.log 0640 mysql mysql -
+d /var/lib/mysql-files 0750 mysql mysql -
+d /var/lib/mysql-keyring 0700 mysql mysql -

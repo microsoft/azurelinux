@@ -1,0 +1,40 @@
+From 967daa88c5a035d15405c049e8f12baa84eb8b4a Mon Sep 17 00:00:00 2001
+From: Milan Zamazal <mzamazal@redhat.com>
+Date: Thu, 25 Sep 2025 21:28:55 +0200
+Subject: [PATCH 13/15] ipa: simple: blc: Prevent division by zero in BLC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When there are no values in the histogram, BLC simple IPA can crash on
+division by zero.  We cannot get anything meaningful in such a case
+anyway, let's simply return from `process()' then.
+
+Tested-by: Barnabás Pőcze <barnabas.pocze@ideasonboard.com>
+Reviewed-by: Barnabás Pőcze <barnabas.pocze@ideasonboard.com>
+Reviewed-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Signed-off-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/blc.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/ipa/simple/algorithms/blc.cpp b/src/ipa/simple/algorithms/blc.cpp
+index 616da0ee7..ec71e154e 100644
+--- a/src/ipa/simple/algorithms/blc.cpp
++++ b/src/ipa/simple/algorithms/blc.cpp
+@@ -80,6 +80,11 @@ void BlackLevel::process(IPAContext &context,
+ 	constexpr float ignoredPercentage = 0.02;
+ 	const unsigned int total =
+ 		std::accumulate(begin(histogram), end(histogram), 0);
++	if (total == 0) {
++		LOG(IPASoftBL, Debug) << "Not guessing black level, histogram is empty";
++		return;
++	}
++
+ 	const unsigned int pixelThreshold = ignoredPercentage * total;
+ 	const unsigned int histogramRatio = 256 / SwIspStats::kYHistogramSize;
+ 	const unsigned int currentBlackIdx =
+-- 
+2.51.0
+

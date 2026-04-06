@@ -1,0 +1,12 @@
+diff -up vim73/runtime/doc/vim.1.668894 vim73/runtime/doc/vim.1
+--- vim73/runtime/doc/vim.1.668894	2010-05-15 13:04:00.000000000 +0200
++++ vim73/runtime/doc/vim.1	2012-08-28 12:41:36.000000000 +0200
+@@ -73,7 +73,7 @@ To edit a file that starts with a dash, 
+ .TP
+ \-
+ The file to edit is read from stdin.  Commands are read from stderr, which
+-should be a tty.
++should be a TTY.
+ .TP
+ \-t {tag}
+ The file to edit and the initial cursor position depends on a "tag", a sort

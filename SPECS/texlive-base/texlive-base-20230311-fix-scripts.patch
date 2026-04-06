@@ -1,0 +1,20 @@
+diff -up ./scripts/context/perl/mptopdf.pl.fix-scripts ./scripts/context/perl/mptopdf.pl
+--- ./scripts/context/perl/mptopdf.pl.fix-scripts	2023-05-25 11:52:19.149713294 -0400
++++ ./scripts/context/perl/mptopdf.pl	2023-05-25 11:53:05.379317240 -0400
+@@ -1,5 +1,4 @@
+-eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}' && eval 'exec perl -S $0 $argv:q'
+-        if 0;
++#! /usr/bin/perl -w
+ 
+ # MikTeX users can set environment variable TEXSYSTEM to "miktex".
+ 
+diff -up ./scripts/thumbpdf/thumbpdf.pl.fix-scripts ./scripts/thumbpdf/thumbpdf.pl
+--- ./scripts/thumbpdf/thumbpdf.pl.fix-scripts	2023-05-25 11:53:23.018547680 -0400
++++ ./scripts/thumbpdf/thumbpdf.pl	2023-05-25 11:53:44.086822918 -0400
+@@ -1,5 +1,4 @@
+-eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}' && eval 'exec perl -S $0 $argv:q'
+-  if 0;
++#! /usr/bin/perl -w
+ use strict;
+ $^W=1; # turn warning on
+ #

@@ -1,0 +1,11 @@
+diff -Naur webrtc-audio-processing-1.3-original/webrtc/api/task_queue/task_queue_base.h webrtc-audio-processing-1.3/webrtc/api/task_queue/task_queue_base.h
+--- webrtc-audio-processing-1.3-original/webrtc/api/task_queue/task_queue_base.h	2023-09-05 11:19:47.000000000 -0400
++++ webrtc-audio-processing-1.3/webrtc/api/task_queue/task_queue_base.h	2025-02-04 14:24:16.239045712 -0500
+@@ -10,6 +10,7 @@
+ #ifndef API_TASK_QUEUE_TASK_QUEUE_BASE_H_
+ #define API_TASK_QUEUE_TASK_QUEUE_BASE_H_
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "api/task_queue/queued_task.h"

@@ -1,0 +1,48 @@
+From d6e8e874e7f609ca5a198a82fcd461893ccd4a3c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 24 Aug 2025 16:08:33 +0200
+Subject: [PATCH] Fix build failure in test code with Rust 1.89+
+
+---
+ src/lib.rs  | 4 ++--
+ src/unix.rs | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 51b22db..e6a8a17 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -266,7 +266,7 @@ mod test {
+         file1.lock_exclusive().unwrap();
+         assert_eq!(file2.try_lock_exclusive().unwrap_err().kind(),
+                    lock_contended_error().kind());
+-        assert_eq!(file2.try_lock_shared().unwrap_err().kind(),
++        assert_eq!(FileExt::try_lock_shared(&file2).unwrap_err().kind(),
+                    lock_contended_error().kind());
+ 
+         // Once the exclusive lock is dropped, the second file is able to create a lock.
+@@ -283,7 +283,7 @@ mod test {
+         let file2 = fs::OpenOptions::new().read(true).write(true).create(true).open(&path).unwrap();
+ 
+         file1.lock_exclusive().unwrap();
+-        assert_eq!(file2.try_lock_shared().unwrap_err().kind(),
++        assert_eq!(FileExt::try_lock_shared(&file2).unwrap_err().kind(),
+                    lock_contended_error().kind());
+ 
+         // Drop file1; the lock should be released.
+diff --git a/src/unix.rs b/src/unix.rs
+index 91867f7..0212e15 100644
+--- a/src/unix.rs
++++ b/src/unix.rs
+@@ -240,7 +240,7 @@ mod test {
+         // Create a lock through fd1, then replace it through fd2.
+         file1.lock_shared().unwrap();
+         file2.lock_exclusive().unwrap();
+-        assert_eq!(file3.try_lock_shared().unwrap_err().raw_os_error(),
++        assert_eq!(FileExt::try_lock_shared(&file3).unwrap_err().raw_os_error(),
+                    lock_contended_error().raw_os_error());
+ 
+         // Either of the file descriptors should be able to unlock.
+-- 
+2.51.0
+

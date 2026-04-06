@@ -1,0 +1,59 @@
+From d8ef2148b09d6bfa5a6b9c5b025961ad40993e91 Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Wed, 6 Nov 2024 18:27:44 -0600
+Subject: [PATCH 2/2] Remove hatch-fancy-pypi-readme build-system dependency
+
+---
+ pyproject.toml | 31 +------------------------------
+ 1 file changed, 1 insertion(+), 30 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index a43705c..3d76d43 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
++requires = ["hatchling", "hatch-vcs"]
+ build-backend = "hatchling.build"
+ 
+ [project]
+@@ -55,35 +55,6 @@ Twitter = "https://twitter.com/hynek"
+ source = "vcs"
+ raw-options = { local_scheme = "no-local-version" }
+ 
+-[tool.hatch.metadata.hooks.fancy-pypi-readme]
+-content-type = "text/markdown"
+-
+-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+-text = "# Service Identity Verification for pyOpenSSL & *cryptography*\n"
+-
+-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+-path = "README.md"
+-start-after = "spiel-begin -->\n"
+-
+-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+-text = """
+-
+-
+-## Release Information
+-
+-"""
+-
+-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+-path = "CHANGELOG.md"
+-pattern = "\n(###.+?\n)## "
+-
+-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+-text = """
+-----
+-
+-[Complete Changelog →](https://service-identity.readthedocs.io/en/stable/changelog.html)
+-"""
+-
+ 
+ [tool.pytest.ini_options]
+ addopts = ["-ra", "--strict-markers", "--strict-config"]
+-- 
+2.47.0
+

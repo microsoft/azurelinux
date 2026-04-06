@@ -1,0 +1,186 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 7 Jul 2023 15:25:59 -0500
+Subject: [PATCH] RH: Add mpathcleanup
+
+mpathcleanup is a program that will remove a multipath device as well as
+all of the scsi path devices that make it up.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipath/Makefile     |   2 +
+ multipath/mpathcleanup | 145 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 147 insertions(+)
+ create mode 100755 multipath/mpathcleanup
+
+diff --git a/multipath/Makefile b/multipath/Makefile
+index 3dc241cc..47e82234 100644
+--- a/multipath/Makefile
++++ b/multipath/Makefile
+@@ -25,6 +25,7 @@ install:
+ 	$(Q)$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 755 $(EXEC) $(DESTDIR)$(bindir)/
+ 	$(Q)$(INSTALL_PROGRAM) -m 755 mpathconf $(DESTDIR)$(bindir)/
++	$(Q)$(INSTALL_PROGRAM) -m 755 mpathcleanup $(DESTDIR)$(bindir)/
+ 	$(Q)$(INSTALL_PROGRAM) -d $(DESTDIR)$(udevrulesdir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 644 11-dm-mpath.rules $(DESTDIR)$(udevrulesdir)
+ 	$(Q)$(INSTALL_PROGRAM) -m 644 99-z-dm-mpath-late.rules $(DESTDIR)$(udevrulesdir)
+@@ -49,6 +50,7 @@ endif
+ uninstall:
+ 	$(Q)$(RM) $(DESTDIR)$(bindir)/$(EXEC)
+ 	$(Q)$(RM) $(DESTDIR)$(bindir)/mpathconf
++	$(Q)$(RM) $(DESTDIR)$(bindir)/mpathcleanup
+ 	$(Q)$(RM) $(DESTDIR)$(udevrulesdir)/11-dm-mpath.rules
+ 	$(Q)$(RM) $(DESTDIR)$(udevrulesdir)/99-z-dm-mpath-late.rules
+ 	$(Q)$(RM) $(DESTDIR)$(modulesloaddir)/multipath.conf
+diff --git a/multipath/mpathcleanup b/multipath/mpathcleanup
+new file mode 100755
+index 00000000..6fd921e4
+--- /dev/null
++++ b/multipath/mpathcleanup
+@@ -0,0 +1,145 @@
++#!/bin/bash
++#
++# Copyright (C) 2023 Red Hat, Inc. All rights reserved.
++#
++# This file is part of the device-mapper-multipath package.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions
++# of the GNU General Public License v.2.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software Foundation,
++# Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++unset PROGRAM FLUSH DEVICE DEVNAME MAJOR MINOR PATHDEVS PATHDEV HAVE_MULTIPATHD QUEUEING
++
++function usage
++{
++	echo "usage: $PROGRAM [-h] [--flush] <device>"
++	echo ""
++	echo "remove a multipath device and its scsi path devices"
++	echo ""
++	echo "options:"
++	echo "  -h, --help        show this help message and exit"
++	echo "  --flush           disable queuing on the multipath device and"
++	echo "                    flush the path devices before removing"
++}
++
++function parse_args
++{
++	while [ -n "$1" ]; do
++		case $1 in
++			--flush)
++				FLUSH=1
++				shift
++				;;
++			--help | -h)
++				usage
++				exit 1
++				;;
++			*)
++				if [ -n "$DEVICE" ]; then
++					usage
++					exit 1
++				fi
++				DEVICE=$1
++				shift
++				;;
++		esac
++	done
++}
++
++function validate_device
++{
++	if [ -z "$DEVICE" ]; then
++		usage
++		exit 1
++	fi
++	if [[ "$DEVICE" =~ ^[[:digit:]]+:[[:digit:]]+$ ]]; then
++		MAJOR=${DEVICE%%:*}
++		MINOR=${DEVICE##*:}
++		DEVNAME=`dmsetup ls --target multipath | grep "($MAJOR, $MINOR)$" | awk '{print $1}'`
++	else
++		DEVNAME=`dmsetup ls --target multipath | awk '{print $1}' | grep "^$DEVICE$"`
++	fi
++	if [ -z "$DEVNAME" ]; then
++		DEVNAME=`multipath -v 1 -l $DEVICE 2>/dev/null`
++		if [ -z "$DEVNAME" ]; then
++			echo "$DEVICE is not a multipath device"
++			exit 1
++		fi
++		# verify that this is not a native nvme multipath device
++		dmsetup ls --target multipath | awk '{print $1}' | grep -q "^$DEVNAME$"
++		if test $? -eq 1; then
++			echo "$DEVICE is not a device-mapper multipath device"
++			exit 1
++		fi
++	fi
++	if [ -z "$MINOR" ]; then
++		MINOR=`dmsetup info -c --noheadings -o minor $DEVNAME`
++	fi
++}
++
++function get_paths
++{
++	PATHDEVS=`ls /sys/block/dm-$MINOR/slaves`
++	for PATHDEV in $PATHDEVS; do
++		if [[ ! "$PATHDEV" =~ ^sd[a-z]+$ ]]; then
++			echo "$PATHDEV is not a scsi device. $PROGRAM only works with scsi devices"
++			exit 1
++		fi
++	done
++}
++
++function remove_devs
++{
++	pidof multipathd > /dev/null
++	HAVE_MULTIPATHD=$?
++	multipath -v2 -l "$DEVNAME" | grep features | grep -q queue_if_no_path
++	QUEUEING=$?
++	if [ -n "$FLUSH" ] && [ "$QUEUEING" -eq 0 ]; then
++		if test $HAVE_MULTIPATHD -eq 0; then
++			multipathd disablequeueing map "$DEVNAME" > /dev/null
++		else
++			dmsetup message "$DEVNAME" 0 fail_if_no_path
++		fi
++		sleep 1
++	fi
++	if test $HAVE_MULTIPATHD -eq 0; then
++		multipath -f "$DEVNAME"
++	else
++		multipathd -Df "$DEVNAME"
++	fi
++	if test $? -eq 1; then
++		echo "$DEVICE cannot be removed"
++		exit 1
++	fi
++	for PATHDEV in $PATHDEVS; do
++		if [ -n "$FLUSH" ]; then
++			blockdev --flushbufs /dev/"$PATHDEV"
++		fi
++		echo 1 > /sys/block/"$PATHDEV"/device/delete
++	done
++}
++
++function verify_removal
++{
++	multipath -v 1 -d $DEVNAME | grep -q "^$DEVNAME$"
++	if test $? -eq 0; then
++		echo "$DEVICE removed but path devices still exist"
++		exit 1
++	fi
++	multipath -v 1 -l $DEVNAME | grep -q "^$DEVNAME$"
++	if test $? -eq 0; then
++		echo "$DEVICE removal succeeded, but device still exists"
++		exit 1
++	fi
++}
++
++PROGRAM="$0"
++parse_args "$@"
++validate_device
++get_paths
++remove_devs
++verify_removal

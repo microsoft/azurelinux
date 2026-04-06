@@ -1,0 +1,21 @@
+diff -up netpbm-10.47.05/converter/other/fiasco/config.h.time netpbm-10.47.05/converter/other/fiasco/config.h
+--- netpbm-10.47.05/converter/other/fiasco/config.h.time	2009-12-10 08:34:36.000000000 +0100
++++ netpbm-10.47.05/converter/other/fiasco/config.h	2009-12-10 08:43:54.000000000 +0100
+@@ -19,7 +19,7 @@
+ #define STDC_HEADERS 1
+ 
+ /* Define if you can safely include both <sys/time.h> and <time.h>.  */
+-#define TIME_WITH_SYS_TIME 1
++/* #undef TIME_WITH_SYS_TIME */
+ 
+ /* Define if the X Window System is missing or not being used.  */
+ #define X_DISPLAY_MISSING 1
+@@ -75,7 +75,7 @@
+ #define HAVE_STRING_H 1
+ 
+ /* Define if you have the <sys/time.h> header file.  */
+-#define HAVE_SYS_TIME_H 1
++/* #undef HAVE_SYS_TIME_H */
+ 
+ /* Define if you have the <unistd.h> header file.  */
+ #define HAVE_UNISTD_H 1

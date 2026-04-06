@@ -1,0 +1,44 @@
+diff -ruN llvm18-18.1.8-build.orig/llvm-18.1.8.src/include/llvm/ADT/SmallVector.h llvm18-18.1.8-build/llvm-18.1.8.src/include/llvm/ADT/SmallVector.h
+--- llvm18-18.1.8-build.orig/llvm-18.1.8.src/include/llvm/ADT/SmallVector.h	2024-06-15 19:21:32.000000000 +0200
++++ llvm18-18.1.8-build/llvm-18.1.8.src/include/llvm/ADT/SmallVector.h	2025-01-20 11:16:51.376050420 +0100
+@@ -20,6 +20,7 @@
+ #include <cassert>
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cstring>
+ #include <functional>
+ #include <initializer_list>
+diff -ruN llvm18-18.1.8-build.orig/llvm-18.1.8.src/lib/Target/AMDGPU/MCTargetDesc/AMDGPUMCTargetDesc.h llvm18-18.1.8-build/llvm-18.1.8.src/lib/Target/AMDGPU/MCTargetDesc/AMDGPUMCTargetDesc.h
+--- llvm18-18.1.8-build.orig/llvm-18.1.8.src/lib/Target/AMDGPU/MCTargetDesc/AMDGPUMCTargetDesc.h	2024-06-15 19:21:32.000000000 +0200
++++ llvm18-18.1.8-build/llvm-18.1.8.src/lib/Target/AMDGPU/MCTargetDesc/AMDGPUMCTargetDesc.h	2025-01-20 13:59:46.883931619 +0100
+@@ -16,6 +16,7 @@
+ #define LLVM_LIB_TARGET_AMDGPU_MCTARGETDESC_AMDGPUMCTARGETDESC_H
+ 
+ #include <memory>
++#include <cstdint>
+ 
+ namespace llvm {
+ class Target;
+diff -ruN llvm18-18.1.8-build.orig/llvm-18.1.8.src/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.h llvm18-18.1.8-build/llvm-18.1.8.src/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.h
+--- llvm18-18.1.8-build.orig/llvm-18.1.8.src/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.h	2024-06-15 19:21:32.000000000 +0200
++++ llvm18-18.1.8-build/llvm-18.1.8.src/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.h	2025-01-20 13:27:17.844538342 +0100
+@@ -15,6 +15,7 @@
+ 
+ #include <memory>
+ #include <string>
++#include <cstdint>
+ 
+ namespace llvm {
+ class formatted_raw_ostream;
+diff -ruN llvm18-18.1.8-build.orig/llvm-18.1.8.src/utils/TableGen/RegisterInfoEmitter.cpp llvm18-18.1.8-build/llvm-18.1.8.src/utils/TableGen/RegisterInfoEmitter.cpp
+--- llvm18-18.1.8-build.orig/llvm-18.1.8.src/utils/TableGen/RegisterInfoEmitter.cpp	2024-06-15 19:21:32.000000000 +0200
++++ llvm18-18.1.8-build/llvm-18.1.8.src/utils/TableGen/RegisterInfoEmitter.cpp	2025-01-20 14:38:02.042933335 +0100
+@@ -115,6 +115,7 @@
+   OS << "\n#ifdef GET_REGINFO_ENUM\n";
+   OS << "#undef GET_REGINFO_ENUM\n\n";
+ 
++  OS << "#include <cstdint>\n";
+   OS << "namespace llvm {\n\n";
+ 
+   OS << "class MCRegisterClass;\n"

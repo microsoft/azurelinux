@@ -1,0 +1,206 @@
+From ee6af258e8cb1a7fada5e6d3e54429b89f12b158 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 15 Jun 2018 12:02:21 +0200
+Subject: [PATCH 56/59] Log die() calls to syslog
+
+Pass messages given to die(), die2() and bug() to syslog. Currently this
+functionality requires waiting for a short amount of time (1 second is
+used) after logging the message and before exiting. This is a workaround
+for the following systemd bug:
+https://github.com/systemd/systemd/issues/2913
+
+The need for this workaround is the main reason why I decided not to
+enable this functionality by default.
+
+Resolves: rhbz#1318198
+Resolves: rhbz#1582672
+---
+ logging.c     | 13 +++++++++----
+ logging.h     |  2 ++
+ main.c        |  4 ++++
+ parseconf.c   |  1 +
+ tcpwrap.c     |  3 ---
+ tunables.c    |  2 ++
+ tunables.h    |  2 ++
+ utility.c     | 11 +++++++++++
+ vsftpd.conf.5 | 10 ++++++++++
+ 9 files changed, 41 insertions(+), 7 deletions(-)
+
+diff --git a/logging.c b/logging.c
+index c4461f7..9e86808 100644
+--- a/logging.c
++++ b/logging.c
+@@ -30,10 +30,6 @@ static void vsf_log_do_log_to_file(int fd, struct mystr* p_str);
+ void
+ vsf_log_init(struct vsf_session* p_sess)
+ {
+-  if (tunable_syslog_enable || tunable_tcp_wrappers)
+-  {
+-    vsf_sysutil_openlog(0);
+-  }
+   if (!tunable_xferlog_enable && !tunable_dual_log_enable)
+   {
+     return;
+@@ -389,3 +385,12 @@ vsf_log_do_log_vsftpd_format(struct vsf_session* p_sess, struct mystr* p_str,
+   }
+ }
+ 
++void
++vsf_log_die(const char* p_text)
++{
++  struct mystr log_str = INIT_MYSTR;
++
++  str_append_text(&log_str, "ERROR: ");
++  str_append_text(&log_str, p_text);
++  str_syslog(&log_str, 1);
++}
+diff --git a/logging.h b/logging.h
+index 1ff57d1..75f06c1 100644
+--- a/logging.h
++++ b/logging.h
+@@ -91,5 +91,7 @@ void vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
+ void vsf_log_failed_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
+                   struct mystr* p_str);
+ 
++void vsf_log_die(const char* p_text);
++
+ #endif /* VSF_LOGGING_H */
+ 
+diff --git a/main.c b/main.c
+index f039081..1178d44 100644
+--- a/main.c
++++ b/main.c
+@@ -120,6 +120,10 @@ main(int argc, const char* argv[])
+     }
+     vsf_sysutil_free(p_statbuf);
+   }
++  if (tunable_log_die || tunable_syslog_enable || tunable_tcp_wrappers)
++  {
++    vsf_sysutil_openlog(0);
++  }
+   /* Resolve pasv_address if required */
+   if (tunable_pasv_address && tunable_pasv_addr_resolve)
+   {
+diff --git a/parseconf.c b/parseconf.c
+index 47b54f1..aeb401a 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -112,6 +112,7 @@ parseconf_bool_array[] =
+   { "seccomp_sandbox", &tunable_seccomp_sandbox },
+   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
+   { "better_stou", &tunable_better_stou },
++  { "log_die", &tunable_log_die },
+   { 0, 0 }
+ };
+ 
+diff --git a/tcpwrap.c b/tcpwrap.c
+index 5bf57d3..132b771 100644
+--- a/tcpwrap.c
++++ b/tcpwrap.c
+@@ -27,15 +27,12 @@ int
+ vsf_tcp_wrapper_ok(int remote_fd)
+ {
+   struct request_info req;
+-  vsf_sysutil_openlog(0);
+   request_init(&req, RQ_DAEMON, "vsftpd", RQ_FILE, remote_fd, 0);
+   fromhost(&req);
+   if (!hosts_access(&req))
+   {
+-    vsf_sysutil_closelog();
+     return 0;
+   }
+-  vsf_sysutil_closelog();
+   return 1;
+ }
+ 
+diff --git a/tunables.c b/tunables.c
+index 5ec2bdc..63de8e6 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -93,6 +93,7 @@ int tunable_http_enable;
+ int tunable_seccomp_sandbox;
+ int tunable_allow_writeable_chroot;
+ int tunable_better_stou;
++int tunable_log_die;
+ 
+ unsigned int tunable_accept_timeout;
+ unsigned int tunable_connect_timeout;
+@@ -241,6 +242,7 @@ tunables_load_defaults()
+   tunable_seccomp_sandbox = 0;
+   tunable_allow_writeable_chroot = 0;
+   tunable_better_stou = 0;
++  tunable_log_die = 0;
+ 
+   tunable_accept_timeout = 60;
+   tunable_connect_timeout = 60;
+diff --git a/tunables.h b/tunables.h
+index 85ea1a8..8a4b8b2 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -96,6 +96,8 @@ extern int tunable_allow_writeable_chroot;    /* Allow misconfiguration */
+ extern int tunable_better_stou;               /* Use better file name generation
+                                                * algorithm for the STOU command
+ 					       */
++extern int tunable_log_die;                   /* Log calls to die(), die2()
++                                               * and bug() */
+ 
+ /* Integer/numeric defines */
+ extern unsigned int tunable_accept_timeout;
+diff --git a/utility.c b/utility.c
+index 5fd714d..75e5bdd 100644
+--- a/utility.c
++++ b/utility.c
+@@ -9,6 +9,8 @@
+ #include "sysutil.h"
+ #include "str.h"
+ #include "defs.h"
++#include "logging.h"
++#include "tunables.h"
+ 
+ #define DIE_DEBUG
+ 
+@@ -41,11 +43,20 @@ void
+ bug(const char* p_text)
+ {
+   /* Rats. Try and write the reason to the network for diagnostics */
++  if (tunable_log_die)
++  {
++    vsf_log_die(p_text);
++  }
+   vsf_sysutil_activate_noblock(VSFTP_COMMAND_FD);
+   (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "500 OOPS: ", 10);
+   (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, p_text,
+                                 vsf_sysutil_strlen(p_text));
+   (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "\r\n", 2);
++  if (tunable_log_die)
++  {
++    /* Workaround for https://github.com/systemd/systemd/issues/2913 */
++    vsf_sysutil_sleep(1.0);
++  }
+   vsf_sysutil_exit(2);
+ }
+ 
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index e9ae474..f246906 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -358,6 +358,16 @@ wanting to e.g. append a file.
+ 
+ Default: YES
+ .TP
++.B log_die
++Log an error to syslog when some error condition occurs and vsftpd decides
++to quit. Internally, the error messages given to the functions die(), die2()
++and bug() are passed to syslog. Currently this functionality requires waiting
++for a short amount of time (1 second is used) after logging the message and
++before exiting. This is a workaround for the following systemd bug:
++https://github.com/systemd/systemd/issues/2913
++
++Default: NO
++.TP
+ .B log_ftp_protocol
+ When enabled, all FTP requests and responses are logged, providing the option
+ xferlog_std_format is not enabled. Useful for debugging.
+-- 
+2.14.4
+

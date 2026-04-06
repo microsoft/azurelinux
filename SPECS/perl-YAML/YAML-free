@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# YAML-free: create repackaged YAML tarball without non-free content
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1813197
+#     https://github.com/ingydotnet/yaml-pm/issues/219
+#
+# Usage: YAML-free YAML-version.tar.gz
+# Creates: YAML-free-version.tar.gz
+
+case $# in
+1)	YAML_tarball="$1"
+	;;
+*)	echo "YAML-free: usage: YAML-free YAML-version.tar.gz" 1>&2
+	exit 1
+	;;
+esac
+
+if echo "$YAML_tarball" | grep --silent -x 'YAML-[1-9][0-9]*\.[0-9][0-9.]*\.tar\.gz'; then
+	YAML_free_tarball=$(echo "$YAML_tarball" | sed -e 's|^YAML|YAML-free|')
+	YAML_dirname=$(echo "$YAML_tarball" | sed -e 's|\.tar\.gz$||')
+else
+	echo "YAML-free: tarball $YAML_tarball does not meet expected naming" 1>&2
+	exit 1
+fi
+
+echo "Creating $YAML_free_tarball from $YAML_tarball in directory $YAML_dirname"
+
+echo "Ensuring directory $YAML_dirname does not already exist"
+rm -rf "$YAML_dirname"
+
+echo "Extracting $YAML_tarball"
+tar xfz "$YAML_tarball"
+
+echo "Removing non-free file t/load-slides.t"
+rm "$YAML_dirname/t/load-slides.t"
+
+echo "Removing reference to non-free file t/load-slides.t from MANIFEST"
+sed -i -e '/^t\/load-slides.t/d' "$YAML_dirname/MANIFEST"
+
+echo "Creating $YAML_free_tarball"
+tar cfz "$YAML_free_tarball" "$YAML_dirname"
+
+echo "Removing work directory $YAML_dirname"
+rm -rf "$YAML_dirname"

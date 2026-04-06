@@ -1,0 +1,226 @@
+From f52ee4b8373f9fa8a96f9f6af656dfabc90b57ee Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 13 Nov 2024 17:41:54 +0100
+Subject: [PATCH 6/7] krb5: add realm_krb5_get_error_message()
+
+The krb5_get_error_message() call returns an error message in an
+allocated string which must be freed. This makes it hard to simply use
+krb5_get_error_message() in a printf() argument list.
+realm_krb5_get_error_message() used a static memory area to make the
+usage more easy.
+---
+ service/Makefile.am             |  1 +
+ service/realm-kerberos-helper.c | 33 +++++++++++++++++++++++++++++++++
+ service/realm-kerberos-helper.h | 28 ++++++++++++++++++++++++++++
+ service/realm-kerberos.c        |  9 +++++----
+ tools/Makefile.am               |  1 +
+ tools/realm-client.c            | 15 ++++++++++-----
+ 6 files changed, 78 insertions(+), 9 deletions(-)
+ create mode 100644 service/realm-kerberos-helper.c
+ create mode 100644 service/realm-kerberos-helper.h
+
+diff --git a/service/Makefile.am b/service/Makefile.am
+index 1fb4da9..977f4e4 100644
+--- a/service/Makefile.am
++++ b/service/Makefile.am
+@@ -56,6 +56,7 @@ realmd_SOURCES = \
+ 	service/realm-kerberos.h \
+ 	service/realm-kerberos-config.c \
+ 	service/realm-kerberos-config.h \
++	service/realm-kerberos-helper.c \
+ 	service/realm-kerberos-membership.c \
+ 	service/realm-kerberos-membership.h \
+ 	service/realm-kerberos-provider.c \
+diff --git a/service/realm-kerberos-helper.c b/service/realm-kerberos-helper.c
+new file mode 100644
+index 0000000..a89fb6a
+--- /dev/null
++++ b/service/realm-kerberos-helper.c
+@@ -0,0 +1,33 @@
++/* realmd -- Realm Kerberos helper functions used by tools as well
++ *
++ * Copyright 2024 Red Hat Inc
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; either version 2 of the licence or (at
++ * your option) any later version.
++ *
++ * See the included COPYING file for more information.
++ *
++ * Author: Sumit Bose <sbose@redhat.com>
++ */
++
++#include "config.h"
++
++#include "realm-kerberos-helper.h"
++
++const char *realm_krb5_get_error_message (krb5_context ctx,
++                                          krb5_error_code code)
++{
++	static char out[4096];
++	const char *tmp;
++	size_t len;
++
++	tmp = krb5_get_error_message (ctx, code);
++	len = strlen (tmp);
++	memcpy (out, tmp, MIN (sizeof (out), len));
++	out[sizeof(out) - 1] = '\0';
++	krb5_free_error_message (ctx, tmp);
++
++	return out;
++}
+diff --git a/service/realm-kerberos-helper.h b/service/realm-kerberos-helper.h
+new file mode 100644
+index 0000000..4dc1bdb
+--- /dev/null
++++ b/service/realm-kerberos-helper.h
+@@ -0,0 +1,28 @@
++/* realmd -- Realm Kerberos helper functions used by tools as well
++ *
++ * Copyright 2024 Red Hat Inc
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; either version 2 of the licence or (at
++ * your option) any later version.
++ *
++ * See the included COPYING file for more information.
++ *
++ * Author: Sumit Bose <sbose@redhat.com>
++ */
++
++#include "config.h"
++
++#ifndef __REALM_KERBEROS_HELPER_H__
++#define __REALM_KERBEROS_HELPER_H__
++
++#include <string.h>
++#include <sys/param.h>
++#include <krb5/krb5.h>
++
++
++const char *realm_krb5_get_error_message (krb5_context ctx,
++                                          krb5_error_code code);
++
++#endif /* __REALM_KERBEROS_HELPER_H__ */
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 8810f87..51a1b11 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -24,6 +24,7 @@
+ #include "realm-errors.h"
+ #include "realm-invocation.h"
+ #include "realm-kerberos.h"
++#include "realm-kerberos-helper.h"
+ #include "realm-kerberos-membership.h"
+ #include "realm-login-name.h"
+ #include "realm-options.h"
+@@ -65,21 +66,21 @@ G_DEFINE_TYPE (RealmKerberos, realm_kerberos, G_TYPE_DBUS_OBJECT_SKELETON);
+ #define return_if_krb5_failed(ctx, code) G_STMT_START \
+ 	if G_LIKELY ((code) == 0) { } else { \
+ 		g_warn_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
+-		                krb5_get_error_message ((ctx), (code))); \
++		                realm_krb5_get_error_message ((ctx), (code))); \
+ 		 return; \
+ 	} G_STMT_END
+ 
+ #define return_val_if_krb5_failed(ctx, code, val) G_STMT_START \
+ 	if G_LIKELY ((code) == 0) { } else { \
+ 		g_warn_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
+-		                krb5_get_error_message ((ctx), (code))); \
++		                realm_krb5_get_error_message ((ctx), (code))); \
+ 		 return (val); \
+ 	} G_STMT_END
+ 
+ #define warn_if_krb5_failed(ctx, code) G_STMT_START \
+ 	if G_LIKELY ((code) == 0) { } else { \
+ 		g_warn_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
+-		                krb5_get_error_message ((ctx), (code))); \
++		                realm_krb5_get_error_message ((ctx), (code))); \
+ 	} G_STMT_END
+ 
+ typedef struct {
+@@ -802,7 +803,7 @@ set_krb5_error (GError **error,
+ 	va_end (va);
+ 
+ 	g_set_error (error, REALM_KRB5_ERROR, code,
+-	             "%s: %s", string, krb5_get_error_message (context, code));
++	             "%s: %s", string, realm_krb5_get_error_message (context, code));
+ 	g_free (string);
+ }
+ 
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index b94782f..97b67e7 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -10,6 +10,7 @@ realm_SOURCES = \
+ 	tools/realm-join.c \
+ 	tools/realm-leave.c \
+ 	tools/realm-logins.c \
++	service/realm-kerberos-helper.c \
+ 	$(NULL)
+ 
+ realm_CFLAGS = \
+diff --git a/tools/realm-client.c b/tools/realm-client.c
+index a63652d..46848da 100644
+--- a/tools/realm-client.c
++++ b/tools/realm-client.c
+@@ -17,6 +17,7 @@
+ #include "realm.h"
+ #include "realm-client.h"
+ #include "realm-dbus-constants.h"
++#include "service/realm-kerberos-helper.h"
+ 
+ #include <glib/gi18n.h>
+ #include <glib/gstdio.h>
+@@ -543,7 +544,7 @@ propagate_krb5_error (GError **dest,
+ 	if (code != 0) {
+ 		if (format)
+ 			g_string_append (message, ": ");
+-		g_string_append (message, krb5_get_error_message (context, code));
++		g_string_append (message, realm_krb5_get_error_message (context, code));
+ 	}
+ 
+ 	g_set_error_literal (dest, g_quark_from_static_string ("krb5"),
+@@ -614,7 +615,8 @@ copy_to_ccache (krb5_context krb5,
+ 
+ 	code = krb5_cc_default (krb5, &def_ccache);
+ 	if (code != 0) {
+-		g_debug ("krb5_cc_default failed: %s", krb5_get_error_message (krb5, code));
++		g_debug ("krb5_cc_default failed: %s",
++		         realm_krb5_get_error_message (krb5, code));
+ 		return FALSE;
+ 	}
+ 
+@@ -637,13 +639,15 @@ copy_to_ccache (krb5_context krb5,
+ 		g_debug ("no matching principal found in %s", krb5_cc_default_name (krb5));
+ 		return FALSE;
+ 	} else if (code != 0) {
+-		g_debug ("krb5_cc_retrieve_cred failed: %s", krb5_get_error_message (krb5, code));
++		g_debug ("krb5_cc_retrieve_cred failed: %s",
++		         realm_krb5_get_error_message (krb5, code));
+ 		return FALSE;
+ 	}
+ 
+ 	code = krb5_cc_initialize (krb5, ccache, creds.client);
+ 	if (code != 0) {
+-		g_debug ("krb5_cc_initialize failed: %s", krb5_get_error_message (krb5, code));
++		g_debug ("krb5_cc_initialize failed: %s",
++		         realm_krb5_get_error_message (krb5, code));
+ 		return FALSE;
+ 	}
+ 
+@@ -651,7 +655,8 @@ copy_to_ccache (krb5_context krb5,
+ 	krb5_free_cred_contents (krb5, &creds);
+ 
+ 	if (code != 0) {
+-		g_debug ("krb5_cc_store_cred failed: %s", krb5_get_error_message (krb5, code));
++		g_debug ("krb5_cc_store_cred failed: %s",
++		         realm_krb5_get_error_message (krb5, code));
+ 		return FALSE;
+ 	}
+ 
+-- 
+2.47.1
+

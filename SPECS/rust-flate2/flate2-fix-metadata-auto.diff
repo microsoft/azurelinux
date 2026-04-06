@@ -1,0 +1,13 @@
+--- flate2-1.1.9/Cargo.toml	2006-07-24T01:21:28+00:00
++++ flate2-1.1.9/Cargo.toml	2026-02-06T14:54:37.608611+00:00
+@@ -265,10 +265,3 @@
+ [dev-dependencies.rand]
+ version = "0.9"
+ 
+-[target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies.miniz_oxide]
+-version = "0.8.5"
+-features = [
+-    "with-alloc",
+-    "simd",
+-]
+-default-features = false

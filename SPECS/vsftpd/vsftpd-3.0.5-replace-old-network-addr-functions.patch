@@ -1,0 +1,139 @@
+diff -urN vsftpd-3.0.5-orig/postlogin.c vsftpd-3.0.5/postlogin.c
+--- vsftpd-3.0.5-orig/postlogin.c	2015-07-22 21:03:22.000000000 +0200
++++ vsftpd-3.0.5/postlogin.c	2023-02-13 16:34:05.244467476 +0100
+@@ -27,4 +27,6 @@
+ #include "ssl.h"
+ #include "vsftpver.h"
++#include <netdb.h>
++#include <arpa/inet.h>
+ #include "opts.h"
+
+@@ -628,9 +629,10 @@
+   else
+   {
+     const void* p_v4addr = vsf_sysutil_sockaddr_ipv6_v4(s_p_sockaddr);
++    static char result[INET_ADDRSTRLEN];
+     if (p_v4addr)
+     {
+-      str_append_text(&s_pasv_res_str, vsf_sysutil_inet_ntoa(p_v4addr));
++      str_append_text(&s_pasv_res_str, inet_ntop(AF_INET, p_v4addr, result, INET_ADDRSTRLEN));
+     }
+     else
+     {
+diff -urN vsftpd-3.0.5-orig/sysutil.c vsftpd-3.0.5/sysutil.c
+--- vsftpd-3.0.5-orig/sysutil.c	2012-09-16 09:07:38.000000000 +0200
++++ vsftpd-3.0.5/sysutil.c	2023-02-13 16:08:58.557153109 +0100
+@@ -2205,20 +2205,13 @@
+   const struct sockaddr* p_sockaddr = &p_sockptr->u.u_sockaddr;
+   if (p_sockaddr->sa_family == AF_INET)
+   {
+-    return inet_ntoa(p_sockptr->u.u_sockaddr_in.sin_addr);
++    static char result[INET_ADDRSTRLEN];
++    return inet_ntop(AF_INET, &p_sockptr->u.u_sockaddr_in.sin_addr, result, INET_ADDRSTRLEN);
+   }
+   else if (p_sockaddr->sa_family == AF_INET6)
+   {
+-    static char inaddr_buf[64];
+-    const char* p_ret = inet_ntop(AF_INET6,
+-                                  &p_sockptr->u.u_sockaddr_in6.sin6_addr,
+-                                  inaddr_buf, sizeof(inaddr_buf));
+-    inaddr_buf[sizeof(inaddr_buf) - 1] = '\0';
+-    if (p_ret == NULL)
+-    {
+-      inaddr_buf[0] = '\0';
+-    }
+-    return inaddr_buf;
++    static char result[INET6_ADDRSTRLEN];
++    return inet_ntop(AF_INET6, &p_sockptr->u.u_sockaddr_in6.sin6_addr, result, INET6_ADDRSTRLEN);
+   }
+   else
+   {
+@@ -2227,12 +2220,6 @@
+   }
+ }
+ 
+-const char*
+-vsf_sysutil_inet_ntoa(const void* p_raw_addr)
+-{
+-  return inet_ntoa(*((struct in_addr*)p_raw_addr));
+-}
+-
+ int
+ vsf_sysutil_inet_aton(const char* p_text, struct vsf_sysutil_sockaddr* p_addr)
+ {
+@@ -2241,7 +2228,7 @@
+   {
+     bug("bad family");
+   }
+-  if (inet_aton(p_text, &sin_addr))
++  if (inet_pton(AF_INET, p_text, &sin_addr))
+   {
+     vsf_sysutil_memcpy(&p_addr->u.u_sockaddr_in.sin_addr,
+                        &sin_addr, sizeof(p_addr->u.u_sockaddr_in.sin_addr));
+@@ -2257,37 +2244,46 @@
+ vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
+                         const char* p_name)
+ {
+-  struct hostent* hent = gethostbyname(p_name);
+-  if (hent == NULL)
++  struct addrinfo *result;
++  struct addrinfo hints;
++  int ret;
++
++  memset(&hints, 0, sizeof(struct addrinfo));
++  hints.ai_family = AF_UNSPEC;
++
++  if ((ret = getaddrinfo(p_name, NULL, &hints, &result)) != 0)
+   {
++    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
+     die2("cannot resolve host:", p_name);
+   }
+   vsf_sysutil_sockaddr_clear(p_sockptr);
+-  if (hent->h_addrtype == AF_INET)
++  if (result->ai_family == AF_INET)
+   {
+-    unsigned int len = hent->h_length;
++    unsigned int len = result->ai_addrlen;
+     if (len > sizeof((*p_sockptr)->u.u_sockaddr_in.sin_addr))
+     {
+       len = sizeof((*p_sockptr)->u.u_sockaddr_in.sin_addr);
+     }
+     vsf_sysutil_sockaddr_alloc_ipv4(p_sockptr);
+     vsf_sysutil_memcpy(&(*p_sockptr)->u.u_sockaddr_in.sin_addr,
+-                       hent->h_addr_list[0], len);
++                       &result->ai_addrlen, len);
+   }
+-  else if (hent->h_addrtype == AF_INET6)
++  else if (result->ai_family == AF_INET6)
+   {
+-    unsigned int len = hent->h_length;
++    unsigned int len = result->ai_addrlen;
+     if (len > sizeof((*p_sockptr)->u.u_sockaddr_in6.sin6_addr))
+     {
+       len = sizeof((*p_sockptr)->u.u_sockaddr_in6.sin6_addr);
+     }
+     vsf_sysutil_sockaddr_alloc_ipv6(p_sockptr);
+     vsf_sysutil_memcpy(&(*p_sockptr)->u.u_sockaddr_in6.sin6_addr,
+-                       hent->h_addr_list[0], len);
++                       &result->ai_addrlen, len);
+   }
+   else
+   {
+-    die("gethostbyname(): neither IPv4 nor IPv6");
++    freeaddrinfo(result);
++    die("getaddrinfo(): neither IPv4 nor IPv6");
+   }
++  freeaddrinfo(result);
+ }
+ 
+diff -urN vsftpd-3.0.5-orig/sysutil.h vsftpd-3.0.5/sysutil.h
+--- vsftpd-3.0.5-orig/sysutil.h	2021-05-18 08:50:21.000000000 +0200
++++ vsftpd-3.0.5/sysutil.h	2023-02-13 15:59:22.088331075 +0100
+@@ -277,7 +277,6 @@
+ 
+ const char* vsf_sysutil_inet_ntop(
+   const struct vsf_sysutil_sockaddr* p_sockptr);
+-const char* vsf_sysutil_inet_ntoa(const void* p_raw_addr);
+ int vsf_sysutil_inet_aton(
+   const char* p_text, struct vsf_sysutil_sockaddr* p_addr);
+ 

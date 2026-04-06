@@ -1,0 +1,21 @@
+--- telnetd/telnetd.c	Thu Apr 13 00:36:12 2000
++++ telnetd.new/telnetd.c	Sun Mar 11 03:10:43 2001
+@@ -44,7 +44,7 @@
+ #include "../version.h"
+ 
+ #include <netdb.h>
+-#include <termcap.h>
++#include <ncurses/termcap.h>
+ #include <netinet/in.h>
+ /* #include <netinet/ip.h> */ /* Don't think this is used at all here */
+ #include <arpa/inet.h>
+--- telnetd/defs.h	Mon Aug  2 06:14:03 1999
++++ telnetd.new/defs.h	Sun Mar 11 03:28:13 2001
+@@ -56,6 +56,7 @@
+ #include <sys/file.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
++#include <time.h>
+ #include <sys/ioctl.h>
+ #include <netinet/in.h>
+ #include <arpa/telnet.h>

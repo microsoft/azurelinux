@@ -1,0 +1,11 @@
+--- nanorand-0.7.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nanorand-0.7.0/Cargo.toml	2024-06-10T15:30:28.575387+00:00
+@@ -29,7 +29,7 @@
+ lto = "thin"
+ [dependencies.getrandom]
+ version = "0.2.5"
+-features = ["rdrand", "js"]
++features = ["rdrand"]
+ optional = true
+ 
+ [dependencies.zeroize]

@@ -1,0 +1,53 @@
+From 5924df771f850c249396a37a62f97ac242bf2f96 Mon Sep 17 00:00:00 2001
+From: Hector Martin <marcan@marcan.st>
+Date: Wed, 20 Aug 2025 13:34:08 +0900
+Subject: [PATCH 1/2] mgr/dashboard: Make saml2 robust against module load
+ errors
+
+Loading saml2 can fail due to issues with the xmlsec package (possibly
+subinterpreter related):
+
+  File "/usr/share/ceph/mgr/dashboard/controllers/saml2.py", line 6, in <module>
+    from onelogin.saml2.auth import OneLogin_Saml2_Auth
+  File "/lib/python3.13/site-packages/onelogin/saml2/auth.py", line 12, in <module>
+    import xmlsec
+xmlsec.Error: (100, 'lxml & xmlsec libxml2 library version mismatch')
+
+Instead of taking down the entire dashboard module, treat this exception
+like a missing saml2 package.
+
+Signed-off-by: Hector Martin <marcan@marcan.st>
+---
+ src/pybind/mgr/dashboard/controllers/saml2.py | 2 +-
+ src/pybind/mgr/dashboard/services/sso.py      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/pybind/mgr/dashboard/controllers/saml2.py b/src/pybind/mgr/dashboard/controllers/saml2.py
+index c11b18a27bc7..e859f558cdc4 100644
+--- a/src/pybind/mgr/dashboard/controllers/saml2.py
++++ b/src/pybind/mgr/dashboard/controllers/saml2.py
+@@ -8,7 +8,7 @@ try:
+     from onelogin.saml2.settings import OneLogin_Saml2_Settings
+ 
+     python_saml_imported = True
+-except ImportError:
++except Exception:
+     python_saml_imported = False
+ 
+ from .. import mgr
+diff --git a/src/pybind/mgr/dashboard/services/sso.py b/src/pybind/mgr/dashboard/services/sso.py
+index 2290e6ea3e15..38910ca4aa34 100644
+--- a/src/pybind/mgr/dashboard/services/sso.py
++++ b/src/pybind/mgr/dashboard/services/sso.py
+@@ -20,7 +20,7 @@ try:
+     from onelogin.saml2.settings import OneLogin_Saml2_Settings as Saml2Settings
+ 
+     python_saml_imported = True
+-except ImportError:
++except Exception:
+     python_saml_imported = False
+ 
+ 
+-- 
+2.50.1
+

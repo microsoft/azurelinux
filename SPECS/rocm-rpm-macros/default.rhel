@@ -1,0 +1,12 @@
+#%Module 1.0
+#
+#  ROCm module for use with 'environment-modules' package:
+# 
+
+conflict rocm
+
+setenv        ROCM_BIN      /usr/bin
+setenv        ROCM_LIB      /usr/lib64
+setenv        ROCM_INCLUDE  /usr/include
+setenv        ROCM_GPUS     "gfx90a:xnack+;gfx90a:xnack-;gfx942;gfx1100;gfx1101;gfx1102;gfx1151"
+

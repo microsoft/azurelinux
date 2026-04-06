@@ -1,0 +1,24 @@
+diff -Naur lzo-2.08/configure lzo-2.08.configure/configure
+--- lzo-2.08/configure	2014-06-29 15:08:49.000000000 +0530
++++ lzo-2.08.configure/configure	2014-06-30 10:38:08.344604418 +0530
+@@ -13875,7 +13875,7 @@
+ asm_msg_amd64=no
+ asm_msg_i386=no
+ 
+-case "$host_cpu-$ac_cv_sizeof_void_p" in
++case "$target_cpu-$ac_cv_sizeof_void_p" in
+     amd64-8 | x86_64-8) asm_arch="amd64"; asm_dir="asm/amd64/src_gas/elf64"; asm_mode="amd64_src_gas_elf64" ;;
+     i?86-4) asm_arch="i386"; asm_dir="asm/i386/src_gas"; asm_mode="i386_src_gas" ;;
+     *) enable_asm=no ;;
+diff -Naur lzo-2.08/configure.ac lzo-2.08.configure/configure.ac
+--- lzo-2.08/configure.ac	2014-06-29 15:08:49.000000000 +0530
++++ lzo-2.08.configure/configure.ac	2014-06-30 10:38:38.706603340 +0530
+@@ -123,7 +123,7 @@
+ asm_msg_amd64=no
+ asm_msg_i386=no
+ 
+-case "$host_cpu-$ac_cv_sizeof_void_p" in
++case "$target_cpu-$ac_cv_sizeof_void_p" in
+     amd64-8 | x86_64-8) asm_arch="amd64"; asm_dir="asm/amd64/src_gas/elf64"; asm_mode="amd64_src_gas_elf64" ;;
+     i?86-4) asm_arch="i386"; asm_dir="asm/i386/src_gas"; asm_mode="i386_src_gas" ;;
+     *) enable_asm=no ;;

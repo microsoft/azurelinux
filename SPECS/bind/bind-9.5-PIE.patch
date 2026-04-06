@@ -1,0 +1,28 @@
+From 13348a5fc64387bf53ef450688e181100d0ceddb Mon Sep 17 00:00:00 2001
+From: Petr Mensik <pemensik@redhat.com>
+Date: Thu, 12 Dec 2024 15:56:13 +0100
+Subject: [PATCH] Harden named service build flags
+
+---
+ bin/named/Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/bin/named/Makefile.am b/bin/named/Makefile.am
+index 57a023b..b832e9c 100644
+--- a/bin/named/Makefile.am
++++ b/bin/named/Makefile.am
+@@ -33,7 +33,10 @@ endif HAVE_LIBXML2
+ 
+ AM_CPPFLAGS +=						\
+ 	-DNAMED_LOCALSTATEDIR=\"${localstatedir}\"	\
+-	-DNAMED_SYSCONFDIR=\"${sysconfdir}\"
++	-DNAMED_SYSCONFDIR=\"${sysconfdir}\"		\
++	-fpie
++
++AM_LDFLAGS  += -pie -Wl,-z,relro,-z,now,-z,nodlopen,-z,noexecstack
+ 
+ sbin_PROGRAMS = named
+ 
+-- 
+2.47.1
+

@@ -1,0 +1,67 @@
+From cdd0ede64037938b5ef89da2b5ac3c77ea7c6375 Mon Sep 17 00:00:00 2001
+From: Josh Stone <jistone@redhat.com>
+Date: Tue, 3 Feb 2026 16:09:21 -0800
+Subject: [PATCH] bootstrap: always propagate `CARGO_TARGET_{host}_LINKER`
+
+We were already setting `CARGO_TARGET_{target}_LINKER` when there is a
+setting in `bootstrap.toml`, and when the host and target are the same,
+this is also used for build scripts and proc-macros.
+
+However, the host value wasn't set when building for any other target,
+and Cargo would see that as a fingerprint change for those build
+artifacts, rebuilding them.
+
+If we always set the `CARGO_TARGET_{host}_LINKER`, then those build
+scripts will keep a consistent Cargo fingerprint, so they'll remain
+cached no matter how we're alternating targets.
+---
+ src/bootstrap/src/core/builder/cargo.rs | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/bootstrap/src/core/builder/cargo.rs b/src/bootstrap/src/core/builder/cargo.rs
+index 7150b2b0d59f..488125863ee0 100644
+--- a/src/bootstrap/src/core/builder/cargo.rs
++++ b/src/bootstrap/src/core/builder/cargo.rs
+@@ -10,7 +10,7 @@
+ use crate::core::config::SplitDebuginfo;
+ use crate::core::config::flags::Color;
+ use crate::utils::build_stamp;
+-use crate::utils::helpers::{self, LldThreads, check_cfg_arg, linker_args, linker_flags};
++use crate::utils::helpers::{self, LldThreads, check_cfg_arg, linker_flags};
+ use crate::{
+     BootstrapCommand, CLang, Compiler, Config, DryRun, EXTRA_CHECK_CFGS, GitRepo, Mode,
+     RemapScheme, TargetSelection, command, prepare_behaviour_dump_dir, t,
+@@ -310,7 +310,15 @@ fn configure_linker(&mut self, builder: &Builder<'_>) -> &mut Cargo {
+             }
+         }
+ 
+-        for arg in linker_args(builder, compiler.host, LldThreads::Yes) {
++        // We need to set host linker flags for compiling build scripts and proc-macros.
++        // This is done the same way as the target linker flags below, so cargo won't see
++        // any fingerprint difference between host==target versus cross-compiled targets
++        // when it comes to those host build artifacts.
++        if let Some(host_linker) = builder.linker(compiler.host) {
++            let host = crate::envify(&compiler.host.triple);
++            self.command.env(format!("CARGO_TARGET_{host}_LINKER"), host_linker);
++        }
++        for arg in linker_flags(builder, compiler.host, LldThreads::Yes) {
+             self.hostflags.arg(&arg);
+         }
+ 
+@@ -319,11 +327,11 @@ fn configure_linker(&mut self, builder: &Builder<'_>) -> &mut Cargo {
+             self.command.env(format!("CARGO_TARGET_{target}_LINKER"), target_linker);
+         }
+         // We want to set -Clinker using Cargo, therefore we only call `linker_flags` and not
+-        // `linker_args` here.
++        // `linker_args` here. Cargo will pass that to both rustc and rustdoc invocations.
+         for flag in linker_flags(builder, target, LldThreads::Yes) {
+             self.rustflags.arg(&flag);
+         }
+-        for arg in linker_args(builder, target, LldThreads::Yes) {
++        for arg in linker_flags(builder, target, LldThreads::Yes) {
+             self.rustdocflags.arg(&arg);
+         }
+ 
+-- 
+2.52.0
+

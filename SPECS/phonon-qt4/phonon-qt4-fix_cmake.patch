@@ -1,0 +1,53 @@
+--- a/CMakeLists.orig.txt	2019-07-19 13:42:16.000000000 +0200
++++ b/CMakeLists.txt	2025-09-14 18:56:52.624400499 +0200
+@@ -1,6 +1,7 @@
++cmake_minimum_required(VERSION 3.12...4.0)
++
+ project(Phonon)
+ 
+-cmake_minimum_required(VERSION 2.8.9 FATAL_ERROR)
+ add_definitions(-DPHONON_BUILD_WITH_CMAKE)
+ 
+ option(PHONON_ASSERT_STATES "Enable code to assert backend state transitions" ON)
+--- a/cmake/PhononQt4.cmake.11	2025-09-14 19:07:43.771080907 +0200
++++ b/cmake/PhononQt4.cmake	2025-09-14 19:08:53.185368723 +0200
+@@ -239,7 +239,7 @@
+    set( __KDE_HAVE_GCC_VISIBILITY ${__KDE_HAVE_GCC_VISIBILITY} CACHE BOOL "GCC support for hidden visibility")
+ 
+    # get the gcc version
+-   exec_program(${CMAKE_C_COMPILER} ARGS ${CMAKE_C_COMPILER_ARG1} --version OUTPUT_VARIABLE _gcc_version_info)
++   execute_process(COMMAND ${CMAKE_C_COMPILER} ARGS ${CMAKE_C_COMPILER_ARG1} --version OUTPUT_VARIABLE _gcc_version_info)
+ 
+    string (REGEX MATCH "[345]\\.[0-9]\\.[0-9]" _gcc_version "${_gcc_version_info}")
+    # gcc on mac just reports: "gcc (GCC) 3.3 20030304 ..." without the patch level, handle this here:
+@@ -258,7 +258,7 @@
+ 
+    set(_GCC_COMPILED_WITH_BAD_ALLOCATOR FALSE)
+    if (GCC_IS_NEWER_THAN_4_1)
+-      exec_program(${CMAKE_C_COMPILER} ARGS ${CMAKE_C_COMPILER_ARG1} -v OUTPUT_VARIABLE _gcc_alloc_info)
++      execute_process(COMMAND ${CMAKE_C_COMPILER} ARGS ${CMAKE_C_COMPILER_ARG1} -v OUTPUT_VARIABLE _gcc_alloc_info)
+       string(REGEX MATCH "(--enable-libstdcxx-allocator=mt)" _GCC_COMPILED_WITH_BAD_ALLOCATOR "${_gcc_alloc_info}")
+    endif (GCC_IS_NEWER_THAN_4_1)
+ 
+--- a/phonon/CMakeLists.orig.txt	2019-07-19 13:42:16.000000000 +0200
++++ b/phonon/CMakeLists.txt	2025-09-14 19:43:10.112595481 +0200
+@@ -169,7 +169,7 @@
+                                            VERSION ${PHONON_LIB_VERSION}
+                                            SOVERSION ${PHONON_LIB_SOVERSION}
+                                            DEFINE_SYMBOL MAKE_PHONON_LIB
+-                                           LINK_INTERFACE_LIBRARIES "")
++                                           EXPORT_LINK_INTERFACE_LIBRARIES "")
+ # LINK_INTERFACE_LIBRARIES: By default don't add any linked libraries to the "exported"
+ # link interfaces, so that executables linking against this library
+ # will not automatically add implicit dependencies to their link list.
+--- a/phonon/experimental/CMakeLists.orig.txt	2025-09-14 19:44:54.080040392 +0200
++++ b/phonon/experimental/CMakeLists.txt	2019-07-19 13:42:16.000000000 +0200
+@@ -26,7 +26,7 @@
+                                          VERSION ${PHONON_LIB_VERSION}
+                                          SOVERSION ${PHONON_LIB_SOVERSION}
+                                          DEFINE_SYMBOL MAKE_PHONONEXPERIMENTAL_LIB
+-                                         LINK_INTERFACE_LIBRARIES ""
++                                         EXPORT_LINK_INTERFACE_LIBRARIES ""
+                                          )
+ install(TARGETS ${PHONON_LIB_SONAME}experimental EXPORT PhononExperimentalLibs ${INSTALL_TARGETS_DEFAULT_ARGS})
+ target_include_directories(${PHONON_LIB_SONAME}experimental

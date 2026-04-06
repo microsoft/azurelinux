@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT
+#
+# Declarative buildsystem for GAP, requires RPM 4.20+ to work:
+# https://rpm-software-management.github.io/rpm/manual/buildsystem.html
+#
+# GAP packages should define the following:
+# - gap_pkgname: the lowercased name of the GAP package
+# - gap_upname: the upstream name of the GAP package, if different from
+#   gap_pkgname
+# - gap_makedoc: name of the makedoc file if it is not makedoc.g
+# - gap_skip_docs: set to 1 to skip installing docs (default is 0)
+# - gap_skip_check: set to 1 to skip running tests (default is 0)
+%gap_upname %gap_pkgname
+%gap_makedoc makedoc.g
+%gap_skip_docs 0
+%gap_skip_check 0
+
+%gap_root_dir %{buildroot}%["%{_target_cpu}" == "noarch" ? "%{gap_libdir}" : "%{gap_archdir}"]
+%gap_install_dir %{gap_root_dir}/pkg/%{gap_upname}
+
+%buildsystem_gap_conf() %nil
+%buildsystem_gap_build() gap %* %{gap_makedoc}
+%buildsystem_gap_install() \
+  mkdir -p %{gap_install_dir}/doc; \
+  cp -a *.g %* %{gap_install_dir}; \
+%if !0%{?gap_skip_docs} \
+  %{gap_copy_docs} \
+%endif
+%buildsystem_gap_check() \
+%if !0%{?gap_skip_check} \
+  gap -l '%{gap_root_dir};' %* \
+%endif

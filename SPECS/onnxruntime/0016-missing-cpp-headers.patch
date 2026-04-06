@@ -1,0 +1,49 @@
+From e04eda4304b3eb66b8d1dfb4a2f992efab506724 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:14:51 -0300
+Subject: [PATCH 16/20] missing-cpp-headers
+
+---
+ onnxruntime/contrib_ops/cpu/utils/console_dumper.h               | 1 +
+ .../transpose_optimization/onnx_transpose_optimization.cc        | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/onnxruntime/contrib_ops/cpu/utils/console_dumper.h b/onnxruntime/contrib_ops/cpu/utils/console_dumper.h
+index 9ebc44f441..a68f198908 100644
+--- a/onnxruntime/contrib_ops/cpu/utils/console_dumper.h
++++ b/onnxruntime/contrib_ops/cpu/utils/console_dumper.h
+@@ -6,6 +6,7 @@
+ #include "core/framework/ort_value.h"
+ #include "core/framework/float16.h"
+ #include "contrib_ops/cpu/utils/debug_macros.h"
++#include <iostream>
+ 
+ namespace onnxruntime {
+ namespace contrib {
+diff --git a/onnxruntime/core/optimizer/transpose_optimization/onnx_transpose_optimization.cc b/onnxruntime/core/optimizer/transpose_optimization/onnx_transpose_optimization.cc
+index 470838d36e..ac45587190 100644
+--- a/onnxruntime/core/optimizer/transpose_optimization/onnx_transpose_optimization.cc
++++ b/onnxruntime/core/optimizer/transpose_optimization/onnx_transpose_optimization.cc
+@@ -11,6 +11,7 @@
+ #include <unordered_set>
+ #include <utility>
+ #include <vector>
++#include <cstring>
+ 
+ #include <gsl/gsl>
+ #include "core/common/make_string.h"
+diff --git a/onnxruntime/core/optimizer/transpose_optimization/optimizer_api.h b/onnxruntime/core/optimizer/transpose_optimization/optimizer_api.h
+index 7122aec45e..646ee5c662 100644
+--- a/onnxruntime/core/optimizer/transpose_optimization/optimizer_api.h
++++ b/onnxruntime/core/optimizer/transpose_optimization/optimizer_api.h
+@@ -11,6 +11,7 @@
+ #include <unordered_map>
+ #include <unordered_set>
+ #include <vector>
++#include <cstdint>
+ 
+ namespace onnx_transpose_optimization {
+ namespace api {
+-- 
+2.47.1
+

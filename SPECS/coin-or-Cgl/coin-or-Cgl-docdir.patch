@@ -1,0 +1,31 @@
+--- Cgl-releases-0.60.8/Cgl/configure.orig	2023-10-25 11:18:20.000000000 -0600
++++ Cgl-releases-0.60.8/Cgl/configure	2023-10-27 12:43:25.076690930 -0600
+@@ -27411,7 +27411,7 @@ echo "${ECHO_T}$doxysrcdir (src)" >&6
+   fi
+   # Not built, fall back to installed tag file
+   if test $doxyfound = no ; then
+-    eval doxydir="${datadir}/coin/doc/${proj}/doxydoc"
++    eval doxydir="${datadir}/doc/coin-or-${proj}"
+     # AC_MSG_NOTICE([Considering $doxydir (install)])
+     # AC_MSG_NOTICE([Subdirs: $coin_subdirs)])
+     coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=$doxydir/html"
+--- Cgl-releases-0.60.8/Cgl/Makefile.in.orig	2023-10-25 11:18:20.000000000 -0600
++++ Cgl-releases-0.60.8/Cgl/Makefile.in	2023-10-27 12:43:25.076690930 -0600
+@@ -394,7 +394,7 @@ EXTRA_DIST = examples/cgl1.cpp examples/
+ ########################################################################
+ pkgconfiglibdir = $(libdir)/pkgconfig
+ pkgconfiglib_DATA = cgl.pc
+-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Cgl
++addlibsdir = $(DESTDIR)$(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ 
+ ########################################################################
+ #                         Maintainer Stuff                             #
+@@ -404,7 +404,7 @@ CLEANFILES =
+ # Files that are generated and should be cleaned with make distclean
+ DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
+ DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md 
+-DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
++DocInstallDir = $(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+ COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
+ all: all-recursive

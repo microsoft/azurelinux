@@ -1,0 +1,13 @@
+diff --git a/demo/Makefile.am b/demo/Makefile.am
+index ad440e5ad..8f665acec 100644
+--- a/demo/Makefile.am
++++ b/demo/Makefile.am
+@@ -20,7 +20,7 @@ GNUPLOT = gnuplot
+ 
+ all: $(BINARY_FILES)
+ 
+-$(BINARY_FILES): ../src/bf_test $(top_srcdir)/demo/dodecahedron.dat
++$(BINARY_FILES) &: ../src/bf_test $(top_srcdir)/demo/dodecahedron.dat
+ 	@echo Creating binary data files
+ 	test "$(top_srcdir)" = "$(top_builddir)" || cp $(top_srcdir)/demo/dodecahedron.dat .
+ 	@../src/bf_test

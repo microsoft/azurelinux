@@ -1,0 +1,68 @@
+diff -up Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.cpp.orig Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.cpp
+--- Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.cpp.orig	2023-10-25 12:14:19.000000000 -0600
++++ Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.cpp	2023-10-27 13:48:41.867896805 -0600
+@@ -41,7 +41,7 @@ void CbcSymmetry::Node::node(int i, doub
+   sign = s;
+ }
+ 
+-inline bool CbcSymmetry::compare(register Node &a, register Node &b) const
++inline bool CbcSymmetry::compare(Node &a, Node &b) const
+ {
+   if (a.get_code() == b.get_code())
+     if (a.get_coeff() == b.get_coeff())
+diff -up Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.hpp.orig Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.hpp
+--- Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.hpp.orig	2023-10-25 12:14:19.000000000 -0600
++++ Cbc-releases-2.10.11/Cbc/src/CbcSymmetry.hpp	2023-10-27 13:51:26.121563870 -0600
+@@ -80,7 +80,7 @@ class CbcSymmetry {
+ 
+   public:
+     void node(int, double, double, double, int, int);
+-    inline void color_vertex(register int k) { color = k; }
++    inline void color_vertex(int k) { color = k; }
+     inline int get_index() const { return index; }
+     inline double get_coeff() const { return coeff; }
+     inline double get_lb() const { return lb; }
+@@ -88,7 +88,7 @@ class CbcSymmetry {
+     inline int get_color() const { return color; }
+     inline int get_code() const { return code; }
+     inline int get_sign() const { return sign; }
+-    inline void bounds(register double a, register double b)
++    inline void bounds(double a, double b)
+     {
+       lb = a;
+       ub = b;
+@@ -96,7 +96,7 @@ class CbcSymmetry {
+   };
+ 
+   struct myclass0 {
+-    inline bool operator()(register const Node &a, register const Node &b)
++    inline bool operator()(const Node &a, const Node &b)
+     {
+ 
+       return ((a.get_code() < b.get_code()) || ((a.get_code() == b.get_code() && ((a.get_coeff() < b.get_coeff() - COUENNE_HACKED_EPS_SYMM) || ((fabs(a.get_coeff() - b.get_coeff()) < COUENNE_HACKED_EPS_SYMM) && ((a.get_lb() < b.get_lb() - COUENNE_HACKED_EPS_SYMM) || ((fabs(a.get_lb() - b.get_lb()) < COUENNE_HACKED_EPS_SYMM) && ((a.get_ub() < b.get_ub() - COUENNE_HACKED_EPS_SYMM) || ((fabs(a.get_ub() - b.get_ub()) < COUENNE_HACKED_EPS_SYMM) && ((a.get_index() < b.get_index())))))))))));
+@@ -104,14 +104,14 @@ class CbcSymmetry {
+   };
+ 
+   struct myclass {
+-    inline bool operator()(register const Node &a, register const Node &b)
++    inline bool operator()(const Node &a, const Node &b)
+     {
+       return (a.get_index() < b.get_index());
+     }
+   };
+ 
+   struct less_than_str {
+-    inline bool operator()(register const char *a, register const char *b) const
++    inline bool operator()(const char *a, const char *b) const
+     {
+       return strcmp(a, b) < 0;
+     }
+@@ -186,7 +186,7 @@ public:
+   void adjustStats(const CbcSymmetry * other);
+   inline int numberColumns() const
+   { return numberColumns_;}
+-  inline bool compare(register Node &a, register Node &b) const;
++  inline bool compare(Node &a, Node &b) const;
+   CbcNauty *getNtyInfo() { return nauty_info_; }
+ 
+   // bool node_sort (  Node  a, Node  b);

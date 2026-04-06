@@ -1,0 +1,14 @@
+--- crypton-x509-system-1.6.7/System/X509/Unix.hs~	2001-09-09 09:46:40.000000000 +0800
++++ crypton-x509-system-1.6.7/System/X509/Unix.hs	2025-07-31 17:24:29.728531927 +0800
+@@ -27,10 +27,7 @@
+ 
+ defaultSystemPaths :: [FilePath]
+ defaultSystemPaths =
+-    [ "/etc/ssl/certs/"                 -- linux
+-    , "/system/etc/security/cacerts/"   -- android
+-    , "/usr/local/share/certs/"         -- freebsd
+-    , "/etc/ssl/cert.pem"               -- openbsd
++    [ "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem" -- fedora
+     ]
+ 
+ envPathOverride :: String

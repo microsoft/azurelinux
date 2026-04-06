@@ -1,0 +1,16 @@
+diff --git a/src/3rdparty/chromium/third_party/webrtc/rtc_base/physical_socket_server.cc b/src/3rdparty/chromium/third_party/webrtc/rtc_base/physical_socket_server.cc
+index d421682..ffa75a7 100644
+--- a/src/3rdparty/chromium/third_party/webrtc/rtc_base/physical_socket_server.cc
++++ b/src/3rdparty/chromium/third_party/webrtc/rtc_base/physical_socket_server.cc
+@@ -77,6 +77,11 @@ typedef void* SockOptArg;
+ 
+ #if defined(WEBRTC_POSIX) && !defined(WEBRTC_MAC) && !defined(__native_client__)
+ 
++// Seems that kernel 5.2.0 renames this define to SIOCGSTAMP_OLD
++#ifndef SIOCGSTAMP
++#define SIOCGSTAMP        0x8906          /* Get stamp (timeval) */
++#endif
++
+ int64_t GetSocketRecvTimestamp(int socket) {
+   struct timeval tv_ioctl;
+   int ret = ioctl(socket, SIOCGSTAMP, &tv_ioctl);

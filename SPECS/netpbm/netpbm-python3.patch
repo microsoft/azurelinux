@@ -1,0 +1,28 @@
+diff --git a/buildtools/makeman b/buildtools/makeman
+index 196dbd0..d73ab76 100755
+--- a/buildtools/makeman
++++ b/buildtools/makeman
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ #
+ # makeman -- compile netpbm's stereotyped HTML to troff markup
+ #
+diff --git a/buildtools/manpage.mk b/buildtools/manpage.mk
+index ef1a103..c1badb8 100644
+--- a/buildtools/manpage.mk
++++ b/buildtools/manpage.mk
+@@ -126,11 +126,11 @@ reportman:
+ # to standard error.
+ %.1 %.3 %.5: $(USERGUIDE)/%.html
+ 	@echo Converting $< to $@
+-	@python $(MAKEMAN) -d $(USERGUIDE) $(<F) 
++	@python3 $(MAKEMAN) -d $(USERGUIDE) $(<F)
+ 
+ netpbm.1: $(USERGUIDE)/index.html
+ 	@echo Converting $< to $@
+-	@python $(MAKEMAN) -d $(USERGUIDE) index.html
++	@python3 $(MAKEMAN) -d $(USERGUIDE) index.html
+ 	@mv index.1 netpbm.1
+ 
+ # Generate man pages

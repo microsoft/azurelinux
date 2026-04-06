@@ -1,0 +1,33 @@
+--- iana-time-zone-0.1.65/Cargo.toml	1970-01-01T00:00:01+00:00
++++ iana-time-zone-0.1.65/Cargo.toml	2026-02-06T15:35:19.328751+00:00
+@@ -64,30 +64,3 @@
+ [dev-dependencies.getrandom]
+ version = "0.2.1"
+ 
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies.js-sys]
+-version = "0.3.66"
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies.log]
+-version = "0.4.14"
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies.wasm-bindgen]
+-version = "0.2.89"
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies.getrandom]
+-version = "0.2.1"
+-features = ["js"]
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.46"
+-
+-[target.'cfg(target_os = "android")'.dependencies.android_system_properties]
+-version = "0.1.5"
+-
+-[target.'cfg(target_os = "haiku")'.dependencies.iana-time-zone-haiku]
+-version = "0.1.1"
+-
+-[target.'cfg(target_os = "windows")'.dependencies.windows-core]
+-version = ">=0.56, <=0.62"
+-
+-[target.'cfg(target_vendor = "apple")'.dependencies.core-foundation-sys]
+-version = "0.8.6"

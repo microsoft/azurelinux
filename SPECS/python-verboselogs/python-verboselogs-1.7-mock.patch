@@ -1,0 +1,12 @@
+diff -uNr a/verboselogs/tests.py b/verboselogs/tests.py
+--- a/verboselogs/tests.py	2017-08-07 12:45:42.000000000 -0700
++++ b/verboselogs/tests.py	2022-04-27 14:58:03.208985356 -0700
+@@ -14,7 +14,7 @@
+ import unittest
+ 
+ # Test dependencies.
+-import mock
++from unittest import mock
+ 
+ # The module we're testing.
+ import verboselogs

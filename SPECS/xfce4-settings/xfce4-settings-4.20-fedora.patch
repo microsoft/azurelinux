@@ -1,0 +1,14 @@
+--- xfsettingsd/xsettings.xml.orig	2025-02-15 11:18:57.698932502 -0600
++++ xfsettingsd/xsettings.xml	2025-02-15 11:21:36.088560532 -0600
+@@ -19,9 +19,9 @@
+   </property>
+   <property name="Xft" type="empty">
+     <property name="DPI" type="int" value="96"/>
+-    <property name="Antialias" type="int" value="-1"/>
++    <property name="Antialias" type="int" value="1"/>
+     <property name="Hinting" type="int" value="-1"/>
+-    <property name="HintStyle" type="string" value="hintnone"/>
++    <property name="HintStyle" type="string" value="hintfull"/>
+     <property name="RGBA" type="string" value="none"/>
+   </property>
+   <property name="Gtk" type="empty">

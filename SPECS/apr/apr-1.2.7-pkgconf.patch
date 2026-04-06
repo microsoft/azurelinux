@@ -1,0 +1,56 @@
+
+This is a fugly hack to make apr-1-config libdir-agnostic, by using
+pkg-config to determine the libdir setting.  pkg-config will
+magically determine the appropriate libdir setting.
+
+This allows apr-devel.i386 and apr-devel.x86_64 to be 
+installed in parallel.
+
+--- apr-1.2.7/Makefile.in.pkgconf
++++ apr-1.2.7/Makefile.in
+@@ -60,7 +60,7 @@
+ 
+ # Create apr-config script suitable for the install tree
+ apr-config.out: $(APR_CONFIG)
+-	sed 's,^\(location=\).*$$,\1installed,' < $(APR_CONFIG) > $@
++	sed 's,^\(location=\).*$$,\1installed,;s,^\(APR_.*_DIR\)=.*,\1="$${libdir}/build",' < $(APR_CONFIG) > $@
+ 
+ # Create apr_rules.mk suitable for the install tree
+ build/apr_rules.out: build/apr_rules.mk
+--- apr-1.2.7/apr.pc.in.pkgconf
++++ apr-1.2.7/apr.pc.in
+@@ -3,9 +3,10 @@
+ libdir=@libdir@
+ APR_MAJOR_VERSION=@APR_MAJOR_VERSION@
+ includedir=@includedir@
++CPPFLAGS=@EXTRA_CPPFLAGS@
+ 
+ Name: APR
+ Description: The Apache Portable Runtime library
+ Version: @APR_DOTTED_VERSION@
+ Libs: -L${libdir} -l@APR_LIBNAME@ @EXTRA_LIBS@
+-Cflags: @EXTRA_CPPFLAGS@ @EXTRA_CFLAGS@ -I${includedir}
++Cflags: ${CPPFLAGS} @EXTRA_CFLAGS@ -I${includedir}
+--- apr-1.2.7/apr-config.in.pkgconf
++++ apr-1.2.7/apr-config.in
+@@ -24,16 +24,17 @@
+ prefix="@prefix@"
+ exec_prefix="@exec_prefix@"
+ bindir="@bindir@"
+-libdir="@libdir@"
+ datarootdir="@datadir@"
+ datadir="@datadir@"
+-installbuilddir="@installbuilddir@"
+ includedir="@includedir@"
+ 
++libdir=`pkg-config --variable=libdir apr-@APR_MAJOR_VERSION@`
++installbuilddir="${libdir}/apr-@APR_MAJOR_VERSION@/build"
++
+ CC="@CC@"
+ CPP="@CPP@"
+ SHELL="@SHELL@"
+-CPPFLAGS="@EXTRA_CPPFLAGS@"
++CPPFLAGS=`pkg-config --variable=CPPFLAGS apr-@APR_MAJOR_VERSION@`
+ CFLAGS="@EXTRA_CFLAGS@"
+ LDFLAGS="@EXTRA_LDFLAGS@"
+ LIBS="@EXTRA_LIBS@"

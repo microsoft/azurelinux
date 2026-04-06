@@ -1,0 +1,3 @@
+d /run/setroubleshoot 711 setroubleshoot setroubleshoot -
+d /var/lib/setroubleshoot 700 setroubleshoot setroubleshoot -
+Z /var/lib/setroubleshoot - setroubleshoot setroubleshoot -

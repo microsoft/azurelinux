@@ -1,0 +1,21 @@
+--- jsonwebtoken-9.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jsonwebtoken-9.3.1/Cargo.toml	2026-02-07T06:47:43.421172+00:00
+@@ -75,18 +75,12 @@
+ version = "0.6"
+ optional = true
+ 
+-[dev-dependencies.wasm-bindgen-test]
+-version = "0.3.1"
+-
+ [features]
+ default = ["use_pem"]
+ use_pem = [
+     "pem",
+     "simple_asn1",
+ ]
+-
+-[target.'cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))'.dev-dependencies.criterion]
+-version = "0.4"
+ 
+ [target.'cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))'.dev-dependencies.time]
+ version = "0.3"

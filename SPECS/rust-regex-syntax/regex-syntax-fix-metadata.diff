@@ -1,0 +1,11 @@
+--- regex-syntax-0.8.9/Cargo.toml	2006-07-24T01:21:28+00:00
++++ regex-syntax-0.8.9/Cargo.toml	2026-02-06T15:15:47.206294+00:00
+@@ -43,7 +43,7 @@
+ homepage = "https://github.com/rust-lang/regex/tree/master/regex-syntax"
+ documentation = "https://docs.rs/regex-syntax"
+ readme = "README.md"
+-license = "MIT OR Apache-2.0"
++license = "(MIT OR Apache-2.0) AND Unicode-DFS-2016"
+ repository = "https://github.com/rust-lang/regex"
+ 
+ [package.metadata.docs.rs]

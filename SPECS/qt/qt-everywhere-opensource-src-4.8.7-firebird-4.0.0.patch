@@ -1,0 +1,21 @@
+diff -up qt-everywhere-opensource-src-4.8.7/config.tests/unix/ibase/ibase.pro.ibase qt-everywhere-opensource-src-4.8.7/config.tests/unix/ibase/ibase.pro
+--- qt-everywhere-opensource-src-4.8.7/config.tests/unix/ibase/ibase.pro.ibase	2015-05-07 09:14:42.000000000 -0500
++++ qt-everywhere-opensource-src-4.8.7/config.tests/unix/ibase/ibase.pro	2016-11-30 10:56:11.017740104 -0600
+@@ -1,4 +1,4 @@
+ SOURCES = ibase.cpp
+ CONFIG -= qt dylib
+ mac:CONFIG -= app_bundle
+-LIBS += -lgds
++LIBS += -lfbclient
+diff -up qt-everywhere-opensource-src-4.8.7/src/sql/drivers/ibase/qsql_ibase.pri.ibase qt-everywhere-opensource-src-4.8.7/src/sql/drivers/ibase/qsql_ibase.pri
+--- qt-everywhere-opensource-src-4.8.7/src/sql/drivers/ibase/qsql_ibase.pri.ibase	2015-05-07 09:14:48.000000000 -0500
++++ qt-everywhere-opensource-src-4.8.7/src/sql/drivers/ibase/qsql_ibase.pri	2016-11-30 10:57:11.783113341 -0600
+@@ -2,7 +2,7 @@ HEADERS += $$PWD/qsql_ibase.h
+ SOURCES += $$PWD/qsql_ibase.cpp
+ 
+ unix {
+-    !contains(LIBS, .*gds.*):!contains(LIBS, .*libfb.*):LIBS += -lgds
++    !contains(LIBS, .*gds.*):!contains(LIBS, .*libfb.*):LIBS += -lfbclient
+ } else {
+     !contains(LIBS, .*gds.*):!contains(LIBS, .*fbclient.*) {
+         win32-borland:LIBS += gds32.lib

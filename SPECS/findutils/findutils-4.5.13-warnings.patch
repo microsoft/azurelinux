@@ -1,0 +1,26 @@
+From 690d4bd9f29a805999a3ce4651dac9585ccc9917 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 11 May 2011 16:46:57 +0200
+Subject: [PATCH] findutils-4.5.7-warnings.patch
+
+---
+ xargs/xargs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xargs/xargs.c b/xargs/xargs.c
+index 5e373f2..c0a8676 100644
+--- a/xargs/xargs.c
++++ b/xargs/xargs.c
+@@ -1346,7 +1346,8 @@ xargs_do_exec (struct buildcmd_control *ctl, void *usercontext, int argc, char *
+ 		 * utility if we run it, for POSIX compliance on the
+ 		 * handling of exit values.
+ 		 */
+-		write (fd[1], &errno, sizeof (int));
++		int sink = write (fd[1], &errno, sizeof (int));
++		(void) sink;
+ 	      }
+ 
+ 	    close (fd[1]);
+-- 
+1.7.1
+

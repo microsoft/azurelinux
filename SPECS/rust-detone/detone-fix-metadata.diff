@@ -1,0 +1,9 @@
+--- detone-1.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ detone-1.0.1/Cargo.toml	2025-07-14T02:17:29.046263+00:00
+@@ -32,5 +32,5 @@
+ resolver = "2"
+ 
+ [dev-dependencies.icu_normalizer]
+-version = "1.4.3"
++version = ">=1.4.3, <3.0.0"
+ features = ["compiled_data"]

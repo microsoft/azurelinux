@@ -1,0 +1,42 @@
+diff --git a/parse.y b/parse.y
+--- a/parse.y
++++ b/parse.y
+@@ -4255,7 +4255,8 @@ xparse_dolparen (base, string, indp, flags)
+ 
+   save_parser_state (&ps);
+   save_input_line_state (&ls);
+-
++  /* avoid echoing every substitution again */
++  echo_input_at_read = 0;
+ #if defined (ALIAS) || defined (DPAREN_ARITHMETIC)
+   pushed_string_list = (STRING_SAVER *)NULL;
+ #endif
+diff --git a/subst.c b/subst.c
+--- a/subst.c
++++ b/subst.c
+@@ -10222,6 +10222,7 @@ param_expand (string, sindex, quoted, expanded_something,
+   WORD_LIST *list, *l;
+   WORD_DESC *tdesc, *ret;
+   int tflag, nullarg;
++  int old_echo_input;
+ 
+ /*itrace("param_expand: `%s' pflags = %d", string+*sindex, pflags);*/
+   zindex = *sindex;
+@@ -10614,6 +10615,9 @@ arithsub:
+ 	}
+ 
+ comsub:
++      old_echo_input = echo_input_at_read;
++      /* avoid echoing every substitution again */
++      echo_input_at_read = 0;
+       if (pflags & PF_NOCOMSUB)
+ 	/* we need zindex+1 because string[zindex] == RPAREN */
+ 	temp1 = substring (string, *sindex, zindex+1);
+@@ -10626,6 +10630,7 @@ comsub:
+ 	}
+       FREE (temp);
+       temp = temp1;
++      echo_input_at_read = old_echo_input;
+       break;
+ 
+     /* Do POSIX.2d9-style arithmetic substitution.  This will probably go

@@ -1,0 +1,27 @@
+From 029d42d1049dcde7950c11fb9adf07c07a8c4c02 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 18 Mar 2020 10:56:53 +0100
+Subject: [PATCH] ANGLE: Fix resizing of windows (Take 2)
+
+Task-number: QTBUG-62475
+Change-Id: I0ea17e7875906508941ae64bb396a4236928b0f9
+---
+ .../angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp       | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+index e8f13b388f..9ece77ecbc 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+@@ -845,7 +845,7 @@ EGLint SwapChain11::copyOffscreenToBackbuffer(const gl::Context *context,
+     stateManager->setRenderTarget(mBackBufferRTView.get(), nullptr);
+ 
+     // Set the viewport
+-    stateManager->setSimpleViewport(mWidth, mHeight);
++    stateManager->setSimpleViewport(width, height);
+ 
+     // Apply textures
+     stateManager->setSimplePixelTextureAndSampler(mOffscreenSRView, mPassThroughSampler);
+-- 
+2.20.1.windows.1
+

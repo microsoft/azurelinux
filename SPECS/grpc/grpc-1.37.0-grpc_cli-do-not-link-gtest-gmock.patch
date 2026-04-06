@@ -1,0 +1,50 @@
+diff -Naur grpc-1.37.1-original/CMakeLists.txt grpc-1.37.1/CMakeLists.txt
+--- grpc-1.37.1-original/CMakeLists.txt	2021-04-27 18:01:25.000000000 -0400
++++ grpc-1.37.1/CMakeLists.txt	2021-05-04 11:00:04.934427672 -0400
+@@ -3294,10 +3294,6 @@
+     ${_gRPC_UPB_INCLUDE_DIR}
+     ${_gRPC_XXHASH_INCLUDE_DIR}
+     ${_gRPC_ZLIB_INCLUDE_DIR}
+-    third_party/googletest/googletest/include
+-    third_party/googletest/googletest
+-    third_party/googletest/googlemock/include
+-    third_party/googletest/googlemock
+     ${_gRPC_PROTO_GENS_DIR}
+ )
+ target_link_libraries(grpc++_test_config
+@@ -10669,7 +10665,6 @@
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
+ 
+ add_executable(grpc_cli
+   ${_gRPC_PROTO_GENS_DIR}/src/proto/grpc/reflection/v1alpha/reflection.pb.cc
+@@ -10683,8 +10678,6 @@
+   test/cpp/util/proto_file_parser.cc
+   test/cpp/util/proto_reflection_descriptor_database.cc
+   test/cpp/util/service_describer.cc
+-  third_party/googletest/googletest/src/gtest-all.cc
+-  third_party/googletest/googlemock/src/gmock-all.cc
+ )
+ 
+ target_include_directories(grpc_cli
+@@ -10699,10 +10692,6 @@
+     ${_gRPC_UPB_INCLUDE_DIR}
+     ${_gRPC_XXHASH_INCLUDE_DIR}
+     ${_gRPC_ZLIB_INCLUDE_DIR}
+-    third_party/googletest/googletest/include
+-    third_party/googletest/googletest
+-    third_party/googletest/googlemock/include
+-    third_party/googletest/googlemock
+     ${_gRPC_PROTO_GENS_DIR}
+ )
+ 
+@@ -10715,7 +10704,6 @@
+ )
+ 
+ 
+-endif()
+ if(gRPC_BUILD_CODEGEN AND gRPC_BUILD_GRPC_CPP_PLUGIN)
+ 
+ add_executable(grpc_cpp_plugin

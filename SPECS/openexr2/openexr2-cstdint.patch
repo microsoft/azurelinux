@@ -1,0 +1,33 @@
+--- openexr-2.5.8/OpenEXR/IlmImf/ImfHuf.cpp~	2022-03-17 13:22:45.000000000 -0500
++++ openexr-2.5.8/OpenEXR/IlmImf/ImfHuf.cpp	2023-02-22 11:25:19.388443280 -0600
+@@ -53,7 +53,7 @@
+ #include <cstring>
+ #include <cassert>
+ #include <algorithm>
+-
++#include <cstdint>
+ 
+ using namespace std;
+ using namespace IEX_NAMESPACE;
+--- openexr-2.5.8/OpenEXR/IlmImf/ImfDwaCompressor.cpp~	2022-03-17 13:22:45.000000000 -0500
++++ openexr-2.5.8/OpenEXR/IlmImf/ImfDwaCompressor.cpp	2023-02-22 11:28:58.411563129 -0600
+@@ -159,7 +159,7 @@
+ #include <limits>
+ 
+ #include <cstddef>
+-
++#include <cstdint>
+ 
+ // Windows specific addition to prevent the indirect import of the redefined min/max macros
+ #if defined _WIN32 || defined _WIN64
+--- openexr-2.5.8/OpenEXR/IlmImf/ImfMisc.cpp~	2022-03-17 13:22:45.000000000 -0500
++++ openexr-2.5.8/OpenEXR/IlmImf/ImfMisc.cpp	2023-02-22 11:34:44.735590212 -0600
+@@ -40,6 +40,8 @@
+ //
+ //-----------------------------------------------------------------------------
+ 
++#include <cstdint>
++
+ #include <ImfMisc.h>
+ #include <ImfHeader.h>
+ #include <ImfAttribute.h>

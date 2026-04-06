@@ -1,0 +1,786 @@
+From eea4ad2cce289753aaa35b4e0258a76d8f8f367c Mon Sep 17 00:00:00 2001
+From: Thierry Fauck <thierry@linux.vnet.ibm.com>
+Date: Tue, 13 May 2014 07:48:24 -0400
+Subject: [PATCH] Support for powerpc64 arch ppc64el
+
+Signed-off-by: Thierry Fauck <thierry@linux.vnet.ibm.com>
+
+	Add support for ppc64le proc and ELF ABIv2.
+	Provides support for irelative and wchar
+---
+ ltrace-elf.c                           |    2 +-
+ ltrace-elf.h                           |    1 +
+ sysdeps/linux-gnu/ppc/arch.h           |   35 ++++-
+ sysdeps/linux-gnu/ppc/fetch.c          |  244 +++++++++++++++++++++++++++++---
+ sysdeps/linux-gnu/ppc/plt.c            |   98 ++++++++++++--
+ sysdeps/linux-gnu/ppc/trace.c          |   10 ++
+ testsuite/ltrace.main/system_calls.exp |    2 +-
+ 7 files changed, 356 insertions(+), 36 deletions(-)
+
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index 8997518..f638342 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -859,7 +859,7 @@ populate_plt(struct process *proc, const char *filename,
+ 	return 0;
+ }
+ 
+-static void
++void
+ delete_symbol_chain(struct library_symbol *libsym)
+ {
+ 	while (libsym != NULL) {
+diff --git a/ltrace-elf.h b/ltrace-elf.h
+index db4ffe9..4a824c4 100644
+--- a/ltrace-elf.h
++++ b/ltrace-elf.h
+@@ -166,6 +166,7 @@ int elf_read_next_uleb128(Elf_Data *data, GElf_Xword *offset, uint64_t *retp);
+ /* Return whether there's AMOUNT more bytes after OFFSET in DATA.  */
+ int elf_can_read_next(Elf_Data *data, GElf_Xword offset, GElf_Xword amount);
+ 
++void delete_symbol_chain(struct library_symbol *);
+ #if __WORDSIZE == 32
+ #define PRI_ELF_ADDR		PRIx32
+ #define GELF_ADDR_CAST(x)	(void *)(uint32_t)(x)
+diff --git a/sysdeps/linux-gnu/ppc/arch.h b/sysdeps/linux-gnu/ppc/arch.h
+index bf9b5dc..7918a13 100644
+--- a/sysdeps/linux-gnu/ppc/arch.h
++++ b/sysdeps/linux-gnu/ppc/arch.h
+@@ -23,8 +23,8 @@
+ #define LTRACE_PPC_ARCH_H
+ 
+ #include <gelf.h>
++#include <stdbool.h>
+ 
+-#define BREAKPOINT_VALUE { 0x7f, 0xe0, 0x00, 0x08 }
+ #define BREAKPOINT_LENGTH 4
+ #define DECR_PC_AFTER_BREAK 0
+ 
+@@ -34,8 +34,33 @@
+ #ifdef __powerpc64__ // Says 'ltrace' is 64 bits, says nothing about target.
+ #define LT_ELFCLASS2	ELFCLASS64
+ #define LT_ELF_MACHINE2	EM_PPC64
+-#define ARCH_SUPPORTS_OPD
+-#endif
++
++# ifdef __LITTLE_ENDIAN__
++# define BREAKPOINT_VALUE { 0x08, 0x00, 0xe0, 0x7f }
++# define ARCH_ENDIAN_LITTLE
++# else
++# define BREAKPOINT_VALUE { 0x7f, 0xe0, 0x00, 0x08 }
++# define ARCH_SUPPORTS_OPD
++# define ARCH_ENDIAN_BIG
++# endif
++
++# if _CALL_ELF != 2
++# define ARCH_SUPPORTS_OPD
++# define STACK_FRAME_OVERHEAD 112
++#  ifndef EF_PPC64_ABI
++#  define EF_PPC64_ABI 3
++#  endif
++# else /* _CALL_ELF == 2 ABIv2 */
++# define STACK_FRAME_OVERHEAD 32
++# endif /* CALL_ELF */
++
++#else
++#define BREAKPOINT_VALUE { 0x7f, 0xe0, 0x00, 0x08 }
++#define ARCH_ENDIAN_BIG
++# ifndef EF_PPC64_ABI
++# define EF_PPC64_ABI 3
++# endif
++#endif 	/* __powerpc64__ */
+ 
+ #define ARCH_HAVE_SW_SINGLESTEP
+ #define ARCH_HAVE_ADD_PLT_ENTRY
+@@ -43,7 +68,6 @@
+ #define ARCH_HAVE_TRANSLATE_ADDRESS
+ #define ARCH_HAVE_DYNLINK_DONE
+ #define ARCH_HAVE_FETCH_ARG
+-#define ARCH_ENDIAN_BIG
+ #define ARCH_HAVE_SIZEOF
+ #define ARCH_HAVE_ALIGNOF
+ 
+@@ -56,7 +80,8 @@ struct arch_ltelf_data {
+ 	Elf_Data *opd_data;
+ 	GElf_Addr opd_base;
+ 	GElf_Xword opd_size;
+-	int secure_plt;
++	bool secure_plt : 1;
++	bool elfv2_abi  : 1;
+ 
+ 	Elf_Data *reladyn;
+ 	size_t reladyn_count;
+diff --git a/sysdeps/linux-gnu/ppc/fetch.c b/sysdeps/linux-gnu/ppc/fetch.c
+index ed38336..c9381c3 100644
+--- a/sysdeps/linux-gnu/ppc/fetch.c
++++ b/sysdeps/linux-gnu/ppc/fetch.c
+@@ -30,9 +30,11 @@
+ #include "ptrace.h"
+ #include "proc.h"
+ #include "value.h"
++#include "ltrace-elf.h"
+ 
+ static int allocate_gpr(struct fetch_context *ctx, struct process *proc,
+-			struct arg_type_info *info, struct value *valuep);
++			struct arg_type_info *info, struct value *valuep,
++			size_t off, bool is_hfa_type);
+ 
+ /* Floating point registers have the same width on 32-bit as well as
+  * 64-bit PPC, but <ucontext.h> presents a different API depending on
+@@ -62,7 +64,10 @@ struct fetch_context {
+ 		gregs64_t r64;
+ 	} regs;
+ 	struct fpregs_t fpregs;
+-
++	int vgreg;
++	int struct_size;
++	int struct_hfa_size;
++	int struct_hfa_count;
+ };
+ 
+ static int
+@@ -74,7 +79,8 @@ fetch_context_init(struct process *proc, struct fetch_context *context)
+ 	if (proc->e_machine == EM_PPC)
+ 		context->stack_pointer = proc->stack_pointer + 8;
+ 	else
+-		context->stack_pointer = proc->stack_pointer + 112;
++		context->stack_pointer = proc->stack_pointer
++			+ STACK_FRAME_OVERHEAD;
+ 
+ 	/* When ltrace is 64-bit, we might use PTRACE_GETREGS to
+ 	 * obtain 64-bit as well as 32-bit registers.  But if we do it
+@@ -118,6 +124,11 @@ arch_fetch_arg_init(enum tof type, struct process *proc,
+ 		return NULL;
+ 	}
+ 
++	context->vgreg = context->greg;
++	context->struct_size = 0;
++	context->struct_hfa_size = 0;
++	context->struct_hfa_count = 0;
++
+ 	/* Aggregates or unions of any length, and character strings
+ 	 * of length longer than 8 bytes, will be returned in a
+ 	 * storage buffer allocated by the caller. The caller will
+@@ -125,8 +136,20 @@ arch_fetch_arg_init(enum tof type, struct process *proc,
+ 	 * in r3, causing the first explicit argument to be passed in
+ 	 * r4.  */
+ 	context->ret_struct = ret_info->type == ARGTYPE_STRUCT;
+-	if (context->ret_struct)
++	if (context->ret_struct) {
++#if _CALL_ELF == 2
++		/* if R3 points to stack, parameters will be in R4.  */
++		uint64_t pstack_end = ptrace(PTRACE_PEEKTEXT, proc->pid,
++					proc->stack_pointer, 0);
++		if (((arch_addr_t)context->regs.r64[3] > proc->stack_pointer)
++		    && (context->regs.r64[3] < pstack_end)) {
++			context->greg++;
++			context->stack_pointer += 8;
++		}
++#else
+ 		context->greg++;
++#endif
++	}
+ 
+ 	return context;
+ }
+@@ -144,7 +167,8 @@ arch_fetch_arg_clone(struct process *proc,
+ 
+ static int
+ allocate_stack_slot(struct fetch_context *ctx, struct process *proc,
+-		    struct arg_type_info *info, struct value *valuep)
++		    struct arg_type_info *info, struct value *valuep,
++		    bool is_hfa_type)
+ {
+ 	size_t sz = type_sizeof(proc, info);
+ 	if (sz == (size_t)-1)
+@@ -154,7 +178,14 @@ allocate_stack_slot(struct fetch_context *ctx, struct process *proc,
+ 	size_t off = 0;
+ 	if (proc->e_machine == EM_PPC && a < 4)
+ 		a = 4;
++#if _CALL_ELF == 2
++	else if (proc->e_machine == EM_PPC64 && sz == 4 && is_hfa_type)
++		a = 4;
++	else
++		a = 8;
++#else
+ 	else if (proc->e_machine == EM_PPC64 && a < 8)
++#endif
+ 		a = 8;
+ 
+ 	/* XXX Remove the two double casts when arch_addr_t
+@@ -164,7 +195,7 @@ allocate_stack_slot(struct fetch_context *ctx, struct process *proc,
+ 
+ 	if (valuep != NULL)
+ 		value_in_inferior(valuep, ctx->stack_pointer + off);
+-	ctx->stack_pointer += sz;
++	ctx->stack_pointer += a;
+ 
+ 	return 0;
+ }
+@@ -216,19 +247,34 @@ align_small_int(unsigned char *buf, size_t w, size_t sz)
+ 
+ static int
+ allocate_gpr(struct fetch_context *ctx, struct process *proc,
+-	     struct arg_type_info *info, struct value *valuep)
++	     struct arg_type_info *info, struct value *valuep,
++	     size_t off, bool is_hfa_type)
+ {
+ 	if (ctx->greg > 10)
+-		return allocate_stack_slot(ctx, proc, info, valuep);
++		return allocate_stack_slot(ctx, proc, info, valuep, is_hfa_type);
+ 
+-	int reg_num = ctx->greg++;
+-	if (valuep == NULL)
+-		return 0;
++	int reg_num = ctx->greg;
+ 
+ 	size_t sz = type_sizeof(proc, info);
+ 	if (sz == (size_t)-1)
+ 		return -1;
+ 	assert(sz == 1 || sz == 2 || sz == 4 || sz == 8);
++#if _CALL_ELF == 2
++	/* Consume the stack slot corresponding to this arg.  */
++	if ((sz + off) >= 8)
++		ctx->greg++;
++
++	if (is_hfa_type)
++		ctx->stack_pointer += sz;
++	else
++		ctx->stack_pointer += 8;
++#else
++	ctx->greg++;
++#endif
++
++	if (valuep == NULL)
++		return 0;
++
+ 	if (value_reserve(valuep, sz) == NULL)
+ 		return -1;
+ 
+@@ -240,13 +286,14 @@ allocate_gpr(struct fetch_context *ctx, struct process *proc,
+ 	u.i64 = read_gpr(ctx, proc, reg_num);
+ 	if (proc->e_machine == EM_PPC)
+ 		align_small_int(u.buf, 8, sz);
+-	memcpy(value_get_raw_data(valuep), u.buf, sz);
++	memcpy(value_get_raw_data(valuep), u.buf + off, sz);
+ 	return 0;
+ }
+ 
+ static int
+ allocate_float(struct fetch_context *ctx, struct process *proc,
+-	       struct arg_type_info *info, struct value *valuep)
++	       struct arg_type_info *info, struct value *valuep,
++	       size_t off, bool is_hfa_type)
+ {
+ 	int pool = proc->e_machine == EM_PPC64 ? 13 : 8;
+ 	if (ctx->freg <= pool) {
+@@ -257,8 +304,12 @@ allocate_float(struct fetch_context *ctx, struct process *proc,
+ 		} u = { .d = ctx->fpregs.fpregs[ctx->freg] };
+ 
+ 		ctx->freg++;
++
++		if (!is_hfa_type)
++			ctx->vgreg++;
++
+ 		if (proc->e_machine == EM_PPC64)
+-			allocate_gpr(ctx, proc, info, NULL);
++			allocate_gpr(ctx, proc, info, NULL, off, is_hfa_type);
+ 
+ 		size_t sz = sizeof(double);
+ 		if (info->type == ARGTYPE_FLOAT) {
+@@ -272,8 +323,128 @@ allocate_float(struct fetch_context *ctx, struct process *proc,
+ 		memcpy(value_get_raw_data(valuep), u.buf, sz);
+ 		return 0;
+ 	}
+-	return allocate_stack_slot(ctx, proc, info, valuep);
++	return allocate_stack_slot(ctx, proc, info, valuep, is_hfa_type);
++}
++
++#if _CALL_ELF == 2
++static int
++allocate_hfa(struct fetch_context *ctx, struct process *proc,
++	     struct arg_type_info *info, struct value *valuep,
++	     enum arg_type hfa_type, size_t hfa_count)
++{
++	size_t sz = type_sizeof(proc, info);
++	if (sz == (size_t)-1)
++		return -1;
++
++	ctx->struct_hfa_size += sz;
++
++	/* There are two changes regarding structure return types:
++	 * * heterogeneous float/vector structs are returned
++	 *   in (multiple) FP/vector registers,
++	 *   instead of via implicit reference.
++	 * * small structs (up to 16 bytes) are return
++	 *   in one or two GPRs, instead of via implicit reference.
++	 *
++	 * Other structures (larger than 16 bytes, not heterogeneous)
++	 * are still returned via implicit reference (i.e. a pointer
++	 * to memory where to return the struct being passed in r3).
++	 * Of course, whether or not an implicit reference pointer
++	 * is present will shift the remaining arguments,
++	 * so you need to get this right for ELFv2 in order
++	 * to get the arguments correct.
++	 * If an actual parameter is known to correspond to an HFA
++	 * formal parameter, each element is passed in the next
++	 * available floating-point argument register starting at fp1
++	 * until the fp13. The remaining elements of the aggregate are
++	 * passed on the stack.  */
++	size_t slot_off = 0;
++
++	unsigned char *buf = value_reserve(valuep, sz);
++	if (buf == NULL)
++		return -1;
++
++	struct arg_type_info *hfa_info = type_get_simple(hfa_type);
++	size_t hfa_sz = type_sizeof(proc, hfa_info);
++
++	if (hfa_count > 8)
++		ctx->struct_hfa_count += hfa_count;
++
++	while (hfa_count > 0 && ctx->freg <= 13) {
++		int rc;
++		struct value tmp;
++
++		value_init(&tmp, proc, NULL, hfa_info, 0);
++
++		/* Hetereogeneous struct - get value on GPR or stack.  */
++		if (((hfa_type == ARGTYPE_FLOAT
++		    || hfa_type == ARGTYPE_DOUBLE)
++		      && hfa_count <= 8))
++			rc = allocate_float(ctx, proc, hfa_info, &tmp,
++						slot_off, true);
++		else
++			rc = allocate_gpr(ctx, proc, hfa_info, &tmp,
++						slot_off, true);
++
++		memcpy(buf, value_get_data(&tmp, NULL), hfa_sz);
++
++		slot_off += hfa_sz;
++		buf += hfa_sz;
++		hfa_count--;
++		if (slot_off == 8) {
++			slot_off = 0;
++			ctx->vgreg++;
++		}
++
++		value_destroy(&tmp);
++		if (rc < 0)
++			return -1;
++	}
++	if (hfa_count == 0)
++		return 0;
++
++	/* if no remaining FP, GPR corresponding to slot is used
++	* Mostly it is in part of r10.  */
++	if (ctx->struct_hfa_size <= 64 && ctx->vgreg == 10) {
++		while (ctx->vgreg <= 10) {
++			struct value tmp;
++			value_init(&tmp, proc, NULL, hfa_info, 0);
++			union {
++				uint64_t i64;
++				unsigned char buf[0];
++			} u;
++
++			u.i64 = read_gpr(ctx, proc, ctx->vgreg);
++
++			memcpy(buf, u.buf + slot_off, hfa_sz);
++			slot_off += hfa_sz;
++			buf += hfa_sz;
++			hfa_count--;
++			ctx->stack_pointer += hfa_sz;
++			if (slot_off >= 8 ) {
++				slot_off = 0;
++				ctx->vgreg++;
++			}
++			value_destroy(&tmp);
++		}
++	}
++
++	if (hfa_count == 0)
++		return 0;
++
++	/* Remaining values are on stack */
++	while (hfa_count) {
++		struct value tmp;
++		value_init(&tmp, proc, NULL, hfa_info, 0);
++
++		value_in_inferior(&tmp, ctx->stack_pointer);
++		memcpy(buf, value_get_data(&tmp, NULL), hfa_sz);
++		ctx->stack_pointer += hfa_sz;
++		buf += hfa_sz;
++		hfa_count--;
++	}
++	return 0;
+ }
++#endif
+ 
+ static int
+ allocate_argument(struct fetch_context *ctx, struct process *proc,
+@@ -287,13 +458,25 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
+ 
+ 	case ARGTYPE_FLOAT:
+ 	case ARGTYPE_DOUBLE:
+-		return allocate_float(ctx, proc, info, valuep);
++		return allocate_float(ctx, proc, info, valuep,
++					8 - type_sizeof(proc,info), false);
+ 
+ 	case ARGTYPE_STRUCT:
+ 		if (proc->e_machine == EM_PPC) {
+ 			if (value_pass_by_reference(valuep) < 0)
+ 				return -1;
+ 		} else {
++#if _CALL_ELF == 2
++			struct arg_type_info *hfa_info;
++			size_t hfa_size;
++			hfa_info = type_get_hfa_type(info, &hfa_size);
++			if (hfa_info != NULL ) {
++				size_t sz = type_sizeof(proc, info);
++				ctx->struct_size += sz;
++				return allocate_hfa(ctx, proc, info, valuep,
++						hfa_info->type, hfa_size);
++			}
++#endif
+ 			/* PPC64: Fixed size aggregates and unions passed by
+ 			 * value are mapped to as many doublewords of the
+ 			 * parameter save area as the value uses in memory.
+@@ -326,6 +509,10 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
+ 	size_t sz = type_sizeof(proc, valuep->type);
+ 	if (sz == (size_t)-1)
+ 		return -1;
++
++	if (ctx->ret_struct)
++		ctx->struct_size += sz;
++
+ 	size_t slots = (sz + width - 1) / width;  /* Round up.  */
+ 	unsigned char *buf = value_reserve(valuep, slots * width);
+ 	if (buf == NULL)
+@@ -346,9 +533,11 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
+ 		struct arg_type_info *fp_info
+ 			= type_get_fp_equivalent(valuep->type);
+ 		if (fp_info != NULL)
+-			rc = allocate_float(ctx, proc, fp_info, &val);
++			rc = allocate_float(ctx, proc, fp_info, &val,
++					8-type_sizeof(proc,info), false);
+ 		else
+-			rc = allocate_gpr(ctx, proc, long_info, &val);
++			rc = allocate_gpr(ctx, proc, long_info, &val,
++					0, false);
+ 
+ 		if (rc >= 0) {
+ 			memcpy(ptr, value_get_data(&val, NULL), width);
+@@ -363,6 +552,7 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
+ 			return rc;
+ 	}
+ 
++#ifndef __LITTLE_ENDIAN__
+ 	/* Small values need post-processing.  */
+ 	if (sz < width) {
+ 		switch (info->type) {
+@@ -394,6 +584,7 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
+ 			break;
+ 		}
+ 	}
++#endif
+ 
+ 	return 0;
+ }
+@@ -411,7 +602,22 @@ arch_fetch_retval(struct fetch_context *ctx, enum tof type,
+ 		  struct process *proc, struct arg_type_info *info,
+ 		  struct value *valuep)
+ {
++	if (fetch_context_init(proc, ctx) < 0)
++		return -1;
++
++#if _CALL_ELF == 2
++	void *ptr = (void *)(ctx->regs.r64[1]+32);
++	uint64_t val = ptrace(PTRACE_PEEKTEXT, proc->pid, ptr, 0);
++
++	if (ctx->ret_struct
++	   && ((ctx->struct_size > 64
++	      || ctx->struct_hfa_count > 8
++	      || (ctx->struct_hfa_size == 0 && ctx->struct_size > 56)
++	      || (ctx->regs.r64[3] == ctx->regs.r64[1]+32)
++	      || (ctx->regs.r64[3] == val )))) {
++#else
+ 	if (ctx->ret_struct) {
++#endif
+ 		assert(info->type == ARGTYPE_STRUCT);
+ 
+ 		uint64_t addr = read_gpr(ctx, proc, 3);
+@@ -424,8 +630,6 @@ arch_fetch_retval(struct fetch_context *ctx, enum tof type,
+ 		return 0;
+ 	}
+ 
+-	if (fetch_context_init(proc, ctx) < 0)
+-		return -1;
+ 	return allocate_argument(ctx, proc, info, valuep);
+ }
+ 
+diff --git a/sysdeps/linux-gnu/ppc/plt.c b/sysdeps/linux-gnu/ppc/plt.c
+index 332daa8..45ed7fb 100644
+--- a/sysdeps/linux-gnu/ppc/plt.c
++++ b/sysdeps/linux-gnu/ppc/plt.c
+@@ -136,7 +136,11 @@
+  */
+ 
+ #define PPC_PLT_STUB_SIZE 16
+-#define PPC64_PLT_STUB_SIZE 8 //xxx
++#if _CALL_ELF != 2
++#define PPC64_PLT_STUB_SIZE 8
++#else
++#define PPC64_PLT_STUB_SIZE 4
++#endif
+ 
+ static inline int
+ host_powerpc64()
+@@ -186,8 +190,13 @@ ppc32_delayed_symbol(struct library_symbol *libsym)
+ 	if ((insn1 & BRANCH_MASK) == B_INSN
+ 	    || ((insn2 & BRANCH_MASK) == B_INSN
+ 		/* XXX double cast  */
++#ifdef __LITTLE_ENDIAN__
++		&& (ppc_branch_dest(libsym->enter_addr + 4, insn1)
++		    == (arch_addr_t) (long) libsym->lib->arch.pltgot_addr)))
++#else
+ 		&& (ppc_branch_dest(libsym->enter_addr + 4, insn2)
+ 		    == (arch_addr_t) (long) libsym->lib->arch.pltgot_addr)))
++#endif
+ 	{
+ 		mark_as_resolved(libsym, libsym->arch.resolved_value);
+ 	}
+@@ -206,7 +215,7 @@ arch_dynlink_done(struct process *proc)
+ 				"couldn't read PLT value for %s(%p): %s\n",
+ 				libsym->name, libsym->enter_addr,
+ 				strerror(errno));
+-			return;
++				return;
+ 		}
+ 
+ 		if (proc->e_machine == EM_PPC)
+@@ -227,8 +236,14 @@ reloc_is_irelative(int machine, GElf_Rela *rela)
+ {
+ 	bool irelative = false;
+ 	if (machine == EM_PPC64) {
+-#ifdef R_PPC64_JMP_IREL
++#ifdef __LITTLE_ENDIAN__
++# ifdef R_PPC64_IRELATIVE
++		irelative = GELF_R_TYPE(rela->r_info) == R_PPC64_IRELATIVE;
++# endif
++#else
++# ifdef R_PPC64_JMP_IREL
+ 		irelative = GELF_R_TYPE(rela->r_info) == R_PPC64_JMP_IREL;
++# endif
+ #endif
+ 	} else {
+ 		assert(machine == EM_PPC);
+@@ -285,6 +300,7 @@ arch_translate_address_dyn(struct process *proc,
+ 			   arch_addr_t addr, arch_addr_t *ret)
+ {
+ 	if (proc->e_machine == EM_PPC64) {
++#if _CALL_ELF != 2
+ 		uint64_t value;
+ 		if (proc_read_64(proc, addr, &value) < 0) {
+ 			fprintf(stderr,
+@@ -296,6 +312,7 @@ arch_translate_address_dyn(struct process *proc,
+ 		 * arch_addr_t becomes integral type.  */
+ 		*ret = (arch_addr_t)(uintptr_t)value;
+ 		return 0;
++#endif
+ 	}
+ 
+ 	*ret = addr;
+@@ -306,7 +323,8 @@ int
+ arch_translate_address(struct ltelf *lte,
+ 		       arch_addr_t addr, arch_addr_t *ret)
+ {
+-	if (lte->ehdr.e_machine == EM_PPC64) {
++	if (lte->ehdr.e_machine == EM_PPC64
++	    && !lte->arch.elfv2_abi) {
+ 		/* XXX The double cast should be removed when
+ 		 * arch_addr_t becomes integral type.  */
+ 		GElf_Xword offset
+@@ -430,7 +448,16 @@ reloc_copy_if_irelative(GElf_Rela *rela, void *data)
+ int
+ arch_elf_init(struct ltelf *lte, struct library *lib)
+ {
++
++	/* Check for ABIv2 in ELF header processor specific flag.  */
++#ifndef EF_PPC64_ABI
++	assert (! (lte->ehdr.e_flags & 3 ) == 2)
++#else
++	lte->arch.elfv2_abi=((lte->ehdr.e_flags & EF_PPC64_ABI) == 2) ;
++#endif
++
+ 	if (lte->ehdr.e_machine == EM_PPC64
++	    && !lte->arch.elfv2_abi
+ 	    && load_opd_data(lte, lib) < 0)
+ 		return -1;
+ 
+@@ -599,7 +626,7 @@ read_plt_slot_value(struct process *proc, GElf_Addr addr, GElf_Addr *valp)
+ 	uint64_t l;
+ 	/* XXX double cast.  */
+ 	if (proc_read_64(proc, (arch_addr_t)(uintptr_t)addr, &l) < 0) {
+-		fprintf(stderr, "ptrace .plt slot value @%#" PRIx64": %s\n",
++		debug(DEBUG_EVENT, "ptrace .plt slot value @%#" PRIx64": %s",
+ 			addr, strerror(errno));
+ 		return -1;
+ 	}
+@@ -616,7 +643,7 @@ unresolve_plt_slot(struct process *proc, GElf_Addr addr, GElf_Addr value)
+ 	 * pointers intact.  Hence the only adjustment that we need to
+ 	 * do is to IP.  */
+ 	if (ptrace(PTRACE_POKETEXT, proc->pid, addr, value) < 0) {
+-		fprintf(stderr, "failed to unresolve .plt slot: %s\n",
++		debug(DEBUG_EVENT, "failed to unresolve .plt slot: %s",
+ 			strerror(errno));
+ 		return -1;
+ 	}
+@@ -629,9 +656,48 @@ arch_elf_add_func_entry(struct process *proc, struct ltelf *lte,
+ 			arch_addr_t addr, const char *name,
+ 			struct library_symbol **ret)
+ {
+-	if (lte->ehdr.e_machine != EM_PPC || lte->ehdr.e_type == ET_DYN)
++#ifndef PPC64_LOCAL_ENTRY_OFFSET
++	assert(! lte->arch.elfv2_abi);
++#else
++	/* With ABIv2 st_other field contains an offset.  */
++	 if (lte->arch.elfv2_abi)
++		addr += PPC64_LOCAL_ENTRY_OFFSET(sym->st_other);
++#endif
++
++	int st_info = GELF_ST_TYPE(sym->st_info);
++
++	if ((lte->ehdr.e_machine != EM_PPC && sym->st_other == 0)
++	    || lte->ehdr.e_type == ET_DYN
++	    || (st_info == STT_FUNC && ! sym->st_other))
+ 		return PLT_DEFAULT;
+ 
++	if (st_info == STT_FUNC) {
++		/* Put the default symbol to the chain.
++		 * The addr has already been updated with
++		 * symbol offset  */
++		char *full_name = strdup(name);
++		if (full_name == NULL) {
++			fprintf(stderr, "couldn't copy name of %s: %s\n",
++			name, strerror(errno));
++			free(full_name);
++			return PLT_FAIL;
++		}
++		struct library_symbol *libsym = malloc(sizeof *libsym);
++		if (libsym == NULL
++		    || library_symbol_init(libsym, addr, full_name, 1,
++					   LS_TOPLT_NONE) < 0) {
++			free(libsym);
++			delete_symbol_chain(libsym);
++			libsym = NULL;
++			fprintf(stderr, "Couldn't add symbol %s"
++				"for tracing.\n", name);
++		}
++		full_name = NULL;
++		libsym->next = *ret;
++		*ret = libsym;
++		return PLT_OK;
++	}
++
+ 	bool ifunc = false;
+ #ifdef STT_GNU_IFUNC
+ 	ifunc = GELF_ST_TYPE(sym->st_info) == STT_GNU_IFUNC;
+@@ -761,9 +827,15 @@ arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
+ 	assert(plt_slot_addr >= lte->plt_addr
+ 	       || plt_slot_addr < lte->plt_addr + lte->plt_size);
+ 
++	/* Should avoid to do read if dynamic linker hasn't run yet
++	 * or allow -1 a valid return code.  */
+ 	GElf_Addr plt_slot_value;
+-	if (read_plt_slot_value(proc, plt_slot_addr, &plt_slot_value) < 0)
+-		goto fail;
++	if (read_plt_slot_value(proc, plt_slot_addr, &plt_slot_value) < 0) {
++		if (!lte->arch.elfv2_abi)
++			goto fail;
++		else
++			return PPC_PLT_UNRESOLVED;
++	}
+ 
+ 	struct library_symbol *libsym = malloc(sizeof(*libsym));
+ 	if (libsym == NULL) {
+@@ -997,8 +1069,12 @@ ppc_plt_bp_continue(struct breakpoint *bp, struct process *proc)
+ 			return;
+ 		}
+ 
++#if _CALL_ELF == 2
++		continue_after_breakpoint(proc, bp);
++#else
+ 		jump_to_entry_point(proc, bp);
+ 		continue_process(proc->pid);
++#endif
+ 		return;
+ 
+ 	case PPC64_PLT_STUB:
+@@ -1123,7 +1199,11 @@ arch_library_symbol_init(struct library_symbol *libsym)
+ 	/* We set type explicitly in the code above, where we have the
+ 	 * necessary context.  This is for calls from ltrace-elf.c and
+ 	 * such.  */
++#if _CALL_ELF == 2
++	libsym->arch.type = PPC_PLT_UNRESOLVED;
++#else
+ 	libsym->arch.type = PPC_DEFAULT;
++#endif
+ 	return 0;
+ }
+ 
+diff --git a/sysdeps/linux-gnu/ppc/trace.c b/sysdeps/linux-gnu/ppc/trace.c
+index ee9a6b5..5aab538 100644
+--- a/sysdeps/linux-gnu/ppc/trace.c
++++ b/sysdeps/linux-gnu/ppc/trace.c
+@@ -65,9 +65,15 @@ syscall_p(struct process *proc, int status, int *sysnum)
+ 	if (WIFSTOPPED(status)
+ 	    && WSTOPSIG(status) == (SIGTRAP | proc->tracesysgood)) {
+ 		long pc = (long)get_instruction_pointer(proc);
++#ifndef __LITTLE_ENDIAN__
+ 		int insn =
+ 		    (int)ptrace(PTRACE_PEEKTEXT, proc->pid, pc - sizeof(long),
+ 				0);
++#else
++		int insn =
++		    (int)ptrace(PTRACE_PEEKTEXT, proc->pid, pc - sizeof(int),
++				0);
++#endif
+ 
+ 		if (insn == SYSCALL_INSN) {
+ 			*sysnum =
+diff -up ltrace-0.7.91/sysdeps/linux-gnu/ppc/trace.c\~ ltrace-0.7.91/sysdeps/linux-gnu/ppc/trace.c
+--- ltrace-0.7.91/sysdeps/linux-gnu/ppc/trace.c~	2014-08-08 14:05:58.000000000 +0200
++++ ltrace-0.7.91/sysdeps/linux-gnu/ppc/trace.c	2014-08-08 14:07:55.000000000 +0200
+@@ -133,7 +133,11 @@ arch_sw_singlestep(struct process *proc,
+ 			return SWS_FAIL;
+ 		uint32_t insn;
+ #ifdef __powerpc64__
++# ifdef __LITTLE_ENDIAN__
++		insn = (uint32_t) l;
++# else
+ 		insn = l >> 32;
++# endif
+ #else
+ 		insn = l;
+ #endif
+diff -up ltrace-0.7.91/configure\~ ltrace-0.7.91/configure
+--- ltrace-0.7.91/configure~	2014-08-08 14:09:12.000000000 +0200
++++ ltrace-0.7.91/configure	2014-08-08 14:18:30.000000000 +0200
+@@ -2555,7 +2555,7 @@ case "${host_cpu}" in
+     arm*|sa110)		HOST_CPU="arm" ;;
+     cris*)		HOST_CPU="cris" ;;
+     mips*)		HOST_CPU="mips" ;;
+-    powerpc|powerpc64)	HOST_CPU="ppc" ;;
++    powerpc|powerpc64|powerpc64le)	HOST_CPU="ppc" ;;
+     sun4u|sparc64)	HOST_CPU="sparc" ;;
+     s390x)		HOST_CPU="s390" ;;
+     i?86|x86_64)	HOST_CPU="x86" ;;
+@@ -12094,7 +12094,7 @@ if test x"$enable_libunwind" = xyes; the
+       arm*|sa110)         UNWIND_ARCH="arm" ;;
+       i?86)               UNWIND_ARCH="x86" ;;
+       powerpc)            UNWIND_ARCH="ppc32" ;;
+-      powerpc64)          UNWIND_ARCH="ppc64" ;;
++      powerpc64|powerpc64le)          UNWIND_ARCH="ppc64" ;;
+       mips*)              UNWIND_ARCH="mips" ;;
+       *)                  UNWIND_ARCH="${host_cpu}" ;;
+   esac

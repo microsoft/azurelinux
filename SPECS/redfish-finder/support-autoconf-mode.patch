@@ -1,0 +1,91 @@
+From f6248933605e051992e5a0c29b2c9753e0dc4e76 Mon Sep 17 00:00:00 2001
+From: John Chung <john.chung@arm.com>
+Date: Sun, 28 May 2023 16:32:05 +0800
+Subject: [PATCH] Support to configure AutoConf mode
+
+Get IP address by DHCP server. If fails, fallback to use IP address
+from smbios type 42. And redfish service ip address is based on type
+42 records.
+
+dmidecode output :
+
+Handle 0x0075, DMI type 42, 130 bytes
+Management Controller Host Interface
+        Host Interface Type: Network
+        Device Type: USB
+        idVendor: 0x0b05
+        idProduct: 0x1976
+        Protocol ID: 04 (Redfish over IP)
+                Service UUID: c95cab2a-6de0-45f4-8b3b-726c3794b26b
+                Host IP Assignment Type: AutoConf
+                Host IP Address Format: IPv4
+                IPv4 Address: 169.254.11.12
+                IPv4 Mask: 255.255.0.0
+                Redfish Service IP Discovery Type: AutoConf
+                Redfish Service IP Address Format: IPv4
+                IPv4 Redfish Service Address: 169.254.201.45
+                IPv4 Redfish Service Mask: 255.255.0.0
+                Redfish Service Port: 443
+                Redfish Service Vlan: 0
+                Redfish Service Hostname: bmc.host.interface
+
+Signed-off-by: John Chung <john.chung@arm.com>
+---
+ redfish-finder | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/redfish-finder b/redfish-finder
+index b869a9b..31045dd 100755
+--- a/redfish-finder
++++ b/redfish-finder
+@@ -124,8 +124,12 @@ class HostConfig():
+ 			if cursor == None:
+ 				raise RuntimeError("redfish-finder: Unable to parse SMBIOS Host IP Assignment Type")
+ 			self.assigntype = []
+-			if cursor.split()[0] == "Static":
+-				self.assigntype.append(AssignType.STATIC)
++			if cursor.split()[0] == "Static" or cursor.split()[0] == "AutoConf":
++				assigntype = AssignType.STATIC
++				if cursor.split()[0] == "AutoConf":
++					assigntype = AssignType.AUTOCONF
++				self.assigntype.append(assigntype)
++
+ 				cursor = cursor_consume_next(cursor, "Host IP Address Format: ")
+ 				if cursor.split()[0] == "IPv4":
+ 					cursor = cursor_consume_next(cursor, "IPv4 Address: ")
+@@ -166,11 +170,11 @@ class HostConfig():
+ 	# attributes of the network manager connection object
+ 	#
+ 	def generate_nm_config(self, device, nmcon):
+-		assignmap = { AssignType.STATIC: "manual", AssignType.DHCP: "auto"}
++		assignmap = { AssignType.STATIC: "manual", AssignType.DHCP: "auto", AssignType.AUTOCONF: "auto"}
+ 		methodp = "ipv4.method"
+ 		for i in range(len(self.assigntype)):
+ 			assigntype = self.assigntype[i]
+-			if assigntype == AssignType.STATIC:
++			if assigntype == AssignType.STATIC or assigntype == AssignType.AUTOCONF:
+ 				if self.address[i].version == 4:
+ 					methodp = "ipv4.method"
+ 					addrp = "ipv4.addresses"	
+@@ -179,7 +183,7 @@ class HostConfig():
+ 					addrp = "ipv6.addresses"
+ 			try:
+ 				nmcon.update_property(methodp, assignmap[assigntype])
+-				if assigntype == AssignType.STATIC:
++				if assigntype == AssignType.STATIC or assigntype == AssignType.AUTOCONF:
+ 					nmcon.update_property(addrp, str(self.address[i]) + "/" + str(self.network[i].prefixlen))
+ 			except:
+ 				print("redfish-finder: Error generating nm_config")
+@@ -208,8 +212,11 @@ class ServiceConfig():
+ 			cursor = cursor_consume_next(cursor, "Redfish Service IP Discovery Type: ")
+ 			if cursor == None:
+ 				raise RuntimeError("redfish-finder: Unable to find Redfish Service Info")
+-			if cursor.split()[0] == "Static":
++			if cursor.split()[0] == "Static" or cursor.split()[0] == "AutoConf":
+ 				self.assigntype = AssignType.STATIC
++				if cursor.split()[0] == "AutoConf":
++					self.assigntype = AssignType.AUTOCONF
++
+ 				cursor = cursor_consume_next(cursor, "Redfish Service IP Address Format: ")
+ 				if cursor.split()[0] == "IPv4":
+ 					cursor = cursor_consume_next(cursor, "IPv4 Redfish Service Address: ")

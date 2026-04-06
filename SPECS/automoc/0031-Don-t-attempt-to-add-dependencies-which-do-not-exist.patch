@@ -1,0 +1,27 @@
+From 48f6e64d98e4aaa47f2a49faa5f3e821bc21fd6e Mon Sep 17 00:00:00 2001
+From: Stephen Kelly <steveire@gmail.com>
+Date: Sun, 19 Jul 2015 21:24:51 +0200
+Subject: [PATCH 31/33] Don't attempt to add dependencies which do not exist.
+
+---
+ Automoc4Config.cmake | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index d048686..8473d49 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -272,7 +272,9 @@ endmacro(_AUTOMOC4_KDE4_PRE_TARGET_HANDLING)
+ 
+ 
+ macro(_AUTOMOC4_KDE4_POST_TARGET_HANDLING _target)
+-   add_dependencies(${_target} "${_target}_automoc")
++  if (TARGET "${_target}_automoc")
++    add_dependencies(${_target} "${_target}_automoc")
++  endif()
+ endmacro(_AUTOMOC4_KDE4_POST_TARGET_HANDLING)
+ 
+ 
+-- 
+2.4.3
+

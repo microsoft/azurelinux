@@ -1,0 +1,58 @@
+diff -urp webkit-qtwebkit-23.orig/Source/JavaScriptCore/disassembler/udis86/itab.py webkit-qtwebkit-23/Source/JavaScriptCore/disassembler/udis86/itab.py
+--- webkit-qtwebkit-23.orig/Source/JavaScriptCore/disassembler/udis86/itab.py	2014-09-24 20:42:05.000000000 +0900
++++ webkit-qtwebkit-23/Source/JavaScriptCore/disassembler/udis86/itab.py	2024-12-30 23:47:54.212127087 +0900
+@@ -314,7 +314,7 @@ class UdItabGenerator( ud_opcode.UdOpcod
+         self.ItabH.write( "\n" )
+ 
+         self.ItabH.write("\n/* itab entry operand definitions */\n");
+-        operands = self.OperandDict.keys()
++        operands = list(self.OperandDict.keys())
+         operands.sort()
+         for o in operands:
+             self.ItabH.write("#define O_%-7s { %-12s %-8s }\n" %
+diff -urp webkit-qtwebkit-23.orig/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py webkit-qtwebkit-23/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py
+--- webkit-qtwebkit-23.orig/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py	2014-09-24 20:42:05.000000000 +0900
++++ webkit-qtwebkit-23/Source/JavaScriptCore/disassembler/udis86/ud_opcode.py	2024-12-30 23:39:06.846776937 +0900
+@@ -115,9 +115,9 @@ class UdOpcodeTables:
+             '/mod'   : lambda v: '00' if v == '!11' else '01',
+             # Mode extensions:
+             # (16, 32, 64) => (00, 01, 02)
+-            '/o'     : lambda v: "%02x" % (int(v) / 32),
+-            '/a'     : lambda v: "%02x" % (int(v) / 32),
+-            '/m'     : lambda v: "%02x" % (int(v) / 32),
++            '/o'     : lambda v: "%02x" % (int(v) // 32),
++            '/a'     : lambda v: "%02x" % (int(v) // 32),
++            '/m'     : lambda v: "%02x" % (int(v) // 32),
+             '/sse'   : lambda v: UdOpcodeTables.OpcExtIndex['sse'][v]
+         }
+ 
+diff -urp webkit-qtwebkit-23.orig/Source/WebCore/inspector/generate-inspector-protocol-version webkit-qtwebkit-23/Source/WebCore/inspector/generate-inspector-protocol-version
+--- webkit-qtwebkit-23.orig/Source/WebCore/inspector/generate-inspector-protocol-version	2014-09-24 20:42:05.000000000 +0900
++++ webkit-qtwebkit-23/Source/WebCore/inspector/generate-inspector-protocol-version	2024-12-31 00:28:56.956589842 +0900
+@@ -187,8 +187,8 @@ def normalize_types(obj, domain_name, ty
+ def load_json(filename):
+     input_file = open(filename, "r")
+     json_string = input_file.read()
+-    json_string = re.sub(":\s*true", ": True", json_string)
+-    json_string = re.sub(":\s*false", ": False", json_string)
++    json_string = re.sub(r":\s*true", ": True", json_string)
++    json_string = re.sub(r":\s*false", ": False", json_string)
+     return eval(json_string)
+ 
+ def self_test():
+@@ -295,6 +295,7 @@ def self_test():
+     ]
+ 
+     errors = compare_schemas(schema_1, schema_2)
++    errors.sort()
+     golden_errors = [
+         "Network.setUserAgentOverride: command is missing",
+         "Network.setExtraHTTPHeaders: required parameter is missing: mimeType",
+@@ -302,6 +303,7 @@ def self_test():
+         "Network.loadingFailed: event is missing",
+         "Network.requestWillBeSent: required parameter is missing: postData",
+         "Network.requestWillBeSent: required parameter is missing: documentURL" ]
++    golden_errors.sort()
+     for i in range(len(errors)):
+         if errors[i] != golden_errors[i]:
+             return False

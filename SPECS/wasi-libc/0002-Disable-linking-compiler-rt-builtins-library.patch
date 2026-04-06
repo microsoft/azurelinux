@@ -1,0 +1,47 @@
+From e23112ea2e6e3422794388035129a052918983ff Mon Sep 17 00:00:00 2001
+From: Paul Murphy <murp@redhat.com>
+Date: Fri, 9 Jan 2026 11:28:46 -0600
+Subject: [PATCH 2/2] Disable linking compiler-rt builtins library
+
+The instructions lead us to believe it was always necessary,
+but so far we haven't and had no complaints yet.
+---
+ Makefile | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e0776fb..b1fac34 100644
+--- a/Makefile
++++ b/Makefile
+@@ -643,17 +643,15 @@ builtins: $(BUILTINS_LIB_PATH)
+ 
+ # Note: libc.so is special because it shouldn't link to libc.so, and the
+ # -nodefaultlibs flag here disables the default `-lc` logic that clang
+-# has. Note though that this also disables linking of compiler-rt
+-# libraries so that is explicitly passed in via `$(BUILTINS_LIB_PATH)`
++# has.
+ #
+ # Note: --allow-undefined-file=linker-provided-symbols.txt is
+ # a workaround for https://github.com/llvm/llvm-project/issues/103592
+-$(SYSROOT_LIB)/libc.so: $(OBJDIR)/libc.so.a $(BUILTINS_LIB_PATH)
++$(SYSROOT_LIB)/libc.so: $(OBJDIR)/libc.so.a
+ 	$(CC) --target=${TARGET_TRIPLE} -nodefaultlibs \
+ 	-shared --sysroot=$(SYSROOT) \
+ 	-o $@ -Wl,--whole-archive $< -Wl,--no-whole-archive \
+ 	-Wl,--allow-undefined-file=linker-provided-symbols.txt \
+-	$(BUILTINS_LIB_PATH) \
+ 	$(EXTRA_CFLAGS) $(LDFLAGS)
+ 
+ # Note that unlike `libc.so` above this rule does not pass `-nodefaultlibs`
+@@ -867,7 +865,7 @@ STATIC_LIBS += \
+ 	$(SYSROOT_LIB)/libsetjmp.a
+ endif
+ 
+-libc: $(INCLUDE_DIRS) $(STATIC_LIBS) builtins
++libc: $(INCLUDE_DIRS) $(STATIC_LIBS)
+ 	touch $@
+ 
+ DUMMY := m rt pthread crypt util xnet resolv
+-- 
+2.52.0
+

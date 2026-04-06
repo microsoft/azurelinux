@@ -1,0 +1,29 @@
+--- xz2-0.1.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ xz2-0.1.7/Cargo.toml	2024-09-21T23:12:17.487893+00:00
+@@ -39,16 +39,8 @@
+     "futures",
+ ]
+ 
+-[dependencies.futures]
+-version = "0.1.26"
+-optional = true
+-
+ [dependencies.lzma-sys]
+ version = "0.1.18"
+-
+-[dependencies.tokio-io]
+-version = "0.1.12"
+-optional = true
+ 
+ [dev-dependencies.quickcheck]
+ version = "1.0.1"
+@@ -59,9 +51,3 @@
+ [dev-dependencies.tokio-core]
+ version = "0.1.17"
+ 
+-[features]
+-static = ["lzma-sys/static"]
+-tokio = [
+-    "tokio-io",
+-    "futures",
+-]

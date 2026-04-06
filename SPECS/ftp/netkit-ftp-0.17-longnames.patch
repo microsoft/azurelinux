@@ -1,0 +1,106 @@
+--- netkit-ftp-0.17/ftp/cmds.c.longnames	2006-07-25 11:13:55.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2006-07-24 17:52:10.000000000 +0200
+@@ -1057,10 +1057,9 @@
+ status(void)
+ {
+ 	int i;
+-
+-	if (connected)
++	if (connected) 
+ 		printf("Connected to %s.\n", hostname);
+-	else
++	else 
+ 		printf("Not connected.\n");
+ 	if (!proxy) {
+ 		pswitch(1);
+@@ -1081,7 +1080,7 @@
+ 		onoff(runique));
+ 	printf("Case: %s; CR stripping: %s\n",onoff(mcase),onoff(crflag));
+ 	if (ntflag) {
+-		printf("Ntrans: (in) %s (out) %s\n", ntin,ntout);
++		printf("Ntrans: (in) %s (out) %s\n",ntin,ntout);
+ 	}
+ 	else {
+ 		printf("Ntrans: off\n");
+@@ -1948,14 +1947,14 @@
+ 	}
+ 	ntflag++;
+ 	code = ntflag;
+-	(void) strncpy(ntin, argv[1], 16);
+-	ntin[16] = '\0';
++	(void) strncpy(ntin, argv[1], NTRANS_MAX);
++	ntin[NTRANS_MAX] = '\0';
+ 	if (argc == 2) {
+ 		ntout[0] = '\0';
+ 		return;
+ 	}
+-	(void) strncpy(ntout, argv[2], 16);
+-	ntout[16] = '\0';
++	(void) strncpy(ntout, argv[2], NTRANS_MAX);
++ 	ntout[NTRANS_MAX] = '\0';
+ }
+ 
+ static char *
+@@ -1965,10 +1964,10 @@
+ 	char *cp1, *cp2 = new;
+ 	register int i, ostop, found;
+ 
+-	for (ostop = 0; *(ntout + ostop) && ostop < 16; ostop++);
++	for (ostop = 0; *(ntout + ostop) && ostop < NTRANS_MAX; ostop++);
+ 	for (cp1 = name; *cp1; cp1++) {
+ 		found = 0;
+-		for (i = 0; *(ntin + i) && i < 16; i++) {
++		for (i = 0; *(ntin + i) && i < NTRANS_MAX; i++) {
+ 			if (*cp1 == *(ntin + i)) {
+ 				found++;
+ 				if (i < ostop) {
+--- netkit-ftp-0.17/ftp/ftp.c.longnames	2006-07-25 11:13:56.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2006-07-24 17:46:14.000000000 +0200
+@@ -1656,8 +1656,8 @@
+ 		int runqe;
+ 		int mcse;
+ 		int ntflg;
+-		char nti[17];
+-		char nto[17];
++		char nti[NTRANS_MAX+1];
++		char nto[NTRANS_MAX+1];
+ 		int mapflg;
+ 		char mi[MAXPATHLEN];
+ 		char mo[MAXPATHLEN];
+@@ -1712,11 +1712,11 @@
+ 	mcase = op->mcse;
+ 	ip->ntflg = ntflag;
+ 	ntflag = op->ntflg;
+-	(void) strncpy(ip->nti, ntin, 16);
+-	(ip->nti)[16] = '\0';		/* shouldn't use strlen */
++	(void) strncpy(ip->nti, ntin, NTRANS_MAX);
++	(ip->nti)[NTRANS_MAX] = '\0';		/* shouldn't use strlen */
+ 	(void) strcpy(ntin, op->nti);
+-	(void) strncpy(ip->nto, ntout, 16);
+-	(ip->nto)[16] = '\0';
++	(void) strncpy(ip->nto, ntout, NTRANS_MAX);
++	(ip->nto)[NTRANS_MAX] = '\0';
+ 	(void) strcpy(ntout, op->nto);
+ 	ip->mapflg = mapflag;
+ 	mapflag = op->mapflg;
+--- netkit-ftp-0.17/ftp/ftp_var.h.longnames	2006-07-25 11:13:56.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp_var.h	2006-07-24 15:49:37.000000000 +0200
+@@ -42,6 +42,7 @@
+ 
+ #include <setjmp.h>
+ #include <sys/param.h>
++#define NTRANS_MAX	64
+ 
+ /*
+  * Tick counter step size.
+@@ -82,8 +83,8 @@
+ Extern char     pasv[64];       /* passive port for proxy data connection */
+ Extern int      passivemode;    /* passive mode enabled */
+ Extern char	*altarg;	/* argv[1] with no shell-like preprocessing  */
+-Extern char	ntin[17];	/* input translation table */
+-Extern char	ntout[17];	/* output translation table */
++Extern char	ntin[NTRANS_MAX+1];	/* input translation table */
++Extern char	ntout[NTRANS_MAX+1];	/* output translation table */
+ Extern char	mapin[MAXPATHLEN];	/* input map template */
+ Extern char	mapout[MAXPATHLEN];	/* output map template */
+ Extern char	typename[32];		/* name of file transfer type */

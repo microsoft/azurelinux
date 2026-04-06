@@ -1,0 +1,38 @@
+--- object-0.36.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ object-0.36.7/Cargo.toml	2025-08-19T13:30:54.831017+00:00
+@@ -100,11 +100,6 @@
+ version = "0.7.0"
+ optional = true
+ 
+-[dependencies.wasmparser]
+-version = "0.222.0"
+-optional = true
+-default-features = false
+-
+ [features]
+ all = [
+     "read",
+@@ -112,7 +107,6 @@
+     "build",
+     "std",
+     "compression",
+-    "wasm",
+ ]
+ archive = []
+ build = [
+@@ -146,7 +140,6 @@
+     "elf",
+     "macho",
+     "pe",
+-    "wasm",
+     "xcoff",
+ ]
+ elf = []
+@@ -176,7 +169,6 @@
+     "all",
+     "unstable",
+ ]
+-wasm = ["dep:wasmparser"]
+ write = [
+     "write_std",
+     "coff",

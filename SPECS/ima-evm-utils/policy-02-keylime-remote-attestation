@@ -1,0 +1,37 @@
+# PROC_SUPER_MAGIC
+dont_measure fsmagic=0x9fa0
+# SYSFS_MAGIC
+dont_measure fsmagic=0x62656572
+# DEBUGFS_MAGIC
+dont_measure fsmagic=0x64626720
+# TMPFS_MAGIC
+dont_measure fsmagic=0x01021994
+# DEVPTS_SUPER_MAGIC
+dont_measure fsmagic=0x1cd1
+# BINFMTFS_MAGIC
+dont_measure fsmagic=0x42494e4d
+# SECURITYFS_MAGIC
+dont_measure fsmagic=0x73636673
+# SELINUX_MAGIC
+dont_measure fsmagic=0xf97cff8c
+# SMACK_MAGIC
+dont_measure fsmagic=0x43415d53
+# CGROUP_SUPER_MAGIC
+dont_measure fsmagic=0x27e0eb
+# CGROUP2_SUPER_MAGIC
+dont_measure fsmagic=0x63677270
+# NSFS_MAGIC
+dont_measure fsmagic=0x6e736673
+# EFIVARFS_MAGIC
+dont_measure fsmagic=0xde5e81e4
+# OVERLAYFS_MAGIC
+# when containers are used we almost always want to ignore them
+dont_measure fsmagic=0x794c7630
+
+
+# Measure and log keys loaded onto the .ima keyring
+measure func=KEY_CHECK keyrings=.ima
+# Measure and log executables
+measure func=BPRM_CHECK
+# Measure and log shared libraries
+measure func=FILE_MMAP mask=MAY_EXEC

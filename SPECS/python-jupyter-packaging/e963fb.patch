@@ -1,0 +1,23 @@
+From e963fb27aa3b58cd70c5ca61ebe68c222d803b7e Mon Sep 17 00:00:00 2001
+From: Steven Silvester <steven.silvester@ieee.org>
+Date: Tue, 7 Mar 2023 10:47:22 -0600
+Subject: [PATCH] Ignore warning raised when importing
+ setuptools.command.develop
+
+---
+ pyproject.toml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index e4c1e27..b316257 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -81,5 +81,7 @@ filterwarnings= [
+   # Fail on warnings
+   "error",
+   # Ignore our own deprecation warnings.
+-  "ignore:.*:deprecation.DeprecatedWarning"
++  "ignore:.*:deprecation.DeprecatedWarning",
++  # Ignore warning raised when importing setuptools.command.develop.
++  "ignore:pkg_resources is deprecated as an API:DeprecationWarning"
+ ]

@@ -1,0 +1,30 @@
+--- ghc-9.6.6/libraries/Cabal/Cabal/src/Distribution/PackageDescription/Check.hs~	2024-07-01 06:50:13.000000000 +0800
++++ ghc-9.6.6/libraries/Cabal/Cabal/src/Distribution/PackageDescription/Check.hs	2024-08-02 00:11:48.876073781 +0800
+@@ -1896,19 +1896,19 @@
+ --
+ checkPackageVersions :: GenericPackageDescription -> [PackageCheck]
+ checkPackageVersions pkg =
+-  -- if others is empty,
+-  -- the error will still fire but listing no dependencies.
+-  -- so we have to check
+-  if length others > 0
+-  then
+-    PackageDistSuspiciousWarn (MissingUpperBounds others) : baseErrors
+-  else
++  -- -- if others is empty,
++  -- -- the error will still fire but listing no dependencies.
++  -- -- so we have to check
++  -- if length others > 0
++  -- then
++  --   PackageDistSuspiciousWarn (MissingUpperBounds others) : baseErrors
++  -- else
+     baseErrors
+   where
+     baseErrors = PackageDistInexcusable BaseNoUpperBounds <$ bases
+     deps = toDependencyVersionsMap allNonInternalBuildDepends pkg
+     -- base gets special treatment (it's more critical)
+-    (bases, others) = partition (("base" ==) . unPackageName) $
++    (bases, _others) = partition (("base" ==) . unPackageName) $
+       [ name
+       | (name, vr) <- Map.toList deps
+       , not (hasUpperBound vr)

@@ -1,0 +1,42 @@
+From 8e55f9a7fd8462131c2ba12e6e35002d3f4c456a Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Thu, 12 Jun 2025 08:50:26 -0700
+Subject: [PATCH] rocsolver parallel jobs
+
+---
+ CMakeLists.txt             | 3 +++
+ library/src/CMakeLists.txt | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 872f323ca8df..f9c29108c9a7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -147,6 +147,9 @@ option(WERROR "Treat warnings as errors" OFF)
+ option(BUILD_COMPRESSED_DBG "Enable compressed debug symbols" ON)
+ check_cxx_compiler_flag("--offload-compress" CXX_COMPILER_SUPPORTS_OFFLOAD_COMPRESS)
+ cmake_dependent_option(BUILD_OFFLOAD_COMPRESS "Build with offload compression" ON CXX_COMPILER_SUPPORTS_OFFLOAD_COMPRESS OFF)
++check_cxx_compiler_flag("-parallel-jobs=4" CXX_COMPILER_SUPPORTS_PARALLEL_HIP_JOBS)
++cmake_dependent_option(BUILD_PARALLEL_HIP_JOBS "Build with parallel hip jobs" ON CXX_COMPILER_SUPPORTS_PARALLEL_HIP_JOBS OFF)
++
+ 
+ cmake_dependent_option(BUILD_FILE_REORG_BACKWARD_COMPATIBILITY
+   "Build with file/folder reorg backward compatibility enabled" OFF "NOT WIN32" OFF)
+diff --git a/library/src/CMakeLists.txt b/library/src/CMakeLists.txt
+index fea7c5d4265c..cb75fd8093b3 100755
+--- a/library/src/CMakeLists.txt
++++ b/library/src/CMakeLists.txt
+@@ -416,6 +416,10 @@ if ( BUILD_OFFLOAD_COMPRESS )
+   target_compile_options( rocsolver PRIVATE --offload-compress )
+ endif ()
+ 
++if(BUILD_PARALLEL_HIP_JOBS)
++  target_compile_options(rocsolver PRIVATE "-parallel-jobs=4")
++endif()
++
+ target_include_directories(rocsolver
+   PUBLIC
+     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/library/include>
+-- 
+2.49.0
+

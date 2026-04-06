@@ -1,0 +1,19 @@
+From: Pavel Raiskup <pavel@raiskup.cz>
+Date: Mon, 14 Sep 2015 09:51:12 +0200
+Subject: [PATCH 7/7] Note that cpio uses Sum32 checksum only
+
+Related to Package Wrangler and FIPS check.
+
+diff --git a/src/main.c b/src/main.c
+index a875a13..13cdfcf 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -167,7 +167,7 @@ static struct argp_option options[] = {
+   {"pattern-file", 'E', N_("FILE"), 0,
+    N_("Read additional patterns specifying filenames to extract or list from FILE"), 210},
+   {"only-verify-crc", ONLY_VERIFY_CRC_OPTION, 0, 0,
+-   N_("When reading a CRC format archive, only verify the CRC's of each file in the archive, don't actually extract the files"), 210},
++   N_("When reading a CRC format archive, only verify the checksum of each file in the archive, don't actually extract the files"), 210},
+   {"rename", 'r', 0, 0,
+    N_("Interactively rename files"), GRID+1 },
+   {"rename-batch-file", RENAME_BATCH_FILE_OPTION, N_("FILE"), OPTION_HIDDEN,

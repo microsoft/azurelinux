@@ -1,0 +1,25 @@
+From 88704fc2eabb9dd19a9c3eb81a9b3dc37d95651c Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Fri, 31 Jan 2020 11:04:57 -0800
+Subject: [PATCH][clang] Don't install static libraries
+
+---
+ clang/cmake/modules/AddClang.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/clang/cmake/modules/AddClang.cmake b/clang/cmake/modules/AddClang.cmake
+index 5752f4277444..0f52822d91f0 100644
+--- a/clang/cmake/modules/AddClang.cmake
++++ b/clang/cmake/modules/AddClang.cmake
+@@ -113,7 +113,7 @@ macro(add_clang_library name)
+     if(TARGET ${lib})
+       target_link_libraries(${lib} INTERFACE ${LLVM_COMMON_LIBS})
+ 
+-      if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY OR ARG_INSTALL_WITH_TOOLCHAIN)
++      if (ARG_SHARED AND (NOT LLVM_INSTALL_TOOLCHAIN_ONLY OR ARG_INSTALL_WITH_TOOLCHAIN))
+         get_target_export_arg(${name} Clang export_to_clangtargets UMBRELLA clang-libraries)
+         install(TARGETS ${lib}
+           COMPONENT ${lib}
+-- 
+2.30.2
+

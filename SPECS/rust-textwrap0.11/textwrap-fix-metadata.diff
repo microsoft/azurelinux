@@ -1,0 +1,13 @@
+--- textwrap-0.11.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ textwrap-0.11.0/Cargo.toml	2023-06-23T18:54:14.943929+00:00
+@@ -24,10 +24,6 @@
+ repository = "https://github.com/mgeisler/textwrap"
+ [package.metadata.docs.rs]
+ all-features = true
+-[dependencies.hyphenation]
+-version = "0.7.1"
+-features = ["embed_all"]
+-optional = true
+ 
+ [dependencies.term_size]
+ version = "0.3.0"

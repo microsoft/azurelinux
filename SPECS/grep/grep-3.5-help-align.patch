@@ -1,0 +1,23 @@
+diff --git a/src/grep.c b/src/grep.c
+index a530988..b6f6ee3 100644
+--- a/src/grep.c
++++ b/src/grep.c
+@@ -2023,7 +2023,8 @@ Output control:\n\
+   -D, --devices=ACTION      how to handle devices, FIFOs and sockets;\n\
+                             ACTION is 'read' or 'skip'\n\
+   -r, --recursive           like --directories=recurse\n\
+-  -R, --dereference-recursive  likewise, but follow all symlinks\n\
++  -R, --dereference-recursive\n\
++                            likewise, but follow all symlinks\n\
+ "));
+       printf (_("\
+       --include=GLOB        search only files that match GLOB (a file pattern)"
+@@ -2033,7 +2034,7 @@ Output control:\n\
+       --exclude-dir=GLOB    skip directories that match GLOB\n\
+ "));
+       printf (_("\
+-  -L, --files-without-match  print only names of FILEs with no selected lines\n\
++  -L, --files-without-match print only names of FILEs with no selected lines\n\
+   -l, --files-with-matches  print only names of FILEs with selected lines\n\
+   -c, --count               print only a count of selected lines per FILE\n\
+   -T, --initial-tab         make tabs line up (if needed)\n\

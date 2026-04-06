@@ -1,0 +1,28 @@
+--- ./process.c.orig    2009-03-06 02:25:10.000000000 +0100
++++ ./process.c 2013-09-12 10:51:16.000000000 +0200
+@@ -2901,9 +2901,9 @@
+         */
+ 
+ #ifdef IZ_HAVE_UXUIDGID
+-            if (eb_len >= EB_UX3_MINLEN
+-                && z_uidgid != NULL
+-                && (*((EB_HEADSIZE + 0) + ef_buf) == 1)
++            if ((eb_len >= EB_UX3_MINLEN)
++                && (z_uidgid != NULL)
++                && ((*((EB_HEADSIZE + 0) + ef_buf) == 1)))
+                     /* only know about version 1 */
+             {
+                 uch uid_size;
+@@ -2915,10 +2915,10 @@
+                 flags &= ~0x0ff;      /* ignore any previous UNIX field */
+ 
+                 if ( read_ux3_value((EB_HEADSIZE + 2) + ef_buf,
+-                                    uid_size, z_uidgid[0])
++                                    uid_size, &z_uidgid[0])
+                     &&
+                      read_ux3_value((EB_HEADSIZE + uid_size + 3) + ef_buf,
+-                                    gid_size, z_uidgid[1]) )
++                                    gid_size, &z_uidgid[1]) )
+                 {
+                     flags |= EB_UX2_VALID;   /* signal success */
+                 }

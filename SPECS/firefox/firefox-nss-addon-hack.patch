@@ -1,0 +1,19 @@
+diff -up firefox-84.0.2/security/certverifier/NSSCertDBTrustDomain.cpp.nss-hack firefox-84.0.2/security/certverifier/NSSCertDBTrustDomain.cpp
+--- firefox-84.0.2/security/certverifier/NSSCertDBTrustDomain.cpp.nss-hack      2021-01-11 12:12:02.585514543 +0100
++++ firefox-84.0.2/security/certverifier/NSSCertDBTrustDomain.cpp       2021-01-11 12:47:50.345984582 +0100
+@@ -1619,6 +1619,15 @@ SECStatus InitializeNSS(const nsACString
+     return srv;
+   }
+
++  /* Sets the NSS_USE_ALG_IN_ANY_SIGNATURE bit.
++   * does not change NSS_USE_ALG_IN_CERT_SIGNATURE,
++   * so policy will still disable use of sha1 in
++   * certificate related signature processing. */
++  srv = NSS_SetAlgorithmPolicy(SEC_OID_SHA1, NSS_USE_ALG_IN_ANY_SIGNATURE, 0);
++  if (srv != SECSuccess) {
++    NS_WARNING("Unable to use SHA1 for Add-ons, expect broken/disabled Add-ons. See https://bugzilla.redhat.com/show_bug.cgi?id=1908018 for details.");
++  }
++
+   if (nssDbConfig == NSSDBConfig::ReadWrite) {
+     UniquePK11SlotInfo slot(PK11_GetInternalKeySlot());
+     if (!slot) {

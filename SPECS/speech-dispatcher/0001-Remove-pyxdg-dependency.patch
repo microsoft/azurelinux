@@ -1,0 +1,29 @@
+--- speech-dispatcher-0.11.1/src/api/python/speechd_config/config.py~	2022-01-08 16:36:58.000000000 -0600
++++ speech-dispatcher-0.11.1/src/api/python/speechd_config/config.py	2022-01-10 10:39:08.029069754 -0600
+@@ -29,8 +29,6 @@
+ import sys
+ import time
+ 
+-from xdg import BaseDirectory
+-
+ # Configuration and sound data paths
+ from . import buildconfig
+ 
+@@ -180,7 +178,16 @@
+ 
+     def user_conf_dir(self):
+         """Return user configuration directory"""
+-        return os.path.join(BaseDirectory.xdg_config_home, "speech-dispatcher")
++        config_dir = os.environ['XDG_CONFIG_HOME']
++        if not config_dir:
++            home_dir = os.environ['HOME']
++            if home_dir:
++                config_dir = os.path.join(home_dir, ".config")
++            else:
++                tmpdir = os.environ['TMPDIR'] or "/tmp/"
++                config_dir = os.path.join(tmpdir, os.getlogin(), ".config")
++
++        return os.path.join(config_dir, "speech-dispatcher")
+ 
+     def system_conf_dir(self):
+         """Determine system configuration directory"""

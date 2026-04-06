@@ -1,0 +1,13 @@
+diff -Nrup a/Makefile b/Makefile
+--- a/Makefile	2023-03-22 17:41:49.069789592 -0400
++++ b/Makefile	2023-03-22 17:44:07.528427093 -0400
+@@ -52,7 +52,7 @@ LOCALTIME=	Factory
+ #	make zonenames
+ # to get a list of the values you can use for POSIXRULES.
+ 
+-POSIXRULES=	-
++POSIXRULES=	America/New_York
+ 
+ # Also see TZDEFRULESTRING below, which takes effect only
+ # if POSIXRULES is '-' or if the template file cannot be accessed.
+Binary files a/tzdata2023a-rearguard.tar.gz and b/tzdata2023a-rearguard.tar.gz differ

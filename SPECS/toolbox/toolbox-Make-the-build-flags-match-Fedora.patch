@@ -1,0 +1,62 @@
+From a1bb7d53fab70899c991feb9276cf93a12280750 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <rishi@fedoraproject.org>
+Date: Mon, 29 Jun 2020 17:57:47 +0200
+Subject: [PATCH] build: Make the build flags match Fedora's %{gobuildflags}
+
+These reflect the defaults for Fedora 39, which is the oldest supported
+Fedora, barring some exceptions mentioned below.
+
+The change to use the RPM's %{name}, %{version}, %{release} and the
+SOURCE_DATE_EPOCH environment variable [1], instead of /dev/urandom, to
+generate the build ID annotation for the toolbox(1) binary [2] was left
+out.  It will need more work to propagate the RPM's %{name}, %{version}
+and %{release} to Meson.
+
+Note that these flags are meant for every CPU architecture other than
+PPC64, and should be kept updated to match Fedora's Go guidelines. Use
+'rpm --eval "%{gobuildflags}"' to expand the %{gobuildflags} macro.
+
+[1] https://reproducible-builds.org/docs/source-date-epoch/
+
+[2] go-rpm-macros commit 1980932bf3a21890
+    https://pagure.io/go-rpm-macros/c/1980932bf3a21890
+    https://fedoraproject.org/wiki/Changes/ReproduciblePackageBuilds
+---
+ src/go-build-wrapper | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/go-build-wrapper b/src/go-build-wrapper
+index a5a1a6a508fb..5978422e9aed 100755
+--- a/src/go-build-wrapper
++++ b/src/go-build-wrapper
+@@ -33,9 +33,9 @@ if ! cd "$1"; then
+     exit 1
+ fi
+ 
+-tags=""
++tags="-tags rpm_crashtraceback,${GO_BUILDTAGS:-}"
+ if $7; then
+-    tags="-tags migration_path_for_coreos_toolbox"
++    tags="$tags,migration_path_for_coreos_toolbox"
+ fi
+ 
+ if ! libc_dir=$("$5" --print-file-name=libc.so); then
+@@ -114,9 +114,14 @@ dynamic_linker="/run/host$dynamic_linker_canonical_dirname/$dynamic_linker_basen
+ 
+ # shellcheck disable=SC2086
+ go build \
++        -buildmode pie \
++        -compiler gc \
+         $tags \
+         -trimpath \
+-        -ldflags "-extldflags '-Wl,-dynamic-linker,$dynamic_linker -Wl,-rpath,/run/host$libc_dir_canonical_dirname -Wl,--export-dynamic -Wl,--unresolved-symbols=ignore-in-object-files' -linkmode external -X github.com/containers/toolbox/pkg/version.currentVersion=$4" \
++        -ldflags "${GO_LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \n') -compressdwarf=false -extldflags '-Wl,-z,relro -Wl,--as-needed -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -Wl,--build-id=sha1 -specs=/usr/lib/rpm/redhat/redhat-package-notes -Wl,-dynamic-linker,$dynamic_linker -Wl,-rpath,/run/host$libc_dir_canonical_dirname -Wl,--export-dynamic -Wl,--unresolved-symbols=ignore-in-object-files' -linkmode external -X github.com/containers/toolbox/pkg/version.currentVersion=$4" \
++        -a \
++        -v \
++        -x \
+         -o "$2/$3"
+ 
+ exit "$?"
+-- 
+2.51.0
+

@@ -1,0 +1,67 @@
+From e02da7d1a729ed168b135baf74ce8f9a501e8414 Mon Sep 17 00:00:00 2001
+From: Arjen Hiemstra <ahiemstra@heimr.nl>
+Date: Thu, 18 Nov 2021 13:05:30 +0100
+Subject: [PATCH 15/55] Client: Delay deletion of QDrag object until after
+ we're done with it
+
+In certain cases, most notably when performing drag and drop operations
+with touch, the QDrag object gets deleted before data_source_send is
+executed. This then tries to access a deleted data_source, crashing the
+client.
+
+To avoid this, we indicate we want the QDrag object to stay around and
+then delete it in QWaylandDrag::finishDrag, which with data_device v3 is
+guaranteed to be called after everyone is done with the data source.
+
+Change-Id: I6a2f5a219f58d1b721a9fec33c57d26d2c522ec9
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 39e3290efa2dd40722fa3322284cae3b01ccedf4)
+---
+ src/client/qwaylanddnd.cpp | 11 +++++++++++
+ src/client/qwaylanddnd_p.h |  1 +
+ 2 files changed, 12 insertions(+)
+
+diff --git a/src/client/qwaylanddnd.cpp b/src/client/qwaylanddnd.cpp
+index 97ee5b2e..7c53f5fa 100644
+--- a/src/client/qwaylanddnd.cpp
++++ b/src/client/qwaylanddnd.cpp
+@@ -80,6 +80,9 @@ void QWaylandDrag::cancel()
+     QBasicDrag::cancel();
+ 
+     m_display->currentInputDevice()->dataDevice()->cancelDrag();
++
++    if (drag())
++        drag()->deleteLater();
+ }
+ 
+ void QWaylandDrag::move(const QPoint &globalPos, Qt::MouseButtons b, Qt::KeyboardModifiers mods)
+@@ -130,6 +133,14 @@ void QWaylandDrag::finishDrag()
+ {
+     QKeyEvent event(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+     eventFilter(shapedPixmapWindow(), &event);
++
++    if (drag())
++        drag()->deleteLater();
++}
++
++bool QWaylandDrag::ownsDragObject() const
++{
++    return true;
+ }
+ 
+ }
+diff --git a/src/client/qwaylanddnd_p.h b/src/client/qwaylanddnd_p.h
+index 747f0190..46f629ac 100644
+--- a/src/client/qwaylanddnd_p.h
++++ b/src/client/qwaylanddnd_p.h
+@@ -83,6 +83,7 @@ protected:
+     void drop(const QPoint &globalPos, Qt::MouseButtons b, Qt::KeyboardModifiers mods) override;
+     void endDrag() override;
+ 
++    bool ownsDragObject() const override;
+ 
+ private:
+     QWaylandDisplay *m_display = nullptr;
+-- 
+2.51.1
+

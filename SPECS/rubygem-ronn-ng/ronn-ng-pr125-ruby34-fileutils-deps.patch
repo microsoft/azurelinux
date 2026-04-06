@@ -1,0 +1,20 @@
+From bc2ba6e53f21391ab6c400062a0204084ab9b54b Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Tue, 19 Nov 2024 23:02:09 +0900
+Subject: [PATCH] [tests] require fileutils explicitly
+
+ruby 3.4 no longer loads fileutils implicitly.
+Fixes #124 .
+---
+ test/test_ronn.rb | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/test_ronn.rb b/test/test_ronn.rb
+index 066ed8e..d05c136 100644
+--- a/test/test_ronn.rb
++++ b/test/test_ronn.rb
+@@ -1,3 +1,4 @@
++require 'fileutils'
+ require 'contest'
+ 
+ class RonnTest < Test::Unit::TestCase

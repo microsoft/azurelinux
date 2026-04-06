@@ -1,0 +1,2 @@
+[org.gnome.mutter:GNOME]
+experimental-features=['scale-monitor-framebuffer', 'xwayland-native-scaling']

@@ -1,0 +1,50 @@
+--- rustix-0.38.44/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustix-0.38.44/Cargo.toml	2025-02-16T19:33:57.658787+00:00
+@@ -74,32 +74,14 @@
+ name = "rustix"
+ path = "src/lib.rs"
+ 
+-[[bench]]
+-name = "mod"
+-path = "benches/mod.rs"
+-harness = false
+-
+ [dependencies.bitflags]
+ version = "2.4.0"
+ default-features = false
+ 
+-[dependencies.compiler_builtins]
+-version = "0.1.49"
+-optional = true
+-
+-[dependencies.core]
+-version = "1.0.0"
+-optional = true
+-package = "rustc-std-workspace-core"
+-
+ [dependencies.itoa]
+ version = "1.0.13"
+ optional = true
+ default-features = false
+-
+-[dependencies.rustc-std-workspace-alloc]
+-version = "1.0.0"
+-optional = true
+ 
+ [dev-dependencies.flate2]
+ version = "1.0"
+@@ -185,14 +167,6 @@
+ ]
+ rand = []
+ runtime = ["linux-raw-sys/prctl"]
+-rustc-dep-of-std = [
+-    "core",
+-    "rustc-std-workspace-alloc",
+-    "compiler_builtins",
+-    "linux-raw-sys/rustc-dep-of-std",
+-    "bitflags/rustc-dep-of-std",
+-    "compiler_builtins?/rustc-dep-of-std",
+-]
+ shm = ["fs"]
+ std = [
+     "bitflags/std",

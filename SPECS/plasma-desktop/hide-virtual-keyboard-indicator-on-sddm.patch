@@ -1,0 +1,13 @@
+diff --git a/sddm-theme/Main.qml b/sddm-theme/Main.qml
+index 884165299..cb187da2f 100644
+--- a/sddm-theme/Main.qml
++++ b/sddm-theme/Main.qml
+@@ -452,7 +452,7 @@ Item {
+                     userListComponent.mainPasswordBox.forceActiveFocus();
+                     inputPanel.showHide()
+                 }
+-                visible: inputPanel.status === Loader.Ready
++                visible: false
+ 
+                 Layout.fillHeight: true
+                 containmentMask: Item {

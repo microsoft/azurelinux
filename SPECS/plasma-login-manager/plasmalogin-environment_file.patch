@@ -1,0 +1,12 @@
+diff --git a/services/plasmalogin.service.in b/services/plasmalogin.service.in
+index d652b0f..1c51101 100644
+--- a/services/plasmalogin.service.in
++++ b/services/plasmalogin.service.in
+@@ -9,6 +9,7 @@ StartLimitBurst=2
+ 
+ [Service]
+ ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/plasmalogin
++EnvironmentFile=-/etc/sysconfig/plasmalogin
+ Restart=always
+ 
+ [Install]

@@ -1,0 +1,126 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+
+SIM_PORT_DATA=2321
+SIM_PORT_CMD=$((SIM_PORT_DATA+1))
+
+# Run from top dir of this repository
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+TOP_DIR="$(realpath "$SCRIPT_DIR/..")"
+cd "$TOP_DIR" || { echo "Error: cd to cd $TOP_DIR failed"; exit 1; }
+
+
+verify_simulator_is_running() {
+    local pid_tpm=$1
+
+    sleep 1
+    ss -lntp4 2> /dev/null | grep "${pid_tpm}" | grep -q "${SIM_PORT_DATA}"
+    ret_data=$?
+    ss -lntp4 2> /dev/null | grep "${pid_tpm}" | grep -q "${SIM_PORT_CMD}"
+    ret_cmd=$?
+    if [ $ret_data -eq 0 ] && [ $ret_cmd -eq 0 ]; then
+        echo "Simulator with PID ${pid_tpm} bound to port ${SIM_PORT_DATA} and ${SIM_PORT_CMD} successfully."
+        return 0
+    else
+        echo "Error: Port conflict? Cleaning up PID: ${pid_tpm}"
+        return 1
+    fi
+}
+
+build_tpm2_simulator_ibm() (
+    test -d ibmtpm && return
+    echo "---> compiling IBM tpm simulator"
+    mkdir ibmtpm
+    curl -Ls https://downloads.sourceforge.net/project/ibmswtpm2/ibmtpm1682.tar.gz | tar xz -C ibmtpm
+    cd ibmtpm/src && make
+)
+
+start_tpm2_simulator_ibm () {
+    build_tpm2_simulator_ibm || return 1
+
+    echo "---> starting IBM tpm simulator"
+    ibmtpm/src/tpm_server &
+    pid_tpm=$!
+    verify_simulator_is_running $pid_tpm
+}
+
+start_tpm2_simulator_swtpm () {
+    echo "---> starting swtpm simulator"
+    swtpm socket --tpm2 \
+        --server port=$SIM_PORT_DATA \
+        --ctrl type=tcp,port=$SIM_PORT_CMD \
+        --flags not-need-init \
+        --tpmstate dir="$PWD" \
+        --seccomp action=none &
+    pid_tpm=$!
+    verify_simulator_is_running $pid_tpm
+}
+
+start_dbusd () {
+    echo "---> starting dbus daemon"
+    dbus-daemon --session --print-address > /tmp/bus-socket-path.txt &
+    sleep 1
+    DBUS_SESSION_BUS_ADDRESS="$(tail -n1 /tmp/bus-socket-path.txt)"
+    export DBUS_SESSION_BUS_ADDRESS
+}
+
+start_tpm2_abrmd() {
+    local tabrmd_tcti=$1
+
+    echo "---> starting abrmd"
+    local tabrmd_name="com.intel.tss2.Tabrmd${SIM_PORT_DATA}"
+    tpm2-abrmd --session --dbus-name="${tabrmd_name}" --tcti "${tabrmd_tcti}:host=localhost,port=${SIM_PORT_DATA}" &
+    TCTI_ADDRESS="tabrmd:bus_name=${tabrmd_name},bus_type=session"
+    TPM2TOOLS_TCTI="$TCTI_ADDRESS"
+    TPM2OPENSSL_TCTI="$TCTI_ADDRESS"
+    export TPM2TOOLS_TCTI
+    export TPM2OPENSSL_TCTI
+    sleep 1
+    busctl --address="${DBUS_SESSION_BUS_ADDRESS}" list | grep "$tabrmd_name"
+}
+
+start_tpm2_sim_env() {
+    local sim_type=$1
+
+    start_dbusd
+
+    if [ "$sim_type" = "swtpm" ]; then
+        start_tpm2_simulator_swtpm || return 1
+        start_tpm2_abrmd swtpm || return 1
+    elif [ "$sim_type" = "ibm" ]; then
+        start_tpm2_simulator_ibm || return 1
+        start_tpm2_abrmd mssim || return 1
+    else
+        echo "invalid tpm simulator typ"
+        return 1
+    fi
+}
+
+make_check () {
+    echo "Running make check"
+    openssl version
+    tpm2_getcap properties-fixed | head -n 20
+    make check
+}
+
+function cleanup()
+{
+    pkill -P $$
+}
+trap cleanup EXIT
+
+build_tpm2_openssl() {
+    ./bootstrap
+    ./configure CC=gcc --enable-op-digest --enable-op-cipher
+    make
+}
+
+SIM_TYPE=${1:-swtpm}
+SKIP_BUILD=${2:-build}
+if [ "$SKIP_BUILD" = "skip-build" ]; then
+    echo "Skipping the build"
+else
+    build_tpm2_openssl || { echo "Compiling tpm2-openssl failed"; exit 1; }
+fi
+start_tpm2_sim_env "${SIM_TYPE}" || { echo "Starting tpm2 simulator failed ($SIM_TYPE)"; exit 1; }
+make_check || { echo "tpm2-openssl make check failed"; exit 1; }

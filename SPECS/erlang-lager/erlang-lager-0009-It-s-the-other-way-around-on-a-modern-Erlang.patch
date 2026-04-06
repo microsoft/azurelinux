@@ -1,0 +1,31 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 23 Apr 2024 20:58:12 +0200
+Subject: [PATCH] It's the other way around on a modern Erlang
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/src/lager_trunc_io.erl b/src/lager_trunc_io.erl
+index a4c06b7..b87dd3f 100644
+--- a/src/lager_trunc_io.erl
++++ b/src/lager_trunc_io.erl
+@@ -750,13 +750,13 @@ map_printing_test() ->
+     ?assertEqual("#{bar => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}])], 7))),
+     ?assertEqual("#{bar => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}])], 9))),
+     ?assertEqual("#{bar => foo}", lists:flatten(format("~p", [maps:from_list([{bar, foo}])], 10))),
+-    ?assertEqual("#{bar => ...,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 9))),
+-    ?assertEqual("#{bar => foo,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 10))),
+-    ?assertEqual("#{bar => foo,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 17))),
+-    ?assertEqual("#{bar => foo,foo => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 18))),
+-    ?assertEqual("#{bar => foo,foo => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 19))),
+-    ?assertEqual("#{bar => foo,foo => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 20))),
+-    ?assertEqual("#{bar => foo,foo => bar}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 21))),
++    ?assertEqual("#{foo => ...,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 9))),
++    ?assertEqual("#{foo => bar,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 10))),
++    ?assertEqual("#{foo => bar,...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 17))),
++    ?assertEqual("#{foo => bar,bar => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 18))),
++    ?assertEqual("#{foo => bar,bar => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 19))),
++    ?assertEqual("#{foo => bar,bar => ...}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 20))),
++    ?assertEqual("#{foo => bar,bar => foo}", lists:flatten(format("~p", [maps:from_list([{bar, foo}, {foo, bar}])], 21))),
+     ?assertEqual("#{22835963083295358096932575511191922182123945984 => ...}",
+                  lists:flatten(format("~w", [
+                                              maps:from_list([{22835963083295358096932575511191922182123945984,

@@ -1,0 +1,46 @@
+From dab5d73cfe5af6c1d890f07f67dbe862202e6e5f Mon Sep 17 00:00:00 2001
+From: Milan Zamazal <mzamazal@redhat.com>
+Date: Thu, 25 Sep 2025 21:28:54 +0200
+Subject: [PATCH 12/15] libcamera: simple: Avoid incorrect arithmetic in AWB
+
+The R/G/B sums computed in AWB simple IPA may be zero or perhaps even
+negative.  Let's make sure the sums are always positive, to prevent
+division by zero or completely nonsense results.
+
+Signed-off-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/awb.cpp | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/ipa/simple/algorithms/awb.cpp b/src/ipa/simple/algorithms/awb.cpp
+index ddd0b7914..6a6243b98 100644
+--- a/src/ipa/simple/algorithms/awb.cpp
++++ b/src/ipa/simple/algorithms/awb.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "awb.h"
+ 
++#include <algorithm>
+ #include <numeric>
+ #include <stdint.h>
+ 
+@@ -71,10 +72,11 @@ void Awb::process(IPAContext &context,
+ 	 */
+ 	const uint64_t nPixels = std::accumulate(
+ 		histogram.begin(), histogram.end(), 0);
+-	const uint64_t offset = blackLevel * nPixels;
+-	const uint64_t sumR = stats->sumR_ - offset / 4;
+-	const uint64_t sumG = stats->sumG_ - offset / 2;
+-	const uint64_t sumB = stats->sumB_ - offset / 4;
++	const int64_t offset = blackLevel * nPixels;
++	const int64_t minValid = 1;
++	const uint64_t sumR = std::max(static_cast<int64_t>(stats->sumR_) - offset / 4, minValid);
++	const uint64_t sumG = std::max(static_cast<int64_t>(stats->sumG_) - offset / 2, minValid);
++	const uint64_t sumB = std::max(static_cast<int64_t>(stats->sumB_) - offset / 4, minValid);
+ 
+ 	/*
+ 	 * Calculate red and blue gains for AWB.
+-- 
+2.51.0
+

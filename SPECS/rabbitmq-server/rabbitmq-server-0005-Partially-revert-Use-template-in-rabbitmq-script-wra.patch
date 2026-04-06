@@ -1,0 +1,20 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 7 Jan 2020 00:19:51 +0300
+Subject: [PATCH] Partially revert "Use template in rabbitmq-script-wrapper for
+ RabbitMQ user and group"
+
+This reverts commit ad99cb2524ebc5750a13c3c12203390926f7b5cb.
+
+diff --git a/scripts/rabbitmq-script-wrapper b/scripts/rabbitmq-script-wrapper
+index da8fe252e7..cbe65ad33c 100644
+--- a/scripts/rabbitmq-script-wrapper
++++ b/scripts/rabbitmq-script-wrapper
+@@ -37,7 +37,7 @@ maybe_fixup_erlang_cookie() {
+     _erlang_cookie="$_rabbitmq_home/.erlang.cookie"
+     if [ -f "$_erlang_cookie" ]
+     then
+-        chown @RABBITMQ_USER@:@RABBITMQ_GROUP@ "$_erlang_cookie"
++        chown rabbitmq:rabbitmq "$_erlang_cookie"
+         chmod 400 "$_erlang_cookie"
+     fi
+ }

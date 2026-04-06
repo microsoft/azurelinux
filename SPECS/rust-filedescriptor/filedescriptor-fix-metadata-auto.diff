@@ -1,0 +1,17 @@
+--- filedescriptor-0.8.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ filedescriptor-0.8.3/Cargo.toml	2025-02-14T14:01:52.283253+00:00
+@@ -43,14 +43,3 @@
+ [dependencies.thiserror]
+ version = "1.0"
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = [
+-    "winuser",
+-    "handleapi",
+-    "fileapi",
+-    "namedpipeapi",
+-    "processthreadsapi",
+-    "winsock2",
+-    "processenv",
+-]

@@ -1,0 +1,47 @@
+From 35afca663128b33b44c1ae4d3bad715cae8d8bba Mon Sep 17 00:00:00 2001
+From: Elvis Lee <kwangwoong.lee@lge.com>
+Date: Wed, 17 Mar 2021 16:31:10 +0900
+Subject: [PATCH 18/55] Connect flushRequest after forceRoundTrip
+
+If flushRequest is connected with aboutToBlock, the flushRequest
+may consumes all events so that processEvents might be blocked in forceRoundTrip.
+
+Change-Id: I12b2c506e8442bf0e75f6ab6e418d3e1eea6d68c
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 654a54755138c520c3a41210d8078196e9a2c1bf)
+---
+ src/client/qwaylandintegration.cpp | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index 8afecb31..661cea53 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -192,10 +192,6 @@ QAbstractEventDispatcher *QWaylandIntegration::createEventDispatcher() const
+ 
+ void QWaylandIntegration::initialize()
+ {
+-    QAbstractEventDispatcher *dispatcher = QGuiApplicationPrivate::eventDispatcher;
+-    QObject::connect(dispatcher, SIGNAL(aboutToBlock()), mDisplay.data(), SLOT(flushRequests()));
+-    QObject::connect(dispatcher, SIGNAL(awake()), mDisplay.data(), SLOT(flushRequests()));
+-
+     int fd = wl_display_get_fd(mDisplay->wl_display());
+     QSocketNotifier *sn = new QSocketNotifier(fd, QSocketNotifier::Read, mDisplay.data());
+     QObject::connect(sn, SIGNAL(activated(QSocketDescriptor)), mDisplay.data(), SLOT(flushRequests()));
+@@ -203,6 +199,13 @@ void QWaylandIntegration::initialize()
+     // Call after eventDispatcher is fully connected, for QWaylandDisplay::forceRoundTrip()
+     mDisplay->initialize();
+ 
++    // But the aboutToBlock() and awake() should be connected after initializePlatform().
++    // Otherwise the connected flushRequests() may consumes up all events before processEvents starts to wait,
++    // so that processEvents(QEventLoop::WaitForMoreEvents) may be blocked in the forceRoundTrip().
++    QAbstractEventDispatcher *dispatcher = QGuiApplicationPrivate::eventDispatcher;
++    QObject::connect(dispatcher, SIGNAL(aboutToBlock()), mDisplay.data(), SLOT(flushRequests()));
++    QObject::connect(dispatcher, SIGNAL(awake()), mDisplay.data(), SLOT(flushRequests()));
++
+     // Qt does not support running with no screens
+     mDisplay->ensureScreen();
+ }
+-- 
+2.51.1
+

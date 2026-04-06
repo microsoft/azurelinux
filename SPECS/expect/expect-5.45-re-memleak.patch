@@ -1,0 +1,14 @@
+diff -up expect5.45/expect.c.orig expect5.45/expect.c
+--- expect5.45/expect.c.orig	2013-10-02 13:16:31.462430482 +0200
++++ expect5.45/expect.c	2013-10-02 13:17:18.420599495 +0200
+@@ -185,9 +185,9 @@ free_ecase(
+ {
+     if (ec->i_list->duration == EXP_PERMANENT) {
+ 	if (ec->pat)  { Tcl_DecrRefCount(ec->pat); }
+-	if (ec->gate) { Tcl_DecrRefCount(ec->gate); }
+ 	if (ec->body) { Tcl_DecrRefCount(ec->body); }
+     }
++    if (ec->gate) { Tcl_DecrRefCount(ec->gate); }
+ 
+     if (free_ilist) {
+ 	ec->i_list->ecount--;

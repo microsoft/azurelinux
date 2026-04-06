@@ -1,0 +1,39 @@
+.TH VERSIONINGIT "1" "April 2022" "" "User Commands"
+.SH NAME
+.B versioningit
+\(en show the version of a
+.BR versioningit -enabled
+project
+.SH SYNOPSIS
+.B versioningit
+.RB [ \-h ]
+.RB [ \-n ]
+.RB [ \-\-traceback ]
+.RB [ \-v ]
+.RB [ \-w ]
+.RB [ \-V ]
+.RI [ project_dir ]
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.I project_dir
+.SS "OPTIONAL ARGUMENTS"
+.P
+.TP
+.BR \-h ,\  \-\-help
+Show a help message and exit
+.TP
+.BR \-n ,\  \-\-next\-version
+Show the next version after the current VCS tag
+.TP
+.B \-\-traceback
+Show full traceback on library error
+.TP
+.BR \-v ,\  \-\-verbose
+Show more log messages
+.TP
+.BR \-w ,\  \-\-write
+Write version to configured file
+.TP
+.BR \-V ,\  \-\-version
+Show program\(cqs version number and exit

@@ -1,0 +1,61 @@
+From a2ea4efcae9ff6c7af47058d8b61aa88f269cf66 Mon Sep 17 00:00:00 2001
+From: Steve Grubb <ausearch.1@gmail.com>
+Date: Mon, 19 Jan 2026 16:27:54 -0500
+Subject: [PATCH] If less than 16 chars were read, allow shebang test (corner
+ case)
+Content-type: text/plain
+
+---
+ src/library/file.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/src/library/file.c b/src/library/file.c
+index 30571890071b..6491733c0042 100644
+--- a/src/library/file.c
++++ b/src/library/file.c
+@@ -1253,12 +1253,9 @@ int get_ima_hash(int fd, file_hash_alg_t *alg, char *sha)
+ 
+ 
+ static unsigned char e_ident[EI_NIDENT];
+-static int read_preliminary_header(int fd)
++static inline ssize_t read_preliminary_header(int fd)
+ {
+-	ssize_t rc = safe_read(fd, (char *)e_ident, EI_NIDENT);
+-	if (rc == EI_NIDENT)
+-		return 0;
+-	return 1;
++	return safe_read(fd, (char *)e_ident, EI_NIDENT);
+ }
+ 
+ 
+@@ -1356,8 +1353,10 @@ static int looks_like_text_script(int fd)
+ uint32_t gather_elf(int fd, off_t size)
+ {
+ 	uint32_t info = 0;
++	ssize_t rc;
+ 
+-	if (read_preliminary_header(fd))
++	rc = read_preliminary_header(fd);
++	if (rc < 2)
+ 		goto rewind_out;
+ 
+ 	/* Detect scripts via shebang before ELF check */
+@@ -1366,6 +1365,10 @@ uint32_t gather_elf(int fd, off_t size)
+ 		goto rewind_out;
+ 	}
+ 
++	/* Make sure we have the full preliminary header */
++	if (rc < EI_NIDENT)
++		goto rewind_out;
++
+ 	/* Check ELF magic */
+ 	if (strncmp((char *)e_ident, ELFMAG, 4)) {
+ 		// Not ELF - see if it might be text script
+@@ -1688,4 +1691,3 @@ rewind_out:
+ 	rewind_fd(fd);
+ 	return info;
+ }
+-
+-- 
+2.52.0
+

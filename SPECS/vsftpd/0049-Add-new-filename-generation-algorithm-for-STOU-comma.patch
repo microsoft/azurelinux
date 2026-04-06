@@ -1,0 +1,322 @@
+From 1203b943b369651d96d057f8190f14f015e6ff0b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 6 Feb 2018 13:30:44 +0100
+Subject: [PATCH 49/59] Add new filename generation algorithm for STOU command
+
+A new configuration option 'better_stou' can be used to enable
+a better algorithm for generating unique filenames.
+
+Resolves: rhbz#1479237
+---
+ parseconf.c   |   1 +
+ postlogin.c   | 176 +++++++++++++++++++++++++++++++++++++++++++++++++---------
+ sysutil.c     |   3 +
+ sysutil.h     |   3 +-
+ tunables.c    |   2 +
+ tunables.h    |   3 +
+ vsftpd.conf.5 |   5 ++
+ 7 files changed, 166 insertions(+), 27 deletions(-)
+
+diff --git a/parseconf.c b/parseconf.c
+index 33a1349..47b54f1 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -111,6 +111,7 @@ parseconf_bool_array[] =
+   { "http_enable", &tunable_http_enable },
+   { "seccomp_sandbox", &tunable_seccomp_sandbox },
+   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
++  { "better_stou", &tunable_better_stou },
+   { 0, 0 }
+ };
+ 
+diff --git a/postlogin.c b/postlogin.c
+index 8363c9c..7c749ef 100644
+--- a/postlogin.c
++++ b/postlogin.c
+@@ -29,6 +29,7 @@
+ #include "opts.h"
+ 
+ #include <errno.h>
++#include <stdio.h>
+ 
+ /* Private local functions */
+ static void handle_pwd(struct vsf_session* p_sess);
+@@ -1028,6 +1029,114 @@ handle_stor(struct vsf_session* p_sess)
+   handle_upload_common(p_sess, 0, 0);
+ }
+ 
++/* Based on __gen_tempname() from glibc - thanks, glibc! Relicensed
++ * from LGPL2.1+ to GPL2.
++ */
++static int
++create_unique_file(struct vsf_session* p_sess, struct mystr* p_outstr,
++                   const struct mystr* p_base_str,
++                   int (*access_checker)(const struct mystr*))
++{
++  struct mystr s_result = INIT_MYSTR;
++  const int suffix_len = 6;
++  unsigned int count;
++  static unsigned long long int value;
++  unsigned long long int random_time_bits;
++  int fd = -1;
++  /* These are the characters used in temporary file names.  */
++  struct mystr s_letters = INIT_MYSTR;
++  unsigned int s_letters_len;
++  int base_len;
++
++  str_alloc_text(&s_letters,
++      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
++  s_letters_len = str_getlen(&s_letters);
++
++  /* A lower bound on the number of temporary files to attempt to
++     generate.  The maximum total number of temporary file names that
++     can exist for a given template is 62**6.  It should never be
++     necessary to try all of these combinations.  Instead if a reasonable
++     number of names is tried (we define reasonable as 62**3) fail to
++     give the system administrator the chance to remove the problems.  */
++#define ATTEMPTS_MIN (62 * 62 * 62)
++
++  /* The number of times to attempt to generate a temporary file. */
++#if ATTEMPTS_MIN < TMP_MAX
++  unsigned int attempts = TMP_MAX;
++#else
++  unsigned int attempts = ATTEMPTS_MIN;
++#endif
++#undef ATTEMPTS_MIN
++
++  {
++    long sec = vsf_sysutil_get_time_sec();
++    long usec = vsf_sysutil_get_time_usec();
++    random_time_bits = ((unsigned long long int) usec << 16) ^ sec;
++    value += random_time_bits ^ vsf_sysutil_getpid();
++  }
++
++  if (str_isempty(p_base_str))
++  {
++    const char *base = "STOU.";
++    base_len = vsf_sysutil_strlen(base);
++    str_reserve(&s_result, base_len + suffix_len);
++    str_alloc_text(&s_result, base);
++  }
++  else
++  {
++    str_reserve(&s_result, str_getlen(p_base_str) + suffix_len + 1);
++    str_copy(&s_result, p_base_str);
++    str_append_char(&s_result, '.');
++    base_len = str_getlen(&s_result);
++  }
++
++  for (count = 0; count < attempts; value += 7777, ++count)
++  {
++    unsigned long long v = value;
++    str_trunc(&s_result, base_len);
++    for (int i = 0; i < suffix_len; ++i)
++    {
++      char c;
++      c = str_get_char_at(&s_letters, v % s_letters_len);
++      v /= s_letters_len;
++      str_append_char(&s_result, c);
++    }
++    if (!access_checker(&s_result))
++    {
++      /* If we generate a filename which is not allowed, we fail immediatelly,
++       * without trying any other possibilities. This is to prevent attackers
++       * from keeping us busy.
++       */
++      vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
++      break;
++    }
++    fd = str_create_exclusive(&s_result);
++    if (vsf_sysutil_retval_is_error(fd))
++    {
++      if (kVSFSysUtilErrEXIST == vsf_sysutil_get_error())
++      {
++        continue;
++      }
++      else
++      {
++        vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
++        break;
++      }
++    }
++    else
++    {
++      break;
++    }
++  }
++  if (!vsf_sysutil_retval_is_error(fd))
++  {
++    str_copy(p_outstr, &s_result);
++  }
++  str_free(&s_letters);
++  str_free(&s_result);
++  return fd;
++}
++
+ static void
+ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
+ {
+@@ -1049,41 +1158,56 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
+     return;
+   }
+   resolve_tilde(&p_sess->ftp_arg_str, p_sess);
+-  p_filename = &p_sess->ftp_arg_str;
+-  if (is_unique)
+-  {
+-    get_unique_filename(&s_filename, p_filename);
+-    p_filename = &s_filename;
+-  }
+   vsf_log_start_entry(p_sess, kVSFLogEntryUpload);
+   str_copy(&p_sess->log_str, &p_sess->ftp_arg_str);
+   prepend_path_to_filename(&p_sess->log_str);
+-  if (!vsf_access_check_file(p_filename))
+-  {
+-    vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
+-    return;
+-  }
+-  /* NOTE - actual file permissions will be governed by the tunable umask */
+-  /* XXX - do we care about race between create and chown() of anonymous
+-   * upload?
+-   */
+-  if (is_unique || (p_sess->is_anonymous && !tunable_anon_other_write_enable))
++  p_filename = &p_sess->ftp_arg_str;
++  if (is_unique && tunable_better_stou)
+   {
+-    new_file_fd = str_create_exclusive(p_filename);
++    new_file_fd = create_unique_file(p_sess, &s_filename, p_filename,
++                                     vsf_access_check_file);
++    if (vsf_sysutil_retval_is_error(new_file_fd))
++    {
++      return;
++    }
++    p_filename = &s_filename;
+   }
+   else
+   {
+-    /* For non-anonymous, allow open() to overwrite or append existing files */
+-    new_file_fd = str_create(p_filename);
+-    if (!is_append && offset == 0)
++    if (is_unique)
+     {
+-      do_truncate = 1;
++      get_unique_filename(&s_filename, p_filename);
++      p_filename = &s_filename;
++    }
++    if (!vsf_access_check_file(p_filename))
++    {
++      vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
++      return;
++    }
++    /* NOTE - actual file permissions will be governed by the tunable umask */
++    /* XXX - do we care about race between create and chown() of anonymous
++     * upload?
++     */
++    if (is_unique || (p_sess->is_anonymous && !tunable_anon_other_write_enable))
++    {
++      new_file_fd = str_create_exclusive(p_filename);
++    }
++    else
++    {
++      /* For non-anonymous, allow open() to overwrite or append existing
++       * files
++       */
++      new_file_fd = str_create(p_filename);
++      if (!is_append && offset == 0)
++      {
++        do_truncate = 1;
++      }
++    }
++    if (vsf_sysutil_retval_is_error(new_file_fd))
++    {
++      vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
++      return;
+     }
+-  }
+-  if (vsf_sysutil_retval_is_error(new_file_fd))
+-  {
+-    vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
+-    return;
+   }
+   created = 1;
+   vsf_sysutil_fstat(new_file_fd, &s_p_statbuf);
+diff --git a/sysutil.c b/sysutil.c
+index 1c0422e..e847650 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -1666,6 +1666,9 @@ vsf_sysutil_get_error(void)
+     case EAGAIN:
+       retval = kVSFSysUtilErrAGAIN;
+       break;
++    case EEXIST:
++      retval = kVSFSysUtilErrEXIST;
++      break;
+     default:
+       break;
+   }
+diff --git a/sysutil.h b/sysutil.h
+index be727f5..7a59f13 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -19,7 +19,8 @@ enum EVSFSysUtilError
+   kVSFSysUtilErrOPNOTSUPP,
+   kVSFSysUtilErrACCES,
+   kVSFSysUtilErrNOENT,
+-  kVSFSysUtilErrAGAIN
++  kVSFSysUtilErrAGAIN,
++  kVSFSysUtilErrEXIST
+ };
+ enum EVSFSysUtilError vsf_sysutil_get_error(void);
+ 
+diff --git a/tunables.c b/tunables.c
+index 9680528..5ec2bdc 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -92,6 +92,7 @@ int tunable_ftp_enable;
+ int tunable_http_enable;
+ int tunable_seccomp_sandbox;
+ int tunable_allow_writeable_chroot;
++int tunable_better_stou;
+ 
+ unsigned int tunable_accept_timeout;
+ unsigned int tunable_connect_timeout;
+@@ -239,6 +240,7 @@ tunables_load_defaults()
+   tunable_http_enable = 0;
+   tunable_seccomp_sandbox = 0;
+   tunable_allow_writeable_chroot = 0;
++  tunable_better_stou = 0;
+ 
+   tunable_accept_timeout = 60;
+   tunable_connect_timeout = 60;
+diff --git a/tunables.h b/tunables.h
+index a466427..85ea1a8 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -93,6 +93,9 @@ extern int tunable_ftp_enable;                /* Allow FTP protocol */
+ extern int tunable_http_enable;               /* Allow HTTP protocol */
+ extern int tunable_seccomp_sandbox;           /* seccomp filter sandbox */
+ extern int tunable_allow_writeable_chroot;    /* Allow misconfiguration */
++extern int tunable_better_stou;               /* Use better file name generation
++                                               * algorithm for the STOU command
++					       */
+ 
+ /* Integer/numeric defines */
+ extern unsigned int tunable_accept_timeout;
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 43b0435..6911a73 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -65,6 +65,11 @@ creates an 'etc' directory in the new root directory, they could potentially
+ trick the C library into loading a user-created configuration file from the
+ /etc/ directory.
+ 
++Default: NO
++.TP
++.B better_stou
++Use better file name generation algorithm for the STOU command.
++
+ Default: NO
+ .TP
+ .B anon_mkdir_write_enable
+-- 
+2.14.4
+

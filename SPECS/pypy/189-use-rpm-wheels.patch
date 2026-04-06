@@ -1,0 +1,89 @@
+diff --git a/lib-python/2.7/ensurepip/__init__.py b/lib-python/2.7/ensurepip/__init__.py
+index 78ffd23..225c90a 100644
+--- a/lib-python/2.7/ensurepip/__init__.py
++++ b/lib-python/2.7/ensurepip/__init__.py
+@@ -1,11 +1,14 @@
+ #!/usr/bin/env python2
+ from __future__ import print_function
+ 
++import distutils.version
++import glob
+ import os
+ import os.path
+ import pkgutil
+ import shutil
+ import sys
++import runpy
+ import tempfile
+ import warnings
+ 
+@@ -13,9 +16,24 @@ import warnings
+ __all__ = ["version", "bootstrap"]
+ 
+ 
+-_SETUPTOOLS_VERSION = "44.0.0"
++_WHEEL_DIR = "/usr/share/python-wheels/"
+ 
+-_PIP_VERSION = "20.0.2"
++_wheels = {}
++
++def _get_most_recent_wheel_version(pkg):
++    prefix = os.path.join(_WHEEL_DIR, "{}-".format(pkg))
++    _wheels[pkg] = {}
++    for suffix in "-py2.py3-none-any.whl", "-py3-none-any.whl":
++        pattern = "{}*{}".format(prefix, suffix)
++        for path in glob.glob(pattern):
++            version_str = path[len(prefix):-len(suffix)]
++            _wheels[pkg][version_str] = os.path.basename(path)
++    return str(max(_wheels[pkg], key=distutils.version.LooseVersion))
++
++
++_SETUPTOOLS_VERSION = _get_most_recent_wheel_version("setuptools")
++
++_PIP_VERSION = _get_most_recent_wheel_version("pip")
+ 
+ _PROJECTS = [
+     ("setuptools", _SETUPTOOLS_VERSION),
+@@ -28,13 +46,18 @@ def _run_pip(args, additional_paths=None):
+     if additional_paths is not None:
+         sys.path = additional_paths + sys.path
+ 
+-    # Install the bundled pip, filtering the PipDeprecationWarning
+-    import pip._internal.cli.main
+-    from pip._internal.utils.deprecation import PipDeprecationWarning
+-    with warnings.catch_warnings():
+-        warnings.filterwarnings('ignore', category=PipDeprecationWarning)
+-        return pip._internal.cli.main.main(args)
++    # Invoke pip as if it's the main module, and catch the exit.
++    backup_argv = sys.argv[:]
++    sys.argv[1:] = args
++    try:
++        # run_module() alters sys.modules and sys.argv, but restores them at exit
++        runpy.run_module("pip", run_name="__main__", alter_sys=True)
++    except SystemExit as exc:
++        return exc.code
++    finally:
++        sys.argv[:] = backup_argv
+ 
++    raise SystemError("pip did not exit, this should never happen")
+ 
+ def version():
+     """
+@@ -88,13 +111,10 @@ def bootstrap(root=None, upgrade=False, user=False,
+         # additional paths that need added to sys.path
+         additional_paths = []
+         for project, version in _PROJECTS:
+-            wheel_name = "{}-{}-py2.py3-none-any.whl".format(project, version)
+-            whl = pkgutil.get_data(
+-                "ensurepip",
+-                "_bundled/{}".format(wheel_name),
+-            )
+-            with open(os.path.join(tmpdir, wheel_name), "wb") as fp:
+-                fp.write(whl)
++            wheel_name = _wheels[project][version]
++            with open(os.path.join(_WHEEL_DIR, wheel_name), "rb") as sfp:
++                with open(os.path.join(tmpdir, wheel_name), "wb") as fp:
++                    fp.write(sfp.read())
+ 
+             additional_paths.append(os.path.join(tmpdir, wheel_name))
+ 

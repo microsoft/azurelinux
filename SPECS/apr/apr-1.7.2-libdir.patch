@@ -1,0 +1,17 @@
+diff --git a/apr-config.in b/apr-config.in
+index bed47ca..d4bf4d8 100644
+--- a/apr-config.in
++++ b/apr-config.in
+@@ -198,8 +198,10 @@ while test $# -gt 0; do
+     ;;
+     --link-ld)
+     if test "$location" = "installed"; then
+-        ### avoid using -L if libdir is a "standard" location like /usr/lib
+-        flags="$flags -L$libdir -l${APR_LIBNAME}"
++        if test "$prefix" != "/usr"; then
++            flags="$flags -L$libdir"
++        fi
++        flags="$flags -l${APR_LIBNAME}"
+     elif test "$location" = "crosscompile"; then
+         flags="$flags -L$APR_TARGET_DIR/$libdir -l${APR_LIBNAME}"
+     else

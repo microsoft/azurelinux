@@ -1,0 +1,230 @@
+From 4b6f88a0ad6f1069f3597087058dce028bf67433 Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Wed, 9 Apr 2025 22:51:12 -0500
+Subject: [PATCH] Revert "sbsign, sbvarsign: support engine based private keys"
+
+This reverts commit efc424c8eea2c398e4371320b4d7266898675ac8.
+---
+ src/fileio.c    | 50 -------------------------------------------------
+ src/fileio.h    |  1 -
+ src/sbsign.c    | 16 +++-------------
+ src/sbvarsign.c | 15 +++------------
+ 4 files changed, 6 insertions(+), 76 deletions(-)
+
+diff --git a/src/fileio.c b/src/fileio.c
+index 032eb1e..faab3b7 100644
+--- a/src/fileio.c
++++ b/src/fileio.c
+@@ -39,7 +39,6 @@
+ #include <openssl/bio.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+-#include <openssl/engine.h>
+ 
+ #include <ccan/talloc/talloc.h>
+ #include <ccan/read_write_all/read_write_all.h>
+@@ -48,55 +47,6 @@
+ 
+ #define FLAG_NOERROR	(1<<0)
+ 
+-static int ui_read(UI *ui, UI_STRING *uis)
+-{
+-	char password[128];
+-
+-	if (UI_get_string_type(uis) != UIT_PROMPT)
+-		return 0;
+-
+-	EVP_read_pw_string(password, sizeof(password), "Enter engine key pass phrase:", 0);
+-	UI_set_result(ui, uis, password);
+-	return 1;
+-}
+-
+-EVP_PKEY *fileio_read_engine_key(const char *engine, const char *filename)
+-{
+-	UI_METHOD *ui;
+-	ENGINE *e;
+-	EVP_PKEY *pkey = NULL;
+-
+-	ENGINE_load_builtin_engines();
+-	e = ENGINE_by_id(engine);
+-
+-	if (!e) {
+-		fprintf(stderr, "Failed to load engine: %s\n", engine);
+-		ERR_print_errors_fp(stderr);
+-		return NULL;
+-	}
+-
+-	ui = UI_create_method("sbsigntools");
+-	if (!ui) {
+-		fprintf(stderr, "Failed to create UI method\n");
+-		ERR_print_errors_fp(stderr);
+-		goto out_free;
+-	}
+-	UI_method_set_reader(ui, ui_read);
+-
+-	if (!ENGINE_init(e)) {
+-		fprintf(stderr, "Failed to initialize engine %s\n", engine);
+-		ERR_print_errors_fp(stderr);
+-		goto out_free;
+-	}
+-
+-	pkey = ENGINE_load_private_key(e, filename, ui, NULL);
+-	ENGINE_finish(e);
+-
+- out_free:
+-	ENGINE_free(e);
+-	return pkey;
+-}
+-
+ EVP_PKEY *fileio_read_pkey(const char *filename)
+ {
+ 	EVP_PKEY *key = NULL;
+diff --git a/src/fileio.h b/src/fileio.h
+index b3ed22c..52c3c12 100644
+--- a/src/fileio.h
++++ b/src/fileio.h
+@@ -38,7 +38,6 @@
+ #include <openssl/x509.h>
+ 
+ EVP_PKEY *fileio_read_pkey(const char *filename);
+-EVP_PKEY *fileio_read_engine_key(const char *engine, const char *filename);
+ X509 *fileio_read_cert(const char *filename);
+ 
+ int fileio_read_file(void *ctx, const char *filename,
+diff --git a/src/sbsign.c b/src/sbsign.c
+index 898fe66..3bb42c2 100644
+--- a/src/sbsign.c
++++ b/src/sbsign.c
+@@ -76,7 +76,6 @@ static struct option options[] = {
+ 	{ "verbose", no_argument, NULL, 'v' },
+ 	{ "help", no_argument, NULL, 'h' },
+ 	{ "version", no_argument, NULL, 'V' },
+-	{ "engine", required_argument, NULL, 'e'},
+ 	{ "addcert", required_argument, NULL, 'a'},
+ 	{ NULL, 0, NULL, 0 },
+ };
+@@ -87,7 +86,6 @@ static void usage(void)
+ 			"<efi-boot-image>\n"
+ 		"Sign an EFI boot image for use with secure boot.\n\n"
+ 		"Options:\n"
+-		"\t--engine <eng>     use the specified engine to load the key\n"
+ 		"\t--key <keyfile>    signing key (PEM-encoded RSA "
+ 						"private key)\n"
+ 		"\t--cert <certfile>  certificate (x509 certificate)\n"
+@@ -152,22 +150,20 @@ static int add_intermediate_certs(PKCS7 *p7, const char *filename)
+ 
+ int main(int argc, char **argv)
+ {
+-	const char *keyfilename, *certfilename, *addcertfilename, *engine;
++	const char *keyfilename, *certfilename, *addcertfilename;
+ 	struct sign_context *ctx;
+ 	uint8_t *buf, *tmp;
+ 	int rc, c, sigsize;
+-	EVP_PKEY *pkey;
+ 
+ 	ctx = talloc_zero(NULL, struct sign_context);
+ 
+ 	keyfilename = NULL;
+ 	certfilename = NULL;
+ 	addcertfilename = NULL;
+-	engine = NULL;
+ 
+ 	for (;;) {
+ 		int idx;
+-		c = getopt_long(argc, argv, "o:c:k:dvVhe:a:", options, &idx);
++		c = getopt_long(argc, argv, "o:c:k:dvVha:", options, &idx);
+ 		if (c == -1)
+ 			break;
+ 
+@@ -193,9 +189,6 @@ int main(int argc, char **argv)
+ 		case 'h':
+ 			usage();
+ 			return EXIT_SUCCESS;
+-		case 'e':
+-			engine = optarg;
+-			break;
+ 		case 'a':
+ 			addcertfilename = optarg;
+ 			break;
+@@ -244,10 +237,7 @@ int main(int argc, char **argv)
+ 	 * module isn't present).  In either case ignore the errors
+ 	 * (malloc will cause other failures out lower down */
+ 	ERR_clear_error();
+-	if (engine)
+-		pkey = fileio_read_engine_key(engine, keyfilename);
+-	else
+-		pkey = fileio_read_pkey(keyfilename);
++	EVP_PKEY *pkey = fileio_read_pkey(keyfilename);
+ 	if (!pkey)
+ 		return EXIT_FAILURE;
+ 
+diff --git a/src/sbvarsign.c b/src/sbvarsign.c
+index 58031ec..db43054 100644
+--- a/src/sbvarsign.c
++++ b/src/sbvarsign.c
+@@ -397,7 +397,6 @@ static struct option options[] = {
+ 	{ "verbose", no_argument, NULL, 'v' },
+ 	{ "help", no_argument, NULL, 'h' },
+ 	{ "version", no_argument, NULL, 'V' },
+-	{ "engine", required_argument, NULL, 'e'},
+ 	{ NULL, 0, NULL, 0 },
+ };
+ 
+@@ -409,7 +408,6 @@ void usage(void)
+ 			"<var-name> <var-data-file>\n"
+ 		"Sign a blob of data for use in SetVariable().\n\n"
+ 		"Options:\n"
+-		"\t--engine <eng>     use the specified engine to load the key\n"
+ 		"\t--key <keyfile>    signing key (PEM-encoded RSA "
+ 						"private key)\n"
+ 		"\t--cert <certfile>  certificate (x509 certificate)\n"
+@@ -438,7 +436,7 @@ static void version(void)
+ 
+ int main(int argc, char **argv)
+ {
+-	const char *guid_str, *attr_str, *varname, *engine;
++	const char *guid_str, *attr_str, *varname;
+ 	const char *keyfilename, *certfilename;
+ 	struct varsign_context *ctx;
+ 	bool include_attrs;
+@@ -448,14 +446,13 @@ int main(int argc, char **argv)
+ 
+ 	keyfilename = NULL;
+ 	certfilename = NULL;
+-	engine = NULL;
+ 	guid_str = NULL;
+ 	attr_str= NULL;
+ 	include_attrs = false;
+ 
+ 	for (;;) {
+ 		int idx;
+-		c = getopt_long(argc, argv, "o:g:a:k:c:ivVhe:", options, &idx);
++		c = getopt_long(argc, argv, "o:g:a:k:c:ivVh", options, &idx);
+ 		if (c == -1)
+ 			break;
+ 
+@@ -487,9 +484,6 @@ int main(int argc, char **argv)
+ 		case 'h':
+ 			usage();
+ 			return EXIT_SUCCESS;
+-		case 'e':
+-			engine = optarg;
+-			break;
+ 		}
+ 	}
+ 
+@@ -551,10 +545,7 @@ int main(int argc, char **argv)
+ 	if (fileio_read_file(ctx, ctx->infilename, &ctx->data, &ctx->data_len))
+ 		return EXIT_FAILURE;
+ 
+-	if (engine)
+-		ctx->key = fileio_read_engine_key(engine, keyfilename);
+-	else
+-		ctx->key = fileio_read_pkey(keyfilename);
++	ctx->key = fileio_read_pkey(keyfilename);
+ 	if (!ctx->key)
+ 		return EXIT_FAILURE;
+ 
+-- 
+2.49.0
+

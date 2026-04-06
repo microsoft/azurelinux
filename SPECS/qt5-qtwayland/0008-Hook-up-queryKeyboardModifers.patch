@@ -1,0 +1,55 @@
+From b52ceb0fe1d17ecbe8fb3c6f092e40dbf4b54305 Mon Sep 17 00:00:00 2001
+From: David Redondo <qt@david-redondo.de>
+Date: Wed, 26 May 2021 14:49:40 +0200
+Subject: [PATCH 08/55] Hook up queryKeyboardModifers
+
+Can be useful when upon enter a modifiers event is received but no key
+event so no QKeyEvent is generated.
+
+Fixes: QTBUG-62786
+Change-Id: I30b57fc78ce6d54d8f644ca95ba40e7e26eb24ed
+Reviewed-by: Marco Martin <mart@kde.org>
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+
+
+(cherry picked from commit 4fa2baba8181ade4958a94e9531ec4f6919438a9)
+---
+ src/client/qwaylandintegration.cpp | 8 ++++++++
+ src/client/qwaylandintegration_p.h | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index d257e2e3..cd8569b1 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -262,6 +262,14 @@ QWaylandDisplay *QWaylandIntegration::display() const
+     return mDisplay.data();
+ }
+ 
++Qt::KeyboardModifiers QWaylandIntegration::queryKeyboardModifiers() const
++{
++    if (auto *seat = mDisplay->currentInputDevice()) {
++        return seat->modifiers();
++    }
++    return Qt::NoModifier;
++}
++
+ QList<int> QWaylandIntegration::possibleKeys(const QKeyEvent *event) const
+ {
+     if (auto *seat = mDisplay->currentInputDevice())
+diff --git a/src/client/qwaylandintegration_p.h b/src/client/qwaylandintegration_p.h
+index ff70ae25..73b80658 100644
+--- a/src/client/qwaylandintegration_p.h
++++ b/src/client/qwaylandintegration_p.h
+@@ -107,6 +107,8 @@ public:
+ 
+     QWaylandDisplay *display() const;
+ 
++    Qt::KeyboardModifiers queryKeyboardModifiers() const override;
++
+     QList<int> possibleKeys(const QKeyEvent *event) const override;
+ 
+     QStringList themeNames() const override;
+-- 
+2.51.1
+

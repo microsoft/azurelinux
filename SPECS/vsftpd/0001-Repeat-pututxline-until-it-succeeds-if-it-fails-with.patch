@@ -1,0 +1,108 @@
+From 7957425ef5ab365fc96ea0615f99705581c6dbd8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Mon, 12 Aug 2019 18:15:36 +0200
+Subject: [PATCH] Repeat pututxline() until it succeeds if it fails with EINTR
+
+Since the pututxline() bug rhbz#1749439 is now fixed in glibc in
+Fedora and RHEL-8, we can implement a complete solution for the stale
+utmp entries issue originally reported as rhbz#1688848.
+
+This patch is a followup to commit 896b3694ca062d7.
+
+Resolves: rhbz#1688852
+Resolves: rhbz#1737433
+---
+ sysdeputil.c | 53 +++++++++++++---------------------------------------
+ 1 file changed, 13 insertions(+), 40 deletions(-)
+
+diff --git a/sysdeputil.c b/sysdeputil.c
+index 4fbcca7..75be680 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -1203,7 +1203,7 @@ void
+ vsf_insert_uwtmp(const struct mystr* p_user_str,
+                  const struct mystr* p_host_str)
+ {
+-  int attempts;
++  struct utmpx* p_res;
+ 
+   if (sizeof(s_utent.ut_line) < 16)
+   {
+@@ -1233,34 +1233,21 @@ vsf_insert_uwtmp(const struct mystr* p_user_str,
+   vsf_sysutil_strcpy(s_utent.ut_host, str_getbuf(p_host_str),
+                      sizeof(s_utent.ut_host));
+   s_utent.ut_tv.tv_sec = vsf_sysutil_get_time_sec();
+-  for (attempts = 2; attempts > 0; --attempts)
++  setutxent();
++  do
+   {
+-    struct utmpx* p_res;
+-    setutxent();
+     p_res = pututxline(&s_utent);
+     /* For now we'll ignore errors other than EINTR and EAGAIN */
+-    if (p_res != NULL || (errno != EINTR && errno != EAGAIN))
+-    {
+-      break;
+-    }
+-  }
+-  if (attempts == 0)
+-  {
+-    /* This makes us skip pututxline() in vsf_remove_uwtmp() */
+-    s_uwtmp_inserted = -1;
+-  }
+-  else
+-  {
+-    s_uwtmp_inserted = 1;
+-    endutxent();
+-  }
++  } while (p_res == NULL && (errno == EINTR || errno == EAGAIN));
++  s_uwtmp_inserted = 1;
++  endutxent();
+   updwtmpx(WTMPX_FILE, &s_utent);
+ }
+ 
+ void
+ vsf_remove_uwtmp(void)
+ {
+-  int attempts;
++  struct utmpx* p_res;
+ 
+   if (!s_uwtmp_inserted)
+   {
+@@ -1270,27 +1257,13 @@ vsf_remove_uwtmp(void)
+   vsf_sysutil_memclr(s_utent.ut_user, sizeof(s_utent.ut_user));
+   vsf_sysutil_memclr(s_utent.ut_host, sizeof(s_utent.ut_host));
+   s_utent.ut_tv.tv_sec = 0;
+-  if (s_uwtmp_inserted == 1)
++  setutxent();
++  do
+   {
+-    for (attempts = 2; attempts > 0; --attempts)
+-    {
+-      struct utmpx* p_res;
+-      setutxent();
+-      p_res = pututxline(&s_utent);
+-      /* For now we'll ignore errors other than EINTR and EAGAIN */
+-      if (p_res != NULL || (errno != EINTR && errno != EAGAIN))
+-      {
+-        break;
+-      }
+-    }
+-    if (attempts != 0)
+-    {
+-      endutxent();
+-    }
+-  }
+-  /* Set s_uwtmp_inserted to 0 regardless of the result of
+-   * pututxline() to make sure we won't run this function twice.
+-   */
++    p_res = pututxline(&s_utent);
++    /* For now we'll ignore errors other than EINTR and EAGAIN */
++  } while (p_res == NULL && (errno == EINTR || errno == EAGAIN));
++  endutxent();
+   s_uwtmp_inserted = 0;
+   s_utent.ut_tv.tv_sec = vsf_sysutil_get_time_sec();
+   updwtmpx(WTMPX_FILE, &s_utent);
+-- 
+2.20.1
+

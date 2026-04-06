@@ -1,0 +1,31 @@
+From fd549849a91b6cf9a143a89703ee27e2dec736c1 Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Wed, 7 Aug 2024 10:27:39 +0200
+Subject: [PATCH] Make systemd use 0700 mode on cache folders
+
+The provided gssproxy.service unit configures /var/lib/gssproxy/clients
+and /var/lib/gssproxy/rcache as "StateDirectory". However, systemd
+applies mode 0755 by default on such folders. "StateDirectoryMode" has
+to be set too to restrict access to root only.
+
+Signed-off-by: Julien Rische <jrische@redhat.com>
+(cherry picked from commit b954728937c09a40409279d1247679aa5d39c7c8)
+---
+ systemd/gssproxy.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/systemd/gssproxy.service.in b/systemd/gssproxy.service.in
+index 14d2185..b8f1f77 100644
+--- a/systemd/gssproxy.service.in
++++ b/systemd/gssproxy.service.in
+@@ -6,6 +6,7 @@ Before=rpc-gssd.service
+ 
+ [Service]
+ StateDirectory=gssproxy/clients gssproxy/rcache
++StateDirectoryMode=0700
+ Environment=KRB5RCACHEDIR=/var/lib/gssproxy/rcache
+ ExecStart=@sbindir@/gssproxy -D
+ # These two should be used with traditional UNIX forking daemons
+-- 
+2.45.2
+

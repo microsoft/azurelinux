@@ -1,0 +1,56 @@
+diff --git a/ldns-1.8.4/packaging/ldns-config.in b/ldns-1.8.4/packaging/ldns-config.in
+index 623f77e..2b961f9 100755
+--- a/ldns-1.8.4/packaging/ldns-config.in
++++ b/ldns-1.8.4/packaging/ldns-config.in
+@@ -3,16 +3,28 @@
+ prefix="@prefix@"
+ exec_prefix="@exec_prefix@"
+ VERSION="@PACKAGE_VERSION@"
+-CFLAGS="@CFLAGS@"
+ CPPFLAGS="@CPPFLAGS@ @LIBSSL_CPPFLAGS@"
+-LDFLAGS="@LDFLAGS@ @LIBSSL_LDFLAGS@"
+ PYTHON_CPPFLAGS="@PYTHON_CPPFLAGS@"
+-PYTHON_LDFLAGS="@PYTHON_LDFLAGS@"
++PYTHON_LDFLAGS="@PYTHON_LIBS@"
+ LIBS="@LIBS@ @LIBSSL_LIBS@"
+-LIBDIR="@libdir@"
+ INCLUDEDIR="@includedir@"
+ LIBVERSION="@VERSION_INFO@"
++ARCH="`uname -m`"
+ 
++case $ARCH in
++       x86_64 | amd64 | sparc64 | s390x | ppc64)
++
++               LIBDIR="/usr/lib64"
++               LIBDIR_SEC="/usr/lib"
++               ;;
++       * )
++               LIBDIR="/usr/lib"
++               LIBDIR_SEC="/usr/lib64"
++               ;;
++esac
++
++LDFLAGS_SEC="@LDFLAGS@ -L$LIBDIR_SEC"
++LDFLAGS="@LDFLAGS@ -L$LIBDIR"
+ 
+ for arg in $@
+ do
+@@ -28,13 +40,17 @@ do
+     then
+         echo "${LDFLAGS} -L${LIBDIR} ${LIBS} -lldns"
+     fi
++    if [ $arg = "--libs_sec" ] || [ $arg = "--libs-sec" ]
++    then
++        echo "${LDFLAGS_SEC} ${LIBS} -lldns"
++    fi
+     if [ $arg = "--python-libs" ]
+     then
+         echo "${LDFLAGS} ${PYTHON_LDFLAGS} -L${LIBDIR} ${LIBS} -lldns"
+     fi
+     if [ $arg = "-h" ] || [ $arg = "--help" ]
+     then
+-        echo "Usage: $0 [--cflags] [--python-cflags] [--libs] [--python-libs] [--version]"
++        echo "Usage: $0 [--cflags] [--python-cflags] [--libs] [--libs-sec] [--python-libs] [--version]"
+     fi
+     if [ $arg = "--version" ]
+     then

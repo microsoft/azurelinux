@@ -1,0 +1,111 @@
+commit 75040c3388d9a7dd5ad2bee53cbcc8bf3d35cd17
+Author: Honza Horak <hhorak@redhat.com>
+Date:   Fri Oct 30 20:16:50 2020 +0100
+
+    The libpq package is supposed to be used for all the PostgreSQL modules
+    available in RHEL 8, and ABI versioning will guarantee us that modular RPMs will
+    depend on appropriate libpq ABI version (picked at build-time).
+
+diff -ur postgresql-16.1/config/Makefile postgresql_patched/config/Makefile
+--- postgresql-16.1/config/Makefile	2023-11-06 23:04:27.000000000 +0100
++++ postgresql_patched/config/Makefile	2023-12-05 10:43:19.733619095 +0100
+@@ -8,6 +8,7 @@
+ install: all installdirs
+ 	$(INSTALL_SCRIPT) $(srcdir)/install-sh '$(DESTDIR)$(pgxsdir)/config/install-sh'
+ 	$(INSTALL_SCRIPT) $(srcdir)/missing '$(DESTDIR)$(pgxsdir)/config/missing'
++	$(INSTALL_SCRIPT) $(srcdir)/build-exports-gnu-ld '$(DESTDIR)$(pgxsdir)/config/build-exports-gnu-ld'
+
+ installdirs:
+ 	$(MKDIR_P) '$(DESTDIR)$(pgxsdir)/config'
+diff -ur postgresql-16.1/src/interfaces/libpq/exports.txt postgresql_patched/src/interfaces/libpq/exports.txt
+--- postgresql-16.1/src/interfaces/libpq/exports.txt	2023-11-06 23:04:27.000000000 +0100
++++ postgresql_patched/src/interfaces/libpq/exports.txt	2023-12-05 10:48:24.627604638 +0100
+@@ -171,23 +171,23 @@
+ PQsslAttribute            169
+ PQsetErrorContextVisibility 170
+ PQresultVerboseErrorMessage 171
+-PQencryptPasswordConn     172
+-PQresultMemorySize        173
++PQencryptPasswordConn     172     10
++PQresultMemorySize        173     12
+ PQhostaddr                174
+ PQgssEncInUse             175
+ PQgetgssctx               176
+-PQsetSSLKeyPassHook_OpenSSL         177
++PQsetSSLKeyPassHook_OpenSSL         177     13
+ PQgetSSLKeyPassHook_OpenSSL         178
+ PQdefaultSSLKeyPassHook_OpenSSL     179
+-PQenterPipelineMode       180
++PQenterPipelineMode       180       14
+ PQexitPipelineMode        181
+ PQpipelineSync            182
+ PQpipelineStatus          183
+ PQsetTraceFlags           184
+ PQmblenBounded            185
+ PQsendFlushRequest        186
+-PQconnectionUsedGSSAPI    187
+-PQclosePrepared           188
++PQconnectionUsedGSSAPI    187     16
++PQclosePrepared           188     18
+ PQclosePortal             189
+ PQsendClosePrepared       190
+ PQsendClosePortal         191
+diff -ur postgresql-16.1/src/Makefile.shlib postgresql_patched/src/Makefile.shlib
+--- postgresql-16.1/src/Makefile.shlib	2023-11-06 23:04:27.000000000 +0100
++++ postgresql_patched/src/Makefile.shlib	2023-12-05 10:43:19.739634021 +0100
+@@ -176,7 +176,7 @@
+     endif
+     LINK.shared		+= -Wl,-soname,$(soname)
+   endif
+-  BUILD.exports		= ( echo '{ global:'; $(AWK) '/^[^\#]/ {printf "%s;\n",$$1}' $<; echo ' local: *; };' ) >$@
++  BUILD.exports		= $(SHELL) $(top_srcdir)/config/build-exports-gnu-ld < $< > $@
+   exports_file		= $(SHLIB_EXPORTS:%.txt=%.list)
+   ifneq (,$(exports_file))
+     LINK.shared		+= -Wl,--version-script=$(exports_file)
+diff --git a/config/build-exports-gnu-ld b/config/build-exports-gnu-ld
+new file mode 100755
+index 0000000000..84c48e3ade
+--- /dev/null
++++ b/config/build-exports-gnu-ld
+@@ -0,0 +1,41 @@
++#! /bin/sh
++
++# by default use PG_ prefix
++: "${SYMBOL_VERSION_PREFIX=PG_}"
++
++# we started symbol versioning since v10
++: "${SYMBOL_VERSION_START=9.6}"
++
++version=$SYMBOL_VERSION_START
++version_prev=
++first=:
++
++open_block ()
++{
++       $first || echo
++       first=false
++       echo "${SYMBOL_VERSION_PREFIX}$version {"
++       echo "global:"
++}
++
++close_block ()
++{
++       echo "}${version_prev:+ $SYMBOL_VERSION_PREFIX$version_prev};"
++       version_prev=$version
++       version=$1
++}
++
++open_block
++while read -r symbol _ new_version
++do
++       case $symbol in '#'*) continue ;; esac
++       if test -n "$new_version" && test "$new_version" != "$version"; then
++               close_block "$new_version"
++               open_block
++       fi
++       echo "  $symbol;"
++done
++
++echo "local:"
++echo " *;"
++close_block

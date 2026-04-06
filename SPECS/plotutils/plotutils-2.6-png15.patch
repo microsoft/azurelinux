@@ -1,0 +1,39 @@
+diff -up plotutils-2.6/libplot/z_write.c.png15 plotutils-2.6/libplot/z_write.c
+--- plotutils-2.6/libplot/z_write.c.png15	2008-07-15 20:54:10.000000000 -0400
++++ plotutils-2.6/libplot/z_write.c	2012-03-22 13:26:48.251676137 -0400
+@@ -164,7 +164,11 @@ _pl_z_maybe_output_image (S___(Plotter *
+     }
+ 
+   /* cleanup after libpng errors (error handler does a longjmp) */
++#if PNG_LIBPNG_VER_MAJOR >= 1 && PNG_LIBPNG_VER_MINOR >= 4
++  if (setjmp (png_jmpbuf(png_ptr)))
++#else
+   if (setjmp (png_ptr->jmpbuf))
++#endif
+     {
+       png_destroy_write_struct (&png_ptr, (png_info **)NULL);
+       return -1;
+@@ -444,7 +448,11 @@ _our_error_fn_stdio (png_struct *png_ptr
+ #endif
+     }
+ 
++#if PNG_LIBPNG_VER_MAJOR >= 1 && PNG_LIBPNG_VER_MINOR >= 4
++  longjmp (png_jmpbuf(png_ptr), 1);
++#else
+   longjmp (png_ptr->jmpbuf, 1);
++#endif
+ }
+ 
+ static void 
+@@ -515,7 +523,11 @@ _our_error_fn_stream (png_struct *png_pt
+ #endif
+     }
+ 
++#if PNG_LIBPNG_VER_MAJOR >= 1 && PNG_LIBPNG_VER_MINOR >= 4
++  longjmp (png_jmpbuf(png_ptr), 1);
++#else
+   longjmp (png_ptr->jmpbuf, 1);
++#endif
+ }
+ 
+ static void 

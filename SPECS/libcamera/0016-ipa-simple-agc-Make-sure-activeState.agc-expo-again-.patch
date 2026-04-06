@@ -1,0 +1,67 @@
+From c49fbfc6be5f123f8dd3d4a3f7a503d283c223a1 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <johannes.goede@oss.qualcomm.com>
+Date: Tue, 9 Dec 2025 11:32:38 +0100
+Subject: [PATCH] ipa: simple: agc: Make sure activeState.agc expo/again are
+ always initialized
+
+If the first frame of a stream is bad, the IPA will not get called with
+frame == 0, leaving activeState.agc expo/again uninitialized. This causes
+the agc algorithm to set a very low gain and exposure on the next run
+(where it will hit the if (!stats->valid) {} path) resulting in starting
+with a black image.
+
+Fix this by using a valid flag instead of checking for frame == 0.
+
+The entire activeState gets cleared to 0 on configure() resetting the new
+valid flag.
+
+Signed-off-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
+---
+ src/ipa/simple/algorithms/agc.cpp | 5 +++--
+ src/ipa/simple/ipa_context.h      | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index 189de770..2f7e040c 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -100,7 +100,7 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ }
+ 
+ void Agc::process(IPAContext &context,
+-		  const uint32_t frame,
++		  [[maybe_unused]] const uint32_t frame,
+ 		  IPAFrameContext &frameContext,
+ 		  const SwIspStats *stats,
+ 		  ControlList &metadata)
+@@ -110,13 +110,14 @@ void Agc::process(IPAContext &context,
+ 	metadata.set(controls::ExposureTime, exposureTime.get<std::micro>());
+ 	metadata.set(controls::AnalogueGain, frameContext.sensor.gain);
+ 
+-	if (frame == 0) {
++	if (!context.activeState.agc.valid) {
+ 		/*
+ 		 * Init active-state from sensor values in case updateExposure()
+ 		 * does not run for the first frame.
+ 		 */
+ 		context.activeState.agc.exposure = frameContext.sensor.exposure;
+ 		context.activeState.agc.again = frameContext.sensor.gain;
++		context.activeState.agc.valid = true;
+ 	}
+ 
+ 	if (!stats->valid) {
+diff --git a/src/ipa/simple/ipa_context.h b/src/ipa/simple/ipa_context.h
+index c3081e30..26b60fb6 100644
+--- a/src/ipa/simple/ipa_context.h
++++ b/src/ipa/simple/ipa_context.h
+@@ -40,6 +40,7 @@ struct IPAActiveState {
+ 	struct {
+ 		int32_t exposure;
+ 		double again;
++		bool valid;
+ 	} agc;
+ 
+ 	struct {
+-- 
+2.52.0
+

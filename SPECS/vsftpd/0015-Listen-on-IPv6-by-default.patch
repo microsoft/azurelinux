@@ -1,0 +1,55 @@
+From c5daaedf1efe23b397a5950f5503f5cbfac871c8 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 14:25:28 +0200
+Subject: [PATCH 15/59] Listen on IPv6 by default.
+
+---
+ vsftpd.conf   | 14 +++++++++-----
+ vsftpd.conf.5 |  5 +++--
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/vsftpd.conf b/vsftpd.conf
+index db44170..ae6c6c9 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -111,12 +111,16 @@ xferlog_std_format=YES
+ # When "listen" directive is enabled, vsftpd runs in standalone mode and
+ # listens on IPv4 sockets. This directive cannot be used in conjunction
+ # with the listen_ipv6 directive.
+-listen=YES
+-#
+-# This directive enables listening on IPv6 sockets. To listen on IPv4 and IPv6
+-# sockets, you must run two copies of vsftpd with two configuration files.
++listen=NO
++#
++# This directive enables listening on IPv6 sockets. By default, listening
++# on the IPv6 "any" address (::) will accept connections from both IPv6
++# and IPv4 clients. It is not necessary to listen on *both* IPv4 and IPv6
++# sockets. If you want that (perhaps because you want to listen on specific
++# addresses) then you must run two copies of vsftpd with two configuration
++# files.
+ # Make sure, that one of the listen options is commented !!
+-#listen_ipv6=YES
++listen_ipv6=YES
+ 
+ pam_service_name=vsftpd
+ userlist_enable=YES
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 0744f85..72bb86f 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -297,8 +297,9 @@ Default: NO
+ .TP
+ .B listen_ipv6
+ Like the listen parameter, except vsftpd will listen on an IPv6 socket instead
+-of an IPv4 one. This parameter and the listen parameter are mutually
+-exclusive.
++of an IPv4 one. Note that a socket listening on the IPv6 "any" address (::)
++will accept both IPv6 and IPv4 connections by default. This parameter and the
++listen parameter are mutually exclusive.
+ 
+ Default: NO
+ .TP
+-- 
+2.14.4
+

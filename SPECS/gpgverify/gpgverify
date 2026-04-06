@@ -1,0 +1,193 @@
+#!/bin/bash
+
+# Copyright 2018 – 2024 B. Persson, Bjorn@Rombobeorn.se
+#
+# This material is provided as is, with absolutely no warranty expressed
+# or implied. Any use is at your own risk.
+#
+# Permission is hereby granted to use or copy this program
+# for any purpose, provided the above notices are retained on all copies.
+# Permission to modify the code and to distribute modified code is granted,
+# provided the above notices are retained, and a notice that the code was
+# modified is included with the above copyright notice.
+
+
+function print_help {
+    cat <<'EOF'
+gpgverify is a wrapper around gpgv designed for easy and safe scripting. It
+verifies a file against an OpenPGP signature and one or more keyrings. The
+keyrings shall together contain all the keys that are trusted to certify the
+authenticity of the file, and must not contain any untrusted keys.
+
+To verify a detached signature, where the signature and the signed data are two
+separate files, both --signature and --data must be given:
+  gpgverify --keyring=<pathname> --signature=<pathname> --data=<pathname>
+  gpgverify --keyrings <pathname>... --signature=<pathname> --data=<pathname>
+
+If the signature is embedded in the signed file, give --data and --output:
+  gpgverify --keyring=<pathname> --data=<pathname> --output=<pathname>
+  gpgverify --keyrings <pathname>... --data=<pathname> --output=<pathname>
+
+The verified data will be written to the output file. An output file is required
+even for a clearsigned text file, because a clearsigned block can be surrounded
+by unsigned text. A program that trusts the contents of a clearsigned file after
+verifying the signature is vulnerable to spoofing. Only the contents of the
+output file can be trusted.
+
+The differences, compared to invoking gpgv directly, are that gpgverify accepts
+keyrings in either ASCII-armored or unarmored form, that it won't accidentally
+use a default keyring in addition to the specified ones, and that it insists on
+writing an output file if the signature is not detached.
+
+Parameters:
+  --keyring=<pathname>    keyring with only trusted keys (can be repeated)
+  --keyrings              Multiple keyrings with only trusted keys follow.
+  --signature=<pathname>  detached signature to verify
+  --data=<pathname>       signed file to verify, or data file to verify against
+                          a detached signature
+  --output=<pathname>     file to write the verified data to when the signature
+                          is embedded in the signed file
+EOF
+}
+
+
+function fatal_error {
+    message="$1"  # an error message
+    status=$2     # a number to use as the exit code
+    echo "gpgverify: $message" >&2
+    exit $status
+}
+
+
+function parameter_error {
+    message="$1"  # an error message
+    fatal_error "${message}" 2
+}
+
+
+function require_parameter {
+    term="$1"   # a term for a required parameter
+    value="$2"  # Complain and terminate if this value is empty.
+    if test -z "${value}" ; then
+        parameter_error "No ${term} was provided."
+    fi
+}
+
+
+function check_status {
+    action="$1"  # a string that describes the action that was attempted
+    status=$2    # the exit code of the command
+    if test $status -ne 0 ; then
+        fatal_error "$action failed." $status
+    fi
+}
+
+
+# Parse the command line.
+keyring_parameters=false
+keyrings=()  # empty array
+signature=
+data=
+output=
+for parameter in "$@" ; do
+    if [[ "${parameter}" = -* ]] ; then
+        # This parameter begins with a dash, so it's not part of any list of
+        # keyrings.
+        keyring_parameters=false
+    fi
+    case "${parameter}" in
+        (--help)
+            print_help
+            exit
+            ;;
+        (--keyrings)
+            # The following parameters will be keyring pathnames until one
+            # begins with a dash.
+            keyring_parameters=true
+            ;;
+        (--keyring=*)
+            keyrings+=("${parameter#*=}")
+            ;;
+        (--signature=*)
+            if test -n "${signature}" ; then
+                # This is a second occurrence of --signature.
+                parameter_error 'Only one signature at a time can be verified.'
+            fi
+            signature="${parameter#*=}"
+            ;;
+        (--data=*)
+            if test -n "${data}" ; then
+                # This is a second occurrence of --data.
+                parameter_error 'Only one data file at a time can be verified.'
+            fi
+            data="${parameter#*=}"
+            ;;
+        (--output=*)
+            if test -n "${output}" ; then
+                # This is a second occurrence of --output.
+                parameter_error 'Only one output file can be written.'
+            fi
+            output="${parameter#*=}"
+            ;;
+        (*)
+            if ${keyring_parameters} ; then
+                keyrings+=("${parameter}")
+            else
+                parameter_error "Unknown parameter: \"${parameter}\""
+            fi
+            ;;
+    esac
+done
+require_parameter 'keyring' "${keyrings}"
+require_parameter 'data file' "${data}"
+
+# If no detached signature is provided, then the signature is embedded in the
+# data file, and there must be an output file to write the verified data to –
+# even if the data file is clearsigned.
+if test -z "${signature}${output}" ; then
+    msg='Neither a signature nor an output file was provided. '
+    msg+='Trusting a clearsigned file without stripping off unsigned text '
+    msg+='makes you vulnerable to spoofing.'
+    parameter_error "${msg}"
+fi
+
+# Make a temporary working directory.
+workdir="$(mktemp --directory)"
+check_status 'Making a temporary directory' $?
+
+# Decode any ASCII armor on the keyrings.
+keyring_params=()  # empty array
+number=1
+for keyring in "${keyrings[@]}" ; do
+    if grep --quiet '^-----BEGIN PGP PUBLIC KEY BLOCK-----' "${keyring}" ; then
+        # This looks like an ASCII-armored keyring.
+        ring="${workdir}/keyring${number}.gpg"
+        gpg2 --homedir="${workdir}" --yes --output="${ring}" --dearmor \
+             "${keyring}"
+        check_status "Decoding the keyring \"${keyring}\"" $?
+        ((++number))
+    else
+        # This is not an ASCII-armored keyring. Don't dearmor it, but ensure
+        # that the pathname contains slashes to prevent GnuPG from looking for
+        # the file in the wrong place.
+        ring=`realpath "${keyring}" --canonicalize-existing`
+        check_status 'Accessing a keyring' $?
+    fi
+    keyring_params+=("--keyring=${ring}")
+done
+
+# Verify the signature using the decoded keyrings.
+# The signature pathname shall be a single parameter even if it contains
+# whitespace, but shall be omitted entirely if it's an empty string.
+gpgv2 --homedir="${workdir}" "${keyring_params[@]}" \
+      ${output:+"--output=${output}"} ${signature:+"${signature}"} "${data}"
+check_status 'Signature verification' $?
+
+# (--homedir isn't actually necessary. --dearmor processes only the input file,
+# and if --keyring is used and contains a slash, then gpgv2 uses only that
+# keyring. Thus neither command will look for a default keyring, but --homedir
+# makes extra double sure that no default keyring will be touched in case
+# another version of GPG works differently.)
+
+# Clean up. (This is not done in case of an error that may need inspection.)
+rm --recursive --force ${workdir}

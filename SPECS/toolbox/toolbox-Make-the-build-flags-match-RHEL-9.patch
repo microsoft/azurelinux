@@ -1,0 +1,50 @@
+From 2d1b4b2492c65abd0d0bf0c71c971f550447412d Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <rishi@fedoraproject.org>
+Date: Mon, 29 Jun 2020 17:57:47 +0200
+Subject: [PATCH] build: Make the build flags match RHEL 9's %{gobuildflags}
+
+These reflect the defaults for RHEL 9.5, because RHEL 9.6 is still early
+in its development cycle and the defaults may be in a state of flux.
+
+Note that these flags are meant for every CPU architecture other than
+PPC64, and should be kept updated to match RHEL 9's Go guidelines. Use
+'rpm --eval "%{gobuildflags}"' to expand the %{gobuildflags} macro.
+---
+ src/go-build-wrapper | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/go-build-wrapper b/src/go-build-wrapper
+index a5a1a6a508fb..0a2c7526f210 100755
+--- a/src/go-build-wrapper
++++ b/src/go-build-wrapper
+@@ -33,9 +33,9 @@ if ! cd "$1"; then
+     exit 1
+ fi
+ 
+-tags=""
++tags="-tags rpm_crashtraceback,${GO_BUILDTAGS:-},libtrust_openssl"
+ if $7; then
+-    tags="-tags migration_path_for_coreos_toolbox"
++    tags="$tags,migration_path_for_coreos_toolbox"
+ fi
+ 
+ if ! libc_dir=$("$5" --print-file-name=libc.so); then
+@@ -114,9 +114,14 @@ dynamic_linker="/run/host$dynamic_linker_canonical_dirname/$dynamic_linker_basen
+ 
+ # shellcheck disable=SC2086
+ go build \
++        -buildmode pie \
++        -compiler gc \
+         $tags \
+         -trimpath \
+-        -ldflags "-extldflags '-Wl,-dynamic-linker,$dynamic_linker -Wl,-rpath,/run/host$libc_dir_canonical_dirname -Wl,--export-dynamic -Wl,--unresolved-symbols=ignore-in-object-files' -linkmode external -X github.com/containers/toolbox/pkg/version.currentVersion=$4" \
++        -ldflags "${GO_LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \n') -compressdwarf=false -extldflags '-Wl,-z,relro -Wl,--as-needed -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -Wl,-dynamic-linker,$dynamic_linker -Wl,-rpath,/run/host$libc_dir_canonical_dirname -Wl,--export-dynamic -Wl,--unresolved-symbols=ignore-in-object-files' -linkmode external -X github.com/containers/toolbox/pkg/version.currentVersion=$4" \
++        -a \
++        -v \
++        -x \
+         -o "$2/$3"
+ 
+ exit "$?"
+-- 
+2.51.0
+

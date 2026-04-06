@@ -1,0 +1,13 @@
+diff --git a/llvm/docs/conf.py b/llvm/docs/conf.py
+index cf8a75980b53..b208ad138e89 100644
+--- a/llvm/docs/conf.py
++++ b/llvm/docs/conf.py
+@@ -26,7 +26,7 @@ from datetime import date
+ 
+ # Add any Sphinx extension module names here, as strings. They can be extensions
+ # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+-extensions = ["myst_parser", "sphinx.ext.intersphinx", "sphinx.ext.todo"]
++extensions = ["sphinx.ext.intersphinx", "sphinx.ext.todo"]
+ 
+ # Automatic anchors for markdown titles
+ from llvm_slug import make_slug

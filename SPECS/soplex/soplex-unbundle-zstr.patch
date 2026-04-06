@@ -1,0 +1,56 @@
+--- soplex-release-711/CMakeLists.txt.orig	2024-09-11 03:04:16.000000000 -0600
++++ soplex-release-711/CMakeLists.txt	2024-09-18 13:29:48.612954134 -0600
+@@ -123,12 +123,12 @@ if(COVERAGE)
+ endif()
+ 
+ if(ZLIB)
+-    find_package(ZLIB)
++    find_package(zlib-ng)
+ endif()
+-if(ZLIB_FOUND)
++if(zlib-ng_FOUND)
+     set(SOPLEX_WITH_ZLIB on)
+-    set(libs ${libs} ${ZLIB_LIBRARIES})
+-    include_directories(${ZLIB_INCLUDE_DIRS})
++    set(libs ${libs} z-ng)
++    include_directories(${zlib-ng_INCLUDE_DIR})
+ endif()
+ 
+ if(GMP)
+--- soplex-release-711/src/CMakeLists.txt.orig	2024-09-18 13:26:53.648807408 -0600
++++ soplex-release-711/src/CMakeLists.txt	2024-09-18 13:27:19.135391782 -0600
+@@ -185,11 +185,6 @@ install(FILES
+      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
+  DESTINATION include/soplex/external/fmt)
+ 
+- install(FILES
+-     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/zstr.hpp
+-     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/strict_fstream.hpp
+-  DESTINATION include/soplex/external/zstr)
+-
+ # install the binary and the library to appropriate lcoations and add them to an export group
+ install(TARGETS soplex libsoplex EXPORT soplex-targets
+ 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+--- soplex-release-711/src/depend.orig	2024-09-11 03:04:16.000000000 -0600
++++ soplex-release-711/src/depend	2024-09-18 13:27:41.471027538 -0600
+@@ -17,8 +17,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmai
+  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
+  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
+  src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
+- src/soplex/external/zstr/zstr.hpp \
+- src/soplex/external/zstr/strict_fstream.hpp src/soplex/spxscaler.h \
++ src/soplex/spxscaler.h \
+  src/soplex/vector.h src/soplex/svector.h src/soplex/svset.h \
+  src/soplex/dsvector.h src/soplex/dvector.h src/soplex/spxscaler.hpp \
+  src/soplex/spxlpbase_real.hpp src/soplex/mpsinput.h \
+--- soplex-release-711/src/soplex/spxfileio.h.orig	2024-09-11 03:04:16.000000000 -0600
++++ soplex-release-711/src/soplex/spxfileio.h	2024-09-18 13:28:17.246444120 -0600
+@@ -41,7 +41,7 @@
+  *-----------------------------------------------------------------------------
+  */
+ #ifdef SOPLEX_WITH_ZLIB
+-#include "soplex/external/zstr/zstr.hpp"
++#include <zstr/zstr.hpp>
+ #endif // WITH_GSZSTREAM
+ 
+ namespace soplex

@@ -1,0 +1,12 @@
+diff -up xorg-cf-files-1.0.8/linux.cf.defaultsource xorg-cf-files-1.0.8/linux.cf
+--- xorg-cf-files-1.0.8/linux.cf.defaultsource	2023-02-21 21:28:43.000000000 -0500
++++ xorg-cf-files-1.0.8/linux.cf	2024-04-21 19:26:57.976031460 -0400
+@@ -242,7 +242,7 @@ InstallNamedTargetNoClobber(install,file
+ #if LinuxCLibMajorVersion >= 6
+ # define LinuxSourceDefines	-D_POSIX_C_SOURCE=199309L \
+ 				-D_POSIX_SOURCE -D_XOPEN_SOURCE \
+-				-D_BSD_SOURCE -D_SVID_SOURCE \
++				-D_DEFAULT_SOURCE \
+                                 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 				LinuxAdditionalIncludes LinuxGnuSourceDefines \
+ 				LinuxLocaleDefines

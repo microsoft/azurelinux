@@ -1,0 +1,22 @@
+diff -ur v5.0_original/ncompress-5.0/compress.c v5.0/ncompress-5.0/compress.c
+--- v5.0_original/ncompress-5.0/compress.c	2021-02-02 09:16:16.000000000 +0100
++++ v5.0/ncompress-5.0/compress.c	2022-06-24 11:11:52.435388146 +0200
+@@ -150,6 +150,7 @@
+ #include	<sys/types.h>
+ #include	<sys/stat.h>
+ #include	<errno.h>
++#include	<unistd.h>
+ 
+ #if !defined(DOS) && !defined(WINDOWS)
+ #	include	<dirent.h>
+@@ -424,8 +425,8 @@
+ char			*ofname = NULL;		/* Output filename								*/
+ int				fgnd_flag = 0;		/* Running in background (SIGINT=SIGIGN)		*/
+ 
+-long 			bytes_in;			/* Total number of byte from input				*/
+-long 			bytes_out;			/* Total number of byte to output				*/
++long long 			bytes_in;		/* Total number of byte from input				*/
++long long 			bytes_out;		/* Total number of byte to output				*/
+ 
+ /*
+  * 8086 & 80286 Has a problem with array bigger than 64K so fake the array

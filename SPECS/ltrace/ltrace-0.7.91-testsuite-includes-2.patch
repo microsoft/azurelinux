@@ -1,0 +1,48 @@
+From 57dbe34ea7aa54b97e11406e1cfb2e427a68779e Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Wed, 8 Apr 2015 16:04:13 +0200
+Subject: [PATCH] Fix warnings in compilation of test-suite cases
+
+---
+ testsuite/ltrace.main/signals.c    | 5 +++--
+ testsuite/ltrace.minor/wchar.exp   | 3 ++-
+ testsuite/ltrace.torture/signals.c | 5 +++--
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/testsuite/ltrace.main/signals.c b/testsuite/ltrace.main/signals.c
+index a02e795..ab23fc7 100644
+--- a/testsuite/ltrace.main/signals.c
++++ b/testsuite/ltrace.main/signals.c
+@@ -2,9 +2,10 @@
+    Objectives  : Verify that ltrace can trace user defined signal.
+    This file was written by Yao Qi <qiyao@cn.ibm.com>. */
+ 
+-#include<stdio.h>
+-#include<signal.h>
++#include <stdio.h>
++#include <signal.h>
+ #include <sys/types.h>
++#include <unistd.h>
+ 
+ #define LOOP	7
+ 
+diff --git a/testsuite/ltrace.torture/signals.c b/testsuite/ltrace.torture/signals.c
+index b786c81..c66416e 100644
+--- a/testsuite/ltrace.torture/signals.c
++++ b/testsuite/ltrace.torture/signals.c
+@@ -2,9 +2,10 @@
+    Objectives  : Verify that ltrace can trace user defined signal.
+    This file was written by Yao Qi <qiyao@cn.ibm.com>. */
+ 
+-#include<stdio.h>
+-#include<signal.h>
++#include <stdio.h>
++#include <signal.h>
+ #include <sys/types.h>
++#include <unistd.h>
+ 
+ #define LOOP	20
+ 
+-- 
+2.3.5
+

@@ -1,0 +1,60 @@
+diff -up bullet3-3.08/src/BulletSoftBody/btSoftMultiBodyDynamicsWorld.cpp.fix-odr bullet3-3.08/src/BulletSoftBody/btSoftMultiBodyDynamicsWorld.cpp
+--- bullet3-3.08/src/BulletSoftBody/btSoftMultiBodyDynamicsWorld.cpp.fix-odr	2021-02-11 11:17:29.417618076 -0500
++++ bullet3-3.08/src/BulletSoftBody/btSoftMultiBodyDynamicsWorld.cpp	2021-02-11 11:18:01.669770577 -0500
+@@ -177,7 +177,7 @@ void btSoftMultiBodyDynamicsWorld::debug
+ 	}
+ }
+ 
+-struct btSoftSingleRayCallback : public btBroadphaseRayCallback
++struct btSoftMultiBodySingleRayCallback : public btBroadphaseRayCallback
+ {
+ 	btVector3 m_rayFromWorld;
+ 	btVector3 m_rayToWorld;
+@@ -188,7 +188,7 @@ struct btSoftSingleRayCallback : public
+ 	const btSoftMultiBodyDynamicsWorld* m_world;
+ 	btCollisionWorld::RayResultCallback& m_resultCallback;
+ 
+-	btSoftSingleRayCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, const btSoftMultiBodyDynamicsWorld* world, btCollisionWorld::RayResultCallback& resultCallback)
++	btSoftMultiBodySingleRayCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, const btSoftMultiBodyDynamicsWorld* world, btCollisionWorld::RayResultCallback& resultCallback)
+ 		: m_rayFromWorld(rayFromWorld),
+ 		  m_rayToWorld(rayToWorld),
+ 		  m_world(world),
+@@ -256,7 +256,7 @@ void btSoftMultiBodyDynamicsWorld::rayTe
+ 	BT_PROFILE("rayTest");
+ 	/// use the broadphase to accelerate the search for objects, based on their aabb
+ 	/// and for each object with ray-aabb overlap, perform an exact ray test
+-	btSoftSingleRayCallback rayCB(rayFromWorld, rayToWorld, this, resultCallback);
++	btSoftMultiBodySingleRayCallback rayCB(rayFromWorld, rayToWorld, this, resultCallback);
+ 
+ #ifndef USE_BRUTEFORCE_RAYBROADPHASE
+ 	m_broadphasePairCache->rayTest(rayFromWorld, rayToWorld, rayCB);
+diff -up bullet3-3.08/src/BulletSoftBody/btSoftRigidDynamicsWorld.cpp.fix-odr bullet3-3.08/src/BulletSoftBody/btSoftRigidDynamicsWorld.cpp
+--- bullet3-3.08/src/BulletSoftBody/btSoftRigidDynamicsWorld.cpp.fix-odr	2021-02-11 11:16:19.157285864 -0500
++++ bullet3-3.08/src/BulletSoftBody/btSoftRigidDynamicsWorld.cpp	2021-02-11 11:16:44.220404370 -0500
+@@ -172,7 +172,7 @@ void btSoftRigidDynamicsWorld::debugDraw
+ 	}
+ }
+ 
+-struct btSoftSingleRayCallback : public btBroadphaseRayCallback
++struct btSoftRigidSingleRayCallback : public btBroadphaseRayCallback
+ {
+ 	btVector3 m_rayFromWorld;
+ 	btVector3 m_rayToWorld;
+@@ -183,7 +183,7 @@ struct btSoftSingleRayCallback : public
+ 	const btSoftRigidDynamicsWorld* m_world;
+ 	btCollisionWorld::RayResultCallback& m_resultCallback;
+ 
+-	btSoftSingleRayCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, const btSoftRigidDynamicsWorld* world, btCollisionWorld::RayResultCallback& resultCallback)
++	btSoftRigidSingleRayCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld, const btSoftRigidDynamicsWorld* world, btCollisionWorld::RayResultCallback& resultCallback)
+ 		: m_rayFromWorld(rayFromWorld),
+ 		  m_rayToWorld(rayToWorld),
+ 		  m_world(world),
+@@ -251,7 +251,7 @@ void btSoftRigidDynamicsWorld::rayTest(c
+ 	BT_PROFILE("rayTest");
+ 	/// use the broadphase to accelerate the search for objects, based on their aabb
+ 	/// and for each object with ray-aabb overlap, perform an exact ray test
+-	btSoftSingleRayCallback rayCB(rayFromWorld, rayToWorld, this, resultCallback);
++	btSoftRigidSingleRayCallback rayCB(rayFromWorld, rayToWorld, this, resultCallback);
+ 
+ #ifndef USE_BRUTEFORCE_RAYBROADPHASE
+ 	m_broadphasePairCache->rayTest(rayFromWorld, rayToWorld, rayCB);

@@ -1,0 +1,39 @@
+From dcd38f32d6ab340653d9688e99b9db3ef5fbc058 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Sun, 26 Jan 2025 14:58:10 +0100
+Subject: [PATCH] Fix bool detection.
+
+---
+ ToolBox.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/ToolBox.h b/ToolBox.h
+index bf18b72..f6f33cc 100644
+--- a/ToolBox.h
++++ b/ToolBox.h
+@@ -9,7 +9,7 @@ extern "C"
+ /*****************************************************************************/
+ /*  MODULE IMPORTS:                                                          */
+ /*****************************************************************************/
+-#ifdef PERL_DARWIN
++#if defined(PERL_DARWIN) || (defined __STDC_VERSION__ && __STDC_VERSION__ > 201710L)
+ #include <stdbool.h>
+ #endif
+ /*****************************************************************************/
+@@ -94,9 +94,13 @@ typedef  Z_longword         *Z_longwordptr;
+         #define boolean bool
+     #else
+ 	typedef int boolean;
++#if defined __STDC_VERSION__ && __STDC_VERSION__ > 201710L
++/* bool, true and false are keywords.  */
++#else
+ 	#ifndef I_STDBOOL
+ 	    enum { false, true };
+ 	#endif
++#endif
+     #endif
+ #endif
+ 
+-- 
+2.48.1
+

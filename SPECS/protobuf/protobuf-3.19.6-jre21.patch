@@ -1,0 +1,18 @@
+FTBFS with java-21-openjdk since support for 1.7 was dropped in JDK 20:
+
+[ERROR] Source option 7 is no longer supported. Use 8 or later.
+[ERROR] Target option 7 is no longer supported. Use 8 or later.
+
+--- protobuf-3.19.6/java/pom.xml.jre21	2022-02-13 11:45:39.367028268 +0900
++++ protobuf-3.19.6/java/pom.xml	2024-04-03 12:43:18.212542147 +0900
+@@ -111,8 +112,8 @@
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>3.6.1</version>
+           <configuration>
+-            <source>1.7</source>
+-            <target>1.7</target>
++            <source>1.8</source>
++            <target>1.8</target>
+           </configuration>
+         </plugin>
+         <plugin>

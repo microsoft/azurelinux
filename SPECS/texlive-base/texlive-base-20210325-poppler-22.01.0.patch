@@ -1,0 +1,49 @@
+diff -up texlive-base-20210325/source/texk/web2c/Makefile.in.poppler22 texlive-base-20210325/source/texk/web2c/Makefile.in
+--- texlive-base-20210325/source/texk/web2c/Makefile.in.poppler22	2022-01-15 16:57:15.020632269 -0500
++++ texlive-base-20210325/source/texk/web2c/Makefile.in	2022-01-15 17:00:20.852711238 -0500
+@@ -4573,7 +4573,7 @@ ttf2afm_tests = pdftexdir/ttf2afm.test
+ # Force Automake to use CXXLD for linking
+ nodist_EXTRA_pdftosrc_SOURCES = dummy.cxx
+ pdftosrc_CPPFLAGS = $(pdftex_cppflags)
+-pdftosrc_CXXFLAGS = $(WARNING_CXXFLAGS)
++pdftosrc_CXXFLAGS = $(WARNING_CXXFLAGS) -std=c++17
+ pdftosrc_SOURCES = pdftexdir/pdftosrc.cc
+ pdftosrc_LDADD = $(pdftex_ldadd) $(LDADD)
+ pdftosrc_DEPENDENCIES = $(pdftex_dependencies)
+@@ -18343,7 +18343,7 @@ xetex-xetex-pool.obj: xetex-pool.c
+ @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+ 
+ pdftexdir/libpdftex_a-pdftoepdf.o: pdftexdir/pdftoepdf.cc
+-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) $(libpdftex_a_CXXFLAGS) $(CXXFLAGS) -MT pdftexdir/libpdftex_a-pdftoepdf.o -MD -MP -MF pdftexdir/$(DEPDIR)/libpdftex_a-pdftoepdf.Tpo -c -o pdftexdir/libpdftex_a-pdftoepdf.o `test -f 'pdftexdir/pdftoepdf.cc' || echo '$(srcdir)/'`pdftexdir/pdftoepdf.cc
++@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpdftex_a_CPPFLAGS) $(CPPFLAGS) -std=c++17 $(libpdftex_a_CXXFLAGS) $(CXXFLAGS) -MT pdftexdir/libpdftex_a-pdftoepdf.o -MD -MP -MF pdftexdir/$(DEPDIR)/libpdftex_a-pdftoepdf.Tpo -c -o pdftexdir/libpdftex_a-pdftoepdf.o `test -f 'pdftexdir/pdftoepdf.cc' || echo '$(srcdir)/'`pdftexdir/pdftoepdf.cc
+ @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) pdftexdir/$(DEPDIR)/libpdftex_a-pdftoepdf.Tpo pdftexdir/$(DEPDIR)/libpdftex_a-pdftoepdf.Po
+ @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pdftexdir/pdftoepdf.cc' object='pdftexdir/libpdftex_a-pdftoepdf.o' libtool=no @AMDEPBACKSLASH@
+ @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler22 texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler22	2022-01-14 15:01:29.811105995 -0500
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc	2022-01-14 15:01:29.831106120 -0500
+@@ -964,17 +964,17 @@ The changes below seem to work fine.
+ */
+ // begin modification
+             groupDict = pageDict->lookup("Group");
+-            const Dict& dic1 = page->getGroup();
+-            const Dict& dic2 = groupDict.getDict();
++            Dict *dic1 = page->getGroup();
++            Dict *dic2 = groupDict.getDict();
+             // replace dic2 in groupDict with dic1
+-            l = dic2.getLength();
++            l = dic2->getLength();
+             for (i = 0; i < l; i++) {
+-                groupDict.dictRemove(dic2.getKey(i));
++                groupDict.dictRemove(dic2->getKey(i));
+             }
+-            l = dic1.getLength();
++            l = dic1->getLength();
+             for (i = 0; i < l; i++) {
+-                groupDict.dictAdd(dic1.getKey(i),
+-                                  dic1.getValNF(i).copy());
++                groupDict.dictAdd(dic1->getKey(i),
++                                  dic1->getValNF(i).copy());
+             }
+ // end modification
+             pdf_printf("/Group %ld 0 R\n", (long)pdfpagegroupval);

@@ -1,0 +1,15 @@
+auth        substack      smartcard-auth
+auth        include       postlogin
+
+account     required      pam_nologin.so
+account     include       smartcard-auth
+
+password    include       smartcard-auth
+
+session     required      pam_selinux.so close
+session     required      pam_loginuid.so
+session     required      pam_selinux.so open
+session     optional      pam_keyinit.so force revoke
+session     required      pam_namespace.so
+session     include       smartcard-auth
+session     include       postlogin

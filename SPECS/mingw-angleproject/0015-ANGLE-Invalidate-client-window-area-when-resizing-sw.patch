@@ -1,0 +1,37 @@
+From 7d300c6e7d05f4e31c966f1298d11da3eae9d679 Mon Sep 17 00:00:00 2001
+From: Val Doroshchuk <valentyn.doroshchuk@qt.io>
+Date: Fri, 21 Jun 2019 11:24:06 +0200
+Subject: [PATCH] ANGLE: Invalidate client window area when resizing swap chain
+
+Inspired by:
+https://codereview.appspot.com/6812076/
+Resizing a window larger results in the newly exposed region being invalidated
+but the old region is treated as valid.
+This can result in the old region no longer updating.
+Was added to D3D9.
+
+Improving a fix from Filippo Cucchetto:
+https://codereview.qt-project.org/c/qt/qtbase/+/195336
+and pushing to D3D11.
+
+ifndef protects against compilation error for WinRT.
+Invalidate() should be used only for desktop apps.
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+index dcfd06484d..e8f13b388f 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+@@ -504,6 +504,10 @@ EGLint SwapChain11::resize(const gl::Context *context,
+     ASSERT(SUCCEEDED(result));
+     if (SUCCEEDED(result))
+     {
++#ifndef ANGLE_ENABLE_WINDOWS_STORE
++        if (mNativeWindow->getNativeWindow())
++            InvalidateRect(mNativeWindow->getNativeWindow(), nullptr, FALSE);
++#endif
+         const auto &format =
+             d3d11::Format::Get(mOffscreenRenderTargetFormat, mRenderer->getRenderer11DeviceCaps());
+         mBackBufferTexture.set(backbufferTexture, format);
+-- 
+2.14.2.windows.1
+

@@ -1,0 +1,27 @@
+From 756857b5d05fe85ea93851111fafc430944dbe61 Mon Sep 17 00:00:00 2001
+From: Santhosh Kumar <santhosh.kumar.selvaraj@qt.io>
+Date: Wed, 18 Oct 2023 11:23:20 +0200
+Subject: Fix tooltip palette issue in gtk3 theme
+
+The tooltip text doesn't show with right palette when application runs
+in dark mode using gtk3 theme.
+
+This patchset removes explicitly setting ToolTipText palette in
+gtk3theme.
+
+Pick-to: 6.6 6.5
+Change-Id: Id90626a377733814c3f32f0bf7e5539097b76dd6
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index bbc70c39a2..22cfabb843 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -573,7 +573,6 @@ void QGtk3Storage::createMapping()
+         ADD(All, AlternateBase);
+ 
+         GTK(Default, Foreground, NORMAL);
+-        ADD(All, ToolTipText);
+         MODIFY(Normal, Text, 100, 100, 100);
+         ADD(All, PlaceholderText, Light);
+         MODIFY(Normal, Text, -100, -100, -100);

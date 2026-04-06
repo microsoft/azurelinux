@@ -1,0 +1,24 @@
+diff -ur seaborn-0.12.2/doc/tools/extract_examples.py seaborn-0.12.2.docscrape/doc/tools/extract_examples.py
+--- seaborn-0.12.2/doc/tools/extract_examples.py	2022-09-11 00:28:57.663038500 +0200
++++ seaborn-0.12.2.docscrape/doc/tools/extract_examples.py	2023-04-30 11:39:39.568295944 +0200
+@@ -3,7 +3,7 @@
+ import sys
+ import pydoc
+ import seaborn
+-from seaborn.external.docscrape import NumpyDocString
++from numpydoc.docscrape import NumpyDocString
+ import nbformat
+ 
+ 
+diff -ur seaborn-0.12.2/seaborn/_docstrings.py seaborn-0.12.2.docscrape/seaborn/_docstrings.py
+--- seaborn-0.12.2/seaborn/_docstrings.py	2022-09-11 00:28:57.669322700 +0200
++++ seaborn-0.12.2.docscrape/seaborn/_docstrings.py	2023-04-30 11:39:20.330984799 +0200
+@@ -1,6 +1,6 @@
+ import re
+ import pydoc
+-from .external.docscrape import NumpyDocString
++from numpydoc.docscrape import NumpyDocString
+ 
+ 
+ class DocstringComponents:
+Sólo en seaborn-0.12.2/seaborn/external: docscrape.py

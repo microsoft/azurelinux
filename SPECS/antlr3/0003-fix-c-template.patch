@@ -1,0 +1,35 @@
+Description: Fix various issues with the C template (backports of patchs proposed upstream)
+Origin: backport, https://github.com/stephengaito/antlr3/commit/adc5e54
+                  https://github.com/stephengaito/antlr3/commit/71df80c
+--- a/tool/src/main/resources/org/antlr/codegen/templates/C/C.stg
++++ b/tool/src/main/resources/org/antlr/codegen/templates/C/C.stg
+@@ -2132,7 +2132,9 @@
+ <if(LEXER)>
+     LRECOVER();
+ <else>
++<! use following code to make it recover inline;
+     RECOVERFROMMISMATCHEDSET(&FOLLOW_set_in_<ruleName><elementIndex>);
++!>
+ <endif>
+     goto rule<ruleDescriptor.name>Ex;
+ }<\n>
+@@ -2143,7 +2145,10 @@
+ EXCEPTION->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
+ EXCEPTION->name         = (void *)ANTLR3_MISMATCHED_SET_NAME;
+ <if(PARSER)>
++EXCEPTION->expectingSet = NULL;
++<! use following code to make it recover inline;
+ EXCEPTION->expectingSet = &FOLLOW_set_in_<ruleName><elementIndex>;
++!>
+ <endif>
+ >>
+ 
+@@ -2510,7 +2515,7 @@
+  */
+ static const ANTLR3_INT32 * const dfa<dfa.decisionNumber>_transitions[] =
+ {
+-    <dfa.transitionEdgeTables:{xref|dfa<dfa.decisionNumber>_T<xref>}; separator=", ", wrap="\n", null="_empty">
++    <dfa.transitionEdgeTables:{xref|dfa<dfa.decisionNumber>_T<xref>}; separator=", ", wrap="\n", null="NULL">
+ };
+ 
+ <if(dfa.specialStateSTs)>

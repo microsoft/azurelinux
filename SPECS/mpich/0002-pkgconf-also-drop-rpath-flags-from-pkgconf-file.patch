@@ -1,0 +1,25 @@
+From 03b024ee9346babc48a646b6ab98884ebdd49791 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 8 Feb 2022 10:45:41 +0100
+Subject: [PATCH 2/4] pkgconf: also drop rpath flags from pkgconf file
+
+When environment modules are used, libraries are resolved using normal
+linker search options. The rpath argument here is actually completely
+wrong in that case.
+---
+ src/packaging/pkgconfig/mpich.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/packaging/pkgconfig/mpich.pc.in b/src/packaging/pkgconfig/mpich.pc.in
+index ff6dc35807..5ad7e8bcbc 100644
+--- a/src/packaging/pkgconfig/mpich.pc.in
++++ b/src/packaging/pkgconfig/mpich.pc.in
+@@ -9,7 +9,7 @@ Description: High Performance and portable MPI
+ Version: @MPICH_VERSION@
+ URL: http://www.mcs.anl.gov/research/projects/mpich
+ Requires:
+-Libs: @WRAPPER_C_DYNAMIC_LOADING_FLAGS@ -L${libdir} -l@MPILIBNAME@ @LPMPILIBNAME@
++Libs: -L${libdir} -l@MPILIBNAME@ @LPMPILIBNAME@
+ Cflags: @WRAPPER_CPPFLAGS@ -I${includedir}
+ 
+ # pkg-config does not understand Cxxflags, etc. So we allow users to

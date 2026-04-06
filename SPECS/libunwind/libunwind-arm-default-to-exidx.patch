@@ -1,0 +1,15 @@
+diff -up libunwind-1.6.2/src/arm/Gglobal.c.default-to-exidx libunwind-1.6.2/src/arm/Gglobal.c
+--- libunwind-1.6.2/src/arm/Gglobal.c.default-to-exidx	2021-12-20 12:06:56.067313075 -0500
++++ libunwind-1.6.2/src/arm/Gglobal.c	2021-12-20 12:08:43.063060309 -0500
+@@ -33,7 +33,10 @@ HIDDEN atomic_bool tdep_init_done = 0;
+ /* Android only supports three types of unwinding methods. */
+ HIDDEN int unwi_unwind_method = UNW_ARM_METHOD_DWARF | UNW_ARM_METHOD_EXIDX | UNW_ARM_METHOD_LR;
+ #else
+-HIDDEN int unwi_unwind_method = UNW_ARM_METHOD_ALL;
++/* UNW_ARM_METHOD_ALL starts with UNW_ARM_METHOD_DWARF */
++/* which is never right on Fedora ARM. Default instead */
++/* to UNW_ARM_METHOD_EXIDX. */
++HIDDEN int unwi_unwind_method = UNW_ARM_METHOD_EXIDX;
+ #endif
+ 
+ HIDDEN void

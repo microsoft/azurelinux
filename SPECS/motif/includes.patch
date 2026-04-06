@@ -1,0 +1,72 @@
+--- motif-2.3.8/lib/Xm/XpmCrBufFrI.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/XpmCrBufFrI.c	2025-08-14 14:07:13.543514735 -0500
+@@ -39,7 +39,7 @@
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+-
++#include <string.h>
+ 
+ /* October 2004, source code review by Thomas Biege <thomas@suse.de> */
+ 
+--- motif-2.3.8/lib/Xm/XpmWrFFrI.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/XpmWrFFrI.c	2025-08-14 14:10:27.307965260 -0500
+@@ -37,6 +37,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ 
+ /* October 2004, source code review by Thomas Biege <thomas@suse.de> */
+ 
+--- motif-2.3.8/lib/Xm/Xpmrgb.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/Xpmrgb.c	2025-08-14 14:13:47.593686683 -0500
+@@ -50,6 +50,7 @@
+ 
+ #include "XpmI.h"
+ #include <ctype.h>
++#include <string.h>
+ 
+ #ifndef FOR_MSW				/* normal part first, MSW part at
+ 					 * the end, (huge ifdef!) */
+--- motif-2.3.8/lib/Xm/XpmCrDatFrI.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/XpmCrDatFrI.c	2025-08-14 14:14:21.697225831 -0500
+@@ -37,6 +37,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ 
+ /* October 2004, source code review by Thomas Biege <thomas@suse.de> */
+ 
+--- motif-2.3.8/lib/Xm/XpmRdFToI.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/XpmRdFToI.c	2025-08-14 14:16:09.040737658 -0500
+@@ -37,6 +37,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ 
+ /* October 2004, source code review by Thomas Biege <thomas@suse.de> */
+ 
+--- motif-2.3.8/lib/Xm/Xpmcreate.c~	2016-03-15 21:10:08.000000000 -0500
++++ motif-2.3.8/lib/Xm/Xpmcreate.c	2025-08-14 14:17:00.651339098 -0500
+@@ -43,6 +43,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
+ 
+ /* October 2004, source code review by Thomas Biege <thomas@suse.de> */
+ 
+--- motif-2.3.8/lib/Xm/XpmI.h~	2017-08-16 19:38:43.000000000 -0500
++++ motif-2.3.8/lib/Xm/XpmI.h	2025-08-14 14:20:19.913720840 -0500
+@@ -28,6 +28,8 @@
+ extern "C" {
+ #endif
+ 
++#include <string.h>
++
+ /* Xpm internal symbols are prefixed with _Xm */
+ 
+ #define xpmParseData _XmxpmParseData

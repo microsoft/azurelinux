@@ -1,0 +1,43 @@
+From 600db5413294701bdfda8ce19fa804bcbc866d2e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 8 Jan 2021 13:23:17 +0100
+Subject: [PATCH 2/3] Fix deadcode and check return code
+
+1. fstrm-0.6.0/libmy/argv.c:1782: addr_non_null: The address of an object "argv_types" is never null.
+2. fstrm-0.6.0/libmy/argv.c:1782: assignment: Assigning: "type_p" = "argv_types".
+3. fstrm-0.6.0/libmy/argv.c:1809: notnull: At condition "type_p == NULL", the value of "type_p" cannot be "NULL".
+4. fstrm-0.6.0/libmy/argv.c:1809: dead_error_condition: The condition "type_p == NULL" cannot be true.
+5. fstrm-0.6.0/libmy/argv.c:1810: dead_error_begin: Execution cannot reach this statement: "(void)fprintf(argv_error_st...".
+
+40. fstrm-0.6.0/libmy/argv.c:2724: check_return: Calling "string_to_value" without checking return value (as is done elsewhere 6 out of 7 times).
+---
+ libmy/argv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/libmy/argv.c b/libmy/argv.c
+index c3aadfe..16dca73 100644
+--- a/libmy/argv.c
++++ b/libmy/argv.c
+@@ -1806,7 +1806,7 @@ static	void	display_variables(const argv_t *args)
+       int		entry_c, size = 0;
+       
+       /* find the type and the size for array */
+-      if (type_p == NULL) {
++      if (type_p->at_value == 0) {
+ 	(void)fprintf(argv_error_stream, "%s: illegal variable type %d\n",
+ 		      __FILE__, val_type);
+ 	continue;
+@@ -2721,7 +2721,9 @@ static	void	do_list(argv_t *grid, const int arg_c, char **argv,
+ 	    case ARGV_LONG:
+ 	    case ARGV_FLOAT:
+ 	    case ARGV_DOUBLE:
+-              string_to_value(*arg_p, match_p->ar_variable, match_p->ar_type);
++              if (string_to_value(*arg_p, match_p->ar_variable, match_p->ar_type) != NOERROR) {
++		*okay_bp = ARGV_FALSE;
++	      }
+ 	      char_c = len;
+ 	      /* we actually used it so we advance the queue tail position */
+ 	      (*queue_tail_p)++;
+-- 
+2.26.3
+

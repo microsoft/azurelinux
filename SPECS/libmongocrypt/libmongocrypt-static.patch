@@ -1,0 +1,73 @@
+diff -up libmongocrypt-1.5.1/cmake/ImportBSON.cmake.old libmongocrypt-1.5.1/cmake/ImportBSON.cmake
+--- libmongocrypt-1.5.1/cmake/ImportBSON.cmake.old	2022-07-18 10:20:53.120630885 +0200
++++ libmongocrypt-1.5.1/cmake/ImportBSON.cmake	2022-07-18 10:38:05.240337632 +0200
+@@ -160,21 +160,25 @@ add_library (_mongocrypt-libbson_for_sta
+ add_library (_mongocrypt-libbson_for_shared INTERFACE)
+ add_library (_mongocrypt::libbson_for_static ALIAS _mongocrypt-libbson_for_static)
+ add_library (_mongocrypt::libbson_for_shared ALIAS _mongocrypt-libbson_for_shared)
+-install (
+-   TARGETS _mongocrypt-libbson_for_static _mongocrypt-libbson_for_shared
+-   EXPORT mongocrypt_targets
+-)
+ 
+ # Link to the requested libbson, only exporting that usage for the local build tree.
+ # The mongocrypt-config file will later add the appropriate link library for downstream
+ # users during find_package()
+ if (USE_SHARED_LIBBSON)
+    target_link_libraries (_mongocrypt-libbson_for_shared INTERFACE $<BUILD_INTERFACE:bson_shared>)
++   target_link_libraries (_mongocrypt-libbson_for_static INTERFACE $<BUILD_INTERFACE:bson_shared>)
++   install (
++      TARGETS _mongocrypt-libbson_for_shared
++      EXPORT mongocrypt_targets
++   )
+ else ()
+    target_link_libraries (_mongocrypt-libbson_for_shared INTERFACE $<BUILD_INTERFACE:bson_static>)
++   target_link_libraries (_mongocrypt-libbson_for_static INTERFACE $<BUILD_INTERFACE:bson_static>)
++   install (
++      TARGETS _mongocrypt-libbson_for_static _mongocrypt-libbson_for_shared
++      EXPORT mongocrypt_targets
++   )
+ endif ()
+-# libbson_for_static always links to the static libbson:
+-target_link_libraries (_mongocrypt-libbson_for_static INTERFACE $<BUILD_INTERFACE:bson_static>)
+ 
+ if (TARGET mongoc_static)
+    # And an alias to the mongoc target for use in some test cases
+diff -up libmongocrypt-1.5.1/cmake/mongocrypt-config.cmake.old libmongocrypt-1.5.1/cmake/mongocrypt-config.cmake
+--- libmongocrypt-1.5.1/cmake/mongocrypt-config.cmake.old	2022-07-18 10:29:21.516993829 +0200
++++ libmongocrypt-1.5.1/cmake/mongocrypt-config.cmake	2022-07-18 10:31:39.591821061 +0200
+@@ -2,14 +2,6 @@ include(CMakeFindDependencyMacro)
+ find_dependency(kms_message 0.0.1)
+ include("${CMAKE_CURRENT_LIST_DIR}/mongocrypt_targets.cmake")
+ 
+-if (DEFINED MONGOCRYPT_LIBBSON_STATIC_USE)
+-    # The user has named a library that should be linked as the static libbson library
+-    set_property (
+-        TARGET mongo::_mongocrypt-libbson_for_static
+-        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "$<LINK_ONLY:${MONGOCRYPT_LIBBSON_STATIC_USE}>"
+-    )
+-endif ()
+-
+ 
+ # BOOL: Whether the libmongocrypt dynamic library in this package needs to link to an external libbson.
+ #   In the default configuration, the shared lib will include the TUs for a pinned version of libbson
+@@ -19,7 +11,7 @@ endif ()
+ #   libmongocrypt dynamic library will contain pending references to libbson symbols that will
+ #   need to be resolved before the library can be used.
+ #
+-#   (Note: static libmongocrypt *always* needs to link against an external libbson, as it does not
++#   (Note: libmongocrypt *always* needs to link against an external libbson, as it does not
+ #    embed the libbson symbols.)
+ set (_using_shared_libbson "@USE_SHARED_LIBBSON@")
+ 
+--- libmongocrypt-1.7.0/cmake/ImportBSON.cmake.old	2023-01-27 09:44:33.602270081 +0100
++++ libmongocrypt-1.7.0/cmake/ImportBSON.cmake	2023-01-27 09:44:40.931242458 +0100
+@@ -119,7 +119,7 @@
+          INTERFACE_INCLUDE_DIRECTORIES "${_MONGOCRYPT_SYSTEM_LIBBSON_INCLUDE_DIR}"
+          )
+       set_property (TARGET bson_shared PROPERTY IMPORTED_LOCATION "${_MONGOCRYPT_SYSTEM_LIBBSON_SHARED}")
+-      set_property (TARGET bson_static PROPERTY IMPORTED_LOCATION "${_MONGOCRYPT_SYSTEM_LIBBSON_STATIC}")
++      set_property (TARGET bson_static PROPERTY IMPORTED_LOCATION "${_MONGOCRYPT_SYSTEM_LIBBSON_SHARED}")
+       set_property (
+          CACHE _MONGOCRYPT_SYSTEM_LIBBSON_SHARED
+                _MONGOCRYPT_SYSTEM_LIBBSON_INCLUDE_DIR

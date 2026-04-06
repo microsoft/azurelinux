@@ -1,0 +1,314 @@
+From 93312460e37be0ba1acbbefa553bfc25f4fc5ea9 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+aa-turner@users.noreply.github.com>
+Date: Sun, 27 Apr 2025 21:00:40 +0100
+Subject: [PATCH 1/9] Fix tests for Python 3.14a7+
+
+---
+ tests/test_extensions/test_ext_autodoc.py         | 2 +-
+ tests/test_extensions/test_ext_autodoc_configs.py | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc.py b/tests/test_extensions/test_ext_autodoc.py
+index a06c1bbe30d..bdcd6ef2b95 100644
+--- a/tests/test_extensions/test_ext_autodoc.py
++++ b/tests/test_extensions/test_ext_autodoc.py
+@@ -941,7 +941,7 @@ def test_autodoc_special_members(app):
+     actual = do_autodoc(app, 'class', 'target.Class', options)
+     assert list(filter(lambda l: '::' in l, actual)) == [
+         '.. py:class:: Class(arg)',
+-        '   .. py:attribute:: Class.__annotations__',
++        '   .. py:attribute:: Class.__annotations_cache__',
+         '   .. py:attribute:: Class.__dict__',
+         '   .. py:method:: Class.__init__(arg)',
+         '   .. py:attribute:: Class.__module__',
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index ab7539190e0..d520e7f9cfe 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1368,7 +1368,6 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
+-        '      :type: int',
+         '',
+         '      docstring',
+         '',
+
+From 523f290134f644b115e18e347dce093fa0fbd662 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+aa-turner@users.noreply.github.com>
+Date: Sun, 27 Apr 2025 21:03:35 +0100
+Subject: [PATCH 2/9] Fix tests for Python 3.14a7+
+
+---
+ tests/test_extensions/test_ext_autodoc_configs.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index d520e7f9cfe..2f8dc75d082 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1368,6 +1368,7 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
++        '      :type: int',
+         '',
+         '      docstring',
+         '',
+@@ -1440,7 +1441,6 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
+-        '      :type: myint',
+         '',
+         '      docstring',
+         '',
+
+From a81bcf834822fac1cf96a2ab43c5b0d260ec532b Mon Sep 17 00:00:00 2001
+From: James Addison <jay@jp-hosting.net>
+Date: Tue, 6 May 2025 22:06:24 +0100
+Subject: [PATCH 3/9] Tests: make test expectations pyversion-conditional
+
+Relates-to commits 93312460e37be0ba1acbbefa553bfc25f4fc5ea9, 523f290134f644b115e18e347dce093fa0fbd662.
+---
+ tests/test_extensions/test_ext_autodoc.py         |  6 +++++-
+ tests/test_extensions/test_ext_autodoc_configs.py | 10 +++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc.py b/tests/test_extensions/test_ext_autodoc.py
+index bdcd6ef2b95..d7cef59056e 100644
+--- a/tests/test_extensions/test_ext_autodoc.py
++++ b/tests/test_extensions/test_ext_autodoc.py
+@@ -938,10 +938,14 @@ def test_autodoc_special_members(app):
+     }
+     if sys.version_info >= (3, 13, 0, 'alpha', 5):
+         options['exclude-members'] = '__static_attributes__,__firstlineno__'
++    if sys.version_info >= (3, 14, 0, 'alpha', 7):
++        annotations_attributes = ['   .. py:attribute:: Class.__annotations_cache__']
++    else:
++        annotations_attributes = ['   .. py:attribute:: Class.__annotations__']
+     actual = do_autodoc(app, 'class', 'target.Class', options)
+     assert list(filter(lambda l: '::' in l, actual)) == [
+         '.. py:class:: Class(arg)',
+-        '   .. py:attribute:: Class.__annotations_cache__',
++    ] + annotations_attributes + [
+         '   .. py:attribute:: Class.__dict__',
+         '   .. py:method:: Class.__init__(arg)',
+         '   .. py:attribute:: Class.__module__',
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index 2f8dc75d082..f449bb57809 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1348,6 +1348,10 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+     # default
+     options = {'members': None}
+     actual = do_autodoc(app, 'module', 'target.autodoc_type_aliases', options)
++    if sys.version_info >= (3, 14, 0, 'alpha', 7):
++        attr2_typeinfo = []
++    else:
++        attr2_typeinfo = ['      :type: int']
+     assert list(actual) == [
+         '',
+         '.. py:module:: target.autodoc_type_aliases',
+@@ -1368,7 +1372,6 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
+-        '      :type: int',
+         '',
+         '      docstring',
+         '',
+@@ -1421,6 +1424,10 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         'io.StringIO': 'my.module.StringIO',
+     }
+     actual = do_autodoc(app, 'module', 'target.autodoc_type_aliases', options)
++    if sys.version_info >= (3, 14, 0, 'alpha', 7):
++        attr2_typeinfo = []
++    else:
++        attr2_typeinfo = ['      :type: myint']
+     assert list(actual) == [
+         '',
+         '.. py:module:: target.autodoc_type_aliases',
+@@ -1441,6 +1448,7 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
++    ] + attr2_typeinfo + [
+         '',
+         '      docstring',
+         '',
+
+From 26e7a6435ad9840345455f35f62c063cb588bba7 Mon Sep 17 00:00:00 2001
+From: James Addison <jay@jp-hosting.net>
+Date: Tue, 6 May 2025 22:16:42 +0100
+Subject: [PATCH 4/9] Tests: fixup: actually insert updated expectation
+
+Relates-to commit a81bcf834822fac1cf96a2ab43c5b0d260ec532b.
+---
+ tests/test_extensions/test_ext_autodoc_configs.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index f449bb57809..fe2561aea00 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1372,6 +1372,7 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
++    ] + attr2_typeinfo + [
+         '',
+         '      docstring',
+         '',
+
+From 52c7010c4b673898af115d3a86728274a8dd620d Mon Sep 17 00:00:00 2001
+From: James Addison <jay@jp-hosting.net>
+Date: Tue, 6 May 2025 22:19:30 +0100
+Subject: [PATCH 5/9] Tests: linting: use iterable unpacking as suggested by
+ `ruff`
+
+---
+ tests/test_extensions/test_ext_autodoc_configs.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index fe2561aea00..39fdc454e31 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1372,7 +1372,7 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
+-    ] + attr2_typeinfo + [
++        *attr2_typeinfo,
+         '',
+         '      docstring',
+         '',
+@@ -1449,7 +1449,7 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+         '',
+         '   .. py:attribute:: Foo.attr2',
+         '      :module: target.autodoc_type_aliases',
+-    ] + attr2_typeinfo + [
++        *attr2_typeinfo,
+         '',
+         '      docstring',
+         '',
+
+From 7b3ce9b642e636fe2ec58f1e090dc79d51b1f2f0 Mon Sep 17 00:00:00 2001
+From: James Addison <jay@jp-hosting.net>
+Date: Tue, 6 May 2025 22:21:24 +0100
+Subject: [PATCH 6/9] Tests: linting: use iterable unpacking as suggested by
+ `ruff` (uno mas)
+
+---
+ tests/test_extensions/test_ext_autodoc.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc.py b/tests/test_extensions/test_ext_autodoc.py
+index d7cef59056e..4f38634cf51 100644
+--- a/tests/test_extensions/test_ext_autodoc.py
++++ b/tests/test_extensions/test_ext_autodoc.py
+@@ -945,7 +945,7 @@ def test_autodoc_special_members(app):
+     actual = do_autodoc(app, 'class', 'target.Class', options)
+     assert list(filter(lambda l: '::' in l, actual)) == [
+         '.. py:class:: Class(arg)',
+-    ] + annotations_attributes + [
++        *annotations_attributes,
+         '   .. py:attribute:: Class.__dict__',
+         '   .. py:method:: Class.__init__(arg)',
+         '   .. py:attribute:: Class.__module__',
+
+From 386ba32af878b23c5857be588f932fe2af4a2d88 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+AA-Turner@users.noreply.github.com>
+Date: Mon, 12 May 2025 17:36:04 +0100
+Subject: [PATCH 7/9] Style
+
+---
+ tests/test_extensions/test_ext_autodoc.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc.py b/tests/test_extensions/test_ext_autodoc.py
+index 4f38634cf51..012e708a2f3 100644
+--- a/tests/test_extensions/test_ext_autodoc.py
++++ b/tests/test_extensions/test_ext_autodoc.py
+@@ -939,9 +939,9 @@ def test_autodoc_special_members(app):
+     if sys.version_info >= (3, 13, 0, 'alpha', 5):
+         options['exclude-members'] = '__static_attributes__,__firstlineno__'
+     if sys.version_info >= (3, 14, 0, 'alpha', 7):
+-        annotations_attributes = ['   .. py:attribute:: Class.__annotations_cache__']
++        annotations_attributes = ('   .. py:attribute:: Class.__annotations_cache__',)
+     else:
+-        annotations_attributes = ['   .. py:attribute:: Class.__annotations__']
++        annotations_attributes = ('   .. py:attribute:: Class.__annotations__',)
+     actual = do_autodoc(app, 'class', 'target.Class', options)
+     assert list(filter(lambda l: '::' in l, actual)) == [
+         '.. py:class:: Class(arg)',
+
+From 1f381ec05015fcbc695d1f0991e77241daef49c7 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+aa-turner@users.noreply.github.com>
+Date: Mon, 12 May 2025 17:38:28 +0100
+Subject: [PATCH 8/9] fstr
+
+---
+ tests/test_extensions/test_ext_autodoc.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc.py b/tests/test_extensions/test_ext_autodoc.py
+index 012e708a2f3..7aa12db3c32 100644
+--- a/tests/test_extensions/test_ext_autodoc.py
++++ b/tests/test_extensions/test_ext_autodoc.py
+@@ -939,13 +939,13 @@ def test_autodoc_special_members(app):
+     if sys.version_info >= (3, 13, 0, 'alpha', 5):
+         options['exclude-members'] = '__static_attributes__,__firstlineno__'
+     if sys.version_info >= (3, 14, 0, 'alpha', 7):
+-        annotations_attributes = ('   .. py:attribute:: Class.__annotations_cache__',)
++        ann_attr_name = '__annotations_cache__'
+     else:
+-        annotations_attributes = ('   .. py:attribute:: Class.__annotations__',)
++        ann_attr_name = '__annotations__'
+     actual = do_autodoc(app, 'class', 'target.Class', options)
+     assert list(filter(lambda l: '::' in l, actual)) == [
+         '.. py:class:: Class(arg)',
+-        *annotations_attributes,
++        f'   .. py:attribute:: Class.{ann_attr_name}',
+         '   .. py:attribute:: Class.__dict__',
+         '   .. py:method:: Class.__init__(arg)',
+         '   .. py:attribute:: Class.__module__',
+
+From 0bd1f9d1615c20078677b48a09180c4b68e27796 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+aa-turner@users.noreply.github.com>
+Date: Mon, 12 May 2025 17:40:13 +0100
+Subject: [PATCH 9/9] tuple
+
+---
+ tests/test_extensions/test_ext_autodoc_configs.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autodoc_configs.py b/tests/test_extensions/test_ext_autodoc_configs.py
+index 39fdc454e31..c88496ee506 100644
+--- a/tests/test_extensions/test_ext_autodoc_configs.py
++++ b/tests/test_extensions/test_ext_autodoc_configs.py
+@@ -1349,9 +1349,9 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+     options = {'members': None}
+     actual = do_autodoc(app, 'module', 'target.autodoc_type_aliases', options)
+     if sys.version_info >= (3, 14, 0, 'alpha', 7):
+-        attr2_typeinfo = []
++        attr2_typeinfo = ()
+     else:
+-        attr2_typeinfo = ['      :type: int']
++        attr2_typeinfo = ('      :type: int',)
+     assert list(actual) == [
+         '',
+         '.. py:module:: target.autodoc_type_aliases',
+@@ -1426,9 +1426,9 @@ def test_autodoc_type_aliases(app: SphinxTestApp) -> None:
+     }
+     actual = do_autodoc(app, 'module', 'target.autodoc_type_aliases', options)
+     if sys.version_info >= (3, 14, 0, 'alpha', 7):
+-        attr2_typeinfo = []
++        attr2_typeinfo = ()
+     else:
+-        attr2_typeinfo = ['      :type: myint']
++        attr2_typeinfo = ('      :type: myint',)
+     assert list(actual) == [
+         '',
+         '.. py:module:: target.autodoc_type_aliases',

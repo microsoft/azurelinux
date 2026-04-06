@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Multilib safe wrapper for pkg-config to call correct platform-specific version of pkg-config
+
+## Vendored definition of %_target_platform from redhat-rpm-config to avoid depending on it
+TARGET_PLATFORM=$(rpm --eval '%{_target_cpu}-%{_vendor}-%{_target_os}%{?_gnu}')
+
+exec "@PKGCONF_BINDIR@/${TARGET_PLATFORM}-pkg-config" "$@"

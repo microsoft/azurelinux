@@ -1,0 +1,30 @@
+From 957662e99f6ec38849a9cf47eaebe1c232f74bbd Mon Sep 17 00:00:00 2001
+From: Al Stone <ahs3@ahs3.net>
+Date: Wed, 14 Apr 2021 21:18:12 -0600
+Subject: [PATCH 2/2] Correct dumping of SLIC tables
+
+When dumping the SLIC table, the code was not starting at the proper
+offset.  Set the offset to the first byte after the header.
+
+Signed-off-by: Al Stone <ahs3@ahs3.net>
+---
+ source/common/dmtbdump3.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/source/common/dmtbdump3.c b/source/common/dmtbdump3.c
+index 6e5f5d7ff..9a5b5ecd5 100644
+--- a/source/common/dmtbdump3.c
++++ b/source/common/dmtbdump3.c
+@@ -177,7 +177,8 @@ AcpiDmDumpSlic (
+     ACPI_TABLE_HEADER       *Table)
+ {
+ 
+-    (void) AcpiDmDumpTable (Table->Length, sizeof (ACPI_TABLE_HEADER), Table,
++    (void) AcpiDmDumpTable (Table->Length, sizeof (ACPI_TABLE_HEADER),
++        (void *) (Table + sizeof (*Table)),
+         Table->Length - sizeof (*Table), AcpiDmTableInfoSlic);
+ }
+ 
+-- 
+2.45.2
+

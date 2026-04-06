@@ -1,0 +1,34 @@
+From ee24cf237226da85eca6d4682248ab43e1d35f5c Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@redhat.com>
+Date: Sat, 14 Jun 2025 16:32:21 +0200
+Subject: [PATCH] Ignore environment variables set by pytest-xdist
+
+Signed-off-by: Nils Philippsen <nils@redhat.com>
+---
+ psutil/tests/test_process.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/psutil/tests/test_process.py b/psutil/tests/test_process.py
+index 6e6fef59..50fa6d0a 100755
+--- a/psutil/tests/test_process.py
++++ b/psutil/tests/test_process.py
+@@ -1512,7 +1512,15 @@ class TestProcess(PsutilTestCase):
+     @pytest.mark.skipif(not HAS_ENVIRON, reason="not supported")
+     def test_environ(self):
+         def clean_dict(d):
+-            exclude = ["PLAT", "HOME", "PYTEST_CURRENT_TEST", "PYTEST_VERSION"]
++            exclude = [
++                "PLAT",
++                "HOME",
++                "PYTEST_CURRENT_TEST",
++                "PYTEST_VERSION",
++                "PYTEST_XDIST_TESTRUNUID",
++                "PYTEST_XDIST_WORKER",
++                "PYTEST_XDIST_WORKER_COUNT",
++            ]
+             if MACOS:
+                 exclude.extend([
+                     "__CF_USER_TEXT_ENCODING",
+-- 
+2.49.0
+

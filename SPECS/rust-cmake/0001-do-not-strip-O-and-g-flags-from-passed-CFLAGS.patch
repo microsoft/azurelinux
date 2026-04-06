@@ -1,0 +1,48 @@
+From ca59e59730782291f936c7ba552875494c2f5207 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 5 Mar 2025 15:09:36 +0100
+Subject: [PATCH] do not strip -O and -g flags from passed CFLAGS
+
+---
+ src/lib.rs | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 57d4a43..05e4dd2 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -712,11 +712,6 @@ impl Config {
+             .collect::<String>();
+ 
+         {
+-            // let cmake deal with optimization/debuginfo
+-            let skip_arg = |arg: &OsStr| match arg.to_str() {
+-                Some(s) => s.starts_with("-O") || s.starts_with("/O") || s == "-g",
+-                None => false,
+-            };
+             let mut set_compiler = |kind: &str, compiler: &cc::Tool, extra: &OsString| {
+                 let flag_var = format!("CMAKE_{}_FLAGS", kind);
+                 let tool_var = format!("CMAKE_{}_COMPILER", kind);
+@@ -726,9 +721,6 @@ impl Config {
+                     flagsflag.push("=");
+                     flagsflag.push(extra);
+                     for arg in compiler.args() {
+-                        if skip_arg(arg) {
+-                            continue;
+-                        }
+                         flagsflag.push(" ");
+                         flagsflag.push(arg);
+                     }
+@@ -750,9 +742,6 @@ impl Config {
+                         flagsflag.push("=");
+                         flagsflag.push(extra);
+                         for arg in compiler.args() {
+-                            if skip_arg(arg) {
+-                                continue;
+-                            }
+                             flagsflag.push(" ");
+                             flagsflag.push(arg);
+                         }
+-- 
+2.48.1
+

@@ -1,0 +1,12 @@
+--- b/meson.build
++++ a/meson.build
+@@ -11,7 +11,7 @@
+ 
+ dbus_services_dir = dependency('dbus-1').get_variable(pkgconfig: 'session_bus_services_dir',
+                                                                 pkgconfig_define: ['datadir', get_option('datadir')])
+-sn_watcher_dir = join_paths(get_option('prefix'), get_option('libdir'), 'xapps')
++sn_watcher_dir = join_paths(get_option('prefix'), get_option('libexecdir'), 'xapps')
+ 
+ cdata = configuration_data()
+ cdata.set_quoted('GETTEXT_PACKAGE', 'xapp')
+

@@ -1,0 +1,41 @@
+From 8ab149b9e413a239a074acdba258d2dce019bcf6 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sun, 17 Nov 2024 07:41:31 -0500
+Subject: [PATCH] Use system copy of Natural Earth data
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ mapclassify/tests/test_greedy.py | 2 +-
+ mapclassify/tests/test_rgba.py   | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/mapclassify/tests/test_greedy.py b/mapclassify/tests/test_greedy.py
+index 471364b..9ad526f 100644
+--- a/mapclassify/tests/test_greedy.py
++++ b/mapclassify/tests/test_greedy.py
+@@ -5,7 +5,7 @@ import pytest
+ from ..greedy import greedy
+ 
+ world = geopandas.read_file(
+-    "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
++    "/usr/share/natural-earth-map-data/cultural/ne_110m_admin_0_countries.shp"
+ )
+ sw = libpysal.weights.Queen.from_dataframe(
+     world, ids=world.index.to_list(), silence_warnings=True
+diff --git a/mapclassify/tests/test_rgba.py b/mapclassify/tests/test_rgba.py
+index 36ac447..b62bd10 100644
+--- a/mapclassify/tests/test_rgba.py
++++ b/mapclassify/tests/test_rgba.py
+@@ -10,8 +10,7 @@ from mapclassify.util import get_color_array
+ class TestRGBA:
+     def setup_method(self):
+         world = geopandas.read_file(
+-            "https://naciscdn.org/naturalearth/110m"
+-            "/cultural/ne_110m_admin_0_countries.zip"
++            "/usr/share/natural-earth-map-data/cultural/ne_110m_admin_0_countries.shp"
+         )
+         world["area"] = world.area
+ 
+-- 
+2.50.0
+

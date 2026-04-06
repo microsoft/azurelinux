@@ -1,0 +1,20 @@
+diff --git a/configure.ac b/configure.ac
+index dba6523fd..a506588fa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1894,7 +1894,6 @@ Makefile
+ src/apps/admin/module.mk
+ src/apps/admin/pvfs2-config
+ src/apps/devel/module.mk
+-src/apps/devel/lmdb/module.mk
+ src/apps/karma/module.mk
+ src/apps/vis/module.mk
+ src/apps/fuse/module.mk
+@@ -1918,7 +1917,6 @@ src/common/mgmt/module.mk
+ src/common/security/module.mk
+ src/common/hash/module.mk
+ src/common/token-utils/module.mk
+-src/common/lmdb/module.mk
+ src/io/bmi/module.mk
+ src/io/bmi/bmi_tcp/module.mk
+ src/io/bmi/bmi_gm/module.mk

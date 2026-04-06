@@ -1,0 +1,371 @@
+From 29821ef8025dddc95c122e87afb09d5b3a5ef6ed Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 12 May 2022 10:53:47 +0200
+Subject: [PATCH] Upgrade to 3.84
+
+---
+ Changes                    | 30 ++++++++++++++++++++++++++
+ Cwd.pm                     | 43 ++++++++++----------------------------
+ Cwd.xs                     |  4 ++++
+ Makefile.PL                |  2 +-
+ lib/File/Spec.pm           |  4 ++--
+ lib/File/Spec/AmigaOS.pm   |  2 +-
+ lib/File/Spec/Cygwin.pm    |  2 +-
+ lib/File/Spec/Epoc.pm      |  2 +-
+ lib/File/Spec/Functions.pm |  2 +-
+ lib/File/Spec/Mac.pm       |  2 +-
+ lib/File/Spec/OS2.pm       |  2 +-
+ lib/File/Spec/Unix.pm      |  4 ++--
+ lib/File/Spec/Win32.pm     |  2 +-
+ t/cwd_enoent.t             |  3 +++
+ 14 files changed, 60 insertions(+), 44 deletions(-)
+
+diff --git a/Changes b/Changes
+index 7f04db2..9533c1f 100644
+--- a/Changes
++++ b/Changes
+@@ -1,5 +1,35 @@
+ Revision history for Perl distribution PathTools.
+ 
++3.81
++
++- compare inode numbers as strings (github #18788)
++
++3.80
++
++- use the PerlLIO_*() functions for lstat() and readlink() to support
++  Win32 symlink support added to perl.
++
++- skip a test that assumes getcwd() doesn't return symlinks on Win32, where
++  it can.
++
++3.79
++
++- fix an off-by-one in bsd_realpath()
++
++3.78
++
++- fallback to Internals::getcwd() for getcwd() if available (requires
++  $Config{d_getcwd})
++
++3.77
++
++- don't translate "..." to "..\.." on Win32
++
++3.76
++
++- test t/cwd_enoent.t - also accept ESTALE for a directory that no
++  longer exists (github #16699)
++
+ 3.75
+ - Fix t/abs2rel.t on 5.8.8 by changing mkpath call to be
+   compatible with older File::Path
+diff --git a/Cwd.pm b/Cwd.pm
+index 6a1d2f1..0683583 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+@@ -181,12 +181,6 @@ if ($^O =~ /android/) {
+ }
+ 
+ my $found_pwd_cmd = defined($pwd_cmd);
+-unless ($pwd_cmd) {
+-    # Isn't this wrong?  _backtick_pwd() will fail if someone has
+-    # pwd in their path but it is not /bin/pwd or /usr/bin/pwd?
+-    # See [perl #16774]. --jhi
+-    $pwd_cmd = 'pwd';
+-}
+ 
+ # Lazy-load Carp
+ sub _carp  { require Carp; Carp::carp(@_)  }
+@@ -213,26 +207,13 @@ sub _backtick_pwd {
+ # we take care not to override an existing definition for cwd().
+ 
+ unless ($METHOD_MAP{$^O}{cwd} or defined &cwd) {
+-    # The pwd command is not available in some chroot(2)'ed environments
+-    my $sep = $Config::Config{path_sep} || ':';
+-    my $os = $^O;  # Protect $^O from tainting
+-
+-
+-    # Try again to find a pwd, this time searching the whole PATH.
+-    if (defined $ENV{PATH} and $os ne 'MSWin32') {  # no pwd on Windows
+-	my @candidates = split($sep, $ENV{PATH});
+-	while (!$found_pwd_cmd and @candidates) {
+-	    my $candidate = shift @candidates;
+-	    $found_pwd_cmd = 1 if -x "$candidate/pwd";
+-	}
+-    }
+-
+     if( $found_pwd_cmd )
+     {
+ 	*cwd = \&_backtick_pwd;
+     }
+     else {
+-	*cwd = \&getcwd;
++        # getcwd() might have an empty prototype
++	*cwd = sub { getcwd(); };
+     }
+ }
+ 
+@@ -275,7 +256,7 @@ sub fastcwd_ {
+ 	($odev, $oino) = ($cdev, $cino);
+ 	CORE::chdir('..') || return undef;
+ 	($cdev, $cino) = stat('.');
+-	last if $odev == $cdev && $oino == $cino;
++	last if $odev == $cdev && $oino eq $cino;
+ 	opendir(DIR, '.') || return undef;
+ 	for (;;) {
+ 	    $direntry = readdir(DIR);
+@@ -284,7 +265,7 @@ sub fastcwd_ {
+ 	    next if $direntry eq '..';
+ 
+ 	    ($tdev, $tino) = lstat($direntry);
+-	    last unless $tdev != $odev || $tino != $oino;
++	    last unless $tdev != $odev || $tino ne $oino;
+ 	}
+ 	closedir(DIR);
+ 	return undef unless defined $direntry; # should never happen
+@@ -298,7 +279,7 @@ sub fastcwd_ {
+ 	&& CORE::chdir($1) or return undef;
+     ($cdev, $cino) = stat('.');
+     die "Unstable directory path, current directory changed unexpectedly"
+-	if $cdev != $orig_cdev || $cino != $orig_cino;
++	if $cdev != $orig_cdev || $cino ne $orig_cino;
+     $path;
+ }
+ if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
+@@ -315,7 +296,7 @@ sub chdir_init {
+     if ($ENV{'PWD'} and $^O ne 'os2' and $^O ne 'dos' and $^O ne 'MSWin32') {
+ 	my($dd,$di) = stat('.');
+ 	my($pd,$pi) = stat($ENV{'PWD'});
+-	if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd) {
++	if (!defined $dd or !defined $pd or $di ne $pi or $dd != $pd) {
+ 	    $ENV{'PWD'} = cwd();
+ 	}
+     }
+@@ -328,7 +309,7 @@ sub chdir_init {
+     if ($^O ne 'MSWin32' and $ENV{'PWD'} =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
+ 	my($pd,$pi) = stat($2);
+ 	my($dd,$di) = stat($1);
+-	if (defined $pd and defined $dd and $di == $pi and $dd == $pd) {
++	if (defined $pd and defined $dd and $di ne $pi and $dd == $pd) {
+ 	    $ENV{'PWD'}="$2$3";
+ 	}
+     }
+@@ -430,7 +411,7 @@ sub _perl_abs_path
+ 	    $! = $e;
+ 	    return undef;
+ 	}
+-	if ($pst[0] == $cst[0] && $pst[1] == $cst[1])
++	if ($pst[0] == $cst[0] && $pst[1] eq $cst[1])
+ 	{
+ 	    $dir = undef;
+ 	}
+@@ -448,7 +429,7 @@ sub _perl_abs_path
+ 		$tst[0] = $pst[0]+1 unless (@tst = lstat("$dotdots/$dir"))
+ 	    }
+ 	    while ($dir eq '.' || $dir eq '..' || $tst[0] != $pst[0] ||
+-		   $tst[1] != $pst[1]);
++		   $tst[1] ne $pst[1]);
+ 	}
+ 	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
+ 	closedir(PARENT);
+@@ -820,9 +801,7 @@ C<fast_abs_path()>.
+ 
+ =head1 AUTHOR
+ 
+-Originally by the perl5-porters.
+-
+-Maintained by Ken Williams <KWILLIAMS@cpan.org>
++Maintained by perl5-porters <F<perl5-porters@perl.org>>.
+ 
+ =head1 COPYRIGHT
+ 
+diff --git a/Cwd.xs b/Cwd.xs
+index 223e1a6..4fda057 100644
+--- a/Cwd.xs
++++ b/Cwd.xs
+@@ -15,6 +15,10 @@
+ #  include "ppport.h"
+ #endif
+ 
++#if defined(HAS_READLINK) && !defined(PerlLIO_readlink)
++#define PerlLIO_readlink readlink
++#endif
++
+ #ifdef I_UNISTD
+ #   include <unistd.h>
+ #endif
+diff --git a/Makefile.PL b/Makefile.PL
+index 11e04af..0311708 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -16,7 +16,7 @@ push @extra, 'LICENSE' => 'perl_5'
+ push @extra, 'META_MERGE' => {
+         resources => {
+             repository  => 'git://perl5.git.perl.org/perl.git',
+-            bugtracker  => 'https://rt.perl.org/rt3/',
++            bugtracker  => 'https://github.com/Perl/perl5/issues',
+             homepage    => "http://dev.perl.org/",
+             license     => [ 'http://dev.perl.org/licenses/' ],
+         },
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index 30d883b..e0a49ed 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -2,7 +2,7 @@ package File::Spec;
+ 
+ use strict;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+@@ -316,7 +316,7 @@ L<ExtUtils::MakeMaker>
+ 
+ =head1 AUTHOR
+ 
+-Currently maintained by Ken Williams C<< <KWILLIAMS@cpan.org> >>.
++Maintained by perl5-porters <F<perl5-porters@perl.org>>.
+ 
+ The vast majority of the code was written by
+ Kenneth Albanowski C<< <kjahds@kjahds.com> >>,
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index fd9da81..a29617c 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index 953c233..e21c0bb 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index fcb9e89..2429bb2 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index e14ad2f..a09150c 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 8026edc..369d1f0 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index 3c35ba9..604e2e3 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index c06d18f..52904b4 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+@@ -530,7 +530,7 @@ Copyright (c) 2004 by the Perl 5 Porters.  All rights reserved.
+ This program is free software; you can redistribute it and/or modify
+ it under the same terms as Perl itself.
+ 
+-Please submit bug reports and patches to perlbug@perl.org.
++Please submit bug reports at L<https://github.com/Perl/perl5/issues>.
+ 
+ =head1 SEE ALSO
+ 
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index 1537442..b05b535 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.80';
++our $VERSION = '3.84';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index 2e94bad..0fe3834 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -31,6 +31,9 @@ foreach my $type (qw(regular perl)) {
+ 	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
+ 	    if $type eq 'regular' && $^O eq 'dragonfly';
+ 
++	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
++	    if $type eq 'regular' && $^O eq 'haiku';
++
+ 	no warnings "redefine";
+ 	local *Cwd::abs_path = \&Cwd::_perl_abs_path if $type eq "perl";
+ 	local *Cwd::getcwd = \&Cwd::_perl_getcwd if $type eq "perl";
+-- 
+2.34.3
+

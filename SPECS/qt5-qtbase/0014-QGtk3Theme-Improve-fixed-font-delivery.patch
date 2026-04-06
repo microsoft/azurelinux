@@ -1,0 +1,84 @@
+From 9628ad303ad924255a224fdcc113ff8264172fc7 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:44:11 +0200
+Subject: [PATCH 14/15] QGtk3Theme: Improve fixed font delivery
+
+The gtk_fixed widget was used as a reference to obtain a fixed font
+and HeaderViewFont.
+
+This is a mistake, because the gtk_fixed widget is a container for
+other widgets with fixed geometries and no layouting.
+
+This patch makes the default style being used for a fixed font and, as
+a drive-by, the combo box as a reference for a header view font.
+A monospace based css provider as explicitly added to the style
+context, in case a fixed font is requested. The provider is removed
+afterwards.
+---
+ .../platformthemes/gtk3/qgtk3interface.cpp    | 24 +++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+index 0fab1220b4..21abea81cf 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+@@ -18,6 +18,7 @@
+ #include <QtCore/QMetaEnum>
+ #include <QtCore/QSettings>
+ #include <QtCore/QFileInfo>
++#include <QtCore/QScopeGuard>
+ #include <QtGui/QFontDatabase>
+ #include <QtGui/QIcon>
+ 
+@@ -538,13 +539,13 @@ inline constexpr QGtk3Interface::QGtkWidget QGtk3Interface::toWidgetType(QPlatfo
+     case QPlatformTheme::ToolButtonFont: return QGtkWidget::gtk_button;
+     case QPlatformTheme::ItemViewFont: return QGtkWidget::gtk_entry;
+     case QPlatformTheme::ListViewFont: return QGtkWidget::gtk_tree_view;
+-    case QPlatformTheme::HeaderViewFont: return QGtkWidget::gtk_fixed;
++    case QPlatformTheme::HeaderViewFont: return QGtkWidget::gtk_combo_box;
+     case QPlatformTheme::ListBoxFont: return QGtkWidget::gtk_Default;
+     case QPlatformTheme::ComboMenuItemFont: return QGtkWidget::gtk_combo_box;
+     case QPlatformTheme::ComboLineEditFont: return QGtkWidget::gtk_combo_box_text;
+     case QPlatformTheme::SmallFont: return QGtkWidget::gtk_Default;
+     case QPlatformTheme::MiniFont: return QGtkWidget::gtk_Default;
+-    case QPlatformTheme::FixedFont: return QGtkWidget::gtk_fixed;
++    case QPlatformTheme::FixedFont: return QGtkWidget::gtk_Default;
+     case QPlatformTheme::GroupBoxTitleFont: return QGtkWidget::gtk_Default;
+     case QPlatformTheme::TabButtonFont: return QGtkWidget::gtk_button;
+     case QPlatformTheme::EditorFont: return QGtkWidget::gtk_entry;
+@@ -624,6 +625,24 @@ QFont QGtk3Interface::font(QPlatformTheme::Font type) const
+     if (!con)
+         return QFont();
+ 
++    // explicitly add provider for fixed font
++    GtkCssProvider *cssProvider = nullptr;
++    if (type == QPlatformTheme::FixedFont) {
++        cssProvider = gtk_css_provider_new();
++        const char *fontSpec = "{font-family: monospace;}";
++        gtk_css_provider_load_from_data(cssProvider, fontSpec, -1, NULL);
++        gtk_style_context_add_provider(con, GTK_STYLE_PROVIDER(cssProvider),
++                                       GTK_STYLE_PROVIDER_PRIORITY_USER);
++    }
++
++    // remove monospace provider from style context and unref it
++    QScopeGuard guard([&](){
++        if (cssProvider) {
++            gtk_style_context_remove_provider(con, GTK_STYLE_PROVIDER(cssProvider));
++            g_object_unref(cssProvider);
++        }
++    });
++
+     const PangoFontDescription *gtkFont = gtk_style_context_get_font(con, GTK_STATE_FLAG_NORMAL);
+     if (!gtkFont)
+         return QFont();
+@@ -650,6 +669,7 @@ QFont QGtk3Interface::font(QPlatformTheme::Font type) const
+             font.setFamily("monospace");
+         }
+     }
++
+     return font;
+ }
+ 
+-- 
+2.41.0
+

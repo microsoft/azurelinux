@@ -1,0 +1,3722 @@
+diff -up ./esc/src/app/esc.js.fix4 ./esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix4	2019-01-10 16:19:14.676953557 -0800
++++ ./esc/src/app/esc.js	2019-01-10 16:19:22.530914751 -0800
+@@ -23,7 +23,14 @@ const Gio = imports.gi.Gio;
+ const GObject = imports.gi.GObject;
+ const Pango = imports.gi.Pango;
+ const GLib = imports.gi.GLib;
++const PhoneHome = imports.phoneHome;
++const OperationDialog = imports.operationDialog;
++const PinDialog = imports.pinDialog;
++const ESC_CONFIG_FILE_NAME = "esc.conf";
++const ESC_CONFIG_GROUP = "ESC";
++const ESC_PWORD_FILE = "pword";
+ 
++const UNKNOWN_LABEL = "unknown";
+ const CoolKeyNotifyIface = '<node> \
+ <interface name="com.jmagne.CoolKeyNotify"> \
+ <method name="notifyCoolKeyEvent"> \
+@@ -36,6 +43,25 @@ const CoolKeyNotifyIface = '<node> \
+ </interface> \
+ </node>';
+ 
++
++// Get application folder and add it into the imports path
++function getAppFileInfo() {
++    let stack = (new Error()).stack,
++        stackLine = stack.split('\n')[1],
++        coincidence, path, file;
++
++    if (!stackLine) throw new Error('Can not find path!');
++
++    coincidence = new RegExp('@(.+):\\d+').exec(stackLine);
++    if (!coincidence) throw new Error('Could not find current file!');
++
++    path = coincidence[1];
++    file = Gio.File.new_for_path(path);
++    return [file.get_path(), file.get_parent().get_path(), file.get_basename()];
++}
++const path = getAppFileInfo()[1];
++
++
+ const CoolKeyNotify = new Lang.Class({
+     Name: 'CoolKeyNotify',
+ 
+@@ -73,8 +99,20 @@ class ESC {
+         this.application = new Gtk.Application();
+         this.application.connect('activate', this._onActivate.bind(this));
+         this.application.connect('startup', this._onStartup.bind(this));
++        this._selectedTokenInfo = null;
++        this._notifyCallback = null;
++        this._currentDir = path;
+     }
+ 
++    _setNotifyCallback(cb) {
++        this._notifyCallback = cb;
++
++    }
++
++    _clearNotifyCallback() {
++        this._notifyCallback = null;
++     }
++
+     _onActivate() {
+         this._window.present();
+     }
+@@ -94,6 +132,28 @@ class ESC {
+          }
+      }
+ 
++   _onCertDetail() {
++       this._promptPin();
++    }
++
++   _onFormat() {
++        this._operationMgr = new OperationDialog.operationDialog(this);
++        this._operationMgr.launchOperation(this._selectedTokenInfo,OperationDialog.OP_FORMAT);
++    }
++
++    _onEnroll() {
++        this._operationMgr = new OperationDialog.operationDialog(this);
++        this._operationMgr.launchOperation(this._selectedTokenInfo,OperationDialog.OP_ENROLL);
++    }
++
++    _onResetPin() {
++       this._operationMgr = new OperationDialog.operationDialog(this);
++       this._operationMgr.launchOperation(this._selectedTokenInfo,OperationDialog.OP_PIN_RESET);
++    }
++
++   _onPhoneHome() {
++       this._phoneHomeMgr.getPhoneHomeInfo(this._selectedTokenInfo,true);
++    }
+     _onExit() {
+         if(this.notify) {
+             this.notify._dbusImpl.unexport();
+@@ -115,6 +175,9 @@ class ESC {
+                this._removeCoolkey(aKeyType, aKeyID, aKeyState, aData, strData);
+             break;
+             default:
++               if(this._notifyCallback) {
++                   this._notifyCallback(aKeyType, aKeyID,aKeyState, aData,strData);
++               }
+             break;
+         }
+     }
+@@ -126,10 +189,10 @@ class ESC {
+             break;
+ 
+             case 2:
+-                return "unitialized";
++                return "uninitialized";
+             break;
+             case 1:
+-                return "no applet";
++                return "unknown";
+             break;
+             default:
+                 return "unknown";
+@@ -137,8 +200,12 @@ class ESC {
+         }
+      }
+ 
+-    _insertCoolkey(aKeyType, aKeyID, aKeyState, aData, strData) {
++    _phoneHome(url) {
++        let info = this.mgr.phone_home(url); 
++        return info;
++     }
+ 
++    _insertCoolkey(aKeyType, aKeyID, aKeyState, aData, strData) {
+          if(aKeyType && aKeyID) {
+ 
+              let inserted = new Coolkey.Token({ key_type: String(aKeyType) ,
+@@ -146,8 +213,68 @@ class ESC {
+ 
+              this.mgr.get_token_info(inserted);
+ 
++             let issuer = inserted.issuer;
++             let issuedTo = inserted.issued_to;
++
++             if(issuer == null || issuer.length == 0) {
++                 issuer = "unknown";
++             }
++             if(issuedTo == null || issuedTo.length == 0) {
++                 issuedTo = "unknown";
++             }
+              this._tokenStore.set (this._tokenStore.append(), [0, 1, 2, 3, 4],
+-                [inserted.issuer, inserted.issued_to, this._getStatusString(inserted.status), aKeyID,aKeyType]);
++                [issuer, issuedTo, this._getStatusString(inserted.status), aKeyID,aKeyType]);
++
++             let [ isSelected, iter]  = this._tokenStore.get_iter_first();
++
++              while(isSelected) {
++                  if(aKeyID == this._tokenStore.get_value(iter,3)) {
++                      this.selection.select_iter(iter);
++                      break;
++                  }
++                  isSelected  = this._tokenStore.iter_next(iter);
++              }
++
++         }
++     }
++
++     _updateCoolkey(originalKey) {
++         if(originalKey) {
++             this._removeCoolkey(originalKey.key_type, originalKey.cuid,null, null, null);
++             this._insertCoolkey(originalKey.key_type, originalKey.cuid,null, null, null);
++         }
++
++     }
++     _updateOperationsArea(insertedToken, doReset) {
++         if(!insertedToken && !doReset) {
++             return;
++         }
++     
++         if(doReset) {
++             this._operationsGrid.remove(this._phoneHomeButton);
++             this._operationsGrid.remove(this._enrollButton);
++             this._operationsGrid.remove(this._resetPinButton);
++             this._operationsGrid.remove(this._formatButton);
++             this._operationsGrid.remove(this._certDetailButton);
++             this._operationsGrid.show_all();
++             return;
++         }
++ 
++         if(insertedToken.is_a_cool_key) {   
++             this._operationsGrid.add(this._phoneHomeButton);
++             this._operationsGrid.add(this._formatButton);
++             if(insertedToken.status == 2 ) {
++                 this._operationsGrid.add(this._enrollButton);
++             }
++          
++             // if enrolled 
++             if(insertedToken.status == 4) { 
++                 this._operationsGrid.add(this._enrollButton);
++                 this._operationsGrid.add(this._resetPinButton);
++                 this._operationsGrid.add(this._certDetailButton);
++             }
++
++             this._operationsGrid.show_all();
+          }
+      }
+ 
+@@ -158,10 +285,13 @@ class ESC {
+               if(aKeyID == this._tokenStore.get_value(iter,3)) {
+                   this._tokenStore.remove(iter);
+                   this._tokenInfoBuffer.text = "";
++                  this._updateOperationsArea(null,true);
+                   return;
+               }
+               isSelected  = this._tokenStore.iter_next(iter);
+          }
++
++         this._updateOperationsArea(null,true);
+      }
+ 
+     _updateTokenInfoTextView(coolkey_token) {
+@@ -172,9 +302,160 @@ class ESC {
+         let atr  = coolkey_token.atr;
+         let issuer_info = coolkey_token.issuer_info;
+ 
+-        this._tokenInfoBuffer.text = "Token ID: " + cuid + "\n" 
++        this._tokenInfoBuffer.text = "Token ID: " + cuid + "\n"
+              + "ATR: " + atr + "\n"
+-             + "Token Issuer URL: " + issuer_info + "\n";
++             + "Token Issuer URL: " + issuer_info + "\n"
++             + "Token is a CoolKey: " + coolkey_token.is_a_cool_key + "\n\n\n " ;
++
++     }
++
++     _getCertListDetail(certsList,pFileName) {
++
++          let i = 0;
++          let detail = "\n\nCerts In Detail \n\n";
++          let curDetail = "";
++          if(certsList == null) {
++             return null;
++          }
++
++          //right now for some reason specifying a nickname will list all certs
++          for(i = 0 ; i < 1; i++ ) {
++              curDetail = this._getCertDetail(certsList[i],pFileName); 
++
++              if(curDetail.length < 100) {
++                  detail += "Error finding cert detail.";
++              } else {
++                  detail += curDetail + "\n";
++              }
++          }
++
++          return detail;    
++
++     }
++
++     _getCertDetail(certObj, pFileName) {
++         if(certObj == null || pFileName == null) {
++             return null;
++         }
++
++         let certDetail = "";
++         let token = "";
++         let nick = "";
++         if(certObj.token == null) 
++             token = "internal"; 
++         else
++             token = certObj.token;
++
++         nick = certObj.nick;
++ 
++         certDetail = this._execProgram(['/usr/bin/certutil','-L','-d', this._getConfigPath(), '-h', token, '-f' , pFileName, '-n', token + ":" + nick]);
++
++         return certDetail;
++     }
++
++     _getCertList(coolkey_token,pFileName) {
++
++        let certInfo = "";
++
++        certInfo =  this._execProgram(['/usr/bin/certutil','-L','-d', this._getConfigPath(), '-h', 'all', '-f' , pFileName]);
++
++        let certs = this._parseCertList(certInfo);
++
++        let i = 0;
++        let certsInfo = "Certificate List\n";
++
++        if(certs.length == 0 ) {
++            certsInfo = certsInfo + "No Certificates Found\n";
++            return certsInfo;
++        }
++      
++        for(i = 0 ; i < certs.length; i++ ) {
++            certsInfo += "\n" + certs[i].token + " : " + certs[i].nick +  "\n";
++        }
++
++        certsInfo += this._getCertListDetail(certs,pFileName) + "\n";
++
++        return certsInfo;
++     }
++
++     _parseCertList(listStr) {
++
++         if(!listStr)
++            return;
++
++         let lines = listStr.split('\n');
++
++         let line = "";
++         let i = 0;
++         let token = "";
++         let nick = "";
++
++         let certlist = [];
++         for(i = 3 ; i < lines.length; i++) {
++
++             token = "";
++             nick = "";
++             let index = lines[i].search(/,/i);
++
++             if(index > 0) {
++                 line = lines[i];
++                 index -= 2;
++                 line = line.substring(0,index);
++                 line = line.trim();
++
++                 let sepIndex = line.indexOf(":");
++
++                 if(sepIndex > 0 ) {
++
++                     let res = line.split(":");
++
++                      if(res.length == 2) {
++                         token = res[0];
++                          nick = res[1];
++                      } else {
++                          token = "";
++                          nick = line;
++                      }
++                 
++                     certlist.push({
++                         token: token,
++                         nick: nick,
++                         certDetail: ""
++                     });
++                 }
++             }
++
++
++         }
++     
++         return certlist;   
++     }
++
++    _execProgram(args) {
++
++        let result = -1;
++        try {
++            let proc = new Gio.Subprocess({
++                argv: args ,
++                flags: Gio.SubprocessFlags.STDOUT_PIPE
++            });
++
++            proc.init(null);
++
++            let [res,stdoutb,stderrb] =  proc.communicate_utf8(null,null);
++
++            if(res == false) {
++               result = -1;
++               return result;
++            }
++
++            result = stdoutb.toString();
++
++        } catch (e) {
++            return result;
++        }
++
++        return result;
+      }
+ 
+     _onTokenTreeViewSelectionChanged()  {
+@@ -188,9 +469,78 @@ class ESC {
+              cuid: this._tokenStore.get_value(iter,3) } );
+ 
+         this.mgr.get_token_info(selected);
++        this._updateOperationsArea(selected,true);
++        this._updateOperationsArea(selected,false);
++        this._selectedTokenInfo = selected;
+         this._updateTokenInfoTextView(selected);
+     }
+ 
++    _configValueWithKeyID(aKeyID,configValue) {
++        if(!configValue || !aKeyID)
++            return null;
++
++        return configValue + "-" + aKeyID;
++
++    }
++
++    _setConfigValue(name,value) {
++        if(!this._configFile) {
++            return;
++        }
++
++        try {
++            this._configFile.set_string(ESC_CONFIG_GROUP,name,value);
++            this._configFile.save_to_file(this._configFileName);
++        } catch(e) {
++            return;
++        }
++    }
++
++    _getConfigValue(name) {
++         if(!this._configFile) {
++             return null;
++         }
++
++         let value = null;
++         try {
++             value = this._configFile.get_string(ESC_CONFIG_GROUP,name);
++         } catch(e) {
++             return null;
++         }
++
++         return value;
++     }
++
++    _getPropertyValue(name) {
++         if(!this._propFile) {
++             return null;
++         }
++
++         let value = null;
++         try {
++             value = this._propFile.get_string(ESC_CONFIG_GROUP,name);
++         } catch(e) {
++             return null;
++         }
++
++         return value;
++     }
++
++    _initProperties() {
++
++         this._propFile = new GLib.KeyFile();    
++
++         this._propFileName =  this._currentDir + "/esc.properties";
++         let res = false;
++         try {
++             res = this._propFile.load_from_file (this._propFileName,  0 );
++         } catch(e) {
++             this._onExitClicked();
++             //IO error
++         }
++
++
++    }
+     _initConfig() {
+          // See if it exists already, otherwise create
+          this._configFile =  new GLib.KeyFile();
+@@ -208,17 +558,17 @@ class ESC {
+              }
+          }
+ 
+-         let config_name = this._configPath + "/esc.conf";
++         this._configFileName = this._configPath + "/esc.conf";
+          let res = false;
+          try {
+-             res = this._configFile.load_from_file (config_name,  0 );
++             res = this._configFile.load_from_file (this._configFileName,  0 );
+          } catch(e) {
+              // need to create config file
+          }
+ 
+          if (res == false) {
+              this._configFile.set_string("ESC","name","Smart Card Utility");
+-             res = this._configFile.save_to_file(config_name); 
++             this._configFile.save_to_file(this._configFileName); 
+          } 
+      }
+ 
+@@ -235,24 +585,30 @@ class ESC {
+                 this._window.set_icon_name('application-x-executable');
+             }
+ 
+-            this._hb = new Gtk.HeaderBar();
++            this._hb = new Gtk.HeaderBar({spacing: 10 });
+             this._hb.set_title("Smart Card Manager");
+             this._hb.set_show_close_button(true);
+-            this._window.set_titlebar(this._hb);
+ 
+-            this._headerTokenBox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,halign: Gtk.Align.CENTER});
+-            this._headerInfoBox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL,halign: Gtk.Align.CENTER});
++            this._window.set_titlebar(this._hb);
+ 
+             this._infoLabel = new Gtk.Label({label: "<b>Token Information</b>",use_markup: true});
+             this._tokenLabel = new Gtk.Label({label: "<b>Tokens</b>",use_markup: true});
+ 
+-            this._headerInfoBox.add(this._infoLabel);
++            this._vSep = new Gtk.VSeparator();
++
++            this._hb.add(this._tokenLabel);
++            this._hb.pack_end(this._infoLabel);
++            //this._hb.add(this._vSep);
+ 
+-            this._headerTokenBox.add(this._tokenLabel);
+ 
+             this._initConfig();
++            this._initProperties();
++
++            this._statusMessages = null; 
++            this._getStatusMessages();
++         
+             this._outerGrid = new Gtk.Grid({orientation: Gtk.Orientation.HORIZONTAL, border_width: 0});
+-            this._tokenFrame = new Gtk.Frame({hexpand: true});
++            this._tokenFrame = new Gtk.Frame({hexpand: false, width_request: 300});
+             this._infoFrame  = new Gtk.Frame({border_width: 0});
+             
+             this._tokenBox = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, border_width: 0,hexpand: true});
+@@ -280,33 +636,33 @@ class ESC {
+ 
+              // Create the treeview
+             this._tokenTreeView = new Gtk.TreeView ({
+-                expand: true,
++                hexpand: true,
++                vexpand: true,
+                 model: this._tokenStore });
+ 
+             let issuer = new Gtk.TreeViewColumn ({ title: "Issuer" });
+             let issuedTo = new Gtk.TreeViewColumn ({ title: "Issued To" });
+             let status = new Gtk.TreeViewColumn ({ title: "Status" });
+-            let tokenId = new Gtk.TreeViewColumn({ title: "Token Id"});
++            //let tokenId = new Gtk.TreeViewColumn({ title: "Token Id"});
+ 
+             let bold = new Gtk.CellRendererText ({
+-              weight: Pango.Weight.BOLD });
+-
++              weight: Pango.Weight.BOLD});
+             let normal = new Gtk.CellRendererText ();
+ 
+             issuer.pack_start (bold, true);
+             issuedTo.pack_start (normal, true);
+             status.pack_start (normal, true);
+-            tokenId.pack_start(normal,true);
++            //tokenId.pack_start(normal,true);
+  
+             issuer.add_attribute (bold, "text", 0);
+             issuedTo.add_attribute (normal, "text", 1);
+             status.add_attribute (normal, "text", 2);
+-            tokenId.add_attribute(normal,"text",3);
++            //tokenId.add_attribute(normal,"text",3);
+ 
+             this._tokenTreeView.insert_column (issuer, 0);
+             this._tokenTreeView.insert_column (issuedTo, 1);
+             this._tokenTreeView.insert_column (status, 2);
+-            this._tokenTreeView.insert_column (tokenId, 3);
++            //this._tokenTreeView.insert_column (tokenId, 3);
+ 
+             // Connect view slection to a method
+             this._label = new Gtk.Label ({ label: "" });
+@@ -329,37 +685,175 @@ class ESC {
+                 hscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                 vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                 shadow_type: Gtk.ShadowType.ETCHED_IN,
+-                height_request: 400,
+-                width_request: 400, });
++                height_request: 500,
++                width_request: 400 });
+            
+             this._scrolledTokenInfoWindow.add_with_viewport (this._tokenInfoTextView);
+-            this._infoBox.add(this._headerInfoBox);
++            //this._infoBox.add(this._headerInfoBox);
++
++            //this._escImage = new Gtk.Image({file: this._currentDir + "/" + "enrolled-keyx2.png"});
++            //this._infoBox.add(this._escImage);
+             this._infoBox.add(this._scrolledTokenInfoWindow);
+-            this._operationsGrid =  new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, 
++
++            this._operationsGrid =  new Gtk.Grid({orientation: Gtk.Orientation.HORIZONTAL, 
+                 halign: Gtk.Align.CENTER,
+                 valign: Gtk.Align.CENTER,
+-                row_spacing: 20,
+-                border_width: 0});
++                row_spacing: 10,
++                column_spacing: 6,
++                border_width: 6});
+ 
+             this._operationsLabel = new Gtk.Label({label: "<b>Operations</b>", use_markup: true});
++
++            this._certDetailButton = new Gtk.Button({ label: "Cert Info" });
++            this._certDetailButton.connect("clicked", this._onCertDetail.bind(this));
++
++
+             this._infoBox.add(this._operationsGrid); 
+-            this._operationsGrid.add(this._operationsLabel);
+ 
+             this._exitButton = new Gtk.Button({ label: "Exit" });
+             this._exitButton.connect("clicked", this._onExit.bind(this));
++
+             this._operationsGrid.add(this._exitButton);
+-           
+-            this._tokenBox.add(this._headerTokenBox);
++            
++            this._operationsGrid.add(this._operationsLabel);
++            // operations buttons
++
++
++            this._phoneHomeButton = new Gtk.Button({ label: "Phone Home" });
++            this._phoneHomeButton.connect("clicked", this._onPhoneHome.bind(this));
++          
++            this._formatButton = new Gtk.Button({ label: "Format" });
++            this._formatButton.connect("clicked", this._onFormat.bind(this));
++
++            this._enrollButton = new Gtk.Button({ label: "Enroll" });
++            this._enrollButton.connect("clicked", this._onEnroll.bind(this));
++
++            this._resetPinButton = new Gtk.Button({ label: "Reset Pin" });
++            this._resetPinButton.connect("clicked", this._onResetPin.bind(this));
++
+             this._tokenBox.add(this._tokenTreeView);
+ 
+-            this._window.set_default_size(750, 550);
++            this._window.set_default_size(950, 500);
+             this._window.connect('destroy',this._onWindowDestroy.bind(this));
+             this._window.show_all();
++           
+     } 
+     _createCoolKeyMgr(dbusName) {
+-        this.mgr = new Coolkey.Mgr({ dbusUniqueName: dbusName, config_dir: this._configPath});
+-        //this.mgr.speak("Welcome to ESC...");
++        this.mgr = new Coolkey.Mgr({ dbusUniqueName: dbusName, config_dir: this._configPath, config_file_name: ESC_CONFIG_FILE_NAME });
++
++        this._phoneHomeMgr = new PhoneHome.phoneHome(this);
++       
++        if(!this.mgr || !this._phoneHomeMgr) {
++            this._onExitClicked(); 
++        }
+     }
++
++    _alert(msg) {
++        this._messageDialog = new Gtk.MessageDialog ({
++            transient_for: this._window,
++            modal: true,
++            buttons: Gtk.ButtonsType.OK,
++            message_type: Gtk.MessageType.WARNING,
++            text: msg });
++
++        this._messageDialog.connect ('response', Lang.bind(this, this._response_cb));
++        this._messageDialog.show();
++    }
++
++    _promptPin() {
++
++        let status = this._selectedTokenInfo.status;
++
++        if(status == 4 /* enrolled */) {
++            this._pinMgr = new PinDialog.pinDialog(this);
++            this._pinMgr.launchPinPrompt(this._promptPinDone.bind(this));
++        }
++      
++    }
++    _promptPinDone(tempFileName) {
++
++        let coolkey_token = this._selectedTokenInfo;
++
++        this._tokenInfoBuffer.text += 
++              this._getCertList(coolkey_token,tempFileName)  + "\n";
++
++     }
++    _response_cb() {
++        if(this._messageDialog) {
++            this._messageDialog.destroy();
++        }
++        this._messageDialog = null;
++    }
++    _getConfigPath() {
++        return this._configPath;
++    }
++
++    _getStatusMessages() {
++
++        this._statusMessages = new Array(
++            this._getPropertyValue("errorNone"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorProblemCommToken"),
++            this._getPropertyValue("errorProblemResetTokenPin"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorLifeCyclePDU"),
++            this._getPropertyValue("errorTokenEnrollment"),
++            this._getPropertyValue("errorProblemCommToken"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorTermSecureConn"),
++            this._getPropertyValue("errorAuthFailure"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorTokenDisabled"),
++            this._getPropertyValue("errorSecureChannel"),
++            this._getPropertyValue("errorServerMisconfig"),
++            this._getPropertyValue("errorTokenUpgrade"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorExternalAuth"),
++            this._getPropertyValue("errorInvalidTokenType"),
++            this._getPropertyValue("errorInvalidTokenTypeParams"),
++            this._getPropertyValue("errorCannotPublish"),
++            this._getPropertyValue("errorCommTokenDB"),
++            this._getPropertyValue("errorTokenSuspended"),
++            this._getPropertyValue("errorPinResetable"),
++            this._getPropertyValue("errorConnLost"),
++            this._getPropertyValue("errorEntryTokenDB"),
++            this._getPropertyValue("errorNoTokenState"),
++            this._getPropertyValue("errorInvalidLostTokenReason"),
++            this._getPropertyValue("errorTokenUnusable"),
++            this._getPropertyValue("errorNoInactiveToken"),
++            this._getPropertyValue("errorProcessMultiTokens"),
++            this._getPropertyValue("errorTokenTerminated"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorKeyRecoveryFailed"),
++            this._getPropertyValue("errorInternalServer"),
++            this._getPropertyValue("errorKeyArchival"),
++            this._getPropertyValue("errorConnTKS"),
++            this._getPropertyValue("errorFailUpdateTokenDB"),
++            this._getPropertyValue("errorCertRevocation"),
++            this._getPropertyValue("errorNotOwnToken"),
++            this._getPropertyValue("errorESCMisconfigured"),
++            this._getPropertyValue("errorESCNoCommCardReader"),
++            this._getPropertyValue("errorESCNoTokenSession"),
++            this._getPropertyValue("errorESCNoTalkTPS"),
++            this._getPropertyValue("errorESCNoTalkTokenReader")
++        );
++
++    }
++
++    _getErrorMessage(status_code) {
++        let result =  this._getPropertyValue("errorInternalServer");
++
++        if(status_code < 0 && status_code >= this._statusMessages.length)
++        {
++            return result;
++        }   
++      
++        return this._statusMessages[status_code];
++    }   
+ }
+ 
+ let app = new ESC();
+diff -up ./esc/src/app/esc.properties.fix4 ./esc/src/app/esc.properties
+--- ./esc/src/app/esc.properties.fix4	2019-01-10 16:19:56.456747125 -0800
++++ ./esc/src/app/esc.properties	2019-01-10 16:20:47.731493781 -0800
+@@ -0,0 +1,217 @@
++# ***** BEGIN COPYRIGHT BLOCK *****
++# This Program is free software; you can redistribute it and/or modify it under
++# the terms of the GNU General Public License as published by the Free Software
++# Foundation; version 2 of the License.
++#
++# This Program is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.#
++# You should have received a copy of the GNU General Public License along with
++# this Program; if not, write to the Free Software Foundation, Inc., 59 Temple
++# Place, Suite 330, Boston, MA 02111-1307 USA.
++#
++# Copyright (C) 2005 Red Hat, Inc.
++# All rights reserved.
++# ***** END COPYRIGHT BLOCK
++
++#ESC strings used in Javascript
++#Strings for ESC.js 
++[ESC]
++escTitle=Smart Card Manager
++smartCard=smart card
++smartCardU=Smart Card
++enrolledKey=Enrolled
++noKeysPresent=No Cards Present
++blankKey=Blank
++uninitializedKey=Uninitialized
++statusEnrolled=Enrolled
++statusUnavailable=Unavailable
++statusNoApplet=Unformatted
++statusUninitialized=Formatted
++statusLoggedIn=Logged In
++statusUnknown=Unknown
++statusBusy=Busy
++unknownIssuer=Unknown
++redHatUser=User
++statusUnknown=Unknown
++appletVersion = Smart Card Applet Version:
++operationPINReset=Resetting Key Password..
++operationEnrollment=Enrolling Key..
++operationFormat=Formatting Key..
++tokenInformation=CARD INFORMATION
++advancedInformation=Diagnostics Information
++keyID=Key ID:
++tpsURI=Smart Card Server URL:
++tpsUI=Enrollment UI URL:
++tpsPhoneHomeURL=Phone Home URL:
++status=Status:
++issuer=Issuer:
++atr=Atr:
++escLogEntries=Smart Card Activity
++noLogFileOrData=No log file or log file has no data.
++dataCopiedToClipboard=Diagnostics information copied to the clipboard.
++diagnosticsReport=SMART CARD DIAGNOSTICS REPORT
++diagnosticsSystemInfo=Software Version Information
++diagnosticsSoftVersioInfo=System Versions:
++diagnosticsDetails=Active Smart Card Details
++secCard=Card
++certsOnToken=Certificates on Smart Card 
++certificateNickname=Certificate Nickname:
++certIssuedTo=Issued to;
++certIssuedBy=Issued by;
++certValidityFrom=Validity from:
++certValidityTo=Validity to:
++certSerialNumber=Serial number:
++coolkeyComponentVersion=Smart Card Manager Version:
++coolkeyDetectedNumberKeys=Number of Smart Cards Detected:
++enrolledDetected=Enrolled Smart Card Detected
++enrolledDetectedMessage=Smart Card Manager has detected an already enrolled card. If you do not wish to re-enroll, press the "Close" button.
++enrolledDetectedMessageGeneric=Smart Card Manager has detected an already enrolled card. Click Proceed to continue.
++unenrolledDetectedMessage=Smart Card Manager has detected that you have entered a new and un-enrolled smart card. Before you can use this smart card, you have to enroll it.  Enrolling your smart card personalizes it so only you can use it for secure operations.
++enrollAnyway=If you would like to re-enroll anyway, click  Enroll My Smart Card Now.
++readyToProceed=When you are ready to begin the process,click  Enroll My Smart Card Now.
++formatingToken=Formatting... 
++enrollingToken=Enrolling... 
++resettingTokenPIN=Password Reset.. 
++cancellingOperation=Cancelling.. 
++blinkingToken=Blinking.. 
++keyInserted=Smart Card Inserted!
++keyRemoved=Smart Card Removed!
++keyInsertedComputer=smart card inserted.
++keyRemovedComputer=smart card removed.
++diagnosticsMessage=The information below is diagnostic information that your system generates as you use your smart card. If you are having smart card problems, you may be asked by your support engineer to send this information for analysis.
++
++menuManageKeys=Manage Smart Cards...
++menuExit=Quit   
++#ESC Error Messages from TPS
++errorNone=Operation Completed Successfully.
++serverError=Smart Card Server error.
++errorProblemResetTokenPin=The Smart Card Server cannot reset your smart card's password.
++errorTokenEnrollment=The Smart Card Server cannot import the required certificates into your smart card.
++errorLifeCyclePDU=The Smart Card Server cannot finalize the enrollment of your smart card.
++errorCommCA=Error communicating with the Certification Authority.
++errorInternalServer=Internal Smart Card Server error.
++errorResetPin=Error resetting the smart card's password.
++errorInternalServer=Internal Smart Card Server error.
++errorAuthFailure=The Smart Card Server cannot validate your credentials. Please try again with the correct credentials.
++errorTokenDisabled=The Smart Card Server does not know about your smart card.
++errorSecureChannel=The Smart Card Server cannot establish a secure channel with the smart card.
++errorServerMisconfig=The Smart Card Server has not been configured correctly.
++errorProblemCommToken=Your smart card can not perform the operation requested by the Smart Card Server.
++errorExternalAuth=Your smart card cannot correctly identify the Smart Card Server.
++errorTokenUpgrade=The Smart Card Server cannot upgrade the software on your smart card.
++errorTermSecureConn=The Smart Card Server can not terminate the secure cummunications channel with the smart card.
++errorInvalidTokenType=The Smart Card Server does not recognize the requested type of card enrollment.
++errorInvalidTokenTypeParams=The Smart Card Server cannot process the requested type of enrollment due to a misconfiguration.
++errorCannotPublish=The Smart Card Server cannot publish your card's certificates to the certificate directory.
++errorCommTokenDB=The Smart Card Server cannot connect to its internal database.
++errorTokenSuspended=You are not allowed to perform this operation with this smart card.
++errorPinResetable=You are not allowed to reset the password of this smart card.
++errorConnLost=The Smart Card Manager has lost the connection to the Smart Card Server.
++errorEntryTokenDB=The Smart Card Server cannot add your smart card to its internal database.
++errorNoTokenState=The Smart Card server does not recognize your smart card's current status.
++errorInvalidLostTokenReason=The Smart Card server cannot process your smart card which has been reported lost.
++errorTokenUnusable=The Smart Card Server cannot process your smart card which has been reported stolen.
++errorNoInactiveToken=The Smart Card Server cannot restore your smart card's security keys.
++errorProcessMultiTokens=The Smart Card Server has detected that you already have one enrolled smart card. The server only allows one enrolled card per user.
++errorTokenTerminated=The Smart Card Server can not process your smart card which is marked as terminated.
++errorKeyRecoveryProcessed=Smart card key recovery has been processed.
++errorKeyRecoveryFailed=The Smart Card Server can not restore the security keys onto your smart card.
++errorNoOperateLostToken=Cannot process this smart card, which has been reported lost.
++errorKeyArchival=The Smart Card Server can not restore the security keys onto your smart card due to a server misconfiguration.
++errorConnTKS=The Smart Card server cannot contact its security key server,which is required for processing.
++errorFailUpdateTokenDB=The Smart Card Server cannot reset the status of your smart card.
++errorCertRevocation=The Smart Card Server cannot mark the security keys on your smart card as revoked.
++errorNotOwnToken=The Smart Card Server cannot process a smart card which you do not own.
++errorESCMisconfigured=The Smart Card Manager has been misconfigured.
++errorESCNoCommCardReader=The Smart Card Manager cannot initiate communications with the smart card.
++errorESCNoTokenSession=The Smart Card Manager cannot establish a communications session with the smart card.
++errorESCNoTalkTPS=The Smart Card Manager cannot initiate communications with the Smart Card Server.
++errorESCNoTalkTokenReader=The Smart Card Manager cannot finalize communications with the smart card.
++#ESC text in general  Alert messages
++errorCoolKeyIsAuth=coolkey.GetCoolKeyIsAuthenticated() failed!
++errorAuthCoolKey=coolkey.AuthenticateCoolKey failed!
++errorJsNotifyInterface=Can't find jsNotify interface.
++errorUniversalXPConnect=Can't get UniversalXPConnect.
++errorConfigValue=Error obtaining issuer info for key.
++errorConfigValue=Error Getting Config Value:
++errorSetConfigValue=Error SettingConfig Value: 
++errorBlankTPSURI=Blank Tps Uri submitted.
++noTpsConfigUrl=You must provide a Url to test!
++aboutToTestTPSURI=About to test Smart Card Server URI:
++errorSelectKey=Please select a Smart card.
++tpsURLContacted=Smart Card Server URL has been successfully contacted.
++errorContactTPSURL=Error contacting Smart Card Server URL, reconfigure and try again.
++errorBlankEnrollURI=Blank Enroll Uri submitted.
++aboutToTestEnrollURI=About to test Enroll URI:
++enrollURLContacted=x Enrollment URL has been successfully contacted.
++errorContactEnrollURL=Error contacting  Enroll URL, reconfigure and try again.
++tpsConfigSuccess=Smart Card Server config information successfully obtained!
++tpsConfigError=Error obtaining Smart Card Server config information!
++tpsConfigTest=About to test the Smart Card Server Phone Home Url :
++tpsNoConfigUrl=Provide a valid Smart Card Server config URL!
++tpsURIMustHaveValue=Smart Card Server URL item must have a value!
++errorSetConfigValue=Error setting config value!:
++configChangesSubmitted=Configuration changes submitted.
++errorSetDataValue=Error Setting data values:
++errorCoolKeyGetStatus=coolkey.GetCoolKeyStatus() failed!
++errorCoolKeyGetPolicy=coolkey.GetCoolKeyPolicy() failed!
++errorCoolKeyRequiresAuth=coolkey.GetCoolKeyRequiresAuthentication() failed!
++errorCoolKeyIsAuth=coolkey.GetCoolKeyIsAuthenticated() failed!
++errorCoolKeyCertNicknames=coolkey.GetCoolKeyCertNicknames() failed!
++errorAuthCoolKey=coolkey.AuthenticateCoolKey failed!
++errorCoolKeyCertInfo=coolkey.GetCoolKeyCertInfo() failed!
++errorGetAvailCoolKeys=coolkey.GetAvailableCoolKeys() failed!
++errorEnollCoolKey=coolkey.EnrollCoolKey() failed!
++errorCoolKeyIsEnrolled=coolkey.GetCoolKeyIsEnrolled failed!
++errorResetCoolKeyPIN=coolkey.ResestCoolKeyPASSWORD() failed! Make sure smart card is enrolled.
++errorFormatCoolKey=coolkey.FormatCoolKey() failed!
++errorCancelCoolKey=coolkeyCancelCoolKeyOperation() failed!
++errorBlinkCoolKey=coolkey.BlinkCoolKey() failes!
++noCurrentlySelectedToken=No currently selected smart card!
++errorProvideScreenName=You must provide a valid screen name!
++errorProvideTokenPIN=You must provide a valid card password!
++errorMatchPinValues=The Password values you entered don't match!
++errorValidUserPassword=You must provide a valid user password!
++errorSelectKey=Please select a smart card.
++errorEnrolledFirst=Smart card must be enrolled first! Enroll card and try again.
++enrollmentFor=Enrollment of your 
++errorNeedKeyForSecMode=Please insert enrolled smart card before attempting secure mode.
++errorEnrollmentUI=Problem loading Enrollment UI, check your network connection, re-insert the card, and try again!
++errorPhoneHomeInfo=Problem loading Phone Home Information, check your network connection, re-insert the card, and try again!
++wasSuccessful=was successful.
++pinResetSuccessful=Password Reset was successfull!
++formatOf=Format of
++error=Error
++serverResponse= Server Response: 
++enrollmentOfKey=Enrollment of smart card 
++formatingOfKey=Formatting of smart card
++pinResetOfKey=Password Reset for smart card 
++operationForKey=Operation for smart card 
++failed=failed. 
++cancelled=cancelled.
++errorFindESCPlatform=Unable to determine Smart Card Manager platform.
++errorIssuerInfo=Error obtaining Issuer Info for key.
++
++escUsage1=Usage:    
++escUsage2=esc
++escUsage3=esc -secmode SECURITY_URL
++escUsage4=Ex: esc -secmode http://test.host.com
++escUsage5=esc -usage
++
++#Strings for TRAY.j
++errorTrayIsInitialized=Can't determine if Icon component is already intialized!
++errorShowAllWindows=Error Showing All Windows:
++errorHideAllWindows=Error Hiding all Windows:
++errorShowWindow=Error Showing Window:
++errorHideWindow=Error Hiding Window:
++errorRemoveWindow=Error Removing Window:
++errorTrayNotification=Error Sending Tray notification:
++#Strings for GenericAuth.js
++value=Value
++mustMatch=must match
++mustHaveValue=Must have value set for field:
++noParentWindow=No parent window.
++authDialogNoParent=Auth dialog has no parent!
++authSubmit=Submit
++authSubmitAccessKey=S
+diff -up ./esc/src/app/Makefile.am.fix4 ./esc/src/app/Makefile.am
+--- ./esc/src/app/Makefile.am.fix4	2019-01-10 17:44:13.841523700 -0800
++++ ./esc/src/app/Makefile.am	2019-01-10 17:44:45.545372112 -0800
+@@ -15,4 +15,4 @@
+ # All rights reserved.
+ # END COPYRIGHT BLOCK
+ 
+-dist_bin_SCRIPTS = esc.js opensc.esc.conf
++dist_bin_SCRIPTS = esc.js opensc.esc.conf phoneHome.js operationDialog.js pinDialog.js esc.properties
+diff -up ./esc/src/app/opensc.esc.conf.fix4 ./esc/src/app/opensc.esc.conf
+--- ./esc/src/app/opensc.esc.conf.fix4	2019-01-10 16:28:07.169377285 -0800
++++ ./esc/src/app/opensc.esc.conf	2019-01-10 16:29:24.545004705 -0800
+@@ -18,6 +18,15 @@
+ app default {
+     enable_default_driver = true;
+ 
++    #debug = 9;
++
++        # The file to which debug output will be written
++        #
++        # Special values 'stdout' and 'stderr' are recognized.
++        # Default: stderr
++        #
++    #debug_file = /tmp/opensc.log;
++
+     card_atr
+       3B:FF:14:00:FF:81:31:FE:45:80:25:A0:00:00:00:56:57:53:43:36:35:30:03:03:38 {
+                 pkcs11_enable_InitToken = yes;
+@@ -32,6 +41,24 @@ app default {
+       3B:FF:14:00:FF:81:31:FE:45:80:25:A0:00:00:00:56:57:53:43:36:35:30:03:00:3B {
+                 pkcs11_enable_InitToken = yes;
+     }
++
++    card_atr 
++      3B:FB:96:00:00:80:31:FE:45:00:31:C0:64:77:E3:02:00:82:90:00:76 {
++                pkcs11_enable_InitToken = yes;
++    }
++
++    card_atr
++      3B:65:00:00:9C:02:02:01:02 {
++                pkcs11_enable_InitToken = yes;
++    }
++
++
++    card_atr
++      3B:FE:18:00:00:80:31:FE:45:53:43:45:36:30:2D:43:44:30:38:31:2D:6E:46:A9 {
++               pkcs11_enable_InitToken = yes;
++    }
++
++
+     reader_driver ctapi {
+     }
+     reader_driver pcsc {
+diff -up ./esc/src/app/operationDialog.js.fix4 ./esc/src/app/operationDialog.js
+--- ./esc/src/app/operationDialog.js.fix4	2019-01-10 16:20:30.353579643 -0800
++++ ./esc/src/app/operationDialog.js	2019-01-10 16:51:54.600521629 -0800
+@@ -0,0 +1,333 @@
++/** BEGIN COPYRIGHT BLOCK
++ * This Program is free software; you can redistribute it and/or modify it under
++ * the terms of the GNU General Public License as published by the Free Software
++ * Foundation; version 2 of the License.
++ *    
++ * This Program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this Program; if not, write to the Free Software Foundation, Inc., 59 Temple
++ * Place, Suite 330, Boston, MA 02111-1307 USA.
++ *
++ * Copyright (C) 2005 Red Hat, Inc.
++ * All rights reserved.
++ * END COPYRIGHT BLOCK **/
++
++imports.gi.versions.Gtk = '3.0'
++const Gtk = imports.gi.Gtk;
++const Lang = imports.lang;
++const Gio = imports.gi.Gio;
++const GObject = imports.gi.GObject;
++const GLib = imports.gi.GLib;
++
++var  OP_FORMAT = 0;
++var  OP_ENROLL = 1;
++var  OP_PIN_RESET = 2;
++
++const  DEF_TOKEN_TYPE = "userKey";
++
++
++var OpLabels = new Array("Format", "Enroll", "ResetPin" ); 
++
++
++const TOKEN_OPERATION = "Token Operation";
++
++function operationDialog(app) {
++  if(!app)
++      return;
++  this.app = app;
++
++}
++
++operationDialog.prototype = {
++    launchOperation: function(tokenInfo,operation) {
++
++        if(tokenInfo == null) {
++            this.app_alert("Invalid Token!");
++        }
++        this.dialog = new Gtk.Dialog ({ transient_for: this.app._window,
++                         modal: true,deletable: false,
++                         title: TOKEN_OPERATION, border_width: 10 });
++
++        this.operation = operation;
++        this.tokenInfo = tokenInfo;
++
++        let opMessage = "";
++        if(this.operation == OP_FORMAT) {
++            opMessage = "Format Smart Card";
++
++        } else if(this.operation == OP_ENROLL)  {
++            opMessage = "Enroll Smart Card";
++        } else if(this.operation == OP_PIN_RESET) {
++            opMessage = "Reset Smart Card Pin";
++        } else {
++            this.app._alert("operationdDialog: Invalid operation!");
++            return;
++        }
++
++        this.area = this.dialog.get_content_area();
++        this.grid = new Gtk.Grid ({row_spacing: 20, column_spacing: 20});
++
++        this.message = new Gtk.Label ({label: opMessage});
++        this.area.add (this.message);
++
++        //this.throbberImage = new Gtk.Image({file: this.app._currentDir + "/" + "throbber-anim5.gif"});
++
++        this.progressBar = new Gtk.ProgressBar ({ valign: Gtk.Align.CENTER });
++        this.progressBar.set_fraction(0.0);
++
++        this.progressLabel = new Gtk.Label({label: "Progress:"});
++        this.actionArea = this.dialog.get_action_area();
++
++        this.actionArea.add(this.grid);
++
++        this.ldapUserLabel = new Gtk.Label({label: "Ldap User:"});
++        this.ldapUserBox =  new Gtk.Entry();
++
++        this.grid.attach(this.ldapUserLabel, 0, 0, 1,1);
++        this.grid.attach(this.ldapUserBox,1, 0,1,1);
++
++        this.ldapPasswordLabel = new Gtk.Label({label: "Ldap Password:"});
++        this.ldapPasswordBox = new Gtk.Entry();
++        this.ldapPasswordBox.set_visibility(false);
++
++        this.grid.attach(this.ldapPasswordLabel,2,0,1,1);
++        this.grid.attach(this.ldapPasswordBox,3,0,1,1);
++
++        if(this.operation !=  OP_FORMAT ) {
++
++            this.newpinLabel = new Gtk.Label({label: "New Pin:"});
++            this.newpinBox   = new Gtk.Entry();
++            this.newpinBox.set_visibility(false);
++
++            this.confirmPinLabel = new Gtk.Label({label: "Confirm Pin:"});
++            this.confirmPinBox = new Gtk.Entry();
++            this.confirmPinBox.set_visibility(false);
++
++            this.grid.attach(this.newpinLabel, 0,1,1,1);
++            this.grid.attach(this.newpinBox,1,1,1,1);
++            this.grid.attach(this.confirmPinLabel,2,1,1,1);
++            this.grid.attach(this.confirmPinBox,3,1,1,1);
++        }
++
++        this.oKButton = new  Gtk.Button ({label: OpLabels[this.operation]}); 
++
++        this.dismissButton = new Gtk.Button({label: "Cancel" });
++
++        //this.grid.attach(this.throbberImage,0,2,1,1);
++        this.grid.attach(this.progressLabel, 0,2,1,1);
++        //this.throbberImage.hide();
++        this.grid.attach(this.progressBar, 1,2,1,1);
++        this.grid.attach (this.oKButton,2,2,1,1);
++        this.grid.attach (this.dismissButton,3,2,1,1);
++
++        // Connect the button to the function that handles what it does
++        this.oKButton.connect ("clicked", this.oKHandler.bind(this));
++
++        this.dismissButton.connect("clicked", this.cancelHandler.bind(this));
++        this.dialog.show_all();
++        this.hideThrobberImage();
++        this.inProgress = false;
++    },
++
++    hideThrobberImage() {
++        //this.throbberImage.hide();
++    },
++
++    showThrobberImage() {
++        //this.throbberImage.show();
++    },
++
++    updateUI(state) {
++    },
++
++    checkSanity: function() {
++
++         if(this.operation ==  OP_ENROLL || this.operation == OP_PIN_RESET) {
++
++             let pin = this.newpinBox.get_text();
++             let confirm = this.confirmPinBox.get_text();
++            
++             if( pin && confirm) {
++
++                 if(pin != confirm) {
++
++                     this.app._alert("Pins must match!");
++                     return false;
++                 }
++
++             } else {
++                 this.app._alert("Must provide token pin!");
++                 return false;             
++             } 
++
++         }
++
++         // Now check the ldap user info
++
++        
++         let ldapUser = this.ldapUserBox.get_text();
++         let ldapPin = this.ldapPasswordBox.get_text();
++
++         if(!ldapUser || !ldapPin) {
++             this.app._alert("Must provide user name and password!");
++             return false;
++         }
++
++         return true;  
++    },
++
++    cancelHandler() {
++        if(this.inProgress == false) {
++            this.dialog.destroy();
++        } else {
++           this.app.mgr.cancel_token_operation(this.tokenInfo); 
++        }
++    },
++    oKHandler: function() {
++
++        if(this.inProgress) {
++            return;
++        }
++
++        if(!this.checkSanity()) {
++           return;
++        }
++
++        let res = 0;
++        this.app._setNotifyCallback(this.notify.bind(this));
++
++        if(this.operation == OP_FORMAT) {
++           this.inProgress = 1;
++           this.showThrobberImage();
++           res = this.app.mgr.format_token(this.tokenInfo, DEF_TOKEN_TYPE, this.ldapUserBox.get_text(), "" /* pin */ ,this.ldapPasswordBox.get_text(),""
++               ); 
++
++        } else if(this.operation == OP_ENROLL) {
++           this.inProgress = true;
++           this.showThrobberImage();
++           res = this.app.mgr.enroll_token(this.tokenInfo, DEF_TOKEN_TYPE, this.ldapUserBox.get_text(), this.newpinBox.get_text() /* pin */ ,this.ldapPasswordBox.get_text(),""
++               );
++
++        } else if(this.operation == OP_PIN_RESET) {
++           this.inProgress = true;
++           this.showThrobberImage();
++           res = this.app.mgr.reset_token_pin(this.tokenInfo, DEF_TOKEN_TYPE, this.ldapUserBox.get_text(), this.newpinBox.get_text() /* pin */ ,this.ldapPasswordBox.get_text(),""
++               );
++
++        } else { 
++            this.app_alert("Invalid token operation!");
++        }
++    },
++
++    notify: function(aKeyType, aKeyID, aKeyState, aData, strData) {
++
++        this.onCoolKeyStateChange(aKeyType, aKeyID, aKeyState, aData, strData);
++        //print("notify: aKeyType: " + aKeyType + " aKeyID: " + aKeyID + " aKeyState: " + aKeyState + " aData: " + aData + " strDAta: " + strData);
++    }, 
++
++    onCoolKeyStateChange: function(keyType, keyID, keyState, data,strData) {
++
++        //this.app._alert("KeyID:    " + keyID + "\n" +
++        //      "KeyState: " + keyState + "\n" +
++        //      "Data:     " + data);
++        //this.app._alert("State Change ="+keyState);
++
++        switch(keyState)
++        {
++           case 1000: // KeyInserted
++               break;
++           case 1001: // KeyRemoved
++               break;
++           case 1002: // EnrollmentStart
++               this.inProgress = true;
++               break;
++           case 1003: // EnrollmentComplete
++               this.onCoolKeyEnrollmentComplete(keyType, keyID);
++               this.inProgress = false;
++               break;
++           case 1004: // EnrollmentError
++               this.inProgress = false;
++               this.onCoolKeyStateError(keyType, keyID, keyState, data);
++           break;
++          case 1008: // PINResetStart
++               this.inProgress = true;
++               break;
++          case 1009: // PINResetComplete
++              this.onCoolKeyPINResetComplete(keyType, keyID);
++              this.inProgress = false;
++              break;
++          case 1010: // PINResetError
++              this.onCoolKeyStateError(keyType, keyID, keyState, data);
++              this.inProgress = false;
++              break;
++          case 1014: // FormatStart
++              this.inProgress = true;
++              break;
++          case 1015: // FormatComplete
++              this.onCoolKeyFormatComplete(keyType, keyID);
++              this.inProgress = false;
++              break;
++          case 1016: // FormatError
++              this.onCoolKeyStateError(keyType, keyID, keyState, data);
++              this.inProgress = false;
++              break;
++          case 1017: // BlinkStatus Update?
++              break;
++          case 1018: 
++              break;
++          case 1020: // OperationCancelled
++              this.onCoolKeyStateError(keyType, keyID, keyState, data);
++              this.inProgress = false;
++          break;
++          case 1021: // OperationStatusUpdate
++              this.onCoolKeyStatusUpdate(keyType, keyID, data);
++          break;
++
++          case 1022: //Need Auth 
++              inProgress = false;
++              break;
++       }
++    },
++
++    onCoolKeyEnrollmentComplete: function(keyType, keyID) {
++        this.hideThrobberImage();
++        this.app._alert("Enrollment Succesfully Complete!");
++        this.app._updateCoolkey( this.tokenInfo);
++        this.dialog.destroy();
++        
++    },
++
++    onCoolKeyStateError: function(keyType, keyID, keyState, data) {
++        this.hideThrobberImage();
++        this.app._alert(OpLabels[this.operation] + " Error: " + this.app._getErrorMessage(data));
++
++        this.app._updateCoolkey( this.tokenInfo );
++        this.dialog.destroy();
++    },
++
++    onCoolKeyPINResetComplete: function(keyType, keyID) {
++        this.hideThrobberImage();
++        this.app._alert("Pin Reset Successfully Completed!");
++        this.dialog.destroy();
++    },
++
++    onCoolKeyFormatComplete: function(keyType, keyID) {
++       this.hideThrobberImage();
++       this.app._alert("Format Succesfully Completed!"); 
++       this.app._updateCoolkey(this.tokenInfo);
++       this.dialog.destroy();
++    },
++
++    onCoolKeyStatusUpdate: function(keyType, keyID, data) {
++
++        if(data) {
++            let  percent =  parseFloat(data);
++
++            this.progressBar.set_fraction( percent / 100);
++        }
++    }
++}
++
+diff -up ./esc/src/app/phoneHome.js.fix4 ./esc/src/app/phoneHome.js
+--- ./esc/src/app/phoneHome.js.fix4	2019-01-10 16:25:23.036167620 -0800
++++ ./esc/src/app/phoneHome.js	2019-01-10 16:25:43.978066779 -0800
+@@ -0,0 +1,260 @@
++/** BEGIN COPYRIGHT BLOCK
++ * This Program is free software; you can redistribute it and/or modify it under
++ * the terms of the GNU General Public License as published by the Free Software
++ * Foundation; version 2 of the License.
++ *
++ * This Program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this Program; if not, write to the Free Software Foundation, Inc., 59 Temple
++ * Place, Suite 330, Boston, MA 02111-1307 USA.
++ *
++ * Copyright (C) 2005 Red Hat, Inc.
++ * All rights reserved.
++ * END COPYRIGHT BLOCK **/
++
++imports.gi.versions.Gtk = '3.0'
++const Gtk = imports.gi.Gtk;
++const Lang = imports.lang;
++const Gio = imports.gi.Gio;
++const GObject = imports.gi.GObject;
++const GLib = imports.gi.GLib;
++
++//Phone Home related Constants
++
++const  KEY_ISSUER_URL    = "keyIssuerUrl";
++const  KEY_ISSUER        = "keyIssuer";
++const  TPS_URL           = "Operation";
++const  TPS_UI            = "UI";
++const  SERVICES_TAG      = "Services";
++const  ISSUER_TAG        = "IssuerName";
++const  SERVICE_INFO_TAG  = "ServiceInfo";
++const  ENROLLED_TOKEN_BROWSER_URL = "EnrolledTokenBrowserURL";
++const  ENROLLED_TOKEN_URL = "EnrolledTokenURL";
++const  TOKEN_TYPE = "TokenType";
++const  RESET_PHONE_HOME  = "ResetPhoneHome";
++
++const  PHONE_HOME_CONFIG_INFO = "Phone Home Configuration Information";
++
++
++function phoneHome(app) {
++  if(!app)
++      return;
++  this.app = app;
++  this.url = "";
++  this.tokenType = "";
++  this.operationUrl = "";
++  this.enrolledTokenBrowserURL = "";
++  this.issuerName = "";
++}
++
++phoneHome.prototype = {
++    getPhoneHomeInfo: function(tokenInfo,forceUserInput) {
++        if(!tokenInfo && !forceUserInput) {
++            return null;
++        }
++
++        this.tokenInfo = tokenInfo;
++
++        if(!forceUserInput && this.tokenInfo.issuer_info != null) {
++            this.url = this.tokenInfo.issuerInfo;
++            this.getPhoneHomeFromServer(tokenInfo);
++        }  else { 
++            this.promptPhoneHomeURL();
++        }
++
++    },
++
++    getPhoneHomeFromServer: function(tokenInfo) {
++        if(!this.url || !tokenInfo) {
++            return;
++        }
++
++        this.phoneHomeInfo = this.app._phoneHome(this.url);
++        if(this.phoneHomeInfo) {
++           this.parse(this.phoneHomeInfo,tokenInfo);
++           this.app._alert("Phone Home Info Successfully Obtained!");
++        } else {
++           this.app._alert("Unable to obtain phone home info!");
++        }
++
++    },
++
++    promptPhoneHomeURL: function() {
++        this.createPhoneHomeDialog();
++    },
++
++    createPhoneHomeDialog: function() {
++        this.phDialog = new Gtk.Dialog ({ transient_for: this.app._window,
++                         modal: true,
++                         title: PHONE_HOME_CONFIG_INFO, border_width: 20 });
++
++        this.phArea = this.phDialog.get_content_area();
++        this.phMessage = new Gtk.Label ({label: "Enter url: ex: http://test.host.com:8080/tps/phoneHome"});
++        this.phArea.add (this.phMessage);
++
++        this.phActionArea = this.phDialog.get_action_area();
++        this.phUrlBox =  new Gtk.Entry({width_chars: 35});
++        this.phGrid = new Gtk.Grid ({halign: Gtk.Align.CENTER,
++                                     valign: Gtk.Align.CENTER,
++                                     row_spacing: 10, column_spacing: 10});
++
++        if(this.tokenInfo.issuer_info) {
++            this.phUrlBox.set_text(this.tokenInfo.issuer_info);
++        }
++
++        this.phActionArea.add(this.phGrid);
++
++        this.phOKButton = Gtk.Button.new_from_stock (Gtk.STOCK_OK);
++
++        this.phGrid.attach(this.phUrlBox, 0, 0, 1,1);
++        this.phGrid.attach(this.phOKButton,1, 0,1,1);
++
++        // Connect the button to the function that handles what it does
++        this.phOKButton.connect ("clicked", this.phoneHomeOKHandler.bind(this));
++
++        this.phDialog.show_all();
++    },
++
++    phoneHomeOKHandler: function() {
++
++        this.url = this.phUrlBox.get_text();
++
++        this.getPhoneHomeFromServer(this.tokenInfo);
++
++        if(this.phDialog) { 
++            this.phDialog.destroy();
++            this.phDialog = null;
++        }
++    }, 
++
++    parse: function(info,tokenInfo) {
++        if(!info) {
++            return;
++        }
++        //Find tokenType
++
++        this.tokenType = this.findValue(info,"<TokenType>","</TokenType>");
++        this.operationUrl = this.findValue(info,"<Operation>","</Operation>");
++        this.enrolledTokenBrowserURL = this.findValue(info,"<EnrolledTokenBrowserURL","</EnrolledTokenBrowserURL>");
++        this.issuerName = this.findValue(info,"<IssuerName>","</IssuerName>");       
++
++        let key_issuer_url = this.app._configValueWithKeyID(tokenInfo.cuid,KEY_ISSUER_URL);
++        this.app._setConfigValue(key_issuer_url,this.url);
++
++        let key_issuer = this.app._configValueWithKeyID(tokenInfo.cuid,KEY_ISSUER); 
++        this.app._setConfigValue(key_issuer,this.issuerName);
++
++        let operation_url = this.app._configValueWithKeyID(tokenInfo.cuid,TPS_URL);
++        this.app._setConfigValue(operation_url,this.operationUrl);
++
++        let enrolled_token_browser_url = this.app._configValueWithKeyID(tokenInfo.cuid,ENROLLED_TOKEN_BROWSER_URL);
++        this.app._setConfigValue(enrolled_token_browser_url, this.enrolledTokenBrowserURL);
++
++        let token_type = this.app._configValueWithKeyID(tokenInfo.cuid,TOKEN_TYPE);
++        this.app._setConfigValue(token_type, this.tokenType);
++    },
++
++    findValue: function(fullString, startTag, endTag) {
++        if(!fullString || !startTag || !endTag) {
++           return null;
++        }
++
++        let spos = fullString.search(startTag) + startTag.length;
++        let epos = fullString.search(endTag);
++
++        let value = fullString.slice(spos,epos);
++
++        if(value) {
++            return value.trim();
++        }
++
++        return null;
++    },
++
++    getTokenType: function() {
++        return this.tokenType;
++    },
++
++    getOperationURL: function() {
++        return this.operationURL;
++    },
++
++    getEnrolledTokenBrowserURL: function() {
++        return this.enrolledTokenBrowserURL;
++    },
++
++    getIssuerName: function() {
++        return this.issuerName;
++    },
++
++    getCachedPhoneHomeValue: function(aKeyID,aValue) {
++        var retValue = null;
++
++        if(!aKeyID || ! aValue)
++            return null;
++
++        var theValue = this.app._configValueWithKeyID(aKeyID,aValue);
++
++        if(!theValue)
++            return null;
++
++         retValue = this.app._getConfigValue(theValue);
++
++         return retValue;
++    },
++
++    getCachedPhoneHomeURL: function(aKeyID) {
++        var url = null;
++
++         if(!aKeyID)
++             return null;
++
++         var urlValue = this.app._configValueWithKeyID(aKeyID,KEY_ISSUER_URL);
++
++         if(!urlValue)
++             return null;
++
++         url = this.app._getConfigValue(urlValue);
++
++         return url;
++    },
++
++    getCachedIssuer: function(aKeyID) {
++        var issuer = null;
++
++        if(!aKeyID)
++            return null;
++
++        var issuerValue = this.app._configValueWithKeyID(aKeyID,KEY_ISSUER);
++
++        if(!issuerValue)
++            return null;
++
++        issuer = this.app._getConfigValue(issuerValue);
++
++        return issuer;
++    },
++
++    getCachedTPSURL: function(aKeyID) {
++        var url = null;
++
++        if(!aKeyID)
++            return null;
++
++         var urlValue = this.app_.configValueWithKeyID(aKeyID,TPS_URL);
++
++         if(!urlValue)
++             return null;
++
++         url = this.app._getConfigValue(urlValue);
++
++         return url;
++    },
++
++    getCachedTokenType: function(aKeyID) {
++        return getCachedPhoneHomeValue(aKeyID,TOKEN_TYPE);
++    }
++}
+diff -up ./esc/src/app/pinDialog.js.fix4 ./esc/src/app/pinDialog.js
+--- ./esc/src/app/pinDialog.js.fix4	2019-01-10 16:26:01.510982356 -0800
++++ ./esc/src/app/pinDialog.js	2019-01-10 16:26:11.322935109 -0800
+@@ -0,0 +1,109 @@
++/** BEGIN COPYRIGHT BLOCK
++ * This Program is free software; you can redistribute it and/or modify it under
++ * the terms of the GNU General Public License as published by the Free Software
++ * Foundation; version 2 of the License.
++ *    
++ * This Program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this Program; if not, write to the Free Software Foundation, Inc., 59 Temple
++ * Place, Suite 330, Boston, MA 02111-1307 USA.
++ *
++ * Copyright (C) 2005 Red Hat, Inc.
++ * All rights reserved.
++ * END COPYRIGHT BLOCK **/
++
++imports.gi.versions.Gtk = '3.0'
++const Gtk = imports.gi.Gtk;
++const Lang = imports.lang;
++const Gio = imports.gi.Gio;
++const GObject = imports.gi.GObject;
++const GLib = imports.gi.GLib;
++
++
++const TMP_FILE_NAME = "v135tr";
++const PIN_OPERATION = "Password";
++
++function pinDialog(app) {
++  if(!app)
++      return;
++  this.app = app;
++}
++
++pinDialog.prototype = {
++    launchPinPrompt: function(notify) {
++
++        this.notify = notify;
++        this.dialog = new Gtk.Dialog ({ transient_for: this.app._window,
++                         modal: true,
++                         expand: false,
++                         title: PIN_OPERATION ,border_width: 20, deletable: false });
++
++        this.area = this.dialog.get_content_area();
++        this.grid = new Gtk.Grid ({row_spacing: 10, column_spacing: 20});
++
++        this.message = new Gtk.Label ({label: "Enter Token Pin"});
++        this.area.add (this.message);
++
++        this.actionArea = this.dialog.get_action_area();
++        this.pinBox =  new Gtk.Entry();
++        this.pinBox.set_visibility(false);
++        this.grid.add(this.pinBox);
++        this.oKButton = Gtk.Button.new_from_stock (Gtk.STOCK_OK);
++        this.grid.add (this.oKButton);
++
++        this.actionArea.add(this.grid);
++
++        // Connect the button to the function that handles what it does
++        this.oKButton.connect ("clicked", this.oKHandler.bind(this));
++
++        this.dialog.show_all();
++    },
++
++    clearTempFile() {
++        this.saveToTempFile(this.tempFileName,true);
++    },
++
++    saveToTempFile(name,clear) {
++
++        if (name == null) {
++            return null;
++        }
++
++        let contents = "";
++
++        if(clear == false)
++            contents = this.pinBox.get_text();
++        else
++            contents = "";
++
++        try {
++            GLib.file_set_contents(name , contents);
++        } catch(e) {
++            return null;
++        }
++
++
++    },
++
++    oKHandler: function() {
++        if(this.dialog) {
++            this.tempFileName = this.app._getConfigPath() + "/"  + TMP_FILE_NAME; 
++            this.saveToTempFile(this.tempFileName,false);
++            if(this.notify) {
++                this.notify(this.tempFileName);
++            }
++
++            this.clearTempFile();
++            this.dialog.destroy();
++            this.dialog = null;
++        }
++    },
++    getTempFileName() {
++        return this.tempFileName;
++
++   }
++}
++
+diff -up ./esc/src/lib/coolkey/cky_base.h.fix4 ./esc/src/lib/coolkey/cky_base.h
+--- ./esc/src/lib/coolkey/cky_base.h.fix4	2019-01-10 16:32:37.132077352 -0800
++++ ./esc/src/lib/coolkey/cky_base.h	2019-01-10 16:32:51.426008523 -0800
+@@ -19,7 +19,6 @@
+ 
+ #ifndef CKY_BASE_H
+ #define CKY_BASE_H 1
+-
+ /*
+  * Common types and structs
+  */
+@@ -34,19 +33,15 @@ typedef unsigned char CKYBool;
+ 
+ typedef unsigned long CKYBitFlags;
+ 
+-#define CKYBUFFER_PUBLIC \
+-    unsigned long reserved1;\
+-    unsigned long reserved2;\
+-    void *reserved3;\
+-    void *reserved4;
+-
+-#define CKYAPDU_PUBLIC \
+-    unsigned long reserved1;\
+-    unsigned long reserved2;\
+-    void *reserved3;\
+-    void *reserved4; \
+-    void *reserved5;
+-
++#define CKYBUFFER_PRIVATE \
++    CKYSize len; \
++    CKYSize size; \
++    CKYByte *data; \
++    void   *reserved;
++
++#define CKYAPDU_PRIVATE \
++    CKYBuffer apduBuf; \
++    void *reserved;
+ 
+ typedef struct _CKYBuffer {
+ #ifdef CKYBUFFER_PRIVATE
+diff -up ./esc/src/lib/coolkey/cky_basei.h.fix4 ./esc/src/lib/coolkey/cky_basei.h
+--- ./esc/src/lib/coolkey/cky_basei.h.fix4	2019-01-10 16:33:28.080832022 -0800
++++ ./esc/src/lib/coolkey/cky_basei.h	2019-01-10 16:33:48.463733874 -0800
+@@ -21,15 +21,18 @@
+ #ifndef CKY_BASEI_H
+ #define CKY_BASEI_H 1
+ 
+-#define CKYBUFFER_PRIVATE \
+-    CKYSize len; \
+-    CKYSize size; \
+-    CKYByte *data; \
+-    void   *reserved; 
++#define CKYBUFFER_PUBLIC \
++    unsigned long reserved1;\
++    unsigned long reserved2;\
++    void *reserved3;\
++    void *reserved4;
+ 
+-#define CKYAPDU_PRIVATE \
+-    CKYBuffer apduBuf; \
+-    void *reserved;
++#define CKYAPDU_PUBLIC \
++    unsigned long reserved1;\
++    unsigned long reserved2;\
++    void *reserved3;\
++    void *reserved4; \
++    void *reserved5;
+     
+ #endif /* CKY_BASE_H */
+ #endif /* CKY_BASEI_H */
+diff -up ./esc/src/lib/coolkey/cky_card.c.fix4 ./esc/src/lib/coolkey/cky_card.c
+--- ./esc/src/lib/coolkey/cky_card.c.fix4	2019-01-10 16:34:10.863626014 -0800
++++ ./esc/src/lib/coolkey/cky_card.c	2019-01-10 16:34:31.326527479 -0800
+@@ -973,6 +973,24 @@ CKYCardConnection_Disconnect(CKYCardConn
+     return CKYSUCCESS;
+ }
+ 
++CKYStatus
++CKYCardConnection_Eject(CKYCardConnection *conn)
++{
++    unsigned long rv;
++    if (conn->cardHandle == 0) {
++        return CKYSUCCESS;
++    }
++    rv = conn->scard->SCardDisconnect( conn->cardHandle, SCARD_EJECT_CARD);
++    conn->cardHandle = 0;
++    if (rv != SCARD_S_SUCCESS) {
++        conn->lastError = rv;
++        return CKYSCARDERR;
++    }
++    return CKYSUCCESS;
++}
++
++
++
+ CKYBool 
+ CKYCardConnection_IsConnected(const CKYCardConnection *conn)
+ {
+@@ -988,8 +1006,8 @@ CKYCardConnection_GetProtocol(const CKYC
+ CKYStatus 
+ ckyCardConnection_reconnectRaw(CKYCardConnection *conn, unsigned long init)
+ {
+-    unsigned long rv;
+-    unsigned long protocol;
++    unsigned long rv = CKYSUCCESS;
++    unsigned long protocol = 0;
+ 
+     rv = conn->scard->SCardReconnect(conn->cardHandle,
+ 	SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 , init, &protocol);
+@@ -1120,11 +1138,11 @@ CKYCardConnection_GetStatus(CKYCardConne
+ 				unsigned long *state, CKYBuffer *ATR)
+ {
+     unsigned long readerLen = 0;
+-    unsigned long protocol;
+-    unsigned long rv;
+-    CKYSize atrLen;
+-    char *readerStr;
+-    CKYStatus ret;
++    unsigned long protocol = 0;
++    unsigned long rv = 0;
++    CKYSize atrLen = 0;
++    char *readerStr = NULL;
++    CKYStatus ret = CKYSUCCESS;
+ 
+ 
+     /*
+diff -up ./esc/src/lib/coolkey/cky_card.h.fix4 ./esc/src/lib/coolkey/cky_card.h
+--- ./esc/src/lib/coolkey/cky_card.h.fix4	2019-01-10 16:35:49.381151632 -0800
++++ ./esc/src/lib/coolkey/cky_card.h	2019-01-10 16:35:54.632126347 -0800
+@@ -116,6 +116,7 @@ CKYStatus CKYCardConnection_ExchangeAPDU
+ CKYStatus CKYCardConnection_Connect(CKYCardConnection *connection, 
+ 					const char *readerName);
+ CKYStatus CKYCardConnection_Disconnect(CKYCardConnection *connection);
++CKYStatus CKYCardConnection_Eject(CKYCardConnection *connection);
+ unsigned long CKYCardConnection_GetProtocol(const CKYCardConnection *conn);
+ CKYBool CKYCardConnection_IsConnected(const CKYCardConnection *connection);
+ CKYStatus CKYCardConnection_Reconnect(CKYCardConnection *connection);
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix4 ./esc/src/lib/coolkey/CoolKey.cpp
+--- ./esc/src/lib/coolkey/CoolKey.cpp.fix4	2019-01-10 16:36:29.910956473 -0800
++++ ./esc/src/lib/coolkey/CoolKey.cpp	2019-01-10 16:36:44.046888406 -0800
+@@ -257,6 +257,7 @@ static CoolKeyReference g_Reference = NU
+ static CoolKeyRelease g_Release = NULL;
+ static CoolKeyGetConfigValue g_GetConfigValue = NULL;
+ static CoolKeySetConfigValue g_SetConfigValue = NULL;
++static CoolKeyFreeConfigValue g_FreeConfigValue = NULL;
+ static CoolKeyBadCertHandler g_BadCertHandler = NULL;
+ 
+ char* CoolKeyVerifyPassword(PK11SlotInfo *,PRBool,void *);
+@@ -264,6 +265,7 @@ char* CoolKeyVerifyPassword(PK11SlotInfo
+ COOLKEY_API HRESULT CoolKeySetCallbacks(CoolKeyDispatch dispatch,
+ 	CoolKeyReference reference, CoolKeyRelease release,
+         CoolKeyGetConfigValue getconfigvalue,CoolKeySetConfigValue setconfigvalue,
++        CoolKeyFreeConfigValue freeconfigvalue,
+         CoolKeyBadCertHandler badcerthandler)
+ {
+     char tBuff[56];
+@@ -271,6 +273,7 @@ COOLKEY_API HRESULT CoolKeySetCallbacks(
+     g_Reference = reference;
+     g_Release = release;
+     g_GetConfigValue = getconfigvalue;
++    g_FreeConfigValue = freeconfigvalue;
+     g_SetConfigValue = setconfigvalue;
+     g_BadCertHandler = badcerthandler;
+ 
+@@ -293,7 +296,7 @@ COOLKEY_API HRESULT CoolKeySetCallbacks(
+ 
+ #define RELEASE_LISTENER(list) \
+   if (list) { \
+-    (*g_Reference)(list); \
++    (*g_Release)(list); \
+   }
+ 
+ char *CoolKeyVerifyPassword(PK11SlotInfo *slot,PRBool retry,void *arg)
+@@ -728,6 +731,30 @@ HRESULT CoolKeyGetCPLCDataDirectly(CKYAp
+     return result;
+ }
+ 
++char *CoolKeyGetPhoneHomeData(const char *url) {
++
++	string host_port = "";
++	string urlOffset = "";
++	string hostName = "";
++	int isSSL = 0;
++
++	NSS_HTTP_HANDLE http_handle = httpAllocateClient();
++
++	string fullUrl = url;
++
++	int portNum = 80;
++
++	CoolKeyHandler::ExtractFromUrl(fullUrl, host_port, urlOffset, hostName,
++			&isSSL, &portNum);
++
++	char *result = httpSend((char *) host_port.c_str(), url, (char *) "GET",
++			NULL, http_handle,/* mSSL */
++			PR_FALSE, 30);
++
++        httpDestroyClient(http_handle);
++	return result;
++}
++
+ 
+ static std::list<ActiveKeyNode *> g_ActiveKeyList;
+ 
+@@ -990,7 +1017,7 @@ HRESULT CoolKeyEnrollToken(const CoolKey
+         return hres;
+     }
+   
+-    CoolKeyNotify(aKey, eCKState_EnrollmentStart, aScreenName ? 1 : 0);
++    //CoolKeyNotify(aKey, eCKState_EnrollmentStart, aScreenName ? 1 : 0);
+   
+     return S_OK;
+ }
+@@ -1040,7 +1067,7 @@ HRESULT CoolKeyResetTokenPIN(const CoolK
+         return hres;
+     }
+   
+-    CoolKeyNotify(aKey, eCKState_PINResetStart, aScreenName ? 1 : 0);
++    //CoolKeyNotify(aKey, eCKState_PINResetStart, aScreenName ? 1 : 0);
+   
+     return S_OK;
+ }
+@@ -1091,7 +1118,7 @@ HRESULT CoolKeyFormatToken(const CoolKey
+         return hres;
+     }
+   
+-    CoolKeyNotify(aKey, eCKState_FormatStart, 0);
++    //CoolKeyNotify(aKey, eCKState_FormatStart, 0);
+   
+     return S_OK;
+ }
+@@ -1568,6 +1595,16 @@ const char *CoolKeyGetConfig(const char
+     return res;
+ }
+ 
++void CoolKeyFreeConfig(const char *aValue) 
++{
++    if(!g_FreeConfigValue || ! aValue)
++    {
++        return;
++    }
++
++    (*g_FreeConfigValue)(aValue);
++}
++
+ HRESULT     CoolKeySetConfig(const char *aName,const char *aValue)
+ {
+     if( !aName || !aValue)
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix4 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix4	2019-01-10 16:37:47.556582593 -0800
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2019-01-10 16:37:56.118541366 -0800
+@@ -378,8 +378,8 @@ CoolKeyHandler::~CoolKeyHandler()
+     if(mCharScreenNamePwd)
+     {
+         PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::~CoolKeyHandler: attempt to  free mCharScreenNamePwd\n",GetTStamp(tBuff,56)));  
+-        mCharScreenNamePwd = NULL;
+         free(mCharScreenNamePwd);
++        mCharScreenNamePwd = NULL;
+ 
+         PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::~CoolKeyHandler: done free mCharScreenNamePwd\n",GetTStamp(tBuff,56)));
+ 
+@@ -570,6 +570,104 @@ HRESULT CoolKeyHandler::Init(const CoolK
+     return S_OK;
+ }
+ 
++void CoolKeyHandler::ExtractFromUrl(string &fullUrl, string &host_port, string &url, string &hostName, int *isSSL,
++		int *portNum) {
++
++	if (isSSL == NULL || portNum == NULL) {
++		return;
++	}
++
++	char tBuff[56];
++	string ssl_str = "https://";
++	string non_ssl_str = "http://";
++
++	size_t pos = fullUrl.find(ssl_str, 0);
++
++	*isSSL = 0;
++
++	if (pos == 0) {
++		pos += ssl_str.length();
++		*isSSL = 1;
++	} else {
++		pos = fullUrl.find(non_ssl_str, 0);
++		if (pos == string::npos) {
++			return;
++		}
++
++		pos += non_ssl_str.length();
++
++	}
++
++	// Now grab the host name and host port from the tps url
++
++	string host_name_port_str = "";
++	string slash_str = "/";
++
++	size_t end_host_port_pos = fullUrl.find(slash_str, pos);
++	size_t end_host_port_count = 0;
++
++	if (end_host_port_pos == string::npos) {
++		end_host_port_count = fullUrl.length() - pos;
++	} else {
++		end_host_port_count = end_host_port_pos - pos;
++	}
++
++	string tps_url_offset = fullUrl.substr(end_host_port_pos);
++
++	if (!tps_url_offset.length()) {
++		PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++				("%s CoolKeyHandler::ExtractFromUrl NULL tps_url_offset string!.\n",GetTStamp(tBuff,56)));
++		return;
++	}
++
++	url = tps_url_offset;
++
++	PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++			("%s CoolKeyHandler::ExtractFromUrl  tps_url_offset string! %s.\n",GetTStamp(tBuff,56),tps_url_offset.c_str()));
++
++	host_port = fullUrl.substr(pos, end_host_port_count);
++
++	if (!host_port.length()) {
++		CoolKeyLogMsg(PR_LOG_ERROR,
++				"%s ExtractFromUrl.  Bad hostname and port value!.\n",
++				GetTStamp(tBuff, 56));
++		return;
++	}
++
++	PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++			("%s CoolKeyHandler::ExtractFromUrl host_name_port %s.\n",GetTStamp(tBuff,56),host_port.c_str()));
++
++	string delim = ":";
++	string port_num_str = "";
++
++	size_t delimPos = host_port.find(delim, 0);
++
++	if (delimPos == string::npos) {
++		*portNum = 80;
++		hostName = host_port;
++		PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++				("%s CoolKeyHandler::ExtractFromUrl no port number assuming 80!.\n",GetTStamp(tBuff,56)));
++	} else {
++		port_num_str = host_port.substr(delimPos + 1);
++		hostName = host_port.substr(0, delimPos);
++		PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++				("%s CoolKeyHandler::ExtractFromUrl mCharHostName %s!.\n",hostName.c_str(),GetTStamp(tBuff,56)));
++
++	}
++
++	if (port_num_str.length()) {
++		*portNum = atoi(port_num_str.c_str());
++
++
++		PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++				("%s CoolKeyHandler::ExtractFromUrl port_num_str %s.\n",GetTStamp(tBuff,56),port_num_str.c_str()));
++	}
++
++	PR_LOG(coolKeyLogHN, PR_LOG_DEBUG,
++			("%s CoolKeyHandler::ExtractFromUrl port number %d.\n",GetTStamp(tBuff,56),*portNum));
++
++}
++
+ void CoolKeyHandler::CollectPreferences()
+ {
+     char tBuff[56];
+@@ -590,12 +688,15 @@ void CoolKeyHandler::CollectPreferences(
+ 
+     //Quickly grab the configurable http message timeout
+ 
++    const char *tps_url = NULL;
+     const char *msg_timeout = CoolKeyGetConfig("esc.tps.message.timeout");
+ 
+     if(msg_timeout)
+     {
+         httpMessageTimeout = atoi(msg_timeout);
+ 
++        CoolKeyFreeConfig(msg_timeout);
++        
+         PR_LOG( coolKeyLogHN, PR_LOG_DEBUG,("%s CoolKeyHandler::CollectPreferences! Message timeout %d\n",GetTStamp(tBuff,56),httpMessageTimeout));
+ 
+     }
+@@ -611,7 +712,7 @@ void CoolKeyHandler::CollectPreferences(
+     const char *tps_url_for_key_str = tps_url_for_key.c_str();
+ 
+     PR_LOG( coolKeyLogHN, PR_LOG_DEBUG,("%s CoolKeyHandler::CollectPreferences! tps_url %s\n",GetTStamp(tBuff,56),tps_url_for_key_str)); 
+-    const char *tps_url = CoolKeyGetConfig(tps_url_for_key_str);
++    tps_url = CoolKeyGetConfig(tps_url_for_key_str);
+ 
+     if(!tps_url)
+     {
+@@ -625,12 +726,15 @@ void CoolKeyHandler::CollectPreferences(
+ 
+             return;
+         }
++
+     }
+ 
+     PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::CollectPreferences esc.tps.url %s\n",GetTStamp(tBuff,56),tps_url));
+ 
+     string tps_url_str = tps_url;
+ 
++    CoolKeyFreeConfig(tps_url);
++
+     // determine whether or not we are SSL
+ 
+     string ssl_str =     "https://";
+@@ -926,7 +1030,7 @@ HRESULT CoolKeyHandler::Format( const ch
+     HRESULT res = S_OK;
+ 
+     PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::Format:\n",GetTStamp(tBuff,56)));  
+-  
++ 
+     if(aTokenType)
+         mCharTokenType = strdup(aTokenType);
+ 
+@@ -1986,7 +2090,7 @@ CoolKeyHandler::DisconnectFromReader()
+     char tBuff[56];
+     PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::DisconnectFromReader:\n",GetTStamp(tBuff,56)));
+     if (mCardConnection) {
+-        CKYCardConnection_Disconnect(mCardConnection);
++        CKYCardConnection_Eject(mCardConnection);
+         CKYCardConnection_Destroy(mCardConnection);
+         mCardConnection = 0;
+     }
+@@ -2164,9 +2268,9 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     // Since we are configured to only be notified of coolkey's, cac's and piv's
+     // non blank coolkeys will be identified by NOT being cac or piv in the manu id field.
+ 
+-    if(!strcmp((const char *) tokenInfo.manufacturerID,cac_manu_id)) {
++    if(!memcmp( tokenInfo.manufacturerID,cac_manu_id,strlen(cac_manu_id ))) {
+         isACAC = 1;
+-    } else if(!strcmp((const char *) tokenInfo.manufacturerID, piv_manu_id)) {
++    } else if(!memcmp(tokenInfo.manufacturerID, piv_manu_id, strlen(piv_manu_id))) {
+         isAPIV = 1;
+     } else {
+         isACOOLKey = 1;
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.h.fix4 ./esc/src/lib/coolkey/CoolKeyHandler.h
+--- ./esc/src/lib/coolkey/CoolKeyHandler.h.fix4	2019-01-10 16:38:36.918345731 -0800
++++ ./esc/src/lib/coolkey/CoolKeyHandler.h	2019-01-10 16:38:44.109311258 -0800
+@@ -154,6 +154,7 @@ eCKMessage *AllocateMessage(eCKMessage::
+   HRESULT SetPassword(const char *password);
+   HRESULT SetTokenPin(const char *pin);
+ 
++  static void ExtractFromUrl(string &fullUrl, string &host_port, string &url, string &hostName,int  *isSSL, int *portNum);
+ 
+   nsNKeyREQUIRED_PARAMETERS_LIST *GetAuthParametersList() { return &mReqParamList;}
+ 
+diff -up ./esc/src/lib/coolkey/CoolKey.h.fix4 ./esc/src/lib/coolkey/CoolKey.h
+--- ./esc/src/lib/coolkey/CoolKey.h.fix4	2019-01-10 16:37:11.893754318 -0800
++++ ./esc/src/lib/coolkey/CoolKey.h	2019-01-10 16:37:17.142729043 -0800
+@@ -95,6 +95,7 @@ typedef HRESULT (*CoolKeyRelease)(CoolKe
+ 
+ typedef HRESULT (*CoolKeySetConfigValue)(const char *name,const char *value);
+ typedef const char * (*CoolKeyGetConfigValue)(const char *name);
++typedef void (*CoolKeyFreeConfigValue)(const char *name);
+ typedef SECStatus (*CoolKeyBadCertHandler)(void *arg, PRFileDesc *fd);
+ 
+ class CoolKeyListener  {
+@@ -104,7 +105,7 @@ public:
+ 
+     CoolKeyListener() {
+         clientNotify = NULL;
+-        client = NULL;};
++        client = NULL; notify = NULL;};
+     CoolKeyListener(CoolKeyDispatch theListener, CoolKeyDispatch internalListener) {
+         clientNotify = NULL;
+         client = NULL; 
+@@ -144,6 +145,7 @@ COOLKEY_API HRESULT CoolKeyUnregisterLis
+ COOLKEY_API HRESULT CoolKeySetCallbacks(CoolKeyDispatch dispatch,
+                         CoolKeyReference reference, CoolKeyRelease release,
+                         CoolKeyGetConfigValue getconfigvalue,CoolKeySetConfigValue setconfigvalue,
++                        CoolKeyFreeConfigValue freeconfigvalue,
+                         CoolKeyBadCertHandler badcerthandler=NULL);
+ 
+ COOLKEY_API bool    CoolKeyRequiresAuthentication(const CoolKey *aKey);
+@@ -210,6 +212,8 @@ COOLKEY_API HRESULT CoolKeyGetATR(const
+ 
+ COOLKEY_API int CoolKeyGetAppletVer(const CoolKey *aKey, const bool isMajor);
+ 
++COOLKEY_API char *CoolKeyGetPhoneHomeData(const char *url);
++
+ COOLKEY_API HRESULT CoolKeyInitializeLog(char *logFileName, int maxNumLines);
+ 
+ COOLKEY_API HRESULT CoolKeyLogMsg(int logLevel, const char *fmt, ...);
+@@ -289,6 +293,7 @@ const char *CoolKeyGetTokenName(const Co
+ const char *CoolKeyGetKeyID(const char *tokenName, int *aKeyType);
+ 
+ const char *CoolKeyGetConfig(const char *aName);
++void        CoolKeyFreeConfig(const char *aValue);
+ HRESULT     CoolKeySetConfig(const char *aName,const char *aValue);
+ CoolKeyBadCertHandler CoolKeyGetBadCertHandler();
+ HRESULT CoolKeyGetATRDirectly(char *aBuff, int aBuffLen, const char *readerName);
+diff -up ./esc/src/lib/coolkey/CoolKey_Message.cpp.fix4 ./esc/src/lib/coolkey/CoolKey_Message.cpp
+--- ./esc/src/lib/coolkey/CoolKey_Message.cpp.fix4	2019-01-10 16:39:21.887130153 -0800
++++ ./esc/src/lib/coolkey/CoolKey_Message.cpp	2019-01-10 16:39:33.879072661 -0800
+@@ -181,7 +181,7 @@ string eCKMessage::intToString(int aInt)
+     sprintf(temp,"%d",aInt);
+ 
+     result = temp;
+-    delete temp;
++    delete [] temp;
+ 
+     return result;
+ }
+@@ -241,7 +241,7 @@ void  eCKMessage::setBinValue(string &aK
+ 
+     mTokenMap[aKey] = data;
+ 
+-    delete encode_output;
++    delete [] encode_output;
+ 
+ }
+ 
+@@ -1002,7 +1002,7 @@ void URLDecode_str(const string &data,st
+     //printf("output %s \n",decode_output);
+     output = (char *) decode_output;
+ 
+-    delete decode_output;
++    delete []decode_output;
+ }
+ void URLDecode(char *data, unsigned char *buf, int *ret_len, int buff_len)
+ {
+@@ -1065,7 +1065,7 @@ void URLEncode_str(const string &data,st
+     output = encode_output;
+ 
+     //printf("output %s \n",encode_output);
+-    delete encode_output;
++    delete [] encode_output;
+ }
+ 
+ 
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix4 ./esc/src/lib/coolkey-mgr/coolkey-api.cpp
+--- ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix4	2019-01-10 16:41:27.076529992 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-api.cpp	2019-01-10 16:41:46.470437015 -0800
+@@ -20,99 +20,179 @@
+ 
+ static rhCoolKey *coolkey = NULL;
+ static const char * coolkeyDbusName = NULL;
++static const char * configFilePathName = NULL;
++static CoolKeyListener *listener = NULL;
+ 
+-int notify( CoolKeyListener *listener,
+-        unsigned long keyType, const char *keyID, unsigned long keyState,
+-        unsigned long data, const char *strData
+-    )
+-{
+-   CoolKeyDispatch clientListener = listener->GetClientListener();
+-
+-   /* notify our instance of rhCoolKey */
+-
+-   coolkey->RhNotifyKeyStateChange(keyType,keyID,keyState,data,strData);
+-
+-   if(clientListener) {
+-       (clientListener )((CoolKeyListener *) listener->GetClient(),keyType, keyID, keyState,
+-       data, strData);
+-   }
+-   return S_OK;
++#define DEF_TOKEN_TYPE "userKey"
++
++
++int notify(CoolKeyListener *listener, unsigned long keyType, const char *keyID,
++		unsigned long keyState, unsigned long data, const char *strData) {
++	CoolKeyDispatch clientListener = listener->GetClientListener();
++
++	/* notify our instance of rhCoolKey */
++
++	coolkey->RhNotifyKeyStateChange(keyType, keyID, keyState, data, strData);
++
++	if (clientListener) {
++		(clientListener)((CoolKeyListener *) listener->GetClient(), keyType,
++				keyID, keyState, data, strData);
++	}
++	return S_OK;
+ }
+ 
+ void coolkey_destroy() {
+-    if(coolkey != NULL) {
+-        coolkey->ShutDownInstance();
+-        delete coolkey;
+-        coolkey = NULL;
+-    }
++	if (coolkey != NULL) {
++                if(listener) {
++                    coolkey->UnregisterCoolKeyListener(listener);
++                }
++		coolkey->ShutDownInstance();
++		delete coolkey;
++		coolkey = NULL;
++	}
+ }
+ 
+-void coolkey_init(const char *db_dir,CoolKeyNotifyCallback cb,void* notifyClient,const char* dbusUniqueName) {
++void coolkey_init(const char *db_dir, const char *configFileName, CoolKeyNotifyCallback cb,
++		void* notifyClient, const char* dbusUniqueName) {
+ 
+-    coolkeyDbusName = dbusUniqueName;
+-    if(coolkey == NULL) {
+-        coolkey = new rhCoolKey(db_dir);
++	coolkeyDbusName = dbusUniqueName;
++	if (coolkey == NULL) {
++		coolkey = new rhCoolKey(db_dir,configFileName);
++
++		listener = new CoolKeyListener();
++		listener->SetListener((CoolKeyDispatch) cb, (CoolKeyDispatch) notify);
++		listener->SetClient(notifyClient);
++		coolkey->RegisterCoolKeyListener(listener);
++	}
++}
+ 
+-        CoolKeyListener *listener = new CoolKeyListener();
+-        listener->SetListener((CoolKeyDispatch) cb,(CoolKeyDispatch) notify);
+-        listener->SetClient(notifyClient);
+-        coolkey->RegisterCoolKeyListener(listener);
+-    }
++char *coolkey_get_phone_home(char *url) {
++   if(!url) {
++       return NULL;
++   }
++   if (coolkey != NULL) {
++       char *_retval = NULL;
++       coolkey->GetCoolKeyPhoneHomeData(url, &_retval);
++       return _retval;
++   } else {
++      return NULL;
++   } 
+ }
+ 
++
+ /* get a block of data about a token in a structure format */
+-tokenInfo *coolkey_get_token_info(int keyType,const char *keyID) {
++tokenInfo *coolkey_get_token_info(int keyType, const char *keyID) {
++
++	if (coolkey == NULL) {
++		return NULL;
++	}
++	tokenInfo *tInfo = (tokenInfo *) malloc(sizeof(tokenInfo));
++
++	if (tInfo == NULL) {
++		exit(1);
++	}
++
++	tInfo->atr = NULL;
++	tInfo->issuerInfo = NULL;
++	tInfo->issuer = NULL;
++	tInfo->issuedTo = NULL;
++	tInfo->status = 0;
++        tInfo->isACoolKey = 0;
++
++	coolkey->GetCoolKeyATR(keyType, keyID, &tInfo->atr);
++
++	coolkey->GetCoolKeyIssuerInfo(keyType, keyID, &tInfo->issuerInfo);
++
++	coolkey->GetCoolKeyIssuer(keyType, keyID, &tInfo->issuer);
++
++	coolkey->GetCoolKeyIssuedTo(keyType, keyID, &tInfo->issuedTo);
++
++	coolkey->GetCoolKeyStatus(keyType, keyID, &tInfo->status);
++
++        bool isACoolKey = false;
++        coolkey->GetCoolKeyIsReallyCoolKey(keyType, keyID, &isACoolKey);
++        tInfo->isACoolKey = (int) isACoolKey;
++
++	return tInfo;
++}
++
++int coolkey_cancel_token_operation(int keyType, const char *keyId) {
+ 
+     if(coolkey == NULL) {
+-        return NULL;
++        return E_FAIL;
+     }
+-    tokenInfo   *tInfo = (tokenInfo *) malloc(sizeof(tokenInfo)); 
+ 
+-    if(tInfo == NULL) {
+-       exit(1);
++    int ret = E_FAIL;
++    ret = coolkey->CancelCoolKeyOperation(keyType, keyId);
++
++    return S_OK;
++}
++
++int coolkey_format_token(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode) {
++
++    if (coolkey == NULL) {
++        return E_FAIL;
++    }
++
++    int ret = E_FAIL;
++
++    ret = coolkey->FormatCoolKey(keyType, keyId, DEF_TOKEN_TYPE, screenName, pin, screenNamePin, tokenCode);
++
++    return S_OK;
++
++}
++
++int coolkey_enroll_token(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode ) {
++
++    if (coolkey == NULL) {
++        return E_FAIL;
+     }
+ 
+-    tInfo ->atr = NULL;
+-    tInfo->issuerInfo = NULL;
+-    tInfo->issuer = NULL;
+-    tInfo->issuedTo = NULL;
+-    tInfo->status = 0;
+-    
+-    coolkey->GetCoolKeyATR(keyType, keyID, &tInfo->atr); 
++    int ret = E_FAIL;
+ 
+-    coolkey->GetCoolKeyIssuerInfo(keyType, keyID, &tInfo->issuerInfo);
++    ret = coolkey->EnrollCoolKey(keyType, keyId, DEF_TOKEN_TYPE, screenName, pin, screenNamePin, tokenCode);
+ 
+-    coolkey->GetCoolKeyIssuer(keyType, keyID, &tInfo->issuer);
+ 
+-    coolkey->GetCoolKeyIssuedTo(keyType, keyID, &tInfo->issuedTo);
++    return S_OK;
++}
++
++int coolkey_reset_token_pin(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode) {
+ 
+-    coolkey->GetCoolKeyStatus(keyType, keyID, &tInfo->status);
+ 
+-    return tInfo;
++    if (coolkey == NULL) {
++        return E_FAIL;
++    }
++
++    int ret = E_FAIL;
++
++    ret = coolkey->ResetCoolKeyPIN(keyType, keyId,  screenName, pin, screenNamePin);
++
++
++    return S_OK;
+ }
+ 
+ void coolkey_free_token_info(tokenInfo *tInfo) {
+-    if(tInfo) {
+-        if(tInfo->atr) {
+-           PL_strfree(tInfo->atr);
+-           tInfo->atr = NULL;
+-        }
+-
+-        if(tInfo->issuerInfo) {
+-           PL_strfree(tInfo->issuerInfo);
+-           tInfo->issuerInfo = NULL;
+-        }
+-        
+-        if(tInfo->issuer) {
+-           PL_strfree(tInfo->issuer);
+-           tInfo->issuer = NULL;
+-        }
+-
+-        if(tInfo->issuedTo) {
+-           PL_strfree(tInfo->issuedTo);
+-           tInfo->issuedTo = NULL;
+-        }
++	if (tInfo) {
++		if (tInfo->atr) {
++			PL_strfree(tInfo->atr);
++			tInfo->atr = NULL;
++		}
++
++		if (tInfo->issuerInfo) {
++			PL_strfree(tInfo->issuerInfo);
++			tInfo->issuerInfo = NULL;
++		}
++
++		if (tInfo->issuer) {
++			PL_strfree(tInfo->issuer);
++			tInfo->issuer = NULL;
++		}
++
++		if (tInfo->issuedTo) {
++			PL_strfree(tInfo->issuedTo);
++			tInfo->issuedTo = NULL;
++		}
+ 
+-        free(tInfo);
+-    }
++		free(tInfo);
++	}
+ }
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-api.h.fix4 ./esc/src/lib/coolkey-mgr/coolkey-api.h
+--- ./esc/src/lib/coolkey-mgr/coolkey-api.h.fix4	2019-01-10 16:42:11.556316752 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-api.h	2019-01-10 16:42:21.254270258 -0800
+@@ -19,7 +19,6 @@
+ #ifndef __COOLKEY_API_H__
+ #define __COOLKEY_API_H__
+ 
+-
+ typedef struct tokenInfo {
+     int keyType;
+     char* cuid;
+@@ -28,6 +27,7 @@ typedef struct tokenInfo {
+     char* issuer;
+     char* issuedTo;
+     unsigned int   status;
++    unsigned int   isACoolKey;
+ } tokenInfo;
+ 
+ #ifdef __cplusplus
+@@ -38,13 +38,20 @@ typedef int (*CoolKeyNotifyCallback)(voi
+    unsigned long aKeyType, const char *aKeyID, unsigned long aKeyState,
+    unsigned long aData, const char *aStrData);
+ 
+-void coolkey_init(const char *db_dir,CoolKeyNotifyCallback cb, void *notifyClient,const char *dbusUniqueName);
++void coolkey_init(const char *db_dir, const char *configFileName, CoolKeyNotifyCallback cb, void *notifyClient,const char *dbusUniqueName);
+ 
+ void coolkey_destroy();
+ 
++char *coolkey_get_phone_home(char *url);
+ tokenInfo *coolkey_get_token_info(int keyType,const char *keyID);
+ void coolkey_free_token_info(tokenInfo *tInfo);
+ 
++int coolkey_cancel_token_operation(int keyType, const char *keyId);
++int coolkey_format_token(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode);
++int coolkey_enroll_token(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode);
++int coolkey_reset_token_pin(int keyType, const char *keyId, const char *screenName, const char *pin, const char *screenNamePin, const char *tokenCode);
++
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-mgr.c.fix4 ./esc/src/lib/coolkey-mgr/coolkey-mgr.c
+--- ./esc/src/lib/coolkey-mgr/coolkey-mgr.c.fix4	2019-01-10 16:42:49.189136339 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-mgr.c	2019-01-10 16:42:55.436106392 -0800
+@@ -26,11 +26,15 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
++#define SUCCESS 1
++#define FAIL 0
++
+ enum
+ {
+     PROP_0,
+     PROP_DBUS_UNIQUE_NAME,
+     PROP_CONFIG_DIR,
++    PROP_CONFIG_FILE_NAME,
+     N_PROPERTIES
+ };
+ 
+@@ -43,6 +47,7 @@ struct _CoolkeyMgrPrivate {
+     CoolKeyNotifyCallback cb;
+     char *dbusUniqueName;
+     char *configDir;
++    char *configFileName;
+     DBusConnection* dbusConn; 
+ };
+ 
+@@ -101,6 +106,11 @@ coolkey_mgr_set_property (GObject      *
+         priv->configDir = g_value_dup_string(value);
+         break;
+ 
++    case PROP_CONFIG_FILE_NAME:
++        g_free(priv->configFileName);
++        priv->configFileName = g_value_dup_string(value);
++        break;
++
+     default:
+         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+         break;
+@@ -123,6 +133,9 @@ coolkey_mgr_get_property (GObject    *ob
+     case PROP_CONFIG_DIR:
+         g_value_set_string(value,priv->configDir);
+         break;
++    case PROP_CONFIG_FILE_NAME:
++        g_value_set_string(value,priv->configFileName);
++        break;
+     default:
+         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+         break;
+@@ -137,6 +150,7 @@ coolkey_mgr_finalize (GObject *object)
+     if(priv) {
+         g_free (priv->dbusUniqueName);
+         g_free(priv->configDir);
++        g_free(priv->configFileName);
+         if(priv->dbusConn) {
+             dbus_connection_unref(priv->dbusConn);
+             priv->dbusConn = NULL;
+@@ -150,7 +164,7 @@ static void
+ coolkey_mgr_constructed (GObject *object)
+ {
+     CoolkeyMgrPrivate *priv = COOLKEY_MGR_GET_PRIVATE (object);
+-    coolkey_init(priv->configDir,priv->cb,(void *) object,priv->dbusUniqueName);
++    coolkey_init(priv->configDir,priv->configFileName,priv->cb,(void *) object,priv->dbusUniqueName);
+ }
+ 
+ // class initialization
+@@ -174,13 +188,22 @@ coolkey_mgr_class_init (CoolkeyMgrClass
+                              G_PARAM_CONSTRUCT);
+ 
+    obj_properties[PROP_CONFIG_DIR] = 
+-    g_param_spec_string ("config_dir",
++        g_param_spec_string ("config_dir",
+                              "Config_dir",
+                              "User config directory path",
+                              "World",
+                              G_PARAM_READWRITE |
+                              G_PARAM_CONSTRUCT);
+ 
++    obj_properties[PROP_CONFIG_FILE_NAME] =
++        g_param_spec_string ("config_file_name",
++                             "Config_file_name",
++                             "User config file name",
++                             "World",
++                             G_PARAM_READWRITE |
++                             G_PARAM_CONSTRUCT);
++
++
+     g_object_class_install_properties (object_class,
+                                        N_PROPERTIES,
+                                        obj_properties);
+@@ -206,6 +229,124 @@ coolkey_mgr_new (void)
+   return mgr;
+ }
+ 
++int coolkey_mgr_cancel_token_operation(CoolkeyMgr* self, CoolkeyToken* token) {
++
++    gchar *cuid = NULL;
++    gchar *keyType = NULL;
++
++    int ret = FAIL;
++
++    if(token == NULL) {
++        return ret;
++    }
++
++    g_object_get(token,"key_type", &keyType,NULL);
++
++    g_object_get(token,"cuid", &cuid, NULL);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++    int res = coolkey_cancel_token_operation(atoi( keyType), cuid);
++cleanup:
++
++    g_free (keyType);
++    g_free (cuid);
++
++    return ret;
++
++}
++
++
++int coolkey_mgr_format_token(CoolkeyMgr* self, CoolkeyToken* token, gchar *tokenType, gchar *userId, gchar* pin, gchar *userPwd, gchar *tokenCode) {
++
++    gchar *cuid = NULL;
++    gchar *keyType = NULL;
++
++    int ret = FAIL;
++
++    if(token == NULL || userId == NULL || userPwd == NULL ) {
++        return ret; 
++    }
++
++    g_object_get(token,"key_type", &keyType,NULL);
++
++    g_object_get(token,"cuid", &cuid, NULL);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++    int res = coolkey_format_token(atoi( keyType), cuid, userId, pin, userPwd,  tokenCode);
++cleanup:
++
++    g_free (keyType);
++    g_free (cuid);
++
++    return ret;
++}
++
++int coolkey_mgr_enroll_token(CoolkeyMgr* self, CoolkeyToken* token,gchar *tokenType, gchar *userId, gchar *pin,gchar *userPwd, gchar *tokenCode) {
++
++    gchar *cuid = NULL;
++    gchar *keyType = NULL;
++
++    int ret = FAIL;
++
++    if(token == NULL || userId == NULL || userPwd == NULL || pin == NULL) {
++        return ret;
++    }
++
++    g_object_get(token,"key_type", &keyType,NULL);
++
++    g_object_get(token,"cuid", &cuid, NULL);
++
++    int res = coolkey_enroll_token(atoi( keyType), cuid, userId, pin, userPwd,  tokenCode);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++cleanup:
++
++    g_free (keyType);
++    g_free (cuid);
++
++    return ret;
++}
++
++int coolkey_mgr_reset_token_pin(CoolkeyMgr* self, CoolkeyToken* token, gchar *tokenType, gchar *userId,gchar *pin, gchar *userPwd, gchar *tokenCode) {
++
++    gchar *cuid = NULL;
++    gchar *keyType = NULL;
++
++    int ret = FAIL;
++
++    if(token == NULL || userId == NULL || userPwd == NULL || pin == NULL) {
++        return ret;
++    }
++
++    g_object_get(token,"key_type", &keyType,NULL);
++
++    g_object_get(token,"cuid", &cuid, NULL);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++     int res = coolkey_reset_token_pin(atoi( keyType), cuid, userId, pin, userPwd,  tokenCode);
++
++cleanup:
++
++    g_free (keyType);
++    g_free (cuid);
++
++    return ret;
++}
++
++
++
+ void 
+ coolkey_mgr_get_token_info(CoolkeyMgr* self, CoolkeyToken* token) {
+ 
+@@ -218,7 +359,7 @@ coolkey_mgr_get_token_info(CoolkeyMgr* s
+ 
+     g_object_get(token,"cuid", &cuid, NULL);
+ 
+-    if(keyType == NULL) {
++    if(keyType == NULL || cuid == NULL) {
+        goto cleanup;
+     }
+ 
+@@ -231,7 +372,7 @@ coolkey_mgr_get_token_info(CoolkeyMgr* s
+             "issuer_info", tInfo->issuerInfo,
+             "issuer",tInfo->issuer, 
+             "issued_to", tInfo->issuedTo, 
+-            "status", tInfo->status,NULL);
++            "status", tInfo->status,"is_a_cool_key", tInfo->isACoolKey,NULL);
+     }
+ 
+ cleanup:
+@@ -239,10 +380,25 @@ cleanup:
+     coolkey_free_token_info(tInfo);
+     g_free (keyType);
+     g_free (cuid);
+-
+-    
+ }
+ 
++/**
++* coolkey_mgr_phone_home:
++* @url: phone home url to query
++*
++* Returns: raw phone home xml text.
++*
++*/
++
++gchar * 
++coolkey_mgr_phone_home(CoolkeyMgr* self,gchar *url)
++{
++   gchar *phoneInfo = NULL;
++
++   phoneInfo = coolkey_get_phone_home(url);
++
++   return phoneInfo;
++}
+ 
+ /**
+  * coolkey_mgr_speak:
+@@ -256,8 +412,6 @@ coolkey_mgr_speak (CoolkeyMgr* self, gch
+ {
+   gchar *retval= 0;
+ 
+-  printf("Coolkey says: %s \n", words);
+-
+   return retval;
+ }
+ 
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-mgr.h.fix4 ./esc/src/lib/coolkey-mgr/coolkey-mgr.h
+--- ./esc/src/lib/coolkey-mgr/coolkey-mgr.h.fix4	2019-01-10 16:43:15.341010967 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-mgr.h	2019-01-10 16:43:22.355977338 -0800
+@@ -23,7 +23,6 @@
+ 
+ typedef struct _CoolkeyMgrPrivate CoolkeyMgrPrivate;
+ 
+-
+ // Declare CoolkeyMgr as a final (non-derivable) class inherited from GObject
+ #define COOLKEY_TYPE_MGR coolkey_mgr_get_type ()
+ G_DECLARE_FINAL_TYPE (CoolkeyMgr, coolkey_mgr, COOLKEY, MGR, GObject)
+@@ -35,8 +34,20 @@ CoolkeyMgr * coolkey_mgr_new (void);
+  * CoolkeyMgr method declarations.
+  */
+ 
++
++int coolkey_mgr_format_token(CoolkeyMgr* self, CoolkeyToken* token, gchar *tokenType, gchar *userId,gchar *pin, gchar *userPwd, gchar *tokenCode);
++
++int coolkey_mgr_enroll_token(CoolkeyMgr* self, CoolkeyToken* token, gchar *tokenType, gchar *userId, gchar *pin, gchar *userPwd, gchar *tokenCode);
++
++int coolkey_mgr_reset_token_pin(CoolkeyMgr* self, CoolkeyToken* token, gchar *tokenType, gchar *userId, gchar *pin, gchar *userPwd, gchar *tokenCode);
++
++int coolkey_mgr_cancel_token_operation(CoolkeyMgr* self, CoolkeyToken* token);
++
++
+ void  coolkey_mgr_get_token_info(CoolkeyMgr* self, CoolkeyToken* token);
+ 
++gchar * coolkey_mgr_phone_home(CoolkeyMgr* self, gchar *url);
++
+ gchar * coolkey_mgr_speak (CoolkeyMgr* self, gchar *words);
+ void coolkey_mgr_cleanup(CoolkeyMgr *self);
+ 
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-token.c.fix4 ./esc/src/lib/coolkey-mgr/coolkey-token.c
+--- ./esc/src/lib/coolkey-mgr/coolkey-token.c.fix4	2019-01-10 16:43:53.652827301 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-token.c	2019-01-10 16:44:00.252795662 -0800
+@@ -35,6 +35,7 @@ enum
+     PROP_ISSUER,
+     PROP_ISSUEDTO,
+     PROP_STATUS,
++    PROP_IS_COOLKEY,
+     N_PROPERTIES
+ };
+ 
+@@ -51,6 +52,7 @@ struct _CoolkeyTokenPrivate {
+     gchar* issuer;
+     gchar* issued_to;
+     int    status;
++    int    is_a_cool_key;
+ };
+ 
+ 
+@@ -82,6 +84,7 @@ coolkey_token_init (CoolkeyToken *self)
+    priv->issuer_info = NULL;
+    priv->issuer = NULL;
+    priv->issued_to = NULL;
++   priv->is_a_cool_key = 0;
+ }
+ 
+ static void
+@@ -128,6 +131,9 @@ coolkey_token_set_property (GObject
+         priv->status = g_value_get_int(value);
+         break;
+ 
++    case PROP_IS_COOLKEY:
++        priv->is_a_cool_key = g_value_get_int(value);
++        break;
+  
+     default:
+         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+@@ -170,13 +176,16 @@ coolkey_token_get_property (GObject    *
+     case PROP_STATUS:
+         g_value_set_int(value, priv->status);
+         break;
++
++    case PROP_IS_COOLKEY:
++        g_value_set_int(value, priv->is_a_cool_key);
++        break;
+     default:
+         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+         break;
+     }
+ }
+ 
+-
+ static void
+ coolkey_token_finalize (GObject *object)
+ {
+@@ -267,6 +276,13 @@ coolkey_token_class_init (CoolkeyTokenCl
+                              0, INT_MAX,0,
+                              G_PARAM_READWRITE); 
+ 
++    obj_properties[PROP_IS_COOLKEY]  =
++        g_param_spec_int ("is_a_cool_key",
++                             "Is_a_cool_key",
++                             "Is the token a CoolKey",
++                             0, INT_MAX,0,
++                             G_PARAM_READWRITE);
++
+ 
+     g_object_class_install_properties (object_class,
+                                        N_PROPERTIES,
+@@ -292,3 +308,19 @@ coolkey_token_new (void)
+   token = g_object_new(COOLKEY_TYPE_TOKEN, NULL);
+   return token;
+ }
++
++/**
++ * coolkey_token_phone_home:
++ * @url: url of smart card server to phone home
++ *
++ * Returns: Text of the phone home xml file 
++ *
++ */
++gchar *
++coolkey_token_phone_home (CoolkeyToken* self, gchar *url)
++{
++  gchar *retval= 0;
++
++  return retval;
++}
++
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-token.h.fix4 ./esc/src/lib/coolkey-mgr/coolkey-token.h
+--- ./esc/src/lib/coolkey-mgr/coolkey-token.h.fix4	2019-01-10 16:44:25.228675926 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-token.h	2019-01-10 16:44:30.212652031 -0800
+@@ -29,4 +29,8 @@ G_DECLARE_FINAL_TYPE (CoolkeyToken, cool
+ // constructor
+ CoolkeyToken * coolkey_token_new (void);
+ 
++//Methods
++
++gchar *coolkey_token_phone_home(CoolkeyToken *self,gchar *url);
++
+ #endif /* __COOLKEY_TOKEN_H__ */
+diff -up ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp.fix4 ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp
+--- ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp.fix4	2019-01-10 16:45:08.109470350 -0800
++++ ./esc/src/lib/coolkey-mgr/rhCoolKey.cpp	2019-01-10 16:45:15.508434880 -0800
+@@ -28,6 +28,7 @@
+ #include <vector>
+ #include <string>
+ #include <time.h>
++#include <glib.h>
+ 
+ #define STRINGIFY(x) #x
+ #define GETSTRING(x) STRINGIFY(x)
+@@ -50,6 +51,7 @@ static PRLogModuleInfo *coolKeyLog = PR_
+ 
+ static rhCoolKey *single = NULL;
+ 
++char *rhCoolKey::configFilePathName = NULL;
+ 
+ class CoolKeyShutdownObserver
+  {
+@@ -179,15 +181,15 @@ ASCCalcBase64EncodedLength(unsigned int
+   return ((aDataLength + 2) / 3) * 4;
+ }
+ 
+-rhCoolKey::rhCoolKey(const char* dbDir)
++rhCoolKey::rhCoolKey(const char* dbDir, const char* configFileName)
+ {
+     char tBuff[56];
+     PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s rhCoolKey::rhCoolKey: %p \n",GetTStamp(tBuff,56),this));
+ 
++    rhCoolKey::configFilePathName = NULL;
+     if(!single)
+     {
+         single = this;
+-
+     }
+     else
+     {
+@@ -217,6 +219,12 @@ rhCoolKey::rhCoolKey(const char* dbDir)
+         exit(1);
+      }
+ 
++     res = InitConfig(dbDir,configFileName);
++
++     if(res == PR_FALSE) {
++         PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s ESC InitConfig failed,exiting. CoolKey instance %p\n",GetTStamp(tBuff,56),single));
++     }
++
+   /* member initializers and constructor code */ 
+ }
+ 
+@@ -227,6 +235,11 @@ rhCoolKey::~rhCoolKey()
+     char tBuff[56];
+     PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s rhCoolKey::~rhCoolKey: %p \n",GetTStamp(tBuff,56),this));
+ 
++    if(rhCoolKey::configFilePathName != NULL) {
++        delete [] rhCoolKey::configFilePathName;
++        rhCoolKey::configFilePathName = NULL;
++    }
++
+     if(certCBLock) {
+         PR_DestroyLock(certCBLock);
+     }
+@@ -241,7 +254,7 @@ void rhCoolKey::ShutDownInstance()
+     char tBuff[56];
+     PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s rhCoolKey::ShutDownInstance. %p \n",GetTStamp(tBuff,56),this));    
+ 
+-    //ClearNotifyKeyList();
++    ClearAvailableList();
+ 
+     CoolKeyShutdown();
+ }
+@@ -270,6 +283,9 @@ HRESULT rhCoolKey::Reference( CoolKeyLis
+ 
+ HRESULT rhCoolKey::Release( CoolKeyListener *listener )
+ {
++    if(listener) {
++        delete listener;
++    }
+     return S_OK;
+ }
+ 
+@@ -366,25 +382,57 @@ SECStatus rhCoolKey::badCertHandler(void
+ HRESULT rhCoolKey::doSetCoolKeyConfigValue(const char *aName, const char *aValue) 
+ {
+ 
+-    if(!aName || !aValue)
+-    {
+-        return E_FAIL;
+-    }
++    //Unimplimented
+ 
+-
+-    return S_OK;
++    return E_FAIL;
+ 
+ }          
+ 
++void rhCoolKey::doFreeCoolKeyConfigValue(const char *aValue) {
++
++    if(!aValue)
++        return;
++
++    g_free((gchar *)aValue);
++
++}
+ const char *rhCoolKey::doGetCoolKeyConfigValue(const char *aName )
+ {
++
++    char tBuff[56];
+     const char* prefValue = NULL;
+     if(!aName)
+     {
+         return NULL;
+     }
+ 
+-    return (const char *) prefValue;
++    g_autoptr(GError) error = NULL;
++    g_autoptr(GKeyFile) key_file = g_key_file_new ();
++
++    if (!g_key_file_load_from_file (key_file, rhCoolKey::configFilePathName,G_KEY_FILE_NONE, &error))
++    {
++        if (!g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT)) {
++
++            PR_LOG(coolKeyLog, PR_LOG_DEBUG,
++                          ("%s rhCoolKey::doGetCoolKeyConfigValue error opening key file.",
++                          GetTStamp(tBuff,56)));
++            return NULL;
++        }
++    }
++
++    gchar *val = g_key_file_get_string (key_file, "ESC", aName, &error);
++    if (val == NULL)
++    {
++        PR_LOG(coolKeyLog, PR_LOG_DEBUG,
++                          ("%s rhCoolKey::doGetCoolKeyConfigValue error can't get value for: %s.",
++                          GetTStamp(tBuff,56), aName));
++
++        return NULL;
++    }
++   
++    prefValue = (const char*) val; 
++
++    return prefValue;
+ }
+ 
+ void rhCoolKey::RegisterCoolKeyListener(CoolKeyListener *listener) {
+@@ -393,6 +441,14 @@ void rhCoolKey::RegisterCoolKeyListener(
+     }
+ }
+ 
++void rhCoolKey::UnregisterCoolKeyListener(CoolKeyListener *listener) {
++
++    if(listener) {
++        CoolKeyUnregisterListener(listener);
++    }
++}
++
++
+ PRBool rhCoolKey::InitInstance(const char* dbDir)
+ {
+     char tBuff[56];
+@@ -400,9 +456,7 @@ PRBool rhCoolKey::InitInstance(const cha
+ 
+     PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s rhCoolKey::InitInstance %p \n",GetTStamp(tBuff,56),this));
+ 
+-    CoolKeySetCallbacks(Dispatch,Reference, Release,doGetCoolKeyConfigValue ,doSetCoolKeyConfigValue,badCertHandler);
+-
+-    //CoolKeyRegisterListener();
++    CoolKeySetCallbacks(Dispatch,Reference, Release,doGetCoolKeyConfigValue,doSetCoolKeyConfigValue,doFreeCoolKeyConfigValue,badCertHandler);
+ 
+     // Now setup CoolKey.
+ 
+@@ -411,6 +465,37 @@ PRBool rhCoolKey::InitInstance(const cha
+     return ret;
+ }
+ 
++PRBool rhCoolKey::InitConfig(const char *dbDir,const char* configFileName) 
++{
++    char tBuff[56];
++    PRBool ret = PR_TRUE;
++
++    if(!dbDir || !configFileName) {
++        ret = PR_FALSE;
++        return ret;
++    }  
++
++    int size = strlen(dbDir) + strlen(configFileName) + 2;
++
++    //sanity
++
++    if(size > 200) {
++       ret = PR_FALSE;
++       return ret;
++    }
++
++    if(rhCoolKey::configFilePathName == NULL) {
++        rhCoolKey::configFilePathName = new char[size];
++    }
++
++    snprintf(rhCoolKey::configFilePathName,200,"%s/%s",dbDir,configFileName);
++
++    PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s rhCoolKey::InitConfig  full file Name: %s \n",GetTStamp(tBuff,56),configFilePathName));
++
++    return ret;
++    
++}
++
+ CoolKeyNode* rhCoolKey::GetCoolKeyInfo(unsigned long aKeyType, const char * aKeyID)
+ {
+     char tBuff[56];
+@@ -456,8 +541,9 @@ HRESULT  rhCoolKey::ASCGetAvailableCoolK
+         std::list<CoolKeyNode*>::const_iterator it;
+         for(it=gASCAvailableKeys.begin(); it!=gASCAvailableKeys.end(); ++it) {
+           if (aIndex-- == 0) {
+-              *aKeyType = (*it)->mKeyType;
+-              *aKeyID = (char *) (*it)->mKeyID;
++        	  CoolKeyNode *node = (*it);
++              *aKeyType = node->mKeyType;
++              *aKeyID = (char *) node->mKeyID;
+                return S_OK;
+           }
+         }
+@@ -1359,3 +1445,18 @@ HRESULT rhCoolKey::GetCoolKeyVersion(cha
+ 
+     return NS_OK;
+ }
++
++HRESULT rhCoolKey::GetCoolKeyPhoneHomeData(const char *url, char **_retval) {
++	char *phoneHomeData = NULL;
++
++	*_retval = NULL;
++
++	phoneHomeData = CoolKeyGetPhoneHomeData(url);
++
++	if (phoneHomeData) {
++	    *_retval = PL_strdup(phoneHomeData);
++             phoneHomeData = NULL;
++	}
++ 
++	return NS_OK;
++}
+diff -up ./esc/src/lib/coolkey-mgr/rhCoolKey.h.fix4 ./esc/src/lib/coolkey-mgr/rhCoolKey.h
+--- ./esc/src/lib/coolkey-mgr/rhCoolKey.h.fix4	2019-01-10 16:45:36.015336570 -0800
++++ ./esc/src/lib/coolkey-mgr/rhCoolKey.h	2019-01-10 16:45:45.896289201 -0800
+@@ -74,18 +74,20 @@ class rhCoolKey
+ {
+ public:
+ 
+-    rhCoolKey(const char* dbDir);
++    rhCoolKey(const char* dbDir, const char* configFileName);
+ 
+     void ShutDownInstance();
+     ~rhCoolKey();
+ public:
+     static void RegisterCoolKeyListener(CoolKeyListener *listener);
++    static void UnregisterCoolKeyListener(CoolKeyListener *listener);
+     static HRESULT Dispatch( CoolKeyListener *listener,
+     unsigned long keyType, const char *keyID, unsigned long keyState,
+     unsigned long data, const char *strData);
+     static HRESULT Reference( CoolKeyListener *listener );
+     static HRESULT Release( CoolKeyListener *listener );
+ 
++    static void doFreeCoolKeyConfigValue(const char *aValue);
+     static HRESULT doSetCoolKeyConfigValue(const char *aName, const char *aValue); 
+     static const char *doGetCoolKeyConfigValue(const char *aName );
+     static SECStatus badCertHandler(void *arg, PRFileDesc *fd);
+@@ -121,8 +123,7 @@ public:
+     HRESULT AuthenticateCoolKey(PRUint32 aKeyType, const char *aKeyID, const char *aPIN, bool *_retval);
+     HRESULT SetCoolKeyDataValue(PRUint32 aKeyType, const char *aKeyID, const char *name, const char *value);
+     HRESULT GetCoolKeyVersion(char **_retval);
+-
+-    //nsCOMPtr<rhIKeyNotify> mJsNotify;
++    HRESULT GetCoolKeyPhoneHomeData(const char *url, char **_retval);
+ 
+     static std::list<CoolKeyNode*> gASCAvailableKeys;
+ 
+@@ -132,8 +133,8 @@ public:
+ 
+     static PRBool      gAutoEnrollBlankTokens;
+ 
+-    //nsCOMPtr<nsISupports> nssComponent;
+     PRBool InitInstance(const char* dbDir);
++    PRBool InitConfig(const char *dbDir,const char* configFileName);
+ 
+     HRESULT ASCSetCoolKeyPin(unsigned long aKeyType, const char * aKeyID, const char * aPin);
+     PRBool ASCCoolKeyIsAvailable(unsigned long aKeyType, char * aKeyID);
+@@ -151,15 +152,11 @@ public:
+ 
+     void RemoveKeyFromAvailableList(unsigned long aKeyType, const char * aKeyID);
+ 
+-    //rhIKeyNotify* GetNotifyKeyListener(rhIKeyNotify *listener);
+-
+-    //int GetNotifyKeyListenerListSize();
+-    //void AddNotifyKeyListener(rhIKeyNotify *listener);
+-    //void RemoveNotifyKeyListener(rhIKeyNotify *listener);
+-    //void ClearNotifyKeyList();
+-
+     void ClearAvailableList();
+ 
++    private:
++
++    static  char *configFilePathName;
+ 
+ };
+ #endif
+diff -up ./esc/src/lib/coolkey/NSSManager.cpp.fix4 ./esc/src/lib/coolkey/NSSManager.cpp
+--- ./esc/src/lib/coolkey/NSSManager.cpp.fix4	2019-01-10 16:40:09.075903931 -0800
++++ ./esc/src/lib/coolkey/NSSManager.cpp	2019-01-10 16:40:20.324850003 -0800
+@@ -154,6 +154,10 @@ void NSSManager::Shutdown()
+   // Logout all tokens.
+     PK11_LogoutAll();
+ 
++    if(userModule) {
++        SECMOD_UnloadUserModule(userModule);
++    }
++
+     if(systemCertDB)
+     {
+         SECMOD_CloseUserDB(systemCertDB);
+@@ -162,9 +166,6 @@ void NSSManager::Shutdown()
+         systemCertDB = NULL;
+     }
+    
+-    if(userModule) {
+-        SECMOD_UnloadUserModule(userModule);
+-    }
+     NSS_Shutdown();
+ }
+ 
+diff -up ./esc/src/lib/nss-http-client/httpClientNss.cpp.fix4 ./esc/src/lib/nss-http-client/httpClientNss.cpp
+--- ./esc/src/lib/nss-http-client/httpClientNss.cpp.fix4	2019-01-10 16:46:22.792112323 -0800
++++ ./esc/src/lib/nss-http-client/httpClientNss.cpp	2019-01-10 16:46:35.788050020 -0800
+@@ -57,6 +57,48 @@ HttpClientNss::~HttpClientNss()
+     }
+ }
+ 
++PSHttpResponse *HttpClientNss::httpSend(char *host_port,const char *uri,
++		char *method, char *body, PRBool doSSL, int messageTimeout) {
++
++	int family = PR_AF_INET;
++	char hostName[512] = { 0 };
++
++	extractHost(host_port, hostName, 512);
++	family = this->getFamily(hostName);
++
++	PSHttpServer server(host_port, family);
++
++	PSHttpRequest request(&server, uri, HTTP11, 0);
++	_request = &request;
++
++	int timeout = 30;
++
++	if (messageTimeout >= 0) {
++		timeout = messageTimeout;
++
++	}
++
++	request.setSSL(doSSL);
++
++	request.addHeader( "Content-Type", "text/plain" );
++
++	_engine = new HttpEngine();
++
++	if (!_engine)
++		return NULL;
++
++	PSHttpResponse *resp = _engine->makeRequest(request, server,
++			timeout /*_timeout*/, PR_FALSE /* expect chunked*/,
++			PR_FALSE /* process streamed */);
++
++	_response = resp;
++
++	if (resp && resp->getStatus() != 200) {
++		return NULL;
++	}
++
++	return resp;
++}
+ /*
+ Send a http message with a persistant transfer chunked encoded message type
+ 
+@@ -67,7 +109,7 @@ PSHttpResponse *HttpClientNss::httpSendC
+     char *pPort = NULL;
+     char *pPortActual = NULL;
+ 
+-    char hostName[512];
++    char hostName[512] = {0};
+ 
+     /*
+      * Isolate the host name, account for IPV6 numeric addresses.
+@@ -101,7 +143,7 @@ PSHttpResponse *HttpClientNss::httpSendC
+ 
+     ai = PR_GetAddrInfoByName(hostName, PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
+     if (ai) {
+-        printf("%s\n", PR_GetCanonNameFromAddrInfo(ai));
++        //printf("%s\n", PR_GetCanonNameFromAddrInfo(ai));
+         iter = NULL;
+         while ((iter = PR_EnumerateAddrInfo(iter, ai, 0, &addr)) != NULL) {
+             family = PR_NetAddrFamily(&addr);
+@@ -211,4 +253,51 @@ PRBool HttpClientNss::sendChunkedEntityD
+     }
+ }
+ 
++int HttpClientNss::getFamily(char *hostName) {
++
++	PRAddrInfo *ai;
++	void *iter;
++	PRNetAddr addr;
++	int family = PR_AF_INET;
++
++	ai = PR_GetAddrInfoByName(hostName, PR_AF_UNSPEC, PR_AI_ADDRCONFIG);
++	if (ai) {
++		//printf("%s\n", PR_GetCanonNameFromAddrInfo(ai));
++		iter = NULL;
++		while ((iter = PR_EnumerateAddrInfo(iter, ai, 0, &addr)) != NULL) {
++			family = PR_NetAddrFamily(&addr);
++			break;
++		}
++		PR_FreeAddrInfo(ai);
++	}
++
++	return family;
++}
++
++void HttpClientNss::extractHost(char *host_port, char *host, int hostLen) {
++
++	char *pPort = NULL;
++	char *pPortActual = NULL;
++
++	if(!host_port || !host || hostLen <= 0)
++		return;
++
++	if(host_port)
++	        strncpy(host,host_port,hostLen);
++
++	    pPort = host;
++	    while(1)  {
++	        pPort = strchr(pPort, ':');
++	        if (pPort) {
++	            pPortActual = pPort;
++	            pPort++;
++	        } else
++	            break;
++	    }
++
++	    if(pPortActual)
++	        *pPortActual = '\0';
++
++}
++
+ 
+diff -up ./esc/src/lib/nss-http-client/HttpClientNss.h.fix4 ./esc/src/lib/nss-http-client/HttpClientNss.h
+--- ./esc/src/lib/nss-http-client/HttpClientNss.h.fix4	2019-01-10 16:47:19.171842036 -0800
++++ ./esc/src/lib/nss-http-client/HttpClientNss.h	2019-01-10 16:47:37.786752798 -0800
+@@ -33,12 +33,19 @@ public:
+     PSHttpRequest *        _request;
+     PSHttpResponse*        _response;
+ 
+-    PSHttpResponse *httpSendChunked(char *host_port, char *uri, char *method, char *body,PSChunkedResponseCallback cb,void *uw,PRBool doSSL = PR_FALSE,int messageTimeout =30);
+-
++	PSHttpResponse *httpSendChunked(char *host_port, char *uri, char *method,
++			char *body, PSChunkedResponseCallback cb, void *uw, PRBool doSSL =
++					PR_FALSE, int messageTimeout = 30);
++	PSHttpResponse *httpSend(char *host_port,const char *uri, char *method,
++			char *body, PRBool doSSL = PR_FALSE, int messageTimeout = 30);
+     PRBool sendChunkedEntityData(int body_len,unsigned char * body);
+     HttpEngine *getEngine() { return _engine;}
+ 
+     void CloseConnection();
++
++private:
++	void extractHost(char *host_port, char *host, int hostLen);
++	int getFamily(char *hostName);
+ };
+ 
+ #endif
+diff -up ./esc/src/lib/nss-http-client/NssHttpClient.cpp.fix4 ./esc/src/lib/nss-http-client/NssHttpClient.cpp
+--- ./esc/src/lib/nss-http-client/NssHttpClient.cpp.fix4	2019-01-10 16:48:14.117578626 -0800
++++ ./esc/src/lib/nss-http-client/NssHttpClient.cpp	2019-01-10 16:48:29.082506883 -0800
+@@ -156,46 +156,93 @@ NSS_HTTP_CLIENT_API NSS_HTTP_RESULT http
+     return 1;
+ }
+ 
+-NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpSendChunked(char *host_port, char *uri, char *method, char *body,NSChunkedResponseCallback cb,void *cb_uw,NSS_HTTP_HANDLE handle,PRBool doSSL, int messageTimeout )
+-{
+-    NSS_HTTP_RESULT res = 0;
+-
+-    if(!clientTableLock)
+-    {
+-        return res;
+-    }
+-
+-    if(!handle)
+-    {
+-        return res;
+-    }
+-    
+-    PR_Lock(clientTableLock);
+-
+-    HttpClientNss *client = NULL;
+-
+-    client = client_table[handle];
+-
+-    if(!client)
+-    {
+-        PR_Unlock(clientTableLock);
+-        return res;
+-    }
+-
+-    PR_Unlock(clientTableLock);
+-
+-    PSHttpResponse * resp = client->httpSendChunked(host_port,uri,method,body,cb,cb_uw,doSSL,messageTimeout);
+-
+-    if(!resp)
+-    {
+-        res = 0;
+-    }
+-    else
+-    {
+-        res = 1;
+-    }
++NSS_HTTP_CLIENT_API char * httpSend(char *host_port,const char *uri,
++		char *method, char *body, NSS_HTTP_HANDLE handle, PRBool doSSL,
++		int messageTimeout) {
+ 
+-    return res;
++	char *res = 0;
++
++	if(host_port == NULL || uri == NULL) {
++		return NULL;
++	}
++
++	if (!clientTableLock) {
++		return res;
++	}
++
++	if (!handle) {
++		return res;
++	}
++
++	PR_Lock(clientTableLock);
++
++	HttpClientNss *client = NULL;
++
++	client = client_table[handle];
++
++	if (!client) {
++		PR_Unlock(clientTableLock);
++		return res;
++	}
++
++	PR_Unlock(clientTableLock);
++
++	PSHttpResponse *resp = client->httpSend(host_port, uri, method,
++	NULL, doSSL, messageTimeout);
++
++	int retCode = 0;
++	if (!resp) {
++		res = NULL;
++	} else {
++		retCode = resp->getReturnCode();
++
++		if(retCode != 200) {
++			return NULL;
++		}
++
++		res = resp->getContent();
++	}
++
++	return res;
++
++}
++
++NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpSendChunked(char *host_port, char *uri,
++		char *method, char *body, NSChunkedResponseCallback cb, void *cb_uw,
++		NSS_HTTP_HANDLE handle, PRBool doSSL, int messageTimeout) {
++	NSS_HTTP_RESULT res = 0;
++
++	if (!clientTableLock) {
++		return res;
++	}
++
++	if (!handle) {
++		return res;
++	}
++
++	PR_Lock(clientTableLock);
++
++	HttpClientNss *client = NULL;
++
++	client = client_table[handle];
++
++	if (!client) {
++		PR_Unlock(clientTableLock);
++		return res;
++	}
++
++	PR_Unlock(clientTableLock);
++
++	PSHttpResponse * resp = client->httpSendChunked(host_port, uri, method,
++			body, cb, cb_uw, doSSL, messageTimeout);
++
++	if (!resp) {
++		res = 0;
++	} else {
++		res = 1;
++	}
++
++	return res;
+ }
+ 
+ NSS_HTTP_CLIENT_API NSS_HTTP_RESULT sendChunkedEntityData(int body_len,unsigned char *body,NSS_HTTP_HANDLE handle)
+diff -up ./esc/src/lib/nss-http-client/NssHttpClient.h.fix4 ./esc/src/lib/nss-http-client/NssHttpClient.h
+--- ./esc/src/lib/nss-http-client/NssHttpClient.h.fix4	2019-01-10 17:28:26.200053405 -0800
++++ ./esc/src/lib/nss-http-client/NssHttpClient.h	2019-01-10 17:28:49.771941100 -0800
+@@ -28,6 +28,7 @@
+ 
+ #include "nspr.h"
+ 
++#include "response.h"
+ #define NSS_HTTP_CLIENT_API
+ 
+ #define NSS_HTTP_CHUNK_COMPLETE 1
+@@ -45,9 +46,17 @@ NSS_HTTP_CLIENT_API NSS_HTTP_HANDLE http
+ 
+ NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpDestroyClient(NSS_HTTP_HANDLE handle);
+ 
+-NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpSendChunked(char *host_port, char *uri, char *method, char *body,NSChunkedResponseCallback cb,void *cb_uw,NSS_HTTP_HANDLE handle,PRBool doSSL = PR_FALSE,int messageTimeout = 30);
++NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpSendChunked(char *host_port, char *uri,
++		char *method, char *body, NSChunkedResponseCallback cb, void *cb_uw,
++		NSS_HTTP_HANDLE handle, PRBool doSSL = PR_FALSE,
++		int messageTimeout = 30);
++
++NSS_HTTP_CLIENT_API char * httpSend(char *host_port,const char *uri,
++		char *method, char *body, NSS_HTTP_HANDLE handle, PRBool doSSL =
++				PR_FALSE, int messageTimeout = 30);
+ 
+-NSS_HTTP_CLIENT_API NSS_HTTP_RESULT sendChunkedEntityData(int body_len,unsigned char *body,NSS_HTTP_HANDLE handle);
++NSS_HTTP_CLIENT_API NSS_HTTP_RESULT sendChunkedEntityData(int body_len,
++		unsigned char *body, NSS_HTTP_HANDLE handle);
+ 
+ NSS_HTTP_CLIENT_API NSS_HTTP_RESULT httpCloseConnection(NSS_HTTP_HANDLE handle);
+ 
+diff -up ./esc/src/lib/nss-http-client/response.cpp.fix4 ./esc/src/lib/nss-http-client/response.cpp
+--- ./esc/src/lib/nss-http-client/response.cpp.fix4	2019-01-10 16:49:06.754326282 -0800
++++ ./esc/src/lib/nss-http-client/response.cpp	2019-01-10 16:49:15.049286517 -0800
+@@ -52,6 +52,7 @@ RecvBuf::RecvBuf( const PRFileDesc *sock
+     _socket = socket;
+     _allocSize = size;
+     _buf = (char *)PR_Malloc(size);
++    _buf[size -1 ] = 0;
+     _curPos = 0;
+     _curSize = 0;
+     // sns can't do "chunked", but ca needs "chunked"
+@@ -198,7 +199,11 @@ int RecvBuf::getAllContent() {
+                 if (_buf[i+1] == '\n' && _buf[i+2] == '\r' 
+                   && _buf[i+3] == '\n') {
+                     // find content length
+-                    char *clen = strstr(_buf, "Content-length:");
++                    char *clen = NULL;
++                    clen =  strstr(_buf, "Content-length:");
++                    if(!clen) {
++                        clen = strstr(_buf,"Content-Length:");
++                    }
+                     if (clen != NULL) {
+                         clen = &clen[16];
+                         while (1) {
+@@ -859,6 +864,7 @@ PRBool PSHttpResponse::processResponse(P
+ 
+         // Get status string
+         int index = 0;
++        PRBool inName = PR_TRUE;
+         do {
+             char ch = buf.getChar();
+             if ( ch != -1 && ch != '\r' ) {
+@@ -880,15 +886,14 @@ PRBool PSHttpResponse::processResponse(P
+ 
+         // loop over response headers
+         index = 0;
+-//#ifdef CHECK
+         PRBool doneParsing = PR_FALSE;
+         PRBool atEOL = PR_FALSE;
+-        PRBool inName = PR_TRUE;
++        inName = PR_TRUE;
+         char name[2048];
++        char value[2048];
+         int nameLen = sizeof(name);
+ 
+         while ( !doneParsing ) {
+-            char value[2048];
+             int valueLen = sizeof(value);
+             char ch = buf.getChar();
+ 
+@@ -901,15 +906,8 @@ PRBool PSHttpResponse::processResponse(P
+ 
+                     nRead = readHeader( buf, value, valueLen );
+                     if ( nRead < 0 ) {
+-
+-                        //                        return PR_FALSE;    
+-                    } else {
+-                    //    value[index++] = ch;
+-                        if ( index >= (int)(sizeof(value) - 1 ) ) {
+-
+-                            //                            return PR_FALSE;            
+-                        }
+-                    }
++                        return PR_FALSE;    
++                    } 
+                     break;
+                 case '\r':
+                     if ( inName && !atEOL ) {
+@@ -928,6 +926,7 @@ PRBool PSHttpResponse::processResponse(P
+ 
+                         //                        return PR_FALSE;
+                     }
++                    
+                     value[index] = '\0';
+                     index = 0;
+                     inName = PR_TRUE;
+@@ -936,25 +935,29 @@ PRBool PSHttpResponse::processResponse(P
+                     break;
+                 default:
+                     atEOL = PR_FALSE;
+-                    if (inName) {
+-                         name[index++] = ch;
+-                    } else {
+-                         value[index++] = ch;
+-                    }
+-                    if ( inName && (index >= (nameLen-2)) ) {
+-                        name[index] = '\0';
++                    if (inName == PR_TRUE) {
+ 
+-                        //                        return PR_FALSE;            
+-                    } else if ( !inName && (index >= (valueLen-1)) ) {
++                         if(index >= (nameLen -2)) {
++                             return false;
++                         } else {
++                             name[index++] = ch;
++                         }
++                    } 
++
++                    if (inName == PR_FALSE) {
++
++                         if(index >= (valueLen - 1)) {
++                             return false;
++                         } else {
++                             value[index++] = ch;
++                         }
++                    }
+ 
+-                        //                        return PR_FALSE;            
+-                    }    
+                     break;
+                 }
+             }
+ 
+         } //while
+-//#endif //CHECK
+     } catch ( RecvBuf::EndOfFile & ) {
+         if ( !_request->isHangupOk() ) {
+ 

@@ -1,0 +1,95 @@
+From 2466eeb6ff2e1f87c7af9e4b8f95a1c20e00147b Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Tue, 21 Oct 2025 22:45:22 -0400
+Subject: [PATCH 04/15] Fedora: attester: pick attesters in all-attesters
+
+Currently: snp, tdx, az-snp-vtpm and az-tdx-vtpm
+
+Remove all dependencies of non-built attesters
+
+Some require additional dependencies that are not in Fedora
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ attestation-agent/attester/Cargo.toml | 35 +++++++--------------------
+ 1 file changed, 9 insertions(+), 26 deletions(-)
+
+diff --git a/attestation-agent/attester/Cargo.toml b/attestation-agent/attester/Cargo.toml
+index 6a5d1c5..9d30685 100644
+--- a/attestation-agent/attester/Cargo.toml
++++ b/attestation-agent/attester/Cargo.toml
+@@ -23,9 +23,6 @@ hex.workspace = true
+ iocuddle = { version = "0.1.1", optional = true }
+ kbs-types.workspace = true
+ log.workspace = true
+-nvml-wrapper = { git = "https://github.com/rust-nvml/nvml-wrapper", rev="7e0752f331" , optional = true, default-features = false, features = ["serde"]}
+-occlum_dcap = { git = "https://github.com/occlum/occlum", tag = "v0.29.7", optional = true }
+-pv = { version = "0.10.0", package = "s390_pv", optional = true }
+ scroll = { version = "0.13.0", default-features = false, features = [
+     "derive",
+     "std",
+@@ -36,15 +33,8 @@ serde_with.workspace = true
+ sev = { version = "6.3.1", default-features = false, features = [
+     "snp",
+ ], optional = true }
+-sha2.workspace = true
+ strum.workspace = true
+-tdx-attest-rs = { git = "https://github.com/intel/SGXDataCenterAttestationPrimitives", tag = "DCAP_1.23", optional = true }
+ thiserror.workspace = true
+-# TODO: change it to "0.1", once released.
+-csv-rs = { git = "https://github.com/openanolis/csv-rs.git", rev = "9e92ac7", optional = true }
+-codicon = { version = "3.0", optional = true }
+-hyper = { version = "0.14", features = ["full"], optional = true }
+-hyper-tls = { version = "0.5", optional = true }
+ tokio = { workspace = true, features = ["rt", "macros", "fs", "io-util"] }
+ tempfile = { workspace = true, optional = true }
+ env_logger = "0.11"
+@@ -67,16 +57,9 @@ required-features = ["bin"]
+ default = ["all-attesters"]
+ all-attesters = [
+     "tdx-attester",
+-    "sgx-attester",
+     "az-snp-vtpm-attester",
+     "az-tdx-vtpm-attester",
+     "snp-attester",
+-    "csv-attester",
+-    "hygon-dcu-attester",
+-    "cca-attester",
+-    "se-attester",
+-    "tpm-attester",
+-    "nvidia-attester",
+ ]
+ 
+ # tsm-report enables a module that helps attesters to use Linux TSM_REPORTS for generating
+@@ -84,18 +67,18 @@ all-attesters = [
+ # generate TDX quotes with upstream kernels.
+ tsm-report = ["tempfile"]
+ tdx-attester = ["scroll", "tsm-report", "iocuddle"]
+-tdx-attest-dcap-ioctls = ["tdx-attest-rs"]
+-sgx-attester = ["occlum_dcap"]
+-nvidia-attester = ["nvml-wrapper"]
++tdx-attest-dcap-ioctls = []
++sgx-attester = []
++nvidia-attester = []
+ az-snp-vtpm-attester = ["az-snp-vtpm"]
+ az-tdx-vtpm-attester = ["az-snp-vtpm-attester", "az-tdx-vtpm"]
+ snp-attester = ["sev"]
+-csv-attester = ["hygon", "codicon", "hyper", "hyper-tls"]
+-hygon-dcu-attester = ["hygon"]
+-hygon = ["csv-rs"]
+-cca-attester = ["tsm-report"]
+-se-attester = ["pv"]
+-tpm-attester = ["tss-esapi", "picky-asn1", "picky-asn1-x509", "picky-asn1-der"]
++csv-attester = []
++hygon-dcu-attester = []
++hygon = []
++cca-attester = []
++se-attester = []
++tpm-attester = []
+ 
+ 
+ bin = ["clap"]
+-- 
+2.51.1
+

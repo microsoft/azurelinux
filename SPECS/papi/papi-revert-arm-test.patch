@@ -1,0 +1,267 @@
+From fe1124b81a07290ff0c88e04cc6348b1c438eecd Mon Sep 17 00:00:00 2001
+From: Aaron Merey <amerey@redhat.com>
+Date: Wed, 16 Jul 2025 17:04:09 -0400
+Subject: [PATCH] Revert "validation_tests: Add load/store ARM assembly
+ testcode"
+
+This reverts commit 7710a20ed72bb984b52a1d575a2d707d548de35b.
+---
+ src/validation_tests/Makefile.recipies     | 11 ++---
+ src/validation_tests/load_store_testcode.c | 57 ----------------------
+ src/validation_tests/papi_ld_ins.c         | 29 +++--------
+ src/validation_tests/papi_sr_ins.c         | 28 +++--------
+ src/validation_tests/testcode.h            |  4 --
+ 5 files changed, 19 insertions(+), 110 deletions(-)
+ delete mode 100644 src/validation_tests/load_store_testcode.c
+
+diff --git a/src/validation_tests/Makefile.recipies b/src/validation_tests/Makefile.recipies
+index c5ea36582..8949e5e9c 100644
+--- a/src/validation_tests/Makefile.recipies
++++ b/src/validation_tests/Makefile.recipies
+@@ -38,9 +38,6 @@ instructions_testcode.o:	instructions_testcode.c testcode.h
+ matrix_multiply.o:	matrix_multiply.c matrix_multiply.h
+ 	$(CC) $(INCLUDE) $(CFLAGS) $(OPTFLAGS) -O1 -c matrix_multiply.c
+ 
+-load_store_testcode.o:	load_store_testcode.c testcode.h
+-	$(CC) $(INCLUDE) $(CFLAGS) $(OPTFLAGS) -c load_store_testcode.c
+-
+ fp_validation_hl: fp_validation_hl.o $(TESTLIB) $(PAPILIB) flops_testcode.o
+ 	$(CC) -o fp_validation_hl fp_validation_hl.o $(TESTLIB) flops_testcode.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB) -lpthread
+ 
+@@ -84,8 +81,8 @@ papi_fp_ops: papi_fp_ops.o $(TESTLIB) $(PAPILIB) display_error.o branches_testco
+ papi_hw_int: papi_hw_int.o $(TESTLIB) $(PAPILIB)
+ 	$(CC) -o papi_hw_int papi_hw_int.o $(TESTLIB) $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+ 
+-papi_ld_ins: papi_ld_ins.o $(TESTLIB) $(PAPILIB) display_error.o matrix_multiply.o load_store_testcode.o
+-	$(CC) -o papi_ld_ins papi_ld_ins.o $(TESTLIB) display_error.o matrix_multiply.o load_store_testcode.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
++papi_ld_ins: papi_ld_ins.o $(TESTLIB) $(PAPILIB) display_error.o matrix_multiply.o
++	$(CC) -o papi_ld_ins papi_ld_ins.o $(TESTLIB) display_error.o matrix_multiply.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+ 
+ papi_l1_dca: papi_l1_dca.o $(TESTLIB) $(PAPILIB) cache_testcode.o display_error.o matrix_multiply.o
+ 	$(CC) -o papi_l1_dca papi_l1_dca.o $(TESTLIB) cache_testcode.o display_error.o matrix_multiply.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+@@ -111,8 +108,8 @@ papi_ref_cyc: papi_ref_cyc.o $(TESTLIB) $(PAPILIB) display_error.o flops_testcod
+ papi_sp_ops: papi_sp_ops.o $(TESTLIB) $(PAPILIB) display_error.o branches_testcode.o flops_testcode.o
+ 	$(CC) -o papi_sp_ops papi_sp_ops.o $(TESTLIB) display_error.o branches_testcode.o flops_testcode.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+ 
+-papi_sr_ins: papi_sr_ins.o $(TESTLIB) $(PAPILIB) display_error.o matrix_multiply.o load_store_testcode.o
+-	$(CC) -o papi_sr_ins papi_sr_ins.o $(TESTLIB) display_error.o matrix_multiply.o load_store_testcode.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
++papi_sr_ins: papi_sr_ins.o $(TESTLIB) $(PAPILIB) display_error.o matrix_multiply.o
++	$(CC) -o papi_sr_ins papi_sr_ins.o $(TESTLIB) display_error.o matrix_multiply.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+ 
+ papi_tot_cyc: papi_tot_cyc.o $(TESTLIB) $(PAPILIB) display_error.o matrix_multiply.o
+ 	$(CC) -o papi_tot_cyc papi_tot_cyc.o $(TESTLIB) display_error.o matrix_multiply.o $(PAPILIB) $(LDFLAGS) $(EXTRALIB)
+diff --git a/src/validation_tests/load_store_testcode.c b/src/validation_tests/load_store_testcode.c
+deleted file mode 100644
+index 4b8f13c87..000000000
+--- a/src/validation_tests/load_store_testcode.c
++++ /dev/null
+@@ -1,57 +0,0 @@
+-#include "testcode.h"
+-
+-/* Execute n stores */
+-int execute_stores(int n) {
+-
+-#if defined(__aarch64__)
+-
+-	__asm(  ".data\n"
+-		"stvar: .word 1 /* stvar in memory */\n"
+-		".text\n"
+-		"	ldr x2, =stvar /* address of stvar */\n"
+-		"	mov x4, %0\n"
+-		"	mov x1, #0\n"
+-		"str_loop:\n"
+-		"	str x1, [x2] /* store into stvar */\n"
+-		"	add x1, x1, #1\n"
+-		"	cmp x1, x4\n"
+-		"	bne str_loop\n"
+-		:
+-		: "r" (n)
+-		: "cc" /* clobbered */
+-	);
+-
+-	return 0;
+-
+-#endif
+-	return CODE_UNIMPLEMENTED;
+-
+-}
+-
+-/* Execute n loads */
+-int execute_loads(int n) {
+-
+-#if defined(__aarch64__)
+-
+-	__asm(  ".data\n"
+-		"ldvar: .word 1 /* ldvar in memory */\n"
+-		".text\n"
+-		"	ldr x2, =ldvar /* address of ldvar */\n"
+-		"	mov x4, %0\n"
+-		"	mov x1, #0\n"
+-		"ldr_loop:\n"
+-		"	ldr x3, [x2] /* load from ldvar */\n"
+-		"	add x1, x1, x3\n"
+-		"	cmp x1, x4\n"
+-		"	bne ldr_loop\n"
+-		:
+-		: "r" (n)
+-		: "cc" /* clobbered */
+-	);
+-
+-	return 0;
+-
+-#endif
+-	return CODE_UNIMPLEMENTED;
+-
+-}
+diff --git a/src/validation_tests/papi_ld_ins.c b/src/validation_tests/papi_ld_ins.c
+index 24935b290..6c92befd6 100644
+--- a/src/validation_tests/papi_ld_ins.c
++++ b/src/validation_tests/papi_ld_ins.c
+@@ -23,7 +23,6 @@
+ #include "display_error.h"
+ 
+ #include "matrix_multiply.h"
+-#include "testcode.h"
+ 
+ #define SLEEP_RUNS 3
+ 
+@@ -102,26 +101,18 @@ int main(int argc, char **argv) {
+ 		test_fail( __FILE__, __LINE__, "idle average", retval );
+ 	}
+ 
+-	/***********************************/
+-	/* testing a large number of loads */
+-	/***********************************/
++	/*****************************/
++	/* testing Matrix Matrix GHz */
++	/*****************************/
+ 
+ 	if (!quiet) {
+-		printf("\nTesting a large number of loads\n");
++		printf("\nTesting with matrix matrix multiply\n");
+ 	}
+ 
+-	expected=naive_matrix_multiply_estimated_loads(quiet);
+-
+ 	PAPI_reset(eventset);
+ 	PAPI_start(eventset);
+ 
+-	retval = execute_loads(expected);
+-	if (retval == CODE_UNIMPLEMENTED) {
+-		if (!quiet) {
+-			printf("\tNo asm test found for the current hardware. Testing matrix multiply\n");
+-		}
+-		naive_matrix_multiply(quiet);
+-	}
++	naive_matrix_multiply(quiet);
+ 
+ 	retval=PAPI_stop(eventset,&count);
+ 
+@@ -129,6 +120,8 @@ int main(int argc, char **argv) {
+ 		test_fail( __FILE__, __LINE__, "Problem stopping!", retval );
+ 	}
+ 
++	expected=naive_matrix_multiply_estimated_loads(quiet);
++
+ 	if (!quiet) {
+ 		printf("\tActual measured loads = %lld\n",count);
+ 	}
+@@ -161,13 +154,7 @@ int main(int argc, char **argv) {
+ 	PAPI_start(eventset);
+ 
+ 	for(i=0;i<REPITITIONS;i++) {
+-		retval = execute_loads(expected);
+-		if (retval == CODE_UNIMPLEMENTED) {
+-			if (!quiet) {
+-				printf("\tNo asm test found for the current hardware. Testing matrix multiply\n");
+-			}
+-			naive_matrix_multiply(quiet);
+-		}
++		naive_matrix_multiply(quiet);
+ 	}
+ 
+ 	retval=PAPI_stop(eventset,&count);
+diff --git a/src/validation_tests/papi_sr_ins.c b/src/validation_tests/papi_sr_ins.c
+index 40ccaff3b..48766956f 100644
+--- a/src/validation_tests/papi_sr_ins.c
++++ b/src/validation_tests/papi_sr_ins.c
+@@ -23,7 +23,6 @@
+ #include "display_error.h"
+ 
+ #include "matrix_multiply.h"
+-#include "testcode.h"
+ 
+ #define SLEEP_RUNS 3
+ 
+@@ -102,26 +101,18 @@ int main(int argc, char **argv) {
+ 		test_fail( __FILE__, __LINE__, "idle average", retval );
+ 	}
+ 
+-	/************************************/
+-	/* testing a large number of stores */
+-	/************************************/
++	/*****************************/
++	/* testing Matrix Matrix GHz */
++	/*****************************/
+ 
+ 	if (!quiet) {
+-		printf("\nTesting a large number of stores\n");
++		printf("\nTesting with matrix matrix multiply\n");
+ 	}
+ 
+-	expected=naive_matrix_multiply_estimated_stores(quiet);
+-
+ 	PAPI_reset(eventset);
+ 	PAPI_start(eventset);
+ 
+-	retval = execute_stores(expected);
+-	if (retval == CODE_UNIMPLEMENTED) {
+-		if (!quiet) {
+-			printf("\tNo asm test found for the current hardware. Testing matrix multiply\n");
+-		}
+-		naive_matrix_multiply(quiet);
+-	}
++	naive_matrix_multiply(quiet);
+ 
+ 	retval=PAPI_stop(eventset,&count);
+ 
+@@ -129,6 +120,7 @@ int main(int argc, char **argv) {
+ 		test_fail( __FILE__, __LINE__, "Problem stopping!", retval );
+ 	}
+ 
++	expected=naive_matrix_multiply_estimated_stores(quiet);
+ 
+ 	if (!quiet) {
+ 		printf("\tActual measured stores = %lld\n",count);
+@@ -162,13 +154,7 @@ int main(int argc, char **argv) {
+ 	PAPI_start(eventset);
+ 
+ 	for(i=0;i<REPITITIONS;i++) {
+-		retval = execute_stores(expected);
+-		if (retval == CODE_UNIMPLEMENTED) {
+-			if (!quiet) {
+-				printf("\tNo asm test found for the current hardware. Testing matrix multiply\n");
+-			}
+-			naive_matrix_multiply(quiet);
+-		}
++		naive_matrix_multiply(quiet);
+ 	}
+ 
+ 	retval=PAPI_stop(eventset,&count);
+diff --git a/src/validation_tests/testcode.h b/src/validation_tests/testcode.h
+index cc6d4b9c1..9aed854fb 100644
+--- a/src/validation_tests/testcode.h
++++ b/src/validation_tests/testcode.h
+@@ -27,9 +27,5 @@ double cache_read_test(double *array, int size);
+ int cache_random_write_test(double *array, int size, int count);
+ double cache_random_read_test(double *array, int size, int count);
+ 
+-/* load_store_testcode.c */
+-int execute_stores(int n);
+-int execute_loads(int n);
+-
+ /* busy_work.c */
+ double do_cycles( int minimum_time );
+-- 
+2.50.1
+

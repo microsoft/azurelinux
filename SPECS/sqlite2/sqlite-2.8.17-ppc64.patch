@@ -1,0 +1,46 @@
+Patch by Gustavo Luiz Duarte <gustavold@gmail.com> for sqlite >= 2.8.17,
+which fixes the cast of a pointer to int that causes a segmentation fault
+during the tests. On 64 bit machines, pointers are 64 bit and int is 32
+bit. During casting the pointer is truncated, so the original code could
+potentially also break x86_64, while it is doing not so at the moment.
+
+--- sqlite-2.8.17/src/test2.c		2005-04-24 00:43:22.000000000 +0200
++++ sqlite-2.8.17/src/test2.c.ppc64     2012-03-23 10:47:07.000000000 +0100
+@@ -82,7 +82,7 @@ static int pager_open(
+     Tcl_AppendResult(interp, errorName(rc), 0);
+     return TCL_ERROR;
+   }
+-  sprintf(zBuf,"0x%x",(int)pPager);
++  sprintf(zBuf,"%p", pPager);
+   Tcl_AppendResult(interp, zBuf, 0);
+   return TCL_OK;
+ }
+@@ -334,7 +334,7 @@ static int page_get(
+     Tcl_AppendResult(interp, errorName(rc), 0);
+     return TCL_ERROR;
+   }
+-  sprintf(zBuf,"0x%x",(int)pPage);
++  sprintf(zBuf,"%p", pPage);
+   Tcl_AppendResult(interp, zBuf, 0);
+   return TCL_OK;
+ }
+@@ -364,7 +364,7 @@ static int page_lookup(
+   if( Tcl_GetInt(interp, argv[2], &pgno) ) return TCL_ERROR;
+   pPage = sqlitepager_lookup(pPager, pgno);
+   if( pPage ){
+-    sprintf(zBuf,"0x%x",(int)pPage);
++    sprintf(zBuf,"%p", pPage);
+     Tcl_AppendResult(interp, zBuf, 0);
+   }
+   return TCL_OK;
+--- sqlite-2.8.17/src/test3.c		2005-04-24 00:43:22.000000000 +0200
++++ sqlite-2.8.17/src/test3.c.ppc64	2012-03-23 10:47:03.000000000 +0100
+@@ -534,7 +534,7 @@ static int btree_cursor(
+     Tcl_AppendResult(interp, errorName(rc), 0);
+     return TCL_ERROR;
+   }
+-  sprintf(zBuf,"0x%x", (int)pCur);
++  sprintf(zBuf,"%p", pCur);
+   Tcl_AppendResult(interp, zBuf, 0);
+   return SQLITE_OK;
+ }

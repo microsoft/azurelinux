@@ -1,0 +1,38 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,9 +46,9 @@ AC_ARG_WITH(colm,
+ 		COLM_WRAP="$withval/bin/colm-wrap"
+ 		CPPFLAGS="-I$withval/include ${CPPFLAGS}"
+ 		CPPFLAGS="-I$withval/include/aapl ${CPPFLAGS}"
+-		LDFLAGS="-L$withval/lib ${LDFLAGS}"
+-		LIBCOLM_LA="$withval/lib/libcolm.la"
+-		LIBFSM_LA="$withval/lib/libfsm.la"
++		LDFLAGS="-L$libdir ${LDFLAGS}"
++		LIBCOLM_LA="$libdir/libcolm.la"
++		LIBFSM_LA="$libdir/libfsm.la"
+ 		COLM_SHARE="$withval/share"
+ 	],
+ 	[]
+@@ -209,11 +209,11 @@ AC_ARG_WITH(subject,
+ 
+ 		SUBJ_COLM_BIN="${withval}/bin/colm"
+ 		SUBJ_COLM_CPPFLAGS="-I${withval}/include"
+-		SUBJ_COLM_LDFLAGS="-L${withval}/lib -Wl,-rpath,${withval}/lib"
++		SUBJ_COLM_LDFLAGS="-L${libdir} -Wl,-rpath,${libdir}"
+ 
+ 		SUBJ_RAGEL_BIN="$withval/bin/ragel"
+ 		SUBJ_RAGEL_CPPFLAGS="-I$withval/include"
+-		SUBJ_RAGEL_LDFLAGS="-L$withval/lib -Wl,-rpath,${withval}/lib"
++		SUBJ_RAGEL_LDFLAGS="-L${libdir} -Wl,-rpath,${libdir}"
+ 		SUBJ_RAGEL_LM="${withval}/share"
+ 
+ 		SUBJ_RAGEL_C_BIN="$withval/bin/ragel-c"
+@@ -434,7 +434,7 @@ AC_ARG_WITH(colm,
+ 	[
+ 		EXTERNAL_COLM="$withval"
+ 		EXTERNAL_INC="-I$withval/include"
+-		EXTERNAL_LIBS="-L$withval/lib"
++		EXTERNAL_LIBS="-L$withval/${libdir}"
+ 		AC_CHECK_FILES(["$EXTERNAL_COLM/bin/colm"], [],
+ 			[AC_ERROR(["could not find $EXTERNAL_COLM/bin/colm"])])
+ 	],

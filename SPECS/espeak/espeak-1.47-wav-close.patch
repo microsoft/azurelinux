@@ -1,0 +1,23 @@
+diff --git a/src/espeak.cpp b/src/espeak.cpp
+index 00f93c1..4ad42e8 100644
+--- a/src/espeak.cpp
++++ b/src/espeak.cpp
+@@ -281,10 +281,7 @@ static int SynthCallback(short *wav, int numsamples, espeak_EVENT *events)
+ 	if(quiet) return(0);  // -q quiet mode
+ 
+ 	if(wav == NULL)
+-	{
+-		CloseWavFile();
+ 		return(0);
+-	}
+ 
+ 	while(events->type != 0)
+ 	{
+@@ -805,5 +802,7 @@ int main (int argc, char **argv)
+ 
+ 	if(f_phonemes_out != stdout)
+ 		fclose(f_phonemes_out);  // needed for WinCE
++	CloseWavFile();
++	espeak_Terminate();
+ 	return(0);
+ }

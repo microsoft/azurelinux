@@ -1,0 +1,76 @@
+diff -up bullet3-3.08/CMakeLists.txt.tinyxml bullet3-3.08/CMakeLists.txt
+--- bullet3-3.08/CMakeLists.txt.tinyxml	2020-12-22 20:29:33.000000000 -0500
++++ bullet3-3.08/CMakeLists.txt	2021-02-11 10:42:15.135608499 -0500
+@@ -349,6 +349,8 @@ ENDIF(BUILD_PYBULLET)
+ OPTION(BUILD_ENET "Set when you want to build apps with enet UDP networking support" ON)
+ OPTION(BUILD_CLSOCKET "Set when you want to build apps with enet TCP networking support" ON)
+ 
++include(FindPkgConfig)
++pkg_check_modules(tinyxml2 REQUIRED tinyxml2)
+ 
+ IF(BUILD_PYBULLET)
+ 	FIND_PACKAGE(PythonLibs)
+diff -up bullet3-3.08/Extras/BulletRobotics/CMakeLists.txt.tinyxml bullet3-3.08/Extras/BulletRobotics/CMakeLists.txt
+--- bullet3-3.08/Extras/BulletRobotics/CMakeLists.txt.tinyxml	2021-02-11 10:42:15.136608503 -0500
++++ bullet3-3.08/Extras/BulletRobotics/CMakeLists.txt	2021-02-11 10:46:27.929805933 -0500
+@@ -1,5 +1,6 @@
+ 
+ INCLUDE_DIRECTORIES(
++		${tinyxml2_INCLUDE_DIRS}
+ 		${BULLET_PHYSICS_SOURCE_DIR}/src
+ 		${BULLET_PHYSICS_SOURCE_DIR}/examples
+ 		${BULLET_PHYSICS_SOURCE_DIR}/examples/SharedMemory
+@@ -60,7 +61,6 @@ SET(BulletRobotics_INCLUDES
+   ../../examples/Utils/b3ERPCFMHelper.hpp
+   ../../examples/Utils/b3ReferenceFrameHelper.hpp  
+ 
+-  ../../examples/ThirdPartyLibs/tinyxml2/tinyxml2.h
+   ../../examples/ThirdPartyLibs/Wavefront/tiny_obj_loader.h
+   ../../examples/ThirdPartyLibs/stb_image/stb_image.h
+   ../../examples/ThirdPartyLibs/BussIK/Jacobian.h
+@@ -129,7 +129,6 @@ SET(BulletRobotics_SRCS ${BulletRobotics
+ 		../../examples/Utils/b3ResourcePath.cpp
+ 		../../examples/Utils/ChromeTraceUtil.cpp
+ 
+-		../../examples/ThirdPartyLibs/tinyxml2/tinyxml2.cpp
+ 		../../examples/ThirdPartyLibs/Wavefront/tiny_obj_loader.cpp
+ 		../../examples/ThirdPartyLibs/stb_image/stb_image.cpp
+ 		../../examples/ThirdPartyLibs/BussIK/Jacobian.cpp
+@@ -245,7 +244,7 @@ SET_TARGET_PROPERTIES(BulletRobotics PRO
+ SET_TARGET_PROPERTIES(BulletRobotics PROPERTIES SOVERSION ${BULLET_VERSION})
+ 
+ IF (BUILD_SHARED_LIBS)
+-	TARGET_LINK_LIBRARIES(BulletRobotics BulletInverseDynamicsUtils BulletWorldImporter BulletFileLoader BulletSoftBody BulletDynamics BulletCollision BulletInverseDynamics LinearMath Bullet3Common)
++	TARGET_LINK_LIBRARIES(BulletRobotics BulletInverseDynamicsUtils BulletWorldImporter BulletFileLoader BulletSoftBody BulletDynamics BulletCollision BulletInverseDynamics LinearMath Bullet3Common ${tinyxml2_LIBRARIES})
+ ENDIF (BUILD_SHARED_LIBS)
+ 
+   
+diff -up bullet3-3.08/Extras/Serialize/BulletXmlWorldImporter/CMakeLists.txt.tinyxml bullet3-3.08/Extras/Serialize/BulletXmlWorldImporter/CMakeLists.txt
+--- bullet3-3.08/Extras/Serialize/BulletXmlWorldImporter/CMakeLists.txt.tinyxml	2020-12-22 20:29:33.000000000 -0500
++++ bullet3-3.08/Extras/Serialize/BulletXmlWorldImporter/CMakeLists.txt	2021-02-11 10:47:36.997133090 -0500
+@@ -1,8 +1,8 @@
+ INCLUDE_DIRECTORIES(
++	${tinyxml2_INCLUDE_DIRS}
+ 	${BULLET_PHYSICS_SOURCE_DIR}/src
+ 	${BULLET_PHYSICS_SOURCE_DIR}/Extras/Serialize/BulletFileLoader
+ 	${BULLET_PHYSICS_SOURCE_DIR}/Extras/Serialize/BulletWorldImporter
+-	${BULLET_PHYSICS_SOURCE_DIR}/examples/ThirdPartyLibs/tinyxml2
+ )
+ 
+ ADD_LIBRARY(
+@@ -11,14 +11,13 @@ ADD_LIBRARY(
+ 	btBulletXmlWorldImporter.h
+ 	string_split.cpp
+ 	string_split.h
+-	${BULLET_PHYSICS_SOURCE_DIR}/examples/ThirdPartyLibs/tinyxml2/tinyxml2.cpp
+ )
+ 
+ SET_TARGET_PROPERTIES(BulletXmlWorldImporter  PROPERTIES VERSION ${BULLET_VERSION})
+ SET_TARGET_PROPERTIES(BulletXmlWorldImporter PROPERTIES SOVERSION ${BULLET_VERSION})
+ 
+ IF (BUILD_SHARED_LIBS)
+-	TARGET_LINK_LIBRARIES(BulletXmlWorldImporter BulletWorldImporter BulletDynamics BulletCollision BulletFileLoader LinearMath)
++	TARGET_LINK_LIBRARIES(BulletXmlWorldImporter BulletWorldImporter BulletDynamics BulletCollision BulletFileLoader LinearMath ${tinyxml2_LIBRARIES})
+ ENDIF (BUILD_SHARED_LIBS)
+ 
+ IF (INSTALL_EXTRA_LIBS)

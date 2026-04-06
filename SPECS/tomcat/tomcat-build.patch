@@ -1,0 +1,19 @@
+diff -up ./res/bnd/build-defaults.bnd.orig ./res/bnd/build-defaults.bnd
+--- res/bnd/build-defaults.bnd.orig     2023-10-16 11:23:04.752754202 +0800
++++ res/bnd/build-defaults.bnd  2023-10-16 11:23:29.931876910 +0800
+@@ -13,7 +13,7 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+
+-Bundle-Version: ${version_cleanup;${version}}
++Bundle-Version: ${version}
+ Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
+
+ Specification-Title: Apache Tomcat
+@@ -36,4 +36,4 @@ X-Compile-Target-JDK: ${compile.release}
+
+ -removeheaders: DSTAMP,TODAY,TSTAMP
+
+-module.name: org.apache.${replace;${Bundle-Name};-;.}
+\ No newline at end of file
++module.name: org.apache.${replace;${Bundle-Name};-;.}

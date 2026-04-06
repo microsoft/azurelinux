@@ -1,0 +1,20 @@
+diff -up ltrace-0.7.2/proc.c\~ ltrace-0.7.2/proc.c
+--- ltrace-0.7.2/proc.c~	2014-02-13 12:16:33.000000000 +0100
++++ ltrace-0.7.2/proc.c	2014-02-13 15:44:25.000000000 +0100
+@@ -194,9 +197,11 @@ process_init(struct process *proc, const
+ 		goto fail;
+ 	}
+ 
+-	if (proc->leader != proc)
+-		return 0;
+-	if (process_init_main(proc) < 0) {
++	if (proc->leader != proc) {
++		proc->e_machine = proc->leader->e_machine;
++		proc->e_class = proc->leader->e_class;
++		get_arch_dep(proc);
++	} else if (process_init_main(proc) < 0) {
+ 		process_bare_destroy(proc, 0);
+ 		goto fail;
+ 	}
+
+Diff finished.  Thu Feb 13 15:50:21 2014

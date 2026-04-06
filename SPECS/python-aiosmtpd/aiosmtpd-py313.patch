@@ -1,0 +1,33 @@
+diff -rupN --no-dereference aiosmtpd-1.4.4.post2/aiosmtpd/tests/test_server.py aiosmtpd-1.4.4.post2-new/aiosmtpd/tests/test_server.py
+--- aiosmtpd-1.4.4.post2/aiosmtpd/tests/test_server.py	2023-01-19 10:37:59.000000000 +0100
++++ aiosmtpd-1.4.4.post2-new/aiosmtpd/tests/test_server.py	2024-06-29 00:10:04.528638241 +0200
+@@ -8,6 +8,7 @@ import errno
+ import platform
+ import socket
+ import time
++import sys
+ from contextlib import ExitStack
+ from functools import partial
+ from threading import Event
+@@ -446,10 +447,17 @@ class TestUnthreaded:
+         # Stop the task
+         cont.end()
+         catchup_delay()
+-        # Now the listener has gone away
+-        # noinspection PyTypeChecker
+-        with pytest.raises((socket.timeout, ConnectionError)):
+-            assert_smtp_socket(cont)
++        if sys.version_info < (3, 13):
++            # Now the listener has gone away
++            # noinspection PyTypeChecker
++            with pytest.raises((socket.timeout, ConnectionError)):
++                assert_smtp_socket(cont)
++        else:
++            # Starting from Python 3.13, listening asyncio Unix socket is
++            # removed on close, see:
++            # https://github.com/python/cpython/issues/111246
++            # https://github.com/python/cpython/pull/111483
++            assert not Path(cont.unix_socket).exists()
+ 
+     @pytest.mark.filterwarnings(
+         "ignore::pytest.PytestUnraisableExceptionWarning"

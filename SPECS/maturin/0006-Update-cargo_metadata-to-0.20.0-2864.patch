@@ -1,0 +1,176 @@
+From 637b05baf51fe9ab11b105fa248a60b49cc64501 Mon Sep 17 00:00:00 2001
+From: Eashwar Ranganathan <eashwar@eashwar.com>
+Date: Thu, 20 Nov 2025 18:51:25 -0500
+Subject: [PATCH 6/6] Update cargo_metadata to 0.20.0 (#2864)
+
+---
+ Cargo.toml                 |  2 +-
+ src/build_options.rs       | 32 +++++++++++++++++++++-----------
+ src/compile.rs             |  6 +++---
+ src/metadata.rs            |  2 +-
+ src/source_distribution.rs |  4 ++--
+ 5 files changed, 28 insertions(+), 18 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 8c6ae4b6..7d0ffca5 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -43,7 +43,7 @@ anyhow = "1.0.80"
+ base64 = "0.22.0"
+ glob = "0.3.0"
+ cargo-config2 = "0.1.24"
+-cargo_metadata = "0.19.0"
++cargo_metadata = ">=0.20.0, <0.24.0"
+ cargo-options = "0.7.2"
+ cbindgen = { version = "0.29.0", default-features = false }
+ flate2 = "1.0.18"
+diff --git a/src/build_options.rs b/src/build_options.rs
+index f0a7c9e2..2a52e837 100644
+--- a/src/build_options.rs
++++ b/src/build_options.rs
+@@ -935,16 +935,16 @@ fn filter_cargo_targets(
+     config_targets: Option<&[crate::pyproject_toml::CargoTarget]>,
+ ) -> Result<Vec<CompileTarget>> {
+     let root_pkg = cargo_metadata.root_package().unwrap();
+-    let resolved_features = cargo_metadata
++    let resolved_features: Vec<String> = cargo_metadata
+         .resolve
+         .as_ref()
+-        .and_then(|resolve| resolve.nodes.iter().find(|node| node.id == root_pkg.id))
+-        .map(|node| node.features.clone())
++        .and_then(|resolve| resolve.nodes.iter().find(|&node| node.id == root_pkg.id))
++        .map(|node| node.features.iter().map(|f| f.to_string()).collect())
+         .unwrap_or_default();
+     let mut targets: Vec<_> = root_pkg
+         .targets
+         .iter()
+-        .filter(|target| match bridge {
++        .filter(|&target| match bridge {
+             BridgeModel::Bin(_) => {
+                 let is_bin = target.is_bin();
+                 if target.required_features.is_empty() {
+@@ -1017,15 +1017,19 @@ fn filter_cargo_targets(
+ fn has_abi3(deps: &HashMap<&str, &Node>) -> Result<Option<Abi3Version>> {
+     for &lib in PYO3_BINDING_CRATES.iter() {
+         let lib = lib.as_str();
+-        if let Some(pyo3_crate) = deps.get(lib) {
++        if let Some(&pyo3_crate) = deps.get(lib) {
+             // Find the minimal abi3 python version. If there is none, abi3 hasn't been selected
+             // This parser abi3-py{major}{minor} and returns the minimal (major, minor) tuple
+-            let abi3_selected = pyo3_crate.features.iter().any(|x| x == "abi3");
++            let abi3_selected = pyo3_crate
++                .features
++                .iter()
++                .map(AsRef::as_ref)
++                .any(|x| x == "abi3");
+ 
+             let min_abi3_version = pyo3_crate
+                 .features
+                 .iter()
+-                .filter(|x| x.starts_with("abi3-py") && x.len() >= "abi3-pyxx".len())
++                .filter(|&x| x.starts_with("abi3-py") && x.len() >= "abi3-pyxx".len())
+                 .map(|x| {
+                     Ok((
+                         (x.as_bytes()[7] as char).to_string().parse::<u8>()?,
+@@ -1061,10 +1065,11 @@ fn is_generating_import_lib(cargo_metadata: &Metadata) -> Result<bool> {
+             .filter(|package| cargo_metadata[&package.id].name.as_str() == lib)
+             .collect::<Vec<_>>();
+         match pyo3_packages.as_slice() {
+-            [pyo3_crate] => {
++            &[pyo3_crate] => {
+                 let generate_import_lib = pyo3_crate
+                     .features
+                     .iter()
++                    .map(AsRef::as_ref)
+                     .any(|x| x == "generate-import-lib" || x == "generate-abi3-import-lib");
+                 return Ok(generate_import_lib);
+             }
+@@ -1165,9 +1170,9 @@ pub fn find_bridge(cargo_metadata: &Metadata, bridge: Option<&str>) -> Result<Br
+         .packages
+         .iter()
+         .filter_map(|pkg| {
+-            let name = &pkg.name;
++            let name = pkg.name.as_ref();
+             if name == "pyo3" || name == "pyo3-ffi" || name == "cpython" || name == "uniffi" {
+-                Some((name.as_ref(), pkg))
++                Some((name, pkg))
+             } else {
+                 None
+             }
+@@ -1231,7 +1236,12 @@ pub fn find_bridge(cargo_metadata: &Metadata, bridge: Option<&str>) -> Result<Br
+         if !bridge.is_bin() && bridge.is_pyo3_crate(lib) {
+             let lib_name = lib.as_str();
+             let pyo3_node = deps[lib_name];
+-            if !pyo3_node.features.contains(&"extension-module".to_string()) {
++            if !pyo3_node
++                .features
++                .iter()
++                .map(AsRef::as_ref)
++                .any(|f| f == "extension-module")
++            {
+                 let version = cargo_metadata[&pyo3_node.id].version.to_string();
+                 eprintln!(
+                     "⚠️  Warning: You're building a library without activating {lib}'s \
+diff --git a/src/compile.rs b/src/compile.rs
+index 52812deb..75287d65 100644
+--- a/src/compile.rs
++++ b/src/compile.rs
+@@ -541,7 +541,7 @@ fn compile_target(
+                 };
+ 
+                 // Extract the location of the .so/.dll/etc. from cargo's json output
+-                if crate_name == &context.crate_name {
++                if crate_name.as_ref() == context.crate_name {
+                     let tuples = artifact
+                         .target
+                         .crate_types
+@@ -686,9 +686,9 @@ fn pyo3_version(cargo_metadata: &cargo_metadata::Metadata) -> Option<(u64, u64,
+         .packages
+         .iter()
+         .filter_map(|pkg| {
+-            let name = &pkg.name;
++            let name = pkg.name.as_ref();
+             if name == "pyo3" || name == "pyo3-ffi" {
+-                Some((name.as_ref(), pkg))
++                Some((name, pkg))
+             } else {
+                 None
+             }
+diff --git a/src/metadata.rs b/src/metadata.rs
+index f65dabb3..08646af5 100644
+--- a/src/metadata.rs
++++ b/src/metadata.rs
+@@ -528,7 +528,7 @@ impl Metadata24 {
+             license: package.license.clone(),
+             license_files,
+             project_url,
+-            ..Metadata24::new(name, version)
++            ..Metadata24::new(name.to_string(), version)
+         };
+         Ok(metadata)
+     }
+diff --git a/src/source_distribution.rs b/src/source_distribution.rs
+index 0dc7a2a5..d0ea47b9 100644
+--- a/src/source_distribution.rs
++++ b/src/source_distribution.rs
+@@ -342,7 +342,7 @@ pub fn find_path_deps(cargo_metadata: &Metadata) -> Result<HashMap<String, PathD
+             let dependency = top
+                 .dependencies
+                 .iter()
+-                .find(|package| {
++                .find(|&package| {
+                     // Package ids are opaque and there seems to be no way to query their name.
+                     let dep_name = &cargo_metadata
+                         .packages
+@@ -350,7 +350,7 @@ pub fn find_path_deps(cargo_metadata: &Metadata) -> Result<HashMap<String, PathD
+                         .find(|package| &package.id == dep_id)
+                         .unwrap()
+                         .name;
+-                    &package.name == dep_name
++                    package.name == dep_name.as_ref()
+                 })
+                 .unwrap();
+             if let Some(path) = &dependency.path {
+-- 
+2.52.0
+

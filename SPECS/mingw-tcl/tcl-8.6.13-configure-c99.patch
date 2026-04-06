@@ -1,0 +1,21 @@
+diff -rupN --no-dereference tcl8.6.15/unix/tcl.m4 tcl8.6.15-new/unix/tcl.m4
+--- tcl8.6.15/unix/tcl.m4	2024-10-18 11:19:05.123745902 +0200
++++ tcl8.6.15-new/unix/tcl.m4	2024-10-18 11:19:05.243746143 +0200
+@@ -2365,7 +2365,7 @@ AC_DEFUN([SC_TIME_HANDLER], [
+ #include <stdlib.h>]],
+ 	[[extern long timezone;
+ 	    timezone += 1;
+-	    exit (0);]])],
++	    return 0;]])],
+ 	    [tcl_cv_timezone_long=yes], [tcl_cv_timezone_long=no])])
+     if test $tcl_cv_timezone_long = yes ; then
+ 	AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])
+@@ -2378,7 +2378,7 @@ AC_DEFUN([SC_TIME_HANDLER], [
+ #include <stdlib.h>]],
+ 	    [[extern time_t timezone;
+ 		timezone += 1;
+-		exit (0);]])],
++		return 0;]])],
+ 		[tcl_cv_timezone_time=yes], [tcl_cv_timezone_time=no])])
+ 	if test $tcl_cv_timezone_time = yes ; then
+ 	    AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])

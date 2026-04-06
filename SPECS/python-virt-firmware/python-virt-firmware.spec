@@ -1,0 +1,394 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 4;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+Name:           python-virt-firmware
+Version:        26.2
+Release:        %autorelease
+Summary:        Tools for virtual machine firmware volumes
+
+License:        GPL-2.0-only
+URL:            https://pypi.org/project/virt-firmware/
+Source0:        %{pypi_source virt_firmware}
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
+BuildRequires:  make help2man
+BuildRequires:  systemd systemd-rpm-macros
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%description
+Tools for ovmf / armvirt firmware volumes This is a small collection of tools
+for edk2 firmware images. They support decoding and printing the content of
+firmware volumes. Variable stores (OVMF_VARS.fd) can be modified, for example
+to enroll secure boot certificates.
+
+%package -n     python3-virt-firmware
+Summary:        %{summary}
+%{?python_provide:%python_provide python3-virt-firmware}
+Provides:       virt-firmware
+Conflicts:      python3-virt-firmware-peutils < 23.9
+Obsoletes:      python3-virt-firmware-peutils < 23.9
+Requires:       virt-sb-certs
+Recommends:     qemu-img
+Recommends:     dialog
+%description -n python3-virt-firmware
+Tools for ovmf / armvirt firmware volumes This is a small collection of tools
+for edk2 firmware images. They support decoding and printing the content of
+firmware volumes. Variable stores (OVMF_VARS.fd) can be modified, for example
+to enroll secure boot certificates.
+
+%package -n     python3-virt-firmware-tests
+Summary:        %{summary} - test cases
+Requires:       python3-virt-firmware
+Requires:       python3dist(pytest)
+Requires:       edk2-ovmf
+%description -n python3-virt-firmware-tests
+test cases
+
+%package -n     uki-direct
+Provides:       ukidirect
+Summary:        %{summary} - manage UKI kernels.
+Requires:       python3-virt-firmware
+Conflicts:      systemd < 254
+%description -n uki-direct
+kernel-install plugin and systemd unit to manage automatic
+UKI (unified kernel image) updates.
+
+%package -n     virt-sb-certs
+Summary:        secure boot certificate database
+%description -n virt-sb-certs
+secure boot certificates used by microsoft and linux distributions, to
+be used for a more finegrained secure boot configuration for virtual
+machines.
+
+%prep
+%autosetup -n virt_firmware-%{version} -p1
+
+%build
+%pyproject_wheel
+
+%install
+%pyproject_install
+# manpages
+install -m 755 -d      %{buildroot}%{_mandir}/man1
+install -m 644 man/*.1 %{buildroot}%{_mandir}/man1
+# tests
+mkdir -p %{buildroot}%{_datadir}/%{name}
+cp -ar tests %{buildroot}%{_datadir}/%{name}
+# uki-direct
+install -m 755 -d  %{buildroot}%{_unitdir}
+install -m 755 -d  %{buildroot}%{_prefix}/lib/kernel/install.d
+install -m 644 systemd/kernel-bootcfg-boot-successful.service %{buildroot}%{_unitdir}
+install -m 755 systemd/99-uki-uefi-setup.install %{buildroot}%{_prefix}/lib/kernel/install.d
+# virt-sb-certs
+install -m 755 -d %{buildroot}%{_datadir}/virt-sb-certs
+dirs=$(cd %{buildroot}%{python3_sitelib}/virt/firmware/certs; echo *)
+mv -v %{buildroot}%{python3_sitelib}/virt/firmware/certs/* \
+   %{buildroot}%{_datadir}/virt-sb-certs
+for dir in $dirs; do
+    ln -vs ../../../../../../..%{_datadir}/virt-sb-certs/$dir \
+       %{buildroot}%{python3_sitelib}/virt/firmware/certs/$dir
+done
+
+%post -n uki-direct
+%systemd_post kernel-bootcfg-boot-successful.service
+
+%preun -n uki-direct
+%systemd_preun kernel-bootcfg-boot-successful.service
+
+%postun -n uki-direct
+%systemd_postun kernel-bootcfg-boot-successful.service
+
+%files -n python3-virt-firmware
+%license LICENSE
+%doc README.md experimental
+%{_bindir}/host-efi-vars
+%{_bindir}/virt-fw-dump
+%{_bindir}/virt-fw-measure
+%{_bindir}/virt-fw-vars
+%{_bindir}/virt-fw-sigdb
+%{_bindir}/kernel-bootcfg
+%{_bindir}/uefi-boot-menu
+%{_bindir}/migrate-vars
+%{_bindir}/uki-addons
+%{_bindir}/pe-dumpinfo
+%{_bindir}/pe-listsigs
+%{_bindir}/pe-addsigs
+%{_bindir}/pe-inspect
+%{_mandir}/man1/virt-*.1*
+%{_mandir}/man1/kernel-bootcfg.1*
+%{_mandir}/man1/uefi-boot-menu.1*
+%{_mandir}/man1/pe-*.1*
+%dir %{python3_sitelib}/virt
+%{python3_sitelib}/virt/firmware
+%{python3_sitelib}/virt/peutils
+%{python3_sitelib}/virt_firmware-%{version}.dist-info
+
+%files -n python3-virt-firmware-tests
+%{_datadir}/%{name}/tests
+
+%files -n uki-direct
+%{_unitdir}/kernel-bootcfg-boot-successful.service
+%{_prefix}/lib/kernel/install.d/99-uki-uefi-setup.install
+
+%files -n virt-sb-certs
+%{_datadir}/virt-sb-certs
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 26.2-4
+- Latest state for python-virt-firmware
+
+* Thu Feb 12 2026 Gerd Hoffmann <kraxel@redhat.com> - 26.2-3
+- drop 0001-reorganize-esp-detection-catch-bootctl-failures.patch from
+  specfile
+
+* Thu Feb 12 2026 Gerd Hoffmann <kraxel@redhat.com> - 26.2-2
+- drop backport 0001-reorganize-esp-detection-catch-bootctl-failures.patch
+
+* Thu Feb 12 2026 Packit <hello@packit.dev> - 26.2-1
+- Update to 26.2 upstream release
+- Resolves: rhbz#2438836
+
+* Thu Feb 12 2026 Gerd Hoffmann <kraxel@redhat.com> - 25.12-4
+- s/-/_/ for pypi name
+
+* Thu Feb 12 2026 Gerd Hoffmann <kraxel@redhat.com> - 25.12-3
+- use pypi_source macro for Source0
+
+* Thu Jan 08 2026 Gerd Hoffmann <kraxel@redhat.com> - 25.12-2
+- catch bootctl failures
+
+* Mon Dec 08 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.12-1
+- update to update to version 25.12
+
+* Wed Oct 15 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.10-1
+- update to update to version 25.10
+
+* Mon Sep 22 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.9-2
+- upload new sources
+
+* Mon Sep 22 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.9-1
+- update to version 25.9
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 25.7.3-5
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 25.7.3-4
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Tue Aug 05 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.7.3-3
+- switch tests to tmt
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 25.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Mon Jul 21 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.7.3-1
+- update to version 25.7.3
+
+* Thu Jul 17 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.7.2-1
+- update to version 25.7.2
+
+* Thu Jul 03 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.7-1
+- update to version 25.7
+
+* Wed Jun 25 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4.1-6
+- gating: drop constantly failing rpmdeplint test
+
+* Wed Jun 25 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4.1-5
+- Revert "use alternatives for uefi-boot-menu"
+
+* Thu Jun 12 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4.1-4
+- use alternatives for uefi-boot-menu
+
+* Thu Jun 12 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4.1-3
+- switch to %%pyproject macros
+
+* Tue Jun 03 2025 Python Maint <python-maint@redhat.com> - 25.4.1-2
+- Rebuilt for Python 3.14
+
+* Mon Apr 14 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4.1-1
+- update to version 25.4.1
+
+* Mon Apr 14 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.4-1
+- update to version 25.4
+
+* Wed Apr 02 2025 Miro Hrončok <miro@hroncok.cz> - 25.3-2
+- Remove manually specified runtime Requires
+
+* Thu Mar 20 2025 Gerd Hoffmann <kraxel@redhat.com> - 25.3-1
+- update to 25.3, add virt-sb-certs sub-rpm
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 24.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Nov 29 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.11-1
+- update to version 24.11
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 24.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 11 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.7-1
+- update to version 24.7
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 24.4-3
+- Rebuilt for Python 3.13
+
+* Wed Apr 24 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.4-2
+- add qemu-img and dialog as weak dependencies
+
+* Fri Apr 12 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.4-1
+- update to version 24.4
+
+* Thu Feb 29 2024 Todd Zullinger <tmz@pobox.com> - 24.2-3
+- Avoid unowned %%{python3_sitelib}/virt directory
+
+* Thu Feb 29 2024 Davide Cavalca <dcavalca@fedoraproject.org> - 24.2-2
+- Fix install path for kernel install.d hook
+
+* Thu Feb 15 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.2-1
+- update to version 24.2
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 24.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 24.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 10 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.1.1-2
+- add pe test script
+
+* Wed Jan 10 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.1.1-1
+- update to version 24.1.1
+
+* Tue Jan 09 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.1-2
+- add pe-inspect manpage to file list
+
+* Tue Jan 09 2024 Gerd Hoffmann <kraxel@redhat.com> - 24.1-1
+- update to version 24.1
+
+* Thu Nov 30 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.11-1
+- update to version 23.11
+
+* Tue Oct 10 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.10-4
+- clarify uki-direct dependency on systemd >= 254
+
+* Tue Oct 10 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.10-3
+- add pe-inspect to filelist
+
+* Tue Oct 10 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.10-2
+- Revert "Add fixes for systemd unit + kernel-install plugin (from master
+  branch)."
+
+* Tue Oct 10 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.10-1
+- update to version 23.10
+
+* Tue Sep 19 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-6
+- Add fixes for systemd unit + kernel-install plugin (from master branch).
+
+* Tue Sep 19 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-5
+- add Conflicts line for obsoleted subpackage
+
+* Tue Sep 19 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-4
+- use %%_libdir
+
+* Mon Sep 18 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-3
+- add uki-direct subpackage
+
+* Mon Sep 18 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-2
+- drop -peutils subpackage
+
+* Mon Sep 18 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.9-1
+- update to version 23.9
+
+* Fri Sep 15 2023 Daniel P. Berrangé <berrange@redhat.com> - 23.6-4
+- Convert to SPDX format
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 23.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 26 2023 Python Maint <python-maint@redhat.com> - 23.6-2
+- Rebuilt for Python 3.12
+
+* Mon Jun 19 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.6-1
+- update to version 23.6
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 23.5-2
+- Rebuilt for Python 3.12
+
+* Thu May 04 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.5-1
+- update to version 23.5
+
+* Fri Apr 14 2023 Gerd Hoffmann <kraxel@redhat.com> - 23.4-1
+- update to version 23.4
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Gerd Hoffmann <kraxel@redhat.com> - 1.8-1
+- update to version 1.8
+
+* Fri Dec 02 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.7-1
+- update to version 1.7
+
+* Thu Nov 10 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.6-2
+- add conflict declaration
+
+* Thu Nov 10 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.6-1
+- update to version 1.6
+- split peutils to subpackage
+
+* Wed Oct 05 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.5-1
+- update to version 1.5
+
+* Wed Oct 05 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.4-5
+- turn on gating
+
+* Wed Oct 05 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.4-4
+- more test dependency tweaks
+
+* Wed Oct 05 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.4-3
+- tweak test dependencies
+
+* Wed Oct 05 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.4-2
+- add tests
+
+* Tue Sep 27 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.4-1
+- update to version 1.4
+- add man-pages
+- add tests sub-package
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jul 18 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.2-1
+- update to version 1.2
+
+* Fri Jul 01 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.1-1
+- update to version 1.1
+
+* Wed Jun 22 2022 Gerd Hoffmann <kraxel@redhat.com> - 1.0-1
+- update to version 1.0
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.98-2
+- Rebuilt for Python 3.11
+
+* Tue May 24 2022 Gerd Hoffmann <kraxel@redhat.com> - 0.98-1
+- update to version 0.98
+
+* Mon Apr 11 2022 Gerd Hoffmann <kraxel@redhat.com> - 0.95-1
+- Initial package.
+
+## END: Generated by rpmautospec

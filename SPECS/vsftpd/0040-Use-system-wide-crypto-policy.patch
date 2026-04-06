@@ -1,0 +1,27 @@
+From b83be8b4f86bf1a8a6de4802a9486d084c4a46cd Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 29 Aug 2017 10:32:16 +0200
+Subject: [PATCH 40/59] Use system wide crypto policy
+
+Resolves: rhbz#
+---
+ tunables.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tunables.c b/tunables.c
+index 5440c00..354251c 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -297,8 +297,7 @@ tunables_load_defaults()
+   install_str_setting(0, &tunable_dsa_cert_file);
+   install_str_setting(0, &tunable_dh_param_file);
+   install_str_setting(0, &tunable_ecdh_param_file);
+-  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA",
+-                      &tunable_ssl_ciphers);
++  install_str_setting("PROFILE=SYSTEM", &tunable_ssl_ciphers);
+   install_str_setting(0, &tunable_rsa_private_key_file);
+   install_str_setting(0, &tunable_dsa_private_key_file);
+   install_str_setting(0, &tunable_ca_certs_file);
+-- 
+2.14.4
+

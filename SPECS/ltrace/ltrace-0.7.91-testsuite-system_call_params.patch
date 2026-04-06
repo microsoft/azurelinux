@@ -1,0 +1,68 @@
+diff -rup a/testsuite/Makefile.am b/testsuite/Makefile.am
+--- a/testsuite/Makefile.am	2012-12-16 20:53:45.000000000 -0500
++++ b/testsuite/Makefile.am	2019-06-28 16:59:19.935602953 -0400
+@@ -39,6 +39,7 @@ env.exp: Makefile
+ 	rm -f env.exp
+ 	echo set libelf_LD_LIBRARY_PATH '"$(libelf_LD_LIBRARY_PATH)"' >> $@
+ 	echo set libunwind_LD_LIBRARY_PATH '"$(libunwind_LD_LIBRARY_PATH)"' >> $@
++	echo set PREFIX '"$(prefix)"' >> $@
+ 
+ CLEANFILES = *.o *.so *.log *.sum *.ltrace site.bak setval.tmp site.exp env.exp
+ 
+diff -rup a/testsuite/Makefile.in b/testsuite/Makefile.in
+--- a/testsuite/Makefile.in	2013-11-04 20:22:47.000000000 -0500
++++ b/testsuite/Makefile.in	2019-06-28 16:59:12.075602806 -0400
+@@ -648,6 +648,7 @@ env.exp: Makefile
+ 	rm -f env.exp
+ 	echo set libelf_LD_LIBRARY_PATH '"$(libelf_LD_LIBRARY_PATH)"' >> $@
+ 	echo set libunwind_LD_LIBRARY_PATH '"$(libunwind_LD_LIBRARY_PATH)"' >> $@
++	echo set PREFIX '"$(prefix)"' >> $@
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+diff -rup a/testsuite/ltrace.main/system_call_params.exp b/testsuite/ltrace.main/system_call_params.exp
+--- a/testsuite/ltrace.main/system_call_params.exp	2019-06-28 16:44:07.542584754 -0400
++++ b/testsuite/ltrace.main/system_call_params.exp	2019-06-28 17:00:35.811604355 -0400
+@@ -1,5 +1,5 @@
+ # This file is part of ltrace.
+-# Copyright (C) 2013, 2014 Petr Machata, Red Hat Inc.
++# Copyright (C) 2013, 2014, 2015 Petr Machata, Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU General Public License as
+@@ -60,8 +60,35 @@ set conf [ltraceNamedSource "$dir/syscal
+ # somelib.conf is passed, and syscalls.conf is not available, or
+ # doesn't list readdir, that would be taken from somelib.conf with a
+ # wrong prototype.
++#
++# This test relies on the fact that there is no global config file
++# that would provide legitimate system call prototypes.  But that
++# doesn't have to be true, maybe ltrace is already installed on the
++# system with the right prefix.  So first compile a wrapper that we
++# use to redirect fopen calls.
++
++set libfopen_so [ltraceCompile libfopen.so -ldl \
++		     [ltraceSource c [string map [list "@PREFIX@" "$PREFIX"] {
++    #define _GNU_SOURCE
++    #include <dlfcn.h>
++    #include <stdio.h>
++    #include <string.h>
++
++    FILE *
++    fopen(const char *path, const char *mode)
++    {
++	#define PATH "@PREFIX@/share"
++	if (strncmp(path, PATH, sizeof(PATH) - 1) == 0)
++	    path = "/dev/null";
+ 
++	return ((FILE *(*)(const char *, const char *))
++		dlsym(RTLD_NEXT, "fopen")) (path, mode);
++    }
++}]]]
++ 
++setenv LD_PRELOAD $libfopen_so
+ ltraceMatch1 [ltraceRun -L -S -F $conf -- $bin] {^open@SYS\("/some/path", 0\)} == 0
++unsetenv LD_PRELOAD
+ 
+ # On the other hand, if -F somedir/ is given, we want to accept
+ # syscalls.conf found there.

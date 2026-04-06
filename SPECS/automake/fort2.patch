@@ -1,0 +1,16 @@
+diff -r -U5 automake-1.16.5.old/t/fort2.sh automake-1.16.5/t/fort2.sh
+--- automake-1.16.5.old/t/fort2.sh	2022-05-16 15:12:39.683825720 +0200
++++ automake-1.16.5/t/fort2.sh	2022-05-16 15:12:53.495805448 +0200
+@@ -80,11 +80,11 @@
+ grep ' fake-fc .* --@08 .* greets\.f08 ' out
+ grep ' fake-fc .* --@08 .* sub/bonjour\.f08 ' out
+ grep ' fake-fc .* --gby .* --@95 .*[` ]bye\.f95 ' out
+ grep ' fake-fc .* --gby .* --@90 .*[` ]sub/baz\.f90 ' out
+ 
+-test $(grep -c '.*--gby.*\.f' out) -eq 2
++test $(grep -cE '.*--gby.*bye\.f95|--gby.*baz\.f90' out) -eq 2
+ 
+ $EGREP 'fake-fc.*--@(95|03|08).*\.f90' out && exit 1
+ $EGREP 'fake-fc.*--@(90|03|08).*\.f95' out && exit 1
+ $EGREP 'fake-fc.*--@(90|95|08).*\.f03' out && exit 1
+ $EGREP 'fake-fc.*--@(95|95|03).*\.f08' out && exit 1

@@ -1,0 +1,53 @@
+From 21674e2f38f574aa8fee0ab8ce9ee6c8f0664c3c Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 3 Dec 2025 10:40:11 +0100
+Subject: [PATCH 23/23] OvmfPkg/MemDebugLogLib: use AcquireSpinLockOrFail
+
+Drop log lines if we can't get the spin lock.  Not nice, but better than
+risking a deadlock.
+
+Some background:  Most of edk2 runs single-threaded on the BSP, so if
+something holds the lock it is rather unlikely that waiting is going to
+help.  Specifically I think a deadlock can happen if (a) a timer
+interrupt arrives while the lock is held, and (b) some higher-TPL timer
+handler tries to print something to the debug log.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 4ff51f3780f92f66c995e276fea8b49f5a02b889)
+---
+ OvmfPkg/Library/MemDebugLogLib/MemDebugLogCommon.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/OvmfPkg/Library/MemDebugLogLib/MemDebugLogCommon.c b/OvmfPkg/Library/MemDebugLogLib/MemDebugLogCommon.c
+index 8c9ce61cb6d2..b737cb0f709b 100644
+--- a/OvmfPkg/Library/MemDebugLogLib/MemDebugLogCommon.c
++++ b/OvmfPkg/Library/MemDebugLogLib/MemDebugLogCommon.c
+@@ -29,12 +29,12 @@ MemDebugLogLockInit (
+ }
+ 
+ STATIC
+-VOID
++BOOLEAN
+ MemDebugLogLockAcquire (
+   IN volatile UINT64  *MemDebugLogLock
+   )
+ {
+-  AcquireSpinLock ((SPIN_LOCK *)MemDebugLogLock);
++  return AcquireSpinLockOrFail ((SPIN_LOCK *)MemDebugLogLock);
+ }
+ 
+ STATIC
+@@ -90,7 +90,9 @@ MemDebugLogWriteBuffer (
+     return EFI_INVALID_PARAMETER;
+   }
+ 
+-  MemDebugLogLockAcquire (MemDebugLogLock);
++  if (!MemDebugLogLockAcquire (MemDebugLogLock)) {
++    return EFI_NOT_READY;
++  }
+ 
+   BufStart = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + MemDebugLogHdr->HeaderSize);
+   BufEnd   = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + MemDebugLogHdr->HeaderSize + MemDebugLogHdr->DebugLogSize) - 1;
+-- 
+2.52.0
+

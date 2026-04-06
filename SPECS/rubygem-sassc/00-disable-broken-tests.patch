@@ -1,0 +1,42 @@
+diff --git a/test/engine_test.rb b/test/engine_test.rb
+index 29681d7..27c8b0c 100644
+--- a/test/engine_test.rb
++++ b/test/engine_test.rb
+@@ -80,20 +80,6 @@ CSS
+       assert_equal expected_output, output
+     end
+ 
+-    def test_precision_not_specified
+-      template = <<-SCSS
+-$var: 1;
+-.foo {
+-  baz: $var / 3; }
+-SCSS
+-      expected_output = <<-CSS
+-.foo {
+-  baz: 0.3333333333; }
+-CSS
+-      output = Engine.new(template).render
+-      assert_equal expected_output, output
+-    end
+-
+     def test_dependency_filenames_are_reported
+       base = temp_dir("").to_s
+ 
+diff --git a/test/native_test.rb b/test/native_test.rb
+index 876f56c..914416e 100644
+--- a/test/native_test.rb
++++ b/test/native_test.rb
+@@ -9,12 +9,6 @@ module SassC
+     SAMPLE_CSS_OUTPUT = ".hi {\n  width: 30px; }\n"
+     BAD_SASS_STRING = "$size = 30px;"
+ 
+-    class General < Minitest::Test
+-      def test_it_reports_the_libsass_version
+-        assert_equal "3.6.4", Native.version
+-      end
+-    end
+-
+     class DataContext < Minitest::Test
+       def teardown
+         Native.delete_data_context(@data_context) if @data_context

@@ -1,0 +1,7 @@
+# daemon does not need restarting after log rotate
+# so we do not prod it any more
+/var/log/exim/*log {
+  missingok
+  notifempty
+  delaycompress
+}

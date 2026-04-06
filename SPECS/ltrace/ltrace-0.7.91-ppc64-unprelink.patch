@@ -1,0 +1,221 @@
+From a0093ca43cf40d7e5f6cebeb64156062d2de46d9 Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Fri, 10 Jan 2014 20:06:51 +0100
+Subject: [PATCH 2/2] Don't crash untraced calls via PLT in prelinked PPC64
+ binaries
+
+In prelinked binaries, ltrace has to unprelinks PLT slots in order to
+catch calls done through PLT.  This makes the calls done through these
+slots invalid, because the special first PLT slot is not initialized,
+and dynamic linker SIGSEGVs because of this.  Ltrace relies on
+arranging breakpoints such that the dynamic linker is not actually
+entered, and moves PC around itself to simulate the effects of a call
+through PLT.
+
+Originally, arch_elf_add_plt_entry was called only for symbols that
+were actually traced.  Later this was changed and it's now called for
+all PLT entries, and the resulting candidate list is filtered
+afterwards.  This gives backends a chance to rename the symbol, as is
+useful with IRELATIVE PLT calls, where symbol name may not be
+available at all.  But the PPC backend was never updated to reflect
+this, and unresolved all symbols for which arch_elf_add_plt_entry was
+called, thus rendering _all_ PLT slots invalid, even those that
+weren't later procted by breakpoints.  Thus calls done through any
+untraced slots failed.
+
+This patch fixes this problem by deferring the unprelinking of PLT
+slots into the on_install hook of breakpoints.
+---
+ sysdeps/linux-gnu/ppc/arch.h |   21 ++++++++-
+ sysdeps/linux-gnu/ppc/plt.c  |   94 +++++++++++++++++++++++++++++++++--------
+ 2 files changed, 94 insertions(+), 21 deletions(-)
+
+diff --git a/sysdeps/linux-gnu/ppc/arch.h b/sysdeps/linux-gnu/ppc/arch.h
+index 2add3b8..bf9b5dc 100644
+--- a/sysdeps/linux-gnu/ppc/arch.h
++++ b/sysdeps/linux-gnu/ppc/arch.h
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012,2013 Petr Machata
++ * Copyright (C) 2012,2013,2014 Petr Machata
+  * Copyright (C) 2006 Paul Gilliam
+  * Copyright (C) 2002,2004 Juan Cespedes
+  *
+@@ -87,12 +87,29 @@ enum ppc64_plt_type {
+ 	/* Very similar to PPC_PLT_UNRESOLVED, but for JMP_IREL
+ 	 * slots.  */
+ 	PPC_PLT_IRELATIVE,
++
++	/* Transitional state before the breakpoint is enabled.  */
++	PPC_PLT_NEED_UNRESOLVE,
+ };
+ 
+ #define ARCH_HAVE_LIBRARY_SYMBOL_DATA
++struct ppc_unresolve_data;
+ struct arch_library_symbol_data {
+ 	enum ppc64_plt_type type;
+-	GElf_Addr resolved_value;
++
++	/* State		Contents
++	 *
++	 * PPC_DEFAULT		N/A
++	 * PPC64_PLT_STUB	N/A
++	 * PPC_PLT_UNRESOLVED	PLT entry address.
++	 * PPC_PLT_IRELATIVE	Likewise.
++	 * PPC_PLT_RESOLVED	The original value the slot was resolved to.
++	 * PPC_PLT_NEED_UNRESOLVE	DATA.
++	 */
++	union {
++		GElf_Addr resolved_value;
++		struct ppc_unresolve_data *data;
++	};
+ 
+ 	/* Address of corresponding slot in .plt.  */
+ 	GElf_Addr plt_slot_addr;
+diff --git a/sysdeps/linux-gnu/ppc/plt.c b/sysdeps/linux-gnu/ppc/plt.c
+index 8715da6..332daa8 100644
+--- a/sysdeps/linux-gnu/ppc/plt.c
++++ b/sysdeps/linux-gnu/ppc/plt.c
+@@ -679,6 +679,14 @@ arch_elf_add_func_entry(struct process *proc, struct ltelf *lte,
+ 	return PLT_OK;
+ }
+ 
++struct ppc_unresolve_data {
++	struct ppc_unresolve_data *self; /* A canary.  */
++	GElf_Addr plt_entry_addr;
++	GElf_Addr plt_slot_addr;
++	GElf_Addr plt_slot_value;
++	bool is_irelative;
++};
++
+ enum plt_status
+ arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
+ 		       const char *a_name, GElf_Rela *rela, size_t ndx,
+@@ -778,28 +786,23 @@ arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
+ 	    && (plt_slot_value == plt_entry_addr || plt_slot_value == 0)) {
+ 		libsym->arch.type = PPC_PLT_UNRESOLVED;
+ 		libsym->arch.resolved_value = plt_entry_addr;
+-
+ 	} else {
+-		/* Unresolve the .plt slot.  If the binary was
+-		 * prelinked, this makes the code invalid, because in
+-		 * case of prelinked binary, the dynamic linker
+-		 * doesn't update .plt[0] and .plt[1] with addresses
+-		 * of the resover.  But we don't care, we will never
+-		 * need to enter the resolver.  That just means that
+-		 * we have to un-un-resolve this back before we
+-		 * detach.  */
+-
+-		if (unresolve_plt_slot(proc, plt_slot_addr, plt_entry_addr) < 0) {
+-			library_symbol_destroy(libsym);
++		/* Mark the symbol for later unresolving.  We may not
++		 * do this right away, as this is called by ltrace
++		 * core for all symbols, and only later filtered.  We
++		 * only unresolve the symbol before the breakpoint is
++		 * enabled.  */
++
++		libsym->arch.type = PPC_PLT_NEED_UNRESOLVE;
++		libsym->arch.data = malloc(sizeof *libsym->arch.data);
++		if (libsym->arch.data == NULL)
+ 			goto fail2;
+-		}
+ 
+-		if (! is_irelative) {
+-			mark_as_resolved(libsym, plt_slot_value);
+-		} else {
+-			libsym->arch.type = PPC_PLT_IRELATIVE;
+-			libsym->arch.resolved_value = plt_entry_addr;
+-		}
++		libsym->arch.data->self = libsym->arch.data;
++		libsym->arch.data->plt_entry_addr = plt_entry_addr;
++		libsym->arch.data->plt_slot_addr = plt_slot_addr;
++		libsym->arch.data->plt_slot_value = plt_slot_value;
++		libsym->arch.data->is_irelative = is_irelative;
+ 	}
+ 
+ 	*ret = libsym;
+@@ -999,6 +1002,7 @@ ppc_plt_bp_continue(struct breakpoint *bp, struct process *proc)
+ 		return;
+ 
+ 	case PPC64_PLT_STUB:
++	case PPC_PLT_NEED_UNRESOLVE:
+ 		/* These should never hit here.  */
+ 		break;
+ 	}
+@@ -1050,6 +1054,52 @@ ppc_plt_bp_retract(struct breakpoint *bp, struct process *proc)
+ 	}
+ }
+ 
++static void
++ppc_plt_bp_install(struct breakpoint *bp, struct process *proc)
++{
++	/* This should not be an artificial breakpoint.  */
++	struct library_symbol *libsym = bp->libsym;
++	if (libsym == NULL)
++		libsym = bp->arch.irel_libsym;
++	assert(libsym != NULL);
++
++	if (libsym->arch.type == PPC_PLT_NEED_UNRESOLVE) {
++		/* Unresolve the .plt slot.  If the binary was
++		 * prelinked, this makes the code invalid, because in
++		 * case of prelinked binary, the dynamic linker
++		 * doesn't update .plt[0] and .plt[1] with addresses
++		 * of the resover.  But we don't care, we will never
++		 * need to enter the resolver.  That just means that
++		 * we have to un-un-resolve this back before we
++		 * detach.  */
++
++		struct ppc_unresolve_data *data = libsym->arch.data;
++		libsym->arch.data = NULL;
++		assert(data->self == data);
++
++		GElf_Addr plt_slot_addr = data->plt_slot_addr;
++		GElf_Addr plt_slot_value = data->plt_slot_value;
++		GElf_Addr plt_entry_addr = data->plt_entry_addr;
++
++		if (unresolve_plt_slot(proc, plt_slot_addr,
++				       plt_entry_addr) == 0) {
++			if (! data->is_irelative) {
++				mark_as_resolved(libsym, plt_slot_value);
++			} else {
++				libsym->arch.type = PPC_PLT_IRELATIVE;
++				libsym->arch.resolved_value = plt_entry_addr;
++			}
++		} else {
++			fprintf(stderr, "Couldn't unresolve %s@%p.  Not tracing"
++				" this symbol.\n",
++				breakpoint_name(bp), bp->addr);
++			proc_remove_breakpoint(proc, bp);
++		}
++
++		free(data);
++	}
++}
++
+ int
+ arch_library_init(struct library *lib)
+ {
+@@ -1080,6 +1130,11 @@ arch_library_symbol_init(struct library_symbol *libsym)
+ void
+ arch_library_symbol_destroy(struct library_symbol *libsym)
+ {
++	if (libsym->arch.type == PPC_PLT_NEED_UNRESOLVE) {
++		assert(libsym->arch.data->self == libsym->arch.data);
++		free(libsym->arch.data);
++		libsym->arch.data = NULL;
++	}
+ }
+ 
+ int
+@@ -1115,6 +1170,7 @@ arch_breakpoint_init(struct process *proc, struct breakpoint *bp)
+ 	static struct bp_callbacks cbs = {
+ 		.on_continue = ppc_plt_bp_continue,
+ 		.on_retract = ppc_plt_bp_retract,
++		.on_install = ppc_plt_bp_install,
+ 	};
+ 	breakpoint_set_callbacks(bp, &cbs);
+ 
+-- 
+1.7.6.5
+

@@ -1,0 +1,18 @@
+--- dtoa-1.0.11/Cargo.toml	2006-07-24T01:21:28+00:00
++++ dtoa-1.0.11/Cargo.toml	2026-01-07T15:37:42.362431+00:00
+@@ -55,15 +55,6 @@
+ name = "test"
+ path = "tests/test.rs"
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies.no-panic]
+ version = "0.1"
+ optional = true
+-
+-[target."cfg(not(miri))".dev-dependencies.criterion]
+-version = "0.8"
+-default-features = false

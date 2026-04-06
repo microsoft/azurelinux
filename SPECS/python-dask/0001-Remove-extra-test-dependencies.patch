@@ -1,0 +1,39 @@
+From 84f4cb5046da7313b1912e1bb31e19d5fd4a4c8b Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Thu, 20 Jun 2024 21:08:07 -0400
+Subject: [PATCH 1/4] Remove extra test dependencies
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1bdfe0e31..abc9fc4cf 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -70,12 +70,10 @@ complete = [
+ test = [
+     "pandas[test]",
+     "pytest",
+-    "pytest-cov",
+     "pytest-mock",
+     "pytest-rerunfailures",
+     "pytest-timeout",
+     "pytest-xdist",
+-    "pre-commit",
+ ]
+ 
+ [project.entry-points."dask.array.backends"]
+@@ -126,7 +124,7 @@ markers = [
+     "array_expr: Tests that are array-expr specific",
+     "normal_and_array_expr: Tests that should run with and without array-expr",
+ ]
+-addopts = "-v -rsfE --durations=10 --color=yes --cov-config=pyproject.toml"
++addopts = "-v -rsfE --durations=10 --color=yes"
+ filterwarnings = [
+     "error:::dask[.*]",
+     "error:::pandas[.*]",
+-- 
+2.52.0
+

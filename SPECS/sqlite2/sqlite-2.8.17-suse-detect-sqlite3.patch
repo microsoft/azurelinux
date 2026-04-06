@@ -1,0 +1,43 @@
+diff -up sqlite-2.8.17/src/btree.c.sqlite3 sqlite-2.8.17/src/btree.c
+--- sqlite-2.8.17/src/btree.c.sqlite3	2019-04-10 14:39:29.597592819 -0400
++++ sqlite-2.8.17/src/btree.c	2019-04-10 14:40:51.458892027 -0400
+@@ -112,6 +112,8 @@ typedef struct FreelistInfo FreelistInfo
+ static const char zMagicHeader[] = 
+    "** This file contains an SQLite 2.1 database **";
+ #define MAGIC_SIZE (sizeof(zMagicHeader))
++static const char zMagicHeader_V3[] = "SQLite format 3";
++#define MAGIC_SIZE_V3 (sizeof(zMagicHeader_V3))
+ 
+ /*
+ ** This is a magic integer also used to test the integrity of the database
+@@ -794,6 +796,8 @@ static int lockBtree(Btree *pBt){
+     if( strcmp(pP1->zMagic,zMagicHeader)!=0 ||
+           (pP1->iMagic!=MAGIC && swab32(pP1->iMagic)!=MAGIC) ){
+       rc = SQLITE_NOTADB;
++      if( !strcmp(pP1->zMagic,zMagicHeader_V3) )
++        rc = SQLITE_V3;
+       goto page1_init_failed;
+     }
+     pBt->needSwab = pP1->iMagic!=MAGIC;
+diff -up sqlite-2.8.17/src/main.c.sqlite3 sqlite-2.8.17/src/main.c
+--- sqlite-2.8.17/src/main.c.sqlite3	2019-04-10 14:41:00.268709401 -0400
++++ sqlite-2.8.17/src/main.c	2019-04-10 14:41:24.115215151 -0400
+@@ -851,6 +851,7 @@ const char *sqlite_error_string(int rc){
+     case SQLITE_FORMAT:     z = "auxiliary database format error";       break;
+     case SQLITE_RANGE:      z = "bind index out of range";               break;
+     case SQLITE_NOTADB:     z = "file is encrypted or is not a database";break;
++    case SQLITE_V3:         z = "database version mismatch. Try sqlite3";break;
+     default:                z = "unknown error";                         break;
+   }
+   return z;
+diff -up sqlite-2.8.17/src/sqlite.h.in.sqlite3 sqlite-2.8.17/src/sqlite.h.in
+--- sqlite-2.8.17/src/sqlite.h.in.sqlite3	2019-04-10 14:41:44.465793362 -0400
++++ sqlite-2.8.17/src/sqlite.h.in	2019-04-10 14:41:57.761517793 -0400
+@@ -172,6 +172,7 @@ int sqlite_exec(
+ #define SQLITE_FORMAT      24   /* Auxiliary database format error */
+ #define SQLITE_RANGE       25   /* 2nd parameter to sqlite_bind out of range */
+ #define SQLITE_NOTADB      26   /* File opened that is not a database file */
++#define SQLITE_V3          27   /* File opened that is not a database file */
+ #define SQLITE_ROW         100  /* sqlite_step() has another row ready */
+ #define SQLITE_DONE        101  /* sqlite_step() has finished executing */
+ 

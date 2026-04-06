@@ -1,0 +1,2 @@
+#Type Path              Mode User    Group   Age  Argument
+d     /var/lib/lockdown 2775 usbmuxd usbmuxd -    -

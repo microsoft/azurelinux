@@ -1,0 +1,18 @@
+diff -up ./phpab.php.rpm ./phpab.php
+--- ./phpab.php.rpm	2023-09-19 09:19:53.895163447 +0200
++++ ./phpab.php	2023-09-19 09:20:45.772936697 +0200
+@@ -43,12 +43,12 @@
+  *   5 - Duplicates found Error
+  */
+ 
+-define('PHPAB_VERSION', '%development%');
++define('PHPAB_VERSION', '@VERSION@');
+ 
+ if (!ini_get('date.timezone')) {
+      ini_set('date.timezone', 'UTC');
+ }
+-require __DIR__ . '/src/autoload.php';
++require '/usr/share/php/TheSeer/Autoload/autoload.php';
+ 
+ $factory = new \TheSeer\Autoload\Factory();
+ $rc = $factory->getCLI()->run($_SERVER);

@@ -1,0 +1,60 @@
+cookie_accept_domains 
+cookie_reject_domains 
+accept_bad_cookie 0
+accept_cookie 1
+use_cookie 1
+ssl_ca_file 
+ssl_ca_path /etc/pki/tls/certs/
+ssl_key_file 
+ssl_cert_file 
+ssl_verify_server 1
+ssl_forbid_method
+no_cache 0
+noproxy_netaddr 0
+no_proxy 
+meta_refresh 1
+follow_redirection 10
+default_url 1
+retry_http 1
+argv_is_url 1
+no_referer 0
+use_lessopen 0
+bgextviewer 1
+mailer gnome-open mailto:%s
+editor /bin/vi
+mailcap ~/.w3m/mailcap, /etc/w3m/mailcap, /etc/mailcap
+mime_types ~/.w3m/mime.types, /etc/mime.types
+urimethodmap ~/.w3m/urimethodmap, /etc/w3m/urimethodmap
+use_mouse 1
+migemo_command migemo -t egrep /usr/share/migemo/migemo-dict
+use_migemo 0
+ignorecase_search 1
+wrap_search 0
+confirm_qq 1
+save_hist 1
+history 100
+pagerline 10000
+visited_color magenta
+visited_anchor 0
+active_color cyan
+active_style 0
+bg_color terminal
+form_color red
+image_color green
+anchor_color blue
+basic_color terminal
+color 1
+show_lnum 0
+view_unseenobject 1
+ignore_null_img_alt 1
+alt_entity 0
+multicol 0
+dirlist_cmd file:///$LIB/dirlist.cgi
+ext_dirlist 1
+display_link 0
+target_self 0
+frame 0
+tabstop 8
+ftppasswd_anonymous@
+ftppass_hostnamegen 0
+display_image 1

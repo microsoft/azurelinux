@@ -1,0 +1,53 @@
+From be30d9a94ba45afb600717e3fcd95b8b2ff2c60e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 23 May 2025 21:59:14 +0200
+Subject: [PATCH] Fix test_examples on Python 3.14 (#185)
+
+This is basically a followup of https://github.com/aklajnert/pytest-subprocess/pull/148
+---
+ tests/test_examples.py | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/tests/test_examples.py b/tests/test_examples.py
+index 5a27604..df849f3 100644
+--- a/tests/test_examples.py
++++ b/tests/test_examples.py
+@@ -1,3 +1,4 @@
++import sys
+ from pathlib import Path
+ 
+ import pytest
+@@ -39,18 +40,21 @@ def test_documentation(testdir, rst_file):
+         "    os.chdir(os.path.dirname(__file__))\n\n"
+     )
+ 
+-    event_loop_fixture = (
+-        "\n\n"
+-        "@pytest.fixture(autouse=True)\n"
+-        "def event_loop(request):\n"
+-        "    policy = asyncio.get_event_loop_policy()\n"
+-        '    if sys.platform == "win32":\n'
+-        "        loop = asyncio.ProactorEventLoop()\n"
+-        "    else:\n"
+-        "        loop = policy.get_event_loop()\n"
+-        "    yield loop\n"
+-        "    loop.close()\n"
+-    )
++    if sys.version_info < (3, 8):
++        event_loop_fixture = (
++            "\n\n"
++            "@pytest.fixture(autouse=True)\n"
++            "def event_loop(request):\n"
++            "    policy = asyncio.get_event_loop_policy()\n"
++            '    if sys.platform == "win32":\n'
++            "        loop = asyncio.ProactorEventLoop()\n"
++            "    else:\n"
++            "        loop = policy.get_event_loop()\n"
++            "    yield loop\n"
++            "    loop.close()\n"
++        )
++    else:
++        event_loop_fixture = ""
+ 
+     code_blocks = "\n".join(get_code_blocks(ROOT_DIR / rst_file))
+     testdir.makepyfile(

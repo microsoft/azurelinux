@@ -1,0 +1,11 @@
+diff --git a/libmb/hash.h b/libmb/hash.h
+index 86f18bf0d6dc..43827b266a73 100644
+--- a/libmb/hash.h
++++ b/libmb/hash.h
+@@ -38,5 +38,5 @@ struct hash* hash_new(int size);
+ unsigned int hashfunc(struct hash *h, char *s);
+ struct nlist *hash_lookup(struct hash *h, char *s);
+ struct nlist *hash_add(struct hash *h, char *key, char *val);
+-void hash_empty();
++void hash_empty(struct hash *h);
+ void hash_destroy(struct hash *h);

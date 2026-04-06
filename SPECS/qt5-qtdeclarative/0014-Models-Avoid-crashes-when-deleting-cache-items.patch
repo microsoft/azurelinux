@@ -1,0 +1,51 @@
+From c152c7bac6c5940add06a8bf9ad73827f92ef1bc Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Wed, 29 Mar 2023 16:36:03 +0200
+Subject: [PATCH 14/22] Models: Avoid crashes when deleting cache items
+
+Pick-to: 6.5 6.2 5.15
+Fixes: QTBUG-91425
+Change-Id: I58cf9ee29922f83fc6621f771b80ed557b31f106
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 0cfdecba54e4f40468c4c9a8a6668cc1bc0eff65)
+
+* asturmlechner 2023-04-08: Resolve conflict with dev branch commit
+  c2d490a2385ea6f389340a296acaac0fa198c8b9 (qAsConst to std::as_const)
+---
+ .../qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp  | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+index e128d77c52..e5daf2d28b 100644
+--- a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
++++ b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
+@@ -51,6 +51,7 @@ private slots:
+     void contextAccessedByHandler();
+     void deleteRace();
+     void redrawUponColumnChange();
++    void deleteRace();
+ };
+ 
+ class AbstractItemModel : public QAbstractItemModel
+@@ -214,6 +215,17 @@ void tst_QQmlDelegateModel::redrawUponColumnChange()
+     QCOMPARE(item->property("text").toString(), "Coconut");
+ }
+ 
++void tst_QQmlDelegateModel::deleteRace()
++{
++    QQmlEngine engine;
++    QQmlComponent c(&engine, testFileUrl("deleteRace.qml"));
++    QVERIFY2(c.isReady(), qPrintable(c.errorString()));
++    QScopedPointer<QObject> o(c.create());
++    QVERIFY(!o.isNull());
++    QTRY_COMPARE(o->property("count").toInt(), 2);
++    QTRY_COMPARE(o->property("count").toInt(), 0);
++}
++
+ QTEST_MAIN(tst_QQmlDelegateModel)
+ 
+ #include "tst_qqmldelegatemodel.moc"
+-- 
+2.51.1
+

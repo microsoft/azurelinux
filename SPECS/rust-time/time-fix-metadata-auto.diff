@@ -1,0 +1,34 @@
+--- time-0.3.47/Cargo.toml	2006-07-24T01:21:28+00:00
++++ time-0.3.47/Cargo.toml	2026-02-06T23:18:43.821336+00:00
+@@ -104,7 +104,7 @@
+     "parsing",
+ ]
+ std = ["alloc"]
+-wasm-bindgen = ["dep:js-sys"]
++wasm-bindgen = []
+ 
+ [lib]
+ name = "time"
+@@ -201,17 +201,6 @@
+ 
+ [dev-dependencies.time-macros]
+ version = "=0.2.27"
+-
+-[target."cfg(__ui_tests)".dev-dependencies.trybuild]
+-version = "1.0.102"
+-
+-[target.'cfg(all(target_family = "wasm", not(any(target_os = "emscripten", target_os = "wasi"))))'.dependencies.js-sys]
+-version = "0.3.58"
+-optional = true
+-
+-[target."cfg(bench)".dev-dependencies.criterion]
+-version = "0.8.1"
+-default-features = false
+ 
+ [target.'cfg(target_family = "unix")'.dependencies.libc]
+ version = "0.2.98"
+@@ -330,3 +319,4 @@
+ [lints.rustdoc]
+ private-doc-tests = "warn"
+ unescaped-backticks = "warn"
++

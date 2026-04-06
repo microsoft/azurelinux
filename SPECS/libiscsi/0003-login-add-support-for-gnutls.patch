@@ -1,0 +1,115 @@
+From 35fec3ea0ef5c3c068f698e1b2a94695522f8e47 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 9 Apr 2024 15:43:02 +0200
+Subject: [PATCH 3/3] login: add support for gnutls
+Content-Type: text/plain; charset=UTF-8
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure.ac    | 26 ++++++++++++++++++++++++--
+ lib/Makefile.am |  2 +-
+ lib/login.c     | 19 ++++++++++++++++++-
+ 3 files changed, 43 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b7d214f..13ae3bb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -78,11 +78,29 @@ AM_CONDITIONAL([BUILD_EXAMPLES],
+ 
+ AC_CONFIG_HEADERS([config.h])
+ 
++AC_ARG_WITH([gnutls],
++	    [AS_HELP_STRING([--with-gnutls],
++			    [Use gnutls to compute MD5])],
++	    [WITH_GNUTLS=$withval],
++	    [WITH_GNUTLS=auto])
++
+ AC_ARG_WITH([libgcrypt],
+ 	    [AS_HELP_STRING([--with-libgcrypt],
+ 			    [Use libgcrypt to compute MD5])],
+ 	    [WITH_LIBGCRYPT=$withval],
+ 	    [WITH_LIBGCRYPT=auto])
++
++if test "$WITH_GNUTLS" != no; then
++  AC_CHECK_LIB([gnutls], [gnutls_hash_init])
++  if test "$WITH_GNUTLS" = yes && test "$ac_cv_lib_gnutls_gnutls_hash_init" != yes; then
++    AC_MSG_ERROR([gnutls not found])
++  fi
++  WITH_GNUTLS=$ac_cv_lib_gnutls_gnutls_hash_init
++fi
++if test "$WITH_GNUTLS" = yes; then
++  WITH_LIBGCRYPT=no
++fi
++
+ if test "$WITH_LIBGCRYPT" != no; then
+   AC_CHECK_LIB([gcrypt], [gcry_control])
+   if test "$WITH_LIBGCRYPT" = yes && test "$ac_cv_lib_gcrypt_gcry_control" != yes; then
+@@ -91,8 +109,12 @@ if test "$WITH_LIBGCRYPT" != no; then
+   WITH_LIBGCRYPT=$ac_cv_lib_gcrypt_gcry_control
+ fi
+ 
+-AM_CONDITIONAL([HAVE_LIBGCRYPT],
+-	       [expr "$WITH_LIBGCRYPT" : yes > /dev/null 2>&1])
++NEED_MD5=no
++if test "$WITH_GNUTLS" = no && test "$WITH_LIBGCRYPT" = no; then
++  NEED_MD5=yes
++fi
++AM_CONDITIONAL([NEED_MD5],
++	       [expr "$NEED_MD5" : yes > /dev/null 2>&1])
+ 
+ # For MinGW.
+ AC_CHECK_LIB([ws2_32], [gethostbyname])
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 4cc03a9..ba6aaee 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -12,7 +12,7 @@ if TARGET_OS_IS_WIN32
+ libiscsipriv_la_SOURCES += ../win32/win32_compat.c
+ endif
+ 
+-if !HAVE_LIBGCRYPT
++if NEED_MD5
+ libiscsipriv_la_SOURCES += md5.c
+ endif
+ 
+diff --git a/lib/login.c b/lib/login.c
+index 03c4a7d..5177201 100644
+--- a/lib/login.c
++++ b/lib/login.c
+@@ -44,6 +44,10 @@
+ #include "iscsi-private.h"
+ #include "scsi-lowlevel.h"
+ #include "md5.h"
++
++#ifdef HAVE_LIBGNUTLS
++#include <gnutls/crypto.h>
++#endif
+ #ifdef HAVE_LIBGCRYPT
+ #include <gcrypt.h>
+ #endif
+@@ -681,7 +685,20 @@ i2h(int i)
+ 	return i + '0';
+ }
+ 
+-#ifdef HAVE_LIBGCRYPT
++#if defined HAVE_LIBGNUTLS
++#define md5_context_t gnutls_hash_hd_t
++#define md5_open(hd)  gnutls_hash_init(hd, GNUTLS_DIG_MD5)
++#define md5_write     gnutls_hash
++#define md5_read      gnutls_hash_output
++
++static void md5_close(md5_context_t h)
++{
++       unsigned char digest[16];
++
++       gnutls_hash_deinit(h, digest);
++}
++
++#elif defined HAVE_LIBGCRYPT
+ typedef gcry_md_hd_t md5_context_t;
+ #define md5_open(hd) gcry_md_open(hd, GCRY_MD_MD5, 0)
+ #define md5_write gcry_md_write
+-- 
+2.44.0
+

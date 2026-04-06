@@ -1,0 +1,43 @@
+diff -up ./sapi/embed/config.m4.embed ./sapi/embed/config.m4
+--- ./sapi/embed/config.m4.embed	2025-06-03 18:29:26.000000000 +0200
++++ ./sapi/embed/config.m4	2025-06-05 07:18:33.662824247 +0200
+@@ -10,12 +10,12 @@ AC_MSG_CHECKING([for embedded SAPI libra
+ if test "$PHP_EMBED" != "no"; then
+   AS_CASE([$PHP_EMBED],
+     [yes|shared], [
+-      LIBPHP_CFLAGS="-shared"
++      LIBPHP_CFLAGS="-shared -release \$(PHP_MAJOR_VERSION).\$(PHP_MINOR_VERSION)"
+       AS_CASE(["$host_alias"], [*darwin*], [
+         SAPI_SHARED="libs/libphp.dylib"
+         PHP_EMBED_TYPE=shared-dylib
+       ], [PHP_EMBED_TYPE=shared])
+-      INSTALL_IT="\$(mkinstalldirs) \$(INSTALL_ROOT)\$(orig_libdir); \$(INSTALL) -m 0755 $SAPI_SHARED \$(INSTALL_ROOT)\$(orig_libdir)"
++      INSTALL_IT="\$(mkinstalldirs) \$(INSTALL_ROOT)\$(orig_libdir); \$(LIBTOOL) --mode=install \$(INSTALL) -m 0755 \$(OVERALL_TARGET) \$(INSTALL_ROOT)\$(orig_libdir)"
+     ],
+     [static], [
+       LIBPHP_CFLAGS="-static"
+diff -up ./scripts/php-config.in.embed ./scripts/php-config.in
+--- ./scripts/php-config.in.embed	2025-03-25 19:59:01.000000000 +0100
++++ ./scripts/php-config.in	2025-03-26 07:14:03.223870699 +0100
+@@ -19,7 +19,7 @@ exe_extension="@EXEEXT@"
+ php_cli_binary=NONE
+ php_cgi_binary=NONE
+ configure_options="@CONFIGURE_OPTIONS@"
+-php_sapis="@PHP_INSTALLED_SAPIS@"
++php_sapis="apache2handler litespeed phpdbg @PHP_INSTALLED_SAPIS@"
+ ini_dir="@EXPANDED_PHP_CONFIG_FILE_SCAN_DIR@"
+ ini_path="@EXPANDED_PHP_CONFIG_FILE_PATH@"
+ php_embed_type="@PHP_EMBED_TYPE@"
+diff --git a/configure.ac b/configure.ac
+index 6dc1e45b34f..895c5153a2d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1306,7 +1306,7 @@ AS_VAR_IF([program_suffix], [NONE], [program_suffix=])
+ 
+ orig_libdir=$libdir
+ AS_CASE([$libdir],
+-  ['${exec_prefix}/lib'], [libdir=$libdir/php])
++  [${prefix}/${PHP_LIBDIR}], [libdir=$libdir/php])
+ 
+ AS_CASE([$(eval echo $datadir)],
+   ['${prefix}/share'], [datadir=$datadir/php])

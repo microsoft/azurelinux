@@ -1,0 +1,153 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 29 Jan 2003 21:05:37 +0100
+Subject: 011 man2html doctype status
+
+Add DOCTYPE and `Status:' header to man2html
+---
+ man2html/man2html.c | 42 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 31 insertions(+), 11 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 2c8a04c..e418422 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -27,6 +27,8 @@
+ #define BD_INDENT   2
+ 
+ #define SIZE(a)	(sizeof(a)/sizeof(*a))
++#define DOCTYPE "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
++#define CONTENTTYPE "Content-type: text/html\n\n"
+ 
+ static char NEWLINE[2]="\n";
+ static char idxlabel[6] = "ixAAA";
+@@ -1848,6 +1850,7 @@ scan_request(char *c) {
+ 		    if (!t) t=fname;
+ 		    fprintf(stderr, "ln -s %s.html %s.html\n", h, t);
+ 		    s=strrchr(t, '.');if (!s) s=t;
++		    printf(CONTENTTYPE DOCTYPE);
+ 		    printf("<HTML><HEAD><TITLE> Man page of %s</TITLE>\n"
+ 			   "</HEAD><BODY>\n"
+ 			   "See the man page for <A HREF=\"%s.html\">%s</A>.\n"
+@@ -2102,6 +2105,7 @@ scan_request(char *c) {
+ 		*sl = 0;
+ 		if (words > 1) {
+ 		    output_possible=1;
++		    printf(CONTENTTYPE DOCTYPE);
+ 		    out_html("<HTML><HEAD><TITLE>Man page of ");
+ 		    out_html(wordlist[0]);
+ 		    out_html("</TITLE>\n</HEAD><BODY>\n<H1>");
+@@ -3001,9 +3005,25 @@ static char *scan_troff_mandoc(char *c, int san, char **result) {
+ STRDEF *foundpages=NULL;
+ 
+ static void
+-error_page(char *s, char *t, ...) {
++error_page(int status, char *s, char *t, ...) {
+      va_list p;
+ 
++     switch(status) {
++	case 403:
++		printf("Status: 403 Forbidden\n");
++		break;
++	case 404:
++		printf("Status: 404 Not Found\n");
++		break;
++	case 500:
++		printf("Status: 500 Internal Server Error\n");
++		break;
++	case 0:
++	default:
++		break;
++     }
++	     
++     printf(CONTENTTYPE DOCTYPE);
+      printf("<HTML><HEAD><TITLE>%s</TITLE></HEAD>\n"
+ 	    "<BODY>\n<H1>%s</H1>\n", s, s);
+      va_start(p, t);
+@@ -3017,7 +3037,7 @@ char *
+ xstrdup(const char *s) {
+      char *p = strdup(s);
+      if (p == NULL)
+-	  error_page("Out of memory",
++	  error_page(500, "Out of memory",
+ 			 "Sorry, out of memory, aborting...\n");
+      return p;
+ }
+@@ -3026,7 +3046,7 @@ void *
+ xmalloc(size_t size) {
+      void *p = malloc(size);
+      if (p == NULL)
+-	  error_page("Out of memory",
++	  error_page(500, "Out of memory",
+ 			 "Sorry, out of memory, aborting...\n");
+      return p;
+ }
+@@ -3035,14 +3055,14 @@ void *
+ xrealloc(void *ptr, size_t size) {
+      void *p = realloc(ptr,size);
+      if (p == NULL)
+-	  error_page("Out of memory",
++	  error_page(500, "Out of memory",
+ 			 "Sorry, out of memory, aborting...\n");
+      return p;
+ }
+ 
+ static void
+ usage(void) {
+-     error_page("man2html: bad invocation",
++     error_page(500, "man2html: bad invocation",
+ 	"Call: man2html [-l|-h host.domain:port] [-p|-q] [filename]\n"
+ 	"or:   man2html -r [filename]\n");
+ }
+@@ -3095,7 +3115,7 @@ main(int argc, char **argv) {
+     extern char *optarg;
+ #endif
+ 
+-    printf("Content-type: text/html\n\n");
++/*    printf("Content-type: text/html\n\n"); */
+ 
+     opterr = 0;			/* no stderr error messages */
+     while ((c = getopt (argc, argv, "D:E:hH:lL:M:pqr?vVf")) != -1) {
+@@ -3103,7 +3123,7 @@ main(int argc, char **argv) {
+ 	 case 'D':
+ 	      goto_dir(optarg, 0, 0); break;
+ 	 case 'E':
+-	      error_page("Error", "%s", optarg); break;
++	      error_page(0, "Error", "%s", optarg); break;
+ 	 case 'h':
+ 	      set_cgibase("localhost"); break;
+ 	 case 'H':
+@@ -3122,7 +3142,7 @@ main(int argc, char **argv) {
+ 	      set_relative_html_links(); break;
+ 	 case 'v':
+ 	 case 'V':
+-	      error_page("Version", "%s from man-%s", argv[0], version);
++	      error_page(0, "Version", "%s from man-%s", argv[0], version);
+ 	      exit(0);
+ 	 case '?':
+ 	 default:
+@@ -3154,7 +3174,7 @@ main(int argc, char **argv) {
+ 
+ 	 f = fopen(fnam, "r");
+ 	 if (f == NULL)
+-	      error_page("File not found", "Could not open %s\n", filename);
++	      error_page(404, "File not found", "Could not open %s\n", filename);
+ 	 fname = fnam;
+     }
+ 
+@@ -3222,14 +3242,14 @@ main(int argc, char **argv) {
+ 	if (!filename)
+ 	     filename = fname;
+ 	if (*filename == '/')
+-	     error_page("Invalid Man Page",
++	     error_page(403, "Invalid Man Page",
+ 		   "The requested file %s is not a valid (unformatted) "
+ 		   "man page.\nIf the file is a formatted man page, "
+ 		   "you could try to load the\n"
+ 		   "<A HREF=\"file://localhost%s\">plain file</A>.\n",
+ 		   filename, filename);
+ 	else
+-	     error_page("Invalid Man Page",
++	     error_page(403, "Invalid Man Page",
+ 		   "The requested file %s is not a valid (unformatted) "
+ 		   "man page.", filename);
+     }

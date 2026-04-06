@@ -1,0 +1,19 @@
+--- is-terminal-0.4.17/Cargo.toml	1970-01-01T00:00:01+00:00
++++ is-terminal-0.4.17/Cargo.toml	2026-02-14T17:38:54.761297+00:00
+@@ -65,16 +65,3 @@
+ version = "1.0.0"
+ features = ["stdio"]
+ 
+-[target.'cfg(target_os = "hermit")'.dependencies.hermit-abi]
+-version = "0.5.0"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.52, <0.62"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_Console",
+-]
+-
+-[target."cfg(windows)".dev-dependencies.tempfile]
+-version = "3"

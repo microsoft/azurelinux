@@ -1,0 +1,12 @@
+diff -up alembic-1.15.2/pyproject.toml.no-tzdata-pkg alembic-1.15.2/pyproject.toml
+--- alembic-1.15.2/pyproject.toml.no-tzdata-pkg	2025-03-28 14:49:47.000000000 +0100
++++ alembic-1.15.2/pyproject.toml	2025-04-15 11:21:47.288981904 +0200
+@@ -47,7 +47,7 @@ Source = "https://github.com/sqlalchemy/
+ "Issue Tracker" = "https://github.com/sqlalchemy/alembic/issues/"
+ 
+ [project.optional-dependencies]
+-tz = ["tzdata"]
++tz = []
+ 
+ [project.scripts]
+ alembic = "alembic.config:main"

@@ -1,0 +1,127 @@
+From dbb8c0a1fe27bb250c8a34a8f83ace87de34eec3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20Josef=20=C5=A0pa=C4=8Dek?=
+ <michal.josef.spacek@gmail.com>
+Date: Wed, 13 Mar 2024 12:13:44 +0100
+Subject: [PATCH 10/11] Rewrite from Digest::SHA1 to Digest::SHA
+
+Digest::SHA is most actual in CPAN.
+All changes are covered by tests.
+---
+ Build.PL                     | 2 +-
+ META.yml                     | 2 +-
+ Makefile.PL                  | 2 +-
+ README                       | 2 +-
+ lib/Net/SNMP.pm              | 4 ++--
+ lib/Net/SNMP/Security/USM.pm | 8 ++++----
+ 6 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/Build.PL b/Build.PL
+index a8ae8dd..3140545 100644
+--- a/Build.PL
++++ b/Build.PL
+@@ -38,7 +38,7 @@ Module::Build->new(
+    recommends         => {
+       Crypt::DES      => '2.03',  # SNMPv3
+       Digest::MD5     => '2.11',  # SNMPv3
+-      Digest::SHA1    => '1.02',  # SNMPv3
++      Digest::SHA     => 0,       # SNMPv3
+       Digest::HMAC_MD5 => '1.01', # SNMPv3
+       Digest::HMAC_SHA1 => '1.03', # SNMPv3
+       Crypt::Rijndael => '1.02',  # SNMPv3 - AES Cipher Algorithm 
+diff --git a/META.yml b/META.yml
+index 0b1acd7..42fbc5f 100644
+--- a/META.yml
++++ b/META.yml
+@@ -65,7 +65,7 @@ recommends:
+   Digest::HMAC_MD5: '1.01'
+   Digest::HMAC_SHA1: '1.03'
+   Digest::MD5: '2.11'
+-  Digest::SHA1: '1.02'
++  Digest::SHA: '0'
+ requires:
+   Carp: '0'
+   Errno: '0'
+diff --git a/Makefile.PL b/Makefile.PL
+index 516b2f9..3b134c4 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -40,7 +40,7 @@ WriteMakefile(
+       Math::BigInt => 0,
+       Crypt::DES   => '2.03',  # SNMPv3
+       Digest::MD5  => '2.11',  # SNMPv3
+-      Digest::SHA1 => '1.02',  # SNMPv3
++      Digest::SHA  => 0,       # SNMPv3
+       Digest::HMAC_MD5 => '1.01', # SNMPv3
+       Digest::HMAC_SHA1 => '1.03', # SNMPv3
+       Socket       => '2.000',
+diff --git a/README b/README
+index 7f23ea0..b5d02bc 100644
+--- a/README
++++ b/README
+@@ -53,7 +53,7 @@ REQUIREMENTS
+     Net::SNMP uses syntax that is not supported in versions of Perl 
+     earlier than v5.6.0. 
+ 
+-    The non-core modules Crypt::DES, Digest::MD5, Digest::SHA1, and 
++    The non-core modules Crypt::DES, Digest::MD5, Digest::SHA, and 
+     Digest::HMAC are needed to support SNMPv3.
+ 
+     In order to support the AES Cipher Algorithm as a SNMPv3 privacy 
+diff --git a/lib/Net/SNMP.pm b/lib/Net/SNMP.pm
+index 1f69630..53ddda9 100644
+--- a/lib/Net/SNMP.pm
++++ b/lib/Net/SNMP.pm
+@@ -3550,8 +3550,8 @@ earlier than v5.6.0.
+ 
+ =item *
+ 
+-The non-core modules F<Crypt::DES>, F<Digest::MD5>, F<Digest::SHA1>, and 
+-F<Digest::HMAC> are required to support SNMPv3. 
++The non-core modules F<Crypt::DES>, F<Digest::MD5>, F<Digest::SHA>, and 
++F<Digest::HMAC> are required to support SNMPv3.
+ 
+ =item *
+ 
+diff --git a/lib/Net/SNMP/Security/USM.pm b/lib/Net/SNMP/Security/USM.pm
+index 0a2ab34..a76ef56 100644
+--- a/lib/Net/SNMP/Security/USM.pm
++++ b/lib/Net/SNMP/Security/USM.pm
+@@ -25,7 +25,7 @@ use Net::SNMP::Message qw(
+ 
+ use Crypt::DES();
+ use Digest::MD5();
+-use Digest::SHA1();
++use Digest::SHA();
+ use Digest::HMAC_MD5();
+ use Digest::HMAC_SHA1();
+ 
+@@ -1392,7 +1392,7 @@ sub _priv_data_init_3desede
+    if ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACMD5) {
+       $this->{_priv_data}->{hash} = Digest::MD5->new();
+    } elsif ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACSHA) {
+-      $this->{_priv_data}->{hash} = Digest::SHA1->new();
++      $this->{_priv_data}->{hash} = Digest::SHA->new();
+    }
+ 
+    return TRUE;
+@@ -1682,7 +1682,7 @@ sub _priv_key_generate
+       if ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACMD5) {
+          $hnnn = Digest::MD5->new();
+       } elsif ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACSHA) {
+-         $hnnn = Digest::SHA1->new();
++         $hnnn = Digest::SHA->new();
+       } else {
+          return $this->_error(
+             'The authProtocol "%s" is unknown', $this->{_auth_protocol}
+@@ -1784,7 +1784,7 @@ sub _password_localize
+    my $digests =
+    {
+       AUTH_PROTOCOL_HMACMD5,  'Digest::MD5',
+-      AUTH_PROTOCOL_HMACSHA,  'Digest::SHA1',
++      AUTH_PROTOCOL_HMACSHA,  'Digest::SHA',
+    };
+ 
+    if (!exists $digests->{$this->{_auth_protocol}}) {
+-- 
+2.45.1
+

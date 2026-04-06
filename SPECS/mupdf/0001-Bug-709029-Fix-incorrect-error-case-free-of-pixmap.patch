@@ -1,0 +1,50 @@
+From d4743b6092d513321c23c6f7fe5cff87cde043c1 Mon Sep 17 00:00:00 2001
+Message-ID: <d4743b6092d513321c23c6f7fe5cff87cde043c1.1770658023.git.mjg@fedoraproject.org>
+From: Robin Watts <Robin.Watts@artifex.com>
+Date: Mon, 12 Jan 2026 19:08:56 +0000
+Subject: [PATCH] Bug 709029: Fix incorrect error-case free of pixmap.
+
+Don't free a pixmap we don't own!
+---
+ source/fitz/util.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/source/fitz/util.c b/source/fitz/util.c
+index 7710124cc..90226a5c1 100644
+--- a/source/fitz/util.c
++++ b/source/fitz/util.c
+@@ -119,7 +119,15 @@ fz_new_pixmap_from_display_list_with_separations(fz_context *ctx, fz_display_lis
+ 	else
+ 		fz_clear_pixmap_with_value(ctx, pix, 0xFF);
+ 
+-	return fz_fill_pixmap_from_display_list(ctx, list, ctm, pix);
++	fz_try(ctx)
++		fz_fill_pixmap_from_display_list(ctx, list, ctm, pix);
++	fz_catch(ctx)
++	{
++		fz_drop_pixmap(ctx, pix);
++		fz_rethrow(ctx);
++	}
++
++	return pix;
+ }
+ 
+ fz_pixmap *
+@@ -136,14 +144,9 @@ fz_fill_pixmap_from_display_list(fz_context *ctx, fz_display_list *list, fz_matr
+ 		fz_close_device(ctx, dev);
+ 	}
+ 	fz_always(ctx)
+-	{
+ 		fz_drop_device(ctx, dev);
+-	}
+ 	fz_catch(ctx)
+-	{
+-		fz_drop_pixmap(ctx, pix);
+ 		fz_rethrow(ctx);
+-	}
+ 
+ 	return pix;
+ }
+-- 
+2.53.0.247.g99c804103f
+

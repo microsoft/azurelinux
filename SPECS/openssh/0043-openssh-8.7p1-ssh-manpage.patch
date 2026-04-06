@@ -1,0 +1,47 @@
+From 299a602802d7c7d121306eb2aeae1502871a35cb Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 43/50] openssh-8.7p1-ssh-manpage
+
+---
+ ssh.1 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/ssh.1 b/ssh.1
+index 6a9fbdc5..755cdef2 100644
+--- a/ssh.1
++++ b/ssh.1
+@@ -510,12 +510,12 @@ For full details of the options listed below, and their possible values, see
+ .It BatchMode
+ .It BindAddress
+ .It BindInterface
+-.It CASignatureAlgorithms
+ .It CanonicalDomains
+ .It CanonicalizeFallbackLocal
+ .It CanonicalizeHostname
+ .It CanonicalizeMaxDots
+ .It CanonicalizePermittedCNAMEs
++.It CASignatureAlgorithms
+ .It CertificateFile
+ .It ChannelTimeout
+ .It CheckHostIP
+@@ -528,6 +528,7 @@ For full details of the options listed below, and their possible values, see
+ .It ControlPath
+ .It ControlPersist
+ .It DynamicForward
++.It EnableSSHKeysign
+ .It EnableEscapeCommandline
+ .It EnableSSHKeysign
+ .It EscapeChar
+@@ -588,6 +589,8 @@ For full details of the options listed below, and their possible values, see
+ .It RemoteCommand
+ .It RemoteForward
+ .It RequestTTY
++.It RevokedHostKeys
++.It SecurityKeyProvider
+ .It RequiredRSASize
+ .It RevokedHostKeys
+ .It SecurityKeyProvider
+-- 
+2.49.0
+

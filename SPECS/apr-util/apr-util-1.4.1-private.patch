@@ -1,0 +1,10 @@
+--- apr-util-1.4.1/apr-util.pc.in~	2008-05-23 16:27:37.000000000 -0500
++++ apr-util-1.4.1/apr-util.pc.in	2013-02-07 08:55:09.717312176 -0600
+@@ -9,5 +9,6 @@
+ Version: @APRUTIL_DOTTED_VERSION@
+ # assume that apr-util requires libapr of same major version
+ Requires: apr-@APRUTIL_MAJOR_VERSION@
+-Libs: -L${libdir} -l@APRUTIL_LIBNAME@ @LDADD_ldap@ @APRUTIL_EXPORT_LIBS@
++Libs: -L${libdir} -l@APRUTIL_LIBNAME@ @LDADD_ldap@ 
++Libs.private: @APRUTIL_EXPORT_LIBS@
+ Cflags: -I${includedir}

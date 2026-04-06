@@ -1,0 +1,12 @@
+diff -up pygit2-1.15.1/test/utils.py.orig pygit2-1.15.1/test/utils.py
+--- pygit2-1.15.1/test/utils.py.orig	2024-07-07 07:35:48.000000000 +0100
++++ pygit2-1.15.1/test/utils.py	2024-09-04 21:52:13.205337911 +0100
+@@ -50,7 +50,7 @@ try:
+ except socket.gaierror:
+     has_network = False
+ 
+-requires_network = pytest.mark.skipif(not has_network, reason='Requires network')
++requires_network = pytest.mark.skipif(True, reason='Requires network')
+ 
+ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+     has_proxy = sock.connect_ex(('', 8888)) == 0

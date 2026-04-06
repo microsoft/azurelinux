@@ -1,0 +1,14 @@
+diff -rupN --no-dereference setuptools-78.1.1/setuptools/_distutils/compilers/C/cygwin.py setuptools-78.1.1-new/setuptools/_distutils/compilers/C/cygwin.py
+--- setuptools-78.1.1/setuptools/_distutils/compilers/C/cygwin.py	2025-04-19 20:23:10.000000000 +0200
++++ setuptools-78.1.1-new/setuptools/_distutils/compilers/C/cygwin.py	2025-04-29 11:39:54.882538294 +0200
+@@ -196,8 +196,8 @@ class Compiler(unix.Compiler):
+         # (On my machine: 10KiB < stripped_file < ??100KiB
+         #   unstripped_file = stripped_file + XXX KiB
+         #  ( XXX=254 for a typical python extension))
+-        if not debug:
+-            extra_preargs.append("-s")
++        # if not debug:
++            # extra_preargs.append("-s")
+ 
+         super().link(
+             target_desc,

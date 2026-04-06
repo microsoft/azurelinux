@@ -1,0 +1,150 @@
+From e07472a3370edf59e7293f7bd5b273187b3f84d5 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 9 Apr 2024 15:24:57 +0200
+Subject: [PATCH 2/3] login: do not try to "emulate" the libgcrypt API
+Content-Type: text/plain; charset=UTF-8
+
+Implement a more generic wrapper API for message digests, so
+that it is easier to also include gnutls as an option.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ lib/login.c | 64 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 35 insertions(+), 29 deletions(-)
+
+diff --git a/lib/login.c b/lib/login.c
+index 8251d16..03c4a7d 100644
+--- a/lib/login.c
++++ b/lib/login.c
+@@ -681,41 +681,48 @@ i2h(int i)
+ 	return i + '0';
+ }
+ 
+-#ifndef HAVE_LIBGCRYPT
+-typedef struct MD5Context *gcry_md_hd_t;
+-#define gcry_md_write MD5Update
+-#define GCRY_MD_MD5 1
++#ifdef HAVE_LIBGCRYPT
++typedef gcry_md_hd_t md5_context_t;
++#define md5_open(hd) gcry_md_open(hd, GCRY_MD_MD5, 0)
++#define md5_write gcry_md_write
++#define md5_close gcry_md_close
+ 
+-static void gcry_md_open(gcry_md_hd_t *hd, int algo, unsigned int flags)
++static void md5_read(md5_context_t h, uint8_t *result)
++{
++	memcpy(result, gcry_md_read(h, 0), 16);
++}
++#else
++typedef struct MD5Context *md5_context_t;
++#define md5_write MD5Update
++
++static void md5_open(md5_context_t *hd)
+ {
+-	assert(algo == GCRY_MD_MD5 && flags == 0);
+ 	*hd = malloc(sizeof(struct MD5Context));
+ 	if (*hd) {
+ 		MD5Init(*hd);
+ 	}
+ }
+ 
+-static void gcry_md_putc(gcry_md_hd_t h, unsigned char c)
+-{
+-	MD5Update(h, &c, 1);
+-}
+-
+-static char *gcry_md_read(gcry_md_hd_t h, int algo)
++static void md5_read(md5_context_t h, uint8_t *result)
+ {
+ 	unsigned char digest[16];
+-	assert(algo == 0 || algo == GCRY_MD_MD5);
+ 
+ 	MD5Final(digest, h);
+-	return memcpy(h->buf, digest, sizeof(digest));
++	memcpy(result, digest, sizeof(digest));
+ }
+ 
+-static void gcry_md_close(gcry_md_hd_t h)
++static void md5_close(md5_context_t h)
+ {
+ 	memset(h, 0, sizeof(*h));
+ 	free(h);
+ }
+ #endif
+ 
++static inline void md5_putc(md5_context_t h, unsigned char c)
++{
++	md5_write(h, &c, 1);
++}
++
+ /* size of the challenge used for bidirectional chap */
+ #define TARGET_CHAP_C_SIZE 32
+ 
+@@ -726,7 +733,7 @@ iscsi_login_add_chap_response(struct iscsi_context *iscsi, struct iscsi_pdu *pdu
+ 	char * strp;
+ 	unsigned char c, cc[2];
+ 	unsigned char digest[CHAP_R_SIZE];
+-	gcry_md_hd_t ctx;
++	md5_context_t ctx;
+ 	int i;
+ 
+ 	if (iscsi->current_phase != ISCSI_PDU_LOGIN_CSG_SECNEG
+@@ -739,22 +746,22 @@ iscsi_login_add_chap_response(struct iscsi_context *iscsi, struct iscsi_pdu *pdu
+ 		return -1;
+ 	}
+ 
+-	gcry_md_open(&ctx, GCRY_MD_MD5, 0);
++	md5_open(&ctx);
+ 	if (ctx == NULL) {
+ 		iscsi_set_error(iscsi, "Cannot create MD5 algorithm");
+ 		return -1;
+ 	}
+-	gcry_md_putc(ctx, iscsi->chap_i);
+-	gcry_md_write(ctx, (unsigned char *)iscsi->passwd, strlen(iscsi->passwd));
++	md5_putc(ctx, iscsi->chap_i);
++	md5_write(ctx, (unsigned char *)iscsi->passwd, strlen(iscsi->passwd));
+ 
+ 	strp = iscsi->chap_c;
+ 	while (*strp != 0) {
+ 		c = (h2i(strp[0]) << 4) | h2i(strp[1]);
+ 		strp += 2;
+-		gcry_md_putc(ctx, c);
++		md5_putc(ctx, c);
+ 	}
+-	memcpy(digest, gcry_md_read(ctx, 0), sizeof(digest));
+-	gcry_md_close(ctx);
++	md5_read(ctx, digest);
++	md5_close(ctx);
+ 
+ 	strncpy(str,"CHAP_R=0x",MAX_STRING_SIZE);
+ 	if (iscsi_pdu_add_data(iscsi, pdu, (unsigned char *)str, strlen(str))
+@@ -822,20 +829,19 @@ iscsi_login_add_chap_response(struct iscsi_context *iscsi, struct iscsi_pdu *pdu
+ 			return -1;
+ 		}
+ 
+-		gcry_md_open(&ctx, GCRY_MD_MD5, 0);
++		md5_open(&ctx);
+ 		if (ctx == NULL) {
+ 			iscsi_set_error(iscsi, "Cannot create MD5 algorithm");
+ 			return -1;
+ 		}
+-		gcry_md_putc(ctx, iscsi->target_chap_i);
+-		gcry_md_write(ctx, (unsigned char *)iscsi->target_passwd,
++		md5_putc(ctx, iscsi->target_chap_i);
++		md5_write(ctx, (unsigned char *)iscsi->target_passwd,
+ 			      strlen(iscsi->target_passwd));
+-		gcry_md_write(ctx, (unsigned char *)target_chap_c,
++		md5_write(ctx, (unsigned char *)target_chap_c,
+ 			      TARGET_CHAP_C_SIZE);
+ 
+-		memcpy(iscsi->target_chap_r, gcry_md_read(ctx, 0),
+-		       sizeof(iscsi->target_chap_r));
+-		gcry_md_close(ctx);
++		md5_read(ctx, iscsi->target_chap_r);
++		md5_close(ctx);
+ 	}
+ 
+ 	return 0;
+-- 
+2.44.0
+

@@ -1,0 +1,15 @@
+diff --git a/lib/interface.c.old b/lib/interface.c
+index 998830a..d35329f 100644
+--- a/lib/interface.c.old
++++ b/lib/interface.c
+@@ -249,7 +249,10 @@ static const char *get_name(char **namep, const char *p)
+ 	*name++ = *p++;
+ 	count++;
+ 	if (count == (IFNAMSIZ-1))
++	{
++	      p++;
+     	      break;
++	}
+     }
+     *name++ = '\0';
+     return p;

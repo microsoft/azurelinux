@@ -1,0 +1,26 @@
+Index: e2fsprogs-1.45.6/scrub/e2scrub.in
+===================================================================
+--- e2fsprogs-1.45.6.orig/scrub/e2scrub.in
++++ e2fsprogs-1.45.6/scrub/e2scrub.in
+@@ -23,7 +23,7 @@
+ # check filesystems in VGs that have at least 256MB (or so) of
+ # free space.
+ 
+-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
++PATH=/sbin:/bin:/usr/sbin:/usr/bin:$PATH
+ 
+ if (( $EUID != 0 )); then
+     echo "e2scrub must be run as root"
+Index: e2fsprogs-1.45.6/scrub/e2scrub_all.in
+===================================================================
+--- e2fsprogs-1.45.6.orig/scrub/e2scrub_all.in
++++ e2fsprogs-1.45.6/scrub/e2scrub_all.in
+@@ -18,7 +18,7 @@
+ #  along with this program; if not, write the Free Software Foundation,
+ #  Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
+ 
+-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
++PATH=/sbin:/bin:/usr/sbin:/usr/bin:$PATH
+ 
+ if (( $EUID != 0 )); then
+     echo "e2scrub_all must be run as root"

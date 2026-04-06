@@ -1,0 +1,29 @@
+From c48fe1297c169f586ddc3bf0c082e8e1cc93487e Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sun, 17 Nov 2024 02:21:57 -0500
+Subject: [PATCH 6/6] Reduce numpy build requirement
+
+This can match the runtime requirement since we don't mix build/install
+versions.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index e35cdac..103124c 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -4,7 +4,7 @@ requires = [
+     "setuptools-scm[toml]>=6.2",
+     "Cython",
+     "py-cpuinfo",
+-    "numpy>2",
++    "numpy>=1.24",
+ ]
+ build-backend = "setuptools.build_meta"
+ 
+-- 
+2.50.0
+

@@ -1,0 +1,85 @@
+diff -urN glpk-4.65.orig/src/minisat/minisat.c glpk-4.65/src/minisat/minisat.c
+--- glpk-4.65.orig/src/minisat/minisat.c	2018-02-16 00:00:00.000000000 -0700
++++ glpk-4.65/src/minisat/minisat.c	2018-05-20 18:54:25.106624859 -0600
+@@ -135,11 +135,11 @@ struct clause_t
+ 
+ #define clause_learnt(c) ((c)->size_learnt & 1)
+ 
+-#define clause_activity(c) \
+-    (*((float*)&(c)->lits[(c)->size_learnt>>1]))
++#define clause_activity(c, a) \
++    memcpy(&(a), &(c)->lits[(c)->size_learnt>>1], sizeof(float))
+ 
+ #define clause_setactivity(c, a) \
+-    (void)(*((float*)&(c)->lits[(c)->size_learnt>>1]) = (a))
++    memcpy(&(c)->lits[(c)->size_learnt>>1], &(a), sizeof(float))
+ 
+ /*====================================================================*/
+ /* Encode literals in clause pointers: */
+@@ -313,14 +313,18 @@ static inline void act_clause_rescale(so
+     clause** cs = (clause**)vecp_begin(&s->learnts);
+     int i;
+     for (i = 0; i < vecp_size(&s->learnts); i++){
+-        float a = clause_activity(cs[i]);
+-        clause_setactivity(cs[i], a * (float)1e-20);
++        float a;
++        clause_activity(cs[i], a);
++        a *= (float)1e-20;
++        clause_setactivity(cs[i], a);
+     }
+     s->cla_inc *= (float)1e-20;
+ }
+ 
+ static inline void act_clause_bump(solver* s, clause *c) {
+-    float a = clause_activity(c) + s->cla_inc;
++    float a;
++    clause_activity(c, a);
++    a += s->cla_inc;
+     clause_setactivity(c,a);
+     if (a > 1e20) act_clause_rescale(s);
+ }
+@@ -356,7 +360,7 @@ static clause* clause_new(solver* s, lit
+         c->lits[i] = begin[i];
+ 
+     if (learnt)
+-        *((float*)&c->lits[size]) = 0.0;
++        memset(&c->lits[size], 0, sizeof(float));
+ 
+     assert(begin[0] >= 0);
+     assert(begin[0] < s->size*2);
+@@ -850,10 +854,17 @@ clause* solver_propagate(solver* s)
+ }
+ 
+ static inline int clause_cmp (const void* x, const void* y) {
+-    return clause_size((clause*)x) > 2
+-           && (clause_size((clause*)y) == 2
+-               || clause_activity((clause*)x)
+-                  < clause_activity((clause*)y)) ? -1 : 1; }
++    clause *cx = (clause *)x;
++    clause *cy = (clause *)y;
++    float fx, fy;
++    if (clause_size(cx) <= 2)
++        return 1;
++    if (clause_size(cy) == 2)
++        return -1;
++    clause_activity(cx, fx);
++    clause_activity(cy, fy);
++    return fx < fy ? -1 : 1;
++}
+ 
+ void solver_reducedb(solver* s)
+ {
+@@ -874,10 +885,12 @@ void solver_reducedb(solver* s)
+             learnts[j++] = learnts[i];
+     }
+     for (; i < vecp_size(&s->learnts); i++){
++        float f;
++        clause_activity(learnts[i], f);
+         if (clause_size(learnts[i]) > 2
+             && reasons[lit_var(*clause_begin(learnts[i]))]
+                != learnts[i]
+-            && clause_activity(learnts[i]) < extra_lim)
++            && f < extra_lim)
+             clause_remove(s,learnts[i]);
+         else
+             learnts[j++] = learnts[i];

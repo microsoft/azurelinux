@@ -1,0 +1,23 @@
+[Unit]
+Description=The nginx HTTP and reverse proxy server
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+Environment=NGINX_INSTANCE=%i
+PIDFile=/run/nginx-%i.pid
+# Nginx will fail to start if /run/nginx.pid already exists but has the wrong
+# SELinux context. This might happen when running `nginx -t` from the cmdline.
+# https://bugzilla.redhat.com/show_bug.cgi?id=1268621
+ExecStartPre=/usr/bin/rm -f /run/nginx-%i.pid
+ExecStartPre=/usr/sbin/nginx -t -c /etc/nginx/%i.conf
+ExecStart=/usr/sbin/nginx -c /etc/nginx/%i.conf
+ExecReload=/usr/sbin/nginx -s reload -c /etc/nginx/%i.conf
+KillSignal=SIGQUIT
+TimeoutStopSec=5
+KillMode=mixed
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

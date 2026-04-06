@@ -1,0 +1,22 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 29 Jan 2003 21:05:37 +0100
+Subject: 001 hman bashism
+
+Remove bashism from hman
+---
+ man2html/hman.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/man2html/hman.sh b/man2html/hman.sh
+index c484acc..cb72090 100755
+--- a/man2html/hman.sh
++++ b/man2html/hman.sh
+@@ -42,7 +42,7 @@ if [ $# -gt 1 -a "$1" = "-H" ]; then
+ fi
+ 
+ # Interface to a live (already running) netscape browser.
+-function nsfunc () {
++nsfunc () {
+ 	if ( /bin/ps xc | grep -q 'netscape$' ) ; then
+ 		if [ -x  netscape-remote ] ; then
+ 			exec netscape-remote  -remote "openURL($1,new_window)"

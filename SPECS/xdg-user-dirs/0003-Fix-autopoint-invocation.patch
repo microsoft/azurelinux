@@ -1,0 +1,26 @@
+From 12abdfa4c6b193e1ceb48ec44ed253840bb4fcc5 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Tue, 24 Jun 2025 03:41:34 +0000
+Subject: [PATCH] Fix autopoint invocation
+
+AM_GNU_GETTEXT[_REQUIRE]_VERSION must be called before AM_GNU_GETTEXT in
+order for autopoint to work or to be called by autoreconf.
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index dc389db..8392f2f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,6 +20,7 @@ GETTEXT_PACKAGE=xdg-user-dirs
+ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
+ AC_SUBST(GETTEXT_PACKAGE)
+ 
++AM_GNU_GETTEXT_REQUIRE_VERSION([0.14.4])
+ AM_GNU_GETTEXT([external])
+ 
+ dnl ==========================================================================
+-- 
+GitLab
+

@@ -1,0 +1,26 @@
+From 35d566724c48180c9a372c2ed50a253871a51574 Mon Sep 17 00:00:00 2001
+From: Antonio Rojas <arojas@archlinux.org>
+Date: Thu, 9 May 2024 23:37:15 +0000
+Subject: [PATCH 104/104] Fix build with ICU 75
+
+---
+ mapbox-gl-native.pro | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/mapbox-gl-native/mapbox-gl-native.pro b/src/3rdparty/mapbox-gl-native/mapbox-gl-native.pro
+index ed974db77..4d5835d73 100644
+--- a/src/3rdparty/mapbox-gl-native/mapbox-gl-native.pro
++++ b/src/3rdparty/mapbox-gl-native/mapbox-gl-native.pro
+@@ -2,8 +2,7 @@ TARGET = qmapboxgl
+ 
+ load(qt_helper_lib)
+ 
+-CONFIG += qt c++14 exceptions warn_off staticlib object_parallel_to_source
+-CONFIG -= c++1z
++CONFIG += qt c++17 exceptions warn_off staticlib object_parallel_to_source
+ 
+ QT += network-private \
+       gui-private \
+-- 
+2.47.1
+

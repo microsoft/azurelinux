@@ -1,0 +1,75 @@
+From e13d962a6aca3ae23119909624630870d75b509a Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Thu, 19 Dec 2024 23:41:42 +0900
+Subject: [PATCH 2/2] Support caller format change in ruby3.4
+
+---
+ sass-3.7.4/lib/sass/script/tree/funcall.rb | 11 ++++++-----
+ sass-3.7.4/lib/sass/util.rb                |  3 ++-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/sass-3.7.4/lib/sass/script/tree/funcall.rb b/sass-3.7.4/lib/sass/script/tree/funcall.rb
+index 215873c..0ed9338 100644
+--- a/sass-3.7.4/lib/sass/script/tree/funcall.rb
++++ b/sass-3.7.4/lib/sass/script/tree/funcall.rb
+@@ -277,7 +277,7 @@ module Sass::Script::Tree
+         # `_perform`.
+         if e.message =~ /^method '([^']+)': given (\d+), expected (\d+)/
+           error_name, given, expected = $1, $2, $3
+-          raise e if error_name != ruby_name || e.backtrace[0] !~ /:in `_perform'$/
++          raise e if error_name != ruby_name || e.backtrace[0] !~ /:in [`']_perform'$/
+           message = "wrong number of arguments (#{given} for #{expected})"
+         end
+       elsif Sass::Util.jruby?
+@@ -288,12 +288,12 @@ module Sass::Script::Tree
+         if should_maybe_raise
+           # JRuby 1.7 includes __send__ before send and _perform.
+           trace = e.backtrace.dup
+-          raise e if trace.shift !~ /:in `__send__'$/
++          raise e if trace.shift !~ /:in [`']__send__'$/
+ 
+           # JRuby (as of 1.7.2) doesn't put the actual method
+           # for which the argument error was thrown in the backtrace, so we
+           # detect whether our send threw an argument error.
+-          if !(trace[0] =~ /:in `send'$/ && trace[1] =~ /:in `_perform'$/)
++          if !(trace[0] =~ /:in `send'$/ && trace[1] =~ /:in [`']_perform'$/)
+             raise e
+           else
+             # JRuby 1.7 doesn't use standard formatting for its ArgumentErrors.
+@@ -301,13 +301,14 @@ module Sass::Script::Tree
+           end
+         end
+       elsif (md = /^wrong number of arguments \(given (\d+), expected (\d+)\)/.match(e.message)) &&
+-            e.backtrace[0] =~ /:in `#{ruby_name}'$/
++            e.backtrace[0] =~ /:in [`']#{ruby_name}'$/
+         # Handle ruby 2.3 error formatting
+         message = "wrong number of arguments (#{md[1]} for #{md[2]})"
+       elsif e.message =~ /^wrong number of arguments/ &&
+-            e.backtrace[0] !~ /:in `(block in )?#{ruby_name}'$/
++            e.backtrace[0] !~ /:in [`'](block in )?\S*#{ruby_name}'$/
+         raise e
+       end
++      # FIXME change opening quote for ruby 3.4?
+       raise Sass::SyntaxError.new("#{message} for `#{name}'")
+     end
+   end
+diff --git a/sass-3.7.4/lib/sass/util.rb b/sass-3.7.4/lib/sass/util.rb
+index 717f4d2..ba5507c 100644
+--- a/sass-3.7.4/lib/sass/util.rb
++++ b/sass-3.7.4/lib/sass/util.rb
+@@ -440,10 +440,11 @@ module Sass
+     def caller_info(entry = nil)
+       # JRuby evaluates `caller` incorrectly when it's in an actual default argument.
+       entry ||= caller[1]
+-      info = entry.scan(/^((?:[A-Za-z]:)?.*?):(-?.*?)(?::.*`(.+)')?$/).first
++      info = entry.scan(/^((?:[A-Za-z]:)?.*?):(-?.*?)(?::.*[`'](.+)')?$/).first
+       info[1] = info[1].to_i
+       # This is added by Rubinius to designate a block, but we don't care about it.
+       info[2].sub!(/ \{\}\Z/, '') if info[2]
++      info[2].sub!(/^.*[#:\.]/, '') if info[2]
+       info
+     end
+ 
+-- 
+2.47.1
+

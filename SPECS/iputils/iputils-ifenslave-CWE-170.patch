@@ -1,0 +1,88 @@
+From a38091c8eb0c515441080806975856ee09d2edc7 Mon Sep 17 00:00:00 2001
+From: Jan Macku <jamacku@redhat.com>
+Date: Tue, 23 Mar 2021 08:10:10 +0100
+Subject: [PATCH] ifenslave: fix CWE-170: Improper Null Termination
+
+---
+ ifenslave.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/ifenslave.c b/ifenslave.c
+index ddd82ec..1efe4f1 100644
+--- a/ifenslave.c
++++ b/ifenslave.c
+@@ -509,21 +509,24 @@ static int if_getconfig(char *ifname)
+ 	struct sockaddr dstaddr, broadaddr, netmask;
+ 	unsigned char *hwaddr;
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFFLAGS, &ifr) < 0)
+ 		return -1;
+ 	mif_flags = ifr.ifr_flags;
+ 	printf("The result of SIOCGIFFLAGS on %s is %x.\n",
+ 	       ifname, ifr.ifr_flags);
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFADDR, &ifr) < 0)
+ 		return -1;
+ 	printf("The result of SIOCGIFADDR is %2.2x.%2.2x.%2.2x.%2.2x.\n",
+ 	       ifr.ifr_addr.sa_data[2], ifr.ifr_addr.sa_data[3],
+ 	       ifr.ifr_addr.sa_data[4], ifr.ifr_addr.sa_data[5]);
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFHWADDR, &ifr) < 0)
+ 		return -1;
+ 
+@@ -534,33 +537,38 @@ static int if_getconfig(char *ifname)
+ 	       ifr.ifr_hwaddr.sa_family, hwaddr[0], hwaddr[1],
+ 	       hwaddr[2], hwaddr[3], hwaddr[4], hwaddr[5]);
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFMETRIC, &ifr) < 0) {
+ 		metric = 0;
+ 	} else
+ 		metric = ifr.ifr_metric;
+ 	printf("The result of SIOCGIFMETRIC is %d\n", metric);
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFMTU, &ifr) < 0)
+ 		mtu = 0;
+ 	else
+ 		mtu = ifr.ifr_mtu;
+ 	printf("The result of SIOCGIFMTU is %d\n", mtu);
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFDSTADDR, &ifr) < 0) {
+ 		memset(&dstaddr, 0, sizeof(struct sockaddr));
+ 	} else
+ 		dstaddr = ifr.ifr_dstaddr;
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFBRDADDR, &ifr) < 0) {
+ 		memset(&broadaddr, 0, sizeof(struct sockaddr));
+ 	} else
+ 		broadaddr = ifr.ifr_broadaddr;
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	memset(&ifr, 0, sizeof(ifr));
++  	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+ 	if (ioctl(skfd, SIOCGIFNETMASK, &ifr) < 0) {
+ 		memset(&netmask, 0, sizeof(struct sockaddr));
+ 	} else
+-- 
+2.29.2
+

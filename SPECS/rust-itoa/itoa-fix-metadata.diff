@@ -1,0 +1,18 @@
+--- itoa-1.0.17/Cargo.toml	2006-07-24T01:21:28+00:00
++++ itoa-1.0.17/Cargo.toml	2025-12-29T16:15:31.171718+00:00
+@@ -55,15 +55,6 @@
+ name = "test"
+ path = "tests/test.rs"
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies.no-panic]
+ version = "0.1"
+ optional = true
+-
+-[target."cfg(not(miri))".dev-dependencies.criterion]
+-version = "0.8"
+-default-features = false

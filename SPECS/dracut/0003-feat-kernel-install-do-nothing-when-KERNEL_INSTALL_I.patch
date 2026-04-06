@@ -1,0 +1,72 @@
+From 5addd6a9e85c704ae5176f22db2c51f456e9b614 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 18 Jan 2022 18:08:42 +0100
+Subject: [PATCH 3/9] feat(kernel-install): do nothing when
+ $KERNEL_INSTALL_INITRD_GENERATOR says so
+
+dracut may be installed without being actually used. This is very common in
+binary distros where a package may be pulled in through dependencies, even
+though the user does not need it in a particular setup. KERNEL_INSTALL_INITRD_GENERATOR
+is being added in systemd's kernel-install to select which of the possibly many
+initrd generation mechanisms will be used.
+
+For backwards compat, if it not set, continue as before. But if set to
+something else, skip our kernel-install plugins.
+
+(Cherry-picked commit f47bcdd7342ca0d46b889e712a1c7446e18434bc from PR#1825)
+---
+ install.d/50-dracut.install        | 9 ++++++++-
+ install.d/51-dracut-rescue.install | 6 ++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/install.d/50-dracut.install b/install.d/50-dracut.install
+index 441414ac..3f961b11 100755
+--- a/install.d/50-dracut.install
++++ b/install.d/50-dracut.install
+@@ -6,11 +6,17 @@ BOOT_DIR_ABS="$3"
+ KERNEL_IMAGE="$4"
+ 
+ # If KERNEL_INSTALL_MACHINE_ID is defined but empty, BOOT_DIR_ABS is a fake directory.
+-# So, let's skip to create initrd.
++# In this case, do not create the initrd.
+ if ! [[ ${KERNEL_INSTALL_MACHINE_ID-x} ]]; then
+     exit 0
+ fi
+ 
++# Skip this plugin if we're using a different generator. If nothing is specified,
++# assume we're wanted since we're installed.
++if [ "${KERNEL_INSTALL_INITRD_GENERATOR:-dracut}" != "dracut" ]; then
++    exit 0
++fi
++
+ # Do not attempt to create initramfs if the supplied image is already a UKI
+ if [[ "$KERNEL_INSTALL_IMAGE_TYPE" = "uki" ]]; then
+     exit 0
+@@ -38,6 +44,7 @@ elif [[ $KERNEL_INSTALL_LAYOUT == "bls" && -n $KERNEL_INSTALL_STAGING_AREA ]]; t
+     else
+         exit 0
+     fi
++
+ else
+     # No layout information, use users --uefi/--no-uefi preference
+     UEFI_OPTS=""
+diff --git a/install.d/51-dracut-rescue.install b/install.d/51-dracut-rescue.install
+index 9312e242..decee283 100755
+--- a/install.d/51-dracut-rescue.install
++++ b/install.d/51-dracut-rescue.install
+@@ -7,6 +7,12 @@ KERNEL_VERSION="$2"
+ BOOT_DIR_ABS="${3%/*}/0-rescue"
+ KERNEL_IMAGE="$4"
+ 
++# Skip this plugin if we're using a different generator. If nothing is specified,
++# assume we're wanted since we're installed.
++if [ "${KERNEL_INSTALL_INITRD_GENERATOR:-dracut}" != "dracut" ]; then
++    exit 0
++fi
++
+ dropindirs_sort() {
+     suffix=$1
+     shift
+-- 
+2.49.0
+

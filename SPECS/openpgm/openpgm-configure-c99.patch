@@ -1,0 +1,18 @@
+Include <stdio.h> for the printf function.  This avoids an implicit
+function declaration in this configure check, causing to fail
+unconditionally with compilers that do not support them.
+
+Submitted upstream: <https://github.com/steve-o/openpgm/pull/73>
+
+diff -ur openpgm-release-5-2-122.orig/openpgm/pgm/configure.ac openpgm-release-5-2-122/openpgm/pgm/configure.ac
+--- openpgm-release-5-2-122.orig/openpgm/pgm/configure.ac	2012-12-04 03:56:54.000000000 +0100
++++ openpgm-release-5-2-122/openpgm/pgm/configure.ac	2023-01-03 16:07:39.751560631 +0100
+@@ -207,7 +207,7 @@
+ # sprintf, caveat http://savannah.gnu.org/patch/?6848 (ax_c_printf_thsep)
+ AC_MSG_CHECKING([for printf thousands' grouping])
+ AC_COMPILE_IFELSE(
+-	[AC_LANG_PROGRAM(,[[printf ("%'d", 1000000);]])],
++	[AC_LANG_PROGRAM([[#include <stdio.h>]],[[printf ("%'d", 1000000);]])],
+ 	[AC_MSG_RESULT([yes])
+ 		CFLAGS="$CFLAGS -DHAVE_SPRINTF_GROUPING"],
+ 	[AC_MSG_RESULT([no])])

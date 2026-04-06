@@ -1,0 +1,32 @@
+diff -rupN --no-dereference SQLAlchemy-Utils-0.41.1/setup.py SQLAlchemy-Utils-0.41.1-new/setup.py
+--- SQLAlchemy-Utils-0.41.1/setup.py	2023-04-27 09:33:40.000000000 +0200
++++ SQLAlchemy-Utils-0.41.1-new/setup.py	2023-05-01 13:02:07.484205561 +0200
+@@ -29,7 +29,7 @@ extras_require = {
+         'flexmock>=0.9.7',
+         'psycopg>=3.1.8',
+         'psycopg2>=2.5.1',
+-        'psycopg2cffi>=2.8.1',
++        #'psycopg2cffi>=2.8.1',
+         'pg8000>=1.12.4',
+         'pytz>=2014.2',
+         'python-dateutil>=2.6',
+diff -rupN --no-dereference SQLAlchemy-Utils-0.41.1/tests/functions/test_database.py SQLAlchemy-Utils-0.41.1-new/tests/functions/test_database.py
+--- SQLAlchemy-Utils-0.41.1/tests/functions/test_database.py	2023-04-27 09:33:40.000000000 +0200
++++ SQLAlchemy-Utils-0.41.1-new/tests/functions/test_database.py	2023-05-01 13:02:07.485205573 +0200
+@@ -90,6 +90,7 @@ class TestDatabasePostgresPg8000(Databas
+         )
+ 
+ 
++"""
+ class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
+ 
+     @pytest.fixture
+@@ -99,7 +100,7 @@ class TestDatabasePostgresPsycoPG2CFFI(D
+             postgresql_db_password,
+             'db_to_test_create_and_drop_via_psycopg2cffi_driver'
+         )
+-
++"""
+ 
+ @pytest.mark.skipif('sqlalchemy_version < (2, 0, 0)')
+ class TestDatabasePostgresPsycoPG3(DatabaseTest):

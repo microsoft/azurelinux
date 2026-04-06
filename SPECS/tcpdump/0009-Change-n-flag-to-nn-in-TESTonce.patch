@@ -1,0 +1,13 @@
+diff --git a/tests/TESTrun b/tests/TESTrun
+index 0a1a255..9286ff7 100755
+--- a/tests/TESTrun
++++ b/tests/TESTrun
+@@ -116,7 +116,7 @@ sub runtest {
+         # No specific time option, use -tttt
+         $options .= " -tttt";
+     }
+-    $r = system "$TCPDUMP -# -n -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
++    $r = system "$TCPDUMP -# -nn -r $input $options >${newdir}/${outputbase} 2>${rawstderrlog}";
+ 
+     if($r != 0) {
+         #

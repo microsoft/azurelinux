@@ -1,0 +1,33 @@
+Add additional #include directives to avoid implicit function
+declarations and build failures with future compilers.
+
+diff --git a/lib/long-options.c b/lib/long-options.c
+index 76b979634aa4be46..9ee8f6609cdd2c2b 100644
+--- a/lib/long-options.c
++++ b/lib/long-options.c
+@@ -22,6 +22,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <getopt.h>
+ #include "long-options.h"
+ 
+diff --git a/src/lsyslog.c b/src/lsyslog.c
+index 6baf4a2b0a372fc5..0500280259b1af0a 100644
+--- a/src/lsyslog.c
++++ b/src/lsyslog.c
+@@ -18,11 +18,13 @@
+   02111-1307, USA.
+ 
+ */
++#define _GNU_SOURCE /* for vasprintf */
+ #include "config.h"
+ #ifdef ENABLE_SYSLOG
+ #include "zglobal.h"
+ #include <pwd.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ #include <string.h>
+ #endif
+ 

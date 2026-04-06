@@ -1,0 +1,34 @@
+From 4011d34acaafd98ae0cff3bfe348be0d893db90a Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Thu, 29 Feb 2024 10:43:54 +0000
+Subject: [PATCH] Add getEnclosingMethod() to DelegatingExecutableElement
+
+The method has moved class in Java 21.
+
+diff --git a/processor/src/main/java/org/jboss/logging/processor/model/DelegatingExecutableElement.java b/processor/src/main/java/org/jboss/logging/processor/model/DelegatingExecutableElement.java
+index 202552f..5be0f7f 100644
+--- a/processor/src/main/java/org/jboss/logging/processor/model/DelegatingExecutableElement.java
++++ b/processor/src/main/java/org/jboss/logging/processor/model/DelegatingExecutableElement.java
+@@ -24,6 +24,7 @@ package org.jboss.logging.processor.model;
+ 
+ import java.util.List;
+ import javax.lang.model.element.AnnotationValue;
++import javax.lang.model.element.Element;
+ import javax.lang.model.element.ExecutableElement;
+ import javax.lang.model.element.Name;
+ import javax.lang.model.element.TypeParameterElement;
+@@ -56,6 +57,11 @@ public interface DelegatingExecutableElement extends ExecutableElement, Delegati
+         return getDelegate().getReturnType();
+     }
+ 
++    @Override
++    default Element getEnclosingElement() {
++        return getDelegate().getEnclosingElement();
++    }
++
+     @Override
+     default List<? extends VariableElement> getParameters() {
+         return getDelegate().getParameters();
+-- 
+2.43.2
+

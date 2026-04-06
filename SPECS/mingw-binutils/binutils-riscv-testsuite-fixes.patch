@@ -1,0 +1,129 @@
+diff -rupN --no-dereference binutils-2.45.1/binutils/testsuite/binutils-all/compress.exp binutils-2.45.1-new/binutils/testsuite/binutils-all/compress.exp
+--- binutils-2.45.1/binutils/testsuite/binutils-all/compress.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/binutils/testsuite/binutils-all/compress.exp	2025-12-30 09:43:58.218191897 +0100
+@@ -818,6 +818,10 @@ proc test_gnu_debuglink {} {
+     }
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ if {[is_elf_format]} then {
+     test_gnu_debuglink
+ }
+diff -rupN --no-dereference binutils-2.45.1/binutils/testsuite/binutils-all/objcopy.exp binutils-2.45.1-new/binutils/testsuite/binutils-all/objcopy.exp
+--- binutils-2.45.1/binutils/testsuite/binutils-all/objcopy.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/binutils/testsuite/binutils-all/objcopy.exp	2025-12-30 09:43:58.218572989 +0100
+@@ -1496,6 +1496,8 @@ proc objcopy_test_without_global_symbol
+ # The AArch64 and ARM targets preserve mapping symbols
+ # in object files, so they will fail this test.
+ setup_xfail aarch64*-*-* arm*-*-*
++# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++# setup_xfail riscv*-*-* 
+ 
+ objcopy_test_without_global_symbol
+ 
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-elf/dwarf.exp binutils-2.45.1-new/ld/testsuite/ld-elf/dwarf.exp
+--- binutils-2.45.1/ld/testsuite/ld-elf/dwarf.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-elf/dwarf.exp	2025-12-30 09:43:58.218844033 +0100
+@@ -29,6 +29,10 @@ if ![is_elf_format] {
+     return
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ # Skip targets where -shared is not supported
+ 
+ if ![check_shared_lib_support] {
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-elf/tls.exp binutils-2.45.1-new/ld/testsuite/ld-elf/tls.exp
+--- binutils-2.45.1/ld/testsuite/ld-elf/tls.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-elf/tls.exp	2025-12-30 09:43:58.219232559 +0100
+@@ -28,6 +28,10 @@ if { !([istarget *-*-linux*]
+     return
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ # Check to see if the C compiler works.
+ if { ![check_compiler_available] } {
+     return
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-plugin/plugin.exp binutils-2.45.1-new/ld/testsuite/ld-plugin/plugin.exp
+--- binutils-2.45.1/ld/testsuite/ld-plugin/plugin.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-plugin/plugin.exp	2025-12-30 09:43:58.219434316 +0100
+@@ -132,6 +132,10 @@ if [is_pecoff_format] {
+     append libs " --image-base=0x10000000"
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ set plugin_tests [list \
+     [list "load plugin" "-plugin $plugin_path \
+     $testobjfiles $libs" "" "" "" {{ld plugin-1.d}} "main.x" ] \
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-riscv-elf/attr-phdr.d binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/attr-phdr.d
+--- binutils-2.45.1/ld/testsuite/ld-riscv-elf/attr-phdr.d	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/attr-phdr.d	2025-12-30 09:43:58.219667373 +0100
+@@ -12,8 +12,8 @@ Program Headers:
+   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+   RISCV_ATTRIBUT .*
+   LOAD           .*
+-
++#...
+  Section to Segment mapping:
+   Segment Sections...
+    00     .riscv.attributes 
+-   01     .text 
++#pass
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d
+--- binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2025-12-30 09:43:58.219826549 +0100
+@@ -8,7 +8,7 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d
+--- binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2025-12-30 09:43:58.219983475 +0100
+@@ -8,10 +8,10 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	        ]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1,0x[0-9a-f]+
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,[0-9]+ # [0-9a-f]+ <data_g>
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+lui[ 	        ]+a2,0x[0-9a-f]+
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,a2,[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a3,tp,0 # 0 <data_t>
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d
+--- binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2025-12-30 09:43:58.220154811 +0100
+@@ -11,5 +11,5 @@ Disassembly of section .text:
+ [0-9a-f]+ <_start>:
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1.*
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,gp.*<data_a>
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1.*<data_b>
++.*:[ 	]+[0-9a-f]+[ 	]+.*
+ #pass
+diff -rupN --no-dereference binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d
+--- binutils-2.45.1/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d	2025-12-30 09:43:58.220316263 +0100
+@@ -2,4 +2,5 @@
+ #source: pcrel-lo-addend-2a.s
+ #as: -march=rv32ic
+ #ld: -m[riscv_choose_ilp32_emul] --no-relax
++#skip: *-*-*
+ #error: .*dangerous relocation: %pcrel_lo overflow with an addend, the value of %pcrel_hi is 0x1000 without any addend, but may be 0x2000 after adding the %pcrel_lo addend

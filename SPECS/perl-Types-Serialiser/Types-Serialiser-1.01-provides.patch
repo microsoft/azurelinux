@@ -1,0 +1,12 @@
+--- Serialiser.pm
++++ Serialiser.pm
+@@ -112,7 +112,8 @@ Returns false iff C<$value> is C<$Types:
+ BEGIN {
+    # for historical reasons, and to avoid extra dependencies in JSON::PP,
+    # we alias *Types::Serialiser::Boolean with JSON::PP::Boolean.
+-   package JSON::PP::Boolean;
++   package # hide from rpm
++      JSON::PP::Boolean;
+ 
+    *Types::Serialiser::Boolean:: = *JSON::PP::Boolean::;
+ }

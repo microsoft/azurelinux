@@ -1,0 +1,123 @@
+From 828d644c8eba8765843985d9293f033898ed0592 Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@apache.org>
+Date: Fri, 3 Feb 2023 15:12:10 +0000
+Subject: [PATCH] * memcache/apr_memcache.c (conn_connect): Allow use of IPv6  
+ rather than forcing name resolution to IPv4 only.
+
+Submitted by: Lubos Uhliarik <luhliari redhat.com>
+Github: closes #39
+
+
+git-svn-id: https://svn.apache.org/repos/asf/apr/apr/trunk@1907242 13f79535-47bb-0310-9956-ffa450edef68
+---
+ memcache/apr_memcache.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/memcache/apr_memcache.c b/memcache/apr_memcache.c
+index 5f8135c52c..18806281a4 100644
+--- a/memcache/apr_memcache.c
++++ b/memcache/apr_memcache.c
+@@ -290,9 +290,9 @@ static apr_status_t conn_connect(apr_memcache_conn_t *conn)
+     apr_status_t rv = APR_SUCCESS;
+     apr_sockaddr_t *sa;
+ #if APR_HAVE_SOCKADDR_UN
+-    apr_int32_t family = conn->ms->host[0] != '/' ? APR_INET : APR_UNIX;
++    apr_int32_t family = conn->ms->host[0] != '/' ? APR_UNSPEC : APR_UNIX;
+ #else
+-    apr_int32_t family = APR_INET;
++    apr_int32_t family = APR_UNSPEC;
+ #endif
+ 
+     rv = apr_sockaddr_info_get(&sa, conn->ms->host, family, conn->ms->port, 0, conn->p);
+@@ -328,9 +328,9 @@ mc_conn_construct(void **conn_, void *params, apr_pool_t *pool)
+     apr_pool_t *tp;
+     apr_memcache_server_t *ms = params;
+ #if APR_HAVE_SOCKADDR_UN
+-    apr_int32_t family = ms->host[0] != '/' ? APR_INET : APR_UNIX;
++    apr_int32_t family = ms->host[0] != '/' ? APR_UNSPEC : APR_UNIX;
+ #else
+-    apr_int32_t family = APR_INET;
++    apr_int32_t family = APR_UNSPEC;
+ #endif
+ 
+     rv = apr_pool_create(&np, pool);
+
+From 59341af138dd2c6fe9444ee9c865b769c0053bdd Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@apache.org>
+Date: Tue, 27 Jun 2023 14:06:09 +0000
+Subject: [PATCH] * memcache/apr_memcache.c (conn_connect, mc_conn_construct):
+ Fix   regression in IPv4 handling in r1907242. Cycle through the address  
+ list handling v4/v6 addresses correctly.
+
+Submitted by: Lubos Uhliarik <luhliari redhat.com>
+Github: closes #44
+
+
+git-svn-id: https://svn.apache.org/repos/asf/apr/apr/trunk@1910629 13f79535-47bb-0310-9956-ffa450edef68
+---
+ memcache/apr_memcache.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/memcache/apr_memcache.c b/memcache/apr_memcache.c
+index 41b93a0a33..09779d91b5 100644
+--- a/memcache/apr_memcache.c
++++ b/memcache/apr_memcache.c
+@@ -300,14 +300,26 @@ static apr_status_t conn_connect(apr_memcache_conn_t *conn)
+         return rv;
+     }
+ 
+-    rv = apr_socket_timeout_set(conn->sock, 1 * APR_USEC_PER_SEC);
+-    if (rv != APR_SUCCESS) {
+-        return rv;
++    /* Cycle through address until a connect() succeeds. */
++    for (; sa; sa = sa->next) {
++        rv = apr_socket_create(&conn->sock, sa->family, SOCK_STREAM, 0, conn->p);
++        if (rv == APR_SUCCESS) {
++            rv = apr_socket_timeout_set(conn->sock, 1 * APR_USEC_PER_SEC);
++            if (rv != APR_SUCCESS) {
++                return rv;
++            }
++
++            rv = apr_socket_connect(conn->sock, sa);
++            if (rv == APR_SUCCESS) {
++                break;
++            }
++
++            apr_socket_close(conn->sock);
++        }
+     }
+ 
+-    rv = apr_socket_connect(conn->sock, sa);
+-    if (rv != APR_SUCCESS) {
+-        return rv;
++    if (!sa) {
++        return APR_ECONNREFUSED;
+     }
+ 
+     rv = apr_socket_timeout_set(conn->sock, -1);
+@@ -327,11 +339,6 @@ mc_conn_construct(void **conn_, void *params, apr_pool_t *pool)
+     apr_pool_t *np;
+     apr_pool_t *tp;
+     apr_memcache_server_t *ms = params;
+-#if APR_HAVE_SOCKADDR_UN
+-    apr_int32_t family = ms->host[0] != '/' ? APR_UNSPEC : APR_UNIX;
+-#else
+-    apr_int32_t family = APR_UNSPEC;
+-#endif
+ 
+     rv = apr_pool_create(&np, pool);
+     if (rv != APR_SUCCESS) {
+@@ -349,13 +356,6 @@ mc_conn_construct(void **conn_, void *params, apr_pool_t *pool)
+     conn->p = np;
+     conn->tp = tp;
+ 
+-    rv = apr_socket_create(&conn->sock, family, SOCK_STREAM, 0, np);
+-
+-    if (rv != APR_SUCCESS) {
+-        apr_pool_destroy(np);
+-        return rv;
+-    }
+-
+     conn->buffer = apr_palloc(conn->p, BUFFER_SIZE + 1);
+     conn->blen = 0;
+     conn->ms = ms;

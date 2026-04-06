@@ -1,0 +1,46 @@
+From 7f717851c394ac875f6d2e46ddf6996d268bdec6 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Mon, 22 Sep 2025 14:48:09 +0200
+Subject: [PATCH 5/8] ipa: software_isp: AGC: Raise exposure or gain not both
+ at the same time
+
+Raise either exposure or gain; not both at the same time.
+
+Before this change when the last exposure raise is done, hitting
+exposure-max, gain would be increased at the same time.
+
+Reviewed-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/agc.cpp | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index 1fc8d7f42..f7f734514 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -56,12 +56,13 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ 	double &again = frameContext.sensor.gain;
+ 
+ 	if (exposureMSV < kExposureOptimal - kExposureSatisfactory) {
+-		next = exposure * kExpNumeratorUp / kExpDenominator;
+-		if (next - exposure < 1)
+-			exposure += 1;
+-		else
+-			exposure = next;
+-		if (exposure >= context.configuration.agc.exposureMax) {
++		if (exposure < context.configuration.agc.exposureMax) {
++			next = exposure * kExpNumeratorUp / kExpDenominator;
++			if (next - exposure < 1)
++				exposure += 1;
++			else
++				exposure = next;
++		} else {
+ 			next = again * kExpNumeratorUp / kExpDenominator;
+ 			if (next - again < context.configuration.agc.againMinStep)
+ 				again += context.configuration.agc.againMinStep;
+-- 
+2.51.0
+

@@ -1,0 +1,11 @@
+--- netkit-ftp-0.17/ftp/Makefile.nodebug	2006-11-14 15:02:36.000000000 +0100
++++ netkit-ftp-0.17/ftp/Makefile	2007-01-30 13:58:15.000000000 +0100
+@@ -17,7 +17,7 @@
+ 
+ install: ftp
+ 	install -d $(INSTALLROOT)$(BINDIR)
+-	install -s -m$(BINMODE) ftp $(INSTALLROOT)$(BINDIR)
++	install -m$(BINMODE) ftp $(INSTALLROOT)$(BINDIR)
+ 	ln -sf ftp $(INSTALLROOT)$(BINDIR)/pftp
+ 	install -d $(INSTALLROOT)$(MANDIR)/man1
+ 	install -m$(MANMODE) ftp.1 $(INSTALLROOT)$(MANDIR)/man1

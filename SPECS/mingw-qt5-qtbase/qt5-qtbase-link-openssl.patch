@@ -1,0 +1,12 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/network/configure.json qtbase-everywhere-src-5.15.18-new/src/network/configure.json
+--- qtbase-everywhere-src-5.15.18/src/network/configure.json	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/network/configure.json	2025-11-07 14:10:40.074549205 +0100
+@@ -86,7 +86,7 @@
+             "sources": [
+                 { "type": "openssl" },
+                 {
+-                    "libs": "-lssleay32 -llibeay32 -lUser32 -lWs2_32 -lAdvapi32 -lGdi32",
++                    "libs": "-lssl -lcrypto -luser32 -lws2_32 -ladvapi32 -lcrypt32 -lz -lpathcch",
+                     "condition": "config.win32"
+                 },
+                 {

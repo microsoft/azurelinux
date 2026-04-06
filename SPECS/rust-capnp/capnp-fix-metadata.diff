@@ -1,0 +1,30 @@
+--- capnp-0.25.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ capnp-0.25.0/Cargo.toml	2026-02-10T17:04:23.182133+00:00
+@@ -33,13 +33,13 @@
+ repository = "https://github.com/capnproto/capnproto-rust"
+ 
+ [features]
+-alloc = ["embedded-io?/alloc"]
++alloc = []
+ default = [
+     "std",
+     "alloc",
+ ]
+ rpc_try = []
+-std = ["embedded-io?/std"]
++std = []
+ sync_reader = []
+ unaligned = []
+ 
+@@ -83,11 +83,6 @@
+ name = "total_size"
+ path = "tests/total_size.rs"
+ 
+-[dependencies.embedded-io]
+-version = "0.7.1"
+-optional = true
+-default-features = false
+-
+ [dependencies.quickcheck]
+ version = "1"
+ optional = true

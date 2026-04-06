@@ -1,0 +1,32 @@
+# HG changeset patch
+# User Torsten Jager <t.jager@gmx.de>
+# Date 1734473730 -3600
+#      Tue Dec 17 23:15:30 2024 +0100
+# Node ID ea7071a960a1ca8719422e80e130994c8f549731
+# Parent  439d26b4081e3f31f21052049e9564082fc80076
+Attempt to fix build with libnfs 6.
+Thanks to Xavier Bachelot <xine-devel@lists.sourceforge.net>.
+
+diff -r 439d26b4081e -r ea7071a960a1 src/input/input_nfs.c
+--- a/src/input/input_nfs.c	Tue Dec 17 23:15:25 2024 +0100
++++ b/src/input/input_nfs.c	Tue Dec 17 23:15:30 2024 +0100
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2000-2020 the xine project
++ * Copyright (C) 2000-2024 the xine project
+  * Copyright (C) 2018 Petri Hintukainen <phintuka@users.sourceforge.net>
+  *
+  * This file is part of xine, a free video player.
+@@ -134,7 +134,11 @@
+   int rc;
+ 
+   while (got < len) {
+-    rc = nfs_read(this->nfs, this->nfsfh, len - got, buf + got);
++#ifdef LIBNFS_API_V2
++    rc = nfs_read (this->nfs, this->nfsfh, buf + got, len - got);
++#else
++    rc = nfs_read (this->nfs, this->nfsfh, len - got, buf + got);
++#endif
+     if (rc <= 0) {
+       if (errno == EAGAIN || errno == EINTR)
+         continue;

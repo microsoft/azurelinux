@@ -1,0 +1,13 @@
+Index: boto-2.40.0/boto/s3/acl.py
+===================================================================
+--- boto-2.40.0.orig/boto/s3/acl.py
++++ boto-2.40.0/boto/s3/acl.py
+@@ -25,7 +25,7 @@ from boto.s3.user import User
+ CannedACLStrings = ['private', 'public-read',
+                     'public-read-write', 'authenticated-read',
+                     'bucket-owner-read', 'bucket-owner-full-control',
+-                    'log-delivery-write']
++                    'log-delivery-write', 'aws-exec-read']
+ 
+ 
+ class Policy(object):

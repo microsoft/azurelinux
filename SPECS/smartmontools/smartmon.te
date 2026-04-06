@@ -1,0 +1,202 @@
+policy_module(smartmon, 1.13.0)
+
+########################################
+#
+# Declarations
+#
+
+## <desc>
+##	<p>
+##	Determine whether smartmon can support
+##	devices on 3ware controllers.
+##	</p>
+## </desc>
+gen_tunable(smartmon_3ware, false)
+
+require {
+        class capability dac_override;
+        type tmpfs_t, tty_device_t, user_devpts_t, system_mail_t, systemd_logind_sessions_t, mail_home_t;
+}
+
+type fsdaemon_t;
+type fsdaemon_exec_t;
+init_daemon_domain(fsdaemon_t, fsdaemon_exec_t)
+
+type fsdaemon_initrc_exec_t;
+init_script_file(fsdaemon_initrc_exec_t)
+
+# runs smartd_warning.sh and smartd_warning.d/*
+type smartdwarn_t;
+type smartdwarn_script_t;
+type_transition fsdaemon_t smartdwarn_script_t:process smartdwarn_t;
+role system_r types smartdwarn_t;
+
+files_type(smartdwarn_script_t)
+
+application_domain(smartdwarn_t, smartdwarn_script_t)
+domtrans_pattern(fsdaemon_t, smartdwarn_script_t, smartdwarn_t)
+
+corecmd_exec_bin(smartdwarn_t)
+corecmd_exec_shell(smartdwarn_t)
+
+# reads list of users
+auth_read_passwd_file(smartdwarn_t)
+
+hostname_domtrans(smartdwarn_t)
+
+# smartd_warning.sh to run smartd_warning.d/* scripts
+allow smartdwarn_t smartdwarn_script_t:file execute_no_trans;
+
+# for wall cmd
+init_read_utmp(smartdwarn_t)
+allow smartdwarn_t tty_device_t:chr_file { open write };
+allow smartdwarn_t user_devpts_t:chr_file { open write };
+allow smartdwarn_t self:capability { setgid dac_override };
+allow smartdwarn_t systemd_logind_sessions_t:dir { getattr open read search };
+allow smartdwarn_t systemd_logind_sessions_t:file { getattr open read };
+
+files_manage_generic_tmp_files(smartdwarn_t)
+term_open_unallocated_ttys(smartdwarn_t)
+term_search_ptys(smartdwarn_t)
+userdom_use_user_terminals(smartdwarn_t)
+
+
+optional_policy(`
+	systemd_exec_systemctl(smartdwarn_t)
+')
+
+# for sending mail
+optional_policy(`
+	mta_send_mail(smartdwarn_t)
+    mta_manage_home_rw(smartdwarn_t)
+')
+allow smartdwarn_t tmpfs_t:filesystem getattr;
+# for dead.letter when mail is undeliverable
+allow smartdwarn_t mail_home_t:file { getattr lock open write };
+
+# optional_policy(`
+# 	unconfined_domain(smartdwarn_t)
+# ')
+
+
+type fsdaemon_var_run_t;
+files_pid_file(fsdaemon_var_run_t)
+
+type fsdaemon_var_lib_t;
+files_type(fsdaemon_var_lib_t)
+
+type fsdaemon_tmp_t;
+files_tmp_file(fsdaemon_tmp_t)
+
+ifdef(`enable_mls',`
+	init_ranged_daemon_domain(fsdaemon_t, fsdaemon_exec_t, mls_systemhigh)
+')
+
+########################################
+#
+# Local policy
+#
+
+allow fsdaemon_t self:capability { dac_read_search dac_override kill setpcap setgid sys_rawio sys_admin };
+dontaudit fsdaemon_t self:capability sys_tty_config;
+allow fsdaemon_t self:process { getcap setcap signal_perms };
+allow fsdaemon_t self:fifo_file rw_fifo_file_perms;
+allow fsdaemon_t self:unix_stream_socket { accept listen };
+
+manage_dirs_pattern(fsdaemon_t, fsdaemon_tmp_t, fsdaemon_tmp_t)
+manage_files_pattern(fsdaemon_t, fsdaemon_tmp_t, fsdaemon_tmp_t)
+files_tmp_filetrans(fsdaemon_t, fsdaemon_tmp_t, { file dir })
+
+manage_files_pattern(fsdaemon_t, fsdaemon_var_run_t, fsdaemon_var_run_t)
+files_pid_filetrans(fsdaemon_t, fsdaemon_var_run_t, file)
+
+manage_dirs_pattern(fsdaemon_t, fsdaemon_var_lib_t, fsdaemon_var_lib_t)
+manage_files_pattern(fsdaemon_t, fsdaemon_var_lib_t, fsdaemon_var_lib_t)
+files_var_lib_filetrans(fsdaemon_t, fsdaemon_var_lib_t, { dir file })
+
+kernel_read_kernel_sysctls(fsdaemon_t)
+kernel_read_network_state(fsdaemon_t)
+kernel_read_software_raid_state(fsdaemon_t)
+kernel_read_system_state(fsdaemon_t)
+
+auth_use_nsswitch(fsdaemon_t)
+
+corecmd_exec_all_executables(fsdaemon_t)
+
+corenet_all_recvfrom_netlabel(fsdaemon_t)
+corenet_udp_sendrecv_generic_if(fsdaemon_t)
+corenet_udp_sendrecv_generic_node(fsdaemon_t)
+corenet_udp_sendrecv_all_ports(fsdaemon_t)
+
+dev_read_sysfs(fsdaemon_t)
+dev_read_urand(fsdaemon_t)
+
+domain_use_interactive_fds(fsdaemon_t)
+
+files_exec_etc_files(fsdaemon_t)
+files_read_etc_runtime_files(fsdaemon_t)
+
+fs_getattr_all_fs(fsdaemon_t)
+fs_search_auto_mountpoints(fsdaemon_t)
+fs_read_removable_files(fsdaemon_t)
+
+mls_file_read_all_levels(fsdaemon_t)
+
+storage_create_fixed_disk_dev(fsdaemon_t)
+storage_dev_filetrans_named_fixed_disk(fsdaemon_t)
+storage_raw_read_fixed_disk(fsdaemon_t)
+storage_raw_write_fixed_disk(fsdaemon_t)
+storage_raw_read_removable_device(fsdaemon_t)
+storage_read_scsi_generic(fsdaemon_t)
+storage_write_scsi_generic(fsdaemon_t)
+
+term_dontaudit_search_ptys(fsdaemon_t)
+
+domain_signull_all_domains(fsdaemon_t)
+
+auth_read_passwd(fsdaemon_t)
+
+init_read_utmp(fsdaemon_t)
+
+libs_exec_ld_so(fsdaemon_t)
+libs_exec_lib_files(fsdaemon_t)
+
+logging_send_syslog_msg(fsdaemon_t)
+
+seutil_sigchld_newrole(fsdaemon_t)
+
+sysnet_dns_name_resolve(fsdaemon_t)
+
+userdom_dontaudit_use_unpriv_user_fds(fsdaemon_t)
+userdom_dontaudit_search_user_home_dirs(fsdaemon_t)
+userdom_dontaudit_manage_admin_dir(fsdaemon_t)
+userdom_use_user_terminals(fsdaemon_t)
+
+tunable_policy(`smartmon_3ware',`
+	allow fsdaemon_t self:process setfscreate;
+
+	storage_create_fixed_disk_dev(fsdaemon_t)
+	storage_delete_fixed_disk_dev(fsdaemon_t)
+	storage_dev_filetrans_fixed_disk(fsdaemon_t)
+
+	selinux_validate_context(fsdaemon_t)
+
+	seutil_read_file_contexts(fsdaemon_t)
+')
+
+# this should be no longer needed with smartdwarn_t
+# optional_policy(`
+# 	mta_send_mail(fsdaemon_t)
+#     mta_manage_home_rw(fsdaemon_t)
+# ')
+# still creator of the pipe (stdout, stderr) for smartd_warning and mail
+allow system_mail_t fsdaemon_t:fifo_file { getattr read write append ioctl lock };
+
+
+optional_policy(`
+	udev_read_db(fsdaemon_t)
+')
+
+optional_policy(`
+	virt_read_images(fsdaemon_t)
+')

@@ -1,0 +1,65 @@
+From f3ba6614adc715b658fa7ba8de380c5890665de5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 5 Jun 2013 09:08:42 +0200
+Subject: [PATCH] crypt(3) can return NULL
+
+crypt(3) can fail and return NULL since glibc-2.17. This patch
+prevents from crashing CVS in that case.
+
+Patch ported from upstream report
+<https://savannah.nongnu.org/bugs/index.php?39040> developed by
+<mancha1@hush.com>.
+---
+ src/server.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/server.c b/src/server.c
+index bc6f0d0..348338c 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -5647,9 +5647,11 @@ check_repository_password (username, password, repository, host_user_ptr)
+ 	    host_user_tmp = username;
+ 
+ 	/* Verify blank passwords directly, otherwise use crypt(). */
++	char *crypt_passwd = found_password ? crypt (password, found_password): NULL;
+ 	if ((found_password == NULL)
+-	    || ((strcmp (found_password, crypt (password, found_password))
+-		 == 0)))
++	    || (crypt_passwd != NULL
++               && (strcmp (found_password, crypt_passwd)
++		    == 0)))
+ 	{
+ 	    /* Give host_user_ptr permanent storage. */
+ 	    *host_user_ptr = xstrdup (host_user_tmp);
+@@ -5660,7 +5662,7 @@ check_repository_password (username, password, repository, host_user_ptr)
+ #ifdef LOG_AUTHPRIV
+ 	syslog (LOG_AUTHPRIV | LOG_NOTICE,
+ 		"password mismatch for %s in %s: %s vs. %s", username,
+-		repository, crypt(password, found_password), found_password);
++		repository, crypt_passwd, found_password);
+ #endif
+ 	    *host_user_ptr = NULL;
+ 	    retval	 = 2;
+@@ -5869,7 +5871,9 @@ error %s getnameinfo failed\n", strerror (errno));
+             pamh = NULL;
+         }
+ #else
+-	if (strcmp (found_passwd, crypt (password, found_passwd)) == 0)
++	char *crypt_passwd = crypt (password, found_passwd);
++	if ((crypt_passwd != NULL) &&
++	    (strcmp (found_passwd, crypt_passwd) == 0))
+ 	{
+ 	    host_user = xstrdup (username);
+ 	}
+@@ -5879,7 +5883,7 @@ error %s getnameinfo failed\n", strerror (errno));
+ #ifdef LOG_AUTHPRIV
+ 	    syslog (LOG_AUTHPRIV | LOG_NOTICE,
+ 		    "password mismatch for %s: %s vs. %s", username,
+-		    crypt(password, found_passwd), found_passwd);
++		    crypt_passwd, found_passwd);
+ #endif
+ 	}
+ #endif
+-- 
+1.8.1.4
+

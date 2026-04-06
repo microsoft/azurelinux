@@ -1,0 +1,9 @@
+[Unit]
+Description=CVS Server
+After=local-fs.target
+PartOf=cvs.target
+
+[Service]
+Environment=HOME=/var/cvs
+ExecStart=-/usr/bin/cvs -f --allow-root=/var/cvs pserver
+StandardInput=socket

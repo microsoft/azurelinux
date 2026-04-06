@@ -1,0 +1,25 @@
+qt-bugs@ issue: N46882
+bugs.kde.org number: 77545
+applied: no
+author: Stephan Binner <binner@kde.org>
+
+Fix wrong K menu width for the case of enabled side pixmap and a menu title
+(like "Recently Used Applications") being longer than every other entry.
+
+Solution: Respect PanelKMenu::setMaximumSize() as up to Qt 3.2.3
+
+Index: src/widgets/qpopupmenu.cpp
+===================================================================
+RCS file: /home/kde/qt-copy/src/widgets/qpopupmenu.cpp,v
+retrieving revision 1.60
+diff -u -3 -p -b -r1.60 qpopupmenu.cpp
+--- src/widgets/qpopupmenu.cpp	29 Apr 2004 22:31:28 -0000	1.60
++++ src/widgets/qpopupmenu.cpp	30 Apr 2004 01:11:59 -0000
+@@ -2531,7 +2531,7 @@ QSize QPopupMenu::sizeHint() const
+ 
+     QPopupMenu* that = (QPopupMenu*) this;
+     //We do not need a resize here, just the sizeHint..
+-    return that->updateSize(FALSE, FALSE).expandedTo( QApplication::globalStrut() );
++    return that->updateSize(FALSE).expandedTo( QApplication::globalStrut() );
+ }
+

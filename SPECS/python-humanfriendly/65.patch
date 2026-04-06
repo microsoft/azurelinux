@@ -1,0 +1,37 @@
+From 1789ed31946ba6353c8b26332344608519722a88 Mon Sep 17 00:00:00 2001
+From: Steve Kowalik <steven@wedontsleep.org>
+Date: Fri, 29 Jul 2022 17:19:38 +1000
+Subject: [PATCH] Do not import setup in the tests module
+
+pytest 7 and above will call any setup as a hook for any module
+collected, which in this case calls into the Sphinx machinery due to
+importing the setup function from there. Import it as something else so
+that pytest will not call it.
+
+Fixes #64
+---
+ humanfriendly/tests.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/humanfriendly/tests.py b/humanfriendly/tests.py
+index 72dad99..d019a2f 100644
+--- a/humanfriendly/tests.py
++++ b/humanfriendly/tests.py
+@@ -59,7 +59,7 @@
+     deprecation_note_callback,
+     man_role,
+     pypi_role,
+-    setup,
++    setup as sphinx_setup,
+     special_methods_callback,
+     usage_message_callback,
+ )
+@@ -1444,7 +1444,7 @@ def bogus_usage(self):
+ 
+         # Test event callback registration.
+         fake_app = FakeApp()
+-        setup(fake_app)
++        sphinx_setup(fake_app)
+         assert man_role == fake_app.roles['man']
+         assert pypi_role == fake_app.roles['pypi']
+         assert deprecation_note_callback in fake_app.callbacks['autodoc-process-docstring']

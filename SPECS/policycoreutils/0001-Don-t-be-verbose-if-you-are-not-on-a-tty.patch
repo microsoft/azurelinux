@@ -1,0 +1,25 @@
+From ce28d432bef8d1a346054b56a989e58533fecfa7 Mon Sep 17 00:00:00 2001
+From: Dan Walsh <dwalsh@redhat.com>
+Date: Fri, 14 Feb 2014 12:32:12 -0500
+Subject: [PATCH] Don't be verbose if you are not on a tty
+Content-type: text/plain
+
+---
+ policycoreutils/scripts/fixfiles | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policycoreutils/scripts/fixfiles b/policycoreutils/scripts/fixfiles
+index b7cd765c15e4..f2518e96e34c 100755
+--- a/policycoreutils/scripts/fixfiles
++++ b/policycoreutils/scripts/fixfiles
+@@ -108,6 +108,7 @@ exclude_dirs_from_relabelling() {
+ fullFlag=0
+ BOOTTIME=""
+ VERBOSE="-p"
++[ -t 1 ] || VERBOSE=""
+ FORCEFLAG=""
+ THREADS=""
+ RPMFILES=""
+-- 
+2.50.1
+

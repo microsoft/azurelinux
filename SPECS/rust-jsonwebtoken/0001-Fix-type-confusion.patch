@@ -1,0 +1,131 @@
+From 59cb87060205848bf541294d3899a6e3c842038d Mon Sep 17 00:00:00 2001
+From: Vincent Prouillet <github@vincentprouillet.com>
+Date: Tue, 27 Jan 2026 11:14:32 +0100
+Subject: [PATCH] Fix type confusion
+
+---
+ src/errors.rs     |  4 ++++
+ src/validation.rs | 13 +++++++++++
+ tests/hmac.rs     | 56 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
+
+diff --git a/src/errors.rs b/src/errors.rs
+index 2edd7df..a90f947 100644
+--- a/src/errors.rs
++++ b/src/errors.rs
+@@ -53,6 +53,8 @@ pub enum ErrorKind {
+     // Validation errors
+     /// When a claim required by the validation is not present
+     MissingRequiredClaim(String),
++    /// When a claim has an invalid format (eg string instead of integer)
++    InvalidClaimFormat(String),
+     /// When a token’s `exp` claim indicates that it has expired
+     ExpiredSignature,
+     /// When a token’s `iss` claim does not match the expected issuer
+@@ -91,6 +93,7 @@ impl StdError for Error {
+             ErrorKind::ExpiredSignature => None,
+             ErrorKind::MissingAlgorithm => None,
+             ErrorKind::MissingRequiredClaim(_) => None,
++            ErrorKind::InvalidClaimFormat(_) => None,
+             ErrorKind::InvalidIssuer => None,
+             ErrorKind::InvalidAudience => None,
+             ErrorKind::InvalidSubject => None,
+@@ -123,6 +126,7 @@ impl fmt::Display for Error {
+             | ErrorKind::InvalidKeyFormat
+             | ErrorKind::InvalidAlgorithmName => write!(f, "{:?}", self.0),
+             ErrorKind::MissingRequiredClaim(c) => write!(f, "Missing required claim: {}", c),
++            ErrorKind::InvalidClaimFormat(c) => write!(f, "Invalid format for claim: {}", c),
+             ErrorKind::InvalidRsaKey(msg) => write!(f, "RSA key invalid: {}", msg),
+             ErrorKind::Json(err) => write!(f, "JSON error: {}", err),
+             ErrorKind::Utf8(err) => write!(f, "UTF-8 error: {}", err),
+diff --git a/src/validation.rs b/src/validation.rs
+index 289ba03..4bd6b45 100644
+--- a/src/validation.rs
++++ b/src/validation.rs
+@@ -271,6 +271,19 @@ pub(crate) fn validate(claims: ClaimsForValidation, options: &Validation) -> Res
+     if options.validate_exp || options.validate_nbf {
+         let now = get_current_timestamp();
+ 
++        // Reject malformed exp/nbf claim when validation is enabled
++        if options.validate_exp && matches!(claims.exp, TryParse::FailedToParse) {
++            return Err(new_error(ErrorKind::InvalidClaimFormat("exp".to_string())));
++        }
++        if options.validate_nbf && matches!(claims.nbf, TryParse::FailedToParse) {
++            return Err(new_error(ErrorKind::InvalidClaimFormat("nbf".to_string())));
++        }
++
++        if matches!(claims.exp, TryParse::Parsed(exp) if exp < options.reject_tokens_expiring_in_less_than)
++        {
++            return Err(new_error(ErrorKind::InvalidToken));
++        }
++
+         if matches!(claims.exp, TryParse::Parsed(exp) if options.validate_exp
+             && exp - options.reject_tokens_expiring_in_less_than < now - options.leeway )
+         {
+diff --git a/tests/hmac.rs b/tests/hmac.rs
+index 47ca448..e8ef5fe 100644
+--- a/tests/hmac.rs
++++ b/tests/hmac.rs
+@@ -220,3 +220,59 @@ fn verify_hs256_rfc7517_appendix_a1() {
+     let c = decode::<C>(token, &key, &validation).unwrap();
+     assert_eq!(c.claims.iss, "joe");
+ }
++
++// Regression tests for type confusion vulnerability where malformed claims
++// (eg nbf or exp as strings) were silently treated as "not present" when not required
++#[derive(Debug, Serialize)]
++struct ClaimsWithStringNbf {
++    sub: String,
++    nbf: String, // should be a number
++}
++
++#[derive(Debug, Serialize)]
++struct ClaimsWithStringExp {
++    sub: String,
++    exp: String, // should be a number
++}
++
++#[test]
++#[wasm_bindgen_test]
++fn test_string_nbf_rejected_when_validate_nbf_enabled() {
++    // Create token with nbf as string (malformed)
++    let claims = ClaimsWithStringNbf {
++        sub: "test".to_string(),
++        nbf: "99999999999".to_string(), // Far future as string
++    };
++    let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(b"secret")).unwrap();
++
++    let mut validation = Validation::new(Algorithm::HS256);
++    validation.validate_nbf = true;
++    validation.required_spec_claims = std::collections::HashSet::new();
++
++    let result =
++        decode::<serde_json::Value>(&token, &DecodingKey::from_secret(b"secret"), &validation);
++
++    assert!(result.is_err());
++    assert_eq!(result.unwrap_err().into_kind(), ErrorKind::InvalidClaimFormat("nbf".to_string()));
++}
++
++#[test]
++#[wasm_bindgen_test]
++fn test_string_exp_rejected_when_validate_exp_enabled() {
++    // Create token with exp as string (malformed)
++    let claims = ClaimsWithStringExp {
++        sub: "test".to_string(),
++        exp: "99999999999".to_string(), // Far future as string
++    };
++    let token = encode(&Header::default(), &claims, &EncodingKey::from_secret(b"secret")).unwrap();
++
++    let mut validation = Validation::new(Algorithm::HS256);
++    validation.validate_exp = true;
++    validation.required_spec_claims = std::collections::HashSet::new();
++
++    let result =
++        decode::<serde_json::Value>(&token, &DecodingKey::from_secret(b"secret"), &validation);
++
++    assert!(result.is_err());
++    assert_eq!(result.unwrap_err().into_kind(), ErrorKind::InvalidClaimFormat("exp".to_string()));
++}
+-- 
+2.53.0
+

@@ -1,0 +1,60 @@
+diff --git swift-corelibs-libdispatch.orig/src/apply.c swift-corelibs-libdispatch/src/apply.c
+index 9c7d60f..c682f95 100644
+--- swift-corelibs-libdispatch.orig/src/apply.c
++++ swift-corelibs-libdispatch/src/apply.c
+@@ -20,6 +20,9 @@
+ 
+ #include "internal.h"
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-function-type-mismatch"
++
+ typedef void (*dispatch_apply_function_t)(void *, size_t);
+ static char const * const _dispatch_apply_key = "apply";
+ 
+@@ -366,3 +369,5 @@ dispatch_apply(size_t iterations, dispatch_queue_t dq, void (^work)(size_t))
+ 			(dispatch_apply_function_t)_dispatch_Block_invoke(work));
+ }
+ #endif
++
++#pragma GCC diagnostic pop
+diff --git swift-corelibs-libdispatch.orig/src/data.c swift-corelibs-libdispatch/src/data.c
+index 0a3cb1a..81a483b 100644
+--- swift-corelibs-libdispatch.orig/src/data.c
++++ swift-corelibs-libdispatch/src/data.c
+@@ -20,6 +20,9 @@
+ 
+ #include "internal.h"
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-function-type-mismatch"
++
+ /*
+  * Dispatch data objects are dispatch objects with standard retain/release
+  * memory management. A dispatch data object either points to a number of other
+@@ -738,3 +741,5 @@ retry:
+ 	return mep;
+ }
+ #endif // HAVE_MACH
++
++#pragma GCC diagnostic pop
+diff --git swift-corelibs-libdispatch.orig/src/event/event_epoll.c swift-corelibs-libdispatch/src/event/event_epoll.c
+index f31d13e..ac80dfd 100644
+--- swift-corelibs-libdispatch.orig/src/event/event_epoll.c
++++ swift-corelibs-libdispatch/src/event/event_epoll.c
+@@ -20,6 +20,9 @@
+ 
+ 
+ #include "internal.h"
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wsign-conversion"
+ #if DISPATCH_EVENT_BACKEND_EPOLL
+ #include <linux/sockios.h>
+ #include <sys/epoll.h>
+@@ -724,3 +727,5 @@ _dispatch_event_loop_leave_immediate(uint64_t dq_state)
+ }
+ 
+ #endif // DISPATCH_EVENT_BACKEND_EPOLL
++
++#pragma GCC diagnostic pop

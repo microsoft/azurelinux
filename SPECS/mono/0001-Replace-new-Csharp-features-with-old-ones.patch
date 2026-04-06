@@ -1,0 +1,301 @@
+From bf5c5a72978a0f9d32c9934e216bfaaf2d1717be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Mon, 3 Feb 2020 18:38:58 +0100
+Subject: [PATCH] Replace new Csharp features with old ones
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Replace new Csharp features like switch statements and
+"is null" to allow mdoc.exe to build with mcs.
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ mdoc/Mono.Documentation/Updater/DocUtils.cs   | 91 ++++++++++---------
+ .../CppFormatters/CppFullMemberFormatter.cs   | 26 +++---
+ .../Updater/Formatters/FSharpFormatter.cs     | 16 ++--
+ .../Updater/Formatters/JsFormatter.cs         | 27 +++---
+ .../Updater/Formatters/JsMemberFormatter.cs   |  9 +-
+ 5 files changed, 85 insertions(+), 84 deletions(-)
+
+diff --git a/mdoc/Mono.Documentation/Updater/DocUtils.cs b/mdoc/Mono.Documentation/Updater/DocUtils.cs
+index 331ef90..fe2da59 100644
+--- a/mdoc/Mono.Documentation/Updater/DocUtils.cs
++++ b/mdoc/Mono.Documentation/Updater/DocUtils.cs
+@@ -287,24 +287,24 @@ namespace Mono.Documentation.Updater
+             return inst != null
+                     ? inst.GenericArguments.Count
+                     : type.GenericParameters.Count;
+-        }
++        }
+ 
+         class TypeEquality : IEqualityComparer<TypeReference>
+-        {
+-            bool IEqualityComparer<TypeReference>.Equals (TypeReference x, TypeReference y)
++        {
++            bool IEqualityComparer<TypeReference>.Equals (TypeReference x, TypeReference y)
++            {
++                if (x == null && y == null) return true;
++                if (x == null || y == null) return false;
++                return x.FullName == y.FullName;
++            }
++
++            int IEqualityComparer<TypeReference>.GetHashCode (TypeReference obj)
+             {
+-                if (x is null && y is null) return true;
+-                if (x is null || y is null) return false;
+-                return x.FullName == y.FullName;
+-            }
+-
+-            int IEqualityComparer<TypeReference>.GetHashCode (TypeReference obj)
+-            {
+-                return obj.GetHashCode ();
++                return obj.GetHashCode ();
+             }
+         }
+         static TypeEquality typeEqualityComparer = new TypeEquality ();
+-
++
+         public static IEnumerable<TypeReference> GetAllPublicInterfaces (TypeDefinition type)
+         {
+             return GetAllInterfacesFromType (type)
+@@ -314,7 +314,7 @@ namespace Mono.Documentation.Updater
+ 
+         private static IEnumerable<TypeReference> GetAllInterfacesFromType(TypeDefinition type)
+         {
+-            if (type is null)
++            if (type == null)
+                 yield break;
+ 
+             foreach(var i in type.Interfaces)
+@@ -525,26 +525,29 @@ namespace Mono.Documentation.Updater
+             FillUnifiedMemberTypeNames(unifiedTypeNames, memberReference as IGenericParameterProvider);// Fill the member generic parameters unified names as M0, M1....
+             FillUnifiedTypeNames(unifiedTypeNames, memberReference.DeclaringType, genericInterface);// Fill the type generic parameters unified names as T0, T1....
+ 
+-            switch (memberReference)
+-            {
+-                case IMethodSignature methodSignature:
+-                    buf.Append(GetUnifiedTypeName(methodSignature.ReturnType, unifiedTypeNames)).Append(" ");
+-                    buf.Append(SimplifyName(memberReference.Name)).Append(" ");
+-                    AppendParameters(buf, methodSignature.Parameters, unifiedTypeNames);
+-                    break;
+-                case PropertyDefinition propertyReference:
+-                    buf.Append(GetUnifiedTypeName(propertyReference.PropertyType, unifiedTypeNames)).Append(" ");
+-                    if (propertyReference.GetMethod != null)
+-                        buf.Append("get").Append(" ");
+-                    if (propertyReference.SetMethod != null)
+-                        buf.Append("set").Append(" ");
+-                    buf.Append(SimplifyName(memberReference.Name)).Append(" ");
+-                    AppendParameters(buf, propertyReference.Parameters, unifiedTypeNames);
+-                    break;
+-                case EventDefinition eventReference:
+-                    buf.Append(GetUnifiedTypeName(eventReference.EventType, unifiedTypeNames)).Append(" ");
+-                    buf.Append(SimplifyName(memberReference.Name)).Append(" ");
+-                    break;
++            if (memberReference is IMethodSignature)
++            {
++                IMethodSignature methodSignature = (IMethodSignature)memberReference;
++                buf.Append(GetUnifiedTypeName(methodSignature.ReturnType, unifiedTypeNames)).Append(" ");
++                buf.Append(SimplifyName(memberReference.Name)).Append(" ");
++                AppendParameters(buf, methodSignature.Parameters, unifiedTypeNames);
++            }
++            if (memberReference is PropertyDefinition)
++            {
++                PropertyDefinition propertyReference = (PropertyDefinition)memberReference;
++                buf.Append(GetUnifiedTypeName(propertyReference.PropertyType, unifiedTypeNames)).Append(" ");
++                if (propertyReference.GetMethod != null)
++                    buf.Append("get").Append(" ");
++                if (propertyReference.SetMethod != null)
++                    buf.Append("set").Append(" ");
++                buf.Append(SimplifyName(memberReference.Name)).Append(" ");
++                AppendParameters(buf, propertyReference.Parameters, unifiedTypeNames);
++            }
++            if (memberReference is EventDefinition)
++            {
++                EventDefinition eventReference = (EventDefinition)memberReference;
++                buf.Append(GetUnifiedTypeName(eventReference.EventType, unifiedTypeNames)).Append(" ");
++                buf.Append(SimplifyName(memberReference.Name)).Append(" ");
+             }
+             
+             var memberUnifiedTypeNames = new Dictionary<string, string>();
+@@ -666,14 +669,20 @@ namespace Mono.Documentation.Updater
+         /// </summary>
+         private static Collection<MethodReference> GetOverrides(MemberReference memberReference)
+         {
+-            switch (memberReference)
++            if (memberReference is MethodDefinition)
++            {
++                MethodDefinition methodDefinition = (MethodDefinition)memberReference;
++                return methodDefinition.Overrides;
++            }
++            if (memberReference is PropertyDefinition)
++            {
++                PropertyDefinition propertyDefinition = (PropertyDefinition)memberReference;
++                return (propertyDefinition.GetMethod ?? propertyDefinition.SetMethod)?.Overrides;
++            }
++            if (memberReference is EventDefinition)
+             {
+-                case MethodDefinition methodDefinition:
+-                    return methodDefinition.Overrides;
+-                case PropertyDefinition propertyDefinition:
+-                    return (propertyDefinition.GetMethod ?? propertyDefinition.SetMethod)?.Overrides;
+-                case EventDefinition evendDefinition:
+-                    return evendDefinition.AddMethod.Overrides;
++                EventDefinition evendDefinition = (EventDefinition)memberReference;
++                return evendDefinition.AddMethod.Overrides;
+             }
+ 
+             return null;
+@@ -692,4 +701,4 @@ namespace Mono.Documentation.Updater
+             return method.Name.StartsWith("op_", StringComparison.Ordinal);
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/mdoc/Mono.Documentation/Updater/Formatters/CppFormatters/CppFullMemberFormatter.cs b/mdoc/Mono.Documentation/Updater/Formatters/CppFormatters/CppFullMemberFormatter.cs
+index 7d68c38..6b9bcf6 100644
+--- a/mdoc/Mono.Documentation/Updater/Formatters/CppFormatters/CppFullMemberFormatter.cs
++++ b/mdoc/Mono.Documentation/Updater/Formatters/CppFormatters/CppFullMemberFormatter.cs
+@@ -1029,20 +1029,16 @@ namespace Mono.Documentation.Updater.Formatters.CppFormatters
+             if (mref.IsDefinition == false)
+                 mref = mref.Resolve() as MemberReference;
+             
+-            switch (mref)
+-            {
+-                case FieldDefinition field:
+-                    return IsSupportedField(field);
+-                case MethodDefinition method:
+-                    return IsSupportedMethod(method);
+-                case PropertyDefinition property:
+-                    return IsSupportedProperty(property);
+-                case EventDefinition @event:
+-                    return IsSupportedEvent(@event);
+-                case AttachedPropertyDefinition _:
+-                case AttachedEventDefinition _:
+-                    return false;
+-            }
++            if (mref is FieldDefinition)
++                return IsSupportedField((FieldDefinition)mref);
++            else if (mref is MethodDefinition)
++                return IsSupportedMethod((MethodDefinition)mref);
++            else if (mref is PropertyDefinition)
++                return IsSupportedProperty((PropertyDefinition)mref);
++            else if (mref is EventDefinition)
++                return IsSupportedEvent((EventDefinition)mref);
++            else if (mref is AttachedPropertyDefinition || mref is AttachedEventDefinition)
++                return false;
+ 
+             throw new NotSupportedException("Unsupported member type: " + mref?.GetType().FullName);
+         }
+@@ -1119,4 +1115,4 @@ namespace Mono.Documentation.Updater.Formatters.CppFormatters
+             return true;
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/mdoc/Mono.Documentation/Updater/Formatters/FSharpFormatter.cs b/mdoc/Mono.Documentation/Updater/Formatters/FSharpFormatter.cs
+index 236d56f..f91bf9a 100644
+--- a/mdoc/Mono.Documentation/Updater/Formatters/FSharpFormatter.cs
++++ b/mdoc/Mono.Documentation/Updater/Formatters/FSharpFormatter.cs
+@@ -1029,15 +1029,15 @@ namespace Mono.Documentation.Updater
+                 }
+                 return false;
+             }
+-            switch (mref)
++            if (mref is MethodDefinition)
+             {
+-                case MethodDefinition method:
+-                    return !(method.HasCustomAttributes && method.CustomAttributes.Any(
+-                                 ca => ca.GetDeclaringType() ==
+-                                       "System.Diagnostics.Contracts.ContractInvariantMethodAttribute"
+-                                       || ca.GetDeclaringType() ==
+-                                       Consts.CompilerGeneratedAttribute))
+-                            && AppendVisibility(new StringBuilder(), method) != null;
++                MethodDefinition method = (MethodDefinition)mref;
++                return !(method.HasCustomAttributes && method.CustomAttributes.Any(
++                              ca => ca.GetDeclaringType() ==
++                                    "System.Diagnostics.Contracts.ContractInvariantMethodAttribute"
++                                    || ca.GetDeclaringType() ==
++                                    Consts.CompilerGeneratedAttribute))
++                        && AppendVisibility(new StringBuilder(), method) != null;
+             }
+ 
+             return true;
+diff --git a/mdoc/Mono.Documentation/Updater/Formatters/JsFormatter.cs b/mdoc/Mono.Documentation/Updater/Formatters/JsFormatter.cs
+index f8b2f04..92b8f3c 100644
+--- a/mdoc/Mono.Documentation/Updater/Formatters/JsFormatter.cs
++++ b/mdoc/Mono.Documentation/Updater/Formatters/JsFormatter.cs
+@@ -68,23 +68,22 @@ namespace mdoc.Mono.Documentation.Updater.Formatters
+ 
+         public override bool IsSupported(MemberReference mref)
+         {
+-            switch (mref)
++            if (mref is PropertyDefinition)
+             {
+-                case PropertyDefinition propertyDefinition:
+-                    if (!IsPropertySupported(propertyDefinition))
+-                        return false;
+-                    break;
+-                case MethodDefinition methodDefinition:
+-                    if (!IsMethodSupported(methodDefinition))
+-                        return false;
+-                    break;
+-                case FieldDefinition _:
+-                    return false;// In WinRT fields can be exposed only by structures.
+-                case AttachedEventDefinition _:
++                PropertyDefinition propertyDefinition = (PropertyDefinition)mref;
++                if (!IsPropertySupported(propertyDefinition))
+                     return false;
+-                case AttachedPropertyDefinition _:
++            }
++            else if (mref is MethodDefinition)
++            {
++                MethodDefinition methodDefinition = (MethodDefinition)mref;
++                if (!IsMethodSupported(methodDefinition))
+                     return false;
+             }
++            else if (mref is FieldDefinition // In WinRT fields can be exposed only by structures.
++                || mref is AttachedEventDefinition
++                || mref is AttachedPropertyDefinition)
++                return false;
+ 
+             var member = mref.Resolve();
+             return member != null
+@@ -169,4 +168,4 @@ namespace mdoc.Mono.Documentation.Updater.Formatters
+             return fullName;
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/mdoc/Mono.Documentation/Updater/Formatters/JsMemberFormatter.cs b/mdoc/Mono.Documentation/Updater/Formatters/JsMemberFormatter.cs
+index 6bc6995..f6c8af6 100644
+--- a/mdoc/Mono.Documentation/Updater/Formatters/JsMemberFormatter.cs
++++ b/mdoc/Mono.Documentation/Updater/Formatters/JsMemberFormatter.cs
+@@ -58,12 +58,9 @@ namespace mdoc.Mono.Documentation.Updater.Formatters
+ 
+         public override bool IsSupported(MemberReference mref)
+         {
+-            switch (mref)
++            if (mref is PropertyDefinition || mref is EventDefinition)
+             {
+-                case PropertyDefinition _:
+-                    return false;
+-                case EventDefinition _:
+-                    return false;
++                return false;
+             }
+             return base.IsSupported(mref);
+         }
+@@ -82,4 +79,4 @@ namespace mdoc.Mono.Documentation.Updater.Formatters
+             return base.IsSupported(tref);
+         }
+     }
+-}
+\ No newline at end of file
++}
+-- 
+2.24.1
+

@@ -1,0 +1,37 @@
+From 603ca4f57ee2f580d59066600e0ca886efcf8700 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 28 May 2025 10:59:13 +0200
+Subject: [PATCH] asyncio.get_event_loop() doesn't create a new loop since
+ Python 3.14
+
+---
+ aiounittest/case.py                        | 2 +-
+ tests/test_asynctestcase_get_event_loop.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/aiounittest/case.py b/aiounittest/case.py
+index d4e302b..441eed0 100644
+--- a/aiounittest/case.py
++++ b/aiounittest/case.py
+@@ -70,7 +70,7 @@ def get_event_loop(self):
+             class MyTest(aiounittest.AsyncTestCase):
+ 
+                 def get_event_loop(self):
+-                    self.my_loop = asyncio.get_event_loop()
++                    self.my_loop = asyncio.new_event_loop()
+                     return self.my_loop
+ 
+ 
+diff --git a/tests/test_asynctestcase_get_event_loop.py b/tests/test_asynctestcase_get_event_loop.py
+index 91736ef..5d5de9c 100644
+--- a/tests/test_asynctestcase_get_event_loop.py
++++ b/tests/test_asynctestcase_get_event_loop.py
+@@ -27,7 +27,7 @@ async def async_nested_exc():
+ class TestAsyncCaseWithCustomLoop(aiounittest.AsyncTestCase):
+ 
+     def get_event_loop(self):
+-        self.my_loop = asyncio.get_event_loop()
++        self.my_loop = asyncio.new_event_loop()
+         return self.my_loop
+ 
+     async def test_await_async_add(self):

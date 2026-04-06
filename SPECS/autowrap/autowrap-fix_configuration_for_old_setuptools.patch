@@ -1,0 +1,18 @@
+--- a/pyproject.orig.toml	2025-07-07 16:56:17.000000000 +0200
++++ b/pyproject.toml	2025-07-08 21:02:46.116515087 +0200
+@@ -7,7 +7,7 @@
+ dynamic = ["version"]
+ description = "Generates Python Extension modules from commented Cython PXD files"
+ readme = "README.md"
+-license = "BSD-3-Clause"
++license = {text = "BSD-3-Clause"}
+ authors = [
+     {name = "OpenMS Inc.", email = "webmaster@openms.de"}
+ ]
+@@ -162,4 +162,4 @@
+     "if __name__ == .__main__.:",
+     "class .*\\bProtocol\\):",
+     "@(abc\\.)?abstractmethod",
+-]
+\ No newline at end of file
++]

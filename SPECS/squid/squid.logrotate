@@ -1,0 +1,15 @@
+/var/log/squid/*.log {
+    weekly
+    rotate 5
+    compress
+    delaycompress
+    notifempty
+    missingok
+    nocreate
+    sharedscripts
+    postrotate
+      # Asks squid to reopen its logs. (logfile_rotate 0 is set in squid.conf)
+      # errors redirected to make it silent if squid is not running
+      /usr/sbin/squid -k rotate 2>/dev/null
+    endscript
+}

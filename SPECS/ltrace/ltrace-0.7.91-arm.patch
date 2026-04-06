@@ -1,0 +1,610 @@
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index 92b642b..6f86d56 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -531,6 +531,38 @@ elf_read_relocs(struct ltelf *lte, Elf_Scn *scn, GElf_Shdr *shdr,
+ 	return 0;
+ }
+ 
++int
++elf_load_dynamic_entry(struct ltelf *lte, int tag, GElf_Addr *valuep)
++{
++	Elf_Scn *scn;
++	GElf_Shdr shdr;
++	if (elf_get_section_type(lte, SHT_DYNAMIC, &scn, &shdr) < 0
++	    || scn == NULL) {
++	fail:
++		fprintf(stderr, "Couldn't get SHT_DYNAMIC: %s\n",
++			elf_errmsg(-1));
++		return -1;
++	}
++
++	Elf_Data *data = elf_loaddata(scn, &shdr);
++	if (data == NULL)
++		goto fail;
++
++	size_t j;
++	for (j = 0; j < shdr.sh_size / shdr.sh_entsize; ++j) {
++		GElf_Dyn dyn;
++		if (gelf_getdyn(data, j, &dyn) == NULL)
++			goto fail;
++
++		if(dyn.d_tag == tag) {
++			*valuep = dyn.d_un.d_ptr;
++			return 0;
++		}
++	}
++
++	return -1;
++}
++
+ static int
+ ltelf_read_elf(struct ltelf *lte, const char *filename)
+ {
+diff --git a/ltrace-elf.h b/ltrace-elf.h
+index ea14512..db4ffe9 100644
+--- a/ltrace-elf.h
++++ b/ltrace-elf.h
+@@ -139,6 +139,10 @@ struct elf_each_symbol_t {
+ int elf_read_relocs(struct ltelf *lte, Elf_Scn *scn, GElf_Shdr *shdr,
+ 		    struct vect *rela_vec);
+ 
++/* Read a given DT_ TAG from LTE.  Value is returned in *VALUEP.
++ * Returns 0 on success or a negative value on failure.  */
++int elf_load_dynamic_entry(struct ltelf *lte, int tag, GElf_Addr *valuep);
++
+ /* Read, respectively, 1, 2, 4, or 8 bytes from Elf data at given
+  * OFFSET, and store it in *RETP.  Returns 0 on success or a negative
+  * value if there's not enough data.  */
+diff --git a/sysdeps/linux-gnu/arm/arch.h b/sysdeps/linux-gnu/arm/arch.h
+index 58a7fdf..6d0d902 100644
+--- a/sysdeps/linux-gnu/arm/arch.h
++++ b/sysdeps/linux-gnu/arm/arch.h
+@@ -22,6 +22,8 @@
+ #ifndef LTRACE_ARM_ARCH_H
+ #define LTRACE_ARM_ARCH_H
+ 
++#include <libelf.h>
++
+ #define ARCH_HAVE_ENABLE_BREAKPOINT 1
+ #define ARCH_HAVE_DISABLE_BREAKPOINT 1
+ 
+@@ -47,7 +49,7 @@ struct arch_breakpoint_data {
+ 
+ #define ARCH_HAVE_LTELF_DATA
+ struct arch_ltelf_data {
+-	/* We have this only for the hooks.  */
++	Elf_Data *jmprel_data;
+ };
+ 
+ #define ARCH_HAVE_LIBRARY_DATA
+diff --git a/sysdeps/linux-gnu/arm/fetch.c b/sysdeps/linux-gnu/arm/fetch.c
+index 5081d78..b500448 100644
+--- a/sysdeps/linux-gnu/arm/fetch.c
++++ b/sysdeps/linux-gnu/arm/fetch.c
+@@ -32,200 +32,12 @@
+ #include "backend.h"
+ #include "fetch.h"
+ #include "library.h"
+-#include "ltrace-elf.h"
+ #include "proc.h"
+ #include "ptrace.h"
+ #include "regs.h"
+ #include "type.h"
+ #include "value.h"
+ 
+-static int
+-get_hardfp(uint64_t abi_vfp_args)
+-{
+-	if (abi_vfp_args == 2)
+-		fprintf(stderr,
+-			"Tag_ABI_VFP_args value 2 (tool chain-specific "
+-			"conventions) not supported.\n");
+-	return abi_vfp_args == 1;
+-}
+-
+-int
+-arch_elf_init(struct ltelf *lte, struct library *lib)
+-{
+-	/* Nothing in this section is strictly critical.  It's not
+-	 * that much of a deal if we fail to guess right whether the
+-	 * ABI is softfp or hardfp.  */
+-	unsigned hardfp = 0;
+-
+-	Elf_Scn *scn;
+-	Elf_Data *data;
+-	GElf_Shdr shdr;
+-	if (elf_get_section_type(lte, SHT_ARM_ATTRIBUTES, &scn, &shdr) < 0
+-	    || (scn != NULL && (data = elf_loaddata(scn, &shdr)) == NULL)) {
+-		fprintf(stderr,
+-			"Error when obtaining ARM attribute section: %s\n",
+-			elf_errmsg(-1));
+-		goto done;
+-
+-	} else if (scn != NULL && data != NULL) {
+-		GElf_Xword offset = 0;
+-		uint8_t version;
+-		if (elf_read_next_u8(data, &offset, &version) < 0) {
+-			goto done;
+-		} else if (version != 'A') {
+-			fprintf(stderr, "Unsupported ARM attribute section "
+-				"version %d ('%c').\n", version, version);
+-			goto done;
+-		}
+-
+-		do {
+-			const char signature[] = "aeabi";
+-			/* N.B. LEN is including the length field
+-			 * itself.  */
+-			uint32_t sec_len;
+-			if (elf_read_u32(data, offset, &sec_len) < 0
+-			    || !elf_can_read_next(data, offset, sec_len)) {
+-				goto done;
+-			}
+-			const GElf_Xword next_offset = offset + sec_len;
+-			offset += 4;
+-
+-			if (sec_len < 4 + sizeof signature
+-			    || strcmp(signature, data->d_buf + offset) != 0)
+-				goto skip;
+-			offset += sizeof signature;
+-
+-			const GElf_Xword offset0 = offset;
+-			uint64_t tag;
+-			uint32_t sub_len;
+-			if (elf_read_next_uleb128(data, &offset, &tag) < 0
+-			    || elf_read_next_u32(data, &offset, &sub_len) < 0
+-			    || !elf_can_read_next(data, offset0, sub_len))
+-				goto done;
+-
+-			if (tag != 1)
+-				/* IHI0045D_ABI_addenda: "section and
+-				 * symbol attributes are deprecated
+-				 * [...] consumers are permitted to
+-				 * ignore them."  */
+-				goto skip;
+-
+-			while (offset < offset0 + sub_len) {
+-				if (elf_read_next_uleb128(data,
+-							  &offset, &tag) < 0)
+-					goto done;
+-
+-				switch (tag) {
+-					uint64_t v;
+-				case 6: /* Tag_CPU_arch */
+-				case 7: /* Tag_CPU_arch_profile */
+-				case 8: /* Tag_ARM_ISA_use */
+-				case 9: /* Tag_THUMB_ISA_use */
+-				case 10: /* Tag_FP_arch */
+-				case 11: /* Tag_WMMX_arch */
+-				case 12: /* Tag_Advanced_SIMD_arch */
+-				case 13: /* Tag_PCS_config */
+-				case 14: /* Tag_ABI_PCS_R9_use */
+-				case 15: /* Tag_ABI_PCS_RW_data */
+-				case 16: /* Tag_ABI_PCS_RO_data */
+-				case 17: /* Tag_ABI_PCS_GOT_use */
+-				case 18: /* Tag_ABI_PCS_wchar_t */
+-				case 19: /* Tag_ABI_FP_rounding */
+-				case 20: /* Tag_ABI_FP_denormal */
+-				case 21: /* Tag_ABI_FP_exceptions */
+-				case 22: /* Tag_ABI_FP_user_exceptions */
+-				case 23: /* Tag_ABI_FP_number_model */
+-				case 24: /* Tag_ABI_align_needed */
+-				case 25: /* Tag_ABI_align_preserved */
+-				case 26: /* Tag_ABI_enum_size */
+-				case 27: /* Tag_ABI_HardFP_use */
+-				case 28: /* Tag_ABI_VFP_args */
+-				case 29: /* Tag_ABI_WMMX_args */
+-				case 30: /* Tag_ABI_optimization_goals */
+-				case 31: /* Tag_ABI_FP_optimization_goals */
+-				case 32: /* Tag_compatibility */
+-				case 34: /* Tag_CPU_unaligned_access */
+-				case 36: /* Tag_FP_HP_extension */
+-				case 38: /* Tag_ABI_FP_16bit_format */
+-				case 42: /* Tag_MPextension_use */
+-				case 70: /* Tag_MPextension_use as well */
+-				case 44: /* Tag_DIV_use */
+-				case 64: /* Tag_nodefaults */
+-				case 66: /* Tag_T2EE_use */
+-				case 68: /* Tag_Virtualization_use */
+-				uleb128:
+-					if (elf_read_next_uleb128
+-						(data, &offset, &v) < 0)
+-						goto done;
+-					if (tag == 28)
+-						hardfp = get_hardfp(v);
+-					if (tag != 32)
+-						continue;
+-
+-					/* Tag 32 has two arguments,
+-					 * fall through.  */
+-
+-				case 4:	/* Tag_CPU_raw_name */
+-				case 5:	/* Tag_CPU_name */
+-				case 65: /* Tag_also_compatible_with */
+-				case 67: /* Tag_conformance */
+-				ntbs:
+-					offset += strlen(data->d_buf
+-							 + offset) + 1;
+-					continue;
+-				}
+-
+-				/* Handle unknown tags in a generic
+-				 * manner, if possible.  */
+-				if (tag <= 32) {
+-					fprintf(stderr,
+-						"Unknown tag %lld "
+-						"at offset %#llx "
+-						"of ARM attribute section.",
+-						tag, offset);
+-					goto skip;
+-				} else if (tag % 2 == 0) {
+-					goto uleb128;
+-				} else {
+-					goto ntbs;
+-				}
+-			}
+-
+-		skip:
+-			offset = next_offset;
+-
+-		} while (elf_can_read_next(data, offset, 1));
+-
+-	}
+-
+-done:
+-	lib->arch.hardfp = hardfp;
+-	return 0;
+-}
+-
+-void
+-arch_elf_destroy(struct ltelf *lte)
+-{
+-}
+-
+-int
+-arch_library_init(struct library *lib)
+-{
+-	return 0;
+-}
+-
+-void
+-arch_library_destroy(struct library *lib)
+-{
+-}
+-
+-int
+-arch_library_clone(struct library *retp, struct library *lib)
+-{
+-	retp->arch = lib->arch;
+-	return 0;
+-}
+-
+ enum {
+ 	/* How many (double) VFP registers the AAPCS uses for
+ 	 * parameter passing.  */
+diff --git a/sysdeps/linux-gnu/arm/plt.c b/sysdeps/linux-gnu/arm/plt.c
+index d1bf7ca..9e9e37f 100644
+--- a/sysdeps/linux-gnu/arm/plt.c
++++ b/sysdeps/linux-gnu/arm/plt.c
+@@ -1,5 +1,6 @@
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2010 Zach Welch, CodeSourcery
+  * Copyright (C) 2004,2008,2009 Juan Cespedes
+  *
+@@ -20,20 +21,205 @@
+  */
+ 
+ #include <gelf.h>
++#include <stdio.h>
++#include <string.h>
+ 
+ #include "proc.h"
+ #include "library.h"
+ #include "ltrace-elf.h"
+ 
+ static int
++get_hardfp(uint64_t abi_vfp_args)
++{
++	if (abi_vfp_args == 2)
++		fprintf(stderr,
++			"Tag_ABI_VFP_args value 2 (tool chain-specific "
++			"conventions) not supported.\n");
++	return abi_vfp_args == 1;
++}
++
++int
++arch_elf_init(struct ltelf *lte, struct library *lib)
++{
++	GElf_Addr jmprel_addr;
++	Elf_Scn *jmprel_sec;
++	GElf_Shdr jmprel_shdr;
++	if (elf_load_dynamic_entry(lte, DT_JMPREL, &jmprel_addr) < 0
++	    || elf_get_section_covering(lte, jmprel_addr,
++					&jmprel_sec, &jmprel_shdr) < 0
++	    || jmprel_sec == NULL)
++		return -1;
++
++	lte->arch.jmprel_data = elf_loaddata(jmprel_sec, &jmprel_shdr);
++	if (lte->arch.jmprel_data == NULL)
++		return -1;
++
++	/* Nothing in this section is strictly critical.  It's not
++	 * that much of a deal if we fail to guess right whether the
++	 * ABI is softfp or hardfp.  */
++	unsigned hardfp = 0;
++
++	Elf_Scn *scn;
++	Elf_Data *data;
++	GElf_Shdr shdr;
++	if (elf_get_section_type(lte, SHT_ARM_ATTRIBUTES, &scn, &shdr) < 0
++	    || (scn != NULL && (data = elf_loaddata(scn, &shdr)) == NULL)) {
++		fprintf(stderr,
++			"Error when obtaining ARM attribute section: %s\n",
++			elf_errmsg(-1));
++		goto done;
++
++	} else if (scn != NULL && data != NULL) {
++		GElf_Xword offset = 0;
++		uint8_t version;
++		if (elf_read_next_u8(data, &offset, &version) < 0) {
++			goto done;
++		} else if (version != 'A') {
++			fprintf(stderr, "Unsupported ARM attribute section "
++				"version %d ('%c').\n", version, version);
++			goto done;
++		}
++
++		do {
++			const char signature[] = "aeabi";
++			/* N.B. LEN is including the length field
++			 * itself.  */
++			uint32_t sec_len;
++			if (elf_read_u32(data, offset, &sec_len) < 0
++			    || !elf_can_read_next(data, offset, sec_len)) {
++				goto done;
++			}
++			const GElf_Xword next_offset = offset + sec_len;
++			offset += 4;
++
++			if (sec_len < 4 + sizeof signature
++			    || strcmp(signature, data->d_buf + offset) != 0)
++				goto skip;
++			offset += sizeof signature;
++
++			const GElf_Xword offset0 = offset;
++			uint64_t tag;
++			uint32_t sub_len;
++			if (elf_read_next_uleb128(data, &offset, &tag) < 0
++			    || elf_read_next_u32(data, &offset, &sub_len) < 0
++			    || !elf_can_read_next(data, offset0, sub_len))
++				goto done;
++
++			if (tag != 1)
++				/* IHI0045D_ABI_addenda: "section and
++				 * symbol attributes are deprecated
++				 * [...] consumers are permitted to
++				 * ignore them."  */
++				goto skip;
++
++			while (offset < offset0 + sub_len) {
++				if (elf_read_next_uleb128(data,
++							  &offset, &tag) < 0)
++					goto done;
++
++				switch (tag) {
++					uint64_t v;
++				case 6: /* Tag_CPU_arch */
++				case 7: /* Tag_CPU_arch_profile */
++				case 8: /* Tag_ARM_ISA_use */
++				case 9: /* Tag_THUMB_ISA_use */
++				case 10: /* Tag_FP_arch */
++				case 11: /* Tag_WMMX_arch */
++				case 12: /* Tag_Advanced_SIMD_arch */
++				case 13: /* Tag_PCS_config */
++				case 14: /* Tag_ABI_PCS_R9_use */
++				case 15: /* Tag_ABI_PCS_RW_data */
++				case 16: /* Tag_ABI_PCS_RO_data */
++				case 17: /* Tag_ABI_PCS_GOT_use */
++				case 18: /* Tag_ABI_PCS_wchar_t */
++				case 19: /* Tag_ABI_FP_rounding */
++				case 20: /* Tag_ABI_FP_denormal */
++				case 21: /* Tag_ABI_FP_exceptions */
++				case 22: /* Tag_ABI_FP_user_exceptions */
++				case 23: /* Tag_ABI_FP_number_model */
++				case 24: /* Tag_ABI_align_needed */
++				case 25: /* Tag_ABI_align_preserved */
++				case 26: /* Tag_ABI_enum_size */
++				case 27: /* Tag_ABI_HardFP_use */
++				case 28: /* Tag_ABI_VFP_args */
++				case 29: /* Tag_ABI_WMMX_args */
++				case 30: /* Tag_ABI_optimization_goals */
++				case 31: /* Tag_ABI_FP_optimization_goals */
++				case 32: /* Tag_compatibility */
++				case 34: /* Tag_CPU_unaligned_access */
++				case 36: /* Tag_FP_HP_extension */
++				case 38: /* Tag_ABI_FP_16bit_format */
++				case 42: /* Tag_MPextension_use */
++				case 70: /* Tag_MPextension_use as well */
++				case 44: /* Tag_DIV_use */
++				case 64: /* Tag_nodefaults */
++				case 66: /* Tag_T2EE_use */
++				case 68: /* Tag_Virtualization_use */
++				uleb128:
++					if (elf_read_next_uleb128
++						(data, &offset, &v) < 0)
++						goto done;
++					if (tag == 28)
++						hardfp = get_hardfp(v);
++					if (tag != 32)
++						continue;
++
++					/* Tag 32 has two arguments,
++					 * fall through.  */
++
++				case 4:	/* Tag_CPU_raw_name */
++				case 5:	/* Tag_CPU_name */
++				case 65: /* Tag_also_compatible_with */
++				case 67: /* Tag_conformance */
++				ntbs:
++					offset += strlen(data->d_buf
++							 + offset) + 1;
++					continue;
++				}
++
++				/* Handle unknown tags in a generic
++				 * manner, if possible.  */
++				if (tag <= 32) {
++					fprintf(stderr,
++						"Unknown tag %lld "
++						"at offset %#llx "
++						"of ARM attribute section.",
++						tag, offset);
++					goto skip;
++				} else if (tag % 2 == 0) {
++					goto uleb128;
++				} else {
++					goto ntbs;
++				}
++			}
++
++		skip:
++			offset = next_offset;
++
++		} while (elf_can_read_next(data, offset, 1));
++
++	}
++
++done:
++	lib->arch.hardfp = hardfp;
++	return 0;
++}
++
++void
++arch_elf_destroy(struct ltelf *lte)
++{
++}
++
++static int
+ arch_plt_entry_has_stub(struct ltelf *lte, size_t off) {
+-	uint16_t op = *(uint16_t *)((char *)lte->relplt->d_buf + off);
++	char *buf = (char *) lte->arch.jmprel_data->d_buf;
++	uint16_t op = *(uint16_t *) (buf + off);
+ 	return op == 0x4778;
+ }
+ 
+ GElf_Addr
+ arch_plt_sym_val(struct ltelf *lte, size_t ndx, GElf_Rela * rela) {
+-	size_t start = lte->relplt->d_size + 12;
++	size_t start = lte->arch.jmprel_data->d_size + 12;
+ 	size_t off = start + 20, i;
+ 	for (i = 0; i < ndx; i++)
+ 		off += arch_plt_entry_has_stub(lte, off) ? 16 : 12;
+@@ -47,3 +233,21 @@ sym2addr(struct process *proc, struct library_symbol *sym)
+ {
+ 	return sym->enter_addr;
+ }
++
++int
++arch_library_init(struct library *lib)
++{
++	return 0;
++}
++
++void
++arch_library_destroy(struct library *lib)
++{
++}
++
++int
++arch_library_clone(struct library *retp, struct library *lib)
++{
++	retp->arch = lib->arch;
++	return 0;
++}
+diff --git a/sysdeps/linux-gnu/ppc/plt.c b/sysdeps/linux-gnu/ppc/plt.c
+index 5e3ffe1..3ec1397 100644
+--- a/sysdeps/linux-gnu/ppc/plt.c
++++ b/sysdeps/linux-gnu/ppc/plt.c
+@@ -402,38 +402,6 @@ get_glink_vma(struct ltelf *lte, GElf_Addr ppcgot, Elf_Data *plt_data)
+ }
+ 
+ static int
+-load_dynamic_entry(struct ltelf *lte, int tag, GElf_Addr *valuep)
+-{
+-	Elf_Scn *scn;
+-	GElf_Shdr shdr;
+-	if (elf_get_section_type(lte, SHT_DYNAMIC, &scn, &shdr) < 0
+-	    || scn == NULL) {
+-	fail:
+-		fprintf(stderr, "Couldn't get SHT_DYNAMIC: %s\n",
+-			elf_errmsg(-1));
+-		return -1;
+-	}
+-
+-	Elf_Data *data = elf_loaddata(scn, &shdr);
+-	if (data == NULL)
+-		goto fail;
+-
+-	size_t j;
+-	for (j = 0; j < shdr.sh_size / shdr.sh_entsize; ++j) {
+-		GElf_Dyn dyn;
+-		if (gelf_getdyn(data, j, &dyn) == NULL)
+-			goto fail;
+-
+-		if(dyn.d_tag == tag) {
+-			*valuep = dyn.d_un.d_ptr;
+-			return 0;
+-		}
+-	}
+-
+-	return -1;
+-}
+-
+-static int
+ nonzero_data(Elf_Data *data)
+ {
+ 	/* We are not supposed to get here if there's no PLT.  */
+@@ -488,8 +456,8 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 	Elf_Scn *rela_sec;
+ 	GElf_Shdr rela_shdr;
+ 	if ((lte->ehdr.e_machine == EM_PPC64 || lte->arch.secure_plt)
+-	    && load_dynamic_entry(lte, DT_RELA, &rela) == 0
+-	    && load_dynamic_entry(lte, DT_RELASZ, &relasz) == 0
++	    && elf_load_dynamic_entry(lte, DT_RELA, &rela) == 0
++	    && elf_load_dynamic_entry(lte, DT_RELASZ, &relasz) == 0
+ 	    && elf_get_section_covering(lte, rela, &rela_sec, &rela_shdr) == 0
+ 	    && rela_sec != NULL) {
+ 
+@@ -509,7 +477,7 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 
+ 	if (lte->ehdr.e_machine == EM_PPC && lte->arch.secure_plt) {
+ 		GElf_Addr ppcgot;
+-		if (load_dynamic_entry(lte, DT_PPC_GOT, &ppcgot) < 0) {
++		if (elf_load_dynamic_entry(lte, DT_PPC_GOT, &ppcgot) < 0) {
+ 			fprintf(stderr, "couldn't find DT_PPC_GOT\n");
+ 			return -1;
+ 		}
+@@ -522,7 +490,8 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 
+ 	} else if (lte->ehdr.e_machine == EM_PPC64) {
+ 		GElf_Addr glink_vma;
+-		if (load_dynamic_entry(lte, DT_PPC64_GLINK, &glink_vma) < 0) {
++		if (elf_load_dynamic_entry(lte, DT_PPC64_GLINK,
++					   &glink_vma) < 0) {
+ 			fprintf(stderr, "couldn't find DT_PPC64_GLINK\n");
+ 			return -1;
+ 		}
+@@ -532,8 +501,8 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 
+ 	} else {
+ 		/* By exhaustion--PPC32 BSS.  */
+-		if (load_dynamic_entry(lte, DT_PLTGOT,
+-				       &lib->arch.pltgot_addr) < 0) {
++		if (elf_load_dynamic_entry(lte, DT_PLTGOT,
++					   &lib->arch.pltgot_addr) < 0) {
+ 			fprintf(stderr, "couldn't find DT_PLTGOT\n");
+ 			return -1;
+ 		}

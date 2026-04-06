@@ -1,0 +1,18 @@
+--- ./googletest/include/gtest/internal/gtest-port.h.orig	2025-01-27 03:39:18.963893931 +0000
++++ ./googletest/include/gtest/internal/gtest-port.h	2025-01-28 13:57:51.381081952 +0000
+@@ -288,11 +288,11 @@
+ 
+ // Detect C++ feature test macros as gracefully as possible.
+ // MSVC >= 19.15, Clang >= 3.4.1, and GCC >= 4.1.2 support feature test macros.
+-#if GTEST_INTERNAL_CPLUSPLUS_LANG >= 202002L && \
+-    (!defined(__has_include) || GTEST_INTERNAL_HAS_INCLUDE(<version>))
++#if GTEST_INTERNAL_HAS_INCLUDE(<version>) || \
++    (GTEST_INTERNAL_CPLUSPLUS_LANG >= 202002L && !defined(__has_include))
+ #include <version>  // C++20 and later
+-#elif (!defined(__has_include) || GTEST_INTERNAL_HAS_INCLUDE(<ciso646>))
+-#include <ciso646>  // Pre-C++20
++#else
++#include <cerrno>  // Pre-C++20
+ #endif
+ 
+ #include <ctype.h>   // for isspace, etc

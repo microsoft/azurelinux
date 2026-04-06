@@ -1,0 +1,27 @@
+From c68b20b1764acf269a385239d3bdfde6191d3be4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Dan=20Hor=C3=A1k?= <dan@danny.cz>
+Date: Mon, 19 Dec 2022 17:40:43 +0100
+Subject: [PATCH] move from distutils to sysconfig
+
+The distutils module was deprecated in Python 3.10, thus switch to the
+sysconfig module instead.
+---
+ python/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
+index 5b6f420..19ce500 100644
+--- a/python/CMakeLists.txt
++++ b/python/CMakeLists.txt
+@@ -42,7 +42,7 @@ endif ()
+ 
+ set_target_properties ( ${SWIG_MODULE_ftdi1_REAL_NAME} PROPERTIES NO_SONAME ON )
+ 
+-execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig; print( sysconfig.get_python_lib( plat_specific=True, prefix='${CMAKE_INSTALL_PREFIX}' ) )"
++execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "import sysconfig; print( sysconfig.get_path( 'platlib', vars={'platbase': '${CMAKE_INSTALL_PREFIX}'} ) )"
+                   OUTPUT_VARIABLE _ABS_PYTHON_MODULE_PATH
+                   OUTPUT_STRIP_TRAILING_WHITESPACE )
+ 
+-- 
+2.39.0
+

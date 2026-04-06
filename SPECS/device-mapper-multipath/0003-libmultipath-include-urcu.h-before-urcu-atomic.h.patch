@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Tue, 11 Feb 2025 13:11:03 -0500
+Subject: [PATCH] libmultipath: include urcu.h before urcu/atomic.h
+
+urcu/atomic.h requires some header files included by urcu.h. Make sure
+to include it first.
+
+Fixes: https://github.com/opensvc/multipath-tools/issues/112
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+Reviewed-by: Martin Wilck <mwilck@suse.com>
+---
+ libmultipath/checkers/tur.c | 1 +
+ libmultipath/lock.h         | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libmultipath/checkers/tur.c b/libmultipath/checkers/tur.c
+index e70a2e11..0010acf8 100644
+--- a/libmultipath/checkers/tur.c
++++ b/libmultipath/checkers/tur.c
+@@ -15,6 +15,7 @@
+ #include <errno.h>
+ #include <sys/time.h>
+ #include <pthread.h>
++#include <urcu.h>
+ #include <urcu/uatomic.h>
+ 
+ #include "checkers.h"
+diff --git a/libmultipath/lock.h b/libmultipath/lock.h
+index 38473a8c..5f323055 100644
+--- a/libmultipath/lock.h
++++ b/libmultipath/lock.h
+@@ -2,6 +2,7 @@
+ #define LOCK_H_INCLUDED
+ 
+ #include <pthread.h>
++#include <urcu.h>
+ #include <urcu/uatomic.h>
+ #include <stdbool.h>
+ 

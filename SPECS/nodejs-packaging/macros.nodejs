@@ -1,0 +1,38 @@
+# nodejs binary
+%__nodejs %{_bindir}/node
+
+# currently installed nodejs version
+%nodejs_version %(%{__nodejs} -v | sed s/v//)
+%_nodejs_major_version %(echo %{nodejs_version} | sed 's#^\\([0-9]\\+\\).*#\\1#')
+
+# nodejs library directory
+%nodejs_sitelib %{_prefix}/lib/node_modules_%{_nodejs_major_version}
+
+#arch specific library directory
+#for future-proofing only; we don't do multilib
+%nodejs_sitearch %{nodejs_sitelib}
+
+# symlink dependencies so `npm link` works
+# this should be run in every module's %%install section
+# pass --check to work in the current directory instead of the buildroot
+# pass --no-devdeps to ignore devDependencies when --check is used
+%nodejs_symlink_deps %{_rpmconfigdir}/nodejs-symlink-deps %{nodejs_sitelib}
+
+# patch package.json to fix a dependency
+# see `man npm-json` for details on writing dependencies for package.json files
+# e.g. `%%nodejs_fixdep frobber` makes any version of frobber do
+#      `%%nodejs_fixdep frobber '>1.0'` requires frobber > 1.0
+#      `%%nodejs_fixdep -r frobber removes the frobber dep
+%nodejs_fixdep %{_rpmconfigdir}/nodejs-fixdep
+
+# patch package.json to set the package version
+# e.g. `%%nodejs_setversion 1.2.3`
+%nodejs_setversion %{_rpmconfigdir}/nodejs-setversion
+
+# macro to filter unwanted provides from Node.js binary native modules
+%nodejs_default_filter %{expand: \
+%global __provides_exclude_from ^%{nodejs_sitearch}/.*\\.node$
+}
+
+# no-op macro to allow spec compatibility with EPEL
+%nodejs_find_provides_and_requires %{nil}

@@ -1,0 +1,127 @@
+#! /usr/bin/python3 -s
+# Stripped down replacement for cargo2rpm parse-vendor-manifest
+
+import re
+import subprocess
+import sys
+from typing import Optional
+
+
+VERSION_REGEX = re.compile(
+    r"""
+    ^
+    (?P<major>0|[1-9]\d*)
+    \.(?P<minor>0|[1-9]\d*)
+    \.(?P<patch>0|[1-9]\d*)
+    (?:-(?P<pre>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?
+    (?:\+(?P<build>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+    """,
+    re.VERBOSE,
+)
+
+
+class Version:
+    """
+    Version that adheres to the "semantic versioning" format.
+    """
+
+    def __init__(self, major: int, minor: int, patch: int, pre: Optional[str] = None, build: Optional[str] = None):
+        self.major: int = major
+        self.minor: int = minor
+        self.patch: int = patch
+        self.pre: Optional[str] = pre
+        self.build: Optional[str] = build
+
+    @staticmethod
+    def parse(version: str) -> "Version":
+        """
+        Parses a version string and return a `Version` object.
+        Raises a `ValueError` if the string does not match the expected format.
+        """
+
+        match = VERSION_REGEX.match(version)
+        if not match:
+            raise ValueError(f"Invalid version: {version!r}")
+
+        matches = match.groupdict()
+
+        major_str = matches["major"]
+        minor_str = matches["minor"]
+        patch_str = matches["patch"]
+        pre = matches["pre"]
+        build = matches["build"]
+
+        major = int(major_str)
+        minor = int(minor_str)
+        patch = int(patch_str)
+
+        return Version(major, minor, patch, pre, build)
+
+    def to_rpm(self) -> str:
+        """
+        Formats the `Version` object as an equivalent RPM version string.
+        Characters that are invalid in RPM versions are replaced ("-" -> "_")
+
+        Build metadata (the optional `Version.build` attribute) is dropped, so
+        the conversion is not lossless for versions where this attribute is not
+        `None`. However, build metadata is not intended to be part of the
+        version (and is not even considered when doing version comparison), so
+        dropping it when converting to the RPM version format is correct.
+        """
+
+        s = f"{self.major}.{self.minor}.{self.patch}"
+        if self.pre:
+            s += f"~{self.pre.replace('-', '_')}"
+        return s
+
+
+def break_the_build(error: str):
+    """
+    This function writes a string that is an invalid RPM dependency specifier,
+    which causes dependency generators to fail and break the build. The
+    additional error message is printed to stderr.
+    """
+
+    print("*** FATAL ERROR ***")
+    print(error, file=sys.stderr)
+
+ 
+def get_cargo_vendor_txt_paths_from_stdin() -> set[str]:  # pragma nocover
+    """
+    Read lines from standard input and filter out lines that look like paths
+    to `cargo-vendor.txt` files. This is how RPM generators pass lists of files.
+    """
+
+    lines = {line.rstrip("\n") for line in sys.stdin.readlines()}
+    return {line for line in lines if line.endswith("/cargo-vendor.txt")}
+
+
+def action_parse_vendor_manifest():
+    paths = get_cargo_vendor_txt_paths_from_stdin()
+
+    for path in paths:
+        with open(path) as file:
+            manifest = file.read()
+
+        for line in manifest.strip().splitlines():
+            crate, version = line.split(" v")
+            print(f"bundled(crate({crate})) = {Version.parse(version).to_rpm()}")
+
+
+def main():
+    try:
+        action_parse_vendor_manifest()
+        exit(0)
+
+    # print an error message that is not a valid RPM dependency
+    # to cause the generator to break the build
+    except (IOError, ValueError) as exc:
+        break_the_build(str(exc))
+        exit(1)
+
+    break_the_build("Uncaught exception: This should not happen, please report a bug.")
+    exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,37 @@
+--- backon-1.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ backon-1.6.0/Cargo.toml	2025-10-20T21:20:48.618644+00:00
+@@ -41,11 +41,9 @@
+     "std",
+     "std-blocking-sleep",
+     "tokio-sleep",
+-    "gloo-timers-sleep",
+ ]
+ embassy-sleep = ["embassy-time"]
+ futures-timer-sleep = ["futures-timer"]
+-gloo-timers-sleep = []
+ std = ["fastrand/std"]
+ std-blocking-sleep = []
+ tokio-sleep = ["tokio/time"]
+@@ -69,7 +67,7 @@
+ version = "0.12"
+ 
+ [dev-dependencies.spin]
+-version = "0.10.0"
++version = ">=0.9,<0.11"
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.futures-timer]
+ version = "3.0.3"
+@@ -78,13 +76,6 @@
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio]
+ version = "1"
+ optional = true
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.sqlx]
+-version = "0.8.0"
+-features = [
+-    "runtime-tokio",
+-    "sqlite",
+-]
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.tokio]
+ version = "1"

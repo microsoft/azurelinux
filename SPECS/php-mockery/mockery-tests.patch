@@ -1,0 +1,18 @@
+diff -up ./tests/Bootstrap.php.rpm ./tests/Bootstrap.php
+--- ./tests/Bootstrap.php.rpm	2018-05-08 10:54:48.000000000 +0200
++++ ./tests/Bootstrap.php	2018-05-13 10:39:38.471383840 +0200
+@@ -50,11 +50,9 @@ if (!file_exists($autoloadPath)) {
+ 
+ require_once $autoloadPath;
+ 
+-$hamcrestRelativePath = 'hamcrest/hamcrest-php/hamcrest/Hamcrest.php';
+-if (DIRECTORY_SEPARATOR !== '/') {
+-    $hamcrestRelativePath = str_replace('/', DIRECTORY_SEPARATOR, $hamcrestRelativePath);
+-}
+-$hamcrestPath = $composerVendorDirectory . DIRECTORY_SEPARATOR . $hamcrestRelativePath;
++require_once __DIR__ . '/classmap.php';
++
++$hamcrestPath = '/usr/share/php/Hamcrest2/Hamcrest.php';
+ 
+ require_once $hamcrestPath;
+ 

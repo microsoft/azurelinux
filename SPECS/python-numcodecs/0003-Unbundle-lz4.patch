@@ -1,0 +1,47 @@
+From 1abe09a226a09aafb7d0835302b99d4dc895d76e Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sat, 16 Mar 2019 00:23:50 -0400
+Subject: [PATCH 3/6] Unbundle lz4
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ setup.py | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 7fba864..f9fc555 100644
+--- a/setup.py
++++ b/setup.py
+@@ -125,13 +125,10 @@ def lz4_extension():
+     info('setting up LZ4 extension')
+ 
+     extra_compile_args = base_compile_args.copy()
+-    define_macros = []
+ 
+-    # setup sources - use LZ4 bundled in blosc
+-    lz4_sources = glob('c-blosc/internal-complibs/lz4*/*.c')
+-    include_dirs = [d for d in glob('c-blosc/internal-complibs/lz4*') if os.path.isdir(d)]
+-    include_dirs += ['numcodecs']
+-    # define_macros += [('CYTHON_TRACE', '1')]
++    # setup LZ4
++    liblz4 = pkgconfig('liblz4')
++    extra_compile_args += liblz4.cflags
+ 
+     sources = ['numcodecs/lz4.pyx']
+ 
+@@ -139,10 +136,9 @@ def lz4_extension():
+     return [
+         Extension(
+             'numcodecs.lz4',
+-            sources=sources + lz4_sources,
+-            include_dirs=include_dirs,
+-            define_macros=define_macros,
++            sources=sources,
+             extra_compile_args=extra_compile_args,
++            extra_link_args=liblz4.libs,
+         ),
+     ]
+ 
+-- 
+2.50.0
+

@@ -1,0 +1,25 @@
+From 22b704d9779d777bb208a36ca66485a3123065e4 Mon Sep 17 00:00:00 2001
+From: Jussi Kekkonen <jussi.kekkonen@gmail.com>
+Date: Mon, 21 Jun 2010 18:08:40 +0000
+Subject: [PATCH 23/33] Reverting r1140777 as causing some nasty cmake
+ funkyness, discussed in #kde-devel
+
+svn path=/trunk/kdesupport/automoc/; revision=1140880
+---
+ Automoc4Config.cmake | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index a91e68c..2d2d9d2 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -1,6 +1,4 @@
+ 
+-cmake_minimum_required( VERSION 2.6.4 FATAL_ERROR )
+-
+ # It also adds the following macros
+ #  AUTOMOC4(<target> <SRCS_VAR>)
+ #    Use this to run automoc4 on all files contained in the list <SRCS_VAR>.
+-- 
+2.4.3
+

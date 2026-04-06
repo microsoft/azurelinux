@@ -1,0 +1,20 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 3 Apr 2019 12:23:56 +0300
+Subject: [PATCH] Whitelist SMB2 found on some NAS devices
+
+* https://bugzilla.redhat.com/1694552#c7
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/util/fusermount.c b/util/fusermount.c
+index 4b799d9..ef9d1ed 100644
+--- a/util/fusermount.c
++++ b/util/fusermount.c
+@@ -1046,6 +1046,7 @@ static int check_perm(const char **mntp, struct stat *stbuf, int *mountpoint_fd)
+ 		0x5346544E /* NTFS_SB_MAGIC */,
+ 		0x794C7630 /* OVERLAYFS_SUPER_MAGIC */,
+ 		0x52654973 /* REISERFS_SUPER_MAGIC */,
++		0xFE534D42 /* SMB2_SUPER_MAGIC */,
+ 		0x73717368 /* SQUASHFS_MAGIC */,
+ 		0x01021994 /* TMPFS_MAGIC */,
+ 		0x24051905 /* UBIFS_SUPER_MAGIC */,

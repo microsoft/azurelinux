@@ -1,0 +1,22 @@
+--- pegasus/src/Pegasus/Common/InternalException.cpp.orig	2020-03-25 04:14:59.507215411 +0000
++++ pegasus/src/Pegasus/Common/InternalException.cpp	2020-03-25 04:06:31.545770255 +0000
+@@ -982,7 +982,7 @@ SocketWriteError::~SocketWriteError()
+ //     PEGASUS_MAXELEMENTS_NUM HTTP header fields in a single HTTP message
+ //==============================================================================
+ TooManyHTTPHeadersException::TooManyHTTPHeadersException()
+-    : Exception("more than "PEGASUS_MAXELEMENTS
++    : Exception("more than " PEGASUS_MAXELEMENTS
+                     " header fields detected in HTTP message")
+ {
+ }
+--- pegasus/src/Pegasus/Client/tests/slp/slpclient.cpp.orig	2020-03-25 04:21:46.078970915 +0000
++++ pegasus/src/Pegasus/Client/tests/slp/slpclient.cpp	2020-03-25 04:22:16.302878401 +0000
+@@ -49,7 +49,7 @@ int main(int argc, char** argv)
+ 
+         Array<Attribute> criteria;
+         Attribute attr(
+-            PEG_WBEM_SLP_SERVICE_ID"="PEG_WBEM_SLP_SERVICE_ID_DEFAULT);
++            PEG_WBEM_SLP_SERVICE_ID"=" PEG_WBEM_SLP_SERVICE_ID_DEFAULT);
+         Array<CIMServerDescription> connections;
+         SLPClientOptions* opts = (SLPClientOptions*)NULL;
+         if (argc == 2)

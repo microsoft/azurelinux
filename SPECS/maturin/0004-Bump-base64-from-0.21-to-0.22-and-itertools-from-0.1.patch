@@ -1,0 +1,35 @@
+From 7675ff766bb21e50b577d4c8da5d745929f298f3 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 19 Mar 2025 15:49:22 +0100
+Subject: [PATCH 4/6] Bump base64 from 0.21 to 0.22 and itertools from 0.12 to
+ 0.14
+
+---
+ Cargo.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 2c04871a..8c6ae4b6 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -40,7 +40,7 @@ name = "maturin"
+ 
+ [dependencies]
+ anyhow = "1.0.80"
+-base64 = "0.21.0"
++base64 = "0.22.0"
+ glob = "0.3.0"
+ cargo-config2 = "0.1.24"
+ cargo_metadata = "0.19.0"
+@@ -77,7 +77,7 @@ pyproject-toml = { version = "0.13.5", features = ["pep639-glob"] }
+ python-pkginfo = "0.6.5"
+ textwrap = "0.16.1"
+ ignore = "0.4.20"
+-itertools = "0.12.1"
++itertools = "0.14"
+ lddtree = "0.3.7"
+ cc = "1.0.88"
+ dunce = "1.0.2"
+-- 
+2.52.0
+

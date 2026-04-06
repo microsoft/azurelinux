@@ -1,0 +1,23 @@
+From 5e465f7281e90e938236d829ac3761ddda90935e Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <dueno@redhat.com>
+Date: Fri, 24 Oct 2025 16:00:27 +0900
+Subject: [PATCH] Fix E0282 in the signature test
+
+Signed-off-by: Daiki Ueno <dueno@redhat.com>
+---
+ src/signature.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/signature.rs b/src/signature.rs
+index 7544549..254be4f 100644
+--- a/src/signature.rs
++++ b/src/signature.rs
+@@ -1152,7 +1152,7 @@ mod tests {
+         let mut mech = SequoiaMechanism::ephemeral().unwrap();
+         let res = mech.import_keys(&[]);
+         assert!(res.is_ok());
+-        assert_eq!(res.unwrap().key_handles, []);
++        assert!(res.unwrap().key_handles.is_empty());
+ 
+         // A valid import of multiple keys.
+         let pk1 = &TEST_KEY[..];

@@ -1,0 +1,21 @@
+diff -up sysfsutils-2.1.1/lib/sysfs_utils.c.orig sysfsutils-2.1.1/lib/sysfs_utils.c
+--- sysfsutils-2.1.1/lib/sysfs_utils.c.orig	2025-03-11 15:06:31.976403632 +0100
++++ sysfsutils-2.1.1/lib/sysfs_utils.c	2025-03-13 08:40:42.648753678 +0100
+@@ -369,14 +369,14 @@ char *my_strncpy(char *to, const char *f
+ }
+ 
+ /**
+- * my_strncpy -- a safe strncpy
++ * my_strncat -- a safe strncat
+  */
+ char *my_strncat(char *to, const char *from, size_t max)
+ {
+ 	size_t i = 0;
+ 
+-	while (i < max && to[i] != '\0')
++	while (to[i] != '\0')
+ 		i++;
+-	my_strncpy(to+i, from, max-i);
++	my_strncpy(to+i, from, max);
+ 	return to;
+ }

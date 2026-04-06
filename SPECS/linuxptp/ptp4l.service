@@ -1,0 +1,38 @@
+[Unit]
+Description=Precision Time Protocol (PTP) service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/ptp4l
+ExecStart=/usr/sbin/ptp4l $OPTIONS
+
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_TIME
+DeviceAllow=char-pps rw
+DeviceAllow=char-ptp rw
+DevicePolicy=closed
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+# This does not work with selinux
+#NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+ProtectSystem=strict
+ReadWritePaths=/run
+RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_PACKET AF_UNIX
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=~@cpu-emulation @debug @module @mount @obsolete @raw-io
+SystemCallFilter=~@reboot @resources @swap
+
+[Install]
+WantedBy=multi-user.target

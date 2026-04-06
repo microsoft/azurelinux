@@ -1,0 +1,97 @@
+diff -up gt-0.4/src/Makefile.in~ gt-0.4/src/Makefile.in
+--- gt-0.4/src/Makefile.in~	2008-01-27 14:17:25.000000000 +0100
++++ gt-0.4/src/Makefile.in	2008-01-27 14:17:25.000000000 +0100
+@@ -141,7 +141,7 @@ gt_SOURCES = timidity.c common.c readmid
+         wave_a.c dumb_c.c $(CURSES_SOURCE) \
+         sndfont.c readsbk.c sfz.c \
+ 	resample.c resample32.c resample_l.c resample_f.c resample_s.c resample_m.c \
+-	cfg.c ac3enc.c ac3_a.c $(ALSA_SOURCE)
++	cfg.c $(ALSA_SOURCE)
+ 
+ 
+ sf2cfg_SOURCES = sf2cfg.c readsbk.c
+@@ -149,7 +149,6 @@ sfz2pat_SOURCES = sfz2pat.c tables.c
+ 
+ noinst_HEADERS = gtim.h common.h readmidi.h playmidi.h resample.h mix.h instrum.h \
+ 	tables.h butter.h controls.h output.h filter.h sbk.h sflayer.h effects.h \
+-	ac3_codec.h ac3_common.h
+ 
+ 
+ man1_MANS = gt.man sf2cfg.man sfz2pat.man
+@@ -168,7 +167,7 @@ am__gt_SOURCES_DIST = timidity.c common.
+ 	instrum.c tables.c controls.c output.c filter.c wave_a.c \
+ 	dumb_c.c ncurs_c.c sndfont.c readsbk.c sfz.c resample.c \
+ 	resample32.c resample_l.c resample_f.c resample_s.c \
+-	resample_m.c cfg.c ac3enc.c ac3_a.c alsa_a.c
++	resample_m.c cfg.c alsa_a.c
+ @HAS_CURSES_TRUE@am__objects_1 = ncurs_c.$(OBJEXT)
+ @HAS_ALSA_TRUE@am__objects_2 = alsa_a.$(OBJEXT)
+ am_gt_OBJECTS = timidity.$(OBJEXT) common.$(OBJEXT) readmidi.$(OBJEXT) \
+@@ -178,8 +177,7 @@ am_gt_OBJECTS = timidity.$(OBJEXT) commo
+ 	$(am__objects_1) sndfont.$(OBJEXT) readsbk.$(OBJEXT) \
+ 	sfz.$(OBJEXT) resample.$(OBJEXT) resample32.$(OBJEXT) \
+ 	resample_l.$(OBJEXT) resample_f.$(OBJEXT) resample_s.$(OBJEXT) \
+-	resample_m.$(OBJEXT) cfg.$(OBJEXT) ac3enc.$(OBJEXT) \
+-	ac3_a.$(OBJEXT) $(am__objects_2)
++	resample_m.$(OBJEXT) cfg.$(OBJEXT) $(am__objects_2)
+ gt_OBJECTS = $(am_gt_OBJECTS)
+ gt_DEPENDENCIES =
+ gt_LDFLAGS =
+@@ -201,8 +199,7 @@ wav2pat_LDFLAGS =
+ DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
+ depcomp = $(SHELL) $(top_srcdir)/depcomp
+ am__depfiles_maybe = depfiles
+-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/ac3_a.Po ./$(DEPDIR)/ac3enc.Po \
+-@AMDEP_TRUE@	./$(DEPDIR)/alsa_a.Po ./$(DEPDIR)/cfg.Po \
++@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/alsa_a.Po ./$(DEPDIR)/cfg.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/common.Po ./$(DEPDIR)/controls.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/dumb_c.Po ./$(DEPDIR)/filter.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/instrum.Po ./$(DEPDIR)/mix.Po \
+@@ -301,8 +298,6 @@ mostlyclean-compile:
+ distclean-compile:
+ 	-rm -f *.tab.c
+ 
+-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ac3_a.Po@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ac3enc.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alsa_a.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common.Po@am__quote@
+diff -up gt-0.4/src/Makefile.am~ gt-0.4/src/Makefile.am
+--- gt-0.4/src/Makefile.am~	2008-01-27 14:16:30.000000000 +0100
++++ gt-0.4/src/Makefile.am	2008-01-27 14:16:30.000000000 +0100
+@@ -31,14 +31,13 @@ gt_SOURCES = timidity.c common.c readmid
+         wave_a.c dumb_c.c $(CURSES_SOURCE) \
+         sndfont.c readsbk.c sfz.c \
+ 	resample.c resample32.c resample_l.c resample_f.c resample_s.c resample_m.c \
+-	cfg.c ac3enc.c ac3_a.c $(ALSA_SOURCE)
++	cfg.c $(ALSA_SOURCE)
+ 
+ sf2cfg_SOURCES = sf2cfg.c readsbk.c
+ sfz2pat_SOURCES = sfz2pat.c tables.c
+ 
+ noinst_HEADERS = gtim.h common.h readmidi.h playmidi.h resample.h mix.h instrum.h \
+ 	tables.h butter.h controls.h output.h filter.h sbk.h sflayer.h effects.h \
+-	ac3_codec.h ac3_common.h
+ 
+ cfg.c: cfg.l
+ 	rm -f cfg.c
+diff -up gt-0.4/src/output.c~ gt-0.4/src/output.c
+--- gt-0.4/src/output.c~	2008-01-27 14:21:53.000000000 +0100
++++ gt-0.4/src/output.c	2008-01-27 14:21:53.000000000 +0100
+@@ -35,8 +35,6 @@ extern PlayMode alsa_play_mode;
+ #define DEFAULT_PLAY_MODE &alsa_play_mode
+ #endif
+ 
+-extern PlayMode ac3_play_mode;
+-
+ /* This is always compiled in. */
+ extern PlayMode wave_play_mode;
+ 
+@@ -46,7 +44,6 @@ PlayMode *play_mode_list[] = {
+     DEFAULT_PLAY_MODE,
+ #endif
+     &wave_play_mode,
+-    &ac3_play_mode,
+     0
+ };
+ 

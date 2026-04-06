@@ -1,0 +1,11 @@
+diff -rupN --no-dereference libspatialite-5.1.0/spatialite.pc.in libspatialite-5.1.0-new/spatialite.pc.in
+--- libspatialite-5.1.0/spatialite.pc.in	2023-08-04 09:51:40.000000000 +0200
++++ libspatialite-5.1.0-new/spatialite.pc.in	2024-03-05 17:10:33.154529187 +0100
+@@ -8,5 +8,6 @@ includedir=@includedir@
+ Name: spatialite
+ Description: Spatial SQL database engine based on SQLite
+ Version: @VERSION@
+-Libs: -L${libdir} -lspatialite @LIBS@ @LIBXML2_LIBS@ @SQLITE3_LIBS@ -lm
++Libs.private: -L${libdir} @LIBS@ @LIBXML2_LIBS@ @SQLITE3_LIBS@ -lm
++Libs: -L${libdir} -lspatialite
+ Cflags: -I${includedir}

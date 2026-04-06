@@ -1,0 +1,407 @@
+From 2d864b3346270d045242c7de2ca124077a0850d5 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Mon, 28 Jul 2025 10:41:51 -0600
+Subject: [PATCH 1/6] feat: support nmap in socket protocol
+
+---
+ cloudinit/socket.py                     | 35 ++++++++++++++-----------
+ systemd/cloud-config.service            |  2 +-
+ systemd/cloud-final.service             |  2 +-
+ systemd/cloud-init-local.service.tmpl   |  2 +-
+ systemd/cloud-init-network.service.tmpl |  2 +-
+ tests/unittests/test_all_stages.py      |  3 +--
+ 6 files changed, 25 insertions(+), 21 deletions(-)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index 98c82886ff6..d7bc7108c51 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -5,6 +5,8 @@
+ import socket
+ import sys
+ from contextlib import suppress
++from dataclasses import dataclass
++from typing import Optional
+ 
+ from cloudinit import performance
+ from cloudinit.settings import DEFAULT_RUN_DIR
+@@ -12,6 +14,12 @@
+ LOG = logging.getLogger(__name__)
+ 
+ 
++@dataclass
++class StreamSocket:
++    socket: socket.socket
++    connection: Optional[socket.socket]
++
++
+ def sd_notify(message: str):
+     """Send a sd_notify message.
+ 
+@@ -55,13 +63,15 @@ def __init__(self, *names: str):
+         :param names: stage names, used as a unique identifiers
+         """
+         self.stage = ""
+-        self.remote = ""
+         self.first_exception = ""
+         self.systemd_exit_code = 0
+         self.experienced_any_error = False
+         self.sockets = {
+-            name: socket.socket(
+-                socket.AF_UNIX, socket.SOCK_DGRAM | socket.SOCK_CLOEXEC
++            name: StreamSocket(
++                socket.socket(
++                    socket.AF_UNIX, socket.SOCK_STREAM | socket.SOCK_CLOEXEC
++                ),
++                None,
+             )
+             for name in names
+         }
+@@ -72,7 +82,8 @@ def __init__(self, *names: str):
+             socket_path = f"{DEFAULT_RUN_DIR}/share/{name}.sock"
+             with suppress(FileNotFoundError):
+                 os.remove(socket_path)
+-            sock.bind(socket_path)
++            sock.socket.bind(socket_path)
++            sock.socket.listen()
+ 
+     def __call__(self, stage: str):
+         """Set the stage before entering context.
+@@ -116,19 +127,13 @@ def __enter__(self):
+         #     reply, which is expected to be /path/to/{self.stage}-return.sock
+         sock = self.sockets[self.stage]
+         with performance.Timed(f"Waiting to start stage {self.stage}"):
+-            chunk, self.remote = sock.recvfrom(5)
++            sock.connection, _ = sock.socket.accept()
++            chunk, _ = sock.connection.recvfrom(5)
+ 
+         if b"start" != chunk:
+             # The protocol expects to receive a command "start"
+             self.__exit__(None, None, None)
+             raise ValueError(f"Received invalid message: [{str(chunk)}]")
+-        elif f"{DEFAULT_RUN_DIR}/share/{self.stage}-return.sock" != str(
+-            self.remote
+-        ):
+-            # assert that the return path is in a directory with appropriate
+-            # permissions
+-            self.__exit__(None, None, None)
+-            raise ValueError(f"Unexpected path to unix socket: {self.remote}")
+ 
+         sd_notify(f"STATUS=Running ({self.stage} stage)")
+         return self
+@@ -157,15 +162,15 @@ def __exit__(self, exc_type, exc_val, exc_tb):
+             self.systemd_exit_code
+         )
+         sock = self.sockets[self.stage]
+-        sock.connect(self.remote)
++        assert isinstance(sock.connection, socket.socket)
+ 
+         # the returned message will be executed in a subshell
+         # hardcode this message rather than sending a more informative message
+         # to avoid having to sanitize inputs (to prevent escaping the shell)
+-        sock.sendall(
++        sock.connection.sendall(
+             f"echo '{message}'; exit {self.systemd_exit_code};".encode()
+         )
+-        sock.close()
++        sock.connection.close()
+ 
+         # suppress exception - the exception was logged and the init system
+         # notified of stage completion (and the exception received as a status
+diff --git a/systemd/cloud-config.service b/systemd/cloud-config.service
+index 68f80d2b3f8..3fe62f9d961 100644
+--- a/systemd/cloud-config.service
++++ b/systemd/cloud-config.service
+@@ -16,7 +16,7 @@ Type=oneshot
+ # process has completed this stage. The output from the return socket is piped
+ # into a shell so that the process can send a completion message (defaults to
+ # "done", otherwise includes an error message) and an exit code to systemd.
+-ExecStart=sh -c 'echo "start" | nc -Uu -W1 /run/cloud-init/share/config.sock -s /run/cloud-init/share/config-return.sock | sh'
++ExecStart=sh -c 'echo "start" | nc -U /run/cloud-init/share/config.sock | sh'
+ RemainAfterExit=yes
+ TimeoutSec=0
+ 
+diff --git a/systemd/cloud-final.service b/systemd/cloud-final.service
+index fb74a47c8eb..e7e892ab9a4 100644
+--- a/systemd/cloud-final.service
++++ b/systemd/cloud-final.service
+@@ -19,7 +19,7 @@ Type=oneshot
+ # process has completed this stage. The output from the return socket is piped
+ # into a shell so that the process can send a completion message (defaults to
+ # "done", otherwise includes an error message) and an exit code to systemd.
+-ExecStart=sh -c 'echo "start" | nc -Uu -W1 /run/cloud-init/share/final.sock -s /run/cloud-init/share/final-return.sock | sh'
++ExecStart=sh -c 'echo "start" | nc -U /run/cloud-init/share/final.sock | sh'
+ RemainAfterExit=yes
+ TimeoutSec=0
+ TasksMax=infinity
+diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+index 26a6aee1d05..b8a2f33111c 100644
+--- a/systemd/cloud-init-local.service.tmpl
++++ b/systemd/cloud-init-local.service.tmpl
+@@ -33,7 +33,7 @@ ExecStartPre=/sbin/restorecon /run/cloud-init
+ # process has completed this stage. The output from the return socket is piped
+ # into a shell so that the process can send a completion message (defaults to
+ # "done", otherwise includes an error message) and an exit code to systemd.
+-ExecStart=sh -c 'echo "start" | nc -Uu -W1 /run/cloud-init/share/local.sock -s /run/cloud-init/share/local-return.sock | sh'
++ExecStart=sh -c 'echo "start" | nc -U /run/cloud-init/share/local.sock | sh'
+ RemainAfterExit=yes
+ TimeoutSec=0
+ 
+diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
+index 61425b4a9fd..9658af1d633 100644
+--- a/systemd/cloud-init-network.service.tmpl
++++ b/systemd/cloud-init-network.service.tmpl
+@@ -56,7 +56,7 @@ Type=oneshot
+ # process has completed this stage. The output from the return socket is piped
+ # into a shell so that the process can send a completion message (defaults to
+ # "done", otherwise includes an error message) and an exit code to systemd.
+-ExecStart=sh -c 'echo "start" | nc -Uu -W1 /run/cloud-init/share/network.sock -s /run/cloud-init/share/network-return.sock | sh'
++ExecStart=sh -c 'echo "start" | nc -U /run/cloud-init/share/network.sock | sh'
+ RemainAfterExit=yes
+ TimeoutSec=0
+ 
+diff --git a/tests/unittests/test_all_stages.py b/tests/unittests/test_all_stages.py
+index 90bde5e1add..1b66e6955ba 100644
+--- a/tests/unittests/test_all_stages.py
++++ b/tests/unittests/test_all_stages.py
+@@ -15,9 +15,8 @@ class Sync:
+     """
+ 
+     def __init__(self, name: str, path: str):
+-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
++        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+         self.sock.connect(f"{path}/share/{name}.sock")
+-        self.sock.bind(f"{path}/share/{name}-return.sock")
+         self.sock.sendall(b"start")
+ 
+     def receive(self):
+
+From 41fe777167a5d7c1cdfbe60bb825e61c2f132cef Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Mon, 28 Jul 2025 11:01:48 -0600
+Subject: [PATCH 2/6] fixup! feat: support nmap in socket protocol
+
+---
+ cloudinit/socket.py | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index d7bc7108c51..29d38f8067f 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -6,18 +6,18 @@
+ import sys
+ from contextlib import suppress
+ from dataclasses import dataclass
+-from typing import Optional
+-
++from typing import Optional, TypeAlias
+ from cloudinit import performance
+ from cloudinit.settings import DEFAULT_RUN_DIR
+ 
+ LOG = logging.getLogger(__name__)
+ 
++Socket: TypeAlias = socket.socket
+ 
+ @dataclass
+ class StreamSocket:
+-    socket: socket.socket
+-    connection: Optional[socket.socket]
++    socket: Socket
++    connection: Optional[Socket]
+ 
+ 
+ def sd_notify(message: str):
+@@ -128,6 +128,7 @@ def __enter__(self):
+         sock = self.sockets[self.stage]
+         with performance.Timed(f"Waiting to start stage {self.stage}"):
+             sock.connection, _ = sock.socket.accept()
++            assert isinstance(sock.connection, socket.socket)
+             chunk, _ = sock.connection.recvfrom(5)
+ 
+         if b"start" != chunk:
+
+From 78d2308291061bd849491845dfb681c4aa048826 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Mon, 28 Jul 2025 11:07:52 -0600
+Subject: [PATCH 3/6] fixup! fixup! feat: support nmap in socket protocol
+
+---
+ cloudinit/socket.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index 29d38f8067f..475beb27ac0 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -6,13 +6,13 @@
+ import sys
+ from contextlib import suppress
+ from dataclasses import dataclass
+-from typing import Optional, TypeAlias
++from typing import Optional
+ from cloudinit import performance
+ from cloudinit.settings import DEFAULT_RUN_DIR
+ 
+ LOG = logging.getLogger(__name__)
+ 
+-Socket: TypeAlias = socket.socket
++Socket = socket.socket
+ 
+ @dataclass
+ class StreamSocket:
+
+From 6822b50e204486e9c3806ac6837dbc7df5ef86c5 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Mon, 28 Jul 2025 11:13:52 -0600
+Subject: [PATCH 4/6] fixup! fixup! fixup! feat: support nmap in socket
+ protocol
+
+---
+ cloudinit/socket.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index 475beb27ac0..6d4a3e699d3 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -7,6 +7,7 @@
+ from contextlib import suppress
+ from dataclasses import dataclass
+ from typing import Optional
++
+ from cloudinit import performance
+ from cloudinit.settings import DEFAULT_RUN_DIR
+ 
+@@ -14,6 +15,7 @@
+ 
+ Socket = socket.socket
+ 
++
+ @dataclass
+ class StreamSocket:
+     socket: Socket
+
+From 39f81452627bcde7e04574137f9e527098966584 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Tue, 29 Jul 2025 10:20:16 -0600
+Subject: [PATCH 5/6] fixup! fixup! fixup! fixup! feat: support nmap in socket
+ protocol
+
+---
+ cloudinit/socket.py | 34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index 6d4a3e699d3..bc14b01c726 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -5,8 +5,7 @@
+ import socket
+ import sys
+ from contextlib import suppress
+-from dataclasses import dataclass
+-from typing import Optional
++from typing import Dict
+ 
+ from cloudinit import performance
+ from cloudinit.settings import DEFAULT_RUN_DIR
+@@ -16,12 +15,6 @@
+ Socket = socket.socket
+ 
+ 
+-@dataclass
+-class StreamSocket:
+-    socket: Socket
+-    connection: Optional[Socket]
+-
+-
+ def sd_notify(message: str):
+     """Send a sd_notify message.
+ 
+@@ -69,14 +62,12 @@ def __init__(self, *names: str):
+         self.systemd_exit_code = 0
+         self.experienced_any_error = False
+         self.sockets = {
+-            name: StreamSocket(
+-                socket.socket(
+-                    socket.AF_UNIX, socket.SOCK_STREAM | socket.SOCK_CLOEXEC
+-                ),
+-                None,
++            name: socket.socket(
++                socket.AF_UNIX, socket.SOCK_STREAM | socket.SOCK_CLOEXEC
+             )
+             for name in names
+         }
++        self.connections: Dict[str, socket.socket] = {}
+         # ensure the directory exists
+         os.makedirs(f"{DEFAULT_RUN_DIR}/share", mode=0o700, exist_ok=True)
+         # removing stale sockets and bind
+@@ -84,8 +75,8 @@ def __init__(self, *names: str):
+             socket_path = f"{DEFAULT_RUN_DIR}/share/{name}.sock"
+             with suppress(FileNotFoundError):
+                 os.remove(socket_path)
+-            sock.socket.bind(socket_path)
+-            sock.socket.listen()
++            sock.bind(socket_path)
++            sock.listen()
+ 
+     def __call__(self, stage: str):
+         """Set the stage before entering context.
+@@ -129,9 +120,9 @@ def __enter__(self):
+         #     reply, which is expected to be /path/to/{self.stage}-return.sock
+         sock = self.sockets[self.stage]
+         with performance.Timed(f"Waiting to start stage {self.stage}"):
+-            sock.connection, _ = sock.socket.accept()
+-            assert isinstance(sock.connection, socket.socket)
+-            chunk, _ = sock.connection.recvfrom(5)
++            connection, _ = sock.accept()
++            chunk, _ = connection.recvfrom(5)
++            self.connections[self.stage] = connection
+ 
+         if b"start" != chunk:
+             # The protocol expects to receive a command "start"
+@@ -164,16 +155,15 @@ def __exit__(self, exc_type, exc_val, exc_tb):
+         self.experienced_any_error = self.experienced_any_error or bool(
+             self.systemd_exit_code
+         )
+-        sock = self.sockets[self.stage]
+-        assert isinstance(sock.connection, socket.socket)
++        sock = self.connections[self.stage]
+ 
+         # the returned message will be executed in a subshell
+         # hardcode this message rather than sending a more informative message
+         # to avoid having to sanitize inputs (to prevent escaping the shell)
+-        sock.connection.sendall(
++        sock.sendall(
+             f"echo '{message}'; exit {self.systemd_exit_code};".encode()
+         )
+-        sock.connection.close()
++        sock.close()
+ 
+         # suppress exception - the exception was logged and the init system
+         # notified of stage completion (and the exception received as a status
+
+From e6b0d4eab8b3f6d2c5fb8ce841582fde88b53fa9 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Tue, 19 Aug 2025 09:12:51 -0600
+Subject: [PATCH 6/6] fixup! fixup! fixup! fixup! fixup! feat: support nmap in
+ socket protocol
+
+---
+ cloudinit/socket.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/cloudinit/socket.py b/cloudinit/socket.py
+index bc14b01c726..0a5485a07e6 100644
+--- a/cloudinit/socket.py
++++ b/cloudinit/socket.py
+@@ -12,8 +12,6 @@
+ 
+ LOG = logging.getLogger(__name__)
+ 
+-Socket = socket.socket
+-
+ 
+ def sd_notify(message: str):
+     """Send a sd_notify message.

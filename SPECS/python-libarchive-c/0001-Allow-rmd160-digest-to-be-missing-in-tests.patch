@@ -1,0 +1,29 @@
+From e0e2a47b2403632642ee932dd56acd11e4a79efe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sat, 5 Jul 2025 19:31:21 +0200
+Subject: [PATCH] Allow rmd160 digest to be missing in tests
+
+Support for rmd160 was relegated to the legacy provided in openssl-3.0, see
+https://github.com/openssl/openssl/issues/16994 and e.g.
+https://src.fedoraproject.org/rpms/libarchive/c/34b814314e55a401f03af96ceab220867bd35f84.
+When the hash is not available, the tests were failing. Adjust the test
+so that it passes both when the digest is available and when it is not.
+---
+ tests/test_entry.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_entry.py b/tests/test_entry.py
+index 7c8afa7545..022033328d 100644
+--- a/tests/test_entry.py
++++ b/tests/test_entry.py
+@@ -186,4 +186,9 @@ def test_writing_entry_digests(tmpdir):
+         archive.add_file_from_memory('empty.txt', 42, (), stored_digests=fake_hashes)
+     with open(archive_path) as f:
+         libarchive_mtree = f.read()
+-        assert libarchive_mtree == mtree
++
++    # rmd160 might be missing if openssl >= 3.0 is used without "legacy providers"
++    expected = (mtree if 'rmd160' in libarchive_mtree else
++                ' '.join(item for item in mtree.split(' ') if 'rmd160' not in item))
++
++    assert libarchive_mtree == expected

@@ -1,0 +1,25 @@
+From c4bfd7479fbbfac1915eedbdbbace2bb36abf3bd Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 5 Dec 2023 12:32:48 +0100
+Subject: [PATCH] explicitly set version_suffix_components for recent cargo-c
+ versions
+
+---
+ Cargo.toml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 55ffb97..c854871 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -55,6 +55,7 @@ from = "libimagequant.h"
+ [package.metadata.capi.library]
+ name = "imagequant"
+ version = "0.0.4"
++version_suffix_components = 1
+ 
+ [package.metadata.capi.pkg_config]
+ description = "Convert 24/32-bit images to 8-bit palette with alpha channel."
+-- 
+2.43.0
+

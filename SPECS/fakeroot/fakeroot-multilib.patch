@@ -1,0 +1,12 @@
+diff -up fakeroot-1.25.2/scripts/fakeroot.in.multilib fakeroot-1.25.2/scripts/fakeroot.in
+--- fakeroot-1.25.2/scripts/fakeroot.in.multilib	2020-10-05 21:34:34.584490563 +0200
++++ fakeroot-1.25.2/scripts/fakeroot.in	2020-10-05 21:35:33.264201406 +0200
+@@ -35,7 +35,7 @@ FAKEROOT_BINDIR=@bindir@
+ 
+ USEABSLIBPATH=@LDPRELOADABS@
+ FAKEROOT_LIB=lib@fakeroot_transformed@@DLSUFFIX@
+-PATHS=@libdir@:${FAKEROOT_PREFIX}/lib64/libfakeroot:${FAKEROOT_PREFIX}/lib32/libfakeroot
++PATHS=@libdir@:${FAKEROOT_PREFIX}/lib64/libfakeroot:${FAKEROOT_PREFIX}/lib/libfakeroot
+ FAKED=${FAKEROOT_BINDIR}/@faked_transformed@
+ 
+ FAKED_MODE="unknown-is-root"

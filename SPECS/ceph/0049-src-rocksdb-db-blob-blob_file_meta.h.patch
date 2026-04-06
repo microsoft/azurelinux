@@ -1,0 +1,20 @@
+--- ceph-19.2.0/src/rocksdb/db/blob/blob_file_meta.h.orig	2025-01-16 08:16:41.762758595 -0500
++++ ceph-19.2.0/src/rocksdb/db/blob/blob_file_meta.h	2025-01-16 08:17:37.172784779 -0500
+@@ -10,6 +10,7 @@
+ #include <memory>
+ #include <string>
+ #include <unordered_set>
++#include <cstdint>
+ 
+ #include "rocksdb/rocksdb_namespace.h"
+ 
+--- ceph-19.2.0/src/rocksdb/include/rocksdb/trace_record.h.orig	2025-01-16 09:04:19.196962397 -0500
++++ ceph-19.2.0/src/rocksdb/include/rocksdb/trace_record.h	2025-01-16 09:04:33.885701684 -0500
+@@ -8,6 +8,7 @@
+ #include <memory>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "rocksdb/rocksdb_namespace.h"
+ #include "rocksdb/slice.h"

@@ -1,0 +1,15 @@
+zip uses C89-only features, so it needs to be built in C89 mode.
+
+diff --git a/unix/Makefile b/unix/Makefile
+index 86cf54bf0f56cea9..244390893eab5fc6 100644
+--- a/unix/Makefile
++++ b/unix/Makefile
+@@ -202,7 +202,7 @@ generic: flags
+ 	eval $(MAKE) $(MAKEF) zips `cat flags`
+ 
+ generic_gcc:
+-	$(MAKE) $(MAKEF) generic CC=gcc CPP="gcc -E"
++	$(MAKE) $(MAKEF) generic CC="gcc -std=gnu89" CPP="gcc -E"
+ 
+ # AT&T 6300 PLUS (don't know yet how to allocate 64K bytes):
+ att6300nodir:

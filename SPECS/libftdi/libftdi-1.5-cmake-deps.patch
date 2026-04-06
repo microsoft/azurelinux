@@ -1,0 +1,80 @@
+Return-Path: <libftdi+bounces-3653-dan=danny.cz@developer.intra2net.com>
+X-Original-To: dan@danny.cz
+Delivered-To: dan@danny.cz
+Received: from redcrew.org (redcrew.org [37.157.195.192])
+	by server.danny.cz (Postfix) with ESMTP id 6814A11AA7C
+	for <dan@danny.cz>; Thu, 16 Mar 2023 11:14:54 +0100 (CET)
+Received: from developer.intra2net.com (developer.intra2net.com [193.186.7.72])
+	by redcrew.org (Postfix) with ESMTP id 75E572A11
+	for <dan@danny.cz>; Thu, 16 Mar 2023 11:14:54 +0100 (CET)
+Received: from developer.intra2net.com (localhost.localdomain [127.0.0.1])
+	by developer.intra2net.com (Postfix) with SMTP id A02EF278278;
+	Thu, 16 Mar 2023 11:14:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1678961693; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RWRBP3sFq1pG6+FlDOdi6Yk+9FOiLm8CwFX46/0LR9g=;
+	b=ZclgNrLBH+8LWy6RE95IIv9NUWz/pbaU5/Vm7/qJHwEkyDbg5Si6fQruq5bxtVfJKctd3D
+	SRgOO2cG0s11995VvcXjK0XyaKVzBFjk7kw7lXNkeGWuAHXktpOwzJNp5WtKfW0JJsx+J1
+	tGarT4PKc2EDcU+WJOhe1JNBafWX5yM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1678961693;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RWRBP3sFq1pG6+FlDOdi6Yk+9FOiLm8CwFX46/0LR9g=;
+	b=/LLE8SqF+wbv1TgIbDhMSvfr8O/FtBTOxq111bCe1rkEc892zDS7mxy3GvjgVfN1TjVCZ2
+	iosAeMltIBho8FBQ==
+From: Fabian Vogt <fvogt@suse.de>
+To: libftdi@developer.intra2net.com
+Subject: [PATCH] Fix race during build of python bindings
+Date: Thu, 16 Mar 2023 11:14:52 +0100
+Message-ID: <4468851.LvFx2qVVIh@linux-e202.suse.de>
+List-Id: libftdi
+List-Help: <mailto:libftdi+help@developer.intra2net.com>
+List-Post: <mailto:libftdi@developer.intra2net.com>
+List-Subscribe: <mailto:libftdi+subscribe@developer.intra2net.com>
+List-Unsubscribe: <mailto:libftdi+unsubscribe@developer.intra2net.com>
+Reply-To: libftdi@developer.intra2net.com
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+
+The CMake documentation says about add_custom_command that the output must
+not be used as dependency in more than one target, but this was the case
+here: Both the doc_i target and the SWIG target depended on ftdi1_doc.i.
+Make the SWIG target depend on doc_i instead.
+
+This fixes that ftdi1_doc.i was built twice with parallel builds, leading
+to random errors.
+
+Signed-off-by: Fabian Vogt <fvogt@suse.de>
+---
+ python/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
+index 5b6f420..1a8142b 100644
+--- a/python/CMakeLists.txt
++++ b/python/CMakeLists.txt
+@@ -25,7 +25,7 @@ link_directories ( ${CMAKE_CURRENT_BINARY_DIR}/../src )
+ if ( DOCUMENTATION )
+   set(CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
+   # manually add dependency for new cmake / swig versions
+-  set_property(SOURCE ftdi1.i PROPERTY DEPENDS ftdi1_doc.i)
++  set_property(SOURCE ftdi1.i PROPERTY DEPENDS doc_i)
+ endif()
+ if(NOT CMAKE_VERSION VERSION_LESS 3.8.0)
+   swig_add_library ( ftdi1 LANGUAGE python SOURCES ftdi1.i )
+-- 
+2.39.2
+
+
+
+
+
+--
+libftdi - see http://www.intra2net.com/en/developer/libftdi for details.
+To unsubscribe send a mail to libftdi+unsubscribe@developer.intra2net.com   
+

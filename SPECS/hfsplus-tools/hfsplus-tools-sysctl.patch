@@ -1,0 +1,48 @@
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/Scavenger.h.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/Scavenger.h
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/Scavenger.h.jx	2012-02-01 12:17:19.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/dfalib/Scavenger.h	2020-08-11 13:15:46.195975153 -0400
+@@ -48,7 +48,7 @@
+ #endif
+ #include <sys/errno.h>
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
++#include <linux/sysctl.h>
+ #include <sys/mount.h>
+ #include <hfs/hfs_mount.h>
+ 
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_hfs.c.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_hfs.c
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_hfs.c.jx	2012-02-16 14:59:54.000000000 -0500
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/fsck_hfs.c	2020-08-11 13:15:51.661087132 -0400
+@@ -30,7 +30,7 @@
+ #include <sys/ioctl.h>
+ #if !LINUX
+ #include <sys/disk.h>
+-#include <sys/sysctl.h>
++#include <linux/sysctl.h>
+ #include <setjmp.h>
+ #endif
+ #include <hfs/hfs_mount.h>
+diff -up diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c.jx diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c
+--- diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c.jx	2020-08-11 13:14:39.000000000 -0400
++++ diskdev_cmds-540.1.linux3/fsck_hfs.tproj/utilities.c	2020-08-11 13:15:55.631168473 -0400
+@@ -70,7 +70,7 @@
+ #include <string.h>
+ #include <unistd.h> 
+ #include <stdlib.h>
+-#include <sys/sysctl.h>
++#include <linux/sysctl.h>
+ 
+ #include "fsck_hfs.h"
+ 
+diff -up diskdev_cmds-540.1.linux3/newfs_hfs.tproj/makehfs.c.jx diskdev_cmds-540.1.linux3/newfs_hfs.tproj/makehfs.c
+--- diskdev_cmds-540.1.linux3/newfs_hfs.tproj/makehfs.c.jx	2012-02-02 17:36:59.000000000 -0500
++++ diskdev_cmds-540.1.linux3/newfs_hfs.tproj/makehfs.c	2020-08-11 13:15:59.767253216 -0400
+@@ -38,7 +38,7 @@
+ #endif
+ #include <sys/errno.h>
+ #include <sys/stat.h>
+-#include <sys/sysctl.h>
++#include <linux/sysctl.h>
+ #if !LINUX
+ #include <sys/vmmeter.h>
+ #endif

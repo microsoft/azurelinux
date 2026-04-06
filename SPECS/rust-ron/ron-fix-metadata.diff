@@ -1,0 +1,13 @@
+--- ron-0.12.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ron-0.12.0/Cargo.toml	2026-02-12T23:07:06.575749+00:00
+@@ -115,10 +115,6 @@
+ features = ["serde"]
+ default-features = false
+ 
+-[dev-dependencies.option_set]
+-version = "0.3"
+-default-features = false
+-
+ [dev-dependencies.serde]
+ version = "1.0.181"
+ features = [

@@ -1,0 +1,58 @@
+From d33028e43b814615a33e231925eaddb0f679fa2b Mon Sep 17 00:00:00 2001
+From: Karolina Surma <33810531+befeleme@users.noreply.github.com>
+Date: Fri, 15 Nov 2024 04:53:12 +0100
+Subject: [PATCH] Fix compatibility with Python 3.14.0a1 (#848)
+
+typing.ByteString has been removed from Python 3.14.
+Ported the suggested way from the documentation:
+https://docs.python.org/3.13/library/typing.html#typing.ByteString
+---
+ src/nacl/bindings/crypto_secretstream.py | 3 ++-
+ tests/test_secretstream.py               | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/nacl/bindings/crypto_secretstream.py b/src/nacl/bindings/crypto_secretstream.py
+index d7c6725..59b074c 100644
+--- a/src/nacl/bindings/crypto_secretstream.py
++++ b/src/nacl/bindings/crypto_secretstream.py
+@@ -11,7 +11,7 @@
+ # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+-from typing import ByteString, Optional, Tuple, cast
++from typing import Optional, Tuple, Union, cast
+ 
+ from nacl import exceptions as exc
+ from nacl._sodium import ffi, lib
+@@ -73,6 +73,7 @@ class crypto_secretstream_xchacha20poly1305_state:
+ 
+     def __init__(self) -> None:
+         """Initialize a clean state object."""
++        ByteString = Union[bytes, bytearray, memoryview]
+         self.statebuf: ByteString = ffi.new(
+             "unsigned char[]",
+             crypto_secretstream_xchacha20poly1305_STATEBYTES,
+diff --git a/tests/test_secretstream.py b/tests/test_secretstream.py
+index d1b7273..9a847bb 100644
+--- a/tests/test_secretstream.py
++++ b/tests/test_secretstream.py
+@@ -16,7 +16,7 @@ import binascii
+ import json
+ import os
+ import random
+-from typing import ByteString, List, Optional, Tuple
++from typing import List, Optional, Tuple, Union
+ 
+ from _pytest._code import ExceptionInfo
+ from _pytest.monkeypatch import MonkeyPatch
+@@ -219,6 +219,7 @@ def test_it_like_libsodium():
+ 
+     header = crypto_secretstream_xchacha20poly1305_init_push(state, k)
+ 
++    ByteString = Union[bytes, bytearray, memoryview]
+     state_save: ByteString = ffi.buffer(state.statebuf)[:]
+ 
+     c1 = crypto_secretstream_xchacha20poly1305_push(
+-- 
+2.47.0
+

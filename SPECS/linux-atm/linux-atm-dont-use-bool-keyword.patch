@@ -1,0 +1,46 @@
+diff --git a/src/lane/load.c b/src/lane/load.c
+index 39d4672..1cc2202 100644
+--- a/src/lane/load.c
++++ b/src/lane/load.c
+@@ -498,8 +498,8 @@ load_vars(const char *file)
+ 	break;
+       case BOOLEAN:
+ 	Debug_unit(&load_unit, "Variable is boolean: %s", 
+-		   g_return.bool==BL_TRUE?"True":"False");
+-	set_var_bool(curr_unit, varname, g_return.bool);
++		   g_return.b==BL_TRUE?"True":"False");
++	set_var_bool(curr_unit, varname, g_return.b);
+ 	break;
+       case INTEGER:
+ 	Debug_unit(&load_unit, "Variable is integer: %d", g_return.intti);
+diff --git a/src/lane/load_lex.h b/src/lane/load_lex.h
+index 2384e70..72b8f9b 100644
+--- a/src/lane/load_lex.h
++++ b/src/lane/load_lex.h
+@@ -24,7 +24,7 @@
+ #define END 0
+ 
+ typedef struct {
+-  Bool_t bool;
++  Bool_t b;
+   int intti;
+   AtmAddr_t *atmaddress;
+   LaneDestination_t *destaddr;
+diff --git a/src/lane/load_lex.l b/src/lane/load_lex.l
+index c184795..1d412e3 100644
+--- a/src/lane/load_lex.l
++++ b/src/lane/load_lex.l
+@@ -44,11 +44,11 @@ H [0-9a-fA-F]
+ 		 return ATMADDRESS;
+ 	        }
+ True	|
+-true		{g_return.bool = BL_TRUE;
++true		{g_return.b = BL_TRUE;
+ 		 return BOOLEAN;
+ 		}	
+ False	|
+-false		{g_return.bool = BL_FALSE;
++false		{g_return.b = BL_FALSE;
+ 		 return BOOLEAN;
+ 		}
+ \#.*		{}

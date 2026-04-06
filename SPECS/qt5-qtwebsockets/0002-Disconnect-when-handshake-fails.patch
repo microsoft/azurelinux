@@ -1,0 +1,35 @@
+From 0f910acb737cefc889ce1088fc60d15bc18efe9c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Tue, 13 Dec 2022 17:07:48 +0100
+Subject: [PATCH 2/2] Disconnect when handshake fails
+
+It is unexpected that websocket does not disconnect once
+it knows the handshake has failed.
+
+Pick-to: 6.5 6.4 6.2 5.15
+Change-Id: I11e64745ffdb01c11ac79739cf7f384ad6cc4590
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+(cherry picked from commit 7efdec16d9f6116fc6c13bc3ae7c9b9e229e5a49)
+
+* asturmlechner 2023-01-06: Resolve conflict with dev branch commit
+  55cef3a13c8377c55b2fe050751c8a05eb7f9fce
+---
+ src/websockets/qwebsocket_p.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/websockets/qwebsocket_p.cpp b/src/websockets/qwebsocket_p.cpp
+index cf3087f..0dd0fa6 100644
+--- a/src/websockets/qwebsocket_p.cpp
++++ b/src/websockets/qwebsocket_p.cpp
+@@ -1100,6 +1100,8 @@ void QWebSocketPrivate::processHandshake(QTcpSocket *pSocket)
+         m_handshakeState = AllDoneState;
+         setErrorString(errorDescription);
+         Q_EMIT q->error(QAbstractSocket::ConnectionRefusedError);
++        if (m_pSocket->state() != QAbstractSocket::UnconnectedState)
++            m_pSocket->disconnectFromHost();
+     }
+ }
+ 
+-- 
+2.51.1
+

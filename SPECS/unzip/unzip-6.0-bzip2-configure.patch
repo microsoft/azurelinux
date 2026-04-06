@@ -1,0 +1,30 @@
+diff -up unzip60/unix/configure.bzip2-configure unzip60/unix/configure
+--- unzip60/unix/configure.bzip2-configure	2009-04-16 21:25:12.000000000 +0200
++++ unzip60/unix/configure	2009-11-18 11:22:14.598389194 +0100
+@@ -640,7 +640,24 @@ else
+     D_USE_BZ2="-DUSE_BZIP2"
+     L_BZ2="${BZLF} -lbz2"
+   else
+-    echo "-- bzip2 sources not found - no bzip2 support"
++    echo "  Check if OS already has bzip2 library installed"
++    cat > conftest.c << _EOF_
++#include "bzlib.h"
++int main()
++{
++  bz_stream strm;
++  BZ2_bzCompressEnd(&strm);
++  return 0;
++}
++_EOF_
++    $CC $CFLAGS -o conftest conftest.c -lbz2 > /dev/null 2>/dev/null
++    if test $? -eq 0; then
++      echo "-- OS supports bzip2 - linking in bzip2"
++      D_USE_BZ2="-DUSE_BZIP2"
++      L_BZ2="${BZLF} -lbz2"
++    else
++      echo "-- Either bzlib.h or libbz2.a not found - no bzip2"
++    fi
+   fi
+ fi
+ 
+ 

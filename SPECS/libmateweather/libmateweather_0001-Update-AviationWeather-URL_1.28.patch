@@ -1,0 +1,41 @@
+From e73e13cd1092c868cb685da00ba58d21d2e559b0 Mon Sep 17 00:00:00 2001
+From: raveit65 <raveit65.sun@gmail.com>
+Date: Thu, 18 Sep 2025 17:18:30 +0200
+Subject: [PATCH] Update AviationWeather URL
+
+According to their website: "The AviationWeather Data API has been
+redeveloped in 2025."
+
+Also they put 'METAR' (or 'SPECI') onto the beginning of data to make it
+ICAO compliant, so we add code to parse that.
+
+Fixes #135
+---
+ libmateweather/weather-metar.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libmateweather/weather-metar.c b/libmateweather/weather-metar.c
+index 7bc24fc..4698a07 100644
+--- a/libmateweather/weather-metar.c
++++ b/libmateweather/weather-metar.c
+@@ -510,7 +510,7 @@ metar_finish (SoupSession *session, SoupMessage *msg, gpointer data)
+ 
+     loc = info->location;
+ 
+-    searchkey = g_strdup_printf ("<raw_text>%s", loc->code);
++    searchkey = g_strdup_printf ("<raw_text>METAR %s", loc->code);
+     p = strstr (msg->response_body->data, searchkey);
+     g_free (searchkey);
+     if (p) {
+@@ -550,7 +550,7 @@ metar_start_open (WeatherInfo *info)
+     }
+ 
+     msg = soup_form_request_new (
+-        "GET", "https://aviationweather.gov/cgi-bin/data/dataserver.php",
++        "GET", "https://aviationweather.gov/api/data/dataserver",
+         "dataSource", "metars",
+         "requestType", "retrieve",
+         "format", "xml",
+-- 
+2.51.0
+

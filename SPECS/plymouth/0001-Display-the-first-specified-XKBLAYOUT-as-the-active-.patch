@@ -1,0 +1,29 @@
+From b609687e8d15b23aaa39100221b62d37b5859011 Mon Sep 17 00:00:00 2001
+From: n3rdopolis <bluescreen_avenger@verizon.net>
+Date: Thu, 4 Dec 2025 08:31:36 -0500
+Subject: [PATCH] Display the first specified XKBLAYOUT as the active one,
+ instead of the last
+
+This fixes https://bugzilla.redhat.com/show_bug.cgi?id=2416197
+This corrects the keymap display when users specify multiple keymaps
+in /etc/vconsole.conf
+---
+ src/libply-splash-core/ply-input-device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libply-splash-core/ply-input-device.c b/src/libply-splash-core/ply-input-device.c
+index d10033c9..22817420 100644
+--- a/src/libply-splash-core/ply-input-device.c
++++ b/src/libply-splash-core/ply-input-device.c
+@@ -531,7 +531,7 @@ ply_input_device_get_keymap (ply_input_device_t *input_device)
+          *
+          * This string shouldn't be used as a unique indentifier for a keymap
+          */
+-        return xkb_keymap_layout_get_name (input_device->keymap, num_indices - 1);
++        return xkb_keymap_layout_get_name (input_device->keymap, 0);
+ }
+ 
+ int
+-- 
+2.52.0
+

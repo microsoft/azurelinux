@@ -1,0 +1,11 @@
+--- globwalk-0.9.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ globwalk-0.9.1/Cargo.toml	2024-01-13T20:56:05.576464+00:00
+@@ -37,8 +37,5 @@
+ [dependencies.walkdir]
+ version = "2"
+ 
+-[dev-dependencies.docmatic]
+-version = "0.1.2"
+-
+ [dev-dependencies.tempfile]
+ version = "3"

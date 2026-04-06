@@ -1,0 +1,19 @@
+[Unit]
+Description=IP sets for iptables
+Before=iptables.service
+Before=ip6tables.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/ipset/ipset.start-stop start
+ExecStop=/usr/libexec/ipset/ipset.start-stop stop
+ExecReload=/usr/libexec/ipset/ipset.start-stop reload
+# Save current ipset entries on stop.
+#   Value: yes|no,  default: no
+# Saves all ipsets to /etc/sysconfig/ipset if ipset gets stopped
+Environment=IPSET_SAVE_ON_STOP=no
+EnvironmentFile=-/etc/sysconfig/ipset-config
+
+[Install]
+WantedBy=basic.target

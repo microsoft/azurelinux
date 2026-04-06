@@ -1,0 +1,58 @@
+From 593cb078d4e91591aa3be823715f11888b21f8e4 Mon Sep 17 00:00:00 2001
+From: Douglas Gilbert <dgilbert@interlog.com>
+Date: Tue, 17 Oct 2023 20:41:37 +0000
+Subject: [PATCH 2/3] rescan-scsi-bus.sh: remove
+ /tmp/rescan-scsi-mpath-info.txt;
+ https://github.com/doug-gilbert/sg3_utils/pull/44.diff
+X-Patchwork-Bot: notify
+
+git-svn-id: https://svn.bingwo.ca/repos/sg3_utils/trunk@1056 6180dd3e-e324-4e3e-922d-17de1ae2f315
+---
+ scripts/rescan-scsi-bus.sh | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/rescan-scsi-bus.sh b/scripts/rescan-scsi-bus.sh
+index 7d74d90f..188d071c 100755
+--- a/scripts/rescan-scsi-bus.sh
++++ b/scripts/rescan-scsi-bus.sh
+@@ -7,7 +7,16 @@
+ VERSION="20230413"
+ SCAN_WILD_CARD=4294967295
+ 
+-TMPLUNINFOFILE="/tmp/rescan-scsi-mpath-info.txt"
++CLEANUP=:
++trap 'eval "$CLEANUP"' 0
++TMPD=$(mktemp -d /tmp/rsb.XXXXXXXX)
++[ "$TMPD" ] || {
++  echo failed to create temporary directory >&2
++  exit 1
++}
++CLEANUP='rm -rf "$TMPD";'"$CLEANUP"
++
++TMPLUNINFOFILE="$TMPD/rescan-scsi-mpath-info.txt"
+ 
+ setcolor ()
+ {
+@@ -818,9 +827,9 @@ findremapped()
+   mpaths=""
+   local tmpfile=
+ 
+-  tmpfile=$(mktemp /tmp/rescan-scsi-bus.XXXXXXXX 2> /dev/null)
++  tmpfile=$(mktemp "$TMPD/rescan-scsi-bus.XXXXXXXX" 2> /dev/null)
+   if [ -z "$tmpfile" ] ; then
+-    tmpfile="/tmp/rescan-scsi-bus.$$"
++    tmpfile="$TMPD/rescan-scsi-bus.$$"
+     rm -f $tmpfile
+   fi
+ 
+@@ -874,7 +883,6 @@ findremapped()
+     echo "$SCSISTR"
+     incrchgd "$hctl"
+   done < $tmpfile
+-  rm -f $tmpfile
+ 
+   if [ -n "$mp_enable" ] && [ -n "$mpaths" ] ; then
+     echo "Updating multipath device mappings"
+-- 
+2.44.0
+

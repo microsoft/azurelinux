@@ -1,0 +1,15 @@
+--- socket2-0.5.10/Cargo.toml	1970-01-01T00:00:01+00:00
++++ socket2-0.5.10/Cargo.toml	2025-07-20T16:50:33.788827+00:00
+@@ -86,12 +86,3 @@
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.171"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.52"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Networking_WinSock",
+-    "Win32_System_IO",
+-    "Win32_System_Threading",
+-    "Win32_System_WindowsProgramming",
+-]

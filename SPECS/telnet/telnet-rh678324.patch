@@ -1,0 +1,21 @@
+diff -up netkit-telnet-0.17/telnetd/telnetd.c.rh678324 netkit-telnet-0.17/telnetd/telnetd.c
+--- netkit-telnet-0.17/telnetd/telnetd.c.rh678324	2011-06-28 14:51:09.996726296 +0200
++++ netkit-telnet-0.17/telnetd/telnetd.c	2011-06-28 14:52:38.212726283 +0200
+@@ -92,7 +92,7 @@ extern void usage(void);
+ int
+ main(int argc, char *argv[], char *env[])
+ {
+-	struct sockaddr from;
++	struct sockaddr_storage from;
+ 	int on = 1;
+ 	socklen_t fromlen;
+ 	register int ch;
+@@ -344,7 +344,7 @@ main(int argc, char *argv[], char *env[]
+ 
+ 	openlog("telnetd", LOG_PID | LOG_ODELAY, LOG_DAEMON);
+ 	fromlen = sizeof (from);
+-	if (getpeername(s, &from, &fromlen) < 0) {
++	if (getpeername(s, (struct sockaddr *)&from, &fromlen) < 0) {
+ 		fprintf(stderr, "%s: ", progname);
+ 		perror("getpeername");
+ 		_exit(1);

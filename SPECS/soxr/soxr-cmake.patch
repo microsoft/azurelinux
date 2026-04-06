@@ -1,0 +1,24 @@
+Index: soxr-0.1.3-Source/CMakeLists.txt
+===================================================================
+--- soxr-0.1.3-Source.orig/CMakeLists.txt
++++ soxr-0.1.3-Source/CMakeLists.txt
+@@ -225,12 +225,18 @@ endif ()
+ 
+ 
+ # Installation configuration:
++if (UNIX)
++	include(GNUInstallDirs)
++	set (BIN_INSTALL_DIR ${CMAKE_INSTALL_FULL_BINDIR})
++	set (LIB_INSTALL_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
++	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR})
++endif()
+ 
+ if (NOT DEFINED BIN_INSTALL_DIR)
+   set (BIN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/bin")
+ endif ()
+ if (NOT DEFINED LIB_INSTALL_DIR)
+-  set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
++  set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib}")
+ endif ()
+ if (NOT DEFINED INCLUDE_INSTALL_DIR)
+   set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")

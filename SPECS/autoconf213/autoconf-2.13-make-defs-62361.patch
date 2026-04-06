@@ -1,0 +1,54 @@
+diff -u autoconf-2.13/acgeneral.m4~ autoconf-2.13/acgeneral.m4
+--- autoconf-2.13/acgeneral.m4~	Wed May 15 14:47:12 2002
++++ autoconf-2.13/acgeneral.m4	Wed May 15 14:47:12 2002
+@@ -2156,20 +2156,38 @@
+ dnl AC_OUTPUT_MAKE_DEFS()
+ define(AC_OUTPUT_MAKE_DEFS,
+ [# Transform confdefs.h into DEFS.
+-dnl Using a here document instead of a string reduces the quoting nightmare.
+ # Protect against shell expansion while executing Makefile rules.
+ # Protect against Makefile macro expansion.
+-cat > conftest.defs <<\EOF
+-changequote(<<, >>)dnl
+-s%<<#define>> \([A-Za-z_][A-Za-z0-9_]*\) *\(.*\)%-D\1=\2%g
+-s%[ 	`~<<#>>$^&*(){}\\|;'"<>?]%\\&%g
+-s%\[%\\&%g
+-s%\]%\\&%g
+-s%\$%$$%g
+-changequote([, ])dnl
+-EOF
+-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
+-rm -f conftest.defs
++#
++# If the first sed substitution is executed (which looks for macros that
++# take arguments), then we branch to the quote section.  Otherwise,
++# look for a macro that doesn't take arguments.
++cat >confdef2opt.sed <<\_ACEOF
++changequote(<<, >>)dnl
++t clear
++: clear
++s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	(][^ 	(]*([^)]*)\)[ 	]*\(.*\),-D\1=\2,g
++t quote
++s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	][^ 	]*\)[ 	]*\(.*\),-D\1=\2,g
++t quote
++d
++: quote
++s,[ 	`~#$^&*(){}\\|;'"<>?],\\&,g
++s,\[,\\&,g
++s,\],\\&,g
++s,\$,$$,g
++p
++changequote([, ])dnl
++_ACEOF
++# We use echo to avoid assuming a particular line-breaking character.
++# The extra dot is to prevent the shell from consuming trailing
++# line-breaks from the sub-command output.  A line-break within
++# single-quotes doesn't work because, if this script is created in a
++# platform that uses two characters for line-breaks (e.g., DOS), tr
++# would break.
++ac_LF_and_DOT=`echo; echo .`
++DEFS=`sed -n -f confdef2opt.sed confdefs.h | tr "$ac_LF_and_DOT" ' .'`
++rm -f confdef2opt.sed
+ ])
+ 
+ dnl Do the variable substitutions to create the Makefiles or whatever.

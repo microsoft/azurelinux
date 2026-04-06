@@ -1,0 +1,13 @@
+--- wayland-client-0.31.11/Cargo.toml	1970-01-01T00:00:01+00:00
++++ wayland-client-0.31.11/Cargo.toml	2025-11-09T22:59:17.066476+00:00
+@@ -54,10 +54,6 @@
+ name = "list_globals_no_dispatch"
+ path = "examples/list_globals_no_dispatch.rs"
+ 
+-[[example]]
+-name = "simple_window"
+-path = "examples/simple_window.rs"
+-
+ [dependencies.bitflags]
+ version = "2"
+ 

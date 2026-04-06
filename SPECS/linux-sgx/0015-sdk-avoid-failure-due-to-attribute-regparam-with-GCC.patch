@@ -1,0 +1,83 @@
+From b8d2a529940b6b56cac86a3a495e7731cff1e73d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 6 Jan 2026 18:31:32 +0000
+Subject: [PATCH 15/17] sdk: avoid failure due to attribute(regparam) with GCC
+ 16
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+GCC >= 16 now warns about use of attribute(regparam) on x86_64 targets.
+The attribute was always ignored on x86_64, so only had effect on i686
+and thus the warning can be safely ignored.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ psw/urts/linux/Makefile               | 4 ++--
+ sdk/simulation/trtssim/linux/Makefile | 4 ++--
+ sdk/simulation/urtssim/linux/Makefile | 4 ++--
+ sdk/trts/Makefile                     | 1 +
+ 4 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/psw/urts/linux/Makefile b/psw/urts/linux/Makefile
+index 3d08ee5c..1e76d8d5 100644
+--- a/psw/urts/linux/Makefile
++++ b/psw/urts/linux/Makefile
+@@ -36,10 +36,10 @@ CXXFLAGS += -DDISABLE_TRACE
+ CFLAGS += -DDISABLE_TRACE
+ endif
+ 
+-CXXFLAGS += -fPIC -Werror -g
++CXXFLAGS += -fPIC -Werror -Wno-attributes -g
+ CXXFLAGS += $(ADDED_INC)
+ 
+-CFLAGS += -fPIC -Werror -g
++CFLAGS += -fPIC -Werror -Wno-attributes -g
+ CFLAGS += $(ADDED_INC)
+ 
+ VTUNE_DIR = $(LINUX_EXTERNAL_DIR)/vtune/linux
+diff --git a/sdk/simulation/trtssim/linux/Makefile b/sdk/simulation/trtssim/linux/Makefile
+index 16e2a96d..7e545c1a 100644
+--- a/sdk/simulation/trtssim/linux/Makefile
++++ b/sdk/simulation/trtssim/linux/Makefile
+@@ -41,8 +41,8 @@ CPPFLAGS += -I$(COMMON_DIR)/inc/         \
+ 
+ CFLAGS   += $(ENCLAVE_CFLAGS)
+ ASFLAGS  := -DSE_SIM -Werror $(CFLAGS)
+-CFLAGS   += -DSE_SIM -Werror -fasynchronous-unwind-tables
+-CXXFLAGS += -DSE_SIM -Werror $(ENCLAVE_CXXFLAGS)\
++CFLAGS   += -DSE_SIM -Werror -Wno-attributes -fasynchronous-unwind-tables
++CXXFLAGS += -DSE_SIM -Werror -Wno-attributes $(ENCLAVE_CXXFLAGS)\
+             -fno-exceptions -fno-rtti
+ 
+ SIM_DIR    := $(CUR_DIR)/../..
+diff --git a/sdk/simulation/urtssim/linux/Makefile b/sdk/simulation/urtssim/linux/Makefile
+index dd716f2b..5d64c8ac 100644
+--- a/sdk/simulation/urtssim/linux/Makefile
++++ b/sdk/simulation/urtssim/linux/Makefile
+@@ -39,8 +39,8 @@ CXXFLAGS += -DDISABLE_TRACE
+ CFLAGS += -DDISABLE_TRACE
+ endif
+ 
+-CXXFLAGS += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)
+-CFLAGS   += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)
++CXXFLAGS += -fPIC -DSE_SIM -Werror -Wno-attributes -g $(CET_FLAGS)
++CFLAGS   += -fPIC -DSE_SIM -Werror -Wno-attributes -g $(CET_FLAGS)
+ 
+ CPPFLAGS += $(ADDED_INC) #for ubuntu 11 and later version
+ CPPFLAGS += -I$(COMMON_DIR)/inc                \
+diff --git a/sdk/trts/Makefile b/sdk/trts/Makefile
+index 5750aece..4766ef51 100644
+--- a/sdk/trts/Makefile
++++ b/sdk/trts/Makefile
+@@ -39,6 +39,7 @@ CPPFLAGS += -I$(COMMON_DIR)/inc          \
+ 
+ CXXFLAGS += $(ENCLAVE_CXXFLAGS) \
+             -Werror         \
++            -Wno-attributes \
+             -fno-exceptions \
+             -fno-rtti
+ 
+-- 
+2.52.0
+

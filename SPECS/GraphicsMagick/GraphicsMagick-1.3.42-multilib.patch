@@ -1,0 +1,43 @@
+diff -up GraphicsMagick-1.3.42/Magick++/bin/GraphicsMagick++-config.in.multilib GraphicsMagick-1.3.42/Magick++/bin/GraphicsMagick++-config.in
+--- GraphicsMagick-1.3.42/Magick++/bin/GraphicsMagick++-config.in.multilib	2024-02-27 18:06:19.540034131 -0700
++++ GraphicsMagick-1.3.42/Magick++/bin/GraphicsMagick++-config.in	2024-02-27 18:08:09.207596284 -0700
+@@ -36,13 +36,13 @@ while test $# -gt 0; do
+       echo '@CXX@'
+       ;;
+     --cxxflags)
+-      echo '@CXXFLAGS@'
++      echo ''
+       ;;
+     --ldflags)
+-      echo '@MAGICK_API_LDFLAGS@'
++      echo ''
+       ;;
+     --libs)
+-      echo '-lGraphicsMagick++ @MAGICK_API_LIBS@'
++      echo '-lGraphicsMagick++'
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up GraphicsMagick-1.3.42/magick/GraphicsMagick-config.in.multilib GraphicsMagick-1.3.42/magick/GraphicsMagick-config.in
+--- GraphicsMagick-1.3.42/magick/GraphicsMagick-config.in.multilib	2024-02-27 18:06:19.540034131 -0700
++++ GraphicsMagick-1.3.42/magick/GraphicsMagick-config.in	2024-02-27 18:07:36.006426095 -0700
+@@ -33,16 +33,16 @@ while test $# -gt 0; do
+       echo '@CC@'
+       ;;
+     --cflags)
+-      echo '@CFLAGS@'
++      echo ''
+       ;;
+     --cppflags)
+       echo '@MAGICK_API_CPPFLAGS@'
+       ;;
+     --ldflags)
+-      echo '@MAGICK_API_LDFLAGS@'
++      echo ''
+       ;;
+     --libs)
+-      echo '@MAGICK_API_LIBS@'
++      echo '-lGraphicsMagick'
+       ;;
+     *)
+       echo "${usage}" 1>&2

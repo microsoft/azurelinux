@@ -1,0 +1,17 @@
+--- hickory-client-0.24.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hickory-client-0.24.4/Cargo.toml	2025-04-28T21:31:39.916511+00:00
+@@ -137,14 +137,6 @@
+     "macros",
+ ]
+ 
+-[dev-dependencies.tracing-subscriber]
+-version = "0.3"
+-features = [
+-    "std",
+-    "fmt",
+-    "env-filter",
+-]
+-
+ [features]
+ backtrace = ["hickory-proto/backtrace"]
+ dns-over-https = ["hickory-proto/dns-over-https"]

@@ -1,0 +1,24 @@
+From b0c98be668622a16dde1b90762b7e49dc8e41497 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 19 Apr 2025 10:11:54 -0700
+Subject: [PATCH] rocm-smi fix empty return
+
+---
+ src/rocm_smi_utils.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/rocm_smi_utils.cc b/src/rocm_smi_utils.cc
+index f9633abb14d4..366cfb3bf3f8 100755
+--- a/src/rocm_smi_utils.cc
++++ b/src/rocm_smi_utils.cc
+@@ -1073,6 +1073,7 @@ std::string splitString(std::string str, char delim) {
+     tokens.push_back(token);
+     return token;  // return 1st match
+   }
++  return "";
+ }
+ 
+ static std::string pt_rng_Mhz(std::string title, rsmi_range *r) {
+-- 
+2.48.1
+

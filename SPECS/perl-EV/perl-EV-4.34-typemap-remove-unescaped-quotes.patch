@@ -1,0 +1,18 @@
+https://github.com/Perl/perl5/issues/22353#issuecomment-2198256977
+
+diff -Nurp a/typemap b/typemap
+--- a/typemap	2025-05-07 18:15:00.715697457 -0500
++++ b/typemap	2025-05-07 18:17:18.381278764 -0500
+@@ -37,9 +37,9 @@ T_LOOP
+ 
+ T_WATCHER
+ 	if (!(SvROK ($arg) && SvOBJECT (SvRV ($arg))
+-              && (SvSTASH (SvRV ($arg)) == stash_" . ($type =~ /ev_(\S+)/, "$1") . "
+-                  || sv_derived_from ($arg, \"EV::" . ($type =~ /ev_(\S+)/, ucfirst "$1") . "\"))))
+-          croak (\"object is not of type EV::" . ($type =~ /ev_(\S+)/, ucfirst "$1") . "\");
++              && (SvSTASH (SvRV ($arg)) == stash_${ ($type =~ /ev_(\S+)/, \"$1") }
++                  || sv_derived_from ($arg, \"EV::${ ($type =~ /ev_(\S+)/, \ucfirst "$1") }\"))))
++          croak (\"object is not of type EV::${ ($type =~ /ev_(\S+)/, \ucfirst "$1") }\");
+ 	$var = ($type)SvPVX (SvRV ($arg));
+ 
+ OUTPUT

@@ -1,0 +1,37 @@
+diff -ur seaborn-0.12.2/seaborn/distributions.py seaborn-0.12.2.husl/seaborn/distributions.py
+--- seaborn-0.12.2/seaborn/distributions.py	2022-12-18 14:05:24.586145000 +0100
++++ seaborn-0.12.2.husl/seaborn/distributions.py	2023-04-30 11:30:14.851162112 +0200
+@@ -35,7 +35,7 @@
+     _default_color,
+ )
+ from .palettes import color_palette
+-from .external import husl
++import husl
+ from .external.kde import gaussian_kde
+ from ._docstrings import (
+     DocstringComponents,
+Sólo en seaborn-0.12.2/seaborn/external: husl.py
+diff -ur seaborn-0.12.2/seaborn/palettes.py seaborn-0.12.2.husl/seaborn/palettes.py
+--- seaborn-0.12.2/seaborn/palettes.py	2022-12-30 19:31:23.450194400 +0100
++++ seaborn-0.12.2.husl/seaborn/palettes.py	2023-04-30 11:29:40.522606874 +0200
+@@ -4,7 +4,7 @@
+ import numpy as np
+ import matplotlib as mpl
+ 
+-from .external import husl
++import husl
+ 
+ from .utils import desaturate, get_color_cycle
+ from .colors import xkcd_rgb, crayons
+diff -ur seaborn-0.12.2/tests/test_palettes.py seaborn-0.12.2.husl/tests/test_palettes.py
+--- seaborn-0.12.2/tests/test_palettes.py	2022-10-26 13:04:53.732054200 +0200
++++ seaborn-0.12.2.husl/tests/test_palettes.py	2023-04-30 11:29:21.413297799 +0200
+@@ -6,7 +6,7 @@
+ import numpy.testing as npt
+ 
+ from seaborn import palettes, utils, rcmod
+-from seaborn.external import husl
++import husl
+ from seaborn._compat import get_colormap
+ from seaborn.colors import xkcd_rgb, crayons
+ 

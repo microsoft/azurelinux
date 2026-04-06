@@ -1,0 +1,146 @@
+From 5f21983f6472b26693babea4d6ca6b95a7dc7b05 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 10/50] openssh-8.7p1-redhat
+
+---
+ ssh_config            |  7 +++++++
+ ssh_config_redhat     | 18 ++++++++++++++++++
+ sshd_config           |  8 ++++++++
+ sshd_config.0         |  6 +++---
+ sshd_config.5         |  2 +-
+ sshd_config_redhat    | 18 ++++++++++++++++++
+ sshd_config_redhat_cp |  7 +++++++
+ 7 files changed, 62 insertions(+), 4 deletions(-)
+ create mode 100644 ssh_config_redhat
+ create mode 100644 sshd_config_redhat
+ create mode 100644 sshd_config_redhat_cp
+
+diff --git a/ssh_config b/ssh_config
+index cc566356..18169187 100644
+--- a/ssh_config
++++ b/ssh_config
+@@ -44,3 +44,10 @@
+ #   ProxyCommand ssh -q -W %h:%p gateway.example.com
+ #   RekeyLimit 1G 1h
+ #   UserKnownHostsFile ~/.ssh/known_hosts.d/%k
++#
++# This system is following system-wide crypto policy.
++# To modify the crypto properties (Ciphers, MACs, ...), create a  *.conf
++#  file under  /etc/ssh/ssh_config.d/  which will be automatically
++# included below. For more information, see manual page for
++#  update-crypto-policies(8)  and  ssh_config(5).
++Include /etc/ssh/ssh_config.d/*.conf
+diff --git a/ssh_config_redhat b/ssh_config_redhat
+new file mode 100644
+index 00000000..8b1b5902
+--- /dev/null
++++ b/ssh_config_redhat
+@@ -0,0 +1,18 @@
++# The options here are in the "Match final block" to be applied as the last
++# options and could be potentially overwritten by the user configuration
++Match final all
++	# Follow system-wide Crypto Policy, if defined:
++	Include /etc/crypto-policies/back-ends/openssh.config
++
++	GSSAPIAuthentication yes
++
++# If this option is set to yes then remote X11 clients will have full access
++# to the original X11 display. As virtually no X11 client supports the untrusted
++# mode correctly we set this to yes.
++	ForwardX11Trusted yes
++
++# rhbz#2352653 - export COLORTERM
++	SendEnv COLORTERM
++
++# Uncomment this if you want to use .local domain
++# Host *.local
+diff --git a/sshd_config b/sshd_config
+index 0f4a3a72..608203e4 100644
+--- a/sshd_config
++++ b/sshd_config
+@@ -10,6 +10,14 @@
+ # possible, but leave them commented.  Uncommented options override the
+ # default value.
+ 
++# To modify the system-wide sshd configuration, create a  *.conf  file under
++#  /etc/ssh/sshd_config.d/  which will be automatically included below
++Include /etc/ssh/sshd_config.d/*.conf
++
++# If you want to change the port on a SELinux system, you have to tell
++# SELinux about this change.
++# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
++#
+ #Port 22
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+diff --git a/sshd_config.0 b/sshd_config.0
+index 2f77b4f4..49349bb3 100644
+--- a/sshd_config.0
++++ b/sshd_config.0
+@@ -1219,9 +1219,9 @@ DESCRIPTION
+ 
+      SyslogFacility
+              Gives the facility code that is used when logging messages from
+-             sshd(8).  The possible values are: DAEMON, USER, AUTH, LOCAL0,
+-             LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.  The
+-             default is AUTH.
++             sshd(8).  The possible values are: DAEMON, USER, AUTH, AUTHPRIV,
++             LOCAL0, LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.
++             The default is AUTH.
+ 
+      TCPKeepAlive
+              Specifies whether the system should send TCP keepalive messages
+diff --git a/sshd_config.5 b/sshd_config.5
+index c0771737..035a50c8 100644
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -1942,7 +1942,7 @@ By default no subsystems are defined.
+ .It Cm SyslogFacility
+ Gives the facility code that is used when logging messages from
+ .Xr sshd 8 .
+-The possible values are: DAEMON, USER, AUTH, LOCAL0, LOCAL1, LOCAL2,
++The possible values are: DAEMON, USER, AUTH, AUTHPRIV, LOCAL0, LOCAL1, LOCAL2,
+ LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.
+ The default is AUTH.
+ .It Cm TCPKeepAlive
+diff --git a/sshd_config_redhat b/sshd_config_redhat
+new file mode 100644
+index 00000000..993a28d5
+--- /dev/null
++++ b/sshd_config_redhat
+@@ -0,0 +1,18 @@
++SyslogFacility AUTHPRIV
++
++KbdInteractiveAuthentication no
++
++GSSAPIAuthentication yes
++GSSAPICleanupCredentials no
++
++UsePAM yes
++
++X11Forwarding yes
++
++# rhbz#2352653 - accept COLORTERM
++	AcceptEnv COLORTERM
++
++# It is recommended to use pam_motd in /etc/pam.d/sshd instead of PrintMotd,
++# as it is more configurable and versatile than the built-in version.
++PrintMotd no
++
+diff --git a/sshd_config_redhat_cp b/sshd_config_redhat_cp
+new file mode 100644
+index 00000000..1d592d13
+--- /dev/null
++++ b/sshd_config_redhat_cp
+@@ -0,0 +1,7 @@
++# This system is following system-wide crypto policy. The changes to
++# crypto properties (Ciphers, MACs, ...) will not have any effect in
++# this or following included files. To override some configuration option,
++# write it before this block or include it before this file.
++# Please, see manual pages for update-crypto-policies(8) and sshd_config(5).
++Include /etc/crypto-policies/back-ends/opensshserver.config
++
+-- 
+2.49.0
+

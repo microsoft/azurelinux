@@ -1,0 +1,207 @@
+## <summary>policy for nbdkit</summary>
+
+########################################
+## <summary>
+##    Execute nbdkit_exec_t in the nbdkit domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##    Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`nbdkit_domtrans',`
+	gen_require(`
+		type nbdkit_t, nbdkit_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, nbdkit_exec_t, nbdkit_t)
+')
+
+######################################
+## <summary>
+##    Execute nbdkit in the caller domain.
+## </summary>
+## <param name="domain">
+##    <summary>
+##    Domain allowed access.
+##    </summary>
+## </param>
+#
+interface(`nbdkit_exec',`
+	gen_require(`
+		type nbdkit_exec_t;
+	')
+    
+	corecmd_search_bin($1)
+	can_exec($1, nbdkit_exec_t)
+')
+
+########################################
+## <summary>
+##    Execute nbdkit in the nbdkit domain, and
+##    allow the specified role the nbdkit domain.
+## </summary>
+## <param name="domain">
+##    <summary>
+##    Domain allowed to transition
+##    </summary>
+## </param>
+## <param name="role">
+##    <summary>
+##    The role to be allowed the nbdkit domain.
+##    </summary>
+## </param>
+#
+interface(`nbdkit_run',`
+	gen_require(`
+		type nbdkit_t;
+		attribute_role nbdkit_roles;
+	')
+
+	nbdkit_domtrans($1)
+	roleattribute $2 nbdkit_roles;
+')
+
+########################################
+## <summary>
+##    Role access for nbdkit
+## </summary>
+## <param name="role">
+##    <summary>
+##    Role allowed access
+##    </summary>
+## </param>
+## <param name="domain">
+##    <summary>
+##    User domain for the role
+##    </summary>
+## </param>
+#
+interface(`nbdkit_role',`
+	gen_require(`
+		type nbdkit_t;
+		attribute_role nbdkit_roles;
+	')
+
+	roleattribute $1 nbdkit_roles;
+
+	nbdkit_domtrans($2)
+
+	ps_process_pattern($2, nbdkit_t)
+	allow $2 nbdkit_t:process { signull signal sigkill };
+')
+
+########################################
+## <summary>
+##	Allow attempts to connect to nbdkit
+##	with a unix stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`nbdkit_stream_connect',`
+	gen_require(`
+		type nbdkit_t;
+	')
+
+	allow $1 nbdkit_t:unix_stream_socket connectto;
+')
+
+########################################
+## <summary>
+##      Allow nbdkit_exec_t to be an entrypoint
+##      of the specified domain
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`nbdkit_entrypoint',`
+        gen_require(`
+                type nbdkit_exec_t;
+        ')
+        allow $1 nbdkit_exec_t:file entrypoint;
+')
+
+# ----------------------------------------------------------------------
+# RWMJ: See:
+# https://issues.redhat.com/browse/RHEL-5174?focusedId=23387259&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-23387259
+# Remove this when virt.if gets updated.
+
+########################################
+#
+# Interface compatibility blocks
+#
+# The following definitions ensure compatibility with distribution policy
+# versions that do not contain given interfaces (epel, or older Fedora
+# releases).
+# Each block tests for existence of given interface and defines it if needed.
+#
+
+########################################
+## <summary>
+##      Read and write to svirt_image dirs.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+ifndef(`virt_rw_svirt_image_dirs',`
+	interface(`virt_rw_svirt_image_dirs',`
+		gen_require(`
+			type svirt_image_t;
+		')
+
+		allow $1 svirt_image_t:dir rw_dir_perms;
+	')
+')
+
+########################################
+## <summary>
+##      Create svirt_image sock_files.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+ifndef(`virt_create_svirt_image_sock_files',`
+	interface(`virt_create_svirt_image_sock_files',`
+		gen_require(`
+			type svirt_image_t;
+		')
+
+		allow $1 svirt_image_t:sock_file create_sock_file_perms;
+	')
+')
+
+########################################
+## <summary>
+## 	Read and write virtlogd pipes.
+## </summary>
+## <param name="domain">
+## <summary>
+##      Domain allowed access.
+## </summary>
+## </param>
+#
+ifndef(`virtlogd_rw_pipes',`
+	interface(`virtlogd_rw_pipes',`
+	        gen_require(`
+	                type virtlogd_t;
+	        ')
+
+	        allow $1 virtlogd_t:fifo_file rw_fifo_file_perms;
+	')
+')

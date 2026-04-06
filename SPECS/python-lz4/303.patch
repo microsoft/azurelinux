@@ -1,0 +1,26 @@
+From 53819a9e78615bf61dd6d8f2c92274af0c397c2e Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 29 May 2025 12:06:30 +0200
+Subject: [PATCH] Correct the import of _compression for Python 3.14
+
+This is backwards compatible with all supported versions of Python.
+---
+ lz4/frame/__init__.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lz4/frame/__init__.py b/lz4/frame/__init__.py
+index 00f3e64..60bf7dc 100644
+--- a/lz4/frame/__init__.py
++++ b/lz4/frame/__init__.py
+@@ -25,9 +25,9 @@
+ __doc__ = _doc
+ 
+ try:
+-    import _compression   # Python 3.6 and later
++    import compression._common._streams as _compression  # Python 3.14
+ except ImportError:
+-    from . import _compression
++    import _compression   # Python 3.6 - 3.13
+ 
+ 
+ BLOCKSIZE_DEFAULT = _BLOCKSIZE_DEFAULT

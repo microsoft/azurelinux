@@ -1,0 +1,44 @@
+From c6b3af7a1e9119e08a640d9cd93dcb0c984149ee Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 5 Mar 2025 10:13:08 +0100
+Subject: [PATCH 2/3] ISO C23: Port getcwd.m4 to ISO C23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some confgure tests failed because of function arguments missing from
+the prototypes:
+
+    configure:16105: checking whether getcwd (NULL, 0) allocates memory for result
+    configure:16162: gcc -o conftest -g -O2   conftest.c  >&5
+    conftest.c:186:16: error: conflicting types for 'getcwd'; have 'char *(void)'
+      186 |          char *getcwd ();
+	  |                ^~~~~~
+    In file included from conftest.c:181:
+    /usr/include/unistd.h:531:14: note: previous declaration of 'getcwd' with type 'char *(char *, size_t)'
+
+This patch fixes it.
+
+Maintainer is encouraged to rebase the m4 files to the latest gnulib.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ m4/getcwd.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/getcwd.m4 b/m4/getcwd.m4
+index b9fbcec..6f24b14 100644
+--- a/m4/getcwd.m4
++++ b/m4/getcwd.m4
+@@ -21,7 +21,7 @@ AC_DEFUN([gl_FUNC_GETCWD_NULL],
+ #         include <direct.h>
+ #        endif
+ #        ifndef getcwd
+-         char *getcwd ();
++         char *getcwd (char *buf, size_t size);
+ #        endif
+ ]], [[
+ #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+-- 
+2.48.1
+

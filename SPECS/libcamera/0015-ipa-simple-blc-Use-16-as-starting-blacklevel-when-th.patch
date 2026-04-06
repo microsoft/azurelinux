@@ -1,0 +1,54 @@
+From 20cb17a2d178bb6b2f2322bbb52841be58fac304 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Mon, 29 Sep 2025 14:30:42 +0200
+Subject: [PATCH 15/15] ipa: simple: blc: Use 16 as starting blacklevel when
+ there is no sensor-info
+
+At the moment the blc code uses 255 as starting blacklevel for sensors
+where there is no blacklevel info in the sensor-helper.
+
+There are a number of issues with this:
+
+1. When the first frame is bad (e.g. mostly white) which happens sometimes
+the initial blacklevel will be kept leading to a divide by zero problem
+in the AGC code (this divide by 0 problem is avoided in the AGC code by
+not running the AGC algorithm).
+
+2. Not runnning the AGC algorithm means that the gain/exposure do not
+change, which causes the BLC algorithm to not run on the next frames,
+so we keep the bad 255 blacklevel which stops AGC from running which
+stops BLC from running. Leaving things stuck at a 255 blacklevel
+resulting in an unusuable image.
+
+3. Sometimes the auto-blc code leads to an unrealistic high
+blacklevel detection which results in lower image quality.
+
+To fix this start with a blacklevel of 16, which is the highest
+(4096 / 256) blacklevel used for any sensor listing a blackLevel_
+value in the sensor-helper class.
+
+Note 2. could alternatively be fixed by disabling the check for
+exposure/gain changes when the blacklevel is unrealistic high,
+but that still leaves the other problems.
+
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/blc.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ipa/simple/algorithms/blc.cpp b/src/ipa/simple/algorithms/blc.cpp
+index ec71e154e..370385afc 100644
+--- a/src/ipa/simple/algorithms/blc.cpp
++++ b/src/ipa/simple/algorithms/blc.cpp
+@@ -43,7 +43,7 @@ int BlackLevel::configure(IPAContext &context,
+ 	if (definedLevel_.has_value())
+ 		context.configuration.black.level = definedLevel_;
+ 	context.activeState.blc.level =
+-		context.configuration.black.level.value_or(255);
++		context.configuration.black.level.value_or(16);
+ 	return 0;
+ }
+ 
+-- 
+2.51.0
+

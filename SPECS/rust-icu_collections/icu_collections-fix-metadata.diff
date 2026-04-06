@@ -1,0 +1,19 @@
+--- icu_collections-2.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ icu_collections-2.1.1/Cargo.toml	2025-10-29T09:49:19.328574+00:00
+@@ -125,9 +125,6 @@
+ ]
+ default-features = false
+ 
+-[dev-dependencies.iai]
+-version = "0.1.1"
+-
+ [dev-dependencies.postcard]
+ version = "1.0.3"
+ features = ["alloc"]
+@@ -145,6 +142,3 @@
+ version = "0.8.0"
+ features = ["parse"]
+ default-features = false
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"

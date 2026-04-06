@@ -1,0 +1,47 @@
+--- openmotif-2.3.0/doc/man/man1/mwm.1.no_X11R6	2005-12-09 15:08:21.000000000 +0100
++++ openmotif-2.3.0/doc/man/man1/mwm.1	2005-12-09 15:09:06.000000000 +0100
+@@ -366,7 +366,7 @@
+ database\&. This database is built from the following sources\&. They are listed
+ in order of precedence, low to high:
+ .PP
+-\fB/usr/X11R6/lib/X11/app-defaults/Mwm\fP
++\fB/usr/share/X11/app-defaults/Mwm\fP
+ .PP
+ \fB$HOME/Mwm\fP
+ .PP
+@@ -376,7 +376,7 @@
+ .PP
+ \fBmwm\fP command line options
+ .PP
+-The file names \fB/usr/X11R6/lib/X11/app-defaults/Mwm\fP and \fB$HOME/Mwm\fP represent customary locations for these files\&. The actual
++The file names \fB/usr/share/X11/app-defaults/Mwm\fP and \fB$HOME/Mwm\fP represent customary locations for these files\&. The actual
+ location of the system-wide class resource file may depend on the \fBXFILESEARCHPATH\fP environment variable and the
+ current language environment\&. The actual location of the user-specific class
+ resource file may depend on the \fBXUSERFILESEARCHPATH\fP and \fBXAPPLRESDIR\fP
+@@ -595,7 +595,7 @@
+ NameClassValue TypeDefault
+ autoKeyFocusAutoKeyFocusT/FT
+ autoRaiseDelayAutoRaiseDelaymillisec500
+-bitmap-Bitmap-directory/usr/X11R6/include-
++bitmap-Bitmap-directory/usr/include-
+ DirectoryDirectory/X11/bitmaps
+ clientAutoPlaceClientAutoPlaceT/FT
+ colormapFocus-ColormapFocus-stringkeyboard
+@@ -650,7 +650,7 @@
+ This resource identifies a directory to be searched for bitmaps referenced
+ by \fBmwm\fP resources\&. This directory is searched if a bitmap
+ is specified without an absolute pathname\&. The default value for this resource
+-is \fB/usr/X11R6/include/X11/bitmaps\fP\&. The directory \fB/usr/X11R6/include/X11/bitmaps\fP
++is \fB/usr/include/X11/bitmaps\fP\&. The directory \fB/usr/include/X11/bitmaps\fP
+ represents the customary locations for this directory\&. The actual
+ location of this directory may vary on some systems\&. If the bitmap is not
+ found in the specified directory, \fBXBMLANGPATH\fP is searched\&.
+@@ -1348,7 +1348,7 @@
+ .PP
+ \fB/etc/X11/mwm/system\&.mwmrc\fP
+ .PP
+-\fB/usr/X11R6/lib/X11/app-defaults/Mwm\fP
++\fB/usr/share/X11/app-defaults/Mwm\fP
+ .PP
+ \fB$HOME/Mwm\fP
+ .PP

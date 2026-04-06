@@ -1,0 +1,194 @@
+From e4e41aa0167b13f4d6c06c5037042bfee0f1bd9e Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 21 Jan 2025 13:22:44 +0100
+Subject: [PATCH] Upgrade to 3.91
+
+---
+ Cwd.pm                     | 2 +-
+ Cwd.xs                     | 4 ----
+ lib/File/Spec.pm           | 4 +++-
+ lib/File/Spec/AmigaOS.pm   | 2 +-
+ lib/File/Spec/Cygwin.pm    | 2 +-
+ lib/File/Spec/Epoc.pm      | 2 +-
+ lib/File/Spec/Functions.pm | 4 ++--
+ lib/File/Spec/Mac.pm       | 2 +-
+ lib/File/Spec/OS2.pm       | 2 +-
+ lib/File/Spec/Unix.pm      | 2 +-
+ lib/File/Spec/Win32.pm     | 4 ++--
+ 11 files changed, 14 insertions(+), 16 deletions(-)
+
+diff --git a/Cwd.pm b/Cwd.pm
+index dbf08a6..549aa94 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.89';
++our $VERSION = '3.91';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+diff --git a/Cwd.xs b/Cwd.xs
+index ca8639d..bca575c 100644
+--- a/Cwd.xs
++++ b/Cwd.xs
+@@ -292,7 +292,6 @@ return FALSE
+ #define getcwd_sv(a) Perl_getcwd_sv(aTHX_ a)
+ int Perl_getcwd_sv(pTHX_ SV *sv)
+ {
+-#ifndef PERL_MICRO
+ 
+     SvTAINTED_on(sv);
+ 
+@@ -430,9 +429,6 @@ int Perl_getcwd_sv(pTHX_ SV *sv)
+   }
+ #endif
+ 
+-#else
+-    return FALSE;
+-#endif
+ }
+ 
+ #endif
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index fc10c0f..7e1d76f 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -2,7 +2,9 @@ package File::Spec;
+ 
+ use strict;
+ 
+-our $VERSION = '3.88';
++# Keep $VERSION consistent in all *.pm files in this distribution, including
++# Cwd.pm.
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index 3fc3c98..c500d23 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index fb3eaaa..ef1c9ec 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index 9391f3a..1bc81f6 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index a0d8641..6068506 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+@@ -72,7 +72,7 @@ File::Spec::Functions - portably perform operations on file names
+ =head1 SYNOPSIS
+ 
+ 	use File::Spec::Functions;
+-	$x = catfile('a','b');
++	my $x = catfile('a', 'b');
+ 
+ =head1 DESCRIPTION
+ 
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 5f5cca9..08d7fdb 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index eea5328..d8533c0 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index 2d5af10..dbe36fb 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index 292c2f8..f9225e6 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.88';
++our $VERSION = '3.91';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+@@ -249,7 +249,7 @@ Unlike just splitting the directories on the separator, leading empty and
+ trailing directory entries can be returned, because these are significant
+ on some OSs. So,
+ 
+-    File::Spec->splitdir( "/a/b/c" );
++    File::Spec->splitdir( "/a/b//c/" );
+ 
+ Yields:
+ 
+-- 
+2.48.1
+

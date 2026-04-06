@@ -1,0 +1,17 @@
+Suppress GCC 14 allocation size warning in lcptools-v2/pconf_legacy.c
+
+Submitted upstream: <https://sourceforge.net/p/tboot/mailman/message/58730242/>
+
+diff --git a/lcptools-v2/pconf_legacy.c b/lcptools-v2/pconf_legacy.c
+index 443b5cd5525b9fe1..5ebc6c451f7008b1 100644
+--- a/lcptools-v2/pconf_legacy.c
++++ b/lcptools-v2/pconf_legacy.c
+@@ -324,7 +324,7 @@ static lcp_policy_element_t *create(void)
+             ERROR("Error: no pcrs were selected.\n");
+             return NULL;
+         }
+-        digest = malloc(SHA1_DIGEST_SIZE);
++        digest = malloc(sizeof(*digest));
+         if (digest == NULL) {
+             ERROR("Error: failed to allocate memory for digest buffer.\n");
+             return NULL;

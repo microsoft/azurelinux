@@ -1,0 +1,31 @@
+From 1231fbdd894570afc0081ca6c36675b6e2581c7f Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Thu, 7 Sep 2023 10:13:38 +0200
+Subject: [PATCH 13/17] build: Check for NetComposeOfflineDomainJoin in samba's
+ netapi library
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ configure.ac | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index af62507..1912019 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -95,6 +95,12 @@ AC_CHECK_LIB(ldap, ldap_init_fd, [true], [
+ AC_SUBST(LDAP_LIBS)
+ AC_SUBST(LDAP_CFLAGS)
+ 
++# -------------------------------------------------------------------
++# samba
++
++AC_CHECK_LIB([netapi], [NetComposeOfflineDomainJoin],
++	     [AC_DEFINE(SAMBA_NETAPI_HAS_COMPOSEODJ, 1, [Samba NetApi supports composeodj])])
++
+ # -------------------------------------------------------------------
+ # resolv
+ 
+-- 
+2.47.0
+

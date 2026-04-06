@@ -1,0 +1,1046 @@
+From b02ea5beb945bb2fb56aaeccc23cd1f35c77c7c9 Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Mon, 20 Jan 2025 14:16:38 +0100
+Subject: [PATCH 7/9] feat: add openssl module
+
++ fix(ossl): build failure bellow resolved
+
+  non-PLT reloc for symbol defined in shared library and accessed from executable
+
+and other compiler issues (PIE).
+
++ fix(ossl): copy executables for the test suite
+
+and also fix CFLAGS in case of std=c99.
+---
+ Makefile                                      |  25 +-
+ modules.d/01fips/module-setup.sh              |   4 +
+ modules.d/99openssl/module-setup.sh           |  31 ++
+ modules.d/99openssl/openssl-check.sh          |  29 ++
+ src/ossl/Makefile                             |  35 +++
+ src/ossl/src/ossl-config.c                    | 144 +++++++++
+ src/ossl/src/ossl-files.c                     | 280 ++++++++++++++++++
+ src/ossl/tests/config/escapes.cnf             |  11 +
+ src/ossl/tests/config/escapes.cnf.expected    |  12 +
+ src/ossl/tests/config/included-file.noncnf    |   2 +
+ .../tests/config/includes.1.d/includes1.cnf   |   2 +
+ .../tests/config/includes.1.d/includes1.conf  |   2 +
+ .../tests/config/includes.1.d/nonconf.bak     |   2 +
+ src/ossl/tests/config/includes.2.d/main.cnf   |   4 +
+ .../includes.2.d/subincludes.d/subconf.cnf    |   2 +
+ src/ossl/tests/config/includes.cnf            |   6 +
+ src/ossl/tests/config/includes.cnf.expected   |  12 +
+ .../leading-and-trailing-whitespace.cnf       |   6 +
+ ...ading-and-trailing-whitespace.cnf.expected |   7 +
+ src/ossl/tests/config/order.cnf               |  21 ++
+ src/ossl/tests/config/order.cnf.expected      |  16 +
+ src/ossl/tests/config/variables.cnf           |  33 +++
+ src/ossl/tests/config/variables.cnf.expected  |  27 ++
+ src/ossl/tests/files/engines.cnf              |  22 ++
+ src/ossl/tests/files/engines.cnf.expected     |   4 +
+ src/ossl/tests/files/providers.cnf            |  31 ++
+ src/ossl/tests/files/providers.cnf.expected   |   4 +
+ 27 files changed, 770 insertions(+), 4 deletions(-)
+ create mode 100755 modules.d/99openssl/module-setup.sh
+ create mode 100755 modules.d/99openssl/openssl-check.sh
+ create mode 100644 src/ossl/Makefile
+ create mode 100644 src/ossl/src/ossl-config.c
+ create mode 100644 src/ossl/src/ossl-files.c
+ create mode 100644 src/ossl/tests/config/escapes.cnf
+ create mode 100644 src/ossl/tests/config/escapes.cnf.expected
+ create mode 100644 src/ossl/tests/config/included-file.noncnf
+ create mode 100644 src/ossl/tests/config/includes.1.d/includes1.cnf
+ create mode 100644 src/ossl/tests/config/includes.1.d/includes1.conf
+ create mode 100644 src/ossl/tests/config/includes.1.d/nonconf.bak
+ create mode 100644 src/ossl/tests/config/includes.2.d/main.cnf
+ create mode 100644 src/ossl/tests/config/includes.2.d/subincludes.d/subconf.cnf
+ create mode 100644 src/ossl/tests/config/includes.cnf
+ create mode 100644 src/ossl/tests/config/includes.cnf.expected
+ create mode 100644 src/ossl/tests/config/leading-and-trailing-whitespace.cnf
+ create mode 100644 src/ossl/tests/config/leading-and-trailing-whitespace.cnf.expected
+ create mode 100644 src/ossl/tests/config/order.cnf
+ create mode 100644 src/ossl/tests/config/order.cnf.expected
+ create mode 100644 src/ossl/tests/config/variables.cnf
+ create mode 100644 src/ossl/tests/config/variables.cnf.expected
+ create mode 100644 src/ossl/tests/files/engines.cnf
+ create mode 100644 src/ossl/tests/files/engines.cnf.expected
+ create mode 100644 src/ossl/tests/files/providers.cnf
+ create mode 100644 src/ossl/tests/files/providers.cnf.expected
+
+diff --git a/Makefile b/Makefile
+index 5ce30d5f..dd12e8cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -50,7 +50,7 @@ manpages = $(man1pages) $(man5pages) $(man7pages) $(man8pages)
+ 
+ .PHONY: install clean archive test all check AUTHORS CONTRIBUTORS doc
+ 
+-all: dracut.pc dracut-install src/skipcpio/skipcpio dracut-util
++all: dracut.pc dracut-install src/skipcpio/skipcpio dracut-util ossl-config ossl-files
+ 
+ %.o : %.c
+ 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(KMOD_CFLAGS) $< -o $@
+@@ -88,6 +88,15 @@ util/util: $(UTIL_OBJECTS)
+ dracut-util: src/util/util
+ 	cp -a $< $@
+ 
++ossl:
++	$(MAKE) -C src/ossl
++
++ossl-config: ossl
++	cp -a src/ossl/src/ossl-config $@
++
++ossl-files: ossl
++	cp -a src/ossl/src/ossl-files $@
++
+ .PHONY: indent-c
+ indent-c:
+ 	astyle -n --quiet --options=.astylerc $(wildcard *.[ch] */*.[ch] src/*/*.[ch])
+@@ -210,15 +219,21 @@ endif
+ 			$(DESTDIR)$(systemdsystemunitdir)/initrd.target.wants/$$i; \
+ 		done \
+ 	fi
+-	if [ -f src/install/dracut-install ]; then \
++	if [ -r src/install/dracut-install ]; then \
+ 		install -m 0755 src/install/dracut-install $(DESTDIR)$(pkglibdir)/dracut-install; \
+ 	fi
+-	if [ -f src/skipcpio/skipcpio ]; then \
++	if [ -r src/skipcpio/skipcpio ]; then \
+ 		install -m 0755 src/skipcpio/skipcpio $(DESTDIR)$(pkglibdir)/skipcpio; \
+ 	fi
+-	if [ -f dracut-util ]; then \
++	if [ -r dracut-util ]; then \
+ 		install -m 0755 dracut-util $(DESTDIR)$(pkglibdir)/dracut-util; \
+ 	fi
++	if [ -r ossl-config ]; then \
++		install -m 0755 ossl-config $(DESTDIR)$(pkglibdir)/ossl-config; \
++	fi
++	if [ -r ossl-files ]; then \
++		install -m 0755 ossl-files $(DESTDIR)$(pkglibdir)/ossl-files; \
++	fi
+ ifeq ($(enable_dracut_cpio),yes)
+ 	install -m 0755 dracut-cpio $(DESTDIR)$(pkglibdir)/dracut-cpio
+ endif
+@@ -251,7 +266,9 @@ clean:
+ 	$(RM) dracut.pc
+ 	$(RM) dracut-cpio src/dracut-cpio/target/release/dracut-cpio*
+ 	$(RM) -rf build/ doc_site/modules/ROOT/pages/man/*
++	$(RM) ossl-files ossl-config
+ 	$(MAKE) -C test clean
++	$(MAKE) -C src/ossl clean
+ 
+ syncheck:
+ 	@ret=0;for i in dracut-initramfs-restore.sh modules.d/*/*.sh; do \
+diff --git a/modules.d/01fips/module-setup.sh b/modules.d/01fips/module-setup.sh
+index ed4ef20b..312acd94 100755
+--- a/modules.d/01fips/module-setup.sh
++++ b/modules.d/01fips/module-setup.sh
+@@ -5,6 +5,10 @@ check() {
+     return 255
+ }
+ 
++depends() {
++    echo openssl
++}
++
+ # called by dracut
+ installkernel() {
+     local _fipsmodules _mod _bootfstype
+diff --git a/modules.d/99openssl/module-setup.sh b/modules.d/99openssl/module-setup.sh
+new file mode 100755
+index 00000000..8614f254
+--- /dev/null
++++ b/modules.d/99openssl/module-setup.sh
+@@ -0,0 +1,31 @@
++#!/bin/bash
++
++check() {
++    return 255
++}
++
++install() {
++
++    local ossl_files openssl_cnf initrd_openssl_cnf
++
++    ossl_files="${dracutbasedir}/ossl-files"
++
++    openssl_cnf="$($ossl_files --config)"
++
++    initrd_openssl_cnf="${initdir}/${openssl_cnf}"
++
++    if [[ ! -r $openssl_cnf ]]; then
++        dfatal "'$ossl_files --config' does not return a path!!"
++        exit 1
++    fi
++
++    # ossl-files gives us one line per file
++    # shellcheck disable=SC2046
++    inst_multiple -o \
++        /etc/crypto-policies/back-ends/opensslcnf.config \
++        $($ossl_files --engines --providers)
++
++    mkdir -p "${initrd_openssl_cnf%/*}"
++
++    "${dracutbasedir}/ossl-config" > "${initrd_openssl_cnf}"
++}
+diff --git a/modules.d/99openssl/openssl-check.sh b/modules.d/99openssl/openssl-check.sh
+new file mode 100755
+index 00000000..67951f45
+--- /dev/null
++++ b/modules.d/99openssl/openssl-check.sh
+@@ -0,0 +1,29 @@
++#!/bin/sh
++
++eok() {
++
++    {
++        [ "$1" -eq 0 ] && echo OK || echo FAIL
++
++        echo
++
++    } 2> /dev/null
++}
++
++echo
++
++set -x
++
++openssl list -providers
++
++eok "$?"
++
++#openssl s_client -connect “$dns_server_ip:$dns_server_port” -servername “$dns_server_name” </dev/null
++
++#openssl s_client -connect “$test_hostname:$test_port” </dev/null
++
++#openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out localhost.key
++
++#openssl req -x509 -new -key localhost.key -subj /CN=localhost -days 365 -addext "subjectAltName = DNS:localhost" -out localhost.crt
++
++#openssl s_server -cert localhost.crt -key localhost.key -port “$test_port”
+diff --git a/src/ossl/Makefile b/src/ossl/Makefile
+new file mode 100644
+index 00000000..86cf14b3
+--- /dev/null
++++ b/src/ossl/Makefile
+@@ -0,0 +1,35 @@
++.PHONY: all clean tests
++
++CFLAGS ?= -std=c99 -Wall -Werror -pedantic -D_XOPEN_SOURCE=600
++CRYPTO_FLAGS = -lcrypto -Wl,-pie -Wl,-z,now -fPIE -pie -fPIC
++TARGETS = src/ossl-config src/ossl-files
++
++TESTS_CONFIG = $(wildcard tests/config/*.cnf)
++TESTS_FILES = $(wildcard tests/files/*.cnf)
++
++all: $(TARGETS)
++
++clean:
++	$(RM) $(TARGETS)
++	$(RM) tests/config/*.1 tests/config/*.2
++	$(RM) tests/files/*.1
++
++%: %.c
++	$(CC) $(CFLAGS) $(CRYPTO_FLAGS) -o $@ $<
++
++test: $(TARGETS)
++	@for TEST in $(TESTS_CONFIG); do \
++		echo "Test $$TEST..."; \
++		OPENSSL_CONF="$$TEST" src/ossl-config >"$$TEST.1" && \
++		OPENSSL_CONF="$$TEST.1" src/ossl-config >"$$TEST.2" && \
++		diff -u "$$TEST.expected" "$$TEST.1" && \
++		diff -u <(sed 1d "$$TEST.1") <(sed 1d "$$TEST.2") && \
++		echo "PASS" || (echo "FAIL"; exit 1); \
++	done
++	
++	@for TEST in $(TESTS_FILES); do \
++		echo "Test $$TEST..."; \
++		OPENSSL_CONF="$$TEST" src/ossl-files --engines --providers >"$$TEST.1" && \
++		diff -u "$$TEST.expected" "$$TEST.1" && \
++		echo "PASS" || (echo "FAIL"; exit 1); \
++	done
+diff --git a/src/ossl/src/ossl-config.c b/src/ossl/src/ossl-config.c
+new file mode 100644
+index 00000000..4324341c
+--- /dev/null
++++ b/src/ossl/src/ossl-config.c
+@@ -0,0 +1,144 @@
++// cc -std=c99 -Wall -Werror -Wno-error=deprecated-declarations -pedantic -D_XOPEN_SOURCE=600 -o ossl-config ossl-config.c -lcrypto
++
++#include <openssl/conf.h>
++#include <openssl/err.h>
++#include <openssl/safestack.h>
++
++#include <stdbool.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
++#  define FALLTHROUGH [[fallthrough]]
++#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ >= 12)
++#  define FALLTHROUGH __attribute__((fallthrough))
++#else
++#  define FALLTHROUGH ((void) 0)
++#endif
++
++#define cleanup(type) \
++    __attribute__((cleanup(type##_ptr_free)))
++
++#define cleanupfunc(type, func) \
++    static void type##_ptr_free(type **ptr) { \
++        func(*ptr); \
++        *ptr = NULL; \
++    }
++
++typedef STACK_OF(OPENSSL_CSTRING) ossl_sk_cstring_t;
++
++cleanupfunc(char, OPENSSL_free)
++cleanupfunc(CONF, NCONF_free)
++cleanupfunc(ossl_sk_cstring_t, sk_OPENSSL_CSTRING_free)
++
++/**
++ * Print the given value to stdout escaped for the OpenSSL configuration file
++ * format.
++ */
++static void print_escaped_value(const char *value) {
++	for (const char *p = value; *p; p++) {
++		switch (*p) {
++			case '"':
++			case '\'':
++			case '#':
++			case '\\':
++			case '$':
++				putchar('\\');
++				putchar(*p);
++				break;
++			case '\n':
++				fputs("\\n", stdout);
++				break;
++			case '\r':
++				fputs("\\r", stdout);
++				break;
++			case '\b':
++				fputs("\\b", stdout);
++				break;
++			case '\t':
++				fputs("\\t", stdout);
++				break;
++			case ' ':
++				if (p == value || p[1] == '\0') {
++					/* Quote spaces if they are the first or last char of the
++					 * value. We could quote the entire string (and it would
++					 * certainly produce nicer output), but in quoted strings
++					 * the escape sequences for \n, \r, \t, and \b do not work.
++					 * To make sure we're producing correct results we'd thus
++					 * have to selectively not use those in quoted strings and
++					 * close and re-open the quotes if they appear, which is
++					 * more trouble than adding the quotes just around the
++					 * first and last leading and trailing space. */
++					fputs("\" \"", stdout);
++					break;
++				}
++				FALLTHROUGH;
++			default:
++				putchar(*p);
++				break;
++		}
++	}
++}
++
++/**
++ * Print all values in in the configuration section identified by section_name to stdout.
++ */
++static void print_section(const CONF *cnf, OPENSSL_CSTRING section_name) {
++	STACK_OF(CONF_VALUE) *values = NCONF_get_section(cnf, section_name);
++	for (int idx = 0; idx < sk_CONF_VALUE_num(values); idx++) {
++		CONF_VALUE *value = sk_CONF_VALUE_value(values, idx);
++		printf("%s = ", value->name);
++		print_escaped_value(value->value);
++		putchar('\n');
++	}
++}
++
++/**
++ * Parse the default OpenSSL configuration file (or the one specified in the
++ * OPENSSL_CONF environment variable) and write it back to stdout in
++ * a canonical format with all includes and variables expanded.
++ */
++int main(int argc, char *argv[]) {
++	char *configfile cleanup(char) = CONF_get1_default_config_file();
++	if (configfile == NULL) {
++		ERR_print_errors_fp(stderr);
++		exit(EXIT_FAILURE);
++	}
++
++	CONF *cnf cleanup(CONF) = NCONF_new(NULL);
++	if (cnf == NULL) {
++		ERR_print_errors_fp(stderr);
++		exit(EXIT_FAILURE);
++	}
++
++	long eline = 0;
++	if (NCONF_load(cnf, configfile, &eline) == 0) {
++		fprintf(stderr, "Error on line %ld of configuration file\n", eline);
++		ERR_print_errors_fp(stderr);
++		exit(EXIT_FAILURE);
++	}
++
++	STACK_OF(OPENSSL_CSTRING) *sections cleanup(ossl_sk_cstring_t) = NCONF_get_section_names(cnf);
++	if (sections == NULL) {
++		ERR_print_errors_fp(stderr);
++		exit(EXIT_FAILURE);
++	}
++
++	printf("# This configuration file was linarized and expanded from %s\n", configfile);
++
++	int default_section_idx = sk_OPENSSL_CSTRING_find(sections, "default");
++	if (default_section_idx != -1) {
++		print_section(cnf, "default");
++	}
++	for (int idx = 0; idx < sk_OPENSSL_CSTRING_num(sections); idx++) {
++		if (idx == default_section_idx) {
++			continue;
++		}
++		OPENSSL_CSTRING section_name = sk_OPENSSL_CSTRING_value(sections, idx);
++		printf("\n[%s]\n", section_name);
++		print_section(cnf, section_name);
++	}
++
++	return EXIT_SUCCESS;
++}
+diff --git a/src/ossl/src/ossl-files.c b/src/ossl/src/ossl-files.c
+new file mode 100644
+index 00000000..4f252800
+--- /dev/null
++++ b/src/ossl/src/ossl-files.c
+@@ -0,0 +1,280 @@
++// cc -std=c99 -Wall -Werror -Wno-error=deprecated-declarations -pedantic -D_XOPEN_SOURCE=600 -o ossl-files ossl-files.c -lcrypto
++
++#include <openssl/conf.h>
++#include <openssl/crypto.h>
++#include <openssl/err.h>
++#include <openssl/safestack.h>
++
++#include <getopt.h>
++
++#include <stdbool.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++#define cleanup(type) \
++    __attribute__((cleanup(type##_ptr_free)))
++
++#define cleanupfunc(type, func) \
++    static void type##_ptr_free(type **ptr) { \
++        func(*ptr); \
++        *ptr = NULL; \
++    }
++
++typedef STACK_OF(OPENSSL_CSTRING) ossl_sk_cstring_t;
++
++cleanupfunc(char, OPENSSL_free)
++cleanupfunc(CONF, NCONF_free)
++
++typedef enum flag {
++	CONFIG_FILE = 1,
++	ENGINES,
++	PROVIDERS,
++	PKCS11_MODULES,
++} flag_t;
++
++static const OPENSSL_CSTRING get_option(STACK_OF(CONF_VALUE) *section, const OPENSSL_CSTRING name) {
++	for (size_t idx = 0; idx < sk_CONF_VALUE_num(section); ++idx) {
++		const CONF_VALUE *value = sk_CONF_VALUE_value(section, idx);
++		if (strcmp(name, value->name) == 0) {
++			return value->value;
++		}
++	}
++
++	return NULL;
++}
++
++/**
++ * Locate a section in the OpenSSL configuration file given its path
++ * components, separated by dots.
++ *
++ * Returns the STACK_OF(CONF_VALUE) that represents the section, if it exists
++ * and NULL otherwise.
++ */
++static STACK_OF(CONF_VALUE) *locate_section(const CONF* cnf, const OPENSSL_CSTRING path) {
++	STACK_OF(CONF_VALUE) *sect = NCONF_get_section(cnf, "default");
++	if (sect == NULL)
++		return NULL;
++
++	char *pathbuf cleanup(char) = OPENSSL_strdup(path);
++	char *curpath = pathbuf;
++	while (curpath) {
++		char *split = strchr(curpath, '.');
++		char *nextpath = NULL;
++
++		if (split != NULL) {
++			*split = '\0';
++			nextpath = split + 1;
++		}
++
++		const OPENSSL_CSTRING next_section_name = get_option(sect, curpath);
++		if (next_section_name == NULL)
++			return NULL;
++
++		sect = NCONF_get_section(cnf, next_section_name);
++		if (sect == NULL)
++			return NULL;
++
++		curpath = nextpath;
++	}
++
++	return sect;
++}
++
++static void list_providers(const CONF *cnf) {
++	const char *modulesdir = OPENSSL_info(OPENSSL_INFO_MODULES_DIR);
++
++	{
++		struct stat st;
++		size_t pathlen = strlen(modulesdir) + 1 /* "/" */ + strlen("fips.so") + 1;
++		char pathbuf[pathlen];
++
++		snprintf(pathbuf, pathlen, "%s/fips.so", modulesdir);
++		pathbuf[pathlen - 1] = '\0';
++
++		if (stat(pathbuf, &st) == 0) {
++			/* Print the path to the FIPS provider if it exists on disk,
++			 * regardless of whether it is enabled or not. This is because some
++			 * distributions (like Fedora and RHEL) auto-enable the FIPS
++			 * provider if the kernel command line contains fips=1. */
++			puts(pathbuf);
++		}
++	}
++
++	STACK_OF(CONF_VALUE) *providers_sect = locate_section(cnf, "openssl_conf.providers");
++	if (providers_sect == NULL)
++		return;
++
++	for (size_t idx = 0; idx < sk_CONF_VALUE_num(providers_sect); ++idx) {
++		const CONF_VALUE *value = sk_CONF_VALUE_value(providers_sect, idx);
++		/* The section name in the providers section is typically the basename
++		 * of the loadable module, unless the section for this provider
++		 * contains a 'module' option. */
++		const OPENSSL_CSTRING provider_name = value->name;
++		const OPENSSL_CSTRING section_name = value->value;
++
++		if (strcmp(provider_name, "default") == 0
++				|| strcmp(provider_name, "base") == 0
++				|| strcmp(provider_name, "fips") == 0) {
++			/* This is either a builtin provider, which does not exist on disk,
++			 * or it was handled earlier. */
++			continue;
++		}
++
++		STACK_OF(CONF_VALUE) *section = NCONF_get_section(cnf, section_name);
++		if (section == NULL) {
++			printf("%s/%s.so\n", modulesdir, provider_name);
++		} else {
++			OPENSSL_CSTRING module_path = get_option(section, "module");
++			if (module_path) {
++				if (*module_path == '/') {
++					puts(module_path);
++				} else {
++					printf("%s/%s\n", modulesdir, module_path);
++				}
++			} else {
++				printf("%s/%s.so\n", modulesdir, provider_name);
++			}
++		}
++	}
++}
++
++static void list_engines(const CONF *cnf) {
++	const char *enginesdir = OPENSSL_info(OPENSSL_INFO_ENGINES_DIR);
++
++	STACK_OF(CONF_VALUE) *engines_sect = locate_section(cnf, "openssl_conf.engines");
++	if (engines_sect == NULL)
++		return;
++
++	for (size_t idx = 0; idx < sk_CONF_VALUE_num(engines_sect); ++idx) {
++		const CONF_VALUE *value = sk_CONF_VALUE_value(engines_sect, idx);
++		const OPENSSL_CSTRING section_name = value->value;
++
++		STACK_OF(CONF_VALUE) *section = NCONF_get_section(cnf, section_name);
++		if (section == NULL)
++			continue;
++		OPENSSL_CSTRING dynamic_path = get_option(section, "dynamic_path");
++		if (dynamic_path == NULL)
++			continue;
++
++		if (*dynamic_path == '/') {
++			puts(dynamic_path);
++		} else {
++			printf("%s/%s\n", enginesdir, dynamic_path);
++		}
++	}
++}
++
++
++/**
++ * Parse the default OpenSSL configuration file (or the one specified in the
++ * OPENSSL_CONF environment variable) and write it back to stdout in
++ * a canonical format with all includes and variables expanded.
++ */
++int main(int argc, char *argv[]) {
++	struct option long_options[] = {
++		{"config",         no_argument, NULL, CONFIG_FILE},
++		{"engines",        no_argument, NULL, ENGINES},
++		{"providers",      no_argument, NULL, PROVIDERS},
++		{"help",           no_argument, NULL, 'h'},
++		{NULL,             0,           NULL, 0},
++	};
++	int chosen_options[sizeof(long_options) / sizeof(*long_options) - 2] = {0};
++
++	for (size_t idx = 0; idx < sizeof(chosen_options) / sizeof(*chosen_options); idx++) {
++		long_options[idx].flag = &chosen_options[idx];
++	}
++
++	int c;
++	char *configfile cleanup(char) = NULL;
++	while (1) {
++		c = getopt_long(argc, argv, "", long_options, NULL);
++		switch (c) {
++			case -1:
++				// end of options
++				goto options_parsed;
++				break;
++			case 0:
++				/* option detected, we use flags to react, so no need for
++				 * custom code here. */
++				break;
++			case 'h':
++				// --help output requested
++				fprintf(stderr, "Usage: %s OPTIONS\n\n", argv[0]);
++				fputs(
++					"OPTIONS are:\n"
++					"  --config\n"
++					"    Print the path of the OpenSSL configuration file on\n"
++					"    this system\n"
++					"  --engines\n"
++					"    Print the path of any OpenSSL ENGINEs configured in\n"
++					"    the configuration file\n"
++					"  --providers\n"
++					"    Print the path of any OpenSSL providers configured in\n"
++					"    the configuration file\n"
++					"  --help\n"
++					"    Print this help output\n",
++					stderr
++				);
++				return EXIT_FAILURE;
++				break;
++			case '?':
++			case ':':
++				// error, getopt(3) already printed a message
++				return EXIT_FAILURE;
++				break;
++			default:
++				fprintf(stderr, "getopt(3) returned unexpected character code 0%o\n", c);
++				return EXIT_FAILURE;
++				break;
++		}
++	}
++options_parsed:
++
++	configfile = CONF_get1_default_config_file();
++	if (configfile == NULL) {
++		ERR_print_errors_fp(stderr);
++		return EXIT_FAILURE;
++	}
++
++	CONF *cnf cleanup(CONF) = NCONF_new(NULL);
++	if (cnf == NULL) {
++		ERR_print_errors_fp(stderr);
++		return EXIT_FAILURE;
++	}
++
++	long eline = 0;
++	if (NCONF_load(cnf, configfile, &eline) == 0) {
++		fprintf(stderr, "Error on line %ld of configuration file\n", eline);
++		ERR_print_errors_fp(stderr);
++		return EXIT_FAILURE;
++	}
++
++	bool any_chosen = false;
++	for (size_t idx = 0; idx < sizeof(chosen_options) / sizeof(*chosen_options); idx++) {
++		if (chosen_options[idx] != 0) {
++			any_chosen = true;
++		}
++		switch (chosen_options[idx]) {
++			case CONFIG_FILE:
++				puts(configfile);
++				break;
++			case ENGINES:
++				list_engines(cnf);
++				break;
++			case PROVIDERS:
++				list_providers(cnf);
++				break;
++			case PKCS11_MODULES:
++				break;
++		}
++	}
++
++	if (!any_chosen) {
++		fprintf(stderr, "No options were provided, so no output was produced. See --help for instructions.\n");
++		return EXIT_FAILURE;
++	}
++
++	return EXIT_SUCCESS;
++}
+diff --git a/src/ossl/tests/config/escapes.cnf b/src/ossl/tests/config/escapes.cnf
+new file mode 100644
+index 00000000..9fe2fbc8
+--- /dev/null
++++ b/src/ossl/tests/config/escapes.cnf
+@@ -0,0 +1,11 @@
++openssl_conf = openssl_init
++
++[test]
++0.recipient = "/C=FI/O=Insta # Demo/CN=Insta Demo CA"
++1.recipient = /C=FI/O=Insta \n Demo/CN=Insta Demo CA
++2.recipient = /C=FI/O=Insta \b Demo/CN=Insta Demo CA
++3.recipient = /C=FI/O=Insta \r Demo/CN=Insta Demo CA
++4.recipient = /C=FI/O=Insta \t Demo/CN=Insta Demo CA
++5.recipient = "/C=FI/O=Insta ' Demo/CN=Insta Demo CA"
++6.recipient = '/C=FI/O=Insta " Demo/CN=Insta Demo CA'
++7.recipient = /C=FI/O=Insta \\ Demo/CN=Insta Demo CA
+diff --git a/src/ossl/tests/config/escapes.cnf.expected b/src/ossl/tests/config/escapes.cnf.expected
+new file mode 100644
+index 00000000..eff959fc
+--- /dev/null
++++ b/src/ossl/tests/config/escapes.cnf.expected
+@@ -0,0 +1,12 @@
++# This configuration file was linarized and expanded from tests/config/escapes.cnf
++openssl_conf = openssl_init
++
++[test]
++0.recipient = /C=FI/O=Insta \# Demo/CN=Insta Demo CA
++1.recipient = /C=FI/O=Insta \n Demo/CN=Insta Demo CA
++2.recipient = /C=FI/O=Insta \b Demo/CN=Insta Demo CA
++3.recipient = /C=FI/O=Insta \r Demo/CN=Insta Demo CA
++4.recipient = /C=FI/O=Insta \t Demo/CN=Insta Demo CA
++5.recipient = /C=FI/O=Insta \' Demo/CN=Insta Demo CA
++6.recipient = /C=FI/O=Insta \" Demo/CN=Insta Demo CA
++7.recipient = /C=FI/O=Insta \\ Demo/CN=Insta Demo CA
+diff --git a/src/ossl/tests/config/included-file.noncnf b/src/ossl/tests/config/included-file.noncnf
+new file mode 100644
+index 00000000..51089f51
+--- /dev/null
++++ b/src/ossl/tests/config/included-file.noncnf
+@@ -0,0 +1,2 @@
++[included-file]
++present = true
+diff --git a/src/ossl/tests/config/includes.1.d/includes1.cnf b/src/ossl/tests/config/includes.1.d/includes1.cnf
+new file mode 100644
+index 00000000..44c17ecd
+--- /dev/null
++++ b/src/ossl/tests/config/includes.1.d/includes1.cnf
+@@ -0,0 +1,2 @@
++[includes1]
++cnf-file = present
+diff --git a/src/ossl/tests/config/includes.1.d/includes1.conf b/src/ossl/tests/config/includes.1.d/includes1.conf
+new file mode 100644
+index 00000000..c6e3c0c6
+--- /dev/null
++++ b/src/ossl/tests/config/includes.1.d/includes1.conf
+@@ -0,0 +1,2 @@
++[includes1]
++conf-file = present
+diff --git a/src/ossl/tests/config/includes.1.d/nonconf.bak b/src/ossl/tests/config/includes.1.d/nonconf.bak
+new file mode 100644
+index 00000000..f5835c63
+--- /dev/null
++++ b/src/ossl/tests/config/includes.1.d/nonconf.bak
+@@ -0,0 +1,2 @@
++[includes1]
++nonconf = not present
+diff --git a/src/ossl/tests/config/includes.2.d/main.cnf b/src/ossl/tests/config/includes.2.d/main.cnf
+new file mode 100644
+index 00000000..a9141010
+--- /dev/null
++++ b/src/ossl/tests/config/includes.2.d/main.cnf
+@@ -0,0 +1,4 @@
++[includes2]
++main = present
++
++.include tests/config/include.2.d/subincludes.d
+diff --git a/src/ossl/tests/config/includes.2.d/subincludes.d/subconf.cnf b/src/ossl/tests/config/includes.2.d/subincludes.d/subconf.cnf
+new file mode 100644
+index 00000000..9cbf6c7e
+--- /dev/null
++++ b/src/ossl/tests/config/includes.2.d/subincludes.d/subconf.cnf
+@@ -0,0 +1,2 @@
++[includes2]
++subconf = absent
+diff --git a/src/ossl/tests/config/includes.cnf b/src/ossl/tests/config/includes.cnf
+new file mode 100644
+index 00000000..fd243487
+--- /dev/null
++++ b/src/ossl/tests/config/includes.cnf
+@@ -0,0 +1,6 @@
++openssl_conf = openssl_init
++
++.include = tests/config/includes.1.d
++.include tests/config/includes.2.d
++.include tests/config/nonexistant.d
++.include tests/config/included-file.noncnf
+diff --git a/src/ossl/tests/config/includes.cnf.expected b/src/ossl/tests/config/includes.cnf.expected
+new file mode 100644
+index 00000000..519729f1
+--- /dev/null
++++ b/src/ossl/tests/config/includes.cnf.expected
+@@ -0,0 +1,12 @@
++# This configuration file was linarized and expanded from tests/config/includes.cnf
++openssl_conf = openssl_init
++
++[included-file]
++present = true
++
++[includes1]
++cnf-file = present
++conf-file = present
++
++[includes2]
++main = present
+diff --git a/src/ossl/tests/config/leading-and-trailing-whitespace.cnf b/src/ossl/tests/config/leading-and-trailing-whitespace.cnf
+new file mode 100644
+index 00000000..2801bd72
+--- /dev/null
++++ b/src/ossl/tests/config/leading-and-trailing-whitespace.cnf
+@@ -0,0 +1,6 @@
++openssl_conf = openssl_init
++
++[test]
++0.recipient = " /C=FI/O=Insta Demo/CN=Insta Demo CA"
++1.recipient = "/C=FI/O=Insta Demo/CN=Insta Demo CA "
++2.recipient = " /C=FI/O=Insta Demo/CN=Insta Demo CA "
+diff --git a/src/ossl/tests/config/leading-and-trailing-whitespace.cnf.expected b/src/ossl/tests/config/leading-and-trailing-whitespace.cnf.expected
+new file mode 100644
+index 00000000..3dd985cc
+--- /dev/null
++++ b/src/ossl/tests/config/leading-and-trailing-whitespace.cnf.expected
+@@ -0,0 +1,7 @@
++# This configuration file was linarized and expanded from tests/config/leading-and-trailing-whitespace.cnf
++openssl_conf = openssl_init
++
++[test]
++0.recipient = " "/C=FI/O=Insta Demo/CN=Insta Demo CA
++1.recipient = /C=FI/O=Insta Demo/CN=Insta Demo CA" "
++2.recipient = " "/C=FI/O=Insta Demo/CN=Insta Demo CA" "
+diff --git a/src/ossl/tests/config/order.cnf b/src/ossl/tests/config/order.cnf
+new file mode 100644
+index 00000000..89662a1a
+--- /dev/null
++++ b/src/ossl/tests/config/order.cnf
+@@ -0,0 +1,21 @@
++# vim:ft=conf
++openssl_conf = openssl_init
++
++[def]
++# Sections are alphabetically ordered
++0.recipient = 0
++
++[abc]
++# Order within sections is preserved, even if it isn't sorted
++7.recipient = 7
++6.recipient = 6
++4.recipient = 4
++3.recipient = 3
++5.recipient = 5
++2.recipient = 2
++1.recipient = 1
++0.recipient = 0
++
++[default]
++# The default section is consolidated and always printed first
++aaatest = value
+diff --git a/src/ossl/tests/config/order.cnf.expected b/src/ossl/tests/config/order.cnf.expected
+new file mode 100644
+index 00000000..50a62c90
+--- /dev/null
++++ b/src/ossl/tests/config/order.cnf.expected
+@@ -0,0 +1,16 @@
++# This configuration file was linarized and expanded from tests/config/order.cnf
++openssl_conf = openssl_init
++aaatest = value
++
++[abc]
++7.recipient = 7
++6.recipient = 6
++4.recipient = 4
++3.recipient = 3
++5.recipient = 5
++2.recipient = 2
++1.recipient = 1
++0.recipient = 0
++
++[def]
++0.recipient = 0
+diff --git a/src/ossl/tests/config/variables.cnf b/src/ossl/tests/config/variables.cnf
+new file mode 100644
+index 00000000..04916116
+--- /dev/null
++++ b/src/ossl/tests/config/variables.cnf
+@@ -0,0 +1,33 @@
++# vim:ft=conf
++openssl_conf = openssl_init
++
++default_var = ABC
++nested = "\${default_var}"
++
++[othersection]
++
++[test]
++# These should expand to ABC read from the default section
++0.recipient = ${default_var}
++1.recipient = $default_var
++2.recipient = $(default_var)
++# These should expand to DEF as the other section was explicitly referenced
++3.recipient = ${othersection::default_var}
++4.recipient = $othersection::default_var
++5.recipient = $(othersection::default_var)
++
++[test2]
++default_var = GHI
++# These should expand to GHI since the local section is always searched first 
++0.recipient = ${default_var}
++1.recipient = $default_var
++
++[test3]
++.pragma dollarid:on
++# Out of these, the first should contain the literal "$default_var", the others should expand
++0.recipient = literal$default_var
++1.recipient = expanded${default_var}
++2.recipient = expanded$(default_var)
++
++[test4]
++recipient = literal$nested
+diff --git a/src/ossl/tests/config/variables.cnf.expected b/src/ossl/tests/config/variables.cnf.expected
+new file mode 100644
+index 00000000..a2bccf23
+--- /dev/null
++++ b/src/ossl/tests/config/variables.cnf.expected
+@@ -0,0 +1,27 @@
++# This configuration file was linarized and expanded from tests/config/variables.cnf
++openssl_conf = openssl_init
++default_var = ABC
++nested = \${default_var}
++
++[othersection]
++
++[test]
++0.recipient = ABC
++1.recipient = ABC
++2.recipient = ABC
++3.recipient = ABC
++4.recipient = ABC
++5.recipient = ABC
++
++[test2]
++default_var = GHI
++0.recipient = GHI
++1.recipient = GHI
++
++[test3]
++0.recipient = literal\$default_var
++1.recipient = expandedABC
++2.recipient = expandedABC
++
++[test4]
++recipient = literal\$nested
+diff --git a/src/ossl/tests/files/engines.cnf b/src/ossl/tests/files/engines.cnf
+new file mode 100644
+index 00000000..5ca8be01
+--- /dev/null
++++ b/src/ossl/tests/files/engines.cnf
+@@ -0,0 +1,22 @@
++openssl_conf = openssl_init
++
++[openssl_init]
++engines = engines_sect
++
++[engines_sect]
++afalg = afalg_sect
++loader_attic = loader_attic_sect
++pkcs11 = pkcs11_sect
++
++[afalg_sect]
++dynamic_path = afalg.so
++
++[loader_attic_sect]
++dynamic_path = /usr/lib64/engines-3/loader_attic.so
++init = 1
++
++[pkcs11_sect]
++engine_id = pkcs11
++dynamic_path = /usr/lib64/engines-3/libpkcs11.so
++MODULE_PATH = opensc-pkcs11.so
++init = 1
+diff --git a/src/ossl/tests/files/engines.cnf.expected b/src/ossl/tests/files/engines.cnf.expected
+new file mode 100644
+index 00000000..2d60cc52
+--- /dev/null
++++ b/src/ossl/tests/files/engines.cnf.expected
+@@ -0,0 +1,4 @@
++/usr/lib64/engines-3/afalg.so
++/usr/lib64/engines-3/loader_attic.so
++/usr/lib64/engines-3/libpkcs11.so
++/usr/lib64/ossl-modules/fips.so
+diff --git a/src/ossl/tests/files/providers.cnf b/src/ossl/tests/files/providers.cnf
+new file mode 100644
+index 00000000..fee4c826
+--- /dev/null
++++ b/src/ossl/tests/files/providers.cnf
+@@ -0,0 +1,31 @@
++openssl_conf = openssl_init
++
++[openssl_init]
++providers = providers_sect
++
++[providers_sect]
++default = default_sect
++fips = fips_sect
++legacy = legacy_sect
++base = base_sect
++pkcs11 = pkcs11_sect
++oqs = oqs_sect
++
++[default_sect]
++activate = 1
++
++[fips_sect]
++activate = 1
++
++[legacy_sect]
++activate = 1
++
++[base_sect]
++activate = 1
++
++[pkcs11_sect]
++activate = 1
++
++[oqs_sect]
++activate = 1
++module = /usr/lib64/ossl-modules/oqsprovider.so.0.6.0
+diff --git a/src/ossl/tests/files/providers.cnf.expected b/src/ossl/tests/files/providers.cnf.expected
+new file mode 100644
+index 00000000..23b1b7de
+--- /dev/null
++++ b/src/ossl/tests/files/providers.cnf.expected
+@@ -0,0 +1,4 @@
++/usr/lib64/ossl-modules/fips.so
++/usr/lib64/ossl-modules/legacy.so
++/usr/lib64/ossl-modules/pkcs11.so
++/usr/lib64/ossl-modules/oqsprovider.so.0.6.0
+-- 
+2.49.0
+

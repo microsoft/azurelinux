@@ -1,0 +1,38 @@
+From 54324baab4e5b79aa1a3481d107bcda850dee926 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Fri, 3 Feb 2023 20:01:09 +0000
+Subject: [PATCH] Update to use jakarta.xml.bind package
+
+---
+ src/main/java/javax/ws/rs/core/Link.java | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/javax/ws/rs/core/Link.java b/src/main/java/javax/ws/rs/core/Link.java
+index 7265551..433ede9 100644
+--- a/src/main/java/javax/ws/rs/core/Link.java
++++ b/src/main/java/javax/ws/rs/core/Link.java
+@@ -47,9 +47,9 @@ import java.util.Map.Entry;
+ 
+ import javax.ws.rs.ext.RuntimeDelegate;
+ 
+-import javax.xml.bind.annotation.XmlAnyAttribute;
+-import javax.xml.bind.annotation.XmlAttribute;
+-import javax.xml.bind.annotation.adapters.XmlAdapter;
++import jakarta.xml.bind.annotation.XmlAnyAttribute;
++import jakarta.xml.bind.annotation.XmlAttribute;
++import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+ import javax.xml.namespace.QName;
+ 
+ /**
+@@ -500,7 +500,7 @@ public abstract class Link {
+     }
+ 
+     /**
+-     * <p>An implementation of JAXB {@link javax.xml.bind.annotation.adapters.XmlAdapter}
++     * <p>An implementation of JAXB {@link jakarta.xml.bind.annotation.adapters.XmlAdapter}
+      * that maps the JAX-RS {@link javax.ws.rs.core.Link} type to a value that can be
+      * marshalled and unmarshalled by JAXB. The following example shows how to use
+      * this adapter on a JAXB bean class:</p>
+-- 
+2.39.0
+

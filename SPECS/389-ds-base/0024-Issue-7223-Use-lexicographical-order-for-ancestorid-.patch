@@ -1,0 +1,35 @@
+From 7e575cc8cc6f1bf558f50ca0fc55145e469d60d2 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Fri, 13 Feb 2026 16:58:24 +0100
+Subject: [PATCH 1/2] Issue 7223 - Use lexicographical order for ancestorid
+ (#7256)
+
+Description:
+`ldbm_instance_create_default_indexes()` configured ancestorid with
+integerOrderingMatch in the in-memory attrinfo, but ancestorid on disk
+might be using lexicographic ordering (data before the upgrade or after
+ldif2db import).
+
+Relates: https://github.com/389ds/389-ds-base/issues/7223
+
+Reviewed by: @tbordaz (Thanks!)
+---
+ ldap/servers/slapd/back-ldbm/instance.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ldap/servers/slapd/back-ldbm/instance.c b/ldap/servers/slapd/back-ldbm/instance.c
+index 17bfc09a0..1569eb7ff 100644
+--- a/ldap/servers/slapd/back-ldbm/instance.c
++++ b/ldap/servers/slapd/back-ldbm/instance.c
+@@ -231,7 +231,7 @@ ldbm_instance_create_default_indexes(backend *be)
+      * ancestorid is special, there is actually no such attr type
+      * but we still want to use the attr index file APIs.
+      */
+-    e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch");
++    e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, 0);
+     attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+     slapi_entry_free(e);
+ 
+-- 
+2.52.0
+

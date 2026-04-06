@@ -1,0 +1,19 @@
+diff -pruN imsettings-1.8.4.orig/data/imsettings-functions.in imsettings-1.8.4/data/imsettings-functions.in
+--- imsettings-1.8.4.orig/data/imsettings-functions.in	2023-08-21 18:18:38.000000000 +0900
++++ imsettings-1.8.4/data/imsettings-functions.in	2023-08-22 12:45:23.717932630 +0900
+@@ -177,10 +177,11 @@ function is_qt_supported() {
+ }
+ 
+ function is_xim_supported() {
+-  [ -n "$IMSETTINGS_DISABLE_DESKTOP_CHECK" ] && return 0
+-  if check_imsettings_capability xim; then
+-    return 0
+-  fi
++## Disable XIM support
++#  [ -n "$IMSETTINGS_DISABLE_DESKTOP_CHECK" ] && return 0
++#  if check_imsettings_capability xim; then
++#    return 0
++#  fi
+ 
+   return 1
+ }

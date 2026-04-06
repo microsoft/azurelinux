@@ -1,0 +1,12 @@
+diff -Naur reqsign-aws-v4-2.0.0-original/src/sign_request.rs reqsign-aws-v4-2.0.0/src/sign_request.rs
+--- reqsign-aws-v4-2.0.0-original/src/sign_request.rs	2006-07-24 02:21:28.000000000 +0100
++++ reqsign-aws-v4-2.0.0/src/sign_request.rs	2025-10-23 22:43:22.942843533 +0100
+@@ -364,6 +364,8 @@
+     hmac_sha256(sign_service.as_slice(), "aws4_request".as_bytes())
+ }
+ 
++// Downstream-only: avoid a dev-dependency on aws-sigv4 and aws-credential-types
++#[cfg(any())]
+ #[cfg(test)]
+ mod tests {
+     use super::*;

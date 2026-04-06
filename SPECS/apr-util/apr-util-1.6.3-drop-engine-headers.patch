@@ -1,0 +1,23 @@
+diff --git a/crypto/apr_crypto_openssl.c b/crypto/apr_crypto_openssl.c
+index 34d0559..4069cf9 100644
+--- a/crypto/apr_crypto_openssl.c
++++ b/crypto/apr_crypto_openssl.c
+@@ -37,7 +37,6 @@
+ 
+ #include <openssl/evp.h>
+ #include <openssl/rand.h>
+-#include <openssl/engine.h>
+ #include <openssl/opensslv.h>
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000
+ #include <openssl/macros.h>
+@@ -92,6 +91,10 @@
+ #define APR_USE_OPENSSL_ENGINE_API 0
+ #endif
+ 
++#if APR_USE_OPENSSL_ENGINE_API
++#include <openssl/engine.h>
++#endif
++
+ #define LOG_PREFIX "apr_crypto_openssl: "
+ 
+ struct apr_crypto_t {

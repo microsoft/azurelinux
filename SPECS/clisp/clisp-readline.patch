@@ -1,0 +1,75 @@
+--- modules/readline/readline.lisp.orig	2024-12-28 00:47:59.000000000 -0700
++++ modules/readline/readline.lisp	2025-02-10 15:17:06.296266455 -0700
+@@ -126,7 +126,7 @@ name in ~/.inputrc. This is preferred wa
+   (:documentation "Get keymap with given name (e.g., emacs, vi)")
+   (:arguments (name c-string)) (:return-type keymap))
+ 
+-(def-call-out get-keymap-name (:name "rl_get_keymap_by_name") ; untested
++(def-call-out get-keymap-name (:name "rl_get_keymap_name") ; untested
+   (:arguments (keymap keymap)) (:return-type c-string))
+ 
+ ;;; Binding Keys
+@@ -255,7 +255,7 @@ name in ~/.inputrc. This is preferred wa
+ ;;; Redisplay
+ 
+ (def-call-out redisplay (:name "rl_redisplay")
+-  (:arguments) (:return-type int))
++  (:arguments) (:return-type nil))
+ 
+ (def-call-out forced-update-display (:name "rl_forced_update_display")
+   (:arguments) (:return-type int))
+@@ -308,7 +308,7 @@ name in ~/.inputrc. This is preferred wa
+ 
+ (def-call-out copy-text (:name "rl_copy_text") ; untested
+   (:arguments (start int) (end int))
+-  (:return-type int))
++  (:return-type c-string :malloc-free))
+ 
+ (def-call-out kill-text (:name "rl_kill_text") ; untested
+   (:arguments (start int) (end int))
+@@ -316,7 +316,7 @@ name in ~/.inputrc. This is preferred wa
+ 
+ (def-call-out push-macro-input (:name "rl_push_macro_input")
+   (:arguments (macro c-string))
+-  (:return-type int))
++  (:return-type nil))
+ 
+ ;;; Character input
+ 
+@@ -362,7 +362,7 @@ name in ~/.inputrc. This is preferred wa
+ 
+ (def-call-out extend-line-buffer (:name "rl_extend_line_buffer") ; untested
+   (:arguments (len int))
+-  (:return-type int))
++  (:return-type nil))
+ 
+ (def-call-out ding (:name "rl_ding")
+   (:arguments) (:return-type int))
+@@ -404,7 +404,7 @@ name in ~/.inputrc. This is preferred wa
+   (:return-type int))
+ 
+ (def-call-out clear-history (:name "rl_clear_history") ; untested
+-  (:arguments) (:return-type int))
++  (:arguments) (:return-type nil))
+ 
+ (def-call-out get-termcap (:name "rl_get_termcap") ; untested
+   (:arguments (cap c-string))
+@@ -647,10 +647,16 @@ and the completion character will be ins
+   (:documentation "reading multiple-key command"))
+ (def-c-const state-vicmdonce (:name "RL_STATE_VICMDONCE") ; 0x400000
+   (:documentation "entered vi command mode at least once"))
+-(def-c-const state-redisplaying (:name "RL_STATE_REDISPLAYING") ; 0x800000
++(def-c-const state-charsearch (:name "RL_STATE_CHARSEARCH") ; 0x800000
++  (:documentation "vi mode char search"))
++(def-c-const state-redisplaying (:name "RL_STATE_REDISPLAYING") ; 0x1000000
+   (:documentation "updating terminal display"))
+-(def-c-const state-done (:name "RL_STATE_DONE") ; 0x1000000
++(def-c-const state-done (:name "RL_STATE_DONE") ; 0x2000000
+   (:documentation "done; accepted line"))
++(def-c-const state-timeout (:name "RL_STATE_TIMEOUT") ; 0x4000000
++  (:documentation "done; timed out"))
++(def-c-const state-eof (:name "RL_STATE_EOF") ; 0x8000000
++  (:documentation "done; got eof on read"))
+ 
+ (def-c-const readerr ; (-2)
+   (:documentation " Input error; can be returned by (*rl_getc_function)

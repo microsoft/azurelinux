@@ -1,0 +1,80 @@
+diff --git a/Makefile.am b/Makefile.am
+index ddebb5b..913457f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -21,7 +21,9 @@ EXTRA_DIST = \
+ 	$(doc_DATA) \
+ 	autogen.sh \
+ 	config.rpath \
+-	libcupsfilters.pc.in
++	libcupsfilters.pc.in \
++	pdf.utf-8.heavy.in \
++	pdf.utf-8.simple.in
+ 
+ EXTRA_DIST += \
+ 	data/makePDFfromPS.sh \
+diff --git a/charset/pdf.utf-8.heavy b/charset/pdf.utf-8.heavy.in
+similarity index 98%
+rename from charset/pdf.utf-8.heavy
+rename to charset/pdf.utf-8.heavy.in
+index a610af0..6815388 100644
+--- a/charset/pdf.utf-8.heavy
++++ b/charset/pdf.utf-8.heavy.in
+@@ -36,5 +36,5 @@ charset utf8
+ 1E00 1EFF ltor single CourierNew CourierNew:bold CourierNew:italic CourierNew:bold:italic
+ 2000 21FF ltor single DejaVuSansMono DejaVuSansMono:bold DejaVuSansMono:oblique DejaVuSansMono:bold:oblique
+ 2200 23FF ltor single Symbol
+-3000 9FFF ltor double ARPLUMingCN
++3000 9FFF ltor double @CJKFONTS@
+ #0400 04FF ltor single FreeMono FreeMono:bold FreeMono:oblique FreeMono:bold:oblique
+diff --git a/charset/pdf.utf-8.simple b/charset/pdf.utf-8.simple.in
+similarity index 97%
+rename from charset/pdf.utf-8.simple
+rename to charset/pdf.utf-8.simple.in
+index f7d3adf..d66aa29 100644
+--- a/charset/pdf.utf-8.simple
++++ b/charset/pdf.utf-8.simple.in
+@@ -30,4 +30,4 @@ charset utf8
+ 
+ 0000 04FF ltor single monospace monospace:bold monospace:oblique monospace:bold:oblique
+ 0500 05FF rtol single monospace
+-3000 9FFF ltor double ARPLUmingCN
++3000 9FFF ltor double @CJKFONTS@
+diff --git a/configure.ac b/configure.ac
+index f652f04..0c24b19 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -464,12 +464,26 @@ CXXFLAGS="$CXXFLAGS -D_GNU_SOURCE -DPOINTERHOLDER_TRANSITION=0"
+ #                                      See /usr/include/qpdf/PointerHolder.hh
+ CXXFLAGS="$CXXFLAGS -std=c++17"
+ 
++# =========
++# CJK FONTS
++# =========
++AC_ARG_WITH([cjk-fonts],
++	[AS_HELP_STRING([--with-cjk-fonts=value], [Set font name for CJK fonts (default: ARPLUmingCN).])],
++	[AS_IF([test "x$withval" != "x" -a "x$withval" != "xyes" -a "x$withval" != "xno"],
++	       [CJKFONTS="$withval"],
++	       [CJKFONTS="ARPLUmingCN"])],
++	[CJKFONTS="ARPLUmingCN"])
++
++AC_SUBST([CJKFONTS])
++
+ # =====================
+ # Prepare all .in files
+ # =====================
+ AC_CONFIG_FILES([
+ 	libcupsfilters.pc
+ 	Makefile
++	charset/pdf.utf-8.heavy
++	charset/pdf.utf-8.simple
+ ])
+ AC_OUTPUT
+ 
+@@ -499,5 +513,6 @@ Build configuration:
+ 	dbus:            ${enable_dbus}
+ 	werror:          ${enable_werror}
+ 	test-font:       ${with_test_font_path}
++	cjk-fonts:       ${CJKFONTS}
+ ==============================================================================
+ ])

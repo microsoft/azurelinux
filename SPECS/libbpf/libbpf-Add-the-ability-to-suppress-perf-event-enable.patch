@@ -1,0 +1,70 @@
+From 6ec5475f641ada0cf4561489852e65451457b044 Mon Sep 17 00:00:00 2001
+From: Viktor Malik <vmalik@redhat.com>
+Date: Tue, 12 Aug 2025 10:19:50 +0200
+Subject: [PATCH] libbpf: Add the ability to suppress perf event enablement
+
+Automatically enabling a perf event after attaching a BPF prog to it is
+not always desirable.
+
+Add a new "dont_enable" field to struct bpf_perf_event_opts. While
+introducing "enable" instead would be nicer in that it would avoid
+a double negation in the implementation, it would make
+DECLARE_LIBBPF_OPTS() less efficient.
+
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+Suggested-by: Jiri Olsa <jolsa@kernel.org>
+Tested-by: Thomas Richter <tmricht@linux.ibm.com>
+Co-developed-by: Thomas Richter <tmricht@linux.ibm.com>
+Signed-off-by: Thomas Richter <tmricht@linux.ibm.com>
+Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+Link: https://lore.kernel.org/r/20250806162417.19666-2-iii@linux.ibm.com
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+---
+ src/libbpf.c | 13 ++++++++-----
+ src/libbpf.h |  4 +++-
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/src/libbpf.c b/src/libbpf.c
+index e067cb5..7859e73 100644
+--- a/src/libbpf.c
++++ b/src/libbpf.c
+@@ -10965,11 +10965,14 @@ struct bpf_link *bpf_program__attach_perf_event_opts(const struct bpf_program *p
+ 		}
+ 		link->link.fd = pfd;
+ 	}
+-	if (ioctl(pfd, PERF_EVENT_IOC_ENABLE, 0) < 0) {
+-		err = -errno;
+-		pr_warn("prog '%s': failed to enable perf_event FD %d: %s\n",
+-			prog->name, pfd, errstr(err));
+-		goto err_out;
++
++	if (!OPTS_GET(opts, dont_enable, false)) {
++		if (ioctl(pfd, PERF_EVENT_IOC_ENABLE, 0) < 0) {
++			err = -errno;
++			pr_warn("prog '%s': failed to enable perf_event FD %d: %s\n",
++				prog->name, pfd, errstr(err));
++			goto err_out;
++		}
+ 	}
+ 
+ 	return &link->link;
+diff --git a/src/libbpf.h b/src/libbpf.h
+index d1cf813..455a957 100644
+--- a/src/libbpf.h
++++ b/src/libbpf.h
+@@ -499,9 +499,11 @@ struct bpf_perf_event_opts {
+ 	__u64 bpf_cookie;
+ 	/* don't use BPF link when attach BPF program */
+ 	bool force_ioctl_attach;
++	/* don't automatically enable the event */
++	bool dont_enable;
+ 	size_t :0;
+ };
+-#define bpf_perf_event_opts__last_field force_ioctl_attach
++#define bpf_perf_event_opts__last_field dont_enable
+ 
+ LIBBPF_API struct bpf_link *
+ bpf_program__attach_perf_event(const struct bpf_program *prog, int pfd);
+-- 
+2.50.1
+

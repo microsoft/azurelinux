@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenLDAP Server Daemon
+After=syslog.target network-online.target
+Documentation=man:slapd
+Documentation=man:slapd-config
+Documentation=man:slapd-mdb
+Documentation=file:///usr/share/doc/openldap-servers/guide.html
+
+[Service]
+Type=forking
+ExecStartPre=/usr/libexec/openldap/check-config.sh
+ExecStart=/usr/sbin/slapd -u ldap -h "ldap:/// ldaps:/// ldapi:///"
+
+[Install]
+WantedBy=multi-user.target
+Alias=openldap.service

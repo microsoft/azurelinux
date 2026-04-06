@@ -1,0 +1,113 @@
+From d32e687ee00f5a50ec19b7c8792d80fd57c2dbab Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 16 Apr 2024 20:17:19 -0400
+Subject: [PATCH] Downstream-only: use pkg-config unconditionally
+
+---
+ build.rs | 83 ++------------------------------------------------------
+ 1 file changed, 3 insertions(+), 80 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 478bbc6..0f85b6f 100644
+--- a/build.rs
++++ b/build.rs
+@@ -79,74 +79,6 @@ impl std::fmt::Display for Version {
+     }
+ }
+ 
+-fn get_libpcap_version(libdirpath: Option<PathBuf>) -> Result<Version, Box<dyn std::error::Error>> {
+-    if std::env::var("DOCS_RS").is_ok() {
+-        return Ok(Version::docs_rs());
+-    }
+-
+-    if let Ok(libver) = env::var("LIBPCAP_VER") {
+-        return Version::parse(&libver);
+-    }
+-
+-    #[cfg(all(unix, not(target_os = "macos")))]
+-    let mut libfile = PathBuf::from("libpcap.so");
+-    #[cfg(target_os = "macos")]
+-    let mut libfile = PathBuf::from("libpcap.dylib");
+-    #[cfg(windows)]
+-    let mut libfile = PathBuf::from("wpcap.dll");
+-
+-    if let Some(libdir) = libdirpath {
+-        libfile = libdir.join(libfile);
+-    }
+-
+-    let lib = if let Ok(lib) = libloading::Library::new(libfile) {
+-        lib
+-    } else {
+-        return Ok(Version::max());
+-    };
+-
+-    type PcapLibVersion = unsafe extern "C" fn() -> *mut c_char;
+-    let pcap_lib_version = unsafe { lib.get::<PcapLibVersion>(b"pcap_lib_version")? };
+-
+-    let c_buf: *const c_char = unsafe { pcap_lib_version() };
+-    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+-    let v_str: &str = c_str.to_str()?;
+-
+-    let err = format!("cannot infer pcap lib version from: {}", v_str);
+-
+-    #[cfg(not(windows))]
+-    {
+-        let re =
+-            regex::Regex::new(r"libpcap version ([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)")?;
+-        let captures = re.captures(v_str).ok_or_else(|| err.clone())?;
+-
+-        let major_str = captures.get(1).ok_or_else(|| err.clone())?.as_str();
+-        let minor_str = captures.get(2).ok_or_else(|| err.clone())?.as_str();
+-        let micro_str = captures.get(3).ok_or_else(|| err.clone())?.as_str();
+-
+-        Ok(Version::new(
+-            major_str.parse::<usize>()?,
+-            minor_str.parse::<usize>()?,
+-            micro_str.parse::<usize>()?,
+-        ))
+-    }
+-
+-    #[cfg(windows)]
+-    {
+-        let re = regex::Regex::new(r"based on libpcap version ([[:digit:]]+)\.([[:digit:]]+)")?;
+-        let captures = re.captures(v_str).ok_or_else(|| err.clone())?;
+-
+-        let major_str = captures.get(1).ok_or_else(|| err.clone())?.as_str();
+-        let minor_str = captures.get(2).ok_or_else(|| err.clone())?.as_str();
+-
+-        Ok(Version::new(
+-            major_str.parse::<usize>()?,
+-            minor_str.parse::<usize>()?,
+-            0,
+-        ))
+-    }
+-}
+-
+ fn emit_cfg_flags(version: Version) {
+     assert!(
+         version >= Version::LOWEST_SUPPORTED,
+@@ -165,18 +97,9 @@ fn main() {
+     println!("cargo:rerun-if-env-changed=LIBPCAP_LIBDIR");
+     println!("cargo:rerun-if-env-changed=LIBPCAP_VER");
+ 
+-    // If user explicitly set LIBPCAP_LIBDIR, honour their wishes. This keeps
+-    // existing build scripts running. If it's not set, try pkg-config. If
+-    // that's not set, try last ditch effort to build even though library wasn't
+-    // explicitly given.
+-    let version = if let Ok(libdir) = env::var("LIBPCAP_LIBDIR") {
+-        println!("cargo:rustc-link-search=native={}", libdir);
+-        get_libpcap_version(Some(PathBuf::from(&libdir))).unwrap()
+-    } else if let Ok(library) = from_pkg_config() {
+-        Version::parse(&library.version).unwrap()
+-    } else {
+-        get_libpcap_version(None).unwrap()
+-    };
++    // Downstream patch: use pkg-config unconditionally.
++    let library = from_pkg_config().unwrap();
++    let version = Version::parse(&library.version).unwrap();
+ 
+     emit_cfg_flags(version);
+ }
+-- 
+2.44.0
+

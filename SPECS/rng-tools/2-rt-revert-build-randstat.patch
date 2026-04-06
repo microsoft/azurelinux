@@ -1,0 +1,26 @@
+From de2ee0d8b7e8ad2915165ef941a6ec37442a2fdc Mon Sep 17 00:00:00 2001
+From: Vladis Dronov <vdronov@redhat.com>
+Date: Tue, 6 Jul 2021 14:36:46 +0200
+Subject: [PATCH] Revert "Build randstat binary"
+
+We do not want new and mostly useless randstat binary.
+This reverts commit 2ce93190cb0111fcab2f622a539689d70960643a.
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ contrib/Makefile.am | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git contrib/Makefile.am contrib/Makefile.am
+index a81fb0e..18c4fbc 100644
+--- contrib/Makefile.am
++++ contrib/Makefile.am
+@@ -1,2 +1,3 @@
+-bin_PROGRAMS = randstat
+-randstat_SOURCES = randstat.c
++
++EXTRA_DIST = randstat.c
++
+-- 
+2.26.3
+

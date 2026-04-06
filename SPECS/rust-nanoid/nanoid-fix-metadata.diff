@@ -1,0 +1,14 @@
+--- nanoid-0.4.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ nanoid-0.4.0/Cargo.toml	2025-05-12T23:53:11.603467+00:00
+@@ -26,11 +26,6 @@
+ [dependencies.rand]
+ version = "0.8"
+ features = ["small_rng"]
+-[dev-dependencies.cargo-husky]
+-version = "1"
+-features = ["prepush-hook", "precommit-hook", "postmerge-hook", "run-cargo-test", "run-cargo-check", "run-cargo-clippy", "run-cargo-fmt"]
+-default-features = false
+-
+ [dev-dependencies.doc-comment]
+ version = "0.3"
+ [badges.appveyor]

@@ -1,0 +1,33 @@
+--- a/pylib/gyp/generator/cmake.py
++++ b/pylib/gyp/generator/cmake.py
+@@ -40,9 +40,9 @@
+ 
+ try:
+   # maketrans moved to str in python3.
++  _maketrans = str.maketrans
++except NameError:
+   _maketrans = string.maketrans
+-except NameError:
+-  _maketrans = str.maketrans
+ 
+ generator_default_variables = {
+   'EXECUTABLE_PREFIX': '',
+@@ -281,7 +281,7 @@
+     dirs = set(dir for dir in (os.path.dirname(o) for o in outputs) if dir)
+ 
+     if int(action.get('process_outputs_as_sources', False)):
+-      extra_sources.extend(zip(cmake_outputs, outputs))
++      extra_sources.extend(list(zip(cmake_outputs, outputs)))
+ 
+     # add_custom_command
+     output.write('add_custom_command(OUTPUT ')
+@@ -987,7 +987,7 @@
+ 
+     # XCode settings
+     xcode_settings = config.get('xcode_settings', {})
+-    for xcode_setting, xcode_value in xcode_settings.viewitems():
++    for xcode_setting, xcode_value in xcode_settings.items():
+       SetTargetProperty(output, cmake_target_name,
+                         "XCODE_ATTRIBUTE_%s" % xcode_setting, xcode_value,
+                         '' if isinstance(xcode_value, str) else ' ')
+

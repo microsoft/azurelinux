@@ -1,0 +1,12 @@
+--- open-5.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ open-5.3.3/Cargo.toml	2025-11-24T14:33:11.641704+00:00
+@@ -38,9 +38,6 @@
+ license = "MIT"
+ repository = "https://github.com/Byron/open-rs"
+ 
+-[features]
+-shellexecute-on-windows = []
+-
+ [lib]
+ name = "open"
+ path = "src/lib.rs"

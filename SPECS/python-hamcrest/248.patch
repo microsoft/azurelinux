@@ -1,0 +1,36 @@
+From b45547101b82d1c8fc126c7425c5a532f683766e Mon Sep 17 00:00:00 2001
+From: Simon Brunning <simon@brunningonline.net>
+Date: Tue, 18 Jun 2024 15:45:48 +0100
+Subject: [PATCH] Remove obsolete numpy shorthand types which were removed in
+ numpy 2.0
+
+---
+ tests/hamcrest_unit_test/number/iscloseto_test.py | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/tests/hamcrest_unit_test/number/iscloseto_test.py b/tests/hamcrest_unit_test/number/iscloseto_test.py
+index b82109c..b5727f5 100644
+--- a/tests/hamcrest_unit_test/number/iscloseto_test.py
++++ b/tests/hamcrest_unit_test/number/iscloseto_test.py
+@@ -100,10 +100,6 @@ def test_numpy_numeric_type_uint32(self):
+     def test_numpy_numeric_type_uint64(self):
+         self.assertTrue(isnumeric(np.uint64(1)), "Unsigned integer (0 to 18446744073709551615)")
+ 
+-    @unittest.skipUnless(NUMPY_AVAILABLE, "Skipped because it needs NumPy")
+-    def test_numpy_numeric_type_float(self):
+-        self.assertTrue(isnumeric(np.float_(1)), "Shorthand for float64.")
+-
+     @unittest.skipUnless(NUMPY_AVAILABLE, "Skipped because it needs NumPy")
+     def test_numpy_numeric_type_float16(self):
+         self.assertTrue(
+@@ -125,10 +121,6 @@ def test_numpy_numeric_type_float64(self):
+             "Double precision float: sign bit, 11 bits exponent, 52 bits mantissa",
+         )
+ 
+-    @unittest.skipUnless(NUMPY_AVAILABLE, "Skipped because it needs NumPy")
+-    def test_numpy_numeric_type_complex(self):
+-        self.assertTrue(isnumeric(np.complex_(1)), "Shorthand for complex128.")
+-
+     @unittest.skipUnless(NUMPY_AVAILABLE, "Skipped because it needs NumPy")
+     def test_numpy_numeric_type_complex64(self):
+         self.assertTrue(

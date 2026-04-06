@@ -1,0 +1,12 @@
+--- ntirpc-6.3/CMakeLists.txt.orig	2025-07-16 08:49:56.771709703 -0400
++++ ntirpc-6.3/CMakeLists.txt	2025-07-16 09:12:12.285427043 -0400
+@@ -2,7 +2,8 @@
+ 
+ # Current version as of Fedora 16.  Not tested with earlier.
+ 
+-cmake_minimum_required(VERSION 2.6.3)
++cmake_minimum_required(VERSION 3.3.0...4.0)
++cmake_policy(VERSION 3.2.2)
+ 
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+ 

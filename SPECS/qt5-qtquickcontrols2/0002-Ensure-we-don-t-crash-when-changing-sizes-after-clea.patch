@@ -1,0 +1,83 @@
+From 0b994f7057eb95cedf356a016b1d98911fc3f086 Mon Sep 17 00:00:00 2001
+From: Aleix Pol <aleixpol@kde.org>
+Date: Tue, 4 Jan 2022 16:34:16 +0100
+Subject: [PATCH 2/5] Ensure we don't crash when changing sizes after cleanup
+
+This addresses the problems I've seen during destruction. Only
+encountered it when using complex layouts on a DialogButtonBox.
+
+Pick-to: 6.2 6.3
+Change-Id: I54528c8a2b57b4798d90f7e2021e3127f8404762
+(cherry picked from commit 8b24d2bf1655e8491bdd74013579e09cd009e8fc in
+qtdeclarative)
+---
+ src/quicktemplates2/qquickcontainer.cpp       | 5 +++--
+ src/quicktemplates2/qquickdialogbuttonbox.cpp | 8 +++++++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/quicktemplates2/qquickcontainer.cpp b/src/quicktemplates2/qquickcontainer.cpp
+index f38c2b09c..6eed2a024 100644
+--- a/src/quicktemplates2/qquickcontainer.cpp
++++ b/src/quicktemplates2/qquickcontainer.cpp
+@@ -225,6 +225,7 @@ void QQuickContainerPrivate::cleanup()
+     QObject::disconnect(contentModel, &QQmlObjectModel::countChanged, q, &QQuickContainer::countChanged);
+     QObject::disconnect(contentModel, &QQmlObjectModel::childrenChanged, q, &QQuickContainer::contentChildrenChanged);
+     delete contentModel;
++    contentModel = nullptr;
+ }
+ 
+ QQuickItem *QQuickContainerPrivate::itemAt(int index) const
+@@ -436,7 +437,7 @@ void QQuickContainerPrivate::contentChildren_clear(QQmlListProperty<QQuickItem>
+ void QQuickContainerPrivate::updateContentWidth()
+ {
+     Q_Q(QQuickContainer);
+-    if (hasContentWidth || qFuzzyCompare(contentWidth, implicitContentWidth))
++    if (hasContentWidth || qFuzzyCompare(contentWidth, implicitContentWidth) || !contentModel)
+         return;
+ 
+     contentWidth = implicitContentWidth;
+@@ -446,7 +447,7 @@ void QQuickContainerPrivate::updateContentWidth()
+ void QQuickContainerPrivate::updateContentHeight()
+ {
+     Q_Q(QQuickContainer);
+-    if (hasContentHeight || qFuzzyCompare(contentHeight, implicitContentHeight))
++    if (hasContentHeight || qFuzzyCompare(contentHeight, implicitContentHeight) || !contentModel)
+         return;
+ 
+     contentHeight = implicitContentHeight;
+diff --git a/src/quicktemplates2/qquickdialogbuttonbox.cpp b/src/quicktemplates2/qquickdialogbuttonbox.cpp
+index e33c5c934..9afabd18a 100644
+--- a/src/quicktemplates2/qquickdialogbuttonbox.cpp
++++ b/src/quicktemplates2/qquickdialogbuttonbox.cpp
+@@ -237,7 +237,7 @@ static QRectF alignedRect(Qt::LayoutDirection direction, Qt::Alignment alignment
+ void QQuickDialogButtonBoxPrivate::resizeContent()
+ {
+     Q_Q(QQuickDialogButtonBox);
+-    if (!contentItem)
++    if (!contentItem || !contentModel)
+         return;
+ 
+     QRectF geometry = q->boundingRect().adjusted(q->leftPadding(), q->topPadding(), -q->rightPadding(), -q->bottomPadding());
+@@ -322,6 +322,9 @@ void QQuickDialogButtonBoxPrivate::updateLayout()
+ qreal QQuickDialogButtonBoxPrivate::getContentWidth() const
+ {
+     Q_Q(const QQuickDialogButtonBox);
++    if (!contentModel)
++        return 0;
++
+     const int count = contentModel->count();
+     const qreal totalSpacing = qMax(0, count - 1) * spacing;
+     qreal totalWidth = totalSpacing;
+@@ -341,6 +344,9 @@ qreal QQuickDialogButtonBoxPrivate::getContentWidth() const
+ qreal QQuickDialogButtonBoxPrivate::getContentHeight() const
+ {
+     Q_Q(const QQuickDialogButtonBox);
++    if (!contentModel)
++        return 0;
++
+     const int count = contentModel->count();
+     qreal maxHeight = 0;
+     for (int i = 0; i < count; ++i) {
+-- 
+2.51.1
+

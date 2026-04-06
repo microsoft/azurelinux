@@ -1,0 +1,16 @@
+--- zstd-sys-2.0.16+zstd.1.5.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zstd-sys-2.0.16+zstd.1.5.7/Cargo.toml	2025-10-25T22:54:17.417236+00:00
+@@ -13,7 +13,7 @@
+ edition = "2018"
+ rust-version = "1.64"
+ name = "zstd-sys"
+-version = "2.0.16+zstd.1.5.7"
++version = "2.0.16"
+ authors = ["Alexandre Bury <alexandre.bury@gmail.com>"]
+ build = "build.rs"
+ links = "zstd"
+@@ -95,3 +95,4 @@
+ 
+ [lints.rust]
+ non_upper_case_globals = "allow"
++

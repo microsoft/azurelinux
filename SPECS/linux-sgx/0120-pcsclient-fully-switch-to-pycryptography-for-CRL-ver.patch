@@ -1,0 +1,67 @@
+From e13e50bf8ab8ef81727a3162a45b326bd7d098f0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 8 Dec 2025 17:47:01 +0000
+Subject: [PATCH 120/131] pcsclient: fully switch to pycryptography for CRL
+ verification
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The pyopenssl 24.3.0 removed the CRL object and its related
+methods. pccsadmin was already using the pycryptography CRL
+object for the verification task, so fully switch to use it
+for loading the CRL to begin with.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index 046c781d..e68864d2 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -101,11 +101,6 @@ class PCS:
+         # Copy our list so we don't modify the original
+         pychain= pychain_in[:]
+ 
+-        # PyOpenSSL doesn't have methods for verifying a CRL issuer,
+-        # so we need to translate from it to cryptography.
+-
+-        crl= pycrl.to_cryptography()
+-
+         # The chain_pem is our CRL issuer and the CA for the issuer.
+         # Verify that first.
+ 
+@@ -118,13 +113,13 @@ class PCS:
+ 
+         signer_key= pycert.get_pubkey().to_cryptography_key()
+ 
+-        if not crl.is_signature_valid(signer_key):
++        if not pycrl.is_signature_valid(signer_key):
+             self.error("Could not verify CRL signature")
+             return False
+ 
+         # Check the crl issuer
+ 
+-        if pycrl.get_issuer() != pycert.get_subject():
++        if pycrl.issuer != pycert.get_subject():
+             self.error("CRL issuer doesn't match issuer chain")
+             return False
+ 
+@@ -516,10 +511,10 @@ class PCS:
+         crl= response.content
+         if self.ApiVersion<3:
+             crl_str= str(crl, dec)
+-            pycrl= crypto.load_crl(crypto.FILETYPE_PEM, crl)
++            pycrl= x509.load_pem_x509_crl(crl)
+         else:
+             crl_str= binascii.hexlify(crl).decode(dec)
+-            pycrl= crypto.load_crl(crypto.FILETYPE_ASN1, crl)
++            pycrl= x509.load_der_x509_crl(crl)
+ 
+         if not self.verify_crl_trust(pychain, pycrl):
+             self.error("Could not validate certificate using trust chain")
+-- 
+2.53.0
+

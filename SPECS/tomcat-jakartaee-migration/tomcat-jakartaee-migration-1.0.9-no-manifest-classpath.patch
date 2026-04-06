@@ -1,0 +1,11 @@
+--- pom.xml.orig	2024-07-04 21:52:46.000000000 +0300
++++ pom.xml	2025-11-17 13:14:49.456469511 +0200
+@@ -194,7 +194,7 @@
+         <configuration>
+           <archive>
+             <manifest>
+-              <addClasspath>true</addClasspath>
++              <addClasspath>false</addClasspath>
+               <mainClass>org.apache.tomcat.jakartaee.MigrationCLI</mainClass>
+             </manifest>
+           </archive>

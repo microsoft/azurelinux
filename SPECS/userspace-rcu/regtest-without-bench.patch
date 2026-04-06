@@ -1,0 +1,12 @@
+Remove the benchmarks from the regtest target, they timeout on the buildds.
+
+--- a/tests/Makefile.am.orig	2019-06-03 15:46:16.380163423 -0400
++++ b/tests/Makefile.am	2019-06-03 15:46:26.099004417 -0400
+@@ -8,7 +8,6 @@
+ 	cd benchmark && $(MAKE) $(AM_MAKEFLAGS) long_bench
+ regtest:
+ 	cd regression && $(MAKE) $(AM_MAKEFLAGS) regtest
+-	cd benchmark && $(MAKE) $(AM_MAKEFLAGS) regtest
+ 
+ check-loop:
+ 	while [ 0 ]; do \

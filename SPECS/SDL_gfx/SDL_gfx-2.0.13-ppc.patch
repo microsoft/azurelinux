@@ -1,0 +1,20 @@
+--- SDL_gfx-2.0.13/ltconfig.foo	2007-05-04 18:10:41.000000000 -0400
++++ SDL_gfx-2.0.13/ltconfig	2007-05-04 18:10:58.000000000 -0400
+@@ -2001,16 +2001,7 @@ linux-gnu*)
+   shlibpath_var=LD_LIBRARY_PATH
+   shlibpath_overrides_runpath=no
+   deplibs_check_method=pass_all
+-
+-  if test -f /lib/ld.so.1; then
+-    dynamic_linker='GNU ld.so'
+-  else
+-    # Only the GNU ld.so supports shared libraries on MkLinux.
+-    case "$host_cpu" in
+-    powerpc*) dynamic_linker=no ;;
+-    *) dynamic_linker='Linux ld.so' ;;
+-    esac
+-  fi
++  dynamic_linker='GNU ld.so'
+   ;;
+ 
+ netbsd*)

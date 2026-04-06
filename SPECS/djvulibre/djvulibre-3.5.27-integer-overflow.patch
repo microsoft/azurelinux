@@ -1,0 +1,23 @@
+diff --git a/tools/ddjvu.cpp b/tools/ddjvu.cpp
+index 7109952..b41f7d2 100644
+--- a/tools/ddjvu.cpp
++++ b/tools/ddjvu.cpp
+@@ -70,6 +70,7 @@
+ #include <locale.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#include <stdint.h>
+ 
+ #ifdef UNIX
+ # include <sys/time.h>
+@@ -394,7 +395,9 @@ render(ddjvu_page_t *page, int pageno)
+     rowsize = rrect.w;
+   else
+     rowsize = rrect.w * 3; 
+-  if (! (image = (char*)malloc(rowsize * rrect.h)))
++  if ((size_t)rowsize > SIZE_MAX / rrect.h)
++    die(i18n("Integer overflow when allocating image buffer for page %d"), pageno);
++  if (! (image = (char*)malloc((size_t)rowsize * rrect.h)))
+     die(i18n("Cannot allocate image buffer for page %d"), pageno);
+ 
+   /* Render */

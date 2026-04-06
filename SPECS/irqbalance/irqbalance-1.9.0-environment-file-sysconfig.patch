@@ -1,0 +1,25 @@
+From 9d3070150d151bfd5535c3da43313511659d882e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Timoth=C3=A9e=20Ravier?= <tim@siosm.fr>
+Date: Mon, 1 Aug 2022 15:52:24 +0200
+Subject: [PATCH] misc/irqbalance.service: Use sysconfig for EnvironmentFile
+
+---
+ misc/irqbalance.service | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/misc/irqbalance.service b/misc/irqbalance.service
+index 0f79c3e..9bc63b6 100644
+--- a/misc/irqbalance.service
++++ b/misc/irqbalance.service
+@@ -6,8 +6,7 @@ ConditionVirtualization=!container
+ ConditionCPUs=>1
+ 
+ [Service]
+-EnvironmentFile=-/usr/lib/irqbalance/defaults.env
+-EnvironmentFile=-/path/to/irqbalance.env
++EnvironmentFile=-/etc/sysconfig/irqbalance
+ ExecStart=/usr/sbin/irqbalance $IRQBALANCE_ARGS
+ CapabilityBoundingSet=
+ NoNewPrivileges=yes
+-- 
+2.37.1

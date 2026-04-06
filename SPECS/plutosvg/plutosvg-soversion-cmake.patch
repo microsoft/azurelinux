@@ -1,0 +1,11 @@
+diff -Naur plutosvg-0.0.7.old/CMakeLists.txt plutosvg-0.0.7/CMakeLists.txt
+--- plutosvg-0.0.7.old/CMakeLists.txt	2025-07-23 23:16:15.588659812 +0200
++++ plutosvg-0.0.7/CMakeLists.txt	2025-07-23 23:16:46.320802650 +0200
+@@ -22,6 +22,7 @@
+ 
+ set_target_properties(plutosvg PROPERTIES
+     SOVERSION ${PLUTOSVG_VERSION_MAJOR}
++    VERSION ${PLUTOSVG_VERSION_MAJOR}.${PLUTOSVG_VERSION_MINOR}.${PLUTOSVG_VERSION_MICRO}
+     C_VISIBILITY_PRESET hidden
+     C_STANDARD_REQUIRED ON
+     C_STANDARD 99

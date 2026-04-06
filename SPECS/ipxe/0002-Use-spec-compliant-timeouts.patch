@@ -1,0 +1,98 @@
+From bc252caa54fcfb2e9fd0ddb01ebaa50192e85c38 Mon Sep 17 00:00:00 2001
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Wed, 21 Oct 2015 11:18:40 +0200
+Subject: Use spec compliant timeouts
+
+Message-id: <20150428212403.31299.29391.stgit@gimli.home>
+Patchwork-id: 64951
+O-Subject: [RHEL7.2 ipxe PATCH 2/2] [dhcp][RHEL-only] Use spec compliant timeouts
+Bugzilla: 1196352
+RH-Acked-by: Miroslav Rezanina <mrezanin@redhat.com>
+RH-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+RH-Acked-by: Laszlo Ersek <lersek@redhat.com>
+
+Use local config to override iPXE's abbreviated DHCP timeouts using
+the recommended values for spec compliance.  This matches the state
+of RHEL6 gPXE DHCP timeouts after bz968474 + bz1206042
+
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+(cherry picked from commit 7038f41c0131d263de5165b416500009acdbf550)
+---
+ src/config/local/.gitignore |  1 -
+ src/config/local/dhcp.h     | 62 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+), 1 deletion(-)
+ delete mode 100644 src/config/local/.gitignore
+ create mode 100644 src/config/local/dhcp.h
+
+diff --git a/src/config/local/dhcp.h b/src/config/local/dhcp.h
+new file mode 100644
+index 0000000..83df5b8
+--- /dev/null
++++ b/src/config/local/dhcp.h
+@@ -0,0 +1,62 @@
++/*
++ * Downstream localization
++ *
++ * For RHEL, use spec compliant DHCP timeouts (bz1196352)
++ */
++
++/*
++ * PXE spec defines timeouts of 4, 8, 16, 32 seconds
++ */
++#undef DHCP_DISC_START_TIMEOUT_SEC
++#define DHCP_DISC_START_TIMEOUT_SEC 4
++#undef DHCP_DISC_END_TIMEOUT_SEC
++#define DHCP_DISC_END_TIMEOUT_SEC   32
++
++/*
++ * Elapsed time used for early break waiting for ProxyDHCP, this therefore
++ * needs to be less than the cumulative time for the first 2 timeouts.
++ */
++#undef DHCP_DISC_PROXY_TIMEOUT_SEC
++#define DHCP_DISC_PROXY_TIMEOUT_SEC 11
++
++/*
++ * Approximate PXE spec requirement using minimum timeout (0.25s) for
++ * timeouts of 0.25, 0.5, 1, 2, 4
++ */
++#undef DHCP_REQ_START_TIMEOUT_SEC
++#define DHCP_REQ_START_TIMEOUT_SEC  0
++#undef DHCP_REQ_END_TIMEOUT_SEC
++#define DHCP_REQ_END_TIMEOUT_SEC    4
++
++/*
++ * Same as normal request phase, except non-fatal, so we extend the timer
++ * to 8 and set the early timeout to an elapsed time value that causes a
++ * break after the 4 second timeout.  At least that's what we'd like to do,
++ * but our timer operates at 18Hz and has a minimum resolution of 7 cycles.
++ * Therefore the above quarter-second starting timeout looks more like
++ * 0.39s, 0.78s, 1.56s, 3.11s, 6.22s.  If we had an ideal timer, we could
++ * set the timeout to 7s (0.25 + 0.5 + 1 + 2 + 4 = 7.75s) and exit without
++ * failure when the timer rolls over to 8s.  With our timer, we get 0.39 +
++ * 0.78 + 1.56 + 3.11 = 5.84s.  The next timeout would take us to 12.06s
++ * (+6.22).  That seems like a long time to wait for an optional reply, so
++ * we reduce the early timeout to 5s to exit before the timer exceeds the
++ * max and causes a failure.  This still adds one extra cycle vs the
++ * upstream defaults.
++ */
++#undef DHCP_PROXY_START_TIMEOUT_SEC
++#define DHCP_PROXY_START_TIMEOUT_SEC        0
++#undef DHCP_PROXY_END_TIMEOUT_SEC
++#define DHCP_PROXY_END_TIMEOUT_SEC  8
++#undef DHCP_REQ_PROXY_TIMEOUT_SEC
++#define DHCP_REQ_PROXY_TIMEOUT_SEC  5
++
++/*
++ * Same as above, retry each server using our approximation of standard
++ * timeouts and exit before timer induced failure.
++ */
++#undef PXEBS_START_TIMEOUT_SEC
++#define PXEBS_START_TIMEOUT_SEC             0
++#undef PXEBS_END_TIMEOUT_SEC
++#define PXEBS_END_TIMEOUT_SEC               8
++#undef PXEBS_MAX_TIMEOUT_SEC
++#define PXEBS_MAX_TIMEOUT_SEC               5
+-- 
+1.8.3.1
+

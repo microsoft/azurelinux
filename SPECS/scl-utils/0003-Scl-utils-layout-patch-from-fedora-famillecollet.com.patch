@@ -1,0 +1,31 @@
+From c0315dd54bc94c2acf4e4dcf0a72ca42a1cfde60 Mon Sep 17 00:00:00 2001
+From: Lubos Kardos <lkardos@redhat.com>
+Date: Wed, 9 Mar 2016 16:11:56 +0100
+Subject: [PATCH] Scl utils layout patch from fedora@famillecollet.com
+ (#1198693)
+
+---
+ rpm/macros.scl | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/rpm/macros.scl b/rpm/macros.scl
+index 1246fde..41c6be4 100644
+--- a/rpm/macros.scl
++++ b/rpm/macros.scl
+@@ -69,10 +69,13 @@ package or when debugging this package.
+ %global _datadir		%{_prefix}/share
+ %global _sysconfdir		%{_scl_root}/etc
+ %{?nfsmountable:		%global _sysconfdir %{_root_sysconfdir}%{_scl_prefix}/scls/%{scl}}
++%{?rh_layout:			%global _sysconfdir %{_root_sysconfdir}%{_scl_prefix}/%{scl}}
+ %global _sharedstatedir		%{_scl_root}/var/lib
+ %{?nfsmountable:		%global _sharedstatedir %{_root_localstatedir}%{_scl_prefix}/scls/%{scl}/lib}
++%{?rh_layout:			%global _sharedstatedir %{_root_localstatedir}%{_scl_prefix}/%{scl}/lib}
+ %global _localstatedir		%{_scl_root}/var
+ %{?nfsmountable:		%global _localstatedir %{_root_localstatedir}%{_scl_prefix}/scls/%{scl}}
++%{?rh_layout:			%global _localstatedir %{_root_localstatedir}%{_scl_prefix}/%{scl}}
+ %global _libdir			%{_exec_prefix}/%{_lib}
+ %global _includedir		%{_prefix}/include
+ %global _infodir		%{_datadir}/info
+-- 
+1.9.3
+

@@ -1,0 +1,70 @@
+diff --git a/gettext-tools/src/msgl-cat.c b/gettext-tools/src/msgl-cat.c
+index 965cc8c..38c7ca1 100644
+--- a/gettext-tools/src/msgl-cat.c
++++ b/gettext-tools/src/msgl-cat.c
+@@ -307,6 +307,7 @@ catenate_msgdomain_list (string_list_ty *file_list,
+                                    mp->msgid);
+                       multiline_error (xstrdup (""),
+                                        xasprintf ("%s\n", errormsg));
++                      free (errormsg);
+                     }
+                 }
+               else
+diff --git a/gettext-tools/src/x-csharp.c b/gettext-tools/src/x-csharp.c
+index 13d4a53..669db2f 100644
+--- a/gettext-tools/src/x-csharp.c
++++ b/gettext-tools/src/x-csharp.c
+@@ -561,6 +561,7 @@ comment_line_end (size_t chars_to_remove)
+   buffer[buflen] = '\0';
+   savable_comment_add (buffer);
+   lexical_context = lc_outside;
++  free (buffer);
+ }
+ 
+ 
+diff --git a/gettext-tools/src/x-java.c b/gettext-tools/src/x-java.c
+index e89ab95..6c1b4a7 100644
+--- a/gettext-tools/src/x-java.c
++++ b/gettext-tools/src/x-java.c
+@@ -461,6 +461,7 @@ comment_line_end (size_t chars_to_remove)
+     --buflen;
+   buffer[buflen] = '\0';
+   savable_comment_add (buffer);
++  free (buffer);
+ }
+ 
+ 
+diff --git a/gettext-tools/src/x-rst.c b/gettext-tools/src/x-rst.c
+index cde1ee6..82f645f 100644
+--- a/gettext-tools/src/x-rst.c
++++ b/gettext-tools/src/x-rst.c
+@@ -651,6 +651,8 @@ extract_rsj (FILE *f,
+           else
+             goto invalid_rsj;
+ 
++          free (s1);
++
+           /* Parse a comma.  */
+           c = phase2_getc ();
+           if (c == '}')
+@@ -667,6 +669,7 @@ extract_rsj (FILE *f,
+ 
+   fp = NULL;
+   real_file_name = NULL;
++  free (logical_file_name);
+   logical_file_name = NULL;
+   line_number = 0;
+ 
+diff --git a/gettext-tools/src/xg-arglist-callshape.c b/gettext-tools/src/xg-arglist-callshape.c
+index 06b7076..2189aac 100644
+--- a/gettext-tools/src/xg-arglist-callshape.c
++++ b/gettext-tools/src/xg-arglist-callshape.c
+@@ -118,6 +118,7 @@ split_keywordspec (const char *spec,
+                   memcpy (xcomment, xcomment_start, xcomment_len);
+                   xcomment[xcomment_len] = '\0';
+                   string_list_append (&xcomments, xcomment);
++                  free (xcomment);
+                 }
+               else
+                 break;
+

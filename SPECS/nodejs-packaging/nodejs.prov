@@ -1,0 +1,121 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# Copyright 2012 T.C. Hollingsworth <tchollingsworth@gmail.com>
+# Copyright 2017 Tomas Tomecek <ttomecek@redhat.com>
+# Copyright 2019 Jan Staněk <jstanek@redhat.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+"""Automatic provides generator for Node.js libraries.
+
+Metadata taken from package.json.  See `man npm-json` for details.
+"""
+
+from __future__ import print_function, with_statement
+
+import json
+import os
+import sys
+from itertools import chain, groupby
+
+DEPENDENCY_TEMPLATE = "npm(%(name)s) = %(version)s"
+BUNDLED_TEMPLATE = "bundled(nodejs-%(name)s) = %(version)s"
+NODE_MODULES = {"node_modules", "node_modules_prod"}
+
+
+class PrivatePackage(RuntimeError):
+    """Private package metadata that should not be listed."""
+
+
+#: Something is wrong with the ``package.json`` file
+_INVALID_METADATA_FILE = (IOError, PrivatePackage, KeyError)
+
+
+def format_metadata(metadata, bundled=False):
+    """Format ``package.json``-like metadata into RPM dependency.
+
+    Arguments:
+        metadata (dict): Package metadata, presumably read from ``package.json``.
+        bundled (bool): Should the bundled dependency format be used?
+
+    Returns:
+        str: RPM dependency (i.e. ``npm(example) = 1.0.0``)
+
+    Raises:
+        KeyError: Expected key (i.e. ``name``, ``version``) missing in metadata.
+        PrivatePackage: The metadata indicate private (unlisted) package.
+    """
+
+    # Skip private packages
+    if metadata.get("private", False):
+        raise PrivatePackage(metadata)
+
+    template = BUNDLED_TEMPLATE if bundled else DEPENDENCY_TEMPLATE
+    return template % metadata
+
+
+def generate_dependencies(module_path, module_dir_set=NODE_MODULES):
+    """Generate RPM dependency for a module and all it's dependencies.
+
+    Arguments:
+        module_path (str): Path to a module directory or it's ``package.json``
+        module_dir_set (set): Base names of directories to look into
+            for bundled dependencies.
+
+    Yields:
+        str: RPM dependency for the module and each of it's (public) bundled dependencies.
+
+    Raises:
+        ValueError: module_path is not valid module or ``package.json`` file
+    """
+
+    # Determine paths to root module directory and package.json
+    if os.path.isdir(module_path):
+        root_dir = module_path
+    elif os.path.basename(module_path) == "package.json":
+        root_dir = os.path.dirname(module_path)
+    else:  # Invalid metadata path
+        raise ValueError("Invalid module path '%s'" % module_path)
+
+    for dir_path, subdir_list, file_list in os.walk(root_dir):
+        # We are only interested in directories that contain package.json
+        if "package.json" not in file_list:
+            continue
+
+        # Read and format metadata
+        metadata_path = os.path.join(dir_path, "package.json")
+        bundled = dir_path != root_dir
+        try:
+            with open(metadata_path, mode="r") as metadata_file:
+                metadata = json.load(metadata_file)
+            yield format_metadata(metadata, bundled=bundled)
+        except _INVALID_METADATA_FILE:
+            pass  # Ignore
+
+        # Only visit subdirectories in module_dir_set
+        subdir_list[:] = list(module_dir_set & set(subdir_list))
+
+
+if __name__ == "__main__":
+    module_paths = (path.strip() for path in sys.stdin)
+    provides = chain.from_iterable(generate_dependencies(m) for m in module_paths)
+
+    # sort|uniq
+    for provide, __ in groupby(sorted(provides)):
+        print(provide)

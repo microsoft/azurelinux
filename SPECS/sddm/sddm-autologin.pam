@@ -1,0 +1,20 @@
+ #%PAM-1.0
+auth       required    pam_env.so
+auth       required    pam_permit.so
+auth       include     postlogin
+
+account    required    pam_nologin.so
+account    include     system-auth
+
+password   include     system-auth
+
+session    required    pam_selinux.so close
+session    required    pam_loginuid.so
+session    required    pam_selinux.so open
+session    optional    pam_keyinit.so force revoke
+session    required    pam_namespace.so
+session    include     system-auth
+-session    optional    pam_gnome_keyring.so auto_start
+-session    optional    pam_kwallet5.so auto_start
+-session    optional    pam_kwallet.so auto_start
+session    include     postlogin

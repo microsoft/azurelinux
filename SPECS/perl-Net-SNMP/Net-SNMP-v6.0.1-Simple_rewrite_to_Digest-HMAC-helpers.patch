@@ -1,0 +1,93 @@
+From c84b7a235bdcaa37be39a927387c59429d2277c9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20Josef=20=C5=A0pa=C4=8Dek?=
+ <michal.josef.spacek@gmail.com>
+Date: Tue, 5 Mar 2024 19:00:55 +0100
+Subject: [PATCH 03/11] Simple rewrite to Digest::HMAC helpers
+
+We need to concretize algorithms to defined place instead of composition
+in code. Digest::HMAC_* helpers are in the same package as Digest::HMAC.
+
+Difference is that all code for algoritm is now in Digest::HMAC
+distribution instead of previous situation when was composition
+Digest::HMAC and Digest::SHA1 and Digest::MD5 in this code.
+---
+ Build.PL                     | 3 ++-
+ META.yml                     | 3 ++-
+ Makefile.PL                  | 3 ++-
+ lib/Net/SNMP/Security/USM.pm | 7 ++++---
+ 4 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/Build.PL b/Build.PL
+index 6002343..a8ae8dd 100644
+--- a/Build.PL
++++ b/Build.PL
+@@ -39,7 +39,8 @@ Module::Build->new(
+       Crypt::DES      => '2.03',  # SNMPv3
+       Digest::MD5     => '2.11',  # SNMPv3
+       Digest::SHA1    => '1.02',  # SNMPv3
+-      Digest::HMAC    => '1.00',  # SNMPv3
++      Digest::HMAC_MD5 => '1.01', # SNMPv3
++      Digest::HMAC_SHA1 => '1.03', # SNMPv3
+       Crypt::Rijndael => '1.02',  # SNMPv3 - AES Cipher Algorithm 
+    },
+    meta_merge         => {
+diff --git a/META.yml b/META.yml
+index bf64bc6..0b1acd7 100644
+--- a/META.yml
++++ b/META.yml
+@@ -62,7 +62,8 @@ provides:
+ recommends:
+   Crypt::DES: '2.03'
+   Crypt::Rijndael: '1.02'
+-  Digest::HMAC: '1.00'
++  Digest::HMAC_MD5: '1.01'
++  Digest::HMAC_SHA1: '1.03'
+   Digest::MD5: '2.11'
+   Digest::SHA1: '1.02'
+ requires:
+diff --git a/Makefile.PL b/Makefile.PL
+index a15243b..516b2f9 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -41,7 +41,8 @@ WriteMakefile(
+       Crypt::DES   => '2.03',  # SNMPv3
+       Digest::MD5  => '2.11',  # SNMPv3
+       Digest::SHA1 => '1.02',  # SNMPv3
+-      Digest::HMAC => '1.00',  # SNMPv3
++      Digest::HMAC_MD5 => '1.01', # SNMPv3
++      Digest::HMAC_SHA1 => '1.03', # SNMPv3
+       Socket       => '2.000',
+    },
+    dist          => {
+diff --git a/lib/Net/SNMP/Security/USM.pm b/lib/Net/SNMP/Security/USM.pm
+index 4fb5742..0a2ab34 100644
+--- a/lib/Net/SNMP/Security/USM.pm
++++ b/lib/Net/SNMP/Security/USM.pm
+@@ -26,7 +26,8 @@ use Net::SNMP::Message qw(
+ use Crypt::DES();
+ use Digest::MD5();
+ use Digest::SHA1();
+-use Digest::HMAC();
++use Digest::HMAC_MD5();
++use Digest::HMAC_SHA1();
+ 
+ ## Version of the Net::SNMP::Security::USM module
+ 
+@@ -1141,12 +1142,12 @@ sub _auth_data_init
+    if ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACMD5) {
+ 
+       $this->{_auth_data} =
+-         Digest::HMAC->new($this->{_auth_key}, 'Digest::MD5');
++         Digest::HMAC_MD5->new($this->{_auth_key});
+ 
+    } elsif ($this->{_auth_protocol} eq AUTH_PROTOCOL_HMACSHA) {
+ 
+       $this->{_auth_data} =
+-         Digest::HMAC->new($this->{_auth_key}, 'Digest::SHA1');
++         Digest::HMAC_SHA1->new($this->{_auth_key});
+ 
+    } else {
+ 
+-- 
+2.45.1
+

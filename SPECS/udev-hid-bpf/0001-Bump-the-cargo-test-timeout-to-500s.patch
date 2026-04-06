@@ -1,0 +1,26 @@
+From 4f3044dd2429ad85ee936e45adb9c91e8baaa2ab Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Thu, 18 Apr 2024 13:14:40 +1000
+Subject: [PATCH] Bump the cargo test timeout to 500s
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index b56ff8f7be02..ff156c0a5763 100644
+--- a/meson.build
++++ b/meson.build
+@@ -112,7 +112,7 @@ test('cargo test',
+     cargo,
+     args: ['test'],
+     env: cargo_env,
+-    timeout: 120,
++    timeout: 500,
+ )
+ 
+ meson.add_devenv(cargo_env)
+-- 
+2.44.0
+

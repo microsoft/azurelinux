@@ -1,0 +1,498 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>README: Cutter Reference Manual - Cutter</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="Cutter Reference Manual">
+<link rel="up" href="overview.html" title="Overview of Cutter">
+<link rel="prev" href="news.html" title="NEWS">
+<link rel="next" href="features.html" title="Features">
+<meta name="generator" content="GTK-Doc V1.28 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="stylesheet" href="../cutter.css" type="text/css">
+<link rel="shortcut icon" href="../favicon.ico" />
+<link rel="icon" href="../favicon.png" />
+
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="header">
+  <h1>
+    <a href="../">
+      <span class="title">a Unit Testing Framework for C and C++</span>
+      <span class="title-separator">-</span>
+      <span class="title-project">Cutter</span>
+    </a>
+  </h1>
+  <ul class="other-languages">
+    <li id="other-language-japanese" lang="ja" xml:lang="ja"><a href="../index.html.ja">日本語</a></li>
+  </ul>
+  <ul class="menu">
+    <li id="menu-readme"><a href="readme.html">README</a></li>
+    <li id="menu-install"><a href="install.html">Install</a></li>
+    <li id="menu-tutorial"><a href="tutorial.html">Tutorial</a></li>
+    <li id="menu-reference"><a href="./">Reference</a></li>
+    <li id="menu-download"><a href="https://osdn.net/dl/cutter/cutter-1.2.7.tar.gz">Download</a></li>
+  </ul>
+</div>
+
+<div class="content">
+
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts"></td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="overview.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="news.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="features.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="readme"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="readme.top_of_page"></a>README</span></h2>
+<p>README — An introduction of Cutter, a Unit Testing Framework for C and C++</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="id-1.2.2.3.3"></a><h2>Name</h2>
+<p>Cutter</p>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.4"></a><h2>Author</h2>
+<div class="refsect2">
+<a name="id-1.2.2.3.4.2"></a><h3>Program</h3>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p>Kouhei Sutou &lt;kou@clear-code.com&gt;</p></li>
+<li class="listitem"><p>Hiroyuki Ikezoe &lt;ikezoe@clear-code.com&gt;</p></li>
+<li class="listitem"><p>Yuto Hayamizu &lt;y.hayamizu@gmail.com&gt;</p></li>
+</ul></div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.4.3"></a><h3>Kinotan Icons</h3>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Mayu &amp; Co.</p></li></ul></div>
+</div>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.5"></a><h2>License</h2>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p>
+  Source: LGPLv3 or later. (detail:
+  <a class="ulink" href="http://www.gnu.org/licenses/lgpl.html" target="_top">license/lgpl-3.txt</a>
+  )
+</p></li>
+<li class="listitem">
+<p>Document and kinotan icons: Triple license: LGPL, GFDL and/or CC.</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem"><p>
+  LGPL: v3 or later. (detail:
+  <a class="ulink" href="http://www.gnu.org/licenses/lgpl.html" target="_top">license/lgpl-3.txt</a>
+  )
+</p></li>
+<li class="listitem"><p>
+  GFDL: v1.3 or later. (detail:
+  <a class="ulink" href="http://www.gnu.org/licenses/fdl.html" target="_top">license/gfdl-1.3.txt</a>
+  )
+</p></li>
+<li class="listitem"><p>
+  CC: 
+  <a class="ulink" href="http://creativecommons.org/licenses/by-sa/3.0/" target="_top">BY-SA</a>
+  
+</p></li>
+</ul></div>
+</li>
+<li class="listitem">
+<p>Exceptions:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem"><p>
+  glib-compatible/glibintl.h, glib-compatible/gregex.*, glib-compatible/gscripttable.h, glib-compatible/gsequence.*, glib-compatible/gstring.*, glib-compatible/gunicode.h, glib-compatible/guniprop.c: LGPL v2.0 or later. (detail:
+  <a class="ulink" href="http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html" target="_top">glib-compatible/COPYING</a>
+  )
+</p></li>
+<li class="listitem"><p>
+  glib-compatible/pcre/: PCRE LICENSE. (detail:
+  <a class="ulink" href="http://www.pcre.org/licence.txt" target="_top">glib-compatible/pcre/COPYING</a>
+  )
+</p></li>
+<li class="listitem"><p>
+  html/blog.*, html/download.*, html/heading-mark.* html/install.*, html/readme.*, html/reference.*, html/tango-logo.png, html/tutorial.*, html/mini-*.svg: Public domain. They are deliverables by 
+  <a class="ulink" href="http://tango.freedesktop.org/" target="_top">Tango Desktop Project</a>
+  . (Some of them are modified.)
+</p></li>
+<li class="listitem"><p>
+  html/ja.png, html/us.png, html/famfamfam-logo.png: Public domain. They are distributed by
+  <a class="ulink" href="http://famfamfam.com/" target="_top">famfamfam.com</a>
+  .
+</p></li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.6"></a><h2>What's this?</h2>
+<p>Cutter is a xUnit family Unit Testing Framework for C and C++.</p>
+<p>This is a list of features of Cutter:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p>easy to write tests.</p></li>
+<li class="listitem"><p>outputs result with useful format for debugging.</p></li>
+<li class="listitem"><p>tests are built as shared libraries.</p></li>
+</ul></div>
+<p>
+  See 
+  <a class="link" href="features.html" title="Features">FEATURES</a>
+   for more details.
+</p>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.7"></a><h2>Dependency libraries</h2>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>GLib &gt;= 2.16</p></li></ul></div>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.8"></a><h2>Install</h2>
+<p>
+  See 
+  <a class="link" href="install.html" title="Install Cutter to your platform">Install</a>
+  .
+</p>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.9"></a><h2>Repository</h2>
+<p>
+  There is the repository at 
+  <a class="ulink" href="https://github.com/clear-code/cutter/" target="_top">clear-code/cutter on GitHub</a>
+  .
+</p>
+<pre class="programlisting">% git clone https://github.com/clear-code/cutter.git</pre>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.10"></a><h2>Usage</h2>
+<pre class="programlisting">% cutter [OPTION ...] TEST_DIRECTORY</pre>
+<p>TEST_DIRECTORY should have test_*.so. test_*.so are searched recursively.</p>
+<p>
+  See 
+  <a class="link" href="cutter.html" title="cutter">cutter</a>
+   for more details.
+</p>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.11"></a><h2>How to test</h2>
+<p>Executing flow of test is the following.</p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><p>Write a test.</p></li>
+<li class="listitem"><p>Compile it and build test_*.so.</p></li>
+<li class="listitem"><p>Execute cutter. It loads test_*.so and runs them.</p></li>
+</ol></div>
+<p>
+  See 
+  <a class="link" href="tutorial.html" title="Tutorial">a tutorial</a>
+   and sample/stack/.
+</p>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.12"></a><h2>Test result</h2>
+<p>Here is an example test result:</p>
+<pre class="programlisting">..........F.................................................
+
+1) Failure: test_test_case_count
+&lt;1 == cut_test_case_get_n_tests(test_object, NULL)&gt;
+expected: &lt;1&gt;
+ but was: &lt;0&gt;
+test/test-cut-test-case.c:143: test_test_case_count()
+
+Finished in 0.020857 seconds
+
+60 test(s), 253 assertion(s), 1 failure(s), 0 error(s), 0 pending(s), 0 notification(s)</pre>
+<div class="refsect2">
+<a name="id-1.2.2.3.12.4"></a><h3>Progress</h3>
+<p>A part that contains "." and "F" of the test result shows test progress:</p>
+<pre class="programlisting">..........F.................................................</pre>
+<p>Each "." and "F" shows a test case (test function). "." shows a test case that is succeeded and "F" shows a test case that is failed. There are "E", "P" and "N". They shows error, pending and notification respectively. Here is a summary of test case marks:</p>
+<div class="variablelist"><table border="0" class="variablelist">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term"><a name="readme.-"></a>.</span></p></td>
+<td><p>A succeeded test</p></td>
+</tr>
+<tr>
+<td><p><span class="term"><a name="readme.F"></a>F</span></p></td>
+<td><p>A failed test</p></td>
+</tr>
+<tr>
+<td><p><span class="term"><a name="readme.E"></a>E</span></p></td>
+<td><p>A test that had an error</p></td>
+</tr>
+<tr>
+<td><p><span class="term"><a name="readme.P"></a>P</span></p></td>
+<td><p>A test that is marked as pending</p></td>
+</tr>
+<tr>
+<td><p><span class="term"><a name="readme.N"></a>N</span></p></td>
+<td><p>A test that had an notification</p></td>
+</tr>
+</tbody>
+</table></div>
+<p>The above marks are showed after each test is finished. We can confirm the test progress from the output in testing.</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.12.5"></a><h3>Summary of test result</h3>
+<p>Cutter outputs a summary of test result after all tests are finished. The first of a summary is a list of a detail of test result of non-succeeded test. In the example, cutter outputs a detail of test result because there is a failure.</p>
+<pre class="programlisting">1) Failure: test_test_case_count
+&lt;1 == cut_test_case_get_n_tests(test_object, NULL)&gt;
+expected: &lt;1&gt;
+ but was: &lt;0&gt;
+test/test-cut-test-case.c:143: test_test_case_count()</pre>
+<p>In the example, test_test_case_count test case is failed. We expected that cut_test_case_get_n_tests(test_object, NULL) is 1 but was 0. The failed assertion is in test_test_case_count() function in test/test-cut-test-case.c at 143th line.</p>
+<p>Elapsed time for testing is showed after a list of a detail of test result:</p>
+<pre class="programlisting">Finished in 0.020857 seconds</pre>
+<p>The last line is an summary of test result:</p>
+<pre class="programlisting">60 test(s), 253 assertion(s), 1 failure(s), 0 error(s), 0 pending(s), 0 notification(s)</pre>
+<p>Here are the means of each output:</p>
+<div class="variablelist"><table border="0" class="variablelist">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term"><a name="readme.n"></a>n test(s)</span></p></td>
+<td><p>n test case(s) (test function(s)) are run.</p></td>
+</tr>
+<tr>
+<td><p><span class="term">n assertion(s)</span></p></td>
+<td><p>n assertion(s) are passed.</p></td>
+</tr>
+<tr>
+<td><p><span class="term">n failure(s)</span></p></td>
+<td><p>n assertion(s) are failed.</p></td>
+</tr>
+<tr>
+<td><p><span class="term">n error(s)</span></p></td>
+<td><p>n error(s) are occurred (cut_error() is used n times)</p></td>
+</tr>
+<tr>
+<td><p><span class="term">n pending(s)</span></p></td>
+<td><p>n test case(s) are pending (cut_pending() is used n times)</p></td>
+</tr>
+<tr>
+<td><p><span class="term">n notification(s)</span></p></td>
+<td><p>n notification(s) are occurred (cut_notification() is used n times)</p></td>
+</tr>
+</tbody>
+</table></div>
+<p>In the example, 60 test cases are run, 253 assertions are passed and an assertion is failed. There are no error, pending, notification.</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.12.6"></a><h3>XML report</h3>
+<p>Cutter reports test result as XML format if --xml-report option is specified. A reported XML has the following structure:</p>
+<pre class="programlisting">&lt;report&gt;
+  &lt;!-- "result" tag is generated for a test result.
+        Normally, a "result" tag is generated for a test.
+        If you use cut_message(), you will get two or more "result" tags
+        for a test. --&gt;
+  &lt;result&gt;
+    &lt;test-case&gt;
+      &lt;name&gt;TEST CASE NAME&lt;/name&gt;
+      &lt;description&gt;DESCRIPTION OF TEST CASE (if exists)&lt;/description&gt;
+      &lt;start-time&gt;START TIME OF TEST CASE (ISO 8601 format) [e.g.: 2013-11-12T03:32:56.691676Z]&lt;/start-time&gt;
+      &lt;elapsed&gt;ELAPSED TIME OF TEST CASE (in seconds) [e.g.: 0.030883]&lt;/elapsed&gt;
+    &lt;/test-case&gt;
+    &lt;test&gt;
+      &lt;name&gt;TEST NAME&lt;/name&gt;
+      &lt;description&gt;DESCRIPTION OF TEST CASE (if exists)&lt;/description&gt;
+      &lt;start-time&gt;START TIME OF TEST (ISO 8601 format) [e.g.: 2013-11-12T03:32:56.691823Z]&lt;/start-time&gt;
+      &lt;elapsed&gt;ELAPSED TIME OF TEST (in seconds) [e.g.: 0.030883]&lt;/elapsed&gt;
+      &lt;option&gt;&lt;!-- ATTRIBUTE INFORMATION (if exists) --&gt;
+        &lt;name&gt;ATTRIBUTE NAME [e.g.: bug]&lt;/name&gt;
+        &lt;value&gt;ATTRIBUTE VALUE [e.g.: 1234]&lt;/value&gt;
+      &lt;/option&gt;
+      &lt;option&gt;
+        ...
+      &lt;/option&gt;
+      ...
+    &lt;/test&gt;
+    &lt;status&gt;TEST RESULT (one of them: success, notification, omission, pending, failure, error, crash)&lt;/status&gt;
+    &lt;detail&gt;DETAIL OF TEST RESULT (if exists)&lt;/detail&gt;
+    &lt;backtrace&gt;&lt;!-- BACKTRACE (if exists) --&gt;
+      &lt;entry&gt;
+        &lt;file&gt;FILE NAME&lt;/file&gt;
+        &lt;line&gt;LINE&lt;/line&gt;
+        &lt;info&gt;ADDITIONAL INFORMATION&lt;/info&gt;
+      &lt;/entry&gt;
+      &lt;entry&gt;
+        ...
+      &lt;/entry&gt;
+    &lt;/backtrace&gt;
+    &lt;start-time&gt;START TIME OF TEST (ISO 8601 format) [e.g.: 2013-11-12T03:32:56.691823Z]&lt;/start-time&gt;
+    &lt;elapsed&gt;ELAPSED TIME OF TEST (in seconds) [e.g.: 0.030883]&lt;/elapsed&gt;
+  &lt;/result&gt;
+  &lt;result&gt;
+    ...
+  &lt;/result&gt;
+  ...
+&lt;/report&gt;</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.12.7"></a><h3>Test coverage</h3>
+<p>
+  You can see the code coverage with Cutter if your system have 
+  <a class="ulink" href="http://ltp.sourceforge.net/" target="_top">LTP tools</a>
+  .  To see the coverage, add the followling line in your configure.ac and type "make coverage".
+</p>
+<pre class="programlisting">AC_CHECK_COVERAGE</pre>
+</div>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.13"></a><h2>References</h2>
+<div class="refsect2">
+<a name="id-1.2.2.3.13.2"></a><h3>Assertions</h3>
+<p>
+  See 
+  cutter/cut-assertions.h
+  .
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.13.3"></a><h3>Attributes</h3>
+<p>You can add attributes to your test to get more useful information on failure. For example, you can add Bug ID like the following</p>
+<pre class="programlisting">void attributes_invalid_input(void);
+void test_invalid_input(void);
+
+void
+attributes_invalid_input (void)
+{
+    cut_set_attributes("bug", "123");
+}
+
+void
+test_invalid_input (void)
+{
+    cut_assert_equal("OK", get_input());
+}</pre>
+<p>In the above example, test_invalid_input test has an attribute that the test is for Bug #123.</p>
+<p>You need to define a function whose name is "attributes_#{TEST_NAME - 'test_' PREFIX}" to add attributes to a test. In the above example, attributes set function, "attributes_invalid_input", is defined to set "bug" attribute to "test_invalid_input" test.</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.2.3.13.4"></a><h3>Template</h3>
+<p>The following is a template of test.</p>
+<pre class="programlisting">#include &lt;cutter.h&gt;
+
+#include "HEADER_FILE_OF_YOUR_PROGRAM"
+
+void test_condition(void);
+void test_strstr(void);
+
+static int condition = 0;
+
+void
+cut_setup (void)
+{
+    condition = 1;
+}
+
+void
+cut_teardown (void)
+{
+    condition = 0;
+}
+
+void
+test_condition(void)
+{
+    cut_set_message("The condition value should be set to 1 in cut_setup()");
+    cut_assert_equal_int(1, condition);
+  ...
+}
+
+void
+test_strstr(void)
+{
+    cut_assert_equal_string("sub-string",
+                            strstr("string sub-string", "sub"));
+    ...
+}</pre>
+</div>
+</div>
+<div class="refsect1">
+<a name="id-1.2.2.3.14"></a><h2>Thanks</h2>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p>Kazumasa Matsunaga: reported a build bug.</p></li>
+<li class="listitem"><p>Daijiro MORI: reported bugs.</p></li>
+<li class="listitem">
+<p>UNNO Hideyuki:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem"><p>reported a document bug.</p></li>
+<li class="listitem"><p>assisted Solaris install document.</p></li>
+</ul></div>
+</li>
+<li class="listitem"><p>gunyara-kun: suggested API design.</p></li>
+<li class="listitem"><p>Yamakawa Hiroshi: reported works on Cygwin.</p></li>
+<li class="listitem">
+<p>Yoshinori K. Okuji:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem"><p>reported locale related bugs.</p></li>
+<li class="listitem"><p>suggested a new feature.</p></li>
+</ul></div>
+</li>
+<li class="listitem"><p>Zed Shaw: reported bugs.</p></li>
+<li class="listitem"><p>Romuald Conty: reported a document bug.</p></li>
+<li class="listitem">
+<p>Romain Tartière:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem"><p>reported bugs.</p></li>
+<li class="listitem"><p>suggested improvements.</p></li>
+</ul></div>
+</li>
+<li class="listitem">
+<p>Ilya Barygin:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>reported bugs in test.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p>Hiroaki Nakamura:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>reported a bug on CentOS.</p></li></ul></div>
+</li>
+<li class="listitem">
+<p>Tobias Gruetzmacher:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>fixed a GTK+ test runner bug.</p></li></ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.28</div>
+</div>
+
+<div class="sponsors">
+  <p id="sponsor-osdn-net">
+    <a href="https://osdn.net/">
+      <img src="//osdn.net/sflogo.php?group_id=10282&type=1" width="96" height="29" border="0" alt="OSDN">
+    </a>
+  </p>
+  <p id="sponsor-github">
+    <a href="http://github.com/clear-code/cutter/">
+      <img src="../github-logo.png" width="100" height="45" border="0" alt="GitHub's git repositories are used.">
+    </a>
+  </p>
+  <p id="sponsor-tango">
+    <a href="http://tango.freedesktop.org/">
+      <img width="120" height="53" border="0" alt="Tango Desktop Project's icons are used." src="../tango-logo.png" />
+    </a>
+  </p>
+  <p id="sponsor-famfamfam">
+    <a href="http://www.famfamfam.com/">
+      <img width="120" height="18" border="0" alt="famfamfam.com's flags are used." src="../famfamfam-logo.png" />
+    </a>
+  </p>
+</div>
+
+</body>
+</html>

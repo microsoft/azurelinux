@@ -1,0 +1,15 @@
+diff -up tpm2-tss-3.0.0/Doxyfile.in.me tpm2-tss-3.0.0/Doxyfile.in
+--- tpm2-tss-3.0.0/Doxyfile.in.me	2020-09-15 20:24:26.463314644 +0200
++++ tpm2-tss-3.0.0/Doxyfile.in	2020-09-15 20:26:29.010866650 +0200
+@@ -947,7 +947,10 @@ EXCLUDE_PATTERNS       =
+ # Note that the wildcards are matched against the file with absolute path, so to
+ # exclude all test directories use the pattern */test/*
+ 
+-EXCLUDE_SYMBOLS        = *_IN IESYS_CMD_IN_PARAM
++EXCLUDE_SYMBOLS        = StartAuthSession_IN CreatePrimary_IN ContextSave_IN ContextLoad_IN \
++                         Load_IN LoadExternal_IN CreateLoaded_IN EvictControl_IN HMAC_Start_IN \
++                         HierarchyChangeAuth_IN SequenceComplete_IN Policy_IN NV_IN FlushContext_IN \
++                         IESYS_CMD_IN_PARAM
+ 
+ # The EXAMPLE_PATH tag can be used to specify one or more files or directories
+ # that contain example code fragments that are included (see the \include

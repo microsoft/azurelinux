@@ -1,0 +1,79 @@
+diff -urN a/parseconf.c b/parseconf.c
+--- a/parseconf.c	2021-05-29 23:39:19.000000000 +0200
++++ b/parseconf.c	2023-03-03 10:22:38.256439634 +0100
+@@ -185,6 +185,7 @@
+   { "dsa_cert_file", &tunable_dsa_cert_file },
+   { "dh_param_file", &tunable_dh_param_file },
+   { "ecdh_param_file", &tunable_ecdh_param_file },
++  { "ssl_ciphersuites", &tunable_ssl_ciphersuites },
+   { "ssl_ciphers", &tunable_ssl_ciphers },
+   { "rsa_private_key_file", &tunable_rsa_private_key_file },
+   { "dsa_private_key_file", &tunable_dsa_private_key_file },
+diff -urN a/ssl.c b/ssl.c
+--- a/ssl.c	2021-08-02 08:24:35.000000000 +0200
++++ b/ssl.c	2023-03-03 10:28:05.989757655 +0100
+@@ -135,6 +135,11 @@
+     {
+       die("SSL: could not set cipher list");
+     }
++    if (tunable_ssl_ciphersuites &&
++        SSL_CTX_set_ciphersuites(p_ctx, tunable_ssl_ciphersuites) != 1)
++    {
++      die("SSL: could not set ciphersuites");
++    }
+     if (RAND_status() != 1)
+     {
+       die("SSL: RNG is not seeded");
+diff -urN a/tunables.c b/tunables.c
+--- a/tunables.c	2021-05-29 23:39:00.000000000 +0200
++++ b/tunables.c	2023-03-03 10:13:30.566868026 +0100
+@@ -154,6 +154,7 @@
+ const char* tunable_dsa_cert_file;
+ const char* tunable_dh_param_file;
+ const char* tunable_ecdh_param_file;
+ const char* tunable_ssl_ciphers;
++const char* tunable_ssl_ciphersuites;
+ const char* tunable_rsa_private_key_file;
+ const char* tunable_dsa_private_key_file;
+@@ -293,6 +293,7 @@
+   install_str_setting(0, &tunable_dh_param_file);
+   install_str_setting(0, &tunable_ecdh_param_file);
+   install_str_setting("PROFILE=SYSTEM", &tunable_ssl_ciphers);
++  install_str_setting("TLS_AES_256_GCM_SHA384", &tunable_ssl_ciphersuites);
+   install_str_setting(0, &tunable_rsa_private_key_file);
+   install_str_setting(0, &tunable_dsa_private_key_file);
+   install_str_setting(0, &tunable_ca_certs_file);
+diff -urN a/tunables.h b/tunables.h
+--- a/tunables.h
++++ b/tunables.h
+@@ -144,6 +144,7 @@
+ extern const char* tunable_dsa_cert_file;
+ extern const char* tunable_dh_param_file;
+ extern const char* tunable_ecdh_param_file;
+ extern const char* tunable_ssl_ciphers;
++extern const char* tunable_ssl_ciphersuites;
+ extern const char* tunable_rsa_private_key_file;
+ extern const char* tunable_dsa_private_key_file;
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -1009,6 +1009,20 @@
+ 
+ Default: PROFILE=SYSTEM
+ .TP
++.B ssl_ciphersuites
++This option can be used to select which SSL cipher suites vsftpd will allow for
++encrypted SSL connections with TLSv1.3. See the
++.BR ciphers
++man page for further details. Note that restricting ciphers can be a useful
++security precaution as it prevents malicious remote parties forcing a cipher
++which they have found problems with.
++
++By default, the system-wide crypto policy is used. See
++.BR update-crypto-policies(8)
++for further details.
++
++Default: TLS_AES_256_GCM_SHA384
++.TP
+ .B ssl_sni_hostname
+ If set, SSL connections will be rejected unless the SNI hostname in the
+ incoming handshakes matches this value.

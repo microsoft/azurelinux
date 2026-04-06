@@ -1,0 +1,181 @@
+Set the major .so version to 2 for all unixODBC shared libraries, to reflect
+the incompatible ABI changes in 2.2.14.
+
+Note that we only patch 'Makefile.am' files and not 'Makefile.in' files,
+as we use 'autoconf' instead of the 'configure' setup tool
+
+--- unixODBC-2.3.11/DRVConfig/MiniSQL/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/MiniSQL/Makefile.am.patched	2022-05-19 10:56:27.087060411 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcminiS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcminiS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcminiS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcminiS_la_SOURCES = odbcminiS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/PostgreSQL/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/PostgreSQL/Makefile.am.patched	2022-05-19 10:56:27.090060438 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcpsqlS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcpsqlS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcpsqlS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcpsqlS_la_SOURCES = odbcpsqlS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/esoob/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/esoob/Makefile.am.patched	2022-05-19 10:56:27.093060465 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libesoobS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libesoobS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libesoobS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libesoobS_la_SOURCES = esoobS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/sapdb/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/sapdb/Makefile.am.patched	2022-05-19 10:56:27.096060492 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libsapdbS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libsapdbS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libsapdbS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libsapdbS_la_SOURCES = sapdb.c
+ 
+--- unixODBC-2.3.11/DRVConfig/Oracle/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/Oracle/Makefile.am.patched	2022-05-19 10:56:27.098060510 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = liboraodbcS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-liboraodbcS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++liboraodbcS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ liboraodbcS_la_SOURCES = oraodbcS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/Mimer/Makefile.am	2021-03-02 14:50:37.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/Mimer/Makefile.am.patched	2022-05-19 10:56:27.100060528 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libmimerS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libmimerS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libmimerS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libmimerS_la_SOURCES = mimerS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/MySQL/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/MySQL/Makefile.am.patched	2022-05-19 10:56:27.102060546 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcmyS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcmyS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcmyS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcmyS_la_SOURCES = odbcmyS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/txt/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/txt/Makefile.am.patched	2022-05-19 10:56:27.103060555 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbctxtS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbctxtS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbctxtS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbctxtS_la_SOURCES = drvcfg.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/drvcfg1/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/drvcfg1/Makefile.am.patched	2022-05-19 10:56:27.105060573 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcdrvcfg1S.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcdrvcfg1S_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcdrvcfg1S_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcdrvcfg1S_la_SOURCES = drvcfg1.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/oplodbc/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/oplodbc/Makefile.am.patched	2022-05-19 10:56:27.107060592 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = liboplodbcS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-liboplodbcS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++liboplodbcS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ liboplodbcS_la_SOURCES = oplodbc.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/tds/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/tds/Makefile.am.patched	2022-05-19 10:56:27.108060601 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libtdsS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libtdsS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libtdsS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libtdsS_la_SOURCES = tdsS.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/drvcfg2/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/drvcfg2/Makefile.am.patched	2022-05-19 10:56:27.110060619 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcdrvcfg2S.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcdrvcfg2S_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcdrvcfg2S_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcdrvcfg2S_la_SOURCES = drvcfg2.c
+ 	
+--- unixODBC-2.3.11/DRVConfig/nn/Makefile.am	2021-03-02 14:44:29.000000000 +0100
++++ unixODBC-2.3.11/DRVConfig/nn/Makefile.am.patched	2022-05-19 10:56:27.112060637 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libodbcnnS.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include $(LTDLINCL)
+ 
+-libodbcnnS_la_LDFLAGS = -module -no-undefined -version-info 1:0:0 -avoid-version -shared
++libodbcnnS_la_LDFLAGS = -module -no-undefined -version-info $(LIB_VERSION) -avoid-version -shared
+ 
+ libodbcnnS_la_SOURCES = drvcfg.c
+ 	
+--- unixODBC-2.3.11/Drivers/MiniSQL/Makefile.am	2018-01-02 11:48:19.000000000 +0100
++++ unixODBC-2.3.11/Drivers/MiniSQL/Makefile.am.patched	2022-05-19 10:56:27.114060655 +0200
+@@ -193,6 +193,6 @@ EXTRA_DIST = \
+ 	_sqlFreeEnv.c \
+ 	_sqlFreeStmt.c 
+ 
+-libodbcmini_la_LDFLAGS = -no-undefined -version-info 1:0:0 \
++libodbcmini_la_LDFLAGS = -no-undefined -version-info $(LIB_VERSION) \
+ 	-L@msql_libraries@ -lmsql -module
+ 
+--- unixODBC-2.3.11/Drivers/template/Makefile.am	2022-05-02 16:52:53.000000000 +0200
++++ unixODBC-2.3.11/Drivers/template/Makefile.am.patched	2022-05-19 10:56:27.116060673 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libtemplate.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include -I. $(LTDLINCL)
+ 
+-libtemplate_la_LDFLAGS = -no-undefined  -version-info 1:0:0 
++libtemplate_la_LDFLAGS = -no-undefined  -version-info $(LIB_VERSION) 
+ 
+ EXTRA_DIST = \
+ 	driver.h \
+--- unixODBC-2.3.11/Drivers/nn/Makefile.am	2018-01-02 11:48:19.000000000 +0100
++++ unixODBC-2.3.11/Drivers/nn/Makefile.am.patched	2022-05-19 10:56:27.118060691 +0200
+@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libnn.la
+ 
+ AM_CPPFLAGS = -I@top_srcdir@/include -I.
+ 
+-libnn_la_LDFLAGS = -no-undefined  -version-info 1:0:0 -module
++libnn_la_LDFLAGS = -no-undefined  -version-info $(LIB_VERSION) -module
+ 
+ EXTRA_DIST = \
+ 	nnconfig.h \

@@ -1,0 +1,43 @@
+--- event-listener-5.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ event-listener-5.4.1/Cargo.toml	2025-08-10T14:32:18.423632+00:00
+@@ -43,10 +43,6 @@
+ 
+ [features]
+ default = ["std"]
+-loom = [
+-    "concurrent-queue/loom",
+-    "parking?/loom",
+-]
+ portable-atomic = [
+     "portable-atomic-util",
+     "portable_atomic_crate",
+@@ -67,17 +63,8 @@
+ path = "examples/mutex.rs"
+ 
+ [[test]]
+-name = "loom"
+-path = "tests/loom.rs"
+-
+-[[test]]
+ name = "notify"
+ path = "tests/notify.rs"
+-
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+ 
+ [dependencies.concurrent-queue]
+ version = "2.4.0"
+@@ -103,11 +90,6 @@
+ default-features = false
+ package = "portable-atomic"
+ 
+-[dev-dependencies.criterion]
+-version = "0.7"
+-features = ["cargo_bench_support"]
+-default-features = false
+-
+ [dev-dependencies.critical-section]
+ version = "1.2.0"
+ features = ["std"]

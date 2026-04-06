@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=chkrootkit
+Comment=Locally check for signs of a rootkit
+Icon=chkrootkit
+Exec=bash -c "pkexec chkrootkit ; read -p 'Press ENTER to exit'"
+Terminal=true
+Type=Application
+Categories=Application;System;

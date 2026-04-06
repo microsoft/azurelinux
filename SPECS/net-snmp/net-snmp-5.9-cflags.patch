@@ -1,0 +1,20 @@
+diff -urNp a/perl/Makefile.PL b/perl/Makefile.PL
+--- a/perl/Makefile.PL	2020-08-26 08:32:52.498909823 +0200
++++ b/perl/Makefile.PL	2020-08-26 09:30:45.584951552 +0200
+@@ -1,3 +1,4 @@
++use lib '.';
+ use strict;
+ use warnings;
+ use ExtUtils::MakeMaker;
+diff -urNp a/perl/MakefileSubs.pm b/perl/MakefileSubs.pm
+--- a/perl/MakefileSubs.pm	2020-08-26 08:32:52.498909823 +0200
++++ b/perl/MakefileSubs.pm	2020-08-26 08:36:44.097218448 +0200
+@@ -116,7 +116,7 @@ sub AddCommonParams {
+ 	append($Params->{'CCFLAGS'}, $cflags);
+ 	append($Params->{'CCFLAGS'}, $Config{'ccflags'});
+ 	# Suppress known Perl header shortcomings.
+-	$Params->{'CCFLAGS'} =~ s/ -W(cast-qual|write-strings)//g;
++	$Params->{'CCFLAGS'} =~ s/ -W(inline|strict-prototypes|write-strings|cast-qual|no-char-subscripts)//g;
+ 	append($Params->{'CCFLAGS'}, '-Wformat');
+     }
+ }

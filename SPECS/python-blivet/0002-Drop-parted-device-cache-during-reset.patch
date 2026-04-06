@@ -1,0 +1,88 @@
+From b085c6e3a3ab1068dd2a94e4266b299f7ae9af5f Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 8 Apr 2025 13:03:54 +0200
+Subject: [PATCH] Drop parted device cache during reset
+
+Parted caches information about about devices internally.
+The cache is based on device name so when recreating a device
+using the same name but different size (e.g. when removing RAID0
+array and creating RAID1 array with the same name) the cached
+information, including device size, is used by parted. This means
+that during next reset() call parted will think the device is
+bigger and tries to fix the partition table on the array breaking
+it instead.
+
+Resolves: rhbz#2357214
+---
+ blivet/devices/storage.py   | 5 +++++
+ blivet/devicetree.py        | 5 +++++
+ blivet/formats/__init__.py  | 3 +++
+ blivet/formats/disklabel.py | 6 ++++++
+ 4 files changed, 19 insertions(+)
+
+diff --git a/blivet/devices/storage.py b/blivet/devices/storage.py
+index dd7439794..4e7707c63 100644
+--- a/blivet/devices/storage.py
++++ b/blivet/devices/storage.py
+@@ -917,3 +917,8 @@ def is_name_valid(self, name):
+ 
+         badchars = any(c in ('\x00', '/') for c in name)
+         return not badchars and name != '.' and name != '..'
++
++    def drop_cache(self):
++        """ Drop cached information stored for this device and its format """
++        if self.format:
++            self.format.drop_cache()
+diff --git a/blivet/devicetree.py b/blivet/devicetree.py
+index cec34a78b..f44c6db01 100644
+--- a/blivet/devicetree.py
++++ b/blivet/devicetree.py
+@@ -78,6 +78,7 @@ def __init__(self, ignored_disks=None, exclusive_disks=None):
+             :keyword exclusive_disks: exclusive didks
+             :type exclusive_disks: list
+         """
++        self._devices = []
+         self.reset(ignored_disks, exclusive_disks)
+ 
+     def reset(self, ignored_disks=None, exclusive_disks=None):
+@@ -88,6 +89,10 @@ def reset(self, ignored_disks=None, exclusive_disks=None):
+             :keyword exclusive_disks: exclusive didks
+             :type exclusive_disks: list
+         """
++        # remove cached data for devices
++        for device in self._devices:
++            device.drop_cache()
++
+         # internal data members
+         self._devices = []
+         self._actions = ActionList(addfunc=self._register_action,
+diff --git a/blivet/formats/__init__.py b/blivet/formats/__init__.py
+index ae6cb8e81..2d4d3ca63 100644
+--- a/blivet/formats/__init__.py
++++ b/blivet/formats/__init__.py
+@@ -735,6 +735,9 @@ def populate_ksdata(self, data):
+         data.fstype = self.type
+         data.mountpoint = self.ks_mountpoint
+ 
++    def drop_cache(self):
++        """ Drop cached information stored for this format """
++
+ 
+ register_device_format(DeviceFormat)
+ 
+diff --git a/blivet/formats/disklabel.py b/blivet/formats/disklabel.py
+index f40d3d05b..bd16718fe 100644
+--- a/blivet/formats/disklabel.py
++++ b/blivet/formats/disklabel.py
+@@ -603,5 +603,11 @@ def magic_partition_number(self):
+         else:
+             return 0
+ 
++    def drop_cache(self):
++        if self._parted_device and os.path.exists(self.device):
++            ped_device = self._parted_device.getPedDevice()
++            if ped_device:
++                ped_device.cache_remove()
++
+ 
+ register_device_format(DiskLabel)

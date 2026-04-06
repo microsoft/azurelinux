@@ -1,0 +1,41 @@
+--- cpp_demangle-0.5.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cpp_demangle-0.5.1/Cargo.toml	2025-11-07T07:22:39.901005+00:00
+@@ -47,7 +47,6 @@
+ [features]
+ alloc = []
+ default = ["std"]
+-fuzz = ["afl"]
+ logging = ["std"]
+ run_libiberty_tests = []
+ std = ["alloc"]
+@@ -56,30 +55,8 @@
+ name = "cpp_demangle"
+ path = "src/lib.rs"
+ 
+-[[bin]]
+-name = "afl_runner"
+-path = "src/bin/afl_runner.rs"
+-required-features = ["afl"]
+-
+-[[example]]
+-name = "cppfilt"
+-path = "examples/cppfilt.rs"
+-
+-[[example]]
+-name = "simple"
+-path = "examples/simple.rs"
+-required-features = ["std"]
+-
+-[dependencies.afl]
+-version = "0.16"
+-optional = true
+-
+ [dependencies.cfg-if]
+ version = "1.0.0"
+-
+-[dev-dependencies.clap]
+-version = "4.0"
+-features = ["derive"]
+ 
+ [dev-dependencies.diff]
+ version = "0.1.11"

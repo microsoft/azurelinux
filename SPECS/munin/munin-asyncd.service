@@ -1,0 +1,20 @@
+[Unit]
+Description=Munin Node - Asynchronous Proxy
+Documentation=http://guide.munin-monitoring.org/en/latest/node/async.html
+Requires=munin-node.service
+After=network.target
+After=network-online.target
+After=munin-node.service
+
+[Service]
+Type=notify
+User=munin
+ExecStart=/usr/sbin/munin-asyncd
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=full
+TimeoutStopSec=20s
+
+[Install]
+WantedBy=multi-user.target

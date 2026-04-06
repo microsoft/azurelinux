@@ -1,0 +1,29 @@
+# Note(gotmax23): I'm trying to get rid of the need for control macros in favor
+# of a metadata based approach. %%ansible_collection_url is the only macro that
+# requires manually specifying the collection namespace and name, as it is used
+# at the SRPM build stage.
+#
+# Currently, this macro supports either passing this information as arguments
+# or defining the control macros. In order to reduce confusion, this is not an
+# either or approach. Both arguments must be passed OR both control macros must
+# be defined.
+
+
+%__ansible_galaxy_collection_url https://galaxy.ansible.com/ui/repo/published
+
+%ansible_collection_url() %{lua:
+    local namespace_name = nil
+    if rpm.expand("%collection_namespace") ~= "%collection_namespace"
+            and rpm.expand("%collection_name") ~= "%collection_name" then
+        namespace_name = rpm.expand("%collection_namespace") .. "/" .. rpm.expand("%collection_name")
+    end
+    if rpm.expand("%1") ~= "%1" and rpm.expand("%2") ~= "%2" then
+        namespace_name = rpm.expand("%1") .. "/" .. rpm.expand("%2")
+    end
+    if not namespace_name then
+        rpm.expand("%{error:%%ansible_collection_url: You must pass the collection " ..
+            "namespace as the first arg and the collection name as the second}")
+    end
+    url = rpm.expand("%__ansible_galaxy_collection_url")
+    print(url .. "/" .. namespace_name)
+}

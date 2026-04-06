@@ -1,0 +1,56 @@
+From b25def5b8385f8382d3da1e37fc2204ffedc72e5 Mon Sep 17 00:00:00 2001
+From: Vincent Mihalkovic <vmihalko@redhat.com>
+Date: Thu, 31 Oct 2024 14:56:32 +0100
+Subject: [PATCH] json, xml: fix identical branches warning
+
+Error: IDENTICAL_BRANCHES (CWE-398):
+tree-2.1.0/json.c:124: identical_branches: The same code is executed regardless of whether "file->lnk" is true, because the 'then' and 'else' branches are identical. Should one of the branches be modified, or the entire 'if' statement replaced?
+  122|
+  123|     if (file != NULL) {
+  124|->     if (file->lnk) mt = file->mode & S_IFMT;
+  125|       else mt = file->mode & S_IFMT;
+  126|     } else mt = 0;
+
+Error: IDENTICAL_BRANCHES (CWE-398):
+tree-2.1.0/json.c:124: identical_branches: The same code is executed regardless of whether "file->lnk" is true, because the 'then' and 'else' branches are identical. Should one of the branches be modified, or the entire 'if' statement replaced?
+  122|
+  123|     if (file != NULL) {
+  124|->     if (file->lnk) mt = file->mode & S_IFMT;
+  125|       else mt = file->mode & S_IFMT;
+  126|     } else mt = 0;
+---
+ json.c | 3 +--
+ xml.c  | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/json.c b/json.c
+index 3495448..e86a590 100644
+--- a/json.c
++++ b/json.c
+@@ -121,8 +121,7 @@ int json_printinfo(char *dirname, struct _info *file, int level)
+   if (!noindent) json_indent(level);
+ 
+   if (file != NULL) {
+-    if (file->lnk) mt = file->mode & S_IFMT;
+-    else mt = file->mode & S_IFMT;
++    mt = file->mode & S_IFMT;
+   } else mt = 0;
+ 
+   for(t=0;ifmt[t];t++)
+diff --git a/xml.c b/xml.c
+index 9fdf74e..96c76f2 100644
+--- a/xml.c
++++ b/xml.c
+@@ -105,8 +105,7 @@ int xml_printinfo(char *dirname, struct _info *file, int level)
+   if (!noindent) xml_indent(level);
+ 
+   if (file != NULL) {
+-    if (file->lnk) mt = file->mode & S_IFMT;
+-    else mt = file->mode & S_IFMT;
++    mt = file->mode & S_IFMT;
+   } else mt = 0;
+ 
+   for(t=0;ifmt[t];t++)
+-- 
+2.46.2
+

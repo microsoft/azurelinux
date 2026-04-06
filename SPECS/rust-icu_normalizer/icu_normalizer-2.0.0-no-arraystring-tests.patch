@@ -1,0 +1,111 @@
+diff -Naur icu_normalizer-2.0.0-original/tests/tests.rs icu_normalizer-2.0.0/tests/tests.rs
+--- icu_normalizer-2.0.0-original/tests/tests.rs	2006-07-23 21:21:28.000000000 -0400
++++ icu_normalizer-2.0.0/tests/tests.rs	2025-07-13 09:52:22.569644493 -0400
+@@ -431,8 +431,12 @@
+     );
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ type StackString = arraystring::ArrayString<arraystring::typenum::U48>;
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfd_str_to() {
+     let normalizer = DecomposingNormalizerBorrowed::new_nfd();
+@@ -446,6 +450,8 @@
+     assert_eq!(&buf, "e\u{0323}\u{0302}");
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfd_utf8_to() {
+     let normalizer = DecomposingNormalizerBorrowed::new_nfd();
+@@ -482,6 +488,8 @@
+     assert_eq!(&buf, [0x0065u16, 0x0323u16, 0x0302u16].as_slice());
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfc_str_to() {
+     let normalizer = ComposingNormalizerBorrowed::new_nfc();
+@@ -497,6 +505,8 @@
+     assert_eq!(&buf, "ệ");
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfc_utf8_to() {
+     let normalizer = ComposingNormalizerBorrowed::new_nfc();
+@@ -531,6 +541,8 @@
+     assert_eq!(&buf, [0x1EC7u16].as_slice());
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfc_utf8_to_errors() {
+     let normalizer = ComposingNormalizerBorrowed::new_nfc();
+@@ -560,6 +572,8 @@
+     assert_eq!(&buf, "aaa\u{FFFD}aaa\u{FFFD}aaa");
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_nfd_utf8_to_errors() {
+     let normalizer = DecomposingNormalizerBorrowed::new_nfd();
+@@ -806,6 +820,8 @@
+ use atoi::FromRadix16;
+ use icu_properties::props::CanonicalCombiningClass;
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ /// Parse five semicolon-terminated strings consisting of space-separated hexadecimal scalar values
+ fn parse_hex(mut hexes: &[u8]) -> [StackString; 5] {
+     let mut strings = [
+@@ -839,6 +855,8 @@
+     }
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_conformance() {
+     let nfd = DecomposingNormalizerBorrowed::new_nfd();
+@@ -1023,16 +1041,22 @@
+         .unwrap();
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ fn str_to_str(s: &str, sink: &mut StackString) {
+     sink.clear();
+     sink.try_push_str(s).unwrap();
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ fn char_to_str(c: char, sink: &mut StackString) {
+     sink.clear();
+     sink.try_push(c).unwrap();
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_conformance_utf16() {
+     let nfd = DecomposingNormalizerBorrowed::new_nfd();
+@@ -1246,6 +1270,8 @@
+     }
+ }
+ 
++// Downstream: patch out tests requiring arraystring
++#[cfg(any())]
+ #[test]
+ fn test_conformance_utf8() {
+     let nfd = DecomposingNormalizerBorrowed::new_nfd();

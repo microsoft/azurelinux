@@ -1,0 +1,29 @@
+--- radix_trie-0.2.1/Cargo.toml	2020-10-22T10:41:51+00:00
++++ radix_trie-0.2.1/Cargo.toml	2023-03-12T22:03:46.202018+00:00
+@@ -26,9 +26,6 @@
+ [lib]
+ bench = false
+ 
+-[[bench]]
+-name = "trie_benches"
+-harness = false
+ [dependencies.endian-type]
+ version = "0.1.2"
+ 
+@@ -38,14 +35,12 @@
+ [dependencies.serde]
+ version = "1.0"
+ optional = true
+-[dev-dependencies.criterion]
+-version = "0.3"
+ 
+ [dev-dependencies.quickcheck]
+-version = "0.4"
++version = "1.0"
+ 
+ [dev-dependencies.rand]
+-version = "0.3"
++version = "0.8"
+ 
+ [dev-dependencies.serde_test]
+ version = "1.0"

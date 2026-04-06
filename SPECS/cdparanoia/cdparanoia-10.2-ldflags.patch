@@ -1,0 +1,24 @@
+diff -up cdparanoia-III-10.2/interface/Makefile.in.jx cdparanoia-III-10.2/interface/Makefile.in
+--- cdparanoia-III-10.2/interface/Makefile.in.jx	2008-08-21 12:08:54.000000000 -0400
++++ cdparanoia-III-10.2/interface/Makefile.in	2018-03-07 13:12:53.999947802 -0500
+@@ -46,7 +46,7 @@ libcdda_interface.a: 	$(OFILES)
+ 	$(RANLIB) libcdda_interface.a
+ 
+ libcdda_interface.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES) $(LIBS)
++	$(CC) $(LDFLAGS) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES) $(LIBS)
+ 	[ -e libcdda_interface.so.0 ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so.0
+ 	[ -e libcdda_interface.so ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so
+ 
+diff -up cdparanoia-III-10.2/paranoia/Makefile.in.jx cdparanoia-III-10.2/paranoia/Makefile.in
+--- cdparanoia-III-10.2/paranoia/Makefile.in.jx	2008-09-04 15:02:47.000000000 -0400
++++ cdparanoia-III-10.2/paranoia/Makefile.in	2018-03-07 13:12:39.352765050 -0500
+@@ -44,7 +44,7 @@ libcdda_paranoia.a: 	$(OFILES)
+ 	$(RANLIB) libcdda_paranoia.a
+ 
+ libcdda_paranoia.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(OFILES) -L ../interface -lcdda_interface
++	$(CC) $(LDFLAGS) -fpic -shared -o libcdda_paranoia.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_paranoia.so.0 $(OFILES) -L ../interface -lcdda_interface
+ 	[ -e libcdda_paranoia.so.0 ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so.0
+ 	[ -e libcdda_paranoia.so ] || ln -s libcdda_paranoia.so.0.$(VERSION) libcdda_paranoia.so
+ 

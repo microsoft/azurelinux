@@ -1,0 +1,113 @@
+From 0904385936ef4ecae4519f4f7b8f829a3608afcd Mon Sep 17 00:00:00 2001
+From: MSP-Greg <greg.mpls@gmail.com>
+Date: Sun, 13 Jan 2019 08:47:36 -0600
+Subject: [PATCH] Update runtime files for TLS 1.3, no SSL, OpenSSL lib info
+
+Add several constants related to OpenSSL & TLS 1.3
+EM::OPENSSL_LIBRARY_VERSION
+EM::OPENSSL_VERSION
+
+EM_PROTO_TLSv1_3
+EM::OPENSSL_NO_SSL2
+EM::OPENSSL_NO_SSL3
+---
+ ext/eventmachine.h   |  5 +++++
+ ext/rubymain.cpp     | 28 ++++++++++++++++++++++++++++
+ ext/ssl.cpp          |  5 +++++
+ lib/em/connection.rb |  5 +++++
+ 4 files changed, 43 insertions(+)
+
+diff --git a/ext/eventmachine.h b/ext/eventmachine.h
+index 2861276b..788f1ca4 100644
+--- a/ext/eventmachine.h
++++ b/ext/eventmachine.h
+@@ -44,7 +44,12 @@ extern "C" {
+ 		EM_PROTO_SSLv3 = 4,
+ 		EM_PROTO_TLSv1 = 8,
+ 		EM_PROTO_TLSv1_1 = 16,
++#ifdef TLS1_3_VERSION
++		EM_PROTO_TLSv1_2 = 32,
++		EM_PROTO_TLSv1_3 = 64
++#else
+ 		EM_PROTO_TLSv1_2 = 32
++#endif
+ 	};
+ 
+ 	void evma_initialize_library (EMCallback);
+diff --git a/ext/rubymain.cpp b/ext/rubymain.cpp
+index c5ea628e..0194aaea 100644
+--- a/ext/rubymain.cpp
++++ b/ext/rubymain.cpp
+@@ -1511,5 +1511,33 @@ extern "C" void Init_rubyeventmachine()
+ 	rb_define_const (EmModule, "EM_PROTO_TLSv1",   INT2NUM(EM_PROTO_TLSv1  ));
+ 	rb_define_const (EmModule, "EM_PROTO_TLSv1_1", INT2NUM(EM_PROTO_TLSv1_1));
+ 	rb_define_const (EmModule, "EM_PROTO_TLSv1_2", INT2NUM(EM_PROTO_TLSv1_2));
++#ifdef TLS1_3_VERSION
++	rb_define_const (EmModule, "EM_PROTO_TLSv1_3", INT2NUM(EM_PROTO_TLSv1_3));
++#endif
++
++#ifdef OPENSSL_NO_SSL3
++	/* True if SSL3 is not available */
++	rb_define_const (EmModule, "OPENSSL_NO_SSL3", Qtrue);
++	rb_define_const (EmModule, "OPENSSL_NO_SSL2", Qtrue);
++#else
++	rb_define_const (EmModule, "OPENSSL_NO_SSL3", Qfalse);
++#ifdef OPENSSL_NO_SSL2
++	rb_define_const (EmModule, "OPENSSL_NO_SSL2", Qtrue);
++#else
++	rb_define_const (EmModule, "OPENSSL_NO_SSL2", Qfalse);
++#endif
++#endif
++
++  // OpenSSL Build / Runtime/Load versions
++
++	/* Version of OpenSSL that EventMachine was compiled with */
++	rb_define_const(EmModule, "OPENSSL_VERSION", rb_str_new2(OPENSSL_VERSION_TEXT));
++
++#if !defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000
++	/* Version of OpenSSL that EventMachine loaded with */
++	rb_define_const(EmModule, "OPENSSL_LIBRARY_VERSION", rb_str_new2(OpenSSL_version(OPENSSL_VERSION)));
++#else
++	rb_define_const(EmModule, "OPENSSL_LIBRARY_VERSION", rb_str_new2(SSLeay_version(SSLEAY_VERSION)));
++#endif
+ }
+ 
+diff --git a/ext/ssl.cpp b/ext/ssl.cpp
+index 8d5e038a..c83e5b09 100644
+--- a/ext/ssl.cpp
++++ b/ext/ssl.cpp
+@@ -180,6 +180,11 @@ SslContext_t::SslContext_t (bool is_server, const std::string &privkeyfile, cons
+ 		SSL_CTX_set_options (pCtx, SSL_OP_NO_TLSv1_2);
+ 	#endif
+ 
++	#ifdef SSL_OP_NO_TLSv1_3
++	if (!(ssl_version & EM_PROTO_TLSv1_3))
++		SSL_CTX_set_options (pCtx, SSL_OP_NO_TLSv1_3);
++	#endif
++
+ 	#ifdef SSL_MODE_RELEASE_BUFFERS
+ 	SSL_CTX_set_mode (pCtx, SSL_MODE_RELEASE_BUFFERS);
+ 	#endif
+diff --git a/lib/em/connection.rb b/lib/em/connection.rb
+index 7d45e92f..b5f8b0ad 100644
+--- a/lib/em/connection.rb
++++ b/lib/em/connection.rb
+@@ -436,6 +436,9 @@ def start_tls args={}
+         protocols_bitmask |= EventMachine::EM_PROTO_TLSv1
+         protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_1
+         protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_2
++        if EventMachine.const_defined? :EM_PROTO_TLSv1_3
++          protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_3
++        end
+       else
+         [ssl_version].flatten.each do |p|
+           case p.to_s.downcase
+@@ -449,6 +452,8 @@ def start_tls args={}
+             protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_1
+           when 'tlsv1_2'
+             protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_2
++          when 'tlsv1_3'
++            protocols_bitmask |= EventMachine::EM_PROTO_TLSv1_3
+           else
+             raise("Unrecognized SSL/TLS Protocol: #{p}")
+           end

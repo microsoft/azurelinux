@@ -1,0 +1,120 @@
+From e0e4894459bafff17e4c507c93e4977da20008f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Veronika=20Hanul=C3=ADkov=C3=A1?= <vhanulik@redhat.com>
+Date: Fri, 3 May 2024 17:27:32 +0200
+Subject: [PATCH] Remove tests unsupported on Fedora
+
+---
+ Makefile.am         |  2 +-
+ generate-eac-pki.sh |  6 +++---
+ src/eactest.c       | 16 +---------------
+ 3 files changed, 5 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 59f9ed3..ffe667c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -62,7 +62,7 @@ test-eactest:
+ 
+ test-cvcutils:
+ 	echo "whatever" > ZZATTERM00001.txt
+-	openssl ecparam -out ZZATCVCA00001.pem -name prime192v1 -genkey \
++	openssl ecparam -out ZZATCVCA00001.pem -name prime256v1 -genkey \
+ 		&& openssl pkcs8 -topk8 -nocrypt -in ZZATCVCA00001.pem -outform DER -out ZZATCVCA00001.pkcs8 \
+ 		&& $(ENV) $(builddir)/src/cvc-create --role=cvca --type=at --chr=ZZATCVCA00001 --issued=170101 --expires=`date --date="next year" "+%^y%^m%^d"` --sign-with=ZZATCVCA00001.pkcs8 --scheme=ECDSA_SHA_512 --write-dg17 --write-dg18 --write-dg19 --write-dg20 --write-dg21 --at-rfu32 --at-rfu31 --at-rfu30 --at-rfu29 --read-dg1 --read-dg2 --read-dg3 --read-dg4 --read-dg5 --read-dg6 --read-dg7 --read-dg8 --read-dg9 --read-dg10 --read-dg11 --read-dg12 --read-dg13 --read-dg14 --read-dg15 --read-dg16 --read-dg17 --read-dg18 --read-dg19 --read-dg20 --read-dg21 --install-qual-cert --install-cert --pin-management --can-allowed --privileged --rid --verify-community --verify-age \
+ 		&& $(ENV) $(builddir)/src/cvc-create --role=dv_domestic --chr=ZZATDVCA00001 --expires=`date --date="next month" "+%^y%^m%^d"` --sign-with=ZZATCVCA00001.pkcs8 --sign-as=ZZATCVCA00001.cvcert --scheme=ECDSA_SHA_256 --rid \
+diff --git a/generate-eac-pki.sh b/generate-eac-pki.sh
+index bacab32..6994848 100644
+--- a/generate-eac-pki.sh
++++ b/generate-eac-pki.sh
+@@ -17,10 +17,10 @@ EIGHTTEENMONTH="`date --date="18 month" "+%^y%^m%^d"`"
+ curve2dp() {
+     local dp=""
+     case $1 in
+-        prime192v1      ) dp="8";;
+-        brainpoolp192r1 ) dp="9";;
++        #prime192v1      ) dp="8";;
++        #brainpoolp192r1 ) dp="9";;
+         secp224r1       ) dp="10";;
+-        brainpoolP224r1 ) dp="11";;
++        #brainpoolP224r1 ) dp="11";;
+         prime256v1      ) dp="12";;
+         brainpoolP256r1 ) dp="13";;
+         brainpoolP512r1 ) dp="14";;
+diff --git a/src/eactest.c b/src/eactest.c
+index 6f2e08d..477b1bd 100644
+--- a/src/eactest.c
++++ b/src/eactest.c
+@@ -2277,10 +2277,7 @@ static const struct cv_cert cv_certs[] = {
+     {service_bw_cert, sizeof service_bw_cert, NULL, 0, NULL, 0, NULL, 0},
+     {service_bw_cert_2, sizeof service_bw_cert_2, NULL, 0, NULL, 0, NULL, 0},
+     {service_bw_cert_3, sizeof service_bw_cert_3, NULL, 0, NULL, 0, NULL, 0},
+-    {service_bw_cert_4, sizeof service_bw_cert_4, NULL, 0, NULL, 0, NULL, 0},
+-    {NULL, 0, NULL, 0, req_18102010_csr, sizeof req_18102010_csr, NULL, 0},
+-    {NULL, 0, NULL, 0, MY_cvreq, sizeof MY_cvreq, NULL, 0},
+-    {NULL, 0, NULL, 0, NULL, 0, csr_with_outer_sig, sizeof csr_with_outer_sig},
++    {service_bw_cert_4, sizeof service_bw_cert_4, NULL, 0, NULL, 0, NULL, 0}
+ };
+ 
+ 
+@@ -2898,29 +2895,21 @@ do_dynamic_eac_tests(void)
+        { NID_id_PACE_DH_IM_AES_CBC_CMAC_128, 2 },
+        { NID_id_PACE_DH_IM_AES_CBC_CMAC_192, 0 },
+        { NID_id_PACE_DH_IM_AES_CBC_CMAC_256, 1},
+-       { NID_id_PACE_ECDH_GM_3DES_CBC_CBC, 11 },
+        { NID_id_PACE_ECDH_GM_3DES_CBC_CBC, 16 },
+-       { NID_id_PACE_ECDH_GM_AES_CBC_CMAC_128, 9 },
+        { NID_id_PACE_ECDH_GM_AES_CBC_CMAC_128, 12 },
+        { NID_id_PACE_ECDH_GM_AES_CBC_CMAC_192, 18 },
+        { NID_id_PACE_ECDH_GM_AES_CBC_CMAC_192, 10 },
+        { NID_id_PACE_ECDH_GM_AES_CBC_CMAC_256, 15 },
+        { NID_id_PACE_ECDH_IM_3DES_CBC_CBC, 13 },
+        { NID_id_PACE_ECDH_IM_AES_CBC_CMAC_128, 14 },
+-       { NID_id_PACE_ECDH_IM_AES_CBC_CMAC_192, 8 },
+        { NID_id_PACE_ECDH_IM_AES_CBC_CMAC_256, 17 },
+     };
+     const struct ta_params dynamic_ta_params[] = {
+-       { NID_id_TA_RSA_v1_5_SHA_1, 1024 },
+        { NID_id_TA_RSA_v1_5_SHA_256, 1280 },
+-       { NID_id_TA_RSA_PSS_SHA_1, 1536 },
+        { NID_id_TA_RSA_PSS_SHA_256, 2048 },
+        { NID_id_TA_RSA_v1_5_SHA_512, 3072 },
+        { NID_id_TA_RSA_PSS_SHA_512, 1024 },
+-       { NID_id_TA_ECDSA_SHA_1, 8 },
+-       { NID_id_TA_ECDSA_SHA_224, 9 },
+        { NID_id_TA_ECDSA_SHA_256, 10 },
+-       { NID_id_TA_ECDSA_SHA_384, 11 },
+        { NID_id_TA_ECDSA_SHA_512, 12 },
+     };
+     const struct ca_params dynamic_ca_params[] = {
+@@ -2928,28 +2917,20 @@ do_dynamic_eac_tests(void)
+        { NID_id_CA_DH_AES_CBC_CMAC_128, 1 },
+        { NID_id_CA_DH_AES_CBC_CMAC_192, 2 },
+        { NID_id_CA_DH_AES_CBC_CMAC_256, 0 },
+-       { NID_id_CA_ECDH_3DES_CBC_CBC, 8 },
+-       { NID_id_CA_ECDH_AES_CBC_CMAC_128, 11 },
+        { NID_id_CA_ECDH_AES_CBC_CMAC_192, 13 },
+        { NID_id_CA_ECDH_AES_CBC_CMAC_256, 14 },
+     };
+     const struct ri_params dynamic_ri_params[] = {
+-       { NID_id_RI_DH_SHA_1, 0 },
+        { NID_id_RI_DH_SHA_224, 1 },
+        { NID_id_RI_DH_SHA_256, 2 },
+        { NID_id_RI_DH_SHA_384, 0 },
+        { NID_id_RI_DH_SHA_512, 1 },
+-       { NID_id_RI_ECDH_SHA_1, 8 },
+-       { NID_id_RI_ECDH_SHA_224, 9 },
+        { NID_id_RI_ECDH_SHA_256, 10 },
+-       { NID_id_RI_ECDH_SHA_384, 11 },
+        { NID_id_RI_ECDH_SHA_512, 12 },
+-       { NID_id_RI_ECDH_SHA_1, 13 },
+        { NID_id_RI_ECDH_SHA_224, 14 },
+        { NID_id_RI_ECDH_SHA_256, 15 },
+        { NID_id_RI_ECDH_SHA_384, 16 },
+        { NID_id_RI_ECDH_SHA_512, 17 },
+-       { NID_id_RI_ECDH_SHA_1, 18 },
+     };
+ 
+     printf("Dynamic EAC tests:\n");
+-- 
+2.44.0
+

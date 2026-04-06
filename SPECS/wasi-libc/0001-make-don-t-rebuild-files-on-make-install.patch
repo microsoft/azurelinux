@@ -1,0 +1,86 @@
+From 49cd232ebf6d8e35da47ebe9d27f69e3dab9cdeb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Stan=C4=9Bk?= <jstanek@redhat.com>
+Date: Mon, 29 Aug 2022 15:07:34 +0200
+Subject: [PATCH 1/2] make: don't rebuild files on `make install`
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The original Makefile does not allow for clean separation of build and
+install steps, and re-compiles the library on `make install`.
+
+Using [empty target files][], the re-compilation is skipped on install.
+Adapted from [Debian patch][].
+
+[empty target files]: https://www.gnu.org/software/make/manual/make.html#Empty-Targets
+[Debian patch]: https://salsa.debian.org/rust-team/wasi-libc/-/blob/master/debian/patches/dont-rebuild-install.patch
+
+Signed-off-by: Jan Staněk <jstanek@redhat.com>
+Signed-off-by: rpm-build <rpm-build>
+---
+ Makefile | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index cd8deb4..e0776fb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -831,6 +831,7 @@ $(STARTUP_FILES): $(INCLUDE_DIRS) $(LIBC_BOTTOM_HALF_CRT_OBJS)
+ 	touch $@
+ 
+ startup_files: $(STARTUP_FILES)
++	touch $@
+ 
+ # TODO: As of this writing, wasi_thread_start.s uses non-position-independent
+ # code, and I'm not sure how to make it position-independent.  Once we've done
+@@ -850,6 +851,7 @@ endif
+ endif
+ 
+ libc_so: $(INCLUDE_DIRS) $(LIBC_SO)
++	touch $@
+ 
+ STATIC_LIBS = \
+     $(SYSROOT_LIB)/libc.a \
+@@ -866,6 +868,7 @@ STATIC_LIBS += \
+ endif
+ 
+ libc: $(INCLUDE_DIRS) $(STATIC_LIBS) builtins
++	touch $@
+ 
+ DUMMY := m rt pthread crypt util xnet resolv
+ DUMMY_LIBS := $(patsubst %,$(SYSROOT_LIB)/lib%.a,$(DUMMY))
+@@ -882,6 +885,7 @@ no-check-symbols: $(STARTUP_FILES) libc $(DUMMY_LIBS)
+ 	#
+ 	# The build succeeded! The generated sysroot is in $(SYSROOT).
+ 	#
++	touch $@
+ 
+ finish: no-check-symbols
+ 
+@@ -1026,6 +1030,8 @@ endif
+ 	# This ignores whitespace because on Windows the output has CRLF line endings.
+ 	diff -wur "$(EXPECTED_TARGET_DIR)" "$(SYSROOT_SHARE)"
+ 
++	touch $@
++
+ 
+ ##### BINDINGS #################################################################
+ # The `bindings` target retrieves the necessary WIT files for the wasi-cli world
+@@ -1098,10 +1104,13 @@ bindings: $(BINDING_WORK_DIR)/wasi-cli $(BINDING_WORK_DIR)/wit-bindgen
+ 	sed -i 's/extern void exit_exit/_Noreturn extern void exit_exit/' libc-bottom-half/headers/public/wasi/wasip2.h
+ 	sed -i 's/extern void __wasm_import_exit_exit/_Noreturn extern void __wasm_import_exit_exit/' libc-bottom-half/sources/wasip2.c
+ 
++	touch $@
++
+ 
+ clean:
+ 	$(RM) -r "$(BINDING_WORK_DIR)"
+ 	$(RM) -r "$(OBJDIR)"
+ 	$(RM) -r "$(SYSROOT)"
++	$(RM) check-symbols no-check-symbols libc_so libc bindings startup_files
+ 
+-.PHONY: default libc libc_so finish install clean check-symbols no-check-symbols bindings startup_files
++.PHONY: default finish install clean bindings
+-- 
+2.52.0
+

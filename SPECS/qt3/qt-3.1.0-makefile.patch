@@ -1,0 +1,11 @@
+--- qt-x11-free-3.1.0/Makefile.orig	2002-11-14 15:44:17.000000000 +0100
++++ qt-x11-free-3.1.0/Makefile	2002-11-14 15:49:33.000000000 +0100
+@@ -11,7 +11,7 @@
+ install: FORCE
+ 	@$(MAKE) qt.install
+ 
+-all: symlinks src-qmake src-moc sub-src sub-tools sub-tutorial sub-examples
++all: symlinks src-qmake src-moc sub-src sub-tools
+ 	@echo
+ 	@echo "The Qt library is now built in ./lib"
+ 	@echo "The Qt examples are built in the directories in ./examples"

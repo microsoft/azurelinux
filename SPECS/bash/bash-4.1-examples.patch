@@ -1,0 +1,24 @@
+diff --git a/examples/loadables/Makefile.in b/examples/loadables/Makefile.in
+--- a/examples/loadables/Makefile.in
++++ b/examples/loadables/Makefile.in
+@@ -59,7 +59,7 @@ host_cpu = @host_cpu@
+ host_vendor = @host_vendor@
+ 
+ STYLE_CFLAGS = @STYLE_CFLAGS@
+-CFLAGS = @CFLAGS@
+++CFLAGS = -O2 -g
+ LOCAL_CFLAGS = @LOCAL_CFLAGS@
+ DEFS = @DEFS@
+ LOCAL_DEFS = @LOCAL_DEFS@
+diff --git a/examples/loadables/perl/Makefile.in b/examples/loadables/perl/Makefile.in
+--- a/examples/loadables/perl/Makefile.in
++++ b/examples/loadables/perl/Makefile.in
+@@ -42,7 +42,7 @@ SHELL = @MAKE_SHELL@
+ 
+ PERL5 = perl5
+ 
+-CFLAGS = @CFLAGS@
++CFLAGS = -O2 -g
+ 
+ #
+ # These values are generated for configure by ${topdir}/support/shobj-conf.

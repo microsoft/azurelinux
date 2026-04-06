@@ -1,0 +1,34 @@
+--- jsonwebtoken-9.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jsonwebtoken-9.3.1/Cargo.toml	2026-02-07T06:47:43.419955+00:00
+@@ -85,14 +85,6 @@
+     "simple_asn1",
+ ]
+ 
+-[target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dev-dependencies.criterion]
+-version = "0.4"
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dev-dependencies.time]
+-version = "0.3"
+-features = ["wasm-bindgen"]
+-
+ [target.'cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))'.dev-dependencies.criterion]
+ version = "0.4"
+ 
+@@ -103,15 +95,6 @@
+ version = "0.17.4"
+ features = ["std"]
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.js-sys]
+-version = "0.3"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.ring]
+-version = "0.17.4"
+-features = [
+-    "std",
+-    "wasm32_unknown_unknown_js",
+-]
+-
+ [badges.maintenance]
+ status = "passively-maintained"
++

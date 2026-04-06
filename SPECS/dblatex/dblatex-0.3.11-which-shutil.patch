@@ -1,0 +1,42 @@
+From af5dc6ec530b107a4a0bd6ac9b2e80b0e7d36077 Mon Sep 17 00:00:00 2001
+Message-Id: <af5dc6ec530b107a4a0bd6ac9b2e80b0e7d36077.1569226914.git.github@grubix.eu>
+In-Reply-To: <49b85799a8f0674ac5eb6f2dfc37b23208d9754a.1569226914.git.github@grubix.eu>
+References: <49b85799a8f0674ac5eb6f2dfc37b23208d9754a.1569226914.git.github@grubix.eu>
+From: =?UTF-8?q?Nikola=20Forr=C3=B3?= <nforro@redhat.com>
+Date: Tue, 26 Jun 2018 17:41:19 +0200
+Subject: [PATCH 13/13] Use which from shutil
+
+Signed-off-by: Michael J Gruber <github@grubix.eu>
+---
+ setup.py | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 86619ec..799c1d2 100644
+--- a/setup.py
++++ b/setup.py
+@@ -208,17 +208,15 @@ class Build(build):
+ 
+ 
+ def find_programs(utils):
+-    sys.path.append("lib")
+-    from contrib.which import which
++    import shutil
+     util_paths = {}
+     missed = []
+     for util in utils:
+-        try:
+-            path = which.which(util)
++        path = shutil.which(util)
++        if path:
+             util_paths[util] = path
+-        except which.WhichError:
++        else:
+             missed.append(util)
+-    sys.path.remove("lib")
+     return (util_paths, missed)
+ 
+ def kpsewhich(tex_file):
+-- 
+2.23.0.369.g5d0cb2d495
+

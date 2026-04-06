@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
+    <groupId>tw.edu.ntu.csie</groupId>
+    <artifactId>libsvm</artifactId>
+    <version>3.35</version>
+
+    <name>libsvm</name>
+    <description>LIBSVM - A Library for Support Vector Machines</description>
+    <url>https://github.com/cjlin1/libsvm</url>
+
+    <inceptionYear>2014</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>BSD 3-Clause License</name>
+            <url>http://www.csie.ntu.edu.tw/~cjlin/libsvm/COPYRIGHT</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:cjlin1/libsvm.git</connection>
+        <developerConnection>scm:git:git@github.com:cjlin1/libsvm.git</developerConnection>
+        <url>https://github.com/cjlin1/libsvm</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <java.version>8</java.version>
+        <maven.exec.plugin.version>3.0.0</maven.exec.plugin.version>
+        <build.helper.plugin.version>3.0.0</build.helper.plugin.version>
+        <maven-plugin-version>3.8.0</maven-plugin-version>
+        <javadoc.plugin.version>3.2.0</javadoc.plugin.version>
+        <source.plugin.version>3.2.1</source.plugin.version>
+        <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
+        <gpg.plugin.version>1.6</gpg.plugin.version>
+        <gpg.keyname>91EA7956A2DAD9CE</gpg.keyname>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven.exec.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>m4</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>m4</executable>
+                    <arguments>
+                        <argument>java/libsvm/svm.m4</argument>
+                    </arguments>
+                    <outputFile>target/generated-sources/libsvm/svm.java</outputFile>
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build.helper.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/java/libsvm</source>
+                                <source>${project.basedir}/target/generated-sources/libsvm</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-plugin-version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <showDeprecation>true</showDeprecation>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${javadoc.plugin.version}</version>
+                <configuration>
+                    <!-- workaround for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+                    <javaApiLinks>
+                        <property>
+                            <name>foo</name>
+                            <value>bar</value>
+                        </property>
+                    </javaApiLinks>
+                    <links>
+                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
+                    </links>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                    <encoding>utf-8</encoding>
+                    <show>public</show>
+                    <detectLinks>false</detectLinks>
+                    <detectOfflineLinks>true</detectOfflineLinks>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <!-- Speeds up the build of the javadocs -->
+                    <quiet>true</quiet>
+                    <use>false</use>
+                    <doclint>none</doclint>
+                    <additionalJOption>-html5</additionalJOption>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${source.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                            <goal>test-jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus.staging.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

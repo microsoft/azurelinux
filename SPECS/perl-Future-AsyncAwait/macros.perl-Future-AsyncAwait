@@ -1,0 +1,2 @@
+%perl_Future_AsyncAwait_ABI perl(:Future_AsyncAwait_ABI) = %(perl -MFile::Spec -MFile::ShareDir -MFuture::AsyncAwait -e 'open(my $h, q{<}, File::Spec->catdir(File::ShareDir::module_dir(q{Future::AsyncAwait}), q{include}, q{AsyncAwait.h})); undef($/); print $1 if <$h> =~ m{^#define FUTURE_ASYNCAWAIT_ABI_VERSION (\\d+)}m')
+

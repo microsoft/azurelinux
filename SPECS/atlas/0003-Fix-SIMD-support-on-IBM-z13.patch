@@ -1,0 +1,55 @@
+From 999efd5370b33e8b02d9370eda3d454e08fc9d15 Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Wed, 5 Dec 2018 18:59:15 +0100
+Subject: [PATCH 3/8] Fix SIMD support on IBM z13
+
+The header file atlas_simd.h contained a syntax error and a few functional
+errors that affected IBM z13.  It prevented any SIMD kernels from being
+compiled successfully for that platform.  This is fixed.  The macro
+vec_madd is avoided, because some GCC versions don't implement it
+correctly; the equivalent GCC builtin __builtin_s390_vec_madd is used
+instead.
+---
+ include/atlas_simd.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/atlas_simd.h b/include/atlas_simd.h
+index baee6b1..68daf79 100644
+--- a/include/atlas_simd.h
++++ b/include/atlas_simd.h
+@@ -69,7 +69,7 @@
+          #define ATL_FRCGNUVEC
+       #endif
+    #elif defined(ATL_VXZ)
+-      #if ATL_VLEN != 2;
++      #if ATL_VLEN != 2
+          #define ATL_FRCGNUVEC
+       #endif
+    #elif defined(ATL_NEON)
+@@ -390,19 +390,19 @@
+       #define ATL_vld(v_, p_) v_ = vec_ld2f(p_);
+       #define ATL_vst(p_, v_) vec_st2f(v_, p_);
+    #endif
+-   #define ATL_vzero(v_) v_ = vec_splats((TYPE)0.0)
++   #define ATL_vzero(v_) v_ = vec_splats((double)0.0)
+    #define ATL_vcopy(d_, s_) d_ = s_
+-   #define ATL_vbcast(v_, p_) v_ =  vec_splats(*((TYPE*)(p_)))
++   #define ATL_vbcast(v_, p_) v_ = vec_splats((double)*((TYPE*)(p_)))
+    #define ATL_vuld(v_, p_) ATL_vld(v_, p_)
+    #define ATL_vust(p_, v_) ATL_vst(p_, v_)
+    #define ATL_vadd(d_, s1_, s2_) d_ =  s1_ + s2_
+    #define ATL_vsub(d_, s1_, s2_) d_ =  s1_ - s2_
+    #define ATL_vmul(d_, s1_, s2_) d_ =  s1_ * s2_
+-   #define ATL_vmac(d_, s1_, s2_) d_ = vec_madd(s1_, s2_, d_)
++   #define ATL_vmac(d_, s1_, s2_) d_ = __builtin_s390_vec_madd(s1_, s2_, d_)
+    #define ATL_vvrsum1(s0_) \
+    {  ATL_VTYPE t_;\
+       t_ = vec_splat(s0_, 1); \
+-      s0 += t_; \
++      s0_ += t_; \
+    }
+    #define ATL_vsplat0(d_, s_) d_ = vec_splat(s_, 0)
+    #define ATL_vsplat1(d_, s_) d_ = vec_splat(s_, 1)
+-- 
+2.23.0
+

@@ -1,0 +1,40 @@
+From 64bc17942c05053063880a2ea076b710712cbdef Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Tue, 26 Aug 2025 16:57:51 -0500
+Subject: [PATCH 1/2] tests: fix pathlib.PurePosixPath repr on py3.14
+
+``` fish
+for i in python3.{9,10,11,12,13,14}
+    echo -n "$i "
+    $i -c 'import pathlib; print(repr(pathlib.PurePosixPath))'
+end
+```
+
+```
+python3.9 <class 'pathlib.PurePosixPath'>
+python3.10 <class 'pathlib.PurePosixPath'>
+python3.11 <class 'pathlib.PurePosixPath'>
+python3.12 <class 'pathlib.PurePosixPath'>
+python3.13 <class 'pathlib._local.PurePosixPath'>
+python3.14 <class 'pathlib.PurePosixPath'>
+```
+---
+ tests/test_utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_utils.py b/tests/test_utils.py
+index 768bd83..08809e2 100644
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
+@@ -124,7 +124,7 @@ def test_printr(obj, expects, capsys):
+ 	assert re.match(expects, stdout[0])
+ 
+ 
+-if sys.version_info >= (3, 13):
++if sys.version_info[:2] == (3, 13):
+ 	pure_posix_path_expected = "<class 'pathlib._local.PurePosixPath'>"
+ else:
+ 	pure_posix_path_expected = "<class 'pathlib.PurePosixPath'>"
+-- 
+2.51.0
+

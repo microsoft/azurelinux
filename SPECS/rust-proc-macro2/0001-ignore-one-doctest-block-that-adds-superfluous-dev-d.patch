@@ -1,0 +1,26 @@
+From 421d96764e5ac1396ee220aa83c41ad5e6e444ba Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 28 Aug 2024 00:59:51 +0200
+Subject: [PATCH] ignore one doctest block that adds superfluous
+ dev-dependencies
+
+---
+ src/extra.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/extra.rs b/src/extra.rs
+index 522a90e..7ec8495 100644
+--- a/src/extra.rs
++++ b/src/extra.rs
+@@ -27,7 +27,7 @@ use core::fmt::{self, Debug};
+ /// workload that involves parsing it all would overflow a 32-bit source
+ /// location unless spans are being invalidated.
+ ///
+-/// ```
++/// ```ignore
+ /// use flate2::read::GzDecoder;
+ /// use std::ffi::OsStr;
+ /// use std::io::{BufReader, Read};
+-- 
+2.46.0
+

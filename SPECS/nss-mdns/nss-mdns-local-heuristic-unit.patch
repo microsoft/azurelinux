@@ -1,0 +1,112 @@
+From 6ff47454ff413e3033a77d4d9c09b914c78ab3a0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Wed, 7 Dec 2022 22:56:47 +0100
+Subject: [PATCH] Add unit test parts for new autodetection
+
+Use new enum to specify forced present or missing .local SOA record. Use
+from production code auto value, but use forced values from unit test.
+Add few different results to unit test.
+---
+ src/nss.c          |  3 ++-
+ src/util.c         |  7 +++++--
+ src/util.h         |  9 ++++++++-
+ tests/check_util.c | 18 ++++++++++++++++++
+ 4 files changed, 33 insertions(+), 4 deletions(-)
+
+diff --git a/src/nss.c b/src/nss.c
+index 7f9230e..2e1a90b 100644
+--- a/src/nss.c
++++ b/src/nss.c
+@@ -118,7 +118,8 @@ enum nss_status _nss_mdns_gethostbyname_impl(const char* name, int af,
+ #ifndef MDNS_MINIMAL
+     mdns_allow_file = fopen(MDNS_ALLOW_FILE, "r");
+ #endif
+-    result = verify_name_allowed_with_soa(name, mdns_allow_file);
++    result = verify_name_allowed_with_soa(name, mdns_allow_file,
++                                          TEST_LOCAL_SOA_AUTO);
+ #ifndef MDNS_MINIMAL
+     if (mdns_allow_file)
+         fclose(mdns_allow_file);
+diff --git a/src/util.c b/src/util.c
+index 4eacf07..0a1c28a 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -55,14 +55,17 @@ int ends_with(const char* name, const char* suffix) {
+     return strcasecmp(name + ln - ls, suffix) == 0;
+ }
+ 
+-use_name_result_t verify_name_allowed_with_soa(const char* name, FILE* mdns_allow_file) {
++use_name_result_t verify_name_allowed_with_soa(const char* name,
++                                               FILE* mdns_allow_file,
++                                               test_local_soa_t test) {
+     switch (verify_name_allowed(name, mdns_allow_file)) {
+     case VERIFY_NAME_RESULT_NOT_ALLOWED:
+         return USE_NAME_RESULT_SKIP;
+     case VERIFY_NAME_RESULT_ALLOWED:
+         return USE_NAME_RESULT_AUTHORITATIVE;
+     case VERIFY_NAME_RESULT_ALLOWED_IF_NO_LOCAL_SOA:
+-	if (local_soa())
++	if (test == TEST_LOCAL_SOA_YES ||
++	    (test == TEST_LOCAL_SOA_AUTO && local_soa()) )
+ 		/* Make multicast resolution not authoritative for .local zone.
+ 		 * Allow continuing to unicast resolution after multicast had not worked. */
+ 		return USE_NAME_RESULT_OPTIONAL;
+diff --git a/src/util.h b/src/util.h
+index 76809d4..80527e3 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -67,6 +67,12 @@ typedef enum {
+     USE_NAME_RESULT_OPTIONAL,
+ } use_name_result_t;
+ 
++typedef enum {
++    TEST_LOCAL_SOA_NO,
++    TEST_LOCAL_SOA_YES,
++    TEST_LOCAL_SOA_AUTO,
++} test_local_soa_t;
++
+ // Returns true if we should try to resolve the name with mDNS.
+ //
+ // If mdns_allow_file is NULL, then this implements the "local" SOA
+@@ -78,7 +84,8 @@ typedef enum {
+ // The two heuristics described above are disabled if mdns_allow_file
+ // is not NULL.
+ use_name_result_t verify_name_allowed_with_soa(const char* name,
+-                                               FILE* mdns_allow_file);
++                                               FILE* mdns_allow_file,
++                                               test_local_soa_t test);
+ 
+ typedef enum {
+     VERIFY_NAME_RESULT_NOT_ALLOWED,
+diff --git a/tests/check_util.c b/tests/check_util.c
+index d600a2e..36f1008 100644
+--- a/tests/check_util.c
++++ b/tests/check_util.c
+@@ -50,6 +50,24 @@ START_TEST(test_verify_name_allowed_minimal) {
+                      VERIFY_NAME_RESULT_NOT_ALLOWED);
+     ck_assert_int_eq(verify_name_allowed(".", NULL),
+                      VERIFY_NAME_RESULT_NOT_ALLOWED);
++
++    ck_assert_int_eq(verify_name_allowed_with_soa(".", NULL, TEST_LOCAL_SOA_YES),
++                     USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa(".", NULL, TEST_LOCAL_SOA_NO),
++                     USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa(".", NULL, TEST_LOCAL_SOA_AUTO),
++                     USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa("example3.sub.local",
++                         NULL, TEST_LOCAL_SOA_YES), USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa("example4.sub.local",
++                         NULL, TEST_LOCAL_SOA_NO), USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa("example4.sub.local",
++                         NULL, TEST_LOCAL_SOA_AUTO), USE_NAME_RESULT_SKIP);
++    ck_assert_int_eq(verify_name_allowed_with_soa("example1.local",
++                         NULL, TEST_LOCAL_SOA_YES), USE_NAME_RESULT_OPTIONAL);
++    ck_assert_int_eq(verify_name_allowed_with_soa("example2.local",
++                         NULL, TEST_LOCAL_SOA_NO), USE_NAME_RESULT_AUTHORITATIVE);
++    /* TEST_LOCAL_SOA_AUTO would test actual DNS on host, skip that. */
+ }
+ END_TEST
+ 
+-- 
+2.38.1
+

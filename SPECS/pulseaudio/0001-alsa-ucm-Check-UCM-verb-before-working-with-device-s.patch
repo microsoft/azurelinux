@@ -1,0 +1,96 @@
+From 71c850257d2d56a198fa2113bde6d31b411ad89b Mon Sep 17 00:00:00 2001
+From: Alper Nebi Yasak <alpernebiyasak@gmail.com>
+Date: Thu, 30 Nov 2023 20:17:22 +0300
+Subject: [PATCH 1/6] alsa-ucm: Check UCM verb before working with device
+ status
+
+Some versions of the ALSA libraries run into a segmentation fault when
+we query a UCM device/modifier status without first setting a UCM verb.
+It's not a reasonable thing to do anyway, so check for this case and
+return an error. Also do the check in other helpers.
+
+Signed-off-by: Alper Nebi Yasak <alpernebiyasak@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/801>
+---
+ src/modules/alsa/alsa-ucm.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/src/modules/alsa/alsa-ucm.c b/src/modules/alsa/alsa-ucm.c
+index bb9438f79..7f5136249 100644
+--- a/src/modules/alsa/alsa-ucm.c
++++ b/src/modules/alsa/alsa-ucm.c
+@@ -624,6 +624,11 @@ static long ucm_device_status(pa_alsa_ucm_config *ucm, pa_alsa_ucm_device *dev)
+     char *devstatus;
+     long status = 0;
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to get status for UCM device %s: no UCM verb set", dev_name);
++        return -1;
++    }
++
+     devstatus = pa_sprintf_malloc("_devstatus/%s", dev_name);
+     if (snd_use_case_geti(ucm->ucm_mgr, devstatus, &status) < 0) {
+         pa_log_debug("Failed to get status for UCM device %s", dev_name);
+@@ -637,6 +642,11 @@ static long ucm_device_status(pa_alsa_ucm_config *ucm, pa_alsa_ucm_device *dev)
+ static int ucm_device_disable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_device *dev) {
+     const char *dev_name = pa_proplist_gets(dev->proplist, PA_ALSA_PROP_UCM_NAME);
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to disable UCM device %s: no UCM verb set", dev_name);
++        return -1;
++    }
++
+     /* If any of dev's conflicting devices is enabled, trying to disable
+      * dev gives an error despite the fact that it's already disabled.
+      * Check that dev is enabled to avoid this error. */
+@@ -657,6 +667,11 @@ static int ucm_device_disable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_device *dev)
+ static int ucm_device_enable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_device *dev) {
+     const char *dev_name = pa_proplist_gets(dev->proplist, PA_ALSA_PROP_UCM_NAME);
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to enable UCM device %s: no UCM verb set", dev_name);
++        return -1;
++    }
++
+     /* We don't need to enable devices that are already enabled */
+     if (ucm_device_status(ucm, dev) > 0) {
+         pa_log_debug("UCM device %s is already enabled", dev_name);
+@@ -707,6 +722,11 @@ static long ucm_modifier_status(pa_alsa_ucm_config *ucm, pa_alsa_ucm_modifier *m
+     char *modstatus;
+     long status = 0;
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to get status for UCM modifier %s: no UCM verb set", mod_name);
++        return -1;
++    }
++
+     modstatus = pa_sprintf_malloc("_modstatus/%s", mod_name);
+     if (snd_use_case_geti(ucm->ucm_mgr, modstatus, &status) < 0) {
+         pa_log_debug("Failed to get status for UCM modifier %s", mod_name);
+@@ -720,6 +740,11 @@ static long ucm_modifier_status(pa_alsa_ucm_config *ucm, pa_alsa_ucm_modifier *m
+ static int ucm_modifier_disable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_modifier *mod) {
+     const char *mod_name = pa_proplist_gets(mod->proplist, PA_ALSA_PROP_UCM_NAME);
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to disable UCM modifier %s: no UCM verb set", mod_name);
++        return -1;
++    }
++
+     /* We don't need to disable modifiers that are already disabled */
+     if (ucm_modifier_status(ucm, mod) == 0) {
+         pa_log_debug("UCM modifier %s is already disabled", mod_name);
+@@ -738,6 +763,11 @@ static int ucm_modifier_disable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_modifier *m
+ static int ucm_modifier_enable(pa_alsa_ucm_config *ucm, pa_alsa_ucm_modifier *mod) {
+     const char *mod_name = pa_proplist_gets(mod->proplist, PA_ALSA_PROP_UCM_NAME);
+ 
++    if (!ucm->active_verb) {
++        pa_log_error("Failed to disable UCM modifier %s: no UCM verb set", mod_name);
++        return -1;
++    }
++
+     /* We don't need to enable modifiers that are already enabled */
+     if (ucm_modifier_status(ucm, mod) > 0) {
+         pa_log_debug("UCM modifier %s is already enabled", mod_name);
+-- 
+2.52.0
+

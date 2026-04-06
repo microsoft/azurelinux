@@ -1,0 +1,31 @@
+From aae754bd5795623a41087c46085cc73fed70af22 Mon Sep 17 00:00:00 2001
+From: Samuel Moelius <sam@moeli.us>
+Date: Fri, 12 Sep 2025 10:01:38 -0400
+Subject: [PATCH] Fix Cargo error message breakage
+
+---
+ tests/selftest.rs | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tests/selftest.rs b/tests/selftest.rs
+index 7c4d3ae9d..5377e5627 100644
+--- a/tests/selftest.rs
++++ b/tests/selftest.rs
+@@ -84,11 +84,13 @@ fn builder_interface() {
+ 
+ #[test]
+ fn error1() {
++    let manifest_path = current_dir().unwrap().join("foo");
++    let error = "error: the manifest-path must be a path to a Cargo.toml file";
++    let error_with_path = format!("{error}: `{}`", manifest_path.display());
+     match MetadataCommand::new().manifest_path("foo").exec() {
+-        Err(Error::CargoMetadata { stderr }) => assert_eq!(
+-            stderr.trim(),
+-            "error: the manifest-path must be a path to a Cargo.toml file"
+-        ),
++        Err(Error::CargoMetadata { stderr }) => {
++            assert!([error, &error_with_path].contains(&stderr.trim()))
++        }
+         _ => unreachable!(),
+     }
+ }

@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Feb 2025 12:05:03 -0800
+Subject: [PATCH] libmpathutils/uxsock.c: Include string.h for memcpy
+
+Fixes
+uxsock.c:72:2: error: call to undeclared library function 'memcpy' with type 'void *(void *, const void *, unsigned long)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Martin Wilck <mwilck@suse.com>
+Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmpathutil/uxsock.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libmpathutil/uxsock.c b/libmpathutil/uxsock.c
+index 2135476d..a474874e 100644
+--- a/libmpathutil/uxsock.c
++++ b/libmpathutil/uxsock.c
+@@ -8,6 +8,7 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <stdarg.h>
++#include <string.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+ #include <sys/types.h>

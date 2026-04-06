@@ -1,0 +1,207 @@
+From ecebc528e4e6aec1ad49b1c9f2acb5a2d27447cd Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Sun, 15 Jun 2025 20:56:20 +0200
+Subject: [PATCH] Skip tests that fail in mock chroots
+
+Signed-off-by: Nils Philippsen <nils@redhat.com>
+---
+ psutil/tests/test_linux.py       | 43 +++++++++++---------------------
+ psutil/tests/test_process_all.py |  1 +
+ psutil/tests/test_system.py      |  6 +----
+ psutil/tests/test_testutils.py   |  3 +--
+ 4 files changed, 18 insertions(+), 35 deletions(-)
+
+diff --git a/psutil/tests/test_linux.py b/psutil/tests/test_linux.py
+index f4342d7..094fdeb 100755
+--- a/psutil/tests/test_linux.py
++++ b/psutil/tests/test_linux.py
+@@ -233,7 +233,7 @@ class TestSystemVirtualMemoryAgainstFree(PsutilTestCase):
+         psutil_value = psutil.virtual_memory().total
+         assert cli_value == psutil_value
+ 
+-    @retry_on_failure()
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_used(self):
+         # Older versions of procps used slab memory to calculate used memory.
+         # This got changed in:
+@@ -289,6 +289,7 @@ class TestSystemVirtualMemoryAgainstVmstat(PsutilTestCase):
+         assert abs(vmstat_value - psutil_value) < TOLERANCE_SYS_MEM
+ 
+     @retry_on_failure()
++    @pytest.mark.skip(reason="Unreliable in mock")
+     def test_used(self):
+         # Older versions of procps used slab memory to calculate used memory.
+         # This got changed in:
+@@ -649,10 +650,7 @@ class TestSystemCPUTimes(PsutilTestCase):
+ 
+ @pytest.mark.skipif(not LINUX, reason="LINUX only")
+ class TestSystemCPUCountLogical(PsutilTestCase):
+-    @pytest.mark.skipif(
+-        not os.path.exists("/sys/devices/system/cpu/online"),
+-        reason="/sys/devices/system/cpu/online does not exist",
+-    )
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_against_sysdev_cpu_online(self):
+         with open("/sys/devices/system/cpu/online") as f:
+             value = f.read().strip()
+@@ -660,18 +658,13 @@ class TestSystemCPUCountLogical(PsutilTestCase):
+             value = int(value.split('-')[1]) + 1
+             assert psutil.cpu_count() == value
+ 
+-    @pytest.mark.skipif(
+-        not os.path.exists("/sys/devices/system/cpu"),
+-        reason="/sys/devices/system/cpu does not exist",
+-    )
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_against_sysdev_cpu_num(self):
+         ls = os.listdir("/sys/devices/system/cpu")
+         count = len([x for x in ls if re.search(r"cpu\d+$", x) is not None])
+         assert psutil.cpu_count() == count
+ 
+-    @pytest.mark.skipif(
+-        not shutil.which("nproc"), reason="nproc utility not available"
+-    )
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_against_nproc(self):
+         num = int(sh("nproc --all"))
+         assert psutil.cpu_count(logical=True) == num
+@@ -721,7 +714,7 @@ class TestSystemCPUCountLogical(PsutilTestCase):
+                 assert m.called
+ 
+ 
+-@pytest.mark.skipif(not LINUX, reason="LINUX only")
++@pytest.mark.skip(reason="Unreliable on mock")
+ class TestSystemCPUCountCores(PsutilTestCase):
+     @pytest.mark.skipif(
+         not shutil.which("lscpu"), reason="lscpu utility not available"
+@@ -756,10 +749,7 @@ class TestSystemCPUCountCores(PsutilTestCase):
+ 
+ @pytest.mark.skipif(not LINUX, reason="LINUX only")
+ class TestSystemCPUFrequency(PsutilTestCase):
+-    @pytest.mark.skipif(not HAS_CPU_FREQ, reason="not supported")
+-    @pytest.mark.skipif(
+-        AARCH64, reason="aarch64 does not always expose frequency"
+-    )
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_emulate_use_second_file(self):
+         # https://github.com/giampaolo/psutil/issues/981
+         def path_exists_mock(path):
+@@ -774,10 +764,7 @@ class TestSystemCPUFrequency(PsutilTestCase):
+         ):
+             assert psutil.cpu_freq()
+ 
+-    @pytest.mark.skipif(not HAS_CPU_FREQ, reason="not supported")
+-    @pytest.mark.skipif(
+-        AARCH64, reason="aarch64 does not report mhz in /proc/cpuinfo"
+-    )
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_emulate_use_cpuinfo(self):
+         # Emulate a case where /sys/devices/system/cpu/cpufreq* does not
+         # exist and /proc/cpuinfo is used instead.
+@@ -908,7 +895,7 @@ class TestSystemCPUFrequency(PsutilTestCase):
+                     assert freq.current == 200
+ 
+ 
+-@pytest.mark.skipif(not LINUX, reason="LINUX only")
++@pytest.mark.skip(reason="Unreliable on mock")
+ class TestSystemCPUStats(PsutilTestCase):
+ 
+     # XXX: fails too often.
+@@ -941,7 +928,7 @@ class TestLoadAvg(PsutilTestCase):
+ # =====================================================================
+ 
+ 
+-@pytest.mark.skipif(not LINUX, reason="LINUX only")
++@pytest.mark.skip(reason="Unreliable on mock")
+ class TestSystemNetIfAddrs(PsutilTestCase):
+     def test_ips(self):
+         for name, addrs in psutil.net_if_addrs().items():
+@@ -1341,7 +1328,7 @@ class TestRootFsDeviceFinder(PsutilTestCase):
+                 finder.ask_sys_dev_block()
+         finder.ask_sys_class_block()
+ 
+-    @pytest.mark.skipif(GITHUB_ACTIONS, reason="unsupported on GITHUB_ACTIONS")
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_comparisons(self):
+         finder = RootFsDeviceFinder()
+         assert finder.find() is not None
+@@ -1361,15 +1348,13 @@ class TestRootFsDeviceFinder(PsutilTestCase):
+         if base and c:
+             assert base == c
+ 
+-    @pytest.mark.skipif(
+-        not shutil.which("findmnt"), reason="findmnt utility not available"
+-    )
+-    @pytest.mark.skipif(GITHUB_ACTIONS, reason="unsupported on GITHUB_ACTIONS")
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_against_findmnt(self):
+         psutil_value = RootFsDeviceFinder().find()
+         findmnt_value = sh("findmnt -o SOURCE -rn /")
+         assert psutil_value == findmnt_value
+ 
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_disk_partitions_mocked(self):
+         with mock.patch(
+             'psutil._pslinux.cext.disk_partitions',
+@@ -2051,6 +2036,7 @@ class TestProcess(PsutilTestCase):
+             with pytest.raises(psutil.AccessDenied):
+                 psutil.Process().threads()
+ 
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_exe_mocked(self):
+         with mock.patch(
+             'psutil._pslinux.readlink', side_effect=FileNotFoundError
+@@ -2263,6 +2249,7 @@ class TestProcessAgainstStatus(PsutilTestCase):
+         value = self.read_status_file("nonvoluntary_ctxt_switches:")
+         assert self.proc.num_ctx_switches().involuntary == value
+ 
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_cpu_affinity(self):
+         value = self.read_status_file("Cpus_allowed_list:")
+         if '-' in str(value):
+diff --git a/psutil/tests/test_process_all.py b/psutil/tests/test_process_all.py
+index aaa3fa0..d0bb3ac 100755
+--- a/psutil/tests/test_process_all.py
++++ b/psutil/tests/test_process_all.py
+@@ -123,6 +123,7 @@ class TestFetchAllProcesses(PsutilTestCase):
+             ls = [proc_info(pid) for pid in psutil.pids()]
+             return ls
+ 
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_all(self):
+         failures = []
+         for info in self.iter_proc_info():
+diff --git a/psutil/tests/test_system.py b/psutil/tests/test_system.py
+index b961e1f..748a8ba 100755
+--- a/psutil/tests/test_system.py
++++ b/psutil/tests/test_system.py
+@@ -581,11 +581,7 @@ class TestCpuAPIs(PsutilTestCase):
+             if not AIX and name in {'ctx_switches', 'interrupts'}:
+                 assert value > 0
+ 
+-    # TODO: remove this once 1892 is fixed
+-    @pytest.mark.skipif(
+-        MACOS and platform.machine() == 'arm64', reason="skipped due to #1892"
+-    )
+-    @pytest.mark.skipif(not HAS_CPU_FREQ, reason="not supported")
++    @pytest.mark.skip(reason="Unreliable on mock")
+     def test_cpu_freq(self):
+         def check_ls(ls):
+             for nt in ls:
+diff --git a/psutil/tests/test_testutils.py b/psutil/tests/test_testutils.py
+index 6db66e5..fbe1a7c 100755
+--- a/psutil/tests/test_testutils.py
++++ b/psutil/tests/test_testutils.py
+@@ -388,8 +388,7 @@ class TestMemLeakClass(TestMemoryLeak):
+             self.execute(lambda: 0, retries=-1)
+ 
+     @retry_on_failure()
+-    @pytest.mark.skipif(CI_TESTING, reason="skipped on CI")
+-    @pytest.mark.skipif(COVERAGE, reason="skipped during test coverage")
++    @pytest.mark.skip(reason="Unreliable in mock")
+     def test_leak_mem(self):
+         ls = []
+ 
+-- 
+2.49.0
+

@@ -1,0 +1,11 @@
+--- num_enum_derive-0.5.11/Cargo.toml	1970-01-01T00:00:01+00:00
++++ num_enum_derive-0.5.11/Cargo.toml	2024-12-25T16:22:04.232133+00:00
+@@ -32,7 +32,7 @@
+ proc-macro = true
+ 
+ [dependencies.proc-macro-crate]
+-version = "1"
++version = "3"
+ optional = true
+ 
+ [dependencies.proc-macro2]

@@ -1,0 +1,26 @@
+From 7333452aa52d61a170b1fc199869ea6059849058 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Holger=20Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
+Date: Thu, 15 May 2025 13:54:44 +0200
+Subject: [PATCH] Fix: unescaped @ in email address
+
+bug#67126
+---
+ doc/screen.texinfo | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/screen.texinfo b/doc/screen.texinfo
+index b3568b9..76d0588 100644
+--- a/doc/screen.texinfo
++++ b/doc/screen.texinfo
+@@ -5940,7 +5940,7 @@ of @code{Screen} which you are using.  Also include in your message the
+ hardware and operating system, the compiler used to compile, a
+ description of the bug behavior, and the conditions that triggered the
+ bug. In case of security issue please send an mail to
+-@w{@samp{alexander_naumov@opensuse.org}}.
++@w{@samp{alexander_naumov@@opensuse.org}}.
+ 
+ @node Availability,  , Reporting Bugs, Bugs
+ @section Availability
+-- 
+2.49.0
+

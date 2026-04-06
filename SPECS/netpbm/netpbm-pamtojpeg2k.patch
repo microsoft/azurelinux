@@ -1,0 +1,11 @@
+diff -up netpbm-10.47.12/converter/other/jpeg2000/pamtojpeg2k.c.pamtojpeg2kfix netpbm-10.47.12/converter/other/jpeg2000/pamtojpeg2k.c
+--- netpbm-10.47.12/converter/other/jpeg2000/pamtojpeg2k.c.pamtojpeg2kfix	2010-04-27 15:47:10.000000000 +0200
++++ netpbm-10.47.12/converter/other/jpeg2000/pamtojpeg2k.c	2010-05-03 15:37:49.934269588 +0200
+@@ -532,7 +532,5 @@ main(int argc, char **argv)
+ 
+     pm_close(ifP);
+ 
+-    pm_close(stdout);
+-
+     return 0;
+ }

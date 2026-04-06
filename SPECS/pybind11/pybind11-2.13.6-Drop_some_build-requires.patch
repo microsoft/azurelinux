@@ -1,0 +1,10 @@
+diff -ru pybind11-2.13.6/pyproject.toml pybind11-2.13.6_new/pyproject.toml
+--- pybind11-2.13.6/pyproject.toml	2024-09-14 02:25:58.000000000 +0200
++++ pybind11-2.13.6_new/pyproject.toml	2025-04-30 13:40:03.912785944 +0200
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=42", "cmake>=3.18", "ninja"]
++requires = ["setuptools>=42"]
+ build-backend = "setuptools.build_meta"
+ 
+ 

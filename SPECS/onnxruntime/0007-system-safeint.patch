@@ -1,0 +1,51 @@
+From 071f78771ba68ed5975d2be8f7110230ae589ac9 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 18:56:21 -0300
+Subject: [PATCH 07/20] system-safeint
+
+---
+ cmake/external/onnxruntime_external_deps.cmake | 14 +-------------
+ onnxruntime/core/common/safeint.h              |  1 +
+ 2 files changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index f8a091a01c..62bf5812a9 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -416,20 +416,8 @@ set(GSL_TARGET "Microsoft.GSL::GSL")
+ set(GSL_INCLUDE_DIR "$<TARGET_PROPERTY:${GSL_TARGET},INTERFACE_INCLUDE_DIRECTORIES>")
+ onnxruntime_fetchcontent_makeavailable(GSL)
+ 
+-find_path(safeint_SOURCE_DIR NAMES "SafeInt.hpp")
+-if(NOT safeint_SOURCE_DIR)
+-  unset(safeint_SOURCE_DIR)
+-  FetchContent_Declare(
+-      safeint
+-      URL ${DEP_URL_safeint}
+-      URL_HASH SHA1=${DEP_SHA1_safeint}
+-  )
+-
+-  # use fetch content rather than makeavailable because safeint only includes unconditional test targets
+-  FetchContent_Populate(safeint)
+-endif()
+ add_library(safeint_interface INTERFACE)
+-target_include_directories(safeint_interface INTERFACE ${safeint_SOURCE_DIR})
++target_include_directories(safeint_interface INTERFACE /usr/include/SafeInt)
+ 
+ 
+ # Flatbuffers
+diff --git a/onnxruntime/core/common/safeint.h b/onnxruntime/core/common/safeint.h
+index 3ee70f369b..0792a68d15 100644
+--- a/onnxruntime/core/common/safeint.h
++++ b/onnxruntime/core/common/safeint.h
+@@ -24,6 +24,7 @@ class SafeIntExceptionHandler<onnxruntime::OnnxRuntimeException> {
+ 
+ #define SAFEINT_EXCEPTION_HANDLER_CPP 1
+ #define SafeIntDefaultExceptionHandler SafeIntExceptionHandler<onnxruntime::OnnxRuntimeException>
++#define SAFEINT_CPP_THROW noexcept(false)
+ 
+ #if defined(__GNUC__)
+ #include "onnxruntime_config.h"
+-- 
+2.47.1
+

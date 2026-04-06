@@ -1,0 +1,47 @@
+diff -up texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc.header-order-fix texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc.header-order-fix	2023-01-31 12:53:39.214112015 -0500
++++ texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc	2023-01-31 12:54:07.175413160 -0500
+@@ -17,6 +17,11 @@ You should have received a copy of the G
+ with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++/*
++Load aconf.h first to ensure _FILE_OFFSET_BITS is factored in.
++*/
++#include <aconf.h>
++
+ /* Do this early in order to avoid a conflict between
+    MINGW32 <rpcndr.h> defining 'boolean' as 'unsigned char' and
+    <kpathsea/types.h> defining Pascal's boolean as 'int'.
+@@ -31,7 +36,6 @@ with this program.  If not, see <http://
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#include <aconf.h>
+ #include <GString.h>
+ #include <gmem.h>
+ #include <gfile.h>
+diff -up texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc.header-order-fix texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc
+--- texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc.header-order-fix	2023-01-31 12:41:21.483166562 -0500
++++ texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc	2023-01-31 12:53:15.185853229 -0500
+@@ -16,6 +16,12 @@ GNU General Public License for more deta
+ You should have received a copy of the GNU General Public License along
+ with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
++
++/* 
++Load aconf.h first to ensure _FILE_OFFSET_BITS is factored in.
++*/
++#include <aconf.h>
++
+ #include <w2c/config.h>
+ 
+ #include <stdlib.h>
+@@ -24,7 +30,6 @@ with this program.  If not, see <http://
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#include <aconf.h>
+ #include <GString.h>
+ #include <gmem.h>
+ #include <gfile.h>

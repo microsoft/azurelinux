@@ -1,0 +1,23 @@
+diff -up pegasus/src/Pegasus/ControlProviders/InteropProvider/ElementConformsToProfile.cpp.orig pegasus/src/Pegasus/ControlProviders/InteropProvider/ElementConformsToProfile.cpp
+--- pegasus/src/Pegasus/ControlProviders/InteropProvider/ElementConformsToProfile.cpp.orig	2015-02-10 15:00:48.660891308 +0100
++++ pegasus/src/Pegasus/ControlProviders/InteropProvider/ElementConformsToProfile.cpp	2015-02-10 15:02:01.811194154 +0100
+@@ -129,6 +129,7 @@ Array<CIMInstance> InteropProvider::enum
+ Array<CIMInstance> InteropProvider::enumElementConformsToProfileInstances(
+     const OperationContext & opContext, const CIMNamespaceName & opNamespace)
+ {
++    const Uint32 PEGASUS_DYNAMIC_LEN(PEGASUS_DYNAMIC.size());
+     CIMClass elementConformsClass = repository->getClass(
+         PEGASUS_NAMESPACENAME_INTEROP,
+         PEGASUS_CLASSNAME_PG_ELEMENTCONFORMSTOPROFILE,
+diff -up pegasus/src/Pegasus/ControlProviders/InteropProvider/InteropConstants.h.orig pegasus/src/Pegasus/ControlProviders/InteropProvider/InteropConstants.h
+--- pegasus/src/Pegasus/ControlProviders/InteropProvider/InteropConstants.h.orig	2015-02-10 14:43:34.168607514 +0100
++++ pegasus/src/Pegasus/ControlProviders/InteropProvider/InteropConstants.h	2015-02-10 14:43:44.165648967 +0100
+@@ -150,7 +150,7 @@ const String PEGASUS_INTERNAL_PROVIDER_T
+ const String PEGASUS_INTERNAL_SERVICE_TYPE(
+     "Internal Service");
+ const String PEGASUS_DYNAMIC("__DYNAMIC_");
+-const Uint32 PEGASUS_DYNAMIC_LEN(PEGASUS_DYNAMIC.size());
++// const Uint32 PEGASUS_DYNAMIC_LEN(PEGASUS_DYNAMIC.size());
+ const CIMNamespaceName PEGASUS_NAMESPACENAME_ROOT("root");
+ 
+ #define thisProvider "InteropProvider"

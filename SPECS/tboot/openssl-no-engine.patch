@@ -1,0 +1,48 @@
+diff --git a/lcptools-v2/crtpol.c b/lcptools-v2/crtpol.c
+index 6227149..f30eb33 100644
+--- a/lcptools-v2/crtpol.c
++++ b/lcptools-v2/crtpol.c
+@@ -43,7 +43,6 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+ #include <openssl/bn.h>
+diff --git a/lcptools-v2/crtpollist.c b/lcptools-v2/crtpollist.c
+index 616b6d8..67a9a0f 100644
+--- a/lcptools-v2/crtpollist.c
++++ b/lcptools-v2/crtpollist.c
+@@ -44,7 +44,6 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+ #include <openssl/bn.h>
+diff --git a/lcptools-v2/lcputils.c b/lcptools-v2/lcputils.c
+index 4df78da..95c47b2 100644
+--- a/lcptools-v2/lcputils.c
++++ b/lcptools-v2/lcputils.c
+@@ -43,7 +43,6 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+ #include <openssl/bn.h>
+diff --git a/lcptools-v2/pollist2.c b/lcptools-v2/pollist2.c
+index 32daf4e..67fe71f 100644
+--- a/lcptools-v2/pollist2.c
++++ b/lcptools-v2/pollist2.c
+@@ -41,7 +41,6 @@
+ #include <string.h>
+ #include <safe_lib.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+ #include <openssl/bn.h>

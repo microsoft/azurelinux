@@ -1,0 +1,197 @@
+From f0e6edd883dca23ad1c31b5312f1507120242c3c Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 7 Sep 2025 08:13:58 +0100
+Subject: [PATCH 1/2] Omit tests that require test_support, not in the crate
+
+---
+ examples/custom_provider.rs         | 1 +
+ examples/flush_cache.rs             | 1 +
+ examples/global_resolver.rs         | 1 +
+ examples/multithreaded_runtime.rs   | 1 +
+ src/caching_client.rs               | 1 +
+ src/h2.rs                           | 1 +
+ src/h3.rs                           | 1 +
+ src/lookup_ip.rs                    | 1 +
+ src/name_server/name_server.rs      | 1 +
+ src/name_server/name_server_pool.rs | 1 +
+ src/quic.rs                         | 1 +
+ src/resolver.rs                     | 1 +
+ src/tests.rs                        | 2 ++
+ src/tls.rs                          | 1 +
+ 14 files changed, 15 insertions(+)
+
+diff --git a/examples/custom_provider.rs b/examples/custom_provider.rs
+index 162bc64e2..46d90fc0b 100644
+--- a/examples/custom_provider.rs
++++ b/examples/custom_provider.rs
+@@ -122,6 +122,7 @@ fn main() {
+ 
+ #[cfg(any(feature = "webpki-roots", feature = "rustls-platform-verifier"))]
+ #[tokio::test]
++#[cfg(any())]
+ async fn test_custom_provider() {
+     test_support::subscribe();
+     run().await;
+diff --git a/examples/flush_cache.rs b/examples/flush_cache.rs
+index 00fa79d58..23588b6d1 100644
+--- a/examples/flush_cache.rs
++++ b/examples/flush_cache.rs
+@@ -92,6 +92,7 @@ async fn resolve_list<P: hickory_resolver::name_server::ConnectionProvider>(
+ }
+ 
+ #[tokio::test]
++#[cfg(any())]
+ async fn test_flush_cache() {
+     test_support::subscribe();
+     tokio_main().await;
+diff --git a/examples/global_resolver.rs b/examples/global_resolver.rs
+index 60ea6bf37..4df7b374b 100644
+--- a/examples/global_resolver.rs
++++ b/examples/global_resolver.rs
+@@ -143,6 +143,7 @@ fn run() {
+ }
+ 
+ #[test]
++#[cfg(any())]
+ fn test_global_resolver() {
+     test_support::subscribe();
+     run()
+diff --git a/examples/multithreaded_runtime.rs b/examples/multithreaded_runtime.rs
+index c189f00d0..ab1e90bf1 100644
+--- a/examples/multithreaded_runtime.rs
++++ b/examples/multithreaded_runtime.rs
+@@ -63,6 +63,7 @@ fn run() {
+ }
+ 
+ #[test]
++#[cfg(any())]
+ fn test_multithreaded_runtime() {
+     test_support::subscribe();
+     run()
+diff --git a/src/caching_client.rs b/src/caching_client.rs
+index 51d4973d3..0ab5feca6 100644
+--- a/src/caching_client.rs
++++ b/src/caching_client.rs
+@@ -510,6 +510,7 @@ enum Records {
+ 
+ // see also the lookup_tests.rs in integration-tests crate
+ #[cfg(test)]
++#[cfg(any())]
+ mod tests {
+     use std::net::*;
+     use std::str::FromStr;
+diff --git a/src/h2.rs b/src/h2.rs
+index 7067b3260..f8d5a36e2 100644
+--- a/src/h2.rs
++++ b/src/h2.rs
+@@ -54,6 +54,7 @@ where
+ 
+ #[cfg(any(feature = "webpki-roots", feature = "rustls-platform-verifier"))]
+ #[cfg(test)]
++#[cfg(any())]
+ mod tests {
+     use test_support::subscribe;
+ 
+diff --git a/src/h3.rs b/src/h3.rs
+index 5dafa3613..907c8f90b 100644
+--- a/src/h3.rs
++++ b/src/h3.rs
+@@ -48,6 +48,7 @@ pub(crate) fn new_h3_stream_with_future(
+     test,
+     any(feature = "rustls-platform-verifier", feature = "webpki-roots")
+ ))]
++#[cfg(any())]
+ mod tests {
+     use test_support::subscribe;
+ 
+diff --git a/src/lookup_ip.rs b/src/lookup_ip.rs
+index ebe659eb1..649d49a35 100644
+--- a/src/lookup_ip.rs
++++ b/src/lookup_ip.rs
+@@ -343,6 +343,7 @@ impl<C: DnsHandle> LookupContext<C> {
+ }
+ 
+ #[cfg(test)]
++#[cfg(any())]
+ pub(crate) mod tests {
+     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+     use std::sync::{Arc, Mutex};
+diff --git a/src/name_server/name_server.rs b/src/name_server/name_server.rs
+index e1356a575..13ac24148 100644
+--- a/src/name_server/name_server.rs
++++ b/src/name_server/name_server.rs
+@@ -186,6 +186,7 @@ where
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+     use std::str::FromStr;
+diff --git a/src/name_server/name_server_pool.rs b/src/name_server/name_server_pool.rs
+index f3a8744a7..3ac405535 100644
+--- a/src/name_server/name_server_pool.rs
++++ b/src/name_server/name_server_pool.rs
+@@ -377,6 +377,7 @@ impl Stream for Local {
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+     use std::str::FromStr;
+diff --git a/src/quic.rs b/src/quic.rs
+index bd3504f41..96af01dbe 100644
+--- a/src/quic.rs
++++ b/src/quic.rs
+@@ -46,6 +46,7 @@ pub(crate) fn new_quic_stream_with_future(
+     test,
+     any(feature = "rustls-platform-verifier", feature = "webpki-roots")
+ ))]
++#[cfg(any())]
+ mod tests {
+     use std::net::IpAddr;
+ 
+diff --git a/src/resolver.rs b/src/resolver.rs
+index 4179f122b..e05fed2be 100644
+--- a/src/resolver.rs
++++ b/src/resolver.rs
+@@ -1043,6 +1043,7 @@ pub(crate) mod testing {
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
+ #[allow(clippy::extra_unused_type_parameters)]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr};
+     use std::sync::Mutex;
+diff --git a/src/tests.rs b/src/tests.rs
+index 2e3f49501..de23499b1 100644
+--- a/src/tests.rs
++++ b/src/tests.rs
+@@ -1,9 +1,11 @@
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ use test_support::subscribe;
+ 
+ // Keep this in sync with the example in the README.
+ #[cfg(feature = "tokio")]
+ #[tokio::test]
++#[cfg(any())]
+ async fn readme_example() {
+     subscribe();
+ 
+diff --git a/src/tls.rs b/src/tls.rs
+index 21a700998..309ffbed6 100644
+--- a/src/tls.rs
++++ b/src/tls.rs
+@@ -42,6 +42,7 @@ where
+ #[cfg(feature = "__tls")]
+ #[cfg(any(feature = "webpki-roots", feature = "rustls-platform-verifier"))]
+ #[cfg(test)]
++#[cfg(any())]
+ mod tests {
+     use test_support::subscribe;
+ 
+-- 
+2.51.0
+

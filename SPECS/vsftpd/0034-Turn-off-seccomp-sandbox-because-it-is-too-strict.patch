@@ -1,0 +1,25 @@
+From 4922e60589326540b2ee4f0bdfd6cb95f645f3d5 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Fri, 18 Nov 2016 10:23:29 +0100
+Subject: [PATCH 34/59] Turn off seccomp sandbox, because it is too strict.
+
+---
+ tunables.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tunables.c b/tunables.c
+index 78f2bcd..5440c00 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -237,7 +237,7 @@ tunables_load_defaults()
+   tunable_isolate_network = 1;
+   tunable_ftp_enable = 1;
+   tunable_http_enable = 0;
+-  tunable_seccomp_sandbox = 1;
++  tunable_seccomp_sandbox = 0;
+   tunable_allow_writeable_chroot = 0;
+ 
+   tunable_accept_timeout = 60;
+-- 
+2.14.4
+

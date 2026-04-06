@@ -1,0 +1,36 @@
+--- adler32-1.2.0/Cargo.toml	2020-07-30T19:05:16+00:00
++++ adler32-1.2.0/Cargo.toml	2024-09-15T03:06:03.078527+00:00
+@@ -25,33 +25,13 @@
+ [lib]
+ bench = false
+ 
+-[[bench]]
+-name = "bench"
+-path = "src/bench.rs"
+-harness = false
+-[dependencies.compiler_builtins]
+-version = "0.1.2"
+-optional = true
+-
+-[dependencies.core]
+-version = "1.0.0"
+-optional = true
+-package = "rustc-std-workspace-core"
+-[dev-dependencies.criterion]
+-version = "0.3"
+-
+ [dev-dependencies.getrandom]
+ version = "0.1"
+-features = ["wasm-bindgen"]
+-
+-[dev-dependencies.humansize]
+-version = "1.1"
+ 
+ [dev-dependencies.rand]
+ version = "0.7"
+ 
+ [features]
+ default = ["std"]
+-rustc-dep-of-std = ["core", "compiler_builtins"]
+ std = []
+ 

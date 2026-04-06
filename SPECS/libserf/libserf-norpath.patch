@@ -1,0 +1,34 @@
+diff -uNr serf-1.3.9.orig/SConstruct serf-1.3.9/SConstruct
+--- serf-1.3.9.orig/SConstruct	2016-09-02 08:22:35.180532030 +0200
++++ serf-1.3.9/SConstruct	2016-09-02 08:22:56.653174061 +0200
+@@ -224,9 +224,6 @@
+ else:
+   LIBNAMESTATIC = 'serf-${MAJOR}'
+ 
+-env.Append(RPATH=libdir,
+-           PDB='${TARGET.filebase}.pdb')
+-
+ if sys.platform == 'darwin':
+ #  linkflags.append('-Wl,-install_name,@executable_path/%s.dylib' % (LIBNAME,))
+   env.Append(LINKFLAGS=['-Wl,-install_name,%s/%s.dylib' % (thisdir, LIBNAME,)])
+@@ -385,12 +382,6 @@
+ if sys.platform == 'win32':
+   env.Append(CPPDEFINES=['SERF_HAVE_SSPI'])
+ 
+-# On some systems, the -R values that APR describes never make it into actual
+-# RPATH flags. We'll manually map all directories in LIBPATH into new
+-# flags to set RPATH values.
+-for d in env['LIBPATH']:
+-  env.Append(RPATH=':'+d)
+-
+ # Set up the construction of serf-*.pc
+ pkgconfig = env.Textfile('serf-%d.pc' % (MAJOR,),
+                          env.File('build/serf.pc.in'),
+@@ -461,7 +452,6 @@
+   TEST_EXES = [ os.path.join('test', '%s' % (prog)) for prog in TEST_PROGRAMS ]
+ 
+ # Find the (dynamic) library in this directory
+-tenv.Replace(RPATH=thisdir)
+ tenv.Prepend(LIBS=[LIBNAMESTATIC, ],
+              LIBPATH=[thisdir, ])
+ 

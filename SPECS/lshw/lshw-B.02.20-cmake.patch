@@ -1,0 +1,1167 @@
+From 23224a7dc9e090fa3f5f4eac4263579400d97d52 Mon Sep 17 00:00:00 2001
+From: Terje Rosten <terje.rosten@ntnu.no>
+Date: Sun, 7 Jan 2024 15:23:24 +0100
+Subject: [PATCH] cmakeify
+
+---
+ CMakeLists.txt                                |  43 +++++
+ Makefile                                      |  20 ---
+ README.md                                     |  53 +++---
+ lshw.spec.in                                  |  64 ++------
+ src/CMakeLists.txt                            | 104 ++++++++++++
+ src/Makefile                                  | 152 ------------------
+ src/core/Makefile                             |  83 ----------
+ src/core/{config.h => config.h.in}            |  28 +---
+ src/core/db.cc                                |   8 +
+ src/core/dump.cc                              |   2 +-
+ src/core/version.h                            |   2 +
+ src/gui/CMakeLists.txt                        |  77 +++++++++
+ src/gui/Makefile                              |  62 -------
+ .../{gtk-lshw.desktop => gtk-lshw.desktop.in} |   7 +-
+ src/gui/integration/lshw-gui.in               |   5 +
+ .../integration/org.ezix.lshw.gui.policy.in   |  20 +++
+ src/gui/stock.c                               |   1 +
+ src/gui/support.c                             | 144 -----------------
+ src/po/CMakeLists.txt                         |  16 ++
+ src/po/Makefile                               |  23 ---
+ 20 files changed, 340 insertions(+), 574 deletions(-)
+ create mode 100644 CMakeLists.txt
+ delete mode 100644 Makefile
+ create mode 100644 src/CMakeLists.txt
+ delete mode 100644 src/Makefile
+ delete mode 100644 src/core/Makefile
+ rename src/core/{config.h => config.h.in} (50%)
+ create mode 100644 src/gui/CMakeLists.txt
+ delete mode 100644 src/gui/Makefile
+ rename src/gui/integration/{gtk-lshw.desktop => gtk-lshw.desktop.in} (51%)
+ create mode 100644 src/gui/integration/lshw-gui.in
+ create mode 100644 src/gui/integration/org.ezix.lshw.gui.policy.in
+ delete mode 100644 src/gui/support.c
+ create mode 100644 src/po/CMakeLists.txt
+ delete mode 100644 src/po/Makefile
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..92e8aaa
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,43 @@
++cmake_minimum_required(VERSION 3.10)
++
++project(lshw)
++set(VERSION "B.02.20")
++
++find_package(Git)
++
++if(EXISTS "${PROJECT_SOURCE_DIR}/.git" AND "${MAKE_RELEASE}" STREQUAL "")
++  if(GIT_FOUND)
++    execute_process(
++      COMMAND ${GIT_EXECUTABLE} describe --tags
++      OUTPUT_VARIABLE DESCRIBE_TAG
++      OUTPUT_STRIP_TRAILING_WHITESPACE)
++    string(REGEX MATCH "B.[0-9]+.[0-9]+[-][0-9]+" VERSION ${DESCRIBE_TAG})
++    string(REPLACE "-" "." VERSION ${VERSION})
++  endif()
++endif()
++
++message("-- lshw: ${VERSION}")
++
++option(GUI "Enable GUI application (${PROJECT_NAME}-gtk)" ON)
++option(HWDATA "Install hwdata files" ON)
++option(SQLITE "Enable SQLite support" OFF)
++option(ZLIB "Enable zlib support" OFF)
++option(NOLOGO "Don't install vendor logos" OFF)
++option(STATIC "Do a static (will disable other features)" OFF)
++option(POLICYKIT "Install PolicyKit file and pfexec wrapper" OFF)
++
++include(GNUInstallDirs)
++set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING "Install prefix")
++set(DATADIR "${CMAKE_INSTALL_FULL_DATADIR}")
++set(PROJECT_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
++set(SBINDIR "${CMAKE_INSTALL_FULL_SBINDIR}")
++set(MANDIR "${CMAKE_INSTALL_FULL_MANDIR}")
++set(LOCALEDIR "${CMAKE_INSTALL_FULL_LOCALEDIR}")
++
++configure_file(
++  "${PROJECT_SOURCE_DIR}/lshw.spec.in"
++  "${PROJECT_BINARY_DIR}/lshw.spec")
++
++add_subdirectory(src)
++add_subdirectory(src/po)
++add_subdirectory(src/gui)
+diff --git a/Makefile b/Makefile
+deleted file mode 100644
+index b1be8b3..0000000
+--- a/Makefile
++++ /dev/null
+@@ -1,20 +0,0 @@
+-PACKAGENAME = lshw
+-VERSION?= $(shell git describe --tags | cut -d - -f 1,2 | tr - .)
+-export PACKAGENAME
+-
+-all clean install snapshot gui install-gui static:
+-	+$(MAKE) -C src $@
+-
+-version.cpe: .version
+-	echo -n cpe:/a:ezix:$(PACKAGENAME): > $@
+-	cat $^ >> $@
+-
+-.PHONY: $(PACKAGENAME).spec
+-
+-$(PACKAGENAME).spec: $(PACKAGENAME).spec.in
+-	cat $^ | sed -e s/\@VERSION\@/$(VERSION)/g > $@
+-
+-release: $(PACKAGENAME).spec
+-	git archive --prefix=$(PACKAGENAME)-$(VERSION)/ -o $(PACKAGENAME)-$(VERSION).tar HEAD
+-	tar --transform s!^!$(PACKAGENAME)-$(VERSION)/! -rf $(PACKAGENAME)-$(VERSION).tar $^
+-	gzip -f $(PACKAGENAME)-$(VERSION).tar
+diff --git a/README.md b/README.md
+index 0c610f5..8ef71f6 100644
+--- a/README.md
++++ b/README.md
+@@ -15,27 +15,29 @@ Installation
+  1. Requirements
+    - Linux 2.4.x, 2.6.x, 3.x or 4.x (2.2.x might work, though)
+    - a PA-RISC-, Alpha-, IA-64- (Itanium-), PowerPC-, ARM- or x86- based machine
++   - cmake, GNU make or Ninja
+    - an ANSI (or close enough to ANSI compliance) C++ compiler (tested with g++ 2.95.4 and 3.x)
+    - for the (optional) GTK+ graphical user interface, you will need a
+ 	complete GTK+ development environment (gtk3-devel on RedHat/Fedora derivatives)
++   - for optional SQLite feature install SQLite
++   - for optional zlib feature install zlib and gzip
+ 
+- 2. To compile it, just use:
++ 2. Use cmake options to decide feature set:
++   - -DGUI=OFF - disable graphical user interface version og lshw
++   - -DZLIB=ON - enable reading of gzipped datafiles
++   - -DSQLITE=ON -  enable SQLite support
++   - -DPOLICYKIT=ON - enable PolicyKit integration
++   - -DNOLOGO=ON - don't install logos with copyright
+ 
+-    	$ make
++ 3. Do configuration and build by
+ 
+-    To compile with zlib support (see below), use:
+-
+-    	$ make ZLIB=1
+-
+- 3. If you want to build the optional GUI, do:
+-
+-    	$ make
+-    	$ make gui
++       $ mkdir build && cd build
++       $ cmake .. -GNinja <options>
++       $ ninja-build
+ 
+  4. If you want to install the result, do:
+ 
+-    	$ make install
+-    	$ make install-gui
++       $ ninja-build install
+ 
+ Getting help
+ ------------
+@@ -61,12 +63,27 @@ If compiled with zlib support, lshw will look for `file`.gz first, then for `fil
+ 
+ Statically-linked and/or compressed binaries can be built by using
+ 
+-    $ make static
+-
++    $ mkdir build && cd build
++    $ cmake .. -DSTATIC=ON
++    $ ninja
+ or
+-
+-    $ make compressed
+-
+-in the `src/` directory
++    $ mkdir build && cd build
++    $ cmake .. -GNinja
++    $ ninja compressed
+ 
+ Building compressed binaries requires `upx` (cf. https://upx.github.io/).
++
++Release management and data files maintenance
++---------------------------------------------
++
++Create release tarball,
++
++ 1. Edit CMakeLists.txt to set version
++ 2. Run
++    $ mkdir build && cd build
++    $ cmake .. -DMAKE_RELEASE=ON
++    $ make release
++
++Update hwdata files:
++
++    $ make refresh_hwdata
+diff --git a/lshw.spec.in b/lshw.spec.in
+index b3b636f..3a6f9eb 100644
+--- a/lshw.spec.in
++++ b/lshw.spec.in
+@@ -7,9 +7,11 @@ Version: @VERSION@
+ Release: 2
+ Source: http://www.ezix.org/software/files/%{name}-%{version}.tar.gz
+ URL: http://lshw.ezix.org/
+-License: GPL
++License: GPLv2
+ Group: Applications/System
+-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
++BuildRequires: gcc
++BuildRequires: gcc-c++
++BuildRequires: cmake
+ 
+ %global debug_package %{nil}
+ 
+@@ -39,7 +41,7 @@ lshw (Hardware Lister) is a small tool to provide detailed information on
+ the hardware configuration of the machine. It can report exact memory
+ configuration, firmware version, mainboard configuration, CPU version
+ and speed, cache configuration, bus speed, etc. on DMI-capable x86s
+- systems and on some PowerPC machines (PowerMac G4 is known to work).
++systems and on some PowerPC machines (PowerMac G4 is known to work).
+ 
+ This package provides a graphical user interface to display hardware
+ information.
+@@ -54,61 +56,29 @@ http://lshw.ezix.org/
+ %setup -q
+ 
+ %build
+-%{__make} %{?_smp_mflags} \
+-  PREFIX="%{_prefix}" \
+-  SBINDIR="%{_sbindir}" \
+-  MANDIR="%{_mandir}" \
+-  DATADIR="%{_datadir}" \
+-  VERSION="%{version}" \
+-  all
+-%if %{!?_without_gui:1}0
+-%{__make} %{?_smp_mflags} \
+-  PREFIX="%{_prefix}" \
+-  SBINDIR="%{_sbindir}" \
+-  MANDIR="%{_mandir}" \
+-  DATADIR="%{_datadir}" \
+-  VERSION="%{version}" \
+-  gui
+-%endif
++mkdir build && cd build
++%cmake .. %{?_without_gui:-DGUI=OFF}
++make %{?_smp_mflags} VERBOSE=1
+ 
+ %install
+-%{__rm} -rf "%{buildroot}"
+-
+-%{__make} \
+-  DESTDIR="%{buildroot}" \
+-  PREFIX="%{_prefix}" \
+-  SBINDIR="%{_sbindir}" \
+-  MANDIR="%{_mandir}" \
+-  DATADIR="%{_datadir}" \
+-  INSTALL="%{__install} -p" \
+-  install
+-%if %{!?_without_gui:1}0
+-%{__make} \
+-  DESTDIR="%{buildroot}" \
+-  PREFIX="%{_prefix}" \
+-  SBINDIR="%{_sbindir}" \
+-  MANDIR="%{_mandir}" \
+-  DATADIR="%{_datadir}" \
+-  INSTALL="%{__install} -p" \
+-  install-gui
+-%endif
+-
+-%clean
+-%{__rm} -rf %{buildroot}
++cd build
++make install DESTDIR=%{buildroot}
+ 
+ %files
+-%defattr(-,root,root, 0555)
+-%doc README.md COPYING docs/TODO docs/Changelog docs/lshw.xsd
++%license COPYING
++%doc docs/TODO docs/Changelog docs/lshw.xsd
+ %{_sbindir}/lshw
+-%doc %{_mandir}/man?/*
++%{_mandir}/man?/*
+ %{_datadir}/lshw/
+ %{_datadir}/locale/*/*/*
+ 
+ %if %{!?_without_gui:1}0
+ %files gui
+-%defattr(-,root,root, 0555)
+-%doc COPYING
++%license COPYING
+ %{_sbindir}/gtk-lshw
++%{_datadir}/appdata/gtk-lshw.appdata.xml
++%{_datadir}/applications/gtk-lshw.desktop
++%{_datadir}/pixmaps/gtk-lshw.svg
+ %endif
+ 
+ %changelog
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+new file mode 100644
+index 0000000..3030e9c
+--- /dev/null
++++ b/src/CMakeLists.txt
+@@ -0,0 +1,104 @@
++if(STATIC)
++ set(ZLIB OFF)
++ set(SQLITE OFF)
++endif()
++
++find_package(PkgConfig)
++
++# SQLite support
++if(SQLITE)
++  pkg_check_modules(SQLITE3 sqlite3)
++  if(SQLITE3_FOUND)
++    message("-- Enabling SQLite support")
++  else()
++    message(FATAL_ERROR "SQLite not found, install lib or disable feature: -DSQLITE=OFF")
++  endif()
++else()
++  message("-- SQLite support disabled")
++endif()
++
++# zlib support
++if(ZLIB)
++  find_program(GZIP gzip "Path to gzip application")
++  if(NOT GZIP)
++    message(FATAL_ERROR "gzip program not found, install gzip or disable zlib support: -DZLIB=OFF")
++  endif()
++  pkg_check_modules(Z zlib)
++  if(Z_FOUND)
++    message("-- Enabling zlib support")
++  else()
++    message(FATAL_ERROR "zlib not found, install lib or disable feature: -DZLIB=OFF")
++  endif()
++else()
++  message("-- zlib support disabled")
++endif()
++
++if(ERROR)
++  message(FATAL_ERROR "Configuration failed")
++endif()
++
++# Some special targets, compress, refresh_hwdata and release
++add_custom_target(compressed
++  COMMAND upx -9 -o lshw-compress lshw
++  COMMENT "Creating upx compressed binary")
++add_dependencies(compressed lshw)
++
++add_custom_target(refresh_hwdata
++  COMMAND wget -N http://pciids.sourceforge.net/pci.ids
++  COMMAND wget -N http://www.linux-usb.org/usb.ids
++  COMMAND wget -N http://standards-oui.ieee.org/oui/oui.txt
++  COMMAND wget -O manuf.txt http://anonsvn.wireshark.org/wireshark/trunk/manuf
++  COMMAND wget -N https://git.fedorahosted.org/cgit/hwdata.git/plain/pnp.ids
++  COMMAND wget -N http://www-pc.uni-regensburg.de/hardware/TECHNIK/PCI_PNP/pnpid.txt
++  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src"
++  COMMENT "Updating hwdata files from upstream location")
++
++set(TARNAME ${PROJECT_NAME}-${VERSION})
++add_custom_target(release
++  COMMAND ${GIT_EXECUTABLE} archive --prefix=${TARNAME}/
++    -o ${PROJECT_BINARY_DIR}/${TARNAME}.tar HEAD
++  COMMAND mv ${PROJECT_BINARY_DIR}/lshw.spec ${PROJECT_SOURCE_DIR}/lshw.spec
++  COMMAND tar --owner=0 --group=0
++    --transform s,lshw.spec,${TARNAME}/lshw.spec,
++    -rf ${PROJECT_BINARY_DIR}/${TARNAME}.tar lshw.spec
++  COMMAND gzip ${PROJECT_BINARY_DIR}/${TARNAME}.tar
++  COMMAND rm ${PROJECT_SOURCE_DIR}/lshw.spec
++  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
++  COMMENT "Creating release tarball")
++
++configure_file(
++  "${CMAKE_CURRENT_SOURCE_DIR}/core/config.h.in"
++  "${PROJECT_BINARY_DIR}/config.h")
++
++include_directories("${PROJECT_BINARY_DIR}")
++include_directories("${CMAKE_CURRENT_SOURCE_DIR}/core")
++
++file(GLOB DATAFILES "pci.ids" "pnp.ids" "usb.ids" "manuf.txt" "oui.txt" "pnpid.txt")
++
++file(GLOB SOURCES "core/*.cc")
++add_library(core ${SOURCES})
++add_executable(lshw lshw.cc)
++
++if(STATIC)
++  set_target_properties(lshw PROPERTIES LINK_FLAGS "-static" )
++endif()
++
++target_link_libraries(lshw ${SQLITE3_LIBRARIES} ${Z_LIBRARIES} core resolv)
++
++if(NOT ZLIB)
++  if(HWDATA)
++    install(FILES ${DATAFILES} DESTINATION ${PROJECT_DATADIR})
++  endif()
++else()
++  foreach(DATAFILE ${DATAFILES})
++    get_filename_component(FILE ${DATAFILE} NAME)
++    add_custom_command(
++      OUTPUT ${FILE}.gz
++      COMMAND ${GZIP} -c ${DATAFILE} > ${FILE}.gz)
++    add_custom_target(${FILE} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILE}.gz)
++    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${FILE}.gz DESTINATION ${PROJECT_DATADIR})
++  endforeach()
++endif()
++
++install(FILES lshw.1 DESTINATION ${MANDIR}/man1 COMPONENT doc)
++install(TARGETS lshw DESTINATION ${CMAKE_INSTALL_SBINDIR})
+diff --git a/src/Makefile b/src/Makefile
+deleted file mode 100644
+index ac726d0..0000000
+--- a/src/Makefile
++++ /dev/null
+@@ -1,152 +0,0 @@
+-PACKAGENAME:=lshw
+-export PACKAGENAME
+-VERSION?= $(shell git describe --tags --long | cut -d - -f 1,2 | tr - .)
+-
+-SQLITE?=0
+-ZLIB?=0
+-
+-DESTDIR?=/
+-PREFIX?=/usr
+-SBINDIR=$(PREFIX)/sbin
+-MANDIR=$(PREFIX)/share/man
+-DATADIR=$(PREFIX)/share
+-INSTALL?=install -p
+-STRIP?=strip
+-GZIP?=gzip -9
+-export DESTDIR
+-export PREFIX
+-export SBINDIR
+-export MANDIR
+-export DATADIR
+-export SQLITE
+-export ZLIB
+-
+-CXX?=$(CROSS_COMPILE)c++
+-PKG_CONFIG ?= pkg-config
+-INCLUDES=-I./core/
+-ifneq ($(NO_VERSION_CHECK), 1)
+-REMOTE_VERSION_CHECK?=-DREMOTE_VERSION_CHECK
+-endif
+-DEFINES=-DPREFIX=\"$(PREFIX)\" -DSBINDIR=\"$(SBINDIR)\" -DMANDIR=\"$(MANDIR)\" -DDATADIR=\"$(DATADIR)\" -DVERSION=\"$(VERSION)\" $(REMOTE_VERSION_CHECK)
+-CXXFLAGS=-g -Wall -g $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+-ifeq ($(SQLITE), 1)
+-	CXXFLAGS+= -DSQLITE $(shell $(PKG_CONFIG) --cflags sqlite3)
+-endif
+-ifeq ($(ZLIB), 1)
+-	CXXFLAGS+= -DZLIB $(shell $(PKG_CONFIG) --cflags zlib)
+-endif
+-LDFLAGS+=-L./core/ -g
+-ifneq ($(shell $(LD) --help 2| grep -- --as-needed), )
+-	LDFLAGS+= -Wl,--as-needed
+-endif
+-LDSTATIC=-static
+-LIBS+=-llshw
+-ifneq ($(NO_VERSION_CHECK), 1)
+-LIBS+=-lresolv
+-endif
+-ifeq ($(SQLITE), 1)
+-	LIBS+= $(shell $(PKG_CONFIG) --libs sqlite3)
+-endif
+-ifeq ($(ZLIB), 1)
+-	LIBS+= $(shell $(PKG_CONFIG) --libs zlib)
+-endif
+-
+-export CXXFLAGS
+-export LIBS
+-export LDFLAGS
+-
+-ifeq ($(ZLIB), 1)
+-DATAFILES = pci.ids.gz usb.ids.gz oui.txt.gz manuf.txt.gz pnp.ids.gz pnpid.txt.gz
+-else
+-DATAFILES = pci.ids usb.ids oui.txt manuf.txt pnp.ids pnpid.txt
+-endif
+-
+-all: $(PACKAGENAME) $(PACKAGENAME).1 $(DATAFILES)
+-
+-.cc.o:
+-	$(CXX) $(CXXFLAGS) -c $< -o $@
+-
+-%.gz: %
+-	$(GZIP) -c $< > $@
+-
+-.PHONY: core
+-core:
+-	+make -C core all
+-
+-$(PACKAGENAME): core $(PACKAGENAME).o
+-	$(CXX) $(LDFLAGS) -o $@ $(PACKAGENAME).o $(LIBS)
+-
+-.PHONY: po
+-po:
+-	+make -C po all
+-
+-.PHONY: gui
+-gui: core
+-	+make -C gui all
+-
+-.PHONY: nologo
+-nologo:
+-	cp -f gui/artwork/nologo/* gui/artwork/
+-
+-.PHONY: static
+-static: $(PACKAGENAME)-static
+-
+-$(PACKAGENAME)-static: core core/lib$(PACKAGENAME).a $(PACKAGENAME).o
+-	$(CXX) $(LDSTATIC) $(LDFLAGS) -o $@ $(PACKAGENAME).o $(LIBS)
+-	$(STRIP) $@
+-
+-.PHONY: compressed
+-compressed: $(PACKAGENAME)-compressed
+-
+-$(PACKAGENAME)-compressed: $(PACKAGENAME)-static
+-	upx -9 -o $@ $<
+-
+-$(PACKAGENAME).1: $(PACKAGENAME).sgml
+-	docbook2man $<
+-
+-pci.ids:
+-	wget http://pciids.sourceforge.net/pci.ids
+-
+-usb.ids:
+-	wget http://www.linux-usb.org/usb.ids
+-
+-oui.txt:
+-	wget http://standards.ieee.org/regauth/oui/oui.txt
+-
+-manuf.txt:
+-	wget -O $@ http://anonsvn.wireshark.org/wireshark/trunk/manuf
+-
+-pnp.ids:
+-	wget https://git.fedorahosted.org/cgit/hwdata.git/plain/pnp.ids
+-
+-pnpid.txt:
+-	wget http://www-pc.uni-regensburg.de/hardware/TECHNIK/PCI_PNP/pnpid.txt
+-
+-install: all
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(SBINDIR)
+-	$(INSTALL) -m 0755 $(PACKAGENAME) $(DESTDIR)/$(SBINDIR)
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(MANDIR)/man1
+-	$(INSTALL) -m 0644 $(PACKAGENAME).1 $(DESTDIR)/$(MANDIR)/man1
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)
+-	$(INSTALL) -m 0644 $(DATAFILES) $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)
+-	make -C po install
+-
+-install-gui: gui
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(SBINDIR)
+-	$(INSTALL) -m 0755 gui/gtk-$(PACKAGENAME) $(DESTDIR)/$(SBINDIR)
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)/artwork
+-	$(INSTALL) -d -m 0755 $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)/ui
+-	$(INSTALL) -m 0644 gui/*.ui $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)/ui
+-	$(INSTALL) -m 0644 gui/artwork/*.svg $(DESTDIR)/$(DATADIR)/$(PACKAGENAME)/artwork
+-
+-clean:
+-	rm -f $(PACKAGENAME).o $(PACKAGENAME) $(PACKAGENAME)-static $(PACKAGENAME)-compressed
+-	rm -f $(addsuffix .gz,$(DATAFILES))
+-	make -C core clean
+-	make -C gui clean
+-
+-depend:
+-	@makedepend -Y $(SRCS) 2> /dev/null > /dev/null
+-
+-
+-# DO NOT DELETE
+diff --git a/src/core/Makefile b/src/core/Makefile
+deleted file mode 100644
+index 5035062..0000000
+--- a/src/core/Makefile
++++ /dev/null
+@@ -1,83 +0,0 @@
+-PACKAGENAME?=lshw
+-
+-CXX?=$(CROSS_COMPILE)c++
+-INCLUDES=
+-ifneq ($(NO_VERSION_CHECK), 1)
+-REMOTE_VERSION_CHECK?=-DREMOTE_VERSION_CHECK
+-endif
+-DEFINES=-DPREFIX=\"$(PREFIX)\" -DSBINDIR=\"$(SBINDIR)\" -DMANDIR=\"$(MANDIR)\" -DDATADIR=\"$(DATADIR)\" $(REMOTE_VERSION_CHECK)
+-CXXFLAGS?=-g -Wall $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+-LDFLAGS=
+-LDSTATIC=
+-LIBS=
+-
+-OBJS = hw.o main.o print.o mem.o dmi.o device-tree.o cpuinfo.o osutils.o pci.o version.o cpuid.o ide.o cdrom.o pcmcia-legacy.o scsi.o s390.o disk.o spd.o network.o isapnp.o pnp.o fb.o options.o usb.o sysfs.o display.o heuristics.o parisc.o cpufreq.o partitions.o blockio.o lvm.o ideraid.o pcmcia.o volumes.o mounts.o smp.o abi.o jedec.o dump.o fat.o virtio.o vio.o nvme.o mmc.o input.o sound.o graphics.o
+-ifeq ($(SQLITE), 1)
+-	OBJS+= db.o
+-endif
+-SRCS = $(OBJS:.o=.cc)
+-
+-all: lib$(PACKAGENAME).a
+-
+-.cc.o:
+-	$(CXX) $(CXXFLAGS) -c $< -o $@
+-
+-lib$(PACKAGENAME).a: $(OBJS)
+-	$(AR) rs $@ $^
+-
+-install: all
+-
+-clean:
+-	rm -f $(OBJS) lib$(PACKAGENAME).a
+-
+-depend:
+-	@makedepend -Y $(SRCS) 2> /dev/null > /dev/null
+-
+-
+-# DO NOT DELETE
+-
+-hw.o: hw.h osutils.h version.h config.h options.h heuristics.h
+-main.o: hw.h print.h version.h options.h mem.h dmi.h cpuinfo.h cpuid.h
+-main.o: device-tree.h pci.h pcmcia.h pcmcia-legacy.h ide.h scsi.h spd.h
+-main.o: network.h isapnp.h fb.h usb.h sysfs.h display.h parisc.h cpufreq.h
+-main.o: ideraid.h mounts.h smp.h abi.h s390.h virtio.h pnp.h vio.h
+-print.o: print.h hw.h options.h version.h osutils.h config.h
+-mem.o: version.h config.h mem.h hw.h sysfs.h
+-dmi.o: version.h config.h dmi.h hw.h osutils.h
+-device-tree.o: version.h device-tree.h hw.h osutils.h
+-cpuinfo.o: version.h cpuinfo.h hw.h osutils.h
+-osutils.o: version.h osutils.h
+-pci.o: version.h config.h pci.h hw.h osutils.h options.h
+-version.o: version.h config.h
+-cpuid.o: version.h cpuid.h hw.h
+-ide.o: version.h cpuinfo.h hw.h osutils.h cdrom.h disk.h heuristics.h
+-cdrom.o: version.h cdrom.h hw.h partitions.h
+-pcmcia-legacy.o: version.h pcmcia-legacy.h hw.h osutils.h
+-scsi.o: version.h mem.h hw.h cdrom.h disk.h osutils.h heuristics.h sysfs.h
+-disk.o: version.h disk.h hw.h osutils.h heuristics.h partitions.h
+-spd.o: version.h spd.h hw.h osutils.h
+-network.o: version.h config.h network.h hw.h osutils.h sysfs.h options.h
+-network.o: heuristics.h
+-isapnp.o: version.h isapnp.h hw.h pnp.h
+-pnp.o: version.h pnp.h hw.h sysfs.h osutils.h
+-fb.o: version.h fb.h hw.h
+-options.o: version.h options.h osutils.h
+-usb.o: version.h usb.h hw.h osutils.h heuristics.h options.h
+-sysfs.o: version.h sysfs.h hw.h osutils.h
+-display.o: display.h hw.h
+-heuristics.o: version.h sysfs.h hw.h osutils.h
+-parisc.o: version.h device-tree.h hw.h osutils.h heuristics.h
+-cpufreq.o: version.h hw.h osutils.h
+-partitions.o: version.h partitions.h hw.h blockio.h lvm.h volumes.h osutils.h
+-blockio.o: version.h blockio.h osutils.h
+-lvm.o: version.h lvm.h hw.h blockio.h osutils.h
+-ideraid.o: version.h cpuinfo.h hw.h osutils.h cdrom.h disk.h heuristics.h
+-pcmcia.o: version.h pcmcia.h hw.h osutils.h sysfs.h
+-volumes.o: version.h volumes.h hw.h blockio.h lvm.h osutils.h
+-mounts.o: version.h mounts.h hw.h osutils.h
+-smp.o: version.h smp.h hw.h osutils.h
+-abi.o: version.h abi.h hw.h osutils.h
+-jedec.o: jedec.h
+-s390.o: hw.h sysfs.h disk.h s390.h
+-virtio.o: version.h hw.h sysfs.h disk.h virtio.h
+-vio.o: version.h hw.h sysfs.h vio.h
+diff --git a/src/core/config.h b/src/core/config.h.in
+similarity index 50%
+rename from src/core/config.h
+rename to src/core/config.h.in
+index 69023fd..ca25a5f 100644
+--- a/src/core/config.h
++++ b/src/core/config.h.in
+@@ -13,27 +13,15 @@
+ #define N_(String) gettext_noop (String)
+ #endif
+ 
+-#ifndef PACKAGE
+-#define PACKAGE "lshw"
+-#endif
++#define PACKAGE "@PROJECT_NAME@"
++#define VERSION "@VERSION@"
+ 
+-#ifndef PREFIX
+-#define PREFIX "/usr"
+-#endif
++#define SBINDIR "@SBINDIR@"
++#define DATADIR "@DATADIR@"
++#define MANDIR "@MANDIR@"
++#define LOCALEDIR "@LOCALEDIR@"
+ 
+-#ifndef SBINDIR
+-#define SBINDIR PREFIX"/sbin"
+-#endif
++#cmakedefine SQLITE 1
++#cmakedefine ZLIB 1
+ 
+-#ifndef DATADIR
+-#define DATADIR PREFIX"/share/lshw"
+-#endif
+-
+-#ifndef MANDIR
+-#define MANDIR PREFIX"/share/man"
+-#endif
+-
+-#ifndef LOCALEDIR
+-#define LOCALEDIR PREFIX"/share/locale"
+-#endif
+ #endif
+diff --git a/src/core/db.cc b/src/core/db.cc
+index d080295..f85c85b 100644
+--- a/src/core/db.cc
++++ b/src/core/db.cc
+@@ -1,6 +1,12 @@
++
+ #include <string.h>
+ #include <string>
+ #include <stdexcept>
++
++#include "config.h"
++
++#ifdef SQLITE
++
+ #include <sqlite3.h>
+ 
+ #include "db.h"
+@@ -419,3 +425,5 @@ value statement::operator[](const string & i) const
+ {
+   return column(i);
+ }
++
++#endif /* SQLITE */
+diff --git a/src/core/dump.cc b/src/core/dump.cc
+index 6bc9674..f22f0fb 100644
+--- a/src/core/dump.cc
++++ b/src/core/dump.cc
+@@ -1,5 +1,5 @@
+-#include "dump.h"
+ #include "version.h"
++#include "dump.h"
+ #include "osutils.h"
+ 
+ #include <time.h>
+diff --git a/src/core/version.h b/src/core/version.h
+index 91e039a..5cecdda 100644
+--- a/src/core/version.h
++++ b/src/core/version.h
+@@ -1,6 +1,8 @@
+ #ifndef _VERSION_H_
+ #define _VERSION_H_
+ 
++#include "config.h"
++
+ #if defined(__GNUC__) || defined(__INTEL_COMPILER)
+ #define __ID(string) __asm__(".ident\t\"" string "\"")
+ #else
+diff --git a/src/gui/CMakeLists.txt b/src/gui/CMakeLists.txt
+new file mode 100644
+index 0000000..cfe61f1
+--- /dev/null
++++ b/src/gui/CMakeLists.txt
+@@ -0,0 +1,77 @@
++if(NOT GUI OR STATIC)
++  message("-- gtk-${PROJECT_NAME} disabled")
++  return()
++endif()
++
++find_package(PkgConfig)
++
++pkg_check_modules(
++  GtkDeps REQUIRED
++  IMPORTED_TARGET
++  gtk+-3.0
++  gmodule-2.0
++)
++
++set(GTK_SOURCES
++  callbacks.c
++  gtk-lshw.c
++  stock.c
++  engine.cc
++  print-gui.cc
++)
++
++include_directories("${PROJECT_BINARY_DIR}")
++include_directories("${PROJECT_SOURCE_DIR}/src/core")
++
++add_executable(gtk-lshw ${GTK_SOURCES})
++target_link_libraries(gtk-lshw PRIVATE ${SQLITE3_LIBRARIES} ${Z_LIBRARIES} PkgConfig::GtkDeps core resolv)
++install(TARGETS gtk-lshw DESTINATION ${CMAKE_INSTALL_SBINDIR})
++
++if(POLICYKIT)
++  set(desktop_exec ${CMAKE_INSTALL_FULL_BINDIR}/lshw-gui)
++  configure_file(
++    "${CMAKE_CURRENT_SOURCE_DIR}/integration/org.ezix.lshw.gui.policy.in"
++    "${CMAKE_CURRENT_BINARY_DIR}/org.ezix.lshw.gui.policy")
++  configure_file(
++    "${CMAKE_CURRENT_SOURCE_DIR}/integration/lshw-gui.in"
++    "${CMAKE_CURRENT_BINARY_DIR}/lshw-gui")
++else()
++  set(desktop_exec ${CMAKE_INSTALL_FULL_SBINDIR}/gtk-lshw)
++endif()
++
++configure_file(
++  "${CMAKE_CURRENT_SOURCE_DIR}/integration/gtk-lshw.desktop.in"
++  "${CMAKE_CURRENT_BINARY_DIR}/gtk-lshw.desktop")
++configure_file(
++  "${CMAKE_CURRENT_SOURCE_DIR}/artwork/logo.svg"
++  "${CMAKE_CURRENT_BINARY_DIR}/gtk-lshw.svg")
++
++file(GLOB LOGOS "artwork/*.svg")
++file(GLOB NOLOGOS "artwork/nologo/*.svg")
++
++if(NOLOGO)
++  install(FILES ${NOLOGOS} DESTINATION ${PROJECT_DATADIR}/artwork)
++  foreach(LOGO ${LOGOS})
++    get_filename_component(BASENAME ${LOGO} NAME)
++    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/artwork/nologo/${BASENAME}")
++      list(REMOVE_ITEM LOGOS ${LOGO})
++    endif()
++  endforeach()
++endif()
++
++install(FILES ${LOGOS} DESTINATION ${PROJECT_DATADIR}/artwork)
++install(FILES gtk-lshw.ui DESTINATION ${PROJECT_DATADIR}/ui)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gtk-lshw.desktop
++  DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/applications)
++install(FILES integration/gtk-lshw.appdata.xml DESTINATION
++  ${CMAKE_INSTALL_FULL_DATADIR}/appdata)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gtk-lshw.svg DESTINATION
++  ${CMAKE_INSTALL_FULL_DATADIR}/pixmaps)
++
++
++if(POLICYKIT)
++  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.ezix.lshw.gui.policy
++    DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/polkit-1/actions)
++  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/lshw-gui
++    DESTINATION bin)
++endif()
+diff --git a/src/gui/Makefile b/src/gui/Makefile
+deleted file mode 100644
+index cc2d168..0000000
+--- a/src/gui/Makefile
++++ /dev/null
+@@ -1,62 +0,0 @@
+-PACKAGENAME?=lshw
+-
+-CXX?=$(CROSS_COMPILE)c++
+-PKG_CONFIG ?= pkg-config
+-CC?=$(CROSS_COMPILE)cc
+-STRIP?=strip
+-OBJCOPY?=objcopy
+-
+-DEFINES=-DPREFIX=\"$(PREFIX)\" -DSBINDIR=\"$(SBINDIR)\" -DMANDIR=\"$(MANDIR)\" -DDATADIR=\"$(DATADIR)\"
+-GTKINCLUDES=$(shell $(PKG_CONFIG) gtk+-3.0 --cflags)
+-INCLUDES=-I../core $(GTKINCLUDES)
+-CXXFLAGS=-g -Wall $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+-ifeq ($(SQLITE), 1)
+-	CXXFLAGS+= -DSQLITE $(shell $(PKG_CONFIG) --cflags sqlite3)
+-endif
+-CFLAGS=$(CXXFLAGS) -g $(DEFINES)
+-GTKLIBS=$(shell $(PKG_CONFIG) gtk+-3.0 gmodule-2.0 --libs)
+-LIBS+=-L../core -llshw -lresolv $(GTKLIBS)
+-ifeq ($(SQLITE), 1)
+-	LIBS+= $(shell $(PKG_CONFIG) --libs sqlite3)
+-endif
+-LDFLAGS=
+-ifneq ($(shell $(LD) --help 2| grep -- --as-needed), )
+-	LDFLAGS+= -Wl,--as-needed
+-endif
+-
+-OBJS = gtk-lshw.o callbacks.o engine.o print-gui.o stock.o
+-SRCS = $(OBJS:.o=.c)
+-
+-all: gtk-$(PACKAGENAME)
+-
+-.cc.o:
+-	$(CXX) $(CXXFLAGS) -c $< -o $@
+-
+-.c.o:
+-	$(CC) $(CFLAGS) -c $< -o $@
+-
+-.PHONY: icon
+-icon: gtk-$(PACKAGENAME) artwork/logo.svg
+-	$(OBJCOPY) --add-section .icon=artwork/logo.svg gtk-$(PACKAGENAME)
+-
+-interface.c: gtk-lshw.glade gtk-lshw.gladep
+-	glade-2 -w gtk-lshw.glade
+-
+-gtk-$(PACKAGENAME): $(OBJS) ../core/liblshw.a
+-	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+-
+-install: all
+-	$(STRIP) gtk-$(PACKAGENAME)
+-
+-clean:
+-	rm -f $(OBJS) gtk-$(PACKAGENAME) gtk-lshw.glade.bak gtk-lshw.gladep.bak callbacks.c.bak callbacks.h.bak Makefile.bak
+-
+-depend:
+-	@makedepend -Y $(SRCS) 2> /dev/null > /dev/null
+-
+-
+-# DO NOT DELETE
+-
+-gtk-lshw.o: stock.h engine.h
+-callbacks.o: callbacks.h support.h engine.h
+-stock.o: stock.h
+diff --git a/src/gui/integration/gtk-lshw.desktop b/src/gui/integration/gtk-lshw.desktop.in
+similarity index 51%
+rename from src/gui/integration/gtk-lshw.desktop
+rename to src/gui/integration/gtk-lshw.desktop.in
+index 4df1c7c..7124c27 100644
+--- a/src/gui/integration/gtk-lshw.desktop
++++ b/src/gui/integration/gtk-lshw.desktop.in
+@@ -3,10 +3,9 @@ Name=LSHW
+ Comment=HardWare LiSter
+ Comment[fr]=Listeur de matériel
+ Comment[es]=Listar equipamiento
+-Categories=Application;System;X-Red-Hat-Base;X-Fedora;
+-Icon=/usr/share/lshw/artwork/logo.svg
+-Exec=/usr/bin/gtk-lshw
++Categories=GTK;System;
++Icon=gtk-lshw
++Exec=@desktop_exec@
+ Type=Application
+ Terminal=false
+ Encoding=UTF-8
+-X-Desktop-File-Install-Version=0.10
+diff --git a/src/gui/integration/lshw-gui.in b/src/gui/integration/lshw-gui.in
+new file mode 100644
+index 0000000..ac0823b
+--- /dev/null
++++ b/src/gui/integration/lshw-gui.in
+@@ -0,0 +1,5 @@
++#! /bin/bash
++
++/usr/bin/pkexec @CMAKE_INSTALL_FULL_SBINDIR@/gtk-lshw
++
++
+diff --git a/src/gui/integration/org.ezix.lshw.gui.policy.in b/src/gui/integration/org.ezix.lshw.gui.policy.in
+new file mode 100644
+index 0000000..cba4189
+--- /dev/null
++++ b/src/gui/integration/org.ezix.lshw.gui.policy.in
+@@ -0,0 +1,20 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE policyconfig PUBLIC
++"-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
++"http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
++<policyconfig>
++ <vendor>lshw</vendor>
++ <vendor_url>http://ezix.org/project/wiki/HardwareLiSter</vendor_url>
++ <action id="org.ezix.lshw.gui.pkexec.run">
++    <description>Hardware Lister (lshw) - list hardware information</description>
++    <message>Authentication is required to run lshw-gui</message>
++    <icon_name>lshw-gui</icon_name>
++    <defaults>
++     <allow_any>no</allow_any>
++     <allow_inactive>no</allow_inactive>
++     <allow_active>auth_admin_keep</allow_active>
++    </defaults>
++    <annotate key="org.freedesktop.policykit.exec.path">@CMAKE_INSTALL_FULL_SBINDIR@/gtk-lshw</annotate>
++    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
++ </action>
++</policyconfig>
+diff --git a/src/gui/stock.c b/src/gui/stock.c
+index c3159b8..db2e981 100644
+--- a/src/gui/stock.c
++++ b/src/gui/stock.c
+@@ -1,3 +1,4 @@
++#include "config.h"
+ #include "stock.h"
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/gui/support.c b/src/gui/support.c
+deleted file mode 100644
+index 7dc3c78..0000000
+--- a/src/gui/support.c
++++ /dev/null
+@@ -1,144 +0,0 @@
+-/*
+- * DO NOT EDIT THIS FILE - it is generated by Glade.
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#  include <config.h>
+-#endif
+-
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include <string.h>
+-#include <stdio.h>
+-
+-#include <gtk/gtk.h>
+-
+-#include "support.h"
+-
+-GtkWidget*
+-lookup_widget                          (GtkWidget       *widget,
+-                                        const gchar     *widget_name)
+-{
+-  GtkWidget *parent, *found_widget;
+-
+-  for (;;)
+-    {
+-      if (GTK_IS_MENU (widget))
+-        parent = gtk_menu_get_attach_widget (GTK_MENU (widget));
+-      else
+-        parent = widget->parent;
+-      if (!parent)
+-        parent = (GtkWidget*) g_object_get_data (G_OBJECT (widget), "GladeParentKey");
+-      if (parent == NULL)
+-        break;
+-      widget = parent;
+-    }
+-
+-  found_widget = (GtkWidget*) g_object_get_data (G_OBJECT (widget),
+-                                                 widget_name);
+-  if (!found_widget)
+-    g_warning ("Widget not found: %s", widget_name);
+-  return found_widget;
+-}
+-
+-static GList *pixmaps_directories = NULL;
+-
+-/* Use this function to set the directory containing installed pixmaps. */
+-void
+-add_pixmap_directory                   (const gchar     *directory)
+-{
+-  pixmaps_directories = g_list_prepend (pixmaps_directories,
+-                                        g_strdup (directory));
+-}
+-
+-/* This is an internally used function to find pixmap files. */
+-static gchar*
+-find_pixmap_file                       (const gchar     *filename)
+-{
+-  GList *elem;
+-
+-  /* We step through each of the pixmaps directory to find it. */
+-  elem = pixmaps_directories;
+-  while (elem)
+-    {
+-      gchar *pathname = g_strdup_printf ("%s%s%s", (gchar*)elem->data,
+-                                         G_DIR_SEPARATOR_S, filename);
+-      if (g_file_test (pathname, G_FILE_TEST_EXISTS))
+-        return pathname;
+-      g_free (pathname);
+-      elem = elem->next;
+-    }
+-  return NULL;
+-}
+-
+-/* This is an internally used function to create pixmaps. */
+-GtkWidget*
+-create_pixmap                          (GtkWidget       *widget,
+-                                        const gchar     *filename)
+-{
+-  gchar *pathname = NULL;
+-  GtkWidget *pixmap;
+-
+-  if (!filename || !filename[0])
+-      return gtk_image_new ();
+-
+-  pathname = find_pixmap_file (filename);
+-
+-  if (!pathname)
+-    {
+-      g_warning ("Couldn't find pixmap file: %s", filename);
+-      return gtk_image_new ();
+-    }
+-
+-  pixmap = gtk_image_new_from_file (pathname);
+-  g_free (pathname);
+-  return pixmap;
+-}
+-
+-/* This is an internally used function to create pixmaps. */
+-GdkPixbuf*
+-create_pixbuf                          (const gchar     *filename)
+-{
+-  gchar *pathname = NULL;
+-  GdkPixbuf *pixbuf;
+-  GError *error = NULL;
+-
+-  if (!filename || !filename[0])
+-      return NULL;
+-
+-  pathname = find_pixmap_file (filename);
+-
+-  if (!pathname)
+-    {
+-      g_warning ("Couldn't find pixmap file: %s", filename);
+-      return NULL;
+-    }
+-
+-  pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
+-  if (!pixbuf)
+-    {
+-      fprintf (stderr, "Failed to load pixbuf file: %s: %s\n",
+-               pathname, error->message);
+-      g_error_free (error);
+-    }
+-  g_free (pathname);
+-  return pixbuf;
+-}
+-
+-/* This is used to set ATK action descriptions. */
+-void
+-glade_set_atk_action_description       (AtkAction       *action,
+-                                        const gchar     *action_name,
+-                                        const gchar     *description)
+-{
+-  gint n_actions, i;
+-
+-  n_actions = atk_action_get_n_actions (action);
+-  for (i = 0; i < n_actions; i++)
+-    {
+-      if (!strcmp (atk_action_get_name (action, i), action_name))
+-        atk_action_set_description (action, i, description);
+-    }
+-}
+-
+diff --git a/src/po/CMakeLists.txt b/src/po/CMakeLists.txt
+new file mode 100644
+index 0000000..de2f5c8
+--- /dev/null
++++ b/src/po/CMakeLists.txt
+@@ -0,0 +1,16 @@
++include(FindGettext)
++
++if (GETTEXT_FOUND)
++  file(GLOB POTFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.po")
++  string(REPLACE ".po" " " LANGS ${POTFILES})
++  message(STATUS "gettext found: ${LANGS}")
++  string(REPLACE " " ";" LANGS ${LANGS})
++  foreach(LANG ${LANGS})
++    GETTEXT_PROCESS_PO_FILES(${LANG} ALL PO_FILES ${LANG}.po)
++    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${LANG}.gmo"
++      DESTINATION "${CMAKE_INSTALL_FULL_LOCALEDIR}/${LANG}/LC_MESSAGES"
++      RENAME "${PROJECT_NAME}.mo")
++  endforeach()
++else()
++  message("-- gettext not found")
++endif()
+diff --git a/src/po/Makefile b/src/po/Makefile
+deleted file mode 100644
+index 1d5b138..0000000
+--- a/src/po/Makefile
++++ /dev/null
+@@ -1,23 +0,0 @@
+-PACKAGENAME?=lshw
+-
+-LANGUAGES = ca es fr
+-SRCS = $(LANGUAGES:=.po)
+-CATALOGS = $(LANGUAGES:=.mo)
+-
+-all: $(PACKAGENAME).pot $(CATALOGS)
+-
+-POTFILES:
+-	find .. -name \*.cc > $@
+-	find .. -name \*.c >> $@
+-
+-$(PACKAGENAME).pot: POTFILES
+-	xgettext -F --no-wrap --indent --keyword=_ --keyword=N_ -d $(PACKAGENAME) -o $@ -f POTFILES
+-
+-%.mo: %.po
+-	msgfmt -v -o $@ $^
+-
+-install: $(CATALOGS)
+-	$(foreach i, $(LANGUAGES), install -D $(i).mo $(DESTDIR)/$(DATADIR)/locale/$(i)/LC_MESSAGES/$(PACKAGENAME).mo ;)
+-
+-clean:
+-	rm -f $(CATALOGS) $(PACKAGENAME).pot
+-- 
+2.52.0
+

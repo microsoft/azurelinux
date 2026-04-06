@@ -1,0 +1,24 @@
+From f96d339a2ad8535de6cb193d49e75bc10f90a8db Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?=
+ <30413512+eclipseo@users.noreply.github.com>
+Date: Sat, 14 Sep 2019 22:35:43 +0200
+Subject: [PATCH] Use ..= for an inclusive range instead of deprecated ...
+
+https://github.com/rust-lang/rust/issues/51043
+---
+ src/display.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/display.rs b/src/display.rs
+index 826cb10..2563974 100644
+--- a/src/display.rs
++++ b/src/display.rs
+@@ -68,7 +68,7 @@ mod tests {
+                 // 9 => print!("{}", *b as char), // TAB
+                 b'\n' => print!("\\n"),
+                 b'\r' => print!("\\r"),
+-                32...126 => print!("{}", *b as char), // visible ASCII
++                32..=126 => print!("{}", *b as char), // visible ASCII
+                 _ => print!(r"\x{:0>2x}", b),
+ 
+             }

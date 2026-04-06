@@ -1,0 +1,24 @@
+From ad48572d75299355563fc20ba1dd90cbec35ba81 Mon Sep 17 00:00:00 2001
+From: Ashwin Maroli <ashmaroli@gmail.com>
+Date: Wed, 22 Jul 2020 23:33:50 +0530
+Subject: [PATCH] Update test expectation to reflect current result
+
+The change in generated markup is external to the GFM Parser:
+kramdown-2.2.0 changed output of MathJax math engine to be compatible with
+MathJax v2 and v3.
+
+Resolves https://github.com/kramdown/parser-gfm/issues/19
+---
+ test/testcases/header_ids.html | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/testcases/header_ids.html b/test/testcases/header_ids.html
+index b45fe8f..f2fb65f 100644
+--- a/test/testcases/header_ids.html
++++ b/test/testcases/header_ids.html
+@@ -24,4 +24,4 @@ <h3 id="with-smart-quotes">With “smart” quotes</h3>
+ 
+ <h3 id="with--typographic--symbols">with — « typographic » … symbols</h3>
+ 
+-<h3 id="with-m5">with <script type="math/tex">m=5</script></h3>
++<h3 id="with-m5">with \(m=5\)</h3>

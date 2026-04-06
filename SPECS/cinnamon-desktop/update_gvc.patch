@@ -1,0 +1,2381 @@
+diff -uNrp a/libcvc/gvc-channel-map.c b/libcvc/gvc-channel-map.c
+--- a/libcvc/gvc-channel-map.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-channel-map.c	2026-02-22 16:12:11.121477543 +0000
+@@ -178,8 +178,6 @@ gvc_channel_map_get_lfe (GvcChannelMap *
+                 return 0;
+ 
+         if (gvc_channel_map_has_lfe (map))
+-            // there is a function for this in pa 7.1, but it is not used here for backward
+-            // compatibility
+             return (gfloat) pa_cvolume_get_position (&map->priv->pa_volume, &map->priv->pa_map, PA_CHANNEL_POSITION_LFE);
+         else
+             return 0;
+@@ -198,8 +196,6 @@ gvc_channel_map_set_lfe (GvcChannelMap *
+ 
+         cv = *gvc_channel_map_get_cvolume (map);
+ 
+-        // there is a function for this in pa 7.1, but it is not used here for backward
+-        // compatibility
+         pa_cvolume_set_position (&cv, &map->priv->pa_map, PA_CHANNEL_POSITION_LFE, value);
+ 
+         if (!pa_cvolume_equal (&cv, &map->priv->pa_volume))
+@@ -275,8 +271,7 @@ gvc_channel_map_class_init (GvcChannelMa
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcChannelMapClass, volume_changed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__BOOLEAN,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
+ }
+ 
+diff -uNrp a/libcvc/gvc-channel-map.h b/libcvc/gvc-channel-map.h
+--- a/libcvc/gvc-channel-map.h	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-channel-map.h	2026-02-22 16:12:11.121536856 +0000
+@@ -72,7 +72,7 @@ gfloat                  gvc_channel_map_
+ void                    gvc_channel_map_set_lfe                 (GvcChannelMap *map,
+                                                                  gfloat value);
+ gboolean                gvc_channel_map_can_lfe                 (const GvcChannelMap  *map);
+-gboolean                gvc_channel_map_has_position            (const GvcChannelMap  *map,
++gboolean                gvc_channel_map_has_position            (const GvcChannelMap *map,
+                                                                  pa_channel_position_t position);
+ #define                 gvc_channel_map_has_lfe(x)              gvc_channel_map_has_position (x, PA_CHANNEL_POSITION_LFE)
+ 
+diff -uNrp a/libcvc/gvc-mixer-card.c b/libcvc/gvc-mixer-card.c
+--- a/libcvc/gvc-mixer-card.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-card.c	2026-02-22 16:12:11.119934513 +0000
+@@ -61,7 +61,9 @@ enum
+         PROP_ICON_NAME,
+         PROP_PROFILE,
+         PROP_HUMAN_PROFILE,
++        N_PROPS
+ };
++static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
+ static void     gvc_mixer_card_finalize   (GObject            *object);
+ 
+@@ -117,7 +119,7 @@ gvc_mixer_card_set_name (GvcMixerCard *c
+ 
+         g_free (card->priv->name);
+         card->priv->name = g_strdup (name);
+-        g_object_notify (G_OBJECT (card), "name");
++        g_object_notify_by_pspec (G_OBJECT (card), obj_props[PROP_NAME]);
+ 
+         return TRUE;
+ }
+@@ -137,7 +139,7 @@ gvc_mixer_card_set_icon_name (GvcMixerCa
+ 
+         g_free (card->priv->icon_name);
+         card->priv->icon_name = g_strdup (icon_name);
+-        g_object_notify (G_OBJECT (card), "icon-name");
++        g_object_notify_by_pspec (G_OBJECT (card), obj_props[PROP_ICON_NAME]);
+ 
+         return TRUE;
+ }
+@@ -177,6 +179,9 @@ gvc_mixer_card_set_profile (GvcMixerCard
+         g_return_val_if_fail (GVC_IS_MIXER_CARD (card), FALSE);
+         g_return_val_if_fail (card->priv->profiles != NULL, FALSE);
+ 
++        if (g_strcmp0 (card->priv->profile, profile) == 0)
++                return TRUE;
++
+         g_free (card->priv->profile);
+         card->priv->profile = g_strdup (profile);
+ 
+@@ -191,7 +196,7 @@ gvc_mixer_card_set_profile (GvcMixerCard
+                 }
+         }
+ 
+-        g_object_notify (G_OBJECT (card), "profile");
++        g_object_notify_by_pspec (G_OBJECT (card), obj_props[PROP_PROFILE]);
+ 
+         return TRUE;
+ }
+@@ -310,6 +315,15 @@ gvc_mixer_card_profile_compare (GvcMixer
+         return -1;
+ }
+ 
++static void
++free_profile (GvcMixerCardProfile *p)
++{
++        g_free (p->profile);
++        g_free (p->human_profile);
++        g_free (p->status);
++        g_free (p);
++}
++
+ /**
+  * gvc_mixer_card_set_profiles:
+  * @profiles: (transfer full) (element-type GvcMixerCardProfile):
+@@ -319,8 +333,8 @@ gvc_mixer_card_set_profiles (GvcMixerCar
+                              GList        *profiles)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_CARD (card), FALSE);
+-        g_return_val_if_fail (card->priv->profiles == NULL, FALSE);
+ 
++        g_list_free_full (card->priv->profiles, (GDestroyNotify) free_profile);
+         card->priv->profiles = g_list_sort (profiles, (GCompareFunc) gvc_mixer_card_profile_compare);
+ 
+         return TRUE;
+@@ -371,6 +385,21 @@ gvc_mixer_card_set_ports (GvcMixerCard *
+         return TRUE;
+ }
+ 
++void
++gvc_mixer_card_add_port (GvcMixerCard     *card,
++                         GvcMixerCardPort *port)
++{
++        card->priv->ports = g_list_prepend (card->priv->ports, port);
++}
++
++void
++gvc_mixer_card_remove_port (GvcMixerCard     *card,
++                            GvcMixerCardPort *port)
++{
++        card->priv->ports = g_list_remove (card->priv->ports, port);
++        free_port (port);
++}
++
+ static void
+ gvc_mixer_card_set_property (GObject       *object,
+                              guint          prop_id,
+@@ -468,54 +497,42 @@ gvc_mixer_card_class_init (GvcMixerCardC
+         gobject_class->set_property = gvc_mixer_card_set_property;
+         gobject_class->get_property = gvc_mixer_card_get_property;
+ 
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_INDEX,
+-                                         g_param_spec_ulong ("index",
+-                                                             "Index",
+-                                                             "The index for this card",
+-                                                             0, G_MAXULONG, 0,
+-                                                             G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_ID,
+-                                         g_param_spec_ulong ("id",
+-                                                             "id",
+-                                                             "The id for this card",
+-                                                             0, G_MAXULONG, 0,
+-                                                             G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_PA_CONTEXT,
+-                                         g_param_spec_pointer ("pa-context",
+-                                                               "PulseAudio context",
+-                                                               "The PulseAudio context for this card",
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_NAME,
+-                                         g_param_spec_string ("name",
+-                                                              "Name",
+-                                                              "Name to display for this card",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_ICON_NAME,
+-                                         g_param_spec_string ("icon-name",
+-                                                              "Icon Name",
+-                                                              "Name of icon to display for this card",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_PROFILE,
+-                                         g_param_spec_string ("profile",
+-                                                              "Profile",
+-                                                              "Name of current profile for this card",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_HUMAN_PROFILE,
+-                                         g_param_spec_string ("human-profile",
+-                                                              "Profile (Human readable)",
+-                                                              "Name of current profile for this card in human readable form",
+-                                                              NULL,
+-                                                              G_PARAM_READABLE));
++        obj_props[PROP_INDEX] = g_param_spec_ulong ("index",
++                                                    "Index",
++                                                    "The index for this card",
++                                                    0, G_MAXULONG, 0,
++                                                    G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_ID] = g_param_spec_ulong ("id",
++                                                 "id",
++                                                 "The id for this card",
++                                                 0, G_MAXULONG, 0,
++                                                 G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_PA_CONTEXT] = g_param_spec_pointer ("pa-context",
++                                                           "PulseAudio context",
++                                                           "The PulseAudio context for this card",
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_NAME] = g_param_spec_string ("name",
++                                                    "Name",
++                                                    "Name to display for this card",
++                                                    NULL,
++                                                    G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_ICON_NAME] = g_param_spec_string ("icon-name",
++                                                         "Icon Name",
++                                                         "Name of icon to display for this card",
++                                                         NULL,
++                                                         G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_PROFILE] = g_param_spec_string ("profile",
++                                                       "Profile",
++                                                       "Name of current profile for this card",
++                                                       NULL,
++                                                       G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_HUMAN_PROFILE] = g_param_spec_string ("human-profile",
++                                                             "Profile (Human readable)",
++                                                             "Name of current profile for this card in human readable form",
++                                                             NULL,
++                                                             G_PARAM_READABLE|G_PARAM_STATIC_STRINGS);
++
++        g_object_class_install_properties (gobject_class, N_PROPS, obj_props);
+ }
+ 
+ static void
+@@ -538,15 +555,6 @@ gvc_mixer_card_new (pa_context *context,
+ }
+ 
+ static void
+-free_profile (GvcMixerCardProfile *p)
+-{
+-        g_free (p->profile);
+-        g_free (p->human_profile);
+-        g_free (p->status);
+-        g_free (p);
+-}
+-
+-static void
+ gvc_mixer_card_finalize (GObject *object)
+ {
+         GvcMixerCard *mixer_card;
+diff -uNrp a/libcvc/gvc-mixer-card-private.h b/libcvc/gvc-mixer-card-private.h
+--- a/libcvc/gvc-mixer-card-private.h	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-card-private.h	2026-02-22 16:12:11.119867635 +0000
+@@ -30,6 +30,12 @@ GvcMixerCard *        gvc_mixer_card_new
+                                                         guint         index);
+ pa_context *          gvc_mixer_card_get_pa_context    (GvcMixerCard *card);
+ 
++void gvc_mixer_card_add_port (GvcMixerCard     *card,
++                              GvcMixerCardPort *port);
++
++void gvc_mixer_card_remove_port (GvcMixerCard     *card,
++                                 GvcMixerCardPort *port);
++
+ G_END_DECLS
+ 
+ #endif /* __GVC_MIXER_CARD_PRIVATE_H */
+diff -uNrp a/libcvc/gvc-mixer-control.c b/libcvc/gvc-mixer-control.c
+--- a/libcvc/gvc-mixer-control.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-control.c	2026-02-22 16:14:44.110520648 +0000
+@@ -54,8 +54,10 @@
+ 
+ enum {
+         PROP_0,
+-        PROP_NAME
++        PROP_NAME,
++        N_PROPS
+ };
++static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
+ struct GvcMixerControlPrivate
+ {
+@@ -237,7 +239,6 @@ gvc_mixer_control_lookup_device_from_str
+                                              GvcMixerStream *stream)
+ {
+         GList                   *devices, *d;
+-        gboolean                 is_network_stream;
+         const GList             *ports;
+         GvcMixerUIDevice        *ret;
+ 
+@@ -251,43 +252,43 @@ gvc_mixer_control_lookup_device_from_str
+ 
+         ret = NULL;
+         ports = gvc_mixer_stream_get_ports (stream);
+-        is_network_stream = (ports == NULL);
+ 
+         for (d = devices; d != NULL; d = d->next) {
+                 GvcMixerUIDevice *device = d->data;
+                 guint stream_id = G_MAXUINT;
++                const GvcMixerStreamPort *port;
+ 
+                 g_object_get (G_OBJECT (device),
+                              "stream-id", &stream_id,
+                               NULL);
+ 
+-                if (is_network_stream &&
+-                    stream_id == gvc_mixer_stream_get_id (stream)) {
+-                        g_debug ("lookup device from stream - %s - it is a network_stream ",
++                if (stream_id != gvc_mixer_stream_get_id (stream))
++                        continue;
++
++                if (ports == NULL) {
++                        g_debug ("lookup-device-from-stream - %s - is portless ",
+                                  gvc_mixer_ui_device_get_description (device));
+                         ret = device;
+                         break;
+-                } else if (!is_network_stream) {
+-                        const GvcMixerStreamPort *port;
+-                        port = gvc_mixer_stream_get_port (stream);
+-
+-                        if (stream_id == gvc_mixer_stream_get_id (stream) &&
+-                            g_strcmp0 (gvc_mixer_ui_device_get_port (device),
+-                                       port->port) == 0) {
+-                                g_debug ("lookup-device-from-stream found device: device description '%s', device port = '%s', device stream id %i AND stream port = '%s' stream id '%u' and stream description '%s'",
+-                                         gvc_mixer_ui_device_get_description (device),
+-                                         gvc_mixer_ui_device_get_port (device),
+-                                         stream_id,
+-                                         port->port,
+-                                         gvc_mixer_stream_get_id (stream),
+-                                         gvc_mixer_stream_get_description (stream));
+-                                ret = device;
+-                                break;
+-                        }
++                }
++
++                port = gvc_mixer_stream_get_port (stream);
++                if (g_strcmp0 (gvc_mixer_ui_device_get_port (device), port->port) == 0) {
++                        g_debug ("lookup-device-from-stream found device: device description '%s', device port = '%s', device stream id %i AND stream port = '%s' stream id '%u' and stream description '%s'",
++                                 gvc_mixer_ui_device_get_description (device),
++                                 gvc_mixer_ui_device_get_port (device),
++                                 stream_id,
++                                 port->port,
++                                 gvc_mixer_stream_get_id (stream),
++                                 gvc_mixer_stream_get_description (stream));
++                        ret = device;
++                        break;
++
+                 }
+         }
+ 
+-        g_debug ("gvc_mixer_control_lookup_device_from_stream - Could not find a device for stream '%s'",gvc_mixer_stream_get_description (stream));
++        if (!ret)
++                g_debug ("lookup-device-from-stream - Could not find a device for stream '%s'", gvc_mixer_stream_get_description (stream));
+ 
+         g_list_free (devices);
+ 
+@@ -338,7 +339,6 @@ gboolean
+ gvc_mixer_control_set_default_source (GvcMixerControl *control,
+                                       GvcMixerStream  *stream)
+ {
+-        GvcMixerUIDevice* input;
+         pa_operation *o;
+ 
+         g_return_val_if_fail (GVC_IS_MIXER_CONTROL (control), FALSE);
+@@ -370,13 +370,6 @@ gvc_mixer_control_set_default_source (Gv
+ 
+         pa_operation_unref (o);
+ 
+-        /* source change successful, update the UI. */
+-        input = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-        g_signal_emit (G_OBJECT (control),
+-                       signals[ACTIVE_INPUT_UPDATE],
+-                       0,
+-                       gvc_mixer_ui_device_get_id (input));
+-
+         return TRUE;
+ }
+ 
+@@ -549,6 +542,11 @@ gvc_mixer_control_change_profile_on_sele
+         g_object_get (G_OBJECT (device), "card", &card, NULL);
+         current_profile = gvc_mixer_card_get_profile (card);
+ 
++        if (!current_profile) {
++                g_warning ("gvc_mixer_card_get_profile() returned NULL for card %p", card);
++                return FALSE;
++        }
++
+         if (current_profile)
+                 best_profile = gvc_mixer_ui_device_get_best_profile (device, profile, current_profile->profile);
+         else
+@@ -582,7 +580,7 @@ gvc_mixer_control_change_profile_on_sele
+  * - Firstly it queries the stream from the device.
+  *   - It assumes that if the stream is null that it cannot be a bluetooth or network stream (they never show unless they have valid sinks and sources)
+  *   In the scenario of a NULL stream on the device
+- *        - It fetches the device's preferred profile or if NUll the profile with the highest priority on that device.
++ *        - It fetches the device's preferred profile or if NULL the profile with the highest priority on that device.
+  *        - It then caches this device in control->priv->cached_desired_output_id so that when the update_sink triggered
+  *          from when we attempt to change profile we will know exactly what device to highlight on that stream.
+  *        - It attempts to swap the profile on the card from that device and returns.
+@@ -612,17 +610,9 @@ gvc_mixer_control_change_output (GvcMixe
+                 return;
+         }
+ 
+-        /* Handle a network sink as a portless or cardless device */
+         if (!gvc_mixer_ui_device_has_ports (output)) {
+                 g_debug ("Did we try to move to a software/bluetooth sink ?");
+-                if (gvc_mixer_control_set_default_sink (control, stream)) {
+-                        /* sink change was successful,  update the UI.*/
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (output));
+-                }
+-                else {
++                if (!gvc_mixer_control_set_default_sink (control, stream)) {
+                         g_warning ("Failed to set default sink with stream from output %s",
+                                    gvc_mixer_ui_device_get_description (output));
+                 }
+@@ -644,23 +634,11 @@ gvc_mixer_control_change_output (GvcMixe
+ 
+         /* Finally if we are not on the correct stream, swap over. */
+         if (stream != default_stream) {
+-                GvcMixerUIDevice* device;
+-
+                 g_debug ("Attempting to swap over to stream %s ",
+                          gvc_mixer_stream_get_description (stream));
+-                if (gvc_mixer_control_set_default_sink (control, stream)) {
+-                        device = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (device));
+-                } else {
+-                        /* If the move failed for some reason reset the UI. */
+-                        device = gvc_mixer_control_lookup_device_from_stream (control, default_stream);
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (device));
++                if (!gvc_mixer_control_set_default_sink (control, stream)) {
++                        g_warning ("Failed to set default sink from output %s",
++                                   gvc_mixer_ui_device_get_description (output));
+                 }
+         }
+ }
+@@ -674,7 +652,7 @@ gvc_mixer_control_change_output (GvcMixe
+  * - Firstly it queries the stream from the device.
+  *   - It assumes that if the stream is null that it cannot be a bluetooth or network stream (they never show unless they have valid sinks and sources)
+  *   In the scenario of a NULL stream on the device
+- *        - It fetches the device's preferred profile or if NUll the profile with the highest priority on that device.
++ *        - It fetches the device's preferred profile or if NULL the profile with the highest priority on that device.
+  *        - It then caches this device in control->priv->cached_desired_input_id so that when the update_source triggered
+  *          from when we attempt to change profile we will know exactly what device to highlight on that stream.
+  *        - It attempts to swap the profile on the card from that device and returns.
+@@ -702,7 +680,6 @@ gvc_mixer_control_change_input (GvcMixer
+                 return;
+         }
+ 
+-        /* Handle a network sink as a portless/cardless device */
+         if (!gvc_mixer_ui_device_has_ports (input)) {
+                 g_debug ("Did we try to move to a software/bluetooth source ?");
+                 if (! gvc_mixer_control_set_default_source (control, stream)) {
+@@ -729,7 +706,10 @@ gvc_mixer_control_change_input (GvcMixer
+         if (stream != default_stream) {
+                 g_debug ("change-input - attempting to swap over to stream %s",
+                          gvc_mixer_stream_get_description (stream));
+-                gvc_mixer_control_set_default_source (control, stream);
++                if (!gvc_mixer_control_set_default_source (control, stream)) {
++                        g_warning ("Failed to set default source from input %s",
++                                   gvc_mixer_ui_device_get_description (input));
++                }
+         }
+ }
+ 
+@@ -963,6 +943,13 @@ _set_default_source (GvcMixerControl *co
+         guint new_id;
+ 
+         if (stream == NULL) {
++                if (!control->priv->default_source_is_set)
++                        return;
++
++                g_signal_handlers_disconnect_by_func (gvc_mixer_control_get_default_source (control),
++                                                      on_default_source_port_notify,
++                                                      control);
++
+                 control->priv->default_source_id = 0;
+                 control->priv->default_source_is_set = FALSE;
+                 g_signal_emit (control,
+@@ -976,12 +963,6 @@ _set_default_source (GvcMixerControl *co
+ 
+         if (control->priv->default_source_id != new_id) {
+                 GvcMixerUIDevice *input;
+-                control->priv->default_source_id = new_id;
+-                control->priv->default_source_is_set = TRUE;
+-                g_signal_emit (control,
+-                               signals[DEFAULT_SOURCE_CHANGED],
+-                               0,
+-                               new_id);
+ 
+                 if (control->priv->default_source_is_set) {
+                         g_signal_handlers_disconnect_by_func (gvc_mixer_control_get_default_source (control),
+@@ -994,12 +975,22 @@ _set_default_source (GvcMixerControl *co
+                                   G_CALLBACK (on_default_source_port_notify),
+                                   control);
+ 
+-                input = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-
+-                g_signal_emit (G_OBJECT (control),
+-                               signals[ACTIVE_INPUT_UPDATE],
++                control->priv->default_source_id = new_id;
++                control->priv->default_source_is_set = TRUE;
++                g_signal_emit (control,
++                               signals[DEFAULT_SOURCE_CHANGED],
+                                0,
+-                               gvc_mixer_ui_device_get_id (input));
++                               new_id);
++
++                input = gvc_mixer_control_lookup_device_from_stream (control, stream);
++                if (input) {
++                        g_signal_emit (G_OBJECT (control),
++                                       signals[ACTIVE_INPUT_UPDATE],
++                                       0,
++                                       gvc_mixer_ui_device_get_id (input));
++                } else {
++                        g_warning ("Can't find input for stream-id %d",new_id);
++                }
+         }
+ }
+ 
+@@ -1038,6 +1029,11 @@ _set_default_sink (GvcMixerControl *cont
+                  * sink if it's already unset */
+                 if (control->priv->default_sink_is_set == FALSE)
+                         return;
++
++                g_signal_handlers_disconnect_by_func (gvc_mixer_control_get_default_sink (control),
++                                                      on_default_sink_port_notify,
++                                                      control);
++
+                 control->priv->default_sink_id = 0;
+                 control->priv->default_sink_is_set = FALSE;
+                 g_signal_emit (control,
+@@ -1198,6 +1194,13 @@ remove_stream (GvcMixerControl *control,
+         g_object_unref (stream);
+ }
+ 
++/**
++ * add_stream: (skip)
++ * @control: The control to add the stream to
++ * @stream:(transfer full): The stream to add
++ *
++ * Add a stream to the hash table of all known streams
++ */
+ static void
+ add_stream (GvcMixerControl *control,
+             GvcMixerStream  *stream)
+@@ -1222,7 +1225,7 @@ match_stream_with_devices (GvcMixerContr
+                            GvcMixerStreamPort *stream_port,
+                            GvcMixerStream     *stream)
+ {
+-        GList                   *devices, *d;
++        g_autoptr (GList)        devices = NULL;
+         guint                    stream_card_id;
+         guint                    stream_id;
+         gboolean                 in_possession = FALSE;
+@@ -1232,12 +1235,12 @@ match_stream_with_devices (GvcMixerContr
+ 
+         devices  = g_hash_table_get_values (GVC_IS_MIXER_SOURCE (stream) ? control->priv->ui_inputs : control->priv->ui_outputs);
+ 
+-        for (d = devices; d != NULL; d = d->next) {
++        for (GList *d = devices; d != NULL; d = d->next) {
+                 GvcMixerUIDevice *device;
+-                gint              device_stream_id;
+-                gchar            *device_port_name;
+-                gchar            *origin;
+-                gchar            *description;
++                guint             device_stream_id;
++                g_autofree gchar *device_port_name = NULL;
++                g_autofree gchar *origin = NULL;
++                g_autofree gchar *description = NULL;
+                 GvcMixerCard     *card;
+                 guint             card_id;
+ 
+@@ -1267,33 +1270,63 @@ match_stream_with_devices (GvcMixerContr
+                                  stream_port->port,
+                                  stream_card_id);
+ 
+-                        if (stream_card_id == card_id &&
+-                            g_strcmp0 (device_port_name, stream_port->port) == 0) {
+-                                g_debug ("Match device with stream: We have a match with description: '%s', origin: '%s', cached already with device id %u, so set stream id to %i",
+-                                         description,
+-                                         origin,
+-                                         gvc_mixer_ui_device_get_id (device),
+-                                         stream_id);
+-
+-                                g_object_set (G_OBJECT (device),
+-                                              "stream-id", (gint)stream_id,
+-                                              NULL);
+-                                in_possession = TRUE;
++                        if (stream_card_id == card_id) {
++                                if (g_strcmp0 (device_port_name, stream_port->port) == 0) {
++                                        g_debug ("Match device with stream: We have a match with description: '%s', origin: '%s', cached already with device id %u, so set stream id to %i",
++                                                 description,
++                                                 origin,
++                                                 gvc_mixer_ui_device_get_id (device),
++                                                 stream_id);
++
++                                        g_object_set (G_OBJECT (device),
++                                                      "stream-id", stream_id,
++                                                      NULL);
++                                        in_possession = TRUE;
++                                } else {
++                                        /* Other UI devices on that card that match the stream can't be valid */
++                                        if (device_stream_id == stream_id) {
++                                                g_object_set (G_OBJECT (device),
++                                                              "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
++                                                              NULL);
++                                                g_debug ("Found another UI device for this stream: %d, resetting", stream_id);
++                                        }
++                                }
+                         }
+                 }
+-
+-                g_free (device_port_name);
+-                g_free (origin);
+-                g_free (description);
+-
+-                if (in_possession == TRUE)
+-                        break;
+         }
+ 
+-        g_list_free (devices);
+         return in_possession;
+ }
+ 
++
++/* Clear stream-id from all UI devices that reference the stream that lost all ports */
++static void
++clear_stream_from_devices (GvcMixerControl    *control,
++                           GvcMixerStream     *stream)
++{
++        g_autoptr (GList)        devices = NULL;
++        guint                    stream_id;
++
++        stream_id = gvc_mixer_stream_get_id (stream);
++        devices = g_hash_table_get_values (GVC_IS_MIXER_SOURCE (stream) ? control->priv->ui_inputs : control->priv->ui_outputs);
++
++        for (GList *d = devices; d != NULL; d = d->next) {
++                guint             device_stream_id;
++                GvcMixerUIDevice *device = d->data;
++
++                g_object_get (G_OBJECT (device),
++                              "stream-id", &device_stream_id,
++                              NULL);
++
++                if (device_stream_id == stream_id) {
++                        g_object_set (G_OBJECT (device),
++                                      "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
++                                      NULL);
++                        g_debug ("Clearing stream-id: %d", stream_id);
++                }
++        }
++}
++
+ /*
+  * This method attempts to match a sink or source with its relevant UI device.
+  * GvcMixerStream can represent both a sink or source.
+@@ -1306,8 +1339,6 @@ match_stream_with_devices (GvcMixerContr
+  * only then can we match the new hdmi sink with its corresponding device.
+  *
+  * Firstly it checks to see if the incoming stream has no ports.
+- * - If a stream has no ports but has a valid card ID (bluetooth), it will attempt
+- *   to match the device with the stream using the card id.
+  * - If a stream has no ports and no valid card id, it goes ahead and makes a new
+  *   device (software/network devices are only detectable at the sink/source level)
+  * If the stream has ports it will match each port against the stream using match_stream_with_devices().
+@@ -1316,79 +1347,40 @@ match_stream_with_devices (GvcMixerContr
+  */
+ static void
+ sync_devices (GvcMixerControl *control,
+-              GvcMixerStream* stream)
++              GvcMixerStream*  stream,
++              gboolean         is_new,
++              gboolean         is_bluetooth)
+ {
+         /* Go through ports to see what outputs can be created. */
+         const GList *stream_ports;
+         const GList *n = NULL;
+         gboolean     is_output = !GVC_IS_MIXER_SOURCE (stream);
+-        gint         stream_port_count = 0;
+ 
+         stream_ports = gvc_mixer_stream_get_ports (stream);
+ 
+-        if (stream_ports == NULL) {
+-                GvcMixerUIDevice *device;
+-                /* Bluetooth, no ports but a valid card */
+-                if (gvc_mixer_stream_get_card_index (stream) != PA_INVALID_INDEX) {
+-                        GList *devices, *d;
+-                        gboolean in_possession = FALSE;
+-
+-                        devices = g_hash_table_get_values (is_output ? control->priv->ui_outputs : control->priv->ui_inputs);
+-
+-                        for (d = devices; d != NULL; d = d->next) {
+-                                GvcMixerCard *card;
+-                                guint card_id;
+-
+-                                device = d->data;
+-
+-                                g_object_get (G_OBJECT (device),
+-                                             "card", &card,
+-                                              NULL);
+-                                card_id = gvc_mixer_card_get_index (card);
+-                                g_debug ("sync devices, device description - '%s', device card id - %i, stream description - %s, stream card id - %i",
+-                                         gvc_mixer_ui_device_get_description (device),
+-                                         card_id,
+-                                         gvc_mixer_stream_get_description (stream),
+-                                         gvc_mixer_stream_get_card_index (stream));
+-                                if (card_id == gvc_mixer_stream_get_card_index (stream)) {
+-                                        in_possession = TRUE;
+-                                        break;
+-                                }
+-                        }
+-                        g_list_free (devices);
+-
+-                        if (!in_possession) {
+-                                g_warning ("Couldn't match the portless stream (with card) - '%s' is it an input ? -> %i, streams card id -> %i",
+-                                           gvc_mixer_stream_get_description (stream),
+-                                           GVC_IS_MIXER_SOURCE (stream),
+-                                           gvc_mixer_stream_get_card_index (stream));
+-                                return;
+-                        }
++        if (stream_ports == NULL && is_bluetooth) {
++                clear_stream_from_devices (control, stream);
++                return;
++        }
+ 
+-                        g_object_set (G_OBJECT (device),
+-                                      "stream-id", (gint)gvc_mixer_stream_get_id (stream),
+-                                      "description", gvc_mixer_stream_get_description (stream),
+-                                      "origin", "", /*Leave it empty for these special cases*/
+-                                      "port-name", NULL,
+-                                      "port-available", TRUE,
+-                                      NULL);
+-                } else { /* Network sink/source has no ports and no card. */
+-                        GObject *object;
++        if (stream_ports == NULL && is_new) {
++                GvcMixerUIDevice *device;
++                GObject *object;
+ 
+-                        object = g_object_new (GVC_TYPE_MIXER_UI_DEVICE,
+-                                               "stream-id", (gint)gvc_mixer_stream_get_id (stream),
+-                                               "description", gvc_mixer_stream_get_description (stream),
+-                                               "origin", "", /* Leave it empty for these special cases */
+-                                               "port-name", NULL,
+-                                               "port-available", TRUE,
+-                                                NULL);
+-                        device = GVC_MIXER_UI_DEVICE (object);
+-
+-                        g_hash_table_insert (is_output ? control->priv->ui_outputs : control->priv->ui_inputs,
+-                                             GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (device)),
+-                                             g_object_ref (device));
++                object = g_object_new (GVC_TYPE_MIXER_UI_DEVICE,
++                                       "stream-id", gvc_mixer_stream_get_id (stream),
++                                       "description", gvc_mixer_stream_get_description (stream),
++                                       "origin", "", /* Leave it empty for these special cases */
++                                       "port-name", NULL,
++                                       "port-available", TRUE,
++                                       "icon-name", gvc_mixer_stream_get_icon_name (stream),
++                                        NULL);
++                device = GVC_MIXER_UI_DEVICE (object);
++
++                g_hash_table_insert (is_output ? control->priv->ui_outputs : control->priv->ui_inputs,
++                                     GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (device)),
++                                     device);
+ 
+-                }
+                 g_signal_emit (G_OBJECT (control),
+                                signals[is_output ? OUTPUT_ADDED : INPUT_ADDED],
+                                0,
+@@ -1402,7 +1394,6 @@ sync_devices (GvcMixerControl *control,
+ 
+                 GvcMixerStreamPort *stream_port;
+                 stream_port = n->data;
+-                stream_port_count ++;
+ 
+                 if (match_stream_with_devices (control, stream_port, stream))
+                         continue;
+@@ -1483,6 +1474,20 @@ translate_pa_state (pa_sink_state_t stat
+         }
+ }
+ 
++static gboolean
++is_bluetooth (const pa_proplist *proplist)
++{
++        const char *bus = pa_proplist_gets (proplist, "device.bus");
++
++        if (bus == NULL)
++                return FALSE;
++
++        if (g_str_equal ("bluetooth", bus))
++                return TRUE;
++
++        return FALSE;
++}
++
+ /*
+  * Called when anything changes with a sink.
+  */
+@@ -1495,6 +1500,8 @@ update_sink (GvcMixerControl    *control
+         pa_volume_t     max_volume;
+         GvcChannelMap   *map;
+         char            map_buff[PA_CHANNEL_MAP_SNPRINT_MAX];
++        GList          *list = NULL;
++        gboolean        is_bt;
+ 
+         pa_channel_map_snprint (map_buff, PA_CHANNEL_MAP_SNPRINT_MAX, &info->channel_map);
+ #if 1
+@@ -1511,27 +1518,10 @@ update_sink (GvcMixerControl    *control
+                                       GUINT_TO_POINTER (info->index));
+ 
+         if (stream == NULL) {
+-                GList *list = NULL;
+-                guint i;
+-
+                 map = gvc_channel_map_new_from_pa_channel_map (&info->channel_map);
+                 stream = gvc_mixer_sink_new (control->priv->pa_context,
+                                              info->index,
+                                              map);
+-
+-                for (i = 0; i < info->n_ports; i++) {
+-                        GvcMixerStreamPort *port;
+-
+-                        port = g_slice_new0 (GvcMixerStreamPort);
+-                        port->port = g_strdup (info->ports[i]->name);
+-                        port->human_port = g_strdup (info->ports[i]->description);
+-                        port->priority = info->ports[i]->priority;
+-                        port->available = info->ports[i]->available != PA_PORT_AVAILABLE_NO;
+-
+-                        list = g_list_prepend (list, port);
+-                }
+-                gvc_mixer_stream_set_ports (stream, list);
+-
+                 g_object_unref (map);
+                 is_new = TRUE;
+ 
+@@ -1541,6 +1531,19 @@ update_sink (GvcMixerControl    *control
+                 return;
+         }
+ 
++        for (guint i = 0; i < info->n_ports; i++) {
++                GvcMixerStreamPort *port;
++
++                port = g_slice_new0 (GvcMixerStreamPort);
++                port->port = g_strdup (info->ports[i]->name);
++                port->human_port = g_strdup (info->ports[i]->description);
++                port->priority = info->ports[i]->priority;
++                port->available = info->ports[i]->available != PA_PORT_AVAILABLE_NO;
++
++                list = g_list_prepend (list, port);
++        }
++        gvc_mixer_stream_set_ports (stream, g_steal_pointer (&list));
++
+         max_volume = pa_cvolume_max (&info->volume);
+         gvc_mixer_stream_set_name (stream, info->name);
+         gvc_mixer_stream_set_card_index (stream, info->card);
+@@ -1554,7 +1557,12 @@ update_sink (GvcMixerControl    *control
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         gvc_mixer_stream_set_state (stream, translate_pa_state (info->state));
+ 
+-        /* Messy I know but to set the port every time regardless of whether it has changed will cost us a
++        is_bt = is_bluetooth (info->proplist);
++        /* Sync devices as the port on the stream might have changed */
++        if (!is_new)
++                sync_devices (control, stream, is_new, is_bt);
++
++        /* Messy I know but to set the port everytime regardless of whether it has changed will cost us a
+          * port change notify signal which causes the frontend to resync.
+          * Only update the UI when something has changed. */
+         if (info->active_port != NULL) {
+@@ -1566,7 +1574,8 @@ update_sink (GvcMixerControl    *control
+                         if (active_port == NULL ||
+                             g_strcmp0 (active_port->port, info->active_port->name) != 0) {
+                                 g_debug ("update sink - apparently a port update");
+-                                gvc_mixer_stream_set_port (stream, info->active_port->name);
++                                if (!gvc_mixer_stream_set_port (stream, info->active_port->name))
++                                        g_warning ("Port update to of %d '%s' failed", info->index, info->active_port->name);
+                         }
+                 }
+         }
+@@ -1578,9 +1587,9 @@ update_sink (GvcMixerControl    *control
+                                      GUINT_TO_POINTER (info->index),
+                                      g_object_ref (stream));
+                 add_stream (control, stream);
+-                /* Always sink on a new stream to able to assign the right stream id
++                /* Always sync on a new stream to able to assign the right stream id
+                  * to the appropriate outputs (multiple potential outputs per stream). */
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_new, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+@@ -1620,6 +1629,7 @@ update_sink (GvcMixerControl    *control
+         gvc_channel_map_volume_changed (map, &info->volume, FALSE);
+ }
+ 
++
+ static void
+ update_source (GvcMixerControl      *control,
+                const pa_source_info *info)
+@@ -1627,6 +1637,8 @@ update_source (GvcMixerControl      *con
+         GvcMixerStream *stream;
+         gboolean        is_new;
+         pa_volume_t     max_volume;
++        GList          *list = NULL;
++        gboolean        is_bt;
+ 
+ #if 1
+         g_debug ("Updating source: index=%u name='%s' description='%s'",
+@@ -1645,26 +1657,12 @@ update_source (GvcMixerControl      *con
+         stream = g_hash_table_lookup (control->priv->sources,
+                                       GUINT_TO_POINTER (info->index));
+         if (stream == NULL) {
+-                GList *list = NULL;
+-                guint i;
+                 GvcChannelMap *map;
+ 
+                 map = gvc_channel_map_new_from_pa_channel_map (&info->channel_map);
+                 stream = gvc_mixer_source_new (control->priv->pa_context,
+                                                info->index,
+                                                map);
+-
+-                for (i = 0; i < info->n_ports; i++) {
+-                        GvcMixerStreamPort *port;
+-
+-                        port = g_slice_new0 (GvcMixerStreamPort);
+-                        port->port = g_strdup (info->ports[i]->name);
+-                        port->human_port = g_strdup (info->ports[i]->description);
+-                        port->priority = info->ports[i]->priority;
+-                        list = g_list_prepend (list, port);
+-                }
+-                gvc_mixer_stream_set_ports (stream, list);
+-
+                 g_object_unref (map);
+                 is_new = TRUE;
+         } else if (gvc_mixer_stream_is_running (stream)) {
+@@ -1673,6 +1671,17 @@ update_source (GvcMixerControl      *con
+                 return;
+         }
+ 
++        for (guint i = 0; i < info->n_ports; i++) {
++                GvcMixerStreamPort *port;
++
++                port = g_slice_new0 (GvcMixerStreamPort);
++                port->port = g_strdup (info->ports[i]->name);
++                port->human_port = g_strdup (info->ports[i]->description);
++                port->priority = info->ports[i]->priority;
++                list = g_list_prepend (list, port);
++        }
++        gvc_mixer_stream_set_ports (stream, list);
++
+         max_volume = pa_cvolume_max (&info->volume);
+ 
+         gvc_mixer_stream_set_name (stream, info->name);
+@@ -1686,6 +1695,11 @@ update_source (GvcMixerControl      *con
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         g_debug ("update source");
+ 
++        is_bt = is_bluetooth (info->proplist);
++        /* Sync devices as the port on the stream might have changed */
++        if (!is_new)
++                sync_devices (control, stream, is_new, is_bt);
++
+         if (info->active_port != NULL) {
+                 if (is_new)
+                         gvc_mixer_stream_set_port (stream, info->active_port->name);
+@@ -1695,7 +1709,8 @@ update_source (GvcMixerControl      *con
+                         if (active_port == NULL ||
+                             g_strcmp0 (active_port->port, info->active_port->name) != 0) {
+                                 g_debug ("update source - apparently a port update");
+-                                gvc_mixer_stream_set_port (stream, info->active_port->name);
++                                if (!gvc_mixer_stream_set_port (stream, info->active_port->name))
++                                        g_warning ("Port update to of %d '%s' failed", info->index, info->active_port->name);
+                         }
+                 }
+         }
+@@ -1705,7 +1720,7 @@ update_source (GvcMixerControl      *con
+                                      GUINT_TO_POINTER (info->index),
+                                      g_object_ref (stream));
+                 add_stream (control, stream);
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_new, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+@@ -1942,11 +1957,11 @@ card_num_streams_to_status (guint sinks,
+  */
+ static GList *
+ determine_profiles_for_port (pa_card_port_info *port,
+-                             GList* card_profiles)
++                             const GList       *card_profiles)
+ {
+         guint i;
+         GList *supported_profiles = NULL;
+-        GList *p;
++        const GList *p;
+         for (i = 0; i < port->n_profiles; i++) {
+                 for (p = card_profiles; p != NULL; p = p->next) {
+                         GvcMixerCardProfile *prof;
+@@ -1955,9 +1970,9 @@ determine_profiles_for_port (pa_card_por
+                                 supported_profiles = g_list_append (supported_profiles, prof);
+                 }
+         }
+-        g_debug ("%i profiles supported on port %s",
++        g_debug ("%i profiles supported on port %s / %s",
+                  g_list_length (supported_profiles),
+-                 port->description);
++                 port->description, port->name);
+         return g_list_sort (supported_profiles, (GCompareFunc) gvc_mixer_card_profile_compare);
+ }
+ 
+@@ -1971,9 +1986,9 @@ is_card_port_an_output (GvcMixerCardPort
+  * This method will create a ui device for the given port.
+  */
+ static void
+-create_ui_device_from_port (GvcMixerControl* control,
+-                            GvcMixerCardPort* port,
+-                            GvcMixerCard* card)
++update_ui_device_on_port_added (GvcMixerControl  *control,
++                                GvcMixerCardPort *port,
++                                GvcMixerCard     *card)
+ {
+         GvcMixerUIDeviceDirection  direction;
+         GObject                   *object;
+@@ -2007,24 +2022,18 @@ create_ui_device_from_port (GvcMixerCont
+                                gvc_mixer_ui_device_get_id (uidevice));
+         }
+ 
+-        g_debug ("create_ui_device_from_port, direction %u, description '%s', origin '%s', port available %i", 
++        g_debug ("update_ui_device_on_port_added, direction %u, description '%s', origin '%s', port available %i",
+                  direction,
+                  port->human_port,
+                  gvc_mixer_card_get_name (card),
+                  available);
+ }
+ 
+-/*
+- * This method will match up GvcMixerCardPorts with existing devices.
+- * A match is achieved if the device's card-id and the port's card-id are the same
+- * && the device's port-name and the card-port's port member are the same.
+- * A signal is then sent adding or removing that device from the UI depending on the availability of the port.
+- */
+ static void
+-match_card_port_with_existing_device (GvcMixerControl   *control,
+-                                      GvcMixerCardPort  *card_port,
+-                                      GvcMixerCard      *card,
+-                                      gboolean           available)
++update_ui_device_on_port_changed (GvcMixerControl   *control,
++                                  GvcMixerCardPort  *card_port,
++                                  pa_card_port_info *new_port_info,
++                                  GvcMixerCard      *card)
+ {
+         GList                   *d;
+         GList                   *devices;
+@@ -2045,16 +2054,34 @@ match_card_port_with_existing_device (Gv
+ 
+                 if (g_strcmp0 (card_port->port, device_port_name) == 0 &&
+                         device_card == card) {
++                        gboolean was_available;
++                        gboolean is_available;
++                        const GList *card_profiles = gvc_mixer_card_get_profiles (card);
++
++                        was_available = card_port->available != PA_PORT_AVAILABLE_NO;
++                        is_available = new_port_info->available != PA_PORT_AVAILABLE_NO;
++
+                         g_debug ("Found the relevant device %s, update its port availability flag to %i, is_output %i",
+                                  device_port_name,
+-                                 available,
++                                 is_available,
+                                  is_output);
+-                        g_object_set (G_OBJECT (device),
+-                                      "port-available", available, NULL);
+-                        g_signal_emit (G_OBJECT (control),
+-                                       is_output ? signals[available ? OUTPUT_ADDED : OUTPUT_REMOVED] : signals[available ? INPUT_ADDED : INPUT_REMOVED],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (device));
++
++                        card_port->available = new_port_info->available;
++
++                        g_list_free (card_port->profiles);
++                        card_port->profiles = determine_profiles_for_port (new_port_info, card_profiles);
++
++                        gvc_mixer_ui_device_set_profiles (device, card_port->profiles);
++
++                        if (is_available != was_available) {
++                                g_object_set (G_OBJECT (device),
++                                              "port-available", is_available, NULL);
++                                g_signal_emit (G_OBJECT (control),
++                                               is_output ? signals[is_available ? OUTPUT_ADDED : OUTPUT_REMOVED]
++                                                         : signals[is_available ? INPUT_ADDED : INPUT_REMOVED],
++                                               0,
++                                               gvc_mixer_ui_device_get_id (device));
++                        }
+                }
+                g_free (device_port_name);
+         }
+@@ -2063,48 +2090,62 @@ match_card_port_with_existing_device (Gv
+ }
+ 
+ static void
+-create_ui_device_from_card (GvcMixerControl *control,
+-                            GvcMixerCard    *card)
++maybe_remove_ui_device (GvcMixerControl  *control,
++                        GvcMixerUIDevice *device)
+ {
+-        GObject          *object;
+-        GvcMixerUIDevice *in;
+-        GvcMixerUIDevice *out;
+-        const GList      *profiles;
+-
+-        /* For now just create two devices and presume this device is multi directional
+-         * Ensure to remove both on card removal (available to false by default) */
+-        profiles = gvc_mixer_card_get_profiles (card);
++        /* We add UIDevices for ports or for streams, so remove them if the device now
++         * has neither.
++         */
++        if (gvc_mixer_ui_device_get_stream_id (device) == GVC_MIXER_UI_DEVICE_INVALID &&
++            !gvc_mixer_ui_device_has_ports (device)) {
++                gboolean is_output = gvc_mixer_ui_device_is_output (device);
+ 
+-        g_debug ("Portless card just registered - %i", gvc_mixer_card_get_index (card));
++                g_debug ("Removing UIDevice %s",
++                         gvc_mixer_ui_device_get_description (device));
+ 
+-        object = g_object_new (GVC_TYPE_MIXER_UI_DEVICE,
+-                               "type", UIDeviceInput,
+-                               "description", gvc_mixer_card_get_name (card),
+-                               "origin", "", /* Leave it empty for these special cases */
+-                               "port-name", NULL,
+-                               "port-available", FALSE,
+-                               "card", card,
+-                               NULL);
+-        in = GVC_MIXER_UI_DEVICE (object);
+-        gvc_mixer_ui_device_set_profiles (in, profiles);
++                g_hash_table_remove (is_output ? control->priv->ui_outputs : control->priv->ui_inputs,
++                                     GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (device)));
++        }
++}
+ 
+-        g_hash_table_insert (control->priv->ui_inputs,
+-                             GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (in)),
+-                             g_object_ref (in));
+-        object = g_object_new (GVC_TYPE_MIXER_UI_DEVICE,
+-                               "type", UIDeviceOutput,
+-                               "description", gvc_mixer_card_get_name (card),
+-                               "origin", "", /* Leave it empty for these special cases */
+-                               "port-name", NULL,
+-                               "port-available", FALSE,
+-                               "card", card,
+-                               NULL);
+-        out = GVC_MIXER_UI_DEVICE (object);
+-        gvc_mixer_ui_device_set_profiles (out, profiles);
++static void
++update_ui_device_on_port_removed (GvcMixerControl  *control,
++                                  GvcMixerCardPort *card_port,
++                                  GvcMixerCard     *card)
++{
++        GList *d;
++        GList *devices;
++        gboolean is_output = is_card_port_an_output (card_port);
+ 
+-        g_hash_table_insert (control->priv->ui_outputs,
+-                             GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (out)),
+-                             g_object_ref (out));
++        devices  = g_hash_table_get_values (is_output ? control->priv->ui_outputs : control->priv->ui_inputs);
++        for (d = devices; d != NULL; d = d->next) {
++                GvcMixerUIDevice *device = d->data;
++                GvcMixerCard *device_card;
++                gchar *device_port_name;
++
++                g_object_get (G_OBJECT (device),
++                             "card", &device_card,
++                             "port-name", &device_port_name,
++                              NULL);
++
++                if (g_strcmp0 (card_port->port, device_port_name) == 0 && device_card == card) {
++                        g_object_set (G_OBJECT (device),
++                                      "card", NULL,
++                                      "port-name", NULL,
++                                       NULL);
++
++                        g_signal_emit (G_OBJECT (control),
++                                       signals[is_output ? OUTPUT_REMOVED : INPUT_REMOVED],
++                                       0,
++                                       gvc_mixer_ui_device_get_id (device));
++
++                        maybe_remove_ui_device (control, device);
++                }
++
++               g_free (device_port_name);
++        }
++
++        g_list_free (devices);
+ }
+ 
+ #ifdef HAVE_ALSA
+@@ -2531,8 +2572,6 @@ out:
+  * This is done by the following:
+  *
+  * - gvc_mixer_card and gvc_mixer_card_ports are created and relevant setters are called.
+- * - First it checks to see if it's a portless card. Bluetooth devices are portless AFAIHS.
+- *        If so it creates two devices, an input and an output.
+  * - If it's a 'normal' card with ports it will create a new ui-device or
+  *   synchronise port availability with the existing device cached for that port on this card. */
+ 
+@@ -2540,10 +2579,11 @@ static void
+ update_card (GvcMixerControl      *control,
+              const pa_card_info   *info)
+ {
+-        const GList  *card_ports = NULL;
+         const GList  *m = NULL;
+         GvcMixerCard *card;
+         gboolean      is_new = FALSE;
++        GList *profile_list = NULL;
++        GList *old_ports;
+ #if 1
+         guint i;
+         const char *key;
+@@ -2572,43 +2612,26 @@ update_card (GvcMixerControl      *contr
+         card = g_hash_table_lookup (control->priv->cards,
+                                     GUINT_TO_POINTER (info->index));
+         if (card == NULL) {
+-                GList *profile_list = NULL;
+-                GList *port_list = NULL;
+-
+-                for (i = 0; i < info->n_profiles; i++) {
+-                        GvcMixerCardProfile *profile;
+-                        struct pa_card_profile_info pi = info->profiles[i];
+-
+-                        profile = g_new0 (GvcMixerCardProfile, 1);
+-                        profile->profile = g_strdup (pi.name);
+-                        profile->human_profile = g_strdup (pi.description);
+-                        profile->status = card_num_streams_to_status (pi.n_sinks, pi.n_sources);
+-                        profile->n_sinks = pi.n_sinks;
+-                        profile->n_sources = pi.n_sources;
+-                        profile->priority = pi.priority;
+-                        profile_list = g_list_prepend (profile_list, profile);
+-                }
+                 card = gvc_mixer_card_new (control->priv->pa_context,
+                                            info->index);
++                is_new = TRUE;
++        }
+ 
+-                for (i = 0; i < info->n_ports; i++) {
+-                        GvcMixerCardPort *port;
+-                        port = g_new0 (GvcMixerCardPort, 1);
+-                        port->port = g_strdup (info->ports[i]->name);
+-                        port->human_port = g_strdup (info->ports[i]->description);
+-                        port->priority = info->ports[i]->priority;
+-                        port->available = info->ports[i]->available;
+-                        port->direction = info->ports[i]->direction;
+-                        port->icon_name = g_strdup (pa_proplist_gets (info->ports[i]->proplist, "device.icon_name"));
+-                        port->profiles = determine_profiles_for_port (info->ports[i], profile_list);
+-                        port_list = g_list_prepend (port_list, port);
+-                }
++        for (i = 0; i < info->n_profiles; i++) {
++                GvcMixerCardProfile *profile;
++                struct pa_card_profile_info pi = info->profiles[i];
+ 
+-                gvc_mixer_card_set_profiles (card, profile_list);
+-                gvc_mixer_card_set_ports (card, port_list);
+-                is_new = TRUE;
++                profile = g_new0 (GvcMixerCardProfile, 1);
++                profile->profile = g_strdup (pi.name);
++                profile->human_profile = g_strdup (pi.description);
++                profile->status = card_num_streams_to_status (pi.n_sinks, pi.n_sources);
++                profile->n_sinks = pi.n_sinks;
++                profile->n_sources = pi.n_sources;
++                profile->priority = pi.priority;
++                profile_list = g_list_prepend (profile_list, profile);
+         }
+ 
++        gvc_mixer_card_set_profiles (card, profile_list);
+         gvc_mixer_card_set_name (card, pa_proplist_gets (info->proplist, "device.description"));
+         gvc_mixer_card_set_icon_name (card, pa_proplist_gets (info->proplist, "device.icon_name"));
+         gvc_mixer_card_set_profile (card, info->active_profile->name);
+@@ -2619,35 +2642,53 @@ update_card (GvcMixerControl      *contr
+                                      card);
+         }
+ 
+-        card_ports = gvc_mixer_card_get_ports (card);
++        old_ports = g_list_copy ((GList *)gvc_mixer_card_get_ports (card));
++        for (m = old_ports; m; m = m->next) {
++                GvcMixerCardPort *card_port = m->data;
++                gboolean found = FALSE;
++
++                for (i = 0; i < info->n_ports; i++) {
++                        pa_card_port_info *port = info->ports[i];
+ 
+-        if (card_ports == NULL && is_new) {
+-                g_debug ("Portless card just registered - %s", gvc_mixer_card_get_name (card));
+-                create_ui_device_from_card (control, card);
++                        if (g_strcmp0 (card_port->port, port->name) == 0)
++                                found = TRUE;
++                }
++
++                if (!found) {
++                        update_ui_device_on_port_removed (control, card_port, card);
++                        gvc_mixer_card_remove_port (card, card_port);
++                }
+         }
++        g_clear_pointer (&old_ports, g_list_free);
+ 
+-        for (m = card_ports; m != NULL; m = m->next) {
+-                GvcMixerCardPort *card_port;
+-                card_port = m->data;
+-                if (is_new)
+-                        create_ui_device_from_port (control, card_port, card);
+-                else {
+-                        for (i = 0; i < info->n_ports; i++) {
+-                                if (g_strcmp0 (card_port->port, info->ports[i]->name) == 0) {
+-                                        if ((card_port->available == PA_PORT_AVAILABLE_NO) != (info->ports[i]->available == PA_PORT_AVAILABLE_NO)) {
+-                                                card_port->available = info->ports[i]->available;
+-                                                g_debug ("sync port availability on card %i, card port name '%s', new available value %i",
+-                                                          gvc_mixer_card_get_index (card),
+-                                                          card_port->port,
+-                                                          card_port->available);
+-                                                match_card_port_with_existing_device (control,
+-                                                                                      card_port,
+-                                                                                      card,
+-                                                                                      card_port->available != PA_PORT_AVAILABLE_NO);
+-                                        }
+-                                }
++        for (i = 0; i < info->n_ports; i++) {
++                pa_card_port_info *port = info->ports[i];
++                gboolean found = FALSE;
++
++                for (m = gvc_mixer_card_get_ports (card); m; m = m->next) {
++                        GvcMixerCardPort *card_port = m->data;
++
++                        if (g_strcmp0 (card_port->port, port->name) == 0) {
++                                found = TRUE;
++                                update_ui_device_on_port_changed (control, card_port, port, card);
+                         }
+                 }
++
++                if (!found) {
++                        GvcMixerCardPort *card_port;
++
++                        card_port = g_new0 (GvcMixerCardPort, 1);
++                        card_port->port = g_strdup (port->name);
++                        card_port->human_port = g_strdup (port->description);
++                        card_port->priority = port->priority;
++                        card_port->available = port->available;
++                        card_port->direction = port->direction;
++                        card_port->icon_name = g_strdup (pa_proplist_gets (port->proplist, "device.icon_name"));
++                        card_port->profiles = determine_profiles_for_port (port, profile_list);
++
++                        gvc_mixer_card_add_port (card, card_port);
++                        update_ui_device_on_port_added (control, card_port, card);
++                }
+         }
+ 
+ #ifdef HAVE_ALSA
+@@ -2871,7 +2912,13 @@ update_event_role_stream (GvcMixerContro
+                                               GUINT_TO_POINTER (control->priv->event_sink_input_id));
+         }
+ 
+-        max_volume = pa_cvolume_max (&info->volume);
++        /* 0 channels here means there is no valid volume in
++         * pa_ext_stream_restore_info() and in the saved stream entry of
++         * module-stream-restore in PulseAudio. */
++        if (info->volume.channels == 0)
++                max_volume = PA_VOLUME_NORM;
++        else
++                max_volume = pa_cvolume_max (&info->volume);
+ 
+         gvc_mixer_stream_set_name (stream, _("System Sounds"));
+         gvc_mixer_stream_set_icon_name (stream, "emblem-system-symbolic");
+@@ -3119,6 +3166,9 @@ remove_card (GvcMixerControl *control,
+ 
+                 g_object_get (G_OBJECT (device), "card", &card, NULL);
+ 
++                if (card == NULL)
++                        continue;
++
+                 if (gvc_mixer_card_get_index (card) == index) {
+                         g_signal_emit (G_OBJECT (control),
+                                        signals[gvc_mixer_ui_device_is_output (device) ? OUTPUT_REMOVED : INPUT_REMOVED],
+@@ -3434,15 +3484,22 @@ gvc_mixer_new_pa_context (GvcMixerContro
+ }
+ 
+ static void
+-remove_all_streams (GvcMixerControl *control, GHashTable *hash_table)
++remove_all_items (GvcMixerControl *control,
++                  GHashTable *hash_table,
++                  void (*remove_item)(GvcMixerControl *control, guint index))
+ {
+         GHashTableIter iter;
+         gpointer key, value;
+ 
+         g_hash_table_iter_init (&iter, hash_table);
+         while (g_hash_table_iter_next (&iter, &key, &value)) {
+-                remove_stream (control, value);
+-                g_hash_table_iter_remove (&iter);
++                if (remove_item) {
++                        remove_item (control, GPOINTER_TO_UINT (key));
++                        g_hash_table_remove (hash_table, key);
++                        g_hash_table_iter_init (&iter, hash_table);
++                } else {
++                        g_hash_table_iter_remove (&iter);
++                }
+         }
+ }
+ 
+@@ -3450,11 +3507,22 @@ static gboolean
+ idle_reconnect (gpointer data)
+ {
+         GvcMixerControl *control = GVC_MIXER_CONTROL (data);
+-        GHashTableIter iter;
+-        gpointer key, value;
+ 
+         g_return_val_if_fail (control, FALSE);
+ 
++        g_debug ("Reconnect: clean up all objects");
++
++        remove_all_items (control, control->priv->sinks, remove_sink);
++        remove_all_items (control, control->priv->sources, remove_source);
++        remove_all_items (control, control->priv->sink_inputs, remove_sink_input);
++        remove_all_items (control, control->priv->source_outputs, remove_source_output);
++        remove_all_items (control, control->priv->cards, remove_card);
++        remove_all_items (control, control->priv->ui_inputs, NULL);
++        remove_all_items (control, control->priv->ui_outputs, NULL);
++        remove_all_items (control, control->priv->clients, remove_client);
++
++        g_debug ("Reconnect: make new connection");
++
+         if (control->priv->pa_context) {
+                 pa_context_unref (control->priv->pa_context);
+                 control->priv->pa_context = NULL;
+@@ -3462,15 +3530,6 @@ idle_reconnect (gpointer data)
+                 gvc_mixer_new_pa_context (control);
+         }
+ 
+-        remove_all_streams (control, control->priv->sinks);
+-        remove_all_streams (control, control->priv->sources);
+-        remove_all_streams (control, control->priv->sink_inputs);
+-        remove_all_streams (control, control->priv->source_outputs);
+-
+-        g_hash_table_iter_init (&iter, control->priv->clients);
+-        while (g_hash_table_iter_next (&iter, &key, &value))
+-                g_hash_table_iter_remove (&iter);
+-
+         gvc_mixer_control_open (control); /* cannot fail */
+ 
+         control->priv->reconnect_id = 0;
+@@ -3628,7 +3687,7 @@ gvc_mixer_control_set_property (GObject
+         case PROP_NAME:
+                 g_free (self->priv->name);
+                 self->priv->name = g_value_dup_string (value);
+-                g_object_notify (G_OBJECT (self), "name");
++                g_object_notify_by_pspec (G_OBJECT (self), obj_props[PROP_NAME]);
+                 break;
+         default:
+                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+@@ -3684,133 +3743,117 @@ gvc_mixer_control_class_init (GvcMixerCo
+         object_class->set_property = gvc_mixer_control_set_property;
+         object_class->get_property = gvc_mixer_control_get_property;
+ 
+-        g_object_class_install_property (object_class,
+-                                         PROP_NAME,
+-                                         g_param_spec_string ("name",
+-                                                              "Name",
+-                                                              "Name to display for this mixer control",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
++        obj_props[PROP_NAME] = g_param_spec_string ("name",
++                                                    "Name",
++                                                    "Name to display for this mixer control",
++                                                    NULL,
++                                                    G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        g_object_class_install_properties (object_class, N_PROPS, obj_props);
+ 
+         signals [STATE_CHANGED] =
+                 g_signal_new ("state-changed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, state_changed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [STREAM_ADDED] =
+                 g_signal_new ("stream-added",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, stream_added),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [STREAM_REMOVED] =
+                 g_signal_new ("stream-removed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, stream_removed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [STREAM_CHANGED] =
+                 g_signal_new ("stream-changed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, stream_changed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [AUDIO_DEVICE_SELECTION_NEEDED] =
+                 g_signal_new ("audio-device-selection-needed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               0,
+-                              NULL, NULL,
+-                              g_cclosure_marshal_generic,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 3, G_TYPE_UINT, G_TYPE_BOOLEAN, G_TYPE_UINT);
+         signals [CARD_ADDED] =
+                 g_signal_new ("card-added",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, card_added),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [CARD_REMOVED] =
+                 g_signal_new ("card-removed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, card_removed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [DEFAULT_SINK_CHANGED] =
+                 g_signal_new ("default-sink-changed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, default_sink_changed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [DEFAULT_SOURCE_CHANGED] =
+                 g_signal_new ("default-source-changed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, default_source_changed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [ACTIVE_OUTPUT_UPDATE] =
+                 g_signal_new ("active-output-update",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, active_output_update),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [ACTIVE_INPUT_UPDATE] =
+                 g_signal_new ("active-input-update",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, active_input_update),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [OUTPUT_ADDED] =
+                 g_signal_new ("output-added",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, output_added),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [INPUT_ADDED] =
+                 g_signal_new ("input-added",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, input_added),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [OUTPUT_REMOVED] =
+                 g_signal_new ("output-removed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, output_removed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+         signals [INPUT_REMOVED] =
+                 g_signal_new ("input-removed",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerControlClass, input_removed),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__UINT,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_UINT);
+ }
+ 
+diff -uNrp a/libcvc/gvc-mixer-event-role.c b/libcvc/gvc-mixer-event-role.c
+--- a/libcvc/gvc-mixer-event-role.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-event-role.c	2026-02-22 16:12:11.120689180 +0000
+@@ -42,8 +42,10 @@ struct GvcMixerEventRolePrivate
+ enum
+ {
+         PROP_0,
+-        PROP_DEVICE
++        PROP_DEVICE,
++        N_PROPS
+ };
++static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
+ static void     gvc_mixer_event_role_finalize   (GObject            *object);
+ 
+@@ -115,7 +117,7 @@ gvc_mixer_event_role_set_device (GvcMixe
+ 
+         g_free (role->priv->device);
+         role->priv->device = g_strdup (device);
+-        g_object_notify (G_OBJECT (role), "device");
++        g_object_notify_by_pspec (G_OBJECT (role), obj_props[PROP_DEVICE]);
+ 
+         return TRUE;
+ }
+@@ -169,13 +171,12 @@ gvc_mixer_event_role_class_init (GvcMixe
+         stream_class->push_volume = gvc_mixer_event_role_push_volume;
+         stream_class->change_is_muted = gvc_mixer_event_role_change_is_muted;
+ 
+-        g_object_class_install_property (object_class,
+-                                         PROP_DEVICE,
+-                                         g_param_spec_string ("device",
+-                                                              "Device",
+-                                                              "Device",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
++        obj_props[PROP_DEVICE] = g_param_spec_string ("device",
++                                                      "Device",
++                                                      "Device",
++                                                      NULL,
++                                                      G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        g_object_class_install_properties (object_class, N_PROPS, obj_props);
+ }
+ 
+ static void
+diff -uNrp a/libcvc/gvc-mixer-stream.c b/libcvc/gvc-mixer-stream.c
+--- a/libcvc/gvc-mixer-stream.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-stream.c	2026-02-22 16:12:11.121922030 +0000
+@@ -83,7 +83,9 @@ enum
+         PROP_CARD_INDEX,
+         PROP_PORT,
+         PROP_STATE,
++        N_PROPS
+ };
++static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
+ enum {
+         MONITOR_UPDATE,
+@@ -167,9 +169,9 @@ gvc_mixer_stream_get_channel_map (GvcMix
+  * gvc_mixer_stream_get_volume:
+  * @stream:
+  *
+- * Returns:
++ * Returns: (type guint32):
+  */
+-guint32
++pa_volume_t
+ gvc_mixer_stream_get_volume (GvcMixerStream *stream)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), 0);
+@@ -189,13 +191,13 @@ gvc_mixer_stream_get_decibel (GvcMixerSt
+ /**
+  * gvc_mixer_stream_set_volume:
+  * @stream:
+- * @volume:
++ * @volume: (type guint32):
+  *
+  * Returns:
+  */
+ gboolean
+ gvc_mixer_stream_set_volume (GvcMixerStream *stream,
+-                             guint32         volume)
++                              pa_volume_t     volume)
+ {
+         pa_cvolume cv;
+ 
+@@ -206,7 +208,7 @@ gvc_mixer_stream_set_volume (GvcMixerStr
+ 
+         if (!pa_cvolume_equal(gvc_channel_map_get_cvolume(stream->priv->channel_map), &cv)) {
+                 gvc_channel_map_volume_changed(stream->priv->channel_map, &cv, FALSE);
+-                g_object_notify (G_OBJECT (stream), "volume");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_VOLUME]);
+                 return TRUE;
+         }
+ 
+@@ -226,7 +228,7 @@ gvc_mixer_stream_set_decibel (GvcMixerSt
+ 
+         if (!pa_cvolume_equal(gvc_channel_map_get_cvolume(stream->priv->channel_map), &cv)) {
+                 gvc_channel_map_volume_changed(stream->priv->channel_map, &cv, FALSE);
+-                g_object_notify (G_OBJECT (stream), "volume");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_VOLUME]);
+         }
+ 
+         return TRUE;
+@@ -254,7 +256,7 @@ gvc_mixer_stream_set_is_muted  (GvcMixer
+ 
+         if (is_muted != stream->priv->is_muted) {
+                 stream->priv->is_muted = is_muted;
+-                g_object_notify (G_OBJECT (stream), "is-muted");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_IS_MUTED]);
+         }
+ 
+         return TRUE;
+@@ -268,7 +270,7 @@ gvc_mixer_stream_set_can_decibel  (GvcMi
+ 
+         if (can_decibel != stream->priv->can_decibel) {
+                 stream->priv->can_decibel = can_decibel;
+-                g_object_notify (G_OBJECT (stream), "can-decibel");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_CAN_DECIBEL]);
+         }
+ 
+         return TRUE;
+@@ -296,7 +298,7 @@ gvc_mixer_stream_set_name (GvcMixerStrea
+ 
+         g_free (stream->priv->name);
+         stream->priv->name = g_strdup (name);
+-        g_object_notify (G_OBJECT (stream), "name");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_NAME]);
+ 
+         return TRUE;
+ }
+@@ -309,7 +311,7 @@ gvc_mixer_stream_set_description (GvcMix
+ 
+         g_free (stream->priv->description);
+         stream->priv->description = g_strdup (description);
+-        g_object_notify (G_OBJECT (stream), "description");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_DESCRIPTION]);
+ 
+         return TRUE;
+ }
+@@ -329,7 +331,7 @@ gvc_mixer_stream_set_is_event_stream (Gv
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+ 
+         stream->priv->is_event_stream = is_event_stream;
+-        g_object_notify (G_OBJECT (stream), "is-event-stream");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_IS_EVENT_STREAM]);
+ 
+         return TRUE;
+ }
+@@ -349,7 +351,7 @@ gvc_mixer_stream_set_is_virtual (GvcMixe
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+ 
+         stream->priv->is_virtual = is_virtual;
+-        g_object_notify (G_OBJECT (stream), "is-virtual");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_IS_VIRTUAL]);
+ 
+         return TRUE;
+ }
+@@ -369,7 +371,7 @@ gvc_mixer_stream_set_application_id (Gvc
+ 
+         g_free (stream->priv->application_id);
+         stream->priv->application_id = g_strdup (application_id);
+-        g_object_notify (G_OBJECT (stream), "application-id");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_APPLICATION_ID]);
+ 
+         return TRUE;
+ }
+@@ -382,7 +384,7 @@ on_channel_map_volume_changed (GvcChanne
+         if (set == TRUE)
+                 gvc_mixer_stream_push_volume (stream);
+ 
+-        g_object_notify (G_OBJECT (stream), "volume");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_VOLUME]);
+ }
+ 
+ static gboolean
+@@ -410,7 +412,7 @@ gvc_mixer_stream_set_channel_map (GvcMix
+                                   G_CALLBACK (on_channel_map_volume_changed),
+                                   stream);
+ 
+-                g_object_notify (G_OBJECT (stream), "channel-map");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_CHANNEL_MAP]);
+         }
+ 
+         return TRUE;
+@@ -460,7 +462,7 @@ gvc_mixer_stream_set_icon_name (GvcMixer
+ 
+         g_free (stream->priv->icon_name);
+         stream->priv->icon_name = g_strdup (icon_name);
+-        g_object_notify (G_OBJECT (stream), "icon-name");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_ICON_NAME]);
+ 
+         return TRUE;
+ }
+@@ -473,7 +475,7 @@ gvc_mixer_stream_set_form_factor (GvcMix
+ 
+         g_free (stream->priv->form_factor);
+         stream->priv->form_factor = g_strdup (form_factor);
+-        g_object_notify (G_OBJECT (stream), "form-factor");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_FORM_FACTOR]);
+ 
+         return TRUE;
+ }
+@@ -486,7 +488,7 @@ gvc_mixer_stream_set_sysfs_path (GvcMixe
+ 
+         g_free (stream->priv->sysfs_path);
+         stream->priv->sysfs_path = g_strdup (sysfs_path);
+-        g_object_notify (G_OBJECT (stream), "sysfs-path");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_SYSFS_PATH]);
+ 
+         return TRUE;
+ }
+@@ -495,9 +497,9 @@ gvc_mixer_stream_set_sysfs_path (GvcMixe
+  * gvc_mixer_stream_get_base_volume:
+  * @stream:
+  *
+- * Return value:
++ * Returns: (type guint32):
+  */
+-guint32
++pa_volume_t
+ gvc_mixer_stream_get_base_volume (GvcMixerStream *stream)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), 0);
+@@ -508,13 +510,13 @@ gvc_mixer_stream_get_base_volume (GvcMix
+ /**
+  * gvc_mixer_stream_set_base_volume:
+  * @stream:
+- * @base_volume: (type guint32)
++ * @base_volume: (type guint32):
+  *
+  * Returns:
+  */
+ gboolean
+ gvc_mixer_stream_set_base_volume (GvcMixerStream *stream,
+-                                  guint32         base_volume)
++                                  pa_volume_t base_volume)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+ 
+@@ -538,8 +540,6 @@ gvc_mixer_stream_get_port (GvcMixerStrea
+                 }
+         }
+ 
+-        g_assert_not_reached ();
+-
+         return NULL;
+ }
+ 
+@@ -566,7 +566,7 @@ gvc_mixer_stream_set_port (GvcMixerStrea
+                 }
+         }
+ 
+-        g_object_notify (G_OBJECT (stream), "port");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_PORT]);
+ 
+         return TRUE;
+ }
+@@ -599,7 +599,7 @@ gvc_mixer_stream_set_state (GvcMixerStre
+ 
+         if (stream->priv->state != state) {
+                 stream->priv->state = state;
+-                g_object_notify (G_OBJECT (stream), "state");
++                g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_STATE]);
+         }
+ 
+         return TRUE;
+@@ -632,9 +632,13 @@ gvc_mixer_stream_set_ports (GvcMixerStre
+                             GList          *ports)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+-        g_return_val_if_fail (stream->priv->ports == NULL, FALSE);
+ 
+-        stream->priv->ports = g_list_sort (ports, (GCompareFunc) sort_ports);
++        if (stream->priv->ports) {
++                g_list_free_full (stream->priv->ports, (GDestroyNotify) free_port);
++                stream->priv->ports = NULL;
++        }
++        if (ports)
++                stream->priv->ports = g_list_sort (ports, (GCompareFunc) sort_ports);
+ 
+         return TRUE;
+ }
+@@ -653,7 +657,7 @@ gvc_mixer_stream_set_card_index (GvcMixe
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+ 
+         stream->priv->card_index = card_index;
+-        g_object_notify (G_OBJECT (stream), "card-index");
++        g_object_notify_by_pspec (G_OBJECT (stream), obj_props[PROP_CARD_INDEX]);
+ 
+         return TRUE;
+ }
+@@ -921,8 +925,8 @@ on_monitor_read_callback (pa_stream *s,
+                 return;
+         }
+ 
+-        assert (length > 0);
+-        assert (length % sizeof (float) == 0);
++        g_assert (length > 0);
++        g_assert (length % sizeof (float) == 0);
+ 
+         v = ((const float *) data)[length / sizeof (float) -1];
+ 
+@@ -1051,155 +1055,117 @@ gvc_mixer_stream_class_init (GvcMixerStr
+         klass->change_port = gvc_mixer_stream_real_change_port;
+         klass->change_is_muted = gvc_mixer_stream_real_change_is_muted;
+ 
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_INDEX,
+-                                         g_param_spec_ulong ("index",
+-                                                             "Index",
+-                                                             "The index for this stream",
+-                                                             0, G_MAXULONG, 0,
+-                                                             G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_ID,
+-                                         g_param_spec_ulong ("id",
+-                                                             "id",
+-                                                             "The id for this stream",
+-                                                             0, G_MAXULONG, 0,
+-                                                             G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_CHANNEL_MAP,
+-                                         g_param_spec_object ("channel-map",
+-                                                              "channel map",
+-                                                              "The channel map for this stream",
+-                                                              GVC_TYPE_CHANNEL_MAP,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_PA_CONTEXT,
+-                                         g_param_spec_pointer ("pa-context",
+-                                                               "PulseAudio context",
+-                                                               "The PulseAudio context for this stream",
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_VOLUME,
+-                                         g_param_spec_ulong ("volume",
+-                                                             "Volume",
+-                                                             "The volume for this stream",
+-                                                             0, G_MAXULONG, 0,
+-                                                             G_PARAM_READWRITE));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_DECIBEL,
+-                                         g_param_spec_double ("decibel",
+-                                                              "Decibel",
+-                                                              "The decibel level for this stream",
+-                                                              -G_MAXDOUBLE, G_MAXDOUBLE, 0,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_NAME,
+-                                         g_param_spec_string ("name",
+-                                                              "Name",
+-                                                              "Name to display for this stream",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_DESCRIPTION,
+-                                         g_param_spec_string ("description",
+-                                                              "Description",
+-                                                              "Description to display for this stream",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_APPLICATION_ID,
+-                                         g_param_spec_string ("application-id",
++        obj_props[PROP_INDEX] = g_param_spec_ulong ("index",
++                                                    "Index",
++                                                    "The index for this stream",
++                                                    0, G_MAXULONG, 0,
++                                                    G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_ID] = g_param_spec_ulong ("id",
++                                                 "id",
++                                                 "The id for this stream",
++                                                 0, G_MAXULONG, 0,
++                                                 G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_CHANNEL_MAP] = g_param_spec_object ("channel-map",
++                                                           "channel map",
++                                                           "The channel map for this stream",
++                                                           GVC_TYPE_CHANNEL_MAP,
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_PA_CONTEXT] = g_param_spec_pointer ("pa-context",
++                                                           "PulseAudio context",
++                                                           "The PulseAudio context for this stream",
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_VOLUME] = g_param_spec_ulong ("volume",
++                                                     "Volume",
++                                                     "The volume for this stream",
++                                                     0, G_MAXULONG, 0,
++                                                     G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_DECIBEL] = g_param_spec_double ("decibel",
++                                                       "Decibel",
++                                                       "The decibel level for this stream",
++                                                       -G_MAXDOUBLE, G_MAXDOUBLE, 0,
++                                                       G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_NAME] = g_param_spec_string ("name",
++                                                    "Name",
++                                                    "Name to display for this stream",
++                                                    NULL,
++                                                    G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_DESCRIPTION] = g_param_spec_string ("description",
++                                                           "Description",
++                                                           "Description to display for this stream",
++                                                           NULL,
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_APPLICATION_ID] = g_param_spec_string ("application-id",
+                                                               "Application identifier",
+                                                               "Application identifier for this stream",
+                                                               NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_ICON_NAME,
+-                                         g_param_spec_string ("icon-name",
+-                                                              "Icon Name",
+-                                                              "Name of icon to display for this stream",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_FORM_FACTOR,
+-                                         g_param_spec_string ("form-factor",
+-                                                              "Form Factor",
+-                                                              "Device form factor for this stream, as reported by PulseAudio",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_SYSFS_PATH,
+-                                         g_param_spec_string ("sysfs-path",
+-                                                              "Sysfs path",
+-                                                              "Sysfs path for the device associated with this stream",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_IS_MUTED,
+-                                         g_param_spec_boolean ("is-muted",
+-                                                               "is muted",
+-                                                               "Whether stream is muted",
+-                                                               FALSE,
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_CAN_DECIBEL,
+-                                         g_param_spec_boolean ("can-decibel",
+-                                                               "can decibel",
+-                                                               "Whether stream volume can be converted to decibel units",
+-                                                               FALSE,
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_IS_EVENT_STREAM,
+-                                         g_param_spec_boolean ("is-event-stream",
+-                                                               "is event stream",
+-                                                               "Whether stream's role is to play an event",
+-                                                               FALSE,
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_IS_VIRTUAL,
+-                                         g_param_spec_boolean ("is-virtual",
+-                                                               "is virtual stream",
+-                                                               "Whether the stream is virtual",
+-                                                               FALSE,
+-                                                               G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_PORT,
+-                                         g_param_spec_string ("port",
+-                                                              "Port",
+-                                                              "The name of the current port for this stream",
+-                                                              NULL,
+-                                                              G_PARAM_READWRITE));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_STATE,
+-                                         g_param_spec_enum ("state",
+-                                                            "State",
+-                                                            "The current state of this stream",
+-                                                            GVC_TYPE_MIXER_STREAM_STATE,
+-                                                            GVC_STREAM_STATE_INVALID,
+-                                                            G_PARAM_READWRITE));
+-        g_object_class_install_property (gobject_class,
+-                                         PROP_CARD_INDEX,
+-                                         g_param_spec_long ("card-index",
+-                                                             "Card index",
+-                                                             "The index of the card for this stream",
+-                                                             PA_INVALID_INDEX, G_MAXLONG, PA_INVALID_INDEX,
+-                                                             G_PARAM_READWRITE|G_PARAM_CONSTRUCT));
++                                                              G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_ICON_NAME] = g_param_spec_string ("icon-name",
++                                                         "Icon Name",
++                                                         "Name of icon to display for this stream",
++                                                         NULL,
++                                                         G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_FORM_FACTOR] = g_param_spec_string ("form-factor",
++                                                           "Form Factor",
++                                                           "Device form factor for this stream, as reported by PulseAudio",
++                                                           NULL,
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_SYSFS_PATH] = g_param_spec_string ("sysfs-path",
++                                                          "Sysfs path",
++                                                          "Sysfs path for the device associated with this stream",
++                                                          NULL,
++                                                          G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_IS_MUTED] = g_param_spec_boolean ("is-muted",
++                                                         "is muted",
++                                                         "Whether stream is muted",
++                                                         FALSE,
++                                                         G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_CAN_DECIBEL] = g_param_spec_boolean ("can-decibel",
++                                                            "can decibel",
++                                                            "Whether stream volume can be converted to decibel units",
++                                                            FALSE,
++                                                            G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_IS_EVENT_STREAM] = g_param_spec_boolean ("is-event-stream",
++                                                                "is event stream",
++                                                                "Whether stream's role is to play an event",
++                                                                FALSE,
++                                                                G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_IS_VIRTUAL] = g_param_spec_boolean ("is-virtual",
++                                                           "is virtual stream",
++                                                           "Whether the stream is virtual",
++                                                           FALSE,
++                                                           G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_PORT] = g_param_spec_string ("port",
++                                                    "Port",
++                                                    "The name of the current port for this stream",
++                                                    NULL,
++                                                    G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_STATE] = g_param_spec_enum ("state",
++                                                   "State",
++                                                   "The current state of this stream",
++                                                   GVC_TYPE_MIXER_STREAM_STATE,
++                                                   GVC_STREAM_STATE_INVALID,
++                                                   G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
++        obj_props[PROP_CARD_INDEX] = g_param_spec_long ("card-index",
++                                                        "Card index",
++                                                        "The index of the card for this stream",
++                                                        PA_INVALID_INDEX, G_MAXLONG, PA_INVALID_INDEX,
++                                                        G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++
++        g_object_class_install_properties (gobject_class, N_PROPS, obj_props);
++
+         signals [MONITOR_UPDATE] =
+                 g_signal_new ("monitor-update",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerStreamClass, monitor_update),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__DOUBLE,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 1, G_TYPE_DOUBLE);
+         signals [MONITOR_SUSPEND] =
+                 g_signal_new ("monitor-suspend",
+                               G_TYPE_FROM_CLASS (klass),
+                               G_SIGNAL_RUN_LAST,
+                               G_STRUCT_OFFSET (GvcMixerStreamClass, monitor_suspend),
+-                              NULL, NULL,
+-                              g_cclosure_marshal_VOID__VOID,
++                              NULL, NULL, NULL,
+                               G_TYPE_NONE, 0, G_TYPE_NONE);
+ }
+ 
+diff -uNrp a/libcvc/gvc-mixer-stream.h b/libcvc/gvc-mixer-stream.h
+--- a/libcvc/gvc-mixer-stream.h	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-stream.h	2026-02-22 16:12:11.122001541 +0000
+@@ -22,9 +22,9 @@
+ #define __GVC_MIXER_STREAM_H
+ 
+ #include <glib-object.h>
++#include <pulse/pulseaudio.h>
+ #include "gvc-channel-map.h"
+ #include <gio/gio.h>
+-#include <pulse/pulseaudio.h>
+ 
+ G_BEGIN_DECLS
+ 
+@@ -86,10 +86,10 @@ const GList *       gvc_mixer_stream_get
+ gboolean            gvc_mixer_stream_change_port     (GvcMixerStream *stream,
+                                                       const char     *port);
+ 
+-guint32             gvc_mixer_stream_get_volume      (GvcMixerStream *stream);
++pa_volume_t         gvc_mixer_stream_get_volume      (GvcMixerStream *stream);
+ gdouble             gvc_mixer_stream_get_decibel     (GvcMixerStream *stream);
+ gboolean            gvc_mixer_stream_push_volume     (GvcMixerStream *stream);
+-guint32             gvc_mixer_stream_get_base_volume (GvcMixerStream *stream);
++pa_volume_t         gvc_mixer_stream_get_base_volume (GvcMixerStream *stream);
+ 
+ gboolean            gvc_mixer_stream_get_is_muted    (GvcMixerStream *stream);
+ gboolean            gvc_mixer_stream_get_can_decibel (GvcMixerStream *stream);
+@@ -109,9 +109,10 @@ guint               gvc_mixer_stream_get
+ GvcMixerStreamState gvc_mixer_stream_get_state       (GvcMixerStream *stream);
+ void                gvc_mixer_stream_create_monitor  (GvcMixerStream *stream);
+ void                gvc_mixer_stream_remove_monitor  (GvcMixerStream *stream);
++
+ /* private */
+ gboolean            gvc_mixer_stream_set_volume      (GvcMixerStream *stream,
+-                                                      guint32     volume);
++                                                      pa_volume_t     volume);
+ gboolean            gvc_mixer_stream_set_decibel     (GvcMixerStream *stream,
+                                                       gdouble         db);
+ gboolean            gvc_mixer_stream_set_is_muted    (GvcMixerStream *stream,
+@@ -135,7 +136,7 @@ gboolean            gvc_mixer_stream_set
+ gboolean            gvc_mixer_stream_set_application_id (GvcMixerStream *stream,
+                                                          const char *application_id);
+ gboolean            gvc_mixer_stream_set_base_volume (GvcMixerStream *stream,
+-                                                      guint32     base_volume);
++                                                      pa_volume_t     base_volume);
+ gboolean            gvc_mixer_stream_set_port        (GvcMixerStream *stream,
+                                                       const char     *port);
+ gboolean            gvc_mixer_stream_set_ports       (GvcMixerStream *stream,
+diff -uNrp a/libcvc/gvc-mixer-ui-device.c b/libcvc/gvc-mixer-ui-device.c
+--- a/libcvc/gvc-mixer-ui-device.c	2024-12-02 16:43:05.000000000 +0000
++++ b/libcvc/gvc-mixer-ui-device.c	2026-02-22 16:12:11.122056987 +0000
+@@ -55,7 +55,9 @@ enum
+         PROP_UI_DEVICE_TYPE,
+         PROP_PORT_AVAILABLE,
+         PROP_ICON_NAME,
++        N_PROPS
+ };
++static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
+ static void     gvc_mixer_ui_device_finalize   (GObject               *object);
+ 
+@@ -156,14 +158,18 @@ gvc_mixer_ui_device_set_property  (GObje
+                 break;
+         case PROP_UI_DEVICE_TYPE:
+                 self->priv->type = (GvcMixerUIDeviceDirection) g_value_get_uint (value);
++                g_debug ("gvc-mixer-output-set-property - device type: %s",
++                         self->priv->type == UIDeviceInput ? "input" : "output");
+                 break;
+         case PROP_PORT_AVAILABLE:
+-                self->priv->port_available = g_value_get_boolean (value);
+-                g_debug ("gvc-mixer-output-set-property - port available %i, value passed in %i",
++                g_debug ("gvc-mixer-output-set-property - old port available %i, value passed in %i",
+                          self->priv->port_available, g_value_get_boolean (value));
++                self->priv->port_available = g_value_get_boolean (value);
+                 break;
+         case PROP_ICON_NAME:
+                 gvc_mixer_ui_device_set_icon_name (self, g_value_get_string (value));
++                g_debug ("gvc-mixer-output-set-property - icon name: %s",
++                         self->priv->icon_name);
+                 break;
+         default:
+                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+@@ -224,7 +230,6 @@ static void
+ gvc_mixer_ui_device_class_init (GvcMixerUIDeviceClass *klass)
+ {
+         GObjectClass* object_class = G_OBJECT_CLASS (klass);
+-        GParamSpec *pspec;
+ 
+         object_class->constructor = gvc_mixer_ui_device_constructor;
+         object_class->dispose = gvc_mixer_ui_device_dispose;
+@@ -232,62 +237,64 @@ gvc_mixer_ui_device_class_init (GvcMixer
+         object_class->set_property = gvc_mixer_ui_device_set_property;
+         object_class->get_property = gvc_mixer_ui_device_get_property;
+ 
+-        pspec = g_param_spec_string ("description",
++        obj_props[PROP_DESC_LINE_1] =
++                g_param_spec_string ("description",
+                                      "Description construct prop",
+                                      "Set first line description",
+                                      "no-name-set",
+-                                     G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_DESC_LINE_1, pspec);
++                                     G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_string ("origin",
++        obj_props[PROP_DESC_LINE_2] =
++                g_param_spec_string ("origin",
+                                      "origin construct prop",
+                                      "Set second line description name",
+                                      "no-name-set",
+-                                     G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_DESC_LINE_2, pspec);
++                                     G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_pointer ("card",
++        obj_props[PROP_CARD] =
++                g_param_spec_pointer ("card",
+                                       "Card from pulse",
+                                       "Set/Get card",
+-                                      G_PARAM_READWRITE);
+-
+-        g_object_class_install_property (object_class, PROP_CARD, pspec);
++                                      G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_string ("port-name",
++        obj_props[PROP_PORT_NAME] =
++                g_param_spec_string ("port-name",
+                                      "port-name construct prop",
+                                      "Set port-name",
+                                      NULL,
+-                                     G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_PORT_NAME, pspec);
++                                     G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_uint ("stream-id",
++        obj_props[PROP_STREAM_ID] =
++                g_param_spec_uint ("stream-id",
+                                    "stream id assigned by gvc-stream",
+                                    "Set/Get stream id",
+                                    0,
+                                    G_MAXUINT,
+                                    GVC_MIXER_UI_DEVICE_INVALID,
+-                                   G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_STREAM_ID, pspec);
++                                   G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_uint ("type",
++        obj_props[PROP_UI_DEVICE_TYPE] =
++                g_param_spec_uint ("type",
+                                    "ui-device type",
+                                    "determine whether its an input and output",
+-                                   0, 1, 0, G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_UI_DEVICE_TYPE, pspec);
++                                   0, 1, 0,
++                                   G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_boolean ("port-available",
++        obj_props[PROP_PORT_AVAILABLE] =
++                g_param_spec_boolean ("port-available",
+                                       "available",
+                                       "determine whether this port is available",
+                                       FALSE,
+-                                      G_PARAM_READWRITE);
+-        g_object_class_install_property (object_class, PROP_PORT_AVAILABLE, pspec);
++                                      G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS);
+ 
+-        pspec = g_param_spec_string ("icon-name",
++        obj_props[PROP_ICON_NAME] =
++                g_param_spec_string ("icon-name",
+                                      "Icon Name",
+                                      "Name of icon to display for this card",
+                                      NULL,
+-                                     G_PARAM_READWRITE|G_PARAM_CONSTRUCT);
+-        g_object_class_install_property (object_class, PROP_ICON_NAME, pspec);
++                                     G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS);
++
++        g_object_class_install_properties (object_class, N_PROPS, obj_props);
+ }
+ 
+ /* Removes the part of the string that starts with skip_prefix
+@@ -431,6 +438,9 @@ gvc_mixer_ui_device_set_profiles (GvcMix
+ 
+         g_debug ("Set profiles for '%s'", gvc_mixer_ui_device_get_description(device));
+ 
++        g_clear_pointer (&device->priv->supported_profiles, g_list_free);
++        g_clear_pointer (&device->priv->profiles, g_list_free);
++
+         if (in_profiles == NULL)
+                 return;
+ 
+@@ -557,6 +567,11 @@ gvc_mixer_ui_device_get_active_profile (
+         }
+ 
+         profile = gvc_mixer_card_get_profile (device->priv->card);
++        if (!profile) {
++                g_warning ("gvc_mixer_card_get_profile() returned NULL for card %p", device->priv->card);
++                return NULL;
++        }
++
+         return gvc_mixer_ui_device_get_matching_profile (device, profile->profile);
+ }
+ 
+@@ -650,7 +665,7 @@ gvc_mixer_ui_device_set_icon_name (GvcMi
+ 
+         g_free (device->priv->icon_name);
+         device->priv->icon_name = g_strdup (icon_name);
+-        g_object_notify (G_OBJECT (device), "icon-name");
++        g_object_notify_by_pspec (G_OBJECT (device), obj_props[PROP_ICON_NAME]);
+ }
+ 
+ 

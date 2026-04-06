@@ -1,0 +1,35 @@
+diff -up java/Makefile.orig java/Makefile
+--- java/Makefile.orig	2023-02-28 01:31:32.000000000 -0700
++++ java/Makefile	2023-02-28 14:44:58.446569758 -0700
+@@ -5,8 +5,8 @@ FILES = libsvm/svm.class libsvm/svm_mode
+ 		svm_train.class svm_predict.class svm_toy.class svm_scale.class
+ 
+ #JAVAC = jikes
+-JAVAC_FLAGS = --release 11
+-JAVAC = javac
++JAVAC_FLAGS = --release 8
++JAVAC ?= javac
+ # JAVAC_FLAGS =
+ export CLASSPATH := .:$(CLASSPATH)
+ 
+@@ -19,8 +19,20 @@ all: $(FILES)
+ libsvm/svm.java: libsvm/svm.m4
+ 	m4 libsvm/svm.m4 > libsvm/svm.java
+ 
++javadoc: docs/index.html
++
++docs/index.html: $(FILES)
++	javadoc -d docs *.java libsvm/*.java
++
++install:
++	mkdir -p ${JAVA_TARGET_DIR}
++	install -m 644 libsvm.jar ${JAVA_TARGET_DIR}
++uninstall:
++	rm -fr ${JAVA_TARGET_DIR}
++
+ clean:
+ 	rm -f libsvm/*.class *.class *.jar libsvm/*~ *~ libsvm/svm.java
++	rm -rf docs
+ 
+ dist: clean all
+ 	rm *.class libsvm/*.class

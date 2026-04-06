@@ -1,0 +1,135 @@
+From b1f0b50c19ec17df554faa1335d2b989e262b831 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 22 Aug 2018 09:21:04 +0200
+Subject: [PATCH 1/8] ANGLE: Use pixel sizes in the XAML swap chain
+
+This is necessary for Qt applications, as they render to GL in physical
+pixels. This is consistent with the CoreWindow swap chain behavior.
+
+In order to achieve proper scaling, the scale factor has to be initialized
+properly in InspectableNativeWindow.
+
+This change only affects Windows Runtime targets.
+
+Change-Id: I92a365f33752ed49c960e390bbf89cc33ccc8004
+---
+ .../d3d/d3d11/winrt/CoreWindowNativeWindow.cpp     | 23 -------------------
+ .../d3d/d3d11/winrt/CoreWindowNativeWindow.h       |  2 --
+ .../d3d/d3d11/winrt/InspectableNativeWindow.cpp    | 26 +++++++++++++++++++---
+ .../d3d/d3d11/winrt/InspectableNativeWindow.h      |  7 +++++-
+ 4 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.cpp
+index dd37ace87e..1ef90e7b09 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.cpp
+@@ -205,27 +205,4 @@ HRESULT GetCoreWindowSizeInPixels(const ComPtr<ABI::Windows::UI::Core::ICoreWind
+ 
+     return result;
+ }
+-
+-static float GetLogicalDpi()
+-{
+-    ComPtr<ABI::Windows::Graphics::Display::IDisplayPropertiesStatics> displayProperties;
+-
+-    if (SUCCEEDED(GetActivationFactory(HStringReference(RuntimeClass_Windows_Graphics_Display_DisplayProperties).Get(), displayProperties.GetAddressOf())))
+-    {
+-        float dpi = 96.0f;
+-        if (SUCCEEDED(displayProperties->get_LogicalDpi(&dpi)))
+-        {
+-            return dpi;
+-        }
+-    }
+-
+-    // Return 96 dpi as a default if display properties cannot be obtained.
+-    return 96.0f;
+-}
+-
+-float ConvertDipsToPixels(float dips)
+-{
+-    static const float dipsPerInch = 96.0f;
+-    return dips * GetLogicalDpi() / dipsPerInch;
+-}
+ }
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.h b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.h
+index d43bf0ba5f..21855c2c3b 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.h
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.h
+@@ -19,8 +19,6 @@ typedef ABI::Windows::Foundation::__FITypedEventHandler_2_Windows__CUI__CCore__C
+ 
+ namespace rx
+ {
+-float ConvertDipsToPixels(float dips);
+-
+ class CoreWindowNativeWindow : public InspectableNativeWindow, public std::enable_shared_from_this<CoreWindowNativeWindow>
+ {
+   public:
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
+index cc81521320..1bd796e58f 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
+@@ -270,8 +270,28 @@ HRESULT GetOptionalSinglePropertyValue(const ComPtr<ABI::Windows::Foundation::Co
+ 
+ RECT InspectableNativeWindow::clientRect(const Size &size)
+ {
+-    // We don't have to check if a swapchain scale was specified here; the default value is 1.0f
+-    // which will have no effect.
+-    return {0, 0, lround(size.Width * mSwapChainScale), lround(size.Height * mSwapChainScale)};
++    return {0, 0, static_cast<long>(ConvertDipsToPixels(size.Width)),
++                static_cast<long>(ConvertDipsToPixels(size.Height))};
++}
++
++float GetLogicalDpi()
++{
++    ComPtr<ABI::Windows::Graphics::Display::IDisplayPropertiesStatics> displayProperties;
++    float dpi = 96.0f;
++
++    if (SUCCEEDED(GetActivationFactory(HStringReference(RuntimeClass_Windows_Graphics_Display_DisplayProperties).Get(), displayProperties.GetAddressOf())))
++    {
++        if (SUCCEEDED(displayProperties->get_LogicalDpi(&dpi)))
++        {
++            return dpi;
++        }
++    }
++    return dpi;
++}
++
++float ConvertDipsToPixels(float dips)
++{
++    static const float dipsPerInch = 96.0f;
++    return lround((dips * GetLogicalDpi() / dipsPerInch));
+ }
+ }
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.h b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.h
+index 3e67269f36..d81c3e5fb9 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.h
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.h
+@@ -30,6 +30,9 @@ using namespace ABI::Windows::Foundation::Collections;
+ 
+ namespace rx
+ {
++float ConvertDipsToPixels(float dips);
++float GetLogicalDpi();
++
+ class InspectableNativeWindow
+ {
+   public:
+@@ -37,12 +40,14 @@ class InspectableNativeWindow
+         mSupportsSwapChainResize(true),
+         mSwapChainSizeSpecified(false),
+         mSwapChainScaleSpecified(false),
+-        mSwapChainScale(1.0f),
+         mClientRectChanged(false),
+         mClientRect({0,0,0,0}),
+         mNewClientRect({0,0,0,0})
+     {
+         mSizeChangedEventToken.value = 0;
++        mSwapChainScale = 96.0f / GetLogicalDpi();
++        if (mSwapChainScale != 1.0f)
++            mSwapChainScaleSpecified = true;
+     }
+     virtual ~InspectableNativeWindow(){}
+ 
+-- 
+2.15.0.windows.1
+

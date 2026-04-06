@@ -1,0 +1,44 @@
+From 2966285dc09ca9c7e6b95c5212a2d5bd46ab8376 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 27 Sep 2024 05:40:14 -0700
+Subject: [PATCH] offload compress option
+
+Try out --offload-compress
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ cmake/build-options.cmake | 2 ++
+ library/CMakeLists.txt    | 4 ++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/cmake/build-options.cmake b/cmake/build-options.cmake
+index cb35e72fb157..26d04c0aefdb 100755
+--- a/cmake/build-options.cmake
++++ b/cmake/build-options.cmake
+@@ -36,6 +36,8 @@ option( BUILD_SHARED_LIBS "Build rocBLAS as a shared library" ON )
+ # library without tensile to allow for rapid iteration without GEMM functionality
+ option( BUILD_WITH_TENSILE "Build full functionality which requires tensile?" ON )
+ 
++option( BUILD_OFFLOAD_COMPRESS "Build with offload compress?" OFF )
++
+ include(clients/cmake/client-build-options.cmake)
+ 
+ if (WIN32)
+diff --git a/library/CMakeLists.txt b/library/CMakeLists.txt
+index 90a75dd394d2..0386a3058d45 100755
+--- a/library/CMakeLists.txt
++++ b/library/CMakeLists.txt
+@@ -66,6 +66,10 @@ function( rocblas_library_settings lib_target_ )
+   # Do not allow Variable Length Arrays (use unique_ptr instead)
+   target_compile_options( ${lib_target_} PRIVATE -Werror=vla )
+ 
++  if ( BUILD_OFFLOAD_COMPRESS )
++    target_compile_options( ${lib_target_} PRIVATE --offload-compress )
++  endif ()
++  
+   target_compile_definitions( ${lib_target_} PRIVATE ROCM_USE_FLOAT16 ROCBLAS_INTERNAL_API ROCBLAS_BETA_FEATURES_API )
+ 
+   # both libraries will use rocblas_EXPORTS
+-- 
+2.46.0
+

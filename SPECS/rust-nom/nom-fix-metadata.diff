@@ -1,0 +1,23 @@
+--- nom-8.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nom-8.0.0/Cargo.toml	2025-03-24T17:35:53.340824+00:00
+@@ -85,11 +85,6 @@
+ path = "tests/escaped.rs"
+ 
+ [[test]]
+-name = "expression_ast"
+-path = "tests/expression_ast.rs"
+-required-features = ["alloc"]
+-
+-[[test]]
+ name = "float"
+ path = "tests/float.rs"
+ 
+@@ -143,7 +138,7 @@
+ version = "0.3"
+ 
+ [dev-dependencies.proptest]
+-version = "=1.0.0"
++version = "1.0.0"
+ 
+ [features]
+ alloc = []

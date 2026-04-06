@@ -1,0 +1,32 @@
+From d823d7a67291d51d8b3c57c36f059e1d1d84c2e6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 29 Aug 2024 12:50:32 +0100
+Subject: [PATCH 201/203] Workaround missing output directory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Something is causing the output directory to be unexpectedly deleted.
+Until the root cause is identified, workaround this by creating the
+required directory again.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ Linux/build_openssl.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
+index 4e4a81e..d0518e5 100755
+--- a/Linux/build_openssl.sh
++++ b/Linux/build_openssl.sh
+@@ -174,6 +174,7 @@ fi
+ make libcrypto.a || exit 1
+ cp libcrypto.a $SGXSSL_ROOT/package/lib64/$OUTPUT_LIB || exit 1
+ objcopy --rename-section .init=Q6A8dc14f40efc4288a03b32cba4e $SGXSSL_ROOT/package/lib64/$OUTPUT_LIB || exit 1
++mkdir -p $SGXSSL_ROOT/package/include/openssl/
+ cp include/openssl/* $SGXSSL_ROOT/package/include/openssl/ || exit 1
+ grep OPENSSL_VERSION_STR include/openssl/opensslv.h > $SGXSSL_ROOT/sgx/osslverstr.h || exit 1
+ cp -r include/crypto $SGXSSL_ROOT/sgx/test_app/enclave/ || exit 1
+-- 
+2.49.0
+

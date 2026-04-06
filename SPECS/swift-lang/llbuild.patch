@@ -1,0 +1,12 @@
+diff --git llbuild.orig/utils/unittest/googletest/include/gtest/gtest.h llbuild/utils/unittest/googletest/include/gtest/gtest.h
+index eb5c5cc0..30c8d68a 100644
+--- llbuild.orig/utils/unittest/googletest/include/gtest/gtest.h
++++ llbuild/utils/unittest/googletest/include/gtest/gtest.h
+@@ -51,6 +51,7 @@
+ #ifndef GTEST_INCLUDE_GTEST_GTEST_H_
+ #define GTEST_INCLUDE_GTEST_GTEST_H_
+ 
++#include <cstdint>
+ #include <cstddef>
+ #include <limits>
+ #include <memory>

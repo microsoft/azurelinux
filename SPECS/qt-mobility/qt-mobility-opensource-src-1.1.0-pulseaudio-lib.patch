@@ -1,0 +1,11 @@
+--- qt-mobility-opensource-src-1.1.0/src/multimedia/audio/audio.pri.orig	2010-09-08 19:07:17.624306462 -0300
++++ qt-mobility-opensource-src-1.1.0/src/multimedia/audio/audio.pri	2010-09-08 19:07:32.694317010 -0300
+@@ -68,7 +68,7 @@
+             SOURCES += audio/qaudiodeviceinfo_alsa_p.cpp \
+                    audio/qaudiooutput_alsa_p.cpp \
+                    audio/qaudioinput_alsa_p.cpp
+-            LIBS_PRIVATE += -lasound
++            LIBS_PRIVATE += -lasound -lpulse
+         }
+     }
+ }

@@ -1,0 +1,25 @@
+From 6e4f6460ae128385d8518314e0a9718b30a86773 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 1 Jan 2026 22:24:29 +0100
+Subject: [PATCH 2/2] remove brittle expected panic message from a test
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index fdf05dc..7686389 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -3784,7 +3784,7 @@ mod tests {
+         macro_rules! zst_test {
+             ($name:ident($($tt:tt)*), $constructor_in_panic_msg:tt) => {
+                 #[test]
+-                #[should_panic = concat!("LayoutVerified::", $constructor_in_panic_msg, " called on a zero-sized type")]
++                #[should_panic]
+                 fn $name() {
+                     let mut buffer = [0u8];
+                     let lv = $crate::LayoutVerified::<_, [()]>::$name(&mut buffer[..], $($tt)*);
+-- 
+2.52.0
+

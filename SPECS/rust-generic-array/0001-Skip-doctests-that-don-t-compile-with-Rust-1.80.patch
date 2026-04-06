@@ -1,0 +1,48 @@
+From 58396cbc2d0fe7ca7919e70a0fd0229963f6484a Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 21:37:48 +0200
+Subject: [PATCH] Skip doctests that don't compile with Rust 1.80+
+
+---
+ src/arr.rs | 4 ++--
+ src/lib.rs | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/arr.rs b/src/arr.rs
+index cdcc038..b085043 100644
+--- a/src/arr.rs
++++ b/src/arr.rs
+@@ -81,7 +81,7 @@ mod doctests_only {
+     /// }
+     /// ```
+     ///
+-    /// ```rust
++    /// ```compile_fail
+     /// #[macro_use] extern crate generic_array;
+     /// fn main() {
+     ///    fn unsound_lifetime_extension<'a, A>(a: &'a A) -> &'a A {
+@@ -112,7 +112,7 @@ mod doctests_only {
+     /// }
+     /// ```
+     ///
+-    /// ```rust
++    /// ```compile_fail
+     /// #[macro_use] extern crate generic_array;
+     /// fn main() {
+     ///    fn unsound_lifetime_extension<'a, A>(a: &'a A) -> &'a A {
+diff --git a/src/lib.rs b/src/lib.rs
+index 14a2797..a4cdf00 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2,7 +2,7 @@
+ //! Core Rust array types `[T; N]` can't be used generically with
+ //! respect to `N`, so for example this:
+ //!
+-//! ```rust{compile_fail}
++//! ```rust,ignore
+ //! struct Foo<T, N> {
+ //!     data: [T; N]
+ //! }
+-- 
+2.46.0
+

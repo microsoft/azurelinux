@@ -1,0 +1,20 @@
+#!/usr/bin/sh
+
+ARCH=$(uname -m)
+
+case $ARCH in
+    x86_64 | sparc64 | s390x | ppc64 | aarch64)
+        LIB_DIR=/usr/lib64
+        SECONDARY_LIB_DIR=/usr/lib
+        ;;
+    *)
+        LIB_DIR=/usr/lib
+        SECONDARY_LIB_DIR=/usr/lib64
+        ;;
+esac
+
+if [ ! -x $LIB_DIR/fb_config ]; then
+    LIB_DIR=$SECONDARY_LIB_DIR
+fi
+
+exec $LIB_DIR/fb_config "$@"

@@ -1,0 +1,142 @@
+diff -rupN --no-dereference Python-3.11.14/Makefile.pre.in Python-3.11.14-new/Makefile.pre.in
+--- Python-3.11.14/Makefile.pre.in	2025-10-09 23:07:48.892583308 +0200
++++ Python-3.11.14-new/Makefile.pre.in	2025-10-09 23:07:49.900584788 +0200
+@@ -758,7 +758,7 @@ $(srcdir)/Modules/_blake2/blake2s_impl.c
+ # -s, --silent or --quiet is always the first char.
+ # Under BSD make, MAKEFLAGS might be " -s -v x=y".
+ # Ignore macros passed by GNU make, passed after --
+-sharedmods: $(PYTHON_FOR_BUILD_DEPS) pybuilddir.txt @LIBMPDEC_INTERNAL@ @LIBEXPAT_INTERNAL@
++sharedmods: $(PYTHON_FOR_BUILD_DEPS) pybuilddir.txt @LIBMPDEC_INTERNAL@ @LIBEXPAT_INTERNAL@ $(BUILDPYTHON)
+ 	@case "`echo X $$MAKEFLAGS | sed 's/^X //;s/ -- .*//'`" in \
+ 	    *\ -s*|s*) quiet="-q";; \
+ 	    *) quiet="";; \
+diff -rupN --no-dereference Python-3.11.14/Modules/_ctypes/_ctypes.c Python-3.11.14-new/Modules/_ctypes/_ctypes.c
+--- Python-3.11.14/Modules/_ctypes/_ctypes.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/_ctypes/_ctypes.c	2025-10-09 23:07:49.901584789 +0200
+@@ -109,6 +109,7 @@ bytes(cdata)
+ // windows.h must be included before pycore internal headers
+ #ifdef MS_WIN32
+ #  include <windows.h>
++#  include <dlfcn.h>
+ #endif
+ 
+ #include "pycore_call.h"          // _PyObject_CallNoArgs()
+diff -rupN --no-dereference Python-3.11.14/Modules/_multiprocessing/semaphore.c Python-3.11.14-new/Modules/_multiprocessing/semaphore.c
+--- Python-3.11.14/Modules/_multiprocessing/semaphore.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/_multiprocessing/semaphore.c	2025-10-09 23:07:49.902878787 +0200
+@@ -8,6 +8,9 @@
+  */
+ 
+ #include "multiprocessing.h"
++#ifdef __MINGW32__
++#include <semaphore.h>
++#endif
+ 
+ #ifdef HAVE_MP_SEMAPHORE
+ 
+diff -rupN --no-dereference Python-3.11.14/Modules/Setup Python-3.11.14-new/Modules/Setup
+--- Python-3.11.14/Modules/Setup	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/Setup	2025-10-09 23:07:49.903168179 +0200
+@@ -154,7 +154,7 @@ PYTHONPATH=$(COREPYTHONPATH)
+ #binascii binascii.c
+ #cmath cmathmodule.c
+ #math mathmodule.c
+-#mmap mmapmodule.c
++mmap mmapmodule.c
+ #select selectmodule.c
+ 
+ # XML
+diff -rupN --no-dereference Python-3.11.14/setup.py Python-3.11.14-new/setup.py
+--- Python-3.11.14/setup.py	2025-10-09 23:07:49.394375561 +0200
++++ Python-3.11.14-new/setup.py	2025-10-09 23:07:49.903584792 +0200
+@@ -977,7 +977,10 @@ class PyBuildExt(build_ext):
+         self.addext(Extension('spwd', ['spwdmodule.c']))
+ 
+         # select(2); not on ancient System V
+-        self.addext(Extension('select', ['selectmodule.c']))
++        select_libs = []
++        if HOST_PLATFORM.startswith(('mingw', 'win')):
++            select_libs += ['ws2_32']
++        self.addext(Extension('select', ['selectmodule.c'], libraries=select_libs))
+ 
+         # Memory-mapped files (also works on Win32).
+         self.addext(Extension('mmap', ['mmapmodule.c']))
+@@ -1009,7 +1012,8 @@ class PyBuildExt(build_ext):
+         self.addext(Extension('_csv', ['_csv.c']))
+ 
+         # POSIX subprocess module helper.
+-        self.addext(Extension('_posixsubprocess', ['_posixsubprocess.c']))
++        # FIXME Force disabled
++        # self.addext(Extension('_posixsubprocess', ['_posixsubprocess.c']))
+ 
+     def detect_test_extensions(self):
+         # Python C API test module
+@@ -1104,6 +1108,8 @@ class PyBuildExt(build_ext):
+                 # readline package
+                 if find_file('readline/rlconf.h', self.inc_dirs, []) is None:
+                     do_readline = False
++        # FIXME Force disabled
++        do_readline = False
+         if do_readline:
+             readline_libs = [readline_lib]
+             if readline_termcap_library:
+@@ -1328,13 +1334,16 @@ class PyBuildExt(build_ext):
+ 
+     def detect_multiprocessing(self):
+         # Richard Oudkerk's multiprocessing module
++        multiproc_libs = []
+         multiprocessing_srcs = ['_multiprocessing/multiprocessing.c']
+         if (
+             sysconfig.get_config_var('HAVE_SEM_OPEN') and not
+             sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')
+         ):
+             multiprocessing_srcs.append('_multiprocessing/semaphore.c')
+-        self.addext(Extension('_multiprocessing', multiprocessing_srcs))
++        if HOST_PLATFORM.startswith(('mingw', 'win')):
++            multiproc_libs += ['ws2_32']
++        self.addext(Extension('_multiprocessing', multiprocessing_srcs, libraries=multiproc_libs))
+         self.addext(Extension('_posixshmem', ['_multiprocessing/posixshmem.c']))
+ 
+     def detect_uuid(self):
+@@ -1374,7 +1383,8 @@ class PyBuildExt(build_ext):
+         self.addext(Extension('xxlimited_35', ['xxlimited_35.c']))
+ 
+     def detect_tkinter(self):
+-        self.addext(Extension('_tkinter', ['_tkinter.c', 'tkappinit.c']))
++        tkinter_libs = ['tcl', 'tk']
++        self.addext(Extension('_tkinter', ['_tkinter.c', 'tkappinit.c'], libraries=tkinter_libs))
+ 
+     def configure_ctypes(self, ext):
+         return True
+@@ -1421,7 +1431,7 @@ class PyBuildExt(build_ext):
+                         sources=sources)
+         self.add(ext)
+         # function my_sqrt() needs libm for sqrt()
+-        self.addext(Extension('_ctypes_test', ['_ctypes/_ctypes_test.c']))
++        self.addext(Extension('_ctypes_test', sources=['_ctypes/_ctypes_test.c'], libraries=['oleaut32']))
+ 
+         ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
+         ffi_lib = None
+@@ -1472,6 +1482,10 @@ class PyBuildExt(build_ext):
+             # for dlopen, see bpo-32647
+             ext.libraries.append('dl')
+ 
++        ext.libraries.append('ole32')
++        ext.libraries.append('oleaut32')
++        ext.libraries.append('uuid')
++
+     def detect_decimal(self):
+         # Stefan Krah's _decimal module
+         self.addext(
+@@ -1484,7 +1498,10 @@ class PyBuildExt(build_ext):
+         )
+ 
+     def detect_openssl_hashlib(self):
+-        self.addext(Extension('_ssl', ['_ssl.c']))
++        openssl_libs= []
++        if HOST_PLATFORM.startswith(('mingw', 'win')):
++            openssl_libs += ['ws2_32']
++        self.addext(Extension('_ssl', ['_ssl.c'], libraries=openssl_libs))
+         self.addext(Extension('_hashlib', ['_hashopenssl.c']))
+ 
+     def detect_hash_builtins(self):

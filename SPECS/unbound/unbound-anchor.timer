@@ -1,0 +1,14 @@
+[Unit]
+Description=daily update of the root trust anchor for DNSSEC
+Documentation=man:unbound-anchor(8)
+
+[Timer]
+# Current DNSKEY TTL in root zone is 172800 seconds, i.e. 172800/60/60/24 = 2 days.
+# It means that unboud-anchor should be run at least once a day.
+OnCalendar=daily
+Persistent=true
+AccuracySec=24h
+
+[Install]
+WantedBy=timers.target
+

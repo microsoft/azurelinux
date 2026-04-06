@@ -1,0 +1,29 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Mon, 9 Oct 2017 09:22:12 +0100
+Subject: icu_sources_data.py: Decouple from Mozilla build system
+
+mozpack.path is a wrapper around os.path that normalizes path
+separators on Windows, but on Unix we only have one path separator
+so there's nothing to normalize. Avoid needing to import all of it.
+---
+ intl/icu_sources_data.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/intl/icu_sources_data.py b/intl/icu_sources_data.py
+index 2936df9..4db52af 100644
+--- a/intl/icu_sources_data.py
++++ b/intl/icu_sources_data.py
+@@ -21,7 +21,9 @@ import subprocess
+ import sys
+ import tempfile
+
+-from mozpack import path as mozpath
++# Close enough
++import os.path as mozpath
++mozpath.normsep = lambda p: p
+
+ # The following files have been determined to be dead/unused by a
+ # semi-automated analysis. You can just remove any of the files below
+--
+2.31.1
+

@@ -1,0 +1,225 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.old netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.old	2007-11-15 13:34:31.000000000 +0100
++++ netkit-ftp-0.17/ftp/cmds.c	2007-11-15 13:44:44.000000000 +0100
+@@ -137,7 +137,7 @@ static char *pathprotect(char *name)
+ 		if (name[i]=='.' && gotdots>=0) gotdots++;
+ 		else if (name[i]=='/' && gotdots<0) gotdots=0;
+ 		else if (name[i]=='/' && gotdots==2) {
+-		    printf("Warning: embedded .. in %.*s (changing to !!)\n",
++		    fprintf(stderr, "Warning: embedded .. in %.*s (changing to !!)\n",
+ 			   len-1, name);
+ 		    name[i-1] = '!';
+ 		    name[i-2] = '!';
+@@ -167,7 +167,7 @@ another(int *pargc, char ***pargv, const
+ 	int ret;
+ 
+ 	if (len >= sizeof(line) - 3) {
+-		printf("sorry, arguments too long\n");
++		fprintf(stderr, "sorry, arguments too long\n");
+ 		intr(0);
+ 	}
+ 	printf("(%s) ", prompt);
+@@ -195,7 +195,7 @@ setpeer(int argc, char *argv[])
+ 	char *port;
+ 
+ 	if (connected) {
+-		printf("Already connected to %s, use close first.\n",
++		fprintf(stderr, "Already connected to %s, use close first.\n",
+ 			hostname);
+ 		code = -1;
+ 		return;
+@@ -278,7 +278,7 @@ setpeer(int argc, char *argv[])
+ 				unix_server = 0;
+ 			if (overbose && 
+ 			    !strncmp(reply_string, "215 TOPS20", 10))
+-				printf(
++				fprintf(stderr, 
+ "Remember to set tenex mode when transfering binary files from this machine.\n");
+ 		}
+ 		verbose = overbose;
+@@ -316,7 +316,7 @@ do_settype(const char *thetype) 
+ 		if (strcmp(thetype, p->t_name) == 0)
+ 			break;
+ 	if (p->t_name == 0) {
+-		printf("%s: unknown mode\n", thetype);
++		fprintf(stderr, "%s: unknown mode\n", thetype);
+ 		code = -1;
+ 		return;
+ 	}
+@@ -378,7 +378,7 @@ changetype(int newtype, int show)
+ 		if (newtype == p->t_type)
+ 			break;
+ 	if (p->t_name == 0) {
+-		printf("ftp: internal error: unknown type %d\n", newtype);
++		fprintf(stderr, "ftp: internal error: unknown type %d\n", newtype);
+ 		return;
+ 	}
+ 	if (newtype == TYPE_L && bytename[0] != '\0')
+@@ -428,7 +428,7 @@ settenex(void)
+ void
+ setmode(void)
+ {
+-	printf("We only support %s mode, sorry.\n", modename);
++	fprintf(stderr, "We only support %s mode, sorry.\n", modename);
+ 	code = -1;
+ }
+ 
+@@ -439,7 +439,7 @@ setmode(void)
+ void
+ setform(void)
+ {
+-	printf("We only support %s format, sorry.\n", formname);
++	fprintf(stderr, "We only support %s format, sorry.\n", formname);
+ 	code = -1;
+ }
+ 
+@@ -449,7 +449,7 @@ setform(void)
+ void
+ setstruct(void)
+ {
+-	printf("We only support %s structure, sorry.\n", structname);
++	fprintf(stderr, "We only support %s structure, sorry.\n", structname);
+ 	code = -1;
+ }
+ 
+@@ -594,7 +594,7 @@ mput(int argc, char *argv[])
+ 		}
+ 		gargs = ftpglob(argv[i]);
+ 		if (globerr != NULL) {
+-			printf("%s\n", globerr);
++			fprintf(stderr, "%s\n", globerr);
+ 			if (gargs) {
+ 				blkfree(gargs);
+ 				free((char *)gargs);
+@@ -906,7 +906,7 @@ remglob(char *argv[], int doswitch)
+ 		umask(oldumask);
+ 
+ 		if (fd<0) {
+-			printf("Error creating temporary file, oops\n");
++			fprintf(stderr, "Error creating temporary file, oops\n");
+ 			return NULL;
+ 		}
+ 		
+@@ -931,13 +931,13 @@ remglob(char *argv[], int doswitch)
+ 		}
+ 		verbose = oldverbose; hash = oldhash;
+ 		if (badglob) {
+-			printf("Refusing to handle insecure file list\n");
++			fprintf(stderr, "Refusing to handle insecure file list\n");
+ 			close(fd);
+ 			return NULL;
+ 		}
+ 		ftemp = fdopen(fd, "r");
+ 		if (ftemp == NULL) {
+-			printf("fdopen failed, oops\n");
++			fprintf(stderr, "fdopen failed, oops\n");
+ 			return NULL;
+ 		}
+ 		rewind(ftemp);
+@@ -1006,7 +1006,7 @@ checkglob(int fd, const char *pattern)
+ 		while (*sp == '/')
+ 			sp++;
+ 		if (nrslash >= MAXPATHLEN) {
+-			printf("Incredible pattern: %s\n", pattern);
++			fprintf(stderr, "Incredible pattern: %s\n", pattern);
+ 			return 0;
+ 		}
+ 		dotdot[nrslash++] = isdotdotglob(sp);
+@@ -1019,7 +1019,7 @@ checkglob(int fd, const char *pattern)
+ 		if ((sp = strchr(buffer, '\n')) != 0) {
+ 			*sp = '\0';
+ 		} else {
+-			printf("Extremely long filename from server: %s",
++			fprintf(stderr, "Extremely long filename from server: %s",
+ 				buffer);
+ 			okay = 0;
+ 			break;
+@@ -1038,7 +1038,7 @@ checkglob(int fd, const char *pattern)
+ 	}
+ 
+ 	if (!okay)
+-		printf("Filename provided by server "
++		fprintf(stderr, "Filename provided by server "
+ 		       "doesn't match pattern `%s': %s\n", pattern, buffer);
+ 
+ 	fclose(fp);
+@@ -1061,14 +1061,14 @@ status(void)
+ 	if (connected) 
+ 		printf("Connected to %s.\n", hostname);
+ 	else 
+-		printf("Not connected.\n");
++		fprintf(stderr, "Not connected.\n");
+ 	if (!proxy) {
+ 		pswitch(1);
+ 		if (connected) {
+ 			printf("Connected for proxy commands to %s.\n", hostname);
+ 		}
+ 		else {
+-			printf("No proxy connection.\n");
++			fprintf(stderr, "No proxy connection.\n");
+ 		}
+ 		pswitch(0);
+ 	}
+@@ -1218,7 +1218,7 @@ setdebug(int argc, char *argv[])
+ 	if (argc > 1) {
+ 		val = atoi(argv[1]);
+ 		if (val < 0) {
+-			printf("%s: bad debugging value.\n", argv[1]);
++			fprintf(stderr, "%s: bad debugging value.\n", argv[1]);
+ 			code = -1;
+ 			return;
+ 		}
+@@ -1248,7 +1248,7 @@ cd(int argc, char *argv[])
+ 	}
+ 	if (command("CWD %s", argv[1]) == ERROR && code == 500) {
+ 		if (verbose)
+-			printf("CWD command not recognized, trying XCWD\n");
++			fprintf(stderr, "CWD command not recognized, trying XCWD\n");
+ 		(void) command("XCWD %s", argv[1]);
+ 	}
+ }
+@@ -1546,7 +1546,7 @@ user(int argc, char *argv[])
+ 		aflag++;
+ 	}
+ 	if (n != COMPLETE) {
+-		fprintf(stdout, "Login failed.\n");
++		fprintf(stderr, "Login failed.\n");
+ 		return;
+ 	}
+ 	if (!aflag && argc == 4) {
+@@ -1567,7 +1567,7 @@ pwd(void)
+ 	 */
+ 	verbose = 1;
+ 	if (command("PWD") == ERROR && code == 500) {
+-		printf("PWD command not recognized, trying XPWD\n");
++		fprintf(stderr, "PWD command not recognized, trying XPWD\n");
+ 		(void) command("XPWD");
+ 	}
+ 	verbose = oldverbose;
+@@ -1587,7 +1587,7 @@ makedir(int argc, char *argv[])
+ 	}
+ 	if (command("MKD %s", argv[1]) == ERROR && code == 500) {
+ 		if (verbose)
+-			printf("MKD command not recognized, trying XMKD\n");
++			fprintf(stderr, "MKD command not recognized, trying XMKD\n");
+ 		(void) command("XMKD %s", argv[1]);
+ 	}
+ }
+@@ -1606,7 +1606,7 @@ removedir(int argc, char *argv[])
+ 	}
+ 	if (command("RMD %s", argv[1]) == ERROR && code == 500) {
+ 		if (verbose)
+-			printf("RMD command not recognized, trying XRMD\n");
++			fprintf(stderr, "RMD command not recognized, trying XRMD\n");
+ 		(void) command("XRMD %s", argv[1]);
+ 	}
+ }
+@@ -2212,7 +2212,7 @@ cdup(void)
+ {
+ 	if (command("CDUP") == ERROR && code == 500) {
+ 		if (verbose)
+-			printf("CDUP command not recognized, trying XCUP\n");
++			fprintf(stderr, "CDUP command not recognized, trying XCUP\n");
+ 		(void) command("XCUP");
+ 	}
+ }

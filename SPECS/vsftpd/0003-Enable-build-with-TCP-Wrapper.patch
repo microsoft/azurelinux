@@ -1,0 +1,25 @@
+From 1e0e2b13836d40f5a3f4cb20f2b3ea8204115b51 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 6 Sep 2016 13:42:09 +0200
+Subject: [PATCH 03/59] Enable build with TCP Wrapper
+
+---
+ builddefs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builddefs.h b/builddefs.h
+index 63cc62b..83de674 100644
+--- a/builddefs.h
++++ b/builddefs.h
+@@ -1,7 +1,7 @@
+ #ifndef VSF_BUILDDEFS_H
+ #define VSF_BUILDDEFS_H
+ 
+-#undef VSF_BUILD_TCPWRAPPERS
++#define VSF_BUILD_TCPWRAPPERS
+ #define VSF_BUILD_PAM
+ #define VSF_BUILD_SSL
+ 
+-- 
+2.14.4
+

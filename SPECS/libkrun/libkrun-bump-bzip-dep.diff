@@ -1,0 +1,13 @@
+diff --git a/src/vmm/Cargo.toml b/src/vmm/Cargo.toml
+index 35b6fdd..9f09774 100644
+--- a/src/vmm/Cargo.toml
++++ b/src/vmm/Cargo.toml
+@@ -43,7 +43,7 @@ bitfield = { version = "0.19.4", optional = true }
+ bitflags = { version = "2.10.0", optional = true }
+ 
+ [target.'cfg(target_arch = "x86_64")'.dependencies]
+-bzip2 = "0.5"
++bzip2 = "0.6"
+ cpuid = { path = "../cpuid" }
+ zstd = "0.13"
+ 

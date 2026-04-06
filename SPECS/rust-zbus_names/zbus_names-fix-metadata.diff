@@ -1,0 +1,24 @@
+--- zbus_names-4.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zbus_names-4.2.0/Cargo.toml	2025-02-14T19:08:42.161825+00:00
+@@ -41,11 +41,6 @@
+ path = "src/lib.rs"
+ bench = false
+ 
+-[[bench]]
+-name = "benchmarks"
+-path = "benches/benchmarks.rs"
+-harness = false
+-
+ [dependencies.serde]
+ version = "1.0.200"
+ features = ["derive"]
+@@ -61,9 +56,6 @@
+ features = ["enumflags2"]
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

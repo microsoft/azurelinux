@@ -1,0 +1,14 @@
+diff -up librdkafka-2.4.0/src/rdkafka_admin.c.orig librdkafka-2.4.0/src/rdkafka_admin.c
+--- librdkafka-2.4.0/src/rdkafka_admin.c.orig	2024-05-27 10:43:20.827496726 +0200
++++ librdkafka-2.4.0/src/rdkafka_admin.c	2024-05-27 10:44:45.149273519 +0200
+@@ -34,7 +34,9 @@
+ 
+ #include <stdarg.h>
+ 
+-
++#if WITH_SSL && OPENSSL_VERSION_NUMBER >= 0x10101000L
++#include <openssl/rand.h>
++#endif
+ 
+ /** @brief Descriptive strings for rko_u.admin_request.state */
+ static const char *rd_kafka_admin_state_desc[] = {

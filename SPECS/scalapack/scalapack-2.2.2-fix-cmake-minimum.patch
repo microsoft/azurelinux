@@ -1,0 +1,9 @@
+diff -up scalapack-2.2.2/scalapack-2.2.2/BLACS/INSTALL/CMakeLists.txt.fix-cmake-minimum scalapack-2.2.2/scalapack-2.2.2/BLACS/INSTALL/CMakeLists.txt
+--- scalapack-2.2.2/scalapack-2.2.2/BLACS/INSTALL/CMakeLists.txt.fix-cmake-minimum	2025-03-03 12:09:59.080839385 -0500
++++ scalapack-2.2.2/scalapack-2.2.2/BLACS/INSTALL/CMakeLists.txt	2025-03-03 12:10:08.099256072 -0500
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.9)
+ project(INSTALL C Fortran)
+ 
+ add_executable(xintface Fintface.f Cintface.c)

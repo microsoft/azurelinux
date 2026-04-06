@@ -1,0 +1,31 @@
+diff --git a/esmtp-wrapper b/esmtp-wrapper
+index 7871059..1f4dc74 100755
+--- a/esmtp-wrapper
++++ b/esmtp-wrapper
+@@ -16,6 +16,8 @@
+ #  along with this program; if not, write to the Free Software
+ #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ 
++ID=`id -un`
++[ "$HOME" ] || HOME=`getent passwd $ID | cut -d: -f6`
+ qdir="$HOME/.esmtp_queue"
+ deliver_lock="$qdir/.deliver_lock"
+ esmtp="/usr/bin/esmtp"
+@@ -47,7 +49,7 @@ queue_mail() { # ($@)
+ 	}
+ 	touch "$mdir/lock"
+ 	echo "$@" >"$mdir/cmd" || ret=1
+-	cat </dev/stdin >"$mdir/mail" || ret=1
++	cat >"$mdir/mail" || ret=1
+ 	[ $ret -eq 0 ] || {
+ 		echo "could not enqueue mail in dir $mdir" 2>&1
+ 		return 1
+@@ -117,7 +119,7 @@ check_programs	# possible program exit point
+ 
+ case "$ME" in
+ 	sendmail|esmtp)
+-		queue_mail "$@" || return 1
++		queue_mail "$@" || exit 1
+ 		deliver_queue "background" &
+ 	;;
+ 	deliver)

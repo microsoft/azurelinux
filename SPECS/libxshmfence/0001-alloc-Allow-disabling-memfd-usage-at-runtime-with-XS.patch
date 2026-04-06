@@ -1,0 +1,52 @@
+From 537d99a13cde24e96e747465b8129e4d2b988454 Mon Sep 17 00:00:00 2001
+From: Asahi Lina <lina@asahilina.net>
+Date: Tue, 22 Oct 2024 22:28:19 +0900
+Subject: [PATCH libxshmfence] alloc: Allow disabling memfd usage at runtime
+ with XSHMFENCE_NO_MEMFD=1
+
+For thin VMs used for compatibility reasons, it is desirable to directly
+proxy the X11 protocol between an application running in a VM and an X
+server running on the host. We can proxy futex wakeups with some watcher
+code, but we need the futex memory itself to be shared. This works when
+/dev/shm is mounted with virtiofs with DAX, but cannot work for memfds.
+
+Add a XSHMFENCE_NO_MEMFD environment variable that, when set, disables
+the memfd codepath and falls back to /dev/shm.
+
+Signed-off-by: Asahi Lina <lina@asahilina.net>
+---
+ src/xshmfence_alloc.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/src/xshmfence_alloc.c b/src/xshmfence_alloc.c
+index 932adb9886af..77f968c8870a 100644
+--- a/src/xshmfence_alloc.c
++++ b/src/xshmfence_alloc.c
+@@ -69,13 +69,22 @@ int
+ xshmfence_alloc_shm(void)
+ {
+ 	char	template[] = SHMDIR "/shmfd-XXXXXX";
+-	int	fd;
++	int	fd = -1;
+ #ifndef HAVE_MKOSTEMP
+ 	int	flags;
+ #endif
+ 
+ #if HAVE_MEMFD_CREATE
+-	fd = memfd_create("xshmfence", MFD_CLOEXEC|MFD_ALLOW_SEALING);
++	static int disable_memfd = -1;
++
++	if (disable_memfd == -1) {
++		const char *val = getenv("XSHMFENCE_NO_MEMFD");
++		disable_memfd = val ? !!atoi(val) : 0;
++	}
++
++	if (disable_memfd <= 0)
++		fd = memfd_create("xshmfence", MFD_CLOEXEC|MFD_ALLOW_SEALING);
++
+ 	if (fd < 0)
+ #endif
+ #ifdef SHM_ANON
+-- 
+2.47.0
+

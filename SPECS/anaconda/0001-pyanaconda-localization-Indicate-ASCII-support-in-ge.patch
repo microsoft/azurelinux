@@ -1,0 +1,139 @@
+From c6118f65fe3583e1c15c383a8a9c6f5c1989fb22 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 9 Oct 2025 16:51:15 -0700
+Subject: [PATCH] pyanaconda: localization: Indicate ASCII support in
+ get_keyboard_layouts
+
+It is useful to know whether a given keyboard layout supports
+ASCII input or not. Immediately, we want to use this in the
+webUI keyboard logic, but it may be useful elsewhere too in
+future, e.g. to warn the user if they use the Keyboard spoke
+to create a configuration with no layout capable of ASCII input.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ pyanaconda/localization.py                    | 11 +++++++++
+ .../common/structures/keyboard_layout.py      | 10 ++++++++
+ .../modules/localization/localization.py      |  2 ++
+ .../localization/test_module_localization.py  | 23 +++++++++++--------
+ 4 files changed, 36 insertions(+), 10 deletions(-)
+
+diff --git a/pyanaconda/localization.py b/pyanaconda/localization.py
+index 73415b2511..08a9343463 100644
+--- a/pyanaconda/localization.py
++++ b/pyanaconda/localization.py
+@@ -489,6 +489,17 @@ def get_common_keyboard_layouts():
+     return langtable.list_common_keyboards()
+ 
+ 
++def layout_supports_ascii(layout):
++    """Return a boolean indicating whether the xkb layout (given as
++    e.g. 'en(us)' or 'fr(oss)' or 'ru') can input ASCII characters.
++
++    :return: True for ASCII capable, False for not
++    :rtype: bool
++    :param str layout: layout descriptor string
++    """
++    return langtable.supports_ascii(layout)
++
++
+ def get_locale_timezones(locale):
+     """Function returning preferred timezones for the given locale.
+ 
+diff --git a/pyanaconda/modules/common/structures/keyboard_layout.py b/pyanaconda/modules/common/structures/keyboard_layout.py
+index b5aacc764b..007e975965 100644
+--- a/pyanaconda/modules/common/structures/keyboard_layout.py
++++ b/pyanaconda/modules/common/structures/keyboard_layout.py
+@@ -29,6 +29,7 @@ class KeyboardLayout(DBusData):
+     def __init__(self):
+         self._layout_id = ""
+         self._description = ""
++        self._supports_ascii = False
+         self._is_common = False
+         self._langs = []
+ 
+@@ -59,6 +60,15 @@ class KeyboardLayout(DBusData):
+     def is_common(self, value: bool):
+         self._is_common = value
+ 
++    @property
++    def supports_ascii(self) -> bool:
++        """Return whether the layout is capable of typing ASCII characters."""
++        return self._supports_ascii
++
++    @supports_ascii.setter
++    def supports_ascii(self, value: bool):
++        self._supports_ascii = value
++
+     @property
+     def langs(self) -> List[Str]:
+         """Return the list of associated languages."""
+diff --git a/pyanaconda/modules/localization/localization.py b/pyanaconda/modules/localization/localization.py
+index 346a55a1c0..4fb7333ed7 100644
+--- a/pyanaconda/modules/localization/localization.py
++++ b/pyanaconda/modules/localization/localization.py
+@@ -33,6 +33,7 @@ from pyanaconda.localization import (
+     get_language_id,
+     get_language_locales,
+     get_native_name,
++    layout_supports_ascii,
+ )
+ from pyanaconda.modules.common.base import KickstartService
+ from pyanaconda.modules.common.constants.services import LOCALIZATION
+@@ -218,6 +219,7 @@ class LocalizationService(KickstartService):
+                 layout.description = self.get_layout_variant_description(name, with_lang=True, xlated=True)
+                 layout.is_common = name.replace(" ", "") in common_langtable_keyboards and is_common_lang
+                 layout.langs = info.langs
++                layout.supports_ascii = layout_supports_ascii(name.replace(" ", ""))
+                 layouts.append(layout)
+ 
+         return layouts
+diff --git a/tests/unit_tests/pyanaconda_tests/modules/localization/test_module_localization.py b/tests/unit_tests/pyanaconda_tests/modules/localization/test_module_localization.py
+index 7f6449d3ea..7582df2401 100644
+--- a/tests/unit_tests/pyanaconda_tests/modules/localization/test_module_localization.py
++++ b/tests/unit_tests/pyanaconda_tests/modules/localization/test_module_localization.py
+@@ -228,28 +228,31 @@ class LocalizationInterfaceTestCase(unittest.TestCase):
+         normalized_layouts = KeyboardLayout.from_structure_list(layouts)
+ 
+         layouts_expectation = [
+-            ("ara (olpc)", "Arabic (OLPC)", "Arabic", False),
+-            ("cz", "Czech", "Czech", False),
+-            ("de (nodeadkeys)", "German (no dead keys)", "German", True),
+-            ("es", "Spanish", "Spanish; Castilian", True),
+-            ("fr (oss)", "French (alt.)", "French", True),
+-            ("gr", "Greek", "Greek, Modern (1453-); Greek", False),
+-            ("it", "Italian", "Italian", False),
+-            ("jp", "Japanese", "Japanese", True),
+-            ("us", "English (US)", "English", True),
++            ("ara (olpc)", "Arabic (OLPC)", "Arabic", False, True),
++            ("cz", "Czech", "Czech", False, True),
++            ("de (nodeadkeys)", "German (no dead keys)", "German", True, True),
++            ("es", "Spanish", "Spanish; Castilian", True, True),
++            ("fr (oss)", "French (alt.)", "French", True, True),
++            ("gr", "Greek", "Greek, Modern (1453-); Greek", False, False),
++            ("it", "Italian", "Italian", False, True),
++            ("jp", "Japanese", "Japanese", True, True),
++            ("us", "English (US)", "English", True, True),
++            ("ru (dos)", "Russian (DOS)", "Russian", False, False),
+         ]
+ 
+-        for layout_id, description, lang, is_common in layouts_expectation:
++        for layout_id, description, lang, is_common, supports_ascii in layouts_expectation:
+             layout = KeyboardLayout()
+             layout.layout_id = layout_id
+             layout.description = description
+             layout.is_common = is_common
++            layout.supports_ascii = supports_ascii
+             layout.langs = [lang]
+ 
+             gen = (normalized_layout for normalized_layout in normalized_layouts if layout.layout_id == normalized_layout.layout_id)
+             for normalized_layout in gen:
+                 assert layout.description == normalized_layout.description
+                 assert layout.is_common == normalized_layout.is_common
++                assert layout.supports_ascii == normalized_layout.supports_ascii
+                 assert layout.langs == normalized_layout.langs
+                 break
+             else:
+-- 
+2.51.0
+

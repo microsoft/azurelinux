@@ -1,0 +1,59 @@
+From 178f344c1bad06adc0fe187fb24da2b036cc3628 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:17 +0100
+Subject: [PATCH 25/59] FIPS: RSA: encapsulate limits
+
+Patch-name: 0091-FIPS-RSA-encapsulate.patch
+Patch-id: 91
+Patch-status: |
+    # 0091-FIPS-RSA-encapsulate.patch
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ providers/implementations/kem/rsa_kem.c           | 14 ++++++++++++++
+ test/recipes/30-test_evp_data/evppkey_rsa_kem.txt |  1 +
+ 2 files changed, 15 insertions(+)
+
+diff --git a/providers/implementations/kem/rsa_kem.c b/providers/implementations/kem/rsa_kem.c
+index 7494dcc010..5d6123e8cb 100644
+--- a/providers/implementations/kem/rsa_kem.c
++++ b/providers/implementations/kem/rsa_kem.c
+@@ -284,6 +284,13 @@ static int rsasve_generate(PROV_RSA_CTX *prsactx,
+     /* Step (1): nlen = Ceil(len(n)/8) */
+     nlen = RSA_size(prsactx->rsa);
+ 
++#ifdef FIPS_MODULE
++    if (nlen < OPENSSL_RSA_FIPS_MIN_MODULUS_BITS/8) {
++        ERR_raise(ERR_LIB_PROV, PROV_R_KEY_SIZE_TOO_SMALL);
++        return 0;
++    }
++#endif
++
+     if (out == NULL) {
+         if (nlen == 0) {
+             ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
+@@ -360,6 +367,13 @@ static int rsasve_recover(PROV_RSA_CTX *prsactx,
+     /* Step (1): get the byte length of n */
+     nlen = RSA_size(prsactx->rsa);
+ 
++#ifdef FIPS_MODULE
++    if (nlen < OPENSSL_RSA_FIPS_MIN_MODULUS_BITS/8) {
++        ERR_raise(ERR_LIB_PROV, PROV_R_KEY_SIZE_TOO_SMALL);
++        return 0;
++    }
++#endif
++
+     if (out == NULL) {
+         if (nlen == 0) {
+             ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
+diff --git a/test/recipes/30-test_evp_data/evppkey_rsa_kem.txt b/test/recipes/30-test_evp_data/evppkey_rsa_kem.txt
+index ecab1454e7..8e5edd35fe 100644
+--- a/test/recipes/30-test_evp_data/evppkey_rsa_kem.txt
++++ b/test/recipes/30-test_evp_data/evppkey_rsa_kem.txt
+@@ -108,3 +108,4 @@ Securitycheck = 1
+ Unapproved = 1
+ CtrlInit = key-check:0
+ Op = RSASVE
++Result = TEST_ENCAPSULATE_LEN_ERROR
+-- 
+2.51.0
+

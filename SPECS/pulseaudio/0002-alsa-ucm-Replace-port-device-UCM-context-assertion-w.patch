@@ -1,0 +1,64 @@
+From c38b8991161d7cd4ef80c1040629e90a8a3091d5 Mon Sep 17 00:00:00 2001
+From: Alper Nebi Yasak <alpernebiyasak@gmail.com>
+Date: Fri, 1 Dec 2023 13:28:05 +0300
+Subject: [PATCH 2/6] alsa-ucm: Replace port device UCM context assertion with
+ an error
+
+The pa_alsa_ucm_set_port() function is passed both a mapping context and
+a device port, and both of these refer to their respective UCM device.
+While switching over to having one port per mapping per UCM device, I
+expected both of these to be the same device struct, so added an assert
+checking so.
+
+This assertion gets triggered when we have multiple UCM verbs declaring
+the same UCM device name. The root cause here is that the ports' UCM
+device references are set once while creating the ports for the card, so
+they happen to be those of a specific verb and may not match those from
+a different UCM verb's profiles' mappings.
+
+Solving the root cause necessitates a larger refactor. What we actually
+assume here is that name of the UCM device is same for both the port and
+the UCM context, which ends up always true in practice. For now, replace
+the assert with a check and error.
+
+Signed-off-by: Alper Nebi Yasak <alpernebiyasak@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/802>
+---
+ src/modules/alsa/alsa-ucm.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/modules/alsa/alsa-ucm.c b/src/modules/alsa/alsa-ucm.c
+index 7f5136249..018c01739 100644
+--- a/src/modules/alsa/alsa-ucm.c
++++ b/src/modules/alsa/alsa-ucm.c
+@@ -1581,6 +1581,7 @@ int pa_alsa_ucm_set_port(pa_alsa_ucm_mapping_context *context, pa_device_port *p
+     pa_alsa_ucm_config *ucm;
+     pa_alsa_ucm_device *dev;
+     pa_alsa_ucm_port_data *data;
++    const char *dev_name, *ucm_dev_name;
+ 
+     pa_assert(context && context->ucm);
+ 
+@@ -1588,8 +1589,17 @@ int pa_alsa_ucm_set_port(pa_alsa_ucm_mapping_context *context, pa_device_port *p
+     pa_assert(ucm->ucm_mgr);
+ 
+     data = PA_DEVICE_PORT_DATA(port);
+-    dev = context->ucm_device;
+-    pa_assert(dev == data->device);
++    dev = data->device;
++    pa_assert(dev);
++
++    if (context->ucm_device) {
++        dev_name = pa_proplist_gets(dev->proplist, PA_ALSA_PROP_UCM_NAME);
++        ucm_dev_name = pa_proplist_gets(context->ucm_device->proplist, PA_ALSA_PROP_UCM_NAME);
++        if (!pa_streq(dev_name, ucm_dev_name)) {
++            pa_log_error("Failed to set port %s with wrong UCM context: %s", dev_name, ucm_dev_name);
++            return -1;
++        }
++    }
+ 
+     return ucm_device_enable(ucm, dev);
+ }
+-- 
+2.52.0
+

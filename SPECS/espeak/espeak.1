@@ -1,0 +1,115 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ESPEAK 1 "July 25, 2007"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+espeak \- A multi-lingual software speech synthesizer.
+.SH SYNOPSIS
+.B espeak
+.RI [ options ]\ [ words ]
+.SH DESCRIPTION
+.B espeak
+is a software speech synthesizer for English, and some other languages.
+.SH OPTIONS
+.TP
+.BI \-f file
+Text file to speak.
+.TP
+.B \-\-stdin
+Read text input from stdin instead of a file
+.TP
+If neither \fB-f\fP nor \fB--stdin\fP, \fIwords\fP are spoken, or if none then text is spoken from stdin, each line separately.
+.TP
+.BI \-a integer
+Amplitude, 0 to 20, default is 10.
+.TP
+.BI \-g integer
+Word gap. Pause between words, units of 10 ms at the default speed.
+.TP
+.BI \-k integer
+Indicate capital letters with: 1=sound, 2=the word "capitals", higher values = a pitch increase (try -k20).
+.TP
+.BI \-l integer
+Line length. If not zero (which is the default), consider
+lines less than this length as and-of-clause.
+.TP
+.BI \-p integer
+Pitch adjustment, 0 to 99, default is 50.
+.TP
+.BI \-s integer
+Speed in words per minute, default is 160.
+.TP
+.BI \-v voicename
+Use voice file of this name from espeak-data/voices.
+.TP
+.BI \-w file
+Write output to this WAV file, rather than speaking it directly.
+.TP
+.B \-b
+Input text is 8-bit encoding.
+.TP
+.B \-m
+Indicates that the text contains SSML (Speech Synthesis Markup Language) tags or other XML tags. Those SSML tags which are supported are interpreted. Other tags, including HTML, are ignored, except that some HTML tags such as <hr> <h2> and <li> ensure a break in the speech.
+.TP
+.B \-q
+Quiet, don't produce any speech (may be useful with \fB-x\fP).
+.TP
+.B \-x
+Write phoneme mnemonics to stdout.
+.TP
+.B \-X
+Write phonemes mnemonics and translation trace to stdout.
+.TP
+.B \-z
+No final sentence pause at the end of the text.
+.TP
+.BI \-\-compile \fR[\fP\fB=\fPvoicename\fR]\fP
+Compile the pronunciation rules and dictionary in the current directory. The \fIvoicename\fP is optional and specifies which language to use.
+.TP
+.BI \-\-ipa \fR[\fP\fB=\fPipa\fR]\fP
+Write phonemes to stdout using International Phonetic Alphabet. If \fIipa\fP is 1 use ties, if 2 use ZWJ, if 3 separate with "\_".
+.TP
+.BI \-\-path= path
+Specifies the directory containing the espeak-data directory.
+.TP
+.B \-\-pho
+Write mbrola phoneme data (.pho) to stdout or to the file in \fB--phonout\fP.
+.TP
+.BI \-\-phonout= filename
+Write output from \fB-x\fP, \fB-X\fP commands and mbrola phoneme data to this file.
+.TP
+.BI \-\-punct \fR[\fP\fB=\fPcharacters\fR]\fP
+Speak the names of punctuation characters during speaking. If \fIcharacters\fP is omitted, all punctuation is spoken.
+.TP
+.BI \-\-split= minutes
+Starts a new WAV file every \fIminutes\fP. Used with \fB-w\fP.
+.TP
+.B \-\-stdout
+Write speech output to stdout.
+.TP
+.BI \-\-voices \fR[\fP\fB=\fPlanguage\fR]\fP
+Lists the available voices. If \fIlanguage\fP is present then only those voices which are suitable for that language are listed.
+.TP
+.BR \-h ", " \-\-help
+Show summary of options.
+.TP
+.B --version
+Show version information.
+.SH AUTHOR
+eSpeak was written by Jonathan Duddington <jonsd@jsd.clara.co.uk>. The webpage for this package can be found at http://espeak.sourceforge.net/.
+.PP
+This manual page was written by Luke Yelavich <themuso@ubuntu.com>, for the Ubuntu project (but may be used by others).
+Several updates by Jaroslav Škarvada <jskarvad@redhat.com>.

@@ -1,0 +1,27 @@
+From 44f59a1aa74c48515d8feba5a61b7ea3aaa592c4 Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Fri, 24 Jan 2025 09:44:58 +0100
+Subject: [PATCH] Fix build failure with GCC 15 and -std=c23
+
+The newest standard has more strict data type checks, function pointers
+in function prototypes have to declare data types of its arguments.
+---
+ filter/foomatic-rip/process.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/filter/foomatic-rip/process.h b/filter/foomatic-rip/process.h
+index f6e15f65c..54a42923a 100644
+--- a/filter/foomatic-rip/process.h
++++ b/filter/foomatic-rip/process.h
+@@ -18,7 +18,7 @@
+ #include <sys/wait.h>
+ 
+ 
+-pid_t start_process(const char *name, int (*proc_func)(), void *user_arg,
++pid_t start_process(const char *name, int (*proc_func)(FILE*, FILE*, void*), void *user_arg,
+ 		    FILE **fdin, FILE **fdout);
+ pid_t start_system_process(const char *name, const char *command, FILE **fdin,
+ 			   FILE **fdout);
+-- 
+2.48.1
+

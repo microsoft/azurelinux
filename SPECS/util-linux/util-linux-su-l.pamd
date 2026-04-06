@@ -1,0 +1,6 @@
+#%PAM-1.0
+auth		include		su
+account		include		su
+password	include		su
+session		optional	pam_keyinit.so force revoke
+session		include		su

@@ -1,0 +1,72 @@
+From 77b60432f85502270252ad997bc7f1086eca422c Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Tue, 11 Mar 2025 07:32:44 -0700
+Subject: [PATCH] rocm-llvm: work around new assert in array
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ clang/lib/Headers/CMakeLists.txt      |  1 +
+ clang/lib/Headers/cuda_wrappers/array | 39 +++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+ create mode 100644 clang/lib/Headers/cuda_wrappers/array
+
+diff --git a/clang/lib/Headers/CMakeLists.txt b/clang/lib/Headers/CMakeLists.txt
+index 66c3e5c8f617..937adc8a3f5a 100644
+--- a/clang/lib/Headers/CMakeLists.txt
++++ b/clang/lib/Headers/CMakeLists.txt
+@@ -288,6 +288,7 @@ set(files
+ 
+ set(cuda_wrapper_files
+   cuda_wrappers/algorithm
++  cuda_wrappers/array
+   cuda_wrappers/cmath
+   cuda_wrappers/complex
+   cuda_wrappers/new
+diff --git a/clang/lib/Headers/cuda_wrappers/array b/clang/lib/Headers/cuda_wrappers/array
+new file mode 100644
+index 000000000000..41c1263d8b3b
+--- /dev/null
++++ b/clang/lib/Headers/cuda_wrappers/array
+@@ -0,0 +1,39 @@
++/*===---- array - CUDA wrapper for <array> ------------------------------===
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ *
++ *===-----------------------------------------------------------------------===
++ */
++
++#ifndef __CLANG_CUDA_WRAPPERS_ARRAY
++#define __CLANG_CUDA_WRAPPERS_ARRAY
++
++#if _GLIBCXX_RELEASE >= 15
++// https://github.com/pytorch/pytorch/issues/145608
++#pragma push_macro("__glibcxx_requires_subscript")
++#define __glibcxx_requires_subscript(n) 
++#endif
++
++#include_next <array>
++
++#if _GLIBCXX_RELEASE >= 15
++#pragma pop_macro("__glibcxx_requires_subscript")
++#endif
++
++#endif // include guard
+-- 
+2.48.1
+

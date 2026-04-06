@@ -1,0 +1,63 @@
+From 23e9befe7e5747ab648e8558ccd76a5b229e452b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 9 Feb 2021 11:59:38 +0100
+Subject: [PATCH] Disable relative template test cases
+
+Relative templates are not supported since Rails 6.1:
+
+https://travis-ci.org/github/rails/rails-controller-testing/jobs/705868237
+
+Fixes #64
+---
+ test/controllers/template_assertions_test.rb | 8 ++++++--
+ test/integration/template_assertions_test.rb | 4 ++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/test/controllers/template_assertions_test.rb b/test/controllers/template_assertions_test.rb
+index d1a6fa3..1e18c91 100644
+--- a/test/controllers/template_assertions_test.rb
++++ b/test/controllers/template_assertions_test.rb
+@@ -13,6 +13,8 @@ def test_with_partial
+   end
+ 
+   def test_file_with_relative_path_success
++    skip "Deprecated in ActionPack 6.1+" if ActionPack.version >= Gem::Version.new('6.1')
++
+     get :render_file_relative_path
+     assert_template file: 'README.rdoc'
+   end
+@@ -179,8 +181,10 @@ def test_assert_template_reset_between_requests
+     get :render_nothing
+     assert_template layout: nil
+ 
+-    get :render_file_relative_path
+-    assert_template file: 'README.rdoc'
++    if ActionPack.version < Gem::Version.new('6.1')
++      get :render_file_relative_path
++      assert_template file: 'README.rdoc'
++    end
+ 
+     get :render_nothing
+     assert_template file: nil
+diff --git a/test/integration/template_assertions_test.rb b/test/integration/template_assertions_test.rb
+index 0924016..381687b 100644
+--- a/test/integration/template_assertions_test.rb
++++ b/test/integration/template_assertions_test.rb
+@@ -26,6 +26,8 @@ def test_layout_reset_between_requests
+   end
+ 
+   def test_file_reset_between_requests
++    skip "Deprecated in ActionPack 6.1+" if ActionPack.version >= Gem::Version.new('6.1')
++
+     get '/template_assertions/render_file_relative_path'
+     assert_template file: 'README.rdoc'
+ 
+@@ -64,6 +66,8 @@ def test_layout_reset_between_requests_when_opening_a_session
+   end
+ 
+   def test_file_reset_between_requests_when_opening_a_session
++    skip "Deprecated in ActionPack 6.1+" if ActionPack.version >= Gem::Version.new('6.1')
++
+     open_session do |session|
+       session.get '/template_assertions/render_file_relative_path'
+       session.assert_template file: 'README.rdoc'

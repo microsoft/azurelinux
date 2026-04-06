@@ -1,0 +1,35 @@
+diff -pruN paps-0.6.8.orig/src/paps.c paps-0.6.8/src/paps.c
+--- paps-0.6.8.orig/src/paps.c	2007-04-13 14:04:14.000000000 +0900
++++ paps-0.6.8/src/paps.c	2007-11-16 12:28:11.000000000 +0900
+@@ -723,9 +723,12 @@ split_text_into_paragraphs (PangoContext
+       pango_layout_set_alignment (para->layout,
+                                   page_layout->pango_dir == PANGO_DIRECTION_LTR
+                                       ? PANGO_ALIGN_LEFT : PANGO_ALIGN_RIGHT);
+-      pango_layout_set_wrap (para->layout, PANGO_WRAP_WORD_CHAR);
+-      
+-      pango_layout_set_width (para->layout, paint_width * PANGO_SCALE);
++      if (page_layout->do_wordwrap) {
++        pango_layout_set_wrap (para->layout, PANGO_WRAP_WORD_CHAR);
++        pango_layout_set_width (para->layout, paint_width * PANGO_SCALE);
++      } else {
++        pango_layout_set_width (para->layout, -1);
++      }
+       para->height = 0;
+       
+       result = g_list_prepend (result, para);
+@@ -754,9 +757,13 @@ split_text_into_paragraphs (PangoContext
+               pango_layout_set_alignment (para->layout,
+                                           page_layout->pango_dir == PANGO_DIRECTION_LTR
+                                           ? PANGO_ALIGN_LEFT : PANGO_ALIGN_RIGHT);
+-              pango_layout_set_wrap (para->layout, PANGO_WRAP_WORD_CHAR);
++              if (page_layout->do_wordwrap) {
++                pango_layout_set_wrap (para->layout, PANGO_WRAP_WORD_CHAR);
++                pango_layout_set_width (para->layout, paint_width * PANGO_SCALE);
++              } else {
++                pango_layout_set_width (para->layout, -1);
++              }
+ 
+-              pango_layout_set_width (para->layout, paint_width * PANGO_SCALE);
+               para->height = 0;
+ 
+               last_para = next;

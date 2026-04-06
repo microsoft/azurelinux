@@ -1,0 +1,54 @@
+--- a/misc/syntax/spec.syntax
++++ b/misc/syntax/spec.syntax
+@@ -5,25 +5,24 @@
+     keyword whole Build\{Aa\}rch: green
+     keyword whole Build\{Cc\}onflicts: green
+     keyword whole Build\{Pp\}re\{Rr\}eq: green
+-    keyword whole Build\{Rr\}oot: green
++    keyword whole Build\{Rr\}oot: blue
+     keyword whole Build\{Rr\}equires: green
+     keyword whole Conflicts: green
+-    keyword whole Copyright: white
++    keyword whole Copyright: blue
+     keyword whole Description: green
+-    keyword whole Distribution: green
+-    keyword whole Doc\{Dd\}ir: green
++    keyword whole Distribution: blue
++    keyword whole Doc\{Dd\}ir: blue
+     keyword whole Epoch: green
+-    keyword whole Enhances: green
+     keyword whole Exclude\{Aa\}rch: green
+     keyword whole Exclusive\{Aa\}rch: green
+     keyword whole Exclusive\{Oo\}\{Ss\}: green
+-    keyword whole Group: green
++    keyword whole Group: blue
+     keyword whole Icon: green
+     keyword whole License: green
+     keyword whole Name: green
+     keyword whole NoSource\[0123456789\]: green
+     keyword whole Obsoletes: green
+-    keyword whole Packager: green
++    keyword whole Packager: blue
+     keyword whole Patch\[0123456789\]: green
+     keyword whole Prefix: green
+     keyword whole Pre\{Rr\}eq: green
+@@ -37,8 +36,8 @@
+     keyword whole Source\[0123456789\]: green
+     keyword whole Suggests: green
+     keyword whole Summary: green
+-    keyword whole Supplements: green
+-    keyword whole Vendor: green
++    keyword whole VCS: green
++    keyword whole Vendor: blue
+     keyword whole Version: green
+     keyword whole U\{Rr\}\{Ll\}: green
+ 
+@@ -92,7 +91,7 @@
+     keyword whole PATCH\[0123456789\] cyan
+     keyword whole SOURCE\[0123456789\] cyan
+ 
+-context Group( ): green
++context Group( ): blue
+     keyword whole af yellow
+     keyword whole az yellow
+     keyword whole bg yellow

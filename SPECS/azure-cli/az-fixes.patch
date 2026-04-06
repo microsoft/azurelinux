@@ -1,0 +1,37 @@
+From 9441a490c15bd0f72bd62b33b33bd8edecfb6f71 Mon Sep 17 00:00:00 2001
+From: Major Hayden <major@redhat.com>
+Date: Thu, 27 Oct 2022 10:11:26 -0500
+Subject: [PATCH] Fix az executable
+
+Avoid using anything other than dnf/rpm for updates and correct a bug
+where files in the local directory could be imported automatically.
+
+Signed-off-by: Major Hayden <major@redhat.com>
+---
+ src/azure-cli/az | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/azure-cli/az b/src/azure-cli/az
+index 96ee4dc63..454a1476e 100644
+--- a/src/azure-cli/az
++++ b/src/azure-cli/az
+@@ -1,5 +1,6 @@
+ #!/usr/bin/env python
+ 
++import runpy
+ import sys
+ import os
+ 
+@@ -13,7 +14,6 @@ else:
+         os.environ.get('PYTHONPATH'),
+     ])
+ 
+-if os.environ.get('AZ_INSTALLER') is None:
+-    os.environ['AZ_INSTALLER'] = 'PIP'
++os.environ['AZ_INSTALLER'] = 'RPM'
+ 
+-os.execl(sys.executable, sys.executable, '-m', 'azure.cli', *sys.argv[1:])
++runpy.run_module('azure.cli')
+-- 
+2.37.3
+

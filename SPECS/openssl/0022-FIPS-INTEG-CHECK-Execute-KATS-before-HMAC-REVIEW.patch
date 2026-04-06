@@ -1,0 +1,49 @@
+From 2ec805ecc3c89c4db5dea64b2b1f9be756595347 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:15 +0100
+Subject: [PATCH 22/59] FIPS: INTEG-CHECK: Execute KATS before HMAC - REVIEW
+
+Patch-name: 0047-FIPS-early-KATS.patch
+Patch-id: 47
+Patch-status: |
+    # # Execute KATS before HMAC verification
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ providers/fips/self_test.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/providers/fips/self_test.c b/providers/fips/self_test.c
+index c89e91b587..98bf6ad203 100644
+--- a/providers/fips/self_test.c
++++ b/providers/fips/self_test.c
+@@ -489,6 +489,15 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+     if (ev == NULL)
+         goto end;
+ 
++    /*
++     * Run the KAT's before HMAC verification according to FIPS-140-3
++     * requirements
++     */
++    if (!SELF_TEST_kats(ev, st->libctx)) {
++        ERR_raise(ERR_LIB_PROV, PROV_R_SELF_TEST_KAT_FAILURE);
++        goto end;
++    }
++
+     if (st->module_checksum_data == NULL) {
+         module_checksum = fips_hmac_container;
+         checksum_len = sizeof(fips_hmac_container);
+@@ -527,11 +536,6 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+         }
+     }
+ 
+-    if (!SELF_TEST_kats(ev, st->libctx)) {
+-        ERR_raise(ERR_LIB_PROV, PROV_R_SELF_TEST_KAT_FAILURE);
+-        goto end;
+-    }
+-
+     /* Verify that the RNG has been restored properly */
+     rng = ossl_rand_get0_private_noncreating(st->libctx);
+     if (rng != NULL)
+-- 
+2.51.0
+

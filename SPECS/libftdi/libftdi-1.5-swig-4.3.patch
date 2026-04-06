@@ -1,0 +1,80 @@
+From 5169cfca22381c2bf72f9bae43b72a72c8698990 Mon Sep 17 00:00:00 2001
+From: William S Fulton <wsf@fultondesigns.co.uk>
+Date: Fri, 18 Oct 2024 09:38:20 +0200
+Subject: [PATCH] python: update for SWIG 4.3
+
+SWIG 4.3 comes with an API change to the SWIG_Python_AppendOutput()
+function, so switch to the recommended SWIG_AppendOutput() instead.
+Because the new function is a macro in fact also switch to the  {..}
+delimiters as the code needs to be preprocessed. The change is
+compatible with the previous SWIG releases 4.2 and 4.1 at least.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=2319133
+Related: https://github.com/swig/swig/pull/2907
+---
+ python/ftdi1.i | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/python/ftdi1.i b/python/ftdi1.i
+index 8b179f9..fac4d16 100644
+--- a/python/ftdi1.i
++++ b/python/ftdi1.i
+@@ -52,7 +52,7 @@ char * str2charp_size(PyObject* pyObj, int * size)
+ %enddef
+ %feature("autodoc", ftdi_usb_find_all_docstring) ftdi_usb_find_all;
+ %typemap(in,numinputs=0) SWIGTYPE** OUTPUT ($*ltype temp) %{ $1 = &temp; %}
+-%typemap(argout) SWIGTYPE** OUTPUT %{ $result = SWIG_Python_AppendOutput($result, SWIG_NewPointerObj((void*)*$1,$*descriptor,0)); %}
++%typemap(argout,noblock=1) SWIGTYPE** OUTPUT { $result = SWIG_AppendOutput($result, SWIG_NewPointerObj((void*)*$1,$*descriptor,0)); }
+ %apply SWIGTYPE** OUTPUT { struct ftdi_device_list **devlist };
+     int ftdi_usb_find_all(struct ftdi_context *ftdi, struct ftdi_device_list **devlist,
+                           int vendor, int product);
+@@ -92,12 +92,12 @@ char * str2charp_size(PyObject* pyObj, int * size)
+ %enddef
+ %feature("autodoc", ftdi_read_data_docstring) ftdi_read_data;
+ %typemap(in,numinputs=1) (unsigned char *buf, int size) %{ $2 = PyInt_AsLong($input);$1 = (unsigned char*)malloc($2*sizeof(char)); %}
+-%typemap(argout) (unsigned char *buf, int size) %{
++%typemap(argout,noblock=1) (unsigned char *buf, int size) {
+         if(result<0)
+                 $2=0;
+-        $result = SWIG_Python_AppendOutput($result, charp2str((char*)$1, $2));
++        $result = SWIG_AppendOutput($result, charp2str((char*)$1, $2));
+         free($1);
+-%}
++}
+     int ftdi_read_data(struct ftdi_context *ftdi, unsigned char *buf, int size);
+ %clear (unsigned char *buf, int size);
+ 
+@@ -119,12 +119,12 @@ char * str2charp_size(PyObject* pyObj, int * size)
+ %enddef
+ %feature("autodoc", ftdi_read_pins_docstring) ftdi_read_pins;
+ %typemap(in,numinputs=0) unsigned char *pins ($*ltype temp) %{ $1 = &temp; %}
+-%typemap(argout) (unsigned char *pins) %{ $result = SWIG_Python_AppendOutput($result, charp2str((char*)$1, 1)); %}
++%typemap(argout,noblock=1) (unsigned char *pins) { $result = SWIG_AppendOutput($result, charp2str((char*)$1, 1)); }
+     int ftdi_read_pins(struct ftdi_context *ftdi, unsigned char *pins);
+ %clear unsigned char *pins;
+ 
+ %typemap(in,numinputs=0) unsigned char *latency ($*ltype temp) %{ $1 = &temp; %}
+-%typemap(argout) (unsigned char *latency) %{ $result = SWIG_Python_AppendOutput($result, charp2str((char*)$1, 1)); %}
++%typemap(argout,noblock=1) (unsigned char *latency) { $result = SWIG_AppendOutput($result, charp2str((char*)$1, 1)); }
+     int ftdi_get_latency_timer(struct ftdi_context *ftdi, unsigned char *latency);
+ %clear unsigned char *latency;
+ 
+@@ -137,12 +137,12 @@ char * str2charp_size(PyObject* pyObj, int * size)
+ %clear int* value;
+ 
+ %typemap(in,numinputs=1) (unsigned char *buf, int size) %{ $2 = PyInt_AsLong($input);$1 = (unsigned char*)malloc($2*sizeof(char)); %}
+-%typemap(argout) (unsigned char *buf, int size) %{
++%typemap(argout,noblock=1) (unsigned char *buf, int size) {
+         if(result<0)
+                 $2=0;
+-        $result = SWIG_Python_AppendOutput($result, charp2str((char*)$1, $2));
++        $result = SWIG_AppendOutput($result, charp2str((char*)$1, $2));
+         free($1);
+-%}
++}
+     int ftdi_get_eeprom_buf(struct ftdi_context *ftdi, unsigned char * buf, int size);
+ %clear (unsigned char *buf, int size);
+ 
+-- 
+2.47.0
+

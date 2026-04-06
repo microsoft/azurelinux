@@ -1,0 +1,11 @@
+diff -up sblim-wbemcli-1.6.3/main.cpp.orig sblim-wbemcli-1.6.3/main.cpp
+--- sblim-wbemcli-1.6.3/main.cpp.orig	2022-05-02 10:36:09.283825148 +0200
++++ sblim-wbemcli-1.6.3/main.cpp	2022-05-02 10:36:33.440858294 +0200
+@@ -286,6 +286,7 @@ int main (int argc, char *argv[]) {
+            op==GetProperty ||
+            op==SetProperty ||
+            op==CallMethod ||
++           op==CallMethodX ||
+            op==ModifyInstance) && !xtraStr)
+          throw CmdException("Invalid command invocation 2");
+ 

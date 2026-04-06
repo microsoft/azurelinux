@@ -1,0 +1,11 @@
+--- a/configure.ac	2016-06-19 21:53:25.000000000 -0500
++++ b/configure.ac	2016-08-05 13:46:38.048086622 -0500
+@@ -872,7 +872,7 @@
+     AC_CHECK_HEADERS([openssl/evp.h])
+     saved_LIBS=$LIBS
+     case "$host_os" in
+-      *mingw* | *cygwin* | *msys*)
++      *cygwin* | *msys*)
+         case "$host_cpu" in
+           x86_64)
+             AC_CHECK_LIB(eay64,OPENSSL_config)

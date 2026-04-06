@@ -1,0 +1,41 @@
+From 7dada62a77e061c752123e672e844386ff3b01ea Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Wed, 10 Apr 2013 12:32:44 -0400
+Subject: [PATCH] Use RPM compiler options
+
+---
+ m4/cares-compilers.m4 | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
+
+diff --git a/m4/cares-compilers.m4 b/m4/cares-compilers.m4
+index 7ee8e0dbe741c1a64149a0d20b826f507b3ec620..d7708230fb5628ae80fbf1052da0d2c78ebbc160 100644
+--- a/m4/cares-compilers.m4
++++ b/m4/cares-compilers.m4
+@@ -143,19 +143,12 @@ AC_DEFUN([CARES_CHECK_COMPILER_GNU_C], [
+     gccvhi=`echo $gccver | cut -d . -f1`
+     gccvlo=`echo $gccver | cut -d . -f2`
+     compiler_num=`(expr $gccvhi "*" 100 + $gccvlo) 2>/dev/null`
+-    flags_dbg_all="-g -g0 -g1 -g2 -g3"
+-    flags_dbg_all="$flags_dbg_all -ggdb"
+-    flags_dbg_all="$flags_dbg_all -gstabs"
+-    flags_dbg_all="$flags_dbg_all -gstabs+"
+-    flags_dbg_all="$flags_dbg_all -gcoff"
+-    flags_dbg_all="$flags_dbg_all -gxcoff"
+-    flags_dbg_all="$flags_dbg_all -gdwarf-2"
+-    flags_dbg_all="$flags_dbg_all -gvms"
+-    flags_dbg_yes="-g"
+-    flags_dbg_off="-g0"
+-    flags_opt_all="-O -O0 -O1 -O2 -O3 -Os"
+-    flags_opt_yes="-O2"
+-    flags_opt_off="-O0"
++    flags_dbg_all=""
++    flags_dbg_yes=""
++    flags_dbg_off=""
++    flags_opt_all=""
++    flags_opt_yes=""
++    flags_opt_off=""
+     CURL_CHECK_DEF([_WIN32], [], [silent])
+   else
+     AC_MSG_RESULT([no])
+--
+1.8.1.4

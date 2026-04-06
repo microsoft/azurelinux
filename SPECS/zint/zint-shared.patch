@@ -1,0 +1,14 @@
+diff -r c65c3e1348ca backend_qt/.CMakeLists.txt.swp
+Binary file backend_qt/.CMakeLists.txt.swp has changed
+diff -r c65c3e1348ca backend_qt/CMakeLists.txt
+--- a/backend_qt/CMakeLists.txt	Sat Aug 14 17:34:15 2021 +0200
++++ b/backend_qt/CMakeLists.txt	Sat Aug 14 17:35:27 2021 +0200
+@@ -12,7 +12,7 @@
+     qt5_wrap_cpp(QZint_SRCS qzint.h)
+ endif()
+ 
+-add_library(${PROJECT_NAME} STATIC ${QZint_SRCS})
++add_library(${PROJECT_NAME} SHARED ${QZint_SRCS})
+ 
+ set_target_properties(${PROJECT_NAME} PROPERTIES  SOVERSION "${ZINT_VERSION_MAJOR}.${ZINT_VERSION_MINOR}"
+                                         VERSION ${ZINT_VERSION})

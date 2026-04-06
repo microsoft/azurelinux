@@ -1,0 +1,28 @@
+# Skip some unsupported filesystems
+# This list of the filesystems can be found on
+# https://www.kernel.org/doc/Documentation/ABI/testing/ima_policy
+# PROC_SUPER_MAGIC
+dont_appraise fsmagic=0x9fa0
+# SYSFS_MAGIC
+dont_appraise fsmagic=0x62656572
+# DEBUGFS_MAGIC
+dont_appraise fsmagic=0x64626720
+# TMPFS_MAGIC
+dont_appraise fsmagic=0x01021994
+# RAMFS_MAGIC
+dont_appraise fsmagic=0x858458f6
+# DEVPTS_SUPER_MAGIC
+dont_appraise fsmagic=0x1cd1
+# BINFMTFS_MAGIC
+dont_appraise fsmagic=0x42494e4d
+# SECURITYFS_MAGIC
+dont_appraise fsmagic=0x73636673
+# SELINUX_MAGIC
+dont_appraise fsmagic=0xf97cff8c
+# CGROUP_SUPER_MAGIC
+dont_appraise fsmagic=0x27e0eb
+# NSFS_MAGIC
+dont_appraise fsmagic=0x6e736673
+
+appraise func=MMAP_CHECK mask=MAY_EXEC appraise_type=imasig
+appraise func=BPRM_CHECK appraise_type=imasig

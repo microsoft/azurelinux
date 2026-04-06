@@ -1,0 +1,20 @@
+--- gnome-doc-utils-0.20.10/configure.py312	2012-03-27 03:23:17.000000000 +0900
++++ gnome-doc-utils-0.20.10/configure	2023-07-05 18:51:49.693933660 +0900
+@@ -3060,7 +3060,7 @@ else
+      else
+        am_py_prefix=$prefix
+      fi
+-     am_cv_python_pythondir=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(0,0,prefix='$am_py_prefix'))" 2>/dev/null ||
++     am_cv_python_pythondir=`$PYTHON -c "import sys; import sysconfig; sys.stdout.write(sysconfig.get_path('purelib', vars={'platbase': '$am_py_prefix', 'base': '$am_py_prefix'}))" 2>/dev/null ||
+      echo "$PYTHON_PREFIX/lib/python$PYTHON_VERSION/site-packages"`
+      case $am_cv_python_pythondir in
+      $am_py_prefix*)
+@@ -3098,7 +3098,7 @@ else
+      else
+        am_py_exec_prefix=$exec_prefix
+      fi
+-     am_cv_python_pyexecdir=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(1,0,prefix='$am_py_exec_prefix'))" 2>/dev/null ||
++     am_cv_python_pyexecdir=`$PYTHON -c "import sys; import sysconfig; sys.stdout.write(sysconfig.get_path('purelib', vars={'platbase': '$am_py_exec_prefix', 'base': '$am_py_exec_prefix'}))" 2>/dev/null ||
+      echo "$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/site-packages"`
+      case $am_cv_python_pyexecdir in
+      $am_py_exec_prefix*)

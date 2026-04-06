@@ -1,0 +1,67 @@
+From 03b4b94a0338d80d1f45697a5ea083a5e5c937db Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Thu, 12 Jun 2025 23:36:24 +0200
+Subject: [PATCH] Adjust path_to_url et al. to produce the same results on
+ Python 3.14+
+
+See https://github.com/python/cpython/issues/125974
+and https://github.com/pypa/pip/pull/13138#issuecomment-2567715303
+---
+ src/pip/_internal/models/link.py | 6 +++++-
+ src/pip/_internal/utils/urls.py  | 2 +-
+ tests/unit/test_urls.py          | 2 +-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/pip/_internal/models/link.py b/src/pip/_internal/models/link.py
+index f0560f6..38423d1 100644
+--- a/src/pip/_internal/models/link.py
++++ b/src/pip/_internal/models/link.py
+@@ -4,6 +4,7 @@ import logging
+ import os
+ import posixpath
+ import re
++import sys
+ import urllib.parse
+ from dataclasses import dataclass
+ from typing import (
+@@ -134,7 +135,10 @@ def _clean_file_url_path(part: str) -> str:
+     # should not be quoted. On Linux where drive letters do not
+     # exist, the colon should be quoted. We rely on urllib.request
+     # to do the right thing here.
+-    return urllib.request.pathname2url(urllib.request.url2pathname(part))
++    ret = urllib.request.pathname2url(urllib.request.url2pathname(part))
++    if sys.version_info >= (3, 14):
++        ret = ret.removeprefix("//")
++    return ret
+ 
+ 
+ # percent-encoded:                   /
+diff --git a/src/pip/_internal/utils/urls.py b/src/pip/_internal/utils/urls.py
+index 9f34f88..e951a5e 100644
+--- a/src/pip/_internal/utils/urls.py
++++ b/src/pip/_internal/utils/urls.py
+@@ -12,7 +12,7 @@ def path_to_url(path: str) -> str:
+     quoted path parts.
+     """
+     path = os.path.normpath(os.path.abspath(path))
+-    url = urllib.parse.urljoin("file:", urllib.request.pathname2url(path))
++    url = urllib.parse.urljoin("file://", urllib.request.pathname2url(path))
+     return url
+ 
+ 
+diff --git a/tests/unit/test_urls.py b/tests/unit/test_urls.py
+index 0c14525..2a56e45 100644
+--- a/tests/unit/test_urls.py
++++ b/tests/unit/test_urls.py
+@@ -11,7 +11,7 @@ from pip._internal.utils.urls import path_to_url, url_to_path
+ def test_path_to_url_unix() -> None:
+     assert path_to_url("/tmp/file") == "file:///tmp/file"
+     path = os.path.join(os.getcwd(), "file")
+-    assert path_to_url("file") == "file://" + urllib.request.pathname2url(path)
++    assert path_to_url("file") == "file://" + path
+ 
+ 
+ @pytest.mark.skipif("sys.platform != 'win32'")
+-- 
+2.49.0
+

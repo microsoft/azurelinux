@@ -1,0 +1,70 @@
+Submitted upstream: <https://sourceforge.net/p/sblim/bugs/2767/>
+
+diff -ruN sblim-sfcc-2.2.8.orig/backend/cimxml/cimXmlParser.h sblim-sfcc-2.2.8/backend/cimxml/cimXmlParser.h
+--- sblim-sfcc-2.2.8.orig/backend/cimxml/cimXmlParser.h	2014-11-26 17:26:46.000000000 +0100
++++ sblim-sfcc-2.2.8/backend/cimxml/cimXmlParser.h	2023-01-18 11:29:06.707034147 +0100
+@@ -588,6 +588,7 @@
+ void* parser_calloc(ParserHeap *ph, size_t num, size_t sz);
+ void* parser_realloc(ParserHeap *ph, void *p, size_t sz);
+ void* parser_strdup(ParserHeap *ph, const char *s);
++int startParsing(ParserControl *parm);
+ 
+ extern ResponseHdr scanCimXmlResponse(const char *xmlData, CMPIObjectPath *cop);
+ extern void freeCimXmlResponse(ResponseHdr * hdr);
+diff -ruN sblim-sfcc-2.2.8.orig/backend/cimxml/grammar.c sblim-sfcc-2.2.8/backend/cimxml/grammar.c
+--- sblim-sfcc-2.2.8.orig/backend/cimxml/grammar.c	2014-11-26 17:26:46.000000000 +0100
++++ sblim-sfcc-2.2.8/backend/cimxml/grammar.c	2023-01-18 11:28:53.914945664 +0100
+@@ -27,6 +27,7 @@
+ static int ct = 0;
+ static int dontLex = 0;
+ 
++extern CMPIType guessType(char *val);
+ 
+ static void parseError(char* tokExp, int tokFound, ParserControl *parm)
+ {
+@@ -48,10 +49,11 @@
+ }
+ 
+ 
+-void startParsing(ParserControl *parm)
++int startParsing(ParserControl *parm)
+ {
+     parseUnion stateUnion;
+     start(parm, &stateUnion);
++    return 0;
+ }
+ 
+ static void start(ParserControl *parm, parseUnion *stateUnion)
+diff -ruN sblim-sfcc-2.2.8.orig/backend/cimxml/parserUtil.h sblim-sfcc-2.2.8/backend/cimxml/parserUtil.h
+--- sblim-sfcc-2.2.8.orig/backend/cimxml/parserUtil.h	2014-11-26 17:26:46.000000000 +0100
++++ sblim-sfcc-2.2.8/backend/cimxml/parserUtil.h	2023-01-17 10:44:29.215845637 +0100
+@@ -31,6 +31,7 @@
+ void setInstProperties(CMPIInstance *ci, XtokProperties *ps);
+ void setInstQualifiers(CMPIInstance *ci, XtokQualifiers *qs);
+ void setClassProperties(CMPIConstClass *cls, XtokProperties *ps);
++void setClassMethods(CMPIConstClass *cls, XtokMethods *ms);
+ void setClassQualifiers(CMPIConstClass *cls, XtokQualifiers *qs);
+ void addProperty(ParserControl *parm, XtokProperties *ps, XtokProperty *p);
+ void addParamValue(ParserControl *parm, XtokParamValues *vs, XtokParamValue *v);
+diff -ruN sblim-sfcc-2.2.8.orig/TEST/v2test_ec.c sblim-sfcc-2.2.8/TEST/v2test_ec.c
+--- sblim-sfcc-2.2.8.orig/TEST/v2test_ec.c	2014-11-26 17:26:46.000000000 +0100
++++ sblim-sfcc-2.2.8/TEST/v2test_ec.c	2023-01-18 11:35:32.990725766 +0100
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include "cmcimacs.h"
++#include "show.h"
+ 
+ extern char *value2Chars(CMPIType type, CMPIValue * value);
+ /*
+diff -ruN sblim-sfcc-2.2.8.orig/TEST/v2test_ein.c sblim-sfcc-2.2.8/TEST/v2test_ein.c
+--- sblim-sfcc-2.2.8.orig/TEST/v2test_ein.c	2014-11-26 17:26:46.000000000 +0100
++++ sblim-sfcc-2.2.8/TEST/v2test_ein.c	2023-01-18 11:44:44.223586290 +0100
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include "cmcimacs.h"
++#include "show.h"
+ 
+ extern char *value2Chars(CMPIType type, CMPIValue * value);
+ void showProperty( CMPIData , char * );

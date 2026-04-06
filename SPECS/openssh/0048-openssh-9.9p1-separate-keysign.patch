@@ -1,0 +1,25 @@
+From b97b1040bc0918fe9be89cdb482d046270e92d9c Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 48/50] openssh-9.9p1-separate-keysign
+
+---
+ ssh_config.5 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ssh_config.5 b/ssh_config.5
+index a43b2a27..9d5da2a6 100644
+--- a/ssh_config.5
++++ b/ssh_config.5
+@@ -797,7 +797,7 @@ or
+ This option should be placed in the non-hostspecific section.
+ See
+ .Xr ssh-keysign 8
+-for more information.
++for more information. ssh-keysign should be installed explicitly.
+ .It Cm EscapeChar
+ Sets the escape character (default:
+ .Ql ~ ) .
+-- 
+2.49.0
+

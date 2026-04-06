@@ -1,0 +1,30 @@
+From 0eaa8db35c9e580f27ba0c90d11b173cb1d96687 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 10 Jul 2023 13:43:25 +0100
+Subject: [PATCH 2/8] pkg-config include dir should not have the 'yajl' suffix
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Apps use '#include <yajl/yajl.h>' for includes historically.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/yajl.pc.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/yajl.pc.cmake b/src/yajl.pc.cmake
+index 6eaca14..485ded9 100644
+--- a/src/yajl.pc.cmake
++++ b/src/yajl.pc.cmake
+@@ -1,6 +1,6 @@
+ prefix=${CMAKE_INSTALL_PREFIX}
+ libdir=${dollar}{prefix}/lib${LIB_SUFFIX}
+-includedir=${dollar}{prefix}/include/yajl
++includedir=${dollar}{prefix}/include
+ 
+ Name: Yet Another JSON Library
+ Description: A Portable JSON parsing and serialization library in ANSI C
+-- 
+2.41.0
+

@@ -1,0 +1,493 @@
+From d3f561def5d119ce51cc4842d26d046d70a2eedb Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 7 May 2024 16:05:30 +0200
+Subject: [PATCH] Upgrade to 3.72
+
+---
+ HACKERS           | 16 +++++++++++
+ Makefile.PL       |  2 +-
+ PPPort_pm.PL      |  4 +--
+ devel/devtools.pl | 14 ++++++----
+ devel/scanprov    | 11 +++++++-
+ parts/inc/SvPV    | 60 ++++++++++++++++++++++++++++++++++++++---
+ parts/inc/misc    | 68 ++++++++++++++++++++++++++++++-----------------
+ parts/inc/version | 57 +++++++++++++++++++++++++++++++++------
+ parts/ppptools.pl | 13 ++++++---
+ 9 files changed, 198 insertions(+), 47 deletions(-)
+
+diff --git a/HACKERS b/HACKERS
+index 98abad2..7b37b4d 100644
+--- a/HACKERS
++++ b/HACKERS
+@@ -220,6 +220,22 @@ really needed for the public at large to know about, you should use
+ instead.  To avoid name space conflicts, follow what's in L</Helper macros>,
+ below.
+ 
++=item __REDEFINE__
++
++If you add the line C<__REDEFINE__> to the C<=provides> section, you can use
++lines like this in the C<=implementation> section:
++
++  __REDEFINE__ macro    some definition
++
++to both redefine C<macro> and indicate that it is provided by F<ppport.h>.  This
++replaces these C<=implementation> section lines:
++
++  #undef macro
++  #ifndef macro
++  #  define macro    some definition
++  #endif
++
++
+ =item Helper macros
+ 
+ If you need to define a helper macro which is not part of C<Devel::PPPort> API
+diff --git a/Makefile.PL b/Makefile.PL
+index 63fb8c4..643a646 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -106,7 +106,7 @@ sub configure
+         },
+         repository => {
+           type => 'git',
+-          url  => 'git://github.com/Dual-Life/Devel-PPPort.git',
++          url  => 'https://github.com/Dual-Life/Devel-PPPort.git',
+           web  => 'https://github.com/Dual-Life/Devel-PPPort',
+         },
+       },
+diff --git a/PPPort_pm.PL b/PPPort_pm.PL
+index 00fd926..77df89f 100644
+--- a/PPPort_pm.PL
++++ b/PPPort_pm.PL
+@@ -124,7 +124,7 @@ my @todo_list = reverse sort keys %todo;
+ # directories are empty (which should only happen during regeneration of the
+ # base and todo files).).  Actually the final element is for blead (at the
+ # time things were regenerated), which is 1 beyond the max version supported.
+-my $INT_MAX_PERL = (@todo_list) ? $todo_list[0] - 1 : '5034000'; # used for __MAX_PERL__
++my $INT_MAX_PERL = (@todo_list) ? $todo_list[0] - 1 : '5038000'; # used for __MAX_PERL__
+ my $MAX_PERL = format_version($INT_MAX_PERL);
+ my $INT_MIN_PERL = (@todo_list) ? $todo_list[-1] : 5003007;
+ my $MIN_PERL = format_version($INT_MIN_PERL);
+@@ -756,7 +756,7 @@ package Devel::PPPort;
+ use strict;
+ use vars qw($VERSION $data);
+ 
+-$VERSION = '3.71';
++$VERSION = '3.72';
+ 
+ sub _init_data
+ {
+diff --git a/devel/devtools.pl b/devel/devtools.pl
+index cdf8440..afbdd9f 100644
+--- a/devel/devtools.pl
++++ b/devel/devtools.pl
+@@ -148,6 +148,14 @@ sub eta
+   return sprintf "%02d:%02d:%02d", $h, $m, $s;
+ }
+ 
++# Devel releases are odd numbered ones 5.6 and above, but use every
++# release for below 5.6
++sub is_devel_release ($) {
++    my (undef, $major, $minor) = parse_version(shift);
++    return $major >= 6 && $major % 2 != 0;
++}
++
++
+ sub get_and_sort_perls($)
+ {
+     my $opt = shift;
+@@ -180,12 +188,8 @@ sub get_and_sort_perls($)
+         $version = format_version($version);
+ 
+         if ($skip_devels) {
+-            my ($super, $major, $minor) = parse_version($version);
+-
+             # If skipping development releases, we still use blead (0th entry).
+-            # Devel releases are odd numbered ones 5.6 and above, but use every
+-            # release for below 5.6
+-            if ($i != 0 && $major >= 6 && $major % 2 != 0) {
++            if ($i != 0 && is_devel_release($version)) {
+                 splice @perls, $i, 1;
+                 last if $i >= @perls;
+                 redo;
+diff --git a/devel/scanprov b/devel/scanprov
+index 4d42065..7de59ca 100755
+--- a/devel/scanprov
++++ b/devel/scanprov
+@@ -62,7 +62,10 @@ our %opt = (
+  'debug-start' => "",
+ );
+ 
+-GetOptions(\%opt, qw( install=s mode=s blead=s debug=i debug-start=s)) or die;
++GetOptions(\%opt, qw( install=s mode=s
++                      blead=s debug=i
++                      debug-start=s
++                      skip-devels)) or die;
+ 
+ my $clean = $opt{mode} eq 'clean';
+ my $write = $clean || $opt{mode} eq 'write';
+@@ -166,6 +169,12 @@ if ($write) {
+ 
+     # Only a few files will have exceptions that apply to them.  Rewrite each
+     foreach my $version (keys %add_by_version) {
++        if (is_devel_release($version)) {
++            my ($super, $major, $minor) = parse_version($version);
++            $major++;   # Go to next highest version that isn't a devel
++            $version = "$super.$major.0";
++        }
++
+         my $file = "$todo_dir/" . int_parse_version($version);
+         print "-- Adding known exceptions to $file --\n";
+         open my $fh, "+<", $file or die "$file: $!\n";
+diff --git a/parts/inc/SvPV b/parts/inc/SvPV
+index 1d54c0f..e088ea8 100644
+--- a/parts/inc/SvPV
++++ b/parts/inc/SvPV
+@@ -14,6 +14,7 @@
+ __UNDEFINED__
+ SvPVbyte
+ sv_2pvbyte
++sv_2pv
+ sv_2pv_flags
+ sv_pvn_force_flags
+ 
+@@ -82,14 +83,50 @@ __UNDEFINED__  SV_SMAGIC                0
+ __UNDEFINED__  SV_HAS_TRAILING_NUL      0
+ __UNDEFINED__  SV_COW_SHARED_HASH_KEYS  0
+ 
++#if { VERSION < 5.7.2 }
++#
++/* Fix sv_2pv for Perl < 5.7.2 - view https://github.com/Dual-Life/Devel-PPPort/issues/231 */
++
++# ifdef sv_2pv
++#  undef sv_2pv
++# endif
++
++# if defined(PERL_USE_GCC_BRACE_GROUPS)
++  __UNDEFINED__ sv_2pv(sv, lp) ({ SV *_sv_2pv = (sv); STRLEN sv_2pv_dummy_; STRLEN *_lp_2pv = (lp); _lp_2pv = _lp_2pv ? : &sv_2pv_dummy_; SvPOKp(_sv_2pv) ? ((*(_lp_2pv) = SvCUR(_sv_2pv)), SvPVX(_sv_2pv)) : Perl_sv_2pv(aTHX_ _sv_2pv, (_lp_2pv)); })
++# else
++  __UNDEFINED__ sv_2pv(sv, lp) (SvPOKp(sv) ? ((*((lp) ? (lp) : &PL_na) = SvCUR(sv)), SvPVX(sv)) : Perl_sv_2pv(aTHX_ (sv), (lp)))
++# endif
++
++#endif
++
++#if { VERSION < 5.7.2 }
++
++/* Define sv_2pv_flags for Perl < 5.7.2 which does not have it at all */
++
+ #if defined(PERL_USE_GCC_BRACE_GROUPS)
+-  __UNDEFINED__ sv_2pv_flags(sv, lp, flags) ({ SV *_sv = (sv); const I32 _flags = (flags); STRLEN *_lp = lp; _lp = _lp ? : &PL_na; (!(_flags & SV_GMAGIC) && SvGMAGICAL(_sv)) ? ({ char *_pv; SvGMAGICAL_off(_sv); _pv = sv_2pv(_sv, _lp); SvGMAGICAL_on(_sv); _pv; }) : sv_2pv(_sv, _lp); })
+-  __UNDEFINED__ sv_pvn_force_flags(sv, lp, flags) ({ SV *_sv = (sv); const I32 _flags = (flags); STRLEN *_lp = lp; _lp = _lp ? : &PL_na; (!(_flags & SV_GMAGIC) && SvGMAGICAL(_sv)) ? ({ char *_pv; SvGMAGICAL_off(_sv); _pv = sv_pvn_force(_sv, _lp); SvGMAGICAL_on(_sv); _pv; }) : sv_pvn_force(_sv, _lp); })
++  __UNDEFINED__ sv_2pv_flags(sv, lp, flags) ({ SV *_sv = (sv); STRLEN sv_2pv_dummy_; const I32 _flags = (flags); STRLEN *_lp = lp; _lp = _lp ? : &sv_2pv_dummy_; (!(_flags & SV_GMAGIC) && SvGMAGICAL(_sv)) ? ({ char *_pv; SvGMAGICAL_off(_sv); _pv = sv_2pv(_sv, _lp); SvGMAGICAL_on(_sv); _pv; }) : sv_2pv(_sv, _lp); })
++  __UNDEFINED__ sv_pvn_force_flags(sv, lp, flags) ({ SV *_sv = (sv); STRLEN sv_2pv_dummy_; const I32 _flags = (flags); STRLEN *_lp = lp; _lp = _lp ? : &sv_2pv_dummy_; (!(_flags & SV_GMAGIC) && SvGMAGICAL(_sv)) ? ({ char *_pv; SvGMAGICAL_off(_sv); _pv = sv_pvn_force(_sv, _lp); SvGMAGICAL_on(_sv); _pv; }) : sv_pvn_force(_sv, _lp); })
+ #else
+   __UNDEFINED__ sv_2pv_flags(sv, lp, flags) ((PL_Sv = (sv)), (!((flags) & SV_GMAGIC) && SvGMAGICAL(PL_Sv)) ? (SvGMAGICAL_off(PL_Sv), (PL_Xpv = (XPV *)sv_2pv(PL_Sv, (lp) ? (lp) : &PL_na)), SvGMAGICAL_on(PL_Sv), (char *)PL_Xpv) : sv_2pv(PL_Sv, (lp) ? (lp) : &PL_na))
+   __UNDEFINED__ sv_pvn_force_flags(sv, lp, flags) ((PL_Sv = (sv)), (!((flags) & SV_GMAGIC) && SvGMAGICAL(PL_Sv)) ? (SvGMAGICAL_off(PL_Sv), (PL_Xpv = (XPV *)sv_pvn_force(PL_Sv, (lp) ? (lp) : &PL_na)), SvGMAGICAL_on(PL_Sv), (char *)PL_Xpv) : sv_pvn_force(PL_Sv, (lp) ? (lp) : &PL_na))
+ #endif
+ 
++#elif { VERSION < 5.17.2 }
++
++/* Fix sv_2pv_flags for Perl < 5.17.2 */
++
++# ifdef sv_2pv_flags
++#  undef sv_2pv_flags
++# endif
++
++# if defined(PERL_USE_GCC_BRACE_GROUPS)
++  __UNDEFINED__ sv_2pv_flags(sv, lp, flags) ({ SV *_sv_2pv = (sv); STRLEN sv_2pv_dummy_; const I32 _flags_2pv = (flags); STRLEN *_lp_2pv = (lp); _lp_2pv = _lp_2pv ? : &sv_2pv_dummy_; ((!(_flags_2pv & SV_GMAGIC) || !SvGMAGICAL(_sv_2pv)) && SvPOKp(_sv_2pv)) ? ((*(_lp_2pv) = SvCUR(_sv_2pv)), SvPVX(_sv_2pv)) : Perl_sv_2pv_flags(aTHX_ _sv_2pv, (_lp_2pv), (_flags_2pv)); })
++# else
++  __UNDEFINED__ sv_2pv_flags(sv, lp, flags) (((!((flags) & SV_GMAGIC) || !SvGMAGICAL(sv)) && SvPOKp(sv)) ? ((*((lp) ? (lp) : &PL_na) = SvCUR(sv)), SvPVX(sv)) : Perl_sv_2pv_flags(aTHX_ (sv), (lp), (flags)))
++# endif
++
++#endif
++
+ #if { VERSION < 5.8.8 } || ( { VERSION >= 5.9.0 } && { VERSION < 5.9.3 } )
+ # define D_PPP_SVPV_NOLEN_LP_ARG &PL_na
+ #else
+@@ -433,7 +470,20 @@ SvPVCLEAR(sv)
+                 SvPVCLEAR(sv);
+ 
+ 
+-=tests plan => 50
++SV *
++sv_2pv(sv)
++        SV *sv
++        PREINIT:
++                STRLEN len;
++                const char *str;
++        CODE:
++                str = sv_2pv(sv, &len);
++                RETVAL = newSVpvn(str, len);
++        OUTPUT:
++                RETVAL
++
++
++=tests plan => 53
+ 
+ my $mhx = "mhx";
+ 
+@@ -507,3 +557,7 @@ is($str, "x"x40);
+ is($s2, "x"x40);
+ ok($before > 41);
+ is($after, 41);
++
++is(&Devel::PPPort::sv_2pv(42), "42");
++is(&Devel::PPPort::sv_2pv(0.15), "0.15");
++is(&Devel::PPPort::sv_2pv("string"), "string");
+diff --git a/parts/inc/misc b/parts/inc/misc
+index 86d7fde..1a3c672 100644
+--- a/parts/inc/misc
++++ b/parts/inc/misc
+@@ -12,6 +12,7 @@
+ =provides
+ 
+ __UNDEFINED__
++__REDEFINE__
+ END_EXTERN_C
+ EXTERN_C
+ INT2PTR
+@@ -36,6 +37,9 @@ WIDEST_UTYPE
+ XSRETURN
+ NOT_REACHED
+ ASSUME
++Stack_off_t
++Stack_off_t_MAX
++PERL_STACK_OFFSET_DEFINED
+ 
+ =implementation
+ 
+@@ -229,8 +233,7 @@ __UNDEFINED__ SvRXOK(sv) (!!SvRX(sv))
+ __UNDEFINED__  NOOP          /*EMPTY*/(void)0
+ 
+ #if { VERSION < 5.6.1 } && { VERSION < 5.27.7 }
+-#undef dNOOP
+-__UNDEFINED__ dNOOP struct Perl___notused_struct
++__REDEFINE__ dNOOP struct Perl___notused_struct
+ #endif
+ 
+ #ifndef NVTYPE
+@@ -264,23 +267,26 @@ typedef NVTYPE NV;
+ #  endif
+ #endif
+ 
++#ifndef PERL_STACK_OFFSET_DEFINED
++  typedef I32 Stack_off_t;
++#  define Stack_off_t_MAX I32_MAX
++#  define PERL_STACK_OFFSET_DEFINED
++#endif
++
+ __UNDEFINED__  PTR2nat(p)      (PTRV)(p)
+ __UNDEFINED__  NUM2PTR(any,d)  (any)PTR2nat(d)
+ __UNDEFINED__  PTR2IV(p)       INT2PTR(IV,p)
+ __UNDEFINED__  PTR2UV(p)       INT2PTR(UV,p)
+ __UNDEFINED__  PTR2NV(p)       NUM2PTR(NV,p)
+ 
+-#undef START_EXTERN_C
+-#undef END_EXTERN_C
+-#undef EXTERN_C
+ #ifdef __cplusplus
+-#  define START_EXTERN_C extern "C" {
+-#  define END_EXTERN_C }
+-#  define EXTERN_C extern "C"
++__REDEFINE__ START_EXTERN_C extern "C" {
++__REDEFINE__ END_EXTERN_C }
++__REDEFINE__ EXTERN_C extern "C"
+ #else
+-#  define START_EXTERN_C
+-#  define END_EXTERN_C
+-#  define EXTERN_C extern
++__REDEFINE__ START_EXTERN_C
++__REDEFINE__ END_EXTERN_C
++__REDEFINE__ EXTERN_C extern
+ #endif
+ 
+ #if { VERSION < 5.004 } || defined(PERL_GCC_PEDANTIC)
+@@ -297,14 +303,12 @@ __UNDEF_NOT_PROVIDED__  PERL_GCC_BRACE_GROUPS_FORBIDDEN
+ #  endif
+ #endif
+ 
+-#undef STMT_START
+-#undef STMT_END
+ #if defined(VOIDFLAGS) && (VOIDFLAGS) && (defined(sun) || defined(__sun__)) && !defined(__GNUC__)
+-#    define STMT_START  if (1)
+-#    define STMT_END    else (void)0
++__REDEFINE__ STMT_START  if (1)
++__REDEFINE__ STMT_END    else (void)0
+ #else
+-#    define STMT_START  do
+-#    define STMT_END    while (0)
++__REDEFINE__ STMT_START  do
++__REDEFINE__ STMT_END    while (0)
+ #endif
+ 
+ __UNDEFINED__  boolSV(b)    ((b) ? &PL_sv_yes : &PL_sv_no)
+@@ -354,8 +358,7 @@ __UNDEFINED__  dAXMARK         I32 ax = POPMARK; \
+ __UNDEFINED__  XSprePUSH       (sp = PL_stack_base + ax - 1)
+ 
+ #if { VERSION < 5.005 }
+-#  undef XSRETURN
+-#  define XSRETURN(off)                                   \
++__REDEFINE__ XSRETURN(off)                                   \
+       STMT_START {                                        \
+           PL_stack_sp = PL_stack_base + ax + ((off) - 1); \
+           return;                                         \
+@@ -845,8 +848,8 @@ __UNDEFINED__ isIDFIRST_utf8_safe(s,e)  D_PPP_IS_GENERIC_UTF8_SAFE(s, e, IDFIRST
+ __UNDEFINED__ isLOWER_utf8_safe(s,e)    D_PPP_IS_GENERIC_UTF8_SAFE(s, e, LOWER)
+ __UNDEFINED__ isPRINT_utf8_safe(s,e)    D_PPP_IS_GENERIC_UTF8_SAFE(s, e, PRINT)
+ 
+-#  undef isPSXSPC_utf8_safe   /* Use the modern definition */
+-__UNDEFINED__ isPSXSPC_utf8_safe(s,e)   isSPACE_utf8_safe(s,e)
++/* Use the modern definition */
++__REDEFINE__ isPSXSPC_utf8_safe(s,e)   isSPACE_utf8_safe(s,e)
+ 
+ __UNDEFINED__ isPUNCT_utf8_safe(s,e)    D_PPP_IS_GENERIC_UTF8_SAFE(s, e, PUNCT)
+ __UNDEFINED__ isSPACE_utf8_safe(s,e)    D_PPP_IS_GENERIC_UTF8_SAFE(s, e, SPACE)
+@@ -918,8 +921,8 @@ __UNDEFINED__ isIDFIRST_LC_utf8_safe(s,e)  D_PPP_IS_GENERIC_LC_UTF8_SAFE(s, e, I
+ __UNDEFINED__ isLOWER_LC_utf8_safe(s,e)    D_PPP_IS_GENERIC_LC_UTF8_SAFE(s, e, LOWER)
+ __UNDEFINED__ isPRINT_LC_utf8_safe(s,e)    D_PPP_IS_GENERIC_LC_UTF8_SAFE(s, e, PRINT)
+ 
+-#  undef isPSXSPC_LC_utf8_safe   /* Use the modern definition */
+-__UNDEFINED__ isPSXSPC_LC_utf8_safe(s,e)   isSPACE_LC_utf8_safe(s,e)
++/* Use the modern definition */
++__REDEFINE__ isPSXSPC_LC_utf8_safe(s,e)   isSPACE_LC_utf8_safe(s,e)
+ 
+ __UNDEFINED__ isPUNCT_LC_utf8_safe(s,e)    D_PPP_IS_GENERIC_LC_UTF8_SAFE(s, e, PUNCT)
+ __UNDEFINED__ isSPACE_LC_utf8_safe(s,e)    D_PPP_IS_GENERIC_LC_UTF8_SAFE(s, e, SPACE)
+@@ -2586,7 +2589,21 @@ av_count(av)
+         OUTPUT:
+                 RETVAL
+ 
+-=tests plan => 26827
++STRLEN
++mark_size_ok()
++        CODE:
++                RETVAL = sizeof(*PL_markstack_ptr) == sizeof(Stack_off_t);
++        OUTPUT:
++                RETVAL
++
++UV
++mark_max()
++        CODE:
++                RETVAL = Stack_off_t_MAX;
++        OUTPUT:
++                RETVAL
++
++=tests plan => 26829
+ 
+ use vars qw($my_sv @my_av %my_hv);
+ 
+@@ -3033,3 +3050,6 @@ for $name (keys %case_changing) {
+ is(&Devel::PPPort::av_top_index([1,2,3]), 2);
+ is(&Devel::PPPort::av_tindex([1,2,3,4]), 3);
+ is(&Devel::PPPort::av_count([1,2,3,4]), 4);
++
++ok(&Devel::PPPort::mark_size_ok(), "check mark type size");
++ok(&Devel::PPPort::mark_max(), "got a mark max");
+diff --git a/parts/inc/version b/parts/inc/version
+index 1854665..7e1b956 100644
+--- a/parts/inc/version
++++ b/parts/inc/version
+@@ -26,7 +26,7 @@ PERL_BCDVERSION
+ 
+ =implementation
+ 
+-#define D_PPP_RELEASE_DATE 1647561600 /* 2022-03-18 */
++#define D_PPP_RELEASE_DATE 1693785600 /* 2023-09-04 */
+ 
+ #if ! defined(PERL_REVISION) && ! defined(PERL_VERSION_MAJOR)
+ #  if   !   defined(__PATCHLEVEL_H_INCLUDED__)                                  \
+@@ -137,19 +137,60 @@ PERL_BCDVERSION
+ /* N.B. These don't work if the patch number is 42 or 92, as those are what '*'
+  * is in ASCII and EBCDIC respectively */
+ __UNDEFINED__ PERL_VERSION_EQ(j,n,p)                                        \
+-              (((p) == '*') ? (   (j) == D_PPP_VERSION_MAJOR                \
+-                               && (n) == D_PPP_VERSION_MINOR)               \
++              (((p) == '*') ? (   (j) == D_PPP_MAJOR                        \
++                               && (n) == D_PPP_MINOR)                       \
+                             : (PERL_BCDVERSION == D_PPP_JNP_TO_BCD(j,n,p)))
+ __UNDEFINED__ PERL_VERSION_NE(j,n,p) (! PERL_VERSION_EQ(j,n,p))
+ 
+ __UNDEFINED__ PERL_VERSION_LT(j,n,p)      /* p=='*' means _LT(j,n,0) */     \
+-    (PERL_BCDVERSION < D_PPP_JNP_TO_BCD(                    (j),            \
++    (PERL_BCDVERSION < D_PPP_JNP_TO_BCD(                     (j),           \
+                                                              (n),           \
+                                          (((p) == '*') ? 0 : (p))))
+ __UNDEFINED__ PERL_VERSION_GE(j,n,p) (! PERL_VERSION_LT(j,n,p))
+ 
+-__UNDEFINED__ PERL_VERSION_LE(j,n,p)      /* p=='*' means _LT(j,n+1,0) */   \
+-    (PERL_BCDVERSION < D_PPP_JNP_TO_BCD(                          (j),      \
+-                                         (((p) == '*') ? ((n)+1) : (n)),    \
+-                                         (((p) == '*') ?   0     : (p))))
++__UNDEFINED__ PERL_VERSION_LE(j,n,p)      /* p=='*' means _LE(j,n,999) */   \
++    (PERL_BCDVERSION <= D_PPP_JNP_TO_BCD(                      (j),         \
++                                                               (n),         \
++                                         (((p) == '*') ? 999 : (p))))
+ __UNDEFINED__ PERL_VERSION_GT(j,n,p) (! PERL_VERSION_LE(j,n,p))
++
++=xsmisc
++
++/* PERL_VERSION_xx sanity checks */
++
++#if !PERL_VERSION_EQ(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_EQ(major, minor, patch) is false; expected true
++#endif
++#if !PERL_VERSION_EQ(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_EQ(major, minor, '*') is false; expected true
++#endif
++#if PERL_VERSION_NE(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_NE(major, minor, patch) is true; expected false
++#endif
++#if PERL_VERSION_NE(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_NE(major, minor, '*') is true; expected false
++#endif
++#if PERL_VERSION_LT(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_LT(major, minor, patch) is true; expected false
++#endif
++#if PERL_VERSION_LT(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_LT(major, minor, '*') is true; expected false
++#endif
++#if !PERL_VERSION_LE(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_LE(major, minor, patch) is false; expected true
++#endif
++#if !PERL_VERSION_LE(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_LE(major, minor, '*') is false; expected true
++#endif
++#if PERL_VERSION_GT(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_GT(major, minor, patch) is true; expected false
++#endif
++#if PERL_VERSION_GT(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_GT(major, minor, '*') is true; expected false
++#endif
++#if !PERL_VERSION_GE(D_PPP_MAJOR, D_PPP_MINOR, D_PPP_PATCH)
++#  error PERL_VERSION_GE(major, minor, patch) is false; expected true
++#endif
++#if !PERL_VERSION_GE(D_PPP_MAJOR, D_PPP_MINOR, '*')
++#  error PERL_VERSION_GE(major, minor, '*') is false; expected true
++#endif
+diff --git a/parts/ppptools.pl b/parts/ppptools.pl
+index f370487..40194c3 100644
+--- a/parts/ppptools.pl
++++ b/parts/ppptools.pl
+@@ -158,9 +158,16 @@ sub parse_partspec
+         @tmp or warn "no matches for regex $p in $file\n";
+         push @prov, do { my %h; grep !$h{$_}++, @tmp };
+       }
+-      elsif ($p eq '__UNDEFINED__') {
+-        my @tmp = $data{implementation} =~ /^\s*__UNDEFINED__[^\r\n\S]+(\w+)/gm;
+-        @tmp or warn "no __UNDEFINED__ macros in $file\n";
++      elsif ($p eq '__UNDEFINED__' || $p eq '__REDEFINE__') {
++
++        my @tmp = $data{implementation} =~ /^\s*$p[^\r\n\S]+(\w+)/gm;
++
++        if ( $p eq '__REDEFINE__' ) {
++          # relies on expand_undefined logic
++          $data{implementation} =~ s/^\s*__REDEFINE__[^\r\n\S]+(\w+)/#undef $1\n__UNDEFINED__ $1/gm;
++        }
++
++        @tmp or warn "no $p macros in $file\n";
+         push @prov, @tmp;
+       }
+       else {
+-- 
+2.45.0
+

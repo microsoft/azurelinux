@@ -1,0 +1,18 @@
+diff --git a/ewftools/ewfoutput.c b/ewftools/ewfoutput.c
+index 80ae16a..1d2c97f 100644
+--- a/ewftools/ewfoutput.c
++++ b/ewftools/ewfoutput.c
+@@ -197,9 +197,13 @@ void ewfoutput_version_detailed_fprint(
+ 	fprintf(
+ 	 stream,
+ 	 " (libcrypto %s)",
++#if defined ( OPENSSL_FULL_VERSION_STR )
++	 OPENSSL_FULL_VERSION_STR );
++#else
+ 	 SHLIB_VERSION_NUMBER );
+ #endif
+ #endif
++#endif
+ 
+ #if defined( HAVE_LIBODRAW ) || defined( HAVE_LOCAL_LIBODRAW )
+ 	fprintf(

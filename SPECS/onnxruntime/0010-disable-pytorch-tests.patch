@@ -1,0 +1,25 @@
+From 2fbec123065b5f66e9f14befb93841aa235d3d91 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:06:46 -0300
+Subject: [PATCH 10/20] disable-pytorch-tests
+
+---
+ cmake/onnxruntime_unittests.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/onnxruntime_unittests.cmake b/cmake/onnxruntime_unittests.cmake
+index 76f61693fa..3adcc9ae70 100644
+--- a/cmake/onnxruntime_unittests.cmake
++++ b/cmake/onnxruntime_unittests.cmake
+@@ -1221,7 +1221,7 @@ if (NOT onnxruntime_ENABLE_TRAINING_TORCH_INTEROP)
+     target_compile_options(onnx_test_runner_common PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+   endif()
+ 
+-  if (NOT onnxruntime_REDUCED_OPS_BUILD AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
++  if (FALSE AND NOT onnxruntime_REDUCED_OPS_BUILD AND NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+     add_test(NAME onnx_test_pytorch_converted
+       COMMAND onnx_test_runner ${onnx_SOURCE_DIR}/onnx/backend/test/data/pytorch-converted)
+     add_test(NAME onnx_test_pytorch_operator
+-- 
+2.47.1
+

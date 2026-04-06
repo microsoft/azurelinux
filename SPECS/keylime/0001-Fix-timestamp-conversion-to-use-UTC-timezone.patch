@@ -1,0 +1,40 @@
+From 7cf07986522fda7691d9135ad4f8d31d030e8b59 Mon Sep 17 00:00:00 2001
+From: Sergio Correia <scorreia@redhat.com>
+Date: Fri, 13 Feb 2026 04:46:20 -0500
+Subject: [PATCH 1/2] Fix timestamp conversion to use UTC timezone
+
+Ensure Unix timestamps are converted to UTC datetimes by passing
+tz=timezone.utc to datetime.fromtimestamp(). Previously, timestamps
+were converted using the local timezone, causing test failures when
+epoch (0) was incorrectly converted to 1969 instead of 1970.
+
+Signed-off-by: Sergio Correia <scorreia@redhat.com>
+---
+ keylime/models/base/types/timestamp.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/keylime/models/base/types/timestamp.py b/keylime/models/base/types/timestamp.py
+index 8f6782f..22c1fcb 100644
+--- a/keylime/models/base/types/timestamp.py
++++ b/keylime/models/base/types/timestamp.py
+@@ -36,7 +36,7 @@ class Timestamp(ModelType):
+ 
+         if not ts:
+             try:
+-                ts = datetime.fromtimestamp(float(value))
++                ts = datetime.fromtimestamp(float(value), tz=timezone.utc)
+             except ValueError:
+                 pass
+ 
+@@ -49,7 +49,7 @@ class Timestamp(ModelType):
+         return self._load_datetime(ts)
+ 
+     def _load_float(self, value: float) -> datetime:
+-        ts = datetime.fromtimestamp(value)
++        ts = datetime.fromtimestamp(value, tz=timezone.utc)
+         return self._load_datetime(ts)
+ 
+     def _load_int(self, value: int) -> datetime:
+-- 
+2.53.0
+

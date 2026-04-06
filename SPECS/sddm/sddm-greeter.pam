@@ -1,0 +1,17 @@
+#%PAM-1.0
+
+# Load environment from /etc/environment and ~/.pam_environment
+auth		required pam_env.so
+
+# Always let the greeter start without authentication
+auth		required pam_permit.so
+
+# No action required for account management
+account		required pam_permit.so
+
+# Can't change password
+password	required pam_deny.so
+
+# Setup session
+session		required pam_unix.so
+session		optional pam_systemd.so

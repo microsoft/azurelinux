@@ -1,0 +1,38 @@
+diff -rupN --no-dereference dbus-1.16.0/CMakeLists.txt dbus-1.16.0-new/CMakeLists.txt
+--- dbus-1.16.0/CMakeLists.txt	2024-12-16 13:21:54.000000000 +0100
++++ dbus-1.16.0-new/CMakeLists.txt	2024-12-18 09:10:16.270050698 +0100
+@@ -100,7 +100,8 @@ set(DBUS_LIBEXECDIR          ${CMAKE_INS
+ set(DBUS_DATADIR             ${CMAKE_INSTALL_FULL_DATADIR})
+ 
+ #enable building of shared library
+-set(BUILD_SHARED_LIBS ON)
++option(BUILD_SHARED_LIBS ON)
++add_definitions(-DDBUS_STATIC_BUILD)
+ 
+ set(INSTALL_TARGETS_DEFAULT_ARGS EXPORT DBus1Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+diff -rupN --no-dereference dbus-1.16.0/dbus/CMakeLists.txt dbus-1.16.0-new/dbus/CMakeLists.txt
+--- dbus-1.16.0/dbus/CMakeLists.txt	2024-12-16 13:21:54.000000000 +0100
++++ dbus-1.16.0-new/dbus/CMakeLists.txt	2024-12-18 09:10:16.271050702 +0100
+@@ -263,13 +263,20 @@ find_library(LIBRT rt)
+ find_library(LIBSOCKET socket)
+ 
+ ### Client library
++if(${BUILD_SHARED_LIBS})
+ add_library(dbus-1 SHARED
+     ${libdbus_SOURCES}
+     ${libdbus_HEADERS}
+ )
++else()
++add_library(dbus-1 STATIC
++    ${libdbus_SOURCES}
++    ${libdbus_HEADERS}
++)
++endif()
+ 
+ if(WIN32)
+-    if(DEFINED DBUS_LIBRARY_REVISION)
++    if(DEFINED DBUS_LIBRARY_REVISION AND BUILD_SHARED_LIBS)
+         set_target_properties(dbus-1 PROPERTIES SUFFIX "-${DBUS_LIBRARY_MAJOR}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+         add_custom_command(TARGET dbus-1 POST_BUILD
+             COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dbus-1>" "$<TARGET_FILE_DIR:dbus-1>/${CMAKE_SHARED_LIBRARY_PREFIX}dbus-1${CMAKE_SHARED_LIBRARY_SUFFIX}"

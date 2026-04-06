@@ -1,0 +1,10 @@
+#!/usr/bin/sh
+
+# run vim -R if available
+if test -f /usr/bin/vim
+then
+  exec /usr/bin/vim -R "$@"
+fi
+
+# run vi otherwise
+exec /usr/bin/vi -R "$@"

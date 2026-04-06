@@ -1,0 +1,15 @@
+--- fs2-0.4.3/Cargo.toml	1970-01-01T00:00:00+00:00
++++ fs2-0.4.3/Cargo.toml	2025-01-20T21:21:47.769474+00:00
+@@ -23,11 +23,9 @@
+ version = "0.3"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.30"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["handleapi", "processthreadsapi", "winerror", "fileapi", "winbase", "std"]
+ [badges.appveyor]
+ repository = "danburkert/fs2-rs"
+ 
+ [badges.travis-ci]
+ repository = "danburkert/fs2-rs"
++

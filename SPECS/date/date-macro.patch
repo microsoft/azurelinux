@@ -1,0 +1,12 @@
+--- date-052eebaf0086e6bbc5ead01c3f1a8f02496aa701/include/date/tz.h~	2022-12-13 10:47:32.379657849 +0000
++++ date-052eebaf0086e6bbc5ead01c3f1a8f02496aa701/include/date/tz.h	2022-12-13 10:51:18.045464254 +0000
+@@ -44,7 +44,8 @@
+ // Technically any OS may use the mapping process but currently only Windows does use it.
+ 
+ #ifndef USE_OS_TZDB
+-#  define USE_OS_TZDB 0
++// Changed to 1 for Fedora to match how libdate-tz.so is built.
++#  define USE_OS_TZDB 1
+ #endif
+ 
+ #ifndef HAS_REMOTE_API

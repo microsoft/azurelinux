@@ -1,0 +1,18 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 2 Feb 2022 19:59:29 +0100
+Subject: [PATCH] Use correct version instead of relying to git one
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/src/erlware_commons.app.src b/src/erlware_commons.app.src
+index 7709d81..846aab3 100644
+--- a/src/erlware_commons.app.src
++++ b/src/erlware_commons.app.src
+@@ -1,6 +1,6 @@
+ {application,erlware_commons,
+              [{description,"Additional standard library for Erlang"},
+-              {vsn,"git"},
++              {vsn,"1.8.1"},
+               {modules,[]},
+               {registered,[]},
+               {applications,[kernel,stdlib,cf]},

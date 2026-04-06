@@ -1,0 +1,33 @@
+diff -up firefox-134.0-build/firefox-134.0/gfx/skia/skia/modules/skcms/src/Transform_inl.h.aarch64-skia firefox-134.0-build/firefox-134.0/gfx/skia/skia/modules/skcms/src/Transform_inl.h
+--- firefox-134.0/gfx/skia/skia/modules/skcms/src/Transform_inl.h.aarch64-skia	2024-12-30 19:30:46.000000000 +0100
++++ firefox-134.0/gfx/skia/skia/modules/skcms/src/Transform_inl.h	2025-01-02 20:51:07.855087265 +0100
+@@ -151,7 +151,7 @@ SI U32 to_fixed(F f) {  return (U32)cast
+ 
+ 
+ SI F F_from_Half(U16 half) {
+-#if defined(USING_NEON_F16C)
++#if 0 // defined(USING_NEON_F16C)
+     return vcvt_f32_f16((float16x4_t)half);
+ #elif defined(USING_AVX512F)
+     return (F)_mm512_cvtph_ps((__m256i)half);
+@@ -178,7 +178,7 @@ SI F F_from_Half(U16 half) {
+     __attribute__((no_sanitize("unsigned-integer-overflow")))
+ #endif
+ SI U16 Half_from_F(F f) {
+-#if defined(USING_NEON_F16C)
++#if 0 //defined(USING_NEON_F16C)
+     return (U16)vcvt_f16_f32(f);
+ #elif defined(USING_AVX512F)
+     return (U16)_mm512_cvtps_ph((__m512 )f, _MM_FROUND_CUR_DIRECTION );
+diff -up firefox-134.0-build/firefox-134.0/gfx/skia/skia/src/opts/SkRasterPipeline_opts.h.aarch64-skia firefox-134.0-build/firefox-134.0/gfx/skia/skia/src/opts/SkRasterPipeline_opts.h
+--- firefox-134.0/gfx/skia/skia/src/opts/SkRasterPipeline_opts.h.aarch64-skia	2025-01-02 20:51:07.856087299 +0100
++++ firefox-134.0/gfx/skia/skia/src/opts/SkRasterPipeline_opts.h	2025-01-02 23:09:47.802283444 +0100
+@@ -1421,7 +1421,7 @@ SI F from_half(U16 h) {
+ }
+ 
+ SI U16 to_half(F f) {
+-#if defined(SKRP_CPU_NEON) && defined(SK_CPU_ARM64)
++#if 0 // defined(SKRP_CPU_NEON) && defined(SK_CPU_ARM64)
+     return (U16)vcvt_f16_f32(f);
+ 
+ #elif defined(SKRP_CPU_SKX)

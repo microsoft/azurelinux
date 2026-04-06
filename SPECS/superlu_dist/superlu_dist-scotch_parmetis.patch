@@ -1,0 +1,12 @@
+Index: superlu-dist/SRC/get_perm_c.c
+===================================================================
+--- SRC/get_perm_c_parmetis.orig.c	2019-02-08 17:30:10.000000000 +0100
++++ SRC/get_perm_c_parmetis.c	2019-10-25 21:14:01.111512796 +0200
+@@ -27,6 +27,7 @@
+ #include "superlu_dist_config.h"
+ #ifdef HAVE_PARMETIS
+ #include "parmetis.h"
++#include "scotch.h"
+ #endif
+ #include "superlu_ddefs.h"
+ 

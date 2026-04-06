@@ -1,0 +1,24 @@
+--- netkit-telnet-0.17/telnet/commands.c.hostalias	2011-07-11 08:07:22.000000000 -0400
++++ netkit-telnet-0.17/telnet/commands.c	2011-07-11 08:10:12.131039660 -0400
+@@ -2400,17 +2400,21 @@ 
+ 	    ahints.ai_family = PF_UNSPEC;
+ 	    ahints.ai_socktype = SOCK_STREAM;
+ 	    ahints.ai_flags = AI_PASSIVE;
+ 	    error = getaddrinfo(aliasp, "0", &ahints, &ares);
+ 	    if (error) {
++	        printf ("Couldn't get address for %s\n", aliasp);
+ 	        warn("%s: %s", aliasp, gai_strerror(error));
+ 	        close(net);
++		net = -1;
+ 	        continue;
+ 	    }
+ 	    if (bind(net, ares->ai_addr, ares->ai_addrlen) < 0) {
++	        printf ("Couldn't bind to %s\n", aliasp);
+ 	        perror(aliasp);
+                 (void) close(net);   /* dump descriptor */
++		net = -1;
+ 		freeaddrinfo(ares);
+ 		continue;
+             }
+ 	    freeaddrinfo(ares);
+         }

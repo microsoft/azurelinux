@@ -1,0 +1,248 @@
+diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/Blender/BlenderTessellator.h assimp-6.0.4-new/code/AssetLib/Blender/BlenderTessellator.h
+--- assimp-6.0.4/code/AssetLib/Blender/BlenderTessellator.h	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/code/AssetLib/Blender/BlenderTessellator.h	2026-01-27 13:39:44.575779653 +0100
+@@ -143,7 +143,7 @@ namespace Assimp
+ 
+ #if ASSIMP_BLEND_WITH_POLY_2_TRI
+ 
+-#include "contrib/poly2tri/poly2tri/poly2tri.h"
++#include <poly2tri/poly2tri.h>
+ 
+ namespace Assimp
+ {
+diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCGeometry.cpp assimp-6.0.4-new/code/AssetLib/IFC/IFCGeometry.cpp
+--- assimp-6.0.4/code/AssetLib/IFC/IFCGeometry.cpp	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/code/AssetLib/IFC/IFCGeometry.cpp	2026-01-27 13:39:44.576069780 +0100
+@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ #include "IFCUtil.h"
+ #include "Common/PolyTools.h"
+ #include "PostProcessing/ProcessHelper.h"
+-#include "contrib/poly2tri/poly2tri/poly2tri.h"
++#include <poly2tri/poly2tri.h>
+ #include "contrib/clipper/clipper.hpp"
+ 
+ #include <iterator>
+diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCOpenings.cpp assimp-6.0.4-new/code/AssetLib/IFC/IFCOpenings.cpp
+--- assimp-6.0.4/code/AssetLib/IFC/IFCOpenings.cpp	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/code/AssetLib/IFC/IFCOpenings.cpp	2026-01-27 13:39:44.576388357 +0100
+@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ #include "IFCUtil.h"
+ #include "Common/PolyTools.h"
+ #include "PostProcessing/ProcessHelper.h"
+-#include "contrib/poly2tri/poly2tri/poly2tri.h"
++#include <poly2tri/poly2tri.h>
+ #include "contrib/clipper/clipper.hpp"
+ 
+ #include <deque>
+diff -rupN --no-dereference assimp-6.0.4/code/CMakeLists.txt assimp-6.0.4-new/code/CMakeLists.txt
+--- assimp-6.0.4/code/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/code/CMakeLists.txt	2026-01-27 13:39:44.576700550 +0100
+@@ -1117,13 +1117,7 @@ IF(ASSIMP_HUNTER_ENABLED)
+   hunter_add_package(pugixml)
+   find_package(pugixml CONFIG REQUIRED)
+ ELSEIF(NOT TARGET pugixml::pugixml)
+-  SET( Pugixml_SRCS
+-    ../contrib/pugixml/src/pugiconfig.hpp
+-    ../contrib/pugixml/src/pugixml.cpp
+-    ../contrib/pugixml/src/pugixml.hpp
+-  )
+-  INCLUDE_DIRECTORIES("../contrib/pugixml/src")
+-  SOURCE_GROUP( Contrib\\Pugixml FILES ${Pugixml_SRCS})
++  find_package(pugixml REQUIRED)
+ ENDIF()
+ 
+ # utf8
+@@ -1131,7 +1125,7 @@ IF(ASSIMP_HUNTER_ENABLED)
+   hunter_add_package(utf8)
+   find_package(utf8cpp CONFIG REQUIRED)
+ ELSE()
+-  INCLUDE_DIRECTORIES("../contrib/utf8cpp/source")
++  find_package(utf8cpp CONFIG REQUIRED)
+ ENDIF()
+ 
+ # polyclipping
+@@ -1147,10 +1141,10 @@ ENDIF()
+ #ENDIF()
+ 
+ # poly2tri
+-#IF(ASSIMP_HUNTER_ENABLED)
+-#  hunter_add_package(poly2tri)
+-#  find_package(poly2tri CONFIG REQUIRED)
+-#ELSE()
++IF(HAVE_POLY2TRI)
++    include_directories(${POLY2TRI_INCLUDE_PATH})
++    set(Poly2Tri_SRCS "")
++ELSE()
+   SET( Poly2Tri_SRCS
+     ../contrib/poly2tri/poly2tri/common/shapes.cc
+     ../contrib/poly2tri/poly2tri/common/shapes.h
+@@ -1165,13 +1159,13 @@ ENDIF()
+     ../contrib/poly2tri/poly2tri/sweep/sweep_context.h
+   )
+   SOURCE_GROUP( Contrib\\Poly2Tri FILES ${Poly2Tri_SRCS})
+-#ENDIF()
++ENDIF()
+ 
+ # minizip/unzip
+-IF(ASSIMP_HUNTER_ENABLED)
+-  hunter_add_package(minizip)
+-  find_package(minizip CONFIG REQUIRED)
+-ELSE()
++#IF(ASSIMP_HUNTER_ENABLED)
++#  hunter_add_package(minizip)
++#  find_package(minizip CONFIG REQUIRED)
++#ELSE()
+   SET( unzip_SRCS
+     ../contrib/unzip/crypt.h
+     ../contrib/unzip/ioapi.c
+@@ -1180,7 +1174,7 @@ ELSE()
+     ../contrib/unzip/unzip.h
+   )
+   SOURCE_GROUP(Contrib\\unzip FILES ${unzip_SRCS})
+-ENDIF()
++#ENDIF()
+ 
+ # zip (https://github.com/kuba--/zip)
+ separate_arguments(ASSIMP_EXPORTERS_LIST UNIX_COMMAND ${ASSIMP_EXPORTERS_ENABLED})
+@@ -1276,6 +1270,7 @@ ENDIF ()
+ IF (NOT ASSIMP_HUNTER_ENABLED AND (RT_FOUND OR WIN32))
+   SET( ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC 1 )
+   ADD_DEFINITIONS( -DASSIMP_IMPORTER_GLTF_USE_OPEN3DGC=1 )
++  INCLUDE_DIRECTORIES( "../contrib" )
+ ELSE ()
+   SET (open3dgc_SRCS "")
+   MESSAGE (INFO " Hunter enabled or RT-extension not found. glTF import/export will be built without Open3DGC-compression.")
+@@ -1287,7 +1282,8 @@ IF(ASSIMP_HUNTER_ENABLED)
+   hunter_add_package(RapidJSON)
+   find_package(RapidJSON CONFIG REQUIRED)
+ ELSE()
+-  INCLUDE_DIRECTORIES("../contrib/rapidjson/include")
++  find_package(RapidJSON REQUIRED)
++  include_directories(${RapidJSON_INCLUDE_DIRS})
+   ADD_DEFINITIONS( -DRAPIDJSON_HAS_STDSTRING=1)
+   option( ASSIMP_RAPIDJSON_NO_MEMBER_ITERATOR "Suppress rapidjson warning on MSVC (NOTE: breaks android build)" ON )
+   if(ASSIMP_RAPIDJSON_NO_MEMBER_ITERATOR)
+@@ -1300,11 +1296,6 @@ IF(ASSIMP_HUNTER_ENABLED)
+   hunter_add_package(stb)
+   find_package(stb CONFIG REQUIRED)
+ ELSE()
+-  SET( stb_SRCS
+-    ../contrib/stb/stb_image.h
+-  )
+-  INCLUDE_DIRECTORIES("../contrib")
+-  SOURCE_GROUP( Contrib\\stb FILES ${stb_SRCS})
+ ENDIF()
+ 
+ # VC2010 fixes
+@@ -1482,7 +1473,6 @@ IF(ASSIMP_HUNTER_ENABLED)
+   TARGET_LINK_LIBRARIES(assimp
+       PUBLIC
+       openddlparser::openddl_parser
+-      minizip::minizip
+       ZLIB::zlib
+       RapidJSON::rapidjson
+       utf8cpp
+@@ -1501,9 +1491,16 @@ ELSE()
+   if (ASSIMP_BUILD_DRACO)
+     target_link_libraries(assimp ${draco_LIBRARIES})
+   endif()
+-  if(TARGET pugixml::pugixml)
+-    target_link_libraries(assimp pugixml::pugixml)
+-  endif()
++
++  TARGET_LINK_LIBRARIES(assimp pugixml)
++
++  IF (HAVE_POLY2TRI)
++    TARGET_LINK_LIBRARIES(assimp ${POLY2TRI_LIB})
++  ENDIF()
++
++  IF (HAVE_CLIPPER)
++    TARGET_LINK_LIBRARIES(assimp ${CLIPPER_LIB})
++  ENDIF()
+ ENDIF()
+ 
+ if(ASSIMP_ANDROID_JNIIOSYSTEM)
+diff -rupN --no-dereference assimp-6.0.4/code/PostProcessing/TriangulateProcess.cpp assimp-6.0.4-new/code/PostProcessing/TriangulateProcess.cpp
+--- assimp-6.0.4/code/PostProcessing/TriangulateProcess.cpp	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/code/PostProcessing/TriangulateProcess.cpp	2026-01-27 13:39:44.577050877 +0100
+@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ #include "PostProcessing/TriangulateProcess.h"
+ #include "PostProcessing/ProcessHelper.h"
+ #include "Common/PolyTools.h"
+-#include "contrib/earcut-hpp/earcut.hpp"
++#include <mapbox/earcut.hpp>
+ 
+ #include <memory>
+ #include <cstdint>
+diff -rupN --no-dereference assimp-6.0.4/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp assimp-6.0.4-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp
+--- assimp-6.0.4/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-01-27 13:39:44.577289599 +0100
+@@ -24,7 +24,7 @@
+ #endif // _MSC_VER
+ 
+ #define STB_IMAGE_IMPLEMENTATION
+-#include "contrib/stb/stb_image.h"
++#include "stb_image.h"
+ 
+ #ifdef _MSC_VER
+ #pragma warning(default: 4100) // Enable warning 'unreferenced formal parameter'
+diff -rupN --no-dereference assimp-6.0.4/test/CMakeLists.txt assimp-6.0.4-new/test/CMakeLists.txt
+--- assimp-6.0.4/test/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/test/CMakeLists.txt	2026-01-27 13:39:44.577547330 +0100
+@@ -43,14 +43,6 @@ INCLUDE_DIRECTORIES(
+     ${Assimp_SOURCE_DIR}/code
+ )
+ 
+-if(NOT ASSIMP_HUNTER_ENABLED)
+-  INCLUDE_DIRECTORIES(
+-    ${Assimp_SOURCE_DIR}/contrib/googletest/googletest/include
+-    ${Assimp_SOURCE_DIR}/contrib/googletest/googletest/
+-    ${Assimp_SOURCE_DIR}/contrib/pugixml/src
+-  )
+-endif()
+-
+ if (MSVC)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
+ endif()
+@@ -250,26 +242,11 @@ add_executable( unit
+     ${TOOLS}
+ )
+ 
+-if(ASSIMP_HUNTER_ENABLED)
+-    hunter_add_package(GTest)
+-    find_package(GTest CONFIG REQUIRED)
+-    target_link_libraries(unit GTest::gtest_main GTest::gmock)
+-else()
+-    target_sources(unit PUBLIC ${Assimp_SOURCE_DIR}/contrib/googletest/googletest/src/gtest-all.cc)
+-endif()
++find_package(GTest CONFIG REQUIRED)
++target_link_libraries(unit GTest::gtest_main GTest::gmock)
+ 
+ # RapidJSON
+-IF(ASSIMP_HUNTER_ENABLED)
+-  hunter_add_package(RapidJSON)
+-  find_package(RapidJSON CONFIG REQUIRED)
+-ELSE()
+-  INCLUDE_DIRECTORIES("../contrib/rapidjson/include")
+-  ADD_DEFINITIONS( -DRAPIDJSON_HAS_STDSTRING=1)
+-  option( ASSIMP_RAPIDJSON_NO_MEMBER_ITERATOR "Suppress rapidjson warning on MSVC (NOTE: breaks android build)" ON )
+-  if(ASSIMP_RAPIDJSON_NO_MEMBER_ITERATOR)
+-    ADD_DEFINITIONS( -DRAPIDJSON_NOMEMBERITERATORCLASS )
+-  endif()
+-ENDIF()
++find_package(RapidJSON CONFIG REQUIRED)
+ 
+ IF (ASSIMP_BUILD_DRACO)
+   ADD_DEFINITIONS( -DASSIMP_ENABLE_DRACO )
+diff -rupN --no-dereference assimp-6.0.4/test/unit/utglTF2ImportExport.cpp assimp-6.0.4-new/test/unit/utglTF2ImportExport.cpp
+--- assimp-6.0.4/test/unit/utglTF2ImportExport.cpp	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/test/unit/utglTF2ImportExport.cpp	2026-01-27 13:39:44.577770978 +0100
+@@ -987,7 +987,7 @@ namespace {
+             rapidjson::Document schemaDoc;
+             schemaDoc.Parse(R"==({"properties":{"scene" : { "type" : "integer" }}, "required": [ "scene" ]})==");
+             EXPECT_FALSE(schemaDoc.HasParseError());
+-        	m_schema.reset(new rapidjson::SchemaDocument(schemaDoc, m_schemaName.c_str(), static_cast<rapidjson::SizeType>(m_schemaName.size()), this));
++        	m_schema.reset(new rapidjson::SchemaDocument(schemaDoc, 0, 0, this));
+         }
+ 
+         const rapidjson::SchemaDocument* GetRemoteDocument(const char* uri, rapidjson::SizeType) override {

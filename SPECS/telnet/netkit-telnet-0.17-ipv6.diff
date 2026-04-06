@@ -1,0 +1,265 @@
+diff -uNr netkit-telnet-0.17/telnetd/telnetd.c netkit-telnet-0.17.ipv6/telnetd/telnetd.c
+--- netkit-telnet-0.17/telnetd/telnetd.c	2006-07-13 08:37:18.000000000 +0200
++++ netkit-telnet-0.17.ipv6/telnetd/telnetd.c	2006-07-14 08:36:11.000000000 +0200
+@@ -49,6 +49,7 @@
+ /* #include <netinet/ip.h> */ /* Don't think this is used at all here */
+ #include <arpa/inet.h>
+ #include <assert.h>
++#include <sys/poll.h>
+ #include "telnetd.h"
+ #include "pathnames.h"
+ #include "setproctitle.h"
+@@ -68,7 +69,7 @@
+ #define HAS_IPPROTO_IP
+ #endif
+ 
+-static void doit(struct sockaddr_in *who);
++static void doit(struct sockaddr *who, socklen_t wholen);
+ static int terminaltypeok(const char *s);
+ 
+ /*
+@@ -90,7 +91,7 @@
+ int
+ main(int argc, char *argv[], char *env[])
+ {
+-	struct sockaddr_in from;
++	struct sockaddr from;
+ 	int on = 1;
+ 	socklen_t fromlen;
+ 	register int ch;
+@@ -248,64 +249,89 @@
+ 	argc -= optind;
+ 	argv += optind;
+ 
+-	if (debug) {
+-	    int s, ns;
+-	    socklen_t foo;
+-	    struct servent *sp;
+-	    struct sockaddr_in sn;
++	int s = 0;
+ 
+-	    memset(&sn, 0, sizeof(sn));
+-	    sn.sin_family = AF_INET;
++	if (debug) {
++	    struct addrinfo *ai;
++	    unsigned int nfds = 0;
++	    struct pollfd fds[2];
+ 
+ 	    if (argc > 1) {
+-		usage();
+-		/* NOTREACHED */
+-	    } else if (argc == 1) {
+-		    if ((sp = getservbyname(*argv, "tcp"))!=NULL) {
+-			sn.sin_port = sp->s_port;
+-		    } 
+-		    else {
+-			int pt = atoi(*argv);
+-			if (pt <= 0) {
+-			    fprintf(stderr, "telnetd: %s: bad port number\n",
+-				    *argv);
+-			    usage();
+-			    /* NOTREACHED */
+-			}
+-			sn.sin_port = htons(pt);
+-		   }
++	        usage();
++	        /* NOTREACHED */
+ 	    } else {
+-		sp = getservbyname("telnet", "tcp");
+-		if (sp == 0) {
+-		    fprintf(stderr, "telnetd: tcp/telnet: unknown service\n");
+-		    exit(1);
+-		}
+-		sn.sin_port = sp->s_port;
+-	    }
++	        struct addrinfo hints;
++
++	        memset (&hints, '\0', sizeof (hints));
++	        hints.ai_socktype = SOCK_STREAM;
++	        hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
++	        hints.ai_protocol = IPPROTO_TCP;
++
++	        if (argc == 0) {
++	            if (getaddrinfo(NULL, "telnet", &hints, &ai) != 0) {
++	               fprintf(stderr, "telnetd: %s: bad port number\n", *argv);
++	                usage();
++	                /* NOTREACHED */
++	            }
++	        } else {
++	            if (getaddrinfo(NULL, *argv, &hints, &ai) != 0) {
++		        fprintf(stderr, "telnetd: %s: bad port number\n", *argv);
++		        usage();
++		        /* NOTREACHED */
++		    }
++                }
++	    }	
+ 
+-	    s = socket(AF_INET, SOCK_STREAM, 0);
+-	    if (s < 0) {
++	    struct addrinfo *runp;
++	    int b = 0;
++	    for (runp = ai; ((runp != NULL) && (nfds < sizeof (fds) / sizeof (fds[0]))); runp = runp->ai_next) {
++	        fds[nfds].fd = socket(runp->ai_family, runp->ai_socktype, runp->ai_protocol);
++	        if (fds[nfds].fd < 0) {
+ 		    perror("telnetd: socket");;
+-		    exit(1);
++	            exit(1);
++	        }
++	        fds[nfds].events = POLLIN;
++	        (void) setsockopt(fds[nfds].fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
++
++	        if (bind(fds[nfds].fd, runp->ai_addr, runp->ai_addrlen) != 0) {
++	            // Unable to bind to given port. One of the reason can be
++	            // that we can't bind to both IPv4 and IPv6
++	            break;
++	        } else {			
++	            b++;
++	        }
++
++	        if (listen(fds[nfds].fd, 1) < 0) {
++	            perror("listen");
++	            exit(1);
++	        }
++                nfds++;
+ 	    }
+-	    (void) setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+-	    if (bind(s, (struct sockaddr *)&sn, sizeof(sn)) < 0) {
+-		perror("bind");
+-		exit(1);
+-	    }
+-	    if (listen(s, 1) < 0) {
+-		perror("listen");
+-		exit(1);
++	    freeaddrinfo(ai);
++
++	    if (b == 0) {
++	        perror("bind");
++	        exit(1);
+ 	    }
+-	    foo = sizeof(sn);
+-	    ns = accept(s, (struct sockaddr *)&sn, &foo);
+-	    if (ns < 0) {
+-		perror("accept");
+-		exit(1);
++
++	    int n = poll (fds, nfds, -1);
++	    if (n > 0) {
++	        unsigned int i;
++	        for (i = 0; i < nfds; i++) {
++	            if (fds[i].revents & POLLIN) {
++	                struct sockaddr_storage rem;
++	                socklen_t remlen = sizeof(rem);
++	                int fd = accept(fds[i].fd, (struct sockaddr *) &rem, &remlen);
++
++	                if (fd < 0) {
++	                    perror("accept");
++	                    exit(1);
++	                }
++
++	                s = fd;
++	            }
++	        }
+ 	    }
+-	    (void) dup2(ns, 0);
+-	    (void) close(ns);
+-	    (void) close(s);
+ 	} else if (argc > 0) {
+ 		usage();
+ 		/* NOT REACHED */
+@@ -313,13 +339,13 @@
+ 
+ 	openlog("telnetd", LOG_PID | LOG_ODELAY, LOG_DAEMON);
+ 	fromlen = sizeof (from);
+-	if (getpeername(0, (struct sockaddr *)&from, &fromlen) < 0) {
++	if (getpeername(s, &from, &fromlen) < 0) {
+ 		fprintf(stderr, "%s: ", progname);
+ 		perror("getpeername");
+ 		_exit(1);
+ 	}
+ 	if (keepalive &&
+-	    setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof (on)) < 0) {
++	    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof (on)) < 0) {
+ 		syslog(LOG_WARNING, "setsockopt (SO_KEEPALIVE): %m");
+ 	}
+ 
+@@ -333,13 +359,13 @@
+ 		if (tos < 0)
+ 			tos = 020;	/* Low Delay bit */
+ 		if (tos
+-		   && (setsockopt(0, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) < 0)
++		   && (setsockopt(s, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) < 0)
+ 		   && (errno != ENOPROTOOPT) )
+ 			syslog(LOG_WARNING, "setsockopt (IP_TOS): %m");
+ 	}
+ #endif	/* defined(HAS_IPPROTO_IP) && defined(IP_TOS) */
+-	net = 0;
+-	doit(&from);
++	net = s;
++	doit(&from, fromlen);
+ 	/* NOTREACHED */
+ 	return 0;
+ }  /* end of main */
+@@ -608,10 +634,9 @@
+  * Get a pty, scan input lines.
+  */
+ static void
+-doit(struct sockaddr_in *who)
++doit(struct sockaddr *who, socklen_t wholen)
+ {
+ 	const char *host;
+-	struct hostent *hp;
+ 	int level;
+ 	char user_name[256];
+ 
+@@ -623,12 +648,18 @@
+ 		fatal(net, "All network ports in use");
+ 
+ 	/* get name of connected client */
+-	hp = gethostbyaddr((char *)&who->sin_addr, sizeof (struct in_addr),
+-		who->sin_family);
+-	if (hp)
+-		host = hp->h_name;
+-	else
+-		host = inet_ntoa(who->sin_addr);
++	int error = -1;
++	char namebuf[255];
++
++	error = getnameinfo(who, wholen, namebuf, sizeof(namebuf), NULL, 0, 0);
++	
++	if (error) {
++		perror("getnameinfo: localhost");
++		perror(gai_strerror(error));
++		exit(1);		
++	}
++	
++	host = namebuf;
+ 
+ 	/*
+ 	 * We must make a copy because Kerberos is probably going
+@@ -649,13 +680,21 @@
+ 
+ 	/* Get local host name */
+ 	{
+-		struct hostent *h;
++		struct addrinfo hints;
++		struct addrinfo *res;
++		int e;
++
++		memset(&hints, '\0', sizeof(hints));
++		hints.ai_socktype = SOCK_STREAM;
++		hints.ai_flags = AI_ADDRCONFIG;
++
+ 		gethostname(host_name, sizeof(host_name));
+-		h = gethostbyname(host_name);
+-		if (h) {
+-		    strncpy(host_name, h->h_name, sizeof(host_name));
+-		    host_name[sizeof(host_name)-1] = 0;
++		if ((e = getaddrinfo(host_name, NULL, &hints, &res)) != 0) {
++			perror("getaddrinfo: localhost");
++			perror(gai_strerror(e));
++			exit(1);
+ 		}
++		freeaddrinfo(res);
+ 	}
+ 
+ #if	defined(AUTHENTICATE) || defined(ENCRYPT)

@@ -1,0 +1,34 @@
+From 204375d9cc8ba863a40fab23241844596bbb54e1 Mon Sep 17 00:00:00 2001
+From: "Ankur Sinha (Ankur Sinha Gmail)" <sanjay.ankur@gmail.com>
+Date: Sat, 23 Nov 2019 12:51:46 +0000
+Subject: [PATCH 2/2] Fix export variables
+
+---
+ CMake/ExportConfiguration/GDCMConfig.cmake.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMake/ExportConfiguration/GDCMConfig.cmake.in b/CMake/ExportConfiguration/GDCMConfig.cmake.in
+index f8e9d0ba5..4894d293e 100644
+--- a/CMake/ExportConfiguration/GDCMConfig.cmake.in
++++ b/CMake/ExportConfiguration/GDCMConfig.cmake.in
+@@ -37,14 +37,14 @@ get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+ if(EXISTS ${SELF_DIR}/GDCMTargets.cmake)
+   # This is an install tree
+   include(${SELF_DIR}/GDCMTargets.cmake)
+-  get_filename_component(GDCM_INCLUDE_ROOT "${SELF_DIR}/../../@GDCM_INSTALL_INCLUDE_DIR@" ABSOLUTE)
++  get_filename_component(GDCM_INCLUDE_ROOT "@GDCM_INSTALL_INCLUDE_DIR@" ABSOLUTE)
+   set(GDCM_INCLUDE_DIRS ${GDCM_INCLUDE_ROOT})
+-  get_filename_component(GDCM_LIB_ROOT "${SELF_DIR}/../../@GDCM_INSTALL_LIB_DIR@" ABSOLUTE)
++  get_filename_component(GDCM_LIB_ROOT "@GDCM_INSTALL_LIB_DIR@" ABSOLUTE)
+   set(GDCM_LIBRARY_DIRS ${GDCM_LIB_ROOT})
+ else()
+   if(EXISTS ${SELF_DIR}/GDCMExports.cmake)
+     # This is a build tree
+-    set( GDCM_INCLUDE_DIRS "@GDCM_INCLUDE_PATH@")
++    set(GDCM_INCLUDE_DIRS "@GDCM_INCLUDE_PATH@")
+     set(GDCM_LIBRARY_DIRS "@GDCM_LIBRARY_DIR@")
+ 
+     include(${SELF_DIR}/GDCMExports.cmake)
+-- 
+2.23.0
+

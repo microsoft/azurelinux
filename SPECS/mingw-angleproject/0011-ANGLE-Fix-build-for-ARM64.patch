@@ -1,0 +1,63 @@
+From 416fb93dae5009bb51da9f6720a95918a2c79e78 Mon Sep 17 00:00:00 2001
+From: Thomas Miller <thomaslmiller91@gmail.com>
+Date: Tue Oct 16 08:29:58 2018 -0700
+Subject: [PATCH] ANGLE: Fix build for ARM64
+
+__popcnt, SSE, and intrin.h are not available when building for ARM64.
+---
+ src/3rdparty/angle/src/common/mathutil.h | 8 ++++----
+ src/3rdparty/angle/src/common/platform.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+ 
+diff --git a/src/3rdparty/angle/src/common/mathutil.h b/src/3rdparty/angle/src/common/mathutil.h
+index 372e432066..88aedddfe8 100644
+--- a/src/3rdparty/angle/src/common/mathutil.h
++++ b/src/3rdparty/angle/src/common/mathutil.h
+@@ -150,7 +150,7 @@ inline bool supportsSSE2()
+         return supports;
+     }
+ 
+-#if defined(ANGLE_PLATFORM_WINDOWS) && !defined(_M_ARM)
++#if defined(ANGLE_PLATFORM_WINDOWS) && !defined(_M_ARM) && !defined(_M_ARM64)
+     {
+         int info[4];
+         __cpuid(info, 0);
+@@ -162,7 +162,7 @@ inline bool supportsSSE2()
+             supports = (info[3] >> 26) & 1;
+         }
+     }
+-#endif  // defined(ANGLE_PLATFORM_WINDOWS) && !defined(_M_ARM)
++#endif  // defined(ANGLE_PLATFORM_WINDOWS) && !defined(_M_ARM) && !defined(_M_ARM64)
+     checked = true;
+     return supports;
+ #else  // defined(ANGLE_USE_SSE)
+@@ -884,14 +884,14 @@ inline uint32_t BitfieldReverse(uint32_t value)
+ 
+ // Count the 1 bits.
+ #if defined(ANGLE_PLATFORM_WINDOWS)
+-#if defined(_M_ARM)
++#if defined(_M_ARM) || defined(_M_ARM64)
+ inline int BitCount(uint32_t bits)
+ {
+     bits = bits - ((bits >> 1) & 0x55555555);
+     bits = (bits & 0x33333333) + ((bits >> 2) & 0x33333333);
+     return (((bits + (bits >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+ }
+-#else // _M_ARM
++#else // _M_ARM || _M_ARM64
+ inline int BitCount(uint32_t bits)
+ {
+     return static_cast<int>(__popcnt(bits));
+diff --git a/src/3rdparty/angle/src/common/platform.h b/src/3rdparty/angle/src/common/platform.h
+index 47cd57b999..fb251da579 100644
+--- a/src/3rdparty/angle/src/common/platform.h
++++ b/src/3rdparty/angle/src/common/platform.h
+@@ -83,7 +83,7 @@
+ #   undef far
+ #endif
+ 
+-#if defined(_MSC_VER) && !defined(_M_ARM)
++#if defined(_MSC_VER) && !defined(_M_ARM) && !defined(_M_ARM64)
+ #include <intrin.h>
+ #define ANGLE_USE_SSE
+ #elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) && !defined(__MINGW32__)

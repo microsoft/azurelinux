@@ -1,0 +1,316 @@
+#!/bin/sh
+#fix-info-dir (GNU texinfo)
+VERSION=1.1
+#Copyright (C) 1998, 2003 Free Software Foundation, Inc.
+#fix-info-dir comes with NO WARRANTY, to the extent permitted by law.
+#You may redistribute copies of fix-info-dir
+#under the terms of the GNU General Public License.
+#For more information about these matters, see the files named COPYING."
+#fix-info-dir was derived from update-info and gen-dir-node
+# The skeleton file contains info topic names in the
+# order they should appear in the output.  There are three special
+# lines that alter the behavior: a line consisting of just "--" causes
+# the next line to be echoed verbatim to the output.  A line
+# containing just "%%" causes all the remaining filenames (wildcards
+# allowed) in the rest of the file to be ignored.  A line containing
+# just "!!" exits the script when reached (unless preceded by a line
+# containing just "--").
+#Author: Richard L. Hawes, rhawes@dmapub.dma.org.
+
+# ###SECTION 1### Constants
+set -h 2>/dev/null
+# ENVIRONMENT
+if test -z "$TMPDIR"; then
+	TMPDIR="/usr/tmp"
+fi
+if test -z "$LINENO"; then
+	LINENO="0"
+fi
+
+MENU_BEGIN='^\*\([ 	]\)\{1,\}Menu:'
+MENU_FILTER1='s/^\*\([ 	]\)\{1,\}/* /'
+MENU_FILTER2='s/\([ 	]\)\{1,\}$//g'
+
+TMP_FILE1="${TMPDIR}/fx${$}.info"
+TMP_FILE2="${TMPDIR}/fy${$}.info"
+TMP_FILE_LIST="$TMP_FILE1 $TMP_FILE2"
+
+TRY_HELP_MSG="Try --help for more information"
+
+# ###SECTION 100### main program
+#variables set by options
+CREATE_NODE=""
+DEBUG=":"
+MODE=""
+#
+Total="0"
+Changed=""
+
+while test "$*"; do
+	case "$1" in
+		-c|--create)    CREATE_NODE="y";;
+		--debug)	set -eux; DEBUG="set>&2";;
+		-d|--delete)	MODE="Detect_Invalid";;
+		+d);;
+		--version)
+cat<<VersionEOF
+fix-info-dir (GNU Texinfo) $VERSION
+Copyright (C) 1998 Free Software Foundation, Inc.
+fix-info-dir comes with NO WARRANTY, to the extent permitted by law.
+You may redistribute copies of fix-info-dir
+under the terms of the GNU General Public License.
+For more information about these matters, see the files named COPYING.
+Author: Richard L. Hawes
+VersionEOF
+		exit;;
+
+		--help)
+cat<<HelpEndOfFile
+Usage:	fix-info-dir  [OPTION]... [INFO_DIR/[DIR_FILE]] [SKELETON]
+
+It detects and inserts missing menu items into the info dir file.
+The info dir must be the current directory.
+
+Options:
+-c,	--create	create a new info node
+-d,	--delete	delete invalid menu items (ignore missing menu items)
+	--debug		print debug information to standard error path
+	--help		print this help message and exit
+	--version	print current version and exit
+Backup of the info node has a '.old' suffix added.  This is a shell script.
+Environment Variables: TMPDIR
+Email bug reports to bug-texinfo@gnu.org.
+HelpEndOfFile
+		exit;;
+
+		[-+]*)	echo "$0:$LINENO: \"$1\" is not a valid option">&2
+			echo "$TRY_HELP_MSG">&2
+			exit 2;;
+		*) break;;
+	esac
+	shift
+done
+
+ORIGINAL_DIR=`pwd`
+
+if test "$#" -gt "0"; then
+	INFO_DIR="$1"
+	shift
+else
+	INFO_DIR=$DEFAULT_INFO_DIR
+fi
+
+if test ! -d "${INFO_DIR}"; then
+	DIR_FILE=`basename ${INFO_DIR}`;
+	INFO_DIR=`dirname ${INFO_DIR}`;
+else
+	DIR_FILE="dir"
+fi
+
+cd "$INFO_DIR"||exit
+
+
+if test "$CREATE_NODE"; then
+	if test "$#" -gt "0"; then
+		if test `expr $1 : /` = '1'; then
+			SKELETON="$1"
+		else
+			SKELETON="$ORIGINAL_DIR/$1"
+		fi
+		if test ! -r "$SKELETON" && test -f "$SKELETON"; then
+			echo "$0:$LINENO: $SKELETON is not readable">&2
+			exit 2
+		fi
+		shift
+	else
+		SKELETON=/dev/null
+
+	fi
+else
+	if test ! -f "$DIR_FILE"; then
+		echo "$0:$LINENO: $DIR_FILE is irregular or nonexistant">&2
+		exit 2
+	elif test ! -r "$DIR_FILE"; then
+		echo "$0:$LINENO: $DIR_FILE is not readable">&2
+		exit 2
+	elif test ! -w "$DIR_FILE"; then
+		echo "$0:$LINENO: $DIR_FILE is not writeable">&2
+		exit 2
+	fi
+fi
+
+if test "$#" -gt "0"; then
+	echo "$0:$LINENO: Too many parameters">&2
+	echo "$TRY_HELP_MSG">&2
+	exit 2
+fi
+
+if test -f "$DIR_FILE"; then
+	cp "$DIR_FILE" "$DIR_FILE.old"
+	echo "Backed up $DIR_FILE to $DIR_FILE.old."
+fi
+
+if test "$CREATE_NODE"; then
+	if test "$MODE"; then
+		echo "$0:$LINENO: ERROR: Illogical option combination: -d -c">&2
+		echo "$TRY_HELP_MSG">&2
+		exit 2
+	fi
+	echo "Creating new Info Node: `pwd`/$DIR_FILE"
+	Changed="y"
+
+{
+
+	### output the dir header
+	echo "-*- Text -*-"
+	echo "This file was generated automatically by $0."
+	echo "This version was generated on `date`"
+	echo "by `whoami`@`hostname` for `pwd`"
+
+	cat<<DIR_FILE_END_OF_FILE
+This is the file .../info/$DIR_FILE, which contains the topmost node of the
+Info hierarchy.  The first time you invoke Info you start off
+looking at that node, which is ($DIR_FILE)Top.
+
+
+File: $DIR_FILE       Node: Top       This is the top of the INFO tree
+
+  This (the Directory node) gives a menu of major topics.
+  Typing "q" exits, "?" lists all Info commands, "d" returns here,
+  "h" gives a primer for first-timers,
+  "mEmacs<Return>" visits the Emacs topic, etc.
+
+  In Emacs, you can click mouse button 2 on a menu item or cross reference
+  to select it.
+
+* Menu: The list of major topics begins on the next line.
+
+DIR_FILE_END_OF_FILE
+
+### go through the list of files in the skeleton.  If an info file
+### exists, grab the ENTRY information from it.  If an entry exists
+### use it, otherwise create a minimal $DIR_FILE entry.
+
+	# Read one line from the file.  This is so that we can echo lines with
+	# whitespace and quoted characters in them.
+	while read fileline; do
+		# flag fancy features
+		if test ! -z "$echoline"; then        # echo line
+			echo "$fileline"
+			echoline=""
+			continue
+		elif test "${fileline}" = "--"; then
+			# echo the next line
+			echoline="1"
+			continue
+		elif test "${fileline}" = "%%"; then
+			# skip remaining files listed in skeleton file
+			skip="1"
+			continue
+		elif test "${fileline}" = "!!"; then
+			# quit now
+			break
+		fi
+
+		# handle files if they exist
+		for file in $fileline""; do
+			fname=
+			if test -z "$file"; then
+				break
+			fi
+			# Find the file to operate upon.
+			if test -r "$file"; then
+				fname="$file"
+			elif test -r "${file}.info"; then
+				fname="${file}.info"
+			elif test -r "${file}.gz"; then
+				fname="${file}.gz"
+			elif test -r "${file}.info.gz"; then
+				fname="${file}.info.gz"
+			else
+				echo "$0:$LINENO: can't find info file for ${file}?">&2
+				continue
+			fi
+
+			# if we found something and aren't skipping, do the entry
+			if test "$skip"; then
+				continue
+			fi
+
+			infoname=`echo $file|sed -e 's/.info$//'`
+			entry=`zcat -f $fname|\
+			sed -e '1,/START-INFO-DIR-ENTRY/d'\
+			-e '/END-INFO-DIR-ENTRY/,$d'`
+			if [ ! -z "${entry}" ]; then
+				echo "${entry}"
+			else
+				echo "* ${infoname}: (${infoname})."
+			fi
+			Total=`expr "$Total" + "1"`
+		done
+	done
+}>$DIR_FILE<$SKELETON
+fi
+
+trap ' eval "$DEBUG"; rm -f $TMP_FILE_LIST; exit ' 0
+trap ' rm -f $TMP_FILE_LIST
+	exit ' 1
+trap ' rm -f $TMP_FILE_LIST
+	echo "$0:$LINENO: received INT signal.">&2
+	exit ' 2
+trap ' rm -f $TMP_FILE_LIST
+	echo "$0:$LINENO: received QUIT signal.">&2
+	exit ' 3
+
+sed -e "1,/$MENU_BEGIN/d" -e "$MENU_FILTER1" -e "$MENU_FILTER2"<$DIR_FILE\
+|sed -n -e '/\* /{
+s/).*$//g
+s/\.gz$//
+s/\.info$//
+s/^.*(//p
+}'|sort -u>$TMP_FILE1
+ls -F|sed -e '/\/$/d' -e '/[-.][0-9]/d'\
+	-e "/^$DIR_FILE\$/d" -e "/^$DIR_FILE.old\$/d"\
+	-e 's/[*@]$//' -e 's/\.gz$//' -e 's/\.info$//'|sort>$TMP_FILE2
+
+if test -z "$MODE"; then
+	#Detect Missing
+	DONE_MSG="total menu item(s) were inserted into `pwd`/$DIR_FILE"
+	for Info_Name in `comm -13 $TMP_FILE1 $TMP_FILE2`; do
+		if test -r "$Info_Name"; then
+			Info_File="$Info_Name"
+		elif test -r "${Info_Name}.info"; then
+			Info_File="${Info_Name}.info"
+		elif test -r "${Info_Name}.gz"; then
+			Info_File="${Info_Name}.gz"
+		elif test -r "${Info_Name}.info.gz"; then
+			Info_File="${Info_Name}.info.gz"
+		else
+			echo "$0:$LINENO: can't find info file for ${Info_Name}?">&2
+			continue
+		fi
+		Changed="y"
+		if install-info $Info_File $DIR_FILE; then
+			Total=`expr "$Total" + "1"`
+		fi
+	done
+else
+	# Detect Invalid
+	DONE_MSG="total invalid menu item(s) were removed from `pwd`/$DIR_FILE"
+	for Info_Name in `comm -23 $TMP_FILE1 $TMP_FILE2`; do
+		Changed="y"
+		if install-info --remove $Info_Name $DIR_FILE; then
+			Total=`expr "$Total" + "1"`
+		fi
+	done
+fi
+
+# print summary
+if test "$Changed"; then
+	echo "$Total $DONE_MSG"
+else
+	echo "Nothing to do"
+fi
+rm -f $TMP_FILE_LIST
+eval "$DEBUG"
+exit 0

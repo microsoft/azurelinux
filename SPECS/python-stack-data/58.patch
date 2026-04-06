@@ -1,0 +1,34 @@
+From 8d06c5c3a4f1f3c3d93c9a9169284e8ec0df6be1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mark=C3=A9ta=20Cal=C3=A1bkov=C3=A1?=
+ <meggy.calabkova@gmail.com>
+Date: Mon, 20 Jan 2025 14:01:39 +0100
+Subject: [PATCH] Modify test_executing_style_defs to work with Pygments 2.19
+
+---
+ tests/test_core.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_core.py b/tests/test_core.py
+index b0ecdc2..cc06cb5 100644
+--- a/tests/test_core.py
++++ b/tests/test_core.py
+@@ -573,8 +573,8 @@ def test_absolute_filename():
+     [
+         r".c { color: #(999999|ababab); font-style: italic }",
+         r".err { color: #a61717; background-color: #e3d2d2 }",
+-        r".c-ExecutingNode { color: #(999999|ababab); font-style: italic; background-color: #ffff00 }",
+-        r".err-ExecutingNode { color: #a61717; background-color: #ffff00 }",
++        r".c-ExecutingNode { color: #(999999|ababab); font-style: italic; background-color: #(ffff00|FF0) }",
++        r".err-ExecutingNode { color: #A61717; background-color: #(ffff00|FF0) }",
+     ]
+ )
+ def test_executing_style_defs(expected):
+@@ -582,7 +582,7 @@ def test_executing_style_defs(expected):
+     formatter = HtmlFormatter(style=style)
+     style_defs = formatter.get_style_defs()
+ 
+-    assert re.search(expected, style_defs)
++    assert re.search(expected, style_defs, re.IGNORECASE)
+ 
+ 
+ def test_example():

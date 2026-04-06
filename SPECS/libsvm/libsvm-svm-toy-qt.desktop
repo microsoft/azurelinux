@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=svm-toy-qt
+GenericName=svm-toy QT version
+Comment=QT version of svm-toy (libsvm demostration program)
+Exec=svm-toy-qt
+Icon=libsvm-svm-toy-qt-48
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Education;Science;Math;DataVisualization;Qt

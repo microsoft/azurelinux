@@ -1,0 +1,84 @@
+From 4f4340cc0e4c06b06f6531c00254bdcb2d4adf9e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 13 Feb 2025 14:01:10 +0000
+Subject: [PATCH 01/17] Add support for building against host tinyxml2 lib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For the host tools/libraries it is desirable to be build
+against the host provided tinyxml2 library, such that
+security updates automatically propagate from the distro
+vendor.
+
+This is enabled as an opt-in by setting the make variable
+
+  USE_HOST_TINYXML2=1
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ buildenv.mk                     | 14 ++++++++++++++
+ sdk/sign_tool/SignTool/Makefile |  8 ++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/buildenv.mk b/buildenv.mk
+index acae2106..6dac4028 100644
+--- a/buildenv.mk
++++ b/buildenv.mk
+@@ -384,3 +384,17 @@ OPENSSL_CRYPTO_CFLAGS = -I$(OPENSSL_CRYPTO_PREBUILT_DIR)/inc
+ OPENSSL_CRYPTO_LDFLAGS = -L$(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64 -lcrypto
+ OPENSSL_CRYPTO_LIBS = $(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64/libcrypto.a
+ endif
++
++USE_HOST_TINYXML2 ?= 0
++
++ifeq ($(USE_HOST_TINYXML2), 1)
++TINYXML2_CFLAGS = $(shell pkg-config --cflags tinyxml2)
++TINYXML2_LDFLAGS = $(shell pkg-config --libs tinyxml2)
++TINYXML2_OBJ =
++TINYXML2_DIR =
++else
++TINYXML2_CFLAGS = -I$(LINUX_EXTERNAL_DIR)/tinyxml2
++TINYXML2_LDFLAGS =
++TINYXML2_OBJ = tinyxml2.o
++TINYXML2_DIR = $(LINUX_EXTERNAL_DIR)/tinyxml2/
++endif
+diff --git a/sdk/sign_tool/SignTool/Makefile b/sdk/sign_tool/SignTool/Makefile
+index ed177c86..1dcb6f51 100644
+--- a/sdk/sign_tool/SignTool/Makefile
++++ b/sdk/sign_tool/SignTool/Makefile
+@@ -49,11 +49,11 @@ INC +=  -I$(COMMON_DIR)/inc                         \
+         -I$(LINUX_PSW_DIR)/enclave_common           \
+         -I$(LINUX_PSW_DIR)/urts                     \
+         -I$(LINUX_PSW_DIR)/urts/linux               \
+-        -I$(LINUX_EXTERNAL_DIR)/tinyxml2            \
++        $(TINYXML2_CFLAGS)                          \
+         -I$(LINUX_PSW_DIR)/urts/parser              \
+         $(OPENSSL_CRYPTO_CFLAGS)
+ 
+-DIR1 := $(LINUX_EXTERNAL_DIR)/tinyxml2/
++DIR1 := $(TINYXML2_DIR)
+ DIR2 := $(COMMON_DIR)/src/
+ DIR3 := $(LINUX_PSW_DIR)/urts/
+ DIR4 := $(LINUX_PSW_DIR)/urts/linux
+@@ -68,7 +68,7 @@ OBJ1 := manage_metadata.o      \
+ 
+ OBJ2 := sgx_memset_s.o crypto_evp_digest.o crypto_rsa_key.o crypto_rsa3072.o
+ 
+-OBJ3 := tinyxml2.o
++OBJ3 := $(TINYXML2_OBJ)
+ 
+ OBJ4 := loader.o     \
+         se_detect.o  \
+@@ -87,7 +87,7 @@ all: sgx_sign | $(BUILD_DIR)
+ $(BUILD_DIR):
+ 	@$(MKDIR) $@
+ 
+-sgx_sign: PRIVATE_LDLIBS  := -lpthread -lenclaveparser $(OPENSSL_CRYPTO_LDFLAGS) -ldl
++sgx_sign: PRIVATE_LDLIBS  := -lpthread -lenclaveparser $(OPENSSL_CRYPTO_LDFLAGS) -ldl $(TINYXML2_LDFLAGS)
+ sgx_sign: PRIVATE_LDFLAGS := -L$(LINUX_PSW_DIR)/urts/parser $(LDFLAGS)
+ 
+ sgx_sign: $(OBJS) enclaveparser
+-- 
+2.52.0
+

@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Mon, 3 Feb 2025 16:43:42 -0500
+Subject: [PATCH] multipath-tools: fix compilation with latest userspace-rcu
+ code
+
+starting with version 0.15, userspace-rcu can be compiled with
+CONFIG_RCU_USE_ATOMIC_BUILTINS. If it is, then any programs using it
+must be compiled with at least the C11 standard. See:
+https://github.com/urcu/userspace-rcu/commit/89280d020bf064d1055c360fb9974f128051043f
+
+To deal with this, check if compiling with gnu99 fails, and if so,
+switch to using gnu11.
+
+Based-on-patch-by: Yaakov Selkowitz <yselkowi@redhat.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+Reviewed-by: Martin Wilck <mwilck@suse.com>
+---
+ Makefile.inc     |  2 +-
+ create-config.mk | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 729618bd..65f6efc8 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -115,7 +115,7 @@ CPPFLAGS	:= $(FORTIFY_OPT) $(CPPFLAGS) $(D_URCU_VERSION) \
+ 		   -DRUNTIME_DIR=\"$(runtimedir)\" -DCONFIG_DIR=\"$(TGTDIR)$(configdir)\" \
+ 		   -DDEFAULT_CONFIGFILE=\"$(TGTDIR)$(configfile)\" -DSTATE_DIR=\"$(TGTDIR)$(statedir)\" \
+ 		   -DEXTRAVERSION=\"$(EXTRAVERSION)\" -MMD -MP
+-CFLAGS		:= -std=gnu99 $(CFLAGS) $(OPTFLAGS) $(WARNFLAGS) -pipe \
++CFLAGS		:= -std=$(C_STD) $(CFLAGS) $(OPTFLAGS) $(WARNFLAGS) -pipe \
+ 		   -fexceptions
+ BIN_CFLAGS	:= -fPIE -DPIE
+ LIB_CFLAGS	:= -fPIC
+diff --git a/create-config.mk b/create-config.mk
+index 8bd2c20c..ab163ed1 100644
+--- a/create-config.mk
++++ b/create-config.mk
+@@ -157,6 +157,18 @@ FORTIFY_OPT := $(shell \
+ 		echo "-D_FORTIFY_SOURCE=2"; \
+ 	fi)
+ 
++# Check is you can compile with the urcu.h header, using the C99 standard.
++# If urcu/config-<arch>.h defines CONFIG_RCU_USE_ATOMIC_BUILTINS, then anything
++# including urcu.h must be compiled with at least the C11 standard. See:
++# https://github.com/urcu/userspace-rcu/commit/89280d020bf064d1055c360fb9974f128051043f
++C_STD := $(shell \
++	if printf '$(__HASH__)include <urcu.h>\nint main(void) { return 0; }\n' | $(CC) -o /dev/null -c -xc --std=gnu99 - 2>/dev/null; \
++	then \
++		echo "gnu99"; \
++	else \
++		echo "gnu11"; \
++	fi)
++
+ STACKPROT :=
+ 
+ all:	$(TOPDIR)/config.mk
+@@ -182,3 +194,4 @@ $(TOPDIR)/config.mk:	$(multipathdir)/autoconfig.h
+ 	@echo "W_MISSING_INITIALIZERS := $(call TEST_MISSING_INITIALIZERS)" >>$@
+ 	@echo "W_URCU_TYPE_LIMITS := $(call TEST_URCU_TYPE_LIMITS)" >>$@
+ 	@echo "ENABLE_LIBDMMP := $(ENABLE_LIBDMMP)" >>$@
++	@echo "C_STD := $(C_STD)" >>$@

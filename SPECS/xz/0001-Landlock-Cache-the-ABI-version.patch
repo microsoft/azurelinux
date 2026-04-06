@@ -1,0 +1,46 @@
+From ee75c76958dd891906745125590563ab64e85995 Mon Sep 17 00:00:00 2001
+From: Lasse Collin <lasse.collin@tukaani.org>
+Date: Sun, 23 Nov 2025 20:13:37 +0200
+Subject: [PATCH 1/4] Landlock: Cache the ABI version
+
+In xz it can avoid up to two syscalls that query the ABI version.
+---
+ src/common/my_landlock.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/common/my_landlock.h b/src/common/my_landlock.h
+index e135d08c..379d7bd4 100644
+--- a/src/common/my_landlock.h
++++ b/src/common/my_landlock.h
+@@ -4,6 +4,10 @@
+ //
+ /// \file       my_landlock.h
+ /// \brief      Linux Landlock sandbox helper functions
++///
++/// \note       This uses static variables to cache the Landlock ABI version.
++///             Only one file in an application should include this header.
++///             Only one thread should call these functions.
+ //
+ //  Author:     Lasse Collin
+ //
+@@ -32,8 +36,16 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ {
+ 	memzero(attr, sizeof(*attr));
+ 
+-	const int abi_version = syscall(SYS_landlock_create_ruleset,
++	// Cache the Landlock ABI version:
++	//  0 = not checked yet
++	// -1 = Landlock not supported
++	// >0 = Landlock ABI version
++	static int abi_version = 0;
++
++	if (abi_version == 0)
++		abi_version = syscall(SYS_landlock_create_ruleset,
+ 			(void *)NULL, 0, LANDLOCK_CREATE_RULESET_VERSION);
++
+ 	if (abi_version <= 0)
+ 		return -1;
+ 
+-- 
+2.51.1
+

@@ -1,0 +1,897 @@
+From 5bd1369eb7781ad2b349b99f783a7ed07fb7d6ac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Thu, 13 Feb 2025 13:20:28 +0100
+Subject: [PATCH] Backport OpenSSL 3 provider support
+
+Use gist of 451edf324281d30fbbe5669223dcea331670847c and
+5fd6cfc625aa84005618236f4cd699c07367a3dc upstream commits, but do not do
+significant rebase together. Move engine loading of EVP_PKEY from label to
+openssl_link and copy provider variant from newer.
+
+Remove legacy RSA calls from _fromlabel to separate engine handling
+code. Make rsa_check accepting EVP_PKEY pair only and use conditional
+compilation to verify them. Move checking of max exponent bits to
+rsa_check too, because it is done from all usages anyway.
+
+Use rsa_check_legacy in places where bit checking is not necessary.
+
+Fix keyfromlabel to not use engine parameter for provider keys
+
+- Rework key checks to not require 'engine' tag, private key
+  is valid with 'label' tag alone
+
+- Fix _fromlabel() functions to work with engine == NULL
+
+- Update dst__openssl_fromlabel_engine() to do provider lookup
+  only when engine is not set
+
+(cherry picked from commit de486d0ec5d5642ddb1820a1269f5406a2bb1c64)
+
+Use dst_key_t label to signal isprivate property as a downstream
+alternative to upstream commit 74361b0b6e5a6b17ebeea6afe1ca990395d7a6dd.
+That would require additional heavier changes.
+
+Downstream change:
+Move RSA bits check to legacy, let it use rsa_check for newer
+
+rsabigexponent tests got broken by this change.
+---
+ lib/dns/dst_openssl.h       |   4 +
+ lib/dns/dst_parse.c         |  21 ++---
+ lib/dns/openssl_link.c      | 161 +++++++++++++++++++++++++++-----
+ lib/dns/openssldh_link.c    |   5 +
+ lib/dns/opensslecdsa_link.c | 109 +++++++++++-----------
+ lib/dns/openssleddsa_link.c |  40 +++-----
+ lib/dns/opensslrsa_link.c   | 181 ++++++++++++++----------------------
+ 7 files changed, 296 insertions(+), 225 deletions(-)
+
+diff --git a/lib/dns/dst_openssl.h b/lib/dns/dst_openssl.h
+index 819af0f..cd386c0 100644
+--- a/lib/dns/dst_openssl.h
++++ b/lib/dns/dst_openssl.h
+@@ -64,4 +64,8 @@ ENGINE *
+ dst__openssl_getengine(const char *engine);
+ #endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ 
++isc_result_t
++dst__openssl_fromlabel(int key_base_id, const char *engine, const char *label,
++		       const char *pin, EVP_PKEY **ppub, EVP_PKEY **ppriv);
++
+ ISC_LANG_ENDDECLS
+diff --git a/lib/dns/dst_parse.c b/lib/dns/dst_parse.c
+index a353b86..7f3fe51 100644
+--- a/lib/dns/dst_parse.c
++++ b/lib/dns/dst_parse.c
+@@ -195,10 +195,9 @@ check_rsa(const dst_private_t *priv, bool external) {
+ 
+ 	mask = (1ULL << TAG_SHIFT) - 1;
+ 
+-	if (have[TAG_RSA_ENGINE & mask]) {
++	if (have[TAG_RSA_LABEL & mask]) {
+ 		ok = have[TAG_RSA_MODULUS & mask] &&
+-		     have[TAG_RSA_PUBLICEXPONENT & mask] &&
+-		     have[TAG_RSA_LABEL & mask];
++		     have[TAG_RSA_PUBLICEXPONENT & mask];
+ 	} else {
+ 		ok = have[TAG_RSA_MODULUS & mask] &&
+ 		     have[TAG_RSA_PUBLICEXPONENT & mask] &&
+@@ -259,11 +258,9 @@ check_ecdsa(const dst_private_t *priv, bool external) {
+ 
+ 	mask = (1ULL << TAG_SHIFT) - 1;
+ 
+-	if (have[TAG_ECDSA_ENGINE & mask]) {
+-		ok = have[TAG_ECDSA_LABEL & mask];
+-	} else {
+-		ok = have[TAG_ECDSA_PRIVATEKEY & mask];
+-	}
++	ok = have[TAG_ECDSA_LABEL & mask] ||
++	     have[TAG_ECDSA_PRIVATEKEY & mask];
++
+ 	return ok ? 0 : -1;
+ }
+ 
+@@ -295,11 +292,9 @@ check_eddsa(const dst_private_t *priv, bool external) {
+ 
+ 	mask = (1ULL << TAG_SHIFT) - 1;
+ 
+-	if (have[TAG_EDDSA_ENGINE & mask]) {
+-		ok = have[TAG_EDDSA_LABEL & mask];
+-	} else {
+-		ok = have[TAG_EDDSA_PRIVATEKEY & mask];
+-	}
++	ok = have[TAG_EDDSA_LABEL & mask] ||
++	     have[TAG_EDDSA_PRIVATEKEY & mask];
++
+ 	return ok ? 0 : -1;
+ }
+ 
+diff --git a/lib/dns/openssl_link.c b/lib/dns/openssl_link.c
+index e3a89f4..2495be4 100644
+--- a/lib/dns/openssl_link.c
++++ b/lib/dns/openssl_link.c
+@@ -44,6 +44,9 @@
+ #if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+ #include <openssl/engine.h>
+ #endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++#include <openssl/store.h>
++#endif
+ 
+ #include "openssl_shim.h"
+ 
+@@ -51,6 +54,12 @@
+ static ENGINE *e = NULL;
+ #endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ 
++#define DST_RET(a)        \
++	{                 \
++		result = a;  \
++		goto cleanup; \
++	}
++
+ static void
+ enable_fips_mode(void) {
+ #ifdef HAVE_FIPS_MODE
+@@ -70,32 +79,28 @@ enable_fips_mode(void) {
+ 
+ isc_result_t
+ dst__openssl_init(const char *engine) {
+-	isc_result_t result = ISC_R_SUCCESS;
+-
+ 	enable_fips_mode();
+ 
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+ 	if (engine != NULL && *engine == '\0') {
+ 		engine = NULL;
+ 	}
+ 
+-	if (engine != NULL) {
+-		e = ENGINE_by_id(engine);
+-		if (e == NULL) {
+-			result = DST_R_NOENGINE;
+-			goto cleanup_rm;
+-		}
+-		if (!ENGINE_init(e)) {
+-			result = DST_R_NOENGINE;
+-			goto cleanup_rm;
+-		}
+-		/* This will init the engine. */
+-		if (!ENGINE_set_default(e, ENGINE_METHOD_ALL)) {
+-			result = DST_R_NOENGINE;
+-			goto cleanup_init;
+-		}
++	if (engine == NULL) {
++		return (ISC_R_SUCCESS);
+ 	}
+ 
++#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
++	e = ENGINE_by_id(engine);
++	if (e == NULL) {
++		goto cleanup_rm;
++	}
++		if (!ENGINE_init(e)) {
++		goto cleanup_rm;
++	}
++	/* This will init the engine. */
++	if (!ENGINE_set_default(e, ENGINE_METHOD_ALL)) {
++		goto cleanup_init;
++	}
+ 	return ISC_R_SUCCESS;
+ cleanup_init:
+ 	ENGINE_finish(e);
+@@ -105,10 +110,8 @@ cleanup_rm:
+ 	}
+ 	e = NULL;
+ 	ERR_clear_error();
+-#else
+-	UNUSED(engine);
+ #endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+-	return result;
++	return (DST_R_NOENGINE);
+ }
+ 
+ void
+@@ -220,4 +223,120 @@ dst__openssl_getengine(const char *engine) {
+ }
+ #endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ 
++static isc_result_t
++dst__openssl_fromlabel_engine(int key_base_id, const char *engine,
++			      const char *label,
++			      EVP_PKEY **ppub, EVP_PKEY **ppriv) {
++#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
++	isc_result_t result = ISC_R_SUCCESS;
++	ENGINE *e = NULL;
++	EVP_PKEY *pkey = NULL, *pubpkey = NULL;
++
++	UNUSED(key_base_id);
++
++	e = dst__openssl_getengine(engine);
++	if (e == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_NOENGINE));
++	}
++
++	pubpkey = ENGINE_load_public_key(e, label, NULL, NULL);
++	if (pubpkey == NULL) {
++		DST_RET(dst__openssl_toresult2("ENGINE_load_public_key",
++					       DST_R_OPENSSLFAILURE));
++	}
++	if (EVP_PKEY_get_base_id(pubpkey) != key_base_id) {
++		DST_RET(DST_R_BADKEYTYPE);
++	}
++	pkey = ENGINE_load_private_key(e, label, NULL, NULL);
++	if (pkey == NULL) {
++		DST_RET(dst__openssl_toresult2("ENGINE_load_private_key",
++					       DST_R_OPENSSLFAILURE));
++	}
++	if (EVP_PKEY_base_id(pkey) != key_base_id) {
++		DST_RET(DST_R_INVALIDPRIVATEKEY);
++	}
++	*ppub = pubpkey;
++	*ppriv = pkey;
++cleanup:
++	return result;
++#else
++	UNUSED(key_base_id);
++	UNUSED(engine);
++	UNUSED(label);
++	UNUSED(ppub);
++	UNUSED(ppriv);
++	return DST_R_NOENGINE;
++#endif
++}
++
++
++static isc_result_t
++dst__openssl_fromlabel_provider(int key_base_id, const char *label, const char *pin,
++				EVP_PKEY **ppub, EVP_PKEY **ppriv) {
++	UNUSED(pin);
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++	isc_result_t result = DST_R_OPENSSLFAILURE;
++	OSSL_STORE_CTX *ctx = NULL;
++
++
++	ctx = OSSL_STORE_open(label, NULL, NULL, NULL, NULL);
++	if (!ctx) {
++		DST_RET(dst__openssl_toresult2("OSSL_STORE_open_ex",
++					       DST_R_OPENSSLFAILURE));
++	}
++
++	while (!OSSL_STORE_eof(ctx)) {
++		OSSL_STORE_INFO *info = OSSL_STORE_load(ctx);
++		if (info == NULL) {
++			continue;
++		}
++		switch (OSSL_STORE_INFO_get_type(info)) {
++		case OSSL_STORE_INFO_PKEY:
++			if (*ppriv != NULL) {
++				DST_RET(DST_R_INVALIDPRIVATEKEY);
++			}
++			*ppriv = OSSL_STORE_INFO_get1_PKEY(info);
++			if (EVP_PKEY_get_base_id(*ppriv) != key_base_id) {
++				DST_RET(DST_R_BADKEYTYPE);
++			}
++			break;
++		case OSSL_STORE_INFO_PUBKEY:
++			if (*ppub != NULL) {
++				DST_RET(DST_R_INVALIDPUBLICKEY);
++			}
++			*ppub = OSSL_STORE_INFO_get1_PUBKEY(info);
++			if (EVP_PKEY_get_base_id(*ppub) != key_base_id) {
++				DST_RET(DST_R_BADKEYTYPE);
++			}
++			break;
++		}
++		OSSL_STORE_INFO_free(info);
++	}
++	if (*ppriv != NULL && *ppub != NULL) {
++		result = ISC_R_SUCCESS;
++	}
++cleanup:
++	OSSL_STORE_close(ctx);
++	return result;
++#else
++	UNUSED(key_base_id);
++	UNUSED(label);
++	UNUSED(ppub);
++	UNUSED(ppriv);
++	return (DST_R_OPENSSLFAILURE);
++#endif
++}
++
++isc_result_t
++dst__openssl_fromlabel(int key_base_id, const char *engine, const char *label,
++		       const char *pin, EVP_PKEY **ppub, EVP_PKEY **ppriv) {
++	if (engine == NULL) {
++		return (dst__openssl_fromlabel_provider(key_base_id, label,
++						        pin, ppub, ppriv));
++	}
++
++	return (dst__openssl_fromlabel_engine(key_base_id, engine, label,
++					      ppub, ppriv));
++}
++
+ /*! \file */
+diff --git a/lib/dns/openssldh_link.c b/lib/dns/openssldh_link.c
+index a4ba0f7..38345e6 100644
+--- a/lib/dns/openssldh_link.c
++++ b/lib/dns/openssldh_link.c
+@@ -610,6 +610,11 @@ err:
+ 
+ static bool
+ openssldh_isprivate(const dst_key_t *key) {
++	if (key->label != NULL) {
++		/* assume that _fromlabel will not pass without loading private key,
++		 * but for non-exportable key cannot get d value on the object. */
++		return true;
++	}
+ #if OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000
+ 	DH *dh = key->keydata.dh;
+ 	const BIGNUM *priv_key = NULL;
+diff --git a/lib/dns/opensslecdsa_link.c b/lib/dns/opensslecdsa_link.c
+index af45fdc..8b49b5d 100644
+--- a/lib/dns/opensslecdsa_link.c
++++ b/lib/dns/opensslecdsa_link.c
+@@ -617,6 +617,12 @@ opensslecdsa_isprivate(const dst_key_t *key) {
+ 		return false;
+ 	}
+ 
++	if (key->label != NULL) {
++		/* assume that _fromlabel will not pass without loading private key,
++		 * but for non-exportable key cannot get d value on the object. */
++		return true;
++	}
++
+ #if OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000
+ 	eckey = EVP_PKEY_get1_EC_KEY(pkey);
+ 
+@@ -916,7 +922,7 @@ cleanup:
+ 
+ #if OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000
+ static isc_result_t
+-ecdsa_check(EC_KEY *eckey, EC_KEY *pubeckey) {
++ecdsa_check_legacy(EC_KEY *eckey, EC_KEY *pubeckey) {
+ 	const EC_POINT *pubkey;
+ 
+ 	pubkey = EC_KEY_get0_public_key(eckey);
+@@ -937,9 +943,42 @@ ecdsa_check(EC_KEY *eckey, EC_KEY *pubeckey) {
+ 
+ 	return ISC_R_FAILURE;
+ }
++
++static isc_result_t
++ecdsa_check(EVP_PKEY **pkey, EVP_PKEY *pubpkey, int group_nid) {
++	isc_result_t result = ISC_R_FAILURE;
++	EC_KEY *eckey;
++	EC_KEY *pubeckey;
++
++	eckey = EVP_PKEY_get1_EC_KEY(*pkey);
++	if (eckey == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
++	}
++	if (EC_GROUP_get_curve_name(EC_KEY_get0_group(eckey)) != group_nid) {
++		DST_RET(DST_R_INVALIDPRIVATEKEY);
++	}
++
++	pubeckey = EVP_PKEY_get1_EC_KEY(pubpkey);
++	if (pubeckey == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
++	}
++	if (EC_GROUP_get_curve_name(EC_KEY_get0_group(pubeckey)) != group_nid) {
++		DST_RET(DST_R_INVALIDPUBLICKEY);
++	}
++
++	CHECK(ecdsa_check_legacy(eckey, pubeckey));
++cleanup:
++	if (pubeckey != NULL) {
++		EC_KEY_free(pubeckey);
++	}
++	if (eckey != NULL) {
++		EC_KEY_free(eckey);
++	}
++	return result;
++}
+ #else
+ static isc_result_t
+-ecdsa_check(EVP_PKEY **pkey, EVP_PKEY *pubpkey) {
++ecdsa_check(EVP_PKEY **pkey, EVP_PKEY *pubpkey, int group_nid) {
+ 	isc_result_t result = ISC_R_FAILURE;
+ 	int status;
+ 	size_t pkey_len = 0;
+@@ -954,6 +993,8 @@ ecdsa_check(EVP_PKEY **pkey, EVP_PKEY *pubpkey) {
+ 	EVP_PKEY_CTX *ctx = NULL;
+ 	EVP_PKEY *pkey_new = NULL;
+ 
++	UNUSED(group_nid);
++
+ 	/* Check if `pkey` has a public key. */
+ 	status = EVP_PKEY_get_octet_string_param(*pkey, OSSL_PKEY_PARAM_PUB_KEY,
+ 						 NULL, 0, &pkey_len);
+@@ -1267,7 +1308,7 @@ opensslecdsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 		pubeckey = EVP_PKEY_get1_EC_KEY(pub->keydata.pkey);
+ 	}
+ 
+-	if (ecdsa_check(eckey, pubeckey) != ISC_R_SUCCESS) {
++	if (ecdsa_check_legacy(eckey, pubeckey) != ISC_R_SUCCESS) {
+ 		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+ 	}
+ 
+@@ -1276,7 +1317,7 @@ opensslecdsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 	}
+ #else
+ 	if (ecdsa_check(&key->keydata.pkey,
+-			pub == NULL ? NULL : pub->keydata.pkey) !=
++			pub == NULL ? NULL : pub->keydata.pkey, NID_undef) !=
+ 	    ISC_R_SUCCESS)
+ 	{
+ 		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+@@ -1309,11 +1350,7 @@ cleanup:
+ static isc_result_t
+ opensslecdsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 		       const char *pin) {
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+ 	isc_result_t result = ISC_R_SUCCESS;
+-	ENGINE *e;
+-	EC_KEY *eckey = NULL;
+-	EC_KEY *pubeckey = NULL;
+ 	int group_nid;
+ 	EVP_PKEY *pkey = NULL;
+ 	EVP_PKEY *pubpkey = NULL;
+@@ -1323,13 +1360,9 @@ opensslecdsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 
+ 	UNUSED(pin);
+ 
+-	if (engine == NULL || label == NULL) {
++	if (label == NULL) {
+ 		return DST_R_NOENGINE;
+ 	}
+-	e = dst__openssl_getengine(engine);
+-	if (e == NULL) {
+-		DST_RET(DST_R_NOENGINE);
+-	}
+ 
+ 	if (key->key_alg == DST_ALG_ECDSA256) {
+ 		group_nid = NID_X9_62_prime256v1;
+@@ -1337,48 +1370,27 @@ opensslecdsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 		group_nid = NID_secp384r1;
+ 	}
+ 
+-	/* Load private key. */
+-	pkey = ENGINE_load_private_key(e, label, NULL, NULL);
+-	if (pkey == NULL) {
+-		DST_RET(dst__openssl_toresult2("ENGINE_load_private_key",
+-					       DST_R_OPENSSLFAILURE));
+-	}
++	CHECK(dst__openssl_fromlabel(EVP_PKEY_EC, engine, label, pin,
++				       &pubpkey, &pkey));
++
+ 	/* Check base id, group nid */
+ 	if (EVP_PKEY_base_id(pkey) != EVP_PKEY_EC) {
+ 		DST_RET(DST_R_INVALIDPRIVATEKEY);
+ 	}
+-	eckey = EVP_PKEY_get1_EC_KEY(pkey);
+-	if (eckey == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+-	}
+-	if (EC_GROUP_get_curve_name(EC_KEY_get0_group(eckey)) != group_nid) {
+-		DST_RET(DST_R_INVALIDPRIVATEKEY);
+-	}
+-
+-	/* Load public key. */
+-	pubpkey = ENGINE_load_public_key(e, label, NULL, NULL);
+-	if (pubpkey == NULL) {
+-		DST_RET(dst__openssl_toresult2("ENGINE_load_public_key",
+-					       DST_R_OPENSSLFAILURE));
+-	}
+ 	/* Check base id, group nid */
+ 	if (EVP_PKEY_base_id(pubpkey) != EVP_PKEY_EC) {
+ 		DST_RET(DST_R_INVALIDPUBLICKEY);
+ 	}
+-	pubeckey = EVP_PKEY_get1_EC_KEY(pubpkey);
+-	if (pubeckey == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+-	}
+-	if (EC_GROUP_get_curve_name(EC_KEY_get0_group(pubeckey)) != group_nid) {
+-		DST_RET(DST_R_INVALIDPUBLICKEY);
+-	}
+ 
+-	if (ecdsa_check(eckey, pubeckey) != ISC_R_SUCCESS) {
++	if (ecdsa_check(&pkey, pubpkey, group_nid) != ISC_R_SUCCESS) {
+ 		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+ 	}
+ 
++	if (engine != NULL)
++		key->engine = isc_mem_strdup(key->mctx, engine);
++	else
++		key->engine = NULL;
+ 	key->label = isc_mem_strdup(key->mctx, label);
+-	key->engine = isc_mem_strdup(key->mctx, engine);
+ 	key->key_size = EVP_PKEY_bits(pkey);
+ 	key->keydata.pkey = pkey;
+ 	pkey = NULL;
+@@ -1390,21 +1402,8 @@ cleanup:
+ 	if (pkey != NULL) {
+ 		EVP_PKEY_free(pkey);
+ 	}
+-	if (pubeckey != NULL) {
+-		EC_KEY_free(pubeckey);
+-	}
+-	if (eckey != NULL) {
+-		EC_KEY_free(eckey);
+-	}
+ 
+ 	return result;
+-#else
+-	UNUSED(key);
+-	UNUSED(engine);
+-	UNUSED(label);
+-	UNUSED(pin);
+-	return DST_R_NOENGINE;
+-#endif /* !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ }
+ 
+ static dst_func_t opensslecdsa_functions = {
+diff --git a/lib/dns/openssleddsa_link.c b/lib/dns/openssleddsa_link.c
+index 6301db4..08d505b 100644
+--- a/lib/dns/openssleddsa_link.c
++++ b/lib/dns/openssleddsa_link.c
+@@ -362,6 +362,12 @@ openssleddsa_isprivate(const dst_key_t *key) {
+ 		return false;
+ 	}
+ 
++	if (key->label != NULL) {
++		/* assume that _fromlabel will not pass without loading private key,
++		 * but for non-exportable key cannot get d value on the object. */
++		return true;
++	}
++
+ 	/* Must have a buffer to actually check if there is a private key. */
+ 	if (EVP_PKEY_get_raw_private_key(pkey, buf, &len) == 1) {
+ 		return true;
+@@ -591,9 +597,7 @@ cleanup:
+ static isc_result_t
+ openssleddsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 		       const char *pin) {
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+ 	isc_result_t result;
+-	ENGINE *e;
+ 	EVP_PKEY *pkey = NULL, *pubpkey = NULL;
+ 	int baseid = EVP_PKEY_NONE;
+ 
+@@ -616,28 +620,17 @@ openssleddsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 		return ISC_R_NOTIMPLEMENTED;
+ 	}
+ 
+-	if (engine == NULL) {
+-		return DST_R_NOENGINE;
+-	}
+-	e = dst__openssl_getengine(engine);
+-	if (e == NULL) {
+-		return DST_R_NOENGINE;
+-	}
+-	pkey = ENGINE_load_private_key(e, label, NULL, NULL);
+-	if (pkey == NULL) {
+-		return dst__openssl_toresult2("ENGINE_load_private_key",
+-					      ISC_R_NOTFOUND);
+-	}
+-	if (EVP_PKEY_base_id(pkey) != baseid) {
+-		DST_RET(DST_R_INVALIDPRIVATEKEY);
+-	}
++	DST_RET(dst__openssl_fromlabel(baseid, engine, label, pin,
++				       &pubpkey, &pkey));
+ 
+-	pubpkey = ENGINE_load_public_key(e, label, NULL, NULL);
+-	if (eddsa_check(pkey, pubpkey) != ISC_R_SUCCESS) {
++	if (EVP_PKEY_base_id(pkey) != baseid) {
+ 		DST_RET(DST_R_INVALIDPRIVATEKEY);
+ 	}
+ 
+-	key->engine = isc_mem_strdup(key->mctx, engine);
++	if (engine != NULL)
++		key->engine = isc_mem_strdup(key->mctx, engine);
++	else
++		key->engine = NULL;
+ 	key->label = isc_mem_strdup(key->mctx, label);
+ 	key->key_size = EVP_PKEY_bits(pkey);
+ 	key->keydata.pkey = pkey;
+@@ -652,13 +645,6 @@ cleanup:
+ 		EVP_PKEY_free(pkey);
+ 	}
+ 	return result;
+-#else  /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+-	UNUSED(key);
+-	UNUSED(engine);
+-	UNUSED(label);
+-	UNUSED(pin);
+-	return DST_R_NOENGINE;
+-#endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ }
+ 
+ static dst_func_t openssleddsa_functions = {
+diff --git a/lib/dns/opensslrsa_link.c b/lib/dns/opensslrsa_link.c
+index b92e1bf..12210e8 100644
+--- a/lib/dns/opensslrsa_link.c
++++ b/lib/dns/opensslrsa_link.c
+@@ -545,6 +545,12 @@ opensslrsa_isprivate(const dst_key_t *key) {
+ 		return false;
+ 	}
+ 
++	if (key->label != NULL) {
++		/* assume that _fromlabel will not pass without loading private key,
++		 * but for non-exportable key cannot get d value on the object. */
++		return true;
++	}
++
+ #if OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000
+ 	rsa = EVP_PKEY_get1_RSA(pkey);
+ 	INSIST(rsa != NULL);
+@@ -995,7 +1001,7 @@ cleanup:
+ 
+ #if OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000
+ static isc_result_t
+-rsa_check(RSA *rsa, RSA *pub) {
++rsa_check_legacy(RSA *rsa, RSA *pub) {
+ 	const BIGNUM *n1 = NULL, *n2 = NULL;
+ 	const BIGNUM *e1 = NULL, *e2 = NULL;
+ 	BIGNUM *n = NULL, *e = NULL;
+@@ -1050,6 +1056,46 @@ rsa_check(RSA *rsa, RSA *pub) {
+ 
+ 	return ISC_R_SUCCESS;
+ }
++
++static isc_result_t
++rsa_check(EVP_PKEY *pkey, EVP_PKEY *pubpkey) {
++	isc_result_t ret = ISC_R_FAILURE;
++	RSA *rsa = NULL, *pubrsa = NULL;
++	const BIGNUM *ex = NULL;
++
++	pubrsa = EVP_PKEY_get1_RSA(pubpkey);
++	if (pubrsa == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
++	}
++
++	rsa = EVP_PKEY_get1_RSA(pkey);
++	if (rsa == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
++	}
++
++	ret = rsa_check_legacy(rsa, pubrsa);
++	if (ret != ISC_R_SUCCESS) {
++		DST_RET(ret);
++	}
++
++	RSA_get0_key(rsa, NULL, &ex, NULL);
++
++	if (ex == NULL) {
++		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
++	}
++	if (BN_num_bits(ex) > RSA_MAX_PUBEXP_BITS) {
++		DST_RET(ISC_R_RANGE);
++	}
++
++err:
++	if (rsa != NULL) {
++		RSA_free(rsa);
++	}
++	if (pubrsa != NULL) {
++		RSA_free(pubrsa);
++	}
++	return ret;
++}
+ #else
+ static isc_result_t
+ rsa_check(EVP_PKEY *pkey, EVP_PKEY *pubpkey) {
+@@ -1097,6 +1143,10 @@ rsa_check(EVP_PKEY *pkey, EVP_PKEY *pubpkey) {
+ 		}
+ 	}
+ 
++	if (BN_num_bits(e1) > RSA_MAX_PUBEXP_BITS) {
++		DST_RET(ISC_R_RANGE);
++	}
++
+ 	if (EVP_PKEY_eq(pkey, pubpkey) == 1) {
+ 		DST_RET(ISC_R_SUCCESS);
+ 	}
+@@ -1119,6 +1169,10 @@ cleanup:
+ }
+ #endif /* OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000 */
+ 
++static isc_result_t
++opensslrsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
++		     const char *pin);
++
+ static isc_result_t
+ opensslrsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 	dst_private_t priv;
+@@ -1131,12 +1185,8 @@ opensslrsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 	OSSL_PARAM *params = NULL;
+ 	EVP_PKEY_CTX *ctx = NULL;
+ #endif /* OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000 */
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+-	const BIGNUM *ex = NULL;
+-	ENGINE *ep = NULL;
+-	const char *engine = NULL;
+-#endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ 	isc_mem_t *mctx = NULL;
++	const char *engine = NULL;
+ 	const char *label = NULL;
+ 	EVP_PKEY *pkey = NULL;
+ 	BIGNUM *n = NULL, *e = NULL, *d = NULL;
+@@ -1190,46 +1240,7 @@ opensslrsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 	 * See if we can fetch it.
+ 	 */
+ 	if (label != NULL) {
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+-		if (engine == NULL) {
+-			DST_RET(DST_R_NOENGINE);
+-		}
+-		ep = dst__openssl_getengine(engine);
+-		if (ep == NULL) {
+-			DST_RET(dst__openssl_toresult(DST_R_NOENGINE));
+-		}
+-		pkey = ENGINE_load_private_key(ep, label, NULL, NULL);
+-		if (pkey == NULL) {
+-			DST_RET(dst__openssl_toresult2("ENGINE_load_private_"
+-						       "key",
+-						       ISC_R_NOTFOUND));
+-		}
+-		key->engine = isc_mem_strdup(key->mctx, engine);
+-		key->label = isc_mem_strdup(key->mctx, label);
+-
+-		rsa = EVP_PKEY_get1_RSA(pkey);
+-		if (rsa == NULL) {
+-			DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+-		}
+-		if (rsa_check(rsa, pubrsa) != ISC_R_SUCCESS) {
+-			DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+-		}
+-		RSA_get0_key(rsa, NULL, &ex, NULL);
+-
+-		if (ex == NULL) {
+-			DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+-		}
+-		if (BN_num_bits(ex) > RSA_MAX_PUBEXP_BITS) {
+-			DST_RET(ISC_R_RANGE);
+-		}
+-
+-		key->key_size = EVP_PKEY_bits(pkey);
+-		key->keydata.pkey = pkey;
+-		pkey = NULL;
+-		DST_RET(ISC_R_SUCCESS);
+-#else  /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+-		DST_RET(DST_R_NOENGINE);
+-#endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
++		DST_RET(opensslrsa_fromlabel(key, engine, label, NULL));
+ 	}
+ 
+ 	for (i = 0; i < priv.nelements; i++) {
+@@ -1318,9 +1329,14 @@ opensslrsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 			BN_clear_free(iqmp);
+ 		}
+ 	}
+-	if (rsa_check(rsa, pubrsa) != ISC_R_SUCCESS) {
++	if (rsa_check_legacy(rsa, pubrsa) != ISC_R_SUCCESS) {
+ 		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+ 	}
++
++	if (BN_num_bits(e) > RSA_MAX_PUBEXP_BITS) {
++		DST_RET(ISC_R_RANGE);
++	}
++
+ #else
+ 	bld = OSSL_PARAM_BLD_new();
+ 	if (bld == NULL) {
+@@ -1387,17 +1403,9 @@ opensslrsa_parse(dst_key_t *key, isc_lex_t *lexer, dst_key_t *pub) {
+ 		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+ 	}
+ 
+-	if (rsa_check(pkey, pub != NULL ? pub->keydata.pkey : NULL) !=
+-	    ISC_R_SUCCESS)
+-	{
+-		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+-	}
++	CHECK(rsa_check(pkey, pub != NULL ? pub->keydata.pkey : NULL));
+ #endif /* OPENSSL_VERSION_NUMBER < 0x30000000L || OPENSSL_API_LEVEL < 30000 */
+ 
+-	if (BN_num_bits(e) > RSA_MAX_PUBEXP_BITS) {
+-		DST_RET(ISC_R_RANGE);
+-	}
+-
+ 	key->key_size = BN_num_bits(n);
+ 	key->keydata.pkey = pkey;
+ 	pkey = NULL;
+@@ -1461,69 +1469,31 @@ cleanup:
+ static isc_result_t
+ opensslrsa_fromlabel(dst_key_t *key, const char *engine, const char *label,
+ 		     const char *pin) {
+-#if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000
+-	ENGINE *e = NULL;
+ 	isc_result_t result = ISC_R_SUCCESS;
+ 	EVP_PKEY *pkey = NULL, *pubpkey = NULL;
+-	RSA *rsa = NULL, *pubrsa = NULL;
+-	const BIGNUM *ex = NULL;
+ 
+ 	UNUSED(pin);
+ 
+-	if (engine == NULL) {
+-		DST_RET(DST_R_NOENGINE);
+-	}
+-	e = dst__openssl_getengine(engine);
+-	if (e == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_NOENGINE));
+-	}
++	CHECK(dst__openssl_fromlabel(EVP_PKEY_RSA, engine, label, pin,
++				       &pubpkey, &pkey));
++	CHECK(rsa_check(pkey, pubpkey));
+ 
+-	pubpkey = ENGINE_load_public_key(e, label, NULL, NULL);
+-	if (pubpkey == NULL) {
+-		DST_RET(dst__openssl_toresult2("ENGINE_load_public_key",
+-					       DST_R_OPENSSLFAILURE));
+-	}
+-	pubrsa = EVP_PKEY_get1_RSA(pubpkey);
+-	if (pubrsa == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+-	}
+-
+-	pkey = ENGINE_load_private_key(e, label, NULL, NULL);
+ 	if (pkey == NULL) {
+-		DST_RET(dst__openssl_toresult2("ENGINE_load_private_key",
++		DST_RET(dst__openssl_toresult2("dst__openssl_fromlabel",
+ 					       DST_R_OPENSSLFAILURE));
+ 	}
+ 
+-	key->engine = isc_mem_strdup(key->mctx, engine);
++	if (engine != NULL)
++		key->engine = isc_mem_strdup(key->mctx, engine);
++	else
++		key->engine = NULL;
+ 	key->label = isc_mem_strdup(key->mctx, label);
+ 
+-	rsa = EVP_PKEY_get1_RSA(pkey);
+-	if (rsa == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_OPENSSLFAILURE));
+-	}
+-	if (rsa_check(rsa, pubrsa) != ISC_R_SUCCESS) {
+-		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+-	}
+-	RSA_get0_key(rsa, NULL, &ex, NULL);
+-
+-	if (ex == NULL) {
+-		DST_RET(dst__openssl_toresult(DST_R_INVALIDPRIVATEKEY));
+-	}
+-	if (BN_num_bits(ex) > RSA_MAX_PUBEXP_BITS) {
+-		DST_RET(ISC_R_RANGE);
+-	}
+-
+ 	key->key_size = EVP_PKEY_bits(pkey);
+ 	key->keydata.pkey = pkey;
+ 	pkey = NULL;
+ 
+ cleanup:
+-	if (rsa != NULL) {
+-		RSA_free(rsa);
+-	}
+-	if (pubrsa != NULL) {
+-		RSA_free(pubrsa);
+-	}
+ 	if (pkey != NULL) {
+ 		EVP_PKEY_free(pkey);
+ 	}
+@@ -1531,13 +1501,6 @@ cleanup:
+ 		EVP_PKEY_free(pubpkey);
+ 	}
+ 	return result;
+-#else  /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+-	UNUSED(key);
+-	UNUSED(engine);
+-	UNUSED(label);
+-	UNUSED(pin);
+-	return DST_R_NOENGINE;
+-#endif /* if !defined(OPENSSL_NO_ENGINE) && OPENSSL_API_LEVEL < 30000 */
+ }
+ 
+ static dst_func_t opensslrsa_functions = {
+-- 
+2.52.0
+

@@ -1,0 +1,28 @@
+From 0f1b61c0c3e61e67987ca9e8d2710e4ec0736d73 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 15 Jan 2024 20:16:47 +0000
+Subject: [PATCH 06/12] Removed unused absl package
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 36e52115..7feeff5a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -694,7 +694,6 @@ endif()
+ #-----------------------------------------------------------------------------
+ # Compile libraries here if you do not want -Werror or /WX on
+ #-----------------------------------------------------------------------------
+-add_subdirectory(third_party/absl)
+ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+ if(NOT US_USE_SYSTEM_BOOST)
+   add_subdirectory(third_party/boost/nowide)
+-- 
+2.48.1
+

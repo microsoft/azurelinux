@@ -1,0 +1,413 @@
+From 9e7085f2700d698dfbb37aef24c0489c2d09a978 Mon Sep 17 00:00:00 2001
+From: Siddhesh Poyarekar <siddhesh@gotplt.org>
+Date: Thu, 6 Feb 2025 12:06:27 -0500
+Subject: [PATCH] Revert "aarch64: GCS tests for linking issues with dynamic
+ objects"
+
+This reverts commit 1c136b8ee9b9fb402b66957bd51e89e47b94a0f6.
+---
+ .../protections/aarch64-protections.exp       | 15 ----------
+ .../ld-aarch64/protections/gcs-dynamic-1-a.d  | 12 --------
+ .../ld-aarch64/protections/gcs-dynamic-1-b.d  | 12 --------
+ .../protections/gcs-dynamic-2-a-i.d           | 15 ----------
+ .../protections/gcs-dynamic-2-a-ii.d          |  8 ------
+ .../protections/gcs-dynamic-2-a-iii.d         | 15 ----------
+ .../protections/gcs-dynamic-2-a-iv.d          | 12 --------
+ .../ld-aarch64/protections/gcs-dynamic-2-b.d  | 14 ----------
+ .../ld-aarch64/protections/gcs-dynamic-2-c.d  | 12 --------
+ .../ld-aarch64/protections/gcs-dynamic-2-d.d  | 14 ----------
+ .../ld-aarch64/protections/gcs-dynamic-3-a.d  | 15 ----------
+ .../ld-aarch64/protections/gcs-dynamic-3-b.d  | 14 ----------
+ .../ld-aarch64/protections/gcs-dynamic-3-c.d  | 12 --------
+ .../ld-aarch64/protections/gcs-dynamic-4-a.d  |  7 -----
+ .../ld-aarch64/protections/gcs-dynamic-4-b.d  |  7 -----
+ .../ld-aarch64/protections/gcs-dynamic-4-c.d  |  7 -----
+ ld/testsuite/ld-aarch64/protections/gcs-so.s  | 28 -------------------
+ ld/testsuite/ld-aarch64/protections/gcs-so2.s | 28 -------------------
+ 18 files changed, 247 deletions(-)
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-a.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-b.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-i.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-ii.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iii.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iv.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-b.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-c.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-d.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-a.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-b.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-c.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-a.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-b.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-c.d
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-so.s
+ delete mode 100644 ld/testsuite/ld-aarch64/protections/gcs-so2.s
+
+diff --git a/ld/testsuite/ld-aarch64/protections/aarch64-protections.exp b/ld/testsuite/ld-aarch64/protections/aarch64-protections.exp
+index cf0f03daee6..b49428d1039 100644
+--- a/ld/testsuite/ld-aarch64/protections/aarch64-protections.exp
++++ b/ld/testsuite/ld-aarch64/protections/aarch64-protections.exp
+@@ -42,21 +42,6 @@ set aarch64elflinktests {
+    "-shared" ""
+    "-I$srcdir/$subdir -defsym __property_bti__=1"
+    {bti-plt-so.s} {} "libbti-plt-so.so"}
+-
+-  {"Build gcs-so for GCS tests"
+-   "-shared" ""
+-   "-I$srcdir/$subdir -defsym __property_gcs__=1"
+-   {gcs-so.s} {} "libgcs-so.so"}
+-
+-  {"Build nogcs-so for GCS tests"
+-   "-shared" ""
+-   "-I$srcdir/$subdir"
+-   {gcs-so.s} {} "libnogcs-so.so"}
+-
+-  {"Build gcs-so2 for GCS tests"
+-   "-shared" ""
+-   "-I$srcdir/$subdir -defsym __property_gcs__=1"
+-   {gcs-so2.s} {} "libgcs-so2.so"}
+ }
+ 
+ if [check_shared_lib_support] {
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-a.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-a.d
+deleted file mode 100644
+index be8a301f6c0..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-a.d
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error' and shared library with GCS feature reports no error.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -L./tmpdir -lgcs-so
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-b.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-b.d
+deleted file mode 100644
+index d53d45ae598..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-1-b.d
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error -z gcs-report-dynamic=error' and shared library with GCS feature reports no error.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -z gcs-report-dynamic=error -L./tmpdir -lgcs-so
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-i.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-i.d
+deleted file mode 100644
+index 903d14099be..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-i.d
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-ii.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-ii.d
+deleted file mode 100644
+index 7adb481bc30..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-ii.d
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error -z gcs-report-dynamic=error' and shared libraries without GCS feature reports errors.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -z gcs-report-dynamic=error -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#error: \A[^\n]*libnogcs-so\.so: error: GCS is required by -z gcs[^\n]*\n
+-#error:   [^\n]*libbti-plt-so\.so: error: GCS is required by -z gcs[^\n]*
+\ No newline at end of file
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iii.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iii.d
+deleted file mode 100644
+index 76a7c461347..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iii.d
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error -z gcs-report-dynamic=warning' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -z gcs-report-dynamic=warning -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+\ No newline at end of file
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iv.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iv.d
+deleted file mode 100644
+index 554ca1186ef..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-a-iv.d
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=error -z gcs-report-dynamic=none' and shared libraries without GCS feature reports nothing.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=error -z gcs-report-dynamic=none -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+\ No newline at end of file
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-b.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-b.d
+deleted file mode 100644
+index 36262bbc087..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-b.d
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=warning' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=warning -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-c.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-c.d
+deleted file mode 100644
+index 6c7f5da8be7..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-c.d
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#name: '-z gcs=always -z gcs-report=none' and shared libraries without GCS feature reports nothing.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report=none -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-d.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-d.d
+deleted file mode 100644
+index 58498e6c00b..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-2-d.d
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#name: '-z gcs=always -z gcs-report' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=always -z gcs-report -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-a.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-a.d
+deleted file mode 100644
+index ecdaf526779..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-a.d
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#name: '-z gcs=implicit -z gcs-report=error' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=implicit -z gcs-report=error -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-b.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-b.d
+deleted file mode 100644
+index 4d32fb6aa54..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-b.d
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#name: '-z gcs=implicit -z gcs-report=warning' and shared libraries without GCS feature reports warnings.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=implicit -z gcs-report=warning -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#warning: \A[^\n]*libnogcs-so\.so: warning: GCS is required by -z gcs[^\n]*\n
+-#warning:   [^\n]*libbti-plt-so\.so: warning: GCS is required by -z gcs[^\n]*
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+\ No newline at end of file
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-c.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-c.d
+deleted file mode 100644
+index c0da6c1d9c6..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-3-c.d
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#name: '-z gcs=implicit -z gcs-report=none' and shared libraries without GCS feature reports no warning.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=implicit -z gcs-report=none -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+-
+-Displaying notes found in: .note.gnu.property
+-[ 	]+Owner[ 	]+Data size[ 	]+Description
+-  GNU                  0x00000010	NT_GNU_PROPERTY_TYPE_0
+-      Properties: AArch64 feature: GCS
+\ No newline at end of file
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-a.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-a.d
+deleted file mode 100644
+index ae324bbba1e..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-a.d
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#name: '-z gcs=never -z gcs-report=error' and shared libraries without GCS feature reports no warning/error.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=never -z gcs-report=error -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-b.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-b.d
+deleted file mode 100644
+index 6b65898b924..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-b.d
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#name: '-z gcs=never -z gcs-report=warning' and shared libraries without GCS feature reports no warning/error.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=never -z gcs-report=warning -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-c.d b/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-c.d
+deleted file mode 100644
+index 35b011f6a8e..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-dynamic-4-c.d
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#name: '-z gcs=never -z gcs-report=none' and shared libraries without GCS feature reports no warning/error.
+-#source: gcs.s
+-#source: gcs2.s
+-#alltargets: [check_shared_lib_support] *linux*
+-#as: -march=armv9.4-a+gcs  -defsym __property_gcs__=1
+-#ld: -z gcs=never -z gcs-report=none -L./tmpdir -lnogcs-so -lbti-plt-so -lgcs-so2
+-#readelf: -n
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-so.s b/ld/testsuite/ld-aarch64/protections/gcs-so.s
+deleted file mode 100644
+index aa6485b9dde..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-so.s
++++ /dev/null
+@@ -1,28 +0,0 @@
+-	.global	foo2
+-	.type	foo2, %function
+-foo2:
+-	sub	sp, sp, #16
+-	mov	w0, 9
+-	str	w0, [sp, 12]
+-	ldr	w0, [sp, 12]
+-	add	w0, w0, 4
+-	str	w0, [sp, 12]
+-	nop
+-	add	sp, sp, 16
+-	ret
+-	.size	foo2, .-foo2
+-	.global	bar2
+-	.type	bar2, %function
+-bar2:
+-	sub	sp, sp, #16
+-	mov	w0, 9
+-	str	w0, [sp, 12]
+-	ldr	w0, [sp, 12]
+-	add	w0, w0, 4
+-	str	w0, [sp, 12]
+-	nop
+-	add	sp, sp, 16
+-	ret
+-	.size	bar2, .-bar2
+-
+-.include "gnu-note-properties-selectable-merged.inc"
+diff --git a/ld/testsuite/ld-aarch64/protections/gcs-so2.s b/ld/testsuite/ld-aarch64/protections/gcs-so2.s
+deleted file mode 100644
+index 938ba43c69c..00000000000
+--- a/ld/testsuite/ld-aarch64/protections/gcs-so2.s
++++ /dev/null
+@@ -1,28 +0,0 @@
+-	.global	foo3
+-	.type	foo3, %function
+-foo3:
+-	sub	sp, sp, #16
+-	mov	w0, 9
+-	str	w0, [sp, 12]
+-	ldr	w0, [sp, 12]
+-	add	w0, w0, 4
+-	str	w0, [sp, 12]
+-	nop
+-	add	sp, sp, 16
+-	ret
+-	.size	foo3, .-foo3
+-	.global	bar3
+-	.type	bar3, %function
+-bar3:
+-	sub	sp, sp, #16
+-	mov	w0, 9
+-	str	w0, [sp, 12]
+-	ldr	w0, [sp, 12]
+-	add	w0, w0, 4
+-	str	w0, [sp, 12]
+-	nop
+-	add	sp, sp, 16
+-	ret
+-	.size	bar3, .-bar3
+-
+-.include "gnu-note-properties-selectable-merged.inc"
+-- 
+2.48.1
+

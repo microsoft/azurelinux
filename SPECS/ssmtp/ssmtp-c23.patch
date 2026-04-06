@@ -1,0 +1,21 @@
+diff -up ssmtp-2.64/ssmtp.c.c23 ssmtp-2.64/ssmtp.c
+--- ssmtp-2.64/ssmtp.c.c23	2025-05-23 10:04:40.441922800 +0200
++++ ssmtp-2.64/ssmtp.c	2025-05-23 10:06:51.127476199 +0200
+@@ -1494,7 +1494,7 @@ handler() -- A "normal" non-portable ver
+ 			like a socket. So we longjump instead, which is erronious on
+ 			a small number of machines and ill-defined in the language
+ */
+-void handler(void)
++void handler(int u)
+ {
+ 	extern jmp_buf TimeoutJmpBuf;
+ 
+@@ -1556,7 +1556,7 @@ int ssmtp(char *argv[])
+ 	from = from_format(uad, override_from);
+ 
+ 	/* Now to the delivery of the message */
+-	(void)signal(SIGALRM, (void(*)())handler);	/* Catch SIGALRM */
++	(void)signal(SIGALRM, handler);	/* Catch SIGALRM */
+ 	(void)alarm((unsigned) MAXWAIT);			/* Set initial timer */
+ 	if(setjmp(TimeoutJmpBuf) != 0) {
+ 		/* Then the timer has gone off and we bail out */

@@ -1,0 +1,166 @@
+#!/bin/bash
+
+# Copyright (C) 2014-2017 Neil Brown <neilb@suse.de>
+#
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    Author: Neil Brown
+#    Email: <neilb@suse.com>
+
+# This script should be run periodically to automatically
+# perform a 'check' on any md arrays.
+#
+# It supports a 'time budget' such that any incomplete 'check'
+# will be checkpointed when that time has expired.
+# A subsequent invocation can allow the 'check' to continue.
+#
+# Options are:
+#   --continue    Don't start new checks, only continue old ones.
+#   --duration    This is passed to "date --date=$duration" to find out
+#		  when to finish
+#
+# To support '--continue', arrays are identified by UUID and the 'sync_completed'
+# value is stored  in /var/lib/mdcheck/$UUID
+
+# convert a /dev/md name into /sys/.../md equivalent
+sysname() {
+	set `ls -lLd $1`
+	maj=${5%,}
+	min=$6
+	readlink -f /sys/dev/block/$maj:$min
+}
+
+args=$(getopt -o hcd: -l help,continue,duration: -n mdcheck -- "$@")
+rv=$?
+if [ $rv -ne 0 ]; then exit $rv; fi
+
+eval set -- $args
+
+cont=
+endtime=
+while [ " $1" != " --" ]
+do
+    case $1 in
+	--help )
+		echo >&2 'Usage: mdcheck [--continue] [--duration time-offset]'
+		echo >&2 '  time-offset must be understood by "date --date"'
+		exit 0
+		;;
+	--continue ) cont=yes ;;
+	--duration ) shift; dur=$1
+		endtime=$(date --date "$dur" "+%s")
+		;;
+    esac
+    shift
+done
+shift
+
+# We need a temp file occasionally...
+tmp=/var/lib/mdcheck/.md-check-$$
+trap 'rm -f "$tmp"' 0 2 3 15
+
+
+# firstly, clean out really old state files
+mkdir -p /var/lib/mdcheck
+find /var/lib/mdcheck -name "MD_UUID*" -type f -mtime +180 -exec rm {} \;
+
+# Now look at each md device.
+cnt=0
+for dev in /dev/md?*
+do
+	[ -e "$dev" ] || continue
+	sys=`sysname $dev`
+	if [ ! -f "$sys/md/sync_action" ]
+	then # cannot check this array
+		continue
+	fi
+	if [ "`cat $sys/md/sync_action`" != 'idle' ]
+	then # This array is busy
+		continue
+	fi
+
+	mdadm --detail --export "$dev" | grep '^MD_UUID=' > $tmp || continue
+	source $tmp
+	fl="/var/lib/mdcheck/MD_UUID_$MD_UUID"
+	if [ -z "$cont" ]
+	then
+		start=0
+		logger -p daemon.info mdcheck start checking $dev
+	elif [ -z "$MD_UUID" -o ! -f "$fl" ]
+	then
+		# Nothing to continue here
+		continue
+	else
+		start=`cat "$fl"`
+		logger -p daemon.info mdcheck continue checking $dev from $start
+	fi
+
+	cnt=$[cnt+1]
+	eval MD_${cnt}_fl=\$fl
+	eval MD_${cnt}_sys=\$sys
+	eval MD_${cnt}_dev=\$dev
+	echo $start > $fl
+	echo $start > $sys/md/sync_min
+	echo check > $sys/md/sync_action
+done
+
+if [ -z "$endtime" ]
+then
+	exit 0
+fi
+
+while [ `date +%s` -lt $endtime ]
+do
+	any=
+	for i in `eval echo {1..$cnt}`
+	do
+		eval fl=\$MD_${i}_fl
+		eval sys=\$MD_${i}_sys
+		eval dev=\$MD_${i}_dev
+
+		if [ -z "$fl" ]; then continue; fi
+
+		if [ "`cat $sys/md/sync_action`" != 'check' ]
+		then
+			logger -p daemon.info mdcheck finished checking $dev
+			eval MD_${i}_fl=
+			rm -f $fl
+			continue;
+		fi
+		read a rest < $sys/md/sync_completed
+		echo $a > $fl
+		any=yes
+	done
+	if [ -z "$any" ]; then exit 0; fi
+	sleep 120
+done
+
+# We've waited, and there are still checks running.
+# Time to stop them.
+for i in `eval echo {1..$cnt}`
+do
+	eval fl=\$MD_${i}_fl
+	eval sys=\$MD_${i}_sys
+	eval dev=\$MD_${i}_dev
+
+	if [ -z "$fl" ]; then continue; fi
+
+	if [ "`cat $sys/md/sync_action`" != 'check' ]
+	then
+		eval MD_${i}_fl=
+		rm -f $fl
+		continue;
+	fi
+	echo idle > $sys/md/sync_action
+	cat $sys/md/sync_min > $fl
+	logger -p daemon.info pause checking $dev at `cat $fl`
+done

@@ -1,0 +1,26 @@
+Description: Remove hard-coded googleapis font URL
+Bug: https://github.com/haskell/haddock/issues/1211
+Bug-Debian: https://bugs.debian.org/963690
+
+Index: b/utils/haddock/haddock-api/src/Haddock/Backends/Xhtml.hs
+===================================================================
+--- a/utils/haddock/haddock-api/src/Haddock/Backends/Xhtml.hs
++++ b/utils/haddock/haddock-api/src/Haddock/Backends/Xhtml.hs
+@@ -137,7 +137,7 @@ headHtml docTitle themes mathjax_url bas
+                 , thetype "text/css"
+                 , href (withBaseURL base_url quickJumpCssFile) ]
+              << noHtml
+-    , thelink ! [ rel "stylesheet", thetype "text/css", href fontUrl] << noHtml
++    -- , thelink ! [ rel "stylesheet", thetype "text/css", href fontUrl] << noHtml
+     , script ! [ src (withBaseURL base_url haddockJsFile)
+                , emptyAttr "async"
+                , thetype "text/javascript" ]
+@@ -146,7 +146,7 @@ headHtml docTitle themes mathjax_url bas
+     , script ! [src mjUrl, thetype "text/javascript"] << noHtml
+     ]
+   where
+-    fontUrl = "https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700"
++    -- fontUrl = "https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700"
+     mjUrl = fromMaybe "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" mathjax_url
+     mjConf = unwords [ "MathJax.Hub.Config({"
+                      ,   "tex2jax: {"

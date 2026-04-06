@@ -1,0 +1,38 @@
+From fd56df9b6d5fa9932edc6bd41d307e2453a6b442 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Poho=C5=99elsk=C3=BD?= <opohorel@redhat.com>
+Date: Wed, 30 Jul 2025 12:40:17 +0200
+Subject: [PATCH] crontab: Fix backup failure when ~/.cache directory missing
+
+Create ~/.cache parent directory before creating ~/.cache/crontab backup
+directory to prevent "mkdir: No such file or directory" errors when users
+edit crontabs and their cache directory doesn't exist.
+---
+ src/crontab.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/src/crontab.c b/src/crontab.c
+index c11dc81..14d02dd 100644
+--- a/src/crontab.c
++++ b/src/crontab.c
+@@ -578,7 +578,21 @@ static int backup_crontab(const char *crontab_path) {
+ 		exit(ERROR_EXIT);
+ 	}
+ 
++	/* Ensure the backup directory and its parent exist, creating them if necessary */
+ 	if (stat(backup_dir, &sb) < OK && errno == ENOENT) {
++		char *last_slash = strrchr(backup_dir, '/');
++		if (last_slash && last_slash != backup_dir) {
++			char parent_dir[MAX_FNAME];
++			size_t parent_len = last_slash - backup_dir;
++			if (parent_len < sizeof(parent_dir)) {
++				strncpy(parent_dir, backup_dir, parent_len);
++				parent_dir[parent_len] = '\0';
++				/* Check if parent directory exists before creating */
++				if (stat(parent_dir, &sb) < OK && errno == ENOENT) {
++					mkdir(parent_dir, 0700);
++				}
++			}
++		}
+ 		if (OK != mkdir(backup_dir, 0755)) {
+ 			fprintf(stderr, "%s: ", backup_dir);
+ 			perror("mkdir");

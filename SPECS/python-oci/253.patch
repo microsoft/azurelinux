@@ -1,0 +1,22 @@
+From 3149256c19704f7d6cf03bf12aac3576cc97f343 Mon Sep 17 00:00:00 2001
+From: Lazaro Morales <moraleslazaro@gmail.com>
+Date: Fri, 15 May 2020 20:37:05 +0000
+Subject: [PATCH] remove unused and non existing vcr_mods module
+
+---
+ tests/test_config_container.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/test_config_container.py b/tests/test_config_container.py
+index f03a6fb97..29f19f402 100644
+--- a/tests/test_config_container.py
++++ b/tests/test_config_container.py
+@@ -6,8 +6,6 @@
+ # can figure out what kind of recording (via VCR) is being done and also so that they can take actions (e.g. waiting)
+ # in a VCR compatible/friendly way
+ 
+-from . import vcr_mods  # noqa: F401
+-
+ import oci
+ import time
+ import vcr

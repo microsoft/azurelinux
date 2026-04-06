@@ -1,0 +1,32 @@
+From f532bff5632959901b7d456c8b8aa1d30b6fd691 Mon Sep 17 00:00:00 2001
+From: Jens Petersen <juhpetersen@gmail.com>
+Date: Fri, 7 Nov 2025 19:24:33 +0800
+Subject: [PATCH] Client: add 'Accept' header to requests
+
+This adds an HTTP `Accept: application/xml` header to requests.
+---
+ Network/XmlRpc/Client.hs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Network/XmlRpc/Client.hs b/Network/XmlRpc/Client.hs
+index f80c64f..d828e63 100644
+--- a/Network/XmlRpc/Client.hs
++++ b/Network/XmlRpc/Client.hs
+@@ -54,7 +54,8 @@ import           Network.Http.Client        (Method (..), Request,
+                                              getStatusMessage, http,
+                                              inputStreamBody, openConnection,
+                                              openConnectionSSL, receiveResponse,
+-                                             sendRequest, setAuthorizationBasic,
++                                             sendRequest, setAccept,
++                                             setAuthorizationBasic,
+                                              setContentLength, setContentType,
+                                              setHeader)
+ import           OpenSSL
+@@ -209,6 +210,7 @@ request uri auth usrHeaders len = buildRequest $ do
+     http POST (BS.pack $ uriPath uri)
+     setContentType "text/xml"
+     setContentLength len
++    setAccept "application/xml"
+ 
+     case parseUserInfo auth of
+       (Just user, Just pass) -> setAuthorizationBasic (BS.pack user) (BS.pack pass)

@@ -1,0 +1,12 @@
+diff -ur qt-x11-free-3.3.8b/src/tools/qcstring.cpp qt-x11-free-3.3.8b-system-zlib-header/src/tools/qcstring.cpp
+--- qt-x11-free-3.3.8b/src/tools/qcstring.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-system-zlib-header/src/tools/qcstring.cpp	2011-11-04 03:36:21.000000000 +0100
+@@ -53,7 +53,7 @@
+ #include <ctype.h>
+ #include <limits.h>
+ #ifndef QT_NO_COMPRESS
+-#include "../3rdparty/zlib/zlib.h"
++#include <zlib.h>
+ #endif
+ 
+ /*****************************************************************************

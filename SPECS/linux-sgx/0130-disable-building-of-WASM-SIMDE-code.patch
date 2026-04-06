@@ -1,0 +1,33 @@
+From c0655ac4e8f7c85648874f3bed2879848e9487ed Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 3 Feb 2026 11:40:10 +0000
+Subject: [PATCH 130/131] disable building of WASM SIMDE code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The build system tries to git clone the simde project which is not
+possible in koji. Disable until its possible to use distro provided
+headers.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteVerification/appraisal/qal/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/QuoteVerification/appraisal/qal/Makefile b/QuoteVerification/appraisal/qal/Makefile
+index 10ca0572..0bb3fdef 100644
+--- a/QuoteVerification/appraisal/qal/Makefile
++++ b/QuoteVerification/appraisal/qal/Makefile
+@@ -30,7 +30,7 @@ QAL_Link_Flags := $(COMMON_LDFLAGS) -L$(WARM_Lib_Path) -liwasm  -ldl -lm -lpthre
+                 $(shell pkg-config --libs libcrypto) \
+                 -Wl,--gc-sections -Wl,--version-script=sgx_dcap_qal.lds
+ 
+-WASM_CONFIG ?= -DCMAKE_BUILD_TYPE=Release
++WASM_CONFIG ?= -DCMAKE_BUILD_TYPE=Release -DWAMR_BUILD_SIMD=0 -DWAMR_BUILD_LIB_SIMDE=0
+ ifeq ($(DEBUG), 1)
+     WASM_CONFIG := -DCMAKE_BUILD_TYPE=Debug
+     QAL_Link_Flags += -fsanitize=undefined
+-- 
+2.53.0
+

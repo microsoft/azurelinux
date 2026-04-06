@@ -1,0 +1,8 @@
+--- uu_test-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uu_test-0.0.27/Cargo.toml	2024-08-01T21:51:47.138387+00:00
+@@ -49,5 +49,3 @@
+ features = ["process"]
+ package = "uucore"
+ 
+-[target."cfg(target_os = \"redox\")".dependencies.redox_syscall]
+-version = "0.5.1"

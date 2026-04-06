@@ -1,0 +1,55 @@
+From e464888c53a641ee44a34ff2350cfb156c8ed59f Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Tue, 18 Apr 2023 22:05:36 +0200
+Subject: [PATCH 5/5] Accessibility: respect value in attached Accessible in
+ controls
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+QQuickItemPrivate::accessibleRole is virtual and called by the framework
+to determine the role of an item. The default implementation checks and
+respects a possible Accessible attached object. However, subclasses that
+override the virtual don't, so the attached properties are ignored, and
+the class-specific implementation wins. This makes it impossible to
+change the role of e.g. a checkable button.
+
+To fix that, move the code respecting the attached object into a non-
+virtual function that the framework calls instead, and only call the
+virtual member if there is no attached object, or if that object is not
+initialized with a role. Replace calls to the virtual from the
+framework with calls to the non-virtual wrapper.
+
+Do this for both QQuickItem and for QQuickPopup, and adjust the logic
+in QQuickControl types that create an attached object and initialize
+it's role when accessibility becomes active. Use the non-overridable
+effective role value for that as well.
+
+Add a test case, and to avoid any new framework calls to the virtual,
+make it private.
+
+Fixes: QTBUG-110114
+Pick-to: 6.5 6.2
+Change-Id: Ia709cecbd181b6d8ee3297a4af60c1e7db9a2c51
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
+(cherry picked from commit 3c08d08ae2bbd449cc0579a1b3cb499383c7a60c)
+---
+ src/quicktemplates2/qquickpopup.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/quicktemplates2/qquickpopup.cpp b/src/quicktemplates2/qquickpopup.cpp
+index 3f8691e2c..6b1ca32b3 100644
+--- a/src/quicktemplates2/qquickpopup.cpp
++++ b/src/quicktemplates2/qquickpopup.cpp
+@@ -46,6 +46,7 @@
+ 
+ #include <QtQml/qqmlinfo.h>
+ #include <QtQuick/qquickitem.h>
++#include <QtQuick/private/qquickaccessibleattached_p.h>
+ #include <QtQuick/private/qquicktransition_p.h>
+ #include <QtQuick/private/qquickitem_p.h>
+ #include <QtQuick/private/qquickaccessibleattached_p.h>
+-- 
+2.51.1
+

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PARI/GP
+Comment=Programmable calculator based on PARI
+Exec=gp
+Icon=/usr/share/pixmaps/pari-gp.xpm
+Terminal=true
+Type=Application
+Categories=Science;Math;
+X-Desktop-File-Install-Version=0.10

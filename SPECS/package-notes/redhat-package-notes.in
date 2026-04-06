@@ -1,0 +1,2 @@
+*link:
++ %{!r:--package-metadata={\"type\":\"rpm\",\"name\":\"%:getenv(RPM_PACKAGE_NAME \",\"version\":\"%:getenv(RPM_PACKAGE_VERSION -%:getenv(RPM_PACKAGE_RELEASE \",\"architecture\":\"%:getenv(RPM_ARCH \",\"osCpe\":\"@OSCPE@\"}))))}

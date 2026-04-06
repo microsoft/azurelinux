@@ -1,0 +1,59 @@
+From 32104d1072788f1343d0bfbbf0fc113148598878 Mon Sep 17 00:00:00 2001
+From: Benjamin Reed <ranger@befunk.com>
+Date: Fri, 29 May 2009 14:13:21 +0000
+Subject: [PATCH 16/33] move the cpack bits into a separate cmake file
+
+svn path=/trunk/kdesupport/automoc/; revision=974500
+---
+ Automoc4CPack.cmake | 13 +++++++++++++
+ CMakeLists.txt      | 14 ++------------
+ 2 files changed, 15 insertions(+), 12 deletions(-)
+ create mode 100644 Automoc4CPack.cmake
+
+diff --git a/Automoc4CPack.cmake b/Automoc4CPack.cmake
+new file mode 100644
+index 0000000..63f5167
+--- /dev/null
++++ b/Automoc4CPack.cmake
+@@ -0,0 +1,13 @@
++set(CPACK_PACKAGE_VENDOR "KDE")
++set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Automatic moc for Qt 4 packages")
++set(CPACK_PACKAGE_VERSION_MAJOR ${AUTOMOC4_VERSION_MAJOR})
++set(CPACK_PACKAGE_VERSION_MINOR ${AUTOMOC4_VERSION_MINOR})
++set(CPACK_PACKAGE_VERSION_PATCH ${AUTOMOC4_VERSION_PATCH})
++if (APPLE)
++	set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/cpack/README.txt")
++	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cpack/LICENSE.txt")
++	set(CPACK_SET_DESTDIR ON)
++   set(CPACK_PACKAGE_RELOCATABLE OFF)
++endif (APPLE)
++
++include(CPack)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bb8a9d3..04e5fa7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,18 +13,8 @@ endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
+ # set the current version number
+ include(Automoc4Version.cmake)
+ 
+-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Automatic moc for Qt 4 packages")
+-set(CPACK_PACKAGE_VERSION_MAJOR ${AUTOMOC4_VERSION_MAJOR})
+-set(CPACK_PACKAGE_VERSION_MINOR ${AUTOMOC4_VERSION_MINOR})
+-set(CPACK_PACKAGE_VERSION_PATCH ${AUTOMOC4_VERSION_PATCH})
+-if (APPLE)
+-	set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/cpack/README.txt")
+-	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cpack/LICENSE.txt")
+-	set(CPACK_SET_DESTDIR ON)
+-   set(CPACK_PACKAGE_RELOCATABLE OFF)
+-endif (APPLE)
+-
+-include(CPack)
++# set up packaging
++include(Automoc4CPack.cmake)
+ 
+ configure_file(automoc4_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/automoc4_config.h)
+ 
+-- 
+2.4.3
+

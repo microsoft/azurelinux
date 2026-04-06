@@ -1,0 +1,16 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.case netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.case	2008-04-23 14:52:59.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2008-04-23 14:58:07.000000000 +0200
+@@ -831,8 +831,11 @@ mget(int argc, char **argv)
+ 						tp++;
+ 						tp2++;
+ 					}
++					tp = tmpbuf;
++				}
++				else {
++					tp = cp;
+ 				}
+-				tp = tmpbuf;
+ 			}
+ 			if (ntflag) {
+ 				tp = dotrans(tp);

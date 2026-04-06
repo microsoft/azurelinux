@@ -1,0 +1,12 @@
+diff -up libsmi-c5830721/test/mibs/LIBSMI-TEST-016-MIB.fix-typo libsmi-c5830721/test/mibs/LIBSMI-TEST-016-MIB
+--- libsmi-c5830721/test/mibs/LIBSMI-TEST-016-MIB.fix-typo	2024-01-05 11:21:28.131480471 -0500
++++ libsmi-c5830721/test/mibs/LIBSMI-TEST-016-MIB	2024-01-05 11:21:38.674627907 -0500
+@@ -42,7 +42,7 @@ LIBSMI-TEST-016-MIB:207: warning: node `
+ LIBSMI-TEST-016-MIB:200: warning: node `t4Addr' must be contained in at least one conformance group
+ LIBSMI-TEST-016-MIB:214: warning: node `t4AddrIPv6z' must be contained in at least one conformance group
+ LIBSMI-TEST-016-MIB:207: warning: `InetAddressType' should not be subtyped
+-LIBSMI-TEST-016-MIB:200: warning: `InetAddress' object should have an accompanied preceding `InetAdressType' object
++LIBSMI-TEST-016-MIB:200: warning: `InetAddress' object should have an accompanied preceding `InetAddressType' object
+ LIBSMI-TEST-016-MIB:214: warning: `InetAddress' should be used instead of `InetAddressIPv6z'
+ 	    "
+     REVISION        "200211190000Z"

@@ -1,0 +1,66 @@
+--- a/modules/proxy/mod_proxy_hcheck.c
++++ b/modules/proxy/mod_proxy_hcheck.c
+@@ -989,12 +989,30 @@ static apr_status_t hc_watchdog_callback(int state
+     sctx_t *ctx = (sctx_t *)data;
+     server_rec *s = ctx->s;
+     proxy_server_conf *conf;
++    proxy_worker **workers;
++    proxy_worker *worker;
++    apr_time_t now;
++    int i, n;
+ 
++    conf = (proxy_server_conf *) ap_get_module_config(s->module_config, &proxy_module);
++    balancer = (proxy_balancer *)conf->balancers->elts;
++
+     switch (state) {
+         case AP_WATCHDOG_STATE_STARTING:
+             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(03258)
+                          "%s watchdog started.",
+                          HCHECK_WATHCHDOG_NAME);
++            /* set last update time for all workers */
++            now = apr_time_now();
++            for (i = 0; i < conf->balancers->nelts; i++, balancer++) {
++                workers = (proxy_worker **)balancer->workers->elts;
++                for (n = 0; n < balancer->workers->nelts; n++, ++workers) {
++                    worker = *workers;
++                    if (worker->s->updated == 0) {
++                        worker->s->updated = now;
++                    }
++                }
++            }
+ #if HC_USE_THREADS
+             if (tpsize && hctp == NULL) {
+                 rv =  apr_thread_pool_create(&hctp, tpsize,
+@@ -1020,21 +1038,13 @@ static apr_status_t hc_watchdog_callback(int state
+ 
+         case AP_WATCHDOG_STATE_RUNNING:
+             /* loop thru all workers */
+-            if (s) {
+-                int i;
+-                conf = (proxy_server_conf *) ap_get_module_config(s->module_config, &proxy_module);
+-                balancer = (proxy_balancer *)conf->balancers->elts;
+-                ctx->s = s;
++            {
++                now = apr_time_now();
+                 for (i = 0; i < conf->balancers->nelts; i++, balancer++) {
+-                    int n;
+-                    apr_time_t now;
+-                    proxy_worker **workers;
+-                    proxy_worker *worker;
+                     /* Have any new balancers or workers been added dynamically? */
+                     ap_proxy_sync_balancer(balancer, s, conf);
+                     workers = (proxy_worker **)balancer->workers->elts;
+-                    now = apr_time_now();
+-                    for (n = 0; n < balancer->workers->nelts; n++) {
++                    for (n = 0; n < balancer->workers->nelts; n++, workers++) {
+                         worker = *workers;
+                         if (!PROXY_WORKER_IS(worker, PROXY_WORKER_STOPPED) &&
+                             (worker->s->method != NONE) &&
+@@ -1074,7 +1084,6 @@ static apr_status_t hc_watchdog_callback(int state
+                                 hc_check(NULL, baton);
+                             }
+                         }
+-                        workers++;
+                     }
+                 }
+             }

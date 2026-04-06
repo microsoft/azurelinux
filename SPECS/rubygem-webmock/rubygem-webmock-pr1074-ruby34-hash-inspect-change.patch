@@ -1,0 +1,128 @@
+From 6faacb2b7445e8e3d0d8e7f3f0e63317f1728671 Mon Sep 17 00:00:00 2001
+From: Earlopain <14981592+Earlopain@users.noreply.github.com>
+Date: Mon, 28 Oct 2024 10:32:47 +0100
+Subject: [PATCH] Fix failing tests on Ruby 3.4 because of hash inspect changes
+
+Ruby has changed the output of `Hash.inspect`, causing some test failures.
+
+Instead of hardcoding it, just call inspect itself to pass tests on old and new rubies
+
+Ref:
+* https://github.com/ruby/ruby/pull/10924
+* https://bugs.ruby-lang.org/issues/20433
+---
+ spec/unit/matchers/hash_excluding_matcher_spec.rb |  2 +-
+ spec/unit/matchers/hash_including_matcher_spec.rb |  2 +-
+ spec/unit/request_pattern_spec.rb                 | 15 +++++++++------
+ spec/unit/request_signature_snippet_spec.rb       |  7 ++++---
+ spec/unit/stub_request_snippet_spec.rb            |  2 +-
+ 5 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/spec/unit/matchers/hash_excluding_matcher_spec.rb b/spec/unit/matchers/hash_excluding_matcher_spec.rb
+index b1dabc893..4a5fc5d2f 100644
+--- a/spec/unit/matchers/hash_excluding_matcher_spec.rb
++++ b/spec/unit/matchers/hash_excluding_matcher_spec.rb
+@@ -12,7 +12,7 @@ module Matchers
+       end
+ 
+       it 'describes itself properly' do
+-        expect(HashExcludingMatcher.new(a: 1).inspect).to eq 'hash_excluding({"a"=>1})'
++        expect(HashExcludingMatcher.new(a: 1).inspect).to eq "hash_excluding(#{{"a" => 1}.inspect})"
+       end
+ 
+       describe 'success' do
+diff --git a/spec/unit/matchers/hash_including_matcher_spec.rb b/spec/unit/matchers/hash_including_matcher_spec.rb
+index b6ea985b1..886be51b1 100644
+--- a/spec/unit/matchers/hash_including_matcher_spec.rb
++++ b/spec/unit/matchers/hash_including_matcher_spec.rb
+@@ -14,7 +14,7 @@ module Matchers
+       end
+ 
+       it "describes itself properly" do
+-        expect(HashIncludingMatcher.new(a: 1).inspect).to eq "hash_including({\"a\"=>1})"
++        expect(HashIncludingMatcher.new(a: 1).inspect).to eq "hash_including(#{{"a"=>1}.inspect})"
+       end
+ 
+       describe "success" do
+diff --git a/spec/unit/request_pattern_spec.rb b/spec/unit/request_pattern_spec.rb
+index fe6ef2e03..3f22aa130 100644
+--- a/spec/unit/request_pattern_spec.rb
++++ b/spec/unit/request_pattern_spec.rb
+@@ -18,22 +18,25 @@
+     end
+ 
+     it "should report string describing itself with query params" do
+-      expect(WebMock::RequestPattern.new(:get, /.*example.*/, query: {'a' => ['b', 'c']}).to_s).to eq(
+-        "GET /.*example.*/ with query params {\"a\"=>[\"b\", \"c\"]}"
++      query = {'a' => ['b', 'c']}
++      expect(WebMock::RequestPattern.new(:get, /.*example.*/, query: query).to_s).to eq(
++        "GET /.*example.*/ with query params #{query.inspect}"
+       )
+     end
+ 
+     it "should report string describing itself with query params as hash including matcher" do
++      query = {'a' => ['b', 'c']}
+       expect(WebMock::RequestPattern.new(:get, /.*example.*/,
+-      query: WebMock::Matchers::HashIncludingMatcher.new({'a' => ['b', 'c']})).to_s).to eq(
+-        "GET /.*example.*/ with query params hash_including({\"a\"=>[\"b\", \"c\"]})"
++      query: WebMock::Matchers::HashIncludingMatcher.new(query)).to_s).to eq(
++        "GET /.*example.*/ with query params hash_including(#{query.inspect})"
+       )
+     end
+ 
+     it "should report string describing itself with body as hash including matcher" do
++      query = {'a' => ['b', 'c']}
+       expect(WebMock::RequestPattern.new(:get, /.*example.*/,
+-      body: WebMock::Matchers::HashIncludingMatcher.new({'a' => ['b', 'c']})).to_s).to eq(
+-        "GET /.*example.*/ with body hash_including({\"a\"=>[\"b\", \"c\"]})"
++      body: WebMock::Matchers::HashIncludingMatcher.new(query)).to_s).to eq(
++        "GET /.*example.*/ with body hash_including(#{query.inspect})"
+       )
+     end
+   end
+diff --git a/spec/unit/request_signature_snippet_spec.rb b/spec/unit/request_signature_snippet_spec.rb
+index cc0ac545e..d070da779 100644
+--- a/spec/unit/request_signature_snippet_spec.rb
++++ b/spec/unit/request_signature_snippet_spec.rb
+@@ -47,8 +47,9 @@
+   end
+ 
+   describe "#request_stubs" do
++    let(:body) { {"a" => "b"} }
+     before :each do
+-      WebMock.stub_request(:get, "https://www.example.com").with(body: {"a" => "b"})
++      WebMock.stub_request(:get, "https://www.example.com").with(body: body)
+     end
+ 
+     context "when showing the body diff is turned off" do
+@@ -60,7 +61,7 @@
+         result = subject.request_stubs
+         result.sub!("registered request stubs:\n\n", "")
+         expect(result).to eq(
+-          "stub_request(:get, \"https://www.example.com/\").\n  with(\n    body: {\"a\"=>\"b\"})"
++          "stub_request(:get, \"https://www.example.com/\").\n  with(\n    body: #{body.inspect})"
+         )
+       end
+ 
+@@ -74,7 +75,7 @@
+         result = subject.request_stubs
+         result.sub!("registered request stubs:\n\n", "")
+         expect(result).to eq(
+-          "stub_request(:get, \"https://www.example.com/\").\n  with(\n    body: {\"a\"=>\"b\"})\n\nBody diff:\n [[\"-\", \"key\", \"different value\"], [\"+\", \"a\", \"b\"]]\n"
++          "stub_request(:get, \"https://www.example.com/\").\n  with(\n    body: #{body.inspect})\n\nBody diff:\n [[\"-\", \"key\", \"different value\"], [\"+\", \"a\", \"b\"]]\n"
+         )
+       end
+     end
+diff --git a/spec/unit/stub_request_snippet_spec.rb b/spec/unit/stub_request_snippet_spec.rb
+index b8ba9d93d..e9920b92b 100644
+--- a/spec/unit/stub_request_snippet_spec.rb
++++ b/spec/unit/stub_request_snippet_spec.rb
+@@ -69,7 +69,7 @@
+         expected = <<-STUB
+ stub_request(:post, "http://www.example.com/").
+   with(
+-    body: {"user"=>{"first_name"=>"Bartosz"}},
++    body: #{{"user"=>{"first_name"=>"Bartosz"}}.inspect},
+     headers: {
+ \t  'Content-Type'=>'application/x-www-form-urlencoded'
+     }).

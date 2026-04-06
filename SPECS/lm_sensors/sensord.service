@@ -1,0 +1,12 @@
+[Unit]
+Description=Hardware Monitoring Data Logger
+After=lm_sensors.service
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/sensord
+Type=forking
+PIDFile=/var/run/sensord.pid
+ExecStart=@WRAPPER_DIR@/sensord-service-wrapper
+
+[Install]
+WantedBy=multi-user.target

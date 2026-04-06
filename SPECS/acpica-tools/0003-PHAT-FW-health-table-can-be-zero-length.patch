@@ -1,0 +1,37 @@
+From 1fb473e41bcbfbe21c02bcb30983b87aa94a6cb8 Mon Sep 17 00:00:00 2001
+From: Al Stone <ahs3@ahs3.net>
+Date: Tue, 13 Aug 2024 09:50:37 -0600
+Subject: [PATCH] PHAT FW health table can be zero-length
+
+When calculating the VendorLength of the PHAT FW health data subtable,
+the result becomes a negative integer.  However, since UINT32 is being
+used, it looks like a huge positive integer instead.  Conditionalize
+the length calculation to handle this case properly.
+
+This was discovered by using the command: iasl -T phat
+
+Signed-off-by: Al Stone <ahs3@ahs3.net>
+---
+ source/common/dmtbdump2.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/source/common/dmtbdump2.c b/source/common/dmtbdump2.c
+index 32b76b382..dd4d4878e 100644
+--- a/source/common/dmtbdump2.c
++++ b/source/common/dmtbdump2.c
+@@ -2432,8 +2432,10 @@ AcpiDmDumpPhat (
+ 
+             /* Get Device-Specific Data - length of which is the remaining subtable length. */
+ 
+-            VendorLength =
+-                Subtable->Length - sizeof (ACPI_PHAT_HEALTH_DATA) - PathLength;
++	    VendorLength = 0;
++	    if (Subtable->Length > sizeof (ACPI_PHAT_HEALTH_DATA) + PathLength)
++            	VendorLength =
++                	Subtable->Length - sizeof (ACPI_PHAT_HEALTH_DATA) - PathLength;
+             DbgPrint (ASL_DEBUG_OUTPUT, "%u, Subtable->Length %X, VendorLength %X, Offset %X PathLength: %X\n",
+                 __LINE__, Subtable->Length, VendorLength, Offset, PathLength);
+ 
+-- 
+2.45.2
+

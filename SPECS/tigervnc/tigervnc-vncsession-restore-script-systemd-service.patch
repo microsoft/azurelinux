@@ -1,0 +1,114 @@
+From 1919a8ab86c99b47ba86dc697abcdf3343b0aafa Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Tue, 1 Feb 2022 14:31:05 +0100
+Subject: Add vncsession-restore script to restore SELinux context
+
+The vncsession-restore script is used in the ExecStartPre option
+for systemd service file in order to properly start the session
+in case the policy is updated (e.g. after Tigervnc update).
+
+diff --git a/unix/vncserver/CMakeLists.txt b/unix/vncserver/CMakeLists.txt
+index ed259c2..96a9750 100644
+--- a/unix/vncserver/CMakeLists.txt
++++ b/unix/vncserver/CMakeLists.txt
+@@ -5,6 +5,7 @@ target_link_libraries(vncsession ${PAM_LIBRARIES})
+ target_link_libraries(vncsession ${SELINUX_LIBRARIES})
+ 
+ configure_file(vncserver@.service.in vncserver@.service @ONLY)
++configure_file(vncsession-restore.in vncsession-restore @ONLY)
+ configure_file(vncsession-start.in vncsession-start @ONLY)
+ configure_file(vncserver.in vncserver @ONLY)
+ configure_file(vncsession.man.in vncsession.man @ONLY)
+@@ -23,4 +24,5 @@ install(FILES HOWTO.md DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR})
+ if(INSTALL_SYSTEMD_UNITS)
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/vncserver@.service DESTINATION ${CMAKE_INSTALL_FULL_UNITDIR})
+   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vncsession-start DESTINATION ${CMAKE_INSTALL_FULL_LIBEXECDIR})
++  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vncsession-restore DESTINATION ${CMAKE_INSTALL_FULL_LIBEXECDIR})
+ endif()
+diff --git a/unix/vncserver/vncserver@.service.in b/unix/vncserver/vncserver@.service.in
+index 336498a..060b903 100644
+--- a/unix/vncserver/vncserver@.service.in
++++ b/unix/vncserver/vncserver@.service.in
+@@ -35,6 +35,7 @@ After=network.target systemd-user-sessions.service
+ 
+ [Service]
+ Type=forking
++ExecStartPre=+@CMAKE_INSTALL_FULL_LIBEXECDIR@/vncsession-restore %i
+ ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/vncsession-start %i
+ PIDFile=/run/vncsession-%i.pid
+ SELinuxContext=system_u:system_r:vnc_session_t:s0
+
+diff --git a/unix/vncserver/vncsession-restore.in b/unix/vncserver/vncsession-restore.in
+new file mode 100644
+index 00000000..d3abc57d
+--- /dev/null
++++ b/unix/vncserver/vncsession-restore.in
+@@ -0,0 +1,68 @@
++#!/bin/bash
++#
++#  Copyright 2022 Jan Grulich <jgrulich@redhat.com>
++#
++#  This is free software; you can redistribute it and/or modify
++#  it under the terms of the GNU General Public License as published by
++#  the Free Software Foundation; either version 2 of the License, or
++#  (at your option) any later version.
++#
++#  This software is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++#  GNU General Public License for more details.
++#
++#  You should have received a copy of the GNU General Public License
++#  along with this software; if not, write to the Free Software
++#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
++#  USA.
++#
++
++USERSFILE="@CMAKE_INSTALL_FULL_SYSCONFDIR@/tigervnc/vncserver.users"
++
++if [ $# -ne 1 ]; then
++	echo "Syntax:" >&2
++	echo "    $0 <display>" >&2
++	exit 1
++fi
++
++if [ ! -f "${USERSFILE}" ]; then
++	echo "Users file ${USERSFILE} missing" >&2
++	exit 1
++fi
++
++DISPLAY="$1"
++
++USER=`grep "^ *${DISPLAY}=" "${USERSFILE}" 2>/dev/null | head -1 | cut -d = -f 2- | sed 's/ *$//g'`
++
++if [ -z "${USER}" ]; then
++	echo "No user configured for display ${DISPLAY}" >&2
++	exit 1
++fi
++
++USER_HOMEDIR=`getent passwd ${USER} | cut -f6 -d:`
++
++if [ -z "${USER_HOMEDIR}" ]; then
++	echo "Failed to get home directory for ${USER}" >&2
++	exit 1
++fi
++
++if [ ! -d "${USER_HOMEDIR}/.vnc" ]; then
++	exit 0
++fi
++
++MATCHPATHCON=`which matchpathcon`
++
++if [ $? -eq 0 ]; then
++	${MATCHPATHCON} -V "${USER_HOMEDIR}/.vnc" &>/dev/null
++	if [ $? -eq 0 ]; then
++		exit 0
++	fi
++fi
++
++RESTORECON=`which restorecon`
++
++if [ $? -eq 0 ]; then
++	exec "${RESTORECON}" -R "${USER_HOMEDIR}/.vnc" >&2
++	return $?
++fi

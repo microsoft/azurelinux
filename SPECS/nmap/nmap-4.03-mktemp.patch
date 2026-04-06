@@ -1,0 +1,23 @@
+--- nmap-4.03/shtool.mktemp	2006-05-10 13:09:34.000000000 +0200
++++ nmap-4.03/shtool	2006-05-10 13:13:58.000000000 +0200
+@@ -579,15 +579,11 @@
+     else
+         tmpdir="/tmp"
+     fi
+-    tmpdir="$tmpdir/.shtool.$$"
+-    ( umask 077
+-      rm -rf "$tmpdir" >/dev/null 2>&1 || true
+-      mkdir  "$tmpdir" >/dev/null 2>&1
+-      if [ $? -ne 0 ]; then
+-          echo "$msgprefix:Error: failed to create temporary directory \`$tmpdir'" 1>&2
+-          exit 1
+-      fi
+-    )
++    tmpdir=`mktemp -p $tmpdir -d`
++    if [ $? -ne 0 ]; then
++       echo "$msgprefix:Error: failed to create temporary directory \`$tmpdir'" 1>&2
++       exit 1
++    fi
+ 
+     #   create (implicitly) secure temporary file
+     tmpfile="$tmpdir/shtool.tmp"

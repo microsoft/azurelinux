@@ -1,0 +1,16 @@
+--- libbpf-sys-1.6.2+v1.6.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libbpf-sys-1.6.2+v1.6.2/Cargo.toml	2026-01-23T20:37:20.556334+00:00
+@@ -13,7 +13,7 @@
+ edition = "2021"
+ rust-version = "1.82"
+ name = "libbpf-sys"
+-version = "1.6.2+v1.6.2"
++version = "1.6.2"
+ authors = [
+     "Alex Forster <alex@alexforster.com>",
+     "Dan Siemon <dan@coverfire.com>",
+@@ -96,3 +96,4 @@
+ 
+ [build-dependencies.pkg-config]
+ version = "^0.3.30"
++

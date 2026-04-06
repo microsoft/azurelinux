@@ -1,0 +1,73 @@
+From d982e6a817871b174732027eed8b750aa9f8ae4b Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 24 Mar 2025 10:49:00 -0400
+Subject: [PATCH 35/59] FIPS: DH: PCT
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ crypto/dh/dh_key.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/crypto/dh/dh_key.c b/crypto/dh/dh_key.c
+index 052d4d29ed..ace02bb0db 100644
+--- a/crypto/dh/dh_key.c
++++ b/crypto/dh/dh_key.c
+@@ -43,6 +43,9 @@ int ossl_dh_compute_key(unsigned char *key, const BIGNUM *pub_key, DH *dh)
+     BN_MONT_CTX *mont = NULL;
+     BIGNUM *z = NULL, *pminus1;
+     int ret = -1;
++#ifdef FIPS_MODULE
++    int validate = 0;
++#endif
+ 
+     if (BN_num_bits(dh->params.p) > OPENSSL_DH_MAX_MODULUS_BITS) {
+         ERR_raise(ERR_LIB_DH, DH_R_MODULUS_TOO_LARGE);
+@@ -60,6 +63,13 @@ int ossl_dh_compute_key(unsigned char *key, const BIGNUM *pub_key, DH *dh)
+         return 0;
+     }
+ 
++#ifdef FIPS_MODULE
++    if (DH_check_pub_key(dh, pub_key, &validate) <= 0) {
++        ERR_raise(ERR_LIB_DH, DH_R_CHECK_PUBKEY_INVALID);
++        return 0;
++    }
++#endif
++
+     ctx = BN_CTX_new_ex(dh->libctx);
+     if (ctx == NULL)
+         goto err;
+@@ -271,6 +281,9 @@ static int generate_key(DH *dh)
+ #endif
+     BN_CTX *ctx = NULL;
+     BIGNUM *pub_key = NULL, *priv_key = NULL;
++#ifdef FIPS_MODULE
++    int validate = 0;
++#endif
+ 
+     if (BN_num_bits(dh->params.p) > OPENSSL_DH_MAX_MODULUS_BITS) {
+         ERR_raise(ERR_LIB_DH, DH_R_MODULUS_TOO_LARGE);
+@@ -371,8 +384,21 @@ static int generate_key(DH *dh)
+     if (!ossl_dh_generate_public_key(ctx, dh, priv_key, pub_key))
+         goto err;
+ 
++#ifdef FIPS_MODULE
++    if (DH_check_pub_key(dh, pub_key, &validate) <= 0) {
++        ERR_raise(ERR_LIB_DH, DH_R_CHECK_PUBKEY_INVALID);
++        goto err;
++    }
++#endif
++
+     dh->pub_key = pub_key;
+     dh->priv_key = priv_key;
++#ifdef FIPS_MODULE
++    if (ossl_dh_check_pairwise(dh, 0) <= 0) {
++        abort();
++    }
++#endif
++
+     dh->dirty_cnt++;
+     ok = 1;
+  err:
+-- 
+2.51.0
+

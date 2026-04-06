@@ -1,0 +1,28 @@
+From 28c0f53f0a076edd792c42acff4594eb7690cb9f Mon Sep 17 00:00:00 2001
+From: Marcus Meissner <marcus@jet.franken.de>
+Date: Sun, 23 Nov 2025 20:17:11 +0100
+Subject: [PATCH] disabled foxconn 487 / e111 id.
+ https://github.com/libmtp/libmtp/issues/346
+
+---
+ src/music-players.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/music-players.h b/src/music-players.h
+index a90002fbfad1..a2fc406d8f38 100644
+--- a/src/music-players.h
++++ b/src/music-players.h
+@@ -3597,8 +3597,10 @@
+       DEVICE_FLAGS_ANDROID_BUGS },
+   { "Foxconn (for Vizio)", 0x0489, "VTAB1008", 0xe040,
+       DEVICE_FLAGS_ANDROID_BUGS },
++/* ... seems to cause problems, see https://github.com/libmtp/libmtp/issues/346 
+   { "Foxconn (for Lenovo)", 0x0489, "IdeaTab A2109/A2110/Medion LIFETAB S9714", 0xe111,
+       DEVICE_FLAGS_ANDROID_BUGS },
++*/
+ 
+ 
+   /*
+-- 
+2.52.0
+

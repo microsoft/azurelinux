@@ -1,0 +1,11 @@
+--- ./cmake/OpenCVDetectOpenCL.cmake.orig	2019-05-14 00:35:41.373094435 +0100
++++ ./cmake/OpenCVDetectOpenCL.cmake	2019-05-14 00:35:50.833189862 +0100
+@@ -5,7 +5,7 @@ if(APPLE)
+ else()
+   set(OPENCL_LIBRARY "" CACHE STRING "OpenCL library")
+   set(OPENCL_INCLUDE_DIR "${OpenCV_SOURCE_DIR}/3rdparty/include/opencl/1.2" CACHE PATH "OpenCL include directory")
+-  ocv_install_3rdparty_licenses(opencl-headers "${OpenCV_SOURCE_DIR}/3rdparty/include/opencl/LICENSE.txt")
++  #ocv_install_3rdparty_licenses(opencl-headers "${OpenCV_SOURCE_DIR}/3rdparty/include/opencl/LICENSE.txt")
+ endif()
+ mark_as_advanced(OPENCL_INCLUDE_DIR OPENCL_LIBRARY)
+ 

@@ -1,0 +1,10 @@
+--- woff2-1.0.2/include/woff2/output.h.include-cstdint	2017-11-13 19:31:28.000000000 +0100
++++ woff2-1.0.2/include/woff2/output.h	2025-01-29 12:00:47.581485251 +0100
+@@ -13,6 +13,7 @@
+ #include <cstring>
+ #include <memory>
+ #include <string>
++#include <cstdint>
+ 
+ namespace woff2 {
+ 

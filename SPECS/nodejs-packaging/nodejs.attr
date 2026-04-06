@@ -1,0 +1,4 @@
+%__nodejs_provides  %{_rpmconfigdir}/nodejs.prov
+%__nodejs_requires  %{_rpmconfigdir}/nodejs.req
+%__nodejs_suggests  %{_rpmconfigdir}/nodejs.req --optional
+%__nodejs_path  ^/usr/lib/node_modules\(_[[:digit:]]\+\)\{0,1\}/[^/]\+/package\.json$

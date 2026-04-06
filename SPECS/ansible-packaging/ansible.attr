@@ -1,0 +1,6 @@
+%__ansible_provides %{_rpmconfigdir}/ansible-generator --provides
+%__ansible_requires %{_rpmconfigdir}/ansible-generator --requires
+# Prefer ansible-core over ansible. This shells out to echo instead of using a
+# parametric dependency generator to support EL 8.
+%__ansible_suggests /usr/bin/echo ansible-core
+%__ansible_path ^%{_datadir}/ansible/collections/ansible_collections/[^/]+/[^/]+/MANIFEST.json$

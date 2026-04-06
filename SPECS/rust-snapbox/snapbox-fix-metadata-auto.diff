@@ -1,0 +1,27 @@
+--- snapbox-1.0.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ snapbox-1.0.0/Cargo.toml	2026-02-16T16:59:25.820664+00:00
+@@ -84,7 +84,6 @@
+     "dep:os_pipe",
+     "dep:wait-timeout",
+     "dep:libc",
+-    "dep:windows-sys",
+ ]
+ color = [
+     "dep:anstream",
+@@ -220,11 +219,6 @@
+ 
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.176"
+-optional = true
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.60.2"
+-features = ["Win32_Foundation"]
+ optional = true
+ 
+ [lints.clippy]
+@@ -298,3 +292,4 @@
+ [lints.rust.rust_2018_idioms]
+ level = "warn"
+ priority = -1
++

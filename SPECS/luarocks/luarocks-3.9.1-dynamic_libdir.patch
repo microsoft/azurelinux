@@ -1,0 +1,40 @@
+From 5f3d7db817c367690c96af5f074fe88895d0f4be Mon Sep 17 00:00:00 2001
+From: "FeRD (Frank Dana)" <ferdnyc@gmail.com>
+Date: Sat, 29 Apr 2023 21:02:09 -0400
+Subject: [PATCH] Dynamically detect libdir on Linux
+
+Some Linux distributions (e.g. Fedora, CentOS) put 64-bit libraries
+in `/usr/lib64` rather than `/usr/lib`. On such systems `luarocks`
+should use `lib64` rather than `lib`.
+
+Co-authored-by: Michel Alexandre Salim <michel@michel-slm.name>
+---
+ src/luarocks/core/cfg.lua | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/luarocks/core/cfg.lua b/src/luarocks/core/cfg.lua
+index 6231678..5fde2bc 100644
+--- a/src/luarocks/core/cfg.lua
++++ b/src/luarocks/core/cfg.lua
+@@ -393,6 +393,18 @@ local function make_defaults(lua_version, target_cpu, platforms, home)
+       local xdg_cache_home = os.getenv("XDG_CACHE_HOME") or home.."/.cache"
+       defaults.local_cache = xdg_cache_home.."/luarocks"
+       defaults.web_browser = "xdg-open"
++      if platforms.linux then
++         -- inline code from fs/linux.lua since
++         -- luarocks.fs can't be required here
++         -- (circular dependencies)
++         local fd, _, code = io.open("/usr/lib64", "r")
++         if code ~= 2 then
++            defaults.lib_modules_path = "/lib64/lua/"..lua_version
++         end
++         if fd then
++            fd:close()
++         end
++      end
+    end
+ 
+    if platforms.cygwin then
+-- 
+2.40.0
+

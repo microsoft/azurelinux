@@ -1,0 +1,59 @@
+From 96770cfb15c418548ec88a57927e57eef72e1bd1 Mon Sep 17 00:00:00 2001
+From: Paul Olav Tvete <paul.tvete@qt.io>
+Date: Tue, 15 Mar 2022 15:59:15 +0100
+Subject: [PATCH 24/55] Revert "Client: Remove mWaitingForUpdateDelivery"
+
+The reverted commit introduces a severe performance regression
+when a client window is resized while a QtQuick renderthread
+animation is running.
+
+This reverts commit feb1a5c207c13d0bf87c0d8ad039279dbf8cee9e.
+
+Fixes: QTBUG-101726
+Change-Id: Ib5b52ce06efec8c86fada1623c2af82099e57fc6
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+---
+ src/client/qwaylandwindow.cpp | 12 +++++++++---
+ src/client/qwaylandwindow_p.h |  1 +
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 9cc8cb12..3d1be31c 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -658,11 +658,17 @@ void QWaylandWindow::handleFrameCallback()
+             sendExposeEvent(QRect(QPoint(), geometry().size()));
+         if (wasExposed && hasPendingUpdateRequest())
+             deliverUpdateRequest();
++
++        mWaitingForUpdateDelivery = false;
+     };
+ 
+-    // Queued connection, to make sure we don't call handleUpdate() from inside waitForFrameSync()
+-    // in the single-threaded case.
+-    QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
++    if (!mWaitingForUpdateDelivery) {
++        // Queued connection, to make sure we don't call handleUpdate() from inside waitForFrameSync()
++        // in the single-threaded case.
++        mWaitingForUpdateDelivery = true;
++        QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
++    }
++
+ 
+     mFrameSyncWait.notify_all();
+ }
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index cf7ce879..54ac67a9 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -228,6 +228,7 @@ protected:
+     WId mWindowId;
+     bool mWaitingForFrameCallback = false;
+     bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
++    bool mWaitingForUpdateDelivery = false;
+     int mFrameCallbackCheckIntervalTimerId = -1;
+     QElapsedTimer mFrameCallbackElapsedTimer;
+     struct ::wl_callback *mFrameCallback = nullptr;
+-- 
+2.51.1
+

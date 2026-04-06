@@ -1,0 +1,62 @@
+diff -up kbd-2.7-rc1/docs/man/man8/kbdrate.8.orig kbd-2.7-rc1/docs/man/man8/kbdrate.8
+--- kbd-2.7-rc1/docs/man/man8/kbdrate.8.orig	2023-08-09 13:57:23.000000000 +0200
++++ kbd-2.7-rc1/docs/man/man8/kbdrate.8	2024-10-29 12:03:53.354503358 +0100
+@@ -19,7 +19,7 @@ Using
+ without any options will reset the repeat rate to 10.9 characters per second (cps)
+ and the delay to 250 milliseconds (ms) for Intel- and M68K-based systems.
+ These are the IBM defaults. On SPARC-based systems it will reset the repeat rate
+-to 5 cps and the delay to 200 ms.
++to 20 cps and the delay to 200 ms.
+ 
+ .SH OPTIONS
+ .TP
+diff -up kbd-2.7-rc1/src/kbdrate.c.orig kbd-2.7-rc1/src/kbdrate.c
+--- kbd-2.7-rc1/src/kbdrate.c.orig	2024-10-19 00:12:27.000000000 +0200
++++ kbd-2.7-rc1/src/kbdrate.c	2024-10-29 12:08:24.289921559 +0100
+@@ -114,9 +114,12 @@ static int print_only = 0;
+ static int
+ KDKBDREP_ioctl_ok(double rate, int delay, int silent)
+ {
++#if defined(KDKBDREP) && !defined(__sparc__)
+ 	/*
+ 	 * This ioctl is defined in <linux/kd.h> but is not
+ 	 * implemented anywhere - must be in some m68k patches.
++	 * We cannot blindly try unimplemented ioctls on sparc64 -
++	 * the 32<->64bit transition layer does not like it.
+ 	 * Since 2.4.9 also on i386.
+ 	 */
+ 	struct my_kbd_repeat kbdrep_s;
+@@ -181,6 +184,9 @@ KDKBDREP_ioctl_ok(double rate, int delay
+ 	}
+ 
+ 	return 1; /* success! */
++#else /* no KDKBDREP or __sparc__ */
++	return 0;
++#endif /* KDKBDREP */
+ }
+ 
+ #ifdef KIOCSRATE
+@@ -251,6 +257,9 @@ ioport_set(double rate, int delay, int s
+ 
+ 	/* https://wiki.osdev.org/PS/2_Keyboard */
+ 
++	/* The ioport way - will crash on sparc */
++
++#ifndef __sparc__
+ 	for (i = 0; i < (int) RATE_COUNT; i++)
+ 		if (rate * 10 >= valid_rates[i]) {
+ 			value &= 0x60;
+@@ -304,11 +313,12 @@ ioport_set(double rate, int delay, int s
+ 		       valid_rates[value & 0x1f] / 10.0,
+ 		       valid_delays[(value & 0x60) >> 5]);
+ 
++#endif
+ 	return 1;
+ }
+ 
+ #ifdef __sparc__
+-static double rate = 5.0; /* Default rate */
++static double rate = 20.0; /* Default rate */
+ static int delay   = 200; /* Default delay */
+ #else
+ static double rate = 10.9; /* Default rate */

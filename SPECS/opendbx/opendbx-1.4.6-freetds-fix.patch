@@ -1,0 +1,16 @@
+--- opendbx-1.4.6/backends/mssql/mssql_basic.c.orig	2012-05-06 15:59:01.000000000 +0100
++++ opendbx-1.4.6/backends/mssql/mssql_basic.c	2014-05-03 14:36:42.450491218 +0100
+@@ -479,13 +479,8 @@
+ 			case SYBDATETIMN:
+ 				if( dbdatecrack( dbproc, &di, (DBDATETIME*) data ) != FAIL )
+ 				{
+-#ifdef HAVE_LIBSYBDB_MSLIB
+ 					gres[i].length = snprintf( (char*) gres[i].value, gres[i].mlen, "%.4ld-%.2ld-%.2ld %.2ld:%.2ld:%.2ld",
+ 						(long) di.year, (long) di.month+1, (long) di.day, (long) di.hour, (long) di.minute, (long) di.second );
+-#else
+-					gres[i].length = snprintf( (char*) gres[i].value, gres[i].mlen, "%.4ld-%.2ld-%.2ld %.2ld:%.2ld:%.2ld",
+-						(long) di.dateyear, (long) di.datemonth+1, (long) di.datedmonth, (long) di.datehour, (long) di.dateminute, (long) di.datesecond );
+-#endif
+ 				}
+ 				continue;
+ 		}

@@ -1,0 +1,38 @@
+The changes to telnet/commands.c fix fix a crash in the tracefile
+command on 64-bit architectures due to pointer truncation.
+
+The telnetd.c change is just to avoid a future compiler error.
+
+diff -ur netkit-telnet-0.17.orig/telnet/commands.c netkit-telnet-0.17/telnet/commands.c
+--- netkit-telnet-0.17.orig/telnet/commands.c	2023-12-21 12:28:51.146313891 +0100
++++ netkit-telnet-0.17/telnet/commands.c	2023-12-21 12:58:47.177886556 +0100
+@@ -843,7 +843,7 @@
+ struct termios new_tc;
+ #endif
+ 
+-typedef	void (*set_handler_t) P((int));
++typedef	void (*set_handler_t) P((char *));
+ struct setlist {
+     const char *name;				/* name */
+     const char *help;				/* help information */
+@@ -857,7 +857,7 @@
+ #endif
+     { "escape",	"character to escape back to telnet command mode", 0, &escape },
+     { "rlogin", "rlogin escape character", 0, &rlogin },
+-    { "tracefile", "file to write trace information to", (set_handler_t)SetNetTrace, (cc_t *)NetTraceFile},
++    { "tracefile", "file to write trace information to", SetNetTrace, (cc_t *)NetTraceFile},
+     { " ", "", 0, NULL },
+     { " ", "The following need 'localchars' to be toggled true", 0, 0 },
+     { "flushoutput", "character to cause an Abort Output", 0, &termFlushChar },
+diff -ur netkit-telnet-0.17.orig/telnetd/telnetd.c netkit-telnet-0.17/telnetd/telnetd.c
+--- netkit-telnet-0.17.orig/telnetd/telnetd.c	2023-12-21 12:28:51.149313860 +0100
++++ netkit-telnet-0.17/telnetd/telnetd.c	2023-12-21 12:29:51.396695540 +0100
+@@ -385,7 +385,7 @@
+ 	}
+ #endif	/* defined(HAS_IPPROTO_IP) && defined(IP_TOS) */
+ 	net = s;
+-	doit(&from, fromlen);
++	doit((struct sockaddr *) &from, fromlen);
+ 	/* NOTREACHED */
+ 	return 0;
+ }  /* end of main */

@@ -1,0 +1,14 @@
+diff -up db-5.1.19/dist/Makefile.in.185compat db-5.1.19/dist/Makefile.in
+--- db-5.1.19/dist/Makefile.in.185compat	2010-08-27 17:08:03.000000000 +0200
++++ db-5.1.19/dist/Makefile.in	2010-09-10 10:02:32.974640425 +0200
+@@ -193,8 +193,8 @@ libtso_major=	$(libtcl_base)-$(LIBMAJOR)
+ # local libraries, for example.  Do that by adding -I options to the DB185INC
+ # line, and -l options to the DB185LIB line.
+ ##################################################
+-DB185INC=	-c @CFLAGS@ -I$(topdir) @CPPFLAGS@
+-DB185LIB=
++DB185INC=	-c @CFLAGS@ -I$(srcdir) -I$(srcdir)/db.1.85/PORT/linux/include @CPPFLAGS@
++DB185LIB=	${srcdir}/db.1.85/PORT/linux/libdb.a
+ 
+ ##################################################
+ # Performance Event Monitoring definitions

@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 47694d0..3ba68b6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,4 +16,9 @@ if(NOT TARGET Qt::Gui)
+     message(NOTICE "Skipping the build as the condition \"TARGET Qt::Gui\" is not met.")
+     return()
+ endif()
++if (NOT TARGET Threads::Threads)
++    find_package(Threads)
++endif()
++qt_internal_disable_find_package_global_promotion(Threads::Threads)
++
+ qt_build_repo()

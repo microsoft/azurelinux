@@ -1,0 +1,63 @@
+diff -up tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php.old tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php
+--- tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php.old	2022-08-03 16:19:34.658062557 +0200
++++ tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php	2022-08-03 16:20:00.063084090 +0200
+@@ -197,7 +197,7 @@ final class StrictUnifiedDiffOutputBuild
+         $this->assertNotFalse(\file_put_contents($this->fileFrom, $from));
+         $this->assertNotFalse(\file_put_contents($this->fileTo, $to));
+ 
+-        $p = new Process(\sprintf('diff -u %s %s', \escapeshellarg($this->fileFrom), \escapeshellarg($this->fileTo)));
++        $p = Process::fromShellCommandline(\sprintf('diff -u %s %s', \escapeshellarg($this->fileFrom), \escapeshellarg($this->fileTo)));
+         $p->run();
+         $this->assertSame(1, $p->getExitCode()); // note: Process assumes exit code 0 for `isSuccessful`, however `diff` uses the exit code `1` for success with diff
+ 
+@@ -226,7 +226,7 @@ final class StrictUnifiedDiffOutputBuild
+         $this->assertNotFalse(\file_put_contents($this->fileFrom, $from));
+         $this->assertNotFalse(\file_put_contents($this->filePatch, $diff));
+ 
+-        $p = new Process(\sprintf(
++        $p = Process::fromShellCommandline(\sprintf(
+             'git --git-dir %s apply --check -v --unsafe-paths --ignore-whitespace %s',
+             \escapeshellarg($this->dir),
+             \escapeshellarg($this->filePatch)
+@@ -253,7 +253,7 @@ final class StrictUnifiedDiffOutputBuild
+             \escapeshellarg($this->filePatch)
+         );
+ 
+-        $p = new Process($command);
++        $p = Process::fromShellCommandline($command);
+         $p->run();
+ 
+         $this->assertProcessSuccessful($p);
+diff -up tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php.old tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php
+--- tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php.old	2022-08-03 16:19:44.460070865 +0200
++++ tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php	2022-08-03 16:20:06.754089761 +0200
+@@ -97,7 +97,7 @@ final class UnifiedDiffOutputBuilderInte
+             \escapeshellarg($this->filePatch)
+         );
+ 
+-        $p = new Process($command);
++        $p = Process::fromShellCommandline($command);
+         $p->run();
+ 
+         $this->assertProcessSuccessful($p);
+@@ -125,7 +125,7 @@ final class UnifiedDiffOutputBuilderInte
+             \escapeshellarg($this->filePatch)
+         );
+ 
+-        $p = new Process($command);
++        $p = Process::fromShellCommandline($command);
+         $p->run();
+ 
+         $this->assertProcessSuccessful($p);
+diff -up tests/Utils/UnifiedDiffAssertTraitIntegrationTest.php.old tests/Utils/UnifiedDiffAssertTraitIntegrationTest.php
+--- tests/Utils/UnifiedDiffAssertTraitIntegrationTest.php.old	2022-08-03 16:19:24.424053883 +0200
++++ tests/Utils/UnifiedDiffAssertTraitIntegrationTest.php	2022-08-03 16:19:47.539073475 +0200
+@@ -51,7 +51,7 @@ final class UnifiedDiffAssertTraitIntegr
+             \escapeshellarg($this->filePatch)
+         );
+ 
+-        $p = new Process($command);
++        $p = Process::fromShellCommandline($command);
+         $p->run();
+ 
+         $exitCode = $p->getExitCode();

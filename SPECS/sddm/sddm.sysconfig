@@ -1,0 +1,5 @@
+# workaround https://bugzilla.redhat.com/1686675
+# see also https://bugreports.qt.io/browse/QTBUG-58508
+QML_DISABLE_DISK_CACHE=1
+# enable qDebug messages for debug build
+# QT_LOGGING_RULES="*.debug=true"

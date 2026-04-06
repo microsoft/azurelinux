@@ -1,0 +1,12 @@
+diff -ruN fxload-2008_10_13.orig/Makefile fxload-2008_10_13/Makefile
+--- fxload-2008_10_13.orig/Makefile	2008-10-13 23:44:04.000000000 +0200
++++ fxload-2008_10_13/Makefile	2020-11-03 16:05:41.516974652 +0100
+@@ -39,7 +39,7 @@
+ 
+ # object files
+ $(PROG): $(FILES_OBJ)
+-	$(CC) -o $(PROG) $(FILES_OBJ)
++	$(CC) $(LDFLAGS) -o $(PROG) $(FILES_OBJ)
+ 
+ %.o: %.c
+ 	$(CC) -c $(CFLAGS)  $< -o $@

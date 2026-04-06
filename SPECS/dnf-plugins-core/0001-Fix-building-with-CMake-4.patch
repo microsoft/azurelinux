@@ -1,0 +1,77 @@
+From 1f5d725d857b61760174dd09165e885dd63762c5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 25 Jul 2025 16:08:18 +0200
+Subject: [PATCH] Fix building with CMake 4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+CMake 4 removed support for CMake scripts < 3.5 and building dnf-plugins-core
+fails now:
+
+    $ cmake -B redhat-linux-build -S .
+    CMake Warning (dev) at CMakeLists.txt:1 (PROJECT):
+      cmake_minimum_required() should be called prior to this top-level project()
+      call.  Please see the cmake-commands(7) manual for usage documentation of
+      both commands.
+    This warning is for project developers.  Use -Wno-dev to suppress it.
+
+    CMake Error at CMakeLists.txt:2 (CMAKE_MINIMUM_REQUIRED):
+      Compatibility with CMake < 3.5 has been removed from CMake.
+
+      Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+      to tell CMake that the project requires at least <min> but has been updated
+      to work with policies introduced by <max> or earlier.
+
+This patch fixes it by increasing minimal CMake version to 3.5.
+
+It also fixes a warning about the order of cmake_minimum_required()
+and project() calls.
+
+To enable more current policies (4.0.2) it disables CMP0148 policy
+which deprecated PythonInterp CMake module in 3.27.0 (3 years ago). We
+will move from PythonInterp to FindPython3 once we are fine with
+removing support for Python2.
+
+Resolve: https://bugzilla.redhat.com/show_bug.cgi?id=2380548
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ CMakeLists.txt        | 3 ++-
+ dnf-plugins-core.spec | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fcb6364..00c5700 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,5 @@
++CMAKE_MINIMUM_REQUIRED (VERSION 3.5.0...4.0.2)
+ PROJECT (dnf-plugins-core NONE)
+-CMAKE_MINIMUM_REQUIRED (VERSION 2.4)
+ 
+ if (NOT WITHOUT_DEBUG)
+     set (WITHOUT_DEBUG "0")
+@@ -9,6 +9,7 @@ if (NOT WITHOUT_LOCAL)
+     set (WITHOUT_LOCAL "0")
+ endif()
+ 
++CMAKE_POLICY (SET CMP0148 OLD)
+ IF (NOT PYTHON_DESIRED)
+     FIND_PACKAGE (PythonInterp REQUIRED)
+ ELSEIF (${PYTHON_DESIRED} STREQUAL "2")
+diff --git a/dnf-plugins-core.spec b/dnf-plugins-core.spec
+index 0ea420c..8a1c49c 100644
+--- a/dnf-plugins-core.spec
++++ b/dnf-plugins-core.spec
+@@ -48,7 +48,7 @@ License:        GPL-2.0-or-later
+ URL:            https://github.com/rpm-software-management/dnf-plugins-core
+ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+ BuildArch:      noarch
+-BuildRequires:  cmake
++BuildRequires:  cmake >= 3.5.0
+ BuildRequires:  gettext
+ # Documentation
+ %if %{with python3}
+-- 
+2.50.1
+

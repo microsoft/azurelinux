@@ -1,0 +1,12 @@
+diff -Nur chkrootkit-0.44-orig/chkrootkit chkrootkit-0.44/chkrootkit
+--- chkrootkit-0.44-orig/chkrootkit 2004-09-01 15:27:28.000000000 +0200
++++ chkrootkit-0.44/chkrootkit 2004-10-04 14:53:26.003968312 +0200
+@@ -1060,7 +1060,7 @@
+    for i in ${ROOTDIR}${RUNNING} ${ROOTDIR}usr/sbin/${1} `loc ${1} ${1} $pth`
+    do
+       CMD="${i}"
+-      if [ -r "${i}" ]
++      if [ -r "${i}" ] && [ "${i}" != "${ROOTDIR}" ];
+         then
+         return 0
+       fi

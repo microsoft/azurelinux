@@ -1,0 +1,37 @@
+From 9a02d2e62373c192e53ec7ab0652d8a8d719cf5d Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 24 Apr 2024 13:03:09 -0400
+Subject: [PATCH] Downstream-only: do not attempt to run doctests from
+ README.md
+
+These would introduce a circular dependency on the reqwests-retry crate.
+Omitting the README tests avoids a bootstrapping loop between the two
+packages.
+
+Note that if we *did* run these tests, we would need to adjust the path
+from ../../README.md to ../README.md to match the published crate.
+---
+ src/lib.rs | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 1b21173..33c5834 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -42,13 +42,6 @@
+ //! [`ClientWithMiddleware`]: ClientWithMiddleware
+ //! [`with`]: ClientBuilder::with
+ 
+-// Test README examples without overriding module docs.
+-// We want to keep the in-code docs separate as those allow for automatic linking to crate
+-// documentation.
+-#[doc = include_str!("../../README.md")]
+-#[cfg(doctest)]
+-pub struct ReadmeDoctests;
+-
+ mod client;
+ mod error;
+ mod middleware;
+-- 
+2.44.0
+

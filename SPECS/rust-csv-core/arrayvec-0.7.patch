@@ -1,0 +1,17 @@
+diff --git a/src/reader.rs b/src/reader.rs
+index fbb8894..dfb519d 100644
+--- a/src/reader.rs
++++ b/src/reader.rs
+@@ -1330,9 +1330,9 @@ mod tests {
+ 
+     use super::{ReadFieldResult, Reader, ReaderBuilder, Terminator};
+ 
+-    type Csv = ArrayVec<[Row; 10]>;
+-    type Row = ArrayVec<[Field; 10]>;
+-    type Field = ArrayString<[u8; 10]>;
++    type Csv = ArrayVec<Row, 10>;
++    type Row = ArrayVec<Field, 10>;
++    type Field = ArrayString<10>;
+ 
+     // OMG I HATE BYTE STRING LITERALS SO MUCH.
+     fn b(s: &str) -> &[u8] {

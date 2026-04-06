@@ -1,0 +1,87 @@
+From 14a55c1f1f0195e9ada03457e252fafda37ba3f9 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Wed, 6 Sep 2023 12:55:50 +0200
+Subject: [PATCH 12/17] enroll: Add a function to convert an IP address to text
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adutil.c | 34 ++++++++++++++++++++++++++++++++++
+ library/adutil.h |  5 +++++
+ 2 files changed, 39 insertions(+)
+
+diff --git a/library/adutil.c b/library/adutil.c
+index ea49607..36822e2 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -38,6 +38,7 @@
+ #include <stdint.h>
+ #include <time.h>
+ #include <sys/wait.h>
++#include <arpa/inet.h>
+ 
+ static adcli_message_func message_func = NULL;
+ static char last_error[2048] = { 0, };
+@@ -757,6 +758,39 @@ done:
+ 	return ret;
+ }
+ 
++adcli_result
++adcli_sockaddr_to_string(struct sockaddr *sa, char *addr, size_t addr_len)
++{
++	const char *p;
++
++	if (sa == NULL) {
++		return ADCLI_ERR_FAIL;
++	}
++
++	errno = 0;
++	switch (sa->sa_family) {
++		case AF_INET:
++			p = inet_ntop(AF_INET,
++		 &(((struct sockaddr_in *)sa)->sin_addr),
++		 addr, addr_len);
++		break;
++		case AF_INET6:
++			p = inet_ntop(AF_INET6,
++		 &(((struct sockaddr_in6 *)sa)->sin6_addr),
++		 addr, addr_len);
++		break;
++		default:
++			_adcli_err("Failed to get LDAP server address, unknown socket family");
++			return ADCLI_ERR_FAIL;
++	}
++
++	if (p == NULL) {
++		_adcli_err("Failed to convert LDAP server address: %s", strerror(errno));
++		return ADCLI_ERR_FAIL;
++	}
++
++	return ADCLI_SUCCESS;
++}
+ 
+ #ifdef UTIL_TESTS
+ 
+diff --git a/library/adutil.h b/library/adutil.h
+index a07c5da..27c0587 100644
+--- a/library/adutil.h
++++ b/library/adutil.h
+@@ -26,6 +26,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdbool.h>
++#include <sys/socket.h>
+ 
+ typedef enum {
+ 	/* Successful completion */
+@@ -91,4 +92,8 @@ void              adcli_clear_last_error        (void);
+ 
+ const char *      adcli_get_last_error          (void);
+ 
++adcli_result      adcli_sockaddr_to_string      (struct sockaddr *sa,
++						 char *addr,
++						 size_t addr_len);
++
+ #endif /* ADUTIL_H_ */
+-- 
+2.47.0
+

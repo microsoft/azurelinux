@@ -1,0 +1,19 @@
+diff -up qt-mobility-opensource-src-1.2.2/features/deploy.pri.pkgconfig qt-mobility-opensource-src-1.2.2/features/deploy.pri
+--- qt-mobility-opensource-src-1.2.2/features/deploy.pri.pkgconfig	2012-02-23 07:43:48.000000000 -0600
++++ qt-mobility-opensource-src-1.2.2/features/deploy.pri	2014-04-28 07:08:10.030082137 -0500
+@@ -4,13 +4,14 @@ headers.path = $$QT_MOBILITY_INCLUDE/$$T
+ contains(TEMPLATE,.*lib) {
+     target.path=$$QT_MOBILITY_LIB
+ 
+-    maemo5|maemo6|meego {
++    linux-*|maemo5|maemo6|meego {
+         CONFIG += create_pc create_prl
+         QMAKE_PKGCONFIG_NAME = lib$$TARGET
+         QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+         QMAKE_PKGCONFIG_LIBDIR = $$target.path
+         QMAKE_PKGCONFIG_INCDIR = $$headers.path
+         QMAKE_PKGCONFIG_CFLAGS = -I$${QT_MOBILITY_INCLUDE}/QtMobility
++        QMAKE_PKGCONFIG_REQUIRES_PRIVATE = QtCore
+ 
+         pkgconfig.files = $${TARGET}.pc
+         pkgconfig.path = $$QT_MOBILITY_LIB/pkgconfig

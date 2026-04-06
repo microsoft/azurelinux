@@ -1,0 +1,321 @@
+#!/bin/sh
+#
+# Copyright 2009, 2010 Red Hat, Inc.
+# License: GPLv2
+# Author: Dan Horák <dhorak@redhat.com>
+#
+# unblock devices listed in various config files and wait until they are ready
+#
+# it uses dasd and zfcp config file
+# config file syntax:
+# deviceno   options
+# or
+# deviceno   WWPN   FCPLUN
+#
+# also processes the system ccw config file and network interface configurations
+#
+# requires: echo, sleep, modprobe, grep, printf, sed.
+#
+# it is used in
+#   anaconda
+#   dracut generated initramfs
+#   normal system startup driven by upstart
+#
+
+DASDCONFIG=/etc/dasd.conf
+ZFCPCONFIG=/etc/zfcp.conf
+ZNETCONFIG=/etc/ccw.conf
+BLACKLIST=/proc/cio_ignore
+CIO_SETTLE=/proc/cio_settle
+VERBOSE=
+PATH=/bin:/sbin
+DEVICE=			# list of devices given on command line
+ALL_DEVICES=		# list of all unblocked devices
+WAITING_TIMEOUT=60	# maximum time to wait for all devices to appear
+WAITING_TOTAL=0		# actual time spent waiting for devices
+
+usage()
+{
+    echo "Usage: $CMD [-h|--help] [-V|--verbose] [-d|--device <deviceid>]"
+    echo "    -h|--help                 print this message"
+    echo "    -V|--verbose              be verbose"
+    echo "    -d|--device <deviceid>    unblock and wait for specified device"
+    exit 1
+}
+
+# accepts single device, comma-separated lists and dash separated ranges and their combinations
+# the comma separated list is split so we minimize the effect of unsuccessful freeing
+free_device()
+{
+    local DEV DEV_LIST
+
+    [ -z "$1" ] && return
+
+    DEV_LIST=$(echo "$1" | sed 'y/ABCDEF/abcdef/' | sed 's/,/ /g')
+
+    for DEV in $DEV_LIST; do
+        [ $VERBOSE ] && echo "Freeing device(s) $DEV"
+        if ! echo "free $DEV" > $BLACKLIST 2> /dev/null ; then
+    	    echo "Error: can't free device(s) $DEV"
+	else
+	    if [ -z $ALL_DEVICES ]; then
+		ALL_DEVICES="$DEV"
+	    else
+		ALL_DEVICES="$ALL_DEVICES,$DEV"
+	    fi
+	fi
+    done
+}
+
+# wait until a device appears on the ccw bus
+wait_on_single_device()
+{
+    local DEVICE_ONLINE DEV
+    
+    [ -z "$1" ] && return
+    
+    DEV="$1"
+    DEVICE_ONLINE="/sys/bus/ccw/devices/$DEV/online"
+
+    [ $VERBOSE ] && echo "Waiting on device $DEV"
+    [ -f "$DEVICE_ONLINE" ] && return
+
+    for t in 1 2 3 4 5
+    do
+	if [ $WAITING_TOTAL -ge $WAITING_TIMEOUT ]; then
+	    [ $VERBOSE ] && echo "Waiting timeout of $WAITING_TIMEOUT seconds reached"
+	    break
+	fi
+	WAITING_TOTAL=$(($WAITING_TOTAL + $t))
+        [ $VERBOSE ] && echo "Waiting additional $t second(s) and $WAITING_TOTAL second(s) in total"
+	sleep $t
+	[ -f "$DEVICE_ONLINE" ] && return
+    done
+    echo "Error: device $DEV still not ready"
+}
+
+# wait until recently unblocked devices are ready
+# at this point we know the content of ALL_DEVICES is syntacticly correct
+wait_on_devices()
+{
+    if [ -w $CIO_SETTLE ]; then
+	[ $VERBOSE ] && echo "Waiting until all pending CIO requests are processed"
+	echo 1 > $CIO_SETTLE
+	return
+    fi
+
+    OLD_IFS=$IFS
+    IFS=","
+    set $ALL_DEVICES
+    for DEV in $*
+    do
+        IFS="."
+
+        # get the lower bound for range or get the single device
+        LOWER=${DEV%%-*}
+	set $LOWER
+        if [ $# -eq 1 ]; then
+	    L0=0
+	    L1=0
+	    L2=$(printf "%d" "0x$1")
+        else
+	    L0=$(printf "%d" "0x$1")
+	    L1=$(printf "%d" "0x$2")
+	    L2=$(printf "%d" "0x$3")
+        fi
+
+        # get the upper bound for range or get the single device
+        UPPER=${DEV##*-}
+        set $UPPER
+        if [ $# -eq 1 ]; then
+	    U0=0
+	    U1=0
+	    U2=$(printf "%d" "0x$1")
+        else
+	    U0=$(printf "%d" "0x$1")
+	    U1=$(printf "%d" "0x$2")
+	    U2=$(printf "%d" "0x$3")
+        fi
+
+        IFS=$OLD_IFS
+
+        # iterate thru all devices
+	i=$L0
+	while [ $i -le $U0 ]; do
+            [ $i -eq $L0 ] && LJ=$L1 || LJ=0
+            [ $i -eq $U0 ] && UJ=$U1 || UJ=3
+
+	    j=$LJ
+	    while [ $j -le $UJ ]; do
+                [ $i -eq $L0 -a $j -eq $L1 ] && LK=$L2 || LK=0
+                [ $i -eq $U0 -a $j -eq $U1 ] && UK=$U2 || UK=65535
+
+		k=$LK
+		while [ $k -le $UK ]; do
+                    wait_on_single_device "$(printf %x.%x.%04x $i $j $k)"
+		    k=$(($k + 1))
+                done
+		j=$(($j + 1))
+            done
+	    i=$(($i + 1))
+        done
+    done
+}
+
+process_config_file()
+{
+    local CONFIG
+
+    [ -z "$1" ] && return
+    
+    CONFIG="$1"
+    if [ -f "$CONFIG" ]; then
+        while read line; do
+	    case $line in
+		\#*) ;;
+		*)
+		    [ -z "$line" ] && continue
+		    set $line
+		    free_device $1
+		    ;;
+	    esac
+	done < "$CONFIG"
+    fi
+}
+
+# check how we were called
+CMD=${0##*/}
+DIR=${0%/*}
+ARGS=$@
+case $CMD in
+    "dasd_cio_free")
+	MODE_DASD="yes"
+	;;
+    "zfcp_cio_free")
+	MODE_ZFCP="yes"
+	;;
+    "znet_cio_free")
+	MODE_ZNET="yes"
+	;;
+    "device_cio_free")
+	MODE_DASD="yes"
+	MODE_ZFCP="yes"
+	MODE_ZNET="yes"
+	;;
+    *)
+	echo "Error: unknown alias '$CMD'."
+	echo "Supported aliases are dasd_cio_free, zfcp_cio_free and znet_cio_free."
+	exit 1
+	;;
+esac
+
+# process command line options
+while [ $# -gt 0 ]; do
+    case $1 in
+	-V|--verbose)
+	    VERBOSE=yes
+	    ;;
+	-h|--help)
+	    usage
+	    ;;
+	-d|--device)
+	    shift
+	    if [ "$1" ]; then
+		if [ "$DEVICE" ]; then
+		    DEVICE="$DEVICE,$1"
+		else
+		    DEVICE=$1
+		fi
+	    else
+		echo "Error: no device given"
+		usage
+	    fi
+	    ;;
+	*)
+	    echo "Error: unknown option $1"
+	    usage
+	    ;;
+    esac
+    shift
+done
+
+if [ ! -f $BLACKLIST ]; then
+    echo "Error: $BLACKLIST kernel interface doesn't exist"
+    exit 2
+fi
+
+if [ "$DEVICE" ]; then
+    [ $VERBOSE ] && echo "Freeing specific devices"
+    free_device $DEVICE
+    wait_on_devices
+    udevadm settle
+    exit 0
+fi
+
+if [ $VERBOSE ]; then
+    echo -n "Freeing devices:"
+    [ $MODE_DASD ] && echo -n " dasd"
+    [ $MODE_ZFCP ] && echo -n " zfcp"
+    [ $MODE_ZNET ] && echo -n " znet"
+    echo
+fi
+
+[ $MODE_DASD ] && process_config_file $DASDCONFIG
+[ $MODE_ZFCP ] && process_config_file $ZFCPCONFIG
+
+if [ $MODE_DASD ]; then
+    # process the device list defined as option for the dasd module
+    DEVICES=$(modprobe --showconfig | LANG=C grep "options[[:space:]]\+dasd_mod" | \
+	sed -e 's/.*[[:space:]]dasd=\([^[:space:]]*\).*/\1/' -e 's/([^)]*)//g' \
+	-e 's/nopav\|nofcx\|autodetect\|probeonly//g' -e 's/,,/,/g' -e 's/^,//' -e 's/,$//')
+
+    for DEVRANGE in $(echo $DEVICES | sed 's/,/ /g'); do
+	free_device $DEVRANGE
+    done
+fi
+
+if [ $MODE_ZNET ]; then
+    # process the config file
+    if [ -f "$ZNETCONFIG" ]; then
+        while read line; do
+	    case $line in
+		\#*) ;;
+		*)
+		    [ -z "$line" ] && continue
+		    # grep 2 or 3 channels from each "<nettype>,<subchannels>,<options>" line
+		    DEVICES=$(echo $line | LANG=C grep -E -i -o "([0-9]\.[0-9]\.[a-f0-9]+,){1,2}([0-9]\.[0-9]\.[a-f0-9]+)")
+		    free_device $DEVICES
+		    ;;
+	    esac
+	done < "$ZNETCONFIG"
+    fi
+    # process channels from network interface configurations
+    if [ -z "$__sed_discard_ignored_files" ]; then
+	if [ -f /etc/init.d/functions ]; then
+	    . /etc/init.d/functions
+	else
+	    # default value copied from initscripts 9.03.10
+	    __sed_discard_ignored_files='/\(~\|\.bak\|\.orig\|\.rpmnew\|\.rpmorig\|\.rpmsave\)$/d'
+	fi
+    fi
+    for line in $(LANG=C grep -E -i -h \
+	"^[[:space:]]*SUBCHANNELS=['\"]?([0-9]\.[0-9]\.[a-f0-9]+,){1,2}([0-9]\.[0-9]\.[a-f0-9]+)['\"]?([[:space:]]+#|[[:space:]]*$)" \
+	 $( (ls /etc/sysconfig/network-scripts/ifcfg-* 2> /dev/null || echo "__no_config_file") | \
+	LC_ALL=C sed -e "$__sed_discard_ignored_files") 2> /dev/null)
+    do
+	eval "$line"
+        free_device $SUBCHANNELS
+    done
+    for line in $(LANG=C grep -E -i -h \
+	"^s390-subchannels=([0-9]\.[0-9]\.[a-f0-9]+;){2,3}$" \
+	$( (ls /etc/NetworkManager/system-connections/*.nmconnection 2> /dev/null ||  echo "__no_config_file") | \
+        LC_ALL=C sed -e "$__sed_discard_ignored_files") 2> /dev/null)
+    do
+	SUBCHANNELS="$(echo $line | sed -e "s/s390-subchannels=//" -e "s/;/,/g")"
+        free_device $SUBCHANNELS
+    done
+fi
+
+[ -z "$ALL_DEVICES" ] && exit 0
+
+wait_on_devices

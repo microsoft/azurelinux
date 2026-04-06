@@ -1,0 +1,127 @@
+From 4550b06f9de6c23d7b87a34d2bca1c9aaa594a3e Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 14 Feb 2020 06:05:42 -0500
+Subject: [PATCH 2/5] Set FreeType version to 2.14.1 and update tolerances
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ extern/meson.build                       | 2 +-
+ lib/matplotlib/__init__.py               | 2 +-
+ lib/matplotlib/tests/test_axes.py        | 4 ++--
+ lib/matplotlib/tests/test_backend_pgf.py | 2 +-
+ lib/matplotlib/tests/test_ft2font.py     | 6 +++---
+ lib/matplotlib/tests/test_legend.py      | 4 ++--
+ lib/matplotlib/tests/test_polar.py       | 2 +-
+ 7 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/extern/meson.build b/extern/meson.build
+index 5463183a90..928eb6bd56 100644
+--- a/extern/meson.build
++++ b/extern/meson.build
+@@ -13,7 +13,7 @@ else
+   # must match the value in `lib/matplotlib.__init__.py`. Also update the docs
+   # in `docs/devel/dependencies.rst`. Bump the cache key in
+   # `.circleci/config.yml` when changing requirements.
+-  LOCAL_FREETYPE_VERSION = '2.6.1'
++  LOCAL_FREETYPE_VERSION = '2.14.1'
+ 
+   freetype_proj = subproject(
+     f'freetype-@LOCAL_FREETYPE_VERSION@',
+diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py
+index 79cccf0892..04d716b54c 100644
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -1363,7 +1363,7 @@ def _val_or_rc(val, rc_name):
+ def _init_tests():
+     # The version of FreeType to install locally for running the tests. This must match
+     # the value in `meson.build`.
+-    LOCAL_FREETYPE_VERSION = '2.6.1'
++    LOCAL_FREETYPE_VERSION = '2.14.1'
+ 
+     from matplotlib import ft2font
+     if (ft2font.__freetype_version__ != LOCAL_FREETYPE_VERSION or
+diff --git a/lib/matplotlib/tests/test_axes.py b/lib/matplotlib/tests/test_axes.py
+index 159fc70282..b304186fc9 100644
+--- a/lib/matplotlib/tests/test_axes.py
++++ b/lib/matplotlib/tests/test_axes.py
+@@ -8084,7 +8084,7 @@ def test_normal_axes():
+     ]
+     for nn, b in enumerate(bbaxis):
+         targetbb = mtransforms.Bbox.from_bounds(*target[nn])
+-        assert_array_almost_equal(b.bounds, targetbb.bounds, decimal=2)
++        assert_array_almost_equal(b.bounds, targetbb.bounds, decimal=0)
+ 
+     target = [
+         [150.0, 119.999, 930.0, 11.111],
+@@ -8102,7 +8102,7 @@ def test_normal_axes():
+ 
+     target = [85.5138, 75.88888, 1021.11, 1017.11]
+     targetbb = mtransforms.Bbox.from_bounds(*target)
+-    assert_array_almost_equal(bbtb.bounds, targetbb.bounds, decimal=2)
++    assert_array_almost_equal(bbtb.bounds, targetbb.bounds, decimal=0)
+ 
+     # test that get_position roundtrips to get_window_extent
+     axbb = ax.get_position().transformed(fig.transFigure).bounds
+diff --git a/lib/matplotlib/tests/test_backend_pgf.py b/lib/matplotlib/tests/test_backend_pgf.py
+index e218a81cdc..839ad724e1 100644
+--- a/lib/matplotlib/tests/test_backend_pgf.py
++++ b/lib/matplotlib/tests/test_backend_pgf.py
+@@ -165,7 +165,7 @@ def test_pathclip():
+ # test mixed mode rendering
+ @needs_pgf_xelatex
+ @pytest.mark.backend('pgf')
+-@image_comparison(['pgf_mixedmode.pdf'], style='default')
++@image_comparison(['pgf_mixedmode.pdf'], style='default', tol=0.87)
+ def test_mixedmode():
+     mpl.rcParams.update({'font.family': 'serif', 'pgf.rcfonts': False})
+     Y, X = np.ogrid[-1:1:40j, -1:1:40j]
+diff --git a/lib/matplotlib/tests/test_ft2font.py b/lib/matplotlib/tests/test_ft2font.py
+index 6ba23bab34..0aee3222f1 100644
+--- a/lib/matplotlib/tests/test_ft2font.py
++++ b/lib/matplotlib/tests/test_ft2font.py
+@@ -706,10 +706,10 @@ def test_ft2font_get_sfnt_table(font_name, header):
+ 
+ @pytest.mark.parametrize('left, right, unscaled, unfitted, default', [
+     # These are all the same class.
+-    ('A', 'A', 57, 248, 256), ('A', 'À', 57, 248, 256), ('A', 'Á', 57, 248, 256),
+-    ('A', 'Â', 57, 248, 256), ('A', 'Ã', 57, 248, 256), ('A', 'Ä', 57, 248, 256),
++    ('A', 'A', 57, 247, 256), ('A', 'À', 57, 247, 256), ('A', 'Á', 57, 247, 256),
++    ('A', 'Â', 57, 247, 256), ('A', 'Ã', 57, 247, 256), ('A', 'Ä', 57, 247, 256),
+     # And a few other random ones.
+-    ('D', 'A', -36, -156, -128), ('T', '.', -243, -1056, -1024),
++    ('D', 'A', -36, -156, -128), ('T', '.', -243, -1055, -1024),
+     ('X', 'C', -149, -647, -640), ('-', 'J', 114, 495, 512),
+ ])
+ def test_ft2font_get_kerning(left, right, unscaled, unfitted, default):
+diff --git a/lib/matplotlib/tests/test_legend.py b/lib/matplotlib/tests/test_legend.py
+index eb3bfca7c2..c01be3aec0 100644
+--- a/lib/matplotlib/tests/test_legend.py
++++ b/lib/matplotlib/tests/test_legend.py
+@@ -520,9 +520,9 @@ def test_figure_legend_outside():
+         fig.draw_without_rendering()
+ 
+         assert_allclose(axs.get_window_extent().extents,
+-                        axbb[nn])
++                        axbb[nn], rtol=1)
+         assert_allclose(leg.get_window_extent().extents,
+-                        legbb[nn])
++                        legbb[nn], rtol=1)
+ 
+ 
+ @image_comparison(['legend_stackplot.png'],
+diff --git a/lib/matplotlib/tests/test_polar.py b/lib/matplotlib/tests/test_polar.py
+index 844ab8cf3a..826a8a0c3a 100644
+--- a/lib/matplotlib/tests/test_polar.py
++++ b/lib/matplotlib/tests/test_polar.py
+@@ -328,7 +328,7 @@ def test_get_tightbbox_polar():
+     fig.canvas.draw()
+     bb = ax.get_tightbbox(fig.canvas.get_renderer())
+     assert_allclose(
+-        bb.extents, [107.7778,  29.2778, 539.7847, 450.7222], rtol=1e-03)
++        bb.extents, [107.7778,  29.2778, 539.7847, 450.7222], rtol=1)
+ 
+ 
+ @check_figures_equal(extensions=["png"])
+-- 
+2.52.0
+

@@ -1,0 +1,32 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 2 Aug 2017 16:12:19 +0300
+Subject: [PATCH] Add extra search directory
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/kernel/src/code_server.erl b/lib/kernel/src/code_server.erl
+index 7327636751..2e92e77598 100644
+--- a/lib/kernel/src/code_server.erl
++++ b/lib/kernel/src/code_server.erl
+@@ -90,11 +90,17 @@ init(Ref, Parent, [Root,Mode]) ->
+     IPath =
+ 	case Mode of
+ 	    interactive ->
+-		LibDir = filename:append(Root, "lib"),
+-		{ok,Dirs} = erl_prim_loader:list_dir(LibDir),
+-		Paths = make_path(LibDir, Dirs),
++		F = fun(R) ->
++			LD = filename:append(R, "lib"),
++			case erl_prim_loader:list_dir(LD) of
++				    error -> [];
++				    {ok, D} -> make_path(LD, D)
++			end
++		    end,
++		Paths = F(Root),
++		SharedPaths = F("/usr/share/erlang"),
+ 		UserLibPaths = get_user_lib_dirs(),
+-		["."] ++ UserLibPaths ++ Paths;
++		["."] ++ UserLibPaths ++ Paths ++ SharedPaths;
+ 	    _ ->
+ 		[]
+ 	end,

@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenSSH per-connection server daemon
+Documentation=man:sshd(8) man:sshd_config(5)
+Wants=sshd-keygen.target
+After=sshd-keygen.target
+# Migration for Fedora 38 change to remove group ownership for standard host keys
+# See https://fedoraproject.org/wiki/Changes/SSHKeySignSuidBit
+Wants=ssh-host-keys-migration.service
+
+[Service]
+# Set option as empty variable to avoid warnings upon expanding the command line
+# when the config file under /etc does not exist or is empty.
+Environment=OPTIONS=
+EnvironmentFile=-/etc/sysconfig/sshd
+ExecStart=-/usr/sbin/sshd -i $OPTIONS -o "AuthorizedKeysFile ${CREDENTIALS_DIRECTORY}/ssh.ephemeral-authorized_keys-all .ssh/authorized_keys"
+StandardInput=socket
+ImportCredential=ssh.ephemeral-authorized_keys-all

@@ -1,0 +1,13 @@
+diff -rupN --no-dereference tcl8.6.15/win/configure.in tcl8.6.15-new/win/configure.in
+--- tcl8.6.15/win/configure.in	2024-10-18 11:19:05.457746572 +0200
++++ tcl8.6.15-new/win/configure.in	2024-10-18 11:19:05.684747028 +0200
+@@ -174,6 +174,9 @@ AS_IF([test "$tcl_ok" = "yes"], [
+ ], [
+   AC_SUBST(ZLIB_OBJS,[\${ZLIB_OBJS}])
+ ])
++AC_SUBST(ZLIB_DLL_FILE,[])
++AC_SUBST(ZLIB_OBJS,[])
++AC_SUBST(ZLIB_LIBS,[-lz])
+ AC_DEFINE(HAVE_ZLIB, 1, [Is there an installed zlib?])
+ AC_SUBST(TCL_ZLIB_LIB_NAME, $zlib_lib_name)
+ 

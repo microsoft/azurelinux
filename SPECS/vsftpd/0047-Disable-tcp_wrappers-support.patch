@@ -1,0 +1,49 @@
+From b383ec42bb750419fea102fccf36af5216145eb2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 5 Jan 2018 09:17:13 +0100
+Subject: [PATCH 47/59] Disable tcp_wrappers support
+
+Resolves: rhbz#1518796
+---
+ Makefile    | 2 +-
+ builddefs.h | 1 -
+ vsftpd.conf | 1 -
+ 3 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 98118dc..612994e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,7 +8,7 @@ CFLAGS	=	-O2 -fPIE -fstack-protector --param=ssp-buffer-size=4 \
+ 	-D_FORTIFY_SOURCE=2 \
+ 	#-pedantic -Wconversion
+ 
+-LIBS	=	-lwrap -lnsl -lpam -lcap -ldl -lcrypto
++LIBS	=	-lnsl -lpam -lcap -ldl -lcrypto
+ LINK	=	-Wl,-s
+ LDFLAGS	=	-fPIE -pie -Wl,-z,relro -Wl,-z,now
+ 
+diff --git a/builddefs.h b/builddefs.h
+index 83de674..2aa3a4c 100644
+--- a/builddefs.h
++++ b/builddefs.h
+@@ -1,7 +1,6 @@
+ #ifndef VSF_BUILDDEFS_H
+ #define VSF_BUILDDEFS_H
+ 
+-#define VSF_BUILD_TCPWRAPPERS
+ #define VSF_BUILD_PAM
+ #define VSF_BUILD_SSL
+ 
+diff --git a/vsftpd.conf b/vsftpd.conf
+index e70bc6d..6b8eebb 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -125,4 +125,3 @@ listen_ipv6=YES
+ 
+ pam_service_name=vsftpd
+ userlist_enable=YES
+-tcp_wrappers=YES
+-- 
+2.14.4
+

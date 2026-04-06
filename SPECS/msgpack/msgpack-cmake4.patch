@@ -1,0 +1,47 @@
+From 232fff18d4f07aa25338da88ce704675f9fea465 Mon Sep 17 00:00:00 2001
+From: Takatoshi Kondo <redboltz@gmail.com>
+Date: Tue, 6 Aug 2024 09:36:04 +0900
+Subject: [PATCH 1/5] Fixed cmake warnings.
+
+---
+ CMakeLists.txt | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8dc6d610a..c75c908f9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,8 +1,7 @@
+-CMAKE_MINIMUM_REQUIRED (VERSION 2.8.12)
++CMAKE_MINIMUM_REQUIRED (VERSION 3.10)
+ 
+-IF ((CMAKE_VERSION VERSION_GREATER 3.1) OR
+-    (CMAKE_VERSION VERSION_EQUAL 3.1))
+-    CMAKE_POLICY(SET CMP0054 NEW)
++IF (MSGPACK_USE_BOOST)
++    CMAKE_POLICY(SET CMP0167 NEW)
+ ENDIF ()
+ 
+ PROJECT (msgpack)
+@@ -285,7 +285,6 @@
+     # MEMORYCHECK_COMMAND_OPTIONS needs to place prior to CTEST_MEMORYCHECK_COMMAND
+     SET (MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --show-leak-kinds=definite,possible --error-exitcode=1")
+     FIND_PROGRAM(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
+-    INCLUDE(Dart)
+     ADD_SUBDIRECTORY (test)
+ ENDIF ()
+ 
+diff --git a/include/msgpack/type.hpp b/include/msgpack/type.hpp
+index 1ab49745f..9ef3e86d3 100644
+--- a/include/msgpack/type.hpp
++++ b/include/msgpack/type.hpp
+@@ -60,7 +60,9 @@
+ #if defined(MSGPACK_USE_BOOST)
+ 
+ #include "adaptor/boost/fusion.hpp"
++#if !defined(MSGPACK_USE_CPP03)
+ #include "adaptor/boost/msgpack_variant.hpp"
++#endif // !defined(MSGPACK_USE_CPP03)
+ #include "adaptor/boost/optional.hpp"
+ #include "adaptor/boost/string_ref.hpp"
+ #include "adaptor/boost/string_view.hpp"

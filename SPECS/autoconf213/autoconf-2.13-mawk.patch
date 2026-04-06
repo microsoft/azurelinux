@@ -1,0 +1,41 @@
+--- autoconf-2.13/configure.mawk	Tue Jan  5 08:28:57 1999
++++ autoconf-2.13/configure	Sun Mar 21 16:58:01 1999
+@@ -583,7 +583,7 @@
+ done
+ test -n "$M4" || M4="m4"
+ 
+-for ac_prog in mawk gawk nawk awk
++for ac_prog in gawk mawk nawk awk
+ do
+ # Extract the first word of "$ac_prog", so it can be a program name with args.
+ set dummy $ac_prog; ac_word=$2
+--- autoconf-2.13/acspecific.m4.mawk	Tue Jan  5 08:27:52 1999
++++ autoconf-2.13/acspecific.m4	Sun Mar 21 16:58:56 1999
+@@ -479,9 +479,9 @@
+ AC_DEFUN(AC_PROG_RANLIB,
+ [AC_CHECK_PROG(RANLIB, ranlib, ranlib, :)])
+ 
+-dnl Check for mawk first since it's generally faster.
++dnl Don't check for mawk first even if it's generally faster.
+ AC_DEFUN(AC_PROG_AWK,
+-[AC_CHECK_PROGS(AWK, mawk gawk nawk awk, )])
++[AC_CHECK_PROGS(AWK, gawk mawk nawk awk, )])
+ 
+ AC_DEFUN(AC_PROG_YACC,
+ [AC_CHECK_PROGS(YACC, 'bison -y' byacc, yacc)])
+--- autoconf-2.13/autoconf.texi.mawk	Tue Jan  5 08:28:37 1999
++++ autoconf-2.13/autoconf.texi	Sun Mar 21 16:59:42 1999
+@@ -1535,10 +1535,10 @@
+ @defmac AC_PROG_AWK
+ @maindex PROG_AWK
+ @ovindex AWK
+-Check for @code{mawk}, @code{gawk}, @code{nawk}, and @code{awk}, in that
++Check for @code{gawk}, @code{mawk}, @code{nawk}, and @code{awk}, in that
+ order, and set output variable @code{AWK} to the first one that it
+-finds.  It tries @code{mawk} first because that is reported to be the
+-fastest implementation.
++finds.  It tries @code{gawk} first because that is reported to be the
++best implementation.
+ @end defmac
+ 
+ @defmac AC_PROG_CC

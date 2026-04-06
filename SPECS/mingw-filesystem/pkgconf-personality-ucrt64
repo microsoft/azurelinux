@@ -1,0 +1,6 @@
+# MinGW UCRT 64-bit x86 Windows target
+Triplet: x86_64-w64-mingw32ucrt
+SysrootDir: /usr/x86_64-w64-mingw32ucrt/sys-root/mingw
+DefaultSearchPaths: /usr/x86_64-w64-mingw32ucrt/sys-root/mingw/lib/pkgconfig:/usr/x86_64-w64-mingw32ucrt/sys-root/mingw/share/pkgconfig
+SystemIncludePaths: /usr/x86_64-w64-mingw32ucrt/sys-root/mingw/include
+SystemLibraryPaths: /usr/x86_64-w64-mingw32ucrt/sys-root/mingw/lib

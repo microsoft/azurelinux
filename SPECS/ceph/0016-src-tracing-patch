@@ -1,0 +1,23 @@
+--- ceph-16.2.6-681-gfdc003bc/src/tracing/bluestore.tp.orig	2021-12-07 08:02:04.682972474 -0500
++++ ceph-16.2.6-681-gfdc003bc/src/tracing/bluestore.tp	2021-12-07 08:03:13.840771852 -0500
+@@ -1,3 +1,9 @@
++
++#ifdef __x86_64__
++#undef STAP_SDT_ARG_CONSTRAINT
++#define STAP_SDT_ARG_CONSTRAINT norx
++#endif
++
+ #include "include/int_types.h"
+ 
+ TRACEPOINT_EVENT(bluestore, transaction_state_duration,
+--- ceph-16.2.6-681-gfdc003bc/src/tracing/librbd.tp.orig	2021-12-07 09:50:16.467579483 -0500
++++ ceph-16.2.6-681-gfdc003bc/src/tracing/librbd.tp	2021-12-07 09:50:47.620026940 -0500
+@@ -1,3 +1,8 @@
++#ifdef __x86_64__
++#undef STAP_SDT_ARG_CONSTRAINT
++#define STAP_SDT_ARG_CONSTRAINT norx
++#endif
++
+ #include "tracing/tracing-common.h"
+ #include "include/rbd/librbd.h"
+ #include "include/int_types.h"

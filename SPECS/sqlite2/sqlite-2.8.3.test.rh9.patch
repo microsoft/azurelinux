@@ -1,0 +1,16 @@
+diff -Naur sqlite-orig/test/tester.tcl sqlite/test/tester.tcl
+--- sqlite-orig/test/tester.tcl	2003-03-01 20:45:35.000000000 +0100
++++ sqlite/test/tester.tcl	2003-06-28 02:14:03.000000000 +0200
+@@ -43,8 +43,10 @@
+ # Create a test database
+ #
+ catch {db close}
+-file delete -force test.db
+-file delete -force test.db-journal
++#file delete -force test.db
++#file delete -force test.db-journal
++exec rm -fr test.db
++exec rm -fr test.db-journal
+ sqlite db ./test.db
+ if {[info exists ::SETUP_SQL]} {
+   db eval $::SETUP_SQL

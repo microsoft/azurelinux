@@ -1,0 +1,36 @@
+--- v_frame-0.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ v_frame-0.5.0/Cargo.toml	2026-01-22T14:50:21.755838+00:00
+@@ -49,28 +49,6 @@
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+ version = "0.6"
+-
+-[target.wasm32-unknown-unknown.dependencies.wasm-bindgen]
+-version = "0.2"
+-
+-[target.wasm32-unknown-unknown.dev-dependencies.criterion]
+-version = "0.6"
+-features = [
+-    "plotters",
+-    "cargo_bench_support",
+-]
+-default-features = false
+-
+-[target.wasm32-unknown-unknown.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+-[target.wasm32-wasi.dev-dependencies.criterion]
+-version = "0.6"
+-features = [
+-    "plotters",
+-    "cargo_bench_support",
+-]
+-default-features = false
+ 
+ [lints.clippy]
+ allow_attributes = "warn"
+@@ -192,3 +170,4 @@
+ 
+ [lints.rust]
+ missing_docs = "warn"
++

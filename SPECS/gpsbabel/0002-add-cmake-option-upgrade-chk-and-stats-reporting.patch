@@ -1,0 +1,260 @@
+From 21e41c55b72015316604f430c7b8e7bbcf3940a3 Mon Sep 17 00:00:00 2001
+From: tsteven4 <13596209+tsteven4@users.noreply.github.com>
+Date: Sun, 23 Feb 2025 07:58:06 -0700
+Subject: [PATCH 2/2] add cmake option: upgrade chk and stats reporting.
+
+---
+ INSTALL                   |  3 +++
+ gui/CMakeLists.txt        | 16 +++++++++++++---
+ gui/aboutdlg.cc           |  6 ++++++
+ gui/mainwindow.cc         | 14 ++++++++++++++
+ gui/mainwindow.h          |  6 ++++++
+ gui/preferences.cc        |  5 +++++
+ xmldoc/chapters/build.xml |  6 ++++++
+ 7 files changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/INSTALL b/INSTALL
+index 8fe983de..9b049e31 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -59,6 +59,9 @@ GPSBABEL_EMBED_TRANSLATIONS:BOOL:ON|OFF
+ GPSBABEL_ENABLE_PCH:BOOL 
+   Enable precompiled headers when building the target gpsbabel.
+ 
++GPSBABEL_UPGRADE_CHECK:BOOL
++  Enable the graphical user interface upgrade check and usage statistic reporting.
++
+ GPSBABEL_EXTRA_COMPILE_OPTIONS:STRING
+   Extra compile options when building the target gpsbabel.
+ 
+diff --git a/gui/CMakeLists.txt b/gui/CMakeLists.txt
+index dc4e0939..fd6fd017 100644
+--- a/gui/CMakeLists.txt
++++ b/gui/CMakeLists.txt
+@@ -44,6 +44,10 @@ if(UNIX AND NOT APPLE)
+   set_target_properties(gpsbabelfe PROPERTIES RUNTIME_OUTPUT_DIRECTORY GPSBabelFE)
+ endif()
+ 
++option(GPSBABEL_UPGRADE_CHECK "upgrade check and usage statistic reporting." ON)
++if(NOT GPSBABEL_UPGRADE_CHECK)
++  target_compile_definitions(gpsbabelfe PRIVATE DISABLE_UPGRADE_CHECK)
++endif()
+ # RESOURCES
+ list(APPEND RESOURCES app.qrc)
+ if(WIN32)
+@@ -63,7 +67,9 @@ list(APPEND FORMS miscfltui.ui)
+ list(APPEND FORMS preferences.ui)
+ list(APPEND FORMS rttrkui.ui)
+ list(APPEND FORMS trackui.ui)
+-list(APPEND FORMS upgrade.ui)
++if(GPSBABEL_UPGRADE_CHECK)
++  list(APPEND FORMS upgrade.ui)
++endif()
+ list(APPEND FORMS version_mismatch.ui)
+ list(APPEND FORMS wayptsui.ui)
+ 
+@@ -92,7 +98,9 @@ list(APPEND SOURCES optionsdlg.cc)
+ list(APPEND SOURCES preferences.cc)
+ list(APPEND SOURCES processwait.cc)
+ list(APPEND SOURCES runmachine.cc)
+-list(APPEND SOURCES upgrade.cc)
++if(GPSBABEL_UPGRADE_CHECK)
++  list(APPEND SOURCES upgrade.cc)
++endif()
+ list(APPEND SOURCES version_mismatch.cc)
+ 
+ if(UNIX)
+@@ -126,7 +134,9 @@ list(APPEND HEADERS preferences.h)
+ list(APPEND HEADERS processwait.h)
+ list(APPEND HEADERS runmachine.h)
+ list(APPEND HEADERS setting.h)
+-list(APPEND HEADERS upgrade.h)
++if(GPSBABEL_UPGRADE_CHECK)
++  list(APPEND HEADERS upgrade.h)
++endif()
+ list(APPEND HEADERS version_mismatch.h)
+ 
+ if(UNIX AND NOT APPLE)
+diff --git a/gui/aboutdlg.cc b/gui/aboutdlg.cc
+index 9b6994df..da78f8d0 100644
+--- a/gui/aboutdlg.cc
++++ b/gui/aboutdlg.cc
+@@ -25,7 +25,9 @@
+ #include <QTextDocument>  // for QTextDocument
+ #include <QTextEdit>      // for QTextEdit
+ #include "appname.h"      // for appName
++#ifndef DISABLE_UPGRADE_CHECK
+ #include "upgrade.h"      // for UpgradeCheck
++#endif
+ 
+ 
+ AboutDlg::AboutDlg(QWidget* parent, const QString& ver1,
+@@ -53,8 +55,12 @@ AboutDlg::AboutDlg(QWidget* parent, const QString& ver1,
+   tt.replace("$installationId$", installationId);
+ 
+   // Not localized as it should never be seen.
++#ifndef DISABLE_UPGRADE_CHECK
+   tt.replace("$upgradetestmode$",
+              UpgradeCheck::isTestMode() ? "**Upgrade test mode**" : "");
++#else
++  tt.remove("$upgradetestmode$");
++#endif
+ 
+   doc->setHtml(tt);
+   QTextCursor cur(doc);
+diff --git a/gui/mainwindow.cc b/gui/mainwindow.cc
+index e0c9ac43..5fac0453 100644
+--- a/gui/mainwindow.cc
++++ b/gui/mainwindow.cc
+@@ -73,7 +73,9 @@
+ #include "optionsdlg.h"        // for OptionsDlg
+ #include "preferences.h"       // for Preferences
+ #include "runmachine.h"        // for RunMachine
++#ifndef DISABLE_UPGRADE_CHECK
+ #include "upgrade.h"           // for UpgradeCheck
++#endif
+ #include "version_mismatch.h"  // for VersionMismatch
+ 
+ 
+@@ -98,6 +100,7 @@ QString MainWindow::findBabelVersion()
+   return str;
+ }
+ 
++#ifndef DISABLE_UPGRADE_CHECK
+ //------------------------------------------------------------------------
+ // Decides whether available beta upgrades are suggested to user for download.
+ bool MainWindow::allowBetaUpgrades()
+@@ -107,6 +110,7 @@ bool MainWindow::allowBetaUpgrades()
+   // 'suggest beta upgrade' box, allow betas to be suggested for installation.
+   return isBeta_ || babelData_.allowBetaUpgrades_;
+ }
++#endif
+ 
+ //------------------------------------------------------------------------
+ static QString MakeOptions(const QList<FormatOption>& options)
+@@ -170,7 +174,11 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
+   connect(ui_.actionAbout, &QAction::triggered, this, &MainWindow::aboutActionX);
+   connect(ui_.actionVisit_Website, &QAction::triggered, this, &MainWindow::visitWebsiteActionX);
+   connect(ui_.actionMake_a_Donation, &QAction::triggered, this, &MainWindow::donateActionX);
++#ifndef DISABLE_UPGRADE_CHECK
+   connect(ui_.actionUpgradeCheck, &QAction::triggered, this, &MainWindow::upgradeCheckActionX);
++#else
++  ui_.menuHelp->removeAction(ui_.actionUpgradeCheck);
++#endif
+   connect(ui_.actionPreferences, &QAction::triggered, this, &MainWindow::preferencesActionX);
+ 
+   connect(ui_.inputFormatCombo, &QComboBox::currentIndexChanged,
+@@ -222,11 +230,13 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
+   //--- Restore from registry
+   restoreSettings();
+ 
++#ifndef DISABLE_UPGRADE_CHECK
+   upgrade = new UpgradeCheck(this, formatList_, babelData_);
+   if (babelData_.startupVersionCheck_) {
+     upgrade->checkForUpgrade(babelVersion_, babelData_.upgradeCheckTime_,
+                              allowBetaUpgrades());
+   }
++#endif
+ 
+   if (!babelData_.ignoreVersionMismatch_ && babelVersion_ != VERSION) {
+     VersionMismatch vm(nullptr, babelVersion_, QString(VERSION));
+@@ -1000,10 +1010,12 @@ void MainWindow::applyActionX()
+ //------------------------------------------------------------------------
+ void MainWindow::closeActionX()
+ {
++#ifndef DISABLE_UPGRADE_CHECK
+   QDateTime wt= upgrade->getUpgradeWarningTime();
+   if (wt.isValid()) {
+     babelData_.upgradeCheckTime_ = wt;
+   }
++#endif
+   babelData_.runCount_++;
+ 
+   QDateTime now = QDateTime::currentDateTime();
+@@ -1148,6 +1160,7 @@ void MainWindow::aboutActionX()
+   aboutDlg.exec();
+ }
+ 
++#ifndef DISABLE_UPGRADE_CHECK
+ //------------------------------------------------------------------------
+ void MainWindow::upgradeCheckActionX()
+ {
+@@ -1155,6 +1168,7 @@ void MainWindow::upgradeCheckActionX()
+                            QDateTime(QDate(2000, 1, 1), QTime(0, 0)),
+                            allowBetaUpgrades());
+ }
++#endif
+ 
+ //------------------------------------------------------------------------
+ void MainWindow::preferencesActionX()
+diff --git a/gui/mainwindow.h b/gui/mainwindow.h
+index 99c77794..ecb7cb14 100644
+--- a/gui/mainwindow.h
++++ b/gui/mainwindow.h
+@@ -42,7 +42,9 @@
+ #include "filterdata.h"     // for AllFiltersData
+ #include "format.h"         // for Format
+ #include "ui_mainwinui.h"   // for Ui_MainWindow
++#ifndef DISABLE_UPGRADE_CHECK
+ #include "upgrade.h"        // for UpgradeCheck
++#endif
+ 
+ 
+ class MainWindow: public QMainWindow
+@@ -101,8 +103,10 @@ private:
+   void updateFilterStatus();
+   void setWidgetValues();
+   void getWidgetValues();
++#ifndef DISABLE_UPGRADE_CHECK
+   UpgradeCheck* upgrade;
+   bool allowBetaUpgrades();
++#endif
+   void osLoadDeviceNameCombos(QComboBox*);
+   QString getFormatNameForExtension(const QString& ext);
+ 
+@@ -135,7 +139,9 @@ private slots:
+   void preferencesActionX();
+   void visitWebsiteActionX();
+   void resetFormatDefaults();
++#ifndef DISABLE_UPGRADE_CHECK
+   void upgradeCheckActionX();
++#endif
+ 
+ 
+ };
+diff --git a/gui/preferences.cc b/gui/preferences.cc
+index 1cef2afd..01a430ee 100644
+--- a/gui/preferences.cc
++++ b/gui/preferences.cc
+@@ -49,6 +49,11 @@ Preferences::Preferences(QWidget* parent, QList<Format>& formatList,
+ 
+   ui_.startupCheck->setChecked(babelData_.startupVersionCheck_);
+   ui_.reportStatisticsCheck->setChecked(babelData_.reportStatistics_);
++#ifdef DISABLE_UPGRADE_CHECK
++  ui_.startupCheck->hide();
++  ui_.reportStatisticsCheck->hide();
++  ui_.layoutWidget->adjustSize();
++#endif
+   ui_.ignoreVersionMismatchCheck->setChecked(babelData_.ignoreVersionMismatch_);
+ 
+   connect(ui_.buttonBox, &QDialogButtonBox::accepted, this, &Preferences::acceptClicked);
+diff --git a/xmldoc/chapters/build.xml b/xmldoc/chapters/build.xml
+index de92ffa5..dd2730d9 100644
+--- a/xmldoc/chapters/build.xml
++++ b/xmldoc/chapters/build.xml
+@@ -264,6 +264,12 @@ distributed. The Qt provided translations still need to be distributed.
+             <para>Enable precompiled headers when building the target gpsbabel.</para>
+           </listitem>
+         </varlistentry>
++        <varlistentry>
++          <term>GPSBABEL_UPGRADE_CHECK</term>
++          <listitem>
++            <para>Enable the graphical user interface upgrade check and usage statistic reporting.</para>
++          </listitem>
++        </varlistentry>
+         <varlistentry>
+           <term>GPSBABEL_EXTRA_COMPILE_OPTIONS</term>
+           <listitem>
+-- 
+2.48.1
+

@@ -1,0 +1,16 @@
+--- libdeflate-sys-1.25.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libdeflate-sys-1.25.2/Cargo.toml	2026-02-08T11:56:03.586567+00:00
+@@ -41,7 +41,7 @@
+ repository = "https://github.com/libdeflater/libdeflater"
+ 
+ [features]
+-dynamic = ["pkg-config"]
++dynamic = []
+ freestanding = []
+ 
+ [lib]
+@@ -53,4 +53,3 @@
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.9"
+-optional = true

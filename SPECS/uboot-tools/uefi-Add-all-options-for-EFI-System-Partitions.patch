@@ -1,0 +1,57 @@
+From 86782e882e9542f5f402e00cd87efb36ad0552d3 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sat, 2 Mar 2024 11:17:42 +0000
+Subject: [PATCH v4] disk: dos: Add all options for EFI System Partitions
+
+The EFI spec states that the ESP can be any of FAT12/16/32 but for
+compatibility doesn't necssarily require the partition to be the
+EFI partition table ID of 0xef. A number of arm devices will not
+find their firmware on a FAT partition with an ID of 0xef so also
+allow the original FAT12/16/32 partition IDs as they are also
+permissable for an ESP.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+
+v2:
+- Add 0x0c option
+- Make hex constants consistent
+- Move from if to switch statement
+v3:
+- Fix switch brain fart
+v4:
+- Drop boot_ind out of switch
+
+ disk/part_dos.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/disk/part_dos.c b/disk/part_dos.c
+index 567ead7511d..a35181dff4f 100644
+--- a/disk/part_dos.c
++++ b/disk/part_dos.c
+@@ -40,10 +40,21 @@ static int get_bootable(dos_partition_t *p)
+ {
+ 	int ret = 0;
+ 
+-	if (p->sys_ind == 0xef)
++	switch (p->sys_ind) {
++	case 0x01:
++	case 0x06:
++	case 0x0b:
++	case 0x0c:
++	case 0xef:
+ 		ret |= PART_EFI_SYSTEM_PARTITION;
++		break;
++	default:
++		break;
++	}
++
+ 	if (p->boot_ind == 0x80)
+ 		ret |= PART_BOOTABLE;
++
+ 	return ret;
+ }
+ 
+-- 
+2.44.0
+

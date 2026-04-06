@@ -1,0 +1,81 @@
+Create static and shared versions of the PORD library.
+
+Index: mumps/PORD/lib/Makefile
+===================================================================
+--- mumps.orig/PORD/lib/Makefile
++++ mumps/PORD/lib/Makefile
+@@ -24,15 +24,16 @@
+ .c.o:
+ 	$(CC) $(COPTIONS) -c $*.c $(OUTC)$*.o
+ 
+-libpord$(PLAT)$(LIBEXT):$(OBJS)
+-	$(AR)$@ $(OBJS)
++libpord$(PLAT).a:$(OBJS)
++	$(AR) $@ $(OBJS)
+ 	$(RANLIB) $@
+ 
+-libpord$(PLAT)$(LIBEXT_SHARED):$(OBJS)
+-	$(CC) -shared $(OBJS) -o libpord$(PLAT)$(LIBEXT_SHARED)
++libpord$(PLAT).so: $(OBJS)
++	$(CC) -shared $(OBJS) -Wl,-soname,libpord$(PLAT)-$(SONAME_VERSION).so -o libpord$(PLAT)-$(SONAME_VERSION).so $(OPTL) -Wl,-z,defs
++	ln -fs libpord$(PLAT)-$(SONAME_VERSION).so $@
+ 
+ clean:
+ 	rm -f *.o
+ 
+ realclean:
+-	rm -f *.o libpord$(PLAT)$(LIBEXT) libpord$(PLAT)$(LIBEXT_SHARED)
++	rm -f *.o libpord*.a *.so
+Index: mumps/Makefile
+===================================================================
+--- mumps.orig/Makefile
++++ mumps/Makefile
+@@ -65,9 +65,7 @@
+ 
+ include Makefile.inc
+ 
+-prerequisites: Makefile.inc $(LIBSEQNEEDED) $(libdir)/libpord$(PLAT)$(LIBEXT)
+-
+-prerequisitesshared: Makefile.inc $(LIBSEQNEEDED)sharedlibseq $(libdir)/libpord$(PLAT)$(LIBEXT_SHARED)
++prerequisites: Makefile.inc $(LIBSEQNEEDED) $(libdir)/libpord$(PLAT).a $(libdir)/libpord$(PLAT).so
+ 
+ # Rules for fake MPI library used to avoid using MPI:
+ #
+@@ -85,22 +83,22 @@
+ 	(cp libseq/lib* $(libdir))
+ 
+ # Build the libpord.a library and copy it into $(topdir)/lib
+-$(libdir)/libpord$(PLAT)$(LIBEXT):
++$(libdir)/libpord$(PLAT).a:
+ 	if [ "$(LPORDDIR)" != "" ] ; then \
+ 	  cd $(LPORDDIR); \
+-	  $(MAKE) CC="$(CC)" PLAT="$(PLAT)" CFLAGS="$(OPTC)" AR="$(AR)" RANLIB="$(RANLIB)" OUTC="$(OUTC)" LIBEXT="$(LIBEXT)" LIBEXT_SHARED="$(LIBEXT_SHARED)" libpord$(PLAT)$(LIBEXT); \
++	  $(MAKE) CC="$(CC)" CFLAGS="$(OPTC)" AR="$(AR)" RANLIB="$(RANLIB)" OUTC="$(OUTC)" libpord$(PLAT).a; \
+ 	fi;
+ 	if [ "$(LPORDDIR)" != "" ] ; then \
+-	  cp $(LPORDDIR)/libpord$(PLAT)$(LIBEXT) $@; \
++	  cp $(LPORDDIR)/libpord$(PLAT).a $@; \
+ 	fi;
+ 
+-$(libdir)/libpord$(PLAT)$(LIBEXT_SHARED):
++$(libdir)/libpord$(PLAT).so:
+ 	if [ "$(LPORDDIR)" != "" ] ; then \
+ 	  cd $(LPORDDIR); \
+-	  $(MAKE) PLAT="$(PLAT)" FPIC="$(FPIC_OPT)" CC="$(CC)" CFLAGS="$(OPTC)" AR="$(AR)" RANLIB="$(RANLIB)" OUTC="$(OUTC)" LIBEXT="$(LIBEXT)" LIBEXT_SHARED="$(LIBEXT_SHARED)" libpord$(PLAT)$(LIBEXT_SHARED); \
++	  $(MAKE) CC="$(CC)" CFLAGS="$(OPTC)" AR="$(AR)" ARFUNCT= RANLIB="$(RANLIB)" libpord$(PLAT).so; \
+ 	fi;
+ 	if [ "$(LPORDDIR)" != "" ] ; then \
+-	  cp $(LPORDDIR)/libpord$(PLAT)$(LIBEXT_SHARED) $@; \
++	  cp -a $(LPORDDIR)/lib*pord*.so lib/; \
+ 	fi;
+ 
+ 
+@@ -109,7 +107,7 @@
+ clean:
+ 	(cd src; $(MAKE) clean)
+ 	(cd examples; $(MAKE) clean)
+-	(cd $(libdir); $(RM) lib*$(PLAT)$(LIBEXT) lib*$(PLAT)$(LIBEXT_SHARED))
++	(cd $(libdir); $(RM) *$(PLAT).a *$(PLAT).so)
+ 	(cd libseq; $(MAKE) clean)
+ 	if [ "$(LPORDDIR)" != "" ] ; then \
+ 	  cd $(LPORDDIR); $(MAKE) CC="$(CC)" CFLAGS="$(OPTC)" AR="$(AR)" RANLIB="$(RANLIB)" OUTC="$(OUTC)" LIBEXT="$(LIBEXT)" LIBEXT_SHARED="$(LIBEXT_SHARED)" PLAT="$(PLAT)" realclean; \

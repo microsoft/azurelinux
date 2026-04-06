@@ -1,0 +1,31 @@
+From: Jan Pazdziora <jpazdziora@redhat.com>
+Date: Thu, 10 May 2018 18:35:02 +0200
+Subject: [PATCH] Avoid forking sed to get basename.
+
+
+diff --git a/erts/etc/unix/erl.src.src b/erts/etc/unix/erl.src.src
+index 536fa139d9..4dcffbc4c8 100644
+--- a/erts/etc/unix/erl.src.src
++++ b/erts/etc/unix/erl.src.src
+@@ -49,7 +49,7 @@ else
+ fi
+ BINDIR="$ROOTDIR/erts-%VSN%/bin"
+ EMU=%EMULATOR%%EMULATOR_NUMBER%
+-PROGNAME=`basename "$0"`
++PROGNAME=${0##*/}
+ export EMU
+ export ROOTDIR
+ export BINDIR
+diff --git a/erts/etc/unix/start_erl.src b/erts/etc/unix/start_erl.src
+index 34e0369710..62e613bba1 100644
+--- a/erts/etc/unix/start_erl.src
++++ b/erts/etc/unix/start_erl.src
+@@ -37,7 +37,7 @@ VSN=`awk '{print $2}' $DataFile`
+ 
+ BINDIR=$ROOTDIR/erts-$ERTS_VSN/bin
+ EMU=beam
+-PROGNAME=`echo $0 | sed 's/.*\///'`
++PROGNAME=${0##*/}
+ export EMU
+ export ROOTDIR
+ export BINDIR

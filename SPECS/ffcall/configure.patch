@@ -1,0 +1,23 @@
+diff -Nrup a/configure b/configure
+--- a/configure	2021-06-06 12:39:23.000000000 -0600
++++ b/configure	2021-06-11 11:36:25.646094447 -0600
+@@ -20843,7 +20843,7 @@ fi
+ 
+          mprotect_prog="$mprotect_prog"'
+            char* area = (char*) malloc(6*pagesize);
+-           char* fault_address = area + pagesize*7/2;
++           volatile char* fault_address = area + pagesize*7/2;
+          '
+          if test -z "$no_mprotect"; then
+            if test "$cross_compiling" = yes
+@@ -21675,8 +21675,8 @@ else $as_nop
+                           {
+                             unsigned int pagesize = getpagesize ();
+                             int fd;
+-                            char *pw;
+-                            char *px;
++                            volatile char *pw;
++                            volatile char *px;
+                             fd = open ("$filename", O_CREAT | O_RDWR | O_TRUNC, 0700);
+                             if (fd < 0)
+                               return 1;

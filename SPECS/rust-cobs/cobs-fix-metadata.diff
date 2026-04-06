@@ -1,0 +1,12 @@
+--- cobs-0.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cobs-0.3.0/Cargo.toml	2025-05-16T03:02:41.423074+00:00
+@@ -38,6 +38,9 @@
+ ]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/jamesmunns/cobs.rs"
++exclude = [
++    "docs.sh"
++]
+ 
+ [package.metadata.docs.rs]
+ all-features = true

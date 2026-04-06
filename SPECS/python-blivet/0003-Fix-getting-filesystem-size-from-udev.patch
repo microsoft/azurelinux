@@ -1,0 +1,225 @@
+From 28717b8e48d3af5512af4eb1e7df1b909180002f Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 6 May 2025 12:32:28 +0200
+Subject: [PATCH 1/5] Fix getting filesystem size from udev
+
+We cannot use ID_FS_SIZE, for some filesystems (like XFS) this
+doesn't include the filesystem metadata.
+
+See also https://github.com/storaged-project/udisks/pull/1115
+---
+ blivet/tasks/fssize.py | 7 ++++---
+ blivet/udev.py         | 5 +++++
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/blivet/tasks/fssize.py b/blivet/tasks/fssize.py
+index b8045cdc..e1cee891 100644
+--- a/blivet/tasks/fssize.py
++++ b/blivet/tasks/fssize.py
+@@ -58,11 +58,12 @@ class FSSize(fstask.FSTask, metaclass=abc.ABCMeta):
+         if not udev_info:
+             raise FSError("Failed to obtain udev information for device %s" % self.fs.device)
+ 
+-        fs_size = udev.device_get_format_size(udev_info)
+-        if not fs_size:
++        last_block = udev.device_get_format_lastblock(udev_info)
++        block_size = udev.device_get_format_blocksize(udev_info)
++        if not last_block or not block_size:
+             raise FSError("Failed to obtain filesystem size for %s from udev" % self.fs.device)
+ 
+-        return Size(fs_size)
++        return Size(int(last_block) * int(block_size))
+ 
+     def do_task(self):  # pylint: disable=arguments-differ
+         """ Returns the size of the filesystem.
+diff --git a/blivet/udev.py b/blivet/udev.py
+index b7c90643..3162aada 100644
+--- a/blivet/udev.py
++++ b/blivet/udev.py
+@@ -285,6 +285,11 @@ def device_get_format_size(udev_info):
+     return udev_info.get("ID_FS_SIZE")
+ 
+ 
++def device_get_format_lastblock(udev_info):
++    """ Report a device's format last block as reported by udev. """
++    return udev_info.get("ID_FS_LASTBLOCK")
++
++
+ def device_get_format_blocksize(udev_info):
+     """ Report a device's format block size as reported by udev. """
+     return udev_info.get("ID_FS_BLOCKSIZE")
+-- 
+2.49.0
+
+
+From e15d29c0d7d77d4ff1084e8eb3700991c41b3445 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 7 May 2025 12:27:11 +0200
+Subject: [PATCH 2/5] udev: Add an option "path" argument to trigger
+
+So we can trigger an event using device path, not only the sysfs
+name.
+---
+ blivet/udev.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/blivet/udev.py b/blivet/udev.py
+index 3162aada..f73fe8e4 100644
+--- a/blivet/udev.py
++++ b/blivet/udev.py
+@@ -135,12 +135,14 @@ def settle(quiet=False):
+         util.run_program(argv)
+ 
+ 
+-def trigger(subsystem=None, action="add", name=None):
++def trigger(subsystem=None, action="add", name=None, path=None):
+     argv = ["trigger", "--action=%s" % action]
+     if subsystem:
+         argv.append("--subsystem-match=%s" % subsystem)
+     if name:
+         argv.append("--sysname-match=%s" % name)
++    if path:
++        argv.append(path)
+ 
+     util.run_program(["udevadm"] + argv)
+     settle()
+-- 
+2.49.0
+
+
+From 579c3c07a1e021e085514e3cb7053e139b2d83e8 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 7 May 2025 12:30:25 +0200
+Subject: [PATCH 3/5] Get FS size from udev only for filesystems known to be
+ supported
+
+Only some filesystems report correctly their size in udev so we
+should not try for all by default.
+---
+ blivet/tasks/fssize.py | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/blivet/tasks/fssize.py b/blivet/tasks/fssize.py
+index e1cee891..c0eab2d6 100644
+--- a/blivet/tasks/fssize.py
++++ b/blivet/tasks/fssize.py
+@@ -38,6 +38,8 @@ class FSSize(fstask.FSTask, metaclass=abc.ABCMeta):
+     """ An abstract class that represents size information extraction. """
+     description = "current filesystem size"
+ 
++    udev = False
++
+     # TASK methods
+ 
+     @property
+@@ -73,14 +75,15 @@ class FSSize(fstask.FSTask, metaclass=abc.ABCMeta):
+             :raises FSError: on failure
+         """
+ 
+-        # try to get size from udev
+-        try:
+-            size = self._get_size_udev()
+-        except FSError as e:
+-            log.info("Failed to obtain filesystem size for %s from udev: %s",
+-                     self.fs.device, str(e))
+-        else:
+-            return size
++        # try to get size from udev if supported
++        if self.udev:
++            try:
++                size = self._get_size_udev()
++            except FSError as e:
++                log.info("Failed to obtain filesystem size for %s from udev: %s",
++                         self.fs.device, str(e))
++            else:
++                return size
+ 
+         # fallback to filesystem tools
+         error_msgs = self.availability_errors
+@@ -101,6 +104,8 @@ class FSSize(fstask.FSTask, metaclass=abc.ABCMeta):
+ 
+ 
+ class Ext2FSSize(FSSize):
++    udev = True
++
+     def _get_size_tools(self):
+         return Size(self.fs._current_info.block_size * self.fs._current_info.block_count)
+ 
+@@ -111,6 +116,8 @@ class NTFSSize(FSSize):
+ 
+ 
+ class XFSSize(FSSize):
++    udev = True
++
+     def _get_size_tools(self):
+         return Size(self.fs._current_info.block_size * self.fs._current_info.block_count)
+ 
+-- 
+2.49.0
+
+
+From 999cfb78b8af33ed8aaa7d0172fa635ca0f5e654 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 7 May 2025 12:31:25 +0200
+Subject: [PATCH 4/5] Trigger an udev event before getting FS size from udev
+
+Just to make sure udev has up-to-date information.
+---
+ blivet/tasks/fssize.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/blivet/tasks/fssize.py b/blivet/tasks/fssize.py
+index c0eab2d6..5448a659 100644
+--- a/blivet/tasks/fssize.py
++++ b/blivet/tasks/fssize.py
+@@ -55,6 +55,8 @@ class FSSize(fstask.FSTask, metaclass=abc.ABCMeta):
+         raise NotImplementedError
+ 
+     def _get_size_udev(self):
++        # just make sure udev has up-to-date information
++        udev.trigger(action="change", path=self.fs.device)
+         udev.settle()
+         udev_info = udev.get_device(device_node=self.fs.device)
+         if not udev_info:
+-- 
+2.49.0
+
+
+From c230b03246580ff1e49a49cbc571a581b16c73a6 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 7 May 2025 12:31:58 +0200
+Subject: [PATCH 5/5] tests: Add a simple test case for FS size task
+
+---
+ tests/storage_tests/formats_test/fstesting.py | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/tests/storage_tests/formats_test/fstesting.py b/tests/storage_tests/formats_test/fstesting.py
+index ee158bba..995c582b 100644
+--- a/tests/storage_tests/formats_test/fstesting.py
++++ b/tests/storage_tests/formats_test/fstesting.py
+@@ -214,6 +214,21 @@ class FSAsRoot(loopbackedtestcase.LoopBackedTestCase, metaclass=abc.ABCMeta):
+         # and no errors should occur when checking
+         self.assertIsNone(an_fs.do_check())
+ 
++    def test_fssize(self):
++        an_fs = self._fs_class()
++        if not an_fs.formattable:
++            self.skipTest("can not create filesystem %s" % an_fs.name)
++        if an_fs._size_info.availability_errors:
++            self.skipTest("can not get size for filesystem %s" % an_fs.name)
++        an_fs.device = self.loop_devices[0]
++        self.assertIsNone(an_fs.create())
++        an_fs.update_size_info()
++
++        if isinstance(an_fs, fs.NTFS) or isinstance(an_fs, fs.FATFS):
++            self.assertAlmostEqual(an_fs._size, self._DEVICE_SIZE, delta=Size("1 MiB"))
++        else:
++            self.assertEqual(an_fs._size, self._DEVICE_SIZE)
++
+     def test_no_explicit_target_size(self):
+         """ Because _target_size has not been set, resize sets to min size. """
+         # CHECK ME: This is debatable, maybe target size should be set to
+-- 
+2.49.0
+

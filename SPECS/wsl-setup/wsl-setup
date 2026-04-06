@@ -1,0 +1,92 @@
+#!/usr/bin/bash
+#
+#  Setup the environment for the new WSL configuration
+#
+# Copyright (C) 2025
+# SPDX-License-Identifier:      MIT
+#
+# Authors:
+#     Troy Dawson <tdawson@redhat.com>
+#
+
+###############
+# Variables
+###############
+DISTRIBUTION_TEMPLATE_FILE="/usr/share/wsl-setup/wsl-distribution.conf.template"
+DISTRIBUTION_CONF_FILE="/usr/lib/wsl-distribution.conf"
+DISTRIBUTION_CONF_LINK="/etc/wsl-distribution.conf"
+. /etc/os-release
+DEFAULT_NAME="${NAME// /}-${VERSION_ID%.*}"
+ICON_PATH="/usr/share/pixmaps/fedora-logo.ico"
+
+###############
+# Show help
+###############
+usage() {
+  echo "Usage `basename $0`  <options> " >&2
+  echo >&2
+  echo "Setup the environment for the new WSL configuration" >&2
+  echo >&2
+  echo "Options:" >&2
+  echo "  --name, -n" >&2
+  echo "    Set the distro name" >&2
+  echo "    Default: ${DEFAULT_NAME}" >&2
+  echo "  --icon, -i" >&2
+  echo "    Full pathname to the icon" >&2
+  echo "    Default: ${ICON_PATH}" >&2
+  echo "  --help, -h" >&2
+  echo "    Show this options menu" >&2
+  echo >&2
+  popd &>/dev/null
+  exit 1
+}
+
+
+###############
+# Get our arguments
+###############
+while [[ "$#" -ge 1 ]]
+do
+key="$1"
+case $key in
+--name | -n )
+      if ! [ "${2}" == "" ] ; then
+        DEFAULT_NAME="${2}"
+        shift
+      else
+        echo
+        echo "ERROR: Name is not provided"
+        echo
+        usage
+        exit 2
+      fi
+;;
+--icon | -i )
+      if ! [ "${2}" == "" ] ; then
+        ICON_PATH="${2}"
+        shift
+      else
+        echo
+        echo "ERROR: Icon full path is not provided"
+        echo
+        usage
+        exit 2
+      fi
+;;
+* )
+    echo
+    echo "ERROR BAD OPTION: $key"
+    echo
+    usage
+    exit 2
+;;
+esac
+shift
+done
+
+###############
+# Do the work
+###############
+
+cp -f ${DISTRIBUTION_TEMPLATE_FILE} ${DISTRIBUTION_CONF_FILE}
+sed -i -e "s|DEFAULT_NAME|${DEFAULT_NAME}|" -e "s|DEFAULT_ICON_FULL_PATH|${ICON_PATH}|" ${DISTRIBUTION_CONF_FILE}

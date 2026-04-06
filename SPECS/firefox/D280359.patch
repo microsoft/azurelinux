@@ -1,0 +1,28 @@
+From 4e2839ac68797963c302bb9f2fa6f98535583e06 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <grulja@gmail.com>
+Date: Sat, 24 Jan 2026 12:55:28 +0100
+Subject: [PATCH] PipeWire capture: clear existing capabilities before re-enumeration
+
+Prevent duplicate capability entries by clearing the capabilities vector
+before re-enumerating node formats.
+
+Bug: TBD
+Change-Id: Ifff463410a4c39587b8d45694a4049ae82eb6e59
+---
+
+diff --git a/third_party/libwebrtc/modules/video_capture/linux/pipewire_session.cc b/third_party/libwebrtc/modules/video_capture/linux/pipewire_session.cc
+index 957590c92b7a..d178ea05c6b3 100644
+--- a/third_party/libwebrtc/modules/video_capture/linux/pipewire_session.cc
++++ b/third_party/libwebrtc/modules/video_capture/linux/pipewire_session.cc
+@@ -138,6 +138,10 @@ void PipeWireNode::OnNodeInfo(void* data, const pw_node_info* info) {
+       uint32_t id = info->params[i].id;
+       if (id == SPA_PARAM_EnumFormat &&
+           info->params[i].flags & SPA_PARAM_INFO_READ) {
++        RTC_LOG(LS_INFO)
++            << "Clearing existing capabilities before re-enumeration for "
++            << that->display_name_;
++        that->capabilities_.clear();
+         pw_node_enum_params(reinterpret_cast<pw_node*>(that->proxy_), 0, id, 0,
+                             UINT32_MAX, nullptr);
+         break;
+

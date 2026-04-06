@@ -1,0 +1,68 @@
+From 9eec359b0eccae6f266c08d1dd267df59b785d8d Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 12 May 2025 18:00:39 +0200
+Subject: [PATCH] Upgrade to 1.9778
+
+---
+ HiRes.pm | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/HiRes.pm b/HiRes.pm
+index 4555e8e..6943637 100644
+--- a/HiRes.pm
++++ b/HiRes.pm
+@@ -50,7 +50,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+                  stat lstat utime
+                 );
+ 
+-our $VERSION = '1.9777';
++our $VERSION = '1.9778';
+ our $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -74,8 +74,7 @@ sub AUTOLOAD {
+ }
+ 
+ sub import {
+-    my $this = shift;
+-    for my $i (@_) {
++    for my $i (@_[1 .. $#_]) {
+         if (($i eq 'clock_getres'    && !&d_clock_getres)    ||
+             ($i eq 'clock_gettime'   && !&d_clock_gettime)   ||
+             ($i eq 'clock_nanosleep' && !&d_clock_nanosleep) ||
+@@ -88,7 +87,7 @@ sub import {
+             Carp::croak("Time::HiRes::$i(): unimplemented in this platform");
+         }
+     }
+-    Time::HiRes->export_to_level(1, $this, @_);
++    goto &Exporter::import;
+ }
+ 
+ XSLoader::load( 'Time::HiRes', $XS_VERSION );
+@@ -358,7 +357,7 @@ delivered when the timer expires.  C<SIGPROF> can interrupt system calls.
+ The semantics of interval timers for multithreaded programs are
+ system-specific, and some systems may support additional interval
+ timers.  For example, it is unspecified which thread gets the signals.
+-See your L<C<setitimer(2)>> documentation.
++See your C<L<setitimer(2)>> documentation.
+ 
+ =item getitimer ( $which )
+ 
+@@ -654,10 +653,10 @@ gnukfreebsd seems to have non-functional futimens() and utimensat()
+ 
+ Perl modules L<BSD::Resource>, L<Time::TAI64>.
+ 
+-Your system documentation for L<C<clock(3)>>, L<C<clock_gettime(2)>>,
+-L<C<clock_getres(3)>>, L<C<clock_nanosleep(3)>>, L<C<clock_settime(2)>>,
+-L<C<getitimer(2)>>, L<C<gettimeofday(2)>>, L<C<setitimer(2)>>, L<C<sleep(3)>>,
+-L<C<stat(2)>>, L<C<ualarm(3)>>.
++Your system documentation for C<L<clock(3)>>, C<L<clock_gettime(2)>>,
++C<L<clock_getres(3)>>, C<L<clock_nanosleep(3)>>, C<L<clock_settime(2)>>,
++C<L<getitimer(2)>>, C<L<gettimeofday(2)>>, C<L<setitimer(2)>>, C<L<sleep(3)>>,
++C<L<stat(2)>>, C<L<ualarm(3)>>.
+ 
+ =head1 AUTHORS
+ 
+-- 
+2.49.0
+

@@ -1,0 +1,11 @@
+[Unit]
+Description=Vsftpd ftp daemon
+After=network-online.target
+PartOf=vsftpd.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/vsftpd /etc/vsftpd/%i.conf
+
+[Install]
+WantedBy=vsftpd.target

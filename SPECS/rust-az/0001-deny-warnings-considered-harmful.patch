@@ -1,0 +1,24 @@
+From 4613c06f3db9818ed7165c18fc6e89c13ab3e526 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 23 Jul 2023 22:15:00 +0200
+Subject: [PATCH] deny(warnings) considered harmful
+
+---
+ src/lib.rs | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index be8a2cc..be34c6f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -120,7 +120,6 @@ additional terms or conditions.
+ #![no_std]
+ #![warn(missing_docs)]
+ #![doc(html_root_url = "https://docs.rs/az/~1.2")]
+-#![doc(test(attr(deny(warnings))))]
+ #![cfg_attr(feature = "fail-on-warnings", deny(warnings))]
+ 
+ #[cfg(test)]
+-- 
+2.41.0
+

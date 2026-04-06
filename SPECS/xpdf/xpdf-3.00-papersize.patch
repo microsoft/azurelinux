@@ -1,0 +1,13 @@
+--- xpdf-3.00/xpdf/config.h.orig	2004-11-29 17:14:12.583102885 +0100
++++ xpdf-3.00/xpdf/config.h	2004-11-29 17:14:54.312235643 +0100
+@@ -41,8 +41,8 @@
+ #define defPaperWidth  595    // ISO A4 (210x297 mm)
+ #define defPaperHeight 842
+ #else
+-#define defPaperWidth  612    // American letter (8.5x11")
+-#define defPaperHeight 792
++#define defPaperWidth  -1     // match
++#define defPaperHeight -1
+ #endif
+ 
+ //------------------------------------------------------------------------

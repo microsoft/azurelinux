@@ -1,0 +1,24 @@
+--- netkit-ftp-0.17/ftp/ftp.c.to	2012-08-10 15:49:08.510257542 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2012-08-10 15:49:32.386220785 +0200
+@@ -1245,6 +1245,10 @@ initconn(void)
+ 	u_int ad[16], po[2], af, alen, plen;
+ 	char *pasvcmd = NULL;
+ 	char hbuf[MAXHOSTNAMELEN], pbuf[NI_MAXSERV];
++	struct timeval timeout;
++
++	timeout.tv_sec = 30;
++	timeout.tv_usec = 0;
+ 
+ #ifdef INET6
+ 	if (myctladdr.su_family == AF_INET6
+@@ -1486,6 +1490,10 @@ noport:
+ 			perror("ftp: setsockopt (reuse address)");
+ 			goto bad;
+ 		}
++	if (setsockopt (data, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,
++                sizeof(timeout)) < 0) {
++		perror("ftp: setsockopt failed\n");
++	}
+ 	if (bind(data, (struct sockaddr *)&data_addr, sizeof (data_addr)) < 0) {
+ 		perror("ftp: bind");
+ 		goto bad;

@@ -1,0 +1,19 @@
+diff -ur v5.0_original/ncompress-5.0/Makefile.def v5.0/ncompress-5.0/Makefile.def
+--- v5.0_original/ncompress-5.0/Makefile.def	2021-02-02 09:16:16.000000000 +0100
++++ v5.0/ncompress-5.0/Makefile.def	2022-06-24 10:23:42.777040729 +0200
+@@ -27,7 +27,14 @@
+ #	-DBYTEORDER=<order>			Byte order (default: unknown).
+ #	-DMAXSEG_64K=1 -BITS=16		Support segment processor like 80286.
+ #
+-options= $(CFLAGS) $(CPPFLAGS) -DUSERMEM=800000
++options= $(CFLAGS) $(CPPFLAGS) -DDIRENT=1 -DUSERMEM=800000 -DREGISTERS=20 \
++	-D_FILE_OFFSET_BITS=64 \
++	-D_LARGEFILE_SOURCE \
++	-DNOFUNCDEF=1 \
++	-DOBUFSIZ=1024 \
++	-DUTIME_H \
++	-DSYSDIR=1 \
++	$(ARCH_FLAGS)
+ 
+ # library options
+ LBOPT= $(LDFLAGS)

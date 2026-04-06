@@ -1,0 +1,11 @@
+diff -up libevent-2.0.21-stable/test/regress_main.c.orig libevent-2.0.21-stable/test/regress_main.c
+--- libevent-2.0.21-stable/test/regress_main.c.orig	2012-11-02 11:57:00.000000000 -0400
++++ libevent-2.0.21-stable/test/regress_main.c	2013-08-21 10:16:26.714288000 -0400
+@@ -370,7 +370,6 @@ struct testgroup_t testgroups[] = {
+ 	{ "util/", util_testcases },
+ 	{ "bufferevent/", bufferevent_testcases },
+ 	{ "http/", http_testcases },
+-	{ "dns/", dns_testcases },
+ 	{ "evtag/", evtag_testcases },
+ 	{ "rpc/", rpc_testcases },
+ 	{ "thread/", thread_testcases },

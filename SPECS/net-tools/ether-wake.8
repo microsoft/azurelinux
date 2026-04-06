@@ -1,0 +1,81 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ETHER-WAKE 8 "March 31, 2003" "Scyld"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+ether-wake \- A tool to send a Wake-On-LAN "Magic Packet"
+.SH SYNOPSIS
+.B ether-wake
+.RI [ options ] " Host-ID"
+.SH DESCRIPTION
+This manual page documents the usage of the
+.B ether-wake
+command.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics, 
+.\" respectively.
+\fBether-wake\fP is a program that generates and transmits a Wake-On-LAN 
+(WOL) "Magic Packet", used for restarting machines that have been
+soft-powered-down (ACPI D3-warm state). It generates the standard
+AMD Magic Packet format, optionally with a password included.  The
+single required parameter is a station (MAC) address or a host ID that can
+be translated to a MAC address by an
+.BR ethers (5)
+database specified in
+.BR nsswitch.conf (5)
+.
+.SH OPTIONS
+\fBether-wake\fP needs a single dash (´-´) in front of options.
+A summary of options is included below.
+.TP
+.B \-b
+Send the wake-up packet to the broadcast address.
+.TP
+.B \-D
+Increase the Debug Level.
+.TP
+.B \-i ifname
+Use interface ifname instead of the default "eth0".
+.TP
+.B \-p passwd
+Append a four or six byte password to the packet. Only a few adapters
+need or support this. A six byte password may be specified in Ethernet hex
+format (00:22:44:66:88:aa) or four byte dotted decimal (192.168.1.1) format.
+A four byte password must use the dotted decimal format.
+
+.TP
+.B \-V
+Show the program version information.
+
+.SH EXIT STATUS
+This program returns 0 on success.
+A permission failures (e.g. run as a non-root user) results in an exit
+status of 2.  Unrecognized or invalid parameters result in an exit
+status of 3.  Failure to retrieve network interface information or send
+a packet will result in an exit status of 1.
+
+.SH SEE ALSO
+.BR arp (8).
+.br
+.SH SECURITY
+On some non-Linux systems dropping root capability allows the process to be
+dumped, traced or debugged.
+If someone traces this program, they get control of a raw socket.
+Linux handles this safely, but beware when porting this program.
+.SH AUTHOR
+The ether-wake program was written by Donald Becker at Scyld Computing
+Corporation for use with the Scyld(\*(Tm) Beowulf System.

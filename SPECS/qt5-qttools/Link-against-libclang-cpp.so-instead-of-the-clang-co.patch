@@ -1,0 +1,74 @@
+diff --git a/src/qdoc/configure.pri b/src/qdoc/configure.pri
+index 4f3d776..bcd2aae 100644
+--- a/src/qdoc/configure.pri
++++ b/src/qdoc/configure.pri
+@@ -146,33 +146,6 @@ defineTest(qtConfTest_libclang) {
+             }
+         }
+         !equals(QMAKE_HOST.os, Darwin):!msvc: CLANG_LIBS+=-Wl,--start-group
+-        CLANG_LIBS += -lclangAnalysis \
+-                -lclangARCMigrate \
+-                -lclangAST \
+-                -lclangASTMatchers \
+-                -lclangBasic \
+-                -lclangCodeGen \
+-                -lclangCrossTU \
+-                -lclangDriver \
+-                -lclangDynamicASTMatchers \
+-                -lclangEdit \
+-                -lclangFormat \
+-                -lclangFrontend \
+-                -lclangFrontendTool \
+-                -lclangHandleCXX \
+-                -lclangIndex \
+-                -lclangLex \
+-                -lclangParse \
+-                -lclangRewrite \
+-                -lclangRewriteFrontend \
+-                -lclangSema \
+-                -lclangSerialization \
+-                -lclangStaticAnalyzerCheckers \
+-                -lclangStaticAnalyzerCore \
+-                -lclangStaticAnalyzerFrontend \
+-                -lclangTooling \
+-                -lclangToolingASTDiff \
+-                -lclangToolingCore
+ 
+         versionIsAtLeast($$CLANG_VERSION, "10.0.0") {
+             equals(QMAKE_HOST.os, Windows): \
+@@ -187,34 +160,7 @@ defineTest(qtConfTest_libclang) {
+             else: \
+                 CLANG_LIBS += -lclang_static
+ 
+-            CLANG_LIBS += \
+-                    -lclangApplyReplacements \
+-                    -lclangChangeNamespace \
+-                    -lclangDaemon \
+-                    -lclangIncludeFixer \
+-                    -lclangIncludeFixerPlugin \
+-                    -lclangMove \
+-                    -lclangQuery \
+-                    -lclangReorderFields \
+-                    -lclangTidy \
+-                    -lclangTidyAndroidModule \
+-                    -lclangTidyBoostModule \
+-                    -lclangTidyBugproneModule \
+-                    -lclangTidyCERTModule \
+-                    -lclangTidyCppCoreGuidelinesModule \
+-                    -lclangTidyFuchsiaModule \
+-                    -lclangTidyGoogleModule \
+-                    -lclangTidyHICPPModule \
+-                    -lclangTidyLLVMModule \
+-                    -lclangTidyMiscModule \
+-                    -lclangTidyModernizeModule \
+-                    -lclangTidyMPIModule \
+-                    -lclangTidyObjCModule \
+-                    -lclangTidyPerformanceModule \
+-                    -lclangTidyPlugin \
+-                    -lclangTidyReadabilityModule \
+-                    -lclangTidyUtils \
+-                    -lclangToolingRefactor \
++            CLANG_LIBS += -lclang-cpp \
+                     -lfindAllSymbols
+         }
+ 

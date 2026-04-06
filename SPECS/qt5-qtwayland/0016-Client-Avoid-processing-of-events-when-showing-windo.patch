@@ -1,0 +1,38 @@
+From ececabd20645a113e7f8c4488466c25e02d04ea9 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Sun, 14 Nov 2021 13:54:19 +0000
+Subject: [PATCH 16/55] Client: Avoid processing of events when showing windows
+
+The only time we want to dispatch events from the wayland socket is when
+the application is waiting for external events. Doing so at any other
+time will cause unpredictable behavior in client code.
+
+This caused a crash downstream where we had outputs get altered whilst
+itterating through outputs, which shouldn't happen.
+
+There is no benefit to flushing here, it won't make anything appear
+faster as we haven't attached the buffer yet.
+
+Change-Id: Ie13eae4012dab96a93d8810f468d1343402b8c28
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Aleix Pol Gonzalez <aleixpol@kde.org>
+(cherry picked from commit 46ed85a80b28d519cf5887bbdce55d1bf57886c3)
+---
+ src/client/qwaylandwindow.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index bba43a54..41e56d24 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -437,7 +437,6 @@ void QWaylandWindow::setVisible(bool visible)
+         if (window()->type() == Qt::Popup || window()->type() == Qt::ToolTip)
+             activePopups << this;
+         initWindow();
+-        mDisplay->flushRequests();
+ 
+         setGeometry(windowGeometry());
+         // Don't flush the events here, or else the newly visible window may start drawing, but since
+-- 
+2.51.1
+

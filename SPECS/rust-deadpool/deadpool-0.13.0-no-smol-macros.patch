@@ -1,0 +1,12 @@
+diff -Naur deadpool-0.13.0-original/tests/unmanaged_timeout.rs deadpool-0.13.0/tests/unmanaged_timeout.rs
+--- deadpool-0.13.0-original/tests/unmanaged_timeout.rs	2006-07-24 02:21:28.000000000 +0100
++++ deadpool-0.13.0/tests/unmanaged_timeout.rs	2026-02-18 10:47:14.183314328 +0000
+@@ -75,6 +75,8 @@
+     _test_config(Runtime::AsyncStd1).await;
+ }
+ 
++// Downstream patch: avoid the smol_macros dev-dependency
++#[cfg(false)]
+ #[cfg(feature = "rt_smol_2")]
+ #[macro_rules_attribute::apply(smol_macros::test!)]
+ async fn rt_smol_2() {

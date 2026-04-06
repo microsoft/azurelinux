@@ -1,0 +1,188 @@
+--- antlr4-4.13.1/antlr4-maven-plugin/src/main/java/org/antlr/mojo/antlr4/MojoUtils.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/antlr4-maven-plugin/src/main/java/org/antlr/mojo/antlr4/MojoUtils.java	2023-10-17 10:57:44.988344449 -0600
+@@ -55,7 +55,7 @@ class MojoUtils {
+      * directory and reflect the input organization of the grammar files.
+      *
+      * @param   sourceDirectory  The source directory {@link File} object
+-     * @param   grammarFileName  The full path to the input grammar file
++     * @param   grammarFile      The full path to the input grammar file
+      *
+      * @return  The path to the grammar file relative to the source directory
+      */
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/atn/ArrayPredictionContext.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/atn/ArrayPredictionContext.java	2024-07-10 12:42:52.855200630 -0600
+@@ -10,7 +10,7 @@ import java.util.Arrays;
+ 
+ public class ArrayPredictionContext extends PredictionContext {
+ 	/** Parent can be null only if full ctx mode and we make an array
+-	 *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
++	 *  from {@link org.antlr.v4.runtime.ParserRuleContext#EMPTY} and non-empty. We merge {@link org.antlr.v4.runtime.ParserRuleContext#EMPTY} by using null parent and
+ 	 *  returnState == {@link #EMPTY_RETURN_STATE}.
+ 	 */
+ 	public final PredictionContext[] parents;
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/atn/CodePointTransitions.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/atn/CodePointTransitions.java	2023-10-17 10:57:44.989344435 -0600
+@@ -11,8 +11,8 @@ package org.antlr.v4.runtime.atn;
+  * and {@link SetTransition} appropriately based on the range of the input.
+  *
+  * Previously, we distinguished between atom and range transitions for
+- * Unicode code points <= U+FFFF and those above. We used a set
+- * transition for a Unicode code point > U+FFFF. Now that we can serialize
++ * Unicode code points &le; U+FFFF and those above. We used a set
++ * transition for a Unicode code point &gt; U+FFFF. Now that we can serialize
+  * 32-bit int/chars in the ATN serialization, this is no longer necessary.
+  */
+ public abstract class CodePointTransitions {
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/CharStreams.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/CharStreams.java	2023-10-17 10:57:44.989344435 -0600
+@@ -24,7 +24,7 @@ import java.nio.file.Paths;
+ 
+ /** This class represents the primary interface for creating {@link CharStream}s
+  *  from a variety of sources as of 4.7.  The motivation was to support
+- *  Unicode code points > U+FFFF.  {@link ANTLRInputStream} and
++ *  Unicode code points &gt; U+FFFF.  {@link ANTLRInputStream} and
+  *  {@link ANTLRFileStream} are now deprecated in favor of the streams created
+  *  by this interface.
+  *
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/CodePointCharStream.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/CodePointCharStream.java	2023-10-17 10:57:44.989344435 -0600
+@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets
+  * code units.
+  *
+  * Use this if you need to parse input which potentially contains
+- * Unicode values > U+FFFF.
++ * Unicode values &gt; U+FFFF.
+  */
+ public abstract class CodePointCharStream implements CharStream {
+ 	protected final int size;
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/ParserInterpreter.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/ParserInterpreter.java	2023-10-17 10:57:44.990344420 -0600
+@@ -69,7 +69,7 @@ public class ParserInterpreter extends P
+ 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack =
+ 		new ArrayDeque<Pair<ParserRuleContext, Integer>>();
+ 
+-	/** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
++	/** We need a map from (decision,inputIndex)&rarr;forced alt for computing ambiguous
+ 	 *  parse trees. For now, we allow exactly one override.
+ 	 */
+ 	protected int overrideDecision = -1;
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/Parser.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/Parser.java	2023-10-17 10:57:44.990344420 -0600
+@@ -82,7 +82,7 @@ public abstract class Parser extends Rec
+ 
+ 	/**
+ 	 * This field holds the deserialized {@link ATN} with bypass alternatives, created
+-	 * lazily upon first demand. In 4.10 I changed from map<serializedATNstring, ATN>
++	 * lazily upon first demand. In 4.10 I changed from map&lt;serializedATNstring, ATN&gt;
+ 	 * since we only need one per parser object and also it complicates other targets
+ 	 * that don't use ATN strings.
+ 	 *
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/RuleContext.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/RuleContext.java	2023-10-17 10:57:44.990344420 -0600
+@@ -31,10 +31,10 @@ import java.util.List;
+  *  Parser._ctx.
+  *
+  *  public final SContext s() throws RecognitionException {
+- *      SContext _localctx = new SContext(_ctx, getState()); <-- create new node
+- *      enterRule(_localctx, 0, RULE_s);                     <-- push it
++ *      SContext _localctx = new SContext(_ctx, getState()); &larr; create new node
++ *      enterRule(_localctx, 0, RULE_s);                     &larr; push it
+  *      ...
+- *      exitRule();                                          <-- pop back to _localctx
++ *      exitRule();                                          &larr; pop back to _localctx
+  *      return _localctx;
+  *  }
+  *
+@@ -48,9 +48,9 @@ import java.util.List;
+  *  symbol s then call r1, which calls r2, the  would look like
+  *  this:
+  *
+- *     SContext[-1]   <- root node (bottom of the stack)
+- *     R1Context[p]   <- p in rule s called r1
+- *     R2Context[q]   <- q in rule r1 called r2
++ *     SContext[-1]   &larr; root node (bottom of the stack)
++ *     R1Context[p]   &larr; p in rule s called r1
++ *     R2Context[q]   &larr; q in rule r1 called r2
+  *
+  *  So the top of the stack, _ctx, represents a call to the current
+  *  rule and it holds the return address from another rule that invoke
+@@ -161,7 +161,7 @@ public class RuleContext implements Rule
+ 	 */
+ 	public void setAltNumber(int altNumber) { }
+ 
+-	/** @since 4.7. {@see ParseTree#setParent} comment */
++	/** @since 4.7. @see ParseTree#setParent comment */
+ 	@Override
+ 	public void setParent(RuleContext parent) {
+ 		this.parent = parent;
+--- antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/tree/ParseTreeListener.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/runtime/Java/src/org/antlr/v4/runtime/tree/ParseTreeListener.java	2023-10-17 10:57:44.990344420 -0600
+@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.ParserRuleCo
+  *  by {@link ParseTreeWalker}. E.g.,
+  *
+  *  	ParseTreeWalker walker = new ParseTreeWalker();
+- *		walker.walk(myParseTreeListener, myParseTree); <-- triggers events in your listener
++ *		walker.walk(myParseTreeListener, myParseTree); &larr; triggers events in your listener
+  *
+  *  If you want to trigger events in multiple listeners during a single
+  *  tree walk, you can use the ParseTreeDispatcher object available at
+--- antlr4-4.13.1/tool/src/org/antlr/v4/codegen/Target.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/tool/src/org/antlr/v4/codegen/Target.java	2023-10-17 10:57:44.991344406 -0600
+@@ -9,6 +9,7 @@ package org.antlr.v4.codegen;
+ import org.antlr.v4.Tool;
+ import org.antlr.v4.codegen.model.RuleFunction;
+ import org.antlr.v4.codegen.model.SerializedATN;
++import org.antlr.v4.codegen.model.SerializedJavaATN;
+ import org.antlr.v4.misc.CharSupport;
+ import org.antlr.v4.misc.Utils;
+ import org.antlr.v4.parse.ANTLRParser;
+@@ -519,7 +520,7 @@ public abstract class Target {
+ 	 * This is primarily needed by Java target to limit size of any single ATN string
+ 	 * to 65k length.
+ 	 *
+-	 * @see SerializedATN#getSegments
++	 * @see SerializedJavaATN#getSegments
+ 	 *
+ 	 * @return the serialized ATN segment limit
+ 	 */
+--- antlr4-4.13.1/tool/src/org/antlr/v4/semantics/SymbolChecks.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/tool/src/org/antlr/v4/semantics/SymbolChecks.java	2023-10-17 10:57:44.991344406 -0600
+@@ -373,7 +373,8 @@ public class SymbolChecks {
+ 	}
+ 
+ 	/**
+-	 * {@return} list of simple string literals for rule {@param rule}
++	 * @param rule the rule
++	 * @return list of simple string literals for the rule
+ 	 */
+ 	private List<String> getSingleTokenValues(Rule rule)
+ 	{
+--- antlr4-4.13.1/tool/src/org/antlr/v4/tool/ErrorType.java.orig	2023-09-04 16:10:49.000000000 -0600
++++ antlr4-4.13.1/tool/src/org/antlr/v4/tool/ErrorType.java	2023-10-17 10:57:44.991344406 -0600
+@@ -989,7 +989,7 @@ public enum ErrorType {
+ 	 *
+ 	 * <p><em>name</em> is not a recognized token name</p>
+ 	 *
+-	 * <pre>TOKEN: 'a' -> type(CHANNEL1); // error 175</pre>
++	 * <pre>TOKEN: 'a' &rarr; type(CHANNEL1); // error 175</pre>
+ 	 */
+ 	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "<arg> is not a recognized token name", ErrorSeverity.ERROR),
+ 	/**
+@@ -997,7 +997,7 @@ public enum ErrorType {
+ 	 *
+ 	 * <p><em>name</em>is not a recognized mode name</p>
+ 	 *
+-	 * <pre>TOKEN: 'a' -> mode(MODE1); // error 176</pre>
++	 * <pre>TOKEN: 'a' &rarr; mode(MODE1); // error 176</pre>
+ 	 */
+ 	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
+ 	/**
+@@ -1005,7 +1005,7 @@ public enum ErrorType {
+ 	 *
+ 	 * <p><em>name</em> is not a recognized channel name</p>
+ 	 *
+-	 * <pre>TOKEN: 'a' -> channel(TOKEN1); // error 177</pre>
++	 * <pre>TOKEN: 'a' &rarr; channel(TOKEN1); // error 177</pre>
+ 	 */
+ 	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
+ 	/*

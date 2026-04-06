@@ -1,0 +1,68 @@
+From: Ulf Wiger <ulf@wiger.net>
+Date: Tue, 20 Aug 2019 07:27:43 +0200
+Subject: [PATCH] Allow trace filter to silence log output
+
+
+diff --git a/src/lager_util.erl b/src/lager_util.erl
+index a9b4645..a0e8478 100644
+--- a/src/lager_util.erl
++++ b/src/lager_util.erl
+@@ -77,6 +77,8 @@ num_to_level(?EMERGENCY) -> emergency;
+ num_to_level(?LOG_NONE)  -> none.
+ 
+ -spec config_to_mask(atom()|string()) -> {'mask', integer()}.
++config_to_mask(silence) ->
++    silence;
+ config_to_mask(Conf) ->
+     Levels = config_to_levels(Conf),
+     {mask, lists:foldl(fun(Level, Acc) ->
+@@ -419,6 +421,8 @@ trace_acc([{Key, '<', Val}|T], Acc) ->
+ 
+ check_traces(_, _,  [], Acc) ->
+     lists:flatten(Acc);
++check_traces(Attrs, Level, [{_, silence, _} = Flow|Flows], Acc) ->
++    check_traces(Attrs, Level, Flows, [check_trace(Attrs, Flow)|Acc]);
+ check_traces(Attrs, Level, [{_, {mask, FilterLevel}, _}|Flows], Acc) when (Level band FilterLevel) == 0 ->
+     check_traces(Attrs, Level, Flows, Acc);
+ check_traces(Attrs, Level, [{Filter, _, _}|Flows], Acc) when length(Attrs) < length(Filter) ->
+@@ -429,13 +433,16 @@ check_traces(Attrs, Level, [Flow|Flows], Acc) ->
+ check_trace(Attrs, {Filter, _Level, Dest}) when is_list(Filter) ->
+     check_trace(Attrs, {trace_all(Filter), _Level, Dest});
+ 
+-check_trace(Attrs, {Filter, _Level, Dest}) when is_tuple(Filter) ->
++check_trace(Attrs, {Filter, Level, Dest} = F) when is_tuple(Filter) ->
+     Made = gre:make(Attrs, [list]),
+     glc:handle(?DEFAULT_TRACER, Made),
+     Match = glc_lib:matches(Filter, Made),
+     case Match of
+         true ->
+-            Dest;
++            case Level of
++                silence -> {silence, Dest};
++                _        -> Dest
++            end;
+         false ->
+             []
+     end.
+@@ -445,13 +452,17 @@ is_loggable(Msg, {mask, Mask}, MyName) ->
+     %% using syslog style comparison flags
+     %S = lager_msg:severity_as_int(Msg),
+     %?debugFmt("comparing masks ~.2B and ~.2B -> ~p~n", [S, Mask, S band Mask]),
+-    (lager_msg:severity_as_int(Msg) band Mask) /= 0 orelse
+-    lists:member(MyName, lager_msg:destinations(Msg));
++    (not lists:member({silence, MyName}, lager_msg:destinations(Msg)))
++        andalso
++          ((lager_msg:severity_as_int(Msg) band Mask) /= 0 orelse
++           lists:member(MyName, lager_msg:destinations(Msg)));
+ is_loggable(Msg, SeverityThreshold, MyName) when is_atom(SeverityThreshold) ->
+     is_loggable(Msg, level_to_num(SeverityThreshold), MyName);
+ is_loggable(Msg, SeverityThreshold, MyName) when is_integer(SeverityThreshold) ->
+-    lager_msg:severity_as_int(Msg) =< SeverityThreshold orelse
+-    lists:member(MyName, lager_msg:destinations(Msg)).
++    (not lists:member({silence, MyName}, lager_msg:destinations(Msg)))
++        andalso
++        (lager_msg:severity_as_int(Msg) =< SeverityThreshold orelse
++         lists:member(MyName, lager_msg:destinations(Msg))).
+ 
+ i2l(I) when I < 10  -> [$0, $0+I];
+ i2l(I)              -> integer_to_list(I).

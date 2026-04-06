@@ -1,0 +1,11 @@
+--- binutils.orig/config/override.m4	2021-08-31 14:20:17.275574804 +0100
++++ binutils-2.37/config/override.m4	2021-08-31 14:36:37.793954247 +0100
+@@ -41,7 +41,7 @@ dnl Or for updating the whole tree at on
+ AC_DEFUN([_GCC_AUTOCONF_VERSION_CHECK],
+ [m4_if(m4_defn([_GCC_AUTOCONF_VERSION]),
+   m4_defn([m4_PACKAGE_VERSION]), [],
+-  [m4_fatal([Please use exactly Autoconf ]_GCC_AUTOCONF_VERSION[ instead of ]m4_defn([m4_PACKAGE_VERSION])[.])])
++  [])
+ ])
+ m4_define([AC_INIT], m4_defn([AC_INIT])[
+ _GCC_AUTOCONF_VERSION_CHECK

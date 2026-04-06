@@ -1,0 +1,15 @@
+Description: Fix a typo in the %-blacklist.esl rule
+ This sometimes resulted in FTBFS.
+Author: Adrian Bunk <bunk@debian.org>
+
+--- efitools-1.9.2.orig/Make.rules
++++ efitools-1.9.2/Make.rules
+@@ -71,7 +71,7 @@ endif
+ %.hash: %.efi hash-to-efi-sig-list
+ 	./hash-to-efi-sig-list $< $@
+ 
+-%-blacklist.esl: %.crt cert-to-efi-hash-list
++%-blacklist.esl: %.crt cert-to-efi-sig-list
+ 	./cert-to-efi-sig-list $< $@
+ 
+ %-hash-blacklist.esl: %.crt cert-to-efi-hash-list

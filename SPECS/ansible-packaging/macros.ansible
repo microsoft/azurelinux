@@ -1,0 +1,31 @@
+# Stores ephemeral data that's created by %%ansible_collection_install
+# and used by other macros.
+%__ansible_builddir %{_builddir}/%{?buildsubdir:%{buildsubdir}/}.ansible-packaging
+
+%ansible_roles_dir %{_datadir}/ansible/roles
+%ansible_collections_dir %{_datadir}/ansible/collections/ansible_collections
+
+%ansible_collection_build() ansible-galaxy collection build
+
+# On F36, package-notes-srpm-macros inserts a package note file into
+# %%{buildsubdir} that ends up getting included in the collection builds.
+%ansible_collection_install() %{shrink:
+%undefine _package_note_file
+%{_rpmconfigdir}/ansible_collection.py install
+--collections-dir %{buildroot}%{ansible_collections_dir}
+--filelist %{ansible_collection_filelist}
+}
+
+%ansible_test_unit(p:c:) %{shrink:
+%{_rpmconfigdir}/ansible_collection.py test
+%{**} --python-interpreter %{__python3} --local
+}
+
+# TODO: Officially deprecate this macro and add the following line to the macro
+# def after the new approach has gotten more testing and adoption:
+# %%{warn: %%{ansible_collection_files} is deprecated. Use %%files -f %%{ansible_collection_filelist} instead.}
+%ansible_collection_files %{shrink:
+%{ansible_collections_dir}/%{collection_namespace}/
+}
+
+%ansible_collection_filelist %{__ansible_builddir}/ansible_collection_files

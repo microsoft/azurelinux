@@ -1,0 +1,16 @@
+[Unit]
+Description=GlusterFS brick processes (stopping only)
+After=network.target glusterd.service
+
+[Service]
+Type=oneshot
+# glusterd starts the glusterfsd processed on-demand
+# /bin/true will mark this service as started, RemainAfterExit keeps it active
+ExecStart=/bin/true
+RemainAfterExit=yes
+# if there are no glusterfsd processes, a stop/reload should not give an error
+ExecStop=/bin/sh -c "/bin/killall --wait glusterfsd || /bin/true"
+ExecReload=/bin/sh -c "/bin/killall -HUP glusterfsd || /bin/true"
+
+[Install]
+WantedBy=multi-user.target

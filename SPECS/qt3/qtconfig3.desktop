@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Qt3 Config 
+Comment=Configure Qt3 behavior, styles, fonts
+Exec=qtconfig
+Icon=qtconfig3
+Terminal=false
+Type=Application
+Categories=Qt;Settings;

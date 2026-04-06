@@ -1,0 +1,15 @@
+diff --git a/prog/detect/sensors-detect b/prog/detect/sensors-detect
+index 32fd29f..49feecb 100755
+--- a/prog/detect/sensors-detect
++++ b/prog/detect/sensors-detect
+@@ -2792,6 +2792,10 @@ use vars qw(@cpu_ids);
+ 		name => "AMD Family 17h thermal sensors",
+ 		driver => "k10temp",
+ 		detect => sub { amd_pci_detect('1463', '15d0', '1493', '1443') },
++	}, {
++		name => "AMD Family 19h thermal sensors",
++		driver => "k10temp",
++		detect => sub { amd_pci_detect('1653') },
+ 	}, {
+ 		name => "AMD Family 15h power sensors",
+ 		driver => "fam15h_power",

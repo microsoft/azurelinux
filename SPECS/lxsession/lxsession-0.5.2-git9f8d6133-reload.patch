@@ -1,0 +1,78 @@
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/Makefile.am.reload	2020-02-29 23:15:59.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/Makefile.am	2020-10-12 22:57:27.616976651 +0900
+@@ -416,6 +416,7 @@ lxsession_lxsession_VALAFLAGS = \
+     --pkg gio-2.0 \
+     --pkg posix \
+     --pkg lxsettings-daemon \
++    --pkg xevent \
+     $(buildinclip_VALAFLAGS) \
+     $(buildinpolkit_VALAFLAGS) \
+     $(lxsession_gtk_lxsession_VALAFLAGS) \
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/vapi/xevent.vapi.reload	2020-10-12 22:57:27.616976651 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/vapi/xevent.vapi	2020-10-12 22:57:27.616976651 +0900
+@@ -0,0 +1,10 @@
++[CCode (cprefix = "LxsessionXEvent", cheader_filename = "lxsettings-daemon/xevent.h")]
++    public static void send_internal_command( int cmd );
++    public static bool xdpy_init();
++
++[CCode (cname = "int", cprefix = "LXS_", cheader_filename = "lxsettings-daemon/xevent.h", has_type_id = false)]
++	public enum LXS_CMD {
++		RELOAD,
++		EXIT,
++		LAST_CMD
++	}
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.c.reload	2019-02-28 07:02:03.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.c	2020-10-12 22:58:13.620914596 +0900
+@@ -71,13 +71,20 @@ void send_internal_command( int cmd )
+ 	XSync(dpy, False);
+ }
+ 
++gboolean xdpy_init()
++{
++	dpy = XOpenDisplay( g_getenv("DISPLAY") );
++	if( ! dpy )
++		return FALSE;
++	return TRUE;
++}
++
+ gboolean xevent_init()
+ {
+ 	X11Source* xsource;
+ 	int fd;
+ 
+-	dpy = XOpenDisplay( g_getenv("DISPLAY") );
+-	if( ! dpy )
++	if( xdpy_init() == FALSE )
+ 		return FALSE;
+ 
+ 	/* according to the spec, private Atoms should prefix their names with _. */
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsession/main.vala.reload	2020-02-29 23:53:10.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsession/main.vala	2020-10-12 22:57:27.617976650 +0900
+@@ -99,6 +99,17 @@ namespace Lxsession {
+             return -1;
+         }
+ 
++		if (xdpy_init() == false)
++		{
++			return 1;
++		}
++
++		if (reload == true)
++		{
++			send_internal_command(LXS_CMD.RELOAD);
++			return 0;
++		}
++
+         message ("Session is %s",session);
+         message ("DE is %s", desktop_environnement);
+ 
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.h.reload	2019-02-28 07:02:03.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.h	2020-10-12 22:57:27.617976650 +0900
+@@ -35,6 +35,7 @@ typedef enum{
+ 	LXS_LAST_CMD
+ }LXS_CMD;
+ 
++gboolean xdpy_init();
+ gboolean xevent_init();
+ gboolean single_instance_check();
+ void xevent_finalize();

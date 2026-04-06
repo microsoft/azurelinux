@@ -1,0 +1,9 @@
+--- spin_on-0.1.1/Cargo.toml	2020-10-10T19:58:59+00:00
++++ spin_on-0.1.1/Cargo.toml	2023-05-20T14:21:41.745023+00:00
+@@ -18,5 +18,6 @@
+ description = "A simple, inefficient Future executor"
+ categories = ["asynchronous", "no-std"]
+ license = "Apache-2.0 OR MIT"
++exclude = ["/Makefile.toml"]
+ [dependencies.pin-utils]
+ version = "0.1.0"

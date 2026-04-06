@@ -1,0 +1,210 @@
+From 511d4b372a2ea1e79b850d2790ce29be9280cd75 Mon Sep 17 00:00:00 2001
+From: Zuzana Miklankova <zmiklank@redhat.com>
+Date: Mon, 10 Jan 2022 07:46:11 +0100
+Subject: [PATCH] Support-openjdk-17
+
+---
+ contrib/alphamaskdemo/build.xml                | 4 ++--
+ contrib/balloonmanagerdemo/build.xml           | 4 ++--
+ contrib/balloontips/build.xml                  | 4 ++--
+ contrib/dnddemo/build.xml                      | 4 ++--
+ contrib/monitordemo/build.xml                  | 4 ++--
+ contrib/msoffice/build.xml                     | 4 ++--
+ contrib/native_window_msg/build.xml            | 4 ++--
+ contrib/ntservice/nbproject/project.properties | 4 ++--
+ contrib/shapedwindowdemo/build.xml             | 4 ++--
+ contrib/w32printing/build.xml                  | 4 ++--
+ contrib/w32windowhooks/build.xml               | 4 ++--
+ contrib/x11/build.xml                          | 4 ++--
+ 12 files changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/contrib/alphamaskdemo/build.xml b/contrib/alphamaskdemo/build.xml
+index 2186daadd..9e4a2072e 100644
+--- a/contrib/alphamaskdemo/build.xml
++++ b/contrib/alphamaskdemo/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-alphamask.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"	            value="com.sun.jna.contrib.demo.AlphaMaskDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/balloonmanagerdemo/build.xml b/contrib/balloonmanagerdemo/build.xml
+index e9cba2c7b..37d0d0e7a 100644
+--- a/contrib/balloonmanagerdemo/build.xml
++++ b/contrib/balloonmanagerdemo/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-balloonmanager.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.contrib.demo.BalloonManagerDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/balloontips/build.xml b/contrib/balloontips/build.xml
+index e5b64b11d..8fa15d576 100644
+--- a/contrib/balloontips/build.xml
++++ b/contrib/balloontips/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-balloontips.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"		    value="com.sun.jna.contrib.demo.FilteredTextField" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/dnddemo/build.xml b/contrib/dnddemo/build.xml
+index 1feacb3a9..151194fcd 100644
+--- a/contrib/dnddemo/build.xml
++++ b/contrib/dnddemo/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-dnd.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.contrib.demo.GhostedDragImageDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/monitordemo/build.xml b/contrib/monitordemo/build.xml
+index 6e7a5c1b5..f7228c7c9 100644
+--- a/contrib/monitordemo/build.xml
++++ b/contrib/monitordemo/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-monitordemo.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.contrib.demo.MonitorInfoDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/msoffice/build.xml b/contrib/msoffice/build.xml
+index fa0387b61..06627c1cf 100644
+--- a/contrib/msoffice/build.xml
++++ b/contrib/msoffice/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-msoffice.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/native_window_msg/build.xml b/contrib/native_window_msg/build.xml
+index 19e99db68..066da4065 100644
+--- a/contrib/native_window_msg/build.xml
++++ b/contrib/native_window_msg/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-nativewindowmsg.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.platform.win32.Win32WindowDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/ntservice/nbproject/project.properties b/contrib/ntservice/nbproject/project.properties
+index 587ae2b4d..d30a26c83 100644
+--- a/contrib/ntservice/nbproject/project.properties
++++ b/contrib/ntservice/nbproject/project.properties
+@@ -7,7 +7,7 @@ javadoc.nonavbar=false
+ javac.external.vm=false
+ run.test.classpath=${javac.test.classpath}\:${build.test.classes.dir}
+ javac.processorpath=${javac.classpath}
+-javac.target=1.6
++javac.target=1.8
+ annotation.processing.processors.list=
+ javadoc.noindex=false
+ javadoc.additionalparam=
+@@ -29,7 +29,7 @@ dist.dir=dist
+ build.classes.excludes=**/*.java,**/*.form
+ javadoc.splitindex=true
+ javadoc.encoding=
+-javac.source=1.6
++javac.source=1.8
+ file.reference.jna.jar=../../build/jna.jar
+ application.vendor=matthias
+ junit.selected.version=4
+diff --git a/contrib/shapedwindowdemo/build.xml b/contrib/shapedwindowdemo/build.xml
+index 24c25b5cc..b4f8c995d 100644
+--- a/contrib/shapedwindowdemo/build.xml
++++ b/contrib/shapedwindowdemo/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-shapedwindow.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.contrib.demo.ShapedWindowDemo" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/w32printing/build.xml b/contrib/w32printing/build.xml
+index 0af971a82..b76e00709 100644
+--- a/contrib/w32printing/build.xml
++++ b/contrib/w32printing/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-w32printing.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"             value="com.sun.jna.platform.win32.Win32SpoolMonitor" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/w32windowhooks/build.xml b/contrib/w32windowhooks/build.xml
+index 668d22daa..992ae4d7e 100644
+--- a/contrib/w32windowhooks/build.xml
++++ b/contrib/w32windowhooks/build.xml
+@@ -9,8 +9,8 @@
+     <property name="jar"                    location="${build}/demo-w32windowhooks.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+     <property name="main-class"		    value="com.sun.jna.contrib.demo.WindowHooks" />
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+diff --git a/contrib/x11/build.xml b/contrib/x11/build.xml
+index ecf2ae5f9..95f5e8a88 100644
+--- a/contrib/x11/build.xml
++++ b/contrib/x11/build.xml
+@@ -9,8 +9,8 @@
+     <property name="classes"                location="${build}/classes"/>
+     <property name="jar"                    location="${build}/demo-x11.jar"/>
+     <property name="file.reference.jna.jar" location="../../build/jna.jar"/>
+-    <property name="javac.target"           value="1.6" />
+-    <property name="javac.source"           value="1.6" />
++    <property name="javac.target"           value="1.8" />
++    <property name="javac.source"           value="1.8" />
+ 
+     <path id="classpath">
+         <fileset file="${file.reference.jna.jar}"/>
+-- 
+2.31.1
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+if /usr/bin/systemd-detect-virt 2>/dev/null 1>&2; then
+	SENSORS_FLAGS_VM='-n';
+else
+	SENSORS_FLAGS_VM='';
+fi;
+
+/usr/bin/sensors -s $SENSORS_FLAGS_VM

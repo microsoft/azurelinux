@@ -1,0 +1,49 @@
+From 2f43fc2d1b57c7945576bf2950b236416c0403dd Mon Sep 17 00:00:00 2001
+From: Niels De Graef <ndegraef@redhat.com>
+Date: Thu, 4 Jul 2024 17:09:41 +0200
+Subject: [PATCH] wlheadless: Ignore os.waitpid(-1, 0) error
+
+There's a chance that all child processes have already stopped running
+by the time we're cleaning up. If we then try to wait on child processes
+to finish (using `os.waitpid(-1, 0)`, the function will throw a
+`ChildProcessError`, which makes the whole script fail, with the
+following error message:
+
+```
+Traceback (most recent call last):
+  File "/usr/bin/wlheadless-run", line 90, in <module>
+    wlheadless_common.cleanup()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/site-packages/wlheadless/wlheadless_common.py", line 151, in cleanup
+    self.__cleanup_tempdir()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/site-packages/wlheadless/wlheadless_common.py", line 136, in __cleanup_tempdir
+    os.waitpid(-1, 0)
+    ~~~~~~~~~~^^^^^^^
+ChildProcessError: [Errno 10] No child processes
+```
+
+Just ignore the error if it happens.
+---
+ src/wlheadless/wlheadless_common.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/wlheadless/wlheadless_common.py b/src/wlheadless/wlheadless_common.py
+index 556c0f7..d056f3b 100644
+--- a/src/wlheadless/wlheadless_common.py
++++ b/src/wlheadless/wlheadless_common.py
+@@ -133,7 +133,10 @@ class WlheadlessCommon:
+     def __cleanup_tempdir(self):
+         """ Removes our temporary XDG_RUNTIME_DIR directory if empty. """
+         if self.xdg_runtime_dir:
+-            os.waitpid(-1, 0)
++            try:
++                os.waitpid(-1, 0)
++            except ChildProcessError:
++                pass
+             try:
+                 rmtree(self.xdg_runtime_dir)
+             except OSError as error:
+-- 
+2.45.2
+

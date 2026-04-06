@@ -1,0 +1,30 @@
+From 358e5a3b0122b418614e2ac0fc71f6aad1de06f8 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 23 Jun 2025 16:27:40 +0200
+Subject: [PATCH] Make data member as big as IPv6 address
+
+Unfortunately, recent FORTIFY_SOURCE hardening for inet_pton() can't
+deal with our type independent "data[1]" union member trick.
+
+Fixes #699
+---
+ avahi-common/address.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/avahi-common/address.h b/avahi-common/address.h
+index a14104fad..013fa975e 100644
+--- a/avahi-common/address.h
++++ b/avahi-common/address.h
+@@ -71,9 +71,9 @@ typedef struct AvahiAddress {
+     AvahiProtocol proto; /**< Address family */
+ 
+     union {
+-        AvahiIPv6Address ipv6;  /**< Address when IPv6 */
+-        AvahiIPv4Address ipv4;  /**< Address when IPv4 */
+-        uint8_t data[1];        /**< Type-independent data field */
++        AvahiIPv6Address ipv6;                   /**< Address when IPv6 */
++        AvahiIPv4Address ipv4;                   /**< Address when IPv4 */
++        uint8_t data[sizeof(AvahiIPv6Address)];  /**< Type-independent data field */
+     } data;
+ } AvahiAddress;
+ 

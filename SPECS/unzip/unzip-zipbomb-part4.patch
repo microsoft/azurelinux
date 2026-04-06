@@ -1,0 +1,25 @@
+From 5e2efcd633a4a1fb95a129a75508e7d769e767be Mon Sep 17 00:00:00 2001
+From: Mark Adler <madler@alumni.caltech.edu>
+Date: Sun, 9 Feb 2020 20:36:28 -0800
+Subject: [PATCH] Fix bug in UZbunzip2() that incorrectly updated G.incnt.
+
+The update assumed a full buffer, which is not always full. This
+could result in a false overlapped element detection when a small
+bzip2-compressed file was unzipped. This commit remedies that.
+---
+ extract.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/extract.c b/extract.c
+index d9866f9..0cb7bfc 100644
+--- a/extract.c
++++ b/extract.c
+@@ -3010,7 +3010,7 @@ __GDEF
+ #endif
+ 
+     G.inptr = (uch *)bstrm.next_in;
+-    G.incnt = (G.inbuf + INBUFSIZ) - G.inptr;  /* reset for other routines */
++    G.incnt -= G.inptr - G.inbuf;       /* reset for other routines */
+ 
+ uzbunzip_cleanup_exit:
+     err = BZ2_bzDecompressEnd(&bstrm);

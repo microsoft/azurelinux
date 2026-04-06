@@ -1,0 +1,27 @@
+From 9b6deac9e49210b270e2592bfedd250769e75970 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sun, 16 Mar 2025 09:17:55 +0000
+Subject: [PATCH 8/8] Revert "meson.build: Disallow libnfs v6 to fix the broken
+ macOS build"
+
+This reverts commit 42490ac98088a744113589aa75400d9db714776d.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 7f6f638676..08d242e870 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1122,7 +1122,7 @@ endif
+ 
+ libnfs = not_found
+ if not get_option('libnfs').auto() or have_block
+-  libnfs = dependency('libnfs', version: ['>=1.9.3', '<6.0.0'],
++  libnfs = dependency('libnfs', version: '>=1.9.3',
+                       required: get_option('libnfs'),
+                       method: 'pkg-config')
+ endif
+-- 
+2.48.1
+

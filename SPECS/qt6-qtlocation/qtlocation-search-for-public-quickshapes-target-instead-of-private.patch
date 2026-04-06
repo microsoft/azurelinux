@@ -1,0 +1,35 @@
+From 79bdc6c286a723981ad021ebffd2f2e57a342057 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 24 Sep 2025 10:39:08 +0200
+Subject: [PATCH] Location: Search for public QuickShapes target instead of private
+
+The QuickShapes module in qtdeclarative now provides a public target
+(`Qt6::QuickShapes`) in addition to its internal one.
+
+This resolves the module's improper dependency on an internal Qt module,
+and depending on private API.
+
+Change-Id: Iebf032f7783068179f641423e518b05fcb7672bd
+---
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2549a26..87c7865 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@
+ # Need to search for positioning only after we make sure that it's not WASM.
+ # Otherwise we'll get an "QtPositioning not found" error in WASM build.
+ find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS
+-    Qml Quick Network Test QuickTest Positioning PositioningQuick QuickShapesPrivate
++    Qml Quick Network Test QuickTest Positioning PositioningQuick QuickShapes
+ )
+ 
+ find_package(Qt6 ${PROJECT_VERSION} QUIET CONFIG OPTIONAL_COMPONENTS
+@@ -48,6 +48,6 @@
+     endforeach()
+ endmacro()
+ 
+-assertTargets(Qml Quick Network Test QuickTest Positioning PositioningQuick QuickShapesPrivate)
++assertTargets(Qml Quick Network Test QuickTest Positioning PositioningQuick QuickShapes)
+ 
+ qt_build_repo()

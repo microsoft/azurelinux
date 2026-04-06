@@ -1,0 +1,24 @@
+--- netkit-ftp-0.17/ftp/ftp.c.data	2005-12-02 15:31:27.000000000 +0100
++++ netkit-ftp-0.17/ftp/ftp.c	2005-12-02 15:35:46.000000000 +0100
+@@ -1223,6 +1223,7 @@
+ static int
+ initconn(void)
+ {
++	int rc;
+ 	u_char *p, *a;
+ 	int result, tmpno = 0;
+ 	socklen_t len;
+@@ -1240,6 +1241,13 @@
+ 	}
+ #endif
+ 	if (passivemode) {
++		if (data >= 0){
++			rc = close (data);
++			data = -1;
++			if (rc == -1){
++				perror ("ftp: close");
++			}
++		}
+ 		data_addr = hisctladdr;
+ 		data = socket(data_addr.su_family, SOCK_STREAM, 0);
+ 		if (data < 0) {

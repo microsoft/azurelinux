@@ -1,0 +1,303 @@
+diff -rupN --no-dereference Python-3.11.14/config.site-mingw Python-3.11.14-new/config.site-mingw
+--- Python-3.11.14/config.site-mingw	1970-01-01 01:00:00.000000000 +0100
++++ Python-3.11.14-new/config.site-mingw	2025-10-09 23:07:47.862008604 +0200
+@@ -0,0 +1,2 @@
++ac_cv_file__dev_ptmx=no
++ac_cv_file__dev_ptc=no
+diff -rupN --no-dereference Python-3.11.14/configure.ac Python-3.11.14-new/configure.ac
+--- Python-3.11.14/configure.ac	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/configure.ac	2025-10-09 23:07:47.862581755 +0200
+@@ -528,6 +528,15 @@ AC_DEFINE_UNQUOTED(_PYTHONFRAMEWORK, "${
+ # Set name for machine-dependent library files
+ AC_ARG_VAR([MACHDEP], [name for machine-dependent library files])
+ AC_MSG_CHECKING(MACHDEP)
++case $host in
++  *-*-mingw*)
++    test -z "$MACHDEP" && MACHDEP=win32
++
++    dnl Configuration will be based only on "host triplet" as build
++    dnl must not depend from posix compatible environement.
++    ac_sys_system=ignore
++    ;;
++esac
+ if test -z "$MACHDEP"
+ then
+     # avoid using uname for cross builds
+@@ -554,6 +563,8 @@ then
+ 	*-*-wasi)
+ 	    ac_sys_system=WASI
+ 	    ;;
++        *-*-mingw*)
++            ;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+@@ -614,12 +625,23 @@ if test "$cross_compiling" = yes; then
+ 	wasm32-*-* | wasm64-*-*)
+ 		_host_cpu=$host_cpu
+ 		;;
++	*-*-mingw*)
++		_host_cpu=
++		;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+ 		AC_MSG_ERROR([cross build not supported for $host])
+ 	esac
+ 	_PYTHON_HOST_PLATFORM="$MACHDEP${_host_cpu:+-$_host_cpu}"
++
++	case "$host_os" in
++	mingw*)
++	# As sys.platform() return 'win32' to build python and extantions
++	# we will use 'mingw' (in setup.py and etc.)
++	_PYTHON_HOST_PLATFORM=mingw
++	;;
++	esac
+ fi
+ 
+ # Some systems cannot stand _XOPEN_SOURCE being defined at all; they
+@@ -1526,6 +1548,13 @@ if test $enable_shared = "yes"; then
+ 	;;
+ 
+   esac
++  case $host in
++    *-*-mingw*)
++        LDLIBRARY='libpython$(LDVERSION).dll.a'
++        DLLLIBRARY='libpython$(LDVERSION).dll'
++        BLDLIBRARY='-L. -lpython$(LDVERSION)'
++        ;;
++  esac
+ else # shared is disabled
+   PY_ENABLE_SHARED=0
+   case $ac_sys_system in
+@@ -1534,6 +1563,10 @@ else # shared is disabled
+           LDLIBRARY='libpython$(LDVERSION).dll.a'
+           ;;
+   esac
++  case $host in
++    *-*-mingw*)
++          LDLIBRARY='libpython$(LDVERSION).a';;
++  esac
+ fi
+ 
+ if test "$cross_compiling" = yes; then
+@@ -3101,6 +3134,9 @@ if test -z "$SHLIB_SUFFIX"; then
+ 	CYGWIN*)   SHLIB_SUFFIX=.dll;;
+ 	*)	   SHLIB_SUFFIX=.so;;
+ 	esac
++	case $host_os in
++	mingw*)    SHLIB_SUFFIX=.dll;;
++	esac
+ fi
+ AC_MSG_RESULT($SHLIB_SUFFIX)
+ 
+@@ -3232,6 +3268,12 @@ then
+ 		LDCXXSHARED="g++ -shared -Wl,--enable-auto-image-base";;
+ 	*)	LDSHARED="ld";;
+ 	esac
++	case $host in
++	*-*-mingw*)
++		LDSHARED='$(CC) -shared -Wl,--enable-auto-image-base'
++		LDCXXSHARED='$(CXX) -shared -Wl,--enable-auto-image-base'
++		;;
++	esac
+ fi
+ 
+ dnl Emscripten's emconfigure sets LDSHARED. Set BLDSHARED outside the
+@@ -4567,6 +4609,12 @@ then
+ 	fi
+ 	;;
+ 	esac
++	case $host in
++	*-*-mingw*)
++	DYNLOADFILE="dynload_win.o"
++	extra_machdep_objs="$extra_machdep_objs PC/dl_nt.o"
++	;;
++	esac
+ fi
+ AC_MSG_RESULT($DYNLOADFILE)
+ if test "$DYNLOADFILE" != "dynload_stub.o"
+@@ -4593,7 +4641,7 @@ fi
+ 
+ # checks for library functions
+ AC_CHECK_FUNCS([ \
+-  accept4 alarm bind_textdomain_codeset chmod chown clock close_range confstr \
++  accept4 bind_textdomain_codeset chmod chown clock close_range confstr \
+   copy_file_range ctermid dup dup3 execv explicit_bzero explicit_memset \
+   faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
+   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
+@@ -5717,7 +5765,7 @@ AC_MSG_RESULT($LDVERSION)
+ 
+ # On Android and Cygwin the shared libraries must be linked with libpython.
+ AC_SUBST(LIBPYTHON)
+-if test -n "$ANDROID_API_LEVEL" -o "$MACHDEP" = "cygwin"; then
++if test -n "$ANDROID_API_LEVEL" -o "$MACHDEP" = "cygwin" -o "$MACHDEP" = "win32"; then
+   LIBPYTHON="-lpython${VERSION}${ABIFLAGS}"
+ else
+   LIBPYTHON=''
+@@ -6277,6 +6325,9 @@ AC_CHECK_TYPE(socklen_t,,
+ #ifdef HAVE_SYS_SOCKET_H
+ #include <sys/socket.h>
+ #endif
++#ifdef __MINGW32__
++#include <ws2tcpip.h>
++#endif
+ ])
+ 
+ AC_CACHE_CHECK([for broken mbstowcs], [ac_cv_broken_mbstowcs],
+@@ -6750,6 +6801,19 @@ WITH_SAVE_ENV([
+   ])
+ ])
+ 
++# For mingw build need additional library for linking
++case $host in
++  *-*-mingw*)
++    LIBS="$LIBS -lversion -lshlwapi -lpathcch -lbcrypt"
++    CFLAGS="$CFLAGS -DMS_WINDOWS -DMS_WIN32"
++  ;&
++  x86_64-*-mingw*)
++    CFLAGS="$CFLAGS -DMS_WIN64";
++  ;;
++  *)
++  ;;
++esac
++
+ # ssl module default cipher suite string
+ AH_TEMPLATE(PY_SSL_DEFAULT_CIPHERS,
+   [Default cipher suites list for ssl module.
+diff -rupN --no-dereference Python-3.11.14/Include/pyport.h Python-3.11.14-new/Include/pyport.h
+--- Python-3.11.14/Include/pyport.h	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Include/pyport.h	2025-10-09 23:07:47.863312252 +0200
+@@ -347,7 +347,8 @@ extern "C" {
+     _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+ #define _Py_COMP_DIAG_POP _Pragma("clang diagnostic pop")
+ #elif defined(__GNUC__) \
+-    && ((__GNUC__ >= 5) || (__GNUC__ == 4) && (__GNUC_MINOR__ >= 6))
++    && ((__GNUC__ >= 5) || (__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) \
++    && !defined(__MINGW32__)
+ #define _Py_COMP_DIAG_PUSH _Pragma("GCC diagnostic push")
+ #define _Py_COMP_DIAG_IGNORE_DEPR_DECLS \
+     _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+diff -rupN --no-dereference Python-3.11.14/Lib/sysconfig.py Python-3.11.14-new/Lib/sysconfig.py
+--- Python-3.11.14/Lib/sysconfig.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/sysconfig.py	2025-10-09 23:07:47.863564438 +0200
+@@ -737,6 +737,8 @@ def get_platform():
+ 
+     """
+     if os.name == 'nt':
++        if 'GCC' in sys.version:
++            return 'mingw'
+         if 'amd64' in sys.version.lower():
+             return 'win-amd64'
+         if '(arm)' in sys.version.lower():
+diff -rupN --no-dereference Python-3.11.14/Makefile.pre.in Python-3.11.14-new/Makefile.pre.in
+--- Python-3.11.14/Makefile.pre.in	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Makefile.pre.in	2025-10-09 23:07:47.866645901 +0200
+@@ -118,7 +118,7 @@ CFLAGSFORSHARED=@CFLAGSFORSHARED@
+ # C flags used for building the interpreter object files
+ PY_STDMODULE_CFLAGS= $(PY_CFLAGS) $(PY_CFLAGS_NODIST) $(PY_CPPFLAGS) $(CFLAGSFORSHARED)
+ PY_BUILTIN_MODULE_CFLAGS= $(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE_BUILTIN
+-PY_CORE_CFLAGS=	$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE
++PY_CORE_CFLAGS=	$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE -DMS_WINDOWS -DMS_COREDLL -DMS_DLL_ID=\"@VERSION@\" -DPY3_DLLNAME=\"@DLLLIBRARY@\"
+ # Linker flags used for building the interpreter object files
+ PY_CORE_LDFLAGS=$(PY_LDFLAGS) $(PY_LDFLAGS_NODIST)
+ # Strict or non-strict aliasing flags used to compile dtoa.c, see above
+diff -rupN --no-dereference Python-3.11.14/Modules/posixmodule.c Python-3.11.14-new/Modules/posixmodule.c
+--- Python-3.11.14/Modules/posixmodule.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/posixmodule.c	2025-10-09 23:07:47.867581763 +0200
+@@ -343,7 +343,7 @@ corresponding Unix manual entries for mo
+ #  define HAVE_SYSTEM     1
+ #  include <process.h>
+ #else
+-#  ifdef _MSC_VER
++#  ifdef MS_WINDOWS
+      /* Microsoft compiler */
+ #    define HAVE_GETPPID    1
+ #    define HAVE_GETLOGIN   1
+@@ -356,7 +356,7 @@ corresponding Unix manual entries for mo
+ #    define HAVE_CWAIT      1
+ #    define HAVE_FSYNC      1
+ #    define fsync _commit
+-#  endif  /* _MSC_VER */
++#  endif  /* MS_WINDOWS */
+ #endif  /* ! __WATCOMC__ || __QNX__ */
+ 
+ /*[clinic input]
+@@ -434,7 +434,7 @@ extern char        *ctermid_r(char *);
+ #  endif
+ #endif
+ 
+-#ifdef _MSC_VER
++#ifdef MS_WINDOWS
+ #  ifdef HAVE_DIRECT_H
+ #    include <direct.h>
+ #  endif
+@@ -4057,7 +4057,7 @@ os_link_impl(PyObject *module, path_t *s
+ #endif
+ 
+ 
+-#if defined(MS_WINDOWS) && !defined(HAVE_OPENDIR)
++#if defined(MS_WINDOWS)
+ static PyObject *
+ _listdir_windows_no_opendir(path_t *path, PyObject *list)
+ {
+@@ -4298,7 +4298,7 @@ os_listdir_impl(PyObject *module, path_t
+                     path->object ? path->object : Py_None) < 0) {
+         return NULL;
+     }
+-#if defined(MS_WINDOWS) && !defined(HAVE_OPENDIR)
++#if defined(MS_WINDOWS)
+     return _listdir_windows_no_opendir(path, NULL);
+ #else
+     return _posix_listdir(path, NULL);
+diff -rupN --no-dereference Python-3.11.14/Objects/exceptions.c Python-3.11.14-new/Objects/exceptions.c
+--- Python-3.11.14/Objects/exceptions.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Objects/exceptions.c	2025-10-09 23:07:47.869135345 +0200
+@@ -1648,7 +1648,9 @@ MiddlingExtendsException(PyExc_ImportErr
+  */
+ 
+ #ifdef MS_WINDOWS
+-#include "errmap.h"
++#include <winsock2.h>
++#include <windows.h>
++#include "../PC/errmap.h"
+ #endif
+ 
+ /* Where a function has a single filename, such as open() or some
+diff -rupN --no-dereference Python-3.11.14/Python/dynload_win.c Python-3.11.14-new/Python/dynload_win.c
+--- Python-3.11.14/Python/dynload_win.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Python/dynload_win.c	2025-10-09 23:07:47.870632283 +0200
+@@ -21,9 +21,9 @@
+ #endif
+ 
+ #ifdef PYD_PLATFORM_TAG
+-#define PYD_TAGGED_SUFFIX PYD_DEBUG_SUFFIX ".cp" Py_STRINGIFY(PY_MAJOR_VERSION) Py_STRINGIFY(PY_MINOR_VERSION) "-" PYD_PLATFORM_TAG ".pyd"
++#define PYD_TAGGED_SUFFIX PYD_DEBUG_SUFFIX ".cpython-" Py_STRINGIFY(PY_MAJOR_VERSION) Py_STRINGIFY(PY_MINOR_VERSION) "-" PYD_PLATFORM_TAG ".dll"
+ #else
+-#define PYD_TAGGED_SUFFIX PYD_DEBUG_SUFFIX ".cp" Py_STRINGIFY(PY_MAJOR_VERSION) Py_STRINGIFY(PY_MINOR_VERSION) ".pyd"
++#define PYD_TAGGED_SUFFIX PYD_DEBUG_SUFFIX ".cpython-" Py_STRINGIFY(PY_MAJOR_VERSION) Py_STRINGIFY(PY_MINOR_VERSION) ".dll"
+ #endif
+ 
+ #define PYD_UNTAGGED_SUFFIX PYD_DEBUG_SUFFIX ".pyd"
+@@ -170,7 +170,7 @@ static char *GetPythonImport (HINSTANCE
+    Return whether the DLL was found.
+ */
+ extern HMODULE PyWin_DLLhModule;
+-static int
++int
+ _Py_CheckPython3(void)
+ {
+     static int python3_checked = 0;
+diff -rupN --no-dereference Python-3.11.14/Python/sysmodule.c Python-3.11.14-new/Python/sysmodule.c
+--- Python-3.11.14/Python/sysmodule.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Python/sysmodule.c	2025-10-09 23:07:47.871067667 +0200
+@@ -2982,7 +2982,8 @@ _PySys_InitCore(PyThreadState *tstate, P
+             goto type_init_failed;
+         }
+     }
+-
++// FIXME ???? What is VPATH?
++#define VPATH "..\\.."
+     SET_SYS_FROM_STRING("_vpath", VPATH);
+ #endif
+ 

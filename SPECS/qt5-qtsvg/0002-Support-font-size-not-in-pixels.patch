@@ -1,0 +1,35 @@
+From 7d90c0dc417f3d724fba64cc3e9416491435c745 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <albert.astals.cid@kdab.com>
+Date: Mon, 11 Oct 2021 11:13:57 +0200
+Subject: [PATCH 2/5] Support font size not in pixels
+
+Fixes: QTBUG-97422
+Pick-to: 6.2
+Change-Id: I4df2af0e657f241af69480e6e30d454870df51d8
+Reviewed-by: Eirik Aavitsland <eirik.aavitsland@qt.io>
+(cherry picked from commit 4531aad935d55924a32212b339c657ce363a6c08)
+---
+ src/svg/qsvghandler.cpp | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/svg/qsvghandler.cpp b/src/svg/qsvghandler.cpp
+index dd9b7164..f37bf42e 100644
+--- a/src/svg/qsvghandler.cpp
++++ b/src/svg/qsvghandler.cpp
+@@ -1393,9 +1393,10 @@ static void parseFont(QSvgNode *node,
+         case FontSizeNone:
+             break;
+         case FontSizeValue: {
+-            QSvgHandler::LengthType dummy; // should always be pixel size
+-            fontStyle->setSize(qMin(parseLength(attributes.fontSize, dummy, handler),
+-                                    qreal(0xffff)));
++            QSvgHandler::LengthType type;
++            qreal fs = parseLength(attributes.fontSize, type, handler);
++            fs = convertToPixels(fs, true, type);
++            fontStyle->setSize(qMin(fs, qreal(0xffff)));
+         }
+             break;
+         default:
+-- 
+2.51.1
+

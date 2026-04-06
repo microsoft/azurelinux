@@ -1,0 +1,93 @@
+From de48dd0da38fc715783e8efaada5af4c22298b0e Mon Sep 17 00:00:00 2001
+From: James Chapman <jachapma@redhat.com>
+Date: Thu, 5 Feb 2026 15:33:08 +0000
+Subject: [PATCH] Issue 7224 - CI Test - Simplify
+ test_reserve_descriptor_validation (#7225)
+
+Description:
+Previously, the test_reserve_descriptor_validation CItest calculated
+the expected number of file descriptors based on backends, indexes,
+SSL/FIPS mode, and compared it to the value returned by the server.
+This approach is fragile, especially in FIPS mode.
+
+Fix:
+The test has been updated to simply verify that the server corrects
+the configured nsslapd-reservedescriptors value if it is set too low,
+instead of calculating the expected total.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7224
+
+Reviewed by: @bsimonova  (Thank you)
+---
+ .../suites/resource_limits/fdlimits_test.py   | 36 +++++++------------
+ 1 file changed, 13 insertions(+), 23 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/resource_limits/fdlimits_test.py b/dirsrvtests/tests/suites/resource_limits/fdlimits_test.py
+index c843a4b24..a49e378c3 100644
+--- a/dirsrvtests/tests/suites/resource_limits/fdlimits_test.py
++++ b/dirsrvtests/tests/suites/resource_limits/fdlimits_test.py
+@@ -27,7 +27,7 @@ RESRV_FD_ATTR = "nsslapd-reservedescriptors"
+ GLOBAL_LIMIT = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+ SYSTEMD_LIMIT = ensure_str(check_output("systemctl show -p LimitNOFILE dirsrv@standalone1".split(" ")).strip()).split('=')[1]
+ CUSTOM_VAL = str(int(SYSTEMD_LIMIT) - 10)
+-RESRV_DESC_VAL = str(10)
++RESRV_DESC_VAL_LOW = 10
+ TOO_HIGH_VAL = str(GLOBAL_LIMIT * 2)
+ TOO_HIGH_VAL2 = str(int(SYSTEMD_LIMIT) * 2)
+ TOO_LOW_VAL = "0"
+@@ -86,40 +86,30 @@ def test_reserve_descriptor_validation(topology_st):
+     :id: 9bacdbcc-7754-4955-8a56-1d8c82bce274
+     :setup: Standalone Instance
+     :steps:
+-        1. Set attr nsslapd-reservedescriptors to a low value of RESRV_DESC_VAL (10)
++        1. Set attr nsslapd-reservedescriptors to a low value (10)
+         2. Verify low value has been set
+         3. Restart instance (On restart the reservedescriptor attr will be validated)
+-        4. Check updated value for nsslapd-reservedescriptors attr
++        4. Verify corrected value for nsslapd-reservedescriptors > low value
+     :expectedresults:
+         1. Success
+-        2. A value of RESRV_DESC_VAL (10) is returned
++        2. A value of RESRV_DESC_VAL_LOW (10) is returned
+         3. Success
+-        4. A value of STANDALONE_INST_RESRV_DESCS (55) is returned
++        4. Corrected value for nsslapd-reservedescriptors > low value
+     """
+ 
+-    # Set nsslapd-reservedescriptors to a low value (RESRV_DESC_VAL:10)
+-    topology_st.standalone.config.set(RESRV_FD_ATTR, RESRV_DESC_VAL)
+-    resrv_fd = topology_st.standalone.config.get_attr_val_utf8(RESRV_FD_ATTR)
+-    assert resrv_fd == RESRV_DESC_VAL
++    # Set nsslapd-reservedescriptors to a low value (10)
++    topology_st.standalone.config.set(RESRV_FD_ATTR, str(RESRV_DESC_VAL_LOW))
++    resrv_fd = int(topology_st.standalone.config.get_attr_val_utf8(RESRV_FD_ATTR))
++    assert resrv_fd == RESRV_DESC_VAL_LOW
+ 
+     # An instance restart triggers a validation of the configured nsslapd-reservedescriptors attribute
+     topology_st.standalone.restart()
+ 
+-    """
+-    A standalone instance contains a single backend with default indexes
+-    so we only check these. TODO add tests for repl, chaining, PTA, SSL
+-    """
+-    STANDALONE_INST_RESRV_DESCS = 25 if is_fips() else 20 # Reserve descriptor constant (higher in FIPS mode)
+-    backends = Backends(topology_st.standalone)
+-    STANDALONE_INST_RESRV_DESCS += (len(backends.list()) * 4) # 4 = Backend descriptor constant
+-    for be in backends.list() :
+-        STANDALONE_INST_RESRV_DESCS += len(be.get_indexes().list())
+-
+-    # Varify reservedescriptors has been updated
+-    resrv_fd = topology_st.standalone.config.get_attr_val_utf8(RESRV_FD_ATTR)
+-    assert resrv_fd == str(STANDALONE_INST_RESRV_DESCS)
++    # Get the corrected value
++    corrected_fd = int(topology_st.standalone.config.get_attr_val_utf8(RESRV_FD_ATTR))
++    assert corrected_fd > RESRV_DESC_VAL_LOW
+ 
+-    log.info("test_reserve_descriptor_validation PASSED")
++    log.info(f"test_reserve_descriptor_validation PASSED (corrected from {RESRV_DESC_VAL_LOW} to {corrected_fd})")
+ 
+ @pytest.mark.skipif(ds_is_older("1.4.1.2"), reason="Not implemented")
+ def test_reserve_descriptors_high(topology_st):
+-- 
+2.52.0
+

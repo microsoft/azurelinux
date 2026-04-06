@@ -1,0 +1,26 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sun, 20 Dec 2020 12:03:03 +0100
+Subject: Fix \: escape sequence
+
+Handle \: sequence in the same way as \%, i.e. by replacing
+it with empty string. Quoting groff(7):
+  \:     Inserts a zero-width break point (similar to \% but
+         without a soft hyphen character)
+
+Bugs-Debian: https://bugs.debian.org/922704
+---
+ man2html/man2html.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index d49408c..9c276eb 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -669,6 +669,7 @@ scan_escape(char *c) {
+     case '^':
+     case '!':
+     case '%':
++    case ':':
+     case 'a':
+     case 'd':
+     case 'r':

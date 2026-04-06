@@ -1,0 +1,41 @@
+From d239cceef88fbbe4cf7479025f12934d9c3c83a5 Mon Sep 17 00:00:00 2001
+From: Andre de la Rocha <andre.rocha@qt.io>
+Date: Tue, 11 Sep 2018 12:57:23 +0200
+Subject: [PATCH] ANGLE: Disable multisampling to avoid crash in Qt
+ applications
+
+This patch adds a workaround for the crash that occurs with multisampling
+enabled in some Qt applications (e.g., the 2dpainting example). The old
+Angle release we were using lacked support for multisampling, so it was
+ignored when requested. This current version seems to support it, but is
+causing a crash in the D3D11 shaders, so this workaround disables that
+support.
+---
+ .../libANGLE/renderer/d3d/d3d11/Renderer11.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
+index bd14f4de2..f487538a5 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
+@@ -997,6 +997,8 @@ gl::SupportedSampleSet Renderer11::generateSampleSetForEGLConfig(
+ {
+     gl::SupportedSampleSet sampleCounts;
+ 
++#if 0  // Qt: Disabling support for multisampling as it is causing a crash in the D3D11 shaders.
++
+     // Generate a new set from the set intersection of sample counts between the color and depth
+     // format caps.
+     std::set_intersection(colorBufferFormatCaps.sampleCounts.begin(),
+@@ -1017,6 +1019,8 @@ gl::SupportedSampleSet Renderer11::generateSampleSetForEGLConfig(
+         sampleCounts = depthStencilBufferFormatCaps.sampleCounts;
+     }
+ 
++#endif
++
+     // Always support 0 samples
+     sampleCounts.insert(0);
+ 
+-- 
+2.14.1.windows.1
+

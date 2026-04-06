@@ -1,0 +1,28 @@
+--- ceph-19.1.0/src/common/crc32c_ppc_fast_zero_asm.S.orig	2024-07-26 07:18:50.733484175 -0400
++++ ceph-19.1.0/src/common/crc32c_ppc_fast_zero_asm.S	2024-07-26 07:17:48.449531183 -0400
+@@ -45,8 +45,10 @@
+ 
+ /* unsigned int barrett_reduction(unsigned long val) */
+ FUNC_START(barrett_reduction)
+-	lis	r4,.constants@ha
+-	la	r4,.constants@l(r4)
++/*	lis	r4,.constants@ha      */
++/*	la	r4,.constants@l(r4)   */
++	addis	r4,r4,.constants@toc@ha
++	addi	r4,r4,.constants@toc@l
+ 
+ 	li	r5,16
+ 	vxor	v1,v1,v1	/* zero v1 */
+@@ -83,8 +85,10 @@
+ 
+ /* unsigned int barrett_reduction_reflected(unsigned long val) */
+ FUNC_START(barrett_reduction_reflected)
+-	lis	r4,.bit_reflected_constants@ha
+-	la	r4,.bit_reflected_constants@l(r4)
++/*	lis	r4,.bit_reflected_constants@ha      */
++/*	la	r4,.bit_reflected_constants@l(r4)   */
++	addis	r4,r4,.bit_reflected_constants@toc@ha
++	addi	r4,r4,.bit_reflected_constants@toc@l
+ 
+ 	li	r5,16
+ 	vxor	v1,v1,v1	/* zero v1 */

@@ -1,0 +1,26 @@
+From 13df8b92ae89c796238e669ee6ef4447a42d6355 Mon Sep 17 00:00:00 2001
+From: Jeremy Bicha <jbicha@ubuntu.com>
+Date: Fri, 1 Dec 2017 12:11:35 -0500
+Subject: [PATCH] style.css: Fix failure to start in GNOME Flashback
+
+The order for 'font' properties matters
+https://developer.gnome.org/gtk3/stable/chap-css-properties.html
+
+https://bugzilla.gnome.org/show_bug.cgi?id=791001
+---
+ data/antler/style.css | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/antler/style.css b/data/antler/style.css
+index 5ab6f71..4d84904 100644
+--- a/data/antler/style.css
++++ b/data/antler/style.css
+@@ -13,7 +13,7 @@
+   border-width: 0px;
+   border-radius: 2px;
+   border-image: url("dark-key-border.svg") 2 2 2 2 repeat stretch;
+-  font: Sans 14px;
++  font: 14px Sans;
+   background-image: -gtk-gradient (linear,
+ 				     left top,
+ 				     left bottom,

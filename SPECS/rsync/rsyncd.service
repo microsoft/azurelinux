@@ -1,0 +1,12 @@
+[Unit]
+Description=fast remote file copy program daemon
+ConditionPathExists=/etc/rsyncd.conf
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/rsyncd
+ExecStart=/usr/bin/rsync --daemon --no-detach "$OPTIONS"
+
+[Install]
+WantedBy=multi-user.target

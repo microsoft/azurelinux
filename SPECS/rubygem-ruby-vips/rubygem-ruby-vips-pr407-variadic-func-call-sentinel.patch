@@ -1,0 +1,23 @@
+From bafd88c211063131f27ce5c51a37d13bac5299f7 Mon Sep 17 00:00:00 2001
+From: Kleis Auke Wolthuizen <github@kleisauke.nl>
+Date: Mon, 4 Nov 2024 10:04:35 +0100
+Subject: [PATCH] Ensure variadic call is null-terminated
+
+---
+ CHANGELOG.md      | 2 ++
+ lib/vips/image.rb | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/vips/image.rb b/lib/vips/image.rb
+index 45bd2ed..e777d47 100644
+--- a/lib/vips/image.rb
++++ b/lib/vips/image.rb
+@@ -830,7 +830,7 @@ def has_alpha?
+       # @return [Image] new image
+       def add_alpha
+         ptr = GenericPtr.new
+-        result = Vips::vips_addalpha self, ptr
++        result = Vips::vips_addalpha self, ptr, :pointer, nil
+         raise Vips::Error if result != 0
+ 
+         Vips::Image.new ptr[:value]

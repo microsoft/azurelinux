@@ -1,0 +1,39 @@
+From 3571160e4372c7c326117ea5ba098f318bd09ddf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 4 Oct 2024 09:43:17 +0100
+Subject: [PATCH 108/131] qgs: protect against format strings in QL log
+ messages
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The sgx_proc_log_report() method takes a format string and
+var-args. It is unsafe to accept a non-const string from
+the QL library and pass it to sgx_proc_log_report(), as the
+log message may contain format strings from user data.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
+index 77838c31..1e97b586 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
+@@ -50,10 +50,10 @@ typedef quote3_error_t (*sgx_ql_set_logging_callback_t)(sgx_ql_logging_callback_
+ 
+ void sgx_ql_logging_callback(sgx_ql_log_level_t level, const char *message) {
+     if (level == SGX_QL_LOG_ERROR) {
+-        sgx_proc_log_report(1, message);
++        sgx_proc_log_report(1, "%s", message);
+ 
+     } else if (level == SGX_QL_LOG_INFO) {
+-        sgx_proc_log_report(3, message);
++        sgx_proc_log_report(3, "%s", message);
+     }
+ }
+ 
+-- 
+2.53.0
+

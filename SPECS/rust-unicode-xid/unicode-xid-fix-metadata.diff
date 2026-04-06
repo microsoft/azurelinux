@@ -1,0 +1,18 @@
+--- unicode-xid-0.2.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-xid-0.2.6/Cargo.toml	2024-10-07T14:31:26.325737+00:00
+@@ -51,15 +51,6 @@
+ name = "exhaustive_tests"
+ path = "tests/exhaustive_tests.rs"
+ 
+-[[bench]]
+-name = "xid"
+-path = "benches/xid.rs"
+-harness = false
+-
+-[dev-dependencies.criterion]
+-version = "0.3"
+-
+ [features]
+-bench = []
+ default = []
+ no_std = []

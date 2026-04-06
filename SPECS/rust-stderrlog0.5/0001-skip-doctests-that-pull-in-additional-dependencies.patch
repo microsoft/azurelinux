@@ -1,0 +1,43 @@
+From 64737face1924060352ae30511b83ec17e1f1c85 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 18 Jan 2025 17:14:11 +0100
+Subject: [PATCH] skip doctests that pull in additional dependencies
+
+---
+ src/lib.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 9c300f4..a4d6ee7 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -30,7 +30,7 @@
+ //!
+ //! # StructOpt Example
+ //!
+-//! ```
++//! ```rust,ignore
+ //! use log::*;
+ //! use structopt::StructOpt;
+ //!
+@@ -69,7 +69,7 @@
+ //!
+ //! ## docopt Example
+ //!
+-//! ```rust
++//! ```rust,ignore
+ //! use log::*;
+ //! use docopt::Docopt;
+ //! use serde::Deserialize;
+@@ -108,7 +108,7 @@
+ //!
+ //! # clap Example
+ //!
+-//! ```
++//! ```rust,ignore
+ //! use clap::{Arg, App, crate_version};
+ //! use log::*;
+ //! use std::str::FromStr;
+-- 
+2.48.1
+

@@ -1,0 +1,34 @@
+From 2f0f3b0e9121720108431c5d054164016f476230 Mon Sep 17 00:00:00 2001
+From: Paul Moore <paul@paul-moore.com>
+Date: Sat, 25 Jan 2025 11:12:55 -0500
+Subject: [PATCH] tests: remove the fuzzer from test 62-sim-arch_transactions
+
+We can't reliably run the bpf-sim-fuzz tests on tests which manipulate
+the filters arch/ABIs unless the filter is safe to run on all arch/ABIs,
+which is more or less impossible.  Remove the bpf-sim-fuzz test section
+in test #62 to work around this, just as we do with the other similar
+tests.
+
+Signed-off-by: Paul Moore <paul@paul-moore.com>
+Signed-off-by: Tom Hromatka <tom.hromatka@oracle.com>
+(cherry picked from commit 7db46d72f13c172b290818f624c2966bd0db5677)
+---
+ tests/62-sim-arch_transactions.tests | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/tests/62-sim-arch_transactions.tests b/tests/62-sim-arch_transactions.tests
+index 4b23213e..aac6db24 100644
+--- a/tests/62-sim-arch_transactions.tests
++++ b/tests/62-sim-arch_transactions.tests
+@@ -14,11 +14,6 @@ test type: bpf-sim
+ 62-sim-arch_transactions	+x86_64	open		N	N	N	N	N	N	KILL
+ 62-sim-arch_transactions	+x86_64	close		N	N	N	N	N	N	ALLOW
+ 
+-test type: bpf-sim-fuzz
+-
+-# Testname			StressCount
+-62-sim-arch_transactions	5
+-
+ test type: bpf-valgrind
+ 
+ # Testname

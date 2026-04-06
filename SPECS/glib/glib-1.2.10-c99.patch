@@ -1,0 +1,76 @@
+diff -ur glib-1.2.10.orig/configure glib-1.2.10/configure
+--- glib-1.2.10.orig/configure	2019-09-09 23:02:53.452387052 +0200
++++ glib-1.2.10/configure	2019-09-09 23:08:08.854586763 +0200
+@@ -1145,7 +1145,7 @@
+ #line 1146 "configure"
+ #include "confdefs.h"
+ 
+-main(){return(0);}
++int main(){return(0);}
+ EOF
+ if { (eval echo configure:1151: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+   ac_cv_prog_cc_works=yes
+@@ -1838,7 +1838,7 @@
+ #line 1839 "configure"
+ #include "confdefs.h"
+ 
+-main(){return(0);}
++int main(){return(0);}
+ EOF
+ if { (eval echo configure:1844: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+   ac_cv_prog_cc_works=yes
+@@ -2343,6 +2343,7 @@
+ #line 2344 "configure"
+ #include "confdefs.h"
+ #include <ctype.h>
++#include <stdlib.h>
+ #define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+ #define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+ #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+@@ -3592,6 +3593,8 @@
+ #line 3593 "configure"
+ #include "confdefs.h"
+ 
++#include <stdlib.h>
++
+ int main() {
+ 
+ extern char *sys_siglist[];
+@@ -3624,6 +3627,7 @@
+ #line 3625 "configure"
+ #include "confdefs.h"
+ #include <signal.h>
++#include <string.h>
+ int main() {
+ 
+ strlen (sys_siglist[0]);
+@@ -3964,6 +3968,7 @@
+ #include "confdefs.h"
+ 
+ 	#include <stdarg.h>
++	#include <stdlib.h>
+ 	void f (int i, ...) {
+ 	va_list args1, args2;
+ 	va_start (args1, i);
+@@ -5486,8 +5491,9 @@
+ #line 5487 "configure"
+ #include "confdefs.h"
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <$mutex_header_file>
+-main()
++int main()
+ {
+   FILE *f=fopen("conftestval", "w");
+   if (!f) exit(1);
+@@ -5526,8 +5532,9 @@
+ #line 5527 "configure"
+ #include "confdefs.h"
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <$mutex_header_file>
+-main()
++int main()
+ {
+   static $mutex_default_type tv = $mutex_default_init;
+   char *p = (char*) &tv;

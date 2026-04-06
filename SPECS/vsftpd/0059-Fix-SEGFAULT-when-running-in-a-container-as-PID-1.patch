@@ -1,0 +1,58 @@
+From 970711fde95bee3de1e4a5e0b557c3132d0c3e3f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 6 Feb 2018 11:39:01 +0100
+Subject: [PATCH 59/59] Fix SEGFAULT when running in a container as PID 1
+
+When vsftpd is running in a container as PID 1, it is possible
+that it will get SIGCHILD for processes, which were not directly
+created by it, but by some of its children. These processes will
+not be in the s_p_pid_ip_hash hash table, and thus trying to
+delete the entry from the hash table in standalone.c:handle_sigchld()
+will result in segmentation fault.
+
+I can quite easily reproduce it with the upstream vsftpd and default
+configuration, except for isolate=NO and isolate_network=NO being set
+(it seems to me that network namespaces take a long time to create
+and destroy, which hides the race condition), on a quad-core machine.
+When connecting to vsftpd in a loop like this:
+$ while true; do echo -en '' | nc localhost 21; done
+
+vsftpd crashes after a couple of seconds.
+---
+ standalone.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/standalone.c b/standalone.c
+index 3b65ea2..3f35e9e 100644
+--- a/standalone.c
++++ b/standalone.c
+@@ -270,13 +270,21 @@ handle_sigchld(void* duff)
+     if (reap_one)
+     {
+       struct vsf_sysutil_ipaddr* p_ip;
+-      /* Account total number of instances */
+-      --s_children;
+-      /* Account per-IP limit */
+       p_ip = (struct vsf_sysutil_ipaddr*)
+         hash_lookup_entry(s_p_pid_ip_hash, (void*)&reap_one);
+-      drop_ip_count(p_ip);      
+-      hash_free_entry(s_p_pid_ip_hash, (void*)&reap_one);
++      /* If we are running in a container as PID 1, it is possible
++       * that we will get SIGCHILD for processes, which were not
++       * created directly by our process and which are not in the
++       * s_p_pid_ip_hash hash table.
++       */
++      if (p_ip)
++      {
++        /* Account total number of instances */
++        --s_children;
++        /* Account per-IP limit */
++        drop_ip_count(p_ip);
++        hash_free_entry(s_p_pid_ip_hash, (void*)&reap_one);
++      }
+     }
+   }
+ }
+-- 
+2.14.4
+

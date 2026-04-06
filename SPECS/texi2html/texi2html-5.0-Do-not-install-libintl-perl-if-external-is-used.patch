@@ -1,0 +1,48 @@
+From 68e345ada811cdea2d9ccf056001e15f6e2316a0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 22 Oct 2014 10:30:16 +0200
+Subject: [PATCH] Do not install libintl-perl if external is used
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Configuration --with-external-libintl-perl=yes should not
+install the bundled libintl-perl code. This patch fixes it.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.am | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index bc3257b..37dfd0f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -259,14 +259,16 @@ distclean-local:
+ install-data-local: i18n
+ 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/i18n
+ 	$(INSTALL_DATA) i18n/*.thl  $(DESTDIR)$(pkgdatadir)/i18n
+-	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/Recode \
+-	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/RecodeData
+-	$(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/*.pm \
+-	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale
+-	$(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/Recode/*.pm \
+-	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/Recode
+-	$(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/RecodeData/*.pm \
+-	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/RecodeData
++	if test '$(USE_EXTERNAL_LIBINTL)' != 'yes'; then \
++	  $(MKDIR_P) $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/Recode \
++	    $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/RecodeData ;\
++	  $(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/*.pm \
++	    $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale ; \
++	  $(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/Recode/*.pm \
++	    $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/Recode ; \
++	  $(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/RecodeData/*.pm \
++	    $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/RecodeData ; \
++	fi
+ 	if test '$(USE_EXTERNAL_EASTASIANWIDTH)' != 'yes'; then \
+ 	  $(MKDIR_P) $(DESTDIR)$(pkgdatadir)/lib/Unicode-EastAsianWidth/lib/Unicode ; \
+ 	  $(INSTALL_DATA) $(srcdir)/lib/Unicode-EastAsianWidth/lib/Unicode/EastAsianWidth.pm \
+-- 
+1.9.3
+

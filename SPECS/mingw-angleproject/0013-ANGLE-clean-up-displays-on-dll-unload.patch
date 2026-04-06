@@ -1,0 +1,78 @@
+From d8ca4f6d0d8fffd8319f340685e03751049678ae Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Tue, 16 Apr 2019 10:19:27 +0200
+Subject: [PATCH] ANGLE: clean up displays on dll unload
+
+If the displays are not cleaned up on dll unloading, profilers might
+report memory leaks.
+
+Change-Id: I04cbc3c2448bfb450f7d840e216827f86856e963
+---
+ src/3rdparty/angle/src/libANGLE/Display.cpp     | 17 +++++++++++++++++
+ src/3rdparty/angle/src/libANGLE/Display.h       |  1 +
+ .../angle/src/libGLESv2/global_state.cpp        |  2 ++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/Display.cpp b/src/3rdparty/angle/src/libANGLE/Display.cpp
+index 735b472787..0bb0bb05b1 100644
+--- a/src/3rdparty/angle/src/libANGLE/Display.cpp
++++ b/src/3rdparty/angle/src/libANGLE/Display.cpp
+@@ -364,6 +364,23 @@ Display *Display::GetDisplayFromDevice(Device *device, const AttributeMap &attri
+     return display;
+ }
+ 
++//static
++void Display::CleanupDisplays()
++{
++    // ~Display takes care of removing the entry from the according map
++    {
++        ANGLEPlatformDisplayMap *displays = GetANGLEPlatformDisplayMap();
++        while (!displays->empty())
++            delete displays->begin()->second;
++    }
++
++    {
++        DevicePlatformDisplayMap *displays = GetDevicePlatformDisplayMap();
++        while (!displays->empty())
++            delete displays->begin()->second;
++    }
++}
++
+ Display::Display(EGLenum platform, EGLNativeDisplayType displayId, Device *eglDevice)
+     : mImplementation(nullptr),
+       mDisplayId(displayId),
+diff --git a/src/3rdparty/angle/src/libANGLE/Display.h b/src/3rdparty/angle/src/libANGLE/Display.h
+index aa1d1c3b37..2a1c386d75 100644
+--- a/src/3rdparty/angle/src/libANGLE/Display.h
++++ b/src/3rdparty/angle/src/libANGLE/Display.h
+@@ -65,6 +65,7 @@ class Display final : angle::NonCopyable
+     static Display *GetDisplayFromDevice(Device *device, const AttributeMap &attribMap);
+     static Display *GetDisplayFromNativeDisplay(EGLNativeDisplayType nativeDisplay,
+                                                 const AttributeMap &attribMap);
++    static void CleanupDisplays();
+ 
+     static const ClientExtensions &GetClientExtensions();
+     static const std::string &GetClientExtensionString();
+diff --git a/src/3rdparty/angle/src/libGLESv2/global_state.cpp b/src/3rdparty/angle/src/libGLESv2/global_state.cpp
+index c5f3dfe4e1..26045bf5b2 100644
+--- a/src/3rdparty/angle/src/libGLESv2/global_state.cpp
++++ b/src/3rdparty/angle/src/libGLESv2/global_state.cpp
+@@ -13,6 +13,7 @@
+ #include "common/tls.h"
+ 
+ #include "libANGLE/Thread.h"
++#include "libANGLE/Display.h"
+ 
+ namespace gl
+ {
+@@ -140,6 +141,7 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE, DWORD reason, LPVOID)
+             return static_cast<BOOL>(egl::DeallocateCurrentThread());
+ 
+         case DLL_PROCESS_DETACH:
++            egl::Display::CleanupDisplays();
+             return static_cast<BOOL>(egl::TerminateProcess());
+     }
+ 
+-- 
+2.20.1.windows.1
+

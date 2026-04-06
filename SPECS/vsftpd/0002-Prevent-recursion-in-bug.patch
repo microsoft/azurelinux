@@ -1,0 +1,107 @@
+From e679a3ce0f2cf1558da31e0bccd9e2398b89c7e9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 30 Jul 2019 16:07:01 +0200
+Subject: [PATCH 2/2] Prevent recursion in bug()
+
+Resolves: rhbz#1666380
+---
+ sysutil.c | 35 +++++++++++++++++++++++++++++++----
+ sysutil.h |  1 +
+ utility.c | 12 +++++++-----
+ 3 files changed, 39 insertions(+), 9 deletions(-)
+
+diff --git a/sysutil.c b/sysutil.c
+index fd07d99..e2df671 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -774,21 +774,48 @@ vsf_sysutil_deactivate_linger_failok(int fd)
+   (void) setsockopt(fd, SOL_SOCKET, SO_LINGER, &the_linger, sizeof(the_linger));
+ }
+ 
+-void
+-vsf_sysutil_activate_noblock(int fd)
++static int
++vsf_sysutil_activate_noblock_internal(int fd, int return_err)
+ {
+   int retval;
+   int curr_flags = fcntl(fd, F_GETFL);
+   if (vsf_sysutil_retval_is_error(curr_flags))
+   {
+-    die("fcntl");
++    if (return_err)
++    {
++      return -1;
++    }
++    else
++    {
++      die("fcntl");
++    }
+   }
+   curr_flags |= O_NONBLOCK;
+   retval = fcntl(fd, F_SETFL, curr_flags);
+   if (retval != 0)
+   {
+-    die("fcntl");
++    if (return_err)
++    {
++      return -1;
++    }
++    else
++    {
++      die("fcntl");
++    }
+   }
++  return 0;
++}
++
++void
++vsf_sysutil_activate_noblock(int fd)
++{
++  (void) vsf_sysutil_activate_noblock_internal(fd, 0);
++}
++
++int
++vsf_sysutil_activate_noblock_no_die(int fd)
++{
++  return vsf_sysutil_activate_noblock_internal(fd, 1);
+ }
+ 
+ void
+diff --git a/sysutil.h b/sysutil.h
+index 2df14ed..0772423 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -281,6 +281,7 @@ void vsf_sysutil_activate_oobinline(int fd);
+ void vsf_sysutil_activate_linger(int fd);
+ void vsf_sysutil_deactivate_linger_failok(int fd);
+ void vsf_sysutil_activate_noblock(int fd);
++int vsf_sysutil_activate_noblock_no_die(int fd);
+ void vsf_sysutil_deactivate_noblock(int fd);
+ /* This does SHUT_RDWR */
+ void vsf_sysutil_shutdown_failok(int fd);
+diff --git a/utility.c b/utility.c
+index 75e5bdd..5619a04 100644
+--- a/utility.c
++++ b/utility.c
+@@ -47,11 +47,13 @@ bug(const char* p_text)
+   {
+     vsf_log_die(p_text);
+   }
+-  vsf_sysutil_activate_noblock(VSFTP_COMMAND_FD);
+-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "500 OOPS: ", 10);
+-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, p_text,
+-                                vsf_sysutil_strlen(p_text));
+-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "\r\n", 2);
++  if (vsf_sysutil_activate_noblock_no_die(VSFTP_COMMAND_FD) == 0)
++  {
++    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "500 OOPS: ", 10);
++    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, p_text,
++				  vsf_sysutil_strlen(p_text));
++    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "\r\n", 2);
++  }
+   if (tunable_log_die)
+   {
+     /* Workaround for https://github.com/systemd/systemd/issues/2913 */
+-- 
+2.20.1
+

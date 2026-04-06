@@ -1,0 +1,12 @@
+[Unit]
+Description=Free all devices on startup
+DefaultDependencies=no
+Before=sysinit.target systemd-udev-trigger.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/device_cio_free
+
+[Install]
+WantedBy=sysinit.target

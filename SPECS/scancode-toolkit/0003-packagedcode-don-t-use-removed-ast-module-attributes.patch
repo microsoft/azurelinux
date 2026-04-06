@@ -1,0 +1,111 @@
+From a5ebcbc256e5efdd19722f11389dd9390e680473 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Tue, 5 Aug 2025 23:33:17 -0500
+Subject: [PATCH 3/4] packagedcode: don't use removed ast module attributes
+
+This is needed for Python 3.14 compatibility.
+
+Signed-off-by: Maxwell G <maxwell@gtmx.me>
+---
+ src/packagedcode/build.py         | 18 +++++++++---------
+ src/packagedcode/pypi.py          |  8 ++++----
+ src/packagedcode/pypi_setup_py.py | 10 ++--------
+ 3 files changed, 15 insertions(+), 21 deletions(-)
+
+diff --git a/src/packagedcode/build.py b/src/packagedcode/build.py
+index 2f2d964..9fe4cef 100644
+--- a/src/packagedcode/build.py
++++ b/src/packagedcode/build.py
+@@ -163,14 +163,14 @@ class BaseStarlarkManifestHandler(models.DatafileHandler):
+                 args = {}
+                 for kw in statement.value.keywords:
+                     arg_name = kw.arg
+-                    if isinstance(kw.value, ast.Str):
+-                        args[arg_name] = kw.value.s
++                    if isinstance(kw.value, ast.Constant) and isinstance(kw.value.value, str):
++                        args[arg_name] = kw.value.value
+ 
+                     if isinstance(kw.value, ast.List):
+                         # We collect the elements of a list if the element is
+                         # not a function call
+                         args[arg_name] = [
+-                            elt.s for elt in kw.value.elts
++                            elt.value for elt in kw.value.elts
+                             if not isinstance(elt, ast.Call)
+                         ]
+                 if args:
+@@ -351,17 +351,17 @@ class BuckMetadataBzlHandler(BaseStarlarkManifestHandler):
+                 statement_keys = statement.value.keys
+                 statement_values = statement.value.values
+                 for statement_k, statement_v in zip(statement_keys, statement_values):
+-                    if isinstance(statement_k, ast.Str):
+-                        key_name = statement_k.s
++                    if isinstance(statement_k, ast.Constant) and isinstance(statement_k.value, str):
++                        key_name = statement_k.value
+                     # The list values in a `METADATA.bzl` file seem to only contain strings
+                     if isinstance(statement_v, ast.List):
+                         value = []
+                         for e in statement_v.elts:
+-                            if not isinstance(e, ast.Str):
++                            if not (isinstance(e, ast.Constant) and isinstance(e.value, str)):
+                                 continue
+-                            value.append(e.s)
+-                    if isinstance(statement_v, (ast.Str, ast.Constant)):
+-                        value = statement_v.s
++                            value.append(e.value)
++                    if isinstance(statement_v, ast.Constant) and isinstance(statement_v.value, str):
++                        value = statement_v.value
+                     metadata_fields[key_name] = value
+ 
+         parties = []
+diff --git a/src/packagedcode/pypi.py b/src/packagedcode/pypi.py
+index 1930bb7..489e977 100644
+--- a/src/packagedcode/pypi.py
++++ b/src/packagedcode/pypi.py
+@@ -2157,8 +2157,8 @@ def get_setup_py_args_legacy(location, include_not_parsable=False):
+                         ]
+                         values.append(val)
+ 
+-                    elif isinstance(val, (ast.Str, ast.Constant,)):
+-                        values.append(val.s)
++                    elif isinstance(val, ast.Constant) and isinstance(val.value, str):
++                        values.append(val.value)
+ 
+                     else:
+                         if include_not_parsable:
+@@ -2183,8 +2183,8 @@ def get_setup_py_args_legacy(location, include_not_parsable=False):
+                 mapping = dict(zip(keys, values))
+                 setup_args[arg_name] = mapping
+ 
+-            elif isinstance(arg_value, (ast.Str, ast.Constant,)):
+-                setup_args[arg_name] = arg_value.s
++            elif isinstance(arg_value, ast.Constant) and isinstance(arg_value.value, str):
++                setup_args[arg_name] = arg_value.value
+             else:
+                 if include_not_parsable:
+                     if isinstance(arg_value, ast.Attribute):
+diff --git a/src/packagedcode/pypi_setup_py.py b/src/packagedcode/pypi_setup_py.py
+index 5e2559a..51a9431 100644
+--- a/src/packagedcode/pypi_setup_py.py
++++ b/src/packagedcode/pypi_setup_py.py
+@@ -119,15 +119,9 @@ def node_to_value(node, body):
+     """
+     if node is None:
+         return
+-    if hasattr(ast, 'Constant'):
+-        if isinstance(node, ast.Constant):
+-            return node.value
+ 
+-    if isinstance(node, ast.Str):
+-        return node.s
+-
+-    if isinstance(node, ast.Num):
+-        return node.n
++    if isinstance(node, ast.Constant):
++        return node.value
+ 
+     if isinstance(node, (ast.List, ast.Tuple, ast.Set,)):
+         return [node_to_value(subnode, body) for subnode in node.elts]
+-- 
+2.51.0
+

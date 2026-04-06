@@ -1,0 +1,77 @@
+--- ppxlib-0.35.0/ast/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/ast/dune	2025-02-05 10:34:39.239853680 -0700
+@@ -5,7 +5,7 @@
+ (library
+  (name ppxlib_ast)
+  (public_name ppxlib.ast)
+- (libraries astlib stdlib-shims)
++ (libraries astlib)
+  (flags
+   (:standard -safe-string)
+   -w
+--- ppxlib-0.35.0/dune-project.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/dune-project	2025-02-05 10:34:39.239853680 -0700
+@@ -21,7 +21,6 @@
+   (ppx_derivers (>= 1.0))
+   (sexplib0 (>= v0.12))
+   (sexplib0 (and :with-test (>= "v0.15"))) ; Printexc.register_printer in sexplib0 changed
+-  stdlib-shims
+   (ocamlfind :with-test)
+   (re (and :with-test (>= 1.9.0)))
+   (cinaps (and :with-test (>= v0.12.1)))
+--- ppxlib-0.35.0/metaquot_lifters/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/metaquot_lifters/dune	2025-02-05 10:34:39.239853680 -0700
+@@ -3,4 +3,4 @@
+  (public_name ppxlib.metaquot_lifters)
+  (flags
+   (:standard -safe-string))
+- (libraries ppxlib ppxlib_traverse_builtins stdppx stdlib-shims))
++ (libraries ppxlib ppxlib_traverse_builtins stdppx))
+--- ppxlib-0.35.0/ppxlib.opam.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/ppxlib.opam	2025-02-05 10:34:39.239853680 -0700
+@@ -26,7 +26,6 @@ depends: [
+   "ppx_derivers" {>= "1.0"}
+   "sexplib0" {>= "v0.12"}
+   "sexplib0" {with-test & >= "v0.15"}
+-  "stdlib-shims"
+   "ocamlfind" {with-test}
+   "re" {with-test & >= "1.9.0"}
+   "cinaps" {with-test & >= "v0.12.1"}
+--- ppxlib-0.35.0/src/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/src/dune	2025-02-05 10:35:15.094347231 -0700
+@@ -9,7 +9,6 @@
+   ppx_derivers
+   ppxlib_traverse_builtins
+   stdppx
+-  stdlib-shims
+   sexplib0
+   compiler-libs.common)
+  (flags
+--- ppxlib-0.35.0/src/gen/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/src/gen/dune	2025-02-05 10:34:39.240853665 -0700
+@@ -2,4 +2,4 @@
+  (names gen_ast_pattern gen_ast_builder)
+  (flags
+   (:standard -safe-string))
+- (libraries ppxlib_ast astlib ppxlib_traverse_builtins stdppx stdlib-shims))
++ (libraries ppxlib_ast astlib ppxlib_traverse_builtins stdppx))
+--- ppxlib-0.35.0/stdppx/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/stdppx/dune	2025-02-05 10:34:39.240853665 -0700
+@@ -1,6 +1,6 @@
+ (library
+  (name stdppx)
+  (public_name ppxlib.stdppx)
+- (libraries sexplib0 stdlib-shims)
++ (libraries sexplib0)
+  (flags
+   (:standard -safe-string)))
+--- ppxlib-0.35.0/traverse/dune.orig	2025-02-03 03:26:46.000000000 -0700
++++ ppxlib-0.35.0/traverse/dune	2025-02-05 10:34:39.240853665 -0700
+@@ -4,6 +4,6 @@
+  (kind ppx_deriver)
+  (flags
+   (:standard -safe-string))
+- (libraries ppxlib ppxlib_ast ppxlib_traverse_builtins stdppx stdlib-shims)
++ (libraries ppxlib ppxlib_ast ppxlib_traverse_builtins stdppx)
+  (preprocess
+   (pps ppxlib_metaquot)))

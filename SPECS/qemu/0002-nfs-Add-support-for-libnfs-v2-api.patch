@@ -1,0 +1,53 @@
+From 379565f41b2b2ddf50c162a917405244d2f992f2 Mon Sep 17 00:00:00 2001
+From: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Date: Sun, 26 Jan 2025 12:59:45 +1000
+Subject: [PATCH 2/8] nfs: Add support for libnfs v2 api
+
+Signed-off-by: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+---
+ block/nfs.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/block/nfs.c b/block/nfs.c
+index 0500f60c08..f768ee0c4b 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -268,11 +268,18 @@ static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, int64_t offset,
+     NFSRPC task;
+ 
+     nfs_co_init_task(bs, &task);
+-    task.iov = iov;
+ 
+     WITH_QEMU_LOCK_GUARD(&client->mutex) {
++#ifdef LIBNFS_API_V2
++        if (nfs_pread_async(client->context, client->fh,
++                            iov->iov[0].iov_base,
++                            bytes > iov->iov[0].iov_len ? iov->iov[0].iov_len : bytes,
++                            offset, nfs_co_generic_cb, &task) != 0) {
++#else
++        task.iov = iov;
+         if (nfs_pread_async(client->context, client->fh,
+                             offset, bytes, nfs_co_generic_cb, &task) != 0) {
++#endif            
+             return -ENOMEM;
+         }
+ 
+@@ -317,9 +324,15 @@ static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, int64_t offset,
+     }
+ 
+     WITH_QEMU_LOCK_GUARD(&client->mutex) {
++#ifdef LIBNFS_API_V2
++        if (nfs_pwrite_async(client->context, client->fh,
++                             buf, bytes, offset,
++                             nfs_co_generic_cb, &task) != 0) {
++#else
+         if (nfs_pwrite_async(client->context, client->fh,
+                              offset, bytes, buf,
+                              nfs_co_generic_cb, &task) != 0) {
++#endif            
+             if (my_buffer) {
+                 g_free(buf);
+             }
+-- 
+2.48.1
+

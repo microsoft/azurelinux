@@ -1,0 +1,11 @@
+--- a/tests/query-harness.sh
++++ b/tests/query-harness.sh
+@@ -10,7 +10,7 @@ fi
+ testquery="${top_builddir}/tests/testquery"
+ if [ -n "$USE_VALGRIND" ] && (type valgrind 1>/dev/null)
+ then
+-	output="`valgrind -q --error-exitcode=1 "$testquery" $arguments`"
++	output="`libtool --mode=execute valgrind -q --error-exitcode=1 "$testquery" $arguments`"
+ else
+ 	output="`"$testquery" $arguments`"
+ fi

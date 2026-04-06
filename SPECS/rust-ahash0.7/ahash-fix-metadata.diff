@@ -1,0 +1,22 @@
+--- ahash-0.7.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ahash-0.7.8/Cargo.toml	2024-10-23T12:23:24.943283+00:00
+@@ -74,19 +74,6 @@
+ bench = true
+ doc = true
+ 
+-[[bench]]
+-name = "ahash"
+-path = "tests/bench.rs"
+-harness = false
+-
+-[[bench]]
+-name = "map"
+-path = "tests/map_tests.rs"
+-harness = false
+-
+-[dev-dependencies.criterion]
+-version = "0.3.2"
+-
+ [dev-dependencies.fnv]
+ version = "1.0.5"
+ 

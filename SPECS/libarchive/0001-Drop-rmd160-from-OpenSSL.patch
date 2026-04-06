@@ -1,0 +1,24 @@
+From 375bbe7d20284f205ebb73652ef61ae6fceac344 Mon Sep 17 00:00:00 2001
+From: Lukas Javorsky <ljavorsk@redhat.com>
+Date: Tue, 18 Jul 2023 10:29:22 +0000
+Subject: [PATCH] Drop rmd160 from OpenSSL
+
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7f5dbdf..179fb2d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1300,7 +1300,6 @@ if test "x$with_openssl" != "xno"; then
+     LIBSREQUIRED="$LIBSREQUIRED${LIBSREQUIRED:+ }libcrypto"
+     AC_CHECK_LIB(crypto,OPENSSL_config)
+     CRYPTO_CHECK(MD5, OPENSSL, md5)
+-    CRYPTO_CHECK(RMD160, OPENSSL, rmd160)
+     CRYPTO_CHECK(SHA1, OPENSSL, sha1)
+     CRYPTO_CHECK(SHA256, OPENSSL, sha256)
+     CRYPTO_CHECK(SHA384, OPENSSL, sha384)
+-- 
+2.41.0
+

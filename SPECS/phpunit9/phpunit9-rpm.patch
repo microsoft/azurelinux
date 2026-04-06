@@ -1,0 +1,127 @@
+diff -up ./phpunit.rpm ./phpunit
+--- ./phpunit.rpm	2024-03-21 13:50:22.000000000 +0100
++++ ./phpunit	2024-03-21 13:59:15.659377103 +0100
+@@ -71,27 +71,11 @@ if (isset($GLOBALS['_composer_autoload_p
+     define('PHPUNIT_COMPOSER_INSTALL', $GLOBALS['_composer_autoload_path']);
+ 
+     unset($GLOBALS['_composer_autoload_path']);
++} else if (file_exists('./vendor/phpunit/phpunit/phpunit') && file_exists('./vendor/autoload.php')) {
++    echo "\n==== Redirecting to composer installed version in vendor/phpunit ====\n\n";
++    define ('PHPUNIT_COMPOSER_INSTALL', realpath('./vendor/autoload.php'));
+ } else {
+-    foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
+-        if (file_exists($file)) {
+-            define('PHPUNIT_COMPOSER_INSTALL', $file);
+-
+-            break;
+-        }
+-    }
+-
+-    unset($file);
+-}
+-
+-if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
+-    fwrite(
+-        STDERR,
+-        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+-        '    composer install' . PHP_EOL . PHP_EOL .
+-        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+-    );
+-
+-    die(1);
++    define ('PHPUNIT_COMPOSER_INSTALL', '/usr/share/php/PHPUnit9/autoload.php');
+ }
+ 
+ $options = getopt('', array('prepend:'));
+@@ -104,4 +88,13 @@ unset($options);
+ 
+ require PHPUNIT_COMPOSER_INSTALL;
+ 
+-PHPUnit\TextUI\Command::main();
++if (class_exists('PHPUnit\\TextUI\\Application')) {
++    // PHPUnit v10 or newer
++    exit((new PHPUnit\TextUI\Application)->run($_SERVER['argv']));
++} else if (class_exists('PHPUnit_TextUI_Command')) {
++    // PHPUnit v5 or older
++    PHPUnit_TextUI_Command::main();
++} else {
++    // PHPUnit v6 to v9
++    PHPUnit\TextUI\Command::main();
++}
+diff -up ./src/TextUI/Command.php.rpm ./src/TextUI/Command.php
+--- ./src/TextUI/Command.php.rpm	2024-03-21 13:50:22.000000000 +0100
++++ ./src/TextUI/Command.php	2024-03-21 13:59:59.517211974 +0100
+@@ -601,13 +601,13 @@ class Command
+         $this->printVersionString();
+ 
+         $latestVersion           = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit');
+-        $latestCompatibleVersion = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit-' . explode('.', Version::series())[0]);
++        $latestCompatibleVersion = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit-' . $major=explode('.', Version::series())[0]);
+ 
+         $notLatest           = version_compare($latestVersion, Version::id(), '>');
+         $notLatestCompatible = version_compare($latestCompatibleVersion, Version::id(), '>');
+ 
+         if ($notLatest || $notLatestCompatible) {
+-            print 'You are not using the latest version of PHPUnit.' . PHP_EOL;
++            print 'You are not using the latest version of PHPUnit.' . PHP_EOL . PHP_EOL;
+         } else {
+             print 'You are using the latest version of PHPUnit.' . PHP_EOL;
+         }
+@@ -618,6 +618,7 @@ class Command
+                 Version::id(),
+                 $latestCompatibleVersion,
+             );
++            printf('Try a system update for new phpunit%s package.' . PHP_EOL . PHP_EOL, $major);
+         }
+ 
+         if ($notLatest) {
+@@ -625,6 +626,7 @@ class Command
+                 'The latest version is PHPUnit %s.' . PHP_EOL,
+                 $latestVersion,
+             );
++            printf('Try to install and use the phpunit%s command.' . PHP_EOL . PHP_EOL, explode('.', $latestVersion)[0]);
+         }
+ 
+         exit(TestRunner::SUCCESS_EXIT);
+diff -up ./src/Util/Xml/SchemaFinder.php.rpm ./src/Util/Xml/SchemaFinder.php
+--- ./src/Util/Xml/SchemaFinder.php.rpm	2024-03-21 13:50:22.000000000 +0100
++++ ./src/Util/Xml/SchemaFinder.php	2024-03-21 13:59:15.659377103 +0100
+@@ -75,6 +75,6 @@ final class SchemaFinder
+             return __PHPUNIT_PHAR_ROOT__ . '/';
+         }
+ 
+-        return __DIR__ . '/../../../';
++        return __DIR__ . '/../../';
+     }
+ }
+diff -up ./tests/bootstrap.php.rpm ./tests/bootstrap.php
+--- ./tests/bootstrap.php.rpm	2024-03-21 13:50:22.000000000 +0100
++++ ./tests/bootstrap.php	2024-03-21 13:59:15.659377103 +0100
+@@ -9,8 +9,8 @@
+  */
+ const TEST_FILES_PATH = __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR;
+ 
+-$composer = file_exists(__DIR__ . '/../vendor/autoload.php');
+-$phar     = file_exists(__DIR__ . '/autoload.php');
++$composer = true;
++$phar     = false;
+ 
+ if ($composer && $phar) {
+     print 'More than one test fixture autoloader is available, exiting.' . PHP_EOL;
+@@ -26,10 +26,14 @@ if (!$composer && !$phar) {
+ 
+ if ($composer) {
+     if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
+-        define('PHPUNIT_COMPOSER_INSTALL', dirname(__DIR__) . '/vendor/autoload.php');
++        define('PHPUNIT_COMPOSER_INSTALL', '@PATH@/autoload.php');
+     }
+ 
+-    require_once __DIR__ . '/../vendor/autoload.php';
++    require_once PHPUNIT_COMPOSER_INSTALL;
++    require_once __DIR__ . '/_files/CoverageNamespacedFunctionTest.php';
++    require_once __DIR__ . '/_files/CoveredFunction.php';
++    require_once __DIR__ . '/_files/NamespaceCoveredFunction.php';
++    require_once __DIR__ . '/autoload.php';
+ }
+ 
+ if ($phar) {

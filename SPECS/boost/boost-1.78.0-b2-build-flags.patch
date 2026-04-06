@@ -1,0 +1,25 @@
+From 1ded9b9c219542442b3c10af815e5413a2a89c75 Mon Sep 17 00:00:00 2001
+From: Thomas W Rodgers <trodgers@redhat.com>
+Date: Tue, 1 Mar 2022 10:03:34 -0800
+Subject: [PATCH] Adjust b2 build flags for Fedora Packaging
+
+---
+ src/engine/build.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/build/src/engine/build.sh b/tools/build/src/engine/build.sh
+index f1ad08cb..ab58deba 100755
+--- a/tools/build/src/engine/build.sh
++++ b/tools/build/src/engine/build.sh
+@@ -323,7 +323,7 @@ case "${B2_TOOLSET}" in
+ 
+     gcc|gcc-*)
+         CXX_VERSION_OPT=${CXX_VERSION_OPT:---version}
+-        B2_CXXFLAGS_RELEASE="-O2 -s"
++        B2_CXXFLAGS_RELEASE="${RPM_OPT_FLAGS} ${RPM_LD_FLAGS}"
+         B2_CXXFLAGS_DEBUG="-O0 -g"
+     ;;
+ 
+-- 
+2.35.1
+

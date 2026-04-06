@@ -1,0 +1,11 @@
+--- ouroboros_macro-0.18.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ouroboros_macro-0.18.5/Cargo.toml	2025-03-03T22:09:51.028986+00:00
+@@ -31,7 +31,7 @@
+ proc-macro = true
+ 
+ [dependencies.heck]
+-version = "0.4.1"
++version = "0.5"
+ 
+ [dependencies.proc-macro2]
+ version = "1.0"

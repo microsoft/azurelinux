@@ -1,0 +1,31 @@
+--- weezl-0.1.12/Cargo.toml	1970-01-01T00:00:01+00:00
++++ weezl-0.1.12/Cargo.toml	2025-11-24T14:49:58.927150+00:00
+@@ -88,20 +88,11 @@
+ path = "tests/roundtrip_vec.rs"
+ required-features = ["alloc"]
+ 
+-[[bench]]
+-name = "msb8"
+-path = "benches/msb8.rs"
+-harness = false
+-required-features = ["std"]
+-
+ [dependencies.futures]
+ version = "0.3.12"
+ features = ["std"]
+ optional = true
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.3.1"
+ 
+ [dev-dependencies.tokio]
+ version = "1"
+@@ -115,6 +106,6 @@
+ default-features = false
+ 
+ [dev-dependencies.tokio-util]
+-version = "0.6.2"
++version = "0.7.7"
+ features = ["compat"]
+ default-features = false

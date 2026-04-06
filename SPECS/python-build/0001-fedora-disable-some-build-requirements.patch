@@ -1,0 +1,66 @@
+From 69a16663d625ca3b414f19c09f0f9d734c9dc502 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Mon, 4 Aug 2025 10:04:15 +0200
+Subject: [PATCH] fedora: disable some build requirements
+
+This will reduce the number of packages pulled into the build
+environment.  This speeds up builds and also makes it easier to bring
+this package to new EPEL versions.
+
+build[uv, virtualenv]:
+We want the uv build requirement to be optional, and we pull in the
+virtualenv build requirement already in our %pyproject_buildrequires
+call in the spec file.
+
+pytest-cov:
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+
+pytest-rerunfailures:
+This is used for the flaky marker.  Instead of having the additional
+build requirement, we'll just skip the one test that uses it.
+
+pytest-xdist:
+This is used for running tests in parallel, and doesn't affect the test
+run overall.
+---
+ pyproject.toml     | 4 ----
+ tests/test_main.py | 1 -
+ 2 files changed, 5 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1f39bd6..0902b85 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -72,17 +72,13 @@ docs = [
+ test = [
+   "filelock >= 3",
+   "pytest >= 6.2.4",
+-  "pytest-cov >= 2.12",
+   "pytest-mock >= 2",
+-  "pytest-rerunfailures >= 9.1",
+-  "pytest-xdist >= 1.34",
+   "wheel >= 0.36.0",
+   'setuptools >= 42.0.0; python_version < "3.10"',
+   'setuptools >= 56.0.0; python_version == "3.10"',
+   'setuptools >= 56.0.0; python_version == "3.11"',
+   'setuptools >= 67.8.0; python_version >= "3.12"',
+   "setuptools_scm >= 6",
+-  { include-group = "extra" },
+ ]
+ typing = [
+   "importlib-metadata >= 5.1",
+diff --git a/tests/test_main.py b/tests/test_main.py
+index ea9fbf0..571dfc0 100644
+--- a/tests/test_main.py
++++ b/tests/test_main.py
+@@ -339,7 +339,6 @@ def test_build_package_via_sdist_invalid_distribution(tmp_dir, package_test_setu
+         ),
+     ],
+ )
+-@pytest.mark.flaky(reruns=5)
+ def test_output(package_test_setuptools, tmp_dir, capsys, args, output):
+     build.__main__.main([package_test_setuptools, '-o', tmp_dir, *args])
+     stdout, stderr = capsys.readouterr()
+-- 
+2.50.1
+

@@ -1,0 +1,74 @@
+From f4f76740ad4693cb967801e366f1d6410381dd71 Mon Sep 17 00:00:00 2001
+From: groff owner <groff-owner@fedoraproject.org>
+Date: Thu, 2 Nov 2023 13:09:37 +0000
+Subject: [PATCH] Revert upstream change of mapping special characters for
+ UTF-8
+
+Adopt Debian decision: https://salsa.debian.org/debian/groff/-/commit/d5394c68d70e6c5199b01d2522e094c8fd52e64e
+---
+ tmac/man.local  | 16 ++++++++++++++++
+ tmac/mdoc.local | 17 ++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/tmac/man.local b/tmac/man.local
+index 5daa507..4bed937 100644
+--- a/tmac/man.local
++++ b/tmac/man.local
+@@ -2,6 +2,22 @@
+ .\"
+ .\" Put local modifications to groff_man(7)'s behavior here.
+ .\"
++.\" Adopting Debian's decision to preserve old mapping for UTF-8
++.\" Debian: As of groff 1.23.0, the "-", "'", "`", "^", and "~" input
++.\" characters are mapped to non-Basic Latin code points in output from
++.\" the "utf8" device, for consistency with other output devices such as
++.\" PDF.  Unfortunately in practice this still causes far too much
++.\" disruption for innocent users of manual pages who just want to be able
++.\" to search for characters normally, so preserve the old behaviour.
++.\" Comment this out if you want to make sure that manual pages you're
++.\" writing are clear of these problems.
++.if '\*[.T]'utf8' \{\
++.  char - \-
++.  char ' \[aq]
++.  char ` \[ga]
++.  char ^ \[ha]
++.  char ~ \[ti]
++.\}
+ .\" Change "0" to "1" to enable OSC 8 links on SGR-capable grotty(1)
+ .\" output devices.
+ .if !'\*[.T]'html' \
+diff --git a/tmac/mdoc.local b/tmac/mdoc.local
+index 94688ab..1bb47d6 100644
+--- a/tmac/mdoc.local
++++ b/tmac/mdoc.local
+@@ -2,6 +2,22 @@
+ .\"
+ .\" Put local modifications to groff_mdoc(7)'s behavior here.
+ .\"
++.\" Adopting Debian's decision to preserve old mapping for UTF-8
++.\" Debian: As of groff 1.23.0, the "-", "'", "`", "^", and "~" input
++.\" characters are mapped to non-Basic Latin code points in output from
++.\" the "utf8" device, for consistency with other output devices such as
++.\" PDF.  Unfortunately in practice this still causes far too much
++.\" disruption for innocent users of manual pages who just want to be able
++.\" to search for characters normally, so preserve the old behaviour.
++.\" Comment this out if you want to make sure that manual pages you're
++.\" writing are clear of these problems.
++.if '\*[.T]'utf8' \{\
++.  char - \-
++.  char ' \[aq]
++.  char ` \[ga]
++.  char ^ \[ha]
++.  char ~ \[ti]
++.\}
+ .\" "CW" is not a portable font name, but some man pages use it anyway.
+ .\" Uncomment this to suppress warnings produced by such pages.  This
+ .\" test remaps the font to roman ("R") on nroff (terminal) devices. You
+@@ -12,4 +28,3 @@
+ .\" mode: nroff
+ .\" fill-column: 72
+ .\" End:
+-.\" vim: set filetype=groff textwidth=72:
+-- 
+2.41.0
+

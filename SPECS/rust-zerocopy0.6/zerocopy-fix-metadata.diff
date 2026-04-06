@@ -1,0 +1,20 @@
+--- zerocopy-0.6.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zerocopy-0.6.6/Cargo.toml	2025-01-06T22:02:17.264541+00:00
+@@ -36,7 +36,7 @@
+ version = "=0.6.6"
+ 
+ [dev-dependencies.rand]
+-version = "0.6"
++version = "0.8"
+ 
+ [dev-dependencies.rustversion]
+ version = "1.0"
+@@ -45,7 +45,7 @@
+ version = "1.1"
+ 
+ [dev-dependencies.trybuild]
+-version = "=1.0.80"
++version = "1.0.80"
+ 
+ [features]
+ __internal_use_only_features_that_work_on_stable = [

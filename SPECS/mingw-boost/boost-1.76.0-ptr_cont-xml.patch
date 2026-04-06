@@ -1,0 +1,1263 @@
+From adc94a80adbb7b720bd149c8b805876baa77b815 Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <jwakely@redhat.com>
+Date: Wed, 5 Aug 2020 11:28:26 +0100
+Subject: [PATCH] Fix invalid XHTML markup in docs
+
+The reStructuredText files insert <hr> HTML elements, which are not
+valid in XHTML.
+
+The doc/tutorial_example.html file contains unquoted attributes and
+unclosed <meta> and <link> tags (although since that file is included
+into another document, it probably shouldn't have <html>, <head> and
+<body> elements at all).
+---
+ doc/associative_ptr_container.html |   2 +-
+ doc/associative_ptr_container.rst  |   2 +-
+ doc/examples.html                  |   2 +-
+ doc/examples.rst                   |   4 +-
+ doc/faq.html                       |   2 +-
+ doc/faq.rst                        |   2 +-
+ doc/guidelines.html                |   4 +-
+ doc/guidelines.rst                 |   4 +-
+ doc/headers.html                   |   2 +-
+ doc/headers.rst                    |   2 +-
+ doc/indirect_fun.html              |   2 +-
+ doc/indirect_fun.rst               |   2 +-
+ doc/ptr_array.html                 |   2 +-
+ doc/ptr_array.rst                  |   2 +-
+ doc/ptr_container.html             |   2 +-
+ doc/ptr_container.rst              |   2 +-
+ doc/ptr_deque.html                 |   2 +-
+ doc/ptr_deque.rst                  |   2 +-
+ doc/ptr_inserter.html              |   2 +-
+ doc/ptr_inserter.rst               |   2 +-
+ doc/ptr_list.html                  |   2 +-
+ doc/ptr_list.rst                   |   2 +-
+ doc/ptr_map.html                   |   2 +-
+ doc/ptr_map.rst                    |   2 +-
+ doc/ptr_map_adapter.html           |   2 +-
+ doc/ptr_map_adapter.rst            |   2 +-
+ doc/ptr_multimap_adapter.html      |   2 +-
+ doc/ptr_multimap_adapter.rst       |   2 +-
+ doc/ptr_multiset.html              |   2 +-
+ doc/ptr_multiset.rst               |   2 +-
+ doc/ptr_multiset_adapter.html      |   2 +-
+ doc/ptr_multiset_adapter.rst       |   2 +-
+ doc/ptr_sequence_adapter.html      |   2 +-
+ doc/ptr_sequence_adapter.rst       |   2 +-
+ doc/ptr_set.html                   |   2 +-
+ doc/ptr_set.rst                    |   2 +-
+ doc/ptr_set_adapter.html           |   2 +-
+ doc/ptr_set_adapter.rst            |   2 +-
+ doc/ptr_vector.html                |   2 +-
+ doc/ptr_vector.rst                 |   2 +-
+ doc/reference.html                 |   4 +-
+ doc/reference.rst                  |   4 +-
+ doc/reversible_ptr_container.html  |   2 +-
+ doc/reversible_ptr_container.rst   |   2 +-
+ doc/tutorial.html                  |   4 +-
+ doc/tutorial.rst                   |   4 +-
+ doc/tutorial_example.html          | 384 ++++++++++++++---------------
+ 47 files changed, 245 insertions(+), 245 deletions(-)
+
+diff --git a/doc/associative_ptr_container.html b/doc/associative_ptr_container.html
+index ccc4d9fa..9467864f 100644
+--- a/libs/ptr_container/doc/associative_ptr_container.html
++++ b/libs/ptr_container/doc/associative_ptr_container.html
+@@ -529,7 +529,7 @@ <h2><a id="semantics-algorithms" name="semantics-algorithms"><span id="algorithm
+ - Effects: returns the object with key ``key``
+ 
+ - Throws: ``bad_ptr_container_operation`` if the key does not exist                                  -->
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/associative_ptr_container.rst b/doc/associative_ptr_container.rst
+index b9b8d45a..6dcd0833 100644
+--- a/libs/ptr_container/doc/associative_ptr_container.rst
++++ b/libs/ptr_container/doc/associative_ptr_container.rst
+@@ -216,7 +216,7 @@ Semantics: algorithms
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 	
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/examples.html b/doc/examples.html
+index 5568b323..dbc8ce2b 100644
+--- a/libs/ptr_container/doc/examples.html
++++ b/libs/ptr_container/doc/examples.html
+@@ -886,7 +886,7 @@ <h1><a class="toc-backref" href="#id10">9. A large example</a></h1>
+ <li><a class="reference external" href="ptr_container.html">home</a></li>
+ <li><a class="reference external" href="reference.html">reference</a></li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/examples.rst b/doc/examples.rst
+index 213094bf..d82f4b85 100644
+--- a/libs/ptr_container/doc/examples.rst
++++ b/libs/ptr_container/doc/examples.rst
+@@ -180,7 +180,7 @@ The source code can also be found `here <../test/tut1.cpp>`_.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ **Navigate:**
+ 
+@@ -189,7 +189,7 @@ The source code can also be found `here <../test/tut1.cpp>`_.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/faq.html b/doc/faq.html
+index f318483b..1d701131 100644
+--- a/libs/ptr_container/doc/faq.html
++++ b/libs/ptr_container/doc/faq.html
+@@ -373,7 +373,7 @@ <h1><a class="toc-backref" href="#id12" id="when-the-stored-pointers-cannot-be-0
+ <p>Storing a null-pointer among a list of pointers does not fit well into the Object Oriented paradigm. 
+ The most elegant design is to use the Null-Object Pattern where one basically makes a concrete
+ class with dummy implementations of the virtual functions. See <a class="reference" href="ptr_container.html#references">[13]</a> for details.</p>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/faq.rst b/doc/faq.rst
+index 40c8eb2d..e2ead8d7 100644
+--- a/libs/ptr_container/doc/faq.rst
++++ b/libs/ptr_container/doc/faq.rst
+@@ -95,7 +95,7 @@ class with dummy implementations of the virtual functions. See `[13] <ptr_contai
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/guidelines.html b/doc/guidelines.html
+index 759b6259..25d1f148 100644
+--- a/libs/ptr_container/doc/guidelines.html
++++ b/libs/ptr_container/doc/guidelines.html
+@@ -414,12 +414,12 @@ <h2><a class="toc-backref" href="#id13" id="avoid-null-pointers-in-containers-if
+ </ul>
+ <p>Finally you might end up in a situation where not even the Null Object can help
+ you. That is when you truly need <tt class="docutils literal"><span class="pre">container&lt;</span> <span class="pre">nullable&lt;T&gt;</span> <span class="pre">&gt;</span></tt>.</p>
+-<hr><p><strong>Navigate:</strong></p>
++<hr/><p><strong>Navigate:</strong></p>
+ <ul class="simple">
+ <li><a class="reference" href="ptr_container.html">home</a></li>
+ <li><a class="reference" href="reference.html">reference</a></li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/guidelines.rst b/doc/guidelines.rst
+index 1c39c7ba..bf69dac8 100644
+--- a/libs/ptr_container/doc/guidelines.rst
++++ b/libs/ptr_container/doc/guidelines.rst
+@@ -144,7 +144,7 @@ you. That is when you truly need ``container< nullable<T> >``.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ **Navigate:**
+ 
+@@ -153,7 +153,7 @@ you. That is when you truly need ``container< nullable<T> >``.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/headers.html b/doc/headers.html
+index 4b040825..aa1609ab 100644
+--- a/libs/ptr_container/doc/headers.html
++++ b/libs/ptr_container/doc/headers.html
+@@ -375,7 +375,7 @@ <h2 class="subtitle" id="library-headers">Library headers</h2>
+ <li><a class="reference" href="ptr_container.html">home</a></li>
+ <li><a class="reference" href="reference.html">reference</a></li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/headers.rst b/doc/headers.rst
+index befcbb55..8c8e8ded 100644
+--- a/libs/ptr_container/doc/headers.rst
++++ b/libs/ptr_container/doc/headers.rst
+@@ -75,7 +75,7 @@ Library headers
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/indirect_fun.html b/doc/indirect_fun.html
+index a0446472..acc13346 100644
+--- a/libs/ptr_container/doc/indirect_fun.html
++++ b/libs/ptr_container/doc/indirect_fun.html
+@@ -401,7 +401,7 @@ <h2 class="subtitle" id="indirected-functions">Indirected functions</h2>
+          
+ } // namespace 'boost'  
+ </pre>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/indirect_fun.rst b/doc/indirect_fun.rst
+index 5fd13df2..f6583d90 100644
+--- a/libs/ptr_container/doc/indirect_fun.rst
++++ b/libs/ptr_container/doc/indirect_fun.rst
+@@ -127,7 +127,7 @@ first operation is expanded inline.
+         
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_array.html b/doc/ptr_array.html
+index 30da95f7..483fcfa4 100644
+--- a/libs/ptr_container/doc/ptr_array.html
++++ b/libs/ptr_container/doc/ptr_array.html
+@@ -660,7 +660,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_array.rst b/doc/ptr_array.rst
+index 68c2b47b..a7390236 100644
+--- a/libs/ptr_container/doc/ptr_array.rst
++++ b/libs/ptr_container/doc/ptr_array.rst
+@@ -281,7 +281,7 @@ Semantics: pointer container requirements
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_container.html b/doc/ptr_container.html
+index 5672bdfd..77a89a35 100644
+--- a/libs/ptr_container/doc/ptr_container.html
++++ b/libs/ptr_container/doc/ptr_container.html
+@@ -735,7 +735,7 @@ <h1>References</h1>
+ <tr><td class="label">[13]</td><td>Kevlin Henney, <a class="reference external" href="http://www.two-sdg.demon.co.uk/curbralan/papers/europlop/NullObject.pdf">Null Object</a>, 2002.</td></tr>
+ </tbody>
+ </table>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_container.rst b/doc/ptr_container.rst
+index 0436cce7..257a2fda 100644
+--- a/libs/ptr_container/doc/ptr_container.rst
++++ b/libs/ptr_container/doc/ptr_container.rst
+@@ -384,7 +384,7 @@ __ http://www.two-sdg.demon.co.uk/curbralan/papers/europlop/NullObject.pdf
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright: Thorsten Ottosen 2004-2006. 
+ 
+diff --git a/doc/ptr_deque.html b/doc/ptr_deque.html
+index 5216aa0e..bc996969 100644
+--- a/libs/ptr_container/doc/ptr_deque.html
++++ b/libs/ptr_container/doc/ptr_deque.html
+@@ -526,7 +526,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_deque.rst b/doc/ptr_deque.rst
+index 020ba362..a2a2cc99 100644
+--- a/libs/ptr_container/doc/ptr_deque.rst
++++ b/libs/ptr_container/doc/ptr_deque.rst
+@@ -170,7 +170,7 @@ Semantics: pointer container requirements
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_inserter.html b/doc/ptr_inserter.html
+index 9fb05a8a..92e4a527 100644
+--- a/libs/ptr_container/doc/ptr_inserter.html
++++ b/libs/ptr_container/doc/ptr_inserter.html
+@@ -348,7 +348,7 @@ <h2 class="subtitle" id="insert-iterators">Insert Iterators</h2>
+     } // namespace 'ptr_container'
+ } // namespace 'boost'  
+ </pre>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_inserter.rst b/doc/ptr_inserter.rst
+index 574bbdad..ef1c820b 100644
+--- a/libs/ptr_container/doc/ptr_inserter.rst
++++ b/libs/ptr_container/doc/ptr_inserter.rst
+@@ -70,7 +70,7 @@ can be transfered as well.
+         
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2008. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_list.html b/doc/ptr_list.html
+index 1a8e6798..c76aeaf9 100644
+--- a/libs/ptr_container/doc/ptr_list.html
++++ b/libs/ptr_container/doc/ptr_list.html
+@@ -500,7 +500,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_list.rst b/doc/ptr_list.rst
+index 302049d0..2eceb9d7 100644
+--- a/libs/ptr_container/doc/ptr_list.rst
++++ b/libs/ptr_container/doc/ptr_list.rst
+@@ -146,7 +146,7 @@ Semantics: list operations
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_map.html b/doc/ptr_map.html
+index e5fd2c9c..bc75e5cb 100644
+--- a/libs/ptr_container/doc/ptr_map.html
++++ b/libs/ptr_container/doc/ptr_map.html
+@@ -342,7 +342,7 @@ <h2 class="subtitle" id="class-ptr-map">Class <tt class="docutils literal"><span
+ 
+ } // namespace 'boost'  
+ </pre>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_map.rst b/doc/ptr_map.rst
+index 6b50a2ba..64113937 100644
+--- a/libs/ptr_container/doc/ptr_map.rst
++++ b/libs/ptr_container/doc/ptr_map.rst
+@@ -63,7 +63,7 @@ to store the pointers.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_map_adapter.html b/doc/ptr_map_adapter.html
+index 2ed30539..b451914c 100644
+--- a/libs/ptr_container/doc/ptr_map_adapter.html
++++ b/libs/ptr_container/doc/ptr_map_adapter.html
+@@ -556,7 +556,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_map_adapter.rst b/doc/ptr_map_adapter.rst
+index 517ea7fc..aabf5c4e 100644
+--- a/libs/ptr_container/doc/ptr_map_adapter.rst
++++ b/libs/ptr_container/doc/ptr_map_adapter.rst
+@@ -194,7 +194,7 @@ Semantics: pointer container requirements
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+  
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_multimap_adapter.html b/doc/ptr_multimap_adapter.html
+index 3780ec8c..49243a16 100644
+--- a/libs/ptr_container/doc/ptr_multimap_adapter.html
++++ b/libs/ptr_container/doc/ptr_multimap_adapter.html
+@@ -540,7 +540,7 @@ <h2>Semantics: typedefs</h2>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_multimap_adapter.rst b/doc/ptr_multimap_adapter.rst
+index 3b9e9961..56d37f5d 100644
+--- a/libs/ptr_container/doc/ptr_multimap_adapter.rst
++++ b/libs/ptr_container/doc/ptr_multimap_adapter.rst
+@@ -189,7 +189,7 @@ Semantics: pointer container requirements
+  
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_multiset.html b/doc/ptr_multiset.html
+index a82a7995..50fa9681 100644
+--- a/libs/ptr_container/doc/ptr_multiset.html
++++ b/libs/ptr_container/doc/ptr_multiset.html
+@@ -349,7 +349,7 @@ <h2 class="subtitle" id="class-ptr-multiset">Class <tt class="docutils literal">
+ <ul class="simple">
+ <li>Using <tt class="docutils literal"><span class="pre">nullable&lt;T&gt;</span></tt> as <tt class="docutils literal"><span class="pre">Key</span></tt> is meaningless and is not allowed</li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_multiset.rst b/doc/ptr_multiset.rst
+index 120891bd..3af8bef3 100644
+--- a/libs/ptr_container/doc/ptr_multiset.rst
++++ b/libs/ptr_container/doc/ptr_multiset.rst
+@@ -70,7 +70,7 @@ to store the pointers.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_multiset_adapter.html b/doc/ptr_multiset_adapter.html
+index 6bcfebb1..96e811d1 100644
+--- a/libs/ptr_container/doc/ptr_multiset_adapter.html
++++ b/libs/ptr_container/doc/ptr_multiset_adapter.html
+@@ -491,7 +491,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_multiset_adapter.rst b/doc/ptr_multiset_adapter.rst
+index eb9eafe2..8c437fb1 100644
+--- a/libs/ptr_container/doc/ptr_multiset_adapter.rst
++++ b/libs/ptr_container/doc/ptr_multiset_adapter.rst
+@@ -134,7 +134,7 @@ Semantics: pointer container requirements
+  
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_sequence_adapter.html b/doc/ptr_sequence_adapter.html
+index aa2e7a42..9c4af800 100644
+--- a/libs/ptr_container/doc/ptr_sequence_adapter.html
++++ b/libs/ptr_container/doc/ptr_sequence_adapter.html
+@@ -827,7 +827,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_sequence_adapter.rst b/doc/ptr_sequence_adapter.rst
+index 5640d029..d98684c1 100644
+--- a/libs/ptr_container/doc/ptr_sequence_adapter.rst
++++ b/libs/ptr_container/doc/ptr_sequence_adapter.rst
+@@ -443,7 +443,7 @@ contain any nulls*.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+     
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_set.html b/doc/ptr_set.html
+index 8e66779f..1a5a37b0 100644
+--- a/libs/ptr_container/doc/ptr_set.html
++++ b/libs/ptr_container/doc/ptr_set.html
+@@ -350,7 +350,7 @@ <h2 class="subtitle" id="class-ptr-set">Class <tt class="docutils literal"><span
+ <ul class="simple">
+ <li>Using <tt class="docutils literal"><span class="pre">nullable&lt;T&gt;</span></tt> as <tt class="docutils literal"><span class="pre">Key</span></tt> is meaningless and is not allowed</li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_set.rst b/doc/ptr_set.rst
+index 6679a8b2..5fb83d1e 100644
+--- a/libs/ptr_container/doc/ptr_set.rst
++++ b/libs/ptr_container/doc/ptr_set.rst
+@@ -72,7 +72,7 @@ to store the pointers.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_set_adapter.html b/doc/ptr_set_adapter.html
+index 12820d38..e32501da 100644
+--- a/libs/ptr_container/doc/ptr_set_adapter.html
++++ b/libs/ptr_container/doc/ptr_set_adapter.html
+@@ -491,7 +491,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_set_adapter.rst b/doc/ptr_set_adapter.rst
+index bb19e148..7b89c184 100644
+--- a/libs/ptr_container/doc/ptr_set_adapter.rst
++++ b/libs/ptr_container/doc/ptr_set_adapter.rst
+@@ -136,7 +136,7 @@ Semantics: pointer container requirements
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+  
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/ptr_vector.html b/doc/ptr_vector.html
+index def2a569..150c9a71 100644
+--- a/libs/ptr_container/doc/ptr_vector.html
++++ b/libs/ptr_container/doc/ptr_vector.html
+@@ -550,7 +550,7 @@ <h1>Semantics</h1>
+ </blockquote>
+ </li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/ptr_vector.rst b/doc/ptr_vector.rst
+index 374166f2..575a5679 100644
+--- a/libs/ptr_container/doc/ptr_vector.rst
++++ b/libs/ptr_container/doc/ptr_vector.rst
+@@ -185,7 +185,7 @@ Semantics: C-array support
+     
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2007. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/reference.html b/doc/reference.html
+index 1ae18479..653b4324 100644
+--- a/libs/ptr_container/doc/reference.html
++++ b/libs/ptr_container/doc/reference.html
+@@ -797,11 +797,11 @@ <h1><a id="disabling-the-use-of-exceptions" name="disabling-the-use-of-exception
+ you might end up breaking the One Definition Rule.</p>
+ <p>If <tt class="docutils literal"><span class="pre">BOOST_NO_EXCEPTIONS</span></tt> is defined, then <tt class="docutils literal"><span class="pre">BOOST_PTR_CONTAINER_NO_EXCEPTIONS</span></tt>
+ is also defined.</p>
+-<hr><p><strong>Navigate:</strong></p>
++<hr/><p><strong>Navigate:</strong></p>
+ <ul class="simple">
+ <li><a class="reference" href="ptr_container.html">home</a></li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/reference.rst b/doc/reference.rst
+index 3dffbc68..0b827e0e 100644
+--- a/libs/ptr_container/doc/reference.rst
++++ b/libs/ptr_container/doc/reference.rst
+@@ -486,7 +486,7 @@ is also defined.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ **Navigate:**
+ 
+@@ -494,7 +494,7 @@ is also defined.
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2007. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/reversible_ptr_container.html b/doc/reversible_ptr_container.html
+index ede30c57..e45fcde8 100644
+--- a/libs/ptr_container/doc/reversible_ptr_container.html
++++ b/libs/ptr_container/doc/reversible_ptr_container.html
+@@ -885,7 +885,7 @@ <h1>Semantics</h1>
+ Boost.Serialization</li>
+ <li>Exception safety: Loading gives the basic guarantee</li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/reversible_ptr_container.rst b/doc/reversible_ptr_container.rst
+index 360f7d97..4fb24163 100644
+--- a/libs/ptr_container/doc/reversible_ptr_container.rst
++++ b/libs/ptr_container/doc/reversible_ptr_container.rst
+@@ -506,7 +506,7 @@ All containers can be serialized by means of
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2007. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/tutorial.html b/doc/tutorial.html
+index 7c93b469..05047afd 100644
+--- a/libs/ptr_container/doc/tutorial.html
++++ b/libs/ptr_container/doc/tutorial.html
+@@ -773,7 +773,7 @@ <h1>Algorithms</h1>
+ BOOST_ASSERT( another_zoo.empty() );
+ </pre>
+ <p>That is all; now you have learned all the basics!</p>
+-<hr><p><strong>See also</strong></p>
++<hr/><p><strong>See also</strong></p>
+ <ul class="simple">
+ <li><a class="reference external" href="guidelines.html">Usage guidelines</a></li>
+ <li><a class="reference external" href="../../conversion/cast.htm#Polymorphic_castl">Cast utilities</a></li>
+@@ -783,7 +783,7 @@ <h1>Algorithms</h1>
+ <li><a class="reference external" href="ptr_container.html">home</a></li>
+ <li><a class="reference external" href="examples.html">examples</a></li>
+ </ul>
+-<hr><table class="docutils field-list" frame="void" rules="none">
++<hr/><table class="docutils field-list" frame="void" rules="none">
+ <col class="field-name" />
+ <col class="field-body" />
+ <tbody valign="top">
+diff --git a/doc/tutorial.rst b/doc/tutorial.rst
+index a7c12e20..8b84364a 100644
+--- a/libs/ptr_container/doc/tutorial.rst
++++ b/libs/ptr_container/doc/tutorial.rst
+@@ -440,7 +440,7 @@ That is all; now you have learned all the basics!
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+         
+ **See also**
+ 
+@@ -455,7 +455,7 @@ That is all; now you have learned all the basics!
+ 
+ .. raw:: html 
+ 
+-        <hr>
++        <hr/>
+ 
+ :Copyright:     Thorsten Ottosen 2004-2006. Use, modification and distribution is subject to the Boost Software License, Version 1.0 (see LICENSE_1_0.txt__).
+ 
+diff --git a/doc/tutorial_example.html b/doc/tutorial_example.html
+index 202a17bb..9ebf4a1c 100644
+--- a/libs/ptr_container/doc/tutorial_example.html
++++ b/libs/ptr_container/doc/tutorial_example.html
+@@ -1,12 +1,12 @@
+ <html>
+ <head>
+-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
++<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+ <title> </title>
+-<link rel="stylesheet" href="default.css" type="text/css">
++<link rel="stylesheet" href="default.css" type="text/css"/>
+ </head>
+ 
+ <body>
+-    <pre><span class=comment>//
++    <pre><span class="comment">//
+ // Boost.Pointer Container
+ //
+ //  Copyright Thorsten Ottosen 2003-2005. Use, modification and
+@@ -30,149 +30,149 @@
+ //
+ // First we select which container to use.
+ //</span>
+-<span class=preprocessor>#include</span> <span class=special>&lt;</span><span class=identifier>boost</span><span class=special>/</span><span class=identifier>ptr_container</span><span class=special>/</span><span class=identifier>ptr_deque</span><span class=special>.</span><span class=identifier>hpp</span><span class=special>&gt;</span>
++<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">ptr_container</span><span class="special">/</span><span class="identifier">ptr_deque</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+ 
+-<span class=comment>//
++<span class="comment">//
+ // we need these later in the example
+ //</span>
+-<span class=preprocessor>#include</span> <span class=special>&lt;</span><span class=identifier>boost</span><span class=special>/</span><span class=identifier>assert</span><span class=special>.</span><span class=identifier>hpp</span><span class=special>&gt;</span>
+-<span class=preprocessor>#include</span> <span class=special>&lt;</span><span class=identifier>string</span><span class=special>&gt;</span>
+-<span class=preprocessor>#include</span> <span class=special>&lt;</span><span class=identifier>exception</span><span class=special>&gt;</span>
++<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">assert</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
++<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">string</span><span class="special">&gt;</span>
++<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">exception</span><span class="special">&gt;</span>
+ 
+ 
+-<span class=comment>//
++<span class="comment">//
+ // Then we define a small polymorphic class
+ // hierarchy.
+ //</span> 
+ 
+-<span class=keyword>class</span> <span class=identifier>animal</span> <span class=special>:</span> <span class=identifier>boost</span><span class=special>::</span><span class=identifier>noncopyable</span>
+-<span class=special>{</span>
+-    <span class=keyword>virtual</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>do_speak</span><span class=special>()</span> <span class=keyword>const</span> <span class=special>=</span> <span class=number>0</span><span class=special>;</span>
+-    <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>name_</span><span class=special>;</span>
++<span class="keyword">class</span> <span class="identifier">animal</span> <span class="special">:</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">noncopyable</span>
++<span class="special">{</span>
++    <span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">do_speak</span><span class="special">()</span> <span class="keyword">const</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
++    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">name_</span><span class="special">;</span>
+ 
+-<span class=keyword>protected</span><span class=special>:</span>
+-    <span class=comment>//
++<span class="keyword">protected</span><span class="special">:</span>
++    <span class="comment">//
+     // Animals cannot be copied...
+     //</span>
+-    <span class=identifier>animal</span><span class=special>(</span> <span class=keyword>const</span> <span class=identifier>animal</span><span class=special>&amp;</span> <span class=identifier>r</span> <span class=special>)</span> <span class=special>:</span> <span class=identifier>name_</span><span class=special>(</span> <span class=identifier>r</span><span class=special>.</span><span class=identifier>name_</span> <span class=special>)</span>           <span class=special>{</span> <span class=special>}</span>
+-    <span class=keyword>void</span> <span class=keyword>operator</span><span class=special>=(</span> <span class=keyword>const</span> <span class=identifier>animal</span><span class=special>&amp;</span> <span class=special>);</span>
++    <span class="identifier">animal</span><span class="special">(</span> <span class="keyword">const</span> <span class="identifier">animal</span><span class="special">&amp;</span> <span class="identifier">r</span> <span class="special">)</span> <span class="special">:</span> <span class="identifier">name_</span><span class="special">(</span> <span class="identifier">r</span><span class="special">.</span><span class="identifier">name_</span> <span class="special">)</span>           <span class="special">{</span> <span class="special">}</span>
++    <span class="keyword">void</span> <span class="keyword">operator</span><span class="special">=(</span> <span class="keyword">const</span> <span class="identifier">animal</span><span class="special">&amp;</span> <span class="special">);</span>
+ 
+-<span class=keyword>private</span><span class=special>:</span>
+-    <span class=comment>//
++<span class="keyword">private</span><span class="special">:</span>
++    <span class="comment">//
+     // ...but due to advances in genetics, we can clone them!
+     //</span>
+ 
+-    <span class=keyword>virtual</span> <span class=identifier>animal</span><span class=special>*</span> <span class=identifier>do_clone</span><span class=special>()</span> <span class=keyword>const</span> <span class=special>=</span> <span class=number>0</span><span class=special>;</span>
++    <span class="keyword">virtual</span> <span class="identifier">animal</span><span class="special">*</span> <span class="identifier">do_clone</span><span class="special">()</span> <span class="keyword">const</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+         
+-<span class=keyword>public</span><span class=special>:</span>
+-    <span class=identifier>animal</span><span class=special>(</span> <span class=keyword>const</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span><span class=special>&amp;</span> <span class=identifier>name</span> <span class=special>)</span> <span class=special>:</span> <span class=identifier>name_</span><span class=special>(</span><span class=identifier>name</span><span class=special>)</span>        <span class=special>{</span> <span class=special>}</span>
+-    <span class=keyword>virtual</span> <span class=special>~</span><span class=identifier>animal</span><span class=special>()</span> <span class=keyword>throw</span><span class=special>()</span>                              <span class=special>{</span> <span class=special>}</span>
++<span class="keyword">public</span><span class="special">:</span>
++    <span class="identifier">animal</span><span class="special">(</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&amp;</span> <span class="identifier">name</span> <span class="special">)</span> <span class="special">:</span> <span class="identifier">name_</span><span class="special">(</span><span class="identifier">name</span><span class="special">)</span>        <span class="special">{</span> <span class="special">}</span>
++    <span class="keyword">virtual</span> <span class="special">~</span><span class="identifier">animal</span><span class="special">()</span> <span class="keyword">throw</span><span class="special">()</span>                              <span class="special">{</span> <span class="special">}</span>
+     
+-    <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>speak</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>do_speak</span><span class=special>();</span>
+-    <span class=special>}</span>
+-
+-    <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>name</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>name_</span><span class=special>;</span>
+-    <span class=special>}</span>
+-
+-    <span class=identifier>animal</span><span class=special>*</span> <span class=identifier>clone</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>do_clone</span><span class=special>();</span>
+-    <span class=special>}</span>
+-<span class=special>};</span>
+-
+-<span class=comment>//
++    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">speak</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">do_speak</span><span class="special">();</span>
++    <span class="special">}</span>
++
++    <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">name</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">name_</span><span class="special">;</span>
++    <span class="special">}</span>
++
++    <span class="identifier">animal</span><span class="special">*</span> <span class="identifier">clone</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">do_clone</span><span class="special">();</span>
++    <span class="special">}</span>
++<span class="special">};</span>
++
++<span class="comment">//
+ // An animal is still not Clonable. We need this last hook.
+ //
+ // Notice that we pass the animal by const reference
+ // and return by pointer.
+ //</span>
+ 
+-<span class=identifier>animal</span><span class=special>*</span> <span class=identifier>new_clone</span><span class=special>(</span> <span class=keyword>const</span> <span class=identifier>animal</span><span class=special>&amp;</span> <span class=identifier>a</span> <span class=special>)</span>
+-<span class=special>{</span>
+-    <span class=keyword>return</span> <span class=identifier>a</span><span class=special>.</span><span class=identifier>clone</span><span class=special>();</span>
+-<span class=special>}</span>
++<span class="identifier">animal</span><span class="special">*</span> <span class="identifier">new_clone</span><span class="special">(</span> <span class="keyword">const</span> <span class="identifier">animal</span><span class="special">&amp;</span> <span class="identifier">a</span> <span class="special">)</span>
++<span class="special">{</span>
++    <span class="keyword">return</span> <span class="identifier">a</span><span class="special">.</span><span class="identifier">clone</span><span class="special">();</span>
++<span class="special">}</span>
+ 
+-<span class=comment>//
++<span class="comment">//
+ // We do not need to define 'delete_clone()' since
+ // since the default is to call the default 'operator delete()'.
+ //</span>
+ 
+-<span class=keyword>const</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>muuuh</span> <span class=special>=</span> <span class=string>&quot;Muuuh!&quot;</span><span class=special>;</span>
+-<span class=keyword>const</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>oiink</span> <span class=special>=</span> <span class=string>&quot;Oiiink&quot;</span><span class=special>;</span>
+-
+-<span class=keyword>class</span> <span class=identifier>cow</span> <span class=special>:</span> <span class=keyword>public</span> <span class=identifier>animal</span>
+-<span class=special>{</span>
+-    <span class=keyword>virtual</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>do_speak</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>muuuh</span><span class=special>;</span>
+-    <span class=special>}</span>
+-
+-    <span class=keyword>virtual</span> <span class=identifier>animal</span><span class=special>*</span> <span class=identifier>do_clone</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=keyword>new</span> <span class=identifier>cow</span><span class=special>(</span> <span class=special>*</span><span class=keyword>this</span> <span class=special>);</span>
+-    <span class=special>}</span>
+-
+-<span class=keyword>public</span><span class=special>:</span>
+-    <span class=identifier>cow</span><span class=special>(</span> <span class=keyword>const</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span><span class=special>&amp;</span> <span class=identifier>name</span> <span class=special>)</span> <span class=special>:</span> <span class=identifier>animal</span><span class=special>(</span><span class=identifier>name</span><span class=special>)</span>          <span class=special>{</span> <span class=special>}</span>
+-<span class=special>};</span>
+-
+-<span class=keyword>class</span> <span class=identifier>pig</span> <span class=special>:</span> <span class=keyword>public</span> <span class=identifier>animal</span>
+-<span class=special>{</span>
+-    <span class=keyword>virtual</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span> <span class=identifier>do_speak</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>oiink</span><span class=special>;</span>
+-    <span class=special>}</span>
+-
+-    <span class=keyword>virtual</span> <span class=identifier>animal</span><span class=special>*</span> <span class=identifier>do_clone</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=keyword>new</span> <span class=identifier>pig</span><span class=special>(</span> <span class=special>*</span><span class=keyword>this</span> <span class=special>);</span>
+-    <span class=special>}</span>
++<span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">muuuh</span> <span class="special">=</span> <span class="string">&quot;Muuuh!&quot;</span><span class="special">;</span>
++<span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">oiink</span> <span class="special">=</span> <span class="string">&quot;Oiiink&quot;</span><span class="special">;</span>
++
++<span class="keyword">class</span> <span class="identifier">cow</span> <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">animal</span>
++<span class="special">{</span>
++    <span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">do_speak</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">muuuh</span><span class="special">;</span>
++    <span class="special">}</span>
++
++    <span class="keyword">virtual</span> <span class="identifier">animal</span><span class="special">*</span> <span class="identifier">do_clone</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="keyword">new</span> <span class="identifier">cow</span><span class="special">(</span> <span class="special">*</span><span class="keyword">this</span> <span class="special">);</span>
++    <span class="special">}</span>
++
++<span class="keyword">public</span><span class="special">:</span>
++    <span class="identifier">cow</span><span class="special">(</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&amp;</span> <span class="identifier">name</span> <span class="special">)</span> <span class="special">:</span> <span class="identifier">animal</span><span class="special">(</span><span class="identifier">name</span><span class="special">)</span>          <span class="special">{</span> <span class="special">}</span>
++<span class="special">};</span>
++
++<span class="keyword">class</span> <span class="identifier">pig</span> <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">animal</span>
++<span class="special">{</span>
++    <span class="keyword">virtual</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">do_speak</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">oiink</span><span class="special">;</span>
++    <span class="special">}</span>
++
++    <span class="keyword">virtual</span> <span class="identifier">animal</span><span class="special">*</span> <span class="identifier">do_clone</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="keyword">new</span> <span class="identifier">pig</span><span class="special">(</span> <span class="special">*</span><span class="keyword">this</span> <span class="special">);</span>
++    <span class="special">}</span>
+     
+-<span class=keyword>public</span><span class=special>:</span>
+-    <span class=identifier>pig</span><span class=special>(</span> <span class=keyword>const</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>string</span><span class=special>&amp;</span> <span class=identifier>name</span> <span class=special>)</span> <span class=special>:</span> <span class=identifier>animal</span><span class=special>(</span><span class=identifier>name</span><span class=special>)</span>          <span class=special>{</span> <span class=special>}</span>
+-<span class=special>};</span>
++<span class="keyword">public</span><span class="special">:</span>
++    <span class="identifier">pig</span><span class="special">(</span> <span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">&amp;</span> <span class="identifier">name</span> <span class="special">)</span> <span class="special">:</span> <span class="identifier">animal</span><span class="special">(</span><span class="identifier">name</span><span class="special">)</span>          <span class="special">{</span> <span class="special">}</span>
++<span class="special">};</span>
+ 
+-<span class=comment>//
++<span class="comment">//
+ // Then we, of course, need a place to put all
+ // those animals.
+ //</span>
+ 
+-<span class=keyword>class</span> <span class=identifier>farm</span>
+-<span class=special>{</span>
+-    <span class=comment>//
++<span class="keyword">class</span> <span class="identifier">farm</span>
++<span class="special">{</span>
++    <span class="comment">//
+     // This is where the smart containers are handy
+     //</span>
+-    <span class=keyword>typedef</span> <span class=identifier>boost</span><span class=special>::</span><span class=identifier>ptr_deque</span><span class=special>&lt;</span><span class=identifier>animal</span><span class=special>&gt;</span> <span class=identifier>barn_type</span><span class=special>;</span>
+-    <span class=identifier>barn_type</span>                        <span class=identifier>barn</span><span class=special>;</span>
++    <span class="keyword">typedef</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">ptr_deque</span><span class="special">&lt;</span><span class="identifier">animal</span><span class="special">&gt;</span> <span class="identifier">barn_type</span><span class="special">;</span>
++    <span class="identifier">barn_type</span>                        <span class="identifier">barn</span><span class="special">;</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // A convenience typedef for the compiler-appropriate
+     // smart pointer used to manage barns
+     //</span>    
+-    <span class=keyword>typedef</span> <span class=identifier><a href="compatible_smart_ptr.html"><em>compatible-smart-ptr</em></a></span><span class=special>&lt;</span><span class=identifier>barn_type</span><span class=special>&gt;</span> <span class=identifier>raii_ptr</span><span class=special>;</span>
++    <span class="keyword">typedef</span> <span class="identifier"><a href="compatible_smart_ptr.html"><em>compatible-smart-ptr</em></a></span><span class="special">&lt;</span><span class="identifier">barn_type</span><span class="special">&gt;</span> <span class="identifier">raii_ptr</span><span class="special">;</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // An error type
+     //</span>
+-    <span class=keyword>struct</span> <span class=identifier>farm_trouble</span> <span class=special>:</span> <span class=keyword>public</span> <span class=identifier>std</span><span class=special>::</span><span class=identifier>exception</span>           <span class=special>{</span> <span class=special>};</span>
++    <span class="keyword">struct</span> <span class="identifier">farm_trouble</span> <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">exception</span>           <span class="special">{</span> <span class="special">};</span>
+ 
+-<span class=keyword>public</span><span class=special>:</span>
+-    <span class=comment>// 
++<span class="keyword">public</span><span class="special">:</span>
++    <span class="comment">// 
+     // We would like to make it possible to
+     // iterate over the animals in the farm
+     //</span>
+-    <span class=keyword>typedef</span> <span class=identifier>barn_type</span><span class=special>::</span><span class=identifier>iterator</span>  <span class=identifier>animal_iterator</span><span class=special>;</span>
++    <span class="keyword">typedef</span> <span class="identifier">barn_type</span><span class="special">::</span><span class="identifier">iterator</span>  <span class="identifier">animal_iterator</span><span class="special">;</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // We also need to count the farm's size...
+     //</span>
+-    <span class=keyword>typedef</span> <span class=identifier>barn_type</span><span class=special>::</span><span class=identifier>size_type</span> <span class=identifier>size_type</span><span class=special>;</span>
++    <span class="keyword">typedef</span> <span class="identifier">barn_type</span><span class="special">::</span><span class="identifier">size_type</span> <span class="identifier">size_type</span><span class="special">;</span>
+     
+-    <span class=comment>//
++    <span class="comment">//
+     // And we also want to transfer an animal
+     // safely around. The easiest way to think
+     // about '::auto_type' is to imagine a simplified
+@@ -184,100 +184,100 @@
+     //
+     // but not more.
+     //</span>
+-    <span class=keyword>typedef</span> <span class=identifier>barn_type</span><span class=special>::</span><span class=identifier>auto_type</span>  <span class=identifier>animal_transport</span><span class=special>;</span>
++    <span class="keyword">typedef</span> <span class="identifier">barn_type</span><span class="special">::</span><span class="identifier">auto_type</span>  <span class="identifier">animal_transport</span><span class="special">;</span>
+ 
+-    <span class=comment>// 
++    <span class="comment">// 
+     // Create an empty farm.
+     //</span>
+-    <span class=identifier>farm</span><span class=special>()</span>                                                 <span class=special>{</span> <span class=special>}</span>
++    <span class="identifier">farm</span><span class="special">()</span>                                                 <span class="special">{</span> <span class="special">}</span>
+     
+-    <span class=comment>//
++    <span class="comment">//
+     // We need a constructor that can make a new
+     // farm by cloning a range of animals.
+     //</span>
+-    <span class=identifier>farm</span><span class=special>(</span> <span class=identifier>animal_iterator</span> <span class=identifier>begin</span><span class=special>,</span> <span class=identifier>animal_iterator</span> <span class=identifier>end</span> <span class=special>)</span>
+-     <span class=special>:</span> 
+-        <span class=comment>//
++    <span class="identifier">farm</span><span class="special">(</span> <span class="identifier">animal_iterator</span> <span class="identifier">begin</span><span class="special">,</span> <span class="identifier">animal_iterator</span> <span class="identifier">end</span> <span class="special">)</span>
++     <span class="special">:</span> 
++        <span class="comment">//
+         // Objects are always cloned before insertion
+         // unless we explicitly add a pointer or 
+         // use 'release()'. Therefore we actually
+         // clone all animals in the range
+         //</span>
+-        <span class=identifier>barn</span><span class=special>(</span> <span class=identifier>begin</span><span class=special>,</span> <span class=identifier>end</span> <span class=special>)</span>                               <span class=special>{</span> <span class=special>}</span>
++        <span class="identifier">barn</span><span class="special">(</span> <span class="identifier">begin</span><span class="special">,</span> <span class="identifier">end</span> <span class="special">)</span>                               <span class="special">{</span> <span class="special">}</span>
+     
+-    <span class=comment>//
++    <span class="comment">//
+     // ... so we need some other function too
+     //</span>
+ 
+-    <span class=identifier>animal_iterator</span> <span class=identifier>begin</span><span class=special>()</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>begin</span><span class=special>();</span>
+-    <span class=special>}</span>
++    <span class="identifier">animal_iterator</span> <span class="identifier">begin</span><span class="special">()</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">begin</span><span class="special">();</span>
++    <span class="special">}</span>
+ 
+-    <span class=identifier>animal_iterator</span> <span class=identifier>end</span><span class=special>()</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>end</span><span class=special>();</span>
+-    <span class=special>}</span>
++    <span class="identifier">animal_iterator</span> <span class="identifier">end</span><span class="special">()</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">end</span><span class="special">();</span>
++    <span class="special">}</span>
+     
+-    <span class=comment>//
++    <span class="comment">//
+     // Here it is quite ok to have an 'animal*' argument.
+     // The smart container will handle all ownership
+     // issues.
+     //</span>
+-    <span class=keyword>void</span> <span class=identifier>buy_animal</span><span class=special>(</span> <span class=identifier>animal</span><span class=special>*</span> <span class=identifier>a</span> <span class=special>)</span>
+-    <span class=special>{</span>
+-        <span class=identifier>barn</span><span class=special>.</span><span class=identifier>push_back</span><span class=special>(</span> <span class=identifier>a</span> <span class=special>);</span>
+-    <span class=special>}</span>
++    <span class="keyword">void</span> <span class="identifier">buy_animal</span><span class="special">(</span> <span class="identifier">animal</span><span class="special">*</span> <span class="identifier">a</span> <span class="special">)</span>
++    <span class="special">{</span>
++        <span class="identifier">barn</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span> <span class="identifier">a</span> <span class="special">);</span>
++    <span class="special">}</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // The farm can also be in economical trouble and
+     // therefore be in the need to sell animals.
+     //</span>
+-    <span class=identifier>animal_transport</span> <span class=identifier>sell_animal</span><span class=special>(</span> <span class=identifier>animal_iterator</span> <span class=identifier>to_sell</span> <span class=special>)</span>
+-    <span class=special>{</span>
+-        <span class=keyword>if</span><span class=special>(</span> <span class=identifier>to_sell</span> <span class=special>==</span> <span class=identifier>end</span><span class=special>()</span> <span class=special>)</span>
+-            <span class=keyword>throw</span> <span class=identifier>farm_trouble</span><span class=special>();</span>
++    <span class="identifier">animal_transport</span> <span class="identifier">sell_animal</span><span class="special">(</span> <span class="identifier">animal_iterator</span> <span class="identifier">to_sell</span> <span class="special">)</span>
++    <span class="special">{</span>
++        <span class="keyword">if</span><span class="special">(</span> <span class="identifier">to_sell</span> <span class="special">==</span> <span class="identifier">end</span><span class="special">()</span> <span class="special">)</span>
++            <span class="keyword">throw</span> <span class="identifier">farm_trouble</span><span class="special">();</span>
+ 
+-        <span class=comment>//
++        <span class="comment">//
+         // Here we remove the animal from the barn,
+         // but the animal is not deleted yet...it's
+         // up to the buyer to decide what
+         // to do with it.
+         //</span>
+-        <span class=keyword>return</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>release</span><span class=special>(</span> <span class=identifier>to_sell</span> <span class=special>);</span>
+-    <span class=special>}</span>
++        <span class="keyword">return</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">release</span><span class="special">(</span> <span class="identifier">to_sell</span> <span class="special">);</span>
++    <span class="special">}</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // How big a farm do we have?
+     //</span>
+-    <span class=identifier>size_type</span> <span class=identifier>size</span><span class=special>()</span> <span class=keyword>const</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>size</span><span class=special>();</span>
+-    <span class=special>}</span>
++    <span class="identifier">size_type</span> <span class="identifier">size</span><span class="special">()</span> <span class="keyword">const</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">size</span><span class="special">();</span>
++    <span class="special">}</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // If things are bad, we might choose to sell all animals :-(
+       //</span>
+ 
+-    <span class=identifier>raii_ptr</span> <span class=identifier>sell_farm</span><span class=special>()</span>
+-    <span class=special>{</span>
+-        <span class=keyword>return</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>release</span><span class=special>();</span>
+-    <span class=special>}</span>
++    <span class="identifier">raii_ptr</span> <span class="identifier">sell_farm</span><span class="special">()</span>
++    <span class="special">{</span>
++        <span class="keyword">return</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">release</span><span class="special">();</span>
++    <span class="special">}</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // However, if things are good, we might buy somebody
+     // else's farm :-)
+     //</span>
+ 
+-    <span class=keyword>void</span> <span class=identifier>buy_farm</span><span class=special>(</span> <span class=identifier>raii_ptr</span> <span class=identifier>other</span> <span class=special>)</span>
+-    <span class=special>{</span>
+-        <span class=comment>//
++    <span class="keyword">void</span> <span class="identifier">buy_farm</span><span class="special">(</span> <span class="identifier">raii_ptr</span> <span class="identifier">other</span> <span class="special">)</span>
++    <span class="special">{</span>
++        <span class="comment">//
+         // This line inserts all the animals from 'other'
+         // and is guaranteed either to succeed or to have no
+         // effect
+         //</span>
+-        <span class=identifier>barn</span><span class=special>.</span><span class=identifier>transfer</span><span class=special>(</span> <span class=identifier>barn</span><span class=special>.</span><span class=identifier>end</span><span class=special>(),</span> <span class=comment>// insert new animals at the end</span>
+-                         <span class=special>*</span><span class=identifier>other</span> <span class=special>);</span>     <span class=comment>// we want to transfer all animals,
++        <span class="identifier">barn</span><span class="special">.</span><span class="identifier">transfer</span><span class="special">(</span> <span class="identifier">barn</span><span class="special">.</span><span class="identifier">end</span><span class="special">(),</span> <span class="comment">// insert new animals at the end</span>
++                         <span class="special">*</span><span class="identifier">other</span> <span class="special">);</span>     <span class="comment">// we want to transfer all animals,
+                                        // so we use the whole container as argument
+         //
+         // You might think you would have to do
+@@ -286,86 +286,86 @@
+         //
+         // but '*other' is empty and can go out of scope as it wants
+         //</span>
+-        <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>other</span><span class=special>-&gt;</span><span class=identifier>empty</span><span class=special>()</span> <span class=special>);</span>
+-    <span class=special>}</span>
++        <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">other</span><span class="special">-&gt;</span><span class="identifier">empty</span><span class="special">()</span> <span class="special">);</span>
++    <span class="special">}</span>
+     
+-<span class=special>};</span> <span class=comment>// class 'farm'.</span>
++<span class="special">};</span> <span class="comment">// class 'farm'.</span>
+ 
+-<span class=keyword>int</span> <span class=identifier>main</span><span class=special>()</span>
+-<span class=special>{</span>
+-    <span class=comment>//
++<span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
++<span class="special">{</span>
++    <span class="comment">//
+     // First we make a farm
+     //</span>
+-    <span class=identifier>farm</span> <span class=identifier>animal_farm</span><span class=special>;</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span> <span class=special>==</span> <span class=number>0u</span> <span class=special>);</span>
++    <span class="identifier">farm</span> <span class="identifier">animal_farm</span><span class="special">;</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">==</span> <span class="number">0u</span> <span class="special">);</span>
+     
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>pig</span><span class=special>(</span><span class=string>&quot;Betty&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>pig</span><span class=special>(</span><span class=string>&quot;Benny&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>pig</span><span class=special>(</span><span class=string>&quot;Jeltzin&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>cow</span><span class=special>(</span><span class=string>&quot;Hanz&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>cow</span><span class=special>(</span><span class=string>&quot;Mary&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=keyword>new</span> <span class=identifier>cow</span><span class=special>(</span><span class=string>&quot;Frederik&quot;</span><span class=special>)</span> <span class=special>);</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span> <span class=special>==</span> <span class=number>6u</span> <span class=special>);</span>
+-
+-    <span class=comment>//
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">pig</span><span class="special">(</span><span class="string">&quot;Betty&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">pig</span><span class="special">(</span><span class="string">&quot;Benny&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">pig</span><span class="special">(</span><span class="string">&quot;Jeltzin&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">cow</span><span class="special">(</span><span class="string">&quot;Hanz&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">cow</span><span class="special">(</span><span class="string">&quot;Mary&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="keyword">new</span> <span class="identifier">cow</span><span class="special">(</span><span class="string">&quot;Frederik&quot;</span><span class="special">)</span> <span class="special">);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">==</span> <span class="number">6u</span> <span class="special">);</span>
++
++    <span class="comment">//
+     // Then we make another farm...it will actually contain
+     // a clone of the other farm.
+     //</span>
+-    <span class=identifier>farm</span> <span class=identifier>new_farm</span><span class=special>(</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>begin</span><span class=special>(),</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>end</span><span class=special>()</span> <span class=special>);</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span> <span class=special>==</span> <span class=number>6u</span> <span class=special>);</span>
++    <span class="identifier">farm</span> <span class="identifier">new_farm</span><span class="special">(</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">end</span><span class="special">()</span> <span class="special">);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">==</span> <span class="number">6u</span> <span class="special">);</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // Is it really clones in the new farm?
+     //</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>begin</span><span class=special>()-&gt;</span><span class=identifier>name</span><span class=special>()</span> <span class=special>==</span> <span class=string>&quot;Betty&quot;</span> <span class=special>);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">begin</span><span class="special">()-&gt;</span><span class="identifier">name</span><span class="special">()</span> <span class="special">==</span> <span class="string">&quot;Betty&quot;</span> <span class="special">);</span>
+     
+-    <span class=comment>//
++    <span class="comment">//
+     // Then we search for an animal, Mary (the Crown Princess of Denmark),
+     // because we would like to buy her ...
+     //</span>
+-    <span class=keyword>typedef</span> <span class=identifier>farm</span><span class=special>::</span><span class=identifier>animal_iterator</span> <span class=identifier>iterator</span><span class=special>;</span>
+-    <span class=identifier>iterator</span> <span class=identifier>to_sell</span><span class=special>;</span>
+-    <span class=keyword>for</span><span class=special>(</span> <span class=identifier>iterator</span> <span class=identifier>i</span>   <span class=special>=</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>begin</span><span class=special>(),</span>
+-                  <span class=identifier>end</span> <span class=special>=</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>end</span><span class=special>();</span>
+-         <span class=identifier>i</span> <span class=special>!=</span> <span class=identifier>end</span><span class=special>;</span> <span class=special>++</span><span class=identifier>i</span> <span class=special>)</span>
+-    <span class=special>{</span>
+-        <span class=keyword>if</span><span class=special>(</span> <span class=identifier>i</span><span class=special>-&gt;</span><span class=identifier>name</span><span class=special>()</span> <span class=special>==</span> <span class=string>&quot;Mary&quot;</span> <span class=special>)</span>
+-        <span class=special>{</span>
+-            <span class=identifier>to_sell</span> <span class=special>=</span> <span class=identifier>i</span><span class=special>;</span>
+-            <span class=keyword>break</span><span class=special>;</span>
+-        <span class=special>}</span>
+-    <span class=special>}</span>
+-
+-    <span class=identifier>farm</span><span class=special>::</span><span class=identifier>animal_transport</span> <span class=identifier>mary</span> <span class=special>=</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>sell_animal</span><span class=special>(</span> <span class=identifier>to_sell</span> <span class=special>);</span>
+-
+-
+-    <span class=keyword>if</span><span class=special>(</span> <span class=identifier>mary</span><span class=special>-&gt;</span><span class=identifier>speak</span><span class=special>()</span> <span class=special>==</span> <span class=identifier>muuuh</span> <span class=special>)</span>
+-        <span class=comment>//
++    <span class="keyword">typedef</span> <span class="identifier">farm</span><span class="special">::</span><span class="identifier">animal_iterator</span> <span class="identifier">iterator</span><span class="special">;</span>
++    <span class="identifier">iterator</span> <span class="identifier">to_sell</span><span class="special">;</span>
++    <span class="keyword">for</span><span class="special">(</span> <span class="identifier">iterator</span> <span class="identifier">i</span>   <span class="special">=</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span>
++                  <span class="identifier">end</span> <span class="special">=</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">end</span><span class="special">();</span>
++         <span class="identifier">i</span> <span class="special">!=</span> <span class="identifier">end</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span> <span class="special">)</span>
++    <span class="special">{</span>
++        <span class="keyword">if</span><span class="special">(</span> <span class="identifier">i</span><span class="special">-&gt;</span><span class="identifier">name</span><span class="special">()</span> <span class="special">==</span> <span class="string">&quot;Mary&quot;</span> <span class="special">)</span>
++        <span class="special">{</span>
++            <span class="identifier">to_sell</span> <span class="special">=</span> <span class="identifier">i</span><span class="special">;</span>
++            <span class="keyword">break</span><span class="special">;</span>
++        <span class="special">}</span>
++    <span class="special">}</span>
++
++    <span class="identifier">farm</span><span class="special">::</span><span class="identifier">animal_transport</span> <span class="identifier">mary</span> <span class="special">=</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">sell_animal</span><span class="special">(</span> <span class="identifier">to_sell</span> <span class="special">);</span>
++
++
++    <span class="keyword">if</span><span class="special">(</span> <span class="identifier">mary</span><span class="special">-&gt;</span><span class="identifier">speak</span><span class="special">()</span> <span class="special">==</span> <span class="identifier">muuuh</span> <span class="special">)</span>
++        <span class="comment">//
+         // Great, Mary is a cow, and she may live longer
+         //</span>
+-        <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>buy_animal</span><span class=special>(</span> <span class=identifier>mary</span><span class=special>.</span><span class=identifier>release</span><span class=special>()</span> <span class=special>);</span>
+-    <span class=keyword>else</span>
+-        <span class=comment>//
++        <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">buy_animal</span><span class="special">(</span> <span class="identifier">mary</span><span class="special">.</span><span class="identifier">release</span><span class="special">()</span> <span class="special">);</span>
++    <span class="keyword">else</span>
++        <span class="comment">//
+         // Then the animal would be destroyed (!)
+         // when we go out of scope.
+         //</span>
+-        <span class=special>;</span>
++        <span class="special">;</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // Now we can observe some changes to the two farms...
+     //</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span> <span class=special>==</span> <span class=number>5u</span> <span class=special>);</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span>    <span class=special>==</span> <span class=number>7u</span> <span class=special>);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">==</span> <span class="number">5u</span> <span class="special">);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span>    <span class="special">==</span> <span class="number">7u</span> <span class="special">);</span>
+ 
+-    <span class=comment>//
++    <span class="comment">//
+     // The new farm has however underestimated how much
+     // it cost to feed Mary and its owner is forced to sell the farm...
+     //</span>
+-    <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>buy_farm</span><span class=special>(</span> <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>sell_farm</span><span class=special>()</span> <span class=special>);</span>
++    <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">buy_farm</span><span class="special">(</span> <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">sell_farm</span><span class="special">()</span> <span class="special">);</span>
+ 
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>new_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span>    <span class=special>==</span> <span class=number>0u</span> <span class=special>);</span>
+-    <span class=identifier>BOOST_ASSERT</span><span class=special>(</span> <span class=identifier>animal_farm</span><span class=special>.</span><span class=identifier>size</span><span class=special>()</span> <span class=special>==</span> <span class=number>12u</span> <span class=special>);</span>     
+-<span class=special>}</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">new_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span>    <span class="special">==</span> <span class="number">0u</span> <span class="special">);</span>
++    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span> <span class="identifier">animal_farm</span><span class="special">.</span><span class="identifier">size</span><span class="special">()</span> <span class="special">==</span> <span class="number">12u</span> <span class="special">);</span>     
++<span class="special">}</span>
+ </pre>
+ </body>
+ 

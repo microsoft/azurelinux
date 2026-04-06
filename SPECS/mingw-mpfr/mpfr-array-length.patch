@@ -1,0 +1,58 @@
+diff -Naurd mpfr-4.0.2-a/PATCHES mpfr-4.0.2-b/PATCHES
+--- mpfr-4.0.2-a/PATCHES	2020-03-30 16:50:17.064231191 +0000
++++ mpfr-4.0.2-b/PATCHES	2020-03-30 16:50:17.096230810 +0000
+@@ -0,0 +1 @@
++array-length
+diff -Naurd mpfr-4.0.2-a/VERSION mpfr-4.0.2-b/VERSION
+--- mpfr-4.0.2-a/VERSION	2020-03-30 15:17:31.535330224 +0000
++++ mpfr-4.0.2-b/VERSION	2020-03-30 16:50:17.096230810 +0000
+@@ -1 +1 @@
+-4.0.2-p5
++4.0.2-p6
+diff -Naurd mpfr-4.0.2-a/src/mpfr-impl.h mpfr-4.0.2-b/src/mpfr-impl.h
+--- mpfr-4.0.2-a/src/mpfr-impl.h	2020-03-30 13:09:17.490071686 +0000
++++ mpfr-4.0.2-b/src/mpfr-impl.h	2020-03-30 16:50:17.084230953 +0000
+@@ -2026,7 +2026,21 @@
+ struct mpfr_group_t {
+   size_t     alloc;
+   mp_limb_t *mant;
++#if MPFR_GROUP_STATIC_SIZE != 0
+   mp_limb_t  tab[MPFR_GROUP_STATIC_SIZE];
++#else
++  /* In order to detect memory leaks when testing, MPFR_GROUP_STATIC_SIZE
++     can be set to 0, in which case tab will not be used. ISO C does not
++     support zero-length arrays[*], thus let's use a flexible array member
++     (which will be equivalent here). Note: this is new in C99, but this
++     is just used for testing.
++     [*] Zero-length arrays are a GNU extension:
++           https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
++         and as such an extension is forbidden in ISO C, it triggers an
++         error with -Werror=pedantic.
++  */
++  mp_limb_t  tab[];
++#endif
+ };
+ 
+ #define MPFR_GROUP_DECL(g) struct mpfr_group_t g
+diff -Naurd mpfr-4.0.2-a/src/mpfr.h mpfr-4.0.2-b/src/mpfr.h
+--- mpfr-4.0.2-a/src/mpfr.h	2020-03-30 15:17:31.535330224 +0000
++++ mpfr-4.0.2-b/src/mpfr.h	2020-03-30 16:50:17.096230810 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 2
+-#define MPFR_VERSION_STRING "4.0.2-p5"
++#define MPFR_VERSION_STRING "4.0.2-p6"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd mpfr-4.0.2-a/src/version.c mpfr-4.0.2-b/src/version.c
+--- mpfr-4.0.2-a/src/version.c	2020-03-30 15:17:31.535330224 +0000
++++ mpfr-4.0.2-b/src/version.c	2020-03-30 16:50:17.096230810 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.2-p5";
++  return "4.0.2-p6";
+ }

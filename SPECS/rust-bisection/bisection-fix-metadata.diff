@@ -1,0 +1,8 @@
+--- bisection-0.1.0/Cargo.toml	2020-09-02T19:52:24+00:00
++++ bisection-0.1.0/Cargo.toml	2024-12-26T17:20:32.558810+00:00
+@@ -23,4 +23,4 @@
+ license = "MIT"
+ repository = "https://github.com/SteadBytes/bisection"
+ [dev-dependencies.proptest]
+-version = "0.10.0"
++version = "1"

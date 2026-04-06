@@ -1,0 +1,30 @@
+commit 69de79cfa71749de8e0e4dcab17b4ab36208e5fc
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Fri Jul 16 09:32:38 2021 +0200
+
+    Fix header problem
+
+diff --git a/lib/libc-config.h b/lib/libc-config.h
+index f14013f..884272b 100644
+--- a/lib/libc-config.h
++++ b/lib/libc-config.h
+@@ -71,11 +71,6 @@
+ # endif
+ #endif
+ 
+-#ifndef __attribute_nonnull__
+-/* <sys/cdefs.h> either does not exist, or is too old for Gnulib.
+-   Prepare to include <cdefs.h>, which is Gnulib's version of a
+-   more-recent glibc <sys/cdefs.h>.  */
+-
+ /* Define _FEATURES_H so that <cdefs.h> does not include <features.h>.  */
+ # ifndef _FEATURES_H
+ #  define _FEATURES_H 1
+@@ -171,7 +166,6 @@
+ #  endif
+ # endif
+ 
+-#endif /* defined __glibc_likely */
+ 
+ 
+ /* A substitute for glibc <libc-symbols.h>, good enough for Gnulib.  */

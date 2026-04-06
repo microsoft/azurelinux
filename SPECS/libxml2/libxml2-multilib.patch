@@ -1,0 +1,24 @@
+*** XML/xml2-config.in.orig	2006-06-06 16:35:56.000000000 +0200
+--- XML/xml2-config.in	2006-06-06 16:36:24.000000000 +0200
+***************
+*** 3,9 ****
+  prefix=@prefix@
+  exec_prefix=@exec_prefix@
+  includedir=@includedir@
+! libdir=@libdir@
+  cflags=
+  libs=
+  
+--- 3,14 ----
+  prefix=@prefix@
+  exec_prefix=@exec_prefix@
+  includedir=@includedir@
+! if [ "`ldd /bin/sh | grep lib64`" = "" ]
+! then
+!     libdir=${exec_prefix}/lib
+! else
+!     libdir=${exec_prefix}/lib64
+! fi
+  cflags=
+  libs=
+  

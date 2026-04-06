@@ -1,0 +1,48 @@
+.TH GRPC_CLI "1" "May 2021" "" "User Commands"
+.SH NAME
+.B grpc_cli
+\(en a command-line tool to talk to a grpc server
+.SH SYNOPSIS
+.B grpc_cli
+.I COMMAND
+.RI [ OPTION ]...\:
+.SH OPTIONS
+.SS COMMANDS
+.P
+Each of the following has a corresponding man page: for example,
+.BR grpc_cli\-ls (1)
+for
+.RB \(lq grpc_cli\ ls \(rq.
+.TP
+.B grpc_cli\ ls
+List services
+.TP
+.B grpc_cli\ call
+Call method
+.TP
+.B grpc_cli\ type
+Print type
+.TP
+.B grpc_cli\ parse
+Parse message
+.TP
+.B grpc_cli\ totext
+Convert binary message to text
+.TP
+.B grpc_cli\ tojson
+Convert binary message to json
+.TP
+.B grpc_cli\ tobinary
+Convert text message to binary
+.TP
+.B grpc_cli\ help
+Print this message, or per-command usage
+.SH "SEE\ ALSO"
+.BR grpc_cli\-ls (1),
+.BR grpc_cli\-call (1),
+.BR grpc_cli\-type (1),
+.BR grpc_cli\-parse (1),
+.BR grpc_cli\-totext (1),
+.BR grpc_cli\-tojson (1),
+.BR grpc_cli\-tobinary (1),
+.BR grpc_cli\-help (1)

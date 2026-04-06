@@ -1,0 +1,73 @@
+From 396ba2b16136611334a87ac7d72ae29e53dc6808 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Thu, 31 Aug 2023 13:43:47 +0200
+Subject: [PATCH 03/17] conn: Copy domain GUID from disco
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adconn.c | 14 ++++++++++++++
+ library/adconn.h |  2 ++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/library/adconn.c b/library/adconn.c
+index 37405cc..f28ccba 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -74,6 +74,7 @@ struct _adcli_conn_ctx {
+ 	char *canonical_host;
+ 	char *domain_short;
+ 	char *domain_sid;
++	char *domain_guid;
+ 	adcli_disco *domain_disco;
+ 	enum conn_is_writeable is_writeable;
+ 	char *default_naming_context;
+@@ -164,6 +165,11 @@ disco_dance_if_necessary (adcli_conn *conn)
+ 			conn->domain_short = strdup (conn->domain_disco->domain_short);
+ 			return_if_fail (conn->domain_short != NULL);
+ 		}
++
++		if (!conn->domain_guid && conn->domain_disco->domain_guid) {
++			conn->domain_guid = strdup(conn->domain_disco->domain_guid);
++			return_if_fail (conn->domain_guid != NULL);
++		}
+ 	}
+ }
+ 
+@@ -1313,6 +1319,7 @@ conn_free (adcli_conn *conn)
+ 	free (conn->domain_realm);
+ 	free (conn->domain_controller);
+ 	free (conn->domain_short);
++	free (conn->domain_guid);
+ 	free (conn->default_naming_context);
+ 	free (conn->configuration_naming_context);
+ 	_adcli_strv_free (conn->supported_capabilities);
+@@ -1421,6 +1428,13 @@ adcli_conn_get_domain_name (adcli_conn *conn)
+ 	return conn->domain_name;
+ }
+ 
++const char *
++adcli_conn_get_domain_guid(adcli_conn *conn)
++{
++	return_val_if_fail (conn != NULL, NULL);
++	return conn->domain_guid;
++}
++
+ void
+ adcli_conn_set_domain_name (adcli_conn *conn,
+                             const char *value)
+diff --git a/library/adconn.h b/library/adconn.h
+index 3a3c32b..34b4c23 100644
+--- a/library/adconn.h
++++ b/library/adconn.h
+@@ -104,6 +104,8 @@ const char *        adcli_conn_get_domain_short      (adcli_conn *conn);
+ 
+ const char *        adcli_conn_get_domain_sid        (adcli_conn *conn);
+ 
++const char *        adcli_conn_get_domain_guid       (adcli_conn *conn);
++
+ LDAP *              adcli_conn_get_ldap_connection   (adcli_conn *conn);
+ 
+ krb5_context        adcli_conn_get_krb5_context      (adcli_conn *conn);
+-- 
+2.47.0
+

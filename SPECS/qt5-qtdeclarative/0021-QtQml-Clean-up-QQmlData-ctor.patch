@@ -1,0 +1,111 @@
+From 301eaf8d6fbe7d290e8acd1f37832170479b6b91 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Mon, 10 Jul 2023 07:43:28 +0200
+Subject: [PATCH 21/22] QtQml: Clean up QQmlData ctor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Initialize the "dummy" member even though we never use it. Static
+analyzers complain about it and we may appreciate it having a defined
+value in the future. Also, initialize other members inline where
+possible.
+
+Coverity-Id: 415867
+Change-Id: Ie428eb3294d6363afe9d7ab2d2bed6e52df0b304
+Reviewed-by: Olivier De Cannière <olivier.decanniere@qt.io>
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 10985a568db8cfb4140140967f7d247627ec4350)
+
+* asturmlechner 2023-08-12: Resolve conflicts with dev branch commits
+  10985a568db8cfb4140140967f7d247627ec4350 and
+  e5246cafffb93f69a49c133210390c253fcb71f2 and
+  d3b3fef5a878d7fd53de6a9f9fff196a273930e3
+---
+ src/qml/qml/qqmldata_p.h   | 20 ++++++++++----------
+ src/qml/qml/qqmlengine.cpp |  7 ++-----
+ 2 files changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/src/qml/qml/qqmldata_p.h b/src/qml/qml/qqmldata_p.h
+index c44fb8608e..69dac27c9a 100644
+--- a/src/qml/qml/qqmldata_p.h
++++ b/src/qml/qml/qqmldata_p.h
+@@ -185,7 +185,7 @@ public:
+     private:
+         void layout(QQmlNotifierEndpoint*);
+     };
+-    QAtomicPointer<NotifyList> notifyList;
++    QAtomicPointer<NotifyList> notifyList = nullptr;
+ 
+     inline QQmlNotifierEndpoint *notify(int index) const;
+     void addNotify(int index, QQmlNotifierEndpoint *);
+@@ -201,12 +201,12 @@ public:
+     QQmlContextData *outerContext = nullptr;
+     QQmlContextDataRef ownContext;
+ 
+-    QQmlAbstractBinding *bindings;
+-    QQmlBoundSignal *signalHandlers;
++    QQmlAbstractBinding *bindings = nullptr;
++    QQmlBoundSignal *signalHandlers = nullptr;
+ 
+     // Linked list for QQmlContext::contextObjects
+-    QQmlData *nextContextObject;
+-    QQmlData**prevContextObject;
++    QQmlData *nextContextObject = nullptr;
++    QQmlData**prevContextObject = nullptr;
+ 
+     inline bool hasBindingBit(int) const;
+     inline void setBindingBit(QObject *obj, int);
+@@ -216,10 +216,10 @@ public:
+     inline void setPendingBindingBit(QObject *obj, int);
+     inline void clearPendingBindingBit(int);
+ 
+-    quint16 lineNumber;
+-    quint16 columnNumber;
++    quint16 lineNumber = 0;
++    quint16 columnNumber = 0;
+ 
+-    quint32 jsEngineId; // id of the engine that created the jsWrapper
++    quint32 jsEngineId = 0; // id of the engine that created the jsWrapper
+ 
+     struct DeferredData {
+         DeferredData();
+@@ -240,7 +240,7 @@ public:
+ 
+     QQmlPropertyCache *propertyCache;
+ 
+-    QQmlGuardImpl *guards;
++    QQmlGuardImpl *guards = 0;
+ 
+     static QQmlData *get(const QObject *object, bool create = false) {
+         QObjectPrivate *priv = QObjectPrivate::get(const_cast<QObject *>(object));
+@@ -289,7 +289,7 @@ public:
+ 
+ private:
+     // For attachedProperties
+-    mutable QQmlDataExtended *extendedData;
++    mutable QQmlDataExtended *extendedData = nullptr;
+ 
+     Q_NEVER_INLINE static QQmlData *createQQmlData(QObjectPrivate *priv);
+     Q_NEVER_INLINE static QQmlPropertyCache *createPropertyCache(QJSEngine *engine, QObject *object);
+diff --git a/src/qml/qml/qqmlengine.cpp b/src/qml/qml/qqmlengine.cpp
+index 5ae937e22f..afb117d36e 100644
+--- a/src/qml/qml/qqmlengine.cpp
++++ b/src/qml/qml/qqmlengine.cpp
+@@ -719,11 +719,8 @@ void QQmlPrivate::qdeclarativeelement_destructor(QObject *o)
+ QQmlData::QQmlData()
+     : ownedByQml1(false), ownMemory(true), indestructible(true), explicitIndestructibleSet(false),
+       hasTaintedV4Object(false), isQueuedForDeletion(false), rootObjectInCreation(false),
+-      hasInterceptorMetaObject(false), hasVMEMetaObject(false), parentFrozen(false),
+-      bindingBitsArraySize(InlineBindingArraySize), notifyList(nullptr),
+-      bindings(nullptr), signalHandlers(nullptr), nextContextObject(nullptr), prevContextObject(nullptr),
+-      lineNumber(0), columnNumber(0), jsEngineId(0),
+-      propertyCache(nullptr), guards(nullptr), extendedData(nullptr)
++      hasInterceptorMetaObject(false), hasVMEMetaObject(false), parentFrozen(false), dummy(0),
++      bindingBitsArraySize(InlineBindingArraySize), propertyCache(nullptr)
+ {
+     memset(bindingBitsValue, 0, sizeof(bindingBitsValue));
+     init();
+-- 
+2.51.1
+

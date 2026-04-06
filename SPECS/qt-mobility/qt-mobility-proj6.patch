@@ -1,0 +1,10 @@
+diff -up qt-mobility-opensource-src-1.2.2/config.tests/proj/proj.pro.proj6 qt-mobility-opensource-src-1.2.2/config.tests/proj/proj.pro
+--- qt-mobility-opensource-src-1.2.2/config.tests/proj/proj.pro.proj6	2014-03-25 13:26:00.000000000 -0600
++++ qt-mobility-opensource-src-1.2.2/config.tests/proj/proj.pro	2019-09-08 19:57:01.450992211 -0600
+@@ -1,5 +1,6 @@
+ TEMPLATE = app
+ LIBS += -lproj
++QMAKE_CXXFLAGS += -DACCEPT_USE_OF_DEPRECATED_PROJ_API_H
+ 
+ SOURCES += proj.cpp
+ 

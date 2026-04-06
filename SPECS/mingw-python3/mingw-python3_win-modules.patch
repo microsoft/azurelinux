@@ -1,0 +1,63 @@
+diff -rupN --no-dereference Python-3.11.14/Modules/Setup Python-3.11.14-new/Modules/Setup
+--- Python-3.11.14/Modules/Setup	2025-10-09 23:07:50.151997727 +0200
++++ Python-3.11.14-new/Modules/Setup	2025-10-09 23:07:50.405086176 +0200
+@@ -270,6 +270,12 @@ mmap mmapmodule.c
+ # macOS specific module, needs SystemConfiguration and CoreFoundation framework
+ # _scproxy _scproxy.c
+ 
++# Windows specific modules
++msvcrt ../PC/msvcrtmodule.c
++_winapi _winapi.c
++winsound ../PC/winsound.c -lwinmm
++_overlapped overlapped.c
++
+ # Examples
+ 
+ #xx xxmodule.c
+diff -rupN --no-dereference Python-3.11.14/Modules/Setup.bootstrap.in Python-3.11.14-new/Modules/Setup.bootstrap.in
+--- Python-3.11.14/Modules/Setup.bootstrap.in	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/Setup.bootstrap.in	2025-10-09 23:07:50.405334319 +0200
+@@ -8,15 +8,15 @@
+ # module C APIs are used in core
+ atexit atexitmodule.c
+ faulthandler faulthandler.c
+-posix posixmodule.c
+-_signal signalmodule.c
++nt posixmodule.c
++_signal signalmodule.c -lws2_32
+ _tracemalloc _tracemalloc.c
+ 
+ # modules used by importlib, deepfreeze, freeze, runpy, and sysconfig
+ _codecs _codecsmodule.c
+ _collections _collectionsmodule.c
+ errno errnomodule.c
+-_io _io/_iomodule.c _io/iobase.c _io/fileio.c _io/bytesio.c _io/bufferedio.c _io/textio.c _io/stringio.c
++_io _io/_iomodule.c _io/iobase.c _io/fileio.c _io/bytesio.c _io/bufferedio.c _io/textio.c _io/stringio.c _io/winconsoleio.c
+ itertools itertoolsmodule.c
+ _sre _sre/sre.c
+ _thread _threadmodule.c
+@@ -33,3 +33,5 @@ _symtable symtablemodule.c
+ 
+ # for systems without $HOME env, used by site._getuserbase()
+ @MODULE_PWD_TRUE@pwd pwdmodule.c
++
++winreg ../PC/winreg.c
+diff -rupN --no-dereference Python-3.11.14/setup.py Python-3.11.14-new/setup.py
+--- Python-3.11.14/setup.py	2025-10-09 23:07:50.152215544 +0200
++++ Python-3.11.14-new/setup.py	2025-10-09 23:07:50.405561611 +0200
+@@ -1382,6 +1382,15 @@ class PyBuildExt(build_ext):
+         self.addext(Extension('xxlimited', ['xxlimited.c']))
+         self.addext(Extension('xxlimited_35', ['xxlimited_35.c']))
+ 
++        # Modules with some Windows dependencies:
++        if HOST_PLATFORM.startswith(('mingw', 'win')):
++            srcdir = sysconfig.get_config_var('srcdir')
++            pc_srcdir = os.path.abspath(os.path.join(srcdir, 'PC'))
++
++            self.add(Extension('_msi', [os.path.join(pc_srcdir, p)
++                for p in ['_msi.c']],
++                libraries=['msi','cabinet','rpcrt4']) ) # To link with lib(msi|cabinet|rpcrt4).a
++
+     def detect_tkinter(self):
+         tkinter_libs = ['tcl', 'tk']
+         self.addext(Extension('_tkinter', ['_tkinter.c', 'tkappinit.c'], libraries=tkinter_libs))

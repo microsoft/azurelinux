@@ -1,0 +1,50 @@
+diff --git a/lib/readline/input.c b/lib/readline/input.c
+--- a/lib/readline/input.c
++++ b/lib/readline/input.c
+@@ -971,11 +971,11 @@ postproc_signal:
+ 	 call the application's signal event hook. */
+       if (rl_signal_event_hook)
+ 	(*rl_signal_event_hook) ();
+-#if defined (READLINE_CALLBACKS)
+-      else if (osig == SIGINT && (ostate & RL_STATE_CALLBACK) && (ostate & (RL_STATE_ISEARCH|RL_STATE_NSEARCH|RL_STATE_NUMERICARG)))
++      /* If the application's SIGINT handler returns, make sure we abort out of
++	 searches and numeric arguments because we've freed necessary state. */
++      if (osig == SIGINT && (ostate & (RL_STATE_ISEARCH|RL_STATE_NSEARCH|RL_STATE_NUMERICARG)))
+         /* just these cases for now */
+         _rl_abort_internal ();
+-#endif
+     }
+ }
+ 
+diff --git a/lib/readline/isearch.c b/lib/readline/isearch.c
+--- a/lib/readline/isearch.c
++++ b/lib/readline/isearch.c
+@@ -889,12 +889,14 @@ opcode_dispatch:
+ int
+ _rl_isearch_cleanup (_rl_search_cxt *cxt, int r)
+ {
++  RL_UNSETSTATE(RL_STATE_ISEARCH);
++  if (cxt == 0)
++    return (r != 0);
++
++  _rl_iscxt = 0;
+   if (r >= 0)
+     _rl_isearch_fini (cxt);
+   _rl_scxt_dispose (cxt, 0);
+-  _rl_iscxt = 0;
+-
+-  RL_UNSETSTATE(RL_STATE_ISEARCH);
+ 
+   return (r != 0);
+ }
+diff --git a/patchlevel.h b/patchlevel.h
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[ 	]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 8
++#define PATCHLEVEL 9
+ 
+ #endif /* _PATCHLEVEL_H_ */

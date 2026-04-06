@@ -1,0 +1,30 @@
+# Fails in 8.4.4 in Fedora KOJI
+main.mysql_client_test             : BUG#0
+
+# Unstable in 8.4.4 in Fedora KOJI
+main.mysqlslap                     : BUG#0
+
+# Fails in 8.4.6 in Fedora KOJI
+federated.federated_server			: BUG#0
+innodb.lob_recovery				: BUG#0
+innodb.multi_value_basic			: BUG#0
+innodb_fts.bug_34846823				: BUG#0
+innodb_gis.rtree_search				: BUG#0
+main.lock_multi_bug38691			: BUG#0
+perfschema.system_events_component		: BUG#0
+perfschema.system_events_plugin			: BUG#0
+rpl.rpl_eventlog_psi_memory			: BUG#0
+rpl.rpl_parallel_ddl_innodb			: BUG#0
+rpl.rpl_parallel_ddl_myisam			: BUG#0
+rpl_gtid.mysqldump_bug33630199			: BUG#0
+sys_vars.myisam_data_pointer_size_func		: BUG#0
+# unstable on ELN
+main.multi_update                       : BUG#0
+
+# Fails since 8.4.7
+innodb_fts.optimize_big             : BUG#0
+innodb_undo.undo_settings           : BUG#0
+rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts   : BUG#0
+
+# Times out since 8.4.7
+parts.partition_reverse_scan_icp    : BUG#0

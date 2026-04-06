@@ -1,0 +1,11 @@
+[Unit]
+Description=Hyper-V FCOPY daemon
+ConditionPathExists=/sys/bus/vmbus/devices/eb765408-105f-49b6-b4aa-c123b64d17d4/
+IgnoreOnIsolate=1
+
+[Service]
+ExecStartPre=/bin/sh -c '[ ! -d /sys/bus/vmbus/devices/eb765408-105f-49b6-b4aa-c123b64d17d4/uio ] && modprobe uio_hv_generic && echo 34d14be3-dee4-41c8-9ae7-6b174977c192 > /sys/bus/vmbus/drivers/uio_hv_generic/new_id ||:'
+ExecStart=hv_fcopy_uio_daemon -n
+
+[Install]
+WantedBy=multi-user.target

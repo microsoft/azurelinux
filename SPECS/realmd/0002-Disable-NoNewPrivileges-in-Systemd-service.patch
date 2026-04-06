@@ -1,0 +1,25 @@
+From 21bcf4e18744949a2b9bf8d3c2119b41fd895e04 Mon Sep 17 00:00:00 2001
+From: Rahul Sundaram <rahulsundaram@gmail.com>
+Date: Tue, 5 Mar 2024 17:56:57 +0000
+Subject: [PATCH 2/7] Disable NoNewPrivileges in Systemd service
+
+---
+ dbus/realmd.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus/realmd.service.in b/dbus/realmd.service.in
+index 8fce139..3c290e0 100644
+--- a/dbus/realmd.service.in
++++ b/dbus/realmd.service.in
+@@ -10,7 +10,7 @@ DevicePolicy=closed
+ KeyringMode=private
+ LockPersonality=yes
+ MemoryDenyWriteExecute=yes
+-NoNewPrivileges=yes
++NoNewPrivileges=no
+ PrivateDevices=yes
+ ProtectClock=yes
+ ProtectControlGroups=yes
+-- 
+2.47.1
+

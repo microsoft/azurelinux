@@ -1,0 +1,39 @@
+From 3a97e6d3a9a44662ac6c4a86878c833d19e0ca30 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Tue, 9 Feb 2021 16:09:21 +0000
+Subject: [PATCH 03/55] Client: Connect drags being accepted to updating the
+ source drag icon
+
+Currently in a multi-process drag and drop when the other client accepts
+a given mimetype for dropping it calls accept, which is received by the
+client, but the drag cursor is never updated.
+
+Instead the drag cursor was updated in the data_device_enter events
+which only works if we are operating within one process.
+
+The code existed to handle this existed but both the targetChanged
+signal and the dragSourceTargetChanged were unused.
+
+Change-Id: I443f31f1b2ef72d4b5eadaf7115f97544dac883a
+Reviewed-by: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 08e478448a97a440d5a968a5d797f0d7302140c2)
+---
+ src/client/qwaylanddatadevice.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/client/qwaylanddatadevice.cpp b/src/client/qwaylanddatadevice.cpp
+index 4d2459d1..375f13fb 100644
+--- a/src/client/qwaylanddatadevice.cpp
++++ b/src/client/qwaylanddatadevice.cpp
+@@ -130,6 +130,7 @@ bool QWaylandDataDevice::startDrag(QMimeData *mimeData, QWaylandWindow *icon)
+ 
+     m_dragSource.reset(new QWaylandDataSource(m_display->dndSelectionHandler(), mimeData));
+     connect(m_dragSource.data(), &QWaylandDataSource::cancelled, this, &QWaylandDataDevice::dragSourceCancelled);
++    connect(m_dragSource.data(), &QWaylandDataSource::targetChanged, this, &QWaylandDataDevice::dragSourceTargetChanged);
+ 
+     start_drag(m_dragSource->object(), origin->wlSurface(), icon->wlSurface(), m_display->currentInputDevice()->serial());
+     return true;
+-- 
+2.51.1
+

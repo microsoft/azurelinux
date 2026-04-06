@@ -1,0 +1,18 @@
+Avoids this warning:
+
+../src/unixaux.d: In function ‘install_signal_handler’:
+../src/unixaux.d:734:3: warning: ‘siginterrupt’ is deprecated: Use sigaction with SA_RESTART instead [-Wdeprecated-declarations]
+  734 |   siginterrupt(sig,0);
+      |   ^~~~~~~~~~~~
+
+--- src/unixaux.d.orig	2024-07-12 09:22:07.000000000 -0600
++++ src/unixaux.d	2024-08-26 15:42:17.202775988 -0600
+@@ -703,7 +703,7 @@ global int wait2 (pid_t child) {
+ global signal_handler_t install_signal_handler (int sig,
+                                                 signal_handler_t handler) {
+   var signal_handler_t old_handler;
+- #if defined(USE_SIGACTION)
++ #if defined(HAVE_SIGACTION)
+   var struct sigaction old_sa;
+   var struct sigaction new_sa;
+   memset(&new_sa,0,sizeof(new_sa));

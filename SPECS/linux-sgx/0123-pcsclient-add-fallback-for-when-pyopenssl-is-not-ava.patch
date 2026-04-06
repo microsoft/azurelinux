@@ -1,0 +1,75 @@
+From bf9e0725f88903c43623c14eaa97a784310e1a7e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 8 Dec 2025 17:56:59 +0000
+Subject: [PATCH 123/131] pcsclient: add fallback for when pyopenssl is not
+ available
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RHEL does not ship pyopenssl, however, the pycryptography that is
+included is also too old to support certificate verification. Add
+a further fallback that can invoke the 'openssl' command line tool
+to verify certificates.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 28 +++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index eeb29697..1368b57b 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -24,7 +24,14 @@ except ImportError:
+     verification = None
+ 
+ if verification is None:
+-    from OpenSSL import crypto
++    try:
++        from OpenSSL import crypto
++    except ModuleNotFoundError:
++        # Fallback to spawning 'openssl' binary if
++        # pyopenssl is not available
++        crypto = None
++        import tempfile
++        import subprocess
+ 
+ from platform import system
+ if system() == 'Windows':
+@@ -166,7 +173,7 @@ class PCS:
+                     # Printing or logging the error details
+                     print(e)
+                     return False
+-        else:
++        elif crypto is not None:
+             store= self.init_cert_store(pychain)
+ 
+             for pycert in pycerts:
+@@ -178,6 +185,23 @@ class PCS:
+                     # Printing or logging the error details
+                     print(e)
+                     return False
++        else:
++            with tempfile.NamedTemporaryFile("wb") as chainfile:
++                for cert in pychain:
++                    chainfile.write(cert.public_bytes(serialization.Encoding.PEM))
++                chainfile.flush()
++
++                for cert in pycerts:
++                    with tempfile.NamedTemporaryFile("wb") as certfile:
++                        certfile.write(cert.public_bytes(serialization.Encoding.PEM))
++                        certfile.flush()
++
++                        try:
++                            subprocess.check_call(["openssl", "verify",
++                                                   "-CAfile", chainfile.name, certfile.name],
++                                                  stdout=subprocess.DEVNULL)
++                        except subprocess.CalledProcessError as e:
++                            return False
+ 
+         return True
+ 
+-- 
+2.53.0
+

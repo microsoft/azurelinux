@@ -1,0 +1,11 @@
+Name: libsvm
+Version: @VERSION@
+Date: @DATE@
+Author: Jun-Cheng Chen, Kuan-Jen Peng, Chih-Yuan Yang and Chih-Huai Cheng
+Maintainer: Chih-Chung Chang and Chih-Jen Lin
+Title: Support Vector Machines
+Description: This tool provides a simple interface to LIBSVM, a
+ library for support vector machines. It is very easy to use as the
+ usage and the way of specifying parameters are the same as that of
+ LIBSVM.
+Url: https://www.csie.ntu.edu.tw/~cjlin/libsvm/

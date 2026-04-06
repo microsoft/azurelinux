@@ -1,0 +1,42 @@
+From 11329603da1f9600e29bbd8f2c2a704ae0062e49 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 18 Jun 2024 12:19:02 -0700
+Subject: [PATCH] test_pickle_exception: even harder location stripping. Ref
+ #74.
+
+With Python 3.13, we need to strip even harder, because we get
+location lines with differing amounts of tildes and up carets in
+them, e.g.:
+
+    ~~^~~~~
+
+and:
+
+    ^^^^^^^
+
+Let's ditch the regex and instead go line-by-line with a pretty
+loose match for anything that looks like a location line.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ tests/test_pickle_exception.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_pickle_exception.py b/tests/test_pickle_exception.py
+index 53a9dce..afe0d69 100644
+--- a/tests/test_pickle_exception.py
++++ b/tests/test_pickle_exception.py
+@@ -30,7 +30,9 @@ class CustomError(Exception):
+ 
+ 
+ def strip_locations(tb_text):
+-    return tb_text.replace('    ~~^~~\n', '').replace('    ^^^^^^^^^^^^^^^^^\n', '')
++    lines = tb_text.splitlines()
++    lines = [line for line in lines if '~~^~~' not in line and '^^^^' not in line]
++    return '\n'.join(lines)
+ 
+ 
+ @pytest.mark.parametrize('protocol', [None, *list(range(1, pickle.HIGHEST_PROTOCOL + 1))])
+-- 
+2.45.2
+

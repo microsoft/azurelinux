@@ -1,0 +1,12 @@
+diff -U 3 -dHrN a/docs/conf.py c/docs/conf.py
+--- a/docs/conf.py	2024-03-01 19:35:19.000000000 +0100
++++ c/docs/conf.py	2025-05-08 18:19:19.766473207 +0200
+@@ -20,7 +20,7 @@
+ # add these directories to sys.path here. If the directory is relative to the
+ # documentation root, use os.path.abspath to make it absolute, like shown here.
+ #sys.path.insert(0, os.path.abspath('.'))
+-sys.path.insert(0, os.path.abspath('../'))
++sys.path.insert(0, os.path.abspath('../src/'))
+ 
+ # -- General configuration ------------------------------------------------
+ 

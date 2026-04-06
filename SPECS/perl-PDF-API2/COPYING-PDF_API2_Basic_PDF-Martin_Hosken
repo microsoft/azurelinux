@@ -1,0 +1,546 @@
+From martin_hosken@sil.org Thu Jan 28 18:37:42 2021
+Return-Path: martin_hosken@sil.org
+Received: from zmta03.collab.prod.int.phx2.redhat.com (LHLO
+ zmta03.collab.prod.int.phx2.redhat.com) (10.5.81.10) by
+ zmail20.collab.prod.int.phx2.redhat.com with LMTP; Thu, 28 Jan 2021
+ 12:37:42 -0500 (EST)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	by zmta03.collab.prod.int.phx2.redhat.com (Postfix) with ESMTP id 0713B509ED
+	for <ppisar@mail.corp.redhat.com>; Thu, 28 Jan 2021 12:37:42 -0500 (EST)
+Received: by smtp.corp.redhat.com (Postfix)
+	id CAFD210336D8; Thu, 28 Jan 2021 17:37:41 +0000 (UTC)
+Delivered-To: ppisar@redhat.com
+Received: from mimecast-mx02.redhat.com (mimecast04.extmail.prod.ext.rdu2.redhat.com [10.11.55.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C69831041AEF
+	for <ppisar@redhat.com>; Thu, 28 Jan 2021 17:37:41 +0000 (UTC)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1B60101A53F
+	for <ppisar@redhat.com>; Thu, 28 Jan 2021 17:37:41 +0000 (UTC)
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=dkim.mimecast.com; s=201903; t=1611855461;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=rYlWdP9PrigBo31ON5H2GaU2fhedta3Y6+hGmuKlhAE=;
+	b=rjsUK44fg+LHiMquS3u/6on9omJmCk0EQzk/QJ0vHHWJUG6E+52xPHnBlk4TTFpEFZEG3M
+	MI+0PqjheLauCrR6KtP++3kK5+Wg0SFYX7w3nZ1UJoMCG28FA3zvGDkNRscaE+DVTaFf+1
+	vsiS4euAGyeysun5V4bU2Hq/NnLG7o4TgNVNPk/ftjxPBNuwEvH1PLJwR0C92HETrWnsW5
+	cNxGd8gle0pcqtKJkFzTsWj55y+oOBd4mzQlRn/jdgGnHO+ldN1jaPl2lrrhOju+8sMjMc
+	uMN2VlHLy5oMZCk4lp8Eex08fTUFOXuz5ZrCr7rbYXvBb2cD+LSGq90Csa0DRg==
+ARC-Seal: i=1; s=201903; d=dkim.mimecast.com; t=1611855461; a=rsa-sha256;
+	cv=none;
+	b=l7XVxwSGAoCQ1HbjR27dulWPTYYlwnbuG1Zm5nGQk+N473pheTRHtbO8OBxB6LKAqApkw4
+	7GyzZaM0x8lLEtOkwXuW4A1Hfz9fSJv5hkaw5JDinPE5zk9B43i3yBpTeNiia+v4eYHLjy
+	m80xfzr5DC/e78ktw4UfL+3sBaA3mPd1z2OSq6qQ3u1/EQ8VpSliXR44fGx4qDYZZyJ9Nc
+	acZDBzon68ce833U0N19/oLRgxXSammKN3wJv2IAw4ShgOABWXA0jdPS4X7pJXzes+u4es
+	7CSEC2PJKcfZJLU7FM4Kewu9R/B5O8uf048qCsJofUBKq6AAat9ZtJ1yiJJ12Q==
+ARC-Authentication-Results: i=1;
+	relay.mimecast.com;
+	dkim=pass header.d=sil.org header.s=google header.b=aNhfRTDE;
+	dmarc=pass (policy=none) header.from=sil.org;
+	spf=pass (relay.mimecast.com: domain of martin_hosken@sil.org designates 209.85.166.182 as permitted sender) smtp.mailfrom=martin_hosken@sil.org
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com
+ [209.85.166.182]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-5cJMN9zJMESUFmE1s7-wGQ-1; Thu, 28 Jan 2021 12:37:38 -0500
+X-MC-Unique: 5cJMN9zJMESUFmE1s7-wGQ-1
+Received: by mail-il1-f182.google.com with SMTP id g7so4881883iln.2
+        for <ppisar@redhat.com>; Thu, 28 Jan 2021 09:37:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sil.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rYlWdP9PrigBo31ON5H2GaU2fhedta3Y6+hGmuKlhAE=;
+        b=aNhfRTDE2e86inX4ZfW75kX6P0ns2ZquPR85uzdw+zzUecHY8WJr3L1yow4yXQc2KV
+         HqXO2/M5tNrUieT+iv9anc1UL96aBwVyRNKc00TZNX7fdD8NzNIfAoEM46M0dj38dX2r
+         xjCk+vKb/vOFPoVUWGBJBWYYjmfXGJfkraQJY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rYlWdP9PrigBo31ON5H2GaU2fhedta3Y6+hGmuKlhAE=;
+        b=dtzMb3Km8RblTigDtGSIRw2EWvjHu5SafbW5Gouq3mplBikCtmirOPTA/clcH/hAQA
+         KUutxT3UMXvBE7ybLUBTjOBhpvY5cW/XQib0ms06wrVcx2pOrs+dBnju1/6TVnVwiZQO
+         sMwc5UlZhVpxNDX73lLVl+yB7I7RwFIxY1Mj5Q4PN1AneZxYI2EiKLo6R9QtFxDdtZOC
+         I/ANwvm3lDKxGIYc1s6/tBQ5t6RSJlDw1H6OHqYo8/5D+Uy2tMZuEHSv6zR1ojWaLOp1
+         5CF27J1VArnI/AugWIRqr/E5TsFvzEXv5u0hVCKmYXHRd9+sSXYm12i1yX0TLXmTEak2
+         I3dA==
+X-Gm-Message-State: AOAM5338ROH30999q9s/8ZuPNF3iYueAFEntXOufFaaLm+dJ4ABO0XMy
+	BFlSbUZTRY+0oALvCkjYOL3inlvkcChBEV2g3yyzj0qyUgFzEA==
+X-Google-Smtp-Source: ABdhPJw7RYY3S/NGCWcZXzzZSFi3RfKEvvF6g3XqMM5FGjr5vk69rMEjseQkUruru16KyAvyGoNlKRm1fi4H9r6zfD0=
+X-Received: by 2002:a92:c907:: with SMTP id t7mr97286ilp.87.1611855457690;
+ Thu, 28 Jan 2021 09:37:37 -0800 (PST)
+MIME-Version: 1.0
+References: <trinity-a60ee120-32d0-42ed-a33e-d32076c36bad-1605624954082@3c-app-gmx-bap37>
+ <e21b9398-55d4-f4b3-527b-684703d88291@catskilltech.com> <20201117235218.73d18468@sil-mh8>
+ <20210128132735.GA10661@dhcp-0-146.brq.redhat.com>
+In-Reply-To: <20210128132735.GA10661@dhcp-0-146.brq.redhat.com>
+From: Martin Hosken <martin_hosken@sil.org>
+Date: Fri, 29 Jan 2021 00:37:25 +0700
+Message-ID: <CAHfoyqNBR6rHg_u7fv=Ao=CsPs4Kfi=puUTW39deXs-fZn8rnQ@mail.gmail.com>
+Subject: Re: PDF::API2::Basic::PDF::* modules license
+To: Petr Pisar <ppisar@redhat.com>
+Cc: Phil M Perry <phil4597@catskilltech.com>, Steve Simms <steve@deefs.net>, 
+	Alfred Reibenschuh <alfredreibenschuh@gmx.net>
+Authentication-Results: relay.mimecast.com;
+	dkim=pass header.d=sil.org header.s=google header.b=aNhfRTDE;
+	dmarc=pass (policy=none) header.from=sil.org;
+	spf=pass (relay.mimecast.com: domain of martin_hosken@sil.org designates 209.85.166.182 as permitted sender) smtp.mailfrom=martin_hosken@sil.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Impersonation-Protect: Policy=CLT - Impersonation Protection Definition;Similar Internal Domain=false;Similar Monitored External Domain=false;Custom External Domain=false;Mimecast External Domain=false;Newly Observed Domain=false;Internal User Name=false;Custom Display Name List=false;Reply-to Address Mismatch=false;Targeted Threat Dictionary=false;Mimecast Threat Dictionary=false;Custom Threat Dictionary=false
+Content-Type: multipart/alternative; boundary="000000000000fc4a0705b9f9572d"
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Status: RO
+Content-Length: 18045
+Lines: 448
+
+--000000000000fc4a0705b9f9572d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+    I, Martin Hosken, grant anybody a permission to use my PDF::API2 code
+    under the terms of MIT license.
+
+GB,
+Martin
+
+On Thu, 28 Jan 2021, 20:27 Petr Pisar, <ppisar@redhat.com> wrote:
+
+> On Tue, Nov 17, 2020 at 11:52:18PM +0700, Martin Hosken wrote:
+> > I'm happy to take recommendations on preferred licenses. I would also b=
+e
+> > happy to go all the way to MIT if that helps. Persuade me (not hard) an=
+d
+> > then I might ask someone else to do the work? I am no longer actively
+> > supporting this code.
+> >
+> First accept my appology for my silence.
+>
+> I'm glad you are willing to help us and to relicense your PDF::API2 code.
+> It's
+> indeed only a matter of sending us an e-mail message that you grant anybo=
+dy
+> permission to use that code under the new license. I can see you like MIT
+> license and that works for us. Current PDF::API2 maintainer would rather
+> see
+> LGPL, but that's not a show stopper for him.
+>
+> If you want to go with MIT license, just send as a text like this:
+>
+>     I, Martin Hosken, grant anybody a permission to use my PDF::API2 code
+>     under the terms of MIT license.
+>
+> If you want to go with LGPL license, then use a text like this:
+>
+>     I, Martin Hosken, grant anybody a permission to use my PDF::API2 code
+>     under the terms of the GNU Lesser General Public License version 2.1,
+> or
+>     any later version.
+>
+> You can simply reply to this e-mail. That's all we need from you. You
+> don't have
+> to make any commits or software releases anywhere.
+>
+> -- Petr
+>
+>
+> > > Does anyone have a contact for Ulrich Pfeifer (original author of
+> > > Matrix.pm)? Steve, did you get in touch with him already?
+> > >
+> > > If Martin and Ulrich are on board for the Basic/PDF/ routines and
+> > > Matrix.pm, that should do it (for conversion to LGPL) unless there's
+> > > some license statement lurking somewhere behind odd and obscure
+> language.
+> > >
+> > > Alfred: yeah, it's still moderately useful.  =F0=9F=98=81
+> > >
+> > > -------- Forwarded Message --------
+> > > Subject:    Aw: Fwd: PDF::API2::Basic::PDF::* modules license
+> > > Date:       Tue, 17 Nov 2020 15:55:54 +0100
+> > > From:       Alfred Reibenschuh <alfredreibenschuh@gmx.net>
+> > > To:         phil4597@catskilltech.com
+> > >
+> > >
+> > >
+> > > hello
+> > > yes, i can be considered as part of the circle of authors.
+> > > i give the permission to relicense all code in PDF::API2
+> > > orginating from me to LGPL version 2.1
+> > > i hope that my creation is still considered useful.
+> > > Alfred Reibenschuh (alfredreibenschuh@gmx.net)
+> > > yours,
+> > > Alfred Reibenschuh (alfredreibenschuh@gmx.net)
+> > > --
+> > > *Gesendet:* Freitag, 13. November 2020 um 01:57 Uhr
+> > > *Von:* "Phil M Perry" <phil4597@catskilltech.com>
+> > > *An:* "Alfred Reibenschuh" <alfredreibenschuh@gmx.net>
+> > > *Cc:* "Steve Simms" <steve@deefs.net>, Martin_Hosken@sil.org, "Petr
+> > > Pisar" <ppisar@redhat.com>
+> > > *Betreff:* Fwd: PDF::API2::Basic::PDF::* modules license
+> > >
+> > > Hi Alfred,
+> > >
+> > > I don't know if you count as an "author" for the purposes of this
+> > > discussion, but it might be good to get you in the loop as the
+> previous
+> > > PDF::API2 maintainer. The bottom line is that we may need to get
+> > > previous authors' permissions in order to change the licenses used in
+> > > PDF::API2 (and PDF::Builder, a fork) to be all LGPL. Martin is alread=
+y
+> > > on the discussion; I don't know if there's anyone else who should be
+> in
+> > > here. I'll have to look and see if there's an author listed for the
+> > > "same as Perl" module.
+> > >
+> > > Phil Perry (PDF::Builder owner)
+> > >
+> > > -------- Forwarded Message --------
+> > > Subject:    PDF::API2::Basic::PDF::* modules license
+> > > Date:       Wed, 11 Nov 2020 17:03:01 +0100
+> > > From:       Petr Pisar <ppisar@redhat.com>
+> > > To:         Martin_Hosken@sil.org
+> > > CC:         Steve Simms <steve@deefs.net>, Phil Perry <
+> phil4597@catskilltech.com>
+> > >
+> > >
+> > >
+> > > Hello,
+> > >
+> > > I found you are a copyright holder of various PDF::API2::Basic::PDF::=
+*
+> Perl
+> > > modules. E.g. lib/PDF/API2/Basic/PDF/Array.pm file from PDF-API2-2.03=
+8
+> > > software available at
+> > > <
+> https://cpan.metacpan.org/authors/id/S/SS/SSIMMS/PDF-API2-2.038.tar.gz>
+> > > reads:
+> > >
+> > >
+> #=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > #
+> > > # THIS IS A REUSED PERL MODULE, FOR PROPER LICENCING TERMS SEE BELOW:
+> > > #
+> > > # Copyright Martin Hosken <Martin_Hosken@sil.org>
+> > > #
+> > > # No warranty or expression of effectiveness, least of all regarding
+> > > # anyone's safety, is implied in this software or documentation.
+> > > #
+> > > # This specific module is licensed under the Perl Artistic License.
+> > > #
+> > >
+> #=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > >
+> > > If I understand it correctly, you refer to this license
+> > > <https://dev.perl.org/licenses/artistic.html>.
+> > >
+> > > The code (Array.pm, Bool.pm, Dict.pm, File.pm, Filter.pm, Name.pm,
+> Null.pm,
+> > > Number.pm, Objind.pm, Page.pm, Pages.pm, String.pm, and Utils.pm
+> files)
+> > > found
+> > > its way to PDF-API2 and PDF-Builder software distributions. Both usin=
+g
+> > > LGPLv2.1+ (GNU Lesser General Public License version 2.1 or later)
+> license.
+> > >
+> > > I'd like to distribute PDF-API2 and PDF-Builder including your files =
+in
+> > > a Fedora Linux distribution, but your Perl Artistic License possesses
+> an
+> > > issue
+> > > for me, Fedora, and probably for PDF-API2 and PDF-Builder maintainers
+> (CCed)
+> > > and their users.
+> > >
+> > > The problem with Perl Artistic License is that it is not, according t=
+o
+> Free
+> > > Software Foundation
+> > > <https://www.gnu.org/licenses/license-list.html#ArtisticLicense> and
+> Fedora
+> > > legal team <https://fedoraproject.org/wiki/Licensing:Main#Bad_License=
+s
+> >
+> > > author, compatible with (L)GPL. That prevents me from packaging the
+> software
+> > > for Fedora and puts other PDF-API2 and PDF-Builder users to a legal
+> risk.
+> > >
+> > > May I kindly ask you to relicense the code under a license compatible
+> with
+> > > LGPLv2.1 license? E.g. dual-licensing with GPL as Perl does
+> > > <https://dev.perl.org/licenses/> using this wordings:
+> > >
+> > > This library is free software; you can redistribute it
+> > > and/or modify it under the same terms as Perl itself.
+> > >
+> > > Or explicitly allowing LGPL, like:
+> > >
+> > > This specific module is licensed under the Perl Artistic License or
+> > > the GNU Lesser General Public License.
+> > >
+> > > would be great.
+> > >
+> > > Can you help us like that?
+> > >
+> > > -- Petr
+> >
+>
+
+--000000000000fc4a0705b9f9572d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><span style=3D"font-family:sans-serif;font-size:12.8px">=
+=C2=A0 =C2=A0 I, Martin Hosken, grant anybody a permission to use my PDF::A=
+PI2 code</span><br style=3D"font-family:sans-serif;font-size:12.8px"><span =
+style=3D"font-family:sans-serif;font-size:12.8px">=C2=A0 =C2=A0 under the t=
+erms of MIT license.</span><br><br><div data-smartmail=3D"gmail_signature">=
+GB,<br>Martin</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" cl=
+ass=3D"gmail_attr">On Thu, 28 Jan 2021, 20:27 Petr Pisar, &lt;<a href=3D"ma=
+ilto:ppisar@redhat.com">ppisar@redhat.com</a>&gt; wrote:<br></div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
+lid;padding-left:1ex">On Tue, Nov 17, 2020 at 11:52:18PM +0700, Martin Hosk=
+en wrote:<br>
+&gt; I&#39;m happy to take recommendations on preferred licenses. I would a=
+lso be<br>
+&gt; happy to go all the way to MIT if that helps. Persuade me (not hard) a=
+nd<br>
+&gt; then I might ask someone else to do the work? I am no longer actively<=
+br>
+&gt; supporting this code.<br>
+&gt; <br>
+First accept my appology for my silence.<br>
+<br>
+I&#39;m glad you are willing to help us and to relicense your PDF::API2 cod=
+e. It&#39;s<br>
+indeed only a matter of sending us an e-mail message that you grant anybody=
+<br>
+permission to use that code under the new license. I can see you like MIT<b=
+r>
+license and that works for us. Current PDF::API2 maintainer would rather se=
+e<br>
+LGPL, but that&#39;s not a show stopper for him.<br>
+<br>
+If you want to go with MIT license, just send as a text like this:<br>
+<br>
+=C2=A0 =C2=A0 I, Martin Hosken, grant anybody a permission to use my PDF::A=
+PI2 code<br>
+=C2=A0 =C2=A0 under the terms of MIT license.<br>
+<br>
+If you want to go with LGPL license, then use a text like this:<br>
+<br>
+=C2=A0 =C2=A0 I, Martin Hosken, grant anybody a permission to use my PDF::A=
+PI2 code<br>
+=C2=A0 =C2=A0 under the terms of the GNU Lesser General Public License vers=
+ion 2.1, or<br>
+=C2=A0 =C2=A0 any later version.<br>
+<br>
+You can simply reply to this e-mail. That&#39;s all we need from you. You d=
+on&#39;t have<br>
+to make any commits or software releases anywhere.<br>
+<br>
+-- Petr<br>
+<br>
+<br>
+&gt; &gt; Does anyone have a contact for Ulrich Pfeifer (original author of=
+ <br>
+&gt; &gt; Matrix.pm)? Steve, did you get in touch with him already?<br>
+&gt; &gt; <br>
+&gt; &gt; If Martin and Ulrich are on board for the Basic/PDF/ routines and=
+ <br>
+&gt; &gt; Matrix.pm, that should do it (for conversion to LGPL) unless ther=
+e&#39;s <br>
+&gt; &gt; some license statement lurking somewhere behind odd and obscure l=
+anguage.<br>
+&gt; &gt; <br>
+&gt; &gt; Alfred: yeah, it&#39;s still moderately useful.=C2=A0 =F0=9F=98=
+=81<br>
+&gt; &gt; <br>
+&gt; &gt; -------- Forwarded Message --------<br>
+&gt; &gt; Subject:=C2=A0 =C2=A0 Aw: Fwd: PDF::API2::Basic::PDF::* modules l=
+icense<br>
+&gt; &gt; Date:=C2=A0 =C2=A0 =C2=A0 =C2=A0Tue, 17 Nov 2020 15:55:54 +0100<b=
+r>
+&gt; &gt; From:=C2=A0 =C2=A0 =C2=A0 =C2=A0Alfred Reibenschuh &lt;<a href=3D=
+"mailto:alfredreibenschuh@gmx.net" target=3D"_blank" rel=3D"noreferrer">alf=
+redreibenschuh@gmx.net</a>&gt;<br>
+&gt; &gt; To:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:phil4597@c=
+atskilltech.com" target=3D"_blank" rel=3D"noreferrer">phil4597@catskilltech=
+.com</a><br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; hello<br>
+&gt; &gt; yes, i can be considered as part of the circle of authors.<br>
+&gt; &gt; i give the permission to relicense all code in PDF::API2<br>
+&gt; &gt; orginating from me=C2=A0to=C2=A0LGPL version 2.1<br>
+&gt; &gt; i hope that my creation is still considered useful.<br>
+&gt; &gt; Alfred Reibenschuh (<a href=3D"mailto:alfredreibenschuh@gmx.net" =
+target=3D"_blank" rel=3D"noreferrer">alfredreibenschuh@gmx.net</a>)<br>
+&gt; &gt; yours,<br>
+&gt; &gt; Alfred Reibenschuh (<a href=3D"mailto:alfredreibenschuh@gmx.net" =
+target=3D"_blank" rel=3D"noreferrer">alfredreibenschuh@gmx.net</a>)<br>
+&gt; &gt; --<br>
+&gt; &gt; *Gesendet:*=C2=A0Freitag, 13. November 2020 um 01:57 Uhr<br>
+&gt; &gt; *Von:*=C2=A0&quot;Phil M Perry&quot; &lt;<a href=3D"mailto:phil45=
+97@catskilltech.com" target=3D"_blank" rel=3D"noreferrer">phil4597@catskill=
+tech.com</a>&gt;<br>
+&gt; &gt; *An:*=C2=A0&quot;Alfred Reibenschuh&quot; &lt;<a href=3D"mailto:a=
+lfredreibenschuh@gmx.net" target=3D"_blank" rel=3D"noreferrer">alfredreiben=
+schuh@gmx.net</a>&gt;<br>
+&gt; &gt; *Cc:*=C2=A0&quot;Steve Simms&quot; &lt;<a href=3D"mailto:steve@de=
+efs.net" target=3D"_blank" rel=3D"noreferrer">steve@deefs.net</a>&gt;, <a h=
+ref=3D"mailto:Martin_Hosken@sil.org" target=3D"_blank" rel=3D"noreferrer">M=
+artin_Hosken@sil.org</a>, &quot;Petr <br>
+&gt; &gt; Pisar&quot; &lt;<a href=3D"mailto:ppisar@redhat.com" target=3D"_b=
+lank" rel=3D"noreferrer">ppisar@redhat.com</a>&gt;<br>
+&gt; &gt; *Betreff:*=C2=A0Fwd: PDF::API2::Basic::PDF::* modules license<br>
+&gt; &gt; <br>
+&gt; &gt; Hi Alfred,<br>
+&gt; &gt; <br>
+&gt; &gt; I don&#39;t know if you count as an &quot;author&quot; for the pu=
+rposes of this <br>
+&gt; &gt; discussion, but it might be good to get you in the loop as the pr=
+evious <br>
+&gt; &gt; PDF::API2 maintainer. The bottom line is that we may need to get =
+<br>
+&gt; &gt; previous authors&#39; permissions in order to change the licenses=
+ used in <br>
+&gt; &gt; PDF::API2 (and PDF::Builder, a fork) to be all LGPL. Martin is al=
+ready <br>
+&gt; &gt; on the discussion; I don&#39;t know if there&#39;s anyone else wh=
+o should be in <br>
+&gt; &gt; here. I&#39;ll have to look and see if there&#39;s an author list=
+ed for the <br>
+&gt; &gt; &quot;same as Perl&quot; module.<br>
+&gt; &gt; <br>
+&gt; &gt; Phil Perry (PDF::Builder owner)<br>
+&gt; &gt; <br>
+&gt; &gt; -------- Forwarded Message --------<br>
+&gt; &gt; Subject:=C2=A0 =C2=A0 PDF::API2::Basic::PDF::* modules license<br=
+>
+&gt; &gt; Date:=C2=A0 =C2=A0 =C2=A0 =C2=A0Wed, 11 Nov 2020 17:03:01 +0100<b=
+r>
+&gt; &gt; From:=C2=A0 =C2=A0 =C2=A0 =C2=A0Petr Pisar &lt;<a href=3D"mailto:=
+ppisar@redhat.com" target=3D"_blank" rel=3D"noreferrer">ppisar@redhat.com</=
+a>&gt;<br>
+&gt; &gt; To:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:Martin_Hos=
+ken@sil.org" target=3D"_blank" rel=3D"noreferrer">Martin_Hosken@sil.org</a>=
+<br>
+&gt; &gt; CC:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Steve Simms &lt;<a href=3D"m=
+ailto:steve@deefs.net" target=3D"_blank" rel=3D"noreferrer">steve@deefs.net=
+</a>&gt;, Phil Perry &lt;<a href=3D"mailto:phil4597@catskilltech.com" targe=
+t=3D"_blank" rel=3D"noreferrer">phil4597@catskilltech.com</a>&gt;<br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; Hello,<br>
+&gt; &gt; <br>
+&gt; &gt; I found you are a copyright holder of various PDF::API2::Basic::P=
+DF::* Perl<br>
+&gt; &gt; modules. E.g. lib/PDF/API2/Basic/PDF/Array.pm file from PDF-API2-=
+2.038<br>
+&gt; &gt; software available at<br>
+&gt; &gt; &lt;<a href=3D"https://cpan.metacpan.org/authors/id/S/SS/SSIMMS/P=
+DF-API2-2.038.tar.gz" rel=3D"noreferrer noreferrer" target=3D"_blank">https=
+://cpan.metacpan.org/authors/id/S/SS/SSIMMS/PDF-API2-2.038.tar.gz</a>&gt;<b=
+r>
+&gt; &gt; reads:<br>
+&gt; &gt; <br>
+&gt; &gt; #=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+<br>
+&gt; &gt; #<br>
+&gt; &gt; # THIS IS A REUSED PERL MODULE, FOR PROPER LICENCING TERMS SEE BE=
+LOW:<br>
+&gt; &gt; #<br>
+&gt; &gt; # Copyright Martin Hosken &lt;<a href=3D"mailto:Martin_Hosken@sil=
+.org" target=3D"_blank" rel=3D"noreferrer">Martin_Hosken@sil.org</a>&gt;<br=
+>
+&gt; &gt; #<br>
+&gt; &gt; # No warranty or expression of effectiveness, least of all regard=
+ing<br>
+&gt; &gt; # anyone&#39;s safety, is implied in this software or documentati=
+on.<br>
+&gt; &gt; #<br>
+&gt; &gt; # This specific module is licensed under the Perl Artistic Licens=
+e.<br>
+&gt; &gt; #<br>
+&gt; &gt; #=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+<br>
+&gt; &gt; <br>
+&gt; &gt; If I understand it correctly, you refer to this license<br>
+&gt; &gt; &lt;<a href=3D"https://dev.perl.org/licenses/artistic.html" rel=
+=3D"noreferrer noreferrer" target=3D"_blank">https://dev.perl.org/licenses/=
+artistic.html</a>&gt;.<br>
+&gt; &gt; <br>
+&gt; &gt; The code (Array.pm, Bool.pm, Dict.pm, File.pm, Filter.pm, Name.pm=
+, Null.pm,<br>
+&gt; &gt; Number.pm, Objind.pm, Page.pm, Pages.pm, String.pm, and Utils.pm =
+files) <br>
+&gt; &gt; found<br>
+&gt; &gt; its way to PDF-API2 and PDF-Builder software distributions. Both =
+using<br>
+&gt; &gt; LGPLv2.1+ (GNU Lesser General Public License version 2.1 or later=
+) license.<br>
+&gt; &gt; <br>
+&gt; &gt; I&#39;d like to distribute PDF-API2 and PDF-Builder including you=
+r files in<br>
+&gt; &gt; a Fedora Linux distribution, but your Perl Artistic License posse=
+sses an <br>
+&gt; &gt; issue<br>
+&gt; &gt; for me, Fedora, and probably for PDF-API2 and PDF-Builder maintai=
+ners (CCed)<br>
+&gt; &gt; and their users.<br>
+&gt; &gt; <br>
+&gt; &gt; The problem with Perl Artistic License is that it is not, accordi=
+ng to Free<br>
+&gt; &gt; Software Foundation<br>
+&gt; &gt; &lt;<a href=3D"https://www.gnu.org/licenses/license-list.html#Art=
+isticLicense" rel=3D"noreferrer noreferrer" target=3D"_blank">https://www.g=
+nu.org/licenses/license-list.html#ArtisticLicense</a>&gt; and Fedora<br>
+&gt; &gt; legal team &lt;<a href=3D"https://fedoraproject.org/wiki/Licensin=
+g:Main#Bad_Licenses" rel=3D"noreferrer noreferrer" target=3D"_blank">https:=
+//fedoraproject.org/wiki/Licensing:Main#Bad_Licenses</a>&gt;<br>
+&gt; &gt; author, compatible with (L)GPL. That prevents me from packaging t=
+he software<br>
+&gt; &gt; for Fedora and puts other PDF-API2 and PDF-Builder users to a leg=
+al risk.<br>
+&gt; &gt; <br>
+&gt; &gt; May I kindly ask you to relicense the code under a license compat=
+ible with<br>
+&gt; &gt; LGPLv2.1 license? E.g. dual-licensing with GPL as Perl does<br>
+&gt; &gt; &lt;<a href=3D"https://dev.perl.org/licenses/" rel=3D"noreferrer =
+noreferrer" target=3D"_blank">https://dev.perl.org/licenses/</a>&gt; using =
+this wordings:<br>
+&gt; &gt; <br>
+&gt; &gt; This library is free software; you can redistribute it<br>
+&gt; &gt; and/or modify it under the same terms as Perl itself.<br>
+&gt; &gt; <br>
+&gt; &gt; Or explicitly allowing LGPL, like:<br>
+&gt; &gt; <br>
+&gt; &gt; This specific module is licensed under the Perl Artistic License =
+or<br>
+&gt; &gt; the GNU Lesser General Public License.<br>
+&gt; &gt; <br>
+&gt; &gt; would be great.<br>
+&gt; &gt; <br>
+&gt; &gt; Can you help us like that?<br>
+&gt; &gt; <br>
+&gt; &gt; -- Petr<br>
+&gt; <br>
+</blockquote></div>
+
+--000000000000fc4a0705b9f9572d--
+
+

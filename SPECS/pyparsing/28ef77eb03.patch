@@ -1,0 +1,32 @@
+From 28ef77eb0392ec592a0a22a770a95ef9405c9ef1 Mon Sep 17 00:00:00 2001
+From: ptmcg <ptmcg@austin.rr.com>
+Date: Mon, 17 Mar 2025 21:28:43 -0500
+Subject: [PATCH] Rewrite to remove return from finally block (Issue #578)
+
+---
+ pyparsing/core.py     | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/pyparsing/core.py b/pyparsing/core.py
+index 2b38b966..c22346f4 100644
+--- a/pyparsing/core.py
++++ b/pyparsing/core.py
+@@ -5767,14 +5766,15 @@ def _generateDefaultName(self) -> str:
+         self._defaultName = ": ..."
+ 
+         # Use the string representation of main expression.
+-        retString = "..."
+         try:
+             if self.expr is not None:
+                 retString = str(self.expr)[:1000]
+             else:
+                 retString = "None"
+-        finally:
+-            return f"{type(self).__name__}: {retString}"
++        except Exception:
++            retString = "..."
++
++        return f"{type(self).__name__}: {retString}"
+ 
+     def copy(self) -> ParserElement:
+         if self.expr is not None:

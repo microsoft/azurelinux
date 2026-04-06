@@ -1,0 +1,366 @@
+From f5e74db1b5245814d5993b6b16d58274ca8b89ab Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:42:49 +0200
+Subject: [PATCH 13/15] Document QGtk3Storage
+
+Add internal documentation to header and implementation of
+QGtk3Storage
+---
+ .../platformthemes/gtk3/qgtk3storage.cpp      | 231 +++++++++++++++---
+ .../platformthemes/gtk3/qgtk3storage_p.h      |   1 +
+ 2 files changed, 193 insertions(+), 39 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 0b6b8e8523..7775ac66e4 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -24,7 +24,26 @@ QGtk3Storage::QGtk3Storage()
+     populateMap();
+ }
+ 
+-// Set a brush from a source and resolve recursions
++/*!
++    \internal
++    \enum QGtk3Storage::SourceType
++    \brief This enum represents the type of a color source.
++
++    \value Gtk Color is read from a GTK widget
++    \value Fixed A fixed brush is specified
++    \value Modified The color is a modification of another color (fixed or read from GTK)
++    \omitvalue Invalid
++ */
++
++/*!
++    \internal
++    \brief Find a brush from a source.
++
++    Returns a QBrush from a given \param source and a \param map of available brushes
++    to search from.
++
++    A null QBrush is returned, if no brush corresponding to the source has been found.
++ */
+ QBrush QGtk3Storage::brush(const Source &source, const BrushMap &map) const
+ {
+     switch (source.sourceType) {
+@@ -64,7 +83,14 @@ QBrush QGtk3Storage::brush(const Source &source, const BrushMap &map) const
+     Q_UNREACHABLE();
+ }
+ 
+-// Find source for a recursion and take dark/light/unknown into consideration
++/*!
++    \internal
++    \brief Recurse to find a source brush for modification.
++
++    Returns the source specified by the target brush \param b in the \param map of brushes.
++    Takes dark/light/unknown into consideration.
++    Returns an empty brush if no suitable one can be found.
++ */
+ QGtk3Storage::Source QGtk3Storage::brush(const TargetBrush &b, const BrushMap &map) const
+ {
+ #define FIND(brush) if (map.contains(brush))\
+@@ -88,7 +114,16 @@ QGtk3Storage::Source QGtk3Storage::brush(const TargetBrush &b, const BrushMap &m
+ #undef FIND
+ }
+ 
+-// Create a simple standard palette
++/*!
++    \internal
++    \brief Returns a simple, hard coded base palette.
++
++    Create a hard coded palette with default colors as a fallback for any color that can't be
++    obtained from GTK.
++
++    \note This palette will be used as a default baseline for the system palette, which then
++    will be used as a default baseline for any other palette type.
++ */
+ QPalette QGtk3Storage::standardPalette()
+ {
+     QColor backgroundColor(0xd4, 0xd0, 0xc8);
+@@ -105,7 +140,13 @@ QPalette QGtk3Storage::standardPalette()
+     return palette;
+ }
+ 
+-// Deliver a palette styled according to the current GTK Theme
++/*!
++    \internal
++    \brief Return a GTK styled QPalette.
++
++    Returns the pointer to a (cached) QPalette for \param type, with its brushes
++    populated according to the current GTK theme.
++ */
+ const QPalette *QGtk3Storage::palette(QPlatformTheme::Palette type) const
+ {
+     if (type >= QPlatformTheme::NPalettes)
+@@ -160,6 +201,12 @@ const QPalette *QGtk3Storage::palette(QPlatformTheme::Palette type) const
+     return &m_paletteCache[type].value();
+ }
+ 
++/*!
++    \internal
++    \brief Return a GTK styled font.
++
++    Returns a QFont of \param type, styled according to the current GTK theme.
++*/
+ const QFont *QGtk3Storage::font(QPlatformTheme::Font type) const
+ {
+     if (m_fontCache[type].has_value())
+@@ -169,6 +216,13 @@ const QFont *QGtk3Storage::font(QPlatformTheme::Font type) const
+     return &m_fontCache[type].value();
+ }
+ 
++/*!
++    \internal
++    \brief Return a GTK styled standard pixmap if available.
++
++    Returns a pixmap specified by \param standardPixmap and \param size.
++    Returns an empty pixmap if GTK doesn't support the requested one.
++ */
+ QPixmap QGtk3Storage::standardPixmap(QPlatformTheme::StandardPixmap standardPixmap,
+                                      const QSizeF &size) const
+ {
+@@ -186,11 +240,19 @@ QPixmap QGtk3Storage::standardPixmap(QPlatformTheme::StandardPixmap standardPixm
+     return QPixmap::fromImage(image.scaled(size.toSize()));
+ }
+ 
++/*!
++    \internal
++    \brief Returns a GTK styled file icon corresponding to \param fileInfo.
++ */
+ QIcon QGtk3Storage::fileIcon(const QFileInfo &fileInfo) const
+ {
+     return m_interface ? m_interface->fileIcon(fileInfo) : QIcon();
+ }
+ 
++/*!
++    \internal
++    \brief Clears all caches.
++ */
+ void QGtk3Storage::clear()
+ {
+     m_appearance = Qt::Appearance::Unknown;
+@@ -202,6 +264,13 @@ void QGtk3Storage::clear()
+         cache.reset();
+ }
+ 
++/*!
++    \internal
++    \brief Handles a theme change at runtime.
++
++    Clear all caches, re-populate with current GTK theme and notify the window system interface.
++    This method is a callback for the theme change signal sent from GTK.
++ */
+ void QGtk3Storage::handleThemeChange()
+ {
+     clear();
+@@ -209,6 +278,54 @@ void QGtk3Storage::handleThemeChange()
+     QWindowSystemInterface::handleThemeChange(nullptr);
+ }
+ 
++/*!
++    \internal
++    \brief Populates a map with information about how to locate colors in GTK.
++
++    This method creates a data structure to locate color information for each brush of a QPalette
++    within GTK. The structure can hold mapping information for each QPlatformTheme::Palette
++    enum value. If no specific mapping is stored for an enum value, the system palette is returned
++    instead of a specific one. If no mapping is stored for the system palette, it will fall back to
++    QGtk3Storage::standardPalette.
++
++    The method will populate the data structure with a standard mapping, covering the following
++    palette types:
++    \list
++    \li QPlatformTheme::SystemPalette
++    \li QPlatformTheme::CheckBoxPalette
++    \li QPlatformTheme::RadioButtonPalette
++    \li QPlatformTheme::ComboBoxPalette
++    \li QPlatformTheme::GroupBoxPalette
++    \li QPlatformTheme::MenuPalette
++    \li QPlatformTheme::TextLineEditPalette
++    \endlist
++
++    The method will check the environment variable {{QT_GUI_GTK_JSON_SAVE}}. If it points to a
++    valid path with write access, it will write the standard mapping into a Json file.
++    That Json file can be modified and/or extended.
++    The Json syntax is
++    - "QGtk3Palettes" (top level value)
++        - QPlatformTheme::Palette
++            - QPalette::ColorRole
++                - Qt::Appearance
++                - Qt::ColorGroup
++                - Source data
++                    - Source Type
++                        - [source data]
++
++    If the environment variable {{QT_GUI_GTK_JSON_HARDCODED}} contains the keyword \c true,
++    all sources are converted to fixed sources. In that case, they contain the hard coded HexRGBA
++    values read from GTK.
++
++    The method will also check the environment variable {{QT_GUI_GTK_JSON}}. If it points to a valid
++    Json file with read access, it will be parsed instead of creating a standard mapping.
++    Parsing errors will be printed out with qCInfo if the logging category {{qt.qpa.gtk}} is activated.
++    In case of a parsing error, the method will fall back to creating a standard mapping.
++
++    \note
++    If a Json file contains only fixed brushes (e.g. exported with {{QT_GUI_GTK_JSON_HARDCODED=true}}),
++    no colors will be imported from GTK.
++ */
+ void QGtk3Storage::populateMap()
+ {
+     static QString m_themeName;
+@@ -248,6 +365,15 @@ void QGtk3Storage::populateMap()
+         qWarning() << "File" << jsonOutput << "could not be saved.\n";
+ }
+ 
++/*!
++    \internal
++    \brief Return a palette map for saving.
++
++    This method returns the existing palette map, if the environment variable
++    {{QT_GUI_GTK_JSON_HARDCODED}} is not set or does not contain the keyword \c true.
++    If it contains the keyword \c true, it returns a palette map with all brush
++    sources converted to fixed sources.
++ */
+ const QGtk3Storage::PaletteMap QGtk3Storage::savePalettes() const
+ {
+     const QString hard = qEnvironmentVariable("QT_GUI_GTK_JSON_HARDCODED");
+@@ -282,21 +408,50 @@ const QGtk3Storage::PaletteMap QGtk3Storage::savePalettes() const
+     return map;
+ }
+ 
++/*!
++    \internal
++    \brief Saves current palette mapping to a \param filename with Json format \param f.
++
++    Saves the current palette mapping into a QJson file,
++    taking {{QT_GUI_GTK_JSON_HARDCODED}} into consideration.
++    Returns \c true if saving was successful and \c false otherwise.
++ */
+ bool QGtk3Storage::save(const QString &filename, QJsonDocument::JsonFormat f) const
+ {
+     return QGtk3Json::save(savePalettes(), filename, f);
+ }
+ 
++/*!
++    \internal
++    \brief Returns a QJsonDocument with current palette mapping.
++
++    Saves the current palette mapping into a QJsonDocument,
++    taking {{QT_GUI_GTK_JSON_HARDCODED}} into consideration.
++    Returns \c true if saving was successful and \c false otherwise.
++ */
+ QJsonDocument QGtk3Storage::save() const
+ {
+     return QGtk3Json::save(savePalettes());
+ }
+ 
++/*!
++    \internal
++    \brief Loads palette mapping from Json file \param filename.
++
++    Returns \c true if the file was successfully parsed and \c false otherwise.
++ */
+ bool QGtk3Storage::load(const QString &filename)
+ {
+     return QGtk3Json::load(m_palettes, filename);
+ }
+ 
++/*!
++    \internal
++    \brief Creates a standard palette mapping.
++
++    The method creates a hard coded standard mapping, used if no external Json file
++    containing a valid mapping has been specified in the environment variable {{QT_GUI_GTK_JSON}}.
++ */
+ void QGtk3Storage::createMapping()
+ {
+     // Hard code standard mapping
+@@ -332,41 +487,39 @@ void QGtk3Storage::createMapping()
+ #define CLEAR map.clear()
+ 
+     /*
+-     *  Macro ussage:
+-     *
+-     *  1. Define a source
+-     *
+-     *  GTK(QGtkWidget, QGtkColorSource, GTK_STATE_FLAG)
+-     *  Fetch the color from a GtkWidget, related to a source and a state.
+-     *
+-     *  LIGHTER(ColorGroup, ColorROle, lighter)
+-     *  Use a color of the same QPalette related to ColorGroup and ColorRole.
+-     *  Make the color lighter (if lighter >100) or darker (if lighter < 100)
+-     *
+-     *  MODIFY(ColorGroup, ColorRole, red, green, blue)
+-     *  Use a color of the same QPalette related to ColorGroup and ColorRole.
+-     *  Modify it by adding red, green, blue.
+-     *
+-     *  FIX(const QBrush &)
+-     *  Use a fixed brush without querying GTK
+-     *
+-     *  2. Define the target
+-     *
+-     *  Use ADD(ColorGroup, ColorRole) to use the defined source for the
+-     *  color group / role in the current palette.
+-     *
+-     *  Use ADD(ColorGroup, ColorRole, Appearance) to use the defined source
+-     *  only for a specific appearance
+-     *
+-     *  3. Save mapping
+-     *  Save the defined mappings for a specific palette.
+-     *  If a mapping entry does not cover all color groups and roles of a palette,
+-     *  the system palette will be used for the remaining values.
+-     *  If the system palette does not have all combination of color groups and roles,
+-     *  the remaining ones will be populated by a hard coded fusion-style like palette.
+-     *
+-     *  4. Clear mapping
+-     *  Use CLEAR to clear the mapping and begin a new one.
++       Macro usage:
++
++       1. Define a source
++       GTK(QGtkWidget, QGtkColorSource, GTK_STATE_FLAG)
++       Fetch the color from a GtkWidget, related to a source and a state.
++
++       LIGHTER(ColorGroup, ColorROle, lighter)
++       Use a color of the same QPalette related to ColorGroup and ColorRole.
++       Make the color lighter (if lighter >100) or darker (if lighter < 100)
++
++       MODIFY(ColorGroup, ColorRole, red, green, blue)
++       Use a color of the same QPalette related to ColorGroup and ColorRole.
++       Modify it by adding red, green, blue.
++
++       FIX(const QBrush &)
++       Use a fixed brush without querying GTK
++
++       2. Define the target
++       Use ADD(ColorGroup, ColorRole) to use the defined source for the
++       color group / role in the current palette.
++
++       Use ADD(ColorGroup, ColorRole, Appearance) to use the defined source
++       only for a specific appearance
++
++       3. Save mapping
++       Save the defined mappings for a specific palette.
++       If a mapping entry does not cover all color groups and roles of a palette,
++       the system palette will be used for the remaining values.
++       If the system palette does not have all combination of color groups and roles,
++       the remaining ones will be populated by a hard coded fusion-style like palette.
++
++       4. Clear mapping
++       Use CLEAR to clear the mapping and begin a new one.
+      */
+ 
+ 
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage_p.h b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+index 57f6aeea96..af628d49ff 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+@@ -33,6 +33,7 @@ class QGtk3Storage
+ public:
+     QGtk3Storage();
+ 
++    // Enum documented in cpp file. Please keep it in line with updates made here.
+     enum class SourceType {
+         Gtk,
+         Fixed,
+-- 
+2.41.0
+

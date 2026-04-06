@@ -1,0 +1,72 @@
+From 67620805316e85b4edf6133a106181a4b4c8afac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Thu, 22 Jan 2026 10:55:45 +0100
+Subject: [PATCH] Fix segfault when interrupting fapolicyd startup
+Content-type: text/plain
+
+In non-daemon mode, hitting Ctrl-C while fapolicyd initializes leads to
+getting 2 segfaults:
+- first one in term_handler() because 'q' is not initialized yet
+- then one in coredump_handler() because 'm' is not initialized yet
+
+Reproducer:
+~~~
+ # fapolicyd --debug
+ [...]
+ 01/22/26 10:48:37 [ INFO ]: Loading rpmdb backend
+ ^CSegmentation fault (core dumped)
+~~~
+
+GDB shows:
+~~~
+(gdb) bt
+ #0  mlist_first (m=m@entry=0x0) at daemon/mounts.c:86  <<<<< SECOND SEGFAULT
+ #1  0x00005627e02de9ec in unmark_fanotify (m=0x0) at daemon/notify.c:258
+ #2  0x00005627e02dda13 in coredump_handler (sig=11) at daemon/fapolicyd.c:336
+ #3  coredump_handler (sig=11) at daemon/fapolicyd.c:333
+ #4  <signal handler called>
+ #5  __new_sem_post (sem=0x20) at sem_post.c:36         <<<<< FIRST SEGFAULT
+ #6  <signal handler called>
+ #7  __recvmsg_syscall (flags=0, msg=0x7ffe93e00350, fd=6) at ../sysdeps/unix/sysv/linux/recvmsg.c:27
+ #8  __libc_recvmsg (fd=6, msg=msg@entry=0x7ffe93e00350, flags=flags@entry=0)
+     at ../sysdeps/unix/sysv/linux/recvmsg.c:41
+ #9  0x00005627e02eef82 in rpm_load_list (conf=<optimized out>) at library/rpm-backend.c:260
+ #10 0x00005627e02ecc02 in backend_load (conf=conf@entry=0x5627e02fa0e0 <config>) at library/backend-manager.c:152
+ #11 0x00005627e02e21c0 in init_database (config=config@entry=0x5627e02fa0e0 <config>) at library/database.c:1440
+ #12 0x00005627e02db599 in main (argc=<optimized out>, argv=<optimized out>) at daemon/fapolicyd.c:1053
+~~~
+---
+ src/daemon/notify.c | 3 +++
+ src/library/queue.c | 3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/daemon/notify.c b/src/daemon/notify.c
+index 8e1e778cb8c8..db6fb72e01ac 100644
+--- a/src/daemon/notify.c
++++ b/src/daemon/notify.c
+@@ -255,6 +255,9 @@ void fanotify_update(mlist *m)
+ 
+ void unmark_fanotify(mlist *m)
+ {
++	if (m == NULL)
++		return;
++
+ 	const char *path = mlist_first(m);
+ 
+ 	// Stop the flow of events
+diff --git a/src/library/queue.c b/src/library/queue.c
+index c82026439923..6236d0096c80 100644
+--- a/src/library/queue.c
++++ b/src/library/queue.c
+@@ -236,6 +236,7 @@ int q_timed_dequeue(struct queue *q, struct fanotify_event_metadata *data,
+ 
+ void q_shutdown(struct queue *q)
+ {
++	if (q == NULL)
++		return;
+ 	sem_post(&q->sem);
+ }
+-
+-- 
+2.52.0
+

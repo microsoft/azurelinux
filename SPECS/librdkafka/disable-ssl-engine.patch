@@ -1,0 +1,24 @@
+diff -up librdkafka-2.4.0/mklove/modules/configure.libssl.orig librdkafka-2.4.0/mklove/modules/configure.libssl
+--- librdkafka-2.4.0/mklove/modules/configure.libssl.orig	2024-05-27 09:24:27.753113899 +0200
++++ librdkafka-2.4.0/mklove/modules/configure.libssl	2024-05-27 09:25:53.958955299 +0200
+@@ -16,7 +16,7 @@
+ # SSL that is the feature, not crypto.
+ 
+ mkl_toggle_option "Feature" ENABLE_SSL "--enable-ssl" "Enable SSL support" "try"
+-
++mkl_toggle_option "Feature" ENABLE_SSL_ENGINE "--enable-ssl-engine" "Enable SSL support" "y"
+ 
+ function manual_checks {
+     case "$ENABLE_SSL" in
+diff -up librdkafka-2.4.0/src/rdkafka_conf.h.orig librdkafka-2.4.0/src/rdkafka_conf.h
+--- librdkafka-2.4.0/src/rdkafka_conf.h.orig	2024-05-27 09:24:25.329090240 +0200
++++ librdkafka-2.4.0/src/rdkafka_conf.h	2024-05-27 09:25:02.428452354 +0200
+@@ -32,7 +32,7 @@
+ #include "rdlist.h"
+ #include "rdkafka_cert.h"
+ 
+-#if WITH_SSL && OPENSSL_VERSION_NUMBER >= 0x10100000 &&                        \
++#if WITH_SSL && OPENSSL_VERSION_NUMBER >= 0x10100000 && ENABLE_SSL_ENGINE &&            \
+     !defined(OPENSSL_IS_BORINGSSL)
+ #define WITH_SSL_ENGINE 1
+ /* Deprecated in OpenSSL 3 */

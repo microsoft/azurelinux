@@ -1,0 +1,26 @@
+From 2c8231f03987daaf9524f9568884a7b296480b32 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Thu, 17 Jul 2025 09:50:35 +0200
+Subject: [PATCH] Fedora 43 removes some symbolic links
+
+See https://fedoraproject.org/wiki/Changes/dropingOfCertPemFile
+---
+ src/pip/_vendor/truststore/_openssl.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/pip/_vendor/truststore/_openssl.py b/src/pip/_vendor/truststore/_openssl.py
+index 9951cf7..3e25a56 100644
+--- a/src/pip/_vendor/truststore/_openssl.py
++++ b/src/pip/_vendor/truststore/_openssl.py
+@@ -6,8 +6,10 @@
+ 
+ # candidates based on https://github.com/tiran/certifi-system-store by Christian Heimes
+ _CA_FILE_CANDIDATES = [
+-    # Alpine, Arch, Fedora 34+, OpenWRT, RHEL 9+, BSD
++    # Alpine, Arch, Fedora 34-42, OpenWRT, RHEL 9-10, BSD
+     "/etc/ssl/cert.pem",
++    # Fedora 43+, RHEL 11+
++    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+     # Fedora <= 34, RHEL <= 9, CentOS <= 9
+     "/etc/pki/tls/cert.pem",
+     # Debian, Ubuntu (requires ca-certificates)

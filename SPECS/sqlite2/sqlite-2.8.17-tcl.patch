@@ -1,0 +1,28 @@
+Address problem using sqlite2 with Tcl-8.5
+Based on sqlite2-tcl.diff from OpenSuSE sqlite2-2.8.17-166.3.src.rpm
+diff -up sqlite-2.8.17/configure.ac.orig sqlite-2.8.17/configure.ac
+--- sqlite-2.8.17/configure.ac.orig
++++ sqlite-2.8.17/configure.ac
+@@ -432,7 +432,7 @@
+   else 
+     LIBS=""
+     AC_SEARCH_LIBS(Tcl_Init, dnl
+-        tcl8.4 tcl8.3 tcl84 tcl83 tcl,,,$otherlibs)
++        tcl8.6 tcl8.5 tcl8.4 tcl8.3 tcl84 tcl83 tcl,,,$otherlibs)
+   fi
+   TARGET_TCL_LIBS="$LIBS $otherlibs"
+ fi
+diff -up sqlite-2.8.17/src/tclsqlite.c.orig sqlite-2.8.17/src/tclsqlite.c
+--- sqlite-2.8.17/src/tclsqlite.c.orig
++++ sqlite-2.8.17/src/tclsqlite.c
+@@ -1231,6 +1231,10 @@
+   Tcl_Interp *interp;
+   Tcl_FindExecutable(argv[0]);
+   interp = Tcl_CreateInterp();
++  if (Tcl_Init(interp) == TCL_ERROR) {
++      fprintf(stderr,"%s\n",
++	      Tcl_GetVar(interp, "errorInfo", TCL_GLOBAL_ONLY));
++  }
+   Libsqlite_Init(interp);
+   if( argc>=2 ){
+     int i;

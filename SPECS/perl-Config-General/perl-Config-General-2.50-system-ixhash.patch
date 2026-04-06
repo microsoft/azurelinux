@@ -1,0 +1,14 @@
+diff -ur Config-General-2.61.org/t/run.t Config-General-2.61/t/run.t
+--- Config-General-2.61.org/t/run.t	2016-04-18 06:57:15.000000000 -0600
++++ Config-General-2.61/t/run.t	2016-04-19 09:54:33.644572959 -0600
+@@ -14,7 +14,9 @@
+ # ahem, we deliver the test code with a local copy of
+ # the Tie::IxHash module so we can do tests on sorted
+ # hashes without dependency to Tie::IxHash.
+-use lib qw(t);
++#
++# ahem, in this rpm we don't (we want to test with the system installed one)
++#use lib qw(t);
+ use Tie::IxHash;
+ my @WARNINGS_FOUND;
+ BEGIN {

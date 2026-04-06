@@ -1,0 +1,5 @@
+#%PAM-1.0
+# This tool only uses the password stack.
+password   substack	system-auth
+-password   optional	pam_gnome_keyring.so use_authtok
+password   substack	postlogin

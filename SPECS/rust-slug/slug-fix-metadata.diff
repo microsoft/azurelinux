@@ -1,0 +1,21 @@
+--- slug-0.1.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ slug-0.1.6/Cargo.toml	2024-09-17T21:07:45.667828+00:00
+@@ -31,18 +31,6 @@
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/Stebalien/slug-rs"
+ 
+-[lib]
+-name = "slug"
+-crate-type = [
+-    "cdylib",
+-    "rlib",
+-]
+-path = "src/lib.rs"
+-
+-[[bench]]
+-name = "main"
+-path = "benches/main.rs"
+-
+ [dependencies.deunicode]
+ version = "1"
+ 

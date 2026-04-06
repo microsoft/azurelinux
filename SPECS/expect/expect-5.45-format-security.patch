@@ -1,0 +1,13 @@
+--- exp_clib.c.orig	2017-03-24 10:34:37.269183513 -0400
++++ exp_clib.c	2017-03-24 10:34:41.171117943 -0400
+@@ -1938,8 +1938,8 @@
+      char *str;
+ {
+   if (exp_is_debugging) {
+-    fprintf(stderr,str);
+-    if (exp_logfile) fprintf(exp_logfile,str);
++    fprintf(stderr, "%s", str);
++    if (exp_logfile) fprintf(exp_logfile, "%s", str);
+   }
+ }
+ 

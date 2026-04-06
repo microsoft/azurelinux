@@ -1,0 +1,42 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 19 Apr 2017 22:12:46 +0200
+Subject: Fix tbl font parsing
+
+The printf.1posix man page contains tbl table that looks like this:
+.TS
+lf5 | lf5 | lf7.
+_
+9999999999@2147483647@printf: "9999999999" arithmetic overflow
+.TE
+
+While parsing the last 'f' from the header line man2html used to ignore
+all the characters until the next space. Unfortunately this included
+the '.' (dot) that ends the header. As a result man2html considered the
+table data lines as being part of the header and thus set the length
+of cells to 9999999999 and 2147483647 characters. Finally it tried to
+display such an unreasonable number of &nbsp; entities, what make it
+to appear to hang...
+
+To fix the issue make sure the trailing dot is not ignored while parsing
+'f' or 'F' specifiers of tbl header.
+
+Bugs-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/man2html/+bug/1666067
+---
+ man2html/man2html.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 8c4db71..9da6d19 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -902,8 +902,8 @@ static char *scan_format(char *c, TABLEROW **result, int *maxcol)
+ 	case 'f': case 'F':
+ 	    c++;
+ 	    curfield->font = toupper(*c);
+-	    c++;
+-	    if (!isspace(*c)) c++;
++	    if (*c != '.') c++;
++	    if (*c != '.' && !isspace(*c)) c++;
+ 	    break;
+ 	case 't': case 'T': curfield->valign='t'; c++; break;
+ 	case 'p': case 'P':

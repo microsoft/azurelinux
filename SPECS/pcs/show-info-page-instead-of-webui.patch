@@ -1,0 +1,148 @@
+From e7fa056f582c992d3d2b289911be20440fb839ac Mon Sep 17 00:00:00 2001
+From: Ivan Devat <idevat@redhat.com>
+Date: Tue, 5 Nov 2024 16:35:02 +0100
+Subject: [PATCH 1/2] show info page instead of webui
+
+---
+ pcs/Makefile.am                      |  1 +
+ pcs/daemon/app/webui_info_handler.py | 31 ++++++++++++++++++++++++++++
+ pcs/daemon/run.py                    |  4 +++-
+ pcs_test/smoke.sh.in                 |  4 ++--
+ pcsd/public/ui_instructions.html     | 24 ++++++++++-----------
+ 5 files changed, 48 insertions(+), 16 deletions(-)
+ create mode 100644 pcs/daemon/app/webui_info_handler.py
+
+diff --git a/pcs/Makefile.am b/pcs/Makefile.am
+index 1297473ff..8d4b93073 100644
+--- a/pcs/Makefile.am
++++ b/pcs/Makefile.am
+@@ -219,6 +219,7 @@ EXTRA_DIST		= \
+ 			  daemon/app/webui/core.py \
+ 			  daemon/app/webui/session.py \
+ 			  daemon/app/webui/sinatra_ui.py \
++			  daemon/app/webui_info_handler.py \
+ 			  daemon/async_tasks/__init__.py \
+ 			  daemon/async_tasks/scheduler.py \
+ 			  daemon/async_tasks/task.py \
+diff --git a/pcs/daemon/app/webui_info_handler.py b/pcs/daemon/app/webui_info_handler.py
+new file mode 100644
+index 000000000..3ab8275bf
+--- /dev/null
++++ b/pcs/daemon/app/webui_info_handler.py
+@@ -0,0 +1,31 @@
++from pcs.daemon.app.common import (
++    BaseHandler,
++    RoutesType,
++)
++
++
++class _WebuiInfoHandler(BaseHandler):
++    __path = None
++
++    def initialize(self, path):
++        self.__path = path
++
++    def get(self):
++        self.set_status(404)
++        self.render(self.__path)
++
++
++def get_routes(path: str) -> RoutesType:
++    return [
++        # The following two rules can be compressed into one: r"/(ui/?)?".
++        # However, the content of the parentheses used here should be captured
++        # and passed in to the handler’s get method as an argument.
++        # Unfortunately, it seems that tornado version 6.4.1 don't pass this
++        # argument (unlike version 6.3.3). Maybe it's a bug (it needs further
++        # inspection). These rules are a safe way to avoid surprises.
++        # Moreover, the captured parameter is irrelevant to the functionality
++        # of the handler.
++        (r"/", _WebuiInfoHandler, dict(path=path)),
++        (r"/ui/?", _WebuiInfoHandler, dict(path=path)),
++        (r"/ui/.*", _WebuiInfoHandler, dict(path=path)),
++    ]
+diff --git a/pcs/daemon/run.py b/pcs/daemon/run.py
+index 558315c23..cfe9999fc 100644
+--- a/pcs/daemon/run.py
++++ b/pcs/daemon/run.py
+@@ -33,6 +33,7 @@ from pcs.daemon.app import (
+     auth,
+     sinatra_remote,
+     sinatra_ui,
++    webui_info_handler,
+ )
+ from pcs.daemon.app import capabilities as capabilities_app
+ 
+@@ -168,7 +169,8 @@ def configure_app(  # noqa: PLR0913
+             # Even with disabled (standalone) webui the following routes must be
+             # provided because they can be used via unix socket from cockpit.
+             routes.extend(
+-                sinatra_ui.get_routes(auth_provider, ruby_pcsd_wrapper)
++                webui_info_handler.get_routes(webui_fallback)
++                + sinatra_ui.get_routes(auth_provider, ruby_pcsd_wrapper)
+             )
+ 
+         return Application(
+diff --git a/pcs_test/smoke.sh.in b/pcs_test/smoke.sh.in
+index fdfe8be2c..a9bb83447 100755
+--- a/pcs_test/smoke.sh.in
++++ b/pcs_test/smoke.sh.in
+@@ -71,10 +71,10 @@ if [ "$webui_http_code_response" = "200" ]; then
+   curl --insecure --cookie ${cookie_file} --header "X-Requested-With: XMLHttpRequest" --data "hidden[hidden_input]=&config[stonith-enabled]=false" https://localhost:2224/managec/${cluster_name}/update_cluster_settings > "${output_file}"
+   cat "${output_file}"; echo ""
+   [ "$(cat ${output_file})" = "Update Successful" ]
+-elif [  "$webui_http_code_response" = "401"  ]; then
++elif [  "$webui_http_code_response" = "404"  ]; then
+   curl --insecure  https://localhost:2224/ui/ > "${output_file}"
+   cat "${output_file}"; echo ""
+-  [ "$(cat "${output_file}")" = '{"notauthorized":"true"}' ]
++  grep "HA cluster management has been moved" "${output_file}"
+ else
+   echo "Unexpected response from https://localhost:2224/ui/ - http code: '${webui_http_code_response}'"
+   exit 1
+diff --git a/pcsd/public/ui_instructions.html b/pcsd/public/ui_instructions.html
+index a120ed3d4..b9c1c3152 100644
+--- a/pcsd/public/ui_instructions.html
++++ b/pcsd/public/ui_instructions.html
+@@ -1,27 +1,25 @@
+ <!DOCTYPE html>
+ <html>
+ <head>
+-  <title>Pcs WebUI instructions</title>
++  <title>Web UI is disabled</title>
+   <meta charset="utf-8" />
+ </head>
+ <body>
+-  <h1>Pcs WebUI instructions</h1>
++  <h1>Package <code>pcs-web-ui</code> is not installed</h1>
+   <p>
+-  WebUI is not a part of pcs repository but it has its own
+-  <a href="https://github.com/ClusterLabs/pcs-web-ui">repository</a>.
++    Since Fedora 42, pcsd web UI is distributed with pcs as <code>pcs-web-ui
++    </code> package. This<br>package can be uninstalled to disable the web UI.
+   </p>
+   <p>
+-  You can clone <a href="https://github.com/ClusterLabs/pcs-web-ui">WebUI repository</a>
+-  and build the web application into pcs by:
++    To re-enable pcsd web UI, install the <code>pcs-web-ui</code> RPM package.
+   </p>
+-  <pre><code>
+-    $ npm install
+-    $ npm run build
+-    $ mv ./build [/path/to/]pcs/pcsd/public/ui
+-  </code></pre>
+   <p>
+-  For more details, see instructions in
+-  <a href="https://github.com/ClusterLabs/pcs-web-ui/blob/main/README.md">README.md</a>.
++    Another option is to try pcsd web UI as an application for
++    <a href="https://cockpit-project.org/">Cockpit</a>
++    - a web-based<br>graphical interface for servers. The HA Cluster Management
++    application can be<br>installed from within the Applications pane in
++    Cockpit or by installing the<br><code>cockpit-ha-cluster</code> RPM
++    package.
+   </p>
+ </body>
+ </html>
+-- 
+2.50.1
+

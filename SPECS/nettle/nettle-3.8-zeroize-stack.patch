@@ -1,0 +1,334 @@
+From 24a4cb910a51f35dff89842e8cce27f88e8e78c3 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <dueno@redhat.com>
+Date: Wed, 24 Aug 2022 17:19:57 +0900
+Subject: [PATCH] Clear any intermediate data allocate on stack
+
+Signed-off-by: Daiki Ueno <dueno@redhat.com>
+---
+ cbc.c                 |  3 +++
+ cfb.c                 | 13 +++++++++++++
+ ctr.c                 |  4 ++++
+ ctr16.c               |  2 ++
+ ecc-random.c          |  3 +++
+ ecdsa-keygen.c        |  2 ++
+ ecdsa-sign.c          |  2 ++
+ ed25519-sha512-sign.c |  2 ++
+ ed448-shake256-sign.c |  2 ++
+ gostdsa-sign.c        |  2 ++
+ hmac.c                | 10 +++++++---
+ nettle-internal.h     |  5 +++++
+ pbkdf2.c              |  5 ++++-
+ pss-mgf1.c            |  5 ++++-
+ pss.c                 |  4 ++++
+ 15 files changed, 59 insertions(+), 5 deletions(-)
+
+diff --git a/cbc.c b/cbc.c
+index 76b6492d..b9da3aa0 100644
+--- a/cbc.c
++++ b/cbc.c
+@@ -128,6 +128,9 @@ cbc_decrypt(const void *ctx, nettle_cipher_func *f,
+ 	      length - block_size);
+       /* Writes first block. */
+       memxor3(dst, buffer, initial_iv, block_size);
++
++      TMP_CLEAR(buffer, buffer_size);
++      TMP_CLEAR(initial_iv, block_size);
+     }
+ }
+ 
+diff --git a/cfb.c b/cfb.c
+index b9da3159..b1b01b9e 100644
+--- a/cfb.c
++++ b/cfb.c
+@@ -83,6 +83,8 @@ cfb_encrypt(const void *ctx, nettle_cipher_func *f,
+       /* We do not care about updating IV here. This is the last call in
+        * message sequence and one has to set IV afterwards anyway */
+     }
++
++  TMP_CLEAR(buffer, block_size);
+ }
+ 
+ /* Don't allocate any more space than this on the stack */
+@@ -115,6 +117,8 @@ cfb_decrypt(const void *ctx, nettle_cipher_func *f,
+ 
+ 	  f(ctx, block_size, buffer, iv);
+ 	  memxor3(dst + length, src + length, buffer, left);
++
++	  TMP_CLEAR(buffer, block_size);
+ 	}
+     }
+   else
+@@ -160,6 +164,9 @@ cfb_decrypt(const void *ctx, nettle_cipher_func *f,
+ 	  f(ctx, block_size, buffer, iv);
+ 	  memxor(dst, buffer, left);
+ 	}
++
++      TMP_CLEAR(buffer, buffer_size);
++      TMP_CLEAR(initial_iv, block_size);
+     }
+ }
+ 
+@@ -196,6 +203,9 @@ cfb8_encrypt(const void *ctx, nettle_cipher_func *f,
+       pos ++;
+     }
+   memcpy(iv, buffer + pos, block_size);
++
++  TMP_CLEAR(buffer, block_size * 2);
++  TMP_CLEAR(outbuf, block_size);
+ }
+ 
+ void
+@@ -235,4 +245,7 @@ cfb8_decrypt(const void *ctx, nettle_cipher_func *f,
+     }
+ 
+   memcpy(iv, buffer + i, block_size);
++
++  TMP_CLEAR(buffer, block_size * 2);
++  TMP_CLEAR(outbuf, block_size * 2);
+ }
+diff --git a/ctr.c b/ctr.c
+index 8c6b4626..217d1abb 100644
+--- a/ctr.c
++++ b/ctr.c
+@@ -137,6 +137,8 @@ ctr_crypt(const void *ctx, nettle_cipher_func *f,
+ 	  f(ctx, block_size, block, ctr);
+ 	  INCREMENT(block_size, ctr);
+ 	  memxor3(dst + filled, src + filled, block, length - filled);
++
++	  TMP_CLEAR(block, block_size);
+ 	}
+     }
+   else
+@@ -173,5 +175,7 @@ ctr_crypt(const void *ctx, nettle_cipher_func *f,
+ 	  INCREMENT(block_size, ctr);
+ 	  memxor(dst, buffer, length);
+ 	}
++
++      TMP_CLEAR(buffer, buffer_size);
+     }
+ }
+diff --git a/ctr16.c b/ctr16.c
+index d744d2a9..ec0abd72 100644
+--- a/ctr16.c
++++ b/ctr16.c
+@@ -102,5 +102,7 @@ _nettle_ctr_crypt16(const void *ctx, nettle_cipher_func *f,
+ 	done:
+ 	  memxor3 (dst + i, src + i, buffer->b, length - i);
+ 	}
++
++      TMP_CLEAR(buffer, MIN(blocks, CTR_BUFFER_LIMIT / 16));
+     }
+ }
+diff --git a/ecc-random.c b/ecc-random.c
+index a7b48d6a..676f5933 100644
+--- a/ecc-random.c
++++ b/ecc-random.c
+@@ -36,6 +36,7 @@
+ #endif
+ 
+ #include <assert.h>
++#include <string.h>
+ 
+ #include "ecc.h"
+ #include "ecc-internal.h"
+@@ -79,4 +80,6 @@ ecc_scalar_random (struct ecc_scalar *x,
+   TMP_ALLOC (scratch, ECC_MOD_RANDOM_ITCH (x->ecc->q.size));
+ 
+   ecc_mod_random (&x->ecc->q, x->p, random_ctx, random, scratch);
++
++  TMP_CLEAR (scratch, ECC_MOD_RANDOM_ITCH (x->ecc->q.size));
+ }
+diff --git a/ecdsa-keygen.c b/ecdsa-keygen.c
+index 870282b0..05dd827a 100644
+--- a/ecdsa-keygen.c
++++ b/ecdsa-keygen.c
+@@ -59,4 +59,6 @@ ecdsa_generate_keypair (struct ecc_point *pub,
+   ecc_mod_random (&ecc->q, key->p, random_ctx, random, p);
+   ecc->mul_g (ecc, p, key->p, p + 3*ecc->p.size);
+   ecc->h_to_a (ecc, 0, pub->p, p, p + 3*ecc->p.size);
++
++  TMP_CLEAR (p, itch);
+ }
+diff --git a/ecdsa-sign.c b/ecdsa-sign.c
+index e6fb3287..e6b960bf 100644
+--- a/ecdsa-sign.c
++++ b/ecdsa-sign.c
+@@ -68,4 +68,6 @@ ecdsa_sign (const struct ecc_scalar *key,
+       mpz_limbs_finish (signature->s, size);
+     }
+   while (mpz_sgn (signature->r) == 0 || mpz_sgn (signature->s) == 0);
++
++  TMP_CLEAR (k, size + ECC_ECDSA_SIGN_ITCH (size));
+ }
+diff --git a/ed25519-sha512-sign.c b/ed25519-sha512-sign.c
+index 389a157e..52a46ea5 100644
+--- a/ed25519-sha512-sign.c
++++ b/ed25519-sha512-sign.c
+@@ -38,6 +38,7 @@
+ 
+ #include "ecc-internal.h"
+ #include "sha2.h"
++#include <string.h>
+ 
+ void
+ ed25519_sha512_sign (const uint8_t *pub,
+@@ -61,6 +62,7 @@ ed25519_sha512_sign (const uint8_t *pub,
+ 	       length, msg, signature, scratch_out);
+ 
+   gmp_free_limbs (scratch, itch);
++  explicit_bzero (digest, sizeof(digest));
+ #undef k1
+ #undef k2
+ #undef scratch_out
+diff --git a/ed448-shake256-sign.c b/ed448-shake256-sign.c
+index c524593d..01abf457 100644
+--- a/ed448-shake256-sign.c
++++ b/ed448-shake256-sign.c
+@@ -39,6 +39,7 @@
+ #include "ecc-internal.h"
+ #include "eddsa-internal.h"
+ #include "sha3.h"
++#include <string.h>
+ 
+ void
+ ed448_shake256_sign (const uint8_t *pub,
+@@ -63,6 +64,7 @@ ed448_shake256_sign (const uint8_t *pub,
+ 	       length, msg, signature, scratch_out);
+ 
+   gmp_free_limbs (scratch, itch);
++  explicit_bzero (digest, sizeof(digest));
+ #undef k1
+ #undef k2
+ #undef scratch_out
+diff --git a/gostdsa-sign.c b/gostdsa-sign.c
+index 892c0742..a7e0c21d 100644
+--- a/gostdsa-sign.c
++++ b/gostdsa-sign.c
+@@ -71,4 +71,6 @@ gostdsa_sign (const struct ecc_scalar *key,
+       mpz_limbs_finish (signature->s, size);
+     }
+   while (mpz_sgn (signature->r) == 0 || mpz_sgn (signature->s) == 0);
++
++  TMP_CLEAR (k, size + ECC_GOSTDSA_SIGN_ITCH (size));
+ }
+diff --git a/hmac.c b/hmac.c
+index ea356970..6a55551b 100644
+--- a/hmac.c
++++ b/hmac.c
+@@ -53,6 +53,8 @@ hmac_set_key(void *outer, void *inner, void *state,
+ {
+   TMP_DECL(pad, uint8_t, NETTLE_MAX_HASH_BLOCK_SIZE);
+   TMP_ALLOC(pad, hash->block_size);
++  TMP_DECL(digest, uint8_t, NETTLE_MAX_HASH_DIGEST_SIZE);
++  TMP_ALLOC(digest, hash->digest_size);
+   
+   hash->init(outer);
+   hash->init(inner);
+@@ -62,9 +64,6 @@ hmac_set_key(void *outer, void *inner, void *state,
+       /* Reduce key to the algorithm's hash size. Use the area pointed
+        * to by state for the temporary state. */
+ 
+-      TMP_DECL(digest, uint8_t, NETTLE_MAX_HASH_DIGEST_SIZE);
+-      TMP_ALLOC(digest, hash->digest_size);
+-
+       hash->init(state);
+       hash->update(state, key_length, key);
+       hash->digest(state, hash->digest_size, digest);
+@@ -86,6 +85,9 @@ hmac_set_key(void *outer, void *inner, void *state,
+   hash->update(inner, hash->block_size, pad);
+ 
+   memcpy(state, inner, hash->context_size);
++
++  TMP_CLEAR(pad, hash->block_size);
++  TMP_CLEAR(digest, hash->digest_size);
+ }
+ 
+ void
+@@ -112,4 +114,6 @@ hmac_digest(const void *outer, const void *inner, void *state,
+   hash->digest(state, length, dst);
+ 
+   memcpy(state, inner, hash->context_size);
++
++  TMP_CLEAR(digest, hash->digest_size);
+ }
+diff --git a/nettle-internal.h b/nettle-internal.h
+index c41f3ee0..62b89e11 100644
+--- a/nettle-internal.h
++++ b/nettle-internal.h
+@@ -76,6 +76,11 @@
+   do { assert((size_t)(size) <= (sizeof(name))); } while (0)
+ #endif 
+ 
++#include <string.h>		/* explicit_bzero */
++
++#define TMP_CLEAR(name, size) (explicit_bzero (name, sizeof (*name) * (size)))
++#define TMP_CLEAR_ALIGN(name, size) (explicit_bzero (name, size))
++
+ /* Limits that apply to systems that don't have alloca */
+ #define NETTLE_MAX_HASH_BLOCK_SIZE 144  /* For sha3_224*/
+ #define NETTLE_MAX_HASH_DIGEST_SIZE 64
+diff --git a/pbkdf2.c b/pbkdf2.c
+index 291d138a..a8ecba5b 100644
+--- a/pbkdf2.c
++++ b/pbkdf2.c
+@@ -92,8 +92,11 @@ pbkdf2 (void *mac_ctx,
+       if (length <= digest_size)
+ 	{
+ 	  memcpy (dst, T, length);
+-	  return;
++	  break;
+ 	}
+       memcpy (dst, T, digest_size);
+     }
++
++  TMP_CLEAR (U, digest_size);
++  TMP_CLEAR (T, digest_size);
+ }
+diff --git a/pss-mgf1.c b/pss-mgf1.c
+index 3f5e204b..3644c642 100644
+--- a/pss-mgf1.c
++++ b/pss-mgf1.c
+@@ -66,8 +66,11 @@ pss_mgf1(const void *seed, const struct nettle_hash *hash,
+       if (length <= hash->digest_size)
+ 	{
+ 	  hash->digest(state, length, mask);
+-	  return;
++	  break;
+ 	}
+       hash->digest(state, hash->digest_size, mask);
+     }
++
++  TMP_CLEAR(h, hash->digest_size);
++  TMP_CLEAR_ALIGN(state, hash->context_size);
+ }
+diff --git a/pss.c b/pss.c
+index d28e7b13..8106ebf2 100644
+--- a/pss.c
++++ b/pss.c
+@@ -77,6 +77,7 @@ pss_encode_mgf1(mpz_t m, size_t bits,
+   if (key_size < hash->digest_size + salt_length + 2)
+     {
+       TMP_GMP_FREE(em);
++      TMP_CLEAR_ALIGN(state, hash->context_size);
+       return 0;
+     }
+ 
+@@ -111,6 +112,7 @@ pss_encode_mgf1(mpz_t m, size_t bits,
+ 
+   nettle_mpz_set_str_256_u(m, key_size, em);
+   TMP_GMP_FREE(em);
++  TMP_CLEAR_ALIGN(state, hash->context_size);
+   return 1;
+ }
+ 
+@@ -194,5 +196,7 @@ pss_verify_mgf1(const mpz_t m, size_t bits,
+   ret = 1;
+  cleanup:
+   TMP_GMP_FREE(em);
++  TMP_CLEAR(h2, hash->digest_size);
++  TMP_CLEAR_ALIGN(state, hash->context_size);
+   return ret;
+ }
+-- 
+2.41.0
+

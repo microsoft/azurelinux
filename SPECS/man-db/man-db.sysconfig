@@ -1,0 +1,10 @@
+# Set this to "no" to disable man-db update triggered by installation
+# of any package containing manual pages
+SERVICE="yes"
+
+# Set this to "no" to disable daily man-db update run by
+# /etc/cron.daily/man-db.cron
+CRON="yes"
+
+# Options used by mandb, we use "-q" as default, too much noise without it
+OPTS="-q"

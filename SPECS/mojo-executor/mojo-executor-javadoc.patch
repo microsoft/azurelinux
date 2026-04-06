@@ -1,0 +1,11 @@
+--- a/mojo-executor-maven-plugin/src/main/java/org/twdata/maven/mojoexecutor/plugin/MojoExecutorMojo.java	2021-09-01 14:12:37.868008807 -0600
++++ b/mojo-executor-maven-plugin/src/main/java/org/twdata/maven/mojoexecutor/plugin/MojoExecutorMojo.java	2021-09-01 14:16:43.163332600 -0600
+@@ -89,7 +89,7 @@ public class MojoExecutorMojo extends Ab
+     private boolean quiet;
+ 
+     /**
+-     * Enable thread blocking per plugin GA (groupId & artifactId)
++     * Enable thread blocking per plugin GA (groupId &amp; artifactId)
+      */
+     @Parameter(defaultValue = "false")
+     private boolean blocking;

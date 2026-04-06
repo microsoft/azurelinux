@@ -1,0 +1,79 @@
+From 0fe46c511e81062575b05936f804eb18c9f0a011 Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Wed, 12 Nov 2025 15:47:24 +0100
+Subject: [PATCH] rastertopclx.c: Fix infinite loop caused by crafted file
+
+Infinite loop happened because of crafted input raster file, which led
+into heap buffer overflow of `CompressBuf` array.
+
+Based on comments there should be always some `count` when compressing
+the data, and processing of crafted file ended with offset and count
+being 0.
+
+Fixes CVE-2025-64524
+---
+ filter/rastertopclx.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/filter/rastertopclx.c b/filter/rastertopclx.c
+index ded86f114..39cb378bf 100644
+--- a/filter/rastertopclx.c
++++ b/filter/rastertopclx.c
+@@ -825,10 +825,10 @@ StartPage(cf_filter_data_t      *data,	// I - filter data
+   }
+ 
+   if (header->cupsCompression)
+-    CompBuffer = malloc(DotBufferSize * 4);
++    CompBuffer = calloc(DotBufferSize * 4, sizeof(unsigned char));
+ 
+   if (header->cupsCompression >= 3)
+-    SeedBuffer = malloc(DotBufferSize);
++    SeedBuffer = calloc(DotBufferSize, sizeof(unsigned char));
+ 
+   SeedInvalid = 1;
+ 
+@@ -1159,6 +1159,13 @@ CompressData(unsigned char *line,	// I - Data to compress
+               seed ++;
+               count ++;
+             }
++
++	    //
++	    // Bail out if we don't have count to compress
++	    //
++
++	    if (count == 0)
++	      break;
+ 	  }
+ 
+ 	  //
+@@ -1252,6 +1259,13 @@ CompressData(unsigned char *line,	// I - Data to compress
+ 
+             count = line_ptr - start;
+ 
++	    //
++	    // Bail out if we don't have count to compress
++	    //
++
++	    if (count == 0)
++	      break;
++
+ #if 0
+             fprintf(stderr,
+ 		    "DEBUG: offset=%d, count=%d, comp_ptr=%p(%d of %d)...\n",
+@@ -1424,6 +1438,13 @@ CompressData(unsigned char *line,	// I - Data to compress
+ 
+             count = (line_ptr - start) / 3;
+ 
++	    //
++	    // Bail out if we don't have count to compress
++	    //
++
++	    if (count == 0)
++	      break;
++
+ 	    //
+ 	    // Place mode 10 compression data in the buffer; each sequence
+ 	    // starts with a command byte that looks like:
+-- 
+2.51.1
+

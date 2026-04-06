@@ -1,0 +1,133 @@
+diff -up xpdf-4.06/xpdf/GlobalParams.cc.urw-font-fix xpdf-4.06/xpdf/GlobalParams.cc
+--- xpdf-4.06/xpdf/GlobalParams.cc.urw-font-fix	2025-11-13 17:08:30.000000000 -0500
++++ xpdf-4.06/xpdf/GlobalParams.cc	2025-11-18 15:23:11.114577091 -0500
+@@ -84,98 +84,98 @@ static struct {
+   double obliqueFactor;		// oblique sheer factor
+ } displayFontTab[] = {
+   {"Courier",                               // name
+-   "n022003l.pfb",                          // t1FileName
++   "NimbusMonoPS-Regular.t1",               // t1FileName
+    "cour.ttf",                              // ttFileName
+    "Courier", "Courier",                    // macFileName, macFontName
+    "NimbusMonoPS-Regular",                  // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Courier-Bold",                          // name
+-   "n022004l.pfb",                          // t1FileName
++   "NimbusMonoPS-Bold.t1",                  // t1FileName
+    "courbd.ttf",                            // ttFileName
+    "Courier", "Courier Bold",               // macFileName, macFontName
+    "NimbusMonoPS-Bold",                     // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Courier-BoldOblique",                   // name
+-   "n022024l.pfb",                          // t1FileName
++   "NimbusMonoPS-BoldItalic.t1",            // t1FileName
+    "courbi.ttf",                            // ttFileName
+    "Courier", "Courier Bold Oblique",       // macFileName, macFontName
+    "NimbusMonoPS-BoldItalic",               // fcFontName
+    "Courier-Bold", 0.212557                 // obliqueFont, obliqueFactor
+   },
+   {"Courier-Oblique",                       // name
+-   "n022023l.pfb",                          // t1FileName
++   "NimbusMonoPS-Italic.t1",                // t1FileName
+    "couri.ttf",                             // ttFileName
+    "Courier", "Courier Oblique",            // macFileName, macFontName
+    "NimbusMonoPS-Italic",                   // fcFontName
+    "Courier", 0.212557                      // obliqueFont, obliqueFactor
+   },
+   {"Helvetica",                             // name
+-   "n019003l.pfb",                          // t1FileName
++   "NimbusSans-Regular.t1",                 // t1FileName
+    "arial.ttf",                             // ttFileName
+    "Helvetica", "Helvetica",                // macFileName, macFontName
+    "NimbusSans-Regular",                    // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Helvetica-Bold",                        // name
+-   "n019004l.pfb",                          // t1FileName
++   "NimbusSans-Bold.t1",                    // t1FileName
+    "arialbd.ttf",                           // ttFileName
+    "Helvetica", "Helvetica Bold",           // macFileName, macFontName
+    "NimbusSans-Bold",                       // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Helvetica-BoldOblique",                 // name
+-   "n019024l.pfb",                          // t1FileName
++   "NimbusSans-BoldItalic.t1",              // t1FileName
+    "arialbi.ttf",                           // ttFileName
+    "Helvetica", "Helvetica Bold Oblique",   // macFileName, macFontName
+    "NimbusSans-BoldItalic",                 // fcFontName
+    "Helvetica-Bold", 0.212557               // obliqueFont, obliqueFactor
+   },
+   {"Helvetica-Oblique",                     // name
+-   "n019023l.pfb",                          // t1FileName
++   "NimbusSans-Italic.t1",                  // t1FileName
+    "ariali.ttf",                            // ttFileName
+    "Helvetica", "Helvetica Oblique",        // macFileName, macFontName
+    "NimbusSans-Italic",                     // fcFontName
+    "Helvetica", 0.212557                    // obliqueFont, obliqueFactor
+   },
+   {"Symbol",                                // name
+-   "s050000l.pfb",                          // t1FileName
++   "StandardSymbolsPS.t1",                  // t1FileName
+    NULL,                                    // ttFileName
+    "Symbol", "Symbol",                      // macFileName, macFontName
+    "Standard Symbols PS",                   // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Times-Bold",                            // name
+-   "n021004l.pfb",                          // t1FileName
++   "NimbusRoman-Bold.t1",                   // t1FileName
+    "timesbd.ttf",                           // ttFileName
+    "Times", "Times Bold",                   // macFileName, macFontName
+    "NimbusRoman-Bold",                      // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Times-BoldItalic",                      // name
+-   "n021024l.pfb",                          // t1FileName
++   "NimbusRoman-BoldItalic.t1",             // t1FileName
+    "timesbi.ttf",                           // ttFileName
+    "Times", "Times Bold Italic",            // macFileName, macFontName
+    "NimbusRoman-BoldItalic",                // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Times-Italic",                          // name
+-   "n021023l.pfb",                          // t1FileName
++   "NimbusRoman-Italic.t1",                 // t1FileName
+    "timesi.ttf",                            // ttFileName
+    "Times", "Times Italic",                 // macFileName, macFontName
+    "NimbusRoman-Italic",                    // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"Times-Roman",                           // name
+-   "n021003l.pfb",                          // t1FileName
++   "NimbusRoman-Regular.t1",                // t1FileName
+    "times.ttf",                             // ttFileName
+    "Times", "Times Roman",                  // macFileName, macFontName
+    "NimbusRoman-Regular",                   // fcFontName
+    NULL, 0                                  // obliqueFont, obliqueFactor
+   },
+   {"ZapfDingbats",                          // name
+-   "d050000l.pfb",                          // t1FileName
++   "D050000L.t1",                           // t1FileName
+    NULL,                                    // ttFileName
+    "ZapfDingbats", "Zapf Dingbats",         // macFileName, macFontName
+    "D050000L",                              // fcFontName
+@@ -192,6 +192,7 @@ static const char *displayFontDirs[] = {
+   "c:/windows/fonts",
+   "c:/winnt/fonts",
+ #else // _WIN32
++  "/usr/share/fonts/urw-base35",
+   "/usr/share/ghostscript/fonts",
+   "/usr/local/share/ghostscript/fonts",
+   "/usr/share/fonts/default/Type1",
+@@ -2788,7 +2789,7 @@ UnicodeRemapping *GlobalParams::getUnico
+ }
+ 
+ GString *GlobalParams::findFontFile(GString *fontName) {
+-  static const char *exts[] = { ".pfa", ".pfb", ".ttf", ".ttc", ".otf" };
++  static const char *exts[] = { ".pfa", ".pfb", ".t1", ".ttf", ".ttc", ".otf" };
+   GString *path, *dir;
+ #ifdef _WIN32
+   GString *fontNameU;

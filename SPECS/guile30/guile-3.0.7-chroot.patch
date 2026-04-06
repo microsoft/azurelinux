@@ -1,0 +1,22 @@
+commit ab9588774461715d0664b8662790b36e8389307d
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Thu Jul 22 10:26:24 2021 +0200
+
+    Make chroot call more secure
+
+diff --git a/libguile/posix.c b/libguile/posix.c
+index 31c4ab1..1054440 100644
+--- a/libguile/posix.c
++++ b/libguile/posix.c
+@@ -2033,7 +2033,10 @@ SCM_DEFINE (scm_chroot, "chroot", 1, 0, 0,
+ #define FUNC_NAME s_scm_chroot
+ {
+   int rv;
+-
++  WITH_STRING (path, c_path,
++	       rv = chdir (c_path));
++  if (rv == -1)
++    SCM_SYSERROR;
+   WITH_STRING (path, c_path,
+ 	       rv = chroot (c_path));
+   if (rv == -1)

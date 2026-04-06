@@ -1,0 +1,40 @@
+From ee6cbb12ff36a1e6618d7388a78dd4e0a2b44041 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Sun, 21 Jul 2024 22:01:50 +0100
+Subject: [PATCH] modules/speller/default/vector_hash-t.hpp: fix gcc-15 build
+
+Uncoming `gcc-15` added extra checks for template instantiation that is
+guaranteed to fail in
+  https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=313afcfdabeab3e6705ac0bd1273627075be0023
+
+As a result `aspell` build now fails as:
+
+    In file included from modules/speller/default/readonly_ws.cpp:51:
+    modules/speller/default/vector_hash-t.hpp: In member function 'void aspeller::VectorHashTable<Parms>::recalc_size()':
+    modules/speller/default/vector_hash-t.hpp:186:43: error: 'class aspeller::VectorHashTable<Parms>' has no member named 'e'
+      186 |     for (iterator i = begin(); i != this->e; ++i, ++this->_size);
+          |                                           ^
+    modules/speller/default/vector_hash-t.hpp:186:59: error: 'class aspeller::VectorHashTable<Parms>' has no member named '_size'; did you mean 'size'?
+      186 |     for (iterator i = begin(); i != this->e; ++i, ++this->_size);
+          |                                                           ^~~~~
+          |                                                           size
+
+It looks like `_size` is `size_` mis-spelling and `e` was not introduced
+here.
+---
+ modules/speller/default/vector_hash-t.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/speller/default/vector_hash-t.hpp b/modules/speller/default/vector_hash-t.hpp
+index 969a80cb..e4420b4a 100644
+--- a/modules/speller/default/vector_hash-t.hpp
++++ b/modules/speller/default/vector_hash-t.hpp
+@@ -183,7 +183,7 @@ namespace aspeller {
+   template<class Parms>
+   void VectorHashTable<Parms>::recalc_size() {
+     size_ = 0;
+-    for (iterator i = begin(); i != this->e; ++i, ++this->_size);
++    for (iterator i = begin(), e = end(); i != e; ++i, ++size_);
+   }
+ 
+ }

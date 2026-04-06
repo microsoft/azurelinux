@@ -1,0 +1,64 @@
+From ac4b23acbe728182c955fedc0bd91d401924d954 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Tue, 26 Jan 2016 09:29:20 +0100
+Subject: [PATCH 2/2] Add gts2xyz-manpage.
+
+---
+ doc/manpages/Makefile.am |  1 +
+ doc/manpages/Makefile.in |  1 +
+ doc/manpages/gts2xyz.1   | 19 +++++++++++++++++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 doc/manpages/gts2xyz.1
+
+diff --git a/doc/manpages/Makefile.am b/doc/manpages/Makefile.am
+index c4aebe9..a15c0a2 100644
+--- a/doc/manpages/Makefile.am
++++ b/doc/manpages/Makefile.am
+@@ -3,6 +3,7 @@ dist_man_MANS = \
+ 	gts2dxf.1 \
+ 	gts2oogl.1 \
+ 	gts2stl.1 \
++	gts2xyz.1 \
+ 	gtscheck.1 \
+ 	gtscompare.1 \
+ 	gts-config.1 \
+diff --git a/doc/manpages/Makefile.in b/doc/manpages/Makefile.in
+index 69192e1..94440a9 100644
+--- a/doc/manpages/Makefile.in
++++ b/doc/manpages/Makefile.in
+@@ -216,6 +216,7 @@ dist_man_MANS = \
+ 	gts2dxf.1 \
+ 	gts2oogl.1 \
+ 	gts2stl.1 \
++	gts2xyz.1 \
+ 	gtscheck.1 \
+ 	gtscompare.1 \
+ 	gts-config.1 \
+diff --git a/doc/manpages/gts2xyz.1 b/doc/manpages/gts2xyz.1
+new file mode 100644
+index 0000000..4ac4a84
+--- /dev/null
++++ b/doc/manpages/gts2xyz.1
+@@ -0,0 +1,19 @@
++.TH gts2xyz 1 "September 4, 2013" "" "GNU Triangulated Surface utils"
++
++.SH NAME
++gts2xyz \- samples a GTS file on a regular grid at intervals DX. 
++
++.SH SYNOPSIS
++.B gts2xyz
++.RI DX <\  input.gts\  >\  output.xyz
++
++.SH DESCRIPTION
++This manual page documents briefly the 
++.B gts2xyz
++command.
++
++.SH AUTHOR
++gts2xyz was written by Stephane Popinet <popinet@users.sourceforge.net>.
++.PP
++This manual page was written by Ruben Molina <rmolina@udea.edu.co>,
++for the Debian project (but may be used by others).
+-- 
+2.40.1
+

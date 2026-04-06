@@ -1,0 +1,87 @@
+From 2b2652e914b1c38d4c009a8dcac11dfee9c7e008 Mon Sep 17 00:00:00 2001
+From: Lasse Collin <lasse.collin@tukaani.org>
+Date: Sun, 23 Nov 2025 20:13:49 +0200
+Subject: [PATCH 2/4] Landlock: Workaround a bug in RHEL 9 kernel
+
+If one runs xz 5.8.0 or 5.8.1 from some other distribution in a container
+on RHEL 9, xz will fail with the message "Failed to enable the sandbox".
+
+RHEL 9 kernel since 5.14.0-603.el9 (2025-07-30) claims to support
+Landlock ABI version 6, but it lacks support for LANDLOCK_SCOPE_SIGNAL.
+The issue is still present in 5.14.0-643.el9 (2025-11-22). Red Hat is
+aware of the issue, but I don't know when it will be fixed.
+
+The sandbox is meant to be transparent to users, thus there isn't and
+won't be a command line option to disable it. Instead, add a workaround
+to keep xz working on the buggy RHEL 9 kernels.
+
+Reported-by: Richard W.M. Jones
+Thanks-to: Pavel Raiskup
+Tested-by: Orgad Shaneh
+Tested-by: Richard W.M. Jones
+Fixes: https://github.com/tukaani-project/xz/issues/199
+Link: https://issues.redhat.com/browse/RHEL-125143
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2407105
+Link: https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/65BDSY56R5ZJRTUC4B6CIVCVLY4LG4ME/
+---
+ src/common/my_landlock.h | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/src/common/my_landlock.h b/src/common/my_landlock.h
+index 379d7bd4..0f8e04e0 100644
+--- a/src/common/my_landlock.h
++++ b/src/common/my_landlock.h
+@@ -21,6 +21,7 @@
+ #include <linux/landlock.h>
+ #include <sys/syscall.h>
+ #include <sys/prctl.h>
++#include <sys/utsname.h>
+ 
+ 
+ /// \brief      Initialize Landlock ruleset attributes to forbid everything
+@@ -42,10 +43,28 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ 	// >0 = Landlock ABI version
+ 	static int abi_version = 0;
+ 
+-	if (abi_version == 0)
++	// Red Hat Enterprise Linux 9 kernel since 5.14.0-603.el9 (2025-07-30)
++	// claims ABI version 6 support, but as of 5.14.0-643.el9 (2025-11-22)
++	// it lacks LANDLOCK_SCOPE_SIGNAL. ABI version 6 was added in upstream
++	// Linux 6.12 while RHEL 9 has Linux 5.14 with lots of backports.
++	// We assume that any kernel version 5.14 with ABI version 6 is buggy.
++	static bool is_rhel9 = false;
++
++	if (abi_version == 0) {
+ 		abi_version = syscall(SYS_landlock_create_ruleset,
+ 			(void *)NULL, 0, LANDLOCK_CREATE_RULESET_VERSION);
+ 
++		if (abi_version == 6) {
++			static const char rel[] = "5.14.";
++			const size_t rel_len = sizeof(rel) - 1;
++
++			struct utsname un;
++			if (uname(&un) == 0 && strncmp(
++					un.release, rel, rel_len) == 0)
++				is_rhel9 = true;
++		}
++	}
++
+ 	if (abi_version <= 0)
+ 		return -1;
+ 
+@@ -121,6 +140,12 @@ my_landlock_ruleset_attr_forbid_all(struct landlock_ruleset_attr *attr)
+ #endif
+ 		FALLTHROUGH;
+ 
++	case 6:
++		if (is_rhel9)
++			attr->scoped &= ~LANDLOCK_SCOPE_SIGNAL;
++
++		FALLTHROUGH;
++
+ 	default:
+ 		// We only know about the features of the ABIs 1-6.
+ 		break;
+-- 
+2.51.1
+

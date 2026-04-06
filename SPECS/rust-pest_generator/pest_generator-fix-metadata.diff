@@ -1,0 +1,8 @@
+--- pest_generator-2.8.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pest_generator-2.8.4/Cargo.toml	2025-12-30T18:34:24.153490+00:00
+@@ -57,5 +57,4 @@
+ default = ["std"]
+ export-internal = []
+ grammar-extras = ["pest_meta/grammar-extras"]
+-not-bootstrap-in-src = ["pest_meta/not-bootstrap-in-src"]
+ std = ["pest/std"]

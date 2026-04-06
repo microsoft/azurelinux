@@ -1,0 +1,29 @@
+commit 5e489373bee49ad40e424304fff16d693867ebcd
+Author: Ken McDonell <kenj@kenj.id.au>
+Date:   Fri Feb 13 14:28:35 2026 +1100
+
+    src/selinux/pcp.fc: one more try for services script
+    
+    Previous commit had left behind both the old (bad) and new (good)
+    lines for the /usr/libexec/pcp/services scripts.
+    
+    Because the good ones came second, they won on RHEL 8 where I was
+    testing this.
+    
+    On CentOS Stream 10, semodule is smarter and detects the duplicate
+    (and conflicting) labelling requests, and barfs.
+
+diff --git a/src/selinux/pcp.fc b/src/selinux/pcp.fc
+index b2cc6c5c32..9a4fd48ab9 100644
+--- a/src/selinux/pcp.fc
++++ b/src/selinux/pcp.fc
+@@ -5,9 +5,6 @@
+ 
+ /usr/libexec/pcp/bin/pmcd	--	gen_context(system_u:object_r:pcp_pmcd_exec_t,s0)
+ /usr/libexec/pcp/bin/pmproxy    --      gen_context(system_u:object_r:pcp_pmproxy_exec_t,s0)
+-/usr/libexec/pcp/services/pmproxy  --   gen_context(system_u:object_r:pcp_pmproxy_exec_t,s0)
+-/usr/libexec/pcp/services/pmlogger --   gen_context(system_u:object_r:pcp_pmlogger_exec_t,s0)
+-/usr/libexec/pcp/services/pmie     --   gen_context(system_u:object_r:pcp_pmie_exec_t,s0)
+ 
+ /usr/libexec/pcp/bin/pmie_check --      gen_context(system_u:object_r:pcp_pmie_exec_t,s0)
+ /usr/libexec/pcp/bin/pmie_daily --      gen_context(system_u:object_r:pcp_pmie_exec_t,s0)

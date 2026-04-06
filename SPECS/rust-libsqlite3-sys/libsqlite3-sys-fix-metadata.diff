@@ -1,0 +1,103 @@
+--- libsqlite3-sys-0.36.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ libsqlite3-sys-0.36.0/Cargo.toml	2025-12-22T13:49:45.961990+00:00
+@@ -16,7 +16,7 @@
+ authors = ["The rusqlite developers"]
+ build = "build.rs"
+ links = "sqlite3"
+-exclude = ["**/*.sh"]
++exclude = ["**/*.sh", "/bindgen-bindings/", "/Upgrade.md"]
+ autolib = false
+ autobins = false
+ autoexamples = false
+@@ -34,87 +34,27 @@
+ repository = "https://github.com/rusqlite/rusqlite"
+ 
+ [features]
+-buildtime_bindgen = [
+-    "bindgen",
+-    "pkg-config",
+-    "vcpkg",
+-]
+-bundled = [
+-    "cc",
+-    "bundled_bindings",
+-]
+-bundled-sqlcipher = ["bundled"]
+-bundled-sqlcipher-vendored-openssl = [
+-    "bundled-sqlcipher",
+-    "openssl-sys/vendored",
+-]
+-bundled-windows = [
+-    "cc",
+-    "bundled_bindings",
+-]
+-bundled_bindings = []
++bindgen = []
++buildtime_bindgen = []
+ column_metadata = []
+ default = ["min_sqlite_version_3_34_1"]
+-in_gecko = []
+-loadable_extension = [
+-    "prettyplease",
+-    "quote",
+-    "syn",
+-]
+-min_sqlite_version_3_34_1 = [
+-    "pkg-config",
+-    "vcpkg",
+-]
++min_sqlite_version_3_34_1 = []
++pkg-config = []
+ preupdate_hook = ["buildtime_bindgen"]
+ session = [
+     "preupdate_hook",
+     "buildtime_bindgen",
+ ]
+-sqlcipher = []
+ unlock_notify = []
+-wasm32-wasi-vfs = []
+-with-asan = []
+ 
+ [lib]
+ name = "libsqlite3_sys"
+ path = "src/lib.rs"
+ 
+-[dependencies.openssl-sys]
+-version = "0.9.103"
+-optional = true
+-
+ [build-dependencies.bindgen]
+ version = "0.72"
+ features = ["runtime"]
+-optional = true
+ default-features = false
+-
+-[build-dependencies.cc]
+-version = "1.2.27"
+-optional = true
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.19"
+-optional = true
+-
+-[build-dependencies.prettyplease]
+-version = "0.2.20"
+-optional = true
+-
+-[build-dependencies.quote]
+-version = "1.0.36"
+-optional = true
+-default-features = false
+-
+-[build-dependencies.syn]
+-version = "2.0.87"
+-features = [
+-    "full",
+-    "extra-traits",
+-    "visit-mut",
+-]
+-optional = true
+-
+-[build-dependencies.vcpkg]
+-version = "0.2.15"
+-optional = true

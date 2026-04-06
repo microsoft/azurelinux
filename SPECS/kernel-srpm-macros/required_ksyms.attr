@@ -1,0 +1,4 @@
+%__required_ksyms_requires	/usr/lib/rpm/redhat/find-requires.ksyms
+%__required_ksyms_path		.*\.(ko|ko\.gz|ko\.bz2|ko\.xz|ko\.zst)$
+# Exclude built-in kernel modules
+%__required_ksyms_exclude_path	^/lib/modules/[1-9][^/]*/kernel/.*

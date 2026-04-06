@@ -1,0 +1,25 @@
+--- pest-2.8.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pest-2.8.4/Cargo.toml	2025-12-30T18:32:46.655292+00:00
+@@ -51,11 +51,6 @@
+ name = "json"
+ path = "tests/json.rs"
+ 
+-[[bench]]
+-name = "stack"
+-path = "benches/stack.rs"
+-harness = false
+-
+ [dependencies.memchr]
+ version = "2"
+ optional = true
+@@ -77,10 +72,6 @@
+ version = "0.1.5"
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+-features = ["html_reports"]
+-
+ [dev-dependencies.miette]
+ version = "7.2.0"
+ features = ["fancy"]

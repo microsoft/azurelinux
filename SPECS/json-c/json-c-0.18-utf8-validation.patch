@@ -1,0 +1,13 @@
+diff --git a/json_tokener.c b/json_tokener.c
+index c831f8a5d3..773229e6a3 100644
+--- a/json_tokener.c
++++ b/json_tokener.c
+@@ -678,7 +678,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
+ 					state = json_tokener_state_string_escape;
+ 					break;
+ 				}
+-				else if ((tok->flags & JSON_TOKENER_STRICT) && c <= 0x1f)
++				else if ((tok->flags & JSON_TOKENER_STRICT) && (unsigned char)c <= 0x1f)
+ 				{
+ 					// Disallow control characters in strict mode
+ 					tok->err = json_tokener_error_parse_string;

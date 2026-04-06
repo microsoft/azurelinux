@@ -1,0 +1,22 @@
+diff --git a/unix/tcl.m4 b/unix/tcl.m4
+index 9f15d52..7fad3a8 100644
+--- a/unix/tcl.m4
++++ b/unix/tcl.m4
+@@ -2366,7 +2366,7 @@ AC_DEFUN([SC_TIME_HANDLER], [
+ #include <stdlib.h>]],
+ 	[[extern long timezone;
+ 	    timezone += 1;
+-	    exit (0);]])],
++	    return 0;]])],
+ 	    [tcl_cv_timezone_long=yes], [tcl_cv_timezone_long=no])])
+     if test $tcl_cv_timezone_long = yes ; then
+ 	AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])
+@@ -2379,7 +2379,7 @@ AC_DEFUN([SC_TIME_HANDLER], [
+ #include <stdlib.h>]],
+ 	    [[extern time_t timezone;
+ 		timezone += 1;
+-		exit (0);]])],
++		return 0;]])],
+ 		[tcl_cv_timezone_time=yes], [tcl_cv_timezone_time=no])])
+ 	if test $tcl_cv_timezone_time = yes ; then
+ 	    AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])

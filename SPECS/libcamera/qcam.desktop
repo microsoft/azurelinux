@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=QCam
+GenericName=Camera Demo App
+Comment=Take photos with cameras exposed by libcamera
+Exec=qcam
+Type=Application
+Terminal=false
+StartupNotify=true

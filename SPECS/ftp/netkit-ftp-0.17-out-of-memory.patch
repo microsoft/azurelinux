@@ -1,0 +1,29 @@
+diff -up netkit-ftp-0.17/ftp/glob.c.arg_max1 netkit-ftp-0.17/ftp/glob.c
+--- netkit-ftp-0.17/ftp/glob.c.arg_max1	2012-01-24 12:59:09.335021131 +0100
++++ netkit-ftp-0.17/ftp/glob.c	2012-01-24 13:05:27.752028732 +0100
+@@ -55,10 +55,15 @@ char glob_rcsid[] = 
+ #include "ftp_var.h"  /* for protos only */
+ #include "glob.h"
+ 
++#ifndef LOWEST_ARG_MAX
++  #define LOWEST_ARG_MAX       2621440	/* ARG_MAX for default stack size limit 10240 */
++#endif
++
+ #define	QUOTE 0200
+ #define	TRIM 0177
+ #define	eq(a,b)		(strcmp(a, b)==0)
+-#define	GAVSIZ		(sysconf(_SC_ARG_MAX)/6)
++#define	max(a,b)	(a > b ? a : b)
++#define	GAVSIZ		(max((int)sysconf(_SC_ARG_MAX), LOWEST_ARG_MAX)/6)
+ #define	isdir(d)	((d.st_mode & S_IFMT) == S_IFDIR)
+ 
+ const char *globerr;
+@@ -159,7 +164,7 @@ ginit(entry *agargv)
+ 	gargv = agargv; 
+ 	sortbas = agargv; 
+ 	gargc = 0;
+-	gnleft = sysconf(_SC_ARG_MAX) - 4;
++	gnleft = max((int)sysconf(_SC_ARG_MAX), LOWEST_ARG_MAX) - 4;
+ }
+ 
+ static 

@@ -1,0 +1,106 @@
+commit de2b32289bf701ce3c8167a1b58436866922085e
+Author: Tan Shen Joon <shen.joon.tan@intel.com>
+Date:   Thu Aug 15 10:43:34 2019 +0800
+
+    deprecate RES_USE_INET6
+    
+    Following the remove of RES_USE_INET6, this patch
+    is cherry picked from glibc patch to adopt the similar
+    fix
+    
+    https://sourceware.org/git/?p=glibc.git;a=commit;h=9c02d0784dfa0bb4b0bfec4fb6db35d3ea953288
+    
+    Signed-off-by: Tan Shen Joon <shen.joon.tan@intel.com>
+
+diff --git a/src/nss_altfiles/files-hosts.c b/src/nss_altfiles/files-hosts.c
+index 65661d8..8d31a1f 100644
+--- a/src/nss_altfiles/files-hosts.c
++++ b/src/nss_altfiles/files-hosts.c
+@@ -33,8 +33,8 @@
+ #define DATABASE	"hosts"
+ #define NEED_H_ERRNO
+ 
+-#define EXTRA_ARGS	 , af, flags
+-#define EXTRA_ARGS_DECL	 , int af, int flags
++#define EXTRA_ARGS	 , af
++#define EXTRA_ARGS_DECL	 , int af
+ 
+ #define ENTDATA hostent_data
+ struct hostent_data
+@@ -59,12 +59,7 @@ LINE_PARSER
+      af = af == AF_UNSPEC ? AF_INET : af;
+    else
+      {
+-       if (af == AF_INET6 && (flags & AI_V4MAPPED) != 0
+-	   && inet_pton (AF_INET, addr, entdata->host_addr) > 0)
+-	 map_v4v6_address ((char *) entdata->host_addr,
+-			   (char *) entdata->host_addr);
+-       else if (af == AF_INET
+-		&& inet_pton (AF_INET6, addr, entdata->host_addr) > 0)
++     if (af == AF_INET && inet_pton (AF_INET6, addr, entdata->host_addr) > 0)
+ 	 {
+ 	   if (IN6_IS_ADDR_V4MAPPED (entdata->host_addr))
+ 	     memcpy (entdata->host_addr, entdata->host_addr + 12, INADDRSZ);
+@@ -97,16 +92,13 @@ LINE_PARSER
+    STRING_FIELD (result->h_name, isspace, 1);
+  })
+ 
+-#define EXTRA_ARGS_VALUE \
+-  , ((_res.options & RES_USE_INET6) ? AF_INET6 : AF_INET),		      \
+-  ((_res.options & RES_USE_INET6) ? AI_V4MAPPED : 0)
++#define EXTRA_ARGS_VALUE , AF_INET
+ #include "files-XXX.c"
+ #undef EXTRA_ARGS_VALUE
+ 
+ /* We only need to consider IPv4 mapped addresses if the input to the
+    gethostbyaddr() function is an IPv6 address.  */
+-#define EXTRA_ARGS_VALUE \
+-  , af, (len == IN6ADDRSZ ? AI_V4MAPPED : 0)
++#define EXTRA_ARGS_VALUE , af
+ DB_LOOKUP (hostbyaddr, ,,,
+ 	   {
+ 	     if (result->h_length == (int) len
+@@ -130,12 +122,8 @@ ALTFILES_SYMBOL1(_gethostbyname3_r) (const char *name, int af, struct hostent *r
+ 
+   if (status == NSS_STATUS_SUCCESS)
+     {
+-      /* XXX Is using _res to determine whether we want to convert IPv4
+-         addresses to IPv6 addresses really the right thing to do?  */
+-      int flags = ((_res.options & RES_USE_INET6) ? AI_V4MAPPED : 0);
+-
+       while ((status = internal_getent (stream, result, buffer, buflen, errnop,
+-					herrnop, af, flags))
++					herrnop, af))
+ 	     == NSS_STATUS_SUCCESS)
+ 	{
+ 	  LOOKUP_NAME_CASE (h_name, h_aliases)
+@@ -162,8 +150,7 @@ ALTFILES_SYMBOL1(_gethostbyname3_r) (const char *name, int af, struct hostent *r
+ 
+ 	again:
+ 	  while ((status = internal_getent (stream, &tmp_result_buf, tmp_buffer,
+-					    tmp_buflen, errnop, herrnop, af,
+-					    flags))
++					    tmp_buflen, errnop, herrnop, af))
+ 		 == NSS_STATUS_SUCCESS)
+ 	    {
+ 	      int matches = 1;
+@@ -351,9 +338,7 @@ ALTFILES_SYMBOL1(_gethostbyname_r) (const char *name, struct hostent *result,
+ 			    char *buffer, size_t buflen, int *errnop,
+ 			    int *herrnop)
+ {
+-  int af = ((_res.options & RES_USE_INET6) ? AF_INET6 : AF_INET);
+-
+-  return ALTFILES_SYMBOL1(_gethostbyname3_r) (name, af, result, buffer, buflen,
++  return ALTFILES_SYMBOL1(_gethostbyname3_r) (name, AF_INET, result, buffer, buflen,
+ 				      errnop, herrnop, NULL, NULL);
+ }
+ 
+@@ -390,7 +375,7 @@ ALTFILES_SYMBOL1(_gethostbyname4_r) (const char *name, struct gaih_addrtuple **p
+ 
+ 	  struct hostent result;
+ 	  status = internal_getent (stream, &result, buffer, buflen, errnop,
+-				    herrnop, AF_UNSPEC, 0);
++				    herrnop, AF_UNSPEC);
+ 	  if (status != NSS_STATUS_SUCCESS)
+ 	    break;
+ 

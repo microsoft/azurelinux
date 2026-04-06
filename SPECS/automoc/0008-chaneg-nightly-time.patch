@@ -1,0 +1,30 @@
+From b2910b1de438b29a4538d931bc613dac3316ed46 Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Sat, 18 Apr 2009 17:06:43 +0000
+Subject: [PATCH 08/33] -chaneg nightly time
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=955858
+---
+ CTestConfig.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CTestConfig.cmake b/CTestConfig.cmake
+index 92f9d2f..fb50721 100644
+--- a/CTestConfig.cmake
++++ b/CTestConfig.cmake
+@@ -5,7 +5,7 @@
+ ##   ENABLE_TESTING()
+ ##   INCLUDE(Dart)
+ set(CTEST_PROJECT_NAME "automoc4")
+-set(CTEST_NIGHTLY_START_TIME "16:00:00 CET")
++set(CTEST_NIGHTLY_START_TIME "19:10:00 CET")
+ 
+ set(CTEST_DROP_METHOD "http")
+ set(CTEST_DROP_SITE "my.cdash.org")
+-- 
+2.4.3
+

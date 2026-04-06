@@ -1,0 +1,11 @@
+--- tryfn-1.0.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ tryfn-1.0.0/Cargo.toml	2026-02-16T16:57:29.121255+00:00
+@@ -95,7 +95,7 @@
+ version = "0.4.20"
+ 
+ [dependencies.libtest-mimic]
+-version = "0.7.0"
++version = ">=0.7.0, <0.9.0"
+ 
+ [dependencies.snapbox]
+ version = "1.0.0"

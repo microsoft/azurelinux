@@ -1,0 +1,12 @@
+diff -up extra-cmake-modules-5.39.0/find-modules/FindPoppler.cmake.poppler_overlinking extra-cmake-modules-5.39.0/find-modules/FindPoppler.cmake
+--- extra-cmake-modules-5.39.0/find-modules/FindPoppler.cmake.poppler_overlinking	2017-09-09 07:07:55.000000000 -0500
++++ extra-cmake-modules-5.39.0/find-modules/FindPoppler.cmake	2017-11-06 14:26:33.473536485 -0600
+@@ -85,7 +85,7 @@ set(Poppler_known_components
+ )
+ foreach(_comp ${Poppler_known_components})
+     string(TOLOWER "${_comp}" _lc_comp)
+-    set(Poppler_${_comp}_component_deps "Core")
++    #set(Poppler_${_comp}_component_deps "Core")
+     set(Poppler_${_comp}_pkg_config "poppler-${_lc_comp}")
+     set(Poppler_${_comp}_lib "poppler-${_lc_comp}")
+     set(Poppler_${_comp}_header_subdir "poppler/${_lc_comp}")

@@ -1,0 +1,30 @@
+From 50542e94521e0b93b572a7132bb859e289db20b5 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 9 Aug 2024 21:55:40 +0200
+Subject: [PATCH] build and link against shared xxhash library
+
+---
+ build.rs | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 8413da2..fa9739e 100644
+--- a/build.rs
++++ b/build.rs
+@@ -1,12 +1,3 @@
+ fn main() {
+-    let mut cc = cc::Build::new();
+-
+-    cc.include("src/c/");
+-    #[cfg(feature = "no_std")]
+-    cc.define("XXH_NO_STDLIB", None);
+-
+-    cc.file("src/c/xxhash.c");
+-    cc.warnings(false);
+-
+-    cc.compile("xxhash");
++    pkg_config::Config::new().atleast_version("0.8.1").probe("libxxhash").unwrap();
+ }
+-- 
+2.46.0
+

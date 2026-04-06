@@ -1,0 +1,11 @@
+[Unit]
+Description=Tftp Server
+Requires=tftp.socket
+Documentation=man:in.tftpd
+
+[Service]
+ExecStart=/usr/sbin/in.tftpd -s /var/lib/tftpboot
+StandardInput=socket
+
+[Install]
+Also=tftp.socket

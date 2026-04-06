@@ -1,0 +1,230 @@
+Fix various incompatible pointers by switching to correct
+const-qualified types.
+
+Several problematic casts can be removed, except for the one in the
+masterPtr->data in ImgXpmGetData.
+
+Submitted upstream: <https://sourceforge.net/p/tix/bugs/113/>
+
+diff --git a/generic/tixDItem.c b/generic/tixDItem.c
+index 602c506d158d8a98..d23a4eb036aa8997 100644
+--- a/generic/tixDItem.c
++++ b/generic/tixDItem.c
+@@ -30,7 +30,7 @@ static int   DItemParseProc _ANSI_ARGS_((ClientData clientData,
+ 		Tcl_Interp *interp, Tk_Window tkwin, CONST84 char *value,
+ 		char *widRec, int offset));
+ 
+-static char *DItemPrintProc _ANSI_ARGS_((
++static const char *DItemPrintProc _ANSI_ARGS_((
+ 		ClientData clientData, Tk_Window tkwin, char *widRec,
+ 		int offset, Tcl_FreeProc **freeProcPtr));
+ 
+@@ -548,7 +548,7 @@ static int DItemParseProc(clientData, interp, tkwin, value, widRec,offset)
+     return TCL_OK;
+ }
+ 
+-static char *DItemPrintProc(clientData, tkwin, widRec,offset, freeProcPtr)
++static const char *DItemPrintProc(clientData, tkwin, widRec,offset, freeProcPtr)
+     ClientData clientData;
+     Tk_Window tkwin;
+     char *widRec;
+diff --git a/generic/tixDiStyle.c b/generic/tixDiStyle.c
+index 3c450cf001d075ba..fba76706afcd16f0 100644
+--- a/generic/tixDiStyle.c
++++ b/generic/tixDiStyle.c
+@@ -31,7 +31,7 @@ typedef struct StyleInfo {
+ static int   		DItemStyleParseProc _ANSI_ARGS_((ClientData clientData,
+ 			    Tcl_Interp *interp, Tk_Window tkwin,
+ 			    CONST84 char *value,char *widRec, int offset));
+-static char *		DItemStylePrintProc _ANSI_ARGS_((
++static const char *	DItemStylePrintProc _ANSI_ARGS_((
+ 			    ClientData clientData, Tk_Window tkwin, 
+ 			    char *widRec, int offset,
+ 			    Tcl_FreeProc **freeProcPtr));
+@@ -998,7 +998,7 @@ not_found:
+     return TCL_ERROR;
+ }
+ 
+-static char *DItemStylePrintProc(clientData, tkwin, widRec,offset, freeProcPtr)
++static const char *DItemStylePrintProc(clientData, tkwin, widRec,offset, freeProcPtr)
+     ClientData clientData;
+     Tk_Window tkwin;
+     char *widRec;
+diff --git a/generic/tixImgCmp.c b/generic/tixImgCmp.c
+index 4ba60ca06541156e..5df05c4eb32a4611 100644
+--- a/generic/tixImgCmp.c
++++ b/generic/tixImgCmp.c
+@@ -142,8 +142,8 @@ typedef union CmpItemPtr {
+  * The type record for bitmap images:
+  */
+ static int		ImgCmpCreate _ANSI_ARGS_((Tcl_Interp *interp,
+-			    char *name, int argc, Tcl_Obj *CONST objv[],
+-			    Tk_ImageType *typePtr, Tk_ImageMaster master,
++			    const char *name, int argc, Tcl_Obj *CONST objv[],
++			    const Tk_ImageType *typePtr, Tk_ImageMaster master,
+ 			    ClientData *clientDataPtr));
+ static ClientData	ImgCmpGet _ANSI_ARGS_((Tk_Window tkwin,
+ 			    ClientData clientData));
+@@ -378,11 +378,11 @@ static int
+ ImgCmpCreate(interp, name, argc, objv, typePtr, master, clientDataPtr)
+     Tcl_Interp *interp;		/* Interpreter for application containing
+ 				 * image. */
+-    char *name;			/* Name to use for image. */
++    const char *name;		/* Name to use for image. */
+     int argc;			/* Number of arguments. */
+     Tcl_Obj *CONST objv[];	/* Argument strings for options (doesn't
+ 				 * include image name or type). */
+-    Tk_ImageType *typePtr;	/* Pointer to our type record (not used). */
++    const Tk_ImageType *typePtr;/* Pointer to our type record (not used). */
+     Tk_ImageMaster master;	/* Token for image, to be used by us in
+ 				 * later callbacks. */
+     ClientData *clientDataPtr;	/* Store manager's token for image here;
+diff --git a/generic/tixImgXpm.c b/generic/tixImgXpm.c
+index 23c3981c6ea29fe8..16afe3b2318cf6e2 100644
+--- a/generic/tixImgXpm.c
++++ b/generic/tixImgXpm.c
+@@ -22,8 +22,8 @@
+  */
+ 
+ static int		ImgXpmCreate _ANSI_ARGS_((Tcl_Interp *interp,
+-			    char *name, int argc, Tcl_Obj *CONST objv[],
+-			    Tk_ImageType *typePtr, Tk_ImageMaster master,
++			    const char *name, int argc, Tcl_Obj *CONST objv[],
++			    const Tk_ImageType *typePtr, Tk_ImageMaster master,
+ 			    ClientData *clientDataPtr));
+ static ClientData	ImgXpmGet _ANSI_ARGS_((Tk_Window tkwin,
+ 			    ClientData clientData));
+@@ -45,11 +45,11 @@ static int		ImgXpmConfigureMaster _ANSI_ARGS_((
+ 			    int flags));
+ static int		ImgXpmGetData _ANSI_ARGS_((Tcl_Interp *interp,
+ 			    PixmapMaster *masterPtr));
+-static char ** 		ImgXpmGetDataFromFile _ANSI_ARGS_((Tcl_Interp * interp,
++static const char **	ImgXpmGetDataFromFile _ANSI_ARGS_((Tcl_Interp * interp,
+ 			    char * string, int * numLines_return));
+-static char ** 		ImgXpmGetDataFromId _ANSI_ARGS_((Tcl_Interp * interp,
++static const char **	ImgXpmGetDataFromId _ANSI_ARGS_((Tcl_Interp * interp,
+ 			    CONST84 char * id));
+-static char ** 		ImgXpmGetDataFromString _ANSI_ARGS_((Tcl_Interp*interp,
++static const char **	ImgXpmGetDataFromString _ANSI_ARGS_((Tcl_Interp*interp,
+ 			    char * string, int * numLines_return));
+ static void 		ImgXpmGetPixmapFromData _ANSI_ARGS_((
+ 			    Tcl_Interp * interp,
+@@ -115,11 +115,11 @@ static int
+ ImgXpmCreate(interp, name, argc, objv, typePtr, master, clientDataPtr)
+     Tcl_Interp *interp;		/* Interpreter for application containing
+ 				 * image. */
+-    char *name;			/* Name to use for image. */
++    const char *name;		/* Name to use for image. */
+     int argc;			/* Number of arguments. */
+     Tcl_Obj *CONST objv[];	/* Argument strings for options (doesn't
+ 				 * include image name or type). */
+-    Tk_ImageType *typePtr;	/* Pointer to our type record (not used). */
++    const Tk_ImageType *typePtr;/* Pointer to our type record (not used). */
+     Tk_ImageMaster master;	/* Token for image, to be used by us in
+ 				 * later callbacks. */
+     ClientData *clientDataPtr;	/* Store manager's token for image here;
+@@ -286,7 +286,7 @@ ImgXpmGetData(interp, masterPtr)
+     Tcl_Interp *interp;			/* For reporting errors. */
+     PixmapMaster *masterPtr;
+ {
+-    char ** data = NULL;
++    const char ** data = NULL;
+     int  isAllocated = 0;	/* do we need to free "data"? */
+     int listArgc;
+     CONST84 char ** listArgv = NULL;
+@@ -342,7 +342,7 @@ ImgXpmGetData(interp, masterPtr)
+ 	    ckfree((char*)masterPtr->data);
+ 	}
+ 	masterPtr->isDataAlloced = isAllocated;
+-	masterPtr->data = data;
++	masterPtr->data = (char **)data;
+ 	masterPtr->size[0] = size[0];
+ 	masterPtr->size[1] = size[1];
+ 	masterPtr->cpp = cpp;
+@@ -363,7 +363,7 @@ ImgXpmGetData(interp, masterPtr)
+     return code;
+ }
+ 
+-static char ** ImgXpmGetDataFromId(interp, id)
++static const char ** ImgXpmGetDataFromId(interp, id)
+     Tcl_Interp * interp;
+     CONST84 char * id;
+ {
+@@ -378,13 +378,13 @@ static char ** ImgXpmGetDataFromId(interp, id)
+     if (hashPtr == NULL) {
+ 	Tcl_AppendResult(interp, "unknown pixmap ID \"", id,
+ 	    "\"", NULL);
+-	return (char**)NULL;
++	return NULL;
+     } else {
+-	return (char**)Tcl_GetHashValue(hashPtr);
++	return Tcl_GetHashValue(hashPtr);
+     }
+ }
+ 
+-static char ** ImgXpmGetDataFromString(interp, string, numLines_return)
++static const char ** ImgXpmGetDataFromString(interp, string, numLines_return)
+     Tcl_Interp * interp;
+     char * string;
+     int * numLines_return;
+@@ -392,7 +392,7 @@ static char ** ImgXpmGetDataFromString(interp, string, numLines_return)
+     int quoted;
+     char * p, * list;
+     int numLines;
+-    char ** data;
++    const char ** data;
+ 
+     /* skip the leading blanks (leading blanks are not defined in the
+      * the XPM definition, but skipping them shouldn't hurt. Also, the ability
+@@ -510,17 +510,17 @@ static char ** ImgXpmGetDataFromString(interp, string, numLines_return)
+ 
+   error:
+     Tcl_AppendResult(interp, "File format error", NULL);
+-    return (char**) NULL;
++    return NULL;
+ }
+ 
+-static char ** ImgXpmGetDataFromFile(interp, fileName, numLines_return)
++static const char ** ImgXpmGetDataFromFile(interp, fileName, numLines_return)
+     Tcl_Interp * interp;
+     char * fileName;
+     int * numLines_return;
+ {
+     FILE * fd = NULL;
+     int size, n;
+-    char ** data;
++    const char ** data;
+     char *cmdBuffer = NULL;
+     Tcl_DString buffer;			/* initialized by Tcl_TildeSubst */
+ 
+@@ -588,7 +588,7 @@ static char ** ImgXpmGetDataFromFile(interp, fileName, numLines_return)
+ 	ckfree(cmdBuffer);
+     }
+     Tcl_DStringFree(&buffer);
+-    return (char**)NULL;
++    return NULL;
+ }
+ 
+ 
+diff --git a/generic/tixUtils.c b/generic/tixUtils.c
+index 998acb84e3f8c79c..e7967b51ecd3a1e4 100644
+--- a/generic/tixUtils.c
++++ b/generic/tixUtils.c
+@@ -24,7 +24,7 @@
+ static int	ReliefParseProc(ClientData clientData,
+ 	Tcl_Interp *interp, Tk_Window tkwin, CONST84 char *value,
+ 	char *widRec, int offset);
+-static char *	ReliefPrintProc(ClientData clientData,
++static const char *	ReliefPrintProc(ClientData clientData,
+ 	Tk_Window tkwin, char *widRec, int offset,
+ 	Tix_FreeProc **freeProcPtr);
+ 
+@@ -637,7 +637,7 @@ ReliefParseProc(clientData, interp, tkwin, value, widRec,offset)
+     return TCL_ERROR;
+ }
+ 
+-static char *
++static const char *
+ ReliefPrintProc(clientData, tkwin, widRec,offset, freeProcPtr)
+     ClientData clientData;
+     Tk_Window tkwin;

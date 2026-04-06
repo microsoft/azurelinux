@@ -1,0 +1,14 @@
+Index: openexr-2.5.3/OpenEXR/IlmImf/dwaLookups.cpp
+===================================================================
+--- openexr-2.5.3.orig/OpenEXR/IlmImf/dwaLookups.cpp
++++ openexr-2.5.3/OpenEXR/IlmImf/dwaLookups.cpp
+@@ -300,7 +300,8 @@ generateNoop()
+         unsigned short src = (unsigned short)i;
+         Xdr::write <CharPtrIO> (tmp,  src);
+ 
+-        printf("0x%04x, ", dst);
++	// DST is a short, so the right length modifier is 'h'
++        printf("0x%04hx, ", dst);
+     }
+     printf("\n};\n");
+ }

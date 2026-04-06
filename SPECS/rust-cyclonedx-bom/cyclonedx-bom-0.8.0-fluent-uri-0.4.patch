@@ -1,0 +1,13 @@
+diff --git a/src/external_models/uri.rs b/src/external_models/uri.rs
+index 90d66f3..8a51129 100644
+--- a/src/external_models/uri.rs
++++ b/src/external_models/uri.rs
+@@ -18,7 +18,7 @@
+ 
+ use std::{convert::TryFrom, str::FromStr};
+ 
+-use fluent_uri::Uri as Url;
++use fluent_uri::UriRef as Url;
+ use purl::{GenericPurl, GenericPurlBuilder};
+ use thiserror::Error;
+ 

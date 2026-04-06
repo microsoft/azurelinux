@@ -1,0 +1,54 @@
+From 33557055f488422b7ef0651b50f44963337ff7f7 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Fri, 5 Mar 2021 12:52:36 +0100
+Subject: [PATCH 4/5] Improve parsing of "r"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Negative r values are illegal, and zero means empty for circles.
+
+Pick-to: 6.1
+Change-Id: Icb1d932f35909f71dafe1ee69eb2250eeb1bb2ad
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 4a88e194e6b243e83703ad83d95e49b2febed99e)
+---
+ src/svg/qsvghandler.cpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/svg/qsvghandler.cpp b/src/svg/qsvghandler.cpp
+index 836f9a65..222b6d89 100644
+--- a/src/svg/qsvghandler.cpp
++++ b/src/svg/qsvghandler.cpp
+@@ -2579,6 +2579,8 @@ static QSvgNode *createCircleNode(QSvgNode *parent,
+     qreal ncx = toDouble(cx);
+     qreal ncy = toDouble(cy);
+     qreal nr  = toDouble(r);
++    if (nr < 0.0)
++        return nullptr;
+ 
+     QRectF rect(ncx-nr, ncy-nr, nr*2, nr*2);
+     QSvgNode *circle = new QSvgCircle(parent, rect);
+@@ -3049,15 +3051,16 @@ static QSvgStyleProperty *createRadialGradientNode(QSvgNode *node,
+ 
+     qreal ncx = 0.5;
+     qreal ncy = 0.5;
+-    qreal nr  = 0.5;
+     if (!cx.isEmpty())
+         ncx = toDouble(cx);
+     if (!cy.isEmpty())
+         ncy = toDouble(cy);
++
++    qreal nr = 0.0;
+     if (!r.isEmpty())
+         nr = toDouble(r);
+-    if (nr < 0.5)
+-        nr = 0.5;
++    if (nr <= 0.0)
++        return nullptr;
+ 
+     qreal nfx = ncx;
+     if (!fx.isEmpty())
+-- 
+2.51.1
+

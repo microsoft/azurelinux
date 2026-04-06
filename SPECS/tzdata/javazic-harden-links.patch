@@ -1,0 +1,84 @@
+commit 1bc13a1c10a580f84f1b7686c95344ec2633f611
+Author: Florian Weimer <fweimer@openjdk.org>
+Date:   Thu Sep 26 22:37:45 2024 +0000
+
+    8340552: Harden TzdbZoneRulesCompiler against missing zone names
+    
+    Reviewed-by: andrew, jlu, naoto
+
+diff -ur tzdata-2024b.orig/javazic-1.8/build/tools/tzdb/TzdbZoneRulesCompiler.java tzdata-2024b/javazic-1.8/build/tools/tzdb/TzdbZoneRulesCompiler.java
+--- tzdata-2024b.orig/javazic-1.8/build/tools/tzdb/TzdbZoneRulesCompiler.java	2014-04-22 19:46:49.000000000 +0200
++++ tzdata-2024b/javazic-1.8/build/tools/tzdb/TzdbZoneRulesCompiler.java	2024-09-20 21:10:12.748483767 +0200
+@@ -248,7 +248,7 @@
+             // link version-region-rules
+             out.writeShort(builtZones.size());
+             for (Map.Entry<String, ZoneRules> entry : builtZones.entrySet()) {
+-                 int regionIndex = Arrays.binarySearch(regionArray, entry.getKey());
++                 int regionIndex = findRegionIndex(regionArray, entry.getKey());
+                  int rulesIndex = rulesList.indexOf(entry.getValue());
+                  out.writeShort(regionIndex);
+                  out.writeShort(rulesIndex);
+@@ -256,8 +256,8 @@
+             // alias-region
+             out.writeShort(links.size());
+             for (Map.Entry<String, String> entry : links.entrySet()) {
+-                 int aliasIndex = Arrays.binarySearch(regionArray, entry.getKey());
+-                 int regionIndex = Arrays.binarySearch(regionArray, entry.getValue());
++                 int aliasIndex = findRegionIndex(regionArray, entry.getKey());
++                 int regionIndex = findRegionIndex(regionArray, entry.getValue());
+                  out.writeShort(aliasIndex);
+                  out.writeShort(regionIndex);
+             }
+@@ -269,6 +269,14 @@
+         }
+     }
+ 
++    private static int findRegionIndex(String[] regionArray, String region) {
++        int index = Arrays.binarySearch(regionArray, region);
++        if (index < 0) {
++            throw new IllegalArgumentException("Unknown region: " + region);
++        }
++        return index;
++    }
++
+     private static final Pattern YEAR = Pattern.compile("(?i)(?<min>min)|(?<max>max)|(?<only>only)|(?<year>[0-9]+)");
+     private static final Pattern MONTH = Pattern.compile("(?i)(jan)|(feb)|(mar)|(apr)|(may)|(jun)|(jul)|(aug)|(sep)|(oct)|(nov)|(dec)");
+     private static final Matcher DOW = Pattern.compile("(?i)(mon)|(tue)|(wed)|(thu)|(fri)|(sat)|(sun)").matcher("");
+@@ -607,22 +615,20 @@
+             }
+             builtZones.put(aliasId, realRules);
+         }
+-        // remove UTC and GMT
+-        // builtZones.remove("UTC");
+-        // builtZones.remove("GMT");
+-        // builtZones.remove("GMT0");
+-        builtZones.remove("GMT+0");
+-        builtZones.remove("GMT-0");
+-        links.remove("GMT+0");
+-        links.remove("GMT-0");
+-        // remove ROC, which is not supported in j.u.tz
+-        builtZones.remove("ROC");
+-        links.remove("ROC");
+-        // remove EST, HST and MST. They are supported via
+-        // the short-id mapping
+-        builtZones.remove("EST");
+-        builtZones.remove("HST");
+-        builtZones.remove("MST");
++
++        List<String> zonesToRemove = Arrays.asList(
++            // remove UTC and GMT
++            "GMT+0",
++            "GMT-0",
++            // remove ROC, which is not supported in j.u.tz
++            "ROC",
++            // remove EST, HST and MST. They are supported via
++            // the short-id mapping
++            "EST",
++            "HST",
++            "MST");
++        builtZones.keySet().removeAll(zonesToRemove);
++        links.keySet().removeAll(zonesToRemove);
+     }
+ 
+     /**
+

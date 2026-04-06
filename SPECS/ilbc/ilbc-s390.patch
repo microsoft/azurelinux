@@ -1,0 +1,12 @@
+diff -Naur libilbc-3.0.4.old/rtc_base/system/arch.h libilbc-3.0.4/rtc_base/system/arch.h
+--- libilbc-3.0.4.old/rtc_base/system/arch.h	2022-05-25 10:51:43.561630619 +0200
++++ libilbc-3.0.4/rtc_base/system/arch.h	2022-05-25 11:40:46.556337090 +0200
+@@ -60,6 +60,8 @@
+ #else
+ #define WEBRTC_ARCH_BIG_ENDIAN
+ #endif
++#elif defined(__s390__) || defined(__s390x__) || defined(__zarch__)
++#define WEBRTC_ARCH_BIG_ENDIAN
+ #elif defined(__sparc) || defined(__sparc__)
+ #if __SIZEOF_LONG__ == 8
+ #define WEBRTC_ARCH_64_BITS

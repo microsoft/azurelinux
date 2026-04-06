@@ -1,0 +1,28 @@
+From 3e0effdd08b629c2242ef37c022cefd3bd2d8c02 Mon Sep 17 00:00:00 2001
+From: Marc Perache <marc.perache@cea.fr>
+Date: Wed, 24 Jan 2024 11:25:51 +0100
+Subject: [PATCH] Update FFTW3Config.cmake.in
+
+Fixes FFTW/fftw3/issues/130
+as proposed by @sergiomb2 and @ferdnyc
+
+Update FFTW3Config.cmake.in
+---
+ FFTW3Config.cmake.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/FFTW3Config.cmake.in b/FFTW3Config.cmake.in
+index 6b1fbc2e1..b5aa4f39c 100644
+--- a/FFTW3Config.cmake.in
++++ b/FFTW3Config.cmake.in
+@@ -10,7 +10,9 @@ set (FFTW3@PREC_SUFFIX@_LIBRARIES fftw3@PREC_SUFFIX@)
+ set (FFTW3@PREC_SUFFIX@_LIBRARY_DIRS @CMAKE_INSTALL_FULL_LIBDIR@)
+ set (FFTW3@PREC_SUFFIX@_INCLUDE_DIRS @CMAKE_INSTALL_FULL_INCLUDEDIR@)
+ 
+-include ("${CMAKE_CURRENT_LIST_DIR}/FFTW3LibraryDepends.cmake")
++if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/FFTW3LibraryDepends.cmake")
++  include ("${CMAKE_CURRENT_LIST_DIR}/FFTW3LibraryDepends.cmake")
++endif ()
+ 
+ if (CMAKE_VERSION VERSION_LESS 2.8.3)
+   set (CMAKE_CURRENT_LIST_DIR)

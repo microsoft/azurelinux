@@ -1,0 +1,27 @@
+diff -up oauth2client-3.0.0/docs/conf.py.doc oauth2client-3.0.0/docs/conf.py
+--- oauth2client-3.0.0/docs/conf.py.doc	2016-12-27 17:01:44.043275431 +0100
++++ oauth2client-3.0.0/docs/conf.py	2016-12-27 17:02:14.024315815 +0100
+@@ -64,9 +64,9 @@ project = u'oauth2client'
+ copyright = u'2014, Google, Inc'
+ 
+ # Version info
+-distro = get_distribution('oauth2client')
+-version = distro.version
+-release = distro.version
++#distro = get_distribution('oauth2client')
++version = '4.1.3'
++release = '4.1.3'
+ 
+ exclude_patterns = ['_build']
+ 
+diff -up oauth2client-3.0.0/docs/source/oauth2client.contrib.rst.doc oauth2client-3.0.0/docs/source/oauth2client.contrib.rst
+--- oauth2client-3.0.0/docs/source/oauth2client.contrib.rst.doc	2016-07-28 20:50:44.000000000 +0200
++++ oauth2client-3.0.0/docs/source/oauth2client.contrib.rst	2016-12-27 17:01:29.849256312 +0100
+@@ -13,7 +13,6 @@ Submodules
+ 
+ .. toctree::
+ 
+-   oauth2client.contrib.appengine
+    oauth2client.contrib.devshell
+    oauth2client.contrib.dictionary_storage
+    oauth2client.contrib.flask_util

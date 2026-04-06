@@ -1,0 +1,16 @@
+diff --git a/SConstruct b/SConstruct
+index 8826ffc..6539333 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -881,11 +881,6 @@ if meta.platform in ['android']:
+     env.AddManualDependency(libs=['log', 'android'])
+ 
+ if meta.compiler in ['gcc', 'clang']:
+-    if not meta.platform in ['android']:
+-        env.Append(CXXFLAGS=[
+-            '-std=c++98',
+-        ])
+-
+     env.Append(CXXFLAGS=[
+         '-fno-exceptions',
+     ])

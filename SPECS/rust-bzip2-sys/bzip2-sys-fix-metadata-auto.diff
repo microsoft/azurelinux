@@ -1,0 +1,16 @@
+--- bzip2-sys-0.1.13+1.0.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bzip2-sys-0.1.13+1.0.8/Cargo.toml	2025-03-15T23:59:20.322259+00:00
+@@ -11,7 +11,7 @@
+ 
+ [package]
+ name = "bzip2-sys"
+-version = "0.1.13+1.0.8"
++version = "0.1.13"
+ authors = ["Alex Crichton <alex@alexcrichton.com>"]
+ build = "build.rs"
+ links = "bzip2"
+@@ -47,3 +47,4 @@
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.9"
++

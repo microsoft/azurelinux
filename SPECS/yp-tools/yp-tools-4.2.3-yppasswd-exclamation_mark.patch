@@ -1,0 +1,15 @@
+diff -ur yp-tools-4.2.3/src/yppasswd.c yp-tools-4.2.3/src/yppasswd.c
+--- yp-tools-4.2.3/src/yppasswd.c       2018-03-27 15:47:48.000000000 +0200
++++ yp-tools-4.2.3/src/yppasswd.c        2022-08-16 19:02:41.727441211 +0200
+@@ -689,6 +689,11 @@
+         }
+     }
+
++  if (strchr(pwd->pw_passwd, '!') != NULL || strchr(pwd->pw_passwd, '*') != NULL) {
++      printf("%s: The account is locked or has no password. Please unlock the account or set an initial password\n", progname);
++      return 1;
++  }
++
+   /* Initialize password information */
+   memset (&yppwd, '\0', sizeof (yppwd));
+   yppwd.newpw.pw_passwd = pwd->pw_passwd;

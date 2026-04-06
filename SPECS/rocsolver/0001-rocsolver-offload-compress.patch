@@ -1,0 +1,40 @@
+From 14a964a12049d33020c2f34266cb2c1108ea34b9 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Mon, 14 Apr 2025 16:46:30 -0700
+Subject: [PATCH] rocsolver offload compress
+
+---
+ CMakeLists.txt             | 1 +
+ library/src/CMakeLists.txt | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4675f33..905ba4c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,6 +57,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ option(ROCSOLVER_EMBED_FMT "Hide libfmt symbols" ON)
+ option(OPTIMAL "Build specialized kernels for small matrix sizes" ON)
+ option(ROCSOLVER_FIND_PACKAGE_LAPACK_CONFIG "Skip module mode search for LAPACK" ON)
++option( BUILD_OFFLOAD_COMPRESS "Build with offload compress?" OFF )
+ option(ROCSOLVER_USE_INTERNAL_BLAS "Use internal implementation of GEMM and TRSM for debugging." OFF)
+ option(ROCSOLVER_USE_REFERENCE_SECULAR_EQUATIONS_SOLVER "Use LAPACK like implementation of secular equations solver" ON)
+ 
+diff --git a/library/src/CMakeLists.txt b/library/src/CMakeLists.txt
+index 8e383d5..50cb001 100755
+--- a/library/src/CMakeLists.txt
++++ b/library/src/CMakeLists.txt
+@@ -418,6 +418,10 @@ if(BUILD_OFFLOAD_COMPRESS)
+   target_compile_options(rocsolver PRIVATE "--offload-compress")
+ endif()
+ 
++if ( BUILD_OFFLOAD_COMPRESS )
++  target_compile_options( rocsolver PRIVATE --offload-compress )
++endif ()
++
+ target_include_directories(rocsolver
+   PUBLIC
+     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/library/include>
+-- 
+2.50.1
+

@@ -1,0 +1,39 @@
+From e37d6503c82cc4616030deb02d641b3538b668fd Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@redhat.com>
+Date: Fri, 15 Jul 2016 16:01:08 +0200
+Subject: [PATCH] Use proto_dist from command line
+
+Use protocol distribution value from command line when provided instead
+of always using default value (inet_tcp) when trying to check epmd.
+
+If provided more than one protocol distribution types, then use the
+first one.
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbit_common/src/rabbit_nodes_common.erl | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/deps/rabbit_common/src/rabbit_nodes_common.erl b/deps/rabbit_common/src/rabbit_nodes_common.erl
+index 7b4b6e2e9c..367cdf6be8 100644
+--- a/deps/rabbit_common/src/rabbit_nodes_common.erl
++++ b/deps/rabbit_common/src/rabbit_nodes_common.erl
+@@ -117,10 +117,15 @@ ensure_epmd() ->
+ start_epmd() ->
+     Exe = rabbit_runtime:get_erl_path(),
+     ID = rabbit_misc:random(1000000000),
++    ProtoDist = case init:get_argument(proto_dist) of
++            {ok, [Proto | _Protos]} -> Proto;
++            error -> "inet_tcp"
++    end,
+     Port = open_port(
+              {spawn_executable, Exe},
+              [{args, ["-boot", "no_dot_erlang",
+                       "-sname", rabbit_misc:format("epmd-starter-~b", [ID]),
++                      "-proto_dist", rabbit_misc:format("~p", [ProtoDist]),
+                       "-noinput", "-s", "erlang", "halt"]},
+               exit_status, stderr_to_stdout, use_stdio]),
+     port_shutdown_loop(Port).
+-- 
+2.44.0
+

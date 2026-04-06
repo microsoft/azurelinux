@@ -1,0 +1,31 @@
+From 0e620eeb7caebd36938478f2246de773a7be8a84 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 11 Nov 2024 15:07:12 +0400
+Subject: [PATCH] build: fix -Dtools=false build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+tests/meson.build:107:27: ERROR: Unknown variable "util_dep"
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index 310699f..977aa45 100644
+--- a/meson.build
++++ b/meson.build
+@@ -61,6 +61,7 @@ version_gen_h = vcs_tag(
+ subdir('libfdt')
+ 
+ dtc_tools = []
++util_dep = declare_dependency()
+ if get_option('tools')
+   flex = find_program('flex', required: true)
+   bison = find_program('bison', required: true)
+-- 
+2.47.0
+

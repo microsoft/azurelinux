@@ -1,0 +1,12 @@
+--- concurrent-queue-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ concurrent-queue-2.5.0/Cargo.toml	2024-05-08T18:20:35.824696+00:00
+@@ -64,9 +64,3 @@
+ default = ["std"]
+ std = []
+ 
+-[target."cfg(loom)".dependencies.loom]
+-version = "0.7"
+-optional = true
+-
+-[target."cfg(target_family = \"wasm\")".dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

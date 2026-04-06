@@ -1,0 +1,14 @@
+# OS specific settings
+
+%_ghcdocdir %{_ghclicensedir}/%{name}
+
+%ghc_without_dynamic 1
+
+# enable library documentation in doc subpkgs (deprecated)
+%with_haddock 1
+
+%ghc_haddocks\
+%bcond haddock 1
+
+# %%{?_smp_ncpus_max:--jobs=%%{?_smp_ncpus_max}}
+%ghc_smp_mflags %{?_smp_mflags}

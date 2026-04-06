@@ -1,0 +1,108 @@
+From a5fe60b2b02a1d893589f79f47b62c3f7e78315a Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Fri, 3 May 2024 11:35:13 +0200
+Subject: [PATCH] Use setuptools instead of whey as build backend
+
+Python has too many build systems already,
+and I'm not interested in packaging whey and its multiple missing
+dependencies.
+setuptools will do just fine.
+---
+ pyproject.toml | 48 +++++++++++++++++++++++++++++-------------------
+ setup.py       | 13 +++++++++++++
+ 2 files changed, 42 insertions(+), 19 deletions(-)
+ create mode 100644 setup.py
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2ad31ef..30a0176 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+-requires = [ "whey",]
+-build-backend = "whey"
++requires = [ "setuptools>=62",]
++build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "coincidence"
+@@ -9,7 +9,33 @@ description = "Helper functions for pytest."
+ readme = "README.rst"
+ requires-python = ">=3.6"
+ keywords = [ "pytest", "regression", "testing", "unittest", "utilities",]
+-dynamic = [ "classifiers", "dependencies",]
++# install_requires is set in setup.py based on requirements.txt,
++# so dependencies must be listed as dynamic.
++dynamic = [ "dependencies",]
++
++classifiers = [
++    "Development Status :: 4 - Beta",
++    "Framework :: Pytest",
++    "Intended Audience :: Developers",
++    "License :: OSI Approved :: MIT License",
++    "Operating System :: OS Independent",
++    "Programming Language :: Python",
++    "Programming Language :: Python :: 3 :: Only",
++    "Programming Language :: Python :: 3.6",
++    "Programming Language :: Python :: 3.7",
++    "Programming Language :: Python :: 3.8",
++    "Programming Language :: Python :: 3.9",
++    "Programming Language :: Python :: 3.10",
++    "Programming Language :: Python :: 3.11",
++    "Programming Language :: Python :: 3.12",
++    "Programming Language :: Python :: Implementation :: CPython",
++    "Programming Language :: Python :: Implementation :: PyPy",
++    "Topic :: Software Development :: Libraries :: Python Modules",
++    "Topic :: Software Development :: Quality Assurance",
++    "Topic :: Software Development :: Testing",
++    "Topic :: Software Development :: Testing :: Unit",
++    "Typing :: Typed",
++]
+ 
+ [[project.authors]]
+ name = "Dominic Davis-Foster"
+@@ -25,22 +51,6 @@ Homepage = "https://github.com/python-coincidence/coincidence"
+ "Source Code" = "https://github.com/python-coincidence/coincidence"
+ Documentation = "https://coincidence.readthedocs.io/en/latest"
+ 
+-[tool.whey]
+-base-classifiers = [
+-    "Development Status :: 4 - Beta",
+-    "Framework :: Pytest",
+-    "Intended Audience :: Developers",
+-    "Topic :: Software Development :: Libraries :: Python Modules",
+-    "Topic :: Software Development :: Quality Assurance",
+-    "Topic :: Software Development :: Testing",
+-    "Topic :: Software Development :: Testing :: Unit",
+-    "Typing :: Typed",
+-]
+-python-versions = [ "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12",]
+-python-implementations = [ "CPython", "PyPy",]
+-platforms = [ "Windows", "macOS", "Linux",]
+-license-key = "MIT"
+-
+ [tool.mkrecipe]
+ extras = "all"
+ conda-channels = [ "conda-forge", "domdfcoding",]
+diff --git a/setup.py b/setup.py
+new file mode 100644
+index 0000000..5d8cfee
+--- /dev/null
++++ b/setup.py
+@@ -0,0 +1,13 @@
++from pathlib import Path
++
++from setuptools import setup
++
++HERE = Path(__file__).resolve().parent
++
++
++def get_requirements() -> list[str]:
++    with (HERE / "requirements.txt").open("r", encoding="utf-8") as fp:
++        return [line.strip() for line in fp if not line.startswith("#")]
++
++
++setup(install_requires=get_requirements())
+-- 
+2.44.0
+

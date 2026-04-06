@@ -1,0 +1,23 @@
+Use pkg-config to report libpng version and installation directories.
+
+
+diff -Naur libpng-1.5.5.orig/libpng-config.in libpng-1.5.5/libpng-config.in
+--- libpng-1.5.5.orig/libpng-config.in	2011-09-22 09:40:23.000000000 -0400
++++ libpng-1.5.5/libpng-config.in	2011-10-05 01:03:32.335435187 -0400
+@@ -11,11 +11,11 @@
+ 
+ # Modeled after libxml-config.
+ 
+-version="@PNGLIB_VERSION@"
+-prefix="@prefix@"
+-exec_prefix="@exec_prefix@"
+-libdir="@libdir@"
+-includedir="@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
++version=`pkg-config --modversion libpng`
++prefix=`pkg-config --variable prefix libpng`
++exec_prefix=`pkg-config --variable exec_prefix libpng`
++libdir=`pkg-config --variable libdir libpng`
++includedir=`pkg-config --variable includedir libpng`
+ libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@"
+ all_libs="-lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ @LIBS@"
+ I_opts="-I${includedir}"

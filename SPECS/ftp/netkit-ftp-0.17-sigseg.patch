@@ -1,0 +1,16 @@
+--- netkit-ftp-0.17-orig/ftp/ftp.c	2007-08-06 23:32:49.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2007-08-06 23:31:06.000000000 +0200
+@@ -483,8 +483,10 @@ getreply(int expecteof)
+ 					return (0);
+ 				}
+ 				lostpeer(0);
+-				fclose(cout);
+-				cout = NULL;
++				if (cout) {
++					fclose(cout);
++					cout = NULL;
++				}
+ 				if (verbose) {
+ 					printf("421 Service not available, remote server has closed connection\n");
+ 					(void) fflush(stdout);
+

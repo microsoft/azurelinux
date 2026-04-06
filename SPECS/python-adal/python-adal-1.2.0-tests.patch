@@ -1,0 +1,23 @@
+diff -up ./tests/test_mex.py.orig ./tests/test_mex.py
+--- ./tests/test_mex.py.orig	2018-10-19 00:29:42.000000000 +0200
++++ ./tests/test_mex.py	2018-11-02 01:34:24.851553069 +0100
+@@ -25,6 +25,7 @@
+ #
+ #------------------------------------------------------------------------------
+ import os
++from distutils.version import LooseVersion
+ import unittest
+ import httpretty
+ from tests import util
+@@ -52,7 +53,10 @@ class Test_Mex(unittest.TestCase):
+             mex.discover()
+             self.fail('No exception was thrown caused by failed request')
+         except Exception as exp:
+-            self.assertEqual(exp.args[0], 'Mex Get request returned http error: 500 and server response: HTTPretty :)')
++            if LooseVersion(httpretty.__version__) >= LooseVersion("0.9.0"):
++                self.assertEqual(exp.args[0], 'Mex Get request returned http error: 500 and server response: {"message": "HTTPretty :)"}')
++            else:
++                self.assertEqual(exp.args[0], 'Mex Get request returned http error: 500 and server response: HTTPretty :)')
+ 
+     @httpretty.activate
+     def _happyPathTest(self, file_name, expectedUrl):

@@ -1,0 +1,37 @@
+From 5891358639fcfa7a2e2004855275bd7da0c85c64 Mon Sep 17 00:00:00 2001
+From: James Coglan <jcoglan@gmail.com>
+Date: Sun, 6 Feb 2022 23:36:18 +0000
+Subject: [PATCH] As of rspec-mocks v3.10.3, mock expectations need to use
+ explicit hashes to avoid confusion with keyword args
+
+---
+ spec/websocket/extensions_spec.rb | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/spec/websocket/extensions_spec.rb b/spec/websocket/extensions_spec.rb
+index 7c1e4f1..ccb305d 100644
+--- a/spec/websocket/extensions_spec.rb
++++ b/spec/websocket/extensions_spec.rb
+@@ -134,18 +134,18 @@
+       end
+ 
+       it "activates one session with a boolean param" do
+-        expect(@session).to receive(:activate).with("gzip" => true).exactly(1).and_return(true)
++        expect(@session).to receive(:activate).with({ "gzip" => true }).exactly(1).and_return(true)
+         @extensions.activate("deflate; gzip")
+       end
+ 
+       it "activates one session with a string param" do
+-        expect(@session).to receive(:activate).with("mode" => "compress").exactly(1).and_return(true)
++        expect(@session).to receive(:activate).with({ "mode" => "compress" }).exactly(1).and_return(true)
+         @extensions.activate("deflate; mode=compress")
+       end
+ 
+       it "activate multiple sessions" do
+-        expect(@session).to receive(:activate).with("a" => true).exactly(1).and_return(true)
+-        expect(@nonconflict_session).to receive(:activate).with("b" => true).exactly(1).and_return(true)
++        expect(@session).to receive(:activate).with({ "a" => true }).exactly(1).and_return(true)
++        expect(@nonconflict_session).to receive(:activate).with({ "b" => true }).exactly(1).and_return(true)
+         @extensions.activate("deflate; a, reverse; b")
+       end
+ 

@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+
+# Copyright (C) 2020 Igor Raits <ignatenkobrain@fedoraproject.org>.
+#
+# Fedora-License-Identifier: GPLv3+
+# SPDX-2.0-License-Identifier: GPL-3.0+
+# SPDX-3.0-License-Identifier: GPL-3.0-or-later
+#
+# This program is free software.
+# For more information on the license, see COPYING.
+# For more information on free software, see
+# <https://www.gnu.org/philosophy/free-sw.en.html>.
+
+import argparse
+import json
+import re
+import sys
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-P", "--provides", action="store_const", const="provides", dest="action"
+    )
+    group.add_argument(
+        "-R", "--requires", action="store_const", const="requires", dest="action"
+    )
+    args = parser.parse_args()
+
+    files = sys.stdin.read().splitlines()
+
+    for f in files:
+        with open(f, "r") as fobj:
+            info = json.load(fobj)["collection_info"]
+            if args.action == "provides":
+                print(
+                    f"ansible-collection({info['namespace']}.{info['name']}) = {info['version']}"
+                )
+            if args.action == "requires":
+                # Require either ansible-core or a version of ansible 2.9 that
+                # supports collections but prefer ansible-core.
+                print("(ansible-core or (ansible < 2.10.0 with ansible >= 2.9.10))")
+                for dep, req in info.get("dependencies", {}).items():
+                    print(f"ansible-collection({dep})", end="")
+                    if req == "*":
+                        print()
+                        continue
+                    m = re.match(r"^>=(\d+\.\d+\.\d+)$", req)
+                    if m:
+                        print(f" >= {m.group(1)}")
+                        continue
+                    raise NotImplementedError(
+                        "Generation of dependencies different than '*' or '>=' is not supported yet"
+                    )
+
+
+if __name__ == "__main__":
+    main()

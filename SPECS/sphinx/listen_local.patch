@@ -1,0 +1,26 @@
+--- sphinx-2.2.11-release-orig/sphinx.conf.in	2019-09-05 08:57:23.608395395 -0400
++++ sphinx-2.2.11-release/sphinx.conf.in	2019-09-05 08:56:43.568117907 -0400
+@@ -810,8 +810,8 @@
+ 	# listen			= 192.168.0.1:9312
+ 	# listen			= 9312
+ 	# listen			= /var/run/searchd.sock
+-	listen			= 9312
+-	listen			= 9306:mysql41
++	listen			= 127.0.0.1:9312
++	listen			= 127.0.0.1:9306:mysql41
+ 
+ 	# log file, searchd run info is logged here
+ 	# optional, default is 'searchd.log'
+--- sphinx-2.2.11-release-orig/sphinx-min.conf.in	2019-09-05 08:59:14.851388059 -0400
++++ sphinx-2.2.11-release/sphinx-min.conf.in	2019-09-05 08:59:44.248857589 -0400
+@@ -49,8 +49,8 @@
+ 
+ searchd
+ {
+-	listen			= 9312
+-	listen			= 9306:mysql41
++	listen			= 127.0.0.1:9312
++	listen			= 127.0.0.1:9306:mysql41
+ 	log			= @CONFDIR@/log/searchd.log
+ 	query_log		= @CONFDIR@/log/query.log
+ 	read_timeout		= 5

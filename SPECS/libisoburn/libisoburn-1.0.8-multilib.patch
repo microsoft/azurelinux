@@ -1,0 +1,22 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for libisoburn >= 1.0.8, which solves multilib/
+multiarch problem by removing the timestamp within the footer from the doxygen generated files.
+
+--- libisoburn-1.0.8/doc/doxygen.conf.in			2011-02-23 14:43:07.000000000 +0100
++++ libisoburn-1.0.8/doc/doxygen.conf.in.multilib		2011-04-17 20:31:16.872988140 +0200
+@@ -689,7 +689,7 @@
+ # each generated HTML page. If it is left blank doxygen will generate a 
+ # standard footer.
+ 
+-HTML_FOOTER            = 
++HTML_FOOTER            = doc/footer_no_timestamp.html
+ 
+ # The HTML_STYLESHEET tag can be used to specify a user-defined cascading 
+ # style sheet that is used by each HTML page. It can be used to 
+--- libisoburn-1.0.8/doc/footer_no_timestamp.html		1970-01-01 01:00:00.000000000 +0100
++++ libisoburn-1.0.8/doc/footer_no_timestamp.html.multilib	2011-04-17 20:31:27.817044448 +0200
+@@ -0,0 +1,5 @@
++<hr size="1"><address style="text-align: right;"><small>Generated for $projectname by&nbsp;
++<a href="http://www.doxygen.org/index.html">
++<img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> $doxygenversion </small></address>
++</body>
++</html>

@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 24 Jul 2024 12:17:12 -0600
+Subject: [PATCH] Fix reported SAST findings
+
+- efi/console.c: Initialize pointer
+
+    "Error: UNINIT (CWE-457):
+    syslinux-6.04-pre1/efi/console.c:242: var_decl: Declaring variable ""first"" without initializer.
+    syslinux-6.04-pre1/efi/console.c:271: uninit_use: Using uninitialized value ""first"".
+
+    "Error: UNINIT (CWE-457):
+    syslinux-6.04-pre1/efi/console.c:242: var_decl: Declaring variable ""first"" without initializer.
+    syslinux-6.04-pre1/efi/console.c:282: uninit_use: Using uninitialized value ""first"".
+    280|    }
+    281|
+    282|->  if (!first)
+    283|            goto out;
+    284|    rv = 1;"
+
+- xfs_dir2.c: return NULL instead of a freed pointer
+
+    Error: USE_AFTER_FREE (CWE-416):
+    syslinux-6.04-pre1/core/fs/xfs/xfs_dir2.c:521: freed_arg: "free" frees "ip". [Note: The source code implementation of the function has been overridden by a builtin model.]
+    syslinux-6.04-pre1/core/fs/xfs/xfs_dir2.c:523: use_after_free: Using freed pointer "ip".
+    #  521|       free(ip);
+    #  522|
+    #  523|->     return ip;
+    #  524|   }
+    #  525|
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ core/fs/xfs/xfs_dir2.c | 2 +-
+ efi/console.c          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/fs/xfs/xfs_dir2.c b/core/fs/xfs/xfs_dir2.c
+index 2f5928a5..e73e45f1 100644
+--- a/core/fs/xfs/xfs_dir2.c
++++ b/core/fs/xfs/xfs_dir2.c
+@@ -520,7 +520,7 @@ found:
+ failed:
+     free(ip);
+ 
+-    return ip;
++    return NULL;
+ }
+ 
+ static xfs_fsblock_t
+diff --git a/efi/console.c b/efi/console.c
+index d7ed0b4a..206a8131 100644
+--- a/efi/console.c
++++ b/efi/console.c
+@@ -239,7 +239,7 @@ struct _EFI_UGA_DRAW_PROTOCOL {
+ 
+ static int setup_uga(struct screen_info *si)
+ {
+-	EFI_UGA_DRAW_PROTOCOL *uga, *first;
++	EFI_UGA_DRAW_PROTOCOL *uga, *first = NULL;
+ 	EFI_GUID UgaProtocol = EFI_UGA_PROTOCOL_GUID;
+ 	UINT32 width, height;
+ 	EFI_STATUS status;

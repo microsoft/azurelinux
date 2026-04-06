@@ -1,0 +1,12 @@
+diff -up libquicktime-git-2213b76712c8e08d885482d117f904d570c990aa/configure.ac.orig libquicktime-git-2213b76712c8e08d885482d117f904d570c990aa/configure.ac
+--- libquicktime-git-2213b76712c8e08d885482d117f904d570c990aa/configure.ac.orig	2024-02-03 02:55:35.000000000 +0100
++++ libquicktime-git-2213b76712c8e08d885482d117f904d570c990aa/configure.ac	2024-03-01 09:04:39.171159808 +0100
+@@ -235,7 +235,7 @@ have_lame="false"
+   AC_TRY_RUN([
+     #include <lame/lame.h>
+     #include <stdio.h>
+-    main()
++    int main()
+     {
+     int version_major;
+     int version_minor;

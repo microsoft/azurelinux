@@ -1,0 +1,19 @@
+commit 00a0eecec4a9af0b5f6f11ac5ffb3b5991e4a018
+Author: Kevin Buettner <kevinb@redhat.com>
+Date:   Tue Jul 22 12:27:25 2025 -0700
+
+    Update cmake_minimum_required for CMake4.0
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9d7fc10f..3d02fe48 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,7 +25,7 @@
+ # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ # POSSIBILITY OF SUCH DAMAGE.
+ 
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ # Do not add /W3 to MSVC command-line
+ #

@@ -1,0 +1,13 @@
+--- etcetera-0.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ etcetera-0.11.0/Cargo.toml	2025-10-30T13:22:31.774266+00:00
+@@ -42,10 +42,3 @@
+ [dependencies.cfg-if]
+ version = "1"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Com",
+-    "Win32_UI_Shell",
+-]

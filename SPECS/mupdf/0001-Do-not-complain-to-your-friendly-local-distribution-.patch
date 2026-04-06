@@ -1,0 +1,29 @@
+From 4232ffdd8bfbc60067f81bf92afba3713209c430 Mon Sep 17 00:00:00 2001
+Message-ID: <4232ffdd8bfbc60067f81bf92afba3713209c430.1761772186.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Thu, 6 Jun 2024 14:27:12 +0200
+Subject: [PATCH] Do not complain to your friendly local distribution manager
+
+Artifex decided to rely on local forks for added functionality, so do
+not complain to the distribution manager about lack of functionality in
+unbundled builds.
+---
+ platform/gl/gl-ui.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/platform/gl/gl-ui.c b/platform/gl/gl-ui.c
+index d3dfb1de6..c0d9d72d7 100644
+--- a/platform/gl/gl-ui.c
++++ b/platform/gl/gl-ui.c
+@@ -449,8 +449,6 @@ void ui_init(int w, int h, const char *title)
+ #if defined(FREEGLUT) && (GLUT_API_VERSION >= 6)
+ 	glutKeyboardExtFunc(on_keyboard);
+ #else
+-	fz_warn(ctx, "This version of MuPDF has been built WITHOUT clipboard or unicode input support!");
+-	fz_warn(ctx, "Please file a complaint with your friendly local distribution manager.");
+ 	glutKeyboardFunc(on_keyboard);
+ #endif
+ 	glutSpecialFunc(on_special);
+-- 
+2.51.2.1007.g590f8df4db
+

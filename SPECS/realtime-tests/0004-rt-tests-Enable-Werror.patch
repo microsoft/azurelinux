@@ -1,0 +1,30 @@
+From 82120b520cebfef0da5294cbdca3b056f1f110c1 Mon Sep 17 00:00:00 2001
+From: Crystal Wood <crwood@redhat.com>
+Date: Tue, 7 Jan 2025 17:02:28 -0500
+Subject: [PATCH 4/5] rt-tests: Enable -Werror
+
+Now that the most obvious nuisance warnings have been disabled, don't let
+the actual bad stuff slip in.
+
+Signed-off-by: Crystal Wood <crwood@redhat.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index dda29c3f5b85..26acffed8114 100644
+--- a/Makefile
++++ b/Makefile
+@@ -33,7 +33,7 @@ prefix  ?= /usr/local
+ bindir  ?= $(prefix)/bin
+ mandir	?= $(prefix)/share/man
+ 
+-CFLAGS ?= -Wall -Wno-nonnull -Wextra -Wno-sign-compare -Wno-unused-parameter
++CFLAGS ?= -Wall -Werror -Wno-nonnull -Wextra -Wno-sign-compare -Wno-unused-parameter
+ CPPFLAGS += -D_GNU_SOURCE -Isrc/include
+ LDFLAGS ?=
+ 
+-- 
+2.47.1
+

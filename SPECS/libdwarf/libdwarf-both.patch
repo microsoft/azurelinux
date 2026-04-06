@@ -1,0 +1,55 @@
+From 51ea3e8455f1da6e3b6d5c34fb0d3ffdb0c155a2 Mon Sep 17 00:00:00 2001
+From: Tom Hughes <tom@compton.nu>
+Date: Tue, 25 Jun 2024 08:55:46 +0100
+Subject: [PATCH] Make default-library=both work on linux
+
+---
+ src/lib/libdwarf/meson.build  | 8 ++++----
+ src/lib/libdwarfp/meson.build | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/lib/libdwarf/meson.build b/src/lib/libdwarf/meson.build
+index a7570214..6a970024 100644
+--- a/src/lib/libdwarf/meson.build
++++ b/src/lib/libdwarf/meson.build
+@@ -121,12 +121,12 @@ else
+     libzstd_deps = dependency('',required: false)
+ endif
+ 
+-if (lib_type == 'shared')
+-  compiler_flags = ['-DLIBDWARF_BUILD']
+-  compiler_flags_public = []
+-else
++if (lib_type == 'static')
+   compiler_flags = ['-DLIBDWARF_STATIC']
+   compiler_flags_public = ['-DLIBDWARF_STATIC']
++else
++  compiler_flags = ['-DLIBDWARF_BUILD']
++  compiler_flags_public = []
+ endif
+ 
+ libdwarf_lib = library('dwarf', libdwarf_src,
+diff --git a/src/lib/libdwarfp/meson.build b/src/lib/libdwarfp/meson.build
+index a46c89eb..c6a1cf72 100644
+--- a/src/lib/libdwarfp/meson.build
++++ b/src/lib/libdwarfp/meson.build
+@@ -31,12 +31,12 @@ libdwarfp_src = [
+ ]
+ 
+ libdwarf_dir = include_directories('../libdwarf')
+-if (lib_type == 'shared')
+-  compiler_flags = ['-DLIBDWARF_BUILD']
+-  compiler_flags_public = []
+-else
++if (lib_type == 'static')
+   compiler_flags = ['-DLIBDWARF_STATIC']
+   compiler_flags_public = ['-DLIBDWARF_STATIC']
++else
++  compiler_flags = ['-DLIBDWARF_BUILD']
++  compiler_flags_public = []
+ endif
+ 
+ 
+-- 
+2.49.0
+

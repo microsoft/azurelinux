@@ -1,0 +1,11 @@
+diff -rupN angle-57ea533/src/libANGLE/HandleAllocator.cpp angle-57ea533-new/src/libANGLE/HandleAllocator.cpp
+--- angle-57ea533/src/libANGLE/HandleAllocator.cpp	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/libANGLE/HandleAllocator.cpp	2021-07-24 14:43:04.567574295 +0200
+@@ -10,6 +10,7 @@
+ #include "libANGLE/HandleAllocator.h"
+ 
+ #include <algorithm>
++#include <limits>
+ 
+ #include "common/debug.h"
+ 

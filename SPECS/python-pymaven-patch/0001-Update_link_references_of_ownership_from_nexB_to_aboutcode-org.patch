@@ -1,0 +1,24 @@
+From b92cd5f3f1ed7967bc0c0b9ad57af6827e17b612 Mon Sep 17 00:00:00 2001
+From: Chin Yeung Li <tli@nexb.com>
+Date: Wed, 21 Aug 2024 11:27:37 +0800
+Subject: [PATCH] Update link references of ownership from nexB to
+ aboutcode-org
+
+Signed-off-by: Chin Yeung Li <tli@nexb.com>
+---
+ setup.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index cb0f827..aae2776 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -4,7 +4,7 @@ author = Walter Scheper
+ author_email = Walter.Scheper@sas.com
+ summary = Python access to maven. nexB advanced patch.
+ description-file = README.rst
+-home-page = https://github.com/nexB/pymaven
++home-page = https://github.com/aboutcode-org/pymaven
+ license = Apache-2
+ license_file = LICENSE
+ version=0.3.2

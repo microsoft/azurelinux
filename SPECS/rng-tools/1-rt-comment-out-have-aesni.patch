@@ -1,0 +1,42 @@
+From 86a66ed41390fa5f98aade60a55376269fd163b0 Mon Sep 17 00:00:00 2001
+From: Vladis Dronov <vdronov@redhat.com>
+Date: Fri, 17 Sep 2021 01:04:51 +0200
+Subject: [PATCH] Comment out an unused assignment
+
+Covscan warns about an unused value. Comment it out.
+
+Defect type: UNUSED_VALUE: covscan warning:
+rng-tools-6.13/rngd_rdrand.c:260: assigned_value: Assigning value
+from "!!(info.ecx & 0x2000000U)" to "have_aesni" here, but that
+stored value is overwritten before it can be used.
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ rngd_rdrand.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git rngd_rdrand.c rngd_rdrand.c
+index caa9d05..ea7b8fa 100644
+--- rngd_rdrand.c
++++ rngd_rdrand.c
+@@ -239,7 +239,7 @@ int init_drng_entropy_source(struct rng *ent_src)
+ 	struct cpuid info;
+ 	/* We need RDRAND, but AESni is optional */
+ 	const uint32_t features_ecx1_rdrand = 1 << 30;
+-	const uint32_t features_ecx1_aesni  = 1 << 25;
++	//const uint32_t features_ecx1_aesni  = 1 << 25;
+ 	const uint32_t features_ebx7_rdseed = 1 << 18;
+ 	uint32_t max_cpuid_leaf;
+ 	unsigned char xkey[AES_BLOCK];	/* Material to XOR into the key */
+@@ -257,7 +257,7 @@ int init_drng_entropy_source(struct rng *ent_src)
+ 	if (!(info.ecx & features_ecx1_rdrand))
+ 		return 1;
+ 
+-	have_aesni = !!(info.ecx & features_ecx1_aesni);
++	//have_aesni = !!(info.ecx & features_ecx1_aesni);
+ 	have_aesni = 0; /* BACK OUT NH */
+ 	have_rdseed = 0;
+ 	if (max_cpuid_leaf >= 7) {
+-- 
+2.26.3
+

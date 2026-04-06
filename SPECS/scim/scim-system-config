@@ -1,0 +1,55 @@
+# This file is encoded in UTF-8 encoding.
+/DefaultIMEngineFactory/si_LK = IMEngine-M17N-si-wijesekera
+/DefaultIMEngineFactory/ta_IN = IMEngine-M17N-ta-tamil99
+# scim-python pinyin
+/DefaultIMEngineFactory/zh_CN = 29ab338a-5a27-46b8-96cd-abbe86f17132
+/DefaultIMEngineFactory/zh_SG = 05235cfc-43ce-490c-b1b1-c5a2185276ae
+# CangJie3
+/DefaultIMEngineFactory/zh_HK = 5da9d4ff-ccdd-45af-b1a5-7bd4ac0aeb5f
+# chewing
+/DefaultIMEngineFactory/zh_TW = fcff66b6-4d3e-4cf2-833c-01ef66ac6025
+/FrontEnd/OnTheSpot = true
+/FrontEnd/Socket/ConfigReadOnly = false
+/FrontEnd/Socket/MaxClients = 512
+/FrontEnd/X11/BrokenWchar = true
+/FrontEnd/X11/Dynamic = false
+/FrontEnd/X11/OnTheSpot = true
+/FrontEnd/X11/ServerName = SCIM
+/Hotkeys/FrontEnd/NextFactory = 
+/Hotkeys/FrontEnd/NextFactory/zh_CN = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
+/Hotkeys/FrontEnd/NextFactory/zh_HK = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
+/Hotkeys/FrontEnd/NextFactory/zh_SG = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
+/Hotkeys/FrontEnd/NextFactory/zh_TW = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
+/Hotkeys/FrontEnd/PreviousFactory = 
+/Hotkeys/FrontEnd/PreviousFactory/zh_CN = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
+/Hotkeys/FrontEnd/PreviousFactory/zh_HK = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
+/Hotkeys/FrontEnd/PreviousFactory/zh_SG = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
+/Hotkeys/FrontEnd/PreviousFactory/zh_TW = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
+/Hotkeys/FrontEnd/ShowFactoryMenu = 
+# disable trigger hotkey by default, except for the locale below:
+/Hotkeys/FrontEnd/Trigger = Control+space
+/Hotkeys/FrontEnd/Trigger/ja_JP = Zenkaku_Hankaku,Alt+grave,Control+space
+/Hotkeys/FrontEnd/Trigger/ko_KR = Alt+Alt_L+KeyRelease,Shift+space,Control+space,Hangul
+/Hotkeys/FrontEnd/ValidKeyMask = Shift+Control+Alt+Meta+Super+Hyper+CapsLock
+/Panel/Gtk/Color/ActiveBackground = light sky blue
+/Panel/Gtk/Color/ActiveText = black
+/Panel/Gtk/Color/NormalBackground = #F7F3F7
+/Panel/Gtk/Color/NormalText = black
+/Panel/Gtk/Font = default
+/Panel/Gtk/DefaultSticked = false
+/Panel/Gtk/LookupTableEmbedded = true
+/Panel/Gtk/LookupTableVertical = true
+/Panel/Gtk/ShowStatusBox = false
+/Panel/Gtk/ShowTrayIcon = true
+/Panel/Gtk/ToolBar/AlwaysShow = false
+/Panel/Gtk/ToolBar/AutoSnap = true
+/Panel/Gtk/ToolBar/HideTimeout = 2
+/Panel/Gtk/ToolBar/POS_X = -1 
+/Panel/Gtk/ToolBar/POS_Y = -1 
+/Panel/Gtk/ToolBar/ShowHelpIcon = true
+/Panel/Gtk/ToolBar/ShowFactoryIcon = true
+/Panel/Gtk/ToolBar/ShowFactoryName = true
+/Panel/Gtk/ToolBar/ShowMenuIcon = true
+/Panel/Gtk/ToolBar/ShowSetupIcon = true
+/Panel/Gtk/ToolBar/ShowStickIcon = false
+/IMEngine/RawCode/Locales = default

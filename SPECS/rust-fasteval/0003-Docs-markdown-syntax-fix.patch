@@ -1,0 +1,24 @@
+From ed9092e993794d608d548bd535010a541bf7537e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 17 Nov 2021 10:52:02 +0100
+Subject: [PATCH 3/3] Docs: markdown syntax fix
+
+https://docs.rs/fasteval/0.2.4/fasteval/#methodology was garbled,
+and "cargo doc" was emitting a warning.
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index ac012293f1..de21cd2a8d 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -541,7 +541,7 @@
+ //!
+ //! All numeric results can be found in `fasteval/benches/bench.rs`.
+ //!
+-//! See the [detailed post about my benchmarking methology]{http://likebike.com/posts/How_To_Write_Fast_Rust_Code.html#how-to-measure}
++//! See the [detailed post about my benchmarking methology](http://likebike.com/posts/How_To_Write_Fast_Rust_Code.html#how-to-measure)
+ //! on my blog.
+ //!
+ //! # How is `fasteval` so fast?

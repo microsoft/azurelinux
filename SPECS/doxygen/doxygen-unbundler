@@ -1,0 +1,69 @@
+#!/usr/bin/bash -e
+# Replace Doxygen-generated Javascript files with symblic links.
+
+set -o pipefail
+
+jsdir="$1"
+buildroot="$2"
+subdir="$3"
+
+if test -z "$jsdir" ; then
+    echo "error: Javascript directory argument required" 1>&2
+    exit 1
+fi
+
+js_files="$(echo "$jsdir"/doxygen/*.js)"
+
+if test -z "$buildroot" ; then
+    # Only absolute links are possible because the final installation
+    # destination is unknown.
+    if test -z "$subdir"; then
+        subdir="."
+    fi
+    find "$subdir" -type f -name '*.js' \
+	| while read js_file; do
+	for js_file_ref in $js_files; do
+            if cmp -s "$js_file_ref" "$js_file"; then
+		ln -sf "$js_file_ref" "$js_file"
+		break
+	    fi
+	done
+    done
+else
+    # Create relative links.
+    cd "$buildroot"
+    abs_buildroot="$(readlink -f .)"
+    cd "./$subdir"
+
+    # Compute the number of ../ needed to reach the root directory.
+    prefix=""
+    while true; do
+	p="$(readlink -f "${prefix:-.}")"
+	if test "$p" = "$abs_buildroot"; then
+	    break
+	elif test "$p" = "/"; then
+	    echo "error: Could not find buildroot directory" 1>&2
+	    exit 1
+	elif test -z "$prefix"; then
+	    prefix=".."
+	else
+	    prefix="../$prefix"
+	fi
+    done
+
+    # Create relative links.
+    find . -type f -name '*.js' -printf "%d %p\n" \
+	| while read depth js_file; do
+	for js_file_ref in $js_files; do
+            if cmp -s "$js_file_ref" "$js_file"; then
+		target_prefix="$prefix"
+		i=1
+		while test "$i" -lt "$depth"; do
+		    target_prefix="../$target_prefix"
+		    i=$(($i + 1))
+		done
+		ln -sf "$target_prefix$js_file_ref" "$js_file"
+	    fi
+	done
+    done
+fi

@@ -1,0 +1,56 @@
+From 1839c987c86752602b51981963132234ac7554a2 Mon Sep 17 00:00:00 2001
+From: Petr Gotthard <petr.gotthard@advantech.cz>
+Date: Sun, 6 Oct 2024 22:11:15 +0200
+Subject: [PATCH 2/2] tests: do not test sha1 by default
+
+Note: Chagnes on files which are not in the release tar are skipped on
+purpose since the patch is applied against the release tar by the spec
+file.
+---
+ test/ecdsa_genpkey_sign_rawin.sh  | 2 +-
+ test/rsa_genpkey_sign_rawin.sh    | 2 +-
+ test/rsapss_genpkey_sign_rawin.sh | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test/ecdsa_genpkey_sign_rawin.sh b/test/ecdsa_genpkey_sign_rawin.sh
+index 01403cf..7266049 100755
+--- a/test/ecdsa_genpkey_sign_rawin.sh
++++ b/test/ecdsa_genpkey_sign_rawin.sh
+@@ -11,7 +11,7 @@ openssl genpkey -provider tpm2 -algorithm EC -pkeyopt group:P-256 -out testkey.p
+ openssl pkey -provider tpm2 -provider base -in testkey.priv -pubout -out testkey.pub
+ 
+ # check various digests
+-for HASH in sha1 sha256 sha384 sha512; do
++for HASH in ${TPM2_TEST_HASHES:-sha256 sha384 sha512}; do
+     # skip unsupported algorithms
+     tpm2_getcap algorithms | grep $HASH || continue
+ 
+diff --git a/test/rsa_genpkey_sign_rawin.sh b/test/rsa_genpkey_sign_rawin.sh
+index 267cea9..f2b9a94 100755
+--- a/test/rsa_genpkey_sign_rawin.sh
++++ b/test/rsa_genpkey_sign_rawin.sh
+@@ -11,7 +11,7 @@ openssl genpkey -provider tpm2 -algorithm RSA -pkeyopt bits:1024 -out testkey.pr
+ openssl pkey -provider tpm2 -provider base -in testkey.priv -pubout -out testkey.pub
+ 
+ # check default scheme with various digests
+-for HASH in sha1 sha256 sha384 sha512; do
++for HASH in ${TPM2_TEST_HASHES:-sha256 sha384 sha512}; do
+     # skip unsupported algorithms
+     tpm2_getcap algorithms | grep $HASH || continue
+ 
+diff --git a/test/rsapss_genpkey_sign_rawin.sh b/test/rsapss_genpkey_sign_rawin.sh
+index 28447b2..99f8d63 100755
+--- a/test/rsapss_genpkey_sign_rawin.sh
++++ b/test/rsapss_genpkey_sign_rawin.sh
+@@ -5,7 +5,7 @@ set -eufx
+ echo -n "abcde12345abcde12345" > testdata
+ 
+ # check default scheme with various digests
+-for HASH in sha1 sha256 sha384 sha512; do
++for HASH in ${TPM2_TEST_HASHES:-sha256 sha384 sha512}; do
+     # skip unsupported algorithms
+     tpm2_getcap algorithms | grep $HASH || continue
+ 
+-- 
+2.47.0
+

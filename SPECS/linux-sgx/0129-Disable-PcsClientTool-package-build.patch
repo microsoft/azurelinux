@@ -1,0 +1,30 @@
+From e5195226c8bc6d3dbb237c5b9cc745cc56815955 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 2 Feb 2026 16:12:50 +0000
+Subject: [PATCH 129/131] Disable PcsClientTool package build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/PcsClientTool/Makefile b/tools/PcsClientTool/Makefile
+index d6eec9cb..dd99ee7f 100644
+--- a/tools/PcsClientTool/Makefile
++++ b/tools/PcsClientTool/Makefile
+@@ -6,7 +6,8 @@
+ .PHONY: default all
+ default: all
+ 
+-all: deb_sgx_pcs_client_pkg rpm_sgx_pcs_client_pkg
++#all: deb_sgx_pcs_client_pkg rpm_sgx_pcs_client_pkg
++all:
+ 
+ .PHONY: deb_sgx_pcs_client_pkg
+ deb_sgx_pcs_client_pkg:
+-- 
+2.53.0
+

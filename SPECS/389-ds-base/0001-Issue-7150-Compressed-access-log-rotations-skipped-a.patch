@@ -1,0 +1,551 @@
+From 045fe1a6899b7e4588be7101e81bb78995a713b1 Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Tue, 16 Dec 2025 15:48:35 -0800
+Subject: [PATCH] Issue 7150 - Compressed access log rotations skipped,
+ accesslog-list out of sync (#7151)
+
+Description: Accept `.gz`-suffixed rotated log filenames when
+rebuilding rotation info and checking previous logs, preventing
+compressed rotations from being dropped from the internal list.
+
+Add regression tests to stress log rotation with compression,
+verify `nsslapd-accesslog-list` stays in sync, and guard against
+crashes when flushing buffered logs during rotation.
+Minor doc fix in test.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7150
+
+Reviewed by: @progier389 (Thanks!)
+---
+ .../suites/logging/log_flush_rotation_test.py | 341 +++++++++++++++++-
+ ldap/servers/slapd/log.c                      |  99 +++--
+ 2 files changed, 402 insertions(+), 38 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/logging/log_flush_rotation_test.py b/dirsrvtests/tests/suites/logging/log_flush_rotation_test.py
+index b33a622e1..864ba9c5d 100644
+--- a/dirsrvtests/tests/suites/logging/log_flush_rotation_test.py
++++ b/dirsrvtests/tests/suites/logging/log_flush_rotation_test.py
+@@ -6,6 +6,7 @@
+ # See LICENSE for details.
+ # --- END COPYRIGHT BLOCK ---
+ #
++import glob
+ import os
+ import logging
+ import time
+@@ -13,14 +14,351 @@ import pytest
+ from lib389._constants import DEFAULT_SUFFIX, PW_DM
+ from lib389.tasks import ImportTask
+ from lib389.idm.user import UserAccounts
++from lib389.idm.domain import Domain
++from lib389.idm.directorymanager import DirectoryManager
+ from lib389.topologies import topology_st as topo
+ 
+ 
+ log = logging.getLogger(__name__)
+ 
+ 
++def remove_rotated_access_logs(inst):
++    """
++    Remove all rotated access log files to start fresh for each test.
++    This prevents log files from previous tests affecting current test results.
++    """
++    log_dir = inst.get_log_dir()
++    patterns = [
++        f'{log_dir}/access.2*',      # Uncompressed rotated logs
++        f'{log_dir}/access.*.gz',    # Compressed rotated logs
++    ]
++    for pattern in patterns:
++        for log_file in glob.glob(pattern):
++            try:
++                os.remove(log_file)
++                log.info(f"Removed old log file: {log_file}")
++            except OSError as e:
++                log.warning(f"Could not remove {log_file}: {e}")
++
++
++def reset_access_log_config(inst):
++    """
++    Reset access log configuration to default values.
++    """
++    inst.config.set('nsslapd-accesslog-compress', 'off')
++    inst.config.set('nsslapd-accesslog-maxlogsize', '100')
++    inst.config.set('nsslapd-accesslog-maxlogsperdir', '10')
++    inst.config.set('nsslapd-accesslog-logrotationsync-enabled', 'off')
++    inst.config.set('nsslapd-accesslog-logbuffering', 'on')
++    inst.config.set('nsslapd-accesslog-logexpirationtime', '-1')
++    inst.config.set('nsslapd-accesslog-logminfreediskspace', '5')
++
++
++def generate_heavy_load(inst, suffix, iterations=50):
++    """
++    Generate heavy LDAP load to fill access log quickly.
++    Performs multiple operations: searches, modifies, binds to populate logs.
++    """
++    for i in range(iterations):
++        suffix.replace('description', f'iteration_{i}')
++        suffix.get_attr_val('description')
++
++
++def count_access_logs(log_dir, compressed_only=False):
++    """
++    Count access log files in the log directory.
++    Returns count of rotated access logs (not including the active 'access' file).
++    """
++    if compressed_only:
++        pattern = f'{log_dir}/access.*.gz'
++    else:
++        pattern = f'{log_dir}/access.2*'
++    log_files = glob.glob(pattern)
++    return len(log_files)
++
++
++def test_log_pileup_with_compression(topo):
++    """Test that log rotation properly deletes old logs when compression is enabled.
++
++    :id: fa1bfce8-b6d3-4520-a0a8-bead14fa5838
++    :setup: Standalone Instance
++    :steps:
++        1. Clean up existing rotated logs and reset configuration
++        2. Enable access log compression
++        3. Set strict log limits (small maxlogsperdir)
++        4. Disable log expiration to test count-based deletion
++        5. Generate heavy load to create many log rotations
++        6. Verify log count does not exceed maxlogsperdir limit
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. Success
++        6. Log count should be at or below maxlogsperdir + small buffer
++    """
++
++    inst = topo.standalone
++    suffix = Domain(inst, DEFAULT_SUFFIX)
++    log_dir = inst.get_log_dir()
++
++    # Clean up before test
++    remove_rotated_access_logs(inst)
++    reset_access_log_config(inst)
++    inst.restart()
++
++    max_logs = 5
++    inst.config.set('nsslapd-accesslog-compress', 'on')
++    inst.config.set('nsslapd-accesslog-maxlogsperdir', str(max_logs))
++    inst.config.set('nsslapd-accesslog-maxlogsize', '1')  # 1MB to trigger rotation
++    inst.config.set('nsslapd-accesslog-logrotationsync-enabled', 'off')
++    inst.config.set('nsslapd-accesslog-logbuffering', 'off')
++
++    inst.config.set('nsslapd-accesslog-logexpirationtime', '-1')
++
++    inst.config.set('nsslapd-accesslog-logminfreediskspace', '5')
++
++    inst.restart()
++    time.sleep(2)
++
++    target_logs = max_logs * 3
++    for i in range(target_logs):
++        log.info(f"Generating load for log rotation {i+1}/{target_logs}")
++        generate_heavy_load(inst, suffix, iterations=150)
++        time.sleep(1)  # Wait for rotation
++
++    time.sleep(3)
++
++    logs_on_disk = count_access_logs(log_dir)
++    log.info(f"Configured maxlogsperdir: {max_logs}")
++    log.info(f"Actual rotated logs on disk: {logs_on_disk}")
++
++    all_access_logs = glob.glob(f'{log_dir}/access*')
++    log.info(f"All access log files: {all_access_logs}")
++
++    max_allowed = max_logs + 2
++    assert logs_on_disk <= max_allowed, (
++        f"Log rotation failed to delete old files! "
++        f"Expected at most {max_allowed} rotated logs (maxlogsperdir={max_logs} + 2 buffer), "
++        f"but found {logs_on_disk}. The server has lost track of the file list."
++    )
++
++
++@pytest.mark.parametrize("compress_enabled", ["on", "off"])
++def test_accesslog_list_mismatch(topo, compress_enabled):
++    """Test that nsslapd-accesslog-list stays synchronized with actual log files.
++
++    :id: 0a8a46a6-cae7-43bd-8b64-5e3481480cd3
++    :parametrized: yes
++    :setup: Standalone Instance
++    :steps:
++        1. Clean up existing rotated logs and reset configuration
++        2. Configure log rotation with compression enabled/disabled
++        3. Generate activity to trigger multiple rotations
++        4. Get the nsslapd-accesslog-list attribute
++        5. Compare with actual files on disk
++        6. Verify they match (accounting for .gz extension when enabled)
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. Success
++        6. The list attribute should match actual files on disk
++    """
++
++    inst = topo.standalone
++    suffix = Domain(inst, DEFAULT_SUFFIX)
++    log_dir = inst.get_log_dir()
++    compression_on = compress_enabled == "on"
++
++    # Clean up before test
++    remove_rotated_access_logs(inst)
++    reset_access_log_config(inst)
++    inst.restart()
++
++    inst.config.set('nsslapd-accesslog-compress', compress_enabled)
++    inst.config.set('nsslapd-accesslog-maxlogsize', '1')
++    inst.config.set('nsslapd-accesslog-maxlogsperdir', '10')
++    inst.config.set('nsslapd-accesslog-logrotationsync-enabled', 'off')
++    inst.config.set('nsslapd-accesslog-logbuffering', 'off')
++    inst.config.set('nsslapd-accesslog-logexpirationtime', '-1')
++
++    inst.restart()
++    time.sleep(2)
++
++    for i in range(15):
++        suffix_note = "(no compression)" if not compression_on else ""
++        log.info(f"Generating load for rotation {i+1}/15 {suffix_note}")
++        generate_heavy_load(inst, suffix, iterations=150)
++        time.sleep(1)
++
++    time.sleep(3)
++
++    accesslog_list = inst.config.get_attr_vals_utf8('nsslapd-accesslog-list')
++    log.info(f"nsslapd-accesslog-list entries (compress={compress_enabled}): {len(accesslog_list)}")
++    log.info(f"nsslapd-accesslog-list (compress={compress_enabled}): {accesslog_list}")
++
++    disk_files = glob.glob(f'{log_dir}/access.2*')
++    log.info(f"Actual files on disk (compress={compress_enabled}): {len(disk_files)}")
++    log.info(f"Disk files (compress={compress_enabled}): {disk_files}")
++
++    disk_files_for_compare = set()
++    for fpath in disk_files:
++        if compression_on and fpath.endswith('.gz'):
++            disk_files_for_compare.add(fpath[:-3])
++        else:
++            disk_files_for_compare.add(fpath)
++
++    list_files_set = set(accesslog_list)
++    missing_from_disk = list_files_set - disk_files_for_compare
++    extra_on_disk = disk_files_for_compare - list_files_set
++
++    if missing_from_disk:
++        log.error(
++            f"[compress={compress_enabled}] Files in list but NOT on disk: {missing_from_disk}"
++        )
++    if extra_on_disk:
++        log.warning(
++            f"[compress={compress_enabled}] Files on disk but NOT in list: {extra_on_disk}"
++        )
++
++    assert not missing_from_disk, (
++        f"nsslapd-accesslog-list mismatch (compress={compress_enabled})! "
++        f"Files listed but missing from disk: {missing_from_disk}. "
++        f"This indicates the server's internal list is out of sync with actual files."
++    )
++
++    if len(extra_on_disk) > 2:
++        log.warning(
++            f"Potential log tracking issue (compress={compress_enabled}): "
++            f"{len(extra_on_disk)} files on disk are not tracked in the accesslog-list: "
++            f"{extra_on_disk}"
++        )
++
++
++def test_accesslog_list_mixed_compression(topo):
++    """Test that nsslapd-accesslog-list correctly tracks both compressed and uncompressed logs.
++
++    :id: 11b088cd-23be-407d-ad16-4ce2e12da09e
++    :setup: Standalone Instance
++    :steps:
++        1. Clean up existing rotated logs and reset configuration
++        2. Create rotated logs with compression OFF
++        3. Enable compression and create more rotated logs
++        4. Get the nsslapd-accesslog-list attribute
++        5. Compare with actual files on disk
++        6. Verify all files are correctly tracked (uncompressed and compressed)
++    :expectedresults:
++        1. Success
++        2. Success - uncompressed rotated logs created
++        3. Success - compressed rotated logs created
++        4. Success
++        5. Success
++        6. The list should contain base filenames (without .gz) that
++           correspond to files on disk (either as-is or with .gz suffix)
++    """
++
++    inst = topo.standalone
++    suffix = Domain(inst, DEFAULT_SUFFIX)
++    log_dir = inst.get_log_dir()
++
++    # Clean up before test
++    remove_rotated_access_logs(inst)
++    reset_access_log_config(inst)
++    inst.restart()
++
++    inst.config.set('nsslapd-accesslog-compress', 'off')
++    inst.config.set('nsslapd-accesslog-maxlogsize', '1')
++    inst.config.set('nsslapd-accesslog-maxlogsperdir', '20')
++    inst.config.set('nsslapd-accesslog-logrotationsync-enabled', 'off')
++    inst.config.set('nsslapd-accesslog-logbuffering', 'off')
++    inst.config.set('nsslapd-accesslog-logexpirationtime', '-1')
++
++    inst.restart()
++    time.sleep(2)
++
++    for i in range(15):
++        log.info(f"Generating load for uncompressed rotation {i+1}/15")
++        generate_heavy_load(inst, suffix, iterations=150)
++        time.sleep(1)
++
++    time.sleep(2)
++
++    # Check what we have so far
++    uncompressed_files = glob.glob(f'{log_dir}/access.2*')
++    log.info(f"Files on disk after uncompressed phase: {uncompressed_files}")
++
++    inst.config.set('nsslapd-accesslog-compress', 'on')
++    inst.restart()
++    time.sleep(2)
++
++    for i in range(15):
++        log.info(f"Generating load for compressed rotation {i+1}/15")
++        generate_heavy_load(inst, suffix, iterations=150)
++        time.sleep(1)
++
++    time.sleep(3)
++
++    accesslog_list = inst.config.get_attr_vals_utf8('nsslapd-accesslog-list')
++
++    disk_files = glob.glob(f'{log_dir}/access.2*')
++
++    log.info(f"nsslapd-accesslog-list entries: {len(accesslog_list)}")
++    log.info(f"nsslapd-accesslog-list: {sorted(accesslog_list)}")
++    log.info(f"Actual files on disk: {len(disk_files)}")
++    log.info(f"Disk files: {sorted(disk_files)}")
++
++    compressed_on_disk = [f for f in disk_files if f.endswith('.gz')]
++    uncompressed_on_disk = [f for f in disk_files if not f.endswith('.gz')]
++    log.info(f"Compressed files on disk: {compressed_on_disk}")
++    log.info(f"Uncompressed files on disk: {uncompressed_on_disk}")
++
++    list_files_set = set(accesslog_list)
++
++    disk_files_base = set()
++    for fpath in disk_files:
++        if fpath.endswith('.gz'):
++            disk_files_base.add(fpath[:-3])  # Strip .gz
++        else:
++            disk_files_base.add(fpath)
++
++    missing_from_disk = list_files_set - disk_files_base
++
++    extra_on_disk = disk_files_base - list_files_set
++
++    if missing_from_disk:
++        log.error(f"Files in list but NOT on disk: {missing_from_disk}")
++    if extra_on_disk:
++        log.warning(f"Files on disk but NOT in list: {extra_on_disk}")
++
++    assert not missing_from_disk, (
++        f"nsslapd-accesslog-list contains stale entries! "
++        f"Files in list but not on disk (as base or .gz): {missing_from_disk}"
++    )
++
++    for list_file in accesslog_list:
++        exists_uncompressed = os.path.exists(list_file)
++        exists_compressed = os.path.exists(list_file + '.gz')
++        assert exists_uncompressed or exists_compressed, (
++            f"File in accesslog-list does not exist on disk: {list_file} "
++            f"(checked both {list_file} and {list_file}.gz)"
++        )
++        if exists_compressed and not exists_uncompressed:
++            log.info(f"  {list_file} -> exists as .gz (compressed)")
++        elif exists_uncompressed:
++            log.info(f"  {list_file} -> exists (uncompressed)")
++
++    if len(extra_on_disk) > 1:
++        log.warning(
++            f"Some files on disk are not tracked in accesslog-list: {extra_on_disk}"
++        )
++
++    log.info("Mixed compression test completed successfully")
++
++
+ def test_log_flush_and_rotation_crash(topo):
+-    """Make sure server does not crash whening flushing a buffer and rotating
++    """Make sure server does not crash when flushing a buffer and rotating
+     the log at the same time
+ 
+     :id: d4b0af2f-48b2-45f5-ae8b-f06f692c3133
+@@ -36,6 +374,7 @@ def test_log_flush_and_rotation_crash(topo):
+         3. Success
+         4. Success
+     """
++    # NOTE: This test is placed last as it may affect the suffix state.
+ 
+     inst = topo.standalone
+ 
+diff --git a/ldap/servers/slapd/log.c b/ldap/servers/slapd/log.c
+index 27bb4bc15..ea744ac1e 100644
+--- a/ldap/servers/slapd/log.c
++++ b/ldap/servers/slapd/log.c
+@@ -137,6 +137,7 @@ static void vslapd_log_emergency_error(LOGFD fp, const char *msg, int locked);
+ static int get_syslog_loglevel(int loglevel);
+ static void log_external_libs_debug_openldap_print(char *buffer);
+ static int log__fix_rotationinfof(char *pathname);
++static int log__validate_rotated_logname(const char *timestamp_str, PRBool *is_compressed);
+ 
+ static int
+ get_syslog_loglevel(int loglevel)
+@@ -375,7 +376,7 @@ g_log_init()
+     loginfo.log_security_fdes = NULL;
+     loginfo.log_security_file = NULL;
+     loginfo.log_securityinfo_file = NULL;
+-    loginfo.log_numof_access_logs = 1;
++    loginfo.log_numof_security_logs = 1;
+     loginfo.log_security_logchain = NULL;
+     loginfo.log_security_buffer = log_create_buffer(LOG_BUFFER_MAXSIZE);
+     loginfo.log_security_compress = cfg->securitylog_compress;
+@@ -3422,7 +3423,7 @@ log__open_accesslogfile(int logfile_state, int locked)
+                 }
+             } else if (loginfo.log_access_compress) {
+                 if (compress_log_file(newfile, loginfo.log_access_mode) != 0) {
+-                    slapi_log_err(SLAPI_LOG_ERR, "log__open_auditfaillogfile",
++                    slapi_log_err(SLAPI_LOG_ERR, "log__open_accesslogfile",
+                             "failed to compress rotated access log (%s)\n",
+                             newfile);
+                 } else {
+@@ -4825,6 +4826,50 @@ log__delete_rotated_logs()
+     loginfo.log_error_logchain = NULL;
+ }
+ 
++/*
++ * log__validate_rotated_logname
++ *
++ * Validates that a log filename timestamp suffix matches the expected format:
++ * YYYYMMDD-HHMMSS (15 chars) or YYYYMMDD-HHMMSS.gz (18 chars) for compressed files.
++ * Uses regex pattern: ^[0-9]{8}-[0-9]{6}(\.gz)?$
++ *
++ * \param timestamp_str The timestamp portion of the log filename (after the first '.')
++ * \param is_compressed Output parameter set to PR_TRUE if the file has .gz suffix
++ * \return 1 if valid, 0 if invalid
++ */
++static int
++log__validate_rotated_logname(const char *timestamp_str, PRBool *is_compressed)
++{
++    Slapi_Regex *re = NULL;
++    char *re_error = NULL;
++    int rc = 0;
++
++    /* Match YYYYMMDD-HHMMSS with optional .gz suffix */
++    static const char *pattern = "^[0-9]{8}-[0-9]{6}(\\.gz)?$";
++
++    *is_compressed = PR_FALSE;
++
++    re = slapi_re_comp(pattern, &re_error);
++    if (re == NULL) {
++        slapi_log_err(SLAPI_LOG_ERR, "log__validate_rotated_logname",
++                      "Failed to compile regex: %s\n", re_error ? re_error : "unknown error");
++        slapi_ch_free_string(&re_error);
++        return 0;
++    }
++
++    rc = slapi_re_exec_nt(re, timestamp_str);
++    if (rc == 1) {
++        /* Check if compressed by looking for .gz suffix */
++        size_t len = strlen(timestamp_str);
++        if (len >= 3 && strcmp(timestamp_str + len - 3, ".gz") == 0) {
++            *is_compressed = PR_TRUE;
++        }
++    }
++
++    slapi_re_free(re);
++    return rc == 1 ? 1 : 0;
++}
++
+ #define ERRORSLOG 1
+ #define ACCESSLOG 2
+ #define AUDITLOG 3
+@@ -4907,31 +4952,19 @@ log__fix_rotationinfof(char *pathname)
+             }
+         } else if (0 == strncmp(log_type, dirent->name, strlen(log_type)) &&
+                    (p = strchr(dirent->name, '.')) != NULL &&
+-                   NULL != strchr(p, '-')) /* e.g., errors.20051123-165135 */
++                   NULL != strchr(p, '-')) /* e.g., errors.20051123-165135 or errors.20051123-165135.gz */
+         {
+             struct logfileinfo *logp;
+-            char *q;
+-            int ignoreit = 0;
+-
+-            for (q = ++p; q && *q; q++) {
+-                if (*q != '-' &&
+-                    *q != '.' && /* .gz */
+-                    *q != 'g' &&
+-                    *q != 'z' &&
+-                    !isdigit(*q))
+-                {
+-                    ignoreit = 1;
+-                }
+-            }
+-            if (ignoreit || (q - p != 15)) {
++            PRBool is_compressed = PR_FALSE;
++
++            /* Skip the '.' to get the timestamp portion */
++            p++;
++            if (!log__validate_rotated_logname(p, &is_compressed)) {
+                 continue;
+             }
+             logp = (struct logfileinfo *)slapi_ch_malloc(sizeof(struct logfileinfo));
+             logp->l_ctime = log_reverse_convert_time(p);
+-            logp->l_compressed = PR_FALSE;
+-            if (strcmp(p + strlen(p) - 3, ".gz") == 0) {
+-                logp->l_compressed = PR_TRUE;
+-            }
++            logp->l_compressed = is_compressed;
+             PR_snprintf(rotated_log, rotated_log_len, "%s/%s",
+                         logsdir, dirent->name);
+ 
+@@ -5098,23 +5131,15 @@ log__check_prevlogs(FILE *fp, char *pathname)
+     for (dirent = PR_ReadDir(dirptr, dirflags); dirent;
+          dirent = PR_ReadDir(dirptr, dirflags)) {
+         if (0 == strncmp(log_type, dirent->name, strlen(log_type)) &&
+-            (p = strrchr(dirent->name, '.')) != NULL &&
+-            NULL != strchr(p, '-')) { /* e.g., errors.20051123-165135 */
+-            char *q;
+-            int ignoreit = 0;
+-
+-            for (q = ++p; q && *q; q++) {
+-                if (*q != '-' &&
+-                    *q != '.' && /* .gz */
+-                    *q != 'g' &&
+-                    *q != 'z' &&
+-                    !isdigit(*q))
+-                {
+-                    ignoreit = 1;
+-                }
+-            }
+-            if (ignoreit || (q - p != 15))
++            (p = strchr(dirent->name, '.')) != NULL &&
++            NULL != strchr(p, '-')) { /* e.g., errors.20051123-165135 or errors.20051123-165135.gz */
++            PRBool is_compressed = PR_FALSE;
++
++            /* Skip the '.' to get the timestamp portion */
++            p++;
++            if (!log__validate_rotated_logname(p, &is_compressed)) {
+                 continue;
++            }
+ 
+             fseek(fp, 0, SEEK_SET);
+             buf[BUFSIZ - 1] = '\0';
+-- 
+2.52.0
+

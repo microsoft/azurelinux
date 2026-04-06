@@ -1,0 +1,108 @@
+From 36f45f9d1164461b0d297be9e4795ed3ed3bd558 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <johannes.goede@oss.qualcomm.com>
+Date: Sun, 21 Dec 2025 15:51:43 +0100
+Subject: [PATCH] ply-device-manager: Fix race in fb_device_has_drm_device ()
+
+In the common case of plymouth starting from the initramfs and using
+its drm plugin to display the splash, the following may happen:
+
+When udev gets restarted after changing root from the initramfs to the real
+root, plymouth will receive a udev add event for the /dev/fb0 belonging
+to the drm device on which it is already displaying the splash.
+
+fb_device_has_drm_device () then checks the udev database for any DRM
+(/dev/dri/card#) devices with the same ID_PATH (e.g. "pci-0000:2b:00.0").
+However there is a race here since udev was just started from the real
+root and is still enumerating devices, so when it gets the udev add event
+for /dev/fb0 and fb_device_has_drm_device () calls
+udev_enumerate_scan_devices () with a filter to find the matching DRM
+device, then the DRM device may not be enumerated yet.
+
+This results in fb_device_has_drm_device () returning false and plymouth
+loading the frame-buffer plugin to open the /dev/fb0 which belongs to
+the /dev/dri/card# which it already has open. Opening the same display
+output twice, once through DRM and once through fbdev is not good.
+
+Fix this by rewriting fb_device_has_drm_device () to simply check if
+the fbdev name ends in 'drmfb' which is true for all fbdev's which
+are backward compatible emulated fbdev-s for DRM devices. This also
+greatly simplifies the fb_device_has_drm_device () code.
+
+Signed-off-by: Hans de Goede <johannes.goede@oss.qualcomm.com>
+---
+ src/libply-splash-core/ply-device-manager.c | 54 +--------------------
+ 1 file changed, 2 insertions(+), 52 deletions(-)
+
+diff --git a/src/libply-splash-core/ply-device-manager.c b/src/libply-splash-core/ply-device-manager.c
+index da53f3ae..b220ea4d 100644
+--- a/src/libply-splash-core/ply-device-manager.c
++++ b/src/libply-splash-core/ply-device-manager.c
+@@ -213,63 +213,13 @@ free_devices_from_device_path (ply_device_manager_t *manager,
+ }
+ 
+ #ifdef HAVE_UDEV
+-static bool
+-drm_device_in_use (ply_device_manager_t *manager,
+-                   const char           *device_path)
+-{
+-        ply_renderer_t *renderer;
+-
+-        renderer = ply_hashtable_lookup (manager->renderers, (void *) device_path);
+-
+-        return renderer != NULL;
+-}
+-
+ static bool
+ fb_device_has_drm_device (ply_device_manager_t *manager,
+                           struct udev_device   *fb_device)
+ {
+-        struct udev_enumerate *card_matches;
+-        struct udev_list_entry *card_entry;
+-        const char *id_path;
+-        bool has_drm_device = false;
++        const char *name = udev_device_get_sysattr_value (fb_device, "name");
+ 
+-        /* We want to see if the framebuffer is associated with a DRM-capable
+-         * graphics card, if it is, we'll use the DRM device */
+-        card_matches = udev_enumerate_new (manager->udev_context);
+-        udev_enumerate_add_match_is_initialized (card_matches);
+-        udev_enumerate_add_match_parent (card_matches, udev_device_get_parent (fb_device));
+-        udev_enumerate_add_match_subsystem (card_matches, "drm");
+-        id_path = udev_device_get_property_value (fb_device, "ID_PATH");
+-        udev_enumerate_add_match_property (card_matches, "ID_PATH", id_path);
+-
+-        ply_trace ("trying to find associated drm node for fb device (path: %s)", id_path);
+-
+-        udev_enumerate_scan_devices (card_matches);
+-
+-        /* there should only ever be at most one match so we don't iterate through
+-         * the list, but just look at the first entry */
+-        card_entry = udev_enumerate_get_list_entry (card_matches);
+-
+-        if (card_entry != NULL) {
+-                struct udev_device *card_device = NULL;
+-                const char *card_node;
+-                const char *card_path;
+-
+-                card_path = udev_list_entry_get_name (card_entry);
+-                card_device = udev_device_new_from_syspath (manager->udev_context, card_path);
+-                card_node = udev_device_get_devnode (card_device);
+-                if (card_node != NULL && drm_device_in_use (manager, card_node))
+-                        has_drm_device = true;
+-                else
+-                        ply_trace ("no card node!");
+-
+-                udev_device_unref (card_device);
+-        } else {
+-                ply_trace ("no card entry!");
+-        }
+-
+-        udev_enumerate_unref (card_matches);
+-        return has_drm_device;
++        return ply_string_has_suffix (name, "drmfb");
+ }
+ 
+ static void
+-- 
+2.52.0
+

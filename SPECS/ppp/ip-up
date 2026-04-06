@@ -1,0 +1,17 @@
+#!/bin/bash
+# This file should not be modified -- make local changes to
+# /etc/ppp/ip-up.local instead
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+LOGDEVICE=$6
+REALDEVICE=$1
+
+[ -f /etc/sysconfig/network-scripts/ifcfg-${LOGDEVICE} ] && /etc/sysconfig/network-scripts/ifup-post --realdevice ${REALDEVICE} ifcfg-${LOGDEVICE}
+
+/etc/ppp/ip-up.ipv6to4 ${LOGDEVICE}
+
+[ -x /etc/ppp/ip-up.local ] && /etc/ppp/ip-up.local "$@"
+
+exit 0

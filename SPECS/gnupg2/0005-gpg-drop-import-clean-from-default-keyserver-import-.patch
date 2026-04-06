@@ -1,0 +1,52 @@
+From 5b9854a16f5d8b288c33315113a02e17afc40614 Mon Sep 17 00:00:00 2001
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+Date: Mon, 15 Jul 2019 16:24:35 -0400
+Subject: gpg: drop import-clean from default keyserver import options
+
+* g10/gpg.c (main): drop IMPORT_CLEAN from the
+default opt.keyserver_options.import_options
+* doc/gpg.texi: reflect this change in the documentation
+
+Given that SELF_SIGS_ONLY is already set, it's not clear what
+additional benefit IMPORT_CLEAN provides.  Furthermore, IMPORT_CLEAN
+means that receiving an OpenPGP certificate from a keyserver will
+potentially delete data that is otherwise held in the local keyring,
+which is surprising to users who expect retrieval from the keyservers
+to be purely additive.
+
+GnuPG-Bug-Id: 4628
+Signed-off-by: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+---
+ doc/gpg.texi | 2 +-
+ g10/gpg.c    | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/doc/gpg.texi b/doc/gpg.texi
+index ec3492838..2a998ab3b 100644
+--- a/doc/gpg.texi
++++ b/doc/gpg.texi
+@@ -2176,7 +2176,7 @@ are available for all keyserver types, some common options are:
+ 
+ @end table
+ 
+-The default list of options is: "self-sigs-only, import-clean,
++The default list of options is: "self-sigs-only,
+ repair-keys, repair-pks-subkey-bug, export-attributes". However, if
+ the actual used source is an LDAP server "no-self-sigs-only" is
+ assumed unless "self-sigs-only" has been explicitly configured.
+diff --git a/g10/gpg.c b/g10/gpg.c
+index ff83d0bce..9fac3de54 100644
+--- a/g10/gpg.c
++++ b/g10/gpg.c
+@@ -2482,8 +2482,7 @@ main (int argc, char **argv)
+ 					    | IMPORT_REPAIR_PKS_SUBKEY_BUG
+                                             | IMPORT_SELF_SIGS_ONLY
+                                             | IMPORT_COLLAPSE_UIDS
+-                                            | IMPORT_COLLAPSE_SUBKEYS
+-                                            | IMPORT_CLEAN);
++                                            | IMPORT_COLLAPSE_SUBKEYS);
+     opt.keyserver_options.export_options = EXPORT_ATTRIBUTES;
+     opt.keyserver_options.options = 0;
+     opt.verify_options = (LIST_SHOW_UID_VALIDITY
+-- 
+2.43.0

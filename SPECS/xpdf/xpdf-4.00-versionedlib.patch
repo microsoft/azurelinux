@@ -1,0 +1,27 @@
+diff -up xpdf-4.00/fofi/CMakeLists.txt.versionedlib xpdf-4.00/fofi/CMakeLists.txt
+--- xpdf-4.00/fofi/CMakeLists.txt.versionedlib	2017-08-08 19:22:50.000000000 -0400
++++ xpdf-4.00/fofi/CMakeLists.txt	2017-08-16 20:06:18.106884951 -0400
+@@ -24,3 +24,5 @@ add_library(fofi_objs OBJECT
+ add_library(fofi
+   $<TARGET_OBJECTS:fofi_objs>
+ )
++
++set_target_properties(fofi PROPERTIES VERSION 4 SOVERSION 4)
+diff -up xpdf-4.00/goo/CMakeLists.txt.versionedlib xpdf-4.00/goo/CMakeLists.txt
+--- xpdf-4.00/goo/CMakeLists.txt.versionedlib	2017-08-08 19:22:50.000000000 -0400
++++ xpdf-4.00/goo/CMakeLists.txt	2017-08-16 20:06:00.525277924 -0400
+@@ -25,3 +25,5 @@ add_library(goo_objs OBJECT
+ add_library(goo
+   $<TARGET_OBJECTS:goo_objs>
+ )
++
++set_target_properties(goo PROPERTIES VERSION 4 SOVERSION 4)
+diff -up xpdf-4.00/splash/CMakeLists.txt.versionedlib xpdf-4.00/splash/CMakeLists.txt
+--- xpdf-4.00/splash/CMakeLists.txt.versionedlib	2017-08-08 19:22:50.000000000 -0400
++++ xpdf-4.00/splash/CMakeLists.txt	2017-08-16 20:06:41.204368689 -0400
+@@ -44,4 +44,5 @@ if (HAVE_SPLASH)
+   add_library(splash
+     $<TARGET_OBJECTS:splash_objs>
+   )
++  set_target_properties(splash PROPERTIES VERSION 4 SOVERSION 4)
+ endif ()

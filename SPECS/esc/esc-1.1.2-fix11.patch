@@ -1,0 +1,58 @@
+diff -up ./esc/src/lib/coolkey/Makefile.am.fix11 ./esc/src/lib/coolkey/Makefile.am
+--- ./esc/src/lib/coolkey/Makefile.am.fix11	2021-09-23 15:54:17.207378817 -0700
++++ ./esc/src/lib/coolkey/Makefile.am	2021-09-23 17:36:26.312894242 -0700
+@@ -24,6 +24,7 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
++COOLKEY_CFLAGS=-D_FORTIFY_SOURCE=2 -fcf-protection=full
+ 
+ AM_CPPFLAGS += \
+ 	$(COOLKEY_CFLAGS) \
+@@ -51,8 +52,8 @@ source_c           = \
+ 
+ lib_LTLIBRARIES += libCoolkey-1.0.la
+ 
+-libCoolkey_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@  -I ../nss-http-client
+-libCoolkey_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -I ../nss-http-client
++libCoolkey_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ $(AM_CFLAGS)  -I ../nss-http-client
++libCoolkey_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ $(AM_CPPFLAGS) -I ../nss-http-client
+ libCoolkey_1_0_la_LIBADD = $(COOLKEY_LIBS)
+ libCoolkey_1_0_la_LDFLAGS = -Wl,-z,now
+ libCoolkey_1_0_la_SOURCES = $(source_c) $(source_cpp)
+diff -up ./esc/src/lib/coolkey-mgr/Makefile.am.fix11 ./esc/src/lib/coolkey-mgr/Makefile.am
+--- ./esc/src/lib/coolkey-mgr/Makefile.am.fix11	2021-09-23 17:37:12.680837943 -0700
++++ ./esc/src/lib/coolkey-mgr/Makefile.am	2021-09-23 18:25:02.611294039 -0700
+@@ -24,8 +24,9 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
++COOLKEY_MGR_CFLAGS=-fcf-protection=full
+ 
+-OTHER_CPPFLAGS = -I ../coolkey $(PCSC_CFLAGS)
++OTHER_CPPFLAGS = -I ../coolkey $(PCSC_CFLAGS) $(COOLKEY_MGR_CFLAGS)
+ OTHER_LIBS = -L../coolkey/.libs -lCoolkey-1.0 -L../nss-http-client/.libs -lNssHttpClient-1.0 $(DBUS_LIBS)
+ ESC_CFLAGS += $(DBUS_CFLAGS)
+ 
+diff -up ./esc/src/lib/nss-http-client/Makefile.am.fix11 ./esc/src/lib/nss-http-client/Makefile.am
+--- ./esc/src/lib/nss-http-client/Makefile.am.fix11	2021-09-23 16:09:43.841312015 -0700
++++ ./esc/src/lib/nss-http-client/Makefile.am	2021-09-23 17:36:44.518872136 -0700
+@@ -24,6 +24,7 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
++NSS_HTTP_CLIENT_CFLAGS=-D_FORTIFY_SOURCE=2 -fcf-protection=full
+ AM_CPPFLAGS += \
+ 	$(NSS_HTTP_CLIENT_CFLAGS) \
+ 	$(NULL)
+@@ -49,8 +50,8 @@ source_c           = \
+ MYDEFS = @DEFS@
+ lib_LTLIBRARIES += libNssHttpClient-1.0.la
+ 
+-#libNssHttpClient_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -DLINUX -I ../coolkey
+-libNssHttpClient_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -I ../coolkey @DEFS@
++#libNssHttpClient_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -DLINUX  $(AM_CFLAGS) -I ../coolkey
++libNssHttpClient_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ $(AM_CPPFLAGS) -I ../coolkey @DEFS@
+ libNssHttpClient_1_0_la_LIBADD = $(COOLKEY_LIBS)
+ libNssHttpClient_1_0_la_LDFLAGS = -Wl,-z,now
+ libNssHttpClient_1_0_la_SOURCES = $(source_c) $(source_cpp) $(source_h)

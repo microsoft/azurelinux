@@ -1,0 +1,16 @@
+--- whoami-2.1.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ whoami-2.1.0/Cargo.toml	2026-01-29T23:19:30.360044+00:00
+@@ -51,13 +51,9 @@
+ [features]
+ default = [
+     "std",
+-    "wasi-wasite",
+-    "wasm-web",
+ ]
+ force-stub = []
+ std = []
+-wasi-wasite = []
+-wasm-web = []
+ 
+ [lib]
+ name = "whoami"

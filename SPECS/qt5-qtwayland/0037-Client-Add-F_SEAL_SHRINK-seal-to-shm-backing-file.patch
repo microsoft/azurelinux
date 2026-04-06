@@ -1,0 +1,53 @@
+From 438daa0fc6bdf9dbfb5dadf618bef70458f09cb8 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Thu, 17 Nov 2022 15:25:37 +0200
+Subject: [PATCH 37/55] Client: Add F_SEAL_SHRINK seal to shm backing file
+
+This lets libwayland-server avoid installing a SIGBUS handler when it
+wants to mmap() the backing file and access the contents of shared
+memory client buffers.
+
+Change-Id: Id0b17f729799535d73e8700c5a99c32fd88a068a
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 0c1cbb376e0cf878e3a91ab4917fe784a3b4c547)
+---
+ src/client/qwaylandshmbackingstore.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/qwaylandshmbackingstore.cpp b/src/client/qwaylandshmbackingstore.cpp
+index dc7ff670..98acd42d 100644
+--- a/src/client/qwaylandshmbackingstore.cpp
++++ b/src/client/qwaylandshmbackingstore.cpp
+@@ -52,6 +52,7 @@
+ 
+ #include <QtWaylandClient/private/wayland-wayland-client-protocol.h>
+ 
++#include <fcntl.h>
+ #include <unistd.h>
+ #include <sys/mman.h>
+ 
+@@ -61,6 +62,9 @@
+ #  ifndef MFD_CLOEXEC
+ #    define MFD_CLOEXEC     0x0001U
+ #  endif
++#  ifndef MFD_ALLOW_SEALING
++#    define MFD_ALLOW_SEALING 0x0002U
++#  endif
+ #endif
+ 
+ QT_BEGIN_NAMESPACE
+@@ -75,7 +79,9 @@ QWaylandShmBuffer::QWaylandShmBuffer(QWaylandDisplay *display,
+     int fd = -1;
+ 
+ #ifdef SYS_memfd_create
+-    fd = syscall(SYS_memfd_create, "wayland-shm", MFD_CLOEXEC);
++    fd = syscall(SYS_memfd_create, "wayland-shm", MFD_CLOEXEC | MFD_ALLOW_SEALING);
++    if (fd >= 0)
++        fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_SEAL);
+ #endif
+ 
+     QScopedPointer<QFile> filePointer;
+-- 
+2.51.1
+

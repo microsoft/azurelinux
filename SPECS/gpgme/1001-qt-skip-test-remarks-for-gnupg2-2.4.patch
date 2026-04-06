@@ -1,0 +1,58 @@
+diff --git a/lang/qt/tests/t-remarks.cpp b/lang/qt/tests/t-remarks.cpp
+index f9a901a..4b2f2ab 100644
+--- a/lang/qt/tests/t-remarks.cpp
++++ b/lang/qt/tests/t-remarks.cpp
+@@ -47,6 +47,12 @@
+ 
+ #include "t-support.h"
+ 
++#define SKIP_ON_2_4() do { \
++    if (GpgME::engineInfo(GpgME::GpgEngine).engineVersion() >= "2.4.0") { \
++        QSKIP("The test does not work well with gnupg 2.4+."); \
++    } \
++} while (false)
++
+ using namespace QGpgME;
+ using namespace GpgME;
+ 
+@@ -105,6 +111,7 @@ private Q_SLOTS:
+ 
+     void testRemarkReplaceSingleUIDExportable()
+     {
++        SKIP_ON_2_4();
+         if (!loopbackSupported()) {
+             return;
+         }
+@@ -187,6 +194,7 @@ private Q_SLOTS:
+ 
+     void testMultipleRemarks()
+     {
++        SKIP_ON_2_4();
+         if (!loopbackSupported()) {
+             return;
+         }
+@@ -269,6 +277,7 @@ private Q_SLOTS:
+ 
+     void testRemarkReplaceSingleUID()
+     {
++        SKIP_ON_2_4();
+         if (!loopbackSupported()) {
+             return;
+         }
+@@ -350,6 +359,7 @@ private Q_SLOTS:
+ 
+     void testRemarkReplaceMultiUID()
+     {
++        SKIP_ON_2_4();
+         if (!loopbackSupported()) {
+             return;
+         }
+@@ -466,6 +476,8 @@ private:
+     QTemporaryDir mDir;
+ };
+ 
++#undef SKIP_ON_2_4
++
+ QTEST_MAIN(TestRemarks)
+ 
+ #include "t-remarks.moc"

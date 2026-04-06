@@ -1,0 +1,21 @@
+diff --git a/Bindings/Java/NativeComponent.java b/Bindings/Java/NativeComponent.java
+index 2e6304a..cf6c9b0 100644
+--- a/Bindings/Java/NativeComponent.java
++++ b/Bindings/Java/NativeComponent.java
+@@ -23,7 +23,15 @@ public class NativeComponent extends Component {
+   private native static void initializeNativeData ();
+ 
+   static {
+-    System.loadLibrary("brlapi_java");
++    try {
++         System.load( "/usr/lib64/brltty/libbrlapi_java.so" );
++    } catch( UnsatisfiedLinkError e ) {
++         try {
++             System.load( "/usr/lib/brltty/libbrlapi_java.so" );
++         } catch( UnsatisfiedLinkError f ) {
++             throw new UnsatisfiedLinkError("brlapi_java library load failed");
++         }
++    }
+     initializeNativeData();
+   }
+ 

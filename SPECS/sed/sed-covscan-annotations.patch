@@ -1,0 +1,46 @@
+From 7dbe9c0c2b3f2cac602ce352cad11dab4defe896 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 30 Jan 2024 10:41:40 +0100
+Subject: [PATCH 3/3] covscan annotations
+Content-Type: text/plain; charset=UTF-8
+
+---
+ lib/malloca.c | 1 +
+ sed/compile.c | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/lib/malloca.c b/lib/malloca.c
+index 1e19978..11783b4 100644
+--- a/lib/malloca.c
++++ b/lib/malloca.c
+@@ -71,6 +71,7 @@ mmalloca (size_t n)
+              [mem, mem + nplus).  */
+           p[-1] = offset;
+           /* p ≡ sa_alignment_max mod 2*sa_alignment_max.  */
++          /* cppcheck-suppress memleak */
+           return p;
+         }
+     }
+diff --git a/sed/compile.c b/sed/compile.c
+index f96fbca..52759a5 100644
+--- a/sed/compile.c
++++ b/sed/compile.c
+@@ -830,6 +830,7 @@ setup_replacement (struct subst *sub, const char *text, size_t length)
+ 
+   tail->next = NULL;
+   sub->replacement = root.next;
++  /* coverity [leaked_storage] */
+ }
+ 
+ static void
+@@ -1328,6 +1329,7 @@ compile_program (struct vector *vector)
+                   bad_prog (_(Y_CMD_LEN));
+ 
+                 IF_LINT (free (src_lens));
++                /* coverity [leaked_storage] */
+               }
+             else
+               {
+-- 
+2.43.0
+

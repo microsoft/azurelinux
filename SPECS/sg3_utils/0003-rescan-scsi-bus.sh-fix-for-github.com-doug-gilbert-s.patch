@@ -1,0 +1,30 @@
+From bc99b8db2cf8afd04b1f9d68e9bd4f9d847b3c6f Mon Sep 17 00:00:00 2001
+From: Douglas Gilbert <dgilbert@interlog.com>
+Date: Thu, 21 Dec 2023 04:35:26 +0000
+Subject: [PATCH 3/3] rescan-scsi-bus.sh: fix for
+ github.com/doug-gilbert/sg3_utils/issues/46
+X-Patchwork-Bot: notify
+
+git-svn-id: https://svn.bingwo.ca/repos/sg3_utils/trunk@1076 6180dd3e-e324-4e3e-922d-17de1ae2f315
+---
+ scripts/rescan-scsi-bus.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/rescan-scsi-bus.sh b/scripts/rescan-scsi-bus.sh
+index 188d071c..52991e1e 100755
+--- a/scripts/rescan-scsi-bus.sh
++++ b/scripts/rescan-scsi-bus.sh
+@@ -1240,7 +1240,9 @@ if [ -x /usr/bin/sg_inq ] ; then
+   if [ "$sg_turs_version" -gt 353 ] ; then
+     sg_turs_opt="--ascq=0x3a"
+   else
+-    sg_turs_opt=""
++    # Not really interested in timing a TUR but an empty string such as
++    # "" gets interpreted on the command line as a positional parameter.
++    sg_turs_opt="-t"
+   fi
+ else
+   echo "WARN: /usr/bin/sg_inq not present -- please install sg3_utils"
+-- 
+2.44.0
+

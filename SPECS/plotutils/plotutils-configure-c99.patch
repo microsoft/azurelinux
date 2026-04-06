@@ -1,0 +1,54 @@
+Do not call the undeclared exit function.  This avoids build problems
+with future compilers which do not support implicit function
+declarations.
+
+diff --git a/configure b/configure
+index 229ccd453ae4487f..fdf3785ad4c5175f 100755
+--- a/configure
++++ b/configure
+@@ -19537,9 +19537,9 @@ int main()
+       || fflush ((FILE *)0) < 0
+       || (fpr = fopen ("conftest0", "r")) == (FILE *)0
+       || fread (test_array, 1, 7, fpr) != 7)
+-    exit (1);
++    return 1;
+   else
+-    exit(0); }
++    return 0; }
+ _ACEOF
+ rm -f conftest$ac_exeext
+ if { (ac_try="$ac_link"
+@@ -24022,7 +24022,7 @@ int main()
+   int i;
+   for (i=0; i < B; i++)
+     Array[i] = i - 3;
+-  exit (Array[1] != -2);
++  return Array[1] != -2;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
+diff --git a/configure.ac b/configure.ac
+index 8fb7b640864eb4a8..d1f6d7e08c6946d4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -88,9 +88,9 @@ int main()
+       || fflush ((FILE *)0) < 0
+       || (fpr = fopen ("conftest0", "r")) == (FILE *)0
+       || fread (test_array, 1, 7, fpr) != 7)
+-    exit (1);
++    return 1;
+   else
+-    exit(0); }]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_NULL_FLUSH)],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(no)])
++    return 0; }]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_NULL_FLUSH)],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(no)])
+ 
+ # Checks for header files: ANSI C, POSIX, and nonstandard Unix headers.
+ AC_HEADER_STDC
+@@ -383,7 +383,7 @@ int main()
+   int i;
+   for (i=0; i < B; i++)
+     Array[[i]] = i - 3;
+-  exit (Array[[1]] != -2);
++  return Array[[1]] != -2;
+ }]])],
+ [ac_cv_c_gcc_strength_bug="no"],[ac_cv_c_gcc_strength_bug="yes"],[ac_cv_c_gcc_strength_bug="yes"]) )
+   if test "$ac_cv_c_gcc_strength_bug" = "yes"

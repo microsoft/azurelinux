@@ -1,0 +1,26 @@
+--- rustls-pki-types-1.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-pki-types-1.14.0/Cargo.toml	2026-01-16T20:39:30.927279+00:00
+@@ -54,17 +54,13 @@
+ alloc = ["dep:zeroize"]
+ default = ["alloc"]
+ std = ["alloc"]
+-web = ["web-time"]
++web = []
+ 
+ [lib]
+ name = "rustls_pki_types"
+ path = "src/lib.rs"
+ 
+ [dependencies.zeroize]
+-version = "1"
+-optional = true
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.web-time]
+ version = "1"
+ optional = true
+ 
+@@ -84,3 +80,4 @@
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(rustls_pki_types_docsrs)"]
++

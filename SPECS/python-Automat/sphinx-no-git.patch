@@ -1,0 +1,42 @@
+diff --git a/docs/conf.py b/docs/conf.py
+index d2e19c6..fb540a3 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -44,29 +44,6 @@ import subprocess
+ _project_root = pathlib.Path(__file__).parent.parent
+ _source_root = _project_root / "src"
+ 
+-_git_reference = subprocess.run(
+-    ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+-    text=True,
+-    encoding="utf8",
+-    capture_output=True,
+-    check=True,
+-).stdout
+-
+-
+-# Try to find URL fragment for the GitHub source page based on current
+-# branch or tag.
+-
+-if _git_reference == "HEAD":
+-    # It looks like the branch has no name.
+-    # Fallback to commit ID.
+-    _git_reference = subprocess.getoutput("git rev-parse HEAD")
+-
+-if os.environ.get("READTHEDOCS", "") == "True":
+-    rtd_version = os.environ.get("READTHEDOCS_VERSION", "")
+-    if "." in rtd_version:
+-        # It looks like we have a tag build.
+-        _git_reference = rtd_version
+-
+ pydoctor_args = [
+     # pydoctor should not fail the sphinx build, we have another tox environment for that.
+     "--intersphinx=https://docs.twisted.org/en/twisted-22.1.0/api/objects.inv",
+@@ -75,7 +52,6 @@ pydoctor_args = [
+     "--intersphinx=https://zopeinterface.readthedocs.io/en/latest/objects.inv",
+     # TODO: not sure why I have to specify these all twice.
+     f"--config={_project_root}/.pydoctor.cfg",
+-    f"--html-viewsource-base=https://github.com/glyph/automat/tree/{_git_reference}/src",
+     f"--project-base-dir={_source_root}",
+     "--html-output={outdir}/api",
+     "--privacy=HIDDEN:automat.test.*",

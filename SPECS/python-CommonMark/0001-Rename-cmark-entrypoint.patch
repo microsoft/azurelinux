@@ -1,0 +1,27 @@
+From f114dca7d89fa86f9f2773df6ccfba15e90397fc Mon Sep 17 00:00:00 2001
+From: "FeRD (Frank Dana)" <ferdnyc@gmail.com>
+Date: Sat, 28 May 2022 08:18:20 -0400
+Subject: [PATCH] Rename cmark entrypoint
+
+The name 'cmark' conflicts with a package of the same name, in
+Fedora, so the command-line tool is renamed to 'commonmark'.
+---
+ setup.py   |  2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 71ac8bc..d82c4fb 100644
+--- a/setup.py
++++ b/setup.py
+@@ -48,7 +48,7 @@ setup(
+     keywords=["markup", "markdown", "commonmark"],
+     entry_points={
+         'console_scripts': [
+-            'cmark = commonmark.cmark:main',
++            'commonmark = commonmark.cmark:main',
+         ]
+     },
+     cmdclass={'test': Test},
+-- 
+2.35.3
+

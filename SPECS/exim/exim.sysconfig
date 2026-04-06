@@ -1,0 +1,4 @@
+DAEMON=yes
+QUEUE=1h
+USER=exim
+GROUP=exim

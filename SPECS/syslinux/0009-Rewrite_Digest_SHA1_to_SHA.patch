@@ -1,0 +1,33 @@
+From c5a4d036fff8925bc10f17d68837b862a9a894e4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20Josef=20=C5=A0pa=C4=8Dek?= <mspacek@redhat.com>
+Date: Wed, 10 Jul 2024 15:58:33 +0200
+Subject: [PATCH] Rewrite Digest::SHA1 to SHA
+
+---
+ utils/sha1pass | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/sha1pass b/utils/sha1pass
+index 3be2dbc..34cc99c 100755
+--- a/utils/sha1pass
++++ b/utils/sha1pass
+@@ -1,7 +1,7 @@
+ #!/usr/bin/perl
+ 
+ use bytes;
+-use Digest::SHA1;
++use Digest::SHA;
+ use MIME::Base64;
+ 
+ sub random_bytes($) {
+@@ -29,6 +29,6 @@ sub random_bytes($) {
+ unless (defined($salt)) {
+     $salt = MIME::Base64::encode(random_bytes(6), '');
+ }
+-$pass = Digest::SHA1::sha1_base64($salt, $pass);
++$pass = Digest::SHA::sha1_base64($salt, $pass);
+ 
+ print '$4$', $salt, '$', $pass, "\$\n";
+-- 
+2.45.2
+

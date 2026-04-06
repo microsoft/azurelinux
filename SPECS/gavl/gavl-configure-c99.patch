@@ -1,0 +1,22 @@
+Avoid an implicit int in the clock_gettime test, to keep the same test
+outcome with future compilers that do not support implicit ints.
+
+Fixed upstream as part of:
+
+r6246 | gmerlin | 2021-09-01 11:46:30 +0200 (Wed, 01 Sep 2021) | 2 lines
+
+Applied cross-building.patch by Helmut Grohne
+
+diff --git a/configure.ac b/configure.ac
+index 90b0be6c89df4b3b..1df85ad6c222ce8d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -162,7 +162,7 @@ AC_MSG_CHECKING(for CLOCK_MONOTONIC)
+ AC_TRY_RUN([
+   #include <time.h>
+   #include <errno.h>
+-main()
++int main(void)
+   {
+   struct timespec tp;
+   if(clock_gettime(CLOCK_MONOTONIC, &tp))

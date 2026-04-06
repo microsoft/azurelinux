@@ -1,0 +1,101 @@
+From af7e95c32cea40c1e443ae301e64b27f068b4915 Mon Sep 17 00:00:00 2001
+From: Paulo Alcantara <pcacjr@zytor.com>
+Date: Wed, 11 Oct 2017 07:00:31 -0400
+Subject: [PATCH] ext4: Fix 64bit feature
+
+As per ext4 specification:
+
+> In ext2, ext3, and ext4 (when the 64bit feature is not enabled), the
+> block group descriptor was only 32 bytes long and therefore ends at
+> bg_checksum. On an ext4 filesystem with the 64bit feature enabled, the
+> block group descriptor expands to at least the 64 bytes described below;
+> the size is stored in the superblock.
+
+Since block group descriptor has been expanded to 64 bytes long (when 64
+bit feature is enabled), we cannot index ext2_group_desc and return it
+*directly* -- as we did it in ext2_get_group_desc -- it's still 32 bytes
+long.
+
+Instead, use s_desc_size field from superblock to correctly index and
+return block group descriptors.
+
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Gene Cumm <gene.cumm@gmail.com>
+Signed-off-by: Paulo Alcantara <pcacjr@zytor.com>
+---
+ core/fs/ext2/ext2.c    | 23 ++++++++++++++---------
+ core/fs/ext2/ext2_fs.h |  1 +
+ 2 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/core/fs/ext2/ext2.c b/core/fs/ext2/ext2.c
+index 76bd1d5..4bc0a53 100644
+--- a/core/fs/ext2/ext2.c
++++ b/core/fs/ext2/ext2.c
+@@ -25,22 +25,17 @@ static enum dirent_type ext2_cvt_type(unsigned int d_file_type)
+ 	return inode_type[d_file_type];
+ }
+ 
+-/*
+- * get the group's descriptor of group_num
+- */
+-static const struct ext2_group_desc *
+-ext2_get_group_desc(struct fs_info *fs, uint32_t group_num)
++static const void *__ext2_get_group_desc(struct fs_info *fs, uint32_t group_num)
+ {
+     struct ext2_sb_info *sbi = EXT2_SB(fs);
+     uint32_t desc_block, desc_index;
+-    const struct ext2_group_desc *desc_data_block;
++    uint8_t *p;
+ 
+     if (group_num >= sbi->s_groups_count) {
+ 	printf ("ext2_get_group_desc"
+ 		"block_group >= groups_count - "
+ 		"block_group = %d, groups_count = %d",
+ 		group_num, sbi->s_groups_count);
+-
+ 	return NULL;
+     }
+ 
+@@ -49,8 +44,17 @@ ext2_get_group_desc(struct fs_info *fs, uint32_t group_num)
+ 
+     desc_block += sbi->s_first_data_block + 1;
+ 
+-    desc_data_block = get_cache(fs->fs_dev, desc_block);
+-    return &desc_data_block[desc_index];
++    p = get_cache(fs->fs_dev, desc_block);
++    return p + sbi->s_desc_size * desc_index;
++}
++
++/*
++ * get the group's descriptor of group_num
++ */
++static inline const struct ext2_group_desc *
++ext2_get_group_desc(struct fs_info *fs, uint32_t group_num)
++{
++    return __ext2_get_group_desc(fs, group_num);
+ }
+ 
+ /*
+@@ -306,6 +310,7 @@ static int ext2_fs_init(struct fs_info *fs)
+     if (sb.s_desc_size < sizeof(struct ext2_group_desc))
+ 	sb.s_desc_size = sizeof(struct ext2_group_desc);
+     sbi->s_desc_per_block   = BLOCK_SIZE(fs) / sb.s_desc_size;
++    sbi->s_desc_size = sb.s_desc_size;
+     sbi->s_groups_count     = (sb.s_blocks_count - sb.s_first_data_block
+ 			       + EXT2_BLOCKS_PER_GROUP(fs) - 1)
+ 	                      / EXT2_BLOCKS_PER_GROUP(fs);
+diff --git a/core/fs/ext2/ext2_fs.h b/core/fs/ext2/ext2_fs.h
+index 803a995..d8d07eb 100644
+--- a/core/fs/ext2/ext2_fs.h
++++ b/core/fs/ext2/ext2_fs.h
+@@ -278,6 +278,7 @@ struct ext2_sb_info {
+     uint32_t s_first_data_block;	/* First Data Block */
+     int      s_inode_size;
+     uint8_t  s_uuid[16];	/* 128-bit uuid for volume */
++    int      s_desc_size;	/* size of group descriptor */
+ };
+ 
+ static inline struct ext2_sb_info *EXT2_SB(struct fs_info *fs)
+-- 
+2.7.4.GIT
+

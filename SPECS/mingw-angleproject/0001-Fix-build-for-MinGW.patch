@@ -1,0 +1,26 @@
+From 75f877269a86aa111afbf816be14ef6c36ea6478 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Mon, 2 Jul 2018 12:56:39 +0200
+Subject: [PATCH] Fix build for MinGW
+
+SSE is not properly supported for Mingw yet.
+---
+ src/common/platform.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/angle/src/common/platform.h b/src/3rdparty/angle/srccommon/platform.h
+index 0065fd2..47cd57b 100644
+--- a/src/3rdparty/angle/src/common/platform.h
++++ b/src/3rdparty/angle/src/common/platform.h
+@@ -86,7 +86,7 @@
+ #if defined(_MSC_VER) && !defined(_M_ARM)
+ #include <intrin.h>
+ #define ANGLE_USE_SSE
+-#elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__))
++#elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) && !defined(__MINGW32__)
+ #include <x86intrin.h>
+ #define ANGLE_USE_SSE
+ #endif
+-- 
+2.10.2.windows.1
+

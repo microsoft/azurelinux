@@ -1,0 +1,19 @@
+commit 276b240f1694f929ce4b91bcd1827ec31e5ea1fe
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Thu Jul 22 12:02:10 2021 +0200
+
+    Disable stack overflow test
+
+diff --git a/test-suite/standalone/test-stack-overflow b/test-suite/standalone/test-stack-overflow
+index dd54249..45a96be 100755
+--- a/test-suite/standalone/test-stack-overflow
++++ b/test-suite/standalone/test-stack-overflow
+@@ -3,6 +3,8 @@ guild compile "$0"
+ exec guile -q -s "$0" "$@"
+ !#
+ 
++(exit 77)
++
+ (unless (defined? 'setrlimit)
+   ;; Without an rlimit, this test can take down your system, as it
+   ;; consumes all of your memory in stack space.  That doesn't seem like

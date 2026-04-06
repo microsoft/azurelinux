@@ -1,0 +1,228 @@
+diff --git a/src/client/qwaylandabstractdecoration_p.h b/src/client/qwaylandabstractdecoration_p.h
+index 81c8e17..61cbde7 100644
+--- a/src/client/qwaylandabstractdecoration_p.h
++++ b/src/client/qwaylandabstractdecoration_p.h
+@@ -82,6 +82,12 @@ class Q_WAYLAND_CLIENT_EXPORT QWaylandAbstractDecoration : public QObject
+     Q_OBJECT
+     Q_DECLARE_PRIVATE(QWaylandAbstractDecoration)
+ public:
++    enum MarginsType {
++        Full,
++        ShadowsExcluded,
++        ShadowsOnly
++    };
++
+     QWaylandAbstractDecoration();
+     ~QWaylandAbstractDecoration() override;
+ 
+@@ -91,7 +97,8 @@ public:
+     void update();
+     bool isDirty() const;
+ 
+-    virtual QMargins margins() const = 0;
++    virtual QMargins margins(MarginsType marginsType = Full) const = 0;
++
+     QWindow *window() const;
+     const QImage &contentImage();
+ 
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index ec232cd..54b27f1 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -383,6 +383,16 @@ void QWaylandWindow::setGeometry(const QRect &r)
+ void QWaylandWindow::resizeFromApplyConfigure(const QSize &sizeWithMargins, const QPoint &offset)
+ {
+     QMargins margins = frameMargins();
++
++    // Exclude shadows from margins once they are excluded from window geometry
++    // 1) First resizeFromApplyConfigure() call will have sizeWithMargins equal to surfaceSize()
++    //    which has full margins (shadows included).
++    // 2) Following resizeFromApplyConfigure() calls should have sizeWithMargins equal to
++    //    windowContentGeometry() which excludes shadows, therefore in this case we have to
++    //    exclude them too in order not to accidentally apply smaller size to the window.
++    if (mWindowDecoration && (sizeWithMargins != surfaceSize()))
++        margins = mWindowDecoration->margins(QWaylandAbstractDecoration::ShadowsExcluded);
++
+     int widthWithoutMargins = qMax(sizeWithMargins.width() - (margins.left() + margins.right()), 1);
+     int heightWithoutMargins = qMax(sizeWithMargins.height() - (margins.top() + margins.bottom()), 1);
+     QRect geometry(windowGeometry().topLeft(), QSize(widthWithoutMargins, heightWithoutMargins));
+@@ -710,7 +720,12 @@ QSize QWaylandWindow::surfaceSize() const
+  */
+ QRect QWaylandWindow::windowContentGeometry() const
+ {
+-    return QRect(QPoint(), surfaceSize());
++    QMargins shadowMargins;
++
++    if (mWindowDecoration)
++        shadowMargins = mWindowDecoration->margins(QWaylandAbstractDecoration::ShadowsOnly);
++
++    return QRect(QPoint(shadowMargins.left(), shadowMargins.top()), surfaceSize().shrunkBy(shadowMargins));
+ }
+ 
+ /*!
+@@ -1111,6 +1126,16 @@ Qt::WindowStates QWaylandWindow::windowStates() const
+     return mLastReportedWindowStates;
+ }
+ 
++QWaylandWindow::ToplevelWindowTilingStates QWaylandWindow::toplevelWindowTilingStates() const
++{
++    return mLastReportedToplevelWindowTilingStates;
++}
++
++void QWaylandWindow::handleToplevelWindowTilingStatesChanged(ToplevelWindowTilingStates states)
++{
++    mLastReportedToplevelWindowTilingStates = states;
++}
++
+ void QWaylandWindow::handleWindowStatesChanged(Qt::WindowStates states)
+ {
+     createDecoration();
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 1907f10..33a3b83 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -95,6 +95,15 @@ public:
+         Vulkan
+     };
+ 
++    enum ToplevelWindowTilingState {
++        WindowNoState = 0,
++        WindowTiledLeft = 1,
++        WindowTiledRight = 2,
++        WindowTiledTop = 4,
++        WindowTiledBottom = 8
++    };
++    Q_DECLARE_FLAGS(ToplevelWindowTilingStates, ToplevelWindowTilingState)
++
+     QWaylandWindow(QWindow *window, QWaylandDisplay *display);
+     ~QWaylandWindow() override;
+ 
+@@ -148,6 +157,9 @@ public:
+     void handleContentOrientationChange(Qt::ScreenOrientation orientation) override;
+     void setOrientationMask(Qt::ScreenOrientations mask);
+ 
++    ToplevelWindowTilingStates toplevelWindowTilingStates() const;
++    void handleToplevelWindowTilingStatesChanged(ToplevelWindowTilingStates states);
++
+     void setWindowState(Qt::WindowStates states) override;
+     void setWindowFlags(Qt::WindowFlags flags) override;
+     void handleWindowStatesChanged(Qt::WindowStates states);
+@@ -260,6 +272,7 @@ protected:
+     QRegion mMask;
+     QRegion mOpaqueArea;
+     Qt::WindowStates mLastReportedWindowStates = Qt::WindowNoState;
++    ToplevelWindowTilingStates mLastReportedToplevelWindowTilingStates = WindowNoState;
+ 
+     QWaylandShmBackingStore *mBackingStore = nullptr;
+     QWaylandBuffer *mQueuedBuffer = nullptr;
+@@ -296,6 +309,8 @@ private:
+     friend class QWaylandSubSurface;
+ };
+ 
++Q_DECLARE_OPERATORS_FOR_FLAGS(QWaylandWindow::ToplevelWindowTilingStates)
++
+ inline QIcon QWaylandWindow::windowIcon() const
+ {
+     return mWindowIcon;
+diff --git a/src/plugins/decorations/bradient/main.cpp b/src/plugins/decorations/bradient/main.cpp
+index e75fda3..72dda67 100644
+--- a/src/plugins/decorations/bradient/main.cpp
++++ b/src/plugins/decorations/bradient/main.cpp
+@@ -72,7 +72,7 @@ class Q_WAYLAND_CLIENT_EXPORT QWaylandBradientDecoration : public QWaylandAbstra
+ public:
+     QWaylandBradientDecoration();
+ protected:
+-    QMargins margins() const override;
++    QMargins margins(MarginsType marginsType = Full) const override;
+     void paint(QPaintDevice *device) override;
+     bool handleMouse(QWaylandInputDevice *inputDevice, const QPointF &local, const QPointF &global,Qt::MouseButtons b,Qt::KeyboardModifiers mods) override;
+     bool handleTouch(QWaylandInputDevice *inputDevice, const QPointF &local, const QPointF &global, Qt::TouchPointState state, Qt::KeyboardModifiers mods) override;
+@@ -129,8 +129,11 @@ QRectF QWaylandBradientDecoration::minimizeButtonRect() const
+                   (margins().top() - BUTTON_WIDTH) / 2, BUTTON_WIDTH, BUTTON_WIDTH);
+ }
+ 
+-QMargins QWaylandBradientDecoration::margins() const
++QMargins QWaylandBradientDecoration::margins(MarginsType marginsType) const
+ {
++    if (marginsType == ShadowsOnly)
++        return QMargins();
++
+     return QMargins(3, 30, 3, 3);
+ }
+ 
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index 2666df2..8d8ac85 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -88,6 +88,7 @@ void QWaylandXdgSurface::Toplevel::applyConfigure()
+         && !m_xdgSurface->m_window->display()->isKeyboardAvailable())
+         m_xdgSurface->m_window->display()->handleWindowDeactivated(m_xdgSurface->m_window);
+ 
++    m_xdgSurface->m_window->handleToplevelWindowTilingStatesChanged(m_toplevelStates);
+     m_xdgSurface->m_window->handleWindowStatesChanged(m_pending.states);
+ 
+     if (m_pending.size.isEmpty()) {
+@@ -120,6 +121,7 @@ void QWaylandXdgSurface::Toplevel::xdg_toplevel_configure(int32_t width, int32_t
+     size_t numStates = states->size / sizeof(uint32_t);
+ 
+     m_pending.states = Qt::WindowNoState;
++    m_toplevelStates = QWaylandWindow::WindowNoState;
+ 
+     for (size_t i = 0; i < numStates; i++) {
+         switch (xdgStates[i]) {
+@@ -132,6 +134,18 @@ void QWaylandXdgSurface::Toplevel::xdg_toplevel_configure(int32_t width, int32_t
+         case XDG_TOPLEVEL_STATE_FULLSCREEN:
+             m_pending.states |= Qt::WindowFullScreen;
+             break;
++        case XDG_TOPLEVEL_STATE_TILED_LEFT:
++            m_toplevelStates |= QWaylandWindow::WindowTiledLeft;
++            break;
++        case XDG_TOPLEVEL_STATE_TILED_RIGHT:
++            m_toplevelStates |= QWaylandWindow::WindowTiledRight;
++            break;
++        case XDG_TOPLEVEL_STATE_TILED_TOP:
++            m_toplevelStates |= QWaylandWindow::WindowTiledTop;
++            break;
++        case XDG_TOPLEVEL_STATE_TILED_BOTTOM:
++            m_toplevelStates |= QWaylandWindow::WindowTiledBottom;
++            break;
+         default:
+             break;
+         }
+@@ -458,7 +472,7 @@ void QWaylandXdgSurface::xdg_surface_configure(uint32_t serial)
+ }
+ 
+ QWaylandXdgShell::QWaylandXdgShell(QWaylandDisplay *display, uint32_t id, uint32_t availableVersion)
+-    : QtWayland::xdg_wm_base(display->wl_registry(), id, qMin(availableVersion, 1u))
++    : QtWayland::xdg_wm_base(display->wl_registry(), id, qMin(availableVersion, 2u))
+     , m_display(display)
+ {
+     display->addRegistryListener(&QWaylandXdgShell::handleRegistryGlobal, this);
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
+index 0c98be3..d791213 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
+@@ -58,6 +58,7 @@
+ 
+ #include <QtWaylandClient/qtwaylandclientglobal.h>
+ #include <QtWaylandClient/private/qwaylandshellsurface_p.h>
++#include <QtWaylandClient/private/qwaylandwindow_p.h>
+ 
+ #include <QtCore/QSize>
+ #include <QtGui/QRegion>
+@@ -69,7 +70,6 @@ class QWindow;
+ namespace QtWaylandClient {
+ 
+ class QWaylandDisplay;
+-class QWaylandWindow;
+ class QWaylandInputDevice;
+ class QWaylandXdgShell;
+ 
+@@ -123,6 +123,7 @@ private:
+             QSize size = {0, 0};
+             Qt::WindowStates states = Qt::WindowNoState;
+         }  m_pending, m_applied;
++        QWaylandWindow::ToplevelWindowTilingStates m_toplevelStates = QWaylandWindow::WindowNoState;
+         QSize m_normalSize;
+ 
+         QWaylandXdgSurface *m_xdgSurface = nullptr;

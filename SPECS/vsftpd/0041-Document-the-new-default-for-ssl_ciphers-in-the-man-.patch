@@ -1,0 +1,31 @@
+From 2369d1ea5144d525d315aba90da528e7d9bfd1cc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 21 Dec 2017 14:19:18 +0100
+Subject: [PATCH 41/59] Document the new default for ssl_ciphers in the man
+ page
+
+Related: rhbz#1483970
+---
+ vsftpd.conf.5 | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 3ca55e4..2a7662e 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -1078,7 +1078,11 @@ man page for further details. Note that restricting ciphers can be a useful
+ security precaution as it prevents malicious remote parties forcing a cipher
+ which they have found problems with.
+ 
+-Default: DES-CBC3-SHA
++By default, the system-wide crypto policy is used. See
++.BR update-crypto-policies(8)
++for further details.
++
++Default: PROFILE=SYSTEM
+ .TP
+ .B ssl_sni_hostname
+ If set, SSL connections will be rejected unless the SNI hostname in the
+-- 
+2.14.4
+

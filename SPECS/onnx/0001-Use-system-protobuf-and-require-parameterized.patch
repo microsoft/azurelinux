@@ -1,0 +1,21 @@
+From 30745ee623fb1fe7531d6399e54b5ffe411446f5 Mon Sep 17 00:00:00 2001
+From: Alejandro Alvarez Ayllon <a.alvarezayllon@gmail.com>
+Date: Sat, 24 Feb 2024 14:52:25 +0100
+Subject: [PATCH 2/4] Use system protobuf and require parameterized
+
+---
+ requirements.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/requirements.txt b/requirements.txt
+index 7f3a9ad03..46dd7f7fd 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,2 +1,3 @@
+ numpy>=1.20
+-protobuf>=3.20.2
++protobuf >= 3.14.0, < 4
++parameterized >= 0.8.1, < 1
+-- 
+2.52.0
+

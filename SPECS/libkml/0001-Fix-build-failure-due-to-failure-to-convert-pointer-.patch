@@ -1,0 +1,3495 @@
+From fe1f7ba4e76f156a160a6d3bbf28c3e224b3f43f Mon Sep 17 00:00:00 2001
+From: Sandro Mani <manisandro@gmail.com>
+Date: Fri, 8 Apr 2016 23:21:00 +0200
+Subject: [PATCH 1/4] Fix build failure due to failure to convert pointer to
+ bool
+
+---
+ tests/kml/base/net_cache_test.cc                   |  22 +--
+ tests/kml/base/zip_file_test.cc                    |  26 +--
+ tests/kml/convenience/csv_file_test.cc             |   2 +-
+ tests/kml/convenience/csv_parser_test.cc           |  12 +-
+ tests/kml/convenience/element_counter_test.cc      |  10 +-
+ tests/kml/convenience/feature_list_test.cc         |   2 +-
+ tests/kml/convenience/google_maps_data_test.cc     |   2 +-
+ tests/kml/convenience/google_spreadsheets_test.cc  |   2 +-
+ .../kml/convenience/kml_feature_list_saver_test.cc |   2 +-
+ tests/kml/convenience/kmz_check_links_test.cc      |   8 +-
+ tests/kml/dom/abstractview_test.cc                 |   8 +-
+ tests/kml/dom/atom_test.cc                         |  20 +-
+ tests/kml/dom/document_test.cc                     |   4 +-
+ tests/kml/dom/extendeddata_test.cc                 |  16 +-
+ tests/kml/dom/folder_test.cc                       |   4 +-
+ tests/kml/dom/geometry_test.cc                     |  24 +--
+ tests/kml/dom/gx_tour_test.cc                      |  72 +++----
+ tests/kml/dom/hotspot_test.cc                      |   2 +-
+ tests/kml/dom/iconstyle_test.cc                    |   2 +-
+ tests/kml/dom/kml22_test.cc                        |   2 +-
+ tests/kml/dom/kml_cast_test.cc                     | 206 ++++++++++-----------
+ tests/kml/dom/kml_factory_test.cc                  |   6 +-
+ tests/kml/dom/kml_handler_ns_test.cc               |   2 +-
+ tests/kml/dom/kml_handler_test.cc                  |  56 +++---
+ tests/kml/dom/link_test.cc                         |  10 +-
+ tests/kml/dom/networklink_test.cc                  |   2 +-
+ tests/kml/dom/object_test.cc                       |   4 +-
+ tests/kml/dom/overlay_test.cc                      |  16 +-
+ tests/kml/dom/parser_test.cc                       |  12 +-
+ tests/kml/dom/placemark_test.cc                    |   4 +-
+ tests/kml/dom/region_test.cc                       |  20 +-
+ tests/kml/dom/serializer_test.cc                   |   2 +-
+ tests/kml/dom/snippet_test.cc                      |  14 +-
+ tests/kml/dom/unknown_test.cc                      |   8 +-
+ tests/kml/dom/xal_test.cc                          |  18 +-
+ tests/kml/dom/xml_serializer_test.cc               |   2 +-
+ tests/kml/engine/clone_test.cc                     |  16 +-
+ tests/kml/engine/entity_mapper_test.cc             |  10 +-
+ tests/kml/engine/feature_balloon_test.cc           |   2 +-
+ tests/kml/engine/feature_view_test.cc              |  10 +-
+ tests/kml/engine/find_test.cc                      |   4 +-
+ tests/kml/engine/id_mapper_test.cc                 |   8 +-
+ tests/kml/engine/kml_cache_test.cc                 |  10 +-
+ tests/kml/engine/kml_file_test.cc                  |  62 +++----
+ tests/kml/engine/kml_stream_test.cc                |  22 +--
+ tests/kml/engine/kmz_cache_test.cc                 |   8 +-
+ tests/kml/engine/kmz_file_test.cc                  |  44 ++---
+ tests/kml/engine/link_util_test.cc                 |   8 +-
+ tests/kml/engine/location_util_test.cc             |   6 +-
+ tests/kml/engine/merge_test.cc                     |   2 +-
+ tests/kml/engine/parse_old_schema_test.cc          |   2 +-
+ tests/kml/engine/style_inliner_test.cc             |   4 +-
+ tests/kml/engine/style_merger_test.cc              |  10 +-
+ tests/kml/engine/style_resolver_test.cc            |  34 ++--
+ tests/kml/engine/style_splitter_test.cc            |  28 +--
+ tests/kml/engine/update_processor_test.cc          |   4 +-
+ tests/kml/engine/update_test.cc                    |  40 ++--
+ tests/kml/regionator/regionator_test.cc            |  10 +-
+ tests/kml/xsd/xsd_complex_type_test.cc             |   6 +-
+ tests/kml/xsd/xsd_file_test.cc                     |  22 +--
+ tests/kml/xsd/xsd_handler_test.cc                  |   6 +-
+ tests/kml/xsd/xsd_schema_test.cc                   |   2 +-
+ tests/kml/xsd/xsd_simple_type_test.cc              |   8 +-
+ tests/kml/xsd/xsd_util_test.cc                     |   6 +-
+ 64 files changed, 509 insertions(+), 509 deletions(-)
+
+diff --git a/tests/kml/base/net_cache_test.cc b/tests/kml/base/net_cache_test.cc
+index f9afa05..d28470c 100644
+--- a/tests/kml/base/net_cache_test.cc
++++ b/tests/kml/base/net_cache_test.cc
+@@ -134,7 +134,7 @@ TEST_F(NetCacheTest, TestBasicFetch) {
+   ASSERT_FALSE(null_net_cache_->Fetch(kUrl));
+   ASSERT_EQ(kSize0, null_net_cache_->Size());
+   // Fetch of a valid testdata path succeeds.
+-  ASSERT_TRUE(testdata_net_cache_->Fetch(kUrl));
++  ASSERT_TRUE(testdata_net_cache_->Fetch(kUrl) != 0);
+   // TODO read the test file directly and compare content
+   ASSERT_EQ(static_cast<size_t>(1), testdata_net_cache_->Size());
+   // Fetch on UrlDataNetCache returns URL.
+@@ -150,11 +150,11 @@ TEST_F(NetCacheTest, TestBasicLookUp) {
+   ASSERT_FALSE(testdata_net_cache_->LookUp(kUrl));
+   ASSERT_FALSE(url_data_net_cache_->LookUp(kUrl));
+   // Fetch this URL into the cache in those caches that save content.
+-  ASSERT_TRUE(testdata_net_cache_->Fetch(kUrl));
+-  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl));
++  ASSERT_TRUE(testdata_net_cache_->Fetch(kUrl) != 0);
++  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl) != 0);
+   // Verify that these caches return true now on LookUp.
+-  ASSERT_TRUE(testdata_net_cache_->LookUp(kUrl));
+-  ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl));
++  ASSERT_TRUE(testdata_net_cache_->LookUp(kUrl) != 0);
++  ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl) != 0);
+ }
+ 
+ // Verify basic usage of the Save() method.
+@@ -164,7 +164,7 @@ TEST_F(NetCacheTest, TestBasicSave) {
+   MemoryFilePtr test_data_item = MemoryFile::CreateFromString(kContent);
+   ASSERT_TRUE(url_data_net_cache_->Save(kUrl, test_data_item));
+   ASSERT_EQ(static_cast<size_t>(1), url_data_net_cache_->Size());
+-  ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl));
++  ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl) != 0);
+   ASSERT_EQ(kContent,
+                        url_data_net_cache_->Fetch(kUrl)->get_content());
+ }
+@@ -172,7 +172,7 @@ TEST_F(NetCacheTest, TestBasicSave) {
+ // Verify basic usage of the Delete() method.
+ TEST_F(NetCacheTest, TestBasicDelete) {
+   const string kUrl("http://host.com/style/simple.kml");
+-  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl));
++  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl) != 0);
+   ASSERT_TRUE(url_data_net_cache_->Delete(kUrl));
+   ASSERT_EQ(kSize0, url_data_net_cache_->Size());
+   ASSERT_FALSE(url_data_net_cache_->LookUp(kUrl));
+@@ -181,7 +181,7 @@ TEST_F(NetCacheTest, TestBasicDelete) {
+ // Verify basic usage of the RemoveOldest method.
+ TEST_F(NetCacheTest, TestBasicRemoveOldest) {
+   const string kUrl("http://host.com/style/simple.kml");
+-  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl));
++  ASSERT_TRUE(url_data_net_cache_->Fetch(kUrl) != 0);
+   ASSERT_TRUE(url_data_net_cache_->RemoveOldest());
+   ASSERT_EQ(kSize0, url_data_net_cache_->Size());
+   ASSERT_FALSE(url_data_net_cache_->LookUp(kUrl));
+@@ -202,11 +202,11 @@ TEST_F(NetCacheTest, TestOverflow) {
+   for (size_t i = 0; i < kUrlDataNetCacheSize*2; ++i) {
+     const string kUrl("http://host.com/" + ToString(i));
+     MemoryFilePtr url_data = url_data_net_cache_->Fetch(kUrl);
+-    ASSERT_TRUE(url_data);  // UrlDataNetFetcher never fails.
++    ASSERT_TRUE(url_data != 0);  // UrlDataNetFetcher never fails.
+     // UrlDataNetFetcher simply uses the url as the content.
+     ASSERT_EQ(kUrl, url_data->get_content());
+     // The most recently Fetch()'ed url is guaranteed to bein the cache.
+-    ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl));
++    ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl) != 0);
+     const size_t want_size =
+         i < kUrlDataNetCacheSize ? i + 1 : kUrlDataNetCacheSize;
+     ASSERT_EQ(want_size, url_data_net_cache_->Size());
+@@ -215,7 +215,7 @@ TEST_F(NetCacheTest, TestOverflow) {
+   // the test range.
+   for (size_t i = kUrlDataNetCacheSize; i < kUrlDataNetCacheSize*2; ++i) {
+     const string kUrl("http://host.com/" + ToString(i));
+-    ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl));
++    ASSERT_TRUE(url_data_net_cache_->LookUp(kUrl) != 0);
+   }
+   // RemoveOldest() removes items one at a time.
+   for (size_t i = 0; i < kUrlDataNetCacheSize; ++i) {
+diff --git a/tests/kml/base/zip_file_test.cc b/tests/kml/base/zip_file_test.cc
+index 6f48699..4ce8fc0 100644
+--- a/tests/kml/base/zip_file_test.cc
++++ b/tests/kml/base/zip_file_test.cc
+@@ -55,7 +55,7 @@ TEST_F(ZipFileTest, TestOpenFromString) {
+   ASSERT_TRUE(File::ReadFileToString(kGoodKmz, &zip_file_data));
+   ASSERT_FALSE(zip_file_data.empty());
+   zip_file_.reset(ZipFile::OpenFromString(zip_file_data));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   string kml_data;
+   // doc.kml can be read.
+   ASSERT_TRUE(zip_file_->FindFirstOf(".kml", &kml_data));
+@@ -66,7 +66,7 @@ TEST_F(ZipFileTest, TestOpenFromString) {
+   ASSERT_TRUE(File::ReadFileToString(kBadKmz, &zip_file_data));
+   ASSERT_FALSE(zip_file_data.empty());
+   zip_file_.reset(ZipFile::OpenFromString(zip_file_data));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   kml_data.clear();
+   // There is no KML file to read.
+   ASSERT_FALSE(zip_file_->FindFirstOf(".kml", &kml_data));
+@@ -77,7 +77,7 @@ TEST_F(ZipFileTest, TestOpenFromFile) {
+   // doc.kmz contains doc.kml and is a valid zip archive.
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   string kml_data;
+   // doc.kml can be read.
+   ASSERT_TRUE(zip_file_->FindFirstOf(".kml", &kml_data));
+@@ -85,7 +85,7 @@ TEST_F(ZipFileTest, TestOpenFromFile) {
+   // nokml.kmz is a valid zip archive, but does not contain any KML files
+   const string kBadKmz = string(DATADIR) + "/kmz/nokml.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kBadKmz.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   kml_data.clear();
+   // There is no KML file to read.
+   ASSERT_FALSE(zip_file_->FindFirstOf(".kml", &kml_data));
+@@ -139,7 +139,7 @@ TEST_F(ZipFileTest, TestIsZipData) {
+ TEST_F(ZipFileTest, TestFindFirstOf) {
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   string kml_data;
+   ASSERT_FALSE(zip_file_->FindFirstOf(".bad", &kml_data));
+   ASSERT_TRUE(kml_data.empty());
+@@ -153,7 +153,7 @@ TEST_F(ZipFileTest, TestGetToc) {
+   // - a/a.kml
+   const string kMulti1 = string(DATADIR) + "/kmz/multikml-nodoc.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kMulti1.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   StringVector list;
+   zip_file_->GetToc(&list);
+   // 3 files were read into the vector.
+@@ -167,7 +167,7 @@ TEST_F(ZipFileTest, TestGetToc) {
+ TEST_F(ZipFileTest, TestIsInToc) {
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_TRUE(zip_file_->IsInToc("doc.kml"));
+   ASSERT_FALSE(zip_file_->IsInToc("docx.kml"));
+ }
+@@ -176,7 +176,7 @@ TEST_F(ZipFileTest, TestGetEntry) {
+   // nokml.kmz has a file called foo.txt in a folder called foo.
+   const string kNokml = string(DATADIR) + "/kmz/nokml.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kNokml.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   string file_data;
+   ASSERT_TRUE(zip_file_->GetEntry("foo/foo.txt", &file_data));
+   ASSERT_FALSE(file_data.empty());
+@@ -195,7 +195,7 @@ TEST_F(ZipFileTest, TestGetKmzData) {
+   string kmz_data;
+   File::ReadFileToString(kGoodKmz, &kmz_data);
+   zip_file_.reset(ZipFile::OpenFromString(kmz_data));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_EQ(kmz_data, zip_file_->get_data());
+ }
+ 
+@@ -331,25 +331,25 @@ TEST_F(ZipFileTest, TestMinizipOverflow) {
+   const string kOverflowBadOffset = string(DATADIR) +
+     "/kmz/overflow_bad_offset.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kOverflowBadOffset.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_FALSE(zip_file_->GetEntry(kDefaultKml, NULL));
+ 
+   const string kOverflowStack = string(DATADIR) +
+     "/kmz/overflow_corrupted_stack.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kOverflowStack.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_FALSE(zip_file_->GetEntry(kDefaultKml, NULL));
+ 
+   const string kOverflowOpen = string(DATADIR) +
+     "/kmz/overflow_unzOpenCurrentFile.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kOverflowOpen.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_FALSE(zip_file_->GetEntry(kDefaultKml, NULL));
+ 
+   const string kOverflowRead = string(DATADIR) +
+     "/kmz/overflow_unzReadCurrentFile.kmz";
+   zip_file_.reset(ZipFile::OpenFromFile(kOverflowRead.c_str()));
+-  ASSERT_TRUE(zip_file_);
++  ASSERT_TRUE(zip_file_ != 0);
+   ASSERT_TRUE(zip_file_->GetEntry(kDefaultKml, NULL));
+ }
+ 
+diff --git a/tests/kml/convenience/csv_file_test.cc b/tests/kml/convenience/csv_file_test.cc
+index 7d9b85e..988dcac 100644
+--- a/tests/kml/convenience/csv_file_test.cc
++++ b/tests/kml/convenience/csv_file_test.cc
+@@ -128,7 +128,7 @@ TEST_F(CsvFileTest, TestParseCsvLine) {
+   for (size_t i = 0; i < kLineCount; ++i) {
+     PlacemarkPtr placemark = kmldom::AsPlacemark(
+         folder->get_feature_array_at(i));
+-    ASSERT_TRUE(placemark);
++    ASSERT_TRUE(placemark != 0);
+     ComparePlacemark(placemark, i);
+   }
+ }
+diff --git a/tests/kml/convenience/csv_parser_test.cc b/tests/kml/convenience/csv_parser_test.cc
+index 62ed9e4..aec12d1 100644
+--- a/tests/kml/convenience/csv_parser_test.cc
++++ b/tests/kml/convenience/csv_parser_test.cc
+@@ -226,7 +226,7 @@ TEST(CsvParserTest, TestCsvLineToPlacemarkWithNameAndDescription) {
+   ASSERT_EQ(static_cast<size_t>(1), folder->get_feature_array_size());
+   kmldom::PlacemarkPtr placemark =
+       kmldom::AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(CheckPointLatLon(placemark, kLat, kLon));
+   ASSERT_TRUE(placemark->has_name());
+   ASSERT_EQ(kName, placemark->get_name());
+@@ -297,7 +297,7 @@ TEST(CsvParserTest, TestLincolnParkGc) {
+   for (size_t i = 0; i < 18; ++i) {
+     const kmldom::PlacemarkPtr& p =
+         kmldom::AsPlacemark(folder->get_feature_array_at(i));
+-    ASSERT_TRUE(p);
++    ASSERT_TRUE(p != 0);
+     ASSERT_EQ(kmlbase::ToString(i+1), p->get_name());
+     ASSERT_TRUE(p->has_extendeddata());
+     const kmldom::ExtendedDataPtr ed = p->get_extendeddata();
+@@ -426,7 +426,7 @@ TEST(CsvParserTest, TestFeatureId) {
+   ASSERT_EQ(static_cast<size_t>(1), folder->get_feature_array_size());
+   const kmldom::PlacemarkPtr p =
+       kmldom::AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(p);
++  ASSERT_TRUE(p != 0);
+   ASSERT_TRUE(p->has_id());
+   ASSERT_EQ(string("feature-abc"), p->get_id());
+   ASSERT_TRUE(CheckPointLatLon(p, 1.1, -2.2));
+@@ -441,14 +441,14 @@ TEST(CsvParserTest, TestStyleId) {
+   ASSERT_TRUE(CsvParser::ParseCsv(&csv_splitter, &container_saver));
+   ASSERT_EQ(static_cast<size_t>(2), folder->get_feature_array_size());
+   kmldom::PlacemarkPtr p = kmldom::AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(p);
++  ASSERT_TRUE(p != 0);
+   ASSERT_TRUE(p->has_id());
+   ASSERT_EQ(string("feature-abc"), p->get_id());
+   ASSERT_TRUE(p->has_styleurl());
+   ASSERT_EQ(string("style.kml#style-big"), p->get_styleurl());
+   ASSERT_TRUE(CheckPointLatLon(p, 1.1, -2.2));
+   p = kmldom::AsPlacemark(folder->get_feature_array_at(1));
+-  ASSERT_TRUE(p);
++  ASSERT_TRUE(p != 0);
+   ASSERT_TRUE(p->has_id());
+   ASSERT_EQ(string("feature-xyz"), p->get_id());
+   ASSERT_TRUE(p->has_styleurl());
+@@ -474,7 +474,7 @@ TEST(CsvParserTest, TestGnisAk101) {
+   for (size_t i = 0; i < 101; ++i) {
+     const kmldom::PlacemarkPtr& p =
+         kmldom::AsPlacemark(folder->get_feature_array_at(i));
+-    ASSERT_TRUE(p);
++    ASSERT_TRUE(p != 0);
+     ASSERT_TRUE(p->has_extendeddata());
+     const kmldom::ExtendedDataPtr ed = p->get_extendeddata();
+     ASSERT_EQ(static_cast<size_t>(14), ed->get_data_array_size());
+diff --git a/tests/kml/convenience/element_counter_test.cc b/tests/kml/convenience/element_counter_test.cc
+index f7f548a..c19926b 100644
+--- a/tests/kml/convenience/element_counter_test.cc
++++ b/tests/kml/convenience/element_counter_test.cc
+@@ -67,7 +67,7 @@ TEST_F(ElementCounterTest, TestEmpty) {
+ 
+ TEST_F(ElementCounterTest, TestBasicParse) {
+   ElementPtr root = parser_->Parse("<Placemark/>", NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(static_cast<size_t>(1), element_count_map_.size());
+   ASSERT_EQ(1, element_count_map_[kmldom::Type_Placemark]);
+ }
+@@ -75,7 +75,7 @@ TEST_F(ElementCounterTest, TestBasicParse) {
+ TEST_F(ElementCounterTest, TestMultipleElements) {
+   const string kKml("<Folder><Placemark/><Placemark/></Folder>");
+   ElementPtr root = parser_->Parse(kKml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(static_cast<size_t>(2), element_count_map_.size());
+   ASSERT_EQ(1, element_count_map_[kmldom::Type_Folder]);
+   ASSERT_EQ(2, element_count_map_[kmldom::Type_Placemark]);
+@@ -84,11 +84,11 @@ TEST_F(ElementCounterTest, TestMultipleElements) {
+ TEST_F(ElementCounterTest, TestRepeatedParse) {
+   const string kXml("<Placemark/>");
+   ElementPtr root = parser_->Parse(kXml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(static_cast<size_t>(1), element_count_map_.size());
+   ASSERT_EQ(1, element_count_map_[kmldom::Type_Placemark]);
+   root = parser_->Parse(kXml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(static_cast<size_t>(1), element_count_map_.size());
+   ASSERT_EQ(2, element_count_map_[kmldom::Type_Placemark]);
+ }
+@@ -104,7 +104,7 @@ TEST_F(ElementCounterTest, TestEachComplex) {
+     }
+     const string kXml(string("<") + xsd_->ElementName(i) + "/>");
+     ElementPtr root = parser_->Parse(kXml, NULL);
+-    ASSERT_TRUE(root);
++    ASSERT_TRUE(root != 0);
+     ASSERT_EQ(type_id, root->Type());
+     ASSERT_EQ(1, element_count_map_[type_id]);
+   }
+diff --git a/tests/kml/convenience/feature_list_test.cc b/tests/kml/convenience/feature_list_test.cc
+index d91f081..82498cb 100644
+--- a/tests/kml/convenience/feature_list_test.cc
++++ b/tests/kml/convenience/feature_list_test.cc
+@@ -138,7 +138,7 @@ TEST_F(FeatureListTest, TestSave) {
+     // Verify that these are all Placemarks
+     PlacemarkPtr placemark =
+         kmldom::AsPlacemark(folder->get_feature_array_at(i));
+-    ASSERT_TRUE(placemark);
++    ASSERT_TRUE(placemark != 0);
+ 
+     // Verify that each is a proper Point Placemark with lat and lon.
+     double lat, lon;
+diff --git a/tests/kml/convenience/google_maps_data_test.cc b/tests/kml/convenience/google_maps_data_test.cc
+index 4ff31c1..24b8a98 100644
+--- a/tests/kml/convenience/google_maps_data_test.cc
++++ b/tests/kml/convenience/google_maps_data_test.cc
+@@ -553,7 +553,7 @@ TEST_F(GoogleMapsDataTest, TestGetKmlUri) {
+       string(DATADIR) + "/gmaps/metafeed.xml", &maps_feed_xml));
+   const kmldom::AtomFeedPtr feed =
+       kmldom::AsAtomFeed(kmldom::ParseAtom(maps_feed_xml, NULL));
+-  ASSERT_TRUE(feed);
++  ASSERT_TRUE(feed != 0);
+ 
+   const string want("http://maps.google.com/maps/ms?msa=0&msid="
+                     "201514259179526663268.0004687a1a3e44d72b6b4&output=kml");
+diff --git a/tests/kml/convenience/google_spreadsheets_test.cc b/tests/kml/convenience/google_spreadsheets_test.cc
+index 835177b..ad1724d 100644
+--- a/tests/kml/convenience/google_spreadsheets_test.cc
++++ b/tests/kml/convenience/google_spreadsheets_test.cc
+@@ -116,7 +116,7 @@ TEST_F(GoogleSpreadsheetsTest, TestDownloadSpreadsheet) {
+   kmldom::AtomFeedPtr feed = AtomUtil::GetAndParseFeed(
+       "http://example.com/gdata/doclist-metafeed.xml",
+       test_data_http_client);
+-  ASSERT_TRUE(feed);
++  ASSERT_TRUE(feed != 0);
+ 
+   HttpRequestVector request_log;
+   google_spreadsheets_.reset(
+diff --git a/tests/kml/convenience/kml_feature_list_saver_test.cc b/tests/kml/convenience/kml_feature_list_saver_test.cc
+index 9e69083..4d89fd1 100644
+--- a/tests/kml/convenience/kml_feature_list_saver_test.cc
++++ b/tests/kml/convenience/kml_feature_list_saver_test.cc
+@@ -53,7 +53,7 @@ TEST_F(KmlFeatureListSaverTest, TestBasicSaveToFeatureList) {
+   // Verify that this is our Placemark.
+   kmldom::PlacemarkPtr got_placemark =
+       kmldom::AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(id, placemark->get_id());
+ }
+ 
+diff --git a/tests/kml/convenience/kmz_check_links_test.cc b/tests/kml/convenience/kmz_check_links_test.cc
+index cf82255..2553449 100644
+--- a/tests/kml/convenience/kmz_check_links_test.cc
++++ b/tests/kml/convenience/kmz_check_links_test.cc
+@@ -55,7 +55,7 @@ TEST_F(KmzCheckLinksTest, TestNoLinks) {
+   // doc.kmz has no links.
+   const string kNoLinks = string(DATADIR) + "/kmz/doc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kNoLinks.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   ASSERT_TRUE(KmzCheckLinks(*kmz_file_, NULL));
+ }
+ 
+@@ -66,7 +66,7 @@ TEST_F(KmzCheckLinksTest, TestOverlay) {
+                                  "/kmz/zermatt-photo.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kPhotoLink.c_str()));
+   // The KML parses fine.
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   // And all expected files are within the KMZ.
+   vector<string> missing_links;
+   ASSERT_TRUE(KmzCheckLinks(*kmz_file_, &missing_links));
+@@ -80,7 +80,7 @@ TEST_F(KmzCheckLinksTest, TestBadOverlay) {
+                                    "/kmz/zermatt-photo-bad.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kNoPhotoLink.c_str()));
+   // The KML parses file.
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   // But there's a dangling link.
+   vector<string> missing_links;
+   ASSERT_FALSE(KmzCheckLinks(*kmz_file_, &missing_links));
+@@ -93,7 +93,7 @@ TEST_F(KmzCheckLinksTest, TestNull) {
+   // There is no KML file in this KMZ file.
+   const string kNoKml = string(DATADIR) + "/kmz/nokml.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kNoKml.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   ASSERT_FALSE(KmzCheckLinks(*kmz_file_, NULL));
+ }
+ 
+diff --git a/tests/kml/dom/abstractview_test.cc b/tests/kml/dom/abstractview_test.cc
+index f2e61d9..bc9776b 100644
+--- a/tests/kml/dom/abstractview_test.cc
++++ b/tests/kml/dom/abstractview_test.cc
+@@ -308,7 +308,7 @@ TEST_F(CameraTest, TestSetGetHasClear) {
+ TEST(AbstractViewTest, TestParseSerializeGxAltitudeMode) {
+   KmlFactory* factory = KmlFactory::GetFactory();
+   CameraPtr camera = factory->CreateCamera();
+-  ASSERT_TRUE(camera);
++  ASSERT_TRUE(camera != 0);
+   camera->set_latitude(37.0);
+   camera->set_longitude(-122.0);
+   camera->set_gx_altitudemode(GX_ALTITUDEMODE_RELATIVETOSEAFLOOR);
+@@ -322,7 +322,7 @@ TEST(AbstractViewTest, TestParseSerializeGxAltitudeMode) {
+   ASSERT_EQ(kCameraExpected, SerializeRaw(Parse(kCameraExpected, NULL)));
+ 
+   LookAtPtr lookat = factory->CreateLookAt();
+-  ASSERT_TRUE(lookat);
++  ASSERT_TRUE(lookat != 0);
+   lookat->set_latitude(37.0);
+   lookat->set_longitude(-122.0);
+   lookat->set_gx_altitudemode(GX_ALTITUDEMODE_CLAMPTOSEAFLOOR);
+@@ -340,7 +340,7 @@ TEST(AbstractViewTest, TestGxTimePrimitives) {
+   KmlFactory* factory = KmlFactory::GetFactory();
+ 
+   CameraPtr camera = factory->CreateCamera();
+-  ASSERT_TRUE(camera);
++  ASSERT_TRUE(camera != 0);
+   camera->set_latitude(37.0);
+   camera->set_longitude(-122.0);
+   GxTimeSpanPtr gx_timespan = factory->CreateGxTimeSpan();
+@@ -355,7 +355,7 @@ TEST(AbstractViewTest, TestGxTimePrimitives) {
+   ASSERT_EQ(kCameraExpected, SerializeRaw(Parse(kCameraExpected, NULL)));
+ 
+   LookAtPtr lookat = factory->CreateLookAt();
+-  ASSERT_TRUE(lookat);
++  ASSERT_TRUE(lookat != 0);
+   lookat->set_latitude(37.0);
+   lookat->set_longitude(-122.0);
+   GxTimeStampPtr gx_timestamp = factory->CreateGxTimeStamp();
+diff --git a/tests/kml/dom/atom_test.cc b/tests/kml/dom/atom_test.cc
+index a9a8ffa..da73cf0 100644
+--- a/tests/kml/dom/atom_test.cc
++++ b/tests/kml/dom/atom_test.cc
+@@ -75,7 +75,7 @@ TEST_F(AtomCategoryTest, TestParseScheme) {
+   // ParseKml calls AddElement.
+   atomcategory_ = AsAtomCategory(
+       ParseKml(string("<atom:category scheme='") + kScheme + "'/>"));
+-  ASSERT_TRUE(atomcategory_);
++  ASSERT_TRUE(atomcategory_ != 0);
+   ASSERT_TRUE(atomcategory_->has_scheme());
+   ASSERT_EQ(kScheme, atomcategory_->get_scheme());
+ }
+@@ -85,7 +85,7 @@ TEST_F(AtomCategoryTest, TestParseLabel) {
+   // ParseKml calls AddElement.
+   atomcategory_ = AsAtomCategory(
+       ParseKml(string("<atom:category label='") + kLabel + "'/>"));
+-  ASSERT_TRUE(atomcategory_);
++  ASSERT_TRUE(atomcategory_ != 0);
+   ASSERT_TRUE(atomcategory_->has_label());
+   ASSERT_EQ(kLabel, atomcategory_->get_label());
+ }
+@@ -95,7 +95,7 @@ TEST_F(AtomCategoryTest, TestParseTerm) {
+   // ParseKml calls AddElement.
+   atomcategory_ = AsAtomCategory(
+       ParseKml(string("<atom:category term='") + kTerm + "'/>"));
+-  ASSERT_TRUE(atomcategory_);
++  ASSERT_TRUE(atomcategory_ != 0);
+   ASSERT_TRUE(atomcategory_->has_term());
+   ASSERT_EQ(kTerm, atomcategory_->get_term());
+ }
+@@ -124,7 +124,7 @@ TEST_F(AtomContentTest, TestParseSrc) {
+   // ParseKml calls AddElement.
+   atomcontent_ = AsAtomContent(
+       ParseKml(string("<atom:content src='") + kSrc + "'/>"));
+-  ASSERT_TRUE(atomcontent_);
++  ASSERT_TRUE(atomcontent_ != 0);
+   ASSERT_TRUE(atomcontent_->has_src());
+   ASSERT_EQ(kSrc, atomcontent_->get_src());
+ }
+@@ -134,7 +134,7 @@ TEST_F(AtomContentTest, TestParseType) {
+   // ParseKml calls AddElement.
+   atomcontent_ = AsAtomContent(
+       ParseKml(string("<atom:content type='") + kType + "'/>"));
+-  ASSERT_TRUE(atomcontent_);
++  ASSERT_TRUE(atomcontent_ != 0);
+   ASSERT_TRUE(atomcontent_->has_type());
+   ASSERT_EQ(kType, atomcontent_->get_type());
+ }
+@@ -143,7 +143,7 @@ TEST_F(AtomContentTest, TestParseUnknownContent) {
+   const string kContent("<goo:bar>baz<goo:a>foo</goo:a></goo:bar>\n");
+   atomcontent_ = AsAtomContent(
+       ParseKml(string("<atom:content>") + kContent + "</atom:content>"));
+-  ASSERT_TRUE(atomcontent_);
++  ASSERT_TRUE(atomcontent_ != 0);
+   ASSERT_EQ(static_cast<size_t>(1),
+             atomcontent_->get_unknown_elements_array_size());
+   ASSERT_EQ(kContent, atomcontent_->get_unknown_elements_array_at(0));
+@@ -162,7 +162,7 @@ TEST_F(AtomContentTest, TestParseUnknownContentWithUnknownAttributes) {
+      string("<atom:content type='xhtml' xml:lang='en'") +
+                     " xml:base='http://diveintomark.org/'>" + kContent +
+                  "</atom:content>"));
+-  ASSERT_TRUE(atomcontent_);
++  ASSERT_TRUE(atomcontent_ != 0);
+   ASSERT_EQ(static_cast<size_t>(1),
+             atomcontent_->get_unknown_elements_array_size());
+   ASSERT_EQ(kContent, atomcontent_->get_unknown_elements_array_at(0));
+@@ -186,14 +186,14 @@ TEST_F(AtomContentTest, TestParseMisplacedContent) {
+                                "</name></Placemark>");
+   atomcontent_ = AsAtomContent(
+       ParseKml(string("<atom:content>") + kPlacemark + "</atom:content>"));
+-  ASSERT_TRUE(atomcontent_);
++  ASSERT_TRUE(atomcontent_ != 0);
+   ASSERT_EQ(static_cast<size_t>(0),
+             atomcontent_->get_unknown_elements_array_size());
+   ASSERT_EQ(static_cast<size_t>(1),
+             atomcontent_->get_misplaced_elements_array_size());
+   PlacemarkPtr placemark = AsPlacemark(
+       atomcontent_->get_misplaced_elements_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kName, placemark->get_name());
+ }
+ 
+@@ -402,7 +402,7 @@ TEST_F(AtomEntryTest, TestSetSummary) {
+ TEST_F(AtomEntryTest, TestSetContent) {
+   atomentry_->set_content(KmlFactory::GetFactory()->CreateAtomContent());
+   ASSERT_TRUE(atomentry_->has_content());
+-  ASSERT_TRUE(atomentry_->get_content());
++  ASSERT_TRUE(atomentry_->get_content() != 0);
+ }
+ 
+ TEST_F(AtomEntryTest, TestParseSummary) {
+diff --git a/tests/kml/dom/document_test.cc b/tests/kml/dom/document_test.cc
+index 1bb72da..6dad687 100644
+--- a/tests/kml/dom/document_test.cc
++++ b/tests/kml/dom/document_test.cc
+@@ -110,7 +110,7 @@ TEST_F(DocumentTest, TestDeleteSchemaAndStyleSelectorAt) {
+   orig_style->set_id("style0");
+   document_->add_styleselector(orig_style);
+   StyleSelectorPtr got_style = document_->DeleteStyleSelectorAt(0);
+-  ASSERT_TRUE(got_style);
++  ASSERT_TRUE(got_style != 0);
+   ASSERT_EQ(orig_style->get_id(), got_style->get_id());
+   ASSERT_FALSE(document_->DeleteStyleSelectorAt(0));
+ 
+@@ -118,7 +118,7 @@ TEST_F(DocumentTest, TestDeleteSchemaAndStyleSelectorAt) {
+   orig_schema->set_name("schema0");
+   document_->add_schema(orig_schema);
+   SchemaPtr got_schema = document_->DeleteSchemaAt(0);
+-  ASSERT_TRUE(got_schema);
++  ASSERT_TRUE(got_schema != 0);
+   ASSERT_EQ(orig_schema->get_name(), got_schema->get_name());
+   ASSERT_FALSE(document_->DeleteSchemaAt(0));
+ }
+diff --git a/tests/kml/dom/extendeddata_test.cc b/tests/kml/dom/extendeddata_test.cc
+index 09e5e5e..61ccc4e 100644
+--- a/tests/kml/dom/extendeddata_test.cc
++++ b/tests/kml/dom/extendeddata_test.cc
+@@ -259,16 +259,16 @@ TEST_F(ExtendedDataTest, TestParse) {
+     "</ExtendedData>";
+   string errors;
+   ElementPtr root = Parse(kml, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const ExtendedDataPtr extendeddata = AsExtendedData(root);
+-  ASSERT_TRUE(extendeddata);
++  ASSERT_TRUE(extendeddata != 0);
+   ASSERT_EQ(static_cast<size_t>(1),
+                        extendeddata->get_data_array_size());
+   ASSERT_EQ(static_cast<size_t>(1),
+                        extendeddata->get_schemadata_array_size());
+   const DataPtr data = AsData(extendeddata->get_data_array_at(0));
+-  ASSERT_TRUE(data);
++  ASSERT_TRUE(data != 0);
+   ASSERT_TRUE(data->has_name());
+   ASSERT_EQ(d_name, data->get_name());
+   ASSERT_TRUE(data->has_displayname());
+@@ -277,13 +277,13 @@ TEST_F(ExtendedDataTest, TestParse) {
+   ASSERT_EQ(value, data->get_value());
+   const SchemaDataPtr schemadata = AsSchemaData(
+       extendeddata->get_schemadata_array_at(0));
+-  ASSERT_TRUE(schemadata);
++  ASSERT_TRUE(schemadata != 0);
+   ASSERT_TRUE(schemadata->has_schemaurl());
+   ASSERT_EQ(schemaurl, schemadata->get_schemaurl());
+   ASSERT_EQ(static_cast<size_t>(1), schemadata->get_simpledata_array_size());
+   const SimpleDataPtr simpledata = AsSimpleData(
+       schemadata->get_simpledata_array_at(0));
+-  ASSERT_TRUE(simpledata);
++  ASSERT_TRUE(simpledata != 0);
+   ASSERT_TRUE(simpledata->has_name());
+   ASSERT_TRUE(simpledata->has_text());
+   ASSERT_EQ(sd_name, simpledata->get_name());
+@@ -312,7 +312,7 @@ TEST_F(MetadataTest, TestParseSerialize) {
+     "</Metadata>");
+ 
+   metadata_ = AsMetadata(Parse(kMetadata, NULL));
+-  ASSERT_TRUE(metadata_);
++  ASSERT_TRUE(metadata_ != 0);
+   ASSERT_EQ(kMetadata, SerializeRaw(metadata_));
+ }
+ 
+@@ -358,9 +358,9 @@ TEST_F(GxSimpleArrayDataTest, TestParseSerialize) {
+       "<gx:value>v3</gx:value>"
+       "</gx:SimpleArrayData>");
+   ElementPtr root = Parse(kKml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   const GxSimpleArrayDataPtr gx_simplearraydata = AsGxSimpleArrayData(root);
+-  ASSERT_TRUE(gx_simplearraydata);
++  ASSERT_TRUE(gx_simplearraydata != 0);
+   ASSERT_TRUE(gx_simplearraydata->has_name());
+   ASSERT_EQ("myname", gx_simplearraydata->get_name());
+   ASSERT_EQ(static_cast<size_t>(3),
+diff --git a/tests/kml/dom/folder_test.cc b/tests/kml/dom/folder_test.cc
+index 544d3a9..a19980b 100644
+--- a/tests/kml/dom/folder_test.cc
++++ b/tests/kml/dom/folder_test.cc
+@@ -66,10 +66,10 @@ TEST_F(FolderTest, TestParse) {
+     "</Folder>";
+   string errors;
+   ElementPtr root = Parse(kFolder, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const FolderPtr folder = AsFolder(root);
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   // Verify the Object-ness of Folder.
+   ASSERT_EQ(string("folder123"), folder->get_id());
+   ASSERT_FALSE(folder->has_targetid());
+diff --git a/tests/kml/dom/geometry_test.cc b/tests/kml/dom/geometry_test.cc
+index 9b38aa1..319c362 100644
+--- a/tests/kml/dom/geometry_test.cc
++++ b/tests/kml/dom/geometry_test.cc
+@@ -520,10 +520,10 @@ TEST_F(PointTest, TestSerializeParseAll) {
+   ASSERT_EQ(expected, SerializeRaw(point_));
+   string errors;
+   ElementPtr element = Parse(expected, &errors);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_TRUE(errors.empty());
+   PointPtr point = AsPoint(element);
+-  ASSERT_TRUE(point);
++  ASSERT_TRUE(point != 0);
+   ASSERT_TRUE(point->has_id());
+   ASSERT_EQ(string("point-id"), point->get_id());
+   ASSERT_TRUE(point->has_extrude());
+@@ -646,10 +646,10 @@ TEST_F(LineStringTest, TestSerializeParseAll) {
+   ASSERT_EQ(expected, SerializeRaw(linestring_));
+   string errors;
+   ElementPtr element = Parse(expected, &errors);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_TRUE(errors.empty());
+   LineStringPtr linestring = AsLineString(element);
+-  ASSERT_TRUE(linestring);
++  ASSERT_TRUE(linestring != 0);
+   ASSERT_TRUE(linestring->has_id());
+   ASSERT_EQ(string("linestring-id"), linestring->get_id());
+   ASSERT_TRUE(linestring->has_extrude());
+@@ -775,10 +775,10 @@ TEST_F(LinearRingTest, TestSerializeParseAll) {
+   ASSERT_EQ(expected, SerializeRaw(linearring_));
+   string errors;
+   ElementPtr element = Parse(expected, &errors);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_TRUE(errors.empty());
+   LinearRingPtr linearring = AsLinearRing(element);
+-  ASSERT_TRUE(linearring);
++  ASSERT_TRUE(linearring != 0);
+   ASSERT_TRUE(linearring->has_id());
+   ASSERT_EQ(string("linearring-id"), linearring->get_id());
+   ASSERT_TRUE(linearring->has_extrude());
+@@ -816,7 +816,7 @@ TEST_F(OuterBoundaryIsTest, TestSetGetHasClear) {
+   outerboundaryis_->set_linearring(
+       KmlFactory::GetFactory()->CreateLinearRing());
+   ASSERT_TRUE(outerboundaryis_->has_linearring());
+-  ASSERT_TRUE(outerboundaryis_->get_linearring());
++  ASSERT_TRUE(outerboundaryis_->get_linearring() != 0);
+   // Clear it and verify we're back to the default state.
+   outerboundaryis_->clear_linearring();
+ }
+@@ -846,7 +846,7 @@ TEST_F(InnerBoundaryIsTest, TestSetGetHasClear) {
+   innerboundaryis_->set_linearring(
+       KmlFactory::GetFactory()->CreateLinearRing());
+   ASSERT_TRUE(innerboundaryis_->has_linearring());
+-  ASSERT_TRUE(innerboundaryis_->get_linearring());
++  ASSERT_TRUE(innerboundaryis_->get_linearring() != 0);
+   // Clear it and verify we're back to the default state.
+   innerboundaryis_->clear_linearring();
+ }
+@@ -968,10 +968,10 @@ TEST_F(PolygonTest, TestSerializeParseAll) {
+   ASSERT_EQ(expected, SerializeRaw(polygon_));
+   string errors;
+   ElementPtr element = Parse(expected, &errors);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_TRUE(errors.empty());
+   PolygonPtr polygon = AsPolygon(element);
+-  ASSERT_TRUE(polygon);
++  ASSERT_TRUE(polygon != 0);
+   ASSERT_TRUE(polygon->has_id());
+   ASSERT_EQ(string("polygon-id"), polygon->get_id());
+   ASSERT_TRUE(polygon->has_extrude());
+@@ -1129,10 +1129,10 @@ TEST_F(GxTrackTest, TestParse) {
+   );
+   string errors;
+   ElementPtr element = Parse(kGxTrackKml, &errors);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxTrackPtr gx_track = AsGxTrack(element);
+-  ASSERT_TRUE(gx_track);
++  ASSERT_TRUE(gx_track != 0);
+   ASSERT_TRUE(gx_track->has_altitudemode());
+   ASSERT_EQ(ALTITUDEMODE_RELATIVETOGROUND, gx_track->get_altitudemode());
+   ASSERT_EQ(static_cast<size_t>(2), gx_track->get_when_array_size());
+diff --git a/tests/kml/dom/gx_tour_test.cc b/tests/kml/dom/gx_tour_test.cc
+index c9a779e..c41142a 100644
+--- a/tests/kml/dom/gx_tour_test.cc
++++ b/tests/kml/dom/gx_tour_test.cc
+@@ -49,9 +49,9 @@ TEST_F(GxTourTest, TestType) {
+   ASSERT_FALSE(gx_tour_->IsA(Type_Container));
+   ASSERT_FALSE(gx_tour_->IsA(Type_Geometry));
+   ASSERT_TRUE(gx_tour_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxTour(gx_tour_));
+-  ASSERT_TRUE(AsFeature(gx_tour_));
+-  ASSERT_TRUE(AsObject(gx_tour_));
++  ASSERT_TRUE(AsGxTour(gx_tour_) != 0);
++  ASSERT_TRUE(AsFeature(gx_tour_) != 0);
++  ASSERT_TRUE(AsObject(gx_tour_) != 0);
+ }
+ 
+ // Verify proper defaults:
+@@ -90,10 +90,10 @@ TEST_F(GxTourTest, TestParse) {
+     "</gx:Tour>";
+   string errors;
+   ElementPtr root = Parse(kGxTour, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxTourPtr tour = AsGxTour(root);
+-  ASSERT_TRUE(tour);
++  ASSERT_TRUE(tour != 0);
+   ASSERT_FALSE(tour->has_id());
+   ASSERT_FALSE(tour->has_targetid());
+   ASSERT_TRUE(tour->has_name());
+@@ -151,9 +151,9 @@ TEST_F(GxPlaylistTest, TestType) {
+   ASSERT_FALSE(gx_playlist_->IsA(Type_Feature));
+   ASSERT_FALSE(gx_playlist_->IsA(Type_Geometry));
+   ASSERT_TRUE(gx_playlist_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxPlaylist(gx_playlist_));
++  ASSERT_TRUE(AsGxPlaylist(gx_playlist_) != 0);
+   ASSERT_FALSE(AsFeature(gx_playlist_));
+-  ASSERT_TRUE(AsObject(gx_playlist_));
++  ASSERT_TRUE(AsObject(gx_playlist_) != 0);
+ }
+ 
+ // Verify proper defaults:
+@@ -182,19 +182,19 @@ TEST_F(GxPlaylistTest, TestParse) {
+     "</gx:Playlist>";
+   string errors;
+   ElementPtr root = Parse(kGxPlaylist, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxPlaylistPtr gx_playlist = AsGxPlaylist(root);
+-  ASSERT_TRUE(gx_playlist);
++  ASSERT_TRUE(gx_playlist != 0);
+   ASSERT_TRUE(gx_playlist->has_id());
+   ASSERT_EQ(string("gx_playlist123"), gx_playlist->get_id());
+   ASSERT_FALSE(gx_playlist->has_targetid());
+   ASSERT_EQ(static_cast<size_t>(3),
+       gx_playlist->get_gx_tourprimitive_array_size());
+   ASSERT_TRUE(AsGxAnimatedUpdate(
+-        gx_playlist->get_gx_tourprimitive_array_at(0)));
+-  ASSERT_TRUE(AsGxFlyTo(gx_playlist->get_gx_tourprimitive_array_at(1)));
+-  ASSERT_TRUE(AsGxWait(gx_playlist->get_gx_tourprimitive_array_at(2)));
++        gx_playlist->get_gx_tourprimitive_array_at(0)) != 0);
++  ASSERT_TRUE(AsGxFlyTo(gx_playlist->get_gx_tourprimitive_array_at(1)) != 0);
++  ASSERT_TRUE(AsGxWait(gx_playlist->get_gx_tourprimitive_array_at(2)) != 0);
+ }
+ 
+ TEST_F(GxPlaylistTest, TestSerialize) {
+@@ -215,9 +215,9 @@ TEST_F(GxAnimatedUpdateTest, TestType) {
+   ASSERT_TRUE(gx_animatedupdate_->IsA(Type_GxAnimatedUpdate));
+   ASSERT_TRUE(gx_animatedupdate_->IsA(Type_GxTourPrimitive));
+   ASSERT_TRUE(gx_animatedupdate_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxAnimatedUpdate(gx_animatedupdate_));
+-  ASSERT_TRUE(AsGxTourPrimitive(gx_animatedupdate_));
+-  ASSERT_TRUE(AsObject(gx_animatedupdate_));
++  ASSERT_TRUE(AsGxAnimatedUpdate(gx_animatedupdate_) != 0);
++  ASSERT_TRUE(AsGxTourPrimitive(gx_animatedupdate_) != 0);
++  ASSERT_TRUE(AsObject(gx_animatedupdate_) != 0);
+ }
+ 
+ // Verify proper defaults:
+@@ -256,12 +256,12 @@ TEST_F(GxAnimatedUpdateTest, TestParse) {
+     "</gx:AnimatedUpdate>";
+   string errors;
+   ElementPtr root = Parse(kGxAnimatedUpdate, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxAnimatedUpdatePtr animatedupdate = AsGxAnimatedUpdate(root);
+   ASSERT_TRUE(animatedupdate->has_gx_duration());
+   ASSERT_DOUBLE_EQ(1.1, animatedupdate->get_gx_duration());
+-  ASSERT_TRUE(animatedupdate);
++  ASSERT_TRUE(animatedupdate != 0);
+   ASSERT_TRUE(animatedupdate->has_update());
+   ASSERT_EQ(kGxAnimatedUpdate, SerializeRaw(Parse(kGxAnimatedUpdate, NULL)));
+ }
+@@ -293,9 +293,9 @@ TEST_F(GxFlyToTest, TestType) {
+   ASSERT_TRUE(gx_flyto_->IsA(Type_GxFlyTo));
+   ASSERT_TRUE(gx_flyto_->IsA(Type_GxTourPrimitive));
+   ASSERT_TRUE(gx_flyto_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxFlyTo(gx_flyto_));
+-  ASSERT_TRUE(AsGxTourPrimitive(gx_flyto_));
+-  ASSERT_TRUE(AsObject(gx_flyto_));
++  ASSERT_TRUE(AsGxFlyTo(gx_flyto_) != 0);
++  ASSERT_TRUE(AsGxTourPrimitive(gx_flyto_) != 0);
++  ASSERT_TRUE(AsObject(gx_flyto_) != 0);
+ }
+ 
+ TEST_F(GxFlyToTest, TestDefaults) {
+@@ -358,16 +358,16 @@ TEST_F(GxFlyToTest, TestParse) {
+     "</gx:FlyTo>";
+   string errors;
+   ElementPtr root = Parse(kGxFlyTo, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxFlyToPtr flyto = AsGxFlyTo(root);
+-  ASSERT_TRUE(flyto);
++  ASSERT_TRUE(flyto != 0);
+   ASSERT_TRUE(flyto->has_gx_duration());
+   ASSERT_DOUBLE_EQ(10.0, flyto->get_gx_duration());
+   ASSERT_TRUE(flyto->has_gx_flytomode());
+   ASSERT_TRUE(GX_FLYTOMODE_SMOOTH == flyto->get_gx_flytomode());
+   ASSERT_TRUE(flyto->has_abstractview());
+-  ASSERT_TRUE(AsCamera(flyto->get_abstractview()));
++  ASSERT_TRUE(AsCamera(flyto->get_abstractview()) != 0);
+ }
+ 
+ TEST_F(GxFlyToTest, TestSerialize) {
+@@ -397,9 +397,9 @@ TEST_F(GxSoundCueTest, TestType) {
+   ASSERT_TRUE(gx_soundcue_->IsA(Type_GxSoundCue));
+   ASSERT_TRUE(gx_soundcue_->IsA(Type_GxTourPrimitive));
+   ASSERT_TRUE(gx_soundcue_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxSoundCue(gx_soundcue_));
+-  ASSERT_TRUE(AsGxTourPrimitive(gx_soundcue_));
+-  ASSERT_TRUE(AsObject(gx_soundcue_));
++  ASSERT_TRUE(AsGxSoundCue(gx_soundcue_) != 0);
++  ASSERT_TRUE(AsGxTourPrimitive(gx_soundcue_) != 0);
++  ASSERT_TRUE(AsObject(gx_soundcue_) != 0);
+ }
+ 
+ TEST_F(GxSoundCueTest, TestDefaults) {
+@@ -438,10 +438,10 @@ TEST_F(GxSoundCueTest, TestParse) {
+     "</gx:SoundCue>";
+   string errors;
+   ElementPtr root = Parse(kGxSoundCue, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxSoundCuePtr soundcue = AsGxSoundCue(root);
+-  ASSERT_TRUE(soundcue);
++  ASSERT_TRUE(soundcue != 0);
+   ASSERT_TRUE(soundcue->has_href());
+   ASSERT_EQ("some/cool/file.mp3", soundcue->get_href());
+ }
+@@ -469,9 +469,9 @@ TEST_F(GxTourControlTest, TestType) {
+   ASSERT_TRUE(gx_tourcontrol_->IsA(Type_GxTourControl));
+   ASSERT_TRUE(gx_tourcontrol_->IsA(Type_GxTourPrimitive));
+   ASSERT_TRUE(gx_tourcontrol_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxTourControl(gx_tourcontrol_));
+-  ASSERT_TRUE(AsGxTourPrimitive(gx_tourcontrol_));
+-  ASSERT_TRUE(AsObject(gx_tourcontrol_));
++  ASSERT_TRUE(AsGxTourControl(gx_tourcontrol_) != 0);
++  ASSERT_TRUE(AsGxTourPrimitive(gx_tourcontrol_) != 0);
++  ASSERT_TRUE(AsObject(gx_tourcontrol_) != 0);
+ }
+ 
+ TEST_F(GxTourControlTest, TestDefaults) {
+@@ -510,10 +510,10 @@ TEST_F(GxTourControlTest, TestParse) {
+     "</gx:TourControl>";
+   string errors;
+   ElementPtr root = Parse(kGxTourControl, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const GxTourControlPtr tourcontrol = AsGxTourControl(root);
+-  ASSERT_TRUE(tourcontrol);
++  ASSERT_TRUE(tourcontrol != 0);
+   ASSERT_TRUE(tourcontrol->has_gx_playmode());
+   ASSERT_TRUE(GX_PLAYMODE_PAUSE == tourcontrol->get_gx_playmode());
+ }
+@@ -541,9 +541,9 @@ TEST_F(GxWaitTest, TestType) {
+   ASSERT_TRUE(gx_wait_->IsA(Type_GxWait));
+   ASSERT_TRUE(gx_wait_->IsA(Type_GxTourPrimitive));
+   ASSERT_TRUE(gx_wait_->IsA(Type_Object));
+-  ASSERT_TRUE(AsGxWait(gx_wait_));
+-  ASSERT_TRUE(AsGxTourPrimitive(gx_wait_));
+-  ASSERT_TRUE(AsObject(gx_wait_));
++  ASSERT_TRUE(AsGxWait(gx_wait_) != 0);
++  ASSERT_TRUE(AsGxTourPrimitive(gx_wait_) != 0);
++  ASSERT_TRUE(AsObject(gx_wait_) != 0);
+ }
+ 
+ }  // end namespace kmldom
+diff --git a/tests/kml/dom/hotspot_test.cc b/tests/kml/dom/hotspot_test.cc
+index 599a177..4519af9 100644
+--- a/tests/kml/dom/hotspot_test.cc
++++ b/tests/kml/dom/hotspot_test.cc
+@@ -54,7 +54,7 @@ TEST_F(HotSpotTest, TestParse) {
+   ElementPtr root = Parse(
+     "<hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+ #if 0
+   const HotSpot* hotspot = AsHotSpot(root);
+diff --git a/tests/kml/dom/iconstyle_test.cc b/tests/kml/dom/iconstyle_test.cc
+index 3f47dbc..612dd42 100644
+--- a/tests/kml/dom/iconstyle_test.cc
++++ b/tests/kml/dom/iconstyle_test.cc
+@@ -118,7 +118,7 @@ TEST_F(IconStyleTest, TestParse) {
+     "</IconStyle>";
+   string errors;
+   ElementPtr root = Parse(kIconStyleIcon, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const IconStylePtr iconstyle = AsIconStyle(root);
+   ASSERT_TRUE(iconstyle->has_icon());
+diff --git a/tests/kml/dom/kml22_test.cc b/tests/kml/dom/kml22_test.cc
+index 3d91113..a51d80c 100644
+--- a/tests/kml/dom/kml22_test.cc
++++ b/tests/kml/dom/kml22_test.cc
+@@ -187,7 +187,7 @@ void Kml22Test::AssertXmlNamespaceForRange(KmlDomType begin_dom_type,
+   for (; element_type_id != end_id; ++element_type_id) {
+     ElementPtr element = kml_factory->CreateElementById(
+         static_cast<KmlDomType>(element_type_id));
+-    ASSERT_TRUE(element);
++    ASSERT_TRUE(element != 0);
+     ASSERT_EQ(xmlns_id, element->get_xmlns())
+         << xsd_->ElementName(element_type_id);
+   }
+diff --git a/tests/kml/dom/kml_cast_test.cc b/tests/kml/dom/kml_cast_test.cc
+index 12f679e..c6c87d4 100644
+--- a/tests/kml/dom/kml_cast_test.cc
++++ b/tests/kml/dom/kml_cast_test.cc
+@@ -38,139 +38,139 @@ TEST_F(KmlCastTest, TestCasts) {
+ 
+   // The temporary ElementPtr holds a reference to the created Element
+   // which is released when the As*() goes out of scope.
+-  ASSERT_TRUE(AsAbstractLatLonBox(factory->CreateElementById(Type_LatLonBox)));
++  ASSERT_TRUE(AsAbstractLatLonBox(factory->CreateElementById(Type_LatLonBox)) != 0);
+   ASSERT_TRUE(AsAbstractLatLonBox(
+-      factory->CreateElementById(Type_LatLonAltBox)));
+-  ASSERT_TRUE(AsAbstractView(factory->CreateElementById(Type_LookAt)));
+-  ASSERT_TRUE(AsColorStyle(factory->CreateElementById(Type_IconStyle)));
+-  ASSERT_TRUE(AsContainer(factory->CreateElementById(Type_Folder)));
+-  ASSERT_TRUE(AsFeature(factory->CreateElementById(Type_Placemark)));
+-  ASSERT_TRUE(AsGeometry(factory->CreateElementById(Type_Point)));
+-  ASSERT_TRUE(AsObject(factory->CreateElementById(Type_Placemark)));
+-  ASSERT_TRUE(AsOverlay(factory->CreateElementById(Type_GroundOverlay)));
+-  ASSERT_TRUE(AsStyleSelector(factory->CreateElementById(Type_Style)));
+-  ASSERT_TRUE(AsSubStyle(factory->CreateElementById(Type_BalloonStyle)));
+-  ASSERT_TRUE(AsTimePrimitive(factory->CreateElementById(Type_TimeSpan)));
+-  ASSERT_TRUE(AsAlias(factory->CreateElementById(Type_Alias)));
+-  ASSERT_TRUE(AsAtomAuthor(factory->CreateElementById(Type_AtomAuthor)));
+-  ASSERT_TRUE(AsAtomContent(factory->CreateElementById(Type_AtomContent)));
+-  ASSERT_TRUE(AsAtomEntry(factory->CreateElementById(Type_AtomEntry)));
+-  ASSERT_TRUE(AsAtomFeed(factory->CreateElementById(Type_AtomFeed)));
+-  ASSERT_TRUE(AsAtomLink(factory->CreateElementById(Type_AtomLink)));
+-  ASSERT_TRUE(AsBalloonStyle(factory->CreateElementById(Type_BalloonStyle)));
+-  ASSERT_TRUE(AsCamera(factory->CreateElementById(Type_Camera)));
+-  ASSERT_TRUE(AsChange(factory->CreateElementById(Type_Change)));
+-  ASSERT_TRUE(AsCoordinates(factory->CreateElementById(Type_coordinates)));
+-  ASSERT_TRUE(AsCreate(factory->CreateElementById(Type_Create)));
+-  ASSERT_TRUE(AsData(factory->CreateElementById(Type_Data)));
+-  ASSERT_TRUE(AsDelete(factory->CreateElementById(Type_Delete)));
+-  ASSERT_TRUE(AsDocument(factory->CreateElementById(Type_Document)));
+-  ASSERT_TRUE(AsExtendedData(factory->CreateElementById(Type_ExtendedData)));
+-  ASSERT_TRUE(AsFolder(factory->CreateElementById(Type_Folder)));
++      factory->CreateElementById(Type_LatLonAltBox)) != 0);
++  ASSERT_TRUE(AsAbstractView(factory->CreateElementById(Type_LookAt)) != 0);
++  ASSERT_TRUE(AsColorStyle(factory->CreateElementById(Type_IconStyle)) != 0);
++  ASSERT_TRUE(AsContainer(factory->CreateElementById(Type_Folder)) != 0);
++  ASSERT_TRUE(AsFeature(factory->CreateElementById(Type_Placemark)) != 0);
++  ASSERT_TRUE(AsGeometry(factory->CreateElementById(Type_Point)) != 0);
++  ASSERT_TRUE(AsObject(factory->CreateElementById(Type_Placemark)) != 0);
++  ASSERT_TRUE(AsOverlay(factory->CreateElementById(Type_GroundOverlay)) != 0);
++  ASSERT_TRUE(AsStyleSelector(factory->CreateElementById(Type_Style)) != 0);
++  ASSERT_TRUE(AsSubStyle(factory->CreateElementById(Type_BalloonStyle)) != 0);
++  ASSERT_TRUE(AsTimePrimitive(factory->CreateElementById(Type_TimeSpan)) != 0);
++  ASSERT_TRUE(AsAlias(factory->CreateElementById(Type_Alias)) != 0);
++  ASSERT_TRUE(AsAtomAuthor(factory->CreateElementById(Type_AtomAuthor)) != 0);
++  ASSERT_TRUE(AsAtomContent(factory->CreateElementById(Type_AtomContent)) != 0);
++  ASSERT_TRUE(AsAtomEntry(factory->CreateElementById(Type_AtomEntry)) != 0);
++  ASSERT_TRUE(AsAtomFeed(factory->CreateElementById(Type_AtomFeed)) != 0);
++  ASSERT_TRUE(AsAtomLink(factory->CreateElementById(Type_AtomLink)) != 0);
++  ASSERT_TRUE(AsBalloonStyle(factory->CreateElementById(Type_BalloonStyle)) != 0);
++  ASSERT_TRUE(AsCamera(factory->CreateElementById(Type_Camera)) != 0);
++  ASSERT_TRUE(AsChange(factory->CreateElementById(Type_Change)) != 0);
++  ASSERT_TRUE(AsCoordinates(factory->CreateElementById(Type_coordinates)) != 0);
++  ASSERT_TRUE(AsCreate(factory->CreateElementById(Type_Create)) != 0);
++  ASSERT_TRUE(AsData(factory->CreateElementById(Type_Data)) != 0);
++  ASSERT_TRUE(AsDelete(factory->CreateElementById(Type_Delete)) != 0);
++  ASSERT_TRUE(AsDocument(factory->CreateElementById(Type_Document)) != 0);
++  ASSERT_TRUE(AsExtendedData(factory->CreateElementById(Type_ExtendedData)) != 0);
++  ASSERT_TRUE(AsFolder(factory->CreateElementById(Type_Folder)) != 0);
+   ASSERT_TRUE(AsGroundOverlay(
+-      factory->CreateElementById(Type_GroundOverlay)));
+-  ASSERT_TRUE(AsHotSpot(factory->CreateElementById(Type_hotSpot)));
+-  ASSERT_TRUE(AsIcon(factory->CreateElementById(Type_Icon)));
+-  ASSERT_TRUE(AsIconStyle(factory->CreateElementById(Type_IconStyle)));
+-  ASSERT_TRUE(AsImagePyramid(factory->CreateElementById(Type_ImagePyramid)));
++      factory->CreateElementById(Type_GroundOverlay)) != 0);
++  ASSERT_TRUE(AsHotSpot(factory->CreateElementById(Type_hotSpot)) != 0);
++  ASSERT_TRUE(AsIcon(factory->CreateElementById(Type_Icon)) != 0);
++  ASSERT_TRUE(AsIconStyle(factory->CreateElementById(Type_IconStyle)) != 0);
++  ASSERT_TRUE(AsImagePyramid(factory->CreateElementById(Type_ImagePyramid)) != 0);
+   ASSERT_TRUE(AsInnerBoundaryIs(
+-      factory->CreateElementById(Type_innerBoundaryIs)));
+-  ASSERT_TRUE(AsItemIcon(factory->CreateElementById(Type_ItemIcon)));
+-  ASSERT_TRUE(AsLabelStyle(factory->CreateElementById(Type_LabelStyle)));
+-  ASSERT_TRUE(AsLatLonAltBox(factory->CreateElementById(Type_LatLonAltBox)));
+-  ASSERT_TRUE(AsLatLonBox(factory->CreateElementById(Type_LatLonBox)));
+-  ASSERT_TRUE(AsLineString(factory->CreateElementById(Type_LineString)));
+-  ASSERT_TRUE(AsLineStyle(factory->CreateElementById(Type_LineStyle)));
+-  ASSERT_TRUE(AsLinearRing(factory->CreateElementById(Type_LinearRing)));
+-  ASSERT_TRUE(AsLink(factory->CreateElementById(Type_Link)));
+-  ASSERT_TRUE(AsLinkSnippet(factory->CreateElementById(Type_linkSnippet)));
+-  ASSERT_TRUE(AsListStyle(factory->CreateElementById(Type_ListStyle)));
+-  ASSERT_TRUE(AsLocation(factory->CreateElementById(Type_Location)));
+-  ASSERT_TRUE(AsLod(factory->CreateElementById(Type_Lod)));
+-  ASSERT_TRUE(AsLookAt(factory->CreateElementById(Type_LookAt)));
+-  ASSERT_TRUE(AsKml(factory->CreateElementById(Type_kml)));
+-  ASSERT_TRUE(AsModel(factory->CreateElementById(Type_Model)));
++      factory->CreateElementById(Type_innerBoundaryIs)) != 0);
++  ASSERT_TRUE(AsItemIcon(factory->CreateElementById(Type_ItemIcon)) != 0);
++  ASSERT_TRUE(AsLabelStyle(factory->CreateElementById(Type_LabelStyle)) != 0);
++  ASSERT_TRUE(AsLatLonAltBox(factory->CreateElementById(Type_LatLonAltBox)) != 0);
++  ASSERT_TRUE(AsLatLonBox(factory->CreateElementById(Type_LatLonBox)) != 0);
++  ASSERT_TRUE(AsLineString(factory->CreateElementById(Type_LineString)) != 0);
++  ASSERT_TRUE(AsLineStyle(factory->CreateElementById(Type_LineStyle)) != 0);
++  ASSERT_TRUE(AsLinearRing(factory->CreateElementById(Type_LinearRing)) != 0);
++  ASSERT_TRUE(AsLink(factory->CreateElementById(Type_Link)) != 0);
++  ASSERT_TRUE(AsLinkSnippet(factory->CreateElementById(Type_linkSnippet)) != 0);
++  ASSERT_TRUE(AsListStyle(factory->CreateElementById(Type_ListStyle)) != 0);
++  ASSERT_TRUE(AsLocation(factory->CreateElementById(Type_Location)) != 0);
++  ASSERT_TRUE(AsLod(factory->CreateElementById(Type_Lod)) != 0);
++  ASSERT_TRUE(AsLookAt(factory->CreateElementById(Type_LookAt)) != 0);
++  ASSERT_TRUE(AsKml(factory->CreateElementById(Type_kml)) != 0);
++  ASSERT_TRUE(AsModel(factory->CreateElementById(Type_Model)) != 0);
+   ASSERT_TRUE(AsMultiGeometry(
+-      factory->CreateElementById(Type_MultiGeometry)));
+-  ASSERT_TRUE(AsNetworkLink(factory->CreateElementById(Type_NetworkLink)));
++      factory->CreateElementById(Type_MultiGeometry)) != 0);
++  ASSERT_TRUE(AsNetworkLink(factory->CreateElementById(Type_NetworkLink)) != 0);
+   ASSERT_TRUE(AsNetworkLinkControl(
+-      factory->CreateElementById(Type_NetworkLinkControl)));
+-  ASSERT_TRUE(AsOrientation(factory->CreateElementById(Type_Orientation)));
++      factory->CreateElementById(Type_NetworkLinkControl)) != 0);
++  ASSERT_TRUE(AsOrientation(factory->CreateElementById(Type_Orientation)) != 0);
+   ASSERT_TRUE(AsOuterBoundaryIs(
+-      factory->CreateElementById(Type_outerBoundaryIs)));
+-  ASSERT_TRUE(AsOverlayXY(factory->CreateElementById(Type_overlayXY)));
+-  ASSERT_TRUE(AsPair(factory->CreateElementById(Type_Pair)));
+-  ASSERT_TRUE(AsPhotoOverlay(factory->CreateElementById(Type_PhotoOverlay)));
+-  ASSERT_TRUE(AsPlacemark(factory->CreateElementById(Type_Placemark)));
+-  ASSERT_TRUE(AsPoint(factory->CreateElementById(Type_Point)));
+-  ASSERT_TRUE(AsPolyStyle(factory->CreateElementById(Type_PolyStyle)));
+-  ASSERT_TRUE(AsPolygon(factory->CreateElementById(Type_Polygon)));
+-  ASSERT_TRUE(AsRegion(factory->CreateElementById(Type_Region)));
+-  ASSERT_TRUE(AsResourceMap(factory->CreateElementById(Type_ResourceMap)));
+-  ASSERT_TRUE(AsRotationXY(factory->CreateElementById(Type_rotationXY)));
+-  ASSERT_TRUE(AsScale(factory->CreateElementById(Type_Scale)));
+-  ASSERT_TRUE(AsSchema(factory->CreateElementById(Type_Schema)));
+-  ASSERT_TRUE(AsSchemaData(factory->CreateElementById(Type_SchemaData)));
++      factory->CreateElementById(Type_outerBoundaryIs)) != 0);
++  ASSERT_TRUE(AsOverlayXY(factory->CreateElementById(Type_overlayXY)) != 0);
++  ASSERT_TRUE(AsPair(factory->CreateElementById(Type_Pair)) != 0);
++  ASSERT_TRUE(AsPhotoOverlay(factory->CreateElementById(Type_PhotoOverlay)) != 0);
++  ASSERT_TRUE(AsPlacemark(factory->CreateElementById(Type_Placemark)) != 0);
++  ASSERT_TRUE(AsPoint(factory->CreateElementById(Type_Point)) != 0);
++  ASSERT_TRUE(AsPolyStyle(factory->CreateElementById(Type_PolyStyle)) != 0);
++  ASSERT_TRUE(AsPolygon(factory->CreateElementById(Type_Polygon)) != 0);
++  ASSERT_TRUE(AsRegion(factory->CreateElementById(Type_Region)) != 0);
++  ASSERT_TRUE(AsResourceMap(factory->CreateElementById(Type_ResourceMap)) != 0);
++  ASSERT_TRUE(AsRotationXY(factory->CreateElementById(Type_rotationXY)) != 0);
++  ASSERT_TRUE(AsScale(factory->CreateElementById(Type_Scale)) != 0);
++  ASSERT_TRUE(AsSchema(factory->CreateElementById(Type_Schema)) != 0);
++  ASSERT_TRUE(AsSchemaData(factory->CreateElementById(Type_SchemaData)) != 0);
+   ASSERT_TRUE(AsScreenOverlay(
+-      factory->CreateElementById(Type_ScreenOverlay)));
+-  ASSERT_TRUE(AsScreenXY(factory->CreateElementById(Type_screenXY)));
+-  ASSERT_TRUE(AsSimpleData(factory->CreateElementById(Type_SimpleData)));
+-  ASSERT_TRUE(AsSimpleField(factory->CreateElementById(Type_SimpleField)));
+-  ASSERT_TRUE(AsSize(factory->CreateElementById(Type_size)));
+-  ASSERT_TRUE(AsSnippet(factory->CreateElementById(Type_Snippet)));
+-  ASSERT_TRUE(AsStyle(factory->CreateElementById(Type_Style)));
+-  ASSERT_TRUE(AsStyleMap(factory->CreateElementById(Type_StyleMap)));
+-  ASSERT_TRUE(AsTimeSpan(factory->CreateElementById(Type_TimeSpan)));
+-  ASSERT_TRUE(AsTimeStamp(factory->CreateElementById(Type_TimeStamp)));
+-  ASSERT_TRUE(AsUpdate(factory->CreateElementById(Type_Update)));
+-  ASSERT_TRUE(AsViewVolume(factory->CreateElementById(Type_ViewVolume)));
++      factory->CreateElementById(Type_ScreenOverlay)) != 0);
++  ASSERT_TRUE(AsScreenXY(factory->CreateElementById(Type_screenXY)) != 0);
++  ASSERT_TRUE(AsSimpleData(factory->CreateElementById(Type_SimpleData)) != 0);
++  ASSERT_TRUE(AsSimpleField(factory->CreateElementById(Type_SimpleField)) != 0);
++  ASSERT_TRUE(AsSize(factory->CreateElementById(Type_size)) != 0);
++  ASSERT_TRUE(AsSnippet(factory->CreateElementById(Type_Snippet)) != 0);
++  ASSERT_TRUE(AsStyle(factory->CreateElementById(Type_Style)) != 0);
++  ASSERT_TRUE(AsStyleMap(factory->CreateElementById(Type_StyleMap)) != 0);
++  ASSERT_TRUE(AsTimeSpan(factory->CreateElementById(Type_TimeSpan)) != 0);
++  ASSERT_TRUE(AsTimeStamp(factory->CreateElementById(Type_TimeStamp)) != 0);
++  ASSERT_TRUE(AsUpdate(factory->CreateElementById(Type_Update)) != 0);
++  ASSERT_TRUE(AsViewVolume(factory->CreateElementById(Type_ViewVolume)) != 0);
+ 
+   ASSERT_TRUE(AsXalAddressDetails(
+-      factory->CreateElementById(Type_XalAddressDetails)));
++      factory->CreateElementById(Type_XalAddressDetails)) != 0);
+   ASSERT_TRUE(AsXalAdministrativeArea(
+-      factory->CreateElementById(Type_XalAdministrativeArea)));
+-  ASSERT_TRUE(AsXalCountry(factory->CreateElementById(Type_XalCountry)));
+-  ASSERT_TRUE(AsXalLocality(factory->CreateElementById(Type_XalLocality)));
+-  ASSERT_TRUE(AsXalPostalCode(factory->CreateElementById(Type_XalPostalCode)));
++      factory->CreateElementById(Type_XalAdministrativeArea)) != 0);
++  ASSERT_TRUE(AsXalCountry(factory->CreateElementById(Type_XalCountry)) != 0);
++  ASSERT_TRUE(AsXalLocality(factory->CreateElementById(Type_XalLocality)) != 0);
++  ASSERT_TRUE(AsXalPostalCode(factory->CreateElementById(Type_XalPostalCode)) != 0);
+   ASSERT_TRUE(AsXalSubAdministrativeArea(
+-      factory->CreateElementById(Type_XalSubAdministrativeArea)));
++      factory->CreateElementById(Type_XalSubAdministrativeArea)) != 0);
+   ASSERT_TRUE(AsXalThoroughfare(
+-      factory->CreateElementById(Type_XalThoroughfare)));
++      factory->CreateElementById(Type_XalThoroughfare)) != 0);
+ 
+   ASSERT_TRUE(AsGxAnimatedUpdate(
+-      factory->CreateElementById(Type_GxAnimatedUpdate)));
++      factory->CreateElementById(Type_GxAnimatedUpdate)) != 0);
+   ASSERT_TRUE(AsGxFlyTo(
+-      factory->CreateElementById(Type_GxFlyTo)));
++      factory->CreateElementById(Type_GxFlyTo)) != 0);
+   ASSERT_TRUE(AsGxLatLonQuad(
+-      factory->CreateElementById(Type_GxLatLonQuad)));
++      factory->CreateElementById(Type_GxLatLonQuad)) != 0);
+   ASSERT_TRUE(AsGxMultiTrack(
+-      factory->CreateElementById(Type_GxMultiTrack)));
++      factory->CreateElementById(Type_GxMultiTrack)) != 0);
+   ASSERT_TRUE(AsGxPlaylist(
+-      factory->CreateElementById(Type_GxPlaylist)));
++      factory->CreateElementById(Type_GxPlaylist)) != 0);
+   ASSERT_TRUE(AsGxSimpleArrayField(
+-      factory->CreateElementById(Type_GxSimpleArrayField)));
++      factory->CreateElementById(Type_GxSimpleArrayField)) != 0);
+   ASSERT_TRUE(AsGxSimpleArrayData(
+-      factory->CreateElementById(Type_GxSimpleArrayData)));
++      factory->CreateElementById(Type_GxSimpleArrayData)) != 0);
+   ASSERT_TRUE(AsGxSoundCue(
+-      factory->CreateElementById(Type_GxSoundCue)));
++      factory->CreateElementById(Type_GxSoundCue)) != 0);
+   ASSERT_TRUE(AsGxTimeSpan(
+-      factory->CreateElementById(Type_GxTimeSpan)));
++      factory->CreateElementById(Type_GxTimeSpan)) != 0);
+   ASSERT_TRUE(AsGxTimeStamp(
+-      factory->CreateElementById(Type_GxTimeStamp)));
++      factory->CreateElementById(Type_GxTimeStamp)) != 0);
+   ASSERT_TRUE(AsTimePrimitive(
+-      factory->CreateElementById(Type_GxTimeSpan)));
++      factory->CreateElementById(Type_GxTimeSpan)) != 0);
+   ASSERT_TRUE(AsTimePrimitive(
+-      factory->CreateElementById(Type_GxTimeStamp)));
++      factory->CreateElementById(Type_GxTimeStamp)) != 0);
+   ASSERT_TRUE(AsGxTour(
+-      factory->CreateElementById(Type_GxTour)));
++      factory->CreateElementById(Type_GxTour)) != 0);
+   ASSERT_TRUE(AsGxTourControl(
+-      factory->CreateElementById(Type_GxTourControl)));
++      factory->CreateElementById(Type_GxTourControl)) != 0);
+   ASSERT_TRUE(AsGxTourPrimitive(
+-      factory->CreateElementById(Type_GxFlyTo)));
++      factory->CreateElementById(Type_GxFlyTo)) != 0);
+   ASSERT_TRUE(AsGxTrack(
+-      factory->CreateElementById(Type_GxTrack)));
++      factory->CreateElementById(Type_GxTrack)) != 0);
+   ASSERT_TRUE(AsGxWait(
+-      factory->CreateElementById(Type_GxWait)));
++      factory->CreateElementById(Type_GxWait)) != 0);
+ }
+ 
+ }  // end namespace kmldom
+diff --git a/tests/kml/dom/kml_factory_test.cc b/tests/kml/dom/kml_factory_test.cc
+index a70049e..9fd6d2f 100644
+--- a/tests/kml/dom/kml_factory_test.cc
++++ b/tests/kml/dom/kml_factory_test.cc
+@@ -321,9 +321,9 @@ TEST(KmlFactoryTest, TestCreateElementFromName) {
+   ASSERT_FALSE(kf->CreateElementFromName("complete junk"));
+   ASSERT_FALSE(kf->CreateElementFromName("<Placemark"));
+ 
+-  ASSERT_TRUE(kmldom::AsPlacemark(kf->CreateElementFromName("Placemark")));
+-  ASSERT_TRUE(kmldom::AsAtomAuthor(kf->CreateElementFromName("atom:author")));
+-  ASSERT_TRUE(kmldom::AsGxTour(kf->CreateElementFromName("gx:Tour")));
++  ASSERT_TRUE(kmldom::AsPlacemark(kf->CreateElementFromName("Placemark")) != 0);
++  ASSERT_TRUE(kmldom::AsAtomAuthor(kf->CreateElementFromName("atom:author")) != 0);
++  ASSERT_TRUE(kmldom::AsGxTour(kf->CreateElementFromName("gx:Tour")) != 0);
+ }
+ 
+ }  // end namespace kmldom
+diff --git a/tests/kml/dom/kml_handler_ns_test.cc b/tests/kml/dom/kml_handler_ns_test.cc
+index edac146..97d43f6 100644
+--- a/tests/kml/dom/kml_handler_ns_test.cc
++++ b/tests/kml/dom/kml_handler_ns_test.cc
+@@ -184,7 +184,7 @@ TEST_F(KmlHandlerNSTest, TestNamespaceParsing) {
+   string errors;
+   ElementPtr root = parser.ParseNS(kNamespaceKml, &errors);
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+ 
+   // TODO: ultimately the parse is preserved 1:1. Currently the parse will
+   // drop the xmlns attrs and the element prefixes so this is a test of an
+diff --git a/tests/kml/dom/kml_handler_test.cc b/tests/kml/dom/kml_handler_test.cc
+index de4e03e..0f71dbe 100644
+--- a/tests/kml/dom/kml_handler_test.cc
++++ b/tests/kml/dom/kml_handler_test.cc
+@@ -248,9 +248,9 @@ void KmlHandlerTest::VerifyElementTypes(
+ // This helper function verifies the proper state of kKmlFolder's DOM.
+ void KmlHandlerTest::VerifyFolderParse(const ElementPtr& root) const {
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   FolderPtr folder = AsFolder(kml->get_feature());
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_TRUE(folder->has_name());
+   ASSERT_FALSE(folder->has_visibility());
+   ASSERT_FALSE(folder->has_open());
+@@ -454,23 +454,23 @@ TEST_F(KmlHandlerTest, InhibitingEndElement) {
+   kml_handler.EndElement("NetworkLinkControl");
+   kml_handler.EndElement("kml");
+   ElementPtr root = kml_handler.PopRoot();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   // Document is a Container and is not collected.
+   ASSERT_TRUE(kml->has_feature());
+-  ASSERT_TRUE(AsDocument(kml->get_feature()));
++  ASSERT_TRUE(AsDocument(kml->get_feature()) != 0);
+   // NetworkLinkControl is not a Feature is not collected.
+   ASSERT_TRUE(kml->has_networklinkcontrol());
+   // One non-Container Feature is collected.
+   ASSERT_EQ(static_cast<size_t>(1), features.size());
+   PlacemarkPtr placemark = AsPlacemark(features[0]);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   // Verify the collected feature has all expected children.
+   ASSERT_TRUE(placemark->has_name());
+   ASSERT_TRUE(placemark->has_geometry());
+   PointPtr point = AsPoint(placemark->get_geometry());
+-  ASSERT_TRUE(point);
++  ASSERT_TRUE(point != 0);
+   ASSERT_TRUE(point->has_coordinates());
+ }
+ 
+@@ -487,11 +487,11 @@ TEST_F(KmlHandlerTest, TestParserHandlesGrossDescriptions) {
+   string data;
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(kInvalidDescriptions, &data));
+   ElementPtr root = Parse(data, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   DocumentPtr document = AsDocument(kml->get_feature());
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   ASSERT_EQ(static_cast<size_t>(3), document->get_feature_array_size());
+ 
+   PlacemarkPtr placemark0 = AsPlacemark(document->get_feature_array_at(0));
+@@ -514,7 +514,7 @@ TEST_F(KmlHandlerTest, TestParserHandlesBoolWhitespace) {
+   string data;
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(kOutlineSpace, &data));
+   ElementPtr root = Parse(data, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   DocumentPtr document = AsDocument(AsKml(root)->get_feature());
+   StylePtr style = AsStyle(document->get_styleselector_array_at(0));
+   PolyStylePtr polystyle = style->get_polystyle();
+@@ -534,7 +534,7 @@ TEST_F(KmlHandlerTest, TestMaxNestingOf100Folders) {
+   string data;
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(k100Folders, &data));
+   ElementPtr root = Parse(data, NULL);
+-  ASSERT_TRUE(root);  // Parse succeeded.
++  ASSERT_TRUE(root != 0);  // Parse succeeded.
+ }
+ 
+ // 101 nested folders exceeds our default nesting limit of 100.
+@@ -606,27 +606,27 @@ TEST_F(KmlHandlerTest, TestHandlesOldSchemaUsage) {
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(kOldSchemaKml, &data));
+   string errors;
+   ElementPtr root = Parse(data, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_TRUE(kml->has_feature());
+   const DocumentPtr document = AsDocument(kml->get_feature());
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   ASSERT_EQ(static_cast<size_t>(1), document->get_schema_array_size());
+   const SchemaPtr schema = AsSchema(document->get_schema_array_at(0));
+-  ASSERT_TRUE(schema);
++  ASSERT_TRUE(schema != 0);
+   ASSERT_EQ("S_521_525_SSSSS_id", schema->get_id());
+   ASSERT_EQ("S_521_525_SSSSS", schema->get_name());
+   ASSERT_EQ(static_cast<size_t>(2), schema->get_simplefield_array_size());
+   const SimpleFieldPtr simplefield0 =
+     AsSimpleField(schema->get_simplefield_array_at(0));
+-  ASSERT_TRUE(simplefield0);
++  ASSERT_TRUE(simplefield0 != 0);
+   ASSERT_EQ("Foo", simplefield0->get_name());
+   ASSERT_EQ("string", simplefield0->get_type());
+   const SimpleFieldPtr simplefield1 =
+     AsSimpleField(schema->get_simplefield_array_at(1));
+-  ASSERT_TRUE(simplefield1);
++  ASSERT_TRUE(simplefield1 != 0);
+   ASSERT_EQ("Bar", simplefield1->get_name());
+   ASSERT_EQ("string", simplefield1->get_type());
+   ASSERT_EQ(static_cast<size_t>(2), document->get_feature_array_size());
+@@ -637,21 +637,21 @@ TEST_F(KmlHandlerTest, TestHandlesOldSchemaUsage) {
+   ASSERT_TRUE(placemark0->has_extendeddata());
+   const ExtendedDataPtr extendeddata0 =
+     AsExtendedData(placemark0->get_extendeddata());
+-  ASSERT_TRUE(extendeddata0);
++  ASSERT_TRUE(extendeddata0 != 0);
+   ASSERT_EQ(static_cast<size_t>(1), extendeddata0->get_schemadata_array_size());
+   const SchemaDataPtr schemadata0 =
+     AsSchemaData(extendeddata0->get_schemadata_array_at(0));
+-  ASSERT_TRUE(schemadata0);
++  ASSERT_TRUE(schemadata0 != 0);
+   ASSERT_EQ("S_521_525_SSSSS_id", schemadata0->get_schemaurl());
+   ASSERT_EQ(static_cast<size_t>(2), schemadata0->get_simpledata_array_size());
+   const SimpleDataPtr simpledata00 =
+     AsSimpleData(schemadata0->get_simpledata_array_at(0));
+-  ASSERT_TRUE(simpledata00);
++  ASSERT_TRUE(simpledata00 != 0);
+   ASSERT_EQ("Foo", simpledata00->get_name());
+   ASSERT_EQ("foo 1", simpledata00->get_text());
+   const SimpleDataPtr simpledata01 =
+     AsSimpleData(schemadata0->get_simpledata_array_at(1));
+-  ASSERT_TRUE(simpledata01);
++  ASSERT_TRUE(simpledata01 != 0);
+   ASSERT_EQ("Bar", simpledata01->get_name());
+   ASSERT_EQ("bar 1", simpledata01->get_text());
+ 
+@@ -661,21 +661,21 @@ TEST_F(KmlHandlerTest, TestHandlesOldSchemaUsage) {
+   ASSERT_TRUE(placemark1->has_extendeddata());
+   const ExtendedDataPtr extendeddata1 =
+     AsExtendedData(placemark1->get_extendeddata());
+-  ASSERT_TRUE(extendeddata1);
++  ASSERT_TRUE(extendeddata1 != 0);
+   ASSERT_EQ(static_cast<size_t>(1), extendeddata1->get_schemadata_array_size());
+   const SchemaDataPtr schemadata1 =
+     AsSchemaData(extendeddata1->get_schemadata_array_at(0));
+-  ASSERT_TRUE(schemadata1);
++  ASSERT_TRUE(schemadata1 != 0);
+   ASSERT_EQ("S_521_525_SSSSS_id", schemadata1->get_schemaurl());
+   ASSERT_EQ(static_cast<size_t>(2), schemadata1->get_simpledata_array_size());
+   const SimpleDataPtr simpledata10 =
+     AsSimpleData(schemadata1->get_simpledata_array_at(0));
+-  ASSERT_TRUE(simpledata10);
++  ASSERT_TRUE(simpledata10 != 0);
+   ASSERT_EQ("Foo", simpledata10->get_name());
+   ASSERT_EQ("foo 2", simpledata10->get_text());
+   const SimpleDataPtr simpledata11 =
+     AsSimpleData(schemadata1->get_simpledata_array_at(1));
+-  ASSERT_TRUE(simpledata11);
++  ASSERT_TRUE(simpledata11 != 0);
+   ASSERT_EQ("Bar", simpledata11->get_name());
+   ASSERT_EQ("bar 2", simpledata11->get_text());
+ }
+@@ -701,7 +701,7 @@ TEST_F(KmlHandlerTest, TestOldSchemaParserObserver) {
+   parser.AddObserver(&simple_new_element_observer);
+   string errors;
+   ElementPtr root = parser.Parse(kOldSchemaKml, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   // NewElement() is called only 4 times; The logic that handles the old
+   // <Schema> knows to look for <Foo> as a child, and the handing there is
+@@ -738,7 +738,7 @@ TEST_F(KmlHandlerTest, TestOldSchemaHandling) {
+   kml_handler_->EndElement(kOldStyleSchemaChild);
+   kml_handler_->EndElement(kOldStyleSchemaName);
+   ElementPtr root = kml_handler_->PopRoot();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(Type_Document, root->Type());
+   // A Placemark was created from OldStyleSchemaName.
+   ASSERT_EQ(Type_Placemark, AsDocument(root)->get_feature_array_at(0)->Type());
+diff --git a/tests/kml/dom/link_test.cc b/tests/kml/dom/link_test.cc
+index 89c45ae..c41fc47 100644
+--- a/tests/kml/dom/link_test.cc
++++ b/tests/kml/dom/link_test.cc
+@@ -155,10 +155,10 @@ TEST_F(LinkTest, TestParse) {
+   const string kLink = "<Link>" + kHref + "</Link>";
+   string errors;
+   ElementPtr root = Parse(kLink, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LinkPtr link = AsLink(root);
+-  ASSERT_TRUE(link);
++  ASSERT_TRUE(link != 0);
+   ASSERT_TRUE(link->has_href());
+   ASSERT_EQ(kContent, link->get_href());
+ }
+@@ -170,10 +170,10 @@ TEST_F(LinkTest, TestAcceptCdataInHref) {
+   const string kLink = "<Link>" + kHref + "</Link>";
+   string errors;
+   ElementPtr root = Parse(kLink, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LinkPtr link = AsLink(root);
+-  ASSERT_TRUE(link);
++  ASSERT_TRUE(link != 0);
+   ASSERT_TRUE(link->has_href());
+   ASSERT_TRUE(kContent == link->get_href());
+ }
+@@ -522,7 +522,7 @@ TEST_F(IconStyleIconTest, TestParseSerializeUnknown) {
+       "<refreshMode>onExpire</refreshMode>"
+       "</Icon>");
+   ElementPtr element(Parse(kIcon, NULL));
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_EQ(kIcon, SerializeRaw(element));
+ }
+ 
+diff --git a/tests/kml/dom/networklink_test.cc b/tests/kml/dom/networklink_test.cc
+index b2047a4..0a33e0d 100644
+--- a/tests/kml/dom/networklink_test.cc
++++ b/tests/kml/dom/networklink_test.cc
+@@ -104,7 +104,7 @@ TEST_F(NetworkLinkTest, TestParseUrl) {
+   ElementPtr root = Parse(kNetworkLinkUrl + kHref + kUrlNetworkLink, &errors);
+   ASSERT_TRUE(errors.empty());
+   const NetworkLinkPtr networklink = AsNetworkLink(root);
+-  ASSERT_TRUE(networklink);
++  ASSERT_TRUE(networklink != 0);
+   // Verify that the Url was set as the Link.
+   ASSERT_TRUE(networklink->has_link());
+   ASSERT_EQ(Type_Url, networklink->get_link()->Type());
+diff --git a/tests/kml/dom/object_test.cc b/tests/kml/dom/object_test.cc
+index 3247a81..33e143e 100644
+--- a/tests/kml/dom/object_test.cc
++++ b/tests/kml/dom/object_test.cc
+@@ -91,10 +91,10 @@ TEST_F(ObjectTest, TestParse) {
+       "<Placemark id=\"" + kId + "\" targetId=\"" + kTargetId + "\" />");
+   string errors;
+   ElementPtr root = Parse(kKml, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const PlacemarkPtr placemark = AsPlacemark(root);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(placemark->has_id());
+   ASSERT_TRUE(placemark->has_targetid());
+   ASSERT_EQ(kId, placemark->get_id());
+diff --git a/tests/kml/dom/overlay_test.cc b/tests/kml/dom/overlay_test.cc
+index d619853..31c770d 100644
+--- a/tests/kml/dom/overlay_test.cc
++++ b/tests/kml/dom/overlay_test.cc
+@@ -364,10 +364,10 @@ TEST_F(OverlayXYTest, TestParse) {
+   ElementPtr root = Parse(
+     "<overlayXY x=\"0.5\" y=\"123\" xunits=\"fraction\" yunits=\"pixels\"/>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const OverlayXYPtr overlayxy = AsOverlayXY(root);
+-  ASSERT_TRUE(overlayxy);
++  ASSERT_TRUE(overlayxy != 0);
+   ASSERT_EQ(0.5, overlayxy->get_x());
+   ASSERT_EQ(123, overlayxy->get_y());
+   ASSERT_EQ(static_cast<int>(UNITS_FRACTION), overlayxy->get_xunits());
+@@ -406,10 +406,10 @@ TEST_F(ScreenXYTest, TestParse) {
+     "<screenXY x=\"0.5\" y=\"123\" xunits=\"fraction\" "
+       "yunits=\"insetPixels\"/>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const ScreenXYPtr screenxy = AsScreenXY(root);
+-  ASSERT_TRUE(screenxy);
++  ASSERT_TRUE(screenxy != 0);
+   ASSERT_EQ(0.5, screenxy->get_x());
+   ASSERT_EQ(123., screenxy->get_y());
+   ASSERT_EQ(static_cast<int>(UNITS_FRACTION),
+@@ -450,10 +450,10 @@ TEST_F(RotationXYTest, TestParse) {
+   ElementPtr root = Parse(
+     "<rotationXY x=\"512\" y=\"0.7\" xunits=\"pixels\" yunits=\"fraction\"/>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const RotationXYPtr rotationxy = AsRotationXY(root);
+-  ASSERT_TRUE(rotationxy);
++  ASSERT_TRUE(rotationxy != 0);
+   ASSERT_EQ(512., rotationxy->get_x());
+   ASSERT_EQ(0.7, rotationxy->get_y());
+   ASSERT_EQ(static_cast<int>(UNITS_PIXELS),
+@@ -494,10 +494,10 @@ TEST_F(SizeTest, TestParse) {
+   ElementPtr root = Parse(
+     "<size x=\"512\" y=\"0.7\" xunits=\"pixels\" yunits=\"fraction\"/>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const SizePtr size = AsSize(root);
+-  ASSERT_TRUE(size);
++  ASSERT_TRUE(size != 0);
+   ASSERT_EQ(512., size->get_x());
+   ASSERT_EQ(0.7, size->get_y());
+   ASSERT_EQ(static_cast<int>(UNITS_PIXELS), size->get_xunits());
+diff --git a/tests/kml/dom/parser_test.cc b/tests/kml/dom/parser_test.cc
+index ae6c7b0..b2cd586 100644
+--- a/tests/kml/dom/parser_test.cc
++++ b/tests/kml/dom/parser_test.cc
+@@ -49,18 +49,18 @@ TEST(ParserTest, TestValidKml) {
+                           &errors);
+   // KML is valid so there are no errors and the root is <kml>.
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+ 
+   const KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+ 
+   errors.clear();
+   // Assigning to root releases storage allocated in Parse above.
+   root = Parse(" <kml/>", &errors);  // Note leading space.
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+ 
+-  ASSERT_TRUE(AsKml(root));
++  ASSERT_TRUE(AsKml(root) != 0);
+ 
+   // ElementPtr root going out of scope releases storage allocated in 2nd
+   // Parse.
+@@ -148,7 +148,7 @@ TEST(ParserTest, TestKmlWithUnknownEmptyFields) {
+   const string kKml(
+       string("<kml>") + kUnknownXml + "</kml>");
+   ElementPtr root = Parse(kKml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(static_cast<size_t>(1), root->get_unknown_elements_array_size());
+   ASSERT_EQ(kUnknownXml, root->get_unknown_elements_array_at(0));
+ }
+@@ -171,7 +171,7 @@ TEST(ParserTest, TestBasicParseAtom) {
+                               &errors);
+   ASSERT_TRUE(errors.empty());
+   ASSERT_TRUE(root.get());
+-  ASSERT_TRUE(AsAtomFeed(root));
++  ASSERT_TRUE(AsAtomFeed(root) != 0);
+   ASSERT_EQ(kmlbase::XMLNS_ATOM, root->get_xmlns());
+ }
+ 
+diff --git a/tests/kml/dom/placemark_test.cc b/tests/kml/dom/placemark_test.cc
+index 42e2f5b..b7b6ec2 100644
+--- a/tests/kml/dom/placemark_test.cc
++++ b/tests/kml/dom/placemark_test.cc
+@@ -100,10 +100,10 @@ TEST_F(PlacemarkTest, TestParse) {
+     "</Placemark>";
+   string errors;
+   ElementPtr root = Parse(kPlacemark, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const PlacemarkPtr placemark = AsPlacemark(root);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_FALSE(placemark->has_id());
+   ASSERT_FALSE(placemark->has_targetid());
+   ASSERT_TRUE(placemark->has_name());
+diff --git a/tests/kml/dom/region_test.cc b/tests/kml/dom/region_test.cc
+index e58c99e..5901aae 100644
+--- a/tests/kml/dom/region_test.cc
++++ b/tests/kml/dom/region_test.cc
+@@ -127,10 +127,10 @@ TEST_F(LatLonAltBoxTest, TestParseAltitudeMode) {
+     "</LatLonAltBox>";
+   string errors;
+   ElementPtr root = Parse(kLatLonAltBoxAbsolute, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LatLonAltBoxPtr llab_absolute = AsLatLonAltBox(root);
+-  ASSERT_TRUE(llab_absolute);
++  ASSERT_TRUE(llab_absolute != 0);
+ 
+   // Verify the proper values in the object model:
+   ASSERT_TRUE(llab_absolute->has_north());
+@@ -154,10 +154,10 @@ TEST_F(LatLonAltBoxTest, TestParseAltitudeMode) {
+     "<altitudeMode>clampToGround</altitudeMode>"
+     "</LatLonAltBox>";
+   root = Parse(kLatLonAltBoxClampToGround, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LatLonAltBoxPtr llab_clamptoground = AsLatLonAltBox(root);
+-  ASSERT_TRUE(llab_clamptoground);
++  ASSERT_TRUE(llab_clamptoground != 0);
+   ASSERT_FALSE(llab_clamptoground->has_north());
+   ASSERT_FALSE(llab_clamptoground->has_south());
+   ASSERT_FALSE(llab_clamptoground->has_east());
+@@ -174,10 +174,10 @@ TEST_F(LatLonAltBoxTest, TestParseAltitudeMode) {
+     "<altitudeMode>relativeToGround</altitudeMode>"
+     "</LatLonAltBox>";
+   root = Parse(kLatLonAltBoxRelativeToGround, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LatLonAltBoxPtr llab_relativetoground = AsLatLonAltBox(root);
+-  ASSERT_TRUE(llab_relativetoground);
++  ASSERT_TRUE(llab_relativetoground != 0);
+   ASSERT_TRUE(llab_relativetoground->has_altitudemode());
+   ASSERT_FALSE(llab_relativetoground->has_gx_altitudemode());
+   ASSERT_EQ(static_cast<int>(ALTITUDEMODE_RELATIVETOGROUND),
+@@ -188,10 +188,10 @@ TEST_F(LatLonAltBoxTest, TestParseAltitudeMode) {
+     "<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>"
+     "</LatLonAltBox>";
+   root = Parse(kLatLonAltBoxRelativeToSeaFloor, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const LatLonAltBoxPtr llab_relativetoseafloor = AsLatLonAltBox(root);
+-  ASSERT_TRUE(llab_relativetoseafloor);
++  ASSERT_TRUE(llab_relativetoseafloor != 0);
+   ASSERT_FALSE(llab_relativetoseafloor->has_north());
+   ASSERT_FALSE(llab_relativetoseafloor->has_south());
+   ASSERT_FALSE(llab_relativetoseafloor->has_east());
+@@ -313,10 +313,10 @@ TEST_F(RegionTest, TestParse) {
+     "</Region>";
+   string errors;
+   ElementPtr root = Parse(kRegion, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const RegionPtr region = AsRegion(root);
+-  ASSERT_TRUE(region);
++  ASSERT_TRUE(region != 0);
+   ASSERT_EQ(string("region123"), region->get_id());
+   ASSERT_TRUE(region->has_latlonaltbox());
+   ASSERT_DOUBLE_EQ(101.101, region->get_latlonaltbox()->get_minaltitude());
+diff --git a/tests/kml/dom/serializer_test.cc b/tests/kml/dom/serializer_test.cc
+index 133af21..08be450 100644
+--- a/tests/kml/dom/serializer_test.cc
++++ b/tests/kml/dom/serializer_test.cc
+@@ -144,7 +144,7 @@ class ColorSerializer : public Serializer {
+ 
+ // This exists because Serialize is public only on Element.
+ static void CallSerializer(const ElementPtr& element, Serializer* serializer) {
+-  ASSERT_TRUE(element);  // This is basically an internal check.
++  ASSERT_TRUE(element != 0);  // This is basically an internal check.
+   ASSERT_TRUE(serializer);  // This is basically an internal check.
+   element->Serialize(*serializer);
+ }
+diff --git a/tests/kml/dom/snippet_test.cc b/tests/kml/dom/snippet_test.cc
+index 62f1d85..fb0a376 100644
+--- a/tests/kml/dom/snippet_test.cc
++++ b/tests/kml/dom/snippet_test.cc
+@@ -92,9 +92,9 @@ TEST_F(SnippetTest, TestBasicParse) {
+   const string kPlacemark = "<Placemark>" + kSnippet + "</Placemark>";
+   string errors;
+   ElementPtr root = Parse(kPlacemark, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   const PlacemarkPtr placemark = AsPlacemark(root);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(placemark->has_snippet());
+   ASSERT_FALSE(placemark->get_snippet()->has_maxlines());
+   ASSERT_EQ(2, placemark->get_snippet()->get_maxlines());  // The default.
+@@ -115,12 +115,12 @@ TEST_F(SnippetTest, TestParseMaxLines) {
+   const string kFolder = "<Folder>" + kSnippet + "</Folder>";
+   string errors;
+   ElementPtr root = Parse(kFolder, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const FolderPtr folder = AsFolder(root);
+   ASSERT_TRUE(folder->has_snippet());
+   const SnippetPtr snippet = folder->get_snippet();
+-  ASSERT_TRUE(snippet);
++  ASSERT_TRUE(snippet != 0);
+   ASSERT_TRUE(snippet->has_maxlines());
+   ASSERT_EQ(5, snippet->get_maxlines());
+ }
+@@ -195,7 +195,7 @@ TEST_F(LinkSnippetTest, TestBasicParse) {
+     kLinkSnippet + "</NetworkLinkControl>";
+   string errors;
+   ElementPtr root = Parse(kNetworkLinkControl, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   const NetworkLinkControlPtr networklinkcontrol = AsNetworkLinkControl(root);
+   ASSERT_TRUE(networklinkcontrol->has_linksnippet());
+   const LinkSnippetPtr linksnippet = networklinkcontrol->get_linksnippet();
+@@ -217,12 +217,12 @@ TEST_F(LinkSnippetTest, TestParseMaxLines) {
+     kLinkSnippet + "</NetworkLinkControl>";
+   string errors;
+   ElementPtr root = Parse(kNetworkLinkControl, &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const NetworkLinkControlPtr networklinkcontrol = AsNetworkLinkControl(root);
+   ASSERT_TRUE(networklinkcontrol->has_linksnippet());
+   const LinkSnippetPtr linksnippet = networklinkcontrol->get_linksnippet();
+-  ASSERT_TRUE(linksnippet);
++  ASSERT_TRUE(linksnippet != 0);
+   ASSERT_TRUE(linksnippet->has_maxlines());
+   ASSERT_EQ(7, linksnippet->get_maxlines());
+ }
+diff --git a/tests/kml/dom/unknown_test.cc b/tests/kml/dom/unknown_test.cc
+index 3c42f52..20c9e8d 100644
+--- a/tests/kml/dom/unknown_test.cc
++++ b/tests/kml/dom/unknown_test.cc
+@@ -59,7 +59,7 @@ TEST(UnknownTest, TestUnknownElement) {
+     "</Placemark>",
+     &errors);
+   // This is XML valid and hence parses fine.
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   // The root element is a Placemark.
+   const PlacemarkPtr placemark = AsPlacemark(root);
+@@ -90,7 +90,7 @@ TEST(UnknownTest, TestMisplaced) {
+       "<name>placemark</name>"
+     "</Placemark>",
+     &errors);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   const PlacemarkPtr placemark = AsPlacemark(root);
+   ASSERT_EQ(string("placemark"), placemark->get_name());
+@@ -114,7 +114,7 @@ TEST(UnknownTest, TestUnknownAttribute) {
+     "</GroundOverlay>",
+     &errors);
+   // This is XML valid so it parses fine.
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_TRUE(errors.empty());
+   // The root is a GroundOverlay.
+   const GroundOverlayPtr groundoverlay = AsGroundOverlay(root);
+@@ -155,7 +155,7 @@ TEST(UnknownTest, TestSaveUnknown) {
+                          kUnknownSimple + "<kml/>" +
+                          kUnknownComplex + "<kml/>" +
+                          "</" + kTagName + ">");
+-      ASSERT_TRUE(element) << kTagName;
++      ASSERT_TRUE(element != 0) << kTagName;
+       ASSERT_EQ(static_cast<size_t>(2),
+                 element->get_unknown_elements_array_size());
+       ASSERT_EQ(kUnknownSimple, element->get_unknown_elements_array_at(0));
+diff --git a/tests/kml/dom/xal_test.cc b/tests/kml/dom/xal_test.cc
+index c825603..09b3f48 100644
+--- a/tests/kml/dom/xal_test.cc
++++ b/tests/kml/dom/xal_test.cc
+@@ -93,42 +93,42 @@ TEST_F(XalAddressDetailsTest, TestParseDom) {
+       File::JoinPaths(DATADIR, File::JoinPaths("xal", "gaddr.kml")));
+   ASSERT_TRUE(File::ReadFileToString(kXalGaddr, &gaddr_content));
+   ElementPtr root = kmldom::Parse(gaddr_content, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_TRUE(kml->has_feature());
+   DocumentPtr document = AsDocument(kml->get_feature());
+   ASSERT_EQ(static_cast<size_t>(1), document->get_feature_array_size());
+   PlacemarkPtr placemark = AsPlacemark(document->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   XalAddressDetailsPtr xaladdressdetails =
+     AsXalAddressDetails(placemark->get_xaladdressdetails());
+-  ASSERT_TRUE(xaladdressdetails);
++  ASSERT_TRUE(xaladdressdetails != 0);
+   ASSERT_TRUE(xaladdressdetails->has_country());
+   XalCountryPtr country = xaladdressdetails->get_country();
+   ASSERT_TRUE(country->has_countrynamecode());
+   ASSERT_EQ(string("US"), country->get_countrynamecode());
+   XalAdministrativeAreaPtr administrativearea =
+       country->get_administrativearea();
+-  ASSERT_TRUE(administrativearea);
++  ASSERT_TRUE(administrativearea != 0);
+   ASSERT_EQ(string("CA"),
+       administrativearea->get_administrativeareaname());
+   XalSubAdministrativeAreaPtr subadministrativearea =
+       administrativearea->get_subadministrativearea();
+-  ASSERT_TRUE(subadministrativearea);
++  ASSERT_TRUE(subadministrativearea != 0);
+   ASSERT_EQ(string("Santa Clara"),
+             subadministrativearea->get_subadministrativeareaname());
+   XalLocalityPtr locality = subadministrativearea->get_locality();
+-  ASSERT_TRUE(locality);
++  ASSERT_TRUE(locality != 0);
+   ASSERT_EQ(string("Mountain View"), locality->get_localityname());
+   XalThoroughfarePtr thoroughfare = locality->get_thoroughfare();
+-  ASSERT_TRUE(thoroughfare);
++  ASSERT_TRUE(thoroughfare != 0);
+   ASSERT_EQ(string("Amphitheatre Pkwy"),
+             thoroughfare->get_thoroughfarename());
+   ASSERT_EQ(string("1600"),
+             thoroughfare->get_thoroughfarenumber());
+   XalPostalCodePtr postalcode = locality->get_postalcode();
+-  ASSERT_TRUE(postalcode);
++  ASSERT_TRUE(postalcode != 0);
+   ASSERT_EQ(string("94043"), postalcode->get_postalcodenumber());
+ }
+ 
+diff --git a/tests/kml/dom/xml_serializer_test.cc b/tests/kml/dom/xml_serializer_test.cc
+index 5aa4e1c..c3d6946 100644
+--- a/tests/kml/dom/xml_serializer_test.cc
++++ b/tests/kml/dom/xml_serializer_test.cc
+@@ -264,7 +264,7 @@ TEST_F(XmlSerializerTest, SerializeRawCoordinates) {
+       "    <coordinates>1.2,3.4,5.6 9.8,7.6</coordinates>"
+       "  </LineString>"
+       "</Placemark>"));
+-  ASSERT_TRUE(placemark_);
++  ASSERT_TRUE(placemark_ != 0);
+   const string want(
+       "<Placemark>"
+       "<LineString>"
+diff --git a/tests/kml/engine/clone_test.cc b/tests/kml/engine/clone_test.cc
+index 18b105a..fcd4cca 100644
+--- a/tests/kml/engine/clone_test.cc
++++ b/tests/kml/engine/clone_test.cc
+@@ -174,7 +174,7 @@ TEST_F(CloneTest, TestClonePointCoordinates) {
+ 
+   // Verify that a new <coordinates> was created and has the expected content.
+   CoordinatesPtr coordinates_clone = AsCoordinates(clone);
+-  ASSERT_TRUE(coordinates_clone);
++  ASSERT_TRUE(coordinates_clone != 0);
+   ASSERT_EQ(static_cast<size_t>(1),
+             coordinates_clone->get_coordinates_array_size());
+   Vec3 vec3 = coordinates_clone->get_coordinates_array_at(0);
+@@ -199,7 +199,7 @@ TEST_F(CloneTest, TestCloneLineCoordinates) {
+ 
+   // Verify all the points came over okay.
+   CoordinatesPtr cloned_coordinates = AsCoordinates(element);
+-  ASSERT_TRUE(cloned_coordinates);
++  ASSERT_TRUE(cloned_coordinates != 0);
+   ASSERT_EQ(static_cast<size_t>(kNumPoints),
+                        cloned_coordinates->get_coordinates_array_size());
+   for (i = 0; i < kNumPoints; ++i) {
+@@ -215,7 +215,7 @@ TEST_F(CloneTest, TestCloneSnippet) {
+   // Clone an empty/default Snippet.
+   ElementPtr element = Clone(snippet_);
+   SnippetPtr cloned_snippet = AsSnippet(element);
+-  ASSERT_TRUE(cloned_snippet);
++  ASSERT_TRUE(cloned_snippet != 0);
+   ASSERT_EQ(snippet_->get_maxlines(),
+                        cloned_snippet->get_maxlines());
+   ASSERT_EQ(snippet_->get_text(), cloned_snippet->get_text());
+@@ -237,7 +237,7 @@ TEST_F(CloneTest, TestCloneIconStyle) {
+   ASSERT_EQ(kmldom::Type_IconStyleIcon, iconstyle->get_icon()->Type());
+ 
+   IconStylePtr clone = AsIconStyle(Clone(iconstyle));
+-  ASSERT_TRUE(clone);
++  ASSERT_TRUE(clone != 0);
+   ASSERT_EQ(kmldom::Type_IconStyle, clone->Type());
+   ASSERT_TRUE(clone->has_icon());
+   ASSERT_TRUE(clone->get_icon()->has_href());
+@@ -248,11 +248,11 @@ TEST_F(CloneTest, TestCloneIconStyle) {
+ TEST_F(CloneTest, TestCloneWithMisplacedChild) {
+   kmldom::IconPtr icon =
+     kmldom::AsIcon(kmldom::Parse("<Icon><x>64</x></Icon>", NULL));
+-  ASSERT_TRUE(icon);
++  ASSERT_TRUE(icon != 0);
+   ASSERT_EQ(static_cast<size_t>(1), icon->get_misplaced_elements_array_size());
+   ASSERT_EQ(static_cast<size_t>(0), icon->get_unknown_elements_array_size());
+   kmldom::IconPtr clone = kmldom::AsIcon(Clone(icon));
+-  ASSERT_TRUE(clone);
++  ASSERT_TRUE(clone != 0);
+   ASSERT_EQ(static_cast<size_t>(1), clone->get_misplaced_elements_array_size());
+   ASSERT_EQ(static_cast<size_t>(0), clone->get_unknown_elements_array_size());
+   ASSERT_FALSE(kmldom::SerializePretty(clone).empty());
+@@ -263,11 +263,11 @@ TEST_F(CloneTest, TestCloneWithFullyUnknownChild) {
+   // manifested in cloning any element with a fully unknown child.
+   kmldom::IconPtr icon =
+       kmldom::AsIcon(kmldom::Parse("<Icon><w>64</w></Icon>", NULL));
+-  ASSERT_TRUE(icon);
++  ASSERT_TRUE(icon != 0);
+   ASSERT_EQ(static_cast<size_t>(0), icon->get_misplaced_elements_array_size());
+   ASSERT_EQ(static_cast<size_t>(1), icon->get_unknown_elements_array_size());
+   kmldom::IconPtr clone = kmldom::AsIcon(Clone(icon));
+-  ASSERT_TRUE(clone);
++  ASSERT_TRUE(clone != 0);
+   ASSERT_EQ(static_cast<size_t>(0), clone->get_misplaced_elements_array_size());
+   ASSERT_EQ(static_cast<size_t>(1), clone->get_unknown_elements_array_size());
+   ASSERT_FALSE(kmldom::SerializePretty(clone).empty());
+diff --git a/tests/kml/engine/entity_mapper_test.cc b/tests/kml/engine/entity_mapper_test.cc
+index 42a76c4..37a6ede 100644
+--- a/tests/kml/engine/entity_mapper_test.cc
++++ b/tests/kml/engine/entity_mapper_test.cc
+@@ -114,7 +114,7 @@ const static struct {
+ TEST_F(EntityMapperTest, TestGetEntityFields) {
+   string errs;
+   kml_file_ = KmlFile::CreateFromParse(kEntityKml, NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ASSERT_TRUE(errs.empty());
+ 
+   DocumentPtr doc = kmldom::AsDocument(kml_file_->get_root());
+@@ -233,9 +233,9 @@ TEST_F(EntityMapperTest, TestAltMarkupData) {
+   };
+ 
+   kml_file_ = KmlFile::CreateFromParse(kDataKml, NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   PlacemarkPtr p = kmldom::AsPlacemark(kml_file_->get_root());
+-  ASSERT_TRUE(p);
++  ASSERT_TRUE(p != 0);
+   kmlbase::StringMap entity_map;
+   kmlbase::StringPairVector alt_markup_map;
+   EntityMapper entity_mapper(kml_file_, &entity_map, &alt_markup_map);
+@@ -278,11 +278,11 @@ TEST_F(EntityMapperTest, TestAltMarkupSchemaData) {
+   kml_file_ = KmlFile::CreateFromParse(data, &errors);
+   ASSERT_FALSE(data.empty());
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   KmlPtr kml = kmldom::AsKml(kml_file_->get_root());
+   DocumentPtr doc = kmldom::AsDocument(kml->get_feature());
+   PlacemarkPtr p = kmldom::AsPlacemark(doc->get_feature_array_at(0));
+-  ASSERT_TRUE(p);
++  ASSERT_TRUE(p != 0);
+   kmlbase::StringMap entity_map;
+   kmlbase::StringPairVector alt_markup_map;
+   EntityMapper entity_mapper(kml_file_, &entity_map, &alt_markup_map);
+diff --git a/tests/kml/engine/feature_balloon_test.cc b/tests/kml/engine/feature_balloon_test.cc
+index 1e1e5fd..6e5c374 100644
+--- a/tests/kml/engine/feature_balloon_test.cc
++++ b/tests/kml/engine/feature_balloon_test.cc
+@@ -251,7 +251,7 @@ TEST_F(FeatureBalloonTest, TestAllBalloonsFile) {
+   kml_file_ = KmlFile::CreateFromParse(data, &errors);
+   ASSERT_FALSE(data.empty());
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   for (size_t i = 0; i < sizeof(kFeatures)/sizeof(kFeatures[0]); ++i) {
+     // Extract the Placemark.
+     const FeaturePtr feature=
+diff --git a/tests/kml/engine/feature_view_test.cc b/tests/kml/engine/feature_view_test.cc
+index 0ec4f1e..ce572bb 100644
+--- a/tests/kml/engine/feature_view_test.cc
++++ b/tests/kml/engine/feature_view_test.cc
+@@ -66,9 +66,9 @@ TEST(FeatureViewTest, TestComputeFeatureLookAt) {
+   point->set_coordinates(coordinates);
+   point_placemark->set_geometry(point);
+ 
+-  ASSERT_TRUE(point_placemark);
++  ASSERT_TRUE(point_placemark != 0);
+   const LookAtPtr point_lookat = ComputeFeatureLookAt(point_placemark);
+-  ASSERT_TRUE(point_lookat);
++  ASSERT_TRUE(point_lookat != 0);
+   ASSERT_DOUBLE_EQ(-122.0, point_lookat->get_longitude());
+   ASSERT_DOUBLE_EQ(37.0, point_lookat->get_latitude());
+   ASSERT_DOUBLE_EQ(0.0, point_lookat->get_altitude());
+@@ -89,7 +89,7 @@ TEST(FeatureViewTest, TestComputeFeatureLookAt) {
+   line_placemark->set_geometry(linestring);
+ 
+   const LookAtPtr line_lookat = ComputeFeatureLookAt(line_placemark);
+-  ASSERT_TRUE(line_lookat);
++  ASSERT_TRUE(line_lookat != 0);
+   // We're looking at the center point of the line.
+   ASSERT_DOUBLE_EQ(-121.5, line_lookat->get_longitude());
+   ASSERT_DOUBLE_EQ(37.5, line_lookat->get_latitude());
+@@ -116,7 +116,7 @@ TEST(FeatureViewTest, TestComputeFeatureLookAtFolder) {
+   folder->add_feature(placemark);
+   // Now an abstract view can be determined for the folder.
+   LookAtPtr lookat = ComputeFeatureLookAt(folder);
+-  ASSERT_TRUE(lookat);
++  ASSERT_TRUE(lookat != 0);
+   ASSERT_DOUBLE_EQ(0.0, lookat->get_latitude());
+   ASSERT_DOUBLE_EQ(0.0, lookat->get_longitude());
+   // The range was clamped to 1000 meters.
+@@ -140,7 +140,7 @@ TEST(FeatureViewTest, TestComputeFeatureLookAtFolder) {
+ TEST(FeatureViewTest, TestComputeBboxLookAt) {
+   Bbox bbox(36.59062, 34.98788, -82.00043, -90.06512);
+   kmldom::LookAtPtr lookat = ComputeBboxLookAt(bbox);
+-  ASSERT_TRUE(lookat);
++  ASSERT_TRUE(lookat != 0);
+   // These fields are expected to be set to these values.
+   ASSERT_DOUBLE_EQ(-86.032775, lookat->get_longitude());
+   ASSERT_DOUBLE_EQ(35.78925, lookat->get_latitude());
+diff --git a/tests/kml/engine/find_test.cc b/tests/kml/engine/find_test.cc
+index 316ee86..8c28224 100644
+--- a/tests/kml/engine/find_test.cc
++++ b/tests/kml/engine/find_test.cc
+@@ -96,7 +96,7 @@ TEST_F(ElementFinderTest, TestBasicGetElementsById) {
+   // Verify we got just what we asked for and in depth-first order.
+   ASSERT_EQ(static_cast<size_t>(3), placemarks.size());
+   ASSERT_EQ(kId0, AsPlacemark(placemarks[0])->get_id());
+-  ASSERT_TRUE(AsPlacemark(placemarks[1]));
++  ASSERT_TRUE(AsPlacemark(placemarks[1]) != 0);
+   ASSERT_EQ(kId1, AsPlacemark(placemarks[2])->get_id());
+ 
+   // Ask for all the Points.
+@@ -107,7 +107,7 @@ TEST_F(ElementFinderTest, TestBasicGetElementsById) {
+   ASSERT_EQ(static_cast<size_t>(2), points.size());
+   PointPtr point = AsPoint(points[0]);
+   ASSERT_TRUE(point->has_coordinates());
+-  ASSERT_TRUE(AsPoint(points[1]));
++  ASSERT_TRUE(AsPoint(points[1]) != 0);
+ 
+   // Verify that no elements are found if there are none
+   // of this type in the element hierarchy.
+diff --git a/tests/kml/engine/id_mapper_test.cc b/tests/kml/engine/id_mapper_test.cc
+index 97df852..b6f6fbb 100644
+--- a/tests/kml/engine/id_mapper_test.cc
++++ b/tests/kml/engine/id_mapper_test.cc
+@@ -213,7 +213,7 @@ TEST_F(IdMapperTest, TestClearIds) {
+   folder0_->set_name(kFolderName);
+   folder0_->add_feature(placemark0_);
+   FolderPtr folder = AsFolder(ClearIds(folder0_));
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_TRUE(folder->has_name());
+   ASSERT_EQ(kFolderName, folder->get_name());
+   ASSERT_EQ(static_cast<size_t>(1), folder->get_feature_array_size());
+@@ -359,7 +359,7 @@ TEST_F(IdMapperTest, TestUnknownElements) {
+     "</IconStyle>"
+     "</Style>");
+   ElementPtr root = kmldom::Parse(kKml, NULL);
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   MapIds(root, &object_id_map_, NULL);
+   ASSERT_EQ(static_cast<size_t>(2), object_id_map_.size());
+ 
+@@ -367,13 +367,13 @@ TEST_F(IdMapperTest, TestUnknownElements) {
+   ASSERT_FALSE(find == object_id_map_.end());
+   kmldom::IconStylePtr iconstyle =
+       kmldom::AsIconStyle(object_id_map_[kIconStyleId]);
+-  ASSERT_TRUE(iconstyle);
++  ASSERT_TRUE(iconstyle != 0);
+   ASSERT_EQ(kIconStyleId, iconstyle->get_id());
+ 
+   find = object_id_map_.find(kStyleId);
+   ASSERT_FALSE(find == object_id_map_.end());
+   kmldom::StylePtr style = kmldom::AsStyle(object_id_map_[kStyleId]);
+-  ASSERT_TRUE(iconstyle);
++  ASSERT_TRUE(iconstyle != 0);
+   ASSERT_EQ(kStyleId, style->get_id());
+ }
+ 
+diff --git a/tests/kml/engine/kml_cache_test.cc b/tests/kml/engine/kml_cache_test.cc
+index a8846ce..3d4e36e 100644
+--- a/tests/kml/engine/kml_cache_test.cc
++++ b/tests/kml/engine/kml_cache_test.cc
+@@ -85,12 +85,12 @@ TEST_F(KmlCacheTest, TestBasicFetchKml) {
+   KmlFilePtr kml_file = kml_cache_->FetchKmlRelative(kBaseUrl, kTargetHref);
+   // Verify that this file fetches, parses, has the right url, has a Placemark
+   // with the given id and is at the given lat,lon.
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   ASSERT_EQ(kTargetUrl, kml_file->get_url());
+      
+   kmldom::PlacemarkPtr placemark =
+       AsPlacemark(kml_file->GetObjectById("SZXX0026"));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   double lat, lon;
+   ASSERT_TRUE(kmlengine::GetFeatureLatLon(placemark, &lat, &lon));
+   ASSERT_EQ(46.9, lat);
+@@ -103,9 +103,9 @@ TEST_F(KmlCacheTest, TestBasicFetchKml) {
+   kml_file = NULL;  // Releases our reference to this KmlFile.
+   placemark = NULL;  // Releases our reference to this Placemark
+   kml_file = kml_cache_->FetchKmlRelative(kBaseUrl, kTargetHref);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   placemark = AsPlacemark(kml_file->GetObjectById("SZXX0026"));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+ 
+   // The immediately preceding should not have caused a fetch.
+   //ASSERT_EQ(1, testdata_net_fetcher_.get_fetch_count());
+@@ -223,7 +223,7 @@ TEST_F(KmlCacheTest, TestFetchDataRelativeTestCases) {
+                                                 kTestCases[i].target_href,
+                                                 &data);
+     if (kTestCases[i].bytes) {
+-      ASSERT_TRUE(status);
++      ASSERT_TRUE(status != 0);
+       ASSERT_EQ(kTestCases[i].bytes, data.size());
+     } else {
+       ASSERT_FALSE(status);
+diff --git a/tests/kml/engine/kml_file_test.cc b/tests/kml/engine/kml_file_test.cc
+index fc56658..2d85d54 100644
+--- a/tests/kml/engine/kml_file_test.cc
++++ b/tests/kml/engine/kml_file_test.cc
+@@ -66,7 +66,7 @@ class KmlFileTest : public testing::Test {
+ // Verify the encoding appears properly in the xml header.
+ TEST_F(KmlFileTest, TestEncoding) {
+   kml_file_ = KmlFile::CreateFromParse("<kml/>", NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ASSERT_EQ(string("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"),
+             kml_file_->CreateXmlHeader());
+ 
+@@ -81,11 +81,11 @@ TEST_F(KmlFileTest, TestEncoding) {
+ // Verify basic usage of the ParseFromString() method.
+ TEST_F(KmlFileTest, TestBasicParseFromString) {
+   kml_file_ = KmlFile::CreateFromParse("<kml/>", NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ElementPtr root = kml_file_->get_root();
+   // Verify old API exists and functions.
+   ASSERT_EQ(root, kml_file_->root());
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(kmldom::Type_kml, root->Type());
+ 
+   string errors;
+@@ -97,7 +97,7 @@ TEST_F(KmlFileTest, TestBasicParseFromString) {
+ TEST_F(KmlFileTest, TestRoot) {
+   kml_file_ = KmlFile::CreateFromParse("<kml/>", NULL);
+   ElementPtr root = kml_file_->get_root();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   ASSERT_EQ(kmldom::Type_kml, root->Type());
+ 
+   // Verify that any complex element can be used as root.
+@@ -113,7 +113,7 @@ TEST_F(KmlFileTest, TestBasicObjectIdParse) {
+     "<Placemark id=\"placemark\"/>"
+     "</Folder>",
+     NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ObjectPtr f = kml_file_->GetObjectById("folder");
+   ASSERT_EQ(kmldom::Type_Folder, f->Type());
+   ObjectPtr p = kml_file_->GetObjectById("placemark");
+@@ -129,9 +129,9 @@ TEST_F(KmlFileTest, TestObjectIdDupePassing) {
+     "</Folder>",
+     &errors);
+   // By default the duplicate ids do not cause the parse to fail.
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   // Verify an element of the duplicate id exists.
+-  ASSERT_TRUE(kml_file_->GetObjectById(kDupeId));
++  ASSERT_TRUE(kml_file_->GetObjectById(kDupeId) != 0);
+ }
+ 
+ // TODO: how/if to bring back strict mode for import from xml
+@@ -172,19 +172,19 @@ TEST_F(KmlFileTest, TestBasicGetSharedStyleById) {
+         "<Style id=\"" + kFolderStyleId + "\"/>"
+       "</Folder>"
+     "</Document>", NULL);
+-  ASSERT_TRUE(kml_file_);  // Verify the parse succeeded.
++  ASSERT_TRUE(kml_file_ != 0);  // Verify the parse succeeded.
+ 
+   // Verify both shared style selectors were found.
+   StyleSelectorPtr style = kml_file_->GetSharedStyleById(kStyleId);
+-  ASSERT_TRUE(AsStyle(style));  // Verify it's a <Style>
++  ASSERT_TRUE(AsStyle(style) != 0);  // Verify it's a <Style>
+   ASSERT_EQ(kStyleId, style->get_id());
+   StyleSelectorPtr stylemap = kml_file_->GetSharedStyleById(kStyleMapId);
+-  ASSERT_TRUE(AsStyleMap(stylemap));  // Verify it's a <StyleMap>
++  ASSERT_TRUE(AsStyleMap(stylemap) != 0);  // Verify it's a <StyleMap>
+   ASSERT_EQ(kStyleMapId, stylemap->get_id());
+ 
+   // Verify that the local style is found as an Object...
+   ObjectPtr object = kml_file_->GetObjectById(kFolderStyleId);
+-  ASSERT_TRUE(AsStyle(object));  // Verify it's a <Style>
++  ASSERT_TRUE(AsStyle(object) != 0);  // Verify it's a <Style>
+   ASSERT_EQ(kFolderStyleId, object->get_id());
+   // ...but is not found as a shared style.
+   ASSERT_FALSE(kml_file_->GetSharedStyleById(kFolderStyleId));
+@@ -194,8 +194,8 @@ TEST_F(KmlFileTest, TestBasicGetSharedStyleById) {
+ // is a Placemark with the given name.
+ void KmlFileTest::VerifyIsPlacemarkWithName(const ElementPtr& root,
+                                             const string& name) {
+-  ASSERT_TRUE(root);
+-  ASSERT_TRUE(AsPlacemark(root));
++  ASSERT_TRUE(root != 0);
++  ASSERT_TRUE(AsPlacemark(root) != 0);
+   ASSERT_EQ(name, AsPlacemark(root)->get_name());
+ }
+ 
+@@ -225,7 +225,7 @@ void KmlFileTest::KmlToKmz(const string& kml_data,
+   const char* tempname = tempfile->name().c_str();
+   ASSERT_TRUE(KmzFile::WriteKmz(tempname, kml_data));
+   KmzFilePtr kmz_file = KmzFile::OpenFromFile(tempname);
+-  ASSERT_TRUE(kmz_file);
++  ASSERT_TRUE(kmz_file != 0);
+   ASSERT_TRUE(kmz_file->ReadKml(kmz_data));
+ }
+ 
+@@ -251,7 +251,7 @@ TEST_F(KmlFileTest, TestGetLinkParents) {
+   string errors;
+   kml_file_ = KmlFile::CreateFromParse(kml, &errors);
+   ASSERT_TRUE(errors.empty());
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   const ElementVector& link_parents = kml_file_->get_link_parent_vector();
+   // This is obviously exactly matched to the content of alllinks.kml.
+   ASSERT_EQ(static_cast<size_t>(7), link_parents.size());
+@@ -272,7 +272,7 @@ TEST_F(KmlFileTest, TestGetLinkParents) {
+ // Verify const behavior.
+ TEST_F(KmlFileTest, TestConstNull) {
+   const KmlFilePtr kml_file = KmlFile::CreateFromParse("<kml/>", NULL);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   ASSERT_FALSE(kml_file->GetObjectById("blah"));
+   ASSERT_FALSE(kml_file->GetSharedStyleById("blah"));
+ }
+@@ -283,7 +283,7 @@ TEST_F(KmlFileTest, TestBasicCreateFromString) {
+   const string kPlacemark("<Placemark><name>" + kName +
+                                "</name></Placemark>");
+   kml_file_ = KmlFile::CreateFromString(kPlacemark);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+ }
+ 
+ // Verify basic usage of the CreateFromStringWithUrl() static method.
+@@ -294,11 +294,11 @@ TEST_F(KmlFileTest, TestBasicCreateFromStringWithUrl) {
+   const string kUrl("http://foo.com/goo/baz.kml");
+   // There's no requirement a NetCache need exist.
+   kml_file_ = KmlFile::CreateFromStringWithUrl(kPlacemark, kUrl, NULL);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ASSERT_EQ(kUrl, kml_file_->get_url());
+   PlacemarkPtr placemark = AsPlacemark(kml_file_->get_root());
+   ASSERT_EQ(placemark, AsPlacemark(kml_file_->root()));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kName, placemark->get_name());
+   ASSERT_FALSE(kml_file_->get_kml_cache());
+ }
+@@ -346,11 +346,11 @@ TEST_F(KmlFileTest, TestCreateFromImport) {
+   KmlPtr kml = KmlFactory::GetFactory()->CreateKml();
+   kml->set_feature(placemark);
+   KmlFilePtr kml_file = KmlFile::CreateFromImport(kml);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   ElementPtr root = kml_file->get_root();
+   ASSERT_EQ(root, kml_file->root());
+-  ASSERT_TRUE(root);
+-  ASSERT_TRUE(kmldom::AsKml(root));
++  ASSERT_TRUE(root != 0);
++  ASSERT_TRUE(kmldom::AsKml(root) != 0);
+   ASSERT_EQ(kName, kmldom::AsKml(root)->get_feature()->get_name());
+ }
+ 
+@@ -365,7 +365,7 @@ TEST_F(KmlFileTest, TestCreateFromImportFailsOnDupeIds) {
+ TEST_F(KmlFileTest, TestCreateFromImportSerialize) {
+   KmlPtr kml = KmlFactory::GetFactory()->CreateKml();
+   kml_file_ = KmlFile::CreateFromImport(kml);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   string xml;
+   ASSERT_TRUE(kml_file_->SerializeToString(&xml));
+   ASSERT_EQ(string(
+@@ -382,11 +382,11 @@ TEST_F(KmlFileTest, TestCreateFromImportAndGetById) {
+   string kml;
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(kAllStyles, &kml));
+   ElementPtr element = kmldom::Parse(kml, NULL);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+ 
+   // Import this dom into a KmlFile.
+   kml_file_ = KmlFile::CreateFromImport(element);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   ASSERT_EQ(kmldom::Type_Style,
+             kml_file_->GetSharedStyleById("allstyles")->Type());
+   ASSERT_EQ(kmldom::Type_ListStyle,
+@@ -415,18 +415,18 @@ TEST_F(KmlFileTest, TestCreateFromImportLax) {
+   ASSERT_FALSE(KmlFile::CreateFromImport(folder));
+   // CreateFromImportLax() permits duplicate ids...
+   KmlFilePtr kml_file = KmlFile::CreateFromImportLax(folder);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   // ...and the id mapping hits the last object with that id...
+   placemark = AsPlacemark(kml_file->GetObjectById(kId));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kLastName, placemark->get_name());
+   // ...and the first one is the first feature in the folder
+   folder = AsFolder(kml_file->get_root());
+   ASSERT_EQ(folder, AsFolder(kml_file->root()));
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_EQ(static_cast<size_t>(2), folder->get_feature_array_size());
+   placemark = AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kFirstName, placemark->get_name());
+   ASSERT_EQ(kId, placemark->get_id());
+ }
+@@ -434,7 +434,7 @@ TEST_F(KmlFileTest, TestCreateFromImportLax) {
+ TEST_F(KmlFileTest, TestForSerializeWithNamespaces) {
+   kml_file_ = KmlFile::CreateFromString(
+       "<Document><gx:Tour><atom:author/></gx:Tour></Document>");
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   string xml;
+   ASSERT_TRUE(kml_file_->SerializeToString(&xml));
+   const string kExpected =
+@@ -452,7 +452,7 @@ TEST_F(KmlFileTest, TestForSerializeWithNamespaces) {
+ TEST_F(KmlFileTest, TestBasicSerializeToOstream) {
+   kml_file_ = KmlFile::CreateFromString(
+       "<Document><gx:Tour><atom:author/></gx:Tour></Document>");
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   std::ostringstream oss;
+   ASSERT_TRUE(kml_file_->SerializeToOstream(&oss));
+   const string kExpected =
+diff --git a/tests/kml/engine/kml_stream_test.cc b/tests/kml/engine/kml_stream_test.cc
+index 9c86e49..695ac7c 100644
+--- a/tests/kml/engine/kml_stream_test.cc
++++ b/tests/kml/engine/kml_stream_test.cc
+@@ -61,13 +61,13 @@ TEST(KmlStreamTest, TestBasicParseFromIstream) {
+   ASSERT_TRUE(errors.empty());
+   ASSERT_TRUE(string_stream.eof());
+   ElementPtr root = kml_stream->get_root();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   PlacemarkPtr placemark = AsPlacemark(root);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(string("hello"), placemark->get_name());
+   ASSERT_TRUE(placemark->has_geometry());
+   PointPtr point = AsPoint(placemark->get_geometry());
+-  ASSERT_TRUE(point);
++  ASSERT_TRUE(point != 0);
+   ASSERT_TRUE(point->has_coordinates());
+   ASSERT_EQ(static_cast<size_t>(1),
+             point->get_coordinates()->get_coordinates_array_size());
+@@ -123,12 +123,12 @@ TEST(KmlStreamTest, TestBigParseFromIstream) {
+       kml_stream(KmlStream::ParseFromIstream(&test_istream, NULL, NULL));
+   ASSERT_TRUE(kml_stream.get());
+   ElementPtr root = kml_stream->get_root();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_TRUE(kml->has_feature());
+   FolderPtr folder = AsFolder(kml->get_feature());
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_EQ(kFeatureCount, folder->get_feature_array_size());
+ }
+ 
+@@ -142,12 +142,12 @@ TEST(KmlStreamTest, TestBigParseFromIstreamWithObserver) {
+       KmlStream::ParseFromIstream(&test_istream, NULL, &parser_observer));
+   ASSERT_TRUE(kml_stream.get());
+   ElementPtr root = kml_stream->get_root();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_TRUE(kml->has_feature());
+   FolderPtr folder = AsFolder(kml->get_feature());
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_EQ(kFeatureCount, folder->get_feature_array_size());
+ }
+ 
+@@ -176,9 +176,9 @@ TEST(KmlStreamTest, TestParseFromIstreamWithObserver) {
+       KmlStream::ParseFromIstream(&test_istream, NULL, &parser_observer));
+   ASSERT_TRUE(kml_stream.get());
+   ElementPtr root = kml_stream->get_root();
+-  ASSERT_TRUE(root);
++  ASSERT_TRUE(root != 0);
+   KmlPtr kml = AsKml(root);
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_FALSE(kml->has_feature());  // Folder is a (discarded) Feature.
+   ASSERT_EQ(kFeatureCount + 1, parser_observer.get_feature_count());
+ }
+diff --git a/tests/kml/engine/kmz_cache_test.cc b/tests/kml/engine/kmz_cache_test.cc
+index afc3c8c..abc8e00 100644
+--- a/tests/kml/engine/kmz_cache_test.cc
++++ b/tests/kml/engine/kmz_cache_test.cc
+@@ -114,7 +114,7 @@ TEST_F(KmzCacheTest, TestBasicSaveLookUpDelete) {
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   string want_kml_data;
+   KmzFilePtr kmz_file = KmzFile::OpenFromFile(kGoodKmz.c_str());
+-  ASSERT_TRUE(kmz_file);
++  ASSERT_TRUE(kmz_file != 0);
+   kmz_file->ReadKml(&want_kml_data);
+ 
+   // Save this KmzFile into the cache under a given URL.
+@@ -122,7 +122,7 @@ TEST_F(KmzCacheTest, TestBasicSaveLookUpDelete) {
+ 
+   // Lookup the KmzFile with that same URL.
+   KmzFilePtr lookup_kmz_file = kmz_cache_->LookUp(kUrl);
+-  ASSERT_TRUE(lookup_kmz_file);
++  ASSERT_TRUE(lookup_kmz_file != 0);
+ 
+   // Make sure the content of the KmzFile is as expected.
+   // This KMZ test file is known to have one KML file.
+@@ -158,7 +158,7 @@ TEST_F(KmzCacheTest, TestBasicFetchUrl) {
+   const string kKmzTestFile(string(DATADIR) +
+                                  kMockKmzNet[0].kmz_test_file);
+   KmzFilePtr kmz_file = KmzFile::OpenFromFile(kKmzTestFile.c_str());
+-  ASSERT_TRUE(kmz_file);
++  ASSERT_TRUE(kmz_file != 0);
+   ASSERT_TRUE(kmz_file->ReadKml(&want_kml_data));
+ 
+   ASSERT_EQ(want_kml_data, got_kml_data);
+@@ -199,7 +199,7 @@ TEST_F(KmzCacheTest, TestBasicFetchFromCache) {
+   const string kKmzTestFile(string(DATADIR) +
+                                  kMockKmzNet[0].kmz_test_file);
+   KmzFilePtr kmz_file = KmzFile::OpenFromFile(kKmzTestFile.c_str());
+-  ASSERT_TRUE(kmz_file);
++  ASSERT_TRUE(kmz_file != 0);
+   ASSERT_TRUE(kmz_file->ReadKml(&want_kml_data));
+ 
+   ASSERT_EQ(want_kml_data, got_kml_data);
+diff --git a/tests/kml/engine/kmz_file_test.cc b/tests/kml/engine/kmz_file_test.cc
+index b112cde..f11b25a 100644
+--- a/tests/kml/engine/kmz_file_test.cc
++++ b/tests/kml/engine/kmz_file_test.cc
+@@ -55,7 +55,7 @@ TEST_F(KmzTest, TestOpenFromFile) {
+   // doc.kmz contains a simple doc.kml and is a valid zip archive.
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   string kml_data;
+   // doc.kml can be read.
+   ASSERT_TRUE(kmz_file_->ReadKml(&kml_data));
+@@ -63,7 +63,7 @@ TEST_F(KmzTest, TestOpenFromFile) {
+   // nokml.kmz is a valid zip archive, but does not contain any KML files
+   const string kBadKmz = string(DATADIR) + "/kmz/nokml.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kBadKmz.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   kml_data.clear();
+   // There is no KML file to read.
+   ASSERT_FALSE(kmz_file_->ReadKml(&kml_data));
+@@ -91,7 +91,7 @@ TEST_F(KmzTest, TestOpenFromString) {
+   ASSERT_TRUE(File::ReadFileToString(kGoodKmz, &kmz_file_data));
+   ASSERT_FALSE(kmz_file_data.empty());
+   kmz_file_.reset(KmzFile::OpenFromString(kmz_file_data));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   string kml_data;
+   // doc.kml can be read.
+   ASSERT_TRUE(kmz_file_->ReadKml(&kml_data));
+@@ -102,7 +102,7 @@ TEST_F(KmzTest, TestOpenFromString) {
+   ASSERT_TRUE(File::ReadFileToString(kBadKmz, &kmz_file_data));
+   ASSERT_FALSE(kmz_file_data.empty());
+   kmz_file_.reset(KmzFile::OpenFromString(kmz_file_data));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   kml_data.clear();
+   // There is no KML file to read.
+   ASSERT_FALSE(kmz_file_->ReadKml(&kml_data));
+@@ -115,7 +115,7 @@ TEST_F(KmzTest, TestReadKml) {
+   // of doc.kml.
+   const string kDoc = string(DATADIR) + "/kmz/doc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kDoc.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   string kml_data;
+   ASSERT_TRUE(kmz_file_->ReadKml(&kml_data));
+   ASSERT_FALSE(kml_data.empty());
+@@ -123,7 +123,7 @@ TEST_F(KmzTest, TestReadKml) {
+   // nokml.kmz is a valid zip archive, but does not contain any KML files
+   const string kNokml = string(DATADIR) + "/kmz/nokml.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kNokml.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   kml_data.clear();
+   ASSERT_FALSE(kmz_file_->ReadKml(&kml_data));
+   ASSERT_TRUE(kml_data.empty());
+@@ -135,7 +135,7 @@ TEST_F(KmzTest, TestReadKml) {
+   // Assert that z/c.kml is read first.
+   const string kMulti1 = string(DATADIR) + "/kmz/multikml-nodoc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kMulti1.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   kml_data.clear();
+   ASSERT_TRUE(kmz_file_->ReadKml(&kml_data));
+   ASSERT_FALSE(kml_data.empty());
+@@ -182,7 +182,7 @@ TEST_F(KmzTest, TestReadFile) {
+   // nokml.kmz has a file called foo.txt in a folder called foo.
+   const string kNokml = string(DATADIR) + "/kmz/nokml.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kNokml.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   string file_data;
+   ASSERT_TRUE(kmz_file_->ReadFile("foo/foo.txt", &file_data));
+   ASSERT_FALSE(file_data.empty());
+@@ -219,7 +219,7 @@ TEST_F(KmzTest, TestList) {
+   // - a/a.kml
+   const string kMulti1 = string(DATADIR) + "/kmz/multikml-nodoc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kMulti1.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   std::vector<string> list;
+   kmz_file_->List(&list);
+   // 3 files were read into the vector.
+@@ -247,7 +247,7 @@ TEST_F(KmzTest, TestWriteKmz) {
+   // correctly.
+   ASSERT_TRUE(File::Exists(tempfile->name()));
+   kmz_file_.reset(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   string kml_data;
+   ASSERT_TRUE(kmz_file_->ReadKml(&kml_data));
+   ASSERT_FALSE(kml_data.empty());
+@@ -275,7 +275,7 @@ TEST_F(KmzTest, TestCreate) {
+   kmlbase::TempFilePtr tempfile = kmlbase::TempFile::CreateTempFile();
+   ASSERT_TRUE(tempfile != NULL);
+   kmz.reset(KmzFile::Create(tempfile->name().c_str()));
+-  ASSERT_TRUE(kmz);
++  ASSERT_TRUE(kmz != 0);
+ }
+ 
+ TEST_F(KmzTest, TestAddFile) {
+@@ -284,7 +284,7 @@ TEST_F(KmzTest, TestAddFile) {
+   {
+     // Create an empty KmzFile.
+     KmzFilePtr kmz = KmzFile::Create(tempfile->name().c_str());
+-    ASSERT_TRUE(kmz);
++    ASSERT_TRUE(kmz != 0);
+     // Add three files to the archive.
+     const string kNewKml = "<Placemark><name/></Placemark>";
+     ASSERT_TRUE(kmz->AddFile(kNewKml, "doc.kml"));
+@@ -300,7 +300,7 @@ TEST_F(KmzTest, TestAddFile) {
+ 
+   // Verify that the archive we created contains the files in order.
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   std::vector<string> list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(3), list.size());
+@@ -316,7 +316,7 @@ TEST_F(KmzTest, TestAddFileList) {
+   {
+     // Create an empty KmzFile.
+     KmzFilePtr kmz_file = KmzFile::Create(tempfile->name().c_str());
+-    ASSERT_TRUE(kmz_file);
++    ASSERT_TRUE(kmz_file != 0);
+ 
+     // Create a KmlFile from the testdata file.
+     const string kBaseDir = File::JoinPaths(string(DATADIR), "kmz");
+@@ -342,7 +342,7 @@ TEST_F(KmzTest, TestAddFileList) {
+   // invalid. Verify that only two resources were added by AddFileList.
+   ASSERT_EQ(static_cast<size_t>(1), errs);
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   kmlbase::StringVector list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(2), list.size());
+@@ -364,7 +364,7 @@ TEST_F(KmzTest, TestCreateFromElement) {
+         kml_file->get_root(), kml_file->get_url(), tempfile->name()));
+   }
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   std::vector<string> list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(3), list.size());
+@@ -382,7 +382,7 @@ TEST_F(KmzTest, TestCreateFromKmlFilePath) {
+   ASSERT_TRUE(KmzFile::CreateFromKmlFilepath(kTestKml, tempfile->name()));
+   }
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   std::vector<string> list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(3), list.size());
+@@ -404,7 +404,7 @@ TEST_F(KmzTest, TestCreateFromKmlFile) {
+   ASSERT_TRUE(KmzFile::CreateFromKmlFilepath(kTestKml, tempfile->name()));
+   }
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   std::vector<string> list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(3), list.size());
+@@ -426,7 +426,7 @@ TEST_F(KmzTest, TestCreateFromGoogleEarthFile) {
+   ASSERT_TRUE(KmzFile::CreateFromKmlFilepath(kTestKml, tempfile->name()));
+   }
+   KmzFilePtr created(KmzFile::OpenFromFile(tempfile->name().c_str()));
+-  ASSERT_TRUE(created);
++  ASSERT_TRUE(created != 0);
+   std::vector<string> list;
+   created->List(&list);
+   ASSERT_EQ(static_cast<size_t>(5), list.size());
+@@ -441,7 +441,7 @@ TEST_F(KmzTest, TestSaveToString) {
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+ 
+   kmz_file_.reset(KmzFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+ 
+   string read_kmz_data;
+   ASSERT_TRUE(kmlbase::File::ReadFileToString(kGoodKmz, &read_kmz_data));
+@@ -458,7 +458,7 @@ TEST_F(KmzTest, TestSetGetMaxUncompressedFileSize) {
+   const unsigned int kNewSize = 209715200;  // 200 MB.
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   ASSERT_EQ(kDefaultSize, kmz_file_->get_max_uncompressed_file_size());
+   kmz_file_->set_max_uncompressed_file_size(kNewSize);
+   ASSERT_EQ(kNewSize, kmz_file_->get_max_uncompressed_file_size());
+@@ -467,7 +467,7 @@ TEST_F(KmzTest, TestSetGetMaxUncompressedFileSize) {
+ TEST_F(KmzTest, TestMaxUnCompressedSizeExceeded) {
+   const string kGoodKmz = string(DATADIR) + "/kmz/doc.kmz";
+   kmz_file_.reset(KmzFile::OpenFromFile(kGoodKmz.c_str()));
+-  ASSERT_TRUE(kmz_file_);
++  ASSERT_TRUE(kmz_file_ != 0);
+   const unsigned int kMaxSize = 43;
+   kmz_file_->set_max_uncompressed_file_size(kMaxSize);  // 43 bytes.
+   ASSERT_EQ(kMaxSize, kmz_file_->get_max_uncompressed_file_size());
+diff --git a/tests/kml/engine/link_util_test.cc b/tests/kml/engine/link_util_test.cc
+index 7564afc..2cb0824 100644
+--- a/tests/kml/engine/link_util_test.cc
++++ b/tests/kml/engine/link_util_test.cc
+@@ -178,7 +178,7 @@ TEST_F(LinkUtilTest, TestGetLinkParentHref) {
+ TEST_F(LinkUtilTest, TestFetchLink) {
+   const string kBase("http://host.com/kmz/radar-animation.kmz");
+   KmlFilePtr base_kml_file = kml_cache_->FetchKmlAbsolute(kBase);
+-  ASSERT_TRUE(base_kml_file);
++  ASSERT_TRUE(base_kml_file != 0);
+   ElementVector networklink_vector;
+   GetElementsById(base_kml_file->get_root(), kmldom::Type_NetworkLink,
+                   &networklink_vector);
+@@ -186,10 +186,10 @@ TEST_F(LinkUtilTest, TestFetchLink) {
+   ASSERT_EQ(static_cast<size_t>(1), networklink_vector.size());
+   KmlFilePtr target_kml_file = FetchLink(base_kml_file,
+                                          AsNetworkLink(networklink_vector[0]));
+-  ASSERT_TRUE(target_kml_file);
++  ASSERT_TRUE(target_kml_file != 0);
+   kmldom::DocumentPtr document =
+       AsDocument(GetRootFeature(target_kml_file->get_root()));
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   // This is kmz/radar-animation.kmz/level00/0.kml.
+   ASSERT_EQ(string("0130_256_-1"), document->get_name());
+ }
+@@ -197,7 +197,7 @@ TEST_F(LinkUtilTest, TestFetchLink) {
+ TEST_F(LinkUtilTest, TestFetchIcon) {
+   const string kBase("http://host.com/kmz/rumsey/kml/lc01.kmz");
+   KmlFilePtr kml_file = kml_cache_->FetchKmlAbsolute(kBase);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   ElementVector groundoverlay_vector;
+   GetElementsById(kml_file->get_root(), kmldom::Type_GroundOverlay,
+                   &groundoverlay_vector);
+diff --git a/tests/kml/engine/location_util_test.cc b/tests/kml/engine/location_util_test.cc
+index 1a7236d..3f8d35d 100644
+--- a/tests/kml/engine/location_util_test.cc
++++ b/tests/kml/engine/location_util_test.cc
+@@ -248,12 +248,12 @@ TEST(LocationUtilTest, RunTestCases) {
+     KmlFilePtr kml_file =
+         ParseFromDataDirFile(kTestCases[i].subdir, kTestCases[i].kml_filename);
+     // Assert basic sanity of KmlFile.
+-    ASSERT_TRUE(kml_file) << kTestCases[i].kml_filename;
+-    ASSERT_TRUE(kml_file->get_root());
++    ASSERT_TRUE(kml_file != 0) << kTestCases[i].kml_filename;
++    ASSERT_TRUE(kml_file->get_root() != 0);
+     kmldom::FeaturePtr feature = kmldom::AsFeature(
+         kml_file->GetObjectById(kTestCases[i].feature_id));
+     // Asserts both that this id is found and is a Feature.
+-    ASSERT_TRUE(feature);
++    ASSERT_TRUE(feature != 0);
+     Bbox bbox;
+     ASSERT_EQ(kTestCases[i].has_bounds, GetFeatureBounds(feature, &bbox))
+         << kTestCases[i].kml_filename << " " << kTestCases[i].feature_id;
+diff --git a/tests/kml/engine/merge_test.cc b/tests/kml/engine/merge_test.cc
+index 223c806..f2f5557 100644
+--- a/tests/kml/engine/merge_test.cc
++++ b/tests/kml/engine/merge_test.cc
+@@ -381,7 +381,7 @@ void MergeTest::VerifyPointPlacemark(PlacemarkPtr placemark,
+   ASSERT_EQ(name, placemark->get_name());
+   ASSERT_TRUE(placemark->has_geometry());
+   PointPtr point = kmldom::AsPoint(placemark->get_geometry());
+-  ASSERT_TRUE(point);
++  ASSERT_TRUE(point != 0);
+   ASSERT_TRUE(point->has_coordinates());
+   CoordinatesPtr coordinates = point->get_coordinates();
+   ASSERT_EQ(static_cast<size_t>(1),
+diff --git a/tests/kml/engine/parse_old_schema_test.cc b/tests/kml/engine/parse_old_schema_test.cc
+index 2edaba1..6c37b54 100644
+--- a/tests/kml/engine/parse_old_schema_test.cc
++++ b/tests/kml/engine/parse_old_schema_test.cc
+@@ -75,7 +75,7 @@ TEST_F(ParseOldSchemaTest, TestParseOldSchema) {
+       "<Polygon/>"
+       "</S_park_boundaries_S>");
+   PlacemarkPtr placemark = ParseOldSchema(kXml, schema_name_map_, NULL);
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(placemark->has_name());
+   ASSERT_EQ(kName, placemark->get_name());
+   ASSERT_TRUE(placemark->has_geometry());
+diff --git a/tests/kml/engine/style_inliner_test.cc b/tests/kml/engine/style_inliner_test.cc
+index fd4b4fc..9a579da 100644
+--- a/tests/kml/engine/style_inliner_test.cc
++++ b/tests/kml/engine/style_inliner_test.cc
+@@ -96,7 +96,7 @@ TEST_F(StyleInlinerTest, CallStyleInlinerMethodsInTypicalUsage) {
+   // 1) <Document>
+   DocumentPtr document = kml_factory_->CreateDocument();
+   ASSERT_TRUE(style_inliner_->NewElement(document));
+-  ASSERT_TRUE(style_inliner_->get_document());
++  ASSERT_TRUE(style_inliner_->get_document() != 0);
+ 
+   // 2) <Style id="_0">
+   StylePtr style = kml_factory_->CreateStyle();
+@@ -207,7 +207,7 @@ TEST_F(StyleInlinerTest, TestFiles) {
+ 
+     // Call the function under test.
+     ElementPtr root = InlineStyles(input, &errors);
+-    ASSERT_TRUE(root);
++    ASSERT_TRUE(root != 0);
+     ASSERT_TRUE(errors.empty());
+     string check;
+     ASSERT_TRUE(ReadDataDirFileToString(kTestCases[i].check_subdir_,
+diff --git a/tests/kml/engine/style_merger_test.cc b/tests/kml/engine/style_merger_test.cc
+index 4c40921..280241f 100644
+--- a/tests/kml/engine/style_merger_test.cc
++++ b/tests/kml/engine/style_merger_test.cc
+@@ -94,10 +94,10 @@ void StyleMergerTest::VerifyEmptyStyle(const StylePtr& style) const {
+ // test fixture.
+ void StyleMergerTest::VerifyStyleMergersEmpty() const {
+   StylePtr style = style_merger_normal_->GetResolvedStyle();
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   VerifyEmptyStyle(style);
+   style = style_merger_highlight_->GetResolvedStyle();
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   VerifyEmptyStyle(style);
+ }
+ 
+@@ -108,7 +108,7 @@ void StyleMergerTest::VerifyStyleLineStyle(const StylePtr& style,
+                                            const string& color,
+                                            double width) const {
+   ASSERT_EQ(id, style->get_id());
+-  ASSERT_TRUE(style->get_linestyle());
++  ASSERT_TRUE(style->get_linestyle() != 0);
+   ASSERT_EQ(color,
+                        style->get_linestyle()->get_color().to_string_abgr());
+   ASSERT_EQ(width, style->get_linestyle()->get_width());
+@@ -347,14 +347,14 @@ TEST_F(StyleMergerTest, TestNestingDepthDetection) {
+   ASSERT_EQ(0, style_merger_normal_->get_nesting_depth());
+   // The resolved style is the one with a <LineStyle>
+   StylePtr resolved_style = style_merger_normal_->GetResolvedStyle();
+-  ASSERT_TRUE(resolved_style);
++  ASSERT_TRUE(resolved_style != 0);
+   ASSERT_TRUE(resolved_style->has_linestyle());
+   ASSERT_FALSE(resolved_style->has_iconstyle());
+   // Now try to resolve against another styleUrl to another StyleSelector.
+   style_merger_normal_->MergeStyleUrl(string("#") + kStyleMapId);
+   ASSERT_EQ(-1, style_merger_normal_->get_nesting_depth());
+   // Verify that no further merging happened.
+-  ASSERT_TRUE(resolved_style);
++  ASSERT_TRUE(resolved_style != 0);
+   ASSERT_TRUE(resolved_style->has_linestyle());
+   ASSERT_FALSE(resolved_style->has_iconstyle());
+ }
+diff --git a/tests/kml/engine/style_resolver_test.cc b/tests/kml/engine/style_resolver_test.cc
+index 86fad21..eaa36d9 100644
+--- a/tests/kml/engine/style_resolver_test.cc
++++ b/tests/kml/engine/style_resolver_test.cc
+@@ -134,10 +134,10 @@ bool StyleResolverTest::ReadDataDirFileToString(const string& filename,
+ void StyleResolverTest::ParseFromDataDirFile(const string& filename) {
+   string kml_data;
+   bool status = ReadDataDirFileToString(filename, &kml_data);
+-  ASSERT_TRUE(status);
++  ASSERT_TRUE(status != 0);
+   kml_file_ = KmlFile::CreateFromParse(kml_data, NULL);
+-  ASSERT_TRUE(kml_file_) << filename;
+-  ASSERT_TRUE(kml_file_->get_root());
++  ASSERT_TRUE(kml_file_ != 0) << filename;
++  ASSERT_TRUE(kml_file_->get_root() != 0);
+ }
+ 
+ // This is a utility function to compare the given element to the KML in the
+@@ -158,12 +158,12 @@ TEST_F(StyleResolverTest, TestFiles) {
+     FeaturePtr feature = kmldom::AsFeature(
+         kml_file_->GetObjectById(kTestCases[i].feature_id_));
+     // This is internal to the test.
+-    ASSERT_TRUE(feature) << "no such feature " << kTestCases[i].feature_id_;
++    ASSERT_TRUE(feature != 0) << "no such feature " << kTestCases[i].feature_id_;
+ 
+     // This is the function under test.
+     StylePtr style = CreateResolvedStyle(feature, kml_file_,
+                                          kTestCases[i].style_state_);
+-    ASSERT_TRUE(style) << kTestCases[i].style_state_;  // This helps debugging.
++    ASSERT_TRUE(style != 0) << kTestCases[i].style_state_;  // This helps debugging.
+ 
+     // A text comparison is used as that detects issues with unknown elements.
+     ASSERT_FALSE(ComparePretty(style, kTestCases[i].check_file_))
+@@ -175,12 +175,12 @@ TEST_F(StyleResolverTest, TestBasicCreateNetworkResolvedStyle) {
+   const string kPath("style/weather/point-sarnen.kml");
+   const string kUrl("http://host.com/" + kPath);
+   KmlFilePtr kml_file = kml_cache_->FetchKmlAbsolute(kUrl);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   ASSERT_EQ(kml_cache_.get(), kml_file->get_kml_cache());
+   const string kFeatureId("SZXX0026");
+   const FeaturePtr& feature = kmldom::AsFeature(
+       kml_file->GetObjectById(kFeatureId));
+-  ASSERT_TRUE(feature);
++  ASSERT_TRUE(feature != 0);
+   // Verify the feature has a styleUrl to another KML file.
+   ASSERT_TRUE(feature->has_styleurl());
+   const string kStyleUrl("style.kml#i27");
+@@ -188,12 +188,12 @@ TEST_F(StyleResolverTest, TestBasicCreateNetworkResolvedStyle) {
+   const kmldom::StyleStateEnum style_state = kmldom::STYLESTATE_NORMAL;
+   StylePtr style = CreateResolvedStyle(feature, kml_file,
+                                               style_state);
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   ASSERT_TRUE(style->has_id());
+   ASSERT_EQ(string("i27"), style->get_id());
+   ASSERT_TRUE(style->has_iconstyle());
+   ASSERT_TRUE(style->get_iconstyle()->has_icon());
+-  ASSERT_TRUE(style->get_iconstyle()->get_icon());
++  ASSERT_TRUE(style->get_iconstyle()->get_icon() != 0);
+   ASSERT_TRUE(style->get_iconstyle()->get_icon()->has_href());
+   ASSERT_TRUE(style->has_labelstyle());
+   ASSERT_TRUE(style->has_balloonstyle());
+@@ -304,15 +304,15 @@ TEST_F(StyleResolverTest, TestRemoteFiles) {
+   for (size_t i = 0; i < size; ++i) {
+     // Read the file and find the feature.
+     kml_file_ = kml_cache_->FetchKmlAbsolute(kRemoteTestCases[i].source_url_);
+-    ASSERT_TRUE(kml_file_);
++    ASSERT_TRUE(kml_file_ != 0);
+     FeaturePtr feature = kmldom::AsFeature(
+         kml_file_->GetObjectById(kRemoteTestCases[i].feature_id_));
+-    ASSERT_TRUE(feature);  // This is internal to the test.
++    ASSERT_TRUE(feature != 0);  // This is internal to the test.
+ 
+     // This is the function under test.
+     StylePtr style = CreateResolvedStyle(feature, kml_file_,
+                                          kRemoteTestCases[i].style_state_);
+-    ASSERT_TRUE(style);
++    ASSERT_TRUE(style != 0);
+ 
+     // A text comparison is used as that detects issues with unknown elements.
+     ASSERT_FALSE(ComparePretty(style, kRemoteTestCases[i].check_file_))
+@@ -347,14 +347,14 @@ TEST_F(StyleResolverTest, BasicCreateResolvedStyleSelectorTest) {
+       "</Document>"
+     "</kml>");
+   kml_file_ = KmlFile::CreateFromString(kKml);
+-  ASSERT_TRUE(kml_file_);
++  ASSERT_TRUE(kml_file_ != 0);
+   const SharedStyleMap& shared_styles = kml_file_->get_shared_style_map();
+   ASSERT_EQ(static_cast<size_t>(3), shared_styles.size());
+   StyleSelectorPtr styleselector =
+       StyleResolver::CreateResolvedStyleSelector("#stylemap0", shared_styles);
+-  ASSERT_TRUE(styleselector);
++  ASSERT_TRUE(styleselector != 0);
+   StyleMapPtr stylemap = AsStyleMap(styleselector);
+-  ASSERT_TRUE(stylemap);
++  ASSERT_TRUE(stylemap != 0);
+   ASSERT_EQ(static_cast<size_t>(2), stylemap->get_pair_array_size());
+ 
+   PairPtr pair = stylemap->get_pair_array_at(0);
+@@ -363,7 +363,7 @@ TEST_F(StyleResolverTest, BasicCreateResolvedStyleSelectorTest) {
+   ASSERT_FALSE(pair->has_styleurl());
+   ASSERT_TRUE(pair->has_styleselector());
+   StylePtr style = AsStyle(pair->get_styleselector());
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   ASSERT_TRUE(style->has_iconstyle());
+   ASSERT_FALSE(style->has_labelstyle());
+ 
+@@ -373,7 +373,7 @@ TEST_F(StyleResolverTest, BasicCreateResolvedStyleSelectorTest) {
+   ASSERT_FALSE(pair->has_styleurl());
+   ASSERT_TRUE(pair->has_styleselector());
+   style = AsStyle(pair->get_styleselector());
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   ASSERT_FALSE(style->has_iconstyle());
+   ASSERT_TRUE(style->has_labelstyle());
+ }
+diff --git a/tests/kml/engine/style_splitter_test.cc b/tests/kml/engine/style_splitter_test.cc
+index da85c23..8fc73cc 100644
+--- a/tests/kml/engine/style_splitter_test.cc
++++ b/tests/kml/engine/style_splitter_test.cc
+@@ -87,7 +87,7 @@ TEST_F(StyleSplitterTest, CallStyleSplitterMethodsInTypicalUsage) {
+   const string kDocId("d");
+   document->set_id(kDocId);
+   ASSERT_TRUE(style_splitter_->NewElement(document));
+-  ASSERT_TRUE(style_splitter_->get_document());
++  ASSERT_TRUE(style_splitter_->get_document() != 0);
+   ASSERT_EQ(kDocId, style_splitter_->get_document()->get_id());
+ 
+   // 2) On "<Placemark>" the parser creates a Placemark and calls NewElement().
+@@ -107,7 +107,7 @@ TEST_F(StyleSplitterTest, CallStyleSplitterMethodsInTypicalUsage) {
+   // as well.
+   const string kId0("_0");
+   ASSERT_EQ(static_cast<size_t>(1), shared_style_map_.size());
+-  ASSERT_TRUE(shared_style_map_[kId0]);
++  ASSERT_TRUE(shared_style_map_[kId0] != 0);
+   ASSERT_EQ(kId0, shared_style_map_[kId0]->get_id());
+   ASSERT_EQ(static_cast<size_t>(1), document->get_styleselector_array_size());
+   ASSERT_EQ(kId0, document->get_styleselector_array_at(0)->get_id());
+@@ -227,12 +227,12 @@ TEST_F(StyleSplitterTest, TestNoDocument) {
+   ElementPtr root = style_splitting_parser_->Parse(kNoStyleFolder, &errors);
+   // Verify that this still parses just fine.
+   FolderPtr folder = AsFolder(root);
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_TRUE(folder->has_name());
+   ASSERT_FALSE(folder->has_description());
+   ASSERT_EQ(static_cast<size_t>(1), folder->get_feature_array_size());
+   PlacemarkPtr placemark = AsPlacemark(folder->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   // No <Document> to split this <Style> to so it remains in <Placemark>:
+   ASSERT_TRUE(placemark->has_styleselector());
+   ASSERT_EQ(kNoStyleFolder, SerializePretty(root));
+@@ -254,9 +254,9 @@ TEST_F(StyleSplitterTest, TestBasicPlacemark) {
+     "</Document>");
+   ElementPtr root = style_splitting_parser_->Parse(kInlineStyle, &errors);
+   DocumentPtr document = AsDocument(root);
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   PlacemarkPtr placemark = AsPlacemark(document->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(placemark->has_name());
+   ASSERT_FALSE(placemark->has_description());
+   ASSERT_TRUE(placemark->has_styleurl());
+@@ -265,7 +265,7 @@ TEST_F(StyleSplitterTest, TestBasicPlacemark) {
+   ASSERT_EQ(static_cast<size_t>(1), shared_style_map_.size());
+   ASSERT_EQ(static_cast<size_t>(1), document->get_styleselector_array_size());
+   StylePtr style = AsStyle(document->get_styleselector_array_at(0));
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   ASSERT_TRUE(style->has_id());
+   ASSERT_EQ(string("_0"), style->get_id());
+   ASSERT_TRUE(style->has_linestyle());
+@@ -301,16 +301,16 @@ TEST_F(StyleSplitterTest, TestIdCollision) {
+       "  </Placemark>\n"
+       "</Document>\n");
+   DocumentPtr document = AsDocument(style_splitting_parser_->Parse(kKml, NULL));
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   PlacemarkPtr placemark = AsPlacemark(document->get_feature_array_at(0));
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kKml, SerializePretty(document));
+   ASSERT_FALSE(placemark->has_styleurl());
+   ASSERT_TRUE(placemark->has_styleselector());
+-  ASSERT_TRUE(AsStyle(placemark->get_styleselector()));
++  ASSERT_TRUE(AsStyle(placemark->get_styleselector()) != 0);
+   ASSERT_EQ(static_cast<size_t>(1), shared_style_map_.size());
+   style = AsStyle(shared_style_map_[kId]);
+-  ASSERT_TRUE(style);
++  ASSERT_TRUE(style != 0);
+   ASSERT_EQ(kId, style->get_id());
+   ASSERT_EQ(static_cast<size_t>(0), document->get_styleselector_array_size());
+ }
+@@ -327,19 +327,19 @@ TEST_F(StyleSplitterTest, TestMultipleFeatures) {
+   }
+   const string kDocument(SerializePretty(document));
+   document = AsDocument(style_splitting_parser_->Parse(kDocument, NULL));
+-  ASSERT_TRUE(document);
++  ASSERT_TRUE(document != 0);
+   ASSERT_EQ(kCount, document->get_styleselector_array_size());
+   ASSERT_EQ(kCount, document->get_feature_array_size());
+   for (size_t i = 0; i < kCount; ++i) {
+     PlacemarkPtr placemark = AsPlacemark(document->get_feature_array_at(i));
+-    ASSERT_TRUE(placemark);
++    ASSERT_TRUE(placemark != 0);
+     ASSERT_EQ(ToString(i), placemark->get_name());
+     ASSERT_FALSE(placemark->has_styleselector());
+     ASSERT_TRUE(placemark->has_styleurl());
+     const string kExpectedStyleId("_" + ToString(i));
+     ASSERT_EQ(string("#") + kExpectedStyleId, placemark->get_styleurl());
+     StylePtr style = AsStyle(document->get_styleselector_array_at(i));
+-    ASSERT_TRUE(style);
++    ASSERT_TRUE(style != 0);
+     ASSERT_EQ(kExpectedStyleId, style->get_id());
+   }
+ }
+diff --git a/tests/kml/engine/update_processor_test.cc b/tests/kml/engine/update_processor_test.cc
+index ac20b22..d99e433 100644
+--- a/tests/kml/engine/update_processor_test.cc
++++ b/tests/kml/engine/update_processor_test.cc
+@@ -104,14 +104,14 @@ TEST_F(UpdateProcessorTest, TestProcessUpdateChangeWithMappedId) {
+       "    <name>new name</name>"
+       "  </Placemark>"
+       "</Change>"));
+-  ASSERT_TRUE(change);
++  ASSERT_TRUE(change != 0);
+ 
+   // Run the method under test.
+   update_processor_->ProcessUpdateChange(change);
+ 
+   // Verify all is as expected.
+   kmldom::PlacemarkPtr placemark = kmldom::AsPlacemark(kml_file_->get_root());
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   // The <Placemark>'s id= is _not_ effected.
+   ASSERT_EQ(string("internal-id"), placemark->get_id());
+   // No targetId= is set in the target Object.
+diff --git a/tests/kml/engine/update_test.cc b/tests/kml/engine/update_test.cc
+index 55c98a1..fa53d3d 100644
+--- a/tests/kml/engine/update_test.cc
++++ b/tests/kml/engine/update_test.cc
+@@ -77,13 +77,13 @@ TEST(UpdateTest, TestProcessUpdateNull) {
+ 
+ TEST(UpdateTest, TestSingleSimpleChange) {
+   KmlFilePtr target_file = KmlFile::CreateFromParse(target_change, NULL);
+-  ASSERT_TRUE(target_file);
++  ASSERT_TRUE(target_file != 0);
+   PlacemarkPtr target_placemark =
+       kmldom::AsPlacemark(target_file->GetObjectById("p"));
+   ASSERT_EQ(string("hi"), target_placemark->get_name());
+-  ASSERT_TRUE(target_placemark);
++  ASSERT_TRUE(target_placemark != 0);
+   UpdatePtr update = AsUpdate(kmldom::Parse(source_change, NULL));
+-  ASSERT_TRUE(update);
++  ASSERT_TRUE(update != 0);
+   ProcessUpdate(update, target_file);
+   ASSERT_EQ(string("NEW NAME"), target_placemark->get_name());
+   ASSERT_FALSE(target_placemark->has_targetid());
+@@ -108,12 +108,12 @@ static const char target_create[] = "<Folder id=\"f\"/>";
+ 
+ TEST(UpdateTest, TestSingleSimpleCreate) {
+   KmlFilePtr target_file = KmlFile::CreateFromParse(target_create, NULL);
+-  ASSERT_TRUE(target_file);
++  ASSERT_TRUE(target_file != 0);
+   FolderPtr folder = kmldom::AsFolder(target_file->get_root());
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_EQ(static_cast<size_t>(0), folder->get_feature_array_size());
+   UpdatePtr update = AsUpdate(kmldom::Parse(source_create, NULL));
+-  ASSERT_TRUE(update);
++  ASSERT_TRUE(update != 0);
+   ProcessUpdate(update, target_file);
+   ASSERT_EQ(static_cast<size_t>(1), folder->get_feature_array_size());
+   ASSERT_EQ(string("Update-Created Placemark"),
+@@ -207,13 +207,13 @@ static const char target_delete[] = "<Folder><Placemark id=\"p\"/></Folder>";
+ 
+ TEST(UpdateTest, TestSingleSimpleDelete) {
+   KmlFilePtr target_file = KmlFile::CreateFromParse(target_delete, NULL);
+-  ASSERT_TRUE(target_file);
++  ASSERT_TRUE(target_file != 0);
+   UpdatePtr update = AsUpdate(kmldom::Parse(source_delete, NULL));
+-  ASSERT_TRUE(update);
++  ASSERT_TRUE(update != 0);
+   ProcessUpdate(update, target_file);
+   // Verify the Placemark has been removed from the Folder.
+   FolderPtr folder = kmldom::AsFolder(target_file->get_root());
+-  ASSERT_TRUE(folder);
++  ASSERT_TRUE(folder != 0);
+   ASSERT_EQ(static_cast<size_t>(0), folder->get_feature_array_size());
+   // TODO: actually remove the object from the KmlFile's map(s).
+   // Verify the KmlFile's id mapping for the Placemark is gone.
+@@ -253,7 +253,7 @@ TEST(UpdateTest, TestManyDeletes) {
+   ASSERT_EQ(string("i0"), folder->get_feature_array_at(0)->get_id());
+   ASSERT_EQ(kmldom::Type_Placemark, folder->get_feature_array_at(0)->Type());
+   KmlFilePtr kml_file = KmlFile::CreateFromImport(folder);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   for (int i = 0; i < kNumFeatures; ++i) {
+     DeletePtr deleet = kml_factory->CreateDelete();
+     deleet->add_feature(CreateFeature(i, false));  // Set targetId=
+@@ -285,7 +285,7 @@ TEST(UpdateTest, TestChangeCoordinates) {
+   placemark->set_name(kName);
+   placemark->set_geometry(point);
+   KmlFilePtr kml_file = KmlFile::CreateFromImport(placemark);
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+ 
+   // Create the <Update> KML.
+   coordinates = kml_factory->CreateCoordinates();
+@@ -305,14 +305,14 @@ TEST(UpdateTest, TestChangeCoordinates) {
+   // Call the function under test.
+   ProcessUpdate(update, kml_file);
+   // Verify the KML file's contents have changed.
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+   placemark = AsPlacemark(kml_file->get_root());
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_EQ(kId, placemark->get_id());
+   ASSERT_EQ(kName, placemark->get_name());
+   ASSERT_TRUE(placemark->has_geometry());
+   point = AsPoint(placemark->get_geometry());
+-  ASSERT_TRUE(point);
++  ASSERT_TRUE(point != 0);
+   ASSERT_TRUE(point->has_coordinates());
+   coordinates = point->get_coordinates();
+   ASSERT_EQ(static_cast<size_t>(1), coordinates->get_coordinates_array_size());
+@@ -378,11 +378,11 @@ TEST(UpdateTest, TestFiles) {
+   const size_t size = sizeof(kTestCases)/sizeof(kTestCases[0]);
+   for (size_t i = 0; i < size; ++i) {
+     KmlFilePtr target = ParseTestCaseFile(kTestCases[i].target_file_);
+-    ASSERT_TRUE(target);
++    ASSERT_TRUE(target != 0);
+     KmlFilePtr source = ParseTestCaseFile(kTestCases[i].source_file_);
+-    ASSERT_TRUE(source);
++    ASSERT_TRUE(source != 0);
+     UpdatePtr update = AsUpdate(source->get_root());
+-    ASSERT_TRUE(update);
++    ASSERT_TRUE(update != 0);
+     ProcessUpdate(update, target);
+     string actual;
+     ASSERT_TRUE(target->SerializeToString(&actual));
+@@ -401,7 +401,7 @@ TEST(UpdateTest, TestProcessUpdateWithIdMapNull) {
+ TEST(UpdateTest, TestProcessUpdateWithIdMapBasic) {
+   KmlFilePtr kml_file(KmlFile::CreateFromString(
+       "<Placemark id=\"inner\"><name>old name</name></Placemark>"));
+-  ASSERT_TRUE(kml_file);
++  ASSERT_TRUE(kml_file != 0);
+ 
+   kmldom::UpdatePtr update = kmldom::AsUpdate(kmldom::ParseKml(
+       "<Update>"
+@@ -411,7 +411,7 @@ TEST(UpdateTest, TestProcessUpdateWithIdMapBasic) {
+       "    </Placemark>"
+       "  </Change>"
+       "</Update>"));
+-  ASSERT_TRUE(update);
++  ASSERT_TRUE(update != 0);
+ 
+   kmlbase::StringMap id_map;
+   id_map["outer"] = "inner";
+@@ -419,7 +419,7 @@ TEST(UpdateTest, TestProcessUpdateWithIdMapBasic) {
+   ProcessUpdateWithIdMap(update, &id_map, kml_file);
+ 
+   PlacemarkPtr placemark = AsPlacemark(kml_file->get_root());
+-  ASSERT_TRUE(placemark);
++  ASSERT_TRUE(placemark != 0);
+   ASSERT_TRUE(placemark->has_name());
+   ASSERT_EQ(string("new name"), placemark->get_name());
+   ASSERT_TRUE(placemark->has_id());
+diff --git a/tests/kml/regionator/regionator_test.cc b/tests/kml/regionator/regionator_test.cc
+index 956a5c2..f6fc1a7 100644
+--- a/tests/kml/regionator/regionator_test.cc
++++ b/tests/kml/regionator/regionator_test.cc
+@@ -137,7 +137,7 @@ TEST_F(RegionatorTest, TwoLevelPointRegionatorTest) {
+   // The Document in the root KML has 5 features.
+   DocumentPtr document1 =
+       kmldom::AsDocument(kml_file_map_["1.kml"]->get_feature());
+-  ASSERT_TRUE(document1);
++  ASSERT_TRUE(document1 != 0);
+   ASSERT_EQ(static_cast<size_t>(5), document1->get_feature_array_size()); 
+   // The 5 features are 4 x NetworkLinks + the Folder returned by 
+   // PointRegionHandler's GetFeature
+@@ -224,13 +224,13 @@ TEST_F(RegionatorTest, SetRootFilenameTest) {
+   const string k2Kml("2.kml");
+   ASSERT_EQ(kmldom::Type_kml, kml_file_map_[k2Kml]->Type());
+   DocumentPtr d = kmldom::AsDocument(kml_file_map_[kPickleKml]->get_feature());
+-  ASSERT_TRUE(d);
++  ASSERT_TRUE(d != 0);
+   ASSERT_TRUE(d->has_atomlink());
+   AtomLinkPtr link = d->get_atomlink();
+   ASSERT_EQ(string(kPickleKml), link->get_href());
+   ASSERT_EQ(string("self"), link->get_rel());
+   d = kmldom::AsDocument(kml_file_map_[k2Kml]->get_feature());
+-  ASSERT_TRUE(d);
++  ASSERT_TRUE(d != 0);
+   ASSERT_TRUE(d->has_atomlink());
+   link = d->get_atomlink();
+   ASSERT_EQ(string(kPickleKml), link->get_href());
+@@ -249,11 +249,11 @@ TEST_F(RegionatorTest, SetNaturalRegionTest) {
+   rtor.SetNaturalRegion(region);
+   rtor.Regionate(NULL);
+   kmldom::KmlPtr kml = kml_file_map_["1.kml"];
+-  ASSERT_TRUE(kml);
++  ASSERT_TRUE(kml != 0);
+   ASSERT_TRUE(kml->has_feature());
+   kmldom::LookAtPtr lookat =
+       kmldom::AsLookAt(kml->get_feature()->get_abstractview());
+-  ASSERT_TRUE(lookat);
++  ASSERT_TRUE(lookat != 0);
+   ASSERT_DOUBLE_EQ(35.78925, lookat->get_latitude());
+   ASSERT_DOUBLE_EQ(-86.032775, lookat->get_longitude());
+ }
+diff --git a/tests/kml/xsd/xsd_complex_type_test.cc b/tests/kml/xsd/xsd_complex_type_test.cc
+index 19bccfe..432ebdc 100644
+--- a/tests/kml/xsd/xsd_complex_type_test.cc
++++ b/tests/kml/xsd/xsd_complex_type_test.cc
+@@ -46,7 +46,7 @@ TEST_F(XsdComplexTypeTest, TestBasicCreate) {
+   // <xs:complexType name="chocolateType"/>
+   const string kChocolateType("chocolateType");
+   xsd_complex_type_ = CreateXsdComplexType(kChocolateType);
+-  ASSERT_TRUE(xsd_complex_type_);
++  ASSERT_TRUE(xsd_complex_type_ != 0);
+   ASSERT_EQ(kChocolateType, xsd_complex_type_->get_name());
+ }
+ 
+@@ -80,14 +80,14 @@ TEST_F(XsdComplexTypeTest, TestAddElement) {
+   // Add a child XsdElement: // <element name="latitude" type="double"/>.
+   const string kLatitude("latitude");
+   XsdElementPtr latitude = CreateXsdElement(kLatitude, "double");
+-  ASSERT_TRUE(latitude);
++  ASSERT_TRUE(latitude != 0);
+   xsd_complex_type_->add_element(latitude);
+   ASSERT_EQ(static_cast<size_t>(1), xsd_complex_type_->get_sequence_size());
+   ASSERT_EQ(kLatitude, xsd_complex_type_->get_sequence_at(0)->get_name());
+   // Add another child XsdElement: // <element name="longitude" type="double"/>.
+   const string kLongitude("longitude");
+   XsdElementPtr longitude = CreateXsdElement(kLongitude, "double");
+-  ASSERT_TRUE(longitude);
++  ASSERT_TRUE(longitude != 0);
+   xsd_complex_type_->add_element(longitude);
+   ASSERT_EQ(static_cast<size_t>(2), xsd_complex_type_->get_sequence_size());
+   ASSERT_EQ(kLatitude, xsd_complex_type_->get_sequence_at(0)->get_name());
+diff --git a/tests/kml/xsd/xsd_file_test.cc b/tests/kml/xsd/xsd_file_test.cc
+index 6b85b41..dbfb877 100644
+--- a/tests/kml/xsd/xsd_file_test.cc
++++ b/tests/kml/xsd/xsd_file_test.cc
+@@ -91,9 +91,9 @@ TEST_F(XsdFileTest, TestFindElementTypeByName) {
+   xsd_file_->add_element(CreateXsdElement(kMyElement, kPrefix + ":" + kMyType));
+ 
+   const XsdElementPtr element = xsd_file_->FindElement(kMyElement);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   const XsdTypePtr complex_type = xsd_file_->FindElementType(element);
+-  ASSERT_TRUE(complex_type);
++  ASSERT_TRUE(complex_type != 0);
+   ASSERT_EQ(kMyType, complex_type->get_name());
+ }
+ 
+@@ -154,7 +154,7 @@ TEST_F(XsdFileTest, TestResolveRef) {
+ 
+   // Call the method under test for a good case.
+   XsdElementPtr element = xsd_file_->ResolveRef(kPrefix + ":" + kMyElement);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_EQ(kMyElement, element->get_name());
+ 
+   // Call the method under test for some failure cases.
+@@ -224,7 +224,7 @@ void XsdFileTest::AddTestElements() {
+     attributes.SetString(kType, kTestElements[i].type);
+     attributes.SetString(kAbstract, kTestElements[i].abstract);
+     XsdElementPtr element = XsdElement::Create(attributes);
+-    ASSERT_TRUE(element);
++    ASSERT_TRUE(element != 0);
+     xsd_file_->add_element(element);
+   }
+ }
+@@ -242,9 +242,9 @@ TEST_F(XsdFileTest, TestGetTypeHierarchy) {
+   std::vector<XsdComplexTypePtr> hier;
+   const XsdElementPtr element = xsd_file_->FindElement("Placemark");
+   XsdTypePtr derived = xsd_file_->FindElementType(element);
+-  ASSERT_TRUE(derived);
++  ASSERT_TRUE(derived != 0);
+   XsdComplexTypePtr complex_type = XsdComplexType::AsComplexType(derived);
+-  ASSERT_TRUE(complex_type);
++  ASSERT_TRUE(complex_type != 0);
+   ASSERT_TRUE(xsd_file_->GetTypeHierarchy(complex_type, &hier));
+   ASSERT_EQ(static_cast<size_t>(2), hier.size());
+   ASSERT_EQ(string("FeatureType"), hier[0]->get_name());
+@@ -359,7 +359,7 @@ TEST_F(XsdFileTest, TestFindChildElements) {
+   const string kPlacemarkType("PlacemarkType");
+   complex_type = XsdComplexType::AsComplexType(
+       xsd_file_->FindType(kPlacemarkType));
+-  ASSERT_TRUE(complex_type);
++  ASSERT_TRUE(complex_type != 0);
+   ASSERT_EQ(kPlacemarkType, complex_type->get_name());
+ 
+   // This has no children.
+@@ -384,13 +384,13 @@ TEST_F(XsdFileTest, TestSearchTypeHierarchy) {
+   InitTestXsd();
+   const XsdComplexTypePtr& point_type =
+       XsdComplexType::AsComplexType(xsd_file_->FindType("PointType"));
+-  ASSERT_TRUE(point_type);
++  ASSERT_TRUE(point_type != 0);
+   const XsdComplexTypePtr& geometry_type =
+       XsdComplexType::AsComplexType(xsd_file_->FindType("GeometryType"));
+-  ASSERT_TRUE(geometry_type);
++  ASSERT_TRUE(geometry_type != 0);
+   const XsdComplexTypePtr& object_type =
+       XsdComplexType::AsComplexType(xsd_file_->FindType("ObjectType"));
+-  ASSERT_TRUE(object_type);
++  ASSERT_TRUE(object_type != 0);
+   ASSERT_TRUE(xsd_file_->SearchTypeHierarchy(point_type, geometry_type));
+   ASSERT_TRUE(xsd_file_->SearchTypeHierarchy(point_type, object_type));
+ }
+@@ -401,7 +401,7 @@ TEST_F(XsdFileTest, TestGetElementsOfType) {
+   InitTestXsd();
+   const XsdComplexTypePtr geometry_type =
+       XsdComplexType::AsComplexType(xsd_file_->FindType("GeometryType"));
+-  ASSERT_TRUE(geometry_type);
++  ASSERT_TRUE(geometry_type != 0);
+   XsdElementVector geometry_elements;
+   xsd_file_->GetElementsOfType(geometry_type, &geometry_elements);
+   ASSERT_EQ(static_cast<size_t>(3), geometry_elements.size());
+diff --git a/tests/kml/xsd/xsd_handler_test.cc b/tests/kml/xsd/xsd_handler_test.cc
+index ff09e8c..c99da40 100644
+--- a/tests/kml/xsd/xsd_handler_test.cc
++++ b/tests/kml/xsd/xsd_handler_test.cc
+@@ -204,10 +204,10 @@ TEST_F(XsdHandlerTest, TestGetKml21ElementChildren) {
+ TEST_F(XsdHandlerTest, TestGetKml21ExtensionBase) {
+   ParseKml21Xsd();
+   XsdElementPtr element = xsd_file_->FindElement("GroundOverlay");
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   XsdComplexTypePtr groundoverlay = XsdComplexType::AsComplexType(
+       xsd_file_->FindElementType(element));
+-  ASSERT_TRUE(groundoverlay);
++  ASSERT_TRUE(groundoverlay != 0);
+   std::vector<XsdComplexTypePtr> type_hier;
+   ASSERT_TRUE(xsd_file_->GetTypeHierarchy(groundoverlay, &type_hier));
+   ASSERT_EQ(static_cast<size_t>(3), type_hier.size());
+@@ -222,7 +222,7 @@ TEST_F(XsdHandlerTest, TestGetKml21Enumeration) {
+   ParseKml21Xsd();
+   XsdSimpleTypePtr altitude_mode_enum = XsdSimpleType::AsSimpleType(
+       xsd_file_->FindType("altitudeModeEnum"));
+-  ASSERT_TRUE(altitude_mode_enum);
++  ASSERT_TRUE(altitude_mode_enum != 0);
+   ASSERT_TRUE(altitude_mode_enum->IsEnumeration());
+   ASSERT_EQ(string("string"), altitude_mode_enum->get_restriction_base());
+   ASSERT_EQ(static_cast<size_t>(3), altitude_mode_enum->get_enumeration_size());
+diff --git a/tests/kml/xsd/xsd_schema_test.cc b/tests/kml/xsd/xsd_schema_test.cc
+index 4be90f5..04a1b10 100644
+--- a/tests/kml/xsd/xsd_schema_test.cc
++++ b/tests/kml/xsd/xsd_schema_test.cc
+@@ -65,7 +65,7 @@ TEST_F(XsdSchemaTest, TestCreate) {
+   attributes_.SetString(string("xmlns:") + kPrefix, kNamespace);
+   attributes_.SetString(kTargetNamespace, kNamespace);
+   xsd_schema_ = XsdSchema::Create(attributes_);
+-  ASSERT_TRUE(xsd_schema_);
++  ASSERT_TRUE(xsd_schema_ != 0);
+   ASSERT_EQ(kNamespace, xsd_schema_->get_target_namespace());
+   ASSERT_EQ(kPrefix, xsd_schema_->get_target_namespace_prefix());
+ }
+diff --git a/tests/kml/xsd/xsd_simple_type_test.cc b/tests/kml/xsd/xsd_simple_type_test.cc
+index 2ac931d..ef0e0b7 100644
+--- a/tests/kml/xsd/xsd_simple_type_test.cc
++++ b/tests/kml/xsd/xsd_simple_type_test.cc
+@@ -47,7 +47,7 @@ TEST_F(XsdSimpleTypeTest, TestBasicCreate) {
+ 
+   xsd_simple_type_ = XsdSimpleType::Create(attributes_);
+ 
+-  ASSERT_TRUE(xsd_simple_type_);
++  ASSERT_TRUE(xsd_simple_type_ != 0);
+   ASSERT_EQ(kTypeName, xsd_simple_type_->get_name());
+ }
+ 
+@@ -55,7 +55,7 @@ TEST_F(XsdSimpleTypeTest, TestEnumeration) {
+   // <simpleType name="altitudeModeEnumType">
+   attributes_.SetString(kName, "altitudeModeEnumType");
+   xsd_simple_type_ = XsdSimpleType::Create(attributes_);
+-  ASSERT_TRUE(xsd_simple_type_);
++  ASSERT_TRUE(xsd_simple_type_ != 0);
+   ASSERT_FALSE(xsd_simple_type_->IsEnumeration());
+   ASSERT_EQ(static_cast<size_t>(0),
+                        xsd_simple_type_->get_enumeration_size());
+@@ -91,7 +91,7 @@ TEST_F(XsdSimpleTypeTest, TestEqualsOperator) {
+   // <simpleType name="altitudeModeEnumType">
+   attributes_.SetString(kName, "altitudeModeEnumType");
+   altitude_mode_type_ = XsdSimpleType::Create(attributes_);
+-  ASSERT_TRUE(altitude_mode_type_);
++  ASSERT_TRUE(altitude_mode_type_ != 0);
+ 
+   ASSERT_TRUE(altitude_mode_type_ == altitude_mode_type_);
+ 
+@@ -99,7 +99,7 @@ TEST_F(XsdSimpleTypeTest, TestEqualsOperator) {
+   const string kTypeName("anglepos90Type");
+   attributes_.SetString(kName, kTypeName);
+   angle_pos90_type_ = XsdSimpleType::Create(attributes_);
+-  ASSERT_TRUE(angle_pos90_type_);
++  ASSERT_TRUE(angle_pos90_type_ != 0);
+ 
+   ASSERT_FALSE(angle_pos90_type_ == altitude_mode_type_);
+ }
+diff --git a/tests/kml/xsd/xsd_util_test.cc b/tests/kml/xsd/xsd_util_test.cc
+index e0c514b..953dd3f 100644
+--- a/tests/kml/xsd/xsd_util_test.cc
++++ b/tests/kml/xsd/xsd_util_test.cc
+@@ -39,7 +39,7 @@ class XsdUtilTest : public testing::Test {
+ TEST_F(XsdUtilTest, TestCreateXsdComplexType) {
+   const string kTypeName("PlacemarkType");
+   XsdComplexTypePtr complex_type = CreateXsdComplexType(kTypeName);
+-  ASSERT_TRUE(complex_type);
++  ASSERT_TRUE(complex_type != 0);
+   ASSERT_EQ(kTypeName, complex_type->get_name());
+ }
+ 
+@@ -47,7 +47,7 @@ TEST_F(XsdUtilTest, TestCreateXsdElement) {
+   const string kName("Placemark");
+   const string kType("PlacemarkType");
+   XsdElementPtr element = CreateXsdElement(kName, kType);
+-  ASSERT_TRUE(element);
++  ASSERT_TRUE(element != 0);
+   ASSERT_EQ(kName, element->get_name());
+   ASSERT_EQ(kType, element->get_type());
+ }
+@@ -56,7 +56,7 @@ TEST_F(XsdUtilTest, TestCreateXsdSchema) {
+   const string kPrefix("fooml");
+   const string kTargetNamespace("http://foo.com/ml");
+   XsdSchemaPtr schema = CreateXsdSchema(kPrefix, kTargetNamespace);
+-  ASSERT_TRUE(schema);
++  ASSERT_TRUE(schema != 0);
+   ASSERT_EQ(kPrefix, schema->get_target_namespace_prefix());
+   ASSERT_EQ(kTargetNamespace, schema->get_target_namespace());
+ }
+-- 
+2.8.1
+

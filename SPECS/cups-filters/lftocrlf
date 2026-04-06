@@ -1,0 +1,124 @@
+#!/bin/bash
+## Copyright (C) 2003-2006 Red Hat, Inc.
+## Copyright (C) 2003-2006 Tim Waugh <twaugh@redhat.com>
+## Changed on 2007/05/17, Opher Shachar, LADPC Ltd.
+##     Added support for page-ranges option.
+##     Added page accounting.
+
+## This program is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License
+## as published by the Free Software Foundation; either version 2
+## of the License, or (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+if [ $# == 0 ]; then
+  echo >&2 "ERROR: $0 job-id user title copies options [file]"
+  exit 1
+fi
+
+# Extract the papersize
+SENDFF=`grep '^\*DefaultSendFF' "$PPD" | cut -d\  -f2`
+COPIES=1
+if [ $# -ge 4 ]; then
+  COPIES="$4"
+fi
+
+if [ $# -lt 6 ]; then
+  unset TMPFILE
+  trap -- 'rm -f "$TMPFILE"' EXIT
+  TMPFILE=$(mktemp ${TMPDIR:-/tmp}/lftocrlf.XXXXXX)
+  cat > "$TMPFILE"
+else
+  TMPFILE="$6"
+fi
+
+PR=${5#*page-ranges=}
+# Do options specify page-ranges?
+if [[ "$PR" != "$5" ]]; then
+  PR=${PR%% *}
+else
+  #unset PR
+  PR=1-999999
+fi
+
+if [[ "$PR" ]]; then
+  TMPFILE2=$(mktemp ${TMPDIR:-/tmp}/lftocrlf2.XXXXXX)
+  pagenum=0
+  EOF=
+  { 
+  while [[ "$PR" ]]; do
+    pl=${PR%%,*}		;# take first subrange
+    PR=${PR#$pl};PR=${PR#,}	;# remove from range list
+    pu=${pl#*-}			;# extract upper and lower
+    pl=${pl%-*}			;# pages of subrange
+    # Allows interpreting 0-5,3-10 as 1-5,6-10 rejects 5-1 or 1-
+    (( pagenum >= pl )) && pl=$(( pagenum + 1 ))
+    (( pl > pu )) && continue
+    
+    # Loop reading pages until at or over lower page of subrange.
+    while read -d `echo -ne '\f'` -r; do
+      (( pagenum++ ))
+      (( pagenum == pl )) && break
+    done
+    # Did we reach lower page of subrange or EOF?
+    if (( pagenum < pl )); then
+      [[ ! "$REPLY" ]] && break		;# empty last page - we're done.
+      (( pagenum++ ))
+      EOF=y
+    fi
+    # Output page and report to page log
+    if (( pagenum == pl )); then
+      echo -n "${REPLY}" >>"$TMPFILE2"
+      # If EOF then page has no final FF
+      [[ ! "$EOF" ]] && echo -ne '\f' >>"$TMPFILE2"
+      echo "PAGE: $pagenum $COPIES" >&2
+    fi
+    [[ "$EOF" ]] && break
+    # Is the current subrange a single page?
+    (( pagenum == pu )) && continue
+    while read -d `echo -ne '\f'` -r; do
+      (( pagenum++ ))
+      echo -ne "${REPLY}\f" >>"$TMPFILE2"
+      echo "PAGE: $pagenum $COPIES" >&2
+      (( pagenum == pu )) && break
+    done
+    # Could be that we reached EOF before page boundry
+    if (( pagenum < pu )); then
+      if [[ "$REPLY" ]]; then
+        (( pagenum++ ))
+        echo -n "${REPLY}" >>"$TMPFILE2"
+        echo "PAGE: $pagenum $COPIES" >&2
+      fi
+      break
+    fi
+  done
+  } <"$TMPFILE"
+else
+  TMPFILE2="$TMPFILE"
+  pc=$(grep -co `echo -ne '\f'` "$TMPFILE2")
+  pc=$(( pc * $COPIES ))
+  echo "PAGE: $pc" >&2
+fi
+
+while [ "$COPIES" -gt 0 ]; do
+  # Just translate LF->CRLF at the moment, until the PPD has options added.
+  sed -e 's/$/'`echo -ne '\r'`'/g' "$TMPFILE2"
+
+  if [ "$SENDFF" == "True" ]
+    then
+    echo -ne \\014
+  fi
+
+  COPIES=$(($COPIES - 1))
+done
+# Cleanup
+[[ "$TMPFILE" != "$TMPFILE2" ]] && rm -f "$TMPFILE2"
+exit 0

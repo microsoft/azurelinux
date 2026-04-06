@@ -1,0 +1,69 @@
+#
+# Simplified makefile for running the PostgreSQL regression tests
+# in an RPM installation
+#
+
+# maximum simultaneous connections for parallel tests
+MAXCONNOPT =
+ifdef MAX_CONNECTIONS
+MAXCONNOPT += --max-connections=$(MAX_CONNECTIONS)
+endif
+
+# locale
+NOLOCALE =
+ifdef NO_LOCALE
+NOLOCALE += --no-locale
+endif
+
+srcdir := .
+
+REGRESS_OPTS += --dlpath=.
+
+pg_regress_locale_flags = $(if $(ENCODING),--encoding=$(ENCODING)) $(NOLOCALE)
+
+pg_regress_installcheck = ./pg_regress --inputdir=$(srcdir) --bindir=@bindir@ $(pg_regress_locale_flags)
+
+# Test input and expected files.  These are created by pg_regress itself, so we
+# don't have a rule to create them.  We do need rules to clean them however.
+ifile_list := $(subst .source,, $(notdir $(wildcard $(srcdir)/input/*.source)))
+input_files  := $(foreach file, $(ifile_list), sql/$(file).sql)
+ofile_list := $(subst .source,, $(notdir $(wildcard $(srcdir)/output/*.source)))
+output_files := $(foreach file, $(ofile_list), expected/$(file).out)
+
+abs_srcdir := $(shell pwd)
+abs_builddir := $(shell pwd)
+
+check: installcheck-parallel
+
+installcheck: cleandirs
+	$(pg_regress_installcheck) $(REGRESS_OPTS) --schedule=$(srcdir)/serial_schedule $(EXTRA_TESTS)
+
+installcheck-parallel: cleandirs
+	$(pg_regress_installcheck) $(REGRESS_OPTS) --schedule=$(srcdir)/parallel_schedule $(MAXCONNOPT) $(EXTRA_TESTS)
+
+# The tests command the server to write into testtablespace and results.
+# On a SELinux-enabled system this will fail unless we mark those directories
+# as writable by the server.
+cleandirs:
+	-rm -rf testtablespace results
+	mkdir testtablespace results
+	if test -x /usr/bin/chcon && ! test -f /.dockerenv; then \
+	    /usr/bin/chcon -u system_u -r object_r -t postgresql_db_t testtablespace results ; \
+	fi
+
+# old interfaces follow...
+
+runcheck: check
+runtest: installcheck
+runtest-parallel: installcheck-parallel
+
+
+##
+## Clean up
+##
+
+clean distclean maintainer-clean:
+	rm -f $(output_files) $(input_files)
+	rm -rf testtablespace
+	rm -rf results tmp_check log
+	rm -f regression.diffs regression.out regress.out run_check.out

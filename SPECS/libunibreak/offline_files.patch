@@ -1,0 +1,66 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 9a2b420..604180b 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -57,26 +57,7 @@ distclean-local:
+ 	rm -f LineBreak.txt WordBreakData.txt GraphemeBreakData.txt DerivedCoreProperties.txt EastAsianWidth.txt emoji-data.txt
+ 
+ 
+-LineBreak.txt:
+-	wget http://unicode.org/Public/UNIDATA/LineBreak.txt
+-
+-WordBreakProperty.txt:
+-	wget http://www.unicode.org/Public/UNIDATA/auxiliary/WordBreakProperty.txt
+-
+-GraphemeBreakProperty.txt:
+-	wget http://www.unicode.org/Public/UNIDATA/auxiliary/GraphemeBreakProperty.txt
+-
+-DerivedCoreProperties.txt:
+-	wget https://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+-
+-EastAsianWidth.txt:
+-	wget https://www.unicode.org/Public/UNIDATA/EastAsianWidth.txt
+-
+-emoji-data.txt:
+-	wget https://www.unicode.org/Public/UNIDATA/emoji/emoji-data.txt
+-
+-
+-linebreakdata: LineBreak.txt
++linebreakdata:
+ 	sed -E -n -f ${srcdir}/extract_data.sed LineBreak.txt | \
+ 	sed -E -f ${srcdir}/expand_single.sed | \
+ 	${srcdir}/generate_linebreakdata.py > tmp.c
+@@ -84,27 +65,23 @@ linebreakdata: LineBreak.txt
+ 	cat ${srcdir}/linebreakdata1.tmpl tmp.txt tmp.c > ${srcdir}/linebreakdata.c
+ 	rm tmp.txt tmp.c
+ 
+-wordbreakdata: WordBreakProperty.txt
++wordbreakdata:
+ 	${srcdir}/generate_word_break.py > ${srcdir}/wordbreakdata.c
+ 
+-graphemebreakdata: GraphemeBreakProperty.txt
++graphemebreakdata:
+ 	${srcdir}/generate_grapheme_break.py > ${srcdir}/graphemebreakdata.c
+ 
+-eastasianwidthdata: EastAsianWidth.txt
++eastasianwidthdata:
+ 	${srcdir}/generate_east_asian_width.py > ${srcdir}/eastasianwidthdata.c
+ 
+-indicconjunctbreakdata: DerivedCoreProperties.txt
++indicconjunctbreakdata:
+ 	${srcdir}/generate_indic_conjunct_break.py > ${srcdir}/indicconjunctbreakdata.c
+ 
+-emojidata: emoji-data.txt
++emojidata:
+ 	${srcdir}/generate_extended_pictographic.py > ${srcdir}/emojidata.c
+ 
+ update-test:
+-	rm -f WordBreakTest.txt GraphemeBreakTest.txt
+-	rm -f ${srcdir}/WordBreakTest.txt ${srcdir}/GraphemeBreakTest.txt
+-	wget http://www.unicode.org/Public/UNIDATA/auxiliary/WordBreakTest.txt
+-	wget http://www.unicode.org/Public/UNIDATA/auxiliary/GraphemeBreakTest.txt
+-	[ -f ${srcdir}/WordBreakTest.txt ] || mv -f WordBreakTest.txt GraphemeBreakTest.txt ${srcdir}
++	[ -f ${srcdir}/WordBreakTest.txt && -f ${srcdir}/GraphemeBreakTest.txt ] || exit 42
+ 
+ 
+ # Tests

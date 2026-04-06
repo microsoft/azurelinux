@@ -1,0 +1,38 @@
+From 80c1f2948087fdca46b566f5196915e6cf2300ff Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Sun, 13 Jul 2025 15:14:50 -0500
+Subject: [PATCH 2/2] relationship_writer: properly access __annotations__ dict
+
+As of PEP 749 (Python 3.14), it is no longer possible to access
+__annotations__ on class instances. __annotations__ is now a descriptor
+that is only defined on `type` and not on `object`. Apparently,
+accessing __annotations__ on class instances was never supported in the
+first place:
+
+> Second, in previous versions of Python it was possible to access the __annotations__ attribute on instances of user-defined classes with annotations. However, this behavior was undocumented and not supported by inspect.get_annotations(), and it cannot be preserved under the PEP 649 framework without bigger changes, such as a new object.__annotations__ descriptor. This behavior change should be called out in porting guides.
+
+Note that making this code call `dataclasses.fields()` to get a list of
+fields is probably a better solution here, but I chose the most minimal
+change to get this working with Python 3.14. Feel free to close this and
+create a new PR if you prefer a different solution.
+
+Ref: https://peps.python.org/pep-0749/#metaclass-behavior-with-pep-649
+Signed-off-by: Maxwell G <maxwell@gtmx.me>
+---
+ src/spdx_tools/spdx3/writer/console/relationship_writer.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/spdx_tools/spdx3/writer/console/relationship_writer.py b/src/spdx_tools/spdx3/writer/console/relationship_writer.py
+index 1a8b16a..26b0203 100644
+--- a/src/spdx_tools/spdx3/writer/console/relationship_writer.py
++++ b/src/spdx_tools/spdx3/writer/console/relationship_writer.py
+@@ -12,5 +12,5 @@ def write_relationship(relationship: Relationship, text_output: TextIO, heading:
+     if heading:
+         text_output.write("## Relationship\n")
+     write_element_properties(relationship, text_output)
+-    for property_name in relationship.__annotations__.keys():
++    for property_name in type(relationship).__annotations__.keys():
+         write_value(property_name, getattr(relationship, property_name), text_output)
+-- 
+2.50.0
+

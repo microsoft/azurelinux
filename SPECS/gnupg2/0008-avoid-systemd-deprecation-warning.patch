@@ -1,0 +1,40 @@
+From 241db54dcd6ce4b32e3298d49195965757e6d3ef Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Mon, 21 Aug 2023 14:22:50 +0900
+Subject: avoid-systemd-deprecation-warning
+
+---
+ agent/gpg-agent.c | 3 ---
+ dirmngr/dirmngr.c | 3 ---
+ 2 files changed, 6 deletions(-)
+
+diff --git a/agent/gpg-agent.c b/agent/gpg-agent.c
+index c4b281d63..8bcd496bf 100644
+--- a/agent/gpg-agent.c
++++ b/agent/gpg-agent.c
+@@ -1399,9 +1399,6 @@ main (int argc, char **argv)
+       agent_exit (0);
+     }
+ 
+-  if (is_supervised && !opt.quiet)
+-    log_info(_("WARNING: \"%s\" is a deprecated option\n"), "--supervised");
+-
+   if (is_supervised)
+     ;
+   else if (!opt.extra_socket)
+diff --git a/dirmngr/dirmngr.c b/dirmngr/dirmngr.c
+index f79a0f877..755572d6e 100644
+--- a/dirmngr/dirmngr.c
++++ b/dirmngr/dirmngr.c
+@@ -1332,9 +1332,6 @@ main (int argc, char **argv)
+     {
+       struct stat statbuf;
+ 
+-      if (!opt.quiet)
+-        log_info(_("WARNING: \"%s\" is a deprecated option\n"), "--supervised");
+-
+       /* In supervised mode, we expect file descriptor 3 to be an
+          already opened, listening socket.
+ 
+-- 
+2.43.0

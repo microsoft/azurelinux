@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Malcolm <dmalcolm@redhat.com>
+Date: Fri, 19 Jun 2020 16:57:09 +0200
+Subject: 00160: Disable test_fs_holes in RPM build
+
+Python 3.3 added os.SEEK_DATA and os.SEEK_HOLE, which may be present in the
+header files in the build chroot, but may not be supported in the running
+kernel, hence we disable this test in an rpm build.
+Adding these was upstream issue http://bugs.python.org/issue10142
+---
+ Lib/test/test_posix.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_posix.py b/Lib/test/test_posix.py
+index 2dae473327..c893ecbdc6 100644
+--- a/Lib/test/test_posix.py
++++ b/Lib/test/test_posix.py
+@@ -1235,6 +1235,7 @@ class PosixTester(unittest.TestCase):
+         posix.RTLD_GLOBAL
+         posix.RTLD_LOCAL
+ 
++    @unittest._skipInRpmBuild('running kernel may not match kernel in chroot')
+     @unittest.skipUnless(hasattr(os, 'SEEK_HOLE'),
+                          "test needs an OS that reports file holes")
+     def test_fs_holes(self):

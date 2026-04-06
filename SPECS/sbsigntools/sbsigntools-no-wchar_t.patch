@@ -1,0 +1,34 @@
+diff -up sbsigntools-0.9.5/src/sbvarsign.c.orig sbsigntools-0.9.5/src/sbvarsign.c
+--- sbsigntools-0.9.5/src/sbvarsign.c.orig	2023-05-05 12:56:50.000000000 +0200
++++ sbsigntools-0.9.5/src/sbvarsign.c	2024-11-18 23:53:08.764976485 +0100
+@@ -67,7 +67,7 @@ struct varsign_context {
+ 	uint8_t				*data;
+ 	size_t				data_len;
+ 
+-	CHAR16				*var_name;
++	uint16_t			*var_name;
+ 	int				var_name_bytes;
+ 	EFI_GUID			var_guid;
+ 	uint32_t			var_attrs;
+@@ -163,18 +163,18 @@ static uint32_t parse_attrs(const char *
+ 
+ static int set_varname(struct varsign_context *ctx, const char *str)
+ {
+-	CHAR16 *wstr;
++	uint16_t *wstr;
+ 	int i, len;
+ 
+ 	len = strlen(str);
+ 
+-	wstr = talloc_array(ctx, CHAR16, len);
++	wstr = talloc_array(ctx, uint16_t, len);
+ 
+ 	for (i = 0; i < len; i++)
+ 		wstr[i] = str[i];
+ 
+ 	ctx->var_name = wstr;
+-	ctx->var_name_bytes = len * sizeof(CHAR16);
++	ctx->var_name_bytes = len * sizeof(uint16_t);
+ 
+ 	return 0;
+ }

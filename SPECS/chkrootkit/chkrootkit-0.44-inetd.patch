@@ -1,0 +1,15 @@
+diff -Nur chkrootkit-0.44-orig/chkrootkit chkrootkit-0.44/chkrootkit
+--- chkrootkit-0.44-orig/chkrootkit	2004-09-01 15:27:28.000000000 +0200
++++ chkrootkit-0.44/chkrootkit	2004-10-04 15:08:30.638442968 +0200
+@@ -1216,9 +1216,8 @@
+     STATUS=${NOT_INFECTED}
+     getCMD 'inetd'
+ 
+-    if [ ! -r ${CMD} -o ${CMD} = '/' ]
+-    then
+-       return ${NOT_TESTED}
++    if [ ${?} -ne 0 ]; then
++       return ${NOT_FOUND}
+     fi
+ 
+     if [ "${EXPERT}" = "t" ]; then

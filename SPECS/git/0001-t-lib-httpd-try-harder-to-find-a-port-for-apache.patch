@@ -1,0 +1,73 @@
+From 89ccbc15948db9ddbf74530e3fd66dd78ae897ae Mon Sep 17 00:00:00 2001
+From: Todd Zullinger <tmz@pobox.com>
+Date: Sun, 21 Aug 2022 13:49:57 -0400
+Subject: [PATCH] t/lib-httpd: try harder to find a port for apache
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When running multiple builds concurrently, tests which run daemons, like
+apache httpd, sometimes conflict with each other, leading to spurious
+failures:
+
+    ++ /usr/sbin/httpd -d '/tmp/git-t.ck9I/trash directory.t9118-git-svn-funky-branch-names/httpd' \
+       -f /builddir/build/BUILD/git-2.37.2/t/lib-httpd/apache.conf -DDAV -DSVN -c 'Listen 127.0.0.1:9118' \
+       -k start
+    (98)Address already in use: AH00072: make_sock: could not bind to address 127.0.0.1:9118
+    no listening sockets available, shutting down
+    AH00015: Unable to open logs
+    ++ test 1 -ne 0
+
+Try a bit harder to find an open port to use to avoid these intermittent
+failures.  If we fail to start httpd, increment the port number and try
+again.  By default, we make 3 attempts.  This may be overridden by
+setting GIT_TEST_START_HTTPD_TRIES to a different value.
+
+Helped-by: Ondřej Pohořelský <opohorel@redhat.com>
+Signed-off-by: Todd Zullinger <tmz@pobox.com>
+---
+ t/lib-httpd.sh | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/t/lib-httpd.sh b/t/lib-httpd.sh
+index 2fb1b2ae56..4afdf5a6aa 100644
+--- a/t/lib-httpd.sh
++++ b/t/lib-httpd.sh
+@@ -206,19 +206,26 @@ enable_cgipassauth () {
+ }
+ 
+ start_httpd() {
+-	prepare_httpd >&3 2>&4
+-
+ 	test_atexit stop_httpd
+ 
+-	"$LIB_HTTPD_PATH" -d "$HTTPD_ROOT_PATH" \
+-		-f "$TEST_PATH/apache.conf" $HTTPD_PARA \
+-		-c "Listen 127.0.0.1:$LIB_HTTPD_PORT" -k start \
+-		>&3 2>&4
+-	if test $? -ne 0
+-	then
+-		cat "$HTTPD_ROOT_PATH"/error.log >&4 2>/dev/null
+-		test_skip_or_die GIT_TEST_HTTPD "web server setup failed"
+-	fi
++	i=0
++	while test $i -lt ${GIT_TEST_START_HTTPD_TRIES:-3}
++	do
++		i=$(($i + 1))
++		prepare_httpd >&3 2>&4
++		say >&3 "Starting httpd on port $LIB_HTTPD_PORT"
++		"$LIB_HTTPD_PATH" -d "$HTTPD_ROOT_PATH" \
++			-f "$TEST_PATH/apache.conf" $HTTPD_PARA \
++			-c "Listen 127.0.0.1:$LIB_HTTPD_PORT" -k start \
++			>&3 2>&4
++		test $? -eq 0 && return
++		LIB_HTTPD_PORT=$(($LIB_HTTPD_PORT + 1))
++		export LIB_HTTPD_PORT
++		# clean up modules symlink, prepare_httpd will re-create it
++		rm -f "$HTTPD_ROOT_PATH/modules"
++	done
++	cat "$HTTPD_ROOT_PATH"/error.log >&4 2>/dev/null
++	test_skip_or_die GIT_TEST_HTTPD "web server setup failed"
+ }
+ 
+ stop_httpd() {

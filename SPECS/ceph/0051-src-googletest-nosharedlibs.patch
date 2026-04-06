@@ -1,0 +1,42 @@
+--- ceph-19.2.0/src/googletest/googletest/CMakeLists.txt.orig	2025-01-23 07:43:33.314970694 -0500
++++ ceph-19.2.0/src/googletest/googletest/CMakeLists.txt	2025-01-23 07:44:13.529250429 -0500
+@@ -63,6 +63,8 @@
+   set_up_hermetic_build()
+ endif()
+ 
++option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
++
+ # These commands only run if this is the main project
+ if(CMAKE_PROJECT_NAME STREQUAL "gtest" OR CMAKE_PROJECT_NAME STREQUAL "googletest-distribution")
+ 
+@@ -126,9 +128,9 @@
+ # are used for other targets, to ensure that gtest can be compiled by a user
+ # aggressive about warnings.
+ cxx_library(gtest "${cxx_strict}" src/gtest-all.cc)
+-set_target_properties(gtest PROPERTIES VERSION ${GOOGLETEST_VERSION})
++#set_target_properties(gtest PROPERTIES VERSION ${GOOGLETEST_VERSION})
+ cxx_library(gtest_main "${cxx_strict}" src/gtest_main.cc)
+-set_target_properties(gtest_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
++#set_target_properties(gtest_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
+ # If the CMake version supports it, attach header directory information
+ # to the targets for when we are part of a parent build (ie being pulled
+ # in via add_subdirectory() rather than being a standalone build).
+--- ceph-19.2.0/src/googletest/googlemock/CMakeLists.txt.orig	2025-01-23 07:40:52.399853240 -0500
++++ ceph-19.2.0/src/googletest/googlemock/CMakeLists.txt	2025-01-23 07:43:18.466236642 -0500
+@@ -54,6 +54,7 @@
+ # if they are the same (the default).
+ add_subdirectory("${gtest_dir}" "${gmock_BINARY_DIR}/${gtest_dir}")
+ 
++option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
+ 
+ # These commands only run if this is the main project
+ if(CMAKE_PROJECT_NAME STREQUAL "gmock" OR CMAKE_PROJECT_NAME STREQUAL "googletest-distribution")
+@@ -100,7 +101,7 @@
+ else()
+   cxx_library(gmock "${cxx_strict}" src/gmock-all.cc)
+   target_link_libraries(gmock PUBLIC gtest)
+-  set_target_properties(gmock PROPERTIES VERSION ${GOOGLETEST_VERSION})
++  #  set_target_properties(gmock PROPERTIES VERSION ${GOOGLETEST_VERSION})
+   cxx_library(gmock_main "${cxx_strict}" src/gmock_main.cc)
+   target_link_libraries(gmock_main PUBLIC gmock)
+   set_target_properties(gmock_main PROPERTIES VERSION ${GOOGLETEST_VERSION})

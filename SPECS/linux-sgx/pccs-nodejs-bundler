@@ -1,0 +1,83 @@
+#!/bin/sh
+
+#set -v
+set -e
+
+if test -z "$1"
+then
+    echo "syntax: $0 PCCS-TARBALL-VERSION"
+    exit 1
+fi
+
+VERSION=$1
+
+TARBALL=pccs-${VERSION}.tar.gz
+
+if ! test -f $TARBALL
+then
+    echo "error: $0 missing $TARBALL"
+    exit 1
+fi
+tar xfz $TARBALL
+DIRNAME=confidential-computing.tee.dcap.pccs-DCAP_${VERSION}
+pushd $DIRNAME
+
+# Apply patches from linux-sgx.spec since they update the package-lock.json
+# to pull in security fixes. See linux-sgx.spec for the github URL of the
+# source-git repo where the patches are maintained.
+for p in ../04*.patch
+do
+    patch -p1 < $p
+done
+pushd service
+echo " Downloading prod dependencies"
+npm install --omit=dev --omit=optional --ignore-scripts
+if ! npm audit
+then
+    echo "error: $0 some dependencies have known vulnerabilities"
+    if test -z "$NPM_IGNORE_AUDIT"
+    then
+       exit 1
+    fi
+fi
+rm -rf node_modules/*/prebuilds
+rm -f node_modules/sqlite3/deps/sqlite-autoconf-*.tar.gz
+popd
+
+function find_package {
+    find . -type f -name "package.json"  -not \( -path './service/node_modules/resolve/test/*' -o -path './service/node_modules/github-from-package/example/*' \)   "$@"
+}
+
+echo "LICENSES IN BUNDLE:"
+find_package -exec jq '.license | strings' {} \; >> ../pccs-${VERSION}-nodejs-licenses.txt
+find_package -exec jq '.license | objects | .type' {} \; >> ../pccs-${VERSION}-nodejs-licenses.txt 2>/dev/null
+find_package -exec jq '.licenses[] .type' {} \; >> ../pccs-${VERSION}-nodejs-licenses.txt 2>/dev/null
+sort -u -o ../pccs-${VERSION}-nodejs-licenses.txt ../pccs-${VERSION}-nodejs-licenses.txt
+
+IGNORE_NO_LICENSE="(PCCS|seq-queue)"
+# Locate any dependencies without a provided license
+find_package -execdir jq 'if .license==null and .licenses==null then .name else null end' '{}' '+' \
+  | grep -vE '^null$' | grep -v -E $IGNORE_NO_LICENSE | sort -u > ../nolicense.txt
+
+if [ -s ../nolicense.txt ]; then
+  echo -e "\e[5m\e[41mSome dependencies do not list a license. Manual verification required!\e[0m"
+  cat ../nolicense.txt
+  echo -e "\e[5m\e[41m======================================================================\e[0m"
+else
+  rm -f ../nolicense.txt
+fi
+
+
+if [ -d service/node_modules ] ; then
+  TODAY=$(date +"%Y%m%d")
+  OUTPUT=pccs-${VERSION}-${TODAY}-node-modules.tar.xz
+  tar cJf ../$OUTPUT --sort=name $(find service -type d -name node_modules)
+
+  echo "Review pccs-${VERSION}-nodejs-licenses.txt for any new"
+  echo "licenses to be added to linux-sgx.spec"
+  echo "New archive is $OUTPUT"
+fi
+
+popd
+
+rm -rf $DIRNAME

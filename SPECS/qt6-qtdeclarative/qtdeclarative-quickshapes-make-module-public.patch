@@ -1,0 +1,64 @@
+From 6847deaf579f8490db4bfce6f1ac7b6188f2f3fe Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 24 Sep 2025 10:35:42 +0200
+Subject: [PATCH] QuickShapes: Make the module public
+
+The QuickShapes module was previously built as an internal-only module.
+This created an improper dependency for modules like QtLocation, which
+link against it and were consequently forced to depend on private API.
+
+This allows other modules to have a clean, public dependency on the
+QuickShapes API.
+
+Change-Id: I029e670f61efd29459a3bb51579cd1f796c7f0fd
+---
+
+diff --git a/src/quickshapes/CMakeLists.txt b/src/quickshapes/CMakeLists.txt
+index ddbff75..7087379 100644
+--- a/src/quickshapes/CMakeLists.txt
++++ b/src/quickshapes/CMakeLists.txt
+@@ -2,10 +2,10 @@
+ # SPDX-License-Identifier: BSD-3-Clause
+ 
+ #####################################################################
+-## QuickShapesPrivate Module:
++## QuickShapes Module:
+ #####################################################################
+ 
+-qt_internal_add_qml_module(QuickShapesPrivate
++qt_internal_add_qml_module(QuickShapes
+     URI "QtQuick.Shapes"
+     VERSION "${PROJECT_VERSION}"
+     PLUGIN_TARGET qmlshapesplugin
+@@ -14,7 +14,6 @@
+     CLASS_NAME QmlShapesPlugin
+     DEPENDENCIES
+         QtQuick/auto
+-    INTERNAL_MODULE
+     SOURCES
+         qquickshape.cpp qquickshape_p.h
+         qquickshape_p_p.h
+@@ -22,10 +21,13 @@
+         qquickshapesglobal.h qquickshapesglobal_p.h
+         qquickshapecurverenderer.cpp qquickshapecurverenderer_p.h qquickshapecurverenderer_p_p.h
+         qquickshapesoftwarerenderer.cpp qquickshapesoftwarerenderer_p.h
++    LIBRARIES
++        Qt::GuiPrivate
++        Qt::QuickPrivate
+     PUBLIC_LIBRARIES
+         Qt::Core
+-        Qt::GuiPrivate
+         Qt::Qml
++    PRIVATE_MODULE_INTERFACE
+         Qt::QuickPrivate
+     )
+ 
+@@ -36,7 +38,7 @@
+     LIBRARIES Qt::QuickShapesPrivate
+ )
+ 
+-qt_internal_add_shaders(QuickShapesPrivate "qtquickshapes_shaders"
++qt_internal_add_shaders(QuickShapes "qtquickshapes_shaders"
+     SILENT
+     BATCHABLE
+     PRECOMPILE

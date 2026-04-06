@@ -1,0 +1,25 @@
+From a0f3314425529f6778c390bc8eb9420659c7377f Mon Sep 17 00:00:00 2001
+From: David Shea <reallylongword@gmail.com>
+Date: Tue, 8 Jul 2025 13:45:36 -0400
+Subject: [PATCH] Relax the test requirement versions
+
+---
+ test_requirements.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test_requirements.txt b/test_requirements.txt
+index 5eb7ce1..aa41851 100644
+--- a/test_requirements.txt
++++ b/test_requirements.txt
+@@ -1,4 +1,4 @@
+-pytest==2.8.7
+-pytest-xdist==1.13.1
+-pyftpdlib==1.5.0
+-six==1.10.0
++pytest>=2.8.7
++pytest-xdist>=1.13.1
++pyftpdlib>=1.5.0
++six>=1.10.0
+-- 
+2.49.0
+

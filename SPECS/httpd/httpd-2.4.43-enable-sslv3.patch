@@ -1,0 +1,62 @@
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index 979489c..3d6443b 100644
+--- a/modules/ssl/ssl_engine_config.c
++++ b/modules/ssl/ssl_engine_config.c
+@@ -1485,6 +1485,10 @@ static const char *ssl_cmd_protocol_parse(cmd_parms *parms,
+ #endif
+         else if (strcEQ(w, "all")) {
+             thisopt = SSL_PROTOCOL_ALL;
++#ifndef OPENSSL_NO_SSL3
++            /* by default, ALL kw doesn't turn on SSLv3 */
++            thisopt &= ~SSL_PROTOCOL_SSLV3;
++#endif
+         }
+         else {
+             return apr_pstrcat(parms->temp_pool,
+diff --git a/modules/ssl/ssl_engine_init.c b/modules/ssl/ssl_engine_init.c
+index b0fcf81..ab6f263 100644
+--- a/modules/ssl/ssl_engine_init.c
++++ b/modules/ssl/ssl_engine_init.c
+@@ -568,6 +568,28 @@ static apr_status_t ssl_init_ctx_tls_extensions(server_rec *s,
+ }
+ #endif
+ 
++/*
++ * Enable/disable SSLProtocol. If the mod_ssl enables protocol
++ * which is disabled by default by OpenSSL, show a warning.
++ * "option" is for example SSL_OP_NO_SSLv3.
++ */
++static void ssl_set_ctx_protocol_option(server_rec *s,
++                                        SSL_CTX *ctx,
++                                        long option,
++                                        int enabled,
++                                        const char *name)
++{
++      if (!enabled) {
++                SSL_CTX_set_options(ctx, option);
++      }
++      else if (SSL_CTX_get_options(ctx) & option) {
++                    SSL_CTX_clear_options(ctx, option);
++                    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s, APLOGNO(02904)
++                                 "Allowing SSLProtocol %s even though it is disabled "
++                                 "by OpenSSL by default on this system", name);
++      }
++}
++
+ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+                                           apr_pool_t *p,
+                                           apr_pool_t *ptemp,
+@@ -735,9 +757,13 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+     }
+     if (prot == TLS1_1_VERSION && protocol & SSL_PROTOCOL_TLSV1) {
+         prot = TLS1_VERSION;
++        ssl_set_ctx_protocol_option(s, ctx, SSL_OP_NO_TLSv1,
++                                    protocol & SSL_PROTOCOL_TLSV1, "TLSv1");
+     }
+ #ifndef OPENSSL_NO_SSL3
+     if (prot == TLS1_VERSION && protocol & SSL_PROTOCOL_SSLV3) {
++        ssl_set_ctx_protocol_option(s, ctx, SSL_OP_NO_SSLv3,
++                                    protocol & SSL_PROTOCOL_SSLV3, "SSLv3");
+         prot = SSL3_VERSION;
+     }
+ #endif

@@ -1,0 +1,23 @@
+diff -up gsl-1.15/gsl-config.in.pom gsl-1.15/gsl-config.in
+--- gsl-1.15/gsl-config.in.pom	2010-12-26 18:57:08.000000000 +0100
++++ gsl-1.15/gsl-config.in	2011-05-09 08:33:05.000000000 +0200
+@@ -58,16 +58,16 @@ while test $# -gt 0; do
+ 	;;
+ 
+     --cflags)
+-       	echo @GSL_CFLAGS@ 
++       	echo -I$includedir
+        	;;
+ 
+     --libs)
+         : ${GSL_CBLAS_LIB=-lgslcblas}
+-	echo @GSL_LIBS@ $GSL_CBLAS_LIB @GSL_LIBM@
++	echo -lgsl $GSL_CBLAS_LIB -lm
+        	;;
+ 
+     --libs-without-cblas)
+-	echo @GSL_LIBS@ @GSL_LIBM@
++	echo -lgsl -lm
+        	;;
+     *)
+ 	usage

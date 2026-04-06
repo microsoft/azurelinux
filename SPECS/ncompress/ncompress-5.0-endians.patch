@@ -1,0 +1,12 @@
+diff -ur v5.0_original/ncompress-5.0/compress.c v5.0/ncompress-5.0/compress.c
+--- v5.0_original/ncompress-5.0/compress.c	2021-02-02 09:16:16.000000000 +0100
++++ v5.0/ncompress-5.0/compress.c	2022-06-24 11:39:42.325726170 +0200
+@@ -357,7 +357,7 @@
+ 
+ union	bytes
+ {
+-	long	word;
++	int	word;
+ 	struct
+ 	{
+ #if BYTEORDER == 4321

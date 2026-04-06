@@ -1,0 +1,22 @@
+--- x509-parser-0.18.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ x509-parser-0.18.1/Cargo.toml	2026-02-09T16:06:03.776531+00:00
+@@ -20,19 +20,12 @@
+     "CHANGELOG.md",
+     "LICENSE-*",
+     "README.md",
+-    ".gitignore",
+-    ".travis.yml",
+     "Cargo.toml",
+     "src/*.rs",
+     "src/extensions/*.rs",
+     "src/validate/*.rs",
+     "src/visitor/*.rs",
+     "tests/*.rs",
+-    "assets/*.crl",
+-    "assets/*.csr",
+-    "assets/*.der",
+-    "assets/*.pem",
+-    "assets/crl-ext/*.der",
+     "examples/*.rs",
+ ]
+ autolib = false

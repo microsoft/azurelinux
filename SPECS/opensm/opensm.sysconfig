@@ -1,0 +1,72 @@
+# Problem #1: Multiple IB fabrics needing a subnet manager
+#
+# In the event that a machine has more than one IB subnet attached,
+# and that machine is an opensm server, by default, opensm will
+# only attach to one port and will not manage the fabric on the
+# other port.  There are two ways to solve this problem:
+#
+# 1) Start opensm on multiple machines and configure it to manage
+#    different fabrics on each machine
+# 2) Configure opensm to start multiple instances on a single
+#    machine
+#
+# Both solutions to this problem require non-standard configurations.
+# In other words, you would normally have to modify /etc/rdma/opensm.conf
+# and once you do that, the file will no longer be updated for new
+# options when opensm is upgraded.  In an effort to allow people to
+# have more than one subnet managed by opensm without having to modify
+# the system default opensm.conf file, we have enabled two methods
+# for modifying the default opensm config items needed to enable
+# multiple fabric management.
+#
+# Method #1: Create multiple opensm.conf files in non-standard locations
+#   Copy /etc/rdma/opensm.conf to /etc/rdma/opensm.conf.<number>
+#     (do this once for each instance you want started)
+#   Edit each copy of the opensm.conf file to reflect the necessary changes
+#     for a multiple instance startup.  If you need to manage more than
+#     one fabric, you will have to change the guid option in each file
+#     to specify the guid of the specific port you want opensm attached
+#     to.
+#
+# The advantage to method #1 is that, on the off chance you want to do
+# really special custom things on different ports, like have different
+# QoS settings depending on which port you are attached to, you have the
+# freedom to edit any and all settings for each instance without those
+# changes affecting other instances or being lost when opensm upgrades.
+#
+# Method #2: Specify multiple GUIDS variable entries in this file
+#   Uncomment the below GUIDS variable and enter each guid you need to attach
+#     to into the list.  If using this method you need to enter each
+#     guid into the list as we won't attach to any default ports, only
+#     those specified in the list.
+#
+#GUIDS="0x0002c90300048ca1 0x0002c90300048ca2"
+#
+# The obvious advantage to method #2 is that it's simple and doesn't
+# clutter up your file system, but it is far more limited in what you
+# can do.  If you enable method #2, then even if you create the files
+# referenced in method #1, they will be ignored.
+#
+# Problem #2: Activating a backup subnet manager
+#
+# The default priority of opensm is set so that it wants to be the
+# primary subnet manager.  This is great when you are only running
+# opensm on one server, but if you want to have a non-primary opensm
+# instance for failover, then you have to manually edit the opensm.conf
+# file like for problem #1.  This carries with it all the problems
+# listed above.  If you wish to enable opensm as a non-primary manager,
+# then you can uncomment the PRIORITY variable below and set it to
+# some number between 0 and 15, where 15 is the highest priority and
+# the primary manager, with 0 being the lowest backup server.  This method
+# will work with the GUIDS option above, and also with the multiple
+# config files in method #1 above.  However, only a single priority is
+# supported here.  If you wanted more than one priority (say this machine
+# is the primary on the first fabric, and second on the second fabric,
+# while the other opensm server is primary on the second fabric and
+# second on the primary), then the only way to do that is to use method #1
+# above and individually edit the config files.  If you edit the config
+# files to set the priority and then also set the priority here, then
+# this setting will override the config files and render that particular
+# edit useless.
+#
+#PRIORITY=15

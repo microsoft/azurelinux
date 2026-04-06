@@ -1,0 +1,70 @@
+From 2835c2a00d93c70c4c442b1dd51f14c941e35f65 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 14 Jul 2025 11:59:43 +0200
+Subject: [PATCH] Fix `from websockets.(asyncio|sync).router import *` without
+ werkzeug
+
+This is a followup for 3128f5619de15991ec2af93d68c9c6626c6a5ae0
+
+Also, skip test_router_supports_unix_sockets without werkzeug.
+---
+ src/websockets/asyncio/router.py | 4 ++++
+ src/websockets/sync/router.py    | 4 ++++
+ tests/asyncio/test_router.py     | 1 +
+ tests/sync/test_router.py        | 1 +
+ 4 files changed, 10 insertions(+)
+
+diff --git a/src/websockets/asyncio/router.py b/src/websockets/asyncio/router.py
+index 12b292aa1..28c4bf314 100644
+--- a/src/websockets/asyncio/router.py
++++ b/src/websockets/asyncio/router.py
+@@ -35,6 +35,10 @@ def unix_route(
+     ) -> Awaitable[Server]:
+         raise ImportError("unix_route() requires werkzeug")
+ 
++    class Router:
++        def __init__(self, *args: Any, **kwargs: Any) -> None:
++            raise ImportError("Router() requires werkzeug")
++
+ else:
+ 
+     class Router:
+diff --git a/src/websockets/sync/router.py b/src/websockets/sync/router.py
+index 0292a17d8..618b2d555 100644
+--- a/src/websockets/sync/router.py
++++ b/src/websockets/sync/router.py
+@@ -35,6 +35,10 @@ def unix_route(
+     ) -> Server:
+         raise ImportError("unix_route() requires werkzeug")
+ 
++    class Router:
++        def __init__(self, *args: Any, **kwargs: Any) -> None:
++            raise ImportError("Router() requires werkzeug")
++
+ else:
+ 
+     class Router:
+diff --git a/tests/asyncio/test_router.py b/tests/asyncio/test_router.py
+index 1426cc9f3..3dd766c96 100644
+--- a/tests/asyncio/test_router.py
++++ b/tests/asyncio/test_router.py
+@@ -186,6 +186,7 @@ async def handler(self, connection):
+ 
+ 
+ @unittest.skipUnless(hasattr(socket, "AF_UNIX"), "this test requires Unix sockets")
++@unittest.skipUnless("werkzeug" in sys.modules, "werkzeug not installed")
+ class UnixRouterTests(EvalShellMixin, unittest.IsolatedAsyncioTestCase):
+     async def test_router_supports_unix_sockets(self):
+         """Router supports Unix sockets."""
+diff --git a/tests/sync/test_router.py b/tests/sync/test_router.py
+index 07274e625..cf04a8689 100644
+--- a/tests/sync/test_router.py
++++ b/tests/sync/test_router.py
+@@ -162,6 +162,7 @@ def handler(self, connection):
+ 
+ 
+ @unittest.skipUnless(hasattr(socket, "AF_UNIX"), "this test requires Unix sockets")
++@unittest.skipUnless("werkzeug" in sys.modules, "werkzeug not installed")
+ class UnixRouterTests(EvalShellMixin, unittest.IsolatedAsyncioTestCase):
+     def test_router_supports_unix_sockets(self):
+         """Router supports Unix sockets."""

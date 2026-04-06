@@ -1,0 +1,345 @@
+From ebaf4e0e48c6e881818d8759470f227d4e15abca Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 18 May 2023 14:28:48 +0200
+Subject: [PATCH] Upgrade to 3.89
+
+---
+ Changes                    |  24 +++++
+ Cwd.pm                     |  10 +-
+ Cwd.xs                     |  18 ++--
+ META.json                  |   2 +-
+ META.yml                   |   2 +-
+ Makefile.PL                |   5 +-
+ lib/File/Spec.pm           |   6 +-
+ lib/File/Spec/AmigaOS.pm   |   2 +-
+ lib/File/Spec/Cygwin.pm    |   2 +-
+ lib/File/Spec/Epoc.pm      |   2 +-
+ lib/File/Spec/Functions.pm |   2 +-
+ lib/File/Spec/Mac.pm       |   2 +-
+ lib/File/Spec/OS2.pm       |   2 +-
+ lib/File/Spec/Unix.pm      |   2 +-
+ lib/File/Spec/Win32.pm     |   2 +-
+ t/Spec.t                   | 196 ++++++++++++++++++++++++++++++++++++-
+ t/cwd_enoent.t             |   4 +-
+ t/tmpdir.t                 |   2 +-
+ 18 files changed, 254 insertions(+), 31 deletions(-)
+
+diff --git a/Changes b/Changes
+index 9533c1f..47e172a 100644
+--- a/Changes
++++ b/Changes
+@@ -1,5 +1,29 @@
+ Revision history for Perl distribution PathTools.
+ 
++3.87-3.88
++
++- Fix handling of empty path, VMS fixes.
++
++3.86
++
++- Fix compilation warning on illumos based platforms
++
++3.85
++
++- Fix issue related to tainting empty PATH
++
++3.84
++
++- Add PerlIO_readlink backcompat defines to Cws.xs
++
++3.83
++
++- More bugtracker changes, document maintainer is the Perl-5 Porters
++
++3.82
++
++- Change to build so bugreports go to GitHub
++
+ 3.81
+ 
+ - compare inode numbers as strings (github #18788)
+diff --git a/Cwd.pm b/Cwd.pm
+index 0683583..dbf08a6 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.89';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+@@ -192,8 +192,14 @@ sub _backtick_pwd {
+     # Localize %ENV entries in a way that won't create new hash keys.
+     # Under AmigaOS we don't want to localize as it stops perl from
+     # finding 'sh' in the PATH.
+-    my @localize = grep exists $ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV) if $^O ne "amigaos";
++    my @localize = grep exists $ENV{$_}, qw(IFS CDPATH ENV BASH_ENV) if $^O ne "amigaos";
+     local @ENV{@localize} if @localize;
++    # empty PATH is the same as "." on *nix, so localize it to /something/
++    # we won't *use* the path as code above turns $pwd_cmd into a specific
++    # executable, but it will blow up anyway under taint. We could set it to
++    # anything absolute. Perhaps "/" would be better.
++    local $ENV{PATH}= "/usr/bin"
++        if $^O ne "amigaos";
+     
+     my $cwd = `$pwd_cmd`;
+     # Belt-and-suspenders in case someone said "undef $/".
+diff --git a/Cwd.xs b/Cwd.xs
+index 4fda057..ca8639d 100644
+--- a/Cwd.xs
++++ b/Cwd.xs
+@@ -7,13 +7,11 @@
+ #include "EXTERN.h"
+ #include "perl.h"
+ #include "XSUB.h"
+-#ifndef NO_PPPORT_H
+-#  define NEED_croak_xs_usage
+-#  define NEED_sv_2pv_flags
+-#  define NEED_my_strlcpy
+-#  define NEED_my_strlcat
+-#  include "ppport.h"
+-#endif
++#define NEED_croak_xs_usage
++#define NEED_sv_2pv_flags
++#define NEED_my_strlcpy
++#define NEED_my_strlcat
++#include "ppport.h"
+ 
+ #if defined(HAS_READLINK) && !defined(PerlLIO_readlink)
+ #define PerlLIO_readlink readlink
+@@ -24,8 +22,10 @@
+ #endif
+ 
+ /* For special handling of os390 sysplexed systems */
++#ifdef OS390
+ #define SYSNAME "$SYSNAME"
+ #define SYSNAME_LEN (sizeof(SYSNAME) - 1)
++#endif
+ 
+ /* The realpath() implementation from OpenBSD 3.9 to 4.2 (realpath.c 1.13)
+  * Renamed here to bsd_realpath() to avoid library conflicts.
+@@ -202,7 +202,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                     if (slen < 0)
+                         return (NULL);
+                     symlink[slen] = '\0';
+-#  ifdef EBCDIC /* XXX Probably this should be only os390 */
++#  ifdef OS390
+                     /* Replace all instances of $SYSNAME/foo simply by /foo */
+                     if (slen > SYSNAME_LEN + strlen(next_token)
+                         && strnEQ(symlink, SYSNAME, SYSNAME_LEN)
+@@ -245,7 +245,7 @@ bsd_realpath(const char *path, char resolved[MAXPATHLEN])
+                     }
+                     remaining_len = my_strlcpy(remaining, symlink, sizeof(remaining));
+                 }
+-#  ifdef EBCDIC
++#  ifdef OS390
+               not_symlink: ;
+ #  endif
+             }
+diff --git a/META.json b/META.json
+index ad429a5..d810ba7 100644
+--- a/META.json
++++ b/META.json
+@@ -50,6 +50,6 @@
+          "url" : "git://perl5.git.perl.org/perl.git"
+       }
+    },
+-   "version" : "3.73",
++   "version" : "3.86",
+    "x_serialization_backend" : "JSON::PP version 2.27400_02"
+ }
+diff --git a/META.yml b/META.yml
+index c2adfcf..f5e9fe3 100644
+--- a/META.yml
++++ b/META.yml
+@@ -26,5 +26,5 @@ resources:
+   bugtracker: https://rt.perl.org/rt3/
+   homepage: http://dev.perl.org/
+   repository: git://perl5.git.perl.org/perl.git
+-version: '3.73'
++version: '3.86'
+ x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+diff --git a/Makefile.PL b/Makefile.PL
+index 0311708..754acbe 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -29,10 +29,7 @@ WriteMakefile
+           'VERSION_FROM' => 'Cwd.pm',
+           'ABSTRACT' => 'Tools for working with directory and file names',
+           'AUTHOR' => 'Perl 5 Porters',
+-          'DEFINE' => join(" ",
+-                "-DDOUBLE_SLASHES_SPECIAL=@{[$^O eq q(qnx) || $^O eq q(nto) ? 1 : 0]}",
+-                ((grep { $_ eq 'PERL_CORE=1' } @ARGV) ? '-DNO_PPPORT_H' : ()),
+-          ),
++          'DEFINE' => "-DDOUBLE_SLASHES_SPECIAL=@{[$^O eq q(qnx) || $^O eq q(nto) ? 1 : 0]}",
+           'PREREQ_PM' => {
+                            'Carp' => '0',
+                            'File::Basename' => '0',
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index e0a49ed..fc10c0f 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -2,7 +2,7 @@ package File::Spec;
+ 
+ use strict;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+@@ -33,13 +33,13 @@ File::Spec - portably perform operations on file names
+ 
+ 	use File::Spec;
+ 
+-	$x=File::Spec->catfile('a', 'b', 'c');
++	my $x = File::Spec->catfile('a', 'b', 'c');
+ 
+ which returns 'a/b/c' under Unix. Or:
+ 
+ 	use File::Spec::Functions;
+ 
+-	$x = catfile('a', 'b', 'c');
++	my $x = catfile('a', 'b', 'c');
+ 
+ =head1 DESCRIPTION
+ 
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index a29617c..3fc3c98 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index e21c0bb..fb3eaaa 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index 2429bb2..9391f3a 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index a09150c..a0d8641 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 369d1f0..5f5cca9 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index 604e2e3..eea5328 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index 52904b4..2d5af10 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index b05b535..292c2f8 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.84';
++our $VERSION = '3.88';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index 0fe3834..05b30b3 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -28,8 +28,10 @@ foreach my $type (qw(regular perl)) {
+ 
+         # https://github.com/Perl/perl5/issues/16525
+         # https://bugs.dragonflybsd.org/issues/3250
++        my @vlist = ($Config{osvers} =~ /(\d+)/g);
++        my $osver = sprintf("%d%03d", map { defined() ? $_ : '0' } @vlist[0,1]);
+ 	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
+-	    if $type eq 'regular' && $^O eq 'dragonfly';
++	    if $type eq 'regular' && $^O eq 'dragonfly' && $osver < 6002;
+ 
+ 	skip "getcwd() doesn't fail on non-existent directories on this platform", 4
+ 	    if $type eq 'regular' && $^O eq 'haiku';
+diff --git a/t/tmpdir.t b/t/tmpdir.t
+index 0f03dc5..aeff4fc 100644
+--- a/t/tmpdir.t
++++ b/t/tmpdir.t
+@@ -43,7 +43,7 @@ for ('File::Spec', "File::Spec::Win32") {
+     -d $ENV{TMPDIR} && -w _
+        or skip "Can't create usable TMPDIR env var", 1;
+     my $tmpdir2 = $_->tmpdir;
+-    isn't $tmpdir2, $tmpdir1, "$_->tmpdir works with changing env";
++    isnt $tmpdir2, $tmpdir1, "$_->tmpdir works with changing env";
+   }
+ }
+ 
+-- 
+2.40.1
+

@@ -1,0 +1,36 @@
+From e3c75970d5de401a80b8c7f97a31b0ad4cf7ed7d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 15 Jan 2026 12:48:19 +0000
+Subject: [PATCH 127/131] qgs: add compat for boost 1.89 which deprecated
+ deadline_timer.hpp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The asio::deadline_timer was deprecated in 1.89 and as a result
+the deadline_timer.hpp file is no longer implicitly included by
+asio.hpp.
+
+To retain compat with old and new boost the code must explicitly
+include the deadline_timer.hpp
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/qgs_server.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h b/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
+index 91eb41a4..b56b2633 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
+@@ -34,6 +34,7 @@
+ 
+ #include <stdint.h>
+ #include <boost/asio.hpp>
++#include <boost/asio/deadline_timer.hpp>
+ #include <boost/scoped_ptr.hpp>
+ 
+ #if BOOST_VERSION >= 108700
+-- 
+2.53.0
+

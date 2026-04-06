@@ -1,0 +1,12 @@
+diff --git a/examples/multimedia/spectrum/app/wavfile.cpp b/examples/multimedia/spectrum/app/wavfile.cpp
+index 475200d..5c786c1 100644
+--- a/examples/multimedia/spectrum/app/wavfile.cpp
++++ b/examples/multimedia/spectrum/app/wavfile.cpp
+@@ -48,6 +48,7 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
+ #include <qendian.h>
+ #include "wavfile.h"
+ 

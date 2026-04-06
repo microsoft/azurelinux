@@ -1,0 +1,130 @@
+From 6bab69a62f17a32fa81e1ed1ab3617263cac103f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marcin=20K=C5=82opotek?= <marcin.klopotek@jcommerce.pl>
+Date: Fri, 5 Jan 2018 15:01:07 +0100
+Subject: [PATCH] Fixes #44: Show original exception throw from test class
+ constructor
+
+---
+ .../java/junitparams/JUnitParamsRunner.java   | 24 +++++++++-
+ .../internal/JUnitParamsRunnerTest.java       | 47 +++++++++++++++++++
+ 2 files changed, 69 insertions(+), 2 deletions(-)
+ create mode 100644 src/test/java/junitparams/internal/JUnitParamsRunnerTest.java
+
+diff --git a/src/main/java/junitparams/JUnitParamsRunner.java b/src/main/java/junitparams/JUnitParamsRunner.java
+index d31930a..313eb24 100644
+--- a/src/main/java/junitparams/JUnitParamsRunner.java
++++ b/src/main/java/junitparams/JUnitParamsRunner.java
+@@ -7,9 +7,11 @@
+ import org.junit.AfterClass;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
++import org.junit.internal.runners.statements.Fail;
+ import org.junit.runner.Description;
+ import org.junit.runner.manipulation.Filter;
+ import org.junit.runner.manipulation.NoTestsRemainException;
++import org.junit.runner.notification.Failure;
+ import org.junit.runner.notification.RunNotifier;
+ import org.junit.runners.BlockJUnit4ClassRunner;
+ import org.junit.runners.model.FrameworkMethod;
+@@ -18,6 +20,7 @@
+ import org.junit.validator.PublicClassValidator;
+ 
+ import static org.junit.internal.runners.rules.RuleMemberValidator.*;
++import static org.junit.runner.Description.createSuiteDescription;
+ 
+ import junitparams.internal.ParameterisedTestClassRunner;
+ import junitparams.internal.ParametrizedTestMethodsFilter;
+@@ -443,13 +446,30 @@ protected void runChild(FrameworkMethod method, RunNotifier notifier) {
+ 
+         TestMethod testMethod = parameterisedRunner.testMethodFor(method);
+         if (parameterisedRunner.shouldRun(testMethod)) {
+-            parameterisedRunner.runParameterisedTest(testMethod, methodBlock(method), notifier);
++            Statement statement = methodBlock(method);
++            if (initializedProperly(statement, notifier)) {
++                parameterisedRunner.runParameterisedTest(testMethod, statement, notifier);
++            }
+         } else {
+             verifyMethodCanBeRunByStandardRunner(testMethod);
+             super.runChild(method, notifier);
+         }
+     }
+ 
++    private boolean initializedProperly(Statement statement, RunNotifier notifier) {
++        boolean initializedProperly = true;
++        if (statement instanceof Fail) {
++            try {
++                statement.evaluate();
++            } catch (Throwable throwable) {
++                initializedProperly = false;
++                Failure instantiationFailure = new Failure(createSuiteDescription("Instantiation failure"), throwable);
++                notifier.fireTestFailure(instantiationFailure);
++            }
++        }
++        return initializedProperly;
++    }
++
+     @Override
+     protected Description describeChild(FrameworkMethod method) {
+         Description description = parameterisedRunner.getDescriptionFor(method);
+@@ -489,7 +509,7 @@ protected Statement methodInvoker(FrameworkMethod method, Object test) {
+     @Override
+     public Description getDescription() {
+         if (description == null) {
+-            description = Description.createSuiteDescription(getName(), getTestClass().getAnnotations());
++            description = createSuiteDescription(getName(), getTestClass().getAnnotations());
+             List<FrameworkMethod> resultMethods = getListOfMethods();
+ 
+             for (FrameworkMethod method : resultMethods)
+diff --git a/src/test/java/junitparams/internal/JUnitParamsRunnerTest.java b/src/test/java/junitparams/internal/JUnitParamsRunnerTest.java
+new file mode 100644
+index 0000000..f08579a
+--- /dev/null
++++ b/src/test/java/junitparams/internal/JUnitParamsRunnerTest.java
+@@ -0,0 +1,47 @@
++package junitparams.internal;
++
++import junitparams.JUnitParamsRunner;
++import org.assertj.core.api.iterable.Extractor;
++import org.junit.Test;
++import org.junit.runner.JUnitCore;
++import org.junit.runner.Result;
++import org.junit.runner.RunWith;
++import org.junit.runner.notification.Failure;
++
++import static org.assertj.core.api.Assertions.assertThat;
++import static org.junit.Assert.fail;
++
++public class JUnitParamsRunnerTest {
++
++    private static final RuntimeException TEST_EXCEPTION = new RuntimeException("Test Exception");
++
++    @Test
++    public void shouldGetOriginalExceptionThrownBySampleTestConstructor() {
++        final Result testResult = JUnitCore.runClasses(ExceptionInSampleTestConstructorTest.class);
++        final Extractor<Failure, Throwable> throwableProperty = new Extractor<Failure, Throwable>() {
++            @Override
++            public Throwable extract(Failure failure) {
++                return failure.getException();
++            }
++        };
++        assertThat(testResult.getFailures())
++                .extracting(throwableProperty)
++                .contains(TEST_EXCEPTION);
++    }
++
++    @RunWith(JUnitParamsRunner.class)
++    public static class ExceptionInSampleTestConstructorTest {
++
++        @SuppressWarnings("WeakerAccess")
++        public ExceptionInSampleTestConstructorTest() {
++            throw TEST_EXCEPTION;
++        }
++
++        @Test
++        @SuppressWarnings({"unused", "WeakerAccess"})
++        public void testCase() {
++            fail("Should not be invoked");
++        }
++
++    }
++}

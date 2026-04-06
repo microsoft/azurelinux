@@ -1,0 +1,7 @@
+#!/bin/sh
+for session in ~/.xsession ~/.Xclients /etc/X11/xinit/Xclients ;
+do
+if [ -f ${session} ] ; then
+  exec ${session}
+fi
+done

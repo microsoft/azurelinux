@@ -1,0 +1,11 @@
+--- trycmd-0.15.11/Cargo.toml	1970-01-01T00:00:01+00:00
++++ trycmd-0.15.11/Cargo.toml	2026-01-14T12:59:13.169795+00:00
+@@ -161,7 +161,7 @@
+ default-features = false
+ 
+ [dependencies.toml_edit]
+-version = "0.23.5"
++version = ">=0.23.5, <0.25.0"
+ features = ["serde"]
+ 
+ [lints.clippy]

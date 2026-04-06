@@ -1,0 +1,12 @@
+diff -Naur libaribcaption-1.1.1.old/CMakeLists.txt libaribcaption-1.1.1/CMakeLists.txt
+--- libaribcaption-1.1.1.old/CMakeLists.txt	2024-08-13 13:15:59.096943089 +0200
++++ libaribcaption-1.1.1/CMakeLists.txt	2024-08-13 13:19:29.535044200 +0200
+@@ -267,6 +267,8 @@
+     PROPERTIES
+         C_VISIBILITY_PRESET hidden
+         CXX_VISIBILITY_PRESET hidden
++        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
++        SOVERSION ${PROJECT_VERSION_MAJOR}
+ )
+ 
+ # Enable /utf-8 for MSVC

@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 7 Jun 2018 17:43:52 -0500
+Subject: [PATCH] RH: reset default find_mutipaths value to off
+
+Upstream has changed to default find_multipaths to "strict". For now
+Redhat will retain the previous default of "off".
+
+Co-authored-by: Paul Donohue <git@PaulSD.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/defaults.h       | 2 +-
+ multipath/multipath.conf.5.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libmultipath/defaults.h b/libmultipath/defaults.h
+index 02f7e57c..cd03fd1a 100644
+--- a/libmultipath/defaults.h
++++ b/libmultipath/defaults.h
+@@ -24,7 +24,7 @@
+ #define DEFAULT_NO_PATH_RETRY	NO_PATH_RETRY_UNDEF
+ #define DEFAULT_VERBOSITY	2
+ #define DEFAULT_REASSIGN_MAPS	0
+-#define DEFAULT_FIND_MULTIPATHS	FIND_MULTIPATHS_STRICT
++#define DEFAULT_FIND_MULTIPATHS	FIND_MULTIPATHS_OFF
+ #define DEFAULT_FAST_IO_FAIL	5
+ #define DEFAULT_DEV_LOSS_TMO	600
+ #define DEFAULT_RETAIN_HWHANDLER RETAIN_HWHANDLER_ON
+diff --git a/multipath/multipath.conf.5.in b/multipath/multipath.conf.5.in
+index af9fbb96..0c1eff40 100644
+--- a/multipath/multipath.conf.5.in
++++ b/multipath/multipath.conf.5.in
+@@ -1226,7 +1226,7 @@ as non-multipath and passed on to upper layers.
+ \fBNote:\fR this may cause delays during device detection if
+ there are single-path devices which aren\'t blacklisted.
+ .TP
+-The default is: \fBstrict\fR
++The default is: \fBoff\fR
+ .RE
+ .
+ .

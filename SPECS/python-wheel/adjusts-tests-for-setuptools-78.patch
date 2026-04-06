@@ -1,0 +1,43 @@
+From 0d9b84905461d58892907296e1af5d530a32894c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 16 Apr 2025 14:05:09 +0200
+Subject: [PATCH] Adjusts tests for setuptools 78+
+
+---
+ tests/test_bdist_wheel.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_bdist_wheel.py b/tests/test_bdist_wheel.py
+index fcb2dfc..2feef0d 100644
+--- a/tests/test_bdist_wheel.py
++++ b/tests/test_bdist_wheel.py
+@@ -132,7 +132,7 @@ def test_licenses_default(dummy_dist, monkeypatch, tmp_path):
+     )
+     with WheelFile("dist/dummy_dist-1.0-py2.py3-none-any.whl") as wf:
+         license_files = {
+-            "dummy_dist-1.0.dist-info/" + fname for fname in DEFAULT_LICENSE_FILES
++            "dummy_dist-1.0.dist-info/licenses/" + fname for fname in DEFAULT_LICENSE_FILES
+         }
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+@@ -146,7 +146,7 @@ def test_licenses_deprecated(dummy_dist, monkeypatch, tmp_path):
+         [sys.executable, "setup.py", "bdist_wheel", "-b", str(tmp_path), "--universal"]
+     )
+     with WheelFile("dist/dummy_dist-1.0-py2.py3-none-any.whl") as wf:
+-        license_files = {"dummy_dist-1.0.dist-info/DUMMYFILE"}
++        license_files = {"dummy_dist-1.0.dist-info/licenses/licenses/DUMMYFILE"}
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+ 
+@@ -171,7 +171,7 @@ def test_licenses_override(dummy_dist, monkeypatch, tmp_path, config_file, confi
+     )
+     with WheelFile("dist/dummy_dist-1.0-py2.py3-none-any.whl") as wf:
+         license_files = {
+-            "dummy_dist-1.0.dist-info/" + fname for fname in {"DUMMYFILE", "LICENSE"}
++            "dummy_dist-1.0.dist-info/licenses/" + fname for fname in {"licenses/DUMMYFILE", "LICENSE"}
+         }
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+-- 
+2.49.0
+

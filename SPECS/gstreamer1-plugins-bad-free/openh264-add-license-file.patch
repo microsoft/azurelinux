@@ -1,0 +1,45 @@
+From b13e925daa574fb07aac0271f2b51c25ecb9d483 Mon Sep 17 00:00:00 2001
+From: Kalev Lember <klember@redhat.com>
+Date: Wed, 8 Nov 2023 14:41:14 +0100
+Subject: [PATCH 1/1] openh264: Add LICENSE file
+
+The openh264 plugin is BSD-licensed, different from the rest of the
+gst-plugins-bad. This commit splits the license text out in its own file
+to make it easier for binary distributions to distribute the license
+text.
+---
+ .../gst-plugins-bad/ext/openh264/LICENSE      | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 subprojects/gst-plugins-bad/ext/openh264/LICENSE
+
+diff --git a/subprojects/gst-plugins-bad/ext/openh264/LICENSE b/subprojects/gst-plugins-bad/ext/openh264/LICENSE
+new file mode 100644
+index 00000000000..e57601b4fb6
+--- /dev/null
++++ b/subprojects/gst-plugins-bad/ext/openh264/LICENSE
+@@ -0,0 +1,22 @@
++Copyright (c) 2014, Ericsson AB. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without modification,
++are permitted provided that the following conditions are met:
++
++1. Redistributions of source code must retain the above copyright notice, this
++list of conditions and the following disclaimer.
++
++2. Redistributions in binary form must reproduce the above copyright notice, this
++list of conditions and the following disclaimer in the documentation and/or other
++materials provided with the distribution.
++
++THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
++INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
++OF SUCH DAMAGE.
+-- 
+GitLab
+

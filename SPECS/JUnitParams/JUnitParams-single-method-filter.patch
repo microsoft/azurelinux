@@ -1,0 +1,86 @@
+--- JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/FilterableTest.java.orig	2017-11-03 02:05:01.000000000 -0600
++++ JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/FilterableTest.java	2023-11-03 16:38:12.533336631 -0600
+@@ -5,6 +5,7 @@ import org.junit.runner.Description;
+ import org.junit.runner.JUnitCore;
+ import org.junit.runner.Request;
+ import org.junit.runner.Result;
++import org.junit.runner.Runner;
+ import org.junit.runner.manipulation.Filter;
+ 
+ import static org.assertj.core.api.Assertions.*;
+@@ -22,7 +23,7 @@ public class FilterableTest {
+ 
+     @Test
+     public void shouldRunSingleTestWithoutParameters() throws Exception {
+-        Request request = requestSingleMethodRun(SampleTestCase.class, "firstTestMethod");
++        Request request = Request.method(SampleTestCase.class, "firstTestMethod");
+ 
+         Result result = new JUnitCore().run(request);
+ 
+@@ -31,7 +32,7 @@ public class FilterableTest {
+ 
+     @Test
+     public void shouldRunParametrisedTest() throws Exception {
+-        Request request = requestSingleMethodRun(SampleTestCase.class, "secondTestMethod");
++        Request request = Request.method(SampleTestCase.class, "secondTestMethod");
+ 
+         Result result = new JUnitCore().run(request);
+ 
+@@ -40,43 +41,27 @@ public class FilterableTest {
+ 
+     @Test
+     public void shouldReturnOneDescriptionForSimpleTestCase() throws Exception {
+-        Request request = requestSingleMethodRun(SampleTestCase.class, "firstTestMethod");
++        Request request = Request.method(SampleTestCase.class, "firstTestMethod");
+ 
+-        Description description = request.getRunner().getDescription();
++        Runner runner = request.getRunner();
++        Description description = runner.getDescription();
+ 
+-        assertThat(description.getChildren()).hasSize(1);
+-        assertThat(description.getChildren().get(0).getChildren()).hasSize(0);
++        assertThat(runner.testCount() == 1);
++        for (Description desc: description.getChildren())
++            if (desc.getDisplayName() == "firstTestMethod")
++                assertThat(desc.getChildren()).hasSize(0);
+     }
+ 
+     @Test
+     public void shouldReturnParametrizedDescriptionsForParametrizedTestCase() throws Exception {
+-        Request request = requestSingleMethodRun(SampleTestCase.class, "secondTestMethod");
+-
+-        Description description = request.getRunner().getDescription();
+-
+-        assertThat(description.getChildren()).hasSize(1);
+-        assertThat(description.getChildren().get(0).getChildren()).hasSize(2);
+-    }
+-
+-    private Request requestSingleMethodRun(Class<SampleTestCase> clazz, String methodName) {
+-        return Request.aClass(clazz).filterWith(new SingleMethodFilter(methodName));
+-    }
+-
+-    private static class SingleMethodFilter extends Filter {
+-        private final String methodName;
+-
+-        public SingleMethodFilter(String methodName) {
+-            this.methodName = methodName;
+-        }
++        Request request = Request.method(SampleTestCase.class, "secondTestMethod");
+ 
+-        @Override
+-        public boolean shouldRun(Description description) {
+-            return description.getDisplayName().contains(methodName);
+-        }
++        Runner runner = request.getRunner();
++        Description description = runner.getDescription();
+ 
+-        @Override
+-        public String describe() {
+-            return methodName;
+-        }
++        assertThat(runner.testCount() == 1);
++        for (Description desc: description.getChildren())
++            if (desc.getDisplayName() == "secondTestMethod")
++                assertThat(desc.getChildren()).hasSize(2);
+     }
+ }

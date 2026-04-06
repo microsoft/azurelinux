@@ -1,0 +1,1 @@
+%perl_Object_Pad_ABI perl(:Object_Pad_ABI) = %(perl -MFile::Spec -MFile::ShareDir -MObject::Pad -e 'open(my $h, q{<}, File::Spec->catdir(File::ShareDir::module_dir(q{Object::Pad}), q{include}, q{object_pad.h})); undef($/); print qq{$2.$1} if <$h> =~ m{^#define OBJECTPAD_ABIVERSION_MINOR (\\d+)\\R#define OBJECTPAD_ABIVERSION_MAJOR (\\d+)}m')

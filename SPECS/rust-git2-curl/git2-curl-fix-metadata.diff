@@ -1,0 +1,11 @@
+--- git2-curl-0.21.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ git2-curl-0.21.0/Cargo.toml	2025-04-29T12:11:02.037533+00:00
+@@ -67,8 +67,3 @@
+ [dev-dependencies.tempfile]
+ version = "3.0"
+ 
+-[features]
+-zlib-ng-compat = [
+-    "git2/zlib-ng-compat",
+-    "curl/zlib-ng-compat",
+-]

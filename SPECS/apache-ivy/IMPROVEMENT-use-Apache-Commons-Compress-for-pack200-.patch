@@ -1,0 +1,1094 @@
+From d77284167b6695903b80c72afed57469ffab5cc3 Mon Sep 17 00:00:00 2001
+From: Maarten Coene <4728619+maartenc@users.noreply.github.com>
+Date: Wed, 23 Apr 2025 23:04:43 +0200
+Subject: [PATCH] IMPROVEMENT: use Apache Commons Compress for pack200 handling
+ to avoid issues on Java 14 and later. (IVY-1652)
+
+---
+ asciidoc/release-notes.adoc                   |   1 +
+ ivy.xml                                       |  11 +-
+ optional.patterns                             |   1 +
+ .../ivy/core/pack/PackagingManager.java       |   2 +
+ .../apache/ivy/core/pack/PackingRegistry.java |   6 +-
+ .../apache/ivy/core/settings/IvySettings.java |  23 ++-
+ .../pack/ArchivePacking.java                  |  64 +++----
+ .../pack/OsgiBundlePacking.java               | 113 ++++++-----
+ .../pack/Pack200Packing.java                  | 124 ++++++------
+ .../{core => plugins}/pack/StreamPacking.java |  70 +++----
+ .../{core => plugins}/pack/ZipPacking.java    | 176 +++++++++---------
+ src/java/org/apache/ivy/util/FileUtil.java    | 103 ----------
+ .../ivy/core/retrieve/RetrieveTest.java       |   6 -
+ .../pack/ZipPackingTest.java                  | 144 +++++++-------
+ version.properties                            |   2 +
+ 15 files changed, 400 insertions(+), 446 deletions(-)
+ rename src/java/org/apache/ivy/{core => plugins}/pack/ArchivePacking.java (94%)
+ rename src/java/org/apache/ivy/{core => plugins}/pack/OsgiBundlePacking.java (63%)
+ rename src/java/org/apache/ivy/{core => plugins}/pack/Pack200Packing.java (69%)
+ rename src/java/org/apache/ivy/{core => plugins}/pack/StreamPacking.java (94%)
+ rename src/java/org/apache/ivy/{core => plugins}/pack/ZipPacking.java (96%)
+ rename test/java/org/apache/ivy/{core => plugins}/pack/ZipPackingTest.java (96%)
+
+diff --git a/asciidoc/release-notes.adoc b/asciidoc/release-notes.adoc
+index e1871302..7f1d146d 100644
+--- a/asciidoc/release-notes.adoc
++++ b/asciidoc/release-notes.adoc
+@@ -55,6 +55,8 @@ Note, if you have resolved dependencies with version of Ivy prior to 2.6.0, you
+ - DOCUMENTATION: bla bla bla (jira:IVY-1234[]) (Thanks to Jane Doe)
+ ////
+ 
++- IMPROVEMENT: use Apache Commons Compress for pack200 handling to avoid issues on Java 14 and later. If pack200 is needed, make sure to add Apache Commons Compress to your classpath. (IVY-1652)
++
+ == Committers and Contributors
+ 
+ Here is the list of people who have contributed source code and documentation up to this release. Many thanks to all of them, and also to the whole IvyDE community contributing ideas and feedback, and promoting the use of Apache Ivy !
+diff --git a/ivy.xml b/ivy.xml
+index c3dac27e..2841c3b0 100644
+--- a/ivy.xml
++++ b/ivy.xml
+@@ -32,6 +32,7 @@
+         <conf name="oro" extends="core" description="to use optional glob matcher"/>
+         <conf name="vfs" extends="core" description="core + optional VirtualFileSystem(VFS) support" />
+         <conf name="sftp" extends="core" description="core + optional SFTP support" />
++        <conf name="pack200" extends="core" description="core + optional pack200 support" />
+         <conf name="standalone" extends="core" description="to launch in standalone mode (from command line)"/>
+         <conf name="ant" extends="core" description="core + ant jar provided as a dependency"/>
+         <conf name="default" extends="core" description="full ivy with all dependencies"/>
+@@ -46,8 +47,9 @@
+     <dependencies>
+         <dependency org="org.apache.ant" name="ant" rev="${apache-ant.version}" conf="default,ant"/>
+         <dependency org="org.apache.httpcomponents" name="httpclient" rev="${httpclient.version}" conf="default,httpclient->runtime,master"/>
+-        <dependency org="oro" name="oro" rev="${oro.version}" conf="default,oro"/>
++        <dependency org="org.apache.commons" name="commons-compress" rev="${commons-compress.version}" conf="default,pack200"/>
+         <dependency org="org.apache.commons" name="commons-vfs2" rev="${commons-vfs2.version}" conf="default,vfs"/>
++        <dependency org="oro" name="oro" rev="${oro.version}" conf="default,oro"/>
+         <dependency org="com.jcraft" name="jsch" rev="${jsch.version}" conf="default,sftp"/>
+         <dependency org="com.jcraft" name="jsch.agentproxy" rev="${jsch.agentproxy.version}" conf="default,sftp"/>
+         <dependency org="com.jcraft" name="jsch.agentproxy.connector-factory" rev="${jsch.agentproxy.version}" conf="default,sftp"/>
+@@ -55,6 +57,9 @@
+         <dependency org="org.bouncycastle" name="bcpg-jdk15on" rev="${bouncycastle.version}" conf="default"/>
+         <dependency org="org.bouncycastle" name="bcprov-jdk15on" rev="${bouncycastle.version}" conf="default"/>
+ 
++        <!-- we manually specify a dependency on commons-codec so that both the httpclient and the pack200 configs resolve to the same version -->
++        <dependency org="commons-codec" name="commons-codec" rev="${commons-codec.version}" conf="default,httpclient,pack200"/>
++
+         <!-- Test dependencies -->
+         <dependency org="junit" name="junit" rev="${junit.version}" conf="test"/>
+         <dependency org="org.hamcrest" name="hamcrest-core" rev="${hamcrest.version}" conf="test"/>
+@@ -67,8 +72,8 @@
+         <dependency org="xmlunit" name="xmlunit" rev="${xmlunit.version}" conf="test" transitive="false"/>
+ 
+         <!-- Global excludes -->
+-        <exclude org="junit" module="junit" conf="core,default,httpclient,oro,vfs,sftp,standalone,ant"/>
+-        <exclude org="org.hamcrest" module="hamcrest-core" conf="core,default,httpclient,oro,vfs,sftp,standalone,ant"/>
++        <exclude org="junit" module="junit" conf="core,default,httpclient,oro,vfs,sftp,pack200,standalone,ant"/>
++        <exclude org="org.hamcrest" module="hamcrest-core" conf="core,default,httpclient,oro,vfs,sftp,standalone,pack200,ant"/>
+         <!-- Exclude the whole outdated commons-httpclient org -->
+         <exclude org="commons-httpclient" conf="*"/>
+     </dependencies>
+diff --git a/optional.patterns b/optional.patterns
+index 81b0d3d0..a480cf7a 100644
+--- a/optional.patterns
++++ b/optional.patterns
+@@ -20,6 +20,7 @@
+ #This file defines the sources to compile for ivy-optional.jar
+ org/apache/ivy/Main.java
+ org/apache/ivy/plugins/matcher/GlobPatternMatcher.java
++org/apache/ivy/plugins/pack/Pack200Packing.java
+ org/apache/ivy/plugins/repository/sftp/**/*.java
+ org/apache/ivy/plugins/repository/ssh/**/*.java
+ org/apache/ivy/plugins/repository/vfs/**/*.java
+diff --git a/src/java/org/apache/ivy/core/pack/PackagingManager.java b/src/java/org/apache/ivy/core/pack/PackagingManager.java
+index be8e19c7..e39c1ca8 100644
+--- a/src/java/org/apache/ivy/core/pack/PackagingManager.java
++++ b/src/java/org/apache/ivy/core/pack/PackagingManager.java
+@@ -26,6 +26,8 @@ import org.apache.ivy.core.module.descriptor.Artifact;
+ import org.apache.ivy.core.module.descriptor.DefaultArtifact;
+ import org.apache.ivy.core.settings.IvySettings;
+ import org.apache.ivy.plugins.IvySettingsAware;
++import org.apache.ivy.plugins.pack.ArchivePacking;
++import org.apache.ivy.plugins.pack.StreamPacking;
+ 
+ public class PackagingManager implements IvySettingsAware {
+ 
+diff --git a/src/java/org/apache/ivy/core/pack/PackingRegistry.java b/src/java/org/apache/ivy/core/pack/PackingRegistry.java
+index 8e6d82a4..5e8b3db5 100644
+--- a/src/java/org/apache/ivy/core/pack/PackingRegistry.java
++++ b/src/java/org/apache/ivy/core/pack/PackingRegistry.java
+@@ -20,15 +20,13 @@ package org.apache.ivy.core.pack;
+ import java.util.HashMap;
+ import java.util.Map;
+ 
++import org.apache.ivy.plugins.pack.ArchivePacking;
++
+ public class PackingRegistry {
+ 
+     private Map<String, ArchivePacking> packings = new HashMap<>();
+ 
+     public PackingRegistry() {
+-        // register defaults
+-        register(new ZipPacking());
+-        register(new Pack200Packing());
+-        register(new OsgiBundlePacking());
+     }
+ 
+     public void register(ArchivePacking packing) {
+diff --git a/src/java/org/apache/ivy/core/settings/IvySettings.java b/src/java/org/apache/ivy/core/settings/IvySettings.java
+index 20d8a556..5a09535a 100644
+--- a/src/java/org/apache/ivy/core/settings/IvySettings.java
++++ b/src/java/org/apache/ivy/core/settings/IvySettings.java
+@@ -33,8 +33,10 @@ import org.apache.ivy.core.module.id.ModuleId;
+ import org.apache.ivy.core.module.id.ModuleRevisionId;
+ import org.apache.ivy.core.module.id.ModuleRules;
+ import org.apache.ivy.core.module.status.StatusManager;
+-import org.apache.ivy.core.pack.ArchivePacking;
++import org.apache.ivy.plugins.pack.ArchivePacking;
+ import org.apache.ivy.core.pack.PackingRegistry;
++import org.apache.ivy.plugins.pack.OsgiBundlePacking;
++import org.apache.ivy.plugins.pack.ZipPacking;
+ import org.apache.ivy.core.publish.PublishEngineSettings;
+ import org.apache.ivy.core.repository.RepositoryManagementEngineSettings;
+ import org.apache.ivy.core.resolve.ResolveEngineSettings;
+@@ -286,6 +288,21 @@ public class IvySettings implements SortEngineSettings, PublishEngineSettings, P
+                     + "org.apache.ivy.plugins.matcher.GlobPatternMatcher was not found", e);
+         }
+ 
++        addArchivePacking(new ZipPacking());
++        addArchivePacking(new OsgiBundlePacking());
++        try {
++            // Pack200Packing is optional. Only add it when available.
++            @SuppressWarnings("unchecked")
++            Class<? extends ArchivePacking> pack200 = (Class<? extends ArchivePacking>) IvySettings.class
++                .getClassLoader()
++                .loadClass("org.apache.ivy.plugins.pack.Pack200Packing");
++            addArchivePacking(pack200.newInstance());
++        } catch (Exception e) {
++            // ignore: the pack200 packing isn't on the classpath
++            Message.info("impossible to define pack200 packaging: "
++                         + "org.apache.ivy.plugins.pack.Pack200Packing was not found", e);
++        }
++
+         addReportOutputter(new LogReportOutputter());
+         addReportOutputter(new XmlReportOutputter());
+ 
+@@ -1554,6 +1571,10 @@ public class IvySettings implements SortEngineSettings, PublishEngineSettings, P
+     }
+ 
+     public synchronized void addConfigured(ArchivePacking packing) {
++        addArchivePacking(packing);
++    }
++
++    public synchronized void addArchivePacking(ArchivePacking packing) {
+         init(packing);
+         packingRegistry.register(packing);
+     }
+diff --git a/src/java/org/apache/ivy/core/pack/ArchivePacking.java b/src/java/org/apache/ivy/plugins/pack/ArchivePacking.java
+similarity index 94%
+rename from src/java/org/apache/ivy/core/pack/ArchivePacking.java
+rename to src/java/org/apache/ivy/plugins/pack/ArchivePacking.java
+index 8143d11e..33e316bd 100644
+--- a/src/java/org/apache/ivy/core/pack/ArchivePacking.java
++++ b/src/java/org/apache/ivy/plugins/pack/ArchivePacking.java
+@@ -1,32 +1,32 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.File;
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-public abstract class ArchivePacking {
+-
+-    public abstract String[] getNames();
+-
+-    public abstract void unpack(InputStream packed, File dest) throws IOException;
+-
+-    public abstract String getUnpackedExtension(String ext);
+-
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.File;
++import java.io.IOException;
++import java.io.InputStream;
++
++public abstract class ArchivePacking {
++
++    public abstract String[] getNames();
++
++    public abstract void unpack(InputStream packed, File dest) throws IOException;
++
++    public abstract String getUnpackedExtension(String ext);
++
++}
+diff --git a/src/java/org/apache/ivy/core/pack/OsgiBundlePacking.java b/src/java/org/apache/ivy/plugins/pack/OsgiBundlePacking.java
+similarity index 63%
+rename from src/java/org/apache/ivy/core/pack/OsgiBundlePacking.java
+rename to src/java/org/apache/ivy/plugins/pack/OsgiBundlePacking.java
+index 6e453b93..ac75a94c 100644
+--- a/src/java/org/apache/ivy/core/pack/OsgiBundlePacking.java
++++ b/src/java/org/apache/ivy/plugins/pack/OsgiBundlePacking.java
+@@ -1,47 +1,66 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.File;
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-import org.apache.ivy.util.FileUtil;
+-
+-/**
+- * Packaging which handle OSGi bundles with inner packed jar
+- */
+-public class OsgiBundlePacking extends ZipPacking {
+-
+-    private static final String[] NAMES = {"bundle"};
+-
+-    @Override
+-    public String[] getNames() {
+-        return NAMES;
+-    }
+-
+-    @Override
+-    protected void writeFile(InputStream zip, File f) throws IOException {
+-        // XXX maybe we should only unpack file listed by the 'Bundle-ClassPath' MANIFEST header ?
+-        if (f.getName().endsWith(".jar.pack.gz")) {
+-            zip = FileUtil.unwrapPack200(zip);
+-            f = new File(f.getParentFile(), f.getName().substring(0, f.getName().length() - 8));
+-        }
+-        super.writeFile(zip, f);
+-    }
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.File;
++import java.io.IOException;
++import java.io.InputStream;
++
++import org.apache.ivy.core.settings.IvySettings;
++import org.apache.ivy.plugins.IvySettingsAware;
++import org.apache.ivy.util.FileUtil;
++
++/**
++ * Packaging which handle OSGi bundles with inner packed jar
++ */
++public class OsgiBundlePacking extends ZipPacking implements IvySettingsAware {
++
++    private static final String[] NAMES = {"bundle"};
++
++    private IvySettings settings;
++
++    @Override
++    public String[] getNames() {
++        return NAMES;
++    }
++
++    @Override
++    protected void writeFile(InputStream zip, File f) throws IOException {
++        // XXX maybe we should only unpack file listed by the 'Bundle-ClassPath' MANIFEST header ?
++        if (f.getName().endsWith(".jar.pack.gz")) {
++            // unpack the pack200 file
++            ArchivePacking pack200 = settings.getPackingRegistry().get("pack200");
++            if (pack200 == null) {
++                throw new IOException("Packing type 'pack200' not found!");
++            }
++
++            if (!(pack200 instanceof StreamPacking)) {
++                throw new IOException("Packing type 'pack200' is not a stream packing!");
++            }
++
++            f = new File(f.getParentFile(), f.getName().substring(0, f.getName().length() - 8));
++            zip = ((StreamPacking) pack200).unpack(zip);
++        }
++        super.writeFile(zip, f);
++    }
++
++    @Override
++    public void setSettings(IvySettings settings) {
++        this.settings = settings;
++    }
++}
+diff --git a/src/java/org/apache/ivy/core/pack/Pack200Packing.java b/src/java/org/apache/ivy/plugins/pack/Pack200Packing.java
+similarity index 69%
+rename from src/java/org/apache/ivy/core/pack/Pack200Packing.java
+rename to src/java/org/apache/ivy/plugins/pack/Pack200Packing.java
+index 264d4457..9a47da1e 100644
+--- a/src/java/org/apache/ivy/core/pack/Pack200Packing.java
++++ b/src/java/org/apache/ivy/plugins/pack/Pack200Packing.java
+@@ -1,55 +1,69 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-import org.apache.ivy.util.FileUtil;
+-
+-public class Pack200Packing extends StreamPacking {
+-
+-    private static final String[] NAMES = {"pack200"};
+-
+-    @Override
+-    public String[] getNames() {
+-        return NAMES;
+-    }
+-
+-    @Override
+-    public String getUnpackedExtension(String ext) {
+-        if (ext.endsWith("pack.gz")) {
+-            ext = ext.substring(0, ext.length() - 7);
+-            if (ext.endsWith(".")) {
+-                ext = ext.substring(0, ext.length() - 1);
+-            }
+-        } else if (ext.endsWith("pack")) {
+-            ext = ext.substring(0, ext.length() - 4);
+-            if (ext.endsWith(".")) {
+-                ext = ext.substring(0, ext.length() - 1);
+-            }
+-        }
+-        return ext;
+-    }
+-
+-    @Override
+-    public InputStream unpack(InputStream packed) throws IOException {
+-        return FileUtil.unwrapPack200(packed);
+-    }
+-
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.BufferedInputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.zip.GZIPInputStream;
++
++import org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
++
++public class Pack200Packing extends StreamPacking {
++
++    private static final String[] NAMES = {"pack200"};
++
++    @Override
++    public String[] getNames() {
++        return NAMES;
++    }
++
++    @Override
++    public String getUnpackedExtension(String ext) {
++        if (ext.endsWith("pack.gz")) {
++            ext = ext.substring(0, ext.length() - 7);
++            if (ext.endsWith(".")) {
++                ext = ext.substring(0, ext.length() - 1);
++            }
++        } else if (ext.endsWith("pack")) {
++            ext = ext.substring(0, ext.length() - 4);
++            if (ext.endsWith(".")) {
++                ext = ext.substring(0, ext.length() - 1);
++            }
++        }
++        return ext;
++    }
++
++    @Override
++    public InputStream unpack(InputStream packed) throws IOException {
++        BufferedInputStream buffered = new BufferedInputStream(packed);
++        buffered.mark(4);
++        byte[] magic = new byte[4];
++        buffered.read(magic, 0, 4);
++        buffered.reset();
++
++        InputStream in = buffered;
++        if (magic[0] == (byte) 0x1F && magic[1] == (byte) 0x8B && magic[2] == (byte) 0x08) {
++            // this is a gziped pack200
++            in = new GZIPInputStream(in);
++        }
++
++        return new Pack200CompressorInputStream(in);
++    }
++
++}
+diff --git a/src/java/org/apache/ivy/core/pack/StreamPacking.java b/src/java/org/apache/ivy/plugins/pack/StreamPacking.java
+similarity index 94%
+rename from src/java/org/apache/ivy/core/pack/StreamPacking.java
+rename to src/java/org/apache/ivy/plugins/pack/StreamPacking.java
+index 6f6e2ed3..8c0ccb04 100644
+--- a/src/java/org/apache/ivy/core/pack/StreamPacking.java
++++ b/src/java/org/apache/ivy/plugins/pack/StreamPacking.java
+@@ -1,35 +1,35 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.File;
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-import org.apache.ivy.util.FileUtil;
+-
+-public abstract class StreamPacking extends ArchivePacking {
+-
+-    public abstract InputStream unpack(InputStream packed) throws IOException;
+-
+-    @Override
+-    public void unpack(InputStream packed, File dest) throws IOException {
+-        FileUtil.copy(unpack(packed), dest, null);
+-    }
+-
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.File;
++import java.io.IOException;
++import java.io.InputStream;
++
++import org.apache.ivy.util.FileUtil;
++
++public abstract class StreamPacking extends ArchivePacking {
++
++    public abstract InputStream unpack(InputStream packed) throws IOException;
++
++    @Override
++    public void unpack(InputStream packed, File dest) throws IOException {
++        FileUtil.copy(unpack(packed), dest, null);
++    }
++
++}
+diff --git a/src/java/org/apache/ivy/core/pack/ZipPacking.java b/src/java/org/apache/ivy/plugins/pack/ZipPacking.java
+similarity index 96%
+rename from src/java/org/apache/ivy/core/pack/ZipPacking.java
+rename to src/java/org/apache/ivy/plugins/pack/ZipPacking.java
+index 197463c4..43517b57 100644
+--- a/src/java/org/apache/ivy/core/pack/ZipPacking.java
++++ b/src/java/org/apache/ivy/plugins/pack/ZipPacking.java
+@@ -1,88 +1,88 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.File;
+-import java.io.FileOutputStream;
+-import java.io.IOException;
+-import java.io.InputStream;
+-import java.util.zip.ZipEntry;
+-import java.util.zip.ZipInputStream;
+-
+-import org.apache.ivy.util.FileUtil;
+-import org.apache.ivy.util.Message;
+-
+-public class ZipPacking extends ArchivePacking {
+-
+-    private static final String[] NAMES = {"zip", "jar", "war"};
+-
+-    @Override
+-    public String[] getNames() {
+-        return NAMES;
+-    }
+-
+-    @Override
+-    public String getUnpackedExtension(String ext) {
+-        if (ext.endsWith("zip") || ext.endsWith("jar") || ext.endsWith("war")) {
+-            ext = ext.substring(0, ext.length() - 3);
+-            if (ext.endsWith(".")) {
+-                ext = ext.substring(0, ext.length() - 1);
+-            }
+-        }
+-        return ext;
+-    }
+-
+-    @Override
+-    public void unpack(InputStream packed, File dest) throws IOException {
+-        try (ZipInputStream zip = new ZipInputStream(packed)) {
+-            ZipEntry entry = null;
+-            while (((entry = zip.getNextEntry()) != null)) {
+-                String entryName = entry.getName();
+-                File f = FileUtil.resolveFile(dest, entryName);
+-                if (!FileUtil.isLeadingPath(dest, f, true)) {
+-                    Message.verbose("\t\tskipping " + entryName + " as its target "
+-                                    + f.getCanonicalPath()
+-                                    + " is outside of " + dest.getCanonicalPath() + ".");
+-                    continue;
+-                }
+-                Message.verbose("\t\texpanding " + entryName + " to " + f);
+-
+-                // create intermediary directories - sometimes zip don't add them
+-                File dirF = f.getParentFile();
+-                if (dirF != null) {
+-                    dirF.mkdirs();
+-                }
+-
+-                if (entry.isDirectory()) {
+-                    f.mkdirs();
+-                } else {
+-                    writeFile(zip, f);
+-                }
+-
+-                f.setLastModified(entry.getTime());
+-            }
+-        }
+-    }
+-
+-    protected void writeFile(InputStream zip, File f) throws IOException {
+-        try (FileOutputStream out = new FileOutputStream(f)) {
+-            FileUtil.copy(zip, out, null, false);
+-        }
+-    }
+-
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.File;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipInputStream;
++
++import org.apache.ivy.util.FileUtil;
++import org.apache.ivy.util.Message;
++
++public class ZipPacking extends ArchivePacking {
++
++    private static final String[] NAMES = {"zip", "jar", "war"};
++
++    @Override
++    public String[] getNames() {
++        return NAMES;
++    }
++
++    @Override
++    public String getUnpackedExtension(String ext) {
++        if (ext.endsWith("zip") || ext.endsWith("jar") || ext.endsWith("war")) {
++            ext = ext.substring(0, ext.length() - 3);
++            if (ext.endsWith(".")) {
++                ext = ext.substring(0, ext.length() - 1);
++            }
++        }
++        return ext;
++    }
++
++    @Override
++    public void unpack(InputStream packed, File dest) throws IOException {
++        try (ZipInputStream zip = new ZipInputStream(packed)) {
++            ZipEntry entry = null;
++            while (((entry = zip.getNextEntry()) != null)) {
++                String entryName = entry.getName();
++                File f = FileUtil.resolveFile(dest, entryName);
++                if (!FileUtil.isLeadingPath(dest, f, true)) {
++                    Message.verbose("\t\tskipping " + entryName + " as its target "
++                                    + f.getCanonicalPath()
++                                    + " is outside of " + dest.getCanonicalPath() + ".");
++                    continue;
++                }
++                Message.verbose("\t\texpanding " + entryName + " to " + f);
++
++                // create intermediary directories - sometimes zip don't add them
++                File dirF = f.getParentFile();
++                if (dirF != null) {
++                    dirF.mkdirs();
++                }
++
++                if (entry.isDirectory()) {
++                    f.mkdirs();
++                } else {
++                    writeFile(zip, f);
++                }
++
++                f.setLastModified(entry.getTime());
++            }
++        }
++    }
++
++    protected void writeFile(InputStream zip, File f) throws IOException {
++        try (FileOutputStream out = new FileOutputStream(f)) {
++            FileUtil.copy(zip, out, null, false);
++        }
++    }
++
++}
+diff --git a/src/java/org/apache/ivy/util/FileUtil.java b/src/java/org/apache/ivy/util/FileUtil.java
+index 4d387412..77dbf231 100644
+--- a/src/java/org/apache/ivy/util/FileUtil.java
++++ b/src/java/org/apache/ivy/util/FileUtil.java
+@@ -22,10 +22,7 @@ import org.apache.ivy.util.url.TimeoutConstrainedURLHandler;
+ import org.apache.ivy.util.url.URLHandler;
+ import org.apache.ivy.util.url.URLHandlerRegistry;
+ 
+-import java.io.BufferedInputStream;
+ import java.io.BufferedReader;
+-import java.io.ByteArrayInputStream;
+-import java.io.ByteArrayOutputStream;
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.FileOutputStream;
+@@ -42,11 +39,6 @@ import java.util.Collections;
+ import java.util.List;
+ import java.util.Stack;
+ import java.util.StringTokenizer;
+-import java.util.jar.JarOutputStream;
+-import java.util.zip.GZIPInputStream;
+-import java.util.zip.ZipInputStream;
+-
+-import static java.util.jar.Pack200.newUnpacker;
+ 
+ /**
+  * Utility class used to deal with file related operations, like copy, full reading, symlink, ...
+@@ -693,101 +685,6 @@ public final class FileUtil {
+         return l;
+     }
+ 
+-    public static InputStream unwrapPack200(InputStream packed) throws IOException {
+-        BufferedInputStream buffered = new BufferedInputStream(packed);
+-        buffered.mark(4);
+-        byte[] magic = new byte[4];
+-        buffered.read(magic, 0, 4);
+-        buffered.reset();
+-
+-        InputStream in = buffered;
+-
+-        if (magic[0] == (byte) 0x1F && magic[1] == (byte) 0x8B && magic[2] == (byte) 0x08) {
+-            // this is a gziped pack200
+-            in = new GZIPInputStream(in);
+-        }
+-
+-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+-        JarOutputStream jar = new JarOutputStream(baos);
+-        newUnpacker().unpack(new UncloseInputStream(in), jar);
+-        jar.close();
+-        return new ByteArrayInputStream(baos.toByteArray());
+-    }
+-
+-    /**
+-     * Wrap an input stream and do not close the stream on call to close(). Used to avoid closing a
+-     * {@link ZipInputStream} used with {@link Pack200.Unpacker#unpack(File, JarOutputStream)}
+-     */
+-    private static final class UncloseInputStream extends InputStream {
+-
+-        private InputStream wrapped;
+-
+-        public UncloseInputStream(InputStream wrapped) {
+-            this.wrapped = wrapped;
+-        }
+-
+-        @Override
+-        public void close() throws IOException {
+-            // do not close
+-        }
+-
+-        @Override
+-        public int read() throws IOException {
+-            return wrapped.read();
+-        }
+-
+-        @Override
+-        public int hashCode() {
+-            return wrapped.hashCode();
+-        }
+-
+-        @Override
+-        public int read(byte[] b) throws IOException {
+-            return wrapped.read(b);
+-        }
+-
+-        @Override
+-        public boolean equals(Object obj) {
+-            return wrapped.equals(obj);
+-        }
+-
+-        @Override
+-        public int read(byte[] b, int off, int len) throws IOException {
+-            return wrapped.read(b, off, len);
+-        }
+-
+-        @Override
+-        public long skip(long n) throws IOException {
+-            return wrapped.skip(n);
+-        }
+-
+-        @Override
+-        public String toString() {
+-            return wrapped.toString();
+-        }
+-
+-        @Override
+-        public int available() throws IOException {
+-            return wrapped.available();
+-        }
+-
+-        @Override
+-        public void mark(int readlimit) {
+-            wrapped.mark(readlimit);
+-        }
+-
+-        @Override
+-        public void reset() throws IOException {
+-            wrapped.reset();
+-        }
+-
+-        @Override
+-        public boolean markSupported() {
+-            return wrapped.markSupported();
+-        }
+-
+-    }
+-
+     private static final class DissectedPath {
+         private final String root;
+ 
+diff --git a/test/java/org/apache/ivy/core/retrieve/RetrieveTest.java b/test/java/org/apache/ivy/core/retrieve/RetrieveTest.java
+index 742202a3..85c365c6 100644
+--- a/test/java/org/apache/ivy/core/retrieve/RetrieveTest.java
++++ b/test/java/org/apache/ivy/core/retrieve/RetrieveTest.java
+@@ -41,11 +41,9 @@ import org.apache.ivy.util.MockMessageLogger;
+ import org.apache.tools.ant.Project;
+ import org.apache.tools.ant.taskdefs.Copy;
+ import org.apache.tools.ant.taskdefs.Delete;
+-import org.apache.tools.ant.taskdefs.condition.JavaVersion;
+ import org.apache.tools.ant.types.FilterChain;
+ import org.apache.tools.ant.filters.TokenFilter.ReplaceString;
+ import org.junit.After;
+-import org.junit.Assume;
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
+@@ -500,10 +498,6 @@ public class RetrieveTest {
+      */
+     @Test
+     public void testUnpackExt() throws Exception {
+-        final JavaVersion java14OrHigher = new JavaVersion();
+-        java14OrHigher.setAtLeast("14");
+-        Assume.assumeFalse("Pack200 tools and API have been removed since JDK 14", java14OrHigher.eval());
+-
+         final ResolveOptions roptions = getResolveOptions(new String[] {"*"});
+ 
+         final URL url = new File("test/repositories/1/packaging/module10/ivys/ivy-1.0.xml").toURI()
+diff --git a/test/java/org/apache/ivy/core/pack/ZipPackingTest.java b/test/java/org/apache/ivy/plugins/pack/ZipPackingTest.java
+similarity index 96%
+rename from test/java/org/apache/ivy/core/pack/ZipPackingTest.java
+rename to test/java/org/apache/ivy/plugins/pack/ZipPackingTest.java
+index 5435dff4..91f7f831 100644
+--- a/test/java/org/apache/ivy/core/pack/ZipPackingTest.java
++++ b/test/java/org/apache/ivy/plugins/pack/ZipPackingTest.java
+@@ -1,72 +1,72 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one or more
+- *  contributor license agreements.  See the NOTICE file distributed with
+- *  this work for additional information regarding copyright ownership.
+- *  The ASF licenses this file to You under the Apache License, Version 2.0
+- *  (the "License"); you may not use this file except in compliance with
+- *  the License.  You may obtain a copy of the License at
+- *
+- *      https://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing, software
+- *  distributed under the License is distributed on an "AS IS" BASIS,
+- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- *  See the License for the specific language governing permissions and
+- *  limitations under the License.
+- *
+- */
+-package org.apache.ivy.core.pack;
+-
+-import java.io.File;
+-import java.io.FileInputStream;
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-import static org.junit.Assert.assertTrue;
+-import static org.junit.Assert.assertFalse;
+-
+-import org.apache.ivy.TestHelper;
+-import org.apache.ivy.util.DefaultMessageLogger;
+-import org.apache.ivy.util.FileUtil;
+-import org.apache.ivy.util.Message;
+-import org.apache.tools.ant.Project;
+-import org.apache.tools.ant.taskdefs.Mkdir;
+-import org.apache.tools.ant.taskdefs.Delete;
+-import org.junit.After;
+-import org.junit.Before;
+-import org.junit.Test;
+-
+-public class ZipPackingTest {
+-
+-    private static final Project PROJECT = TestHelper.newProject();
+-    private static final File TEST_DIR = PROJECT.resolveFile("build/test/pack");
+-
+-    @Before
+-    public void setUp() {
+-        Mkdir mkdir = new Mkdir();
+-        mkdir.setProject(PROJECT);
+-        mkdir.setDir(TEST_DIR);
+-        mkdir.execute();
+-        Message.setDefaultLogger(new DefaultMessageLogger(Message.MSG_INFO));
+-    }
+-
+-    @After
+-    public void tearDown() {
+-        Delete del = new Delete();
+-        del.setProject(PROJECT);
+-        del.setDir(TEST_DIR);
+-        del.execute();
+-    }
+-
+-    @Test
+-    public void zipPackingExtractsArchive() throws IOException {
+-        try (InputStream zip = new FileInputStream(PROJECT.resolveFile("test/zip/test.zip"))) {
+-            new ZipPacking().unpack(zip, TEST_DIR);
+-        }
+-        assertTrue("Expecting file a", FileUtil.resolveFile(TEST_DIR, "a").isFile());
+-        assertTrue("Expecting directory b", FileUtil.resolveFile(TEST_DIR, "b").isDirectory());
+-        assertTrue("Expecting file b/c", FileUtil.resolveFile(TEST_DIR, "b/c").isFile());
+-        assertTrue("Expecting directory d", FileUtil.resolveFile(TEST_DIR, "d").isDirectory());
+-        assertFalse("Not expecting file e", PROJECT.resolveFile("build/test/e").exists());
+-    }
+-}
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one or more
++ *  contributor license agreements.  See the NOTICE file distributed with
++ *  this work for additional information regarding copyright ownership.
++ *  The ASF licenses this file to You under the Apache License, Version 2.0
++ *  (the "License"); you may not use this file except in compliance with
++ *  the License.  You may obtain a copy of the License at
++ *
++ *      https://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package org.apache.ivy.plugins.pack;
++
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.IOException;
++import java.io.InputStream;
++
++import static org.junit.Assert.assertTrue;
++import static org.junit.Assert.assertFalse;
++
++import org.apache.ivy.TestHelper;
++import org.apache.ivy.util.DefaultMessageLogger;
++import org.apache.ivy.util.FileUtil;
++import org.apache.ivy.util.Message;
++import org.apache.tools.ant.Project;
++import org.apache.tools.ant.taskdefs.Mkdir;
++import org.apache.tools.ant.taskdefs.Delete;
++import org.junit.After;
++import org.junit.Before;
++import org.junit.Test;
++
++public class ZipPackingTest {
++
++    private static final Project PROJECT = TestHelper.newProject();
++    private static final File TEST_DIR = PROJECT.resolveFile("build/test/pack");
++
++    @Before
++    public void setUp() {
++        Mkdir mkdir = new Mkdir();
++        mkdir.setProject(PROJECT);
++        mkdir.setDir(TEST_DIR);
++        mkdir.execute();
++        Message.setDefaultLogger(new DefaultMessageLogger(Message.MSG_INFO));
++    }
++
++    @After
++    public void tearDown() {
++        Delete del = new Delete();
++        del.setProject(PROJECT);
++        del.setDir(TEST_DIR);
++        del.execute();
++    }
++
++    @Test
++    public void zipPackingExtractsArchive() throws IOException {
++        try (InputStream zip = new FileInputStream(PROJECT.resolveFile("test/zip/test.zip"))) {
++            new ZipPacking().unpack(zip, TEST_DIR);
++        }
++        assertTrue("Expecting file a", FileUtil.resolveFile(TEST_DIR, "a").isFile());
++        assertTrue("Expecting directory b", FileUtil.resolveFile(TEST_DIR, "b").isDirectory());
++        assertTrue("Expecting file b/c", FileUtil.resolveFile(TEST_DIR, "b/c").isFile());
++        assertTrue("Expecting directory d", FileUtil.resolveFile(TEST_DIR, "d").isDirectory());
++        assertFalse("Not expecting file e", PROJECT.resolveFile("build/test/e").exists());
++    }
++}
+diff --git a/version.properties b/version.properties
+index 57a04932..2e07fbc5 100644
+--- a/version.properties
++++ b/version.properties
+@@ -32,6 +32,8 @@ target.ivy.bundle.version.qualifier=alpha_
+ apache-ant.version=1.9.16
+ ant-contrib.version=1.0b3
+ bouncycastle.version=1.70
++commons-codec.version=1.18.0
++commons-compress.version=1.27.1
+ commons-vfs2.version=2.2
+ hamcrest.version=1.3
+ httpclient.version=4.5.13
+-- 
+2.53.0
+

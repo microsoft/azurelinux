@@ -1,0 +1,4 @@
+
+%kf5_kinit_requires \
+Requires: kf5-kinit%{?_isa}\
+%{nil}

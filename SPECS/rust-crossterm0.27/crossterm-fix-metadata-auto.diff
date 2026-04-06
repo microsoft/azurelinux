@@ -1,0 +1,26 @@
+--- crossterm-0.27.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crossterm-0.27.0/Cargo.toml	2024-08-31T03:40:17.684827+00:00
+@@ -143,8 +143,6 @@
+ ]
+ use-dev-tty = ["filedescriptor"]
+ windows = [
+-    "dep:winapi",
+-    "dep:crossterm_winapi",
+ ]
+ 
+ [target."cfg(unix)".dependencies.filedescriptor]
+@@ -168,14 +166,3 @@
+ features = ["support-v0_8"]
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.crossterm_winapi]
+-version = "0.9.1"
+-optional = true
+-
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"
+-features = [
+-    "winuser",
+-    "winerror",
+-]
+-optional = true

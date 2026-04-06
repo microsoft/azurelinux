@@ -1,0 +1,67 @@
+From f0321d8e8dab69780b9baffb54b9336ee8df8d41 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Thu, 6 Feb 2025 13:43:01 +0000
+Subject: [PATCH 4/5] src: Fix declaration of ldm_new
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+GCC 15 forbids declaring a function with () instead of (void).
+Declaring it properly reveals an actual bug in ldmtool.
+
+ldmtool.c: In function ‘main’:
+ldmtool.c:859:23: error: too many arguments to function ‘ldm_new’; expected 0, have 1
+  859 |     LDM * const ldm = ldm_new(&err);
+      |                       ^~~~~~~ ~~~~
+In file included from ldmtool.c:38:
+ldm.h:259:6: note: declared here
+  259 | LDM *ldm_new();
+      |      ^~~~~~~
+---
+ src/ldm.c     | 2 +-
+ src/ldm.h     | 2 +-
+ src/ldmtool.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/ldm.c b/src/ldm.c
+index 47f393f..baa66bf 100644
+--- a/src/ldm.c
++++ b/src/ldm.c
+@@ -2354,7 +2354,7 @@ error:
+ }
+ 
+ LDM *
+-ldm_new()
++ldm_new(void)
+ {
+     LDM *ldm = LDM_CAST(g_object_new(LDM_TYPE, NULL));
+     ldm->priv->disk_groups = g_array_sized_new(FALSE, FALSE,
+diff --git a/src/ldm.h b/src/ldm.h
+index 87fff7b..62e1fee 100644
+--- a/src/ldm.h
++++ b/src/ldm.h
+@@ -256,7 +256,7 @@ GType ldm_disk_group_get_type(void);
+  *
+  * Returns: (transfer full): a new #LDM object
+  */
+-LDM *ldm_new();
++LDM *ldm_new(void);
+ 
+ /**
+  * ldm_add:
+diff --git a/src/ldmtool.c b/src/ldmtool.c
+index 7ccd072..eaf3bf6 100644
+--- a/src/ldmtool.c
++++ b/src/ldmtool.c
+@@ -856,7 +856,7 @@ main(int argc, char *argv[])
+     g_type_init();
+ #endif
+ 
+-    LDM * const ldm = ldm_new(&err);
++    LDM * const ldm = ldm_new();
+ 
+     int ret = 0;
+ 
+-- 
+2.48.1
+

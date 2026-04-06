@@ -1,0 +1,12 @@
+diff -up sbsigntools-0.9.5/tests/Makefile.am.orig sbsigntools-0.9.5/tests/Makefile.am
+--- sbsigntools-0.9.5/tests/Makefile.am.orig	2025-10-03 10:20:11.676718647 +0200
++++ sbsigntools-0.9.5/tests/Makefile.am	2025-10-03 10:20:40.506763759 +0200
+@@ -18,7 +18,7 @@ if TEST_BINARY_FORMAT
+ EFILDFLAGS = --defsym=EFI_SUBSYSTEM=0x0a
+ FORMAT = -O binary
+ else
+-FORMAT = --target=efi-app-$(EFI_ARCH:x64=x86_64)
++FORMAT = --output-target=efi-app-$(EFI_ARCH:x64=x86_64)
+ endif
+ check_DATA = $(test_key) $(test_cert)
+ check_SCRIPTS = test-wrapper.sh

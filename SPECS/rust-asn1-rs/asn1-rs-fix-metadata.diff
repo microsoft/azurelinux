@@ -1,0 +1,19 @@
+--- asn1-rs-0.7.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ asn1-rs-0.7.1/Cargo.toml	2025-12-04T09:42:33.298033+00:00
+@@ -20,7 +20,6 @@
+     "CHANGELOG.md",
+     "LICENSE-*",
+     "README.md",
+-    ".gitignore",
+     "Cargo.toml",
+     "doc/*.md",
+     "examples/*.rs",
+@@ -194,7 +193,7 @@
+ version = "3.0"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.pem]
+ version = "3.0"

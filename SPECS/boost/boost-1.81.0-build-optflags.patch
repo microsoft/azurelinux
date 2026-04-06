@@ -1,0 +1,70 @@
+From ebc90bc3e372dc8e5db21f79d2a79e4f5c4d01ee Mon Sep 17 00:00:00 2001
+From: Patrick Palka <ppalka@redhat.com>
+Date: Mon, 4 Dec 2023 09:24:20 -0500
+Subject: [PATCH] Adjust options for Fedora package build
+
+---
+ tools/build/src/tools/gcc.jam | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index 834f5e1bf..c753afc23 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -513,7 +513,7 @@ rule compile.fortran ( targets * : sources * : properties * )
+ 
+ actions compile.c++ bind PCH_FILE
+ {
+-    "$(CONFIG_COMMAND)" $(LANG) -ftemplate-depth-$(TEMPLATE_DEPTH) $(OPTIONS) $(USER_OPTIONS) -D$(DEFINES) $(INCLUDE-GCH)$(_)"$(PCH_FILE:S=)" $(INCLUDE-PCH)$(_)"$(PCH_FILE)" -I"$(INCLUDES)" -include$(_)"$(FORCE_INCLUDES)" -c -o "$(<)" "$(>:T)"
++    "$(CONFIG_COMMAND)" $(LANG) $(OPTIONS) $(USER_OPTIONS) -D$(DEFINES) $(INCLUDE-GCH)$(_)"$(PCH_FILE:S=)" $(INCLUDE-PCH)$(_)"$(PCH_FILE)" -I"$(INCLUDES)" -include$(_)"$(FORCE_INCLUDES)" -c -o "$(<)" "$(>:T)"
+ }
+ 
+ actions compile.c bind PCH_FILE
+@@ -523,7 +523,7 @@ actions compile.c bind PCH_FILE
+ 
+ actions compile.c++.preprocess bind PCH_FILE
+ {
+-    "$(CONFIG_COMMAND)" $(LANG) -ftemplate-depth-$(TEMPLATE_DEPTH) $(OPTIONS) $(USER_OPTIONS) -D$(DEFINES) $(INCLUDE-GCH)$(_)"$(PCH_FILE:S=)" $(INCLUDE-PCH)$(_)"$(PCH_FILE)" -I"$(INCLUDES)" -include$(_)"$(FORCE_INCLUDES)" "$(>:T)" -E >"$(<)"
++    "$(CONFIG_COMMAND)" $(LANG) $(OPTIONS) $(USER_OPTIONS) -D$(DEFINES) $(INCLUDE-GCH)$(_)"$(PCH_FILE:S=)" $(INCLUDE-PCH)$(_)"$(PCH_FILE)" -I"$(INCLUDES)" -include$(_)"$(FORCE_INCLUDES)" "$(>:T)" -E >"$(<)"
+ }
+ 
+ actions compile.c.preprocess bind PCH_FILE
+@@ -627,22 +627,22 @@ actions compile.c.pch
+ ###
+ 
+ # Declare flags and action for compilation.
+-toolset.flags gcc.compile OPTIONS <optimization>off   : -O0 ;
+-toolset.flags gcc.compile OPTIONS <optimization>speed : -O3 ;
+-toolset.flags gcc.compile OPTIONS <optimization>space : -Os ;
+-toolset.flags gcc.compile OPTIONS <optimization>minimal : -O1 ;
++toolset.flags gcc.compile OPTIONS <optimization>off   : ;
++toolset.flags gcc.compile OPTIONS <optimization>speed : ;
++toolset.flags gcc.compile OPTIONS <optimization>space : ;
++toolset.flags gcc.compile OPTIONS <optimization>minimal : ;
+ toolset.flags gcc.compile OPTIONS <optimization>debug : -Og ;
+ 
+-toolset.flags gcc.compile OPTIONS <inlining>off  : -fno-inline ;
+-toolset.flags gcc.compile OPTIONS <inlining>on   : -Wno-inline ;
+-toolset.flags gcc.compile OPTIONS <inlining>full : -finline-functions -Wno-inline ;
++toolset.flags gcc.compile OPTIONS <inlining>off  : ;
++toolset.flags gcc.compile OPTIONS <inlining>on   : ;
++toolset.flags gcc.compile OPTIONS <inlining>full : ;
+ 
+-toolset.flags gcc.compile OPTIONS <warnings>off : -w ;
+-toolset.flags gcc.compile OPTIONS <warnings>on  : -Wall ;
+-toolset.flags gcc.compile OPTIONS <warnings>all : -Wall ;
+-toolset.flags gcc.compile OPTIONS <warnings>extra : -Wall -Wextra ;
+-toolset.flags gcc.compile OPTIONS <warnings>pedantic : -Wall -Wextra -pedantic ;
+-toolset.flags gcc.compile OPTIONS <warnings-as-errors>on : -Werror ;
++toolset.flags gcc.compile OPTIONS <warnings>off : ;
++toolset.flags gcc.compile OPTIONS <warnings>on  : ;
++toolset.flags gcc.compile OPTIONS <warnings>all : ;
++toolset.flags gcc.compile OPTIONS <warnings>extra : ;
++toolset.flags gcc.compile OPTIONS <warnings>pedantic : ;
++toolset.flags gcc.compile OPTIONS <warnings-as-errors>on : ;
+ 
+ toolset.flags gcc.compile OPTIONS <debug-symbols>on : -g ;
+ toolset.flags gcc.compile OPTIONS <profiling>on : -pg ;
+-- 
+2.43.0
+

@@ -1,0 +1,15 @@
+[Unit]
+Description=DNS caching server.
+Before=nss-lookup.target
+Wants=nss-lookup.target
+After=network.target
+; Use bind-dynamic or uncomment following to listen on non-local IP address
+;After=network-online.target
+
+[Service]
+ExecStart=/usr/sbin/dnsmasq
+Type=forking
+PIDFile=/run/dnsmasq.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,27 @@
+From 24e914edf76bde592f4a72673465e9d8d6bd9f6b Mon Sep 17 00:00:00 2001
+From: "Colin B. Macdonald" <cbm@m.fsf.org>
+Date: Wed, 9 Dec 2015 14:55:37 -0800
+Subject: [PATCH] Drop unneeded builddeps
+
+These were noted during a package review for Fedora:
+https://bugzilla.redhat.com/show_bug.cgi?id=1165620#c13
+---
+ Build.PL | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/Build.PL b/Build.PL
+index d84786d..e97cea5 100644
+--- a/Build.PL
++++ b/Build.PL
+@@ -36,10 +36,7 @@ my $builder = $class->new(
+                         },
+     add_to_cleanup      => [ 'biber-*' ],
+     configure_requires => { 'Module::Build' => 0.38 },
+-    build_requires => {
+-        'Config::AutoConf' => '0.15',
+-        'ExtUtils::LibBuilder' => '0.02'
+-    },
++    build_requires => { },
+     requires => {
+                  'autovivification' => 0,
+                  'Class::Accessor' => 0,

@@ -1,0 +1,25 @@
+From: Francois-Denis Gonthier <neumann@lostwebsite.net>
+Date: Thu, 20 Sep 2018 15:01:18 +0300
+Subject: [PATCH] Load man-pages from system-wide directory
+
+Patch allows one to use standard man path with erl -man command.
+(Erlang manual pages are placed to /usr/share/man/ hierarchy
+as required by Debian policy.)
+
+diff --git a/erts/etc/common/erlexec.c b/erts/etc/common/erlexec.c
+index 888df87e35..14272f06c6 100644
+--- a/erts/etc/common/erlexec.c
++++ b/erts/etc/common/erlexec.c
+@@ -716,8 +716,10 @@ int main(int argc, char **argv)
+ 			error("-man not supported on Windows");
+ #else
+ 			argv[i] = "man";
+-			erts_snprintf(tmpStr, sizeof(tmpStr), "%s/man", rootdir);
+-			set_env("MANPATH", tmpStr);
++			/*
++			* Conform to erlang-manpages content.
++			*/
++			putenv(strsave("MANSECT=3erl:1:5:7"));
+ 			execvp("man", argv+i);
+ 			error("Could not execute the 'man' command.");
+ #endif

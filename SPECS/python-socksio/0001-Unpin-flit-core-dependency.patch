@@ -1,0 +1,24 @@
+From d55c0581c60ae81ad958e6f88ddda4622ec0ff48 Mon Sep 17 00:00:00 2001
+From: Theodore Ni <3806110+tjni@users.noreply.github.com>
+Date: Thu, 29 Feb 2024 19:06:33 -0800
+Subject: [PATCH] Unpin flit-core dependency
+
+(cherry picked from commit b326406915fd98a8185c1c160165c5b8963b30c1)
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2856277..70868e0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["flit_core >=2,<3"]
++requires = ["flit_core >=2"]
+ build-backend = "flit_core.buildapi"
+ 
+ [tool.flit.metadata]
+-- 
+2.48.1
+

@@ -1,0 +1,44 @@
+From b92439492b37d7121ccd378e2fff4157884f22ee Mon Sep 17 00:00:00 2001
+From: Tom Hughes <tom@compton.nu>
+Date: Tue, 18 Jun 2024 00:05:23 +0100
+Subject: [PATCH] Drop mason dependency handling
+
+---
+ Makefile | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ef73718..87d1fa1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,26 +1,9 @@
+ CXXFLAGS += -Iinclude -std=c++14 -Wall -Wextra -Wshadow -Werror -Wno-class-memaccess -g -fPIC
+ 
+-MASON ?= .mason/mason
+-VARIANT = variant 1.1.4
+-GEOMETRY = geometry 0.9.2
+-RAPIDJSON = rapidjson 1.1.0
+-
+-$(MASON):
+-	git submodule update --init
+-
+-DEPS = `$(MASON) cflags $(VARIANT)` \
+-	`$(MASON) cflags $(GEOMETRY)` \
+-	`$(MASON) cflags $(RAPIDJSON)`
+-
+-mason_packages/headers/geometry: $(MASON)
+-	$(MASON) install $(VARIANT)
+-	$(MASON) install $(GEOMETRY)
+-	$(MASON) install $(RAPIDJSON)
+-
+ build:
+ 	mkdir -p build
+ 
+-build/test: test/test.cpp include/mapbox/polylabel.hpp build mason_packages/headers/geometry
++build/test: test/test.cpp include/mapbox/polylabel.hpp build
+ 	$(CXX) $(CFLAGS) $(CXXFLAGS) $(DEPS) $< -o $@
+ 
+ test: build/test
+-- 
+2.45.2
+

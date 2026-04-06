@@ -1,0 +1,44 @@
+From b994886e18307ef3002a63679fba4a6177f476cf Mon Sep 17 00:00:00 2001
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 26 Nov 2025 15:08:25 +0100
+Subject: blkid: Drop const from blkid_partitions_get_name()
+
+const for idx is useless as the value is copied anyway, so drop the
+const. AFAIK this doesn't change ABI.
+
+(cherry picked from commit b243de928aab8565e264f4af1d776cc860689f64)
+(cherry picked from commit 479133958af89a2afda442e158107b465301dfbb)
+---
+ libblkid/src/blkid.h.in              | 2 +-
+ libblkid/src/partitions/partitions.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libblkid/src/blkid.h.in b/libblkid/src/blkid.h.in
+index 91fc3b0be..031650dbc 100644
+--- a/libblkid/src/blkid.h.in
++++ b/libblkid/src/blkid.h.in
+@@ -340,7 +340,7 @@ extern uint64_t blkid_topology_get_diskseq(blkid_topology tp)
+  * partitions probing
+  */
+ extern int blkid_known_pttype(const char *pttype);
+-extern int blkid_partitions_get_name(const size_t idx, const char **name);
++extern int blkid_partitions_get_name(size_t idx, const char **name);
+ 
+ extern int blkid_probe_enable_partitions(blkid_probe pr, int enable)
+ 			__ul_attribute__((nonnull));
+diff --git a/libblkid/src/partitions/partitions.c b/libblkid/src/partitions/partitions.c
+index 9df813c92..e838b3db1 100644
+--- a/libblkid/src/partitions/partitions.c
++++ b/libblkid/src/partitions/partitions.c
+@@ -907,7 +907,7 @@ int blkid_known_pttype(const char *pttype)
+  *
+  * Returns: -1 if @idx is out of range, or 0 on success.
+  */
+-int blkid_partitions_get_name(const size_t idx, const char **name)
++int blkid_partitions_get_name(size_t idx, const char **name)
+ {
+ 	if (idx < ARRAY_SIZE(idinfos)) {
+ 		*name = idinfos[idx]->name;
+-- 
+2.52.0
+

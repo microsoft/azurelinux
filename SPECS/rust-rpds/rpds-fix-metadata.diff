@@ -1,0 +1,16 @@
+--- rpds-1.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rpds-1.1.1/Cargo.toml	2025-04-12T06:50:05.298001+00:00
+@@ -142,12 +142,9 @@
+ features = ["triomphe"]
+ 
+ [dependencies.serde]
+-version = "1.0.219"
++version = "1.0.218"
+ optional = true
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+ 
+ [dev-dependencies.pretty_assertions]
+ version = "1.4.1"

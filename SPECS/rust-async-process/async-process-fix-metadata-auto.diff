@@ -1,0 +1,22 @@
+--- async-process-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-process-2.5.0/Cargo.toml	2025-09-14T14:57:59.928951+00:00
+@@ -95,18 +95,8 @@
+ ]
+ default-features = false
+ 
+-[target."cfg(windows)".dependencies.blocking]
+-version = "1.0.0"
+-
+-[target."cfg(windows)".dev-dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Threading",
+-]
+-default-features = false
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(async_process_force_signal_backend)"]
++

@@ -1,0 +1,14 @@
+# The s390 architecture needs a pause before accessing the test DB.
+
+diff -up lmdb-LMDB_0.9.17/libraries/liblmdb/Makefile.orig lmdb-LMDB_0.9.17/libraries/liblmdb/Makefile
+--- lmdb-LMDB_0.9.17/libraries/liblmdb/Makefile.orig	2015-12-03 09:21:35.621480706 +0100
++++ lmdb-LMDB_0.9.17/libraries/liblmdb/Makefile	2015-12-03 09:22:10.069644210 +0100
+@@ -57,7 +57,7 @@ clean:
+ 
+ test:	all
+ 	rm -rf testdb && mkdir testdb
+-	./mtest && ./mdb_stat testdb
++	./mtest && sleep 1 && ./mdb_stat testdb
+ 
+ liblmdb.a:	mdb.o midl.o
+ 	$(AR) rs $@ mdb.o midl.o

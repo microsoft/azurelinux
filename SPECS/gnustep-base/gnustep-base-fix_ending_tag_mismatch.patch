@@ -1,0 +1,95 @@
+--- a/Documentation/ReleaseNotes.orig.gsdoc	2025-02-10 18:00:46.000000000 +0100
++++ b/Documentation/ReleaseNotes.gsdoc	2025-02-15 21:49:12.103604889 +0100
+@@ -95,49 +95,49 @@
+         <p>
+         </p>
+ 
+-	autogsdoc (and many source/header files) updated for ObjC-2 support<br>
+-	gdnc gspath spelling error fixes<br>
+-	GSFileHandle remove handle from run loop when -dealloc is called<br>
+-	GSHTTPURLHandle close socket if we end loading with I/O in progress.<br>
+-	GSMimeDocimnet optimisations<br>
+-	GSPrivateSymbolPath() portability improvements<br>
+-	GSVersionMacros add GS_UNIMPLEMENTED to mark unimplemented methods<br>
+-	HTMLLinker man page groff warning fixed<br>
+-	Make GSTcpTune options available to streams as well as file handles and improve debug logging for stream operations.<br>
+-	NSBundle improvements in librarym bundle lookup<br>
+-	NSCache thread safety fix<br>
+-	NSData caching data of file URLs and OSX consistency tweak to permissions when writing file atomically<br>
+-	NSDate implements +now constructor.<br>
+-	NSDecimalNumber fix possible coimparison bug for zero values<br>
+-	NSError -description and -localizedDescription formats match OSX<br>
+-	NSException portability improvments<br>
+-	NSFileManager makeed safety fix and make enumerating a file URL return URLs rather than paths.<br>
+-	NSIndexSet implements enumerateRangesInRange convenience methods.<br>
+-	NSISO8601DateFormatter.m: bugfix for date/time string generation<br>
+-	NSJSONSerialization fix memory leak, fix issue with unicode surrogate pairs.<br>
+-	NSKeyValueObserving Add methods to remove observers<br>
+-	NSLocale Fix -countryCode incorrectly returning language code, fix for hyphen and underscore in locale identifier<br>
+-	NSMessagePort remove restriction on Distributed Objects message length<br>
+-	NSNotificationCenter fix for memory leak, minor bugfixes (use before initialise)<br>
+-	NSNull fix for -valueForUndefinedKey: to return singleton<br>
+-	NSNumberFormatter make minimum/maximum properties NSNumbers<br>
+-	NSObject optimise allocation with new runtime library<br>
+-	NSOperation fix occasional scheduling bug<br>
+-	NSOrderedSet Fix keyed encoding to match Apple platforms.<br>
+-	NSPathUtilities fix intialisation order deadlock.<br>
+-	NSPredicate fix for array access keywords<br>
+-	NSProcessInfo android support<br>
+-	NSString correct class used when loading empty string from file/URL, implements regular expression search methods.<br>
+-	NSTask return an error if the path to launch in is bad, use _exit to terminate forked process if needed, use closefrom() to close descriptors in child process if possible<br>
+-	NSTimer wrap call to block in exception handler (bug #289)<br>
+-	NSTimeZone improvements<br>
+-	NSURL Fix NSURL path on Windows for UNC paths.<br>
+-	NSURLRequest: Support deleting using setValue:forHTTPHeaderField: with nil value.<br>
+-	NSURLSession many bugfixes and improvements<br>
+-	NSUserDefaults fix potential deadlock<br>
+-	NSXMLElement bugfix to remove previous attributes when setting attributes.<br>
+-	NSXMLNode returns NSError on failure to evaluate xpath expression.<br>
+-	gnustep_global_lock and GSLazyLock deprecated for removal in next release.
++	autogsdoc (and many source/header files) updated for ObjC-2 support<br />
++	gdnc gspath spelling error fixes<br />
++	GSFileHandle remove handle from run loop when -dealloc is called<br />
++	GSHTTPURLHandle close socket if we end loading with I/O in progress.<br />
++	GSMimeDocimnet optimisations<br />
++	GSPrivateSymbolPath() portability improvements<br />
++	GSVersionMacros add GS_UNIMPLEMENTED to mark unimplemented methods<br />
++	HTMLLinker man page groff warning fixed<br />
++	Make GSTcpTune options available to streams as well as file handles and improve debug logging for stream operations.<br />
++	NSBundle improvements in librarym bundle lookup<br />
++	NSCache thread safety fix<br />
++	NSData caching data of file URLs and OSX consistency tweak to permissions when writing file atomically<br />
++	NSDate implements +now constructor.<br />
++	NSDecimalNumber fix possible coimparison bug for zero values<br />
++	NSError -description and -localizedDescription formats match OSX<br />
++	NSException portability improvments<br />
++	NSFileManager makeed safety fix and make enumerating a file URL return URLs rather than paths.<br />
++	NSIndexSet implements enumerateRangesInRange convenience methods.<br />
++	NSISO8601DateFormatter.m: bugfix for date/time string generation<br />
++	NSJSONSerialization fix memory leak, fix issue with unicode surrogate pairs.<br />
++	NSKeyValueObserving Add methods to remove observers<br />
++	NSLocale Fix -countryCode incorrectly returning language code, fix for hyphen and underscore in locale identifier<br />
++	NSMessagePort remove restriction on Distributed Objects message length<br />
++	NSNotificationCenter fix for memory leak, minor bugfixes (use before initialise)<br />
++	NSNull fix for -valueForUndefinedKey: to return singleton<br />
++	NSNumberFormatter make minimum/maximum properties NSNumbers<br />
++	NSObject optimise allocation with new runtime library<br />
++	NSOperation fix occasional scheduling bug<br />
++	NSOrderedSet Fix keyed encoding to match Apple platforms.<br />
++	NSPathUtilities fix intialisation order deadlock.<br />
++	NSPredicate fix for array access keywords<br />
++	NSProcessInfo android support<br />
++	NSString correct class used when loading empty string from file/URL, implements regular expression search methods.<br />
++	NSTask return an error if the path to launch in is bad, use _exit to terminate forked process if needed, use closefrom() to close descriptors in child process if possible<br />
++	NSTimer wrap call to block in exception handler (bug #289)<br />
++	NSTimeZone improvements<br />
++	NSURL Fix NSURL path on Windows for UNC paths.<br />
++	NSURLRequest: Support deleting using setValue:forHTTPHeaderField: with nil value.<br />
++	NSURLSession many bugfixes and improvements<br />
++	NSUserDefaults fix potential deadlock<br />
++	NSXMLElement bugfix to remove previous attributes when setting attributes.<br />
++	NSXMLNode returns NSError on failure to evaluate xpath expression.<br />
++	gnustep_global_lock and GSLazyLock deprecated for removal in next release.
+       </section>
+ 
+       <section>

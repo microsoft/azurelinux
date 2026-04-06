@@ -1,0 +1,40 @@
+Downstream-only patch.  CVS hasn't had a release since 2008.
+
+diff --git a/lib/getdate.c b/lib/getdate.c
+index 5180358c85f8a050..18a6ce0416aa188b 100644
+--- a/lib/getdate.c
++++ b/lib/getdate.c
+@@ -1019,7 +1019,7 @@ main(ac, av)
+ 
+     (void)printf("Enter date, or blank line to exit.\n\t> ");
+     (void)fflush(stdout);
+-    while (gets(buff) && buff[0]) {
++    while (fgets(buff, sizeof(buff) - 1, stdin) && buff[0]) {
+ 	d = get_date(buff, (struct timeb *)NULL);
+ 	if (d == -1)
+ 	    (void)printf("Bad format - couldn't convert.\n");
+diff --git a/lib/getdate.y b/lib/getdate.y
+index 0e128d74ef609818..007318cd0aef2623 100644
+--- a/lib/getdate.y
++++ b/lib/getdate.y
+@@ -1015,7 +1015,7 @@ main(ac, av)
+ 
+     (void)printf("Enter date, or blank line to exit.\n\t> ");
+     (void)fflush(stdout);
+-    while (gets(buff) && buff[0]) {
++    while (fgets(buff, sizeof(buff) - 1, stdin) && buff[0]) {
+ 	d = get_date(buff, (struct timeb *)NULL);
+ 	if (d == -1)
+ 	    (void)printf("Bad format - couldn't convert.\n");
+diff --git a/src/cvs.h b/src/cvs.h
+index a7f4b2f6bd6c67fb..cd6ffc9bbd7859aa 100644
+--- a/src/cvs.h
++++ b/src/cvs.h
+@@ -486,6 +486,7 @@ extern int parse_config PROTO ((char *));
+ 
+ typedef	RETSIGTYPE (*SIGCLEANUPPROC)	PROTO(());
+ int SIG_register PROTO((int sig, SIGCLEANUPPROC sigcleanup));
++int SIG_deregister PROTO((int sig, SIGCLEANUPPROC sigcleanup));
+ int isdir PROTO((const char *file));
+ int isfile PROTO((const char *file));
+ int islink PROTO((const char *file));

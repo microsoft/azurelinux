@@ -1,0 +1,21 @@
+diff -rupN --no-dereference fribidi-1.0.16/bin/meson.build fribidi-1.0.16-new/bin/meson.build
+--- fribidi-1.0.16/bin/meson.build	2024-09-25 20:04:10.000000000 +0200
++++ fribidi-1.0.16-new/bin/meson.build	2024-09-29 19:58:34.971034681 +0200
+@@ -1,7 +1,7 @@
+ # The fribidi binary is used by the test setup, so if bin=false we still
+ # need to build it for internal usage, we just won't install it.
+ fribidi = executable('fribidi',
+-  'fribidi-main.c', 'getopt.c', 'getopt1.c', fribidi_unicode_version_h,
++  'fribidi-main.c', fribidi_unicode_version_h,
+   c_args: ['-DHAVE_CONFIG_H'] + fribidi_static_cargs,
+   include_directories: incs,
+   link_with: libfribidi,
+@@ -12,7 +12,7 @@ if not get_option('bin')
+ endif
+ 
+ executable('fribidi-benchmark',
+-  'fribidi-benchmark.c', 'getopt.c', 'getopt1.c', fribidi_unicode_version_h,
++  'fribidi-benchmark.c', fribidi_unicode_version_h,
+   c_args: ['-DHAVE_CONFIG_H'] + fribidi_static_cargs,
+   include_directories: incs,
+   link_with: libfribidi,

@@ -1,0 +1,24 @@
+From 52f55ddd914b64cfc6221db3270c6755a1e21488 Mon Sep 17 00:00:00 2001
+From: Hartley McGuire <skipkayhil@gmail.com>
+Date: Tue, 11 Feb 2025 12:51:04 -0500
+Subject: [PATCH] Fix sqlite3 dbconsole not working outside Rails
+
+Another place in this file does the correct, `defined?` check, but this
+one assumes the `Rails` constant will exist.
+---
+ .../lib/active_record/connection_adapters/sqlite3_adapter.rb  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index d87a46d2d595a..6ca9a8ef7c061 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -46,7 +46,7 @@ def dbconsole(config, options = {})
+ 
+           args << "-#{options[:mode]}" if options[:mode]
+           args << "-header" if options[:header]
+-          args << File.expand_path(config.database, Rails.respond_to?(:root) ? Rails.root : nil)
++          args << File.expand_path(config.database, defined?(Rails.root) ? Rails.root : nil)
+ 
+           find_cmd_and_exec(ActiveRecord.database_cli[:sqlite], *args)
+         end

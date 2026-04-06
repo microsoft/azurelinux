@@ -1,0 +1,8 @@
+--- url-2.5.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ url-2.5.7/Cargo.toml	2025-10-25T22:48:54.962203+00:00
+@@ -108,5 +108,3 @@
+ [dev-dependencies.serde_json]
+ version = "1.0"
+ 
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

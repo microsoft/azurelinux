@@ -1,0 +1,19 @@
+Fix a generic C99 compatibility issue in the generated configure
+script, to avoid build failures with future compilers.
+
+Current autoconf no longer generates this problematic code, so the
+issue will go away once upstream re-runs autoconf.
+
+diff --git a/configure b/configure
+index 95d29da75706df9b..faf0bf5bfaf7a17d 100755
+--- a/configure
++++ b/configure
+@@ -760,7 +760,7 @@ cat > conftest.$ac_ext << EOF
+ #line 761 "configure"
+ #include "confdefs.h"
+ 
+-main(){return(0);}
++int main(){return(0);}
+ EOF
+ if { (eval echo configure:766: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+   ac_cv_prog_cc_works=yes

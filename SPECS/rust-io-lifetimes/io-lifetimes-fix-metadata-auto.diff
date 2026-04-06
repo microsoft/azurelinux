@@ -1,0 +1,35 @@
+--- io-lifetimes-2.0.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ io-lifetimes-2.0.4/Cargo.toml	2025-01-20T16:54:52.435356+00:00
+@@ -54,8 +54,6 @@
+ [features]
+ close = [
+     "libc",
+-    "hermit-abi",
+-    "windows-sys",
+ ]
+ default = []
+ 
+@@ -95,22 +93,8 @@
+ version = "0.2.96"
+ optional = true
+ 
+-[target.'cfg(target_os = "hermit")'.dependencies.hermit-abi]
+-version = ">=0.3, <=0.4"
+-optional = true
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.52, <=0.59"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-    "Win32_Networking_WinSock",
+-    "Win32_Security",
+-    "Win32_System_IO",
+-]
+-optional = true
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(wasi_ext)"]
++

@@ -1,0 +1,226 @@
+From f1be05c8efeb65b77a8bfd21763ab55bb5c04906 Mon Sep 17 00:00:00 2001
+From: Ivan Solovev <ivan.solovev@qt.io>
+Date: Thu, 2 Jan 2025 16:48:49 +0100
+Subject: [PATCH] QLowEnergyControllerPrivateBluez: guard against malformed
+ replies
+
+The QLowEnergyControllerPrivateBluez::l2cpReadyRead() slot reads the
+data from a Bluetooth L2CAP socket and then tries to process it
+according to ATT protocol specs.
+
+However, the code was missing length and sanity checks at some
+codepaths in processUnsolicitedReply() and processReply() helper
+methods, simply relying on the data to be in the proper format.
+
+This patch adds some minimal checks to make sure that we do not read
+past the end of the received array and do not divide by zero.
+
+This problem was originally pointed out by Marc Mutz in an unrelated
+patch.
+
+Pick-to: 6.5 5.15
+Change-Id: I8dcfe031f70ad61fa3d87dc9d771c3fabc6d0edc
+Reviewed-by: Alex Blasche <alexander.blasche@qt.io>
+Reviewed-by: Juha Vuolle <juha.vuolle@qt.io>
+(cherry picked from commit aecbd657c841a2a8c74631ceac96b8ff1f03ab5c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+(cherry picked from commit 53e991671f725c136e9aa824c59ec13934c63fb4)
+
+(cherry picked from commit 465e3f3112a9c158aa6dd2f8b9439ae6c2de336f)
+---
+ src/bluetooth/qlowenergycontroller_bluez.cpp | 76 +++++++++++++++++---
+ 1 file changed, 66 insertions(+), 10 deletions(-)
+
+diff --git a/src/bluetooth/qlowenergycontroller_bluez.cpp b/src/bluetooth/qlowenergycontroller_bluez.cpp
+index 6cb6ad66..0608e2ca 100644
+--- a/src/bluetooth/qlowenergycontroller_bluez.cpp
++++ b/src/bluetooth/qlowenergycontroller_bluez.cpp
+@@ -179,12 +179,13 @@ static inline QBluetoothUuid convert_uuid128(const quint128 *p)
+     return QBluetoothUuid(qtdst);
+ }
+ 
+-static void dumpErrorInformation(const QByteArray &response)
++/* returns false if the format is incorrect */
++static bool dumpErrorInformation(const QByteArray &response)
+ {
+     const char *data = response.constData();
+     if (response.size() != 5 || data[0] != ATT_OP_ERROR_RESPONSE) {
+         qCWarning(QT_BT_BLUEZ) << QLatin1String("Not a valid error response");
+-        return;
++        return false;
+     }
+ 
+     quint8 lastCommand = data[1];
+@@ -238,6 +239,8 @@ static void dumpErrorInformation(const QByteArray &response)
+     qCDebug(QT_BT_BLUEZ) << "Error1:" << errorString
+              << "last command:" << hex << lastCommand
+              << "handle:" << handle;
++
++    return true;
+ }
+ 
+ static int getUuidSize(const QBluetoothUuid &uuid)
+@@ -1014,6 +1017,7 @@ QLowEnergyHandle parseReadByTypeCharDiscovery(
+ {
+     Q_ASSERT(charData);
+     Q_ASSERT(data);
++    Q_ASSERT(elementLength >= 5);
+ 
+     QLowEnergyHandle attributeHandle = bt_get_le16(&data[0]);
+     charData->properties =
+@@ -1022,7 +1026,7 @@ QLowEnergyHandle parseReadByTypeCharDiscovery(
+ 
+     if (elementLength == 7) // 16 bit uuid
+         charData->uuid = QBluetoothUuid(bt_get_le16(&data[5]));
+-    else
++    else if (elementLength == 21) // 128 bit uuid
+         charData->uuid = convert_uuid128((quint128 *)&data[5]);
+ 
+     qCDebug(QT_BT_BLUEZ) << "Found handle:" << hex << attributeHandle
+@@ -1039,6 +1043,7 @@ QLowEnergyHandle parseReadByTypeIncludeDiscovery(
+ {
+     Q_ASSERT(foundServices);
+     Q_ASSERT(data);
++    Q_ASSERT(elementLength >= 6);
+ 
+     QLowEnergyHandle attributeHandle = bt_get_le16(&data[0]);
+ 
+@@ -1048,9 +1053,14 @@ QLowEnergyHandle parseReadByTypeIncludeDiscovery(
+     // data[2] -> included service start handle
+     // data[4] -> included service end handle
+ 
++    // TODO: Spec v. 5.3, Vol. 3, Part G, 4.5.1 mentions that only
++    // 16-bit UUID can be returned here. If the UUID is 128-bit,
++    // then it is omitted from the response, and should be requested
++    // separately with the ATT_READ_REQ command.
++
+     if (elementLength == 8) //16 bit uuid
+         foundServices->append(QBluetoothUuid(bt_get_le16(&data[6])));
+-    else
++    else if (elementLength == 22) // 128 bit uuid
+         foundServices->append(convert_uuid128((quint128 *) &data[6]));
+ 
+     qCDebug(QT_BT_BLUEZ) << "Found included service: " << hex
+@@ -1059,17 +1069,29 @@ QLowEnergyHandle parseReadByTypeIncludeDiscovery(
+     return attributeHandle;
+ }
+ 
++Q_DECL_COLD_FUNCTION
++static void reportMalformedData(quint8 cmd, const QByteArray &response)
++{
++    qCDebug(QT_BT_BLUEZ, "Command 0x%X malformed data: %s", cmd,
++            response.toHex().constData());
++}
++
+ void QLowEnergyControllerPrivateBluez::processReply(
+         const Request &request, const QByteArray &response)
+ {
+     Q_Q(QLowEnergyController);
+ 
++    // We already have an isEmpty() check at the only calling site that reads
++    // incoming data, so Q_ASSERT is enough.
++    Q_ASSERT(!response.isEmpty());
++
+     quint8 command = response.constData()[0];
+ 
+     bool isErrorResponse = false;
+     // if error occurred 2. byte is previous request type
+     if (command == ATT_OP_ERROR_RESPONSE) {
+-        dumpErrorInformation(response);
++        if (!dumpErrorInformation(response))
++            return;
+         command = response.constData()[1];
+         isErrorResponse = true;
+     }
+@@ -1083,7 +1105,10 @@ void QLowEnergyControllerPrivateBluez::processReply(
+             mtuSize = ATT_DEFAULT_LE_MTU;
+             break;
+         }
+-
++        if (response.size() < 3) {
++            reportMalformedData(command, response);
++            break;
++        }
+         const char *data = response.constData();
+         quint16 mtu = bt_get_le16(&data[1]);
+         mtuSize = mtu;
+@@ -1111,8 +1136,15 @@ void QLowEnergyControllerPrivateBluez::processReply(
+             break;
+         }
+ 
++        // response[1] == elementLength. According to the spec it should be
++        // at least 4 bytes. See Spec v5.3, Vol 3, Part F, 3.4.4.10
++        if (response.size() < 2 || response[1] < 4) {
++            reportMalformedData(command, response);
++            break;
++        }
++
+         QLowEnergyHandle start = 0, end = 0;
+-        const quint16 elementLength = response.constData()[1];
++        const quint16 elementLength = response.constData()[1]; // value checked above
+         const quint16 numElements = (response.size() - 2) / elementLength;
+         quint16 offset = 2;
+         const char *data = response.constData();
+@@ -1190,16 +1222,25 @@ void QLowEnergyControllerPrivateBluez::processReply(
+         }
+ 
+         /* packet format:
+-         * if GATT_CHARACTERISTIC discovery
++         * if GATT_CHARACTERISTIC discovery (Spec 5.3, Vol. 3, Part G, 4.6)
+          *      <opcode><elementLength>
+          *          [<handle><property><charHandle><uuid>]+
++         * The minimum elementLength is 7 bytes (uuid is always included)
+          *
+-         * if GATT_INCLUDE discovery
++         * if GATT_INCLUDE discovery (Spec 5.3, Vol. 3, Part G, 4.5.1)
+          *      <opcode><elementLength>
+          *          [<handle><startHandle_included><endHandle_included><uuid>]+
++         *  The minimum elementLength is 6 bytes (uuid can be omitted).
+          *
+          *  The uuid can be 16 or 128 bit.
+          */
++
++        const quint8 minimumElementLength = attributeType == GATT_CHARACTERISTIC ? 7 : 6;
++        if (response.size() < 2 || response[1] < minimumElementLength) {
++            reportMalformedData(command, response);
++            break;
++        }
++
+         QLowEnergyHandle lastHandle;
+         const quint16 elementLength = response.constData()[1];
+         const quint16 numElements = (response.size() - 2) / elementLength;
+@@ -1401,6 +1442,12 @@ void QLowEnergyControllerPrivateBluez::processReply(
+             break;
+         }
+ 
++        // Spec 5.3, Vol. 3, Part F, 3.4.3.2
++        if (response.size() < 6) {
++            reportMalformedData(command, response);
++            break;
++        }
++
+         const quint8 format = response[1];
+         quint16 elementLength;
+         switch (format) {
+@@ -1831,8 +1878,17 @@ void QLowEnergyControllerPrivateBluez::discoverServiceDescriptors(
+ 
+ void QLowEnergyControllerPrivateBluez::processUnsolicitedReply(const QByteArray &payload)
+ {
++    Q_ASSERT(!payload.isEmpty());
++
+     const char *data = payload.constData();
+-    bool isNotification = (data[0] == ATT_OP_HANDLE_VAL_NOTIFICATION);
++    const quint8 command = data[0];
++    bool isNotification = (command == ATT_OP_HANDLE_VAL_NOTIFICATION);
++
++    if (payload.size() < 3) {
++        reportMalformedData(command, payload);
++        return;
++    }
++
+     const QLowEnergyHandle changedHandle = bt_get_le16(&data[1]);
+ 
+     if (QT_BT_BLUEZ().isDebugEnabled()) {
+-- 
+2.51.1
+

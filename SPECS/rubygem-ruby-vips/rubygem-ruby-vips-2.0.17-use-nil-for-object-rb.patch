@@ -1,0 +1,31 @@
+From 2ecd377375ef7f0fa182253a1b06980b2a9b358d Mon Sep 17 00:00:00 2001
+From: John Cupitt <jcupitt@gmail.com>
+Date: Sun, 5 Apr 2020 15:37:50 +0100
+Subject: [PATCH] use x.nil? where we can
+
+thanks @Nakilon
+
+https://github.com/libvips/ruby-vips/commit/af80cc54ecec93bfbaeeb977115313cf2c3f253a#r38300205
+---
+ lib/vips/gvalue.rb       |  2 +-
+ lib/vips/image.rb        | 32 +++++++++++++-------------------
+ lib/vips/interpolate.rb  |  2 +-
+ lib/vips/object.rb       |  2 +-
+ lib/vips/operation.rb    |  5 ++---
+ lib/vips/sourcecustom.rb |  2 +-
+ 6 files changed, 19 insertions(+), 26 deletions(-)
+
+diff --git a/lib/vips/object.rb b/lib/vips/object.rb
+index e7523ae..d1fab07 100644
+--- a/lib/vips/object.rb
++++ b/lib/vips/object.rb
+@@ -262,7 +262,7 @@ def set name, value
+ 
+     def signal_connect name, handler=nil
+       marshal = MARSHAL_ALL[name.to_sym]
+-      raise Vips::Error, "unsupported signal #{name}" if marshal == nil
++      raise Vips::Error, "unsupported signal #{name}" if marshal.nil?
+ 
+       if block_given? 
+         # This will grab any block given to us and make it into a proc
+

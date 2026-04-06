@@ -1,0 +1,72 @@
+From d437ecf75de2d6fdeb2aed6f45c4b3b16373389b Mon Sep 17 00:00:00 2001
+From: Sergey Poznyakoff <gray@gnu.org>
+Date: Fri, 11 Aug 2023 21:35:30 +0300
+Subject: [PATCH] Revert "Fix savannah bug #63567"
+
+Commit e89c7a45eb broke deletion from archives. The reported number
+of bytes read is rounded to the nearest record anyway, revert the
+commit and document the fact.
+
+Reported by Ed Santiago. See
+https://bugzilla.redhat.com/show_bug.cgi?id=2230127
+
+* doc/tar.texi: Document the fact that --totals rounds up the
+number of bytes reads to the nearest record.
+* src/buffer.c: Revert changes.
+* tests/delete06.at: Fix expected status code and stderr.
+---
+ doc/tar.texi      | 5 +++++
+ src/buffer.c      | 3 +--
+ tests/delete06.at | 7 +++++--
+ 3 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/doc/tar.texi b/doc/tar.texi
+index d43b39e4..ee631137 100644
+--- a/doc/tar.texi
++++ b/doc/tar.texi
+@@ -4215,6 +4215,11 @@ Total bytes read: 7924664320 (7.4GiB, 95MiB/s)
+ @end group
+ @end smallexample
+ 
++Notice, that since @command{tar} operates on @dfn{records}, the number
++of bytes reported can be rounded up to the nearest full record.  This
++can happen, in particular, when the last record in the archive is
++partial.  @xref{Blocking}.
++
+ Finally, when deleting from an archive, the @option{--totals} option
+ displays both numbers plus number of bytes removed from the archive:
+ 
+diff --git a/src/buffer.c b/src/buffer.c
+index 12a0579f..8a575f9a 100644
+--- a/src/buffer.c
++++ b/src/buffer.c
+@@ -987,8 +987,7 @@ short_read (size_t status)
+     }
+ 
+   record_end = record_start + (record_size - left) / BLOCKSIZE;
+-  if (left == 0)
+-    records_read++;
++  records_read++;
+ }
+ 
+ /*  Flush the current buffer to/from the archive.  */
+diff --git a/tests/delete06.at b/tests/delete06.at
+index 9668a28c..c84ba20e 100644
+--- a/tests/delete06.at
++++ b/tests/delete06.at
+@@ -36,7 +36,10 @@ esac
+ dd if=archive.tar of=trunc.tar bs=$size count=1 2>/dev/null
+ tar --delete 'b/' -f trunc.tar
+ ],
+-[0],
+-[],[],[],[],[gnu, pax])
++[2],
++[],
++[tar: lseek: trunc.tar: Value too large for defined data type
++tar: Exiting with failure status due to previous errors
++],[],[],[gnu, pax])
+ 
+ AT_CLEANUP
+-- 
+2.41.0
+

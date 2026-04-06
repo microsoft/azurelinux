@@ -1,0 +1,25 @@
+--- phf_generator-0.13.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ phf_generator-0.13.1/Cargo.toml	2025-12-28T12:07:28.621893+00:00
+@@ -32,15 +32,6 @@
+ name = "phf_generator"
+ path = "src/lib.rs"
+ 
+-[[bin]]
+-name = "gen_hash_test"
+-path = "src/bin/gen_hash_test.rs"
+-
+-[[bench]]
+-name = "benches"
+-path = "benches/benches.rs"
+-harness = false
+-
+ [dependencies.fastrand]
+ version = "2.1.0"
+ default-features = false
+@@ -48,6 +39,3 @@
+ [dependencies.phf_shared]
+ version = "^0.13.1"
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.6.0"

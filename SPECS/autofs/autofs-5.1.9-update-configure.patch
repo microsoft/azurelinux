@@ -1,0 +1,252 @@
+Update configure script.
+
+From: Ian Kent <raven@themaw.net>
+
+Signed-off-by: Ian Kent <raven@themaw.net>
+---
+ configure |   92 +++++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 46 insertions(+), 46 deletions(-)
+
+diff --git a/configure b/configure
+index d9b94b3e5..3dc07f638 100755
+--- a/configure
++++ b/configure
+@@ -2437,8 +2437,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ # for pkg-config macros
+-# pkg.m4 - Macros to locate and utilise pkg-config.   -*- Autoconf -*-
+-# serial 11 (pkg-config-0.29.1)
++# pkg.m4 - Macros to locate and use pkg-config.   -*- Autoconf -*-
++# serial 12 (pkg-config-0.29.2)
+ 
+ 
+ 
+@@ -3706,8 +3706,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ pkg_failed=no
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for systemd" >&5
+-printf %s "checking for systemd... " >&6; }
++{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libsystemd" >&5
++printf %s "checking for libsystemd... " >&6; }
+ 
+ if test -n "$systemd_CFLAGS"; then
+     pkg_cv_systemd_CFLAGS="$systemd_CFLAGS"
+@@ -3747,7 +3747,7 @@ fi
+ 
+ 
+ if test $pkg_failed = yes; then
+-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+ if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+@@ -3756,12 +3756,12 @@ else
+         _pkg_short_errors_supported=no
+ fi
+         if test $_pkg_short_errors_supported = yes; then
+-	        systemd_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libsystemd" 2>&1`
++                systemd_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libsystemd" 2>&1`
+         else
+-	        systemd_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libsystemd" 2>&1`
++                systemd_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libsystemd" 2>&1`
+         fi
+-	# Put the nasty error message in config.log where it belongs
+-	echo "$systemd_PKG_ERRORS" >&5
++        # Put the nasty error message in config.log where it belongs
++        echo "$systemd_PKG_ERRORS" >&5
+ 
+ 
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sm_notify in -lsystemd" >&5
+@@ -3807,7 +3807,7 @@ fi
+ 
+ 
+ elif test $pkg_failed = untried; then
+-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sm_notify in -lsystemd" >&5
+@@ -3853,8 +3853,8 @@ fi
+ 
+ 
+ else
+-	systemd_CFLAGS=$pkg_cv_systemd_CFLAGS
+-	systemd_LIBS=$pkg_cv_systemd_LIBS
++        systemd_CFLAGS=$pkg_cv_systemd_CFLAGS
++        systemd_LIBS=$pkg_cv_systemd_LIBS
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ printf "%s\n" "yes" >&6; }
+ 
+@@ -3997,8 +3997,8 @@ fi
+ if test "x$with_libtirpc" = "xyes"; then
+ 
+ pkg_failed=no
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIRPC" >&5
+-printf %s "checking for TIRPC... " >&6; }
++{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libtirpc" >&5
++printf %s "checking for libtirpc... " >&6; }
+ 
+ if test -n "$TIRPC_CFLAGS"; then
+     pkg_cv_TIRPC_CFLAGS="$TIRPC_CFLAGS"
+@@ -4038,7 +4038,7 @@ fi
+ 
+ 
+ if test $pkg_failed = yes; then
+-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+ if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+@@ -4047,14 +4047,14 @@ else
+         _pkg_short_errors_supported=no
+ fi
+         if test $_pkg_short_errors_supported = yes; then
+-	        TIRPC_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libtirpc" 2>&1`
++                TIRPC_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libtirpc" 2>&1`
+         else
+-	        TIRPC_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libtirpc" 2>&1`
++                TIRPC_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libtirpc" 2>&1`
+         fi
+-	# Put the nasty error message in config.log where it belongs
+-	echo "$TIRPC_PKG_ERRORS" >&5
++        # Put the nasty error message in config.log where it belongs
++        echo "$TIRPC_PKG_ERRORS" >&5
+ 
+-	as_fn_error $? "Package requirements (libtirpc) were not met:
++        as_fn_error $? "Package requirements (libtirpc) were not met:
+ 
+ $TIRPC_PKG_ERRORS
+ 
+@@ -4065,9 +4065,9 @@ Alternatively, you may set the environment variables TIRPC_CFLAGS
+ and TIRPC_LIBS to avoid the need to call pkg-config.
+ See the pkg-config man page for more details." "$LINENO" 5
+ elif test $pkg_failed = untried; then
+-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+-	{ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
++        { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+ as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+ is in your PATH or set the PKG_CONFIG environment variable to the full
+@@ -4080,8 +4080,8 @@ See the pkg-config man page for more details.
+ To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+ See \`config.log' for more details" "$LINENO" 5; }
+ else
+-	TIRPC_CFLAGS=$pkg_cv_TIRPC_CFLAGS
+-	TIRPC_LIBS=$pkg_cv_TIRPC_LIBS
++        TIRPC_CFLAGS=$pkg_cv_TIRPC_CFLAGS
++        TIRPC_LIBS=$pkg_cv_TIRPC_LIBS
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ printf "%s\n" "yes" >&6; }
+ 
+@@ -4812,8 +4812,8 @@ fi
+ # LDAP SASL auth needs libxml and Kerberos
+ 
+ pkg_failed=no
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XML" >&5
+-printf %s "checking for XML... " >&6; }
++{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libxml-2.0" >&5
++printf %s "checking for libxml-2.0... " >&6; }
+ 
+ if test -n "$XML_CFLAGS"; then
+     pkg_cv_XML_CFLAGS="$XML_CFLAGS"
+@@ -4853,7 +4853,7 @@ fi
+ 
+ 
+ if test $pkg_failed = yes; then
+-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+ if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+@@ -4862,21 +4862,21 @@ else
+         _pkg_short_errors_supported=no
+ fi
+         if test $_pkg_short_errors_supported = yes; then
+-	        XML_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libxml-2.0" 2>&1`
++                XML_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libxml-2.0" 2>&1`
+         else
+-	        XML_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libxml-2.0" 2>&1`
++                XML_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libxml-2.0" 2>&1`
+         fi
+-	# Put the nasty error message in config.log where it belongs
+-	echo "$XML_PKG_ERRORS" >&5
++        # Put the nasty error message in config.log where it belongs
++        echo "$XML_PKG_ERRORS" >&5
+ 
+-	HAVE_LIBXML=0
++        HAVE_LIBXML=0
+ elif test $pkg_failed = untried; then
+-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+-	HAVE_LIBXML=0
++        HAVE_LIBXML=0
+ else
+-	XML_CFLAGS=$pkg_cv_XML_CFLAGS
+-	XML_LIBS=$pkg_cv_XML_LIBS
++        XML_CFLAGS=$pkg_cv_XML_CFLAGS
++        XML_LIBS=$pkg_cv_XML_LIBS
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ printf "%s\n" "yes" >&6; }
+ 
+@@ -5079,8 +5079,8 @@ fi
+ 
+ 
+ pkg_failed=no
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for NSL" >&5
+-printf %s "checking for NSL... " >&6; }
++{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libnsl" >&5
++printf %s "checking for libnsl... " >&6; }
+ 
+ if test -n "$NSL_CFLAGS"; then
+     pkg_cv_NSL_CFLAGS="$NSL_CFLAGS"
+@@ -5120,7 +5120,7 @@ fi
+ 
+ 
+ if test $pkg_failed = yes; then
+-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+ if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+@@ -5129,12 +5129,12 @@ else
+         _pkg_short_errors_supported=no
+ fi
+         if test $_pkg_short_errors_supported = yes; then
+-	        NSL_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libnsl" 2>&1`
++                NSL_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libnsl" 2>&1`
+         else
+-	        NSL_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libnsl" 2>&1`
++                NSL_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libnsl" 2>&1`
+         fi
+-	# Put the nasty error message in config.log where it belongs
+-	echo "$NSL_PKG_ERRORS" >&5
++        # Put the nasty error message in config.log where it belongs
++        echo "$NSL_PKG_ERRORS" >&5
+ 
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for yp_match in -lnsl" >&5
+@@ -5181,7 +5181,7 @@ fi
+ NSL_CFLAGS=""
+ 
+ elif test $pkg_failed = untried; then
+-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
++        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+ printf "%s\n" "no" >&6; }
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for yp_match in -lnsl" >&5
+@@ -5228,8 +5228,8 @@ fi
+ NSL_CFLAGS=""
+ 
+ else
+-	NSL_CFLAGS=$pkg_cv_NSL_CFLAGS
+-	NSL_LIBS=$pkg_cv_NSL_LIBS
++        NSL_CFLAGS=$pkg_cv_NSL_CFLAGS
++        NSL_LIBS=$pkg_cv_NSL_LIBS
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ printf "%s\n" "yes" >&6; }
+ 

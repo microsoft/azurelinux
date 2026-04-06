@@ -1,0 +1,30 @@
+--- rustls-platform-verifier-0.5.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-platform-verifier-0.5.3/Cargo.toml	2026-02-23T17:24:59.039082+00:00
+@@ -49,27 +49,17 @@
+ [features]
+ cert-logging = ["base64"]
+ dbg = []
+-docsrs = ["jni"]
+ ffi-testing = [
+     "rustls/ring",
+ ]
+ 
+ [lib]
+ name = "rustls_platform_verifier"
+-crate-type = [
+-    "cdylib",
+-    "rlib",
+-]
+ path = "src/lib.rs"
+ 
+ [dependencies.base64]
+ version = "0.22"
+ optional = true
+-
+-[dependencies.jni]
+-version = "0.21"
+-optional = true
+-default-features = false
+ 
+ [dependencies.log]
+ version = "0.4"

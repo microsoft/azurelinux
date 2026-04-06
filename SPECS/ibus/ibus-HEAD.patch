@@ -1,0 +1,2724 @@
+From ea70b2dff6bbcedc8c339f4f016cf6862e20d1e7 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Tue, 7 Oct 2025 14:24:54 +0900
+Subject: [PATCH] Revert "bus: Update gdm bits based on new gdm changes"
+
+Unfortunately this patch(4a45bf1) enables ibus-daemon in gdm by default
+and I'm reverting it for ibus 1.5.33.
+The GDM default has been disable IBus.
+
+Fixes: https://github.com/ibus/ibus/commit/4a45bf1
+BUG=https://github.com/ibus/ibus/pull/2804
+---
+ bus/main.c                                    | 33 +------------------
+ ....freedesktop.IBus.session.GNOME.service.in |  3 ++
+ configure.ac                                  |  2 +-
+ 3 files changed, 5 insertions(+), 33 deletions(-)
+
+diff --git a/bus/main.c b/bus/main.c
+index e0db15b3..63ec5536 100644
+--- a/bus/main.c
++++ b/bus/main.c
+@@ -39,7 +39,6 @@
+ 
+ #ifdef G_OS_UNIX
+ #include <glib-unix.h>
+-#include <grp.h>
+ #endif
+ 
+ #include "global.h"
+@@ -57,12 +56,10 @@ static gchar *config = "default";
+ static gchar *desktop = "gnome";
+ 
+ static gchar *panel_extension_disable_users[] = {
++    "gdm",
+     "gnome-initial-setup",
+     "liveuser"
+ };
+-static gchar *panel_extension_disable_groups[] = {
+-    "gdm",
+-};
+ 
+ static void
+ show_version_and_quit (void)
+@@ -187,11 +184,6 @@ main (gint argc, gchar **argv)
+ {
+     int i;
+     const gchar *username = ibus_get_user_name ();
+-    const gchar *groupname = NULL;
+-#ifdef HAVE_GETGRGID_R
+-    char buffer[4096];
+-    struct group gbuf;
+-#endif
+ 
+     setlocale (LC_ALL, "");
+ 
+@@ -224,23 +216,6 @@ main (gint argc, gchar **argv)
+         }
+     }
+ 
+-    /* get group name */
+-    {
+-        struct group *grp = NULL;
+-#ifdef HAVE_GETGRGID_R
+-        /* MT-Safe locale */
+-        getgrgid_r (getgid (), &gbuf, buffer, sizeof(buffer), &grp);
+-#else
+-        /* MT-Unsafe race:grgid locale */
+-        grp = getgrgid (getgid ());
+-#endif
+-
+-        if (grp && grp->gr_name && grp->gr_name[0])
+-            groupname = grp->gr_name;
+-        else
+-            g_warning ("Couldn't get group name");
+-    }
+-
+     /* daemonize process */
+     if (daemonize) {
+         if (daemon (1, 0) != 0) {
+@@ -284,12 +259,6 @@ main (gint argc, gchar **argv)
+             break;
+         }
+     }
+-    for (i = 0; i < G_N_ELEMENTS(panel_extension_disable_groups); i++) {
+-        if (g_strcmp0 (groupname, panel_extension_disable_groups[i]) == 0) {
+-            emoji_extension = "disable";
+-            break;
+-        }
+-    }
+     if (!single) {
+         /* execute config component */
+         if (g_strcmp0 (config, "default") == 0) {
+diff --git a/bus/services/org.freedesktop.IBus.session.GNOME.service.in b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
+index f0debb37..858cf10d 100644
+--- a/bus/services/org.freedesktop.IBus.session.GNOME.service.in
++++ b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
+@@ -12,6 +12,9 @@ Before=gnome-session.target
+ After=gnome-session-initialized.target
+ PartOf=gnome-session-initialized.target
+ 
++# Never run in GDM
++Conflicts=gnome-session@gnome-login.target
++
+ [Service]
+ Type=dbus
+ # Only pull --xim in X11 session, it is done via Xwayland-session.d on Wayland
+diff --git a/configure.ac b/configure.ac
+index ad4f1929..b353a654 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -178,7 +178,7 @@ AC_MSG_RESULT([$enable_product_build])
+ AC_CHECK_HEADERS([sys/prctl.h])
+ 
+ # Check functions.
+-AC_CHECK_FUNCS(daemon getgrgid_r)
++AC_CHECK_FUNCS(daemon)
+ 
+ # Check dlclose() in libc.so.
+ AC_CHECK_LIB(c, dlclose, LIBDL="", [AC_CHECK_LIB(dl, dlclose, LIBDL="-ldl")])
+-- 
+2.51.0
+
+From 4a45bf155c968bcc2f711d6b4827788802de18d1 Mon Sep 17 00:00:00 2001
+From: Joan Torres Lopez <joantolo@redhat.com>
+Date: Sun, 5 Oct 2025 10:39:50 +0900
+Subject: [PATCH] bus: Update gdm bits based on new gdm changes
+
+Since GDM 49 version, gdm user doesn't exist and for each greeter
+there's a dynamic user creation, e.g. gdm-greeter-1, gdm-greeter-2.
+All of them are part of gdm group, so instead of checking for a specific
+user, we check for a specific group.
+
+Also, remove Conflicts in systemd service to allow ibus in GDM sessions.
+This covers some cases where users might have special characters in their
+password or username.
+
+BUG=https://gitlab.gnome.org/GNOME/gdm/-/issues/1018
+BUG=https://github.com/ibus/ibus/pull/2804
+---
+ bus/main.c                                    | 33 ++++++++++++++++++-
+ ....freedesktop.IBus.session.GNOME.service.in |  3 --
+ configure.ac                                  |  2 +-
+ 3 files changed, 33 insertions(+), 5 deletions(-)
+
+diff --git a/bus/main.c b/bus/main.c
+index 63ec5536..e0db15b3 100644
+--- a/bus/main.c
++++ b/bus/main.c
+@@ -39,6 +39,7 @@
+ 
+ #ifdef G_OS_UNIX
+ #include <glib-unix.h>
++#include <grp.h>
+ #endif
+ 
+ #include "global.h"
+@@ -56,10 +57,12 @@ static gchar *config = "default";
+ static gchar *desktop = "gnome";
+ 
+ static gchar *panel_extension_disable_users[] = {
+-    "gdm",
+     "gnome-initial-setup",
+     "liveuser"
+ };
++static gchar *panel_extension_disable_groups[] = {
++    "gdm",
++};
+ 
+ static void
+ show_version_and_quit (void)
+@@ -184,6 +187,11 @@ main (gint argc, gchar **argv)
+ {
+     int i;
+     const gchar *username = ibus_get_user_name ();
++    const gchar *groupname = NULL;
++#ifdef HAVE_GETGRGID_R
++    char buffer[4096];
++    struct group gbuf;
++#endif
+ 
+     setlocale (LC_ALL, "");
+ 
+@@ -216,6 +224,23 @@ main (gint argc, gchar **argv)
+         }
+     }
+ 
++    /* get group name */
++    {
++        struct group *grp = NULL;
++#ifdef HAVE_GETGRGID_R
++        /* MT-Safe locale */
++        getgrgid_r (getgid (), &gbuf, buffer, sizeof(buffer), &grp);
++#else
++        /* MT-Unsafe race:grgid locale */
++        grp = getgrgid (getgid ());
++#endif
++
++        if (grp && grp->gr_name && grp->gr_name[0])
++            groupname = grp->gr_name;
++        else
++            g_warning ("Couldn't get group name");
++    }
++
+     /* daemonize process */
+     if (daemonize) {
+         if (daemon (1, 0) != 0) {
+@@ -259,6 +284,12 @@ main (gint argc, gchar **argv)
+             break;
+         }
+     }
++    for (i = 0; i < G_N_ELEMENTS(panel_extension_disable_groups); i++) {
++        if (g_strcmp0 (groupname, panel_extension_disable_groups[i]) == 0) {
++            emoji_extension = "disable";
++            break;
++        }
++    }
+     if (!single) {
+         /* execute config component */
+         if (g_strcmp0 (config, "default") == 0) {
+diff --git a/bus/services/org.freedesktop.IBus.session.GNOME.service.in b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
+index 858cf10d..f0debb37 100644
+--- a/bus/services/org.freedesktop.IBus.session.GNOME.service.in
++++ b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
+@@ -12,9 +12,6 @@ Before=gnome-session.target
+ After=gnome-session-initialized.target
+ PartOf=gnome-session-initialized.target
+ 
+-# Never run in GDM
+-Conflicts=gnome-session@gnome-login.target
+-
+ [Service]
+ Type=dbus
+ # Only pull --xim in X11 session, it is done via Xwayland-session.d on Wayland
+diff --git a/configure.ac b/configure.ac
+index a9396d7e..fc32398c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -178,7 +178,7 @@ AC_MSG_RESULT([$enable_product_build])
+ AC_CHECK_HEADERS([sys/prctl.h])
+ 
+ # Check functions.
+-AC_CHECK_FUNCS(daemon)
++AC_CHECK_FUNCS(daemon getgrgid_r)
+ 
+ # Check dlclose() in libc.so.
+ AC_CHECK_LIB(c, dlclose, LIBDL="", [AC_CHECK_LIB(dl, dlclose, LIBDL="-ldl")])
+-- 
+2.51.0
+
+From 94c6ede4289666782d860ae964f9a09cbdc78554 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 13 Nov 2025 20:15:37 +0900
+Subject: [PATCH] engine: Update simple.xml with xkeyboard-config 2.46
+
+---
+ engine/gensimple.py  |  8 ++---
+ engine/simple.xml.in | 70 ++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 69 insertions(+), 9 deletions(-)
+
+diff --git a/engine/gensimple.py b/engine/gensimple.py
+index de6d7ff5..4e331732 100755
+--- a/engine/gensimple.py
++++ b/engine/gensimple.py
+@@ -248,7 +248,7 @@ class GenerateEngineXML():
+                                   self._AUTHOR,
+                                   self.__first)
+         parser.setContentHandler(self.__handler)
+-        f = codecs.open(self.__path, 'r', encoding='utf-8')
++        f = open(self.__path, 'r', encoding='utf-8')
+         try:
+             parser.parse(f)
+         except SAXParseException:
+@@ -257,7 +257,7 @@ class GenerateEngineXML():
+             f.close()
+     def write(self, output=None):
+         if output != None:
+-            od = codecs.open(output, 'w', encoding='utf-8')
++            od = open(output, 'w', encoding='utf-8')
+         else:
+             if PY3K:
+                 od = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+@@ -311,7 +311,7 @@ class ISO639XML(XMLFilterBase):
+ 
+ 
+ def parse_iso639(path):
+-    f = codecs.open(path, 'r', encoding='utf-8')
++    f = open(path, 'r', encoding='utf-8')
+     parser = sax_make_parser()
+     parser.setFeature(sax_feature_namespaces, 0)
+     handler = ISO639XML(parser)
+@@ -327,7 +327,7 @@ def parse_iso639(path):
+ 
+ def parse_denylist(denyfile):
+     denylist = []
+-    f = codecs.open(denyfile, 'r', encoding='utf-8')
++    f = open(denyfile, 'r', encoding='utf-8')
+     for line in f.readlines():
+         if line == '\n' or line[0] == '#':
+             continue
+diff --git a/engine/simple.xml.in b/engine/simple.xml.in
+index 92fea8a8..c39d4134 100644
+--- a/engine/simple.xml.in
++++ b/engine/simple.xml.in
+@@ -3,7 +3,7 @@
+     <name>org.freedesktop.IBus.Simple</name>
+     <description>A table based simple engine</description>
+     <exec>@libexecdir@/ibus-engine-simple</exec>
+-    <version>1.5.33-beta1.20250916</version>
++    <version>1.5.33.20251113</version>
+     <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
+     <license>GPL</license>
+     <homepage>https://github.com/ibus/ibus/wiki</homepage>
+@@ -2738,8 +2738,20 @@
+             <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
+             <layout>us</layout>
+             <layout_variant>mac</layout_variant>
+-            <longname>English (Macintosh)</longname>
+-            <description>English (Macintosh)</description>
++            <longname>English (Macintosh, ABC, ANSI)</longname>
++            <description>English (Macintosh, ABC, ANSI)</description>
++            <icon>ibus-keyboard</icon>
++            <rank>1</rank>
++        </engine>
++        <engine>
++            <name>xkb:us:mac-iso:eng</name>
++            <language>en</language>
++            <license>GPL</license>
++            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
++            <layout>us</layout>
++            <layout_variant>mac-iso</layout_variant>
++            <longname>English (Macintosh, ABC, ISO)</longname>
++            <description>English (Macintosh, ABC, ISO)</description>
+             <icon>ibus-keyboard</icon>
+             <rank>1</rank>
+         </engine>
+@@ -2906,8 +2918,20 @@
+             <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
+             <layout>us</layout>
+             <layout_variant>dvorak-mac</layout_variant>
+-            <longname>English (Dvorak, Macintosh)</longname>
+-            <description>English (Dvorak, Macintosh)</description>
++            <longname>English (Dvorak, Macintosh, ANSI)</longname>
++            <description>English (Dvorak, Macintosh, ANSI)</description>
++            <icon>ibus-keyboard</icon>
++            <rank>1</rank>
++        </engine>
++        <engine>
++            <name>xkb:us:dvorak-mac-iso:eng</name>
++            <language>en</language>
++            <license>GPL</license>
++            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
++            <layout>us</layout>
++            <layout_variant>dvorak-mac-iso</layout_variant>
++            <longname>English (Dvorak, Macintosh, ISO)</longname>
++            <description>English (Dvorak, Macintosh, ISO)</description>
+             <icon>ibus-keyboard</icon>
+             <rank>1</rank>
+         </engine>
+@@ -11041,6 +11065,18 @@
+             <icon>ibus-keyboard</icon>
+             <rank>1</rank>
+         </engine>
++        <engine>
++            <name>xkb:th:mnc:tha</name>
++            <language>th</language>
++            <license>GPL</license>
++            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
++            <layout>th</layout>
++            <layout_variant>mnc</layout_variant>
++            <longname>Thai (Manoonchai)</longname>
++            <description>Thai (Manoonchai)</description>
++            <icon>ibus-keyboard</icon>
++            <rank>1</rank>
++        </engine>
+         <engine>
+             <name>xkb:bw::tsn</name>
+             <language>tn</language>
+@@ -11217,6 +11253,18 @@
+             <icon>ibus-keyboard</icon>
+             <rank>1</rank>
+         </engine>
++        <engine>
++            <name>xkb:ua:winkeysenhanced:ukr</name>
++            <language>uk</language>
++            <license>GPL</license>
++            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
++            <layout>ua</layout>
++            <layout_variant>winkeysenhanced</layout_variant>
++            <longname>Ukrainian (Windows Enhanced)</longname>
++            <description>Ukrainian (Windows Enhanced)</description>
++            <icon>ibus-keyboard</icon>
++            <rank>1</rank>
++        </engine>
+         <engine>
+             <name>xkb:ua:macOS:ukr</name>
+             <language>uk</language>
+@@ -11324,6 +11372,18 @@
+             <icon>ibus-keyboard</icon>
+             <rank>1</rank>
+         </engine>
++        <engine>
++            <name>xkb:pk:pak_urdu_phonetic:urd</name>
++            <language>ur</language>
++            <license>GPL</license>
++            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
++            <layout>pk</layout>
++            <layout_variant>pak_urdu_phonetic</layout_variant>
++            <longname>Urdu (Pak Urdu Phonetic)</longname>
++            <description>Urdu (Pak Urdu Phonetic)</description>
++            <icon>ibus-keyboard</icon>
++            <rank>1</rank>
++        </engine>
+         <engine>
+             <name>xkb:pk:ara:ara</name>
+             <language>ar</language>
+-- 
+2.51.0
+
+From 8720838d7f59de485e6769bb939b6eef0c985276 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 14 Nov 2025 02:39:56 +0900
+Subject: [PATCH] src: Load EN compose file in pt-BR locale
+
+- The EN compose table is enabled in case that language compose files,
+  el-GR, fi-FI, pt-BR languages, are loaded but the user has no
+  user compose file.
+- Output double dead keys with the well-known chars likes the EN compose
+  table in case that the user has a user compose file but not enable
+  the EN compose table.
+- Load language compose files in case the user compose file is loaded
+  with the 'include "%L"' keyword.
+
+Fixes: https://github.com/ibus/ibus/commit/7c2b32b4
+BUG=https://github.com/ibus/ibus/issues/2825
+---
+ src/ibuscomposetable.c | 32 ++++++++++++++--
+ src/ibuscomposetable.h |  1 +
+ src/ibusenginesimple.c | 85 +++++++++++++++++++++++++-----------------
+ 3 files changed, 81 insertions(+), 37 deletions(-)
+
+diff --git a/src/ibuscomposetable.c b/src/ibuscomposetable.c
+index e60ad091..8e1785ca 100644
+--- a/src/ibuscomposetable.c
++++ b/src/ibuscomposetable.c
+@@ -1576,6 +1576,20 @@ ibus_compose_table_new_with_list (GList   *compose_list,
+ }
+ 
+ 
++static gboolean
++_datafile_is_system (const gchar *compose_file)
++{
++    g_assert (compose_file);
++    if (!g_ascii_strncasecmp (compose_file, "/usr", 4) ||
++        !g_ascii_strncasecmp (compose_file, "/etc", 4) ||
++        !g_ascii_strncasecmp (compose_file, "/usr", 4) ||
++        !g_ascii_strncasecmp (compose_file, "/opt", 4)) {
++        return TRUE;
++    }
++    return FALSE;
++}
++
++
+ IBusComposeTableEx *
+ ibus_compose_table_new_with_file (const gchar *compose_file,
+                                   GSList      *compose_tables)
+@@ -1632,6 +1646,7 @@ ibus_compose_table_new_with_file (const gchar *compose_file,
+             } else {
+                 compose_table->id = g_str_hash (compose_file);
+                 compose_table->can_load_en_us = can_load_en_us;
++                compose_table->is_system = _datafile_is_system (compose_file);
+                 return compose_table;
+             }
+         }
+@@ -1647,8 +1662,10 @@ ibus_compose_table_new_with_file (const gchar *compose_file,
+             max_compose_len,
+             n_index_stride,
+             g_str_hash (compose_file));
+-    if (compose_table)
++    if (compose_table) {
+         compose_table->can_load_en_us = can_load_en_us;
++        compose_table->is_system = _datafile_is_system (compose_file);
++    }
+ 
+     g_list_free_full (compose_list,
+                       (GDestroyNotify) ibus_compose_list_element_free);
+@@ -1793,8 +1810,10 @@ ibus_compose_table_list_add_file (GSList      *compose_tables,
+ 
+     compose_table = ibus_compose_table_load_cache (compose_file,
+                                                    &saved_version);
+-    if (compose_table != NULL)
++    if (compose_table != NULL) {
++        compose_table->is_system = _datafile_is_system (compose_file);
+         return g_slist_prepend (compose_tables, compose_table);
++    }
+ 
+ parse:
+     if ((compose_table = ibus_compose_table_new_with_file (compose_file,
+@@ -2138,8 +2157,15 @@ ibus_check_algorithmically (const guint   *compose_buffer,
+ 
+     for (i = 0; i < n_compose && IS_DEAD_KEY (compose_buffer[i]); i++)
+         ;
+-    if (i == n_compose)
++    if (i == n_compose) {
++        /* If no EN compose, double dead keys should be output? */
++        if (i == 2 && compose_buffer[0] == compose_buffer[1]) {
++            *output_char = ibus_keysym_to_unicode (compose_buffer[0],
++                                                   FALSE,
++                                                   NULL);
++        }
+         return TRUE;
++    }
+ 
+     if (i > 0 && i == n_compose - 1) {
+         combination_buffer[0] = ibus_keyval_to_unicode (compose_buffer[i]);
+diff --git a/src/ibuscomposetable.h b/src/ibuscomposetable.h
+index 2068657d..ce4cdae1 100644
+--- a/src/ibuscomposetable.h
++++ b/src/ibuscomposetable.h
+@@ -65,6 +65,7 @@ struct _IBusComposeTableEx
+     guint32 id;
+     char *rawdata;
+     gboolean can_load_en_us;
++    gboolean is_system;
+ };
+ 
+ 
+diff --git a/src/ibusenginesimple.c b/src/ibusenginesimple.c
+index baef9508..ac7ffc41 100644
+--- a/src/ibusenginesimple.c
++++ b/src/ibusenginesimple.c
+@@ -173,7 +173,9 @@ ibus_engine_simple_class_init (IBusEngineSimpleClass *class)
+                                                        length,
+                                                        &saved_version);
+     g_bytes_unref (data);
+-    if (!en_compose_table && saved_version) {
++    if (en_compose_table) {
++        en_compose_table->is_system = TRUE;
++    } else if (!en_compose_table && saved_version) {
+         g_warning ("Failed to parse the builtin compose due to the different "
+                    "version %u. Please rebuild IBus resource files.",
+                    saved_version);
+@@ -1023,6 +1025,7 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
+     GString *output = g_string_new ("");
+     gboolean success = FALSE;
+     gboolean is_32bit = FALSE;
++    gboolean all_is_system = TRUE;
+     gboolean can_load_en_us = FALSE;
+     gunichar output_char = '\0';
+ 
+@@ -1034,18 +1037,27 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
+ 
+     G_LOCK (global_tables);
+     tmp_list = global_tables;
++    while (tmp_list) {
++        IBusComposeTableEx *compose_table = tmp_list->data;
++        if (!compose_table->is_system) {
++            all_is_system = FALSE;
++            break;
++        }
++        tmp_list = tmp_list->next;
++    }
++    tmp_list = global_tables;
+     while (tmp_list) {
+         IBusComposeTableEx *compose_table = tmp_list->data;
+         if (compose_table->can_load_en_us)
+             can_load_en_us = TRUE;
+-        /* If global_tables includes en_compose_table only, i.e. no user
+-         * or locale compose tables, en_compose_table is used.
+-         * If not, en_compose_table is used in case one of the other compose
+-         * tables has can_load_en_us = %TRUE, i.e. the table file has
+-         * the line of 'include "%L"'.
++        /* If global_tables includes system compose tables only, i.e. no user
++         * compose tables, en_compose_table is used.
++         * If user compose table is included in global_tables, en_compose_table
++         * is used in case that the user compose table has can_load_en_us =
++         * %TRUE, i.e. the compose file has the line of 'include "%L"'.
+          * en_compose_table is always appended to the last of global_tables.
+          */
+-        if ((compose_table == en_compose_table) && global_tables->next != NULL
++        if ((compose_table == en_compose_table) && !all_is_system
+             && !can_load_en_us) {
+             tmp_list = tmp_list->next;
+             continue;
+@@ -1102,7 +1114,12 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
+     g_string_free (output, TRUE);
+     output = NULL;
+ 
+-    if (ibus_check_algorithmically (priv->compose_buffer,
++    /* TODO: priv->tentative_match should not be used in case
++     * success == %TRUE? Now ibus_check_algorithmically() hits double dead
++     * keys.
++     */
++    if (!success &&
++        ibus_check_algorithmically (priv->compose_buffer,
+                                     n_compose,
+                                     &output_char)) {
+         priv->in_compose_sequence = TRUE;
+@@ -1689,42 +1706,42 @@ ibus_engine_simple_add_table_by_locale (IBusEngineSimple *simple,
+     if (locale == NULL) {
+         path = g_build_filename (g_get_user_config_dir (),
+                                  "ibus", "Compose", NULL);
+-        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
++        if (g_file_test (path, G_FILE_TEST_EXISTS))
+             ibus_engine_simple_add_compose_file (simple, path);
+-            g_free (path);
+-            return retval;
+-        }
+         g_clear_pointer(&path, g_free);
+ 
+-        path = g_build_filename (g_get_user_config_dir (),
+-                                 "gtk-4.0", "Compose", NULL);
+-        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
+-            ibus_engine_simple_add_compose_file (simple, path);
+-            g_free (path);
+-            return retval;
++        /* If user compose is not loaded except for en_compose_table */
++        if (global_tables && !global_tables->next) {
++            path = g_build_filename (g_get_user_config_dir (),
++                                     "gtk-4.0", "Compose", NULL);
++            if (g_file_test (path, G_FILE_TEST_EXISTS))
++                ibus_engine_simple_add_compose_file (simple, path);
++            g_clear_pointer(&path, g_free);
+         }
+-        g_clear_pointer(&path, g_free);
+ 
+-        path = g_build_filename (g_get_user_config_dir (),
+-                                 "gtk-3.0", "Compose", NULL);
+-        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
+-            ibus_engine_simple_add_compose_file (simple, path);
+-            g_free (path);
+-            return retval;
++        if (global_tables && !global_tables->next) {
++            path = g_build_filename (g_get_user_config_dir (),
++                                     "gtk-3.0", "Compose", NULL);
++            if (g_file_test (path, G_FILE_TEST_EXISTS))
++                ibus_engine_simple_add_compose_file (simple, path);
++            g_clear_pointer(&path, g_free);
+         }
+-        g_clear_pointer(&path, g_free);
+ 
+         home = g_get_home_dir ();
+-        if (home == NULL)
+-            return retval;
+ 
+-        path = g_build_filename (home, ".XCompose", NULL);
+-        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
+-            ibus_engine_simple_add_compose_file (simple, path);
+-            g_free (path);
+-            return retval;
++        if (home && global_tables && !global_tables->next) {
++            path = g_build_filename (home, ".XCompose", NULL);
++            if (g_file_test (path, G_FILE_TEST_EXISTS))
++                ibus_engine_simple_add_compose_file (simple, path);
++            g_clear_pointer(&path, g_free);
++        }
++
++        /* Decide if both user compose and locale compose is loaded. */
++        if (global_tables && global_tables->next) {
++            IBusComposeTableEx *compose_table = global_tables->data;
++            if (!compose_table->can_load_en_us)
++                return retval;
+         }
+-        g_clear_pointer(&path, g_free);
+ 
+ #if GLIB_CHECK_VERSION (2, 58, 0)
+         langs = g_get_language_names_with_category ("LC_CTYPE");
+-- 
+2.51.0
+
+From 563b433d721201e76b4e8ac6ea593e873fd72a13 Mon Sep 17 00:00:00 2001
+From: Arnout Engelen <arnout@bzzt.net>
+Date: Mon, 3 Nov 2025 09:49:46 +0100
+Subject: [PATCH] ui/gtk3: don't build in parallel
+
+As that led to nondeterministic generated method names. This
+only seems to have a small effect on performance (~10s on a
+whole fresh build).
+
+While I appreciate the ibus project doesn't consider such
+nondeterminisms as particularly problematic (#2272), having
+bitwise reproducible builds is increasingly desirable in Linux
+distributions, so hopefully you could consider applying this
+change nonetheless.
+
+BUG=https://github.com/ibus/ibus/pull/2821
+---
+ ui/gtk3/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ui/gtk3/Makefile.am b/ui/gtk3/Makefile.am
+index d99d8e82..4df6c5eb 100644
+--- a/ui/gtk3/Makefile.am
++++ b/ui/gtk3/Makefile.am
+@@ -317,6 +317,8 @@ panelbinding.o: $(srcdir)/panelbinding.c
+ 	$(AM_V_CC_no)$(COMPILE) -c -o $@ $<
+ 	$(NULL)
+ 
++.NOTPARALLEL:
++
+ MAINTAINERCLEANFILES += extension.c panelbinding.c
+ 
+ man_seven_DATA = ibus-emoji.7
+-- 
+2.51.0
+
+From 02032bc5f0fc89c7d18774758ae052dd3606408b Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Mon, 6 Oct 2025 20:40:17 +0900
+Subject: [PATCH 1/4] src: Fix GCC `-Wunused-but-set-variable` flag
+
+Add `G_GNUC_UNUSED` flag for the GCC warnings.
+
+BUG=https://github.com/ibus/ibus/pull/2805
+---
+ src/ibuscomponent.c    | 4 ++--
+ src/ibusmessage.c      | 2 +-
+ src/ibusserializable.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/ibuscomponent.c b/src/ibuscomponent.c
+index 80ace332..c453a2f5 100644
+--- a/src/ibuscomponent.c
++++ b/src/ibuscomponent.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* bus - The Input Bus
+  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2020-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2020 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+@@ -729,7 +729,7 @@ ibus_component_new_varargs (const gchar *first_property_name, ...)
+ {
+     va_list var_args;
+     IBusComponent *component;
+-    IBusComponentPrivate *priv;
++    G_GNUC_UNUSED IBusComponentPrivate *priv;
+ 
+     g_assert (first_property_name);
+ 
+diff --git a/src/ibusmessage.c b/src/ibusmessage.c
+index 89e31771..12fbb48e 100644
+--- a/src/ibusmessage.c
++++ b/src/ibusmessage.c
+@@ -459,7 +459,7 @@ ibus_message_new (guint domain,
+     GValue *values, *values_tmp;
+     guint n_properties = 4, i;
+     IBusMessage *msg;
+-    IBusMessagePrivate *priv;
++    G_GNUC_UNUSED IBusMessagePrivate *priv;
+ 
+     g_return_val_if_fail (domain > 0 && domain <= G_MAXUINT8, NULL);
+     g_return_val_if_fail (code <= G_MAXUINT8, NULL);
+diff --git a/src/ibusserializable.c b/src/ibusserializable.c
+index 231020b7..501841b3 100644
+--- a/src/ibusserializable.c
++++ b/src/ibusserializable.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2018-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2018-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2019 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+@@ -269,7 +269,7 @@ GVariant *
+ ibus_serializable_serialize_object (IBusSerializable *object)
+ {
+     g_return_val_if_fail (IBUS_IS_SERIALIZABLE (object), FALSE);
+-    gboolean retval;
++    G_GNUC_UNUSED gboolean retval;
+ 
+     GVariantBuilder builder;
+     g_variant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
+-- 
+2.51.1
+
+From c9d5d0f521de9f02a876c319c02978235a7453cc Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Mon, 6 Oct 2025 20:40:25 +0900
+Subject: [PATCH 2/4] ui/gtk3/application: --enable-wayland-im option without daemon
+
+Wish to run ibus-daemon after run ibus-ui-gtk3 for the debug purpose.
+
+BUG=https://github.com/ibus/ibus/pull/2805
+---
+ ui/gtk3/application.vala | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
+index 82cc5397..65ab43cf 100644
+--- a/ui/gtk3/application.vala
++++ b/ui/gtk3/application.vala
+@@ -37,6 +37,7 @@ class Application {
+     private static bool m_verbose;
+     private static bool m_enable_wayland_im;
+ #if USE_GDK_WAYLAND
++    private static ulong m_bus_connected_id;
+     private static ulong m_realize_surface_id;
+     private static ulong m_ibus_focus_in_id;
+     private static ulong m_ibus_focus_out_id;
+@@ -285,7 +286,7 @@ class Application {
+         bus = new IBus.Bus();
+         GLib.MainLoop? loop = null;
+         if (!bus.is_connected() && m_exec_daemon) {
+-            ulong handler_id = bus.connected.connect((bus) => {
++            m_bus_connected_id = bus.connected.connect((bus) => {
+                 if (loop != null)
+                     loop.quit();
+             });
+@@ -295,17 +296,31 @@ class Application {
+                     loop.run();
+                 }
+             }
+-            bus.disconnect(handler_id);
++            bus.disconnect(m_bus_connected_id);
++            m_bus_connected_id = 0;
+         }
+         if (!bus.is_connected()) {
+-            m_log.printf("Failed to connect to ibus-daemon\n");
+-            m_log.flush();
+-            assert_not_reached();
++            if (m_exec_daemon) {
++                m_log.printf("Failed to connect to ibus-daemon\n");
++                m_log.flush();
++                assert_not_reached();
++            } else {
++                m_bus_connected_id = bus.connected.connect((bus) => {
++                    m_wayland_im = new IBus.WaylandIM("bus", bus,
++                                                      "wl_display", wl_display,
++                                                      "log", m_log,
++                                                      "verbose", m_verbose);
++                    bus.disconnect(m_bus_connected_id);
++                    m_bus_connected_id = 0;
++                });
++            }
++        }
++        if (bus.is_connected()) {
++            m_wayland_im = new IBus.WaylandIM("bus", bus,
++                                              "wl_display", wl_display,
++                                              "log", m_log,
++                                              "verbose", m_verbose);
+         }
+-        m_wayland_im = new IBus.WaylandIM("bus", bus,
+-                                          "wl_display", wl_display,
+-                                          "log", m_log,
+-                                          "verbose", m_verbose);
+     }
+ 
+     private void set_wayland_surface(void *surface) {
+-- 
+2.51.1
+
+From 1a9ea16b12d4e90e4caf74c4569a596660da6e9c Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 26 Nov 2025 14:55:28 +0900
+Subject: [PATCH 3/4] util/IMdkit: Fix memory leaks with fail safe
+
+- When malloc() is failed, the pointer should not be deallocated
+  and also other allocated memory pointers should be freed in FrameMgr.c.
+- The `XIM_STRFUNC` macro implemented in XimProto.h.
+- GCC `-Wanalyzer-malloc-leak` flag does not have to warn the reallocation
+  since the `address` pointer is not changed and `address->imvalue_mask`
+  should work in i18nMethod.c
+- Seems GCC does not understand `if (!p->value)` and replace it with a
+  wrapper variable in i18nMethod.c
+- Fix exit() from within signal handler by CWE-479 and
+  `-Wanalyzer-unsafe-call-within-signal-handler` in client/x11/main.c
+
+BUG=https://github.com/ibus/ibus/pull/2805
+---
+ client/x11/main.c        |   7 +-
+ util/IMdkit/FrameMgr.c   | 316 ++++++++++++++++++++++++++++++++++-----
+ util/IMdkit/XimProto.h   |   7 +-
+ util/IMdkit/i18nMethod.c | 104 +++++++------
+ 4 files changed, 352 insertions(+), 82 deletions(-)
+
+diff --git a/client/x11/main.c b/client/x11/main.c
+index ab9679dd..5fadd43d 100644
+--- a/client/x11/main.c
++++ b/client/x11/main.c
+@@ -1309,7 +1309,12 @@ _atexit_cb ()
+ static void
+ _sighandler (int sig)
+ {
+-    exit(EXIT_FAILURE);
++    /* rhbz#1767691 _sighandler() is called with SIGTERM
++     * and exit() causes SEGV during calling atexit functions.
++     * _atexit_cb() might be broken. _exit() does not call
++     * atexit functions.
++     */
++    _exit (EXIT_FAILURE);
+ }
+ 
+ static void
+diff --git a/util/IMdkit/FrameMgr.c b/util/IMdkit/FrameMgr.c
+index 80d019a0..976db94e 100644
+--- a/util/IMdkit/FrameMgr.c
++++ b/util/IMdkit/FrameMgr.c
+@@ -23,6 +23,7 @@ SOFTWARE.
+                              miyamoto@jrd.dec.com
+ 
+     This version tidied and debugged by Steve Underwood May 1999
++    This version tidied and debugged by Takao Fujiwara Nov 2025
+ 
+ ******************************************************************/
+ 
+@@ -30,6 +31,7 @@ SOFTWARE.
+ #include <assert.h>
+ #include <stdlib.h>
+ #include "FrameMgr.h"
++#include "XimProto.h"
+ 
+ /* Convenient macro */
+ 
+@@ -218,7 +220,11 @@ FrameMgr FrameMgrInit (XimFrame frame, char* area, Bool byte_swap)
+ {
+     FrameMgr fm;
+ 
+-    fm = (FrameMgr) Xmalloc (sizeof (FrameMgrRec));
++    if ((fm = (FrameMgr) Xmalloc (sizeof (FrameMgrRec))) == NULL) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return NULL;
++    }
+ 
+     fm->frame = frame;
+     fm->fi = FrameInstInit (frame);
+@@ -259,7 +265,8 @@ void FrameMgrFree (FrameMgr fm)
+     }
+     /*endwhile*/
+ 
+-    FrameInstFree (fm->fi);
++    if (fm->fi)
++        FrameInstFree (fm->fi);
+     Xfree (fm);
+ }
+ 
+@@ -868,7 +875,11 @@ static FrameInst FrameInstInit (XimFrame frame)
+ {
+     FrameInst fi;
+ 
+-    fi = (FrameInst) Xmalloc (sizeof (FrameInstRec));
++    if ((fi = (FrameInst) Xmalloc (sizeof (FrameInstRec))) == NULL) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return NULL;
++    }
+ 
+     fi->template = frame;
+     fi->cur_no = 0;
+@@ -884,7 +895,7 @@ static void FrameInstFree (FrameInst fi)
+ 
+     ChainIterInit (&ci, &fi->cm);
+ 
+-    while (ChainIterGetNext (&ci, &frame_no, &d))
++    while (ChainIterGetNext (&ci, &frame_no, &d) && fi->template)
+     {
+         register XimFrameType type;
+         type = fi->template[frame_no].type;
+@@ -912,6 +923,11 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+ {
+     XimFrameType ret_type;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return -1;
++    }
+     ret_type = fi->template[fi->cur_no].type;
+ 
+     switch (ret_type)
+@@ -944,7 +960,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+                 if ((d = ChainMgrGetExtraData (&fi->cm, iter_idx)) == NULL)
+                 {
+                     dr.iter = IterInit (&fi->template[iter_idx + 1], NO_VALUE);
++                    if (!dr.iter)
++                        return -1;
+                     d = ChainMgrSetData (&fi->cm, iter_idx, dr);
++                    if (!d) {
++                        IterFree (dr.iter);
++                        return -1;
++                    }
+                 }
+                 /*endif*/
+                 info->counter.iter = d->iter;
+@@ -980,6 +1002,7 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+             register int unit;
+             register int number;
+             register int size;
++            register int s;
+             register int i;
+ 
+             unit = _UNIT ((long) fi->template[fi->cur_no].data);
+@@ -991,11 +1014,21 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+             {
+                 i = _FrameInstDecrement (fi->template, i);
+                 assert (i >= 0);
+-                size += _FrameInstGetItemSize (fi, i);
++                s = _FrameInstGetItemSize (fi, i);
++                if (s == NO_VALUE) {
++                    size = NO_VALUE;
++                    number = 0;
++                    break;
++                } else {
++                    size += s;
++                }
+                 number--;
+             }
+             /*endwhile*/
+-            info->num = (unit - (size%unit))%unit;
++            if (size == NO_VALUE)
++                info->num = NO_VALUE;
++            else
++                info->num = (unit - (size%unit))%unit;
+         }
+         /*endif*/
+         fi->cur_no = _FrameInstIncrement (fi->template, fi->cur_no);
+@@ -1011,7 +1044,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
+             {
+                 dr.iter = IterInit (&fi->template[fi->cur_no + 1], NO_VALUE);
++                if (!dr.iter)
++                    return -1;
+                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return -1;
++                }
+             }
+             /*endif*/
+             sub_type = IterGetNextType (d->iter, info);
+@@ -1037,7 +1076,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
+             {
+                 dr.fi = FrameInstInit (fi->template[fi->cur_no + 1].data);
++                if (!dr.fi)
++                    return -1;
+                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return -1;
++                }
+             }
+             /*endif*/
+             sub_type = FrameInstGetNextType (d->fi, info);
+@@ -1064,6 +1109,11 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+ {
+     XimFrameType ret_type;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return -1;
++    }
+     ret_type = fi->template[fi->cur_no].type;
+ 
+     switch (ret_type)
+@@ -1096,7 +1146,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+                 if ((d = ChainMgrGetExtraData (&fi->cm, iter_idx)) == NULL)
+                 {
+                     dr.iter = IterInit (&fi->template[iter_idx + 1], NO_VALUE);
++                    if (!dr.iter)
++                        return -1;
+                     d = ChainMgrSetData (&fi->cm, iter_idx, dr);
++                    if (!d) {
++                        IterFree (dr.iter);
++                        return -1;
++                    }
+                 }
+                 /*endif*/
+                 info->counter.iter = d->iter;
+@@ -1130,6 +1186,7 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+             register int unit;
+             register int number;
+             register int size;
++            register int s;
+             register int i;
+ 
+             unit = _UNIT ((long) fi->template[fi->cur_no].data);
+@@ -1141,11 +1198,21 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+             {
+                 i = _FrameInstDecrement (fi->template, i);
+                 assert (i >= 0);
+-                size += _FrameInstGetItemSize (fi, i);
++                s = _FrameInstGetItemSize (fi, i);
++                if (s == NO_VALUE) {
++                    size = NO_VALUE;
++                    number = 0;
++                    break;
++                } else {
++                    size += s;
++                }
+                 number--;
+             }
+             /*endwhile*/
+-            info->num = (unit - (size%unit))%unit;
++            if (size == NO_VALUE)
++                info->num = NO_VALUE;
++            else
++                info->num = (unit - (size%unit))%unit;
+         }
+         /*endif*/
+         break;
+@@ -1159,7 +1226,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
+             {
+                 dr.iter = IterInit (&fi->template[fi->cur_no + 1], NO_VALUE);
++                if (!dr.iter)
++                    return -1;
+                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return -1;
++                }
+             }
+             /*endif*/
+             sub_type = IterPeekNextType (d->iter, info);
+@@ -1180,7 +1253,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
+             {
+                 dr.fi = FrameInstInit (fi->template[fi->cur_no + 1].data);
++                if (!dr.fi)
++                    return -1;
+                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return -1;
++                }
+             }
+             /*endif*/
+             sub_type = FrameInstPeekNextType (d->fi, info);
+@@ -1202,6 +1281,11 @@ static Bool FrameInstIsIterLoopEnd (FrameInst fi)
+ {
+     Bool ret = False;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return True;
++    }
+     if (fi->template[fi->cur_no].type == ITER)
+     {
+         ExtraData d = ChainMgrGetExtraData (&fi->cm, fi->cur_no);
+@@ -1313,6 +1397,11 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
+     XimFrameType type;
+     register int i;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return FmNoMoreData;
++    }
+     i = 0;
+     while ((type = fi->template[i].type) != EOL)
+     {
+@@ -1323,6 +1412,8 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
+             {
+                 dr.num = -1;
+                 d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d)
++                    return FmNoMoreData;
+             }
+             /*endif*/
+             if (d->num == NO_VALUE)
+@@ -1336,7 +1427,13 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
+             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
+             {
+                 dr.iter = IterInit (&fi->template[i + 1], NO_VALUE);
++                if (!dr.iter)
++                    return FmNoMoreData;
+                 d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return FmNoMoreData;
++                }
+             }
+             /*endif*/
+             if (IterSetSize (d->iter, num) == FmSuccess)
+@@ -1348,7 +1445,13 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
+             if ((d = ChainMgrGetExtraData(&fi->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit(fi->template[i + 1].data);
+-                d = ChainMgrSetData(&fi->cm, i, dr);
++                if (!dr.fi)
++                    return FmNoMoreData;
++                d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return FmNoMoreData;
++                }
+             }
+             /*endif*/
+             if (FrameInstSetSize(d->fi, num) == FmSuccess)
+@@ -1374,6 +1477,11 @@ static int FrameInstGetSize (FrameInst fi)
+     ExtraDataRec dr;
+     int ret_size;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return NO_VALID_FIELD;
++    }
+     i = fi->cur_no;
+     while ((type = fi->template[i].type) != EOL)
+     {
+@@ -1389,7 +1497,13 @@ static int FrameInstGetSize (FrameInst fi)
+             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
+             {
+                 dr.iter = IterInit (&fi->template[i + 1], NO_VALUE);
++                if (!dr.iter)
++                    return NO_VALID_FIELD;
+                 d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return NO_VALID_FIELD;
++                }
+             }
+             /*endif*/
+             ret_size = IterGetSize(d->iter);
+@@ -1402,7 +1516,13 @@ static int FrameInstGetSize (FrameInst fi)
+             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit (fi->template[i + 1].data);
++                if (!dr.fi)
++                    return NO_VALID_FIELD;
+                 d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return NO_VALID_FIELD;
++                }
+             }
+             /*endif*/
+             ret_size = FrameInstGetSize (d->fi);
+@@ -1428,6 +1548,11 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
+     register int i;
+     XimFrameType type;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return FmNoMoreData;
++    }
+     i = 0;
+     while ((type = fi->template[i].type) != EOL)
+     {
+@@ -1437,7 +1562,12 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
+             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
+             {
+                 dr.iter = IterInit (&fi->template[i + 1], num);
+-                (void)ChainMgrSetData (&fi->cm, i, dr);
++                if (!dr.iter)
++                    return FmNoMoreData;
++                if (!ChainMgrSetData (&fi->cm, i, dr)) {
++                    IterFree (dr.iter);
++                    return FmNoMoreData;
++                }
+                 return FmSuccess;
+             }
+             /*endif*/
+@@ -1450,7 +1580,13 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
+             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit (fi->template[i + 1].data);
++                if (!dr.fi)
++                    return FmNoMoreData;
+                 d = ChainMgrSetData (&fi->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return FmNoMoreData;
++                }
+             }
+             /*endif*/
+             if (FrameInstSetIterCount (d->fi, num) == FmSuccess)
+@@ -1472,14 +1608,26 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
+ static int FrameInstGetTotalSize (FrameInst fi)
+ {
+     register int size;
++    register int s;
+     register int i;
+ 
+     size = 0;
+     i = 0;
+ 
++    if (!fi) {
++        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return 0;
++    }
+     while (fi->template[i].type != EOL)
+     {
+-        size += _FrameInstGetItemSize (fi, i);
++        s = _FrameInstGetItemSize (fi, i);
++        if (s == NO_VALUE) {
++            size = NO_VALUE;
++            break;
++        } else {
++            size += s;
++        }
+         assert (i >= 0);
+         i = _FrameInstIncrement (fi->template, i);
+     }
+@@ -1526,8 +1674,8 @@ static Iter IterInit (XimFrame frame, int count)
+ 
+     it = (Iter) Xmalloc (sizeof (IterRec));
+     if (!it) {
+-        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
+-                 __FILE__, __LINE__);
++        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
+         return NULL;
+     }
+     it->template = frame;
+@@ -1600,7 +1748,7 @@ static void IterFree (Iter it)
+             ExtraDataRec dr;
+     
+             ChainIterInit (&ci, &it->cm);
+-            while (ChainIterGetNext (&ci, &count, &dr))
++            while (ChainIterGetNext (&ci, &count, &dr) && dr.fi)
+                 FrameInstFree (dr.fi);
+             /*endwhile*/
+             ChainIterFree (&ci);
+@@ -1638,8 +1786,12 @@ static Bool IterIsLoopEnd (Iter it, Bool *myself)
+             }
+             else
+             {
+-                if (FrameInstIsEnd (d->fi))
+-                {
++                if (!d->fi) {
++                    fprintf (stderr, "(XIM-IMdkit) WARNING: d->fi != NULL " \
++                                     "in %s:%s.\n",
++                             __FILE__, XIM_STRFUNC);
++                    ret = True;
++                } else if (FrameInstIsEnd (d->fi)) {
+                     it->cur_no++;
+                     if (!it->allow_expansion  &&  it->cur_no == it->max_count)
+                     {
+@@ -1677,9 +1829,9 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
+     XimFrameType type;
+ 
+     if (!it || !it->template) {
+-        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
+-                 __FILE__, __LINE__);
+-	return (XimFrameType) NULL;
++        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++	return (XimFrameType)NULL;
+     }
+ 
+     type = it->template->type;
+@@ -1732,7 +1884,13 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
+             {
+                 dr.iter = IterInit (it->template + 1, NO_VALUE);
++                if (!dr.iter)
++	            return (XimFrameType)NULL;
+                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++	            return (XimFrameType)NULL;
++                }
+             }
+             /*endif*/
+ 
+@@ -1755,7 +1913,13 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
+             {
+                 dr.fi = FrameInstInit (it->template[1].data);
++                if (!dr.fi)
++	            return (XimFrameType)NULL;
+                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++	            return (XimFrameType)NULL;
++                }
+             }
+             /*endif*/
+ 
+@@ -1781,9 +1945,9 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
+     XimFrameType type;
+ 
+     if (!it->template) {
+-        fprintf (stderr, "(XIM-IMdkit) WARNING: dereference pointer %s:%d.\n",
+-                 __FILE__, __LINE__);
+-        return (XimFrameType) NULL;
++        fprintf (stderr, "(XIM-IMdkit) WARNING: dereference pointer %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
++        return (XimFrameType)NULL;
+     }
+ 
+     type = it->template->type;
+@@ -1823,7 +1987,13 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
+             {
+                 dr.iter = IterInit (it->template + 1, NO_VALUE);
++                if (!dr.iter)
++                    return (XimFrameType)NULL;
+                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return (XimFrameType)NULL;
++                }
+             }
+             /*endif*/
+ 
+@@ -1843,7 +2013,13 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
+             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
+             {
+                 dr.fi = FrameInstInit (it->template[1].data);
++                if (!dr.fi)
++                    return (XimFrameType)NULL;
+                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return (XimFrameType)NULL;
++                }
+             }
+             /*endif*/
+ 
+@@ -1885,9 +2061,8 @@ static FmStatus IterSetSize (Iter it, int num)
+                 {
+                     dr.num = NO_VALUE;
+                     d = ChainMgrSetData (&it->cm, i, dr);
+-                }
+-                if (!d) {
+-                    return FmNoMoreData;
++                    if (!d)
++                        return FmNoMoreData;
+                 }
+                 /*endif*/
+                 if (d->num == NO_VALUE)
+@@ -1903,7 +2078,8 @@ static FmStatus IterSetSize (Iter it, int num)
+                 ExtraDataRec dr;
+                 
+                 dr.num = num;
+-                ChainMgrSetData (&it->cm, it->max_count, dr);
++                if (!ChainMgrSetData (&it->cm, it->max_count, dr))
++                    return FmNoMoreData;
+                 it->max_count++;
+     
+                 return FmSuccess;
+@@ -1922,7 +2098,13 @@ static FmStatus IterSetSize (Iter it, int num)
+                 if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+                 {
+                     dr.iter = IterInit (it->template + 1, NO_VALUE);
++                    if (!dr.iter)
++                        return FmNoMoreData;
+                     d = ChainMgrSetData (&it->cm, i, dr);
++                    if (!d) {
++                        IterFree (dr.iter);
++                        return FmNoMoreData;
++                    }
+                 }
+                 /*endif*/
+                 if (IterSetSize (d->iter, num) == FmSuccess)
+@@ -1935,7 +2117,12 @@ static FmStatus IterSetSize (Iter it, int num)
+                 ExtraDataRec dr;
+ 
+                 dr.iter = IterInit (it->template + 1, NO_VALUE);
+-                ChainMgrSetData (&it->cm, it->max_count, dr);
++                if (!dr.iter)
++                    return FmNoMoreData;
++                if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
++                    IterFree (dr.iter);
++                    return FmNoMoreData;
++                }
+                 it->max_count++;
+ 
+                 if (IterSetSize(dr.iter, num) == FmSuccess)
+@@ -1956,7 +2143,13 @@ static FmStatus IterSetSize (Iter it, int num)
+                 if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+                 {
+                     dr.fi = FrameInstInit (it->template[1].data);
++                    if (!dr.fi)
++                        return FmNoMoreData;
+                     d = ChainMgrSetData (&it->cm, i, dr);
++                    if (!d) {
++                        FrameInstFree (dr.fi);
++                        return FmNoMoreData;
++                    }
+                 }
+                 /*endif*/
+                 if (FrameInstSetSize (d->fi, num) == FmSuccess)
+@@ -1969,7 +2162,12 @@ static FmStatus IterSetSize (Iter it, int num)
+                 ExtraDataRec dr;
+ 
+                 dr.fi = FrameInstInit (it->template[1].data);
+-                ChainMgrSetData (&it->cm, it->max_count, dr);
++                if (!dr.fi)
++                    return FmNoMoreData;
++                if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
++                    FrameInstFree (dr.fi);
++                    return FmNoMoreData;
++                }
+                 it->max_count++;
+ 
+                 if (FrameInstSetSize (dr.fi, num) == FmSuccess)
+@@ -2013,7 +2211,13 @@ static int IterGetSize (Iter it)
+             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+             {
+                 dr.iter = IterInit (it->template + 1, NO_VALUE);
++                if (!dr.iter)
++                    return NO_VALID_FIELD;
+                 d = ChainMgrSetData (&it->cm, i, dr);
++                if (!d) {
++                    IterFree (dr.iter);
++                    return NO_VALID_FIELD;
++                }
+             }
+             /*endif*/
+             ret_size = IterGetSize (d->iter);
+@@ -2032,7 +2236,13 @@ static int IterGetSize (Iter it)
+             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit (it->template[1].data);
++                if (!dr.fi)
++                    return NO_VALID_FIELD;
+                 d = ChainMgrSetData (&it->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return NO_VALID_FIELD;
++                }
+             }
+             /*endif*/
+             ret_size = FrameInstGetSize (d->fi);
+@@ -2077,7 +2287,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
+             if ((d = ChainMgrGetExtraData(&it->cm, i)) == NULL)
+             {
+                 dr.iter = IterInit(it->template + 1, num);
+-                (void)ChainMgrSetData(&it->cm, i, dr);
++                if (!dr.iter)
++                    return FmNoMoreData;
++                if (!ChainMgrSetData(&it->cm, i, dr)) {
++                    IterFree (dr.iter);
++                    return FmNoMoreData;
++                }
+                 return FmSuccess;
+             }
+             /*endif*/
+@@ -2091,7 +2306,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
+             ExtraDataRec dr;
+ 
+             dr.iter = IterInit (it->template + 1, num);
+-            ChainMgrSetData (&it->cm, it->max_count, dr);
++            if (!dr.iter)
++                return FmNoMoreData;
++            if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
++                IterFree (dr.iter);
++                return FmNoMoreData;
++            }
+             it->max_count++;
+ 
+             return FmSuccess;
+@@ -2108,7 +2328,13 @@ static FmStatus IterSetIterCount (Iter it, int num)
+             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit (it->template[1].data);
++                if (!dr.fi)
++                    return FmNoMoreData;
+                 d = ChainMgrSetData (&it->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return FmNoMoreData;
++                }
+             }
+             /*endif*/
+             if (FrameInstSetIterCount (d->fi, num) == FmSuccess)
+@@ -2121,7 +2347,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
+             ExtraDataRec dr;
+             
+             dr.fi = FrameInstInit (it->template[1].data);
+-            ChainMgrSetData (&it->cm, it->max_count, dr);
++            if (!dr.fi)
++                return FmNoMoreData;
++            if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
++                FrameInstFree (dr.fi);
++                return FmNoMoreData;
++            }
+             it->max_count++;
+ 
+             if (FrameInstSetIterCount (dr.fi, num) == FmSuccess)
+@@ -2215,7 +2446,13 @@ static int IterGetTotalSize (Iter it)
+             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
+             {
+                 dr.fi = FrameInstInit (it->template[1].data);
++                if (!dr.fi)
++                    return NO_VALUE;
+                 d = ChainMgrSetData (&it->cm, i, dr);
++                if (!d) {
++                    FrameInstFree (dr.fi);
++                    return NO_VALUE;
++                }
+             }
+             /*endif*/
+             if ((num = FrameInstGetTotalSize (d->fi)) == NO_VALUE)
+@@ -2278,8 +2515,8 @@ static ExtraData ChainMgrSetData (ChainMgr cm,
+ {
+     Chain cur = (Chain) Xmalloc (sizeof (ChainRec));
+     if (!cur) {
+-        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
+-                 __FILE__, __LINE__);
++        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
++                 __FILE__, XIM_STRFUNC);
+         return NULL;
+     }
+ 
+@@ -2445,6 +2682,7 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
+             register int unit;
+             register int number;
+             register int size;
++            register int s;
+             register int i;
+ 
+             unit = _UNIT ((long) fi->template[cur_no].data);
+@@ -2456,11 +2694,19 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
+             {
+                 assert (i >= 0);
+                 i = _FrameInstDecrement (fi->template, i);
+-                size += _FrameInstGetItemSize (fi, i);
++                s = _FrameInstGetItemSize (fi, i);
++                if (s == NO_VALUE) {
++                    size = NO_VALUE;
++                    number = 0;
++                    break;
++                } else {
++                    size += s;
++                }
+                 number--;
+             }
+             /*endwhile*/
+-            size = (unit - (size%unit))%unit;
++            if (size != NO_VALUE)
++                size = (unit - (size%unit))%unit;
+             return size;
+         }
+ 
+diff --git a/util/IMdkit/XimProto.h b/util/IMdkit/XimProto.h
+index e3ed168c..a25213f5 100644
+--- a/util/IMdkit/XimProto.h
++++ b/util/IMdkit/XimProto.h
+@@ -1,4 +1,4 @@
+-/* $XConsortium: XimProto.h,v 1.2 94/01/20 18:02:24 rws Exp $ */
++/* $XConsortium: XimProto.h,v 1.3 25/09/24 00:00:00 rws Exp $ */
+ /******************************************************************
+ 
+            Copyright 1992, 1993, 1994 by FUJITSU LIMITED
+@@ -226,5 +226,10 @@ typedef CARD16	XICID;		/* Input Context ID */
+ 	}								\
+     }
+ 
++#if (defined(_MSC_VER) && (_MSC_VER > 1300))
++#define XIM_STRFUNC     ((const char*) (__FUNCTION__))
++#else
++#define XIM_STRFUNC     ((const char*) (__func__))
+ #endif
+ 
++#endif
+diff --git a/util/IMdkit/i18nMethod.c b/util/IMdkit/i18nMethod.c
+index 7f343d87..f7a53f40 100644
+--- a/util/IMdkit/i18nMethod.c
++++ b/util/IMdkit/i18nMethod.c
+@@ -2,7 +2,8 @@
+  
+          Copyright 1994, 1995 by Sun Microsystems, Inc.
+          Copyright 1993, 1994 by Hewlett-Packard Company
+-         Copyright (C) 2014-2025 Red Hat, Inc.
++         Copyright (C) 2008-2025 Red Hat, Inc.
++         Copyright (C) 2018-2025 Takao Fujiwara
+  
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+@@ -37,6 +38,8 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ #endif
+ #include <X11/Xproto.h>
+ #undef NEED_EVENTS
++#include <assert.h>
++
+ #include "FrameMgr.h"
+ #include "IMdkit.h"
+ #include "Xi18n.h"
+@@ -194,17 +197,18 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 if (address->imvalue_mask & I18N_IM_LOCALE)
+                     return IMLocale;
+                 /*endif*/
+-                /* address->im_locale will be released later and don't need
+-                 * -Wanalyzer-malloc-leak flag in gcc 11.0.1.
++                /* xi18n_setup() initialize the `address` structure with 0 and
++                 * the pointer of the `address` is not changed and
++                 * `address->imvalue_mask` should avoid the reallocation so
++                 * the `-Wanalyzer-malloc-leak` flag in GCC 11.0.1 should not
++                 * warn about leaks of CWE-401.
+                  */
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+-                address->im_locale = (char *) malloc (strlen (p->value) + 1);
++                assert (!address->im_locale);
++                address->im_locale = (char *)malloc (strlen (p->value) + 1);
+                 if (!address->im_locale)
+                     return IMLocale;
+                 /*endif*/
+                 strcpy (address->im_locale, p->value);
+-#pragma GCC diagnostic pop
+                 address->imvalue_mask |= I18N_IM_LOCALE;
+             }
+             else if (strcmp (p->name, IMServerTransport) == 0)
+@@ -212,14 +216,12 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 if (address->imvalue_mask & I18N_IM_ADDRESS)
+                     return IMServerTransport;
+                 /*endif*/
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+-                address->im_addr = (char *) malloc (strlen (p->value) + 1);
++                assert (!address->im_addr);
++                address->im_addr = (char *)malloc (strlen (p->value) + 1);
+                 if (!address->im_addr)
+                     return IMServerTransport;
+                 /*endif*/
+                 strcpy(address->im_addr, p->value);
+-#pragma GCC diagnostic pop
+                 address->imvalue_mask |= I18N_IM_ADDRESS;
+             }
+             else if (strcmp (p->name, IMServerName) == 0)
+@@ -227,14 +229,12 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 if (address->imvalue_mask & I18N_IM_NAME)
+                     return IMServerName;
+                 /*endif*/
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+-                address->im_name = (char *) malloc (strlen (p->value) + 1);
++                assert (!address->im_name);
++                address->im_name = (char *)malloc (strlen (p->value) + 1);
+                 if (!address->im_name)
+                     return IMServerName;
+                 /*endif*/
+                 strcpy (address->im_name, p->value);
+-#pragma GCC diagnostic pop
+                 address->imvalue_mask |= I18N_IM_NAME;
+             }
+             else if (strcmp (p->name, IMServerWindow) == 0)
+@@ -242,7 +242,7 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 if (address->imvalue_mask & I18N_IMSERVER_WIN)
+                     return IMServerWindow;
+                 /*endif*/
+-                address->im_window = (Window) p->value;
++                address->im_window = (Window)p->value;
+                 address->imvalue_mask |= I18N_IMSERVER_WIN;
+             }
+             else if (strcmp (p->name, IMInputStyles) == 0)
+@@ -252,19 +252,21 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 /*endif*/
+                 address->input_styles.count_styles =
+                     ((XIMStyles*)p->value)->count_styles;
+-                address->input_styles.supported_styles =
+-                    (XIMStyle *) malloc (sizeof (XIMStyle)*address->input_styles.count_styles);
+-                if (address->input_styles.supported_styles == (XIMStyle *) NULL)
++                assert (!address->input_styles.supported_styles);
++                address->input_styles.supported_styles = (XIMStyle *)malloc (
++                        sizeof (XIMStyle) * address->input_styles.count_styles);
++                if (address->input_styles.supported_styles == (XIMStyle *)NULL)
+                     return IMInputStyles;
+                 /*endif*/
+                 memmove (address->input_styles.supported_styles,
+-                         ((XIMStyles *) p->value)->supported_styles,
+-                         sizeof (XIMStyle)*address->input_styles.count_styles);
++                         ((XIMStyles *)p->value)->supported_styles,
++                         sizeof (XIMStyle) *
++                                 address->input_styles.count_styles);
+                 address->imvalue_mask |= I18N_INPUT_STYLES;
+             }
+             else if (strcmp (p->name, IMProtocolHandler) == 0)
+             {
+-                address->improto = (IMProtoHandler) p->value;
++                address->improto = (IMProtoHandler)p->value;
+                 address->imvalue_mask |= I18N_IM_HANDLER;
+             }
+             else if (strcmp (p->name, IMOnKeysList) == 0)
+@@ -273,15 +275,16 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                     return IMOnKeysList;
+                 /*endif*/
+                 address->on_keys.count_keys =
+-                    ((XIMTriggerKeys *) p->value)->count_keys;
+-                address->on_keys.keylist =
+-                    (XIMTriggerKey *) malloc (sizeof (XIMTriggerKey)*address->on_keys.count_keys);
+-                if (address->on_keys.keylist == (XIMTriggerKey *) NULL)
++                    ((XIMTriggerKeys *)p->value)->count_keys;
++                assert (!address->on_keys.keylist);
++                address->on_keys.keylist = (XIMTriggerKey *)malloc (
++                        sizeof (XIMTriggerKey) * address->on_keys.count_keys);
++                if (address->on_keys.keylist == (XIMTriggerKey *)NULL)
+                     return IMOnKeysList;
+                 /*endif*/
+                 memmove (address->on_keys.keylist,
+-                         ((XIMTriggerKeys *) p->value)->keylist,
+-                         sizeof (XIMTriggerKey)*address->on_keys.count_keys);
++                         ((XIMTriggerKeys *)p->value)->keylist,
++                         sizeof (XIMTriggerKey) * address->on_keys.count_keys);
+                 address->imvalue_mask |= I18N_ON_KEYS;
+             }
+             else if (strcmp (p->name, IMOffKeysList) == 0)
+@@ -290,15 +293,16 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                     return IMOffKeysList;
+                 /*endif*/
+                 address->off_keys.count_keys =
+-                    ((XIMTriggerKeys *) p->value)->count_keys;
+-                address->off_keys.keylist =
+-                    (XIMTriggerKey *) malloc (sizeof (XIMTriggerKey)*address->off_keys.count_keys);
+-                if (address->off_keys.keylist == (XIMTriggerKey *) NULL)
++                    ((XIMTriggerKeys *)p->value)->count_keys;
++                assert (!address->off_keys.keylist);
++                address->off_keys.keylist = (XIMTriggerKey *)malloc (
++                        sizeof (XIMTriggerKey) * address->off_keys.count_keys);
++                if (address->off_keys.keylist == (XIMTriggerKey *)NULL)
+                     return IMOffKeysList;
+                 /*endif*/
+                 memmove (address->off_keys.keylist,
+-                         ((XIMTriggerKeys *) p->value)->keylist,
+-                         sizeof (XIMTriggerKey)*address->off_keys.count_keys);
++                         ((XIMTriggerKeys *)p->value)->keylist,
++                         sizeof (XIMTriggerKey) * address->off_keys.count_keys);
+                 address->imvalue_mask |= I18N_OFF_KEYS;
+             }
+             else if (strcmp (p->name, IMEncodingList) == 0)
+@@ -308,17 +312,19 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+                 /*endif*/
+                 address->encoding_list.count_encodings =
+                     ((XIMEncodings *) p->value)->count_encodings;
++                assert (!address->encoding_list.supported_encodings);
+                 address->encoding_list.supported_encodings =
+-                    (XIMEncoding *) malloc (sizeof (XIMEncoding)*address->encoding_list.count_encodings);
++                        (XIMEncoding *)malloc (sizeof (XIMEncoding) *
++                                address->encoding_list.count_encodings);
+                 if (address->encoding_list.supported_encodings
+-                    == (XIMEncoding *) NULL)
+-                {
++                    == (XIMEncoding *)NULL) {
+                     return IMEncodingList;
+                 }
+                 /*endif*/
+                 memmove (address->encoding_list.supported_encodings,
+-                         ((XIMEncodings *) p->value)->supported_encodings,
+-                         sizeof (XIMEncoding)*address->encoding_list.count_encodings);
++                         ((XIMEncodings *)p->value)->supported_encodings,
++                         sizeof (XIMEncoding) *
++                                 address->encoding_list.count_encodings);
+                 address->imvalue_mask |= I18N_ENCODINGS;
+             }
+             else if (strcmp (p->name, IMFilterEventMask) == 0)
+@@ -354,30 +360,38 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
+     {
+         for (p = args;  p->name != NULL;  p++)
+         {
++            register char *_p = NULL;
+             if (strcmp (p->name, IMLocale) == 0)
+             {
+-                p->value = (char *) malloc (strlen (address->im_locale) + 1);
+-                if (!p->value)
++                _p = (char *)malloc (strlen (address->im_locale) + 1);
++                /* Workaround to avoid the warning of the leak of '*p.value'
++                 * CWE-401 and -Wanalyzer-malloc-leak. Seems GCC does not
++                 * understand the `if (!p->value)` sentence.
++                 */
++                if (!_p)
+                     return IMLocale;
+                 /*endif*/
++                p->value = _p;
+                 strcpy (p->value, address->im_locale);
+             }
+             else if (strcmp (p->name, IMServerTransport) == 0)
+             {
+-                p->value = (char *) malloc (strlen (address->im_addr) + 1);
+-                if (!p->value)
++                _p = (char *)malloc (strlen (address->im_addr) + 1);
++                if (!_p)
+                     return IMServerTransport;
+                 /*endif*/
++                p->value = _p;
+                 strcpy (p->value, address->im_addr);
+             }
+             else if (strcmp (p->name, IMServerName) == 0)
+             {
+                 if (address->imvalue_mask & I18N_IM_NAME)
+                 {
+-                    p->value = (char *) malloc (strlen (address->im_name) + 1);
+-                    if (!p->value)
++                    _p = (char *)malloc (strlen (address->im_name) + 1);
++                    if (!_p)
+                         return IMServerName;
+                     /*endif*/
++                    p->value = _p;
+                     strcpy (p->value, address->im_name);
+                 }
+                 else
+-- 
+2.51.1
+
+From 59bdaf6169f34a3353d6bf597fef0e84e2ca73c8 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Tue, 14 Oct 2025 09:00:24 +0900
+Subject: [PATCH 4/4] Fix memory leaks #2
+
+- Fix leaks of GOptionContext in bus/main.c
+- Fix leaks of IBusEngineDesc when IME is switched in
+  client/wayland/ibuswaylandim.c
+- Fix leaks of IBusTextClass:copy(), which is used in
+  Emojier:get_one_dimension_lookup_table(), in src/ibustext.c
+- Fix leak of IBusExtensionEvent with commit-text signal and clicking close
+  button since it's not floating in ui/gtk3/panelbinding.vala
+
+Fixes: https://github.com/ibus/ibus/commit/a800957
+BUG=https://github.com/ibus/ibus/pull/2805
+---
+ bus/main.c                     | 35 +++++++++++++++++++++-------------
+ client/wayland/ibuswaylandim.c |  1 +
+ src/ibustext.c                 | 11 ++++++++---
+ ui/gtk3/panelbinding.vala      |  6 ++++++
+ 4 files changed, 37 insertions(+), 16 deletions(-)
+
+diff --git a/bus/main.c b/bus/main.c
+index e0db15b3..ff9941ec 100644
+--- a/bus/main.c
++++ b/bus/main.c
+@@ -182,6 +182,14 @@ _on_sigusr1 (void)
+ }
+ #endif
+ 
++static inline void
++exit_and_free_context (int             status,
++                       GOptionContext *context)
++{
++    g_option_context_free (context);
++    exit (status);
++}
++
+ gint
+ main (gint argc, gchar **argv)
+ {
+@@ -203,11 +211,11 @@ main (gint argc, gchar **argv)
+     if (!g_option_context_parse (context, &argc, &argv, &error)) {
+         g_printerr ("Option parsing failed: %s\n", error->message);
+ 	g_error_free (error);
+-        exit (-1);
++        exit_and_free_context (EXIT_FAILURE, context);
+     }
+     if (g_gdbus_timeout < -1) {
+         g_printerr ("Bad timeout (must be >= -1): %d\n", g_gdbus_timeout);
+-        exit (-1);
++        exit_and_free_context (EXIT_FAILURE, context);
+     }
+ 
+     if (g_mempro) {
+@@ -220,7 +228,7 @@ main (gint argc, gchar **argv)
+ 
+         if (pwd == NULL || g_strcmp0 (pwd->pw_name, username) != 0) {
+             g_printerr ("Please run ibus-daemon with login user! Do not run ibus-daemon with sudo or su.\n");
+-            exit (-1);
++            exit_and_free_context (EXIT_FAILURE, context);
+         }
+     }
+ 
+@@ -245,7 +253,7 @@ main (gint argc, gchar **argv)
+     if (daemonize) {
+         if (daemon (1, 0) != 0) {
+             g_printerr ("Cannot daemonize ibus.\n");
+-            exit (-1);
++            exit_and_free_context (EXIT_FAILURE, context);
+         }
+     }
+ 
+@@ -267,7 +275,7 @@ main (gint argc, gchar **argv)
+         if (ibus_bus_is_connected (bus)) {
+             if (!replace) {
+                 g_printerr ("current session already has an ibus-daemon.\n");
+-                exit (-1);
++                exit_and_free_context (EXIT_FAILURE, context);
+             }
+             ibus_bus_exit (bus, FALSE);
+             while (ibus_bus_is_connected (bus)) {
+@@ -301,11 +309,11 @@ main (gint argc, gchar **argv)
+             }
+             if (component == NULL || !bus_component_start (component, g_verbose)) {
+                 g_printerr ("Can not execute default config program\n");
+-                exit (-1);
++                exit_and_free_context (EXIT_FAILURE, context);
+             }
+         } else if (g_strcmp0 (config, "disable") != 0 && g_strcmp0 (config, "") != 0) {
+             if (!execute_cmdline (config))
+-                exit (-1);
++                exit_and_free_context (EXIT_FAILURE, context);
+         }
+ 
+         /* execute panel component */
+@@ -318,11 +326,11 @@ main (gint argc, gchar **argv)
+             }
+             if (component == NULL || !bus_component_start (component, g_verbose)) {
+                 g_printerr ("Can not execute default panel program\n");
+-                exit (-1);
++                exit_and_free_context (EXIT_FAILURE, context);
+             }
+         } else if (g_strcmp0 (panel, "disable") != 0 && g_strcmp0 (panel, "") != 0) {
+             if (!execute_cmdline (panel))
+-                exit (-1);
++                exit_and_free_context (EXIT_FAILURE, context);
+         }
+     }
+ 
+@@ -337,25 +345,25 @@ main (gint argc, gchar **argv)
+         if (component != NULL &&
+             !bus_component_start (component, g_verbose)) {
+             g_printerr ("Can not execute default panel program\n");
+-            exit (-1);
++            exit_and_free_context (EXIT_FAILURE, context);
+         }
+     } else if (g_strcmp0 (emoji_extension, "disable") != 0 &&
+                g_strcmp0 (emoji_extension, "") != 0) {
+         if (!execute_cmdline (emoji_extension))
+-            exit (-1);
++            exit_and_free_context (EXIT_FAILURE, context);
+     }
+ #endif
+ 
+     /* execute ibus xim server */
+     if (xim) {
+         if (!execute_cmdline (LIBEXECDIR "/ibus-x11 --kill-daemon"))
+-            exit (-1);
++            exit_and_free_context (EXIT_FAILURE, context);
+     }
+ 
+     if (!daemonize) {
+         if (getppid () == 1) {
+             g_warning ("The parent process died.");
+-            exit (0);
++            exit_and_free_context (EXIT_SUCCESS, context);
+         }
+ #ifdef HAVE_SYS_PRCTL_H
+ #ifdef G_OS_UNIX
+@@ -396,5 +404,6 @@ main (gint argc, gchar **argv)
+ #endif
+     }
+     bus_server_run ();
++    g_option_context_free (context);
+     return 0;
+ }
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index e058044f..60257779 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -924,6 +924,7 @@ _bus_global_engine_changed_cb (IBusBus       *bus,
+     keymap = create_user_xkb_keymap (priv->xkb_context, desc);
+     if (keymap && !ibus_wayland_im_update_xkb_state (wlim, keymap))
+         xkb_keymap_unref (keymap);
++    g_object_unref (desc);
+ }
+ 
+ 
+diff --git a/src/ibustext.c b/src/ibustext.c
+index 73d3d10c..0576f6c8 100644
+--- a/src/ibustext.c
++++ b/src/ibustext.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* IBus - The Input Bus
+  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2011-2021 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2011-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2021 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+@@ -109,7 +109,7 @@ ibus_text_deserialize (IBusText *text,
+     retval = IBUS_SERIALIZABLE_CLASS (ibus_text_parent_class)->deserialize (
+                             (IBusSerializable *)text, variant);
+ 
+-    if (text->is_static == FALSE)
++    if (!text->is_static)
+         g_free (text->text);
+     g_variant_get_child (variant, retval++, "s", &text->text);
+     text->is_static = FALSE;
+@@ -139,10 +139,15 @@ ibus_text_copy (IBusText       *dest,
+     g_return_val_if_fail (IBUS_IS_TEXT (dest), FALSE);
+     g_return_val_if_fail (IBUS_IS_TEXT (src), FALSE);
+ 
++    if (!dest->is_static)
++        g_free (dest->text);
+     dest->text = g_strdup (src->text);
+     dest->is_static = FALSE;
++    if (dest->attrs)
++        g_clear_object (&dest->attrs);
+     if (src->attrs) {
+-        dest->attrs = (IBusAttrList *)ibus_serializable_copy ((IBusSerializable *)src->attrs);
++        dest->attrs = (IBusAttrList *)ibus_serializable_copy (
++                (IBusSerializable *)src->attrs);
+         g_object_ref_sink (dest->attrs);
+     }
+ 
+diff --git a/ui/gtk3/panelbinding.vala b/ui/gtk3/panelbinding.vala
+index 49c91575..507b3dac 100644
+--- a/ui/gtk3/panelbinding.vala
++++ b/ui/gtk3/panelbinding.vala
+@@ -910,6 +910,9 @@ class PanelBinding : IBus.PanelService {
+                         "is-enabled", false,
+                         "is-extension", true);
+                 panel_extension(close_event);
++                // Vala calls event.ref_sink() and panel_extension() does not
++                // unref the event and need to call event.unref() here.
++                close_event.unref();
+             });
+             m_emojier.send_message.connect((m) => {
+                 send_message(m);
+@@ -1175,6 +1178,9 @@ class PanelBinding : IBus.PanelService {
+                     "is-enabled", false,
+                     "is-extension", true);
+             panel_extension(event);
++            // Vala calls event.ref_sink() and panel_extension() does not unref
++            // the event and need to call event.unref() here.
++            event.unref();
+             return;
+         }
+         if (m_emojier == null)
+-- 
+2.51.1
+
+From 296192bd69448e5d782a33162de25534db0a79e7 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 17 Oct 2025 13:14:32 +0900
+Subject: [PATCH 1/5] ui/gtk3: Fix mouse position in Emojier category list
+
+BUG=rhbz#2237664
+---
+ ui/gtk3/emojier.vala | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/ui/gtk3/emojier.vala b/ui/gtk3/emojier.vala
+index ffa8cdaa..71422266 100644
+--- a/ui/gtk3/emojier.vala
++++ b/ui/gtk3/emojier.vala
+@@ -29,6 +29,8 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+                 valign : Gtk.Align.FILL
+             );
+             this.motion_notify_event.connect((e) => {
++                if (!m_enter_notify_enable)
++                    return false;
+                 Gdk.EventMotion pe = e;
+                 if (m_mouse_x == pe.x_root && m_mouse_y == pe.y_root)
+                     return false;
+@@ -37,6 +39,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+                 var row = this.get_row_at_y((int)e.y);
+                 if (row != null)
+                     this.select_row(row);
++                m_category_active_index = row.get_index();
+                 return false;
+             });
+             this.enter_notify_event.connect((e) => {
+@@ -279,6 +282,12 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+     private const unichar[] EMOJI_VARIANT_LIST = {
+             0x1f3fb, 0x1f3fc, 0x1f3fd, 0x1f3fe, 0x1f3ff, 0x200d };
+ 
++    // Access both class methods and instances.
++    protected static int m_category_active_index = -1;
++    protected static bool m_enter_notify_enable = true;
++    protected static double m_mouse_x;
++    protected static double m_mouse_y;
++
+     // Set the actual default values in the constructor
+     // because these fields are used for class_init() and static functions,
+     // e.g. set_emoji_font(), can be called before class_init() is called.
+@@ -348,14 +357,10 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+      * Unicode category list.
+      */
+     private bool m_candidate_panel_mode;
+-    private int m_category_active_index = -1;
+     private IBus.LookupTable m_lookup_table;
+     private Gtk.Label[] m_candidates;
+-    private bool m_enter_notify_enable = true;
+     private uint m_entry_notify_show_id;
+     private uint m_entry_notify_disable_id;
+-    protected static double m_mouse_x;
+-    protected static double m_mouse_y;
+     private Gtk.ProgressBar m_unicode_progress_bar;
+     private uint m_unicode_progress_id;
+     private Gtk.Label m_unicode_percent_label;
+@@ -988,7 +993,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+             EPaddedLabelBox widget =
+                     new EPaddedLabelBox(_(category), Gtk.Align.CENTER);
+             row.add(widget);
+-            m_list_box.add(row);
++            m_list_box.insert(row, -1);
+             if (i == m_category_active_index)
+                 m_list_box.select_row(row);
+         }
+@@ -1113,7 +1118,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+                                         TravelDirection.NONE,
+                                         caption);
+             row.add(widget);
+-            m_list_box.add(row);
++            m_list_box.insert(row, -1);
+             if (n++ == m_category_active_index) {
+                 m_list_box.select_row(row);
+             }
+-- 
+2.51.1
+
+From 0314cf5bf5bb3a46ff96cfb4f93ac937c129b7fb Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 17 Oct 2025 23:38:00 +0900
+Subject: [PATCH 3/5] client/wayland: Free IBusInputContext in input_method_activate()
+
+Call input_method_deactivate() when input_method_activate() is
+called twice and zwp_input_method_context_v1 is null but
+IBusInputContext is not null.
+This enhances not to cause a SEGV in _context_hide_preedit_text_cb()
+
+BUG=rhbz#2326455
+---
+ client/wayland/ibuswaylandim.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index e058044f..631bea93 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -1796,7 +1796,7 @@ input_method_activate (void                               *data,
+ 
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
+     priv = ibus_wayland_im_get_instance_private (wlim);
+-    if (priv->context)
++    if (priv->context || priv->ibuscontext)
+         input_method_deactivate (data, input_method, context);
+ 
+     priv->context = context;
+@@ -1828,10 +1828,7 @@ input_method_activate (void                               *data,
+         g_assert_not_reached ();
+     }
+ 
+-    if (priv->ibuscontext) {
+-        g_object_unref (priv->ibuscontext);
+-        priv->ibuscontext = NULL;
+-    }
++    g_assert (!priv->ibuscontext);
+ 
+     priv->cancellable = g_cancellable_new ();
+     ibus_bus_create_input_context_async (priv->ibusbus,
+@@ -1884,8 +1881,7 @@ input_method_deactivate (void                               *data,
+                 priv->ibuscontext,
+                 G_CALLBACK (_context_hide_preedit_text_cb),
+                 wlim);
+-        g_object_unref (priv->ibuscontext);
+-        priv->ibuscontext = NULL;
++        g_clear_object (&priv->ibuscontext);
+         g_signal_emit (wlim,
+                        wayland_im_signals[IBUS_FOCUS_OUT],
+                        0,
+-- 
+2.51.1
+
+From f6c52ce0baf0ad11705a0f9af160076a97104bf2 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 26 Nov 2025 15:16:03 +0900
+Subject: [PATCH 4/5] util/IMdkit: Fix SEGV with allocation fail in _Xi18nChangeIC()
+
+When malloc() is failed, it should break the for loop to set
+attrib_num value correctly to free attrib_list array.
+
+BUG=rhbz#2346033
+---
+ util/IMdkit/i18nIc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/util/IMdkit/i18nIc.c b/util/IMdkit/i18nIc.c
+index 14a3dc51..e82ffbcf 100644
+--- a/util/IMdkit/i18nIc.c
++++ b/util/IMdkit/i18nIc.c
+@@ -2,6 +2,8 @@
+  
+          Copyright 1994, 1995 by Sun Microsystems, Inc.
+          Copyright 1993, 1994 by Hewlett-Packard Company
++         Copyright (C) 2008-2025 Red Hat, Inc.
++         Copyright (C) 2017-2025 Takao Fujiwara
+  
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+@@ -714,10 +716,11 @@ void _Xi18nChangeIC (XIMS ims,
+         FrameMgrSetSize (fm, value_length);
+         attrib_list[attrib_num].value_length = value_length;
+         FrameMgrGetToken (fm, value);
+-        attrib_list[attrib_num].value = (void *) malloc (value_length + 1);
++        attrib_list[attrib_num].value = (void *)malloc (value_length + 1);
+         if (!attrib_list[attrib_num].value) {
+             fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
+                      __FILE__, __LINE__);
++            break;
+         } else {
+             memmove (attrib_list[attrib_num].value, value, value_length);
+             ((char *)attrib_list[attrib_num].value)[value_length] = '\0';
+-- 
+2.51.1
+
+From ca0193f5b1c17f5c8a456e09421d2a8688c5d667 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 23 Oct 2025 22:45:11 +0900
+Subject: [PATCH 5/5] ui/gtk3: Refer QT_IM_MODULES to check Wayland configuration
+
+QT_IM_MODULES and QT_IM_MODULE is available. The warning message
+is not changed at the moment.
+ibus-setup also runs `ibus start` instead ibus-daemon.
+
+BUG=rhbz#2392358
+---
+ setup/main.py      | 19 ++++++++++++++-----
+ ui/gtk3/panel.vala |  6 +++++-
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/setup/main.py b/setup/main.py
+index d0e05666..31b44037 100644
+--- a/setup/main.py
++++ b/setup/main.py
+@@ -4,8 +4,8 @@
+ # ibus - The Input Bus
+ #
+ # Copyright (c) 2007-2016 Peng Huang <shawn.p.huang@gmail.com>
+-# Copyright (c) 2010-2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
+-# Copyright (c) 2007-2020 Red Hat, Inc.
++# Copyright (c) 2010-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2007-2025 Red Hat, Inc.
+ #
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+@@ -602,13 +602,22 @@ class Setup(object):
+         GLib.timeout_add_seconds(timeout, lambda *args: main_loop.quit())
+         self.__bus.connect("connected", lambda *args: main_loop.quit())
+ 
+-        os.spawnlp(os.P_NOWAIT, "ibus-daemon", "ibus-daemon", "--xim", "--daemonize")
++        os.spawnlp(os.P_NOWAIT, "ibus", "ibus", "start", "--xim", "--daemonize")
+ 
+         main_loop.run()
+ 
+         if self.__bus.is_connected():
+-            message = _("IBus has been started! "
+-                "If you cannot use IBus, add the following lines to your $HOME/.bashrc; then relog into your desktop.\n"
++            message = _("IBus has been started. "
++                "If you cannot use IBus, add the following lines to your "
++                "$HOME/.bashrc; then relog into your desktop.\n"
++                "\n"
++                "  # For Wayland sessions ($XDG_SESSION_TYPE is \"wayland\")\n"
++                "  export GTK_IM_MODULE=wayland\n"
++                "  export XMODIFIERS=@im=ibus\n"
++                "  export QT_IM_MODULES=wayland;ibus\n"
++                "  export QT_IM_MODULE=ibus\n"
++                "\n"
++                "  # For X11 sessions ($XDG_SESSION_TYPE is \"x11\")\n"
+                 "  export GTK_IM_MODULE=ibus\n"
+                 "  export XMODIFIERS=@im=ibus\n"
+                 "  export QT_IM_MODULE=ibus"
+diff --git a/ui/gtk3/panel.vala b/ui/gtk3/panel.vala
+index 90194529..cfa6e50d 100644
+--- a/ui/gtk3/panel.vala
++++ b/ui/gtk3/panel.vala
+@@ -1027,7 +1027,11 @@ class Panel : IBus.PanelService {
+                         "Wayland",
+                         "ibus start");
+         } else if (m_is_wayland && m_is_wayland_im && !is_gnome()) {
+-            if (Environment.get_variable("QT_IM_MODULE") == "ibus") {
++            var qt_im_module = Environment.get_variable("QT_IM_MODULE");
++            var qt_im_modules = Environment.get_variable("QT_IM_MODULES");
++            if ((qt_im_module != null && qt_im_module != "wayland") &&
++                (qt_im_modules == null ||
++                 !qt_im_modules.has_prefix("wayland"))) {
+                 var format =
+                         _("Please unset QT_IM_MODULE and GTK_IM_MODULE " +
+                           "environment variables and 'ibus-daemon --panel " +
+-- 
+2.51.1
+
+From 2f7a74ebef5aac2ed529304beacff25591d29044 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 4 Dec 2025 19:41:59 +0900
+Subject: [PATCH] src/tests/ibus-keypress: Fix GTK3 build
+
+BUG=https://github.com/ibus/ibus/issues/2829
+---
+ src/tests/ibus-keypress.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/tests/ibus-keypress.c b/src/tests/ibus-keypress.c
+index cd8afe83..17029512 100644
+--- a/src/tests/ibus-keypress.c
++++ b/src/tests/ibus-keypress.c
+@@ -431,8 +431,11 @@ destroy_window (gpointer user_data)
+     data->source = 0;
+ 
+     g_info ("Destroying window after timeout");
++#if GTK_CHECK_VERSION (4, 0, 0)
+     gtk_window_destroy (GTK_WINDOW (data->window));
+-
++#else
++    gtk_widget_destroy (data->window);
++#endif
+     data->window = NULL;
+ 
+     return G_SOURCE_REMOVE;
+@@ -470,8 +473,9 @@ create_keypress (void)
+ #endif
+ 
+     if (!m_replay) {
+-        g_test_fail_printf ("Failed to create uinput device: %s",
+-                            error->message);
++        g_test_fail_printf ("Failed to create uinput device: %s: %s",
++                            error->message,
++                            "Probably you should run `chmod a+rw /dev/uinput`");
+         g_error_free (error);
+         return FALSE;
+     }
+@@ -741,7 +745,7 @@ test_keypress (gconstpointer user_data)
+ #if GTK_CHECK_VERSION (4, 0, 0)
+     gtk_init ();
+ #else
+-    gtk_init (data->argc, data->argv);
++    gtk_init (&data->argc, &data->argv);
+ #endif
+ 
+     g_assert ((channel =  g_io_channel_unix_new (m_pipe_engine[0])));
+@@ -770,7 +774,11 @@ test_keypress (gconstpointer user_data)
+     if (destroy_data.source)
+ 	g_source_remove (destroy_data.source);
+     if (destroy_data.window)
++#if GTK_CHECK_VERSION (4, 0, 0)
+ 	gtk_window_destroy (GTK_WINDOW (destroy_data.window));
++#else
++        gtk_widget_destroy (destroy_data.window);
++#endif
+     close (m_pipe_engine[0]);
+     close (m_pipe_engine[1]);
+ }
+-- 
+2.52.0
+
+From 7f5b5c59c9631292d41bb272b7716f5cdb356db5 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 10 Dec 2025 10:18:49 +0900
+Subject: [PATCH] ui/gtk3/propertypanel: Disable X11 display in Wayland
+
+Add a workaround until IBus panel is migrated to GTK4.
+GTK3 causes a SEGV when the session is switched to the console
+in Wayland with Ctrl-Alt-F3 because it calls
+gdk_display_get_default() by
+gdk_x11_get_xatom_by_name("Wacom Serial IDs") and the display
+is not X11.
+
+BUG=rhbz#2418670
+---
+ ui/gtk3/propertypanel.vala | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/ui/gtk3/propertypanel.vala b/ui/gtk3/propertypanel.vala
+index f1ecd7f7..1ba1681f 100644
+--- a/ui/gtk3/propertypanel.vala
++++ b/ui/gtk3/propertypanel.vala
+@@ -54,7 +54,18 @@ public class PropertyPanel : Gtk.Box {
+         set_visible(true);
+ 
+ #if ENABLE_XIM
+-        var display = BindingCommon.get_xdisplay();
++        Gdk.X11.Display? display = null;
++        // Disable X11 display in Wayland as a workaround.
++        // GTK3 causes a SEGV when the session is switched to the console
++        // in Wayland with Ctrl-Alt-F3 because it calls
++        // gdk_display_get_default() by
++        // gdk_x11_get_xatom_by_name("Wacom Serial IDs") and the display
++        // is not X11.
++        // Need to backport the fix to GTK3:
++        // https://gitlab.gnome.org/GNOME/gtk/-/commit/920259c2
++        // or need to migrate IBus panel to GTK4.
++        if (BindingCommon.default_is_xdisplay())
++            display = BindingCommon.get_xdisplay();
+         if (display != null) {
+             m_xdisplay = display.get_xdisplay();
+             var screen = display.get_default_screen();
+-- 
+2.52.0
+
+From b67624c79ad6c26a50194b626b329894b32367f9 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 19 Dec 2025 20:56:27 +0900
+Subject: [PATCH] configure: Add warning to run `make -C tools maintainer-clean-generic`
+
+When users specify --disable-wayland option for configure,
+the behavior effects VALA files in tools and need to
+regenerate C files but many users don't know the steps so added
+a warning in the configure output to inform to run
+`make -C tools maintainer-clean-generic` of the users.
+
+Fixes: https://github.com/ibus/ibus/commit/2bc23ed
+BUG=https://github.com/ibus/ibus/issues/2836
+---
+ configure.ac | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 401fcd27..401e5f27 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -931,6 +931,17 @@ AC_SUBST([GDBUS_CODEGEN], [`$PKG_CONFIG --variable gdbus_codegen gio-2.0`])
+ 
+ OUTPUT_TAIL=''
+ HAS_OUTPUT_TAIL=0
++AS_IF([test x"$enable_wayland" = x"no"],
++      [OUTPUT_TAIL="$OUTPUT_TAIL
++You invoked the \`configure\` script with disabled wayland option
++so you have to run
++\`make -C tools maintainer-clean-generic\` to regenerate C files with VALA
++before run \`make\`.
++"
++       HAS_OUTPUT_TAIL=1
++      ],
++      []
++)
+ AS_IF([test x"$enable_ui" != x"no" &&
+        test -f "$ac_confdir/ui/gtk3/application.c"
+       ],
+-- 
+2.52.0
+
+From 63bbe0b43408a1308be797cfab79c9d54bd1c144 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 8 Jan 2026 19:48:35 +0900
+Subject: [PATCH 1/2] ui/gtk3/extension: Fix assertion in panel_binding_construct()
+
+Check m_ibus in extension.vala:bus_name_acquired_cb().
+
+BUG=rhbz#1797120
+---
+ ui/gtk3/extension.vala | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ui/gtk3/extension.vala b/ui/gtk3/extension.vala
+index 5cd1a6ad..3acd76ea 100644
+--- a/ui/gtk3/extension.vala
++++ b/ui/gtk3/extension.vala
+@@ -73,6 +73,10 @@ class ExtensionGtk : Gtk.Application {
+                                       string         signal_name,
+                                       Variant        parameters) {
+         debug("signal_name = %s", signal_name);
++        /* rhbz#1797120 Fix assert(bus.is_connected()) in
++         * panel_binding_construct()
++         */
++        return_if_fail(m_bus.is_connected());
+         m_panel = new PanelBinding(m_bus, this);
+         m_panel.load_settings();
+     }
+-- 
+2.52.0
+
+From e8628f50640567890e08d2e5fb0230e891bbe0fd Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 8 Jan 2026 19:52:12 +0900
+Subject: [PATCH 2/2] ui/gtk3: Fix SEGV with double bus_name_acquired_cb()
+
+When PanelBinding() is called twice, g_dbus_connection_register_object()
+is failed in ibus_service_register() due to the duplicated object path
+and it calls unnecessary g_object_unref() although g_object_unref() is
+called in g_dbus_connection_register_object() and it causes a SEGV.
+
+But @user_data_free_func in g_dbus_connection_register_object() is not
+called with g_dbus_connection_unregister_object() immediately and I'd
+think not to use @user_data_free_func.
+
+BUG=rhbz#2419469
+---
+ src/ibusservice.c        | 18 ++++++++++++++++--
+ ui/gtk3/application.vala | 16 ++++++++++++++--
+ ui/gtk3/extension.vala   | 16 ++++++++++++++--
+ 3 files changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/src/ibusservice.c b/src/ibusservice.c
+index 51bd2ee4..3c7c04a4 100644
+--- a/src/ibusservice.c
++++ b/src/ibusservice.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2015 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2015-2023 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2015-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2019 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+@@ -495,9 +495,15 @@ ibus_service_unregister_cb (GDBusConnection    *connection,
+     guint *p = ids;
+     while (*p != 0) {
+         g_dbus_connection_unregister_object (connection, *p++);
++        /* g_dbus_connection_register_object(connection) calls
++         * g_object_ref(service).
++         */
++        g_object_unref (service);
+     }
+     g_signal_handlers_disconnect_by_func (connection,
+                     G_CALLBACK (ibus_service_connection_closed_cb), service);
++    /* g_hash_table_insert(service->priv->table) calls g_object_ref(connection)
++     */
+     g_object_unref (connection);
+     g_free (ids);
+ }
+@@ -566,12 +572,19 @@ ibus_service_register (IBusService     *service,
+ 
+     array = g_array_new (TRUE, TRUE, sizeof (guint));
+     while (*p != NULL) {
++        /* Probably I think @user_data_free_func in
++         * g_dbus_connection_register_object() is not useful in this case
++         * since the free func is not called until the @connection is closed
++         * but the @connection is shared with other instances
++         * so it would be better to call g_object_unref(service)
++         * after g_dbus_connection_unregister_object() is called.
++         */
+         guint id = g_dbus_connection_register_object (connection,
+                                                       service->priv->object_path,
+                                                       *p,
+                                                       &ibus_service_interface_vtable,
+                                                       g_object_ref (service),
+-                                                      (GDestroyNotify)g_object_unref,
++                                                      NULL,
+                                                       error);
+         if (id != 0) {
+             g_array_append_val (array, id);
+@@ -594,6 +607,7 @@ error_out:
+         guint *ids = (guint*) array->data;
+         while (*ids != 0) {
+             g_dbus_connection_unregister_object (connection, *ids++);
++            g_object_unref (service);
+         }
+         g_array_free (array, TRUE);
+     }
+diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
+index 65ab43cf..dcabc892 100644
+--- a/ui/gtk3/application.vala
++++ b/ui/gtk3/application.vala
+@@ -3,7 +3,7 @@
+  * ibus - The Input Bus
+  *
+  * Copyright(c) 2011 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright(c) 2017-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright(c) 2017-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -98,6 +98,16 @@ class Application {
+                                       string         signal_name,
+                                       Variant        parameters) {
+         debug("signal_name = %s", signal_name);
++        if (m_panel != null) {
++            // ibus_object_destroy() is needed because g_object_unref() is
++            // called by ibus_service_unregister_cb() but another
++            // g_object_unref() is also called by g_object_run_dispose()
++            // and one g_object_unref() is not needed because Vala calls it
++            // with `m_panel = null`.
++            m_panel.ref();
++            ((IBus.Object)m_panel).destroy();
++            m_panel.disconnect_signals();
++        }
+         m_panel = new Panel(bus, m_enable_wayland_im);
+         if (m_log != null)
+             m_panel.set_log(m_log, m_verbose);
+@@ -128,7 +138,8 @@ class Application {
+         // g_dbus_connection_register_object()
+         debug("signal_name = %s", signal_name);
+ 
+-        // unref m_panel
++        m_panel.ref();
++        ((IBus.Object)m_panel).destroy();
+         m_panel.disconnect_signals();
+ #if USE_GDK_WAYLAND
+         if (m_realize_surface_id != 0) {
+@@ -144,6 +155,7 @@ class Application {
+             m_ibus_focus_out_id = 0;
+         }
+ #endif
++        // unref m_panel
+         m_panel = null;
+     }
+ 
+diff --git a/ui/gtk3/extension.vala b/ui/gtk3/extension.vala
+index 3acd76ea..7ee54cd3 100644
+--- a/ui/gtk3/extension.vala
++++ b/ui/gtk3/extension.vala
+@@ -3,7 +3,7 @@
+  * ibus - The Input Bus
+  *
+  * Copyright(c) 2018 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright(c) 2018-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright(c) 2018-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -77,6 +77,16 @@ class ExtensionGtk : Gtk.Application {
+          * panel_binding_construct()
+          */
+         return_if_fail(m_bus.is_connected());
++        if (m_panel != null) {
++            // ibus_object_destroy() is needed because g_object_unref() is
++            // called by ibus_service_unregister_cb() but another
++            // g_object_unref() is also called by g_object_run_dispose()
++            // and one g_object_unref() is not needed because Vala calls it
++            // with `m_panel = null`.
++            m_panel.ref();
++            ((IBus.Object)m_panel).destroy();
++            m_panel.disconnect_signals();
++        }
+         m_panel = new PanelBinding(m_bus, this);
+         m_panel.load_settings();
+     }
+@@ -95,8 +105,10 @@ class ExtensionGtk : Gtk.Application {
+         // g_dbus_connection_register_object()
+         debug("signal_name = %s", signal_name);
+ 
+-        // unref m_panel
++        m_panel.ref();
++        ((IBus.Object)m_panel).destroy();
+         m_panel.disconnect_signals();
++        // unref m_panel
+         m_panel = null;
+     }
+ 
+-- 
+2.52.0
+

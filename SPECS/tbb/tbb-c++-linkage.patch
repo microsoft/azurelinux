@@ -1,0 +1,11 @@
+--- oneTBB-2022.0.0/src/tbbmalloc/CMakeLists.txt.orig	2024-10-31 11:23:11.000000000 -0600
++++ oneTBB-2022.0.0/src/tbbmalloc/CMakeLists.txt	2025-01-19 09:48:14.422176071 -0700
+@@ -72,7 +72,7 @@ set_target_properties(tbbmalloc PROPERTI
+     DEFINE_SYMBOL ""
+     VERSION ${TBBMALLOC_BINARY_VERSION}.${TBB_BINARY_MINOR_VERSION}
+     SOVERSION ${TBBMALLOC_BINARY_VERSION}
+-    LINKER_LANGUAGE C
++    LINKER_LANGUAGE CXX
+ )
+ 
+ tbb_handle_ipo(tbbmalloc)

@@ -1,0 +1,14 @@
+--- delharc-0.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ delharc-0.6.1/Cargo.toml	2024-10-16T03:03:24.095981+00:00
+@@ -34,11 +34,6 @@
+ 
+ [package.metadata.docs.rs]
+ all-features = true
+-
+-[[example]]
+-name = "extract"
+-path = "examples/extract.rs"
+-required-features = ["std"]
+ 
+ [[test]]
+ name = "decode"

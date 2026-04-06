@@ -1,0 +1,11 @@
+--- gix-archive-0.24.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gix-archive-0.24.0/Cargo.toml	2026-01-08T21:43:32.568094+00:00
+@@ -95,7 +95,7 @@
+ version = "2.0.17"
+ 
+ [dependencies.zip]
+-version = "5.1.1"
++version = ">=5.1.1,<8"
+ features = ["deflate-flate2"]
+ optional = true
+ default-features = false

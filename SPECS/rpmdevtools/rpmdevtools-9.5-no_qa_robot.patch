@@ -1,0 +1,21 @@
+diff -up rpmdevtools-9.5/Makefile.am.orig rpmdevtools-9.5/Makefile.am
+--- rpmdevtools-9.5/Makefile.am.orig	2021-12-10 11:37:29.889405680 +0100
++++ rpmdevtools-9.5/Makefile.am	2021-12-10 11:37:34.637495820 +0100
+@@ -1,4 +1,4 @@
+-SUBDIRS = emacs qa-robot
++SUBDIRS = emacs
+ 
+ pkgsysconfdir = $(sysconfdir)/rpmdevtools
+ bashcompdir = @bashcompdir@
+diff -up rpmdevtools-9.5/Makefile.in.orig rpmdevtools-9.5/Makefile.in
+--- rpmdevtools-9.5/Makefile.in.orig	2021-12-10 11:37:31.073428158 +0100
++++ rpmdevtools-9.5/Makefile.in	2021-12-10 11:37:38.304565439 +0100
+@@ -317,7 +317,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = emacs qa-robot
++SUBDIRS = emacs
+ pkgsysconfdir = $(sysconfdir)/rpmdevtools
+ bin_SCRIPTS = rpmdev-newinit rpmdev-newspec rpmdev-rmdevelrpms
+ dist_bin_SCRIPTS = rpmdev-checksig rpmdev-diff rpmdev-extract rpmdev-md5 \

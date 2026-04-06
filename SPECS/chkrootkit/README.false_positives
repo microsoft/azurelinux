@@ -1,0 +1,36 @@
+This is an additional document added to the Fedora RPM package of
+chkrootkit.
+-----
+
+It is in the nature of some of chkrootkit's checks that there may be some
+false positives among the reported findings. The chkrootkit user is
+advised to examine such files more closely (display them, query the RPM
+database about them, compare with backups on read-only media) and use
+another layer of protection (such as an intrusion detection tool).
+
+
+For example, where it is searched for hidden files below /usr/lib, which
+begin with a dot, chkrootkit may report files which belong into valid RPM
+packages, or which have been created at run-time by some software, and
+which are innocent. The output could look like this (the lines have been
+wrapped for readability):
+
+Searching for suspicious files and dirs, it may take a while... 
+/usr/lib/firefox-1.5.0.3/.autoreg
+/usr/lib/firefox-1.5.0.2/.autoreg
+/usr/lib/firefox-1.5.0.8/.autoreg
+/usr/lib/firefox-1.5.0.1/.autoreg
+/usr/lib/qt-3.3/etc/settings/.qt_plugins_3.3rc.lock
+/usr/lib/qt-3.3/etc/settings/.qtrc.lock
+/usr/lib/firefox-1.5/.autoreg
+/usr/lib/perl5/5.8.8/i386-linux-thread-multi/.packlist
+/usr/lib/firefox-1.5.0.4/.autoreg
+
+In this example, the files are valid files from Firefox (previous and
+current versions), Perl and the Qt GUI toolkit, but only the ".packlist"
+file is included in the main "perl" package. Creating and maintaining a
+simple white-list inside chkrootkit would bear the risk that a new rootkit
+uses the knowledge about white-listed file locations to store its
+malicious files.
+
+Also see:  http://www.chkrootkit.org/faq/

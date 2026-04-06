@@ -1,0 +1,73 @@
+From d053fbd391610e72fff1f8ee02c1222305f15de9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Van=C4=9Bk?= <arkamar@gentoo.org>
+Date: Mon, 1 Jul 2024 10:29:39 +0000
+Subject: [PATCH] Support for Numpy 2.0 in tests
+
+The newbyteorder has been removed in Numpy 2.0 [1]. Its usages are
+replaced with respect to migration guide.
+
+[1] https://numpy.org/devdocs/numpy_2_0_migration_guide.html#ndarray-and-scalar-methods
+
+Fixes: #8332
+---
+ tests/py_test.py | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tests/py_test.py b/tests/py_test.py
+index 7d6c0a37966..fc13a490f71 100644
+--- a/tests/py_test.py
++++ b/tests/py_test.py
+@@ -1095,7 +1095,7 @@ def test_create_numpy_vector_int8(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,
+@@ -1144,7 +1144,7 @@ def test_create_numpy_vector_uint16(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,
+@@ -1213,7 +1213,7 @@ def test_create_numpy_vector_int64(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,
+@@ -1287,7 +1287,7 @@ def test_create_numpy_vector_float32(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,
+@@ -1361,7 +1361,7 @@ def test_create_numpy_vector_float64(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,
+@@ -1427,7 +1427,7 @@ def test_create_numpy_vector_bool(self):
+ 
+       # Reverse endian:
+       b = flatbuffers.Builder(0)
+-      x_other_endian = x.byteswap().newbyteorder()
++      x_other_endian = x.byteswap().view(x.dtype.newbyteorder())
+       b.CreateNumpyVector(x_other_endian)
+       self.assertBuilderEquals(
+           b,

@@ -1,0 +1,20 @@
+--- db-5.3.28/lang/sql/sqlite/tool/lemon.c.lemon_hash	2013-09-09 17:35:07.000000000 +0200
++++ db-5.3.28/lang/sql/sqlite/tool/lemon.c	2017-02-22 13:12:08.564106051 +0100
+@@ -3428,7 +3428,7 @@
+   int maxdtlength;          /* Maximum length of any ".datatype" field. */
+   char *stddt;              /* Standardized name for a datatype */
+   int i,j;                  /* Loop counters */
+-  int hash;                 /* For hashing the name of a type */
++  unsigned hash;            /* For hashing the name of a type */
+   const char *name;         /* Name of the parser */
+ 
+   /* Allocate and initialize types[] and allocate stddt[] */
+@@ -3491,7 +3491,7 @@
+         break;
+       }
+       hash++;
+-      if( hash>=arraysize ) hash = 0;
++      if( hash>=(unsigned)arraysize ) hash = 0;
+     }
+     if( types[hash]==0 ){
+       sp->dtnum = hash + 1;

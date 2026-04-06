@@ -1,0 +1,73 @@
+diff --git a/keylime/src/config/base.rs b/keylime/src/config/base.rs
+index c171c85..d2e889a 100644
+--- a/keylime/src/config/base.rs
++++ b/keylime/src/config/base.rs
+@@ -625,27 +625,15 @@ pub(crate) fn config_translate_keywords(
+             });
+         }
+
+-        let actions_dir = match config.revocation_actions_dir.as_ref() {
+-            "" => {
+-                error!("The option 'enable_revocation_notifications' is set as 'true' but the revocation actions directory was set as empty in 'revocation_actions_dir'");
+-                return Err(KeylimeConfigError::IncompatibleOptions {
+-                    option_a: "enable_revocation_notifications".into(),
+-                    value_a: "true".into(),
+-                    option_b: "revocation_actions_dir".into(),
+-                    value_b: "empty".into(),
+-                });
+-            }
+-            dir => Path::new(dir),
++        if config.revocation_actions_dir.is_empty() {
++            error!("The option 'enable_revocation_notifications' is set as 'true' but the revocation actions directory was set as empty in 'revocation_actions_dir'");
++            return Err(KeylimeConfigError::IncompatibleOptions {
++                option_a: "enable_revocation_notifications".into(),
++                value_a: "true".into(),
++                option_b: "revocation_actions_dir".into(),
++                value_b: "empty".into(),
++            });
+         };
+-
+-        // Validate that the revocation actions directory exists
+-        let _revocation_actions_dir =
+-            &actions_dir.canonicalize().map_err(|e| {
+-                KeylimeConfigError::MissingActionsDir {
+-                    path: keylime_dir.display().to_string(),
+-                    source: e,
+-                }
+-            })?;
+     }
+
+     let revocation_cert = config_get_file_path(
+@@ -938,32 +926,6 @@ mod tests {
+         assert!(result.is_ok());
+     }
+
+-    #[test]
+-    fn test_invalid_revocation_actions_dir() {
+-        let tempdir = tempfile::tempdir()
+-            .expect("failed to create temporary directory");
+-
+-        let test_config = AgentConfig {
+-            keylime_dir: tempdir.path().display().to_string(),
+-            enable_revocation_notifications: true,
+-            revocation_actions_dir: "/invalid".to_string(),
+-            ..Default::default()
+-        };
+-        let result = config_translate_keywords(&test_config);
+-        // Expect error due to the inexistent directory
+-        assert!(result.is_err());
+-        let test_config = AgentConfig {
+-            keylime_dir: tempdir.path().display().to_string(),
+-            enable_revocation_notifications: false,
+-            revocation_actions_dir: "/invalid".to_string(),
+-            ..Default::default()
+-        };
+-
+-        // Now unset enable_revocation_notifications and check that is allowed
+-        let result = config_translate_keywords(&test_config);
+-        assert!(result.is_ok());
+-    }
+-
+     #[test]
+     fn test_keylime_dir_option() {
+         let dir = tempfile::tempdir()

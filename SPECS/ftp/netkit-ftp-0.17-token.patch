@@ -1,0 +1,75 @@
+diff -rup netkit-ftp-0.17/ftp/ruserpass.c netkit-ftp-0.17-new/ftp/ruserpass.c
+--- netkit-ftp-0.17/ftp/ruserpass.c	2012-10-29 15:11:10.593841089 +0100
++++ netkit-ftp-0.17-new/ftp/ruserpass.c	2012-10-29 15:13:14.379822697 +0100
+@@ -58,7 +58,8 @@ static int token(void);
+ #define	ID	10
+ #define	MACH	11
+ 
+-static char tokval[100];
++#define MAXTOKENLEN 4096
++static char tokval[MAXTOKENLEN];
+ 
+ static struct toktab {
+ 	const char *tokstr;
+@@ -249,13 +250,16 @@ bad:
+ 	return(-1);
+ }
+ 
+-static 
++static
+ int
+ token(void)
+ {
+ 	char *cp;
+ 	int c;
+ 	struct toktab *t;
++	size_t toklen = 0;
++	int showwarn = 1;
++	int quote = 0;
+ 
+ 	if (feof(cfile))
+ 		return (0);
+@@ -266,20 +270,32 @@ token(void)
+ 		return (0);
+ 	cp = tokval;
+ 	if (c == '"') {
+-		while ((c = getc(cfile)) != EOF && c != '"') {
+-			if (c == '\\')
+-				c = getc(cfile);
+-			*cp++ = c;
+-		}
+-	} else {
++		quote = 1;
++	}
++	else {
+ 		*cp++ = c;
+-		while ((c = getc(cfile)) != EOF
+-		    && c != '\n' && c != '\t' && c != ' ' && c != ',') {
+-			if (c == '\\')
+-				c = getc(cfile);
+-			*cp++ = c;
++		toklen++;
++	}
++	while ((c = getc(cfile)) != EOF) {
++		if (c == '"')
++			break;
++		if (c == '\\')
++			c = getc(cfile);
++		if (!quote && (c == '\n' || c == '\t' || c == ' ' || c == ','))
++			break;
++		if (toklen >= MAXTOKENLEN) {
++			if (showwarn) {
++				fprintf(stderr,
++						"Warning: .netrc token too long, will be trunctated to %zd characters\n",
++						toklen);
++				showwarn = 0;
++			}
++			continue;
+ 		}
++		*cp++ = c;
++		toklen++;
+ 	}
++
+ 	*cp = 0;
+ 	if (tokval[0] == 0)
+ 		return (0);

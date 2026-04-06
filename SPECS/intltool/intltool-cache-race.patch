@@ -1,0 +1,46 @@
+From 7355bdbca18c95a2b99cb254434ad2c2248d6747 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <locutusofborg@debian.org>
+Date: Wed, 2 Dec 2020 16:52:53 +0100
+Subject: [PATCH] [PATCH] Avoid a race where some processes try to use a
+ partial cache
+
+Gbp-Pq: 0001-Avoid-a-race-where-some-processes-try-to-use-a-parti.patch.
+---
+ intltool-merge.in | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/intltool-merge.in b/intltool-merge.in
+index 05db7cf930..89923a7da1 100644
+--- a/intltool-merge.in
++++ b/intltool-merge.in
+@@ -43,6 +43,7 @@ use Getopt::Long;
+ use Text::Wrap;
+ use File::Basename;
+ use Encode;
++use Fcntl qw(:flock);
+ 
+ my $must_end_tag      = -1;
+ my $last_depth        = -1;
+@@ -392,11 +393,14 @@ sub load_cache
+ 
+ sub get_cached_translation_database
+ {
++    open(my $lockfh, ">", "$cache_file.lock") or die $!;
++    flock($lockfh, LOCK_EX) or die "Could not lock '$cache_file.lock' - $!";
+     my $cache_file_age = -M $cache_file;
+     if (defined $cache_file_age) 
+     {
+         if ($cache_file_age <= &get_newest_po_age) 
+         {
++            close($lockfh);
+             &load_cache;
+             return;
+         }
+@@ -404,6 +408,7 @@ sub get_cached_translation_database
+     }
+ 
+     &create_cache;
++    close($lockfh);
+ }
+ 
+ sub add_translation

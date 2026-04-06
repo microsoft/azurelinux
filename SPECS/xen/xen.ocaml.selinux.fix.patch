@@ -1,0 +1,24 @@
+--- xen-4.5.0/tools/ocaml/xenstored/select_stubs.c.orig	2015-01-12 16:53:24.000000000 +0000
++++ xen-4.5.0/tools/ocaml/xenstored/select_stubs.c	2015-01-26 18:36:36.579632056 +0000
+@@ -16,6 +16,7 @@
+ #include <errno.h>
+ #include <sys/resource.h>
+ #include <unistd.h>
++#include <stdio.h>
+ #include <caml/mlvalues.h>
+ #include <caml/memory.h>
+ #include <caml/fail.h>
+@@ -74,7 +75,12 @@
+ 	struct rlimit rl;
+ 
+ 	rl.rlim_cur = rl.rlim_max = Int_val(limit);
+-	if (setrlimit(RLIMIT_NOFILE, &rl) != 0) uerror("setrlimit", Nothing);
++	if (setrlimit(RLIMIT_NOFILE, &rl) != 0) {
++		if (errno == EACCES)
++			fprintf(stderr, "setrlimit: permission denied\n");
++		else
++			uerror("setrlimit", Nothing);
++	}
+ 	CAMLreturn(Val_unit);
+ 
+ }

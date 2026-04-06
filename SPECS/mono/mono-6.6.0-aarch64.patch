@@ -1,0 +1,11 @@
+--- a/mono/sgen/sgen-archdep.h  2016-10-10 11:22:26.607082785 -0500
++++ b/mono/sgen/sgen-archdep.h  2016-10-10 11:22:48.526184527 -0500
+@@ -45,6 +45,8 @@
+
+ #elif defined(TARGET_ARM64)
+
++#define ARCH_MIN_MS_BLOCK_SIZE (64*1024)
++#define ARCH_MIN_MS_BLOCK_SIZE_SHIFT   16
+ #if defined(__APPLE__)
+ #define REDZONE_SIZE	128
+ #else

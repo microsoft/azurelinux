@@ -1,0 +1,25 @@
+From 87a375822f0f1d76fa464423f9743e36c5036713 Mon Sep 17 00:00:00 2001
+From: Jon Rowe <mail@jonrowe.co.uk>
+Date: Sun, 14 Jul 2024 23:21:43 +0100
+Subject: [PATCH] Pass hash through as explicit hash to avoid unknown keyword
+ argument error.
+
+---
+ lib/cucumber/multiline_argument/data_table.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/cucumber/multiline_argument/data_table.rb b/lib/cucumber/multiline_argument/data_table.rb
+index 4914b9478..1261ac585 100644
+--- a/lib/cucumber/multiline_argument/data_table.rb
++++ b/lib/cucumber/multiline_argument/data_table.rb
+@@ -75,7 +75,9 @@ def row(row)
+         def eof; end
+       end
+ 
+-      NULL_CONVERSIONS = Hash.new(strict: false, proc: ->(cell_value) { cell_value }).freeze
++      # This is a Hash being initialized with a default value of a Hash, DO NOT REFORMAT TO REMOVE {}
++      # Future versions [3.4.0+] of ruby will interpret these as keywords and break.
++      NULL_CONVERSIONS = Hash.new({ strict: false, proc: ->(cell_value) { cell_value } }).freeze
+ 
+       # @param data [Core::Test::DataTable] the data for the table
+       # @param conversion_procs [Hash] see map_columns!

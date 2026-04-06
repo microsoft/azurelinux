@@ -1,0 +1,57 @@
+From 410d98af2547d170bb79d90d129680e59d5a4d1e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Wed, 11 Sep 2024 15:43:26 +0200
+Subject: [PATCH] Revert "Retry timed out real requests when running webmock
+ specs."
+
+This reverts commit 47223fbcd2187f8d4ed0f8c355254abb376407dc.
+---
+ spec/acceptance/curb/curb_spec_helper.rb | 2 +-
+ spec/acceptance/webmock_shared.rb        | 8 --------
+ spec/spec_helper.rb                      | 1 -
+ 3 files changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/spec/acceptance/curb/curb_spec_helper.rb b/spec/acceptance/curb/curb_spec_helper.rb
+index cea503a..cc3473c 100644
+--- a/spec/acceptance/curb/curb_spec_helper.rb
++++ b/spec/acceptance/curb/curb_spec_helper.rb
+@@ -37,7 +37,7 @@ module CurbSpecHelper
+       curl.password = options[:basic_auth][1]
+     end
+     curl.timeout  = 30
+-    curl.connect_timeout = 5
++    curl.connect_timeout = 30
+ 
+     if headers = options[:headers]
+       headers.each {|k,v| curl.headers[k] = v }
+diff --git a/spec/acceptance/webmock_shared.rb b/spec/acceptance/webmock_shared.rb
+index 4a97a0b..98f8bd5 100644
+--- a/spec/acceptance/webmock_shared.rb
++++ b/spec/acceptance/webmock_shared.rb
+@@ -22,14 +22,6 @@ shared_examples "with WebMock" do |*adapter_info|
+       WebMock.reset!
+     end
+ 
+-    around(:each, net_connect: true) do |ex|
+-      ex.run_with_retry retry: 2, exceptions_to_retry: [
+-        client_timeout_exception_class,
+-        connection_refused_exception_class,
+-        connection_error_class
+-      ].compact
+-    end
+-
+     include_context "allowing and disabling net connect", *adapter_info
+ 
+     include_context "stubbing requests", *adapter_info
+diff --git a/spec/spec_helper.rb b/spec/spec_helper.rb
+index 9c7bc84..98af5b9 100644
+--- a/spec/spec_helper.rb
++++ b/spec/spec_helper.rb
+@@ -13,7 +13,6 @@ end
+ $LOAD_PATH.unshift(File.dirname(__FILE__))
+ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+ require 'rspec'
+-require 'rspec/retry'
+ 
+ require 'webmock/rspec'
+ 

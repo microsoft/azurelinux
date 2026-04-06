@@ -1,0 +1,64 @@
+From 236465ba9d380e1b6795f641ad3e8ef2b0271561 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 13 May 2025 07:09:41 -0400
+Subject: [PATCH] =?UTF-8?q?Downstream-only:=20Ignore=20a=20few=20tests=20w?=
+ =?UTF-8?q?e=20can=E2=80=99t=20compile?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These tests fail to compile with:
+
+  error[E0277]: the trait bound `Cow<'a, str>: ZeroFrom<'a, str>` is not satisfied
+
+This problem seems to be specific to testing the released crate; we
+cannot reproduce it in a git checkout. Enabling all features does not
+help; nor does ensuring the zerofrom dependency with the derive feature
+is present in the normalized Cargo.toml, as in
+https://github.com/unicode-org/icu4x/pull/6585. It could still be a
+similar issue with path dev-depencencies that we haven’t found yet. See
+https://src.fedoraproject.org/rpms/rust-zerovec/pull-request/1#comment-232114
+and subsequent discussion.
+---
+ src/lib.rs     | 4 ++--
+ src/map/map.rs | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index aac65cde9..8c2089187 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -89,7 +89,7 @@
+ //!
+ //! Use custom types inside of ZeroVec:
+ //!
+-//! ```rust
++//! ```rust,ignore
+ //! # #[cfg(all(feature = "serde", feature = "derive"))] {
+ //! use zerovec::{ZeroVec, VarZeroVec, ZeroMap};
+ //! use std::borrow::Cow;
+@@ -463,7 +463,7 @@ pub use zerovec_derive::make_ule;
+ ///
+ /// # Example
+ ///
+-/// ```rust
++/// ```rust,ignore
+ /// use std::borrow::Cow;
+ /// use zerofrom::ZeroFrom;
+ /// use zerovec::ule::encode_varule_to_box;
+diff --git a/src/map/map.rs b/src/map/map.rs
+index 1dc974125..176029df1 100644
+--- a/src/map/map.rs
++++ b/src/map/map.rs
+@@ -414,7 +414,7 @@ where
+     /// Same as `insert()`, but allows using [EncodeAsVarULE](crate::ule::EncodeAsVarULE)
+     /// types with the value to avoid an extra allocation when dealing with custom ULE types.
+     ///
+-    /// ```rust
++    /// ```rust,ignore
+     /// use std::borrow::Cow;
+     /// use zerovec::ZeroMap;
+     ///
+-- 
+2.49.0
+

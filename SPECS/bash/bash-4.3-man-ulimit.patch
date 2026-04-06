@@ -1,0 +1,15 @@
+diff --git a/doc/bash.1 b/doc/bash.1
+index 6e8aebb..e846e68 100644
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -10333,6 +10333,7 @@ and
+ which are in 512-byte increments.
+ The return status is 0 unless an invalid option or argument is supplied,
+ or an error occurs while setting a new limit.
++In POSIX Mode 512-byte blocks are used for the `-c' and `-f' options.
+ .RE
+ .TP
+ \fBumask\fP [\fB\-p\fP] [\fB\-S\fP] [\fImode\fP]
+-- 
+2.9.3
+

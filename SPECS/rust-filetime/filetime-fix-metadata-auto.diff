@@ -1,0 +1,18 @@
+--- filetime-0.2.26/Cargo.toml	1970-01-01T00:00:01+00:00
++++ filetime-0.2.26/Cargo.toml	2025-08-27T15:42:04.747277+00:00
+@@ -43,15 +43,6 @@
+ [dev-dependencies.tempfile]
+ version = "3"
+ 
+-[target.'cfg(target_os = "redox")'.dependencies.libredox]
+-version = "0.1.0"
+-
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.27"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.60.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-]

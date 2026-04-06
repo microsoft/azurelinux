@@ -1,0 +1,35 @@
+diff -urNp a/snmplib/snmp_api.c b/snmplib/snmp_api.c
+--- a/snmplib/snmp_api.c	2020-11-26 11:05:51.084788775 +0100
++++ b/snmplib/snmp_api.c	2020-11-26 11:08:27.850751397 +0100
+@@ -235,7 +235,7 @@ static const char *api_errors[-SNMPERR_M
+     "No error",                 /* SNMPERR_SUCCESS */
+     "Generic error",            /* SNMPERR_GENERR */
+     "Invalid local port",       /* SNMPERR_BAD_LOCPORT */
+-    "Unknown host",             /* SNMPERR_BAD_ADDRESS */
++    "Invalid address",          /* SNMPERR_BAD_ADDRESS */
+     "Unknown session",          /* SNMPERR_BAD_SESSION */
+     "Too long",                 /* SNMPERR_TOO_LONG */
+     "No socket",                /* SNMPERR_NO_SOCKET */
+@@ -1662,7 +1662,9 @@ _sess_open(netsnmp_session * in_session)
+         DEBUGMSGTL(("_sess_open", "couldn't interpret peername\n"));
+         in_session->s_snmp_errno = SNMPERR_BAD_ADDRESS;
+         in_session->s_errno = errno;
+-        snmp_set_detail(in_session->peername);
++        if (!netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
++                                    NETSNMP_DS_LIB_CLIENT_ADDR))
++            snmp_set_detail(in_session->peername);
+         return NULL;
+     }
+ 
+diff -ruNp a/snmplib/transports/snmpUDPIPv4BaseDomain.c b/snmplib/transports/snmpUDPIPv4BaseDomain.c
+--- a/snmplib/transports/snmpUDPIPv4BaseDomain.c	2021-01-06 12:51:51.948106797 +0100
++++ b/snmplib/transports/snmpUDPIPv4BaseDomain.c	2021-01-06 14:17:31.029745744 +0100
+@@ -209,6 +209,8 @@ netsnmp_udpipv4base_transport_bind(netsn
+         DEBUGMSGTL(("netsnmp_udpbase",
+                     "failed to bind for clientaddr: %d %s\n",
+                     errno, strerror(errno)));
++        NETSNMP_LOGONCE((LOG_ERR, "Cannot bind for clientaddr: %s\n",
++                    strerror(errno)));
+         goto err;
+     }
+ 

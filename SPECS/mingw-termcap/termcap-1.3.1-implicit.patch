@@ -1,0 +1,20 @@
+FTBFS with mingw-gcc 14:
+
+../tparam.c: In function 'memory_out':
+../tparam.c:51:3: error: implicit declaration of function 'write' [-Wimplicit-function-declaration]
+
+diff --git a/tparam.c b/tparam.c
+index 5a9809a..c9aceb1 100644
+--- a/tparam.c
++++ b/tparam.c
+@@ -38,6 +38,10 @@ char *realloc ();
+ #define bcopy(s, d, n) memcpy ((d), (s), (n))
+ #endif
+ 
++#ifdef HAVE_UNISTD_H
++#include <unistd.h>
++#endif
++
+ #endif /* not emacs */
+ 
+ #ifndef NULL

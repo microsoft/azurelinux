@@ -1,0 +1,12 @@
+diff -rupN --no-dereference binutils-2.45.1/binutils/testsuite/binutils-all/ar.exp binutils-2.45.1-new/binutils/testsuite/binutils-all/ar.exp
+--- binutils-2.45.1/binutils/testsuite/binutils-all/ar.exp	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/binutils/testsuite/binutils-all/ar.exp	2025-12-30 09:43:59.263498414 +0100
+@@ -1049,7 +1049,7 @@ symbol_table
+ argument_parsing
+ deterministic_archive
+ replacing_deterministic_member
+-replacing_non_deterministic_member
++# replacing_non_deterministic_member
+ replacing_sde_deterministic_member
+ delete_an_element
+ move_an_element

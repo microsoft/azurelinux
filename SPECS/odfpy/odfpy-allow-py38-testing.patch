@@ -1,0 +1,11 @@
+diff -uNr odfpy-release-1.4.0-orig/tox.ini odfpy-release-1.4.0/tox.ini
+--- odfpy-release-1.4.0-orig/tox.ini	2019-08-30 11:49:56.744400311 -0400
++++ odfpy-release-1.4.0/tox.ini	2019-08-30 11:50:29.173641403 -0400
+@@ -5,6 +5,7 @@
+     py35,
+     py36,
+     py37,
++    py38,
+ 
+ [testenv]
+ commands =

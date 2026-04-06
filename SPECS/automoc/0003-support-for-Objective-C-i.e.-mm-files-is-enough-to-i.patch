@@ -1,0 +1,34 @@
+From f6628033865fe0a38271c4b720f1b2d29f3fd974 Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Wed, 11 Mar 2009 21:40:11 +0000
+Subject: [PATCH 03/33] -support for Objective C (i.e. mm files) is enough to
+ increase at least the patch version number
+
+Alex
+
+CCMAIL: kretz@kde.org
+
+Or should we go to 0.10.0 ?
+
+
+svn path=/trunk/kdesupport/automoc/; revision=938448
+---
+ Automoc4Version.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Automoc4Version.cmake b/Automoc4Version.cmake
+index 1e93ca7..7d93128 100644
+--- a/Automoc4Version.cmake
++++ b/Automoc4Version.cmake
+@@ -1,7 +1,7 @@
+ # set the current version number
+ set(AUTOMOC4_VERSION_MAJOR  "0")
+ set(AUTOMOC4_VERSION_MINOR  "9")
+-set(AUTOMOC4_VERSION_PATCH "88")
++set(AUTOMOC4_VERSION_PATCH "89")
+ 
+ set(AUTOMOC4_VERSION "${AUTOMOC4_VERSION_MAJOR}.${AUTOMOC4_VERSION_MINOR}.${AUTOMOC4_VERSION_PATCH}")
+ 
+-- 
+2.4.3
+

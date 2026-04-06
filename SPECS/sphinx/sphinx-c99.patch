@@ -1,0 +1,99 @@
+Add missing return types to avoid build failures with C99 compilers.
+Include <string.h> to avoid implicit function declarations.
+Avoid incompatible pointer types and a format string warning.
+
+Partially fixed via:
+
+commit da41e452c5acc99ffe40f48be32d9ca7e55c407c
+Author: tomat <tomat@406a0c4d-033a-0410-8de8-e80135713968>
+Date:   Wed Jun 2 05:16:06 2010 +0000
+
+    fixed query buffer overrun and SIGPIPE in C API, mantis bug 489 \ 504
+    
+    git-svn-id: svn://svn.sphinxsearch.com/sphinx/trunk@2316 406a0c4d-033a-0410-
+8de8-e80135713968
+
+Rest submitted upstream: <https://github.com/sphinxsearch/sphinx/pull/47>
+
+diff --git a/api/libsphinxclient/sphinxclient.c b/api/libsphinxclient/sphinxclient.c
+index 16f7913fa37b3bf3..0530fc2c65f1082c 100644
+--- a/api/libsphinxclient/sphinxclient.c
++++ b/api/libsphinxclient/sphinxclient.c
+@@ -311,7 +311,7 @@ static void sphinx_free_results ( sphinx_client * client )
+ }
+ 
+ 
+-static sock_close ( int sock );
++static void sock_close ( int sock );
+ 
+ 
+ #define safe_free(_ptr) \
+@@ -1436,7 +1436,7 @@ static int sock_set_blocking ( int sock )
+ }
+ 
+ 
+-static sock_close ( int sock )
++static void sock_close ( int sock )
+ {
+ 	if ( sock<0 )
+ 		return;
+diff --git a/api/libsphinxclient/test.c b/api/libsphinxclient/test.c
+index f779bb1ff638a179..670e379b4ad3c36f 100644
+--- a/api/libsphinxclient/test.c
++++ b/api/libsphinxclient/test.c
+@@ -16,6 +16,7 @@
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #if _WIN32
+ #include <winsock2.h>
+@@ -218,7 +219,8 @@ void test_excerpt_spz ( sphinx_client * client )
+ 
+ void test_persist_work ( sphinx_client * client )
+ {
+-	char * docs[] = { NULL };
++	const char * docs[] = { NULL };
++	char *docs0;
+ 	const char words[] = "that is";
+ 	const char * index = "test1";
+ 	const char filler[] = " no need to worry about ";
+@@ -229,13 +231,14 @@ void test_persist_work ( sphinx_client * client )
+ 
+ 	// should be in sync with sphinxclient.c MAX_PACKET_LEN
+ 	i = 8*1024*1024 + 50;
+-	docs[0] = malloc ( i );
+-	if ( !docs[0] )
++	docs0 = malloc ( i );
++	if ( !docs0 )
+ 		die ( "malloc failed at test_persist_work" );
++	docs[0] = docs0;
+ 
+-	memcpy ( docs[0], words, sizeof(words)-1 );
+-	doc = docs[0] + sizeof(words)-1;
+-	while ( ( doc + sizeof(filler) )<docs[0]+i )
++	memcpy ( docs0, words, sizeof(words)-1 );
++	doc = docs0 + sizeof(words)-1;
++	while ( ( doc + sizeof(filler) )<docs0+i )
+ 	{
+ 		memcpy ( doc, filler, sizeof(filler)-1 );
+ 		doc += sizeof(filler)-1;
+@@ -264,7 +267,7 @@ void test_persist_work ( sphinx_client * client )
+ 			opts.html_strip_mode = "none";
+ 			opts.query_mode = SPH_TRUE;
+ 
+-			*( docs[0]+sizeof(words)+100 ) = '\0';
++			*( docs0+sizeof(words)+100 ) = '\0';
+ 		}
+ 
+ 		printf ( "n=%d,\t", i );
+@@ -405,7 +408,7 @@ void title ( const char * name )
+ 	if ( g_smoke || !name )
+ 		return;
+ 
+-	printf ( "-> % s <-\n\n", name );
++	printf ( "-> %s <-\n\n", name );
+ }
+ 
+ int main ( int argc, char ** argv )

@@ -1,0 +1,42 @@
+--- deadpool-0.13.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ deadpool-0.13.0/Cargo.toml	2026-02-23T17:02:48.370075+00:00
+@@ -30,6 +30,9 @@
+ ]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/deadpool-rs/deadpool"
++exclude = [
++    "test-build.sh",
++]
+ 
+ [package.metadata.docs.rs]
+ all-features = true
+@@ -118,29 +121,11 @@
+ version = "1.5"
+ features = ["sync"]
+ 
+-[dev-dependencies.async-std]
+-version = "1.0"
+-features = ["attributes"]
+-
+-[dev-dependencies.config]
+-version = "0.15"
+-features = ["json"]
+-
+-[dev-dependencies.criterion]
+-version = "0.8"
+-features = [
+-    "html_reports",
+-    "async_tokio",
+-]
+-
+ [dev-dependencies.itertools]
+ version = "0.14"
+ 
+ [dev-dependencies.macro_rules_attribute]
+ version = "0.2.2"
+-
+-[dev-dependencies.smol-macros]
+-version = "0.1.1"
+ 
+ [dev-dependencies.tokio]
+ version = "1.5.0"

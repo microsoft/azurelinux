@@ -1,0 +1,12 @@
+diff -up texlive-base-20220321/source/configure.poppler-22.08.0 texlive-base-20220321/source/configure
+--- texlive-base-20220321/source/configure.poppler-22.08.0	2022-10-31 09:48:21.875540925 -0400
++++ texlive-base-20220321/source/configure	2022-10-31 09:50:13.731220862 -0400
+@@ -23545,7 +23545,7 @@ printf %s "checking requested system \`x
+ int
+ main (void)
+ {
+-GfxFont *gfxFont; gfxFont->decRefCnt();
++GfxFont *gfxFont; gfxFont->getFlags();
+   ;
+   return 0;
+ }

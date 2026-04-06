@@ -1,0 +1,67 @@
+.TH "CLIQUER" "1" "1.21" "Cliquer" "User Commands"
+.SH "NAME"
+cliquer \- Find cliques in arbitrary weighted graphs
+.SH "SYNOPSIS"
+.B cliquer
+[\fIOPTION\fR]... <\fIDIMACS_FILE\fR>
+.SH "DESCRIPTION"
+.PP
+Cliquer is a set of C routines for finding cliques in an arbitrary weighted
+graph.  It uses an exact branch-and-bound algorithm developed by Patric
+Östergård.  It is designed with the aim of being efficient while still being
+flexible and easy to use.
+.SH "OPTIONS"
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print the help text.
+.TP
+\fB\-a\fR, \fB\-\-all\fR
+Find all cliques.
+.TP
+\fB\-s\fR, \fB\-\-single\fR
+Find a single clique (the default).
+.TP
+\fB\-w\fR, \fB\-\-weight\fR
+Tell only maximum weight (no faster than \-s).
+.TP
+\fB\-m\fR N, \fB\-\-min\fR N
+Search for cliques with weight at least N.  If N = 0, searches for maximum
+weight clique (default).
+.TP
+\fB\-M\fR N, \fB\-\-max\fR N
+Search for cliques with weight at most N.  If N = 0, no limit is imposed
+(default).  Positive N is incompatible with \fI\-\-min 0\fR (\fI\-\-min 1\fR
+is assumed).
+.TP
+\fB\-x\fR, \fB\-\-maximal\fR
+Require cliques to be maximal.
+.TP
+\fB\-u\fR, \fB\-\-unweighted\fR
+Assume weight 1 for all vertices.
+.TP
+\fB\-0\fR, \fB\-\-from\-0\fR
+Number vertices from 0 to n-1 instead of 1 to n when writing.
+.TP
+\fB\-r\fR F, \fB\-\-reorder\fR F
+Reorder with function F.  The available functions are:
+.IP none
+No ordering (same order as in the file).
+.IP reverse
+Reverse of the order in the file.
+.IP default
+Either unweighted\-coloring or weighted\-coloring, depending on weightedness.
+.IP unweighted\-coloring
+Coloring method efficient for unweighted graphs.
+.IP weighted\-coloring
+Coloring method efficient for weighted graphs.
+.IP degree
+Order by ascending degree.
+.IP random
+Random order.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Suppresses progress output.  Specifying \-q twice suppresses all output except
+the actual result.
+.SH "AUTHORS"
+Cliquer was written by Sampo Niskanen <sampo.niskanen@iki.fi> and
+Patric Östergård <patric.ostergard@tkk.fi>.

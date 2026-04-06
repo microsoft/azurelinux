@@ -1,0 +1,11 @@
+--- lcms2-6.1.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lcms2-6.1.0/Cargo.toml	2024-04-02T09:52:22.315559+00:00
+@@ -50,8 +50,5 @@
+ [dependencies.lcms2-sys]
+ version = "4.0.4"
+ 
+-[features]
+-static = ["lcms2-sys/static"]
+-
+ [badges.maintenance]
+ status = "actively-developed"

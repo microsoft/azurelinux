@@ -1,0 +1,54 @@
+From 593fb3d6c0fcff266729d1d497d931e7e3ad9a83 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 24 May 2018 10:20:55 +0200
+Subject: [PATCH] Upgrade to 0.95
+
+---
+ lib/Filter/Simple.pm |  6 ++----
+ t/no.t               | 13 +++++++++++++
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+ create mode 100644 t/no.t
+
+diff --git a/lib/Filter/Simple.pm b/lib/Filter/Simple.pm
+index 082fe95..1dcf3c8 100644
+--- a/lib/Filter/Simple.pm
++++ b/lib/Filter/Simple.pm
+@@ -2,14 +2,12 @@ package Filter::Simple;
+ 
+ use Text::Balanced ':ALL';
+ 
+-use vars qw{ $VERSION @EXPORT };
+-
+-$VERSION = '0.94';
++our $VERSION = '0.95';
+ 
+ use Filter::Util::Call;
+ use Carp;
+ 
+-@EXPORT = qw( FILTER FILTER_ONLY );
++our @EXPORT = qw( FILTER FILTER_ONLY );
+ 
+ 
+ sub import {
+diff --git a/t/no.t b/t/no.t
+new file mode 100644
+index 0000000..8980eae
+--- /dev/null
++++ b/t/no.t
+@@ -0,0 +1,13 @@
++BEGIN {
++    unshift @INC, 't/lib/';
++}
++
++print "1..2\n";
++
++use Filter::Simple::FilterTest qr/ok/ => "not ok", pass => "fail";
++no Filter::Simple::FilterTest;
++
++sub pass { print "ok ", $_[0], "\n" }
++
++print "ok 1\n";
++("pa"."ss")->(2);
+-- 
+2.14.3
+

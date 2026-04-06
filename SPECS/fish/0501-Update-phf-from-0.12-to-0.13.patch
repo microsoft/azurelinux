@@ -1,0 +1,27 @@
+From bf0c1bf372c6c80ca400afc3517573a3f8328179 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 28 Dec 2025 12:21:58 +0000
+Subject: [PATCH] Update phf from 0.12 to 0.13
+
+---
+ Cargo.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 26a4941e7..2d4f67907 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -35,8 +35,8 @@ once_cell = "1.19.0"
+ pcre2 = { git = "https://github.com/fish-shell/rust-pcre2", tag = "0.2.9-utf32", default-features = false, features = [
+     "utf32",
+ ] }
+-phf = { version = "0.12", default-features = false }
+-phf_codegen = { version = "0.12" }
++phf = { version = "0.13", default-features = false }
++phf_codegen = { version = "0.13" }
+ portable-atomic = { version = "1", default-features = false, features = [
+     "fallback",
+ ] }
+-- 
+2.52.0
+

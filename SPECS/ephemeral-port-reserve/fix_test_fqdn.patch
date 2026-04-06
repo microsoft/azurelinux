@@ -1,0 +1,35 @@
+From 3f5185a6694573564db04d8f8af01295c80327e1 Mon Sep 17 00:00:00 2001
+From: Charalampos Stratakis <cstratak@redhat.com>
+Date: Thu, 29 May 2025 05:12:43 +0200
+Subject: [PATCH] Handle hostname resolution failure in test_fqdn
+
+When running the tests in containers without systemd,
+hostname resolution can fail with:
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+This is due to the generated hostname being either a random
+string or the container ID which cannot be resolved to an IP address.
+
+Since we're only testing local port binding, fall back to using
+localhost (127.0.0.1) when hostname resolution fails.
+---
+ tests/ephemeral_port_test.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/ephemeral_port_test.py b/tests/ephemeral_port_test.py
+index c5411f7..c9be85c 100644
+--- a/tests/ephemeral_port_test.py
++++ b/tests/ephemeral_port_test.py
+@@ -45,7 +45,11 @@ def test_localhost():
+ 
+ 
+ def test_fqdn():
+-    fqip = socket.gethostbyname(getfqdn())
++    try:
++        fqip = socket.gethostbyname(getfqdn())
++    except (socket.gaierror, socket.error):
++        # If FQDN resolution fails, fall back to localhost since we're testing local binding
++        fqip = '127.0.0.1'
+     assert_ip(fqip)
+ 
+ 

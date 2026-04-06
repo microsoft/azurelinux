@@ -1,0 +1,40 @@
+From 2a82570d855ab90f419daf14b986669ef4fd2aec Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 22 Aug 2022 17:47:02 +0200
+Subject: [PATCH] allow-errors-in-notebooks-with-external-images.patch
+
+---
+ doc/code-cells.ipynb               | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/doc/code-cells.ipynb b/doc/code-cells.ipynb
+index 1d550e2..3a0d7dd 100644
+--- a/doc/code-cells.ipynb
++++ b/doc/code-cells.ipynb
+@@ -228,6 +228,13 @@
+     "### Image URLs"
+    ]
+   },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "There may be errors in this part because images' URLs are not accessible during a build of RPM. See [online documentation](http://nbsphinx.readthedocs.io/en/latest/code-cells.html#Image-URLs)."
++   ]
++  },
+   {
+    "cell_type": "code",
+    "execution_count": null,
+@@ -936,6 +943,9 @@
+    "nbconvert_exporter": "python",
+    "pygments_lexer": "ipython3",
+    "version": "3.9.9"
++  },
++  "nbsphinx": {
++   "allow_errors": true
+   }
+  },
+  "nbformat": 4,
+-- 
+2.37.2
+

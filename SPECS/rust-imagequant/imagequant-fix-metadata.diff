@@ -1,0 +1,12 @@
+--- imagequant-4.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ imagequant-4.4.1/Cargo.toml	2025-08-18T19:53:47.546699+00:00
+@@ -85,9 +85,6 @@
+ version = "1.1.8"
+ optional = true
+ 
+-[dev-dependencies.lodepng]
+-version = "3.10"
+-
+ [profile.release]
+ debug = 0
+ panic = "abort"

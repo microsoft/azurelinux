@@ -1,0 +1,35 @@
+--- handlebars-5.1.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ handlebars-5.1.2/Cargo.toml	2024-04-28T20:46:28.101792+00:00
+@@ -97,9 +97,6 @@
+ version = "2.2.3"
+ optional = true
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.env_logger]
+ version = "0.10"
+ 
+@@ -117,9 +114,6 @@
+     "parsing",
+ ]
+ 
+-[dev-dependencies.tiny_http]
+-version = "0.12"
+-
+ [features]
+ default = []
+ dir_source = ["walkdir"]
+@@ -127,12 +121,5 @@
+ script_helper = ["rhai"]
+ string_helpers = ["heck"]
+ 
+-[target."cfg(unix)".dev-dependencies.pprof]
+-version = "0.13"
+-features = [
+-    "flamegraph",
+-    "prost-codec",
+-]
+-
+ [badges.maintenance]
+ status = "actively-developed"

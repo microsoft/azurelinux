@@ -1,0 +1,30 @@
+From d9083a4cc638cf9c7dfc3cc534a7c6b4debf50ab Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Thu, 10 Apr 2025 16:42:14 +0200
+Subject: strcasecmp: Support cross-compilation.
+
+Reported by Rudi Heitbaum <rudi@heitbaum.com> in
+<https://lists.gnu.org/archive/html/bug-gnulib/2025-04/msg00055.html>.
+
+diff --git a/m4/strcasecmp.m4 b/m4/strcasecmp.m4
+index e40ee5d..eb4345d 100644
+--- a/m4/strcasecmp.m4
++++ b/m4/strcasecmp.m4
+@@ -1,5 +1,5 @@
+ # strcasecmp.m4
+-# serial 2
++# serial 3
+ dnl Copyright (C) 2002-2025 Free Software Foundation, Inc.
+ dnl This file is free software; the Free Software Foundation
+ dnl gives unlimited permission to copy and/or distribute it,
+@@ -57,7 +57,7 @@ int main ()
+           gl_cv_func_strcasecmp_works=no
+         fi
+        ],
+-       [])
++       [:])
+     ])
+ ])
+ 
+-- 
+cgit v1.1

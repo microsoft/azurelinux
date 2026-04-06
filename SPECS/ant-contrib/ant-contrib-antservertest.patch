@@ -1,0 +1,29 @@
+diff --git a/test/resources/antserver/antservertest.xml b/test/resources/antserver/antservertest.xml
+index 77f8db0..c51fad0 100644
+--- a/test/resources/antserver/antservertest.xml
++++ b/test/resources/antserver/antservertest.xml
+@@ -3,8 +3,8 @@
+ 
+     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+ 
+-    <property name="server.host" value="localhost" />
+-    <property name="server.port" value="17000" />
++    <property name="server.host" value="127.0.0.1" />
++    <property name="server.port" value="23456" />
+ 
+     <target name="default">
+     </target>
+@@ -124,11 +124,11 @@
+                     <try>
+                         <antcall target="${test.target}" />
+                     </try>
+-                    <finally>
++                    <catch>
+                         <remoteant machine="${server.host}" port="${server.port}">
+                             <shutdown />
+                         </remoteant>
+-                    </finally>
++                    </catch>
+                 </trycatch>
+             </sequential>
+         </parallel>

@@ -1,0 +1,21 @@
+diff -rupN --no-dereference sip-4.19.25/siputils.py sip-4.19.25-new/siputils.py
+--- sip-4.19.25/siputils.py	2021-02-26 16:17:35.156108000 +0100
++++ sip-4.19.25-new/siputils.py	2021-10-21 13:45:54.780566626 +0200
+@@ -1473,7 +1473,7 @@ class ModuleMakefile(Makefile):
+     """
+     def __init__(self, configuration, build_file, install_dir=None, static=0,
+                  console=0, qt=0, opengl=0, threaded=0, warnings=1, debug=0,
+-                 dir=None, makefile="Makefile", installs=None, strip=1,
++                 dir=None, makefile="Makefile", installs=None, strip=0,
+                  export_all=0, universal=None, arch=None,
+                  deployment_target=None):
+         """Initialise an instance of a module Makefile.
+@@ -1784,7 +1784,7 @@ class SIPModuleMakefile(ModuleMakefile):
+     """
+     def __init__(self, configuration, build_file, install_dir=None, static=0,
+                  console=0, qt=0, opengl=0, threaded=0, warnings=1, debug=0,
+-                 dir=None, makefile="Makefile", installs=None, strip=1,
++                 dir=None, makefile="Makefile", installs=None, strip=0,
+                  export_all=0, universal=None, arch=None, prot_is_public=0,
+                  deployment_target=None):
+         """Initialise an instance of a SIP generated module Makefile.

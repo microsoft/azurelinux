@@ -1,0 +1,12 @@
+diff -up nmap-6.01/ncat/ncat_main.c.noepoll nmap-6.01/ncat/ncat_main.c
+--- nmap-6.01/ncat/ncat_main.c.noepoll	2013-01-04 12:50:18.670295473 +0100
++++ nmap-6.01/ncat/ncat_main.c	2013-01-04 12:50:18.692295660 +0100
+@@ -280,6 +280,8 @@ int main(int argc, char *argv[])
+ #ifdef WIN32
+     windows_init();
+ #endif
++    
++    nsock_set_default_engine("select");
+ 
+     while (1) {
+         /* handle command line arguments */

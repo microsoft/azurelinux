@@ -1,0 +1,41 @@
+Compile AllOp together with other overlays.
+
+Author: Matus Honek <mhonek@redhat.com>
+Resolves: #1319782
+
+diff --git a/servers/slapd/overlays/Makefile.in b/servers/slapd/overlays/Makefile.in
+index b5c3fc8..9aa8a4f 100644
+--- a/servers/slapd/overlays/Makefile.in
++++ b/servers/slapd/overlays/Makefile.in
+@@ -38,7 +38,8 @@ SRCS = overlays.c \
+ 	translucent.c \
+ 	unique.c \
+ 	valsort.c \
+-	smbk5pwd.c
++	smbk5pwd.c \
++	allop.c
+ OBJS = statover.o \
+ 	@SLAPD_STATIC_OVERLAYS@ \
+ 	overlays.o
+@@ -58,7 +59,7 @@ NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+ UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+ 
+ LIBRARY = ../liboverlays.a
+-PROGRAMS = @SLAPD_DYNAMIC_OVERLAYS@ smbk5pwd.la
++PROGRAMS = @SLAPD_DYNAMIC_OVERLAYS@ smbk5pwd.la allop.la
+ 
+ XINCPATH = -I.. -I$(srcdir)/..
+ XDEFS = $(MODULES_CPPFLAGS)
+@@ -148,6 +149,12 @@ smbk5pwd.lo : smbk5pwd.c
+ smbk5pwd.la : smbk5pwd.lo
+ 	$(LTLINK_MOD) -module -o $@ smbk5pwd.lo version.lo $(LINK_LIBS) $(shell pkg-config openssl --libs)
+ 
++allop.lo : allop.c
++	$(LTCOMPILE_MOD) -DDO_SAMBA -UHAVE_MOZNSS -DHAVE_OPENSSL $(shell pkg-config openssl --cflags) $<
++
++allop.la : allop.lo
++	$(LTLINK_MOD) -module -o $@ allop.lo version.lo $(LINK_LIBS) $(shell pkg-config openssl --libs)
++
+ install-local:	$(PROGRAMS)
+ 	@if test -n "$?" ; then \
+ 		$(MKDIR) $(DESTDIR)$(moduledir); \

@@ -1,0 +1,25 @@
+From a47cd6fd89e913310bdca752ca6a69f53c140747 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 29 Aug 2024 16:21:45 +0200
+Subject: [PATCH] Port from rustix 0.37 to 0.38
+
+---
+ src/unix.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/unix.rs b/src/unix.rs
+index 59af979..0a3de13 100644
+--- a/src/unix.rs
++++ b/src/unix.rs
+@@ -6,7 +6,7 @@ use rustix::fd::BorrowedFd;
+ ///
+ /// If STDOUT is not a tty, returns `None`
+ pub fn terminal_size() -> Option<(Width, Height)> {
+-    terminal_size_using_fd(rustix::io::raw_stdout())
++    terminal_size_using_fd(rustix::stdio::raw_stdout())
+ }
+ 
+ /// Returns the size of the terminal using the given file descriptor, if available.
+-- 
+2.46.0
+

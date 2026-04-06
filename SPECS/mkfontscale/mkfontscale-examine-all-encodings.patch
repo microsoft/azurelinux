@@ -1,0 +1,13 @@
+diff --git ./mkfontscale.c ../mkfontscale.c
+index 21fccffea612..a7bbaf852d67 100644
+--- ./mkfontscale.c
++++ ../mkfontscale.c
+@@ -341,7 +341,7 @@ getName(FT_Face face, int nid)
+     FT_SfntName name;
+ 
+     if (getNameHelper(face, nid,
+-                      TT_PLATFORM_MICROSOFT, TT_MS_ID_UNICODE_CS, &name) ||
++                      TT_PLATFORM_MICROSOFT, -1, &name) ||
+         getNameHelper(face, nid, TT_PLATFORM_APPLE_UNICODE, -1, &name)) {
+         unsigned int i;
+         char *string = malloc(name.string_len / 2 + 1);

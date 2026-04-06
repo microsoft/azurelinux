@@ -1,0 +1,33 @@
+diff -upr less-458_orig/lessecho.c less-458_work/lessecho.c
+--- less-458_orig/lessecho.c	2013-05-07 14:03:52.091104655 +0200
++++ less-458_work/lessecho.c	2013-05-07 11:21:10.883991862 +0200
+@@ -41,7 +41,27 @@ static int num_metachars = 0;
+ static void pr_usage(void)
+ {
+ 	fprintf(stderr,
+-		"usage: lessecho [-ox] [-cx] [-pn] [-dn] [-mx] [-nn] [-ex] [-fn] [-a] file ...\n");
++		"usage: lessecho [-ox] [-cx] [-pn] [-dn] [-mx] [-nn] [-ex] [-fn] [-a] file ...\n\n");
++	fprintf(stderr,
++		"  -ox\t- specifies \"x\" to be the open quote character\n");
++	fprintf(stderr,
++		"  -cx\t- specifies \"x\" to be the close quote character\n");
++	fprintf(stderr,
++		"  -pn\t- specifies \"n\" to be the open quote character, as an integer\n");
++	fprintf(stderr,
++		"  -dn\t- specifies \"n\" to be the close quote character, as an integer\n");
++	fprintf(stderr,
++		"  -mx\t- specifies \"x\" to be a metachar\n");
++	fprintf(stderr,
++		"  -nn\t- specifies \"n\" to be a metachar, as an integer\n");
++	fprintf(stderr,
++		"  -ex\t- specifies \"x\" to be the escape char for metachars\n");
++	fprintf(stderr,
++		"  -fn\t- specifies \"n\" to be the escape char for metachars, as an integer\n");
++	fprintf(stderr,
++		"  -a\t- specifies that all arguments are to be quoted\n");
++	fprintf(stderr,
++		"  -?\t- prints this help\n");
+ }
+ 
+ static void pr_version(void)
+

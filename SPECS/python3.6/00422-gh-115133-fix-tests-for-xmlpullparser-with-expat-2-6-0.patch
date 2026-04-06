@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Serhiy Storchaka <storchaka@gmail.com>
+Date: Sun, 11 Feb 2024 12:08:39 +0200
+Subject: 00422: gh-115133: Fix tests for XMLPullParser with Expat 2.6.0
+
+Feeding the parser by too small chunks defers parsing to prevent
+CVE-2023-52425. Future versions of Expat may be more reactive.
+
+(cherry picked from commit 4a08e7b3431cd32a0daf22a33421cd3035343dc4)
+---
+ Lib/test/test_xml_etree.py                    | 58 ++++++++++++-------
+ ...-02-08-14-21-28.gh-issue-115133.ycl4ko.rst |  2 +
+ 2 files changed, 38 insertions(+), 22 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2024-02-08-14-21-28.gh-issue-115133.ycl4ko.rst
+
+diff --git a/Lib/test/test_xml_etree.py b/Lib/test/test_xml_etree.py
+index acaa519f42..2195eb9485 100644
+--- a/Lib/test/test_xml_etree.py
++++ b/Lib/test/test_xml_etree.py
+@@ -10,6 +10,7 @@ import html
+ import io
+ import operator
+ import pickle
++import pyexpat
+ import sys
+ import types
+ import unittest
+@@ -97,6 +98,10 @@ EXTERNAL_ENTITY_XML = """\
+ <document>&entity;</document>
+ """
+ 
++fails_with_expat_2_6_0 = (unittest.expectedFailure
++                        if pyexpat.version_info >= (2, 6, 0) else
++                        lambda test: test)
++
+ class ModuleTest(unittest.TestCase):
+     def test_sanity(self):
+         # Import sanity.
+@@ -1044,28 +1049,37 @@ class XMLPullParserTest(unittest.TestCase):
+         self.assertEqual([(action, elem.tag) for action, elem in events],
+                          expected)
+ 
+-    def test_simple_xml(self):
+-        for chunk_size in (None, 1, 5):
+-            with self.subTest(chunk_size=chunk_size):
+-                parser = ET.XMLPullParser()
+-                self.assert_event_tags(parser, [])
+-                self._feed(parser, "<!-- comment -->\n", chunk_size)
+-                self.assert_event_tags(parser, [])
+-                self._feed(parser,
+-                           "<root>\n  <element key='value'>text</element",
+-                           chunk_size)
+-                self.assert_event_tags(parser, [])
+-                self._feed(parser, ">\n", chunk_size)
+-                self.assert_event_tags(parser, [('end', 'element')])
+-                self._feed(parser, "<element>text</element>tail\n", chunk_size)
+-                self._feed(parser, "<empty-element/>\n", chunk_size)
+-                self.assert_event_tags(parser, [
+-                    ('end', 'element'),
+-                    ('end', 'empty-element'),
+-                    ])
+-                self._feed(parser, "</root>\n", chunk_size)
+-                self.assert_event_tags(parser, [('end', 'root')])
+-                self.assertIsNone(parser.close())
++    def test_simple_xml(self, chunk_size=None):
++        parser = ET.XMLPullParser()
++        self.assert_event_tags(parser, [])
++        self._feed(parser, "<!-- comment -->\n", chunk_size)
++        self.assert_event_tags(parser, [])
++        self._feed(parser,
++                   "<root>\n  <element key='value'>text</element",
++                   chunk_size)
++        self.assert_event_tags(parser, [])
++        self._feed(parser, ">\n", chunk_size)
++        self.assert_event_tags(parser, [('end', 'element')])
++        self._feed(parser, "<element>text</element>tail\n", chunk_size)
++        self._feed(parser, "<empty-element/>\n", chunk_size)
++        self.assert_event_tags(parser, [
++            ('end', 'element'),
++            ('end', 'empty-element'),
++            ])
++        self._feed(parser, "</root>\n", chunk_size)
++        self.assert_event_tags(parser, [('end', 'root')])
++        self.assertIsNone(parser.close())
++
++    @fails_with_expat_2_6_0
++    def test_simple_xml_chunk_1(self):
++        self.test_simple_xml(chunk_size=1)
++
++    @fails_with_expat_2_6_0
++    def test_simple_xml_chunk_5(self):
++        self.test_simple_xml(chunk_size=5)
++
++    def test_simple_xml_chunk_22(self):
++        self.test_simple_xml(chunk_size=22)
+ 
+     def test_feed_while_iterating(self):
+         parser = ET.XMLPullParser()
+diff --git a/Misc/NEWS.d/next/Library/2024-02-08-14-21-28.gh-issue-115133.ycl4ko.rst b/Misc/NEWS.d/next/Library/2024-02-08-14-21-28.gh-issue-115133.ycl4ko.rst
+new file mode 100644
+index 0000000000..6f1015235c
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2024-02-08-14-21-28.gh-issue-115133.ycl4ko.rst
+@@ -0,0 +1,2 @@
++Fix tests for :class:`~xml.etree.ElementTree.XMLPullParser` with Expat
++2.6.0.

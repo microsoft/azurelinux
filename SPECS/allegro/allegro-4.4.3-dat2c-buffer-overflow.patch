@@ -1,0 +1,32 @@
+tools/dat2c: Fix a buffer overlow
+
+When prefix is set and datafile_name is not set then
+strlen(prefix) + 6 bytes are necessary, not strlen(prefix) 5,
+because then we get: "$(prefix)_data\0" which requires 6 bytes
+extra for "_data\0".
+
+This fixes dat2c crashing like this:
+
+ dat2c mbdata.dat -o mbdata.c -h mbdata.h -p mb -g
+ *** buffer overflow detected ***: terminated
+ make: *** [Makefile:45: mbdata.c] Aborted (core dumped)
+
+When compiled with a recent gcc version + a high FORTIFY_SOURCE setting.
+
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2225996
+diff -up allegro-4.4.3.1/tools/dat2c.c~ allegro-4.4.3.1/tools/dat2c.c
+--- allegro-4.4.3.1/tools/dat2c.c~	2019-03-04 02:30:11.000000000 +0100
++++ allegro-4.4.3.1/tools/dat2c.c	2023-07-26 20:12:52.250765448 +0200
+@@ -1641,9 +1641,10 @@ int do_conversion(struct dat2c *dat2c)
+    int result = 0;
+    char *prefixed_name = 0;
+ 
+-   prefixed_name = malloc(5 +
++   /* 2 for '_' + '\0' */
++   prefixed_name = malloc(2 +
+       (dat2c->prefix ? (signed)strlen(dat2c->prefix) : 0) +
+-      (dat2c->datafile_name ? (signed)strlen(dat2c->datafile_name) : 0));
++      (dat2c->datafile_name ? (signed)strlen(dat2c->datafile_name) : 4));
+    if (!prefixed_name)
+       out_of_memory();
+    sprintf(prefixed_name, "%s%s%s",

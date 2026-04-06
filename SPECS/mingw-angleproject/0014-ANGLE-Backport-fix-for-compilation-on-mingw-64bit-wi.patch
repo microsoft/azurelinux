@@ -1,0 +1,35 @@
+From e7ff4aa4ef2221aa02d39bdead7f35008016994e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 26 Apr 2019 14:57:01 +0300
+Subject: [PATCH] ANGLE: Backport fix for compilation on mingw/64bit with clang
+
+This backports the following upstream fix from angle:
+https://github.com/google/angle/commit/63cc351fbad06c6241d1c7372fe76f74e1d09a10
+---
+ .../angle/src/common/third_party/smhasher/src/PMurHash.cpp     | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp b/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
+index 071bc31539..93b48713cd 100644
+--- a/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
++++ b/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
+@@ -49,6 +49,7 @@ on big endian machines, or a byte-by-byte read if the endianess is unknown.
+ 
+ 
+ #include "PMurHash.h"
++#include <stdint.h>
+ 
+ /* I used ugly type names in the header to avoid potential conflicts with
+  * application or system typedefs & defines. Since I'm not including any more
+@@ -208,7 +209,7 @@ void PMurHash32_Process(uint32_t *ph1, uint32_t *pcarry, const void *key, int le
+   /* This CPU does not handle unaligned word access */
+ 
+   /* Consume enough so that the next data byte is word aligned */
+-  int i = -(long)ptr & 3;
++  int i = -(intptr_t)ptr & 3;
+   if(i && i <= len) {
+       DOBYTES(i, h1, c, n, ptr, len);
+   }
+-- 
+2.20.1 (Apple Git-117)
+

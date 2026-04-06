@@ -1,0 +1,18 @@
+#!/usr/bin/sh
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" ] || [ "$RPM_BUILD_ROOT" = "/" ]; then
+	exit 0
+fi
+
+STRIP=${1:-strip}
+NCPUS=${RPM_BUILD_NCPUS:-1}
+
+case `uname -a` in
+Darwin*) exit 0 ;;
+*) ;;
+esac
+
+# Strip ELF binaries
+find "$RPM_BUILD_ROOT" -type f -name '*.[ao]' \! -regex "$RPM_BUILD_ROOT/*usr/lib/debug.*" -print0 | \
+  eu-elfclassify --not-program --not-library --not-linux-kernel-module --stdin0 --print0 | \
+  xargs -0 -r -P$NCPUS -n32 sh -c "$STRIP -p -R .gnu.lto_* -R .gnu.debuglto_* -R .llvm.lto -N __gnu_lto_v1 \"\$@\"" ARG0

@@ -1,0 +1,14 @@
+diff --git a/cassandane/utils/annotator.pl b/cassandane/utils/annotator.pl
+index 265c73f..8af3d58 100755
+--- a/cassandane/utils/annotator.pl
++++ b/cassandane/utils/annotator.pl
+@@ -140,6 +140,8 @@ GetOptions(
+ xlog "annotator $$ starting";
+ Cassandane::AnnotatorDaemon->run(
+         pid_file => $pidfile,
+-        port => $port
++	port => $port,
++	user => (getpwuid($<))[0],
++	group => (getgrgid($())[0],
+     );
+ xlog "annotator $$ exiting";

@@ -1,0 +1,14 @@
+--- jwalk-0.8.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jwalk-0.8.1/Cargo.toml	2023-07-18T11:53:50.694352+00:00
+@@ -43,10 +43,7 @@
+ version = "0.8"
+ 
+ [dependencies.rayon]
+-version = "1.5"
+-
+-[dev-dependencies.criterion]
+-version = "0.4.0"
++version = "1.6.1"
+ 
+ [dev-dependencies.fs_extra]
+ version = "1.2"

@@ -1,0 +1,20 @@
+--- serial_test-2.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ serial_test-2.0.0/Cargo.toml	2024-03-22T21:00:18.151671+00:00
+@@ -34,10 +34,6 @@
+ 
+ [dependencies.dashmap]
+ version = "5"
+-
+-[dependencies.document-features]
+-version = "0.2"
+-optional = true
+ 
+ [dependencies.fslock]
+ version = "0.2"
+@@ -81,6 +77,5 @@
+     "logging",
+     "async",
+ ]
+-docsrs = ["document-features"]
+ file_locks = ["fslock"]
+ logging = ["log"]

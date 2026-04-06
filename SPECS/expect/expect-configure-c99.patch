@@ -1,0 +1,200 @@
+Avoid calling exit without declaring the function.
+
+Add missing <string.h> include for memcpy.
+
+Use AC_TYPE_SIGNAL to fix REARM_SIG check.  Add missing includes.
+
+Fix various implicit int return types of main.
+
+Submitted upstream here: <https://sourceforge.net/p/expect/patches/24/#6759>
+
+diff --git a/configure.in b/configure.in
+index 51558fa14d2bcf7e..055c88fbd8797eaa 100755
+--- a/configure.in
++++ b/configure.in
+@@ -452,7 +452,11 @@ AC_CHECK_FUNC(siglongjmp, AC_DEFINE(HAVE_SIGLONGJMP))
+ # because Unixware 2.0 handles it specially and refuses to compile
+ # autoconf's automatic test that is a call with no arguments
+ AC_MSG_CHECKING([for memcpy])
+-AC_TRY_LINK(,[
++AC_TRY_LINK([
++#ifdef HAVE_STRING_H
++#include <string.h>
++#endif
++],[
+ char *s1, *s2;
+ memcpy(s1,s2,0);
+ ],
+@@ -469,6 +473,7 @@ memcpy(s1,s2,0);
+ AC_MSG_CHECKING([if WNOHANG requires _POSIX_SOURCE])
+ AC_TRY_RUN([
+ #include <sys/wait.h>
++int
+ main() {
+ #ifndef WNOHANG
+ 	return 0;
+@@ -489,6 +494,7 @@ rm -rf wnohang
+ AC_TRY_RUN([
+ #include <stdio.h>
+ #include <sys/wait.h>
++int
+ main() {
+ #ifdef WNOHANG
+ 	FILE *fp = fopen("wnohang","w");
+@@ -527,16 +533,21 @@ else
+   AC_DEFINE(SELECT_MASK_TYPE, fd_set)
+ fi
+ 
+-dnl # Check for the data type of the function used in signal(). This
+-dnl # must be before the test for rearming.
+-dnl # echo checking return type of signal handlers
+-dnl AC_HEADER_EGREP([(void|sighandler_t).*signal], signal.h, retsigtype=void,AC_DEFINE(RETSIGTYPE, int) retsigtype=int)
++AC_TYPE_SIGNAL
+ 
+ # FIXME: check if alarm exists
+ AC_MSG_CHECKING([if signals need to be re-armed])
+ AC_TRY_RUN([
+ #include <signal.h>
+-#define RETSIGTYPE $retsigtype
++#ifdef HAVE_STDLIB_H
++# include <stdlib.h>
++#endif
++#ifdef HAVE_UNISTD_H
++# include <unistd.h>
++#endif
++#ifndef NO_SYS_WAIT_H
++# include <sys/wait.h>
++#endif
+ 
+ int signal_rearms = 0;
+ 
+@@ -553,6 +564,7 @@ int n;
+ signal_rearms++;
+ }
+ 
++int
+ main()
+ {
+ 	signal(SIGINT,parent_sigint_handler);
+@@ -714,10 +726,11 @@ fi
+ AC_MSG_CHECKING([for struct sgttyb])
+ AC_TRY_RUN([
+ #include <sgtty.h>
++int
+ main()
+ {
+   struct sgttyb tmp;
+-  exit(0);
++  return 0;
+ }],
+         AC_MSG_RESULT(yes)
+         AC_DEFINE(HAVE_SGTTYB)
+@@ -738,10 +751,11 @@ if test $mach -eq 0 ; then
+   # pty_termios.c is set up to handle pty_termio.
+   AC_MSG_CHECKING([for struct termio])
+   AC_TRY_RUN([#include <termio.h>
++  int
+   main()
+   {
+     struct termio tmp;
+-    exit(0);
++    return 0;
+   }],
+         AC_DEFINE(HAVE_TERMIO)
+         PTY_TYPE=termios
+@@ -760,10 +774,11 @@ if test $mach -eq 0 ; then
+ #  include <inttypes.h>
+ #  endif
+ #  include <termios.h>
++  int
+   main()
+   {
+     struct termios tmp;
+-    exit(0);
++    return 0;
+   }],
+         AC_DEFINE(HAVE_TERMIOS)
+         PTY_TYPE=termios
+@@ -782,6 +797,7 @@ AC_TRY_RUN([
+ #include <inttypes.h>
+ #endif
+ #include <termios.h>
++int
+ main() {
+ #if defined(TCGETS) || defined(TCGETA)
+ 	return 0;
+@@ -804,6 +820,7 @@ AC_TRY_RUN([
+ #include <inttypes.h>
+ #endif
+ #include <termios.h>
++int
+ main() {
+ #ifdef TIOCGWINSZ
+ 	return 0;
+@@ -823,6 +840,7 @@ main() {
+ AC_MSG_CHECKING([for Cray-style ptys])
+ SETUID=":"
+ AC_TRY_RUN([
++int
+ main(){
+ #ifdef CRAY
+ 	return 0;
+@@ -878,12 +896,13 @@ AC_MSG_CHECKING([for SV-style timezone])
+ AC_TRY_RUN([
+ extern char *tzname[2];
+ extern int daylight;
++int
+ main()
+ {
+   int *x = &daylight;
+   char **y = tzname;
+ 
+-  exit(0);
++  return 0;
+ }],
+ 	AC_DEFINE(HAVE_SV_TIMEZONE)
+ 	AC_MSG_RESULT(yes),
+diff --git a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+index 0689cab3da994068..ebe839e5553ba520 100644
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -2400,7 +2400,7 @@ AC_DEFUN([TEA_TIME_HANDLER], [
+ 	AC_TRY_COMPILE([#include <time.h>],
+ 	    [extern long timezone;
+ 	    timezone += 1;
+-	    exit (0);],
++	    return 0;],
+ 	    tcl_cv_timezone_long=yes, tcl_cv_timezone_long=no)])
+     if test $tcl_cv_timezone_long = yes ; then
+ 	AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])
+@@ -2412,7 +2412,7 @@ AC_DEFUN([TEA_TIME_HANDLER], [
+ 	    AC_TRY_COMPILE([#include <time.h>],
+ 		[extern time_t timezone;
+ 		timezone += 1;
+-		exit (0);],
++		return 0;],
+ 		tcl_cv_timezone_time=yes, tcl_cv_timezone_time=no)])
+ 	if test $tcl_cv_timezone_time = yes ; then
+ 	    AC_DEFINE(HAVE_TIMEZONE_VAR, 1, [Should we use the global timezone variable?])
+@@ -2452,17 +2452,17 @@ AC_DEFUN([TEA_BUGGY_STRTOD], [
+ 		    double value;
+ 		    value = strtod(infString, &term);
+ 		    if ((term != infString) && (term[-1] == 0)) {
+-			exit(1);
++			return 1;
+ 		    }
+ 		    value = strtod(nanString, &term);
+ 		    if ((term != nanString) && (term[-1] == 0)) {
+-			exit(1);
++			return 1;
+ 		    }
+ 		    value = strtod(spaceString, &term);
+ 		    if (term == (spaceString+1)) {
+-			exit(1);
++			return 1;
+ 		    }
+-		    exit(0);
++		    return 0;
+ 		}], tcl_cv_strtod_buggy=ok, tcl_cv_strtod_buggy=buggy,
+ 		    tcl_cv_strtod_buggy=buggy)])
+ 	if test "$tcl_cv_strtod_buggy" = buggy; then

@@ -1,0 +1,50 @@
+From 72ee29639c55b5942bc07c8ed0013005f8fc5a97 Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Wed, 8 Apr 2015 07:14:10 -0400
+Subject: [PATCH 2/2] Fix tracing multi-threaded processes without -f
+
+- In handle_syscall, we avoid touching stack of ignored processes.
+  But in handle_sysret, we require a sysret-like stack entry even
+  for ignored processes, even though we then go ahead to not act
+  on that stack entry.  Instead, for ignored processes, avoid looking
+  at stack trace at all.
+---
+ handle_event.c                          | 10 +++++-----
+ testsuite/ltrace.main/main-threaded.exp |  1 +
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/handle_event.c b/handle_event.c
+index 6fa7e98..c2550ad 100644
+--- a/handle_event.c
++++ b/handle_event.c
+@@ -619,12 +619,12 @@ handle_x_sysret(Event *event, char *(*name_cb)(struct process *, int))
+ 	debug(DEBUG_FUNCTION, "handle_x_sysret(pid=%d, sysnum=%d)",
+ 	      event->proc->pid, event->e_un.sysnum);
+ 
+-	unsigned d = event->proc->callstack_depth;
+-	assert(d > 0);
+-	struct callstack_element *elem = &event->proc->callstack[d - 1];
+-	assert(elem->is_syscall);
+-
+ 	if (event->proc->state != STATE_IGNORED) {
++		unsigned d = event->proc->callstack_depth;
++		assert(d > 0);
++		struct callstack_element *elem = &event->proc->callstack[d - 1];
++		assert(elem->is_syscall);
++
+ 		struct timedelta spent = calc_time_spent(elem->enter_time);
+ 		if (options.syscalls)
+ 			output_syscall_right(event->proc,
+diff --git a/testsuite/ltrace.main/main-threaded.exp b/testsuite/ltrace.main/main-threaded.exp
+index cead82d..aca7afd 100644
+--- a/testsuite/ltrace.main/main-threaded.exp
++++ b/testsuite/ltrace.main/main-threaded.exp
+@@ -60,5 +60,6 @@ set bin [ltraceCompile {} $libprint -lpthread [ltraceSource c {
+ }]]
+ 
+ ltraceMatch1 [ltraceRun -f -l libprint.so -- $bin] {print\(} == 30
++ltraceMatch1 [ltraceRun -L -- $bin] exited == 1
+ 
+ ltraceDone
+-- 
+2.1.0

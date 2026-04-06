@@ -1,0 +1,54 @@
+--- notify-6.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ notify-6.1.1/Cargo.toml	2025-12-26T19:37:12.320002+00:00
+@@ -69,20 +69,12 @@
+     "macos_fsevent",
+     "crossbeam-channel",
+ ]
+-macos_fsevent = ["fsevent-sys"]
++macos_fsevent = []
+ macos_kqueue = [
+-    "kqueue",
+     "mio",
+ ]
+ manual_tests = []
+ timing_tests = []
+-
+-[target."cfg(any(target_os=\"freebsd\", target_os=\"openbsd\", target_os = \"netbsd\", target_os = \"dragonflybsd\"))".dependencies.kqueue]
+-version = "^1.0.4"
+-
+-[target."cfg(any(target_os=\"freebsd\", target_os=\"openbsd\", target_os = \"netbsd\", target_os = \"dragonflybsd\"))".dependencies.mio]
+-version = "0.8"
+-features = ["os-ext"]
+ 
+ [target."cfg(any(target_os=\"linux\", target_os=\"android\"))".dependencies.inotify]
+ version = "0.9"
+@@ -92,29 +84,3 @@
+ version = "0.8"
+ features = ["os-ext"]
+ 
+-[target."cfg(target_os=\"macos\")".dependencies.bitflags]
+-version = "2.3.0"
+-
+-[target."cfg(target_os=\"macos\")".dependencies.fsevent-sys]
+-version = "4"
+-optional = true
+-
+-[target."cfg(target_os=\"macos\")".dependencies.kqueue]
+-version = "1.0"
+-optional = true
+-
+-[target."cfg(target_os=\"macos\")".dependencies.mio]
+-version = "0.8"
+-features = ["os-ext"]
+-optional = true
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.48.0"
+-features = [
+-    "Win32_System_Threading",
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-    "Win32_Security",
+-    "Win32_System_WindowsProgramming",
+-    "Win32_System_IO",
+-]

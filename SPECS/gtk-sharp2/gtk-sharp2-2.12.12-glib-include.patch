@@ -1,0 +1,24 @@
+--- gtk-sharp-2.12.22/glib/glue/thread.c.orig	2015-05-19 01:31:33.935397399 +0100
++++ gtk-sharp-2.12.22/glib/glue/thread.c	2015-05-19 01:32:13.455087547 +0100
+@@ -19,21 +19,13 @@
+  * Boston, MA 02111-1307, USA.
+  */
+ 
+-#ifdef DISABLE_GTHREAD_CHECK
+ #include <glib.h>
+-#else
+-#include <glib/gthread.h>
+-#endif
+ 
+ gboolean glibsharp_g_thread_supported (void);
+ 
+ gboolean
+ glibsharp_g_thread_supported ()
+ {
+-#ifdef DISABLE_GTHREAD_CHECK
+-	return TRUE;
+-#else
+ 	return g_thread_supported ();
+-#endif
+ }
+ 

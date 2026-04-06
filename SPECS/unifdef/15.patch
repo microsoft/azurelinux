@@ -1,0 +1,91 @@
+From 9791614057fe7fc72babd78708fdd07857fef9cf Mon Sep 17 00:00:00 2001
+From: Martin Liska <mliska@suse.cz>
+Date: Wed, 10 Aug 2022 10:06:55 +0200
+Subject: [PATCH] Fix fgets(..., size=1)
+
+I noticed the following 2 tests are failing with -O1
+-D_FORTIFY_SOURCE=1:
+
+[   44s] FAILED: whitespace-1.out: unifdef -DFOO whitespace.c
+[   44s] FAILED: whitespace-2.out: unifdef -DBAR whitespace.c
+
+It's caused by fact that:
+
+fgets returns '\0' if n == 1:
+
+char *
+_IO_fgets (char *buf, int n, FILE *fp)
+{
+  size_t count;
+  char *result;
+  int old_error;
+  CHECK_FILE (fp, NULL);
+  if (n <= 0)
+    return NULL;
+  if (__glibc_unlikely (n == 1))
+    {
+      /* Another irregular case: since we have to store a NUL byte and
+	 there is only room for exactly one byte, we don't have to
+	 read anything.  */
+      buf[0] = '\0';
+      return buf;
+    }
+---
+ tests/whitespace-1.experr | 2 --
+ tests/whitespace-1.expout | 5 +++++
+ tests/whitespace-1.exprc  | 2 +-
+ tests/whitespace-2.expout | 3 ++-
+ unifdef.c                 | 3 ++-
+ 5 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/tests/whitespace-1.experr b/tests/whitespace-1.experr
+index cb23fce..e69de29 100644
+--- a/tests/whitespace-1.experr
++++ b/tests/whitespace-1.experr
+@@ -1,2 +0,0 @@
+-unifdef: whitespace.c: 4: Obfuscated preprocessor control line (#if line 1 depth 1)
+-unifdef: Output may be truncated
+diff --git a/tests/whitespace-1.expout b/tests/whitespace-1.expout
+index 257cc56..14dd150 100644
+--- a/tests/whitespace-1.expout
++++ b/tests/whitespace-1.expout
+@@ -1 +1,6 @@
+ foo
++                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //spong
++
++#ifdef BAR
++bar
++#endif
+diff --git a/tests/whitespace-1.exprc b/tests/whitespace-1.exprc
+index 0cfbf08..d00491f 100644
+--- a/tests/whitespace-1.exprc
++++ b/tests/whitespace-1.exprc
+@@ -1 +1 @@
+-2
++1
+diff --git a/tests/whitespace-2.expout b/tests/whitespace-2.expout
+index 84cabfe..43f6399 100644
+--- a/tests/whitespace-2.expout
++++ b/tests/whitespace-2.expout
+@@ -1,5 +1,6 @@
+ #ifdef FOO
+ foo
+-#endif                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        //spong
++#endif                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
++                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //spong
+ 
+ bar
+diff --git a/unifdef.c b/unifdef.c
+index dc145a2..b7335aa 100644
+--- a/unifdef.c
++++ b/unifdef.c
+@@ -846,7 +846,8 @@ parseline(void)
+ 	   newline or if there is too much whitespace in a directive */
+ 	if (linestate == LS_HASH) {
+ 		long len = cp - tline;
+-		if (fgets(tline + len, MAXLINE - len, input) == NULL) {
++		const char *line = fgets(tline + len, MAXLINE - len, input);
++		if (line == NULL || *line == '\0') {
+ 			if (ferror(input))
+ 				err(2, "can't read %s", filename);
+ 			debug("parser insert newline at EOF", linenum);

@@ -1,0 +1,10 @@
+--- console-0.16.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ console-0.16.2/Cargo.toml	2026-01-01T16:11:34.758899+00:00
+@@ -77,7 +77,6 @@
+ features = [
+     "std",
+     "bit-set",
+-    "break-dead-code",
+ ]
+ default-features = false
+ 

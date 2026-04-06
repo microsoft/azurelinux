@@ -1,0 +1,81 @@
+diff -urN hdparm-9.54/fibmap.c hdparm-9.54_patched/fibmap.c
+--- hdparm-9.54/fibmap.c	2016-10-13 01:50:52.000000000 +0200
++++ hdparm-9.54_patched/fibmap.c	2018-10-04 12:17:39.630627349 +0200
+@@ -232,6 +232,7 @@
+ 	if (fstat(fd, &st) == -1) {
+ 		err = errno;
+ 		perror(file_name);
++		close(fd);
+ 		return err;
+ 	}
+ 	if (!S_ISREG(st.st_mode)) {
+diff -urN hdparm-9.54/fwdownload.c hdparm-9.54_patched/fwdownload.c
+--- hdparm-9.54/fwdownload.c	2017-12-06 13:41:40.000000000 +0100
++++ hdparm-9.54_patched/fwdownload.c	2018-10-04 12:19:23.819336125 +0200
+@@ -95,12 +95,19 @@
+ 	int xfer_min = 1, xfer_max = 0xffff, xfer_size;
+ 	ssize_t offset;
+ 
+-	if ((fwfd = open(fwpath, O_RDONLY)) == -1 || fstat(fwfd, &st) == -1) {
++	if ((fwfd = open(fwpath, O_RDONLY)) == -1) {
+ 		err = errno;
+ 		perror(fwpath);
+ 		return err;
+ 	}
+ 
++	if (fstat(fwfd, &st) == -1) {
++		err = errno;
++		perror(fwpath);
++		close(fwfd);
++		return err;
++	}
++
+ 	if (!S_ISREG(st.st_mode)) {
+ 		fprintf(stderr, "%s: not a regular file\n", fwpath);
+ 		err = EINVAL;
+diff -urN hdparm-9.54/hdparm.c hdparm-9.54_patched/hdparm.c
+--- hdparm-9.54/hdparm.c	2018-02-03 19:10:40.000000000 +0100
++++ hdparm-9.54_patched/hdparm.c	2018-10-04 13:25:58.924126976 +0200
+@@ -590,6 +590,9 @@
+ 	printf("\n");
+ 	printf("\n * signifies the current active mode\n");
+ 	printf("\n");
++	free(fwrev);
++	free(model);
++	free(serno);
+ }
+ 
+ static const char *busstate_str (unsigned int value)
+@@ -1174,8 +1177,10 @@
+ 	if (!shortened)
+ 		fdevname = strdup("the full disk");
+ 
+-	if (start_lba == 0ULL)
++	if (start_lba == 0ULL) {
++		free(fdevname);
+ 		return 0;
++	}
+ 	if (start_lba == START_LBA_UNKNOWN || fd_is_raid(fd)) {
+ 		fprintf(stderr, "%s is a RAID device: please specify an absolute LBA of a raw member device instead (raid1 only)\n", devname);
+ 	} else if (msg) {
+@@ -1187,6 +1192,7 @@
+ 		fprintf(stderr, "The absolute LBA of sector %llu from %s should be %llu\n", lba, devname, start_lba + lba);
+ 	}
+ 	fprintf(stderr, "Aborting.\n");
++	free(fdevname);
+ 	exit(EINVAL);
+ }
+ 
+diff -urN hdparm-9.54/sysfs.c hdparm-9.54_patched/sysfs.c
+--- hdparm-9.54/sysfs.c	2018-10-04 12:14:29.900157666 +0200
++++ hdparm-9.54_patched/sysfs.c	2018-10-04 14:13:07.056659514 +0200
+@@ -60,8 +63,8 @@
+ 		}
+ 		if (count < 0)
+ 			err = errno;
+-		fclose(fp);
+ 	}
++	fclose(fp);
+ 	if (err && verbose) perror(path);
+ 	*pathtail = '\0';
+ 	return err;

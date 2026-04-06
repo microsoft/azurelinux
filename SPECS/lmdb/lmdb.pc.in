@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: liblmdb
+Description: Lightning Memory-mapped key-value database
+URL: http://symas.com/mdb/
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -llmdb
+Cflags: -I${includedir}

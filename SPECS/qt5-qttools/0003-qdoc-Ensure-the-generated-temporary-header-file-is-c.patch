@@ -1,0 +1,48 @@
+From fa40a2d3373b89be0cd0a43fe0c1d047e3d34058 Mon Sep 17 00:00:00 2001
+From: Topi Reinio <topi.reinio@qt.io>
+Date: Mon, 16 Jan 2023 09:31:24 +0000
+Subject: [PATCH 3/3] qdoc: Ensure the generated temporary header file is
+ closed properly
+
+Use the correct scope for the QFile object used for writing the
+temporary header file; this ensures that the associated QTextStream
+object is destroyed first and its contents flushed before destroying
+the QFile, potentially leading to truncated writes to the file.
+
+Pick-to: 6.5 6.4 6.2 5.15
+Done-with: Simon Geisseler
+Fixes: QTBUG-109614
+Change-Id: Ic6a68c0b52219ce607a5116c730862ee0cb37f04
+Reviewed-by: Luca Di Sera <luca.disera@qt.io>
+(cherry picked from commit 0d8837c4103f941297adc3c76cb0ae6f67b6e34b)
+---
+ src/qdoc/clangcodeparser.cpp | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/qdoc/clangcodeparser.cpp b/src/qdoc/clangcodeparser.cpp
+index 539a603da..a41b99cec 100644
+--- a/src/qdoc/clangcodeparser.cpp
++++ b/src/qdoc/clangcodeparser.cpp
+@@ -1395,8 +1395,7 @@ void ClangCodeParser::buildPCH()
+             args_.push_back("-xc++");
+             CXTranslationUnit tu;
+             QString tmpHeader = pchFileDir_->path() + "/" + module;
+-            QFile tmpHeaderFile(tmpHeader);
+-            if (tmpHeaderFile.open(QIODevice::Text | QIODevice::WriteOnly)) {
++            { QFile tmpHeaderFile(tmpHeader); if (tmpHeaderFile.open(QIODevice::Text | QIODevice::WriteOnly)) {
+                 QTextStream out(&tmpHeaderFile);
+                 if (header.isEmpty()) {
+                     for (auto it = allHeaders_.constKeyValueBegin();
+@@ -1421,8 +1420,7 @@ void ClangCodeParser::buildPCH()
+                             out << line << "\n";
+                     }
+                 }
+-                tmpHeaderFile.close();
+-            }
++            } }
+             if (printParsingErrors_ == 0)
+                 qCWarning(lcQdoc) << "clang not printing errors; include paths were guessed";
+             CXErrorCode err =
+-- 
+2.51.1
+

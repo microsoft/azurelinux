@@ -1,0 +1,13 @@
+[Unit]
+Description=One-time temporary TLS key generation for httpd.service
+Documentation=man:httpd-init.service(8)
+
+ConditionPathExists=|!/etc/pki/tls/certs/localhost.crt
+ConditionPathExists=|!/etc/pki/tls/private/localhost.key
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+PrivateTmp=true
+
+ExecStart=/usr/libexec/httpd-ssl-gencerts

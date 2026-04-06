@@ -1,0 +1,32 @@
+--- ring-0.17.14/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ring-0.17.14/Cargo.toml	2025-03-27T20:40:55.016783+00:00
+@@ -253,24 +253,8 @@
+ version = "1.2.8"
+ default-features = false
+ 
+-[target.'cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_os = "windows"))'.dependencies.windows-sys]
+-version = "0.52"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Threading",
+-]
+-
+-[target.'cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_vendor = "apple", any(target_os = "ios", target_os = "macos", target_os = "tvos", target_os = "visionos", target_os = "watchos")))'.dependencies.libc]
+-version = "0.2.155"
+-default-features = false
+-
+ [target.'cfg(all(any(all(target_arch = "aarch64", target_endian = "little"), all(target_arch = "arm", target_endian = "little")), any(target_os = "android", target_os = "linux")))'.dependencies.libc]
+ version = "0.2.148"
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.37"
+-features = ["std"]
+ default-features = false
+ 
+ [target.'cfg(any(unix, windows, target_os = "wasi"))'.dev-dependencies.libc]
+@@ -292,3 +276,4 @@
+ debug = 0
+ debug-assertions = false
+ rpath = false
++

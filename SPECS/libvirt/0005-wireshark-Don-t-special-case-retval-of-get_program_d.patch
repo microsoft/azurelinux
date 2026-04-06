@@ -1,0 +1,46 @@
+From 1086888f95a322101f8cf53b63c96600ccbeb882 Mon Sep 17 00:00:00 2001
+Message-ID: <1086888f95a322101f8cf53b63c96600ccbeb882.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Fri, 10 Oct 2025 19:16:54 +0200
+Subject: [PATCH 5/8] wireshark: Don't special case retval of
+ get_program_data() in dissect_libvirt_message()
+Content-type: text/plain
+
+The get_program_data() function returns a pointer (in this
+specific case to an array of procedure strings) which, if
+non-NULL is then passed val_to_str(). Well, if val_to_str() sees
+NULL it is treated gracefully, i.e. like if the numeric value
+'proc' wasn't found in the array.
+
+Therefore, there's no need to special case call to
+col_append_fstr(). Both result into the same behaviour.
+
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ tools/wireshark/src/packet-libvirt.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/tools/wireshark/src/packet-libvirt.c b/tools/wireshark/src/packet-libvirt.c
+index af14c6bed7..6c729801d4 100644
+--- a/tools/wireshark/src/packet-libvirt.c
++++ b/tools/wireshark/src/packet-libvirt.c
+@@ -469,11 +469,7 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+                  val_to_str(prog, program_strings, "%x"));
+ 
+     vs = get_program_data(prog, VIR_PROGRAM_PROCSTRINGS);
+-    if (vs == NULL) {
+-        col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%d", proc);
+-    } else {
+-        col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", val_to_str(proc, vs, "%d"));
+-    }
++    col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", val_to_str(proc, vs, "%d"));
+ 
+     col_append_fstr(pinfo->cinfo, COL_INFO, " Type=%s Serial=%u Status=%s",
+                     val_to_str(type, type_strings, "%d"), serial,
+-- 
+2.51.0
+

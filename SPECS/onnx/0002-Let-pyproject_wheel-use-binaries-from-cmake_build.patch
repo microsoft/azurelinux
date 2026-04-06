@@ -1,0 +1,33 @@
+From 75e1082f2d17c2c2ccb3c38b429fa24a4b45bbea Mon Sep 17 00:00:00 2001
+From: Alejandro Alvarez Ayllon <a.alvarezayllon@gmail.com>
+Date: Sat, 24 Feb 2024 14:53:10 +0100
+Subject: [PATCH 3/4] Let pyproject_wheel use binaries from cmake_build
+
+---
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 7d2cb9e50..af9049a1e 100644
+--- a/setup.py
++++ b/setup.py
+@@ -27,7 +27,7 @@ import setuptools.command.build_py
+ import setuptools.command.develop
+ 
+ TOP_DIR = os.path.realpath(os.path.dirname(__file__))
+-CMAKE_BUILD_DIR = os.path.join(TOP_DIR, ".setuptools-cmake-build")
++CMAKE_BUILD_DIR = os.path.join(TOP_DIR, "redhat-linux-build")
+ 
+ WINDOWS = os.name == "nt"
+ 
+@@ -151,6 +151,7 @@ class CmakeBuild(setuptools.Command):
+         self.jobs = multiprocessing.cpu_count() if self.jobs is None else int(self.jobs)
+ 
+     def run(self):
++        return
+         os.makedirs(CMAKE_BUILD_DIR, exist_ok=True)
+ 
+         with cd(CMAKE_BUILD_DIR):
+-- 
+2.52.0
+

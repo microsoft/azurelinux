@@ -1,0 +1,11 @@
+--- glusterfs-11.0/configure.ac.orig	2023-02-07 08:27:06.663310072 -0500
++++ glusterfs-11.0/configure.ac	2023-02-07 08:27:56.012452316 -0500
+@@ -1319,7 +1319,7 @@
+ fi
+ 
+ GF_HOST_OS=""
+-GF_LDFLAGS="${GF_LDFLAGS} -rdynamic"
++GF_LDFLAGS="${GF_LDFLAGS} -rdynamic -fuse-ld=mold"
+ 
+ dnl see --with-libtirpc option check above, libtirpc(-devel) is required for
+ dnl ipv6-default

@@ -1,0 +1,29 @@
+From 842e6024a916025533ae73d8740f9445d4dc1de6 Mon Sep 17 00:00:00 2001
+Message-ID: <842e6024a916025533ae73d8740f9445d4dc1de6.1762376054.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Tue, 3 Jun 2025 16:41:35 +0200
+Subject: [PATCH] pdf_font: report font name in warning
+
+b835c7213 ("Bug 708512: Add some more sanity checks for font ascent/descent values", 2025-05-02)
+started to warn about bogus font params. Report the affected font to
+help users track down problems.
+---
+ source/pdf/pdf-font.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/pdf/pdf-font.c b/source/pdf/pdf-font.c
+index 5e3b8765d..533b39d93 100644
+--- a/source/pdf/pdf-font.c
++++ b/source/pdf/pdf-font.c
+@@ -1507,7 +1507,7 @@ pdf_load_font_descriptor(fz_context *ctx, pdf_document *doc, pdf_font_desc *font
+ 		fontdesc->descent < FZ_MAX_TRUSTWORTHY_DESCENT * 1000)
+ 	{
+ 		if (fontdesc->ascent != 0 || fontdesc->descent != 0)
+-			fz_warn(ctx, "bogus font ascent/descent values (%g / %g)", fontdesc->ascent, fontdesc->descent);
++			fz_warn(ctx, "bogus font ascent/descent values (%g / %g) in font %s", fontdesc->ascent, fontdesc->descent, fontdesc->font->name);
+ 		fontdesc->font->ascender = 0.8f;
+ 		fontdesc->font->descender = -0.2f;
+ 		fontdesc->font->ascdesc_src = FZ_ASCDESC_DEFAULT;
+-- 
+2.52.0.rc0.476.g3d3e2faed3
+

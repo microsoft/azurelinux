@@ -1,0 +1,5 @@
+# Options to cyrus-master
+CYRUSOPTIONS=""
+
+# Mailbox list dumps are rotated n times via cron.daily
+#ROTATE=6

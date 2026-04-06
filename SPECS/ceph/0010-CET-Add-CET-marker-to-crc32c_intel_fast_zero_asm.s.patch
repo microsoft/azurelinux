@@ -1,0 +1,27 @@
+From 1999108aeb1f6f93a19ea7bb64c6ae8b87d1b264 Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Thu, 20 Jan 2022 05:33:13 -0800
+Subject: [PATCH] CET: Add CET marker to crc32c_intel_fast_zero_asm.s
+
+Add .note.gnu.property section to crc32c_intel_fast_zero_asm.s to mark
+for IBT and SHSTK compatibility.
+---
+ src/common/crc32c_intel_fast_zero_asm.s | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/common/crc32c_intel_fast_zero_asm.s b/src/common/crc32c_intel_fast_zero_asm.s
+index 216ecf639f3..2e291d858f3 100644
+--- a/src/common/crc32c_intel_fast_zero_asm.s
++++ b/src/common/crc32c_intel_fast_zero_asm.s
+@@ -654,4 +654,8 @@ slversion crc32_iscsi_zero_00, 00,   02,  0014
+ %ifidn __OUTPUT_FORMAT__, elf64
+ ; inform linker that this doesn't require executable stack
+ section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
+ %endif
+-- 
+2.34.1
+

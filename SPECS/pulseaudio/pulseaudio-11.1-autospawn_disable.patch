@@ -1,0 +1,24 @@
+diff -up pulseaudio-11.1/src/pulse/client-conf.c.autospawn pulseaudio-11.1/src/pulse/client-conf.c
+--- pulseaudio-11.1/src/pulse/client-conf.c.autospawn	2018-03-01 15:52:25.304612437 -0600
++++ pulseaudio-11.1/src/pulse/client-conf.c	2018-03-01 15:56:17.643552698 -0600
+@@ -63,7 +63,7 @@ static const pa_client_conf default_conf
+     .cookie_from_x11_valid = false,
+     .cookie_file_from_application = NULL,
+     .cookie_file_from_client_conf = NULL,
+-    .autospawn = true,
++    .autospawn = false,
+     .disable_shm = false,
+     .disable_memfd = false,
+     .shm_size = 0,
+diff -up pulseaudio-11.1/src/pulse/client.conf.in.autospawn pulseaudio-11.1/src/pulse/client.conf.in
+--- pulseaudio-11.1/src/pulse/client.conf.in.autospawn	2016-08-23 07:50:10.000000000 -0500
++++ pulseaudio-11.1/src/pulse/client.conf.in	2018-03-01 15:56:01.201344622 -0600
+@@ -22,7 +22,7 @@
+ ; default-server =
+ ; default-dbus-server =
+ 
+-; autospawn = yes
++; autospawn = no 
+ ; daemon-binary = @PA_BINARY@
+ ; extra-arguments = --log-target=syslog
+ 

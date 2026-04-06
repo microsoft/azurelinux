@@ -1,0 +1,63 @@
+From 3d02ef3be17f37baf729e786a8f36af4982f70ad Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 10:52:16 +0100
+Subject: [PATCH 23/59] Add documentation for isolate_* options. Correct
+ default
+
+values of max_clients, max_per_ip.
+---
+ vsftpd.conf.5 | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index e242873..31d317f 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -652,6 +652,21 @@ change it with the setting
+ .BR xferlog_file .
+ 
+ Default: NO
++.TP
++.B isolate_network
++If enabled, use CLONE_NEWNET to isolate the untrusted processes so that
++they can't do arbitrary connect() and instead have to ask the privileged
++process for sockets (
++.BR port_promiscuous
++have to be disabled).
++
++Default: YES
++.TP
++.B isolate
++If enabled, use CLONE_NEWPID and CLONE_NEWIPC to isolate processes to their
++ipc and pid namespaces. So separated processes can not interact with each other.
++
++Default: YES
+ 
+ .SH NUMERIC OPTIONS
+ Below is a list of numeric options. A numeric option must be set to a non
+@@ -749,8 +764,9 @@ Default: 077
+ .B max_clients
+ If vsftpd is in standalone mode, this is the maximum number of clients which
+ may be connected. Any additional clients connecting will get an error message.
++The value 0 switches off the limit.
+ 
+-Default: 0 (unlimited)
++Default: 2000
+ .TP
+ .B max_login_fails
+ After this many login failures, the session is killed.
+@@ -760,9 +776,9 @@ Default: 3
+ .B max_per_ip
+ If vsftpd is in standalone mode, this is the maximum number of clients which
+ may be connected from the same source internet address. A client will get an
+-error message if they go over this limit.
++error message if they go over this limit. The value 0 switches off the limit.
+ 
+-Default: 0 (unlimited)
++Default: 50
+ .TP
+ .B pasv_max_port
+ The maximum port to allocate for PASV style data connections. Can be used to
+-- 
+2.14.4
+

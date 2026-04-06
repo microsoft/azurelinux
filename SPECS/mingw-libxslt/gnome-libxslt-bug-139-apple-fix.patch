@@ -1,0 +1,66 @@
+diff -rupN --no-dereference libxslt-v1.1.43/libxslt/functions.c libxslt-v1.1.43-new/libxslt/functions.c
+--- libxslt-v1.1.43/libxslt/functions.c	2025-03-12 18:38:02.000000000 +0100
++++ libxslt-v1.1.43-new/libxslt/functions.c	2026-01-13 13:44:59.587784444 +0100
+@@ -34,6 +34,7 @@
+ #include "numbersInternals.h"
+ #include "keys.h"
+ #include "documents.h"
++#include "transformInternals.h"
+ 
+ #ifdef WITH_XSLT_DEBUG
+ #define WITH_XSLT_DEBUG_FUNCTION
+@@ -125,7 +126,20 @@ xsltDocumentFunctionLoadDocument(xmlXPat
+ 	    /*
+ 	    * This selects the stylesheet's doc itself.
+ 	    */
+-	    doc = tctxt->style->doc;
++	    doc = xmlCopyDoc(tctxt->style->doc, 1);
++	    if (doc == NULL) {
++		xsltTransformError(tctxt, NULL, NULL,
++		    "document() : failed to copy style doc\n");
++		goto out_fragment;
++	    }
++	    xsltCleanupSourceDoc(doc); /* Remove psvi fields. */
++	    idoc = xsltNewDocument(tctxt, doc);
++	    if (idoc == NULL) {
++		xsltTransformError(tctxt, NULL, NULL,
++		    "document() : failed to create xsltDocument\n");
++		xmlFreeDoc(doc);
++		goto out_fragment;
++	    }
+ 	} else {
+             goto out_fragment;
+ 	}
+diff -rupN --no-dereference libxslt-v1.1.43/libxslt/transform.c libxslt-v1.1.43-new/libxslt/transform.c
+--- libxslt-v1.1.43/libxslt/transform.c	2025-03-12 18:38:02.000000000 +0100
++++ libxslt-v1.1.43-new/libxslt/transform.c	2026-01-13 13:44:59.588618646 +0100
+@@ -43,6 +43,7 @@
+ #include "xsltlocale.h"
+ #include "pattern.h"
+ #include "transform.h"
++#include "transformInternals.h"
+ #include "variables.h"
+ #include "numbersInternals.h"
+ #include "namespaces.h"
+@@ -5757,7 +5758,7 @@ xsltCountKeys(xsltTransformContextPtr ct
+  *
+  * Resets source node flags and ids stored in 'psvi' member.
+  */
+-static void
++void
+ xsltCleanupSourceDoc(xmlDocPtr doc) {
+     xmlNodePtr cur = (xmlNodePtr) doc;
+     void **psviPtr;
+diff -rupN --no-dereference libxslt-v1.1.43/libxslt/transformInternals.h libxslt-v1.1.43-new/libxslt/transformInternals.h
+--- libxslt-v1.1.43/libxslt/transformInternals.h	1970-01-01 01:00:00.000000000 +0100
++++ libxslt-v1.1.43-new/libxslt/transformInternals.h	2026-01-13 13:44:59.589319363 +0100
+@@ -0,0 +1,9 @@
++/*
++ * Summary: set of internal interfaces for the XSLT engine transformation part.
++ *
++ * Copy: See Copyright for the status of this software.
++ *
++ * Author: David Kilzer <ddkilzer@apple.com>
++ */
++
++void xsltCleanupSourceDoc(xmlDocPtr doc);

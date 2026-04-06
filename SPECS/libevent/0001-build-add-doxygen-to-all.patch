@@ -1,0 +1,26 @@
+From e3e7bb212ea17aa8a9d5a30163487342e6ebb350 Mon Sep 17 00:00:00 2001
+From: Azat Khuzhin <azat@libevent.org>
+Date: Tue, 11 Aug 2020 02:12:23 +0300
+Subject: [PATCH] build: add doxygen to all
+
+Fixes: 7e6c5fb4 ("build: do not try install doxygen man pages if they were not requested")
+Fixes: #1075
+Fixes: #886
+---
+ doxygen.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/doxygen.am b/doxygen.am
+index 53da8d24..1377aacd 100644
+--- a/doxygen.am
++++ b/doxygen.am
+@@ -53,5 +53,6 @@ uninstall-local:
+ 	rmdir "$(DESTDIR)$(htmldir)/" || true
+ 
+ doxygen: doxygen-doc
++all: doxygen
+ 
+ endif ENABLE_DOXYGEN
+-- 
+2.25.4
+

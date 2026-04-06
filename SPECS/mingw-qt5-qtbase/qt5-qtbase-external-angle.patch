@@ -1,0 +1,62 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/gui/gui.pro qtbase-everywhere-src-5.15.18-new/src/gui/gui.pro
+--- qtbase-everywhere-src-5.15.18/src/gui/gui.pro	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/gui/gui.pro	2025-11-07 14:10:21.890164256 +0100
+@@ -19,12 +19,6 @@ MODULE_PLUGIN_TYPES = \
+     imageformats \
+     egldeviceintegrations
+ 
+-# This is here only because the platform plugin is no module, obviously.
+-qtConfig(angle) {
+-    MODULE_AUX_INCLUDES = \
+-        \$\$QT_MODULE_INCLUDE_BASE/QtANGLE
+-}
+-
+ # Code coverage with TestCocoon
+ # The following is required as extra compilers use $$QMAKE_CXX instead of $(CXX).
+ # Without this, testcocoon.prf is read only after $$QMAKE_CXX is used by the
+@@ -36,6 +30,8 @@ testcocoon {
+ osx: LIBS_PRIVATE += -framework AppKit
+ darwin: LIBS_PRIVATE += -framework CoreGraphics
+ 
++win32:qtConfig(angle): LIBS_PRIVATE += -lGLESv2
++
+ CONFIG += simd optimize_full
+ 
+ include(accessible/accessible.pri)
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/gui/Qt5GuiConfigExtras.cmake.in qtbase-everywhere-src-5.15.18-new/src/gui/Qt5GuiConfigExtras.cmake.in
+--- qtbase-everywhere-src-5.15.18/src/gui/Qt5GuiConfigExtras.cmake.in	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/gui/Qt5GuiConfigExtras.cmake.in	2025-11-07 14:10:21.890424692 +0100
+@@ -2,9 +2,9 @@
+ !!IF !isEmpty(CMAKE_ANGLE_EGL_DLL_RELEASE)
+ 
+ !!IF isEmpty(CMAKE_INCLUDE_DIR_IS_ABSOLUTE)
+-set(Qt5Gui_EGL_INCLUDE_DIRS \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/$$CMAKE_INCLUDE_DIR/QtANGLE\")
++set(Qt5Gui_EGL_INCLUDE_DIRS \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/$$CMAKE_INCLUDE_DIR\")
+ !!ELSE
+-set(Qt5Gui_EGL_INCLUDE_DIRS \"$$CMAKE_INCLUDE_DIR/QtANGLE\")
++set(Qt5Gui_EGL_INCLUDE_DIRS \"$$CMAKE_INCLUDE_DIR\")
+ !!ENDIF
+ 
+ _qt5_Gui_check_file_exists(${Qt5Gui_EGL_INCLUDE_DIRS})
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/opengl/opengl.pro qtbase-everywhere-src-5.15.18-new/src/opengl/opengl.pro
+--- qtbase-everywhere-src-5.15.18/src/opengl/opengl.pro	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/opengl/opengl.pro	2025-11-07 14:10:21.890641262 +0100
+@@ -10,6 +10,7 @@ QMAKE_DOCS = $$PWD/doc/qtopengl.qdocconf
+ 
+ qtConfig(opengl): CONFIG += opengl
+ qtConfig(opengles2): CONFIG += opengles2
++win32:qtConfig(angle): LIBS_PRIVATE += -lGLESv2
+ 
+ HEADERS += qgl.h \
+            qgl_p.h \
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/plugins/platforms/windows/windows.pri qtbase-everywhere-src-5.15.18-new/src/plugins/platforms/windows/windows.pri
+--- qtbase-everywhere-src-5.15.18/src/plugins/platforms/windows/windows.pri	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/plugins/platforms/windows/windows.pri	2025-11-07 14:10:21.890875650 +0100
+@@ -4,6 +4,7 @@ LIBS += -lwinspool -limm32 -loleaut32
+ QT_FOR_CONFIG += gui
+ 
+ qtConfig(opengl):!qtConfig(opengles2):!qtConfig(dynamicgl): LIBS *= -lopengl32
++qtConfig(angle):LIBS += -lGLESv2 -lEGL
+ 
+ mingw: QMAKE_USE *= uuid
+ # For the dialog helpers:

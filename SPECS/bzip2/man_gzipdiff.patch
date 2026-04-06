@@ -1,0 +1,20 @@
+--- ./bzip2-1.0.8/bzip2.1	2019-07-13 19:50:05.000000000 +0200
++++ ./bzip2-1.0.8/bzip2.1.new	2021-01-29 11:51:04.091430407 +0100
+@@ -170,6 +170,17 @@
+ to try to recover data from
+ damaged files.
+ 
++Unlike 
++.I GNU gzip,
++.I bzip2 
++will not create a cascade of
++.I .bz2 
++suffixes even when using the 
++.I --force
++option:
++
++       filename.bz2    does not become   filename.bz2.bz2
++
+ Return values: 0 for a normal exit, 1 for environmental problems (file
+ not found, invalid flags, I/O errors, &c), 2 to indicate a corrupt
+ compressed file, 3 for an internal consistency error (eg, bug) which

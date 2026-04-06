@@ -1,0 +1,10 @@
+--- pyo3-0.23.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pyo3-0.23.5/Cargo.toml	2025-04-04T12:27:26.316546+00:00
+@@ -428,7 +428,6 @@
+     "serde",
+     "smallvec",
+ ]
+-generate-import-lib = ["pyo3-ffi/generate-import-lib"]
+ macros = [
+     "pyo3-macros",
+     "indoc",

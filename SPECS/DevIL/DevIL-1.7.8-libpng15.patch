@@ -1,0 +1,28 @@
+--- devil-1.7.8/src-IL/src/il_png.c.orig	2011-11-05 18:21:39.980007624 -0400
++++ devil-1.7.8/src-IL/src/il_png.c	2011-11-05 18:46:18.644000033 -0400
+@@ -278,7 +278,11 @@
+ 
+ 	// Expand low-bit-depth grayscale images to 8 bits
+ 	if (png_color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
++#if PNG_LIBPNG_VER > 10400
++		png_set_expand_gray_1_2_4_to_8(png_ptr);
++#else
+ 		png_set_gray_1_2_4_to_8(png_ptr);
++#endif
+ 	}
+ 
+ 	// Expand RGB images with transparency to full alpha channels
+--- devil-1.7.8/src-IL/src/il_icon.c.orig	2011-11-05 18:21:27.560000432 -0400
++++ devil-1.7.8/src-IL/src/il_icon.c	2011-11-05 18:46:44.626000535 -0400
+@@ -525,7 +525,11 @@
+ 
+ 	// Expand low-bit-depth grayscale images to 8 bits
+ 	if (ico_color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
++#if PNG_LIBPNG_VER > 10400
++		png_set_expand_gray_1_2_4_to_8(ico_png_ptr);
++#else
+ 		png_set_gray_1_2_4_to_8(ico_png_ptr);
++#endif
+ 	}
+ 
+ 	// Expand RGB images with transparency to full alpha channels

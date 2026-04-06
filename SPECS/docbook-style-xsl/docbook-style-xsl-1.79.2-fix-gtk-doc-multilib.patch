@@ -1,0 +1,74 @@
+diff -urN docbook-xsl-nons-1.79.2/fo/autoidx.xsl docbook-xsl-nons-1.79.2.new/fo/autoidx.xsl
+--- docbook-xsl-nons-1.79.2/fo/autoidx.xsl	2016-12-09 22:47:31.000000000 +0000
++++ docbook-xsl-nons-1.79.2.new/fo/autoidx.xsl	2021-01-15 13:20:25.144862117 +0000
+@@ -295,7 +295,8 @@
+   <fo:block>
+     <xsl:if test="$autolink.index.see != 0">
+       <xsl:attribute name="id">
+-        <xsl:value-of select="concat('ientry-', generate-id())"/>
++        <xsl:text>ientry-</xsl:text>
++        <xsl:call-template name="object.id"/>
+       </xsl:attribute>
+     </xsl:if>
+     <xsl:if test="$axf.extensions != 0">
+@@ -790,7 +791,10 @@
+ 
+   <xsl:variable name="linkend">
+     <xsl:if test="$seetarget">
+-      <xsl:value-of select="concat('ientry-', generate-id($seetarget))"/>
++      <xsl:text>ientry-</xsl:text>
++      <xsl:call-template name="object.id">
++        <xsl:with-param name="object" select="$seetarget"/>
++      </xsl:call-template>
+     </xsl:if>
+   </xsl:variable>
+   
+@@ -852,7 +856,10 @@
+ 
+     <xsl:variable name="linkend">
+       <xsl:if test="$seealsotarget">
+-        <xsl:value-of select="concat('ientry-', generate-id($seealsotarget))"/>
++        <xsl:text>ientry-</xsl:text>
++        <xsl:call-template name="object.id">
++          <xsl:with-param name="object" select="$seealsotarget"/>
++        </xsl:call-template>
+       </xsl:if>
+     </xsl:variable>
+ 
+diff -urN docbook-xsl-nons-1.79.2/html/autoidx.xsl docbook-xsl-nons-1.79.2.new/html/autoidx.xsl
+--- docbook-xsl-nons-1.79.2/html/autoidx.xsl	2016-12-09 22:47:30.000000000 +0000
++++ docbook-xsl-nons-1.79.2.new/html/autoidx.xsl	2021-01-15 13:20:25.145862128 +0000
+@@ -306,7 +306,8 @@
+     <xsl:if test="$autolink.index.see != 0">
+       <!-- add internal id attribute to form see and seealso links -->
+       <xsl:attribute name="id">
+-        <xsl:value-of select="concat('ientry-', generate-id())"/>
++        <xsl:text>ientry-</xsl:text>
++        <xsl:call-template name="object.id"/>
+       </xsl:attribute>
+     </xsl:if>
+     <xsl:for-each select="$refs/primary">
+@@ -729,7 +730,10 @@
+ 
+   <xsl:variable name="linkend">
+     <xsl:if test="$seetarget">
+-      <xsl:value-of select="concat('#ientry-', generate-id($seetarget))"/>
++      <xsl:text>#ientry-</xsl:text>
++      <xsl:call-template name="object.id">
++        <xsl:with-param name="object" select="$seetarget"/>
++      </xsl:call-template>
+     </xsl:if>
+   </xsl:variable>
+ 
+@@ -788,7 +792,10 @@
+ 
+     <xsl:variable name="linkend">
+       <xsl:if test="$seealsotarget">
+-        <xsl:value-of select="concat('#ientry-', generate-id($seealsotarget))"/>
++        <xsl:text>#ientry-</xsl:text>
++        <xsl:call-template name="object.id">
++          <xsl:with-param name="object" select="$seealsotarget"/>
++        </xsl:call-template>
+       </xsl:if>
+     </xsl:variable>
+ 

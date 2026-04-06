@@ -1,0 +1,20 @@
+*** Makefile.orig	Wed Jul 13 21:43:16 1994
+--- Makefile	Wed Dec 31 19:00:00 1969
+***************
+*** 15,22 ****
+  
+  ${LIBDB}: ${OBJ1} ${OBJ2} ${OBJ3} ${OBJ4} ${OBJ5} ${MISC}
+  	rm -f $@
+! 	ar cq $@ \
+! 	    `lorder ${OBJ1} ${OBJ2} ${OBJ3} ${OBJ4} ${OBJ5} ${MISC} | tsort`
+  	ranlib $@
+  
+  clean:
+--- 15,21 ----
+  
+  ${LIBDB}: ${OBJ1} ${OBJ2} ${OBJ3} ${OBJ4} ${OBJ5} ${MISC}
+  	rm -f $@
+! 	ar cq $@ ${OBJ1} ${OBJ2} ${OBJ3} ${OBJ4} ${OBJ5} ${MISC}
+  	ranlib $@
+  
+  clean:

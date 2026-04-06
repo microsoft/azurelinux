@@ -1,0 +1,10 @@
+--- GDCM-3.0.24/CMakeLists.txt
++++ GDCM-3.0.24/CMakeLists.txt
+@@ -335,6 +335,7 @@ mark_as_advanced(
+ option(GDCM_USE_SYSTEM_POPPLER "Use system poppler (pdf)" OFF)
+ if(GDCM_USE_SYSTEM_POPPLER)
+   find_package(Poppler REQUIRED)
++  set(CMAKE_CXX_STANDARD 20)
+ endif()
+ mark_as_advanced(GDCM_USE_SYSTEM_POPPLER)
+ 

@@ -1,0 +1,57 @@
+diff --git a/build.xml b/build.xml
+index 8542245..6179cfa 100644
+--- a/build.xml
++++ b/build.xml
+@@ -16,8 +16,8 @@
+ 
+ <property name="file" value=""/>
+ 
+-	<property name="ant.build.javac.target" value="1.6" />
+-	<property name="ant.build.javac.source" value="1.6" />
++	<property name="ant.build.javac.target" value="1.8" />
++	<property name="ant.build.javac.source" value="1.8" />
+ 	<property name="version" value="2.1.0"/>
+ 	<property name="deprecation" value="on"/>
+ 	<property name="Specification-Title" value="BeanShell" />
+@@ -178,8 +178,8 @@
+ 			debug="on"
+ 			includes="**/*.java"
+ 			excludes="${excludes},**/bak/**"
+-			source="1.6"
+-			target="1.6"
++			source="1.8"
++			target="1.8"
+ 		>
+ 			<classpath>
+ 				<fileset refid="lib-fileset"/>
+@@ -213,8 +213,8 @@
+ 			debug="on"
+ 			includes="**/*.java"
+ 			excludes="${excludes},**/bak/**"
+-			source="1.6"
+-			target="1.6"
++			source="1.8"
++			target="1.8"
+ 		>
+ 			<classpath>
+ 				<fileset refid="lib-fileset"/>
+@@ -255,7 +255,7 @@
+ 			 destdir="${javadoc-dir}"
+ 			 author="true"
+ 			 version="true"
+-			 source="1.6"
++			 source="1.8"
+ 			 use="true"
+ 			 windowtitle="BeanShell ${version}"
+ 			 doctitle="&lt;h1&gt;BeanShell ${version}&lt;h1&gt;"
+@@ -680,8 +680,8 @@
+ 				destdir="${build-dir}"
+ 				debug="on"
+ 				debuglevel="lines,vars,source"
+-				source="1.6"
+-				target="1.6"
++				source="1.8"
++				target="1.8"
+ 			  >
+ 		 <classpath>
+ 			<path refid="test-classpath"/>

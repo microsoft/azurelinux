@@ -1,0 +1,12 @@
+diff --git a/setup.py b/setup.py
+index 37a36e6..4d5bd64 100644
+--- a/setup.py
++++ b/setup.py
+@@ -37,7 +37,6 @@ extras_require = {
+         'pymysql',
+         'flake8>=2.4.0',
+         'isort>=4.2.2',
+-        'pyodbc',
+     ],
+     'babel': ['Babel>=1.3'],
+     'arrow': ['arrow>=0.3.4'],

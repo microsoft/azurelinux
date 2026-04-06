@@ -1,0 +1,76 @@
+--- compact_str-0.9.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ compact_str-0.9.0/Cargo.toml	2025-04-12T21:39:04.301047+00:00
+@@ -55,10 +55,6 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.borsh]
+-version = "1"
+-optional = true
+-
+ [dependencies.bytes]
+ version = "1"
+ optional = true
+@@ -71,18 +67,8 @@
+ [dependencies.cfg-if]
+ version = "1"
+ 
+-[dependencies.diesel]
+-version = "2"
+-optional = true
+-default-features = false
+-
+ [dependencies.itoa]
+ version = "1"
+-
+-[dependencies.markup]
+-version = "0.15"
+-optional = true
+-default-features = false
+ 
+ [dependencies.proptest]
+ version = "1"
+@@ -119,11 +105,6 @@
+ version = "1"
+ features = ["union"]
+ optional = true
+-
+-[dependencies.sqlx]
+-version = "0.8"
+-optional = true
+-default-features = false
+ 
+ [dependencies.static_assertions]
+ version = "1"
+@@ -169,31 +150,12 @@
+ 
+ [features]
+ arbitrary = ["dep:arbitrary"]
+-borsh = ["dep:borsh"]
+ bytes = ["dep:bytes"]
+ default = ["std"]
+-diesel = ["dep:diesel"]
+-markup = ["dep:markup"]
+ proptest = ["dep:proptest"]
+ quickcheck = ["dep:quickcheck"]
+ rkyv = ["dep:rkyv"]
+ serde = ["dep:serde"]
+ smallvec = ["dep:smallvec"]
+-sqlx = [
+-    "dep:sqlx",
+-    "std",
+-]
+-sqlx-mysql = [
+-    "sqlx",
+-    "sqlx/mysql",
+-]
+-sqlx-postgres = [
+-    "sqlx",
+-    "sqlx/postgres",
+-]
+-sqlx-sqlite = [
+-    "sqlx",
+-    "sqlx/sqlite",
+-]
+ std = []
+ zeroize = ["dep:zeroize"]

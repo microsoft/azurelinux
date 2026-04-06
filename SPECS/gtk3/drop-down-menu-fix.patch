@@ -1,0 +1,94 @@
+From a7fabc99d5e9c5d11d02b1eea55e4b4bb5b45bf8 Mon Sep 17 00:00:00 2001
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Mon, 6 Oct 2025 18:53:15 +0200
+Subject: [PATCH] gtkmenu: Await more motion events before deactivating on
+ release
+
+Under some circumstances, it is possible to get into situations where
+a GtkMenu is popped down immediately on button release even on short
+clicks. The circumstances that exhibit this behavior are:
+
+- The GtkMenu has to pop up underneath the pointer. E.g. comboboxes,
+  but not necessarily just that.
+- The compositor has to send a motion event between button press and
+  release. E.g. RDP and EIS do that, in order to ensure the button
+  release happens in the right coordinates. But this might as well
+  happen in other circumstances, input devices and compositors.
+
+This results in GtkMenu thinking that this motion event was triggered
+by user input, thus deeming it no longer necessary to keep the menu
+opened after a short press+release.
+
+While this behavior makes some sense, doing so on the first synthetic
+motion event received is a bit too eager, so fix this by expecting
+a (low) number of motion events before considering that an item was
+definitely selected. Fixes these quickly dismissing popups in
+comboboxes (and other places) when interacting through RDP.
+
+Part-of: <https://gitlab.gnome.org/GNOME/gtk/-/merge_requests/9022>
+---
+ gtk/gtkmenu.c        | 13 ++++++++++++-
+ gtk/gtkmenuprivate.h |  1 +
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/gtk/gtkmenu.c b/gtk/gtkmenu.c
+index 18bef6957da..500194929b9 100644
+--- a/gtk/gtkmenu.c
++++ b/gtk/gtkmenu.c
+@@ -154,6 +154,10 @@
+ #define MENU_POPUP_DELAY     225
+ #define MENU_POPDOWN_DELAY  1000
+ 
++#define N_MOTION_EVENTS 3 /* Expected motion events before
++                           * allowing to popdown on release
++                           */
++
+ #define ATTACH_INFO_KEY "gtk-menu-child-attach-info-key"
+ #define ATTACHED_MENUS "gtk-attached-menus"
+ 
+@@ -4051,6 +4055,7 @@ static gboolean
+ gtk_menu_motion_notify (GtkWidget      *widget,
+                         GdkEventMotion *event)
+ {
++  GtkMenuPrivate *priv;
+   GtkWidget *menu_item;
+   GtkMenu *menu;
+   GtkMenuShell *menu_shell;
+@@ -4090,8 +4095,12 @@ gtk_menu_motion_notify (GtkWidget      *widget,
+ 
+   menu_shell = GTK_MENU_SHELL (parent);
+   menu = GTK_MENU (menu_shell);
++  priv = menu->priv;
+ 
+-  if (definitely_within_item (menu_item, event->x, event->y))
++  priv->n_motion_events++;
++
++  if (priv->n_motion_events >= N_MOTION_EVENTS &&
++      definitely_within_item (menu_item, event->x, event->y))
+     menu_shell->priv->activate_time = 0;
+ 
+   need_enter = (gtk_menu_has_navigation_triangle (menu) || menu_shell->priv->ignore_enter);
+@@ -4468,6 +4477,8 @@ gtk_menu_enter_notify (GtkWidget        *widget,
+   source_device = gdk_event_get_source_device ((GdkEvent *) event);
+   menu_item = gtk_get_event_widget ((GdkEvent*) event);
+ 
++  GTK_MENU (widget)->priv->n_motion_events = 0;
++
+   if (GTK_IS_MENU (widget) &&
+       gdk_device_get_source (source_device) != GDK_SOURCE_TOUCHSCREEN)
+     {
+diff --git a/gtk/gtkmenuprivate.h b/gtk/gtkmenuprivate.h
+index 0918d83e7bf..36c9dd46ba3 100644
+--- a/gtk/gtkmenuprivate.h
++++ b/gtk/gtkmenuprivate.h
+@@ -87,6 +87,7 @@ struct _GtkMenuPrivate
+   gint scroll_offset;
+   gint saved_scroll_offset;
+   gint scroll_step;
++  gint n_motion_events;
+ 
+   guint scroll_timeout;
+ 
+-- 
+GitLab
+

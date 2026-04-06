@@ -1,0 +1,12 @@
+--- minizip-ng-4.0.7/mz_crypt_openssl.c.orig	2024-06-15 18:21:44.000000000 +0200
++++ minizip-ng-4.0.7/mz_crypt_openssl.c	2024-10-10 20:31:46.571833998 +0200
+@@ -12,7 +12,9 @@
+ #include "mz_crypt.h"
+ 
+ #include <openssl/err.h>
++#if !defined(OPENSSL_NO_ENGINE)
+ #include <openssl/engine.h>
++#endif
+ #include <openssl/rand.h>
+ #include <openssl/sha.h>
+ #include <openssl/aes.h>

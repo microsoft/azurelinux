@@ -1,0 +1,14 @@
+diff -rupN --no-dereference harfbuzz-11.5.1/src/hb-ot-cmap-table.hh harfbuzz-11.5.1-new/src/hb-ot-cmap-table.hh
+--- harfbuzz-11.5.1/src/hb-ot-cmap-table.hh	2025-09-22 18:58:28.000000000 +0200
++++ harfbuzz-11.5.1-new/src/hb-ot-cmap-table.hh	2026-01-17 10:47:11.543551452 +0100
+@@ -1679,6 +1679,10 @@ struct SubtableUnicodesCache {
+   {
+     SubtableUnicodesCache* cache =
+         (SubtableUnicodesCache*) hb_malloc (sizeof(SubtableUnicodesCache));
++
++    if (unlikely (!cache))
++      return nullptr;
++
+     new (cache) SubtableUnicodesCache (source_table);
+     return cache;
+   }

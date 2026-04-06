@@ -1,0 +1,16 @@
+diff -r -U5 libtool-2.4.6.old/tests/demo.at libtool-2.4.6/tests/demo.at
+--- libtool-2.4.6.old/tests/demo.at	2022-01-31 22:15:48.539557030 +0100
++++ libtool-2.4.6/tests/demo.at	2022-02-01 09:43:30.262092074 +0100
+@@ -508,11 +508,11 @@
+ ## ----------- ##
+ 
+ AT_SETUP([force non-PIC objects])
+ 
+ AT_CHECK([case $host in
+-hppa*|amd64*|x86_64*|s390*)
++hppa*|amd64*|x86_64*|s390*|arm*)
+   # These hosts cannot use non-PIC shared libs
+   exit 77 ;;
+ *-solaris*|*-sunos*)
+   # Libtool does not build non-PIC shared libs on these hosts
+   exit 77 ;;

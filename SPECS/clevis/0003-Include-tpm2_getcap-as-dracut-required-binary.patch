@@ -1,0 +1,36 @@
+From fc371d25a72806109e9a5c0205d67ba2232a6f17 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 20 Nov 2024 18:45:56 +0100
+Subject: [PATCH] Include tpm2_getcap as dracut required binary
+
+---
+ src/luks/dracut/clevis-pin-tpm2/module-setup.sh.in | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/luks/dracut/clevis-pin-tpm2/module-setup.sh.in b/src/luks/dracut/clevis-pin-tpm2/module-setup.sh.in
+index 5ff0640..723df7a 100755
+--- a/src/luks/dracut/clevis-pin-tpm2/module-setup.sh.in
++++ b/src/luks/dracut/clevis-pin-tpm2/module-setup.sh.in
+@@ -19,7 +19,8 @@
+ #
+ 
+ check() {
+-    require_binaries clevis-decrypt-tpm2 tpm2_createprimary tpm2_flushcontext tpm2_load tpm2_unseal || return 1
++    require_binaries clevis-decrypt-tpm2 tpm2_createprimary tpm2_flushcontext \
++        tpm2_load tpm2_unseal tpm2_pcrread tpm2_getcap || return 1
+     require_any_binary tpm2_pcrread tpm2_pcrlist || return 1
+     return 0
+ }
+@@ -30,7 +31,8 @@ depends() {
+ }
+ 
+ install() {
+-    inst_multiple clevis-decrypt-tpm2 tpm2_createprimary tpm2_flushcontext tpm2_load tpm2_unseal
++    inst_multiple clevis-decrypt-tpm2 tpm2_createprimary tpm2_flushcontext \
++        tpm2_load tpm2_unseal tpm2_getcap
+     inst_multiple -o tpm2_pcrread tpm2_pcrlist
+     inst_libdir_file "libtss2-tcti-device.so*"
+ }
+-- 
+2.47.0
+

@@ -1,0 +1,292 @@
+diff -up sqlite-2.8.17/main.mk.suse sqlite-2.8.17/main.mk
+--- sqlite-2.8.17/main.mk.suse	2019-04-10 13:58:27.732431498 -0400
++++ sqlite-2.8.17/main.mk	2019-04-10 13:58:44.004100000 -0400
+@@ -145,7 +145,7 @@ all:	sqlite.h config.h libsqlite.a sqlit
+ # of the most recently modified source code file
+ #
+ last_change:	$(SRC)
+-	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -1 \
++	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -n 1 \
+           | awk '{print $$5,$$6}' >last_change
+ 
+ libsqlite.a:	$(LIBOBJ)
+diff -up sqlite-2.8.17/Makefile.in.suse sqlite-2.8.17/Makefile.in
+--- sqlite-2.8.17/Makefile.in.suse	2019-04-10 13:56:27.446882088 -0400
++++ sqlite-2.8.17/Makefile.in	2019-04-10 13:58:22.316541835 -0400
+@@ -26,7 +26,7 @@ BCC = @BUILD_CC@ @BUILD_CFLAGS@
+ # will run on the target platform.  (BCC and TCC are usually the
+ # same unless your are cross-compiling.)
+ #
+-TCC = @TARGET_CC@ @TARGET_CFLAGS@ -I. -I${TOP}/src
++TCC = @TARGET_CC@ @TARGET_CFLAGS@ -I. -I${TOP}/src -DTHREADSAFE=1
+ 
+ # Some standard variables and programs
+ #
+@@ -184,7 +184,7 @@ Makefile: $(TOP)/Makefile.in
+ # of the most recently modified source code file
+ #
+ last_change:	$(SRC)
+-	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -1 \
++	cat $(SRC) | grep '$$Id: ' | sort +4 | tail -n 1 \
+           | awk '{print $$5,$$6}' >last_change
+ 
+ libsqlite.la:	$(LIBOBJ)
+@@ -365,7 +365,7 @@ tclsqlite:	tclsqlite-sh.lo libsqlite.la
+ testfixture@TARGET_EXEEXT@:	$(TOP)/src/tclsqlite.c libtclsqlite.la libsqlite.la $(TESTSRC)
+ 	$(LTLINK) $(TCL_FLAGS) -DTCLSH=1 -DSQLITE_TEST=1\
+                 -o testfixture $(TESTSRC) $(TOP)/src/tclsqlite.c \
+-		libtclsqlite.la libsqlite.la $(LIBTCL)
++		libtclsqlite.la libsqlite.la $(LIBTCL) -lpthread
+ 
+ fulltest:	testfixture@TARGET_EXEEXT@ sqlite@TARGET_EXEEXT@
+ 	./testfixture $(TOP)/test/all.test
+diff -up sqlite-2.8.17/src/attach.c.suse sqlite-2.8.17/src/attach.c
+--- sqlite-2.8.17/src/attach.c.suse	2019-04-10 13:58:52.066935738 -0400
++++ sqlite-2.8.17/src/attach.c	2019-04-10 13:59:35.179057409 -0400
+@@ -48,7 +48,7 @@ void sqliteAttach(Parse *pParse, Token *
+   }
+ 
+   zFile = 0;
+-  sqliteSetNString(&zFile, pFilename->z, pFilename->n, 0);
++  sqliteSetNString(&zFile, pFilename->z, pFilename->n, (char*)0);
+   if( zFile==0 ) return;
+   sqliteDequote(zFile);
+ #ifndef SQLITE_OMIT_AUTHORIZATION
+@@ -59,7 +59,7 @@ void sqliteAttach(Parse *pParse, Token *
+ #endif /* SQLITE_OMIT_AUTHORIZATION */
+ 
+   zName = 0;
+-  sqliteSetNString(&zName, pDbname->z, pDbname->n, 0);
++  sqliteSetNString(&zName, pDbname->z, pDbname->n, (char*)0);
+   if( zName==0 ) return;
+   sqliteDequote(zName);
+   for(i=0; i<db->nDb; i++){
+diff -up sqlite-2.8.17/src/build.c.suse sqlite-2.8.17/src/build.c
+--- sqlite-2.8.17/src/build.c.suse	2019-04-10 13:59:41.010938595 -0400
++++ sqlite-2.8.17/src/build.c	2019-04-10 14:01:24.312835795 -0400
+@@ -559,7 +559,7 @@ void sqliteAddColumn(Parse *pParse, Toke
+   char *z = 0;
+   Column *pCol;
+   if( (p = pParse->pNewTable)==0 ) return;
+-  sqliteSetNString(&z, pName->z, pName->n, 0);
++  sqliteSetNString(&z, pName->z, pName->n, (char*)0);
+   if( z==0 ) return;
+   sqliteDequote(z);
+   for(i=0; i<p->nCol; i++){
+@@ -617,7 +617,7 @@ void sqliteAddColumnType(Parse *pParse,
+   pCol = &p->aCol[i];
+   pz = &pCol->zType;
+   n = pLast->n + Addr(pLast->z) - Addr(pFirst->z);
+-  sqliteSetNString(pz, pFirst->z, n, 0);
++  sqliteSetNString(pz, pFirst->z, n, (char*)0);
+   z = *pz;
+   if( z==0 ) return;
+   for(i=j=0; z[i]; i++){
+@@ -650,9 +650,9 @@ void sqliteAddDefaultValue(Parse *pParse
+   if( i<0 ) return;
+   pz = &p->aCol[i].zDflt;
+   if( minusFlag ){
+-    sqliteSetNString(pz, "-", 1, pVal->z, pVal->n, 0);
++    sqliteSetNString(pz, "-", 1, pVal->z, pVal->n, (char*)0);
+   }else{
+-    sqliteSetNString(pz, pVal->z, pVal->n, 0);
++    sqliteSetNString(pz, pVal->z, pVal->n, (char*)0);
+   }
+   sqliteDequote(*pz);
+ }
+@@ -1856,7 +1856,7 @@ IdList *sqliteIdListAppend(IdList *pList
+   memset(&pList->a[pList->nId], 0, sizeof(pList->a[0]));
+   if( pToken ){
+     char **pz = &pList->a[pList->nId].zName;
+-    sqliteSetNString(pz, pToken->z, pToken->n, 0);
++    sqliteSetNString(pz, pToken->z, pToken->n, (char*)0);
+     if( *pz==0 ){
+       sqliteIdListDelete(pList);
+       return 0;
+@@ -1921,7 +1921,7 @@ SrcList *sqliteSrcListAppend(SrcList *pL
+   }
+   if( pTable ){
+     char **pz = &pList->a[pList->nSrc].zName;
+-    sqliteSetNString(pz, pTable->z, pTable->n, 0);
++    sqliteSetNString(pz, pTable->z, pTable->n, (char*)0);
+     if( *pz==0 ){
+       sqliteSrcListDelete(pList);
+       return 0;
+@@ -1931,7 +1931,7 @@ SrcList *sqliteSrcListAppend(SrcList *pL
+   }
+   if( pDatabase ){
+     char **pz = &pList->a[pList->nSrc].zDatabase;
+-    sqliteSetNString(pz, pDatabase->z, pDatabase->n, 0);
++    sqliteSetNString(pz, pDatabase->z, pDatabase->n, (char*)0);
+     if( *pz==0 ){
+       sqliteSrcListDelete(pList);
+       return 0;
+@@ -1962,7 +1962,7 @@ void sqliteSrcListAssignCursors(Parse *p
+ void sqliteSrcListAddAlias(SrcList *pList, Token *pToken){
+   if( pList && pList->nSrc>0 ){
+     int i = pList->nSrc - 1;
+-    sqliteSetNString(&pList->a[i].zAlias, pToken->z, pToken->n, 0);
++    sqliteSetNString(&pList->a[i].zAlias, pToken->z, pToken->n, (char*)0);
+     sqliteDequote(pList->a[i].zAlias);
+   }
+ }
+diff -up sqlite-2.8.17/src/expr.c.suse sqlite-2.8.17/src/expr.c
+--- sqlite-2.8.17/src/expr.c.suse	2019-04-10 14:30:57.775728582 -0400
++++ sqlite-2.8.17/src/expr.c	2019-04-10 14:31:15.127321739 -0400
+@@ -269,7 +269,7 @@ ExprList *sqliteExprListAppend(ExprList
+     memset(pItem, 0, sizeof(*pItem));
+     pItem->pExpr = pExpr;
+     if( pName ){
+-      sqliteSetNString(&pItem->zName, pName->z, pName->n, 0);
++      sqliteSetNString(&pItem->zName, pName->z, pName->n, (char*)0);
+       sqliteDequote(pItem->zName);
+     }
+   }
+diff -up sqlite-2.8.17/src/pragma.c.suse sqlite-2.8.17/src/pragma.c
+--- sqlite-2.8.17/src/pragma.c.suse	2019-04-10 14:31:21.335176252 -0400
++++ sqlite-2.8.17/src/pragma.c	2019-04-10 14:31:38.126782727 -0400
+@@ -167,7 +167,7 @@ void sqlitePragma(Parse *pParse, Token *
+   sqliteDequote(zLeft);
+   if( minusFlag ){
+     zRight = 0;
+-    sqliteSetNString(&zRight, "-", 1, pRight->z, pRight->n, 0);
++    sqliteSetNString(&zRight, "-", 1, pRight->z, pRight->n, (char*)0);
+   }else{
+     zRight = sqliteStrNDup(pRight->z, pRight->n);
+     sqliteDequote(zRight);
+diff -up sqlite-2.8.17/src/printf.c.suse sqlite-2.8.17/src/printf.c
+--- sqlite-2.8.17/src/printf.c.suse	2019-04-10 14:31:45.198616993 -0400
++++ sqlite-2.8.17/src/printf.c	2019-04-10 14:33:50.164555108 -0400
+@@ -647,7 +647,7 @@ struct sgMprintf {
+   int  nChar;      /* Length of the string so far */
+   int  nTotal;     /* Output size if unconstrained */
+   int  nAlloc;     /* Amount of space allocated in zText */
+-  void *(*xRealloc)(void*,int);  /* Function used to realloc memory */
++  void *(*xRealloc)(void*,size_t);  /* Function used to realloc memory */
+ };
+ 
+ /* 
+@@ -688,7 +688,7 @@ static void mout(void *arg, const char *
+ ** the consumer.  
+ */
+ static char *base_vprintf(
+-  void *(*xRealloc)(void*,int),   /* Routine to realloc memory. May be NULL */
++  void *(*xRealloc)(void*,size_t),   /* Routine to realloc memory. May be NULL */
+   int useInternal,                /* Use internal %-conversions if true */
+   char *zInitBuf,                 /* Initially write here, before mallocing */
+   int nInitBuf,                   /* Size of zInitBuf[] */
+@@ -715,7 +715,7 @@ static char *base_vprintf(
+ /*
+ ** Realloc that is a real function, not a macro.
+ */
+-static void *printf_realloc(void *old, int size){
++static void *printf_realloc(void *old, size_t size){
+   return sqliteRealloc(old,size);
+ }
+ 
+@@ -752,8 +752,7 @@ char *sqlite_mprintf(const char *zFormat
+   char zBuf[200];
+ 
+   va_start(ap,zFormat);
+-  z = base_vprintf((void*(*)(void*,int))realloc, 0, 
+-                   zBuf, sizeof(zBuf), zFormat, ap);
++  z = base_vprintf(realloc, 0, zBuf, sizeof(zBuf), zFormat, ap);
+   va_end(ap);
+   return z;
+ }
+@@ -762,8 +761,7 @@ char *sqlite_mprintf(const char *zFormat
+ */
+ char *sqlite_vmprintf(const char *zFormat, va_list ap){
+   char zBuf[200];
+-  return base_vprintf((void*(*)(void*,int))realloc, 0,
+-                      zBuf, sizeof(zBuf), zFormat, ap);
++  return base_vprintf(realloc, 0, zBuf, sizeof(zBuf), zFormat, ap);
+ }
+ 
+ /*
+diff -up sqlite-2.8.17/src/select.c.suse sqlite-2.8.17/src/select.c
+--- sqlite-2.8.17/src/select.c.suse	2019-04-10 14:33:55.340435617 -0400
++++ sqlite-2.8.17/src/select.c	2019-04-10 14:35:16.170605054 -0400
+@@ -121,7 +121,7 @@ int sqliteJoinType(Parse *pParse, Token
+     if( pB==0 ){ pB = &dummy; zSp1 = 0; }
+     if( pC==0 ){ pC = &dummy; zSp2 = 0; }
+     sqliteSetNString(&pParse->zErrMsg, "unknown or unsupported join type: ", 0,
+-       pA->z, pA->n, zSp1, 1, pB->z, pB->n, zSp2, 1, pC->z, pC->n, 0);
++       pA->z, pA->n, zSp1, 1, pB->z, pB->n, zSp2, 1, pC->z, pC->n, (char*)0);
+     pParse->nErr++;
+     jointype = JT_INNER;
+   }else if( jointype & JT_RIGHT ){
+@@ -744,7 +744,7 @@ static void generateColumnNames(
+  
+         zTab = pTabList->a[j].zAlias;
+         if( fullNames || zTab==0 ) zTab = pTab->zName;
+-        sqliteSetString(&zName, zTab, ".", zCol, 0);
++        sqliteSetString(&zName, zTab, ".", zCol, (char*)0);
+         sqliteVdbeOp3(v, OP_ColumnName, i, p2, zName, P3_DYNAMIC);
+       }else{
+         sqliteVdbeOp3(v, OP_ColumnName, i, p2, zCol, 0);
+@@ -809,19 +809,19 @@ Table *sqliteResultSetOfSelect(Parse *pP
+     }else if( (p=pEList->a[i].pExpr)->op==TK_DOT 
+                && (pR=p->pRight)!=0 && pR->token.z && pR->token.z[0] ){
+       int cnt;
+-      sqliteSetNString(&aCol[i].zName, pR->token.z, pR->token.n, 0);
++      sqliteSetNString(&aCol[i].zName, pR->token.z, pR->token.n, (char*)0);
+       for(j=cnt=0; j<i; j++){
+         if( sqliteStrICmp(aCol[j].zName, aCol[i].zName)==0 ){
+           int n;
+           char zBuf[30];
+           sprintf(zBuf,"_%d",++cnt);
+           n = strlen(zBuf);
+-          sqliteSetNString(&aCol[i].zName, pR->token.z, pR->token.n, zBuf, n,0);
++          sqliteSetNString(&aCol[i].zName, pR->token.z, pR->token.n, zBuf, n, (char*)0);
+           j = -1;
+         }
+       }
+     }else if( p->span.z && p->span.z[0] ){
+-      sqliteSetNString(&pTab->aCol[i].zName, p->span.z, p->span.n, 0);
++      sqliteSetNString(&pTab->aCol[i].zName, p->span.z, p->span.n, (char*)0);
+     }else{
+       char zBuf[30];
+       sprintf(zBuf, "column%d", i+1);
+@@ -879,7 +879,7 @@ static int fillInColumnList(Parse *pPars
+         char zFakeName[60];
+         sprintf(zFakeName, "sqlite_subquery_%p_",
+            (void*)pTabList->a[i].pSelect);
+-        sqliteSetString(&pTabList->a[i].zAlias, zFakeName, 0);
++        sqliteSetString(&pTabList->a[i].zAlias, zFakeName, (char*)0);
+       }
+       pTabList->a[i].pTab = pTab = 
+         sqliteResultSetOfSelect(pParse, pTabList->a[i].zAlias,
+@@ -1003,7 +1003,7 @@ static int fillInColumnList(Parse *pPars
+               pLeft->token.z = zTabName;
+               pLeft->token.n = strlen(zTabName);
+               pLeft->token.dyn = 0;
+-              sqliteSetString((char**)&pExpr->span.z, zTabName, ".", zName, 0);
++              sqliteSetString((char**)&pExpr->span.z, zTabName, ".", zName, (char*)0);
+               pExpr->span.n = strlen(pExpr->span.z);
+               pExpr->span.dyn = 1;
+               pExpr->token.z = 0;
+diff -up sqlite-2.8.17/src/tokenize.c.suse sqlite-2.8.17/src/tokenize.c
+--- sqlite-2.8.17/src/tokenize.c.suse	2019-04-10 14:35:30.217290528 -0400
++++ sqlite-2.8.17/src/tokenize.c	2019-04-10 14:35:41.641034104 -0400
+@@ -434,7 +434,7 @@ int sqliteRunParser(Parse *pParse, const
+       }
+       case TK_ILLEGAL: {
+         sqliteSetNString(pzErrMsg, "unrecognized token: \"", -1, 
+-           pParse->sLastToken.z, pParse->sLastToken.n, "\"", 1, 0);
++           pParse->sLastToken.z, pParse->sLastToken.n, "\"", 1, (char*)0);
+         nErr++;
+         goto abort_parse;
+       }
+diff -up sqlite-2.8.17/src/vdbe.c.suse sqlite-2.8.17/src/vdbe.c
+--- sqlite-2.8.17/src/vdbe.c.suse	2019-04-10 14:35:48.752874467 -0400
++++ sqlite-2.8.17/src/vdbe.c	2019-04-10 14:36:13.433320479 -0400
+@@ -114,7 +114,7 @@ int sqlite_step(
+   sqlite *db;
+   int rc;
+ 
+-  if( p->magic!=VDBE_MAGIC_RUN ){
++  if( !p || p->magic!=VDBE_MAGIC_RUN ){
+     return SQLITE_MISUSE;
+   }
+   db = p->db;

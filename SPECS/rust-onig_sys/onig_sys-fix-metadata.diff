@@ -1,0 +1,21 @@
+--- onig_sys-69.9.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ onig_sys-69.9.1/Cargo.toml	2025-12-27T14:39:43.068223+00:00
+@@ -41,6 +41,7 @@
+ repository = "https://github.com/iwillspeak/rust-onig"
+ 
+ [features]
++bindgen = []
+ default = ["generate"]
+ generate = ["bindgen"]
+ posix-api = []
+@@ -51,9 +52,8 @@
+ path = "src/lib.rs"
+ 
+ [build-dependencies.bindgen]
+-version = "0.71"
++version = "0.72"
+ features = ["runtime"]
+-optional = true
+ 
+ [build-dependencies.cc]
+ version = "1.0"

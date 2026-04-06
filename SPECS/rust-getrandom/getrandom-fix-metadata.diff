@@ -1,0 +1,12 @@
+--- getrandom-0.4.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ getrandom-0.4.1/Cargo.toml	2026-02-14T14:34:46.474340+00:00
+@@ -77,6 +77,9 @@
+ [dependencies.cfg-if]
+ version = "1"
+ 
++[dependencies.libc]
++version = "0.2.154"
++
+ [dependencies.rand_core]
+ version = "0.10.0"
+ optional = true

@@ -1,0 +1,203 @@
+From c288d4a26ad44dc481c9d18d2920c9d70474833c Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 40/50] openssh-7.1p2-audit-race-condition
+
+---
+ monitor_wrap.c | 46 +++++++++++++++++++++++++++++++++++++
+ monitor_wrap.h |  2 ++
+ session.c      | 61 ++++++++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 102 insertions(+), 7 deletions(-)
+
+diff --git a/monitor_wrap.c b/monitor_wrap.c
+index 1a079c15..768a59f9 100644
+--- a/monitor_wrap.c
++++ b/monitor_wrap.c
+@@ -1415,4 +1415,50 @@ mm_audit_destroy_sensitive_data(struct ssh *ssh, const char *fp, pid_t pid, uid_
+ 	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUDIT_SERVER_KEY_FREE, m);
+ 	sshbuf_free(m);
+ }
++
++int mm_forward_audit_messages(int fdin)
++{
++	u_char buf[4];
++	u_int blen, msg_len;
++	struct sshbuf *m;
++	int r, ret = 0;
++
++	debug3_f("entering");
++	if ((m = sshbuf_new()) == NULL)
++ 		fatal_f("sshbuf_new failed");
++	do {
++		blen = atomicio(read, fdin, buf, sizeof(buf));
++		if (blen == 0) /* closed pipe */
++			break;
++		if (blen != sizeof(buf)) {
++			error_f("Failed to read the buffer from child");
++			ret = -1;
++			break;
++		}
++
++		msg_len = get_u32(buf);
++		if (msg_len > 256 * 1024)
++			fatal_f("read: bad msg_len %d", msg_len);
++		sshbuf_reset(m);
++		if ((r = sshbuf_reserve(m, msg_len, NULL)) != 0)
++			fatal_fr(r, "buffer error");
++		if (atomicio(read, fdin, sshbuf_mutable_ptr(m), msg_len) != msg_len) {
++			error_f("Failed to read the the buffer content from the child");
++			ret = -1;
++			break;
++		}
++		if (atomicio(vwrite, pmonitor->m_recvfd, buf, blen) != blen || 
++		    atomicio(vwrite, pmonitor->m_recvfd, sshbuf_mutable_ptr(m), msg_len) != msg_len) {
++			error_f("Failed to write the message to the monitor");
++			ret = -1;
++			break;
++		}
++	} while (1);
++	sshbuf_free(m);
++	return ret;
++}
++void mm_set_monitor_pipe(int fd)
++{
++	pmonitor->m_recvfd = fd;
++}
+ #endif /* SSH_AUDIT_EVENTS */
+diff --git a/monitor_wrap.h b/monitor_wrap.h
+index 661ed63b..e957ba6e 100644
+--- a/monitor_wrap.h
++++ b/monitor_wrap.h
+@@ -93,6 +93,8 @@ void mm_audit_unsupported_body(struct ssh *, int);
+ void mm_audit_kex_body(struct ssh *, int, char *, char *, char *, char *, pid_t, uid_t);
+ void mm_audit_session_key_free_body(struct ssh *, int, pid_t, uid_t);
+ void mm_audit_destroy_sensitive_data(struct ssh *, const char *, pid_t, uid_t);
++int mm_forward_audit_messages(int);
++void mm_set_monitor_pipe(int);
+ #endif
+ 
+ struct Session;
+diff --git a/session.c b/session.c
+index 83fc9418..b4753d93 100644
+--- a/session.c
++++ b/session.c
+@@ -167,6 +167,10 @@ static Session *sessions = NULL;
+ login_cap_t *lc;
+ #endif
+ 
++#ifdef SSH_AUDIT_EVENTS
++int paudit[2];
++#endif
++
+ static int is_child = 0;
+ static int in_chroot = 0;
+ static int have_dev_log = 1;
+@@ -390,6 +394,8 @@ xauth_valid_string(const char *s)
+ 	return 1;
+ }
+ 
++void child_destory_sensitive_data(struct ssh *ssh);
++
+ #define USE_PIPES 1
+ /*
+  * This is called to fork and execute a command when we have no tty.  This
+@@ -513,6 +519,8 @@ do_exec_no_pty(struct ssh *ssh, Session *s, const char *command)
+ 		close(err[0]);
+ #endif
+ 
++		child_destory_sensitive_data(ssh);
++
+ 		/* Do processing for the child (exec command etc). */
+ 		do_child(ssh, s, command);
+ 		/* NOTREACHED */
+@@ -630,6 +638,9 @@ do_exec_pty(struct ssh *ssh, Session *s, const char *command)
+ 		/* Close the extra descriptor for the pseudo tty. */
+ 		close(ttyfd);
+ 
++		/* Do this early, so we will not block large MOTDs */
++		child_destory_sensitive_data(ssh);
++
+ 		/* record login, etc. similar to login(1) */
+ #ifndef HAVE_OSF_SIA
+ 		do_login(ssh, s, command);
+@@ -766,6 +777,8 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+ 	}
+ 	if (s->command != NULL && s->ptyfd == -1)
+ 		s->command_handle = mm_audit_run_command(ssh, s->command);
++	if (pipe(paudit) < 0)
++		fatal("pipe: %s", strerror(errno));
+ #endif
+ 	if (s->ttyfd != -1)
+ 		ret = do_exec_pty(ssh, s, command);
+@@ -781,6 +794,20 @@ do_exec(struct ssh *ssh, Session *s, const char *command)
+ 	 */
+ 	sshbuf_reset(loginmsg);
+ 
++#ifdef SSH_AUDIT_EVENTS
++	close(paudit[1]);
++	if (ret == 0) {
++		/*
++		 * Read the audit messages from forked child and send them
++		 * back to monitor. We don't want to communicate directly,
++		 * because the messages might get mixed up.
++		 * Continue after the pipe gets closed (all messages sent).
++		 */
++		ret = mm_forward_audit_messages(paudit[0]);
++	}
++	close(paudit[0]);
++#endif /* SSH_AUDIT_EVENTS */
++
+ 	return ret;
+ }
+ 
+@@ -1532,6 +1559,33 @@ child_close_fds(struct ssh *ssh)
+ 	log_redirect_stderr_to(NULL);
+ }
+ 
++void
++child_destory_sensitive_data(struct ssh *ssh)
++{
++#ifdef SSH_AUDIT_EVENTS
++	int pparent = paudit[1];
++	close(paudit[0]);
++	/* Hack the monitor pipe to avoid race condition with parent */
++	mm_set_monitor_pipe(pparent);
++#endif
++
++	/* remove hostkey from the child's memory */
++	/* FIXME beldmit destroy_sensitive_data(ssh); */
++	/*
++	 * We can audit this, because we hacked the pipe to direct the
++	 * messages over postauth child. But this message requires answer
++	 * which we can't do using one-way pipe.
++	 */
++	packet_destroy_all(ssh, 0, 1);
++	/* XXX this will clean the rest but should not audit anymore */
++	/* packet_clear_keys(ssh); */
++
++#ifdef SSH_AUDIT_EVENTS
++	/* Notify parent that we are done */
++	close(pparent);
++#endif
++}
++
+ /*
+  * Performs common processing for the child, such as setting up the
+  * environment, closing extra file descriptors, setting the user and group
+@@ -1549,13 +1603,6 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+ 
+ 	sshpkt_fmt_connection_id(ssh, remote_id, sizeof(remote_id));
+ 
+-	/* remove keys from memory */
+-	destroy_sensitive_data(ssh);
+-	ssh_packet_clear_keys(ssh);
+-	/* Don't audit this - both us and the parent would be talking to the
+-	   monitor over a single socket, with no synchronization. */
+-	packet_destroy_all(ssh, 0, 1);
+-
+ 	/* Force a password change */
+ 	if (s->authctxt->force_pwchange) {
+ 		do_setusercontext(pw);
+-- 
+2.49.0
+

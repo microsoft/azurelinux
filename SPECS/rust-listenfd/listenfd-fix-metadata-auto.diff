@@ -1,0 +1,15 @@
+--- listenfd-1.0.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ listenfd-1.0.2/Cargo.toml	2025-01-24T16:37:28.134224+00:00
+@@ -53,12 +53,3 @@
+ [target."cfg(not(windows))".dependencies.libc]
+ version = "0.2.40"
+ 
+-[target."cfg(windows)".dependencies.uuid]
+-version = "1.0.0"
+-
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.4"
+-features = [
+-    "winsock2",
+-    "processthreadsapi",
+-]

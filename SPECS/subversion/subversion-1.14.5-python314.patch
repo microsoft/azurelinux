@@ -1,0 +1,51 @@
+"The interpreter internally avoids some reference count modifications when
+loading objects onto the operands stack by borrowing references when
+possible. This can lead to smaller reference count values compared to
+previous Python versions."
+
+https://docs.python.org/3.14/whatsnew/3.14.html#whatsnew314-refcount
+
+diff --git a/subversion/bindings/swig/python/tests/mergeinfo.py b/subversion/bindings/swig/python/tests/mergeinfo.py
+index 873fc52..ab4da18 100644
+--- a/subversion/bindings/swig/python/tests/mergeinfo.py
++++ b/subversion/bindings/swig/python/tests/mergeinfo.py
+@@ -138,8 +138,8 @@ class SubversionMergeinfoTestCase(unittest.TestCase):
+         # ....and now 3 (incref during iteration of each range object)
+ 
+         refcount = sys.getrefcount(r)
+-        # ....and finally, 4 (getrefcount() also increfs)
+-        expected = 4
++        # ....and finally, 4 (getrefcount() also increfs, but not as of 3.14)
++        expected = 3 if sys.version_info >= (3, 14) else 4
+ 
+         # Note: if path and index are not '/trunk' and 0 respectively, then
+         # only some of the range objects are leaking, which is, as far as
+diff --git a/subversion/bindings/swig/python/tests/repository.py b/subversion/bindings/swig/python/tests/repository.py
+index e764ec5..d180c75 100644
+--- a/subversion/bindings/swig/python/tests/repository.py
++++ b/subversion/bindings/swig/python/tests/repository.py
+@@ -429,13 +429,14 @@ class SubversionRepositoryTestCase(unittest.TestCase):
+     root = fs.revision_root(self.fs, self.rev)
+     editor = BatonCollector(self.fs, root)
+     e_ptr, e_baton = delta.make_editor(editor)
++    expected = 1 if sys.version_info >= (3, 14) else 2
+     repos.replay(root, e_ptr, e_baton)
+     for baton in editor.batons:
+       self.assertEqual(sys.getrefcount(baton[2]), 2,
+                        "leak on baton %s after replay without errors"
+                        % repr(baton))
+     del e_baton
+-    self.assertEqual(sys.getrefcount(e_ptr), 2,
++    self.assertEqual(sys.getrefcount(e_ptr), expected,
+                      "leak on editor baton after replay without errors")
+ 
+     editor = BatonCollectorErrorOnClose(self.fs, root,
+@@ -451,7 +452,7 @@ class SubversionRepositoryTestCase(unittest.TestCase):
+       self.assertEqual(sys.getrefcount(baton[2]), 2,
+                        "leak on baton %s after replay with an error"
+                        % repr(baton))
+-    self.assertEqual(sys.getrefcount(e_ptr), 2,
++    self.assertEqual(sys.getrefcount(e_ptr), expected,
+                      "leak on editor baton after replay with an error")
+ 
+   def test_delta_editor_apply_textdelta_handler_refcount(self):

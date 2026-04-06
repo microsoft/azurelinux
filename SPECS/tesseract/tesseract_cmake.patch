@@ -1,0 +1,78 @@
+diff -rupN --no-dereference tesseract-5.5.2/CMakeLists.txt tesseract-5.5.2-new/CMakeLists.txt
+--- tesseract-5.5.2/CMakeLists.txt	2025-12-26 18:27:50.000000000 +0100
++++ tesseract-5.5.2-new/CMakeLists.txt	2025-12-27 18:26:53.244564788 +0100
+@@ -375,7 +375,7 @@ elseif(UNIX)
+     set(LIB_pthread pthread)
+   endif()
+ elseif(WIN32)
+-  set(LIB_Ws2_32 Ws2_32)
++  set(LIB_Ws2_32 ws2_32)
+ endif()
+ 
+ add_definitions("-DCMAKE_BUILD")
+@@ -927,12 +927,17 @@ set_target_properties(
+   libtesseract PROPERTIES SOVERSION
+                           ${VERSION_MAJOR}.${VERSION_MINOR})
+ 
+-set_target_properties(
+-  libtesseract
+-  PROPERTIES
+-    OUTPUT_NAME
+-    tesseract$<$<BOOL:${WIN32}>:${VERSION_MAJOR}${VERSION_MINOR}$<$<CONFIG:DEBUG>:d>>
+-)
++if(MINGW)
++  set_target_properties(libtesseract PROPERTIES SUFFIX "-${VERSION_MAJOR}${VERSION_MINOR}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++  set_target_properties(libtesseract PROPERTIES OUTPUT_NAME tesseract)
++else()
++  set_target_properties(
++    libtesseract
++    PROPERTIES
++      OUTPUT_NAME
++      tesseract$<$<BOOL:${WIN32}>:${VERSION_MAJOR}${VERSION_MINOR}$<$<CONFIG:DEBUG>:d>>
++  )
++endif()
+ 
+ if(SW_BUILD)
+   target_link_libraries(libtesseract PUBLIC org.sw.demo.danbloomberg.leptonica
+@@ -1063,9 +1068,9 @@ install(
+ 
+ if(INSTALL_CONFIGS)
+   install(FILES ${TESSERACT_CONFIGS}
+-          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/tessdata/configs)
++          DESTINATION ${TESSDATA_PREFIX}/tessdata/configs)
+   install(FILES ${TESSERACT_TESSCONFIGS}
+-          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/tessdata/tessconfigs)
++          DESTINATION ${TESSDATA_PREFIX}/tessdata/tessconfigs)
+ endif()
+ 
+ # ##############################################################################
+diff -rupN --no-dereference tesseract-5.5.2/src/training/CMakeLists.txt tesseract-5.5.2-new/src/training/CMakeLists.txt
+--- tesseract-5.5.2/src/training/CMakeLists.txt	2025-12-26 18:27:50.000000000 +0100
++++ tesseract-5.5.2-new/src/training/CMakeLists.txt	2025-12-27 18:26:53.244940112 +0100
+@@ -114,7 +114,7 @@ if(NOT DISABLED_LEGACY_ENGINE)
+     common/trainingsampleset.h)
+ endif()
+ 
+-add_library(common_training ${COMMON_TRAINING_SRC})
++add_library(common_training STATIC ${COMMON_TRAINING_SRC})
+ target_include_directories(common_training PUBLIC common
+                                                   ${CMAKE_CURRENT_BINARY_DIR})
+ target_link_libraries(common_training PUBLIC libtesseract)
+@@ -282,7 +282,7 @@ if(ICU_FOUND)
+ 
+   file(GLOB unicharset_training_src unicharset/*)
+ 
+-  add_library(unicharset_training ${unicharset_training_src})
++  add_library(unicharset_training STATIC ${unicharset_training_src})
+   if(SW_BUILD)
+     target_link_libraries(unicharset_training
+                           PUBLIC common_training org.sw.demo.unicode.icu.i18n)
+@@ -426,7 +426,7 @@ if(ICU_FOUND)
+ 
+     file(GLOB pango_training_src pango/*)
+ 
+-    add_library(pango_training ${pango_training_src})
++    add_library(pango_training STATIC ${pango_training_src})
+     target_link_libraries(pango_training PUBLIC unicharset_training)
+     if(SW_BUILD)
+       target_link_libraries(pango_training

@@ -1,0 +1,22 @@
+diff -up sqlite-2.8.17/test/tclsqlite.test.orig sqlite-2.8.17/test/tclsqlite.test
+--- sqlite-2.8.17/test/tclsqlite.test.orig	2005-04-23 17:43:22.000000000 -0500
++++ sqlite-2.8.17/test/tclsqlite.test	2009-03-20 10:36:39.235100000 -0500
+@@ -61,16 +61,15 @@ do_test tcl-1.5 {
+   } msg]
+   lappend v $msg
+ } {0 {}}
++catch {expr x*} msg
+ do_test tcl-1.6 {
+   set v [catch {
+     db eval {SELECT * FROM t1} data {
+       expr x*
+     }
+   } msg]
+-  regsub {:.*$} $msg {} msg
+   lappend v $msg
+-} {1 {syntax error in expression "x*"}}
+-
++} [list 1 $msg]
+ if {[sqlite -encoding]=="UTF-8" && [sqlite -tcl-uses-utf]} {
+   catch {unset ::result}
+   do_test tcl-2.1 {

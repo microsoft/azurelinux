@@ -1,0 +1,87 @@
+#!/bin/sh
+
+#set -vx
+
+LCFILE=/etc/pki/ca-trust/ca-legacy.conf
+LLINK=/etc/pki/ca-trust/source/ca-bundle.legacy.crt
+LDEFAULT=/usr/share/pki/ca-trust-legacy/ca-bundle.legacy.default.crt
+LDISABLE=/usr/share/pki/ca-trust-legacy/ca-bundle.legacy.disable.crt
+
+# An absent value, or any unexpected value, is treated as "default".
+is_disabled()
+{
+    grep -i "^legacy *= *disable *$" $LCFILE >/dev/null 2>&1
+}
+
+do_check()
+{
+    is_disabled
+    if [ $? -eq 0 ]; then
+        echo "Legacy CAs are set to DISABLED in file $LCFILE (affects install/upgrade)"
+        LEXPECT=$LDISABLE
+    else
+        echo "Legacy CAs are set to DEFAULT in file $LCFILE (affects install/upgrade)"
+        LEXPECT=$LDEFAULT
+    fi
+    echo "Status of symbolic link $LLINK:"
+    readlink -v $LLINK
+}
+
+do_install()
+{
+    is_disabled
+    if [ $? -eq 0 ]; then
+        # found, legacy is disabled
+        ln -sf $LDISABLE $LLINK
+    else
+        # expression not found, legacy is set to default
+        ln -sf $LDEFAULT $LLINK
+    fi
+}
+
+do_default()
+{
+    sed -i 's/^legacy *=.*$/legacy=default/' $LCFILE
+    do_install
+    /usr/bin/update-ca-trust
+}
+
+do_disable()
+{
+    sed -i 's/^legacy *=.*$/legacy=disable/' $LCFILE
+    do_install
+    /usr/bin/update-ca-trust
+}
+
+do_help()
+{
+    echo "usage: $0 [check | default | disable | install]"
+}
+
+if [[ $# -eq 0 ]]; then
+  # no parameters
+  do_help
+  exit $?
+fi
+
+if [[ "$1" = "install" ]]; then
+  do_install
+  exit $?
+fi
+
+if [[ "$1" = "default" ]]; then
+  do_default
+  exit $?
+fi
+if [[ "$1" = "disable" ]]; then
+  do_disable
+  exit $?
+fi
+
+if [[ "$1" = "check" ]]; then
+  do_check
+  exit $?
+fi
+
+echo "$0: Unsupported command $1"
+do_help

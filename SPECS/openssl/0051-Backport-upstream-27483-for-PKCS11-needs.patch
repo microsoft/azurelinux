@@ -1,0 +1,146 @@
+From 5e135e7ceefd5b72cb54a93b13b478af05873318 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Mon, 12 May 2025 14:34:39 +0200
+Subject: [PATCH 51/59] Backport upstream #27483 for PKCS11 needs
+
+---
+ .../implementations/skeymgmt/aes_skmgmt.c     |  2 +
+ providers/implementations/skeymgmt/generic.c  | 12 ++++
+ .../implementations/skeymgmt/skeymgmt_lcl.h   |  1 +
+ test/evp_skey_test.c                          | 61 +++++++++++++++++++
+ 4 files changed, 76 insertions(+)
+
+diff --git a/providers/implementations/skeymgmt/aes_skmgmt.c b/providers/implementations/skeymgmt/aes_skmgmt.c
+index 6d3b5f377f..17be480131 100644
+--- a/providers/implementations/skeymgmt/aes_skmgmt.c
++++ b/providers/implementations/skeymgmt/aes_skmgmt.c
+@@ -48,5 +48,7 @@ const OSSL_DISPATCH ossl_aes_skeymgmt_functions[] = {
+     { OSSL_FUNC_SKEYMGMT_FREE, (void (*)(void))generic_free },
+     { OSSL_FUNC_SKEYMGMT_IMPORT, (void (*)(void))aes_import },
+     { OSSL_FUNC_SKEYMGMT_EXPORT, (void (*)(void))aes_export },
++    { OSSL_FUNC_SKEYMGMT_IMP_SETTABLE_PARAMS,
++      (void (*)(void))generic_imp_settable_params },
+     OSSL_DISPATCH_END
+ };
+diff --git a/providers/implementations/skeymgmt/generic.c b/providers/implementations/skeymgmt/generic.c
+index b41bf8e12d..5fb3fad7e3 100644
+--- a/providers/implementations/skeymgmt/generic.c
++++ b/providers/implementations/skeymgmt/generic.c
+@@ -65,6 +65,16 @@ end:
+     return generic;
+ }
+ 
++static const OSSL_PARAM generic_import_params[] = {
++    OSSL_PARAM_octet_string(OSSL_SKEY_PARAM_RAW_BYTES, NULL, 0),
++    OSSL_PARAM_END
++};
++
++const OSSL_PARAM *generic_imp_settable_params(void *provctx)
++{
++    return generic_import_params;
++}
++
+ int generic_export(void *keydata, int selection,
+                    OSSL_CALLBACK *param_callback, void *cbarg)
+ {
+@@ -89,5 +99,7 @@ const OSSL_DISPATCH ossl_generic_skeymgmt_functions[] = {
+     { OSSL_FUNC_SKEYMGMT_FREE, (void (*)(void))generic_free },
+     { OSSL_FUNC_SKEYMGMT_IMPORT, (void (*)(void))generic_import },
+     { OSSL_FUNC_SKEYMGMT_EXPORT, (void (*)(void))generic_export },
++    { OSSL_FUNC_SKEYMGMT_IMP_SETTABLE_PARAMS,
++      (void (*)(void))generic_imp_settable_params },
+     OSSL_DISPATCH_END
+ };
+diff --git a/providers/implementations/skeymgmt/skeymgmt_lcl.h b/providers/implementations/skeymgmt/skeymgmt_lcl.h
+index c180c1d303..a7e7605050 100644
+--- a/providers/implementations/skeymgmt/skeymgmt_lcl.h
++++ b/providers/implementations/skeymgmt/skeymgmt_lcl.h
+@@ -15,5 +15,6 @@
+ OSSL_FUNC_skeymgmt_import_fn generic_import;
+ OSSL_FUNC_skeymgmt_export_fn generic_export;
+ OSSL_FUNC_skeymgmt_free_fn generic_free;
++OSSL_FUNC_skeymgmt_imp_settable_params_fn generic_imp_settable_params;
+ 
+ #endif
+diff --git a/test/evp_skey_test.c b/test/evp_skey_test.c
+index b81df9c8f8..e33bbbe003 100644
+--- a/test/evp_skey_test.c
++++ b/test/evp_skey_test.c
+@@ -92,6 +92,66 @@ end:
+     return ret;
+ }
+ 
++static int test_skey_skeymgmt(void)
++{
++    int ret = 0;
++    EVP_SKEYMGMT *skeymgmt = NULL;
++    EVP_SKEY *key = NULL;
++    const unsigned char import_key[KEY_SIZE] = {
++        0x53, 0x4B, 0x45, 0x59, 0x53, 0x4B, 0x45, 0x59,
++        0x53, 0x4B, 0x45, 0x59, 0x53, 0x4B, 0x45, 0x59,
++    };
++    OSSL_PARAM params[2];
++    const OSSL_PARAM *imp_params;
++    const OSSL_PARAM *p;
++    OSSL_PARAM *exp_params = NULL;
++    const void *export_key = NULL;
++    size_t export_len;
++
++    deflprov = OSSL_PROVIDER_load(libctx, "default");
++    if (!TEST_ptr(deflprov))
++        return 0;
++
++    /* Fetch our SKYMGMT for Generic Secrets */
++    if (!TEST_ptr(skeymgmt = EVP_SKEYMGMT_fetch(libctx, OSSL_SKEY_TYPE_GENERIC,
++                                                NULL)))
++        goto end;
++
++    /* Check the parameter we need is available */
++    if (!TEST_ptr(imp_params = EVP_SKEYMGMT_get0_imp_settable_params(skeymgmt))
++        || !TEST_ptr(p = OSSL_PARAM_locate_const(imp_params,
++                                                 OSSL_SKEY_PARAM_RAW_BYTES)))
++        goto end;
++
++    /* Import EVP_SKEY */
++    params[0] = OSSL_PARAM_construct_octet_string(OSSL_SKEY_PARAM_RAW_BYTES,
++                                                  (void *)import_key, KEY_SIZE);
++    params[1] = OSSL_PARAM_construct_end();
++
++    if (!TEST_ptr(key = EVP_SKEY_import(libctx,
++                                        EVP_SKEYMGMT_get0_name(skeymgmt), NULL,
++                                        OSSL_SKEYMGMT_SELECT_ALL, params)))
++        goto end;
++
++    /* Export EVP_SKEY */
++    if (!TEST_int_gt(EVP_SKEY_export(key, OSSL_SKEYMGMT_SELECT_SECRET_KEY,
++                                     ossl_pkey_todata_cb, &exp_params), 0)
++        || !TEST_ptr(p = OSSL_PARAM_locate_const(exp_params,
++                                                 OSSL_SKEY_PARAM_RAW_BYTES))
++        || !TEST_int_gt(OSSL_PARAM_get_octet_string_ptr(p, &export_key,
++                                                        &export_len), 0)
++        || !TEST_mem_eq(import_key, KEY_SIZE, export_key, export_len))
++        goto end;
++
++    ret = 1;
++end:
++    OSSL_PARAM_free(exp_params);
++    EVP_SKEYMGMT_free(skeymgmt);
++    EVP_SKEY_free(key);
++
++    return ret;
++}
++
+ #define IV_SIZE 16
+ #define DATA_SIZE 32
+ static int test_aes_raw_skey(void)
+@@ -252,6 +312,7 @@ int setup_tests(void)
+         return 0;
+ 
+     ADD_TEST(test_skey_cipher);
++    ADD_TEST(test_skey_skeymgmt);
+ 
+     ADD_TEST(test_aes_raw_skey);
+ #ifndef OPENSSL_NO_DES
+-- 
+2.51.0
+

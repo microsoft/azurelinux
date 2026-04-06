@@ -1,0 +1,63 @@
+diff -rupN --no-dereference angle-57ea533/DEPS angle-57ea533-new/DEPS
+--- angle-57ea533/DEPS	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/DEPS	2021-01-15 23:27:20.780586358 +0100
+@@ -128,7 +128,7 @@ hooks = [
+     # Note: On Win, this should run after win_toolchain, as it may use it.
+     'name': 'clang',
+     'pattern': '.',
+-    'action': ['python', 'tools/clang/scripts/update.py', '--if-needed'],
++    'action': ['python3', 'tools/clang/scripts/update.py', '--if-needed'],
+   },
+ 
+   # Pull rc binaries using checked-in hashes.
+@@ -147,7 +147,7 @@ hooks = [
+   {
+     # A change to a .gyp, .gypi, or to GYP itself should run the generator.
+     'pattern': '.',
+-    'action': ['python', 'gyp/gyp_angle'],
++    'action': ['python3', 'gyp/gyp_angle'],
+   },
+ ]
+ 
+diff -rupN --no-dereference angle-57ea533/src/angle.gyp angle-57ea533-new/src/angle.gyp
+--- angle-57ea533/src/angle.gyp	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/angle.gyp	2021-01-15 23:27:20.781586358 +0100
+@@ -11,7 +11,7 @@
+         'angle_id_script': '<(angle_gen_path)/<(angle_id_script_base)',
+         'angle_id_header_base': 'commit.h',
+         'angle_id_header': '<(angle_gen_path)/id/<(angle_id_header_base)',
+-        'angle_use_commit_id%': '<!(python <(angle_id_script_base) check ..)',
++        'angle_use_commit_id%': '<!(python3 <(angle_id_script_base) check ..)',
+         'angle_enable_d3d9%': 0,
+         'angle_enable_d3d11%': 0,
+         'angle_enable_gl%': 0,
+@@ -385,7 +385,7 @@
+                             'msvs_cygwin_shell': 0,
+                             'action':
+                             [
+-                                'python', '<(angle_id_script)', 'gen', '<(angle_path)', '<(angle_id_header)'
++                                'python3', '<(angle_id_script)', 'gen', '<(angle_path)', '<(angle_id_header)'
+                             ],
+                         },
+                     ],
+diff -rupN --no-dereference angle-57ea533/src/tests/tests.gyp angle-57ea533-new/src/tests/tests.gyp
+--- angle-57ea533/src/tests/tests.gyp	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/tests/tests.gyp	2021-01-15 23:27:20.781586358 +0100
+@@ -278,7 +278,7 @@
+                                     ],
+                                     'action':
+                                     [
+-                                        'python',
++                                        'python3',
+                                         '<(gles_conformance_tests_generator_script)',
+                                         '<(gles2_conformance_tests_input_file)',
+                                         '<(gles_conformance_tests_input_dir)',
+@@ -345,7 +345,7 @@
+                                     ],
+                                     'action':
+                                     [
+-                                        'python',
++                                        'python3',
+                                         '<(gles_conformance_tests_generator_script)',
+                                         '<(gles3_conformance_tests_input_file)',
+                                         '<(gles_conformance_tests_input_dir)',

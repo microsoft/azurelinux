@@ -1,0 +1,58 @@
+From 0b8c3f9a770d69c13dedaa6e9e4a0191300d9f5d Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 13 Jan 2025 04:05:34 -0500
+Subject: [PATCH 2/2] Fix compatibility with latest numcodecs
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml |  4 ++--
+ zarr/util.py   | 11 ++++++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 02789ba0..ca8dcb59 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -13,7 +13,7 @@ dependencies = [
+     'asciitree',
+     'numpy>=1.24',
+     'fasteners; sys_platform != "emscripten"',
+-    'numcodecs>=0.10.0,!=0.14.0,!=0.14.1,<0.16',
++    'numcodecs>=0.10.0',
+ ]
+ dynamic = ["version"]
+ classifiers = [
+@@ -42,7 +42,7 @@ docs = [
+     'sphinx-copybutton',
+     'pydata-sphinx-theme',
+     'numpydoc',
+-    'numcodecs[msgpack]!=0.14.0,!=0.14.1,<0.16',
++    'numcodecs[msgpack]',
+     'pytest-doctestplus',
+ ]
+ 
+diff --git a/zarr/util.py b/zarr/util.py
+index 2c9b0f61..80fcdd47 100644
+--- a/zarr/util.py
++++ b/zarr/util.py
+@@ -31,7 +31,16 @@ from numcodecs.compat import (
+ )
+ from numcodecs.ndarray_like import NDArrayLike
+ from numcodecs.registry import codec_registry
+-from numcodecs.blosc import cbuffer_sizes, cbuffer_metainfo
++
++try:
++    # numcodecs 0.18+
++    from numcodecs.blosc import (
++        _cbuffer_sizes as cbuffer_sizes,
++        _cbuffer_metainfo as cbuffer_metainfo,
++    )
++except ImportError:
++    # numcodecs < 0.18
++    from numcodecs.blosc import cbuffer_sizes, cbuffer_metainfo
+ from zarr.types import DIMENSION_SEPARATOR
+ 
+ KeyType = TypeVar("KeyType")
+-- 
+2.49.0
+

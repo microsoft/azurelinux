@@ -1,0 +1,14 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 99172e3..e16367c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -31,9 +31,6 @@ log = "0.4"
+ [target.'cfg(any(target_os = "android", target_os = "linux"))'.dependencies]
+ nix = { version = "0.27.1", features = ["event", "feature", "fs", "mman", "socket", "uio", "ioctl"] }
+ 
+-[target.'cfg(windows)'.dependencies]
+-winapi = {version = "0.3", features = ["winnt", "handleapi", "processthreadsapi", "winbase"]}
+-
+ [build-dependencies]
+ pkg-config = "0.3"
+ anyhow = "1.0.57"

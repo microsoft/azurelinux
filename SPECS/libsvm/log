@@ -1,0 +1,368 @@
+1.04: 2000/6/17, add "load" button to svm-toy. README 
+file updated.
+
+2.0: 2000/8, major updates. Include nu-svm, one-class svm, and svr
+
+2.01: 2000/9/22, correct the calculation of obj value and number of bounded support vectors
+
+2.02: 2000/9/29, replace b^2/2 newsvm to regular nu svm.
+
+2.03: 2000/10/24 some improvements on the computational speed
+
+2.1: 2000/12/19 Java version included, regression demonstrated in svm-toy
+
+2.2: 2001/1/16 multi-class classification, nu-SVR, remove epsilon_a
+
+2.3: 2001/3/15 c+-, cross validation, fix some minor bugs
+
+2.31: 2001/4/12 fix one bug on one-class SVM, use float for Cache
+
+2.32: 2001/9/23 
+	1. max line number of svm-scale now dynamic
+	2. gcc 3.0 problem: now g++ always used
+	3. java code in a "libsvm" package
+	4. avoid a problem when compiled with Borland C++ builder
+
+2.33: 2001/12/1
+	Python interface added
+
+2.34: 2002/6/15
+	Add the subroutine svm_check_parameter in svm.cpp
+	--> better error handling
+	fix bug of python interface for handling different weights
+	fix bug of cross validation in svm-train.c
+
+2.35: 2002/6/16
+	libsvm.jar was not compiled correctly in 2.34
+
+2.36: 2002/8/4
+	grid.py added: contour plot of CV accuracy
+	fix several bugs
+
+2.4:  2003/4/1
+	svm.cpp
+		non-psd kernel using max(...,0) in svm.cpp
+	python interface
+		python interface bug (nu-svm)
+	grid.py
+		-log2c and -log2c for grid.py
+	        output current best
+		coarse grid as default (2)
+		ssh for grid.py 
+	improvements of scaling 
+
+2.5: 2003/11/13
+	subroutines for accessing decision values and number of labels. 
+		for svm.cpp, java, and  python interface
+	fix bug of svm-scale.c (about -r and -s factors)
+	use fscanf but not sscanf in svm-predict.c (faster)
+	makefile for windows
+	add "using namespace std;" in some .java files
+	improve easy.py: output cv rate, error messages printed
+		better checking
+	better python interface example svm_test.py
+	and some minor updates
+
+2.6: 2004/04/01
+	Probability estimates for classification/regression 
+	Python interface: use swig 1.3 instead of 1.1
+	Cross validation becomes a library subroutine
+	A few minor corrections: (not completely listed)
+		more interface functions such as getting svm_type
+		print nu only when Cp=Cn
+		floor division in python interface
+
+2.7: 2004/11/10
+	Stratified cross validation
+	Better faq
+	Scaling: support storing the factor of y
+	A few minor updates:
+		class QMatrix added
+		improve the use of easy.py and grid.py on windows 
+		grid.py: same CV and same g: use smaller C
+		sparse input for python interface
+		working set selection: < to <=
+
+2.71: 2004/11/20
+	fix a java bug introduced from 2.6 to 2.7
+
+2.8: 2005/04/01
+	new working set selection via second order information
+	fix minor changes/corrections:
+		problem when cache size less than two kernel columns
+		-v #data -> stratified CV is not loo -> ensure loo is done
+		problem of typing "svm-train -c" only
+		problem of "svm-train -n 1 -s 3 ..."
+		python interface makefile: -fPIC for 32/64bit
+		color change in svmtoy
+		makefile in building QT svmtoy
+
+2.81: 2005/11/20
+	add a python script subset.py for subsampling
+	slightly modify the working set so it's exact the same as the paper
+	default cache size to 100 MB
+
+2.82: 2006/04/01
+	precomputed kernel
+	directly implement a fast powi() function
+	poly degree double to int
+	minor corrections:
+		java code for CV
+2.83: 2006/11/17
+	Fix the bug of -t 3
+	better checking load/save in svm-train.c/svm-predict.c/svm.cpp
+	remove redundant var pos in svm_predict_values (thanks to Albert Strasheim)
+	Better descriptions in README for the precomputed kernel
+
+2.84: 2007/04/01
+	Improve the shrinking code: faster for some cases
+	Code more 64-bit friendly: allow large -m
+	In Solver, b is replaced by p
+	Subroutine max_violating_pair removed. Things are directly
+	written in do_shrinking().
+	Modify do_shrinking() so variable names are the same as libsvm
+	document
+
+2.85: 2007/11/6
+	fix minor memory leak in svm-predict.c
+	add tools/checkdata.py 
+	java to 1.5
+	Makefile: CXX?
+	Makefile.win: avoid warning from .net 2005
+	avoid warning of gcc 4.2
+	sigma 0.001 to 1e-12; in Newton direction of prob output
+	2 * (long int) l avoid warning of old Visual C++
+	grid.py: avoid gnuplot problem on windows
+
+2.86: 2008/04/01
+	svm-scale for java
+	version number in svm.h and svm.m4
+	rename svmtrain.exe to svm-train.exe 
+	python: while 1 --> while True, Popen -> call
+	show best parameters on the contour of grid.py
+
+2.87: 2008/10/13
+	svm-toy/qt updated to qt4 from qt3
+	fix a bug in svm-scale.c
+		max feature index of -r file is considered
+	Makefile: add make lib; add -Wconversion and -fPIC in Makefile
+	Add "rb" in load_model of svm.cpp
+	Simplify do_shrinking of svm.cpp
+	Change the order of loops in reconstrict_gradient of svm.cpp
+		save the number of kernel evaluations
+	Add python/setup.py
+
+2.88: 2008/10/30
+	better gradient reconstructions
+	issue a warning	when -h 0 may be faster
+
+2.89: 2009/04/01
+	reduce input/loading time of svm-train/svm-predict by half
+	pointer function so users can specify their own outputs
+	remove info_flush() 
+	a extern variable libsvm_version
+	svm-train -q option (disable outputs)
+	svm-scale: warning if more nonzero produced
+	easy.py: popel.communiate() to avoid some deadlock (if lots of
+		outputs when #classes is large)
+
+2.9: 2009/11/1
+	tools/*.py can be run under python 3.0
+	svm_set_quiet() in python interface to disable outputs
+	check gamma < 0
+	internal functions to be static
+
+2.91: 2010/04/01
+	completely new python interface using ctype
+	new way to set the print_string function
+	Java: able to load model from a BufferedReader directly
+	fix grid.py so -log2c can be run under python 2.6 or after
+
+3.0: 2010/09/13
+	Move model structure to svm.h
+	Two functions for freeing a model (content or the whole model)
+	QD from Qfloat to double (better precision because SSE on 64-bit machines less accurate than i387 on 32-bit
+	exit status for checkdata.py 
+	old python interface (swig) is removed
+
+3.1: 2011/04/01
+	MATLAB interface:
+		Merge matlab interface to core libsvm
+		Using mexPrintf() when calling info() in MATLAB interface.
+		Both 32- and 64-bit windows binary files are provided
+	Java:
+		Math.random is replaced by Random in java interface
+	Python interface:
+i		subroutines to get SVs 
+		relative path to load *.dll and *.so
+	svm.cpp: 
+		null pointer check before release memory in svm_free_model_content()
+		svm_destroy_model() no longer supported.
+	svm-train.c and svm-predict.c
+		Better format check in reading data labels
+	svm-toy:
+		fix the svm_toy dialog path
+	tools:
+		Using new string formatting/encoding in tools/*.py
+		clearer png output, fix grid.py legend
+
+3.11: 2011/11/5
+	Set max number of iterations in the main loop of solvers
+	matlab:
+		new make.m for unix/mac/windows and for matlab/octave
+	matlab and python:
+		fix a problem that decision values returned by svmpredict is empty if number of classes = 1
+	
+3.12: 2012/04/01
+      svm-toy: support loading/saving of regression data
+      python interface: handle the issue of the "0th" feature if using lists
+      tools/grid.py: not redrawing contour if c,g, cv doesn't change
+      add setlocale when saving and loading model so not affected by users' locale
+
+3.13: 2012/11/06
+      svm.c and svm.h:
+            add sv_indices in model structure, so users can know which training instances are SVs
+	    two library funs svm_get_sv_indices and svm_get_nr_sv are added
+	    max_iter warning moved to stderr so -q won't disable it
+      svm-train.c:
+            usage modified to stress that multiclass is supported
+      svm-predict.c:
+            add -q for svm-predict
+      svm-scale.c:
+	    issue a warning if feature indices do not start from 1
+	    issue a warning for inconsistency between scaling-factor file and input file
+      tools:
+	    subset.py is written to be much faster
+      
+3.14: 2012/11/16
+      fix a bug: we didn't re-compile windows binary after updating svm.def
+
+3.15: 2013/1/27
+      fix the bug of not freeing sv_indices
+      tools/grid.py:
+             -null option: allow the search on C or g only
+	     -resume option: resume tasks from an earlier run
+	     can be called as a python module            	
+      python interface:
+      	     local package searched first
+	     libsvm options can be str or list
+	     param.show() becomes print(param)
+
+3.16: 2013/1/27
+      tools/:
+             easy.py fails in 3.15. Fix it by modifying grid.py
+
+3.17: 2013/04/01
+      svm.cpp:
+	     if class labels are 1 and -1, ensure labels[0] = 1 and labels[1] = -1
+      	     initialize model->sv_indices as null in svm_load_model
+	     if nr_fold > # data, change nr_fold to be # data and ro leave-one-out cv 
+      matlab interface: 
+      	     handle the problem where output variables are not specified
+
+3.18: 2014/04/01
+      svm.cpp and svm-scale.c:
+      	     check return values of fscanf
+      matlab interface:
+      	     Makefile no longer handles octave because make.m should be used
+
+3.19: 2014/10/27
+      svm.cpp:
+             use size_t rather than long int in some places for 64-bit windows support
+      matlab interface:
+             use size_t and mwIndex to avoid type conversions
+      python interface:
+             use __all__
+
+3.20: 2014/11/15
+      matlab interface:
+             fix a bug in libsvmwrite.c introduced in 3.19 (cannot run on windows)
+
+3.21: 2015/12/14
+      pre-built windows exe files changed from 32 to 64 bit
+      matlab interface:
+             now use #include "../svm.h"
+             fix some minor issues in make.m of matlab interface
+
+3.22: 2016/12/22
+      probability output:
+             if 2 classes, directly output the predited probabilities
+	     rather than run the iterative algorithms for multi-class situations
+      java:
+             libsvm.jar generated by java 1.7 rather than 1.5
+             change the use of "_" in svm.java, which won't be allowed in later java
+
+3.23: 2018/7/15
+      add more digits of predicted file, model file, scaled data and data from matlab libsvmwrite: to %.17g
+      revise svm-scale.c so features in test data that do not appear in training data are scaled to zero.
+      remove unnecessary tab or space in all files
+      python interface:
+            add Scipy support
+	    add scaling (csr_find_scale_param and csr_scale functions)
+	    put some utility functions identical in LIBLINEAR to commonutil.py.
+	    functions for scaling are put in commonutil.py.
+	    sort column indices of csr matrix before training as feature indices must be ascending
+      convert Qt version of svm-toy from Qt4 to Qt5
+      remove gtk svm-toy because we stop maintaining this tool
+      minor improvement of descriptions in README
+
+3.24: 2019/9/11
+      modify java code so that variable names and some other places are consistent with C code
+      fix compiling issues in matlab/Makefile: use mex only rather than build some .o files separately
+      python interface:
+            use array for reading data in python/commonutil.py to lower the memory usage
+            fix a bug in python/commonutil.py for reading pre-computed kernel
+      minor improvements and bug fixes
+
+3.25: 2021/4/14
+      Add python/setup.py for installation via PyPI
+          python directory reorganized
+          python sources now in the directory python/libsvm
+      Not adding -std=c99 to CFLAGS in generating mex (this causes MinGW to fail)
+
+3.3:  2022/8/11
+      One-class probabilistic outputs introduced
+      Use numpy Use numpy stuff directly instead of mirrored ones in scipy
+
+3.31: 2023/2/28
+      Including openmp extension in the master code instead of showing modifications in faq
+      pypi use openmp by default
+      workflow (wheels): add matrix build for windows, linux, macos
+      Remove deprecated applet API in svm_toy.java
+      Fix memory leak of prob_density_marks and avoid a copy
+      Updated readme on the description of nr_class
+
+3.32: 2023/7/9
+      python interface: fix a bug in svm.py, where indptr.copy() results in a 32bit integer, but we need 64bit
+      matlab interface: fix a bug in handling wrong or too long filename
+
+3.33: 2024/7/10
+      python interface:
+            Avoid numba deprecation warning by setting jit arguments
+nonpython=True
+            Remove shebang (#!) in non-executable python files
+      tools/grid.py:
+            Allow grid.py to handle file names with spaces
+      svm.cpp:
+            Avoid vsprintf deprecated warning in Mac Clang ++ by using vsnprintf instead
+
+3.34: 2024/8/22
+      Ensure cache size does not overflow (as long int is 32 bit on Windows)
+      Fix bug with jit decorator fallback when numba isn't installed
+
+3.35: 2024/9/1
+      Fix an issue of underflow due to the change in 3.34 of using size_t for cache size
+
+3.36: 2025/5/12
+      Python interface:
+            Restructure LIBSVM solver types and kernel types into seperate enum classes.
+            Use module-level variable to keep a refence to ctypes print_null in svm.py -- avoid gargabe collection issues in multi-threading
+            Support file objects as input to svm_read_problem() in commonutil.py
+      Minor updates on the wheel file.
+
+3.37: 2025/12/29
+      Update settings for building wheel
+      Python interface:
+            Change some variable names in Python code for consistency.
+            fix a bug that can't run predict() without scipy installed in python interface
+            README: add an illustration on reading data from URL

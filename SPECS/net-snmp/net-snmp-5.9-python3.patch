@@ -1,0 +1,38 @@
+diff --git a/Makefile.in b/Makefile.in
+index 912f6b2..862fb5f 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -227,7 +227,7 @@ perlcleanfeatures:
+ 
+ # python specific build rules
+ #
+-PYMAKE=$(PYTHON) setup.py $(PYTHONARGS)
++PYMAKE=/usr/bin/python3 setup.py $(PYTHONARGS)
+ pythonmodules: subdirs
+ 	@(dir=`pwd`; cd python; $(PYMAKE) build --basedir=$$dir) ; \
+         if test $$? != 0 ; then \
+diff --git a/python/netsnmp/client.py b/python/netsnmp/client.py
+index daf11a4..3a30a64 100644
+--- a/python/netsnmp/client.py
++++ b/python/netsnmp/client.py
+@@ -56,7 +56,7 @@ class Varbind(object):
+     def __init__(self, tag=None, iid=None, val=None, type_arg=None):
+         self.tag = STR(tag)
+         self.iid = STR(iid)
+-        self.val = STR(val)
++        self.val = val
+         self.type = STR(type_arg)
+         # parse iid out of tag if needed
+         if iid is None and tag is not None:
+@@ -66,7 +66,10 @@ class Varbind(object):
+                 (self.tag, self.iid) = match.group(1, 2)
+ 
+     def __setattr__(self, name, val):
+-        self.__dict__[name] = STR(val)
++        if name == 'val':
++            self.__dict__[name] = val
++        else:
++            self.__dict__[name] = STR(val)
+ 
+     def __str__(self):
+         return obj_to_str(self)

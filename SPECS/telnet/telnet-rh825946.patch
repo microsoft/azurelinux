@@ -1,0 +1,25 @@
+diff -up netkit-telnet-0.17/telnetd/sys_term.c.rh825946 netkit-telnet-0.17/telnetd/sys_term.c
+--- netkit-telnet-0.17/telnetd/sys_term.c.rh825946	1999-12-17 15:28:47.000000000 +0100
++++ netkit-telnet-0.17/telnetd/sys_term.c	2012-06-14 14:05:30.538342755 +0200
+@@ -723,6 +723,9 @@ void cleanup(int sig) {
+     char *p;
+     (void)sig;
+ 
++    /* to avoid a race for wtmp lock */
++    signal(SIGCHLD, SIG_IGN);
++
+     p = line + sizeof("/dev/") - 1;
+     if (logout(p)) logwtmp(p, "", "");
+ #ifdef PARANOID_TTYS
+diff -up netkit-telnet-0.17/telnetd/telnetd.c.rh825946 netkit-telnet-0.17/telnetd/telnetd.c
+--- netkit-telnet-0.17/telnetd/telnetd.c.rh825946	2012-06-14 14:04:42.000000000 +0200
++++ netkit-telnet-0.17/telnetd/telnetd.c	2012-06-14 14:06:01.547291404 +0200
+@@ -1147,8 +1147,6 @@ void telnet(int f, int p)
+ 	if (FD_ISSET(p, &obits) && (pfrontp - pbackp) > 0)
+ 	    ptyflush();
+     }
+-    /* to avoid a race for wtmp lock */
+-    signal(SIGCHLD, SIG_IGN);
+     cleanup(0);
+ }  /* end of telnet */
+ 	

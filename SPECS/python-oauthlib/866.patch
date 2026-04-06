@@ -1,0 +1,37 @@
+From 6cbbd16bf7ac0ee6af68dc900cbaa734c52343c8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 24 Oct 2023 15:08:10 +0200
+Subject: [PATCH] Make UtilsTests.test_filter_params Python 3.13+ compatible
+
+Since Python 3.13.0a1, docstrings are automatically dedented.
+See https://github.com/python/cpython/issues/81283
+and https://docs.python.org/3.13/whatsnew/3.13.html#other-language-changes
+
+As a result, using a docstring with leading space as a test case
+breaks the test assumption.
+
+The initial commit which introduced this test a decade ago
+(6c0c7914f3a57823834b1be492b307992f943629)
+does not specify why testing the spaces is important.
+---
+ tests/oauth1/rfc5849/test_utils.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/oauth1/rfc5849/test_utils.py b/tests/oauth1/rfc5849/test_utils.py
+index 013c71a9..22128908 100644
+--- a/tests/oauth1/rfc5849/test_utils.py
++++ b/tests/oauth1/rfc5849/test_utils.py
+@@ -53,11 +53,11 @@ def test_filter_params(self):
+         # The following is an isolated test function used to test the filter_params decorator.
+         @filter_params
+         def special_test_function(params, realm=None):
+-            """ I am a special test function """
++            """I am a special test function"""
+             return 'OAuth ' + ','.join(['='.join([k, v]) for k, v in params])
+ 
+         # check that the docstring got through
+-        self.assertEqual(special_test_function.__doc__, " I am a special test function ")
++        self.assertEqual(special_test_function.__doc__, "I am a special test function")
+ 
+         # Check that the decorator filtering works as per design.
+         #   Any param that does not start with 'oauth'

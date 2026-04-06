@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-cd-image;
+Actions=xorrisoExtractHere;
+
+[Desktop Action xorrisoExtractHere]
+Name=Extract ISO image using Xorriso here
+Name[de]=ISO-Abbild mit Xorriso hier entpacken
+Icon=media-optical
+Exec=/bin/nice -n 19 ionice -n7 -c3 xorriso -indev "%F" -osirrox on -cp_rx "*" "$(dirname %F)"

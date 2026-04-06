@@ -1,0 +1,15 @@
+diff -up check-0.11.0/configure.ac.info-in-builddir check-0.11.0/configure.ac
+--- check-0.11.0/configure.ac.info-in-builddir	2016-12-21 15:36:18.415103323 -0500
++++ check-0.11.0/configure.ac	2016-12-21 15:37:20.008715140 -0500
+@@ -20,9 +20,9 @@ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_LIBOBJ_DIR([lib])
+ 
+ # really severe build strictness
+-AM_INIT_AUTOMAKE([-Wall gnits 1.11.2])
++#AM_INIT_AUTOMAKE([-Wall gnits 1.11.2])
+ # Change to using into-in-builddir in the future:
+-#AM_INIT_AUTOMAKE([info-in-builddir -Wall -Werror gnits 1.14])
++AM_INIT_AUTOMAKE([info-in-builddir -Wall -Werror gnits 1.14])
+ 
+ # define things like _GNU_SOURCE appropriately
+ # From patch 2803433, request system extensions to generate 64-bit safe code

@@ -1,0 +1,35 @@
+From 6d4c9642dc6c9e2915c004e6a87855ba94b43e49 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 4 Oct 2024 17:41:37 +0100
+Subject: [PATCH 104/131] pcsclient: only import 'pypac' module on Windows
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The PACSession object is only used in a code path that runs on
+Windows, so don't try to import this on Linux, to avoid the
+redundant dependency.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index 9f1d2245..046c781d 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -5,8 +5,9 @@ import json
+ import binascii
+ from urllib import parse
+ from OpenSSL import crypto
+-from pypac import PACSession
+ from platform import system
++if system() == 'Windows':
++    from pypac import PACSession
+ from lib.intelsgx.credential import Credentials
+ from requests.adapters import HTTPAdapter
+ from urllib3.util import Retry
+-- 
+2.53.0
+

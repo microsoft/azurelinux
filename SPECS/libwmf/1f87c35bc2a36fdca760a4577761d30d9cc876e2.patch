@@ -1,0 +1,32 @@
+From 1f87c35bc2a36fdca760a4577761d30d9cc876e2 Mon Sep 17 00:00:00 2001
+From: Bo Anderson <mail@boanderson.me>
+Date: Tue, 27 Jun 2023 04:07:35 +0100
+Subject: [PATCH] Fix missing includes on macOS
+
+---
+ src/extra/gd/gd.c     | 1 +
+ src/extra/gd/gd_gd2.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/extra/gd/gd.c b/src/extra/gd/gd.c
+index dc6a9a7..a3395d6 100644
+--- a/src/extra/gd/gd.c
++++ b/src/extra/gd/gd.c
+@@ -1,4 +1,5 @@
+ #include <stdio.h>
++#include <limits.h>
+ #include <math.h>
+ #include <string.h>
+ #include <stdlib.h>
+diff --git a/src/extra/gd/gd_gd2.c b/src/extra/gd/gd_gd2.c
+index 05d8dcb..e5c5d32 100644
+--- a/src/extra/gd/gd_gd2.c
++++ b/src/extra/gd/gd_gd2.c
+@@ -12,6 +12,7 @@
+ 
+ #include <stdio.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <math.h>
+ #include <string.h>
+ #include <stdlib.h>

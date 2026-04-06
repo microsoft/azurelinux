@@ -1,0 +1,26 @@
+From 871393804b0bdec39e365a59ceaed7aaee774355 Mon Sep 17 00:00:00 2001
+From: Kjell Ahlstedt <kjellahlstedt@gmail.com>
+Date: Tue, 15 Apr 2025 09:53:12 +0200
+Subject: [PATCH] MSVC_NMake/gendef/gendef.cc: License info: library -> program
+
+Was incorrectly corrected in the previous commit.
+---
+ MSVC_NMake/gendef/gendef.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/MSVC_NMake/gendef/gendef.cc b/MSVC_NMake/gendef/gendef.cc
+index ecd7224..09ea9d0 100644
+--- a/MSVC_NMake/gendef/gendef.cc
++++ b/MSVC_NMake/gendef/gendef.cc
+@@ -13,7 +13,7 @@
+  *  GNU General Public License for more details.
+  *
+  *  You should have received a copy of the GNU General Public License
+- *  along with this library; if not, see <https://www.gnu.org/licenses/>.
++ *  along with this program; if not, see <https://www.gnu.org/licenses/>.
+  *
+  *  For more information, visit the MICO Home Page at
+  *  http://www.mico.org/
+-- 
+GitLab
+

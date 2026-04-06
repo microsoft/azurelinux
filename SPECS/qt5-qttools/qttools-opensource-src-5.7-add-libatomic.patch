@@ -1,0 +1,11 @@
+diff -urp qttools-opensource-src-5.6.0-beta1/src/qtdiag/qtdiag.pro q/src/qtdiag/qtdiag.pro
+--- qttools-opensource-src-5.6.0-beta1/src/qtdiag/qtdiag.pro	2015-10-30 11:48:01.000000000 +0100
++++ q/src/qtdiag/qtdiag.pro	2016-04-30 08:45:22.099054040 +0200
+@@ -2,6 +2,7 @@ load(qt_app)
+ 
+ CONFIG += console
+ QT += core-private gui-private
++LIBS += -latomic
+ 
+ qtHaveModule(network) {
+     QT += network

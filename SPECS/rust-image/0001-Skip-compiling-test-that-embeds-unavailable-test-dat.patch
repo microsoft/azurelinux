@@ -1,0 +1,25 @@
+From 974138e2dab3d59c8c45cab8881921aae4686d39 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 12 Sep 2025 20:56:51 +0200
+Subject: [PATCH] Skip compiling test that embeds unavailable test data
+
+---
+ src/metadata.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/metadata.rs b/src/metadata.rs
+index f0e55e5..f47e0de 100644
+--- a/src/metadata.rs
++++ b/src/metadata.rs
+@@ -158,7 +158,7 @@ enum ExifEndian {
+     Little,
+ }
+ 
+-#[cfg(all(test, feature = "jpeg"))]
++#[cfg(any())]
+ mod tests {
+     use crate::{codecs::jpeg::JpegDecoder, ImageDecoder as _};
+ 
+-- 
+2.51.0
+

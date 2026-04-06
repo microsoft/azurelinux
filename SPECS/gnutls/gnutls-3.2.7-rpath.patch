@@ -1,0 +1,12 @@
+diff -ur gnutls-3.2.7.orig/configure gnutls-3.2.7/configure
+--- gnutls-3.2.7.orig/configure	2013-11-23 11:09:49.000000000 +0100
++++ gnutls-3.2.7/configure	2013-11-25 16:53:05.559440656 +0100
+@@ -39652,7 +39652,7 @@
+ shlibpath_overrides_runpath=unknown
+ version_type=none
+ dynamic_linker="$host_os ld.so"
+-sys_lib_dlsearch_path_spec="/lib /usr/lib"
++sys_lib_dlsearch_path_spec="/lib /usr/lib /lib64 /usr/lib64"
+ need_lib_prefix=unknown
+ hardcode_into_libs=no
+ 

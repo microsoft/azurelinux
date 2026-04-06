@@ -1,0 +1,216 @@
+From 1cd5674ab9d90d663b4aada9c02cd1a2115c0b24 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 13 Feb 2025 14:12:38 +0000
+Subject: [PATCH 00/17] Add support for building against host openssl crypto
+ lib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For the host tools/libraries it is desirable to be build
+against the host provided openssl crypto library, such
+that security updates automatically propagate from the
+distro vendor.
+
+This is enabled as an opt-in by setting the make variable
+
+  USE_HOST_OPENSSL_CRYPTO=1
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ buildenv.mk                                     | 13 +++++++++++++
+ psw/ae/aesm_service/Makefile                    |  3 +++
+ psw/ae/aesm_service/source/utils/CMakeLists.txt |  4 ++--
+ psw/urts/linux/Makefile                         |  8 +++-----
+ sdk/sign_tool/SignTool/Makefile                 |  7 ++-----
+ sdk/simulation/uae_service_sim/linux/Makefile   |  7 ++-----
+ sdk/simulation/urtssim/linux/Makefile           |  7 ++-----
+ 7 files changed, 27 insertions(+), 22 deletions(-)
+
+diff --git a/buildenv.mk b/buildenv.mk
+index 4689c603..acae2106 100644
+--- a/buildenv.mk
++++ b/buildenv.mk
+@@ -371,3 +371,16 @@ else
+     SGX_LIB_DIR := $(SGX_SDK)/lib64/$(MITIGATION_LIB_PATH)
+     SGX_BIN_DIR := $(SGX_SDK)/bin/x64
+ endif
++
++USE_HOST_OPENSSL_CRYPTO ?= 0
++
++ifeq ($(USE_HOST_OPENSSL_CRYPTO), 1)
++OPENSSL_CRYPTO_CFLAGS = $(shell pkg-config --cflags libcrypto)
++OPENSSL_CRYPTO_LDFLAGS = $(shell pkg-config --libs libcrypto)
++OPENSSL_CRYPTO_LIBS = $(shell pkg-config --libs libcrypto)
++else
++OPENSSL_CRYPTO_PREBUILT_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
++OPENSSL_CRYPTO_CFLAGS = -I$(OPENSSL_CRYPTO_PREBUILT_DIR)/inc
++OPENSSL_CRYPTO_LDFLAGS = -L$(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64 -lcrypto
++OPENSSL_CRYPTO_LIBS = $(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64/libcrypto.a
++endif
+diff --git a/psw/ae/aesm_service/Makefile b/psw/ae/aesm_service/Makefile
+index 498d6e2f..bac84292 100644
+--- a/psw/ae/aesm_service/Makefile
++++ b/psw/ae/aesm_service/Makefile
+@@ -46,6 +46,9 @@ ifeq ($(BUILD_REF_LE), 1)
+      AESM_CONFIG += -DREF_LE=ON
+ endif
+ 
++AESM_CONFIG += -DOPENSSL_CRYPTO_CFLAGS=$(OPENSSL_CRYPTO_CFLAGS)
++AESM_CONFIG += -DOPENSSL_CRYPTO_LIBS=$(OPENSSL_CRYPTO_LIBS)
++
+ ifeq ($(ARCH), x86)
+     SQLITECFLAGS += -m32
+ else
+diff --git a/psw/ae/aesm_service/source/utils/CMakeLists.txt b/psw/ae/aesm_service/source/utils/CMakeLists.txt
+index a3843bdf..2c9c87b3 100644
+--- a/psw/ae/aesm_service/source/utils/CMakeLists.txt
++++ b/psw/ae/aesm_service/source/utils/CMakeLists.txt
+@@ -45,7 +45,7 @@ target_include_directories(utils PRIVATE
+     ${PROJECT_SOURCE_DIR}/../../../../external/epid-sdk
+     ${PROJECT_SOURCE_DIR}/../../../../external/rdrand
+     ${PROJECT_SOURCE_DIR}/../../data/constants/linux
+-    ${PROJECT_SOURCE_DIR}/../../../../external/dcap_source/prebuilt/openssl/inc
++    ${OPENSSL_CRYPTO_CFLAGS}
+ )
+ 
+ target_compile_definitions(utils PRIVATE
+@@ -55,7 +55,7 @@ target_compile_definitions(utils PRIVATE
+ set_property(TARGET utils APPEND_STRING PROPERTY LINK_FLAGS " -Wl,-z,defs")
+ 
+ target_link_libraries(utils
+-    ${PROJECT_SOURCE_DIR}/../../../../external/dcap_source/prebuilt/openssl/lib/linux64/libcrypto.a
++    ${OPENSSL_CRYPTO_LIBS}
+     oal
+     ${CMAKE_SOURCE_DIR}/../../../../external/rdrand/src/librdrand.a
+ )
+diff --git a/psw/urts/linux/Makefile b/psw/urts/linux/Makefile
+index 7e0b6a08..3d08ee5c 100644
+--- a/psw/urts/linux/Makefile
++++ b/psw/urts/linux/Makefile
+@@ -43,8 +43,6 @@ CFLAGS += -fPIC -Werror -g
+ CFLAGS += $(ADDED_INC)
+ 
+ VTUNE_DIR = $(LINUX_EXTERNAL_DIR)/vtune/linux
+-PREBUILT_OPENSSL_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
+-CRYPTO_LIB := -L$(PREBUILT_OPENSSL_DIR)/lib/linux64 -lcrypto
+ 
+ INC += -I$(SGX_HEADER_DIR)                \
+        -I$(COMMON_DIR)/inc/internal       \
+@@ -55,14 +53,14 @@ INC += -I$(SGX_HEADER_DIR)                \
+        -I$(LINUX_PSW_DIR)/urts/parser     \
+        -I$(VTUNE_DIR)/include \
+        -I$(VTUNE_DIR)/sdk/src/ittnotify   \
+-       -I$(PREBUILT_OPENSSL_DIR)/inc
++       $(OPENSSL_CRYPTO_CFLAGS)
+ 
+ LDFLAGS := -lwrapper
+ INTERNAL_LDFLAGS := -lwrapper
+ LDFLAGS += $(COMMON_LDFLAGS) -Wl,-Bdynamic -L$(BUILD_DIR) -lsgx_enclave_common -lpthread
+ INTERNAL_LDFLAGS += $(COMMON_LDFLAGS) -lpthread
+-LDFLAGS += -L$(VTUNE_DIR)/sdk/src/ittnotify -littnotify -ldl $(CRYPTO_LIB)
+-INTERNAL_LDFLAGS += -L$(VTUNE_DIR)/sdk/src/ittnotify -littnotify -ldl $(CRYPTO_LIB)
++LDFLAGS += -L$(VTUNE_DIR)/sdk/src/ittnotify -littnotify -ldl $(OPENSSL_CRYPTO_LDFLAGS)
++INTERNAL_LDFLAGS += -L$(VTUNE_DIR)/sdk/src/ittnotify -littnotify -ldl $(OPENSSL_CRYPTO_LDFLAGS)
+ LDFLAGS += -Wl,--version-script=urts.lds -Wl,--gc-sections
+ INTERNAL_LDFLAGS += -Wl,--version-script=urts_internal.lds -Wl,--gc-sections
+ 
+diff --git a/sdk/sign_tool/SignTool/Makefile b/sdk/sign_tool/SignTool/Makefile
+index 1ed9f286..ed177c86 100644
+--- a/sdk/sign_tool/SignTool/Makefile
++++ b/sdk/sign_tool/SignTool/Makefile
+@@ -42,9 +42,6 @@ CFLAGS += $(FLAGS)
+ CXXFLAGS += $(FLAGS)
+ LDFLAGS := -pie $(COMMON_LDFLAGS) -Wno-odr
+ 
+-PREBUILT_OPENSSL_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
+-CRYPTO_LIB := -L$(PREBUILT_OPENSSL_DIR)/lib/linux64 -lcrypto
+-
+ INC += $(ADDED_INC)
+ INC +=  -I$(COMMON_DIR)/inc                         \
+         -I$(COMMON_DIR)/inc/internal                \
+@@ -54,7 +51,7 @@ INC +=  -I$(COMMON_DIR)/inc                         \
+         -I$(LINUX_PSW_DIR)/urts/linux               \
+         -I$(LINUX_EXTERNAL_DIR)/tinyxml2            \
+         -I$(LINUX_PSW_DIR)/urts/parser              \
+-        -I$(PREBUILT_OPENSSL_DIR)/inc
++        $(OPENSSL_CRYPTO_CFLAGS)
+ 
+ DIR1 := $(LINUX_EXTERNAL_DIR)/tinyxml2/
+ DIR2 := $(COMMON_DIR)/src/
+@@ -90,7 +87,7 @@ all: sgx_sign | $(BUILD_DIR)
+ $(BUILD_DIR):
+ 	@$(MKDIR) $@
+ 
+-sgx_sign: PRIVATE_LDLIBS  := -lpthread -lenclaveparser $(CRYPTO_LIB) -ldl
++sgx_sign: PRIVATE_LDLIBS  := -lpthread -lenclaveparser $(OPENSSL_CRYPTO_LDFLAGS) -ldl
+ sgx_sign: PRIVATE_LDFLAGS := -L$(LINUX_PSW_DIR)/urts/parser $(LDFLAGS)
+ 
+ sgx_sign: $(OBJS) enclaveparser
+diff --git a/sdk/simulation/uae_service_sim/linux/Makefile b/sdk/simulation/uae_service_sim/linux/Makefile
+index c66beed2..45ddb576 100644
+--- a/sdk/simulation/uae_service_sim/linux/Makefile
++++ b/sdk/simulation/uae_service_sim/linux/Makefile
+@@ -34,9 +34,6 @@ include $(TOP_DIR)/buildenv.mk
+ 
+ get_version_name = $(addsuffix _VERSION,$(shell echo $(subst _deploy,,$(subst libsgx_,,$(basename $1))) | tr a-z A-Z))
+ 
+-PREBUILT_OPENSSL_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
+-CRYPTO_LIB := -L$(PREBUILT_OPENSSL_DIR)/lib/linux64 -lcrypto
+-
+ INCLUDES := -I..                                            \
+             -I$(COMMON_DIR)/inc                             \
+             -I$(COMMON_DIR)/inc/internal                    \
+@@ -48,7 +45,7 @@ INCLUDES := -I..                                            \
+             -I$(LINUX_PSW_DIR)/ae/inc                       \
+             -I$(LINUX_PSW_DIR)/ae/inc/internal              \
+             -I$(LINUX_PSW_DIR)/ae/common                    \
+-            -I$(PREBUILT_OPENSSL_DIR)/inc
++            $(OPENSSL_CRYPTO_CFLAGS)
+ 
+ 
+ CXXFLAGS += -Wall -fPIC $(INCLUDES) -Werror -g $(CET_FLAGS)
+@@ -60,7 +57,7 @@ RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
+ 
+ EXTERNAL_LIB += -L$(RDRAND_LIBDIR) -lrdrand
+ EXTERNAL_LIB += -L$(RDRAND_LIBDIR) -lrt
+-EXTERNAL_LIB += -ldl $(CRYPTO_LIB)
++EXTERNAL_LIB += -ldl $(OPENSSL_CRYPTO_LDFLAGS)
+ 
+ vpath %.cpp $(LINUX_PSW_DIR)/ae/common \
+             $(LINUX_SDK_DIR)/simulation/urtssim \
+diff --git a/sdk/simulation/urtssim/linux/Makefile b/sdk/simulation/urtssim/linux/Makefile
+index e756d468..ea8ca78c 100644
+--- a/sdk/simulation/urtssim/linux/Makefile
++++ b/sdk/simulation/urtssim/linux/Makefile
+@@ -42,9 +42,6 @@ endif
+ CXXFLAGS += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)
+ CFLAGS   += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)
+ 
+-PREBUILT_OPENSSL_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
+-CRYPTO_LIB := -L$(PREBUILT_OPENSSL_DIR)/lib/linux64 -lcrypto
+-
+ CPPFLAGS += $(ADDED_INC) #for ubuntu 11 and later version
+ CPPFLAGS += -I$(COMMON_DIR)/inc                \
+             -I$(COMMON_DIR)/inc/internal/linux \
+@@ -53,7 +50,7 @@ CPPFLAGS += -I$(COMMON_DIR)/inc                \
+             -I$(LINUX_PSW_DIR)/urts/parser     \
+             -I$(VTUNE_DIR)/include \
+             -I$(VTUNE_DIR)/sdk/src/ittnotify \
+-            -I$(PREBUILT_OPENSSL_DIR)/inc
++            $(OPENSSL_CRYPTO_CFLAGS)
+ 
+ CPPFLAGS += -I$(COMMON_DIR)/inc/internal      \
+             -I$(LINUX_PSW_DIR)/urts/linux     \
+@@ -128,7 +125,7 @@ LDFLAGS += $(COMMON_LDFLAGS) -Wl,--version-script=$(LINUX_PSW_DIR)/urts/linux/ur
+ LIBURTSSIM_SHARED := libsgx_urts_sim.so
+ LIBURTS_DEPLOY := libsgx_urts_deploy.so
+ 
+-LDLIBS += -lwrapper $(CRYPTO_LIB) -Wl,-Bdynamic -Wl,-Bsymbolic -lsgx_uae_service_sim
++LDLIBS += -lwrapper $(OPENSSL_CRYPTO_LDFLAGS) -Wl,-Bdynamic -Wl,-Bsymbolic -lsgx_uae_service_sim
+ SONAME = $(LIBURTSSIM_SHARED)
+ 
+ .PHONY: all
+-- 
+2.52.0
+

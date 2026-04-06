@@ -1,0 +1,1 @@
+%perl_XS_Parse_Sublike_ABI perl(:XS_Parse_Sublike_ABI) = %(perl -MFile::Spec -MFile::ShareDir -MXS::Parse::Sublike -e 'open(my $h, q{<}, File::Spec->catdir(File::ShareDir::module_dir(q{XS::Parse::Sublike}), q{include}, q{XSParseSublike.h})); undef($/); print $1 if <$h> =~ m{^#define XSPARSESUBLIKE_ABI_VERSION (\\d+)}m')

@@ -1,0 +1,11 @@
+--- config-0.15.13/Cargo.toml	1970-01-01T00:00:01+00:00
++++ config-0.15.13/Cargo.toml	2025-07-31T15:33:41.823631+00:00
+@@ -180,7 +180,7 @@
+ version = "0.2"
+ 
+ [dependencies.ron]
+-version = "0.8"
++version = ">=0.7,<0.9"
+ optional = true
+ 
+ [dependencies.rust-ini]

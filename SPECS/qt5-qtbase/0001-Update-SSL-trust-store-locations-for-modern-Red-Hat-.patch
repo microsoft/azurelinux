@@ -1,0 +1,59 @@
+From fc220df0ab000b3c6f10863915807ec82200d1dc Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 29 Jul 2025 10:08:31 -0700
+Subject: [PATCH] Update SSL trust store locations for modern Red Hat (qt5)
+
+Red Hat family distros haven't used /usr/share/ssl since 2004:
+https://bugzilla.redhat.com/show_bug.cgi?id=143392
+/etc/ssl/certs has never been a canonical location on Red Hat
+family distros, and as of
+https://fedoraproject.org/wiki/Changes/dropingOfCertPemFile is
+being removed. The same change also removes
+/etc/pki/tls/certs/ca-bundle.crt . This updates both magic lists
+with the modern canonical locations for Red Hat and derived
+distros. The tls-ca-bundle.pem bundle has been around in Fedora
+since around 2013:
+https://src.fedoraproject.org/rpms/ca-certificates/c/d538ada99cda951da7da3a72dc5eea06f02be212
+The directory-hash dir has been around since around 2021:
+https://src.fedoraproject.org/rpms/ca-certificates/c/1c8b67fb5ab3954a308d019461bb30d50412087e
+
+This is a qt5 version of
+ https://codereview.qt-project.org/c/qt/qtbase/+/664056 .
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ src/network/ssl/qsslsocket.cpp         | 3 ++-
+ src/network/ssl/qsslsocket_openssl.cpp | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/network/ssl/qsslsocket.cpp b/src/network/ssl/qsslsocket.cpp
+index 2a0b3a4f1d1..bfaddad7360 100644
+--- a/src/network/ssl/qsslsocket.cpp
++++ b/src/network/ssl/qsslsocket.cpp
+@@ -2957,7 +2957,8 @@ QList<QByteArray> QSslSocketPrivate::unixRootCertDirectories()
+ {
+     return QList<QByteArray>() <<  "/etc/ssl/certs/" // (K)ubuntu, OpenSUSE, Mandriva ...
+                                << "/usr/lib/ssl/certs/" // Gentoo, Mandrake
+-                               << "/usr/share/ssl/" // Centos, Redhat, SuSE
++                               << "/usr/share/ssl/" // Red Hat pre-2004, SuSE
++                               << "/etc/pki/ca-trust/extracted/pem/directory-hash/" // Red Hat 2021+
+                                << "/usr/local/ssl/" // Normal OpenSSL Tarball
+                                << "/var/ssl/certs/" // AIX
+                                << "/usr/local/ssl/certs/" // Solaris
+diff --git a/src/network/ssl/qsslsocket_openssl.cpp b/src/network/ssl/qsslsocket_openssl.cpp
+index 8f6858c867a..3050b7baa54 100644
+--- a/src/network/ssl/qsslsocket_openssl.cpp
++++ b/src/network/ssl/qsslsocket_openssl.cpp
+@@ -961,7 +961,8 @@ QList<QSslCertificate> QSslSocketPrivate::systemCaCertificates()
+         for (const QString& file : qAsConst(certFiles))
+             systemCerts.append(QSslCertificate::fromPath(file, platformEncodingFormat));
+ # ifndef Q_OS_ANDROID
+-        systemCerts.append(QSslCertificate::fromPath(QLatin1String("/etc/pki/tls/certs/ca-bundle.crt"), QSsl::Pem)); // Fedora, Mandriva
++        systemCerts.append(QSslCertificate::fromPath(QLatin1String("/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"), QSsl::Pem)); // Red Hat 2013+
++        systemCerts.append(QSslCertificate::fromPath(QLatin1String("/etc/pki/tls/certs/ca-bundle.crt"), QSsl::Pem)); // Red Hat older, Mandriva
+         systemCerts.append(QSslCertificate::fromPath(QLatin1String("/usr/local/share/certs/ca-root-nss.crt"), QSsl::Pem)); // FreeBSD's ca_root_nss
+ # endif
+     }
+-- 
+2.49.0
+

@@ -1,0 +1,16 @@
+/etc/mrtg.*	gen_context(system_u:object_r:mrtg_etc_t,s0)
+/etc/mrtg/mrtg\.ok	--	gen_context(system_u:object_r:mrtg_lock_t,s0)
+
+/etc/rc\.d/init\.d/mrtg	--	gen_context(system_u:object_r:mrtg_initrc_exec_t,s0)
+
+/usr/bin/mrtg	--	gen_context(system_u:object_r:mrtg_exec_t,s0)
+
+/var/lib/mrtg(/.*)?	gen_context(system_u:object_r:mrtg_var_lib_t,s0)
+
+/run/lock/mrtg(/.*)?	gen_context(system_u:object_r:mrtg_lock_t,s0)
+/run/lock/mrtg-rrd(/.*)?	gen_context(system_u:object_r:mrtg_lock_t,s0)
+/run/lock/subsys/mrtg	--	gen_context(system_u:object_r:mrtg_lock_t,s0)
+
+/var/log/mrtg.*	gen_context(system_u:object_r:mrtg_log_t,s0)
+
+/run/mrtg\.pid	--	gen_context(system_u:object_r:mrtg_var_run_t,s0)

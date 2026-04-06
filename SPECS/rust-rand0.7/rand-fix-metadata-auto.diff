@@ -1,0 +1,11 @@
+--- rand-0.7.3/Cargo.toml	2020-01-10T21:46:19+00:00
++++ rand-0.7.3/Cargo.toml	2023-05-21T12:52:28.593382+00:00
+@@ -67,8 +67,6 @@
+ [target."cfg(not(target_os = \"emscripten\"))".dependencies.rand_chacha]
+ version = "0.2.1"
+ default-features = false
+-[target."cfg(target_os = \"emscripten\")".dependencies.rand_hc]
+-version = "0.2"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.22"
+ optional = true

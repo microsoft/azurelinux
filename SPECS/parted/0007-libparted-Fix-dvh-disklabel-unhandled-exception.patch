@@ -1,0 +1,29 @@
+From 1480769f2a7071c5a251b6c69658808199e8b05b Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 8 Jan 2025 13:35:04 -0800
+Subject: [PATCH 7/8] libparted: Fix dvh disklabel unhandled exception
+
+When an exception is using PED_EXCEPTION_IGNORE_CANCEL it should check
+for !PED_EXCEPTION_IGNORE so that an unhandled exception is treated the
+same as cancel. Otherwise it could lead to using the disklabel with
+incorrect values.
+---
+ libparted/labels/dvh.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libparted/labels/dvh.c b/libparted/labels/dvh.c
+index 0f9124d..7d7dae3 100644
+--- a/libparted/labels/dvh.c
++++ b/libparted/labels/dvh.c
+@@ -308,7 +308,7 @@ dvh_read (PedDisk* disk)
+ 			PED_EXCEPTION_IGNORE_CANCEL,
+ 			_("Checksum is wrong, indicating the partition "
+ 			  "table is corrupt."))
+-				== PED_EXCEPTION_CANCEL)
++				!= PED_EXCEPTION_IGNORE)
+ 			return 0;
+ 	}
+ 
+-- 
+2.47.1
+

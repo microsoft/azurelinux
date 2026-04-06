@@ -1,0 +1,24 @@
+
+Don't expose private symbols for the Apache modules DSO.
+
+--- subversion-1.14.2/build/generator/gen_base.py.modsyms
++++ subversion-1.14.2/build/generator/gen_base.py
+@@ -727,13 +727,17 @@
+   def __init__(self, name, options, gen_obj):
+     TargetLib.__init__(self, name, options, gen_obj)
+ 
++    if name[:4] != "mod_":
++      raise Exception("Apache module targets must be named mod_*")
++
+     tfile = name + self.gen_obj._extension_map['lib', 'target']
+     self.filename = build_path_join(self.path, tfile)
+ 
++    modsyms = name[4:] + '_[^_].*'
+     # we have a custom linking rule
+     ### hmm. this is Makefile-specific
+     self.compile_cmd = '$(COMPILE_APACHE_MOD)'
+-    self.link_cmd = '$(LINK_APACHE_MOD)'
++    self.link_cmd = '$(LINK_APACHE_MOD) -export-symbols-regex ' + modsyms
+ 
+ class TargetSharedOnlyLib(TargetLib):
+ 

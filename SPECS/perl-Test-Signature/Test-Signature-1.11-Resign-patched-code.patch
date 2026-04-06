@@ -1,0 +1,59 @@
+From 4ee74683bf9da99c680cbcc3979f0974c8f2ede7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 18 May 2017 11:06:37 +0200
+Subject: [PATCH] Resign patched code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Public key 0x4B528393E6A3B0DFB2EF3A6412C9C5C767C6FAA2.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ SIGNATURE | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/SIGNATURE b/SIGNATURE
+index fb7b162..0282fc1 100644
+--- a/SIGNATURE
++++ b/SIGNATURE
+@@ -1,5 +1,5 @@
+ This file contains message digests of all files listed in MANIFEST,
+-signed via the Module::Signature module, version 0.74.
++signed via the Module::Signature module, version 0.81.
+ 
+ To verify the content in this distribution, first make sure you have
+ Module::Signature installed, then type:
+@@ -12,13 +12,13 @@ the distribution may already have been compromised, and you should
+ not run its Makefile.PL or Build.PL.
+ 
+ -----BEGIN PGP SIGNED MESSAGE-----
+-Hash: SHA1
++Hash: SHA256
+ 
+ SHA1 94ac89fb0fdcce47b44844a7dcafc2c5a5eda61e Changes
+ SHA1 4e742aac79b5fb92216a2f20db73c77ca2d8968e INSTALL
+ SHA1 3522a8584f44dd25ffaf5a59e9dbc36932b20dec MANIFEST
+ SHA1 529af12b14b3773c51defaf49d3e0246f6d3cad2 META.yml
+-SHA1 c14df95057379f66936c5bb23decafb6501234e5 Makefile.PL
++SHA1 0090ae40254b396a54cf81f1bf2751a00b82d3b9 Makefile.PL
+ SHA1 9a460a2e279e63ed9003b9ab04e1e6f0fa9f8fe4 README
+ SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+ SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+@@ -32,9 +32,9 @@ SHA1 cfcd1a692b4d82b90e255b35d83d6f90c4375264 lib/Test/Signature.pm
+ SHA1 22ff815f7bd1e63c3c6a925c8cce23e76c277004 t/0-signature.t
+ SHA1 a216b0928445955e2c8b48c850faef40d3328321 t/9-pod.t
+ -----BEGIN PGP SIGNATURE-----
+-Version: GnuPG v1
++Version: GnuPG v2
+ 
+-iEYEARECAAYFAlUlFegACgkQtLPdNzw1AaBXLACeJYlJ5VbGQ6g1j2hrW06pcZWL
+-rX8AoINI5dMnCSWJKZQ0Z0oqtzo2+LfL
+-=iBjf
++iF4EAREIAAYFAlkdY94ACgkQEsnFx2fG+qK3bQD7B6/B4yFcB3M3AODEnA0fWUs6
++EpyKjhvHbPNtgg87TjAA/1dBmGi+suKVcsZscbST3wt+q+RAgyYoXheSdmDu8aRn
++=YaOM
+ -----END PGP SIGNATURE-----
+-- 
+2.9.4
+

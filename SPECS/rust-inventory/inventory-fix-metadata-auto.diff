@@ -1,0 +1,8 @@
+--- inventory-0.3.21/Cargo.toml	1970-01-01T00:00:01+00:00
++++ inventory-0.3.21/Cargo.toml	2025-08-27T15:38:51.472067+00:00
+@@ -66,5 +66,3 @@
+ version = "1.0.89"
+ features = ["diff"]
+ 
+-[target.'cfg(target_family = "wasm")'.dependencies.rustversion]
+-version = "1.0"

@@ -1,0 +1,63 @@
+From 74ad11c52ea9a57e4b0fe338da20b03992b730af Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 13 May 2025 10:26:15 -0400
+Subject: [PATCH] Downstream-only: always use the system jemalloc
+
+---
+ build.rs | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 07b60b7..1441e1f 100644
+--- a/build.rs
++++ b/build.rs
+@@ -82,10 +82,12 @@ fn main() {
+     let out_dir = PathBuf::from(env::var_os("OUT_DIR").expect("OUT_DIR was not set"));
+     let src_dir = env::current_dir().expect("failed to get current directory");
+     let version = expect_env("CARGO_PKG_VERSION");
+-    let je_version = version
+-        .split_once('+')
+-        .expect("jemalloc version is missing")
+-        .1;
++    // Downstream: Since we use the system jemalloc, there is no +.
++    let je_version = if let Some(version_parts) = version.split_once('+') {
++        version_parts.1
++    } else {
++        &version
++    };
+ 
+     info!("TARGET={}", target);
+     info!("HOST={}", host);
+@@ -103,8 +105,7 @@ fn main() {
+         warning!("jemalloc support for `{}` is untested", target);
+     }
+ 
+-    let mut use_prefix =
+-        env::var("CARGO_FEATURE_UNPREFIXED_MALLOC_ON_SUPPORTED_PLATFORMS").is_err();
++    let mut use_prefix = false;
+ 
+     if !use_prefix
+         && NO_UNPREFIXED_MALLOC_TARGETS
+@@ -129,6 +130,10 @@ fn main() {
+         println!("cargo:rustc-cfg=prefixed");
+     }
+ 
++    // Unconditionally use the system library!
++    println!("cargo:rustc-link-lib=dylib=jemalloc");
++    if false {
++
+     if let Some(jemalloc) = read_and_watch_env_os("JEMALLOC_OVERRIDE") {
+         info!("jemalloc override set");
+         let jemalloc = PathBuf::from(jemalloc);
+@@ -364,6 +369,8 @@ fn main() {
+             .compile("pthread_atfork");
+         println!("cargo:rerun-if-changed=src/pthread_atfork.c");
+     }
++
++    }
+ }
+ 
+ fn make_command(make_cmd: &str, build_dir: &Path, num_jobs: &str) -> Command {
+-- 
+2.51.0
+

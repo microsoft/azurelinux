@@ -1,0 +1,23 @@
+From 44c7063fe4c40ffed0d7e5d0dbae4a32ed91022b Mon Sep 17 00:00:00 2001
+From: Arturo Castro <arturo@rin.rs>
+Date: Tue, 19 Apr 2022 12:36:35 +0200
+Subject: [PATCH] serde::Serialize -> serde_derive::Serialize
+
+serde:: doesn't work on tests on CI
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 46542b05..a5cbf53f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1812,7 +1812,7 @@ mod tests {
+     }
+ 
+     bitflags! {
+-        #[derive(serde::Serialize, serde::Deserialize)]
++        #[derive(serde_derive::Serialize, serde_derive::Deserialize)]
+         struct SerdeFlags: u32 {
+             const A = 1;
+             const B = 2;

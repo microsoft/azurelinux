@@ -1,0 +1,15 @@
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+index d5e9b715e..af4c046c4 100644
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -570,6 +570,10 @@ foreach(arch ${archs})
+                     list(APPEND gnArgArg libyuv_use_sve=false)
+                 endif()
+             endif()
++            if(cpu MATCHES "arm.*")
++                # https://bugreports.qt.io/browse/QTBUG-129985
++                list(APPEND gnArgArg build_webnn_with_xnnpack=false)
++            endif()
+             unset(cpu)
+         endif()
+ 

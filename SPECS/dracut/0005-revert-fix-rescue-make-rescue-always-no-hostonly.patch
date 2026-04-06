@@ -1,0 +1,28 @@
+From 713e33a21bfd073bfe43762f8885b1a283ddd39b Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Wed, 29 Jan 2025 20:25:03 +0100
+Subject: [PATCH 5/9] revert: "fix(rescue): make rescue always no-hostonly"
+
+This partly reverts commit 224c00914bfb4ba1dee48e094ebb137facfd5947.
+---
+ install.d/51-dracut-rescue.install | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/install.d/51-dracut-rescue.install b/install.d/51-dracut-rescue.install
+index decee283..1be9b882 100755
+--- a/install.d/51-dracut-rescue.install
++++ b/install.d/51-dracut-rescue.install
+@@ -119,8 +119,8 @@ case "$COMMAND" in
+ 
+         if [[ ! -f "$BOOT_DIR_ABS/$INITRD" ]]; then
+             # shellcheck disable=SC2046
+-            dracut -f \
+-                --add-confdir rescue \
++            dracut -f --no-hostonly --no-uefi \
++                -a "rescue" \
+                 $([[ $KERNEL_INSTALL_VERBOSE == 1 ]] && echo --verbose) \
+                 --kver "$KERNEL_VERSION" \
+                 "$BOOT_DIR_ABS/$INITRD"
+-- 
+2.49.0
+

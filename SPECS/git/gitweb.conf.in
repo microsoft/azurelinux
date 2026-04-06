@@ -1,0 +1,53 @@
+# The gitweb config file is a fragment of perl code. You can set variables
+# using "our $variable = value"; text from "#" character until the end of a
+# line is ignored. See perlsyn(1) man page for details.
+#
+# See /usr/share/doc/gitweb-*/README and /usr/share/doc/gitweb-*/INSTALL for
+# more details and available configuration variables.
+
+# Set the path to git projects.  This is an absolute filesystem path which will
+# be prepended to the project path.
+#our $projectroot = "@PROJECTROOT@";
+
+# Set the list of git base URLs used for URL to where fetch project from, i.e.
+# the full URL is "$git_base_url/$project". By default this is empty
+#our @git_base_url_list = qw(git://git.example.com
+#                            ssh://git.example.com@PROJECTROOT@);
+
+# Enable the 'blame' blob view, showing the last commit that modified
+# each line in the file. This can be very CPU-intensive. Disabled by default
+#$feature{'blame'}{'default'} = [1];
+#
+# Allow projects to override the default setting via git config file.
+# Example: gitweb.blame = 0|1;
+#$feature{'blame'}{'override'} = 1;
+
+# Disable the 'snapshot' link, providing a compressed archive of any tree. This
+# can potentially generate high traffic if you have large project. Enabled for
+# .tar.gz snapshots by default.
+#
+# Value is a list of formats defined in %known_snapshot_formats that you wish
+# to offer.
+#$feature{'snapshot'}{'default'} = [];
+#
+# Allow projects to override the default setting via git config file.
+# Example: gitweb.snapshot = tbz2,zip; (use "none" to disable)
+#$feature{'snapshot'}{'override'} = 1;
+
+# Disable grep search, which will list the files in currently selected tree
+# containing the given string. This can be potentially CPU-intensive, of
+# course. Enabled by default.
+#$feature{'grep'}{'default'} = [0];
+#
+# Allow projects to override the default setting via git config file.
+# Example: gitweb.grep = 0|1;
+#$feature{'grep'}{'override'} = 1;
+
+# Disable the pickaxe search, which will list the commits that modified a given
+# string in a file. This can be practical and quite faster alternative to
+# 'blame', but still potentially CPU-intensive. Enabled by default.
+#$feature{'pickaxe'}{'default'} = [0];
+#
+# Allow projects to override the default setting via git config file.
+# Example: gitweb.pickaxe = 0|1;
+#$feature{'pickaxe'}{'override'} = 1;

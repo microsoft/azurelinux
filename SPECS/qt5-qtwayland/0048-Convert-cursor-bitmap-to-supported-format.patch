@@ -1,0 +1,66 @@
+From f5110358be64646c992fac2d01e2c6a2af14fd9d Mon Sep 17 00:00:00 2001
+From: Michael Weghorn <m.weghorn@posteo.de>
+Date: Mon, 20 Feb 2023 14:02:23 +0100
+Subject: [PATCH 48/55] Convert cursor bitmap to supported format
+
+The 1-bit image formats QImage::Format_Mono and
+QImage::Format_MonoLSB used by cursor bitmaps don't have
+a corresponding wl_shm_format.
+
+Therefore, convert to a supported image format as necessary
+to make such bitmap cursors work on Wayland as well.
+
+Fixes: QTBUG-95434
+Change-Id: I402fd870b301ddc01075251b66f2cf7cc1923133
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 45ec1362f8fcb5ade92f4d2d4985b1c24e78c8ba)
+
+Backport changes: Use Qt::ReturnByValue version for QCursor::mask() and QCursor::bitmap()
+---
+ src/client/qwaylandcursor.cpp | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/qwaylandcursor.cpp b/src/client/qwaylandcursor.cpp
+index e4eca9d4..ba76ba2d 100644
+--- a/src/client/qwaylandcursor.cpp
++++ b/src/client/qwaylandcursor.cpp
+@@ -44,6 +44,7 @@
+ #include "qwaylandshmbackingstore_p.h"
+ 
+ #include <QtGui/QImageReader>
++#include <QBitmap>
+ #include <QDebug>
+ 
+ #include <wayland-cursor.h>
+@@ -250,7 +251,27 @@ QWaylandCursor::QWaylandCursor(QWaylandDisplay *display)
+ QSharedPointer<QWaylandBuffer> QWaylandCursor::cursorBitmapBuffer(QWaylandDisplay *display, const QCursor *cursor)
+ {
+     Q_ASSERT(cursor->shape() == Qt::BitmapCursor);
+-    const QImage &img = cursor->pixmap().toImage();
++
++    const QBitmap mask = cursor->mask(Qt::ReturnByValue);
++    QImage img;
++    if (cursor->pixmap().isNull())
++        img = cursor->bitmap(Qt::ReturnByValue).toImage();
++    else
++        img = cursor->pixmap().toImage();
++
++    // convert to supported format if necessary
++    if (!display->shm()->formatSupported(img.format())) {
++        if (mask.isNull()) {
++            img.convertTo(QImage::Format_RGB32);
++        } else {
++            // preserve mask
++            img.convertTo(QImage::Format_ARGB32);
++            QPixmap pixmap = QPixmap::fromImage(img);
++            pixmap.setMask(mask);
++            img = pixmap.toImage();
++        }
++    }
++
+     QSharedPointer<QWaylandShmBuffer> buffer(new QWaylandShmBuffer(display, img.size(), img.format()));
+     memcpy(buffer->image()->bits(), img.bits(), size_t(img.sizeInBytes()));
+     return buffer;
+-- 
+2.51.1
+

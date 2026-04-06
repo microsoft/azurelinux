@@ -1,0 +1,45 @@
+From d3075330a6be4d7a5013c2ebdd39e97678c3ac8d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 13 Dec 2024 13:36:55 +0100
+Subject: [PATCH] Keep using URI RFC2396 parser
+
+The default parser in URI 1.0.0 / Ruby 3.4 has been changed to RFC3986
+[[1]]. This causes test failures such as:
+
+~~~
+... snip ...
+
+Failure:
+GlobalIDTest#test_invalid_app_name [test/cases/global_id_test.rb:13]:
+ArgumentError expected but nothing was raised.
+
+rails test test/cases/global_id_test.rb:8
+
+F
+
+... snip ...
+~~~
+
+where underscores / ampersands are now allowed in host. Keep using URI
+RFC2396 parser for compatibility.
+
+Fixes #190
+
+[1]: https://github.com/ruby/uri/pull/107
+---
+ lib/global_id/uri/gid.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/global_id/uri/gid.rb b/lib/global_id/uri/gid.rb
+index 20a22a7..8af8feb 100644
+--- a/lib/global_id/uri/gid.rb
++++ b/lib/global_id/uri/gid.rb
+@@ -62,7 +62,7 @@ module URI
+       #   URI.parse('gid://bcx')       # => URI::GID instance
+       #   URI::GID.parse('gid://bcx/') # => raises URI::InvalidComponentError
+       def parse(uri)
+-        generic_components = URI.split(uri) << nil << true # nil parser, true arg_check
++        generic_components = URI.split(uri) << URI::RFC2396_Parser.new << true # nil parser, true arg_check
+         new(*generic_components)
+       end
+ 

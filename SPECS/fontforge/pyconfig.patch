@@ -1,0 +1,24 @@
+--- fontforge/pycontrib/FontCompare/setup.py~	2022-12-31 23:25:21.000000000 -0600
++++ fontforge/pycontrib/FontCompare/setup.py	2024-06-14 15:14:14.119920623 -0500
+@@ -15,7 +15,6 @@
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ """
+ #!/usr/bin/env python
+-from distutils.core import setup
+ from setuptools import setup 
+ setup(name='Font Compare',
+       version='1.0',
+--- fontforge/fontforge/python.c~	2022-12-31 23:25:21.000000000 -0600
++++ fontforge/fontforge/python.c	2024-06-14 15:38:41.397897757 -0500
+@@ -19633,7 +19633,10 @@
+     if ( saved_progname )
+ 	free(saved_progname);
+     saved_progname = copy_to_wide_string(progname);
+-    Py_SetProgramName(saved_progname);
++    PyStatus status;
++    PyConfig config;
++    PyConfig_InitPythonConfig(&config);
++    status = PyConfig_SetString(&config, &config.program_name, saved_progname);
+ }
+ 
+ static wchar_t ** copy_argv(char *arg0, int argc ,char **argv) {

@@ -1,0 +1,25 @@
+From bc6f3e7ca0921b50a3ff836d08ce264a4f114224 Mon Sep 17 00:00:00 2001
+From: Clement Lefebvre <clement.lefebvre@linuxmint.com>
+Date: Tue, 12 Jan 2021 17:29:16 +0000
+Subject: [PATCH 1/4] Fix compilation error
+
+---
+ libcaribou/key-model.vala | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcaribou/key-model.vala b/libcaribou/key-model.vala
+index 89015bc..e88342e 100644
+--- a/libcaribou/key-model.vala
++++ b/libcaribou/key-model.vala
+@@ -101,7 +101,7 @@ namespace Caribou {
+                     unichar uc;
+                     while (text.get_next_char (ref index, out uc)) {
+                         uint keyval = Gdk.unicode_to_keyval (uc);
+-                        if (keyval != uc | 0x01000000)
++                        if (keyval != (uc | 0x01000000))
+                             _keyvals += keyval;
+                     }
+                 } else {
+-- 
+2.29.2
+

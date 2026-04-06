@@ -1,0 +1,39 @@
+commit ed0c9f04c13689a814ea3a2ab6712afff4409364
+Author: Ken McDonell <kenj@kenj.id.au>
+Date:   Thu Feb 12 07:22:29 2026 +1100
+
+    src/selinux/pcp.fc: rework fix for unconfined_t PCP daemons
+    
+    Commit 5ce65bc97b was close but NQR.
+    
+    Adjust the type to be pcp_pm<foo>_initrc_exec_t not pcp_pm<foo>_exec_t
+    for the "new" services scripts.
+    
+    Verified on vm39 (RHEL 8).
+
+diff --git a/src/selinux/pcp.fc b/src/selinux/pcp.fc
+index 1ab786a36b..b2cc6c5c32 100644
+--- a/src/selinux/pcp.fc
++++ b/src/selinux/pcp.fc
+@@ -5,6 +5,9 @@
+ 
+ /usr/libexec/pcp/bin/pmcd	--	gen_context(system_u:object_r:pcp_pmcd_exec_t,s0)
+ /usr/libexec/pcp/bin/pmproxy    --      gen_context(system_u:object_r:pcp_pmproxy_exec_t,s0)
++/usr/libexec/pcp/services/pmproxy  --   gen_context(system_u:object_r:pcp_pmproxy_exec_t,s0)
++/usr/libexec/pcp/services/pmlogger --   gen_context(system_u:object_r:pcp_pmlogger_exec_t,s0)
++/usr/libexec/pcp/services/pmie     --   gen_context(system_u:object_r:pcp_pmie_exec_t,s0)
+ 
+ /usr/libexec/pcp/bin/pmie_check --      gen_context(system_u:object_r:pcp_pmie_exec_t,s0)
+ /usr/libexec/pcp/bin/pmie_daily --      gen_context(system_u:object_r:pcp_pmie_exec_t,s0)
+@@ -15,8 +18,11 @@
+ 
+ /usr/libexec/pcp/lib/pmcd	--	gen_context(system_u:object_r:pcp_pmcd_initrc_exec_t,s0)
+ /usr/libexec/pcp/lib/pmlogger	--	gen_context(system_u:object_r:pcp_pmlogger_initrc_exec_t,s0)
++/usr/libexec/pcp/services/pmlogger --   gen_context(system_u:object_r:pcp_pmlogger_initrc_exec_t,s0)
+ /usr/libexec/pcp/lib/pmproxy	--	gen_context(system_u:object_r:pcp_pmproxy_initrc_exec_t,s0)
++/usr/libexec/pcp/services/pmproxy  --   gen_context(system_u:object_r:pcp_pmproxy_initrc_exec_t,s0)
+ /usr/libexec/pcp/lib/pmie	--	gen_context(system_u:object_r:pcp_pmie_initrc_exec_t,s0)
++/usr/libexec/pcp/services/pmie     --   gen_context(system_u:object_r:pcp_pmie_initrc_exec_t,s0)
+ 
+ /usr/share/pcp/lib/pmcd         --      gen_context(system_u:object_r:pcp_pmcd_exec_t,s0)
+ /usr/share/pcp/lib/pmproxy      --      gen_context(system_u:object_r:pcp_pmproxy_exec_t,s0)

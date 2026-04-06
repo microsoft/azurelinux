@@ -1,0 +1,55 @@
+From 33b36731390947426a45be7e75cb491153c93d5a Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 30 May 2025 14:30:10 +0200
+Subject: [PATCH] Replace atty with std::io::IsTerminal
+
+---
+ src/fmt.rs | 10 +++++-----
+ src/lib.rs |  2 --
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/src/fmt.rs b/src/fmt.rs
+index f447565..df99af0 100644
+--- a/src/fmt.rs
++++ b/src/fmt.rs
+@@ -6,6 +6,7 @@ use ansi_term::Colour::{Green, Red, Yellow};
+ 
+ use std::env;
+ use std::fmt;
++use std::io::IsTerminal;
+ 
+ #[doc(hidden)]
+ #[derive(Debug, Copy, Clone, PartialEq)]
+@@ -18,12 +19,11 @@ pub enum ColorWhen {
+ #[cfg(feature = "color")]
+ pub fn is_a_tty(stderr: bool) -> bool {
+     debugln!("is_a_tty: stderr={:?}", stderr);
+-    let stream = if stderr {
+-        atty::Stream::Stderr
++    if stderr {
++        std::io::stderr().is_terminal()
+     } else {
+-        atty::Stream::Stdout
+-    };
+-    atty::is(stream)
++        std::io::stdout().is_terminal()
++    }
+ }
+ 
+ #[cfg(not(feature = "color"))]
+diff --git a/src/lib.rs b/src/lib.rs
+index 8c47b77..656ffd2 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -542,8 +542,6 @@
+ 
+ #[cfg(all(feature = "color", not(target_os = "windows")))]
+ extern crate ansi_term;
+-#[cfg(feature = "color")]
+-extern crate atty;
+ #[macro_use]
+ extern crate bitflags;
+ #[cfg(feature = "suggestions")]
+-- 
+2.49.0
+

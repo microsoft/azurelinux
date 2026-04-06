@@ -1,0 +1,12 @@
+diff -up oneTBB-2020.3/Makefile.compat oneTBB-2020.3/Makefile
+--- oneTBB-2020.3/Makefile.compat	2020-07-10 07:18:01.000000000 -0600
++++ oneTBB-2020.3/Makefile	2023-01-10 20:33:51.617438349 -0700
+@@ -37,7 +37,7 @@ tbbproxy: mkdir
+ tbbbind: mkdir
+ 	$(MAKE) -C "$(work_dir)_release"  -r -f $(tbb_root)/build/Makefile.tbbbind cfg=release tbbbind
+ 
+-test: tbb tbbmalloc $(if $(use_proxy),tbbproxy)
++test: tbb
+ 	-$(MAKE) -C "$(work_dir)_release"  -r -f $(tbb_root)/build/Makefile.tbbmalloc cfg=release malloc_test
+ 	-$(MAKE) -C "$(work_dir)_release"  -r -f $(tbb_root)/build/Makefile.test cfg=release
+ 

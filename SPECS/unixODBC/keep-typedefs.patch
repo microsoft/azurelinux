@@ -1,0 +1,18 @@
+Upstream has decided to deprecate these typedefs, but experience so far
+says that removing them just breaks code to little purpose.
+
+
+diff -Naur unixODBC-2.2.14.orig/include/sqltypes.h unixODBC-2.2.14/include/sqltypes.h
+--- unixODBC-2.2.14.orig/include/sqltypes.h	2008-10-31 12:21:53.000000000 -0400
++++ unixODBC-2.2.14/include/sqltypes.h	2009-02-16 13:28:50.000000000 -0500
+@@ -170,6 +170,10 @@
+  typedef SQLUINTEGER 	SQLROWSETSIZE;
+  typedef SQLLEN 		SQLROWOFFSET;
+  */
++typedef SQLULEN         SQLROWCOUNT;
++typedef SQLULEN         SQLROWSETSIZE;
++typedef SQLULEN         SQLTRANSID;
++typedef SQLLEN          SQLROWOFFSET;
+ #endif
+ #else
+ typedef long            SQLINTEGER;

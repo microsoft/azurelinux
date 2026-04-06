@@ -1,0 +1,31 @@
+From 6e34923d4d8cecb61018186a5092afd5501e0917 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Tue, 22 Feb 2022 12:31:08 +0100
+Subject: [PATCH 27/55] Reduce memory leakage
+
+We need to clean up the event queue when we're done.
+
+Change-Id: I13a9eb77e978f4eab227a3a28dab8ebc8de94405
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 1264e5f565d8fb7ac200e4b00531ab876922458f)
+---
+ src/client/qwaylanddisplay.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index b8da02b3..4a331a4c 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -381,6 +381,9 @@ QWaylandDisplay::~QWaylandDisplay(void)
+ #endif
+     if (mDisplay)
+         wl_display_disconnect(mDisplay);
++
++    if (m_frameEventQueue)
++        wl_event_queue_destroy(m_frameEventQueue);
+ }
+ 
+ // Steps which is called just after constructor. This separates registry_global() out of the constructor
+-- 
+2.51.1
+

@@ -1,0 +1,1386 @@
+From b0a417393f6a656758f40f30234086e1017faa7a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Mon, 11 Nov 2024 18:09:07 +0100
+Subject: [PATCH] Backport nsupdate TLS support into 9.18
+
+Attempt to support TLS from nsupdate even in 9.18 release.
+
+Create few dispatch calls with 2 suffix with tls
+
+Keep original functions without changes and add new functions with
+additional tlsctx and transport pointers passed.
+
+Convert xfrin.c:get_create_tlsctx() into a library function
+
+In order to make xfrin.c:get_create_tlsctx() reusable, move the function
+into transport.c, and make changes into its prototype to not use the
+'dns_xfrin_ctx_t' type, thus making it more universal.
+
+This change prepares ground for adding transport support into the
+dispatch manager.
+
+Also, move the typedefs for 'dns_transport_t' and 'dns_transport_list_t'
+from transport.h into types.h.
+
+(cherry picked from commit 881747218ba0ad411f6f1bf361c2c09c805d4aa8)
+
+Update calls inside libdns
+
+Add remaining transport additions to request and dispatch calls. Add
+mctx into dispentry.
+
+Compilable nsupdate
+
+Implement DoT support for nsupdate
+
+Implement DNS-over-TLS support for nsupdate. Use DiG's DoT
+implementation as a model for the newly added features.
+
+(cherry picked from commit 13000c28c2e0ab2754f0f37ab8d6edb8249a1370)
+
+[pemensik] Adapted to previous 9.18 changes.
+Add usage and command line parsing
+
+Fixup tls initialization from nsupdate
+
+Detach transport also on dispatch_destroy properly.
+
+Adapted to 9.18.33.
+---
+ bin/nsupdate/nsupdate.c         | 192 ++++++++++++++++++++----
+ lib/dns/dispatch.c              | 128 ++++++++++++++--
+ lib/dns/include/dns/dispatch.h  |  22 +++
+ lib/dns/include/dns/request.h   |  23 +++
+ lib/dns/include/dns/transport.h |  45 +++++-
+ lib/dns/include/dns/types.h     |   2 +
+ lib/dns/request.c               |  63 ++++++--
+ lib/dns/transport.c             | 253 ++++++++++++++++++++++++++++++++
+ lib/dns/xfrin.c                 |   7 +-
+ 9 files changed, 671 insertions(+), 64 deletions(-)
+
+diff --git a/bin/nsupdate/nsupdate.c b/bin/nsupdate/nsupdate.c
+index 293ed28..819925e 100644
+--- a/bin/nsupdate/nsupdate.c
++++ b/bin/nsupdate/nsupdate.c
+@@ -45,6 +45,7 @@
+ #include <isc/stdio.h>
+ #include <isc/string.h>
+ #include <isc/task.h>
++#include <isc/tls.h>
+ #include <isc/types.h>
+ #include <isc/util.h>
+ 
+@@ -67,6 +68,7 @@
+ #include <dns/rdatatype.h>
+ #include <dns/request.h>
+ #include <dns/tkey.h>
++#include <dns/transport.h>
+ #include <dns/tsig.h>
+ 
+ #include <dst/dst.h>
+@@ -118,6 +120,7 @@ static bool memdebugging = false;
+ static bool have_ipv4 = false;
+ static bool have_ipv6 = false;
+ static bool is_dst_up = false;
++static bool use_tls = false;
+ static bool usevc = false;
+ static bool usegsstsig = false;
+ static bool use_win2k_gsstsig = false;
+@@ -145,6 +148,14 @@ static dns_tsigkey_t *tsigkey = NULL;
+ static dst_key_t *sig0key = NULL;
+ static isc_sockaddr_t *servers = NULL;
+ static isc_sockaddr_t *primary_servers = NULL;
++static dns_transport_list_t *transport_list = NULL;
++static dns_transport_t *transport = NULL;
++static isc_tlsctx_cache_t *tls_ctx_cache = NULL;
++static char *tls_hostname = NULL;
++static char *tls_client_key_file = NULL;
++static char *tls_client_cert_file = NULL;
++static char *tls_ca_file = NULL;
++static bool tls_always_verify_remote = true;
+ static bool default_servers = true;
+ static int ns_inuse = 0;
+ static int primary_inuse = 0;
+@@ -790,6 +801,19 @@ set_source_ports(dns_dispatchmgr_t *manager) {
+ 	isc_portset_destroy(gmctx, &v6portset);
+ }
+ 
++static isc_result_t
++create_name(const char *str, char *namedata, size_t len, dns_name_t *name) {
++	isc_buffer_t namesrc, namebuf;
++
++	dns_name_init(name, NULL);
++	isc_buffer_constinit(&namesrc, str, strlen(str));
++	isc_buffer_add(&namesrc, strlen(str));
++	isc_buffer_init(&namebuf, namedata, len);
++
++	return dns_name_fromtext(name, &namesrc, dns_rootname,
++				 DNS_NAME_DOWNCASE, &namebuf);
++}
++
+ static void
+ setup_system(void) {
+ 	isc_result_t result;
+@@ -797,6 +821,8 @@ setup_system(void) {
+ 	isc_sockaddrlist_t *nslist;
+ 	isc_logconfig_t *logconfig = NULL;
+ 	irs_resconf_t *resconf = NULL;
++	dns_name_t tlsname;
++	char namedata[DNS_NAME_FORMATSIZE + 1];
+ 
+ 	ddebug("setup_system()");
+ 
+@@ -942,6 +968,31 @@ setup_system(void) {
+ 		check_result(result, "dns_dispatch_createudp (v4)");
+ 	}
+ 
++	transport_list = dns_transport_list_new(gmctx);
++	isc_tlsctx_cache_create(gmctx, &tls_ctx_cache);
++
++	if (tls_client_key_file == NULL) {
++		result = create_name("tls-non-auth-client", namedata,
++				     sizeof(namedata), &tlsname);
++		check_result(result, "create_name (tls-non-auth-client)");
++		transport = dns_transport_new(&tlsname, DNS_TRANSPORT_TLS,
++					      transport_list);
++		dns_transport_set_tlsname(transport, "tls-non-auth-client");
++	} else {
++		result = create_name("tls-auth-client", namedata,
++				     sizeof(namedata), &tlsname);
++		check_result(result, "create_name (tls-auth-client)");
++		transport = dns_transport_new(&tlsname, DNS_TRANSPORT_TLS,
++					      transport_list);
++		dns_transport_set_tlsname(transport, "tls-auth-client");
++		dns_transport_set_keyfile(transport, tls_client_key_file);
++		dns_transport_set_certfile(transport, tls_client_cert_file);
++	}
++	dns_transport_set_cafile(transport, tls_ca_file);
++	dns_transport_set_remote_hostname(transport, tls_hostname);
++	dns_transport_set_always_verify_remote(transport,
++					       tls_always_verify_remote);
++
+ 	result = dns_requestmgr_create(gmctx, taskmgr, dispatchmgr, dispatchv4,
+ 				       dispatchv6, &requestmgr);
+ 	check_result(result, "dns_requestmgr_create");
+@@ -982,7 +1033,7 @@ version(void) {
+ 	fprintf(stderr, "nsupdate %s\n", PACKAGE_VERSION);
+ }
+ 
+-#define PARSE_ARGS_FMT "46C:dDghilL:Mok:p:Pr:R:t:Tu:vVy:"
++#define PARSE_ARGS_FMT "46A:C:dDE:ghH:iK:lL:MoOk:p:Pr:R:St:Tu:vVy:"
+ 
+ static void
+ pre_parse_args(int argc, char **argv) {
+@@ -1025,7 +1076,9 @@ pre_parse_args(int argc, char **argv) {
+ 			fprintf(stderr, "usage: nsupdate [-CdDi] [-L level] "
+ 					"[-l] [-g | -o | -y keyname:secret "
+ 					"| -k keyfile] [-p port] "
+-					"[-v] [-V] [-P] [-T] [-4 | -6] "
++					"[ -S [-K tlskeyfile] [-E tlscertfile] "
++					"[-A tlscafile] [-H tlshostname] "
++					"[-O] ] [-v] [-V] [-P] [-T] [-4 | -6] "
+ 					"[filename]\n");
+ 			exit(EXIT_FAILURE);
+ 
+@@ -1097,6 +1150,10 @@ parse_args(int argc, char **argv) {
+ 				fatal("can't find IPv6 networking");
+ 			}
+ 			break;
++		case 'A':
++			use_tls = true;
++			tls_ca_file = isc_commandline_argument;
++			break;
+ 		case 'C':
+ 			resolvconf = isc_commandline_argument;
+ 			break;
+@@ -1107,12 +1164,27 @@ parse_args(int argc, char **argv) {
+ 			debugging = true;
+ 			ddebugging = true;
+ 			break;
++		case 'E':
++			use_tls = true;
++			usevc = true;
++			tls_client_cert_file = isc_commandline_argument;
++			break;
++		case 'H':
++			use_tls = true;
++			usevc = true;
++			tls_hostname = isc_commandline_argument;
++			break;
+ 		case 'M':
+ 			break;
+ 		case 'i':
+ 			force_interactive = true;
+ 			interactive = true;
+ 			break;
++		case 'K':
++			use_tls = true;
++			usevc = true;
++			tls_client_key_file = isc_commandline_argument;
++			break;
+ 		case 'l':
+ 			local_only = true;
+ 			break;
+@@ -1145,6 +1217,11 @@ parse_args(int argc, char **argv) {
+ 			usegsstsig = true;
+ 			use_win2k_gsstsig = true;
+ 			break;
++		case 'O':
++			use_tls = true;
++			usevc = true;
++			tls_always_verify_remote = false;
++			break;
+ 		case 'p':
+ 			result = isc_parse_uint16(&dnsport,
+ 						  isc_commandline_argument, 10);
+@@ -1156,6 +1233,10 @@ parse_args(int argc, char **argv) {
+ 				exit(EXIT_FAILURE);
+ 			}
+ 			break;
++		case 'S':
++			use_tls = true;
++			usevc = true;
++			break;
+ 		case 't':
+ 			result = isc_parse_uint32(&timeout,
+ 						  isc_commandline_argument, 10);
+@@ -1218,6 +1299,26 @@ parse_args(int argc, char **argv) {
+ 	}
+ #endif /* HAVE_GSSAPI */
+ 
++	if (use_tls) {
++		usevc = true;
++		if ((tls_client_key_file == NULL) !=
++		    (tls_client_cert_file == NULL))
++		{
++			fprintf(stderr,
++				"%s: cannot specify the -K option without"
++				"the -E option, and vice versa.\n",
++				argv[0]);
++			exit(EXIT_FAILURE);
++		}
++		if (tls_ca_file != NULL && tls_always_verify_remote == false) {
++			fprintf(stderr,
++				"%s: cannot specify the -A option in "
++				"conjuction with the -O option.\n",
++				argv[0]);
++			exit(EXIT_FAILURE);
++		}
++	}
++
+ 	if (argv[isc_commandline_index] != NULL) {
+ 		if (strcmp(argv[isc_commandline_index], "-") == 0) {
+ 			input = stdin;
+@@ -2468,8 +2569,10 @@ static void
+ send_update(dns_name_t *zone, isc_sockaddr_t *primary) {
+ 	isc_result_t result;
+ 	dns_request_t *request = NULL;
+-	unsigned int options = DNS_REQUESTOPT_CASE;
+ 	isc_sockaddr_t *srcaddr;
++	unsigned int options = DNS_REQUESTOPT_CASE;
++	dns_transport_t *req_transport = NULL;
++	isc_tlsctx_cache_t *req_tls_ctx_cache = NULL;
+ 
+ 	ddebug("send_update()");
+ 
+@@ -2477,7 +2580,12 @@ send_update(dns_name_t *zone, isc_sockaddr_t *primary) {
+ 
+ 	if (usevc) {
+ 		options |= DNS_REQUESTOPT_TCP;
++		if (use_tls) {
++			req_transport = transport;
++			req_tls_ctx_cache = tls_ctx_cache;
++		}
+ 	}
++
+ 	if (tsigkey == NULL && sig0key != NULL) {
+ 		result = dns_message_setsig0key(updatemsg, sig0key);
+ 		check_result(result, "dns_message_setsig0key");
+@@ -2500,11 +2608,11 @@ send_update(dns_name_t *zone, isc_sockaddr_t *primary) {
+ 		updatemsg->tsigname->attributes |= DNS_NAMEATTR_NOCOMPRESS;
+ 	}
+ 
+-	result = dns_request_create(requestmgr, updatemsg, srcaddr, primary,
+-				    options, tsigkey, timeout, udp_timeout,
+-				    udp_retries, global_task, update_completed,
+-				    NULL, &request);
+-	check_result(result, "dns_request_create");
++	result = dns_request_create2(
++		requestmgr, updatemsg, srcaddr, primary, req_transport,
++		req_tls_ctx_cache, options, tsigkey, timeout, udp_timeout,
++		udp_retries, global_task, update_completed, NULL, &request);
++	check_result(result, "dns_request_create2");
+ 
+ 	if (debugging) {
+ 		show_message(stdout, updatemsg, "Outgoing update query:");
+@@ -2594,7 +2702,9 @@ recvsoa(isc_task_t *task, isc_event_t *event) {
+ 	result = dns_request_getresponse(request, rcvmsg,
+ 					 DNS_MESSAGEPARSE_PRESERVEORDER);
+ 	if (result == DNS_R_TSIGERRORSET && servers != NULL) {
+-		unsigned int options = 0;
++		unsigned int options = DNS_REQUESTOPT_CASE;
++		dns_transport_t *req_transport = NULL;
++		isc_tlsctx_cache_t *req_tls_ctx_cache = NULL;
+ 
+ 		dns_message_detach(&rcvmsg);
+ 		ddebug("Destroying request [%p]", request);
+@@ -2605,8 +2715,12 @@ recvsoa(isc_task_t *task, isc_event_t *event) {
+ 		dns_message_renderreset(soaquery);
+ 		ddebug("retrying soa request without TSIG");
+ 
+-		if (!default_servers && usevc) {
++		if (usevc) {
+ 			options |= DNS_REQUESTOPT_TCP;
++			if (!default_servers && use_tls) {
++				req_transport = transport;
++				req_tls_ctx_cache = tls_ctx_cache;
++			}
+ 		}
+ 
+ 		if (isc_sockaddr_pf(addr) == AF_INET6) {
+@@ -2615,10 +2729,10 @@ recvsoa(isc_task_t *task, isc_event_t *event) {
+ 			srcaddr = localaddr4;
+ 		}
+ 
+-		result = dns_request_create(requestmgr, soaquery, srcaddr, addr,
+-					    options, NULL, timeout, udp_timeout,
+-					    udp_retries, global_task, recvsoa,
+-					    reqinfo, &request);
++		result = dns_request_create2(
++			requestmgr, soaquery, srcaddr, addr, req_transport,
++			req_tls_ctx_cache, options, NULL, timeout, udp_timeout,
++			udp_retries, global_task, recvsoa, reqinfo, &request);
+ 		check_result(result, "dns_request_create");
+ 		requests++;
+ 		return;
+@@ -2831,10 +2945,16 @@ sendrequest(isc_sockaddr_t *destaddr, dns_message_t *msg,
+ 	isc_result_t result;
+ 	nsu_requestinfo_t *reqinfo;
+ 	isc_sockaddr_t *srcaddr;
+-	unsigned int options = 0;
++	unsigned int options = DNS_REQUESTOPT_CASE;
++	dns_transport_t *req_transport = NULL;
++	isc_tlsctx_cache_t *req_tls_ctx_cache = NULL;
+ 
+-	if (!default_servers && usevc) {
++	if (usevc) {
+ 		options |= DNS_REQUESTOPT_TCP;
++		if (!default_servers && use_tls) {
++			req_transport = transport;
++			req_tls_ctx_cache = tls_ctx_cache;
++		}
+ 	}
+ 
+ 	reqinfo = isc_mem_get(gmctx, sizeof(nsu_requestinfo_t));
+@@ -2847,11 +2967,12 @@ sendrequest(isc_sockaddr_t *destaddr, dns_message_t *msg,
+ 		srcaddr = localaddr4;
+ 	}
+ 
+-	result = dns_request_create(requestmgr, msg, srcaddr, destaddr, options,
+-				    default_servers ? NULL : tsigkey, timeout,
+-				    udp_timeout, udp_retries, global_task,
+-				    recvsoa, reqinfo, request);
+-	check_result(result, "dns_request_create");
++	result = dns_request_create2(requestmgr, msg, srcaddr, destaddr,
++				     req_transport, req_tls_ctx_cache, options,
++				     default_servers ? NULL : tsigkey, timeout,
++				     udp_timeout, udp_retries, global_task,
++				     recvsoa, reqinfo, request);
++	check_result(result, "dns_request_create2");
+ 	requests++;
+ }
+ 
+@@ -2934,7 +3055,6 @@ start_gssrequest(dns_name_t *primary) {
+ 	char namestr[DNS_NAME_FORMATSIZE];
+ 	char mykeystr[DNS_NAME_FORMATSIZE];
+ 	char *err_message = NULL;
+-
+ 	debug("start_gssrequest");
+ 	usevc = true;
+ 
+@@ -3030,8 +3150,15 @@ send_gssrequest(isc_sockaddr_t *destaddr, dns_message_t *msg,
+ 		dns_request_t **request, gss_ctx_id_t context) {
+ 	isc_result_t result;
+ 	nsu_gssinfo_t *reqinfo;
+-	unsigned int options = 0;
+ 	isc_sockaddr_t *srcaddr;
++	unsigned int options = DNS_REQUESTOPT_CASE | DNS_REQUESTOPT_TCP;
++	dns_transport_t *req_transport = NULL;
++	isc_tlsctx_cache_t *req_tls_ctx_cache = NULL;
++
++	if (!default_servers && use_tls) {
++		req_transport = transport;
++		req_tls_ctx_cache = tls_ctx_cache;
++	}
+ 
+ 	debug("send_gssrequest");
+ 	REQUIRE(destaddr != NULL);
+@@ -3041,18 +3168,17 @@ send_gssrequest(isc_sockaddr_t *destaddr, dns_message_t *msg,
+ 	reqinfo->addr = destaddr;
+ 	reqinfo->context = context;
+ 
+-	options |= DNS_REQUESTOPT_TCP;
+-
+ 	if (isc_sockaddr_pf(destaddr) == AF_INET6) {
+ 		srcaddr = localaddr6;
+ 	} else {
+ 		srcaddr = localaddr4;
+ 	}
+ 
+-	result = dns_request_create(requestmgr, msg, srcaddr, destaddr, options,
+-				    tsigkey, timeout, udp_timeout, udp_retries,
+-				    global_task, recvgss, reqinfo, request);
+-	check_result(result, "dns_request_create");
++	result = dns_request_create2(requestmgr, msg, srcaddr, destaddr,
++				     req_transport, req_tls_ctx_cache, options,
++				     tsigkey, timeout, udp_timeout, udp_retries,
++				     global_task, recvgss, reqinfo, request);
++	check_result(result, "dns_request_create2");
+ 	if (debugging) {
+ 		show_message(stdout, msg, "Outgoing update query:");
+ 	}
+@@ -3321,6 +3447,14 @@ static void
+ cleanup(void) {
+ 	ddebug("cleanup()");
+ 
++	if (tls_ctx_cache != NULL) {
++		isc_tlsctx_cache_detach(&tls_ctx_cache);
++	}
++
++	if (transport_list != NULL) {
++		dns_transport_list_detach(&transport_list);
++	}
++
+ 	LOCK(&answer_lock);
+ 	if (answer != NULL) {
+ 		dns_message_detach(&answer);
+diff --git a/lib/dns/dispatch.c b/lib/dns/dispatch.c
+index bd53763..5722fe2 100644
+--- a/lib/dns/dispatch.c
++++ b/lib/dns/dispatch.c
+@@ -30,6 +30,7 @@
+ #include <isc/stats.h>
+ #include <isc/string.h>
+ #include <isc/time.h>
++#include <isc/tls.h>
+ #include <isc/util.h>
+ 
+ #include <dns/acl.h>
+@@ -83,6 +84,10 @@ struct dns_dispentry {
+ 	dns_dispatch_t *disp;
+ 	isc_nmhandle_t *handle; /*%< netmgr handle for UDP connection */
+ 	dns_dispatchstate_t state;
++	/* TLS support for nsupdate. */
++	isc_mem_t *mctx;
++	dns_transport_t *transport;
++	isc_tlsctx_cache_t *tlsctx_cache;
+ 	unsigned int bucket;
+ 	unsigned int retries;
+ 	unsigned int timeout;
+@@ -107,11 +112,12 @@ struct dns_dispatch {
+ 	/* Unlocked. */
+ 	unsigned int magic; /*%< magic */
+ 	int tid;
+-	dns_dispatchmgr_t *mgr; /*%< dispatch manager */
+-	isc_nmhandle_t *handle; /*%< netmgr handle for TCP connection */
+-	isc_sockaddr_t local;	/*%< local address */
+-	in_port_t localport;	/*%< local UDP port */
+-	isc_sockaddr_t peer;	/*%< peer address (TCP) */
++	dns_dispatchmgr_t *mgr;	    /*%< dispatch manager */
++	isc_nmhandle_t *handle;	    /*%< netmgr handle for TCP connection */
++	isc_sockaddr_t local;	    /*%< local address */
++	in_port_t localport;	    /*%< local UDP port */
++	isc_sockaddr_t peer;	    /*%< peer address (TCP) */
++	dns_transport_t *transport; /*%< TCP transport parameters */
+ 
+ 	/*% Locked by mgr->lock. */
+ 	ISC_LINK(dns_dispatch_t) link;
+@@ -119,6 +125,7 @@ struct dns_dispatch {
+ 	/* Locked by "lock". */
+ 	isc_mutex_t lock; /*%< locks all below */
+ 	isc_socktype_t socktype;
++	dns_dispatchopt_t options;
+ 	dns_dispatchstate_t state;
+ 	isc_refcount_t references;
+ 
+@@ -220,13 +227,27 @@ udp_dispatch_getnext(dns_dispentry_t *resp, int32_t timeout);
+ 
+ static const char *
+ socktype2str(dns_dispentry_t *resp) {
++	dns_transport_type_t transport_type = DNS_TRANSPORT_UDP;
+ 	dns_dispatch_t *disp = resp->disp;
+ 
+-	switch (disp->socktype) {
+-	case isc_socktype_udp:
++	if (disp->socktype == isc_socktype_tcp) {
++		if (resp->transport != NULL) {
++			transport_type =
++				dns_transport_get_type(resp->transport);
++		} else {
++			transport_type = DNS_TRANSPORT_TCP;
++		}
++	}
++
++	switch (transport_type) {
++	case DNS_TRANSPORT_UDP:
+ 		return "UDP";
+-	case isc_socktype_tcp:
++	case DNS_TRANSPORT_TCP:
+ 		return "TCP";
++	case DNS_TRANSPORT_TLS:
++		return "TLS";
++	case DNS_TRANSPORT_HTTP:
++		return "HTTP";
+ 	default:
+ 		return "<unexpected>";
+ 	}
+@@ -457,6 +478,14 @@ dispentry_destroy(dns_dispentry_t *resp) {
+ 		isc_nmhandle_detach(&resp->handle);
+ 	}
+ 
++	if (resp->tlsctx_cache != NULL) {
++		isc_tlsctx_cache_detach(&resp->tlsctx_cache);
++	}
++
++	if (resp->transport != NULL) {
++		dns_transport_detach(&resp->transport);
++	}
++
+ 	isc_mem_put(disp->mgr->mctx, resp, sizeof(*resp));
+ 
+ 	dns_dispatch_detach(&disp); /* DISPATCH001 */
+@@ -1161,6 +1190,15 @@ dispatch_allocate(dns_dispatchmgr_t *mgr, isc_socktype_t type,
+ isc_result_t
+ dns_dispatch_createtcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
+ 		       const isc_sockaddr_t *destaddr, dns_dispatch_t **dispp) {
++	return dns_dispatch_createtcp2(mgr, localaddr, destaddr, NULL, 0,
++				       dispp);
++}
++
++isc_result_t
++dns_dispatch_createtcp2(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
++			const isc_sockaddr_t *destaddr,
++			dns_transport_t *transport, dns_dispatchopt_t options,
++			dns_dispatch_t **dispp) {
+ 	dns_dispatch_t *disp = NULL;
+ 
+ 	REQUIRE(VALID_DISPATCHMGR(mgr));
+@@ -1170,7 +1208,11 @@ dns_dispatch_createtcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
+ 
+ 	dispatch_allocate(mgr, isc_socktype_tcp, &disp);
+ 
++	disp->options = options;
+ 	disp->peer = *destaddr;
++	if (transport != NULL) {
++		dns_transport_attach(transport, &disp->transport);
++	}
+ 
+ 	if (localaddr != NULL) {
+ 		disp->local = *localaddr;
+@@ -1185,6 +1227,7 @@ dns_dispatch_createtcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
+ 	 * Append it to the dispatcher list.
+ 	 */
+ 
++	/* TODO: DNS_DISPATCHOPT_UNSHARED is not backported */
+ 	/* FIXME: There should be a lookup hashtable here */
+ 	ISC_LIST_APPEND(mgr->list, disp, link);
+ 	UNLOCK(&mgr->lock);
+@@ -1208,6 +1251,13 @@ dns_dispatch_createtcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
+ isc_result_t
+ dns_dispatch_gettcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *destaddr,
+ 		    const isc_sockaddr_t *localaddr, dns_dispatch_t **dispp) {
++	return dns_dispatch_gettcp2(mgr, destaddr, localaddr, NULL, dispp);
++}
++
++isc_result_t
++dns_dispatch_gettcp2(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *destaddr,
++		     const isc_sockaddr_t *localaddr,
++		     dns_transport_t *transport, dns_dispatch_t **dispp) {
+ 	dns_dispatch_t *disp_connected = NULL;
+ 	dns_dispatch_t *disp_fallback = NULL;
+ 	isc_result_t result = ISC_R_NOTFOUND;
+@@ -1248,8 +1298,10 @@ dns_dispatch_gettcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *destaddr,
+ 		if (disp->socktype != isc_socktype_tcp ||
+ 		    !isc_sockaddr_equal(destaddr, &peeraddr) ||
+ 		    (localaddr != NULL &&
+-		     !isc_sockaddr_eqaddr(localaddr, &sockname)))
++		     !isc_sockaddr_eqaddr(localaddr, &sockname)) ||
++		    (transport != disp->transport))
+ 		{
++			// dispatch_match alternative
+ 			UNLOCK(&disp->lock);
+ 			continue;
+ 		}
+@@ -1403,6 +1455,9 @@ dispatch_destroy(dns_dispatch_t *disp) {
+ 			     disp->handle, &disp->handle);
+ 		isc_nmhandle_detach(&disp->handle);
+ 	}
++	if (disp->transport != NULL) {
++		dns_transport_detach(&disp->transport);
++	}
+ 
+ 	isc_mutex_destroy(&disp->lock);
+ 
+@@ -1426,7 +1481,18 @@ dns_dispatch_add(dns_dispatch_t *disp, unsigned int options,
+ 		 unsigned int timeout, const isc_sockaddr_t *dest,
+ 		 dispatch_cb_t connected, dispatch_cb_t sent,
+ 		 dispatch_cb_t response, void *arg, dns_messageid_t *idp,
+-		 dns_dispentry_t **respp) {
++		 dns_dispentry_t **resp) {
++	return dns_dispatch_add2(disp, options, timeout, dest, NULL, NULL,
++				 connected, sent, response, arg, idp, resp);
++}
++
++isc_result_t
++dns_dispatch_add2(dns_dispatch_t *disp, unsigned int options,
++		  unsigned int timeout, const isc_sockaddr_t *dest,
++		  dns_transport_t *transport, isc_tlsctx_cache_t *tlsctx_cache,
++		  dispatch_cb_t connected, dispatch_cb_t sent,
++		  dispatch_cb_t response, void *arg, dns_messageid_t *idp,
++		  dns_dispentry_t **respp) {
+ 	dns_dispentry_t *resp = NULL;
+ 	dns_qid_t *qid = NULL;
+ 	in_port_t localport;
+@@ -1444,6 +1510,7 @@ dns_dispatch_add(dns_dispatch_t *disp, unsigned int options,
+ 	REQUIRE(connected != NULL);
+ 	REQUIRE(response != NULL);
+ 	REQUIRE(sent != NULL);
++	REQUIRE(disp->transport == transport);
+ 
+ 	LOCK(&disp->lock);
+ 
+@@ -1471,6 +1538,7 @@ dns_dispatch_add(dns_dispatch_t *disp, unsigned int options,
+ 		.rlink = ISC_LINK_INITIALIZER,
+ 		.magic = RESPONSE_MAGIC,
+ 	};
++	isc_mem_attach(disp->mgr->mctx, &resp->mctx);
+ 
+ #if DNS_DISPATCH_TRACE
+ 	fprintf(stderr, "dns_dispentry__init:%s:%s:%d:%p->references = 1\n",
+@@ -1530,6 +1598,14 @@ dns_dispatch_add(dns_dispatch_t *disp, unsigned int options,
+ 		return ISC_R_NOMORE;
+ 	}
+ 
++	if (transport != NULL) {
++		dns_transport_attach(transport, &resp->transport);
++	}
++
++	if (tlsctx_cache != NULL) {
++		isc_tlsctx_cache_attach(tlsctx_cache, &resp->tlsctx_cache);
++	}
++
+ 	dns_dispatch_attach(disp, &resp->disp); /* DISPATCH001 */
+ 
+ 	disp->requests++;
+@@ -1779,6 +1855,7 @@ dns_dispatch_done(dns_dispentry_t **respp) {
+ 	*respp = NULL;
+ 
+ 	dispentry_cancel(resp, ISC_R_CANCELED);
++	isc_mem_detach(&resp->mctx); ///< FIXME: is this ok?
+ 	dns_dispentry_detach(&resp); /* DISPENTRY000 */
+ }
+ 
+@@ -1970,6 +2047,27 @@ udp_dispatch_connect(dns_dispatch_t *disp, dns_dispentry_t *resp) {
+ 
+ static isc_result_t
+ tcp_dispatch_connect(dns_dispatch_t *disp, dns_dispentry_t *resp) {
++	dns_transport_type_t transport_type = DNS_TRANSPORT_TCP;
++	isc_tlsctx_t *tlsctx = NULL;
++	isc_tlsctx_client_session_cache_t *sess_cache = NULL;
++
++	if (resp->transport != NULL) {
++		transport_type = dns_transport_get_type(resp->transport);
++	}
++
++	if (transport_type == DNS_TRANSPORT_TLS) {
++		isc_result_t result;
++
++		result = dns_transport_get_tlsctx(
++			resp->transport, &resp->peer, resp->tlsctx_cache,
++			resp->mctx, &tlsctx, &sess_cache);
++
++		if (result != ISC_R_SUCCESS) {
++			return result;
++		}
++		INSIST(tlsctx != NULL);
++	}
++
+ 	/* Check whether the dispatch is already connecting or connected. */
+ 	LOCK(&disp->lock);
+ 	switch (disp->state) {
+@@ -1995,8 +2093,14 @@ tcp_dispatch_connect(dns_dispatch_t *disp, dns_dispentry_t *resp) {
+ 			      "connecting from %s to %s, timeout %u", localbuf,
+ 			      peerbuf, resp->timeout);
+ 
+-		isc_nm_tcpdnsconnect(disp->mgr->nm, &disp->local, &disp->peer,
+-				     tcp_connected, disp, resp->timeout, 0);
++		if (tlsctx != NULL) {
++			isc_nm_tlsdnsconnect(disp->mgr->nm, &disp->local, &disp->peer,
++					     tcp_connected, disp, resp->timeout, 0,
++					     tlsctx, sess_cache);
++		} else {
++			isc_nm_tcpdnsconnect(disp->mgr->nm, &disp->local, &disp->peer,
++					     tcp_connected, disp, resp->timeout, 0);
++		}
+ 		break;
+ 
+ 	case DNS_DISPATCHSTATE_CONNECTING:
+diff --git a/lib/dns/include/dns/dispatch.h b/lib/dns/include/dns/dispatch.h
+index ad377f0..cfdc374 100644
+--- a/lib/dns/include/dns/dispatch.h
++++ b/lib/dns/include/dns/dispatch.h
+@@ -56,6 +56,7 @@
+ #include <isc/refcount.h>
+ #include <isc/types.h>
+ 
++#include <dns/transport.h>
+ #include <dns/types.h>
+ 
+ /* Add -DDNS_DISPATCH_TRACE=1 to CFLAGS for detailed reference tracing */
+@@ -74,6 +75,11 @@ struct dns_dispatchset {
+ 	isc_mutex_t	 lock;
+ };
+ 
++typedef enum dns_dispatchopt {
++	DNS_DISPATCHOPT_FIXEDID = 1 << 0,
++	DNS_DISPATCHOPT_UNSHARED = 1 << 1, /* Don't share this connection */
++} dns_dispatchopt_t;
++
+ /*
+  */
+ #define DNS_DISPATCHOPT_FIXEDID 0x00000001U
+@@ -199,6 +205,11 @@ dns_dispatch_createtcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
+  *
+  *\li	Anything else	-- failure.
+  */
++isc_result_t
++dns_dispatch_createtcp2(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *localaddr,
++			const isc_sockaddr_t *destaddr,
++			dns_transport_t *transport, dns_dispatchopt_t options,
++			dns_dispatch_t **dispp);
+ 
+ #if DNS_DISPATCH_TRACE
+ #define dns_dispatch_ref(ptr) \
+@@ -258,6 +269,10 @@ dns_dispatch_gettcp(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *destaddr,
+ /*
+  * Attempt to connect to a existing TCP connection.
+  */
++isc_result_t
++dns_dispatch_gettcp2(dns_dispatchmgr_t *mgr, const isc_sockaddr_t *destaddr,
++		     const isc_sockaddr_t *localaddr,
++		     dns_transport_t *transport, dns_dispatch_t **dispp);
+ 
+ typedef void (*dispatch_cb_t)(isc_result_t eresult, isc_region_t *region,
+ 			      void *cbarg);
+@@ -268,6 +283,13 @@ dns_dispatch_add(dns_dispatch_t *disp, unsigned int options,
+ 		 dispatch_cb_t connected, dispatch_cb_t sent,
+ 		 dispatch_cb_t response, void *arg, dns_messageid_t *idp,
+ 		 dns_dispentry_t **resp);
++isc_result_t
++dns_dispatch_add2(dns_dispatch_t *disp, unsigned int options,
++		  unsigned int timeout, const isc_sockaddr_t *dest,
++		  dns_transport_t *transport, isc_tlsctx_cache_t *tlsctx_cache,
++		  dispatch_cb_t connected, dispatch_cb_t sent,
++		  dispatch_cb_t response, void *arg, dns_messageid_t *idp,
++		  dns_dispentry_t **respp);
+ /*%<
+  * Add a response entry for this dispatch.
+  *
+diff --git a/lib/dns/include/dns/request.h b/lib/dns/include/dns/request.h
+index d00574f..17bcbf6 100644
+--- a/lib/dns/include/dns/request.h
++++ b/lib/dns/include/dns/request.h
+@@ -44,6 +44,7 @@
+ #define DNS_REQUESTOPT_TCP     0x00000001U
+ #define DNS_REQUESTOPT_CASE    0x00000002U
+ #define DNS_REQUESTOPT_FIXEDID 0x00000004U
++#define DNS_REQUESTOPT_LARGE   0x00000008U
+ 
+ typedef struct dns_requestevent {
+ 	ISC_EVENT_COMMON(struct dns_requestevent);
+@@ -161,6 +162,17 @@ dns_request_create(dns_requestmgr_t *requestmgr, dns_message_t *message,
+ 		   unsigned int udptimeout, unsigned int udpretries,
+ 		   isc_task_t *task, isc_taskaction_t action, void *arg,
+ 		   dns_request_t **requestp);
++isc_result_t
++dns_request_create2(dns_requestmgr_t *requestmgr, dns_message_t *message,
++		   const isc_sockaddr_t *srcaddr,
++		   const isc_sockaddr_t *destaddr,
++		   dns_transport_t *req_transport,
++		   isc_tlsctx_cache_t *req_tls_ctx_cache,
++		   unsigned int options,
++		   dns_tsigkey_t *key, unsigned int timeout,
++		   unsigned int udptimeout, unsigned int udpretries,
++		   isc_task_t *task, isc_taskaction_t action, void *arg,
++		   dns_request_t **requestp);
+ /*%<
+  * Create and send a request.
+  *
+@@ -204,6 +216,17 @@ dns_request_createraw(dns_requestmgr_t *requestmgr, isc_buffer_t *msgbuf,
+ 		      unsigned int udpretries, isc_task_t *task,
+ 		      isc_taskaction_t action, void *arg,
+ 		      dns_request_t **requestp);
++isc_result_t
++dns_request_createraw2(dns_requestmgr_t *requestmgr, isc_buffer_t *msgbuf,
++		      const isc_sockaddr_t *srcaddr,
++		      const isc_sockaddr_t *destaddr,
++		      dns_transport_t *transport,
++		      isc_tlsctx_cache_t *tlsctx_cache,
++		      unsigned int options,
++		      unsigned int timeout, unsigned int udptimeout,
++		      unsigned int udpretries, isc_task_t *task,
++		      isc_taskaction_t action, void *arg,
++		      dns_request_t **requestp);
+ /*!<
+  * \brief Create and send a request.
+  *
+diff --git a/lib/dns/include/dns/transport.h b/lib/dns/include/dns/transport.h
+index e74ccd7..e6499a9 100644
+--- a/lib/dns/include/dns/transport.h
++++ b/lib/dns/include/dns/transport.h
+@@ -13,7 +13,9 @@
+ 
+ #pragma once
+ 
+-#include <dns/name.h>
++#include <isc/tls.h>
++
++#include <dns/types.h>
+ 
+ typedef enum {
+ 	DNS_TRANSPORT_NONE = 0,
+@@ -29,9 +31,6 @@ typedef enum {
+ 	DNS_HTTP_POST = 1,
+ } dns_http_mode_t;
+ 
+-typedef struct dns_transport	  dns_transport_t;
+-typedef struct dns_transport_list dns_transport_list_t;
+-
+ dns_transport_t *
+ dns_transport_new(const dns_name_t *name, dns_transport_type_t type,
+ 		  dns_transport_list_t *list);
+@@ -63,15 +62,44 @@ dns_transport_get_tls_versions(const dns_transport_t *transport);
+ bool
+ dns_transport_get_prefer_server_ciphers(const dns_transport_t *transport,
+ 					bool		      *preferp);
++bool
++dns_transport_get_always_verify_remote(dns_transport_t *transport);
+ /*%<
+  * Getter functions: return the type, cert file, key file, CA file,
+- * hostname, HTTP endpoint, or HTTP mode (GET or POST) for 'transport'.
++ * hostname, HTTP endpoint, HTTP mode (GET or POST), ciphers, TLS name,
++ * TLS version, server ciphers preference mode, and always enabling
++ * authentication mode for 'transport'.
+  *
+  * dns_transport_get_prefer_server_ciphers() returns 'true' is value
+  * was set, 'false' otherwise. The actual value is returned via
+  * 'preferp' pointer.
+  */
+ 
++isc_result_t
++dns_transport_get_tlsctx(dns_transport_t *transport, const isc_sockaddr_t *peer,
++			 isc_tlsctx_cache_t *tlsctx_cache, isc_mem_t *mctx,
++			 isc_tlsctx_t			   **pctx,
++			 isc_tlsctx_client_session_cache_t **psess_cache);
++/*%<
++ * Get the transport's TLS Context and the TLS Client Session Cache associated
++ * with it.
++ *
++ * When neither the TLS hostname, nor the TLS certificates authorities (CA)
++ * file are set for the 'transport', then Opportunistic TLS (no authentication
++ * of the remote peer) will be used, unless the 'always_verify_remote' mode is
++ * enabled on the 'transport', in which case the remote peer will be
++ * authenticated by its IP address using the system's default certificates
++ * authorities store.
++ *
++ * Requires:
++ *\li	'transport' is a valid, 'DNS_TRANSPORT_TLS' type transport.
++ *\li	'peer' is not NULL.
++ *\li	'tlsctx_cache' is not NULL.
++ *\li	'mctx' is not NULL.
++ *\li	'pctx' is not NULL and '*pctx' is NULL.
++ *\li	'psess_cache' is not NULL and '*psess_cache' is NULL.
++ */
++
+ void
+ dns_transport_set_certfile(dns_transport_t *transport, const char *certfile);
+ void
+@@ -96,9 +124,14 @@ dns_transport_set_tls_versions(dns_transport_t *transport,
+ void
+ dns_transport_set_prefer_server_ciphers(dns_transport_t *transport,
+ 					const bool	 prefer);
++void
++dns_transport_set_always_verify_remote(dns_transport_t *transport,
++				       const bool	always_verify_remote);
+ /*%<
+  * Setter functions: set the type, cert file, key file, CA file,
+- * hostname, HTTP endpoint, or HTTP mode (GET or POST) for 'transport'.
++ * hostname, HTTP endpoint, HTTP mode (GET or POST), ciphers, TLS name,
++ * TLS version, server ciphers preference mode, and always enabling
++ * authentication mode for 'transport'.
+  *
+  * Requires:
+  *\li	'transport' is valid.
+diff --git a/lib/dns/include/dns/types.h b/lib/dns/include/dns/types.h
+index 8ddcbeb..7ba4801 100644
+--- a/lib/dns/include/dns/types.h
++++ b/lib/dns/include/dns/types.h
+@@ -142,6 +142,8 @@ typedef struct dns_ssutable	     dns_ssutable_t;
+ typedef struct dns_stats	     dns_stats_t;
+ typedef uint32_t		     dns_rdatastatstype_t;
+ typedef struct dns_tkeyctx	     dns_tkeyctx_t;
++typedef struct dns_transport	     dns_transport_t;
++typedef struct dns_transport_list    dns_transport_list_t;
+ typedef uint16_t		     dns_trust_t;
+ typedef struct dns_tsec		     dns_tsec_t;
+ typedef struct dns_tsig_keyring	     dns_tsig_keyring_t;
+diff --git a/lib/dns/request.c b/lib/dns/request.c
+index 8aaa29f..badedab 100644
+--- a/lib/dns/request.c
++++ b/lib/dns/request.c
+@@ -399,12 +399,12 @@ isblackholed(dns_dispatchmgr_t *dispatchmgr, const isc_sockaddr_t *destaddr) {
+ static isc_result_t
+ tcp_dispatch(bool newtcp, dns_requestmgr_t *requestmgr,
+ 	     const isc_sockaddr_t *srcaddr, const isc_sockaddr_t *destaddr,
+-	     dns_dispatch_t **dispatchp) {
++	     dns_transport_t *transport, dns_dispatch_t **dispatchp) {
+ 	isc_result_t result;
+ 
+ 	if (!newtcp) {
+-		result = dns_dispatch_gettcp(requestmgr->dispatchmgr, destaddr,
+-					     srcaddr, dispatchp);
++		result = dns_dispatch_gettcp2(requestmgr->dispatchmgr, destaddr,
++					      srcaddr, transport, dispatchp);
+ 		if (result == ISC_R_SUCCESS) {
+ 			char peer[ISC_SOCKADDR_FORMATSIZE];
+ 
+@@ -415,8 +415,8 @@ tcp_dispatch(bool newtcp, dns_requestmgr_t *requestmgr,
+ 		}
+ 	}
+ 
+-	result = dns_dispatch_createtcp(requestmgr->dispatchmgr, srcaddr,
+-					destaddr, dispatchp);
++	result = dns_dispatch_createtcp2(requestmgr->dispatchmgr, srcaddr,
++					 destaddr, transport, 0, dispatchp);
+ 	return result;
+ }
+ 
+@@ -452,12 +452,12 @@ udp_dispatch(dns_requestmgr_t *requestmgr, const isc_sockaddr_t *srcaddr,
+ static isc_result_t
+ get_dispatch(bool tcp, bool newtcp, dns_requestmgr_t *requestmgr,
+ 	     const isc_sockaddr_t *srcaddr, const isc_sockaddr_t *destaddr,
+-	     dns_dispatch_t **dispatchp) {
++	     dns_transport_t *transport, dns_dispatch_t **dispatchp) {
+ 	isc_result_t result;
+ 
+ 	if (tcp) {
+ 		result = tcp_dispatch(newtcp, requestmgr, srcaddr, destaddr,
+-				      dispatchp);
++				      transport, dispatchp);
+ 	} else {
+ 		result = udp_dispatch(requestmgr, srcaddr, destaddr, dispatchp);
+ 	}
+@@ -472,6 +472,21 @@ dns_request_createraw(dns_requestmgr_t *requestmgr, isc_buffer_t *msgbuf,
+ 		      unsigned int udpretries, isc_task_t *task,
+ 		      isc_taskaction_t action, void *arg,
+ 		      dns_request_t **requestp) {
++	return dns_request_createraw2(requestmgr, msgbuf, srcaddr, destaddr,
++				      NULL, NULL, options, timeout, udptimeout,
++				      udpretries, task, action, arg, requestp);
++}
++
++isc_result_t
++dns_request_createraw2(dns_requestmgr_t *requestmgr, isc_buffer_t *msgbuf,
++		       const isc_sockaddr_t *srcaddr,
++		       const isc_sockaddr_t *destaddr,
++		       dns_transport_t *transport,
++		       isc_tlsctx_cache_t *tlsctx_cache, unsigned int options,
++		       unsigned int timeout, unsigned int udptimeout,
++		       unsigned int udpretries, isc_task_t *task,
++		       isc_taskaction_t action, void *arg,
++		       dns_request_t **requestp) {
+ 	dns_request_t *request = NULL;
+ 	isc_result_t result;
+ 	isc_mem_t *mctx = NULL;
+@@ -553,7 +568,7 @@ dns_request_createraw(dns_requestmgr_t *requestmgr, isc_buffer_t *msgbuf,
+ again:
+ 
+ 	result = get_dispatch(tcp, newtcp, requestmgr, srcaddr, destaddr,
+-			      &request->dispatch);
++			      transport, &request->dispatch);
+ 	if (result != ISC_R_SUCCESS) {
+ 		goto detach;
+ 	}
+@@ -563,10 +578,10 @@ again:
+ 		dispopt |= DNS_DISPATCHOPT_FIXEDID;
+ 	}
+ 
+-	result = dns_dispatch_add(request->dispatch, dispopt, request->timeout,
+-				  destaddr, req_connected, req_senddone,
+-				  req_response, request, &id,
+-				  &request->dispentry);
++	result = dns_dispatch_add2(request->dispatch, dispopt, request->timeout,
++				   destaddr, transport, tlsctx_cache,
++				   req_connected, req_senddone, req_response,
++				   request, &id, &request->dispentry);
+ 	if (result != ISC_R_SUCCESS) {
+ 		if ((options & DNS_REQUESTOPT_FIXEDID) != 0 && !newtcp) {
+ 			newtcp = true;
+@@ -630,6 +645,21 @@ dns_request_create(dns_requestmgr_t *requestmgr, dns_message_t *message,
+ 		   unsigned int udptimeout, unsigned int udpretries,
+ 		   isc_task_t *task, isc_taskaction_t action, void *arg,
+ 		   dns_request_t **requestp) {
++	return dns_request_create2(requestmgr, message, srcaddr, destaddr, NULL,
++				   NULL, options, key, timeout, udptimeout,
++				   udpretries, task, action, arg, requestp);
++}
++
++isc_result_t
++dns_request_create2(dns_requestmgr_t *requestmgr, dns_message_t *message,
++		    const isc_sockaddr_t *srcaddr,
++		    const isc_sockaddr_t *destaddr,
++		    dns_transport_t *req_transport,
++		    isc_tlsctx_cache_t *req_tls_ctx_cache, unsigned int options,
++		    dns_tsigkey_t *key, unsigned int timeout,
++		    unsigned int udptimeout, unsigned int udpretries,
++		    isc_task_t *task, isc_taskaction_t action, void *arg,
++		    dns_request_t **requestp) {
+ 	dns_request_t *request = NULL;
+ 	isc_result_t result;
+ 	isc_mem_t *mctx = NULL;
+@@ -707,14 +737,15 @@ dns_request_create(dns_requestmgr_t *requestmgr, dns_message_t *message,
+ 
+ again:
+ 	result = get_dispatch(tcp, false, requestmgr, srcaddr, destaddr,
+-			      &request->dispatch);
++			      req_transport, &request->dispatch);
+ 	if (result != ISC_R_SUCCESS) {
+ 		goto detach;
+ 	}
+ 
+-	result = dns_dispatch_add(
+-		request->dispatch, 0, request->timeout, destaddr, req_connected,
+-		req_senddone, req_response, request, &id, &request->dispentry);
++	result = dns_dispatch_add2(request->dispatch, 0, request->timeout,
++				   destaddr, req_transport, req_tls_ctx_cache,
++				   req_connected, req_senddone, req_response,
++				   request, &id, &request->dispentry);
+ 	if (result != ISC_R_SUCCESS) {
+ 		goto detach;
+ 	}
+diff --git a/lib/dns/transport.c b/lib/dns/transport.c
+index 88a3df4..2a779ba 100644
+--- a/lib/dns/transport.c
++++ b/lib/dns/transport.c
+@@ -15,9 +15,11 @@
+ 
+ #include <isc/list.h>
+ #include <isc/mem.h>
++#include <isc/netaddr.h>
+ #include <isc/refcount.h>
+ #include <isc/result.h>
+ #include <isc/rwlock.h>
++#include <isc/sockaddr.h>
+ #include <isc/util.h>
+ 
+ #include <dns/name.h>
+@@ -54,6 +56,7 @@ struct dns_transport {
+ 		char *ciphers;
+ 		uint32_t protocol_versions;
+ 		ternary_t prefer_server_ciphers;
++		bool always_verify_remote;
+ 	} tls;
+ 	struct {
+ 		char *endpoint;
+@@ -332,6 +335,256 @@ dns_transport_get_prefer_server_ciphers(const dns_transport_t *transport,
+ 	return false;
+ }
+ 
++void
++dns_transport_set_always_verify_remote(dns_transport_t *transport,
++				       const bool always_verify_remote) {
++	REQUIRE(VALID_TRANSPORT(transport));
++	REQUIRE(transport->type == DNS_TRANSPORT_TLS ||
++		transport->type == DNS_TRANSPORT_HTTP);
++
++	transport->tls.always_verify_remote = always_verify_remote;
++}
++
++bool
++dns_transport_get_always_verify_remote(dns_transport_t *transport) {
++	REQUIRE(VALID_TRANSPORT(transport));
++	REQUIRE(transport->type == DNS_TRANSPORT_TLS ||
++		transport->type == DNS_TRANSPORT_HTTP);
++
++	return transport->tls.always_verify_remote;
++}
++
++isc_result_t
++dns_transport_get_tlsctx(dns_transport_t *transport, const isc_sockaddr_t *peer,
++			 isc_tlsctx_cache_t *tlsctx_cache, isc_mem_t *mctx,
++			 isc_tlsctx_t **pctx,
++			 isc_tlsctx_client_session_cache_t **psess_cache) {
++	isc_result_t result = ISC_R_FAILURE;
++	isc_tlsctx_t *tlsctx = NULL, *found = NULL;
++	isc_tls_cert_store_t *store = NULL, *found_store = NULL;
++	isc_tlsctx_client_session_cache_t *sess_cache = NULL;
++	isc_tlsctx_client_session_cache_t *found_sess_cache = NULL;
++	uint32_t tls_versions;
++	const char *ciphers = NULL;
++	bool prefer_server_ciphers;
++	uint16_t family;
++	const char *tlsname = NULL;
++
++	REQUIRE(VALID_TRANSPORT(transport));
++	REQUIRE(transport->type == DNS_TRANSPORT_TLS);
++	REQUIRE(peer != NULL);
++	REQUIRE(tlsctx_cache != NULL);
++	REQUIRE(mctx != NULL);
++	REQUIRE(pctx != NULL && *pctx == NULL);
++	REQUIRE(psess_cache != NULL && *psess_cache == NULL);
++
++	family = (isc_sockaddr_pf(peer) == PF_INET6) ? AF_INET6 : AF_INET;
++
++	tlsname = dns_transport_get_tlsname(transport);
++	INSIST(tlsname != NULL && *tlsname != '\0');
++
++	/*
++	 * Let's try to re-use the already created context. This way
++	 * we have a chance to resume the TLS session, bypassing the
++	 * full TLS handshake procedure, making establishing
++	 * subsequent TLS connections faster.
++	 */
++	result = isc_tlsctx_cache_find(tlsctx_cache, tlsname,
++				       isc_tlsctx_cache_tls, family, &found,
++				       &found_store, &found_sess_cache);
++	if (result != ISC_R_SUCCESS) {
++		const char *hostname =
++			dns_transport_get_remote_hostname(transport);
++		const char *ca_file = dns_transport_get_cafile(transport);
++		const char *cert_file = dns_transport_get_certfile(transport);
++		const char *key_file = dns_transport_get_keyfile(transport);
++		const bool always_verify_remote =
++			dns_transport_get_always_verify_remote(transport);
++		char peer_addr_str[INET6_ADDRSTRLEN] = { 0 };
++		isc_netaddr_t peer_netaddr = { 0 };
++		bool hostname_ignore_subject;
++
++		/*
++		 * So, no context exists. Let's create one using the
++		 * parameters from the configuration file and try to
++		 * store it for further reuse.
++		 */
++		result = isc_tlsctx_createclient(&tlsctx);
++		if (result != ISC_R_SUCCESS) {
++			goto failure;
++		}
++		tls_versions = dns_transport_get_tls_versions(transport);
++		if (tls_versions != 0) {
++			isc_tlsctx_set_protocols(tlsctx, tls_versions);
++		}
++		ciphers = dns_transport_get_ciphers(transport);
++		if (ciphers != NULL) {
++			isc_tlsctx_set_cipherlist(tlsctx, ciphers);
++		}
++
++		if (dns_transport_get_prefer_server_ciphers(
++			    transport, &prefer_server_ciphers))
++		{
++			isc_tlsctx_prefer_server_ciphers(tlsctx,
++							 prefer_server_ciphers);
++		}
++
++		if (always_verify_remote || hostname != NULL || ca_file != NULL)
++		{
++			/*
++			 * The situation when 'found_store != NULL' while
++			 * 'found == NULL' may occur as there is a one-to-many
++			 * relation between cert stores and per-transport TLS
++			 * contexts. That is, there could be one store
++			 * shared between multiple contexts.
++			 */
++			if (found_store == NULL) {
++				/*
++				 * 'ca_file' can equal 'NULL' here, in
++				 * which case the store with system-wide
++				 * CA certificates will be created.
++				 */
++				result = isc_tls_cert_store_create(ca_file,
++								   &store);
++
++				if (result != ISC_R_SUCCESS) {
++					goto failure;
++				}
++			} else {
++				store = found_store;
++			}
++
++			INSIST(store != NULL);
++			if (hostname == NULL) {
++				/*
++				 * If hostname is not specified, then use the
++				 * peer IP address for validation.
++				 */
++				isc_netaddr_fromsockaddr(&peer_netaddr, peer);
++				isc_netaddr_format(&peer_netaddr, peer_addr_str,
++						   sizeof(peer_addr_str));
++				hostname = peer_addr_str;
++			}
++
++			/*
++			 * According to RFC 8310, Subject field MUST NOT
++			 * be inspected when verifying hostname for DoT.
++			 * Only SubjectAltName must be checked.
++			 */
++			hostname_ignore_subject = true;
++			result = isc_tlsctx_enable_peer_verification(
++				tlsctx, false, store, hostname,
++				hostname_ignore_subject);
++			if (result != ISC_R_SUCCESS) {
++				goto failure;
++			}
++
++			/*
++			 * Let's load client certificate and enable
++			 * Mutual TLS. We do that only in the case when
++			 * Strict TLS is enabled, because Mutual TLS is
++			 * an extension of it.
++			 */
++			if (cert_file != NULL) {
++				INSIST(key_file != NULL);
++
++				result = isc_tlsctx_load_certificate(
++					tlsctx, key_file, cert_file);
++				if (result != ISC_R_SUCCESS) {
++					goto failure;
++				}
++			}
++		}
++
++		isc_tlsctx_enable_dot_client_alpn(tlsctx);
++
++		isc_tlsctx_client_session_cache_create(
++			mctx, tlsctx,
++			ISC_TLSCTX_CLIENT_SESSION_CACHE_DEFAULT_SIZE,
++			&sess_cache);
++
++		found_store = NULL;
++		result = isc_tlsctx_cache_add(tlsctx_cache, tlsname,
++					      isc_tlsctx_cache_tls, family,
++					      tlsctx, store, sess_cache, &found,
++					      &found_store, &found_sess_cache);
++		if (result == ISC_R_EXISTS) {
++			/*
++			 * It seems the entry has just been created from
++			 * within another thread while we were initialising
++			 * ours. Although this is unlikely, it could happen
++			 * after startup/re-initialisation. In such a case,
++			 * discard the new context and associated data and use
++			 * the already established one from now on.
++			 *
++			 * Such situation will not occur after the
++			 * initial 'warm-up', so it is not critical
++			 * performance-wise.
++			 */
++			INSIST(found != NULL);
++			isc_tlsctx_free(&tlsctx);
++			/*
++			 * The 'store' variable can be 'NULL' when remote server
++			 * verification is not enabled (that is, when Strict or
++			 * Mutual TLS are not used).
++			 *
++			 * The 'found_store' might be equal to 'store' as there
++			 * is one-to-many relation between a store and
++			 * per-transport TLS contexts. In that case, the call to
++			 * 'isc_tlsctx_cache_find()' above could have returned a
++			 * store via the 'found_store' variable, whose value we
++			 * can assign to 'store' later. In that case,
++			 * 'isc_tlsctx_cache_add()' will return the same value.
++			 * When that happens, we should not free the store
++			 * object, as it is managed by the TLS context cache.
++			 */
++			if (store != NULL && store != found_store) {
++				isc_tls_cert_store_free(&store);
++			}
++			isc_tlsctx_client_session_cache_detach(&sess_cache);
++			/* Let's return the data from the cache. */
++			*psess_cache = found_sess_cache;
++			*pctx = found;
++		} else {
++			/*
++			 * Adding the fresh values into the cache has been
++			 * successful, let's return them
++			 */
++			INSIST(result == ISC_R_SUCCESS);
++			*psess_cache = sess_cache;
++			*pctx = tlsctx;
++		}
++	} else {
++		/*
++		 * The cache lookup has been successful, let's return the
++		 * results.
++		 */
++		INSIST(result == ISC_R_SUCCESS);
++		*psess_cache = found_sess_cache;
++		*pctx = found;
++	}
++
++	return ISC_R_SUCCESS;
++
++failure:
++	if (tlsctx != NULL) {
++		isc_tlsctx_free(&tlsctx);
++	}
++
++	/*
++	 * The 'found_store' is being managed by the TLS context
++	 * cache. Thus, we should keep it as it is, as it will get
++	 * destroyed alongside the cache. As there is one store per
++	 * multiple TLS contexts, we need to handle store deletion in a
++	 * special way.
++	 */
++	if (store != NULL && store != found_store) {
++		isc_tls_cert_store_free(&store);
++	}
++
++	return result;
++}
++
+ static void
+ transport_destroy(dns_transport_t *transport) {
+ 	isc_refcount_destroy(&transport->references);
+diff --git a/lib/dns/xfrin.c b/lib/dns/xfrin.c
+index 6a46ea3..ae2b70f 100644
+--- a/lib/dns/xfrin.c
++++ b/lib/dns/xfrin.c
+@@ -938,6 +938,7 @@ xfrin_create(isc_mem_t *mctx, dns_zone_t *zone, dns_db_t *db, isc_nm_t *netmgr,
+ 	*xfrp = xfr;
+ }
+ 
++#if 0
+ static isc_result_t
+ get_create_tlsctx(const dns_xfrin_ctx_t *xfr, isc_tlsctx_t **pctx,
+ 		  isc_tlsctx_client_session_cache_t **psess_cache) {
+@@ -1152,6 +1153,8 @@ cleanup:
+ 
+ 	return result;
+ }
++/* if 0 */
++#endif
+ 
+ static isc_result_t
+ xfrin_start(dns_xfrin_ctx_t *xfr) {
+@@ -1195,7 +1198,9 @@ xfrin_start(dns_xfrin_ctx_t *xfr) {
+ 				     connect_xfr, 30000, 0);
+ 		break;
+ 	case DNS_TRANSPORT_TLS: {
+-		CHECK(get_create_tlsctx(xfr, &tlsctx, &sess_cache));
++		CHECK(dns_transport_get_tlsctx(
++			xfr->transport, &xfr->primaryaddr, xfr->tlsctx_cache,
++			xfr->mctx, &tlsctx, &sess_cache));
+ 		INSIST(tlsctx != NULL);
+ 		isc_nm_tlsdnsconnect(xfr->netmgr, &xfr->sourceaddr,
+ 				     &xfr->primaryaddr, xfrin_connect_done,
+-- 
+2.52.0
+

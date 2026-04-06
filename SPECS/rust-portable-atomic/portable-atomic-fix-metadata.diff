@@ -1,0 +1,20 @@
+--- portable-atomic-1.13.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ portable-atomic-1.13.0/Cargo.toml	2026-01-12T16:22:03.733472+00:00
+@@ -91,7 +91,7 @@
+ version = "0.1"
+ 
+ [dev-dependencies.crossbeam-utils]
+-version = "=0.8.16"
++version = "0.8.16"
+ 
+ [dev-dependencies.fastrand]
+ version = "2"
+@@ -113,7 +113,7 @@
+ version = "1"
+ 
+ [target."cfg(unix)".dev-dependencies.libc]
+-version = "=0.2.163"
++version = "0.2.163"
+ 
+ [lints.clippy]
+ all = "warn"

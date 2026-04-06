@@ -1,0 +1,42 @@
+From 5c10072a978dd7566559f44a54c3e031bb4cb216 Mon Sep 17 00:00:00 2001
+From: nerdopolis <bluescreen_avenger@verizon.net>
+Date: Thu, 4 Jan 2024 21:42:28 -0500
+Subject: [PATCH] renderers: Only call ply_terminal_set_unbuffered_input when
+ there is a terminal
+
+---
+ src/plugins/renderers/drm/plugin.c          | 3 ++-
+ src/plugins/renderers/frame-buffer/plugin.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/renderers/drm/plugin.c b/src/plugins/renderers/drm/plugin.c
+index 0335283d..54cfe874 100644
+--- a/src/plugins/renderers/drm/plugin.c
++++ b/src/plugins/renderers/drm/plugin.c
+@@ -1941,7 +1941,8 @@ close_input_source (ply_renderer_backend_t      *backend,
+                                                                   (ply_input_device_leds_changed_handler_t) on_input_leds_changed,
+                                                                   &backend->input_source);
+                 }
+-                ply_terminal_set_unbuffered_input (backend->terminal);
++                if (backend->terminal != NULL)
++                        ply_terminal_set_unbuffered_input (backend->terminal);
+         }
+ 
+         if (input_source->terminal_input_watch != NULL) {
+diff --git a/src/plugins/renderers/frame-buffer/plugin.c b/src/plugins/renderers/frame-buffer/plugin.c
+index 3ce9b3d9..e57d0437 100644
+--- a/src/plugins/renderers/frame-buffer/plugin.c
++++ b/src/plugins/renderers/frame-buffer/plugin.c
+@@ -807,7 +807,8 @@ close_input_source (ply_renderer_backend_t      *backend,
+                                                                   (ply_input_device_leds_changed_handler_t) on_input_leds_changed,
+                                                                   &backend->input_source);
+                 }
+-                ply_terminal_set_unbuffered_input (backend->terminal);
++                if (backend->terminal != NULL)
++                        ply_terminal_set_unbuffered_input (backend->terminal);
+         }
+ 
+         if (input_source->terminal_input_watch != NULL) {
+-- 
+2.52.0
+

@@ -1,0 +1,19 @@
+diff -urNp docbook-xsl-1.76.1-orig/manpages/other.xsl docbook-xsl-1.76.1/manpages/other.xsl
+--- docbook-xsl-1.76.1-orig/manpages/other.xsl	2010-08-27 05:14:52.000000000 +0200
++++ docbook-xsl-1.76.1/manpages/other.xsl	2011-09-06 17:17:07.973737258 +0200
+@@ -595,7 +595,14 @@ manvolnum
+           <xsl:with-param name="message-prolog">Note: </xsl:with-param>
+           <xsl:with-param name="message-epilog"> (soelim stub)</xsl:with-param>
+           <xsl:with-param name="content">
+-            <xsl:value-of select="'.so '"/>
++            <xsl:choose>
++              <xsl:when test="$man.output.in.separate.dir = 0">
++              <xsl:value-of select="concat('.so man', $section, '/')"/>
++              </xsl:when>
++              <xsl:otherwise>
++              <xsl:value-of select="'.so '"/> <!-- added case -->
++              </xsl:otherwise>
++              </xsl:choose>
+             <xsl:variable name="full.filename">
+               <xsl:call-template name="make.adjusted.man.filename">
+                 <xsl:with-param name="name" select="$first.refname"/>

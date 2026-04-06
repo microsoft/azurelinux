@@ -1,0 +1,26 @@
+diff --git a/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc b/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
+index b68cbaf85b..dc90592c45 100644
+--- a/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
++++ b/onnxruntime/core/optimizer/selectors_actions/selector_action_transformer.cc
+@@ -147,7 +147,7 @@ static Status MatchAndProcess(
+       RuntimeOptimizationRecord::ProducedOpIdVector produced_op_ids{};
+       produced_op_ids.reserve(action_saved_state.produced_node_op_schemas.size());
+ 
+-      for (const auto op_schema : action_saved_state.produced_node_op_schemas) {
++      for (const auto &op_schema : action_saved_state.produced_node_op_schemas) {
+         produced_op_ids.push_back(utils::MakeOpId(*op_schema));
+         if (save_context->record_produced_node_op_schema) {
+           status = save_context->record_produced_node_op_schema(*op_schema);
+diff --git a/onnxruntime/core/session/inference_session.cc b/onnxruntime/core/session/inference_session.cc
+index 023cbcbe88..cf3c5a4395 100644
+--- a/onnxruntime/core/session/inference_session.cc
++++ b/onnxruntime/core/session/inference_session.cc
+@@ -907,7 +907,7 @@ common::Status InferenceSession::SaveToOrtFormat(const std::filesystem::path& fi
+   ORT_RETURN_IF_ERROR(kernel_type_str_resolver.RegisterGraphNodeOpSchemas(model_->MainGraph()));
+   ORT_RETURN_IF_ERROR(standalone::RegisterCustomOpNodeSchemas(kernel_type_str_resolver, model_->MainGraph()));
+ 
+-  for (const auto op_schema : saved_runtime_optimization_produced_node_op_schemas_) {
++  for (const auto &op_schema : saved_runtime_optimization_produced_node_op_schemas_) {
+     ORT_RETURN_IF_ERROR(kernel_type_str_resolver.RegisterOpSchema(*op_schema));
+   }
+ 

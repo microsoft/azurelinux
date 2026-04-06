@@ -1,0 +1,47 @@
+--- Coro-6.57.orig/Coro/State.xs	2025-01-23 16:07:29.965651973 +0100
++++ Coro-6.57/Coro/State.xs	2025-01-23 16:07:41.276699126 +0100
+@@ -156,7 +156,7 @@ static void *coro_thx;
+ # include <assert.h>
+ #endif
+ 
+-static double (*nvtime)(); /* so why doesn't it take void? */
++static double (*nvtime)(pTHX); /* so why doesn't it take void? */
+ static void   (*u2time)(pTHX_ UV ret[2]);
+ 
+ /* we hijack an hopefully unused CV flag for our purposes */
+@@ -391,7 +391,7 @@ coro_u2time (pTHX_ UV ret[2])
+ }
+ 
+ ecb_inline double
+-coro_nvtime (void)
++coro_nvtime (pTHX)
+ {
+   struct timeval tv;
+   gettimeofday (&tv, 0);
+@@ -420,7 +420,7 @@ time_init (pTHX)
+   if (!svp)          croak ("Time::HiRes is required, but missing. Caught");
+   if (!SvIOK (*svp)) croak ("Time::NVtime isn't a function pointer. Caught");
+ 
+-  nvtime = INT2PTR (double (*)(), SvIV (*svp));
++  nvtime = INT2PTR (double (*)(pTHX), SvIV (*svp));
+ 
+   svp = hv_fetch (PL_modglobal, "Time::U2time", 12, 0);
+   u2time = INT2PTR (void (*)(pTHX_ UV ret[2]), SvIV (*svp));
+@@ -3031,7 +3031,7 @@ PerlIOCede_pushed (pTHX_ PerlIO *f, cons
+   PerlIOCede *self = PerlIOSelf (f, PerlIOCede);
+ 
+   self->every = SvCUR (arg) ? SvNV (arg) : 0.01;
+-  self->next  = nvtime () + self->every;
++  self->next  = nvtime (aTHX) + self->every;
+ 
+   return PerlIOBuf_pushed (aTHX_ f, mode, Nullsv, tab);
+ }
+@@ -3048,7 +3048,7 @@ static IV
+ PerlIOCede_flush (pTHX_ PerlIO *f)
+ {
+   PerlIOCede *self = PerlIOSelf (f, PerlIOCede);
+-  double now = nvtime ();
++  double now = nvtime (aTHX);
+ 
+   if (now >= self->next)
+     {

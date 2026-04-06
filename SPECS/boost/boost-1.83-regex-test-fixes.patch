@@ -1,0 +1,37 @@
+From 9c974cf22c53315d90a7c1bef7cea9b4f552d088 Mon Sep 17 00:00:00 2001
+From: Patrick Palka <ppalka@redhat.com>
+Date: Wed, 6 Dec 2023 14:21:13 -0500
+Subject: [PATCH] Work around spurious Boost.Regex test failures
+
+---
+ libs/regex/example/timer/regex_timer.cpp           | 1 +
+ libs/regex/test/static_mutex/static_mutex_test.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libs/regex/example/timer/regex_timer.cpp b/libs/regex/example/timer/regex_timer.cpp
+index d121b70f1..bee544908 100644
+--- a/libs/regex/example/timer/regex_timer.cpp
++++ b/libs/regex/example/timer/regex_timer.cpp
+@@ -13,6 +13,7 @@
+ #pragma warning(disable: 4996 4127)
+ #endif
+ 
++#define BOOST_TIMER_ENABLE_DEPRECATED
+ #include <boost/config.hpp>
+ #include <boost/regex.hpp>
+ #include <boost/cregex.hpp>
+diff --git a/libs/regex/test/static_mutex/static_mutex_test.cpp b/libs/regex/test/static_mutex/static_mutex_test.cpp
+index be7500bd3..935e74525 100644
+--- a/libs/regex/test/static_mutex/static_mutex_test.cpp
++++ b/libs/regex/test/static_mutex/static_mutex_test.cpp
+@@ -16,6 +16,7 @@
+   *   DESCRIPTION: test program for boost::static_mutex.
+   */
+ 
++#define BOOST_TIMER_ENABLE_DEPRECATED
+ #include <boost/regex/pending/static_mutex.hpp>
+ #include <boost/thread/thread.hpp>
+ #include <boost/timer.hpp>
+-- 
+2.43.0
+

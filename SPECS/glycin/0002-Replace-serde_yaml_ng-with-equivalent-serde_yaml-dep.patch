@@ -1,0 +1,28 @@
+From 913ece178b66c08c5f2445ae46199a5ea89e8d60 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 24 Mar 2025 21:14:36 +0100
+Subject: [PATCH 2/2] Replace serde_yaml_ng with equivalent serde_yaml
+ dependency
+
+---
+ tests/Cargo.toml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/tests/Cargo.toml b/tests/Cargo.toml
+index 1aa3165..8f46aed 100644
+--- a/tests/Cargo.toml
++++ b/tests/Cargo.toml
+@@ -22,9 +22,7 @@ tokio.workspace = true
+ gdk.workspace = true
+ zbus = { workspace = true, features = ["p2p"] }
+ tracing-subscriber.workspace = true
+-# The unmaintained serde_yaml 0.9 crate should work here as well
+-# serde_yaml = "0.9.33"
+-serde_yaml = { package = "serde_yaml_ng", version = "0.10.0" }
++serde_yaml = "0.9.33"
+ 
+ [[test]]
+ name = "change_memory_format"
+-- 
+2.51.1
+

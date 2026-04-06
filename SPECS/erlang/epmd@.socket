@@ -1,0 +1,10 @@
+[Unit]
+Description=Erlang Port Mapper Daemon Activation Socket
+
+[Socket]
+ListenStream=%I
+Accept=false
+
+[Install]
+WantedBy=sockets.target
+

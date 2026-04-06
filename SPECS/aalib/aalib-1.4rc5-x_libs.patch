@@ -1,0 +1,13 @@
+--- aalib-1.4.0/configure.in.X_LIBS	2007-12-12 17:48:53.000000000 -0800
++++ aalib-1.4.0/configure.in	2007-12-12 17:49:11.000000000 -0800
+@@ -103,8 +103,8 @@ AC_PATH_XTRA
+ if test "x$no_x" = x; then
+     x_driver=true
+     AC_DEFINE(X11_DRIVER)
+-    LIBS="$LIBS $X_EXTRA_LIBS $X_LIBS -lX11"
+-    AALIB_LIBS="$AALIB_LIBS $X_EXTRA_LIBS $X_LIBS -lX11"
++    LIBS="$LIBS $X_EXTRA_LIBS -lX11"
++    AALIB_LIBS="$AALIB_LIBS $X_EXTRA_LIBS -lX11"
+     CFLAGS="$CFLAGS $X_CFLAGS"
+ fi
+ 

@@ -1,0 +1,19 @@
+Unconditionally include <string.h>, to avoid implicit function
+declarations.  libXpm defines SYSV during the build, which is why they
+do not see t his isssue.
+
+diff --git a/lib/Xm/XpmI.h b/lib/Xm/XpmI.h
+index bbba02b0cac1f91e..3468f2d1edf84f7c 100644
+--- a/lib/Xm/XpmI.h
++++ b/lib/Xm/XpmI.h
+@@ -118,9 +118,9 @@ extern "C" {
+ extern FILE *popen();
+ #endif
+ 
+-#if defined(SYSV) || defined(SVR4) || defined(VMS) || defined(WIN32) || defined (_SVID_SOURCE)
+ #include <string.h>
+ 
++#if defined(SYSV) || defined(SVR4) || defined(VMS) || defined(WIN32) || defined (_SVID_SOURCE)
+ #ifndef index
+ #define index strchr
+ #endif

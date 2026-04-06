@@ -1,0 +1,42 @@
+From c59b56642d10997a35553ae08e6b341b565794f7 Mon Sep 17 00:00:00 2001
+From: groff owner <groff-owner@fedoraproject.org>
+Date: Mon, 10 Jul 2023 11:51:30 +0000
+Subject: [PATCH] load site-font and site-tmac from /etc/groff
+
+Move site-font and site-tmac configuration from /usr/share/groff to
+/etc/groff. That allows permanent custom changes. (Symlinking brought
+a lot of problems with RPM. This is safer and cleaner.)
+
+---
+ Makefile.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index a47df30..e9618d1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -3857,7 +3857,7 @@ fontdir = $(datasubdir)/font
+ oldfontdir = $(datasubdir)/oldfont
+ 
+ # `localfontdir' says where local fonts will be installed (as dev*/*).
+-localfontdir = $(dataprogramdir)/site-font
++localfontdir = @sysconfdir@/groff/site-font
+ 
+ # `legacyfontdir' is for compatibility with AT&T/DWB troff.
+ legacyfontdir = /usr/lib/font
+@@ -3869,10 +3869,10 @@ fontpath = $(localfontdir)$(RT_SEP)$(fontdir)$(RT_SEP)$(legacyfontdir)
+ tmacdir = $(datasubdir)/tmac
+ 
+ # `systemtmacdir' says where to install platform-dependent macros.
+-systemtmacdir = $(libprogramdir)/site-tmac
++systemtmacdir = @sysconfdir@/groff/site-tmac
+ 
+ # `localtmacdir' says where local files will be installed.
+-localtmacdir = $(dataprogramdir)/site-tmac
++localtmacdir = @sysconfdir@/groff/site-tmac
+ 
+ # appdefdir
+ # `appdefdir' says where to install the application defaults file for
+-- 
+2.41.0
+

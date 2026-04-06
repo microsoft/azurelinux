@@ -1,0 +1,17 @@
+--- pyo3-0.27.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pyo3-0.27.2/Cargo.toml	2025-12-29T20:33:30.363117+00:00
+@@ -536,9 +536,6 @@
+ version = "=0.27.2"
+ features = ["resolve-config"]
+ 
+-[target.'cfg(not(target_has_atomic = "64"))'.dependencies.portable-atomic]
+-version = "1.0"
+-
+ [lints.clippy]
+ checked_conversions = "warn"
+ dbg_macro = "warn"
+@@ -569,3 +566,4 @@
+ [lints.rustdoc]
+ bare_urls = "warn"
+ broken_intra_doc_links = "warn"
++

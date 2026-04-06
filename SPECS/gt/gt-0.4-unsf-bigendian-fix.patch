@@ -1,0 +1,171 @@
+diff -up gt-0.4/utils/unsf.c.endian gt-0.4/utils/unsf.c
+--- gt-0.4/utils/unsf.c.endian	2008-02-02 22:37:07.000000000 +0100
++++ gt-0.4/utils/unsf.c	2008-02-02 22:39:10.000000000 +0100
+@@ -67,6 +67,7 @@
+ #include <math.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <endian.h>
+ 
+ #ifndef TRUE 
+    #define TRUE         -1
+@@ -290,59 +291,6 @@ double bend_coarse[128] = {
+  1290.1591550923506, 1366.8760106701147, 1448.1546878700494, 1534.2664467217226
+ };
+ 
+-typedef union {
+-      unsigned char c[4];
+-      unsigned long l;
+-} long_end;
+-typedef union {
+-      unsigned char c[2];
+-      unsigned short s;
+-} short_end;
+-
+-static int big_endian = 1;
+-
+-static long longnum(unsigned char c1, unsigned char c2,
+-		unsigned char c3, unsigned char c4)
+-{
+-    long_end lswitch;
+-    if (big_endian) {
+-	lswitch.c[0] = c4;
+-	lswitch.c[1] = c3;
+-	lswitch.c[2] = c2;
+-	lswitch.c[3] = c1;
+-    } else {
+-	lswitch.c[0] = c1;
+-	lswitch.c[1] = c2;
+-	lswitch.c[2] = c3;
+-	lswitch.c[3] = c4;
+-    }
+-    return(lswitch.l);
+-}
+-
+-static short shortnum(unsigned char c1, unsigned char c2)
+-{
+-    short_end sswitch;
+-    if (big_endian) {
+-	sswitch.c[0] = c2;
+-	sswitch.c[1] = c1;
+-    } else {
+-	sswitch.c[0] = c1;
+-	sswitch.c[1] = c2;
+-    }
+-    return(sswitch.s);
+-}
+-
+-static void byteorder(void)
+-{   long_end hexx;
+-
+-    hexx.c[0] = 0x12;
+-    hexx.c[1] = 0x34;
+-    hexx.c[2] = 0x56;
+-    hexx.c[3] = 0x78;
+-    if (hexx.l == 0x78563412) big_endian = 0;
+-}
+-
+-
+ static char *getname(char *p)
+ {
+ 	int i, j, e;
+@@ -425,14 +373,8 @@ static void mem_write8(int val)
+ /* writes a word to the memory buffer (little endian) */
+ static void mem_write16(int val)
+ {
+- if (big_endian) {
+-   mem_write8((val >> 8) & 0xFF);
+-   mem_write8(val & 0xFF);
+- }
+- else {
+    mem_write8(val & 0xFF);
+    mem_write8((val >> 8) & 0xFF);
+- }
+ }
+ 
+ 
+@@ -440,41 +382,13 @@ static void mem_write16(int val)
+ /* writes a long to the memory buffer (little endian) */
+ static void mem_write32(int val)
+ {
+- if (big_endian) {
+-   mem_write8((val >> 24) & 0xFF);
+-   mem_write8((val >> 16) & 0xFF);
+-   mem_write8((val >> 8) & 0xFF);
+-   mem_write8(val & 0xFF);
+- }
+- else {
+    mem_write8(val & 0xFF);
+    mem_write8((val >> 8) & 0xFF);
+    mem_write8((val >> 16) & 0xFF);
+    mem_write8((val >> 24) & 0xFF);
+- }
+-}
+-
+-
+-
+-/* alters data already written to the memory buffer (little endian) */
+-static void mem_modify32(int pos, int val)
+-{
+- if (big_endian) {
+-   mem[pos+3] = (val >> 24) & 0xFF;
+-   mem[pos+2] = (val >> 16) & 0xFF;
+-   mem[pos+1] = (val >> 8) & 0xFF;
+-   mem[pos] = val & 0xFF;
+- }
+- else {
+-   mem[pos] = val & 0xFF;
+-   mem[pos+1] = (val >> 8) & 0xFF;
+-   mem[pos+2] = (val >> 16) & 0xFF;
+-   mem[pos+3] = (val >> 24) & 0xFF;
+- }
+ }
+ 
+ 
+-
+ /* writes a block of data the memory buffer */
+ static void mem_write_block(void *data, int size)
+ {
+@@ -708,8 +622,13 @@ static int sf_num_preset_indexes = 0;
+ /* SoundFont preset generators */
+ typedef struct rangesType
+ {
++#if __BYTE_ORDER == __LITTLE_ENDIAN
+    unsigned char byLo;
+    unsigned char byHi;
++#else
++   unsigned char byHi;
++   unsigned char byLo;
++#endif
+ } rangesType;
+ 
+ 
+@@ -3254,9 +3173,6 @@ static int get16(FILE *f)
+    b1 = get8(f);
+    b2 = get8(f);
+ 
+- if (big_endian)
+-   return ((b1 << 8) | b2);
+- else
+    return ((b2 << 8) | b1);
+ }
+ 
+@@ -3272,9 +3188,6 @@ static int get32(FILE *f)
+    b3 = get8(f);
+    b4 = get8(f);
+ 
+- if (big_endian)
+-   return ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4);
+- else
+    return ((b4 << 24) | (b3 << 16) | (b2 << 8) | b1);
+ }
+ 
+@@ -3753,8 +3666,6 @@ int main(int argc, char *argv[])
+ 
+ 	opt_soundfont = argv[optind];
+ 
+-	byteorder();
+-
+ 	add_soundfont_patches();
+ 
+ 	if (!opt_no_write) fclose(cfg_fd);

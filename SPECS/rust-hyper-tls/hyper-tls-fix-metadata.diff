@@ -1,0 +1,7 @@
+--- hyper-tls-0.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hyper-tls-0.6.0/Cargo.toml	2024-04-17T21:22:06.966246+00:00
+@@ -70,4 +70,3 @@
+ 
+ [features]
+ alpn = ["native-tls/alpn"]
+-vendored = ["native-tls/vendored"]

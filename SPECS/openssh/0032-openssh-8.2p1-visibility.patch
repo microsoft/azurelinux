@@ -1,0 +1,52 @@
+From 6aa231d9acfeca870ee87e3bf9c4a1239518706d Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 32/50] openssh-8.2p1-visibility
+
+---
+ regress/misc/sk-dummy/sk-dummy.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/regress/misc/sk-dummy/sk-dummy.c b/regress/misc/sk-dummy/sk-dummy.c
+index 347b2122..344f8a8a 100644
+--- a/regress/misc/sk-dummy/sk-dummy.c
++++ b/regress/misc/sk-dummy/sk-dummy.c
+@@ -81,7 +81,7 @@ skdebug(const char *func, const char *fmt, ...)
+ #endif
+ }
+ 
+-uint32_t
++uint32_t __attribute__((visibility("default")))
+ sk_api_version(void)
+ {
+ 	return SSH_SK_VERSION_MAJOR;
+@@ -230,7 +230,7 @@ check_options(struct sk_option **options)
+ 	return 0;
+ }
+ 
+-int
++int __attribute__((visibility("default")))
+ sk_enroll(uint32_t alg, const uint8_t *challenge, size_t challenge_len,
+     const char *application, uint8_t flags, const char *pin,
+     struct sk_option **options, struct sk_enroll_response **enroll_response)
+@@ -478,7 +478,7 @@ sig_ed25519(const uint8_t *message, size_t message_len,
+ 	return ret;
+ }
+ 
+-int
++int __attribute__((visibility("default")))
+ sk_sign(uint32_t alg, const uint8_t *data, size_t datalen,
+     const char *application, const uint8_t *key_handle, size_t key_handle_len,
+     uint8_t flags, const char *pin, struct sk_option **options,
+@@ -535,7 +535,7 @@ sk_sign(uint32_t alg, const uint8_t *data, size_t datalen,
+ 	return ret;
+ }
+ 
+-int
++int __attribute__((visibility("default")))
+ sk_load_resident_keys(const char *pin, struct sk_option **options,
+     struct sk_resident_key ***rks, size_t *nrks)
+ {
+-- 
+2.49.0
+

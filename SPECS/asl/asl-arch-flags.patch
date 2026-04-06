@@ -1,0 +1,22 @@
+--- asl-2f5d9de248c53a3063bba23af2013cd3db768bf8/support/cmake/setArchitecture.cmake.orig	2024-02-01 06:05:32.000000000 -0700
++++ asl-2f5d9de248c53a3063bba23af2013cd3db768bf8/support/cmake/setArchitecture.cmake	2024-02-06 16:40:38.509292057 -0700
+@@ -149,19 +149,6 @@ function(getArchitectureFlags ARCH COMPI
+     message(ERROR_CRITICAL "Please define the architecture")
+   endif()
+   if(UNIX AND NOT CPUARCH MATCHES "arm")
+-    if(CPUARCH MATCHES "ppc64") # on AIX
+-      if(ARCH EQUAL 32)
+-        set(CCFLAG "")
+-      elseif(ARCH EQUAL 64)
+-        set(CCFLAG "-maix64")
+-      endif()
+-    else()
+-      if(ARCH EQUAL 32)
+-        set(CCFLAG "-m32")
+-      elseif(ARCH EQUAL 64)
+-        set(CCFLAG "-m64")
+-      endif()
+-    endif()
+     set(${COMPILE_FLAGS}
+         ${CCFLAG} PARENT_SCOPE)
+     set(${LINK_FLAGS}

@@ -1,0 +1,36 @@
+From a723b73f85f586e855514cce078de3f153c9e201 Mon Sep 17 00:00:00 2001
+From: "Endi S. Dewata" <edewata@redhat.com>
+Date: Fri, 4 Jun 2021 15:59:34 -0500
+Subject: [PATCH] Drop Assertions.callerIs()
+
+---
+ src/main/java/org/jboss/jdeparser/Assertions.java | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/src/main/java/org/jboss/jdeparser/Assertions.java b/src/main/java/org/jboss/jdeparser/Assertions.java
+index 017c645..a8c0129 100644
+--- a/src/main/java/org/jboss/jdeparser/Assertions.java
++++ b/src/main/java/org/jboss/jdeparser/Assertions.java
+@@ -18,19 +18,10 @@
+ 
+ package org.jboss.jdeparser;
+ 
+-import sun.reflect.Reflection;
+-
+ /**
+  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
+  */
+ class Assertions {
+-    static boolean callerIs(Class<?> clazz) {
+-        try {
+-            return Reflection.getCallerClass(3) == clazz;
+-        } catch (Throwable ignored) {}
+-        // dunno
+-        return true;
+-    }
+ 
+     @SuppressWarnings("ConstantConditions")
+     static boolean alwaysTrue(boolean expr) {
+-- 
+2.31.1
+

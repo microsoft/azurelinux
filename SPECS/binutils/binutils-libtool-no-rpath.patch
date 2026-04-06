@@ -1,0 +1,28 @@
+diff -rup binutils.orig/ltmain.sh binutils-2.37/ltmain.sh
+--- binutils.orig/ltmain.sh	2022-01-27 16:23:09.304207432 +0000
++++ binutils-2.37/ltmain.sh	2022-01-27 16:23:18.380143759 +0000
+@@ -7103,6 +7103,7 @@ EOF
+ 	  rpath="$finalize_rpath"
+ 	  test "$mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
++	    case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64) continue;; esac
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
+ 	      if test -n "$hardcode_libdir_separator"; then
+ 		if test -z "$hardcode_libdirs"; then
+@@ -7798,6 +7799,7 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
++	case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64) continue;; esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+@@ -7849,6 +7851,7 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
++	case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64) continue;; esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+Only in binutils-2.37: ltmain.sh.orig

@@ -1,0 +1,66 @@
+diff -up pegasus/src/Providers/ManagedSystem/Process/Process_Linux.cpp_old pegasus/src/Providers/ManagedSystem/Process/Process_Linux.cpp
+--- pegasus/src/Providers/ManagedSystem/Process/Process_Linux.cpp_old	2010-01-14 15:06:36.757941652 +0100
++++ pegasus/src/Providers/ManagedSystem/Process/Process_Linux.cpp	2010-01-14 15:08:12.113962655 +0100
+@@ -539,7 +539,7 @@ NOTES             :
+ */
+ Boolean Process::getRealText(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_tsize * getpagesize() / 1024;
++  i64 = pInfo.pst_tsize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -555,7 +555,7 @@ NOTES             :
+ */
+ Boolean Process::getRealData(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_dsize * getpagesize() / 1024;
++  i64 = pInfo.pst_dsize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -603,7 +603,7 @@ NOTES             :
+ */
+ Boolean Process::getVirtualData(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_vdsize * getpagesize() / 1024;
++  i64 = pInfo.pst_vdsize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -619,7 +619,7 @@ NOTES             :
+ */
+ Boolean Process::getVirtualStack(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_vssize * getpagesize() / 1024;
++  i64 = pInfo.pst_vssize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -635,7 +635,7 @@ NOTES             :
+ */
+ Boolean Process::getVirtualMemoryMappedFileSize(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_vmmsize * getpagesize() / 1024;
++  i64 = pInfo.pst_vmmsize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -651,7 +651,7 @@ NOTES             :
+ */
+ Boolean Process::getVirtualSharedMemory(Uint64& i64) const
+ {
+-  i64 = pInfo.pst_vshmsize * getpagesize() / 1024;
++  i64 = pInfo.pst_vshmsize * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 
+@@ -721,7 +721,7 @@ Boolean Process::getRealSpace(Uint64& i6
+   i64 = (pInfo.pst_dsize +  // real data
+          pInfo.pst_tsize)   // real text  may need to figure out how to get
+                             // realStackSize
+-        * getpagesize() / 1024;
++        * sysconf(_SC_PAGESIZE) / 1024;
+   return true;
+ }
+ 

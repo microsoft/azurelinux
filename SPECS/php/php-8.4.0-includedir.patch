@@ -1,0 +1,11 @@
+--- ./configure.ac.includedir
++++ ./configure.ac
+@@ -1368,7 +1368,7 @@
+ EXPANDED_DATADIR=$datadir
+ EXPANDED_PHP_CONFIG_FILE_PATH=$(eval echo "$PHP_CONFIG_FILE_PATH")
+ EXPANDED_PHP_CONFIG_FILE_SCAN_DIR=$(eval echo "$PHP_CONFIG_FILE_SCAN_DIR")
+-INCLUDE_PATH=.:$EXPANDED_PEAR_INSTALLDIR
++INCLUDE_PATH=.:$EXPANDED_PEAR_INSTALLDIR:${EXPANDED_DATADIR}/php
+ 
+ exec_prefix=$old_exec_prefix
+ libdir=$old_libdir

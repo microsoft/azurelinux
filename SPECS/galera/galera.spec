@@ -1,0 +1,426 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autochangelog
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+# To both save infrastructure resources and workaround for i686 FTBFS
+ExcludeArch: %{ix86}
+
+Name:           galera
+Version:        26.4.25
+Release:        1%{?dist}
+Summary:        Synchronous multi-master wsrep provider (replication engine)
+
+License:        GPL-2.0-only
+URL:            https://mariadb.com/docs/galera-cluster
+
+# The Upstream Release Monitoring use this config: https://release-monitoring.org/project/9068/ which checks GitHub tags.
+# The MariaDB upstream releases their own - further patched - version (dozens of files added) on their custom download web page. However they only release it with a MariaDB server release. 
+# So it can only be accessed through the 'https://archive.mariadb.org/mariadb-.../...' path which contains the major version of the MariaDB server.
+# Furthermore there is a lag (can be days, weeks) between when a new tag is done on GitHub and when MariaDB upstream releases the new version on their web with the new MariaDB server release.
+Source0:        https://archive.mariadb.org/mariadb-11.8/%{name}-%{version}/src/%{name}-%{version}.tar.gz
+
+Patch0:         cmake_paths.patch
+Patch1:         docs.patch
+Patch2:         network.patch
+
+BuildRequires:  boost-devel check-devel openssl-devel cmake systemd gcc-c++ asio-devel
+Requires:       nmap-ncat
+Requires:       procps-ng
+
+%{?systemd_requires}
+
+
+%description
+Galera is a fast synchronous multimaster wsrep provider (replication engine)
+for transactional databases and similar applications. For more information
+about wsrep API see https://github.com/codership/wsrep-API repository. For a
+description of Galera replication engine see https://www.galeracluster.com web.
+
+
+%prep
+%setup -q
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+
+# Create a sysusers.d config file
+cat >galera.sysusers.conf <<EOF
+u garb - 'Galera Arbitrator Daemon' /dev/null -
+EOF
+
+%build
+
+%cmake \
+       -DCMAKE_BUILD_TYPE="%{?with_debug:Debug}%{!?with_debug:RelWithDebInfo}" \
+       -DINSTALL_LAYOUT=RPM \
+       -DCMAKE_RULE_MESSAGES:BOOL=OFF \
+       \
+       -DBUILD_SHARED_LIBS:BOOL=OFF \
+       \
+       -DINSTALL_DOCDIR="share/doc/%{name}/" \
+       -DINSTALL_GARBD="bin" \
+       -DINSTALL_GARBD-SYSTEMD="bin" \
+       -DINSTALL_CONFIGURATION="/etc/sysconfig/" \
+       -DINSTALL_SYSTEMD_SERVICE="lib/systemd/system" \
+       -DINSTALL_LIBDIR="%{_lib}/galera" \
+       -DINSTALL_MANPAGE="share/man/man8"
+
+cmake -B %_vpath_builddir -N -LAH
+
+%cmake_build
+
+
+%install
+%cmake_install
+
+# PATCH 4:
+#  Use a dedicated user for the Systemd service
+#  To fix an security issue reported by Systemd:
+#
+## systemd[1]: /usr/lib/systemd/system/garb.service:14: Special user nobody configured, this is not safe!
+##   Subject: Special user nobody configured, this is not safe!
+##   Defined-By: systemd
+##   Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+##   Documentation: https://systemd.io/UIDS-GIDS
+##
+##   The unit garb.service is configured to use User=nobody.
+##
+##   This is not safe. The nobody user's main purpose on Linux-based
+##   operating systems is to be the owner of files that otherwise cannot be mapped
+##   to any local user. It's used by the NFS client and Linux user namespacing,
+##   among others. By running a unit's processes under the identity of this user
+##   they might possibly get read and even write access to such files that cannot
+##   otherwise be mapped.
+##
+##   It is strongly recommended to avoid running services under this user identity,
+##   in particular on systems using NFS or running containers. Allocate a user ID
+##   specific to this service, either statically via systemd-sysusers or dynamically
+##   via the DynamicUser= service setting.
+sed -i 's/User=nobody/User=garb/g' %{buildroot}%{_unitdir}/garb.service
+# Maintainers from other distributions also tries to resolve it on the upstream:
+#   https://github.com/codership/galera/pull/633
+
+install -m0644 -D galera.sysusers.conf %{buildroot}%{_sysusersdir}/galera.conf
+
+
+%check
+%ctest
+
+
+%pre
+# Fixup after upgrading on system before systemd unit rename
+unlink /etc/systemd/system/garb.service || :
+
+%post
+/sbin/ldconfig
+%systemd_post garb.service
+
+%preun
+%systemd_preun garb.service
+
+%postun
+/sbin/ldconfig
+%systemd_postun_with_restart garb.service
+
+
+%files
+%config(noreplace,missingok) %{_sysconfdir}/sysconfig/garb
+
+%dir %{_docdir}/galera
+%dir %{_libdir}/galera
+
+%{_bindir}/garbd
+
+# PATCH 3:
+#   Make sure the wrapper script is executable
+%attr(755, -, -) %{_bindir}/garb-systemd
+
+%{_mandir}/man8/garbd.8*
+
+%{_unitdir}/garb.service
+
+%{_libdir}/galera/libgalera_smm.so
+
+%doc %{_docdir}/galera/COPYING
+%doc %{_docdir}/galera/LICENSE.asio
+%doc %{_docdir}/galera/README-MySQL
+%{_sysusersdir}/galera.conf
+
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 26.4.25-2
+- Latest state for galera
+
+* Sun Feb 08 2026 Michal Schorm <mschorm@redhat.com> - 26.4.25-1
+- Rebased to 26.4.25
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.24-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 26.4.24-4
+- Rebuilt for Boost 1.90
+
+* Thu Jan 08 2026 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.24-3
+- Update the Source to correct URL as Packit bot uses this value
+
+* Thu Jan 08 2026 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.24-2
+- Setup Packit Bot
+
+* Tue Jan 06 2026 Michal Schorm <mschorm@redhat.com> - 26.4.24-1
+- Rebase to 26.4.24
+
+* Fri Aug 08 2025 Michal Schorm <mschorm@redhat.com> - 26.4.23-2
+- [bugfix] Fix the application of the build flags
+
+* Fri Aug 08 2025 Michal Schorm <mschorm@redhat.com> - 26.4.23-1
+- Rebase to 26.4.23
+
+* Wed Jul 30 2025 Michal Schorm <mschorm@redhat.com> - 26.4.22-1
+- Rebase to 26.4.22
+
+* Wed Jul 30 2025 Michal Schorm <mschorm@redhat.com> - 26.4.21-4
+- [typo fixup] Fix typo in SPEC file comment
+
+* Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Tue Feb 11 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 26.4.21-2
+- Add sysusers.d config file to allow rpm to create users/groups
+  automatically
+
+* Wed Feb 05 2025 Michal Schorm <mschorm@redhat.com> - 26.4.21-1
+- Rebase to 26.4.21
+
+* Thu Jan 23 2025 Michal Schorm <mschorm@redhat.com> - 26.4.20-3
+- Fix for FTBFS after Fedora Change "Unify bin and sbin"
+  https://fedoraproject.org/wiki/Changes/Unify_bin_and_sbin
+
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Nov 14 2024 Michal Schorm <mschorm@redhat.com> - 26.4.20-1
+- Rebase to 26.4.20
+
+* Thu Nov 14 2024 Michal Schorm <mschorm@redhat.com> - 26.4.19-2
+- Introduce patch removing unnecessary <openssl/engine.h> dependency
+
+* Fri Oct 18 2024 Michal Schorm <mschorm@redhat.com> - 26.4.19-1
+- Rebase to 26.4.19
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.18-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-10
+- Bump release for package rebuild
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-9
+- Fixup of systemd service rename
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-8
+- Bump release for package rebuild
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-7
+- Make sure the network is actually up at the moment of the service
+  startup: https://systemd.io/NETWORK_ONLINE/
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-6
+- Rename the systemd service from 'garbd.service' to 'garb.service'
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-5
+- [Documentation enhancement] Stop packing useless documentaion files,
+  start packing useful documentation file
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-4
+- [SPECfile cleanup] start using %%{unitdir} macro
+
+* Sun Jun 09 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-3
+- [SPECfile cleanup] Remove no longer used downstream versions of upstream
+  files
+
+* Fri Jun 07 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-2
+- ExcludeArch: %%{ix86} Both to: 1) Save infractsructure resources
+
+* Fri Jun 07 2024 Michal Schorm <mschorm@redhat.com> - 26.4.18-1
+- Rebase to 26.4.18
+
+* Wed Jan 24 2024 Michal Schorm <mschorm@redhat.com> - 26.4.16-5
+- Rebuild
+
+* Tue Jan 23 2024 Michal Schorm <mschorm@redhat.com> - 26.4.16-4
+- Fix FTBFS by applying upstream commit from a future version of Galera,
+  which fixes the problem with SSL certificates exipirng, which was causing
+  test failures
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jan 18 2024 Jonathan Wakely <jwakely@redhat.com> - 26.4.16-2
+- Rebuilt for Boost 1.83
+
+* Fri Nov 17 2023 Michal Schorm <mschorm@redhat.com> - 26.4.16-1
+- Rebase to 26.4.16 - release with MariaDB 10.5.23 - galera 26.4.15 skipped
+  by mariaDB upstream
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Apr 29 2023 Michal Schorm <mschorm@redhat.com> - 26.4.14-2
+- Fix RPM syntax: '%%patchN' has been deprecated https://lists.fedoraprojec
+  t.org/archives/list/devel@lists.fedoraproject.org/thread/VBFDPQHAHF3WG6WB
+  ZR2L5GSWMW6CVTJS/
+
+* Sat Apr 29 2023 Michal Schorm <mschorm@redhat.com> - 26.4.14-1
+- Rebase to 26.4.14
+
+* Thu Mar 30 2023 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.13-4
+- migrated to SPDX license
+
+* Mon Feb 20 2023 Jonathan Wakely <jwakely@redhat.com> - 26.4.13-3
+- Rebuilt for Boost 1.81
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 15 2022 Michal Schorm <mschorm@redhat.com> - 26.4.13-1
+- Rebase to 26.4.13
+
+* Wed Aug 24 2022 Michal Schorm <mschorm@redhat.com> - 26.4.12-1
+- Rebase to 26.4.12
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.11-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Michal Schorm <mschorm@redhat.com> - 26.4.11-6
+- Update the package description
+
+* Wed May 04 2022 Thomas Rodgers <trodgers@redhat.com> - 26.4.11-5
+- Rebuilt for Boost 1.78
+
+* Thu Apr 28 2022 Michal Schorm <mschorm@redhat.com> - 26.4.11-4
+- Remove the second source path definition from the CMake command
+
+* Mon Feb 21 2022 Michal Schorm <mschorm@redhat.com> - 26.4.11-3
+- cmake_paths.patch upstreaming efforts started
+
+* Sun Feb 20 2022 Michal Schorm <mschorm@redhat.com> - 26.4.11-2
+- Enable CTest in the %%check phase
+
+* Sun Feb 20 2022 Michal Schorm <mschorm@redhat.com> - 26.4.11-1
+- Rebase to 26.4.11
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 19 2021 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.9-3
+- Explicitly require the 'procps-ng' package
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 26.4.9-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Sat Aug 07 2021 Michal Schorm <mschorm@redhat.com> - 26.4.9-1
+- Rebase to 26.4.9
+
+* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 26.4.8-12
+- Rebuilt for Boost 1.76
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.8-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-10
+- Release bump for:   Switch from SCONS build tooling to CMAKE build
+  tooling
+
+* Wed Jul 14 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-9
+- PATCH 4: Use a dedicated user for the Systemd service
+
+* Wed Jul 14 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-8
+- PATCH 3: Make sure the wrapper script is executable
+
+* Wed Jul 14 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-7
+- PATCH 2: Fix the hardcoded paths
+
+* Wed Jul 14 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-6
+- PATCH 1: Change the Systemd service name from "garb" to "garbd"
+
+* Thu Jun 10 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-5
+- Revert "Fix the failing wsrep test issued in the BZ#1959484"
+
+* Thu Jun 10 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-4
+- Switch from SCONS to CMAKE building tooling
+
+* Wed Jun 09 2021 Michal Schorm <mschorm@redhat.com> - 26.4.8-3
+- Use bash globbing in .gitignore
+
+* Wed Jun 09 2021 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.8-2
+- Fix the failing wsrep test issued in the BZ#1959484
+
+* Wed Jun 09 2021 Lukas Javorsky <ljavorsk@redhat.com> - 26.4.8-1
+- Rebase to 26.4.8
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 26.4.7-4
+- Rebuilt for updated systemd-rpm-macros
+
+* Wed Feb 24 2021 Michal Schorm <mschorm@redhat.com> - 26.4.7-3
+- Add a workaround for 32 bit architectures
+
+* Tue Feb 23 2021 Michal Schorm <mschorm@redhat.com> - 26.4.7-2
+- typo
+
+* Tue Feb 23 2021 Michal Schorm <mschorm@redhat.com> - 26.4.7-1
+- Rebase to 26.4.7
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 26.4.6-3
+- Rebuilt for Boost 1.75
+
+* Wed Nov 11 2020 Michal Schorm <mschorm@redhat.com> - 26.4.6-2
+- Fix the Source URL comment, point ot MariaDB.org Archive instead of a
+  local mirror
+
+* Wed Nov 04 2020 Michal Schorm <mschorm@redhat.com> - 26.4.6-1
+- Rebase to 26.4.6
+
+* Thu Sep 17 2020 Michal Schorm <mschorm@redhat.com> - 26.4.5-2
+- Extend the workaround also to ELN
+
+* Wed Sep 16 2020 Michal Schorm <mschorm@redhat.com> - 26.4.5-1
+- Rebase to 26.4.5
+
+* Wed Sep 16 2020 Michal Schorm <mschorm@redhat.com> - 26.4.4-7
+- Apply workaround for FTBFS on F33+
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.4-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 08 2020 Michal Schorm <mschorm@redhat.com> - 26.4.4-2
+- Second rebuild for Boost 1.73
+
+* Fri Jun 05 2020 Michal Schorm <mschorm@redhat.com> - 26.4.4-1
+- Rebase to 26.4.4 Resolves: rhbz#1546787
+
+* Thu May 28 2020 Jonathan Wakely <jwakely@redhat.com> - 26.4.3-4
+- Rebuilt for Boost 1.73
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 26.4.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sun Jan 19 2020 Michal Schorm <mschorm@redhat.com> - 26.4.3-2
+- Fix of sources for the previous commit
+
+* Sat Jan 18 2020 Michal Schorm <mschorm@redhat.com> - 26.4.3-1
+- Rebase to 26.4.3
+
+* Wed Nov 27 2019 Michal Schorm <mschorm@redhat.com> - 25.3.28-2
+- RPMAUTOSPEC: unresolvable merge
+## END: Generated by rpmautospec

@@ -1,0 +1,165 @@
+--- actix-tls-3.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ actix-tls-3.5.0/Cargo.toml	2025-12-11T20:07:50.908685+00:00
+@@ -74,49 +74,6 @@
+     "dep:tls-openssl",
+     "dep:tokio-openssl",
+ ]
+-rustls = ["rustls-0_20"]
+-rustls-0_20 = ["rustls-0_20-webpki-roots"]
+-rustls-0_20-native-roots = [
+-    "tokio-rustls-023",
+-    "dep:rustls-native-certs-06",
+-]
+-rustls-0_20-webpki-roots = [
+-    "tokio-rustls-023",
+-    "webpki-roots-022",
+-]
+-rustls-0_21 = ["rustls-0_21-webpki-roots"]
+-rustls-0_21-native-roots = [
+-    "tokio-rustls-024",
+-    "dep:rustls-native-certs-06",
+-]
+-rustls-0_21-webpki-roots = [
+-    "tokio-rustls-024",
+-    "webpki-roots-025",
+-]
+-rustls-0_22 = [
+-    "dep:tokio-rustls-025",
+-    "dep:rustls-pki-types-1",
+-]
+-rustls-0_22-native-roots = [
+-    "rustls-0_22",
+-    "dep:rustls-native-certs-08",
+-]
+-rustls-0_22-webpki-roots = [
+-    "rustls-0_22",
+-    "dep:webpki-roots-026",
+-]
+-rustls-0_23 = [
+-    "dep:tokio-rustls-026",
+-    "dep:rustls-pki-types-1",
+-]
+-rustls-0_23-native-roots = [
+-    "rustls-0_23",
+-    "dep:rustls-native-certs-08",
+-]
+-rustls-0_23-webpki-roots = [
+-    "rustls-0_23",
+-    "dep:webpki-roots-026",
+-]
+ uri = [
+     "dep:http-0_2",
+     "dep:http-1",
+@@ -126,23 +83,11 @@
+ name = "actix_tls"
+ path = "src/lib.rs"
+ 
+-[[example]]
+-name = "accept-rustls"
+-path = "examples/accept-rustls.rs"
+-required-features = [
+-    "accept",
+-    "rustls-0_23",
+-]
+-
+ [[test]]
+ name = "accept-openssl"
+ path = "tests/accept-openssl.rs"
+ 
+ [[test]]
+-name = "accept-rustls"
+-path = "tests/accept-rustls.rs"
+-
+-[[test]]
+ name = "test_connect"
+ path = "tests/test_connect.rs"
+ 
+@@ -181,21 +126,6 @@
+ [dependencies.pin-project-lite]
+ version = "0.2.7"
+ 
+-[dependencies.rustls-native-certs-06]
+-version = "0.6"
+-optional = true
+-package = "rustls-native-certs"
+-
+-[dependencies.rustls-native-certs-08]
+-version = "0.8"
+-optional = true
+-package = "rustls-native-certs"
+-
+-[dependencies.rustls-pki-types-1]
+-version = "1"
+-optional = true
+-package = "rustls-pki-types"
+-
+ [dependencies.tls-openssl]
+ version = "0.10.55"
+ optional = true
+@@ -211,27 +141,6 @@
+ [dependencies.tokio-openssl]
+ version = "0.6"
+ optional = true
+-
+-[dependencies.tokio-rustls-023]
+-version = "0.23"
+-optional = true
+-package = "tokio-rustls"
+-
+-[dependencies.tokio-rustls-024]
+-version = "0.24"
+-optional = true
+-package = "tokio-rustls"
+-
+-[dependencies.tokio-rustls-025]
+-version = "0.25"
+-optional = true
+-package = "tokio-rustls"
+-
+-[dependencies.tokio-rustls-026]
+-version = "0.26"
+-optional = true
+-default-features = false
+-package = "tokio-rustls"
+ 
+ [dependencies.tokio-util]
+ version = "0.7"
+@@ -241,21 +150,6 @@
+ features = ["log"]
+ default-features = false
+ 
+-[dependencies.webpki-roots-022]
+-version = "0.22"
+-optional = true
+-package = "webpki-roots"
+-
+-[dependencies.webpki-roots-025]
+-version = "0.25"
+-optional = true
+-package = "webpki-roots"
+-
+-[dependencies.webpki-roots-026]
+-version = "0.26"
+-optional = true
+-package = "webpki-roots"
+-
+ [dev-dependencies.actix-codec]
+ version = "0.5"
+ 
+@@ -291,16 +185,6 @@
+ [dev-dependencies.tokio-rustls-026]
+ version = "0.26"
+ package = "tokio-rustls"
+-
+-[target."cfg(any())".dependencies.rustls-021]
+-version = "0.21.6"
+-optional = true
+-package = "rustls"
+-
+-[target."cfg(any())".dependencies.rustls-webpki-0101]
+-version = "0.101.4"
+-optional = true
+-package = "rustls-webpki"
+ 
+ [lints.clippy]
+ disallowed-names = "warn"

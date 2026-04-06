@@ -1,0 +1,42 @@
+From dcc7f76ded119bc471614eb1ea61908e031fab3e Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Wed, 8 Jan 2025 04:35:51 -0800
+Subject: [PATCH] Include cstdint for gcc 15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When building with gcc 15 on fedora, there is this error
+
+In file included from /sfs/rocm/amdsmi/rocm_smi/include/rocm_smi/rocm_smi_gpu_metrics.h:47,
+                 from /sfs/rocm/amdsmi/rocm_smi/src/rocm_smi_gpu_metrics.cc:44:
+/sfs/rocm/amdsmi/rocm_smi/include/rocm_smi/rocm_smi_common.h:149:5: error: ‘uintptr_t’ does not name a type
+  149 |     uintptr_t func_id_iter;
+      |     ^~~~~~~~~
+/sfs/rocm/amdsmi/rocm_smi/include/rocm_smi/rocm_smi_common.h:53:1: note: ‘uintptr_t’ is defined in header ‘<cstdint>’; this is probably fixable by adding ‘#include <cstdint>’
+   52 | #include <unordered_set>
+  +++ |+#include <cstdint>
+   53 |
+
+Take the advice and add cstdint
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ rocm_smi/include/rocm_smi/rocm_smi_common.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rocm_smi/include/rocm_smi/rocm_smi_common.h b/rocm_smi/include/rocm_smi/rocm_smi_common.h
+index 601e2255f9bc..ccc81f59ae62 100644
+--- a/rocm_smi/include/rocm_smi/rocm_smi_common.h
++++ b/rocm_smi/include/rocm_smi/rocm_smi_common.h
+@@ -50,6 +50,7 @@
+ #include <vector>
+ #include <string>
+ #include <unordered_set>
++#include <cstdint>
+ 
+ #define CHECK_DV_IND_RANGE \
+     amd::smi::RocmSMI& smi = amd::smi::RocmSMI::getInstance(); \
+-- 
+2.47.1
+

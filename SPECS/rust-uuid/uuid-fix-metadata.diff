@@ -1,0 +1,58 @@
+--- uuid-1.21.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uuid-1.21.0/Cargo.toml	2026-02-14T14:18:13.953894+00:00
+@@ -63,7 +63,6 @@
+     "serde",
+     "arbitrary",
+     "slog",
+-    "borsh",
+     "v1",
+     "v3",
+     "v4",
+@@ -96,18 +95,11 @@
+ 
+ [features]
+ atomic = ["dep:atomic"]
+-borsh = [
+-    "dep:borsh",
+-    "dep:borsh-derive",
+-]
+ default = ["std"]
+ fast-rng = [
+     "rng",
+     "dep:rand",
+ ]
+-js = [
+-]
+-macro-diagnostics = []
+ md5 = ["dep:md-5"]
+ rng = ["dep:getrandom"]
+ rng-getrandom = [
+@@ -143,16 +135,6 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.borsh]
+-version = "1"
+-optional = true
+-default-features = false
+-
+-[dependencies.borsh-derive]
+-version = "1"
+-optional = true
+-default-features = false
+-
+ [dependencies.bytemuck]
+ version = "1.21.0"
+ features = ["derive"]
+@@ -175,11 +157,6 @@
+ 
+ [dependencies.slog]
+ version = "2"
+-optional = true
+-
+-[dependencies.zerocopy]
+-version = "0.8"
+-features = ["derive"]
+ optional = true
+ 
+ [dev-dependencies.rustversion]

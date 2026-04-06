@@ -1,0 +1,9 @@
+[Unit]
+Description=XVNC Server
+
+[Socket]
+ListenStream=5900
+Accept=yes
+
+[Install]
+WantedBy=sockets.target

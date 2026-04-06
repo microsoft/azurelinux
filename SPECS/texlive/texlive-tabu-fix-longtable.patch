@@ -1,0 +1,12 @@
+diff -up tex/latex/tabu/tabu.sty.fix-longtable tex/latex/tabu/tabu.sty
+--- tex/latex/tabu/tabu.sty.fix-longtable	2023-01-07 22:26:25.122509902 -0500
++++ tex/latex/tabu/tabu.sty	2023-01-07 22:27:36.507051072 -0500
+@@ -1356,7 +1356,7 @@
+                          \tabuendlongtrial}\egroup      % got \tabu@box
+ }% \tabu@longtrial
+ \def\tabuendlongtrial{% no @ allowed for \scantokens
+-    \LT@echunk  \global\setbox\@ne \hbox{\unhbox\@ne}\kern\wd\@ne
++    \LT@echunk  \global\setbox\LT@gbox \hbox{\unhbox\LT@gbox}\kern\wd\LT@gbox
+                 \LT@get@widths
+ }% \tabuendlongtrial
+ \def\tabu@adl@endtrial{% <arydshln in nested trials - problem for global column counters!>

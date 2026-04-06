@@ -1,0 +1,67 @@
+--- petgraph-0.8.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ petgraph-0.8.3/Cargo.toml	2025-12-29T16:36:12.187218+00:00
+@@ -36,12 +36,19 @@
+ categories = ["data-structures"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/petgraph/petgraph"
++exclude = [
++    "/clippy.toml",
++    "/custom.css",
++    "/graph-example.dot",
++    "/Makefile",
++    # Note that contents of assets/ are licensed CC-BY-SA-4.0
++    "/assets/**",
++]
+ 
+ [package.metadata.docs.rs]
+ features = [
+     "rayon",
+     "serde-1",
+-    "quickcheck",
+ ]
+ 
+ [package.metadata.release]
+@@ -53,7 +60,6 @@
+ [features]
+ all = [
+     "unstable",
+-    "quickcheck",
+     "matrix_graph",
+     "stable_graph",
+     "graphmap",
+@@ -74,12 +80,6 @@
+ generate = []
+ graphmap = []
+ matrix_graph = []
+-quickcheck = [
+-    "std",
+-    "dep:quickcheck",
+-    "graphmap",
+-    "stable_graph",
+-]
+ rayon = [
+     "std",
+     "dep:rayon",
+@@ -172,10 +172,6 @@
+ path = "tests/page_rank.rs"
+ 
+ [[test]]
+-name = "quickcheck"
+-path = "tests/quickcheck.rs"
+-
+-[[test]]
+ name = "spfa"
+ path = "tests/spfa.rs"
+ 
+@@ -327,11 +323,6 @@
+ version = "2.5.0"
+ default-features = false
+ 
+-[dependencies.quickcheck]
+-version = "0.8"
+-optional = true
+-default-features = false
+-
+ [dependencies.rayon]
+ version = "1.5.3"
+ optional = true

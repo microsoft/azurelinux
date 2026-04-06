@@ -1,0 +1,92 @@
+From 5f4569f0605a73eb1a282ee5251ead073ed3b26e Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Tue, 26 Nov 2024 12:32:07 -0800
+Subject: [PATCH] libldap: avoid SSL context cleanup during library destruction
+
+Given that libldap can be pulled into random applications and applications
+are allowed to call OPENSSL_cleanup() before exiting, the only sane thing
+to do is to avoid trying to touch SSL context in ldap destructors, and just
+let them leak if the application does not explicitly free the ldap context.
+
+Add ldap_int_tls_destroy_safe() which skips SSL context cleanup while
+maintaining all other cleanup operations, and use it in the library
+destructor path.
+
+Fixes: https://bugs.openldap.org/show_bug.cgi?id=9952
+---
+ libraries/libldap/init.c     |  2 +-
+ libraries/libldap/ldap-int.h |  1 +
+ libraries/libldap/tls2.c     | 25 +++++++++++++++++++++----
+ 3 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/libraries/libldap/init.c b/libraries/libldap/init.c
+index 213276b4b5..aa017f4128 100644
+--- a/libraries/libldap/init.c
++++ b/libraries/libldap/init.c
+@@ -545,7 +545,7 @@ ldap_int_destroy_global_options(void)
+ 	}
+ #endif
+ #ifdef HAVE_TLS
+-	ldap_int_tls_destroy( gopts );
++	ldap_int_tls_destroy_safe( gopts );
+ #endif
+ }
+ 
+diff --git a/libraries/libldap/ldap-int.h b/libraries/libldap/ldap-int.h
+index 7e754775e8..b73097ccc7 100644
+--- a/libraries/libldap/ldap-int.h
++++ b/libraries/libldap/ldap-int.h
+@@ -914,6 +914,7 @@ LDAP_F (int) ldap_int_tls_start LDAP_P(( LDAP *ld,
+ 	LDAPConn *conn, LDAPURLDesc *srv ));
+ 
+ LDAP_F (void) ldap_int_tls_destroy LDAP_P(( struct ldapoptions *lo ));
++LDAP_F (void) ldap_int_tls_destroy_safe LDAP_P(( struct ldapoptions *lo ));
+ 
+ /*
+  *	in getvalues.c
+diff --git a/libraries/libldap/tls2.c b/libraries/libldap/tls2.c
+index 0841005a59..82f8573602 100644
+--- a/libraries/libldap/tls2.c
++++ b/libraries/libldap/tls2.c
+@@ -97,10 +97,14 @@ tls_ctx_ref( tls_ctx *ctx )
+ static ldap_pvt_thread_mutex_t tls_def_ctx_mutex;
+ #endif
+ 
+-void
+-ldap_int_tls_destroy( struct ldapoptions *lo )
+-{
+-	if ( lo->ldo_tls_ctx ) {
++/*
++ * Implementation function that handles all cleanup.
++ * skip_ctx_cleanup: 1 when called from destructor, 0 for normal operation
++ */
++static void
++ldap_int_tls_destroy_impl( struct ldapoptions *lo, int skip_ctx_cleanup )
++ {
++	if ( lo->ldo_tls_ctx && !skip_ctx_cleanup ) {
+ 		ldap_pvt_tls_ctx_free( lo->ldo_tls_ctx );
+ 		lo->ldo_tls_ctx = NULL;
+ 	}
+@@ -147,6 +151,19 @@ ldap_int_tls_destroy( struct ldapoptions *lo )
+ 	BER_BVZERO( &lo->ldo_tls_pin );
+ }
+ 
++
++void
++ldap_int_tls_destroy( struct ldapoptions *lo )
++{
++	ldap_int_tls_destroy_impl(lo, 0);
++}
++
++/* Safe version for destructor use */
++void ldap_int_tls_destroy_safe( struct ldapoptions *lo )
++{
++	ldap_int_tls_destroy_impl(lo, 1);
++}
++
+ /*
+  * Tear down the TLS subsystem. Should only be called once.
+  */
+-- 
+2.47.0
+

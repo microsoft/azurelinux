@@ -1,0 +1,38 @@
+From 89006b84ca41edcce4a31bd8f7be705de23cd754 Mon Sep 17 00:00:00 2001
+From: David Redondo <qt@david-redondo.de>
+Date: Tue, 11 Apr 2023 14:27:27 +0200
+Subject: [PATCH 46/55] Destroy frame queue before display
+
+wl_event_queue_destroy accesses the display.
+Found by running a test under valgrind.
+
+Pick-to: 6.5
+Change-Id: Ic89cbd3b6e98b4fc9561b0e63b5fab4886a1ec50
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit a76bf824fcd1cc3789f0d3454a0423c0241d9718)
+---
+ src/client/qwaylanddisplay.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index cc321497..737b539d 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -379,11 +379,12 @@ QWaylandDisplay::~QWaylandDisplay(void)
+ #if QT_CONFIG(cursor)
+     qDeleteAll(mCursorThemes);
+ #endif
+-    if (mDisplay)
+-        wl_display_disconnect(mDisplay);
+ 
+     if (m_frameEventQueue)
+         wl_event_queue_destroy(m_frameEventQueue);
++
++    if (mDisplay)
++        wl_display_disconnect(mDisplay);
+ }
+ 
+ // Steps which is called just after constructor. This separates registry_global() out of the constructor
+-- 
+2.51.1
+

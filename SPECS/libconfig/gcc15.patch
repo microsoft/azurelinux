@@ -1,0 +1,37 @@
+From 690342b9cbc8b39787a1501bd890d63ca63a003c Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Thu, 5 Dec 2024 06:47:40 +0000
+Subject: [PATCH] Fix declarations to allow build with gcc 15
+
+---
+(Backported to 1.7.3)
+
+ lib/grammar.y | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/lib/grammar.y b/lib/grammar.y
+index f614fa7..b7d6989 100644
+--- a/lib/grammar.y
++++ b/lib/grammar.y
+@@ -40,8 +40,7 @@
+ #include "wincompat.h"
+ 
+ /* These declarations are provided to suppress compiler warnings. */
+-extern int libconfig_yylex();
+-extern int libconfig_yyget_lineno();
++extern int libconfig_yyget_lineno(void *);
+ 
+ static const char *err_array_elem_type = "mismatched element type in array";
+ static const char *err_duplicate_setting = "duplicate setting name";
+@@ -82,6 +81,11 @@ void libconfig_yyerror(void *scanner, struct parse_context *ctx,
+   char *sval;
+ }
+ 
++%{
++/* These declarations are provided to suppress compiler warnings. */
++extern int libconfig_yylex(YYSTYPE *, void *);
++%}
++
+ %token <ival> TOK_BOOLEAN TOK_INTEGER TOK_HEX
+ %token <llval> TOK_INTEGER64 TOK_HEX64
+ %token <fval> TOK_FLOAT

@@ -1,0 +1,147 @@
+From 6481ac7fbd0027a7038560e0f51dd0af056cc229 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 18/50] openssh-6.6.1p1-selinux-contexts
+
+---
+ openbsd-compat/port-linux-sshd.c | 69 +++++++++++++++++++++++++++++++-
+ openbsd-compat/port-linux.c      |  2 +-
+ openbsd-compat/port-linux.h      |  1 +
+ sshd-auth.c                      |  2 +-
+ 4 files changed, 71 insertions(+), 3 deletions(-)
+
+diff --git a/openbsd-compat/port-linux-sshd.c b/openbsd-compat/port-linux-sshd.c
+index 8c5fc1fe..646f0887 100644
+--- a/openbsd-compat/port-linux-sshd.c
++++ b/openbsd-compat/port-linux-sshd.c
+@@ -33,6 +33,7 @@
+ #include "misc.h"      /* servconf.h needs misc.h for struct ForwardOptions */
+ #include "servconf.h"
+ #include "port-linux.h"
++#include "misc.h"
+ #include "sshkey.h"
+ #include "hostfile.h"
+ #include "auth.h"
+@@ -450,7 +451,7 @@ sshd_selinux_setup_exec_context(char *pwname)
+ void
+ sshd_selinux_copy_context(void)
+ {
+-	security_context_t *ctx;
++	char *ctx;
+ 
+ 	if (!sshd_selinux_enabled())
+ 		return;
+@@ -469,6 +470,72 @@ sshd_selinux_copy_context(void)
+ 	}
+ }
+ 
++void
++sshd_selinux_change_privsep_preauth_context(void)
++{
++	int len;
++	char line[1024], *preauth_context = NULL, *cp, *arg;
++	const char *contexts_path;
++	FILE *contexts_file;
++	struct stat sb;
++
++	contexts_path = selinux_openssh_contexts_path();
++	if (contexts_path == NULL) {
++		debug3_f("Failed to get the path to SELinux context");
++		return;
++	}
++
++	if ((contexts_file = fopen(contexts_path, "r")) == NULL) {
++		debug_f("Failed to open SELinux context file");
++		return;
++	}
++
++	if (fstat(fileno(contexts_file), &sb) != 0 ||
++	    sb.st_uid != 0 || (sb.st_mode & 022) != 0) {
++		logit_f("SELinux context file needs to be owned by root"
++		    " and not writable by anyone else");
++		fclose(contexts_file);
++		return;
++	}
++
++	while (fgets(line, sizeof(line), contexts_file)) {
++		/* Strip trailing whitespace */
++		for (len = strlen(line) - 1; len > 0; len--) {
++			if (strchr(" \t\r\n", line[len]) == NULL)
++				break;
++			line[len] = '\0';
++		}
++
++		if (line[0] == '\0')
++			continue;
++
++		cp = line;
++		arg = strdelim(&cp);
++		if (arg && *arg == '\0')
++			arg = strdelim(&cp);
++
++		if (arg && strcmp(arg, "privsep_preauth") == 0) {
++			arg = strdelim(&cp);
++			if (!arg || *arg == '\0') {
++				debug_f("privsep_preauth is empty");
++				fclose(contexts_file);
++				return;
++			}
++			preauth_context = xstrdup(arg);
++		}
++	}
++	fclose(contexts_file);
++
++	if (preauth_context == NULL) {
++		debug_f("Unable to find 'privsep_preauth' option in"
++		    " SELinux context file");
++		return;
++	}
++
++	ssh_selinux_change_context(preauth_context);
++	free(preauth_context);
++}
++
+ #endif
+ #endif
+ 
+diff --git a/openbsd-compat/port-linux.c b/openbsd-compat/port-linux.c
+index 7426f6f7..9a6b1d6e 100644
+--- a/openbsd-compat/port-linux.c
++++ b/openbsd-compat/port-linux.c
+@@ -188,7 +188,7 @@ ssh_selinux_change_context(const char *newname)
+ 	xasprintf(&newctx, "%.*s%s%s", (int)(cx - oldctx + 1), oldctx,
+ 	    newname, cx2 == NULL ? "" : cx2);
+ 
+-	debug3_f("setting context from '%s' to '%s'", oldctx, newctx);
++	debug_f("setting context from '%s' to '%s'", oldctx, newctx);
+ 	if (setcon(newctx) < 0)
+ 		do_log2_f(log_level, "setcon %s from %s failed with %s",
+ 		    newctx, oldctx, strerror(errno));
+diff --git a/openbsd-compat/port-linux.h b/openbsd-compat/port-linux.h
+index 1b745a76..7f8ba200 100644
+--- a/openbsd-compat/port-linux.h
++++ b/openbsd-compat/port-linux.h
+@@ -27,6 +27,7 @@ int sshd_selinux_enabled(void);
+ void sshd_selinux_copy_context(void);
+ void sshd_selinux_setup_exec_context(char *);
+ int sshd_selinux_setup_env_variables(void);
++void sshd_selinux_change_privsep_preauth_context(void);
+ #endif
+ 
+ #ifdef LINUX_OOM_ADJUST
+diff --git a/sshd-auth.c b/sshd-auth.c
+index d51e4636..e4a8edfd 100644
+--- a/sshd-auth.c
++++ b/sshd-auth.c
+@@ -188,7 +188,7 @@ privsep_child_demote(void)
+ 		fatal_f("ssh_sandbox_init failed");
+ #endif
+ #ifdef WITH_SELINUX
+-	ssh_selinux_change_context("sshd_net_t");
++	sshd_selinux_change_privsep_preauth_context();
+ #endif
+ 
+ 	/* Demote the child */
+-- 
+2.49.0
+

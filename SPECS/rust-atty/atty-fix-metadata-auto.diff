@@ -1,0 +1,16 @@
+--- atty-0.2.14/Cargo.toml	2020-01-05T22:19:30+00:00
++++ atty-0.2.14/Cargo.toml	2023-05-25T18:14:49.045407+00:00
+@@ -22,13 +22,8 @@
+ keywords = ["terminal", "tty", "isatty"]
+ license = "MIT"
+ repository = "https://github.com/softprops/atty"
+-[target."cfg(target_os = \"hermit\")".dependencies.hermit-abi]
+-version = "0.1.6"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2"
+ default-features = false
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["consoleapi", "processenv", "minwinbase", "minwindef", "winbase"]
+ [badges.travis-ci]
+ repository = "softprops/atty"

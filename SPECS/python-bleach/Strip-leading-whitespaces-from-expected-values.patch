@@ -1,0 +1,29 @@
+From 8dad2ab00914d75f1fdf756779a0005f2da8c84e Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 3 Jul 2023 14:39:59 +0200
+Subject: [PATCH] Strip leading whitespaces from expected values
+
+---
+ tests/test_parse_shim.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_parse_shim.py b/tests/test_parse_shim.py
+index f49a643..adb8a01 100644
+--- a/tests/test_parse_shim.py
++++ b/tests/test_parse_shim.py
+@@ -52,10 +52,10 @@ class ParseResult:
+         # the base url is. Since our parser is not using a baseurl, it sets the
+         # scheme to "". Further, our parser includes spaces at the beginning,
+         # but I don't see that as being problematic.
+-        ("\t   :foo.com   \n", ParseResult(path="   :foo.com   ")),
++        ("\t   :foo.com   \n", ParseResult(path=":foo.com   ")),
+         # NOTE(willkg): The wpt tests set the path to "/foo/foo.com" because
+         # the base url is at "/foo"
+-        (" foo.com  ", ParseResult(path=" foo.com  ")),
++        (" foo.com  ", ParseResult(path="foo.com  ")),
+         ("a:\t foo.com", ParseResult(scheme="a", path=" foo.com")),
+         (
+             "http://f:21/ b ? d # e ",
+-- 
+2.41.0
+

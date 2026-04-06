@@ -1,0 +1,105 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/codecs/qutfcodec.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/codecs/qutfcodec.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/codecs/qutfcodec.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/codecs/qutfcodec.cpp	2025-11-07 14:10:38.931771949 +0100
+@@ -38,6 +38,7 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
+ #include "qutfcodec_p.h"
+ #include "qlist.h"
+ #include "qendian.h"
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/global/qendian.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/global/qendian.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/global/qendian.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/global/qendian.cpp	2025-11-07 14:10:38.932265837 +0100
+@@ -38,6 +38,8 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
++
+ #include "qendian.h"
+ 
+ #include "qalgorithms.h"
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/global/qendian.h qtbase-everywhere-src-5.15.18-new/src/corelib/global/qendian.h
+--- qtbase-everywhere-src-5.15.18/src/corelib/global/qendian.h	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/global/qendian.h	2025-11-07 14:10:38.932553613 +0100
+@@ -41,6 +41,8 @@
+ #ifndef QENDIAN_H
+ #define QENDIAN_H
+ 
++#include <limits>
++
+ #include <QtCore/qfloat16.h>
+ #include <QtCore/qglobal.h>
+ 
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/plugin/quuid.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/plugin/quuid.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/plugin/quuid.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/plugin/quuid.cpp	2025-11-07 14:10:38.932968446 +0100
+@@ -38,6 +38,8 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
++
+ #include "quuid.h"
+ 
+ #include "qcryptographichash.h"
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/serialization/qdatastream.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/serialization/qdatastream.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/serialization/qdatastream.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/serialization/qdatastream.cpp	2025-11-07 14:10:38.933408654 +0100
+@@ -37,6 +37,8 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
++
+ #include "qdatastream.h"
+ #include "qdatastream_p.h"
+ 
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearray.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearray.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearray.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearray.cpp	2025-11-07 14:10:38.933886199 +0100
+@@ -39,6 +39,8 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
++
+ #include "qbytearray.h"
+ #include "qbytearraymatcher.h"
+ #include "private/qtools_p.h"
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearraymatcher.cpp qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearraymatcher.cpp
+--- qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearraymatcher.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearraymatcher.cpp	2025-11-07 14:10:38.934451270 +0100
+@@ -39,6 +39,7 @@
+ 
+ #include "qbytearraymatcher.h"
+ 
++#include <limits>
+ #include <limits.h>
+ 
+ QT_BEGIN_NAMESPACE
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearraymatcher.h qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearraymatcher.h
+--- qtbase-everywhere-src-5.15.18/src/corelib/text/qbytearraymatcher.h	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/text/qbytearraymatcher.h	2025-11-07 14:10:38.934699651 +0100
+@@ -40,6 +40,8 @@
+ #ifndef QBYTEARRAYMATCHER_H
+ #define QBYTEARRAYMATCHER_H
+ 
++#include <limits>
++
+ #include <QtCore/qbytearray.h>
+ 
+ #include <limits>
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/dbus/qdbuserror.cpp qtbase-everywhere-src-5.15.18-new/src/dbus/qdbuserror.cpp
+--- qtbase-everywhere-src-5.15.18/src/dbus/qdbuserror.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/dbus/qdbuserror.cpp	2025-11-07 14:10:38.934962166 +0100
+@@ -37,6 +37,7 @@
+ **
+ ****************************************************************************/
+ 
++#include <limits>
+ #include "qdbuserror.h"
+ 
+ #include <qdebug.h>

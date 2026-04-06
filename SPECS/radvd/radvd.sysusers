@@ -1,0 +1,3 @@
+#Type Name     ID             GECOS                 Home directory Shell
+g     radvd    75
+u     radvd    75             "radvd user"          /              /sbin/nologin

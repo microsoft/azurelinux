@@ -1,0 +1,12 @@
+--- cvs-1.11.21/contrib/rcs2log.sh.old	2005-08-02 22:46:43.000000000 +0200
++++ cvs-1.11.21/contrib/rcs2log.sh	2006-05-09 11:49:10.000000000 +0200
+@@ -68,6 +68,9 @@
+ For more information about these matters, see the files named COPYING.
+ Author: Paul Eggert <eggert@twinsun.com>'
+ 
++# set old environment for sort (bug #190009)
++export _POSIX2_VERSION=199209
++
+ # functions
+ @MKTEMP_SH_FUNCTION@
+ 

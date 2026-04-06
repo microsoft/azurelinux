@@ -1,0 +1,40 @@
+From d4dd48058872eb68d8856bdadca0a36cb0a7088d Mon Sep 17 00:00:00 2001
+From: Ralph Castain <rhc@pmix.org>
+Date: Tue, 15 Oct 2024 07:12:00 -0600
+Subject: [PATCH] Unlock stdin target
+
+Fix typo that locked the target to rank=0 and instead
+use the rank provided by user.
+
+Signed-off-by: Ralph Castain <rhc@pmix.org>
+---
+ src/prted/prun_common.c | 2 +-
+ src/tools/prte/prte.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/prted/prun_common.c b/src/prted/prun_common.c
+index 62281d30c5..3d2897aa25 100644
+--- a/src/prted/prun_common.c
++++ b/src/prted/prun_common.c
+@@ -786,7 +786,7 @@ int prun_common(pmix_cli_result_t *results,
+         } else if (0 == strcmp(opt->values[0], "none")) {
+             pname.rank = PMIX_RANK_INVALID;
+         } else {
+-            pname.rank = 0;
++            pname.rank = strtoul(opt->values[0], NULL, 10);
+         }
+     } else {
+         pname.rank = 0;
+diff --git a/src/tools/prte/prte.c b/src/tools/prte/prte.c
+index 5a4e62235c..85a15faa62 100644
+--- a/src/tools/prte/prte.c
++++ b/src/tools/prte/prte.c
+@@ -1205,7 +1205,7 @@ int main(int argc, char *argv[])
+         } else if (0 == strcmp(opt->values[0], "none")) {
+             pname.rank = PMIX_RANK_INVALID;
+         } else {
+-            pname.rank = 0;
++            pname.rank = strtoul(opt->values[0], NULL, 10);
+         }
+     } else {
+         pname.rank = 0;

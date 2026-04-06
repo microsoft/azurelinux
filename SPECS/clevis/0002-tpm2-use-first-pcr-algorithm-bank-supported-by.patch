@@ -1,0 +1,95 @@
+From ccb89a5b0961fc885f31120bda869a14ef286326 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Old=C5=99ich=20Jedli=C4=8Dka?= <oldium.pro@gmail.com>
+Date: Fri, 4 Oct 2024 12:39:03 +0200
+Subject: [PATCH] tpm2: use first PCR algorithm bank supported by TPM as
+ default
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The default is `sha1`, which is not always supported (it is legacy and
+optional for implementation). Make this more future-proof and use the first
+bank with non-empty set of PCRs, which is returned from TPM by
+`tpm2_getcap pcrs`.
+
+The swtpm by default does not create sha1 bank, so this fixes usage with
+swtpm.
+
+Signed-off-by: Oldřich Jedlička <oldium.pro@gmail.com>
+---
+ src/pins/tpm2/clevis-encrypt-tpm2        | 12 ++++++++++--
+ src/pins/tpm2/clevis-encrypt-tpm2.1.adoc |  8 ++++++--
+ src/pins/tpm2/pin-tpm2                   |  6 ++++--
+ 3 files changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/src/pins/tpm2/clevis-encrypt-tpm2 b/src/pins/tpm2/clevis-encrypt-tpm2
+index 3c31569c..09b4d797 100755
+--- a/src/pins/tpm2/clevis-encrypt-tpm2
++++ b/src/pins/tpm2/clevis-encrypt-tpm2
+@@ -58,7 +58,7 @@ if [ -t 0 ]; then
+     echo
+     echo "  key: <string>   Algorithm type for the generated key (default: ecc)"
+     echo
+-    echo "  pcr_bank: <string>   PCR algorithm bank to use for policy (default: sha1)"
++    echo "  pcr_bank: <string>   PCR algorithm bank to use for policy (default: first supported by TPM)"
+     echo
+     echo "  pcr_ids: <string>   PCR list used for policy. If not present, no policy is used"
+     echo
+@@ -130,7 +130,15 @@ hash="$(jose fmt -j- -Og hash -u- <<< "$cfg")" || hash="sha256"
+ 
+ key="$(jose fmt -j- -Og key -u- <<< "$cfg")" || key="ecc"
+ 
+-pcr_bank="$(jose fmt -j- -Og pcr_bank -u- <<< "$cfg")" || pcr_bank="sha1"
++pcr_bank="$(jose fmt -j- -Og pcr_bank -u- <<< "$cfg")" || {
++    if ! pcr_bank=$(tpm2_getcap pcrs |
++            awk '/^[[:space:]]*-[[:space:]]*([^:]+):[[:space:]]*\[[[:space:]]*[^][:space:]]/ \
++                     {found=1; split($0, m, /[-:[:space:]]+/); print m[2]; exit}
++                 END {exit !found}'); then
++        echo "Unable to find non-empty PCR algorithm bank, please check output of tpm2_getcap pcrs" >&2
++        exit 1
++    fi
++}
+ 
+ # Trim the spaces from the config, so that we will not have issues parsing
+ # the PCR IDs.
+diff --git a/src/pins/tpm2/clevis-encrypt-tpm2.1.adoc b/src/pins/tpm2/clevis-encrypt-tpm2.1.adoc
+index 16adf0b6..ec76495f 100644
+--- a/src/pins/tpm2/clevis-encrypt-tpm2.1.adoc
++++ b/src/pins/tpm2/clevis-encrypt-tpm2.1.adoc
+@@ -91,13 +91,17 @@ This command uses the following configuration properties:
+   - *symcipher*
+ 
+ * *pcr_bank*  (string) :
+-  PCR algorithm bank to use for policy (default: sha1)
++  PCR algorithm bank to use for policy (default: first supported by TPM)
+ 
+-  It must be one of the following:
++  Examples of PCR algorithm banks, support depends on TPM chip:
+ 
+   - *sha1*
+   - *sha256*
+ 
++  For the full list of algorithms supported by the TPM chip check output of
++  `tpm2_getcap pcrs` and use the algorithm which shows non-empty list of PCR
++  numbers.
++
+ * *pcr_ids*  (string) :
+   Comma separated list of PCR used for policy. If not present, no policy is used
+ 
+diff --git a/src/pins/tpm2/pin-tpm2 b/src/pins/tpm2/pin-tpm2
+index 05f0649a..5ef0a6a3 100755
+--- a/src/pins/tpm2/pin-tpm2
++++ b/src/pins/tpm2/pin-tpm2
+@@ -142,8 +142,10 @@ test_pcr_ids "${orig}" '{"key": "ecc"}' "" || exit 1
+ # arrays and check if we get the expected pcr_ids.
+ 
+ # Let's first make sure this would be a valid configuration.
+-_default_pcr_bank="sha1"
+-if validate_pcrs "${_default_pcr_bank}" "4,16"; then
++_default_pcr_bank=$(tpm2_getcap pcrs |
++    awk '/^[[:space:]]*-[[:space:]]*([^:]+):[[:space:]]*\[[[:space:]]*[^][:space:]]/ \
++             {split($0, m, /[-:[:space:]]+/); print m[2]; exit}')
++if [ -n "$_default_pcr_bank" ] && validate_pcrs "${_default_pcr_bank}" "4,16"; then
+     test_pcr_ids "${orig}" '{"pcr_ids": "16"}' "16" || exit 1
+     test_pcr_ids "${orig}" '{"pcr_ids": ["16"]}' "16"  || exit 1
+     test_pcr_ids "${orig}" '{"pcr_ids": "4,  16"}' "4,16" || exit 1

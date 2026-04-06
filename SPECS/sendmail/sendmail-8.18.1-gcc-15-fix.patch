@@ -1,0 +1,115 @@
+diff --git a/libsm/vfscanf.c b/libsm/vfscanf.c
+index e1b7830..b0aa923 100644
+--- a/libsm/vfscanf.c
++++ b/libsm/vfscanf.c
+@@ -37,6 +37,7 @@ SM_IDSTR(id, "@(#)$Id: vfscanf.c,v 1.55 2013-11-22 20:51:44 ca Exp $")
+ #define SUPPRESS	0x10	/* suppress assignment */
+ #define POINTER		0x20	/* weird %p pointer (`fake hex') */
+ #define NOSKIP		0x40	/* do not skip blanks */
++#define UNSIGNED	0x80	/* unsigned conversions */
+ 
+ /*
+ **  The following are used in numeric conversions only:
+@@ -122,9 +123,6 @@ sm_vfscanf(fp, timeout, fmt0, ap)
+ 	int nassigned;		/* number of fields assigned */
+ 	int nread;		/* number of characters consumed from fp */
+ 	int base;		/* base argument to strtoll/strtoull */
+-
+-	/* conversion function (strtoll/strtoull) */
+-	ULONGLONG_T (*ccfn) __P((const char *, char **, int));
+ 	char ccltab[256];	/* character class table for %[...] */
+ 	char buf[BUF];		/* buffer for numeric conversions */
+ 	SM_EVENT *evt = NULL;
+@@ -160,7 +158,6 @@ sm_vfscanf(fp, timeout, fmt0, ap)
+ 	nassigned = 0;
+ 	nread = 0;
+ 	base = 0;		/* XXX just to keep gcc happy */
+-	ccfn = NULL;		/* XXX just to keep gcc happy */
+ 	for (;;)
+ 	{
+ 		c = *fmt++;
+@@ -240,13 +237,11 @@ literal:
+ 			/* FALLTHROUGH */
+ 		  case 'd':
+ 			c = CT_INT;
+-			ccfn = (ULONGLONG_T (*)())sm_strtoll;
+ 			base = 10;
+ 			break;
+ 
+ 		  case 'i':
+ 			c = CT_INT;
+-			ccfn = (ULONGLONG_T (*)())sm_strtoll;
+ 			base = 0;
+ 			break;
+ 
+@@ -255,21 +250,20 @@ literal:
+ 			/* FALLTHROUGH */
+ 		  case 'o':
+ 			c = CT_INT;
+-			ccfn = sm_strtoull;
++			flags |= UNSIGNED;
+ 			base = 8;
+ 			break;
+ 
+ 		  case 'u':
+ 			c = CT_INT;
+-			ccfn = sm_strtoull;
++			flags |= UNSIGNED;
+ 			base = 10;
+ 			break;
+ 
+ 		  case 'X':
+ 		  case 'x':
+-			flags |= PFXOK;	/* enable 0x prefixing */
++			flags |= PFXOK | UNSIGNED;
+ 			c = CT_INT;
+-			ccfn = sm_strtoull;
+ 			base = 16;
+ 			break;
+ 
+@@ -297,9 +291,8 @@ literal:
+ 			break;
+ 
+ 		  case 'p':	/* pointer format is like hex */
+-			flags |= POINTER | PFXOK;
++			flags |= POINTER | PFXOK | UNSIGNED;
+ 			c = CT_INT;
+-			ccfn = sm_strtoull;
+ 			base = 16;
+ 			break;
+ 
+@@ -324,7 +317,6 @@ literal:
+ 			if (isupper(c))
+ 				flags |= LONG;
+ 			c = CT_INT;
+-			ccfn = (ULONGLONG_T (*)()) sm_strtoll;
+ 			base = 10;
+ 			break;
+ 		}
+@@ -628,7 +620,12 @@ literal:
+ 				ULONGLONG_T res;
+ 
+ 				*p = 0;
+-				res = (*ccfn)(buf, (char **)NULL, base);
++				if (flags & UNSIGNED)
++					res = sm_strtoull(buf, (char **)NULL,
++							  base);
++				else
++					res = sm_strtoll(buf, (char **)NULL,
++							 base);
+ 				if (flags & POINTER)
+ 					*SM_VA_ARG(ap, void **) =
+ 					    (void *)(long) res;
+diff --git a/mailstats/mailstats.c b/mailstats/mailstats.c
+index 6b34a57..5395bec 100644
+--- a/mailstats/mailstats.c
++++ b/mailstats/mailstats.c
+@@ -65,7 +65,7 @@ main(argc, argv)
+ 	char sfilebuf[MAXPATHLEN];
+ 	char buf[MAXLINE];
+ 	struct statistics stats;
+-	extern char *ctime();
++	extern char *ctime(const time_t *);
+ 	extern char *optarg;
+ 	extern int optind;
+ # define MSOPTS "cC:f:opP"

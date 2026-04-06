@@ -1,0 +1,12 @@
+diff -rup pypy-pypy-f66246c46ca3/lib_pypy/_pypy_interact.py pypy-pypy-f66246c46ca3/lib_pypy/_pypy_interact.py
+--- pypy-pypy-f66246c46ca3/lib_pypy/_pypy_interact.py	2013-05-27 10:35:37.612236951 +0200
++++ pypy-pypy-f66246c46ca3/lib_pypy/_pypy_interact.py	2013-05-27 10:37:25.602852747 +0200
+@@ -4,7 +4,7 @@ import sys
+ irc_header = "And now for something completely different"
+ 
+ 
+-def interactive_console(mainmodule=None, quiet=False, future_flags=0):
++def interactive_console(mainmodule=None, quiet=True, future_flags=0):
+     # set sys.{ps1,ps2} just before invoking the interactive interpreter. This
+     # mimics what CPython does in pythonrun.c
+     if not hasattr(sys, 'ps1'):

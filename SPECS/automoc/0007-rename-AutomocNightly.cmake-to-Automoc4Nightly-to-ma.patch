@@ -1,0 +1,71 @@
+From 9e467130a4d51715e4e2a6ceb43642f5860fb47f Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Sat, 18 Apr 2009 16:42:13 +0000
+Subject: [PATCH 07/33] -rename AutomocNightly.cmake to Automoc4Nightly, to
+ match the other files
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=955851
+---
+ Automoc4Nightly.cmake | 19 +++++++++++++++++++
+ AutomocNightly.cmake  | 19 -------------------
+ 2 files changed, 19 insertions(+), 19 deletions(-)
+ create mode 100644 Automoc4Nightly.cmake
+ delete mode 100644 AutomocNightly.cmake
+
+diff --git a/Automoc4Nightly.cmake b/Automoc4Nightly.cmake
+new file mode 100644
+index 0000000..236f263
+--- /dev/null
++++ b/Automoc4Nightly.cmake
+@@ -0,0 +1,19 @@
++set(CTEST_VCS svn)
++set(CTEST_VCS_REPOSITORY https://neundorf@svn.kde.org/home/kde/trunk/kdesupport/automoc)
++set(CTEST_CMAKE_GENERATOR "Unix Makefiles" )
++
++# set(CTEST_AVOID_SPACES FALSE)
++
++get_filename_component(_currentDir "${CMAKE_CURRENT_LIST_FILE}" PATH)
++
++# generic support code, sets up everything required:
++include( "${_currentDir}/KDECTestNightly.cmake" )
++
++ctest_empty_binary_directory("${CTEST_BINARY_DIRECTORY}")
++ctest_start(Nightly)
++ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" )
++ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_submit()
++
+diff --git a/AutomocNightly.cmake b/AutomocNightly.cmake
+deleted file mode 100644
+index 236f263..0000000
+--- a/AutomocNightly.cmake
++++ /dev/null
+@@ -1,19 +0,0 @@
+-set(CTEST_VCS svn)
+-set(CTEST_VCS_REPOSITORY https://neundorf@svn.kde.org/home/kde/trunk/kdesupport/automoc)
+-set(CTEST_CMAKE_GENERATOR "Unix Makefiles" )
+-
+-# set(CTEST_AVOID_SPACES FALSE)
+-
+-get_filename_component(_currentDir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+-
+-# generic support code, sets up everything required:
+-include( "${_currentDir}/KDECTestNightly.cmake" )
+-
+-ctest_empty_binary_directory("${CTEST_BINARY_DIRECTORY}")
+-ctest_start(Nightly)
+-ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" )
+-ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" )
+-ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" )
+-ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" )
+-ctest_submit()
+-
+-- 
+2.4.3
+

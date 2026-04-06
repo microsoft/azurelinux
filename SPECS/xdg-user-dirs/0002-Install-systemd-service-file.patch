@@ -1,0 +1,51 @@
+From 1512365de068446f8b5e14163601dd71e34e8bc1 Mon Sep 17 00:00:00 2001
+From: David Redondo <kde@david-redondo.de>
+Date: Thu, 9 Feb 2023 11:57:37 +0100
+Subject: [PATCH 2/2] Install systemd service file
+
+---
+ Makefile.am  | 4 +++-
+ configure.ac | 5 +++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f649564..81d9976 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -14,7 +14,7 @@ INCLUDES =					\
+ 	$(NULL)
+ 
+ EXTRA_DIST= config.rpath translate.c autogen.sh \
+-	user-dirs.conf user-dirs.defaults xdg-user-dir xdg-user-dirs.desktop
++	user-dirs.conf user-dirs.defaults xdg-user-dir xdg-user-dirs.desktop xdg-user-dirs.service
+ 
+ xdgdir=$(sysconfdir)/xdg
+ xdg_DATA=user-dirs.conf user-dirs.defaults
+@@ -22,6 +22,8 @@ xdg_DATA=user-dirs.conf user-dirs.defaults
+ xdgautostartdir=$(xdgdir)/autostart
+ xdgautostart_DATA = xdg-user-dirs.desktop
+ 
++systemduserunit_DATA = xdg-user-dirs.service
++
+ libraries = $(LIBINTL)
+ 
+ bin_PROGRAMS =					\
+diff --git a/configure.ac b/configure.ac
+index 2cce082..dc389db 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -77,6 +77,11 @@ if test x$enable_documentation = xyes; then
+ fi
+ AM_CONDITIONAL(BUILD_DOCUMENTATION, test x$enable_documentation = xyes)
+ 
++PKG_CHECK_EXISTS([systemd],
++      [systemduserunitdir=$($PKG_CONFIG --variable=systemduserunitdir systemd)],
++      [systemduserunitdir='${prefix}/lib/systemd/user'])
++AC_SUBST(systemduserunitdir)
++
+ AC_OUTPUT([ po/Makefile.in
+ Makefile
+ man/Makefile
+-- 
+2.48.1
+

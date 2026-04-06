@@ -1,0 +1,26 @@
+diff -up vim90/src/term.c.fixkeys vim90/src/term.c
+--- vim90/src/term.c.fixkeys	2022-10-20 14:45:53.896659582 +0200
++++ vim90/src/term.c	2022-10-20 14:48:28.958697659 +0200
+@@ -851,14 +851,14 @@ static struct builtin_term builtin_termc
+     {K_XRIGHT,		"\033[@;*C"},	// Esc [ C or Esc [ 1 ; C
+     {K_XLEFT,		"\033[@;*D"},	// Esc [ D or Esc [ 1 ; D
+     // An extra set of function keys for vt100 mode
+-    {K_XF1,		"\033O*P"},
+-    {K_XF2,		"\033O*Q"},
+-    {K_XF3,		"\033O*R"},
+-    {K_XF4,		"\033O*S"},
+-    {K_F1,		"\033[11;*~"},
+-    {K_F2,		"\033[12;*~"},
+-    {K_F3,		"\033[13;*~"},
+-    {K_F4,		"\033[14;*~"},
++    {K_XF1,		"\033[11~"},
++    {K_XF2,		"\033[12~"},
++    {K_XF3,		"\033[13~"},
++    {K_XF4,		"\033[14~"},
++    {K_F1,		"\033OP"},
++    {K_F2,		"\033OQ"},
++    {K_F3,		"\033OR"},
++    {K_F4,		"\033OS"},
+     {K_F5,		"\033[15;*~"},
+     {K_F6,		"\033[17;*~"},
+     {K_F7,		"\033[18;*~"},

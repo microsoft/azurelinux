@@ -1,0 +1,33 @@
+diff --git a/src/backend/utils/misc/postgresql.conf.sample b/src/backend/utils/misc/postgresql.conf.sample
+index 83d5df8e46..e47d127a7b 100644
+--- a/src/backend/utils/misc/postgresql.conf.sample
++++ b/src/backend/utils/misc/postgresql.conf.sample
+@@ -473,7 +473,7 @@
+ 					# logging_collector to be on.
+ 
+ # This is used when logging to stderr:
+-#logging_collector = off		# Enable capturing of stderr, jsonlog,
++logging_collector = on		# Enable capturing of stderr, jsonlog,
+ 					# and csvlog into log files. Required
+ 					# to be on for csvlogs and jsonlogs.
+ 					# (change requires restart)
+@@ -481,16 +481,16 @@
+ # These are only used if logging_collector is on:
+ #log_directory = 'log'			# directory where log files are written,
+ 					# can be absolute or relative to PGDATA
+-#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'	# log file name pattern,
++log_filename = 'postgresql-%a.log'	# log file name pattern,
+							# can include strftime() escapes
+ #log_file_mode = 0600			# creation mode for log files,
+ 					# begin with 0 to use octal notation
+-#log_rotation_age = 1d			# Automatic rotation of logfiles will
++log_rotation_age = 1d			# Automatic rotation of logfiles will
+ 					# happen after that time.  0 disables.
+ #log_rotation_size = 10MB		# Automatic rotation of logfiles will
+ 					# happen after that much log output.
+ 					# 0 disables.
+-#log_truncate_on_rotation = off		# If on, an existing log file with the
++log_truncate_on_rotation = on		# If on, an existing log file with the
+ 					# same name as the new log file will be
+ 					# truncated rather than appended to.
+ 					# But such truncation only occurs on

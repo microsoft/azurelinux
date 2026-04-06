@@ -1,0 +1,128 @@
+From dcbc2d4c8f0648b0c1b78b2b43c3a28640dc3576 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 17 Feb 2023 18:01:57 +0100
+Subject: [PATCH 1/2] tests: Fix pointer type for assert_string_equal()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+error: pointer targets in passing argument 1 of ‘_assert_string_equal’
+differ in signedness [-Werror=pointer-sign]
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Pavel Filipenský <pfilipensky@samba.org>
+---
+ tests/test_dns_fake.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/tests/test_dns_fake.c b/tests/test_dns_fake.c
+index c057ebe..4f19f12 100644
+--- a/tests/test_dns_fake.c
++++ b/tests/test_dns_fake.c
+@@ -392,7 +392,7 @@ static void test_res_fake_uri_query(void **state)
+ 
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 5);
+-	assert_string_equal(rrdata, "https://vpn.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn.cwrap.org/VPN");
+ 
+ 	assert_int_equal(ns_parserr(&handle, ns_s_an, 1, &rr), 0);
+ 	assert_int_equal(ns_rr_type(rr), ns_t_uri);
+@@ -402,7 +402,7 @@ static void test_res_fake_uri_query(void **state)
+ 
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 10);
+-	assert_string_equal(rrdata, "https://vpn2.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn2.cwrap.org/VPN");
+ 
+ 	assert_int_equal(ns_parserr(&handle, ns_s_an, 2, &rr), 0);
+ 	assert_int_equal(ns_rr_type(rr), ns_t_uri);
+@@ -412,7 +412,7 @@ static void test_res_fake_uri_query(void **state)
+ 
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 20);
+-	assert_string_equal(rrdata, "https://vpn3.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn3.cwrap.org/VPN");
+ 
+ }
+ 
+@@ -461,7 +461,7 @@ static void test_res_fake_uri_query_minimal(void **state)
+ 
+ 	assert_int_equal(prio, 1);
+ 	assert_int_equal(weight, 100);
+-	assert_string_equal(rrdata, "ftp://ftp.cwrap.org/public");
++	assert_string_equal((const char *)rrdata, "ftp://ftp.cwrap.org/public");
+ }
+ 
+ static void test_res_fake_soa_query(void **state)
+@@ -746,7 +746,7 @@ static void test_res_fake_txt_query(void **state)
+ 	assert_int_equal(ns_rr_type(rr), ns_t_txt);
+ 
+ 	rrdata = ns_rr_rdata(rr);
+-	assert_string_equal(rrdata, "v=spf1 mx");
++	assert_string_equal((const char *)rrdata, "v=spf1 mx");
+ }
+ 
+ static void test_res_fake_uri_nsearch(void **state)
+@@ -787,7 +787,7 @@ static void test_res_fake_uri_nsearch(void **state)
+ 	NS_GET16(weight, rrdata);
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 5);
+-	assert_string_equal(rrdata, "https://vpn.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn.cwrap.org/VPN");
+ 
+ 	assert_int_equal(ns_parserr(&handle, ns_s_an, 1, &rr), 0);
+ 	assert_int_equal(ns_rr_type(rr), ns_t_uri);
+@@ -796,7 +796,7 @@ static void test_res_fake_uri_nsearch(void **state)
+ 	NS_GET16(weight, rrdata);
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 10);
+-	assert_string_equal(rrdata, "https://vpn2.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn2.cwrap.org/VPN");
+ 
+ 	assert_int_equal(ns_parserr(&handle, ns_s_an, 2, &rr), 0);
+ 	assert_int_equal(ns_rr_type(rr), ns_t_uri);
+@@ -805,7 +805,7 @@ static void test_res_fake_uri_nsearch(void **state)
+ 	NS_GET16(weight, rrdata);
+ 	assert_int_equal(prio, 2);
+ 	assert_int_equal(weight, 20);
+-	assert_string_equal(rrdata, "https://vpn3.cwrap.org/VPN");
++	assert_string_equal((const char *)rrdata, "https://vpn3.cwrap.org/VPN");
+ }
+ 
+ int main(void)
+-- 
+2.39.2
+
+
+From f2e7f58025ecb4cf399494166abea01813b1d0f0 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 17 Feb 2023 17:51:27 +0100
+Subject: [PATCH 2/2] cmake: Fix cmocka >= 1.1.6 find_package() in CONFIG mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Pavel Filipenský <pfilipensky@samba.org>
+---
+ tests/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 1262bed..7f2f4ee 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,5 +1,9 @@
+ project(tests C)
+ 
++if (TARGET cmocka::cmocka)
++    set(CMOCKA_LIBRARY cmocka::cmocka)
++endif()
++
+ set(TORTURE_LIBRARY torture)
+ 
+ # A simple DNS server for testing
+-- 
+2.39.2
+

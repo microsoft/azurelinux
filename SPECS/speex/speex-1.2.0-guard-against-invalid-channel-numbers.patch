@@ -1,0 +1,14 @@
+diff --git a/src/wav_io.c b/src/wav_io.c
+index b51830158f4defb536a760c93a77567daf69a74b..09d62eb017bb48fe48fa1efcaa122719ef1fe39f 100644
+--- a/src/wav_io.c
++++ b/src/wav_io.c
+@@ -111,7 +111,7 @@ int read_wav_header(FILE *file, int *rate, int *channels, int *format, spx_int32
+    stmp = le_short(stmp);
+    *channels = stmp;
+ 
+-   if (stmp>2)
++   if (stmp>2 || stmp<1)
+    {
+       fprintf (stderr, "Only mono and (intensity) stereo supported\n");
+       return -1;
+

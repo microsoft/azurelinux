@@ -1,0 +1,175 @@
+diff -up pegasus/Makefile.Release.orig pegasus/Makefile.Release
+--- pegasus/Makefile.Release.orig	2025-04-02 09:41:58.144585088 +0200
++++ pegasus/Makefile.Release	2025-04-02 09:50:05.938271446 +0200
+@@ -446,6 +446,10 @@ stage_genOpenPegasusSSLCertsFile: FORCE
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 	@$(ECHO-E) "#" >> \
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
++	@$(ECHO-E) "set -e" >> \
++             $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
++	@$(ECHO-E) "#" >> \
++             $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 	@$(ECHO-E) "PEGASUS_PEM_DIR=$(PEGASUS_PEM_DIR)" >> \
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 	@$(ECHO-E) "PEGASUS_CONFIG_DIR=$(PEGASUS_CONFIG_DIR)" >> \
+@@ -458,6 +462,8 @@ stage_genOpenPegasusSSLCertsFile: FORCE
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 	@$(ECHO-E) "PEGASUS_SSL_TRUSTSTORE=$(PEGASUS_SSL_TRUSTSTORE)" >> \
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
++	@$(ECHO-E) "DAYS=3650" >> \
++             $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 	@$(CAT) $(ROOT)/rpm/tog-specfiles/tog-pegasus-genSSLCerts.spec >> \
+              $(PEGASUS_STAGING_DIR)$(PEGASUS_SCRIPT_DIR)/genOpenPegasusSSLCerts
+ 
+diff -up pegasus/rpm/tog-specfiles/tog-pegasus-genSSLCerts.spec.orig pegasus/rpm/tog-specfiles/tog-pegasus-genSSLCerts.spec
+--- pegasus/rpm/tog-specfiles/tog-pegasus-genSSLCerts.spec.orig	2014-09-10 18:15:40.000000000 +0200
++++ pegasus/rpm/tog-specfiles/tog-pegasus-genSSLCerts.spec	2025-04-02 09:54:27.678967236 +0200
+@@ -29,16 +29,6 @@ function create_ssl_cnf #(config_file, C
+             $PEGASUS_CONFIG_DIR/$SSL_CFG
+     echo "OU                     = The OpenPegasus Project" >> \
+             $PEGASUS_CONFIG_DIR/$SSL_CFG
+-    DN=`hostname`;
+-    if [ -z "$DN" ] || [ "$DN" = "(none)" ]; then
+-            DN='localhost.localdomain';
+-    fi;
+-    FQDN=`{ host -W1 $DN 2>/dev/null || echo "$DN has address "; } |\
+-            grep 'has address' | head -1 | sed 's/\ .*$//'`;
+-    if [ -z "$FQDN" ] ; then
+-        FQDN="$DN";
+-    fi;
+-    # cannot use 'hostname --fqdn' because this can hang indefinitely
+     # Hack the $CA onto the end of the CN so we differentiate the issuer
+     # of the signature from the subject
+     echo "CN                     = $FQDN$CA"  >> $PEGASUS_CONFIG_DIR/$SSL_CFG
+@@ -52,27 +42,26 @@ function create_ssl_cnf #(config_file, C
+     echo "basicConstraints = CA:TRUE" >> $PEGASUS_CONFIG_DIR/$SSL_CFG
+ }
+ 
+-cnfChanged=0;
+-if [ ! -e $PEGASUS_CONFIG_DIR/ssl-ca.cnf ] ||
+-   [ ! -e $PEGASUS_CONFIG_DIR/ssl-service.cnf ] ||
+-   [ ! -e $PEGASUS_CONFIG_DIR/server.pem ] ||
+-   [ ! -e $PEGASUS_CONFIG_DIR/file.pem ]  ||
+-   [ ! -e $PEGASUS_CONFIG_DIR/client.pem ]; then
+-
+-    mkdir -p ${PEGASUS_INSTALL_LOG%/*}
+-    mkdir -p $PEGASUS_CONFIG_DIR
++function selfsign_sscg()
++{
++    sscg --quiet \
++         --lifetime "${DAYS}" \
++         --cert-key-file "${PEGASUS_PEM_DIR}"/"${PEGASUS_SSL_KEY_FILE}" \
++         --cert-file "${PEGASUS_PEM_DIR}/${PEGASUS_SSL_CERT_FILE}" \
++         --ca-file "${PEGASUS_PEM_DIR}"/ca.crt \
++         --hostname "${FQDN}" \
++         --country "UK" \
++         --state "Berkshire" \
++         --locality "Reading" \
++         --organization "The Open Group" \
++         --organizational-unit "The OpenPegasus Project"
++}
+ 
+-    create_ssl_cnf ssl-ca.cnf CA
+-    create_ssl_cnf ssl-service.cnf
+-
+-    chmod 400 $PEGASUS_CONFIG_DIR/ssl-*.cnf
+-    chown root $PEGASUS_CONFIG_DIR/ssl-*.cnf
+-    chgrp root $PEGASUS_CONFIG_DIR/ssl-*.cnf
+-    cnfChanged=1;
+-fi
+-if [ $cnfChanged -eq 1 ] || \
+-         [ ! -e $PEGASUS_PEM_DIR/$PEGASUS_SSL_CERT_FILE ] || \
+-         [ ! -e $PEGASUS_PEM_DIR/$PEGASUS_SSL_KEY_FILE ]; then
++function selfsign_openssl()
++{
++    # Get minimum RSA key length at current security level
++    # This workarounds openssl not enforcing min. key length enforced by current security level
++    KEYSIZE=`grep min_rsa_size /etc/crypto-policies/state/CURRENT.pol | cut -d ' ' -f 3`
+ 
+     # Restrict access of the key to root
+     OLDUMASK=`umask`
+@@ -81,28 +70,34 @@ if [ $cnfChanged -eq 1 ] || \
+     # Create private key for the CA certificate
+     TMPKEY=`mktemp --tmpdir=$PEGASUS_PEM_DIR XXXXXXXXXXXX`
+ 
+-    /usr/bin/openssl genrsa -out $TMPKEY 2048
++    /usr/bin/openssl genrsa -out $TMPKEY $KEYSIZE
+ 
+     # Restore the umask for the other files
+     umask $OLDUMASK
+ 
+     # Create CA certificate:
+-    /usr/bin/openssl req -new -x509 -days 3650 \
+-                         -config $PEGASUS_CONFIG_DIR/ssl-ca.cnf \
++    # Hack the $CA onto the end of the CN so we differentiate the issuer
++    # of the signature from the subject
++    /usr/bin/openssl req -new -x509 -days $DAYS \
++                         -subj "/C=UK/ST=Berkshire/L=Reading/O=The Open Group/OU=The OpenPegasus Project/CN=${FQDN}CA" \
++                         -addext "subjectKeyIdentifier = hash" \
++                         -addext "authorityKeyIdentifier = keyid:always,issuer" \
++                         -addext "basicConstraints = CA:TRUE" \
+                          -key $TMPKEY \
+                          -out $PEGASUS_PEM_DIR/ca.crt \
+ 
+     # Create private key for the service certificate
+-    /usr/bin/openssl genrsa -out $PEGASUS_PEM_DIR/$PEGASUS_SSL_KEY_FILE 2048
++    /usr/bin/openssl genrsa -out $PEGASUS_PEM_DIR/$PEGASUS_SSL_KEY_FILE $KEYSIZE
+ 
+     # Create a signing request for the service certificate
+     /usr/bin/openssl req -new \
+-                         -config $PEGASUS_CONFIG_DIR/ssl-service.cnf \
++                         -subj "/C=UK/ST=Berkshire/L=Reading/O=The Open Group/OU=The OpenPegasus Project/CN=$FQDN" \
++                         -addext "basicConstraints = CA:FALSE" \
+                          -key $PEGASUS_PEM_DIR/$PEGASUS_SSL_KEY_FILE \
+                          -out $PEGASUS_PEM_DIR/server.csr
+ 
+     # Sign the request with the CA certificate
+-    /usr/bin/openssl x509 -req -days 3650 \
++    /usr/bin/openssl x509 -req -days $DAYS \
+                           -in $PEGASUS_PEM_DIR/server.csr \
+                           -CA $PEGASUS_PEM_DIR/ca.crt \
+                           -CAkey $TMPKEY \
+@@ -128,6 +123,43 @@ if [ $cnfChanged -eq 1 ] || \
+     # long race here between the key generation and its deletion.
+     # The random filename should significantly mitigate this.
+     rm -f $TMPKEY
++}
++
++cnfChanged=0;
++if [ ! -e $PEGASUS_CONFIG_DIR/ssl-ca.cnf ] ||
++   [ ! -e $PEGASUS_CONFIG_DIR/ssl-service.cnf ] ||
++   [ ! -e $PEGASUS_CONFIG_DIR/server.pem ] ||
++   [ ! -e $PEGASUS_CONFIG_DIR/file.pem ]  ||
++   [ ! -e $PEGASUS_CONFIG_DIR/client.pem ]; then
++
++    mkdir -p ${PEGASUS_INSTALL_LOG%/*}
++    mkdir -p $PEGASUS_CONFIG_DIR
++
++    DN=`hostname`;
++    if [ -z "$DN" ] || [ "$DN" = "(none)" ]; then
++            DN='localhost.localdomain';
++    fi;
++    FQDN=`{ host -W1 $DN 2>/dev/null || echo "$DN has address "; } |\
++            grep 'has address' | head -1 | sed 's/\ .*$//'`;
++    if [ -z "$FQDN" ] ; then
++        FQDN="$DN";
++    fi;
++    # cannot use 'hostname --fqdn' because this can hang indefinitely
++
++    create_ssl_cnf ssl-ca.cnf CA
++    create_ssl_cnf ssl-service.cnf
++
++    chmod 400 $PEGASUS_CONFIG_DIR/ssl-*.cnf
++    chown root $PEGASUS_CONFIG_DIR/ssl-*.cnf
++    chgrp root $PEGASUS_CONFIG_DIR/ssl-*.cnf
++    cnfChanged=1;
++fi
++if [ $cnfChanged -eq 1 ] || \
++         [ ! -e $PEGASUS_PEM_DIR/$PEGASUS_SSL_CERT_FILE ] || \
++         [ ! -e $PEGASUS_PEM_DIR/$PEGASUS_SSL_KEY_FILE ]; then
++
++    # If sscg fails, try openssl
++    selfsign_sscg || selfsign_openssl
+ 
+ fi;
+ if [ ! -e $PEGASUS_PEM_DIR/$PEGASUS_SSL_TRUSTSTORE ]; then

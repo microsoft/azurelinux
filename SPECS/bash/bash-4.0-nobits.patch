@@ -1,0 +1,154 @@
+diff -up bash-4.0/execute_cmd.c.nobits bash-4.0/execute_cmd.c
+--- bash-4.0/execute_cmd.c.nobits	2009-08-11 11:53:38.000000000 +0200
++++ bash-4.0/execute_cmd.c	2009-08-14 16:18:18.000000000 +0200
+@@ -4747,6 +4747,7 @@ shell_execve (command, args, env)
+ 	      && memcmp (sample, ELFMAG, SELFMAG) == 0)
+ 	    {
+ 	      off_t offset = -1;
++              int dynamic_nobits = 0;
+ 
+ 	      /* It is an ELF file.  Now determine whether it is dynamically
+ 		 linked and if yes, get the offset of the interpreter
+@@ -4756,13 +4757,61 @@ shell_execve (command, args, env)
+ 		{
+ 		  Elf32_Ehdr ehdr;
+ 		  Elf32_Phdr *phdr;
+-		  int nphdr;
++                  Elf32_Shdr *shdr;
++		  int nphdr, nshdr;
+ 
+ 		  /* We have to copy the data since the sample buffer
+ 		     might not be aligned correctly to be accessed as
+ 		     an Elf32_Ehdr struct.  */
+ 		  memcpy (&ehdr, sample, sizeof (Elf32_Ehdr));
+ 
++		  nshdr = ehdr.e_shnum;
++		  shdr = (Elf32_Shdr *) malloc (nshdr * ehdr.e_shentsize);
++                  
++		  if (shdr != NULL)
++		    {
++#ifdef HAVE_PREAD
++		      sample_len = pread (fd, shdr, nshdr * ehdr.e_shentsize,
++					  ehdr.e_shoff);
++#else
++		      if (lseek (fd, ehdr.e_shoff, SEEK_SET) != -1)
++			sample_len = read (fd, shdr,
++					   nshdr * ehdr.e_shentsize);
++		      else
++			sample_len = -1;
++#endif
++		      if (sample_len == nshdr * ehdr.e_shentsize)
++                        {
++                          char *strings = (char *) malloc (shdr[ehdr.e_shstrndx].sh_size);
++                          if (strings != NULL)
++                            {
++#ifdef HAVE_PREAD
++		              sample_len = pread (fd, strings,
++                                             shdr[ehdr.e_shstrndx].sh_size,
++					     shdr[ehdr.e_shstrndx].sh_offset);
++#else
++		              if (lseek (fd, shdr[ehdr.e_shstrndx].sh_offset,
++                                         SEEK_SET) != -1)
++			        sample_len = read (fd, strings,
++			  		       shdr[ehdr.e_shstrndx].sh_size);
++		              else
++			        sample_len = -1;
++#endif
++                              if (sample_len == shdr[ehdr.e_shstrndx].sh_size)
++			        while (nshdr-- > 0)
++                                  if (strcmp (strings + shdr[nshdr].sh_name,
++                                              ".interp") == 0 &&
++                                      shdr[nshdr].sh_type == SHT_NOBITS)
++                                    {
++                                      dynamic_nobits++;
++                                      break;
++                                    }
++                              free (strings);
++                            }
++                        }
++		      free (shdr);
++		    }
++
+ 		  nphdr = ehdr.e_phnum;
+ 		  phdr = (Elf32_Phdr *) malloc (nphdr * ehdr.e_phentsize);
+ 		  if (phdr != NULL)
+@@ -4792,13 +4841,60 @@ shell_execve (command, args, env)
+ 		{
+ 		  Elf64_Ehdr ehdr;
+ 		  Elf64_Phdr *phdr;
+-		  int nphdr;
++                  Elf64_Shdr *shdr;
++		  int nphdr, nshdr;
+ 
+ 		  /* We have to copy the data since the sample buffer
+ 		     might not be aligned correctly to be accessed as
+ 		     an Elf64_Ehdr struct.  */
+ 		  memcpy (&ehdr, sample, sizeof (Elf64_Ehdr));
+ 
++		  nshdr = ehdr.e_shnum;
++		  shdr = (Elf64_Shdr *) malloc (nshdr * ehdr.e_shentsize);
++		  if (shdr != NULL)
++		    {
++#ifdef HAVE_PREAD
++		      sample_len = pread (fd, shdr, nshdr * ehdr.e_shentsize,
++					  ehdr.e_shoff);
++#else
++		      if (lseek (fd, ehdr.e_shoff, SEEK_SET) != -1)
++			sample_len = read (fd, shdr,
++					   nshdr * ehdr.e_shentsize);
++		      else
++			sample_len = -1;
++#endif
++		      if (sample_len == nshdr * ehdr.e_shentsize)
++                        {
++                          char *strings = (char *) malloc (shdr[ehdr.e_shstrndx].sh_size);
++                          if (strings != NULL)
++                            {
++#ifdef HAVE_PREAD
++		              sample_len = pread (fd, strings,
++                                             shdr[ehdr.e_shstrndx].sh_size,
++					     shdr[ehdr.e_shstrndx].sh_offset);
++#else
++		              if (lseek (fd, shdr[ehdr.e_shstrndx].sh_offset,
++                                         SEEK_SET) != -1)
++			        sample_len = read (fd, strings,
++			  		       shdr[ehdr.e_shstrndx].sh_size);
++		              else
++			        sample_len = -1;
++#endif
++                              if (sample_len == shdr[ehdr.e_shstrndx].sh_size)
++			        while (nshdr-- > 0)
++                                  if (strcmp (strings + shdr[nshdr].sh_name,
++                                              ".interp") == 0 &&
++                                      shdr[nshdr].sh_type == SHT_NOBITS)
++                                    {
++                                      dynamic_nobits++;
++                                      break;
++                                    }
++                              free (strings);
++                            }
++                        }
++		      free (shdr);
++		    }
++
+ 		  nphdr = ehdr.e_phnum;
+ 		  phdr = (Elf64_Phdr *) malloc (nphdr * ehdr.e_phentsize);
+ 		  if (phdr != NULL)
+@@ -4858,8 +4954,15 @@ shell_execve (command, args, env)
+ 		    {
+ 		      close (fd);
+ 		      errno = i;
+-		      sys_error ("%s: %s: bad ELF interpreter", command,
+-				 interp);
++                      if (dynamic_nobits > 0)
++                        {
++                          sys_error ("%s: bad ELF interpreter", command);
++                        }
++                      else
++                        {
++		          sys_error ("%s: %s: bad ELF interpreter", command,
++				     interp);
++                        }
+ 		      free (interp);
+ 		      return (EX_NOEXEC);
+ 		    }

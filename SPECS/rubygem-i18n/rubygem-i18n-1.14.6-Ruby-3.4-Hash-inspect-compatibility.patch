@@ -1,0 +1,82 @@
+From e0573765482a06e5dcb5597a9b856d110bdc10fb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 9 Dec 2024 10:23:00 +0100
+Subject: [PATCH] Ruby 3.4 `Hash#inspect` compatibility.
+
+---
+ lib/i18n/tests/localization/procs.rb        |  4 ++--
+ lib/i18n/tests/procs.rb                     | 18 +++++++++++-------
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/lib/i18n/tests/localization/procs.rb b/lib/i18n/tests/localization/procs.rb
+index 7db45d1..2c5d8e1 100644
+--- a/lib/i18n/tests/localization/procs.rb
++++ b/lib/i18n/tests/localization/procs.rb
+@@ -34,7 +34,7 @@ module I18n
+         test "localize Date: given a format that resolves to a Proc it calls the Proc with the object and extra options" do
+           setup_time_proc_translations
+           date = ::Date.new(2008, 3, 1)
+-          assert_equal '[Sat, 01 Mar 2008, {:foo=>"foo"}]', I18n.l(date, :format => :proc, :foo => 'foo', :locale => :ru)
++          assert_equal %|[Sat, 01 Mar 2008, #{{:foo=>"foo"}}]|, I18n.l(date, :format => :proc, :foo => 'foo', :locale => :ru)
+         end
+ 
+         test "localize DateTime: given a format that resolves to a Proc it calls the Proc with the object" do
+@@ -46,7 +46,7 @@ module I18n
+         test "localize DateTime: given a format that resolves to a Proc it calls the Proc with the object and extra options" do
+           setup_time_proc_translations
+           datetime = ::DateTime.new(2008, 3, 1, 6)
+-          assert_equal '[Sat, 01 Mar 2008 06:00:00 +00:00, {:foo=>"foo"}]', I18n.l(datetime, :format => :proc, :foo => 'foo', :locale => :ru)
++          assert_equal %|[Sat, 01 Mar 2008 06:00:00 +00:00, #{{:foo=>"foo"}}]|, I18n.l(datetime, :format => :proc, :foo => 'foo', :locale => :ru)
+         end
+ 
+         test "localize Time: given a format that resolves to a Proc it calls the Proc with the object" do
+diff --git a/lib/i18n/tests/procs.rb b/lib/i18n/tests/procs.rb
+index db99c76..d377117 100644
+--- a/lib/i18n/tests/procs.rb
++++ b/lib/i18n/tests/procs.rb
+@@ -5,34 +5,38 @@ module I18n
+     module Procs
+       test "lookup: given a translation is a proc it calls the proc with the key and interpolation values" do
+         I18n.backend.store_translations(:en, :a_lambda => lambda { |*args| I18n::Tests::Procs.filter_args(*args) })
+-        assert_equal '[:a_lambda, {:foo=>"foo"}]', I18n.t(:a_lambda, :foo => 'foo')
++        assert_equal %|[:a_lambda, #{{:foo=>"foo"}}]|, I18n.t(:a_lambda, :foo => 'foo')
+       end
+ 
+       test "lookup: given a translation is a proc it passes the interpolation values as keyword arguments" do
+         I18n.backend.store_translations(:en, :a_lambda => lambda { |key, foo:, **| I18n::Tests::Procs.filter_args(key, foo: foo) })
+-        assert_equal '[:a_lambda, {:foo=>"foo"}]', I18n.t(:a_lambda, :foo => 'foo')
++        assert_equal %|[:a_lambda, #{{:foo=>"foo"}}]|, I18n.t(:a_lambda, :foo => 'foo')
+       end
+ 
+       test "defaults: given a default is a Proc it calls it with the key and interpolation values" do
+         proc = lambda { |*args| I18n::Tests::Procs.filter_args(*args) }
+-        assert_equal '[nil, {:foo=>"foo"}]', I18n.t(nil, :default => proc, :foo => 'foo')
++        assert_equal %|[nil, #{{:foo=>"foo"}}]|, I18n.t(nil, :default => proc, :foo => 'foo')
+       end
+ 
+       test "defaults: given a default is a key that resolves to a Proc it calls it with the key and interpolation values" do
+         the_lambda = lambda { |*args| I18n::Tests::Procs.filter_args(*args) }
+         I18n.backend.store_translations(:en, :a_lambda => the_lambda)
+-        assert_equal '[:a_lambda, {:foo=>"foo"}]', I18n.t(nil, :default => :a_lambda, :foo => 'foo')
+-        assert_equal '[:a_lambda, {:foo=>"foo"}]', I18n.t(nil, :default => [nil, :a_lambda], :foo => 'foo')
++        assert_equal %|[:a_lambda, #{{:foo=>"foo"}}]|, I18n.t(nil, :default => :a_lambda, :foo => 'foo')
++        assert_equal %|[:a_lambda, #{{:foo=>"foo"}}]|, I18n.t(nil, :default => [nil, :a_lambda], :foo => 'foo')
+       end
+ 
+       test "interpolation: given an interpolation value is a lambda it calls it with key and values before interpolating it" do
+         proc = lambda { |*args| I18n::Tests::Procs.filter_args(*args) }
+-        assert_match %r(\[\{:foo=>#<Proc.*>\}\]), I18n.t(nil, :default => '%{foo}', :foo => proc)
++        if RUBY_VERSION < "3.4"
++          assert_match %r(\[\{:foo=>#<Proc.*>\}\]), I18n.t(nil, :default => '%{foo}', :foo => proc)
++        else
++          assert_match %r(\[\{foo: #<Proc.*>\}\]), I18n.t(nil, :default => '%{foo}', :foo => proc)
++        end
+       end
+ 
+       test "interpolation: given a key resolves to a Proc that returns a string then interpolation still works" do
+         proc = lambda { |*args| "%{foo}: " + I18n::Tests::Procs.filter_args(*args) }
+-        assert_equal 'foo: [nil, {:foo=>"foo"}]', I18n.t(nil, :default => proc, :foo => 'foo')
++        assert_equal %|foo: [nil, #{{:foo=>"foo"}}]|, I18n.t(nil, :default => proc, :foo => 'foo')
+       end
+ 
+       test "pluralization: given a key resolves to a Proc that returns valid data then pluralization still works" do

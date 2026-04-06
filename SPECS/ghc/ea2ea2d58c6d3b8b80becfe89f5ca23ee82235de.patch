@@ -1,0 +1,444 @@
+From ea2ea2d58c6d3b8b80becfe89f5ca23ee82235de Mon Sep 17 00:00:00 2001
+From: Ben Gamari <ben@smart-cactus.org>
+Date: Tue, 19 Nov 2024 14:53:54 -0500
+Subject: [PATCH] ghci: Don't rely on Uniques in BRK_FUN
+
+This is a partial backport of the treatment given to modules names in
+!10448, removing the dependence of BRK_FUN on the representation of
+`Unique`.
+---
+ compiler/GHC/ByteCode/Asm.hs         |  7 +++----
+ compiler/GHC/ByteCode/Instr.hs       | 10 +++-------
+ compiler/GHC/ByteCode/Types.hs       |  6 +++++-
+ compiler/GHC/HsToCore/Breakpoints.hs | 12 +++++++-----
+ compiler/GHC/Runtime/Eval.hs         | 10 ++++------
+ compiler/GHC/Runtime/Interpreter.hs  | 11 +++++++----
+ compiler/GHC/StgToByteCode.hs        | 14 ++++++++------
+ libraries/ghci/GHCi/Message.hs       | 15 ++++++++++++++-
+ libraries/ghci/GHCi/Run.hs           | 12 +++++++++---
+ rts/Interpreter.c                    |  8 ++++----
+ 10 files changed, 64 insertions(+), 41 deletions(-)
+
+diff --git a/compiler/GHC/ByteCode/Asm.hs b/compiler/GHC/ByteCode/Asm.hs
+index fab5cd405582..5d6842d88dfa 100644
+--- a/compiler/GHC/ByteCode/Asm.hs
++++ b/compiler/GHC/ByteCode/Asm.hs
+@@ -27,7 +27,6 @@ import GHC.Runtime.Heap.Layout ( fromStgWord, StgWord )
+ import GHC.Types.Name
+ import GHC.Types.Name.Set
+ import GHC.Types.Literal
+-import GHC.Types.Unique
+ import GHC.Types.Unique.DSet
+ 
+ import GHC.Utils.Outputable
+@@ -518,11 +517,11 @@ assembleI platform i = case i of
+   CCALL off m_addr i       -> do np <- addr m_addr
+                                  emit bci_CCALL [wOp off, Op np, SmallOp i]
+   PRIMCALL                 -> emit bci_PRIMCALL []
+-  BRK_FUN index uniq cc    -> do p1 <- ptr BCOPtrBreakArray
+-                                 q <- int (getKey uniq)
++  BRK_FUN index mod cc     -> do p1 <- ptr BCOPtrBreakArray
++                                 m <- addr mod
+                                  np <- addr cc
+                                  emit bci_BRK_FUN [Op p1, SmallOp index,
+-                                                   Op q, Op np]
++                                                   Op m, Op np]
+ 
+   where
+     literal (LitLabel fs (Just sz) _)
+diff --git a/compiler/GHC/ByteCode/Instr.hs b/compiler/GHC/ByteCode/Instr.hs
+index a1ad9da5e9df..c9089e7eb5e6 100644
+--- a/compiler/GHC/ByteCode/Instr.hs
++++ b/compiler/GHC/ByteCode/Instr.hs
+@@ -19,7 +19,6 @@ import GHCi.FFI (C_ffi_cif)
+ import GHC.StgToCmm.Layout     ( ArgRep(..) )
+ import GHC.Utils.Outputable
+ import GHC.Types.Name
+-import GHC.Types.Unique
+ import GHC.Types.Literal
+ import GHC.Core.DataCon
+ import GHC.Builtin.PrimOps
+@@ -31,6 +30,7 @@ import Data.Word
+ import GHC.Stack.CCS (CostCentre)
+ 
+ import GHC.Stg.Syntax
++import Language.Haskell.Syntax.Module.Name (ModuleName)
+ 
+ -- ----------------------------------------------------------------------------
+ -- Bytecode instructions
+@@ -205,7 +205,7 @@ data BCInstr
+                    -- Note [unboxed tuple bytecodes and tuple_BCO] in GHC.StgToByteCode
+ 
+    -- Breakpoints
+-   | BRK_FUN         !Word16 Unique (RemotePtr CostCentre)
++   | BRK_FUN         !Word16 (RemotePtr ModuleName) (RemotePtr CostCentre)
+ 
+ -- -----------------------------------------------------------------------------
+ -- Printing bytecode instructions
+@@ -356,11 +356,7 @@ instance Outputable BCInstr where
+    ppr ENTER                 = text "ENTER"
+    ppr (RETURN pk)           = text "RETURN  " <+> ppr pk
+    ppr (RETURN_TUPLE)        = text "RETURN_TUPLE"
+-   ppr (BRK_FUN index uniq _cc) = text "BRK_FUN" <+> ppr index <+> mb_uniq <+> text "<cc>"
+-     where mb_uniq = sdocOption sdocSuppressUniques $ \case
+-             True  -> text "<uniq>"
+-             False -> ppr uniq
+-
++   ppr (BRK_FUN index _mod_name _cc) = text "BRK_FUN" <+> ppr index <+> text "<module>" <+> text "<cc>"
+ 
+ 
+ -- -----------------------------------------------------------------------------
+diff --git a/compiler/GHC/ByteCode/Types.hs b/compiler/GHC/ByteCode/Types.hs
+index c555fb329e9b..254e754f8cd1 100644
+--- a/compiler/GHC/ByteCode/Types.hs
++++ b/compiler/GHC/ByteCode/Types.hs
+@@ -44,6 +44,7 @@ import qualified GHC.Exts.Heap as Heap
+ import GHC.Stack.CCS
+ import GHC.Cmm.Expr ( GlobalRegSet, emptyRegSet, regSetToList )
+ import GHC.Iface.Syntax
++import Language.Haskell.Syntax.Module.Name (ModuleName)
+ 
+ -- -----------------------------------------------------------------------------
+ -- Compiled Byte Code
+@@ -242,6 +243,7 @@ data ModBreaks
+         -- ^ Array pointing to cost centre for each breakpoint
+    , modBreaks_breakInfo :: IntMap CgBreakInfo
+         -- ^ info about each breakpoint from the bytecode generator
++   , modBreaks_module :: RemotePtr ModuleName
+    }
+ 
+ seqModBreaks :: ModBreaks -> ()
+@@ -251,7 +253,8 @@ seqModBreaks ModBreaks{..} =
+   rnf modBreaks_vars `seq`
+   rnf modBreaks_decls `seq`
+   rnf modBreaks_ccs `seq`
+-  rnf (fmap seqCgBreakInfo modBreaks_breakInfo)
++  rnf (fmap seqCgBreakInfo modBreaks_breakInfo) `seq`
++  rnf modBreaks_module
+ 
+ -- | Construct an empty ModBreaks
+ emptyModBreaks :: ModBreaks
+@@ -263,6 +266,7 @@ emptyModBreaks = ModBreaks
+    , modBreaks_decls = array (0,-1) []
+    , modBreaks_ccs = array (0,-1) []
+    , modBreaks_breakInfo = IntMap.empty
++   , modBreaks_module = toRemotePtr nullPtr
+    }
+ 
+ {-
+diff --git a/compiler/GHC/HsToCore/Breakpoints.hs b/compiler/GHC/HsToCore/Breakpoints.hs
+index bbf88fa5ee56..dc1b2cef04e7 100644
+--- a/compiler/GHC/HsToCore/Breakpoints.hs
++++ b/compiler/GHC/HsToCore/Breakpoints.hs
+@@ -27,16 +27,18 @@ mkModBreaks interp mod extendedMixEntries
+ 
+     breakArray <- GHCi.newBreakArray interp count
+     ccs <- mkCCSArray interp mod count entries
++    mod_ptr <- GHCi.newModuleName interp (moduleName mod)
+     let
+            locsTicks  = listArray (0,count-1) [ tick_loc  t | t <- entries ]
+            varsTicks  = listArray (0,count-1) [ tick_ids  t | t <- entries ]
+            declsTicks = listArray (0,count-1) [ tick_path t | t <- entries ]
+     return $ emptyModBreaks
+-                       { modBreaks_flags = breakArray
+-                       , modBreaks_locs  = locsTicks
+-                       , modBreaks_vars  = varsTicks
+-                       , modBreaks_decls = declsTicks
+-                       , modBreaks_ccs   = ccs
++                       { modBreaks_flags  = breakArray
++                       , modBreaks_locs   = locsTicks
++                       , modBreaks_vars   = varsTicks
++                       , modBreaks_decls  = declsTicks
++                       , modBreaks_ccs    = ccs
++                       , modBreaks_module = mod_ptr
+                        }
+ 
+ mkCCSArray
+diff --git a/compiler/GHC/Runtime/Eval.hs b/compiler/GHC/Runtime/Eval.hs
+index 427a8797ee29..a0913c0eb59a 100644
+--- a/compiler/GHC/Runtime/Eval.hs
++++ b/compiler/GHC/Runtime/Eval.hs
+@@ -325,15 +325,14 @@ handleRunStatus step expr bindings final_ids status history
+   | otherwise              = not_tracing
+  where
+   tracing
+-    | EvalBreak is_exception apStack_ref ix mod_uniq resume_ctxt _ccs <- status
++    | EvalBreak is_exception apStack_ref ix mod_name resume_ctxt _ccs <- status
+     , not is_exception
+     = do
+        hsc_env <- getSession
+        let interp = hscInterp hsc_env
+        let dflags = hsc_dflags hsc_env
+        let hmi = expectJust "handleRunStatus" $
+-                   lookupHptDirectly (hsc_HPT hsc_env)
+-                                     (mkUniqueGrimily mod_uniq)
++                   lookupHpt (hsc_HPT hsc_env) (mkModuleName mod_name)
+            modl = mi_module (hm_iface hmi)
+            breaks = getModBreaks hmi
+ 
+@@ -358,15 +357,14 @@ handleRunStatus step expr bindings final_ids status history
+ 
+   not_tracing
+     -- Hit a breakpoint
+-    | EvalBreak is_exception apStack_ref ix mod_uniq resume_ctxt ccs <- status
++    | EvalBreak is_exception apStack_ref ix mod_name resume_ctxt ccs <- status
+     = do
+          hsc_env <- getSession
+          let interp = hscInterp hsc_env
+          resume_ctxt_fhv <- liftIO $ mkFinalizedHValue interp resume_ctxt
+          apStack_fhv <- liftIO $ mkFinalizedHValue interp apStack_ref
+          let hmi = expectJust "handleRunStatus" $
+-                     lookupHptDirectly (hsc_HPT hsc_env)
+-                                       (mkUniqueGrimily mod_uniq)
++                     lookupHpt (hsc_HPT hsc_env) (mkModuleName mod_name)
+              modl = mi_module (hm_iface hmi)
+              bp | is_exception = Nothing
+                 | otherwise = Just (BreakInfo modl ix)
+diff --git a/compiler/GHC/Runtime/Interpreter.hs b/compiler/GHC/Runtime/Interpreter.hs
+index 8ff9fcd36b6b..e7711c178a22 100644
+--- a/compiler/GHC/Runtime/Interpreter.hs
++++ b/compiler/GHC/Runtime/Interpreter.hs
+@@ -25,6 +25,7 @@ module GHC.Runtime.Interpreter
+   , mkCostCentres
+   , costCentreStackInfo
+   , newBreakArray
++  , newModuleName
+   , storeBreakpoint
+   , breakpointStatus
+   , getBreakpointVar
+@@ -84,7 +85,6 @@ import GHC.Linker.Types
+ import GHC.Data.Maybe
+ import GHC.Data.FastString
+ 
+-import GHC.Types.Unique
+ import GHC.Types.SrcLoc
+ import GHC.Types.Unique.FM
+ import GHC.Types.Basic
+@@ -381,6 +381,10 @@ newBreakArray interp size = do
+   breakArray <- interpCmd interp (NewBreakArray size)
+   mkFinalizedHValue interp breakArray
+ 
++newModuleName :: Interp -> ModuleName -> IO (RemotePtr ModuleName)
++newModuleName interp mod_name =
++  castRemotePtr <$> interpCmd interp (NewBreakModule (moduleNameString mod_name))
++
+ storeBreakpoint :: Interp -> ForeignRef BreakArray -> Int -> Int -> IO ()
+ storeBreakpoint interp ref ix cnt = do                               -- #19157
+   withForeignRef ref $ \breakarray ->
+@@ -414,13 +418,12 @@ seqHValue interp unit_env ref =
+ handleSeqHValueStatus :: Interp -> UnitEnv -> EvalStatus () -> IO (EvalResult ())
+ handleSeqHValueStatus interp unit_env eval_status =
+   case eval_status of
+-    (EvalBreak is_exception _ ix mod_uniq resume_ctxt _) -> do
++    (EvalBreak is_exception _ ix mod_name resume_ctxt _) -> do
+       -- A breakpoint was hit; inform the user and tell them
+       -- which breakpoint was hit.
+       resume_ctxt_fhv <- liftIO $ mkFinalizedHValue interp resume_ctxt
+       let hmi = expectJust "handleRunStatus" $
+-                  lookupHptDirectly (ue_hpt unit_env)
+-                    (mkUniqueGrimily mod_uniq)
++                  lookupHpt (ue_hpt unit_env) (mkModuleName mod_name)
+           modl = mi_module (hm_iface hmi)
+           bp | is_exception = Nothing
+              | otherwise = Just (BreakInfo modl ix)
+diff --git a/compiler/GHC/StgToByteCode.hs b/compiler/GHC/StgToByteCode.hs
+index c85f66528ac5..d3a91cb511ac 100644
+--- a/compiler/GHC/StgToByteCode.hs
++++ b/compiler/GHC/StgToByteCode.hs
+@@ -53,7 +53,6 @@ import GHC.Types.Var.Set
+ import GHC.Builtin.Types.Prim
+ import GHC.Core.TyCo.Ppr ( pprType )
+ import GHC.Utils.Error
+-import GHC.Types.Unique
+ import GHC.Builtin.Uniques
+ import GHC.Data.FastString
+ import GHC.Utils.Panic
+@@ -392,7 +391,6 @@ schemeER_wrk :: StackDepth -> BCEnv -> CgStgExpr -> BcM BCInstrList
+ schemeER_wrk d p (StgTick (Breakpoint tick_ty tick_no fvs) rhs)
+   = do  code <- schemeE d 0 p rhs
+         cc_arr <- getCCArray
+-        this_mod <- moduleName <$> getCurrentModule
+         platform <- profilePlatform <$> getProfile
+         let idOffSets = getVarOffSets platform d p fvs
+             ty_vars   = tyCoVarsOfTypesWellScoped (tick_ty:map idType fvs)
+@@ -405,8 +403,12 @@ schemeER_wrk d p (StgTick (Breakpoint tick_ty tick_no fvs) rhs)
+                , interpreterProfiled interp
+                = cc_arr ! tick_no
+                | otherwise = toRemotePtr nullPtr
+-        let breakInstr = BRK_FUN (fromIntegral tick_no) (getUnique this_mod) cc
+-        return $ breakInstr `consOL` code
++        mb_mod_name <- getCurrentModuleName
++        case mb_mod_name of
++          Just mod_ptr -> do
++            let breakInstr = BRK_FUN (fromIntegral tick_no) mod_ptr cc
++            return $ breakInstr `consOL` code
++          Nothing -> return code
+ schemeER_wrk d p rhs = schemeE d 0 p rhs
+ 
+ getVarOffSets :: Platform -> StackDepth -> BCEnv -> [Id] -> [Maybe (Id, WordOff)]
+@@ -2263,8 +2265,8 @@ newBreakInfo :: BreakIndex -> CgBreakInfo -> BcM ()
+ newBreakInfo ix info = BcM $ \st ->
+   return (st{breakInfo = IntMap.insert ix info (breakInfo st)}, ())
+ 
+-getCurrentModule :: BcM Module
+-getCurrentModule = BcM $ \st -> return (st, thisModule st)
++getCurrentModuleName :: BcM (Maybe (RemotePtr ModuleName))
++getCurrentModuleName = BcM $ \st -> return (st, modBreaks_module <$> modBreaks st)
+ 
+ tickFS :: FastString
+ tickFS = fsLit "ticked"
+diff --git a/libraries/ghci/GHCi/Message.hs b/libraries/ghci/GHCi/Message.hs
+index 5e2fb167add0..762e4454d8ce 100644
+--- a/libraries/ghci/GHCi/Message.hs
++++ b/libraries/ghci/GHCi/Message.hs
+@@ -22,6 +22,7 @@ module GHCi.Message
+   , getMessage, putMessage, getTHMessage, putTHMessage
+   , Pipe(..), remoteCall, remoteTHCall, readPipe, writePipe
+   , LoadedDLL
++  , BreakModule
+   ) where
+ 
+ import Prelude -- See note [Why do we import Prelude here?]
+@@ -228,6 +229,12 @@ data Message a where
+     :: RemoteRef (ResumeContext ())
+     -> Message (EvalStatus ())
+ 
++  -- | Allocate a string for a breakpoint module name.
++  -- This uses an empty dummy type because @ModuleName@ isn't available here.
++  NewBreakModule
++   :: String
++   -> Message (RemotePtr BreakModule)
++
+ deriving instance Show (Message a)
+ 
+ 
+@@ -382,7 +389,7 @@ data EvalStatus_ a b
+   | EvalBreak Bool
+        HValueRef{- AP_STACK -}
+        Int {- break index -}
+-       Int {- uniq of ModuleName -}
++       String {- module name -}
+        (RemoteRef (ResumeContext b))
+        (RemotePtr CostCentreStack) -- Cost centre stack
+   deriving (Generic, Show)
+@@ -396,6 +403,10 @@ data EvalResult a
+ 
+ instance Binary a => Binary (EvalResult a)
+ 
++-- | A dummy type that tags the pointer to a breakpoint's @ModuleName@, because
++-- that type isn't available here.
++data BreakModule
++
+ -- | A dummy type that tags pointers returned by 'LoadDLL'.
+ data LoadedDLL
+ 
+@@ -526,6 +537,7 @@ getMessage = do
+       36 -> Msg <$> (Seq <$> get)
+       37 -> Msg <$> return RtsRevertCAFs
+       38 -> Msg <$> (ResumeSeq <$> get)
++      39 -> Msg <$> (NewBreakModule <$> get)
+       40 -> Msg <$> (LookupSymbolInDLL <$> get <*> get)
+       _  -> error $ "Unknown Message code " ++ (show b)
+ 
+@@ -570,6 +582,7 @@ putMessage m = case m of
+   Seq a                       -> putWord8 36 >> put a
+   RtsRevertCAFs               -> putWord8 37
+   ResumeSeq a                 -> putWord8 38 >> put a
++  NewBreakModule name         -> putWord8 39 >> put name
+   LookupSymbolInDLL dll str   -> putWord8 40 >> put dll >> put str
+ 
+ -- -----------------------------------------------------------------------------
+diff --git a/libraries/ghci/GHCi/Run.hs b/libraries/ghci/GHCi/Run.hs
+index a5fcd8695827..57b4fe007604 100644
+--- a/libraries/ghci/GHCi/Run.hs
++++ b/libraries/ghci/GHCi/Run.hs
+@@ -96,6 +96,7 @@ run m = case m of
+   MkCostCentres mod ccs -> mkCostCentres mod ccs
+   CostCentreStackInfo ptr -> ccsToStrings (fromRemotePtr ptr)
+   NewBreakArray sz -> mkRemoteRef =<< newBreakArray sz
++  NewBreakModule name -> newModuleName name
+   SetupBreakpoint ref ix cnt -> do
+     arr <- localRef ref;
+     _ <- setupBreakpoint arr ix cnt
+@@ -330,7 +331,7 @@ withBreakAction opts breakMVar statusMVar act
+         -- as soon as it is hit, or in resetBreakAction below.
+ 
+    onBreak :: BreakpointCallback
+-   onBreak ix# uniq# is_exception apStack = do
++   onBreak ix# mod_name# is_exception apStack = do
+      tid <- myThreadId
+      let resume = ResumeContext
+            { resumeBreakMVar = breakMVar
+@@ -339,7 +340,8 @@ withBreakAction opts breakMVar statusMVar act
+      resume_r <- mkRemoteRef resume
+      apStack_r <- mkRemoteRef apStack
+      ccs <- toRemotePtr <$> getCCSOf apStack
+-     putMVar statusMVar $ EvalBreak is_exception apStack_r (I# ix#) (I# uniq#) resume_r ccs
++     mod_name <- if is_exception then return "<dummy>" else peekCString (Ptr mod_name#)
++     putMVar statusMVar $ EvalBreak is_exception apStack_r (I# ix#) mod_name resume_r ccs
+      takeMVar breakMVar
+ 
+    resetBreakAction stablePtr = do
+@@ -388,7 +390,7 @@ resetStepFlag = poke stepFlag 0
+ 
+ type BreakpointCallback
+      = Int#    -- the breakpoint index
+-    -> Int#    -- the module uniq
++    -> Addr#   -- the module name
+     -> Bool    -- exception?
+     -> HValue  -- the AP_STACK, or exception
+     -> IO ()
+@@ -435,6 +437,10 @@ foreign import ccall unsafe "mkCostCentre"
+ mkCostCentres _ _ = return []
+ #endif
+ 
++newModuleName :: String -> IO (RemotePtr BreakModule)
++newModuleName name =
++  castRemotePtr . toRemotePtr <$> newCString name
++
+ getIdValFromApStack :: HValue -> Int -> IO (Maybe HValue)
+ getIdValFromApStack apStack (I# stackDepth) = do
+    case getApStackVal# apStack stackDepth of
+diff --git a/rts/Interpreter.c b/rts/Interpreter.c
+index 73fa5f941bda..552e41d94ddf 100644
+--- a/rts/Interpreter.c
++++ b/rts/Interpreter.c
+@@ -1111,7 +1111,7 @@ run_BCO:
+         /* check for a breakpoint on the beginning of a let binding */
+         case bci_BRK_FUN:
+         {
+-            int arg1_brk_array, arg2_array_index, arg3_module_uniq;
++            int arg1_brk_array, arg2_array_index, arg3_module_name;
+ #if defined(PROFILING)
+             int arg4_cc;
+ #endif
+@@ -1129,7 +1129,7 @@ run_BCO:
+ 
+             arg1_brk_array      = BCO_GET_LARGE_ARG;
+             arg2_array_index    = BCO_NEXT;
+-            arg3_module_uniq    = BCO_GET_LARGE_ARG;
++            arg3_module_name    = BCO_GET_LARGE_ARG;
+ #if defined(PROFILING)
+             arg4_cc             = BCO_GET_LARGE_ARG;
+ #else
+@@ -1194,7 +1194,7 @@ run_BCO:
+                   // continue execution of this BCO when the IO action returns.
+                   //
+                   // ioAction :: Int#        -- the breakpoint index
+-                  //          -> Int#        -- the module uniq
++                  //          -> Addr#       -- the module name
+                   //          -> Bool        -- exception?
+                   //          -> HValue      -- the AP_STACK, or exception
+                   //          -> IO ()
+@@ -1208,7 +1208,7 @@ run_BCO:
+                   SpW(8)  = (W_)new_aps;
+                   SpW(7)  = (W_)False_closure;         // True <=> an exception
+                   SpW(6)  = (W_)&stg_ap_ppv_info;
+-                  SpW(5)  = (W_)BCO_LIT(arg3_module_uniq);
++                  SpW(5)  = (W_)BCO_LIT(arg3_module_name);
+                   SpW(4)  = (W_)&stg_ap_n_info;
+                   SpW(3)  = (W_)arg2_array_index;
+                   SpW(2)  = (W_)&stg_ap_n_info;
+-- 
+GitLab
+

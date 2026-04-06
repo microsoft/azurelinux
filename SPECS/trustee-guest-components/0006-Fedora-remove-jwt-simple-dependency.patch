@@ -1,0 +1,96 @@
+From 7374e5ab044bbfd40468e3cd42479c5844b187e8 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Tue, 21 Oct 2025 23:04:54 -0400
+Subject: [PATCH 06/15] Fedora: remove jwt-simple dependency
+
+jwt-simple is not in Fedora.
+
+The code checks time validity. Use std::time instead for this.
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ Cargo.toml                                     |  3 ---
+ attestation-agent/kbs_protocol/Cargo.toml      |  1 -
+ .../kbs_protocol/src/token_provider/mod.rs     | 18 ++++++++----------
+ 3 files changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index cb41d55..d64917c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -23,9 +23,6 @@ const_format = "0.2.34"
+ env_logger = "0.11.8"
+ hex = "0.4.3"
+ hmac = "0.12.1"
+-jwt-simple = { version = "0.12", default-features = false, features = [
+-    "pure-rust",
+-] }
+ kbs-types = { "git" = "https://github.com/confidential-containers/kbs-types.git", rev = "900aa8f" }
+ log = "0.4.28"
+ nix = "0.30"
+diff --git a/attestation-agent/kbs_protocol/Cargo.toml b/attestation-agent/kbs_protocol/Cargo.toml
+index 5fabfad..09c1ee3 100644
+--- a/attestation-agent/kbs_protocol/Cargo.toml
++++ b/attestation-agent/kbs_protocol/Cargo.toml
+@@ -15,7 +15,6 @@ canon-json = { version = "0.2.1", optional = true }
+ clap = { workspace = true, features = ["derive"], optional = true }
+ crypto = { path = "../deps/crypto", default-features = false }
+ env_logger = { workspace = true, optional = true }
+-jwt-simple.workspace = true
+ kbs-types.workspace = true
+ log.workspace = true
+ reqwest = { workspace = true, features = ["cookies", "json"], optional = true }
+diff --git a/attestation-agent/kbs_protocol/src/token_provider/mod.rs b/attestation-agent/kbs_protocol/src/token_provider/mod.rs
+index 6648e89..7a07ce9 100644
+--- a/attestation-agent/kbs_protocol/src/token_provider/mod.rs
++++ b/attestation-agent/kbs_protocol/src/token_provider/mod.rs
+@@ -14,11 +14,8 @@ pub use aa::*;
+ use anyhow::*;
+ use async_trait::async_trait;
+ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+-use jwt_simple::{
+-    claims::JWTClaims,
+-    prelude::{Clock, UnixTimeStamp},
+-};
+ use serde_json::Value;
++use std::time::SystemTime;
+ 
+ use crate::keypair::TeeKeyPair;
+ 
+@@ -33,8 +30,8 @@ pub trait TokenProvider: Send + Sync {
+ #[derive(Clone, Debug)]
+ pub struct Token {
+     pub content: String,
+-    exp: Option<UnixTimeStamp>,
+-    nbf: Option<UnixTimeStamp>,
++    exp: Option<u64>,
++    nbf: Option<u64>,
+ }
+ 
+ impl Token {
+@@ -44,16 +41,17 @@ impl Token {
+             .nth(1)
+             .ok_or_else(|| anyhow!("illegal token format"))?;
+         let claims = URL_SAFE_NO_PAD.decode(claims_b64)?;
+-        let claims = serde_json::from_slice::<JWTClaims<Value>>(&claims)?;
++        let claims = serde_json::from_slice::<Value>(&claims)?;
+         Ok(Self {
+             content: token,
+-            exp: claims.expires_at,
+-            nbf: claims.invalid_before,
++            exp: claims["exp"].as_u64(),
++            nbf: claims["nbf"].as_u64(),
+         })
+     }
+ 
+     pub fn check_valid(&self) -> Result<()> {
+-        let now = Clock::now_since_epoch();
++        let now = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)
++            .unwrap().as_secs();
+         if let Some(exp) = self.exp {
+             if exp < now {
+                 bail!("token expired");
+-- 
+2.51.1
+

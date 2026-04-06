@@ -1,0 +1,55 @@
+diff --git a/pylib/gyp/common.py b/pylib/gyp/common.py
+index b268d229..03c99cab 100644
+--- a/pylib/gyp/common.py
++++ b/pylib/gyp/common.py
+@@ -4,7 +4,6 @@
+ 
+ from __future__ import with_statement
+ 
+-import collections
+ import errno
+ import filecmp
+ import os.path
+@@ -12,6 +11,11 @@ import re
+ import tempfile
+ import sys
+ 
++try:
++  from collections.abc import MutableSet
++except ImportError:
++  from collections import MutableSet
++
+ 
+ # A minimal memoizing decorator. It'll blow up if the args aren't immutable,
+ # among other "problems".
+@@ -494,7 +498,7 @@ def uniquer(seq, idfun=None):
+ 
+ 
+ # Based on http://code.activestate.com/recipes/576694/.
+-class OrderedSet(collections.MutableSet):
++class OrderedSet(MutableSet):
+   def __init__(self, iterable=None):
+     self.end = end = []
+     end += [None, end, end]         # sentinel node for doubly linked list
+diff --git a/pylib/gyp/generator/msvs.py b/pylib/gyp/generator/msvs.py
+index 843e7067..327fe8d2 100644
+--- a/pylib/gyp/generator/msvs.py
++++ b/pylib/gyp/generator/msvs.py
+@@ -4,7 +4,7 @@
+ 
+ from __future__ import print_function
+ 
+-import collections
++from collections import OrderedDict
+ import copy
+ import ntpath
+ import os
+@@ -195,7 +195,7 @@ def _ConvertSourcesToFilterHierarchy(sources, prefix=None, excluded=None,
+   if not prefix: prefix = []
+   result = []
+   excluded_result = []
+-  folders = collections.OrderedDict()
++  folders = OrderedDict()
+   # Gather files into the final result, excluded, or folders.
+   for s in sources:
+     if len(s) == 1:

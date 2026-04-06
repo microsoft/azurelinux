@@ -1,0 +1,88 @@
+commit f519f8f92d3925f2b58a93e555da3720c09af56c
+Author: albert-github <albert.tests@gmail.com>
+Date:   Sun Jun 22 12:35:03 2025 +0200
+
+    Input buffer overflow
+    
+    When having a, very,  long string as an argument in e.g. PHP or C++ we get am error like:
+    ```
+    input buffer overflow, can't enlarge buffer because scanner uses REJECT
+    ```
+    which can be overcome by enlarging the lex buffers (CMake option `enlarge_lex_buffers`) but is also possible to limit the search pattern from a `+` pattern to a number of elements `{1,n}` pattern.
+    
+    For PHP the string argument should, analogous to C++ not be a copy rule but a skip rule (`scanner.l`)
+
+diff --git a/src/code.l b/src/code.l
+index a2020eb14..4fb0c0fd5 100644
+--- a/src/code.l
++++ b/src/code.l
+@@ -1279,10 +1279,10 @@ ENDQopt ("const"|"volatile"|"sealed"|"override")({BN}+("const"|"volatile"|"seale
+                                           yyextra->inForEachExpression = FALSE;
+                                           BEGIN( SkipStringS );
+                                         }
+-<SkipString>[^\"\\\r\n]*                {
++<SkipString>[^\"\\\r\n]{1,100}          {
+                                           yyextra->code->codify(yytext);
+                                         }
+-<SkipStringS>[^\'\\\r\n]*               {
++<SkipStringS>[^\'\\\r\n]{1,100}         {
+                                           yyextra->code->codify(yytext);
+                                         }
+ <SkipString,SkipStringS>{CPPC}|{CCS}       {
+diff --git a/src/pre.l b/src/pre.l
+index dc155aa6f..9edf21727 100644
+--- a/src/pre.l
++++ b/src/pre.l
+@@ -607,10 +607,10 @@ WSopt [ \t\r]*
+                                           outputChar(yyscanner,*yytext);
+                                           BEGIN( CopyStringFtn );
+                                         }
+-<CopyString>[^\"\\\r\n]+                {
++<CopyString>[^\"\\\r\n]{1,1000}         {
+                                           outputArray(yyscanner,yytext,yyleng);
+                                         }
+-<CopyStringCs>[^\"\r\n]+                {
++<CopyStringCs>[^\"\r\n]{1,1000}         {
+                                           outputArray(yyscanner,yytext,yyleng);
+                                         }
+ <CopyStringCs>\"\"                      {
+@@ -623,7 +623,7 @@ WSopt [ \t\r]*
+                                           outputChar(yyscanner,*yytext);
+                                           BEGIN( CopyLine );
+                                         }
+-<CopyStringFtnDouble>[^\"\\\r\n]+       {
++<CopyStringFtnDouble>[^\"\\\r\n]{1,1000} {
+                                           outputArray(yyscanner,yytext,yyleng);
+                                         }
+ <CopyStringFtnDouble>\\.                {
+@@ -633,7 +633,7 @@ WSopt [ \t\r]*
+                                           outputChar(yyscanner,*yytext);
+                                           BEGIN( CopyLine );
+                                         }
+-<CopyStringFtn>[^\'\\\r\n]+             {
++<CopyStringFtn>[^\'\\\r\n]{1,1000}      {
+                                           outputArray(yyscanner,yytext,yyleng);
+                                         }
+ <CopyStringFtn>\\.                      {
+@@ -652,7 +652,7 @@ WSopt [ \t\r]*
+                                             BEGIN( CopyLine );
+                                           }
+                                         }
+-<CopyRawString>[^)]+                    {
++<CopyRawString>[^)]{1,1000}             {
+                                           outputArray(yyscanner,yytext,yyleng);
+                                         }
+ <CopyRawString>.                        {
+diff --git a/src/scanner.l b/src/scanner.l
+index a6a70d25c..3c8b887d4 100644
+--- a/src/scanner.l
++++ b/src/scanner.l
+@@ -5141,7 +5141,7 @@ NONLopt [^\n]*
+                                           if (yyextra->insidePHP)
+                                           {
+                                             yyextra->lastCopyArgStringContext=YY_START;
+-                                            BEGIN(CopyArgPHPString);
++                                            BEGIN(SkipPHPString);
+                                           }
+                                         }
+ <ReadFuncArgType,ReadTempArgs,CopyArgString,CopyArgPHPString,CopyArgRound,CopyArgSquare,CopyArgSharp>"<="|">="|"<=>" {

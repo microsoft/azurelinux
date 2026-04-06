@@ -1,0 +1,35 @@
+From 08da3685eddca11092fecab35c053843e02df0aa Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Fri, 9 Jan 2026 14:56:11 +0100
+Subject: [PATCH 3/3] Don't use evex512 with LLVM 22
+
+As Intel has walked back on the existence of AVX 10.1-256, LLVM
+no longer uses evex512 and avx-10.n-512 are now avx-10.n instead,
+so we can skip all the special handling on LLVM 22.
+---
+ compiler/rustc_codegen_llvm/src/llvm_util.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/compiler/rustc_codegen_llvm/src/llvm_util.rs b/compiler/rustc_codegen_llvm/src/llvm_util.rs
+index 63f820dc2918..fbb582fe8601 100644
+--- a/compiler/rustc_codegen_llvm/src/llvm_util.rs
++++ b/compiler/rustc_codegen_llvm/src/llvm_util.rs
+@@ -287,12 +287,12 @@ pub(crate) fn to_llvm_features<'a>(sess: &Session, s: &'a str) -> Option<LLVMFea
+                 "cmpxchg16b" => Some(LLVMFeature::new("cx16")),
+                 "lahfsahf" => Some(LLVMFeature::new("sahf")),
+                 // Enable the evex512 target feature if an avx512 target feature is enabled.
+-                s if s.starts_with("avx512") => Some(LLVMFeature::with_dependencies(
++                s if s.starts_with("avx512") && major < 22 => Some(LLVMFeature::with_dependencies(
+                     s,
+                     smallvec![TargetFeatureFoldStrength::EnableOnly("evex512")],
+                 )),
+-                "avx10.1" => Some(LLVMFeature::new("avx10.1-512")),
+-                "avx10.2" => Some(LLVMFeature::new("avx10.2-512")),
++                "avx10.1" if major < 22 => Some(LLVMFeature::new("avx10.1-512")),
++                "avx10.2" if major < 22 => Some(LLVMFeature::new("avx10.2-512")),
+                 "apxf" => Some(LLVMFeature::with_dependencies(
+                     "egpr",
+                     smallvec![
+-- 
+2.53.0
+

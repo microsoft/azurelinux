@@ -1,0 +1,32 @@
+From f693474b85f8dc1d31570833c62d9210ed1ffcf2 Mon Sep 17 00:00:00 2001
+From: mikhail nefedov <mnefedov@users.sourceforge.net>
+Date: Thu, 23 Aug 2018 00:36:52 +0200
+Subject: [PATCH 4/9] Avoid putting directories found during header search into
+ srcfiles.
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ src/dir.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/dir.c b/src/dir.c
+index 01c599e..7f7287e 100644
+--- a/src/dir.c
++++ b/src/dir.c
+@@ -616,8 +616,11 @@ incfile(char *file, char *type)
+ 	    snprintf(path, sizeof(path), "%.*s/%s",
+ 		    (int)(PATHLEN - 2 - file_len), incdirs[i],
+ 		    file);
+-	    if (access(compath(path), READ) == 0) {
+-		addsrcfile(path);
++            if (access(compath(path), READ) == 0) {
++                struct stat st;
++                if( 0 == stat(path,&st) && S_ISREG(st.st_mode) ) {
++                     addsrcfile(path);
++                }
+ 		break;
+ 	    }
+ 	}
+-- 
+2.26.2
+

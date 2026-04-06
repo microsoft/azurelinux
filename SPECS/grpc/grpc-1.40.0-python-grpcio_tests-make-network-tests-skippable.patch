@@ -1,0 +1,20 @@
+diff -Naur grpc-1.40.0-original/src/python/grpcio_tests/tests/unit/_dns_resolver_test.py grpc-1.40.0/src/python/grpcio_tests/tests/unit/_dns_resolver_test.py
+--- grpc-1.40.0-original/src/python/grpcio_tests/tests/unit/_dns_resolver_test.py	2021-09-03 19:20:52.000000000 -0400
++++ grpc-1.40.0/src/python/grpcio_tests/tests/unit/_dns_resolver_test.py	2021-09-09 10:55:12.919416808 -0400
+@@ -14,6 +14,7 @@
+ """Tests for an actual dns resolution."""
+ 
+ import logging
++import os
+ import unittest
+ 
+ import grpc
+@@ -46,6 +47,8 @@
+     def tearDown(self):
+         self._server.stop(None)
+ 
++    @unittest.skipIf('FEDORA_NO_NETWORK_TESTS' in os.environ,
++                     'Network tests disabled')
+     def test_connect_loopback(self):
+         # NOTE(https://github.com/grpc/grpc/issues/18422)
+         # In short, Gevent + C-Ares = Segfault. The C-Ares driver is not

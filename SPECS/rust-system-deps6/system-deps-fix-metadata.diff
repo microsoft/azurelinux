@@ -1,0 +1,11 @@
+--- system-deps-6.2.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ system-deps-6.2.2/Cargo.toml	2024-12-02T17:04:56.751268+00:00
+@@ -31,7 +31,7 @@
+ repository = "https://github.com/gdesmott/system-deps"
+ 
+ [dependencies.cfg-expr]
+-version = "0.15.5"
++version = "0.17"
+ features = ["targets"]
+ 
+ [dependencies.heck]

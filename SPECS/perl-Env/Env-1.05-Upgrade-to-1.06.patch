@@ -1,0 +1,56 @@
+From dd0857320449cb99c7dc312b9f1ebd9d571bad09 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 16 May 2023 15:26:11 +0200
+Subject: [PATCH] Upgrade to 1.06
+
+---
+ lib/Env.pm             |  4 ++--
+ t/release-pod-syntax.t | 15 ---------------
+ 2 files changed, 2 insertions(+), 17 deletions(-)
+ delete mode 100644 t/release-pod-syntax.t
+
+diff --git a/lib/Env.pm b/lib/Env.pm
+index eaf30f1..991afdd 100644
+--- a/lib/Env.pm
++++ b/lib/Env.pm
+@@ -1,6 +1,6 @@
+ package Env;
+ 
+-our $VERSION = '1.05';
++our $VERSION = '1.06';
+ 
+ =head1 NAME
+ 
+@@ -75,7 +75,7 @@ Gregor N. Purdy E<lt>F<gregor@focusresearch.com>E<gt>
+ =cut
+ 
+ sub import {
+-    my ($callpack) = caller(0);
++    my $callpack = caller(0);
+     my $pack = shift;
+     my @vars = grep /^[\$\@]?[A-Za-z_]\w*$/, (@_ ? @_ : keys(%ENV));
+     return unless @vars;
+diff --git a/t/release-pod-syntax.t b/t/release-pod-syntax.t
+deleted file mode 100644
+index d46a955..0000000
+--- a/t/release-pod-syntax.t
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#!perl
+-
+-BEGIN {
+-  unless ($ENV{RELEASE_TESTING}) {
+-    require Test::More;
+-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+-  }
+-}
+-
+-use Test::More;
+-
+-eval "use Test::Pod 1.41";
+-plan skip_all => "Test::Pod 1.41 required for testing POD" if $@;
+-
+-all_pod_files_ok();
+-- 
+2.40.1
+

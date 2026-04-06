@@ -1,0 +1,11 @@
+--- a/Assemble.c~	2025-08-13 22:05:00.416132027 -0400
++++ b/Assemble.c	2025-08-13 22:13:16.650837070 -0400
+@@ -1597,8 +1597,6 @@
+ 				goto try_again;
+ 			goto out;
+ 		}
+-		/* just incase it was started but has no content */
+-		ioctl(mdfd, STOP_ARRAY, NULL);
+ 	}
+ 
+ 	if (content != &info) {

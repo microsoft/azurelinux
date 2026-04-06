@@ -1,0 +1,13 @@
+--- httpdate-1.0.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ httpdate-1.0.3/Cargo.toml	2023-08-31T17:00:17.422070+00:00
+@@ -26,10 +26,3 @@
+ ]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/pyfisch/httpdate"
+-
+-[[bench]]
+-name = "benchmarks"
+-harness = false
+-
+-[dev-dependencies.criterion]
+-version = "0.5"

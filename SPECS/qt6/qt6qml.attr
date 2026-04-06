@@ -1,0 +1,2 @@
+%__qt6qml_path     ^%{_qt6_qmldir}(/[^/]+)+/qmldir$
+%__qt6qml_provides %{_rpmconfigdir}/qt6qml.prov

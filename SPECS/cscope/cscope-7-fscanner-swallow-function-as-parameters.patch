@@ -1,0 +1,43 @@
+From e1b4cbc93529b07b3217928e8f9b1f43b80f9b06 Mon Sep 17 00:00:00 2001
+From: Jiri Slaby <jslaby@suse.cz>
+Date: Fri, 5 Dec 2014 19:15:53 +0100
+Subject: [PATCH 8/9] fscanner: swallow function as parameters
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some functions take as a parameter a pointer to another function. This
+causes troubles in the cscope scanner and such function definition is
+dropped on the floor.
+
+Instead of choking and skipping the definition/declaration, teach the
+scanner about this case. So now cscope will not skip those and put
+them properly in the index.
+
+I carry this patch for a couple of months and using cscope daily on
+the Linux kernel and see no problems.
+
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Hans-Bernhard Bröker <broeker@users.sourceforge.net>
+Cc: Neil Horman <nhorman@users.sourceforge.net>
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ src/fscanner.l | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/fscanner.l b/src/fscanner.l
+index 8a93192..43880bf 100644
+--- a/src/fscanner.l
++++ b/src/fscanner.l
+@@ -505,7 +505,7 @@ if{wsnl}*\(	{ 	/* ignore 'if' */
+ 		}
+ 
+ <WAS_IDENTIFIER>{       
+-{ws}*\(({wsnl}|{identifier}|{number}|[*&[\]=,.:])*\)([()]|{wsnl})*[:a-zA-Z_#{]	{
++{ws}*\(({wsnl}|{identifier}|\({ws}*\*{ws}*{identifier}{ws}*\){ws}*\([^()]*\)|{number}|[*&[\]=,.:])*\)([()]|{wsnl})*[:a-zA-Z_#{]	{
+ 			/* a function definition */
+ 			/* note: "#define a (b) {" and "#if defined(a)\n#" 
+ 			 * are not fcn definitions! */
+-- 
+2.26.2
+

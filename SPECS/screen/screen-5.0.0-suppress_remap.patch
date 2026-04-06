@@ -1,0 +1,17 @@
+Author: Loic Minier <lool@dooz.org>
+Description: Unbreak several useful keybindings.
+
+fix for nonworking ^a backspace (rhbz#708698)
+
+diff -urNp a/termcap.c b/termcap.c
+--- a/termcap.c	2024-08-29 13:12:18.219574842 +0200
++++ b/termcap.c	2024-08-29 13:17:59.212026846 +0200
+@@ -449,8 +449,6 @@ int remap(int n, int map)
+ 		} else
+ 			break;
+ 	}
+-	if (n < KMAP_KEYS)
+-		domap = 1;
+ 	if (map == 0 && domap)
+ 		return 0;
+ 	if (map && !domap)

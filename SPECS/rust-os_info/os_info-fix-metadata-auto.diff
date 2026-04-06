@@ -1,0 +1,20 @@
+--- os_info-3.12.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ os_info-3.12.0/Cargo.toml	2025-06-20T15:03:20.343033+00:00
+@@ -65,17 +65,3 @@
+ [dev-dependencies.pretty_assertions]
+ version = "1"
+ 
+-[target.'cfg(target_os = "macos")'.dependencies.plist]
+-version = "1.5.1"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.52"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_LibraryLoader",
+-    "Win32_System_Registry",
+-    "Win32_System_SystemInformation",
+-    "Win32_System_SystemServices",
+-    "Win32_System_Threading",
+-    "Win32_UI_WindowsAndMessaging",
+-]

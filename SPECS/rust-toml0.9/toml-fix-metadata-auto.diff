@@ -1,0 +1,16 @@
+--- toml-0.9.12+spec-1.1.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ toml-0.9.12+spec-1.1.0/Cargo.toml	2026-02-15T11:49:52.831393+00:00
+@@ -13,7 +13,7 @@
+ edition = "2021"
+ rust-version = "1.76"
+ name = "toml"
+-version = "0.9.12+spec-1.1.0"
++version = "0.9.12"
+ build = false
+ include = [
+     "build.rs",
+@@ -311,3 +311,4 @@
+ [lints.rust.rust_2018_idioms]
+ level = "warn"
+ priority = -1
++

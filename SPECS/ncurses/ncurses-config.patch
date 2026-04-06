@@ -1,0 +1,56 @@
+diff -up ncurses-6.5-20250118/misc/gen-pkgconfig.in.config ncurses-6.5-20250118/misc/gen-pkgconfig.in
+--- ncurses-6.5-20250118/misc/gen-pkgconfig.in.config	2024-09-28 22:21:23.000000000 +0200
++++ ncurses-6.5-20250118/misc/gen-pkgconfig.in	2025-01-23 15:11:09.010013512 +0100
+@@ -83,7 +83,7 @@ if [ "$includedir" != "/usr/include" ];
+ fi
+ 
+ lib_flags=
+-for opt in -L$libdir @EXTRA_PKG_LDFLAGS@ @LIBS@
++for opt in -L$libdir @LIBS@
+ do
+ 	case $opt in
+ 	-l*) # LIBS is handled specially below
+diff -up ncurses-6.5-20250118/misc/ncurses-config.in.config ncurses-6.5-20250118/misc/ncurses-config.in
+--- ncurses-6.5-20250118/misc/ncurses-config.in.config	2024-09-28 22:18:19.000000000 +0200
++++ ncurses-6.5-20250118/misc/ncurses-config.in	2025-01-23 15:12:11.696971472 +0100
+@@ -41,7 +41,6 @@ exec_prefix="@exec_prefix@"
+ 
+ bindir="@bindir@"
+ includedir="@includedir@"
+-libdir="@libdir@"
+ datarootdir="@datarootdir@"
+ datadir="@datadir@"
+ mandir="@mandir@"
+@@ -110,7 +109,7 @@ fi
+ # There is no portable way to find the list of standard library directories.
+ # Require a POSIX shell anyway, to keep this simple.
+ lib_flags=
+-for opt in -L$libdir @EXTRA_PKG_LDFLAGS@ $LIBS
++for opt in $LIBS
+ do
+ 	case $opt in
+ 	-specs*) # ignore linker specs-files which were used to build library
+@@ -129,13 +128,13 @@ do
+ 		lib_check=`echo "x$opt" | sed -e 's/^.-L//'`
+ 		[ -d "$lib_check" ] || continue
+ 		case "$lib_check" in
+-		@LD_SEARCHPATH@) # skip standard libdir
++		////) # skip standard libdir (disabled for multilib)
+ 			if [ "$lib_check" = "$libdir" ]
+ 			then
+ 				lib_first=no
+ 				IFS_save="$IFS"
+ 				IFS='|'
+-				LIBDIRS="@LD_SEARCHPATH@"
++				LIBDIRS=""
+ 				for lib_check in $LIBDIRS
+ 				do
+ 					if [ -d "$lib_check" ]
+@@ -324,7 +323,6 @@ while [ $# -gt 0 ]; do
+ 		echo "$INCS"
+ 		;;
+ 	--libdir)
+-		echo "${libdir}"
+ 		;;
+ 	--mandir)
+ 		echo "${mandir}"

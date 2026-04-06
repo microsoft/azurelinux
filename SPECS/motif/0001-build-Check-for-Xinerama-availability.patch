@@ -1,0 +1,61 @@
+From 3a164564cf8241ee4544ff012659e8eb510b195b Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Tue, 19 Nov 2024 18:40:33 +0100
+Subject: [PATCH 1/7] build: Check for Xinerama availability
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ configure.ac       | 22 ++++++++++++++++++++++
+ lib/Xm/Makefile.am |  2 +-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index d57f71e6..f0b2617d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -280,7 +280,29 @@ AC_SUBST(LIB_XP)
+ AC_FIND_XFT
+ AC_IMAGE_SUPPORT
+ 
++AC_ARG_ENABLE(xinerama,[  --enable-xinerama       Enable Xinerama (default=yes)])
++if test "x$enable_xinerama" = "x"
++then
++    enable_xinerama="yes"
++fi
++
++if test "x$enable_xinerama" = "xyes"
++then
++  AC_MSG_CHECKING([for libXinerama])
++  AC_CHECK_HEADERS(X11/extensions/Xinerama.h,
++    AC_CHECK_LIB(Xinerama, XineramaQueryExtension, ,enable_xinerama="no"),
++  enable_xinerama="no")
++fi
++
++if test "x$enable_xinerama" = "xyes"
++then
++  LIB_XINERAMA=-lXinerama
++else
++  LIB_XINERAMA=
++fi
+ 
++AM_CONDITIONAL(XINERAMA, test "$enable_xinerama" = "yes")
++AC_SUBST(LIB_XINERAMA)
+ 
+ # AM_CONDITIONAL(Motif22Compatibility, test x$enable_motif22_compatibility = xyes)
+ 
+diff --git a/lib/Xm/Makefile.am b/lib/Xm/Makefile.am
+index a95fa2db..07b733f5 100644
+--- a/lib/Xm/Makefile.am
++++ b/lib/Xm/Makefile.am
+@@ -71,7 +71,7 @@ else
+ PRINTS_SRC =
+ endif
+ 
+-libXm_la_LIBADD = ${X_LIBS} ${X_XMU} -lXt -lXext ${LIB_XP} -lX11 ${X_EXTRA_LIBS}
++libXm_la_LIBADD = ${X_LIBS} ${X_XMU} -lXt -lXext ${LIB_XP} ${LIB_XINERAMA} -lX11 ${X_EXTRA_LIBS}
+ 
+ noinst_HEADERS = BaseClassI.h \
+ BitmapsI.h \
+-- 
+2.49.0
+

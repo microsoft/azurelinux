@@ -1,0 +1,33 @@
+From 43fffd4acd90f8d6947cba869e01cf36bb116b3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sat, 18 Jan 2025 12:27:36 +0100
+Subject: [PATCH 3/4] configure: drop broken configure code
+
+Doesn't work on Fedora 41 or 42:
+checking where to install Emacs Lisp files... ./configure: eval: line 12626: syntax error near unexpected token `('
+./configure: eval: line 12626: `itz_cv_path_site_lisp= mapbacktrace(#f(compiled-function (evald func args flags) #<bytecode 0x133e8adafae87e4>))'
+---
+ configure.ac.footer | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac.footer b/configure.ac.footer
+index 1e5e4da1e6..5c60a2ec9c 100644
+--- a/configure.ac.footer
++++ b/configure.ac.footer
+@@ -59,12 +59,7 @@ else
+         ELISP="emacs/t-mouse.el emacs/t-mouse.elc"
+ fi
+ 
+-if test $EMACS != : ; then
+-        ITZ_PATH_SITE_LISP
+-        lispdir=${itz_cv_path_site_lisp}
+-else
+-        lispdir='${datadir}/emacs/site-lisp'
+-fi
++lispdir='${datadir}/emacs/site-lisp'
+ 
+ # Header-checks
+ AC_CHECK_HEADERS(syslog.h linux/input.h linux/joystick.h ncurses.h ncurses/curses.h curses.h)
+-- 
+2.47.1
+

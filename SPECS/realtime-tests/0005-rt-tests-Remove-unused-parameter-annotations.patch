@@ -1,0 +1,269 @@
+From ccbdda89d4c982daaada0a4e5745d53e93f8df4e Mon Sep 17 00:00:00 2001
+From: Crystal Wood <crwood@redhat.com>
+Date: Tue, 7 Jan 2025 17:02:29 -0500
+Subject: [PATCH 5/5] rt-tests: Remove unused parameter annotations
+
+These are no longer necessary with -Wno-unused-parameter
+
+Signed-off-by: Crystal Wood <crwood@redhat.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ src/cyclictest/cyclictest.c           | 11 +++++------
+ src/oslat/oslat.c                     |  4 ++--
+ src/pi_tests/pi_stress.c              |  4 ++--
+ src/pmqtest/pmqtest.c                 |  7 +++----
+ src/ptsematest/ptsematest.c           |  7 +++----
+ src/queuelat/queuelat.c               |  2 +-
+ src/rt-migrate-test/rt-migrate-test.c |  4 ++--
+ src/sched_deadline/cyclicdeadline.c   |  2 +-
+ src/signaltest/signaltest.c           |  2 +-
+ src/sigwaittest/sigwaittest.c         |  4 ++--
+ src/ssdd/ssdd.c                       |  2 +-
+ src/svsematest/svsematest.c           |  5 +++--
+ 12 files changed, 26 insertions(+), 28 deletions(-)
+
+diff --git a/src/cyclictest/cyclictest.c b/src/cyclictest/cyclictest.c
+index b1f842096595..890da5d869c9 100644
+--- a/src/cyclictest/cyclictest.c
++++ b/src/cyclictest/cyclictest.c
+@@ -436,11 +436,10 @@ static int set_deepest_cpu_idle_state(unsigned int cpu, unsigned int deepest_sta
+ 
+ static inline int have_libcpupower_support(void) { return 1; }
+ #else
+-static inline int save_cpu_idle_disable_state(__attribute__((unused)) unsigned int cpu) { return -1; }
+-static inline int restore_cpu_idle_disable_state(__attribute__((unused)) unsigned int cpu) { return -1; }
++static inline int save_cpu_idle_disable_state(unsigned int cpu) { return -1; }
++static inline int restore_cpu_idle_disable_state(unsigned int cpu) { return -1; }
+ static inline void free_cpu_idle_disable_states(void) { }
+-static inline int set_deepest_cpu_idle_state(__attribute__((unused)) unsigned int cpu,
+-											 __attribute__((unused)) unsigned int state) { return -1; }
++static inline int set_deepest_cpu_idle_state(unsigned int cpu, unsigned int state) { return -1; }
+ static inline int have_libcpupower_support(void) { return 0; }
+ #endif /* HAVE_LIBCPUPOWER_SUPPORT */
+ 
+@@ -1687,7 +1686,7 @@ static void rstat_print_stat(struct thread_param *par, int index, int verbose, i
+  * thread that creates a named fifo and hands out run stats when someone
+  * reads from the fifo.
+  */
+-static void *fifothread(void *param __attribute__ ((unused)))
++static void *fifothread(void *param)
+ {
+ 	int ret;
+ 	int fd;
+@@ -1868,7 +1867,7 @@ rstat_err:
+ 	return;
+ }
+ 
+-static void write_stats(FILE *f, void *data __attribute__ ((unused)))
++static void write_stats(FILE *f, void *data)
+ {
+ 	struct thread_param **par = parameters;
+ 	int i;
+diff --git a/src/oslat/oslat.c b/src/oslat/oslat.c
+index 0863297f2cf1..9e5a08a2fbd9 100644
+--- a/src/oslat/oslat.c
++++ b/src/oslat/oslat.c
+@@ -220,7 +220,7 @@ struct global {
+ 
+ static struct global g;
+ 
+-static void workload_nop(char *dst __attribute__ ((unused)), char *src __attribute__ ((unused)), size_t size __attribute__ ((unused)))
++static void workload_nop(char *dst, char *src, size_t size)
+ {
+ 	/* Nop */
+ }
+@@ -596,7 +596,7 @@ static void run_expt(struct thread *threads, int runtime_secs, bool preheat)
+ 		pthread_join(threads[i].thread_id, NULL);
+ }
+ 
+-static void handle_alarm(int code __attribute__ ((unused)))
++static void handle_alarm(int code)
+ {
+ 	g.cmd = STOP;
+ }
+diff --git a/src/pi_tests/pi_stress.c b/src/pi_tests/pi_stress.c
+index 1116ee61584d..6f8c5632bdd7 100644
+--- a/src/pi_tests/pi_stress.c
++++ b/src/pi_tests/pi_stress.c
+@@ -388,7 +388,7 @@ int pending_interrupt(void)
+  *   1. report progress
+  *   2. check for deadlocks
+  */
+-void *reporter(void *arg __attribute__ ((unused)))
++void *reporter(void *arg)
+ {
+ 	int status;
+ 	int end = 0;
+@@ -1334,7 +1334,7 @@ void summary(void)
+ 	       t->tm_yday, t->tm_hour, t->tm_min, t->tm_sec);
+ }
+ 
+-void write_stats(FILE *f, void *data __attribute__ ((unused)))
++void write_stats(FILE *f, void *data)
+ {
+ 	fprintf(f, "  \"inversion\": %lu\n", total_inversions());
+ }
+diff --git a/src/pmqtest/pmqtest.c b/src/pmqtest/pmqtest.c
+index b21dfa0fe0cc..04e36a1ad979 100644
+--- a/src/pmqtest/pmqtest.c
++++ b/src/pmqtest/pmqtest.c
+@@ -418,14 +418,13 @@ static void process_options(int argc, char *argv[])
+ 
+ static int volatile shutdown;
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	shutdown = 1;
+ }
+ 
+-static void print_stat(FILE *fp __attribute__ ((unused)),
+-		       struct params *receiver, struct params *sender,
+-		       int verbose __attribute__ ((unused)), int quiet)
++static void print_stat(FILE *fp, struct params *receiver, struct params *sender,
++		       int verbose, int quiet)
+ {
+ 	int i;
+ 
+diff --git a/src/ptsematest/ptsematest.c b/src/ptsematest/ptsematest.c
+index 5a29718d7bfb..d21166946f6a 100644
+--- a/src/ptsematest/ptsematest.c
++++ b/src/ptsematest/ptsematest.c
+@@ -321,14 +321,13 @@ static void process_options(int argc, char *argv[])
+ 
+ static int volatile shutdown;
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	shutdown = 1;
+ }
+ 
+-static void print_stat(FILE *fp __attribute__ ((unused)),
+-		       struct params *receiver, struct params *sender,
+-		       int verbose __attribute__ ((unused)), int quiet)
++static void print_stat(FILE *fp, struct params *receiver, struct params *sender,
++		       int verbose, int quiet)
+ {
+ 	int i;
+ 
+diff --git a/src/queuelat/queuelat.c b/src/queuelat/queuelat.c
+index c0573897a02b..28cf7abe83ae 100644
+--- a/src/queuelat/queuelat.c
++++ b/src/queuelat/queuelat.c
+@@ -520,7 +520,7 @@ void main_loop(void)
+ 	free(src);
+ }
+ 
+-void sig_handler(int sig __attribute__ ((unused)))
++void sig_handler(int sig)
+ {
+ 	print_exit_info();
+ 	exit(0);
+diff --git a/src/rt-migrate-test/rt-migrate-test.c b/src/rt-migrate-test/rt-migrate-test.c
+index 7b1917df12a3..8afe0834905b 100644
+--- a/src/rt-migrate-test/rt-migrate-test.c
++++ b/src/rt-migrate-test/rt-migrate-test.c
+@@ -354,7 +354,7 @@ static void print_results(void)
+ 	}
+ }
+ 
+-static void write_stats(FILE *f, void *data __attribute__ ((unused)))
++static void write_stats(FILE *f, void *data)
+ {
+ 	int i;
+ 	int t;
+@@ -489,7 +489,7 @@ static int check_times(int l)
+ 	return 0;
+ }
+ 
+-static void stop_log(int sig __attribute__ ((unused)))
++static void stop_log(int sig)
+ {
+ 	stop = 1;
+ }
+diff --git a/src/sched_deadline/cyclicdeadline.c b/src/sched_deadline/cyclicdeadline.c
+index 631d57ee885e..32fd0d0e280f 100644
+--- a/src/sched_deadline/cyclicdeadline.c
++++ b/src/sched_deadline/cyclicdeadline.c
+@@ -1073,7 +1073,7 @@ static int calc_nr_cpus(const char *setcpu, char **buf)
+ 	return -1;
+ }
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	shutdown = 1;
+ }
+diff --git a/src/signaltest/signaltest.c b/src/signaltest/signaltest.c
+index 5412c50f7e17..d8cda97697cf 100644
+--- a/src/signaltest/signaltest.c
++++ b/src/signaltest/signaltest.c
+@@ -353,7 +353,7 @@ static void process_options(int argc, char *argv[], unsigned int max_cpus)
+ 	}
+ }
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	shutdown = 1;
+ }
+diff --git a/src/sigwaittest/sigwaittest.c b/src/sigwaittest/sigwaittest.c
+index 8c1c16fb3081..026cc8151015 100644
+--- a/src/sigwaittest/sigwaittest.c
++++ b/src/sigwaittest/sigwaittest.c
+@@ -370,13 +370,13 @@ static void process_options(int argc, char *argv[])
+ 
+ static int volatile mustshutdown;
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	mustshutdown = 1;
+ }
+ 
+ static void print_stat(struct params *receiver, struct params *sender,
+-		       int verbose __attribute__ ((unused)), int quiet)
++		       int verbose, int quiet)
+ {
+ 	int i;
+ 
+diff --git a/src/ssdd/ssdd.c b/src/ssdd/ssdd.c
+index 45f6a23910ca..50f74245fd48 100644
+--- a/src/ssdd/ssdd.c
++++ b/src/ssdd/ssdd.c
+@@ -152,7 +152,7 @@ static pid_t parent;
+ static int nforks = 10;
+ static int nsteps = 10000;
+ 
+-static void sigchld(int sig __attribute__ ((unused)), siginfo_t *info __attribute__ ((unused)), void *arg __attribute__ ((unused)))
++static void sigchld(int sig, siginfo_t *info, void *arg)
+ {
+ 	got_sigchld = 1;
+ }
+diff --git a/src/svsematest/svsematest.c b/src/svsematest/svsematest.c
+index 3c857dcb0189..f3cddf854575 100644
+--- a/src/svsematest/svsematest.c
++++ b/src/svsematest/svsematest.c
+@@ -416,7 +416,7 @@ static void process_options(int argc, char *argv[])
+ 
+ static int volatile mustshutdown;
+ 
+-static void sighand(int sig __attribute__ ((unused)))
++static void sighand(int sig)
+ {
+ 	mustshutdown = 1;
+ }
+@@ -456,7 +456,8 @@ static void write_stats(FILE *f, void *data)
+ 	fprintf(f, "  }\n");
+ }
+ 
+-static void print_stat(FILE *fp __attribute__ ((unused)), struct params *receiver, struct params *sender, int verbose __attribute__ ((unused)), int quiet)
++static void print_stat(FILE *fp, struct params *receiver, struct params *sender,
++		       int verbose, int quiet)
+ {
+ 	int i;
+ 
+-- 
+2.47.1
+

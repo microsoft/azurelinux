@@ -1,0 +1,639 @@
+From dee0c0842f92b9fb7caf64eb498c4c27d1aa5326 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Mon, 22 Sep 2025 16:33:24 -0400
+Subject: [PATCH] Remove ipaclustercheck
+
+---
+ setup.py                              |  12 +-
+ src/ipaclustercheck/__init__.py       |   5 -
+ src/ipaclustercheck/core/__init__.py  |   0
+ src/ipaclustercheck/core/main.py      |  32 ------
+ src/ipaclustercheck/core/output.py    |  68 -----------
+ src/ipaclustercheck/ipa/__init__.py   |   0
+ src/ipaclustercheck/ipa/crlmanager.py |  36 ------
+ src/ipaclustercheck/ipa/plugin.py     | 117 -------------------
+ src/ipaclustercheck/ipa/ruv.py        | 155 --------------------------
+ tests/test_cluster_ruv.py             | 106 ------------------
+ 10 files changed, 1 insertion(+), 530 deletions(-)
+ delete mode 100644 src/ipaclustercheck/__init__.py
+ delete mode 100644 src/ipaclustercheck/core/__init__.py
+ delete mode 100644 src/ipaclustercheck/core/main.py
+ delete mode 100644 src/ipaclustercheck/core/output.py
+ delete mode 100644 src/ipaclustercheck/ipa/__init__.py
+ delete mode 100644 src/ipaclustercheck/ipa/crlmanager.py
+ delete mode 100644 src/ipaclustercheck/ipa/plugin.py
+ delete mode 100644 src/ipaclustercheck/ipa/ruv.py
+ delete mode 100644 tests/test_cluster_ruv.py
+
+diff --git a/setup.py b/setup.py
+index 578fc52..6f47cda 100644
+--- a/setup.py
++++ b/setup.py
+@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
+ setup(
+     name='ipahealthcheck',
+     version='0.19',
+-    namespace_packages=['ipahealthcheck', 'ipaclustercheck'],
++    namespace_packages=['ipahealthcheck'],
+     package_dir={'': 'src'},
+     # packages=find_packages(where='src'),
+     packages=[
+@@ -14,14 +14,11 @@ setup(
+         'ipahealthcheck.ipa',
+         'ipahealthcheck.meta',
+         'ipahealthcheck.system',
+-        'ipaclustercheck.core',
+-        'ipaclustercheck.ipa',
+     ],
+     entry_points={
+         # creates bin/ipahealthcheck
+         'console_scripts': [
+             'ipa-healthcheck = ipahealthcheck.core.main:main',
+-            'ipa-clustercheck = ipaclustercheck.core.main:main',
+         ],
+         # subsystem registries
+         'ipahealthcheck.registry': [
+@@ -73,13 +70,6 @@ setup(
+         'ipahealthcheck.system': [
+             'filesystemspace = ipahealthcheck.system.filesystemspace',
+         ],
+-        'ipaclustercheck.registry': [
+-            'ipaclustercheck.ipa = ipaclustercheck.ipa.plugin:registry',
+-        ],
+-        'ipaclustercheck.ipa': [
+-            'crl = ipaclustercheck.ipa.crlmanager',
+-            'ruv = ipaclustercheck.ipa.ruv',
+-        ],
+     },
+     classifiers=[
+         'Programming Language :: Python :: 3.6',
+diff --git a/src/ipaclustercheck/__init__.py b/src/ipaclustercheck/__init__.py
+deleted file mode 100644
+index 6c91ef7..0000000
+--- a/src/ipaclustercheck/__init__.py
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-__import__('pkg_resources').declare_namespace(__name__)
+diff --git a/src/ipaclustercheck/core/__init__.py b/src/ipaclustercheck/core/__init__.py
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/ipaclustercheck/core/main.py b/src/ipaclustercheck/core/main.py
+deleted file mode 100644
+index f475832..0000000
+--- a/src/ipaclustercheck/core/main.py
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#
+-# Copyright (C) 2020 FreeIPA Contributors see COPYING for license
+-#
+-
+-import sys
+-
+-from ipaclustercheck.core.output import output_registry
+-from ipahealthcheck.core.core import RunChecks
+-
+-
+-class ClusterChecks(RunChecks):
+-
+-    def add_options(self):
+-        parser = self.parser
+-        parser.add_argument('--directory', dest='dir',
+-                            help='Directory holding healthcheck logs')
+-
+-    def validate_options(self):
+-        super().validate_options()
+-
+-        if self.options.dir is None:
+-            print("--directory containing logs to check is required")
+-            return 1
+-
+-        return None
+-
+-
+-def main():
+-    clusterchecks = ClusterChecks(['ipaclustercheck.registry'],
+-                                   '/etc/ipa/clustercheck.conf',
+-                                   output_registry, 'ansible')
+-    sys.exit(clusterchecks.run_healthcheck())
+diff --git a/src/ipaclustercheck/core/output.py b/src/ipaclustercheck/core/output.py
+deleted file mode 100644
+index 909eac4..0000000
+--- a/src/ipaclustercheck/core/output.py
++++ /dev/null
+@@ -1,68 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-import json
+-from ipahealthcheck.core.output import OutputRegistry, Output
+-
+-
+-output_registry = OutputRegistry()
+-
+-class ClusterOutput(Output):
+-    """Base class for writing/display output of cluster results
+-
+-       severity doesn't apply in this case so exclude those.
+-    """
+-    def __init__(self, options):
+-        self.filename = options.output_file
+-
+-    def strip_output(self, results):
+-        """Nothing to strip out"""
+-        return list(results.output())
+-
+-    def generate(self, data):
+-        raise NotImplementedError
+-
+-
+-@output_registry
+-class Ansible(ClusterOutput):
+-    """Output information JSON format for consumption by Ansible
+-
+-       Required keywords in a Result:
+-       name - unique identifier for the return value
+-
+-       One of these is required:
+-       value - the return value. Type? I dunno yet
+-       error - if an error was returned
+-    """
+-
+-    options = (
+-        ('--indent', dict(dest='indent', type=int, default=2,
+-         help='Indention level of JSON output')),
+-    )
+-
+-    def __init__(self, options):
+-        super().__init__(options)
+-        self.indent = options.indent
+-
+-    def generate(self, data):
+-        output = []
+-        for line in data:
+-            kw = line.get('kw')
+-            name = kw.get('name')
+-            value = kw.get('value')
+-            error = kw.get('error')
+-
+-            if value and error:
+-                value = '%s: %s' % (error, value)
+-            elif error:
+-                value = error
+-
+-            rval = {'%s' % name: value}
+-            output.append(rval)
+-
+-        output = json.dumps(output, indent=self.indent)
+-        if self.filename is None:
+-            output += '\n'
+-
+-        return output
+diff --git a/src/ipaclustercheck/ipa/__init__.py b/src/ipaclustercheck/ipa/__init__.py
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/ipaclustercheck/ipa/crlmanager.py b/src/ipaclustercheck/ipa/crlmanager.py
+deleted file mode 100644
+index 6806d74..0000000
+--- a/src/ipaclustercheck/ipa/crlmanager.py
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-from ipaclustercheck.ipa.plugin import ClusterPlugin, registry, find_checks
+-from ipahealthcheck.core.plugin import Result, duration
+-from ipahealthcheck.core import constants
+-
+-
+-@registry
+-class ClusterCRLManagerCheck(ClusterPlugin):
+-
+-    @duration
+-    def check(self):
+-        data = self.registry.json
+-        crlmanagers = []
+-
+-        for fqdn in data.keys():
+-             output = find_checks(data[fqdn], 'ipahealthcheck.ipa.roles',
+-                                 'IPACRLManagerCheck')
+-             enabled = output[0].get('kw').get('crlgen_enabled')
+-             if enabled:
+-                 crlmanagers.append(fqdn)
+-        if len(crlmanagers) == 0:
+-            yield Result(self, constants.ERROR,
+-                         name='crlmanager',
+-                         error='No CRL Manager defined')
+-        elif len(crlmanagers) == 1:
+-            yield Result(self, constants.SUCCESS,
+-                         name='crlmanager',
+-                         value=crlmanagers[0])
+-        else:
+-            yield Result(self, constants.ERROR,
+-                         name='crlmanager',
+-                         value=','.join(crlmanagers),
+-                         error='Multiple CRL Managers defined')
+diff --git a/src/ipaclustercheck/ipa/plugin.py b/src/ipaclustercheck/ipa/plugin.py
+deleted file mode 100644
+index a111988..0000000
+--- a/src/ipaclustercheck/ipa/plugin.py
++++ /dev/null
+@@ -1,117 +0,0 @@
+-#
+-# Copyright (C) 2020 FreeIPA Contributors see COPYING for license
+-#
+-
+-from copy import deepcopy
+-import json
+-import logging
+-from os import listdir
+-from os.path import isfile, join
+-
+-from ipahealthcheck.core.plugin import Plugin, Registry
+-from ipalib import api
+-
+-
+-logger = logging.getLogger()
+-
+-def find_checks(data, source, check):
+-    """Look through the dict for a matching source and check.
+-
+-       data: dict of source and check output
+-       source: name of source to find
+-       check: name of check to find
+-
+-       Returns list of contents of source + check or empty list
+-    """
+-    rval = []
+-    for d in data:
+-        if d.get('source') == source and d.get('check') == check:
+-            rval.append(d)
+-
+-    return rval
+-
+-
+-def get_masters(data):
+-    """
+-    Return the list of known masters
+-
+-    This is determined from the list of loaded healthcheck logs. It
+-    is possible that mixed versions are used so some may not be
+-    reporting the full list of masters, so check them all, and raise
+-    an exception if the list cannot be determined.
+-    """
+-    test_masters = list(data)
+-    masters = None
+-    for master in test_masters:
+-        output = find_checks(data[master], 'ipahealthcheck.ipa.meta',
+-                             'IPAMetaCheck')
+-        if len(output) == 0:
+-            raise ValueError('Unable to determine full list of masters. '
+-                             'ipahealthcheck.ipa.meta:IPAMetaCheck not '
+-                             'found.')
+-
+-        masters = output[0].get('kw').get('masters')
+-        if masters:
+-            return masters
+-
+-    raise ValueError('Unable to determine full list of masters. '
+-                     'None of ipahealthcheck.ipa.meta:IPAMetaCheck '
+-                     'contain masters.')
+-
+-
+-class ClusterPlugin(Plugin):
+-    pass
+-
+-
+-class ClusterRegistry(Registry):
+-    def __init__(self):
+-        super().__init__()
+-        self.json = None
+-
+-    def initialize(self, framework, config, options=None):
+-        super().initialize(framework, config, options)
+-
+-        self.json = {}
+-
+-        self.load_files(options.dir)
+-
+-        if not api.isdone('finalize'):
+-            if not api.isdone('bootstrap'):
+-                api.bootstrap(in_server=True,
+-                              context='ipahealthcheck',
+-                              log=None)
+-            if not api.isdone('finalize'):
+-                api.finalize()
+-
+-    def load_files(self, dir):
+-        if self.json:
+-            return
+-
+-        files = [f for f in listdir(dir) if isfile(join(dir, f))]
+-        for file in files:
+-            fname = join(dir, file)
+-            logger.debug("Reading %s", fname)
+-            try:
+-                with open(fname, 'r') as fd:
+-                    data = fd.read()
+-            except Exception as e:
+-                logger.error("Unable to read %s: %s", fname, e)
+-                continue
+-
+-            try:
+-                data = json.loads(data)
+-            except Exception as e:
+-                logger.error("Unable to parse JSON in %s: %s", fname, e)
+-                continue
+-
+-            meta = find_checks(data, 'ipahealthcheck.meta.core',
+-                                   'MetaCheck')
+-            if meta:
+-                fqdn = meta[0].get('kw').get('fqdn')
+-                self.json[fqdn] = deepcopy(data)
+-            else:
+-                logger.error("No fqdn defined in JSON in %s", fname)
+-                continue
+-
+-
+-registry = ClusterRegistry()
+diff --git a/src/ipaclustercheck/ipa/ruv.py b/src/ipaclustercheck/ipa/ruv.py
+deleted file mode 100644
+index 6477738..0000000
+--- a/src/ipaclustercheck/ipa/ruv.py
++++ /dev/null
+@@ -1,155 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-import logging
+-
+-from ipaclustercheck.ipa.plugin import (
+-    ClusterPlugin,
+-    registry,
+-    find_checks,
+-    get_masters
+-)
+-from ipahealthcheck.core.plugin import Result, duration
+-from ipahealthcheck.core import constants
+-from ipalib import api
+-from ipapython.dn import DN
+-
+-
+-logger = logging.getLogger()
+-
+-
+-@registry
+-class ClusterRUVCheck(ClusterPlugin):
+-
+-    # TODO: confirm that all masters are represented, otherwise the
+-    #       trustworthiness of dangling RUV is mixed.
+-    #
+-    #       gah, need to provide full list of all masters in a check.
+-
+-    @duration
+-    def check(self):
+-        data = self.registry.json
+-
+-        # Start with the list of masters from the file(s) collected
+-        # and find a MetaCheck with a full list of masters. For
+-        # backwards compatibility.
+-        try:
+-            masters = get_masters(data)
+-        except ValueError as e:
+-            yield Result(self, constants.ERROR,
+-                         name='dangling_ruv',
+-                         error=str(e))
+-            return
+-
+-        if len(data.keys()) < len(masters):
+-            yield Result(self, constants.ERROR,
+-                         name='dangling_ruv',
+-                         error='Unable to determine list of RUVs, missing '
+-                               'some masters: %s' %
+-                               ''.join(set(masters) - set(data.keys())))
+-            return
+-
+-        # collect the full set of known RUVs for each master
+-        info = {}
+-        for master in masters:
+-            info[master] = {
+-                'ca': False,           # does the host have ca configured?
+-                'ruvs': set(),         # ruvs on the host
+-                'csruvs': set(),       # csruvs on the host
+-                'clean_ruv': set(),    # ruvs to be cleaned from the host
+-                'clean_csruv': set()   # csruvs to be cleaned from the host
+-                }
+-
+-        for fqdn in data.keys():
+-            outputs = find_checks(data[fqdn], 'ipahealthcheck.ds.ruv',
+-                                  'KnownRUVCheck')
+-            for output in outputs:
+-                if not 'suffix' in output.get('kw'):
+-                    continue
+-                basedn = DN(output.get('kw').get('suffix'))
+-
+-                ruvset = set()
+-                ruvtmp = output.get('kw').get('ruvs')
+-                for ruv in ruvtmp:
+-                    ruvset.add(tuple(ruv))
+-
+-                if basedn == DN('o=ipaca'):
+-                    info[fqdn]['ca'] = True
+-                    info[fqdn]['csruvs'] = ruvset
+-                elif basedn == api.env.basedn:
+-                    info[fqdn]['ruvs'] = ruvset
+-                else:
+-                    yield Result(self, constants.WARNING,
+-                                 name='dangling_ruv',
+-                                 error='Unknown suffix found %s expected %s'
+-                                       % (basedn, api.env.basedn))
+-
+-        # Collect the nsDS5ReplicaID for each master
+-        ruvs = set()
+-        csruvs = set()
+-        for fqdn in data.keys():
+-            outputs = find_checks(data[fqdn], 'ipahealthcheck.ds.ruv',
+-                                  'RUVCheck')
+-            for output in outputs:
+-                if not 'key' in output.get('kw'):
+-                    continue
+-                basedn = DN(output.get('kw').get('key'))
+-                ruv = (fqdn, (output.get('kw').get('ruv')))
+-                if basedn == DN('o=ipaca'):
+-                    csruvs.add(ruv)
+-                elif basedn == api.env.basedn:
+-                    ruvs.add(ruv)
+-                else:
+-                    yield Result(self, constants.WARNING,
+-                                 name='dangling_ruv',
+-                                 error='Unknown suffix found %s expected %s'
+-                                       % (basedn, api.env.basedn))
+-
+-        dangles = False
+-        # get the dangling RUVs
+-        for master_info in info.values():
+-            for ruv in master_info['ruvs']:
+-                if ruv not in ruvs:
+-                    master_info['clean_ruv'].add(ruv)
+-                    dangles = True
+-
+-            # if ca is not configured, there will be no csruvs in master_info
+-            for csruv in master_info['csruvs']:
+-                if csruv not in csruvs:
+-                    master_info['clean_csruv'].add(csruv)
+-                    dangles = True
+-
+-        clean_csruvs = set()
+-        clean_ruvs = set()
+-        if dangles:
+-            for _unused, master_info in info.items():
+-                for ruv in master_info['clean_ruv']:
+-                    logger.debug(
+-                        "Dangling RUV id: %s, hostname: %s", ruv[1], ruv[0]
+-                    )
+-                    clean_ruvs.add(ruv[1])
+-                for csruv in master_info['clean_csruv']:
+-                    logger.debug(
+-                        "Dangling CS RUV id: %s, hostname: %s",
+-                        csruv[1],
+-                        csruv[0]
+-                    )
+-                    clean_csruvs.add(csruv[1])
+-
+-        if clean_ruvs:
+-            yield Result(self, constants.ERROR,
+-                         name='dangling_ruv',
+-                         value=', '.join(clean_ruvs))
+-        else:
+-            yield Result(self, constants.SUCCESS,
+-                         name='dangling_ruv',
+-                         value='No dangling RUVs found')
+-        if clean_csruvs:
+-            yield Result(self, constants.ERROR,
+-                         name='dangling_csruv',
+-                         value=', '.join(clean_csruvs))
+-        else:
+-            yield Result(self, constants.SUCCESS,
+-                         name='dangling_csruv',
+-                         value='No dangling CS RUVs found')
+diff --git a/tests/test_cluster_ruv.py b/tests/test_cluster_ruv.py
+deleted file mode 100644
+index 7583c84..0000000
+--- a/tests/test_cluster_ruv.py
++++ /dev/null
+@@ -1,106 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-from base import BaseTest
+-from util import capture_results
+-
+-from ipahealthcheck.core import config
+-from ipaclustercheck.ipa.plugin import ClusterRegistry
+-from ipaclustercheck.ipa.ruv import ClusterRUVCheck
+-
+-import clusterdata
+-
+-
+-class RUVRegistry(ClusterRegistry):
+-    def load_files(self, dir):
+-        self.json = dir
+-
+-
+-class Options:
+-    def __init__(self, data):
+-        self.data = data
+-
+-    @property
+-    def dir(self):
+-        return self.data
+-
+-
+-registry = RUVRegistry()
+-
+-
+-class TestClusterRUV(BaseTest):
+-
+-    def test_no_ruvs(self):
+-        """Single master test that has never created a replica
+-
+-           This type of master will have no RUVs created at all.
+-        """
+-        framework = object()
+-        registry.initialize(framework, config.Config,
+-                            Options(clusterdata.ONE_MASTER))
+-        f = ClusterRUVCheck(registry)
+-
+-        self.results = capture_results(f)
+-
+-        assert len(self.results) == 2
+-        result = self.results.results[0]
+-        assert result.kw.get('name') == 'dangling_ruv'
+-        assert result.kw.get('value') == 'No dangling RUVs found'
+-        result = self.results.results[1]
+-        assert result.kw.get('name') == 'dangling_csruv'
+-        assert result.kw.get('value') == 'No dangling CS RUVs found'
+-
+-    def test_six_ruvs_ok(self):
+-        """Three master test with each having a CA, no dangling
+-        """
+-        framework = object()
+-        registry.initialize(framework, config.Config,
+-                            Options(clusterdata.THREE_MASTERS_OK))
+-        f = ClusterRUVCheck(registry)
+-
+-        self.results = capture_results(f)
+-
+-        assert len(self.results) == 2
+-        result = self.results.results[0]
+-        assert result.kw.get('name') == 'dangling_ruv'
+-        assert result.kw.get('value') == 'No dangling RUVs found'
+-        result = self.results.results[1]
+-        assert result.kw.get('name') == 'dangling_csruv'
+-        assert result.kw.get('value') == 'No dangling CS RUVs found'
+-
+-    def test_six_ruvs_ipa_bad(self):
+-        """Three master test with each having a CA, dangling IPA RUV
+-        """
+-        framework = object()
+-        registry.initialize(framework, config.Config,
+-                            Options(clusterdata.THREE_MASTERS_BAD_IPA_RUV))
+-        f = ClusterRUVCheck(registry)
+-
+-        self.results = capture_results(f)
+-
+-        assert len(self.results) == 2
+-        result = self.results.results[0]
+-        assert result.kw.get('name') == 'dangling_ruv'
+-        assert result.kw.get('value') == '9'
+-        result = self.results.results[1]
+-        assert result.kw.get('name') == 'dangling_csruv'
+-        assert result.kw.get('value') == 'No dangling CS RUVs found'
+-
+-    def test_six_ruvs_cs_bad(self):
+-        """Three master test with each having a CA, dangling CA RUV
+-        """
+-        framework = object()
+-        registry.initialize(framework, config.Config,
+-                            Options(clusterdata.THREE_MASTERS_BAD_CS_RUV))
+-        f = ClusterRUVCheck(registry)
+-
+-        self.results = capture_results(f)
+-
+-        assert len(self.results) == 2
+-        result = self.results.results[0]
+-        assert result.kw.get('name') == 'dangling_ruv'
+-        assert result.kw.get('value') == 'No dangling RUVs found'
+-        result = self.results.results[1]
+-        assert result.kw.get('name') == 'dangling_csruv'
+-        assert result.kw.get('value') == '9'
+-- 
+2.49.0
+

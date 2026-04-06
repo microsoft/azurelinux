@@ -1,0 +1,17 @@
+--- hickory-resolver-0.24.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hickory-resolver-0.24.4/Cargo.toml	2025-09-18T09:14:33.109080+00:00
+@@ -170,14 +170,6 @@
+     "test-util",
+ ]
+ 
+-[dev-dependencies.tracing-subscriber]
+-version = "0.3"
+-features = [
+-    "std",
+-    "fmt",
+-    "env-filter",
+-]
+-
+ [features]
+ backtrace = [
+     "dep:backtrace",

@@ -1,0 +1,68 @@
+diff --git a/tests/directoryscanner.test.php b/tests/directoryscanner.test.php
+index 403aa06..17141dc 100644
+--- a/tests/directoryscanner.test.php
++++ b/tests/directoryscanner.test.php
+@@ -45,7 +45,7 @@ namespace TheSeer\DirectoryScanner\Tests {
+      * @author     Arne Blankerts <arne@blankerts.de>
+      * @copyright  Arne Blankerts <arne@blankerts.de>, All rights reserved.
+      */
+-    class DirectoryScannerTest extends \PHPUnit_Framework_TestCase {
++    class DirectoryScannerTest extends \PHPUnit\Framework\TestCase {
+ 
+         /**
+          * Test if enabling following symbolic links works.
+@@ -60,19 +60,19 @@ namespace TheSeer\DirectoryScanner\Tests {
+         }
+ 
+         /**
+-         * @expectedException \TheSeer\DirectoryScanner\Exception
+-         * @expectedExceptionCode \TheSeer\DirectoryScanner\Exception::InvalidFlag
+          */
+         public function testSettingInvalidFlagThrowsException() {
++            $this->expectException(\TheSeer\DirectoryScanner\Exception::class);
++            $this->expectExceptionCode(\TheSeer\DirectoryScanner\Exception::InvalidFlag);
+             $tmp = new DirectoryScanner();
+             $tmp->setFlag(-1);
+         }
+ 
+         /**
+-         * @expectedException \TheSeer\DirectoryScanner\Exception
+-         * @expectedExceptionCode \TheSeer\DirectoryScanner\Exception::InvalidFlag
+          */
+         public function testUnSettingInvalidFlagThrowsException() {
++            $this->expectException(\TheSeer\DirectoryScanner\Exception::class);
++            $this->expectExceptionCode(\TheSeer\DirectoryScanner\Exception::InvalidFlag);
+             $tmp = new DirectoryScanner();
+             $tmp->unsetFlag(-1);
+         }
+@@ -127,9 +127,9 @@ namespace TheSeer\DirectoryScanner\Tests {
+         /**
+          * Trying to scan a non existend directory should throw an exception
+          *
+-         * @expectedException \TheSeer\DirectoryScanner\Exception
+          */
+         public function testScanOfNonExistendPath() {
++            $this->expectException(\TheSeer\DirectoryScanner\Exception::class);
+             $tmp = new DirectoryScanner();
+             $tmp(__DIR__ . '/_data//not/existing');
+         }
+diff --git a/tests/phpfilter.test.php b/tests/phpfilter.test.php
+index fc518c6..d800b8f 100644
+--- a/tests/phpfilter.test.php
++++ b/tests/phpfilter.test.php
+@@ -43,7 +43,7 @@ namespace TheSeer\DirectoryScanner\Tests {
+     * @author     Arne Blankerts <arne@blankerts.de>
+     * @copyright  Arne Blankerts <arne@blankerts.de>, All rights reserved.
+     */
+-   class PHPFilterIteratorTest extends \PHPUnit_Framework_TestCase {
++   class PHPFilterIteratorTest extends \PHPUnit\Framework\TestCase {
+ 
+       public function testNonPHPFile() {
+          $list = new \ArrayIterator(
+@@ -81,4 +81,4 @@ namespace TheSeer\DirectoryScanner\Tests {
+ 
+    }
+ 
+-}
+\ No newline at end of file
++}

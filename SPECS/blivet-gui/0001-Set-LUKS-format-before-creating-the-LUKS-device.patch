@@ -1,0 +1,32 @@
+From e8f791a1982cb4cf9155352fe8069a4aed7d26c7 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Thu, 9 Jan 2025 13:33:30 +0100
+Subject: [PATCH] Set LUKS format before creating the LUKS device (#2332338)
+
+In some cases we need the format already configured. This is
+normally done by applying the action, but we do that later in
+these cases.
+---
+ blivetgui/blivet_utils.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/blivetgui/blivet_utils.py b/blivetgui/blivet_utils.py
+index 4b916cf3..038bc366 100644
+--- a/blivetgui/blivet_utils.py
++++ b/blivetgui/blivet_utils.py
+@@ -1029,6 +1029,7 @@ def _create_partition(self, user_input):
+                                                  luks_sector_size=user_input.encryption_sector_size,
+                                                  device=new_part.path)
+             actions.append(blivet.deviceaction.ActionCreateFormat(new_part, part_fmt))
++            new_part.format = part_fmt
+ 
+             luks_dev = LUKSDevice("luks-%s" % new_part.name, size=new_part.size, parents=[new_part])
+             actions.append(blivet.deviceaction.ActionCreateDevice(luks_dev))
+@@ -1084,6 +1085,7 @@ def _create_lvmlv(self, user_input):
+                                                      luks_sector_size=user_input.encryption_sector_size,
+                                                      device=new_lv.path)
+                 actions.append(blivet.deviceaction.ActionCreateFormat(new_lv, luks_fmt))
++                new_lv.format = luks_fmt
+ 
+                 luks_dev = LUKSDevice("luks-%s" % new_lv.name, size=new_lv.size, parents=[new_lv])
+                 actions.append(blivet.deviceaction.ActionCreateDevice(luks_dev))

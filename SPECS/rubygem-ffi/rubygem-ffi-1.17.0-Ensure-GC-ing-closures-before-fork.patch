@@ -1,0 +1,57 @@
+From f9f19cc365753075a5d13d9c14d859b4ec6ca089 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 27 Sep 2024 10:11:10 +0200
+Subject: [PATCH 1/2] Ensure GC-ing closures before fork
+
+Fiddle::Closures can't be used before process is forked, otherwise
+test suite might crash with SELinux. This is similar treatment as is
+used in [Fiddle](https://github.com/ruby/fiddle/commit/1343ac7a9567665affc0e9f4bc9fd74cfd97a5fd).
+
+Fixes #1120
+---
+ spec/ffi/callback_spec.rb | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/spec/ffi/callback_spec.rb b/spec/ffi/callback_spec.rb
+index 38c789e94..57f3c4d6a 100644
+--- a/spec/ffi/callback_spec.rb
++++ b/spec/ffi/callback_spec.rb
+@@ -866,6 +866,11 @@ module LibTestFiddle
+       extern 'void testClosureVrV(void *fp)'
+     end
+ 
++    after :all do
++      GC.start
++      expect(ObjectSpace.each_object(Fiddle::Closure) {}).to eq(0)
++    end
++
+     def assert_callback_in_same_thread_called_once
+       called = 0
+       thread = nil
+
+From dc07b6eb4248c28b0309e93f86ef6863744b4716 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 27 Sep 2024 12:13:36 +0200
+Subject: [PATCH 2/2] Some platforms don't support `fork()`
+
+---
+ spec/ffi/callback_spec.rb | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/spec/ffi/callback_spec.rb b/spec/ffi/callback_spec.rb
+index 57f3c4d6a..46ac17b64 100644
+--- a/spec/ffi/callback_spec.rb
++++ b/spec/ffi/callback_spec.rb
+@@ -867,8 +867,10 @@ module LibTestFiddle
+     end
+ 
+     after :all do
+-      GC.start
+-      expect(ObjectSpace.each_object(Fiddle::Closure) {}).to eq(0)
++      if Process.respond_to?(:fork)
++        GC.start
++        expect(ObjectSpace.each_object(Fiddle::Closure) {}).to eq(0)
++      end
+     end
+ 
+     def assert_callback_in_same_thread_called_once

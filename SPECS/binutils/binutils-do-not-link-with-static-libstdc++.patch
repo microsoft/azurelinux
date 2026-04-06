@@ -1,0 +1,82 @@
+diff -rup binutils.orig/configure binutils-2.40/configure
+--- binutils.orig/configure	2023-02-13 14:43:00.728877170 +0000
++++ binutils-2.40/configure	2023-02-13 14:43:13.671864892 +0000
+@@ -5442,49 +5442,6 @@ if test -z "$LD"; then
+   fi
+ fi
+ 
+-# Check whether -static-libstdc++ -static-libgcc is supported.
+-have_static_libs=no
+-if test "$GCC" = yes; then
+-  saved_LDFLAGS="$LDFLAGS"
+-
+-  LDFLAGS="$LDFLAGS -static-libstdc++ -static-libgcc"
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether g++ accepts -static-libstdc++ -static-libgcc" >&5
+-$as_echo_n "checking whether g++ accepts -static-libstdc++ -static-libgcc... " >&6; }
+-  ac_ext=cpp
+-ac_cpp='$CXXCPP $CPPFLAGS'
+-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+-
+-
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-#if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
+-#error -static-libstdc++ not implemented
+-#endif
+-int main() {}
+-_ACEOF
+-if ac_fn_cxx_try_link "$LINENO"; then :
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+-$as_echo "yes" >&6; }; have_static_libs=yes
+-else
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+-$as_echo "no" >&6; }
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-  ac_ext=c
+-ac_cpp='$CPP $CPPFLAGS'
+-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+-
+-
+-  LDFLAGS="$saved_LDFLAGS"
+-fi
+-
+-
+ 
+ 
+ if test -n "$ac_tool_prefix"; then
+--- binutils.orig/configure.ac	2024-11-26 15:08:50.162328683 +0000
++++ binutils-2.43.50-1686dc7079f/configure.ac	2024-11-26 15:08:56.929374527 +0000
+@@ -1410,26 +1410,6 @@ if test -z "$LD"; then
+   fi
+ fi
+ 
+-# Check whether -static-libstdc++ -static-libgcc is supported.
+-have_static_libs=no
+-if test "$GCC" = yes; then
+-  saved_LDFLAGS="$LDFLAGS"
+-
+-  LDFLAGS="$LDFLAGS -static-libstdc++ -static-libgcc"
+-  AC_MSG_CHECKING([whether g++ accepts -static-libstdc++ -static-libgcc])
+-  AC_LANG_PUSH(C++)
+-  AC_LINK_IFELSE([AC_LANG_SOURCE([
+-#if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
+-#error -static-libstdc++ not implemented
+-#endif
+-int main() {}])],
+-    [AC_MSG_RESULT([yes]); have_static_libs=yes],
+-    [AC_MSG_RESULT([no])])
+-  AC_LANG_POP(C++)
+-
+-  LDFLAGS="$saved_LDFLAGS"
+-fi
+-
+ ACX_PROG_GNAT
+ ACX_PROG_GDC
+ ACX_PROG_CARGO

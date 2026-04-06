@@ -1,0 +1,25 @@
+From 5f73befe5a0df82e455f4b1052e62f34009e98bb Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Tue, 23 Apr 2024 15:08:34 -0700
+Subject: [PATCH] Fix page size constant on aarch64 and ppc64le
+
+---
+ compiler-rt/lib/cfi/cfi.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/compiler-rt/lib/cfi/cfi.cpp b/compiler-rt/lib/cfi/cfi.cpp
+index ad1c91623514..e7e86e5807a8 100644
+--- a/compiler-rt/lib/cfi/cfi.cpp
++++ b/compiler-rt/lib/cfi/cfi.cpp
+@@ -53,6 +53,8 @@ namespace __cfi {
+ 
+ #if SANITIZER_LOONGARCH64
+ #define kCfiShadowLimitsStorageSize 16384 // 16KiB on loongarch64 per page
++#elif defined(__aarch64__) || defined(__powerpc64__)
++#define kCfiShadowLimitsStorageSize 65536 // 1 page
+ #else
+ #define kCfiShadowLimitsStorageSize 4096 // 1 page
+ #endif
+-- 
+2.40.1
+

@@ -1,0 +1,39 @@
+From c93008e4d06abb0072e0e5e57d84a4ae182ecfc0 Mon Sep 17 00:00:00 2001
+From: Błażej Szczygieł <mumei6102@gmail.com>
+Date: Tue, 21 Oct 2025 19:49:17 +0200
+Subject: [PATCH] wayland: Fix crash in QWaylandShmBackingStore::scroll()
+
+Fixes a crash when monitor is unplugged while scrolling.
+
+recreateBackBufferIfNeeded() calls getBuffer() which may set
+mFrontBuffer to nullptr.
+
+Amends: 6f25f703fd37a900c139e14a33a4639502bfeae7
+
+Task-number: QTBUG-139231
+Change-Id: Ia5bedce2a3f6580c722f73446de81a26d40ea2f4
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+---
+
+diff --git a/src/plugins/platforms/wayland/qwaylandshmbackingstore.cpp b/src/plugins/platforms/wayland/qwaylandshmbackingstore.cpp
+index b853db2..fa70b53 100644
+--- a/src/plugins/platforms/wayland/qwaylandshmbackingstore.cpp
++++ b/src/plugins/platforms/wayland/qwaylandshmbackingstore.cpp
+@@ -229,7 +229,7 @@
+ // Inspired by QCALayerBackingStore.
+ bool QWaylandShmBackingStore::scroll(const QRegion &region, int dx, int dy)
+ {
+-    if (Q_UNLIKELY(!mBackBuffer || !mFrontBuffer))
++    if (Q_UNLIKELY(!mBackBuffer))
+         return false;
+ 
+     const qreal devicePixelRatio = waylandWindow()->scale();
+@@ -241,6 +241,8 @@
+         return false;
+ 
+     recreateBackBufferIfNeeded();
++    if (!mFrontBuffer)
++        return false;
+ 
+     const QPoint scrollDelta(dx, dy);
+     const QMargins margins = windowDecorationMargins();

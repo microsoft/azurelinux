@@ -1,0 +1,187 @@
+From d3117ae1bb422f771f1c19af54f81d5151f55065 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 29 Mar 2010 17:20:34 +0000
+Subject: [PATCH] coreutils-df-direct.patch
+
+---
+ doc/coreutils.texi |  7 ++++++
+ src/df.c           | 34 ++++++++++++++++++++++++++--
+ tests/df/direct.sh | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 94 insertions(+), 2 deletions(-)
+ create mode 100755 tests/df/direct.sh
+
+diff --git a/doc/coreutils.texi b/doc/coreutils.texi
+index d1c282f..6d1ee11 100644
+--- a/doc/coreutils.texi
++++ b/doc/coreutils.texi
+@@ -12467,6 +12467,13 @@ some systems (notably Solaris), doing this yields more up to date results,
+ but in general this option makes @command{df} much slower, especially when
+ there are many or very busy file systems.
+ 
++@item --direct
++@opindex --direct
++@cindex direct statfs for a file
++Do not resolve mount point and show statistics directly for a file. It can be
++especially useful for NFS mount points if there is a boundary between two
++storage policies behind the mount point.
++
+ @item --total
+ @opindex --total
+ @cindex grand total of file system size, usage and available space
+diff --git a/src/df.c b/src/df.c
+index a969c5c..c465a3f 100644
+--- a/src/df.c
++++ b/src/df.c
+@@ -122,6 +122,9 @@ static bool print_type;
+ /* If true, print a grand total at the end.  */
+ static bool print_grand_total;
+ 
++/* If true, show statistics for a file instead of mount point.  */
++static bool direct_statfs;
++
+ /* Grand total data.  */
+ static struct fs_usage grand_fsu;
+ 
+@@ -249,13 +252,15 @@ enum
+   NO_SYNC_OPTION = CHAR_MAX + 1,
+   SYNC_OPTION,
+   TOTAL_OPTION,
+-  OUTPUT_OPTION
++  OUTPUT_OPTION,
++  DIRECT_OPTION
+ };
+ 
+ static struct option const long_options[] =
+ {
+   {"all", no_argument, nullptr, 'a'},
+   {"block-size", required_argument, nullptr, 'B'},
++  {"direct", no_argument, nullptr, DIRECT_OPTION},
+   {"inodes", no_argument, nullptr, 'i'},
+   {"human-readable", no_argument, nullptr, 'h'},
+   {"si", no_argument, nullptr, 'H'},
+@@ -572,7 +577,10 @@ get_header (void)
+   for (idx_t col = 0; col < ncolumns; col++)
+     {
+       char *cell;
+-      char const *header = _(columns[col]->caption);
++      char const *header = (columns[col]->field == TARGET_FIELD
++                            && direct_statfs)?
++                            _("File") :
++                            _(columns[col]->caption);
+ 
+       if (columns[col]->field == SIZE_FIELD
+           && (header_mode == DEFAULT_MODE
+@@ -1454,6 +1462,17 @@ get_point (char const *point, const struct stat *statp)
+ static void
+ get_entry (char const *name, struct stat const *statp)
+ {
++  if (direct_statfs)
++    {
++      char *resolved = canonicalize_file_name (name);
++      if (resolved)
++        {
++          get_dev (NULL, resolved, name, NULL, NULL, false, false, NULL, false);
++          free (resolved);
++          return;
++        }
++    }
++
+   if ((S_ISBLK (statp->st_mode) || S_ISCHR (statp->st_mode))
+       && get_device (name))
+     return;
+@@ -1524,6 +1543,7 @@ or all file systems by default.\n\
+   -B, --block-size=SIZE  scale sizes by SIZE before printing them; e.g.,\n\
+                            '-BM' prints sizes in units of 1,048,576 bytes;\n\
+                            see SIZE format below\n\
++      --direct          show statistics for a file instead of mount point\n\
+   -h, --human-readable  print sizes in powers of 1024 (e.g., 1023M)\n\
+   -H, --si              print sizes in powers of 1000 (e.g., 1.1G)\n\
+ "), stdout);
+@@ -1618,6 +1638,9 @@ main (int argc, char **argv)
+               xstrtol_fatal (e, oi, c, long_options, optarg);
+           }
+           break;
++        case DIRECT_OPTION:
++          direct_statfs = true;
++          break;
+         case 'i':
+           if (header_mode == OUTPUT_MODE)
+             {
+@@ -1714,6 +1737,13 @@ main (int argc, char **argv)
+         }
+     }
+ 
++  if (direct_statfs && show_local_fs)
++    {
++      error (0, 0, _("options --direct and --local (-l) are mutually "
++                     "exclusive"));
++      usage (EXIT_FAILURE);
++    }
++
+   if (human_output_opts == -1)
+     {
+       if (posix_format)
+diff --git a/tests/df/direct.sh b/tests/df/direct.sh
+new file mode 100755
+index 0000000..8e4cfb8
+--- /dev/null
++++ b/tests/df/direct.sh
+@@ -0,0 +1,55 @@
++#!/bin/sh
++# Ensure "df --direct" works as documented
++
++# Copyright (C) 2010 Free Software Foundation, Inc.
++
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++. "${srcdir=.}/init.sh"; path_prepend_ ../src
++print_ver_ df
++
++df || skip_ "df fails"
++
++DIR=`pwd` || framework_failure
++FILE="$DIR/file"
++touch "$FILE" || framework_failure
++echo "$FILE" > file_exp || framework_failure
++echo "Mounted on" > header_mounted_exp || framework_failure
++echo "File" > header_file_exp || framework_failure
++
++fail=0
++
++df --portability "$FILE" > df_out || fail=1
++df --portability --direct "$FILE" > df_direct_out || fail=1
++df --portability --direct --local "$FILE" > /dev/null 2>&1 && fail=1
++
++# check df header
++$AWK '{ if (NR==1) print $6 " " $7; }' df_out > header_mounted_out \
++  || framework_failure
++$AWK '{ if (NR==1) print $6; }' df_direct_out > header_file_out \
++  || framework_failure
++compare header_mounted_out header_mounted_exp || fail=1
++compare header_file_out header_file_exp || fail=1
++
++# check df output (without --direct)
++$AWK '{ if (NR==2) print $6; }' df_out > file_out \
++  || framework_failure
++compare file_out file_exp && fail=1
++
++# check df output (with --direct)
++$AWK '{ if (NR==2) print $6; }' df_direct_out > file_out \
++  || framework_failure
++compare file_out file_exp || fail=1
++
++Exit $fail
+-- 
+2.49.0
+

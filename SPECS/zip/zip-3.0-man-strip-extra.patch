@@ -1,0 +1,11 @@
+--- ./man/zip.1.old	2024-12-11 10:51:22.837845520 +0100
++++ ./man/zip.1	2024-12-11 10:51:34.458142392 +0100
+@@ -2297,7 +2297,7 @@
+ .B \-X
+ .TP
+ .PD
+-.B \-\-no\-extra
++.B \-\-strip\-extra
+ Do not save extra file attributes (Extended Attributes on OS/2, uid/gid
+ and file times on Unix).  The zip format uses extra fields to include
+ additional information for each entry.  Some extra fields are specific

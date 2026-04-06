@@ -1,0 +1,30 @@
+From 275865e620471c194560824232be632c9cb61600 Mon Sep 17 00:00:00 2001
+From: Heiko Becker <mail@heiko-becker.de>
+Date: Fri, 9 Feb 2024 20:52:29 +0100
+Subject: Replace imp with importlib to support Python 3.12
+
+The imp module has been removed from Python 3.12 [1], replace it with
+importlib. importlib.reload() is available since Python 3.4.
+
+Fixes #34.
+
+[1] https://docs.python.org/3.12/whatsnew/3.12.html
+---
+ test/test_basedirectory.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_basedirectory.py b/test/test_basedirectory.py
+index 954f573..e62f923 100644
+--- a/test/test_basedirectory.py
++++ b/test/test_basedirectory.py
+@@ -9,7 +9,7 @@ import stat
+ try:
+     reload
+ except NameError:
+-    from imp import reload
++    from importlib import reload
+ 
+ class BaseDirectoryTest(unittest.TestCase):
+     def setUp(self):
+-- 
+cgit v1.2.3

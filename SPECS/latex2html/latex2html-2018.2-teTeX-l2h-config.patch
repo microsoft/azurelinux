@@ -1,0 +1,11 @@
+diff -up latex2html-2018.2/latex2html-2018.2/config/config.pl.me latex2html-2018.2/latex2html-2018.2/config/config.pl
+--- latex2html-2018.2/latex2html-2018.2/config/config.pl.me	2018-06-22 16:43:28.830829027 +0200
++++ latex2html-2018.2/latex2html-2018.2/config/config.pl	2018-06-22 16:43:58.532706324 +0200
+@@ -635,6 +635,7 @@ $abs_path_names = &get_name('ABSPATHS');
+ # DBM check
+ # --------------------------------------------------------------------------
+ 
++use DB;
+ &checking('if perl supports some dbm');
+ 
+ my %array;

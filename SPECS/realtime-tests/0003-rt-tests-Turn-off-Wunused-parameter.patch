@@ -1,0 +1,35 @@
+From 0a5eb38592c13d0e0f641a823df6d4f7debe5644 Mon Sep 17 00:00:00 2001
+From: Crystal Wood <crwood@redhat.com>
+Date: Tue, 7 Jan 2025 17:02:27 -0500
+Subject: [PATCH 3/5] rt-tests: Turn off -Wunused-parameter
+
+-Wunused-parameter (part of -Wextra) is an obnoxious warning as it flags
+perfectly reasonable code that takes unneeded parameters in order to
+comply with a function pointer interface, or where the parameter is used
+only by code inside an ifdef, etc.  This results in numerous annotations
+just to shut the compiler up, all for a warning that has relatively
+little value even in cases where it's not a false positive (where it's
+just an indication that cleanup is warranted).
+
+Signed-off-by: Crystal Wood <crwood@redhat.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0fa0928bbca7..dda29c3f5b85 100644
+--- a/Makefile
++++ b/Makefile
+@@ -33,7 +33,7 @@ prefix  ?= /usr/local
+ bindir  ?= $(prefix)/bin
+ mandir	?= $(prefix)/share/man
+ 
+-CFLAGS ?= -Wall -Wno-nonnull -Wextra -Wno-sign-compare
++CFLAGS ?= -Wall -Wno-nonnull -Wextra -Wno-sign-compare -Wno-unused-parameter
+ CPPFLAGS += -D_GNU_SOURCE -Isrc/include
+ LDFLAGS ?=
+ 
+-- 
+2.47.1
+

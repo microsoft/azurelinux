@@ -1,0 +1,32 @@
+--- foldhash-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ foldhash-0.2.0/Cargo.toml	2025-09-11T15:18:47.360005+00:00
+@@ -52,29 +52,8 @@
+ 
+ [dependencies]
+ 
+-[dev-dependencies.ahash]
+-version = "0.8"
+-
+-[dev-dependencies.chrono]
+-version = "0.4"
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+-[dev-dependencies.fxhash]
+-version = "0.2"
+-
+ [dev-dependencies.hashbrown]
+ version = "0.15"
+ 
+-[dev-dependencies.rand]
+-version = "0.8"
+-
+-[dev-dependencies.rapidhash]
+-version = "3.1.0"
+-
+-[dev-dependencies.uuid]
+-version = "1.8"
+-
+ [profile.release]
+ lto = "thin"

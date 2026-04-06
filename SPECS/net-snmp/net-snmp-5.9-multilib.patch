@@ -1,0 +1,48 @@
+diff --git a/man/netsnmp_config_api.3.def b/man/netsnmp_config_api.3.def
+index 90b20d9..bd5abe1 100644
+--- a/man/netsnmp_config_api.3.def
++++ b/man/netsnmp_config_api.3.def
+@@ -295,7 +295,7 @@ for one particular machine.
+ .PP
+ The default list of directories to search is \fC SYSCONFDIR/snmp\fP,
+ followed by \fC DATADIR/snmp\fP,
+-followed by \fC LIBDIR/snmp\fP,
++followed by \fC /usr/lib(64)/snmp\fP,
+ followed by \fC $HOME/.snmp\fP.
+ This list can be changed by setting the environmental variable
+ .I SNMPCONFPATH
+@@ -367,7 +367,7 @@ A colon separated list of directories to search for configuration
+ files in.
+ Default:
+ .br
+-SYSCONFDIR/snmp:\:DATADIR/snmp:\:LIBDIR/snmp:\:$HOME/.snmp
++SYSCONFDIR/snmp:\:DATADIR/snmp:\:/usr/lib(64)/snmp:\:$HOME/.snmp
+ .SH "SEE ALSO"
+ netsnmp_mib_api(3), snmp_api(3)
+ .\" Local Variables:
+diff --git a/man/snmp_config.5.def b/man/snmp_config.5.def
+index fd30873..c3437d6 100644
+--- a/man/snmp_config.5.def
++++ b/man/snmp_config.5.def
+@@ -10,7 +10,7 @@ First off, there are numerous places that configuration files can be
+ found and read from.  By default, the applications look for
+ configuration files in the following 4 directories, in order:
+ SYSCONFDIR/snmp,
+-DATADIR/snmp, LIBDIR/snmp, and $HOME/.snmp.  In each of these
++DATADIR/snmp, /usr/lib(64)/snmp, and $HOME/.snmp.  In each of these
+ directories, it looks for files snmp.conf, snmpd.conf and/or
+ snmptrapd.conf, as well as snmp.local.conf, snmpd.local.conf
+ and/or snmptrapd.local.conf. *.local.conf are always
+diff --git a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
+index 7ce8a46..a4000f9 100644
+--- a/man/snmpd.conf.5.def
++++ b/man/snmpd.conf.5.def
+@@ -1593,7 +1593,7 @@ filename), and call the initialisation routine \fIinit_NAME\fR.
+ .RS
+ .IP "Note:"
+ If the specified PATH is not a fully qualified filename, it will
+-be interpreted relative to LIBDIR/snmp/dlmod, and \fC.so\fR
++be interpreted relative to /usr/lib(64)/snmp/dlmod, and \fC.so\fR
+ will be appended to the filename.
+ .RE
+ .PP

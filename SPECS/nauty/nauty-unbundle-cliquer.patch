@@ -1,0 +1,3226 @@
+--- a/makefile.in
++++ b/makefile.in
+@@ -6,7 +6,7 @@ SHELL=@SHELL@
+ CC=@CC@
+ CFLAGS=@CFLAGS@ @MORECFLAGS@
+ CCC=${CC} ${CPPFLAGS} ${CFLAGS}
+-LDFLAGS=@LDFLAGS@ @LIBS@
++LDFLAGS=@LDFLAGS@ @LIBS@ -lcliquer
+ TESTPROGS=@testprogs@
+ NAUTESTS=@nautests@
+ EXEEXT=@EXEEXT@
+--- a/nautycliquer.c
++++ b/nautycliquer.c
+@@ -18,2573 +18,6 @@
+ 
+ #include "nautycliquer.h"
+ 
+-/*
+- * This file contains the clique searching routines.
+- *
+- * Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
+- * Licensed under the GNU GPL, read the file LICENSE for details.
+- * This version covered by nauty&Traces licence, see file COPYRIGHT.
+- */
+-
+-/*
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <limits.h>
+-#include <unistd.h>
+-#include <sys/time.h>
+-#include <sys/times.h>
+-
+-#include "cliquer.h"
+-*/
+-
+-
+-/* Default cliquer options; no TLS_ATTR on this one */
+-static clique_options clique_default_options_struct = {
+-        reorder_by_default, NULL, clique_print_time, NULL, NULL, NULL, NULL, 0
+-};
+-clique_options *clique_default_options=&clique_default_options_struct;
+-
+-
+-/* Calculate d/q, rounding result upwards/downwards. */
+-#define DIV_UP(d,q) (((d)+(q)-1)/(q))
+-#define DIV_DOWN(d,q) ((int)((d)/(q)))
+-
+-
+-/* Global variables used: */
+-/* These must be saved and restored in re-entrance. */
+-static TLS_ATTR int *clique_size;      /* c[i] == max. clique size in {0,1,...,i-1} */
+-static TLS_ATTR set_t current_clique;  /* Current clique being searched. */
+-static TLS_ATTR set_t best_clique;     /* Largest/heaviest clique found so far. */
+-#if 0
+-static struct tms cputimer;      /* Timer for opts->time_function() */
+-static struct timeval realtimer; /* Timer for opts->time_function() */
+-#endif
+-static TLS_ATTR int clique_list_count=0;  /* No. of cliques in opts->clique_list[] */
+-static TLS_ATTR int weight_multiplier=1;  /* Weights multiplied by this when passing
+-                                  * to time_function(). */
+-
+-/* List cache (contains memory blocks of size g->n * sizeof(int)) */
+-static TLS_ATTR int **temp_list=NULL;
+-static TLS_ATTR int temp_count=0;
+-
+-
+-/*
+- * Macros for re-entrance.  ENTRANCE_SAVE() must be called immediately
+- * after variable definitions, ENTRANCE_RESTORE() restores global
+- * variables to original values.  entrance_level should be increased
+- * and decreased accordingly.
+- */
+-static int entrance_level=0;  /* How many levels for entrance have occurred? */
+-
+-#define ENTRANCE_SAVE() \
+-int *old_clique_size = clique_size;                     \
+-set_t old_current_clique = current_clique;              \
+-set_t old_best_clique = best_clique;                    \
+-int old_clique_list_count = clique_list_count;          \
+-int old_weight_multiplier = weight_multiplier;          \
+-int **old_temp_list = temp_list; 
+-/*
+-int old_temp_count = temp_count;
+-struct tms old_cputimer;                                \
+-struct timeval old_realtimer;                           \
+-memcpy(&old_cputimer,&cputimer,sizeof(struct tms));       \
+-memcpy(&old_realtimer,&realtimer,sizeof(struct timeval))
+-*/
+-
+-#define ENTRANCE_RESTORE() \
+-clique_size = old_clique_size;                          \
+-current_clique = old_current_clique;                    \
+-best_clique = old_best_clique;                          \
+-clique_list_count = old_clique_list_count;              \
+-weight_multiplier = old_weight_multiplier;              \
+-temp_list = old_temp_list;
+-/*
+-temp_count = old_temp_count;                            \
+-memcpy(&cputimer,&old_cputimer,sizeof(struct tms));       \
+-memcpy(&realtimer,&old_realtimer,sizeof(struct timeval));
+-temp_count = old_temp_count;
+-*/
+-
+-
+-/* Number of clock ticks per second (as returned by sysconf(_SC_CLK_TCK)) */
+-#if 0
+-static int clocks_per_sec=0;
+-#endif
+-
+-/* Recursion and helper functions */
+-static boolean sub_unweighted_single(int *table, int size, int min_size,
+-                                     graph_t *g);
+-static int sub_unweighted_all(int *table, int size, int min_size, int max_size,
+-                              boolean maximal, graph_t *g,
+-                              clique_options *opts);
+-static int sub_weighted_all(int *table, int size, int weight,
+-                            int current_weight, int prune_low, int prune_high,
+-                            int min_weight, int max_weight, boolean maximal,
+-                            graph_t *g, clique_options *opts);
+-
+-
+-static boolean store_clique(set_t clique, graph_t *g, clique_options *opts);
+-static boolean is_maximal(set_t clique, graph_t *g);
+-static boolean false_function(set_t clique,graph_t *g,clique_options *opts);
+-
+-/*****  Unweighted searches  *****/
+-/*
+- * Unweighted searches are done separately from weighted searches because
+- * some effective pruning methods can be used when the vertex weights
+- * are all 1.  Single and all clique finding routines are separated,
+- * because the single clique finding routine can store the found clique
+- * while it is returning from the recursion, thus requiring no implicit
+- * storing of the current clique.  When searching for all cliques the
+- * current clique must be stored.
+- */
+-
+-
+-/*
+- * unweighted_clique_search_single()
+- *
+- * Searches for a single clique of size min_size.  Stores maximum clique
+- * sizes into clique_size[].
+- *
+- *   table    - the order of the vertices in g to use
+- *   min_size - minimum size of clique to search for.  If min_size==0,
+- *              searches for a maximum clique.
+- *   g        - the graph
+- *   opts     - time printing options
+- *
+- * opts->time_function is called after each base-level recursion, if
+- * non-NULL.   (NOT IN THIS VERSION)
+- *
+- * Returns the size of the clique found, or 0 if min_size>0 and a clique
+- * of that size was not found (or if time_function aborted the search).
+- * The largest clique found is stored in current_clique.
+- *
+- * Note: Does NOT use opts->user_function of opts->clique_list.
+- */
+-static int unweighted_clique_search_single(int *table, int min_size,
+-                                           graph_t *g, clique_options *opts) {
+-#if 0
+-        struct tms tms;
+-        struct timeval timeval;
+-#endif
+-        int i,j;
+-        int v,w;
+-        int *newtable;
+-        int newsize;
+-
+-        v=table[0];
+-        clique_size[v]=1;
+-        set_empty(current_clique);
+-        SET_ADD_ELEMENT(current_clique,v);
+-        if (min_size==1)
+-                return 1;
+-
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-        for (i=1; i < g->n; i++) {
+-                w=v;
+-                v=table[i];
+-
+-                newsize=0;
+-                for (j=0; j<i; j++) {
+-                        if (GRAPH_IS_EDGE(g, v, table[j])) {
+-                                newtable[newsize]=table[j];
+-                                newsize++;
+-                        }
+-                }
+-
+-                if (sub_unweighted_single(newtable,newsize,clique_size[w],g)) {
+-                        SET_ADD_ELEMENT(current_clique,v);
+-                        clique_size[v]=clique_size[w]+1;
+-                } else {
+-                        clique_size[v]=clique_size[w];
+-                }
+-
+-#if 0
+-                if (opts && opts->time_function) {
+-                        gettimeofday(&timeval,NULL);
+-                        times(&tms);
+-                        if (!opts->time_function(entrance_level,
+-                                                 i+1,g->n,clique_size[v] *
+-                                                 weight_multiplier,
+-                                                 (double)(tms.tms_utime-
+-                                                          cputimer.tms_utime)/
+-                                                 clocks_per_sec,
+-                                                 timeval.tv_sec-
+-                                                 realtimer.tv_sec+
+-                                                 (double)(timeval.tv_usec-
+-                                                          realtimer.tv_usec)/
+-                                                 1000000,opts)) {
+-                                temp_list[temp_count++]=newtable;
+-                                return 0;
+-                        }
+-                }
+-#endif
+-
+-                if (min_size) {
+-                        if (clique_size[v]>=min_size) {
+-                                temp_list[temp_count++]=newtable;
+-                                return clique_size[v];
+-                        }
+-                        if (clique_size[v]+g->n-i-1 < min_size) {
+-                                temp_list[temp_count++]=newtable;
+-                                return 0;
+-                        }
+-                }
+-        }
+-
+-        temp_list[temp_count++]=newtable;
+-
+-        if (min_size)
+-                return 0;
+-        return clique_size[v];
+-}
+-
+-/*
+- * sub_unweighted_single()
+- *
+- * Recursion function for searching for a single clique of size min_size.
+- *
+- *    table    - subset of the vertices in graph
+- *    size     - size of table
+- *    min_size - size of clique to look for within the subgraph
+- *               (decreased with every recursion)
+- *    g        - the graph
+- *
+- * Returns TRUE if a clique of size min_size is found, FALSE otherwise.
+- * If a clique of size min_size is found, it is stored in current_clique.
+- *
+- * clique_size[] for all values in table must be defined and correct,
+- * otherwise inaccurate results may occur.
+- */
+-static boolean sub_unweighted_single(int *table, int size, int min_size,
+-                                     graph_t *g) {
+-        int i;
+-        int v;
+-        int *newtable;
+-        int *p1, *p2;
+-
+-        /* Zero or one vertices needed anymore. */
+-        if (min_size <= 1) {
+-                if (size>0 && min_size==1) {
+-                        set_empty(current_clique);
+-                        SET_ADD_ELEMENT(current_clique,table[0]);
+-                        return TRUE;
+-                }
+-                if (min_size==0) {
+-                        set_empty(current_clique);
+-                        return TRUE;
+-                }
+-                return FALSE;
+-        }
+-        if (size < min_size)
+-                return FALSE;
+-
+-        /* Dynamic memory allocation with cache */
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        for (i = size-1; i >= 0; i--) {
+-                v = table[i];
+-
+-                if (clique_size[v] < min_size)
+-                        break;
+-                /* This is faster when compiling with gcc than placing
+-                 * this in the for-loop condition. */
+-                if (i+1 < min_size)
+-                        break;
+-
+-                /* Very ugly code, but works faster than "for (i=...)" */
+-                p1 = newtable;
+-                for (p2=table; p2 < table+i; p2++) {
+-                        int w = *p2;
+-                        if (GRAPH_IS_EDGE(g, v, w)) {
+-                                *p1 = w;
+-                                p1++;
+-                        }
+-                }
+-
+-                /* Avoid unneccessary loops (next size == p1-newtable) */
+-                if (p1-newtable < min_size-1)
+-                        continue;
+-                /* Now p1-newtable >= min_size-1 >= 2-1 == 1, so we can use
+-                 * p1-newtable-1 safely. */
+-                if (clique_size[newtable[p1-newtable-1]] < min_size-1)
+-                        continue;
+-
+-                if (sub_unweighted_single(newtable,p1-newtable,
+-                                          min_size-1,g)) {
+-                        /* Clique found. */
+-                        SET_ADD_ELEMENT(current_clique,v);
+-                        temp_list[temp_count++]=newtable;
+-                        return TRUE;
+-                }
+-        }
+-        temp_list[temp_count++]=newtable;
+-        return FALSE;
+-}
+-
+-
+-/*
+- * unweighted_clique_search_all()
+- *
+- * Searches for all cliques with size at least min_size and at most
+- * max_size.  Stores the cliques as opts declares.
+- *
+- *   table    - the order of the vertices in g to search
+- *   start    - first index where the subgraph table[0], ..., table[start]
+- *              might include a requested kind of clique
+- *   min_size - minimum size of clique to search for.  min_size > 0 !
+- *   max_size - maximum size of clique to search for.  If no upper limit
+- *              is desired, use eg. INT_MAX
+- *   maximal  - requires cliques to be maximal
+- *   g        - the graph
+- *   opts     - time printing and clique storage options
+- *
+- * Cliques found are stored as defined by opts->user_function and
+- * opts->clique_list.  opts->time_function is called after each
+- * base-level recursion, if non-NULL.
+- *
+- * clique_size[] must be defined and correct for all values of
+- * table[0], ..., table[start-1].
+- *
+- * Returns the number of cliques stored (not neccessarily number of cliques
+- * in graph, if user/time_function aborts).
+- */
+-static int unweighted_clique_search_all(int *table, int start,
+-                                        int min_size, int max_size,
+-                                        boolean maximal, graph_t *g,
+-                                        clique_options *opts) {
+-#if 0
+-        struct timeval timeval;
+-        struct tms tms;
+-#endif
+-        int i,j;
+-        int v;
+-        int *newtable;
+-        int newsize;
+-        int count=0;
+-
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        clique_list_count=0;
+-        set_empty(current_clique);
+-        for (i=start; i < g->n; i++) {
+-                v=table[i];
+-                clique_size[v]=min_size;  /* Do not prune here. */
+-
+-                newsize=0;
+-                for (j=0; j<i; j++) {
+-                        if (GRAPH_IS_EDGE(g,v,table[j])) {
+-                                newtable[newsize]=table[j];
+-                                newsize++;
+-                        }
+-                }
+-
+-                SET_ADD_ELEMENT(current_clique,v);
+-                j=sub_unweighted_all(newtable,newsize,min_size-1,max_size-1,
+-                                     maximal,g,opts);
+-                SET_DEL_ELEMENT(current_clique,v);
+-                if (j<0) {
+-                        /* Abort. */
+-                        count-=j;
+-                        break;
+-                }
+-                count+=j;
+-
+-#if 0
+-                if (opts->time_function) {
+-                        gettimeofday(&timeval,NULL);
+-                        times(&tms);
+-                        if (!opts->time_function(entrance_level,
+-                                                 i+1,g->n,min_size *
+-                                                 weight_multiplier,
+-                                                 (double)(tms.tms_utime-
+-                                                          cputimer.tms_utime)/
+-                                                 clocks_per_sec,
+-                                                 timeval.tv_sec-
+-                                                 realtimer.tv_sec+
+-                                                 (double)(timeval.tv_usec-
+-                                                          realtimer.tv_usec)/
+-                                                 1000000,opts)) {
+-                                /* Abort. */
+-                                break;
+-                        }
+-                }
+-#endif
+-        }
+-        temp_list[temp_count++]=newtable;
+-        return count;
+-}
+-
+-/*
+- * sub_unweighted_all()
+- *
+- * Recursion function for searching for all cliques of given size.
+- *
+- *   table    - subset of vertices of graph g
+- *   size     - size of table
+- *   min_size - minimum size of cliques to search for (decreased with
+- *              every recursion)
+- *   max_size - maximum size of cliques to search for (decreased with
+- *              every recursion).  If no upper limit is desired, use
+- *              eg. INT_MAX
+- *   maximal  - require cliques to be maximal (passed through)
+- *   g        - the graph
+- *   opts     - storage options
+- *
+- * All cliques of suitable size found are stored according to opts.
+- *
+- * Returns the number of cliques found.  If user_function returns FALSE,
+- * then the number of cliques is returned negative.
+- *
+- * Uses current_clique to store the currently-being-searched clique.
+- * clique_size[] for all values in table must be defined and correct,
+- * otherwise inaccurate results may occur.
+- */
+-static int sub_unweighted_all(int *table, int size, int min_size, int max_size,
+-                              boolean maximal, graph_t *g,
+-                              clique_options *opts) {
+-        int i;
+-        int v;
+-        int n;
+-        int *newtable;
+-        int *p1, *p2;
+-        int count=0;     /* Amount of cliques found */
+-
+-        if (min_size <= 0) {
+-                if ((!maximal) || is_maximal(current_clique,g)) {
+-                        /* We've found one.  Store it. */
+-                        count++;
+-                        if (!store_clique(current_clique,g,opts)) {
+-                                return -count;
+-                        }
+-                }
+-                if (max_size <= 0) {
+-                        /* If we add another element, size will be too big. */
+-                        return count;
+-                }
+-        }
+-
+-        if (size < min_size) {
+-                return count;
+-        }
+-
+-        /* Dynamic memory allocation with cache */
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        for (i=size-1; i>=0; i--) {
+-                v = table[i];
+-                if (clique_size[v] < min_size) {
+-                        break;
+-                }
+-                if (i+1 < min_size) {
+-                        break;
+-                }
+-
+-                /* Very ugly code, but works faster than "for (i=...)" */
+-                p1 = newtable;
+-                for (p2=table; p2 < table+i; p2++) {
+-                        int w = *p2;
+-                        if (GRAPH_IS_EDGE(g, v, w)) {
+-                                *p1 = w;
+-                                p1++;
+-                        }
+-                }
+-
+-                /* Avoid unneccessary loops (next size == p1-newtable) */
+-                if (p1-newtable < min_size-1) {
+-                        continue;
+-                }
+-
+-                SET_ADD_ELEMENT(current_clique,v);
+-                n=sub_unweighted_all(newtable,p1-newtable,
+-                                     min_size-1,max_size-1,maximal,g,opts);
+-                SET_DEL_ELEMENT(current_clique,v);
+-                if (n < 0) {
+-                        /* Abort. */
+-                        count -= n;
+-                        count = -count;
+-                        break;
+-                }
+-                count+=n;
+-        }
+-        temp_list[temp_count++]=newtable;
+-        return count;
+-}
+-
+-
+-
+-
+-/***** Weighted clique searches *****/
+-/*
+- * Weighted clique searches can use the same recursive routine, because
+- * in both cases (single/all) they have to search through all potential
+- * permutations searching for heavier cliques.
+- */
+-
+-
+-/*
+- * weighted_clique_search_single()
+- *
+- * Searches for a single clique of weight at least min_weight, and at
+- * most max_weight.  Stores maximum clique sizes into clique_size[]
+- * (or min_weight-1, whichever is smaller).
+- *
+- *   table      - the order of the vertices in g to use
+- *   min_weight - minimum weight of clique to search for.  If min_weight==0,
+- *                then searches for a maximum weight clique
+- *   max_weight - maximum weight of clique to search for.  If no upper limit
+- *                is desired, use eg. INT_MAX
+- *   g          - the graph
+- *   opts       - time printing options
+- *
+- * opts->time_function is called after each base-level recursion, if
+- * non-NULL.
+- *
+- * Returns 0 if a clique of requested weight was not found (also if
+- * time_function requested an abort), otherwise returns >= 1.
+- * If min_weight==0 (search for maximum-weight clique), then the return
+- * value is the weight of the clique found.  The found clique is stored
+- * in best_clique.
+- *
+- * Note: Does NOT use opts->user_function of opts->clique_list.
+- */
+-static int weighted_clique_search_single(int *table, int min_weight,
+-                                         int max_weight, graph_t *g,
+-                                         clique_options *opts) {
+-#if 0
+-        struct timeval timeval;
+-        struct tms tms;
+-#endif
+-        int i,j;
+-        int v;
+-        int *newtable;
+-        int newsize;
+-        int newweight;
+-        int search_weight;
+-        int min_w;
+-        clique_options localopts;
+-
+-        if (min_weight==0)
+-                min_w=INT_MAX;
+-        else
+-                min_w=min_weight;
+-
+-
+-        if (min_weight==1) {
+-                /* min_weight==1 may cause trouble in the routine, and
+-                 * it's trivial to check as it's own case.
+-                 * We write nothing to clique_size[]. */
+-                for (i=0; i < g->n; i++) {
+-                        if (g->weights[table[i]] <= max_weight) {
+-                                set_empty(best_clique);
+-                                SET_ADD_ELEMENT(best_clique,table[i]);
+-                                return g->weights[table[i]];
+-                        }
+-                }
+-                return 0;
+-        }
+-        
+-        localopts.time_function=NULL;
+-        localopts.reorder_function=NULL;
+-        localopts.reorder_map=NULL;
+-        localopts.user_function=false_function;
+-        localopts.user_data=NULL;
+-        localopts.clique_list=&best_clique;
+-        localopts.clique_list_length=1;
+-        clique_list_count=0;
+-
+-        v=table[0];
+-        set_empty(best_clique);
+-        SET_ADD_ELEMENT(best_clique,v);
+-        search_weight=g->weights[v];
+-        if (min_weight && (search_weight >= min_weight)) {
+-                if (search_weight <= max_weight) {
+-                        /* Found suitable clique. */
+-                        return search_weight;
+-                }
+-                search_weight=min_weight-1;
+-        }
+-        clique_size[v]=search_weight;
+-        set_empty(current_clique);
+-
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        for (i = 1; i < g->n; i++) {
+-                v=table[i];
+-
+-                newsize=0;
+-                newweight=0;
+-                for (j=0; j<i; j++) {
+-                        if (GRAPH_IS_EDGE(g,v,table[j])) {
+-                                newweight += g->weights[table[j]];
+-                                newtable[newsize]=table[j];
+-                                newsize++;
+-                        }
+-                }
+-
+-
+-                SET_ADD_ELEMENT(current_clique,v);
+-                search_weight=sub_weighted_all(newtable,newsize,newweight,
+-                                               g->weights[v],search_weight,
+-                                               clique_size[table[i-1]] +
+-                                               g->weights[v],
+-                                               min_w,max_weight,FALSE,
+-                                               g,&localopts);
+-                SET_DEL_ELEMENT(current_clique,v);
+-                if (search_weight < 0) {
+-                        break;
+-                }
+-
+-                clique_size[v]=search_weight;
+-
+-#if 0
+-                if (opts->time_function) {
+-                        gettimeofday(&timeval,NULL);
+-                        times(&tms);
+-                        if (!opts->time_function(entrance_level,
+-                                                 i+1,g->n,clique_size[v] *
+-                                                 weight_multiplier,
+-                                                 (double)(tms.tms_utime-
+-                                                          cputimer.tms_utime)/
+-                                                 clocks_per_sec,
+-                                                 timeval.tv_sec-
+-                                                 realtimer.tv_sec+
+-                                                 (double)(timeval.tv_usec-
+-                                                          realtimer.tv_usec)/
+-                                                 1000000,opts)) {
+-                                set_free(current_clique);
+-                                current_clique=NULL;
+-                                break;
+-                        }
+-                }
+-#endif
+-        }
+-        temp_list[temp_count++]=newtable;
+-        if (min_weight && (search_weight > 0)) {
+-                /* Requested clique has not been found. */
+-                return 0;
+-        }
+-        return clique_size[table[i-1]];
+-}
+-
+-
+-/*
+- * weighted_clique_search_all()
+- *
+- * Searches for all cliques with weight at least min_weight and at most
+- * max_weight.  Stores the cliques as opts declares.
+- *
+- *   table      - the order of the vertices in g to search
+- *   start      - first index where the subgraph table[0], ..., table[start]
+- *                might include a requested kind of clique
+- *   min_weight - minimum weight of clique to search for.  min_weight > 0 !
+- *   max_weight - maximum weight of clique to search for.  If no upper limit
+- *                is desired, use eg. INT_MAX
+- *   maximal    - search only for maximal cliques
+- *   g          - the graph
+- *   opts       - time printing and clique storage options
+- *
+- * Cliques found are stored as defined by opts->user_function and
+- * opts->clique_list.  opts->time_function is called after each
+- * base-level recursion, if non-NULL.
+- *
+- * clique_size[] must be defined and correct for all values of
+- * table[0], ..., table[start-1].
+- *
+- * Returns the number of cliques stored (not neccessarily number of cliques
+- * in graph, if user/time_function aborts).
+- */
+-static int weighted_clique_search_all(int *table, int start,
+-                                      int min_weight, int max_weight,
+-                                      boolean maximal, graph_t *g,
+-                                      clique_options *opts) {
+-#if 0
+-        struct timeval timeval;
+-        struct tms tms;
+-#endif
+-        int i,j;
+-        int v;
+-        int *newtable;
+-        int newsize;
+-        int newweight;
+-
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        clique_list_count=0;
+-        set_empty(current_clique);
+-        for (i=start; i < g->n; i++) {
+-                v=table[i];
+-                clique_size[v]=min_weight;   /* Do not prune here. */
+-
+-                newsize=0;
+-                newweight=0;
+-                for (j=0; j<i; j++) {
+-                        if (GRAPH_IS_EDGE(g,v,table[j])) {
+-                                newtable[newsize]=table[j];
+-                                newweight+=g->weights[table[j]];
+-                                newsize++;
+-                        }
+-                }
+-
+-                SET_ADD_ELEMENT(current_clique,v);
+-                j=sub_weighted_all(newtable,newsize,newweight,
+-                                   g->weights[v],min_weight-1,INT_MAX,
+-                                   min_weight,max_weight,maximal,g,opts);
+-                SET_DEL_ELEMENT(current_clique,v);
+-
+-                if (j<0) {
+-                        /* Abort. */
+-                        break;
+-                }
+-
+-#if 0
+-                if (opts->time_function) {
+-                        gettimeofday(&timeval,NULL);
+-                        times(&tms);
+-                        if (!opts->time_function(entrance_level,
+-                                                 i+1,g->n,clique_size[v] *
+-                                                 weight_multiplier,
+-                                                 (double)(tms.tms_utime-
+-                                                          cputimer.tms_utime)/
+-                                                 clocks_per_sec,
+-                                                 timeval.tv_sec-
+-                                                 realtimer.tv_sec+
+-                                                 (double)(timeval.tv_usec-
+-                                                          realtimer.tv_usec)/
+-                                                 1000000,opts)) {
+-                                set_free(current_clique);
+-                                current_clique=NULL;
+-                                break;
+-                        }
+-                }
+-#endif
+-        }
+-        temp_list[temp_count++]=newtable;
+-
+-        return clique_list_count;
+-}
+-
+-/*
+- * sub_weighted_all()
+- *
+- * Recursion function for searching for all cliques of given weight.
+- *
+- *   table      - subset of vertices of graph g
+- *   size       - size of table
+- *   weight     - total weight of vertices in table
+- *   current_weight - weight of clique found so far
+- *   prune_low  - ignore all cliques with weight less or equal to this value
+- *                (often heaviest clique found so far)  (passed through)
+- *   prune_high - maximum weight possible for clique in this subgraph
+- *                (passed through)
+- *   min_size   - minimum weight of cliques to search for (passed through)
+- *                Must be greater than 0.
+- *   max_size   - maximum weight of cliques to search for (passed through)
+- *                If no upper limit is desired, use eg. INT_MAX
+- *   maximal    - search only for maximal cliques
+- *   g          - the graph
+- *   opts       - storage options
+- *
+- * All cliques of suitable weight found are stored according to opts.
+- *
+- * Returns weight of heaviest clique found (prune_low if a heavier clique
+- * hasn't been found);  if a clique with weight at least min_size is found
+- * then min_size-1 is returned.  If clique storage failed, -1 is returned.
+- *
+- * The largest clique found smaller than max_weight is stored in
+- * best_clique, if non-NULL.
+- *
+- * Uses current_clique to store the currently-being-searched clique.
+- * clique_size[] for all values in table must be defined and correct,
+- * otherwise inaccurate results may occur.
+- *
+- * To search for a single maximum clique, use min_weight==max_weight==INT_MAX,
+- * with best_clique non-NULL.  To search for a single given-weight clique,
+- * use opts->clique_list and opts->user_function=false_function.  When
+- * searching for all cliques, min_weight should be given the minimum weight
+- * desired.
+- */
+-static int sub_weighted_all(int *table, int size, int weight,
+-                            int current_weight, int prune_low, int prune_high,
+-                            int min_weight, int max_weight, boolean maximal,
+-                            graph_t *g, clique_options *opts) {
+-        int i;
+-        int v,w;
+-        int *newtable;
+-        int *p1, *p2;
+-        int newweight;
+-
+-        if (current_weight >= min_weight) {
+-                if ((current_weight <= max_weight) &&
+-                    ((!maximal) || is_maximal(current_clique,g))) {
+-                        /* We've found one.  Store it. */
+-                        if (!store_clique(current_clique,g,opts)) {
+-                                return -1;
+-                        }
+-                }
+-                if (current_weight >= max_weight) {
+-                        /* Clique too heavy. */
+-                        return min_weight-1;
+-                } 
+-        }
+-        if (size <= 0) {
+-                /* current_weight < min_weight, prune_low < min_weight,
+-                 * so return value is always < min_weight. */
+-                if (current_weight>prune_low) {
+-                        if (best_clique)
+-                                set_copy(best_clique,current_clique);
+-                        if (current_weight < min_weight)
+-                                return current_weight;
+-                        else
+-                                return min_weight-1;
+-                } else {
+-                        return prune_low;
+-                }
+-        }
+-
+-        /* Dynamic memory allocation with cache */
+-        if (temp_count) {
+-                temp_count--;
+-                newtable=temp_list[temp_count];
+-        } else {
+-                newtable=malloc(g->n * sizeof(int));
+-        }
+-
+-        for (i = size-1; i >= 0; i--) {
+-                v = table[i];
+-                if (current_weight+clique_size[v] <= prune_low) {
+-                        /* Dealing with subset without heavy enough clique. */
+-                        break;
+-                }
+-                if (current_weight+weight <= prune_low) {
+-                        /* Even if all elements are added, won't do. */
+-                        break;
+-                }
+-
+-                /* Very ugly code, but works faster than "for (i=...)" */
+-                p1 = newtable;
+-                newweight = 0;
+-                for (p2=table; p2 < table+i; p2++) {
+-                        w = *p2;
+-                        if (GRAPH_IS_EDGE(g, v, w)) {
+-                                *p1 = w;
+-                                newweight += g->weights[w];
+-                                p1++;
+-                        }
+-                }
+-
+-                w=g->weights[v];
+-                weight-=w;
+-                /* Avoid a few unneccessary loops */
+-                if (current_weight+w+newweight <= prune_low) {
+-                        continue;
+-                }
+-
+-                SET_ADD_ELEMENT(current_clique,v);
+-                prune_low=sub_weighted_all(newtable,p1-newtable,
+-                                           newweight,
+-                                           current_weight+w,
+-                                           prune_low,prune_high,
+-                                           min_weight,max_weight,maximal,
+-                                           g,opts);
+-                SET_DEL_ELEMENT(current_clique,v);
+-                if ((prune_low<0) || (prune_low>=prune_high)) {
+-                        /* Impossible to find larger clique. */
+-                        break;
+-                }
+-        }
+-        temp_list[temp_count++]=newtable;
+-        return prune_low;
+-}
+-
+-
+-
+-
+-/***** Helper functions *****/
+-
+-
+-/*
+- * store_clique()
+- *
+- * Stores a clique according to given user options.
+- *
+- *   clique - the clique to store
+- *   opts   - storage options
+- *
+- * Returns FALSE if opts->user_function() returned FALSE; otherwise
+- * returns TRUE.
+- */
+-static boolean store_clique(set_t clique, graph_t *g, clique_options *opts) {
+-
+-        clique_list_count++;
+-
+-        /* clique_list[] */
+-        if (opts->clique_list) {
+-                /*
+-                 * This has been a major source of bugs:
+-                 * Has clique_list_count been set to 0 before calling
+-                 * the recursions? 
+-                 */
+-                if (clique_list_count <= 0) {
+-                        fprintf(stderr,"CLIQUER INTERNAL ERROR: "
+-                                "clique_list_count has negative value!\n");
+-                        fprintf(stderr,"Please report as a bug.\n");
+-                        abort();
+-                }
+-                if (clique_list_count <= opts->clique_list_length)
+-                        opts->clique_list[clique_list_count-1] =
+-                                set_duplicate(clique);
+-        }
+-
+-        /* user_function() */
+-        if (opts->user_function) {
+-                if (!opts->user_function(clique,g,opts)) {
+-                        /* User function requested abort. */
+-                        return FALSE;
+-                }
+-        }
+-
+-        return TRUE;
+-}
+-
+-/*
+- * maximalize_clique()
+- *
+- * Adds greedily all possible vertices in g to set s to make it a maximal
+- * clique.
+- *
+- *   s - clique of vertices to make maximal
+- *   g - graph
+- *
+- * Note: Not very optimized (uses a simple O(n^2) routine), but is called
+- *       at maximum once per clique_xxx() call, so it shouldn't matter.
+- */
+-static void maximalize_clique(set_t s,graph_t *g) {
+-        int i,j;
+-        boolean add;
+-
+-        for (i=0; i < g->n; i++) {
+-                add=TRUE;
+-                for (j=0; j < g->n; j++) {
+-                        if (SET_CONTAINS_FAST(s,j) && !GRAPH_IS_EDGE(g,i,j)) {
+-                                add=FALSE;
+-                                break;
+-                        }
+-                }
+-                if (add) {
+-                        SET_ADD_ELEMENT(s,i);
+-                }
+-        }
+-        return;
+-}
+-
+-
+-/*
+- * is_maximal()
+- *
+- * Check whether a clique is maximal or not.
+- *
+- *   clique - set of vertices in clique
+- *   g      - graph
+- *
+- * Returns TRUE is clique is a maximal clique of g, otherwise FALSE.
+- */
+-static boolean is_maximal(set_t clique, graph_t *g) {
+-        int i,j;
+-        int *table;
+-        int len;
+-        boolean addable;
+-
+-        if (temp_count) {
+-                temp_count--;
+-                table=temp_list[temp_count];
+-        } else {
+-                table=malloc(g->n * sizeof(int));
+-        }
+-
+-        len=0;
+-        for (i=0; i < g->n; i++)
+-                if (SET_CONTAINS_FAST(clique,i))
+-                        table[len++]=i;
+-
+-        for (i=0; i < g->n; i++) {
+-                addable=TRUE;
+-                for (j=0; j<len; j++) {
+-                        if (!GRAPH_IS_EDGE(g,i,table[j])) {
+-                                addable=FALSE;
+-                                break;
+-                        }
+-                }
+-                if (addable) {
+-                        temp_list[temp_count++]=table;
+-                        return FALSE;
+-                }
+-        }
+-        temp_list[temp_count++]=table;
+-        return TRUE;
+-}
+-
+-
+-/*
+- * false_function()
+- *
+- * Returns FALSE.  Can be used as user_function.
+- */
+-static boolean false_function(set_t clique,graph_t *g,clique_options *opts) {
+-        return FALSE;
+-}
+-
+-
+-
+-
+-/***** API-functions *****/
+-
+-/*
+- * clique_unweighted_max_weight()
+- *
+- * Returns the size of the maximum (sized) clique in g (or 0 if search
+- * was aborted).
+- *
+- *   g    - the graph
+- *   opts - time printing options
+- *
+- * Note: As we don't have an algorithm faster than actually finding
+- *       a maximum clique, we use clique_unweighted_find_single().
+- *       This incurs only very small overhead.
+- */
+-int clique_unweighted_max_weight(graph_t *g, clique_options *opts) {
+-        set_t s;
+-        int size;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-
+-        s=clique_unweighted_find_single(g,0,0,FALSE,opts);
+-        if (s==NULL) {
+-                /* Search was aborted. */
+-                return 0;
+-        }
+-        size=set_size(s);
+-        set_free(s);
+-        return size;
+-}
+-
+-
+-/*
+- * clique_unweighted_find_single()
+- *
+- * Returns a clique with size at least min_size and at most max_size.
+- *
+- *   g        - the graph
+- *   min_size - minimum size of clique to search for.  If min_size==0,
+- *              searches for maximum clique.
+- *   max_size - maximum size of clique to search for.  If max_size==0, no
+- *              upper limit is used.  If min_size==0, this must also be 0.
+- *   maximal  - require returned clique to be maximal
+- *   opts     - time printing options
+- *
+- * Returns the set of vertices forming the clique, or NULL if a clique
+- * of requested size/maximality does not exist in the graph  (or if
+- * opts->time_function() requests abort).
+- *
+- * The returned clique is newly allocated and can be freed by set_free().
+- *
+- * Note: Does NOT use opts->user_function() or opts->clique_list[].
+- */
+-set_t clique_unweighted_find_single(graph_t *g,int min_size,int max_size,
+-                                    boolean maximal, clique_options *opts) {
+-        int i;
+-        int *table;
+-        set_t s;
+-
+-        ENTRANCE_SAVE();
+-        entrance_level++;
+-
+-        if (opts==NULL)
+-                opts=clique_default_options;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-        ASSERT(min_size>=0);
+-        ASSERT(max_size>=0);
+-        ASSERT((max_size==0) || (min_size <= max_size));
+-        ASSERT(!((min_size==0) && (max_size>0)));
+-        ASSERT((opts->reorder_function==NULL) || (opts->reorder_map==NULL));
+-
+-        if ((max_size>0) && (min_size>max_size)) {
+-                /* state was not changed */
+-                entrance_level--;
+-                return NULL;
+-        }
+-
+-#if 0
+-        if (clocks_per_sec==0)
+-                clocks_per_sec=sysconf(_SC_CLK_TCK);
+-        ASSERT(clocks_per_sec>0);
+-#endif
+-
+-        /* Dynamic allocation */
+-        current_clique=set_new(g->n);
+-        clique_size=malloc(g->n * sizeof(int));
+-        /* table allocated later */
+-        temp_list=malloc((g->n+2)*sizeof(int *));
+-        temp_count=0;
+-
+-#if 0
+-        /* "start clock" */
+-        gettimeofday(&realtimer,NULL);
+-        times(&cputimer);
+-#endif
+-
+-        /* reorder */
+-        if (opts->reorder_function) {
+-                table=opts->reorder_function(g,FALSE);
+-        } else if (opts->reorder_map) {
+-                table=reorder_duplicate(opts->reorder_map,g->n);
+-        } else {
+-                table=reorder_ident(g->n);
+-        }
+-        ASSERT(reorder_is_bijection(table,g->n));
+-
+-
+-        if (unweighted_clique_search_single(table,min_size,g,opts)==0) {
+-                set_free(current_clique);
+-                current_clique=NULL;
+-                goto cleanreturn;
+-        }
+-        if (maximal && (min_size>0)) {
+-                maximalize_clique(current_clique,g);
+-
+-                if ((max_size > 0) && (set_size(current_clique) > max_size)) {
+-                        clique_options localopts;
+-
+-                        s = set_new(g->n);
+-                        localopts.time_function = opts->time_function;
+-                        localopts.output = opts->output;
+-                        localopts.user_function = false_function;
+-                        localopts.clique_list = &s;
+-                        localopts.clique_list_length = 1;
+-
+-                        for (i=0; i < g->n-1; i++)
+-                                if (clique_size[table[i]]>=min_size)
+-                                        break;
+-                        if (unweighted_clique_search_all(table,i,min_size,
+-                                                         max_size,maximal,
+-                                                         g,&localopts)) {
+-                                set_free(current_clique);
+-                                current_clique=s;
+-                        } else {
+-                                set_free(current_clique);
+-                                current_clique=NULL;
+-                        }
+-                }
+-        }
+-        
+-    cleanreturn:
+-        s=current_clique;
+-
+-        /* Free resources */
+-        for (i=0; i < temp_count; i++)
+-                free(temp_list[i]);
+-        free(temp_list);
+-        free(table);
+-        free(clique_size);
+-
+-        ENTRANCE_RESTORE();
+-        entrance_level--;
+-
+-        return s;
+-}
+-
+-
+-/*
+- * clique_unweighted_find_all()
+- *
+- * Find all cliques with size at least min_size and at most max_size.
+- *
+- *   g        - the graph
+- *   min_size - minimum size of cliques to search for.  If min_size==0,
+- *              searches for maximum cliques.
+- *   max_size - maximum size of cliques to search for.  If max_size==0, no
+- *              upper limit is used.  If min_size==0, this must also be 0.
+- *   maximal  - require cliques to be maximal cliques
+- *   opts     - time printing and clique storage options
+- *
+- * Returns the number of cliques found.  This can be less than the number
+- * of cliques in the graph iff opts->time_function() or opts->user_function()
+- * returns FALSE (request abort).
+- *
+- * The cliques found are stored in opts->clique_list[] and
+- * opts->user_function() is called with them (if non-NULL).  The cliques
+- * stored in opts->clique_list[] are newly allocated, and can be freed
+- * by set_free().
+- */
+-int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
+-                               boolean maximal, clique_options *opts) {
+-        int i;
+-        int *table;
+-        int count;
+-
+-        ENTRANCE_SAVE();
+-        entrance_level++;
+-
+-        if (opts==NULL)
+-                opts=clique_default_options;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-        ASSERT(min_size>=0);
+-        ASSERT(max_size>=0);
+-        ASSERT((max_size==0) || (min_size <= max_size));
+-        ASSERT(!((min_size==0) && (max_size>0)));
+-        ASSERT((opts->reorder_function==NULL) || (opts->reorder_map==NULL));
+-
+-        if ((max_size>0) && (min_size>max_size)) {
+-                /* state was not changed */
+-                entrance_level--;
+-                return 0;
+-        }
+-
+-#if 0
+-        if (clocks_per_sec==0)
+-                clocks_per_sec=sysconf(_SC_CLK_TCK);
+-        ASSERT(clocks_per_sec>0);
+-#endif
+-
+-        /* Dynamic allocation */
+-        current_clique=set_new(g->n);
+-        clique_size=malloc(g->n * sizeof(int));
+-        /* table allocated later */
+-        temp_list=malloc((g->n+2)*sizeof(int *));
+-        temp_count=0;
+-
+-        clique_list_count=0;
+-        memset(clique_size,0,g->n * sizeof(int));
+-
+-#if 0
+-        /* "start clock" */
+-        gettimeofday(&realtimer,NULL);
+-        times(&cputimer);
+-#endif
+-
+-        /* reorder */
+-        if (opts->reorder_function) {
+-                table=opts->reorder_function(g,FALSE);
+-        } else if (opts->reorder_map) {
+-                table=reorder_duplicate(opts->reorder_map,g->n);
+-        } else {
+-                table=reorder_ident(g->n);
+-        }
+-        ASSERT(reorder_is_bijection(table,g->n));
+-
+-
+-        /* Search as normal until there is a chance to find a suitable
+-         * clique. */
+-        if (unweighted_clique_search_single(table,min_size,g,opts)==0) {
+-                count=0;
+-                goto cleanreturn;
+-        }
+-
+-        if (min_size==0 && max_size==0) {
+-                min_size=max_size=clique_size[table[g->n-1]];
+-                maximal=FALSE;  /* No need to test, since we're searching
+-                                 * for maximum cliques. */
+-        }
+-        if (max_size==0) {
+-                max_size=INT_MAX;
+-        }
+-
+-        for (i=0; i < g->n-1; i++)
+-                if (clique_size[table[i]] >= min_size)
+-                        break;
+-        count=unweighted_clique_search_all(table,i,min_size,max_size,
+-                                           maximal,g,opts);
+-
+-  cleanreturn:
+-        /* Free resources */
+-        for (i=0; i<temp_count; i++)
+-                free(temp_list[i]);
+-        free(temp_list);
+-        free(table);
+-        free(clique_size);
+-        set_free(current_clique);
+-
+-        ENTRANCE_RESTORE();
+-        entrance_level--;
+-
+-        return count;
+-}
+-
+-
+-
+-
+-/*
+- * clique_max_weight()
+- *
+- * Returns the weight of the maximum weight clique in the graph (or 0 if
+- * the search was aborted).
+- *
+- *   g    - the graph
+- *   opts - time printing options
+- *
+- * Note: As we don't have an algorithm faster than actually finding
+- *       a maximum weight clique, we use clique_find_single().
+- *       This incurs only very small overhead.
+- */
+-int clique_max_weight(graph_t *g,clique_options *opts) {
+-        set_t s;
+-        int weight;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-
+-        s=clique_find_single(g,0,0,FALSE,opts);
+-        if (s==NULL) {
+-                /* Search was aborted. */
+-                return 0;
+-        }
+-        weight=graph_subgraph_weight(g,s);
+-        set_free(s);
+-        return weight;
+-}
+-
+-
+-/*
+- * clique_find_single()
+- *
+- * Returns a clique with weight at least min_weight and at most max_weight.
+- *
+- *   g          - the graph
+- *   min_weight - minimum weight of clique to search for.  If min_weight==0,
+- *                searches for a maximum weight clique.
+- *   max_weight - maximum weight of clique to search for.  If max_weight==0,
+- *                no upper limit is used.  If min_weight==0, max_weight must
+- *                also be 0.
+- *   maximal    - require returned clique to be maximal
+- *   opts       - time printing options
+- *
+- * Returns the set of vertices forming the clique, or NULL if a clique
+- * of requested weight/maximality does not exist in the graph  (or if
+- * opts->time_function() requests abort).
+- *
+- * The returned clique is newly allocated and can be freed by set_free().
+- *
+- * Note: Does NOT use opts->user_function() or opts->clique_list[].
+- * Note: Automatically uses clique_unweighted_find_single if all vertex
+- *       weights are the same.
+- */
+-set_t clique_find_single(graph_t *g,int min_weight,int max_weight,
+-                         boolean maximal, clique_options *opts) {
+-        int i;
+-        int *table;
+-        set_t s;
+-
+-        ENTRANCE_SAVE();
+-        entrance_level++;
+-
+-        if (opts==NULL)
+-                opts=clique_default_options;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-        ASSERT(min_weight>=0);
+-        ASSERT(max_weight>=0);
+-        ASSERT((max_weight==0) || (min_weight <= max_weight));
+-        ASSERT(!((min_weight==0) && (max_weight>0)));
+-        ASSERT((opts->reorder_function==NULL) || (opts->reorder_map==NULL));
+-
+-        if ((max_weight>0) && (min_weight>max_weight)) {
+-                /* state was not changed */
+-                entrance_level--;
+-                return NULL;
+-        }
+-
+-#if 0
+-        if (clocks_per_sec==0)
+-                clocks_per_sec=sysconf(_SC_CLK_TCK);
+-        ASSERT(clocks_per_sec>0);
+-#endif
+-
+-        /* Check whether we can use unweighted routines. */
+-        if (!graph_weighted(g)) {
+-                min_weight=DIV_UP(min_weight,g->weights[0]);
+-                if (max_weight) {
+-                        max_weight=DIV_DOWN(max_weight,g->weights[0]);
+-                        if (max_weight < min_weight) {
+-                                /* state was not changed */
+-                                entrance_level--;
+-                                return NULL;
+-                        }
+-                }
+-
+-                weight_multiplier = g->weights[0];
+-                entrance_level--;
+-                s=clique_unweighted_find_single(g,min_weight,max_weight,
+-                                                maximal,opts);
+-                ENTRANCE_RESTORE();
+-                return s;
+-        }
+-
+-        /* Dynamic allocation */
+-        current_clique=set_new(g->n);
+-        best_clique=set_new(g->n);
+-        clique_size=malloc(g->n * sizeof(int));
+-        memset(clique_size, 0, g->n * sizeof(int));
+-        /* table allocated later */
+-        temp_list=malloc((g->n+2)*sizeof(int *));
+-        temp_count=0;
+-
+-        clique_list_count=0;
+-
+-#if 0
+-        /* "start clock" */
+-        gettimeofday(&realtimer,NULL);
+-        times(&cputimer);
+-#endif
+-
+-        /* reorder */
+-        if (opts->reorder_function) {
+-                table=opts->reorder_function(g,TRUE);
+-        } else if (opts->reorder_map) {
+-                table=reorder_duplicate(opts->reorder_map,g->n);
+-        } else {
+-                table=reorder_ident(g->n);
+-        }
+-        ASSERT(reorder_is_bijection(table,g->n));
+-
+-        if (max_weight==0)
+-                max_weight=INT_MAX;
+-
+-        if (weighted_clique_search_single(table,min_weight,max_weight,
+-                                          g,opts)==0) {
+-                /* Requested clique has not been found. */
+-                set_free(best_clique);
+-                best_clique=NULL;
+-                goto cleanreturn;
+-        }
+-        if (maximal && (min_weight>0)) {
+-                maximalize_clique(best_clique,g);
+-                if (graph_subgraph_weight(g,best_clique) > max_weight) {
+-                        clique_options localopts;
+-
+-                        localopts.time_function = opts->time_function;
+-                        localopts.output = opts->output;
+-                        localopts.user_function = false_function;
+-                        localopts.clique_list = &best_clique;
+-                        localopts.clique_list_length = 1;
+-
+-                        for (i=0; i < g->n-1; i++)
+-                                if ((clique_size[table[i]] >= min_weight) ||
+-                                    (clique_size[table[i]] == 0))
+-                                        break;
+-                        if (!weighted_clique_search_all(table,i,min_weight,
+-                                                        max_weight,maximal,
+-                                                        g,&localopts)) {
+-                                set_free(best_clique);
+-                                best_clique=NULL;
+-                        }
+-                }
+-        }
+-
+- cleanreturn:
+-        s=best_clique;
+-
+-        /* Free resources */
+-        for (i=0; i < temp_count; i++)
+-                free(temp_list[i]);
+-        free(temp_list);
+-        temp_list=NULL;
+-        temp_count=0;
+-        free(table);
+-        set_free(current_clique);
+-        current_clique=NULL;
+-        free(clique_size);
+-        clique_size=NULL;
+-
+-        ENTRANCE_RESTORE();
+-        entrance_level--;
+-
+-        return s;
+-}
+-
+-
+-
+-
+-
+-/*
+- * clique_find_all()
+- *
+- * Find all cliques with weight at least min_weight and at most max_weight.
+- *
+- *   g          - the graph
+- *   min_weight - minimum weight of cliques to search for.  If min_weight==0,
+- *                searches for maximum weight cliques.
+- *   max_weight - maximum weight of cliques to search for.  If max_weight==0,
+- *                no upper limit is used.  If min_weight==0, max_weight must
+- *                also be 0.
+- *   maximal    - require cliques to be maximal cliques
+- *   opts       - time printing and clique storage options
+- *
+- * Returns the number of cliques found.  This can be less than the number
+- * of cliques in the graph iff opts->time_function() or opts->user_function()
+- * returns FALSE (request abort).
+- *
+- * The cliques found are stored in opts->clique_list[] and
+- * opts->user_function() is called with them (if non-NULL).  The cliques
+- * stored in opts->clique_list[] are newly allocated, and can be freed
+- * by set_free().
+- *
+- * Note: Automatically uses clique_unweighted_find_all if all vertex
+- *       weights are the same.
+- */
+-int clique_find_all(graph_t *g, int min_weight, int max_weight,
+-                    boolean maximal, clique_options *opts) {
+-        int i,n;
+-        int *table;
+-
+-        ENTRANCE_SAVE();
+-        entrance_level++;
+-
+-        if (opts==NULL)
+-                opts=clique_default_options;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-        ASSERT(min_weight>=0);
+-        ASSERT(max_weight>=0);
+-        ASSERT((max_weight==0) || (min_weight <= max_weight));
+-        ASSERT(!((min_weight==0) && (max_weight>0)));
+-        ASSERT((opts->reorder_function==NULL) || (opts->reorder_map==NULL));
+-
+-        if ((max_weight>0) && (min_weight>max_weight)) {
+-                /* state was not changed */
+-                entrance_level--;
+-                return 0;
+-        }
+-
+-#if 0
+-        if (clocks_per_sec==0)
+-                clocks_per_sec=sysconf(_SC_CLK_TCK);
+-        ASSERT(clocks_per_sec>0);
+-#endif
+-
+-        if (!graph_weighted(g)) {
+-                min_weight=DIV_UP(min_weight,g->weights[0]);
+-                if (max_weight) {
+-                        max_weight=DIV_DOWN(max_weight,g->weights[0]);
+-                        if (max_weight < min_weight) {
+-                                /* state was not changed */
+-                                entrance_level--;
+-                                return 0;
+-                        }
+-                }
+-                
+-                weight_multiplier = g->weights[0];
+-                entrance_level--;
+-                i=clique_unweighted_find_all(g,min_weight,max_weight,maximal,
+-                                             opts);
+-                ENTRANCE_RESTORE();
+-                return i;
+-        }
+-
+-        /* Dynamic allocation */
+-        current_clique=set_new(g->n);
+-        best_clique=set_new(g->n);
+-        clique_size=malloc(g->n * sizeof(int));
+-        memset(clique_size, 0, g->n * sizeof(int));
+-        /* table allocated later */
+-        temp_list=malloc((g->n+2)*sizeof(int *));
+-        temp_count=0;
+-
+-#if 0
+-        /* "start clock" */
+-        gettimeofday(&realtimer,NULL);
+-        times(&cputimer);
+-#endif
+-
+-        /* reorder */
+-        if (opts->reorder_function) {
+-                table=opts->reorder_function(g,TRUE);
+-        } else if (opts->reorder_map) {
+-                table=reorder_duplicate(opts->reorder_map,g->n);
+-        } else {
+-                table=reorder_ident(g->n);
+-        }
+-        ASSERT(reorder_is_bijection(table,g->n));
+-
+-        /* First phase */
+-        n=weighted_clique_search_single(table,min_weight,INT_MAX,g,opts);
+-        if (n==0) {
+-                /* Requested clique has not been found. */
+-                goto cleanreturn;
+-        }
+-
+-        if (min_weight==0) {
+-                min_weight=n;
+-                max_weight=n;
+-                maximal=FALSE;  /* They're maximum cliques already. */
+-        }
+-        if (max_weight==0)
+-                max_weight=INT_MAX;
+-
+-        for (i=0; i < g->n; i++)
+-                if ((clique_size[table[i]] >= min_weight) ||
+-                    (clique_size[table[i]] == 0))
+-                        break;
+-
+-        /* Second phase */
+-        n=weighted_clique_search_all(table,i,min_weight,max_weight,maximal,
+-                                     g,opts);
+-
+-      cleanreturn:
+-        /* Free resources */
+-        for (i=0; i < temp_count; i++)
+-                free(temp_list[i]);
+-        free(temp_list);
+-        free(table);
+-        set_free(current_clique);
+-        set_free(best_clique);
+-        free(clique_size);
+-
+-        ENTRANCE_RESTORE();
+-        entrance_level--;
+-
+-        return n;
+-}
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-/*
+- * clique_print_time()
+- *
+- * Reports current running information every 0.1 seconds or when values
+- * change.
+- *
+- *   level    - re-entrance level
+- *   i        - current recursion level
+- *   n        - maximum recursion level
+- *   max      - weight of heaviest clique found
+- *   cputime  - CPU time used in algorithm so far
+- *   realtime - real time used in algorithm so far
+- *   opts     - prints information to (FILE *)opts->output (or stdout if NULL)
+- *
+- * Returns always TRUE  (ie. never requests abort).
+- */
+-boolean clique_print_time(int level, int i, int n, int max,
+-                          double cputime, double realtime,
+-                          clique_options *opts) {
+-        static float prev_time=100;
+-        static int prev_i=100;
+-        static int prev_max=100;
+-        static int prev_level=0;
+-        FILE *fp=opts->output;
+-        int j;
+-
+-        if (fp==NULL)
+-                fp=stdout;
+-
+-        if (ABS(prev_time-realtime)>0.1 || i==n || i<prev_i || max!=prev_max ||
+-            level!=prev_level) {
+-                for (j=1; j<level; j++)
+-                        fprintf(fp,"  ");
+-                if (realtime-prev_time < 0.01 || i<=prev_i)
+-                        fprintf(fp,"%3d/%d (max %2d)  %2.2f s  "
+-                                "(0.00 s/round)\n",i,n,max,
+-                                realtime);
+-                else
+-                        fprintf(fp,"%3d/%d (max %2d)  %2.2f s  "
+-                                "(%2.2f s/round)\n",
+-                                i,n,max,realtime,
+-                                (realtime-prev_time)/(i-prev_i));
+-                prev_time=realtime;
+-                prev_i=i;
+-                prev_max=max;
+-                prev_level=level;
+-        }
+-        return TRUE;
+-}
+-
+-/*
+- * clique_print_time_always()
+- *
+- * Reports current running information.
+- *
+- *   level    - re-entrance level
+- *   i        - current recursion level
+- *   n        - maximum recursion level
+- *   max      - largest clique found
+- *   cputime  - CPU time used in algorithm so far
+- *   realtime - real time used in algorithm so far
+- *   opts     - prints information to (FILE *)opts->output (or stdout if NULL)
+- *
+- * Returns always TRUE  (ie. never requests abort).
+- */
+-boolean clique_print_time_always(int level, int i, int n, int max,
+-                                 double cputime, double realtime,
+-                                 clique_options *opts) {
+-        static float prev_time=100;
+-        static int prev_i=100;
+-        FILE *fp=opts->output;
+-        int j;
+-
+-        if (fp==NULL)
+-                fp=stdout;
+-
+-        for (j=1; j<level; j++)
+-                fprintf(fp,"  ");
+-
+-        if (realtime-prev_time < 0.01 || i<=prev_i)
+-                fprintf(fp,"%3d/%d (max %2d)  %2.2f s  (0.00 s/round)\n",
+-                        i,n,max,realtime);
+-        else
+-                fprintf(fp,"%3d/%d (max %2d)  %2.2f s  (%2.2f s/round)\n",
+-                        i,n,max,realtime,(realtime-prev_time)/(i-prev_i));
+-        prev_time=realtime;
+-        prev_i=i;
+-
+-        return TRUE;
+-}
+-
+-
+-/*
+- * This file contains the graph handling routines.
+- *
+- * Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
+- * Licensed under the GNU GPL, read the file LICENSE for details.
+- */
+-
+-/*
+-#include <stdio.h>
+-#include <ctype.h>
+-#include <string.h>
+-#include "graph.h"
+-*/
+-
+-
+-/*
+- * graph_new()
+- *
+- * Returns a newly allocated graph with n vertices all with weight 1,
+- * and no edges.
+- */
+-graph_t *graph_new(int n) {
+-        graph_t *g;
+-        int i;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(n>0);
+-
+-        g=malloc(sizeof(graph_t));
+-        g->n=n;
+-        g->edges=malloc(g->n * sizeof(set_t));
+-        g->weights=malloc(g->n * sizeof(int));
+-        for (i=0; i < g->n; i++) {
+-                g->edges[i]=set_new(n);
+-                g->weights[i]=1;
+-        }
+-        return g;
+-}
+-
+-/*
+- * graph_free()
+- *
+- * Frees the memory associated with the graph g.
+- */
+-void graph_free(graph_t *g) {
+-        int i;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-        ASSERT(g!=NULL);
+-        ASSERT(g->n > 0);
+-
+-        for (i=0; i < g->n; i++) {
+-                set_free(g->edges[i]);
+-        }
+-        free(g->weights);
+-        free(g->edges);
+-        free(g);
+-        return;
+-}
+-
+-
+-/*
+- * graph_resize()
+- *
+- * Resizes graph g to given size.  If size > g->n, the new vertices are
+- * not connected to any others and their weights are set to 1.
+- * If size < g->n, the last g->n - size vertices are removed.
+- */
+-void graph_resize(graph_t *g, int size) {
+-        int i;
+-
+-        ASSERT(g!=NULL);
+-        ASSERT(g->n > 0);
+-        ASSERT(size > 0);
+-
+-        if (g->n == size)
+-                return;
+-
+-        /* Free/alloc extra edge-sets */
+-        for (i=size; i < g->n; i++)
+-                set_free(g->edges[i]);
+-        g->edges=realloc(g->edges, size * sizeof(set_t));
+-        for (i=g->n; i < size; i++)
+-                g->edges[i]=set_new(size);
+-
+-        /* Resize original sets */
+-        for (i=0; i < MIN(g->n,size); i++) {
+-                g->edges[i]=set_resize(g->edges[i],size);
+-        }
+-
+-        /* Weights */
+-        g->weights=realloc(g->weights,size * sizeof(int));
+-        for (i=g->n; i<size; i++)
+-                g->weights[i]=1;
+-        
+-        g->n=size;
+-        return;
+-}
+-
+-/*
+- * graph_crop()
+- *
+- * Resizes the graph so as to remove all highest-valued isolated vertices.
+- */
+-void graph_crop(graph_t *g) {
+-        int i;
+-        
+-        for (i=g->n-1; i>=1; i--)
+-                if (set_size(g->edges[i])>0)
+-                        break;
+-        graph_resize(g,i+1);
+-        return;
+-}
+-
+-
+-/*
+- * graph_weighted()
+- *
+- * Returns TRUE if all vertex weights of graph g are all the same.
+- *
+- * Note: Does NOT require weights to be 1.
+- */
+-boolean graph_weighted(graph_t *g) {
+-        int i,w;
+-
+-        w=g->weights[0];
+-        for (i=1; i < g->n; i++)
+-                if (g->weights[i] != w)
+-                        return TRUE;
+-        return FALSE;
+-}
+-
+-/*
+- * graph_edge_count()
+- *
+- * Returns the number of edges in graph g.
+- */
+-int graph_edge_count(graph_t *g) {
+-        int i;
+-        int count=0;
+-
+-        for (i=0; i < g->n; i++) {
+-                count += set_size(g->edges[i]);
+-        }
+-        return count/2;
+-}
+-
+-/*
+- * graph_print()
+- *
+- * Prints a representation of the graph g to stdout (along with any errors
+- * noticed).  Mainly useful for debugging purposes and trivial output.
+- *
+- * The output consists of a first line describing the dimensions and then
+- * one line per vertex containing the vertex number (numbered 0,...,n-1),
+- * the vertex weight (if the graph is weighted), "->" and then a list
+- * of all vertices it is adjacent to.
+- */
+-void graph_print(graph_t *g) {
+-        int i,j;
+-        int asymm=0;
+-        int refl=0;
+-        int nonpos=0;
+-        int extra=0;
+-        unsigned int weight=0;
+-        boolean weighted;
+-        
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-
+-        if (g==NULL) {
+-                printf("   WARNING: Graph pointer is NULL!\n");
+-                return;
+-        }
+-        if (g->n <= 0) {
+-                printf("   WARNING: Graph has %d vertices "
+-                       "(should be positive)!\n",g->n);
+-                return;
+-        }
+-        
+-        weighted=graph_weighted(g);
+-
+-        printf("%s graph has %d vertices, %d edges (density %.2f).\n",
+-               weighted?"Weighted":((g->weights[0]==1)?
+-                                    "Unweighted":"Semi-weighted"),
+-               g->n,graph_edge_count(g),
+-               (float)graph_edge_count(g)/((float)(g->n - 1)*(g->n)/2));
+-
+-        for (i=0; i < g->n; i++) {
+-                printf("%2d",i);
+-                if (weighted) {
+-                        printf(" w=%d",g->weights[i]);
+-                        if (g->weights[i] <= 0) {
+-                                printf("*NON-POSITIVE*");
+-                                nonpos++;
+-                        }
+-                }
+-                if (weight < INT_MAX)
+-                        weight+=g->weights[i];
+-                printf(" ->");
+-                for (j=0; j < g->n; j++) {
+-                        if (SET_CONTAINS_FAST(g->edges[i],j)) {
+-                                printf(" %d",j);
+-                                if (i==j) {
+-                                        printf("*REFLEXIVE*");
+-                                        refl++;
+-                                }
+-                                if (!SET_CONTAINS_FAST(g->edges[j],i)) {
+-                                        printf("*ASYMMERTIC*");
+-                                        asymm++;
+-                                }
+-                        }
+-                }
+-                for (j=g->n; j < SET_ARRAY_LENGTH(g->edges[i])*ELEMENTSIZE;
+-                     j++) {
+-                        if (SET_CONTAINS_FAST(g->edges[i],j)) {
+-                                printf(" %d*NON-EXISTENT*",j);
+-                                extra++;
+-                        }
+-                }
+-                printf("\n");
+-        }
+-
+-        if (asymm)
+-                printf("   WARNING: Graph contained %d asymmetric edges!\n",
+-                       asymm);
+-        if (refl)
+-                printf("   WARNING: Graph contained %d reflexive edges!\n",
+-                       refl);
+-        if (nonpos)
+-                printf("   WARNING: Graph contained %d non-positive vertex "
+-                       "weights!\n",nonpos);
+-        if (extra)
+-                printf("   WARNING: Graph contained %d edges to "
+-                       "non-existent vertices!\n",extra);
+-        if (weight>=INT_MAX)
+-                printf("   WARNING: Total graph weight >= INT_MAX!\n");
+-        return;
+-}
+-
+-
+-/*
+- * graph_test()
+- *
+- * Tests graph g to be valid.  Checks that g is non-NULL, the edges are
+- * symmetric and anti-reflexive, and that all vertex weights are positive.
+- * If output is non-NULL, prints a few lines telling the status of the graph
+- * to file descriptor output.
+- * 
+- * Returns TRUE if the graph is valid, FALSE otherwise.
+- */
+-boolean graph_test(graph_t *g,FILE *output) {
+-        int i,j;
+-        int edges=0;
+-        int asymm=0;
+-        int nonpos=0;
+-        int refl=0;
+-        int extra=0;
+-        unsigned int weight=0;
+-        boolean weighted;
+-
+-        ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
+-
+-        if (g==NULL) {
+-                if (output)
+-                        fprintf(output,"   WARNING: Graph pointer is NULL!\n");
+-                return FALSE;
+-        }
+-
+-        weighted=graph_weighted(g);
+-        
+-        for (i=0; i < g->n; i++) {
+-                if (g->edges[i]==NULL) {
+-                        if (output)
+-                                fprintf(output,"   WARNING: Graph edge set "
+-                                        "NULL!\n"
+-                                        "   (further warning suppressed)\n");
+-                        return FALSE;
+-                }
+-                if (SET_MAX_SIZE(g->edges[i]) < g->n) {
+-                        if (output)
+-                                fprintf(output,"   WARNING: Graph edge set "
+-                                        "too small!\n"
+-                                        "   (further warnings suppressed)\n");
+-                        return FALSE;
+-                }
+-                for (j=0; j < g->n; j++) {
+-                        if (SET_CONTAINS_FAST(g->edges[i],j)) {
+-                                edges++;
+-                                if (i==j) {
+-                                        refl++;
+-                                }
+-                                if (!SET_CONTAINS_FAST(g->edges[j],i)) {
+-                                        asymm++;
+-                                }
+-                        }
+-                }
+-                for (j=g->n; j < SET_ARRAY_LENGTH(g->edges[i])*ELEMENTSIZE;
+-                     j++) {
+-                        if (SET_CONTAINS_FAST(g->edges[i],j))
+-                                extra++;
+-                }
+-                if (g->weights[i] <= 0)
+-                        nonpos++;
+-                if (weight<INT_MAX)
+-                        weight += g->weights[i];
+-        }
+-        
+-        edges/=2;  /* Each is counted twice. */
+-        
+-        if (output) {
+-                /* Semi-weighted means all weights are equal, but not 1. */
+-                fprintf(output,"%s graph has %d vertices, %d edges "
+-                        "(density %.2f).\n",
+-                        weighted?"Weighted":
+-                        ((g->weights[0]==1)?"Unweighted":"Semi-weighted"),
+-                        g->n,edges,(float)edges/((float)(g->n - 1)*(g->n)/2));
+-                
+-                if (asymm)
+-                        fprintf(output,"   WARNING: Graph contained %d "
+-                                "asymmetric edges!\n",asymm);
+-                if (refl)
+-                        fprintf(output,"   WARNING: Graph contained %d "
+-                                "reflexive edges!\n",refl);
+-                if (nonpos)
+-                        fprintf(output,"   WARNING: Graph contained %d "
+-                                "non-positive vertex weights!\n",nonpos);
+-                if (extra)
+-                        fprintf(output,"   WARNING: Graph contained %d edges "
+-                                "to non-existent vertices!\n",extra);
+-                if (weight>=INT_MAX)
+-                        fprintf(output,"   WARNING: Total graph weight >= "
+-                                "INT_MAX!\n");
+-                if (asymm==0 && refl==0 && nonpos==0 && extra==0 &&
+-                    weight<INT_MAX)
+-                        fprintf(output,"Graph OK.\n");
+-        }
+-        
+-        if (asymm || refl || nonpos || extra || weight>=INT_MAX)
+-                return FALSE;
+-
+-        return TRUE;
+-}
+-
+-
+-/*
+- * graph_test_regular()
+- *
+- * Returns the vertex degree for regular graphs, or -1 if the graph is
+- * not regular.
+- */
+-int graph_test_regular(graph_t *g) {
+-        int i,n;
+-
+-        n=set_size(g->edges[0]);
+-
+-        for (i=1; i < g->n; i++) {
+-                if (set_size(g->edges[i]) != n)
+-                        return -1;
+-        }
+-        return n;
+-}
+-
+-
+-
+-/*
+- * This file contains the vertex reordering routines.
+- *
+- * Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
+- * Licensed under the GNU GPL, read the file LICENSE for details.
+- */
+-
+-/*
+-#include "reorder.h"
+-
+-#include <time.h>
+-#include <sys/times.h>
+-#include <stdlib.h>
+-
+-#include <limits.h>
+-*/
+-
+-
+-/*
+- * reorder_set()
+- *
+- * Reorders the set s with a function  i -> order[i].
+- *
+- * Note: Assumes that order is the same size as SET_MAX_SIZE(s).
+- */
+-void reorder_set(set_t s,int *order) {
+-        set_t tmp;
+-        int i,j;
+-        setelement e;
+-
+-        ASSERT(reorder_is_bijection(order,SET_MAX_SIZE(s)));
+-
+-        tmp=set_new(SET_MAX_SIZE(s));
+-
+-        for (i=0; i<(SET_MAX_SIZE(s)/ELEMENTSIZE); i++) {
+-                e=s[i];
+-                if (e==0)
+-                        continue;
+-                for (j=0; j<ELEMENTSIZE; j++) {
+-                        if (e&1) {
+-                                SET_ADD_ELEMENT(tmp,order[i*ELEMENTSIZE+j]);
+-                        }
+-                        e = e>>1;
+-                }
+-        }
+-        if (SET_MAX_SIZE(s)%ELEMENTSIZE) {
+-                e=s[i];
+-                for (j=0; j<(SET_MAX_SIZE(s)%ELEMENTSIZE); j++) {
+-                        if (e&1) {
+-                                SET_ADD_ELEMENT(tmp,order[i*ELEMENTSIZE+j]);
+-                        }
+-                        e = e>>1;
+-                }
+-        }
+-        set_copy(s,tmp);
+-        set_free(tmp);
+-        return;
+-}
+-
+-
+-/*
+- * reorder_graph()
+- *
+- * Reorders the vertices in the graph with function  i -> order[i].
+- *
+- * Note: Assumes that order is of size g->n.
+- */
+-void reorder_graph(graph_t *g, int *order) {
+-        int i;
+-        set_t *tmp_e;
+-        int *tmp_w;
+-
+-        ASSERT(reorder_is_bijection(order,g->n));
+-
+-        tmp_e=malloc(g->n * sizeof(set_t));
+-        tmp_w=malloc(g->n * sizeof(int));
+-        for (i=0; i<g->n; i++) {
+-                reorder_set(g->edges[i],order);
+-                tmp_e[order[i]]=g->edges[i];
+-                tmp_w[order[i]]=g->weights[i];
+-        }
+-        for (i=0; i<g->n; i++) {
+-                g->edges[i]=tmp_e[i];
+-                g->weights[i]=tmp_w[i];
+-        }
+-        free(tmp_e);
+-        free(tmp_w);
+-        return;
+-}
+-
+-
+-
+-/*
+- * reorder_duplicate()
+- *
+- * Returns a newly allocated duplicate of the given ordering.
+- */
+-int *reorder_duplicate(int *order,int n) {
+-        int *new;
+-
+-        new=malloc(n*sizeof(int));
+-        memcpy(new,order,n*sizeof(int));
+-        return new;
+-}
+-
+-/*
+- * reorder_invert()
+- *
+- * Inverts the given ordering so that new[old[i]]==i.
+- *
+- * Note: Asserts that order is a bijection.
+- */
+-void reorder_invert(int *order,int n) {
+-        int *new;
+-        int i;
+-
+-        ASSERT(reorder_is_bijection(order,n));
+-
+-        new=malloc(n*sizeof(int));
+-        for (i=0; i<n; i++)
+-                new[order[i]]=i;
+-        for (i=0; i<n; i++)
+-                order[i]=new[i];
+-        free(new);
+-        return;
+-}
+-
+-/*
+- * reorder_reverse()
+- *
+- * Reverses the given ordering so that  new[i] == n-1 - old[i].
+- */
+-void reorder_reverse(int *order,int n) {
+-        int i;
+-
+-        for (i=0; i<n; i++)
+-                order[i] = n-1 - order[i];
+-        return;
+-}
+-
+-/*
+- * reorder_is_bijection
+- *
+- * Checks that an ordering is a bijection {0,...,n-1} -> {0,...,n-1}.
+- *
+- * Returns TRUE if it is a bijection, FALSE otherwise.
+- */
+-boolean reorder_is_bijection(int *order,int n) {
+-        boolean *used;
+-        int i;
+-
+-        used=calloc(n,sizeof(boolean));
+-        for (i=0; i<n; i++) {
+-                if (order[i]<0 || order[i]>=n) {
+-                        free(used);
+-                        return FALSE;
+-                }
+-                if (used[order[i]]) {
+-                        free(used);
+-                        return FALSE;
+-                }
+-                used[order[i]]=TRUE;
+-        }
+-        for (i=0; i<n; i++) {
+-                if (!used[i]) {
+-                        free(used);
+-                        return FALSE;
+-                }
+-        }
+-        free(used);
+-        return TRUE;
+-}
+-
+-/*
+- * reorder_ident()
+- *
+- * Returns a newly allocated identity ordering of size n, ie. order[i]==i.
+- */
+-int *reorder_ident(int n) {
+-        int i;
+-        int *order;
+-
+-        order=malloc(n*sizeof(int));
+-        for (i=0; i<n; i++)
+-                order[i]=i;
+-        return order;
+-}
+-
+-
+-
+-/*** Reordering functions for use in clique_options ***/
+-
+-/*
+- * reorder_by_ident()
+- *
+- * Returns an identity ordering.
+- */
+-int *reorder_by_ident(graph_t *g,boolean weighted) {
+-        return reorder_ident(g->n);
+-}
+-
+-/*
+- * reorder_by_reverse()
+- *
+- * Returns a reverse identity ordering.
+- */
+-int *reorder_by_reverse(graph_t *g,boolean weighted) {
+-        int i;
+-        int *order;
+-
+-        order=malloc(g->n * sizeof(int));
+-        for (i=0; i < g->n; i++)
+-                order[i]=g->n-i-1;
+-        return order;
+-}
+-
+-/*
+- * reorder_by_greedy_coloring()
+- *
+- * Equivalent to reorder_by_weighted_greedy_coloring or
+- * reorder_by_unweighted_greedy_coloring according to the value of weighted.
+- */
+-int *reorder_by_greedy_coloring(graph_t *g,boolean weighted) {
+-        if (weighted)
+-                return reorder_by_weighted_greedy_coloring(g,weighted);
+-        else
+-                return reorder_by_unweighted_greedy_coloring(g,weighted);
+-}
+-
+-
+-/*
+- * reorder_by_unweighted_greedy_coloring()
+- *
+- * Returns an ordering for the graph g by coloring the clique one
+- * color at a time, always adding the vertex of largest degree within
+- * the uncolored graph, and numbering these vertices 0, 1, ...
+- *
+- * Experimentally efficient for use with unweighted graphs.
+- */
+-int *reorder_by_unweighted_greedy_coloring(graph_t *g,boolean weighted) {
+-        int i,j,v;
+-        boolean *tmp_used;
+-        int *degree;   /* -1 for used vertices */
+-        int *order;
+-        int maxdegree,maxvertex=0;
+-        boolean samecolor;
+-
+-        tmp_used=calloc(g->n,sizeof(boolean));
+-        degree=calloc(g->n,sizeof(int));
+-        order=calloc(g->n,sizeof(int));
+-
+-        for (i=0; i < g->n; i++) {
+-                for (j=0; j < g->n; j++) {
+-                        ASSERT(!((i==j) && GRAPH_IS_EDGE(g,i,j)));
+-                        if (GRAPH_IS_EDGE(g,i,j))
+-                                degree[i]++;
+-                }
+-        }
+-
+-        v=0;
+-        while (v < g->n) {
+-                /* Reset tmp_used. */
+-                memset(tmp_used,0,g->n * sizeof(boolean));
+-
+-                do {
+-                        /* Find vertex to be colored. */
+-                        maxdegree=0;
+-                        samecolor=FALSE;
+-                        for (i=0; i < g->n; i++) {
+-                                if (!tmp_used[i] && degree[i] >= maxdegree) {
+-                                        maxvertex=i;
+-                                        maxdegree=degree[i];
+-                                        samecolor=TRUE;
+-                                }
+-                        }
+-                        if (samecolor) {
+-                                order[v]=maxvertex;
+-                                degree[maxvertex]=-1;
+-                                v++;
+-
+-                                /* Mark neighbors not to color with same
+-                                 * color and update neighbor degrees. */
+-                                for (i=0; i < g->n; i++) {
+-                                        if (GRAPH_IS_EDGE(g,maxvertex,i)) {
+-                                                tmp_used[i]=TRUE;
+-                                                degree[i]--;
+-                                        }
+-                                }
+-                        }
+-                } while (samecolor);
+-        }
+-
+-        free(tmp_used);
+-        free(degree);
+-        return order;
+-}
+-
+-/*
+- * reorder_by_weighted_greedy_coloring()
+- *
+- * Returns an ordering for the graph g by coloring the clique one
+- * color at a time, always adding the vertex that (in order of importance):
+- *  1. has the minimum weight in the remaining graph
+- *  2. has the largest sum of weights surrounding the vertex
+- *
+- * Experimentally efficient for use with weighted graphs.
+- */
+-int *reorder_by_weighted_greedy_coloring(graph_t *g, boolean weighted) {
+-        int i,j,p=0;
+-        int cnt;
+-        int *nwt;    /* Sum of surrounding vertices' weights */
+-        int min_wt,max_nwt;
+-        boolean *used;
+-        int *order;
+-        
+-        nwt=malloc(g->n * sizeof(int));
+-        order=malloc(g->n * sizeof(int));
+-        used=calloc(g->n,sizeof(boolean));
+-        
+-        for (i=0; i < g->n; i++) {
+-                nwt[i]=0;
+-                for (j=0; j < g->n; j++)
+-                        if (GRAPH_IS_EDGE(g, i, j))
+-                                nwt[i] += g->weights[j];
+-        }
+-
+-        for (cnt=0; cnt < g->n; cnt++) {
+-                min_wt=INT_MAX;
+-                max_nwt=-1;
+-                for (i=g->n-1; i>=0; i--)
+-                        if ((!used[i]) && (g->weights[i] < min_wt))
+-                                min_wt=g->weights[i];
+-                for (i=g->n-1; i>=0; i--) {
+-                        if (used[i] || (g->weights[i] > min_wt))
+-                                continue;
+-                        if (nwt[i] > max_nwt) {
+-                                max_nwt=nwt[i];
+-                                p=i;
+-                        }
+-                }
+-                order[cnt]=p;
+-                used[p]=TRUE;
+-                for (j=0; j < g->n; j++)
+-                        if ((!used[j]) && (GRAPH_IS_EDGE(g, p, j)))
+-                                nwt[j] -= g->weights[p];
+-        }
+-
+-        free(nwt);
+-        free(used);
+-
+-        ASSERT(reorder_is_bijection(order,g->n));
+-
+-        return order;
+-}
+-
+-/*
+- * reorder_by_degree()
+- *
+- * Returns a reordering of the graph g so that the vertices with largest
+- * degrees (most neighbors) are first.
+- */
+-int *reorder_by_degree(graph_t *g, boolean weighted) {
+-        int i,j,v;
+-        int *degree;
+-        int *order;
+-        int maxdegree,maxvertex=0;
+-
+-        degree=calloc(g->n,sizeof(int));
+-        order=calloc(g->n,sizeof(int));
+-
+-        for (i=0; i < g->n; i++) {
+-                for (j=0; j < g->n; j++) {
+-                        ASSERT(!((i==j) && GRAPH_IS_EDGE(g,i,j)));
+-                        if (GRAPH_IS_EDGE(g,i,j))
+-                                degree[i]++;
+-                }
+-        }
+-
+-        for (v=0; v < g->n; v++) {
+-                maxdegree=0;
+-                for (i=0; i < g->n; i++) {
+-                        if (degree[i] >= maxdegree) {
+-                                maxvertex=i;
+-                                maxdegree=degree[i];
+-                        }
+-                }
+-                order[v]=maxvertex;
+-                degree[maxvertex]=-1;  /* used */
+-/*** Max. degree withing unselected graph:
+-                for (i=0; i < g->n; i++) {
+-                        if (GRAPH_IS_EDGE(g,maxvertex,i))
+-                                degree[i]--;
+-                }
+-***/
+-        }
+-
+-        free(degree);
+-        return order;
+-}
+-
+-/*
+- * reorder_by_random()
+- *
+- * Returns a random reordering for graph g.
+- * Note: Used the functions rand() and srand() to generate the random
+- *       numbers.  srand() is re-initialized every time reorder_by_random()
+- *       is called using the system time.
+- */
+-int *reorder_by_random(graph_t *g, boolean weighted) {
+-        /* struct tms t; */
+-        int i,r;
+-        int *new;
+-        boolean *used;
+-
+-/*
+-        srand(times(&t)+time(NULL));
+-*/
+-        INITRANBYTIME;
+-
+-        new=calloc(g->n, sizeof(int));
+-        used=calloc(g->n, sizeof(boolean));
+-        for (i=0; i < g->n; i++) {
+-                do {
+-                        r=NEXTRAN % g->n;
+-                } while (used[r]);
+-                new[i]=r;
+-                used[r]=TRUE;
+-        }
+-        free(used);
+-        return new;
+-}
+-
+ /************************************************************************/
+ 
+ /* This is an interface between nauty and cliquer for finding
+--- a/nautycliquer.h
++++ b/nautycliquer.h
+@@ -6,635 +6,7 @@
+ 
+ #include "nauty.h"
+ #include "gtools.h"
+-#include <limits.h>
+-
+-/**********************************************************************
+-#include "cliquerconf.h"
+-*/
+-
+-/*
+- * setelement is the basic memory type used in sets.  It is often fastest
+- * to be as large as can fit into the CPU registers.
+- *
+- * ELEMENTSIZE is the size of one setelement, measured in bits.  It must
+- * be either 16, 32 or 64  (otherwise additional changes must be made to
+- * the source).
+- *
+- * The default is to use "unsigned long int" and attempt to guess the
+- * size using <limits.h>, which should work pretty well.  Check functioning
+- * with "make test".
+- */
+-
+-/* typedef unsigned long int setelement; */
+-/* #define ELEMENTSIZE 64 */
+-
+-/*
+- * INLINE is a command prepended to function declarations to instruct the
+- * compiler to inline the function.  If inlining is not desired, define blank.
+- *
+- * The default is to use "inline", which is recognized by most compilers.
+- */
+-
+-/* #define INLINE */
+-/* #define INLINE __inline__ */
+-
+-
+-/*
+- * Set handling functions are defined as static functions in set.h for
+- * performance reasons.  This may cause unnecessary warnings from the
+- * compiler.  Some compilers (such as GCC) have the possibility to turn
+- * off the warnings on a per-function basis using a flag prepended to
+- * the function declaration.
+- *
+- * The default is to use the correct attribute when compiling with GCC,
+- * or no flag otherwise.
+- */
+-
+-/* #define UNUSED_FUNCTION __attribute__((unused)) */
+-/* #define UNUSED_FUNCTION */
+-
+-/*
+- * Uncommenting the following will disable all assertions  (checks that
+- * function arguments and other variables are correct).  This is highly
+- * discouraged, as it allows bugs to go unnoticed easier.  The assertions
+- * are set so that they do not slow down programs notably.
+- */
+-
+-/* #define ASSERT(x) */
+-
+-/**********************************************************************
+-#include "misc.h"
+-*/
+-
+-/*
+- * We #define boolean instead of using a typedef because nauty.h uses it
+- * also.  AFAIK, there is no way to check for an existing typedef, and
+- * re-typedefing is illegal (even when using exactly the same datatype!).
+-#ifndef boolean
+-#define boolean int
+-#endif
+-
+-BDM: In nauty's version we will use nauty's boolean (which is int anyway).
+- */
+-
+-/*
+- * Default value for UNUSED_FUNCTION:  use "__attribute__((unused))" for
+- * GCC versions that support it, otherwise leave blank.
+- */
+-#ifndef UNUSED_FUNCTION
+-# if     __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+-#  define UNUSED_FUNCTION __attribute__((unused))
+-# else
+-#  define UNUSED_FUNCTION
+-# endif
+-#endif  /* !UNUSED_FUNCTION */
+-
+-/*
+- * Default inlining directive:  "inline"
+- */
+-#ifndef INLINE
+-#define INLINE inline
+-#endif
+-
+-#ifndef ASSERT
+-#define ASSERT(expr) \
+-        if (!(expr)) { \
+-		fprintf(stderr,"cliquer file %s: line %d: assertion failed: " \
+-			"(%s)\n",__FILE__,__LINE__,#expr); \
+-		abort(); \
+-	}
+-#endif /* !ASSERT */
+-
+-
+-#ifndef FALSE
+-#define FALSE (0)
+-#endif
+-#ifndef TRUE
+-#define TRUE (!FALSE)
+-#endif
+-
+-
+-#ifndef MIN
+-#define MIN(a,b) (((a)<(b))?(a):(b))
+-#endif
+-#ifndef MAX
+-#define MAX(a,b) (((a)>(b))?(a):(b))
+-#endif
+-#ifndef ABS
+-#define ABS(v)  (((v)<0)?(-(v)):(v))
+-#endif
+-
+-/**********************************************************************
+-#include "set.h"
+-*/
+-
+-/*
+- * This file contains the set handling routines.
+- *
+- * Copyright (C) 2002 Sampo Niskanen, Patric Ã–stergÃ¥rd.
+- * Licensed under the GNU GPL, read the file LICENSE for details.
+- */
+-
+-/*
+- * Sets are arrays of setelement's (typically unsigned long int's) with
+- * representative bits for each value they can contain.  The values
+- * are numbered 0,...,n-1.
+- */
+-
+-
+-/*** Variable types and constants. ***/
+-
+-
+-/*
+- * If setelement hasn't been declared:
+- *   - use "unsigned long int" as setelement
+- *   - try to deduce size from ULONG_MAX
+- */
+-
+-#ifndef ELEMENTSIZE
+-typedef unsigned long int setelement;
+-# if (ULONG_MAX == 65535)
+-#  define ELEMENTSIZE 16
+-# elif (ULONG_MAX == 4294967295)
+-#  define ELEMENTSIZE 32
+-# else
+-#  define ELEMENTSIZE 64
+-# endif
+-#endif  /* !ELEMENTSIZE */
+-
+-typedef setelement * set_t;
+-
+-
+-/*** Counting amount of 1 bits in a setelement ***/
+-
+-/* Array for amount of 1 bits in a byte. */
+-static int set_bit_count[256] = {
+-	0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,
+-	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+-	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+-	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+-	2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+-	3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+-	3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+-	4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8 };
+-
+-/* The following macros assume that all higher bits are 0.
+- * They may in some cases be useful also on with other ELEMENTSIZE's,
+- * so we define them all.  */
+-#define SET_ELEMENT_BIT_COUNT_8(a)  (set_bit_count[(a)])
+-#define SET_ELEMENT_BIT_COUNT_16(a) (set_bit_count[(a)>>8] + \
+-				     set_bit_count[(a)&0xFF])
+-#define SET_ELEMENT_BIT_COUNT_32(a) (set_bit_count[(a)>>24] + \
+-				     set_bit_count[((a)>>16)&0xFF] + \
+-				     set_bit_count[((a)>>8)&0xFF] + \
+-				     set_bit_count[(a)&0xFF])
+-#define SET_ELEMENT_BIT_COUNT_64(a) (set_bit_count[(a)>>56] + \
+-				     set_bit_count[((a)>>48)&0xFF] + \
+-				     set_bit_count[((a)>>40)&0xFF] + \
+-				     set_bit_count[((a)>>32)&0xFF] + \
+-				     set_bit_count[((a)>>24)&0xFF] + \
+-				     set_bit_count[((a)>>16)&0xFF] + \
+-				     set_bit_count[((a)>>8)&0xFF] + \
+-				     set_bit_count[(a)&0xFF])
+-#if (ELEMENTSIZE==64)
+-# define SET_ELEMENT_BIT_COUNT(a) SET_ELEMENT_BIT_COUNT_64(a)
+-# define FULL_ELEMENT ((setelement)0xFFFFFFFFFFFFFFFF)
+-#elif (ELEMENTSIZE==32)
+-# define SET_ELEMENT_BIT_COUNT(a) SET_ELEMENT_BIT_COUNT_32(a)
+-# define FULL_ELEMENT ((setelement)0xFFFFFFFF)
+-#elif (ELEMENTSIZE==16)
+-# define SET_ELEMENT_BIT_COUNT(a) SET_ELEMENT_BIT_COUNT_16(a)
+-# define FULL_ELEMENT ((setelement)0xFFFF)
+-#else
+-# error "SET_ELEMENT_BIT_COUNT(a) not defined for current ELEMENTSIZE"
+-#endif
+-
+-/*** Macros and functions ***/
+-
+-/*
+- * Gives a value with bit x (counting from lsb up) set.
+- *
+- * Making this as a table might speed up things on some machines
+- * (though on most modern machines it's faster to shift instead of
+- * using memory).  Making it a macro makes it easy to change.
+- */
+-#define SET_BIT_MASK(x) ((setelement)1<<(x))
+-
+-/* Set element handling macros */
+-
+-#define SET_ELEMENT_INTERSECT(a,b)  ((a)&(b))
+-#define SET_ELEMENT_UNION(a,b)      ((a)|(b))
+-#define SET_ELEMENT_DIFFERENCE(a,b) ((a)&(~(b)))
+-#define SET_ELEMENT_CONTAINS(e,v)   ((e)&SET_BIT_MASK(v))
+-
+-/* Set handling macros */
+-
+-#define SET_ADD_ELEMENT(s,a) \
+-                       ((s)[(a)/ELEMENTSIZE] |= SET_BIT_MASK((a)%ELEMENTSIZE))
+-#define SET_DEL_ELEMENT(s,a) \
+-                       ((s)[(a)/ELEMENTSIZE] &= ~SET_BIT_MASK((a)%ELEMENTSIZE))
+-#define SET_CONTAINS_FAST(s,a) (SET_ELEMENT_CONTAINS((s)[(a)/ELEMENTSIZE], \
+-						      (a)%ELEMENTSIZE))
+-#define SET_CONTAINS(s,a) (((a)<SET_MAX_SIZE(s))?SET_CONTAINS_FAST(s,a):FALSE)
+-
+-/* Sets can hold values between 0,...,SET_MAX_SIZE(s)-1 */
+-#define SET_MAX_SIZE(s) ((s)[-1])
+-/* Sets consist of an array of SET_ARRAY_LENGTH(s) setelements */
+-#define SET_ARRAY_LENGTH(s) (((s)[-1]+ELEMENTSIZE-1)/ELEMENTSIZE)
+-
+-/*
+- * set_new()
+- *
+- * Create a new set that can hold values in the range 0,...,size-1.
+- */
+-UNUSED_FUNCTION
+-static set_t set_new(int size) {
+-	int n;
+-	set_t s;
+-
+-	ASSERT(size>0);
+-
+-	n=(size/ELEMENTSIZE+1)+1;
+-	s=calloc(n,sizeof(setelement));
+-	s[0]=size;
+-
+-	return &(s[1]);
+-}
+-
+-/*
+- * set_free()
+- *
+- * Free the memory associated with set s.
+- */
+-UNUSED_FUNCTION 
+-static void set_free(set_t s) {
+-	ASSERT(s!=NULL);
+-	free(&(s[-1]));
+-}
+-
+-/*
+- * set_resize()
+- *
+- * Resizes set s to given size.  If the size is less than SET_MAX_SIZE(s),
+- * the last elements are dropped.
+- *
+- * Returns a pointer to the new set.
+- */
+-UNUSED_FUNCTION 
+-static set_t set_resize(set_t s, int size) {
+-	int n;
+-
+-	ASSERT(size>0);
+-
+-	n=(size/ELEMENTSIZE+1);
+-	s=((setelement *)realloc(s-1,(n+1)*sizeof(setelement)))+1;
+-
+-	if (n>SET_ARRAY_LENGTH(s))
+-		memset(s+SET_ARRAY_LENGTH(s),0,
+-		       (n-SET_ARRAY_LENGTH(s))*sizeof(setelement));
+-	if (size < SET_MAX_SIZE(s))
+-		s[(size-1)/ELEMENTSIZE] &= (FULL_ELEMENT >>
+-					    (ELEMENTSIZE-size%ELEMENTSIZE));
+-	s[-1]=size;
+-
+-	return s;
+-}
+-
+-/*
+- * set_size()
+- *
+- * Returns the number of elements in set s.
+- */
+-UNUSED_FUNCTION 
+-static int set_size(set_t s) {
+-	int count=0;
+-	setelement *c;
+-
+-	for (c=s; c < s+SET_ARRAY_LENGTH(s); c++)
+-		count+=SET_ELEMENT_BIT_COUNT(*c);
+-	return count;
+-}
+-
+-/*
+- * set_duplicate()
+- *
+- * Returns a newly allocated duplicate of set s.
+- */
+-UNUSED_FUNCTION 
+-static set_t set_duplicate(set_t s) {
+-	set_t new;
+-
+-	new=set_new(SET_MAX_SIZE(s));
+-	memcpy(new,s,SET_ARRAY_LENGTH(s)*sizeof(setelement));
+-	return new;
+-}
+-
+-/*
+- * set_copy()
+- *
+- * Copies set src to dest.  If dest is NULL, is equal to set_duplicate.
+- * If dest smaller than src, it is freed and a new set of the same size as
+- * src is returned.
+- */
+-UNUSED_FUNCTION 
+-static set_t set_copy(set_t dest,set_t src) {
+-	if (dest==NULL)
+-		return set_duplicate(src);
+-	if (SET_MAX_SIZE(dest)<SET_MAX_SIZE(src)) {
+-		set_free(dest);
+-		return set_duplicate(src);
+-	}
+-	memcpy(dest,src,SET_ARRAY_LENGTH(src)*sizeof(setelement));
+-	memset(dest+SET_ARRAY_LENGTH(src),0,((SET_ARRAY_LENGTH(dest) -
+-					      SET_ARRAY_LENGTH(src)) *
+-					     sizeof(setelement)));
+-	return dest;
+-}
+-
+-/*
+- * set_empty()
+- *
+- * Removes all elements from the set s.
+- */
+-UNUSED_FUNCTION 
+-static void set_empty(set_t s) {
+-	memset(s,0,SET_ARRAY_LENGTH(s)*sizeof(setelement));
+-	return;
+-}
+-
+-/*
+- * set_intersection()
+- *
+- * Store the intersection of sets a and b into res.  If res is NULL,
+- * a new set is created and the result is written to it.  If res is
+- * smaller than the larger one of a and b, it is freed and a new set
+- * is created and the result is returned.
+- *
+- * Returns either res or a new set that has been allocated in its stead.
+- *
+- * Note:  res may not be a or b.
+- */
+-UNUSED_FUNCTION 
+-static set_t set_intersection(set_t res,set_t a,set_t b) {
+-	int i,max;
+-
+-	if (res==NULL) {
+-		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+-	} else if (SET_MAX_SIZE(res) < MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b))) {
+-		set_free(res);
+-		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+-	} else {
+-		set_empty(res);
+-	}
+-
+-	max=MIN(SET_ARRAY_LENGTH(a),SET_ARRAY_LENGTH(b));
+-	for (i=0; i<max; i++) {
+-		res[i]=SET_ELEMENT_INTERSECT(a[i],b[i]);
+-	}
+-
+-	return res;
+-}
+-
+-/*
+- * set_union()
+- *
+- * Store the union of sets a and b into res.  If res is NULL, a new set
+- * is created and the result is written to it.  If res is smaller than
+- * the larger one of a and b, it is freed and a new set is created and
+- * the result is returned.
+- *
+- * Returns either res or a new set that has been allocated in its stead.
+- *
+- * Note:  res may not be a or b.
+- */
+-UNUSED_FUNCTION 
+-static set_t set_union(set_t res,set_t a,set_t b) {
+-	int i,max;
+-
+-	if (res==NULL) {
+-		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+-	} else if (SET_MAX_SIZE(res) < MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b))) {
+-		set_free(res);
+-		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+-	} else {
+-		set_empty(res);
+-	}
+-
+-	max=MAX(SET_ARRAY_LENGTH(a),SET_ARRAY_LENGTH(b));
+-	for (i=0; i<max; i++) {
+-		res[i]=SET_ELEMENT_UNION(a[i],b[i]);
+-	}
+-
+-	return res;
+-}
+-
+-
+-/*
+- * set_return_next()
+- *
+- * Returns the smallest value in set s which is greater than n, or -1 if
+- * such a value does not exist.
+- *
+- * Can be used to iterate through all values of s:
+- *
+- * int i=-1;
+- * while ((i=set_return_next(s,i))>=0) {
+- *         // i is in set s
+- * }
+- */
+-UNUSED_FUNCTION 
+-static int set_return_next(set_t s, int n) {
+-	if (n<0)
+-		n=0;
+-	else
+-		n++;
+-	if (n >= SET_MAX_SIZE(s))
+-		return -1;
+-
+-	while (n%ELEMENTSIZE) {
+-		if (SET_CONTAINS(s,n))
+-			return n;
+-		n++;
+-		if (n >= SET_MAX_SIZE(s))
+-			return -1;
+-	}
+-
+-	while (s[n/ELEMENTSIZE]==0) {
+-		n+=ELEMENTSIZE;
+-		if (n >= SET_MAX_SIZE(s))
+-			return -1;
+-	}
+-	while (!SET_CONTAINS(s,n)) {
+-		n++;
+-		if (n >= SET_MAX_SIZE(s))
+-			return -1;
+-	}
+-	return n;
+-}
+-
+-
+-/*
+- * set_print()
+- *
+- * Prints the size and contents of set s to stdout.
+- * Mainly useful for debugging purposes and trivial output.
+- */
+-UNUSED_FUNCTION
+-static void set_print(set_t s) {
+-	int i;
+-	printf("size=%d(max %d)",set_size(s),(int)SET_MAX_SIZE(s));
+-	for (i=0; i<SET_MAX_SIZE(s); i++)
+-		if (SET_CONTAINS(s,i))
+-			printf(" %d",i);
+-	printf("\n");
+-	return;
+-}
+-
+-/********************************************************************
+-#include "graph.h"
+-*/
+-
+-typedef struct _graph_t graph_t;
+-struct _graph_t {
+-	int n;             /* Vertices numbered 0...n-1 */
+-	set_t *edges;      /* A list of n sets (the edges). */
+-	int *weights;      /* A list of n vertex weights. */
+-};
+-
+-
+-#define GRAPH_IS_EDGE_FAST(g,i,j)  (SET_CONTAINS_FAST((g)->edges[(i)],(j)))
+-#define GRAPH_IS_EDGE(g,i,j) (((i)<((g)->n))?SET_CONTAINS((g)->edges[(i)], \
+-							  (j)):FALSE)
+-#define GRAPH_ADD_EDGE(g,i,j) do {            \
+-	SET_ADD_ELEMENT((g)->edges[(i)],(j)); \
+-	SET_ADD_ELEMENT((g)->edges[(j)],(i)); \
+-} while (FALSE)
+-#define GRAPH_DEL_EDGE(g,i,j) do {            \
+-	SET_DEL_ELEMENT((g)->edges[(i)],(j)); \
+-	SET_DEL_ELEMENT((g)->edges[(j)],(i)); \
+-} while (FALSE)
+-
+-
+-graph_t *graph_new(int n);
+-void graph_free(graph_t *g);
+-void graph_resize(graph_t *g, int size);
+-void graph_crop(graph_t *g);
+-
+-boolean graph_weighted(graph_t *g);
+-int graph_edge_count(graph_t *g);
+-
+-graph_t *graph_read_dimacs(FILE *fp);
+-graph_t *graph_read_dimacs_file(char *file);
+-boolean graph_write_dimacs_ascii(graph_t *g, char *comment,FILE *fp);
+-boolean graph_write_dimacs_ascii_file(graph_t *g,char *comment,char *file);
+-boolean graph_write_dimacs_binary(graph_t *g, char *comment,FILE *fp);
+-boolean graph_write_dimacs_binary_file(graph_t *g, char *comment,char *file);
+-
+-void graph_print(graph_t *g);
+-boolean graph_test(graph_t *g, FILE *output);
+-int graph_test_regular(graph_t *g);
+-
+-UNUSED_FUNCTION 
+-static int graph_subgraph_weight(graph_t *g,set_t s) {
+-	int i,j;
+-	int count=0;
+-	setelement e;
+-
+-	for (i=0; i<SET_ARRAY_LENGTH(s); i++) {
+-		if (s[i]) {
+-			e=s[i];
+-			for (j=0; j<ELEMENTSIZE; j++) {
+-				if (e&1)
+-					count+=g->weights[i*ELEMENTSIZE+j];
+-				e = e>>1;
+-			}
+-		}
+-	}
+-	return count;
+-}
+-
+-UNUSED_FUNCTION 
+-static int graph_vertex_degree(graph_t *g, int v) {
+-	return set_size(g->edges[v]);
+-}
+-
+-/********************************************************************
+-#include "reorder.h"
+-*/
+-
+-void reorder_set(set_t s,int *order);
+-void reorder_graph(graph_t *g, int *order);
+-int *reorder_duplicate(int *order,int n);
+-void reorder_invert(int *order,int n);
+-void reorder_reverse(int *order,int n);
+-int *reorder_ident(int n);
+-boolean reorder_is_bijection(int *order,int n);
+-
+-
+-#define reorder_by_default reorder_by_greedy_coloring
+-int *reorder_by_greedy_coloring(graph_t *g, boolean weighted);
+-int *reorder_by_weighted_greedy_coloring(graph_t *g, boolean weighted);
+-int *reorder_by_unweighted_greedy_coloring(graph_t *g,boolean weighted);
+-int *reorder_by_degree(graph_t *g, boolean weighted);
+-int *reorder_by_random(graph_t *g, boolean weighted);
+-int *reorder_by_ident(graph_t *g, boolean weighted);
+-int *reorder_by_reverse(graph_t *g, boolean weighted);
+-
+-
+-typedef struct _clique_options clique_options;
+-struct _clique_options {
+-	int *(*reorder_function)(graph_t *, boolean);
+-	int *reorder_map;
+-
+-	/* arguments:  level, n, max, user_time, system_time, opts */
+-	boolean (*time_function)(int,int,int,int,double,double,
+-				 clique_options *);
+-	FILE *output;
+-
+-	boolean (*user_function)(set_t,graph_t *,clique_options *);
+-	void *user_data;
+-	set_t *clique_list;
+-	int clique_list_length;
+-};
+-
+-extern clique_options *clique_default_options;
+-
+-/* Weighted clique functions */
+-int clique_max_weight(graph_t *g,clique_options *opts);
+-set_t clique_find_single(graph_t *g,int min_weight,int max_weight,
+-				boolean maximal, clique_options *opts);
+-int clique_find_all(graph_t *g, int req_weight, boolean exact,
+-			   boolean maximal, clique_options *opts);
+-
+-/* Unweighted clique functions */
+-#define clique_unweighted_max_size clique_unweighted_max_weight
+-int clique_unweighted_max_weight(graph_t *g, clique_options *opts);
+-set_t clique_unweighted_find_single(graph_t *g,int min_size,
+-					   int max_size,boolean maximal,
+-					   clique_options *opts);
+-int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
+-				      boolean maximal, clique_options *opts);
+-
+-/* Time printing functions */
+-boolean clique_print_time(int level, int i, int n, int max,
+-				 double cputime, double realtime,
+-				 clique_options *opts);
+-boolean clique_print_time_always(int level, int i, int n, int max,
+-					double cputime, double realtime,
+-					clique_options *opts);
+-
+-
+-/* Alternate spelling (let's be a little forgiving): */
+-#define cliquer_options clique_options
+-#define cliquer_default_options clique_default_options
++#include <cliquer.h>
+ 
+ /* Procedures defined in nautycliquer.c */
+ int find_clique(graph *g, int m, int n,

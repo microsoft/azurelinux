@@ -1,0 +1,17 @@
+[Unit]
+Description=VMware vmblock Fuse Mount
+Documentation=https://github.com/vmware/open-vm-tools/blob/master/open-vm-tools/vmblock-fuse/design.txt
+DefaultDependencies=no
+Before=umount.target vmtoolsd.service
+ConditionVirtualization=vmware
+After=sys-fs-fuse-connections.mount
+Wants=vmtoolsd.service
+
+[Mount]
+What=vmware-vmblock-fuse
+Where=/run/vmblock-fuse
+Type=fuse
+Options=subtype=vmware-vmblock,default_permissions,allow_other
+
+[Install]
+WantedBy=multi-user.target

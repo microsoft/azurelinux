@@ -1,0 +1,18 @@
+diff --git a/rmt/rmt.dfl b/rmt/rmt.dfl
+index 7b8ca8b..e0576e8 100644
+--- a/rmt/rmt.dfl
++++ b/rmt/rmt.dfl
+@@ -44,7 +44,9 @@ USER=*
+ #	name	name
+ #
+ #ACCESS=rtape	sparky	/dev/rmt/*
+-ACCESS=*	*	/dev/rmt/*
+-ACCESS=*	*	/dev/null
+-ACCESS=*	*	/dev/zero
+-#ACCESS=*	*	*
++#ACCESS=*	*	/dev/rmt/*
++#ACCESS=*	*	/dev/null
++#ACCESS=*	*	/dev/zero
++
++# Historically, Red Hat rmt was not so ^^ restrictive.
++ACCESS=*	*	*

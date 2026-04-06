@@ -1,0 +1,14 @@
+diff -up lzo-2.08/include/lzo/lzodefs.h.rhbz1309225 lzo-2.08/include/lzo/lzodefs.h
+--- lzo-2.08/include/lzo/lzodefs.h.rhbz1309225	2016-02-19 13:38:02.604220910 +0100
++++ lzo-2.08/include/lzo/lzodefs.h	2016-02-19 13:37:30.619073085 +0100
+@@ -1686,6 +1686,10 @@ extern "C" {
+ #  define __lzo_byte_struct_ma(s,n)     struct s { unsigned char a[n]; } __lzo_may_alias __attribute__((__packed__));
+ #endif
+ #endif
++#if (LZO_CC_GNUC >= 0x060000ul) && defined(__lzo_byte_struct_ma)
++#  undef __lzo_byte_struct
++#  define __lzo_byte_struct(s,n)        __lzo_byte_struct_ma(s,n)
++#endif
+ #if defined(__lzo_byte_struct) &&  !defined(__lzo_byte_struct_ma)
+ #  define __lzo_byte_struct_ma(s,n)     __lzo_byte_struct(s,n)
+ #endif

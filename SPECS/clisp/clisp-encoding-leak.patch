@@ -1,0 +1,10 @@
+--- src/encoding.d.orig	2024-12-28 00:47:59.000000000 -0700
++++ src/encoding.d	2025-02-04 20:28:22.743346018 -0700
+@@ -2592,6 +2592,7 @@ local maygc object encoding_from_name (c
+       pushSTACK(STACK_0);
+     }
+   }
++  free(name);
+  #else
+   unused const_name; unused context;
+   pushSTACK(unbound);           /* :charset */

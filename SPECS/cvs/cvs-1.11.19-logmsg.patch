@@ -1,0 +1,20 @@
+--- cvs-1.11.19/src/logmsg.c.old	2005-03-09 10:45:50.000000000 +0100
++++ cvs-1.11.19/src/logmsg.c	2005-03-09 10:46:36.000000000 +0100
+@@ -230,6 +230,8 @@
+ 	if ((*messagep)[0] == '\0' ||
+ 	    (*messagep)[strlen (*messagep) - 1] != '\n')
+ 	    (void) fprintf (fp, "\n");
++    } else {
++        (void) fprintf (fp, "\n");
+     }
+ 
+     if (repository != NULL)
+@@ -271,7 +273,7 @@
+     }
+ 
+     (void) fprintf (fp,
+-  "\n%s----------------------------------------------------------------------\n",
++  "%s----------------------------------------------------------------------\n",
+ 		    CVSEDITPREFIX);
+     (void) fprintf (fp,
+   "%sEnter Log.  Lines beginning with `%.*s' are removed automatically\n%s\n",

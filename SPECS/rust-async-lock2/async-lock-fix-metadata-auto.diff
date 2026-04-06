@@ -1,0 +1,8 @@
+--- async-lock-2.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-lock-2.8.0/Cargo.toml	2024-01-05T17:41:57.734298+00:00
+@@ -47,5 +47,3 @@
+ [dev-dependencies.waker-fn]
+ version = "1.1.0"
+ 
+-[target."cfg(any(target_arch = \"wasm32\", target_arch = \"wasm64\"))".dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

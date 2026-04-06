@@ -1,0 +1,27 @@
+From 4965cdbc1ee1e6a0c665797bb8b944d96d3d411f Mon Sep 17 00:00:00 2001
+From: Zoltan Fridrich <zfridric@redhat.com>
+Date: Wed, 16 Apr 2025 15:11:59 +0200
+Subject: [PATCH 51/53] Provide better error for non-supported private keys
+
+Signed-off-by: Zoltan Fridrich <zfridric@redhat.com>
+---
+ sshkey.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/sshkey.c b/sshkey.c
+index ca1cdb642..aada474e0 100644
+--- a/sshkey.c
++++ b/sshkey.c
+@@ -3582,6 +3582,9 @@ translate_libcrypto_error(unsigned long pem_err)
+ 			return SSH_ERR_LIBCRYPTO_ERROR;
+ 		}
+ 	case ERR_LIB_ASN1:
++#ifdef ERR_LIB_OSSL_DECODER
++	case ERR_LIB_OSSL_DECODER:
++#endif
+ 		return SSH_ERR_INVALID_FORMAT;
+ 	}
+ 	return SSH_ERR_LIBCRYPTO_ERROR;
+-- 
+2.49.0
+

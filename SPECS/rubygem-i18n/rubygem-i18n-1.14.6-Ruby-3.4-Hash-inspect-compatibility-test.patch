@@ -1,0 +1,85 @@
+From e0573765482a06e5dcb5597a9b856d110bdc10fb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 9 Dec 2024 10:23:00 +0100
+Subject: [PATCH] Ruby 3.4 `Hash#inspect` compatibility.
+
+---
+ test/backend/exceptions_test.rb             |  2 +-
+ test/backend/interpolation_compiler_test.rb |  2 +-
+ test/i18n/exceptions_test.rb                |  4 ++--
+ test/i18n/interpolate_test.rb               |  2 +-
+ test/locale/fallbacks_test.rb               |  2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/backend/exceptions_test.rb b/test/backend/exceptions_test.rb
+index e19c812..2973935 100644
+--- a/test/backend/exceptions_test.rb
++++ b/test/backend/exceptions_test.rb
+@@ -31,6 +31,6 @@ class I18nBackendExceptionsTest < I18n::TestCase
+ 
+   test "exceptions: MissingInterpolationArgument message includes missing key, provided keys and full string" do
+     exception = I18n::MissingInterpolationArgument.new('key', {:this => 'was given'}, 'string')
+-    assert_equal 'missing interpolation argument "key" in "string" ({:this=>"was given"} given)', exception.message
++    assert_equal %|missing interpolation argument "key" in "string" (#{{:this=>"was given"}} given)|, exception.message
+   end
+ end
+diff --git a/test/backend/interpolation_compiler_test.rb b/test/backend/interpolation_compiler_test.rb
+index 35acce3..68a634c 100644
+--- a/test/backend/interpolation_compiler_test.rb
++++ b/test/backend/interpolation_compiler_test.rb
+@@ -88,7 +88,7 @@ class InterpolationCompilerTest < I18n::TestCase
+     I18n.config.missing_interpolation_argument_handler = lambda do |key, values, string|
+       "missing key is #{key}, values are #{values.inspect}, given string is '#{string}'"
+     end
+-    assert_equal %|first missing key is last, values are {:first=>"first"}, given string is '%{first} %{last}'|,
++    assert_equal %|first missing key is last, values are #{{:first=>"first"}.to_s}, given string is '%{first} %{last}'|,
+         compile_and_interpolate('%{first} %{last}', :first => 'first')
+   ensure
+     I18n.config.missing_interpolation_argument_handler = old_handler
+diff --git a/test/i18n/exceptions_test.rb b/test/i18n/exceptions_test.rb
+index 771308d..9029c17 100644
+--- a/test/i18n/exceptions_test.rb
++++ b/test/i18n/exceptions_test.rb
+@@ -43,7 +43,7 @@ class I18nExceptionsTest < I18n::TestCase
+   test "InvalidPluralizationData message contains count, data and missing key" do
+     force_invalid_pluralization_data do |exception|
+       assert_match '1', exception.message
+-      assert_match '{:other=>"bar"}', exception.message
++      assert_match %|#{{:other=>"bar"}}|, exception.message
+       assert_match 'one', exception.message
+     end
+   end
+@@ -58,7 +58,7 @@ class I18nExceptionsTest < I18n::TestCase
+ 
+   test "MissingInterpolationArgument message contains the missing and given arguments" do
+     force_missing_interpolation_argument do |exception|
+-      assert_equal 'missing interpolation argument :bar in "%{bar}" ({:baz=>"baz"} given)', exception.message
++      assert_equal %|missing interpolation argument :bar in "%{bar}" (#{{:baz=>"baz"}.to_s} given)|, exception.message
+     end
+   end
+ 
+diff --git a/test/i18n/interpolate_test.rb b/test/i18n/interpolate_test.rb
+index 2d54090..e9ef2c1 100644
+--- a/test/i18n/interpolate_test.rb
++++ b/test/i18n/interpolate_test.rb
+@@ -91,7 +91,7 @@ class I18nMissingInterpolationCustomHandlerTest < I18n::TestCase
+   end
+ 
+   test "String interpolation can use custom missing interpolation handler" do
+-    assert_equal %|Masao missing key is last, values are {:first=>"Masao"}, given string is '%{first} %{last}'|,
++    assert_equal %|Masao missing key is last, values are #{{:first=>"Masao"}.to_s}, given string is '%{first} %{last}'|,
+       I18n.interpolate("%{first} %{last}", :first => 'Masao')
+   end
+ end
+diff --git a/test/locale/fallbacks_test.rb b/test/locale/fallbacks_test.rb
+index c7218f3..d86041d 100644
+--- a/test/locale/fallbacks_test.rb
++++ b/test/locale/fallbacks_test.rb
+@@ -179,6 +179,6 @@ class I18nFallbacksHashCompatibilityTest < I18n::TestCase
+   end
+ 
+   test "#inspect" do
+-    assert_equal('#<I18n::Locale::Fallbacks @map={:"de-AT"=>[:"de-DE"]} @defaults=[:"en-US", :en]>', @fallbacks.inspect)
++    assert_equal(%|#<I18n::Locale::Fallbacks @map=#{{:"de-AT"=>[:"de-DE"]}} @defaults=[:"en-US", :en]>|, @fallbacks.inspect)
+   end
+ end

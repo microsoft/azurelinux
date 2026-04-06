@@ -1,0 +1,11 @@
+--- signature-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ signature-2.2.0/Cargo.toml	2025-12-03T14:03:14.211917+00:00
+@@ -55,7 +55,7 @@
+ default-features = false
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.sha2]
+ version = "0.10"

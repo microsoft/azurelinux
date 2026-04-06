@@ -1,0 +1,32 @@
+From 215c69b180f8de546c5965c37950d67c6cd8dc33 Mon Sep 17 00:00:00 2001
+From: Stig Palmquist <stig@stig.io>
+Date: Tue, 9 Mar 2021 09:29:43 +0100
+Subject: [PATCH] SHA1 -> SHA256 in checksum chat()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Petr Pisar: Ported from 2c24e534bbd1b843233dda3d66650645883f70a2
+commit in upstream devel branch.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/App/cpanminus/script.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/App/cpanminus/script.pm b/lib/App/cpanminus/script.pm
+index 1b26b5d..af44442 100644
+--- a/lib/App/cpanminus/script.pm
++++ b/lib/App/cpanminus/script.pm
+@@ -1637,7 +1637,7 @@ sub verify_archive {
+ sub verify_checksum {
+     my($self, $file, $chk_file) = @_;
+ 
+-    $self->chat("Verifying the SHA1 for $file\n");
++    $self->chat("Verifying the SHA256 for $file\n");
+ 
+     open my $fh, "<$chk_file" or die "$chk_file: $!";
+     my $data = join '', <$fh>;
+-- 
+2.26.2
+

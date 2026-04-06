@@ -1,0 +1,171 @@
+diff -rupN --no-dereference Python-3.11.14/Lib/distutils/ccompiler.py Python-3.11.14-new/Lib/distutils/ccompiler.py
+--- Python-3.11.14/Lib/distutils/ccompiler.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/distutils/ccompiler.py	2025-10-09 23:07:49.398630234 +0200
+@@ -9,7 +9,7 @@ from distutils.spawn import spawn
+ from distutils.file_util import move_file
+ from distutils.dir_util import mkpath
+ from distutils.dep_util import newer_group
+-from distutils.util import split_quoted, execute
++from distutils.util import split_quoted, execute, get_platform
+ from distutils import log
+ 
+ class CCompiler:
+@@ -948,6 +948,8 @@ def get_default_compiler(osname=None, pl
+         osname = os.name
+     if platform is None:
+         platform = sys.platform
++    if get_platform().startswith('mingw'):
++        return 'mingw32'
+     for pattern, compiler in _default_compilers:
+         if re.match(pattern, platform) is not None or \
+            re.match(pattern, osname) is not None:
+@@ -1005,6 +1007,9 @@ def new_compiler(plat=None, compiler=Non
+         if compiler is None:
+             compiler = get_default_compiler(plat)
+ 
++        if "mingw32" in os.environ.get("CC", ""):
++            compiler = "mingw32"
++
+         (module_name, class_name, long_description) = compiler_class[compiler]
+     except KeyError:
+         msg = "don't know how to compile C/C++ code on platform '%s'" % plat
+diff -rupN --no-dereference Python-3.11.14/Lib/distutils/command/build_ext.py Python-3.11.14-new/Lib/distutils/command/build_ext.py
+--- Python-3.11.14/Lib/distutils/command/build_ext.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/distutils/command/build_ext.py	2025-10-09 23:07:49.399244397 +0200
+@@ -186,7 +186,7 @@ class build_ext(Command):
+         # for extensions under windows use different directories
+         # for Release and Debug builds.
+         # also Python's library directory must be appended to library_dirs
+-        if os.name == 'nt':
++        if os.name == 'nt' and not self.plat_name.startswith(('mingw')):
+             # the 'libs' directory is for binary installs - we assume that
+             # must be the *native* platform.  But we don't really support
+             # cross-compiling via a binary install anyway, so we let it go.
+@@ -712,6 +712,20 @@ class build_ext(Command):
+         # pyconfig.h that MSVC groks.  The other Windows compilers all seem
+         # to need it mentioned explicitly, though, so that's what we do.
+         # Append '_d' to the python import library on debug builds.
++
++        # Use self.plat_name as it works even in case of
++        # cross-compilation (at least for mingw build).
++        if self.plat_name.startswith('mingw'):
++            from distutils import sysconfig
++            extra = []
++            for lib in (
++                sysconfig.get_config_var('BLDLIBRARY').split()
++                + sysconfig.get_config_var('SHLIBS').split()
++                ):
++                if lib.startswith('-l'):
++                    extra.append(lib[2:])
++            return ext.libraries + extra
++
+         if sys.platform == "win32":
+             from distutils._msvccompiler import MSVCCompiler
+             if not isinstance(self.compiler, MSVCCompiler):
+@@ -744,7 +758,7 @@ class build_ext(Command):
+                     # We are cross-compiling for one of the relevant platforms
+                     if get_config_var('ANDROID_API_LEVEL') != 0:
+                         link_libpython = True
+-                    elif get_config_var('MACHDEP') == 'cygwin':
++                    elif get_config_var('MACHDEP') == 'cygwin' or get_config_var('MACHDEP') == 'win32':
+                         link_libpython = True
+ 
+             if link_libpython:
+diff -rupN --no-dereference Python-3.11.14/Lib/distutils/cygwinccompiler.py Python-3.11.14-new/Lib/distutils/cygwinccompiler.py
+--- Python-3.11.14/Lib/distutils/cygwinccompiler.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/distutils/cygwinccompiler.py	2025-10-09 23:07:49.399510637 +0200
+@@ -90,7 +90,8 @@ class CygwinCCompiler(UnixCCompiler):
+     compiler_type = 'cygwin'
+     obj_extension = ".o"
+     static_lib_extension = ".a"
+-    shared_lib_extension = ".dll"
++    shared_lib_extension = ".dll.a"
++    dylib_lib_extension = ".dll.a"
+     static_lib_format = "lib%s%s"
+     shared_lib_format = "%s%s"
+     exe_extension = ".exe"
+@@ -235,8 +236,9 @@ class CygwinCCompiler(UnixCCompiler):
+         # (On my machine: 10KiB < stripped_file < ??100KiB
+         #   unstripped_file = stripped_file + XXX KiB
+         #  ( XXX=254 for a typical python extension))
+-        if not debug:
+-            extra_preargs.append("-s")
++        # => Let mingw-find-debuginfo.sh strip the binaries
++        # if not debug:
++        #     extra_preargs.append("-s")
+ 
+         UnixCCompiler.link(self, target_desc, objects, output_filename,
+                            output_dir, libraries, library_dirs,
+@@ -313,7 +315,10 @@ class Mingw32CCompiler(CygwinCCompiler):
+ 
+         # Include the appropriate MSVC runtime library if Python was built
+         # with MSVC 7.0 or later.
+-        self.dll_libraries = get_msvcr()
++        self.dll_libraries = get_msvcr() or []
++
++    def runtime_library_dir_option(self, dir):
++        return "-L" + dir
+ 
+ # Because these compilers aren't configured in Python's pyconfig.h file by
+ # default, we should at least warn the user if he is using an unmodified
+@@ -366,7 +371,7 @@ def check_config_h():
+         return (CONFIG_H_UNCERTAIN,
+                 "couldn't read '%s': %s" % (fn, exc.strerror))
+ 
+-RE_VERSION = re.compile(br'(\d+\.\d+(\.\d+)*)')
++RE_VERSION = re.compile(br'[\D\s]*(\d+\.\d+(\.\d+)*).*$')
+ 
+ def _find_exe_version(cmd):
+     """Find the version of an executable by running `cmd` in the shell.
+@@ -394,10 +399,14 @@ def get_versions():
+ 
+     If not possible it returns None for it.
+     """
+-    commands = ['gcc -dumpversion', 'ld -v', 'dllwrap --version']
++    gcc = os.environ.get('CC') or 'gcc'
++    ld = os.environ.get('LD') or 'ld'
++    dllwrap = os.environ.get('DLLWRAP') or 'dllwrap'
++    commands = [gcc+' -dumpfullversion -dumpversion', ld+' -v', dllwrap+' --version']
+     return tuple([_find_exe_version(cmd) for cmd in commands])
+ 
+ def is_cygwingcc():
+     '''Try to determine if the gcc that would be used is from cygwin.'''
+-    out_string = check_output(['gcc', '-dumpmachine'])
++    gcc = os.environ.get('CC') or 'gcc'
++    out_string = check_output([gcc, '-dumpmachine'])
+     return out_string.strip().endswith(b'cygwin')
+diff -rupN --no-dereference Python-3.11.14/Lib/distutils/sysconfig.py Python-3.11.14-new/Lib/distutils/sysconfig.py
+--- Python-3.11.14/Lib/distutils/sysconfig.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/distutils/sysconfig.py	2025-10-09 23:07:49.399584054 +0200
+@@ -196,7 +196,7 @@ def customize_compiler(compiler):
+     Mainly needed on Unix, so we can plug in the information that
+     varies across Unices and is stored in Python's Makefile.
+     """
+-    if compiler.compiler_type == "unix":
++    if compiler.compiler_type in ["unix", "cygwin", "mingw32"]:
+         if sys.platform == "darwin":
+             # Perform first-time customization of compiler-related
+             # config vars on OS X now that we know we need a compiler.
+@@ -257,8 +257,8 @@ def customize_compiler(compiler):
+             linker_so=ldshared,
+             linker_exe=cc,
+             archiver=archiver)
+-
+-        compiler.shared_lib_extension = shlib_suffix
++        # Don't override value but use what is set in derived compiler class itself
++        # compiler.shared_lib_extension = shlib_suffix
+ 
+ 
+ def get_python_inc(plat_specific=0, prefix=None):
+diff -rupN --no-dereference Python-3.11.14/Lib/distutils/util.py Python-3.11.14-new/Lib/distutils/util.py
+--- Python-3.11.14/Lib/distutils/util.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/distutils/util.py	2025-10-09 23:07:49.399931493 +0200
+@@ -37,6 +37,8 @@ def get_host_platform():
+ 
+     """
+     if os.name == 'nt':
++        if 'GCC' in sys.version:
++            return 'mingw'
+         if 'amd64' in sys.version.lower():
+             return 'win-amd64'
+         if '(arm)' in sys.version.lower():

@@ -1,0 +1,11 @@
+diff -up octave-7.1.0/liboctave/numeric/randmtzig.cc.time octave-7.1.0/liboctave/numeric/randmtzig.cc
+--- octave-7.1.0/liboctave/numeric/randmtzig.cc.time	2022-04-06 08:05:12.000000000 -0600
++++ octave-7.1.0/liboctave/numeric/randmtzig.cc	2022-07-09 23:03:37.970793323 -0600
+@@ -163,6 +163,7 @@
+ 
+ #include <algorithm>
+ #include <random>
++#include <time.h>
+ 
+ #include "oct-syscalls.h"
+ #include "oct-time.h"

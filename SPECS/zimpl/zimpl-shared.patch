@@ -1,0 +1,137 @@
+--- zimpl-3.7.0/CMakeLists.txt.orig	2025-11-23 05:19:53.000000000 -0700
++++ zimpl-3.7.0/CMakeLists.txt	2025-11-23 13:14:26.606931058 -0700
+@@ -49,8 +49,6 @@ endif()
+ 
+ # use C99 standard
+ set(CMAKE_C_STANDARD 99)
+-set(CMAKE_C_VISIBILITY_PRESET hidden)
+-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+ 
+ option(ZLIB "use ZLIB" ON)
+ option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
+--- zimpl-3.7.0/src/CMakeLists.txt.orig	2025-11-23 05:19:53.000000000 -0700
++++ zimpl-3.7.0/src/CMakeLists.txt	2025-11-23 13:15:22.276583290 -0700
+@@ -119,12 +119,10 @@ if(MSVC)
+ endif()
+ 
+ #create zimpl with pic
+-add_library(libzimpl-pic STATIC ${libsources})
+-set_target_properties(libzimpl-pic PROPERTIES POSITION_INDEPENDENT_CODE on)
+-target_link_libraries(libzimpl-pic ${libs})
+-
+-#create zimpl without pic
+-add_library(libzimpl STATIC ${libsources})
++add_library(libzimpl SHARED ${libsources})
++set_target_properties(libzimpl PROPERTIES
++        POSITION_INDEPENDENT_CODE on
++	VERSION 0.0.0 SOVERSION 0)
+ target_link_libraries(libzimpl ${libs})
+ 
+ #create zimpl binary
+@@ -141,16 +139,13 @@ endif()
+ set_target_properties(libzimpl PROPERTIES
+     OUTPUT_NAME "zimpl")
+ 
+-set_target_properties(libzimpl-pic PROPERTIES
+-    OUTPUT_NAME "zimpl-pic")
+-
+ include(GNUInstallDirs)
+ 
+ # install the header files of zimpl
+ install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/zimpl)
+ 
+ # install the binary and the library to appropriate locations and add them to an export group
+-install(TARGETS libzimpl zimpl libzimpl-pic EXPORT zimpl-targets
++install(TARGETS libzimpl zimpl EXPORT zimpl-targets
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+@@ -164,7 +159,7 @@ endif()
+ install(FILES ${PROJECT_SOURCE_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/zimpl)
+ 
+ # Add library targets to the build-tree export set
+-export(TARGETS libzimpl libzimpl-pic
++export(TARGETS libzimpl
+   FILE "${CMAKE_BINARY_DIR}/zimpl-targets.cmake")
+ 
+ #configure the config file for the build tree
+--- zimpl-3.7.0/src/zimpl/zimpllib.c.orig	2025-11-23 05:19:53.000000000 -0700
++++ zimpl-3.7.0/src/zimpl/zimpllib.c	2025-11-23 13:14:26.607519615 -0700
+@@ -455,3 +455,66 @@ bool zpl_read_with_args(char** argv, int
+ 
+    return ret;
+ }
++
++// Dummy weak definitions to avoid unresolved symbols
++Lps * __attribute__((weak)) xlp_alloc(char const* name, bool need_startval, void* user_data)
++{
++   abort();
++}
++
++void __attribute__((weak)) xlp_free(Lps* lp)
++{
++   abort();
++}
++
++bool __attribute__((weak)) xlp_conname_exists(Lps const* lp, char const* conname)
++{
++   abort();
++}
++
++bool __attribute__((weak)) xlp_addcon_term(Lps* lp, char const* name, ConType type,
++   Numb const* lhs, Numb const* rhs, unsigned int flags, Term const* term)
++{
++   abort();
++}
++
++Var* __attribute__((weak)) xlp_addvar(Lps* lp, char const* name, VarClass usevarclass,
++   Bound const* lower, Bound const* upper, Numb const* priority, Numb const* startval)
++{
++   abort();
++}
++
++int __attribute__((weak)) xlp_addsos_term(Lps* lp, char const* name, SosType type, Numb const* priority, Term const* term)
++{
++   abort();
++}
++
++char const* __attribute__((weak)) xlp_getvarname(Lps const* lp, Var const* var)
++{
++   abort();
++}
++
++VarClass __attribute__((weak)) xlp_getclass(Lps const* lp, Var const* var)
++{
++   abort();
++}
++
++Bound* __attribute__((weak)) xlp_getlower(Lps const* lp, Var const* var)
++{
++   abort();
++}
++
++Bound* __attribute__((weak)) xlp_getupper(Lps const* lp, Var const* var)
++{
++   abort();
++}
++
++bool __attribute__((weak)) xlp_setobj(Lps* lp, char const* name, bool minimize)
++{
++   abort();
++}
++
++void __attribute__((weak)) xlp_addtoobj(Lps* lp, Term const* term)
++{
++   abort();
++}
+--- zimpl-3.7.0/zimpl-config.cmake.in.orig	2025-11-23 05:19:53.000000000 -0700
++++ zimpl-3.7.0/zimpl-config.cmake.in	2025-11-23 13:14:26.607724336 -0700
+@@ -3,7 +3,7 @@ if(NOT TARGET libzimpl)
+ endif()
+ 
+ set(ZIMPL_LIBRARIES libzimpl)
+-set(ZIMPL_PIC_LIBRARIES libzimpl-pic)
++set(ZIMPL_PIC_LIBRARIES libzimpl)
+ set(ZIMPL_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+ set(ZIMPL_FOUND TRUE)
+ 

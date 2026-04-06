@@ -1,0 +1,15 @@
+[Unit]
+Description=Update OpenSSH host key permissions
+Documentation=https://fedoraproject.org/wiki/Changes/SSHKeySignSuidBit
+Before=sshd.service
+After=ssh-keygen.target
+ConditionPathExists=!/var/lib/.ssh-host-keys-migration
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/libexec/openssh/ssh-host-keys-migration.sh
+ExecStart=touch /var/lib/.ssh-host-keys-migration
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sshd.service

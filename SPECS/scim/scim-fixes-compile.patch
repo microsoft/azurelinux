@@ -1,0 +1,42 @@
+Index: scim-1.4.18/modules/FrontEnd/IMdkit/Xi18n.h
+===================================================================
+--- scim-1.4.18.orig/modules/FrontEnd/IMdkit/Xi18n.h
++++ scim-1.4.18/modules/FrontEnd/IMdkit/Xi18n.h
+@@ -69,11 +69,13 @@ IN CONNECTION WITH THE USE OR PERFORMANC
+ #define I18N_SET	1
+ #define I18N_GET	2
+ 
+-typedef struct
++typedef struct _Xi18nCore *Xi18n;
++
++typedef struct _TransportSW
+ {
+     char        *transportname;
+     int         namelen;
+-    Bool        (*checkAddr) ();
++    Bool        (*checkAddr) (Xi18n, struct _TransportSW *, char *);
+ } TransportSW;
+ 
+ typedef struct _XIMPending
+@@ -168,8 +170,6 @@ typedef struct _Xi18nClient
+     struct _Xi18nClient *next;
+ } Xi18nClient;
+ 
+-typedef struct _Xi18nCore *Xi18n;
+-
+ /*
+  * Callback Struct for XIM Protocol
+  */
+Index: scim-1.4.18/modules/FrontEnd/IMdkit/i18nMethod.c
+===================================================================
+--- scim-1.4.18.orig/modules/FrontEnd/IMdkit/i18nMethod.c
++++ scim-1.4.18/modules/FrontEnd/IMdkit/i18nMethod.c
+@@ -89,7 +89,7 @@ TransportSW _TransR[] =
+ #ifdef DNETCONN
+     {"decnet",          6, _Xi18nCheckTransAddress},
+ #endif
+-    {(char *) NULL,     0, (Bool (*) ()) NULL}
++    {(char *) NULL,     0, (Bool (*) (Xi18n, TransportSW *, char *)) NULL}
+ };
+ 
+ static Bool GetInputStyles (Xi18n i18n_core, XIMStyles **p_style)

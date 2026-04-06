@@ -1,0 +1,34 @@
+From 78a5e2e17bba531b41101ca036a5bb1a0d5caca5 Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Tue, 6 Feb 2024 21:15:33 -0500
+Subject: [PATCH 2/2] Don't attempt to memcpy() zero bytes
+
+add_rtattr_nest() is called in several places in the code. As part of
+its operation, it calls add_rtattr(nm type, NULL, 0) which results in
+NULL and 0 being passed to memcpy(). This fails with -Werror=nonnull
+on recent GCC.
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ lib/rtnetlink.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/rtnetlink.c b/lib/rtnetlink.c
+index 3b8413718997568a20752791807b19c1f299955e..faa60d7c12f68af175d223b6c3c3257a982e4f37 100644
+--- a/lib/rtnetlink.c
++++ b/lib/rtnetlink.c
+@@ -172,7 +172,10 @@ static void add_rtattr(struct nlmsghdr *n, int type, const void *data, int alen)
+ 
+ 	rta->rta_type = type;
+ 	rta->rta_len = len;
+-	memcpy(RTA_DATA(rta), data, alen);
++	if (alen > 0)
++	{
++		memcpy(RTA_DATA(rta), data, alen);
++	}
+ 	n->nlmsg_len = NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len);
+ }
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,47 @@
+From a003654d36b9e409931d15af68091d1f366bd46e Mon Sep 17 00:00:00 2001
+From: David Faure <faure@kde.org>
+Date: Thu, 16 Jun 2011 08:49:28 +0200
+Subject: [PATCH 29/33] Fix missing include dirs (current source and build dir)
+ when moc is run.
+
+Apparently these dirs are not in the directory property "INCLUDE_DIRECTORIES",
+so they need to be added by hand.
+
+This fixes compilation of kdelibs/kdewebkit with KDE_NO_DEPRECATED=TRUE:
+moc didn't find kdewebkit_export.h (and silently ignored it), so kdemacros.h
+was not included, and KDE_NO_DEPRECATED was not set, leading to signals
+only in the moc file and not in the header file, at compile time.
+
+Alex: is there a way to only do this when CMAKE_INCLUDE_CURRENT_DIR is on?
+CCMAIL: neundorf@kde.org
+---
+ Automoc4Config.cmake | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index d608513..f0dc204 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -135,6 +135,9 @@ macro(AUTOMOC4 _target_NAME _SRCS)
+       get_directory_property(_moc_defs DEFINITIONS)
+       get_directory_property(_moc_cdefs COMPILE_DEFINITIONS)
+ 
++      # Assume CMAKE_INCLUDE_CURRENT_DIR is set
++      list(APPEND _moc_incs ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
++
+       # configure_file replaces _moc_files, _moc_incs, _moc_cdefs and _moc_defs
+       configure_file(${_AUTOMOC4_CURRENT_DIR}/automoc4.files.in ${_automoc_source}.files)
+ 
+@@ -198,6 +201,9 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+       get_directory_property(_moc_defs DEFINITIONS)
+       get_directory_property(_moc_cdefs COMPILE_DEFINITIONS)
+ 
++      # Assume CMAKE_INCLUDE_CURRENT_DIR is set
++      list(APPEND _moc_incs ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
++
+       # configure_file replaces _moc_files, _moc_incs, _moc_cdefs and _moc_defs
+       configure_file(${_AUTOMOC4_CURRENT_DIR}/automoc4.files.in ${_automoc_dotFiles})
+ 
+-- 
+2.4.3
+

@@ -1,0 +1,19 @@
+diff --color -Nur pyquery-2.0.1.orig/tests/test_pyquery.py pyquery-2.0.1/tests/test_pyquery.py
+--- pyquery-2.0.1.orig/tests/test_pyquery.py	2024-08-30 01:12:19.000000000 -0700
++++ pyquery-2.0.1/tests/test_pyquery.py	2025-02-08 17:01:35.011499602 -0800
+@@ -10,6 +10,7 @@
+ from webtest import http
+ from webtest.debugapp import debug_app
+ from unittest import TestCase
++import pytest
+ 
+ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+ 
+@@ -925,6 +926,7 @@
+ 
+ class TestWebScrappingEncoding(TestCase):
+ 
++    @pytest.mark.skip(reason="requires network connection")
+     def test_get(self):
+         d = pq(url='http://ru.wikipedia.org/wiki/Заглавная_страница',
+                method='get')

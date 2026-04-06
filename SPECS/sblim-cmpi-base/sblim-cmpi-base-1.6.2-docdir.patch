@@ -1,0 +1,12 @@
+diff -up sblim-cmpi-base-1.6.4/Makefile.am.orig sblim-cmpi-base-1.6.4/Makefile.am
+--- sblim-cmpi-base-1.6.4/Makefile.am.orig	2014-10-23 16:54:13.000000000 +0200
++++ sblim-cmpi-base-1.6.4/Makefile.am	2018-08-22 10:59:51.497500435 +0200
+@@ -23,7 +23,7 @@ sblimincdir = $(includedir)/sblim
+ EXTRA_DIST=
+ 
+ # docdir defines where the documentation goes
+-docdir=$(datadir)/doc/$(PACKAGE)-$(VERSION)
++docdir=$(datadir)/doc/$(PACKAGE)
+ 
+ #
+ # Automake instructions for documentation

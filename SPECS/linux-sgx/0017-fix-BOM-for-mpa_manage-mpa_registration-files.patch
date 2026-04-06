@@ -1,0 +1,98 @@
+From 501e90724f57fdb76999dd518876d47212d29853 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 2 Feb 2026 19:01:24 +0000
+Subject: [PATCH 17/17] fix BOM for mpa_manage/mpa_registration files
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The paths for mpa_manage/mpa_registration binaries and their associated
+files all moved, and the BOM was not updated.
+
+These changes are synced from the DCAP repo BOMs.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .../psw-dcap/BOM_install/libsgx-ra-network.txt     |  2 +-
+ .../common/psw-dcap/BOM_install/libsgx-ra-uefi.txt |  2 +-
+ .../common/psw-dcap/BOM_install/sgx-ra-service.txt | 14 +++++++-------
+ .../psw-tdx/BOM_install/libsgx-ra-network.txt      |  2 +-
+ .../common/psw-tdx/BOM_install/libsgx-ra-uefi.txt  |  2 +-
+ .../common/psw-tdx/BOM_install/sgx-ra-service.txt  | 14 +++++++-------
+ 6 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-network.txt b/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-network.txt
+index 2f260bd5..2d4749a0 100644
+--- a/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-network.txt
++++ b/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-network.txt
+@@ -1,2 +1,2 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/lib64/libmpa_network.so	<installdir>/lib/libmpa_network.so	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/lib64/libmpa_network.so	<installdir>/lib/libmpa_network.so	0	main	STP
+diff --git a/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-uefi.txt b/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-uefi.txt
+index 63356491..31db9f6f 100644
+--- a/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-uefi.txt
++++ b/linux/installer/common/psw-dcap/BOM_install/libsgx-ra-uefi.txt
+@@ -1,2 +1,2 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/lib64/libmpa_uefi.so	<installdir>/lib/libmpa_uefi.so	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/lib64/libmpa_uefi.so	<installdir>/lib/libmpa_uefi.so	0	main	STP
+diff --git a/linux/installer/common/psw-dcap/BOM_install/sgx-ra-service.txt b/linux/installer/common/psw-dcap/BOM_install/sgx-ra-service.txt
+index 3521a03f..6fea3137 100644
+--- a/linux/installer/common/psw-dcap/BOM_install/sgx-ra-service.txt
++++ b/linux/installer/common/psw-dcap/BOM_install/sgx-ra-service.txt
+@@ -1,8 +1,8 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/bin/mpa_manage	<installdir>/mpa_manage	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration	<installdir>/mpa_registration	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration_tool.service	<installdir>/mpa_registration_tool.service	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration_tool.conf	<installdir>/mpa_registration_tool.conf	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/config/mpa_registration.conf	<installdir>/conf/mpa_registration.conf	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/startup.sh	<installdir>/startup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/bin/mpa_manage	<installdir>/mpa_manage	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/bin/mpa_registration	<installdir>/mpa_registration	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/mpa_registration_tool.service	<installdir>/mpa_registration_tool.service	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/mpa_registration_tool.conf	<installdir>/mpa_registration_tool.conf	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/installer/common/sgx-ra-service/config/mpa_registration.conf	<installdir>/conf/mpa_registration.conf	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/startup.sh	<installdir>/startup.sh	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
+diff --git a/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-network.txt b/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-network.txt
+index 2f260bd5..2d4749a0 100644
+--- a/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-network.txt
++++ b/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-network.txt
+@@ -1,2 +1,2 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/lib64/libmpa_network.so	<installdir>/lib/libmpa_network.so	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/lib64/libmpa_network.so	<installdir>/lib/libmpa_network.so	0	main	STP
+diff --git a/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-uefi.txt b/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-uefi.txt
+index 63356491..31db9f6f 100644
+--- a/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-uefi.txt
++++ b/linux/installer/common/psw-tdx/BOM_install/libsgx-ra-uefi.txt
+@@ -1,2 +1,2 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/lib64/libmpa_uefi.so	<installdir>/lib/libmpa_uefi.so	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/lib64/libmpa_uefi.so	<installdir>/lib/libmpa_uefi.so	0	main	STP
+diff --git a/linux/installer/common/psw-tdx/BOM_install/sgx-ra-service.txt b/linux/installer/common/psw-tdx/BOM_install/sgx-ra-service.txt
+index 3521a03f..6fea3137 100644
+--- a/linux/installer/common/psw-tdx/BOM_install/sgx-ra-service.txt
++++ b/linux/installer/common/psw-tdx/BOM_install/sgx-ra-service.txt
+@@ -1,8 +1,8 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/bin/mpa_manage	<installdir>/mpa_manage	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration	<installdir>/mpa_registration	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration_tool.service	<installdir>/mpa_registration_tool.service	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/mpa_registration_tool.conf	<installdir>/mpa_registration_tool.conf	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/config/mpa_registration.conf	<installdir>/conf/mpa_registration.conf	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/startup.sh	<installdir>/startup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/package/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/bin/mpa_manage	<installdir>/mpa_manage	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/build/release/bin/mpa_registration	<installdir>/mpa_registration	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/mpa_registration_tool.service	<installdir>/mpa_registration_tool.service	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/mpa_registration_tool.conf	<installdir>/mpa_registration_tool.conf	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/installer/common/sgx-ra-service/config/mpa_registration.conf	<installdir>/conf/mpa_registration.conf	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/startup.sh	<installdir>/startup.sh	0	main	STP
++<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
+-- 
+2.52.0
+

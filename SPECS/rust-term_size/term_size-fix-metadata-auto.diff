@@ -1,0 +1,12 @@
+--- term_size-0.3.2/Cargo.toml	2020-05-02T02:35:26+00:00
++++ term_size-0.3.2/Cargo.toml	2023-08-07T18:26:39.718855+00:00
+@@ -62,9 +62,6 @@
+ unstable = []
+ [target."cfg(not(target_os = \"windows\"))".dependencies.libc]
+ version = "0.2.20"
+-[target."cfg(target_os = \"windows\")".dependencies.winapi]
+-version = "0.3"
+-features = ["wincon", "processenv", "winbase"]
+ [badges.appveyor]
+ repository = "kbknapp/term_size-rs"
+ 

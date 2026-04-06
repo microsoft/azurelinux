@@ -1,0 +1,16 @@
+--- jpegxl-sys-0.11.2+libjxl-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jpegxl-sys-0.11.2+libjxl-0.11.1/Cargo.toml	2025-01-11T19:42:26.727674+00:00
+@@ -13,7 +13,7 @@
+ edition = "2021"
+ rust-version = "1.74.0"
+ name = "jpegxl-sys"
+-version = "0.11.2+libjxl-0.11.1"
++version = "0.11.2"
+ authors = ["Inflation <me@shimotsuki.ink>"]
+ build = "build.rs"
+ links = "jxl"
+@@ -73,3 +73,4 @@
+ 
+ [lints.rustdoc]
+ broken_intra_doc_links = "deny"
++

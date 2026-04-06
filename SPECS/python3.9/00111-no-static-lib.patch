@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Malcolm <dmalcolm@redhat.com>
+Date: Mon, 18 Jan 2010 17:59:07 +0000
+Subject: 00111: Don't try to build a libpythonMAJOR.MINOR.a
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Downstream only: not appropriate for upstream.
+
+See https://bugzilla.redhat.com/show_bug.cgi?id=556092
+
+Co-authored-by: David Malcolm <dmalcolm@redhat.com>
+Co-authored-by: Bohuslav Kabrda <bkabrda@redhat.com>
+Co-authored-by: Matej Stuchlik <mstuchli@redhat.com>
+Co-authored-by: Robert Kuska <rkuska@redhat.com>
+Co-authored-by: Charalampos Stratakis <cstratak@redhat.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+---
+ Makefile.pre.in | 21 ++-------------------
+ 1 file changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index a276d535c7..568018827b 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -588,7 +588,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+ 	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
+ 
+ # Build the interpreter
+-$(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY) $(EXPORTSYMS)
++$(BUILDPYTHON):	Programs/python.o $(LDLIBRARY) $(PY3LIBRARY) $(EXPORTSYMS)
+ 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
+ 
+ platform: $(BUILDPYTHON) pybuilddir.txt
+@@ -636,12 +636,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+ 		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
+ 		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
+ 
+-
+-# Build static library
+-$(LIBRARY): $(LIBRARY_OBJS)
+-	-rm -f $@
+-	$(AR) $(ARFLAGS) $@ $(LIBRARY_OBJS)
+-
+ libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
+ 	if test $(INSTSONAME) != $(LDLIBRARY); then \
+ 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
+@@ -723,7 +717,7 @@ Makefile Modules/config.c: Makefile.pre \
+ 	@echo "The Makefile was updated, you may need to re-run make."
+ 
+ 
+-Programs/_testembed: Programs/_testembed.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY) $(EXPORTSYMS)
++Programs/_testembed: Programs/_testembed.o $(LDLIBRARY) $(PY3LIBRARY) $(EXPORTSYMS)
+ 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
+ 
+ ############################################################################
+@@ -1652,17 +1646,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+ 		else	true; \
+ 		fi; \
+ 	done
+-	@if test -d $(LIBRARY); then :; else \
+-		if test "$(PYTHONFRAMEWORKDIR)" = no-framework; then \
+-			if test "$(SHLIB_SUFFIX)" = .dll; then \
+-				$(INSTALL_DATA) $(LDLIBRARY) $(DESTDIR)$(LIBPL) ; \
+-			else \
+-				$(INSTALL_DATA) $(LIBRARY) $(DESTDIR)$(LIBPL)/$(LIBRARY) ; \
+-			fi; \
+-		else \
+-			echo Skip install of $(LIBRARY) - use make frameworkinstall; \
+-		fi; \
+-	fi
+ 	$(INSTALL_DATA) Modules/config.c $(DESTDIR)$(LIBPL)/config.c
+ 	$(INSTALL_DATA) Programs/python.o $(DESTDIR)$(LIBPL)/python.o
+ 	$(INSTALL_DATA) $(srcdir)/Modules/config.c.in $(DESTDIR)$(LIBPL)/config.c.in

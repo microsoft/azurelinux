@@ -1,0 +1,82 @@
+From 4a0a6c5cc9560438cab41e65948b6da9e63d1123 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:15 +0100
+Subject: [PATCH 11/59] RH: skipped tests EC curves
+
+Patch-name: 0013-skipped-tests-EC-curves.patch
+Patch-id: 13
+Patch-status: |
+    # # Skipped tests from former 0011-Remove-EC-curves.patch
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ test/recipes/15-test_ec.t                            |  2 +-
+ .../30-test_evp_data/evppkey_ecdsa_sigalg.txt        | 12 ------------
+ test/recipes/65-test_cmp_protect.t                   |  2 +-
+ test/recipes/65-test_cmp_vfy.t                       |  2 +-
+ 4 files changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/test/recipes/15-test_ec.t b/test/recipes/15-test_ec.t
+index 9bf946e81b..d6521876e5 100644
+--- a/test/recipes/15-test_ec.t
++++ b/test/recipes/15-test_ec.t
+@@ -104,7 +104,7 @@ SKIP: {
+ 
+ subtest 'Check loading of fips and non-fips keys' => sub {
+     plan skip_all => "FIPS is disabled"
+-        if $no_fips;
++        if 1; #Red Hat specific, original value is $no_fips;
+ 
+     plan tests => 2;
+ 
+diff --git a/test/recipes/30-test_evp_data/evppkey_ecdsa_sigalg.txt b/test/recipes/30-test_evp_data/evppkey_ecdsa_sigalg.txt
+index 7c339c272b..0ff482e4e8 100644
+--- a/test/recipes/30-test_evp_data/evppkey_ecdsa_sigalg.txt
++++ b/test/recipes/30-test_evp_data/evppkey_ecdsa_sigalg.txt
+@@ -132,18 +132,6 @@ AAAA//////////+85vqtpxeehPO5ysL8YyVRAgEBBG0wawIBAQQgiUTxtr5vLVjj
+ 3ev1gTwRBduzqqlwd54AUSgI+pjttW8zrWNitO8H1sf59MPWOESKxNtZ1+Nl
+ -----END PRIVATE KEY-----
+ 
+-PrivateKey = EC_EXPLICIT
+------BEGIN PRIVATE KEY-----
+-MIIBeQIBADCCAQMGByqGSM49AgEwgfcCAQEwLAYHKoZIzj0BAQIhAP////8AAAAB
+-AAAAAAAAAAAAAAAA////////////////MFsEIP////8AAAABAAAAAAAAAAAAAAAA
+-///////////////8BCBaxjXYqjqT57PrvVV2mIa8ZR0GsMxTsPY7zjw+J9JgSwMV
+-AMSdNgiG5wSTamZ44ROdJreBn36QBEEE5JcIvn36opqjEm/k59Al40rBAxWM2TPG
+-l0L13Je51zHpfXQ9Z2o7IQicMXP4wSfJ0qCgg2bgydqoxlYrlLGuVQIhAP////8A
+-AAAA//////////+85vqtpxeehPO5ysL8YyVRAgEBBG0wawIBAQQgec92jwduadCk
+-OjoNRI+YT5Be5TkzZXzYCyTLkMOikDmhRANCAATtECEhQbLEaiUj/Wu0qjcr81lL
+-46dx5zYgArz/iaSNJ3W80oO+F7v04jlQ7wxQzg96R0bwKiMeq5CcW9ZFt6xg
+------END PRIVATE KEY-----
+-
+ PrivateKey = B-163
+ -----BEGIN PRIVATE KEY-----
+ MGMCAQAwEAYHKoZIzj0CAQYFK4EEAA8ETDBKAgEBBBUDnQW0mLiHVha/jqFznX/K
+diff --git a/test/recipes/65-test_cmp_protect.t b/test/recipes/65-test_cmp_protect.t
+index 92c91d8b88..294491fff4 100644
+--- a/test/recipes/65-test_cmp_protect.t
++++ b/test/recipes/65-test_cmp_protect.t
+@@ -27,7 +27,7 @@ plan skip_all => "This test is not supported in a no-cmp build"
+ plan skip_all => "This test is not supported in a shared library build on Windows"
+     if $^O eq 'MSWin32' && !disabled("shared");
+ 
+-plan tests => 2 + ($no_fips ? 0 : 1); #fips test
++plan skip_all => 2 + ($no_fips ? 0 : 1); #fips test
+ 
+ my @basic_cmd = ("cmp_protect_test",
+                  data_file("prot_RSA.pem"),
+diff --git a/test/recipes/65-test_cmp_vfy.t b/test/recipes/65-test_cmp_vfy.t
+index f722800e27..26a01786bb 100644
+--- a/test/recipes/65-test_cmp_vfy.t
++++ b/test/recipes/65-test_cmp_vfy.t
+@@ -27,7 +27,7 @@ plan skip_all => "This test is not supported in a no-cmp build"
+ plan skip_all => "This test is not supported in a no-ec build"
+     if disabled("ec");
+ 
+-plan tests => 2 + ($no_fips ? 0 : 1); #fips test
++plan skip_all => 2 + ($no_fips ? 0 : 1); #fips test
+ 
+ my @basic_cmd = ("cmp_vfy_test",
+                  data_file("server.crt"),     data_file("client.crt"),
+-- 
+2.51.0
+

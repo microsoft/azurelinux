@@ -1,0 +1,50 @@
+From 8d3ca80d401db386ccb5e7568c395a78eede6edc Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 19 May 2025 21:57:43 +0200
+Subject: [PATCH 2/6] drop incompatible cargo flags from setuptools_rust
+
+---
+ setup.py | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5d9fd285..5c56178f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -11,7 +11,6 @@
+ 
+ import os
+ import shlex
+-import shutil
+ 
+ try:
+     import tomllib
+@@ -42,24 +41,9 @@ except ImportError:
+ with open("Cargo.toml", "rb") as fp:
+     version = tomllib.load(fp)["package"]["version"]
+ 
+-# Use `--no-default-features` by default for a minimal build to support PEP 517.
+-# `MATURIN_SETUP_ARGS` env var can be used to pass customized arguments to cargo.
+-cargo_args = ["--no-default-features"]
+-if os.getenv("MATURIN_SETUP_ARGS"):
+-    cargo_args = shlex.split(os.getenv("MATURIN_SETUP_ARGS", ""))
+-
+-if not os.environ.get("MATURIN_NO_INSTALL_RUST") and not shutil.which("cargo"):
+-    from puccinialin import setup_rust
+-
+-    print("Rust not found, installing into a temporary directory")
+-    extra_env = setup_rust()
+-    env = {**os.environ, **extra_env}
+-else:
+-    env = None
+-
+ setup(
+     version=version,
+     cmdclass={"bdist_wheel": bdist_wheel},
+-    rust_extensions=[RustBin("maturin", args=cargo_args, cargo_manifest_args=["--locked"], env=env)],
++    rust_extensions=[RustBin("maturin")],
+     zip_safe=False,
+ )
+-- 
+2.52.0
+

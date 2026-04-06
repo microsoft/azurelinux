@@ -1,0 +1,22 @@
+[Unit]
+Description=Provisioning Certificate Caching Service (PCCS)
+Documentation=https://github.com/intel/SGXDataCenterAttestationPrimitives/blob/master/QuoteGeneration/pccs/README.md
+After=syslog.target network.target auditd.service
+ConditionPathExists=/dev/sgx_enclave
+
+[Service]
+Type=simple
+User=pccs
+ExecStart=/usr/bin/pccs
+Restart=on-failure
+RestartSec=15s
+
+Environment=NODE_CONFIG_DIR=/etc/pccs
+WorkingDirectory=/var/lib/pccs
+InaccessibleDirectories=/home
+DevicePolicy=closed
+DeviceAllow=/dev/sgx_enclave rw
+DeviceAllow=/dev/sgx_provision rw
+
+[Install]
+WantedBy=multi-user.target

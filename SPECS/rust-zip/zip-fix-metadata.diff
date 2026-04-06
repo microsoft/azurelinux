@@ -1,0 +1,82 @@
+--- zip-7.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zip-7.2.0/Cargo.toml	2026-02-12T19:17:50.358945+00:00
+@@ -110,10 +110,6 @@
+     "deflate-flate2",
+     "flate2/zlib-ng",
+ ]
+-deflate-flate2-zlib-ng-compat = [
+-    "deflate-flate2",
+-    "flate2/zlib-ng-compat",
+-]
+ deflate-flate2-zlib-rs = [
+     "deflate-flate2",
+     "flate2/zlib-rs",
+@@ -125,7 +121,6 @@
+ jiff-02 = ["dep:jiff"]
+ legacy-zip = ["bitstream-io"]
+ lzma = ["dep:lzma-rust2"]
+-nt-time = ["dep:nt-time"]
+ ppmd = ["dep:ppmd-rust"]
+ unreserved = []
+ xz = ["dep:lzma-rust2"]
+@@ -174,7 +169,7 @@
+ default-features = false
+ 
+ [dependencies.constant_time_eq]
+-version = "0.3"
++version = "0.4.2"
+ optional = true
+ 
+ [dependencies.crc32fast]
+@@ -190,7 +185,7 @@
+ default-features = false
+ 
+ [dependencies.generic-array]
+-version = "=0.14.7"
++version = "0.14.7"
+ optional = true
+ 
+ [dependencies.hmac]
+@@ -206,7 +201,7 @@
+ optional = true
+ 
+ [dependencies.lzma-rust2]
+-version = "0.15"
++version = "0.16.1"
+ features = [
+     "std",
+     "encoder",
+@@ -219,11 +214,6 @@
+ [dependencies.memchr]
+ version = "2.7"
+ 
+-[dependencies.nt-time]
+-version = "0.10.6"
+-optional = true
+-default-features = false
+-
+ [dependencies.pbkdf2]
+ version = "0.12"
+ optional = true
+@@ -259,13 +249,6 @@
+ optional = true
+ default-features = false
+ 
+-[dev-dependencies.bencher]
+-version = "0.1"
+-
+-[dev-dependencies.clap]
+-version = "=4.4.18"
+-features = ["derive"]
+-
+ [dev-dependencies.getrandom]
+ version = "0.3"
+ features = []
+@@ -294,7 +277,6 @@
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.time]
+ version = "0.3"
+-features = ["wasm-bindgen"]
+ optional = true
+ default-features = false
+ 

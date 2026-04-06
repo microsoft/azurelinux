@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Erlend E. Aasland" <erlend.aasland@protonmail.com>
+Date: Sun, 6 Nov 2022 22:39:34 +0100
+Subject: 00407: gh-99086: Fix implicit int compiler warning in configure check
+ for PTHREAD_SCOPE_SYSTEM
+
+Co-authored-by: Sam James <sam@cmpct.info>
+---
+ .../next/Build/2022-11-04-02-58-10.gh-issue-99086.DV_4Br.rst    | 1 +
+ configure                                                       | 2 +-
+ configure.ac                                                    | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Build/2022-11-04-02-58-10.gh-issue-99086.DV_4Br.rst
+
+diff --git a/Misc/NEWS.d/next/Build/2022-11-04-02-58-10.gh-issue-99086.DV_4Br.rst b/Misc/NEWS.d/next/Build/2022-11-04-02-58-10.gh-issue-99086.DV_4Br.rst
+new file mode 100644
+index 0000000000..e320ecfdfb
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2022-11-04-02-58-10.gh-issue-99086.DV_4Br.rst
+@@ -0,0 +1 @@
++Fix ``-Wimplicit-int`` compiler warning in :program:`configure` check for ``PTHREAD_SCOPE_SYSTEM``.
+diff --git a/configure b/configure
+index e39c16eee2..32c27a468d 100755
+--- a/configure
++++ b/configure
+@@ -10837,7 +10837,7 @@ else
+       void *foo(void *parm) {
+         return NULL;
+       }
+-      main() {
++      int main() {
+         pthread_attr_t attr;
+         pthread_t id;
+         if (pthread_attr_init(&attr)) exit(-1);
+diff --git a/configure.ac b/configure.ac
+index d5ca7172ca..f7668224be 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3185,7 +3185,7 @@ if test "$posix_threads" = "yes"; then
+       void *foo(void *parm) {
+         return NULL;
+       }
+-      main() {
++      int main() {
+         pthread_attr_t attr;
+         pthread_t id;
+         if (pthread_attr_init(&attr)) exit(-1);

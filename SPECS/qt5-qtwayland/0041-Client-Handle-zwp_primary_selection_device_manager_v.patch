@@ -1,0 +1,66 @@
+From aa6386768a90fb089a7a302c38cd7230d268b76b Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Tue, 27 Sep 2022 22:05:07 +0300
+Subject: [PATCH 41/55] Client: Handle zwp_primary_selection_device_manager_v1
+ global removal
+
+The zwp_primary_selection_device_manager_v1 global can be withdrawn if
+the compositor disables the primary selection, i.e. middle click to
+paste selected text. QtWayland needs to handle that; otherwise the app
+can crash.
+
+Pick-to: 6.5
+Change-Id: Idbb4db18b605f85a5951fa12c1bdf61898b0d123
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 45163234a4e4baad0012d3ee07501093d98ba91c)
+---
+ src/client/qwaylanddisplay.cpp            | 9 +++++++++
+ src/client/qwaylandprimaryselectionv1.cpp | 5 -----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index f23c459d..cc321497 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -519,6 +519,8 @@ void QWaylandDisplay::registry_global(uint32_t id, const QString &interface, uin
+ #if QT_CONFIG(wayland_client_primary_selection)
+     } else if (interface == QStringLiteral("zwp_primary_selection_device_manager_v1")) {
+         mPrimarySelectionManager.reset(new QWaylandPrimarySelectionDeviceManagerV1(this, id, 1));
++        for (QWaylandInputDevice *inputDevice : qAsConst(mInputDevices))
++            inputDevice->setPrimarySelectionDevice(mPrimarySelectionManager->createDevice(inputDevice));
+ #endif
+     } else if (interface == QStringLiteral("zwp_text_input_manager_v2") && !mClientSideInputContextRequested) {
+         mTextInputManager.reset(new QtWayland::zwp_text_input_manager_v2(registry, id, 1));
+@@ -577,6 +579,13 @@ void QWaylandDisplay::registry_global_remove(uint32_t id)
+                     inputDevice->setTextInput(nullptr);
+                 mWaylandIntegration->reconfigureInputContext();
+             }
++#if QT_CONFIG(wayland_client_primary_selection)
++            if (global.interface == QStringLiteral("zwp_primary_selection_device_manager_v1")) {
++                mPrimarySelectionManager.reset();
++                for (QWaylandInputDevice *inputDevice : qAsConst(mInputDevices))
++                    inputDevice->setPrimarySelectionDevice(nullptr);
++            }
++#endif
+             mGlobals.removeAt(i);
+             break;
+         }
+diff --git a/src/client/qwaylandprimaryselectionv1.cpp b/src/client/qwaylandprimaryselectionv1.cpp
+index 7805dd73..dac532b2 100644
+--- a/src/client/qwaylandprimaryselectionv1.cpp
++++ b/src/client/qwaylandprimaryselectionv1.cpp
+@@ -54,11 +54,6 @@ QWaylandPrimarySelectionDeviceManagerV1::QWaylandPrimarySelectionDeviceManagerV1
+     : zwp_primary_selection_device_manager_v1(display->wl_registry(), id, qMin(version, uint(1)))
+     , m_display(display)
+ {
+-    // Create devices for all seats.
+-    // This only works if we get the global before all devices
+-    const auto seats = m_display->inputDevices();
+-    for (auto *seat : seats)
+-        seat->setPrimarySelectionDevice(createDevice(seat));
+ }
+ 
+ QWaylandPrimarySelectionDeviceV1 *QWaylandPrimarySelectionDeviceManagerV1::createDevice(QWaylandInputDevice *seat)
+-- 
+2.51.1
+

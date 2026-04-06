@@ -1,0 +1,11 @@
+--- cups-pk-helper-0.1.3/src/cups-pk-helper-mechanism.c	2011-09-02 11:30:26.000000000 +0200
++++ cups-pk-helper-0.1.3/src/cups-pk-helper-mechanism.c	2011-09-02 11:31:34.000000000 +0200
+@@ -291,7 +291,7 @@ _check_polkit_for_action_internal (CphMe
+                 return FALSE;
+         }
+ 
+-        if (!polkit_authorization_result_get_is_authorized (pk_result)) {
++        if (pk_result == NULL || !polkit_authorization_result_get_is_authorized (pk_result)) {
+                 g_set_error (error,
+                              CPH_MECHANISM_ERROR,
+                              CPH_MECHANISM_ERROR_NOT_PRIVILEGED,

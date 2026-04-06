@@ -1,0 +1,49 @@
+From 1cdf46d6c5d0fa094f46ecef7e4294144d956988 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 24 Oct 2025 12:05:00 -0700
+Subject: [PATCH] Ignore alternatives that are binary-identical to existing
+ ones
+
+In https://bugzilla.redhat.com/show_bug.cgi?id=2363937 we found
+a problem that is ultimately triggered by alternatives configs
+having multiple entries that point to the same binary, or the
+same *effective* binary after /usr and /sbin merges (which is
+what streq_bin handles). I can't see a reason why we'd ever want
+to support this as a real thing, so when reading the config,
+let's just skip ingesting any alternative whose leader target is
+the same effective binary as an alternative we've already read.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ alternatives.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/alternatives.c b/alternatives.c
+index 61a95ad..75d3a54 100644
+--- a/alternatives.c
++++ b/alternatives.c
+@@ -520,6 +520,12 @@ static int readConfig(struct alternativeSet *set, const char *title,
+             newAlt.followers[i - 1].target = (line && strlen(line)) ? strsteal(&line) : NULL;
+         }
+ 
++        for (i = 0; i < set->numAlts; i++) {
++            if (streq_bin(newAlt.leader.target, set->alts[i].leader.target)) {
++                goto nextalt;
++            }
++        }
++
+         set->alts = realloc(set->alts, (set->numAlts + 1) * sizeof(*set->alts));
+         set->alts[set->numAlts] = newAlt;
+ 
+@@ -527,7 +533,7 @@ static int readConfig(struct alternativeSet *set, const char *title,
+             set->best = set->numAlts;
+ 
+         set->numAlts++;
+-
++nextalt:
+         memset(&newAlt, 0, sizeof(struct alternative));
+ 
+         nextLine(&buf, &line);
+-- 
+2.51.0
+

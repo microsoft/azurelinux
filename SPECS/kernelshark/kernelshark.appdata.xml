@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>kernelshark.desktop</id>
+  <metadata_license>GPL-2.0+</metadata_license>
+  <project_license>GPL-2.0 and LGPL-2.0</project_license>
+  <name>kernelsharl</name>
+  <summary>GUI analysis for Ftrace data captured by trace-cmd</summary>
+  <description>
+    <p>
+KernelShark is a front end reader of trace-cmd output. "trace-cmd record" and "trace-cmd extract" create a trace.dat (trace-cmd.dat) file. kernelshark can read this file and produce a graph and list view of its data. 
+    </p>
+  </description>
+  <url type="homepage">https://kernelshark.org/</url>
+</component>
+
+

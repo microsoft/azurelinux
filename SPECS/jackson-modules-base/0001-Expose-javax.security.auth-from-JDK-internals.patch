@@ -1,0 +1,26 @@
+From 45cad535d09c0b67719a1ebe14353636515596f7 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Thu, 8 Sep 2022 12:44:54 +0100
+Subject: [PATCH] Expose javax.security.auth from JDK internals
+
+---
+ pom.xml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pom.xml b/pom.xml
+index e72b4934..cafe56de 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -97,6 +97,9 @@ not datatype, data format, or JAX-RS provider modules.
+             <excludes>
+               <exclude>com/fasterxml/jackson/**/failing/*.java</exclude>
+             </excludes>
++            <argLine>
++              --add-opens=java.base/javax.security.auth=ALL-UNNAMED
++            </argLine>
+           </configuration>
+ 	</plugin>
+       </plugins>
+-- 
+2.38.1
+

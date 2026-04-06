@@ -1,0 +1,28 @@
+--- unicode-bidi-0.3.18/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-bidi-0.3.18/Cargo.toml	2025-01-04T15:41:44.820263+00:00
+@@ -49,14 +49,6 @@
+ name = "unicode_bidi"
+ path = "src/lib.rs"
+ 
+-[dependencies.flame]
+-version = "0.2"
+-optional = true
+-
+-[dependencies.flamer]
+-version = "0.4"
+-optional = true
+-
+ [dependencies.serde]
+ version = ">=0.8, <2.0"
+ features = ["derive"]
+@@ -77,10 +69,6 @@
+     "std",
+     "hardcoded-data",
+ ]
+-flame_it = [
+-    "flame",
+-    "flamer",
+-]
+ hardcoded-data = []
+ std = []
+ unstable = []

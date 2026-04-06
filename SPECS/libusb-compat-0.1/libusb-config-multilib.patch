@@ -1,0 +1,25 @@
+Resolve multilib conflict in 'libusb-config' script by removing $libdir variable entirely.
+
+http://fedoraproject.org/wiki/PackagingDrafts/MultilibTricks#Multiarch.2C_binaries_and_compilation_scripts
+
+Author: Jan Vcelak <jvcelak@redhat.com>
+Date: 2011-06-22
+
+diff -uNPrp libusb-compat-0.1.3/libusb-config.in libusb-compat-0.1.3.multilib/libusb-config.in
+--- libusb-compat-0.1.3/libusb-config.in	2009-06-23 23:45:33.000000000 +0200
++++ libusb-compat-0.1.3.multilib/libusb-config.in	2011-06-22 09:55:59.810188470 +0200
+@@ -3,7 +3,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ includedir=@includedir@
+-libdir=@libdir@
+ exec_prefix_set=no
+ 
+ usage()
+@@ -77,5 +76,5 @@ if test "$echo_cflags" = "yes"; then
+ 	echo $includes
+ fi
+ if test "$echo_libs" = "yes"; then
+-	echo -L$libdir -lusb
++	echo -lusb
+ fi

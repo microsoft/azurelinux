@@ -1,0 +1,41 @@
+From 273beaf16daf17cad775460bb28153643a77bfc9 Mon Sep 17 00:00:00 2001
+From: Milan Zamazal <mzamazal@redhat.com>
+Date: Thu, 25 Sep 2025 21:28:56 +0200
+Subject: [PATCH 14/15] ipa: simple: agc: Prevent division by zero in AGC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If the histogram size is non-zero but lower than the number of bins,
+yHistValsPerBin is zero and then the AGC processing crashes on division
+by it.  Let's check yHistValsPerBin for being zero and stop AGC
+processing in such a case.  The condition also covers the cases where
+histogramSize or yHistValsPerBinMod are zero.
+
+Tested-by: Barnabás Pőcze <barnabas.pocze@ideasonboard.com>
+Signed-off-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/agc.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index e0447cbd6..189de770c 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -145,6 +145,12 @@ void Agc::process(IPAContext &context,
+ 	unsigned int denom = 0;
+ 	unsigned int num = 0;
+ 
++	if (yHistValsPerBin == 0) {
++		LOG(IPASoftExposure, Debug)
++			<< "Not adjusting exposure due to insufficient histogram data";
++		return;
++	}
++
+ 	for (unsigned int i = 0; i < histogramSize; i++) {
+ 		unsigned int idx = (i - (i / yHistValsPerBinMod)) / yHistValsPerBin;
+ 		exposureBins[idx] += histogram[blackLevelHistIdx + i];
+-- 
+2.51.0
+

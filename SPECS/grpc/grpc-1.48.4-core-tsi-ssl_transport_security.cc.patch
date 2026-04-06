@@ -1,0 +1,12 @@
+--- grpc-1.48.4/src/core/tsi/ssl_transport_security.cc.orig	2024-09-19 10:02:30.511044976 -0400
++++ grpc-1.48.4/src/core/tsi/ssl_transport_security.cc	2024-09-19 10:03:28.363061372 -0400
+@@ -37,7 +37,9 @@
+ 
+ #include <openssl/bio.h>
+ #include <openssl/crypto.h> /* For OPENSSL_free */
++#if !defined(OPENSSL_NO_ENGINE)
+ #include <openssl/engine.h>
++#endif
+ #include <openssl/err.h>
+ #include <openssl/ssl.h>
+ #include <openssl/tls1.h>

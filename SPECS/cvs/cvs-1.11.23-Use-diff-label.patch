@@ -1,0 +1,85 @@
+From 59d36094189eea391ffda2dcc34d3de935bf476d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 3 May 2018 14:23:25 +0200
+Subject: [PATCH] Use diff --label
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+diff's "-L" option is deprecated, use "--label" instead.
+
+https://savannah.nongnu.org/bugs/?35267
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/diff.c    | 3 ++-
+ src/rcs.c     | 4 ++--
+ src/rcscmds.c | 8 ++++----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/diff.c b/src/diff.c
+index 084f10d..e362753 100644
+--- a/src/diff.c
++++ b/src/diff.c
+@@ -357,7 +357,8 @@ diff (argc, argv)
+ 			error (0, 0, "extra -L arguments ignored");
+ 			break;
+ 		    }
+-		/* Fall through.  */
++		add_diff_args (0, "--label", optarg);
++		break;
+ 	    case 'C': case 'F': case 'I': case 'U': case 'W':
+ 		add_diff_args (c, NULL, optarg);
+ 		break;
+diff --git a/src/rcs.c b/src/rcs.c
+index ba255ce..9edb598 100644
+--- a/src/rcs.c
++++ b/src/rcs.c
+@@ -8933,7 +8933,7 @@ make_file_label (path, rev, rcs)
+ 	assert (strcmp(DEVNULL, path));
+ 	RCS_getrevtime (rcs, rev, datebuf, 0);
+ 	(void) date_to_internet (date, datebuf);
+-	(void) sprintf (label, "-L%s\t%s\t%s", path, date, rev);
++	(void) sprintf (label, "--label=%s\t%s\t%s", path, date, rev);
+     }
+     else
+     {
+@@ -8957,7 +8957,7 @@ make_file_label (path, rev, rcs)
+ 	}
+ 
+ 	(void) tm_to_internet (datebuf, wm);
+-	(void) sprintf (label, "-L%s\t%s", path, datebuf);
++	(void) sprintf (label, "--label=%s\t%s", path, datebuf);
+     }
+     return label;
+ }
+diff --git a/src/rcscmds.c b/src/rcscmds.c
+index a9e576a..8617216 100644
+--- a/src/rcscmds.c
++++ b/src/rcscmds.c
+@@ -290,11 +290,11 @@ RCS_merge(rcs, path, workfile, options, rev1, rev2)
+     call_diff_add_arg ("-E");
+     call_diff_add_arg ("-am");
+ 
+-    call_diff_add_arg ("-L");
++    call_diff_add_arg ("--label");
+     call_diff_add_arg (workfile);
+-    call_diff_add_arg ("-L");
++    call_diff_add_arg ("--label");
+     call_diff_add_arg (xrev1);
+-    call_diff_add_arg ("-L");
++    call_diff_add_arg ("--label");
+     call_diff_add_arg (xrev2);
+ 
+     call_diff_add_arg ("--");
+@@ -352,7 +352,7 @@ RCS_merge(rcs, path, workfile, options, rev1, rev2)
+    against; it must be non-NULL.  If REV2 is non-NULL, compare REV1
+    and REV2; if REV2 is NULL compare REV1 with the file in the working
+    directory, whose name is WORKFILE.  LABEL1 and LABEL2 are default
+-   file labels, and (if non-NULL) should be added as -L options
++   file labels, and (if non-NULL) should be added as --label options
+    to diff.  Output goes to stdout.
+ 
+    Return value is 0 for success, -1 for a failure which set errno,
+-- 
+2.14.3
+

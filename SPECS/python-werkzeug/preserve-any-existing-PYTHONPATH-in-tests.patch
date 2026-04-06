@@ -1,0 +1,33 @@
+From 668b7c6df40795c27ee9d7069a23afaf3a861144 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Thu, 7 Nov 2024 14:31:40 +0100
+Subject: [PATCH] Preserve any existing PYTHONPATH in tests
+
+---
+ tests/conftest.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index f05fd84..a29950e 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -99,6 +99,7 @@ class DevServerClient:
+         self._log_write = open(log_path, "wb")
+         self._log_read = open(log_path, encoding="utf8", errors="surrogateescape")
+         tmp_dir = os.fspath(self._tmp_path)
++        pth_dir = os.pathsep.join((os.getenv("PYTHONPATH"), str(tmp_dir))) if os.getenv("PYTHONPATH") else tmp_dir
+         self._proc = subprocess.Popen(
+             [
+                 sys.executable,
+@@ -106,7 +107,7 @@ class DevServerClient:
+                 self._app_name,
+                 json.dumps(self._server_kwargs),
+             ],
+-            env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONPATH": tmp_dir},
++            env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONPATH": pth_dir},
+             cwd=tmp_dir,
+             close_fds=True,
+             stdout=self._log_write,
+-- 
+2.47.0
+

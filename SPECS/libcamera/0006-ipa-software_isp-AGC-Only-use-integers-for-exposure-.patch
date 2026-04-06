@@ -1,0 +1,64 @@
+From 0aa1355b268655a66965bf3e26e60722b77aec96 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Mon, 22 Sep 2025 14:51:42 +0200
+Subject: [PATCH 6/8] ipa: software_isp: AGC: Only use integers for exposure
+ calculations
+
+Exposure is an integer, instead of re-using the "double next" used
+for again calculations, doing intermediate calculations with double
+precision, use a local next variable of an integer type.
+
+Reviewed-by: Milan Zamazal <mzamazal@redhat.com>
+Reviewed-by: Isaac Scott <isaac.scott@ideasonboard.com>
+Tested-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/algorithms/agc.cpp | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index f7f734514..3471cc881 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -51,19 +51,18 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ 	static constexpr uint8_t kExpNumeratorUp = kExpDenominator + 1;
+ 	static constexpr uint8_t kExpNumeratorDown = kExpDenominator - 1;
+ 
+-	double next;
+ 	int32_t &exposure = frameContext.sensor.exposure;
+ 	double &again = frameContext.sensor.gain;
+ 
+ 	if (exposureMSV < kExposureOptimal - kExposureSatisfactory) {
+ 		if (exposure < context.configuration.agc.exposureMax) {
+-			next = exposure * kExpNumeratorUp / kExpDenominator;
++			int32_t next = exposure * kExpNumeratorUp / kExpDenominator;
+ 			if (next - exposure < 1)
+ 				exposure += 1;
+ 			else
+ 				exposure = next;
+ 		} else {
+-			next = again * kExpNumeratorUp / kExpDenominator;
++			double next = again * kExpNumeratorUp / kExpDenominator;
+ 			if (next - again < context.configuration.agc.againMinStep)
+ 				again += context.configuration.agc.againMinStep;
+ 			else
+@@ -73,13 +72,13 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ 
+ 	if (exposureMSV > kExposureOptimal + kExposureSatisfactory) {
+ 		if (again > context.configuration.agc.again10) {
+-			next = again * kExpNumeratorDown / kExpDenominator;
++			double next = again * kExpNumeratorDown / kExpDenominator;
+ 			if (again - next < context.configuration.agc.againMinStep)
+ 				again -= context.configuration.agc.againMinStep;
+ 			else
+ 				again = next;
+ 		} else {
+-			next = exposure * kExpNumeratorDown / kExpDenominator;
++			int32_t next = exposure * kExpNumeratorDown / kExpDenominator;
+ 			if (exposure - next < 1)
+ 				exposure -= 1;
+ 			else
+-- 
+2.51.0
+

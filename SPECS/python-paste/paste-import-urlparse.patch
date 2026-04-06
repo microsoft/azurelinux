@@ -1,0 +1,12 @@
+diff -ur paste-3.10.1.orig/paste/auth/open_id.py paste-3.10.1/paste/auth/open_id.py
+--- paste-3.10.1.orig/paste/auth/open_id.py	2024-05-01 13:39:58.000000000 +0200
++++ paste-3.10.1/paste/auth/open_id.py	2025-07-14 15:07:33.452939517 +0200
+@@ -56,7 +56,7 @@
+ __all__ = ['AuthOpenIDHandler']
+ 
+ import html
+-import urlparse
++import urllib.parse as urlparse
+ import re
+ 
+ import paste.request

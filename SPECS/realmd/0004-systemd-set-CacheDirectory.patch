@@ -1,0 +1,27 @@
+From 1c5e77194a105adf69f466bd328bb53144121397 Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <bluca@debian.org>
+Date: Thu, 12 Sep 2024 23:08:02 +0200
+Subject: [PATCH 4/7] systemd: set CacheDirectory
+
+realmd uses /var/cache/realmd, so add CacheDirectory=realmd to ensure
+it is created with the right access privileges when the service is
+started. This avoids the need for the package to ship files into /var/,
+which might be created locally and/or wiped.
+
+https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
+---
+ dbus/realmd.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dbus/realmd.service.in b/dbus/realmd.service.in
+index 3c290e0..314d36b 100644
+--- a/dbus/realmd.service.in
++++ b/dbus/realmd.service.in
+@@ -24,3 +24,4 @@ ProtectSystem=no
+ RestrictRealtime=yes
+ RestrictSUIDSGID=yes
+ SystemCallArchitectures=native
++CacheDirectory=realmd
+-- 
+2.47.1
+

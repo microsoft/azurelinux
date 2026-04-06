@@ -1,0 +1,26 @@
+From 6880c3dc9098b3337612850d1500b474aeb944ca Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 29 Aug 2017 17:33:51 +0200
+Subject: [PATCH] require_selinux_(): use selinuxenabled(8) if available
+
+---
+ init.cfg | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/init.cfg b/init.cfg
+index af6b581..f887b3a 100644
+--- a/init.cfg
++++ b/init.cfg
+@@ -114,6 +114,9 @@ require_selinux_()
+   grep 'selinuxfs$' /proc/filesystems > /dev/null \
+     || skip_ "this system lacks SELinux support"
+ 
++  # use the 'selinuxenabled' utility if available
++  selinuxenabled; [ $? = 1 ] && skip_ "SELinux is disabled"
++
+   # Independent of whether SELinux is enabled system-wide,
+   # the current file system may lack SELinux support.
+   # Also the current build may have SELinux support disabled.
+-- 
+2.9.5
+

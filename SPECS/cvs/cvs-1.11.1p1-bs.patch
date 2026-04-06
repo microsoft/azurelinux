@@ -1,0 +1,12 @@
+diff -up cvs-1.11.23/src/sanity.sh.bs cvs-1.11.23/src/sanity.sh
+--- cvs-1.11.23/src/sanity.sh.bs	2008-07-15 15:38:59.000000000 -0400
++++ cvs-1.11.23/src/sanity.sh	2008-07-15 15:40:29.000000000 -0400
+@@ -18,6 +18,8 @@
+ #
+ # Original Author: K. Richard Pixley
+ 
++exit 0
++
+ # usage:
+ usage ()
+ {

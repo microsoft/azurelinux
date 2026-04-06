@@ -1,0 +1,17 @@
+From b2d50bb457a9dbf5da5a84255912c779a1e1a21f Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Tue, 29 Jul 2025 20:53:57 -0600
+Subject: [PATCH] Use spur instead of spur.local
+
+---
+ test-requirements.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test-requirements.txt b/test-requirements.txt
+index d0163ed..b478b21 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -1,2 +1,2 @@
+ pytest
+-spur.local>=0.3.7,<0.4
++spur>=0.3.7,<0.4

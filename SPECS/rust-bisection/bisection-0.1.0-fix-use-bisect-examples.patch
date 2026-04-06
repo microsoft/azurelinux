@@ -1,0 +1,18 @@
+diff -Naur bisection-0.1.0-original/examples/numeric_table.rs bisection-0.1.0/examples/numeric_table.rs
+--- bisection-0.1.0-original/examples/numeric_table.rs	2020-09-02 15:48:57.000000000 -0400
++++ bisection-0.1.0/examples/numeric_table.rs	2024-04-26 12:50:28.274089820 -0400
+@@ -1,4 +1,4 @@
+-use bisect::bisect;
++use bisection::bisect;
+ 
+ fn grade(score: &i32, breakpoints: &[i32], grades: &[char]) -> char {
+     let i = bisect(breakpoints, score);
+diff -Naur bisection-0.1.0-original/examples/sorted_search.rs bisection-0.1.0/examples/sorted_search.rs
+--- bisection-0.1.0-original/examples/sorted_search.rs	2020-09-02 15:48:57.000000000 -0400
++++ bisection-0.1.0/examples/sorted_search.rs	2024-04-26 12:50:31.321129532 -0400
+@@ -1,4 +1,4 @@
+-use bisect::{bisect_left, bisect_right};
++use bisection::{bisect_left, bisect_right};
+ 
+ /// Locate the leftmost value exactly equal to `x`
+ fn index<T: Ord>(a: &[T], x: &T) -> Option<usize> {

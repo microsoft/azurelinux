@@ -1,0 +1,36 @@
+diff --git a/pygraphviz/graphviz_wrap.c b/pygraphviz/graphviz_wrap.c
+index cb06da79..5f66e42b 100644
+--- a/pygraphviz/graphviz_wrap.c
++++ b/pygraphviz/graphviz_wrap.c
+@@ -5447,7 +5447,7 @@ SWIGINTERN PyObject *_wrap_gvRenderData(PyObject *self, PyObject *args) {
+   Agraph_t *arg2 = (Agraph_t *) 0 ;
+   char *arg3 = (char *) 0 ;
+   char **arg4 = (char **) 0 ;
+-  unsigned int *arg5 = (unsigned int *) 0 ;
++  size_t *arg5 = (size_t *) 0 ;
+   void *argp1 = 0 ;
+   int res1 = 0 ;
+   void *argp2 = 0 ;
+@@ -5456,7 +5456,7 @@ SWIGINTERN PyObject *_wrap_gvRenderData(PyObject *self, PyObject *args) {
+   char *buf3 = 0 ;
+   int alloc3 = 0 ;
+   char *temp4 = 0 ;
+-  unsigned int tempn4 ;
++  size_t tempn4 ;
+   PyObject *swig_obj[3] ;
+   int result;
+   
+diff --git a/pygraphviz/graphviz.i b/pygraphviz/graphviz.i
+index d7c49330e342..7f19e1cae6ca 100644
+--- a/pygraphviz/graphviz.i
++++ b/pygraphviz/graphviz.i
+@@ -338,7 +338,7 @@ int gvRenderFilename(GVC_t *gvc, Agraph_t* g, char *format, char *filename);
+ /* three lines are straight from the SWIG manual.  */
+ %include <cstring.i>
+ %include <typemaps.i>
+-%cstring_output_allocate_size(char **result, unsigned int* size, free(*$1));
+-int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, unsigned int *size);
++%cstring_output_allocate_size(char **result, size_t* size, free(*$1));
++int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, size_t *size);
+ /* Free memory allocated and pointed to by *result in gvRenderData */
+ extern void gvFreeRenderData (char* data);

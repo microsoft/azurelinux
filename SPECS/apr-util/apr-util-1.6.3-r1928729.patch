@@ -1,0 +1,59 @@
+From 51ca8797b171ec04de7dc26b056e4239c2993381 Mon Sep 17 00:00:00 2001
+From: Jean-Frederic Clere <jfclere@gmail.com>
+Date: Thu, 25 Sep 2025 09:06:35 +0200
+Subject: [PATCH] backport r1928729: Arrange lmdb logic: htdbm -x  wasn't
+ working because the database was MDB_RDONLY. Additionally add comments in the
+ code.
+
+---
+ dbm/apr_dbm_lmdb.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/dbm/apr_dbm_lmdb.c b/dbm/apr_dbm_lmdb.c
+index 3702dedb..f3ea1f45 100644
+--- a/dbm/apr_dbm_lmdb.c
++++ b/dbm/apr_dbm_lmdb.c
+@@ -41,8 +41,6 @@ typedef struct {
+ 
+ #define APR_DBM_LMDBMODE_RO       MDB_RDONLY
+ #define APR_DBM_LMDBMODE_RWCREATE MDB_CREATE
+-#define APR_DBM_LMDBMODE_RW       (MDB_RDONLY + MDB_CREATE + 1)
+-#define APR_DBM_LMDBMODE_RWTRUNC  (APR_DBM_LMDBMODE_RW + 1)
+ 
+ /* --------------------------------------------------------------------------
+ **
+@@ -98,13 +96,13 @@ static apr_status_t vt_lmdb_open(apr_dbm_t **pdb, const char *pathname,
+         dbmode = APR_DBM_LMDBMODE_RO;
+         break;
+     case APR_DBM_READWRITE:
+-        dbmode = APR_DBM_LMDBMODE_RW;
++        dbmode = 0;
+         break;
+     case APR_DBM_RWCREATE:
+         dbi_open_flags = APR_DBM_LMDBMODE_RWCREATE;
+         break;
+     case APR_DBM_RWTRUNC:
+-        truncate = APR_DBM_LMDBMODE_RWTRUNC;
++        truncate = 1;
+         break;
+     default:
+         return APR_EINVAL;
+@@ -124,14 +122,17 @@ static apr_status_t vt_lmdb_open(apr_dbm_t **pdb, const char *pathname,
+         }
+ 
+         if (dberr == 0) {
++            /* we pass MDB_RDONLY and the default */
+             dberr = mdb_env_open(file.env, pathname, dbmode | DEFAULT_ENV_FLAGS, apr_posix_perms2mode(perm));
+         }
+ 
+         if (dberr == 0) {
++            /* we pass MDB_RDONLY */
+             dberr = mdb_txn_begin(file.env, NULL, dbmode, &file.txn);
+         }
+ 
+         if (dberr == 0) {
++            /* we pass the DB_CREATE */
+             dberr = mdb_dbi_open(file.txn, NULL, dbi_open_flags, &file.dbi);
+ 
+             /* if mode == APR_DBM_RWTRUNC, drop database */
+

@@ -1,0 +1,31 @@
+diff -rupN --no-dereference Python-3.11.14/Python/pylifecycle.c Python-3.11.14-new/Python/pylifecycle.c
+--- Python-3.11.14/Python/pylifecycle.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Python/pylifecycle.c	2025-10-09 23:07:48.138411050 +0200
+@@ -61,6 +61,27 @@ extern void _PyIO_Fini(void);
+ 
+ #define PUTS(fd, str) _Py_write_noraise(fd, str, (int)strlen(str))
+ 
++#if defined(__MINGW32__) && defined(PY_COERCE_C_LOCALE)
++#include <windows.h>
++
++static int
++setenv (const char *var, const char *val, int ovr)
++{
++  BOOL b;
++  char c[2];
++  if (!ovr)
++  {
++    DWORD d;
++    d = GetEnvironmentVariableA (var, c, 2);
++    if (0 != d && GetLastError () != ERROR_ENVVAR_NOT_FOUND)
++      return 1;
++  }
++  b = SetEnvironmentVariableA (var, val);
++  if (b)
++    return 0;
++  return 1;
++}
++#endif
+ 
+ #ifdef __cplusplus
+ extern "C" {

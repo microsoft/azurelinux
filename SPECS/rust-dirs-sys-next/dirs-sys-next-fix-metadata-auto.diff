@@ -1,0 +1,16 @@
+--- dirs-sys-next-0.1.2/Cargo.toml	2021-01-09T05:59:37+00:00
++++ dirs-sys-next-0.1.2/Cargo.toml	2023-05-18T14:16:58.829012+00:00
+@@ -20,13 +20,7 @@
+ readme = "README.md"
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/xdg-rs/dirs/tree/master/dirs-sys"
+-[target."cfg(target_os = \"redox\")".dependencies.redox_users]
+-version = "0.4.0"
+-default-features = false
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["knownfolders", "objbase", "shlobj", "winbase", "winerror"]
+ [badges.maintenance]
+ status = "as-is"

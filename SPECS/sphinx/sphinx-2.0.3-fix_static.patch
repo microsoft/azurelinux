@@ -1,0 +1,22 @@
+--- sphinx-2.0.3-release/api/libsphinxclient/sphinxclient.c~	2011-11-13 06:40:26.000000000 -0600
++++ sphinx-2.0.3-release/api/libsphinxclient/sphinxclient.c	2012-02-14 13:45:50.444826859 -0600
+@@ -290,7 +290,7 @@
+ }
+ 
+ 
+-void sock_close ( int sock );
++static sock_close ( int sock );
+ 
+ 
+ #define safe_free(_ptr) \
+--- sphinx-2.0.3-release/api/libsphinxclient/sphinxclient.c~	2012-02-14 13:50:33.000000000 -0600
++++ sphinx-2.0.3-release/api/libsphinxclient/sphinxclient.c	2012-02-14 13:54:50.527389085 -0600
+@@ -1253,7 +1253,7 @@
+ }
+ 
+ 
+-void sock_close ( int sock )
++static sock_close ( int sock )
+ {
+ 	if ( sock<0 )
+ 		return;

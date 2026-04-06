@@ -1,0 +1,82 @@
+From 9d95ebbf9f259336b60a35bca676c18ca7636e47 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Mon, 3 Nov 2025 21:13:34 -0500
+Subject: [PATCH 14/15] Fedora: refactor: adapt to kbs-types
+ InitData/RuntimeData type changes
+
+- Remove local RuntimeData definition
+- Use kbs_types::RuntimeData and kbs_types::InitData directly
+- Update Attestation construction to match new kbs-types API
+
+Required due to kbs-types commit b5c275c that changed Attestation
+fields from serde_json::Value to concrete types.
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ .../kbs_protocol/src/client/rcar_client.rs    | 25 ++++++-------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
+diff --git a/attestation-agent/kbs_protocol/src/client/rcar_client.rs b/attestation-agent/kbs_protocol/src/client/rcar_client.rs
+index 5cfcfce..0f2c5ef 100644
+--- a/attestation-agent/kbs_protocol/src/client/rcar_client.rs
++++ b/attestation-agent/kbs_protocol/src/client/rcar_client.rs
+@@ -10,7 +10,7 @@ use async_trait::async_trait;
+ use attester::TeeEvidence;
+ use canon_json::CanonicalFormatter;
+ use kbs_types::HashAlgorithm;
+-use kbs_types::{Attestation, Challenge, ErrorInformation, Request, Response, Tee, TeePubKey};
++use kbs_types::{Attestation, Challenge, ErrorInformation, Request, Response, RuntimeData, Tee};
+ use log::{debug, warn};
+ use resource_uri::ResourceUri;
+ use serde::{Deserialize, Serialize};
+@@ -62,14 +62,6 @@ pub struct CompositeEvidence {
+     pub additional_evidence: String,
+ }
+ 
+-#[derive(Serialize)]
+-pub struct RuntimeData {
+-    pub nonce: String,
+-
+-    #[serde(rename = "tee-pubkey")]
+-    pub tee_pubkey: TeePubKey,
+-}
+-
+ async fn get_request_extra_params() -> serde_json::Value {
+     let supported_hash_algorithms = HashAlgorithm::list_all();
+ 
+@@ -273,24 +265,23 @@ impl KbsClient<Box<dyn EvidenceProvider>> {
+             tee_pubkey,
+         };
+ 
+-        let runtime_data_json = serde_json::to_value(&runtime_data)?;
+         let tee_evidence = self
+-            .get_composite_evidence(runtime_data, algorithm, tee)
++            .get_composite_evidence(runtime_data.clone(), algorithm, tee)
+             .await
+             .context("get composite evidence failed")?;
+ 
+         let tee_evidence_json = serde_json::to_value(tee_evidence)?;
+         let attest_endpoint = format!("{}/{KBS_PREFIX}/attest", self.kbs_host_url);
+         let init_data = self._initdata.as_ref().map(|initdata| {
+-            json!({
+-                "format": "toml",
+-                "body": initdata,
+-            })
++            kbs_types::InitData {
++                format: "toml".to_string(),
++                body: initdata.clone(),
++            }
+         });
+         let attest = Attestation {
+             init_data,
+-            runtime_data: runtime_data_json,
+-            tee_evidence: tee_evidence_json,
++            runtime_data,
++            tee_evidence: serde_json::from_value(tee_evidence_json).context("Failed to parse tee_evidence")?,
+         };
+ 
+         debug!("send attest request.");
+-- 
+2.51.1
+

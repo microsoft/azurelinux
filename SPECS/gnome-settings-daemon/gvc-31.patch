@@ -1,0 +1,1120 @@
+From 193da7a58ea60ac9e04d6a96308777b70153506b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:22 +0100
+Subject: [PATCH 01/18] mixer-control: Fix typos and remove trailing whitespace
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 5704270..e326346 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -532,7 +532,7 @@ gvc_mixer_control_get_stream_from_device (GvcMixerControl *control,
+  * @profile: (allow-none): Can be %NULL if any profile present on this port is okay
+  *
+  * Returns: This method will attempt to swap the profile on the card of
+- * the device with given profile name.  If successfull it will set the
++ * the device with given profile name.  If successful it will set the
+  * preferred profile on that device so as we know the next time the user
+  * moves to that device it should have this profile active.
+  */
+@@ -584,7 +584,7 @@ gvc_mixer_control_change_profile_on_selected_device (GvcMixerControl  *control,
+  * - Firstly it queries the stream from the device.
+  *   - It assumes that if the stream is null that it cannot be a bluetooth or network stream (they never show unless they have valid sinks and sources)
+  *   In the scenario of a NULL stream on the device
+- *        - It fetches the device's preferred profile or if NUll the profile with the highest priority on that device.
++ *        - It fetches the device's preferred profile or if NULL the profile with the highest priority on that device.
+  *        - It then caches this device in control->priv->cached_desired_output_id so that when the update_sink triggered
+  *          from when we attempt to change profile we will know exactly what device to highlight on that stream.
+  *        - It attempts to swap the profile on the card from that device and returns.
+@@ -675,7 +675,7 @@ gvc_mixer_control_change_output (GvcMixerControl *control,
+  * - Firstly it queries the stream from the device.
+  *   - It assumes that if the stream is null that it cannot be a bluetooth or network stream (they never show unless they have valid sinks and sources)
+  *   In the scenario of a NULL stream on the device
+- *        - It fetches the device's preferred profile or if NUll the profile with the highest priority on that device.
++ *        - It fetches the device's preferred profile or if NULL the profile with the highest priority on that device.
+  *        - It then caches this device in control->priv->cached_desired_input_id so that when the update_source triggered
+  *          from when we attempt to change profile we will know exactly what device to highlight on that stream.
+  *        - It attempts to swap the profile on the card from that device and returns.
+@@ -1542,7 +1542,7 @@ update_sink (GvcMixerControl    *control,
+                                      GUINT_TO_POINTER (info->index),
+                                      g_object_ref (stream));
+                 add_stream (control, stream);
+-                /* Always sink on a new stream to able to assign the right stream id
++                /* Always sync on a new stream to able to assign the right stream id
+                  * to the appropriate outputs (multiple potential outputs per stream). */
+                 sync_devices (control, stream);
+         } else {
+@@ -1971,7 +1971,7 @@ update_ui_device_on_port_added (GvcMixerControl  *control,
+                                gvc_mixer_ui_device_get_id (uidevice));
+         }
+ 
+-        g_debug ("update_ui_device_on_port_added, direction %u, description '%s', origin '%s', port available %i", 
++        g_debug ("update_ui_device_on_port_added, direction %u, description '%s', origin '%s', port available %i",
+                  direction,
+                  port->human_port,
+                  gvc_mixer_card_get_name (card),
+-- 
+GitLab
+
+
+From 5c588084284aa7154cd9d03de680420ec7fb1b83 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:23 +0100
+Subject: [PATCH 02/18] mixer-control: Use automatic cleanup in
+ match_stream_with_devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Simplifies the loop
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index e326346..6d425dd 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1235,7 +1235,7 @@ match_stream_with_devices (GvcMixerControl    *control,
+                            GvcMixerStreamPort *stream_port,
+                            GvcMixerStream     *stream)
+ {
+-        GList                   *devices, *d;
++        g_autoptr (GList)        devices = NULL;
+         guint                    stream_card_id;
+         guint                    stream_id;
+         gboolean                 in_possession = FALSE;
+@@ -1245,12 +1245,12 @@ match_stream_with_devices (GvcMixerControl    *control,
+ 
+         devices  = g_hash_table_get_values (GVC_IS_MIXER_SOURCE (stream) ? control->priv->ui_inputs : control->priv->ui_outputs);
+ 
+-        for (d = devices; d != NULL; d = d->next) {
++        for (GList *d = devices; d != NULL; d = d->next) {
+                 GvcMixerUIDevice *device;
+                 guint             device_stream_id;
+-                gchar            *device_port_name;
+-                gchar            *origin;
+-                gchar            *description;
++                g_autofree gchar *device_port_name = NULL;
++                g_autofree gchar *origin = NULL;
++                g_autofree gchar *description = NULL;
+                 GvcMixerCard     *card;
+                 guint             card_id;
+ 
+@@ -1295,15 +1295,10 @@ match_stream_with_devices (GvcMixerControl    *control,
+                         }
+                 }
+ 
+-                g_free (device_port_name);
+-                g_free (origin);
+-                g_free (description);
+-
+                 if (in_possession == TRUE)
+                         break;
+         }
+ 
+-        g_list_free (devices);
+         return in_possession;
+ }
+ 
+-- 
+GitLab
+
+
+From 1df9dd1d868644152ee871bd50a08bde87a1af21 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:23 +0100
+Subject: [PATCH 03/18] mixer-control: Print port names with profiles
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Other debug code uses port names instead of the description so
+this simplifies debugging.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 6d425dd..f41c2c1 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1914,9 +1914,9 @@ determine_profiles_for_port (pa_card_port_info *port,
+                                 supported_profiles = g_list_append (supported_profiles, prof);
+                 }
+         }
+-        g_debug ("%i profiles supported on port %s",
++        g_debug ("%i profiles supported on port %s / %s",
+                  g_list_length (supported_profiles),
+-                 port->description);
++                 port->description, port->name);
+         return g_list_sort (supported_profiles, (GCompareFunc) gvc_mixer_card_profile_compare);
+ }
+ 
+-- 
+GitLab
+
+
+From 5f109671cf1440e0d83d3b22578b072836dfa8de Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:24 +0100
+Subject: [PATCH 04/18] mixer-control: Print error when we fail to update
+ source or sink port
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since we allow for port lookups to fail we should check if the update
+worked.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index f41c2c1..15eb5e8 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1525,7 +1525,8 @@ update_sink (GvcMixerControl    *control,
+                         if (active_port == NULL ||
+                             g_strcmp0 (active_port->port, info->active_port->name) != 0) {
+                                 g_debug ("update sink - apparently a port update");
+-                                gvc_mixer_stream_set_port (stream, info->active_port->name);
++                                if (!gvc_mixer_stream_set_port (stream, info->active_port->name))
++                                        g_warning ("Port update to of %d '%s' failed", info->index, info->active_port->name);
+                         }
+                 }
+         }
+@@ -1654,7 +1655,8 @@ update_source (GvcMixerControl      *control,
+                         if (active_port == NULL ||
+                             g_strcmp0 (active_port->port, info->active_port->name) != 0) {
+                                 g_debug ("update source - apparently a port update");
+-                                gvc_mixer_stream_set_port (stream, info->active_port->name);
++                                if (!gvc_mixer_stream_set_port (stream, info->active_port->name))
++                                        g_warning ("Port update to of %d '%s' failed", info->index, info->active_port->name);
+                         }
+                 }
+         }
+-- 
+GitLab
+
+
+From fe701f380fd48f88d5d3fea37a8d92671344c289 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:36:27 +0100
+Subject: [PATCH 05/18] mixer-control: Print error when we fail to set default
+ source
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Makes is consistent with error handling for setting default sink
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 15eb5e8..acac0ca 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -729,7 +729,10 @@ gvc_mixer_control_change_input (GvcMixerControl *control,
+         if (stream != default_stream) {
+                 g_debug ("change-input - attempting to swap over to stream %s",
+                          gvc_mixer_stream_get_description (stream));
+-                gvc_mixer_control_set_default_source (control, stream);
++                if (!gvc_mixer_control_set_default_source (control, stream)) {
++                        g_warning ("Failed to set default source from input %s",
++                                   gvc_mixer_ui_device_get_description (input));
++                }
+         }
+ }
+ 
+-- 
+GitLab
+
+
+From 852dc15b3b60c3e49a1b4e5e38d45ceb1908ac31 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:24 +0100
+Subject: [PATCH 06/18] mixer-control: Use consistent debug prefix
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The debug statements all used different prefixes making it harder than
+needed to grep for them
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index acac0ca..383a74f 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -265,7 +265,7 @@ gvc_mixer_control_lookup_device_from_stream (GvcMixerControl *control,
+ 
+                 if (is_network_stream &&
+                     stream_id == gvc_mixer_stream_get_id (stream)) {
+-                        g_debug ("lookup device from stream - %s - it is a network_stream ",
++                        g_debug ("lookup-device-from-stream - %s - it is a network_stream ",
+                                  gvc_mixer_ui_device_get_description (device));
+                         ret = device;
+                         break;
+@@ -289,7 +289,7 @@ gvc_mixer_control_lookup_device_from_stream (GvcMixerControl *control,
+                 }
+         }
+ 
+-        g_debug ("gvc_mixer_control_lookup_device_from_stream - Could not find a device for stream '%s'",gvc_mixer_stream_get_description (stream));
++        g_debug ("lookup-device-from-stream - Could not find a device for stream '%s'", gvc_mixer_stream_get_description (stream));
+ 
+         g_list_free (devices);
+ 
+-- 
+GitLab
+
+
+From c4c6d365a24583a6d77d1335ccf9d49f8b39a0ae Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:25 +0100
+Subject: [PATCH 07/18] mixer-control: Don't lie about found devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We should only print that a device wasn't found when it is actually
+the case.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 383a74f..7cdb909 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -289,7 +289,8 @@ gvc_mixer_control_lookup_device_from_stream (GvcMixerControl *control,
+                 }
+         }
+ 
+-        g_debug ("lookup-device-from-stream - Could not find a device for stream '%s'", gvc_mixer_stream_get_description (stream));
++        if (!ret)
++                g_debug ("lookup-device-from-stream - Could not find a device for stream '%s'", gvc_mixer_stream_get_description (stream));
+ 
+         g_list_free (devices);
+ 
+-- 
+GitLab
+
+
+From 52d0c7a51e5a7d5a7d7ad789d1e3cccfe46b0f3c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:39:05 +0100
+Subject: [PATCH 08/18] mixer-control: Don't emit output-update on default-sink
+ set
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Don't emit the signal when setting. It will be emitted when the sink
+actually changes. This makes things consistent with switching the
+default source.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 7cdb909..e5b6ca9 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -617,14 +617,7 @@ gvc_mixer_control_change_output (GvcMixerControl *control,
+ 
+         if (!gvc_mixer_ui_device_has_ports (output)) {
+                 g_debug ("Did we try to move to a software/bluetooth sink ?");
+-                if (gvc_mixer_control_set_default_sink (control, stream)) {
+-                        /* sink change was successful,  update the UI.*/
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (output));
+-                }
+-                else {
++                if (!gvc_mixer_control_set_default_sink (control, stream)) {
+                         g_warning ("Failed to set default sink with stream from output %s",
+                                    gvc_mixer_ui_device_get_description (output));
+                 }
+-- 
+GitLab
+
+
+From 806b8e2a2d4776e19a7864d4ca7532777a1dacd9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:26 +0100
+Subject: [PATCH 09/18] mixer-stream: Allow ports to not exist
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With pipewire 1.5.84 the port list might change underneath us,
+see
+
+   https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/5053
+
+We thus can't assume anymore that we find a given port.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-stream.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/gvc-mixer-stream.c b/gvc-mixer-stream.c
+index f9bcc40..0382817 100644
+--- a/gvc-mixer-stream.c
++++ b/gvc-mixer-stream.c
+@@ -532,8 +532,6 @@ gvc_mixer_stream_get_port (GvcMixerStream *stream)
+                 }
+         }
+ 
+-        g_assert_not_reached ();
+-
+         return NULL;
+ }
+ 
+-- 
+GitLab
+
+
+From 3b78fc4be35d604861ebb69209c841517feaa388 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:26 +0100
+Subject: [PATCH 10/18] mixer-stream: Allow to update port list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-stream.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/gvc-mixer-stream.c b/gvc-mixer-stream.c
+index 0382817..83963cc 100644
+--- a/gvc-mixer-stream.c
++++ b/gvc-mixer-stream.c
+@@ -624,9 +624,13 @@ gvc_mixer_stream_set_ports (GvcMixerStream *stream,
+                             GList          *ports)
+ {
+         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
+-        g_return_val_if_fail (stream->priv->ports == NULL, FALSE);
+ 
+-        stream->priv->ports = g_list_sort (ports, (GCompareFunc) sort_ports);
++        if (stream->priv->ports) {
++                g_list_free_full (stream->priv->ports, (GDestroyNotify) free_port);
++                stream->priv->ports = NULL;
++        }
++        if (ports)
++                stream->priv->ports = g_list_sort (ports, (GCompareFunc) sort_ports);
+ 
+         return TRUE;
+ }
+-- 
+GitLab
+
+
+From 02419f8658765fd648623cf01e6f130f5d85f8bc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:27 +0100
+Subject: [PATCH 11/18] mixer-control: Always update port list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It can change underneath us, see
+
+  https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/5053
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 57 +++++++++++++++++++++------------------------
+ 1 file changed, 26 insertions(+), 31 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index e5b6ca9..a6aaf2e 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1451,6 +1451,7 @@ update_sink (GvcMixerControl    *control,
+         pa_volume_t     max_volume;
+         GvcChannelMap   *map;
+         char            map_buff[PA_CHANNEL_MAP_SNPRINT_MAX];
++        GList          *list = NULL;
+ 
+         pa_channel_map_snprint (map_buff, PA_CHANNEL_MAP_SNPRINT_MAX, &info->channel_map);
+ #if 1
+@@ -1467,27 +1468,10 @@ update_sink (GvcMixerControl    *control,
+                                       GUINT_TO_POINTER (info->index));
+ 
+         if (stream == NULL) {
+-                GList *list = NULL;
+-                guint i;
+-
+                 map = gvc_channel_map_new_from_pa_channel_map (&info->channel_map);
+                 stream = gvc_mixer_sink_new (control->priv->pa_context,
+                                              info->index,
+                                              map);
+-
+-                for (i = 0; i < info->n_ports; i++) {
+-                        GvcMixerStreamPort *port;
+-
+-                        port = g_slice_new0 (GvcMixerStreamPort);
+-                        port->port = g_strdup (info->ports[i]->name);
+-                        port->human_port = g_strdup (info->ports[i]->description);
+-                        port->priority = info->ports[i]->priority;
+-                        port->available = info->ports[i]->available != PA_PORT_AVAILABLE_NO;
+-
+-                        list = g_list_prepend (list, port);
+-                }
+-                gvc_mixer_stream_set_ports (stream, list);
+-
+                 g_object_unref (map);
+                 is_new = TRUE;
+ 
+@@ -1497,6 +1481,19 @@ update_sink (GvcMixerControl    *control,
+                 return;
+         }
+ 
++        for (guint i = 0; i < info->n_ports; i++) {
++                GvcMixerStreamPort *port;
++
++                port = g_slice_new0 (GvcMixerStreamPort);
++                port->port = g_strdup (info->ports[i]->name);
++                port->human_port = g_strdup (info->ports[i]->description);
++                port->priority = info->ports[i]->priority;
++                port->available = info->ports[i]->available != PA_PORT_AVAILABLE_NO;
++
++                list = g_list_prepend (list, port);
++        }
++        gvc_mixer_stream_set_ports (stream, g_steal_pointer (&list));
++
+         max_volume = pa_cvolume_max (&info->volume);
+         gvc_mixer_stream_set_name (stream, info->name);
+         gvc_mixer_stream_set_card_index (stream, info->card);
+@@ -1584,6 +1581,7 @@ update_source (GvcMixerControl      *control,
+         GvcMixerStream *stream;
+         gboolean        is_new;
+         pa_volume_t     max_volume;
++        GList          *list = NULL;
+ 
+ #if 1
+         g_debug ("Updating source: index=%u name='%s' description='%s'",
+@@ -1602,26 +1600,12 @@ update_source (GvcMixerControl      *control,
+         stream = g_hash_table_lookup (control->priv->sources,
+                                       GUINT_TO_POINTER (info->index));
+         if (stream == NULL) {
+-                GList *list = NULL;
+-                guint i;
+                 GvcChannelMap *map;
+ 
+                 map = gvc_channel_map_new_from_pa_channel_map (&info->channel_map);
+                 stream = gvc_mixer_source_new (control->priv->pa_context,
+                                                info->index,
+                                                map);
+-
+-                for (i = 0; i < info->n_ports; i++) {
+-                        GvcMixerStreamPort *port;
+-
+-                        port = g_slice_new0 (GvcMixerStreamPort);
+-                        port->port = g_strdup (info->ports[i]->name);
+-                        port->human_port = g_strdup (info->ports[i]->description);
+-                        port->priority = info->ports[i]->priority;
+-                        list = g_list_prepend (list, port);
+-                }
+-                gvc_mixer_stream_set_ports (stream, list);
+-
+                 g_object_unref (map);
+                 is_new = TRUE;
+         } else if (gvc_mixer_stream_is_running (stream)) {
+@@ -1630,6 +1614,17 @@ update_source (GvcMixerControl      *control,
+                 return;
+         }
+ 
++        for (guint i = 0; i < info->n_ports; i++) {
++                GvcMixerStreamPort *port;
++
++                port = g_slice_new0 (GvcMixerStreamPort);
++                port->port = g_strdup (info->ports[i]->name);
++                port->human_port = g_strdup (info->ports[i]->description);
++                port->priority = info->ports[i]->priority;
++                list = g_list_prepend (list, port);
++        }
++        gvc_mixer_stream_set_ports (stream, list);
++
+         max_volume = pa_cvolume_max (&info->volume);
+ 
+         gvc_mixer_stream_set_name (stream, info->name);
+-- 
+GitLab
+
+
+From b9d0b120c6022cc2d1a728820a81beacc9360366 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:28 +0100
+Subject: [PATCH 12/18] mixer-control: Always sync devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This ensures any changes ports get updated, otherwise we'll fail
+to match the updated port.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index a6aaf2e..74f9193 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1507,6 +1507,10 @@ update_sink (GvcMixerControl    *control,
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         gvc_mixer_stream_set_state (stream, translate_pa_state (info->state));
+ 
++        /* Sync devices as the port on the stream might have changed */
++        if (!is_new)
++                sync_devices (control, stream);
++
+         /* Messy I know but to set the port everytime regardless of whether it has changed will cost us a
+          * port change notify signal which causes the frontend to resync.
+          * Only update the UI when something has changed. */
+@@ -1638,6 +1642,10 @@ update_source (GvcMixerControl      *control,
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         g_debug ("update source");
+ 
++        /* Sync devices as the port on the stream might have changed */
++        if (!is_new)
++                sync_devices (control, stream);
++
+         if (info->active_port != NULL) {
+                 if (is_new)
+                         gvc_mixer_stream_set_port (stream, info->active_port->name);
+-- 
+GitLab
+
+
+From cd6c3c8e6133c3fff2d0e7335a9e246de7f132b2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:29 +0100
+Subject: [PATCH 13/18] mixer-control: Let sink update handle active output
+ change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A signal is emitted when the output changes so don't set it right away
+as the stream might change port.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 74f9193..45ae314 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -639,23 +639,11 @@ gvc_mixer_control_change_output (GvcMixerControl *control,
+ 
+         /* Finally if we are not on the correct stream, swap over. */
+         if (stream != default_stream) {
+-                GvcMixerUIDevice* device;
+-
+                 g_debug ("Attempting to swap over to stream %s ",
+                          gvc_mixer_stream_get_description (stream));
+-                if (gvc_mixer_control_set_default_sink (control, stream)) {
+-                        device = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (device));
+-                } else {
+-                        /* If the move failed for some reason reset the UI. */
+-                        device = gvc_mixer_control_lookup_device_from_stream (control, default_stream);
+-                        g_signal_emit (G_OBJECT (control),
+-                                       signals[ACTIVE_OUTPUT_UPDATE],
+-                                       0,
+-                                       gvc_mixer_ui_device_get_id (device));
++                if (!gvc_mixer_control_set_default_sink (control, stream)) {
++                        g_warning ("Failed to set default sink from output %s",
++                                   gvc_mixer_ui_device_get_description (output));
+                 }
+         }
+ }
+-- 
+GitLab
+
+
+From 05c9f284128b35742d4f1d764ab8c05c1f9bb64f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:30 +0100
+Subject: [PATCH 14/18] mixer-control: Let source update handle active output
+ change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A signal is emitted when the output changes so don't set it right away
+as the stream might change port.
+
+This also brings set_default_source in line with set_default_sink()
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 45ae314..b8198d3 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -341,7 +341,6 @@ gboolean
+ gvc_mixer_control_set_default_source (GvcMixerControl *control,
+                                       GvcMixerStream  *stream)
+ {
+-        GvcMixerUIDevice* input;
+         pa_operation *o;
+ 
+         g_return_val_if_fail (GVC_IS_MIXER_CONTROL (control), FALSE);
+@@ -373,13 +372,6 @@ gvc_mixer_control_set_default_source (GvcMixerControl *control,
+ 
+         pa_operation_unref (o);
+ 
+-        /* source change successful, update the UI. */
+-        input = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-        g_signal_emit (G_OBJECT (control),
+-                       signals[ACTIVE_INPUT_UPDATE],
+-                       0,
+-                       gvc_mixer_ui_device_get_id (input));
+-
+         return TRUE;
+ }
+ 
+-- 
+GitLab
+
+
+From 8bf60eef4c7933d2f2eb7184240a2c2c7548de49 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 13:07:31 +0100
+Subject: [PATCH 15/18] mixer-control: Reset `stream-id`s on UI devices
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If we find a matching UI device for a stream matching card and
+port and the same stream is also on another port, reset that
+UI devices `stream-id`.
+
+Since wireplumber 1.5.84 will merely flip the port but not the
+`stream-id` we need to make sure the UI device loses its stream-id.
+Otherwise `gvc_mixer_control_change_output` will try a
+`gvc_mixer_stream_change_port` which seemingly succeeds but fails
+silently as the port doesn't exist on that stream at the moment.
+
+By resetting the `stream-id` we ensure that we take the
+`gvc_mixer_control_change_profile_on_selected_device` code path in
+`gvc_mixer_control_change_output` instead and thus the sink/port
+gets properly selected.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index b8198d3..6653d94 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1257,23 +1257,29 @@ match_stream_with_devices (GvcMixerControl    *control,
+                                  stream_port->port,
+                                  stream_card_id);
+ 
+-                        if (stream_card_id == card_id &&
+-                            g_strcmp0 (device_port_name, stream_port->port) == 0) {
+-                                g_debug ("Match device with stream: We have a match with description: '%s', origin: '%s', cached already with device id %u, so set stream id to %i",
+-                                         description,
+-                                         origin,
+-                                         gvc_mixer_ui_device_get_id (device),
+-                                         stream_id);
+-
+-                                g_object_set (G_OBJECT (device),
+-                                              "stream-id", stream_id,
+-                                              NULL);
+-                                in_possession = TRUE;
++                        if (stream_card_id == card_id) {
++                                if (g_strcmp0 (device_port_name, stream_port->port) == 0) {
++                                        g_debug ("Match device with stream: We have a match with description: '%s', origin: '%s', cached already with device id %u, so set stream id to %i",
++                                                 description,
++                                                 origin,
++                                                 gvc_mixer_ui_device_get_id (device),
++                                                 stream_id);
++
++                                        g_object_set (G_OBJECT (device),
++                                                      "stream-id", stream_id,
++                                                      NULL);
++                                        in_possession = TRUE;
++                                } else {
++                                        /* Other UI devices on that card that match the stream can't be valid */
++                                        if (device_stream_id == stream_id) {
++                                                g_object_set (G_OBJECT (device),
++                                                              "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
++                                                              NULL);
++                                                g_debug ("Found another UI device for this stream: %d, resetting", stream_id);
++                                        }
++                                }
+                         }
+                 }
+-
+-                if (in_possession == TRUE)
+-                        break;
+         }
+ 
+         return in_possession;
+-- 
+GitLab
+
+
+From 3984af01cc7500e5fb67c0284552d2c88f78c002 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 15:18:12 +0100
+Subject: [PATCH 16/18] mixer-control: Clear stream-ids from UI devices when BT
+ stream loses all ports
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Bluetooth streams can become portless so we can't just unconditionally add a
+new UI device for devices without streams. Instead reset stream-ids from
+existing streams that reference the stream that just became portless.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 64 +++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 59 insertions(+), 5 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 6653d94..b45f15a 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1285,6 +1285,35 @@ match_stream_with_devices (GvcMixerControl    *control,
+         return in_possession;
+ }
+ 
++
++/* Clear stream-id from all UI devices that reference the stream that lost all ports */
++static void
++clear_stream_from_devices (GvcMixerControl    *control,
++                           GvcMixerStream     *stream)
++{
++        g_autoptr (GList)        devices = NULL;
++        guint                    stream_id;
++
++        stream_id = gvc_mixer_stream_get_id (stream);
++        devices = g_hash_table_get_values (GVC_IS_MIXER_SOURCE (stream) ? control->priv->ui_inputs : control->priv->ui_outputs);
++
++        for (GList *d = devices; d != NULL; d = d->next) {
++                guint             device_stream_id;
++                GvcMixerUIDevice *device = d->data;
++
++                g_object_get (G_OBJECT (device),
++                              "stream-id", &device_stream_id,
++                              NULL);
++
++                if (device_stream_id == stream_id) {
++                        g_object_set (G_OBJECT (device),
++                                      "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
++                                      NULL);
++                        g_debug ("Clearing stream-id: %d", stream_id);
++                }
++        }
++}
++
+ /*
+  * This method attempts to match a sink or source with its relevant UI device.
+  * GvcMixerStream can represent both a sink or source.
+@@ -1305,7 +1334,8 @@ match_stream_with_devices (GvcMixerControl    *control,
+  */
+ static void
+ sync_devices (GvcMixerControl *control,
+-              GvcMixerStream* stream)
++              GvcMixerStream*  stream,
++              gboolean         is_bluetooth)
+ {
+         /* Go through ports to see what outputs can be created. */
+         const GList *stream_ports;
+@@ -1314,6 +1344,11 @@ sync_devices (GvcMixerControl *control,
+ 
+         stream_ports = gvc_mixer_stream_get_ports (stream);
+ 
++        if (stream_ports == NULL && is_bluetooth) {
++                clear_stream_from_devices (control, stream);
++                return;
++        }
++
+         if (stream_ports == NULL) {
+                 GvcMixerUIDevice *device;
+                 GObject *object;
+@@ -1425,6 +1460,20 @@ translate_pa_state (pa_sink_state_t state) {
+         }
+ }
+ 
++static gboolean
++is_bluetooth (const pa_proplist *proplist)
++{
++        const char *bus = pa_proplist_gets (proplist, "device.bus");
++
++        if (bus == NULL)
++                return FALSE;
++
++        if (g_str_equal ("bluetooth", bus))
++                return TRUE;
++
++        return FALSE;
++}
++
+ /*
+  * Called when anything changes with a sink.
+  */
+@@ -1438,6 +1487,7 @@ update_sink (GvcMixerControl    *control,
+         GvcChannelMap   *map;
+         char            map_buff[PA_CHANNEL_MAP_SNPRINT_MAX];
+         GList          *list = NULL;
++        gboolean        is_bt;
+ 
+         pa_channel_map_snprint (map_buff, PA_CHANNEL_MAP_SNPRINT_MAX, &info->channel_map);
+ #if 1
+@@ -1493,9 +1543,10 @@ update_sink (GvcMixerControl    *control,
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         gvc_mixer_stream_set_state (stream, translate_pa_state (info->state));
+ 
++        is_bt = is_bluetooth (info->proplist);
+         /* Sync devices as the port on the stream might have changed */
+         if (!is_new)
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_bt);
+ 
+         /* Messy I know but to set the port everytime regardless of whether it has changed will cost us a
+          * port change notify signal which causes the frontend to resync.
+@@ -1524,7 +1575,7 @@ update_sink (GvcMixerControl    *control,
+                 add_stream (control, stream);
+                 /* Always sync on a new stream to able to assign the right stream id
+                  * to the appropriate outputs (multiple potential outputs per stream). */
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+@@ -1564,6 +1615,7 @@ update_sink (GvcMixerControl    *control,
+         gvc_channel_map_volume_changed (map, &info->volume, FALSE);
+ }
+ 
++
+ static void
+ update_source (GvcMixerControl      *control,
+                const pa_source_info *info)
+@@ -1572,6 +1624,7 @@ update_source (GvcMixerControl      *control,
+         gboolean        is_new;
+         pa_volume_t     max_volume;
+         GList          *list = NULL;
++        gboolean        is_bt;
+ 
+ #if 1
+         g_debug ("Updating source: index=%u name='%s' description='%s'",
+@@ -1628,9 +1681,10 @@ update_source (GvcMixerControl      *control,
+         gvc_mixer_stream_set_base_volume (stream, (guint32) info->base_volume);
+         g_debug ("update source");
+ 
++        is_bt = is_bluetooth (info->proplist);
+         /* Sync devices as the port on the stream might have changed */
+         if (!is_new)
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_bt);
+ 
+         if (info->active_port != NULL) {
+                 if (is_new)
+@@ -1652,7 +1706,7 @@ update_source (GvcMixerControl      *control,
+                                      GUINT_TO_POINTER (info->index),
+                                      g_object_ref (stream));
+                 add_stream (control, stream);
+-                sync_devices (control, stream);
++                sync_devices (control, stream, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+-- 
+GitLab
+
+
+From 20784b5350c0cc3f3bc8161f8da250850fb6ad91 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Sun, 4 Jan 2026 17:39:03 +0100
+Subject: [PATCH 17/18] mixer-control: Check for invalid input
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With pipewire 1.5.84 there can be a zombie default-source as the
+current profile can't have a stream, see
+
+https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/5053#note_3256202
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index b45f15a..251f78a 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -980,11 +980,14 @@ _set_default_source (GvcMixerControl *control,
+                                new_id);
+ 
+                 input = gvc_mixer_control_lookup_device_from_stream (control, stream);
+-
+-                g_signal_emit (G_OBJECT (control),
+-                               signals[ACTIVE_INPUT_UPDATE],
+-                               0,
+-                               gvc_mixer_ui_device_get_id (input));
++                if (input) {
++                        g_signal_emit (G_OBJECT (control),
++                                       signals[ACTIVE_INPUT_UPDATE],
++                                       0,
++                                       gvc_mixer_ui_device_get_id (input));
++                } else {
++                        g_warning ("Can't find input for stream-id %d",new_id);
++                }
+         }
+ }
+ 
+-- 
+GitLab
+
+
+From 47c47a423ff2f55bb038d92517e4782cf051496a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Mon, 5 Jan 2026 17:15:40 +0100
+Subject: [PATCH 18/18] mixer-control: Simplify device lookup
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There were too branches, one for portless streams (called "network
+streams" here) and those with ports. The portless one checked the
+stream-id only while the other branch checked stream-id and port.
+
+Simplify this by checking the stream-id and only comparing ports when
+available.
+
+As other streams can be portless nowadays this also removes some
+confusion.
+
+Best reviewed with 'git show -w'
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 42 ++++++++++++++++++++----------------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 251f78a..a8c75a0 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -239,7 +239,6 @@ gvc_mixer_control_lookup_device_from_stream (GvcMixerControl *control,
+                                              GvcMixerStream *stream)
+ {
+         GList                   *devices, *d;
+-        gboolean                 is_network_stream;
+         const GList             *ports;
+         GvcMixerUIDevice        *ret;
+ 
+@@ -253,39 +252,38 @@ gvc_mixer_control_lookup_device_from_stream (GvcMixerControl *control,
+ 
+         ret = NULL;
+         ports = gvc_mixer_stream_get_ports (stream);
+-        is_network_stream = (ports == NULL);
+ 
+         for (d = devices; d != NULL; d = d->next) {
+                 GvcMixerUIDevice *device = d->data;
+                 guint stream_id = G_MAXUINT;
++                const GvcMixerStreamPort *port;
+ 
+                 g_object_get (G_OBJECT (device),
+                              "stream-id", &stream_id,
+                               NULL);
+ 
+-                if (is_network_stream &&
+-                    stream_id == gvc_mixer_stream_get_id (stream)) {
+-                        g_debug ("lookup-device-from-stream - %s - it is a network_stream ",
++                if (stream_id != gvc_mixer_stream_get_id (stream))
++                        continue;
++
++                if (ports == NULL) {
++                        g_debug ("lookup-device-from-stream - %s - is portless ",
+                                  gvc_mixer_ui_device_get_description (device));
+                         ret = device;
+                         break;
+-                } else if (!is_network_stream) {
+-                        const GvcMixerStreamPort *port;
+-                        port = gvc_mixer_stream_get_port (stream);
+-
+-                        if (stream_id == gvc_mixer_stream_get_id (stream) &&
+-                            g_strcmp0 (gvc_mixer_ui_device_get_port (device),
+-                                       port->port) == 0) {
+-                                g_debug ("lookup-device-from-stream found device: device description '%s', device port = '%s', device stream id %i AND stream port = '%s' stream id '%u' and stream description '%s'",
+-                                         gvc_mixer_ui_device_get_description (device),
+-                                         gvc_mixer_ui_device_get_port (device),
+-                                         stream_id,
+-                                         port->port,
+-                                         gvc_mixer_stream_get_id (stream),
+-                                         gvc_mixer_stream_get_description (stream));
+-                                ret = device;
+-                                break;
+-                        }
++                }
++
++                port = gvc_mixer_stream_get_port (stream);
++                if (g_strcmp0 (gvc_mixer_ui_device_get_port (device), port->port) == 0) {
++                        g_debug ("lookup-device-from-stream found device: device description '%s', device port = '%s', device stream id %i AND stream port = '%s' stream id '%u' and stream description '%s'",
++                                 gvc_mixer_ui_device_get_description (device),
++                                 gvc_mixer_ui_device_get_port (device),
++                                 stream_id,
++                                 port->port,
++                                 gvc_mixer_stream_get_id (stream),
++                                 gvc_mixer_stream_get_description (stream));
++                        ret = device;
++                        break;
++
+                 }
+         }
+ 
+-- 
+GitLab
+

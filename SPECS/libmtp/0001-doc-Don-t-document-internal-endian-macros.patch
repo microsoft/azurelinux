@@ -1,0 +1,26 @@
+From 8c13199aab80d4bd011ca1af1bd7bfeec38fe42a Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 9 Oct 2017 14:25:26 +0200
+Subject: [PATCH] doc: Don't document internal endian macros
+
+As those will change across platforms, and lead to multilib conflicts
+---
+ doc/Doxyfile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/Doxyfile.in b/doc/Doxyfile.in
+index 57ad0ae1431e..5a55ed91564a 100644
+--- a/doc/Doxyfile.in
++++ b/doc/Doxyfile.in
+@@ -1007,7 +1007,7 @@ EXCLUDE_SYMLINKS       = NO
+ # Note that the wildcards are matched against the file with absolute path, so to
+ # exclude all test directories for example use the pattern */test/*
+ 
+-EXCLUDE_PATTERNS       =
++EXCLUDE_PATTERNS       = */src/gphoto2-endian.h
+ 
+ # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
+ # (namespaces, classes, functions, etc.) that should be excluded from the
+-- 
+2.52.0
+

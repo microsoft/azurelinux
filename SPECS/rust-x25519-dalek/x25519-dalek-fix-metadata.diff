@@ -1,0 +1,23 @@
+--- x25519-dalek-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ x25519-dalek-2.0.1/Cargo.toml	2024-05-01T15:01:18.196170+00:00
+@@ -56,10 +56,6 @@
+     "docsrs",
+ ]
+ 
+-[[bench]]
+-name = "x25519"
+-harness = false
+-
+ [dependencies.curve25519-dalek]
+ version = "4"
+ default-features = false
+@@ -82,9 +78,6 @@
+ 
+ [dev-dependencies.bincode]
+ version = "1"
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+ 
+ [dev-dependencies.rand_core]
+ version = "0.6"

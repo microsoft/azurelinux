@@ -1,0 +1,5 @@
+%__pypy2 /usr/bin/pypy2
+%pypy2_sitelib %(%{__pypy2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+%pypy2_sitearch %(%{__pypy2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
+%pypy2_version %(%{__pypy2} -c "import sys; sys.stdout.write(sys.version[:3])")
+%pypy2_pypy_version %(%{__pypy2} -c "import sys; sys.stdout.write('{}.{}'.format(sys.pypy_version_info.major, sys.pypy_version_info.minor))")

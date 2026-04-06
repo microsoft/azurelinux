@@ -1,0 +1,36 @@
+.\" Copyright 2009 Red Hat, Inc.
+.TH segregdomain 1 2014-11-19 "CRDA" "User Commands"
+.SH NAME
+setregdomain \- set regulatory domain based on country code
+.SH SYNOPSIS               
+.B setregdomain                  
+.SH DESCRIPTION
+setregdomain sets the regulatory domain for your system; it takes no
+arguments and is normally called via system script (eg, udev) rather
+than manually by an administrator.
+
+The regulatory domain is represented by an ISO / IEC 3166-1 alpha2
+country code.  By default, setregdomain attempts to determine
+the appropriate country code by examining the target of the
+.IR /etc/localtime
+symbolic link.  That information is used to look-up the matching
+country code in the
+.IR /usr/share/zoneinfo/zone.tab
+file.
+
+The country code look-up may fail.  This could be due to faulty
+or incomplete information in the
+.IR /usr/share/zoneinfo/zone.tab
+file, or the use of an actual file rather than a symlink for
+.IR /etc/localtime
+, among other possibilities.  In those cases the system
+administrator should define a COUNTRY environment variable in the
+.IR /etc/sysconfig/regdomain
+file.  This value will be used as the country code and the country
+code look-up will be skipped.
+.SH "FILES"
+.BR /etc/sysconfig/regdomain
+.BR /etc/localtime
+.BR /usr/share/zoneinfo/zone.tab
+.SH "SEE ALSO"
+.BR iw (1)

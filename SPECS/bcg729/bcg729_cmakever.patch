@@ -1,0 +1,12 @@
+diff -rupN bcg729-1.1.1/CMakeLists.txt bcg729-1.1.1-new/CMakeLists.txt
+--- bcg729-1.1.1/CMakeLists.txt	2025-07-16 19:44:04.327727310 +0200
++++ bcg729-1.1.1-new/CMakeLists.txt	2025-07-16 19:44:41.801124018 +0200
+@@ -20,7 +20,7 @@
+ #
+ ############################################################################
+ 
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.5)
+ project(bcg729 VERSION 1.1.1 LANGUAGES C)
+ 
+ 

@@ -1,0 +1,58 @@
+--- src/basemath/buch2.c.orig	2024-09-28 01:04:41.000000000 -0600
++++ src/basemath/buch2.c	2024-09-30 10:48:13.738487696 -0600
+@@ -1172,7 +1172,7 @@ getfu(GEN nf, GEN *ptA, GEN *ptU, long p
+ }
+ 
+ static void
+-err_units() { pari_err_PREC("makeunits [cannot get units, use bnfinit(,1)]"); }
++err_units(void) { pari_err_PREC("makeunits [cannot get units, use bnfinit(,1)]"); }
+ 
+ /* bound for log2 |sigma(u)|, sigma complex embedding, u fundamental unit
+  * attached to bnf_get_logfu */
+--- src/basemath/mftrace.c.orig	2024-09-28 01:04:41.000000000 -0600
++++ src/basemath/mftrace.c	2024-09-30 10:48:13.739487683 -0600
+@@ -631,7 +631,7 @@ mfcharGL(GEN G, GEN L)
+   return mkvec4(G, L, o, polcyclo(ord,vt));
+ }
+ static GEN
+-mfchartrivial()
++mfchartrivial(void)
+ { return mfcharGL(znstar0(gen_1,1), cgetg(1,t_COL)); }
+ /* convert a generic character into an 'mfchar' */
+ static GEN
+@@ -1741,7 +1741,7 @@ mfcoef(GEN F, long n)
+ }
+ 
+ static GEN
+-paramconst() { return tagparams(t_MF_CONST, mkNK(1,0,mfchartrivial())); }
++paramconst(void) { return tagparams(t_MF_CONST, mkNK(1,0,mfchartrivial())); }
+ static GEN
+ mftrivial(void) { retmkvec2(paramconst(), cgetg(1,t_VEC)); }
+ static GEN
+--- src/basemath/modsym.c.orig	2024-09-28 00:31:21.000000000 -0600
++++ src/basemath/modsym.c	2024-09-30 10:48:52.328984449 -0600
+@@ -1406,11 +1406,11 @@ indices_backward(GEN W, GEN C)
+ 
+ /*[0,-1;1,-1]*/
+ static GEN
+-mkTAU()
++mkTAU(void)
+ { retmkmat22(gen_0,gen_m1, gen_1,gen_m1); }
+ /* S */
+ static GEN
+-mkS()
++mkS(void)
+ { retmkmat22(gen_0,gen_1, gen_m1,gen_0); }
+ /* N = integer > 1. Returns data describing Delta_0 = Z[P^1(Q)]_0 seen as
+  * a Gamma_0(N) - module. */
+--- src/modules/mpqs.c.orig	2024-09-28 00:31:21.000000000 -0600
++++ src/modules/mpqs.c	2024-09-30 10:48:13.741487657 -0600
+@@ -1501,7 +1501,7 @@ mpqs_solve_linear_system(mpqs_handle_t *
+ /**               MAIN ENTRY POINT AND DRIVER ROUTINE               **/
+ /*********************************************************************/
+ static void
+-toolarge()
++toolarge(void)
+ { pari_warn(warner, "MPQS: number too big to be factored with MPQS,\n\tgiving up"); }
+ 
+ /* Factors N using the self-initializing multipolynomial quadratic sieve

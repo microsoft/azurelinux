@@ -1,0 +1,27 @@
+From d1343f28dcbe25b100b082b34775bd92ead4602c Mon Sep 17 00:00:00 2001
+From: jzmaddock <john@johnmaddock.co.uk>
+Date: Tue, 25 Jan 2022 09:27:40 +0000
+Subject: [PATCH] Update gcc Intel intrinsic usage config. Fixes
+ https://github.com/boostorg/multiprecision/issues/419.
+
+---
+ include/boost/multiprecision/cpp_int/intel_intrinsics.hpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/boost/multiprecision/cpp_int/intel_intrinsics.hpp b/include/boost/multiprecision/cpp_int/intel_intrinsics.hpp
+index eb4624bb4..37717cd51 100644
+--- a/include/boost/multiprecision/cpp_int/intel_intrinsics.hpp
++++ b/include/boost/multiprecision/cpp_int/intel_intrinsics.hpp
+@@ -19,7 +19,11 @@
+ // If this is GCC/clang, then check that the actual intrinsic exists:
+ //
+ #if defined(__has_builtin) && defined(__GNUC__)
+-#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))
++#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H) \
++   && !(defined(BOOST_GCC) && (__GNUC__ >= 9) \
++      && (defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)\
++          || defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_AMD64) \
++          || defined(_M_X64) || defined(__amd64__) || defined(_M_X64)))
+ #undef BOOST_MP_HAS_IMMINTRIN_H
+ #endif
+ #elif defined(BOOST_MP_HAS_IMMINTRIN_H) && defined(__GNUC__) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))

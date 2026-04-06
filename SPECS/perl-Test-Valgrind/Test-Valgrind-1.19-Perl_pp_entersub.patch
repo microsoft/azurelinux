@@ -1,0 +1,19 @@
+--- t/lib/Test/Valgrind/Test/Action.pm
++++ t/lib/Test/Valgrind/Test/Action.pm
+@@ -41,11 +41,14 @@ sub report_smart {
+  if ($report->can('is_leak') and $report->is_leak) {
+   my $data  = $report->data;
+   my @trace = map $_->[2] || '?',
+-               @{$data->{stack} || []}[0 .. 3];
++               @{$data->{stack} || []}[0 .. 4];
+   my $valid_trace = (
+        $trace[0] eq 'malloc'
+    and $trace[1] eq 'tv_leak'
+-   and ($trace[2] eq 'Perl_pp_entersub' or $trace[3] eq 'Perl_pp_entersub')
++   and ( ($trace[2] eq 'Perl_pp_entersub' or $trace[3] eq 'Perl_pp_entersub') or
++         # Perl_pp_entersub symbol not appearing in 5.38.0 but these symbols appear either side of where it should have been
++         ($trace[2] eq 'XS_Test__Valgrind_leak' and $trace[4] eq 'Perl_runops_standard')
++       )
+   );
+ 
+   if ($valid_trace) {

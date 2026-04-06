@@ -1,0 +1,189 @@
+diff --git a/config-report.sh.in b/config-report.sh.in
+index 1af984e..ddd4b62 100755
+--- a/config-report.sh.in
++++ b/config-report.sh.in
+@@ -105,6 +105,18 @@ Netconf:              no
+ HERE_DOCUMENT
+ fi
+ 
++if test '@HAVE_LIBSYSTEMD_DAEMON@' != 'no'; then
++add_to_report <<HERE_DOCUMENT
++Systemd:              yes
++
++HERE_DOCUMENT
++else
++add_to_report <<HERE_DOCUMENT
++Systemd:              no
++
++HERE_DOCUMENT
++fi
++
+ if test '@HAVE_GTEST@' != 'no'; then
+ add_to_report <<HERE_DOCUMENT
+ Google Test:          @GTEST_VERSION@
+diff --git a/config.h.in b/config.h.in
+index 42ccf28..cc6354a 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -52,6 +52,9 @@
+ /* Check valgrind headers */
+ #mesondefine HAVE_VALGRIND_HEADERS
+ 
++/* Support for systemd notification through sd_notify() enabled */
++#mesondefine HAVE_LIBSYSTEMD_DAEMON
++
+ /* Whether libc is musl */
+ #mesondefine LIBC_MUSL
+ 
+diff --git a/meson.build b/meson.build
+index 66e7fd0..dc86d89 100644
+--- a/meson.build
++++ b/meson.build
+@@ -100,6 +100,7 @@ krb5_opt = get_option('krb5')
+ mysql_opt = get_option('mysql')
+ netconf_opt = get_option('netconf')
+ postgresql_opt = get_option('postgresql')
++systemd_opt = get_option('systemd')
+ 
+ FUZZ_OPT = get_option('fuzz')
+ TESTS_OPT = get_option('tests')
+@@ -297,6 +298,13 @@ if netconf_opt.allowed()
+     endif
+ endif
+ 
++# Systemd
++SYSTEMD_DEP = disabler()
++if systemd_opt.enabled()
++    SYSTEMD_DEP = dependency('libsystemd')
++    conf_data.set('HAVE_LIBSYSTEMD_DAEMON', true)
++endif
++
+ # Google Test
+ GTEST_DEP = dependency(
+     'gtest',
+@@ -867,6 +875,11 @@ else
+     report_conf_data.set('SYSREPOCPP_VERSION', 'no')
+     report_conf_data.set('SYSREPOCPP_PREFIX', 'no')
+ endif
++if SYSTEMD_DEP.found()
++    report_conf_data.set('HAVE_LIBSYSTEMD_DAEMON', 'yes')
++else
++    report_conf_data.set('HAVE_LIBSYSTEMD_DAEMON', 'no')
++endif
+ if FUZZ_OPT.enabled() or TESTS_OPT.enabled()
+     report_conf_data.set('HAVE_GTEST', 'yes')
+     version = GTEST_DEP.version()
+diff --git a/meson.options b/meson.options
+index 5c222d5..3ecd2e1 100644
+--- a/meson.options
++++ b/meson.options
+@@ -27,6 +27,7 @@ option(
+     type: 'feature',
+     description: 'Support for PostgreSQL backends.',
+ )
++option('systemd', type: 'feature', description: 'Support for systemd notification through sd_notify().')
+ 
+ # Options for enabling testing code (not real features).
+ option(
+diff --git a/src/bin/dhcp4/main.cc b/src/bin/dhcp4/main.cc
+index 4f88e29..5581b7a 100644
+--- a/src/bin/dhcp4/main.cc
++++ b/src/bin/dhcp4/main.cc
+@@ -24,6 +24,10 @@
+ 
+ #include <iostream>
+ 
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++#include <systemd/sd-daemon.h>
++#endif
++
+ using namespace isc::data;
+ using namespace isc::dhcp;
+ using namespace isc::process;
+@@ -290,6 +294,13 @@ main(int argc, char* argv[]) {
+ 
+         // Tell the admin we are ready to process packets
+         LOG_INFO(dhcp4_logger, DHCP4_STARTED).arg(VERSION);
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++        // Notify systemd about the same
++        sd_notifyf(0, "READY=1\n"
++                   "STATUS=Dispatching packets...\n"
++                   "MAINPID=%lu",
++                   (unsigned long) getpid());
++#endif
+ 
+         // And run the main loop of the server.
+         ret = server.run();
+diff --git a/src/bin/dhcp4/meson.build b/src/bin/dhcp4/meson.build
+index 3dac320..e8cacb9 100644
+--- a/src/bin/dhcp4/meson.build
++++ b/src/bin/dhcp4/meson.build
+@@ -1,3 +1,8 @@
++kea_dhcp4_dependencies = [CRYPTO_DEP]
++if SYSTEMD_DEP.found()
++    kea_dhcp4_dependencies += [SYSTEMD_DEP]
++endif
++
+ dhcp4_lib = static_library(
+     'dhcp4',
+     'client_handler.cc',
+@@ -16,7 +21,7 @@ dhcp4_lib = static_library(
+ kea_dhcp4 = executable(
+     'kea-dhcp4',
+     'main.cc',
+-    dependencies: [CRYPTO_DEP],
++    dependencies: kea_dhcp4_dependencies,
+     include_directories: [include_directories('.')] + INCLUDES,
+     install: true,
+     install_dir: SBINDIR,
+diff --git a/src/bin/dhcp6/main.cc b/src/bin/dhcp6/main.cc
+index 7ab1999..abac799 100644
+--- a/src/bin/dhcp6/main.cc
++++ b/src/bin/dhcp6/main.cc
+@@ -24,6 +24,10 @@
+ 
+ #include <iostream>
+ 
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++#include <systemd/sd-daemon.h>
++#endif
++
+ using namespace isc::data;
+ using namespace isc::dhcp;
+ using namespace isc::process;
+@@ -290,6 +294,13 @@ main(int argc, char* argv[]) {
+ 
+         // Tell the admin we are ready to process packets
+         LOG_INFO(dhcp6_logger, DHCP6_STARTED).arg(VERSION);
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++        // Notify systemd about the same
++        sd_notifyf(0, "READY=1\n"
++                   "STATUS=Dispatching packets...\n"
++                   "MAINPID=%lu",
++                   (unsigned long) getpid());
++#endif
+ 
+         // And run the main loop of the server.
+         ret = server.run();
+diff --git a/src/bin/dhcp6/meson.build b/src/bin/dhcp6/meson.build
+index de60fbf..04a22a9 100644
+--- a/src/bin/dhcp6/meson.build
++++ b/src/bin/dhcp6/meson.build
+@@ -1,3 +1,8 @@
++kea_dhcp6_dependencies = [CRYPTO_DEP]
++if SYSTEMD_DEP.found()
++    kea_dhcp6_dependencies += [SYSTEMD_DEP]
++endif
++
+ dhcp6_lib = static_library(
+     'dhcp6',
+     'client_handler.cc',
+@@ -17,7 +22,7 @@ dhcp6_lib = static_library(
+ kea_dhcp6 = executable(
+     'kea-dhcp6',
+     'main.cc',
+-    dependencies: [CRYPTO_DEP],
++    dependencies: kea_dhcp6_dependencies,
+     include_directories: [include_directories('.')] + INCLUDES,
+     install: true,
+     install_dir: SBINDIR,

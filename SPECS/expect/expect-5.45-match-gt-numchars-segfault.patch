@@ -1,0 +1,17 @@
+diff -up expect5.45/expect.c.orig expect5.45/expect.c
+--- expect5.45/expect.c.orig	2012-02-06 14:15:13.469490744 +0100
++++ expect5.45/expect.c	2012-02-06 14:16:23.596837896 +0100
+@@ -2363,7 +2363,12 @@ expMatchProcess(
+ 
+ 	/* "!e" means no case matched - transfer by default */
+ 	if (!e || e->transfer) {
+-	    int remainder = numchars-match;
++	    int remainder;
++	    if (match > numchars) {
++		match = numchars;
++		eo->matchlen = match;
++	    }
++	    remainder = numchars-match;
+ 	    /* delete matched chars from input buffer */
+ 	    esPtr->printed -= match;
+ 	    if (numchars != 0) {

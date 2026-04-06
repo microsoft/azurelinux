@@ -1,0 +1,12 @@
+--- qt-x11-free-3.3.2/tools/designer/uic/main.cpp.sopwith	2004-06-16 17:14:17.000000000 -0400
++++ qt-x11-free-3.3.2/tools/designer/uic/main.cpp	2004-06-16 17:21:43.000000000 -0400
+@@ -149,6 +149,9 @@
+ 		} else {
+ 		    trmacro = &opt[1];
+ 		}
++	    } else if ( opt == "nostdlib") {
++		QStringList x;
++		QApplication::setLibraryPaths(x);
+ 	    } else if ( opt == "L" ) {
+ 		if ( !(n < argc-1) ) {
+ 		    error = "Missing plugin path.";

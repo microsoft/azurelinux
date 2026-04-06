@@ -1,0 +1,29 @@
+From 1948ee845726be15861f9f84a745b30ecb18051c Mon Sep 17 00:00:00 2001
+From: Matthias Kretz <kretz@kde.org>
+Date: Fri, 6 Feb 2009 08:26:43 +0000
+Subject: [PATCH 01/33] fix make clean: it's SET_directory_properties and not
+ ADD_directory_properties.
+
+svn path=/trunk/kdesupport/automoc/; revision=922011
+---
+ Automoc4Config.cmake | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index e79cf8c..5fcab74 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -198,7 +198,9 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+       endif(_AUTOMOC4_EXECUTABLE_DEP)
+ 
+       set_source_files_properties(${_automoc_source} PROPERTIES GENERATED TRUE)
+-      set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${_automoc_source})
++      get_directory_property(_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
++      list(APPEND _extra_clean_files "${_automoc_source}")
++      set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${_extra_clean_files}")
+       set(${_SRCS} ${_automoc_source} ${${_SRCS}})
+    endif(_moc_files)
+ endmacro(_ADD_AUTOMOC4_TARGET)
+-- 
+2.4.3
+

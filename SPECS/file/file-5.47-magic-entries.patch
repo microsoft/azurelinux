@@ -1,0 +1,22 @@
+From b874d520c592ecd55ebcae0d662dc6e54f5c5414 Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Sat, 25 Jan 2025 16:11:03 +0000
+Subject: [PATCH] /var/folders/6_/7gn53mmj3jgchfrd29b9704m0000gn/T//cvsMMb3m1
+
+---
+ src/apprentice.c | 2 ++--
+ 1 file changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/apprentice.c b/src/apprentice.c
+index 3333e8da4..2151d013f 100644
+--- a/src/apprentice.c
++++ b/src/apprentice.c
+@@ -3391,7 +3391,7 @@ check_buffer(struct magic_set *ms, struct magic_map *map, const char *dbname)
+ 	int i, needsbyteswap;
+ 
+ 	entries = CAST(uint32_t, map->len / sizeof(struct magic));
+-	if (entries < MAGIC_SETS + 1) {
++	if (entries < MAGIC_SETS) {
+ 		file_error(ms, 0, "Too few magic entries %u in `%s'",
+ 		    entries, dbname);
+ 		return -1;

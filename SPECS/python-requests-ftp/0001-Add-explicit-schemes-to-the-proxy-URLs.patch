@@ -1,0 +1,53 @@
+From 329cd51e2845cd0babb0d537263152fc35747c54 Mon Sep 17 00:00:00 2001
+From: David Shea <reallylongword@gmail.com>
+Date: Tue, 8 Jul 2025 14:54:27 -0400
+Subject: [PATCH] Add explicit schemes to the proxy URLs
+
+urllib3's parse_url no longer recognizes "localhost:<port>" as a host +
+port with no scheme, and instead parses it as a scheme and a path. Add
+explicit schemes to get things back on to the right path.
+---
+ tests/test_ftp_proxy.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_ftp_proxy.py b/tests/test_ftp_proxy.py
+index c76e448..98df1f1 100644
+--- a/tests/test_ftp_proxy.py
++++ b/tests/test_ftp_proxy.py
+@@ -33,7 +33,7 @@ def test_proxy_get(ftpd, proxy, session):
+     # Create a file in the anonymous root and fetch it through a proxy
+     with _prepareTestData(ftpd.anon_root) as (testfile, testdata):
+         testurl = 'ftp://127.0.0.1:%d/%s' % (ftpd.ftp_port, testfile)
+-        response = session.get(testurl, proxies={'ftp': 'localhost:%d' % proxy.port})
++        response = session.get(testurl, proxies={'ftp': 'http://localhost:%d' % proxy.port})
+ 
+         assert response.status_code == requests.codes.ok
+ 
+@@ -57,7 +57,7 @@ def test_proxy_connection_refused(ftpd, session):
+         with pytest.raises(requests.exceptions.ConnectionError):
+             session.get(
+                 'ftp://127.0.0.1:%d/' % ftpd.ftp_port,
+-                proxies={'ftp': 'localhost:%d' % port})
++                proxies={'ftp': 'http://localhost:%d' % port})
+ 
+ 
+ def test_proxy_read_timeout(ftpd, session):
+@@ -76,7 +76,7 @@ def test_proxy_read_timeout(ftpd, session):
+         with pytest.raises(requests.exceptions.ReadTimeout):
+             session.get(
+                 'ftp://127.0.0.1:%d' % ftpd.ftp_port,
+-                proxies={'ftp': 'localhost:%d' % port},
++                proxies={'ftp': 'http://localhost:%d' % port},
+                 timeout=1)
+ 
+ 
+@@ -92,5 +92,5 @@ def test_proxy_connection_close(ftpd, session):
+         with pytest.raises(requests.exceptions.ConnectionError):
+             session.get(
+                 'ftp://127.0.0.1:%d/' % ftpd.ftp_port,
+-                proxies={'ftp': 'localhost:%d' % port},
++                proxies={'ftp': 'http://localhost:%d' % port},
+                 timeout=1)
+-- 
+2.49.0
+

@@ -1,0 +1,35 @@
+From 746308fb5d05bfa1f162be28150c9375cfb96167 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 22 Aug 2024 11:48:36 -0400
+Subject: [PATCH] Downstream-only: Omit doctests that require hifitime
+
+It is not worth packaging it solely for a couple of tiny examples.
+---
+ COMPARE.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/COMPARE.md b/COMPARE.md
+index b3d7ab4..b8b9d32 100644
+--- a/COMPARE.md
++++ b/COMPARE.md
+@@ -1052,7 +1052,7 @@ In particular, when computing a duration from two `Epoch` values that spans
+ a positive leap second (a second gets repeated), `hifitime` will correctly
+ report the accurate duration:
+ 
+-```rust
++```ignore
+ use hifitime::{Duration, Epoch};
+ 
+ fn main() -> anyhow::Result<()> {
+@@ -1106,7 +1106,7 @@ In contrast, `hifitime` appears to use saturating arithmetic everywhere (I've
+ not been able to find this behavior documented though, so I'm not clear on what
+ the intended semantics are):
+ 
+-```rust
++```ignore
+ use hifitime::{Duration, Epoch};
+ 
+ fn main() -> anyhow::Result<()> {
+-- 
+2.48.1
+

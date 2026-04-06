@@ -1,0 +1,37 @@
+From 286bc4a302b5130f732c857095ae665f7bea01dd Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 37/50] openssh-8.7p1-minrsabits
+
+---
+ readconf.c | 1 +
+ servconf.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/readconf.c b/readconf.c
+index 6c04ed43..f340bf50 100644
+--- a/readconf.c
++++ b/readconf.c
+@@ -343,6 +343,7 @@ static struct {
+ 	{ "securitykeyprovider", oSecurityKeyProvider },
+ 	{ "knownhostscommand", oKnownHostsCommand },
+ 	{ "requiredrsasize", oRequiredRSASize },
++	{ "rsaminsize", oRequiredRSASize }, /* alias */
+ 	{ "enableescapecommandline", oEnableEscapeCommandline },
+ 	{ "obscurekeystroketiming", oObscureKeystrokeTiming },
+ 	{ "channeltimeout", oChannelTimeout },
+diff --git a/servconf.c b/servconf.c
+index 15c99b30..84891544 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -788,6 +788,7 @@ static struct {
+ 	{ "casignaturealgorithms", sCASignatureAlgorithms, SSHCFG_ALL },
+ 	{ "securitykeyprovider", sSecurityKeyProvider, SSHCFG_GLOBAL },
+ 	{ "requiredrsasize", sRequiredRSASize, SSHCFG_ALL },
++	{ "rsaminsize", sRequiredRSASize, SSHCFG_ALL }, /* alias */
+ 	{ "channeltimeout", sChannelTimeout, SSHCFG_ALL },
+ 	{ "unusedconnectiontimeout", sUnusedConnectionTimeout, SSHCFG_ALL },
+ 	{ "sshdsessionpath", sSshdSessionPath, SSHCFG_GLOBAL },
+-- 
+2.49.0
+

@@ -1,0 +1,617 @@
+From a3a606005525922d35639efc3009db47fc50cbce Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 15:41:26 +0100
+Subject: [PATCH 01/19] test on py3.14
+
+---
+ .github/workflows/test.yml | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 33dede6..9354ddd 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -112,6 +112,10 @@ jobs:
+             python: "3.13-dev"
+             os: windows-latest
+             tox_env: "py313"
++          - name: "windows-py314"
++            python: "3.14"
++            os: windows-latest
++            tox_env: "py314"
+ 
+           - name: "ubuntu-py38"
+             python: "3.8"
+@@ -149,6 +153,11 @@ jobs:
+             os: ubuntu-latest
+             tox_env: "py313-pexpect"
+             use_coverage: true
++          - name: "ubuntu-py314"
++            python: "3.14"
++            os: ubuntu-latest
++            tox_env: "py314"
++            use_coverage: true
+           - name: "ubuntu-pypy3"
+             python: "pypy-3.9"
+             os: ubuntu-latest
+@@ -175,6 +184,10 @@ jobs:
+             python: "3.13-dev"
+             os: macos-latest
+             tox_env: "py313-xdist"
++          - name: "macos-py314"
++            python: "3.14"
++            os: macos-latest
++            tox_env: "py314-xdist"
+ 
+           - name: "plugins"
+             python: "3.12"
+@@ -224,6 +237,7 @@ jobs:
+       with:
+         python-version: ${{ matrix.python }}
+         check-latest: ${{ endsWith(matrix.python, '-dev') }}
++        allow-prereleases: true
+ 
+     - name: Install dependencies
+       run: |
+
+From e8e2899d139ec4248621c113da881230fefc9cca Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 15:42:46 +0100
+Subject: [PATCH 02/19] add news
+
+---
+ changelog/13308.improvement.rst | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 changelog/13308.improvement.rst
+
+diff --git a/changelog/13308.improvement.rst b/changelog/13308.improvement.rst
+new file mode 100644
+index 0000000..9063159
+--- /dev/null
++++ b/changelog/13308.improvement.rst
+@@ -0,0 +1 @@
++support Python 3.14
+
+From 7494a7d88d38450e6864f84cbdb4066029cea864 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 15:43:44 +0100
+Subject: [PATCH 03/19] add 314 to tox.ini
+
+---
+ tox.ini | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tox.ini b/tox.ini
+index 1a6ab34..6f49b80 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -10,6 +10,7 @@ envlist =
+     py311
+     py312
+     py313
++    py314
+     pypy3
+     py38-{pexpect,xdist,unittestextras,numpy,pluggymain,pylib}
+     doctesting
+
+From 93915f78953d939319e9dfd828f6284611c3b786 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 15:56:22 +0100
+Subject: [PATCH 04/19] fix ResourceWarning on pastebin http failures
+
+---
+ src/_pytest/pastebin.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/_pytest/pastebin.py b/src/_pytest/pastebin.py
+index 69c011e..4887620 100644
+--- a/src/_pytest/pastebin.py
++++ b/src/_pytest/pastebin.py
+@@ -78,6 +78,7 @@ def create_new_paste(contents: str | bytes) -> str:
+     import re
+     from urllib.parse import urlencode
+     from urllib.request import urlopen
++    from urllib.error import HTTPError
+ 
+     params = {"code": contents, "lexer": "text", "expiry": "1week"}
+     url = "https://bpa.st"
+@@ -85,8 +86,11 @@ def create_new_paste(contents: str | bytes) -> str:
+         response: str = (
+             urlopen(url, data=urlencode(params).encode("ascii")).read().decode("utf-8")
+         )
+-    except OSError as exc_info:  # urllib errors
+-        return f"bad response: {exc_info}"
++    except HTTPError as e:  # urllib.error errors
++        with e:
++            return f"bad response: {e}"
++    except OSError as e:  # urllib errors
++        return f"bad response: {e}"
+     m = re.search(r'href="/raw/(\w+)"', response)
+     if m:
+         return f"{url}/show/{m.group(1)}"
+
+From 2e94b15467f4bea6f280a0f2fbb769327cdc2ca2 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 15:56:41 +0100
+Subject: [PATCH 05/19] fix ResourceWarning on pytest.raises with urllib.error
+
+---
+ testing/python/raises.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/testing/python/raises.py b/testing/python/raises.py
+index 2011c81..df4ab0b 100644
+--- a/testing/python/raises.py
++++ b/testing/python/raises.py
+@@ -335,5 +335,7 @@ class TestRaises:
+         """
+         from urllib.error import HTTPError
+ 
+-        with pytest.raises(HTTPError, match="Not Found"):
++        with pytest.raises(HTTPError, match="Not Found") as exc_info:
+             raise HTTPError(code=404, msg="Not Found", fp=None, hdrs=None, url="")  # type: ignore [arg-type]
++        with exc_info.value:
++            pass
+
+From ac469d125d26b5569d5c8f440f3445aa41c37d8c Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 26 May 2025 14:57:08 +0000
+Subject: [PATCH 06/19] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ src/_pytest/pastebin.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/_pytest/pastebin.py b/src/_pytest/pastebin.py
+index 4887620..86519f6 100644
+--- a/src/_pytest/pastebin.py
++++ b/src/_pytest/pastebin.py
+@@ -76,9 +76,9 @@ def create_new_paste(contents: str | bytes) -> str:
+     :returns: URL to the pasted contents, or an error message.
+     """
+     import re
++    from urllib.error import HTTPError
+     from urllib.parse import urlencode
+     from urllib.request import urlopen
+-    from urllib.error import HTTPError
+ 
+     params = {"code": contents, "lexer": "text", "expiry": "1week"}
+     url = "https://bpa.st"
+
+From 853b7dcc6c93f2f1ad15ab3d87404ad86af03232 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 16:14:41 +0100
+Subject: [PATCH 07/19] pass real types for HTTPError so it works in cmgr
+
+---
+ testing/python/raises.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/testing/python/raises.py b/testing/python/raises.py
+index df4ab0b..0708d7f 100644
+--- a/testing/python/raises.py
++++ b/testing/python/raises.py
+@@ -1,6 +1,7 @@
+ # mypy: allow-untyped-defs
+ from __future__ import annotations
+ 
++import io
+ import re
+ import sys
+ 
+@@ -333,9 +334,12 @@ class TestRaises:
+ 
+         https://github.com/python/cpython/issues/98778
+         """
++        from email.message import Message
+         from urllib.error import HTTPError
+ 
+         with pytest.raises(HTTPError, match="Not Found") as exc_info:
+-            raise HTTPError(code=404, msg="Not Found", fp=None, hdrs=None, url="")  # type: ignore [arg-type]
++            raise HTTPError(
++                code=404, msg="Not Found", fp=io.BytesIO(), hdrs=Message(), url=""
++            )
+         with exc_info.value:
+             pass
+
+From 1e06df0808eacea7d279723bd90e2c5ee0bba506 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 16:15:04 +0100
+Subject: [PATCH 08/19] xfail test_raises_bdbquit_with_eoferror
+
+---
+ testing/test_debugging.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testing/test_debugging.py b/testing/test_debugging.py
+index 73a4b76..8ab45bd 100644
+--- a/testing/test_debugging.py
++++ b/testing/test_debugging.py
+@@ -1279,6 +1279,7 @@ def test_pdbcls_via_local_module(pytester: Pytester) -> None:
+     result.stdout.fnmatch_lines(["*runcall_called*", "* 1 passed in *"])
+ 
+ 
++@pytest.mark.xfail(sys.version_info >= (3, 14), reason="I don't know why this fails")
+ def test_raises_bdbquit_with_eoferror(pytester: Pytester) -> None:
+     """It is not guaranteed that DontReadFromInput's read is called."""
+     p1 = pytester.makepyfile(
+
+From 7ba9aa53d7472b9d0c1ac7242c5aa7b56df4c544 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 17:14:02 +0100
+Subject: [PATCH 09/19] fix message for unraisable exceptions
+
+---
+ testing/test_unraisableexception.py | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/testing/test_unraisableexception.py b/testing/test_unraisableexception.py
+index a15c754..d8490b5 100644
+--- a/testing/test_unraisableexception.py
++++ b/testing/test_unraisableexception.py
+@@ -8,6 +8,15 @@ import pytest
+ 
+ PYPY = hasattr(sys, "pypy_version_info")
+ 
++UNRAISABLE_LINE = (
++    (
++        "  * PytestUnraisableExceptionWarning: Exception ignored while calling "
++        "deallocator <function BrokenDel.__del__ at *>: None"
++    )
++    if sys.version_info >= (3, 14)
++    else "  * PytestUnraisableExceptionWarning: Exception ignored in: <function BrokenDel.__del__ at *>"
++)
++
+ 
+ @pytest.mark.skipif(PYPY, reason="garbage-collection differences make this flaky")
+ @pytest.mark.filterwarnings("default::pytest.PytestUnraisableExceptionWarning")
+@@ -32,7 +41,7 @@ def test_unraisable(pytester: Pytester) -> None:
+         [
+             "*= warnings summary =*",
+             "test_it.py::test_it",
+-            "  * PytestUnraisableExceptionWarning: Exception ignored in: <function BrokenDel.__del__ at *>",
++            UNRAISABLE_LINE,
+             "  ",
+             "  Traceback (most recent call last):",
+             "  ValueError: del is broken",
+@@ -69,7 +78,7 @@ def test_unraisable_in_setup(pytester: Pytester) -> None:
+         [
+             "*= warnings summary =*",
+             "test_it.py::test_it",
+-            "  * PytestUnraisableExceptionWarning: Exception ignored in: <function BrokenDel.__del__ at *>",
++            UNRAISABLE_LINE,
+             "  ",
+             "  Traceback (most recent call last):",
+             "  ValueError: del is broken",
+@@ -107,7 +116,7 @@ def test_unraisable_in_teardown(pytester: Pytester) -> None:
+         [
+             "*= warnings summary =*",
+             "test_it.py::test_it",
+-            "  * PytestUnraisableExceptionWarning: Exception ignored in: <function BrokenDel.__del__ at *>",
++            UNRAISABLE_LINE,
+             "  ",
+             "  Traceback (most recent call last):",
+             "  ValueError: del is broken",
+
+From 66a5284096584943f611f607358a2c29fac61d55 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 20:27:45 +0100
+Subject: [PATCH 10/19] use improved prog default value for
+ argparse.ArgumentParser
+
+---
+ testing/test_parseopt.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testing/test_parseopt.py b/testing/test_parseopt.py
+index 14e2b5f..36db7b1 100644
+--- a/testing/test_parseopt.py
++++ b/testing/test_parseopt.py
+@@ -28,7 +28,7 @@ class TestParser:
+ 
+     def test_custom_prog(self, parser: parseopt.Parser) -> None:
+         """Custom prog can be set for `argparse.ArgumentParser`."""
+-        assert parser._getparser().prog == os.path.basename(sys.argv[0])
++        assert parser._getparser().prog == argparse.ArgumentParser().prog
+         parser.prog = "custom-prog"
+         assert parser._getparser().prog == "custom-prog"
+
+From 394456931a51e06c68a9a653344483f1e7c24a19 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Mon, 26 May 2025 20:39:57 +0100
+Subject: [PATCH 11/19] Update testing/python/raises.py
+
+---
+ testing/python/raises.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/testing/python/raises.py b/testing/python/raises.py
+index 0708d7f..ed052a3 100644
+--- a/testing/python/raises.py
++++ b/testing/python/raises.py
+@@ -341,5 +341,4 @@ class TestRaises:
+             raise HTTPError(
+                 code=404, msg="Not Found", fp=io.BytesIO(), hdrs=Message(), url=""
+             )
+-        with exc_info.value:
+-            pass
++        exc_info.value.close()  # avoid a resource warning
+
+From 90ca5cf7080f69d89cdf2badc8f9044753a421e6 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Tue, 27 May 2025 09:49:10 +0100
+Subject: [PATCH 12/19] Update testing/test_debugging.py
+
+---
+ testing/test_debugging.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testing/test_debugging.py b/testing/test_debugging.py
+index 8ab45bd..52a35db 100644
+--- a/testing/test_debugging.py
++++ b/testing/test_debugging.py
+@@ -1279,7 +1279,7 @@ def test_pdbcls_via_local_module(pytester: Pytester) -> None:
+     result.stdout.fnmatch_lines(["*runcall_called*", "* 1 passed in *"])
+ 
+ 
+-@pytest.mark.xfail(sys.version_info >= (3, 14), reason="I don't know why this fails")
++@pytest.mark.xfail(sys.version_info >= (3, 14), reason="see https://github.com/python/cpython/issues/124703")
+ def test_raises_bdbquit_with_eoferror(pytester: Pytester) -> None:
+     """It is not guaranteed that DontReadFromInput's read is called."""
+     p1 = pytester.makepyfile(
+
+From e7db19dcbe254f8bebcb4f6665ef43f4fb66b2c7 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Tue, 27 May 2025 08:49:33 +0000
+Subject: [PATCH 13/19] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ testing/test_debugging.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/testing/test_debugging.py b/testing/test_debugging.py
+index 52a35db..f4780f8 100644
+--- a/testing/test_debugging.py
++++ b/testing/test_debugging.py
+@@ -1279,7 +1279,10 @@ def test_pdbcls_via_local_module(pytester: Pytester) -> None:
+     result.stdout.fnmatch_lines(["*runcall_called*", "* 1 passed in *"])
+ 
+ 
+-@pytest.mark.xfail(sys.version_info >= (3, 14), reason="see https://github.com/python/cpython/issues/124703")
++@pytest.mark.xfail(
++    sys.version_info >= (3, 14),
++    reason="see https://github.com/python/cpython/issues/124703",
++)
+ def test_raises_bdbquit_with_eoferror(pytester: Pytester) -> None:
+     """It is not guaranteed that DontReadFromInput's read is called."""
+     p1 = pytester.makepyfile(
+
+From bc5c45081925dd345f9f7545a5e113012031a922 Mon Sep 17 00:00:00 2001
+From: jakkdl <h6+github@pm.me>
+Date: Tue, 27 May 2025 11:46:00 +0200
+Subject: [PATCH 14/19] be more explicit in debugging xfail
+
+---
+ testing/test_debugging.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/testing/test_debugging.py b/testing/test_debugging.py
+index f4780f8..01ff22b 100644
+--- a/testing/test_debugging.py
++++ b/testing/test_debugging.py
+@@ -1281,7 +1281,7 @@ def test_pdbcls_via_local_module(pytester: Pytester) -> None:
+ 
+ @pytest.mark.xfail(
+     sys.version_info >= (3, 14),
+-    reason="see https://github.com/python/cpython/issues/124703",
++    reason="C-D now quits the test session, rather than failing the test. See https://github.com/python/cpython/issues/124703",
+ )
+ def test_raises_bdbquit_with_eoferror(pytester: Pytester) -> None:
+     """It is not guaranteed that DontReadFromInput's read is called."""
+@@ -1297,6 +1297,7 @@ def test_raises_bdbquit_with_eoferror(pytester: Pytester) -> None:
+         """
+     )
+     result = pytester.runpytest(str(p1))
++    result.assert_outcomes(failed=1)
+     result.stdout.fnmatch_lines(["E *BdbQuit", "*= 1 failed in*"])
+     assert result.ret == 1
+
+From 8ff6d3e4677315ac87bfbcba3d0bbf357b5db5df Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Tue, 27 May 2025 12:34:25 +0100
+Subject: [PATCH 15/19] Update changelog/13308.improvement.rst
+
+Co-authored-by: Bruno Oliveira <bruno@soliv.dev>
+---
+ changelog/13308.improvement.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/changelog/13308.improvement.rst b/changelog/13308.improvement.rst
+index 9063159..70018c6 100644
+--- a/changelog/13308.improvement.rst
++++ b/changelog/13308.improvement.rst
+@@ -1 +1 @@
+-support Python 3.14
++Added official support for Python 3.14.
+
+From ac3bc419f6f6a504d93e7570cf899769a9a061bd Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Tue, 27 May 2025 12:35:01 +0100
+Subject: [PATCH 16/19] Update src/_pytest/pastebin.py
+
+---
+ src/_pytest/pastebin.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/_pytest/pastebin.py b/src/_pytest/pastebin.py
+index 86519f6..311f72a 100644
+--- a/src/_pytest/pastebin.py
++++ b/src/_pytest/pastebin.py
+@@ -87,7 +87,7 @@ def create_new_paste(contents: str | bytes) -> str:
+             urlopen(url, data=urlencode(params).encode("ascii")).read().decode("utf-8")
+         )
+     except HTTPError as e:  # urllib.error errors
+-        with e:
++        with e:  # HTTPErrors are also http responses that must be closed!
+             return f"bad response: {e}"
+     except OSError as e:  # urllib errors
+         return f"bad response: {e}"
+
+From 94f67ef625c654bcc52b4008864fef2db6d4ae42 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Wed, 28 May 2025 09:17:53 +0100
+Subject: [PATCH 17/19] add 3.14 trove classifier
+
+---
+ pyproject.toml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index ff27906..ab128a9 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -38,6 +38,8 @@ classifiers = [
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
++    "Programming Language :: Python :: 3.13",
++    "Programming Language :: Python :: 3.14",
+     "Topic :: Software Development :: Libraries",
+     "Topic :: Software Development :: Testing",
+     "Topic :: Utilities",
+@@ -319,6 +321,7 @@ ignore = "W009"
+ 
+ [tool.pyproject-fmt]
+ indent = 4
++max_supported_python = "3.14"
+ 
+ [tool.pytest.ini_options]
+ minversion = "2.0"
+
+From 70353bab4c8d5242f442bb63de79f3eb694d998a Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Thu, 29 May 2025 16:46:36 +0100
+Subject: [PATCH 18/19] patch coverage
+
+---
+ src/_pytest/pastebin.py  |  4 ++--
+ testing/test_pastebin.py | 47 +++++++++++++++++++++++-----------------
+ 2 files changed, 29 insertions(+), 22 deletions(-)
+
+diff --git a/src/_pytest/pastebin.py b/src/_pytest/pastebin.py
+index 311f72a..da6fd94 100644
+--- a/src/_pytest/pastebin.py
++++ b/src/_pytest/pastebin.py
+@@ -86,10 +86,10 @@ def create_new_paste(contents: str | bytes) -> str:
+         response: str = (
+             urlopen(url, data=urlencode(params).encode("ascii")).read().decode("utf-8")
+         )
+-    except HTTPError as e:  # urllib.error errors
++    except HTTPError as e:
+         with e:  # HTTPErrors are also http responses that must be closed!
+             return f"bad response: {e}"
+-    except OSError as e:  # urllib errors
++    except OSError as e:  # eg urllib.error.URLError
+         return f"bad response: {e}"
+     m = re.search(r'href="/raw/(\w+)"', response)
+     if m:
+diff --git a/testing/test_pastebin.py b/testing/test_pastebin.py
+index 8fdd60b..9b928e0 100644
+--- a/testing/test_pastebin.py
++++ b/testing/test_pastebin.py
+@@ -3,6 +3,7 @@ from __future__ import annotations
+ 
+ import email.message
+ import io
++from unittest import mock
+ 
+ from _pytest.monkeypatch import MonkeyPatch
+ from _pytest.pytester import Pytester
+@@ -90,23 +91,6 @@ class TestPaste:
+     def pastebin(self, request):
+         return request.config.pluginmanager.getplugin("pastebin")
+ 
+-    @pytest.fixture
+-    def mocked_urlopen_fail(self, monkeypatch: MonkeyPatch):
+-        """Monkeypatch the actual urlopen call to emulate a HTTP Error 400."""
+-        calls = []
+-
+-        import urllib.error
+-        import urllib.request
+-
+-        def mocked(url, data):
+-            calls.append((url, data))
+-            raise urllib.error.HTTPError(
+-                url, 400, "Bad request", email.message.Message(), io.BytesIO()
+-            )
+-
+-        monkeypatch.setattr(urllib.request, "urlopen", mocked)
+-        return calls
+-
+     @pytest.fixture
+     def mocked_urlopen_invalid(self, monkeypatch: MonkeyPatch):
+         """Monkeypatch the actual urlopen calls done by the internal plugin
+@@ -158,10 +142,33 @@ class TestPaste:
+         )
+         assert len(mocked_urlopen_invalid) == 1
+ 
+-    def test_pastebin_http_error(self, pastebin, mocked_urlopen_fail) -> None:
+-        result = pastebin.create_new_paste(b"full-paste-contents")
++    def test_pastebin_http_error(self, pastebin) -> None:
++        import urllib.error
++
++        with mock.patch(
++            "urllib.request.urlopen",
++            side_effect=urllib.error.HTTPError(
++                url="https://bpa.st",
++                code=400,
++                msg="Bad request",
++                hdrs=email.message.Message(),
++                fp=io.BytesIO(),
++            ),
++        ) as mock_urlopen:
++            result = pastebin.create_new_paste(b"full-paste-contents")
+         assert result == "bad response: HTTP Error 400: Bad request"
+-        assert len(mocked_urlopen_fail) == 1
++        assert len(mock_urlopen.mock_calls) == 1
++
++    def test_pastebin_url_error(self, pastebin) -> None:
++        import urllib.error
++
++        with mock.patch(
++            "urllib.request.urlopen",
++            side_effect=urllib.error.URLError("the url was bad"),
++        ) as mock_urlopen:
++            result = pastebin.create_new_paste(b"full-paste-contents")
++        assert result == "bad response: <urlopen error the url was bad>"
++        assert len(mock_urlopen.mock_calls) == 1
+ 
+     def test_create_new_paste(self, pastebin, mocked_urlopen) -> None:
+         result = pastebin.create_new_paste(b"full-paste-contents")
+
+From be1a0f48a6b604039799470bd3986b20a519faa8 Mon Sep 17 00:00:00 2001
+From: Thomas Grainger <tagrain@gmail.com>
+Date: Fri, 30 May 2025 22:11:01 +0100
+Subject: [PATCH 19/19] Update .github/workflows/test.yml
+
+---
+ .github/workflows/test.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 9354ddd..8547a4c 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -236,7 +236,7 @@ jobs:
+       uses: actions/setup-python@v5
+       with:
+         python-version: ${{ matrix.python }}
+-        check-latest: ${{ endsWith(matrix.python, '-dev') }}
++        check-latest: true
+         allow-prereleases: true
+ 
+     - name: Install dependencies

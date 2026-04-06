@@ -1,0 +1,16 @@
+--- a/pyproject.toml	2022-06-30 14:59:14.129513366 +0300
++++ b/pyproject.toml	2022-06-30 14:59:48.066496449 +0300
+@@ -15,13 +15,6 @@ classifiers = [
+ ]
+ repository = "https://github.com/csernazs/pytest-httpserver"
+
+-include = [
+-    { path = "tests", format = "sdist" },
+-    { path = "CHANGES.rst", format = "sdist" },
+-    { path = "CONTRIBUTION.md", format = "sdist" },
+-    { path = "example*.py", format = "sdist" },
+-    { path = "doc", format = "sdist" },
+-]
+
+ [tool.poetry.dependencies]
+ python = ">=3.8,<4.0"

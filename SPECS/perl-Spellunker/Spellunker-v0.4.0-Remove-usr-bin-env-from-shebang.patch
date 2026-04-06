@@ -1,0 +1,39 @@
+From c3afa20ce7da4392a6586019fe8122a993c1c4fd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 7 Nov 2017 16:38:17 +0100
+Subject: [PATCH] Remove /usr/bin/env from shebang
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is forbidden by packaging guidelines now.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ script/spellunker     | 2 +-
+ script/spellunker-pod | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/script/spellunker b/script/spellunker
+index 0fcb025..c8ce902 100644
+--- a/script/spellunker
++++ b/script/spellunker
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!perl
+ use strict;
+ use warnings;
+ use Spellunker::CLI;
+diff --git a/script/spellunker-pod b/script/spellunker-pod
+index 01ef381..7f22df7 100644
+--- a/script/spellunker-pod
++++ b/script/spellunker-pod
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++#!perl
+ use strict;
+ use warnings;
+ use Spellunker::CLI::Pod;
+-- 
+2.13.6
+

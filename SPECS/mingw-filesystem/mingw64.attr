@@ -1,0 +1,3 @@
+%__mingw64_provides     %{_rpmconfigdir}/mingw.prov mingw64
+%__mingw64_requires     %{_rpmconfigdir}/mingw.req mingw64
+%__mingw64_path		^%{mingw64_prefix}/.*\.([Dd][Ll][Ll]|[Ee][Xx][Ee]|[Pp][Yy][Dd]?|[Pp][Cc])$

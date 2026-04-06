@@ -1,0 +1,33 @@
+diff -up Osi-releases-0.108.9/Osi/configure.orig Osi-releases-0.108.9/Osi/configure
+--- Osi-releases-0.108.9/Osi/configure.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/configure	2023-10-26 20:01:38.975289463 -0600
+@@ -24270,7 +24270,7 @@ echo "${ECHO_T}$doxysrcdir (src)" >&6
+   fi
+   # Not built, fall back to installed tag file
+   if test $doxyfound = no ; then
+-    eval doxydir="${datadir}/coin/doc/${proj}/doxydoc"
++    eval doxydir="${datadir}/doc/coin-or-${proj}"
+     # AC_MSG_NOTICE([Considering $doxydir (install)])
+     # AC_MSG_NOTICE([Subdirs: $coin_subdirs)])
+     coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=$doxydir/html"
+diff -up Osi-releases-0.108.9/Osi/Makefile.in.orig Osi-releases-0.108.9/Osi/Makefile.in
+--- Osi-releases-0.108.9/Osi/Makefile.in.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/Makefile.in	2023-10-26 20:01:38.976289449 -0600
+@@ -410,7 +410,7 @@ EXTRA_DIST = examples/basic2.cpp example
+ ########################################################################
+ #                  Installation of the addlibs file                    #
+ ########################################################################
+-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Osi
++addlibsdir = $(DESTDIR)$(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ 
+ ########################################################################
+ #                         Maintainer Stuff                             #
+@@ -420,7 +420,7 @@ CLEANFILES =
+ # Files that are generated and should be cleaned with make distclean
+ DISTCLEANFILES = $(am__append_15) $(VPATH_DISTCLEANFILES)
+ DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md 
+-DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
++DocInstallDir = $(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+ COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
+ all: all-recursive

@@ -1,0 +1,37 @@
+From 7cb519025d828225122888d1af5465fe6a492edf Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Wed, 26 Jun 2024 03:44:26 -0400
+Subject: [PATCH] Drop extra dependencies
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index c4ae995..bc178d0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,9 +2,7 @@
+ requires = [
+     "setuptools",
+     "Cython>=3.1",
+-    "versioneer[toml]==0.28",
+-    # tomli is used by versioneer
+-    "tomli; python_version < '3.11'",
++    "versioneer[toml]>=0.28",
+ ]
+ build-backend = "setuptools.build_meta"
+ 
+@@ -33,7 +31,7 @@ dependencies = ["certifi", "numpy", "packaging"]
+ 
+ [project.optional-dependencies]
+ dev = ["cython>=3.1"]
+-test = ["pytest", "pytest-cov"]
++test = ["pytest"]
+ benchmark = ["pytest-benchmark"]
+ geopandas = ["geopandas"]
+ 
+-- 
+2.50.0
+

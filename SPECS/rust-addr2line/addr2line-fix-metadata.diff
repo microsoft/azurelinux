@@ -1,0 +1,40 @@
+--- addr2line-0.25.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ addr2line-0.25.1/Cargo.toml	2025-11-04T18:17:07.092322+00:00
+@@ -54,7 +54,6 @@
+     "cpp_demangle",
+     "fallible-iterator",
+     "smallvec",
+-    "dep:clap",
+ ]
+ cargo-all = []
+ default = [
+@@ -82,20 +81,10 @@
+ name = "addr2line"
+ path = "src/lib.rs"
+ 
+-[[bin]]
+-name = "addr2line"
+-path = "src/bin/addr2line.rs"
+-required-features = ["bin"]
+-
+ [dependencies.alloc]
+ version = "1.0.0"
+ optional = true
+ package = "rustc-std-workspace-alloc"
+-
+-[dependencies.clap]
+-version = "4.3.21"
+-features = ["wrap_help"]
+-optional = true
+ 
+ [dependencies.core]
+ version = "1.0.0"
+@@ -103,7 +92,7 @@
+ package = "rustc-std-workspace-core"
+ 
+ [dependencies.cpp_demangle]
+-version = "0.4"
++version = "0.5"
+ features = ["alloc"]
+ optional = true
+ default-features = false

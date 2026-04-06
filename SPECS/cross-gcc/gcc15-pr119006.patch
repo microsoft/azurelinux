@@ -1,0 +1,76 @@
+2025-02-27  Jakub Jelinek  <jakub@redhat.com>
+
+	PR ipa/119006
+	* ipa-icf-gimple.cc (func_checker::compare_operand): If t1 and t2
+	are ADDR_EXPRs, call operand_equal_p on their operands rather than on
+	the ADDR_EXPRs themselves.  Formatting fix.
+
+	* g++.dg/opt/pr119006.C: New test.
+
+--- gcc/ipa-icf-gimple.cc.jj	2025-02-01 00:50:02.080774328 +0100
++++ gcc/ipa-icf-gimple.cc	2025-02-27 14:35:19.931183246 +0100
+@@ -437,12 +437,23 @@ func_checker::compare_operand (tree t1,
+ 		 ("compare_ao_refs failed (dependence clique difference)");
+       gcc_unreachable ();
+     }
++  else if (TREE_CODE (t1) == ADDR_EXPR && TREE_CODE (t2) == ADDR_EXPR)
++    {
++      /* For ADDR_EXPR compare the operands of the ADDR_EXPR rather than
++	 the ADDR_EXPRs themselves.  operand_equal_p will compare the
++	 operands with OEP_ADDRESS_OF and only care about the value
++	 of the ADDR_EXPR, rather than e.g. types of MEM_REFs in there.
++	 Some optimizations use such details though, see PR119006.  */
++      if (operand_equal_p (TREE_OPERAND (t1, 0), TREE_OPERAND (t2, 0),
++			   OEP_MATCH_SIDE_EFFECTS))
++	return true;
++      return return_false_with_msg ("operand_equal_p failed");
++    }
+   else
+     {
+       if (operand_equal_p (t1, t2, OEP_MATCH_SIDE_EFFECTS))
+ 	return true;
+-      return return_false_with_msg
+-		 ("operand_equal_p failed");
++      return return_false_with_msg ("operand_equal_p failed");
+     }
+ }
+ 
+--- gcc/testsuite/g++.dg/opt/pr119006.C.jj	2025-02-27 14:37:05.952707350 +0100
++++ gcc/testsuite/g++.dg/opt/pr119006.C	2025-02-27 14:36:29.251218260 +0100
+@@ -0,0 +1,36 @@
++// PR ipa/119006
++// { dg-do run { target c++11 } }
++// { dg-options "-O2 -fwhole-program" }
++
++struct A {
++  bool operator== (const char *x) const { return x && !__builtin_strcmp (a, x); }
++  char a[11];
++};
++
++struct B {
++  bool operator== (const char *x) const { return x && !__builtin_strcmp (a, x); }
++  bool operator!= (const char *x) const { return !(*this == x); }
++  char a[128];
++};
++
++[[gnu::noinline,gnu::used]] int
++foo (const A& lhs, const char* rhs)
++{
++  return lhs == rhs;
++}
++
++constexpr const char *t = "abcdefghijklmno";
++
++[[gnu::noinline,gnu::used]] void
++bar (B x)
++{
++  if (x != t) __builtin_abort ();
++}
++
++int
++main ()
++{
++  B b;
++  __builtin_strcpy (b.a, t);
++  bar (b);
++}

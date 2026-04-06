@@ -1,0 +1,26 @@
+Change the built-in default socket directory to be /var/run/postgresql.
+For backwards compatibility with (probably non-libpq-based) clients that
+might still expect to find the socket in /tmp, also create a socket in
+/tmp.  This is to resolve communication problems with clients operating
+under systemd's PrivateTmp environment, which won't be using the same
+global /tmp directory as the server; see bug #825448.
+
+Note that we apply the socket directory change at the level of the
+hard-wired defaults in the C code, not by just twiddling the setting in
+postgresql.conf.sample; this is so that the change will take effect on
+server package update, without requiring any existing postgresql.conf
+to be updated.  (Of course, a user who dislikes this behavior can still
+override it via postgresql.conf.)
+
+diff -up postgresql-13.0/src/include/pg_config_manual.h.patch1 postgresql-13.0/src/include/pg_config_manual.h
+--- postgresql-13.0/src/include/pg_config_manual.h.patch1	2020-10-23 10:18:12.204959024 +0200
++++ postgresql-13.0/src/include/pg_config_manual.h	2020-10-23 10:18:39.391208931 +0200
+@@ -201,7 +201,7 @@
+  * support them yet.
+  */
+ #ifndef WIN32
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#define DEFAULT_PGSOCKET_DIR  "/var/run/postgresql"
+ #else
+ #define DEFAULT_PGSOCKET_DIR ""
+ #endif

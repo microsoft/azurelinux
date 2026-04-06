@@ -1,0 +1,27 @@
+From 380e40930661d643c865bace4e1791ca8f9d74cf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Mon, 18 Jun 2018 14:01:46 +0200
+Subject: [PATCH 57/59] Improve error message when max number of bind attempts
+ is exceeded
+
+Resolves: rhbz#1318198
+---
+ privops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/privops.c b/privops.c
+index e577a27..010d28d 100644
+--- a/privops.c
++++ b/privops.c
+@@ -183,7 +183,7 @@ vsf_privop_pasv_listen(struct vsf_session* p_sess)
+   }
+   if (!bind_retries)
+   {
+-    die("vsf_sysutil_bind");
++    die("vsf_sysutil_bind, maximum number of attempts to find a listening port exceeded");
+   }
+   return the_port;
+ }
+-- 
+2.14.4
+

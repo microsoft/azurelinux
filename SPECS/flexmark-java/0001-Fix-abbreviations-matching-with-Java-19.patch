@@ -1,0 +1,31 @@
+From 3edf8f2b27bfc94342d4a2408d6c9dfa6f8e1cd6 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 25 Sep 2024 10:06:03 +0200
+Subject: [PATCH] Fix abbreviations matching with Java 19+
+
+In order for regex \b character class to match non-ASCII characters
+the UNICODE_CHARACTER_CLASS flag must be passed to regex compiler.
+
+See https://bugs.openjdk.org/browse/JDK-8291577
+
+Fixes #632
+---
+ .../abbreviation/internal/AbbreviationNodePostProcessor.java    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/flexmark-ext-abbreviation/src/main/java/com/vladsch/flexmark/ext/abbreviation/internal/AbbreviationNodePostProcessor.java b/flexmark-ext-abbreviation/src/main/java/com/vladsch/flexmark/ext/abbreviation/internal/AbbreviationNodePostProcessor.java
+index f99a40c42..852ce6ede 100644
+--- a/flexmark-ext-abbreviation/src/main/java/com/vladsch/flexmark/ext/abbreviation/internal/AbbreviationNodePostProcessor.java
++++ b/flexmark-ext-abbreviation/src/main/java/com/vladsch/flexmark/ext/abbreviation/internal/AbbreviationNodePostProcessor.java
+@@ -57,7 +57,7 @@ public class AbbreviationNodePostProcessor extends NodePostProcessor {
+                 }
+             }
+ 
+-            if (sb.length() > 0) this.abbreviations = Pattern.compile(sb.toString());
++            if (sb.length() > 0) this.abbreviations = Pattern.compile(sb.toString(), Pattern.UNICODE_CHARACTER_CLASS);
+         }
+     }
+ 
+-- 
+2.46.1
+

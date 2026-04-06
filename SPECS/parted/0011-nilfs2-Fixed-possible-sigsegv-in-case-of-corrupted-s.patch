@@ -1,0 +1,61 @@
+From 2fad7d827d27e75298f1d17b5fa6567ddfc4c338 Mon Sep 17 00:00:00 2001
+From: Anton Butenko <abutenko@akamai.com>
+Date: Fri, 28 Feb 2025 16:09:18 +0100
+Subject: [PATCH 11/12] nilfs2: Fixed possible sigsegv in case of corrupted
+ superblock
+
+bytes value comes from the superblock and it must be at least as long as
+s_sum which is a 32 bit value. So sumoff + 4 is the correct lower limit
+for it, not sumoff - 4.
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ libparted/fs/nilfs2/nilfs2.c |  2 +-
+ tests/t4301-nilfs2-badsb2.sh | 10 ++++++++--
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/libparted/fs/nilfs2/nilfs2.c b/libparted/fs/nilfs2/nilfs2.c
+index 40f8567..74186f1 100644
+--- a/libparted/fs/nilfs2/nilfs2.c
++++ b/libparted/fs/nilfs2/nilfs2.c
+@@ -88,7 +88,7 @@ is_valid_nilfs_sb(struct nilfs2_super_block *sb)
+ 		return 0;
+ 
+ 	bytes = PED_LE16_TO_CPU(sb->s_bytes);
+-	if (bytes > 1024 || bytes < sumoff - 4)
++	if (bytes > 1024 || bytes < sumoff + 4)
+ 		return 0;
+ 
+ 	crc = __efi_crc32(sb, sumoff, PED_LE32_TO_CPU(sb->s_crc_seed));
+diff --git a/tests/t4301-nilfs2-badsb2.sh b/tests/t4301-nilfs2-badsb2.sh
+index 2a1205b..45b6644 100755
+--- a/tests/t4301-nilfs2-badsb2.sh
++++ b/tests/t4301-nilfs2-badsb2.sh
+@@ -27,16 +27,22 @@ end=$(($len * 512 / $ss))
+ parted -s $dev mklabel msdos mkpart primary 1s ${end}s || framework_failure_
+ 
+ # Write a secondary superblock with the nilfs magic number and a nilfs
+-# superblock length (s_bytes) field of only 10 bytes.
++# superblock length (s_bytes) field of only 13 bytes.
+ # struct nilfs2_super_block starts with these four fields...
+ #	uint32_t	s_rev_level;
+ #	uint16_t	s_minor_rev_level;
+ #	uint16_t	s_magic;
+ #	uint16_t	s_bytes;
+ sb2_offset=$(( 24 / ($ss / 512) + 1))
+-perl -e "print pack 'LSSS.', 0, 0, 0x3434, 10, $ss" |
++perl -e "print pack 'LSSS.', 0, 0, 0x3434, 13, $ss" |
+     dd of=$dev bs=$ss seek=$sb2_offset count=1 conv=notrunc
+ 
++# Write primary nilfs magic number and a nilfs
++# superblock length (s_bytes) field of only 13 bytes.
++sb_offset=3
++perl -e "print pack 'LSSS.', 0, 0, 0x3434, 13, $ss" |
++    dd of=$dev bs=$ss seek=$sb_offset count=1 conv=notrunc
++
+ # This used to give parted a sigsegv.
+ parted -s $dev print || fail=1
+ 
+-- 
+2.49.0
+

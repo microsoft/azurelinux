@@ -1,0 +1,23 @@
+From 2f1c8df9c03f2e1513ceb93b73fcce53c825d305 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Thu, 19 Oct 2023 02:47:58 +0000
+Subject: [PATCH] Don't remove egg-info directory in setup.py
+
+Doing this breaks the build.
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5bed656..60b3803 100644
+--- a/setup.py
++++ b/setup.py
+@@ -24,5 +24,3 @@ setup(
+ 		name="domdf-python-tools",
+ 		py_modules=[],
+ 		)
+-
+-shutil.rmtree("domdf_python_tools.egg-info", ignore_errors=True)
+-- 
+2.41.0
+

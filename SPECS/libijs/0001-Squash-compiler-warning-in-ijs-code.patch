@@ -1,0 +1,25 @@
+From eb770edd1c4dd9bf6c561f15564e4b8e10cc54b9 Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Fri, 16 Mar 2018 10:19:43 +0000
+Subject: [PATCH] Squash compiler warning in ijs code.
+
+---
+ ijs_exec_unix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ijs_exec_unix.c b/ijs_exec_unix.c
+index 862961913..622569416 100644
+--- a/ijs_exec_unix.c
++++ b/ijs_exec_unix.c
+@@ -75,7 +75,7 @@ ijs_exec_server(const char *server_cmd, int *pfd_to, int *pfd_from,
+ 
+       argv[i++] = (char *)server_cmd;
+       argv[i++] = NULL;
+-      status = execvp (argv[0], argv);
++      status = execvp (argv[0], (char * const *)argv);
+       if (status < 0)
+         exit (1);
+     }
+-- 
+2.43.0
+

@@ -1,0 +1,265 @@
+From da0e63ccd86ead63e6b29828286897fb1236eb81 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Thu, 25 Aug 2011 10:54:47 +0100
+Subject: [PATCH] Remove sub-classing from OO.o mime-types
+
+https://bugs.freedesktop.org/show_bug.cgi?id=40354
+---
+ data/freedesktop.org.xml.in | 31 -------------------------------
+ 1 file changed, 31 deletions(-)
+
+diff --git a/data/freedesktop.org.xml.in b/data/freedesktop.org.xml.in
+index 8020b13..00e8d90 100644
+--- a/data/freedesktop.org.xml.in
++++ b/data/freedesktop.org.xml.in
+@@ -941,7 +941,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.calc">
+     <comment>LibreOffice Calc spreadsheet</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -954,7 +953,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.calc.template">
+     <comment>LibreOffice Calc template</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -967,7 +965,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.draw">
+     <comment>LibreOffice Draw drawing</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="image-x-generic"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -980,7 +977,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.draw.template">
+     <comment>LibreOffice Draw template</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="image-x-generic"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -993,7 +989,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.impress">
+     <comment>LibreOffice Impress presentation</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-presentation"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1006,7 +1001,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.impress.template">
+     <comment>LibreOffice Impress template</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-presentation"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1019,7 +1013,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.math">
+     <comment>LibreOffice Math formula</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1032,7 +1025,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.writer">
+     <comment>LibreOffice Writer document</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1045,7 +1037,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.writer.global">
+     <comment>LibreOffice Writer global document</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1058,7 +1049,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.sun.xml.writer.template">
+     <comment>LibreOffice Writer template</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1073,7 +1063,6 @@ command to generate the output files.
+     <comment>ODT document</comment>
+     <acronym>ODT</acronym>
+     <expanded-acronym>OpenDocument Text</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1088,7 +1077,6 @@ command to generate the output files.
+     <comment>ODT document (Flat XML)</comment>
+     <acronym>FODT</acronym>
+     <expanded-acronym>OpenDocument Text (Flat XML)</expanded-acronym>
+-    <sub-class-of type="application/xml"/>
+     <generic-icon name="x-office-document"/>
+     <glob pattern="*.fodt"/>
+   </mime-type>
+@@ -1096,7 +1084,6 @@ command to generate the output files.
+     <comment>ODT template</comment>
+     <acronym>ODT</acronym>
+     <expanded-acronym>OpenDocument Text</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1111,7 +1098,6 @@ command to generate the output files.
+     <comment>OTH template</comment>
+     <acronym>OTH</acronym>
+     <expanded-acronym>OpenDocument HTML</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="text-html"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1126,7 +1112,6 @@ command to generate the output files.
+     <comment>ODM document</comment>
+     <acronym>ODM</acronym>
+     <expanded-acronym>OpenDocument Master</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1141,7 +1126,6 @@ command to generate the output files.
+     <comment>ODG drawing</comment>
+     <acronym>ODG</acronym>
+     <expanded-acronym>OpenDocument Drawing</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="image-x-generic"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1156,7 +1140,6 @@ command to generate the output files.
+     <comment>ODG drawing (Flat XML)</comment>
+     <acronym>FODG</acronym>
+     <expanded-acronym>OpenDocument Drawing (Flat XML)</expanded-acronym>
+-    <sub-class-of type="application/xml"/>
+     <generic-icon name="image-x-generic"/>
+     <glob pattern="*.fodg"/>
+   </mime-type>
+@@ -1164,7 +1147,6 @@ command to generate the output files.
+     <comment>ODG template</comment>
+     <acronym>ODG</acronym>
+     <expanded-acronym>OpenDocument Drawing</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="image-x-generic"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1179,7 +1161,6 @@ command to generate the output files.
+     <comment>ODP presentation</comment>
+     <acronym>ODP</acronym>
+     <expanded-acronym>OpenDocument Presentation</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-presentation"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1194,7 +1175,6 @@ command to generate the output files.
+     <comment>ODP presentation (Flat XML)</comment>
+     <acronym>FODP</acronym>
+     <expanded-acronym>OpenDocument Presentation (Flat XML)</expanded-acronym>
+-    <sub-class-of type="application/xml"/>
+     <generic-icon name="x-office-presentation"/>
+     <glob pattern="*.fodp"/>
+   </mime-type>
+@@ -1202,7 +1182,6 @@ command to generate the output files.
+     <comment>ODP template</comment>
+     <acronym>ODP</acronym>
+     <expanded-acronym>OpenDocument Presentation</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-presentation"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1217,7 +1196,6 @@ command to generate the output files.
+     <comment>ODS spreadsheet</comment>
+     <acronym>ODS</acronym>
+     <expanded-acronym>OpenDocument Spreadsheet</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1232,7 +1210,6 @@ command to generate the output files.
+     <comment>ODS spreadsheet (Flat XML)</comment>
+     <acronym>FODS</acronym>
+     <expanded-acronym>OpenDocument Spreadsheet (Flat XML)</expanded-acronym>
+-    <sub-class-of type="application/xml"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <glob pattern="*.fods"/>
+   </mime-type>
+@@ -1240,7 +1217,6 @@ command to generate the output files.
+     <comment>ODS template</comment>
+     <acronym>ODS</acronym>
+     <expanded-acronym>OpenDocument Spreadsheet</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1255,7 +1231,6 @@ command to generate the output files.
+     <comment>ODC chart</comment>
+     <acronym>ODC</acronym>
+     <expanded-acronym>OpenDocument Chart</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1270,7 +1245,6 @@ command to generate the output files.
+     <comment>ODC template</comment>
+     <acronym>ODC</acronym>
+     <expanded-acronym>OpenDocument Chart</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-spreadsheet"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1285,7 +1259,6 @@ command to generate the output files.
+     <comment>ODF formula</comment>
+     <acronym>ODF</acronym>
+     <expanded-acronym>OpenDocument Formula</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1300,7 +1273,6 @@ command to generate the output files.
+     <comment>ODF template</comment>
+     <acronym>ODF</acronym>
+     <expanded-acronym>OpenDocument Formula</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1315,7 +1287,6 @@ command to generate the output files.
+     <comment>ODB database</comment>
+     <acronym>ODB</acronym>
+     <expanded-acronym>OpenDocument Database</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1331,7 +1302,6 @@ command to generate the output files.
+     <comment>ODI image</comment>
+     <acronym>ODI</acronym>
+     <expanded-acronym>OpenDocument Image</expanded-acronym>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="image-x-generic"/>
+     <magic priority="70">
+       <match type="string" value="PK\003\004" offset="0">
+@@ -1344,7 +1314,6 @@ command to generate the output files.
+   </mime-type>
+   <mime-type type="application/vnd.openofficeorg.extension">
+     <comment>OpenOffice.org extension</comment>
+-    <sub-class-of type="application/zip"/>
+     <generic-icon name="x-office-document"/>
+     <glob pattern="*.oxt" />
+   </mime-type>
+-- 
+2.41.0
+

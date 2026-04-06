@@ -1,0 +1,43 @@
+From 3f05c84ed30592e2377d0c9c2987b705cfb21c3c Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Tue, 21 Oct 2025 08:06:17 -0400
+Subject: [PATCH 03/15] Fedora: kbs_protocol: default to openssl
+
+Replace 'rust-crypto' with 'openssl' in default
+
+Use native TLS for openssl
+
+Add "bin" to default to build trustee-attester
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ attestation-agent/kbs_protocol/Cargo.toml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/attestation-agent/kbs_protocol/Cargo.toml b/attestation-agent/kbs_protocol/Cargo.toml
+index 399944f..e703f05 100644
+--- a/attestation-agent/kbs_protocol/Cargo.toml
++++ b/attestation-agent/kbs_protocol/Cargo.toml
+@@ -45,7 +45,7 @@ name = "trustee-attester"
+ required-features = ["bin"]
+ 
+ [features]
+-default = ["background_check", "passport", "rust-crypto", "all-attesters"]
++default = ["background_check", "passport", "openssl", "all-attesters", "bin"]
+ 
+ passport = []
+ # Allow to connect Attestation-Agent with TTRPC to get evidence, token, etc.
+@@ -69,7 +69,7 @@ se-attester = ["attester/se-attester"]
+ tpm-attester = ["attester/tpm-attester"]
+ nvidia-attester = ["attester/nvidia-attester"]
+ 
+-rust-crypto = ["reqwest/rustls-tls", "crypto/rust-crypto"]
+-openssl = ["reqwest/native-tls-vendored", "crypto/openssl"]
++rust-crypto = []
++openssl = ["reqwest/native-tls", "crypto/openssl"]
+ 
+ bin = ["tokio/rt", "tokio/macros", "clap", "env_logger"]
+-- 
+2.51.1
+

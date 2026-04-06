@@ -1,0 +1,76 @@
+From 3aecd977bcb3a5fb81397bd821891e7dfc59e147 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 9 Jan 2026 10:35:43 +0100
+Subject: [PATCH 125/131] [PCS Client Tool] Migrate from deprecated
+ pkg_resources to packaging (#485)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: Miro Hrončok <miro@hroncok.cz>
+
+* [PCS Client Tool] Migrate from deprecated pkg_resources to packaging
+
+Version 14.0 is the first version that had the Version class.
+
+Ref: https://setuptools.pypa.io/en/latest/pkg_resources.html
+
+* [PCS Client Tool] Avoid needless indirection when contracting Version objects
+
+---------
+
+Signed-off-by: Miro Hrončok <miro@hroncok.cz>
+(cherry picked from commit a6c3631330787aaf1e286f5dd06c39c50ac0d796)
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 6 +++---
+ tools/PcsClientTool/requirements.txt    | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index dd4eba40..76a213b0 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -39,7 +39,7 @@ if system() == 'Windows':
+ from lib.intelsgx.credential import Credentials
+ from requests.adapters import HTTPAdapter
+ from urllib3.util import Retry
+-from pkg_resources import parse_version
++from packaging.version import Version
+ 
+ certBegin= '-----BEGIN CERTIFICATE-----'
+ certEnd= '-----END CERTIFICATE-----'
+@@ -90,7 +90,7 @@ class PCS:
+         
+         PARAMS = {}
+         https = requests.Session()
+-        if parse_version(urllib3.__version__) < parse_version('1.26.0'):
++        if Version(urllib3.__version__) < Version('1.26.0'):
+             https.mount("https://", HTTPAdapter(max_retries=Retry(method_whitelist=["HEAD", "GET", "PUT", "POST", "DELETE", "OPTIONS", "TRACE"])))
+         else:
+             https.mount("https://", HTTPAdapter(max_retries=Retry(allowed_methods=["HEAD", "GET", "PUT", "POST", "DELETE", "OPTIONS", "TRACE"])))
+@@ -108,7 +108,7 @@ class PCS:
+         
+         PARAMS = {}
+         https = requests.Session()
+-        if parse_version(urllib3.__version__) < parse_version('1.26.0'):
++        if Version(urllib3.__version__) < Version('1.26.0'):
+             https.mount("https://", HTTPAdapter(max_retries=Retry(method_whitelist=["HEAD", "GET", "PUT", "POST", "DELETE", "OPTIONS", "TRACE"])))
+         else:
+             https.mount("https://", HTTPAdapter(max_retries=Retry(allowed_methods=["HEAD", "GET", "PUT", "POST", "DELETE", "OPTIONS", "TRACE"])))
+diff --git a/tools/PcsClientTool/requirements.txt b/tools/PcsClientTool/requirements.txt
+index 3128807f..fc16cbf5 100644
+--- a/tools/PcsClientTool/requirements.txt
++++ b/tools/PcsClientTool/requirements.txt
+@@ -1,8 +1,8 @@
+ asn1>=2.4.1
+ cryptography>=41.0.7,<44
+ keyring>=23.0.0
++packaging>=14.0
+ pyOpenSSL>=23.2.0,<24.3.0
+ pypac>=0.14.0
+ Requests>=2.31.0
+-setuptools>=65.5.1,<81
+ urllib3>=1.26.18
+-- 
+2.53.0
+

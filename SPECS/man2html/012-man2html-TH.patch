@@ -1,0 +1,64 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 29 Jan 2003 21:05:37 +0100
+Subject: 012 man2html TH
+
+Accept troff macros in .TH line (closes: #180335).
+---
+ man2html/man2html.c | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index e418422..a6473f0 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -2102,21 +2102,46 @@ scan_request(char *c) {
+ 	case V('T','H'):
+ 	    if (!output_possible) {
+ 		sl = fill_words(c+j, wordlist, SIZE(wordlist), &words, 0);
++		/* 
++		 * fill_words changes `"' into `\a', 
++		 * remove all `\a' now
++		 * robert@debian.org, Jan 2003
++		 */
++		for (i=0; i<words; i++) {
++			if (wordlist[i][0] == '\a') {
++				char *tmp;
++				(wordlist[i])++;
++				if ((tmp = strchr(wordlist[i], '\a')))
++					*tmp = '\0';
++			}
++		}
+ 		*sl = 0;
+ 		if (words > 1) {
++		    char *t = NULL;
++		    char *s, *q;
++		    int skip=0;
+ 		    output_possible=1;
+ 		    printf(CONTENTTYPE DOCTYPE);
+ 		    out_html("<HTML><HEAD><TITLE>Man page of ");
+-		    out_html(wordlist[0]);
++		    scan_troff(wordlist[0], 0, &t);
++		    /* we need to remove all html tags */
++		    for (s=q=t; *s; s++) {
++	              if (skip && *s == '>') skip=0;
++		      else if (!skip && *s == '<') skip=1;
++		      else if (!skip) *q++ = *s;
++		    }
++		    *q = '\0';
++		    out_html(t);
++		    free(t);
+ 		    out_html("</TITLE>\n</HEAD><BODY>\n<H1>");
+-		    out_html(wordlist[0]);
++		    scan_troff(wordlist[0], 0, NULL);
+ 		    out_html("</H1>\nSection: ");
+ 		    if (words>4)
+-			out_html(wordlist[4]);
++		    	scan_troff(wordlist[4], 0, NULL);
+ 		    else
+ 			out_html(section_name(wordlist[1]));
+ 		    out_html(" (");
+-		    out_html(wordlist[1]);
++		    scan_troff(wordlist[1], 0, NULL);
+ 		    if (words>2) {
+ 			out_html(")<BR>Updated: ");
+ 			scan_troff(wordlist[2], 1, NULL);

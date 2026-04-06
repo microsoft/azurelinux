@@ -1,0 +1,23 @@
+--- a/Make.rules
++++ b/Make.rules
+@@ -8,6 +8,8 @@
+ ARCH3264 =
+ else ifeq ($(ARCH),aarch64)
+ ARCH3264 =
++else ifeq ($(ARCH),riscv64)
++ARCH3264 =
+ else ifeq ($(ARCH),arm)
+ ARCH3264 =
+ else
+@@ -55,6 +57,11 @@
+   LDFLAGS += --defsym=EFI_SUBSYSTEM=0x0a
+   FORMAT = -O binary
+ endif
++
++ifeq ($(ARCH),riscv64)
++  LDFLAGS += --defsym=EFI_SUBSYSTEM=0x0a
++  FORMAT = -O binary
++endif
+ 
+ %.efi: %.so
+ 	$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym \

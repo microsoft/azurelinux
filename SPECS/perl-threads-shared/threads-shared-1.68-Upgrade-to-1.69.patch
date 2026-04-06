@@ -1,0 +1,39 @@
+From 19d50c0cc8db9e17816d8f9ee2bc89968ec4ffc2 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 9 May 2024 16:16:42 +0200
+Subject: [PATCH] Upgrade to 1.69
+
+---
+ lib/threads/shared.pm | 2 +-
+ shared.xs             | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index 6e67acd..fef27ab 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.68'; # Please update the pod, too.
++our $VERSION = '1.69'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+diff --git a/shared.xs b/shared.xs
+index f78542d..938f963 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -697,7 +697,7 @@ Perl_sharedsv_cond_timedwait(perl_cond *cond, perl_mutex *mut, double abs)
+     struct timespec ts;
+     int got_it = 0;
+ 
+-    ts.tv_sec = (long)abs;
++    ts.tv_sec = (time_t)abs;
+     abs -= (NV)ts.tv_sec;
+     ts.tv_nsec = (long)(abs * 1000000000.0);
+ 
+-- 
+2.45.0
+

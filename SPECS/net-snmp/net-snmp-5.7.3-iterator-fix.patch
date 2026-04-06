@@ -1,0 +1,14 @@
+diff -urNp old/agent/mibgroup/host/data_access/swrun.c new/agent/mibgroup/host/data_access/swrun.c
+--- old/agent/mibgroup/host/data_access/swrun.c	2017-07-18 09:44:00.626109526 +0200
++++ new/agent/mibgroup/host/data_access/swrun.c	2017-07-19 15:27:50.452255836 +0200
+@@ -102,6 +102,10 @@ swrun_count_processes_by_name( char *nam
+         return 0;    /* or -1 */
+ 
+     it = CONTAINER_ITERATOR( swrun_container );
++    if((entry  = (netsnmp_swrun_entry*)ITERATOR_FIRST( it )) != NULL) {
++        if (0 == strcmp( entry->hrSWRunName, name ))
++            i++;
++    }
+     while ((entry = (netsnmp_swrun_entry*)ITERATOR_NEXT( it )) != NULL) {
+         if (0 == strcmp( entry->hrSWRunName, name ))
+             i++;

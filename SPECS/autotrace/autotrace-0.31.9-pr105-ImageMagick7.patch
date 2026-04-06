@@ -1,0 +1,364 @@
+From 73b2ddcac6b88157a241a35b498f07230bdd1868 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Thu, 12 Jan 2023 22:57:42 +0900
+Subject: [PATCH 1/8] Support ImageMagick 7
+
+* Detect IM7 at configure and define preprocesser macro when IM' is detected appropriately,
+  because with IM7 we have to change header path to include
+* Change header inclusion path for IM7
+* GetExceptionInfo is deprecated (at least) in 6.9.12, replace with AcquireExceptionInfo
+* InitializeMagick is deprecated (at least) in 6.9.12, it calls MagickCoreGenesis(path,MagickFalse) internally, so replace as such.
+* GetImageType should be replaced with IdentifyImageType
+* GetOnePixel should be replaced with GetOneAuthenticPixel.
+  GetOneAuthenticPixel returns Quantum array, which must be passed to ScaleQuantumToChar.
+---
+ configure.ac       |  6 +++++
+ src/input-magick.c | 62 ++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 58 insertions(+), 10 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f85d6e6..acaaa3d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -94,6 +94,12 @@ else
+     )
+   fi
+   if test "x${with_magick}" = xImageMagick; then
++      PKG_CHECK_MODULES([IMAGEMAGICK7],
++          [ImageMagick >= 7.0.1],
++	 [HAVE_IMAGEMAGICK7=yes
++	  AC_DEFINE(HAVE_IMAGEMAGICK7, 1, [ImageMagick version 7 or higher is available.])
++	 ],[]
++	)
+       PKG_CHECK_MODULES([IMAGEMAGICK],
+          [ImageMagick >= 5.2.1],
+ 	 [HAVE_MAGICK=yes
+diff --git a/src/input-magick.c b/src/input-magick.c
+index ccb9c12..d76e175 100644
+--- a/src/input-magick.c
++++ b/src/input-magick.c
+@@ -29,7 +29,11 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/types.h>          /* Needed for correct interpretation of magick/api.h */
++#ifdef HAVE_IMAGEMAGICK7
++#include <MagickCore/MagickCore.h>
++#else
+ #include <magick/api.h>
++#endif
+ 
+ static at_bitmap input_magick_reader(gchar * filename, at_input_opts_type * opts, at_msg_func msg_func, gpointer msg_data, gpointer user_data)
+ {
+@@ -37,24 +41,39 @@ static at_bitmap input_magick_reader(gchar * filename, at_input_opts_type * opts
+   ImageInfo *image_info;
+   ImageType image_type;
+   unsigned int i, j, point, np, runcount;
++  unsigned char red, green, blue;
+   at_bitmap bitmap;
++#if defined(HAVE_IMAGEMAGICK7)
++  Quantum q[MaxPixelChannels];
++#else
+   PixelPacket p;
+   PixelPacket *pixel = &p;
++#endif
++#if defined(HAVE_IMAGEMAGICK7)
++  ExceptionInfo *exception_ptr = AcquireExceptionInfo();
++  MagickCoreGenesis("", MagickFalse);
++#else
+   ExceptionInfo exception;
++  ExceptionInfo *exception_ptr = &exception;
+   InitializeMagick("");
+-  GetExceptionInfo(&exception);
++  GetExceptionInfo(exception_ptr);
++#endif
+   image_info = CloneImageInfo((ImageInfo *) NULL);
+   (void)strcpy(image_info->filename, filename);
+   image_info->antialias = 0;
+ 
+-  image = ReadImage(image_info, &exception);
++  image = ReadImage(image_info, exception_ptr);
+   if (image == (Image *) NULL) {
+     /* MagickError(exception.severity,exception.reason,exception.description); */
+     if (msg_func)
+-      msg_func(exception.reason, AT_MSG_FATAL, msg_data);
++      msg_func(exception_ptr->reason, AT_MSG_FATAL, msg_data);
+     goto cleanup;
+   }
+-  image_type = GetImageType(image, &exception);
++#if defined(HAVE_IMAGEMAGICK7)
++  image_type = IdentifyImageType(image, exception_ptr);
++#else
++  image_type = GetImageType(image, exception_ptr);
++#endif
+   if (image_type == BilevelType || image_type == GrayscaleType)
+     np = 1;
+   else
+@@ -68,34 +87,57 @@ static at_bitmap input_magick_reader(gchar * filename, at_input_opts_type * opts
+       ExceptionInfo exception;
+       p = AcquireOnePixel(image, i, j, &exception);
+ #elif defined(HAVE_IMAGEMAGICK)
++  #if defined(HAVE_IMAGEMAGICK7)
++      ClearMagickException(exception_ptr);
++      GetOneAuthenticPixel(image, i, j, q, exception_ptr);
++      red = ScaleQuantumToChar(q[RedPixelChannel]);
++      green = ScaleQuantumToChar(q[GreenPixelChannel]);
++      blue = ScaleQuantumToChar(q[BluePixelChannel]);
++  #else
+   #if ((MagickLibVersion < 0x0645) || (MagickLibVersion >= 0x0649))
+       p = GetOnePixel(image, i, j);
+   #else
+       GetOnePixel(image, i, j, pixel);
++  #endif
++      red = pixel->red;
++      green = pixel->green;
++      blue = pixel->blue;
+   #endif
+ #endif
+-      AT_BITMAP_BITS(&bitmap)[point++] = pixel->red;  /* if gray: red=green=blue */
++      AT_BITMAP_BITS(&bitmap)[point++] = red;  /* if gray: red=green=blue */
+       if (np == 3) {
+-        AT_BITMAP_BITS(&bitmap)[point++] = pixel->green;
+-        AT_BITMAP_BITS(&bitmap)[point++] = pixel->blue;
++        AT_BITMAP_BITS(&bitmap)[point++] = green;
++        AT_BITMAP_BITS(&bitmap)[point++] = blue;
+       }
+     }
+ 
+   DestroyImage(image);
+ cleanup:
+   DestroyImageInfo(image_info);
++#if defined(HAVE_IMAGEMAGICK7)
++  DestroyExceptionInfo(exception_ptr);
++#endif
+   return (bitmap);
+ }
+ 
+ int install_input_magick_readers(void)
+ {
+   size_t n = 0;
++#if defined(HAVE_IMAGEMAGICK7)
++  ExceptionInfo *exception_ptr = AcquireExceptionInfo();
++#else
+   ExceptionInfo exception;
++  ExceptionInfo *exception_ptr = &exception;
++#endif
+   MagickInfo *info;
+   const MagickInfo **infos;
++#if defined(HAVE_IMAGEMAGICK7)
++  MagickCoreGenesis("", MagickFalse);
++#else
+   InitializeMagick("");
+ 
+-  GetExceptionInfo(&exception);
++  GetExceptionInfo(exception_ptr);
++#endif
+ 
+ #ifdef HAVE_GRAPHICSMAGICK
+   info = GetMagickInfo("*", &exception);
+@@ -106,7 +148,7 @@ int install_input_magick_readers(void)
+     info = info->next;
+   }
+ #else
+-  infos = GetMagickInfoList("*", &n, &exception);
++  infos = GetMagickInfoList("*", &n, exception_ptr);
+   for (int i = 0; i < n; i++){
+     info = infos[i];
+     if (info->name && info->description)
+@@ -114,6 +156,6 @@ int install_input_magick_readers(void)
+   }
+ #endif // HAVE_GRAPHICSMAGICK
+ 
+-  DestroyExceptionInfo(&exception);
++  DestroyExceptionInfo(exception_ptr);
+   return 0;
+ }
+
+From 52a3775efd51cf2fdb54da6286a394230f01457b Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 18:36:34 +0100
+Subject: [PATCH 2/8] Fix GraphicsMagick
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ src/input-magick.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/input-magick.c b/src/input-magick.c
+index d76e175..efc45d4 100644
+--- a/src/input-magick.c
++++ b/src/input-magick.c
+@@ -86,6 +86,9 @@ static at_bitmap input_magick_reader(gchar * filename, at_input_opts_type * opts
+ #ifdef HAVE_GRAPHICSMAGICK
+       ExceptionInfo exception;
+       p = AcquireOnePixel(image, i, j, &exception);
++      red = pixel->red;
++      green = pixel->green;
++      blue = pixel->blue;
+ #elif defined(HAVE_IMAGEMAGICK)
+   #if defined(HAVE_IMAGEMAGICK7)
+       ClearMagickException(exception_ptr);
+
+From a25fb12948ec49d9717e5902b7219f1c24ee15e5 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:09:46 +0100
+Subject: [PATCH 3/8] Mention it runs ImageMagick 6
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index 8fa05bc..2dd0255 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -41,13 +41,13 @@ jobs:
+             make check
+         shell: bash
+ 
+-  build_with_latest_imagemagick:
++  build_with_latest_imagemagick_6:
+     runs-on: ubuntu-latest
+     steps:
+       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+       - uses: actions/checkout@v2
+       # Runs a single command using the runners shell
+-      - name: build and run tests package against ImageMagick only
++      - name: build and run tests package against ImageMagick 6 only
+         run: |
+             sudo apt update
+             sudo apt install -y libmagickcore-6.q16-dev libpng-dev libexiv2-dev libtiff-dev libjpeg-dev libxml2-dev libbz2-dev libfreetype6-dev libpstoedit-dev autoconf automake libtool intltool autopoint
+
+From ec78ba5174a614d40fc1f179eeb41da89c7b5308 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:18:20 +0100
+Subject: [PATCH 4/8] Enable Fedora 38
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index 2dd0255..a1e6e0c 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -56,6 +56,22 @@ jobs:
+             make
+             make check
+ 
++  build_with_latest_imagemagick_7:
++    runs-on: ubuntu-latest
++    container: fedora:38
++    steps:
++      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
++      - uses: actions/checkout@v2
++      # Runs a single command using the runners shell
++      - name: build and run tests package against ImageMagick 7 only
++        run: |
++            sudo dnf update
++            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make procps-ng pstoedit-devel 
++            ./autogen.sh
++            ./configure --enable-magick-readers
++            make
++            make check
++
+   build_with_latest_graphicsmagick:
+     runs-on: ubuntu-latest
+     steps:
+
+From 97d6c0b039ecf4fc55fff8ab62f9ab7e81943818 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:20:32 +0100
+Subject: [PATCH 5/8] wsp
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index a1e6e0c..4e7f609 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -66,7 +66,7 @@ jobs:
+       - name: build and run tests package against ImageMagick 7 only
+         run: |
+             sudo dnf update
+-            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make procps-ng pstoedit-devel 
++            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make procps-ng pstoedit-devel
+             ./autogen.sh
+             ./configure --enable-magick-readers
+             make
+
+From 63b8d9c5238226a89443f73cf630a641f6a2e138 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:21:33 +0100
+Subject: [PATCH 6/8] Use -y
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index 4e7f609..211b251 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -65,7 +65,7 @@ jobs:
+       # Runs a single command using the runners shell
+       - name: build and run tests package against ImageMagick 7 only
+         run: |
+-            sudo dnf update
++            sudo dnf update -y
+             sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make procps-ng pstoedit-devel
+             ./autogen.sh
+             ./configure --enable-magick-readers
+
+From cc8205ead703ef684fc79f34f5f324c54cebad0c Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:25:55 +0100
+Subject: [PATCH 7/8] Missing BR
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index 211b251..912fb92 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -66,7 +66,7 @@ jobs:
+       - name: build and run tests package against ImageMagick 7 only
+         run: |
+             sudo dnf update -y
+-            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make procps-ng pstoedit-devel
++            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make pkgconf-pkg-config procps-ng pstoedit-devel
+             ./autogen.sh
+             ./configure --enable-magick-readers
+             make
+
+From c26a2a059926c595a00839c8d9961e9381206579 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 16 Jan 2023 19:35:45 +0100
+Subject: [PATCH 8/8] More BR
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .github/workflows/linux_test.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.github/workflows/linux_test.yml b/.github/workflows/linux_test.yml
+index 912fb92..ce355f7 100644
+--- a/.github/workflows/linux_test.yml
++++ b/.github/workflows/linux_test.yml
+@@ -66,7 +66,7 @@ jobs:
+       - name: build and run tests package against ImageMagick 7 only
+         run: |
+             sudo dnf update -y
+-            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make pkgconf-pkg-config procps-ng pstoedit-devel
++            sudo dnf install -y ImageMagick-devel autoconf automake gcc gcc-c++ gettext-devel glib2-devel intltool libpng-devel libstdc++-devel libtiff-devel libtool make pkgconf-pkg-config procps-ng pstoedit-devel which
+             ./autogen.sh
+             ./configure --enable-magick-readers
+             make

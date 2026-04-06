@@ -1,0 +1,16 @@
+--- nfs-ganesha-3.5/src/config_samples/logrotate_ganesha.orig	2021-06-11 11:05:49.699522427 -0400
++++ nfs-ganesha-3.5/src/config_samples/logrotate_ganesha	2021-06-11 11:06:18.362010100 -0400
+@@ -1,4 +1,5 @@
+ /var/log/ganesha/ganesha.log {
++    su root root
+     weekly
+     rotate 52
+     copytruncate
+--- nfs-ganesha-3.5/src/config_samples/logrotate_fsal_gluster.orig	2021-06-11 11:05:59.857340860 -0400
++++ nfs-ganesha-3.5/src/config_samples/logrotate_fsal_gluster	2021-06-11 11:06:22.785931021 -0400
+@@ -1,4 +1,5 @@
+ /var/log/ganesha/ganesha-gfapi.log {
++    su root root
+     weekly
+     rotate 52
+     copytruncate

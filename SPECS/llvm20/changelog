@@ -1,0 +1,1013 @@
+* Mon Jul 28 2025 Paul Murphy <murp@redhat.com> - 20.1.8-3
+- Backport fix for pgo optimized rust toolchain on ppc64le (rhbz#2382683)
+- Backport fix for crbit spill miscompile on ppc64le power9 and power10 (rhbz#2383037)
+- Backport fix for build of highway package on ppc64le (rhbz#2383182)
+
+* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20.1.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Wed Jul 09 2025 Nikita Popov <npopov@redhat.com> - 20.1.8-1
+- Update to LLVM 20.1.8
+
+* Fri Jun 20 2025 Kashyap Chamarthy <kchamart@redhat.com> - 20.1.7-2
+- Add riscv64 enablement bits; thanks: Songsong Zhang
+   (U2FsdGVkX1@gmail.com) and David Abdurachmanov (davidlt@rivosinc.com)
+
+* Thu Jun 19 2025 Nikita Popov <npopov@redhat.com> - 20.1.7-1
+- Update to LLVM 20.1.7
+
+* Tue Jun 17 2025 Nikita Popov <npopov@redhat.com> - 20.1.6-10
+- Fix llvm-config alternatives handling (rhbz#2361779)
+
+* Mon Jun 16 2025 Nikita Popov <npopov@redhat.com> - 20.1.6-9
+- Use libdir suffix in versioned prefix
+
+* Tue Jun 10 2025 Nikita Popov <npopov@redhat.com> - 20.1.6-8
+- Invert symlink direction
+- Fix i686 multilib installation (rhbz#2365079)
+
+* Thu Jun 05 2025 Timm Bäder <tbaeder@redhat.com> - 20.1.6-7
+- Backport patch to fix rhbz#2363895
+
+* Wed Jun 04 2025 Python Maint <python-maint@redhat.com> - 20.1.6-6
+- Rebuilt for Python 3.14
+
+* Wed Jun 04 2025 Python Maint <python-maint@redhat.com> - 20.1.6-5
+- Bootstrap for Python 3.14
+
+* Wed Jun 04 2025 Python Maint <python-maint@redhat.com> - 20.1.6-4
+- Rebuilt for Python 3.14
+
+* Tue Jun 03 2025 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 20.1.6-3
+- Remove temporary changes on ppc64le
+
+* Tue Jun 03 2025 Python Maint <python-maint@redhat.com> - 20.1.6-2
+- Rebuilt for Python 3.14
+
+* Fri May 30 2025 Nikita Popov <npopov@redhat.com> - 20.1.6-1
+- Update to LLVM 20.1.6
+
+* Mon May 26 2025 Konrad Kleine <kkleine@redhat.com> - 20.1.5-2
+- Build with PGO
+
+* Thu May 22 2025 Nikita Popov <npopov@redhat.com> - 20.1.5-1
+- Update to LLVM 20.1.5
+
+* Tue May 06 2025 Tom Stellard <tstellar@redhat.com> - 20.1.4-6
+- Fix build on ppc64le with glibc >= 2.42
+
+* Tue May 06 2025 Nikita Popov <npopov@redhat.com> - 20.1.4-5
+- Update to LLVM 20.1.4
+
+* Sat Apr 26 2025 Tom Stellard <tstellar@redhat.com> - 20.1.3-2
+- Fix build with glibc >= 2.42
+
+* Thu Apr 17 2025 Nikita Popov <npopov@redhat.com> - 20.1.3-1
+- Update to LLVM 20.1.3
+
+* Fri Apr 04 2025 Tom Stellard <tstellar@redhat.com> - 20.1.2-5
+- Drop ARM and Mips targets on RHEL
+
+* Thu Apr 03 2025 Timm Bäder <tbaeder@redhat.com> - 20.1.2-4
+- Remove gpu-loader binaries
+
+* Thu Apr 03 2025 Nikita Popov <npopov@redhat.com> - 20.1.2-3
+- Update to LLVM 20.1.2
+
+* Tue Apr 01 2025 Miro Hrončok <mhroncok@redhat.com> - 20.1.1-2
+- Drop redundant runtime requirement on python3-setuptools from python3-lit
+
+* Wed Mar 19 2025 Nikita Popov <npopov@redhat.com> - 20.1.1-1
+- Update to LLVM 20.1.1
+
+* Tue Mar 18 2025 Nikita Popov <npopov@redhat.com> - 20.1.0-2
+- Move clang-scan-deps to clang package (rhbz#2353000)
+
+* Wed Mar 05 2025 Nikita Popov <npopov@redhat.com> - 20.1.0-1
+- Update to LLVM 20.1.0
+
+* Thu Feb 27 2025 Nikita Popov <npopov@redhat.com> - 20.1.0~rc3-1
+- Update to LLVM 20 rc 3
+
+* Tue Feb 25 2025 Nikita Popov <npopov@redhat.com> - 19.1.7-11
+- Add clang-devel -> llvm-devel dep (rhbz#2342979)
+
+* Thu Feb 20 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 19.1.7-10
+- Do not rely on alternatives path
+
+* Fri Feb 14 2025 Nikita Popov <npopov@redhat.com> - 19.1.7-9
+- Rename llvm-resource-filesystem -> llvm-filesystem
+
+* Wed Feb 12 2025 Nikita Popov <npopov@redhat.com> - 19.1.7-8
+- Backport bolt fix (rhbz#2344830)
+
+* Wed Feb 12 2025 Nikita Popov <npopov@redhat.com> - 19.1.7-7
+- Introduce llvm-resource-filesystem
+
+* Tue Feb 04 2025 Nikita Popov <npopov@redhat.com> - 19.1.7-6
+- Don't use directory symlinks
+
+* Fri Jan 31 2025 Konrad Kleine <kkleine@redhat.com> - 19.1.7-5
+- Address installability issue with directories that were turned into symlinks
+
+* Thu Jan 30 2025 Josh Stone <jistone@redhat.com> - 19.1.7-4
+- Fix an isel error triggered by Rust 1.85 on s390x
+
+* Wed Jan 22 2025 Konrad Kleine <kkleine@redhat.com> - 19.1.7-3
+- Add polly
+
+* Mon Jan 20 2025 Konrad Kleine <kkleine@redhat.com> - 19.1.7-2
+- Add bolt
+
+* Mon Jan 20 2025 Timm Bäder <tbaeder@redhat.com> - 19.1.7-1
+- Update to 19.1.7
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 19.1.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Tue Dec 24 2024 Konrad Kleine <kkleine@redhat.com> - 19.1.6-3
+- Add libcxx
+
+* Thu Dec 19 2024 Nikita Popov <npopov@redhat.com> - 19.1.6-2
+- Fix mlir exports
+
+* Wed Dec 18 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.6-1
+- Update to 19.1.6
+
+* Fri Dec 06 2024 Konrad Kleine <kkleine@redhat.com> - 19.1.5-3
+- Fix mlir and openmp tests
+- Disable libomp tests on s390x RHEL entirely.
+
+* Wed Dec 04 2024 Konrad Kleine <kkleine@redhat.com> - 19.1.5-2
+- Add mlir
+
+* Tue Dec 03 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.5-1
+- Update to 19.1.5
+
+* Tue Nov 26 2024 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 19.1.4-2
+- Enable LLVM_ENABLE_ZSTD (rhbz#2321848)
+
+* Thu Nov 21 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.4-1
+- Update to 19.1.4
+
+* Tue Nov 19 2024 Konrad Kleine <kkleine@redhat.com> - 19.1.3-4
+- Remove HTML documentation
+- Add lldb man pages
+
+* Mon Nov 18 2024 Josh Stone <jistone@redhat.com> - 19.1.3-3
+- Fix profiling after a binutils NOTE change (rhbz#2322754)
+
+* Mon Nov 18 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.3-2
+- Install i386 config files on x86_64
+
+* Tue Nov 05 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.3-1
+- Update to 19.1.3
+
+* Tue Sep 24 2024 Maxwell G <maxwell@gtmx.me> - 19.1.0-2
+- Add 'Provides: clangd' to the clang-tools-extra subpackage
+
+* Thu Sep 19 2024 Timm Bäder <tbaeder@redhat.com> - 19.1.0-1
+- Update to LLVM 19.1.0
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 18.1.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 11 2024 Jesus Checa Hidalgo <jchecahi@redhat.com> - 18.1.8-1
+- Update to LLVM 18.1.8
+
+* Fri Jun 07 2024 Tom Stellard <tstellar@redhat.com> - 18.1.7-1
+- 18.1.7 Release
+
+* Tue May 28 2024 Nikita Popov <npopov@redhat.com> - 18.1.6-2
+- Fix use after free on ppc64le (rhbz#2283525)
+
+* Sat May 18 2024 Tom Stellard <tstellar@redhat.com> - 18.1.6-1
+- 18.1.6 Release
+
+* Tue May 14 2024 Tom Stellard <tstellar@redhat.com> - 18.1.3-2
+- Backport fix for rhbz#2275090
+
+* Thu Apr 25 2024 Tom Stellard <tstellar@redhat.com> - 18.1.4-1
+- 18.1.4 Release
+
+* Fri Apr 12 2024 Tom Stellard <tstellar@redhat.com> - 18.1.3-1
+- 18.1.3 Release
+
+* Thu Mar 21 2024 Zhengyu He <hezhy472013@gmail.com> - 18.1.2-2
+- Add support for riscv64
+
+* Thu Mar 21 2024 Tom Stellard <tstellar@redhat.com> - 18.1.2-1
+- 18.1.2 Release
+
+* Mon Mar 11 2024 Tom Stellard <tstellar@redhat.com> - 18.1.1-1
+- 18.1.1 Release
+
+* Tue Feb 27 2024 Tom Stellard <tstellar@redhat.com> - 18.1.0~rc4-1
+- 18.1.0-rc4 Release
+
+* Tue Feb 20 2024 Tom Stellard <tstellar@redhat.com> - 18.1.0~rc3-1
+- 18.1.0-rc3 Release
+
+* Thu Feb 01 2024 Nikita Popov <npopov@redhat.com> - 17.0.6-6
+- Fix crash with -fzero-call-used-regs (rhbz#2262260)
+
+* Mon Jan 29 2024 Nikita Popov <npopov@redhat.com> - 17.0.6-5
+- Only use cet-report=error on x86_64
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 17.0.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 17.0.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov 30 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.6-2
+- Fix rhbz #2248872
+
+* Tue Nov 28 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.6-1
+- Update to LLVM 17.0.6
+
+* Tue Nov 14 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.5-1
+- Update to LLVM 17.0.5
+
+* Tue Oct 31 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.4-1
+- Update to LLVM 17.0.4
+
+* Tue Oct 17 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.3-1
+- Update to LLVM 17.0.3
+
+* Tue Oct 03 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.2-1
+- Update to LLVM 17.0.2
+
+* Fri Sep 22 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.1~rc4-1
+- Update to LLVM 17.0.1
+
+* Tue Sep 05 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc4-1
+- Update to LLVM 17.0.0 RC4
+
+* Thu Aug 24 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc3-1
+- Update to LLVM 17.0.0 RC3
+
+* Thu Aug 24 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc2-2
+- Temporarily disable a failing test on ppc64le
+
+* Thu Aug 17 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc2-1
+- Update to LLVM 17.0.0 RC2
+
+* Wed Aug 16 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc1-4
+- Disable LTO on i686
+
+* Mon Aug 14 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc1-3
+- Re-add patch removed by mistake
+
+* Tue Aug 01 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc1-2
+- Enable LLVM_UNREACHABLE_OPTIMIZE temporarily
+
+* Mon Jul 31 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 17.0.0~rc1-1
+- Update to LLVM 17.0.0 RC1
+
+* Mon Jul 31 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.6-6
+- Fix rhbz #2224885
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 16.0.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 10 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.6-4
+- Use LLVM_UNITTEST_LINK_FLAGS to reduce link times for unit tests
+
+* Mon Jul 03 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.6-3
+- Improve error messages for unsupported relocs on s390x (rhbz#2216906)
+- Disable LLVM_UNREACHABLE_OPTIMIZE
+
+* Wed Jun 14 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.6-1
+- Update to LLVM 16.0.6
+
+* Fri Jun 09 2023 Nikita Popov <npopov@redhat.com> - 16.0.5-2
+- Split off llvm-cmake-utils package
+
+* Mon Jun 05 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.5-1
+- Update to LLVM 16.0.5
+
+* Fri May 19 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 16.0.4-2
+- Avoid recommonmark dependency in RHEL builds
+
+* Thu May 18 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.4-1
+- Update to LLVM 16.0.4
+
+* Tue May 09 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.3-1
+- Update to LLVM 16.0.3
+
+* Tue Apr 25 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.2-1
+- Update to LLVM 16.0.2
+
+* Tue Apr 11 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.1-1
+- Update to LLVM 16.0.1
+
+* Thu Mar 23 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0-2
+- Distribute libllvm_gtest.a and libllvm_gtest_main.a with llvm-googletest
+- Stop distributing /usr/share/llvm/src/utils
+
+* Mon Mar 20 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0-1
+- Update to LLVM 16.0.0
+
+* Thu Mar 16 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0~rc4-2
+- Fix the ppc64le triple
+
+* Tue Mar 14 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0~rc4-1
+- Update to LLVM 16.0.0 RC4
+
+* Fri Mar 10 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0~rc3-2
+- Fix llvm-exegesis failures on s390x
+
+* Wed Feb 22 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0~rc3-1
+- Update to LLVM 16.0.0 RC3
+
+* Wed Feb 01 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 16.0.0~rc1-1
+- Update to LLVM 16.0.0 RC1
+
+* Thu Jan 19 2023 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 15.0.7-3
+- Update license to SPDX identifiers.
+- Include the Apache license adopted in 2019.
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 15.0.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 12 2023 Nikita Popov <npopov@redhat.com> - 15.0.7-1
+- Update to LLVM 15.0.7
+
+* Mon Jan 09 2023 Tom Stellard <tstellar@redhat.com> - 15.0.6-3
+- Omit frame pointers when building
+
+* Mon Dec 19 2022 Nikita Popov <npopov@redhat.com> - 15.0.6-2
+- Remove workaround for rbhz#2048440
+
+* Mon Dec 05 2022 Nikita Popov <npopov@redhat.com> - 15.0.6-1
+- Update to LLVM 15.0.6
+
+* Fri Nov 11 2022 Nikita Popov <npopov@redhat.com> - 15.0.4-2
+- Copy CFLAGS to ASMFLAGs to enable CET in asm files
+
+* Wed Nov 02 2022 Nikita Popov <npopov@redhat.com> - 15.0.4-1
+- Update to LLVM 15.0.4
+
+* Tue Sep 27 2022 Nikita Popov <npopov@redhat.com> - 15.0.0-2
+- Export GetHostTriple.cmake
+
+* Tue Sep 06 2022 Nikita Popov <npopov@redhat.com> - 15.0.0-1
+- Update to LLVM 15.0.0
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 14.0.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 17 2022 Timm Bäder <tbaeder@redhat.com> - 14.0.5-2
+- Release bump for new redhat-rpm-config
+
+* Mon Jun 13 2022 Timm Bäder <tbaeder@redhat.com> - 14.0.5-1
+- 14.0.5 Release
+
+* Wed May 18 2022 Tom Stellard <tstellar@redhat.com> - 14.0.3-1
+- 14.0.3 Release
+
+* Fri Apr 29 2022 Timm Bäder <tbaeder@redhat.com> - 14.0.0-2
+- Remove llvm-cmake-devel package
+
+* Wed Mar 23 2022 Timm Bäder <tbaeder@redhat.com> - 14.0.0-1
+- Update to LLVM 14.0.0
+
+* Wed Feb 02 2022 Nikita Popov <npopov@redhat.com> - 13.0.1-1
+- Update to LLVM 13.0.1 final
+
+* Tue Jan 25 2022 Nikita Popov <npopov@redhat.com> - 13.0.1~rc3-1
+- Update to LLVM 13.0.1rc3
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 13.0.1~rc2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 13 2022 Nikita Popov <npopov@redhat.com> - 13.0.1~rc2-1
+- Update to LLVM 13.0.1rc2
+
+* Mon Jan 10 2022 Nikita Popov <npopov@redhat.com> - 13.0.1~rc1-1
+- Upstream 13.0.1 rc1 release
+
+* Sat Jan 08 2022 Miro Hrončok <mhroncok@redhat.com> - 13.0.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Changes/LIBFFI34
+
+* Thu Nov 11 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-7
+- Enable lto on s390x and arm
+
+* Mon Oct 25 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-6
+- Build with Thin LTO
+
+* Mon Oct 18 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-5
+- Build with clang
+
+* Fri Oct 08 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-4
+- Fix default triple on arm
+
+* Wed Oct 06 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-3
+- Set default triple
+
+* Mon Oct 04 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-2
+- Drop abi_revision from soname
+
+* Thu Sep 30 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0-1
+- 13.0.0 Release
+
+* Thu Sep 30 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0~rc4-2
+- Restore config.guess for host triple detection
+
+* Fri Sep 24 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0~rc4-1
+- 13.0.0-rc4 Release
+
+* Fri Sep 17 2021 Tom Stellard <tstellar@redhta.com> - 13.0.0~rc3-1
+- 13.0.0-rc3 Release
+
+* Mon Sep 13 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0~rc1-3
+- Pass LLVM_DEFAULT_TARGET_TRIPLE to cmake
+
+* Mon Sep 13 2021 Konrad Kleine <kkleine@redhat.com> - 13.0.0~rc1-2
+- Add --without=check option
+
+* Wed Aug 04 2021 Tom Stellard <tstellar@redhat.com> - 13.0.0~rc1-1
+- 13.0.0-rc1 Release
+
+* Thu Jul 22 2021 sguelton@redhat.com - 12.0.1-3
+- Maintain versionned link to llvm-config
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 12 2021 Tom Stellard <tstellar@redhat.com> - 12.0.1-1
+- 12.0.1 Release
+
+* Wed Jun 30 2021 Tom Stellard <tstellar@redhat.com> - llvm-12.0.1~rc3-1
+- 12.0.1-rc3 Release
+
+* Fri May 28 2021 Tom Stellard <tstellar@redhat.com> - 12.0.1~rc1-2
+- Stop installing lit tests
+
+* Wed May 26 2021 Tom Stellard <tstellar@redhat.com> - llvm-12.0.1~rc1-1
+- 12.0.1-rc1 Release
+
+* Mon May 17 2021 sguelton@redhat.com - 12.0.0-7
+- Fix handling of llvm-config
+
+* Mon May 03 2021 kkleine@redhat.com - 12.0.0-6
+- More verbose builds thanks to python3-psutil
+
+* Sat May 01 2021 sguelton@redhat.com - 12.0.0-5
+- Fix llvm-config install
+
+* Tue Apr 27 2021 sguelton@redhat.com - 12.0.0-4
+- Provide default empty value for exec_suffix when not in compat mode
+
+* Tue Apr 27 2021 sguelton@redhat.com - 12.0.0-3
+- Fix llvm-config install
+
+* Tue Apr 20 2021 sguelton@redhat.com - 12.0.0-2
+- Backport compat package fix
+
+* Thu Apr 15 2021 Tom Stellard <tstellar@redhat.com> - 12.0.0-1
+- 12.0.0 Release
+
+* Thu Apr 08 2021 sguelton@redhat.com - 12.0.0-0.11.rc5
+- New upstream release candidate
+
+* Tue Apr 06 2021 sguelton@redhat.com - 12.0.0-0.10.rc4
+- Patch test case for compatibility with llvm-test latout
+
+* Fri Apr 02 2021 sguelton@redhat.com - 12.0.0-0.9.rc4
+- New upstream release candidate
+
+* Wed Mar 31 2021 Jonathan Wakely <jwakely@redhat.com> - 12.0.0-0.8.rc3
+- Rebuilt for removed libstdc++ symbols (#1937698)
+
+* Thu Mar 11 2021 sguelton@redhat.com - 12.0.0-0.7.rc3
+- LLVM 12.0.0 rc3
+
+* Wed Mar 10 2021 Kalev Lember <klember@redhat.com> - 12.0.0-0.6.rc2
+- Add llvm-static(major) provides to the -static subpackage
+
+* Tue Mar 09 2021 sguelton@redhat.com - 12.0.0-0.5.rc2
+- rebuilt
+
+* Tue Mar 02 2021 sguelton@redhat.com - 12.0.0-0.4.rc2
+- Change CI working dir
+
+* Wed Feb 24 2021 sguelton@redhat.com - 12.0.0-0.3.rc2
+- 12.0.0-rc2 release
+
+* Tue Feb 16 2021 Dave Airlie <airlied@redhat.com> - 12.0.0-0.2.rc1
+- Enable LLVM_USE_PERF to allow perf integration
+
+* Tue Feb 2 2021 Serge Guelton - 12.0.0-0.1.rc1
+- 12.0.0-rc1 release
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 11.1.0-0.3.rc2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 22 2021 Serge Guelton - 11.1.0-0.2.rc2
+- 11.1.0-rc2 release
+
+* Thu Jan 14 2021 Serge Guelton - 11.1.0-0.1.rc1
+- 11.1.0-rc1 release
+
+* Tue Jan 05 2021 Serge Guelton - 11.0.1-3.rc2
+- Waive extra test case
+
+* Sun Dec 20 2020 sguelton@redhat.com - 11.0.1-2.rc2
+- 11.0.1-rc2 release
+
+* Tue Dec 01 2020 sguelton@redhat.com - 11.0.1-1.rc1
+- 11.0.1-rc1 release
+
+* Sat Oct 31 2020 Jeff Law <law@redhat.com> - 11.0.0-2
+- Fix missing #include for gcc-11
+
+* Wed Oct 14 2020 Josh Stone <jistone@redhat.com> - 11.0.0-1
+- Fix coreos-installer test crash on s390x (rhbz#1883457)
+
+* Mon Oct 12 2020 sguelton@redhat.com - 11.0.0-0.11
+- llvm 11.0.0 - final release
+
+* Thu Oct 08 2020 sguelton@redhat.com - 11.0.0-0.10.rc6
+- 11.0.0-rc6
+
+* Fri Oct 02 2020 sguelton@redhat.com - 11.0.0-0.9.rc5
+- 11.0.0-rc5 Release
+
+* Sun Sep 27 2020 sguelton@redhat.com - 11.0.0-0.8.rc3
+- Fix NVR
+
+* Thu Sep 24 2020 sguelton@redhat.com - 11.0.0-0.2.rc3
+- Obsolete patch for rhbz#1862012
+
+* Thu Sep 24 2020 sguelton@redhat.com - 11.0.0-0.1.rc3
+- 11.0.0-rc3 Release
+
+* Wed Sep 02 2020 sguelton@redhat.com - 11.0.0-0.7.rc2
+- Apply upstream patch for rhbz#1862012
+
+* Tue Sep 01 2020 sguelton@redhat.com - 11.0.0-0.6.rc2
+- Fix source location
+
+* Fri Aug 21 2020 Tom Stellard <tstellar@redhat.com> - 11.0.0-0.5.rc2
+- 11.0.0-rc2 Release
+
+* Wed Aug 19 2020 Tom Stellard <tstellar@redhat.com> - 11.0.0-0.4.rc1
+- Fix regression-tests CI tests
+
+* Tue Aug 18 2020 Tom Stellard <tstellar@redhat.com> - 11.0.0-0.3.rc1
+- Fix rust crash on ppc64le compiling firefox
+- rhbz#1862012
+
+* Tue Aug 11 2020 Tom Stellard <tstellar@redhat.com> - 11.0.0-0.2.rc1
+- Install update_cc_test_checks.py script
+
+* Thu Aug 06 2020 Tom Stellard <tstellar@redhat.com> - 11.0.0-0.1-rc1
+- LLVM 11.0.0-rc1 Release
+- Make llvm-devel require llvm-static and llvm-test
+
+* Tue Aug 04 2020 Tom Stellard <tstellar@redhat.com> - 10.0.0-10
+- Backport upstream patch to fix build with -flto.
+- Disable LTO on s390x to work-around unit test failures.
+
+* Sat Aug 01 2020 sguelton@redhat.com - 10.0.0-9
+- Fix update-alternative uninstall script
+
+* Sat Aug 01 2020 sguelton@redhat.com - 10.0.0-8
+- Fix gpg verification and update macro usage.
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.0.0-7
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+* Thu Jun 11 2020 sguelton@redhat.com - 10.0.0-5
+- Make llvm-test.tar.gz creation reproducible.
+
+* Tue Jun 02 2020 sguelton@redhat.com - 10.0.0-4
+- Instruct cmake not to generate RPATH
+
+* Thu Apr 30 2020 Tom Stellard <tstellar@redhat.com> - 10.0.0-3
+- Install LLVMgold.so symlink in bfd-plugins directory
+
+* Tue Apr 07 2020 sguelton@redhat.com - 10.0.0-2
+- Do not package UpdateTestChecks tests in llvm-tests
+- Apply upstream patch bab5908df to pass gating tests
+
+* Wed Mar 25 2020 sguelton@redhat.com - 10.0.0-1
+- 10.0.0 final
+
+* Mon Mar 23 2020 sguelton@redhat.com - 10.0.0-0.6.rc6
+- 10.0.0 rc6
+
+* Thu Mar 19 2020 sguelton@redhat.com - 10.0.0-0.5.rc5
+- 10.0.0 rc5
+
+* Sat Mar 14 2020 sguelton@redhat.com - 10.0.0-0.4.rc4
+- 10.0.0 rc4
+
+* Thu Mar 05 2020 sguelton@redhat.com - 10.0.0-0.3.rc3
+- 10.0.0 rc3
+
+* Fri Feb 28 2020 sguelton@redhat.com - 10.0.0-0.2.rc2
+- Remove *_finite support, see rhbz#1803203
+
+* Fri Feb 14 2020 sguelton@redhat.com - 10.0.0-0.1.rc2
+- 10.0.0 rc2
+
+* Fri Jan 31 2020 sguelton@redhat.com - 10.0.0-0.1.rc1
+- 10.0.0 rc1
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 9.0.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Tue Jan 21 2020 Tom Stellard <tstellar@redhat.com> - 9.0.1-4
+- Rebuild after previous build failed to strip binaries
+
+* Fri Jan 17 2020 Tom Stellard <tstellar@redhat.com> - 9.0.1-3
+- Add explicit Requires from sub-packages to llvm-libs
+
+* Fri Jan 10 2020 Tom Stellard <tstellar@redhat.com> - 9.0.1-2
+- Fix crash with kernel bpf self-tests
+
+* Thu Dec 19 2019 tstellar@redhat.com - 9.0.1-1
+- 9.0.1 Release
+
+* Mon Nov 25 2019 sguelton@redhat.com - 9.0.0-4
+- Activate AVR on all architectures
+
+* Mon Sep 30 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-3
+- Build libLLVM.so first to avoid OOM errors
+
+* Fri Sep 27 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-2
+- Remove unneeded BuildRequires: libstdc++-static
+
+* Thu Sep 19 2019 sguelton@redhat.com - 9.0.0-1
+- 9.0.0 Release
+
+* Wed Sep 18 2019 sguelton@redhat.com - 9.0.0-0.5.rc3
+- Support avr target, see rhbz#1718492
+
+* Tue Sep 10 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-0.4.rc3
+- Split out test executables into their own export file
+
+* Fri Sep 06 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-0.3.rc3
+- Fix patch for splitting out static library exports
+
+* Fri Aug 30 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-0.2.rc3
+- 9.0.0-rc3 Release
+
+* Thu Aug 01 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-0.1.rc2
+- 9.0.0-rc2 Release
+
+* Tue Jul 30 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-9
+- Sync with llvm8.0 spec file
+
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.0-8.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Wed Jul 17 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-8
+- Add provides for the major version of sub-packages
+
+* Fri May 17 2019 sguelton@redhat.com - 8.0.0-7
+- Fix conflicts between llvm-static = 8 and llvm-dev < 8 around LLVMStaticExports.cmake
+
+* Wed Apr 24 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-6
+- Make sure we aren't passing -g on s390x
+
+* Sat Mar 30 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-5
+- Enable build rpath while keeping install rpath disabled
+
+* Wed Mar 27 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-4
+- Backport r351577 from trunk to fix ninja check failures
+
+* Tue Mar 26 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-3
+- Fix ninja check
+
+* Fri Mar 22 2019 Tom Stellard <tstellar@redhat.com> - 8.0.0-2
+- llvm-test fixes
+
+* Wed Mar 20 2019 sguelton@redhat.com - 8.0.0-1
+- 8.0.0 final
+
+* Fri Mar 15 2019 sguelton@redhat.com - 8.0.0-0.6.rc4
+- Activate all backends (rhbz#1689031)
+
+* Tue Mar 12 2019 sguelton@redhat.com - 8.0.0-0.5.rc4
+- 8.0.0 Release candidate 4
+
+* Mon Mar 4 2019 sguelton@redhat.com - 8.0.0-0.4.rc3
+- Move some binaries to -test package, cleanup specfile
+
+* Mon Mar 4 2019 sguelton@redhat.com - 8.0.0-0.3.rc3
+- 8.0.0 Release candidate 3
+
+* Fri Feb 22 2019 sguelton@redhat.com - 8.0.0-0.2.rc2
+- 8.0.0 Release candidate 2
+
+* Sat Feb 9 2019 sguelton@redhat.com - 8.0.0-0.1.rc1
+- 8.0.0 Release candidate 1
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.1-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Mon Jan 21 2019 Josh Stone <jistone@redhat.com> - 7.0.1-2
+- Fix discriminators in metadata, rhbz#1668033
+
+* Mon Dec 17 2018 sguelton@redhat.com - 7.0.1-1
+- 7.0.1 release
+
+* Tue Dec 04 2018 sguelton@redhat.com - 7.0.0-5
+- Ensure rpmlint passes on specfile
+
+* Sat Nov 17 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-4
+- Install testing libraries for unittests
+
+* Sat Oct 27 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-3
+- Fix running unittests as not-root user
+
+* Thu Sep 27 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-2
+- Fixes for llvm-test package:
+- Add some missing Requires
+- Add --threads option to run-lit-tests script
+- Set PATH so lit can find tools like count, not, etc.
+- Don't hardcode tools directory to /usr/lib64/llvm
+- Fix typo in yaml-bench define
+- Only print information about failing tests
+
+* Fri Sep 21 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-1
+- 7.0.0 Release
+
+* Thu Sep 13 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.15.rc3
+- Disable rpath on install LLVM and related sub-projects
+
+* Wed Sep 12 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.14.rc3
+- Remove rpath from executables and libraries
+
+* Tue Sep 11 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.13.rc3
+- Re-enable arm and aarch64 targets on x86_64
+
+* Mon Sep 10 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.12.rc3
+- 7.0.0-rc3 Release
+
+* Fri Sep 07 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.11.rc2
+- Use python3 shebang for opt-viewewr scripts
+
+* Thu Aug 30 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.10.rc2
+- Drop all uses of python2 from lit tests
+
+* Thu Aug 30 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.9.rc2
+- Build the gold plugin on all supported architectures
+
+* Wed Aug 29 2018 Kevin Fenzi <kevin@scrye.com> - 7.0.0-0.8.rc2
+- Re-enable debuginfo to avoid 25x size increase.
+
+* Tue Aug 28 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.7.rc2
+- 7.0.0-rc2 Release
+
+* Tue Aug 28 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.6.rc1
+- Guard valgrind usage with valgrind_arches macro
+
+* Thu Aug 23 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.5.rc1
+- Package lit tests and googletest sources.
+
+* Mon Aug 20 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.4.rc1
+- Re-enable AMDGPU target on ARM rhbz#1618922
+
+* Mon Aug 13 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.3.rc1
+- Drop references to TestPlugin.so from cmake files
+
+* Fri Aug 10 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.2.rc1
+- Fixes for lit tests
+
+* Fri Aug 10 2018 Tom Stellard <tstellar@redhat.com> - 7.0.0-0.1.rc1
+- 7.0.0-rc1 Release
+- Reduce number of enabled targets on all arches.
+- Drop s390 detection patch, LLVM does not support s390 codegen.
+
+* Mon Aug 06 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-6
+- Backport some fixes needed by mesa and rust
+
+* Thu Jul 26 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-5
+- Move libLLVM-6.0.so to llvm6.0-libs.
+
+* Mon Jul 23 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-4
+- Rebuild because debuginfo stripping failed with the previous build
+
+* Fri Jul 13 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-3
+- Sync specfile with llvm6.0 package
+
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Mon Jun 25 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-1
+- 6.0.1 Release
+
+* Thu Jun 07 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-0.4.rc2
+- 6.0.1-rc2
+
+* Wed Jun 06 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-0.3.rc1
+- Re-enable all targets to avoid breaking the ABI.
+
+* Mon Jun 04 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-0.2.rc1
+- Reduce the number of enabled targets based on the architecture
+
+* Thu May 10 2018 Tom Stellard <tstellar@redhat.com> - 6.0.1-0.1.rc1
+- 6.0.1 rc1
+
+* Tue Mar 27 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-11
+- Re-enable arm tests that used to hang
+
+* Thu Mar 22 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-10
+- Fix testcase in backported patch
+
+* Tue Mar 20 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-9
+- Prevent external projects from linking against both static and shared
+  libraries.  rhbz#1558657
+
+* Mon Mar 19 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-8
+- Backport r327651 from trunk rhbz#1554349
+
+* Fri Mar 16 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-7
+- Filter out cxxflags and cflags from llvm-config that aren't supported by clang
+- rhbz#1556980
+
+* Wed Mar 14 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-6
+- Enable symbol versioning in libLLVM.so
+
+* Wed Mar 14 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-5
+- Stop statically linking libstdc++.  This is no longer required by Steam
+  client, but the steam installer still needs a work-around which should
+  be handled in the steam package.
+* Wed Mar 14 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-4
+- s/make check/ninja check/
+
+* Fri Mar 09 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-3
+- Backport fix for compile time regression on rust rhbz#1552915
+
+* Thu Mar 08 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-2
+- Build with Ninja: This reduces RPM build time on a 6-core x86_64 builder
+  from 82 min to 52 min.
+
+* Thu Mar 08 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-1
+- 6.0.0 Release
+
+* Thu Mar 08 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-0.5.rc2
+- Reduce debuginfo size on i686 to avoid OOM errors during linking
+
+* Fri Feb 09 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-0.4.rc2
+- 6.0.1 rc2
+
+* Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 6.0.0-0.3.rc1
+- Escape macros in %%changelog
+
+* Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-0.2.rc1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Fri Jan 19 2018 Tom Stellard <tstellar@redhat.com> - 6.0.0-0.1.rc1
+- 6.0.1 rc1
+
+* Tue Dec 19 2017 Tom Stellard <tstellar@redhat.com> - 5.0.1-1
+- 5.0.1 Release
+
+* Mon Nov 20 2017 Tom Stellard <tstellar@redhat.com> - 5.0.0-5
+- Backport debuginfo fix for rust
+
+* Fri Nov 03 2017 Tom Stellard <tstellar@redhat.com> - 5.0.0-4
+- Reduce debuginfo size for ARM
+
+* Tue Oct 10 2017 Tom Stellard <tstellar@redhat.com> - 5.0.0-2
+- Reduce memory usage on ARM by disabling debuginfo and some non-ARM targets.
+
+* Mon Sep 25 2017 Tom Stellard <tstellar@redhat.com> - 5.0.0-1
+- 5.0.0 Release
+
+* Mon Sep 18 2017 Tom Stellard <tstellar@redhat.com> - 4.0.1-6
+- Add Requires: libedit-devel for llvm-devel
+
+* Fri Sep 08 2017 Tom Stellard <tstellar@redhat.com> - 4.0.1-5
+- Enable libedit backend for LineEditor API
+
+* Fri Aug 25 2017 Tom Stellard <tstellar@redhat.com> - 4.0.1-4
+- Enable extra functionality when run the LLVM JIT under valgrind.
+
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Wed Jun 21 2017 Tom Stellard <tstellar@redhat.com> - 4.0.1-1
+- 4.0.1 Release
+
+* Thu Jun 15 2017 Tom Stellard <tstellar@redhat.com> - 4.0.0-6
+- Install llvm utils
+
+* Thu Jun 08 2017 Tom Stellard <tstellar@redhat.com> - 4.0.0-5
+- Fix docs-llvm-man target
+
+* Mon May 01 2017 Tom Stellard <tstellar@redhat.com> - 4.0.0-4
+- Make cmake files no longer depend on static libs (rhbz 1388200)
+
+* Tue Apr 18 2017 Josh Stone <jistone@redhat.com> - 4.0.0-3
+- Fix computeKnownBits for ARMISD::CMOV (rust-lang/llvm#67)
+
+* Mon Apr 03 2017 Tom Stellard <tstellar@redhat.com> - 4.0.0-2
+- Simplify spec with rpm macros.
+
+* Thu Mar 23 2017 Tom Stellard <tstellar@redhat.com> - 4.0.0-1
+- LLVM 4.0.0 Final Release
+
+* Wed Mar 22 2017 tstellar@redhat.com - 3.9.1-6
+- Fix %%postun sep for -devel package.
+
+* Mon Mar 13 2017 Tom Stellard <tstellar@redhat.com> - 3.9.1-5
+- Disable failing tests on ARM.
+
+* Sun Mar 12 2017 Peter Robinson <pbrobinson@fedoraproject.org> 3.9.1-4
+- Fix missing mask on relocation for aarch64 (rhbz 1429050)
+
+* Wed Mar 01 2017 Dave Airlie <airlied@redhat.com> - 3.9.1-3
+- revert upstream radeonsi breaking change.
+
+* Thu Feb 23 2017 Josh Stone <jistone@redhat.com> - 3.9.1-2
+- disable sphinx warnings-as-errors
+
+* Fri Feb 10 2017 Orion Poplawski <orion@cora.nwra.com> - 3.9.1-1
+- llvm 3.9.1
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Tue Nov 29 2016 Josh Stone <jistone@redhat.com> - 3.9.0-7
+- Apply backports from rust-lang/llvm#55, #57
+
+* Tue Nov 01 2016 Dave Airlie <airlied@gmail.com - 3.9.0-6
+- rebuild for new arches
+
+* Wed Oct 26 2016 Dave Airlie <airlied@redhat.com> - 3.9.0-5
+- apply the patch from -4
+
+* Wed Oct 26 2016 Dave Airlie <airlied@redhat.com> - 3.9.0-4
+- add fix for lldb out-of-tree build
+
+* Mon Oct 17 2016 Josh Stone <jistone@redhat.com> - 3.9.0-3
+- Apply backports from rust-lang/llvm#47, #48, #53, #54
+
+* Sat Oct 15 2016 Josh Stone <jistone@redhat.com> - 3.9.0-2
+- Apply an InstCombine backport via rust-lang/llvm#51
+
+* Wed Sep 07 2016 Dave Airlie <airlied@redhat.com> - 3.9.0-1
+- llvm 3.9.0
+- upstream moved where cmake files are packaged.
+- upstream dropped CppBackend
+
+* Wed Jul 13 2016 Adam Jackson <ajax@redhat.com> - 3.8.1-1
+- llvm 3.8.1
+- Add mips target
+- Fix some shared library mispackaging
+
+* Tue Jun 07 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 3.8.0-2
+- fix color support detection on terminal
+
+* Thu Mar 10 2016 Dave Airlie <airlied@redhat.com> 3.8.0-1
+- llvm 3.8.0 release
+
+* Wed Mar 09 2016 Dan Horák <dan[at][danny.cz> 3.8.0-0.3
+- install back memory consumption workaround for s390
+
+* Thu Mar 03 2016 Dave Airlie <airlied@redhat.com> 3.8.0-0.2
+- llvm 3.8.0 rc3 release
+
+* Fri Feb 19 2016 Dave Airlie <airlied@redhat.com> 3.8.0-0.1
+- llvm 3.8.0 rc2 release
+
+* Tue Feb 16 2016 Dan Horák <dan[at][danny.cz> 3.7.1-7
+- recognize s390 as SystemZ when configuring build
+
+* Sat Feb 13 2016 Dave Airlie <airlied@redhat.com> 3.7.1-6
+- export C++ API for mesa.
+
+* Sat Feb 13 2016 Dave Airlie <airlied@redhat.com> 3.7.1-5
+- reintroduce llvm-static, clang needs it currently.
+
+* Fri Feb 12 2016 Dave Airlie <airlied@redhat.com> 3.7.1-4
+- jump back to single llvm library, the split libs aren't working very well.
+
+* Fri Feb 05 2016 Dave Airlie <airlied@redhat.com> 3.7.1-3
+- add missing obsoletes (#1303497)
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Thu Jan 07 2016 Jan Vcelak <jvcelak@fedoraproject.org> 3.7.1-1
+- new upstream release
+- enable gold linker
+
+* Wed Nov 04 2015 Jan Vcelak <jvcelak@fedoraproject.org> 3.7.0-100
+- fix Requires for subpackages on the main package
+
+* Tue Oct 06 2015 Jan Vcelak <jvcelak@fedoraproject.org> 3.7.0-100
+- initial version using cmake build system

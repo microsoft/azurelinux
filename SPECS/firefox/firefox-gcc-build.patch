@@ -1,0 +1,38 @@
+--- firefox-80.0.1/toolkit/crashreporter/google-breakpad/src/third_party/lss/linux_syscall_support.h	2020-08-31 10:04:19.000000000 -0400
++++ firefox-80.0.1/toolkit/crashreporter/google-breakpad/src/third_party/lss/linux_syscall_support.h	2020-09-12 07:24:35.298931628 -0400
+@@ -1962,7 +1962,7 @@ struct kernel_statfs {
+                            LSS_ENTRYPOINT                                     \
+                            "pop %%ebx"                                        \
+                            args                                               \
+-                           : "esp", "memory");                                \
++                           : "memory");                                       \
+       LSS_RETURN(type,__res)
+     #undef  _syscall0
+     #define _syscall0(type,name)                                              \
+@@ -2019,7 +2019,7 @@ struct kernel_statfs {
+                              : "i" (__NR_##name), "ri" ((long)(arg1)),        \
+                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
+                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
+-                             : "esp", "memory");                              \
++                             : "memory");                                     \
+         LSS_RETURN(type,__res);                                               \
+       }
+     #undef  _syscall6
+@@ -2041,7 +2041,7 @@ struct kernel_statfs {
+                              : "i" (__NR_##name),  "0" ((long)(&__s)),        \
+                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
+                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
+-                             : "esp", "memory");                              \
++                             : "memory");                                     \
+         LSS_RETURN(type,__res);                                               \
+       }
+     LSS_INLINE int LSS_NAME(clone)(int (*fn)(void *), void *child_stack,
+@@ -2127,7 +2127,7 @@ struct kernel_statfs {
+                            : "0"(-EINVAL), "i"(__NR_clone),
+                              "m"(fn), "m"(child_stack), "m"(flags), "m"(arg),
+                              "m"(parent_tidptr), "m"(newtls), "m"(child_tidptr)
+-                           : "esp", "memory", "ecx", "edx", "esi", "edi");
++                           : "memory", "ecx", "edx", "esi", "edi");
+       LSS_RETURN(int, __res);
+     }
+

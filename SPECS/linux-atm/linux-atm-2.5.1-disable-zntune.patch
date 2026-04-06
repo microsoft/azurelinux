@@ -1,0 +1,11 @@
+diff --git a/src/maint/Makefile.am b/src/maint/Makefile.am
+index 059bfdd..5c86dda 100644
+--- a/src/maint/Makefile.am
++++ b/src/maint/Makefile.am
+@@ -1,5 +1,5 @@
+ BOOTPGMS=atmaddr esi
+-SYSPGMS=atmloop atmtcp enitune zntune hediag # nstune
++SYSPGMS=atmloop atmtcp enitune hediag # nstune
+ USRPGMS=atmdiag atmdump sonetdiag saaldump
+ 
+ INCLUDES=-I$(srcdir)/../q2931 -I$(srcdir)/../saal -I.

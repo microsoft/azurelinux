@@ -1,0 +1,104 @@
+diff -up ./esc/src/app/esc.js.fix13 ./esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix13	2022-06-29 16:03:45.002292355 -0700
++++ ./esc/src/app/esc.js	2022-06-29 16:04:40.594027223 -0700
+@@ -581,7 +581,6 @@ class ESC {
+          this._configFile =  new GLib.KeyFile();
+ 
+          this._configPath = GLib.get_user_config_dir() + "/esc";
+-
+          let configDir = Gio.File.new_for_path(this._configPath);
+ 
+          try {
+@@ -606,6 +605,9 @@ class ESC {
+              this._configFile.save_to_file(this._configFileName); 
+          } 
+      }
++     _initConfigTokenManuIDs() {
++        this._setConfigValue("esc.token.manu_id.0","Volkswagen AG");
++     }
+ 
+     _buildUI() {
+         // Create the application window
+@@ -637,6 +639,7 @@ class ESC {
+ 
+ 
+             this._initConfig();
++            this._initConfigTokenManuIDs();
+             this._initProperties();
+ 
+             this._statusMessages = null; 
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix13 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix13	2022-06-29 16:04:10.082172742 -0700
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2022-06-29 16:04:40.595027219 -0700
+@@ -63,6 +63,7 @@ static const char *piv_manu_id_1=  "piv_
+ static PRLogModuleInfo *coolKeyLogHN = PR_NewLogModule("coolKeyHandler");
+ 
+ void NotifyEndResult(CoolKeyHandler* context, int operation, int result, int description);
++bool isTokenTypeOtherKnownType(CK_TOKEN_INFO *tokenInfo);
+ 
+ struct AutoCKYBuffer : public CKYBuffer
+ {
+@@ -2246,6 +2247,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     int isACOOLKey = 0;
+     int isACAC = 0;
+     int isAPIV = 0;
++    bool isOtherKey = false;
+ 
+     int hasApplet = 0;
+     int isPersonalized = 0;
+@@ -2306,6 +2308,12 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+ 	isAPIV = 1;
+     } else {
+         isACOOLKey = 1;
++        isOtherKey = isTokenTypeOtherKnownType(&tokenInfo);
++        if(isOtherKey == true && hasApplet == 0 && isPersonalized == 0) {
++            isACOOLKey = 0;
++        } else {
++            isOtherKey = false;
++        }
+     }
+ 
+     // OK, we have everything we need, now build the COOLKEYInfo structure.
+@@ -2336,7 +2344,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+         tokenInfo.firmwareVersion.major = 1;    
+     }
+ 
+-    if(isPersonalized == 1 || isACAC == 1 || isAPIV == 1) {
++    if(isPersonalized == 1 || isACAC == 1 || isAPIV == 1 || isOtherKey == true) {
+         tokenInfo.flags |= CKF_TOKEN_INITIALIZED;
+     }
+ 
+@@ -2407,3 +2415,33 @@ failed:
+     
+     return NULL;
+ }
++
++bool isTokenTypeOtherKnownType(CK_TOKEN_INFO *tokenInfo)
++{
++    char tBuff[56];
++    bool res = false;
++
++    if(tokenInfo == NULL) {
++        return res;
++    }
++    string curManuCfg;
++    string num;
++    for(int i = 0;;i++) {
++        num = to_string(i);
++        curManuCfg = "esc.token.manu_id." + num;
++        const char *curManu = CoolKeyGetConfig(curManuCfg.c_str());
++
++        if(curManu == NULL) {
++            break;
++        }
++
++        int match = memcmp(tokenInfo->manufacturerID, curManu, strlen(curManu));
++        CoolKeyFreeConfig(curManu);
++        if(match == 0) {
++            res = true;
++            break;
++        }
++    }
++    PR_LOG( coolKeyLogHN, PR_LOG_DEBUG, ("%s CoolKeyHandler::isTokenTypeOtherKnownType:  result: %d .\n",GetTStamp(tBuff,56), res));
++    return res;
++}

@@ -1,0 +1,55 @@
+From: Sam James <sam@gentoo.org>
+Date: Sat, 24 Jul 2021 22:02:45 +0100
+Subject: [PATCH] util/ulockmgr_server.c: conditionally define closefrom (fix
+ glibc-2.34+)
+
+closefrom(3) has joined us in glibc-land from *BSD and Solaris. Since
+it's available in glibc 2.34+, we want to detect it and only define our
+fallback if the libc doesn't provide it.
+
+Bug: https://bugs.gentoo.org/803923
+Signed-off-by: Sam James <sam@gentoo.org>
+
+diff --git a/configure.ac b/configure.ac
+index 9946a0e..a2d481a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -55,6 +55,7 @@ fi
+ 
+ AC_CHECK_FUNCS([fork setxattr fdatasync splice vmsplice utimensat])
+ AC_CHECK_FUNCS([posix_fallocate])
++AC_CHECK_FUNCS([closefrom])
+ AC_CHECK_MEMBERS([struct stat.st_atim])
+ AC_CHECK_MEMBERS([struct stat.st_atimespec])
+ 
+diff --git a/util/ulockmgr_server.c b/util/ulockmgr_server.c
+index 273c7d9..a04dac5 100644
+--- a/util/ulockmgr_server.c
++++ b/util/ulockmgr_server.c
+@@ -22,6 +22,10 @@
+ #include <sys/socket.h>
+ #include <sys/wait.h>
+ 
++#ifdef HAVE_CONFIG_H
++	#include "config.h"
++#endif
++
+ struct message {
+ 	unsigned intr : 1;
+ 	unsigned nofd : 1;
+@@ -124,6 +128,7 @@ static int receive_message(int sock, void *buf, size_t buflen, int *fdp,
+ 	return res;
+ }
+ 
++#if !defined(HAVE_CLOSEFROM)
+ static int closefrom(int minfd)
+ {
+ 	DIR *dir = opendir("/proc/self/fd");
+@@ -141,6 +146,7 @@ static int closefrom(int minfd)
+ 	}
+ 	return 0;
+ }
++#endif
+ 
+ static void send_reply(int cfd, struct message *msg)
+ {

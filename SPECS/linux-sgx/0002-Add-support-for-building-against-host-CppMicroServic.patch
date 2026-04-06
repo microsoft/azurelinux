@@ -1,0 +1,142 @@
+From 52367555ba7ec1a3591dc0e6fb3b3cc4cef03517 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 13 Feb 2025 14:01:10 +0000
+Subject: [PATCH 02/17] Add support for building against host CppMicroServices
+ lib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For the aesm_sevice it is desirable to be build against the host
+provided CppMicroServices library, such that security updates
+automatically propagate from the distro vendor.
+
+This is enabled as an opt-in by setting the make variable
+
+  USE_HOST_CPPMICROSERVICES=1
+
+The in-tree bundle of CppMicroServices ships a 6 year outdated
+git snapshot that claims to be version 4.0.0, since that time
+upstream reverted the version to 3.x.x. Hence the cmake path
+used for the host is looking for 'cppmicroservices3' not
+'cppmicroservices4' which is used for the ancient bundled copy.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ buildenv.mk                               | 10 +++++++++
+ psw/ae/aesm_service/Makefile              | 27 ++++++++++++++---------
+ psw/ae/aesm_service/source/CMakeLists.txt |  2 +-
+ 3 files changed, 28 insertions(+), 11 deletions(-)
+
+diff --git a/buildenv.mk b/buildenv.mk
+index 6dac4028..915e2eb4 100644
+--- a/buildenv.mk
++++ b/buildenv.mk
+@@ -398,3 +398,13 @@ TINYXML2_LDFLAGS =
+ TINYXML2_OBJ = tinyxml2.o
+ TINYXML2_DIR = $(LINUX_EXTERNAL_DIR)/tinyxml2/
+ endif
++
++USE_HOST_CPPMICROSERVICES ?= 0
++
++ifeq ($(USE_HOST_CPPMICROSERVICES), 1)
++CPPMICROSERVICES_CMAKE_DIR = /usr/share/cppmicroservices3/cmake
++else
++CPPMICROSERVICES_SRC_DIR = $(LINUX_EXTERNAL_DIR)/CppMicroServices
++CPPMICROSERVICES_INSTALL_DIR = $(CPPMICROSERVICES_SRC_DIR)/local-install
++CPPMICROSERVICES_CMAKE_DIR = $(CPPMICROSERVICES_INSTALL_DIR)/share/cppmicroservices4/cmake
++endif
+diff --git a/psw/ae/aesm_service/Makefile b/psw/ae/aesm_service/Makefile
+index bac84292..89a15875 100644
+--- a/psw/ae/aesm_service/Makefile
++++ b/psw/ae/aesm_service/Makefile
+@@ -32,10 +32,8 @@
+ TOP_DIR  = ../../..
+ include $(TOP_DIR)/buildenv.mk
+ 
+-CPPMICROSERVICES_DIR := $(LINUX_EXTERNAL_DIR)/CppMicroServices
+-CPPMICROSERVICES_INSTALL := $(CPPMICROSERVICES_DIR)/local-install
+ AESM_CONFIG := -DBUILD_SHARED_LIBS=ON -DUS_BUILD_SHARED_LIBS=ON
+-CPPMICROSERVICES_CONFIG := -DCMAKE_INSTALL_PREFIX=$(CPPMICROSERVICES_INSTALL) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DFORTIFY_SOURCE_VAL=$(FORTIFY_SOURCE_VAL)
++CPPMICROSERVICES_CONFIG := -DCMAKE_INSTALL_PREFIX=$(CPPMICROSERVICES_INSTALL_DIR) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DFORTIFY_SOURCE_VAL=$(FORTIFY_SOURCE_VAL)
+ ifdef DEBUG
+     AESM_CONFIG += -DCMAKE_BUILD_TYPE=Debug
+ else
+@@ -48,6 +46,7 @@ endif
+ 
+ AESM_CONFIG += -DOPENSSL_CRYPTO_CFLAGS=$(OPENSSL_CRYPTO_CFLAGS)
+ AESM_CONFIG += -DOPENSSL_CRYPTO_LIBS=$(OPENSSL_CRYPTO_LIBS)
++AESM_CONFIG += -DCPPMICROSERVICES_CMAKE_DIR=$(CPPMICROSERVICES_CMAKE_DIR)
+ 
+ ifeq ($(ARCH), x86)
+     SQLITECFLAGS += -m32
+@@ -66,7 +65,9 @@ CFLAGS := $(filter-out -Werror, $(CFLAGS))
+ 
+ WHITE_LIST_FILE := $(LINUX_PSW_DIR)/ae/data/prebuilt/white_list_cert_to_be_verify.bin
+ APPNAME         := source/build/bin/aesm_service
+-CPPMICROSERVICES:= $(CPPMICROSERVICES_DIR)/build/lib/libCppMicroServices.so.4.0.0
++ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
++CPPMICROSERVICES:= $(CPPMICROSERVICES_SRC_DIR)/build/lib/libCppMicroServices.so.4.0.0
++endif
+ RDRAND_LIBDIR :=$(LINUX_EXTERNAL_DIR)/rdrand/src
+ RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
+ 
+@@ -80,21 +81,25 @@ copy_data_file:
+ 
+ $(APPNAME): $(CPPMICROSERVICES) source/build/CMakeCache.txt urts RDRAND
+ 	$(MAKE) -C source/build
++ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
+ 	$(CP) $(CPPMICROSERVICES) source/build/bin/
++endif
+ 
+ CMAKE_VERSION_MAJOR=$(shell cmake --version | head -n  1 | cut -d \  -f 3 | cut -d . -f 1)
+ CMAKE_VERSION_MINOR=$(shell cmake --version | head -n  1 | cut -d \  -f 3 | cut -d . -f 2 | xargs printf '%02d')
+ CMAKE_VERSION=$(CMAKE_VERSION_MAJOR)$(CMAKE_VERSION_MINOR)
+ CMAKE := $(HOME)/cache/bin/cmake
+ 
++ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
+ .PHONY: CPPMICROSERVICES
+ $(CPPMICROSERVICES):
+-	mkdir -p $(CPPMICROSERVICES_DIR)/build
++	mkdir -p $(CPPMICROSERVICES_SRC_DIR)/build
+ ifeq ($(shell test $(CMAKE_VERSION) -lt 302 && echo 1), 1)
+-	$(CPPMICROSERVICES_DIR)/install_cmake.sh
+-	cd $(CPPMICROSERVICES_DIR)/build && $(CMAKE) -DCMAKE_COMMAND=$(CMAKE) $(CPPMICROSERVICES_CONFIG) ../ && $(MAKE) && $(MAKE) install
++	$(CPPMICROSERVICES_SRC_DIR)/install_cmake.sh
++	cd $(CPPMICROSERVICES_SRC_DIR)/build && $(CMAKE) -DCMAKE_COMMAND=$(CMAKE) $(CPPMICROSERVICES_CONFIG) ../ && $(MAKE) && $(MAKE) install
+ else
+-	cd $(CPPMICROSERVICES_DIR)/build && cmake $(CPPMICROSERVICES_CONFIG) ../ && $(MAKE) && $(MAKE) install
++	cd $(CPPMICROSERVICES_SRC_DIR)/build && cmake $(CPPMICROSERVICES_CONFIG) ../ && $(MAKE) && $(MAKE) install
++endif
+ endif
+ 
+ source/build/CMakeCache.txt: $(CPPMICROSERVICES)
+@@ -124,8 +129,10 @@ $(BUILD_DIR):
+ .PHONY: clean
+ clean:
+ 	@$(RM) -r source/build
+-	@$(RM) -r $(CPPMICROSERVICES_DIR)/build
+-	@$(RM) -r $(CPPMICROSERVICES_INSTALL)
++ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
++	@$(RM) -r $(CPPMICROSERVICES_SRC_DIR)/build
++	@$(RM) -r $(CPPMICROSERVICES_INSTALL_DIR)
++endif
+ 	@$(RM) -r data
+ ifeq ($(RDRAND_MAKEFILE), $(wildcard $(RDRAND_MAKEFILE)))
+ 	@$(MAKE) distclean -C $(RDRAND_LIBDIR)
+diff --git a/psw/ae/aesm_service/source/CMakeLists.txt b/psw/ae/aesm_service/source/CMakeLists.txt
+index 5728e9b4..7f368a97 100644
+--- a/psw/ae/aesm_service/source/CMakeLists.txt
++++ b/psw/ae/aesm_service/source/CMakeLists.txt
+@@ -46,7 +46,7 @@ else()
+ endif()
+ 
+ # check if CppMicroServices was found
+-set(CppMicroServices_DIR ../../../../external/CppMicroServices/local-install/share/cppmicroservices4/cmake)
++set(CppMicroServices_DIR ${CPPMICROSERVICES_CMAKE_DIR})
+ find_package(CppMicroServices NO_MODULE REQUIRED)
+ cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+ cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+-- 
+2.52.0
+

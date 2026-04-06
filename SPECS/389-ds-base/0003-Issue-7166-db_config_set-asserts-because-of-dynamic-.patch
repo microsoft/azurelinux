@@ -1,0 +1,33 @@
+From 9adaeba848a5b0fbe5d3a6148736f6c2ae940c35 Mon Sep 17 00:00:00 2001
+From: progier389 <progier@redhat.com>
+Date: Mon, 5 Jan 2026 14:38:38 +0100
+Subject: [PATCH] Issue 7166 - db_config_set asserts because of dynamic list
+ (#7167)
+
+Avoid assertion in db_config_set when args does not contains dynamic list attributes
+
+Issue: #7166
+
+Reviewed by: @tbordaz (Thanks!)
+
+(cherry picked from commit 5f15223280002803a932187c22b10beaeaa74bc2)
+---
+ src/lib389/lib389/cli_conf/backend.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib389/lib389/cli_conf/backend.py b/src/lib389/lib389/cli_conf/backend.py
+index 677b37fcb..d0ec4bd9e 100644
+--- a/src/lib389/lib389/cli_conf/backend.py
++++ b/src/lib389/lib389/cli_conf/backend.py
+@@ -544,7 +544,7 @@ def db_config_set(inst, basedn, log, args):
+     did_something = False
+     replace_list = []
+ 
+-    if args.enable_dynamic_lists and args.disable_dynamic_lists:
++    if getattr(args,'enable_dynamic_lists', None) and getattr(args, 'disable_dynamic_lists', None):
+         raise ValueError("You can not enable and disable dynamic lists at the same time")
+ 
+     for attr, value in list(attrs.items()):
+-- 
+2.52.0
+

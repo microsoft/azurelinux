@@ -1,0 +1,15 @@
+--- parseconf-orig.c	2022-10-25 15:17:18.990701984 +0200
++++ parseconf.c	2022-10-25 15:12:44.213480000 +0200
+@@ -85,9 +85,9 @@
+   { "ssl_sslv2", &tunable_sslv2 },
+   { "ssl_sslv3", &tunable_sslv3 },
+   { "ssl_tlsv1", &tunable_tlsv1 },
+-  { "ssl_tlsv11", &tunable_tlsv1_1 },
+-  { "ssl_tlsv12", &tunable_tlsv1_2 },
+-  { "ssl_tlsv13", &tunable_tlsv1_3 },
++  { "ssl_tlsv1_1", &tunable_tlsv1_1 },
++  { "ssl_tlsv1_2", &tunable_tlsv1_2 },
++  { "ssl_tlsv1_3", &tunable_tlsv1_3 },
+   { "tilde_user_enable", &tunable_tilde_user_enable },
+   { "force_anon_logins_ssl", &tunable_force_anon_logins_ssl },
+   { "force_anon_data_ssl", &tunable_force_anon_data_ssl },

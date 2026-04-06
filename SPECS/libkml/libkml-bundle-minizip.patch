@@ -1,0 +1,49 @@
+diff -rupN libkml-1.3.0/cmake/External_minizip.cmake libkml-1.3.0-new/cmake/External_minizip.cmake
+--- libkml-1.3.0/cmake/External_minizip.cmake	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/cmake/External_minizip.cmake	2018-10-06 21:50:30.785912329 +0200
+@@ -1,15 +1,18 @@
++set(MINIZIP_INSTALL_DIR ${CMAKE_BINARY_DIR}/MINIZIP/install/include)
++set(MINIZIP_BUILD_SHARED_LIBS FALSE)
++
+ ExternalProject_Add(MINIZIP
+   PREFIX MINIZIP
+-  URL "http://sourceforge.net/projects/libkml-files/files/1.3.0/minizip.tar.gz/download"
++  URL "${CMAKE_BINARY_DIR}/minizip-1.3.0.tar.gz"
+   URL_MD5 d5f74eff74e03e497ea60b2c43623416
+   BINARY_DIR ${CMAKE_BINARY_DIR}/MINIZIP/build
+   DEPENDS ${MINIZIP_DEPENDS}
+-  CMAKE_CACHE_ARGS
+-  -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}
++  CMAKE_ARGS
++  -DCMAKE_INSTALL_PREFIX:PATH=${MINIZIP_INSTALL_DIR}
+   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
+-  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS} )
++  -DBUILD_SHARED_LIBS:BOOL=${MINIZIP_BUILD_SHARED_LIBS} )
+ 
+ if(MSVC)
+   include_project_vars(MINIZIP "minizip")
+diff -rupN libkml-1.3.0/cmake/LibKMLHelper.cmake libkml-1.3.0-new/cmake/LibKMLHelper.cmake
+--- libkml-1.3.0/cmake/LibKMLHelper.cmake	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/cmake/LibKMLHelper.cmake	2018-10-06 21:52:17.978906400 +0200
+@@ -59,16 +59,16 @@ endfunction(build_example)
+ 
+ 
+ macro(include_project_vars _project _lib)
+-  set(${_project}_INCLUDE_DIR "${INSTALL_DIR}/include")
++  set(${_project}_INCLUDE_DIR "${${_project}_INSTALL_DIR}/include")
+   if(WIN32)
+     set(_suffix ${CMAKE_LINK_LIBRARY_SUFFIX})
+   else(UNIX)
+-    if(BUILD_SHARED_LIBS)
++    if(${${_project}_BUILD_SHARED_LIBS})
+       set(_suffix ${CMAKE_SHARED_LIBRARY_SUFFIX})
+     else()
+       set(_suffix ".a")
+     endif()
+   endif(WIN32)
+-  set(${_project}_LIBRARY "${INSTALL_DIR}/lib/${_lib}${_suffix}")
++  set(${_project}_LIBRARY "${${_project}_INSTALL_DIR}/lib/${_lib}${_suffix}")
+   include_directories(${${_project}_INCLUDE_DIR})
+ endmacro()

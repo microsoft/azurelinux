@@ -1,0 +1,144 @@
+From 99d8e250514023d3b88a1c9eb724c4898aba9827 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 02/50] openssh-6.6p1-privsep-selinux
+
+---
+ openbsd-compat/port-linux-sshd.c | 22 ++++++++++++++++++++++
+ openbsd-compat/port-linux.h      |  1 +
+ session.c                        | 16 +++++++++-------
+ sshd-auth.c                      |  4 ++++
+ sshd-session.c                   |  2 +-
+ 5 files changed, 37 insertions(+), 8 deletions(-)
+
+diff --git a/openbsd-compat/port-linux-sshd.c b/openbsd-compat/port-linux-sshd.c
+index b9fbe38b..dfafc622 100644
+--- a/openbsd-compat/port-linux-sshd.c
++++ b/openbsd-compat/port-linux-sshd.c
+@@ -415,6 +415,28 @@ sshd_selinux_setup_exec_context(char *pwname)
+ 	debug3_f("done");
+ }
+ 
++void
++sshd_selinux_copy_context(void)
++{
++	security_context_t *ctx;
++
++	if (!ssh_selinux_enabled())
++		return;
++
++	if (getexeccon((security_context_t *)&ctx) != 0) {
++		logit_f("getexeccon failed with %s", strerror(errno));
++		return;
++	}
++	if (ctx != NULL) {
++		/* unset exec context before we will lose this capabililty */
++		if (setexeccon(NULL) != 0)
++			fatal_f("setexeccon failed with %s", strerror(errno));
++		if (setcon(ctx) != 0)
++			fatal_f("setcon failed with %s", strerror(errno));
++		freecon(ctx);
++	}
++}
++
+ #endif
+ #endif
+ 
+diff --git a/openbsd-compat/port-linux.h b/openbsd-compat/port-linux.h
+index 055c825e..498d242a 100644
+--- a/openbsd-compat/port-linux.h
++++ b/openbsd-compat/port-linux.h
+@@ -23,6 +23,7 @@ void ssh_selinux_setup_pty(char *, const char *);
+ void ssh_selinux_change_context(const char *);
+ void ssh_selinux_setfscreatecon(const char *);
+ 
++void sshd_selinux_copy_context(void);
+ void sshd_selinux_setup_exec_context(char *);
+ #endif
+ 
+diff --git a/session.c b/session.c
+index 6444c77f..e4657cef 100644
+--- a/session.c
++++ b/session.c
+@@ -1350,7 +1350,7 @@ do_setusercontext(struct passwd *pw)
+ 
+ 	platform_setusercontext(pw);
+ 
+-	if (platform_privileged_uidswap()) {
++	if (platform_privileged_uidswap() && !is_child) {
+ #ifdef HAVE_LOGIN_CAP
+ 		if (setusercontext(lc, pw, pw->pw_uid,
+ 		    (LOGIN_SETALL & ~(LOGIN_SETPATH|LOGIN_SETUSER))) < 0) {
+@@ -1382,6 +1382,9 @@ do_setusercontext(struct passwd *pw)
+ 			    (unsigned long long)pw->pw_uid);
+ 			chroot_path = percent_expand(tmp, "h", pw->pw_dir,
+ 			    "u", pw->pw_name, "U", uidstr, (char *)NULL);
++#ifdef WITH_SELINUX
++			sshd_selinux_copy_context();
++#endif
+ 			safely_chroot(chroot_path, pw->pw_uid);
+ 			free(tmp);
+ 			free(chroot_path);
+@@ -1417,6 +1420,11 @@ do_setusercontext(struct passwd *pw)
+ 		/* Permanently switch to the desired uid. */
+ 		permanently_set_uid(pw);
+ #endif
++
++#ifdef WITH_SELINUX
++		if (in_chroot == 0)
++			sshd_selinux_copy_context();
++#endif
+ 	} else if (options.chroot_directory != NULL &&
+ 	    strcasecmp(options.chroot_directory, "none") != 0) {
+ 		fatal("server lacks privileges to chroot to ChrootDirectory");
+@@ -1434,9 +1442,6 @@ do_pwchange(Session *s)
+ 	if (s->ttyfd != -1) {
+ 		fprintf(stderr,
+ 		    "You must change your password now and log in again!\n");
+-#ifdef WITH_SELINUX
+-		setexeccon(NULL);
+-#endif
+ #ifdef PASSWD_NEEDS_USERNAME
+ 		execl(_PATH_PASSWD_PROG, "passwd", s->pw->pw_name,
+ 		    (char *)NULL);
+@@ -1649,9 +1654,6 @@ do_child(struct ssh *ssh, Session *s, const char *command)
+ 		argv[i] = NULL;
+ 		optind = optreset = 1;
+ 		__progname = argv[0];
+-#ifdef WITH_SELINUX
+-		ssh_selinux_change_context("sftpd_t");
+-#endif
+ 		exit(sftp_server_main(i, argv, s->pw));
+ 	}
+ 
+diff --git a/sshd-auth.c b/sshd-auth.c
+index 30eecd8a..f957dc22 100644
+--- a/sshd-auth.c
++++ b/sshd-auth.c
+@@ -187,6 +187,10 @@ privsep_child_demote(void)
+ 	if ((box = ssh_sandbox_init(pmonitor)) == NULL)
+ 		fatal_f("ssh_sandbox_init failed");
+ #endif
++#ifdef WITH_SELINUX
++	ssh_selinux_change_context("sshd_net_t");
++#endif
++
+ 	/* Demote the child */
+ 	if (privsep_chroot) {
+ 		/* Change our root directory */
+diff --git a/sshd-session.c b/sshd-session.c
+index 74d2cbc7..4a148db4 100644
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -432,7 +432,7 @@ privsep_postauth(struct ssh *ssh, Authctxt *authctxt)
+ 	 * fd passing, as AFAIK PTY allocation on this platform doesn't require
+ 	 * special privileges to begin with.
+ 	 */
+-#if defined(DISABLE_FD_PASSING) && !defined(HAVE_CYGWIN)
++#if defined(DISABLE_FD_PASSING) && !defined(HAVE_CYGWIN) && !defined(WITH_SELINUX)
+ 	skip_privdrop = 1;
+ #endif
+ 
+-- 
+2.49.0
+

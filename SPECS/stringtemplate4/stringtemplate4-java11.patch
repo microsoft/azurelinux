@@ -1,0 +1,22 @@
+--- a/src/org/stringtemplate/v4/STGroupFile.java
++++ b/src/org/stringtemplate/v4/STGroupFile.java
+@@ -96,7 +96,7 @@ public class STGroupFile extends STGroup
+     }
+ 
+     /** Pass in a URL with the location of a group file. E.g.,
+-     *  STGroup g = new STGroupFile(loader.getResource("org/foo/templates/g.stg"), "UTF-8", '<', '>');
++     *  STGroup g = new STGroupFile(loader.getResource("org/foo/templates/g.stg"), "UTF-8", '&lt;', '&gt;');
+       */
+     public STGroupFile(URL url, String encoding,
+                        char delimiterStartChar, char delimiterStopChar)
+--- a/test/org/stringtemplate/v4/test/BaseTest.java
++++ b/test/org/stringtemplate/v4/test/BaseTest.java
+@@ -258,7 +258,7 @@ public abstract class BaseTest {
+             fileManager.getJavaFileObjectsFromFiles(files);
+ 
+         Iterable<String> compileOptions =
+-            Arrays.asList("-g", "-source", "1.6", "-target", "1.6", "-implicit:class", "-Xlint:-options", "-d", workingDirName, "-cp", workingDirName+pathSep+CLASSPATH);
++            Arrays.asList("-g", "-source", "1.8", "-target", "1.8", "-implicit:class", "-Xlint:-options", "-d", workingDirName, "-cp", workingDirName+pathSep+CLASSPATH);
+ 
+         JavaCompiler.CompilationTask task =
+             compiler.getTask(null, fileManager, null, compileOptions, null,

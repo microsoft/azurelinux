@@ -1,0 +1,13 @@
+diff --git a/tox.ini b/tox.ini
+index 4968f11..a8bc693 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -7,7 +7,7 @@ skipsdist=True
+ deps =
+      twisted
+ commands =
+-    {envbindir}/pip install {toxinidir}
++    #{envbindir}/pip install {toxinidir}
+     {envbindir}/trial {posargs:constantly}
+ 
+ [testenv:cov]

@@ -1,0 +1,132 @@
+--- lwt-5.9.1/dune-project.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/dune-project	2025-06-30 14:27:53.979631443 -0600
+@@ -21,7 +21,7 @@
+    "Shon Feder <shon.feder@gmail.com>")
+  (depends
+   (ocaml (>= 4.08))
+-  (lwt (>= 5.3.0))))
++  (lwt (>= 5.3))))
+ 
+ (package
+  (name lwt_ppx)
+@@ -29,7 +29,7 @@
+  (synopsis "PPX syntax for Lwt, providing something similar to async/await from JavaScript")
+  (depends
+   (ocaml (>= 4.08))
+-  (ppxlib (and (>= 0.16.0) (< 0.36)))
++  (ppxlib (>= 0.36))
+   (ppx_let :with-test)
+   lwt))
+ 
+@@ -38,9 +38,9 @@
+  (synopsis "Helpers for using React with Lwt")
+  (depends
+   (ocaml (>= 4.08))
+-  (cppo (and :build (>= 1.1.0)))
+-  (lwt (>= 3.0.0))
+-  (react (>= 1.0.0))))
++  (cppo (and :build (>= 1.1)))
++  (lwt (>= 3.0))
++  (react (>= 1.0))))
+ 
+ (package
+  (name lwt)
+@@ -57,9 +57,9 @@ synchronization primitives. Code can be
+ ")
+  (depends
+   (ocaml (>= 4.08))
+-  (cppo (and :build (>= 1.1.0)))
++  (cppo (and :build (>= 1.1)))
+   (ocamlfind (and :dev (>= 1.7.3-1)))
+-  (odoc (and :with-doc (>= 2.3.0)))
++  (odoc (and :with-doc (>= 2.3)))
+   dune-configurator
+   ocplib-endian)
+  (depopts base-threads base-unix conf-libev))
+--- lwt-5.9.1/lwt.opam.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/lwt.opam	2025-06-30 14:28:28.212362541 -0600
+@@ -23,9 +23,9 @@ bug-reports: "https://github.com/ocsigen
+ depends: [
+   "dune" {>= "2.7"}
+   "ocaml" {>= "4.08"}
+-  "cppo" {build & >= "1.1.0"}
++  "cppo" {build & >= "1.1"}
+   "ocamlfind" {dev & >= "1.7.3-1"}
+-  "odoc" {with-doc & >= "2.3.0"}
++  "odoc" {with-doc & >= "2.3"}
+   "dune-configurator"
+   "ocplib-endian"
+ ]
+--- lwt-5.9.1/lwt_ppx.opam.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/lwt_ppx.opam	2025-06-30 14:28:40.715742638 -0600
+@@ -14,7 +14,7 @@ bug-reports: "https://github.com/ocsigen
+ depends: [
+   "dune" {>= "2.7"}
+   "ocaml" {>= "4.08"}
+-  "ppxlib" {>= "0.16.0" & < "0.36"}
++  "ppxlib" {>= "0.36"}
+   "ppx_let" {with-test}
+   "lwt"
+   "odoc" {with-doc}
+--- lwt-5.9.1/lwt_react.opam.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/lwt_react.opam	2025-06-30 14:29:04.667261990 -0600
+@@ -12,9 +12,9 @@ bug-reports: "https://github.com/ocsigen
+ depends: [
+   "dune" {>= "2.7"}
+   "ocaml" {>= "4.08"}
+-  "cppo" {build & >= "1.1.0"}
+-  "lwt" {>= "3.0.0"}
+-  "react" {>= "1.0.0"}
++  "cppo" {build & >= "1.1"}
++  "lwt" {>= "3.0"}
++  "react" {>= "1.0"}
+   "odoc" {with-doc}
+ ]
+ build: [
+--- lwt-5.9.1/lwt_retry.opam.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/lwt_retry.opam	2025-06-30 14:29:19.579390907 -0600
+@@ -12,7 +12,7 @@ bug-reports: "https://github.com/ocsigen
+ depends: [
+   "dune" {>= "2.7"}
+   "ocaml" {>= "4.08"}
+-  "lwt" {>= "5.3.0"}
++  "lwt" {>= "5.3"}
+   "odoc" {with-doc}
+ ]
+ dev-repo: "git+https://github.com/ocsigen/lwt.git"
+--- lwt-5.9.1/src/ppx/ppx_lwt.ml.orig	2025-03-07 02:39:48.000000000 -0700
++++ lwt-5.9.1/src/ppx/ppx_lwt.ml	2025-06-30 14:30:44.018700266 -0600
+@@ -144,12 +144,12 @@ let lwt_expression mapper exp attributes
+       match exns with
+       | [] ->
+         let loc = !default_loc in
+-        [%expr Lwt.bind [%e e] [%e pexp_function ~loc cases]]
++        [%expr Lwt.bind [%e e] [%e pexp_function_cases ~loc cases]]
+       | _  ->
+         let loc = !default_loc in
+         [%expr Lwt.try_bind (fun () -> [%e e])
+-                                   [%e pexp_function ~loc cases]
+-                                   [%e pexp_function ~loc exns]]
++                                   [%e pexp_function_cases ~loc cases]
++                                   [%e pexp_function_cases ~loc exns]]
+     in
+     Some (mapper#expression { new_exp with pexp_attributes })
+ 
+@@ -223,7 +223,7 @@ let lwt_expression mapper exp attributes
+           Lwt.backtrace_catch
+             (fun exn -> try Lwt.reraise exn with exn -> exn)
+             (fun () -> [%e expr])
+-            [%e pexp_function ~loc cases]
++            [%e pexp_function_cases ~loc cases]
+         ]
+     in
+     Some (mapper#expression { new_exp with pexp_attributes })
+@@ -248,7 +248,7 @@ let lwt_expression mapper exp attributes
+     in
+     let new_exp =
+       let loc = !default_loc in
+-      [%expr Lwt.bind [%e cond] [%e pexp_function ~loc cases]]
++      [%expr Lwt.bind [%e cond] [%e pexp_function_cases ~loc cases]]
+     in
+     Some (mapper#expression { new_exp with pexp_attributes })
+ 

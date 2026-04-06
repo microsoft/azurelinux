@@ -1,0 +1,26 @@
+From 31fc118e3864d16680e8f717e12a9864fa1d616f Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Fri, 29 Nov 2024 16:18:53 -0500
+Subject: [PATCH] Fix defined name: It is UTF16_STRINGS not UTF16_STRING.
+
+(cherry picked from commit b538a4be9426b47fe62a7244170b789e122bf9ea)
+---
+ sh.file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sh.file.c b/sh.file.c
+index c6742c4..35a2972 100644
+--- a/sh.file.c
++++ b/sh.file.c
+@@ -590,7 +590,7 @@ again:				/* search for matches */
+ static int
+ compare(const void *p, const void *q)
+ {
+-#if defined (WIDE_STRINGS) && !defined (UTF16_STRING)
++#if defined (WIDE_STRINGS) && !defined (UTF16_STRINGS)
+     errno = 0;
+ 
+     return (wcscoll(*(Char *const *) p, *(Char *const *) q));
+-- 
+2.47.1
+

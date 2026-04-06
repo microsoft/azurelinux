@@ -1,0 +1,31 @@
+From 7bb7be597223d95773e7811baa11a57b9bfe4a84 Mon Sep 17 00:00:00 2001
+From: Priscila Gutierres <prgutier@redhat.com>
+Date: Mon, 16 Oct 2023 07:18:09 -0300
+Subject: [PATCH] Unpin test-requirements packages
+
+---
+ test-requirements.txt | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 4014629..b8f48c2 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -1,7 +1,7 @@
+-Faker==15.1.0
+-pytest==7.1.1
+-pytest-cov==4.0.0
+-gevent==22.10.1; "PyPy" not in platform_python_implementation
+-pylibmc==1.6.1; sys.platform != 'win32'
+-python-memcached==1.59
+-zstd==1.5.2.5
++Faker
++pytest
++pytest-cov
++gevent
++pylibmc
++python-memcached
++zstd
+-- 
+2.41.0
+

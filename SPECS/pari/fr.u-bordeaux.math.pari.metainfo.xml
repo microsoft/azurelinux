@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>fr.u-bordeaux.math.pari</id>
+  <metadata_license>0BSD</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>pari</name>
+  <summary>Number Theory-oriented Computer Algebra System</summary>
+  <description>
+    <p>
+      PARI is a widely used computer algebra system designed for fasti
+      computations in number theory (factorizations, algebraic number theory,
+      elliptic curves...), but also contains a large number of other useful
+      functions to compute with mathematical entities such as matrices,
+      polynomials, power series, algebraic numbers, etc., and a lot of
+      transcendental functions.
+    </p>
+    <p>
+      PARI/GP is an advanced programmable calculator, which computes
+      symbolically as long as possible, numerically where needed, and contains
+      a wealth of number-theoretic functions.
+    </p>
+  </description>
+  <launchable type="desktop-id">fr.u-bordeaux.math.pari.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://pari.math.u-bordeaux.fr/Images/texmacs-4.png</image>
+      <caption>A GP session with TeXmacs</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://pari.math.u-bordeaux.fr/Images/gp1.png</image>
+      <caption>A GP session in an X terminal</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://pari.math.u-bordeaux.fr/Images/gp2.png</image>
+      <caption>Another GP session in an X terminal</caption>
+    </screenshot>
+  </screenshots>
+  <update_contact>pari-maintainers@fedoraproject.org</update_contact>
+  <developer_name>PARI/GP Development Headquarters</developer_name>
+  <url type="homepage">https://pari.math.u-bordeaux.fr/</url>
+  <url type="bugtracker">https://pari.math.u-bordeaux.fr/Bugs/</url>
+  <url type="help">https://pari.math.u-bordeaux.fr/doc.html</url>
+  <content_rating type="oars-1.1"></content_rating>
+  <provides>
+    <binary>gp</binary>
+    <binary>gphelp</binary>
+    <binary>tex2mail</binary>
+  </provides>
+</component>
+

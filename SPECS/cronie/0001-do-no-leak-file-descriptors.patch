@@ -1,0 +1,61 @@
+From b3a54d0b3561bc2ab46c11fd5c67350cc216b171 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Stan=C4=9Bk?= <jstanek@redhat.com>
+Date: Wed, 26 Jun 2024 16:08:44 +0200
+Subject: [PATCH] Do not leak file descriptors in backup_crontab
+
+Originally, if anything went wrong during the backup,
+the early return caused the crontab_file and possibly backup_file
+pointers to leak.
+
+Issue found by static scanner.
+---
+ src/crontab.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/src/crontab.c b/src/crontab.c
+index f61fd46..55d2aed 100644
+--- a/src/crontab.c
++++ b/src/crontab.c
+@@ -563,6 +563,7 @@ static int backup_crontab(const char *crontab_path) {
+ 	
+ 	if (swap_uids() == -1) {
+ 		perror("swapping uids");
++		(void) fclose(crontab_file);
+ 		exit(ERROR_EXIT);
+ 	}
+ 
+@@ -590,22 +591,29 @@ static int backup_crontab(const char *crontab_path) {
+ 
+ 	if (swap_uids_back() < OK) {
+ 		perror("swapping uids back");
++		if (backup_file != NULL) {
++			(void) fclose(backup_file);
++		}
++		(void) fclose(crontab_file);
+ 		exit(ERROR_EXIT);
+ 	}
+ 
+ 	if (retval != 0)
+-		return retval;
++		goto cleanup;
+ 
+ 	if (EOF != ch)
+ 		while (EOF != (ch = get_char(crontab_file)))
+ 			putc(ch, backup_file);
+ 
+-	(void) fclose(crontab_file);
+-	(void) fclose(backup_file);
+-
+ 	printf("Backup of %s's previous crontab saved to %s\n", User, backup_path);
+ 
+-	return 0;
++cleanup:
++	if (backup_file != NULL) {
++		(void) fclose(backup_file);
++	}
++	(void) fclose(crontab_file);
++
++	return retval;
+ }
+ 
+ static void check_error(const char *msg) {

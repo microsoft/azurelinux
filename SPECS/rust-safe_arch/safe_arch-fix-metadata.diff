@@ -1,0 +1,16 @@
+--- safe_arch-0.7.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ safe_arch-0.7.4/Cargo.toml	2025-02-25T19:59:49.785190+00:00
+@@ -33,6 +33,13 @@
+ ]
+ license = "Zlib OR Apache-2.0 OR MIT"
+ repository = "https://github.com/Lokathor/safe_arch"
++exclude = [
++    "/.cargo/",
++    "/.github/",
++    "/scripts/",
++    "/rustfmt.toml",
++    "/tmp.txt",
++]
+ 
+ [package.metadata.docs.rs]
+ all-features = true

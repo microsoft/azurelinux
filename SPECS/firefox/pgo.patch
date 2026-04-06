@@ -1,0 +1,128 @@
+diff -up firefox-145.0/build/moz.configure/lto-pgo.configure.pgo firefox-145.0/build/moz.configure/lto-pgo.configure
+--- firefox-145.0/build/moz.configure/lto-pgo.configure.pgo	2025-11-03 16:56:55.000000000 +0100
++++ firefox-145.0/build/moz.configure/lto-pgo.configure	2025-11-05 13:59:53.477443914 +0100
+@@ -96,12 +96,16 @@ set_config("PGO_PROFILE_PATH", pgo_profi
+ 
+ @depends(
+     "--enable-profile-use",
++    c_compiler,
+     pgo_profile_path,
+     llvm_profdata,
+     llvm_profdata_order,
+     build_environment,
+ )
+-def orderfile_path(profile_use, path, profdata, profdata_order, build_env):
++def orderfile_path(profile_use, compiler, path, profdata, profdata_order, build_env):
++    if compiler.type == "gcc":
++        return None
++
+     if not profile_use:
+         return None
+ 
+@@ -145,7 +149,7 @@ def pgo_flags(
+         return namespace(
+             gen_cflags=["-fprofile-generate"],
+             gen_ldflags=["-fprofile-generate"],
+-            use_cflags=["-fprofile-use", "-fprofile-correction", "-Wcoverage-mismatch"],
++            use_cflags=["-fprofile-use", "-fprofile-correction", "-Wno-coverage-mismatch"],
+             use_ldflags=["-fprofile-use"],
+         )
+ 
+diff -up firefox-145.0/build/pgo/profileserver.py.pgo firefox-145.0/build/pgo/profileserver.py
+--- firefox-145.0/build/pgo/profileserver.py.pgo	2025-11-03 16:56:55.000000000 +0100
++++ firefox-145.0/build/pgo/profileserver.py	2025-11-05 13:59:53.477602066 +0100
+@@ -10,7 +10,7 @@ import subprocess
+ import sys
+ 
+ import mozcrash
+-from mozbuild.base import BinaryNotFoundException, MozbuildObject
++from mozbuild.base import BinaryNotFoundException, MozbuildObject, BuildEnvironmentNotFoundException
+ from mozfile import TemporaryDirectory, json
+ from mozhttpd import MozHttpd
+ from mozprofile import FirefoxProfile, Preferences
+@@ -96,9 +96,22 @@ if __name__ == "__main__":
+     locations = ServerLocations()
+     locations.add_host(host="127.0.0.1", port=PORT, options="primary,privileged")
+ 
+-    old_profraw_files = glob.glob("*.profraw")
+-    for f in old_profraw_files:
+-        os.remove(f)
++    using_gcc = False
++    try:
++        if build.config_environment.substs.get('CC_TYPE') == 'gcc':
++            using_gcc = True
++    except BuildEnvironmentNotFoundException:
++        pass
++
++    if using_gcc:
++        for dirpath, _, filenames in os.walk('.'):
++            for f in filenames:
++                if f.endswith('.gcda'):
++                    os.remove(os.path.join(dirpath, f))
++    else:
++        old_profraw_files = glob.glob('*.profraw')
++        for f in old_profraw_files:
++            os.remove(f)
+ 
+     with TemporaryDirectory() as profilePath:
+         # TODO: refactor this into mozprofile
+diff -up firefox-145.0/gfx/2d/moz.build.pgo firefox-145.0/gfx/2d/moz.build
+--- firefox-145.0/gfx/2d/moz.build.pgo	2025-11-03 16:56:57.000000000 +0100
++++ firefox-145.0/gfx/2d/moz.build	2025-11-05 14:21:20.485610837 +0100
+@@ -137,11 +137,11 @@ if CONFIG["INTEL_ARCHITECTURE"]:
+     DEFINES["USE_SSE2"] = True
+     # The file uses SSE2 intrinsics, so it needs special compile flags on some
+     # compilers.
+-    SOURCES["ConvolutionFilterAVX2.cpp"].flags += ["-mavx2"]
++    SOURCES["ConvolutionFilterAVX2.cpp"].flags += ["-mavx2", "-fno-lto"]
+     SOURCES["ConvolutionFilterSSE2.cpp"].flags += CONFIG["SSE2_FLAGS"]
+     SOURCES["FilterProcessingSSE2.cpp"].flags += CONFIG["SSE2_FLAGS"]
+     SOURCES["ImageScalingSSE2.cpp"].flags += CONFIG["SSE2_FLAGS"]
+-    SOURCES["SwizzleAVX2.cpp"].flags += ["-mavx2"]
++    SOURCES["SwizzleAVX2.cpp"].flags += ["-mavx2", "-fno-lto"]
+     SOURCES["SwizzleSSE2.cpp"].flags += CONFIG["SSE2_FLAGS"]
+     SOURCES["SwizzleSSSE3.cpp"].flags += CONFIG["SSSE3_FLAGS"]
+ 
+diff -up firefox-145.0/gfx/skia/generate_mozbuild.py.pgo firefox-145.0/gfx/skia/generate_mozbuild.py
+--- firefox-145.0/gfx/skia/generate_mozbuild.py.pgo	2025-11-03 16:56:57.000000000 +0100
++++ firefox-145.0/gfx/skia/generate_mozbuild.py	2025-11-05 13:59:53.477947055 +0100
+@@ -50,8 +50,8 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] == 'wind
+ if CONFIG['INTEL_ARCHITECTURE']:
+     SOURCES['skia/modules/skcms/skcms.cc'].flags += ['-DSKCMS_DISABLE_SKX']
+     skia_ssse3_flags = ['-Dskvx=skvx_ssse3', '-mssse3']
+-    skia_avx_flags = ['-Dskvx=skvx_avx', '-mavx']
+-    skia_hsw_flags = ['-Dskvx=skvx_hsw', '-mavx2', '-mf16c', '-mfma']
++    skia_avx_flags = ['-Dskvx=skvx_avx', '-mavx', '-fno-lto']
++    skia_hsw_flags = ['-Dskvx=skvx_hsw', '-mavx2', '-mf16c', '-mfma', '-fno-lto']
+     SOURCES['skia/src/core/SkBitmapProcState_opts_ssse3.cpp'].flags += skia_ssse3_flags
+     SOURCES['skia/src/core/SkBlitMask_opts_ssse3.cpp'].flags += skia_ssse3_flags
+     SOURCES['skia/src/core/SkSwizzler_opts_ssse3.cpp'].flags += ['-Dskvx=skvx_ssse3']
+diff -up firefox-145.0/gfx/skia/moz.build.pgo firefox-145.0/gfx/skia/moz.build
+--- firefox-145.0/gfx/skia/moz.build.pgo	2025-11-03 16:56:57.000000000 +0100
++++ firefox-145.0/gfx/skia/moz.build	2025-11-05 13:59:53.478077484 +0100
+@@ -597,8 +597,8 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] == 'wind
+ if CONFIG['INTEL_ARCHITECTURE']:
+     SOURCES['skia/modules/skcms/skcms.cc'].flags += ['-DSKCMS_DISABLE_SKX']
+     skia_ssse3_flags = ['-Dskvx=skvx_ssse3', '-mssse3']
+-    skia_avx_flags = ['-Dskvx=skvx_avx', '-mavx']
+-    skia_hsw_flags = ['-Dskvx=skvx_hsw', '-mavx2', '-mf16c', '-mfma']
++    skia_avx_flags = ['-Dskvx=skvx_avx', '-mavx', '-fno-lto']
++    skia_hsw_flags = ['-Dskvx=skvx_hsw', '-mavx2', '-mf16c', '-mfma', '-fno-lto']
+     SOURCES['skia/src/core/SkBitmapProcState_opts_ssse3.cpp'].flags += skia_ssse3_flags
+     SOURCES['skia/src/core/SkBlitMask_opts_ssse3.cpp'].flags += skia_ssse3_flags
+     SOURCES['skia/src/core/SkSwizzler_opts_ssse3.cpp'].flags += ['-Dskvx=skvx_ssse3']
+diff -up firefox-145.0/toolkit/components/terminator/nsTerminator.cpp.pgo firefox-145.0/toolkit/components/terminator/nsTerminator.cpp
+--- firefox-145.0/toolkit/components/terminator/nsTerminator.cpp.pgo	2025-11-03 16:57:15.000000000 +0100
++++ firefox-145.0/toolkit/components/terminator/nsTerminator.cpp	2025-11-05 13:59:53.478238011 +0100
+@@ -330,6 +330,11 @@ void nsTerminator::StartWatchdog() {
+   }
+ #endif
+ 
++  // Disable watchdog for PGO train builds - writting profile information at
++  // exit may take time and it is better to make build hang rather than
++  // silently produce poorly performing binary.
++  crashAfterMS = INT32_MAX;
++
+   UniquePtr<Options> options(new Options());
+   // crashAfterTicks is guaranteed to be > 0 as
+   // crashAfterMS >= ADDITIONAL_WAIT_BEFORE_CRASH_MS >> HEARTBEAT_INTERVAL_MS

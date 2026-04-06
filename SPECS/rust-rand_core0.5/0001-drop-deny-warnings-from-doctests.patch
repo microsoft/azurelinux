@@ -1,0 +1,25 @@
+From 9ee8a863e25f421632736b0b492a0e635aada558 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 5 Apr 2024 11:47:26 +0200
+Subject: [PATCH] drop deny(warnings) from doctests
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index d8e0189..03f66f9 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -33,7 +33,7 @@
+ 
+ #![deny(missing_docs)]
+ #![deny(missing_debug_implementations)]
+-#![doc(test(attr(allow(unused_variables), deny(warnings))))]
++#![doc(test(attr(allow(unused_variables))))]
+ 
+ #![allow(clippy::unreadable_literal)]
+ 
+-- 
+2.44.0
+

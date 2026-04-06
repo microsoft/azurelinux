@@ -1,0 +1,1078 @@
+From 3890bd739f4b362b6e1a59ddf58f08cbbd53dec7 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 26 May 2025 11:37:20 +0200
+Subject: [PATCH] Add support for Python 3.14 and remove for Python 3.8
+
+---
+ .pre-commit-config.yaml          |   8 +-
+ CHANGELOG.md                     | 168 +++++++++++++++++++++----------
+ README.md                        |  42 +++++---
+ cmd2/argparse_custom.py          |  53 +++++++---
+ docs/overview/installation.md    |  30 ++++--
+ plugins/ext_test/build-pyenvs.sh |   4 +-
+ plugins/ext_test/noxfile.py      |   2 +-
+ plugins/ext_test/setup.py        |   5 +-
+ plugins/template/README.md       |   4 +-
+ plugins/template/build-pyenvs.sh |   4 +-
+ plugins/template/noxfile.py      |   2 +-
+ plugins/template/setup.py        |   5 +-
+ pyproject.toml                   | 152 ++++++++++++++--------------
+ tests/test_argparse_custom.py    |   2 +-
+ tests/test_history.py            |   6 +-
+ 15 files changed, 305 insertions(+), 182 deletions(-)
+
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index 45cbdbc..b84a54c 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -8,15 +8,17 @@ repos:
+       - id: trailing-whitespace
+ 
+   - repo: https://github.com/astral-sh/ruff-pre-commit
+-    rev: "v0.9.3"
++    rev: "v0.11.10"
+     hooks:
+       - id: ruff-format
+         args: [--config=pyproject.toml]
++      - id: ruff-check
++        args: [--config=pyproject.toml, --fix]
+ 
+   - repo: https://github.com/pre-commit/mirrors-prettier
+     rev: "v3.1.0"
+     hooks:
+       - id: prettier
+         additional_dependencies:
+-          - prettier@3.4.2
+-          - prettier-plugin-toml@2.0.1
++          - prettier@3.5.3
++          - prettier-plugin-toml@2.0.5
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 56d0a33..3423fe7 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,3 +1,10 @@
++## 2.6.0 (May TBD, 2025)
++
++- Breaking Change
++    - `cmd2` 2.6 supports Python 3.9+ (removed support for Python 3.8)
++- Enhancements
++    - Add support for Python 3.14
++
+ ## 2.5.11 (January 25, 2025)
+ 
+ - Bug Fixes
+@@ -67,7 +74,8 @@
+     - Multiline commands are no longer fragmented in up-arrow history.
+     - Fixed bug where `async_alert()` overwrites readline's incremental and non-incremental search prompts.
+         - This fix introduces behavior where an updated prompt won't display after an aborted search
+-          until a user presses Enter. See [async_printing.py](https://github.com/python-cmd2/cmd2/blob/master/examples/async_printing.py)
++          until a user presses Enter.
++          See [async_printing.py](https://github.com/python-cmd2/cmd2/blob/master/examples/async_printing.py)
+           example for how to handle this case using `Cmd.need_prompt_refresh()` and `Cmd.async_refresh_prompt()`.
+ - Enhancements
+     - Removed dependency on `attrs` and replaced with [dataclasses](https://docs.python.org/3/library/dataclasses.html)
+@@ -263,7 +271,8 @@
+       and just opens an interactive Python shell.
+     - Changed default behavior of `runcmds_plus_hooks()` to not stop when Ctrl-C is pressed and instead
+       run the next command in its list.
+-    - Removed `cmd2.Cmd.quit_on_sigint` flag, which when `True`, quit the application when Ctrl-C was pressed at the prompt.
++    - Removed `cmd2.Cmd.quit_on_sigint` flag, which when `True`, quit the application when Ctrl-C was pressed at the
++      prompt.
+     - The history bug fix resulted in structure changes to the classes in `cmd2.history`. Therefore, persistent history
+       files created with versions older than 2.0.0 are not compatible.
+ - Enhancements
+@@ -496,7 +505,8 @@
+ - Enhancements
+     - The documentation at [cmd2.rftd.io](https://cmd2.readthedocs.io) received a major overhaul
+ - Other
+-    - Moved [categorize](https://cmd2.readthedocs.io/en/latest/api/utils.html#miscellaneous) utility function from **decorators** module to **utils** module
++    - Moved [categorize](https://cmd2.readthedocs.io/en/latest/api/utils.html#miscellaneous) utility function from \*
++      \*decorators** module to **utils\*\* module
+ - Notes
+     - Now that the 1.0 release is out, `cmd2` intends to follow [Semantic Versioning](https://semver.org)
+ 
+@@ -640,7 +650,8 @@
+ ## 0.9.19 (October 14, 2019)
+ 
+ - Bug Fixes
+-    - Fixed `ValueError` exception which could occur when an old format persistent history file is loaded with new `cmd2`
++    - Fixed `ValueError` exception which could occur when an old format persistent history file is loaded with new
++      `cmd2`
+ - Enhancements
+     - Improved displaying multiline CompletionErrors by indenting all lines
+ 
+@@ -650,7 +661,8 @@
+     - Fixed bug introduced in 0.9.17 where help functions for hidden and disabled commands were not being filtered
+       out as help topics
+ - Enhancements
+-    - `AutoCompleter` now handles argparse's mutually exclusive groups. It will not tab complete flag names or positionals
++    - `AutoCompleter` now handles argparse's mutually exclusive groups. It will not tab complete flag names or
++      positionals
+       for already completed groups. It also will print an error if you try tab completing a flag's value if the flag
+       belongs to a completed group.
+     - `AutoCompleter` now uses the passed-in parser's help formatter to generate hint text. This gives help and
+@@ -699,7 +711,8 @@
+     - Fixed issue where completer function of disabled command would still run
+ - Enhancements
+     - Greatly simplified using argparse-based tab completion. The new interface is a complete overhaul that breaks
+-      the previous way of specifying completion and choices functions. See header of [argparse_custom.py](https://github.com/python-cmd2/cmd2/blob/master/cmd2/argparse_custom.py)
++      the previous way of specifying completion and choices functions. See header
++      of [argparse_custom.py](https://github.com/python-cmd2/cmd2/blob/master/cmd2/argparse_custom.py)
+       for more information.
+     - Enabled tab completion on multiline commands
+ - **Renamed Commands Notice**
+@@ -711,8 +724,10 @@
+         - Lots of end users were confused particularly about what exactly `load` should be loading
+ - Breaking Changes
+     - Restored `cmd2.Cmd.statement_parser` to be a public attribute (no underscore)
+-        - Since it can be useful for creating [post-parsing hooks](https://cmd2.readthedocs.io/en/latest/features/hooks.html#postparsing-hooks)
+-    - Completely overhauled the interface for adding tab completion to argparse arguments. See enhancements for more details.
++        - Since it can be useful for
++          creating [post-parsing hooks](https://cmd2.readthedocs.io/en/latest/features/hooks.html#postparsing-hooks)
++    - Completely overhauled the interface for adding tab completion to argparse arguments. See enhancements for more
++      details.
+     - `ACArgumentParser` is now called `Cmd2ArgumentParser`
+     - Moved `basic_complete` to utils.py
+     - Made optional arguments on the following completer methods keyword-only:
+@@ -742,7 +757,8 @@
+       to determine if ANSI escape sequences should be stripped when not writing to a tty. See documentation for more
+       information on the `allow_ansi` setting.
+ - Breaking Changes
+-    - Python 3.4 reached its [end of life](https://www.python.org/dev/peps/pep-0429/) on March 18, 2019 and is no longer supported by `cmd2`
++    - Python 3.4 reached its [end of life](https://www.python.org/dev/peps/pep-0429/) on March 18, 2019 and is no longer
++      supported by `cmd2`
+         - If you need to use Python 3.4, you should pin your requirements to use `cmd2` 0.9.13
+     - Made lots of changes to minimize the public API of the `cmd2.Cmd` class
+         - Attributes and methods we do not intend to be public now all begin with an underscore
+@@ -752,7 +768,9 @@
+         - `pexcept` - print Exception message to sys.stderr. If debug is true, print exception traceback if one exists
+     - Signature of `poutput` and `perror` significantly changed
+         - Removed color parameters `color`, `err_color`, and `war_color` from `poutput` and `perror`
+-            - See the docstrings of these methods or the [cmd2 docs](https://cmd2.readthedocs.io/en/latest/features/generating_output.html) for more info on applying styles to output messages
++            - See the docstrings of these methods or
++              the [cmd2 docs](https://cmd2.readthedocs.io/en/latest/features/generating_output.html) for more info on
++              applying styles to output messages
+         - `end` argument is now keyword-only and cannot be specified positionally
+         - `traceback_war` no longer exists as an argument since it isn't needed now that `perror` and `pexcept` exist
+     - Moved `cmd2.Cmd.colors` to ansi.py and renamed it to `allow_ansi`. This is now an application-wide setting.
+@@ -832,7 +850,8 @@
+ - Bug Fixes
+     - Fixed a bug in how redirection and piping worked inside `py` or `pyscript` commands
+     - Fixed bug in `async_alert` where it didn't account for prompts that contained newline characters
+-    - Fixed path completion case when CWD is just a slash. Relative path matches were incorrectly prepended with a slash.
++    - Fixed path completion case when CWD is just a slash. Relative path matches were incorrectly prepended with a
++      slash.
+ - Enhancements
+     - Added ability to include command name placeholders in the message printed when trying to run a disabled command.
+         - See docstring for `disable_command()` or `disable_category()` for more details.
+@@ -850,7 +869,8 @@
+     - The following commands now write to stderr instead of stdout when printing an error. This will make catching
+       errors easier in pyscript.
+       _ `do_help()` - when no help information can be found
+-      _ `default()` - in all cases since this is called when an invalid command name is run \* `_report_disabled_command_usage()` - in all cases since this is called when a disabled command is run
++      _ `default()` - in all cases since this is called when an invalid command name is run \*
++      `_report_disabled_command_usage()` - in all cases since this is called when a disabled command is run
+     - Removed \*\*\* from beginning of error messages printed by `do_help()` and `default()`
+     - Significantly refactored `cmd.Cmd` class so that all class attributes got converted to instance attributes, also:
+         - Added `allow_redirection`, `terminators`, `multiline_commands`, and `shortcuts` as optional arguments
+@@ -980,7 +1000,8 @@
+     - The **set** command now tab completes settable parameter names
+     - Added `async_alert`, `async_update_prompt`, and `set_window_title` functions
+         - These allow you to provide feedback to the user in an asynchronous fashion, meaning alerts can
+-          display when the user is still entering text at the prompt. See [async_printing.py](https://github.com/python-cmd2/cmd2/blob/master/examples/async_printing.py)
++          display when the user is still entering text at the prompt.
++          See [async_printing.py](https://github.com/python-cmd2/cmd2/blob/master/examples/async_printing.py)
+           for an example.
+     - Cross-platform colored output support
+         - `colorama` gets initialized properly in `Cmd.__init()`
+@@ -996,7 +1017,8 @@
+     - Deprecated the built-in `cmd2` support for colors including `Cmd.colorize()` and `Cmd._colorcodes`
+ - Deletions (potentially breaking changes)
+     - The `preparse`, `postparsing_precmd`, and `postparsing_postcmd` methods _deprecated_ in the previous release
+-      have been deleted \* The new application lifecycle hook system allows for registration of callbacks to be called at various points
++      have been deleted \* The new application lifecycle hook system allows for registration of callbacks to be called
++      at various points
+       in the lifecycle and is more powerful and flexible than the previous system
+     - `alias` is now a command with subcommands to create, list, and delete aliases. Therefore its syntax
+       has changed. All current alias commands in startup scripts or transcripts will break with this release.
+@@ -1012,7 +1034,8 @@
+       framework, see `docs/hooks.rst` for details.
+     - New dependency on `attrs` third party module
+     - Added `matches_sorted` member to support custom sorting of tab completion matches
+-    - Added [tab_autocomp_dynamic.py](https://github.com/python-cmd2/cmd2/blob/master/examples/tab_autocomp_dynamic.py) example
++    - Added [tab_autocomp_dynamic.py](https://github.com/python-cmd2/cmd2/blob/master/examples/tab_autocomp_dynamic.py)
++      example
+         - Demonstrates updating the argparse object during init instead of during class construction
+ - Deprecations
+     - Deprecated the following hook methods, see `hooks.rst` for full details:
+@@ -1051,8 +1074,10 @@
+     - Added `chop` argument to `cmd2.Cmd.ppaged()` method for displaying output using a pager
+         - If `chop` is `False`, then `self.pager` is used as the pager
+         - Otherwise `self.pager_chop` is used as the pager
+-    - Greatly improved the [table_display.py](https://github.com/python-cmd2/cmd2/blob/master/examples/table_display.py) example
+-        - Now uses the new [tableformatter](https://github.com/python-tableformatter/tableformatter) module which looks better than `tabulate`
++    - Greatly improved the [table_display.py](https://github.com/python-cmd2/cmd2/blob/master/examples/table_display.py)
++      example
++        - Now uses the new [tableformatter](https://github.com/python-tableformatter/tableformatter) module which looks
++          better than `tabulate`
+ - Deprecations
+     - The `CmdResult` helper class is _deprecated_ and replaced by the improved `CommandResult` class
+         - `CommandResult` has the following attributes: **stdout**, **stderr**, and **data**
+@@ -1075,32 +1100,46 @@
+ ## 0.9.0 (May 28, 2018)
+ 
+ - Bug Fixes
+-    - If self.default_to_shell is true, then redirection and piping are now properly passed to the shell. Previously it was truncated.
++    - If self.default_to_shell is true, then redirection and piping are now properly passed to the shell. Previously it
++      was truncated.
+     - Submenus now call all hooks, it used to just call precmd and postcmd.
+ - Enhancements
+     - Automatic completion of `argparse` arguments via `cmd2.argparse_completer.AutoCompleter`
+-        - See the [tab_autocompletion.py](https://github.com/python-cmd2/cmd2/blob/master/examples/tab_autocompletion.py) example for a demonstration of how to use this feature
++        - See
++          the [tab_autocompletion.py](https://github.com/python-cmd2/cmd2/blob/master/examples/tab_autocompletion.py)
++          example for a demonstration of how to use this feature
+     - `cmd2` no longer depends on the `six` module
+     - `cmd2` is now a multi-file Python package instead of a single-file module
+     - New pyscript approach that provides a pythonic interface to commands in the cmd2 application.
+     - Switch command parsing from pyparsing to custom code which utilizes shlex.
+-        - The object passed to do*\* methods has changed. It no longer is the pyparsing object, it's a new Statement object, which is a subclass of `str`. The statement object has many attributes which give you access to various components of the parsed input. If you were using anything but the string in your do*\* methods, this change will require you to update your code.
++        - The object passed to do*\* methods has changed. It no longer is the pyparsing object, it's a new Statement
++          object, which is a subclass of `str`. The statement object has many attributes which give you access to
++          various components of the parsed input. If you were using anything but the string in your do*\* methods, this
++          change will require you to update your code.
+         - `commentGrammars` is no longer supported or available. Comments are C-style or python style.
+         - Input redirection no longer supported. Use the load command instead.
+         - `multilineCommand` attribute is `now multiline_command`
+-        - `identchars` is now ignored. The standardlibrary cmd uses those characters to split the first "word" of the input, but cmd2 hasn't used those for a while, and the new parsing logic parses on whitespace, which has the added benefit of full unicode support, unlike cmd or prior versions of cmd2.
+-        - `set_posix_shlex` function and `POSIX_SHLEX` variable have been removed. Parsing behavior is now always the more forgiving `posix=false`.
+-        - `set_strip_quotes` function and `STRIP_QUOTES_FOR_NON_POSIX` have been removed. Quotes are stripped from arguments when presented as a list (a la `sys.argv`), and present when arguments are presented as a string (like the string passed to do\_\*).
++        - `identchars` is now ignored. The standardlibrary cmd uses those characters to split the first "word" of the
++          input, but cmd2 hasn't used those for a while, and the new parsing logic parses on whitespace, which has the
++          added benefit of full unicode support, unlike cmd or prior versions of cmd2.
++        - `set_posix_shlex` function and `POSIX_SHLEX` variable have been removed. Parsing behavior is now always the
++          more forgiving `posix=false`.
++        - `set_strip_quotes` function and `STRIP_QUOTES_FOR_NON_POSIX` have been removed. Quotes are stripped from
++          arguments when presented as a list (a la `sys.argv`), and present when arguments are presented as a string (
++          like the string passed to do\_\*).
+ - Changes
+     - `strip_ansi()` and `strip_quotes()` functions have moved to new utils module
+     - Several constants moved to new constants module
+-    - Submenu support has been moved to a new [cmd2-submenu](https://github.com/python-cmd2/cmd2-submenu) plugin. If you use submenus, you will need to update your dependencies and modify your imports.
++    - Submenu support has been moved to a new [cmd2-submenu](https://github.com/python-cmd2/cmd2-submenu) plugin. If you
++      use submenus, you will need to update your dependencies and modify your imports.
+ - Deletions (potentially breaking changes)
+     - Deleted all `optparse` code which had previously been deprecated in release 0.8.0
+         - The `options` decorator no longer exists
+         - All `cmd2` code should be ported to use the new `argparse`-based decorators
+-        - See the [Argument Processing](http://cmd2.readthedocs.io/en/latest/argument_processing.html) section of the documentation for more information on these decorators
+-        - Alternatively, see the [argparse_example.py](https://github.com/python-cmd2/cmd2/blob/master/examples/argparse_example.py)
++        - See the [Argument Processing](http://cmd2.readthedocs.io/en/latest/argument_processing.html) section of the
++          documentation for more information on these decorators
++        - Alternatively, see
++          the [argparse_example.py](https://github.com/python-cmd2/cmd2/blob/master/examples/argparse_example.py)
+     - Deleted `cmd_with_subs_completer`, `get_subcommands`, and `get_subcommand_completer`
+         - Replaced by default AutoCompleter implementation for all commands using argparse
+     - Deleted support for old method of calling application commands with `cmd()` and `self`
+@@ -1117,7 +1156,8 @@
+ - Bug Fixes
+     - Commands using the @with_argparser_and_unknown_args were not correctly recognized when tab completing
+     - Fixed issue where completion display function was overwritten when a submenu quits
+-    - Fixed `AttributeError` on Windows when running a `select` command cause by **pyreadline** not implementing `remove_history_item`
++    - Fixed `AttributeError` on Windows when running a `select` command cause by **pyreadline** not implementing
++      `remove_history_item`
+ - Enhancements
+     - Added warning about **libedit** variant of **readline** not being supported on macOS
+     - Added tab completion of alias names in value field of **alias** command
+@@ -1129,14 +1169,18 @@
+ 
+ - Bug Fixes
+ 
+-    - Fixed a bug with all argument decorators where the wrapped function wasn't returning a value and thus couldn't cause the cmd2 app to quit
++    - Fixed a bug with all argument decorators where the wrapped function wasn't returning a value and thus couldn't
++      cause the cmd2 app to quit
+ 
+ - Enhancements
+ 
+     - Added support for verbose help with -v where it lists a brief summary of what each command does
+     - Added support for categorizing commands into groups within the help menu
+-        - See the [Grouping Commands](http://cmd2.readthedocs.io/en/latest/argument_processing.html?highlight=verbose#grouping-commands) section of the docs for more info
+-        - See [help_categories.py](https://github.com/python-cmd2/cmd2/blob/master/examples/help_categories.py) for an example
++        - See
++          the [Grouping Commands](http://cmd2.readthedocs.io/en/latest/argument_processing.html?highlight=verbose#grouping-commands)
++          section of the docs for more info
++        - See [help_categories.py](https://github.com/python-cmd2/cmd2/blob/master/examples/help_categories.py) for an
++          example
+     - Tab completion of paths now supports ~user user path expansion
+     - Simplified implementation of various tab completion functions so they no longer require `ctypes`
+     - Expanded documentation of `display_matches` list to clarify its purpose. See cmd2.py for this documentation.
+@@ -1165,20 +1209,26 @@
+     - Tab completion has been overhauled and now supports completion of strings with quotes and spaces.
+     - Tab completion will automatically add an opening quote if a string with a space is completed.
+     - Added `delimiter_complete` function for tab completing delimited strings
+-    - Added more control over tab completion behavior including the following flags. The use of these flags is documented in cmd2.py
++    - Added more control over tab completion behavior including the following flags. The use of these flags is
++      documented in cmd2.py
+         - `allow_appended_space`
+         - `allow_closing_quote`
+-    - Due to the tab completion changes, non-Windows platforms now depend on [wcwidth](https://pypi.python.org/pypi/wcwidth).
++    - Due to the tab completion changes, non-Windows platforms now depend
++      on [wcwidth](https://pypi.python.org/pypi/wcwidth).
+     - An alias name can now match a command name.
+     - An alias can now resolve to another alias.
+ 
+ - Attribute Changes (Breaks backward compatibility)
+-    - `exclude_from_help` is now called `hidden_commands` since these commands are hidden from things other than help, including tab completion
+-        - This list also no longer takes the function names of commands (`do_history`), but instead uses the command names themselves (`history`)
++    - `exclude_from_help` is now called `hidden_commands` since these commands are hidden from things other than help,
++      including tab completion
++        - This list also no longer takes the function names of commands (`do_history`), but instead uses the command
++          names themselves (`history`)
+     - `excludeFromHistory` is now called `exclude_from_history`
+-    - `cmd_with_subs_completer()` no longer takes an argument called `base`. Adding tab completion to subcommands has been simplified to declaring it in the
++    - `cmd_with_subs_completer()` no longer takes an argument called `base`. Adding tab completion to subcommands has
++      been simplified to declaring it in the
+       subcommand parser's default settings. This easily allows arbitrary completers like path_complete to be used.
+-      See [subcommands.py](https://github.com/python-cmd2/cmd2/blob/master/examples/subcommands.py) for an example of how to use
++      See [subcommands.py](https://github.com/python-cmd2/cmd2/blob/master/examples/subcommands.py) for an example of
++      how to use
+       tab completion in subcommands. In addition, the docstring for `cmd_with_subs_completer()` offers more details.
+ 
+ ## 0.8.2 (March 21, 2018)
+@@ -1189,12 +1239,15 @@
+     - Fixed a bug where the `AddSubmenu` decorator didn't work with a default value for `shared_attributes`
+     - Added a check to `ppaged()` to only use a pager when running in a real fully functional terminal
+ - Enhancements
+-    - Added [quit_on_sigint](http://cmd2.readthedocs.io/en/latest/settingchanges.html#quit-on-sigint) attribute to enable canceling current line instead of quitting when Ctrl+C is typed
++    - Added [quit_on_sigint](http://cmd2.readthedocs.io/en/latest/settingchanges.html#quit-on-sigint) attribute to
++      enable canceling current line instead of quitting when Ctrl+C is typed
+     - Added possibility of having readline history preservation in a SubMenu
+-    - Added [table_display.py](https://github.com/python-cmd2/cmd2/blob/master/examples/table_display.py) example to demonstrate how to display tabular data
++    - Added [table_display.py](https://github.com/python-cmd2/cmd2/blob/master/examples/table_display.py) example to
++      demonstrate how to display tabular data
+     - Added command aliasing with `alias` and `unalias` commands
+     - Added the ability to load an initialization script at startup
+-        - See [alias_startup.py](https://github.com/python-cmd2/cmd2/blob/master/examples/alias_startup.py) for an example
++        - See [alias_startup.py](https://github.com/python-cmd2/cmd2/blob/master/examples/alias_startup.py) for an
++          example
+     - Added a default SIGINT handler which terminates any open pipe subprocesses and re-raises a KeyboardInterrupt
+     - For macOS, will load the `gnureadline` module if available and `readline` if not
+ 
+@@ -1207,10 +1260,14 @@
+     - Fixed outdated [remove_unused.py](https://github.com/python-cmd2/cmd2/blob/master/examples/remove_unused.py)
+ - Enhancements
+     - Added support for sub-menus.
+-        - See [submenus.py](https://github.com/python-cmd2/cmd2/blob/master/examples/submenus.py) for an example of how to use it
++        - See [submenus.py](https://github.com/python-cmd2/cmd2/blob/master/examples/submenus.py) for an example of how
++          to use it
+     - Added option for persistent readline history
+-        - See [persistent_history.py](https://github.com/python-cmd2/cmd2/blob/master/examples/persistent_history.py) for an example
+-        - See the [Searchable command history](http://cmd2.readthedocs.io/en/latest/freefeatures.html#searchable-command-history) section of the documentation for more info
++        - See [persistent_history.py](https://github.com/python-cmd2/cmd2/blob/master/examples/persistent_history.py)
++          for an example
++        - See
++          the [Searchable command history](http://cmd2.readthedocs.io/en/latest/freefeatures.html#searchable-command-history)
++          section of the documentation for more info
+     - Improved PyPI packaging by including unit tests and examples in the tarball
+     - Improved documentation to make it more obvious that **poutput()** should be used instead of **print()**
+     - `exclude_from_help` and `excludeFromHistory` are now instance instead of class attributes
+@@ -1237,11 +1294,15 @@
+             - **do\_\*** commands get a single argument which is the output of argparse.parse_args()
+         - **with_argparser_and_unknown_args** decorator for argparse-based argument parsing, but allows unknown args
+             - **do\_\*** commands get two arguments, the output of argparse.parse_known_args()
+-    - See the [Argument Processing](http://cmd2.readthedocs.io/en/latest/argument_processing.html) section of the documentation for more information on these decorators
+-        - Alternatively, see the [argparse_example.py](https://github.com/python-cmd2/cmd2/blob/master/examples/argparse_example.py)
++    - See the [Argument Processing](http://cmd2.readthedocs.io/en/latest/argument_processing.html) section of the
++      documentation for more information on these decorators
++        - Alternatively, see
++          the [argparse_example.py](https://github.com/python-cmd2/cmd2/blob/master/examples/argparse_example.py)
+           and [arg_print.py](https://github.com/python-cmd2/cmd2/blob/master/examples/arg_print.py) examples
+-    - Added support for Argparse subcommands when using the **with_argument_parser** or **with_argparser_and_unknown_args** decorators
+-        - See [subcommands.py](https://github.com/python-cmd2/cmd2/blob/master/examples/subcommands.py) for an example of how to use subcommands
++    - Added support for Argparse subcommands when using the **with_argument_parser** or \*
++      \*with_argparser_and_unknown_args\*\* decorators
++        - See [subcommands.py](https://github.com/python-cmd2/cmd2/blob/master/examples/subcommands.py) for an example
++          of how to use subcommands
+         - Tab completion of subcommand names is automatically supported
+     - The **\_\_relative_load** command is now hidden from the help menu by default
+         - This command is not intended to be called from the command line, only from within scripts
+@@ -1250,12 +1311,14 @@
+     - The **history** command can now automatically generate a transcript file for regression testing
+         - This makes creating regression tests for your `cmd2` application trivial
+ - Commands Removed
+-    - The **cmdenvironment** has been removed and its functionality incorporated into the **-a/--all** argument to **set**
++    - The **cmdenvironment** has been removed and its functionality incorporated into the **-a/--all** argument to **set
++      **
+     - The **show** command has been removed. Its functionality has always existing within **set** and continues to do so
+     - The **save** command has been removed. The capability to save commands is now part of the **history** command.
+     - The **run** command has been removed. The capability to run prior commands is now part of the **history** command.
+ - Other changes
+-    - The **edit** command no longer allows you to edit prior commands. The capability to edit prior commands is now part of the **history** command. The **edit** command still allows you to edit arbitrary files.
++    - The **edit** command no longer allows you to edit prior commands. The capability to edit prior commands is now
++      part of the **history** command. The **edit** command still allows you to edit arbitrary files.
+     - the **autorun_on_edit** setting has been removed.
+     - For Python 3.4 and earlier, `cmd2` now has an additional dependency on the `contextlib2` module
+ - Deprecations
+@@ -1362,7 +1425,8 @@
+     - Improved tab completion of file system paths, command names, and shell commands
+         - Thanks to Kevin Van Brunt for all of the help with debugging and testing this
+     - Changed default value of USE_ARG_LIST to True - this affects the beavhior of all **@options** commands
+-        - **WARNING**: This breaks backwards compatibility, to restore backwards compatibility, add this to the \***\*init**()\*\* method in your custom class derived from cmd2.Cmd:
++        - **WARNING**: This breaks backwards compatibility, to restore backwards compatibility, add this to the \*\*
++          \*\*init\*\*()\*\* method in your custom class derived from cmd2.Cmd:
+             - cmd2.set_use_arg_list(False)
+         - This change improves argument parsing for all new applications
+     - Refactored code to encapsulate most of the pyparsing logic into a ParserManager class
+@@ -1412,11 +1476,13 @@
+ 
+ ## 0.6.6.1 (August 14, 2013)
+ 
+-- No changes to code trunk. Generated sdist from Python 2.7 to avoid 2to3 changes being applied to source. (Issue https://bitbucket.org/catherinedevlin/cmd2/issue/6/packaging-bug)
++- No changes to code trunk. Generated sdist from Python 2.7 to avoid 2to3 changes being applied to source. (
++  Issue https://bitbucket.org/catherinedevlin/cmd2/issue/6/packaging-bug)
+ 
+ ## 0.6.6 (August 6, 2013)
+ 
+-- Added fix by bitbucket.org/desaintmartin to silence the editor check. bitbucket.org/catherinedevlin/cmd2/issue/1/silent-editor-check
++- Added fix by bitbucket.org/desaintmartin to silence the editor check.
++  bitbucket.org/catherinedevlin/cmd2/issue/1/silent-editor-check
+ 
+ ## 0.6.5.1 (March 18, 2013)
+ 
+diff --git a/README.md b/README.md
+index d34b925..6a54136 100755
+--- a/README.md
++++ b/README.md
+@@ -30,14 +30,21 @@ when using cmd.
+ ![system schema](https://raw.githubusercontent.com/python-cmd2/cmd2/master/.github/images/graph.drawio.png)
+ 
+ When creating solutions developers have no shortage of tools to create rich and smart user interfaces.
+-System administrators have long been duct taping together brittle workflows based on a menagerie of simple command line tools created by strangers on github and the guy down the hall.
++System administrators have long been duct taping together brittle workflows based on a menagerie of simple command line
++tools created by strangers on github and the guy down the hall.
+ Unfortunately, when CLIs become significantly complex the ease of command discoverability tends to fade quickly.
+-On the other hand, Web and traditional desktop GUIs are first in class when it comes to easily discovering functionality.
+-The price we pay for beautifully colored displays is complexity required to aggregate disperate applications into larger systems.
+-`cmd2` fills the niche between high [ease of command discovery](https://clig.dev/#ease-of-discovery) applications and smart workflow automation systems.
+-
+-The `cmd2` framework provides a great mixture of both worlds. Application designers can easily create complex applications and rely on the cmd2 library to offer effortless user facing help and extensive tab completion.
+-When users become comfortable with functionality, cmd2 turns into a feature rich library enabling a smooth transition to full automation. If designed with enough forethought, a well implemented cmd2 application can serve as a boutique workflow tool. `cmd2` pulls off this flexibility based on two pillars of philosophy:
++On the other hand, Web and traditional desktop GUIs are first in class when it comes to easily discovering
++functionality.
++The price we pay for beautifully colored displays is complexity required to aggregate disperate applications into larger
++systems.
++`cmd2` fills the niche between high [ease of command discovery](https://clig.dev/#ease-of-discovery) applications and
++smart workflow automation systems.
++
++The `cmd2` framework provides a great mixture of both worlds. Application designers can easily create complex
++applications and rely on the cmd2 library to offer effortless user facing help and extensive tab completion.
++When users become comfortable with functionality, cmd2 turns into a feature rich library enabling a smooth transition to
++full automation. If designed with enough forethought, a well implemented cmd2 application can serve as a boutique
++workflow tool. `cmd2` pulls off this flexibility based on two pillars of philosophy:
+ 
+ - Tab Completion
+ - Automation Transition
+@@ -46,7 +53,8 @@ When users become comfortable with functionality, cmd2 turns into a feature rich
+ 
+ <a href="https://imgflip.com/i/63h03x"><img src="https://i.imgflip.com/63h03x.jpg" title="made at imgflip.com" width="70%" height="%70"/></a>
+ 
+-Deep extensive tab completion and help text generation based on the argparse library create the first pillar of 'ease of command discovery'. The following is a list of features in this category.
++Deep extensive tab completion and help text generation based on the argparse library create the first pillar of 'ease of
++command discovery'. The following is a list of features in this category.
+ 
+ - Great tab completion of commands, subcommands, file system paths, and shell commands.
+ - Custom tab completion for user designed commands via simple function overloading.
+@@ -57,7 +65,8 @@ Deep extensive tab completion and help text generation based on the argparse lib
+ 
+ <a href="https://imgflip.com/i/66t0y0"><img src="https://i.imgflip.com/66t0y0.jpg" title="made at imgflip.com" width="70%" height="70%"/></a>
+ 
+-cmd2 creates the second pillar of 'ease of transition to automation' through alias/macro creation, command line argument parsing and execution of cmd2 scripting.
++cmd2 creates the second pillar of 'ease of transition to automation' through alias/macro creation, command line argument
++parsing and execution of cmd2 scripting.
+ 
+ - Flexible alias and macro creation for quick abstraction of commands.
+ - Text file scripting of your application with `run_script` (`@`) and `_relative_run_script` (`@@`)
+@@ -72,7 +81,7 @@ On all operating systems, the latest stable version of `cmd2` can be installed u
+ pip install -U cmd2
+ ```
+ 
+-cmd2 works with Python 3.8+ on Windows, macOS, and Linux. It is pure Python code with few 3rd-party dependencies.
++cmd2 works with Python 3.9+ on Windows, macOS, and Linux. It is pure Python code with few 3rd-party dependencies.
+ 
+ For information on other installation options, see
+ [Installation Instructions](https://cmd2.readthedocs.io/en/latest/overview/installation.html) in the cmd2
+@@ -94,7 +103,8 @@ The best way to learn the cmd2 api is to delve into the example applications loc
+     - [example code](https://github.com/python-cmd2/talks/tree/master/PyOhio_2019/examples)
+ - [Cookiecutter](https://github.com/cookiecutter/cookiecutter) Templates from community
+     - Basic cookiecutter template for cmd2 application : https://github.com/jayrod/cookiecutter-python-cmd2
+-    - Advanced cookiecutter template with external plugin support : https://github.com/jayrod/cookiecutter-python-cmd2-ext-plug
++    - Advanced cookiecutter template with external plugin
++      support : https://github.com/jayrod/cookiecutter-python-cmd2-ext-plug
+ - [cmd2 example applications](https://github.com/python-cmd2/cmd2/tree/master/examples)
+     - Basic cmd2 examples to demonstrate how to use various features
+ - [Advanced Examples](https://github.com/jayrod/cmd2-example-apps)
+@@ -111,11 +121,14 @@ import cmd2
+ class FirstApp(cmd2.Cmd):
+     """A simple cmd2 application."""
+ 
+-  def do_hello_world(self, _: cmd2.Statement):
++
++def do_hello_world(self, _: cmd2.Statement):
+     self.poutput('Hello World')
+ 
++
+ if __name__ == '__main__':
+     import sys
++
+     c = FirstApp()
+     sys.exit(c.cmdloop())
+ 
+@@ -123,7 +136,10 @@ if __name__ == '__main__':
+ 
+ ## Found a bug?
+ 
+-If you think you've found a bug, please first read through the open [Issues](https://github.com/python-cmd2/cmd2/issues). If you're confident it's a new bug, go ahead and create a new GitHub issue. Be sure to include as much information as possible so we can reproduce the bug. At a minimum, please state the following:
++If you think you've found a bug, please first read through the
++open [Issues](https://github.com/python-cmd2/cmd2/issues). If you're confident it's a new bug, go ahead and create a new
++GitHub issue. Be sure to include as much information as possible so we can reproduce the bug. At a minimum, please state
++the following:
+ 
+ - `cmd2` version
+ - Python version
+diff --git a/cmd2/argparse_custom.py b/cmd2/argparse_custom.py
+index 68249d8..993f263 100644
+--- a/cmd2/argparse_custom.py
++++ b/cmd2/argparse_custom.py
+@@ -1252,6 +1252,9 @@ class Cmd2ArgumentParser(argparse.ArgumentParser):
+         conflict_handler: str = 'error',
+         add_help: bool = True,
+         allow_abbrev: bool = True,
++        exit_on_error: bool = True,
++        suggest_on_error: bool = False,
++        color: bool = False,
+         *,
+         ap_completer_type: Optional[Type['ArgparseCompleter']] = None,
+     ) -> None:
+@@ -1262,20 +1265,42 @@ class Cmd2ArgumentParser(argparse.ArgumentParser):
+                                   behavior on this parser. If this is None or not present, then cmd2 will use
+                                   argparse_completer.DEFAULT_AP_COMPLETER when tab completing this parser's arguments
+         """
+-        super(Cmd2ArgumentParser, self).__init__(
+-            prog=prog,
+-            usage=usage,
+-            description=description,
+-            epilog=epilog,
+-            parents=parents if parents else [],
+-            formatter_class=formatter_class,  # type: ignore[arg-type]
+-            prefix_chars=prefix_chars,
+-            fromfile_prefix_chars=fromfile_prefix_chars,
+-            argument_default=argument_default,
+-            conflict_handler=conflict_handler,
+-            add_help=add_help,
+-            allow_abbrev=allow_abbrev,
+-        )
++        if sys.version_info[1] >= 14:
++            # Python >= 3.14 so pass new arguments to parent argparse.ArgumentParser class
++            super(Cmd2ArgumentParser, self).__init__(
++                prog=prog,
++                usage=usage,
++                description=description,
++                epilog=epilog,
++                parents=parents if parents else [],
++                formatter_class=formatter_class,  # type: ignore[arg-type]
++                prefix_chars=prefix_chars,
++                fromfile_prefix_chars=fromfile_prefix_chars,
++                argument_default=argument_default,
++                conflict_handler=conflict_handler,
++                add_help=add_help,
++                allow_abbrev=allow_abbrev,
++                exit_on_error=exit_on_error,
++                suggest_on_error=suggest_on_error,
++                color=color,
++            )
++        else:
++            # Python < 3.14, so don't pass new arguments to parent argparse.ArgumentParser class
++            super(Cmd2ArgumentParser, self).__init__(
++                prog=prog,
++                usage=usage,
++                description=description,
++                epilog=epilog,
++                parents=parents if parents else [],
++                formatter_class=formatter_class,  # type: ignore[arg-type]
++                prefix_chars=prefix_chars,
++                fromfile_prefix_chars=fromfile_prefix_chars,
++                argument_default=argument_default,
++                conflict_handler=conflict_handler,
++                add_help=add_help,
++                allow_abbrev=allow_abbrev,
++                exit_on_error=exit_on_error,
++            )
+ 
+         self.set_ap_completer_type(ap_completer_type)  # type: ignore[attr-defined]
+ 
+diff --git a/docs/overview/installation.md b/docs/overview/installation.md
+index e7bcf58..e1be175 100644
+--- a/docs/overview/installation.md
++++ b/docs/overview/installation.md
+@@ -1,6 +1,7 @@
+ # Installation Instructions
+ 
+-`cmd2` works on Linux, macOS, and Windows. It requires Python 3.8 or higher, [pip](https://pypi.org/project/pip), and [setuptools](https://pypi.org/project/setuptools). If you've got all that, then you can just:
++`cmd2` works on Linux, macOS, and Windows. It requires Python 3.9 or higher, [pip](https://pypi.org/project/pip),
++and [setuptools](https://pypi.org/project/setuptools). If you've got all that, then you can just:
+ 
+ ```shell
+ $ pip install cmd2
+@@ -16,7 +17,9 @@ $ pip install cmd2
+ 
+ ## Prerequisites
+ 
+-If you have Python 3 >=3.8 installed from [python.org](https://www.python.org), you will already have [pip](https://pypi.org/project/pip) and [setuptools](https://pypi.org/project/setuptools), but may need to upgrade to the latest versions:
++If you have Python 3 >=3.9 installed from [python.org](https://www.python.org), you will already
++have [pip](https://pypi.org/project/pip) and [setuptools](https://pypi.org/project/setuptools), but may need to upgrade
++to the latest versions:
+ 
+ On Linux or OS X:
+ 
+@@ -32,7 +35,8 @@ C:\> python -m pip install -U pip setuptools
+ 
+ ## Install from PyPI {: #pip_install }
+ 
+-[pip](https://pypi.org/project/pip) is the recommended installer. Installing packages from [PyPI](https://pypi.org) with pip is easy:
++[pip](https://pypi.org/project/pip) is the recommended installer. Installing packages from [PyPI](https://pypi.org) with
++pip is easy:
+ 
+ ```shell
+ $ pip install cmd2
+@@ -42,7 +46,8 @@ This will install the required 3rd-party dependencies, if necessary.
+ 
+ ## Install from GitHub {: #github }
+ 
+-The latest version of `cmd2` can be installed directly from the master branch on GitHub using [pip](https://pypi.org/project/pip):
++The latest version of `cmd2` can be installed directly from the master branch on GitHub
++using [pip](https://pypi.org/project/pip):
+ 
+ ```shell
+ $ pip install -U git+git://github.com/python-cmd2/cmd2.git
+@@ -50,7 +55,8 @@ $ pip install -U git+git://github.com/python-cmd2/cmd2.git
+ 
+ ## Install from Debian or Ubuntu repos
+ 
+-We recommend installing from [pip](https://pypi.org/project/pip), but if you wish to install from Debian or Ubuntu repos this can be done with apt-get.
++We recommend installing from [pip](https://pypi.org/project/pip), but if you wish to install from Debian or Ubuntu repos
++this can be done with apt-get.
+ 
+ For Python 3:
+ 
+@@ -78,13 +84,19 @@ If you wish to permanently uninstall `cmd2`, this can also easily be done with [
+ 
+ ## readline Considerations
+ 
+-Tab completion for `cmd2` applications is only tested against GNU Readline. It does not work properly with the [libedit](http://thrysoee.dk/editline/) library which is similar, but not identical to GNU Readline. `cmd2` will disable all tab-completion support if an incompatible version of `readline` is found.
++Tab completion for `cmd2` applications is only tested against GNU Readline. It does not work properly with
++the [libedit](http://thrysoee.dk/editline/) library which is similar, but not identical to GNU Readline. `cmd2` will
++disable all tab-completion support if an incompatible version of `readline` is found.
+ 
+-When installed using `pip`, `uv`, or similar Python packaging tool on either `macOS` or `Windows`, `cmd2` will automatically install a compatiable version of readline.
++When installed using `pip`, `uv`, or similar Python packaging tool on either `macOS` or `Windows`, `cmd2` will
++automatically install a compatiable version of readline.
+ 
+-Most `Linux` OSes come with a compatible version of readline. However, if you are using a tool like `uv` to install Python on your system and configure a virtual environment, `uv` installed versions of Python come with `libEdit`.
++Most `Linux` OSes come with a compatible version of readline. However, if you are using a tool like `uv` to install
++Python on your system and configure a virtual environment, `uv` installed versions of Python come with `libEdit`.
+ 
+-macOS comes with the [libedit](http://thrysoee.dk/editline/) library which is similar, but not identical, to GNU Readline. Tab completion for `cmd2` applications is only tested against GNU Readline. In this case you just need to install the `gnureadline` Python package which is statically linked against GNU Readline:
++macOS comes with the [libedit](http://thrysoee.dk/editline/) library which is similar, but not identical, to GNU
++Readline. Tab completion for `cmd2` applications is only tested against GNU Readline. In this case you just need to
++install the `gnureadline` Python package which is statically linked against GNU Readline:
+ 
+ ```shell
+ $ pip install -U gnureadline
+diff --git a/plugins/ext_test/build-pyenvs.sh b/plugins/ext_test/build-pyenvs.sh
+index 20f5c8d..4b515bb 100644
+--- a/plugins/ext_test/build-pyenvs.sh
++++ b/plugins/ext_test/build-pyenvs.sh
+@@ -8,7 +8,7 @@
+ # version numbers are: major.minor.patch
+ #
+ # this script will delete and recreate existing virtualenvs named
+-# cmd2-3.8, etc. It will also create a .python-version
++# cmd2-3.9, etc. It will also create a .python-version
+ #
+ # Prerequisites:
+ #   - *nix-ish environment like macOS or Linux
+@@ -23,7 +23,7 @@
+ # virtualenvs will be added to '.python-version'. Feel free to modify
+ # this list, but note that this script intentionally won't install
+ # dev, rc, or beta python releases
+-declare -a pythons=("3.8" "3.9", "3.10", "3.11", "3.12")
++declare -a pythons=("3.9", "3.10", "3.11", "3.12", "3.13")
+ 
+ # function to find the latest patch of a minor version of python
+ function find_latest_version {
+diff --git a/plugins/ext_test/noxfile.py b/plugins/ext_test/noxfile.py
+index 25a9506..d8aa344 100644
+--- a/plugins/ext_test/noxfile.py
++++ b/plugins/ext_test/noxfile.py
+@@ -1,7 +1,7 @@
+ import nox
+ 
+ 
+-@nox.session(python=['3.8', '3.9', '3.10', '3.11', '3.12'])
++@nox.session(python=['3.9', '3.10', '3.11', '3.12', '3.13'])
+ def tests(session):
+     session.install('invoke', './[test]')
+     session.run('invoke', 'pytest', '--junit', '--no-pty')
+diff --git a/plugins/ext_test/setup.py b/plugins/ext_test/setup.py
+index 4511041..42c6d8a 100644
+--- a/plugins/ext_test/setup.py
++++ b/plugins/ext_test/setup.py
+@@ -33,7 +33,7 @@ setuptools.setup(
+     license='MIT',
+     package_data=PACKAGE_DATA,
+     packages=['cmd2_ext_test'],
+-    python_requires='>=3.8',
++    python_requires='>=3.9',
+     install_requires=['cmd2 >= 2, <3'],
+     setup_requires=['setuptools >= 42', 'setuptools_scm >= 3.4'],
+     classifiers=[
+@@ -43,11 +43,12 @@ setuptools.setup(
+         'Topic :: Software Development :: Libraries :: Python Modules',
+         'Intended Audience :: Developers',
+         'License :: OSI Approved :: MIT License',
+-        'Programming Language :: Python :: 3.8',
+         'Programming Language :: Python :: 3.9',
+         'Programming Language :: Python :: 3.10',
+         'Programming Language :: Python :: 3.11',
+         'Programming Language :: Python :: 3.12',
++        'Programming Language :: Python :: 3.13',
++        'Programming Language :: Python :: 3.14',
+     ],
+     # dependencies for development and testing
+     # $ pip install -e .[dev]
+diff --git a/plugins/template/README.md b/plugins/template/README.md
+index 775a9a8..7d305ea 100644
+--- a/plugins/template/README.md
++++ b/plugins/template/README.md
+@@ -51,8 +51,10 @@ and an example app which uses the plugin:
+ import cmd2
+ import cmd2_myplugin
+ 
++
+ class Example(cmd2_myplugin.MyPlugin, cmd2.Cmd):
+     """An class to show how to use a plugin"""
++
+     def __init__(self, *args, **kwargs):
+         # code placed here runs before cmd2.Cmd or
+         # any plugins initialize
+@@ -259,7 +261,7 @@ $ pip install -e .[dev]
+ This command also installs `cmd2-myplugin` "in-place", so the package points to
+ the source code instead of copying files to the python `site-packages` folder.
+ 
+-All the dependencies now have been installed in the `cmd2-3.8`
++All the dependencies now have been installed in the `cmd2-3.9`
+ virtualenv. If you want to work in other virtualenvs, you'll need to manually
+ select it, and install again::
+ 
+diff --git a/plugins/template/build-pyenvs.sh b/plugins/template/build-pyenvs.sh
+index 4a6e157..fd0b505 100644
+--- a/plugins/template/build-pyenvs.sh
++++ b/plugins/template/build-pyenvs.sh
+@@ -8,7 +8,7 @@
+ # version numbers are: major.minor.patch
+ #
+ # this script will delete and recreate existing virtualenvs named
+-# cmd2-3.8, etc. It will also create a .python-version
++# cmd2-3.9, etc. It will also create a .python-version
+ #
+ # Prerequisites:
+ #   - *nix-ish environment like macOS or Linux
+@@ -23,7 +23,7 @@
+ # virtualenvs will be added to '.python-version'. Feel free to modify
+ # this list, but note that this script intentionally won't install
+ # dev, rc, or beta python releases
+-declare -a pythons=("3.8" "3.9" "3.10" "3.11", "3.12")
++declare -a pythons=("3.9" "3.10" "3.11", "3.12", "3.13")
+ 
+ # function to find the latest patch of a minor version of python
+ function find_latest_version {
+diff --git a/plugins/template/noxfile.py b/plugins/template/noxfile.py
+index 25a9506..d8aa344 100644
+--- a/plugins/template/noxfile.py
++++ b/plugins/template/noxfile.py
+@@ -1,7 +1,7 @@
+ import nox
+ 
+ 
+-@nox.session(python=['3.8', '3.9', '3.10', '3.11', '3.12'])
++@nox.session(python=['3.9', '3.10', '3.11', '3.12', '3.13'])
+ def tests(session):
+     session.install('invoke', './[test]')
+     session.run('invoke', 'pytest', '--junit', '--no-pty')
+diff --git a/plugins/template/setup.py b/plugins/template/setup.py
+index 7e872cd..126f8dd 100644
+--- a/plugins/template/setup.py
++++ b/plugins/template/setup.py
+@@ -24,7 +24,7 @@ setuptools.setup(
+     url='https://github.com/python-cmd2/cmd2-plugin-template',
+     license='MIT',
+     packages=['cmd2_myplugin'],
+-    python_requires='>=3.8',
++    python_requires='>=3.9',
+     install_requires=['cmd2 >= 2, <3'],
+     setup_requires=['setuptools_scm'],
+     classifiers=[
+@@ -34,11 +34,12 @@ setuptools.setup(
+         'Topic :: Software Development :: Libraries :: Python Modules',
+         'Intended Audience :: Developers',
+         'License :: OSI Approved :: MIT License',
+-        'Programming Language :: Python :: 3.8',
+         'Programming Language :: Python :: 3.9',
+         'Programming Language :: Python :: 3.10',
+         'Programming Language :: Python :: 3.11',
+         'Programming Language :: Python :: 3.12',
++        'Programming Language :: Python :: 3.13',
++        'Programming Language :: Python :: 3.14',
+     ],
+     # dependencies for development and testing
+     # $ pip install -e .[dev]
+diff --git a/pyproject.toml b/pyproject.toml
+index aff0181..11f5f48 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,7 +8,7 @@ dynamic = ["version"]
+ description = "cmd2 - quickly build feature-rich and user-friendly interactive command line applications in Python"
+ authors = [{ name = "cmd2 Contributors" }]
+ readme = "README.md"
+-requires-python = ">=3.8"
++requires-python = ">=3.9"
+ keywords = ["CLI", "cmd", "command", "interactive", "prompt", "Python"]
+ license = { file = "LICENSE" }
+ classifiers = [
+@@ -19,12 +19,12 @@ classifiers = [
+     "Intended Audience :: System Administrators",
+     "License :: OSI Approved :: MIT License",
+     "Programming Language :: Python :: 3 :: Only",
+-    "Programming Language :: Python :: 3.8",
+     "Programming Language :: Python :: 3.9",
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
+     "Programming Language :: Python :: 3.13",
++    "Programming Language :: Python :: 3.14",
+     "Topic :: Software Development :: Libraries :: Python Modules",
+ ]
+ dependencies = [
+@@ -80,16 +80,16 @@ disallow_untyped_defs = true
+ exclude = [
+     "^.git/",
+     "^.venv/",
+-    "^build/",          # .build directory
+-    "^docs/",           # docs directory
++    "^build/", # .build directory
++    "^docs/", # docs directory
+     "^dist/",
+-    "^examples/",       # examples directory
+-    "^plugins/*",       # plugins directory
+-    "^noxfile\\.py$",   # nox config file
+-    "setup\\.py$",      # any files named setup.py
++    "^examples/", # examples directory
++    "^plugins/*", # plugins directory
++    "^noxfile\\.py$", # nox config file
++    "setup\\.py$", # any files named setup.py
+     "^site/",
+-    "^tasks\\.py$",     # tasks.py invoke config file
+-    "^tests/",          # tests directory
++    "^tasks\\.py$", # tasks.py invoke config file
++    "^tests/", # tests directory
+     "^tests_isolated/", # tests_isolated directory
+ ]
+ files = ['.']
+@@ -155,75 +155,73 @@ output-format = "full"
+ # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+ # McCabe complexity (`C901`) by default.
+ select = [
+-    # https://beta.ruff.rs/docs/rules
+-    #    "A", # flake8-builtins
+-    #    "ANN",  # flake8-annotations
+-    #    "ARG", # flake8-unused-arguments
+-    "ASYNC", # flake8-async
+-    #    "B", # flake8-bugbear
+-    #    "BLE", # flake8-blind-except
+-    #    "C4", # flake8-comprehensions
+-    "C90", # McCabe cyclomatic complexity
+-    #    "COM",  # flake8-commas
+-    #    "D",    # pydocstyle
+-    "DJ", # flake8-django
+-    #    "DTZ", # flake8-datetimez
+-    "E", # pycodestyle
+-    #    "EM", # flake8-errmsg
+-    #    "ERA",  # eradicate
+-    #    "EXE", # flake8-executable
+-    "F",  # Pyflakes
+-    "FA", # flake8-future-annotations
+-    #    "FBT",  # flake8-boolean-trap
+-    "G", # flake8-logging-format
+-    #    "I", # isort
+-    "ICN", # flake8-import-conventions
+-    #    "INP", # flake8-no-pep420
+-    "INT", # flake8-gettext
+-    #    "ISC", # flake8-implicit-str-concat
+-    #    "N", # pep8-naming
+-    "NPY", # NumPy-specific rules
+-    "PD",  # pandas-vet
+-    #    "PGH", # pygrep-hooks
+-    #    "PIE", # flake8-pie
+-    #    "PL", # Pylint
+-    #    "PT", # flake8-pytest-style
+-    #    "PTH",  # flake8-use-pathlib
+-    #    "PYI", # flake8-pyi
+-    #    "RET",  # flake8-return
+-    "RSE", # flake8-raise
+-    #    "Q",    # flake8-quotes
+-    #    "RUF", # Ruff-specific rules
+-    #    "S", # flake8-bandit
+-    #    "SIM", # flake8-simplify
+-    #    "SLF", # flake8-self
+-    #    "T10", # flake8-debugger
+-    #    "T20",  # flake8-print
+-    #    "TCH",  # flake8-type-checking
+-    #    "TD", # flake8-todos
+-    #    "TID", # flake8-tidy-imports
+-    #    "TRY",  # tryceratops
+-    #    "UP", # pyupgrade
+-    #    "W", # pycodestyle
+-    #    "YTT", # flake8-2020
++    # https://docs.astral.sh/ruff/rules
++    # "A", # flake8-builtins (variables or arguments shadowing built-ins)
++    "AIR", # Airflow specific warnings
++    # "ANN",  # flake8-annotations (missing type annotations for arguments or return types)
++    # "ARG", # flake8-unused-arguments (functions or methods with arguments that are never used)
++    "ASYNC", # flake8-async (async await bugs)
++    # "B", # flake8-bugbear (various likely bugs and design issues)
++    # "BLE", # flake8-blind-except (force more specific exception types than just Exception)
++    # "C4", # flake8-comprehensions (warn about things that could be written as a comprehensions but aren't)
++    "C90", # McCabe cyclomatic complexity (warn about functions that are too complex)
++    # "COM",  # flake8-commas (forces commas at the end of every type of iterable/container
++    # "CPY", # flake8-copyright (warn about missing copyright notice at top of file - currently in preview)
++    # "D",    # pydocstyle (warn about things like missing docstrings)
++    # "DOC", # pydoclint (docstring warnings - currently in preview)
++    "DJ", # flake8-django (Django-specific warnings)
++    # "DTZ", # flake8-datetimez (warn about datetime calls where no timezone is specified)
++    "E", # pycodestyle errors (warn about major stylistic issues like mixing spaces and tabs)
++    # "EM", # flake8-errmsg (warn about exceptions that use string literals that aren't assigned to a variable first)
++    # "ERA",  # eradicate (warn about commented-out code)
++    # "EXE", # flake8-executable (warn about files with a shebang present that aren't executable or vice versa)
++    "F",  # Pyflakes (a bunch of common warnings for things like unused imports, imports shadowed by variables, etc)
++    "FA", # flake8-future-annotations (warn if certain from __future__ imports are used but missing)
++    "FAST", # FastAPI specific warnings
++    # "FBT",  # flake8-boolean-trap (force all boolean arguments passed to functions to be keyword arguments and not positional)
++    # "FIX", # flake8-fixme (warn about lines containing FIXME, TODO, XXX, or HACK)
++    "FLY", # flynt (automatically convert from old school string .format to f-strings)
++    # "FURB", # refurb (A tool for refurbishing and modernizing Python codebases)
++    "G", # flake8-logging-format (warn about logging statements using outdated string formatting methods)
++    "I", # isort (sort all import statements in the order established by isort)
++    "ICN", # flake8-import-conventions (force idiomatic import conventions for certain modules typically imported as something else)
++    # "INP", # flake8-no-pep420 (warn about files in the implicit namespace - i.e. force creation of __init__.py files to make packages)
++    "INT", # flake8-gettext (warnings that only apply when you are internationalizing your strings)
++    # "ISC", # flake8-implicit-str-concat (warnings related to implicit vs explicit string concatenation)
++    # "LOG", # flake8-logging (warn about potential logger issues, but very pedantic)
++    # "N", # pep8-naming (force idiomatic naming for classes, functions/methods, and variables/arguments)
++    "NPY", # NumPy specific rules
++    "PD",  # pandas-vet (Pandas specific rules)
++    # "PERF", # Perflint (warn about performance issues)
++    # "PGH", # pygrep-hooks (force specific rule codes when ignoring type or linter issues on a line)
++    # "PIE", # flake8-pie (eliminate unnecessary use of pass, range starting at 0, etc.)
++    # "PLC", # Pylint Conventions
++    "PLE", # Pylint Errors
++    # "PLR", # Pylint Refactoring suggestions
++    # "PLW", # Pylint Warnings
++    # "PT", # flake8-pytest-style (warnings about unit test best practices)
++    # "PTH",  # flake8-use-pathlib (force use of pathlib instead of os.path)
++    # "PYI", # flake8-pyi (warnings related to type hint best practices)
++    # "Q",    # flake8-quotes (force double quotes)
++    # "RET",  # flake8-return (various warnings related to implicit vs explicit return statements)
++    "RSE", # flake8-raise (warn about unnecessary parentheses on raised exceptions)
++    # "RUF", # Ruff-specific rules (miscellaneous grab bag of lint checks specific to Ruff)
++    # "S", # flake8-bandit (security oriented checks, but extremely pedantic - do not attempt to apply to unit test files)
++    # "SIM", # flake8-simplify (rules to attempt to simplify code)
++    # "SLF", # flake8-self (warn when protected members are accessed outside of a class or file)
++    # "SLOT", # flake8-slots (warn about subclasses that should define __slots__)
++    "T10", # flake8-debugger (check for pdb traces left in Python code)
++    # "T20",  # flake8-print (warn about use of `print` or `pprint` - force use of loggers)
++    # "TC",  # flake8-type-checking (type checking warnings)
++    # "TD", # flake8-todos (force all TODOs to include an author and issue link)
++    "TID", # flake8-tidy-imports (extra import rules to check)
++    # "TRY",  # tryceratops (warnings related to exceptions and try/except)
++    # "UP", # pyupgrade (A tool (and pre-commit hook) to automatically upgrade syntax for newer versions of the language)
++    "W", # pycodestyle warnings (warn about minor stylistic issues)
++    # "YTT", # flake8-2020 (checks for misuse of sys.version or sys.version_info)
+ ]
+ ignore = [
+-    # `ruff rule S101` for a description of that rule
+-    "B904",    # Within an `except` clause, raise exceptions with `raise ... from err` -- FIX ME
+-    "B905",    # `zip()` without an explicit `strict=` parameter -- FIX ME
+-    "E501",    # Line too long
+-    "EM101",   # Exception must not use a string literal, assign to variable first
+-    "EXE001",  # Shebang is present but file is not executable -- DO NOT FIX
+-    "G004",    # Logging statement uses f-string
+-    "PLC1901", # `{}` can be simplified to `{}` as an empty string is falsey
+-    "PLW060",  # Using global for `{name}` but no assignment is done -- DO NOT FIX
+-    "PLW2901", # PLW2901: Redefined loop variable -- FIX ME
+-    "PT011",   # `pytest.raises(Exception)` is too broad, set the `match` parameter or use a more specific exception
+-    "PT018",   # Assertion should be broken down into multiple parts
+-    "S101",    # Use of `assert` detected -- DO NOT FIX
+-    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes -- FIX ME
+-    "SLF001",  # Private member accessed: `_Iterator` -- FIX ME
+-    "UP038",   # Use `X | Y` in `{}` call instead of `(X, Y)` -- DO NOT FIX
++    # `uv run ruff rule E501` for a description of that rule
+ ]
+ 
+ # Allow fix for all enabled rules (when `--fix`) is provided.
+diff --git a/tests/test_argparse_custom.py b/tests/test_argparse_custom.py
+index a3f8555..06d7b7d 100644
+--- a/tests/test_argparse_custom.py
++++ b/tests/test_argparse_custom.py
+@@ -79,7 +79,7 @@ def test_apcustom_no_choices_callables_alongside_choices(kwargs):
+ def test_apcustom_no_choices_callables_when_nargs_is_0(kwargs):
+     with pytest.raises(TypeError) as excinfo:
+         parser = Cmd2ArgumentParser()
+-        parser.add_argument('name', action='store_true', **kwargs)
++        parser.add_argument('--name', action='store_true', **kwargs)
+     assert 'None of the following parameters can be used on an action that takes no arguments' in str(excinfo.value)
+ 
+ 
+diff --git a/tests/test_history.py b/tests/test_history.py
+index 1a3bd74..284112d 100755
+--- a/tests/test_history.py
++++ b/tests/test_history.py
+@@ -772,7 +772,7 @@ def test_history_verbose_with_other_options(base_app):
+     options_to_test = ['-r', '-e', '-o file', '-t file', '-c', '-x']
+     for opt in options_to_test:
+         out, err = run_cmd(base_app, 'history -v ' + opt)
+-        assert len(out) == 4
++        assert 4 <= len(out) <= 5
+         assert out[0] == '-v cannot be used with any other options'
+         assert out[1].startswith('Usage:')
+         assert base_app.last_result is False
+@@ -800,7 +800,7 @@ def test_history_script_with_invalid_options(base_app):
+     options_to_test = ['-r', '-e', '-o file', '-t file', '-c']
+     for opt in options_to_test:
+         out, err = run_cmd(base_app, 'history -s ' + opt)
+-        assert len(out) == 4
++        assert 4 <= len(out) <= 5
+         assert out[0] == '-s and -x cannot be used with -c, -r, -e, -o, or -t'
+         assert out[1].startswith('Usage:')
+         assert base_app.last_result is False
+@@ -820,7 +820,7 @@ def test_history_expanded_with_invalid_options(base_app):
+     options_to_test = ['-r', '-e', '-o file', '-t file', '-c']
+     for opt in options_to_test:
+         out, err = run_cmd(base_app, 'history -x ' + opt)
+-        assert len(out) == 4
++        assert 4 <= len(out) <= 5
+         assert out[0] == '-s and -x cannot be used with -c, -r, -e, -o, or -t'
+         assert out[1].startswith('Usage:')
+         assert base_app.last_result is False
+-- 
+2.49.0
+

@@ -1,0 +1,28 @@
+From 556bc78b89338f9bead554aa5dfb3a65d60b4fba Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Mon, 31 Mar 2025 22:34:59 -0400
+Subject: [PATCH] libc: fix build in C23 mode
+
+GCC 15 defaults to C23, in which bool, true, and false are keywords.
+
+Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+---
+ lib/libc/include/stdbool.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/libc/include/stdbool.h b/lib/libc/include/stdbool.h
+index 5b7d36a..0e0f8c6 100644
+--- a/lib/libc/include/stdbool.h
++++ b/lib/libc/include/stdbool.h
+@@ -13,7 +13,7 @@
+ #ifndef _STDBOOL_H
+ #define _STDBOOL_H
+ 
+-#ifndef __cplusplus
++#if !defined(__cplusplus) && __STDC_VERSION__ < 202311L
+ typedef enum { false = 0, true } bool;
+ #endif
+ 
+-- 
+2.49.0
+

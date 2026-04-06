@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: ngie-eign <1574099+ngie-eign@users.noreply.github.com>
+Date: Mon, 25 Feb 2019 21:34:24 -0800
+Subject: 00409: bpo-13497: Fix `broken nice` configure test
+
+Per POSIX, `nice(3)` requires `unistd.h` and `exit(3)` requires `stdlib.h`.
+
+Fixing the test will prevent false positives with pedantic compilers like clang.
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index f7668224be..2696661ab9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4946,6 +4946,8 @@ LIBS=$LIBS_no_readline
+ AC_MSG_CHECKING(for broken nice())
+ AC_CACHE_VAL(ac_cv_broken_nice, [
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
++#include <stdlib.h>
++#include <unistd.h>
+ int main()
+ {
+ 	int val1 = nice(1);

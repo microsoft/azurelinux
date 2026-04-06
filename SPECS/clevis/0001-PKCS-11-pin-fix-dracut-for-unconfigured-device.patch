@@ -1,0 +1,288 @@
+From 691b4136d6077ed7b079a38459b6844dbc584776 Mon Sep 17 00:00:00 2001
+From: Sergio Arroutbi <sarroutb@redhat.com>
+Date: Mon, 30 Sep 2024 11:27:57 +0200
+Subject: [PATCH] PKCS#11 pin: fix dracut for unconfigured device
+
+Signed-off-by: Sergio Arroutbi <sarroutb@redhat.com>
+---
+ .../clevis-pin-pkcs11/module-setup.sh.in      |  2 +-
+ src/luks/systemd/clevis-luks-pkcs11-askpin.in | 72 +++++--------------
+ .../clevis-pkcs11-afunix-socket-unlock.c      |  9 ++-
+ src/pins/pkcs11/clevis-pkcs11-common          | 52 +++++++++++++-
+ 4 files changed, 74 insertions(+), 61 deletions(-)
+
+diff --git a/src/luks/dracut/clevis-pin-pkcs11/module-setup.sh.in b/src/luks/dracut/clevis-pin-pkcs11/module-setup.sh.in
+index 39d06a0..a7a6d6b 100755
+--- a/src/luks/dracut/clevis-pin-pkcs11/module-setup.sh.in
++++ b/src/luks/dracut/clevis-pin-pkcs11/module-setup.sh.in
+@@ -23,7 +23,7 @@ depends() {
+ }
+ 
+ install() {
+-    inst_hook initqueue 60 "${moddir}/clevis-pkcs11-prehook.sh"
++    inst_hook pre-trigger 60 "${moddir}/clevis-pkcs11-prehook.sh"
+     inst_hook initqueue/settled 60 "${moddir}/clevis-pkcs11-hook.sh"
+     inst_hook initqueue/online 60 "${moddir}/clevis-pkcs11-hook.sh"
+ 
+diff --git a/src/luks/systemd/clevis-luks-pkcs11-askpin.in b/src/luks/systemd/clevis-luks-pkcs11-askpin.in
+index 8f4092f..b860efa 100755
+--- a/src/luks/systemd/clevis-luks-pkcs11-askpin.in
++++ b/src/luks/systemd/clevis-luks-pkcs11-askpin.in
+@@ -52,6 +52,7 @@ get_pkcs11_error() {
+     return 0
+ }
+ 
++
+ if command -v pcscd; then
+     echo "clevis-pkcs11: starting pcscd if not available ..."
+     PCSCD_PID=$(ps auxf | grep "[p]cscd")
+@@ -72,51 +73,6 @@ if [ "${dracut_mode}" != true ]; then
+     pkcs11-tool -L
+ fi
+ 
+-if ! pkcs11_device=$(pkcs11-tool -L 2>/dev/null | grep "Slot" | head -1 | \
+-	                 awk -F ":" '{print $2}' | sed -e 's@^ *@@g'); then
+-    echo "No PKCS11 device detected (without module option) / pkcs11-tool error"
+-    exit 1
+-fi
+-
+-if ! pkcs11-tool -O 2>/dev/null 1>/dev/null; then
+-    pkcs11_device=""
+-    echo "No objects in PKCS11 device detected"
+-fi
+-
+-while [ -z "${pkcs11_device}" ]; do
+-    if [ "${dracut_mode}" != true ]; then
+-        module_paths=$(clevis_get_module_path_from_pkcs11_config "/etc/crypttab")
+-        if [ -n "${module_paths}" ]; then
+-            modules=$(echo ${module_paths} | tr ";" "\n")
+-            for module in $modules; do
+-                pkcs11_device=$(pkcs11-tool -L --module ${module} | grep "Slot" \
+-                                | head -1 | awk -F ":" '{print $2}' | sed -e 's@^ *@@g')
+-                if [ -n "${pkcs11_device}" ]; then
+-                    break;
+-                fi
+-            done
+-        fi
+-    fi
+-    if [ -z "${pkcs11_device}" ]; then
+-        if [ "${retry_mode}" == true ]; then
+-            option=$(systemd-ask-password --echo "Detected no PKCS#11 device, retry PKCS#11 detection? [yY/nN]")
+-            if [ "${option}" == "N" ] || [ "${option}" == "n" ] ; then
+-                echo "Won't continue PKCS11 device detection"
+-                exit 0
+-            fi
+-            pkcs11_device=$(pkcs11-tool -L | grep "Slot" \
+-                                | head -1 | awk -F ":" '{print $2}' | sed -e 's@^ *@@g')
+-            if ! pkcs11-tool -O 2>/dev/null; then
+-                pkcs11_device=""
+-                echo "No objects in PKCS11 device detected"
+-            fi
+-        else
+-            exit 0
+-        fi
+-    fi
+-done
+-echo "Detected PKCS11 device:${pkcs11_device}"
+-
+ devices_array=()
+ # Let's analyze all entries from /etc/crypttab that contain clevis-pkcs11.sock entries
+ while read -r line;
+@@ -126,6 +82,8 @@ do
+         next_device=0
+         errors=0
+         msg=""
++        # Store passphrases to send to control socket
++        systemd_device=$(echo "${line}" | awk '{print $1}')
+         while [ ${next_device} -ne 1 ]; do
+             uuid=$(echo "${line}" | awk '{print $2}')
+             if ! mapped_device=$(clevis_map_device "${uuid}"); then
+@@ -141,15 +99,23 @@ do
+             fi
+             # If no PKCS#11 configuration, advance to next device
+             if ! clevis luks list -d "${mapped_device}" | grep pkcs11 >/dev/null 2>&1; then
+-                echo "Device:${mapped_device} does not contain PKCS#11 configuration"
++                echo "Device:${mapped_device} does not contain PKCS#11 configuration" >&2
++                # Send a wrong passphrase
++                echo -n "${systemd_device},NOPASSWORDFOR${systemd_device}" | socat UNIX-CONNECT:/run/systemd/clevis-pkcs11.control.sock -
+                 next_device=1
+                 continue
+             fi
++            if ! pkcs11_device=$(clevis_detect_pkcs11_device "${dracut_mode}" "${retry_mode}"); then
++                echo "No PKCS11 device detected" >&2
++                exit 0
++            else
++                echo "Detected PKCS11 device:${pkcs11_device}" >&2
++            fi
+             # Get configuration PKCS#11 URI
+             uri=$(clevis luks list -d "${mapped_device}" | awk -F '"uri":' '{print $2}' | awk -F '"' '{print $2}' | awk -F '"' '{print $1}')
+             slot_opt=""
+             if ! slot=$(clevis_get_pkcs11_final_slot_from_uri "${uri}"); then
+-                echo "Could not find slot for uri:${uri}"
++                echo "Could not find slot for uri:${uri}" >&2
+             else
+                 slot_opt="--slot-index ${slot}"
+             fi
+@@ -159,8 +125,9 @@ do
+                 module_opt="--module ${module}"
+             fi
+             echo "Device:${mapped_device}, slot_opt:${slot_opt}, module_opt:${module_opt}"
+-            if ! pkcs11-tool -O ${module_opt} ${slot_opt}; then
+-                echo "No objects on slot:${slot}, module_opt:${module_opt}"
++            if ! pkcs11-tool -O ${module_opt} ${slot_opt} 2>/dev/null 1>/dev/null; then
++                echo "No objects on slot:${slot}, module_opt:${module_opt}" >&2
++                echo -n "${systemd_device},NOPASSWORDFOR${systemd_device}" | socat UNIX-CONNECT:/run/systemd/clevis-pkcs11.control.sock -
+                 next_device=1
+                 continue
+             fi
+@@ -175,22 +142,21 @@ do
+             # Get key from PKCS11 pin here and feed AF_UNIX socket program
+             echo "${pin}" > /run/systemd/clevis-pkcs11.pin
+             if ! passphrase=$(clevis_luks_unlock_device "${mapped_device}") || [ -z "${passphrase}" ]; then
+-                echo "Could not unlock device:${mapped_device}"
++                echo "Could not unlock device:${mapped_device}" >&2
+                 msg="$(get_pkcs11_error)"
+                 ((errors++))
+                 if [ ${errors} -eq ${too_many_errors} ]; then
+-                    echo "Too many errors !!!" 1>&2
++                    echo "Too many errors !!!" >&2
+                     next_device=1
+                 fi
+                 continue
+             fi
+             next_device=1
+-            echo "Device:${mapped_device} unlocked successfully by clevis"
++            echo "Device:${mapped_device} unlocked successfully by clevis" >&2
+             if [ "${dracut_mode}" == true ]; then
+                 echo "${mapped_device}" >> /run/systemd/clevis-pkcs11-dracut.devices
+             fi
+             # Store passphrases to send to control socket
+-            systemd_device=$(echo "${line}" | awk '{print $1}')
+             devices_array+=("${systemd_device},${passphrase}")
+         done
+     fi
+diff --git a/src/pins/pkcs11/clevis-pkcs11-afunix-socket-unlock.c b/src/pins/pkcs11/clevis-pkcs11-afunix-socket-unlock.c
+index a6ecc63..24bad83 100644
+--- a/src/pins/pkcs11/clevis-pkcs11-afunix-socket-unlock.c
++++ b/src/pins/pkcs11/clevis-pkcs11-afunix-socket-unlock.c
+@@ -146,7 +146,6 @@ static void* control_thread(void *targ) {
+         }
+         char* t = control_msg;
+         int is_device = 1;
+-        fprintf(logfile, "Received control message:[%s]\n", t);
+         while((t = strtok(t, ","))) {
+             if (is_device) {
+                 fprintf(logfile, "Adding device:%s\n", t);
+@@ -185,7 +184,7 @@ static void dump_wide_version(void) {
+ 
+ static void int_handler(int s) {
+     if(logfile) {
+-        fprintf(logfile, "Closing, signal:[%d]\n", s);
++        fprintf(logfile, "Closing, received signal:[%d]\n", s);
+         fclose(logfile);
+     }
+     exit(EXIT_FAILURE);
+@@ -222,6 +221,7 @@ int main(int argc, char* argv[]) {
+             break;
+         case 'f':
+             strncpy(sock_file, optarg, MAX_PATH - 1);
++            unlink(sock_file);
+             break;
+         case 'k':
+             strncpy(key, optarg, MAX_KEY - 1);
+@@ -275,7 +275,6 @@ int main(int argc, char* argv[]) {
+     memset(&sock_addr, 0, sizeof(sock_addr));
+     sock_addr.sun_family = AF_UNIX;
+     strncpy(sock_addr.sun_path, sock_file, sizeof(sock_addr.sun_path)-1);
+-    unlink(sock_file);
+     s = socket(AF_UNIX, SOCK_STREAM, 0);
+     if (s == -1) {
+         perror("socket");
+@@ -346,8 +345,8 @@ int main(int argc, char* argv[]) {
+                     perror("key entry send error");
+                     goto efailure;
+                 }
+-                fprintf(logfile, "Sending:[%s] to device:[%s]\n",
+-                        entry_key, unlocking_device);
++                fprintf(logfile, "Sending passphrase to device:[%s]\n",
++                        unlocking_device);
+             } else {
+                 fprintf(logfile, "Device not found: [%s]\n", unlocking_device);
+             }
+diff --git a/src/pins/pkcs11/clevis-pkcs11-common b/src/pins/pkcs11/clevis-pkcs11-common
+index 4c0629c..571a2be 100755
+--- a/src/pins/pkcs11/clevis-pkcs11-common
++++ b/src/pins/pkcs11/clevis-pkcs11-common
+@@ -27,6 +27,56 @@ serial_devices_array=""
+ URI_EXPECTED_FORMAT="pkcs11:"
+ DEFAULT_CRYPTTAB_FILE="/etc/crypttab"
+ 
++clevis_detect_pkcs11_device() {
++    dracut_mode="${1:false}"
++    retry_mode="${2:false}"
++    if ! pkcs11_device=$(pkcs11-tool -L 2>/dev/null | grep "Slot" | head -1 | \
++                         awk -F ":" '{print $2}' | sed -e 's@^ *@@g'); then
++        echo ""
++        return 1
++    fi
++
++    if ! pkcs11-tool -O 2>/dev/null 1>/dev/null; then
++        pkcs11_device=""
++        echo "No objects in PKCS11 device detected" >&2
++    fi
++
++    while [ -z "${pkcs11_device}" ]; do
++        if [ "${dracut_mode}" != true ]; then
++            module_paths=$(clevis_get_module_path_from_pkcs11_config "/etc/crypttab")
++            if [ -n "${module_paths}" ]; then
++                modules=$(echo ${module_paths} | tr ";" "\n")
++                for module in $modules; do
++                    pkcs11_device=$(pkcs11-tool -L --module ${module} | grep "Slot" \
++                                    | head -1 | awk -F ":" '{print $2}' | sed -e 's@^ *@@g')
++                    if [ -n "${pkcs11_device}" ]; then
++                        break;
++                    fi
++                done
++            fi
++        fi
++        if [ -z "${pkcs11_device}" ]; then
++            if [ "${retry_mode}" == true ]; then
++                option=$(systemd-ask-password --echo "Detected no PKCS#11 device, retry PKCS#11 detection? [yY/nN]")
++                if [ "${option}" == "N" ] || [ "${option}" == "n" ] ; then
++                    echo ""
++		    # Straight Forward Mode
++                    return 0
++                fi
++                pkcs11_device=$(pkcs11-tool -L | grep "Slot" \
++                                    | head -1 | awk -F ":" '{print $2}' | sed -e 's@^ *@@g')
++                if ! pkcs11-tool -O 2>/dev/null 1>/dev/null; then
++                    pkcs11_device=""
++                    echo "No objects in PKCS11 device detected" >&2
++                fi
++            else
++		echo "${pkcs11_device}"
++                return 0
++            fi
++        fi
++    done
++}
++
+ clevis_parse_devices_array() {
+     INPUT_ARRAY=$(pkcs11-tool -L | grep Slot)
+     counter=0
+@@ -64,12 +114,10 @@ clevis_get_module_path_from_pkcs11_config() {
+     while read -r line; do
+         uuid=$(echo "${line}" | awk '{print $2}')
+         if ! mapped_device=$(clevis_map_device "${uuid}"); then
+-            echo "Could not check mapped device for UID:${uuid}"
+             continue
+         fi
+         # If no PKCS#11 configuration, advance to next device
+         if ! clevis luks list -d "${mapped_device}" | grep pkcs11 >/dev/null 2>&1; then
+-            echo "Device:${mapped_device} does not contain PKCS#11 configuration"
+             continue
+         fi
+         # Get configuration PKCS#11 URI
+-- 
+2.46.2
+

@@ -1,0 +1,37 @@
+From 95d09c54d2502d8d48f2da591089ceb6d09df056 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 29 May 2024 12:21:52 +0200
+Subject: [PATCH] Force NO_COLOR=1 to fix test failures with Python 3.13+ REPL
+
+Python 3.13+ has colors now. Always setting this variable should be safe.
+---
+ pexpect/replwrap.py    | 2 +-
+ tests/test_replwrap.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pexpect/replwrap.py b/pexpect/replwrap.py
+index 08dbd5e8..c8714a23 100644
+--- a/pexpect/replwrap.py
++++ b/pexpect/replwrap.py
+@@ -35,7 +35,7 @@ def __init__(self, cmd_or_spawn, orig_prompt, prompt_change,
+                  continuation_prompt=PEXPECT_CONTINUATION_PROMPT,
+                  extra_init_cmd=None):
+         if isinstance(cmd_or_spawn, basestring):
+-            self.child = pexpect.spawn(cmd_or_spawn, echo=False, encoding='utf-8')
++            self.child = pexpect.spawn(cmd_or_spawn, echo=False, encoding='utf-8', env={'NO_COLOR': '1'})
+         else:
+             self.child = cmd_or_spawn
+         if self.child.echo:
+diff --git a/tests/test_replwrap.py b/tests/test_replwrap.py
+index ddafa5d6..5ac782a4 100644
+--- a/tests/test_replwrap.py
++++ b/tests/test_replwrap.py
+@@ -124,7 +124,7 @@ def test_no_change_prompt(self):
+         if platform.python_implementation() == 'PyPy':
+             raise unittest.SkipTest(skip_pypy)
+ 
+-        child = pexpect.spawn(sys.executable, echo=False, timeout=5, encoding='utf-8')
++        child = pexpect.spawn(sys.executable, echo=False, timeout=5, encoding='utf-8', env={'NO_COLOR': '1'})
+         # prompt_change=None should mean no prompt change
+         py = replwrap.REPLWrapper(child, u">>> ", prompt_change=None,
+                                   continuation_prompt=u"... ")

@@ -1,0 +1,385 @@
+commit efc92106173b5130e32587f6c788f19f2477051d
+Author: Neil Horman <nhorman@tuxdriver.com>
+Date:   Fri Jul 27 15:52:49 2018 -0400
+
+    Add make check test harness
+    
+    Start adding tests to self test cscope in travis ci
+    
+    Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index ae0fc53..d79d44e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-SUBDIRS = doc src contrib
++SUBDIRS = doc src contrib tests
+ 
+ EXTRA_DIST = INSTALL.gnu packages
+ 
+diff --git a/configure.in b/configure.in
+index c51887d..e0a8b1f 100644
+--- a/configure.in
++++ b/configure.in
+@@ -415,5 +415,5 @@ case "$host_os" in
+ 	;;
+ esac
+ 
+-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile contrib/Makefile])
++AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile contrib/Makefile tests/Makefile])
+ AC_OUTPUT
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+new file mode 100644
+index 0000000..2278a71
+--- /dev/null
++++ b/tests/Makefile.am
+@@ -0,0 +1,7 @@
++check_SCRIPTS = check0.sh check1.sh check2.sh \
++		check3.sh check4.sh check6.sh \
++		check7.sh check8.sh check9.sh
++
++TESTS = check0.sh check1.sh check2.sh \
++	check3.sh check4.sh check6.sh \
++	check7.sh check8.sh check9.sh
+diff --git a/tests/check0.sh b/tests/check0.sh
+new file mode 100755
+index 0000000..6c6883b
+--- /dev/null
++++ b/tests/check0.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=4
++SINDEX=0
++STERM=main
++STYPE="find C symbol"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++	CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check1.sh b/tests/check1.sh
+new file mode 100755
+index 0000000..78ffe21
+--- /dev/null
++++ b/tests/check1.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=3
++SINDEX=1
++STERM=main
++STYPE="symbol definition"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check2.sh b/tests/check2.sh
+new file mode 100755
+index 0000000..414430a
+--- /dev/null
++++ b/tests/check2.sh
+@@ -0,0 +1,30 @@
++#!/bin/sh
++
++EXPECT=96
++SINDEX=2
++STERM=build
++STYPE="functions called by"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check3.sh b/tests/check3.sh
+new file mode 100755
+index 0000000..a6b2c7e
+--- /dev/null
++++ b/tests/check3.sh
+@@ -0,0 +1,31 @@
++#!/bin/sh
++
++EXPECT=35
++SINDEX=3
++STERM=printf
++STYPE="functions calling"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check4.sh b/tests/check4.sh
+new file mode 100755
+index 0000000..dd2c98c
+--- /dev/null
++++ b/tests/check4.sh
+@@ -0,0 +1,29 @@
++#!/bin/sh
++EXPECT=3
++SINDEX=4
++STERM=oldsigquit
++STYPE="regular text string"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check6.sh b/tests/check6.sh
+new file mode 100755
+index 0000000..c664960
+--- /dev/null
++++ b/tests/check6.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=1
++SINDEX=6
++STERM=msg.*what
++STYPE="egrep string"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check7.sh b/tests/check7.sh
+new file mode 100755
+index 0000000..5ac965c
+--- /dev/null
++++ b/tests/check7.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=1
++SINDEX=7
++STERM=main.c
++STYPE="file named"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check8.sh b/tests/check8.sh
+new file mode 100755
+index 0000000..72cb946
+--- /dev/null
++++ b/tests/check8.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=8
++SINDEX=8
++STERM=unistd.h
++STYPE="files including this file"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+diff --git a/tests/check9.sh b/tests/check9.sh
+new file mode 100755
+index 0000000..a728a32
+--- /dev/null
++++ b/tests/check9.sh
+@@ -0,0 +1,32 @@
++#!/bin/sh
++
++EXPECT=2
++SINDEX=9
++STERM=reftime
++STYPE="assignments to symbol"
++
++if [ -z "$CSCOPE_BINARY" ]
++then
++        CSCOPE_BINARY=./src/cscope
++fi
++
++echo "Searching item $SINDEX, '$STYPE', '$STERM'"
++
++#Get to the top level directory
++cd ..
++
++#Remove any previous databases from testing
++rm -f cscope.out
++
++#Count the number of instances of the string 'Copyright'
++#We expect 178 currently
++COUNT=$($CSCOPE_BINARY -R -L -k -$SINDEX$STERM | wc -l)
++
++if [ $COUNT -ne $EXPECT ]
++then
++	echo "Expected $EXPECT instances of $STYPE $STERM but found $COUNT"
++	exit 1
++fi
++
++exit 0
++
+-- 
+2.35.1
+

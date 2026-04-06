@@ -1,0 +1,13 @@
+--- similar-asserts-1.7.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ similar-asserts-1.7.0/Cargo.toml	2025-07-23T20:06:39.918763+00:00
+@@ -85,8 +85,9 @@
+ path = "tests/test_unsized.rs"
+ 
+ [dependencies.console]
+-version = "0.15.0"
++version = "0.16.0"
+ default-features = false
++features = ["std"]
+ 
+ [dependencies.serde]
+ version = "1.0.123"

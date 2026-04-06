@@ -1,0 +1,13 @@
+diff -up libffado-2.4.4/SConstruct.scons-quirk libffado-2.4.4/SConstruct
+--- libffado-2.4.4/SConstruct.scons-quirk	2020-08-09 09:29:35.000000000 +0200
++++ libffado-2.4.4/SConstruct	2021-01-05 18:28:40.865754202 +0100
+@@ -150,7 +150,8 @@ if not os.path.isdir( "cache" ):
+ if not os.path.isdir( 'cache/objects' ):
+     os.makedirs( 'cache/objects' )
+ 
+-CacheDir( 'cache/objects' )
++# Doesn't work with scons < 3.0.2
++# CacheDir( 'cache/objects' )
+ 
+ opts.Save( 'cache/options.cache', env )
+ 

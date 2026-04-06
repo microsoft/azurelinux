@@ -1,0 +1,21 @@
+diff -up kbd-1.15.2/src/unicode_start.orig kbd-1.15.2/src/unicode_start
+--- kbd-1.15.2/src/unicode_start.orig	2011-01-05 13:28:22.079662644 +0100
++++ kbd-1.15.2/src/unicode_start	2011-01-05 13:29:01.327353698 +0100
+@@ -72,6 +72,9 @@ stty iutf8
+ # have a Unicode map attached, or explicitly specified, e.g.,
+ # by giving `def.uni' as a second argument.
+ 
++DEFAULT_UNICODE_FONT=latarcyrheb-sun16
++# Also drdos8x16 is a good candidate.
++
+ case "$#" in
+ 	2)
+ 		setfont "$1" -u "$2"
+@@ -80,6 +83,7 @@ case "$#" in
+ 		setfont "$1"
+ 		;;
+ 	0)
++		setfont $DEFAULT_UNICODE_FONT
+ 		;;
+ 	*)
+ 		echo "usage: unicode_start [font [unicode map]]"

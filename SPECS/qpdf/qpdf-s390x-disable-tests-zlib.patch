@@ -1,0 +1,40 @@
+diff -up qpdf-12.3.0/qpdf/qtest/inline-images.test.s390x-disable-tests-zlib qpdf-12.3.0/qpdf/qtest/inline-images.test
+--- qpdf-12.3.0/qpdf/qtest/inline-images.test.s390x-disable-tests-zlib	2026-01-10 20:35:08.000000000 +0100
++++ qpdf-12.3.0/qpdf/qtest/inline-images.test	2026-01-12 16:50:35.235390438 +0100
+@@ -17,7 +17,7 @@ cleanup();
+ my $td = new TestDriver('inline-images');
+ 
+ my $n_compare_pdfs = 0;
+-my $n_tests = 10;
++my $n_tests = 8;
+ 
+ # The file large-inline-image.pdf is a hand-crafted file with several
+ # inline images of various sizes including one that is two megabytes,
+@@ -51,16 +51,6 @@ $td->runtest("externalize eof in inline
+ $td->runtest("check output",
+              {$td->FILE => "a.pdf"},
+              {$td->FILE => "eof-in-inline-image-ii.qdf"});
+-$td->runtest("externalize damaged image",
+-             {$td->COMMAND =>
+-                  "qpdf --externalize-inline-images" .
+-                  " --compress-streams=n --static-id" .
+-                  " damaged-inline-image.pdf a.pdf"},
+-             {$td->FILE => "damaged-inline-image.out", $td->EXIT_STATUS => 3},
+-             $td->NORMALIZE_NEWLINES);
+-$td->runtest("check output",
+-             {$td->FILE => "a.pdf"},
+-             {$td->FILE => "damaged-inline-image-out.pdf"});
+ $td->runtest("named colorspace",
+              {$td->COMMAND =>
+                   "qpdf --static-id --externalize-inline-images" .
+diff -up qpdf-12.3.0/qpdf/qtest/specific-bugs.test.s390x-disable-tests-zlib qpdf-12.3.0/qpdf/qtest/specific-bugs.test
+--- qpdf-12.3.0/qpdf/qtest/specific-bugs.test.s390x-disable-tests-zlib	2026-01-10 20:35:08.000000000 +0100
++++ qpdf-12.3.0/qpdf/qtest/specific-bugs.test	2026-01-12 16:52:29.082970802 +0100
+@@ -39,7 +39,6 @@ my @bug_tests = (
+     ["335a", "ozz-fuzz-12152", 2],
+     ["335b", "ozz-fuzz-14845", 2],
+     ["1503", "linearize with bad outlines", 3, "--linearize"],
+-    ["fuzz-16214", "stream in object stream", 3, "--preserve-unreferenced"],
+     # When adding to this list, consider adding to CORPUS_FROM_TEST in
+     # fuzz/CMakeLists.txt and updating the count in
+     # fuzz/qtest/fuzz.test.

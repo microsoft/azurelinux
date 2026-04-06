@@ -1,0 +1,43 @@
+From 64eaa35c2de99581e522608e841defffb4b2923b Mon Sep 17 00:00:00 2001
+From: Stephan Bergmann <sbergman@redhat.com>
+Date: Thu, 21 Oct 2021 11:14:34 +0200
+Subject: [PATCH] Run tests in deterministic order
+
+LibreOffice already benefits from this (see
+<https://git.libreoffice.org/core/+/2f2246d22e2a8ccbc1dc3e6f5243734a61edf270%5E!>
+"external/cppunit: Run tests in deterministic order", especially as otherwise
+the order in which tests happened to get run differed between --disable-lto and
+--enable-lto builds.
+
+Change-Id: I87d6d7cb0f4c2f6a0ea1ac3ba3d48b4e089eb5c7
+Reviewed-on: https://gerrit.libreoffice.org/c/cppunit/+/123963
+Tested-by: Stephan Bergmann <sbergman@redhat.com>
+Reviewed-by: Stephan Bergmann <sbergman@redhat.com>
+---
+
+diff --git a/src/cppunit/TestFactoryRegistry.cpp b/src/cppunit/TestFactoryRegistry.cpp
+index 35448a6..3b68d58 100644
+--- a/src/cppunit/TestFactoryRegistry.cpp
++++ b/src/cppunit/TestFactoryRegistry.cpp
+@@ -143,12 +143,20 @@
+ void 
+ TestFactoryRegistry::addTestToSuite( TestSuite *suite )
+ {
++  std::multimap<std::string, Test *> sorted;
+   for ( Factories::iterator it = m_factories.begin(); 
+         it != m_factories.end(); 
+         ++it )
+   {
+     TestFactory *factory = *it;
+-    suite->addTest( factory->makeTest() );
++    Test *test = factory->makeTest();
++    sorted.insert({test->getName(), test});
++  }
++  // In the unlikely case of multiple Tests with identical names, those will
++  // still be added in random order:
++  for (auto const &i: sorted)
++  {
++    suite->addTest( i.second );
+   }
+ }
+ 

@@ -1,0 +1,11 @@
+--- maplit-1.0.2/Cargo.toml	1970-01-01T00:00:00+00:00
++++ maplit-1.0.2/Cargo.toml	2023-04-12T15:08:01.873574+00:00
+@@ -14,7 +14,7 @@
+ name = "maplit"
+ version = "1.0.2"
+ authors = ["bluss"]
+-description = "Collection “literal” macros for HashMap, HashSet, BTreeMap, and BTreeSet."
++description = "Collection of macros for HashMap, HashSet, BTreeMap, and BTreeSet literals."
+ documentation = "https://docs.rs/maplit/"
+ keywords = ["literal", "data-structure", "hashmap", "macro"]
+ categories = ["rust-patterns"]

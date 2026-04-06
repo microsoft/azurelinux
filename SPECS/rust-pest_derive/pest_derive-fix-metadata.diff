@@ -1,0 +1,10 @@
+--- pest_derive-2.8.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pest_derive-2.8.4/Cargo.toml	2025-12-30T18:37:38.375393+00:00
+@@ -91,7 +91,6 @@
+ [features]
+ default = ["std"]
+ grammar-extras = ["pest_generator/grammar-extras"]
+-not-bootstrap-in-src = ["pest_generator/not-bootstrap-in-src"]
+ std = [
+     "pest/std",
+     "pest_generator/std",

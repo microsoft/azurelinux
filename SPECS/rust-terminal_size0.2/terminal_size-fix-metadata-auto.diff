@@ -1,0 +1,12 @@
+--- terminal_size-0.2.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ terminal_size-0.2.6/Cargo.toml	2024-08-29T14:23:13.991642+00:00
+@@ -31,9 +31,3 @@
+ version = "0.37.0"
+ features = ["termios"]
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.48.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Console",
+-]

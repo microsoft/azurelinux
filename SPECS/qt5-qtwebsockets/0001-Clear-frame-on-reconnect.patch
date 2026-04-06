@@ -1,0 +1,38 @@
+From 323b8448c7bccad9d53ca2975f41212613ba0863 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Mon, 25 Jan 2021 15:34:22 +0100
+Subject: [PATCH 1/2] Clear frame on reconnect
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise partial data could leak through to next connection and cause
+odd behavior
+
+* asturmlechner 2021-12-22: Fix conflict with dev branch aeeaa00f
+
+Pick-to: 5.15
+Fixes: QTBUG-88923
+Change-Id: I6c75e6325527379bcdca0b9819a89437d0658893
+Reviewed-by: Alex Blasche <alexander.blasche@qt.io>
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 9f6449ef1b6d1e7651f181585f1c35d6722bb87a)
+---
+ src/websockets/qwebsocketdataprocessor.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/websockets/qwebsocketdataprocessor.cpp b/src/websockets/qwebsocketdataprocessor.cpp
+index 2affdd5..95f1194 100644
+--- a/src/websockets/qwebsocketdataprocessor.cpp
++++ b/src/websockets/qwebsocketdataprocessor.cpp
+@@ -273,6 +273,7 @@ void QWebSocketDataProcessor::clear()
+     if (!m_pConverterState)
+         m_pConverterState = new QTextCodec::ConverterState(QTextCodec::ConvertInvalidToNull |
+                                                            QTextCodec::IgnoreHeader);
++    frame.clear();
+ }
+ 
+ /*!
+-- 
+2.51.1
+

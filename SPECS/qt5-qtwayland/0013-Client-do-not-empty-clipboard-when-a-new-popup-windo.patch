@@ -1,0 +1,68 @@
+From 09dcdcc82665a4995cb3625211891c2ef2808f94 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Fri, 16 Jul 2021 13:00:03 +0200
+Subject: [PATCH 13/55] Client: do not empty clipboard when a new popup/window
+ is opened
+
+If we open a new popup or a window within the same app we have to avoid
+invalidating selection offer when losing focus, because it's still the
+same client who has the focus and we might not get a new selection offer
+by the compositor and therefore we would lose clipboard content.
+
+Fixes: QTBUG-93474
+Change-Id: Ia2ef826c2967b1daf1cdeb085e8dae66d090dbcf
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+
+Cherry-pick: 1e57ebd501cfc2255300392cd4565cd034efeed8
+---
+ src/client/qwaylanddisplay.cpp     | 13 +++++++++++++
+ src/client/qwaylandinputdevice.cpp |  8 --------
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index d1ca0274..7560bf41 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -601,6 +601,19 @@ void QWaylandDisplay::handleWaylandSync()
+     QWindow *activeWindow = mActiveWindows.empty() ? nullptr : mActiveWindows.last()->window();
+     if (activeWindow != QGuiApplication::focusWindow())
+         QWindowSystemInterface::handleWindowActivated(activeWindow);
++
++    if (!activeWindow) {
++        if (lastInputDevice()) {
++#if QT_CONFIG(clipboard)
++            if (auto *dataDevice = lastInputDevice()->dataDevice())
++                dataDevice->invalidateSelectionOffer();
++#endif
++#if QT_CONFIG(wayland_client_primary_selection)
++            if (auto *device = lastInputDevice()->primarySelectionDevice())
++                device->invalidateSelectionOffer();
++#endif
++        }
++    }
+ }
+ 
+ const wl_callback_listener QWaylandDisplay::syncCallbackListener = {
+diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
+index f3865ddb..2c396f35 100644
+--- a/src/client/qwaylandinputdevice.cpp
++++ b/src/client/qwaylandinputdevice.cpp
+@@ -1305,14 +1305,6 @@ void QWaylandInputDevice::Keyboard::handleFocusDestroyed()
+ void QWaylandInputDevice::Keyboard::handleFocusLost()
+ {
+     mFocus = nullptr;
+-#if QT_CONFIG(clipboard)
+-    if (auto *dataDevice = mParent->dataDevice())
+-        dataDevice->invalidateSelectionOffer();
+-#endif
+-#if QT_CONFIG(wayland_client_primary_selection)
+-    if (auto *device = mParent->primarySelectionDevice())
+-        device->invalidateSelectionOffer();
+-#endif
+     mParent->mQDisplay->handleKeyboardFocusChanged(mParent);
+     mRepeatTimer.stop();
+ }
+-- 
+2.51.1
+

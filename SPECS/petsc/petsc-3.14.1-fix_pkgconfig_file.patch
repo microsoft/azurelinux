@@ -1,0 +1,11 @@
+--- a/config/PETSc/Configure.orig.py	2020-03-30 05:33:12.000000000 +0200
++++ b/config/PETSc/Configure.py	2020-04-04 22:58:19.770481378 +0200
+@@ -148,7 +148,7 @@
+     if not os.path.exists(os.path.join(self.petscdir.dir,self.arch.arch,'lib','pkgconfig')):
+       os.makedirs(os.path.join(self.petscdir.dir,self.arch.arch,'lib','pkgconfig'))
+     with open(os.path.join(self.petscdir.dir,self.arch.arch,'lib','pkgconfig',petsc_pc),'w') as fd:
+-      cflags_inc = ['-I${includedir}']
++      cflags_inc = ['-I${includedir}/petsc']
+       if self.framework.argDB['prefix']:
+         fd.write('prefix='+self.installdir.dir+'\n')
+       else:

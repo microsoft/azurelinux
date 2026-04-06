@@ -1,0 +1,43 @@
+From a48c2ba69f863a08d6aeb8a550c1f787e6f8dbf1 Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Sat, 7 Jun 2025 20:11:17 +0200
+Subject: [PATCH] remove wrong use of 'struct termio'
+
+The Linux implementation of TCGETS in rshim_fuse_console_ioctl() uses
+sizeof(struct termio), but the type of bd->cons_termios is
+'struct termios', not 'struct termio'.
+Also, "man TCGETS" confirms the expected type is 'struct termios':
+  int ioctl(int fd, TCGETS, struct termios *argp);
+
+I noticed this bug only because glibc recently removed[1] the definition
+of struct termio. rshim then failed to build on Fedora Rawhide.
+
+[1] "linux/termio: remove <termio.h> and struct termio"
+    https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=e04afb71771710cdc6025fe95908f5f17de7b72d
+
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ src/rshim_fuse.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/rshim_fuse.c b/src/rshim_fuse.c
+index 900e0f883e8d..c4d0a7fe06bc 100644
+--- a/src/rshim_fuse.c
++++ b/src/rshim_fuse.c
+@@ -389,11 +389,11 @@ static void rshim_fuse_console_ioctl(fuse_req_t req, int cmd, void *arg,
+   switch (cmd) {
+   case TCGETS:
+     if (!out_bufsz) {
+-      struct iovec iov = { arg, sizeof(struct termio) };
++      struct iovec iov = { arg, sizeof(struct termios) };
+ 
+       fuse_reply_ioctl_retry(req, NULL, 0, &iov, 1);
+     } else {
+-      fuse_reply_ioctl(req, 0, &bd->cons_termios, sizeof(struct termio));
++      fuse_reply_ioctl(req, 0, &bd->cons_termios, sizeof(struct termios));
+     }
+     break;
+ 
+-- 
+2.49.0
+

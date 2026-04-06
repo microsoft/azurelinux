@@ -1,0 +1,28 @@
+From a1b49a5d56d90d58fa51a52f4aa60ae0a7659697 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <neal@gompa.dev>
+Date: Sun, 24 Aug 2025 18:53:44 -0400
+Subject: [PATCH] src_base: cmake: Link libm for the shared library
+
+Otherwise it fails to link with	errors like so:
+
+/usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libxevdb.so: undefined reference to 'log2'
+/usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libxevdb.so: undefined reference to 'pow'
+---
+ src_base/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src_base/CMakeLists.txt b/src_base/CMakeLists.txt
+index 0d8575a..5a2ff99 100644
+--- a/src_base/CMakeLists.txt
++++ b/src_base/CMakeLists.txt
+@@ -92,6 +92,7 @@ elseif( UNIX OR MINGW )
+     endif()
+     set_target_properties(${LIB_NAME_BASE}_dynamic PROPERTIES FOLDER lib
+                                                             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
++    target_link_libraries(${LIB_NAME_BASE}_dynamic m)
+     target_compile_definitions( ${LIB_NAME_BASE} PUBLIC ANY LINUX )
+     target_link_libraries(${LIB_NAME_BASE} m)
+ endif()
+-- 
+2.49.0
+

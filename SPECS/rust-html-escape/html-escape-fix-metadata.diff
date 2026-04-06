@@ -1,0 +1,19 @@
+--- html-escape-0.2.13/Cargo.toml	1970-01-01T00:00:01+00:00
++++ html-escape-0.2.13/Cargo.toml	2024-09-29T16:17:06.602379+00:00
+@@ -38,16 +38,8 @@
+ license = "MIT"
+ repository = "https://github.com/magiclen/html-escape"
+ 
+-[[bench]]
+-name = "encode"
+-harness = false
+-required-features = ["std"]
+-
+ [dependencies.utf8-width]
+ version = "0.1"
+-
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+ 
+ [features]
+ default = ["std"]

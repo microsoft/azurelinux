@@ -1,0 +1,44 @@
+--- zbus-5.12.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zbus-5.12.0/Cargo.toml	2025-10-23T17:38:11.083585+00:00
+@@ -61,16 +61,8 @@
+ serde_bytes = ["zvariant/serde_bytes"]
+ time = ["zvariant/time"]
+ tokio = ["dep:tokio"]
+-tokio-vsock = [
+-    "dep:tokio-vsock",
+-    "tokio",
+-]
+ url = ["zvariant/url"]
+ uuid = ["zvariant/uuid"]
+-vsock = [
+-    "dep:vsock",
+-    "dep:async-io",
+-]
+ 
+ [lib]
+ name = "zbus"
+@@ -180,12 +172,7 @@
+     "io-util",
+     "process",
+     "sync",
+-    "tracing",
+-]
+-optional = true
+-
+-[dependencies.tokio-vsock]
+-version = "0.7"
++]
+ optional = true
+ 
+ [dependencies.tracing]
+@@ -194,10 +181,6 @@
+ [dependencies.uuid]
+ version = "1.8.0"
+ features = ["serde"]
+-
+-[dependencies.vsock]
+-version = "0.5.0"
+-optional = true
+ 
+ [dependencies.winnow]
+ version = "0.7"

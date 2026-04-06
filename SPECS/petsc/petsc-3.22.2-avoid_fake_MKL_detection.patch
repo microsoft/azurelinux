@@ -1,0 +1,13 @@
+--- a/config/BuildSystem/config/packages/BlasLapack.orig.py	2020-11-03 19:01:59.000000000 +0100
++++ b/config/BuildSystem/config/packages/BlasLapack.py	2020-11-09 10:37:06.551705855 +0100
+@@ -601,8 +601,8 @@
+     self.include = []
+     self.defaultincludepath = False
+     if self.libraries.check(self.dlib, 'mkl_set_num_threads') and not self.libraries.check(self.dlib, 'flexiblas_avail'):
+-      self.mkl = 1
+-      self.addDefine('HAVE_MKL_LIBS',1)
++      self.mkl = 0
++      self.addDefine('HAVE_MKL_LIBS',0)
+       '''Set include directory for mkl.h and friends'''
+       '''(the include directory is in CPATH if mklvars.sh has been sourced.'''
+       ''' if the script hasn't been sourced, we still try to pick up the include dir)'''

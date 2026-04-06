@@ -1,0 +1,24 @@
+diff -rupN --no-dereference libspatialite-5.1.0/configure.ac libspatialite-5.1.0-new/configure.ac
+--- libspatialite-5.1.0/configure.ac	2023-08-04 09:51:40.000000000 +0200
++++ libspatialite-5.1.0-new/configure.ac	2024-03-05 17:10:33.524527969 +0100
+@@ -498,7 +498,7 @@ AM_CONDITIONAL(MODULE_ONLY, [test x"$ena
+ #-----------------------------------------------------------------------
+ 
+ # Checking for MinGW
+-AM_CONDITIONAL([MINGW], [test "$target_alias" = "mingw32"])
++AM_CONDITIONAL([MINGW], [[[[ "$target_alias" = *"mingw32" ]]]])
+ # Checking for Mac OsX
+ AM_CONDITIONAL([MACOSX], [test "$target_alias" = "macosx"])
+ # Checking for Android
+diff -rupN --no-dereference libspatialite-5.1.0/test/scandir4win.h libspatialite-5.1.0-new/test/scandir4win.h
+--- libspatialite-5.1.0/test/scandir4win.h	2023-08-04 09:51:40.000000000 +0200
++++ libspatialite-5.1.0-new/test/scandir4win.h	2024-03-05 17:10:33.528527956 +0100
+@@ -11,7 +11,7 @@ even implied
+ 
+ #ifdef _WIN32
+ 
+-#include <Windows.h>
++#include <windows.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ 

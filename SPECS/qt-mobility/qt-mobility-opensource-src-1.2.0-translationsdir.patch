@@ -1,0 +1,12 @@
+diff -up qt-mobility-opensource-src-1.2.0/translations/translations.pro.translationsdir qt-mobility-opensource-src-1.2.0/translations/translations.pro
+--- qt-mobility-opensource-src-1.2.0/translations/translations.pro.translationsdir	2011-05-10 10:06:16.000000000 +0200
++++ qt-mobility-opensource-src-1.2.0/translations/translations.pro	2011-05-13 16:35:38.646709799 +0200
+@@ -102,7 +102,7 @@ qmfiles.files = $$prependAll(LANGUAGES, 
+ meego|maemo6 {
+     qmfiles.path = $${QT_MOBILITY_PREFIX}/share/qtmobility/translations
+ } else {
+-    qmfiles.path = $${QT_MOBILITY_PREFIX}/translations
++    qmfiles.path = $$[QT_INSTALL_TRANSLATIONS]
+ }
+ qmfiles.CONFIG += no_check_exist
+ INSTALLS += qmfiles

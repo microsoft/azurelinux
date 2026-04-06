@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# ipv6-up
+#
+# Called by pppd after IPV6CP/up was finished
+#
+# This file should not be modified -- make local changes to
+# /etc/ppp/ipv6-up.local instead
+#
+
+[ -f /etc/sysconfig/network-scripts/network-functions-ipv6 ] && /etc/ppp/ipv6-up.initscripts "$@"
+
+[ -x /etc/ppp/ipv6-up.local ] && /etc/ppp/ipv6-up.local "$@"
+
+exit 0

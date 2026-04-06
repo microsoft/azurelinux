@@ -1,0 +1,24 @@
+diff -up sblim-sfcCommon-1.0.1/sfcUtil/utilFactory.c.orig sblim-sfcCommon-1.0.1/sfcUtil/utilFactory.c
+--- sblim-sfcCommon-1.0.1/sfcUtil/utilFactory.c.orig	2011-05-09 20:58:25.000000000 +0200
++++ sblim-sfcCommon-1.0.1/sfcUtil/utilFactory.c	2025-01-23 13:31:44.643487582 +0100
+@@ -28,7 +28,7 @@
+ 
+ extern UtilHashTable *newHashTable(long buckets, long opt);
+ extern UtilHashTable *newHashTableDefault(long buckets);
+-extern UtilList *newList(); /*  coming from genericlist */
++extern UtilList *newList(void* memAddFunc, void* memReleaseFunc); /*  coming from genericlist */
+ extern UtilStringBuffer *newStringBuffer(int s);
+ 
+ static Util_Factory_FT ift = {
+diff -up sblim-sfcCommon-1.0.1/sfcUtil/utilft.h.orig sblim-sfcCommon-1.0.1/sfcUtil/utilft.h
+--- sblim-sfcCommon-1.0.1/sfcUtil/utilft.h.orig	2011-05-05 23:08:59.000000000 +0200
++++ sblim-sfcCommon-1.0.1/sfcUtil/utilft.h	2025-01-23 13:20:08.235571262 +0100
+@@ -199,7 +199,7 @@ extern          "C" {
+     int             version;
+     UtilHashTable  *(*newHashTableDefault) (long buckets);
+     UtilHashTable  *(*newHashTable) (long buckets, long opt);
+-    UtilList       *(*newList) ();
++    UtilList       *(*newList) (void* memAddFunc, void* memReleaseFunc);
+     // ProviderRegister *(*newProviderRegister) (char *fn);
+     UtilStringBuffer *(*newStrinBuffer) (int s);
+   };

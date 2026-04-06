@@ -1,0 +1,42 @@
+diff -up sblim-sfcb-1.3.9/man/sfcbrepos.1.pre.in.orig sblim-sfcb-1.3.9/man/sfcbrepos.1.pre.in
+--- sblim-sfcb-1.3.9/man/sfcbrepos.1.pre.in.orig	2009-10-13 21:54:13.000000000 +0200
++++ sblim-sfcb-1.3.9/man/sfcbrepos.1.pre.in	2010-09-06 14:01:57.294564062 +0200
+@@ -26,7 +26,7 @@ Supported command line options are:
+ .TP
+ \fB\-c\fR \fIschemadir\fR
+ Path to obtain the CIM Schema classes.
+-Default is \fI@datadir@/sfcb\fR
++Default is \fI@datadir@/mof/cim-current\fR
+ .TP
+ \fB\-s\fR \fIstagingdir\fR
+ Path to sfcb staging area containing class MOFs and registration files
+@@ -58,7 +58,7 @@ Alias of \fB-b\fR
+ Display usage information and exit.
+ .SH FILES
+ .TP
+-\fI@datadir@/sfcb/CIM/CIM_Schema.mof\fR
++\fI@datadir@/mof/cim-current/CIM_Schema.mof\fR
+ CIM Schema
+ .TP
+ \fI@localstatedir@/lib/sfcb/registration/providerRegister\fR
+diff -up sblim-sfcb-1.3.9/sfcbrepos.sh.in.orig sblim-sfcb-1.3.9/sfcbrepos.sh.in
+--- sblim-sfcb-1.3.9/sfcbrepos.sh.in.orig	2009-12-22 01:18:29.000000000 +0100
++++ sblim-sfcb-1.3.9/sfcbrepos.sh.in	2010-09-06 13:45:28.671491648 +0200
+@@ -59,7 +59,7 @@ then
+     echo -e "\t-X create repository in non-native format as specifed by argument"
+     echo -e "\t-s specify staging directory [@localstatedir@/lib/sfcb/stage]"
+     echo -e "\t-r specify repository directory [@localstatedir@/lib/sfcb/registration]"
+-    echo -e "\t-c specify directory containing CIM Schema MOFs [@datadir@/sfcb/CIM]"
++    echo -e "\t-c specify directory containing CIM Schema MOFs [@datadir@/mof/cim-current]"
+     echo -e "\t-t create tiny class repository by omitting inheritance information"
+     echo -e "\t-z compress repository with gzip"
+     echo
+@@ -99,7 +99,7 @@ fi
+ 
+ if [ -z "$cimschemadir" ]
+ then
+-    cimschemadir=${DESTDIR}@datadir@/sfcb/CIM
++    cimschemadir=${DESTDIR}@datadir@/mof/cim-current
+ fi
+ 
+ if [ -d $stagingdir ] && [ -f $stagingdir/default.reg ] &&

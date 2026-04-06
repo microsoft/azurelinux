@@ -1,0 +1,19 @@
+--- procmail-3.15.1/man/procmail.man.35825	Thu Apr 12 18:31:37 2001
++++ procmail-3.15.1/man/procmail.man	Thu Apr 12 18:32:42 2001
+@@ -44,11 +44,11 @@
+ should be invoked automatically over the
+ .B @DOT_FORWARD@
+ file mechanism as soon as mail arrives.  Alternatively, when installed by
+-a system administrator, it can be invoked from within the mailer immediately.
+-When invoked, it first sets some environment variables to default values,
+-reads the mail message from stdin until an EOF, separates the body from the
+-header, and then, if no command line arguments are present, it starts to look
+-for a file named
++a system administrator (and in the standard Red Hat Linux configuration), it
++can be invoked from within the mailer immediately.  When invoked, it
++first sets some environment variables to default values, reads the mail message from
++stdin until an EOF, separates the body from the header, and then, if no command line
++arguments are present, it starts to look for a file named
+ .BR @PROCMAILRC@ .
+ According to the processing recipes in this file,
+ the mail message that just arrived gets distributed into the right folder

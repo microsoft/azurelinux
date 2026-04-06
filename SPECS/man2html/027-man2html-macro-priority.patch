@@ -1,0 +1,101 @@
+From: Robert Luberda <robert@debian.org>
+Date: Tue, 17 Apr 2007 20:48:31 +0200
+Subject: 027 man2html macro priority
+
+Parse user-defined macros before the global ones (closes: #5587).
+---
+ man2html/man2html.c | 74 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 37 insertions(+), 37 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 6d77e80..ae0d2d7 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -1697,7 +1697,42 @@ scan_request(char *c) {
+ 	    c = scan_escape(c+1);
+     } else {
+ 	i=V(c[0],c[1]);
+-	switch (i) {
++        /* search macro database of self-defined macros */
++	owndef = find_longstrdef(defdef, i, c, NULL);
++	if (owndef) {
++		char **oldargument;
++		int deflen;
++		int onff;
++		sl=fill_words(c+strlen(owndef->longname), wordlist, SIZE(wordlist), &words, '\n');
++		c=sl+1;
++		*sl=0;
++		for (i=1; i<words; i++)
++		    wordlist[i][-1]=0;
++		for (i=0; i<words; i++) {
++		    char *h=NULL;
++		    if (mandoc_command)
++			 scan_troff_mandoc(wordlist[i],1,&h);
++		    else
++			 scan_troff(wordlist[i],1,&h);
++		    wordlist[i]=h;
++		}
++		for (i=words; i<SIZE(wordlist); i++)
++		    wordlist[i]=NULL;
++		deflen = strlen(owndef->st);
++		owndef->st[deflen+1]='a';
++		for (i=0; (owndef->st[deflen+2+i] = owndef->st[i]); i++);
++		oldargument=argument;
++		argument=wordlist;
++		onff=newline_for_fun;
++		if (mandoc_command)
++		     scan_troff_mandoc(owndef->st+deflen+2, 0, NULL);
++		else
++		     scan_troff(owndef->st+deflen+2, 0, NULL);
++		newline_for_fun=onff;
++		argument=oldargument;
++		for (i=0; i<words; i++) if (wordlist[i]) free(wordlist[i]);
++		*sl='\n';
++	} else switch (i) {
+ 	case V('a','b'):
+ 	    h=c+j;
+ 	    while (*h && *h !='\n') h++;
+@@ -2894,42 +2929,7 @@ scan_request(char *c) {
+         /* ----- end of BSD mandoc stuff ----- */
+ 
+  	default:
+-             /* search macro database of self-defined macros */
+-	    owndef = find_longstrdef(defdef, i, c, NULL);
+-	    if (owndef) {
+-		char **oldargument;
+-		int deflen;
+-		int onff;
+-		sl=fill_words(c+strlen(owndef->longname), wordlist, SIZE(wordlist), &words, '\n');
+-		c=sl+1;
+-		*sl=0;
+-		for (i=1; i<words; i++)
+-		    wordlist[i][-1]=0;
+-		for (i=0; i<words; i++) {
+-		    char *h=NULL;
+-		    if (mandoc_command)
+-			 scan_troff_mandoc(wordlist[i],1,&h);
+-		    else
+-			 scan_troff(wordlist[i],1,&h);
+-		    wordlist[i]=h;
+-		}
+-		for (i=words; i<SIZE(wordlist); i++)
+-		    wordlist[i]=NULL;
+-		deflen = strlen(owndef->st);
+-		owndef->st[deflen+1]='a';
+-		for (i=0; (owndef->st[deflen+2+i] = owndef->st[i]); i++);
+-		oldargument=argument;
+-		argument=wordlist;
+-		onff=newline_for_fun;
+-		if (mandoc_command)
+-		     scan_troff_mandoc(owndef->st+deflen+2, 0, NULL);
+-		else
+-		     scan_troff(owndef->st+deflen+2, 0, NULL);
+-		newline_for_fun=onff;
+-		argument=oldargument;
+-		for (i=0; i<words; i++) if (wordlist[i]) free(wordlist[i]);
+-		*sl='\n';
+-	    } else if (mandoc_command && 
++	    if (mandoc_command &&
+ 		       ((isupper(*c) && islower(c[1]))
+ 			|| (islower(*c) && isupper(c[1])))) {
+ 		 /*

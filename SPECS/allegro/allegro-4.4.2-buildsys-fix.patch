@@ -1,0 +1,12 @@
+diff -up allegro-4.4.2/docs/CMakeLists.txt~ allegro-4.4.2/docs/CMakeLists.txt
+--- allegro-4.4.2/docs/CMakeLists.txt~	2011-07-13 10:40:58.000000000 +0200
++++ allegro-4.4.2/docs/CMakeLists.txt	2011-07-13 10:47:19.561523944 +0200
+@@ -72,7 +72,7 @@ foreach(page ${DOC_SRCS})
+     string(REPLACE "._tx" "" basename ${basename})
+ 
+     set(page ${CMAKE_CURRENT_SOURCE_DIR}/${page})
+-    if(${page} MATCHES "/build/")
++    if(${page} MATCHES "src/build/")
+         set(txt_out ${CMAKE_CURRENT_BINARY_DIR}/build/${basename}.txt)
+         set(html_out ${CMAKE_CURRENT_BINARY_DIR}/build/${basename}.html)
+     else()

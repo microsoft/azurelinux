@@ -1,0 +1,11 @@
+--- config/config.in.orig	2018-05-17 11:13:21.478570256 +0200
++++ config/config.in	2018-05-17 11:13:54.000000000 +0200
+@@ -61,7 +61,7 @@
+ # VERBOSE=1
+ #DEBUG=1
+ # PROFILE=gprof
+-#SHARED=2
++SHARED=2
+ 
+ ## Directory specific selections which override the above
+ 

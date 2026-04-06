@@ -1,0 +1,98 @@
+--- reqwest-0.11.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reqwest-0.11.27/Cargo.toml	2024-09-23T20:36:09.500152+00:00
+@@ -96,11 +96,6 @@
+ required-features = ["gzip"]
+ 
+ [[test]]
+-name = "brotli"
+-path = "tests/brotli.rs"
+-required-features = ["brotli"]
+-
+-[[test]]
+ name = "deflate"
+ path = "tests/deflate.rs"
+ required-features = ["deflate"]
+@@ -143,7 +138,7 @@
+ version = "0.7.1"
+ 
+ [dependencies.sync_wrapper]
+-version = "0.1.2"
++version = ">=0.1.2,<2.0.0"
+ 
+ [dependencies.tower-service]
+ version = "0.3"
+@@ -164,11 +159,6 @@
+     "futures-util/io",
+     "tokio/sync",
+ ]
+-brotli = [
+-    "async-compression",
+-    "async-compression/brotli",
+-    "tokio-util",
+-]
+ cookies = [
+     "cookie_crate",
+     "cookie_store",
+@@ -191,13 +181,6 @@
+     "tokio-util",
+ ]
+ hickory-dns = ["hickory-resolver"]
+-http3 = [
+-    "rustls-tls-manual-roots",
+-    "h3",
+-    "h3-quinn",
+-    "quinn",
+-    "futures-channel",
+-]
+ json = ["serde_json"]
+ multipart = ["mime_guess"]
+ native-tls = ["default-tls"]
+@@ -244,20 +227,8 @@
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.encoding_rs]
+ version = "0.8"
+ 
+-[target."cfg(not(target_arch = \"wasm32\"))".dependencies.futures-channel]
+-version = "0.3"
+-optional = true
+-
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.h2]
+ version = "0.3.14"
+-
+-[target."cfg(not(target_arch = \"wasm32\"))".dependencies.h3]
+-version = "0.0.3"
+-optional = true
+-
+-[target."cfg(not(target_arch = \"wasm32\"))".dependencies.h3-quinn]
+-version = "0.0.4"
+-optional = true
+ 
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.hickory-resolver]
+ version = "0.24"
+@@ -310,16 +281,6 @@
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.pin-project-lite]
+ version = "0.2.0"
+ 
+-[target."cfg(not(target_arch = \"wasm32\"))".dependencies.quinn]
+-version = "0.10"
+-features = [
+-    "tls-rustls",
+-    "ring",
+-    "runtime-tokio",
+-]
+-optional = true
+-default-features = false
+-
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.rustls]
+ version = "0.21.6"
+ features = ["dangerous_configuration"]
+@@ -365,10 +326,6 @@
+ [target."cfg(not(target_arch = \"wasm32\"))".dependencies.webpki-roots]
+ version = "0.25"
+ optional = true
+-
+-[target."cfg(not(target_arch = \"wasm32\"))".dev-dependencies.brotli_crate]
+-version = "3.3.0"
+-package = "brotli"
+ 
+ [target."cfg(not(target_arch = \"wasm32\"))".dev-dependencies.doc-comment]
+ version = "0.3"

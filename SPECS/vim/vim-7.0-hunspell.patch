@@ -1,0 +1,399 @@
+diff -ru vim70.orig/src/Makefile vim70.hunspell/src/Makefile
+--- vim70.orig/src/Makefile	2006-12-15 12:29:41.000000000 +0000
++++ vim70.hunspell/src/Makefile	2006-12-14 11:11:20.000000000 +0000
+@@ -1287,7 +1287,7 @@
+ PFLAGS = $(PROTO_FLAGS) -DPROTO $(LINT_CFLAGS)
+ 
+ ALL_LIB_DIRS = $(GUI_LIBS_DIR) $(X_LIBS_DIR)
+-ALL_LIBS = $(GUI_LIBS1) $(GUI_X_LIBS) $(GUI_LIBS2) $(X_PRE_LIBS) $(X_LIBS) $(X_EXTRA_LIBS) $(LIBS) $(EXTRA_LIBS) $(MZSCHEME_LIBS) $(PERL_LIBS) $(PYTHON_LIBS) $(TCL_LIBS) $(RUBY_LIBS) $(PROFILE_LIBS)
++ALL_LIBS = $(GUI_LIBS1) $(GUI_X_LIBS) $(GUI_LIBS2) $(X_PRE_LIBS) $(X_LIBS) $(X_EXTRA_LIBS) $(LIBS) $(EXTRA_LIBS) $(MZSCHEME_LIBS) $(PERL_LIBS) $(PYTHON_LIBS) $(TCL_LIBS) $(RUBY_LIBS) $(PROFILE_LIBS) -lhunspell-1.1
+ 
+ # abbreviations
+ DEST_BIN = $(DESTDIR)$(BINDIR)
+diff -ru vim70.orig/src/spell.c vim70.hunspell/src/spell.c
+--- vim70.orig/src/spell.c	2006-12-15 12:29:44.000000000 +0000
++++ vim70.hunspell/src/spell.c	2006-12-15 12:27:49.000000000 +0000
+@@ -319,6 +319,8 @@
+ # include <time.h>	/* for time_t */
+ #endif
+ 
++#include "hunspell/hunspell.h"
++
+ #define MAXWLEN 250		/* Assume max. word len is this many bytes.
+ 				   Some places assume a word length fits in a
+ 				   byte, thus it can't be above 255. */
+@@ -428,6 +430,8 @@
+ #define	SP_FORMERROR	-2	/* format error in spell file */
+ #define SP_OTHERERROR	-3	/* other error while reading spell file */
+ 
++#define MAXREGIONS 20
++
+ /*
+  * Structure used to store words and other info for one language, loaded from
+  * a .spl file.
+@@ -450,6 +454,10 @@
+     char_u	*sl_name;	/* language name "en", "en.rare", "nl", etc. */
+     char_u	*sl_fname;	/* name of .spl file */
+     int		sl_add;		/* TRUE if it's a .add file. */
++    int		sl_ishunspell;	/* TRUE if it's an unconverted hunspell aff/dic combination. */
++    Hunhandle	*sl_hunspell;
++    vimconv_T   sl_tohunconv;
++    vimconv_T   sl_fromhunconv;
+ 
+     char_u	*sl_fbyts;	/* case-folded word bytes */
+     idx_T	*sl_fidxs;	/* case-folded word indexes */
+@@ -460,7 +468,7 @@
+ 
+     char_u	*sl_info;	/* infotext string or NULL */
+ 
+-    char_u	sl_regions[17];	/* table with up to 8 region names plus NUL */
++    char_u	sl_regions[MAXREGIONS * 2 + 1];	/* table with up to 8 region names plus NUL */
+ 
+     char_u	*sl_midword;	/* MIDWORD string or NULL */
+ 
+@@ -997,6 +1005,36 @@
+ static char_u	*repl_from = NULL;
+ static char_u	*repl_to = NULL;
+ 
++static void
++ensurehunspellinit(lp)
++    slang_T *lp;
++{
++    if (!lp->sl_hunspell)
++    {
++        char_u *dic = lp->sl_fname;
++        char_u *aff = vim_strnsave(dic, strlen(dic));
++    
++	vim_strncpy(aff + strlen(aff) - 3, "aff", 3);
++    
++	lp->sl_hunspell = Hunspell_create(aff, dic);
++
++	vim_free(aff);
++
++	if (convert_setup(&lp->sl_tohunconv, spell_enc(), 
++	    Hunspell_get_dic_encoding(lp->sl_hunspell)) == FAIL)
++	{
++	    lp->sl_tohunconv.vc_fail = TRUE;
++	}
++
++	if (convert_setup(&lp->sl_fromhunconv, 
++	    Hunspell_get_dic_encoding(lp->sl_hunspell), spell_enc()) == FAIL)
++	{
++	    lp->sl_fromhunconv.vc_fail = TRUE;
++	}
++    }
++}
++
++
+ /*
+  * Main spell-checking function.
+  * "ptr" points to a character that could be the start of a word.
+@@ -1101,27 +1139,70 @@
+     {
+ 	mi.mi_lp = LANGP_ENTRY(wp->w_buffer->b_langp, lpi);
+ 
++	if (mi.mi_lp->lp_slang->sl_ishunspell)
++	{
++	    slang_T *lp = mi.mi_lp->lp_slang;
++	    char_u *converted = 0;
++	    char_u *thisword;
++	    char_u *mi_end = mi.mi_end;
++	    char_u *mi_final =  mi.mi_word + strlen(mi.mi_word);
++
++	    while (1)
++	    {
++		ensurehunspellinit(lp);
++		if ((lp->sl_tohunconv.vc_fail == TRUE) || (lp->sl_fromhunconv.vc_fail == TRUE))
++		    break;
++
++		if (mi_end != mi.mi_word)
++		{
++		    thisword = vim_strnsave(mi.mi_word, mi_end - mi.mi_word);
++		    converted = string_convert(&lp->sl_tohunconv, thisword, NULL);
++		    if (converted)
++		    {
++			if (Hunspell_spell(lp->sl_hunspell, converted) != 0)
++			{
++			    mi.mi_result = SP_OK;
++			    mi.mi_end = mi.mi_cend = mi.mi_word + strlen(thisword);
++			}
++			vim_free(converted);
++		    }
++		    vim_free(thisword);
++		}
++
++		if (mi_end == mi_final)
++		    break;
++
++		do
++		{
++		    mb_ptr_adv(mi_end);
++		} while (*mi_end != NUL && spell_iswordp(mi_end, wp->w_buffer));
++	    }
++	}
++
+ 	/* If reloading fails the language is still in the list but everything
+ 	 * has been cleared. */
+-	if (mi.mi_lp->lp_slang->sl_fidxs == NULL)
++	if (!mi.mi_lp->lp_slang->sl_ishunspell && mi.mi_lp->lp_slang->sl_fidxs == NULL)
+ 	    continue;
+ 
+-	/* Check for a matching word in case-folded words. */
+-	find_word(&mi, FIND_FOLDWORD);
++	if (!mi.mi_lp->lp_slang->sl_ishunspell)
++	{
++	    /* Check for a matching word in case-folded words. */
++	    find_word(&mi, FIND_FOLDWORD);
+ 
+-	/* Check for a matching word in keep-case words. */
+-	find_word(&mi, FIND_KEEPWORD);
++	    /* Check for a matching word in keep-case words. */
++	    find_word(&mi, FIND_KEEPWORD);
+ 
+-	/* Check for matching prefixes. */
+-	find_prefix(&mi, FIND_FOLDWORD);
++	    /* Check for matching prefixes. */
++	    find_prefix(&mi, FIND_FOLDWORD);
+ 
+-	/* For a NOBREAK language, may want to use a word without a following
+-	 * word as a backup. */
+-	if (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
+-						   && mi.mi_result2 != SP_BAD)
+-	{
+-	    mi.mi_result = mi.mi_result2;
+-	    mi.mi_end = mi.mi_end2;
++	    /* For a NOBREAK language, may want to use a word without a following
++	     * word as a backup. */
++	    if (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
++						       && mi.mi_result2 != SP_BAD)
++	    {
++		mi.mi_result = mi.mi_result2;
++		mi.mi_end = mi.mi_end2;
++	    }
+ 	}
+ 
+ 	/* Count the word in the first language where it's found to be OK. */
+@@ -2359,6 +2440,80 @@
+ 
+     if (r == FAIL)
+     {
++#	define HUNSPELLDICT "/usr/share/myspell/"
++	DIR *dirp = opendir(HUNSPELLDICT);
++	if (dirp != NULL)
++	{
++	    slang_T* thislang[MAXREGIONS] = {0};
++	    slang_T *lp = 0;
++	    struct dirent *dp;
++	    int i = 0;
++
++	    while ((dp = readdir(dirp)) != NULL)
++	    {
++		char_u final_name[MAXPATHL];
++		char_u spf_name[MAXPATHL];
++		char_u thisregion[3] = {0};
++		char *resolvedlink = final_name;
++		int j, regionpos;
++
++		if (strncmp(dp->d_name, lang, strlen(lang)) != 0)
++		    continue;
++		
++		if ((strlen(dp->d_name) <= 4) || (dp->d_name[strlen(lang)] != '_'))
++		    continue;
++
++		if (strncmp(".dic", dp->d_name + strlen(dp->d_name) - 4, 4) != 0)
++		    continue;
++
++		vim_strncpy(spf_name, HUNSPELLDICT, strlen(HUNSPELLDICT));
++		vim_strncpy(spf_name + strlen(HUNSPELLDICT), dp->d_name, strlen(HUNSPELLDICT));
++
++		if (realpath(spf_name, resolvedlink) != resolvedlink)
++		    continue;
++
++		thisregion[0] = tolower(dp->d_name[strlen(lang)+1]);
++		thisregion[1] = tolower(dp->d_name[strlen(lang)+1+1]);
++
++		r = OK;
++
++		for (j = 0; j < MAXREGIONS; ++j)
++		{
++		    if (thislang[j] && (strcmp(thislang[j]->sl_fname, final_name) == 0))
++			break;
++		}
++
++		if (j < MAXREGIONS)
++		    lp = thislang[j];
++		else
++		{
++		    lp = slang_alloc(lang);
++		    lp->sl_ishunspell = TRUE;
++
++		    lp->sl_fname = vim_strsave(resolvedlink);
++
++		    lp->sl_next = first_lang;
++		    first_lang = lp;
++		    thislang[i] = lp;
++		}
++
++		regionpos = 0;
++		while (lp->sl_regions[regionpos] != 0) ++regionpos;
++
++		//silently lose regions which won't fit in
++		if (regionpos == MAXREGIONS * 2)
++		    continue;
++
++		vim_strncpy(lp->sl_regions + regionpos, thisregion, 2);
++
++		++i;
++	    }
++	    closedir(dirp);
++	}
++    }
++
++    if (r == FAIL)
++    {
+ 	smsg((char_u *)_("Warning: Cannot find word list \"%s.%s.spl\" or \"%s.ascii.spl\""),
+ 						     lang, spell_enc(), lang);
+     }
+@@ -2429,6 +2584,9 @@
+ slang_free(lp)
+     slang_T	*lp;
+ {
++    Hunspell_destroy(lp->sl_hunspell);
++    convert_setup(&lp->sl_tohunconv, NULL, NULL);
++    convert_setup(&lp->sl_fromhunconv, NULL, NULL);
+     vim_free(lp->sl_name);
+     vim_free(lp->sl_fname);
+     slang_clear(lp);
+@@ -2974,7 +3132,7 @@
+ {
+     int		i;
+ 
+-    if (len > 16)
++    if (len > MAXREGIONS*2)
+ 	return SP_FORMERROR;
+     for (i = 0; i < len; ++i)
+ 	lp->sl_regions[i] = getc(fd);			/* <regionname> */
+@@ -4112,6 +4270,7 @@
+     /* loop over comma separated language names. */
+     for (splp = buf->b_p_spl; *splp != NUL; )
+     {
++	int hunspellregionunsupported;
+ 	/* Get one language name. */
+ 	copy_option_part(&splp, lang, MAXWLEN, ",");
+ 
+@@ -4182,6 +4341,7 @@
+ 	/*
+ 	 * Loop over the languages, there can be several files for "lang".
+ 	 */
++	hunspellregionunsupported = 0;
+ 	for (slang = first_lang; slang != NULL; slang = slang->sl_next)
+ 	    if (filename ? fullpathcmp(lang, slang->sl_fname, FALSE) == FPC_SAME
+ 			 : STRICMP(lang, slang->sl_name) == 0)
+@@ -4199,6 +4359,11 @@
+ 				/* This addition file is for other regions. */
+ 				region_mask = 0;
+ 			}
++			else if (slang->sl_ishunspell)
++			{
++			    region_mask = 0;
++			    hunspellregionunsupported++;
++			}
+ 			else
+ 			    /* This is probably an error.  Give a warning and
+ 			     * accept the words anyway. */
+@@ -4207,7 +4372,10 @@
+ 								      region);
+ 		    }
+ 		    else
++		    {
++			hunspellregionunsupported--;
+ 			region_mask = 1 << c;
++		    }
+ 		}
+ 
+ 		if (region_mask != 0)
+@@ -4225,6 +4393,9 @@
+ 			nobreak = TRUE;
+ 		}
+ 	    }
++
++	if (region && hunspellregionunsupported >= 1)
++	    smsg((char_u *) _("Warning: region %s not supported"), region);
+     }
+ 
+     /* round 0: load int_wordlist, if possible.
+@@ -4832,7 +5003,7 @@
+     char_u	*si_info;	/* info text chars or NULL  */
+     int		si_region_count; /* number of regions supported (1 when there
+ 				    are no regions) */
+-    char_u	si_region_name[16]; /* region names; used only if
++    char_u	si_region_name[MAXREGIONS*2]; /* region names; used only if
+ 				     * si_region_count > 1) */
+ 
+     garray_T	si_rep;		/* list of fromto_T entries from REP lines */
+@@ -7093,7 +7264,7 @@
+ 		else
+ 		{
+ 		    line += 8;
+-		    if (STRLEN(line) > 16)
++		    if (STRLEN(line) > MAXREGIONS)
+ 			smsg((char_u *)_("Too many regions in %s line %d: %s"),
+ 						       fname, lnum, line);
+ 		    else
+@@ -8973,7 +9144,7 @@
+     char_u	wfname[MAXPATHL];
+     char_u	**innames;
+     int		incount;
+-    afffile_T	*(afile[8]);
++    afffile_T	*(afile[MAXREGIONS]);
+     int		i;
+     int		len;
+     struct stat	st;
+@@ -9040,8 +9211,8 @@
+ 	EMSG(_(e_invarg));	/* need at least output and input names */
+     else if (vim_strchr(gettail(wfname), '_') != NULL)
+ 	EMSG(_("E751: Output file name must not have region name"));
+-    else if (incount > 8)
+-	EMSG(_("E754: Only up to 8 regions supported"));
++    else if (incount > MAXREGIONS)
++	EMSG2(_("E754: Only up to %d regions supported"), MAXREGIONS);
+     else
+     {
+ 	/* Check for overwriting before doing things that may take a lot of
+@@ -11097,6 +11268,36 @@
+     {
+ 	lp = LANGP_ENTRY(curbuf->b_langp, lpi);
+ 
++	if (lp->lp_slang->sl_ishunspell)
++	{
++	    slang_T *slp = lp->lp_slang;
++	    char **slst;
++	    char_u *converted = 0;
++
++	    ensurehunspellinit(slp);
++
++	    converted = string_convert(&slp->sl_tohunconv, su->su_fbadword, NULL);
++	    if (converted)
++	    {
++		int suggests;
++		suggests = Hunspell_suggest(slp->sl_hunspell, &slst, converted);
++		if (suggests > 0)
++		{
++		    int i;
++		    char_u *suggest;
++		    for (i = 0; i < suggests; ++i)
++		    {
++			suggest = string_convert(&slp->sl_fromhunconv, slst[i], NULL);
++			add_suggestion(su, &su->su_ga, suggest, su->su_badlen, i, 0, FALSE,
++			    slp, FALSE);
++			vim_free(suggest);
++		    }
++		    free(slst);
++		}
++		vim_free(converted);
++	    }
++	}
++
+ 	/* If reloading a spell file fails it's still in the list but
+ 	 * everything has been cleared. */
+ 	if (lp->lp_slang->sl_fbyts == NULL)

@@ -1,0 +1,117 @@
+From 5e5ef99ce6cae2179a2cc89b551b187fb97f35fe Mon Sep 17 00:00:00 2001
+From: David Bold <davidsch@fedoraproject.org>
+Date: Tue, 25 Nov 2025 19:58:05 -0500
+Subject: [PATCH 2/2] Ensure netcdf4 is locked while closing
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ xarray/backends/file_manager.py | 20 +++++++++++++++-----
+ xarray/backends/locks.py        |  3 +++
+ xarray/backends/netCDF4_.py     |  8 +++-----
+ 3 files changed, 21 insertions(+), 10 deletions(-)
+
+diff --git a/xarray/backends/file_manager.py b/xarray/backends/file_manager.py
+index f7cd4675..cf85eaf3 100644
+--- a/xarray/backends/file_manager.py
++++ b/xarray/backends/file_manager.py
+@@ -8,7 +8,7 @@ from collections.abc import Callable, Hashable, Iterator, Mapping, MutableMappin
+ from contextlib import AbstractContextManager, contextmanager
+ from typing import Any, Generic, Literal, TypeVar, cast
+ 
+-from xarray.backends.locks import acquire
++from xarray.backends.locks import NETCDF4_PYTHON_LOCK, acquire
+ from xarray.backends.lru_cache import LRUCache
+ from xarray.core import utils
+ from xarray.core.options import OPTIONS
+@@ -89,7 +89,7 @@ class CachingFileManager(FileManager[T_File]):
+         *args: Any,
+         mode: Any = _OMIT_MODE,
+         kwargs: Mapping[str, Any] | None = None,
+-        lock: Lock | None | Literal[False] = None,
++        lock: Lock | Literal[False] | None = None,
+         cache: MutableMapping[Any, T_File] | None = None,
+         manager_id: Hashable | None = None,
+         ref_counts: dict[Any, int] | None = None,
+@@ -448,9 +448,16 @@ def _remove_del_methods():
+ class DummyFileManager(FileManager[T_File]):
+     """FileManager that simply wraps an open file in the FileManager interface."""
+ 
+-    def __init__(self, value: T_File, *, close: Callable[[], None] | None = None):
++    def __init__(
++        self,
++        value: T_File,
++        *,
++        close: Callable[[], None] | None = None,
++        lock: Lock | Literal[False] | None = None,
++    ):
+         if close is None:
+             close = value.close
++        self._lock = lock
+         self._value = value
+         self._close = close
+ 
+@@ -464,5 +471,8 @@ class DummyFileManager(FileManager[T_File]):
+         yield self._value
+ 
+     def close(self, needs_lock: bool = True) -> None:
+-        del needs_lock  # unused
+-        self._close()
++        if needs_lock and self._lock:
++            with self._lock:
++                self._close()
++        else:
++            self._close()
+diff --git a/xarray/backends/locks.py b/xarray/backends/locks.py
+index 78444354..e2db5e93 100644
+--- a/xarray/backends/locks.py
++++ b/xarray/backends/locks.py
+@@ -281,3 +281,6 @@ def ensure_lock(lock: Lock | None | Literal[False]) -> Lock:
+     if lock is None or lock is False:
+         return DummyLock()
+     return lock
++
++
++NETCDF4_PYTHON_LOCK = combine_locks([NETCDFC_LOCK, HDF5_LOCK])
+diff --git a/xarray/backends/netCDF4_.py b/xarray/backends/netCDF4_.py
+index bb511f9b..5d5d4e74 100644
+--- a/xarray/backends/netCDF4_.py
++++ b/xarray/backends/netCDF4_.py
+@@ -30,7 +30,7 @@ from xarray.backends.file_manager import (
+     PickleableFileManager,
+ )
+ from xarray.backends.locks import (
+-    HDF5_LOCK,
++    NETCDF4_PYTHON_LOCK,
+     NETCDFC_LOCK,
+     combine_locks,
+     ensure_lock,
+@@ -67,8 +67,6 @@ if TYPE_CHECKING:
+ # string used by netCDF4.
+ _endian_lookup = {"=": "native", ">": "big", "<": "little", "|": "native"}
+ 
+-NETCDF4_PYTHON_LOCK = combine_locks([NETCDFC_LOCK, HDF5_LOCK])
+-
+ 
+ class BaseNetCDF4Array(BackendArray):
+     __slots__ = ("datastore", "dtype", "shape", "variable_name")
+@@ -421,7 +419,7 @@ class NetCDF4DataStore(WritableCFDataStore):
+                         "argument is provided"
+                     )
+                 root = manager
+-            manager = DummyFileManager(root)
++            manager = DummyFileManager(root, lock=NETCDF4_PYTHON_LOCK)
+ 
+         self._manager = manager
+         self._group = group
+@@ -520,7 +518,7 @@ class NetCDF4DataStore(WritableCFDataStore):
+             )
+         else:
+             manager = CachingFileManager(
+-                netCDF4.Dataset, filename, mode=mode, kwargs=kwargs
++                netCDF4.Dataset, filename, lock=lock, mode=mode, kwargs=kwargs
+             )
+         return cls(manager, group=group, mode=mode, lock=lock, autoclose=autoclose)
+ 
+-- 
+2.52.0
+

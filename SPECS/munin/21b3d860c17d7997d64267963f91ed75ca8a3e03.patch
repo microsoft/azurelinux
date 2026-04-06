@@ -1,0 +1,36 @@
+From 21b3d860c17d7997d64267963f91ed75ca8a3e03 Mon Sep 17 00:00:00 2001
+From: Lars Kruse <devel@sumpfralle.de>
+Date: Thu, 29 Mar 2018 03:15:42 +0200
+Subject: [PATCH] plugins nginx_*: change category from 'nginx' to 'webserver'
+
+---
+ plugins/node.d/nginx_request | 2 +-
+ plugins/node.d/nginx_status  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/node.d/nginx_request.in b/plugins/node.d/nginx_request.in
+index 38f1cbe6c..9cd41d7cf 100755
+--- a/plugins/node.d/nginx_request.in
++++ b/plugins/node.d/nginx_request.in
+@@ -94,7 +94,7 @@ if ( exists $ARGV[0] and $ARGV[0] eq "config" )
+ {
+ 	print "graph_title Nginx requests\n";
+ 	print "graph_args --base 1000\n";
+-	print "graph_category nginx\n";
++	print "graph_category webserver\n";
+ 	print "graph_vlabel Requests per \${graph_period}\n";
+ 	print "request.type DERIVE\n";
+ 	print "request.min 0\n";
+diff --git a/plugins/node.d/nginx_status.in b/plugins/node.d/nginx_status.in
+index f69b6ab8d..1834dada4 100755
+--- a/plugins/node.d/nginx_status.in
++++ b/plugins/node.d/nginx_status.in
+@@ -93,7 +93,7 @@ if ( exists $ARGV[0] and $ARGV[0] eq "autoconf" ) {
+ if ( exists $ARGV[0] and $ARGV[0] eq "config" ) {
+     print "graph_title Nginx status\n";
+     print "graph_args --base 1000\n";
+-    print "graph_category nginx\n";
++    print "graph_category webserver\n";
+     print "graph_vlabel Connections\n";
+ 
+     print "total.label Active connections\n";

@@ -1,0 +1,2 @@
+g apache 48
+u apache 48 "Apache" /usr/share/httpd /sbin/nologin

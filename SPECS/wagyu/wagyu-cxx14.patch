@@ -1,0 +1,18 @@
+commit ec4832e2b9cc9cd44ec9d2122d5f362899ca8ef5
+Author: Tom Hughes <tom@compton.nu>
+Date:   Fri Jan 29 14:20:38 2021 +0000
+
+    Switch to C++14 as Boost.Geometry requires it from Boost 1.75
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bdadb90..a346401 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ cmake_minimum_required(VERSION 3.8)
+ project(hpp_skel LANGUAGES CXX)
+-set(CMAKE_CXX_STANDARD 11)
++set(CMAKE_CXX_STANDARD 14)
+ set(CMAKE_CXX_STANDARD_REQUIRED on)
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ 

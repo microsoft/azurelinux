@@ -1,0 +1,13 @@
+--- serf-1.3.9/buckets/ssl_buckets.c.errgetfunc
++++ serf-1.3.9/buckets/ssl_buckets.c
+@@ -1204,6 +1204,10 @@
+     }
+ }
+ 
++#ifndef ERR_GET_FUNC
++#define ERR_GET_FUNC(ec) (0)
++#endif
++
+ static int ssl_need_client_cert(SSL *ssl, X509 **cert, EVP_PKEY **pkey)
+ {
+     serf_ssl_context_t *ctx = SSL_get_app_data(ssl);

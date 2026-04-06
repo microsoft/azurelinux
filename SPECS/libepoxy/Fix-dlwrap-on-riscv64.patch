@@ -1,0 +1,21 @@
+From 62f9d554ebd95b0c52382a36ce38284e0feed07e Mon Sep 17 00:00:00 2001
+From: Piggy NL <piggynl@outlook.com>
+Date: Thu, 7 Apr 2022 16:53:15 +0800
+Subject: [PATCH] test: Fix dlwrap on riscv64
+
+---
+ test/dlwrap.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/dlwrap.c b/test/dlwrap.c
+index c0c24c21..68bfa005 100644
+--- a/test/dlwrap.c
++++ b/test/dlwrap.c
+@@ -237,6 +237,7 @@ dlwrap_real_dlsym(void *handle, const char *name)
+          * In the meantime, I'll just keep augmenting this
+          * hard-coded version list as people report bugs. */
+         const char *version[] = {
++            "GLIBC_2.27",
+             "GLIBC_2.17",
+             "GLIBC_2.4",
+             "GLIBC_2.3",

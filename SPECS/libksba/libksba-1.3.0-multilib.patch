@@ -1,0 +1,23 @@
+diff -up libksba-1.3.0/src/ksba-config.in.multilib libksba-1.3.0/src/ksba-config.in
+--- libksba-1.3.0/src/ksba-config.in.multilib	2011-02-25 09:33:11.000000000 +0100
++++ libksba-1.3.0/src/ksba-config.in	2012-12-03 16:17:52.050832689 +0100
+@@ -15,7 +15,7 @@ cflags="@KSBA_CONFIG_CFLAGS@ @GPG_ERROR_
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ api_version="@KSBA_CONFIG_API_VERSION@"
+-my_host="@KSBA_CONFIG_HOST@"
++my_host="none"
+ 
+ includes=""
+ libdirs=""
+@@ -125,10 +125,6 @@ if test "$echo_cflags" = "yes"; then
+ fi
+ 
+ if test "$echo_libs" = "yes"; then
+-    libdirs=""
+-    if test "@libdir@" != "/usr/lib" ; then
+-      libdirs="-L@libdir@"
+-    fi
+     tmp=""
+     for i in $libdirs $libs; do
+        if echo "$tmp" | fgrep -v -- "$i" >/dev/null; then

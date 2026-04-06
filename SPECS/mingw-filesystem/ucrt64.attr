@@ -1,0 +1,3 @@
+%__ucrt64_provides     %{_rpmconfigdir}/mingw.prov ucrt64
+%__ucrt64_requires     %{_rpmconfigdir}/mingw.req ucrt64
+%__ucrt64_path		^%{ucrt64_prefix}/.*\.([Dd][Ll][Ll]|[Ee][Xx][Ee]|[Pp][Yy][Dd]?|[Pp][Cc])$

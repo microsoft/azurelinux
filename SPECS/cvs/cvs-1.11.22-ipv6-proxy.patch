@@ -1,0 +1,439 @@
+diff -up cvs-1.11.23/src/client.c.ipv6 cvs-1.11.23/src/client.c
+--- cvs-1.11.23/src/client.c.ipv6	2008-07-15 15:42:29.000000000 -0400
++++ cvs-1.11.23/src/client.c	2008-07-15 15:43:46.000000000 -0400
+@@ -81,7 +81,7 @@ static Key_schedule sched;
+ /* This is needed for GSSAPI encryption.  */
+ static gss_ctx_id_t gcontext;
+ 
+-static int connect_to_gserver PROTO((cvsroot_t *, int, struct hostent *));
++static int connect_to_gserver PROTO((cvsroot_t *, int, char *));
+ 
+ # endif /* HAVE_GSSAPI */
+ 
+@@ -146,7 +146,7 @@ static size_t try_read_from_server PROTO
+ 
+ static void proxy_connect PROTO ((cvsroot_t *, int));
+ static void auth_server PROTO ((cvsroot_t *, struct buffer *, struct buffer *,
+-				int, int, struct hostent *));
++				int, int, char *));
+ 
+ /* We need to keep track of the list of directories we've sent to the
+    server.  This list, along with the current CVSROOT, will help us
+@@ -3583,30 +3583,6 @@ supported_request (name)
+ 
+ 
+ #if defined (AUTH_CLIENT_SUPPORT) || defined (HAVE_KERBEROS) || defined (HAVE_GSSAPI)
+-static struct hostent *init_sockaddr PROTO ((struct sockaddr_in *, char *,
+-					     unsigned int));
+-
+-static struct hostent *
+-init_sockaddr (name, hostname, port)
+-    struct sockaddr_in *name;
+-    char *hostname;
+-    unsigned int port;
+-{
+-    struct hostent *hostinfo;
+-    unsigned short shortport = port;
+-
+-    memset (name, 0, sizeof (*name));
+-    name->sin_family = AF_INET;
+-    name->sin_port = htons (shortport);
+-    hostinfo = gethostbyname (hostname);
+-    if (hostinfo == NULL)
+-    {
+-	fprintf (stderr, "Unknown host %s.\n", hostname);
+-	error_exit ();
+-    }
+-    name->sin_addr = *(struct in_addr *) hostinfo->h_addr;
+-    return hostinfo;
+-}
+ 
+ 
+ 
+@@ -3782,41 +3758,63 @@ connect_to_pserver (root, to_server_p, f
+ {
+     int sock;
+     int port_number;
+-    struct sockaddr_in client_sai;
+-    struct hostent *hostinfo;
++    int gerr;
++    struct addrinfo hints, *res, *res0;
++    char pbuf[32];
+     struct buffer *local_to_server, *local_from_server;
++    char *p_hostname;
+ 
+-    sock = socket (AF_INET, SOCK_STREAM, 0);
+-    if (sock == -1)
+-    {
+-	error (1, 0, "cannot create socket: %s", SOCK_STRERROR (SOCK_ERRNO));
+-    }
+     port_number = get_cvs_port_number (root);
+ 
+-    /* if we have a proxy connect to that instead */
+-    if (root->proxy_hostname)
+-    {
+-	hostinfo = init_sockaddr (&client_sai, root->proxy_hostname, root->proxy_port);
+-    }
+-    else
+-    {
+-	hostinfo = init_sockaddr (&client_sai, root->hostname, port_number);
++    sprintf (pbuf, "%u", (root->proxy_hostname) ? root->proxy_port : port_number);
++    pbuf[sizeof(pbuf)-1] = '\0';
++    memset (&hints, 0, sizeof (hints));
++    hints.ai_family = af;
++    hints.ai_socktype = SOCK_STREAM;
++
++    /* do we have a proxy? */
++    p_hostname = (root->proxy_hostname) ? root->proxy_hostname : root->hostname;
++
++    gerr = getaddrinfo (p_hostname, pbuf, &hints, &res0);
++    if (gerr)
++    {
++       fprintf (stderr, "Unknown host %s.\n", p_hostname);
++       error_exit ();
++    }
++
++    /* Try connect to p_hostname using all available families */
++    for (res = res0; res != NULL; res = res->ai_next)
++    {
++       sock = socket (res->ai_family, res->ai_socktype, 0);
++       if (sock == -1) {
++           if (res->ai_next)
++               continue;
++           else {
++               char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
++               freeaddrinfo(res0);
++               error (1, 0, "cannot create socket: %s", sock_error);
++           }
++       }
++
++       if (connect (sock, res->ai_addr, res->ai_addrlen) < 0)
++       {
++           if (res->ai_next)
++           {
++               close(sock);
++               continue;
++           }
++           else
++           {
++               char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
++               freeaddrinfo(res0);
++               error (1, 0, "connect to [%s]:%s failed: %s", p_hostname,
++                       pbuf, sock_error);
++           }
++       }
++       /* success */
++       break;
+     }
+ 
+-    if (trace)
+-    {
+-	fprintf (stderr, " -> Connecting to %s(%s):%d\n",
+-		 root->hostname,
+-		 inet_ntoa (client_sai.sin_addr), port_number);
+-    }
+-    if (connect (sock, (struct sockaddr *) &client_sai, sizeof (client_sai))
+-	< 0)
+-	error (1, 0, "connect to %s(%s):%d failed: %s",
+-	       root->proxy_hostname ? root->proxy_hostname : root->hostname,
+-	       inet_ntoa (client_sai.sin_addr),
+-	       root->proxy_hostname ? root->proxy_port : port_number,
+-	       SOCK_STRERROR (SOCK_ERRNO));
+-
+     make_bufs_from_fds (sock, sock, 0, &local_to_server, &local_from_server, 1);
+ 
+     if (root->proxy_hostname)
+@@ -3830,7 +3828,7 @@ connect_to_pserver (root, to_server_p, f
+ 	proxy_connect (root, port_number);
+     }
+ 
+-    auth_server (root, local_to_server, local_from_server, verify_only, do_gssapi, hostinfo);
++    auth_server (root, local_to_server, local_from_server, verify_only, do_gssapi, p_hostname);
+ 
+     if (verify_only)
+     {
+@@ -3904,13 +3902,13 @@ proxy_connect (root, port_number)
+ 
+ 
+ static void
+-auth_server (root, lto_server, lfrom_server, verify_only, do_gssapi, hostinfo)
++auth_server (root, lto_server, lfrom_server, verify_only, do_gssapi, hostname)
+     cvsroot_t *root;
+     struct buffer *lto_server;
+     struct buffer *lfrom_server;
+     int verify_only;
+     int do_gssapi;
+-    struct hostent *hostinfo;
++    char *hostname;
+ {
+     char *username = "";		/* the username we use to connect */
+     char no_passwd = 0;			/* gets set if no password found */
+@@ -3940,7 +3938,7 @@ auth_server (root, lto_server, lfrom_ser
+ 	    error (1, 0, "gserver currently only enabled for socket connections");
+ 	}
+ 
+-	if (! connect_to_gserver (root, fd, hostinfo))
++	if (! connect_to_gserver (root, fd, hostname))
+ 	{
+ 	    error (1, 0,
+ 		    "authorization failed: server %s rejected access to %s",
+@@ -3956,7 +3954,7 @@ auth_server (root, lto_server, lfrom_ser
+ 	char *begin      = NULL;
+ 	char *password   = NULL;
+ 	char *end        = NULL;
+-	
++
+ 	if (verify_only)
+ 	{
+ 	    begin = "BEGIN VERIFICATION REQUEST";
+@@ -4137,36 +4135,74 @@ start_tcp_server (root, to_server, from_
+     int s;
+     const char *portenv;
+     int port;
+-    struct hostent *hp;
+-    struct sockaddr_in sin;
++    int gerr;
++    struct addrinfo hints, *res, *res0;
+     char *hname;
+-
+-    s = socket (AF_INET, SOCK_STREAM, 0);
+-    if (s < 0)
+-	error (1, 0, "cannot create socket: %s", SOCK_STRERROR (SOCK_ERRNO));
++    char pbuf[32], hbuf[1025];
+ 
+     port = get_cvs_port_number (root);
+ 
+-    hp = init_sockaddr (&sin, root->hostname, port);
++    sprintf (pbuf, "%u", port);
++    pbuf[sizeof(pbuf)-1] = '\0';
++    memset (&hints, 0, sizeof(hints));
++    hints.ai_family = af;
++    hints.ai_socktype = SOCK_STREAM;
++    gerr = getaddrinfo (root->hostname, pbuf, &hints, &res0);
++    if (gerr) {
++	fprintf (stderr, "Unknown host %s.\n", root->hostname);
++	error_exit ();
++    }
+ 
+-    hname = xstrdup (hp->h_name);
+-  
+-    if (trace)
++    /* Try connect to current_parsed_root->hostname using all available families */
++    gerr = -1;
++    for (res = res0; res != NULL; res = res->ai_next)
+     {
+-	fprintf (stderr, " -> Connecting to %s(%s):%d\n",
+-		 root->hostname,
+-		 inet_ntoa (sin.sin_addr), port);
++	s = socket (res->ai_family, res->ai_socktype, 0);
++	if (s < 0)
++	{
++	    if (res->ai_next)
++		continue;
++	    else
++	    {
++		char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
++		freeaddrinfo(res0);
++		error (1, 0, "cannot create socket: %s", sock_error);
++	    }
++	}
++	if (trace)
++	{
++	    char hbuf[1025];
++	    getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
++		    NULL, 0, NI_NUMERICHOST);
++	    fprintf (stderr, " -> Connecting to %s(%s):%d\n",
++		    root->hostname, hbuf, port);
++	}
++	
++	if (connect (s, res->ai_addr, res->ai_addrlen) < 0)
++	{
++	    if (res->ai_next)
++	    {
++		close(s);
++		continue;
++	    }
++	    else
++	    {
++		char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
++		freeaddrinfo(res0);
++		error (1, 0, "connect to [%s]:%s failed: %s",
++			root->hostname, pbuf, sock_error);
++	    }
++	}
++	getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf), NULL, 0, 0);
++	hname = xmalloc (strlen (hbuf) + 1);
++	strcpy (hname, hbuf);
++	/* success */
++	break;
+     }
+ 
+-    if (connect (s, (struct sockaddr *) &sin, sizeof sin) < 0)
+-	error (1, 0, "connect to %s(%s):%d failed: %s",
+-	       root->hostname,
+-	       inet_ntoa (sin.sin_addr),
+-	       port, SOCK_STRERROR (SOCK_ERRNO));
+-
+     {
+ 	const char *realm;
+-	struct sockaddr_in laddr;
++	struct sockaddr_storage laddr;
+ 	int laddrlen;
+ 	KTEXT_ST ticket;
+ 	MSG_DAT msg_data;
+@@ -4182,13 +4218,15 @@ start_tcp_server (root, to_server, from_
+ 	/* We don't care about the checksum, and pass it as zero.  */
+ 	status = krb_sendauth (KOPT_DO_MUTUAL, s, &ticket, "rcmd",
+ 			       hname, realm, (unsigned long) 0, &msg_data,
+-			       &cred, sched, &laddr, &sin, "KCVSV1.0");
++			       &cred, sched, &laddr, res->ai_addr, "KCVSV1.0");
+ 	if (status != KSUCCESS)
+ 	    error (1, 0, "kerberos authentication failed: %s",
+ 		   krb_get_err_text (status));
+ 	memcpy (kblock, cred.session, sizeof (C_Block));
+     }
+ 
++    freeaddrinfo(res0);
++
+     close_on_exec (s);
+ 
+     free (hname);
+@@ -4241,10 +4279,10 @@ recv_bytes (sock, buf, need)
+  */
+ #define BUFSIZE 1024
+ static int
+-connect_to_gserver (root, sock, hostinfo)
++connect_to_gserver (root, sock, hostname)
+     cvsroot_t *root;
+     int sock;
+-    struct hostent *hostinfo;
++    char *hostname;
+ {
+     char *str;
+     char buf[BUFSIZE];
+@@ -4257,9 +4295,9 @@ connect_to_gserver (root, sock, hostinfo
+     if (send (sock, str, strlen (str), 0) < 0)
+ 	error (1, 0, "cannot send: %s", SOCK_STRERROR (SOCK_ERRNO));
+ 
+-    if (strlen (hostinfo->h_name) > BUFSIZE - 5)
++    if (strlen (hostname) > BUFSIZE - 5)
+ 	error (1, 0, "Internal error: hostname exceeds length of buffer");
+-    sprintf (buf, "cvs@%s", hostinfo->h_name);
++    sprintf (buf, "cvs@%s", hostname);
+     tok_in.length = strlen (buf);
+     tok_in.value = buf;
+     gss_import_name (&stat_min, &tok_in, GSS_C_NT_HOSTBASED_SERVICE,
+diff -up cvs-1.11.23/src/cvs.h.ipv6 cvs-1.11.23/src/cvs.h
+--- cvs-1.11.23/src/cvs.h.ipv6	2006-08-25 11:48:55.000000000 -0400
++++ cvs-1.11.23/src/cvs.h	2008-07-15 15:42:29.000000000 -0400
+@@ -381,6 +381,7 @@ extern char *CurDir;
+ extern int really_quiet, quiet;
+ extern int use_editor;
+ extern int cvswrite;
++extern int af;
+ extern mode_t cvsumask;
+ 
+ 
+diff -up cvs-1.11.23/src/main.c.ipv6 cvs-1.11.23/src/main.c
+--- cvs-1.11.23/src/main.c.ipv6	2008-07-15 15:42:28.000000000 -0400
++++ cvs-1.11.23/src/main.c	2008-07-15 15:42:29.000000000 -0400
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include <assert.h>
++#include <sys/socket.h>
+ #include "cvs.h"
+ 
+ #ifdef HAVE_WINSOCK_H
+@@ -47,6 +48,7 @@ int quiet = 0;
+ int trace = 0;
+ int noexec = 0;
+ int logoff = 0;
++int af = AF_UNSPEC;
+ 
+ /*
+  * Zero if compression isn't supported or requested; non-zero to indicate
+@@ -164,7 +166,7 @@ static const char *const usg[] =
+        in --help as it is a rather different format from the rest.  */
+ 
+     "Usage: %s [cvs-options] command [command-options-and-arguments]\n",
+-    "  where cvs-options are -q, -n, etc.\n",
++    "  where cvs-options are -4, -6,-q, -n, etc.\n",
+     "    (specify --help-options for a list of options)\n",
+     "  where command is add, admin, etc.\n",
+     "    (specify --help-commands for a list of commands\n",
+@@ -262,6 +264,8 @@ static const char *const opt_usage[] =
+ #endif
+     "    -a           Authenticate all net traffic.\n",
+ #endif
++    "    -4           Use IPv4.\n",
++    "    -6           Use IPv6.\n",
+     "    -s VAR=VAL   Set CVS user variable.\n",
+     "(Specify the --help option for a list of other help options)\n",
+     NULL
+@@ -414,7 +418,7 @@ main (argc, argv)
+     int help = 0;		/* Has the user asked for help?  This
+ 				   lets us support the `cvs -H cmd'
+ 				   convention to give help for cmd. */
+-    static const char short_options[] = "+Qqrwtnvb:T:e:d:Hfz:s:xa";
++    static const char short_options[] = "+46Qqrwtnvb:T:e:d:Hfz:s:xa";
+     static struct option long_options[] =
+     {
+         {"help", 0, NULL, 'H'},
+@@ -521,6 +525,12 @@ main (argc, argv)
+ 		/* --allow-root */
+ 		root_allow_add (optarg);
+ 		break;
++	    case '4':
++		af = AF_INET;
++		break;
++	    case '6':
++		af = AF_INET6;
++		break;
+ 	    case 'Q':
+ 		really_quiet = 1;
+ 		/* FALL THROUGH */
+diff -up cvs-1.11.23/src/server.c.ipv6 cvs-1.11.23/src/server.c
+--- cvs-1.11.23/src/server.c.ipv6	2008-07-15 15:42:29.000000000 -0400
++++ cvs-1.11.23/src/server.c	2008-07-15 15:42:29.000000000 -0400
+@@ -6091,8 +6091,8 @@ kserver_authenticate_connection ()
+ {
+     int status;
+     char instance[INST_SZ];
+-    struct sockaddr_in peer;
+-    struct sockaddr_in laddr;
++    struct sockaddr_storage peer;
++    struct sockaddr_storage laddr;
+     int len;
+     KTEXT_ST ticket;
+     AUTH_DAT auth;
+@@ -6169,7 +6169,8 @@ static void
+ gserver_authenticate_connection ()
+ {
+     char hostname[MAXHOSTNAMELEN];
+-    struct hostent *hp;
++    char hbuf[1025];
++    struct addrinfo hints, *res0;
+     gss_buffer_desc tok_in, tok_out;
+     char buf[1024];
+     char *credbuf;
+@@ -6181,11 +6182,16 @@ gserver_authenticate_connection ()
+     gss_OID mechid;
+ 
+     gethostname (hostname, sizeof hostname);
+-    hp = gethostbyname (hostname);
+-    if (hp == NULL)
++    hostname[sizeof(hostname)-1] = '\0';
++    memset (&hints, 0, sizeof(hints));
++    hints.ai_family = af;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_CANONNAME;
++    if (getaddrinfo (hostname, NULL, &hints, &res0))
+ 	error (1, 0, "can't get canonical hostname");
+ 
+-    sprintf (buf, "cvs@%s", hp->h_name);
++    sprintf (buf, "cvs@%s", res0->ai_canonname);
++    freeaddrinfo (res0);
+     tok_in.value = buf;
+     tok_in.length = strlen (buf);
+ 

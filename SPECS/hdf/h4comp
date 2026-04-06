@@ -1,0 +1,6 @@
+#!/bin/bash
+
+BITS=32
+[ -d /usr/lib64 ] && BITS=64
+
+exec $0-${BITS} "$@"

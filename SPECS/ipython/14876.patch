@@ -1,0 +1,41 @@
+From 87dbf2dcc3ecf9f4db8f9d2f390b1f43f7c7958b Mon Sep 17 00:00:00 2001
+From: Mattias Ellert <mattias.ellert@physics.uu.se>
+Date: Thu, 17 Apr 2025 14:42:11 +0200
+Subject: [PATCH] Fix syntax warning in Python 3.14 (remove return from finally
+ block)
+
+SyntaxWarning: 'return' in a 'finally' block
+---
+ IPython/core/interactiveshell.py | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/IPython/core/interactiveshell.py b/IPython/core/interactiveshell.py
+index 4f3405e2f2..811422f2c8 100644
+--- a/IPython/core/interactiveshell.py
++++ b/IPython/core/interactiveshell.py
+@@ -3152,14 +3152,17 @@ def _run_cell(
+         try:
+             result = runner(coro)
+         except BaseException as e:
+-            info = ExecutionInfo(
+-                raw_cell, store_history, silent, shell_futures, cell_id
+-            )
+-            result = ExecutionResult(info)
+-            result.error_in_exec = e
+-            self.showtraceback(running_compiled_code=True)
+-        finally:
+-            return result
++            try:
++                info = ExecutionInfo(
++                    raw_cell, store_history, silent, shell_futures, cell_id
++                )
++                result = ExecutionResult(info)
++                result.error_in_exec = e
++                self.showtraceback(running_compiled_code=True)
++            except:
++                pass
++
++        return result
+ 
+     def should_run_async(
+         self, raw_cell: str, *, transformed_cell=None, preprocessing_exc_tuple=None

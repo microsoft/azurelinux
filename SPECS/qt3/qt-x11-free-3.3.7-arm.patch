@@ -1,0 +1,25 @@
+--- qt-x11-free-3.3.7/src/tools/qglobal.h.orig	2007-04-24 09:02:36.000000000 -0400
++++ qt-x11-free-3.3.7/src/tools/qglobal.h	2007-04-24 09:03:02.000000000 -0400
+@@ -315,9 +315,9 @@
+    QString bloat. However, gcc 3.4 doesn't allow us to create references to
+    members of a packed struct. (Pointers are OK, because then you
+    supposedly know what you are doing.) */
+-#  if (defined(__arm__) || defined(__ARMEL__)) && !defined(QT_MOC_CPP)
++#  if (defined(__arm__) || defined(__ARMEL__)) && !defined(QT_MOC_CPP) && !defined(__ARM_EABI__)
+ #    define Q_PACKED __attribute__ ((packed))
+-#    if __GNUC__ == 3 && __GNUC_MINOR__ >= 4
++#    if __GNUC__ >= 4 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+ #      define Q_NO_PACKED_REFERENCE
+ #    endif
+ #  endif
+--- qt-x11-free-3.3.7/src/tools/qstring.h.orig	2007-04-24 09:03:11.000000000 -0400
++++ qt-x11-free-3.3.7/src/tools/qstring.h	2007-04-24 09:03:27.000000000 -0400
+@@ -194,7 +194,7 @@
+     char latin1() const { return ucs > 0xff ? 0 : (char) ucs; }
+     ushort unicode() const { return ucs; }
+ #ifdef Q_NO_PACKED_REFERENCE
+-    ushort &unicode() { return *(&ucs); }
++    ushort &unicode() { return *((ushort *)&ucs); }
+ #else
+     ushort &unicode() { return ucs; }
+ #endif

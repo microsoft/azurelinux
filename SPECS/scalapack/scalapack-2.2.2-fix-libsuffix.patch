@@ -1,0 +1,14 @@
+diff -up scalapack-2.2.2/scalapack-2.2.2/CMakeLists.txt.libsuffix scalapack-2.2.2/scalapack-2.2.2/CMakeLists.txt
+--- scalapack-2.2.2/scalapack-2.2.2/CMakeLists.txt.libsuffix	2025-03-03 11:46:45.734876782 -0500
++++ scalapack-2.2.2/scalapack-2.2.2/CMakeLists.txt	2025-03-03 11:47:20.225381661 -0500
+@@ -327,8 +327,8 @@ configure_file(${SCALAPACK_SOURCE_DIR}/C
+ install(FILES
+   ${SCALAPACK_BINARY_DIR}/CMakeFiles/scalapack-config.cmake
+   ${SCALAPACK_BINARY_DIR}/scalapack-config-version.cmake
+-  DESTINATION lib/cmake/scalapack-${SCALAPACK_VERSION}
++  DESTINATION lib${LIB_SUFFIX}/cmake/scalapack-${SCALAPACK_VERSION}
+   )
+ 
+ install(EXPORT scalapack-targets
+-  DESTINATION lib/cmake/scalapack-${SCALAPACK_VERSION})
++  DESTINATION lib${LIB_SUFFIX}/cmake/scalapack-${SCALAPACK_VERSION})

@@ -1,0 +1,30 @@
+diff -Nur chkrootkit-0.47-orig/chklastlog.c chkrootkit-0.47/chklastlog.c
+--- chkrootkit-0.47-orig/chklastlog.c	2006-02-11 18:02:48.000000000 +0100
++++ chkrootkit-0.47/chklastlog.c	2007-02-11 22:10:25.000000000 +0100
+@@ -62,10 +62,10 @@
+ #define LASTLOG_FILENAME "/var/log/lastlog"
+ #endif
+ #ifndef WTMP_FILENAME
+-#define WTMP_FILENAME "/var/adm/wtmp"
++#define WTMP_FILENAME "/var/log/wtmp"
+ #endif
+ #ifndef LASTLOG_FILENAME
+-#define LASTLOG_FILENAME "/var/adm/lastlog"
++#define LASTLOG_FILENAME "/var/log/lastlog"
+ #endif
+ 
+ #define TRUE 1L
+diff -Nur chkrootkit-0.47-orig/README.chklastlog chkrootkit-0.47/README.chklastlog
+--- chkrootkit-0.47-orig/README.chklastlog	2006-02-11 18:02:48.000000000 +0100
++++ chkrootkit-0.47/README.chklastlog	2007-02-11 22:50:04.000000000 +0100
+@@ -31,8 +31,8 @@
+    % cc -o chklastlog chklastlog.c 
+ 
+ 
+-   To run chklastlog you need read permission on the files /var/adm/wtmp
+-   and /var/adm/lastlogin. Normally these files are world-readable and
++   To run chklastlog you need read permission on the files /var/log/wtmp
++   and /var/log/lastlog. Normally these files are world-readable and
+    no special privileges are required to run the checker.
+ 
+    The following is an example of the output of chklastlog.

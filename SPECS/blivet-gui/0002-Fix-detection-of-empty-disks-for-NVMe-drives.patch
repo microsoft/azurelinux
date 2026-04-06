@@ -1,0 +1,30 @@
+From 9095bf9aaf92ae9af1e2e5cb03cc5f6a12c8f9c2 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Sun, 16 Mar 2025 09:09:32 +0100
+Subject: [PATCH] Fix detection of empty disks for NVMe drives
+
+Fixes: #476
+---
+ blivetgui/blivet_utils.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/blivetgui/blivet_utils.py b/blivetgui/blivet_utils.py
+index fda8f3d..595e9e9 100644
+--- a/blivetgui/blivet_utils.py
++++ b/blivetgui/blivet_utils.py
+@@ -116,13 +116,13 @@ def protected(self):
+ 
+     @property
+     def is_empty_disk(self):
+-        return len(self.parents) == 1 and self.parents[0].type in ("disk", "nvdimm") and \
++        return len(self.parents) == 1 and self.parents[0].is_disk and \
+             not self.parents[0].children and self.parents[0].format.type and \
+             self.parents[0].format.type not in ("iso9660",)
+ 
+     @property
+     def is_uninitialized_disk(self):
+-        return len(self.parents) == 1 and self.parents[0].type in ("disk", "nvdimm") and \
++        return len(self.parents) == 1 and self.parents[0].is_disk and \
+             not self.parents[0].children and not self.parents[0].format.type
+ 
+     @property

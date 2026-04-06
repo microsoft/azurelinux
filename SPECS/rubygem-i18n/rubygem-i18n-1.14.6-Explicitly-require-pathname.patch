@@ -1,0 +1,21 @@
+From edb42431d9a4967fa9b1b0c781354c5b39dea4f8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 9 Dec 2024 10:05:28 +0100
+Subject: [PATCH] Explicitly require `pathname`
+
+Bundler requires `pathname`, therefore it might not always be needed.
+But it is right thing to not rely on Bundler internals.
+---
+ test/i18n/load_path_test.rb | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/i18n/load_path_test.rb b/test/i18n/load_path_test.rb
+index ab354c0..f5aac5c 100644
+--- a/test/i18n/load_path_test.rb
++++ b/test/i18n/load_path_test.rb
+@@ -1,4 +1,5 @@
+ require 'test_helper'
++require 'pathname'
+ 
+ class I18nLoadPathTest < I18n::TestCase
+   def setup

@@ -1,0 +1,89 @@
+From 297706c4728fd4008e9e1bc4846367f104c2dce5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 22 Nov 2016 16:42:26 +0100
+Subject: [PATCH] Convert documentation to UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr P√≠sa≈ô <ppisar@redhat.com>
+---
+ SVN-MOVE                      | 2 +-
+ docs/devel/core/explained.pod | 4 +++-
+ docs/devel/debug/c.pod        | 4 +++-
+ docs/user/Changes.pod         | 4 +++-
+ 4 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/SVN-MOVE b/SVN-MOVE
+index e98bfc1..6bc42ac 100644
+--- a/SVN-MOVE
++++ b/SVN-MOVE
+@@ -1,7 +1,7 @@
+ This file tracks the things that need to be done to accomplish the
+ move of modperl projects to SVN:
+ 
+-* missing commit template files (‡ l‡ CVS)
++* missing commit template files (√† l√† CVS)
+   PR:
+   Obtained from:
+   Submitted by:
+diff --git a/docs/devel/core/explained.pod b/docs/devel/core/explained.pod
+index 40f79a2..1298793 100644
+--- a/docs/devel/core/explained.pod
++++ b/docs/devel/core/explained.pod
+@@ -1,3 +1,5 @@
++=encoding utf8
++
+ =head1 NAME
+ 
+ mod_perl 2.0 Source Code Explained
+@@ -704,7 +706,7 @@ arguments passed on the Perl side and put the results back onto the
+ stack.  Therefore the first thing we do is to initialize a few special
+ variables using the C<dXSARGS> macro defined in I<XSUB.h>, which in
+ fact calls a bunch of other macros. These variables help to manipulate
+-the stack. C<dSP> is one of these macros and it declares and initial≠
++the stack. C<dSP> is one of these macros and it declares and initial¬≠
+ izes a local copy of the Perl stack pointer C<sp> which . This local
+ copy should always be accessed as C<SP>.
+ 
+diff --git a/docs/devel/debug/c.pod b/docs/devel/debug/c.pod
+index 64a607c..10bff1c 100644
+--- a/docs/devel/debug/c.pod
++++ b/docs/devel/debug/c.pod
+@@ -1,3 +1,5 @@
++=encoding utf8
++
+ =head1 NAME
+ 
+ Debugging mod_perl C Internals
+@@ -724,7 +726,7 @@ and now we call C<curinfo> again:
+   gdb) curinfo
+   14:/home/httpd/cgi-bin/core_dump.pl
+ 
+-Et voil‡, we can see that the segfault was triggered on line 14 of
++Et voil√†, we can see that the segfault was triggered on line 14 of
+ F<core_dump.pl>, which has the line:
+ 
+   Debug::DumpCore::segv();
+diff --git a/docs/user/Changes.pod b/docs/user/Changes.pod
+index f9ecb76..3582676 100644
+--- a/docs/user/Changes.pod
++++ b/docs/user/Changes.pod
+@@ -1,3 +1,5 @@
++=encoding utf8
++
+ =head1 NAME
+ 
+ CHANGES
+@@ -19,7 +21,7 @@ A new troubleshooting section on how to resolve can't locate file foo,
+ when there is a system limit on the maximum open files. By Ken Simpson
+ E<lt>ksimpsonE<lt>atE<gt>larch.mailchannels.comE<gt>.
+ 
+-A few corrections in the config chapter by Jean-SÈbastien Guay
++A few corrections in the config chapter by Jean-S√©bastien Guay
+ E<lt>jean_seb E<lt>atE<gt> videotron.caE<gt>.
+ 
+ A new troubleshooting section on how to resolve "undefined symbol"
+-- 
+2.34.1
+

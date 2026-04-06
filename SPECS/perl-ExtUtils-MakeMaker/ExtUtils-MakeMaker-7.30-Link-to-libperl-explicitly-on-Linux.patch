@@ -1,0 +1,52 @@
+From 4a4f7dd3d3e7877aa45081311c1a32421e0d32e4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 2 Jul 2013 10:28:15 +0200
+Subject: [PATCH] Link to libperl explicitly on Linux
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<https://bugzilla.redhat.com/show_bug.cgi?id=960048>
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=327585#50>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/ExtUtils/MM_Unix.pm | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/lib/ExtUtils/MM_Unix.pm b/lib/ExtUtils/MM_Unix.pm
+index 198f05e..d9ebe61 100644
+--- a/lib/ExtUtils/MM_Unix.pm
++++ b/lib/ExtUtils/MM_Unix.pm
+@@ -32,6 +32,7 @@ BEGIN {
+     $Is{IRIX}    = $^O eq 'irix';
+     $Is{NetBSD}  = $^O eq 'netbsd';
+     $Is{Interix} = $^O eq 'interix';
++    $Is{Linux}   = $^O eq 'linux';
+     $Is{SunOS4}  = $^O eq 'sunos';
+     $Is{Solaris} = $^O eq 'solaris';
+     $Is{SunOS}   = $Is{SunOS4} || $Is{Solaris};
+@@ -1074,7 +1075,7 @@ sub xs_make_dynamic_lib {
+     push(@m,"	\$(RM_F) \$\@\n");
+ 
+     my $libs = '$(LDLOADLIBS)';
+-    if (($Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
++    if (($Is{Linux} || $Is{NetBSD} || $Is{Interix} || $Is{Android}) && $Config{'useshrplib'} eq 'true') {
+         # Use nothing on static perl platforms, and to the flags needed
+         # to link against the shared libperl library on shared perl
+         # platforms.  We peek at lddlflags to see if we need -Wl,-R
+@@ -1087,6 +1088,11 @@ sub xs_make_dynamic_lib {
+             # The Android linker will not recognize symbols from
+             # libperl unless the module explicitly depends on it.
+             $libs .= ' "-L$(PERL_INC)" -lperl';
++        } else {
++            if ($ENV{PERL_CORE}) {
++                $libs .= ' -L$(PERL_INC)';
++            }
++            $libs .= ' -lperl';
+         }
+     }
+ 
+-- 
+2.13.6
+

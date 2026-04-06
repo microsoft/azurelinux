@@ -1,0 +1,30 @@
+diff -rupN --no-dereference leptonica-1.87.0/CMakeLists.txt leptonica-1.87.0-new/CMakeLists.txt
+--- leptonica-1.87.0/CMakeLists.txt	2025-12-25 00:07:35.000000000 +0100
++++ leptonica-1.87.0-new/CMakeLists.txt	2025-12-25 15:35:59.886493865 +0100
+@@ -327,9 +327,9 @@ get_target_property(leptonica_OUTPUT_NAM
+ configure_file(lept.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/lept.pc.in @ONLY)
+ # to resolve generator expression in OUTPUT_NAME
+ set(pkg_conf_name lept.pc)
+-if(WIN32)
++if(MSVC)
+   set(pkg_conf_name lept_$<CONFIG>.pc)
+-endif(WIN32)
++endif(MSVC)
+ 
+ file(
+   GENERATE
+diff -rupN --no-dereference leptonica-1.87.0/src/CMakeLists.txt leptonica-1.87.0-new/src/CMakeLists.txt
+--- leptonica-1.87.0/src/CMakeLists.txt	2025-12-25 00:07:35.000000000 +0100
++++ leptonica-1.87.0-new/src/CMakeLists.txt	2025-12-25 15:35:59.886814758 +0100
+@@ -23,9 +23,10 @@ set_target_properties(
+     "leptonica$<$<BOOL:${MSVC}>:-${PROJECT_VERSION}$<$<CONFIG:DEBUG>:d>>")
+ 
+ if(MINGW)
++  get_target_property(LEPTONICA_SOVERSION leptonica SOVERSION)
+   set_target_properties(
+     leptonica PROPERTIES SUFFIX
+-                         "-${PROJECT_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++                         "-${LEPTONICA_SOVERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ endif(MINGW)
+ 
+ if(BUILD_SHARED_LIBS)

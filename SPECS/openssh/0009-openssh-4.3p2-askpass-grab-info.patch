@@ -1,0 +1,31 @@
+From 710ce53fdf1d32a0629fce2e42fb49d407e2b06c Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 09/50] openssh-4.3p2-askpass-grab-info
+
+---
+ contrib/gnome-ssh-askpass2.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/contrib/gnome-ssh-askpass2.c b/contrib/gnome-ssh-askpass2.c
+index cb7152dc..bbe93d83 100644
+--- a/contrib/gnome-ssh-askpass2.c
++++ b/contrib/gnome-ssh-askpass2.c
+@@ -70,8 +70,12 @@ report_failed_grab (GtkWidget *parent_window, const char *what)
+ 
+ 	err = gtk_message_dialog_new(GTK_WINDOW(parent_window), 0,
+ 	    GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+-	    "Could not grab %s. A malicious client may be eavesdropping "
+-	    "on your session.", what);
++	    "SSH password dialog could not grab the %s input.\n"
++	    "This might be caused by application such as screensaver, "
++	    "however it could also mean that someone may be eavesdropping "
++	    "on your session.\n"
++	    "Either close the application which grabs the %s or "
++	    "log out and log in again to prevent this from happening.", what, what);
+ 	gtk_window_set_position(GTK_WINDOW(err), GTK_WIN_POS_CENTER);
+ 
+ 	gtk_dialog_run(GTK_DIALOG(err));
+-- 
+2.49.0
+

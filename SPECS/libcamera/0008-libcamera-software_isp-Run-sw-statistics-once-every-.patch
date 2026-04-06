@@ -1,0 +1,243 @@
+From f0da2f56a09fa5124a2d2f616dfe8356e5460a1f Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Sat, 27 Sep 2025 20:00:04 +0200
+Subject: [PATCH 8/8] libcamera: software_isp: Run sw-statistics once every 4th
+ frame
+
+Run sw-statistics once every 4th frame, instead of every frame. There are
+2 reasons for this:
+
+1. There really is no need to have statistics for every frame and only
+doing this every 4th frame helps save some CPU time.
+
+2. The generic nature of the simple pipeline-handler, so no information
+about possible CSI receiver frame-delays. In combination with the software
+ISP often being used with sensors without sensor info in the sensor-helper
+code, so no reliable control-delay information means that the software ISP
+is prone to AGC oscillation. Skipping statistics gathering also means
+skipping running the AGC algorithm slowing it down, avoiding this
+oscillation.
+
+Note ideally the AGC oscillation problem would be fixed by adding sensor
+metadata support all through the stack so that the exact gain and exposure
+used for a specific frame are reliably provided by the sensor metadata.
+
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+Changes in v4:
+- Document why to skip 3 frames / why once every 4 frames
+- Pass frame number to SwStatsCpu::startFrame() SwStatsCpu::processLine?()
+  and move all skipping handling to inside the SwStatsCpu class
+---
+ src/libcamera/software_isp/debayer_cpu.cpp | 18 +++++++++---------
+ src/libcamera/software_isp/debayer_cpu.h   |  4 ++--
+ src/libcamera/software_isp/swstats_cpu.cpp | 19 +++++++++++++++----
+ src/libcamera/software_isp/swstats_cpu.h   | 20 +++++++++++++++++---
+ 4 files changed, 43 insertions(+), 18 deletions(-)
+
+diff --git a/src/libcamera/software_isp/debayer_cpu.cpp b/src/libcamera/software_isp/debayer_cpu.cpp
+index 2dc85e5e0..d5fd0ae73 100644
+--- a/src/libcamera/software_isp/debayer_cpu.cpp
++++ b/src/libcamera/software_isp/debayer_cpu.cpp
+@@ -655,7 +655,7 @@ void DebayerCpu::memcpyNextLine(const uint8_t *linePointers[])
+ 	lineBufferIndex_ = (lineBufferIndex_ + 1) % (patternHeight + 1);
+ }
+ 
+-void DebayerCpu::process2(const uint8_t *src, uint8_t *dst)
++void DebayerCpu::process2(uint32_t frame, const uint8_t *src, uint8_t *dst)
+ {
+ 	unsigned int yEnd = window_.y + window_.height;
+ 	/* Holds [0] previous- [1] current- [2] next-line */
+@@ -681,7 +681,7 @@ void DebayerCpu::process2(const uint8_t *src, uint8_t *dst)
+ 	for (unsigned int y = window_.y; y < yEnd; y += 2) {
+ 		shiftLinePointers(linePointers, src);
+ 		memcpyNextLine(linePointers);
+-		stats_->processLine0(y, linePointers);
++		stats_->processLine0(frame, y, linePointers);
+ 		(this->*debayer0_)(dst, linePointers);
+ 		src += inputConfig_.stride;
+ 		dst += outputConfig_.stride;
+@@ -696,7 +696,7 @@ void DebayerCpu::process2(const uint8_t *src, uint8_t *dst)
+ 	if (window_.y == 0) {
+ 		shiftLinePointers(linePointers, src);
+ 		memcpyNextLine(linePointers);
+-		stats_->processLine0(yEnd, linePointers);
++		stats_->processLine0(frame, yEnd, linePointers);
+ 		(this->*debayer0_)(dst, linePointers);
+ 		src += inputConfig_.stride;
+ 		dst += outputConfig_.stride;
+@@ -710,7 +710,7 @@ void DebayerCpu::process2(const uint8_t *src, uint8_t *dst)
+ 	}
+ }
+ 
+-void DebayerCpu::process4(const uint8_t *src, uint8_t *dst)
++void DebayerCpu::process4(uint32_t frame, const uint8_t *src, uint8_t *dst)
+ {
+ 	const unsigned int yEnd = window_.y + window_.height;
+ 	/*
+@@ -733,7 +733,7 @@ void DebayerCpu::process4(const uint8_t *src, uint8_t *dst)
+ 	for (unsigned int y = window_.y; y < yEnd; y += 4) {
+ 		shiftLinePointers(linePointers, src);
+ 		memcpyNextLine(linePointers);
+-		stats_->processLine0(y, linePointers);
++		stats_->processLine0(frame, y, linePointers);
+ 		(this->*debayer0_)(dst, linePointers);
+ 		src += inputConfig_.stride;
+ 		dst += outputConfig_.stride;
+@@ -746,7 +746,7 @@ void DebayerCpu::process4(const uint8_t *src, uint8_t *dst)
+ 
+ 		shiftLinePointers(linePointers, src);
+ 		memcpyNextLine(linePointers);
+-		stats_->processLine2(y, linePointers);
++		stats_->processLine2(frame, y, linePointers);
+ 		(this->*debayer2_)(dst, linePointers);
+ 		src += inputConfig_.stride;
+ 		dst += outputConfig_.stride;
+@@ -821,12 +821,12 @@ void DebayerCpu::process(uint32_t frame, FrameBuffer *input, FrameBuffer *output
+ 		return;
+ 	}
+ 
+-	stats_->startFrame();
++	stats_->startFrame(frame);
+ 
+ 	if (inputConfig_.patternSize.height == 2)
+-		process2(in.planes()[0].data(), out.planes()[0].data());
++		process2(frame, in.planes()[0].data(), out.planes()[0].data());
+ 	else
+-		process4(in.planes()[0].data(), out.planes()[0].data());
++		process4(frame, in.planes()[0].data(), out.planes()[0].data());
+ 
+ 	metadata.planes()[0].bytesused = out.planes()[0].size();
+ 
+diff --git a/src/libcamera/software_isp/debayer_cpu.h b/src/libcamera/software_isp/debayer_cpu.h
+index 9d343e464..03e0d7843 100644
+--- a/src/libcamera/software_isp/debayer_cpu.h
++++ b/src/libcamera/software_isp/debayer_cpu.h
+@@ -133,8 +133,8 @@ private:
+ 	void setupInputMemcpy(const uint8_t *linePointers[]);
+ 	void shiftLinePointers(const uint8_t *linePointers[], const uint8_t *src);
+ 	void memcpyNextLine(const uint8_t *linePointers[]);
+-	void process2(const uint8_t *src, uint8_t *dst);
+-	void process4(const uint8_t *src, uint8_t *dst);
++	void process2(uint32_t frame, const uint8_t *src, uint8_t *dst);
++	void process4(uint32_t frame, const uint8_t *src, uint8_t *dst);
+ 
+ 	/* Max. supported Bayer pattern height is 4, debayering this requires 5 lines */
+ 	static constexpr unsigned int kMaxLineBuffers = 5;
+diff --git a/src/libcamera/software_isp/swstats_cpu.cpp b/src/libcamera/software_isp/swstats_cpu.cpp
+index eb416dfdc..634ebfc3c 100644
+--- a/src/libcamera/software_isp/swstats_cpu.cpp
++++ b/src/libcamera/software_isp/swstats_cpu.cpp
+@@ -62,8 +62,9 @@ namespace libcamera {
+  */
+ 
+ /**
+- * \fn void SwStatsCpu::processLine0(unsigned int y, const uint8_t *src[])
++ * \fn void SwStatsCpu::processLine0(uint32_t frame, unsigned int y, const uint8_t *src[])
+  * \brief Process line 0
++ * \param[in] frame The frame number
+  * \param[in] y The y coordinate.
+  * \param[in] src The input data.
+  *
+@@ -74,8 +75,9 @@ namespace libcamera {
+  */
+ 
+ /**
+- * \fn void SwStatsCpu::processLine2(unsigned int y, const uint8_t *src[])
++ * \fn void SwStatsCpu::processLine2(uint32_t frame, unsigned int y, const uint8_t *src[])
+  * \brief Process line 2 and 3
++ * \param[in] frame The frame number
+  * \param[in] y The y coordinate.
+  * \param[in] src The input data.
+  *
+@@ -89,6 +91,11 @@ namespace libcamera {
+  * \brief Signals that the statistics are ready
+  */
+ 
++/**
++ * \var SwStatsCpu::kStatPerNumFrames
++ * \brief Run stats once every kStatPerNumFrames frames
++ */
++
+ /**
+  * \typedef SwStatsCpu::statsProcessFn
+  * \brief Called when there is data to get statistics from
+@@ -295,11 +302,15 @@ void SwStatsCpu::statsGBRG10PLine0(const uint8_t *src[])
+ 
+ /**
+  * \brief Reset state to start statistics gathering for a new frame
++ * \param[in] frame The frame number
+  *
+  * This may only be called after a successful setWindow() call.
+  */
+-void SwStatsCpu::startFrame(void)
++void SwStatsCpu::startFrame(uint32_t frame)
+ {
++	if (frame % kStatPerNumFrames)
++		return;
++
+ 	if (window_.width == 0)
+ 		LOG(SwStatsCpu, Error) << "Calling startFrame() without setWindow()";
+ 
+@@ -318,7 +329,7 @@ void SwStatsCpu::startFrame(void)
+  */
+ void SwStatsCpu::finishFrame(uint32_t frame, uint32_t bufferId)
+ {
+-	stats_.valid = true;
++	stats_.valid = frame % kStatPerNumFrames == 0;
+ 	*sharedStats_ = stats_;
+ 	statsReady.emit(frame, bufferId);
+ }
+diff --git a/src/libcamera/software_isp/swstats_cpu.h b/src/libcamera/software_isp/swstats_cpu.h
+index 26a2f462e..fae575f85 100644
+--- a/src/libcamera/software_isp/swstats_cpu.h
++++ b/src/libcamera/software_isp/swstats_cpu.h
+@@ -32,6 +32,14 @@ public:
+ 	SwStatsCpu();
+ 	~SwStatsCpu() = default;
+ 
++	/*
++	 * The combination of pipeline + sensor delays means that
++	 * exposure changes can take up to 3 frames to get applied,
++	 * Run stats once every 4 frames to ensure any previous
++	 * exposure changes have been applied.
++	 */
++	static constexpr uint32_t kStatPerNumFrames = 4;
++
+ 	bool isValid() const { return sharedStats_.fd().isValid(); }
+ 
+ 	const SharedFD &getStatsFD() { return sharedStats_.fd(); }
+@@ -40,11 +48,14 @@ public:
+ 
+ 	int configure(const StreamConfiguration &inputCfg);
+ 	void setWindow(const Rectangle &window);
+-	void startFrame();
++	void startFrame(uint32_t frame);
+ 	void finishFrame(uint32_t frame, uint32_t bufferId);
+ 
+-	void processLine0(unsigned int y, const uint8_t *src[])
++	void processLine0(uint32_t frame, unsigned int y, const uint8_t *src[])
+ 	{
++		if (frame % kStatPerNumFrames)
++			return;
++
+ 		if ((y & ySkipMask_) || y < static_cast<unsigned int>(window_.y) ||
+ 		    y >= (window_.y + window_.height))
+ 			return;
+@@ -52,8 +63,11 @@ public:
+ 		(this->*stats0_)(src);
+ 	}
+ 
+-	void processLine2(unsigned int y, const uint8_t *src[])
++	void processLine2(uint32_t frame, unsigned int y, const uint8_t *src[])
+ 	{
++		if (frame % kStatPerNumFrames)
++			return;
++
+ 		if ((y & ySkipMask_) || y < static_cast<unsigned int>(window_.y) ||
+ 		    y >= (window_.y + window_.height))
+ 			return;
+-- 
+2.51.0
+

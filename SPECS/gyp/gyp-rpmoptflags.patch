@@ -1,0 +1,32 @@
+diff -pruN gyp.orig/pylib/gyp/generator/make.py gyp/pylib/gyp/generator/make.py
+--- gyp.orig/pylib/gyp/generator/make.py	2011-08-23 16:47:59.000000000 +0900
++++ gyp/pylib/gyp/generator/make.py	2011-08-23 17:31:13.000000000 +0900
+@@ -1554,6 +1554,7 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)
+     # Write configuration-specific variables for CFLAGS, etc.
+     for configname in sorted(configs.keys()):
+       config = configs[configname]
++      rpmoptflags = ['$(RPM_OPT_FLAGS)']
+       self.WriteList(config.get('defines'), 'DEFS_%s' % configname, prefix='-D',
+           quoter=EscapeCppDefine)
+ 
+@@ -1565,8 +1566,20 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)
+         cflags_objcc = self.xcode_settings.GetCflagsObjCC(configname)
+       else:
+         cflags = config.get('cflags')
++        if cflags:
++          cflags += rpmoptflags
++        else:
++          cflags = rpmoptflags
+         cflags_c = config.get('cflags_c')
++        if cflags_c:
++          cflags_c += rpmoptflags
++        else:
++          cflags_c = rpmoptflags
+         cflags_cc = config.get('cflags_cc')
++        if cflags_cc:
++          cflags_cc += rpmoptflags
++        else:
++          cflags_cc = rpmoptflags
+ 
+       self.WriteLn("# Flags passed to all source files.");
+       self.WriteList(cflags, 'CFLAGS_%s' % configname)

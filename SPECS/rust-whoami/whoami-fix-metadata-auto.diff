@@ -1,0 +1,43 @@
+--- whoami-2.1.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ whoami-2.1.0/Cargo.toml	2026-01-29T23:19:23.923766+00:00
+@@ -55,36 +55,16 @@
+     "wasm-web",
+ ]
+ force-stub = []
+-std = ["web-sys?/std"]
+-wasi-wasite = ["dep:wasite"]
+-wasm-web = ["dep:web-sys"]
++std = []
++wasi-wasite = []
++wasm-web = []
+ 
+ [lib]
+ name = "whoami"
+ path = "src/lib.rs"
+ 
+-[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi"), not(daku)))'.dependencies.web-sys]
+-version = "0.3.77"
+-features = [
+-    "Navigator",
+-    "Document",
+-    "Window",
+-    "Location",
+-]
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "wasm32", target_os = "wasi"))'.dependencies.wasite]
+-version = "1.0.2"
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_os = "redox", not(target_arch = "wasm32")))'.dependencies.libredox]
+-version = "0.1.12"
+-features = ["call"]
+-default-features = false
+-
+ [lints.rust.unexpected_cfgs]
+ level = "allow"
+ priority = 0
+ check-cfg = ["cfg(daku)"]
++

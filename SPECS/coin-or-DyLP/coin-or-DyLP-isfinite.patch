@@ -1,0 +1,194 @@
+diff -up DyLP-1.10.4/configure.orig DyLP-1.10.4/configure
+--- DyLP-1.10.4/configure.orig	2023-11-12 20:37:09.261197094 -0700
++++ DyLP-1.10.4/configure	2023-11-12 20:37:15.492083614 -0700
+@@ -25665,9 +25665,9 @@ echo "$as_me: Found floating point heade
+  { echo "$as_me:$LINENO: Checking for proper name for isfinite()." >&5
+ echo "$as_me: Checking for proper name for isfinite()." >&6;}
+   ac_name_of_isfinite="unavailable"
+-  echo "$as_me:$LINENO: checking for finite" >&5
+-echo $ECHO_N "checking for finite... $ECHO_C" >&6
+-if test "${ac_cv_func_finite+set}" = set; then
++  echo "$as_me:$LINENO: checking for isfinite" >&5
++echo $ECHO_N "checking for isfinite... $ECHO_C" >&6
++if test "${ac_cv_func_isfinite+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+@@ -25676,12 +25676,12 @@ _ACEOF
+ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+-/* Define finite to an innocuous variant, in case <limits.h> declares finite.
++/* Define isfinite to an innocuous variant, in case <limits.h> declares isfinite.
+    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+-#define finite innocuous_finite
++#define isfinite innocuous_isfinite
+ 
+ /* System header to define __stub macros and hopefully few prototypes,
+-    which can conflict with char finite (); below.
++    which can conflict with char isfinite (); below.
+     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+     <limits.h> exists even on freestanding compilers.  */
+ 
+@@ -25691,34 +25691,19 @@ cat >>conftest.$ac_ext <<_ACEOF
+ # include <assert.h>
+ #endif
+ 
+-#undef finite
++#undef isfinite
+ 
+ /* Override any gcc2 internal prototype to avoid an error.  */
+ #ifdef __cplusplus
+ extern "C"
+ {
+ #endif
+-/* We use char because int might match the return type of a gcc2
+-   builtin and then its argument prototype would still apply.  */
+-char finite ();
+-/* The GNU C library defines this for functions which it implements
+-    to always fail with ENOSYS.  Some functions are actually named
+-    something starting with __ and the normal name is an alias.  */
+-#if defined (__stub_finite) || defined (__stub___finite)
+-choke me
+-#else
+-char (*f) () = finite;
+-#endif
+-#ifdef __cplusplus
+-}
+-#endif
++#include <math.h>
+ 
+ int
+ main ()
+ {
+-return f != finite;
+-  ;
+-  return 0;
++  return isfinite(1.0) == 1;
+ }
+ _ACEOF
+ rm -f conftest.$ac_objext conftest$ac_exeext
+@@ -25743,20 +25728,20 @@ if { (eval echo "$as_me:$LINENO: \"$ac_l
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }; then
+-  ac_cv_func_finite=yes
++  ac_cv_func_isfinite=yes
+ else
+   echo "$as_me: failed program was:" >&5
+ sed 's/^/| /' conftest.$ac_ext >&5
+ 
+-ac_cv_func_finite=no
++ac_cv_func_isfinite=no
+ fi
+ rm -f conftest.err conftest.$ac_objext \
+       conftest$ac_exeext conftest.$ac_ext
+ fi
+-echo "$as_me:$LINENO: result: $ac_cv_func_finite" >&5
+-echo "${ECHO_T}$ac_cv_func_finite" >&6
+-if test $ac_cv_func_finite = yes; then
+-  ac_name_of_isfinite=finite
++echo "$as_me:$LINENO: result: $ac_cv_func_isfinite" >&5
++echo "${ECHO_T}$ac_cv_func_isfinite" >&6
++if test $ac_cv_func_isfinite = yes; then
++  ac_name_of_isfinite=isfinite
+ fi
+ 
+   if test "$ac_name_of_isfinite" = "unavailable"; then
+@@ -25856,9 +25841,9 @@ fi
+ 
+   fi
+   if test "$ac_name_of_isfinite" = "unavailable"; then
+-    echo "$as_me:$LINENO: checking for isfinite" >&5
+-echo $ECHO_N "checking for isfinite... $ECHO_C" >&6
+-if test "${ac_cv_func_isfinite+set}" = set; then
++    echo "$as_me:$LINENO: checking for finite" >&5
++echo $ECHO_N "checking for finite... $ECHO_C" >&6
++if test "${ac_cv_func_finite+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+@@ -25867,12 +25852,12 @@ _ACEOF
+ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+-/* Define isfinite to an innocuous variant, in case <limits.h> declares isfinite.
++/* Define finite to an innocuous variant, in case <limits.h> declares finite.
+    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+-#define isfinite innocuous_isfinite
++#define finite innocuous_finite
+ 
+ /* System header to define __stub macros and hopefully few prototypes,
+-    which can conflict with char isfinite (); below.
++    which can conflict with char finite (); below.
+     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+     <limits.h> exists even on freestanding compilers.  */
+ 
+@@ -25882,7 +25867,7 @@ cat >>conftest.$ac_ext <<_ACEOF
+ # include <assert.h>
+ #endif
+ 
+-#undef isfinite
++#undef finite
+ 
+ /* Override any gcc2 internal prototype to avoid an error.  */
+ #ifdef __cplusplus
+@@ -25891,14 +25876,14 @@ extern "C"
+ #endif
+ /* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+-char isfinite ();
++char finite ();
+ /* The GNU C library defines this for functions which it implements
+     to always fail with ENOSYS.  Some functions are actually named
+     something starting with __ and the normal name is an alias.  */
+-#if defined (__stub_isfinite) || defined (__stub___isfinite)
++#if defined (__stub_finite) || defined (__stub___finite)
+ choke me
+ #else
+-char (*f) () = isfinite;
++char (*f) () = finite;
+ #endif
+ #ifdef __cplusplus
+ }
+@@ -25907,7 +25892,7 @@ char (*f) () = isfinite;
+ int
+ main ()
+ {
+-return f != isfinite;
++return f != finite;
+   ;
+   return 0;
+ }
+@@ -25934,24 +25919,24 @@ if { (eval echo "$as_me:$LINENO: \"$ac_l
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }; then
+-  ac_cv_func_isfinite=yes
++  ac_cv_func_finite=yes
+ else
+   echo "$as_me: failed program was:" >&5
+ sed 's/^/| /' conftest.$ac_ext >&5
+ 
+-ac_cv_func_isfinite=no
++ac_cv_func_finite=no
+ fi
+ rm -f conftest.err conftest.$ac_objext \
+       conftest$ac_exeext conftest.$ac_ext
+ fi
+-echo "$as_me:$LINENO: result: $ac_cv_func_isfinite" >&5
+-echo "${ECHO_T}$ac_cv_func_isfinite" >&6
+-if test $ac_cv_func_isfinite = yes; then
+-  ac_name_of_isfinite=isfinite
++echo "$as_me:$LINENO: result: $ac_cv_func_finite" >&5
++echo "${ECHO_T}$ac_cv_func_finite" >&6
++if test $ac_cv_func_finite = yes; then
++  ac_name_of_isfinite=finite
+ fi
+ 
+   fi
+-  if test "$ac_name_of_isfinite" = "unavailable"; then
++  if test "$ac_name_of_finite" = "unavailable"; then
+     { echo "$as_me:$LINENO: WARNING: Cannot find a C function to check if an IEEE floating point
+ 		 value is finite. There is no hope of building dylp on this
+ 		 system." >&5

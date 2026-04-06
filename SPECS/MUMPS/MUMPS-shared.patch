@@ -1,0 +1,84 @@
+Create a shared version of the MUMPS library.
+
+Index: mumps/src/Makefile
+===================================================================
+--- mumps.orig/src/Makefile
++++ mumps/src/Makefile
+@@ -14,19 +14,24 @@
+ all: $(incdir)/mumps_int_def.h libcommon s d c z
+ 
+ libcommon: $(incdir)/mumps_int_def.h
+-	$(MAKE) $(libdir)/libmumps_common$(PLAT)$(LIBEXT)
++	$(MAKE) $(libdir)/libmumps_common$(PLAT).a
++	$(MAKE) $(libdir)/libmumps_common$(PLAT).so
+ 
+ s: $(incdir)/mumps_int_def.h libcommon
+-	$(MAKE) ARITH=s $(libdir)/libsmumps$(PLAT)$(LIBEXT)
++	$(MAKE) ARITH=s $(libdir)/libsmumps$(PLAT).a
++	$(MAKE) ARITH=s $(libdir)/libsmumps$(PLAT).so
+ 
+ d: $(incdir)/mumps_int_def.h libcommon
+-	$(MAKE) ARITH=d $(libdir)/libdmumps$(PLAT)$(LIBEXT)
++	$(MAKE) ARITH=d $(libdir)/libdmumps$(PLAT).a
++	$(MAKE) ARITH=d $(libdir)/libdmumps$(PLAT).so
+ 
+ c: $(incdir)/mumps_int_def.h libcommon
+-	$(MAKE) ARITH=c $(libdir)/libcmumps$(PLAT)$(LIBEXT)
++	$(MAKE) ARITH=c $(libdir)/libcmumps$(PLAT).a
++	$(MAKE) ARITH=c $(libdir)/libcmumps$(PLAT).so
+ 
+ z: $(incdir)/mumps_int_def.h libcommon
+-	$(MAKE) ARITH=z $(libdir)/libzmumps$(PLAT)$(LIBEXT)
++	$(MAKE) ARITH=z $(libdir)/libzmumps$(PLAT).a
++	$(MAKE) ARITH=z $(libdir)/libzmumps$(PLAT).so
+ 
+ 
+ # Rules for shared libraries
+@@ -212,19 +217,24 @@
+ $(incdir)/mumps_int_def.h: mumps_int_def32_h.in  mumps_int_def64_h.in
+ 	if echo " $(OPTC) " | grep DINTSIZE64; then cat mumps_int_def64_h.in > $(incdir)/mumps_int_def.h; else cat mumps_int_def32_h.in > $(incdir)/mumps_int_def.h; fi
+ 
+-$(libdir)/libmumps_common$(PLAT)$(LIBEXT):      $(OBJS_COMMON_MOD) $(OBJS_COMMON_OTHER)
+-	$(AR)$@ $?
++$(libdir)/libmumps_common$(PLAT).a:      $(OBJS_COMMON_MOD) $(OBJS_COMMON_OTHER)
++	$(AR) $@ $?
+ 	$(RANLIB) $@
+ 
+ $(libdir)/libmumps_common$(PLAT)$(LIBEXT_SHARED):      $(OBJS_COMMON_MOD) $(OBJS_COMMON_OTHER)
+ 	$(FC) $(OPTL) $(SHARED_OPT) $^ -Wl,$(SONAME),libmumps_common$(PLAT)$(LIBEXT_SHARED) -L$(libdir) $(RPATH_OPT) $(LORDERINGS) $(LIBS) $(LIBOTHERS) -o $@ 
+ 
+-$(libdir)/lib$(ARITH)mumps$(PLAT)$(LIBEXT):    $(OBJS_MOD) $(OBJS_OTHER)
+-	$(AR)$@ $?
++$(libdir)/libmumps_common$(PLAT).so:	$(OBJS_COMMON_MOD) $(OBJS_COMMON_OTHER)
++	$(FC) -shared $^ -Wl,-soname,libmumps_common$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) $(LORDERINGS) -lpthread $(MUMPS_LIBF77) $(MPIFLIB) $(MPICLIB) $(METISLIB) -o $(libdir)/libmumps_common$(PLAT)-$(SONAME_VERSION).so $(OPTL) -Wl,-z,defs
++	ln -fs libmumps_common$(PLAT)-$(SONAME_VERSION).so $@
++
++$(libdir)/lib$(ARITH)mumps$(PLAT).a:    $(OBJS_MOD) $(OBJS_OTHER)
++	$(AR) $@ $?
+ 	$(RANLIB) $@
+ 
+-$(libdir)/lib$(ARITH)mumps$(PLAT)$(LIBEXT_SHARED):    $(OBJS_MOD) $(OBJS_OTHER) $(libdir)/libmumps_common$(PLAT)$(LIBEXT_SHARED)
+-	$(FC) $(OPTL) $(SHARED_OPT) $(OBJS_MOD) $(OBJS_OTHER) -L$(libdir) $(LORDERINGS) $(LIBS) $(LIBOTHERS) -lmumps_common$(PLAT) -o $@ $(RPATH_OPT)
++$(libdir)/lib$(ARITH)mumps$(PLAT).so:    $(OBJS_MOD) $(OBJS_OTHER)
++	$(FC) -shared $^ -Wl,-soname,lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) -lmumps_common$(PLAT) $(MUMPS_LIBF77) $(LORDERINGS) $(MPIFLIB) $(METISLIB) $(SCALAP) -o $(libdir)/lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $(OPTL) -Wl,-z,defs
++	ln -fs lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $@
+ 
+ 
+ # Dependencies between modules:
+@@ -446,13 +456,13 @@
+ 
+ .SUFFIXES: .c .F .o
+ .F.o:
+-	$(FC) $(OPTF) $(FPIC) -I. -I../include $(INCS) $(IORDERINGSF) $(ORDERINGSF) -c $*.F $(OUTF)$*.o
++	$(FC) $(OPTF) $(INCS) $(IORDERINGSF) $(ORDERINGSF) -I. -I../include -c $*.F $(OUTF)$*.o
+ .c.o:
+-	$(CC) $(OPTC) $(FPIC) -I../include $(INCS) $(CDEFS) $(IORDERINGSC) $(ORDERINGSC) -c $*.c $(OUTC)$*.o
++	$(CC) $(OPTC) $(INCS) -I../include $(CDEFS) $(IORDERINGSC) $(ORDERINGSC) -c $*.c $(OUTC)$*.o
+ 
+ $(ARITH)mumps_c.o:	mumps_c.c
+ 	$(CC) $(OPTC) $(FPIC) -I../include $(INCS) $(CDEFS) -DMUMPS_ARITH=MUMPS_ARITH_$(ARITH) \
+-	      $(IORDERINGSC) $(ORDERINGSC) -c mumps_c.c $(OUTC)$@
++	      $(IORDERINGSC) $(ORDERINGSC) -I../include -c mumps_c.c $(OUTC)$@
+ 
+ clean:
+ 	$(RM) *.o *.mod $(incdir)/mumps_int_def.h

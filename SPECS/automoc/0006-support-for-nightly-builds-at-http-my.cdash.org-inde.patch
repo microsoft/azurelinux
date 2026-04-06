@@ -1,0 +1,173 @@
+From 1f56930d7aee139be24f38ee01fb681f05ea693a Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Sat, 18 Apr 2009 16:39:20 +0000
+Subject: [PATCH 06/33] -support for nightly builds at
+ http://my.cdash.org/index.php?project=automoc4
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=955848
+---
+ AutomocNightly.cmake  | 19 +++++++++++
+ CMakeLists.txt        |  2 ++
+ KDECTestNightly.cmake | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ kde4automoc.cpp       |  4 +++
+ 4 files changed, 116 insertions(+)
+ create mode 100644 AutomocNightly.cmake
+ create mode 100644 KDECTestNightly.cmake
+
+diff --git a/AutomocNightly.cmake b/AutomocNightly.cmake
+new file mode 100644
+index 0000000..236f263
+--- /dev/null
++++ b/AutomocNightly.cmake
+@@ -0,0 +1,19 @@
++set(CTEST_VCS svn)
++set(CTEST_VCS_REPOSITORY https://neundorf@svn.kde.org/home/kde/trunk/kdesupport/automoc)
++set(CTEST_CMAKE_GENERATOR "Unix Makefiles" )
++
++# set(CTEST_AVOID_SPACES FALSE)
++
++get_filename_component(_currentDir "${CMAKE_CURRENT_LIST_FILE}" PATH)
++
++# generic support code, sets up everything required:
++include( "${_currentDir}/KDECTestNightly.cmake" )
++
++ctest_empty_binary_directory("${CTEST_BINARY_DIRECTORY}")
++ctest_start(Nightly)
++ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" )
++ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" )
++ctest_submit()
++
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 22447c9..16bfc92 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,6 +2,8 @@ project(Automoc4)
+ 
+ cmake_minimum_required(VERSION 2.4.5 FATAL_ERROR)
+ 
++include(CTest)
++
+ find_package(Qt4 REQUIRED)
+ 
+ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
+diff --git a/KDECTestNightly.cmake b/KDECTestNightly.cmake
+new file mode 100644
+index 0000000..2db53d9
+--- /dev/null
++++ b/KDECTestNightly.cmake
+@@ -0,0 +1,91 @@
++# The following variables are set by the script if they haven't been set before:
++#
++# CTEST_SOURCE_DIRECTORY - defaults to $HOME/Dashboards/<CTEST_PROJECT_NAME>/src dir/
++# CTEST_BINARY_DIRECTORY - defaults to $HOME/Dashboards/<CTEST_PROJECT_NAME>/build dir/
++# if CTEST_AVOID_SPACES is TRUE, the spaces in the path above will be removed.
++
++
++###########################################################
++# generic code
++###########################################################
++
++cmake_minimum_required(VERSION 2.6)
++
++include(CMakeDetermineSystem)
++if(CMAKE_HOST_UNIX)
++   include(Platform/UnixPaths)
++endif(CMAKE_HOST_UNIX)
++
++if(CMAKE_HOST_WIN32)
++   include(Platform/WindowsPaths)
++endif(CMAKE_HOST_WIN32)
++
++get_filename_component(currentDirectory "${CMAKE_CURRENT_LIST_FILE}" PATH)
++
++if(NOT EXISTS "${currentDirectory}/CMakeLists.txt")
++   message(FATAL_ERROR "This script must be in the source tree of your project.")
++endif(NOT EXISTS "${currentDirectory}/CMakeLists.txt")
++
++include("${currentDirectory}/CTestConfig.cmake")
++include("${currentDirectory}/CTestCustom.cmake" OPTIONAL)
++
++set(DASHBOARD_DIR "$ENV{HOME}/Dashboards" )
++
++if(NOT DEFINED CTEST_SOURCE_DIRECTORY)
++   if(CTEST_AVOID_SPACES)
++      set(CTEST_SOURCE_DIRECTORY "${DASHBOARD_DIR}/${CTEST_PROJECT_NAME}/srcdir" )
++   else(CTEST_AVOID_SPACES)
++      set(CTEST_SOURCE_DIRECTORY "${DASHBOARD_DIR}/${CTEST_PROJECT_NAME}/src dir" )
++   endif(CTEST_AVOID_SPACES)
++endif(NOT DEFINED CTEST_SOURCE_DIRECTORY)
++
++if(NOT DEFINED CTEST_BINARY_DIRECTORY)
++   if(CTEST_AVOID_SPACES)
++      set(CTEST_BINARY_DIRECTORY "${DASHBOARD_DIR}/${CTEST_PROJECT_NAME}/builddir" )
++   else(CTEST_AVOID_SPACES)
++      set(CTEST_BINARY_DIRECTORY "${DASHBOARD_DIR}/${CTEST_PROJECT_NAME}/build dir" )
++   endif(CTEST_AVOID_SPACES)
++endif(NOT DEFINED CTEST_BINARY_DIRECTORY)
++
++
++
++site_name(CTEST_SITE)
++set(CTEST_BUILD_NAME ${CMAKE_SYSTEM_NAME})
++
++if("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++   find_program(MAKE_EXECUTABLE make gmake)
++   set(CTEST_BUILD_COMMAND    "${MAKE_EXECUTABLE}" )
++else("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++   if(NOT DEFINED CTEST_BUILD_COMMAND)
++      message(FATAL_ERROR "CTEST_CMAKE_GENERATOR is set to \"${CTEST_CMAKE_GENERATOR}\", but CTEST_BUILD_COMMAND has not been set")
++   endif(NOT DEFINED CTEST_BUILD_COMMAND)
++endif("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++
++string(TOLOWER ${CTEST_VCS} _ctest_vcs)
++set(_have_vcs FALSE)
++# only set this if there is no checkout yet
++set(CTEST_CHECKOUT_COMMAND)
++
++if ("${_ctest_vcs}" STREQUAL svn)
++   find_program(SVN_EXECUTABLE svn)
++   if (NOT SVN_EXECUTABLE)
++      message(FATAL_ERROR "Error: CTEST_VCS is svn, but could not find svn executable")
++   endif (NOT SVN_EXECUTABLE)
++   set(CTEST_UPDATE_COMMAND ${SVN_EXECUTABLE})
++   if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}/.svn/entries")
++      set(CTEST_CHECKOUT_COMMAND "${SVN_EXECUTABLE} co ${CTEST_VCS_REPOSITORY}/${CTEST_VCS_PATH} \"${CTEST_SOURCE_DIRECTORY}\"")
++   endif(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}/.svn/entries")
++   set(_have_vcs TRUE)
++endif ("${_ctest_vcs}" STREQUAL svn)
++
++if ("${_ctest_vcs}" STREQUAL cvs)
++   find_program(CVS_EXECUTABLE cvs cvsnt)
++   if (NOT CVS_EXECUTABLE)
++      message(FATAL_ERROR "Error: CTEST_VCS is cvs, but could not find cvs or cvsnt executable")
++   endif (NOT CVS_EXECUTABLE)
++   set(CTEST_UPDATE_COMMAND ${CVS_EXECUTABLE})
++   if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}/CVS/Entries")
++      set(CTEST_CHECKOUT_COMMAND "${CVS_EXECUTABLE} -d ${CTEST_VCS_REPOSITORY} co  -d \"${CTEST_SOURCE_DIRECTORY}\" ${CTEST_VCS_PATH}")
++   endif(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}/CVS/Entries")
++   set(_have_vcs TRUE)
++endif ("${_ctest_vcs}" STREQUAL cvs)
+diff --git a/kde4automoc.cpp b/kde4automoc.cpp
+index e85ec62..34b2c74 100644
+--- a/kde4automoc.cpp
++++ b/kde4automoc.cpp
+@@ -23,6 +23,10 @@
+     THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
++// warnings just for testing cdash, will remove soon again, Alex
++#warning "this is a test"
++#warning "kdecore/network/k2socket.h blub blub test"
++
+ #include <QtCore/QCoreApplication>
+ #include <QtCore/QDateTime>
+ #include <QtCore/QDir>
+-- 
+2.4.3
+

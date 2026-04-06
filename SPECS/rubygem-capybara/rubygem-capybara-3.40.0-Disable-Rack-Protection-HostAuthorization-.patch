@@ -1,0 +1,27 @@
+From e6a90465b2a655a6c359c627c9a52d4f2a0148c0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 19 Jun 2025 10:36:15 +0200
+Subject: [PATCH] Disable `Rack::Protection::HostAuthorization`
+
+Rack::Protection 4.1.0 has introduced new
+`Rack::Protection::HostAuthorization` [[1]]. This makes `www.example.com`
+host to be rejected. The easiest solution is to disable this check for
+the TestApp.
+
+[1]: https://github.com/sinatra/sinatra/pull/2053
+---
+ lib/capybara/spec/test_app.rb | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/capybara/spec/test_app.rb b/lib/capybara/spec/test_app.rb
+index b29a1523c..eabb2a8ea 100644
+--- a/lib/capybara/spec/test_app.rb
++++ b/lib/capybara/spec/test_app.rb
+@@ -19,6 +19,7 @@ def initialize(string1, msg)
+   set :static, true
+   set :raise_errors, true
+   set :show_exceptions, false
++  set :host_authorization, { permitted_hosts: [] }
+ 
+   # Also check lib/capybara/spec/views/*.erb for pages not listed here
+ 

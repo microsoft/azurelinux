@@ -1,0 +1,17 @@
+Add the missing <lzf.h> include file, to declare the functions
+lzf_compress and lzf_decompress.  This is required for C99
+compatibility.
+
+diff --git a/LZF.xs b/LZF.xs
+index 5d691227065642ba..a6af522075998390 100644
+--- a/LZF.xs
++++ b/LZF.xs
+@@ -4,6 +4,8 @@
+ 
+ #include <perlmulticore.h>
+ 
++#include <lzf.h>
++
+ #define LZF_STANDALONE 1
+ #define LZF_STATE_ARG 1
+ 

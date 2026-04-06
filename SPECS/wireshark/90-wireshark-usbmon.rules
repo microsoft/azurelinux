@@ -1,0 +1,1 @@
+SUBSYSTEM=="usbmon", GROUP="usbmon", MODE="640"

@@ -1,0 +1,146 @@
+diff -Naur libdv-1.0.0.old/libdv/dct_block_mmx.S libdv-1.0.0/libdv/dct_block_mmx.S
+--- libdv-1.0.0.old/libdv/dct_block_mmx.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/dct_block_mmx.S	2022-03-24 20:12:54.495220228 +0100
+@@ -1217,3 +1217,7 @@
+ 	popl	 %esi
+ 	popl	 %ebp
+ 	ret
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/dct_block_mmx_x86_64.S libdv-1.0.0/libdv/dct_block_mmx_x86_64.S
+--- libdv-1.0.0.old/libdv/dct_block_mmx_x86_64.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/dct_block_mmx_x86_64.S	2022-03-24 20:12:54.507220437 +0100
+@@ -1207,3 +1207,7 @@
+ 	pop	 %r12
+ 	
+ 	ret
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/encode_x86_64.S libdv-1.0.0/libdv/encode_x86_64.S
+--- libdv-1.0.0.old/libdv/encode_x86_64.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/encode_x86_64.S	2022-03-24 20:12:54.508220455 +0100
+@@ -612,3 +612,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/encode_x86.S libdv-1.0.0/libdv/encode_x86.S
+--- libdv-1.0.0.old/libdv/encode_x86.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/encode_x86.S	2022-03-24 20:12:54.508220455 +0100
+@@ -611,3 +611,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/idct_block_mmx.S libdv-1.0.0/libdv/idct_block_mmx.S
+--- libdv-1.0.0.old/libdv/idct_block_mmx.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/idct_block_mmx.S	2022-03-24 20:12:54.508220455 +0100
+@@ -649,3 +649,6 @@
+ 	.long 0,0
+ 	.align 8
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/idct_block_mmx_x86_64.S libdv-1.0.0/libdv/idct_block_mmx_x86_64.S
+--- libdv-1.0.0.old/libdv/idct_block_mmx_x86_64.S	2022-03-24 20:11:25.272668973 +0100
++++ libdv-1.0.0/libdv/idct_block_mmx_x86_64.S	2022-03-24 20:12:54.508220455 +0100
+@@ -654,3 +654,6 @@
+ 	.long 0,0
+ 	.align 8
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/quant_x86_64.S libdv-1.0.0/libdv/quant_x86_64.S
+--- libdv-1.0.0.old/libdv/quant_x86_64.S	2022-03-24 20:11:25.272668973 +0100
++++ libdv-1.0.0/libdv/quant_x86_64.S	2022-03-24 20:12:54.509220472 +0100
+@@ -463,3 +463,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/quant_x86.S libdv-1.0.0/libdv/quant_x86.S
+--- libdv-1.0.0.old/libdv/quant_x86.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/quant_x86.S	2022-03-24 20:12:54.509220472 +0100
+@@ -458,3 +458,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/rgbtoyuv.S libdv-1.0.0/libdv/rgbtoyuv.S
+--- libdv-1.0.0.old/libdv/rgbtoyuv.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/rgbtoyuv.S	2022-03-24 20:12:54.509220472 +0100
+@@ -1451,3 +1451,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/rgbtoyuv_x86_64.S libdv-1.0.0/libdv/rgbtoyuv_x86_64.S
+--- libdv-1.0.0.old/libdv/rgbtoyuv_x86_64.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/rgbtoyuv_x86_64.S	2022-03-24 20:12:54.509220472 +0100
+@@ -1391,3 +1391,6 @@
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/transpose_x86_64.S libdv-1.0.0/libdv/transpose_x86_64.S
+--- libdv-1.0.0.old/libdv/transpose_x86_64.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/transpose_x86_64.S	2022-03-24 20:12:54.509220472 +0100
+@@ -190,3 +190,7 @@
+ 	pop	%r12
+ 
+ 	ret     $0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/transpose_x86.S libdv-1.0.0/libdv/transpose_x86.S
+--- libdv-1.0.0.old/libdv/transpose_x86.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/transpose_x86.S	2022-03-24 20:12:54.509220472 +0100
+@@ -190,3 +190,7 @@
+ popl %ebp
+ 
+ ret     $0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/vlc_x86_64.S libdv-1.0.0/libdv/vlc_x86_64.S
+--- libdv-1.0.0.old/libdv/vlc_x86_64.S	2022-03-24 20:11:25.272668973 +0100
++++ libdv-1.0.0/libdv/vlc_x86_64.S	2022-03-24 20:12:54.510220489 +0100
+@@ -673,3 +673,7 @@
+ 	.align 16
+ const_f_0_0_0:
+ 	.short	0xffff,0,0,0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+diff -Naur libdv-1.0.0.old/libdv/vlc_x86.S libdv-1.0.0/libdv/vlc_x86.S
+--- libdv-1.0.0.old/libdv/vlc_x86.S	2022-03-24 20:11:25.273668990 +0100
++++ libdv-1.0.0/libdv/vlc_x86.S	2022-03-24 20:12:54.510220489 +0100
+@@ -587,3 +587,7 @@
+ 	.align 16
+ const_f_0_0_0:
+ 	.short	0xffff,0,0,0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif

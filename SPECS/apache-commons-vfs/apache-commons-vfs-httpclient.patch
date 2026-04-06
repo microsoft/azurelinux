@@ -1,0 +1,84 @@
+--- commons-vfs-2.9.0/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/URLFileName.java.orig	2020-01-22 08:10:15.000000000 -0700
++++ commons-vfs-2.9.0/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/URLFileName.java	2023-06-11 21:45:22.283275117 -0600
+@@ -16,8 +16,9 @@
+  */
+ package org.apache.commons.vfs2.provider;
+ 
+-import org.apache.commons.httpclient.URIException;
+-import org.apache.commons.httpclient.util.URIUtil;
++import java.net.URISyntaxException;
++import java.nio.charset.Charset;
++import org.apache.http.client.utils.URIBuilder;
+ import org.apache.commons.vfs2.FileName;
+ import org.apache.commons.vfs2.FileSystemException;
+ import org.apache.commons.vfs2.FileType;
+@@ -68,22 +69,28 @@ public class URLFileName extends Generic
+      *
+      * @param charset the charset used for the path encoding
+      * @return The encoded path.
+-     * @throws URIException If an error occurs encoding the URI.
++     * @throws URISyntaxException If an error occurs encoding the URI.
+      * @throws FileSystemException If some other error occurs.
+      */
+-    public String getPathQueryEncoded(final String charset) throws URIException, FileSystemException {
++    public String getPathQueryEncoded(final String charset) throws URISyntaxException, FileSystemException {
++        final String path = getPathDecoded();
+         if (getQueryString() == null) {
++            if (path == "") {
++                return "";
++            }
+             if (charset != null) {
+-                return URIUtil.encodePath(getPathDecoded(), charset);
++                final Charset cset = Charset.forName(charset);
++                return new URIBuilder(path, cset).toString();
+             }
+-            return URIUtil.encodePath(getPathDecoded());
++            return new URIBuilder(path).toString();
+         }
+ 
+         final StringBuilder sb = new StringBuilder(BUFFER_SIZE);
+         if (charset != null) {
+-            sb.append(URIUtil.encodePath(getPathDecoded(), charset));
++             final Charset cset = Charset.forName(charset);
++             sb.append(new URIBuilder(path, cset).toString());
+         } else {
+-            sb.append(URIUtil.encodePath(getPathDecoded()));
++            sb.append(new URIBuilder(path).toString());
+         }
+         sb.append("?");
+         sb.append(getQueryString());
+@@ -128,9 +135,9 @@ public class URLFileName extends Generic
+      * @param charset The character set.
+      * @return The encoded URI
+      * @throws FileSystemException if some other exception occurs.
+-     * @throws URIException if an exception occurs encoding the URI.
++     * @throws URISyntaxException if an exception occurs encoding the URI.
+      */
+-    public String getURIEncoded(final String charset) throws FileSystemException, URIException {
++    public String getURIEncoded(final String charset) throws FileSystemException, URISyntaxException {
+         final StringBuilder sb = new StringBuilder(BUFFER_SIZE);
+         appendRootUri(sb, true);
+         sb.append(getPathQueryEncoded(charset));
+--- commons-vfs-2.9.0/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/url/UrlFileObject.java.orig	2020-01-22 08:10:15.000000000 -0700
++++ commons-vfs-2.9.0/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/url/UrlFileObject.java	2023-06-11 21:36:11.292184559 -0600
+@@ -20,10 +20,10 @@ import java.io.FileNotFoundException;
+ import java.io.InputStream;
+ import java.net.HttpURLConnection;
+ import java.net.MalformedURLException;
++import java.net.URISyntaxException;
+ import java.net.URL;
+ import java.net.URLConnection;
+ 
+-import org.apache.commons.httpclient.URIException;
+ import org.apache.commons.vfs2.FileName;
+ import org.apache.commons.vfs2.FileSystemException;
+ import org.apache.commons.vfs2.FileType;
+@@ -59,7 +59,7 @@ public class UrlFileObject extends Abstr
+         }
+     }
+ 
+-    protected URL createURL(final FileName name) throws MalformedURLException, FileSystemException, URIException {
++    protected URL createURL(final FileName name) throws MalformedURLException, FileSystemException, URISyntaxException {
+         if (name instanceof URLFileName) {
+             final URLFileName urlName = (URLFileName) getName();
+ 

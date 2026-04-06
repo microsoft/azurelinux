@@ -1,0 +1,50 @@
+From 1c3f1cddb997d819774e2f65b5349c3dbe474ea4 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Thu, 15 Jan 2026 13:05:05 +0200
+Subject: [PATCH 2/2] ipa-sam: use internal Samba method to populate in-memory
+ keytab
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ daemons/ipa-sam/Makefile.am | 1 +
+ daemons/ipa-sam/ipa_sam.c   | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/daemons/ipa-sam/Makefile.am b/daemons/ipa-sam/Makefile.am
+index f80455339..cb9026154 100644
+--- a/daemons/ipa-sam/Makefile.am
++++ b/daemons/ipa-sam/Makefile.am
+@@ -4,6 +4,7 @@ SAMBA40EXTRA_LIBS = $(SAMBA40EXTRA_LIBPATH)	\
+ 			-lsmbldap		\
+ 			-l$(LIBPDB_NAME)			\
+ 			-lsmbconf		\
++			-lgse-private-samba	\
+ 			$(NULL)
+ 
+ AM_CPPFLAGS =						\
+diff --git a/daemons/ipa-sam/ipa_sam.c b/daemons/ipa-sam/ipa_sam.c
+index ea25934d5..261a4b62e 100644
+--- a/daemons/ipa-sam/ipa_sam.c
++++ b/daemons/ipa-sam/ipa_sam.c
+@@ -4895,7 +4895,7 @@ static krb5_error_code bind_callback_obtain_creds(struct ipasam_sasl_interact_pr
+ 	return rc;
+ }
+ 
+-extern const char * lp_dedicated_keytab_file(void);
++extern krb5_error_code gse_krb5_get_server_keytab(krb5_context krbctx, krb5_keytab *keytab);
+ static int bind_callback(LDAP *ldap_struct, struct smbldap_state *ldap_state, void* ipasam_priv) {
+ 	krb5_error_code rc;
+ 	krb5_creds *out_creds = NULL;
+@@ -4937,7 +4937,8 @@ static int bind_callback(LDAP *ldap_struct, struct smbldap_state *ldap_state, vo
+ 		return LDAP_LOCAL_ERROR;
+ 	}
+ 
+-	rc = krb5_kt_resolve(data.context, lp_dedicated_keytab_file(), &data.keytab);
++
++	rc = gse_krb5_get_server_keytab(data.context, &data.keytab);
+ 	if (rc) {
+ 		bind_callback_cleanup(&data, rc);
+ 		return LDAP_LOCAL_ERROR;
+-- 
+2.52.0
+

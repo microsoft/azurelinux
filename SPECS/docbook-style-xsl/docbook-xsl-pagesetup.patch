@@ -1,0 +1,281 @@
+diff -ruNp docbook-xsl-1.74.0.orig/fo/pagesetup.xsl docbook-xsl-1.74.0/fo/pagesetup.xsl
+--- docbook-xsl-1.74.0.orig/fo/pagesetup.xsl	2008-06-01 23:36:39.000000000 +0200
++++ docbook-xsl-1.74.0/fo/pagesetup.xsl	2008-08-06 13:31:11.000000000 +0200
+@@ -1697,45 +1697,99 @@
+         <xsl:with-param name="gentext-key" select="$gentext-key"/>
+       </xsl:call-template>
+ 
+-      <fo:table-column column-number="1">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">header</xsl:with-param>
+-            <xsl:with-param name="position" select="$column1"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
+-      <fo:table-column column-number="2">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">header</xsl:with-param>
+-            <xsl:with-param name="position" select="2"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
+-      <fo:table-column column-number="3">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">header</xsl:with-param>
+-            <xsl:with-param name="position" select="$column3"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="1">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="$column1"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="1">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="$column1"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++			</xsl:choose>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="2">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="2"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="2">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="2"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++      </xsl:choose>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="3">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="$column3"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="3">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">header</xsl:with-param>
++                <xsl:with-param name="position" select="$column3"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++      </xsl:choose>
+ 
+       <fo:table-body>
+         <fo:table-row>
+@@ -2021,45 +2066,99 @@
+         <xsl:with-param name="sequence" select="$sequence"/>
+         <xsl:with-param name="gentext-key" select="$gentext-key"/>
+       </xsl:call-template>
+-      <fo:table-column column-number="1">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">footer</xsl:with-param>
+-            <xsl:with-param name="position" select="$column1"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
+-      <fo:table-column column-number="2">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">footer</xsl:with-param>
+-            <xsl:with-param name="position" select="2"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
+-      <fo:table-column column-number="3">
+-        <xsl:attribute name="column-width">
+-          <xsl:text>proportional-column-width(</xsl:text>
+-          <xsl:call-template name="header.footer.width">
+-            <xsl:with-param name="location">footer</xsl:with-param>
+-            <xsl:with-param name="position" select="$column3"/>
+-            <xsl:with-param name="pageclass" select="$pageclass"/>
+-            <xsl:with-param name="sequence" select="$sequence"/>
+-            <xsl:with-param name="gentext-key" select="$gentext-key"/>
+-          </xsl:call-template>
+-          <xsl:text>)</xsl:text>
+-        </xsl:attribute>
+-      </fo:table-column>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="1">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="$column1"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="1">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="$column1"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++      </xsl:choose>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="2">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="2"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="2">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="2"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++      </xsl:choose>
++      <xsl:choose>
++        <xsl:when test="$passivetex.extensions != 0">
++          <fo:table-column column-number="3">
++            <xsl:attribute name="column-width">
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="$column3"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>%</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:table-column column-number="3">
++            <xsl:attribute name="column-width">
++              <xsl:text>proportional-column-width(</xsl:text>
++              <xsl:call-template name="header.footer.width">
++                <xsl:with-param name="location">footer</xsl:with-param>
++                <xsl:with-param name="position" select="$column3"/>
++                <xsl:with-param name="pageclass" select="$pageclass"/>
++                <xsl:with-param name="sequence" select="$sequence"/>
++                <xsl:with-param name="gentext-key" select="$gentext-key"/>
++              </xsl:call-template>
++              <xsl:text>)</xsl:text>
++            </xsl:attribute>
++          </fo:table-column>
++        </xsl:otherwise>
++      </xsl:choose>
+ 
+       <fo:table-body>
+         <fo:table-row>

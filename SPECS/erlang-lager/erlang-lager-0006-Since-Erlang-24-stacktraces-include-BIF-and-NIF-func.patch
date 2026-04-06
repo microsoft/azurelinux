@@ -1,0 +1,32 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 1 Feb 2022 16:07:18 +0100
+Subject: [PATCH] Since Erlang 24 stacktraces include BIF and NIF functions
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/test/lager_test_backend.erl b/test/lager_test_backend.erl
+index 483aa4d..a036b74 100644
+--- a/test/lager_test_backend.erl
++++ b/test/lager_test_backend.erl
+@@ -1122,7 +1122,7 @@ error_logger_redirect_crash_test_() ->
+         TestBody("bad math",badarith,"gen_server crash terminated with reason: bad arithmetic expression in crash:handle_call/3"),
+         TestBody("bad match",badmatch,"gen_server crash terminated with reason: no match of right hand value {} in crash:handle_call/3"),
+         TestBody("bad arity",badarity,"gen_server crash terminated with reason: fun called with wrong arity of 1 instead of 3 in crash:handle_call/3"),
+-        TestBody("bad arg1",badarg1,"gen_server crash terminated with reason: bad argument in crash:handle_call/3"),
++        TestBody("bad arg1",badarg1,"gen_server crash terminated with reason: bad argument in call to erlang:list_to_binary([\"foo\",bar]) in crash:handle_call/3"),
+         TestBody("bad arg2",badarg2,"gen_server crash terminated with reason: bad argument in call to erlang:iolist_to_binary([\"foo\",bar]) in crash:handle_call/3"),
+         TestBody("bad record",badrecord,"gen_server crash terminated with reason: bad record state in crash:handle_call/3"),
+         TestBody("noproc",noproc,"gen_server crash terminated with reason: no such process or port in call to gen_event:call(foo, bar, baz)"),
+diff --git a/test/pr_stacktrace_test.erl b/test/pr_stacktrace_test.erl
+index e59fcdf..f17eb84 100644
+--- a/test/pr_stacktrace_test.erl
++++ b/test/pr_stacktrace_test.erl
+@@ -30,7 +30,7 @@ pr_stacktrace_bad_arg_test() ->
+         Class:Reason:Stacktrace ->
+             lager:pr_stacktrace(Stacktrace, {Class, Reason})
+     end,
+-    Want = "pr_stacktrace_test:pr_stacktrace_bad_arg_test/0 line 28\n    pr_stacktrace_test:bad_arg/0 line 14\nerror:badarg",
++    Want = "pr_stacktrace_test:pr_stacktrace_bad_arg_test/0 line 28\n    pr_stacktrace_test:bad_arg/0 line 14\n    erlang:integer_to_list(1.0)\nerror:badarg",
+     ?assertNotEqual(nomatch, string:find(Got, Want)).
+ 
+ pr_stacktrace_bad_arity_test() ->

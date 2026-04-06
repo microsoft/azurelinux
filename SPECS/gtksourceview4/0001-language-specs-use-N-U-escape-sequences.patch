@@ -1,0 +1,496 @@
+From 2bc0c7b0aebbeee7eee00d8fcf6f5da2cd446cc9 Mon Sep 17 00:00:00 2001
+From: Christian Hergert <chergert@redhat.com>
+Date: Thu, 15 Jul 2021 16:18:26 -0700
+Subject: [PATCH] language-specs: use \N{U+} escape sequences
+
+We seem to be having problems with \x{} on PCRE2 for reasons that are
+still illusive. This works around the problem by using the \N{U+val}
+style which appears to fix the issue.
+
+The best I've come across is possible compilation settings in PCRE2
+related to how these escape sequences work.
+
+Fixes #202
+---
+ data/language-specs/css.lang                           | 10 +++++-----
+ data/language-specs/def.lang                           |  8 ++++----
+ data/language-specs/groovy.lang                        |  2 +-
+ data/language-specs/html.lang                          |  4 ++--
+ data/language-specs/j.lang                             |  2 +-
+ data/language-specs/javascript-expressions.lang        |  2 +-
+ data/language-specs/javascript-functions-classes.lang  |  2 +-
+ data/language-specs/javascript-literals.lang           |  2 +-
+ data/language-specs/javascript-modules.lang            |  2 +-
+ data/language-specs/javascript-statements.lang         |  2 +-
+ data/language-specs/javascript-values.lang             |  2 +-
+ data/language-specs/javascript.lang                    |  8 ++++----
+ data/language-specs/jsdoc.lang                         |  2 +-
+ data/language-specs/jsx.lang                           |  2 +-
+ data/language-specs/less.lang                          |  2 +-
+ data/language-specs/objj.lang                          |  2 +-
+ data/language-specs/php.lang                           |  2 +-
+ data/language-specs/scss.lang                          |  2 +-
+ data/language-specs/typescript-js-expressions.lang     |  2 +-
+ .../typescript-js-functions-classes.lang               |  2 +-
+ data/language-specs/typescript-js-literals.lang        |  2 +-
+ data/language-specs/typescript-js-modules.lang         |  2 +-
+ data/language-specs/typescript-js-statements.lang      |  2 +-
+ data/language-specs/typescript-jsx.lang                |  2 +-
+ data/language-specs/typescript-type-expressions.lang   |  2 +-
+ data/language-specs/typescript-type-generics.lang      |  2 +-
+ data/language-specs/typescript-type-literals.lang      |  2 +-
+ data/language-specs/typescript.lang                    |  2 +-
+ 28 files changed, 39 insertions(+), 39 deletions(-)
+
+diff --git a/data/language-specs/css.lang b/data/language-specs/css.lang
+index 7d49cfbc..e9c9369d 100644
+--- a/data/language-specs/css.lang
++++ b/data/language-specs/css.lang
+@@ -97,7 +97,7 @@
+   <default-regex-options case-sensitive="false"/>
+ 
+   <!-- from keyword-code-point -->
+-  <keyword-char-class>[^\x{0}-\x{2C}\x{2E}\x{2F}\x{3A}-\x{40}\x{5B}\x{5D}\x{5E}\x{60}\x{7B}-\x{7F}]</keyword-char-class>
++  <keyword-char-class>[^\N{U+0}-\N{U+2C}\N{U+2E}\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}\N{U+5D}\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]</keyword-char-class>
+ 
+   <definitions>
+ 
+@@ -136,7 +136,7 @@
+     U+0080-       Non-ASCII
+     -->
+     <define-regex id="identifier-start-code-point" extended="true">
+-      [^\x{0}-\x{40}\x{5B}-\x{5E}\x{60}\x{7B}-\x{7F}]
++      [^\N{U+0}-\N{U+40}\N{U+5B}-\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]
+     </define-regex>
+ 
+     <!--
+@@ -151,7 +151,7 @@
+     U+0080-       Non-ASCII
+     -->
+     <define-regex id="identifier-code-point" extended="true">
+-      [^\x{0}-\x{2C}\x{2E}\x{2F}\x{3A}-\x{40}\x{5B}-\x{5E}\x{60}\x{7B}-\x{7F}]
++      [^\N{U+0}-\N{U+2C}\N{U+2E}\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}-\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]
+     </define-regex>
+ 
+     <!--
+@@ -165,7 +165,7 @@
+     U+0080-       Non-ASCII
+     -->
+     <define-regex id="identifier-prefix-code-point" extended="true">
+-      [^\x{0}-\x{2F}\x{3A}-\x{40}\x{5B}-\x{5E}\x{60}\x{7B}-\x{7F}]
++      [^\N{U+0}-\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}-\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]
+     </define-regex>
+ 
+     <!--
+@@ -181,7 +181,7 @@
+     U+0080-       Non-ASCII
+     -->
+     <define-regex id="keyword-code-point" extended="true">
+-      [^\x{0}-\x{2C}\x{2E}\x{2F}\x{3A}-\x{40}\x{5B}\x{5D}\x{5E}\x{60}\x{7B}-\x{7F}]
++      [^\N{U+0}-\N{U+2C}\N{U+2E}\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}\N{U+5D}\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]
+     </define-regex>
+ 
+     <!--
+diff --git a/data/language-specs/def.lang b/data/language-specs/def.lang
+index 5f92b938..a929b8fa 100644
+--- a/data/language-specs/def.lang
++++ b/data/language-specs/def.lang
+@@ -168,17 +168,17 @@
+          ID_Start and ID_Continue
+     -->
+     <define-regex id="unicode-id-start" extended="true">
+-      (?!\x{2E2F}) [\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}]
++      (?!\N{U+2E2F}) [\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}]
+     </define-regex>
+     <define-regex id="unicode-id-continue" extended="true">
+-      (?!\x{2E2F}) [\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}]
++      (?!\N{U+2E2F}) [\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}]
+     </define-regex>
+     <define-regex id="unicode-xid-start" extended="true">
+-      (?![\x{037A}\x{0E33}\x{0EB3}\x{309B}-\x{309C}\x{FC5E}-\x{FC63}\x{FDFA}-\x{FDFB}\x{FE70}\x{FE72}\x{FE74}\x{FE76}\x{FE78}\x{FE7A}\x{FE7C}\x{FE7E}\x{FF9E}-\x{FF9F}])
++      (?![\N{U+037A}\N{U+0E33}\N{U+0EB3}\N{U+309B}-\N{U+309C}\N{U+FC5E}-\N{U+FC63}\N{U+FDFA}-\N{U+FDFB}\N{U+FE70}\N{U+FE72}\N{U+FE74}\N{U+FE76}\N{U+FE78}\N{U+FE7A}\N{U+FE7C}\N{U+FE7E}\N{U+FF9E}-\N{U+FF9F}])
+       \%{unicode-id-start}
+     </define-regex>
+     <define-regex id="unicode-xid-continue" extended="true">
+-      (?![\x{037A}\x{309B}-\x{309C}\x{FC5E}-\x{FC63}\x{FDFA}-\x{FDFB}\x{FE70}\x{FE72}\x{FE74}\x{FE76}\x{FE78}\x{FE7A}\x{FE7C}\x{FE7E}])
++      (?![\N{U+037A}\N{U+309B}-\N{U+309C}\N{U+FC5E}-\N{U+FC63}\N{U+FDFA}-\N{U+FDFB}\N{U+FE70}\N{U+FE72}\N{U+FE74}\N{U+FE76}\N{U+FE78}\N{U+FE7A}\N{U+FE7C}\N{U+FE7E}])
+       \%{unicode-id-continue}
+     </define-regex>
+ 
+diff --git a/data/language-specs/groovy.lang b/data/language-specs/groovy.lang
+index 538f4d5c..a1fb9c24 100644
+--- a/data/language-specs/groovy.lang
++++ b/data/language-specs/groovy.lang
+@@ -61,7 +61,7 @@
+     </define-regex>
+ 
+     <define-regex id="letter" extended="true">
+-      [a-zA-Z\x{c0}-\x{d6}\x{d8}-\x{f6}\x{f8}-\x{ff}\x{100}-\x{fffe}_]
++      [a-zA-Z\N{U+c0}-\N{U+d6}\N{U+d8}-\N{U+f6}\N{U+f8}-\N{U+ff}\N{U+100}-\N{U+fffe}_]
+     </define-regex>
+ 
+     <context id="escaped-character">
+diff --git a/data/language-specs/html.lang b/data/language-specs/html.lang
+index effd373b..85c0864a 100644
+--- a/data/language-specs/html.lang
++++ b/data/language-specs/html.lang
+@@ -267,7 +267,7 @@
+     </context>
+ 
+     <!-- See https://gitlab.gnome.org/GNOME/gtksourceview/commit/5385eb27720875bc144d54ccbd00d1613c41f7e0 -->
+-    <define-regex id="attribute-name">[^\x00\t\n\f\r "'/&lt;=&gt;\x{007F}-\x{009F}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}\x{10FFFE}\x{10FFFF}]+</define-regex>
++    <define-regex id="attribute-name">[^\N{U+00}\t\n\f\r "'/&lt;=&gt;\N{U+007F}-\N{U+009F}\N{U+FDD0}-\N{U+FDEF}\N{U+FFFE}\N{U+FFFF}\N{U+1FFFE}\N{U+1FFFF}\N{U+2FFFE}\N{U+2FFFF}\N{U+3FFFE}\N{U+3FFFF}\N{U+4FFFE}\N{U+4FFFF}\N{U+5FFFE}\N{U+5FFFF}\N{U+6FFFE}\N{U+6FFFF}\N{U+7FFFE}\N{U+7FFFF}\N{U+8FFFE}\N{U+8FFFF}\N{U+9FFFE}\N{U+9FFFF}\N{U+AFFFE}\N{U+AFFFF}\N{U+BFFFE}\N{U+BFFFF}\N{U+CFFFE}\N{U+CFFFF}\N{U+DFFFE}\N{U+DFFFF}\N{U+EFFFE}\N{U+EFFFF}\N{U+FFFFE}\N{U+FFFFF}\N{U+10FFFE}\N{U+10FFFF}]+</define-regex>
+ 
+     <context id="generic-tag">
+       <include>
+@@ -382,7 +382,7 @@
+ 
+     <context id="tag" class="no-spell-check">
+       <!-- See https://gitlab.gnome.org/GNOME/gtksourceview/commit/5385eb27720875bc144d54ccbd00d1613c41f7e0 -->
+-      <start>&lt;/?[a-z][^\x00\t\n\f\r /&gt;\x{007F}-\x{009F}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}\x{10FFFE}\x{10FFFF}]*</start>
++      <start>&lt;/?[a-z][^\N{U+00}\t\n\f\r /&gt;\N{U+007F}-\N{U+009F}\N{U+FDD0}-\N{U+FDEF}\N{U+FFFE}\N{U+FFFF}\N{U+1FFFE}\N{U+1FFFF}\N{U+2FFFE}\N{U+2FFFF}\N{U+3FFFE}\N{U+3FFFF}\N{U+4FFFE}\N{U+4FFFF}\N{U+5FFFE}\N{U+5FFFF}\N{U+6FFFE}\N{U+6FFFF}\N{U+7FFFE}\N{U+7FFFF}\N{U+8FFFE}\N{U+8FFFF}\N{U+9FFFE}\N{U+9FFFF}\N{U+AFFFE}\N{U+AFFFF}\N{U+BFFFE}\N{U+BFFFF}\N{U+CFFFE}\N{U+CFFFF}\N{U+DFFFE}\N{U+DFFFF}\N{U+EFFFE}\N{U+EFFFF}\N{U+FFFFE}\N{U+FFFFF}\N{U+10FFFE}\N{U+10FFFF}]*</start>
+       <end>/?&gt;</end>
+       <include>
+         <context sub-pattern="0" where="start" style-ref="tag"/>
+diff --git a/data/language-specs/j.lang b/data/language-specs/j.lang
+index 44d3b5e8..34c8910d 100644
+--- a/data/language-specs/j.lang
++++ b/data/language-specs/j.lang
+@@ -189,7 +189,7 @@
+ 
+     <!-- Lab text definition -->
+     <context id="labtext" style-ref="labtext">
+-      <start>^\s*[\x{2500}|-]{2,}</start>
++      <start>^\s*[\N{U+2500}|-]{2,}</start>
+       <end>\%{close-expdef}</end>
+     </context>
+ 
+diff --git a/data/language-specs/javascript-expressions.lang b/data/language-specs/javascript-expressions.lang
+index 3b3cc350..9ddaf129 100644
+--- a/data/language-specs/javascript-expressions.lang
++++ b/data/language-specs/javascript-expressions.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-expr" name="JavaScript Expressions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript-functions-classes.lang b/data/language-specs/javascript-functions-classes.lang
+index 94f872db..5a056bae 100644
+--- a/data/language-specs/javascript-functions-classes.lang
++++ b/data/language-specs/javascript-functions-classes.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-fn" name="JavaScript Functions and Classes" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript-literals.lang b/data/language-specs/javascript-literals.lang
+index bccbbc9c..6bc58701 100644
+--- a/data/language-specs/javascript-literals.lang
++++ b/data/language-specs/javascript-literals.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-lit" name="JavaScript Literals" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript-modules.lang b/data/language-specs/javascript-modules.lang
+index df5a37c2..5a8802c3 100644
+--- a/data/language-specs/javascript-modules.lang
++++ b/data/language-specs/javascript-modules.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-mod" name="JavaScript Modules" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript-statements.lang b/data/language-specs/javascript-statements.lang
+index ab0359f4..b9c48af4 100644
+--- a/data/language-specs/javascript-statements.lang
++++ b/data/language-specs/javascript-statements.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-st" name="JavaScript Statements" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript-values.lang b/data/language-specs/javascript-values.lang
+index a5af679b..2431e4b5 100644
+--- a/data/language-specs/javascript-values.lang
++++ b/data/language-specs/javascript-values.lang
+@@ -26,7 +26,7 @@
+ -->
+ <language id="js-val" name="JavaScript Built-in Values" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/javascript.lang b/data/language-specs/javascript.lang
+index ecbfed1a..1392b382 100644
+--- a/data/language-specs/javascript.lang
++++ b/data/language-specs/javascript.lang
+@@ -120,7 +120,7 @@
+   </styles>
+ 
+   <!-- from identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+@@ -205,7 +205,7 @@
+          U+200D Zero-width joiner <ZWJ>
+     -->
+     <define-regex id="identifier-char" extended="true">
+-      \%{def:unicode-id-continue} | [$\x{200C}\x{200D}]
++      \%{def:unicode-id-continue} | [$\N{U+200C}\N{U+200D}]
+     </define-regex> <!-- /identifier-char -->
+ 
+     <!-- <IdentifierPart> -->
+@@ -244,7 +244,7 @@
+          Zs Space_Separator category <USP>
+     -->
+     <define-regex id="whitespace" extended="true">
+-      [\t\x{000B}\f \x{00A0}\x{FEFF}\p{Zs}]
++      [\t\N{U+000B}\f \N{U+00A0}\N{U+FEFF}\p{Zs}]
+     </define-regex> <!-- /whitespace -->
+ 
+     <!-- includes characters from <LineTerminator>,
+@@ -257,7 +257,7 @@
+          U+2029 Paragraph separator <PS>
+     -->
+     <define-regex id="not-whitespace" extended="true">
+-      [^\t\x{000B}\f \x{00A0}\x{FEFF}\p{Zs}\n\r\x{2028}\x{2029}]
++      [^\t\N{U+000B}\f \N{U+00A0}\N{U+FEFF}\p{Zs}\n\r\N{U+2028}\N{U+2029}]
+     </define-regex> <!-- /not-whitespace -->
+ 
+     <define-regex id="before-next-token" extended="true">
+diff --git a/data/language-specs/jsdoc.lang b/data/language-specs/jsdoc.lang
+index 9b011b26..bad98882 100644
+--- a/data/language-specs/jsdoc.lang
++++ b/data/language-specs/jsdoc.lang
+@@ -35,7 +35,7 @@
+   </styles>
+ 
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/jsx.lang b/data/language-specs/jsx.lang
+index b493ce52..5c5a8cb9 100644
+--- a/data/language-specs/jsx.lang
++++ b/data/language-specs/jsx.lang
+@@ -37,7 +37,7 @@
+   </styles>
+ 
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/less.lang b/data/language-specs/less.lang
+index 3fdb955a..7509ddbb 100644
+--- a/data/language-specs/less.lang
++++ b/data/language-specs/less.lang
+@@ -56,7 +56,7 @@
+   <default-regex-options case-sensitive="false"/>
+ 
+   <!-- from css:keyword-code-point -->
+-  <keyword-char-class>[^\x{0}-\x{2C}\x{2E}\x{2F}\x{3A}-\x{40}\x{5B}\x{5D}\x{5E}\x{60}\x{7B}-\x{7F}]</keyword-char-class>
++  <keyword-char-class>[^\N{U+0}-\N{U+2C}\N{U+2E}\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}\N{U+5D}\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/objj.lang b/data/language-specs/objj.lang
+index 7b4cb79f..505552ca 100644
+--- a/data/language-specs/objj.lang
++++ b/data/language-specs/objj.lang
+@@ -37,7 +37,7 @@
+   </styles>
+ 
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/php.lang b/data/language-specs/php.lang
+index 15b3008f..11c45381 100644
+--- a/data/language-specs/php.lang
++++ b/data/language-specs/php.lang
+@@ -58,7 +58,7 @@
+ 
+   <definitions>
+ 
+-    <define-regex id="identifier">[a-zA-Z_\x{80}-\x{10ffff}][a-zA-Z0-9_\x{80}-\x{10ffff}]*</define-regex>
++    <define-regex id="identifier">[a-zA-Z_\N{U+80}-\N{U+10ffff}][a-zA-Z0-9_\N{U+80}-\N{U+10ffff}]*</define-regex>
+ 
+     <context id="bash-line-comment" style-ref="comment" end-at-line-end="true" extend-parent="false" class="comment" class-disabled="no-spell-check">
+       <start>#</start>
+diff --git a/data/language-specs/scss.lang b/data/language-specs/scss.lang
+index 41458eed..acfbafb5 100644
+--- a/data/language-specs/scss.lang
++++ b/data/language-specs/scss.lang
+@@ -59,7 +59,7 @@
+   <default-regex-options case-sensitive="false"/>
+ 
+   <!-- from css:keyword-code-point -->
+-  <keyword-char-class>[^\x{0}-\x{2C}\x{2E}\x{2F}\x{3A}-\x{40}\x{5B}\x{5D}\x{5E}\x{60}\x{7B}-\x{7F}]</keyword-char-class>
++  <keyword-char-class>[^\N{U+0}-\N{U+2C}\N{U+2E}\N{U+2F}\N{U+3A}-\N{U+40}\N{U+5B}\N{U+5D}\N{U+5E}\N{U+60}\N{U+7B}-\N{U+7F}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-js-expressions.lang b/data/language-specs/typescript-js-expressions.lang
+index b4926f5b..fb3ea24b 100644
+--- a/data/language-specs/typescript-js-expressions.lang
++++ b/data/language-specs/typescript-js-expressions.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-js-expr" name="TypeScript JavaScript Expression Additions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-js-functions-classes.lang b/data/language-specs/typescript-js-functions-classes.lang
+index 7db4b7d6..bc3be7aa 100644
+--- a/data/language-specs/typescript-js-functions-classes.lang
++++ b/data/language-specs/typescript-js-functions-classes.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-js-fn" name="TypeScript JavaScript Function and Class Additions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-js-literals.lang b/data/language-specs/typescript-js-literals.lang
+index fb6787b3..cdd1279c 100644
+--- a/data/language-specs/typescript-js-literals.lang
++++ b/data/language-specs/typescript-js-literals.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-js-lit" name="TypeScript JavaScript Literal Additions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-js-modules.lang b/data/language-specs/typescript-js-modules.lang
+index 6512e88c..04322d2e 100644
+--- a/data/language-specs/typescript-js-modules.lang
++++ b/data/language-specs/typescript-js-modules.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-js-mod" name="TypeScript JavaScript Module Additions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-js-statements.lang b/data/language-specs/typescript-js-statements.lang
+index 6ce34025..84785b32 100644
+--- a/data/language-specs/typescript-js-statements.lang
++++ b/data/language-specs/typescript-js-statements.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-js-st" name="TypeScript JavaScript Statement Additions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-jsx.lang b/data/language-specs/typescript-jsx.lang
+index d24b6b1e..cb73366e 100644
+--- a/data/language-specs/typescript-jsx.lang
++++ b/data/language-specs/typescript-jsx.lang
+@@ -30,7 +30,7 @@
+   </metadata>
+ 
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-type-expressions.lang b/data/language-specs/typescript-type-expressions.lang
+index dccd11a5..6b837b41 100644
+--- a/data/language-specs/typescript-type-expressions.lang
++++ b/data/language-specs/typescript-type-expressions.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-type-expr" name="TypeScript Type Expressions" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-type-generics.lang b/data/language-specs/typescript-type-generics.lang
+index 4d3a0ff5..a454ffa1 100644
+--- a/data/language-specs/typescript-type-generics.lang
++++ b/data/language-specs/typescript-type-generics.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-type-gen" name="TypeScript Type Generics" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript-type-literals.lang b/data/language-specs/typescript-type-literals.lang
+index 13ee07ab..328740e1 100644
+--- a/data/language-specs/typescript-type-literals.lang
++++ b/data/language-specs/typescript-type-literals.lang
+@@ -22,7 +22,7 @@
+ -->
+ <language id="typescript-type-lit" name="TypeScript Type Literals" version="2.0" _section="Script" hidden="true">
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+diff --git a/data/language-specs/typescript.lang b/data/language-specs/typescript.lang
+index 22e197af..f6ce88d0 100644
+--- a/data/language-specs/typescript.lang
++++ b/data/language-specs/typescript.lang
+@@ -88,7 +88,7 @@
+   </styles>
+ 
+   <!-- from js:identifier-char -->
+-  <keyword-char-class>(?!\x{2E2F})[\p{L}\p{Nl}\x{1885}-\x{1886}\x{2118}\x{212E}\x{309B}-\x{309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{00B7}\x{0387}\x{1369}-\x{1371}\x{19DA}$\x{200C}\x{200D}]</keyword-char-class>
++  <keyword-char-class>(?!\N{U+2E2F})[\p{L}\p{Nl}\N{U+1885}-\N{U+1886}\N{U+2118}\N{U+212E}\N{U+309B}-\N{U+309C}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\N{U+00B7}\N{U+0387}\N{U+1369}-\N{U+1371}\N{U+19DA}$\N{U+200C}\N{U+200D}]</keyword-char-class>
+ 
+   <definitions>
+ 
+-- 
+2.37.1
+

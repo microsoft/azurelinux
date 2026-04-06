@@ -1,0 +1,30 @@
+--- gimli-0.32.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gimli-0.32.3/Cargo.toml	2025-11-04T17:40:04.346147+00:00
+@@ -64,10 +64,6 @@
+     "endian-reader",
+ ]
+ read-core = []
+-rustc-dep-of-std = [
+-    "dep:core",
+-    "dep:alloc",
+-]
+ std = [
+     "fallible-iterator?/std",
+     "stable_deref_trait?/std",
+@@ -77,16 +73,6 @@
+ [lib]
+ name = "gimli"
+ path = "src/lib.rs"
+-
+-[dependencies.alloc]
+-version = "1.0.0"
+-optional = true
+-package = "rustc-std-workspace-alloc"
+-
+-[dependencies.core]
+-version = "1.0.0"
+-optional = true
+-package = "rustc-std-workspace-core"
+ 
+ [dependencies.fallible-iterator]
+ version = "0.3.0"

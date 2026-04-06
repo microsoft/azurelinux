@@ -1,0 +1,26 @@
+From 97b2ceb3544c035459341278d45cef2e44c21c7b Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 13 Mar 2013 13:36:26 +0100
+Subject: [PATCH 2/2] Fix MSHARED-279
+
+See: https://issues.apache.org/jira/browse/MSHARED-279
+---
+ .../java/org/apache/maven/shared/invoker/MavenCommandLineBuilder.java   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main/java/org/apache/maven/shared/invoker/MavenCommandLineBuilder.java b/src/main/java/org/apache/maven/shared/invoker/MavenCommandLineBuilder.java
+index 35ab16b..082c988 100644
+--- a/src/main/java/org/apache/maven/shared/invoker/MavenCommandLineBuilder.java
++++ b/src/main/java/org/apache/maven/shared/invoker/MavenCommandLineBuilder.java
+@@ -478,7 +478,7 @@ public class MavenCommandLineBuilder {
+     private void setupMavenHome(InvocationRequest request) {
+         if (request.getMavenHome() != null) {
+             mavenHome = request.getMavenHome();
+-        } else if (System.getProperty("maven.home") != null) {
++        } else if ( StringUtils.isNotEmpty( System.getProperty("maven.home") ) ) {
+             mavenHome = new File(System.getProperty("maven.home"));
+         }
+ 
+-- 
+1.8.1.4
+

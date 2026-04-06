@@ -1,0 +1,11 @@
+--- v5.0_original/ncompress-5.0/compress.c	2021-02-02 09:16:16.000000000 +0100
++++ v5.0/ncompress-5.0/compress.c	2022-06-24 11:41:59.632028398 +0200
+@@ -1337,7 +1337,7 @@
+ 					boff = -(((OBUFSIZ<<3)-boff)%(n_bits<<3));
+ 					bytes_out += OBUFSIZ;
+ 
+-					memcpy(outbuf, outbuf+OBUFSIZ, (outbits>>3)+1);
++					memmove(outbuf, outbuf+OBUFSIZ, (outbits>>3)+1);
+ 					memset(outbuf+(outbits>>3)+1, '\0', OBUFSIZ);
+ 				}
+ 

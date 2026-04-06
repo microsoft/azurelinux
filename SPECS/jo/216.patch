@@ -1,0 +1,55 @@
+From f489d686068c85f88c3df07547939a785f485cc1 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 28 Apr 2025 07:39:37 -0400
+Subject: [PATCH] Update GPL-2.0-or-later license notices
+
+The FSF is now remote-only, and no longer has a physical address. Based on
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html#SEC4.
+---
+ COPYING          | 4 ++--
+ debian/copyright | 4 ++--
+ jo.c             | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/COPYING b/COPYING
+index 55a6aed..a41be98 100644
+--- a/COPYING
++++ b/COPYING
+@@ -12,8 +12,8 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ * along with this program; if not, see
++ * <https://www.gnu.org/licenses/>.
+  */
+ 
+ #--------------------------------------------------------------------
+diff --git a/debian/copyright b/debian/copyright
+index 5fb49aa..f439423 100644
+--- a/debian/copyright
++++ b/debian/copyright
+@@ -16,5 +16,5 @@ License: GPLv2
+  GNU General Public License for more details.
+  .
+  You should have received a copy of the GNU General Public License
+- along with this program; if not, write to the Free Software
+- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ along with this program; if not, see
++ <https://www.gnu.org/licenses/>.
+diff --git a/jo.c b/jo.c
+index acf21be..14b387c 100644
+--- a/jo.c
++++ b/jo.c
+@@ -28,8 +28,8 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
++ * along with this program; if not, see
++ * <https://www.gnu.org/licenses/>.
+  */
+ 
+ #define SPACER		"   "

@@ -1,0 +1,9 @@
+# Magic
+# Magic data for file(1) command.
+# Format is described in magic(files), where:
+# files is 5 on V7 and BSD, 4 on SV, and ?? in the SVID.
+
+#------------------------------------------------------------------------------
+# skiplist:  file(1) magic Cyrus skiplist DB
+#
+0	string		\241\002\213\015skiplist\ file\0\0\0	Cyrus skiplist DB
