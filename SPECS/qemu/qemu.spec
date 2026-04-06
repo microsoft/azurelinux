@@ -435,7 +435,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -448,6 +448,29 @@ Patch2:   0002-Disable-failing-tests-on-azl.patch
 Patch3:   CVE-2021-20255.patch
 Patch4:   CVE-2025-11234.patch
 Patch5:   CVE-2025-12464.patch
+Patch6:   kvm-migration-Ensure-vmstate_save-sets-errp.patch
+Patch7:   kvm-virtio-net-Add-queues-before-loading-them.patch
+Patch8:  kvm-net-Fix-announce_self.patch
+Patch9:  kvm-migration-Add-helper-to-get-target-runstate.patch
+Patch10:  kvm-qmp-cont-Only-activate-disks-if-migration-completed.patch
+Patch11:  kvm-migration-block-Make-late-block-active-the-default.patch
+Patch12:  kvm-migration-block-Apply-late-block-active-behavior-to-.patch
+Patch13:  kvm-migration-block-Fix-possible-race-with-block_inactiv.patch
+Patch14:  kvm-migration-block-Rewrite-disk-activation.patch
+Patch15:  kvm-block-Add-active-field-to-BlockDeviceInfo.patch
+Patch16:  kvm-block-Allow-inactivating-already-inactive-nodes.patch
+Patch17:  kvm-block-Inactivate-external-snapshot-overlays-when-nec.patch
+Patch18:  kvm-migration-block-active-Remove-global-active-flag.patch
+Patch19:  kvm-block-Don-t-attach-inactive-child-to-active-node.patch
+Patch20:  kvm-block-Fix-crash-on-block_resize-on-inactive-node.patch
+Patch21:  kvm-block-Add-option-to-create-inactive-nodes.patch
+Patch22:  kvm-block-Add-blockdev-set-active-QMP-command.patch
+Patch23:  kvm-block-Support-inactive-nodes-in-blk_insert_bs.patch
+Patch24:  kvm-block-export-Don-t-ignore-image-activation-error-in-.patch
+Patch25:  kvm-block-Drain-nodes-before-inactivating-them.patch
+Patch26:  kvm-block-export-Add-option-to-allow-export-of-inactive-.patch
+Patch27:  kvm-nbd-server-Support-inactive-nodes.patch
+Patch28:  kvm-migration-Fix-UAF-for-incoming-migration-on-Migratio.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3407,6 +3430,20 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Sun Apr 05 2026 Woojoong Kim <woojoongkim@microsoft.com> - 9.1.0-2
+- Add 23 QEMU patches from RHEL qemu-kvm 9.1.0-20 for KubeVirt live migration
+- Post-migration networking: fix announce_self ARP/GARP (RHEL-73891),
+  add virtio-net queues before loading during incoming migration (RHEL-69477)
+- Migration stability: fix UAF on cancelled incoming migration (RHEL-69775),
+  ensure vmstate_save sets error pointer (RHEL-67844)
+- Disk activation: add migration target runstate helper, delay disk activation
+  until migration completes, extend late-block-active to postcopy, fix race
+  with block_inactive, rewrite disk activation logic, per-node activation state
+- Block layer inactive node framework: expose active/inactive status via QMP,
+  add blockdev-set-active command, support creating/inactivating inactive nodes,
+  fix crash on block_resize of inactive node, drain I/O before inactivation,
+  support NBD export of inactive nodes for storage daemon
+
 * Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.1.0-1
 - Upgrade to QEMU 9.1.0
 - Remove CVE patches merged upstream: CVE-2023-6683, CVE-2023-6693,
