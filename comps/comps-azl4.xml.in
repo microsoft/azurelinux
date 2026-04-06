@@ -8,12 +8,13 @@
     <default>false</default>
     <uservisible>false</uservisible>
     <packagelist>
+      <packagereq type="mandatory">azurelinux-release-common</packagereq>
+      <packagereq type="mandatory">azurelinux-rpm-config</packagereq>
       <packagereq type="mandatory">bash</packagereq>
       <packagereq type="mandatory">bzip2</packagereq>
       <packagereq type="mandatory">coreutils</packagereq>
       <packagereq type="mandatory">cpio</packagereq>
       <packagereq type="mandatory">diffutils</packagereq>
-      <packagereq type="mandatory">fedora-release-common</packagereq>
       <packagereq type="mandatory">findutils</packagereq>
       <packagereq type="mandatory">gawk</packagereq>
       <packagereq type="mandatory">glibc-minimal-langpack</packagereq>
@@ -21,7 +22,6 @@
       <packagereq type="mandatory">gzip</packagereq>
       <packagereq type="mandatory">info</packagereq>
       <packagereq type="mandatory">patch</packagereq>
-      <packagereq type="mandatory">redhat-rpm-config</packagereq>
       <packagereq type="mandatory">rpm-build</packagereq>
       <packagereq type="mandatory">sed</packagereq>
       <packagereq type="mandatory">shadow-utils</packagereq>
@@ -63,8 +63,8 @@
       <packagereq type="mandatory">grubby</packagereq>
       <packagereq type="mandatory">rsync</packagereq>
       <packagereq type="mandatory">tar</packagereq>
+      <packagereq type="default">azurelinux-release-cloud</packagereq>
       <packagereq type="default">chrony</packagereq>
-      <packagereq type="default">fedora-release-cloud</packagereq>
       <packagereq type="default">systemd-oomd-defaults</packagereq>
       <packagereq type="optional">console-login-helper-messages-issuegen</packagereq>
       <packagereq type="optional">console-login-helper-messages-motdgen</packagereq>
@@ -207,7 +207,7 @@
     <!-- Intended to allow interactive installation of components that will eventually be
          used in a cloud image. -->
     <id>cloud-server-environment</id>
-    <_name>Fedora Cloud Server</_name>
+    <_name>Azure Linux Cloud Server</_name>
     <_description>A server install with components needed to run in a cloud environment.</_description>
     <display_order>3</display_order>
     <grouplist>
