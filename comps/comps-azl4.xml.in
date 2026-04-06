@@ -6625,27 +6625,6 @@
     </grouplist>
   </category>
   <langpacks>
-    <match install="LabPlot-doc-%s" name="LabPlot-doc"/>
-    <match install="aspell-%s" name="aspell"/>
-    <match install="autocorr-%s" name="autocorr"/>
-    <match install="calligra-l10n-%s" name="calligra-core"/>
-    <match install="eclipse-nls-%s" name="eclipse-platform"/>
-    <match install="firefox-langpacks" name="firefox"/>
-    <match install="gimp-help-%s" name="gimp-help"/>
-    <match install="hunspell-%s" name="hunspell"/>
-    <match install="hyphen-%s" name="hyphen"/>
-    <match install="kde-l10n-%s" name="kdelibs"/>
-    <match install="kde-i18n-%s" name="kdelibs3"/>
-    <match install="kicad-doc-%s" name="kicad-doc"/>
-    <match install="libreoffice-langpack-%s" name="libreoffice-core"/>
     <match install="man-pages-%s" name="man-pages"/>
-    <match install="moodle-%s" name="moodle"/>
-    <match install="mythes-%s" name="mythes"/>
-    <match install="nqc-doc-%s" name="nqc-doc"/>
-    <match install="qt5-qtbase-%s" name="qt5-qtbase"/>
-    <match install="sagemath-doc-%s" name="sagemath-doc"/>
-    <match install="stardict-dic-%s" name="stardict"/>
-    <match install="tagainijisho-dic-%s" name="tagainijisho-common"/>
-    <match install="tesseract-langpack-%s" name="tesseract"/>
   </langpacks>
 </comps>
