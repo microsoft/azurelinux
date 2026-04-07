@@ -904,6 +904,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-vm-utils",
+          "version": "0.7.0",
+          "downloadUrl": "https://github.com/Azure/azure-vm-utils/archive/refs/tags/v0.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azurelinux-image-tools",
           "version": "1.2.0",
           "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.2.0.tar.gz"
@@ -1219,6 +1229,16 @@
           "name": "boost",
           "version": "1.83.0",
           "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_83_0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bootengine",
+          "version": "0.0.38",
+          "downloadUrl": "https://github.com/flatcar/bootengine/archive/daf43bf9c1ca45bf1a43566c3a6f96ec0cb44a36.tar.gz"
         }
       }
     },
@@ -2079,6 +2099,26 @@
           "name": "copy-jdk-configs",
           "version": "3.7",
           "downloadUrl": "https://pagure.io/copy_jdk_configs/blob/1d18ce8b5dec47a0468136ab6cdadfb93defe2c4/f/copy_jdk_configs.lua"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coreos-cloudinit",
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/flatcar/coreos-cloudinit/archive/1c1d7f4ae6b933350d7fd36e882dda170123cccc.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coreos-init",
+          "version": "0.0.1",
+          "downloadUrl": "https://github.com/flatcar/init/archive/8bd8a82fb22bc46ea2cf7da94d58655e102ca26d/init-8bd8a82fb22bc46ea2cf7da94d58655e102ca26d.tar.gz"
         }
       }
     },
@@ -3890,8 +3930,8 @@
         "type": "other",
         "other": {
           "name": "freeipmi",
-          "version": "1.6.11",
-          "downloadUrl": "http://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.11.tar.gz"
+          "version": "1.6.17",
+          "downloadUrl": "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.17.tar.gz"
         }
       }
     },
@@ -3960,8 +4000,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "9.1.1",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-9.1.1.tar.gz"
+          "version": "10.5.0",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.0.tar.gz"
         }
       }
     },
@@ -8210,6 +8250,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-containers-preview",
+          "version": "3.27.0~preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
@@ -8301,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
+          "version": "6.12.78.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.78.2.tar.gz"
         }
       }
     },
@@ -8311,8 +8361,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
+          "version": "6.12.78.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.78.2.tar.gz"
         }
       }
     },
@@ -8371,6 +8421,16 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
+          "version": "6.6.96.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-uvm-micro",
           "version": "6.6.96.mshv1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
         }
@@ -8581,8 +8641,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
         }
       }
     },
@@ -28136,8 +28196,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },
@@ -28146,8 +28206,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.8",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+          "version": "16.1",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/16.1/shim-16.1.tar.bz2"
         }
       }
     },
@@ -28776,8 +28836,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.4",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.4.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.5.tar.gz"
         }
       }
     },
@@ -29356,8 +29416,8 @@
         "type": "other",
         "other": {
           "name": "trident",
-          "version": "0.21.0",
-          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.21.0.tar.gz"
+          "version": "0.22.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.22.0.tar.gz"
         }
       }
     },
@@ -29825,6 +29885,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "update-ssh-keys",
+          "version": "0.3.0",
+          "downloadUrl": "https://github.com/flatcar/update-ssh-keys/archive/be3ce2acc50313a6826c578e9dbb67e17085d60d.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "uuid",
           "version": "1.6.2",
           "downloadUrl": "ftp://ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz"
@@ -29916,8 +29986,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0088",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0088.tar.gz"
+          "version": "9.2.0315",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0315.tar.gz"
         }
       }
     },
