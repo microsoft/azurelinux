@@ -18,7 +18,6 @@
 	<include from="this://./components/common.xml"/>
 	<include from="this://./components/boot.xml"/>
 	<include from="this://./components/liveinstall.xml"/>
-	<include from="this://./teams/base.xml"/>
 	<include from="this://./teams/cloud/cloud.xml"/>
 	<include from="this://./teams/cloud/container.xml"/>
 	<include from="this://./teams/cloud/wsl.xml"/>
