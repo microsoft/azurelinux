@@ -1,0 +1,73 @@
+From c184ba489a432d5748c3de3ff5719ccd8194c1e5 Mon Sep 17 00:00:00 2001
+Message-ID: <c184ba489a432d5748c3de3ff5719ccd8194c1e5.1734433245.git.jdenemar@redhat.com>
+From: =?UTF-8?q?J=C3=A1n=20Tomko?= <jtomko@redhat.com>
+Date: Tue, 3 Dec 2024 12:00:08 +0100
+Subject: [PATCH] qemu: tpm: do not update profile name for transient domains
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If we do not have a persistent definition, there's no point in
+looking for it since we cannot store it.
+
+Also skip the update if the tpm device(s) in the persistent
+definition are different.
+
+This fixes the crash when starting a transient domain.
+
+https://issues.redhat.com/browse/RHEL-69774
+https://gitlab.com/libvirt/libvirt/-/issues/715
+
+Fixes: d79542eec669eb9c449bb8228179e7a87e768017
+Signed-off-by: Ján Tomko <jtomko@redhat.com>
+Reviewed-by: Jiri Denemark <jdenemar@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+(cherry picked from commit 81da7a2c2a2d490cddaaa77d3e3b36e210b38bd7)
+
+https://issues.redhat.com/browse/RHEL-71072
+
+Signed-off-by: Ján Tomko <jtomko@redhat.com>
+---
+ src/qemu/qemu_extdevice.c | 13 ++++++++++++-
+ src/qemu/qemu_tpm.c       |  2 +-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/src/qemu/qemu_extdevice.c b/src/qemu/qemu_extdevice.c
+index a6f31f9773..954cb323a4 100644
+--- a/src/qemu/qemu_extdevice.c
++++ b/src/qemu/qemu_extdevice.c
+@@ -190,7 +190,18 @@ qemuExtDevicesStart(virQEMUDriver *driver,
+ 
+     for (i = 0; i < def->ntpms; i++) {
+         virDomainTPMDef *tpm = def->tpms[i];
+-        virDomainTPMDef *persistentTPMDef = persistentDef->tpms[i];
++        virDomainTPMDef *persistentTPMDef = NULL;
++
++        if (persistentDef) {
++            /* do not try to update the profile in the persistent definition
++             * if the device does not match */
++            if (persistentDef->ntpms == def->ntpms)
++                persistentTPMDef = persistentDef->tpms[i];
++            if (persistentTPMDef &&
++                (persistentTPMDef->type != tpm->type ||
++                 persistentTPMDef->model != tpm->model))
++                persistentTPMDef = NULL;
++        }
+ 
+         if (tpm->type == VIR_DOMAIN_TPM_TYPE_EMULATOR &&
+             qemuExtTPMStart(driver, vm, tpm, persistentTPMDef,
+diff --git a/src/qemu/qemu_tpm.c b/src/qemu/qemu_tpm.c
+index f223dcb9ae..f5e0184e54 100644
+--- a/src/qemu/qemu_tpm.c
++++ b/src/qemu/qemu_tpm.c
+@@ -773,7 +773,7 @@ qemuTPMEmulatorBuildCommand(virDomainTPMDef *tpm,
+                                 incomingMigration) < 0)
+         goto error;
+ 
+-    if (run_setup && !incomingMigration &&
++    if (run_setup && !incomingMigration && persistentTPMDef &&
+         qemuTPMEmulatorUpdateProfileName(&tpm->data.emulator, persistentTPMDef,
+                                          cfg, saveDef) < 0)
+         goto error;
+-- 
+2.47.1

@@ -33,6 +33,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
 specs_file               = $(PKGBUILD_DIR)/specs.json
+rel_versions_macro_file  = $(PKGBUILD_DIR)/macros.releaseversions
 graph_file               = $(PKGBUILD_DIR)/graph.dot
 cached_file              = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file        = $(PKGBUILD_DIR)/preprocessed_graph.dot
@@ -50,6 +51,8 @@ $(call create_folder,$(rpmbuilding_logs_dir))
 parse-specs: $(specs_file)
 ##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
+##help:target:generate-versions-macros-file=Generate a macros file containing version and release macros for all specs.
+generate-versions-macros-file: $(rel_versions_macro_file)
 ##help:target:graph=Create the initial package build graph.
 workplan graph: $(graph_file)
 graph-preprocessed: $(preprocessed_file)
@@ -89,10 +92,29 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
+# Parse all SPECS in $(SPECS_DIR) and generate a release versions macros file containing macros of spec file versions and release.
+$(rel_versions_macro_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-versionsprocessor)
+	$(go-versionsprocessor) \
+		--dir $(SPECS_DIR) \
+		--dist-tag $(DIST_TAG) \
+		$(logging_command) \
+		--build-dir $(parse_working_dir) \
+		--worker-tar $(chroot_worker) \
+		--cpu-prof-file=$(PROFILE_DIR)/versionsprocessor.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/versionsprocessor.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/versionsprocessor.trace \
+		$(if $(EXTRA_MACROS_FILES),$(foreach file,$(EXTRA_MACROS_FILES),--extra-macros-file=$(file))) \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/versionsprocessor.jsonl \
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+		--output $@
+
 # Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
 # We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
 # We only parse the spec files we will actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
+$(specs_file): $(rel_versions_macro_file) $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
 		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
@@ -103,6 +125,7 @@ $(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
 		--worker-tar $(chroot_worker) \
+		--versions-macro-file $(rel_versions_macro_file) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--cpu-prof-file=$(PROFILE_DIR)/specreader.cpu.pprof \
@@ -297,7 +320,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(rel_versions_macro_file) $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -315,6 +338,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
+		--versions-macro-file="$(rel_versions_macro_file)" \
 		--build-attempts="$$(($(PACKAGE_BUILD_RETRIES)+1))" \
 		--check-attempts="$$(($(CHECK_BUILD_RETRIES)+1))" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \
