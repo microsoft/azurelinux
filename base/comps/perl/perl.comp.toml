@@ -1,4 +1,6 @@
 [components.perl]
+# Pin to the commit which upgrades perl to 5.42.2
+spec = { type = "upstream", upstream-commit = "a6fb59f96e92d928431d9892e22dfc22bd006809" }
 
 [components.perl.build]
 # Workaround: disable SystemTap/DTrace during initial distro bringup to avoid a
