@@ -81,6 +81,7 @@ replacement = "RPM_VENDOR=azurelinux"
 | `spec-prepend-lines` | Insert at start of section body | `section`, `lines` |
 | `spec-append-lines` | Insert at end of section body | `section`, `lines` |
 | `spec-search-replace` | Regex replace in spec (**last resort**) | `regex`, `replacement` |
+| `spec-remove-section` | Remove an entire section (header + body); **fails if section doesn't exist** | `section`, optionally `package` |
 | `patch-add` | Copy a patch file into sources and register it in the spec (`PatchN` or `%patchlist`) | `source`, optionally `file` |
 | `patch-remove` | Remove patch files and their spec references matching a glob | `file` |
 | `file-add` | Add a file to sources root | `file`, `source` |
@@ -91,7 +92,9 @@ replacement = "RPM_VENDOR=azurelinux"
 
 Optional fields that apply to multiple types: `section` (target spec section), `package` (target sub-package).
 
-**Up-to-date details can be found from the azldev schema command, or by inspecting [azldev.schema.json](../../external/schemas/azldev.schema.json)**.
+This table is a **quick reference, not exhaustive**. The canonical overlay documentation is upstream: https://github.com/microsoft/azure-linux-dev-tools/blob/main/docs/user/reference/config/overlays.md
+
+The schema can also be inspected locally via `azldev config generate-schema` or [azldev.schema.json](../../external/schemas/azldev.schema.json).
 
 ### Choosing the right overlay type (avoiding regex)
 
@@ -109,6 +112,9 @@ Optional fields that apply to multiple types: `section` (target spec section), `
 | Add a patch | `patch-add` (auto-registers `PatchN` or `%patchlist`) | manual `spec-add-tag` for PatchN + `file-add` |
 | Remove a patch | `patch-remove` with glob (e.g., `file = "CVE-*.patch"`) | regex to delete PatchN line + `file-remove` |
 | Target a sub-package's `%files` | `spec-append-lines` with `section = "%files"`, `package = "devel"` | regex scoped to a section |
+| Disable a build feature with bcond toggle | `build.without = ["feature"]` | regex to modify conditional |
+| Remove an entire subpackage | `spec-remove-section` (×3: `%package`, `%description`, `%files`) | commenting out or `%if 0` wrapping |
+| Disable a feature in a source config file | `file-search-replace` on the config file | `spec-search-replace` |
 
 **When regex IS appropriate:** modifying arbitrary text mid-section (e.g., changing a configure flag, replacing a variable value, removing a conditional block). Even then, always scope with `section` and `package` to limit the blast radius.
 
@@ -116,8 +122,12 @@ Optional fields that apply to multiple types: `section` (target spec section), `
 
 - **Do NOT use inline array syntax for overlays.** Write each overlay as a separate `[[components.<name>.overlays]]` block (array-of-tables), not as `overlays = [{ ... }, { ... }]`. The inline form is valid TOML but harder to read and review. Some older components in the repo use the inline style — don't copy it.
 - **No `$schema` in TOML.** `$` is invalid at the start of a bare TOML key.
-- **Scope regex overlays with `section` and `package`.** When using `spec-search-replace`, always set `section` (e.g. `"%files"`, `"%install"`) and `package` (e.g. `"foo"` for a `%files foo` section) to limit where the regex matches if possible. The `package` value is the **short sub-package suffix** as it appears after the section tag in the spec (e.g. `%files foo` → `package = "foo"`, not `package = "mypkg-foo"`). Unscoped regex overlays risk matching unintended lines elsewhere in the spec, especially after upstream updates. If the overlay targets a specific sub-package's `%files` section, both fields should be set.
+- **`spec-search-replace` cannot match section tags.** `%package`, `%description`, `%files`, and other section headers are structural elements parsed by the spec engine, not matchable text. To remove an entire subpackage, use `spec-remove-section` with `section` and `package` fields — one overlay per section type (`%package`, `%description`, `%files`).
+- **`file-search-replace` targets source files, not the spec.** It operates on files alongside the spec (Source0, Source1, etc. and loose files like build configs) — NOT on the `.spec` file itself. Use `spec-search-replace` for spec modifications.
+- **Scope regex overlays with `section` and `package`.** When using `spec-search-replace`, always set `section` (e.g. `"%files"`, `"%install"`) and `package` (e.g. `"foo"` for a `%files foo` section) to limit where the regex matches if possible. The `package` value is the **short sub-package suffix** as it appears after the section tag in the spec (e.g. `%files foo` → `package = "foo"`, not `package = "mypkg-foo"`). For specs using `-n` naming (e.g. `%package -n %{name}+foo`), use the **unexpanded macro form**: `package = "%{name}+foo"`. Unscoped regex overlays risk matching unintended lines elsewhere in the spec, especially after upstream updates. If the overlay targets a specific sub-package's `%files` section, both fields should be set.
 - **No multi-line regex.** `spec-search-replace` doesn't support `(?s)`/DOTALL. Use multiple single-line replacements.
+- **Blank lines from empty replacements break continuations.** Replacing a line's content with `''` leaves a blank line. In RPM macro heredocs with `\` continuation, this breaks the chain. Either replace with the next entry's text or use a different overlay type.
+- **Replacement string escaping differs from regex.** In TOML literal strings, regex `'\\'` matches `\` in the spec, but `'\\'` in `replacement` produces `\\` in output. Use `'\'` in replacement to get `\`.
 - **No backreferences in `spec-search-replace`.** `${1}` or `$1` in `replacement` is literal text, not a capture group backreference. Repeat the matched text in the replacement instead.
 - **`lines` must be an array of strings.** Use `lines = ["single line"]` for single-element lists, or a multi-line array for multiple elements (not a bare string like `lines = "..."`).
     ```toml

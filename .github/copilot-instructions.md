@@ -37,6 +37,8 @@ azldev.toml                          # Root config — includes distro/ and base
 
 **TOML include hierarchy**: `azldev.toml` → `distro/distro.toml` + `base/project.toml` → `base/comps/components.toml` → `**/*.comp.toml` (stitched into single namespace).
 
+**Builder environment**: Our Koji builders run Fedora, so the `%fedora` macro IS defined during builds. Upstream Fedora specs that gate features on `%{defined fedora}` or `0%{?fedora}` will have those features **enabled** unless explicitly overridden via overlays or `build.defines`. This is the most common reason packages produce unwanted subpackages (e.g., Xen, Flatpak-specific features). When investigating unwanted build output, always check for `%fedora`-gated conditionals in the spec first.
+
 ## azldev CLI Reference
 
 Run all commands from the repo root (where `azldev.toml` lives). If the terminal's cwd has drifted, use `azldev -C /path/to/repo <command>`. Use `azldev --help` and `azldev <command> --help` for current syntax — the tool is under active development.
