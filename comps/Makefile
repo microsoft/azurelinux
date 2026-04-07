@@ -1,10 +1,7 @@
 XMLINFILES=$(wildcard *.xml.in)
 XMLFILES = $(patsubst %.xml.in,%.xml,$(XMLINFILES))
 
-all: po $(XMLFILES) sort
-
-po: $(XMLINFILES)
-	make -C po -f Makefile || exit 1
+all: $(XMLFILES) sort
 
 clean:
 	@rm -fv *~ *.xml
