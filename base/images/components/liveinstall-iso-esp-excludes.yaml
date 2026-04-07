@@ -1,0 +1,3 @@
+exclude:
+- BOOT/fb*.efi
+- fedora

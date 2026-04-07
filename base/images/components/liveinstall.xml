@@ -27,7 +27,7 @@
 	</preferences>
 	<packages type="iso" patternType="plusRecommended" profiles="LiveInstall">
 		<!-- Filter out unwanted EFI files from the embedded ESP, see rhbz#2358785 -->
-		<file name="iso-esp-excludes.yaml" target="image/exclude_files_efifatimage.yaml"/>
+		<file name="components/liveinstall-iso-esp-excludes.yaml" target="image/exclude_files_efifatimage.yaml"/>
 		<!-- The point of a live image is to install -->
 		<package name="authselect"/>
 		<package name="btrfs-progs"/>
