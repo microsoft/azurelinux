@@ -157,21 +157,6 @@
     </packagelist>
   </group>
   <group>
-    <id>container-management</id>
-    <_name>Container Management</_name>
-    <_description>Tools for managing Linux containers</_description>
-    <default>false</default>
-    <uservisible>true</uservisible>
-    <packagelist>
-      <packagereq type="default">podman</packagereq>
-      <packagereq type="optional">buildah</packagereq>
-      <packagereq type="optional">flatpak</packagereq>
-      <packagereq type="optional">flatpak-builder</packagereq>
-      <packagereq type="optional">skopeo</packagereq>
-      <packagereq type="optional">toolbox</packagereq>
-    </packagelist>
-  </group>
-  <group>
     <id>core</id>
     <_name>Core</_name>
     <_description>Smallest possible installation</_description>
@@ -381,7 +366,6 @@
     <grouplist>
       <groupid>cloud-bootloader-tools</groupid>
       <groupid>cloud-server</groupid>
-      <groupid>container-management</groupid>
       <groupid>core</groupid>
     </grouplist>
     <optionlist>
