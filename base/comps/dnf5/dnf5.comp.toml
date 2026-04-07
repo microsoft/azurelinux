@@ -5,3 +5,26 @@
 without = [
     "plugin_rhsm"
 ]
+
+# Upstream packaging of dnf5 includes compatibility symlinks
+# for microdnf and other earlier versions of dnf. We provide the
+# same for tdnf, for the benefit of earlier customers of Azure
+# Linux.
+[[components.dnf5.overlays]]
+type = "spec-add-tag"
+tag = "Provides"
+value = "tdnf = %{version}-%{release}"
+
+[[components.dnf5.overlays]]
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%{_bindir}/tdnf"
+]
+
+[[components.dnf5.overlays]]
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/tdnf"
+]
