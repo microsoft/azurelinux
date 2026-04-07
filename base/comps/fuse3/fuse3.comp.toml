@@ -1,2 +1,3 @@
+# Pin to version 3.16.2. Version 3.17.x updates the soname and would break packages that depend on fuse3-libs
 [components.fuse3]
-spec = { type = "upstream", upstream-name = "fuse3", upstream-distro = { name = "fedora", version = "42" } }
+spec = { type = "upstream", upstream-commit = "f718bab813a887de21faa4a63ee1167c53348641" }
