@@ -29,7 +29,44 @@
 		<!-- Filter out unwanted EFI files from the embedded ESP, see rhbz#2358785 -->
 		<file name="iso-esp-excludes.yaml" target="image/exclude_files_efifatimage.yaml"/>
 		<!-- The point of a live image is to install -->
-		<namedCollection name="anaconda-tools"/>
+		<package name="authselect"/>
+		<package name="btrfs-progs"/>
+		<package name="chrony"/>
+		<package name="cryptsetup"/>
+		<package name="dosfstools"/>
+		<package name="dracut-network"/>
+		<package name="e2fsprogs"/>
+		<package name="efibootmgr"/>
+		<package name="exfatprogs"/>
+		<package name="firewalld"/>
+		<package name="gfs2-utils"/>
+		<package name="glibc-all-langpacks"/>
+		<package name="grub2-efi-aa64"/>
+		<package name="grub2-efi-aa64-cdboot"/>
+		<package name="grub2-efi-x64"/>
+		<package name="grub2-efi-x64-cdboot"/>
+		<package name="grub2-pc"/>
+		<package name="grub2-tools"/>
+		<package name="grub2-tools-efi"/>
+		<package name="grub2-tools-extra"/>
+		<package name="grubby"/>
+		<package name="hfsplus-tools"/>
+		<package name="iscsi-initiator-utils"/>
+		<package name="kbd-legacy"/>
+		<package name="kexec-tools"/>
+		<package name="lvm2"/>
+		<package name="mactel-boot"/>
+		<package name="mdadm"/>
+		<package name="ntfsprogs"/>
+		<package name="nvme-cli"/>
+		<package name="realmd"/>
+		<package name="shim-aa64"/>
+		<package name="shim-x64"/>
+		<package name="teamd"/>
+		<package name="xfsprogs"/>
+		<package name="device-mapper-multipath"/>
+		<package name="fcoe-utils"/>
+		<package name="sdubby"/>
 		<package name="anaconda-install-env-deps"/>
 		<package name="anaconda-live"/>
 		<!-- Need this for SVG release note images -->
