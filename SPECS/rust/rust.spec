@@ -51,9 +51,11 @@ Patch6:         CVE-2025-4207.patch
 Patch7:         CVE-2025-12818.patch
 Patch8:         CVE-2026-24116.patch
 Patch9:         CVE-2025-58160.patch
-Patch10:        CVE-2026-2006.patch
-Patch11:        CVE-2026-33056.patch
-Patch12:        CVE-2026-33055.patch
+Patch10:        CVE-2026-25541.patch
+Patch11:        CVE-2026-25727.patch
+Patch12:        CVE-2026-2006.patch
+Patch13:        CVE-2026-33056.patch
+Patch14:        CVE-2026-33055.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
