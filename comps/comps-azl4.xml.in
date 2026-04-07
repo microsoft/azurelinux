@@ -127,65 +127,6 @@
     </packagelist>
   </group>
   <group>
-    <id>hardware-support</id>
-    <_name>Hardware Support</_name>
-    <_description>This group is a collection of tools for various hardware specific utilities.</_description>
-    <default>false</default>
-    <uservisible>false</uservisible>
-    <packagelist>
-      <packagereq arch="x86_64" type="default">alsa-sof-firmware</packagereq>
-      <packagereq type="default">amd-gpu-firmware</packagereq>
-      <packagereq type="default">atheros-firmware</packagereq>
-      <packagereq type="default">b43-fwcutter</packagereq>
-      <packagereq type="default">b43-openfwwf</packagereq>
-      <packagereq type="default">brcmfmac-firmware</packagereq>
-      <packagereq arch="x86_64" type="default">cirrus-audio-firmware</packagereq>
-      <packagereq arch="x86_64" type="default">intel-audio-firmware</packagereq>
-      <packagereq type="default">intel-gpu-firmware</packagereq>
-      <packagereq arch="x86_64" type="default">intel-vsc-firmware</packagereq>
-      <packagereq type="default">iwlegacy-firmware</packagereq>
-      <packagereq type="default">iwlwifi-dvm-firmware</packagereq>
-      <packagereq type="default">iwlwifi-mvm-firmware</packagereq>
-      <packagereq type="default">libertas-firmware</packagereq>
-      <packagereq type="default">mt7xxx-firmware</packagereq>
-      <packagereq type="default">nvidia-gpu-firmware</packagereq>
-      <packagereq type="default">nxpwireless-firmware</packagereq>
-      <packagereq arch="aarch64" type="default">qcom-firmware</packagereq>
-      <packagereq type="default">qcom-wwan-firmware</packagereq>
-      <packagereq arch="aarch64" type="default">qrtr</packagereq>
-      <packagereq type="default">realtek-firmware</packagereq>
-      <packagereq arch="aarch64" type="default">rmtfs</packagereq>
-      <packagereq type="default">tiwilink-firmware</packagereq>
-      <packagereq type="default">usb_modeswitch</packagereq>
-      <packagereq type="optional">acpi</packagereq>
-      <packagereq type="optional">acpitool</packagereq>
-      <packagereq type="optional">alsa-firmware</packagereq>
-      <packagereq type="optional">atmel-firmware</packagereq>
-      <packagereq arch="aarch64" type="optional">bcm283x-firmware</packagereq>
-      <packagereq arch="x86_64" type="optional">cmospwd</packagereq>
-      <packagereq type="optional">dvb-firmware</packagereq>
-      <packagereq type="optional">gpsd</packagereq>
-      <packagereq type="optional">gpsd-clients</packagereq>
-      <packagereq type="optional">hddtemp</packagereq>
-      <packagereq type="optional">hdparm</packagereq>
-      <packagereq type="optional">iscan-firmware</packagereq>
-      <packagereq type="optional">libifp</packagereq>
-      <packagereq type="optional">liquidio-firmware</packagereq>
-      <packagereq type="optional">lsscsi</packagereq>
-      <packagereq type="optional">mlxsw_spectrum-firmware</packagereq>
-      <packagereq type="optional">mrvlprestera-firmware</packagereq>
-      <packagereq type="optional">netronome-firmware</packagereq>
-      <packagereq type="optional">opensc</packagereq>
-      <packagereq type="optional">pcsc-lite</packagereq>
-      <packagereq type="optional">pcsc-lite-ccid</packagereq>
-      <packagereq type="optional">qcom-accel-firmware</packagereq>
-      <packagereq type="optional">qed-firmware</packagereq>
-      <packagereq type="optional">radeontop</packagereq>
-      <packagereq type="optional">wpan-tools</packagereq>
-      <packagereq type="optional">zd1211-firmware</packagereq>
-    </packagelist>
-  </group>
-  <group>
     <id>standard</id>
     <_name>Standard</_name>
     <_description>Common set of utilities that extend the minimal installation.</_description>
