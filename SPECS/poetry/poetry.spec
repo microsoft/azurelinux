@@ -5,12 +5,13 @@ projects, ensuring you have the right stack everywhere.}
 Summary:        Python dependency management and packaging made easy
 Name:           %{pypi_name}
 Version:        1.8.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://poetry.eustace.io/
 Source0:        https://github.com/python-poetry/poetry/archive/refs/tags/%{version}.tar.gz#/poetry-%{version}.tar.gz
+Patch0:         CVE-2026-34591.patch
 # relax some too-strict dependencies that are specified in setup.py:
 # - importlib-metadata (either removed or too old in fedora)
 # - keyring (too new in fedora, but should be compatible)
@@ -97,6 +98,9 @@ pip3 install build==1.2.1 \
 %{python3_sitelib}/%{pypi_name}-%{version}.dist-info/
 
 %changelog
+* Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.3-2
+- Patch for CVE-2026-34591
+
 * Tue Jul 02 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.3-1
 - Upgrade to version 1.8.3 and enable ptests.
 
