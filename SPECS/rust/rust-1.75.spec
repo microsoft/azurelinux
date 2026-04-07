@@ -53,6 +53,7 @@ Patch8:         CVE-2026-25727_1.75.patch
 Patch9:         CVE-2023-48795_1.75.patch
 Patch10:        CVE-2026-33056_1.75.patch
 Patch11:        CVE-2026-33055_1.75.patch
+Patch12:        CVE-2026-34743_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -188,7 +189,7 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-28
-- Add patch for CVE-2026-33056 & CVE-2026-33055
+- Add patch for CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
 
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.75.0-27
 - Bump to rebuild with updated glibc

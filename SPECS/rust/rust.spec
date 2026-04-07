@@ -56,6 +56,7 @@ Patch11:        CVE-2026-25727.patch
 Patch12:        CVE-2026-2006.patch
 Patch13:        CVE-2026-33056.patch
 Patch14:        CVE-2026-33055.patch
+Patch15:        CVE-2026-34743.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -194,7 +195,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %changelog
 * Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-7
-- Patch for CVE-2026-2006, CVE-2026-33056 & CVE-2026-33055
+- Patch for CVE-2026-2006, CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
 
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.90.0-6
 - Bump to rebuild with updated glibc
