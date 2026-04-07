@@ -1,0 +1,16 @@
+[components.erlang-rebar3]
+# Pin to latest f43 commit which updates to 3.27.0, fixes hex_core 0.15+ API
+# incompatibility, and includes %install/%files fixes for bootstrap mode.
+# Our snapshot (2026-02-24) predates the fix (2026-03-21).
+spec = { type = "upstream", upstream-commit = "851a2e917df6169f4e8aa2bc12dd0d69c4ff73a4" }
+
+# Re-enable bootstrap mode so rebar3 can build itself without needing the old
+# broken erlang-rebar3 3.26.0 in the build tag. The latest upstream commit
+# disabled bootstrap (since Fedora already has a working 3.27.0), but AZL
+# doesn't yet.
+# TODO: Remove this overlay once rebar3 3.27.0 is in the AZL build tag.
+[[components.erlang-rebar3.overlays]]
+description = "Enable bootstrap mode to break self-dependency on broken erlang-rebar3 3.26.0"
+type = "spec-search-replace"
+regex = '^%global bootstrap 0$'
+replacement = '%global bootstrap 1'

@@ -612,7 +612,6 @@
 [components.erlang-proper]
 [components.erlang-providers]
 [components.erlang-rebar3-gpb]
-[components.erlang-rebar3]
 [components.erlang-relx]
 [components.erlang-rpm-macros]
 [components.erlang-ssl_verify_fun]
