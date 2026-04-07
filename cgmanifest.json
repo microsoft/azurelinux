@@ -24324,7 +24324,7 @@
         "other": {
           "name": "python-pycdio",
           "version": "2.1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/73/02/e482cd03681c641aba3863216029814443c023ac772ea5c638b3ff8e699f/pycdio-2.1.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pycdio/pycdio-2.1.1.tar.gz"
         }
       }
     },
