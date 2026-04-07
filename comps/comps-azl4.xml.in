@@ -39,7 +39,6 @@
     <default>false</default>
     <uservisible>false</uservisible>
     <packagelist>
-      <packagereq arch="aarch64,x86_64" type="mandatory">efibootmgr</packagereq>
       <packagereq arch="aarch64" type="mandatory">grub2-efi-aa64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-efi-x64</packagereq>
       <packagereq arch="x86_64" type="mandatory">grub2-pc</packagereq>
@@ -48,6 +47,7 @@
       <packagereq arch="aarch64,x86_64" type="mandatory">grub2-tools-extra</packagereq>
       <packagereq arch="aarch64" type="mandatory">shim-aa64</packagereq>
       <packagereq arch="x86_64" type="mandatory">shim-x64</packagereq>
+      <packagereq arch="aarch64,x86_64" type="optional">efibootmgr</packagereq>
     </packagelist>
   </group>
   <group>
@@ -64,11 +64,11 @@
       <packagereq type="mandatory">rsync</packagereq>
       <packagereq type="mandatory">tar</packagereq>
       <packagereq type="default">chrony</packagereq>
-      <packagereq type="default">console-login-helper-messages-issuegen</packagereq>
-      <packagereq type="default">console-login-helper-messages-motdgen</packagereq>
-      <packagereq type="default">console-login-helper-messages-profile</packagereq>
       <packagereq type="default">fedora-release-cloud</packagereq>
       <packagereq type="default">systemd-oomd-defaults</packagereq>
+      <packagereq type="optional">console-login-helper-messages-issuegen</packagereq>
+      <packagereq type="optional">console-login-helper-messages-motdgen</packagereq>
+      <packagereq type="optional">console-login-helper-messages-profile</packagereq>
     </packagelist>
   </group>
   <group>
@@ -81,8 +81,6 @@
       <packagereq type="mandatory">audit</packagereq>
       <packagereq type="mandatory">bash</packagereq>
       <packagereq type="mandatory">coreutils</packagereq>
-      <packagereq type="mandatory">curl</packagereq>
-      <packagereq type="mandatory">dhcp-client</packagereq>
       <packagereq type="mandatory">dnf5</packagereq>
       <packagereq type="mandatory">e2fsprogs</packagereq>
       <packagereq type="mandatory">filesystem</packagereq>
@@ -104,8 +102,6 @@
       <packagereq type="mandatory">selinux-policy-targeted</packagereq>
       <packagereq type="mandatory">setup</packagereq>
       <packagereq type="mandatory">shadow-utils</packagereq>
-      <packagereq type="mandatory">sssd-common</packagereq>
-      <packagereq type="mandatory">sssd-kcm</packagereq>
       <packagereq type="mandatory">sudo</packagereq>
       <packagereq type="mandatory">systemd</packagereq>
       <packagereq type="mandatory">util-linux</packagereq>
@@ -113,17 +109,21 @@
       <packagereq type="default">dnf5-plugins</packagereq>
       <packagereq type="default">dracut-config-rescue</packagereq>
       <packagereq type="default">firewalld</packagereq>
-      <packagereq type="default">fwupd</packagereq>
-      <packagereq type="default">NetworkManager</packagereq>
-      <packagereq type="default">plymouth</packagereq>
-      <packagereq type="default">prefixdevname</packagereq>
       <packagereq type="default">systemd-resolved</packagereq>
-      <packagereq type="default">zram-generator-defaults</packagereq>
+      <packagereq type="optional">curl</packagereq>
+      <packagereq type="optional">dhcp-client</packagereq>
       <packagereq type="optional">dracut-config-generic</packagereq>
+      <packagereq type="optional">fwupd</packagereq>
       <packagereq type="optional">initial-setup</packagereq>
       <packagereq type="optional">initscripts</packagereq>
+      <packagereq type="optional">NetworkManager</packagereq>
+      <packagereq type="optional">plymouth</packagereq>
+      <packagereq type="optional">prefixdevname</packagereq>
+      <packagereq type="optional">sssd-common</packagereq>
+      <packagereq type="optional">sssd-kcm</packagereq>
       <packagereq arch="aarch64" type="optional">uboot-images-armv8</packagereq>
       <packagereq arch="aarch64" type="optional">uboot-tools</packagereq>
+      <packagereq type="optional">zram-generator-optionals</packagereq>
     </packagelist>
   </group>
   <group>
