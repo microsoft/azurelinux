@@ -1,4 +1,4 @@
-# Pin to 4.5.60 to be in sync with rust-clap
+# Pin to 4.6.0 to be in sync with rust-clap
 # Remove this pin once rust-clap's pin is removed
 [components.rust-clap_builder]
-spec = { type = "upstream", upstream-commit = "bdbf85f857b5f9acb11f0fe0d5cf18646372066d" }
+spec = { type = "upstream", upstream-commit = "5a94017d90c1355714ea8a665ccaebcdbe78760d" }
