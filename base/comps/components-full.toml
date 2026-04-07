@@ -990,7 +990,6 @@
 [components.golang-cloud-google-iam]
 [components.golang-cloud-google-longrunning]
 [components.golang-cloud-google-storage]
-[components.golang-cloud-google]
 [components.golang-code-cloudfoundry-bytefmt]
 [components.golang-contrib-opencensus-exporter-ocagent]
 [components.golang-dario-mergo]
